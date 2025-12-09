@@ -57,7 +57,7 @@ export function ComponentInstall({
   }
 
   const getCliCommand = (pm: string) => {
-    const registryUrl = `@cubbyui/${component}`;
+    const registryUrl = `@cubby-ui/${component}`;
     switch (pm) {
       case "npm":
         return `npx shadcn@latest add ${registryUrl}`;

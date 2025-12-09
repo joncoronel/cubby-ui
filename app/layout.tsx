@@ -80,17 +80,13 @@ export default function RootLayout({
             </div>
           </RootProvider>
         </Providers>
+        <OpenPanelComponent
+          clientId={process.env.NEXT_PUBLIC_OPENPANEL_CLIENT_ID!}
+          trackScreenViews={true}
+          apiUrl="/op/analytics"
+          cdnUrl="/op1.js"
+        />
       </body>
-      <OpenPanelComponent
-        clientId={process.env.NEXT_PUBLIC_OPENPANEL_CLIENT_ID!}
-        trackScreenViews={true}
-        apiUrl="/op/analytics"
-        cdnUrl="/op1.js"
-        // trackAttributes={true}
-        // trackOutgoingLinks={true}
-        // If you have a user id, you can pass it here to identify the user
-        // profileId={'123'}
-      />
     </html>
   );
 }

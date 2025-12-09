@@ -1,0 +1,117 @@
+---
+title: Installation
+description: How to install and configure Cubby UI in your project
+---
+
+Cubby UI uses the [shadcn CLI](https://ui.shadcn.com/docs/cli) to add components to your project. Components are copied directly into your codebase, giving you full ownership and control.
+
+## Prerequisites
+
+Before installing components, ensure your project has:
+
+- **React 19** or later
+- **Tailwind CSS 4** configured
+- **TypeScript** (recommended)
+
+## Quick Start
+
+### 1. Set up shadcn/ui
+
+If you haven't already, initialize shadcn/ui for your framework. Follow the official guide for your setup:
+
+- [Next.js](https://ui.shadcn.com/docs/installation/next)
+- [Vite](https://ui.shadcn.com/docs/installation/vite)
+- [TanStack Start](https://ui.shadcn.com/docs/installation/tanstack)
+- [Other frameworks](https://ui.shadcn.com/docs/installation)
+
+### 2. Add the Cubby UI registry
+
+Update your `components.json` to include the Cubby UI registry:
+
+<CodeBlockMDX
+  code={`{
+  "registries": {
+    "@cubby-ui": {
+      "url": "https://cubby-ui.dev/r/{name}.json"
+    }
+  }
+}`}
+  language="json"
+/>
+
+### 3. Initialize Cubby UI theme
+
+Run the init command to add Cubby UI's theme system to your project:
+
+<CodeBlockMDX code="npx shadcn@latest add @cubby-ui/init" language="bash" />
+
+This adds to your `globals.css`:
+- CSS variables for light and dark modes (using OKLCH colors)
+- Tailwind theme configuration
+
+### 4. Add components
+
+Now you can add any Cubby UI component:
+
+<CodeBlockMDX code="npx shadcn@latest add @cubby-ui/button" language="bash" />
+
+This will:
+- Copy the component source code to your project
+- Install any required dependencies
+- Set up the necessary utility functions
+
+## Adding Multiple Components
+
+Add multiple components in a single command:
+
+<CodeBlockMDX code="npx shadcn@latest add @cubby-ui/button @cubby-ui/input @cubby-ui/card" language="bash" />
+
+## What's Included in Init
+
+The init command adds the following CSS variables and utilities:
+
+**Color Variables:**
+- Background, foreground, card, popover colors
+- Primary, secondary, muted, accent colors
+- Destructive color for error states
+- Border, input, and ring colors
+- Status colors: success, warning, danger, info
+- Sidebar colors
+
+**Border Radius:**
+- `--radius` with computed variants (xs, sm, md, lg, xl)
+
+## Project Structure
+
+After adding components, your project structure will look like this:
+
+<CodeBlockMDX
+  code={`├── components/
+│   └── ui/
+│       └── cubby-ui/
+│           ├── button.tsx
+│           ├── input.tsx
+│           └── card.tsx
+├── hooks/
+│   └── cubby-ui/
+│       └── use-mobile.ts
+├── lib/
+│   └── cubby-ui/
+│       └── utils.ts
+└── components.json`}
+  language="text"
+/>
+
+The exact paths depend on your `components.json` configuration.
+
+## Manual Installation
+
+If you prefer not to use the CLI, you can manually copy component source code from the documentation and install dependencies yourself. Each component's documentation page includes the full source code and dependency list.
+
+For the theme setup, copy the CSS variables from the [Theming](/docs/getting-started/theming) guide into your `globals.css`.
+
+## Next Steps
+
+- Browse the [Components](/docs/components) to see what's available
+- Learn about [Theming](/docs/getting-started/theming) to customize the look and feel
+- Check out individual component pages for usage examples

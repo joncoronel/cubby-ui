@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "pagination",
+  "type": "registry:ui",
+  "title": "Pagination",
+  "description": "A pagination component.",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "@cubby-ui/button"
+  ],
+  "files": [
+    {
+      "path": "registry/default/pagination/pagination.tsx",
+      "content": "import * as React from \"react\";\r\nimport {\r\n  ChevronLeftIcon,\r\n  ChevronRightIcon,\r\n  MoreHorizontalIcon,\r\n} from \"lucide-react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport { Button, buttonVariants } from \"@/registry/default/button/button\";\r\n\r\nfunction Pagination({ className, ...props }: React.ComponentProps<\"nav\">) {\r\n  return (\r\n    <nav\r\n      role=\"navigation\"\r\n      aria-label=\"pagination\"\r\n      data-slot=\"pagination\"\r\n      className={cn(\"mx-auto flex w-full justify-center\", className)}\r\n      {...props}\r\n    />\r\n  );\r\n}\r\n\r\nfunction PaginationContent({\r\n  className,\r\n  ...props\r\n}: React.ComponentProps<\"ul\">) {\r\n  return (\r\n    <ul\r\n      data-slot=\"pagination-content\"\r\n      className={cn(\"flex flex-row items-center gap-1\", className)}\r\n      {...props}\r\n    />\r\n  );\r\n}\r\n\r\nfunction PaginationItem({ ...props }: React.ComponentProps<\"li\">) {\r\n  return <li data-slot=\"pagination-item\" {...props} />;\r\n}\r\n\r\ntype PaginationLinkProps = {\r\n  isActive?: boolean;\r\n  isDisabled?: boolean;\r\n} & Pick<React.ComponentProps<typeof Button>, \"size\"> &\r\n  React.ComponentProps<\"a\">;\r\n\r\nfunction PaginationLink({\r\n  className,\r\n  isActive,\r\n  isDisabled,\r\n  size = \"icon\",\r\n  ...props\r\n}: PaginationLinkProps) {\r\n  return (\r\n    <a\r\n      aria-current={isActive ? \"page\" : undefined}\r\n      aria-disabled={isDisabled}\r\n      data-slot=\"pagination-link\"\r\n      data-active={isActive}\r\n      data-disabled={isDisabled}\r\n      className={cn(\r\n        buttonVariants({\r\n          variant: isActive ? \"outline\" : \"ghost\",\r\n          size,\r\n        }),\r\n        isDisabled && \"pointer-events-none opacity-50\",\r\n        className,\r\n      )}\r\n      {...props}\r\n    />\r\n  );\r\n}\r\n\r\nfunction PaginationPrevious({\r\n  className,\r\n  ...props\r\n}: React.ComponentProps<typeof PaginationLink>) {\r\n  return (\r\n    <PaginationLink\r\n      aria-label=\"Go to previous page\"\r\n      size=\"default\"\r\n      className={cn(\"gap-1.5 px-3 sm:pe-4\", className)}\r\n      {...props}\r\n    >\r\n      <ChevronLeftIcon size={16} />\r\n      <span>Previous</span>\r\n    </PaginationLink>\r\n  );\r\n}\r\n\r\nfunction PaginationNext({\r\n  className,\r\n  ...props\r\n}: React.ComponentProps<typeof PaginationLink>) {\r\n  return (\r\n    <PaginationLink\r\n      aria-label=\"Go to next page\"\r\n      size=\"default\"\r\n      className={cn(\"gap-1.5 px-3 sm:ps-4\", className)}\r\n      {...props}\r\n    >\r\n      <span>Next</span>\r\n      <ChevronRightIcon size={16} />\r\n    </PaginationLink>\r\n  );\r\n}\r\n\r\nfunction PaginationEllipsis({\r\n  className,\r\n  ...props\r\n}: React.ComponentProps<\"span\">) {\r\n  return (\r\n    <span\r\n      aria-hidden\r\n      data-slot=\"pagination-ellipsis\"\r\n      className={cn(\"flex size-10 items-center justify-center\", className)}\r\n      {...props}\r\n    >\r\n      <MoreHorizontalIcon size={16} />\r\n      <span className=\"sr-only\">More pages</span>\r\n    </span>\r\n  );\r\n}\r\n\r\nexport {\r\n  Pagination,\r\n  PaginationContent,\r\n  PaginationEllipsis,\r\n  PaginationItem,\r\n  PaginationLink,\r\n  PaginationNext,\r\n  PaginationPrevious,\r\n};\r\n",
+      "type": "registry:ui",
+      "target": "components/ui/cubby-ui/pagination.tsx"
+    }
+  ]
+}

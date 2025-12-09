@@ -1,0 +1,51 @@
+---
+title: Command
+description: Fast, composable command menu for keyboard-first navigation and actions
+---
+
+import { Command, CommandInput, CommandList, CommandItem, CommandGroup, CommandEmpty } from "@/registry/default/command/command";
+
+## Preview
+
+<ComponentPreview component="command" example="command-basic-command-menu" />
+
+## Installation
+
+<ComponentInstall component="command" />
+
+## Usage
+
+<ComponentUsage component="command" />
+
+## Examples
+
+### Command Dialog
+
+Display command menu in a modal dialog.
+
+<ComponentPreview component="command" example="command-command-dialog" />
+
+### With Footer
+
+Add footer content to the command menu.
+
+<ComponentPreview component="command" example="command-with-footer" />
+
+## API Reference
+
+The Command component is built on top of [Base UI's Autocomplete](https://base-ui.com/react/components/autocomplete). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Autocomplete documentation](https://base-ui.com/react/components/autocomplete).
+
+### Custom Props
+
+#### CommandList
+
+<ApiPropsList>
+
+<ApiProp name="emptyMessage" fullType="ReactNode" simpleType="node" defaultValue='"No results found."'>
+  Custom prop not available in Base UI. Message shown when no results are found
+  in the command list.
+</ApiProp>
+
+</ApiPropsList>

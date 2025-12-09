@@ -1,0 +1,80 @@
+---
+title: Toggle
+description: Two-state button for toggling between on and off
+---
+
+import { Toggle } from "@/registry/default/toggle/toggle";
+
+## Preview
+
+<ComponentPreview component="toggle" example="toggle-basic" />
+
+## Installation
+
+<ComponentInstall component="toggle" />
+
+## Usage
+
+<ComponentUsage component="toggle" />
+
+## Examples
+
+### Different Sizes
+
+Display toggles in various sizes.
+
+<ComponentPreview component="toggle" example="toggle-different-sizes" />
+
+### With Text
+
+Include text labels within toggle buttons.
+
+<ComponentPreview component="toggle" example="toggle-with-text" />
+
+### Outline Variant
+
+Use outline styling for toggles.
+
+<ComponentPreview component="toggle" example="toggle-outline-variant" />
+
+### Controlled
+
+Manage toggle state externally.
+
+<ComponentPreview component="toggle" example="toggle-controlled" />
+
+### Disabled State
+
+Prevent interaction with disabled toggles.
+
+<ComponentPreview component="toggle" example="toggle-disabled-state" />
+
+## API Reference
+
+The Toggle component is built on top of [Base UI's Toggle](https://base-ui.com/react/components/toggle). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Toggle documentation](https://base-ui.com/react/components/toggle).
+
+### Custom Props
+
+<ApiPropsList>
+
+<ApiProp
+  name="variant"
+  fullType='"default" | "outline"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Visual style variant for the toggle button. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp
+  name="size"
+  fullType='"default" | "sm" | "lg"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Size variant for the toggle button. Custom prop not available in Base UI.
+</ApiProp>
+
+</ApiPropsList>

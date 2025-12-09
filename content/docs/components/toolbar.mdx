@@ -1,0 +1,39 @@
+---
+title: Toolbar
+description: Container for grouping related actions and controls
+---
+
+import { Toolbar, ToolbarButton, ToolbarSeparator } from "@/registry/default/toolbar/toolbar";
+
+## Preview
+
+<ComponentPreview component="toolbar" example="toolbar-basic" />
+
+## Installation
+
+<ComponentInstall component="toolbar" />
+
+## Usage
+
+<ComponentUsage component="toolbar" />
+
+## Examples
+
+### With Input
+
+Include input fields within the toolbar.
+
+<ComponentPreview component="toolbar" example="toolbar-with-input" />
+
+## API Reference
+
+The Toolbar component is built on top of [Base UI's Toolbar](https://base-ui.com/react/components/toolbar). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Toolbar documentation](https://base-ui.com/react/components/toolbar).
+
+### Modified Defaults
+
+Our implementation changes the following Base UI prop defaults on ToolbarButton:
+
+- **variant**: defaults to `"ghost"` (Base UI Button defaults to `"solid"`)
+- **size**: defaults to `"default"` (standard Base UI default, but made explicit with buttonVariants)

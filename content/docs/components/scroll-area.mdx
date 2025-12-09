@@ -1,0 +1,55 @@
+---
+title: Scroll Area
+description: Custom scrollable container with styled scrollbars
+---
+
+import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
+
+## Preview
+
+<ComponentPreview component="scroll-area" example="scroll-area-vertical-scroll" />
+
+## Installation
+
+<ComponentInstall component="scroll-area" />
+
+## Usage
+
+<ComponentUsage component="scroll-area" />
+
+## Examples
+
+### Horizontal Scroll
+
+Enable horizontal scrolling for wide content.
+
+<ComponentPreview component="scroll-area" example="scroll-area-horizontal-scroll" />
+
+### Content List
+
+Display scrollable lists of items.
+
+<ComponentPreview component="scroll-area" example="scroll-area-content-list" />
+
+### Code Block
+
+Scrollable container for code snippets.
+
+<ComponentPreview component="scroll-area" example="scroll-area-code-block" />
+
+## API Reference
+
+The ScrollArea component is built on top of [Base UI's ScrollArea](https://base-ui.com/react/components/scroll-area). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI ScrollArea documentation](https://base-ui.com/react/components/scroll-area).
+
+### Custom Props
+
+<ApiPropsList>
+
+<ApiProp name="orientation" fullType='"horizontal" | "vertical"' simpleType="string">
+  Flattened from ScrollBar for convenience. Sets the scroll direction and is
+  passed to the internal ScrollBar component.
+</ApiProp>
+
+</ApiPropsList>

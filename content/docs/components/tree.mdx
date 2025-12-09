@@ -1,0 +1,172 @@
+---
+title: Tree
+description: A hierarchical tree view component with support for selection, expansion, checkboxes, and keyboard navigation.
+---
+
+## Preview
+
+<ComponentPreview component="tree" example="tree-basic" />
+
+## Installation
+
+<ComponentInstall component="tree" />
+
+## Usage
+
+<ComponentUsage component="tree" />
+
+## Examples
+
+### Variants
+
+The Tree component supports three visual variants: `default` (minimal styling), `filled` (card-like with background), and `outline` (bordered card with shadow).
+
+<ComponentPreview component="tree" example="tree-variants" />
+
+### With Icons
+
+Add icons to tree items using the `icon` prop on TreeNode. Use `iconOpen` to show a different icon when the node is expanded (useful for folder states).
+
+<ComponentPreview component="tree" example="tree-with-icons" />
+
+### With Lines
+
+Enable visual connection lines between parent and child nodes using the `showLines` prop for better hierarchy visualization.
+
+<ComponentPreview component="tree" example="tree-with-lines" />
+
+### With Badges
+
+Display additional information using badges. Use the `badge` prop on TreeNode and render with `TreeItemBadge`.
+
+<ComponentPreview component="tree" example="tree-with-badges" />
+
+### With Checkboxes
+
+Enable bulk selection mode with `mode="multiple"`. Parent checkboxes automatically reflect child selection state.
+
+<ComponentPreview component="tree" example="tree-with-checkboxes" />
+
+### Controlled State
+
+Control expansion and selection state externally using the `expanded`/`onExpandedChange` and `selectedNode`/`onNodeSelect` props.
+
+<ComponentPreview component="tree" example="tree-controlled" />
+
+### Disabled & Loading States
+
+Disable interaction on specific nodes using the `disabled` prop. Loading states are shown automatically with a spinner icon when nodes are loading. Set `mode="none"` to create a read-only tree.
+
+<ComponentPreview component="tree" example="tree-disabled-loading" />
+
+### Async Loading
+
+Load tree children dynamically using the `onLoadChildren` callback. The Tree component automatically manages loading state and displays a spinner while fetching data. Children are cached after the first load.
+
+<ComponentPreview component="tree" example="tree-async-loading" />
+
+## API Reference
+
+The Tree component is built with [Base UI's Collapsible](https://base-ui.com/react/components/collapsible) internally for expand/collapse functionality. All Collapsible props are supported on tree nodes. The documentation below only covers custom props specific to our Tree implementation.
+
+For the complete Base UI Collapsible API, see the [Base UI Collapsible documentation](https://base-ui.com/react/components/collapsible).
+
+### Custom Props
+
+#### Tree
+
+<ApiPropsList>
+
+<ApiProp name="data" fullType="TreeNode<TData>[]" simpleType="array" required>
+  The hierarchical data structure to display. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="children" fullType="(item: TreeNode<TData>) => React.ReactElement" simpleType="function" required>
+  Render function for each node. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="selectedNode" fullType="string | null" simpleType="string">
+  Selected node ID (controlled). Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="onNodeSelect" fullType="(nodeId: string) => void" simpleType="function">
+  Callback when node is selected. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="defaultExpanded" fullType="string[]" simpleType="array" defaultValue="[]">
+  Initially expanded node IDs (uncontrolled). Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="expanded" fullType="string[]" simpleType="array">
+  Expanded node IDs (controlled). Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="onExpandedChange" fullType="(expanded: string[]) => void" simpleType="function">
+  Callback when expanded nodes change. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="checkedNodes" fullType="string[]" simpleType="array">
+  Checked node IDs for checkbox mode. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="onCheckedNodesChange" fullType="(checked: string[]) => void" simpleType="function">
+  Callback when checked nodes change. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="variant" fullType='"default" | "filled" | "outline"' simpleType="string" defaultValue='"default"'>
+  Visual style variant. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="showLines" fullType="boolean" defaultValue="false">
+  Show connecting lines between nodes. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="mode" fullType='"single" | "multiple" | "none"' simpleType="string" defaultValue='"single"'>
+  Selection mode. Custom prop not available in Base UI.
+</ApiProp>
+
+</ApiPropsList>
+
+#### TreeNode Interface
+
+The TypeScript interface defining the shape of each tree node:
+
+<ApiPropsList>
+
+<ApiProp name="id" fullType="string" required>
+  Unique identifier for the node.
+</ApiProp>
+
+<ApiProp name="name" fullType="string" required>
+  Display name for the node.
+</ApiProp>
+
+<ApiProp name="children" fullType="TreeNode[]" simpleType="array">
+  Array of child nodes.
+</ApiProp>
+
+<ApiProp name="onLoadChildren" fullType="() => Promise<TreeNode[]>" simpleType="function">
+  Async callback to load children on demand.
+</ApiProp>
+
+<ApiProp name="disabled" fullType="boolean">
+  Whether this node is disabled.
+</ApiProp>
+
+<ApiProp name="loading" fullType="boolean">
+  Whether this node is in a loading state.
+</ApiProp>
+
+<ApiProp name="icon" fullType="ReactNode" simpleType="node">
+  Icon to display for this node.
+</ApiProp>
+
+<ApiProp name="iconOpen" fullType="ReactNode" simpleType="node">
+  Alternative icon when node is expanded.
+</ApiProp>
+
+<ApiProp name="badge" fullType="ReactNode" simpleType="node">
+  Badge content to display at the end of the node.
+</ApiProp>
+
+</ApiPropsList>

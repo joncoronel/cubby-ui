@@ -1,0 +1,74 @@
+---
+title: Autocomplete
+description: Text input with intelligent suggestions and auto-completion functionality
+---
+
+import { Autocomplete } from "@/registry/default/autocomplete/autocomplete";
+
+## Preview
+
+<ComponentPreview component="autocomplete" example="autocomplete-basic" />
+
+## Installation
+
+<ComponentInstall component="autocomplete" />
+
+## Usage
+
+<ComponentUsage component="autocomplete" />
+
+## Examples
+
+### Async Loading
+
+Fetch suggestions asynchronously from an API.
+
+<ComponentPreview component="autocomplete" example="autocomplete-async" />
+
+### Auto Highlight
+
+Automatically highlight the first suggestion.
+
+<ComponentPreview component="autocomplete" example="autocomplete-auto-highlight" />
+
+### Clearable Input
+
+Add a clear button to reset the input value.
+
+<ComponentPreview component="autocomplete" example="autocomplete-clear" />
+
+### Fuzzy Search
+
+Enable fuzzy matching for more flexible searching.
+
+<ComponentPreview component="autocomplete" example="autocomplete-fuzzy" />
+
+### Grouped Options
+
+Organize suggestions into categories.
+
+<ComponentPreview component="autocomplete" example="autocomplete-grouped" />
+
+### Inline Suggestions
+
+Display suggestions inline within the input.
+
+<ComponentPreview component="autocomplete" example="autocomplete-inline" />
+
+### Limited Results
+
+Limit the number of displayed suggestions.
+
+<ComponentPreview component="autocomplete" example="autocomplete-limit" />
+
+## API Reference
+
+The Autocomplete component is built on top of [Base UI's Autocomplete](https://base-ui.com/react/components/autocomplete). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Autocomplete documentation](https://base-ui.com/react/components/autocomplete).
+
+### Modified Defaults
+
+Our implementation changes the following Base UI prop default:
+
+- **AutocompletePositioner**: `sideOffset` defaults to `6` (Base UI defaults to `0`)

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "badge",
+  "type": "registry:ui",
+  "title": "Badge",
+  "description": "A badge component.",
+  "dependencies": [
+    "class-variance-authority"
+  ],
+  "files": [
+    {
+      "path": "registry/default/badge/badge.tsx",
+      "content": "import * as React from \"react\";\r\nimport { cva, type VariantProps } from \"class-variance-authority\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\n\r\nconst badgeVariants = cva(\r\n  \"inline-flex items-center justify-center rounded-md border px-2.5 py-1 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/30 focus-visible:ring-2 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive overflow-hidden shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.06)] \",\r\n  {\r\n    variants: {\r\n      variant: {\r\n        default:\r\n          \"bg-primary border-transparent text-primary-foreground shadow-[0_1px_3px_0_oklch(0.22_0_0_/_0.12)]\",\r\n        outline: \"text-foreground bg-background border-border/60\",\r\n        secondary: \"bg-secondary border-secondary/40 text-secondary-foreground\",\r\n        success:\r\n          \"bg-success border-transparent text-success-foreground shadow-[0_1px_3px_0_oklch(0.48_0.08_140_/_0.10)]\",\r\n        warning:\r\n          \"bg-warning border-transparent text-warning-foreground shadow-[0_1px_3px_0_oklch(0.62_0.08_50_/_0.10)]\",\r\n        info: \"bg-info border-transparent text-info-foreground shadow-[0_1px_3px_0_oklch(0.48_0.08_220_/_0.10)]\",\r\n        danger:\r\n          \"bg-danger border-transparent text-danger-foreground shadow-[0_1px_3px_0_oklch(0.55_0.12_20_/_0.10)]\",\r\n      },\r\n    },\r\n    defaultVariants: {\r\n      variant: \"default\",\r\n    },\r\n  },\r\n);\r\n\r\nfunction Badge({\r\n  className,\r\n  variant,\r\n  ...props\r\n}: React.ComponentProps<\"span\"> & VariantProps<typeof badgeVariants>) {\r\n  return (\r\n    <span\r\n      data-slot=\"badge\"\r\n      className={cn(badgeVariants({ variant }), className)}\r\n      {...props}\r\n    />\r\n  );\r\n}\r\n\r\nexport { Badge, badgeVariants };\r\n",
+      "type": "registry:ui",
+      "target": "components/ui/cubby-ui/badge.tsx"
+    }
+  ]
+}

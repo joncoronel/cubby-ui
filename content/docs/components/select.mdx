@@ -1,0 +1,151 @@
+---
+title: Select
+description: Dropdown selection control for choosing from a list of options
+---
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/registry/default/select/select";
+
+## Preview
+
+<ComponentPreview component="select" example="select-basic" />
+
+## Installation
+
+<ComponentInstall component="select" />
+
+## Usage
+
+<ComponentUsage component="select" />
+
+## Examples
+
+### Controlled
+
+Manage select state externally.
+
+<ComponentPreview component="select" example="select-controlled" />
+
+### With Groups
+
+Organize options into labeled groups.
+
+<ComponentPreview component="select" example="select-with-groups" />
+
+### With Icons
+
+Add icons to select options for visual context.
+
+<ComponentPreview component="select" example="select-with-icons" />
+
+### Multiple Selection
+
+Select multiple options from the list.
+
+<ComponentPreview component="select" example="select-multiple" />
+
+### With Scroll
+
+Handle long lists with scrollable content.
+
+<ComponentPreview component="select" example="select-with-scroll" />
+
+### With Scroll Arrows
+
+Add scroll arrows for navigation through options.
+
+<ComponentPreview component="select" example="select-with-scroll-arrows" />
+
+### Align Item with Trigger
+
+Align selected item with trigger position.
+
+<ComponentPreview component="select" example="select-align-item-with-trigger" />
+
+### Object Values
+
+Use objects as values instead of primitives. The `itemToStringValue` prop converts objects to strings for form submission.
+
+<ComponentPreview component="select" example="select-object-values" />
+
+## API Reference
+
+The Select component is built on top of [Base UI's Select](https://base-ui.com/react/components/select). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Select documentation](https://base-ui.com/react/components/select).
+
+### Custom Props
+
+#### SelectValue
+
+<ApiPropsList>
+
+<ApiProp
+  name="items"
+  fullType="Record<string, string> | { label: string; value: string }[]"
+  simpleType="object | array"
+>
+  Item mapping for rendering multi-select values. Maps value keys to display labels.
+</ApiProp>
+
+<ApiProp name="placeholder" fullType="string" simpleType="string">
+  Placeholder text displayed when no value is selected.
+</ApiProp>
+
+</ApiPropsList>
+
+#### SelectTrigger
+
+<ApiPropsList>
+
+<ApiProp
+  name="size"
+  fullType="'sm' | 'default'"
+  simpleType="enum"
+  defaultValue="default"
+>
+  Size variant of the trigger button.
+</ApiProp>
+
+<ApiProp
+  name="hideChevronRotation"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Disable the chevron rotation animation when the select opens.
+</ApiProp>
+
+</ApiPropsList>
+
+#### SelectContent
+
+<ApiPropsList>
+
+<ApiProp
+  name="showScrollArrows"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Show scroll indicator arrows when content is scrollable.
+</ApiProp>
+
+<ApiProp
+  name="alignItemWithTrigger"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Align the selected item with the trigger button position.
+</ApiProp>
+
+</ApiPropsList>
+
+### Modified Defaults
+
+Our implementation changes the following Base UI prop default:
+
+- **SelectContent**: `sideOffset` defaults to `6` (Base UI defaults to `0`)

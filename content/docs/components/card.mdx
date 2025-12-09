@@ -1,0 +1,71 @@
+---
+title: Card
+description: A versatile container component with header and content areas
+---
+
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/registry/default/card/card";
+import { Button } from "@/registry/default/button/button";
+
+## Preview
+
+<ComponentPreview component="card" example="card-demo" />
+
+## Installation
+
+<ComponentInstall component="card" />
+
+## Usage
+
+<ComponentUsage component="card" />
+
+## Examples
+
+### With Footer and Action
+
+Cards can include footers with buttons and header actions.
+
+<ComponentPreview component="card" example="card-article" />
+
+### Variants
+
+The Card component supports different visual variants.
+
+<ComponentPreview component="card" example="card-variant" />
+
+## API Reference
+
+<ApiPropsList>
+
+<ApiProp
+  name="variant"
+  fullType='"default" | "inset"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Visual style variant of the card.
+</ApiProp>
+
+<ApiProp name="className" fullType="string">
+  Additional CSS classes to apply to the card.
+</ApiProp>
+
+</ApiPropsList>
+
+### Sub-components
+
+The Card component is composed of several sub-components:
+
+- **`Card`**: The main container element
+- **`CardHeader`**: Header section (optional)
+- **`CardTitle`**: Title text component
+- **`CardDescription`**: Description text component
+- **`CardAction`**: Action button container in header (optional)
+- **`CardContent`**: Main content area
+- **`CardFooter`**: Footer section (optional)

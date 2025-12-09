@@ -1,0 +1,107 @@
+---
+title: Button Group
+description: Group related buttons together for compact layouts and better organization
+---
+
+import { ButtonGroup } from "@/registry/default/button-group/button-group";
+import ButtonGroupDemo from "@/registry/examples/button-group/button-group-demo";
+import ButtonGroupOrientation from "@/registry/examples/button-group/button-group-orientation";
+import ButtonGroupSize from "@/registry/examples/button-group/button-group-size";
+import ButtonGroupNested from "@/registry/examples/button-group/button-group-nested";
+import ButtonGroupSeparatorDemo from "@/registry/examples/button-group/button-group-separator-demo";
+import ButtonGroupInput from "@/registry/examples/button-group/button-group-input";
+import ButtonGroupInputGroup from "@/registry/examples/button-group/button-group-input-group";
+import ButtonGroupDropdown from "@/registry/examples/button-group/button-group-dropdown";
+import ButtonGroupSelect from "@/registry/examples/button-group/button-group-select";
+import ButtonGroupPopover from "@/registry/examples/button-group/button-group-popover";
+
+## Preview
+
+<ComponentPreview component="button-group" example="button-group-demo">
+  <ButtonGroupDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall component="button-group" />
+
+## Usage
+
+<ComponentUsage component="button-group" />
+
+## Examples
+
+### Orientation
+
+Use the `orientation` prop to change the layout direction of the button group.
+
+<ComponentPreview component="button-group" example="button-group-orientation">
+  <ButtonGroupOrientation />
+</ComponentPreview>
+
+### Size
+
+Button groups inherit the size of their child buttons. Use different button sizes to create compact or large button groups.
+
+<ComponentPreview component="button-group" example="button-group-size">
+  <ButtonGroupSize />
+</ComponentPreview>
+
+### Nested
+
+Button groups can be nested to create more complex layouts like pagination controls.
+
+<ComponentPreview component="button-group" example="button-group-nested">
+  <ButtonGroupNested />
+</ComponentPreview>
+
+### Separator
+
+Use `ButtonGroupSeparator` to visually divide buttons within a group. The separator is not necessary if using button variants that have a border already.
+
+<ComponentPreview
+  component="button-group"
+  example="button-group-separator-demo"
+>
+  <ButtonGroupSeparatorDemo />
+</ComponentPreview>
+
+### With Input
+
+Integrate input fields directly into button groups for search bars and similar patterns.
+
+<ComponentPreview component="button-group" example="button-group-input">
+  <ButtonGroupInput />
+</ComponentPreview>
+
+### Complex Input Group
+
+Create sophisticated input layouts with nested button groups, inputs, and toggleable features.
+
+<ComponentPreview component="button-group" example="button-group-input-group">
+  <ButtonGroupInputGroup />
+</ComponentPreview>
+
+### With Dropdown
+
+Combine buttons with dropdown menus for actions that need additional options.
+
+<ComponentPreview component="button-group" example="button-group-dropdown">
+  <ButtonGroupDropdown />
+</ComponentPreview>
+
+### With Select
+
+Integrate select components for dynamic forms and input combinations.
+
+<ComponentPreview component="button-group" example="button-group-select">
+  <ButtonGroupSelect />
+</ComponentPreview>
+
+### With Popover
+
+Use popovers within button groups to provide contextual interfaces and assistants.
+
+<ComponentPreview component="button-group" example="button-group-popover">
+  <ButtonGroupPopover />
+</ComponentPreview>

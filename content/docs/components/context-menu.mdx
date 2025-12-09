@@ -1,0 +1,146 @@
+---
+title: Context Menu
+description: Right-click menu that displays contextual actions for specific elements
+---
+
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@/registry/default/context-menu/context-menu";
+
+## Preview
+
+<ComponentPreview component="context-menu" example="context-menu-basic" />
+
+## Installation
+
+<ComponentInstall component="context-menu" />
+
+## Usage
+
+<ComponentUsage component="context-menu" />
+
+## Examples
+
+### With Submenus
+
+Create nested menu structures.
+
+<ComponentPreview component="context-menu" example="context-menu-with-submenus" />
+
+### With Separators and Shortcuts
+
+Add separators and keyboard shortcuts.
+
+<ComponentPreview component="context-menu" example="context-menu-with-separators-and-shortcuts" />
+
+### With Checkboxes and Radio Groups
+
+Include checkbox and radio group menu items.
+
+<ComponentPreview component="context-menu" example="context-menu-with-checkboxes-and-radio-groups" />
+
+## API Reference
+
+### ContextMenuContent
+
+<ApiPropsList>
+
+<ApiProp
+  name="align"
+  fullType='"start" | "center" | "end"'
+  simpleType="string"
+  defaultValue='"start"'
+>
+  How to align the menu. This prop is flattened from the Positioner component for
+  convenience.
+</ApiProp>
+
+<ApiProp name="sideOffset" fullType="number" defaultValue="4">
+  Distance in pixels for positioning. This prop is flattened from the Positioner
+  component for convenience.
+</ApiProp>
+
+</ApiPropsList>
+
+### ContextMenuItem
+
+<ApiPropsList>
+
+<ApiProp name="inset" fullType="boolean">
+  Add left padding to align with items that have icons, creating consistent
+  visual alignment.
+</ApiProp>
+
+<ApiProp
+  name="variant"
+  fullType='"default" | "destructive"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Visual style variant. Use 'destructive' for dangerous actions like delete or
+  remove operations.
+</ApiProp>
+
+</ApiPropsList>
+
+### ContextMenuLabel
+
+<ApiPropsList>
+
+<ApiProp name="inset" fullType="boolean">
+  Add left padding to align with items that have icons, creating consistent
+  visual alignment.
+</ApiProp>
+
+</ApiPropsList>
+
+### ContextMenuGroupLabel
+
+<ApiPropsList>
+
+<ApiProp name="inset" fullType="boolean">
+  Add left padding to align with items that have icons, creating consistent
+  visual alignment.
+</ApiProp>
+
+</ApiPropsList>
+
+### ContextMenuSubTrigger
+
+<ApiPropsList>
+
+<ApiProp name="inset" fullType="boolean">
+  Add left padding to align with items that have icons, creating consistent
+  visual alignment.
+</ApiProp>
+
+<ApiProp name="delay" fullType="number" defaultValue="0">
+  Delay in milliseconds before opening the submenu on hover.
+</ApiProp>
+
+<ApiProp name="closeDelay" fullType="number" defaultValue="0">
+  Delay in milliseconds before closing the submenu when hovering away.
+</ApiProp>
+
+</ApiPropsList>
+
+### ContextMenuSubContent
+
+<ApiPropsList>
+
+<ApiProp name="sideOffset" fullType="number" defaultValue="0">
+  Distance in pixels for positioning the submenu relative to its trigger.
+</ApiProp>
+
+<ApiProp
+  name="align"
+  fullType='"start" | "center" | "end"'
+  simpleType="string"
+  defaultValue='"start"'
+>
+  How to align the submenu relative to its trigger.
+</ApiProp>
+
+</ApiPropsList>
+
+### Additional Props
+
+ContextMenu components inherit all props from [Base UI Context Menu](https://base-ui.com/react/components/context-menu#api-reference), including open, defaultOpen, onOpenChange, positioning options, and accessibility props.

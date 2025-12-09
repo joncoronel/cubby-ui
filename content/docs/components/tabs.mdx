@@ -1,0 +1,102 @@
+---
+title: Tabs
+description: Organize content into multiple panels with tab navigation
+---
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/registry/default/tabs/tabs";
+
+## Preview
+
+<ComponentPreview component="tabs" example="tabs-basic" />
+
+## Installation
+
+<ComponentInstall component="tabs" />
+
+## Usage
+
+<ComponentUsage component="tabs" />
+
+## Examples
+
+### Controlled
+
+Manage active tab state externally.
+
+<ComponentPreview component="tabs" example="tabs-controlled" />
+
+### Underline Variant
+
+Use underline style for tab indicators.
+
+<ComponentPreview component="tabs" example="tabs-underline-variant" />
+
+### Vertical Layout
+
+Display tabs in a vertical orientation.
+
+<ComponentPreview component="tabs" example="tabs-vertical" />
+
+### Vertical Underline
+
+Combine vertical layout with underline styling.
+
+<ComponentPreview component="tabs" example="tabs-vertical-underline" />
+
+### Vertical Underline with Sides
+
+Vertical tabs with side-positioned underlines.
+
+<ComponentPreview component="tabs" example="tabs-vertical-underline-with-sides" />
+
+## API Reference
+
+The Tabs component is built on top of [Base UI's Tabs](https://base-ui.com/react/components/tabs). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Tabs documentation](https://base-ui.com/react/components/tabs).
+
+### Custom Props
+
+#### TabsList
+
+<ApiPropsList>
+
+<ApiProp
+  name="variant"
+  fullType="'capsule' | 'underline'"
+  defaultValue="'capsule'"
+>
+  Visual style variant for the tabs list. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp
+  name="size"
+  fullType="'small' | 'medium'"
+  defaultValue="'medium'"
+>
+  Size variant for the tabs. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp
+  name="side"
+  fullType="'left' | 'right'"
+  defaultValue="'left'"
+>
+  Side positioning for vertical tab orientation. Custom prop not available in Base UI.
+</ApiProp>
+
+</ApiPropsList>
+
+#### TabsContent
+
+<ApiPropsList>
+
+<ApiProp
+  name="animate"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Enable animated transitions when switching between tabs. Custom prop not available in Base UI.
+</ApiProp>
+
+</ApiPropsList>

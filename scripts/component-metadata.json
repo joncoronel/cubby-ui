@@ -1,0 +1,500 @@
+{
+  "accordion": {
+    "title": "Accordion",
+    "description": "A accordion component.",
+    "dependencies": [
+      "@base-ui-components/react",
+      "lucide-react"
+    ],
+    "reference": []
+  },
+  "alert": {
+    "title": "Alert",
+    "description": "A alert component.",
+    "dependencies": [
+      "class-variance-authority"
+    ],
+    "reference": []
+  },
+  "alert-dialog": {
+    "title": "Alert-dialog",
+    "description": "A alert-dialog component.",
+    "dependencies": [
+      "@base-ui-components/react"
+    ],
+    "reference": []
+  },
+  "aspect-ratio": {
+    "title": "Aspect-ratio",
+    "description": "A aspect-ratio component.",
+    "dependencies": [],
+    "reference": []
+  },
+  "autocomplete": {
+    "title": "Autocomplete",
+    "description": "A autocomplete component.",
+    "dependencies": [],
+    "reference": []
+  },
+  "avatar": {
+    "title": "Avatar",
+    "description": "A avatar component.",
+    "dependencies": [
+      "@base-ui-components/react",
+      "class-variance-authority"
+    ],
+    "reference": []
+  },
+  "badge": {
+    "title": "Badge",
+    "description": "A badge component.",
+    "dependencies": [
+      "class-variance-authority"
+    ],
+    "reference": []
+  },
+  "breadcrumbs": {
+    "title": "Breadcrumbs",
+    "description": "A breadcrumbs component.",
+    "dependencies": [
+      "lucide-react"
+    ],
+    "reference": []
+  },
+  "button": {
+    "title": "Button",
+    "description": "A simple button component.",
+    "dependencies": [
+      "@base-ui-components/react",
+      "class-variance-authority"
+    ],
+    "reference": [
+      "https://base-ui-components.netlify.app/react/components/button"
+    ]
+  },
+  "button-group": {
+    "title": "Button Group",
+    "description": "A button-group component.",
+    "dependencies": [],
+    "reference": []
+  },
+  "calendar": {
+    "title": "Calendar",
+    "description": "A calendar component.",
+    "dependencies": [
+      "lucide-react",
+      "react-day-picker"
+    ],
+    "reference": []
+  },
+  "card": {
+    "title": "Card",
+    "description": "A card component.",
+    "dependencies": [],
+    "reference": []
+  },
+  "carousel": {
+    "title": "Carousel",
+    "description": "A carousel component.",
+    "dependencies": [
+      "lucide-react"
+    ],
+    "reference": []
+  },
+  "checkbox": {
+    "title": "Checkbox",
+    "description": "A checkbox component.",
+    "dependencies": [
+      "@base-ui-components/react",
+      "lucide-react"
+    ],
+    "reference": []
+  },
+  "checkbox-group": {
+    "title": "Checkbox-group",
+    "description": "A checkbox-group component.",
+    "dependencies": [
+      "@base-ui-components/react"
+    ],
+    "reference": []
+  },
+  "circular-slider": {
+    "title": "Circular Slider",
+    "description": "A circular-slider component.",
+    "dependencies": [],
+    "reference": []
+  },
+  "code-block": {
+    "title": "Code-block",
+    "description": "A code-block component.",
+    "dependencies": [
+      "@icons-pack/react-simple-icons",
+      "lucide-react",
+      "sugar-high"
+    ],
+    "reference": []
+  },
+  "collapsible": {
+    "title": "Collapsible",
+    "description": "A collapsible component.",
+    "dependencies": [
+      "@base-ui-components/react"
+    ],
+    "reference": []
+  },
+  "combobox": {
+    "title": "Combobox",
+    "description": "A combobox component.",
+    "dependencies": [
+      "lucide-react"
+    ],
+    "reference": []
+  },
+  "command": {
+    "title": "Command",
+    "description": "A command component.",
+    "dependencies": [
+      "cmdk-base",
+      "lucide-react"
+    ],
+    "reference": []
+  },
+  "context-menu": {
+    "title": "Context-menu",
+    "description": "A context-menu component.",
+    "dependencies": [
+      "@base-ui-components/react",
+      "lucide-react"
+    ],
+    "reference": []
+  },
+  "copy-button": {
+    "title": "Copy Button",
+    "description": "A copy-button component.",
+    "dependencies": [],
+    "reference": []
+  },
+  "cropper": {
+    "title": "Cropper",
+    "description": "A cropper component.",
+    "dependencies": [
+      "@origin-space/image-cropper"
+    ],
+    "reference": []
+  },
+  "date-picker": {
+    "title": "Date-picker",
+    "description": "A date-picker component.",
+    "dependencies": [
+      "dayjs",
+      "lucide-react"
+    ],
+    "reference": []
+  },
+  "date-range-picker": {
+    "title": "Date-range-picker",
+    "description": "A date-range-picker component.",
+    "dependencies": [
+      "dayjs",
+      "lucide-react",
+      "react-day-picker"
+    ],
+    "reference": []
+  },
+  "dialog": {
+    "title": "Dialog",
+    "description": "A dialog component.",
+    "dependencies": [
+      "@base-ui-components/react",
+      "lucide-react"
+    ],
+    "reference": []
+  },
+  "drawer": {
+    "title": "Drawer",
+    "description": "A drawer component.",
+    "dependencies": [
+      "vaul-base"
+    ],
+    "reference": []
+  },
+  "dropdown-menu": {
+    "title": "Dropdown-menu",
+    "description": "A dropdown-menu component.",
+    "dependencies": [
+      "@base-ui-components/react",
+      "lucide-react"
+    ],
+    "reference": []
+  },
+  "fancy-button": {
+    "title": "Fancy Button",
+    "description": "A fancy-button component.",
+    "dependencies": [],
+    "reference": []
+  },
+  "form": {
+    "title": "Form",
+    "description": "A form component.",
+    "dependencies": [
+      "@conform-to/react",
+      "@conform-to/zod",
+      "zod"
+    ],
+    "reference": []
+  },
+  "input": {
+    "title": "Input",
+    "description": "A input component.",
+    "dependencies": [
+      "@base-ui-components/react"
+    ],
+    "reference": []
+  },
+  "input-group": {
+    "title": "Input Group",
+    "description": "A input-group component.",
+    "dependencies": [],
+    "reference": []
+  },
+  "input-otp": {
+    "title": "Input-otp",
+    "description": "A input-otp component.",
+    "dependencies": [
+      "input-otp",
+      "lucide-react"
+    ],
+    "reference": []
+  },
+  "kbd": {
+    "title": "Kbd",
+    "description": "A kbd component.",
+    "dependencies": [
+      "class-variance-authority"
+    ],
+    "reference": []
+  },
+  "label": {
+    "title": "Label",
+    "description": "A label component.",
+    "dependencies": [],
+    "reference": []
+  },
+  "menubar": {
+    "title": "Menubar",
+    "description": "A menubar component.",
+    "dependencies": [
+      "@base-ui-components/react",
+      "lucide-react"
+    ],
+    "reference": []
+  },
+  "meter": {
+    "title": "Meter",
+    "description": "A meter component.",
+    "dependencies": [
+      "@base-ui-components/react",
+      "class-variance-authority"
+    ],
+    "reference": []
+  },
+  "navigation-menu": {
+    "title": "Navigation-menu",
+    "description": "A navigation-menu component.",
+    "dependencies": [
+      "@base-ui-components/react",
+      "class-variance-authority"
+    ],
+    "reference": []
+  },
+  "pagination": {
+    "title": "Pagination",
+    "description": "A pagination component.",
+    "dependencies": [],
+    "reference": []
+  },
+  "popover": {
+    "title": "Popover",
+    "description": "A popover component.",
+    "dependencies": [
+      "@base-ui-components/react"
+    ],
+    "reference": []
+  },
+  "preview-card": {
+    "title": "Preview-card",
+    "description": "A preview-card component.",
+    "dependencies": [
+      "@base-ui-components/react"
+    ],
+    "reference": []
+  },
+  "progress": {
+    "title": "Progress",
+    "description": "A progress component.",
+    "dependencies": [
+      "@base-ui-components/react",
+      "class-variance-authority"
+    ],
+    "reference": []
+  },
+  "radio-group": {
+    "title": "Radio-group",
+    "description": "A radio-group component.",
+    "dependencies": [
+      "@base-ui-components/react"
+    ],
+    "reference": []
+  },
+  "resizable": {
+    "title": "Resizable",
+    "description": "A resizable component.",
+    "dependencies": [],
+    "reference": []
+  },
+  "scroll-area": {
+    "title": "Scroll-area",
+    "description": "A scroll-area component.",
+    "dependencies": [
+      "@base-ui-components/react"
+    ],
+    "reference": []
+  },
+  "select": {
+    "title": "Select",
+    "description": "A select component.",
+    "dependencies": [
+      "@base-ui-components/react",
+      "lucide-react"
+    ],
+    "reference": []
+  },
+  "separator": {
+    "title": "Separator",
+    "description": "A separator component.",
+    "dependencies": [
+      "@base-ui-components/react"
+    ],
+    "reference": []
+  },
+  "sheet": {
+    "title": "Sheet",
+    "description": "A sheet component.",
+    "dependencies": [
+      "@base-ui-components/react",
+      "lucide-react"
+    ],
+    "reference": []
+  },
+  "sidebar": {
+    "title": "Sidebar",
+    "description": "A sidebar component.",
+    "dependencies": [
+      "@base-ui-components/react",
+      "class-variance-authority",
+      "lucide-react"
+    ],
+    "reference": []
+  },
+  "skeleton": {
+    "title": "Skeleton",
+    "description": "A skeleton component.",
+    "dependencies": [],
+    "reference": []
+  },
+  "slider": {
+    "title": "Slider",
+    "description": "A slider component.",
+    "dependencies": [
+      "@base-ui-components/react"
+    ],
+    "reference": []
+  },
+  "switch": {
+    "title": "Switch",
+    "description": "A switch component.",
+    "dependencies": [
+      "@base-ui-components/react"
+    ],
+    "reference": []
+  },
+  "table": {
+    "title": "Table",
+    "description": "A table component.",
+    "dependencies": [],
+    "reference": []
+  },
+  "tabs": {
+    "title": "Tabs",
+    "description": "A tabs component.",
+    "dependencies": [
+      "@base-ui-components/react"
+    ],
+    "reference": []
+  },
+  "textarea": {
+    "title": "Textarea",
+    "description": "A textarea component.",
+    "dependencies": [],
+    "reference": []
+  },
+  "timeline": {
+    "title": "Timeline",
+    "description": "A timeline component.",
+    "dependencies": [
+      "@base-ui-components/react"
+    ],
+    "reference": []
+  },
+  "toast": {
+    "title": "Toast",
+    "description": "A toast component.",
+    "dependencies": [
+      "@base-ui-components/react",
+      "clsx"
+    ],
+    "reference": []
+  },
+  "toggle": {
+    "title": "Toggle",
+    "description": "A toggle component.",
+    "dependencies": [
+      "@base-ui-components/react",
+      "class-variance-authority"
+    ],
+    "reference": []
+  },
+  "toggle-group": {
+    "title": "Toggle-group",
+    "description": "A toggle-group component.",
+    "dependencies": [
+      "@base-ui-components/react"
+    ],
+    "reference": []
+  },
+  "toolbar": {
+    "title": "Toolbar",
+    "description": "A toolbar component.",
+    "dependencies": [
+      "@base-ui-components/react"
+    ],
+    "reference": []
+  },
+  "tooltip": {
+    "title": "Tooltip",
+    "description": "A tooltip component.",
+    "dependencies": [
+      "@base-ui-components/react"
+    ],
+    "reference": []
+  },
+  "tree": {
+    "title": "Tree",
+    "description": "A tree component.",
+    "dependencies": [
+      "@base-ui-components/react",
+      "lucide-react"
+    ],
+    "reference": []
+  }
+}

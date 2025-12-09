@@ -1,0 +1,130 @@
+---
+title: Meter
+description: Display scalar measurements within a known range with visual indicators
+---
+
+import { Meter } from "@/registry/default/meter/meter";
+
+## Preview
+
+<ComponentPreview component="meter" example="meter-basic" />
+
+## Installation
+
+<ComponentInstall component="meter" />
+
+## Usage
+
+<ComponentUsage component="meter" />
+
+## Examples
+
+### Different Sizes
+
+Display meters in various sizes.
+
+<ComponentPreview component="meter" example="meter-different-sizes" />
+
+### With Labels
+
+Add descriptive labels to meters.
+
+<ComponentPreview component="meter" example="meter-with-labels" />
+
+### With Min and Max
+
+Define custom minimum and maximum values.
+
+<ComponentPreview component="meter" example="meter-with-min-max" />
+
+### With Optimum Range
+
+Highlight the optimal value range.
+
+<ComponentPreview component="meter" example="meter-with-optimum-range" />
+
+### With Thresholds
+
+Set thresholds for different value ranges.
+
+<ComponentPreview component="meter" example="meter-with-thresholds" />
+
+### With Segments
+
+Display segmented meter visualization.
+
+<ComponentPreview component="meter" example="meter-with-segments" />
+
+## API Reference
+
+The Meter component is built on top of [Base UI's Meter](https://base-ui.com/react/components/meter). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Meter documentation](https://base-ui.com/react/components/meter).
+
+### Custom Props
+
+#### MeterRoot
+
+<ApiPropsList>
+
+<ApiProp name="animated" fullType="boolean" defaultValue="false">
+  Custom prop not available in Base UI. Enable progress animations for the
+  meter indicator.
+</ApiProp>
+
+<ApiProp name="size" fullType='"sm" | "md" | "lg"' simpleType="string" defaultValue='"md"'>
+  Custom prop not available in Base UI. Size variant for the meter component.
+</ApiProp>
+
+<ApiProp name="low" fullType="number">
+  Low threshold value. Values below this threshold are considered low and may
+  trigger visual indicators.
+</ApiProp>
+
+<ApiProp name="high" fullType="number">
+  High threshold value. Values above this threshold are considered high and may
+  trigger visual indicators.
+</ApiProp>
+
+<ApiProp name="optimumMin" fullType="number">
+  Optimum range minimum value. Defines the lower bound of the optimal value
+  range.
+</ApiProp>
+
+<ApiProp name="optimumMax" fullType="number">
+  Optimum range maximum value. Defines the upper bound of the optimal value
+  range.
+</ApiProp>
+
+<ApiProp name="showOptimumMarkers" fullType="boolean" defaultValue="true">
+  Custom prop not available in Base UI. Whether to show visual markers for the
+  optimum range.
+</ApiProp>
+
+<ApiProp name="showThresholdColors" fullType="boolean" defaultValue="true">
+  Custom prop not available in Base UI. Whether to apply threshold-based colors
+  to the meter indicator.
+</ApiProp>
+
+</ApiPropsList>
+
+#### MeterTrack
+
+<ApiPropsList>
+
+<ApiProp name="segments" fullType="number">
+  Custom prop not available in Base UI. Number of segments to divide the track
+  into for a segmented appearance.
+</ApiProp>
+
+<ApiProp name="striped" fullType="boolean">
+  Custom prop not available in Base UI. Apply a striped background pattern to
+  the track.
+</ApiProp>
+
+<ApiProp name="gradient" fullType="boolean">
+  Custom prop not available in Base UI. Apply a gradient background to the
+  track.
+</ApiProp>
+
+</ApiPropsList>

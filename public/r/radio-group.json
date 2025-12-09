@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "radio-group",
+  "type": "registry:ui",
+  "title": "Radio-group",
+  "description": "A radio-group component.",
+  "files": [
+    {
+      "path": "registry/default/radio-group/radio-group.tsx",
+      "content": "import * as React from \"react\";\r\nimport { Radio } from \"@base-ui-components/react/radio\";\r\nimport { RadioGroup as BaseRadioGroup } from \"@base-ui-components/react/radio-group\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\n\r\nfunction RadioGroup({\r\n  className,\r\n  ...props\r\n}: React.ComponentProps<typeof BaseRadioGroup>) {\r\n  return (\r\n    <BaseRadioGroup\r\n      data-slot=\"radio-group\"\r\n      className={cn(\"grid gap-3\", className)}\r\n      {...props}\r\n    />\r\n  );\r\n}\r\n\r\nfunction RadioGroupItem({\r\n  className,\r\n  ...props\r\n}: React.ComponentProps<typeof Radio.Root>) {\r\n  return (\r\n    <Radio.Root\r\n      data-slot=\"radio-group-item\"\r\n      className={cn(\r\n        \"group relative inline-flex size-4 shrink-0 cursor-pointer items-center justify-center rounded-full\",\r\n        \"border-border/80 bg-input border-1 shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.08)]\",\r\n        \"data-checked:border-primary data-checked:bg-primary\",\r\n        \"transition-colors duration-200\",\r\n        \"focus-visible:ring-ring/30 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none\",\r\n        \"disabled:cursor-not-allowed disabled:opacity-60\",\r\n        \"aria-invalid:border-destructive\",\r\n\r\n        className,\r\n      )}\r\n      {...props}\r\n    >\r\n      <Radio.Indicator className=\"before:bg-primary-foreground before:animate-in before:zoom-in-50 flex items-center justify-center before:size-2 before:rounded-full before:duration-200\" />\r\n    </Radio.Root>\r\n  );\r\n}\r\n\r\nexport { RadioGroup, RadioGroupItem };\r\n",
+      "type": "registry:ui",
+      "target": "components/ui/cubby-ui/radio-group.tsx"
+    }
+  ]
+}

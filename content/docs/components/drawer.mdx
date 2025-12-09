@@ -1,0 +1,286 @@
+---
+title: Drawer
+description: Swipeable slide-in panel with snap points for mobile-friendly interactions
+---
+
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHandle,
+  DrawerHeader,
+  DrawerScrollArea,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/registry/default/drawer/drawer";
+
+## Preview
+
+<ComponentPreview component="drawer" example="drawer-basic" />
+
+## Installation
+
+<ComponentInstall component="drawer" />
+
+## Usage
+
+<ComponentUsage component="drawer" />
+
+## Examples
+
+### Directions
+
+Open drawer from different screen edges.
+
+<ComponentPreview component="drawer" example="drawer-directions" />
+
+### Snap Points
+
+Configure multiple snap points for the drawer to rest at different heights.
+
+<ComponentPreview component="drawer" example="drawer-snap-points" />
+
+### Pixel-Based Snap Points
+
+Use pixel values for fixed snap heights that don't depend on content size.
+
+<ComponentPreview component="drawer" example="drawer-pixel-snap-points" />
+
+### Sequential Snap Points
+
+Enable `sequentialSnap` to prevent skipping snap points during fast swipes.
+
+<ComponentPreview component="drawer" example="drawer-sequential-snap" />
+
+### Music Player
+
+A music player demonstrating progressive disclosure with snap points: mini player, expanded controls, and full queue view.
+
+<ComponentPreview component="drawer" example="drawer-music-player" />
+
+### Scrollable Content
+
+Use `DrawerScrollArea` for nested scrollable content that works seamlessly with swipe gestures.
+
+<ComponentPreview component="drawer" example="drawer-with-scroll" />
+
+### With Form
+
+Include form elements within the drawer.
+
+<ComponentPreview component="drawer" example="drawer-with-form" />
+
+## API Reference
+
+The Drawer component is built on top of [Base UI's Dialog](https://base-ui.com/react/components/dialog). All Base UI props are supported. The documentation below only covers custom props specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Dialog documentation](https://base-ui.com/react/components/dialog).
+
+### Custom Props
+
+#### Drawer (Root)
+
+<ApiPropsList>
+
+<ApiProp
+  name="direction"
+  fullType='"top" | "right" | "bottom" | "left"'
+  simpleType="string"
+  defaultValue='"bottom"'
+>
+  Which edge of the screen the drawer slides in from.
+</ApiProp>
+
+<ApiProp
+  name="snapPoints"
+  fullType="(number | `${number}px`)[]"
+  simpleType="array"
+  defaultValue="[1]"
+>
+  Array of snap points where the drawer can rest. Accepts percentages (0-1) or
+  pixel values (`"200px"`). For example, `[0.5, 1]` creates snap points at
+  half-open and fully open. Use `["200px", "400px", 1]` for fixed pixel heights.
+  Dismissing is handled separately via the `dismissible` prop.
+</ApiProp>
+
+<ApiProp
+  name="defaultSnapPoint"
+  fullType="number"
+  simpleType="number"
+  defaultValue="last index"
+>
+  Initial snap point index when the drawer opens (uncontrolled mode).
+</ApiProp>
+
+<ApiProp name="activeSnapPoint" fullType="number" simpleType="number">
+  Controlled snap point index. Use with `onSnapPointChange` for controlled mode.
+</ApiProp>
+
+<ApiProp
+  name="onSnapPointChange"
+  fullType="(snapPointIndex: number) => void"
+  simpleType="function"
+>
+  Callback fired when the active snap point changes (via swipe or
+  programmatically).
+</ApiProp>
+
+<ApiProp
+  name="dismissible"
+  fullType="boolean"
+  simpleType="boolean"
+  defaultValue="true"
+>
+  Whether the drawer can be dismissed by swiping past the lowest snap point.
+  When `true`, swiping down past the lowest snap point will close the drawer.
+</ApiProp>
+
+<ApiProp
+  name="sequentialSnap"
+  fullType="boolean"
+  simpleType="boolean"
+  defaultValue="false"
+>
+  When enabled, prevents skipping snap points during fast swipes. The drawer
+  will stop at each intermediate snap point instead of jumping directly to the
+  furthest one.
+</ApiProp>
+
+<ApiProp
+  name="easing"
+  fullType='"snappy" | "smooth" | "relaxed"'
+  simpleType="string"
+  defaultValue='"smooth"'
+>
+  Animation easing preset. `"snappy"` (200ms), `"smooth"` (300ms), or
+  `"relaxed"` (400ms).
+</ApiProp>
+
+</ApiPropsList>
+
+### Components
+
+| Component           | Description                                                 |
+| ------------------- | ----------------------------------------------------------- |
+| `Drawer`            | Root component that manages state and provides context      |
+| `DrawerTrigger`     | Button that opens the drawer                                |
+| `DrawerContent`     | Main content container with swipe gesture handling          |
+| `DrawerHandle`      | Visual drag indicator (automatically adjusts for direction) |
+| `DrawerHeader`      | Container for title and description                         |
+| `DrawerTitle`       | Accessible title element                                    |
+| `DrawerDescription` | Accessible description element                              |
+| `DrawerBody`        | Flexible content area                                       |
+| `DrawerScrollArea`  | Scrollable area that integrates with swipe gestures         |
+| `DrawerFooter`      | Container for action buttons                                |
+| `DrawerClose`       | Button that closes the drawer                               |
+
+### Nested Scrollable Content
+
+When using scrollable content inside the drawer, wrap it with `DrawerScrollArea`. This ensures:
+
+- When scrolled to top, swiping down dismisses the drawer
+- When scrolled down, swiping scrolls the content first
+- Smooth transition between content scroll and drawer swipe
+
+<CodeBlockMDX
+  code={`<DrawerContent>
+  <DrawerHandle />
+  <DrawerHeader>
+    <DrawerTitle>Long List</DrawerTitle>
+  </DrawerHeader>
+  <DrawerScrollArea>{/* Your scrollable content */}</DrawerScrollArea>
+</DrawerContent>`}
+  language="tsx"
+/>
+
+### Animating Content Based on Snap Position
+
+The drawer provides two ways to animate content based on the current snap position:
+
+#### Option 1: Render Props (Works Everywhere)
+
+Use the render prop pattern to access animation values in JavaScript:
+
+<CodeBlockMDX
+  code={`<Drawer snapPoints={["92px", 1]}>
+  {({ snapProgress, dragProgress, isDragging, activeSnapPoint }) => (
+    <>
+      <DrawerTrigger>Open</DrawerTrigger>
+      <DrawerContent>
+        {/* Mini player fades out as drawer expands */}
+        <div style={{ opacity: 1 - snapProgress }}>Mini Player</div>
+        {/* Full player fades in as drawer expands */}
+        <div style={{ opacity: snapProgress }}>Full Player</div>
+      </DrawerContent>
+    </>
+  )}
+</Drawer>`}
+  language="tsx"
+/>
+
+| Value             | Description                                                  |
+| ----------------- | ------------------------------------------------------------ |
+| `snapProgress`    | Progress between snap points (0 = first snap, 1 = last snap) |
+| `dragProgress`    | Progress toward closed (0 = open, 1 = closed)                |
+| `isDragging`      | Whether currently being dragged/scrolled                     |
+| `activeSnapPoint` | Current active snap point value                              |
+
+#### Option 2: CSS Custom Property (Progressive Enhancement)
+
+For browsers that support scroll-driven animations (Chrome 115+), the drawer exposes a `--drawer-snap-progress` CSS custom property that animates from 0 to 1 based on scroll position. This is more performant as it's GPU-accelerated and doesn't cause React re-renders.
+
+<CodeBlockMDX
+  code={`
+<Drawer snapPoints={["92px", 1]}>
+  <DrawerTrigger>Open</DrawerTrigger>
+  <DrawerContent>
+    <div className="mini-player">Mini Player</div>
+    <div className="full-player">Full Player</div>
+  </DrawerContent>
+</Drawer>
+`}
+  language="tsx"
+/>
+
+<CodeBlockMDX
+  code={`
+.mini-player {
+  opacity: calc(1 - var(--drawer-snap-progress, 0));
+}
+.full-player {
+  opacity: var(--drawer-snap-progress, 0);
+}
+`}
+  language="css"
+/>
+
+The `0` fallback ensures non-supporting browsers show the initial state. Combine with the render prop for full browser support:
+
+<CodeBlockMDX
+  code={`<Drawer snapPoints={["92px", 1]}>
+  {({ snapProgress }) => (
+    <DrawerContent>
+      {/* CSS handles animation in Chrome 115+, JS fallback for others */}
+      <div
+        className="mini-player"
+        style={{ opacity: 1 - snapProgress }}
+      >
+        Mini Player
+      </div>
+    </DrawerContent>
+  )}
+</Drawer>`}
+  language="tsx"
+/>
+
+<CodeBlockMDX
+  code={`
+/* CSS overrides inline style when scroll-driven animations are supported */
+@supports (animation-timeline: scroll()) {
+  .mini-player {
+    opacity: calc(1 - var(--drawer-snap-progress, 0)) !important;
+  }
+}
+`}
+  language="css"
+/>

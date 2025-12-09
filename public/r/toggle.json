@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "toggle",
+  "type": "registry:ui",
+  "title": "Toggle",
+  "description": "A toggle component.",
+  "dependencies": [
+    "class-variance-authority"
+  ],
+  "files": [
+    {
+      "path": "registry/default/toggle/toggle.tsx",
+      "content": "\"use client\"\r\n\r\nimport * as React from \"react\"\r\nimport { Toggle as BaseToggle } from \"@base-ui-components/react/toggle\"\r\nimport { cva, type VariantProps } from \"class-variance-authority\"\r\n\r\nimport { cn } from \"@/lib/utils\"\r\n\r\nconst toggleVariants = cva(\r\n\t\"inline-flex bg-transparent items-center justify-center gap-2.5 rounded-lg text-sm font-medium hover:bg-accent/50 hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-60 data-[pressed]:bg-accent/80 data-[pressed]:text-accent-foreground [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 focus-visible:border-ring focus-visible:ring-ring/30 focus-visible:ring-2 outline-none transition-all duration-200 aria-invalid:ring-destructive/30 aria-invalid:border-destructive whitespace-nowrap\",\r\n\t{\r\n\t\tvariants: {\r\n\t\t\tvariant: {\r\n\t\t\t\tdefault: \"\",\r\n\t\t\t\toutline: \"border border-border/60 shadow-[0_1px_3px_0_oklch(0.18_0_0_/_0.06)] ring-1 ring-border/15 dark:ring-0\",\r\n\t\t\t},\r\n\t\t\tsize: {\r\n\t\t\t\tdefault: \"h-10 px-3 min-w-10\",\r\n\t\t\t\tsm: \"h-9 px-2.5 min-w-9\",\r\n\t\t\t\tlg: \"h-11 px-4 min-w-11\",\r\n\t\t\t},\r\n\t\t},\r\n\t\tdefaultVariants: {\r\n\t\t\tvariant: \"default\",\r\n\t\t\tsize: \"default\",\r\n\t\t},\r\n\t}\r\n)\r\n\r\nfunction Toggle({\r\n\tclassName,\r\n\tvariant,\r\n\tsize,\r\n\t...props\r\n}: React.ComponentProps<typeof BaseToggle> &\r\n\tVariantProps<typeof toggleVariants>) {\r\n\treturn (\r\n\t\t<BaseToggle\r\n\t\t\tdata-slot=\"toggle\"\r\n\t\t\tclassName={cn(toggleVariants({ variant, size, className }))}\r\n\t\t\t{...props}\r\n\t\t/>\r\n\t)\r\n}\r\n\r\nexport { Toggle, toggleVariants }\r\n",
+      "type": "registry:ui",
+      "target": "components/ui/cubby-ui/toggle.tsx"
+    }
+  ]
+}

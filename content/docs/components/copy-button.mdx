@@ -1,0 +1,55 @@
+---
+title: Copy Button
+description: A button component for copying text to clipboard with visual feedback
+---
+
+import { CopyButton } from "@/registry/default/copy-button/copy-button";
+
+## Preview
+
+<ComponentPreview component="copy-button" example="copy-button-demo" />
+
+## Installation
+
+<ComponentInstall component="copy-button" />
+
+## Usage
+
+<ComponentUsage component="copy-button" />
+
+## Examples
+
+### Custom Icons
+
+Customize the copy and check icons by providing your own icon components.
+
+<ComponentPreview component="copy-button"
+  example="copy-button-custom-icons-demo"
+ />
+
+## API Reference
+
+The CopyButton component extends the [Button component](/docs/components/button) with clipboard functionality. All Button props are supported except `size`, `variant`, `onClick`, and `children` which are controlled internally.
+
+<ApiPropsList>
+
+<ApiProp name="content" fullType="string" required>
+  The text content to copy to the clipboard when the button is clicked.
+</ApiProp>
+
+<ApiProp name="timeout" fullType="number" defaultValue="2000">
+  Duration in milliseconds to show the success state (checkmark icon) after
+  copying. Defaults to 2 seconds.
+</ApiProp>
+
+<ApiProp name="copyIcon" fullType="React.ReactNode" simpleType="node">
+  Custom icon to display in the default (not copied) state. Defaults to the
+  lucide Copy icon.
+</ApiProp>
+
+<ApiProp name="checkIcon" fullType="React.ReactNode" simpleType="node">
+  Custom icon to display in the copied/success state. Defaults to the lucide
+  Check icon with green color.
+</ApiProp>
+
+</ApiPropsList>

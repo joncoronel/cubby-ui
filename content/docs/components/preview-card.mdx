@@ -1,0 +1,73 @@
+---
+title: Preview Card
+description: Interactive card that displays content preview on hover or click
+---
+
+import { PreviewCard } from "@/registry/default/preview-card/preview-card";
+
+## Preview
+
+<ComponentPreview component="preview-card" example="preview-card-basic" />
+
+## Installation
+
+<ComponentInstall component="preview-card" />
+
+## Usage
+
+<ComponentUsage component="preview-card" />
+
+## Examples
+
+### Simple
+
+Minimal preview card with basic content.
+
+<ComponentPreview component="preview-card" example="preview-card-simple" />
+
+### Product Preview
+
+Display product information in preview card.
+
+<ComponentPreview component="preview-card" example="preview-card-product" />
+
+### Text Trigger
+
+Trigger preview from inline text.
+
+<ComponentPreview component="preview-card" example="preview-card-text-trigger" />
+
+## API Reference
+
+The PreviewCard component is built on top of [Base UI's PreviewCard](https://base-ui.com/react/components/preview-card). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI PreviewCard documentation](https://base-ui.com/react/components/preview-card).
+
+### Custom Props
+
+#### PreviewCardContent
+
+<ApiPropsList>
+
+<ApiProp name="arrow" fullType="boolean" simpleType="boolean" defaultValue="true">
+  Show or hide the arrow pointing to the trigger. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="align" fullType='"start" | "center" | "end"' simpleType="string">
+  How to align the preview card. Flattened from Positioner for convenience.
+</ApiProp>
+
+<ApiProp name="sideOffset" fullType="number" simpleType="number">
+  Distance in pixels for positioning. Flattened from Positioner for convenience.
+</ApiProp>
+
+</ApiPropsList>
+
+### Modified Defaults
+
+Our implementation changes the following Base UI prop defaults:
+
+- **PreviewCardTrigger**: `delay` defaults to `0` (Base UI defaults to `600`)
+- **PreviewCardTrigger**: `closeDelay` defaults to `0` (Base UI defaults to `300`)
+- **PreviewCardContent**: `align` defaults to `"center"` (Base UI defaults to `"start"`)
+- **PreviewCardContent**: `sideOffset` defaults to `8` (Base UI defaults to `0`)

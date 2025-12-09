@@ -1,0 +1,95 @@
+---
+title: Button
+description: Clickable button with various styles and sizes
+---
+
+import { Button } from "@/registry/default/button/button";
+
+## Preview
+
+<ComponentPreview component="button" example="button-demo" />
+
+## Installation
+
+<ComponentInstall component="button" />
+
+## Usage
+
+<ComponentUsage component="button" />
+
+## Examples
+
+### Variants
+
+The Button supports multiple visual variants for different use cases.
+
+<ComponentPreview component="button" example="button-variants" />
+
+### Sizes
+
+Choose from multiple sizes to fit your design.
+
+<ComponentPreview component="button" example="button-sizes" />
+
+### With Icons
+
+Add icons to provide visual context.
+
+<ComponentPreview component="button" example="button-with-icons" />
+
+### As Link
+
+Use the `render` prop to render as a Next.js Link and set `nativeButton` to `false`.
+
+<ComponentPreview component="button" example="button-with-link" />
+
+## API Reference
+
+The Button component is built on top of [Base UI's Button](https://base-ui.com/react/components/button). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Button documentation](https://base-ui.com/react/components/button).
+
+### Custom Props
+
+<ApiPropsList>
+
+<ApiProp
+  name="variant"
+  fullType='"primary" | "neutral" | "secondary" | "outline" | "ghost" | "link" | "destructive"'
+  simpleType="string"
+  defaultValue='"primary"'
+>
+  Visual style variant of the button. Choose from primary, neutral, secondary,
+  outline, ghost, link, or destructive styles. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp
+  name="size"
+  fullType='"xs" | "sm" | "default" | "lg" | "icon" | "icon_xs" | "icon_sm" | "icon_lg"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Size of the button. Use icon variants for icon-only buttons with proper square
+  dimensions. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="loading" fullType="boolean" defaultValue="false">
+  Display loading state with spinner, automatically disables the button. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="leftSection" fullType="ReactNode" simpleType="node">
+  Content (typically icon) to display before the button text. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="rightSection" fullType="ReactNode" simpleType="node">
+  Content (typically icon) to display after the button text. Custom prop not available in Base UI.
+</ApiProp>
+
+</ApiPropsList>
+
+### Modified Defaults
+
+Our implementation changes the following Base UI prop defaults:
+
+- **Button**: When `loading` is `true`, button is automatically disabled
+- **Button**: When `loading` is `true`, `focusableWhenDisabled` is set to `true` to maintain keyboard accessibility

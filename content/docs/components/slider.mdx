@@ -1,0 +1,102 @@
+---
+title: Slider
+description: Interactive control for selecting a value or range from a continuous scale
+---
+
+import { Slider } from "@/registry/default/slider/slider";
+
+## Preview
+
+<ComponentPreview component="slider" example="slider-basic" />
+
+## Installation
+
+<ComponentInstall component="slider" />
+
+## Usage
+
+<ComponentUsage component="slider" />
+
+## Examples
+
+### Controlled
+
+Manage slider state externally.
+
+<ComponentPreview component="slider" example="slider-controlled" />
+
+### Range Slider
+
+Select a range with two handles.
+
+<ComponentPreview component="slider" example="slider-range" />
+
+### With Steps
+
+Snap to discrete step values.
+
+<ComponentPreview component="slider" example="slider-with-steps" />
+
+### With Value Display
+
+Show the current value alongside the slider.
+
+<ComponentPreview component="slider" example="slider-with-value" />
+
+### Vertical Orientation
+
+Display slider vertically.
+
+<ComponentPreview component="slider" example="slider-vertical" />
+
+### Variants
+
+Apply different visual styles.
+
+<ComponentPreview component="slider" example="slider-variant" />
+
+### Disabled State
+
+Prevent interaction with disabled slider.
+
+<ComponentPreview component="slider" example="slider-disabled-state" />
+
+## API Reference
+
+### Slider
+
+<ApiPropsList>
+
+<ApiProp
+  name="variant"
+  fullType='"default" | "contained" | "squareThumb"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Visual style variant for the slider. Choose from default, contained (thumb
+  aligned to edges), or squareThumb styles.
+</ApiProp>
+
+<ApiProp name="showSteps" fullType="boolean" defaultValue="false">
+  Show step indicator dots along the slider track for discrete value
+  visualization.
+</ApiProp>
+
+<ApiProp name="min" fullType="number" defaultValue="0">
+  Minimum value of the slider range.
+</ApiProp>
+
+<ApiProp name="max" fullType="number" defaultValue="100">
+  Maximum value of the slider range.
+</ApiProp>
+
+<ApiProp name="thumbAlignment" fullType='"center" | "edge"' simpleType="string">
+  Alignment of the slider thumb. Automatically set to 'edge' when variant is
+  'contained', otherwise defaults to 'center'.
+</ApiProp>
+
+</ApiPropsList>
+
+### Additional Props
+
+Slider inherits all props from [Base UI Slider](https://base-ui.com/react/components/slider#api-reference), including orientation, step, value, defaultValue, onChange, and accessibility props.

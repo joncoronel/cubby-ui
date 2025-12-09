@@ -1,0 +1,60 @@
+"use client";
+
+import * as React from "react";
+import { CheckboxGroup } from "@/registry/default/checkbox-group/checkbox-group";
+import { Checkbox } from "@/registry/default/checkbox/checkbox";
+import { Label } from "@/registry/default/label/label";
+
+export default function CheckboxGroupControlled() {
+  const [value, setValue] = React.useState<string[]>(["email", "sms"]);
+
+  const handleClearAll = () => setValue([]);
+  const handleSelectAll = () => setValue(["email", "sms", "push", "in-app"]);
+
+  return (
+    <div className="space-y-4">
+      <CheckboxGroup value={value} onValueChange={setValue}>
+        <div className="space-y-2">
+          <h3 className="text-sm font-medium">Notification Preferences</h3>
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <Checkbox id="email" value="email" />
+              <Label htmlFor="email">Email notifications</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox id="sms" value="sms" />
+              <Label htmlFor="sms">SMS notifications</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox id="push" value="push" />
+              <Label htmlFor="push">Push notifications</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox id="in-app" value="in-app" />
+              <Label htmlFor="in-app">In-app notifications</Label>
+            </div>
+          </div>
+        </div>
+      </CheckboxGroup>
+      <div className="flex items-center justify-between">
+        <div className="text-sm text-muted-foreground">
+          {value.length} of 4 selected
+        </div>
+        <div className="space-x-2">
+          <button
+            onClick={handleClearAll}
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Clear all
+          </button>
+          <button
+            onClick={handleSelectAll}
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Select all
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,86 @@
+---
+title: Combobox
+description: Searchable dropdown for selecting from a list of options with keyboard navigation
+---
+
+import { Combobox } from "@/registry/default/combobox/combobox";
+
+## Preview
+
+<ComponentPreview component="combobox" example="combobox-basic" />
+
+## Installation
+
+<ComponentInstall component="combobox" />
+
+## Usage
+
+<ComponentUsage component="combobox" />
+
+## Examples
+
+### Creatable
+
+Allow users to create new options.
+
+<ComponentPreview component="combobox" example="combobox-creatable" />
+
+### Multiple Selection
+
+Select multiple options from the combobox.
+
+<ComponentPreview component="combobox" example="combobox-multiple" />
+
+### Input Inside Popup
+
+Place the search input within the dropdown popup.
+
+<ComponentPreview component="combobox" example="combobox-input-inside-popup" />
+
+### Async Search
+
+Load options from a remote source by fetching on input changes. The `useAsyncCombobox` hook handles request cancellation, loading states, and keeps the selected value visible while new results stream in.
+
+<ComponentPreview component="combobox" example="combobox-async" />
+
+### Async Search (Multiple)
+
+Async search with multiple selection support. Selected items remain visible in the dropdown while searching for new matches.
+
+<ComponentPreview component="combobox" example="combobox-async-multiple" />
+
+### Grouped
+
+Organize options into logical groups with sticky headers.
+
+<ComponentPreview component="combobox" example="combobox-grouped" />
+
+## API Reference
+
+The Combobox component is built on top of [Base UI's Combobox](https://base-ui.com/react/components/combobox). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Combobox documentation](https://base-ui.com/react/components/combobox).
+
+### Custom Props
+
+#### ComboboxPopup
+
+<ApiPropsList>
+
+<ApiProp
+  name="sideOffset"
+  fullType="number"
+  defaultValue="6"
+>
+  Distance in pixels between the popup and the anchor element. Convenience prop that passes through to the internal Positioner component. Type is inferred from Base UI's Positioner component.
+</ApiProp>
+
+<ApiProp
+  name="backdrop"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Show a backdrop overlay behind the popup. Custom prop not available in Base UI.
+</ApiProp>
+
+</ApiPropsList>

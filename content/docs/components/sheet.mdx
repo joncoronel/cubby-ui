@@ -1,0 +1,60 @@
+---
+title: Sheet
+description: Sliding panel from screen edge for navigation, forms, or content
+---
+
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/registry/default/sheet/sheet";
+
+## Preview
+
+<ComponentPreview component="sheet" example="sheet-basic" />
+
+## Installation
+
+<ComponentInstall component="sheet" />
+
+## Usage
+
+<ComponentUsage component="sheet" />
+
+## Examples
+
+### Positions
+
+Open sheet from different screen edges.
+
+<ComponentPreview component="sheet" example="sheet-positions" />
+
+### Variants
+
+Apply different visual styles to sheets.
+
+<ComponentPreview component="sheet" example="sheet-variants" />
+
+### With Form
+
+Include form elements within the sheet.
+
+<ComponentPreview component="sheet" example="sheet-with-form" />
+
+## API Reference
+
+The Sheet component is built on top of [Base UI's Dialog](https://base-ui.com/react/components/dialog). All Base UI props are supported. The documentation below only covers custom props specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Dialog documentation](https://base-ui.com/react/components/dialog).
+
+### Custom Props
+
+#### SheetContent
+
+<ApiPropsList>
+
+<ApiProp name="side" fullType='"top" | "right" | "bottom" | "left"' simpleType="string" defaultValue='"right"'>
+  Which side of the screen the sheet slides in from. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="variant" fullType='"default" | "floating"' simpleType="string" defaultValue='"default"'>
+  Visual style variant, `'floating'` adds margins and rounded corners. Custom prop not available in Base UI.
+</ApiProp>
+
+</ApiPropsList>

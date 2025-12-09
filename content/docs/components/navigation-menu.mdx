@@ -1,0 +1,120 @@
+---
+title: Navigation Menu
+description: Accessible dropdown navigation menu with support for nested submenus
+---
+
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuList, NavigationMenuTrigger } from "@/registry/default/navigation-menu/navigation-menu";
+
+## Preview
+
+<ComponentPreview component="navigation-menu" example="navigation-menu-basic" />
+
+## Installation
+
+<ComponentInstall component="navigation-menu" />
+
+## Usage
+
+<ComponentUsage component="navigation-menu" />
+
+## Examples
+
+### With Direct Links
+
+Include direct navigation links alongside dropdowns.
+
+<ComponentPreview component="navigation-menu" example="navigation-menu-with-direct-links" />
+
+### Nested Submenus
+
+Create multi-level navigation structures.
+
+<ComponentPreview component="navigation-menu" example="navigation-menu-nested-submenus" />
+
+### Custom Styled Dropdown
+
+Apply custom styling to dropdown content.
+
+<ComponentPreview component="navigation-menu" example="navigation-menu-custom-styled-dropdown" />
+
+### With Next.js Link
+
+Integrate with Next.js Link for client-side navigation.
+
+<ComponentPreview component="navigation-menu" example="navigation-menu-flexible-nextjs-link" />
+
+## API Reference
+
+The Navigation Menu component is built on top of [Base UI's Navigation Menu](https://base-ui.com/react/components/navigation-menu). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Navigation Menu documentation](https://base-ui.com/react/components/navigation-menu).
+
+### Custom Props
+
+#### NavigationMenu
+
+<ApiPropsList>
+
+<ApiProp
+  name="contentProps"
+  fullType="Omit<NavigationMenuPrimitive.Positioner.Props, 'render'>"
+  simpleType="object"
+>
+  Props to pass to the underlying Positioner component for positioning the navigation menu viewport. Allows configuration of positioning behavior without accessing internal components. Custom prop not available in Base UI.
+</ApiProp>
+
+</ApiPropsList>
+
+#### NavigationMenuLink
+
+<ApiPropsList>
+
+<ApiProp
+  name="standalone"
+  fullType="boolean"
+  defaultValue="false"
+>
+  When true, applies trigger button styling to make the link appear as a top-level navigation item rather than a menu link. Custom prop not available in Base UI.
+</ApiProp>
+
+</ApiPropsList>
+
+#### NavigationMenuViewport
+
+<ApiPropsList>
+
+<ApiProp
+  name="contentProps"
+  fullType="Omit<NavigationMenuPrimitive.Positioner.Props, 'render'>"
+  simpleType="object"
+>
+  Props to pass to the underlying Positioner for viewport positioning. Custom prop not available in Base UI.
+</ApiProp>
+
+</ApiPropsList>
+
+#### NavigationMenuSub
+
+<ApiPropsList>
+
+<ApiProp
+  name="contentProps"
+  fullType="Omit<NavigationMenuPrimitive.Positioner.Props, 'render'>"
+  simpleType="object"
+>
+  Props to pass to the underlying Positioner for submenu positioning. Custom prop not available in Base UI.
+</ApiProp>
+
+</ApiPropsList>
+
+### Modified Defaults
+
+Our implementation changes the following Base UI prop defaults:
+
+- **NavigationMenuViewport Positioner**: `sideOffset` defaults to `10` (Base UI defaults to `0`)
+- **NavigationMenuViewport Positioner**: `collisionPadding` defaults to `{ top: 5, bottom: 5, left: 20, right: 20 }`
+- **NavigationMenuSub Positioner**: `sideOffset` defaults to `24` (Base UI defaults to `0`)
+- **NavigationMenuSub Positioner**: `alignOffset` defaults to `-24`
+- **NavigationMenuSub Positioner**: `align` defaults to `'end'`
+- **NavigationMenuSub Positioner**: `side` defaults to `'right'`
+- **NavigationMenuSub**: `orientation` defaults to `'vertical'`

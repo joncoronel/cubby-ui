@@ -1,0 +1,85 @@
+---
+title: Dialog
+description: Modal window that overlays content and requires user interaction
+---
+
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/registry/default/dialog/dialog";
+
+## Preview
+
+<ComponentPreview component="dialog" example="dialog-basic" />
+
+## Installation
+
+<ComponentInstall component="dialog" />
+
+## Usage
+
+<ComponentUsage component="dialog" />
+
+## Examples
+
+### Controlled
+
+Manage dialog open state programmatically.
+
+<ComponentPreview component="dialog" example="dialog-controlled" />
+
+### With Form
+
+Include form elements within the dialog.
+
+<ComponentPreview component="dialog" example="dialog-form" />
+
+### Scrollable Content
+
+Handle long content with scrolling.
+
+<ComponentPreview component="dialog" example="dialog-scroll" />
+
+### Custom Backdrop
+
+Customize backdrop appearance and behavior.
+
+<ComponentPreview component="dialog" example="dialog-custom-backdrop" />
+
+### No Close Button
+
+Hide the default close button.
+
+<ComponentPreview component="dialog" example="dialog-no-close-button" />
+
+### Nested Dialogs
+
+Stack multiple dialogs on top of each other.
+
+<ComponentPreview component="dialog" example="dialog-nested" />
+
+## API Reference
+
+The Dialog component is built on top of [Base UI's Dialog](https://base-ui.com/react/components/dialog). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Dialog documentation](https://base-ui.com/react/components/dialog).
+
+### Custom Props
+
+#### DialogContent
+
+<ApiPropsList>
+
+<ApiProp
+  name="showCloseButton"
+  fullType="boolean"
+  defaultValue="true"
+>
+  Show or hide the X close button in the dialog header. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp
+  name="backdropClassName"
+  fullType="string"
+>
+  Custom className for styling the backdrop overlay. Custom prop not available in Base UI.
+</ApiProp>
+
+</ApiPropsList>

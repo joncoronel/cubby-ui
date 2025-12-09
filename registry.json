@@ -1,0 +1,1291 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "cubby-ui",
+  "homepage": "https://cubby-money.vercel.app",
+  "items": [
+    {
+      "name": "accordion",
+      "type": "registry:ui",
+      "title": "Accordion",
+      "description": "A accordion component.",
+      "files": [
+        {
+          "path": "registry/default/accordion/accordion.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/accordion.tsx"
+        }
+      ],
+      "dependencies": [
+        "lucide-react"
+      ]
+    },
+    {
+      "name": "alert",
+      "type": "registry:ui",
+      "title": "Alert",
+      "description": "A alert component.",
+      "files": [
+        {
+          "path": "registry/default/alert/alert.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/alert.tsx"
+        }
+      ],
+      "dependencies": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "name": "alert-dialog",
+      "type": "registry:ui",
+      "title": "Alert-dialog",
+      "description": "A alert-dialog component.",
+      "files": [
+        {
+          "path": "registry/default/alert-dialog/alert-dialog.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/alert-dialog.tsx"
+        }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/button"
+      ]
+    },
+    {
+      "name": "aspect-ratio",
+      "type": "registry:ui",
+      "title": "Aspect-ratio",
+      "description": "A aspect-ratio component.",
+      "files": [
+        {
+          "path": "registry/default/aspect-ratio/aspect-ratio.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/aspect-ratio.tsx"
+        }
+      ]
+    },
+    {
+      "name": "autocomplete",
+      "type": "registry:ui",
+      "title": "Autocomplete",
+      "description": "A autocomplete component.",
+      "files": [
+        {
+          "path": "registry/default/autocomplete/autocomplete.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/autocomplete.tsx"
+        },
+        {
+          "path": "registry/default/autocomplete/lib/highlight-text.tsx",
+          "type": "registry:lib",
+          "target": "lib/cubby-ui/highlight-text.tsx"
+        },
+        {
+          "path": "registry/default/autocomplete/hooks/use-fuzzy-filter.ts",
+          "type": "registry:hook",
+          "target": "hooks/cubby-ui/use-fuzzy-filter.ts"
+        }
+      ],
+      "dependencies": [
+        "match-sorter"
+      ]
+    },
+    {
+      "name": "avatar",
+      "type": "registry:ui",
+      "title": "Avatar",
+      "description": "A avatar component.",
+      "files": [
+        {
+          "path": "registry/default/avatar/avatar.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/avatar.tsx"
+        }
+      ],
+      "dependencies": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "name": "badge",
+      "type": "registry:ui",
+      "title": "Badge",
+      "description": "A badge component.",
+      "files": [
+        {
+          "path": "registry/default/badge/badge.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/badge.tsx"
+        }
+      ],
+      "dependencies": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "name": "breadcrumbs",
+      "type": "registry:ui",
+      "title": "Breadcrumbs",
+      "description": "A breadcrumbs component.",
+      "files": [
+        {
+          "path": "registry/default/breadcrumbs/breadcrumbs.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/breadcrumbs.tsx"
+        }
+      ],
+      "dependencies": [
+        "lucide-react"
+      ]
+    },
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "title": "Button",
+      "description": "A simple button component.",
+      "files": [
+        {
+          "path": "registry/default/button/button.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/button.tsx"
+        }
+      ],
+      "dependencies": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "name": "button-group",
+      "type": "registry:ui",
+      "title": "Button Group",
+      "description": "A button-group component.",
+      "files": [
+        {
+          "path": "registry/default/button-group/button-group.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/button-group.tsx"
+        }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/separator"
+      ],
+      "dependencies": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "name": "calendar",
+      "type": "registry:ui",
+      "title": "Calendar",
+      "description": "A calendar component.",
+      "files": [
+        {
+          "path": "registry/default/calendar/calendar.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/calendar.tsx"
+        }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/button"
+      ],
+      "dependencies": [
+        "lucide-react",
+        "react-day-picker"
+      ]
+    },
+    {
+      "name": "card",
+      "type": "registry:ui",
+      "title": "Card",
+      "description": "A card component.",
+      "files": [
+        {
+          "path": "registry/default/card/card.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/card.tsx"
+        }
+      ],
+      "dependencies": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "name": "carousel",
+      "type": "registry:ui",
+      "title": "Carousel",
+      "description": "A carousel component.",
+      "files": [
+        {
+          "path": "registry/default/carousel/carousel.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/carousel.tsx"
+        }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/button"
+      ],
+      "dependencies": [
+        "embla-carousel-react",
+        "lucide-react"
+      ]
+    },
+    {
+      "name": "checkbox",
+      "type": "registry:ui",
+      "title": "Checkbox",
+      "description": "A checkbox component.",
+      "files": [
+        {
+          "path": "registry/default/checkbox/checkbox.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/checkbox.tsx"
+        }
+      ],
+      "dependencies": [
+        "lucide-react"
+      ]
+    },
+    {
+      "name": "checkbox-group",
+      "type": "registry:ui",
+      "title": "Checkbox-group",
+      "description": "A checkbox-group component.",
+      "files": [
+        {
+          "path": "registry/default/checkbox-group/checkbox-group.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/checkbox-group.tsx"
+        }
+      ]
+    },
+    {
+      "name": "circular-slider",
+      "type": "registry:ui",
+      "title": "Circular Slider",
+      "description": "A circular-slider component.",
+      "files": [
+        {
+          "path": "registry/default/circular-slider/circular-slider.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/circular-slider.tsx"
+        },
+        {
+          "path": "registry/default/circular-slider/lib/angle-calculations.ts",
+          "type": "registry:lib",
+          "target": "lib/cubby-ui/angle-calculations.ts"
+        },
+        {
+          "path": "registry/default/circular-slider/lib/pointer-utils.ts",
+          "type": "registry:lib",
+          "target": "lib/cubby-ui/pointer-utils.ts"
+        },
+        {
+          "path": "registry/default/circular-slider/lib/svg-constants.ts",
+          "type": "registry:lib",
+          "target": "lib/cubby-ui/svg-constants.ts"
+        },
+        {
+          "path": "registry/default/circular-slider/lib/svg-utils.ts",
+          "type": "registry:lib",
+          "target": "lib/cubby-ui/svg-utils.ts"
+        }
+      ],
+      "dependencies": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "name": "code-block",
+      "type": "registry:ui",
+      "title": "Code-block",
+      "description": "A code-block component.",
+      "files": [
+        {
+          "path": "registry/default/code-block/code-block.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/code-block.tsx"
+        },
+        {
+          "path": "registry/default/code-block/lib/shiki-shared.ts",
+          "type": "registry:lib",
+          "target": "lib/cubby-ui/shiki-shared.ts"
+        },
+        {
+          "path": "registry/default/code-block/lib/transformers/diff.ts",
+          "type": "registry:lib",
+          "target": "lib/cubby-ui/transformers/diff.ts"
+        },
+        {
+          "path": "registry/default/code-block/lib/transformers/focus.ts",
+          "type": "registry:lib",
+          "target": "lib/cubby-ui/transformers/focus.ts"
+        },
+        {
+          "path": "registry/default/code-block/lib/transformers/highlight-lines.ts",
+          "type": "registry:lib",
+          "target": "lib/cubby-ui/transformers/highlight-lines.ts"
+        },
+        {
+          "path": "registry/default/code-block/lib/transformers/utils.ts",
+          "type": "registry:lib",
+          "target": "lib/cubby-ui/transformers/utils.ts"
+        }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/copy-button",
+        "@cubby-ui/tabs"
+      ],
+      "dependencies": [
+        "lucide-react",
+        "@icons-pack/react-simple-icons",
+        "shiki",
+        "hast-util-to-jsx-runtime"
+      ]
+    },
+    {
+      "name": "collapsible",
+      "type": "registry:ui",
+      "title": "Collapsible",
+      "description": "A collapsible component.",
+      "files": [
+        {
+          "path": "registry/default/collapsible/collapsible.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/collapsible.tsx"
+        }
+      ]
+    },
+    {
+      "name": "combobox",
+      "type": "registry:ui",
+      "title": "Combobox",
+      "description": "A combobox component.",
+      "files": [
+        {
+          "path": "registry/default/combobox/combobox.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/combobox.tsx"
+        },
+        {
+          "path": "registry/default/combobox/hooks/use-async-combobox.ts",
+          "type": "registry:hook",
+          "target": "hooks/cubby-ui/use-async-combobox.ts"
+        },
+        {
+          "path": "registry/default/combobox/hooks/use-creatable-combobox.ts",
+          "type": "registry:hook",
+          "target": "hooks/cubby-ui/use-creatable-combobox.ts"
+        }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/label"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ]
+    },
+    {
+      "name": "command",
+      "type": "registry:ui",
+      "title": "Command",
+      "description": "A command component.",
+      "files": [
+        {
+          "path": "registry/default/command/command.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/command.tsx"
+        }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/dialog",
+        "@cubby-ui/input-group"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ]
+    },
+    {
+      "name": "context-menu",
+      "type": "registry:ui",
+      "title": "Context-menu",
+      "description": "A context-menu component.",
+      "files": [
+        {
+          "path": "registry/default/context-menu/context-menu.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/context-menu.tsx"
+        }
+      ],
+      "dependencies": [
+        "lucide-react"
+      ]
+    },
+    {
+      "name": "copy-button",
+      "type": "registry:ui",
+      "title": "Copy Button",
+      "description": "A copy-button component.",
+      "files": [
+        {
+          "path": "registry/default/copy-button/copy-button.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/copy-button.tsx"
+        },
+        {
+          "path": "registry/default/copy-button/lib/copy-to-clipboard.ts",
+          "type": "registry:lib",
+          "target": "lib/cubby-ui/copy-to-clipboard.ts"
+        }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/button"
+      ],
+      "dependencies": [
+        "lucide-react",
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
+      ]
+    },
+    {
+      "name": "cropper",
+      "type": "registry:ui",
+      "title": "Cropper",
+      "description": "A cropper component.",
+      "files": [
+        {
+          "path": "registry/default/cropper/cropper.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/cropper.tsx"
+        }
+      ],
+      "dependencies": [
+        "@origin-space/image-cropper",
+        "lucide-react"
+      ]
+    },
+    {
+      "name": "date-picker",
+      "type": "registry:ui",
+      "title": "Date-picker",
+      "description": "A date-picker component.",
+      "files": [
+        {
+          "path": "registry/default/date-picker/date-picker.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/date-picker.tsx"
+        }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/button",
+        "@cubby-ui/calendar",
+        "@cubby-ui/popover"
+      ],
+      "dependencies": [
+        "dayjs",
+        "lucide-react"
+      ]
+    },
+    {
+      "name": "date-range-picker",
+      "type": "registry:ui",
+      "title": "Date-range-picker",
+      "description": "A date-range-picker component.",
+      "files": [
+        {
+          "path": "registry/default/date-range-picker/date-range-picker.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/date-range-picker.tsx"
+        }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/button",
+        "@cubby-ui/calendar",
+        "@cubby-ui/popover"
+      ],
+      "dependencies": [
+        "dayjs",
+        "lucide-react",
+        "react-day-picker"
+      ]
+    },
+    {
+      "name": "dialog",
+      "type": "registry:ui",
+      "title": "Dialog",
+      "description": "A dialog component.",
+      "files": [
+        {
+          "path": "registry/default/dialog/dialog.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/dialog.tsx"
+        }
+      ],
+      "dependencies": [
+        "lucide-react"
+      ]
+    },
+    {
+      "name": "drawer",
+      "type": "registry:ui",
+      "title": "Drawer",
+      "description": "A drawer component.",
+      "files": [
+        {
+          "path": "registry/default/drawer/drawer.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/drawer.tsx"
+        },
+        {
+          "path": "registry/default/drawer/lib/easing.ts",
+          "type": "registry:lib",
+          "target": "lib/cubby-ui/easing.ts"
+        },
+        {
+          "path": "registry/default/drawer/hooks/use-body-scroll-lock.ts",
+          "type": "registry:hook",
+          "target": "hooks/cubby-ui/use-body-scroll-lock.ts"
+        },
+        {
+          "path": "registry/default/drawer/hooks/use-drawer-gesture.ts",
+          "type": "registry:hook",
+          "target": "hooks/cubby-ui/use-drawer-gesture.ts"
+        },
+        {
+          "path": "registry/default/drawer/hooks/use-nested-scroll.ts",
+          "type": "registry:hook",
+          "target": "hooks/cubby-ui/use-nested-scroll.ts"
+        },
+        {
+          "path": "registry/default/drawer/hooks/use-scroll-snap.ts",
+          "type": "registry:hook",
+          "target": "hooks/cubby-ui/use-scroll-snap.ts"
+        },
+        {
+          "path": "registry/default/drawer/hooks/use-snap-points.ts",
+          "type": "registry:hook",
+          "target": "hooks/cubby-ui/use-snap-points.ts"
+        },
+        {
+          "path": "registry/default/drawer/hooks/use-virtual-keyboard.ts",
+          "type": "registry:hook",
+          "target": "hooks/cubby-ui/use-virtual-keyboard.ts"
+        },
+        {
+          "path": "registry/default/drawer/drawer.css",
+          "type": "registry:file",
+          "target": "components/ui/cubby-ui/drawer.css"
+        }
+      ]
+    },
+    {
+      "name": "dropdown-menu",
+      "type": "registry:ui",
+      "title": "Dropdown-menu",
+      "description": "A dropdown-menu component.",
+      "files": [
+        {
+          "path": "registry/default/dropdown-menu/dropdown-menu.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/dropdown-menu.tsx"
+        }
+      ],
+      "dependencies": [
+        "lucide-react"
+      ]
+    },
+    {
+      "name": "fancy-button",
+      "type": "registry:ui",
+      "title": "Fancy Button",
+      "description": "A fancy-button component.",
+      "files": [
+        {
+          "path": "registry/default/fancy-button/fancy-button.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/fancy-button.tsx"
+        }
+      ],
+      "dependencies": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "name": "form",
+      "type": "registry:ui",
+      "title": "Form",
+      "description": "A form component.",
+      "files": [
+        {
+          "path": "registry/default/form/form.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/form.tsx"
+        }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/label"
+      ],
+      "dependencies": [
+        "@conform-to/react"
+      ]
+    },
+    {
+      "name": "init",
+      "type": "registry:style",
+      "title": "Cubby UI Theme",
+      "description": "Initialize your project with Cubby UI's theme system including OKLCH colors and CSS variables.",
+      "author": "Cubby UI",
+      "files": [],
+      "cssVars": {
+        "theme": {
+          "color-background": "var(--background)",
+          "color-foreground": "var(--foreground)",
+          "color-card": "var(--card)",
+          "color-card-foreground": "var(--card-foreground)",
+          "color-popover": "var(--popover)",
+          "color-popover-foreground": "var(--popover-foreground)",
+          "color-primary": "var(--primary)",
+          "color-primary-foreground": "var(--primary-foreground)",
+          "color-neutral": "var(--neutral)",
+          "color-neutral-foreground": "var(--neutral-foreground)",
+          "color-secondary": "var(--secondary)",
+          "color-secondary-foreground": "var(--secondary-foreground)",
+          "color-muted": "var(--muted)",
+          "color-muted-foreground": "var(--muted-foreground)",
+          "color-accent": "var(--accent)",
+          "color-accent-foreground": "var(--accent-foreground)",
+          "color-destructive": "var(--destructive)",
+          "color-destructive-foreground": "var(--destructive-foreground)",
+          "color-border": "var(--border)",
+          "color-input": "var(--input)",
+          "color-ring": "var(--ring)",
+          "color-sidebar": "var(--sidebar)",
+          "color-sidebar-foreground": "var(--sidebar-foreground)",
+          "color-sidebar-primary": "var(--sidebar-primary)",
+          "color-sidebar-primary-foreground": "var(--sidebar-primary-foreground)",
+          "color-sidebar-accent": "var(--sidebar-accent)",
+          "color-sidebar-accent-foreground": "var(--sidebar-accent-foreground)",
+          "color-sidebar-border": "var(--sidebar-border)",
+          "color-sidebar-ring": "var(--sidebar-ring)",
+          "color-danger": "var(--danger)",
+          "color-danger-foreground": "var(--danger-foreground)",
+          "color-danger-border": "var(--danger-border)",
+          "color-warning": "var(--warning)",
+          "color-warning-foreground": "var(--warning-foreground)",
+          "color-warning-border": "var(--warning-border)",
+          "color-info": "var(--info)",
+          "color-info-foreground": "var(--info-foreground)",
+          "color-info-border": "var(--info-border)",
+          "color-success": "var(--success)",
+          "color-success-foreground": "var(--success-foreground)",
+          "color-success-border": "var(--success-border)",
+          "shadow-top-highlight": "var(--top-highlight)",
+          "radius-xs": "calc(var(--radius) - 6px)",
+          "radius-sm": "calc(var(--radius) - 4px)",
+          "radius-md": "calc(var(--radius) - 2px)",
+          "radius-lg": "var(--radius)",
+          "radius-xl": "calc(var(--radius) + 2px)",
+          "ease-in-cubic": "cubic-bezier(0.55, 0.055, 0.675, 0.19)",
+          "ease-out-cubic": "cubic-bezier(0.215, 0.61, 0.355, 1)",
+          "ease-in-out-cubic": "cubic-bezier(0.645, 0.045, 0.355, 1)"
+        },
+        "light": {
+          "radius": "0.75rem",
+          "background": "oklch(0.98 0 0)",
+          "foreground": "oklch(0.18 0 0)",
+          "card": "oklch(1 0 0)",
+          "card-foreground": "oklch(0.27 0 0)",
+          "popover": "oklch(1 0 0)",
+          "popover-foreground": "oklch(0.27 0 0)",
+          "primary": "oklch(0.6 0.2 250)",
+          "primary-foreground": "oklch(1 0 0)",
+          "neutral": "oklch(0.22 0 0)",
+          "neutral-foreground": "oklch(0.98 0 0)",
+          "secondary": "oklch(0.95 0 0)",
+          "secondary-foreground": "oklch(0.32 0 0)",
+          "muted": "oklch(0.95 0 0)",
+          "muted-foreground": "oklch(0.5 0 0)",
+          "accent": "oklch(0.91 0 0)",
+          "accent-foreground": "oklch(0.22 0 0)",
+          "destructive": "oklch(0.53 0.19 25)",
+          "destructive-foreground": "oklch(0.98 0 0)",
+          "border": "oklch(0 0 0 / 8%)",
+          "input": "oklch(0.95 0 0)",
+          "ring": "oklch(0.55 0.2 250)",
+          "sidebar": "oklch(0.98 0 0)",
+          "sidebar-foreground": "oklch(0.22 0 0)",
+          "sidebar-primary": "oklch(0.28 0 0)",
+          "sidebar-primary-foreground": "oklch(0.97 0 0)",
+          "sidebar-accent": "oklch(0.92 0 0)",
+          "sidebar-accent-foreground": "oklch(0.28 0 0)",
+          "sidebar-border": "oklch(0.9 0 0)",
+          "sidebar-ring": "oklch(0.65 0 0)",
+          "danger": "oklch(0.97 0.04 25)",
+          "danger-foreground": "oklch(0.55 0.18 25)",
+          "danger-border": "oklch(0.9 0.1 25)",
+          "warning": "oklch(0.98 0.06 85)",
+          "warning-foreground": "oklch(0.58 0.14 85)",
+          "warning-border": "oklch(0.92 0.1 85)",
+          "info": "oklch(0.97 0.04 250)",
+          "info-foreground": "oklch(0.45 0.2 250)",
+          "info-border": "oklch(0.9 0.1 250)",
+          "success": "oklch(0.97 0.04 145)",
+          "success-foreground": "oklch(0.48 0.18 145)",
+          "success-border": "oklch(0.9 0.1 145)"
+        },
+        "dark": {
+          "background": "oklch(0.19 0 0)",
+          "foreground": "oklch(0.94 0 0)",
+          "card": "oklch(0.21 0 0)",
+          "card-foreground": "oklch(0.94 0 0)",
+          "popover": "oklch(0.21 0 0)",
+          "popover-foreground": "oklch(0.94 0 0)",
+          "neutral": "oklch(0.95 0 0)",
+          "neutral-foreground": "oklch(0.13 0 0)",
+          "secondary": "oklch(0.28 0 0)",
+          "secondary-foreground": "oklch(0.94 0 0)",
+          "muted": "oklch(0.26 0 0)",
+          "muted-foreground": "oklch(0.73 0 0)",
+          "accent": "oklch(0.31 0 0)",
+          "accent-foreground": "oklch(0.95 0 0)",
+          "destructive": "oklch(0.5 0.22 25)",
+          "destructive-foreground": "oklch(1 0 0)",
+          "border": "oklch(1 0 0 / 5%)",
+          "input": "oklch(1 0 0 / 15%)",
+          "sidebar": "oklch(0.19 0 0)",
+          "sidebar-foreground": "oklch(0.88 0 0)",
+          "sidebar-primary": "oklch(0.95 0 0)",
+          "sidebar-primary-foreground": "oklch(0.13 0 0)",
+          "sidebar-accent": "oklch(0.19 0 0)",
+          "sidebar-accent-foreground": "oklch(0.95 0 0)",
+          "sidebar-border": "oklch(0.28 0 0)",
+          "sidebar-ring": "oklch(0.83 0 0)",
+          "danger": "oklch(0.26 0.07 25)",
+          "danger-foreground": "oklch(0.75 0.15 25)",
+          "danger-border": "oklch(0.36 0.11 25)",
+          "warning": "oklch(0.28 0.06 85)",
+          "warning-foreground": "oklch(0.78 0.12 85)",
+          "warning-border": "oklch(0.38 0.09 85)",
+          "info": "oklch(0.26 0.07 250)",
+          "info-foreground": "oklch(0.72 0.16 250)",
+          "info-border": "oklch(0.36 0.11 250)",
+          "success": "oklch(0.26 0.07 145)",
+          "success-foreground": "oklch(0.72 0.15 145)",
+          "success-border": "oklch(0.36 0.11 145)"
+        }
+      },
+      "css": {
+        "@layer base": {
+          "*": {
+            "@apply": "border-border outline-ring/50"
+          },
+          "body": {
+            "@apply": "bg-background text-foreground"
+          }
+        }
+      },
+      "registryDependencies": [],
+      "dependencies": []
+    },
+    {
+      "name": "input",
+      "type": "registry:ui",
+      "title": "Input",
+      "description": "A input component.",
+      "files": [
+        {
+          "path": "registry/default/input/input.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/input.tsx"
+        }
+      ]
+    },
+    {
+      "name": "input-group",
+      "type": "registry:ui",
+      "title": "Input Group",
+      "description": "A input-group component.",
+      "files": [
+        {
+          "path": "registry/default/input-group/input-group.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/input-group.tsx"
+        }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/button",
+        "@cubby-ui/input",
+        "@cubby-ui/textarea"
+      ],
+      "dependencies": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "name": "input-otp",
+      "type": "registry:ui",
+      "title": "Input-otp",
+      "description": "A input-otp component.",
+      "files": [
+        {
+          "path": "registry/default/input-otp/input-otp.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/input-otp.tsx"
+        }
+      ],
+      "dependencies": [
+        "input-otp",
+        "lucide-react"
+      ]
+    },
+    {
+      "name": "kbd",
+      "type": "registry:ui",
+      "title": "Kbd",
+      "description": "A kbd component.",
+      "files": [
+        {
+          "path": "registry/default/kbd/kbd.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/kbd.tsx"
+        }
+      ],
+      "dependencies": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "name": "label",
+      "type": "registry:ui",
+      "title": "Label",
+      "description": "A label component.",
+      "files": [
+        {
+          "path": "registry/default/label/label.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/label.tsx"
+        }
+      ]
+    },
+    {
+      "name": "menubar",
+      "type": "registry:ui",
+      "title": "Menubar",
+      "description": "A menubar component.",
+      "files": [
+        {
+          "path": "registry/default/menubar/menubar.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/menubar.tsx"
+        }
+      ],
+      "dependencies": [
+        "lucide-react"
+      ]
+    },
+    {
+      "name": "meter",
+      "type": "registry:ui",
+      "title": "Meter",
+      "description": "A meter component.",
+      "files": [
+        {
+          "path": "registry/default/meter/meter.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/meter.tsx"
+        }
+      ],
+      "dependencies": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "name": "navigation-menu",
+      "type": "registry:ui",
+      "title": "Navigation-menu",
+      "description": "A navigation-menu component.",
+      "files": [
+        {
+          "path": "registry/default/navigation-menu/navigation-menu.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/navigation-menu.tsx"
+        }
+      ],
+      "dependencies": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "name": "pagination",
+      "type": "registry:ui",
+      "title": "Pagination",
+      "description": "A pagination component.",
+      "files": [
+        {
+          "path": "registry/default/pagination/pagination.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/pagination.tsx"
+        }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/button"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ]
+    },
+    {
+      "name": "popover",
+      "type": "registry:ui",
+      "title": "Popover",
+      "description": "A popover component.",
+      "files": [
+        {
+          "path": "registry/default/popover/popover.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/popover.tsx"
+        }
+      ]
+    },
+    {
+      "name": "preview-card",
+      "type": "registry:ui",
+      "title": "Preview-card",
+      "description": "A preview-card component.",
+      "files": [
+        {
+          "path": "registry/default/preview-card/preview-card.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/preview-card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "progress",
+      "type": "registry:ui",
+      "title": "Progress",
+      "description": "A progress component.",
+      "files": [
+        {
+          "path": "registry/default/progress/progress.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/progress.tsx"
+        }
+      ],
+      "dependencies": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "name": "radio-group",
+      "type": "registry:ui",
+      "title": "Radio-group",
+      "description": "A radio-group component.",
+      "files": [
+        {
+          "path": "registry/default/radio-group/radio-group.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/radio-group.tsx"
+        }
+      ]
+    },
+    {
+      "name": "resizable",
+      "type": "registry:ui",
+      "title": "Resizable",
+      "description": "A resizable component.",
+      "files": [
+        {
+          "path": "registry/default/resizable/resizable.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/resizable.tsx"
+        }
+      ],
+      "dependencies": [
+        "lucide-react",
+        "react-resizable-panels"
+      ]
+    },
+    {
+      "name": "scroll-area",
+      "type": "registry:ui",
+      "title": "Scroll-area",
+      "description": "A scroll-area component.",
+      "files": [
+        {
+          "path": "registry/default/scroll-area/scroll-area.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/scroll-area.tsx"
+        }
+      ]
+    },
+    {
+      "name": "select",
+      "type": "registry:ui",
+      "title": "Select",
+      "description": "A select component.",
+      "files": [
+        {
+          "path": "registry/default/select/select.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/select.tsx"
+        }
+      ],
+      "dependencies": [
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
+      ]
+    },
+    {
+      "name": "separator",
+      "type": "registry:ui",
+      "title": "Separator",
+      "description": "A separator component.",
+      "files": [
+        {
+          "path": "registry/default/separator/separator.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/separator.tsx"
+        }
+      ],
+      "dependencies": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "name": "sheet",
+      "type": "registry:ui",
+      "title": "Sheet",
+      "description": "A sheet component.",
+      "files": [
+        {
+          "path": "registry/default/sheet/sheet.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/sheet.tsx"
+        }
+      ],
+      "dependencies": [
+        "lucide-react"
+      ]
+    },
+    {
+      "name": "sidebar",
+      "type": "registry:ui",
+      "title": "Sidebar",
+      "description": "A sidebar component.",
+      "files": [
+        {
+          "path": "registry/default/sidebar/sidebar.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/sidebar.tsx"
+        }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/button",
+        "@cubby-ui/input",
+        "@cubby-ui/separator",
+        "@cubby-ui/sheet",
+        "@cubby-ui/skeleton",
+        "@cubby-ui/tooltip"
+      ],
+      "dependencies": [
+        "class-variance-authority",
+        "lucide-react"
+      ]
+    },
+    {
+      "name": "skeleton",
+      "type": "registry:ui",
+      "title": "Skeleton",
+      "description": "A skeleton component.",
+      "files": [
+        {
+          "path": "registry/default/skeleton/skeleton.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/skeleton.tsx"
+        }
+      ]
+    },
+    {
+      "name": "slider",
+      "type": "registry:ui",
+      "title": "Slider",
+      "description": "A slider component.",
+      "files": [
+        {
+          "path": "registry/default/slider/slider.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/slider.tsx"
+        }
+      ],
+      "dependencies": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "name": "switch",
+      "type": "registry:ui",
+      "title": "Switch",
+      "description": "A switch component.",
+      "files": [
+        {
+          "path": "registry/default/switch/switch.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/switch.tsx"
+        }
+      ]
+    },
+    {
+      "name": "table",
+      "type": "registry:ui",
+      "title": "Table",
+      "description": "A table component.",
+      "files": [
+        {
+          "path": "registry/default/table/table.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/table.tsx"
+        }
+      ]
+    },
+    {
+      "name": "tabs",
+      "type": "registry:ui",
+      "title": "Tabs",
+      "description": "A tabs component.",
+      "files": [
+        {
+          "path": "registry/default/tabs/tabs.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/tabs.tsx"
+        }
+      ]
+    },
+    {
+      "name": "textarea",
+      "type": "registry:ui",
+      "title": "Textarea",
+      "description": "A textarea component.",
+      "files": [
+        {
+          "path": "registry/default/textarea/textarea.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/textarea.tsx"
+        }
+      ]
+    },
+    {
+      "name": "timeline",
+      "type": "registry:ui",
+      "title": "Timeline",
+      "description": "A timeline component.",
+      "files": [
+        {
+          "path": "registry/default/timeline/timeline.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/timeline.tsx"
+        }
+      ],
+      "dependencies": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "name": "toast",
+      "type": "registry:ui",
+      "title": "Toast",
+      "description": "A toast component.",
+      "files": [
+        {
+          "path": "registry/default/toast/toast.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/toast.tsx"
+        }
+      ],
+      "dependencies": [
+        "clsx"
+      ]
+    },
+    {
+      "name": "toggle",
+      "type": "registry:ui",
+      "title": "Toggle",
+      "description": "A toggle component.",
+      "files": [
+        {
+          "path": "registry/default/toggle/toggle.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/toggle.tsx"
+        }
+      ],
+      "dependencies": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "name": "toggle-group",
+      "type": "registry:ui",
+      "title": "Toggle-group",
+      "description": "A toggle-group component.",
+      "files": [
+        {
+          "path": "registry/default/toggle-group/toggle-group.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/toggle-group.tsx"
+        }
+      ]
+    },
+    {
+      "name": "toolbar",
+      "type": "registry:ui",
+      "title": "Toolbar",
+      "description": "A toolbar component.",
+      "files": [
+        {
+          "path": "registry/default/toolbar/toolbar.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/toolbar.tsx"
+        }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/button"
+      ]
+    },
+    {
+      "name": "tooltip",
+      "type": "registry:ui",
+      "title": "Tooltip",
+      "description": "A tooltip component.",
+      "files": [
+        {
+          "path": "registry/default/tooltip/tooltip.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/tooltip.tsx"
+        }
+      ]
+    },
+    {
+      "name": "tree",
+      "type": "registry:ui",
+      "title": "Tree",
+      "description": "A tree component.",
+      "files": [
+        {
+          "path": "registry/default/tree/tree.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/tree.tsx"
+        },
+        {
+          "path": "registry/default/tree/lib/tree-utils.ts",
+          "type": "registry:lib",
+          "target": "lib/cubby-ui/tree-utils.ts"
+        }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/checkbox"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ]
+    }
+  ]
+}

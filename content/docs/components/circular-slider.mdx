@@ -1,0 +1,283 @@
+---
+title: Circular Slider
+description: A radial slider component for selecting values along a circular path
+---
+
+## Preview
+
+<ComponentPreview component="circular-slider" example="circular-slider-basic" />
+
+## Installation
+
+<ComponentInstall component="circular-slider" />
+
+## Usage
+
+<ComponentUsage component="circular-slider" />
+
+## Examples
+
+### With Value Display
+
+Display the current value in the center of the slider.
+
+<ComponentPreview
+  component="circular-slider"
+  example="circular-slider-with-value"
+/>
+
+### Sizes
+
+Configure the slider size and independently control track, indicator, and thumb dimensions.
+
+<ComponentPreview component="circular-slider" example="circular-slider-sizes" />
+
+### Variants
+
+Choose between a classic ring style or a filled circle with a radial indicator.
+
+<ComponentPreview
+  component="circular-slider"
+  example="circular-slider-variants"
+/>
+
+### Format Value
+
+Customize the displayed value with custom formatting like units or symbols.
+
+<ComponentPreview
+  component="circular-slider"
+  example="circular-slider-format-value"
+/>
+
+### With Markers
+
+Add visual markers around the circle for better value indication.
+
+<ComponentPreview
+  component="circular-slider"
+  example="circular-slider-with-markers"
+/>
+
+### Direction
+
+Control the direction of value progression around the circle.
+
+<ComponentPreview
+  component="circular-slider"
+  example="circular-slider-counterclockwise"
+/>
+
+### Non-Continuous Mode
+
+Disable continuous mode to show a visual gap and prevent wrapping from max to min.
+
+<ComponentPreview
+  component="circular-slider"
+  example="circular-slider-non-continuous"
+/>
+
+### Custom Start Angle
+
+Configure where the slider starts on the circle.
+
+<ComponentPreview
+  component="circular-slider"
+  example="circular-slider-custom-start"
+/>
+
+## API Reference
+
+The Circular Slider is a custom component built with SVG and follows the established patterns from Base UI components (using `useRender` and `mergeProps`).
+
+### CircularSliderRoot
+
+The root container that manages state and provides context to child components.
+
+<ApiPropsList>
+
+<ApiProp name="value" fullType="number">
+  Controlled value for the slider.
+</ApiProp>
+
+<ApiProp name="defaultValue" fullType="number" defaultValue="0">
+  Uncontrolled default value for the slider.
+</ApiProp>
+
+<ApiProp
+  name="onValueChange"
+  fullType='(value: number, reason: "drag" | "keyboard" | "click") => void'
+  simpleType="function"
+>
+  Callback fired when the slider value changes. Receives the new value and the
+  reason for the change (drag, keyboard, or click).
+</ApiProp>
+
+<ApiProp
+  name="onValueCommitted"
+  fullType="(value: number) => void"
+  simpleType="function"
+>
+  Callback fired when the user stops interacting with the slider (on pointer
+  up).
+</ApiProp>
+
+<ApiProp name="min" fullType="number" defaultValue="0">
+  Minimum value of the slider range.
+</ApiProp>
+
+<ApiProp name="max" fullType="number" defaultValue="100">
+  Maximum value of the slider range.
+</ApiProp>
+
+<ApiProp name="step" fullType="number" defaultValue="1">
+  Step increment for value changes. The slider value will snap to multiples of
+  this value.
+</ApiProp>
+
+<ApiProp name="largeStep" fullType="number" defaultValue="10">
+  Step increment for Page Up/Down keyboard navigation.
+</ApiProp>
+
+<ApiProp name="startAngle" fullType="number" defaultValue="0">
+  Starting angle in degrees where 0° is at the top (12 o'clock position). Use
+  90° for right, 180° for bottom, 270° for left.
+</ApiProp>
+
+<ApiProp
+  name="direction"
+  fullType='"clockwise" | "counterclockwise"'
+  simpleType="string"
+  defaultValue='"clockwise"'
+>
+  Direction of value progression around the circle.
+</ApiProp>
+
+<ApiProp name="continuous" fullType="boolean" defaultValue="true">
+  Enable continuous mode where the slider can loop seamlessly from max back to
+  min (e.g., 360° → 0°). When false, displays a gap at the bottom.
+</ApiProp>
+
+<ApiProp name="disabled" fullType="boolean" defaultValue="false">
+  Disable all interactions with the slider.
+</ApiProp>
+
+<ApiProp name="size" fullType="number" defaultValue="96">
+  Size of the circular slider container in pixels. This only affects the
+  container dimensions, not the track or thumb sizes.
+</ApiProp>
+
+<ApiProp
+  name="variant"
+  fullType='"default" | "filled"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Visual style variant. "default" shows a ring style, "filled" shows a filled
+  circle with a radial indicator line.
+</ApiProp>
+
+</ApiPropsList>
+
+#### Form & Accessibility
+
+These props are forwarded to an underlying native `<input type="range">` for form integration and screen reader support.
+
+<ApiPropsList>
+
+<ApiProp name="name" fullType="string">Form submission name.</ApiProp>
+
+<ApiProp name="id" fullType="string">Element ID for label association.</ApiProp>
+
+<ApiProp name="required" fullType="boolean">Required for form validation.</ApiProp>
+
+<ApiProp name="form" fullType="string">Associate with a form by ID.</ApiProp>
+
+<ApiProp name="aria-label" fullType="string">Accessible label.</ApiProp>
+
+<ApiProp name="aria-labelledby" fullType="string">ID of labelling element.</ApiProp>
+
+<ApiProp name="aria-describedby" fullType="string">ID of describing element.</ApiProp>
+
+<ApiProp name="aria-valuetext" fullType="string | ((value: number) => string)">
+  Human-readable value. Can be a function for dynamic text.
+</ApiProp>
+
+</ApiPropsList>
+
+### CircularSliderTrack
+
+The background circle or arc that shows the full range.
+
+<ApiPropsList>
+
+<ApiProp name="strokeWidth" fullType="number" defaultValue="16">
+  Width of the track stroke in pixels. This value is converted to SVG units for
+  consistent sizing across different container sizes.
+</ApiProp>
+
+</ApiPropsList>
+
+### CircularSliderIndicator
+
+The arc that shows the selected value range from min to current value.
+
+<ApiPropsList>
+
+<ApiProp name="strokeWidth" fullType="number" defaultValue="16">
+  Width of the indicator stroke in pixels. Should typically match the track
+  strokeWidth for visual consistency.
+</ApiProp>
+
+</ApiPropsList>
+
+### CircularSliderThumb
+
+The draggable handle on the circle that controls the value.
+
+<ApiPropsList>
+
+<ApiProp name="size" fullType="number" defaultValue="16">
+  Size of the thumb in pixels. For default variant, this is both width and
+  height. For filled variant, this is the length of the radial line.
+</ApiProp>
+
+</ApiPropsList>
+
+### CircularSliderValue
+
+Text display of the current value, typically shown in the center of the circle.
+
+<ApiPropsList>
+
+<ApiProp
+  name="formatValue"
+  fullType="(value: number) => string"
+  simpleType="function"
+>
+  Custom formatter for the displayed value. Useful for adding units or custom
+  formatting (e.g., adding "h" for hours, "°" for degrees).
+</ApiProp>
+
+</ApiPropsList>
+
+### CircularSliderMarkers
+
+Visual tick marks around the circle for better value indication.
+
+<ApiPropsList>
+
+<ApiProp name="count" fullType="number" defaultValue="12">
+  Number of evenly-spaced markers to display around the circle.
+</ApiProp>
+
+<ApiProp name="length" fullType="number" defaultValue="10 (filled) / 5 (default)">
+  Length of each marker line in pixels. Default length varies by variant: 10px
+  for filled variant, 5px for default variant.
+</ApiProp>
+
+<ApiProp name="showLabels" fullType="boolean" defaultValue="false">
+  Show labels on markers. Currently reserved for future implementation.
+</ApiProp>
+
+</ApiPropsList>

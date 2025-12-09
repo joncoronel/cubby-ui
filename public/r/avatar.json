@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "avatar",
+  "type": "registry:ui",
+  "title": "Avatar",
+  "description": "A avatar component.",
+  "dependencies": [
+    "class-variance-authority"
+  ],
+  "files": [
+    {
+      "path": "registry/default/avatar/avatar.tsx",
+      "content": "\"use client\"\r\n\r\nimport * as React from \"react\"\r\nimport { Avatar as AvatarBase } from \"@base-ui-components/react/avatar\"\r\nimport { cva, VariantProps } from \"class-variance-authority\"\r\n\r\nimport { cn } from \"@/lib/utils\"\r\n\r\nconst avatarVariants = cva(\r\n\t\"relative flex shrink-0 overflow-hidden rounded-full\",\r\n\t{\r\n\t\tvariants: {\r\n\t\t\tsize: {\r\n\t\t\t\tsm: \"size-8 text-sm\",\r\n\t\t\t\tmd: \"size-10\",\r\n\t\t\t\tlg: \"size-12 text-lg\",\r\n\t\t\t},\r\n\t\t},\r\n\t\tdefaultVariants: {\r\n\t\t\tsize: \"md\",\r\n\t\t},\r\n\t}\r\n)\r\n\r\nfunction Avatar({\r\n\tclassName,\r\n\tsize,\r\n\t...props\r\n}: React.ComponentProps<typeof AvatarBase.Root> &\r\n\tVariantProps<typeof avatarVariants>) {\r\n\treturn (\r\n\t\t<AvatarBase.Root\r\n\t\t\tdata-slot=\"avatar\"\r\n\t\t\tclassName={cn(avatarVariants({ size }), className)}\r\n\t\t\t{...props}\r\n\t\t/>\r\n\t)\r\n}\r\n\r\nfunction AvatarImage({\r\n\tclassName,\r\n\t...props\r\n}: React.ComponentProps<typeof AvatarBase.Image>) {\r\n\treturn (\r\n\t\t<AvatarBase.Image\r\n\t\t\tdata-slot=\"avatar-image\"\r\n\t\t\tclassName={cn(\"size-full object-cover\", className)}\r\n\t\t\t{...props}\r\n\t\t/>\r\n\t)\r\n}\r\n\r\nfunction AvatarFallback({\r\n\tclassName,\r\n\t...props\r\n}: React.ComponentProps<typeof AvatarBase.Fallback>) {\r\n\treturn (\r\n\t\t<AvatarBase.Fallback\r\n\t\t\tdata-slot=\"avatar-fallback\"\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"bg-muted flex size-full items-center justify-center rounded-full select-none\",\r\n\t\t\t\tclassName\r\n\t\t\t)}\r\n\t\t\t{...props}\r\n\t\t/>\r\n\t)\r\n}\r\n\r\nexport { Avatar, AvatarImage, AvatarFallback }\r\n",
+      "type": "registry:ui",
+      "target": "components/ui/cubby-ui/avatar.tsx"
+    }
+  ]
+}

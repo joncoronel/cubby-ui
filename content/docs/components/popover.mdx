@@ -1,0 +1,155 @@
+---
+title: Popover
+description: Floating content that appears relative to a trigger element
+---
+
+import { Popover, PopoverContent, PopoverTrigger } from "@/registry/default/popover/popover";
+
+## Preview
+
+<ComponentPreview component="popover" example="popover-basic" />
+
+## Installation
+
+<ComponentInstall component="popover" />
+
+## Usage
+
+<ComponentUsage component="popover" />
+
+## Examples
+
+### Advanced Positioning
+
+Control popover placement with advanced positioning options.
+
+<ComponentPreview component="popover" example="popover-advanced-positioning" />
+
+### Hover Trigger
+
+Open popover on hover instead of click.
+
+<ComponentPreview component="popover" example="popover-hover-trigger" />
+
+### With Backdrop
+
+Add backdrop overlay when popover is open.
+
+<ComponentPreview component="popover" example="popover-with-backdrop" />
+
+### With Header and Footer
+
+Include structured header and footer sections.
+
+<ComponentPreview component="popover" example="popover-with-header-and-footer" />
+
+### Without Arrow
+
+Hide the arrow pointer for a cleaner look.
+
+<ComponentPreview component="popover" example="popover-without-arrow" />
+
+## API Reference
+
+The Popover component is built on top of [Base UI's Popover](https://base-ui.com/react/components/popover). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Popover documentation](https://base-ui.com/react/components/popover).
+
+### Custom Props
+
+#### PopoverContent
+
+<ApiPropsList>
+
+<ApiProp
+  name="arrow"
+  fullType="boolean"
+  defaultValue="true"
+>
+  Show or hide the popover arrow pointing to the trigger. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp
+  name="side"
+  fullType="'top' | 'right' | 'bottom' | 'left'"
+>
+  Which side of the trigger to position the popover. Flattened from Positioner for easier API.
+</ApiProp>
+
+<ApiProp
+  name="align"
+  fullType="'start' | 'center' | 'end'"
+>
+  How to align the popover relative to the trigger. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp
+  name="sideOffset"
+  fullType="number"
+>
+  Distance in pixels between trigger and popover. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp
+  name="alignOffset"
+  fullType="number"
+>
+  Offset along the alignment axis. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp
+  name="collisionBoundary"
+  fullType="Element | Element[] | 'clipping-ancestors'"
+>
+  Boundary for collision detection. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp
+  name="collisionPadding"
+  fullType="number | Partial<Record<Side, number>>"
+>
+  Padding from collision boundary. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp
+  name="sticky"
+  fullType="boolean"
+>
+  Whether popover should stick to trigger during scroll. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp
+  name="positionMethod"
+  fullType="'absolute' | 'fixed'"
+>
+  CSS position method. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp
+  name="arrowPadding"
+  fullType="number"
+>
+  Minimum padding between arrow and popover edges. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp
+  name="container"
+  fullType="HTMLElement | null | undefined"
+>
+  Portal container element. Flattened from Positioner.
+</ApiProp>
+
+</ApiPropsList>
+
+### Modified Defaults
+
+Our implementation changes the following Base UI prop defaults:
+
+- **PopoverContent**: `side` defaults to `'bottom'` (Base UI defaults to `'top'`)
+- **PopoverContent**: `align` defaults to `'center'` (Base UI defaults to `'center'` but we make it explicit)
+- **PopoverContent**: `sideOffset` defaults to `8` (Base UI defaults to `0`)
+- **PopoverContent**: `alignOffset` defaults to `0`
+- **PopoverContent**: `collisionPadding` defaults to `10`
+- **PopoverContent**: `sticky` defaults to `false`
+- **PopoverContent**: `positionMethod` defaults to `'absolute'`
+- **PopoverContent**: `arrow` defaults to `true`

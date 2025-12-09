@@ -1,0 +1,119 @@
+---
+title: Menubar
+description: Horizontal menu bar for organizing navigation and actions
+---
+
+import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } from "@/registry/default/menubar/menubar";
+
+## Preview
+
+<ComponentPreview component="menubar" example="menubar-basic" />
+
+## Installation
+
+<ComponentInstall component="menubar" />
+
+## Usage
+
+<ComponentUsage component="menubar" />
+
+## API Reference
+
+The Menubar component is built on top of [Base UI's Menubar](https://base-ui.com/react/components/menubar). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Menubar documentation](https://base-ui.com/react/components/menubar).
+
+### Custom Props
+
+#### MenubarContent
+
+<ApiPropsList>
+
+<ApiProp
+  name="align"
+  fullType='"start" | "center" | "end"'
+  simpleType="string"
+  defaultValue='"start"'
+>
+  How to align the menu. Flattened from Positioner. Base UI defaults to `'center'`.
+</ApiProp>
+
+<ApiProp
+  name="alignOffset"
+  fullType="number"
+  defaultValue="-4"
+>
+  Offset along alignment axis. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp
+  name="sideOffset"
+  fullType="number"
+  defaultValue="8"
+>
+  Distance in pixels for positioning. Flattened from Positioner. Base UI defaults to `0`.
+</ApiProp>
+
+</ApiPropsList>
+
+#### MenubarItem
+
+<ApiPropsList>
+
+<ApiProp
+  name="inset"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Add left padding to align with items that have icons. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp
+  name="variant"
+  fullType='"default" | "destructive"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Visual style variant for dangerous actions. Custom prop not available in Base UI.
+</ApiProp>
+
+</ApiPropsList>
+
+#### MenubarLabel
+
+<ApiPropsList>
+
+<ApiProp
+  name="inset"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Add left padding to align with items that have icons. Custom prop not available in Base UI.
+</ApiProp>
+
+</ApiPropsList>
+
+#### MenubarSubTrigger
+
+<ApiPropsList>
+
+<ApiProp
+  name="inset"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Add left padding to align with items that have icons. Custom prop not available in Base UI.
+</ApiProp>
+
+</ApiPropsList>
+
+### Modified Defaults
+
+Our implementation changes the following Base UI prop defaults:
+
+- **MenubarTrigger**: `delay` defaults to `0` (Base UI defaults to `600`)
+- **MenubarTrigger**: `closeDelay` defaults to `0`
+- **MenubarContent**: `align` defaults to `'start'` (Base UI defaults to `'center'`)
+- **MenubarContent**: `alignOffset` defaults to `-4`
+- **MenubarContent**: `sideOffset` defaults to `8` (Base UI defaults to `0`)
+- **MenubarSubContent**: `sideOffset` defaults to `8`

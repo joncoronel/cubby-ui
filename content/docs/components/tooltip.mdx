@@ -1,0 +1,89 @@
+---
+title: Tooltip
+description: Contextual information that appears on hover or focus
+---
+
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/registry/default/tooltip/tooltip";
+
+## Preview
+
+<ComponentPreview component="tooltip" example="tooltip-basic" />
+
+## Installation
+
+<ComponentInstall component="tooltip" />
+
+## Usage
+
+<ComponentUsage component="tooltip" />
+
+## Examples
+
+### With Button
+
+Add tooltips to button elements.
+
+<ComponentPreview component="tooltip" example="tooltip-with-button" />
+
+### Positions
+
+Control tooltip placement around the trigger.
+
+<ComponentPreview component="tooltip" example="tooltip-positions" />
+
+### With Delay
+
+Add custom delay before tooltip appears.
+
+<ComponentPreview component="tooltip" example="tooltip-with-delay" />
+
+### Icon Toolbar
+
+Use tooltips in icon-only toolbars.
+
+<ComponentPreview component="tooltip" example="tooltip-icon-toolbar" />
+
+## API Reference
+
+The Tooltip component is built on top of [Base UI's Tooltip](https://base-ui.com/react/components/tooltip). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Tooltip documentation](https://base-ui.com/react/components/tooltip).
+
+### Custom Props
+
+#### TooltipContent
+
+<ApiPropsList>
+
+<ApiProp
+  name="side"
+  fullType="'top' | 'right' | 'bottom' | 'left'"
+>
+  Which side of the trigger to position the tooltip. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp
+  name="align"
+  fullType="'start' | 'center' | 'end'"
+>
+  How to align the tooltip relative to the trigger. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp
+  name="sideOffset"
+  fullType="number"
+>
+  Distance in pixels between trigger and tooltip. Flattened from Positioner.
+</ApiProp>
+
+</ApiPropsList>
+
+### Modified Defaults
+
+Our implementation changes the following Base UI prop defaults:
+
+- **TooltipTrigger**: `delay` defaults to `0` (Base UI defaults to `600`)
+- **TooltipTrigger**: `closeDelay` defaults to `0` (Base UI defaults to `0` but we make it explicit)
+- **TooltipContent**: `side` defaults to `'top'` (Base UI defaults to `'top'` but we make it explicit)
+- **TooltipContent**: `align` defaults to `'center'`
+- **TooltipContent**: `sideOffset` defaults to `8` (Base UI defaults to `0`)

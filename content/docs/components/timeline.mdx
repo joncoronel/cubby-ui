@@ -1,0 +1,47 @@
+---
+title: Timeline
+description: Display events in chronological order with visual connection
+---
+
+import { Timeline, TimelineItem, TimelineContent, TimelineConnector, TimelineIcon } from "@/registry/default/timeline/timeline";
+
+## Preview
+
+<ComponentPreview component="timeline" example="timeline-basic" />
+
+## Installation
+
+<ComponentInstall component="timeline" />
+
+## Usage
+
+<ComponentUsage component="timeline" />
+
+## Examples
+
+### Horizontal
+
+Display timeline events horizontally.
+
+<ComponentPreview component="timeline" example="timeline-horizontal" />
+
+### Stepper
+
+Use timeline as a step progress indicator.
+
+<ComponentPreview component="timeline" example="timeline-stepper" />
+
+## API Reference
+
+The Timeline component is a custom implementation. It does not extend Base UI.
+
+### Timeline Props
+
+- **defaultValue**: `number` (default: `1`) - Initial active step (uncontrolled)
+- **value**: `number` - Active step (controlled)
+- **onValueChange**: `(value: number) => void` - Callback when active step changes
+- **orientation**: `"horizontal" | "vertical"` (default: `"vertical"`) - Timeline layout direction
+
+### TimelineItem Props
+
+- **step**: `number` (required) - Step number for this timeline item

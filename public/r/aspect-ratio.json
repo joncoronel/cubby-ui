@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "aspect-ratio",
+  "type": "registry:ui",
+  "title": "Aspect-ratio",
+  "description": "A aspect-ratio component.",
+  "files": [
+    {
+      "path": "registry/default/aspect-ratio/aspect-ratio.tsx",
+      "content": "import * as React from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\n\r\nexport interface AspectRatioProps extends React.HTMLAttributes<HTMLDivElement> {\r\n  ratio?: number | `${number}/${number}`;\r\n}\r\n\r\nfunction AspectRatio({\r\n  children,\r\n  className,\r\n  ratio = 1,\r\n  style,\r\n  ...props\r\n}: AspectRatioProps) {\r\n  const aspectRatio =\r\n    typeof ratio === \"string\"\r\n      ? ratio\r\n          .split(\"/\")\r\n          .map(Number)\r\n          .reduce((a, b) => a / b)\r\n      : ratio;\r\n\r\n  return (\r\n    <div\r\n      data-slot=\"aspect-ratio\"\r\n      style={{\r\n        ...style,\r\n        aspectRatio: aspectRatio.toString(),\r\n      }}\r\n      className={cn(\"w-full\", className)}\r\n      {...props}\r\n    >\r\n      {children}\r\n    </div>\r\n  );\r\n}\r\n\r\nexport { AspectRatio };\r\n",
+      "type": "registry:ui",
+      "target": "components/ui/cubby-ui/aspect-ratio.tsx"
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+---
+title: Toast
+description: Brief notification message that appears temporarily
+---
+
+import { Toast, useToast } from "@/registry/default/toast/toast";
+
+## Preview
+
+<ComponentPreview component="toast" example="toast-basic" />
+
+## Installation
+
+<ComponentInstall component="toast" />
+
+## Usage
+
+<ComponentUsage component="toast" />
+
+## Examples
+
+### With Action
+
+Include action buttons in toast notifications.
+
+<ComponentPreview component="toast" example="toast-with-action" />
+
+## API Reference
+
+The Toast component is built on top of [Base UI's Toast](https://base-ui.com/components/toast). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Toast documentation](https://base-ui.com/components/toast).
+
+### toast() Function
+
+The primary API is the `toast()` function, which programmatically displays toast notifications. It supports two call signatures:
+
+**1. Object-based (recommended)**
+
+<CodeBlockMDX code={`toast({
+  title: "Success",
+  description: "Your changes have been saved",
+  type: "success"
+})`} language="tsx" />
+```tsx
+toast({
+  title: "Success",
+  description: "Your changes have been saved",
+  type: "success"
+})
+```
+
+**2. JSX-based**
+
+```tsx
+toast(<div>Custom JSX content</div>, { type: "info" });
+```
+
+### Custom Props
+
+- **title**: `string` - Toast title
+- **description**: `string` - Toast description
+- **type**: `"default" | "success" | "error" | "warning" | "info"` (default: `"default"`) - Visual type of the toast
+- **duration**: `number` - Duration in milliseconds before auto-dismissal
+- **priority**: `"low" | "high"` (default: `"low"`) - Display priority (high priority toasts appear at the top)
+- **action**: `{ label: string; onClick: () => void }` - Action button configuration
+- **data**: `TData` - Custom data attached to the toast
+- **onClose**: `() => void` - Lifecycle callback when toast closes
+- **onRemove**: `() => void` - Lifecycle callback when toast is removed from DOM
+
+### Helper Methods
+
+The toast system also provides type-specific helper methods:
+
+- **toast.success()** - Display a success toast (green with checkmark)
+- **toast.error()** - Display an error toast (red with X)
+- **toast.warning()** - Display a warning toast (yellow with exclamation)
+- **toast.info()** - Display an info toast (blue with info icon)
+- **toast.promise()** - Display a toast that updates based on promise state:
+  ```tsx
+  toast.promise(fetchData(), {
+    loading: "Loading...",
+    success: "Data loaded!",
+    error: "Failed to load",
+  });
+  ```

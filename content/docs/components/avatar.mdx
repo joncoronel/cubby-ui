@@ -1,0 +1,62 @@
+---
+title: Avatar
+description: Display user profile images with fallback support and status indicators
+---
+
+import { Avatar, AvatarImage, AvatarFallback } from "@/registry/default/avatar/avatar";
+
+## Preview
+
+<ComponentPreview component="avatar" example="avatar-basic" />
+
+## Installation
+
+<ComponentInstall component="avatar" />
+
+## Usage
+
+<ComponentUsage component="avatar" />
+
+## Examples
+
+### Sizes
+
+Display avatars in different sizes.
+
+<ComponentPreview component="avatar" example="avatar-sizes" />
+
+### Fallback
+
+Show fallback content when image fails to load.
+
+<ComponentPreview component="avatar" example="avatar-fallback" />
+
+### Avatar Group
+
+Display multiple avatars in a group layout.
+
+<ComponentPreview component="avatar" example="avatar-group" />
+
+### With Status Indicator
+
+Add online/offline status indicators to avatars.
+
+<ComponentPreview component="avatar" example="avatar-with-status-indicator" />
+
+## API Reference
+
+The Avatar component is built on top of [Base UI's Avatar](https://base-ui.com/react/components/avatar). All Base UI props are supported. The documentation below only covers custom props specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Avatar documentation](https://base-ui.com/react/components/avatar).
+
+### Custom Props
+
+#### Avatar
+
+<ApiPropsList>
+
+<ApiProp name="size" fullType='"sm" | "md" | "lg"' simpleType="string" defaultValue='"md"'>
+  Size variant for the avatar. Custom prop not available in Base UI.
+</ApiProp>
+
+</ApiPropsList>

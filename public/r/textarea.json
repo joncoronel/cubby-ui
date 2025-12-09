@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "textarea",
+  "type": "registry:ui",
+  "title": "Textarea",
+  "description": "A textarea component.",
+  "files": [
+    {
+      "path": "registry/default/textarea/textarea.tsx",
+      "content": "import * as React from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\n\r\nfunction Textarea({ className, ...props }: React.ComponentProps<\"textarea\">) {\r\n  return (\r\n    <textarea\r\n      data-slot=\"textarea\"\r\n      className={cn(\r\n        \"placeholder:text-muted-foreground aria-invalid:ring-destructive/30 aria-invalid:border-destructive bg-input border-border/50 flex field-sizing-content min-h-20 w-full rounded-lg border px-4 py-3 text-base shadow-[0_1px_3px_0_oklch(0.18_0_0_/_0.04)] transition-colors duration-200 outline-none disabled:cursor-not-allowed disabled:opacity-60 md:text-sm\",\r\n        \"focus-visible:outline-ring/30 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2\",\r\n        className,\r\n      )}\r\n      {...props}\r\n    />\r\n  );\r\n}\r\n\r\nexport { Textarea };\r\n",
+      "type": "registry:ui",
+      "target": "components/ui/cubby-ui/textarea.tsx"
+    }
+  ]
+}

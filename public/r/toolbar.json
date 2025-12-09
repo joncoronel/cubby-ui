@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "toolbar",
+  "type": "registry:ui",
+  "title": "Toolbar",
+  "description": "A toolbar component.",
+  "registryDependencies": [
+    "@cubby-ui/button"
+  ],
+  "files": [
+    {
+      "path": "registry/default/toolbar/toolbar.tsx",
+      "content": "\"use client\"\r\n\r\nimport * as React from \"react\"\r\nimport { Toolbar as BaseToolbar } from \"@base-ui-components/react/toolbar\"\r\n\r\nimport { ButtonProps, buttonVariants } from \"@/registry/default/button/button\"\r\n\r\nimport { cn } from \"@/lib/utils\"\r\n\r\nfunction Toolbar({\r\n\tclassName,\r\n\t...props\r\n}: React.ComponentProps<typeof BaseToolbar.Root>) {\r\n\treturn (\r\n\t\t<BaseToolbar.Root\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"bg-popover border border-border/60 flex items-center gap-1 rounded-md p-1 [box-shadow:0_6px_20px_oklch(0_0_0/0.10)] ring-1 ring-border/15 dark:ring-0\",\r\n\t\t\t\tclassName\r\n\t\t\t)}\r\n\t\t\t{...props}\r\n\t\t/>\r\n\t)\r\n}\r\n\r\nfunction ToolbarButton({\r\n\tclassName,\r\n\tvariant,\r\n\tsize,\r\n\t...props\r\n}: React.ComponentProps<typeof BaseToolbar.Button> & ButtonProps) {\r\n\treturn (\r\n\t\t<BaseToolbar.Button\r\n\t\t\tclassName={cn(\r\n\t\t\t\tbuttonVariants({ variant: variant ?? \"ghost\", size: size ?? \"default\" }),\r\n\t\t\t\t\"shrink-0\",\r\n\t\t\t\tclassName\r\n\t\t\t)}\r\n\t\t\t{...props}\r\n\t\t/>\r\n\t)\r\n}\r\n\r\nfunction ToolbarSeparator({\r\n\tclassName,\r\n\t...props\r\n}: React.ComponentProps<typeof BaseToolbar.Separator>) {\r\n\treturn (\r\n\t\t<BaseToolbar.Separator\r\n\t\t\tclassName={cn(\"bg-border h-6 w-px shrink-0\", className)}\r\n\t\t\t{...props}\r\n\t\t/>\r\n\t)\r\n}\r\n\r\nfunction ToolbarInput({\r\n\t...props\r\n}: React.ComponentProps<typeof BaseToolbar.Input>) {\r\n\treturn <BaseToolbar.Input {...props} />\r\n}\r\n\r\nfunction ToolbarGroup({\r\n\tclassName,\r\n\t...props\r\n}: React.ComponentProps<typeof BaseToolbar.Group>) {\r\n\treturn (\r\n\t\t<BaseToolbar.Group\r\n\t\t\tclassName={cn(\"flex items-center gap-1\", className)}\r\n\t\t\t{...props}\r\n\t\t/>\r\n\t)\r\n}\r\n\r\nfunction ToolbarLink({\r\n\tclassName,\r\n\t...props\r\n}: React.ComponentProps<typeof BaseToolbar.Link>) {\r\n\treturn (\r\n\t\t<BaseToolbar.Link\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"text-muted-foreground hover:text-foreground focus-visible:ring-ring/50 inline-flex h-9 shrink-0 items-center gap-2 rounded-md px-3 text-sm no-underline transition-colors focus-visible:ring-2 focus-visible:outline-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4\",\r\n\t\t\t\tclassName\r\n\t\t\t)}\r\n\t\t\t{...props}\r\n\t\t/>\r\n\t)\r\n}\r\n\r\nexport {\r\n\tToolbar,\r\n\tToolbarButton,\r\n\tToolbarSeparator,\r\n\tToolbarInput,\r\n\tToolbarGroup,\r\n\tToolbarLink,\r\n}\r\n",
+      "type": "registry:ui",
+      "target": "components/ui/cubby-ui/toolbar.tsx"
+    }
+  ]
+}

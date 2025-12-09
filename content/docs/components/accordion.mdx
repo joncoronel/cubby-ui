@@ -1,0 +1,179 @@
+---
+title: Accordion
+description: Vertically stacked set of interactive headings that reveal or hide associated content sections
+---
+
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/registry/default/accordion/accordion";
+
+## Preview
+
+<ComponentPreview component="accordion" example="accordion-demo" />
+
+## Installation
+
+<ComponentInstall component="accordion" />
+
+## Usage
+
+<ComponentUsage component="accordion" />
+
+## Examples
+
+### Multiple Open Items
+
+Allow multiple accordion items to be open simultaneously.
+
+<ComponentPreview component="accordion" example="accordion-multiple" />
+
+### Default Expanded
+
+Set accordion items to be expanded by default.
+
+<ComponentPreview component="accordion" example="accordion-default-expanded" />
+
+### Disabled Items
+
+Disable specific accordion items to prevent interaction.
+
+<ComponentPreview component="accordion" example="accordion-disabled" />
+
+### Chevron Indicator
+
+Use chevron icons as expand/collapse indicators.
+
+<ComponentPreview component="accordion" example="accordion-chevron-indicator" />
+
+### Indicator at Start
+
+Position the expand/collapse indicator at the start of the trigger.
+
+<ComponentPreview component="accordion" example="accordion-indicator-start" />
+
+### Without Indicator
+
+Hide the expand/collapse indicator for a minimal design.
+
+<ComponentPreview component="accordion" example="accordion-without-indicator" />
+
+### With Icon
+
+Add custom icons to accordion triggers.
+
+<ComponentPreview component="accordion" example="accordion-with-icon" />
+
+### With Subtitle
+
+Include descriptive subtitles in accordion triggers.
+
+<ComponentPreview component="accordion" example="accordion-with-subtitle" />
+
+### Outline Variant
+
+Display accordion with outline styling.
+
+<ComponentPreview component="accordion" example="accordion-outline-variant" />
+
+### Split Variant
+
+Use split styling for separated accordion items.
+
+<ComponentPreview component="accordion" example="accordion-split-variant" />
+
+### Isolated Bordered Variant
+
+Apply bordered styling to isolated accordion items.
+
+<ComponentPreview component="accordion" example="accordion-isolated-bordered-variant" />
+
+### Isolated Filled Variant
+
+Use filled background styling for isolated items.
+
+<ComponentPreview component="accordion" example="accordion-isolated-filled-variant" />
+
+### Isolated Filled Bordered Variant
+
+Combine filled background with borders for isolated items.
+
+<ComponentPreview component="accordion" example="accordion-isolated-filled-bordered-variant" />
+
+### Nested Variant
+
+Create nested accordion structures with indentation.
+
+<ComponentPreview component="accordion" example="accordion-nested-varaint" />
+
+## API Reference
+
+The Accordion component is built on top of [Base UI's Accordion](https://base-ui.com/react/components/accordion). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Accordion documentation](https://base-ui.com/react/components/accordion).
+
+### Custom Props
+
+#### Accordion
+
+<ApiPropsList>
+
+<ApiProp
+  name="variant"
+  fullType='"default" | "split" | "outline" | "nested" | "isolated-bordered" | "isolated-filled" | "isolated-filled-bordered"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Visual styling variant for the accordion. Custom prop not available in Base UI.
+</ApiProp>
+
+</ApiPropsList>
+
+#### AccordionTrigger
+
+<ApiPropsList>
+
+<ApiProp
+  name="showIndicator"
+  fullType="boolean"
+  defaultValue="true"
+>
+  Show or hide the expand/collapse indicator icon. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp
+  name="indicatorType"
+  fullType='"chevron" | "plus"'
+  simpleType="string"
+  defaultValue='"plus"'
+>
+  Type of indicator icon to display. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp
+  name="indicatorPosition"
+  fullType='"start" | "end"'
+  simpleType="string"
+  defaultValue='"end"'
+>
+  Position of the indicator icon relative to the trigger text. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp
+  name="icon"
+  fullType="ReactNode"
+>
+  Custom icon to display at the start of the trigger. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp
+  name="subtitle"
+  fullType="ReactNode"
+>
+  Subtitle text to display below the trigger text. Custom prop not available in Base UI.
+</ApiProp>
+
+</ApiPropsList>
+
+### Modified Defaults
+
+Our implementation changes the following Base UI prop default:
+
+- **Accordion**: `multiple` defaults to `false` (Base UI doesn't set a default)

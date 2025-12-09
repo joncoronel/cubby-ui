@@ -1,0 +1,109 @@
+---
+title: Progress
+description: Visual indicator showing completion progress of a task or operation
+---
+
+import { Progress } from "@/registry/default/progress/progress";
+
+## Preview
+
+<ComponentPreview component="progress" example="progress-basic" />
+
+## Installation
+
+<ComponentInstall component="progress" />
+
+## Usage
+
+<ComponentUsage component="progress" />
+
+## Examples
+
+### Different Sizes
+
+Display progress bars in various sizes.
+
+<ComponentPreview component="progress" example="progress-different-sizes" />
+
+### Custom Colors
+
+Apply custom color schemes to progress bars.
+
+<ComponentPreview component="progress" example="progress-custom-colors" />
+
+### With Label
+
+Add labels to show progress percentage or status.
+
+<ComponentPreview component="progress" example="progress-with-label" />
+
+### Dynamic Progress
+
+Animated progress that updates over time.
+
+<ComponentPreview component="progress" example="progress-dynamic" />
+
+### File Upload
+
+Progress indicator for file upload operations.
+
+<ComponentPreview component="progress" example="progress-file-upload" />
+
+## API Reference
+
+### ProgressRoot
+
+<ApiPropsList>
+
+<ApiProp name="animated" fullType="boolean" defaultValue="false">
+  Enable animated progress transitions for smooth visual updates.
+</ApiProp>
+
+<ApiProp
+  name="size"
+  fullType='"sm" | "md" | "lg"'
+  simpleType="string"
+  defaultValue='"md"'
+>
+  Size variant for the progress bar. Choose from small, medium, or large sizes.
+</ApiProp>
+
+<ApiProp name="min" fullType="number" defaultValue="0">
+  Minimum value of the progress range.
+</ApiProp>
+
+<ApiProp name="max" fullType="number" defaultValue="100">
+  Maximum value of the progress range.
+</ApiProp>
+
+</ApiPropsList>
+
+### ProgressTrack
+
+<ApiPropsList>
+
+<ApiProp name="striped" fullType="boolean">
+  Add striped background pattern to the progress track for enhanced visual
+  feedback.
+</ApiProp>
+
+</ApiPropsList>
+
+### ProgressValue
+
+<ApiPropsList>
+
+<ApiProp
+  name="format"
+  fullType="(value: number, max: number) => string"
+  simpleType="function"
+>
+  Custom function to format the displayed progress value. Receives current value
+  and max value as parameters.
+</ApiProp>
+
+</ApiPropsList>
+
+### Additional Props
+
+Progress components inherit all props from [Base UI Progress](https://base-ui.com/react/components/progress#api-reference), including value, defaultValue, onChange, and accessibility props.

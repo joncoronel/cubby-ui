@@ -1,0 +1,254 @@
+---
+title: Code Block
+description: A syntax-highlighted code block component with copy functionality and customizable layout
+---
+
+import {
+  CodeBlock,
+  CodeBlockHeader,
+  CodeBlockPre,
+  CodeBlockCode,
+} from "@/registry/default/code-block/code-block";
+
+## Preview
+
+<ComponentPreview component="code-block" example="code-block-basic" />
+
+## Installation
+
+<ComponentInstall component="code-block" />
+
+## Usage
+
+<ComponentUsage component="code-block" />
+
+## Examples
+
+### Floating Copy Button
+
+Display code without a header using a floating copy button that appears on hover.
+
+<ComponentPreview component="code-block" example="code-block-floating-copy" />
+
+### With Filename
+
+Display a filename in the header to provide context for the code snippet.
+
+<ComponentPreview component="code-block" example="code-block-with-filename" />
+
+### With Tabs
+
+Show multiple code variants using tabs, commonly used for different package managers or language implementations.
+
+<ComponentPreview component="code-block" example="code-block-tabs" />
+
+### With Line Numbers
+
+Add line numbers to help users reference specific lines of code.
+
+<ComponentPreview component="code-block" example="code-block-line-numbers" />
+
+### Multiple Languages
+
+The component automatically detects and highlights syntax for different programming languages.
+
+<ComponentPreview component="code-block" example="code-block-languages" />
+
+### Custom Icon
+
+Override the default language icon with a custom icon of your choice.
+
+<ComponentPreview component="code-block" example="code-block-custom-icon" />
+
+### Custom Height
+
+Control the maximum height and scrolling behavior with custom classes.
+
+<ComponentPreview component="code-block" example="code-block-height" />
+
+### Server-Side Highlighting
+
+Pre-highlight code on the server using the `highlight` function for instant rendering with zero client-side delay.
+
+<ComponentPreview
+  component="code-block"
+  example="code-block-server-highlight"
+/>
+
+### Highlighted Lines
+
+Emphasize specific lines with background highlighting and a left border accent.
+
+<ComponentPreview component="code-block" example="code-block-highlight-lines" />
+
+### Diffs
+
+Show code changes with added, removed, and modified line indicators. Diff markers are automatically stripped from the displayed code.
+
+<ComponentPreview component="code-block" example="code-block-diff" />
+
+### Focus Mode
+
+Blur non-focused lines to draw attention to specific parts of the code.
+
+<ComponentPreview component="code-block" example="code-block-focus" />
+
+## API Reference
+
+The CodeBlock component is a custom implementation built with Shiki for syntax highlighting. It does not extend Base UI.
+
+### Props
+
+#### CodeBlock
+
+The main component that manages state and provides context to sub-components automatically via React Context. Sub-components can access `code`, `language`, `nodes`, and `lines` without explicit prop passing.
+
+<ApiPropsList>
+
+<ApiProp name="code" fullType="string" required>
+  The code content to display and syntax highlight. Automatically shared with
+  all sub-components via context.
+</ApiProp>
+
+<ApiProp name="language" fullType="string" defaultValue='"javascript"'>
+  The programming language for syntax highlighting. Supports all Shiki bundled
+  languages (typescript, python, bash, etc.). Automatically shared with
+  sub-components via context.
+</ApiProp>
+
+<ApiProp name="floatingCopy" fullType="boolean" defaultValue="false">
+  Automatically append a floating copy button positioned at the top-right that appears on hover. Ideal for
+  headerless code blocks.
+</ApiProp>
+
+<ApiProp
+  name="highlightLines"
+  fullType="number[] | string"
+  simpleType="array | string"
+>
+  Lines to highlight with background color and left border. Accepts an array of
+  line numbers `[1, 2, 3]` or a range string `"1-3,5,7-9"`.
+</ApiProp>
+
+<ApiProp name="showDiff" fullType="boolean" defaultValue="false">
+  Enable diff mode to show added (+), removed (-), and modified (!) lines. Diff
+  markers are automatically detected and stripped from the displayed code.
+</ApiProp>
+
+<ApiProp
+  name="focusLines"
+  fullType="number[] | string"
+  simpleType="array | string"
+>
+  Lines to keep focused while blurring others. Accepts an array of line numbers
+  `[1, 2, 3]` or a range string `"1-3,5,7-9"`.
+</ApiProp>
+
+<ApiProp name="initial" fullType="React.ReactElement" simpleType="element">
+  Optional pre-highlighted React element to display immediately, useful for
+  server-side rendering.
+</ApiProp>
+
+<ApiProp name="children" fullType="ReactNode" simpleType="node">
+  The sub-components to render inside the code block. Sub-components
+  automatically receive shared state via React Context.
+</ApiProp>
+
+</ApiPropsList>
+
+#### CodeBlockHeader
+
+Smart header component that auto-arranges language icons, filenames, tabs, and copy button based on props. Automatically consumes `language` and `code` from CodeBlock context.
+
+<ApiPropsList>
+
+<ApiProp name="filename" fullType="string">
+  Optional filename to display next to the language icon.
+</ApiProp>
+
+<ApiProp name="showCopy" fullType="boolean" defaultValue="true">
+  Whether to show the copy button in the header.
+</ApiProp>
+
+<ApiProp name="customIcon" fullType="ReactNode" simpleType="node">
+  Custom icon to display instead of the default language icon.
+  Accepts any React node (component, JSX element, etc.).
+</ApiProp>
+
+<ApiProp name="tabs" fullType="HeaderTab[]" simpleType="array">
+  Array of tab objects with `value` and `label` properties. When provided with
+  `activeTab` and `onTabChange`, renders tab navigation.
+</ApiProp>
+
+<ApiProp name="activeTab" fullType="string | undefined">
+  Currently active tab value (required if tabs are provided). Type is inferred from the Tabs component.
+</ApiProp>
+
+<ApiProp
+  name="onTabChange"
+  fullType="function"
+  simpleType="function"
+>
+  Tab change handler (required if tabs are provided). Type is inferred from the Tabs component's `onValueChange` prop.
+</ApiProp>
+
+<ApiProp
+  name="tabVariant"
+  fullType='"capsule" | "underline"'
+  simpleType="string"
+>
+  Visual style variant of the tabs. Type is inferred from the TabsList component's `variant` prop.
+</ApiProp>
+
+<ApiProp name="className" fullType="string">
+  Additional CSS classes for styling the header.
+</ApiProp>
+
+<ApiProp name="render" fullType="ReactElement" simpleType="element">
+  Custom render element for polymorphic behavior.
+</ApiProp>
+
+<ApiProp name="children" fullType="ReactNode" simpleType="node">
+  Custom children for full control over header layout. When provided, all
+  auto-layout props are ignored.
+</ApiProp>
+
+</ApiPropsList>
+
+#### CodeBlockPre
+
+The pre-formatted text container that wraps the code content. Automatically consumes `lines` from CodeBlock context for line numbers. Includes `group` and `relative` classes for floating button support.
+
+<ApiPropsList>
+
+<ApiProp name="lineNumbers" fullType="boolean" defaultValue="false">
+  Automatically display line numbers alongside the code. When enabled, wraps
+  children in proper flex layout.
+</ApiProp>
+
+<ApiProp name="className" fullType="string">
+  Additional CSS classes for styling. Useful for controlling height (e.g.,
+  `max-h-96`) or scrolling behavior.
+</ApiProp>
+
+<ApiProp name="render" fullType="ReactElement" simpleType="element">
+  Custom render element for polymorphic behavior.
+</ApiProp>
+
+</ApiPropsList>
+
+#### CodeBlockCode
+
+The actual syntax-highlighted code element. Automatically consumes `code` and `nodes` (highlighted JSX) from CodeBlock context.
+
+<ApiPropsList>
+
+<ApiProp name="className" fullType="string">
+  Additional CSS classes for styling.
+</ApiProp>
+
+<ApiProp name="render" fullType="ReactElement" simpleType="element">
+  Custom render element for polymorphic behavior.
+</ApiProp>
+
+</ApiPropsList>

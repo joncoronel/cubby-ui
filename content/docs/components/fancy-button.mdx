@@ -1,0 +1,82 @@
+---
+title: Fancy Button
+description: Stylized button with advanced visual effects and animations
+---
+
+import { FancyButton } from "@/registry/default/fancy-button/fancy-button";
+
+## Preview
+
+<ComponentPreview component="fancy-button" example="fancy-button-demo" />
+
+## Installation
+
+<ComponentInstall component="fancy-button" />
+
+## Usage
+
+<ComponentUsage component="fancy-button" />
+
+## Examples
+
+### Sizes
+
+Choose from multiple button sizes.
+
+<ComponentPreview component="fancy-button" example="fancy-button-sizes" />
+
+### With Icons
+
+Add icons for visual context.
+
+<ComponentPreview component="fancy-button" example="fancy-button-with-icons" />
+
+### Custom Colors
+
+Apply custom color schemes.
+
+<ComponentPreview component="fancy-button" example="fancy-button-custom-colors" />
+
+### Loading State
+
+Display loading indicator during async actions.
+
+<ComponentPreview component="fancy-button" example="fancy-button-loading" />
+
+### Disabled State
+
+Show disabled state for unavailable actions.
+
+<ComponentPreview component="fancy-button" example="fancy-button-disabled" />
+
+### As Link
+
+Render as a Next.js Link component.
+
+<ComponentPreview component="fancy-button" example="fancy-button-as-link" />
+
+## API Reference
+
+The FancyButton component is built on top of [Base UI's Button](https://base-ui.com/react/components/button). All Base UI props are supported. The documentation below only covers custom props specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Button documentation](https://base-ui.com/react/components/button).
+
+### Custom Props
+
+#### FancyButton
+
+<ApiPropsList>
+
+<ApiProp name="color" fullType="string" simpleType="string">
+  Custom gradient color for the fancy button effect. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="leftSection" fullType="ReactNode" simpleType="node">
+  Content (typically icon) to display before the button text. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="rightSection" fullType="ReactNode" simpleType="node">
+  Content (typically icon) to display after the button text. Custom prop not available in Base UI.
+</ApiProp>
+
+</ApiPropsList>

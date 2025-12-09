@@ -11,6 +11,14 @@ const config = {
         source: "/docs/:path*.mdx",
         destination: "/llms.mdx/:path*",
       },
+      {
+        source: "/op/analytics/:path*",
+        destination: "https://api.openpanel.dev/:path*",
+      },
+      {
+        source: "/op1.js",
+        destination: "https://openpanel.dev/op1.js",
+      },
     ];
   },
 };

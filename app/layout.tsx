@@ -84,6 +84,8 @@ export default function RootLayout({
       <OpenPanelComponent
         clientId="881f0567-2ea9-4b26-8f29-7bb0dcf1d69e"
         trackScreenViews={true}
+        apiUrl="/op/analytics"
+        cdnUrl="/op1.js"
         // trackAttributes={true}
         // trackOutgoingLinks={true}
         // If you have a user id, you can pass it here to identify the user

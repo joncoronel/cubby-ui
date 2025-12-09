@@ -82,7 +82,7 @@ export default function RootLayout({
         </Providers>
       </body>
       <OpenPanelComponent
-        clientId="881f0567-2ea9-4b26-8f29-7bb0dcf1d69e"
+        clientId={process.env.NEXT_PUBLIC_OPENPANEL_CLIENT_ID!}
         trackScreenViews={true}
         apiUrl="/op/analytics"
         cdnUrl="/op1.js"

@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { RootProvider } from "fumadocs-ui/provider/next";
 import { Providers } from "@/components/providers/providers";
+import { OpenPanelComponent } from "@openpanel/nextjs";
 
 const geistSans = Geist({
   variable: "--font-sans",
@@ -80,6 +81,14 @@ export default function RootLayout({
           </RootProvider>
         </Providers>
       </body>
+      <OpenPanelComponent
+        clientId="881f0567-2ea9-4b26-8f29-7bb0dcf1d69e"
+        trackScreenViews={true}
+        // trackAttributes={true}
+        // trackOutgoingLinks={true}
+        // If you have a user id, you can pass it here to identify the user
+        // profileId={'123'}
+      />
     </html>
   );
 }

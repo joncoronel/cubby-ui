@@ -39,6 +39,9 @@ importers:
       '@internationalized/date':
         specifier: ^3.10.0
         version: 3.10.0
+      '@openpanel/nextjs':
+        specifier: ^1.1.1
+        version: 1.1.1(next@16.0.7(@babel/core@7.28.5)(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       '@origin-space/image-cropper':
         specifier: ^0.1.9
         version: 0.1.9(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
@@ -958,6 +961,19 @@ packages:
 
   '@open-draft/until@2.1.0':
     resolution: {integrity: sha512-U69T3ItWHvLwGg5eJ0n3I62nWuE6ilHlmz7zM0npLBRvPRd7e6NYmg54vvRtP5mZG7kZqZCFVdsTWo7BPtBujg==}
+
+  '@openpanel/nextjs@1.1.1':
+    resolution: {integrity: sha512-azJSB+SxL4ybj9MA1mDZkLBJ67jbZoDQB52SjaPS0lSBLVEQkcJVMO5x+sZFd9UgVVwWIvkTECdLLF+9eyXf8w==}
+    peerDependencies:
+      next: ^12.0.0 || ^13.0.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
+  '@openpanel/sdk@1.0.2':
+    resolution: {integrity: sha512-WvVWCBcJvJhM5MYKO5Hxjo4G/E0tnK5XK2UC+hKDHtoF+iKvtUWa5bz18pFAPQprq0u/Ev2YqirPsrMQJy5g2g==}
+
+  '@openpanel/web@1.0.5':
+    resolution: {integrity: sha512-n/A9fKiHWcDTH2N6N8MM214ET7aoNJjgpLux0GRW+CD0KDEwI8UosQvvz3UOGHZ3jWqMMsUNdU2B7eYk2W87mg==}
 
   '@orama/orama@3.1.16':
     resolution: {integrity: sha512-scSmQBD8eANlMUOglxHrN1JdSW8tDghsPuS83otqealBiIeMukCQMOf/wc0JJjDXomqwNdEQFLXLGHrU6PGxuA==}
@@ -5347,6 +5363,19 @@ snapshots:
       outvariant: 1.4.3
 
   '@open-draft/until@2.1.0': {}
+
+  '@openpanel/nextjs@1.1.1(next@16.0.7(@babel/core@7.28.5)(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)':
+    dependencies:
+      '@openpanel/web': 1.0.5
+      next: 16.0.7(@babel/core@7.28.5)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
+      react: 19.2.1
+      react-dom: 19.2.1(react@19.2.1)
+
+  '@openpanel/sdk@1.0.2': {}
+
+  '@openpanel/web@1.0.5':
+    dependencies:
+      '@openpanel/sdk': 1.0.2
 
   '@orama/orama@3.1.16': {}
 

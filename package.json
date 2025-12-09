@@ -22,6 +22,7 @@
     "@hugeicons/react": "^1.1.1",
     "@icons-pack/react-simple-icons": "^13.8.0",
     "@internationalized/date": "^3.10.0",
+    "@openpanel/nextjs": "^1.1.1",
     "@origin-space/image-cropper": "^0.1.9",
     "@tanstack/react-table": "^8.21.3",
     "@types/mdx": "^2.0.13",

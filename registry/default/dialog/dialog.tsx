@@ -25,8 +25,8 @@ function DialogBackdrop({ className, ...props }: BaseDialog.Backdrop.Props) {
   return (
     <BaseDialog.Backdrop
       className={cn(
-        "ease-out-cubic fixed inset-0 bg-black/40 transition-opacity duration-150 dark:bg-black/60",
-        "data-ending-style:opacity-0 data-starting-style:opacity-0",
+        "ease-out-cubic fixed inset-0 bg-black/40 transition-all duration-200",
+        "backdrop-blur-sm data-ending-style:opacity-0 data-starting-style:opacity-0",
         className,
       )}
       {...props}
@@ -60,7 +60,7 @@ function DialogContent({
           // Scale effect for nested dialogs on desktop
           "scale-[calc(1-0.1*var(--nested-dialogs))]",
           // Animation duration
-          "transition-all duration-100 ease-out data-open:duration-150",
+          "ease-out-cubic transition-all duration-200",
           // Desktop animations: scale and fade
           "data-starting-style:translate-y-[calc(-50%+1.25rem)] data-starting-style:scale-95 data-starting-style:opacity-0",
           "data-ending-style:translate-y-[calc(-50%+1.25rem)] data-ending-style:scale-95 data-ending-style:opacity-0",
@@ -73,7 +73,7 @@ function DialogContent({
       >
         {children}
         {showCloseButton && (
-          <DialogClose className="absolute top-4 right-4 rounded-sm opacity-70 outline-0 outline-offset-0 outline-transparent outline-solid transition-opacity hover:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring/50 disabled:pointer-events-none">
+          <DialogClose className="focus-visible:outline-ring/50 absolute top-4 right-4 rounded-sm opacity-70 outline-0 outline-offset-0 outline-transparent transition-opacity outline-solid hover:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none">
             <XIcon className="h-4 w-4" />
             <span className="sr-only">Close</span>
           </DialogClose>

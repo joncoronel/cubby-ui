@@ -83,7 +83,8 @@
       "Bash(timeout 30 pnpm exec tsc:*)",
       "Bash(pnpm exec tailwindcss:*)",
       "Bash(xargs cat:*)",
-      "Skill(frontend-design:frontend-design)"
+      "Skill(frontend-design:frontend-design)",
+      "Bash(cmd /c del \"c:\\Users\\jonny\\Documents\\Projects\\cubby-ui\\registry\\examples\\dialog\\dialog-custom-backdrop.tsx\")"
     ],
     "deny": []
   }

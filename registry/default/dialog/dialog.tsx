@@ -20,7 +20,6 @@ function DialogClose({ ...props }: BaseDialog.Close.Props) {
   return <BaseDialog.Close data-slot="dialog-close" {...props} />;
 }
 
-// Backdrop/Overlay component
 function DialogBackdrop({ className, ...props }: BaseDialog.Backdrop.Props) {
   return (
     <BaseDialog.Backdrop
@@ -39,19 +38,20 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
-  backdropClassName,
+  variant = "default",
   ...props
 }: BaseDialog.Popup.Props & {
   showCloseButton?: boolean;
-  backdropClassName?: string;
+  variant?: "default" | "inset";
 }) {
   return (
     <DialogPortal>
-      <DialogBackdrop className={backdropClassName} />
+      <DialogBackdrop />
       <BaseDialog.Popup
+        data-variant={variant}
         className={cn(
-          "bg-popover text-popover-foreground fixed z-50 grid w-full gap-4 p-6 shadow-lg",
-          "ring-border/60 max-w-[calc(100%-1rem)] rounded-lg ring-1 sm:max-w-lg",
+          "bg-popover text-popover-foreground fixed z-50 grid w-full shadow-lg",
+          "ring-border max-w-[calc(100%-1rem)] rounded-2xl ring-1 sm:max-w-lg",
           // Mobile: bottom sheet style
           // "right-0 bottom-0 left-0 rounded-t-lg",
           // Desktop: centered modal
@@ -90,8 +90,32 @@ function DialogHeader({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
+      data-slot="dialog-header"
       className={cn(
-        "flex flex-col space-y-1.5 text-center sm:text-left",
+        "flex flex-col space-y-1.5 px-6 pt-6 text-center sm:text-left",
+        // Add bottom padding when header is not followed by body or footer
+        "not:has-[+[data-slot=dialog-body]]:not:has-[+[data-slot=dialog-footer]]:pb-6",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+// Body component
+function DialogBody({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      data-slot="dialog-body"
+      className={cn(
+        "flex-1 px-6 py-4",
+        // Add extra bottom padding when body is not followed by footer
+        "not:has-[+[data-slot=dialog-footer]]:pb-6",
+        // Inset variant: extra bottom padding before footer
+        "in-data-[variant=inset]:has-[+[data-slot=dialog-footer]]:pb-6",
         className,
       )}
       {...props}
@@ -106,8 +130,11 @@ function DialogFooter({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
+      data-slot="dialog-footer"
       className={cn(
-        "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
+        "flex flex-col-reverse gap-2 px-6 pt-4 pb-6 sm:flex-row sm:justify-end",
+        // Inset variant: muted background with top border for separation
+        "in-data-[variant=inset]:border-border in-data-[variant=inset]:bg-muted in-data-[variant=inset]:rounded-b-2xl in-data-[variant=inset]:border-t in-data-[variant=inset]:pb-4",
         className,
       )}
       {...props}
@@ -146,6 +173,7 @@ export {
   DialogTrigger,
   DialogContent,
   DialogHeader,
+  DialogBody,
   DialogFooter,
   DialogTitle,
   DialogDescription,

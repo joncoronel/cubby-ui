@@ -37,12 +37,6 @@ Handle long content with scrolling.
 
 <ComponentPreview component="dialog" example="dialog-scroll" />
 
-### Custom Backdrop
-
-Customize backdrop appearance and behavior.
-
-<ComponentPreview component="dialog" example="dialog-custom-backdrop" />
-
 ### No Close Button
 
 Hide the default close button.
@@ -54,6 +48,12 @@ Hide the default close button.
 Stack multiple dialogs on top of each other.
 
 <ComponentPreview component="dialog" example="dialog-nested" />
+
+### Inset Footer
+
+Use the `inset` variant for a muted footer background that extends to the dialog edges.
+
+<ComponentPreview component="dialog" example="dialog-inset" />
 
 ## API Reference
 
@@ -76,10 +76,11 @@ For the complete Base UI API, see the [Base UI Dialog documentation](https://bas
 </ApiProp>
 
 <ApiProp
-  name="backdropClassName"
-  fullType="string"
+  name="variant"
+  fullType='"default" | "inset"'
+  defaultValue='"default"'
 >
-  Custom className for styling the backdrop overlay. Custom prop not available in Base UI.
+  Visual variant of the dialog. The `inset` variant applies a muted background to the footer that extends to the dialog edges.
 </ApiProp>
 
 </ApiPropsList>

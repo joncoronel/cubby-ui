@@ -3,8 +3,10 @@
 import * as React from "react";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -17,9 +19,7 @@ export default function DialogControlled() {
   return (
     <div className="flex items-center gap-4">
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger
-          render={(props) => <Button {...props}>Open Dialog</Button>}
-        />
+        <DialogTrigger render={<Button>Open Dialog</Button>} />
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Controlled Dialog</DialogTitle>
@@ -28,6 +28,9 @@ export default function DialogControlled() {
               state: {open ? "open" : "closed"}
             </DialogDescription>
           </DialogHeader>
+          <DialogFooter>
+            <DialogClose render={<Button>Close</Button>} />
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

@@ -5,6 +5,7 @@ import {
   DialogClose,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -14,73 +15,54 @@ import { Button } from "@/registry/default/button/button";
 export default function DialogNested() {
   return (
     <Dialog>
-      <DialogTrigger
-        render={(props) => (
-          <Button {...props}>Open Notifications</Button>
-        )}
-      />
+      <DialogTrigger render={<Button>Open Notifications</Button>} />
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Notifications</DialogTitle>
           <DialogDescription>
-            You are all caught up. Good job! Notice how nested dialogs scale and position properly.
+            You are all caught up. Good job! Notice how nested dialogs scale and
+            position properly.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex justify-between items-center pt-4">
+        <DialogFooter className="justify-between">
           <Dialog>
             <DialogTrigger
-              render={(props) => (
-                <Button {...props} variant="outline" size="sm">
-                  Customize
-                </Button>
-              )}
+              render={<Button variant="outline">Customize</Button>}
             />
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Customize Notifications</DialogTitle>
                 <DialogDescription>
-                  This dialog is nested and automatically scales smaller. The parent dialog gets a dark overlay.
+                  This dialog is nested and automatically scales smaller. The
+                  parent dialog gets a dark overlay.
                 </DialogDescription>
               </DialogHeader>
-              <div className="flex justify-between items-center pt-4">
+              <DialogFooter className="justify-between">
                 <Dialog>
                   <DialogTrigger
-                    render={(props) => (
-                      <Button {...props} variant="ghost" size="sm">
-                        Advanced Settings
-                      </Button>
-                    )}
+                    render={<Button variant="ghost">Advanced Settings</Button>}
                   />
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>Advanced Settings</DialogTitle>
                       <DialogDescription>
-                        Third level dialog - even smaller and the parent dialogs both get overlays.
+                        Third level dialog - even smaller and the parent dialogs
+                        both get overlays.
                       </DialogDescription>
                     </DialogHeader>
-                    <div className="flex justify-end pt-4">
-                      <DialogClose
-                        render={(props) => (
-                          <Button {...props} size="sm">Done</Button>
-                        )}
-                      />
-                    </div>
+                    <DialogFooter>
+                      <DialogClose render={<Button size="sm">Done</Button>} />
+                    </DialogFooter>
                   </DialogContent>
                 </Dialog>
                 <DialogClose
-                  render={(props) => (
-                    <Button {...props} variant="outline">Close</Button>
-                  )}
+                  render={<Button variant="outline">Close</Button>}
                 />
-              </div>
+              </DialogFooter>
             </DialogContent>
           </Dialog>
-          <DialogClose
-            render={(props) => (
-              <Button {...props}>Close</Button>
-            )}
-          />
-        </div>
+          <DialogClose render={<Button>Close</Button>} />
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

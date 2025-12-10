@@ -79,7 +79,6 @@ export function ComponentSearch() {
         className={
           "transition-all duration-150 ease-out max-sm:top-4 max-sm:translate-y-0 max-sm:has-[input:placeholder-shown]:shadow-none max-sm:data-[ending-style]:-translate-y-2 max-sm:data-[ending-style]:scale-none max-sm:data-[ending-style]:blur-xs max-sm:data-[starting-style]:-translate-y-4 max-sm:data-[starting-style]:scale-none max-sm:data-[starting-style]:blur-xs"
         }
-        backdropClassName="max-sm:backdrop-blur-xs max-sm:bg-black/25"
       >
         <Command
           items={componentGroups}

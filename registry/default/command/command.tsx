@@ -39,11 +39,9 @@ function Command<ItemValue = any>({
 function CommandDialog({
   children,
   className,
-  backdropClassName,
   ...props
 }: Omit<React.ComponentProps<typeof Dialog>, 'children'> & {
   className?: string;
-  backdropClassName?: string;
   children?: React.ReactNode;
 }) {
   return (
@@ -53,7 +51,6 @@ function CommandDialog({
           "rounded-4xl border-none bg-transparent p-0 shadow-lg ring-0 [&_[data-slot='dialog-close']]:hidden",
           className,
         )}
-        backdropClassName={backdropClassName}
       >
         {children}
       </DialogContent>

@@ -5,6 +5,7 @@ import {
   DialogClose,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -26,13 +27,9 @@ export default function DialogNoCloseButton() {
             This dialog doesn't have the default close button. You must use the button below or press Escape to close.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex justify-end pt-4">
-          <DialogClose
-            render={(props) => (
-              <Button {...props}>Close Dialog</Button>
-            )}
-          />
-        </div>
+        <DialogFooter>
+          <DialogClose render={<Button>Close Dialog</Button>} />
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

@@ -24,8 +24,8 @@ function DialogClose({ ...props }: BaseDialog.Close.Props) {
 const DialogBackdrop = ({ className, ...props }: BaseDialog.Backdrop.Props) => (
   <BaseDialog.Backdrop
     className={cn(
-      "fixed inset-0 bg-black/40 transition-opacity duration-150 ease-out dark:bg-black/60",
-      "data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+      "ease-out-cubic fixed inset-0 bg-black/40 transition-opacity duration-150 dark:bg-black/60",
+      "data-ending-style:opacity-0 data-starting-style:opacity-0",
       className,
     )}
     {...props}
@@ -59,11 +59,11 @@ const DialogContent = ({
         // Animation duration
         "transition-all duration-100 ease-out data-open:duration-150",
         // Desktop animations: scale and fade
-        "data-[starting-style]:translate-y-[calc(-50%+1.25rem)] data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
-        "data-[ending-style]:translate-y-[calc(-50%+1.25rem)] data-[ending-style]:scale-95 data-[ending-style]:opacity-0",
+        "data-starting-style:translate-y-[calc(-50%+1.25rem)] data-starting-style:scale-95 data-starting-style:opacity-0",
+        "data-ending-style:translate-y-[calc(-50%+1.25rem)] data-ending-style:scale-95 data-ending-style:opacity-0",
         // Nested dialog overlay
-        "data-[nested-dialog-open]:after:absolute data-[nested-dialog-open]:after:inset-0",
-        "data-[nested-dialog-open]:after:rounded-[inherit] data-[nested-dialog-open]:after:bg-black/5",
+        "data-nested-dialog-open:after:absolute data-nested-dialog-open:after:inset-0",
+        "data-nested-dialog-open:after:rounded-[inherit] data-nested-dialog-open:after:bg-black/5",
         className,
       )}
       {...props}

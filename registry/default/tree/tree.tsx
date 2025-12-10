@@ -244,10 +244,68 @@ function Tree<TData extends Record<string, unknown> = Record<string, unknown>>({
 
   const handleToggleNode = React.useCallback(
     async (nodeId: string) => {
-      const newExpanded = new Set(expandedNodes);
-      const isExpanding = !newExpanded.has(nodeId);
+      const isCurrentlyExpanded = expandedNodes.has(nodeId);
+      const isExpanding = !isCurrentlyExpanded;
 
-      if (newExpanded.has(nodeId)) {
+      // Find the node to check if it needs to load children
+      const findNode = (
+        nodes: TreeNode<TData>[],
+      ): TreeNode<TData> | undefined => {
+        for (const node of nodes) {
+          if (node.id === nodeId) return node;
+          if (node.children) {
+            const found = findNode(node.children);
+            if (found) return found;
+          }
+        }
+        return undefined;
+      };
+
+      const node = findNode(mergedData);
+      const needsToLoad =
+        isExpanding &&
+        node &&
+        "onLoadChildren" in node &&
+        node.onLoadChildren &&
+        !loadedNodesRef.current.has(nodeId);
+
+      // If we need to load children, delay expansion until loaded
+      if (needsToLoad) {
+        setLoadingNodes((prev) => new Set(prev).add(nodeId));
+        loadedNodesRef.current.add(nodeId);
+
+        try {
+          const children = await node.onLoadChildren!();
+          setLoadedChildren((prev) => {
+            const next = new Map(prev);
+            next.set(nodeId, children);
+            return next;
+          });
+
+          // NOW expand the node after children are loaded
+          const newExpanded = new Set(expandedNodes);
+          newExpanded.add(nodeId);
+          if (expanded && onExpandedChange) {
+            onExpandedChange(Array.from(newExpanded));
+          } else {
+            setInternalExpanded(newExpanded);
+          }
+        } catch (error) {
+          console.error(`Failed to load children for node ${nodeId}:`, error);
+          loadedNodesRef.current.delete(nodeId);
+        } finally {
+          setLoadingNodes((prev) => {
+            const next = new Set(prev);
+            next.delete(nodeId);
+            return next;
+          });
+        }
+        return;
+      }
+
+      // Standard toggle for collapsing or nodes that don't need to load
+      const newExpanded = new Set(expandedNodes);
+      if (isCurrentlyExpanded) {
         newExpanded.delete(nodeId);
       } else {
         newExpanded.add(nodeId);
@@ -257,52 +315,6 @@ function Tree<TData extends Record<string, unknown> = Record<string, unknown>>({
         onExpandedChange(Array.from(newExpanded));
       } else {
         setInternalExpanded(newExpanded);
-      }
-
-      // If expanding and node has onLoadChildren and hasn't been loaded yet
-      if (isExpanding) {
-        const findNode = (
-          nodes: TreeNode<TData>[],
-        ): TreeNode<TData> | undefined => {
-          for (const node of nodes) {
-            if (node.id === nodeId) return node;
-            if (node.children) {
-              const found = findNode(node.children);
-              if (found) return found;
-            }
-          }
-          return undefined;
-        };
-
-        const node = findNode(mergedData);
-        if (
-          node &&
-          "onLoadChildren" in node &&
-          node.onLoadChildren &&
-          !loadedNodesRef.current.has(nodeId)
-        ) {
-          // Mark as loading
-          setLoadingNodes((prev) => new Set(prev).add(nodeId));
-          loadedNodesRef.current.add(nodeId);
-
-          try {
-            const children = await node.onLoadChildren();
-            setLoadedChildren((prev) => {
-              const next = new Map(prev);
-              next.set(nodeId, children);
-              return next;
-            });
-          } catch (error) {
-            console.error(`Failed to load children for node ${nodeId}:`, error);
-            loadedNodesRef.current.delete(nodeId);
-          } finally {
-            setLoadingNodes((prev) => {
-              const next = new Set(prev);
-              next.delete(nodeId);
-              return next;
-            });
-          }
-        }
       }
     },
     [expandedNodes, expanded, onExpandedChange, mergedData],

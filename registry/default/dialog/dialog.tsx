@@ -6,33 +6,22 @@ import { XIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-function Dialog({ ...props }: React.ComponentProps<typeof BaseDialog.Root>) {
-  return <BaseDialog.Root data-slot="dialog" {...props} />;
-}
+const Dialog = BaseDialog.Root;
 
-function DialogPortal({
-  ...props
-}: React.ComponentProps<typeof BaseDialog.Portal>) {
+function DialogPortal({ ...props }: BaseDialog.Portal.Props) {
   return <BaseDialog.Portal data-slot="dialog-portal" {...props} />;
 }
 
-function DialogTrigger({
-  ...props
-}: React.ComponentProps<typeof BaseDialog.Trigger>) {
+function DialogTrigger({ ...props }: BaseDialog.Trigger.Props) {
   return <BaseDialog.Trigger data-slot="dialog-trigger" {...props} />;
 }
 
-function DialogClose({
-  ...props
-}: React.ComponentProps<typeof BaseDialog.Close>) {
+function DialogClose({ ...props }: BaseDialog.Close.Props) {
   return <BaseDialog.Close data-slot="dialog-close" {...props} />;
 }
 
 // Backdrop/Overlay component
-const DialogBackdrop = ({
-  className,
-  ...props
-}: React.ComponentProps<typeof BaseDialog.Backdrop>) => (
+const DialogBackdrop = ({ className, ...props }: BaseDialog.Backdrop.Props) => (
   <BaseDialog.Backdrop
     className={cn(
       "fixed inset-0 bg-black/40 transition-opacity duration-150 ease-out dark:bg-black/60",
@@ -50,7 +39,7 @@ const DialogContent = ({
   showCloseButton = true,
   backdropClassName,
   ...props
-}: React.ComponentProps<typeof BaseDialog.Popup> & {
+}: BaseDialog.Popup.Props & {
   showCloseButton?: boolean;
   backdropClassName?: string;
 }) => (
@@ -119,10 +108,7 @@ const DialogFooter = ({
 );
 
 // Title component
-const DialogTitle = ({
-  className,
-  ...props
-}: React.ComponentProps<typeof BaseDialog.Title>) => (
+const DialogTitle = ({ className, ...props }: BaseDialog.Title.Props) => (
   <BaseDialog.Title
     className={cn(
       "text-lg leading-none font-semibold tracking-tight",
@@ -136,7 +122,7 @@ const DialogTitle = ({
 const DialogDescription = ({
   className,
   ...props
-}: React.ComponentProps<typeof BaseDialog.Description>) => (
+}: BaseDialog.Description.Props) => (
   <BaseDialog.Description
     className={cn("text-muted-foreground text-sm", className)}
     {...props}

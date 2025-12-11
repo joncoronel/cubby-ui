@@ -2,6 +2,7 @@
 
 import {
   Dialog,
+  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -11,57 +12,59 @@ import {
   DialogTrigger,
 } from "@/registry/default/dialog/dialog";
 import { Button } from "@/registry/default/button/button";
+import { Input } from "@/registry/default/input/input";
+import { Label } from "@/registry/default/label/label";
 
 export default function DialogNested() {
   return (
     <Dialog>
-      <DialogTrigger render={<Button>Open Notifications</Button>} />
-      <DialogContent>
+      <DialogTrigger render={<Button variant="outline">Account</Button>} />
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Notifications</DialogTitle>
+          <DialogTitle>Account Settings</DialogTitle>
           <DialogDescription>
-            You are all caught up. Good job! Notice how nested dialogs scale and
-            position properly.
+            Manage your account preferences and security settings.
           </DialogDescription>
         </DialogHeader>
+        <DialogBody className="space-y-4">
+          <div className="grid gap-2">
+            <Label htmlFor="display-name">Display Name</Label>
+            <Input id="display-name" defaultValue="Jane Cooper" />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" type="email" defaultValue="jane@example.com" />
+          </div>
+        </DialogBody>
         <DialogFooter className="justify-between">
           <Dialog>
             <DialogTrigger
-              render={<Button variant="outline">Customize</Button>}
+              render={<Button variant="ghost" className="text-destructive">Delete Account</Button>}
             />
-            <DialogContent>
+            <DialogContent className="sm:max-w-sm">
               <DialogHeader>
-                <DialogTitle>Customize Notifications</DialogTitle>
+                <DialogTitle>Delete Account</DialogTitle>
                 <DialogDescription>
-                  This dialog is nested and automatically scales smaller. The
-                  parent dialog gets a dark overlay.
+                  This action cannot be undone. All your data will be
+                  permanently removed.
                 </DialogDescription>
               </DialogHeader>
-              <DialogFooter className="justify-between">
-                <Dialog>
-                  <DialogTrigger
-                    render={<Button variant="ghost">Advanced Settings</Button>}
-                  />
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Advanced Settings</DialogTitle>
-                      <DialogDescription>
-                        Third level dialog - even smaller and the parent dialogs
-                        both get overlays.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                      <DialogClose render={<Button size="sm">Done</Button>} />
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-                <DialogClose
-                  render={<Button variant="outline">Close</Button>}
-                />
+              <DialogBody>
+                <p className="text-muted-foreground text-sm">
+                  Please type <span className="font-medium text-foreground">delete</span> to confirm.
+                </p>
+                <Input className="mt-2" placeholder="Type 'delete' to confirm" />
+              </DialogBody>
+              <DialogFooter>
+                <DialogClose render={<Button variant="outline">Cancel</Button>} />
+                <Button variant="destructive">Delete</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
-          <DialogClose render={<Button>Close</Button>} />
+          <div className="flex gap-2">
+            <DialogClose render={<Button variant="outline">Cancel</Button>} />
+            <Button>Save</Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

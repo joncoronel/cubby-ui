@@ -80,12 +80,14 @@ export default function RootLayout({
             </div>
           </RootProvider>
         </Providers>
-        <OpenPanelComponent
-          clientId={process.env.NEXT_PUBLIC_OPENPANEL_CLIENT_ID!}
-          trackScreenViews={true}
-          apiUrl="/op/analytics"
-          cdnUrl="/op1.js"
-        />
+        {process.env.NODE_ENV === "production" && (
+          <OpenPanelComponent
+            clientId={process.env.NEXT_PUBLIC_OPENPANEL_CLIENT_ID!}
+            trackScreenViews={true}
+            apiUrl="/op/analytics"
+            cdnUrl="/op1.js"
+          />
+        )}
       </body>
     </html>
   );

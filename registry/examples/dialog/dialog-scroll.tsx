@@ -16,8 +16,10 @@ import { Button } from "@/registry/default/button/button";
 export default function DialogScroll() {
   return (
     <Dialog>
-      <DialogTrigger render={<Button variant="outline">Terms of Service</Button>} />
-      <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-lg">
+      <DialogTrigger
+        render={<Button variant="outline">Terms of Service</Button>}
+      />
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Terms of Service</DialogTitle>
           <DialogDescription>
@@ -87,6 +89,22 @@ export default function DialogScroll() {
               We reserve the right to modify these terms at any time. We will
               notify users of significant changes via email or through the
               service.
+            </p>
+          </section>
+          <section>
+            <h3 className="mb-2 font-semibold">9. Governing Law</h3>
+            <p className="text-muted-foreground text-sm">
+              These terms shall be governed by and construed in accordance with
+              the laws of the jurisdiction in which we operate, without regard
+              to its conflict of law provisions.
+            </p>
+          </section>
+          <section>
+            <h3 className="mb-2 font-semibold">10. Contact Information</h3>
+            <p className="text-muted-foreground text-sm">
+              If you have any questions about these terms, please contact us at
+              support@example.com. We will respond to your inquiry within a
+              reasonable timeframe.
             </p>
           </section>
         </DialogBody>

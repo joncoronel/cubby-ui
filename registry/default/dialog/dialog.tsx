@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 
 const Dialog = BaseDialog.Root;
 
+const createDialogHandle = BaseDialog.createHandle;
+
 function DialogPortal({ ...props }: BaseDialog.Portal.Props) {
   return <BaseDialog.Portal data-slot="dialog-portal" {...props} />;
 }
@@ -199,4 +201,6 @@ export {
   DialogClose,
   DialogPortal,
   DialogBackdrop,
+  DialogViewport,
+  createDialogHandle,
 };

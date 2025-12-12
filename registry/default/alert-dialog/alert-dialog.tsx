@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 
 const AlertDialog = BaseAlertDialog.Root;
 
+const createAlertDialogHandle = BaseAlertDialog.createHandle;
+
 function AlertDialogPortal({ ...props }: BaseAlertDialog.Portal.Props) {
   return <BaseAlertDialog.Portal data-slot="alert-dialog-portal" {...props} />;
 }
@@ -191,6 +193,7 @@ function AlertDialogDescription({
 
 export {
   AlertDialog,
+  createAlertDialogHandle,
   AlertDialogPortal,
   AlertDialogBackdrop,
   AlertDialogViewport,

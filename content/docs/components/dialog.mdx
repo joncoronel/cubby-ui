@@ -3,7 +3,14 @@ title: Dialog
 description: Modal window that overlays content and requires user interaction
 ---
 
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/registry/default/dialog/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/registry/default/dialog/dialog";
 
 ## Preview
 
@@ -55,6 +62,18 @@ Use the `inset` variant for a muted footer background that extends to the dialog
 
 <ComponentPreview component="dialog" example="dialog-inset" />
 
+### Detached Trigger
+
+Place the trigger outside of the Dialog component using `createDialogHandle()`.
+
+<ComponentPreview component="dialog" example="dialog-detached-trigger" />
+
+### Elements Outside Popup
+
+Place elements visually outside the popup card while keeping them inside the popup component for accessibility (tab order, screen reader support). The popup uses `pointer-events: none` so backdrop clicks work, while inner content uses `pointer-events: auto`.
+
+<ComponentPreview component="dialog" example="dialog-elements-outside" />
+
 ## API Reference
 
 The Dialog component is built on top of [Base UI's Dialog](https://base-ui.com/react/components/dialog). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
@@ -67,20 +86,14 @@ For the complete Base UI API, see the [Base UI Dialog documentation](https://bas
 
 <ApiPropsList>
 
-<ApiProp
-  name="showCloseButton"
-  fullType="boolean"
-  defaultValue="true"
->
-  Show or hide the X close button in the dialog header. Custom prop not available in Base UI.
+<ApiProp name="showCloseButton" fullType="boolean" defaultValue="true">
+  Show or hide the X close button in the dialog header. Custom prop not
+  available in Base UI.
 </ApiProp>
 
-<ApiProp
-  name="variant"
-  fullType='"default" | "inset"'
-  defaultValue='"default"'
->
-  Visual variant of the dialog. The `inset` variant applies a muted background to the footer that extends to the dialog edges.
+<ApiProp name="variant" fullType='"default" | "inset"' defaultValue='"default"'>
+  Visual variant of the dialog. The `inset` variant applies a muted background
+  to the footer that extends to the dialog edges.
 </ApiProp>
 
 </ApiPropsList>

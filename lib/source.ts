@@ -45,10 +45,9 @@ function stripMDXForLLM(content: string): string {
   // Special handling for ApiProp components - extract metadata and format nicely
   // This regex captures the entire opening tag and content separately
   // Use negative lookahead to NOT match ApiPropsList
-  // The opening tag ends with a quote followed by optional whitespace and >
-  // This prevents matching > inside attribute values like "() => void"
+  // Match any characters except > to handle both quoted and JSX expression attributes
   cleaned = cleaned.replace(
-    /<ApiProp(?!sList)([\s\S]*?(?:["']|&#x22;|&#x27;))\s*>([\s\S]*?)<\/ApiProp>/g,
+    /<ApiProp(?!sList)([^>]*?)>([\s\S]*?)<\/ApiProp>/g,
     (_match, attributes, description) => {
       // Extract individual attributes from the tag
       // Use backreferences to match opening/closing quotes of the same type

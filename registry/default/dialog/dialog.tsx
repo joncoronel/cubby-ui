@@ -64,7 +64,7 @@ function DialogContent({
         <BaseDialog.Popup
           data-variant={variant}
           className={cn(
-            "bg-popover text-popover-foreground relative z-50 flex max-h-full min-h-0 max-w-full flex-col overflow-hidden shadow-lg",
+            "bg-popover text-popover-foreground relative z-50 flex max-h-full min-h-0 w-full max-w-full min-w-0 flex-col overflow-hidden shadow-lg",
             "ring-border rounded-2xl ring-1 sm:max-w-lg",
             // Mobile: bottom sheet style
             // "right-0 bottom-0 left-0 rounded-t-lg",
@@ -107,7 +107,7 @@ function DialogHeader({
     <div
       data-slot="dialog-header"
       className={cn(
-        "flex flex-col space-y-1.5 px-6 pt-6 pb-3 text-center sm:text-left",
+        "flex flex-col space-y-1.5 px-6 pt-6 pb-3",
         // Reduce bottom padding when header is directly before footer (no body) to maintain p-4 total gap
         "not-has-[+[data-slot=dialog-body]]:has-[+[data-slot=dialog-footer]]:pb-1",
         // Add extra bottom padding when header is alone (no body or footer)

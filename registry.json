@@ -518,6 +518,16 @@
           "path": "registry/default/dialog/dialog.tsx",
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/dialog.tsx"
+        },
+        {
+          "path": "registry/default/dialog/lib/nested-dialog-utils.ts",
+          "type": "registry:lib",
+          "target": "lib/cubby-ui/nested-dialog-utils.ts"
+        },
+        {
+          "path": "registry/default/dialog/hooks/use-nested-dialog-height.ts",
+          "type": "registry:hook",
+          "target": "hooks/cubby-ui/use-nested-dialog-height.ts"
         }
       ],
       "dependencies": [

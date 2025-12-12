@@ -19,7 +19,7 @@ export default function DialogNested() {
   return (
     <Dialog>
       <DialogTrigger render={<Button variant="outline">Account</Button>} />
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="">
         <DialogHeader>
           <DialogTitle>Account Settings</DialogTitle>
           <DialogDescription>
@@ -39,9 +39,13 @@ export default function DialogNested() {
         <DialogFooter className="justify-between">
           <Dialog>
             <DialogTrigger
-              render={<Button variant="ghost" className="text-destructive">Delete Account</Button>}
+              render={
+                <Button variant="ghost" className="text-destructive">
+                  Delete Account
+                </Button>
+              }
             />
-            <DialogContent className="sm:max-w-sm">
+            <DialogContent className="">
               <DialogHeader>
                 <DialogTitle>Delete Account</DialogTitle>
                 <DialogDescription>
@@ -51,12 +55,19 @@ export default function DialogNested() {
               </DialogHeader>
               <DialogBody>
                 <p className="text-muted-foreground text-sm">
-                  Please type <span className="font-medium text-foreground">delete</span> to confirm.
+                  Please type{" "}
+                  <span className="text-foreground font-medium">delete</span> to
+                  confirm.
                 </p>
-                <Input className="mt-2" placeholder="Type 'delete' to confirm" />
+                <Input
+                  className="mt-2"
+                  placeholder="Type 'delete' to confirm"
+                />
               </DialogBody>
               <DialogFooter>
-                <DialogClose render={<Button variant="outline">Cancel</Button>} />
+                <DialogClose
+                  render={<Button variant="outline">Cancel</Button>}
+                />
                 <Button variant="destructive">Delete</Button>
               </DialogFooter>
             </DialogContent>

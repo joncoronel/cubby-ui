@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import {
   AlertDialog,
   AlertDialogClose,
@@ -13,8 +14,16 @@ import {
 import { Button } from "@/registry/default/button/button";
 
 export default function AlertDialogNested() {
+  const [open, setOpen] = React.useState(false);
+  const [nestedOpen, setNestedOpen] = React.useState(false);
+
+  const handleConfirm = () => {
+    setNestedOpen(false);
+    setOpen(false);
+  };
+
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger render={<Button variant="outline" />}>
         Delete Account
       </AlertDialogTrigger>
@@ -31,7 +40,7 @@ export default function AlertDialogNested() {
             render={<Button variant="outline">Cancel</Button>}
           />
 
-          <AlertDialog>
+          <AlertDialog open={nestedOpen} onOpenChange={setNestedOpen}>
             <AlertDialogTrigger render={<Button variant="destructive" />}>
               Delete
             </AlertDialogTrigger>
@@ -47,13 +56,9 @@ export default function AlertDialogNested() {
                 <AlertDialogClose
                   render={<Button variant="outline">Go Back</Button>}
                 />
-                <AlertDialogClose
-                  render={
-                    <Button variant="destructive">
-                      I Understand, Delete My Account
-                    </Button>
-                  }
-                />
+                <Button variant="destructive" onClick={handleConfirm}>
+                  I Understand, Delete My Account
+                </Button>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>

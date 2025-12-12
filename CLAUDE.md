@@ -61,8 +61,8 @@ Components follow a consistent pattern:
 When creating custom components that support polymorphic rendering (render prop pattern), **always** use Base UI's `useRender` and `mergeProps` utilities:
 
 ```tsx
-import { mergeProps } from "@base-ui-components/react/merge-props";
-import { useRender } from "@base-ui-components/react/use-render";
+import { mergeProps } from "@base-ui/react/merge-props";
+import { useRender } from "@base-ui/react/use-render";
 
 interface MyComponentProps extends useRender.ComponentProps<"button"> {
   // Add your custom props here (NOT the render prop - it's included automatically)

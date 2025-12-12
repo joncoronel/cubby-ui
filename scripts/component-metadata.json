@@ -3,7 +3,7 @@
     "title": "Accordion",
     "description": "A accordion component.",
     "dependencies": [
-      "@base-ui-components/react",
+      "@base-ui/react",
       "lucide-react"
     ],
     "reference": []
@@ -20,7 +20,7 @@
     "title": "Alert-dialog",
     "description": "A alert-dialog component.",
     "dependencies": [
-      "@base-ui-components/react"
+      "@base-ui/react"
     ],
     "reference": []
   },
@@ -40,7 +40,7 @@
     "title": "Avatar",
     "description": "A avatar component.",
     "dependencies": [
-      "@base-ui-components/react",
+      "@base-ui/react",
       "class-variance-authority"
     ],
     "reference": []
@@ -65,7 +65,7 @@
     "title": "Button",
     "description": "A simple button component.",
     "dependencies": [
-      "@base-ui-components/react",
+      "@base-ui/react",
       "class-variance-authority"
     ],
     "reference": [
@@ -105,7 +105,7 @@
     "title": "Checkbox",
     "description": "A checkbox component.",
     "dependencies": [
-      "@base-ui-components/react",
+      "@base-ui/react",
       "lucide-react"
     ],
     "reference": []
@@ -114,7 +114,7 @@
     "title": "Checkbox-group",
     "description": "A checkbox-group component.",
     "dependencies": [
-      "@base-ui-components/react"
+      "@base-ui/react"
     ],
     "reference": []
   },
@@ -138,7 +138,7 @@
     "title": "Collapsible",
     "description": "A collapsible component.",
     "dependencies": [
-      "@base-ui-components/react"
+      "@base-ui/react"
     ],
     "reference": []
   },
@@ -163,7 +163,7 @@
     "title": "Context-menu",
     "description": "A context-menu component.",
     "dependencies": [
-      "@base-ui-components/react",
+      "@base-ui/react",
       "lucide-react"
     ],
     "reference": []
@@ -205,7 +205,7 @@
     "title": "Dialog",
     "description": "A dialog component.",
     "dependencies": [
-      "@base-ui-components/react",
+      "@base-ui/react",
       "lucide-react"
     ],
     "reference": []
@@ -222,7 +222,7 @@
     "title": "Dropdown-menu",
     "description": "A dropdown-menu component.",
     "dependencies": [
-      "@base-ui-components/react",
+      "@base-ui/react",
       "lucide-react"
     ],
     "reference": []
@@ -247,7 +247,7 @@
     "title": "Input",
     "description": "A input component.",
     "dependencies": [
-      "@base-ui-components/react"
+      "@base-ui/react"
     ],
     "reference": []
   },
@@ -284,7 +284,7 @@
     "title": "Menubar",
     "description": "A menubar component.",
     "dependencies": [
-      "@base-ui-components/react",
+      "@base-ui/react",
       "lucide-react"
     ],
     "reference": []
@@ -293,7 +293,7 @@
     "title": "Meter",
     "description": "A meter component.",
     "dependencies": [
-      "@base-ui-components/react",
+      "@base-ui/react",
       "class-variance-authority"
     ],
     "reference": []
@@ -302,7 +302,7 @@
     "title": "Navigation-menu",
     "description": "A navigation-menu component.",
     "dependencies": [
-      "@base-ui-components/react",
+      "@base-ui/react",
       "class-variance-authority"
     ],
     "reference": []
@@ -317,7 +317,7 @@
     "title": "Popover",
     "description": "A popover component.",
     "dependencies": [
-      "@base-ui-components/react"
+      "@base-ui/react"
     ],
     "reference": []
   },
@@ -325,7 +325,7 @@
     "title": "Preview-card",
     "description": "A preview-card component.",
     "dependencies": [
-      "@base-ui-components/react"
+      "@base-ui/react"
     ],
     "reference": []
   },
@@ -333,7 +333,7 @@
     "title": "Progress",
     "description": "A progress component.",
     "dependencies": [
-      "@base-ui-components/react",
+      "@base-ui/react",
       "class-variance-authority"
     ],
     "reference": []
@@ -342,7 +342,7 @@
     "title": "Radio-group",
     "description": "A radio-group component.",
     "dependencies": [
-      "@base-ui-components/react"
+      "@base-ui/react"
     ],
     "reference": []
   },
@@ -356,7 +356,7 @@
     "title": "Scroll-area",
     "description": "A scroll-area component.",
     "dependencies": [
-      "@base-ui-components/react"
+      "@base-ui/react"
     ],
     "reference": []
   },
@@ -364,7 +364,7 @@
     "title": "Select",
     "description": "A select component.",
     "dependencies": [
-      "@base-ui-components/react",
+      "@base-ui/react",
       "lucide-react"
     ],
     "reference": []
@@ -373,7 +373,7 @@
     "title": "Separator",
     "description": "A separator component.",
     "dependencies": [
-      "@base-ui-components/react"
+      "@base-ui/react"
     ],
     "reference": []
   },
@@ -381,7 +381,7 @@
     "title": "Sheet",
     "description": "A sheet component.",
     "dependencies": [
-      "@base-ui-components/react",
+      "@base-ui/react",
       "lucide-react"
     ],
     "reference": []
@@ -390,7 +390,7 @@
     "title": "Sidebar",
     "description": "A sidebar component.",
     "dependencies": [
-      "@base-ui-components/react",
+      "@base-ui/react",
       "class-variance-authority",
       "lucide-react"
     ],
@@ -406,7 +406,7 @@
     "title": "Slider",
     "description": "A slider component.",
     "dependencies": [
-      "@base-ui-components/react"
+      "@base-ui/react"
     ],
     "reference": []
   },
@@ -414,7 +414,7 @@
     "title": "Switch",
     "description": "A switch component.",
     "dependencies": [
-      "@base-ui-components/react"
+      "@base-ui/react"
     ],
     "reference": []
   },
@@ -428,7 +428,7 @@
     "title": "Tabs",
     "description": "A tabs component.",
     "dependencies": [
-      "@base-ui-components/react"
+      "@base-ui/react"
     ],
     "reference": []
   },
@@ -442,7 +442,7 @@
     "title": "Timeline",
     "description": "A timeline component.",
     "dependencies": [
-      "@base-ui-components/react"
+      "@base-ui/react"
     ],
     "reference": []
   },
@@ -450,7 +450,7 @@
     "title": "Toast",
     "description": "A toast component.",
     "dependencies": [
-      "@base-ui-components/react",
+      "@base-ui/react",
       "clsx"
     ],
     "reference": []
@@ -459,7 +459,7 @@
     "title": "Toggle",
     "description": "A toggle component.",
     "dependencies": [
-      "@base-ui-components/react",
+      "@base-ui/react",
       "class-variance-authority"
     ],
     "reference": []
@@ -468,7 +468,7 @@
     "title": "Toggle-group",
     "description": "A toggle-group component.",
     "dependencies": [
-      "@base-ui-components/react"
+      "@base-ui/react"
     ],
     "reference": []
   },
@@ -476,7 +476,7 @@
     "title": "Toolbar",
     "description": "A toolbar component.",
     "dependencies": [
-      "@base-ui-components/react"
+      "@base-ui/react"
     ],
     "reference": []
   },
@@ -484,7 +484,7 @@
     "title": "Tooltip",
     "description": "A tooltip component.",
     "dependencies": [
-      "@base-ui-components/react"
+      "@base-ui/react"
     ],
     "reference": []
   },
@@ -492,7 +492,7 @@
     "title": "Tree",
     "description": "A tree component.",
     "dependencies": [
-      "@base-ui-components/react",
+      "@base-ui/react",
       "lucide-react"
     ],
     "reference": []

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Toast } from "@base-ui-components/react/toast";
+import { Toast } from "@base-ui/react/toast";
 import { clsx } from "clsx";
 
 export interface ToastOptions<TData = unknown> {

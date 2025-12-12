@@ -1,11 +1,11 @@
 "use client";
 
 import * as React from "react";
-// import * as ComboboxPrimitive from "@base-ui-components/react/combobox";
+// import * as ComboboxPrimitive from "@base-ui/react/combobox";
 import { cn } from "@/lib/utils";
 import { X, CheckIcon, ChevronDown } from "lucide-react";
 import { Label } from "@/registry/default/label/label";
-import { Combobox as BaseCombobox } from "@base-ui-components/react/combobox";
+import { Combobox as BaseCombobox } from "@base-ui/react/combobox";
 
 const useFilter = BaseCombobox.useFilter;
 

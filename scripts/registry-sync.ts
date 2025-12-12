@@ -1066,7 +1066,7 @@ async function scanRegistry() {
 
     // Filter out assumed base dependencies
     const filteredDependencies = Array.from(allDependencies).filter(
-      (dep) => dep !== "react" && dep !== "@base-ui-components/react",
+      (dep) => dep !== "react" && dep !== "@base-ui/react",
     );
 
     // Filter out self-references from registry dependencies

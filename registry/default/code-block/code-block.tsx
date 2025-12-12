@@ -9,8 +9,8 @@ import {
   useContext,
 } from "react";
 import * as React from "react";
-import { mergeProps } from "@base-ui-components/react/merge-props";
-import { useRender } from "@base-ui-components/react/use-render";
+import { mergeProps } from "@base-ui/react/merge-props";
+import { useRender } from "@base-ui/react/use-render";
 import { highlight } from "@/registry/default/code-block/lib/shiki-shared";
 import { stripDiffMarker } from "@/registry/default/code-block/lib/transformers/utils";
 import { cn } from "@/lib/utils";

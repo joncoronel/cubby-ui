@@ -1,12 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { Collapsible as BaseCollapsible } from "@base-ui-components/react/collapsible";
-import { CheckboxGroup } from "@base-ui-components/react/checkbox-group";
+import { Collapsible as BaseCollapsible } from "@base-ui/react/collapsible";
+import { CheckboxGroup } from "@base-ui/react/checkbox-group";
 import { Checkbox } from "@/registry/default/checkbox/checkbox";
 import { ChevronRightIcon, Loader2Icon } from "lucide-react";
-import { mergeProps } from "@base-ui-components/react/merge-props";
-import { useRender } from "@base-ui-components/react/use-render";
+import { mergeProps } from "@base-ui/react/merge-props";
+import { useRender } from "@base-ui/react/use-render";
 import { cn } from "@/lib/utils";
 import {
   getAllDescendantIds,

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Autocomplete as AutocompleteBase } from "@base-ui-components/react/autocomplete";
+import { Autocomplete as AutocompleteBase } from "@base-ui/react/autocomplete";
 import { SearchIcon } from "lucide-react";
 
 import { Dialog, DialogContent } from "@/registry/default/dialog/dialog";

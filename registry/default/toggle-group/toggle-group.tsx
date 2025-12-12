@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ToggleGroup as BaseToggleGroup } from "@base-ui-components/react/toggle-group";
+import { ToggleGroup as BaseToggleGroup } from "@base-ui/react/toggle-group";
 
 import { cn } from "@/lib/utils";
 

@@ -86,7 +86,13 @@
       "Skill(frontend-design:frontend-design)",
       "Bash(cmd /c del \"c:\\Users\\jonny\\Documents\\Projects\\cubby-ui\\registry\\examples\\dialog\\dialog-custom-backdrop.tsx\")",
       "Bash(timeout 30 pnpm run lint:fix:*)",
-      "Bash(powershell -Command:*)"
+      "Bash(powershell -Command:*)",
+      "Bash(while read file)",
+      "Bash(do sed -i 's/@base-ui-components\\/react/@base-ui\\/react/g' \"$file\")",
+      "Bash(done)",
+      "Bash(node replace-package-name.js:*)",
+      "Bash(timeout 60 pnpm run lint:*)",
+      "Bash(timeout 120 pnpm run build:*)"
     ],
     "deny": []
   }

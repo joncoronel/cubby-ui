@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Meter as BaseMeter } from "@base-ui-components/react/meter";
+import { Meter as BaseMeter } from "@base-ui/react/meter";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";

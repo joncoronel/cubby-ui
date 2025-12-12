@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 //   CollapsibleContent,
 // } from "@/registry/default/collapsible/collapsible";
 import { ChevronRight } from "lucide-react";
-import { Collapsible } from "@base-ui-components/react/collapsible";
+import { Collapsible } from "@base-ui/react/collapsible";
 
 interface ApiPropProps {
   name: string;

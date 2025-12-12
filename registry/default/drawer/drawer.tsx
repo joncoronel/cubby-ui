@@ -1,9 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { Dialog as BaseDialog } from "@base-ui-components/react/dialog";
-import { mergeProps } from "@base-ui-components/react/merge-props";
-import { useRender } from "@base-ui-components/react/use-render";
+import { Dialog as BaseDialog } from "@base-ui/react/dialog";
+import { mergeProps } from "@base-ui/react/merge-props";
+import { useRender } from "@base-ui/react/use-render";
 
 import { cn } from "@/lib/utils";
 

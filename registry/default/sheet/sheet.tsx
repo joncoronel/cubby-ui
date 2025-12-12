@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Dialog as BaseSheet } from "@base-ui-components/react/dialog";
+import { Dialog as BaseSheet } from "@base-ui/react/dialog";
 import { XIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";

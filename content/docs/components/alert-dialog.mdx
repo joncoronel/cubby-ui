@@ -3,7 +3,7 @@ title: Alert Dialog
 description: Modal dialog that interrupts the user with important content and requires an action
 ---
 
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/registry/default/alert-dialog/alert-dialog";
+import { AlertDialog, AlertDialogClose, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/registry/default/alert-dialog/alert-dialog";
 
 ## Preview
 
@@ -25,12 +25,6 @@ Control the alert dialog open state programmatically.
 
 <ComponentPreview component="alert-dialog" example="alert-dialog-controlled" />
 
-### Custom Backdrop
-
-Customize the backdrop appearance and behavior.
-
-<ComponentPreview component="alert-dialog" example="alert-dialog-custom-backdrop" />
-
 ### Nested
 
 Use nested alert dialogs for multi-step confirmations.
@@ -43,19 +37,26 @@ Use nested alert dialogs for multi-step confirmations.
 
 <ApiPropsList>
 
-<ApiProp name="backdropClassName" fullType="string">
-  Custom className for styling the backdrop overlay behind the dialog.
+<ApiProp name="showCloseButton" fullType="boolean" defaultValue="false">
+  Whether to show a close button in the top-right corner of the dialog.
+</ApiProp>
+
+<ApiProp name="variant" fullType={`"default" | "inset"`} defaultValue={`"default"`}>
+  The visual variant of the dialog. The `inset` variant adds a muted background with a top border to the footer.
 </ApiProp>
 
 </ApiPropsList>
 
-### AlertDialogAction
+### AlertDialogClose
 
-Automatically renders as a destructive Button variant for primary actions (like "Delete" or "Confirm"). This component extends the Button component with appropriate styling for alert actions.
+Use `AlertDialogClose` with the `render` prop to create action buttons:
 
-### AlertDialogCancel
-
-Automatically renders as a ghost Button variant for cancel actions. This component extends the Button component with appropriate styling for cancellation.
+```tsx
+<AlertDialogFooter>
+  <AlertDialogClose render={<Button variant="outline">Cancel</Button>} />
+  <AlertDialogClose render={<Button variant="destructive">Delete</Button>} />
+</AlertDialogFooter>
+```
 
 ### Additional Props
 

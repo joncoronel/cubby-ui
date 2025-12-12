@@ -3,14 +3,12 @@
 import * as React from "react";
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
+  AlertDialogClose,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/registry/default/alert-dialog/alert-dialog";
 import { Button } from "@/registry/default/button/button";
 
@@ -31,8 +29,12 @@ export default function AlertDialogControlled() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction>Confirm</AlertDialogAction>
+            <AlertDialogClose
+              render={<Button variant="outline">Cancel</Button>}
+            />
+            <AlertDialogClose
+              render={<Button variant="destructive">Confirm</Button>}
+            />
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

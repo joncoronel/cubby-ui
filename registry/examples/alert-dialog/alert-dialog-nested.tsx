@@ -2,8 +2,7 @@
 
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
+  AlertDialogClose,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -28,7 +27,9 @@ export default function AlertDialogNested() {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogClose
+            render={<Button variant="outline">Cancel</Button>}
+          />
 
           <AlertDialog>
             <AlertDialogTrigger render={<Button variant="destructive" />}>
@@ -43,10 +44,16 @@ export default function AlertDialogNested() {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Go Back</AlertDialogCancel>
-                <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                  I Understand, Delete My Account
-                </AlertDialogAction>
+                <AlertDialogClose
+                  render={<Button variant="outline">Go Back</Button>}
+                />
+                <AlertDialogClose
+                  render={
+                    <Button variant="destructive">
+                      I Understand, Delete My Account
+                    </Button>
+                  }
+                />
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>

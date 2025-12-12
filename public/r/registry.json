@@ -47,8 +47,8 @@
           "target": "components/ui/cubby-ui/alert-dialog.tsx"
         }
       ],
-      "registryDependencies": [
-        "@cubby-ui/button"
+      "dependencies": [
+        "lucide-react"
       ]
     },
     {

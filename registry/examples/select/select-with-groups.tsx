@@ -47,6 +47,21 @@ export default function SelectWithGroups() {
       value: "eet",
       group: "Europe & Africa",
     },
+    {
+      label: "Asia/Tokyo",
+      value: "asia/tokyo",
+      group: "Asia",
+    },
+    {
+      label: "Asia/Shanghai",
+      value: "asia/shanghai",
+      group: "Asia",
+    },
+    {
+      label: "Asia/Seoul",
+      value: "asia/seoul",
+      group: "Asia",
+    },
   ];
 
   return (
@@ -54,9 +69,11 @@ export default function SelectWithGroups() {
       <SelectTrigger className="w-[280px]">
         <SelectValue />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="max-h-[300px] px-1 pt-0 pb-1">
         <SelectGroup>
-          <SelectGroupLabel>North America</SelectGroupLabel>
+          <SelectGroupLabel className="sticky top-0 z-[1]">
+            North America
+          </SelectGroupLabel>
           {timezoneItems
             .filter((item) => item.group === "North America")
             .map((item) => (
@@ -67,9 +84,24 @@ export default function SelectWithGroups() {
         </SelectGroup>
         <SelectSeparator className="" />
         <SelectGroup>
-          <SelectGroupLabel>Europe & Africa</SelectGroupLabel>
+          <SelectGroupLabel className="sticky top-0 z-[1]">
+            Europe & Africa
+          </SelectGroupLabel>
           {timezoneItems
             .filter((item) => item.group === "Europe & Africa")
+            .map((item) => (
+              <SelectItem key={item.value} value={item.value}>
+                {item.label}
+              </SelectItem>
+            ))}
+        </SelectGroup>
+        <SelectSeparator className="" />
+        <SelectGroup>
+          <SelectGroupLabel className="sticky top-0 z-[1]">
+            Asia
+          </SelectGroupLabel>
+          {timezoneItems
+            .filter((item) => item.group === "Asia")
             .map((item) => (
               <SelectItem key={item.value} value={item.value}>
                 {item.label}

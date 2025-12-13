@@ -122,8 +122,10 @@ function SelectTrigger({
   );
 }
 
-interface SelectContentProps
-  extends Omit<BaseSelect.Positioner.Props, "render"> {
+interface SelectContentProps extends Omit<
+  BaseSelect.Positioner.Props,
+  "render"
+> {
   className?: string;
   showScrollArrows?: boolean;
 }
@@ -185,7 +187,7 @@ function SelectContent({
             data-slot="select-list"
             className={cn(
               // Scrollable list container - max height and overflow are here now
-              "scroll-py-6 overflow-y-auto p-1",
+              "scroll-py-6 overflow-y-auto rounded-xl p-1",
               "data-[side=none]:max-h-(--available-height)",
               className,
             )}
@@ -249,7 +251,7 @@ function SelectGroupLabel({
     <BaseSelect.GroupLabel
       data-slot="select-group-label"
       className={cn(
-        "text-muted-foreground px-2 py-1.5 text-xs font-medium",
+        "text-muted-foreground bg-popover -mx-1 px-2 py-1.5 pt-2.5 pl-3.5 text-xs font-semibold",
         className,
       )}
       {...props}

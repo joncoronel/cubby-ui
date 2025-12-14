@@ -63,63 +63,65 @@ function SheetContent({
   return (
     <SheetPortal>
       <SheetBackdrop />
-      <BaseSheet.Popup
-        data-slot="sheet-content"
-        data-side={side}
-        data-variant={variant}
-        className={cn(
-          "bg-popover text-popover-foreground fixed z-50 flex flex-col outline-hidden",
-          // Transition
-          "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-all duration-250",
-          // Floating variant base styling
-          variant === "floating" &&
-            "ring-border max-h-[calc(100dvh-2rem)] rounded-2xl shadow-[0_16px_32px_0_oklch(0.18_0_0/0.16)] ring-1",
-          // Default variant base styling
-          variant === "default" && "shadow-lg",
-          // Floating right
-          variant === "floating" &&
-            side === "right" &&
-            "inset-y-4 right-4 h-auto w-3/4 data-ending-style:translate-x-[calc(100%+1rem)] data-starting-style:translate-x-[calc(100%+1rem)] sm:max-w-sm",
-          // Floating left
-          variant === "floating" &&
-            side === "left" &&
-            "inset-y-4 left-4 h-auto w-3/4 data-ending-style:-translate-x-[calc(100%+1rem)] data-starting-style:-translate-x-[calc(100%+1rem)] sm:max-w-sm",
-          // Floating top
-          variant === "floating" &&
-            side === "top" &&
-            "inset-x-4 top-4 h-auto w-auto data-ending-style:-translate-y-[calc(100%+1rem)] data-starting-style:-translate-y-[calc(100%+1rem)]",
-          // Floating bottom
-          variant === "floating" &&
-            side === "bottom" &&
-            "inset-x-4 bottom-4 h-auto w-auto data-ending-style:translate-y-[calc(100%+1rem)] data-starting-style:translate-y-[calc(100%+1rem)]",
-          // Default right
-          variant === "default" &&
-            side === "right" &&
-            "inset-y-0 right-0 h-full w-3/4 data-ending-style:translate-x-full data-starting-style:translate-x-full sm:max-w-sm",
-          // Default left
-          variant === "default" &&
-            side === "left" &&
-            "inset-y-0 left-0 h-full w-3/4 data-ending-style:-translate-x-full data-starting-style:-translate-x-full sm:max-w-sm",
-          // Default top
-          variant === "default" &&
-            side === "top" &&
-            "inset-x-0 top-0 h-auto w-full data-ending-style:-translate-y-full data-starting-style:-translate-y-full",
-          // Default bottom
-          variant === "default" &&
-            side === "bottom" &&
-            "inset-x-0 bottom-0 h-auto w-full data-ending-style:translate-y-full data-starting-style:translate-y-full",
-          className,
-        )}
-        {...props}
-      >
-        {children}
-        {showCloseButton && (
-          <SheetClose className="ring-offset-popover focus:ring-ring text-muted-foreground absolute top-5 right-5 rounded-lg opacity-50 transition-opacity duration-200 hover:opacity-100 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
-            <XIcon className="size-4" />
-            <span className="sr-only">Close</span>
-          </SheetClose>
-        )}
-      </BaseSheet.Popup>
+      <SheetViewport>
+        <BaseSheet.Popup
+          data-slot="sheet-content"
+          data-side={side}
+          data-variant={variant}
+          className={cn(
+            "bg-popover text-popover-foreground fixed z-50 flex flex-col outline-hidden",
+            // Transition
+            "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-all duration-250",
+            // Floating variant base styling
+            variant === "floating" &&
+              "ring-border max-h-[calc(100dvh-2rem)] rounded-2xl shadow-[0_16px_32px_0_oklch(0.18_0_0/0.16)] ring-1",
+            // Default variant base styling
+            variant === "default" && "shadow-lg",
+            // Floating right
+            variant === "floating" &&
+              side === "right" &&
+              "inset-y-4 right-4 h-auto w-3/4 data-ending-style:translate-x-[calc(100%+1rem)] data-starting-style:translate-x-[calc(100%+1rem)] sm:max-w-sm",
+            // Floating left
+            variant === "floating" &&
+              side === "left" &&
+              "inset-y-4 left-4 h-auto w-3/4 data-ending-style:-translate-x-[calc(100%+1rem)] data-starting-style:-translate-x-[calc(100%+1rem)] sm:max-w-sm",
+            // Floating top
+            variant === "floating" &&
+              side === "top" &&
+              "inset-x-4 top-4 h-auto w-auto data-ending-style:-translate-y-[calc(100%+1rem)] data-starting-style:-translate-y-[calc(100%+1rem)]",
+            // Floating bottom
+            variant === "floating" &&
+              side === "bottom" &&
+              "inset-x-4 bottom-4 h-auto w-auto data-ending-style:translate-y-[calc(100%+1rem)] data-starting-style:translate-y-[calc(100%+1rem)]",
+            // Default right
+            variant === "default" &&
+              side === "right" &&
+              "inset-y-0 right-0 h-full w-3/4 data-ending-style:translate-x-full data-starting-style:translate-x-full sm:max-w-sm",
+            // Default left
+            variant === "default" &&
+              side === "left" &&
+              "inset-y-0 left-0 h-full w-3/4 data-ending-style:-translate-x-full data-starting-style:-translate-x-full sm:max-w-sm",
+            // Default top
+            variant === "default" &&
+              side === "top" &&
+              "inset-x-0 top-0 h-auto w-full data-ending-style:-translate-y-full data-starting-style:-translate-y-full",
+            // Default bottom
+            variant === "default" &&
+              side === "bottom" &&
+              "inset-x-0 bottom-0 h-auto w-full data-ending-style:translate-y-full data-starting-style:translate-y-full",
+            className,
+          )}
+          {...props}
+        >
+          {children}
+          {showCloseButton && (
+            <SheetClose className="ring-offset-popover focus:ring-ring text-muted-foreground absolute top-5 right-5 rounded-lg opacity-50 transition-opacity duration-200 hover:opacity-100 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
+              <XIcon className="size-4" />
+              <span className="sr-only">Close</span>
+            </SheetClose>
+          )}
+        </BaseSheet.Popup>
+      </SheetViewport>
     </SheetPortal>
   );
 }

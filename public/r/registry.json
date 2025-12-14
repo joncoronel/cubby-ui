@@ -1064,6 +1064,7 @@
         }
       ],
       "dependencies": [
+        "class-variance-authority",
         "lucide-react"
       ]
     },

@@ -2,9 +2,88 @@
 
 import * as React from "react";
 import { Dialog as BaseSheet } from "@base-ui/react/dialog";
+import { cva, type VariantProps } from "class-variance-authority";
 import { XIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+
+const sheetContentVariants = cva(
+  [
+    "bg-popover text-popover-foreground fixed z-50 flex max-h-full min-h-0 w-full max-w-full min-w-0 flex-col outline-hidden",
+    "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-all duration-250",
+  ],
+  {
+    variants: {
+      variant: {
+        default: "shadow-lg",
+        floating:
+          "ring-border max-h-[calc(100%-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] rounded-2xl shadow-[0_16px_32px_0_oklch(0.18_0_0/0.16)] ring-1",
+      },
+      side: {
+        top: "",
+        right: "sm:max-w-sm",
+        bottom: "",
+        left: "sm:max-w-sm",
+      },
+    },
+    compoundVariants: [
+      // Floating variants
+      {
+        variant: "floating",
+        side: "right",
+        class:
+          "inset-y-4 right-4 data-ending-style:translate-x-[calc(100%+1rem)] data-starting-style:translate-x-[calc(100%+1rem)]",
+      },
+      {
+        variant: "floating",
+        side: "left",
+        class:
+          "inset-y-4 left-4 data-ending-style:-translate-x-[calc(100%+1rem)] data-starting-style:-translate-x-[calc(100%+1rem)]",
+      },
+      {
+        variant: "floating",
+        side: "top",
+        class:
+          "inset-x-4 top-4 data-ending-style:-translate-y-[calc(100%+1rem)] data-starting-style:-translate-y-[calc(100%+1rem)]",
+      },
+      {
+        variant: "floating",
+        side: "bottom",
+        class:
+          "inset-x-4 bottom-4 data-ending-style:translate-y-[calc(100%+1rem)] data-starting-style:translate-y-[calc(100%+1rem)]",
+      },
+      // Default variants
+      {
+        variant: "default",
+        side: "right",
+        class:
+          "inset-y-0 right-0 data-ending-style:translate-x-full data-starting-style:translate-x-full",
+      },
+      {
+        variant: "default",
+        side: "left",
+        class:
+          "inset-y-0 left-0 data-ending-style:-translate-x-full data-starting-style:-translate-x-full",
+      },
+      {
+        variant: "default",
+        side: "top",
+        class:
+          "inset-x-0 top-0 data-ending-style:-translate-y-full data-starting-style:-translate-y-full",
+      },
+      {
+        variant: "default",
+        side: "bottom",
+        class:
+          "inset-x-0 bottom-0 data-ending-style:translate-y-full data-starting-style:translate-y-full",
+      },
+    ],
+    defaultVariants: {
+      variant: "default",
+      side: "right",
+    },
+  },
+);
 
 const createSheetHandle = BaseSheet.createHandle;
 
@@ -55,11 +134,10 @@ function SheetContent({
   variant = "default",
   showCloseButton = true,
   ...props
-}: BaseSheet.Popup.Props & {
-  side?: "top" | "right" | "bottom" | "left";
-  variant?: "default" | "floating";
-  showCloseButton?: boolean;
-}) {
+}: BaseSheet.Popup.Props &
+  VariantProps<typeof sheetContentVariants> & {
+    showCloseButton?: boolean;
+  }) {
   return (
     <SheetPortal>
       <SheetBackdrop />
@@ -68,52 +146,7 @@ function SheetContent({
           data-slot="sheet-content"
           data-side={side}
           data-variant={variant}
-          className={cn(
-            "bg-popover text-popover-foreground fixed z-50 flex max-h-full min-h-0 w-full max-w-full min-w-0 flex-col outline-hidden",
-            // Transition
-            "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-all duration-250",
-            // Floating variant base styling
-            variant === "floating" &&
-              "ring-border max-h-[calc(100%-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] rounded-2xl shadow-[0_16px_32px_0_oklch(0.18_0_0/0.16)] ring-1",
-
-            (side === "right" || side === "left") && "sm:max-w-sm",
-
-            // Default variant base styling
-            variant === "default" && "shadow-lg",
-            // Floating right
-            variant === "floating" &&
-              side === "right" &&
-              "inset-y-4 right-4 data-ending-style:translate-x-[calc(100%+1rem)] data-starting-style:translate-x-[calc(100%+1rem)]",
-            // Floating left
-            variant === "floating" &&
-              side === "left" &&
-              "inset-y-4 left-4 data-ending-style:-translate-x-[calc(100%+1rem)] data-starting-style:-translate-x-[calc(100%+1rem)]",
-            // Floating top
-            variant === "floating" &&
-              side === "top" &&
-              "inset-x-4 top-4 data-ending-style:-translate-y-[calc(100%+1rem)] data-starting-style:-translate-y-[calc(100%+1rem)]",
-            // Floating bottom
-            variant === "floating" &&
-              side === "bottom" &&
-              "inset-x-4 bottom-4 data-ending-style:translate-y-[calc(100%+1rem)] data-starting-style:translate-y-[calc(100%+1rem)]",
-            // Default right
-            variant === "default" &&
-              side === "right" &&
-              "inset-y-0 right-0 data-ending-style:translate-x-full data-starting-style:translate-x-full",
-            // Default left
-            variant === "default" &&
-              side === "left" &&
-              "inset-y-0 left-0 data-ending-style:-translate-x-full data-starting-style:-translate-x-full",
-            // Default top
-            variant === "default" &&
-              side === "top" &&
-              "inset-x-0 top-0 data-ending-style:-translate-y-full data-starting-style:-translate-y-full",
-            // Default bottom
-            variant === "default" &&
-              side === "bottom" &&
-              "inset-x-0 bottom-0 data-ending-style:translate-y-full data-starting-style:translate-y-full",
-            className,
-          )}
+          className={cn(sheetContentVariants({ variant, side }), className)}
           {...props}
         >
           {children}

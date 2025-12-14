@@ -138,10 +138,12 @@ function SheetContent({
   children,
   side = "right",
   variant = "default",
+  footerVariant = "default",
   showCloseButton = true,
   ...props
 }: BaseSheet.Popup.Props &
   VariantProps<typeof sheetContentVariants> & {
+    footerVariant?: "default" | "inset";
     showCloseButton?: boolean;
   }) {
   return (
@@ -152,6 +154,7 @@ function SheetContent({
           data-slot="sheet-content"
           data-side={side}
           data-variant={variant}
+          data-footer-variant={footerVariant}
           className={cn(sheetContentVariants({ variant, side }), className)}
           {...props}
         >
@@ -178,6 +181,8 @@ function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
         "not-has-[+[data-slot=sheet-body]]:has-[+[data-slot=sheet-footer]]:pb-1",
         // Add extra bottom padding when header is alone (no body or footer)
         "not-has-[+[data-slot=sheet-body]]:not-has-[+[data-slot=sheet-footer]]:pb-5",
+        // Inset footer variant: add extra bottom padding when header is directly before footer (no body)
+        "in-data-[footer-variant=inset]:not-has-[+[data-slot=sheet-body]]:has-[+[data-slot=sheet-footer]]:pb-5",
         className,
       )}
       {...props}
@@ -195,6 +200,8 @@ function SheetBody({ className, ...props }: React.ComponentProps<"div">) {
         "first:pt-5",
         // Add extra bottom padding when body is not followed by footer
         "not-has-[+[data-slot=sheet-footer]]:pb-5",
+        // Inset footer variant: add bottom padding before bordered footer
+        "in-data-[footer-variant=inset]:has-[+[data-slot=sheet-footer]]:pb-5",
         className,
       )}
       {...props}
@@ -236,6 +243,8 @@ function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
         "mt-auto flex flex-col-reverse gap-2 px-5 pt-3 pb-5 sm:flex-row sm:justify-end",
         // Add extra top padding when footer is first (no header or body)
         "first:pt-5",
+        // Inset variant: muted background with top border for separation
+        "in-data-[footer-variant=inset]:border-border in-data-[footer-variant=inset]:bg-muted in-data-[footer-variant=inset]:border-t in-data-[footer-variant=inset]:pb-4",
         className,
       )}
       {...props}

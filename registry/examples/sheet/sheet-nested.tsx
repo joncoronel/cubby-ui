@@ -29,7 +29,7 @@ export default function SheetNested() {
       >
         Settings
       </SheetTrigger>
-      <SheetContent variant="floating" side="right">
+      <SheetContent className="max-w-xs" variant="floating" side="right">
         <SheetHeader>
           <SheetTitle>Settings</SheetTitle>
           <SheetDescription>
@@ -55,7 +55,7 @@ export default function SheetNested() {
                 </Button>
               }
             />
-            <SheetContent variant="floating" side="right">
+            <SheetContent className="max-w-xs" variant="floating" side="right">
               <SheetHeader>
                 <SheetTitle>Delete Account</SheetTitle>
                 <SheetDescription>

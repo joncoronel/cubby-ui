@@ -43,6 +43,12 @@ Sheets can be nested within each other. When a nested sheet opens, the parent sh
 
 <ComponentPreview component="sheet" example="sheet-nested" />
 
+### Inset Footer
+
+Use `footerVariant="inset"` to give the footer a muted background with a top border, visually separating it from the content.
+
+<ComponentPreview component="sheet" example="sheet-inset-footer" />
+
 ## API Reference
 
 The Sheet component is built on top of [Base UI's Dialog](https://base-ui.com/react/components/dialog). All Base UI props are supported. The documentation below only covers custom props specific to our implementation.
@@ -61,6 +67,10 @@ For the complete Base UI API, see the [Base UI Dialog documentation](https://bas
 
 <ApiProp name="variant" fullType='"default" | "floating"' simpleType="string" defaultValue='"default"'>
   Visual style variant. `"floating"` adds margins from screen edges and rounded corners for a card-like appearance.
+</ApiProp>
+
+<ApiProp name="footerVariant" fullType='"default" | "inset"' simpleType="string" defaultValue='"default"'>
+  Footer style variant. `"inset"` gives the footer a muted background with a top border for visual separation.
 </ApiProp>
 
 <ApiProp name="showCloseButton" fullType="boolean" simpleType="boolean" defaultValue="true">

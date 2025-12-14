@@ -21,8 +21,14 @@ export default function SheetVariants() {
   return (
     <div className="flex flex-wrap items-center justify-center gap-2">
       <Sheet>
-        <SheetTrigger render={<Button variant="outline" />}>
-          <ChevronUpIcon className="size-4" />
+        <SheetTrigger
+          render={
+            <Button
+              variant="outline"
+              leftSection={<ChevronUpIcon className="size-4" />}
+            />
+          }
+        >
           Top
         </SheetTrigger>
         <SheetContent variant="floating" side="top">
@@ -42,8 +48,14 @@ export default function SheetVariants() {
       </Sheet>
 
       <Sheet>
-        <SheetTrigger render={<Button variant="outline" />}>
-          <ChevronRightIcon className="size-4" />
+        <SheetTrigger
+          render={
+            <Button
+              variant="outline"
+              leftSection={<ChevronRightIcon className="size-4" />}
+            />
+          }
+        >
           Right
         </SheetTrigger>
         <SheetContent variant="floating" side="right">
@@ -63,8 +75,14 @@ export default function SheetVariants() {
       </Sheet>
 
       <Sheet>
-        <SheetTrigger render={<Button variant="outline" />}>
-          <ChevronDownIcon className="size-4" />
+        <SheetTrigger
+          render={
+            <Button
+              variant="outline"
+              leftSection={<ChevronDownIcon className="size-4" />}
+            />
+          }
+        >
           Bottom
         </SheetTrigger>
         <SheetContent variant="floating" side="bottom">
@@ -84,8 +102,14 @@ export default function SheetVariants() {
       </Sheet>
 
       <Sheet>
-        <SheetTrigger render={<Button variant="outline" />}>
-          <ChevronLeftIcon className="size-4" />
+        <SheetTrigger
+          render={
+            <Button
+              variant="outline"
+              leftSection={<ChevronLeftIcon className="size-4" />}
+            />
+          }
+        >
           Left
         </SheetTrigger>
         <SheetContent variant="floating" side="left">

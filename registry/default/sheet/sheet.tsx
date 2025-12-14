@@ -69,46 +69,49 @@ function SheetContent({
           data-side={side}
           data-variant={variant}
           className={cn(
-            "bg-popover text-popover-foreground fixed z-50 flex flex-col outline-hidden",
+            "bg-popover text-popover-foreground fixed z-50 flex max-h-full min-h-0 w-full max-w-full min-w-0 flex-col outline-hidden",
             // Transition
             "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-all duration-250",
             // Floating variant base styling
             variant === "floating" &&
-              "ring-border max-h-[calc(100dvh-2rem)] rounded-2xl shadow-[0_16px_32px_0_oklch(0.18_0_0/0.16)] ring-1",
+              "ring-border max-h-[calc(100%-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] rounded-2xl shadow-[0_16px_32px_0_oklch(0.18_0_0/0.16)] ring-1",
+
+            (side === "right" || side === "left") && "sm:max-w-sm",
+
             // Default variant base styling
             variant === "default" && "shadow-lg",
             // Floating right
             variant === "floating" &&
               side === "right" &&
-              "inset-y-4 right-4 h-auto w-3/4 data-ending-style:translate-x-[calc(100%+1rem)] data-starting-style:translate-x-[calc(100%+1rem)] sm:max-w-sm",
+              "inset-y-4 right-4 data-ending-style:translate-x-[calc(100%+1rem)] data-starting-style:translate-x-[calc(100%+1rem)]",
             // Floating left
             variant === "floating" &&
               side === "left" &&
-              "inset-y-4 left-4 h-auto w-3/4 data-ending-style:-translate-x-[calc(100%+1rem)] data-starting-style:-translate-x-[calc(100%+1rem)] sm:max-w-sm",
+              "inset-y-4 left-4 data-ending-style:-translate-x-[calc(100%+1rem)] data-starting-style:-translate-x-[calc(100%+1rem)]",
             // Floating top
             variant === "floating" &&
               side === "top" &&
-              "inset-x-4 top-4 h-auto w-auto data-ending-style:-translate-y-[calc(100%+1rem)] data-starting-style:-translate-y-[calc(100%+1rem)]",
+              "inset-x-4 top-4 data-ending-style:-translate-y-[calc(100%+1rem)] data-starting-style:-translate-y-[calc(100%+1rem)]",
             // Floating bottom
             variant === "floating" &&
               side === "bottom" &&
-              "inset-x-4 bottom-4 h-auto w-auto data-ending-style:translate-y-[calc(100%+1rem)] data-starting-style:translate-y-[calc(100%+1rem)]",
+              "inset-x-4 bottom-4 data-ending-style:translate-y-[calc(100%+1rem)] data-starting-style:translate-y-[calc(100%+1rem)]",
             // Default right
             variant === "default" &&
               side === "right" &&
-              "inset-y-0 right-0 h-full w-3/4 data-ending-style:translate-x-full data-starting-style:translate-x-full sm:max-w-sm",
+              "inset-y-0 right-0 data-ending-style:translate-x-full data-starting-style:translate-x-full",
             // Default left
             variant === "default" &&
               side === "left" &&
-              "inset-y-0 left-0 h-full w-3/4 data-ending-style:-translate-x-full data-starting-style:-translate-x-full sm:max-w-sm",
+              "inset-y-0 left-0 data-ending-style:-translate-x-full data-starting-style:-translate-x-full",
             // Default top
             variant === "default" &&
               side === "top" &&
-              "inset-x-0 top-0 h-auto w-full data-ending-style:-translate-y-full data-starting-style:-translate-y-full",
+              "inset-x-0 top-0 data-ending-style:-translate-y-full data-starting-style:-translate-y-full",
             // Default bottom
             variant === "default" &&
               side === "bottom" &&
-              "inset-x-0 bottom-0 h-auto w-full data-ending-style:translate-y-full data-starting-style:translate-y-full",
+              "inset-x-0 bottom-0 data-ending-style:translate-y-full data-starting-style:translate-y-full",
             className,
           )}
           {...props}

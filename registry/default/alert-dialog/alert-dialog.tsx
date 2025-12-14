@@ -135,8 +135,10 @@ function AlertDialogBody({
       data-slot="alert-dialog-body"
       className={cn(
         "flex-1 overflow-y-auto px-6 pt-1 pb-1",
+        // Add extra top padding when body is first (no header)
+        "first:pt-6",
         // Add extra bottom padding when body is not followed by footer
-        "not:has-[+[data-slot=alert-dialog-footer]]:pb-6",
+        "not-has-[+[data-slot=alert-dialog-footer]]:pb-6",
         // Inset variant: add bottom padding before bordered footer
         "in-data-[variant=inset]:has-[+[data-slot=alert-dialog-footer]]:pb-6",
         className,
@@ -155,6 +157,8 @@ function AlertDialogFooter({
       data-slot="alert-dialog-footer"
       className={cn(
         "flex flex-col-reverse gap-2 px-6 pt-3 pb-6 sm:flex-row sm:justify-end",
+        // Add extra top padding when footer is first (no header or body)
+        "first:pt-6",
         // Inset variant: muted background with top border for separation
         "in-data-[variant=inset]:border-border in-data-[variant=inset]:bg-muted in-data-[variant=inset]:rounded-b-2xl in-data-[variant=inset]:border-t in-data-[variant=inset]:pb-4",
         className,

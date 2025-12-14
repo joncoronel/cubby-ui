@@ -25,9 +25,9 @@ Open sheet from different screen edges.
 
 <ComponentPreview component="sheet" example="sheet-positions" />
 
-### Variants
+### Floating Variant
 
-Apply different visual styles to sheets.
+Use `variant="floating"` for a card-like appearance with rounded corners and margins from screen edges. Great for action sheets and share menus.
 
 <ComponentPreview component="sheet" example="sheet-variants" />
 
@@ -54,7 +54,11 @@ For the complete Base UI API, see the [Base UI Dialog documentation](https://bas
 </ApiProp>
 
 <ApiProp name="variant" fullType='"default" | "floating"' simpleType="string" defaultValue='"default"'>
-  Visual style variant, `'floating'` adds margins and rounded corners. Custom prop not available in Base UI.
+  Visual style variant. `"floating"` adds margins from screen edges and rounded corners for a card-like appearance.
+</ApiProp>
+
+<ApiProp name="showCloseButton" fullType="boolean" simpleType="boolean" defaultValue="true">
+  Whether to show the close button in the top-right corner.
 </ApiProp>
 
 </ApiPropsList>

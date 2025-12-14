@@ -6,39 +6,43 @@ import { XIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-function Sheet({ ...props }: React.ComponentProps<typeof BaseSheet.Root>) {
+const createSheetHandle = BaseSheet.createHandle;
+
+function Sheet({ ...props }: BaseSheet.Root.Props) {
   return <BaseSheet.Root data-slot="sheet" {...props} />;
 }
 
-function SheetTrigger({
-  ...props
-}: React.ComponentProps<typeof BaseSheet.Trigger>) {
+function SheetTrigger({ ...props }: BaseSheet.Trigger.Props) {
   return <BaseSheet.Trigger data-slot="sheet-trigger" {...props} />;
 }
 
-function SheetClose({
-  ...props
-}: React.ComponentProps<typeof BaseSheet.Close>) {
+function SheetClose({ ...props }: BaseSheet.Close.Props) {
   return <BaseSheet.Close data-slot="sheet-close" {...props} />;
 }
 
-function SheetPortal({
-  ...props
-}: React.ComponentProps<typeof BaseSheet.Portal>) {
+function SheetPortal({ ...props }: BaseSheet.Portal.Props) {
   return <BaseSheet.Portal data-slot="sheet-portal" {...props} />;
 }
 
-function SheetOverlay({
-  className,
-  ...props
-}: React.ComponentProps<typeof BaseSheet.Backdrop>) {
+function SheetBackdrop({ className, ...props }: BaseSheet.Backdrop.Props) {
   return (
     <BaseSheet.Backdrop
-      data-slot="sheet-overlay"
+      data-slot="sheet-backdrop"
       className={cn(
-        "fixed inset-0 z-10 bg-black/50 transition-all duration-200 ease-out data-closed:duration-150 data-open:duration-200 [&[data-ending-style]]:opacity-0 [&[data-starting-style]]:opacity-0",
+        "ease-[cubic-bezier(0, 0, 0.58, 1)] fixed inset-0 bg-black/40 transition-all duration-250",
+        "backdrop-blur-sm data-ending-style:opacity-0 data-starting-style:opacity-0",
         className,
       )}
+      {...props}
+    />
+  );
+}
+
+function SheetViewport({ className, ...props }: BaseSheet.Viewport.Props) {
+  return (
+    <BaseSheet.Viewport
+      data-slot="sheet-viewport"
+      className={cn("fixed inset-0 overflow-hidden", className)}
       {...props}
     />
   );
@@ -49,45 +53,72 @@ function SheetContent({
   children,
   side = "right",
   variant = "default",
+  showCloseButton = true,
   ...props
-}: React.ComponentProps<typeof BaseSheet.Popup> & {
+}: BaseSheet.Popup.Props & {
   side?: "top" | "right" | "bottom" | "left";
   variant?: "default" | "floating";
+  showCloseButton?: boolean;
 }) {
   return (
     <SheetPortal>
-      <SheetOverlay />
+      <SheetBackdrop />
       <BaseSheet.Popup
         data-slot="sheet-content"
+        data-side={side}
+        data-variant={variant}
         className={cn(
-          "bg-popover text-popover-foreground fixed z-10 flex flex-col gap-5 outline-hidden transition ease-out data-closed:duration-150 data-open:duration-200",
-          variant === "floating" && "ring-border/70 max-h-[calc(100vh-2rem)] rounded-xl shadow-[0_16px_32px_0_oklch(0.18_0_0_/_0.16)] ring-1",
+          "bg-popover text-popover-foreground fixed z-50 flex flex-col outline-hidden",
+          // Transition
+          "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-all duration-250",
+          // Floating variant base styling
+          variant === "floating" &&
+            "ring-border max-h-[calc(100dvh-2rem)] rounded-2xl shadow-[0_16px_32px_0_oklch(0.18_0_0/0.16)] ring-1",
+          // Default variant base styling
           variant === "default" && "shadow-lg",
-          variant === "floating" && side === "right" &&
-            "inset-y-0 top-4 right-0 h-full w-3/4 origin-right -translate-x-4 sm:max-w-sm [&[data-ending-style]]:translate-x-full [&[data-starting-style]]:translate-x-full",
-          variant === "floating" && side === "left" &&
-            "inset-y-0 top-4 left-0 h-full w-3/4 origin-left translate-x-4 sm:max-w-sm [&[data-ending-style]]:-translate-x-full [&[data-starting-style]]:-translate-x-full",
-          variant === "floating" && side === "top" &&
-            "inset-x-0 top-0 mx-auto h-auto w-[calc(100vw-2rem)] origin-top translate-y-4 [&[data-ending-style]]:-translate-y-full [&[data-starting-style]]:-translate-y-full",
-          variant === "floating" && side === "bottom" &&
-            "inset-x-0 bottom-0 mx-auto h-auto w-[calc(100vw-2rem)] origin-bottom -translate-y-4 [&[data-ending-style]]:translate-y-full [&[data-starting-style]]:translate-y-full",
-          variant === "default" && side === "right" &&
-            "inset-y-0 right-0 h-full w-3/4 origin-right sm:max-w-sm [&[data-ending-style]]:translate-x-full [&[data-starting-style]]:translate-x-full",
-          variant === "default" && side === "left" &&
-            "inset-y-0 left-0 h-full w-3/4 origin-left sm:max-w-sm [&[data-ending-style]]:-translate-x-full [&[data-starting-style]]:-translate-x-full",
-          variant === "default" && side === "top" &&
-            "inset-x-0 top-0 h-auto w-full origin-top [&[data-ending-style]]:-translate-y-full [&[data-starting-style]]:-translate-y-full",
-          variant === "default" && side === "bottom" &&
-            "inset-x-0 bottom-0 h-auto w-full origin-bottom [&[data-ending-style]]:translate-y-full [&[data-starting-style]]:translate-y-full",
+          // Floating right
+          variant === "floating" &&
+            side === "right" &&
+            "inset-y-4 right-4 h-auto w-3/4 data-ending-style:translate-x-[calc(100%+1rem)] data-starting-style:translate-x-[calc(100%+1rem)] sm:max-w-sm",
+          // Floating left
+          variant === "floating" &&
+            side === "left" &&
+            "inset-y-4 left-4 h-auto w-3/4 data-ending-style:-translate-x-[calc(100%+1rem)] data-starting-style:-translate-x-[calc(100%+1rem)] sm:max-w-sm",
+          // Floating top
+          variant === "floating" &&
+            side === "top" &&
+            "inset-x-4 top-4 h-auto w-auto data-ending-style:-translate-y-[calc(100%+1rem)] data-starting-style:-translate-y-[calc(100%+1rem)]",
+          // Floating bottom
+          variant === "floating" &&
+            side === "bottom" &&
+            "inset-x-4 bottom-4 h-auto w-auto data-ending-style:translate-y-[calc(100%+1rem)] data-starting-style:translate-y-[calc(100%+1rem)]",
+          // Default right
+          variant === "default" &&
+            side === "right" &&
+            "inset-y-0 right-0 h-full w-3/4 data-ending-style:translate-x-full data-starting-style:translate-x-full sm:max-w-sm",
+          // Default left
+          variant === "default" &&
+            side === "left" &&
+            "inset-y-0 left-0 h-full w-3/4 data-ending-style:-translate-x-full data-starting-style:-translate-x-full sm:max-w-sm",
+          // Default top
+          variant === "default" &&
+            side === "top" &&
+            "inset-x-0 top-0 h-auto w-full data-ending-style:-translate-y-full data-starting-style:-translate-y-full",
+          // Default bottom
+          variant === "default" &&
+            side === "bottom" &&
+            "inset-x-0 bottom-0 h-auto w-full data-ending-style:translate-y-full data-starting-style:translate-y-full",
           className,
         )}
         {...props}
       >
         {children}
-        <SheetClose className="ring-offset-popover focus:ring-ring text-muted-foreground absolute top-5 right-5 rounded-lg opacity-50 transition-opacity duration-200 hover:opacity-100 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
-          <XIcon className="size-4" />
-          <span className="sr-only">Close</span>
-        </SheetClose>
+        {showCloseButton && (
+          <SheetClose className="ring-offset-popover focus:ring-ring text-muted-foreground absolute top-5 right-5 rounded-lg opacity-50 transition-opacity duration-200 hover:opacity-100 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
+            <XIcon className="size-4" />
+            <span className="sr-only">Close</span>
+          </SheetClose>
+        )}
       </BaseSheet.Popup>
     </SheetPortal>
   );
@@ -97,20 +128,44 @@ function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="sheet-header"
-      className={cn("flex flex-col gap-2 p-5", className)}
+      className={cn(
+        "flex flex-col space-y-1.5 px-5 pt-5 pb-3",
+        // Reduce bottom padding when header is directly before footer (no body)
+        "not-has-[+[data-slot=sheet-body]]:has-[+[data-slot=sheet-footer]]:pb-1",
+        // Add extra bottom padding when header is alone (no body or footer)
+        "not-has-[+[data-slot=sheet-body]]:not-has-[+[data-slot=sheet-footer]]:pb-5",
+        className,
+      )}
       {...props}
     />
   );
 }
 
-function SheetTitle({
-  className,
-  ...props
-}: React.ComponentProps<typeof BaseSheet.Title>) {
+function SheetBody({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="sheet-body"
+      className={cn(
+        "overflow-y-auto px-5 pt-1 pb-1",
+        // Add extra top padding when body is first (no header)
+        "first:pt-5",
+        // Add extra bottom padding when body is not followed by footer
+        "not-has-[+[data-slot=sheet-footer]]:pb-5",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+function SheetTitle({ className, ...props }: BaseSheet.Title.Props) {
   return (
     <BaseSheet.Title
       data-slot="sheet-title"
-      className={cn("text-foreground font-semibold", className)}
+      className={cn(
+        "text-lg leading-none font-semibold tracking-tight",
+        className,
+      )}
       {...props}
     />
   );
@@ -119,7 +174,7 @@ function SheetTitle({
 function SheetDescription({
   className,
   ...props
-}: React.ComponentProps<typeof BaseSheet.Description>) {
+}: BaseSheet.Description.Props) {
   return (
     <BaseSheet.Description
       data-slot="sheet-description"
@@ -133,7 +188,12 @@ function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="sheet-footer"
-      className={cn("mt-auto flex flex-col gap-2 p-5", className)}
+      className={cn(
+        "mt-auto flex flex-col-reverse gap-2 px-5 pt-3 pb-5 sm:flex-row sm:justify-end",
+        // Add extra top padding when footer is first (no header or body)
+        "first:pt-5",
+        className,
+      )}
       {...props}
     />
   );
@@ -141,12 +201,16 @@ function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
 
 export {
   Sheet,
-  SheetOverlay,
-  SheetContent,
   SheetTrigger,
-  SheetClose,
+  SheetContent,
   SheetHeader,
+  SheetBody,
+  SheetFooter,
   SheetTitle,
   SheetDescription,
-  SheetFooter,
+  SheetClose,
+  SheetPortal,
+  SheetBackdrop,
+  SheetViewport,
+  createSheetHandle,
 };

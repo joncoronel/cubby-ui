@@ -2,6 +2,7 @@
 
 import {
   Sheet,
+  SheetBody,
   SheetClose,
   SheetContent,
   SheetDescription,
@@ -22,35 +23,21 @@ export default function SheetWithForm() {
         <SheetHeader>
           <SheetTitle>Edit profile</SheetTitle>
           <SheetDescription>
-            Make changes to your profile here. Click save when you're done.
+            Update your profile information below.
           </SheetDescription>
         </SheetHeader>
-        <div className="grid w-full gap-4 px-4">
-          <div className="grid w-full items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              Name
-            </Label>
-            <Input
-              id="name"
-              defaultValue="Pedro Duarte"
-              className="col-span-3"
-            />
+        <SheetBody className="grid gap-4">
+          <div className="grid gap-2">
+            <Label htmlFor="name">Name</Label>
+            <Input id="name" placeholder="Your name" />
           </div>
-          <div className="grid items-center gap-4">
-            <Label htmlFor="username" className="text-right">
-              Username
-            </Label>
-            <Input
-              id="username"
-              defaultValue="@peduarte"
-              className="col-span-3"
-            />
+          <div className="grid gap-2">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" type="email" placeholder="you@example.com" />
           </div>
-        </div>
+        </SheetBody>
         <SheetFooter>
-          <SheetClose render={<Button type="submit" />}>
-            Save changes
-          </SheetClose>
+          <SheetClose render={<Button type="submit" />}>Save</SheetClose>
           <SheetClose render={<Button variant="outline" />}>Cancel</SheetClose>
         </SheetFooter>
       </SheetContent>

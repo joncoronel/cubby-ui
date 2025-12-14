@@ -11,6 +11,12 @@ const sheetContentVariants = cva(
   [
     "bg-popover text-popover-foreground fixed z-50 flex max-h-full min-h-0 w-full max-w-full min-w-0 flex-col outline-hidden",
     "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-all duration-250",
+    // Nested sheet support
+    "scale-[calc(1-0.05*var(--nested-dialogs))]",
+    // Overlay (hidden by default, fades in/out when nested using allow-discrete)
+    "after:pointer-events-none after:absolute after:inset-0 after:hidden after:rounded-[inherit] after:bg-black/5 after:opacity-0 after:transition-[opacity,display] after:duration-250 after:[transition-behavior:allow-discrete]",
+    "data-nested-dialog-open:after:block data-nested-dialog-open:after:opacity-100",
+    "starting:data-nested-dialog-open:after:opacity-0",
   ],
   {
     variants: {
@@ -32,50 +38,50 @@ const sheetContentVariants = cva(
         variant: "floating",
         side: "right",
         class:
-          "inset-y-4 right-4 data-ending-style:translate-x-[calc(100%+1rem)] data-starting-style:translate-x-[calc(100%+1rem)]",
+          "inset-y-4 right-4 -translate-x-[calc(1.5rem*var(--nested-dialogs))] data-ending-style:translate-x-[calc(100%+1rem)] data-starting-style:translate-x-[calc(100%+1rem)]",
       },
       {
         variant: "floating",
         side: "left",
         class:
-          "inset-y-4 left-4 data-ending-style:-translate-x-[calc(100%+1rem)] data-starting-style:-translate-x-[calc(100%+1rem)]",
+          "inset-y-4 left-4 translate-x-[calc(1.5rem*var(--nested-dialogs))] data-ending-style:-translate-x-[calc(100%+1rem)] data-starting-style:-translate-x-[calc(100%+1rem)]",
       },
       {
         variant: "floating",
         side: "top",
         class:
-          "inset-x-4 top-4 data-ending-style:-translate-y-[calc(100%+1rem)] data-starting-style:-translate-y-[calc(100%+1rem)]",
+          "inset-x-4 top-4 translate-y-[calc(1.5rem*var(--nested-dialogs))] data-ending-style:-translate-y-[calc(100%+1rem)] data-starting-style:-translate-y-[calc(100%+1rem)]",
       },
       {
         variant: "floating",
         side: "bottom",
         class:
-          "inset-x-4 bottom-4 data-ending-style:translate-y-[calc(100%+1rem)] data-starting-style:translate-y-[calc(100%+1rem)]",
+          "inset-x-4 bottom-4 -translate-y-[calc(1.5rem*var(--nested-dialogs))] data-ending-style:translate-y-[calc(100%+1rem)] data-starting-style:translate-y-[calc(100%+1rem)]",
       },
       // Default variants
       {
         variant: "default",
         side: "right",
         class:
-          "inset-y-0 right-0 data-ending-style:translate-x-full data-starting-style:translate-x-full",
+          "inset-y-0 right-0 -translate-x-[calc(1.5rem*var(--nested-dialogs))] data-ending-style:translate-x-full data-starting-style:translate-x-full",
       },
       {
         variant: "default",
         side: "left",
         class:
-          "inset-y-0 left-0 data-ending-style:-translate-x-full data-starting-style:-translate-x-full",
+          "inset-y-0 left-0 translate-x-[calc(1.5rem*var(--nested-dialogs))] data-ending-style:-translate-x-full data-starting-style:-translate-x-full",
       },
       {
         variant: "default",
         side: "top",
         class:
-          "inset-x-0 top-0 data-ending-style:-translate-y-full data-starting-style:-translate-y-full",
+          "inset-x-0 top-0 translate-y-[calc(1.5rem*var(--nested-dialogs))] data-ending-style:-translate-y-full data-starting-style:-translate-y-full",
       },
       {
         variant: "default",
         side: "bottom",
         class:
-          "inset-x-0 bottom-0 data-ending-style:translate-y-full data-starting-style:translate-y-full",
+          "inset-x-0 bottom-0 -translate-y-[calc(1.5rem*var(--nested-dialogs))] data-ending-style:translate-y-full data-starting-style:translate-y-full",
       },
     ],
     defaultVariants: {

@@ -43,19 +43,6 @@
 }
 
 /**
- * Reversed backdrop fade for top/left drawers
- * These use exit range where 0% = visible, 100% = hidden
- */
-@keyframes drawer-backdrop-fade-reverse {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-/**
  * Exit animation for drawer backdrop
  * Animates from current opacity to 0 (no 'from' = starts from computed value)
  * Used to override scroll-driven animations which transitions can't interpolate from

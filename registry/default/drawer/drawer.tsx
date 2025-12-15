@@ -600,14 +600,14 @@ function DrawerContent({
             // Exit: use animation to override scroll-driven animation (transition can't interpolate from animation-held values)
             "[&[data-ending-style]]:[animation:drawer-backdrop-exit_450ms_cubic-bezier(0,0,0.58,1)_forwards]",
 
-            isInitialized && !isAnimating && dragProgress < 1
+            isInitialized && !isAnimating && isDragging && dragProgress < 1
               ? useScrollDrivenAnimation
                 ? // Scroll-driven backdrop animation (Chrome 115+)
                   // Bottom/Right: drawer enters from below/right → use entry range (0→1 opacity)
                   // Top/Left: drawer exits toward top/left → use exit range with reversed keyframe (1→0 opacity)
                   direction === "top" || direction === "left"
-                  ? "[animation-fill-mode:both] [animation-name:drawer-backdrop-fade-reverse] [animation-range:exit_0%_exit_100%] [animation-timeline:--drawer-panel] [animation-timing-function:linear]"
-                  : "[animation-fill-mode:both] [animation-name:drawer-backdrop-fade] [animation-range:entry_0%_entry_100%] [animation-timeline:--drawer-panel] [animation-timing-function:linear]"
+                  ? "fill-mode-[both] direction-[reverse] [animation-name:drawer-backdrop-fade] [animation-range:exit_0%_exit_100%] [animation-timeline:--drawer-panel] [animation-timing-function:linear]"
+                  : "fill-mode-[both] [animation-name:drawer-backdrop-fade] [animation-range:entry_0%_entry_100%] [animation-timeline:--drawer-panel] [animation-timing-function:linear]"
                 : `opacity-(--drawer-backdrop-dynamic-opacity)`
               : `opacity-(--drawer-backdrop-static-opacity)`,
           )}

@@ -31,7 +31,7 @@ function AlertDialogBackdrop({
   return (
     <BaseAlertDialog.Backdrop
       className={cn(
-        "ease-out-cubic fixed inset-0 bg-black/40 transition-all duration-200",
+        "ease-out-cubic fixed inset-0 min-h-dvh bg-black/40 transition-all duration-200 supports-[-webkit-touch-callout:none]:absolute",
         "backdrop-blur-sm data-ending-style:opacity-0 data-starting-style:opacity-0",
         className,
       )}

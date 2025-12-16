@@ -1,14 +1,22 @@
 import * as React from "react";
 
-import type { DrawerDirection, SnapPoint } from "../lib/drawer-utils";
+import type {
+  DrawerDirection,
+  SnapPoint,
+  ScrollGeometry,
+} from "../lib/drawer-utils";
 import {
+  DIRECTION_CONFIG,
   supportsScrollEnd,
   supportsScrollTimeline,
-  supportsScrollSnapChange,
   supportsScrollState,
-  parsePixelValue,
-  waitForScrollEnd,
+  supportsScrollSnapChange,
   prefersReducedMotion,
+  waitForScrollEnd,
+  calculateScrollGeometry,
+  calculateSnapScrollPositions,
+  calculateScrollProgress,
+  calculateSnapProgress,
 } from "../lib/drawer-utils";
 
 /* -------------------------------------------------------------------------------------------------
@@ -76,44 +84,111 @@ export interface UseScrollSnapReturn {
 }
 
 /* -------------------------------------------------------------------------------------------------
+ * Consolidated Ref Types
+ * -------------------------------------------------------------------------------------------------*/
+
+interface ScrollControlState {
+  /** Whether currently in a programmatic scroll (not user-initiated) */
+  isProgrammatic: boolean;
+  /** Last detected snap index to avoid duplicate callbacks */
+  lastDetectedSnapIndex: number;
+  /** Whether state change came from detection (CSS snap) vs external */
+  isFromDetection: boolean;
+}
+
+interface InteractionState {
+  /** Whether drawer is closing (disables pointer events) */
+  isClosing: boolean;
+  /** Whether user is actively touching/pressing */
+  isPointerDown: boolean;
+  /** Previous scroll position for movement detection */
+  prevScrollPos: number | null;
+}
+
+interface InitState {
+  /** Whether initial scroll positioning is complete */
+  hasInitialized: boolean;
+  /** Timeout for DOM ready retry */
+  retryTimeout: ReturnType<typeof setTimeout> | null;
+  /** RAF ID for stability check */
+  rafId: number | null;
+  /** Last scroll position for RAF check */
+  rafLastPos: number | null;
+  /** Count of stable frames */
+  rafStableCount: number;
+}
+
+/* -------------------------------------------------------------------------------------------------
  * Hook Implementation
  * -------------------------------------------------------------------------------------------------*/
 
 // Re-export browser support detection for consumers
-export { supportsScrollTimeline, supportsScrollState } from "../lib/drawer-utils";
+export {
+  supportsScrollTimeline,
+  supportsScrollState,
+} from "../lib/drawer-utils";
 
-export function useScrollSnap({
-  direction,
-  snapPoints,
-  activeSnapPointIndex,
-  onSnapPointChange,
-  onDismiss,
-  dismissible,
-  contentSize,
-  open,
-  onScrollProgress,
-  onSnapProgress,
-  onImmediateClose,
-  isAnimating,
-  onScrollingChange,
-}: UseScrollSnapOptions): UseScrollSnapReturn {
+export function useScrollSnap(
+  options: UseScrollSnapOptions,
+): UseScrollSnapReturn {
+  const {
+    direction,
+    snapPoints,
+    activeSnapPointIndex,
+    dismissible,
+    contentSize,
+    open,
+    onScrollProgress,
+    onSnapProgress,
+    onScrollingChange,
+  } = options;
+
+  // Get direction config (replaces repeated conditionals)
+  const { isVertical, isInverted } = DIRECTION_CONFIG[direction];
+
+  // DOM refs
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const snapTargetRefs = React.useRef<(HTMLDivElement | null)[]>([]);
+
+  // Consolidated refs (instead of 8+ scattered refs)
+  const scrollControlRef = React.useRef<ScrollControlState>({
+    isProgrammatic: false,
+    lastDetectedSnapIndex: activeSnapPointIndex,
+    isFromDetection: false,
+  });
+
+  const interactionRef = React.useRef<InteractionState>({
+    isClosing: false,
+    isPointerDown: false,
+    prevScrollPos: null,
+  });
+
+  const initRef = React.useRef<InitState>({
+    hasInitialized: false,
+    retryTimeout: null,
+    rafId: null,
+    rafLastPos: null,
+    rafStableCount: 0,
+  });
+
+  // Options ref for stable callbacks (avoids effect dependency changes)
+  const optionsRef = React.useRef(options);
+  optionsRef.current = options;
+
+  // React state (only what needs to trigger re-renders)
   const [scrollProgress, setScrollProgress] = React.useState(0);
   const [snapProgress, setSnapProgress] = React.useState(0);
   const [isScrolling, setIsScrolling] = React.useState(false);
   const [isClosing, setIsClosingState] = React.useState(false);
-
-  // Track whether we're programmatically scrolling (to avoid triggering snap change callbacks)
-  const isProgrammaticScrollRef = React.useRef(false);
-
-  // Track closing state with ref to avoid stale closures in scroll handler
-  // Updated synchronously alongside state to eliminate the sync effect
-  const isClosingRef = React.useRef(false);
+  const [isInitialized, setIsInitialized] = React.useState(false);
+  const [viewportSize, setViewportSize] = React.useState(() => {
+    if (typeof window === "undefined") return 800;
+    return isVertical ? window.innerHeight : window.innerWidth;
+  });
 
   // Wrapper that updates both ref and state synchronously
   const setIsClosing = React.useCallback((value: boolean) => {
-    isClosingRef.current = value;
+    interactionRef.current.isClosing = value;
     setIsClosingState(value);
   }, []);
 
@@ -126,74 +201,39 @@ export function useScrollSnap({
     [onScrollingChange],
   );
 
-  const isVertical = direction === "top" || direction === "bottom";
-
-  // Use CSS viewport units for more reliable mobile measurements
-  const [viewportSize, setViewportSize] = React.useState(() => {
-    if (typeof window === "undefined") return 800;
-    return isVertical ? window.innerHeight : window.innerWidth;
-  });
-
+  // Calculate geometry using pure functions (memoized)
   const effectiveSize = contentSize ?? viewportSize * 0.9;
 
-  // Calculate track size (viewport + drawer size + dismiss buffer)
-  const dismissBuffer = dismissible ? effectiveSize * 0.3 : 0;
-  const trackSize = viewportSize + effectiveSize + dismissBuffer;
+  const geometry = React.useMemo<ScrollGeometry>(
+    () =>
+      calculateScrollGeometry(
+        viewportSize,
+        effectiveSize,
+        dismissible,
+        isInverted,
+      ),
+    [viewportSize, effectiveSize, dismissible, isInverted],
+  );
 
-  // Determine if this direction uses inverted scroll (drawer at start of track)
-  const isInvertedScroll = direction === "top" || direction === "left";
+  const snapScrollPositions = React.useMemo(
+    () =>
+      calculateSnapScrollPositions(
+        snapPoints,
+        geometry,
+        dismissible,
+        effectiveSize,
+      ),
+    [snapPoints, geometry, dismissible, effectiveSize],
+  );
 
-  // Calculate snap scroll positions
-  const snapScrollPositions = React.useMemo(() => {
-    const positions: number[] = [];
-    const maxScroll = trackSize - viewportSize;
-    const visibleRange = maxScroll - dismissBuffer;
+  // Calculate scroll positions for CSS animation-range
+  const firstSnapIndex = dismissible ? 1 : 0;
+  const lastSnapIndex = snapScrollPositions.length - 1;
+  const firstSnapScrollPos = snapScrollPositions[firstSnapIndex] ?? 0;
+  const lastSnapScrollPos = snapScrollPositions[lastSnapIndex] ?? 0;
+  const dismissScrollPos = snapScrollPositions[0] ?? 0;
 
-    // Add dismiss position first if dismissible
-    // Bottom/Right: dismiss at scroll 0 (drawer hidden at end)
-    // Top/Left: dismiss at maxScroll (drawer hidden at start)
-    if (dismissible) {
-      positions.push(isInvertedScroll ? maxScroll : 0);
-    }
-
-    // Calculate positions for each snap point
-    snapPoints.forEach((snapPoint) => {
-      let visibleRatio: number;
-
-      if (typeof snapPoint === "string") {
-        const pixels = parsePixelValue(snapPoint);
-        visibleRatio = (pixels ?? effectiveSize) / effectiveSize;
-      } else {
-        visibleRatio = snapPoint;
-      }
-
-      // Calculate scroll position
-      // Bottom/Right: more visible = higher scroll position
-      // Top/Left: more visible = lower scroll position (inverted)
-      let scrollPos: number;
-      if (isInvertedScroll) {
-        // Inverted: maxScroll (closed) -> 0 (fully open)
-        scrollPos = maxScroll - dismissBuffer - visibleRatio * visibleRange;
-      } else {
-        // Normal: 0 (closed) -> maxScroll (fully open)
-        scrollPos = dismissBuffer + visibleRatio * visibleRange;
-      }
-
-      positions.push(Math.min(maxScroll, Math.max(0, scrollPos)));
-    });
-
-    return positions;
-  }, [
-    snapPoints,
-    trackSize,
-    viewportSize,
-    effectiveSize,
-    dismissible,
-    dismissBuffer,
-    isInvertedScroll,
-  ]);
-
-  // Get the scroll position for the active snap point
+  // Get scroll position for a snap point index
   const getScrollPositionForSnapPoint = React.useCallback(
     (index: number): number => {
       const adjustedIndex = dismissible ? index + 1 : index;
@@ -202,7 +242,7 @@ export function useScrollSnap({
     [snapScrollPositions, dismissible],
   );
 
-  // Find nearest snap point index from scroll position
+  // Find nearest snap point from scroll position
   const findNearestSnapIndex = React.useCallback(
     (scrollPos: number): { index: number; isDismiss: boolean } => {
       let closestIndex = 0;
@@ -226,54 +266,6 @@ export function useScrollSnap({
     [snapScrollPositions, dismissible],
   );
 
-  // Calculate progress from scroll position
-  // Progress: 0 = fully open, 1 = fully closed
-  const calculateProgress = React.useCallback(
-    (scrollPos: number): number => {
-      const maxScroll = trackSize - viewportSize;
-      const visibleRange = maxScroll - dismissBuffer;
-
-      let progress: number;
-      if (isInvertedScroll) {
-        // Top/Left: maxScroll = closed (1), 0 = open (0)
-        // Open position is at: maxScroll - dismissBuffer - visibleRange
-        const openScrollPos = maxScroll - dismissBuffer - visibleRange;
-        progress = (scrollPos - openScrollPos) / visibleRange;
-      } else {
-        // Bottom/Right: 0 = closed (1), maxScroll = open (0)
-        progress = 1 - (scrollPos - dismissBuffer) / visibleRange;
-      }
-
-      return Math.min(1, Math.max(0, progress));
-    },
-    [trackSize, viewportSize, dismissBuffer, isInvertedScroll],
-  );
-
-  // Calculate snap progress from scroll position
-  // Snap progress: 0 = at first snap point, 1 = at last snap point
-  const calculateSnapProgress = React.useCallback(
-    (scrollPos: number): number => {
-      // Get first and last snap positions (excluding dismiss position)
-      const firstSnapIndex = dismissible ? 1 : 0;
-      const lastSnapIndex = snapScrollPositions.length - 1;
-
-      // Handle edge case of single snap point
-      if (firstSnapIndex >= lastSnapIndex) return 0;
-
-      const firstSnapPos = snapScrollPositions[firstSnapIndex];
-      const lastSnapPos = snapScrollPositions[lastSnapIndex];
-
-      // Handle edge case of same positions
-      if (firstSnapPos === lastSnapPos) return 0;
-
-      // Normalize scroll position to 0-1 between first and last snap
-      const progress =
-        (scrollPos - firstSnapPos) / (lastSnapPos - firstSnapPos);
-      return Math.min(1, Math.max(0, progress));
-    },
-    [snapScrollPositions, dismissible],
-  );
-
   // Scroll to a specific snap point
   const scrollToSnapPoint = React.useCallback(
     (index: number, behavior: ScrollBehavior = "smooth") => {
@@ -283,17 +275,17 @@ export function useScrollSnap({
       const scrollPos = getScrollPositionForSnapPoint(index);
       const actualBehavior = prefersReducedMotion() ? "auto" : behavior;
 
-      isProgrammaticScrollRef.current = true;
+      scrollControlRef.current.isProgrammatic = true;
       container.scrollTo({
         [isVertical ? "top" : "left"]: scrollPos,
         behavior: actualBehavior,
       });
 
       if (actualBehavior === "auto") {
-        isProgrammaticScrollRef.current = false;
+        scrollControlRef.current.isProgrammatic = false;
       } else {
         waitForScrollEnd(container).then(() => {
-          isProgrammaticScrollRef.current = false;
+          scrollControlRef.current.isProgrammatic = false;
         });
       }
     },
@@ -308,9 +300,8 @@ export function useScrollSnap({
 
       const actualBehavior = prefersReducedMotion() ? "auto" : behavior;
 
-      // Mark as closing to disable all pointer events
       setIsClosing(true);
-      isProgrammaticScrollRef.current = true;
+      scrollControlRef.current.isProgrammatic = true;
 
       container.scrollTo({
         [isVertical ? "top" : "left"]: 0,
@@ -320,441 +311,361 @@ export function useScrollSnap({
       if (actualBehavior !== "auto") {
         await waitForScrollEnd(container);
       }
-      isProgrammaticScrollRef.current = false;
-      // Note: isClosing stays true since dialog is about to close anyway
+      scrollControlRef.current.isProgrammatic = false;
     },
-    [isVertical],
+    [isVertical, setIsClosing],
   );
 
-  // Track if we've done initial scroll for this open
-  const hasInitializedRef = React.useRef(false);
-  const retryTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
-  // Track if initial scroll is complete (used to skip dismiss detection during init)
-  const [isInitialized, setIsInitialized] = React.useState(false);
+  /* -------------------------------------------------------------------------------------------------
+   * Event Handlers (defined outside effects for stability)
+   * -------------------------------------------------------------------------------------------------*/
 
-  // Initial scroll positioning - wait for contentSize to be measured
+  // Helper to trigger dismiss when drawer exits viewport
+  const triggerImmediateDismiss = React.useCallback(() => {
+    if (interactionRef.current.isClosing) return;
+
+    const container = containerRef.current;
+    if (container) {
+      container.style.overflow = "hidden";
+      container.style.pointerEvents = "none";
+      container.style.touchAction = "none";
+    }
+
+    setIsClosing(true);
+    scrollControlRef.current.isProgrammatic = true;
+
+    optionsRef.current.onImmediateClose?.();
+    optionsRef.current.onDismiss();
+  }, [setIsClosing]);
+
+  // RAF-based scroll end detection (fallback for browsers without scrollend)
+  const checkScrollStability = React.useCallback(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const { isVertical: isVert } =
+      DIRECTION_CONFIG[optionsRef.current.direction];
+    const currentPos = isVert ? container.scrollTop : container.scrollLeft;
+    const { rafLastPos } = initRef.current;
+
+    if (rafLastPos !== null && Math.abs(currentPos - rafLastPos) < 0.5) {
+      initRef.current.rafStableCount++;
+      // After 3 stable frames (~50ms), consider scroll ended
+      // But only if user is not actively touching
+      if (
+        initRef.current.rafStableCount >= 3 &&
+        !interactionRef.current.isPointerDown
+      ) {
+        updateIsScrolling(false);
+
+        // Fallback snap detection
+        if (
+          !scrollControlRef.current.isProgrammatic &&
+          !interactionRef.current.isClosing
+        ) {
+          const { index, isDismiss } = findNearestSnapIndex(currentPos);
+          if (
+            !isDismiss &&
+            index !== scrollControlRef.current.lastDetectedSnapIndex
+          ) {
+            scrollControlRef.current.lastDetectedSnapIndex = index;
+            scrollControlRef.current.isFromDetection = true;
+            optionsRef.current.onSnapPointChange(index);
+          }
+        }
+
+        initRef.current.rafId = null;
+        initRef.current.rafLastPos = null;
+        initRef.current.rafStableCount = 0;
+        return;
+      }
+    } else {
+      initRef.current.rafStableCount = 0;
+    }
+
+    initRef.current.rafLastPos = currentPos;
+    initRef.current.rafId = requestAnimationFrame(checkScrollStability);
+  }, [updateIsScrolling, findNearestSnapIndex]);
+
+  const startScrollStabilityCheck = React.useCallback(() => {
+    if (initRef.current.rafId === null) {
+      initRef.current.rafLastPos = null;
+      initRef.current.rafStableCount = 0;
+      initRef.current.rafId = requestAnimationFrame(checkScrollStability);
+    }
+  }, [checkScrollStability]);
+
+  // Main scroll handler
+  const handleScroll = React.useCallback(() => {
+    if (!initRef.current.hasInitialized) return;
+
+    const container = containerRef.current;
+    if (!container) return;
+
+    const { isVertical: isVert } =
+      DIRECTION_CONFIG[optionsRef.current.direction];
+    const scrollPos = isVert ? container.scrollTop : container.scrollLeft;
+
+    // Calculate and emit progress
+    const progress = calculateScrollProgress(scrollPos, geometry);
+    setScrollProgress(progress);
+    optionsRef.current.onScrollProgress?.(progress);
+
+    const snapProg = calculateSnapProgress(
+      scrollPos,
+      snapScrollPositions,
+      optionsRef.current.dismissible,
+    );
+    setSnapProgress(snapProg);
+    optionsRef.current.onSnapProgress?.(snapProg);
+
+    // Only mark as scrolling for user-initiated scrolls
+    // Use 2px threshold to filter out scroll-snap micro-adjustments
+    const positionChanged =
+      interactionRef.current.prevScrollPos !== null &&
+      Math.abs(scrollPos - interactionRef.current.prevScrollPos) > 2;
+
+    interactionRef.current.prevScrollPos = scrollPos;
+
+    if (!scrollControlRef.current.isProgrammatic && positionChanged) {
+      updateIsScrolling(true);
+      // Start RAF-based stability check only for browsers without native scrollend
+      if (!supportsScrollEnd) {
+        startScrollStabilityCheck();
+      }
+    }
+
+    // Trigger dismiss when drawer exits viewport
+    if (!scrollControlRef.current.isProgrammatic) {
+      if (
+        optionsRef.current.dismissible &&
+        !interactionRef.current.isClosing &&
+        progress >= 1
+      ) {
+        triggerImmediateDismiss();
+      }
+    }
+  }, [
+    geometry,
+    snapScrollPositions,
+    updateIsScrolling,
+    startScrollStabilityCheck,
+    triggerImmediateDismiss,
+  ]);
+
+  // Scroll end handler
+  const handleScrollEnd = React.useCallback(() => {
+    updateIsScrolling(false);
+
+    // Fallback snap detection for scrollend
+    if (
+      !scrollControlRef.current.isProgrammatic &&
+      !interactionRef.current.isClosing
+    ) {
+      const container = containerRef.current;
+      if (!container) return;
+
+      const { isVertical: isVert } =
+        DIRECTION_CONFIG[optionsRef.current.direction];
+      const scrollPos = isVert ? container.scrollTop : container.scrollLeft;
+      const { index, isDismiss } = findNearestSnapIndex(scrollPos);
+
+      if (
+        !isDismiss &&
+        index !== scrollControlRef.current.lastDetectedSnapIndex
+      ) {
+        scrollControlRef.current.lastDetectedSnapIndex = index;
+        scrollControlRef.current.isFromDetection = true;
+        optionsRef.current.onSnapPointChange(index);
+      }
+    }
+  }, [updateIsScrolling, findNearestSnapIndex]);
+
+  // Native scroll snap change handler (Chrome 129+)
+  const handleScrollSnapChange = React.useCallback((event: Event) => {
+    if (interactionRef.current.isClosing) return;
+
+    const snapEvent = event as Event & {
+      snapTargetBlock?: Element | null;
+      snapTargetInline?: Element | null;
+    };
+
+    const { isVertical: isVert } =
+      DIRECTION_CONFIG[optionsRef.current.direction];
+    const snapTarget = isVert
+      ? snapEvent.snapTargetBlock
+      : snapEvent.snapTargetInline;
+
+    if (!snapTarget) return;
+
+    const snapIndexAttr = snapTarget.getAttribute("data-snap-index");
+    if (snapIndexAttr === null) return;
+
+    const rawIndex = parseInt(snapIndexAttr, 10);
+    if (isNaN(rawIndex)) return;
+
+    const actualIndex = optionsRef.current.dismissible
+      ? rawIndex - 1
+      : rawIndex;
+    if (actualIndex < 0) return;
+
+    if (actualIndex !== scrollControlRef.current.lastDetectedSnapIndex) {
+      scrollControlRef.current.lastDetectedSnapIndex = actualIndex;
+      scrollControlRef.current.isFromDetection = true;
+      optionsRef.current.onSnapPointChange(actualIndex);
+    }
+  }, []);
+
+  // Touch/mouse handlers to track if user is actively touching
+  // (Used by RAF stability check to distinguish "holding still" from "released")
+  // Note: We use touch/mouse instead of Pointer Events because iOS Safari
+  // has quirky behavior with pointer events that causes flickering
+  const handleTouchStart = React.useCallback(() => {
+    interactionRef.current.isPointerDown = true;
+  }, []);
+
+  const handleTouchEnd = React.useCallback(() => {
+    interactionRef.current.isPointerDown = false;
+    // Reset stable count so we don't immediately fire handleScrollEnd
+    // from counts accumulated while user was holding still
+    // This gives momentum scroll time to start
+    initRef.current.rafStableCount = 0;
+  }, []);
+
+  /* -------------------------------------------------------------------------------------------------
+   * Effects (reduced from 5 to 4)
+   * -------------------------------------------------------------------------------------------------*/
+
+  // Effect 1: Initialization
+  // Note: State/ref resets are unnecessary since DrawerContentInner unmounts on close,
+  // giving us fresh state on remount. We only need to cancel pending callbacks.
   React.useEffect(() => {
     if (!open) {
-      // Reset all state when drawer closes
-      hasInitializedRef.current = false;
-      setIsInitialized(false);
-      setIsClosing(false);
-      updateIsScrolling(false);
-      isProgrammaticScrollRef.current = false;
-      prevScrollPosRef.current = null;
-      isTouchingRef.current = false;
-      // Cancel any running RAF stability check
-      if (rafStateRef.current.rafId !== null) {
-        cancelAnimationFrame(rafStateRef.current.rafId);
-        rafStateRef.current.rafId = null;
+      // Cancel pending callbacks during exit animation
+      if (initRef.current.rafId !== null) {
+        cancelAnimationFrame(initRef.current.rafId);
+        initRef.current.rafId = null;
       }
-      rafStateRef.current.lastScrollPos = null;
-      rafStateRef.current.stableCount = 0;
-      if (retryTimeoutRef.current) {
-        clearTimeout(retryTimeoutRef.current);
-        retryTimeoutRef.current = null;
+      if (initRef.current.retryTimeout) {
+        clearTimeout(initRef.current.retryTimeout);
+        initRef.current.retryTimeout = null;
       }
       return;
     }
 
-    // CRITICAL: Wait for contentSize to be measured before scrolling
-    // Otherwise track height will change and clamp our scroll position
+    // Wait for contentSize to be measured before positioning
     if (contentSize === null) return;
 
-    // Don't re-run if already initialized with measured contentSize
-    if (hasInitializedRef.current) return;
+    // Perform initial scroll positioning (only once per open)
+    if (!initRef.current.hasInitialized) {
+      const performInitialScroll = () => {
+        const container = containerRef.current;
+        if (!container) {
+          initRef.current.retryTimeout = setTimeout(performInitialScroll, 0);
+          return;
+        }
 
-    const performInitialScroll = () => {
-      const container = containerRef.current;
-      if (!container) {
-        retryTimeoutRef.current = setTimeout(performInitialScroll, 0);
-        return;
-      }
+        const size = isVertical
+          ? container.clientHeight
+          : container.clientWidth;
+        if (size === 0) {
+          initRef.current.retryTimeout = setTimeout(performInitialScroll, 0);
+          return;
+        }
 
-      // Measure the actual container size
-      const size = isVertical ? container.clientHeight : container.clientWidth;
-      if (size === 0) {
-        retryTimeoutRef.current = setTimeout(performInitialScroll, 0);
-        return;
-      }
+        initRef.current.hasInitialized = true;
 
-      hasInitializedRef.current = true;
+        if (size !== viewportSize) {
+          setViewportSize(size);
+        }
 
-      if (size !== viewportSize) {
-        setViewportSize(size);
-      }
+        // Calculate target scroll position
+        const targetIndex = dismissible
+          ? activeSnapPointIndex + 1
+          : activeSnapPointIndex;
+        const targetScrollPos = snapScrollPositions[targetIndex] ?? 0;
 
-      // Use the actual snap position from our pre-calculated array
-      const targetIndex = dismissible
-        ? activeSnapPointIndex + 1
-        : activeSnapPointIndex;
-      const targetScrollPos = snapScrollPositions[targetIndex] ?? 0;
+        // Mark as programmatic scroll
+        scrollControlRef.current.isProgrammatic = true;
+        scrollControlRef.current.lastDetectedSnapIndex = activeSnapPointIndex;
 
-      // Mark as programmatic scroll to prevent isScrolling from being set
-      isProgrammaticScrollRef.current = true;
+        // Disable scroll-snap and smooth behavior for instant positioning
+        container.style.scrollSnapType = "none";
+        container.style.scrollBehavior = "auto";
 
-      // Disable scroll-snap AND scroll-behavior for instant positioning
-      container.style.scrollSnapType = "none";
-      container.style.scrollBehavior = "auto";
+        if (isVertical) {
+          container.scrollTop = targetScrollPos;
+        } else {
+          container.scrollLeft = targetScrollPos;
+        }
 
-      if (isVertical) {
-        container.scrollTop = targetScrollPos;
-      } else {
-        container.scrollLeft = targetScrollPos;
-      }
+        // Calculate and emit initial progress
+        const initialProgress = calculateScrollProgress(
+          targetScrollPos,
+          geometry,
+        );
+        setScrollProgress(initialProgress);
+        onScrollProgress?.(initialProgress);
 
-      // Calculate and emit initial progress for backdrop opacity
-      const initialProgress = calculateProgress(targetScrollPos);
-      setScrollProgress(initialProgress);
-      onScrollProgress?.(initialProgress);
+        const initialSnapProgress = calculateSnapProgress(
+          targetScrollPos,
+          snapScrollPositions,
+          dismissible,
+        );
+        setSnapProgress(initialSnapProgress);
+        onSnapProgress?.(initialSnapProgress);
 
-      // Calculate and emit initial snap progress
-      const initialSnapProgress = calculateSnapProgress(targetScrollPos);
-      setSnapProgress(initialSnapProgress);
-      onSnapProgress?.(initialSnapProgress);
+        // Re-enable scroll-snap and smooth behavior
+        container.style.scrollSnapType = isVertical
+          ? "y mandatory"
+          : "x mandatory";
+        container.style.scrollBehavior = "smooth";
 
-      // Re-enable scroll-snap and smooth behavior
-      container.style.scrollSnapType = isVertical
-        ? "y mandatory"
-        : "x mandatory";
-      container.style.scrollBehavior = "smooth";
+        // Clear programmatic flag after a tick
+        setTimeout(() => {
+          scrollControlRef.current.isProgrammatic = false;
+        }, 0);
 
-      // Clear programmatic flag after a tick (after scroll events have fired)
-      setTimeout(() => {
-        isProgrammaticScrollRef.current = false;
-      }, 0);
+        setIsInitialized(true);
+      };
 
-      // Mark as initialized
-      setIsInitialized(true);
-    };
-
-    // Small delay to let DOM settle
-    retryTimeoutRef.current = setTimeout(performInitialScroll, 0);
+      initRef.current.retryTimeout = setTimeout(performInitialScroll, 0);
+    }
 
     return () => {
-      if (retryTimeoutRef.current) {
-        clearTimeout(retryTimeoutRef.current);
-        retryTimeoutRef.current = null;
+      if (initRef.current.retryTimeout) {
+        clearTimeout(initRef.current.retryTimeout);
+        initRef.current.retryTimeout = null;
       }
     };
   }, [
     open,
+    contentSize,
     isVertical,
     viewportSize,
-    contentSize,
     dismissible,
-    snapPoints,
     activeSnapPointIndex,
     snapScrollPositions,
-    calculateProgress,
-    calculateSnapProgress,
+    geometry,
     onScrollProgress,
     onSnapProgress,
-    updateIsScrolling,
-    setIsClosing,
   ]);
 
-  // Track the last detected snap index to avoid duplicate callbacks
-  const lastDetectedSnapIndexRef = React.useRef(activeSnapPointIndex);
-
-  // Track if the state change came from detection (vs external like button click)
-  // When true, the controlled effect should skip programmatic scrolling
-  const isStateFromDetectionRef = React.useRef(false);
-
-  // Track previous scroll position to detect actual movement
-  // This prevents spurious scroll events (common on iOS Safari for Bottom/Right drawers)
-  // from keeping isScrolling stuck as true
-  const prevScrollPosRef = React.useRef<number | null>(null);
-
-  // Persist RAF stability check state across effect re-runs
-  // This is critical because the effect may re-run during scroll (due to dependency changes)
-  // and we don't want to lose the RAF state
-  const rafStateRef = React.useRef({
-    rafId: null as number | null,
-    lastScrollPos: null as number | null,
-    stableCount: 0,
-  });
-
-  // Track whether user is actively touching (to distinguish hold vs momentum)
-  const isTouchingRef = React.useRef(false);
-
-  // Reset last detected snap index when drawer opens
+  // Effect 2: Keep lastDetectedSnapIndex in sync with activeSnapPointIndex
+  // This prevents handleScrollSnapChange from setting isFromDetection=true after programmatic scrolls
   React.useEffect(() => {
     if (open) {
-      lastDetectedSnapIndexRef.current = activeSnapPointIndex;
+      scrollControlRef.current.lastDetectedSnapIndex = activeSnapPointIndex;
     }
   }, [open, activeSnapPointIndex]);
 
-  // Handle scroll events for progress tracking and snap detection
-  React.useEffect(() => {
-    const container = containerRef.current;
-    if (!container || !open) return;
-
-    // Helper to trigger dismiss immediately when drawer exits viewport
-    const triggerImmediateDismiss = () => {
-      if (isClosingRef.current) return; // Guard against multiple calls
-
-      // Immediately disable interaction (don't wait for React state update)
-      container.style.overflow = "hidden";
-      container.style.pointerEvents = "none";
-      container.style.touchAction = "none";
-
-      setIsClosing(true);
-      isClosingRef.current = true;
-      isProgrammaticScrollRef.current = true;
-
-      // Signal immediate close (skip exit animation) then dismiss
-      onImmediateClose?.();
-      onDismiss();
-    };
-
-    // RAF-based scroll end detection - more reliable than scrollend event
-    // Detects when scroll position stops changing for a few frames
-    // Uses rafStateRef to persist state across effect re-runs
-
-    const checkScrollStability = () => {
-      const currentPos = isVertical
-        ? container.scrollTop
-        : container.scrollLeft;
-
-      const { lastScrollPos } = rafStateRef.current;
-
-      if (
-        lastScrollPos !== null &&
-        Math.abs(currentPos - lastScrollPos) < 0.5
-      ) {
-        rafStateRef.current.stableCount++;
-        // After 3 stable frames (~50ms), consider scroll ended
-        // But only if user is not actively touching - they might be holding still
-        if (rafStateRef.current.stableCount >= 3 && !isTouchingRef.current) {
-          handleScrollEnd();
-          rafStateRef.current.rafId = null;
-          rafStateRef.current.lastScrollPos = null;
-          rafStateRef.current.stableCount = 0;
-          return;
-        }
-      } else {
-        rafStateRef.current.stableCount = 0;
-      }
-
-      rafStateRef.current.lastScrollPos = currentPos;
-      rafStateRef.current.rafId = requestAnimationFrame(checkScrollStability);
-    };
-
-    const startScrollStabilityCheck = () => {
-      if (rafStateRef.current.rafId === null) {
-        rafStateRef.current.lastScrollPos = null;
-        rafStateRef.current.stableCount = 0;
-        rafStateRef.current.rafId = requestAnimationFrame(checkScrollStability);
-      }
-    };
-
-    const handleScroll = () => {
-      // Skip during initialization (scroll position is 0 before init)
-      if (!isInitialized) return;
-
-      const scrollPos = isVertical ? container.scrollTop : container.scrollLeft;
-      const progress = calculateProgress(scrollPos);
-      setScrollProgress(progress);
-      onScrollProgress?.(progress);
-
-      // Calculate and emit snap progress
-      const snapProg = calculateSnapProgress(scrollPos);
-      setSnapProgress(snapProg);
-      onSnapProgress?.(snapProg);
-
-      // Only mark as scrolling for user-initiated scrolls, not programmatic
-      // Programmatic scrolls (especially with behavior: 'auto') don't trigger scrollend,
-      // which would leave isScrolling stuck as true forever
-      // Use 2px threshold to filter out scroll-snap micro-adjustments when settling
-      const positionChanged =
-        prevScrollPosRef.current !== null &&
-        Math.abs(scrollPos - prevScrollPosRef.current) > 2;
-
-      // Always update the position baseline (for both programmatic and user scrolls)
-      prevScrollPosRef.current = scrollPos;
-
-      // Only set isScrolling for user-initiated scrolls with actual movement
-      if (!isProgrammaticScrollRef.current && positionChanged) {
-        updateIsScrolling(true);
-        // Start RAF-based stability check only for browsers without native scrollend
-        // Chrome's scrollend already has correct touch-awareness built in
-        if (!supportsScrollEnd) {
-          startScrollStabilityCheck();
-        }
-      }
-
-      // Only do snap detection for user drags, not programmatic scroll
-      if (!isProgrammaticScrollRef.current) {
-        // Trigger dismiss when drawer exits viewport (progress >= 1)
-        if (dismissible && !isClosingRef.current && progress >= 1) {
-          triggerImmediateDismiss();
-          return;
-        }
-
-        // Snap detection is handled by:
-        // - scrollsnapchange (Chrome 129+): native event after snap completes
-        // - scrollend (Firefox 109+, Chrome 114+): position-based detection after scroll ends
-        // - RAF stability check: detects when scroll position stops changing
-        // All browsers update snap point only after scrolling ends, not during drag
-      }
-    };
-
-    const handleScrollEnd = () => {
-      updateIsScrolling(false);
-
-      // Fallback snap detection for scrollend (catches cases where scrollsnapchange didn't fire)
-      // This is especially important for fast swipes where scrollsnapchange may be unreliable
-      if (!isProgrammaticScrollRef.current && !isClosingRef.current) {
-        const scrollPos = isVertical
-          ? container.scrollTop
-          : container.scrollLeft;
-        const { index, isDismiss } = findNearestSnapIndex(scrollPos);
-
-        if (!isDismiss && index !== lastDetectedSnapIndexRef.current) {
-          lastDetectedSnapIndexRef.current = index;
-          isStateFromDetectionRef.current = true;
-          onSnapPointChange(index);
-        }
-      }
-    };
-
-    // Native scroll snap change event (Chrome 129+)
-    // Provides the actual snapped element, more reliable than position-based detection
-    const handleScrollSnapChange = (event: Event) => {
-      // Skip during closing only - not during programmatic scroll
-      // scrollsnapchange fires AFTER scroll completes, so it's safe to process
-      // even for programmatic scrolls (calling onSnapPointChange with same value is a no-op)
-      // This ensures user swipes that happen right after programmatic scrolls are caught
-      if (isClosingRef.current) return;
-
-      // Get the snapped element from the event
-      // TypeScript doesn't have types for this yet, so we need to cast
-      const snapEvent = event as Event & {
-        snapTargetBlock?: Element | null;
-        snapTargetInline?: Element | null;
-      };
-      const snapTarget = isVertical
-        ? snapEvent.snapTargetBlock
-        : snapEvent.snapTargetInline;
-
-      if (!snapTarget) return;
-
-      // Get snap index from data attribute
-      const snapIndexAttr = snapTarget.getAttribute("data-snap-index");
-      if (snapIndexAttr === null) return;
-
-      const rawIndex = parseInt(snapIndexAttr, 10);
-      if (isNaN(rawIndex)) return;
-
-      // Adjust for dismiss target (index 0 is dismiss when dismissible)
-      const actualIndex = dismissible ? rawIndex - 1 : rawIndex;
-
-      // Index -1 means dismiss target was snapped (shouldn't happen normally,
-      // as dismiss is handled by progress >= 1 check, but handle gracefully)
-      if (actualIndex < 0) return;
-
-      if (actualIndex !== lastDetectedSnapIndexRef.current) {
-        lastDetectedSnapIndexRef.current = actualIndex;
-        isStateFromDetectionRef.current = true;
-        onSnapPointChange(actualIndex);
-      }
-    };
-
-    // Touch/mouse tracking to distinguish "holding still" from "released with momentum"
-    const handleTouchStart = () => {
-      isTouchingRef.current = true;
-    };
-
-    const handleTouchEnd = () => {
-      isTouchingRef.current = false;
-      // Reset stable count so we don't immediately fire handleScrollEnd
-      // from counts accumulated while user was holding still
-      // This gives momentum scroll time to start
-      rafStateRef.current.stableCount = 0;
-    };
-
-    container.addEventListener("scroll", handleScroll, { passive: true });
-    container.addEventListener("touchstart", handleTouchStart, {
-      passive: true,
-    });
-    container.addEventListener("touchend", handleTouchEnd, { passive: true });
-    container.addEventListener("touchcancel", handleTouchEnd, {
-      passive: true,
-    });
-    container.addEventListener("mousedown", handleTouchStart);
-    container.addEventListener("mouseup", handleTouchEnd);
-
-    // Also use native scrollend if available (may fire faster than RAF check)
-    if (supportsScrollEnd) {
-      container.addEventListener("scrollend", handleScrollEnd);
-    }
-
-    if (supportsScrollSnapChange) {
-      container.addEventListener("scrollsnapchange", handleScrollSnapChange);
-    }
-
-    return () => {
-      container.removeEventListener("scroll", handleScroll);
-      container.removeEventListener("touchstart", handleTouchStart);
-      container.removeEventListener("touchend", handleTouchEnd);
-      container.removeEventListener("touchcancel", handleTouchEnd);
-      container.removeEventListener("mousedown", handleTouchStart);
-      container.removeEventListener("mouseup", handleTouchEnd);
-      // Don't cancel RAF on cleanup - let it complete to detect scroll end
-      // The ref persists across effect re-runs
-      if (supportsScrollEnd) {
-        container.removeEventListener("scrollend", handleScrollEnd);
-      }
-      if (supportsScrollSnapChange) {
-        container.removeEventListener(
-          "scrollsnapchange",
-          handleScrollSnapChange,
-        );
-      }
-    };
-  }, [
-    isVertical,
-    calculateProgress,
-    calculateSnapProgress,
-    open,
-    isInitialized,
-    dismissible,
-    findNearestSnapIndex,
-    onScrollProgress,
-    onSnapProgress,
-    onDismiss,
-    onImmediateClose,
-    onSnapPointChange,
-    updateIsScrolling,
-    setIsClosing,
-  ]);
-
-  // Update viewport size when container is mounted and on resize
-  React.useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const updateViewportSize = () => {
-      const size = isVertical ? container.clientHeight : container.clientWidth;
-      setViewportSize(size);
-    };
-
-    updateViewportSize();
-
-    window.addEventListener("resize", updateViewportSize);
-    return () => window.removeEventListener("resize", updateViewportSize);
-  }, [isVertical]);
-
-  // Handle controlled snap point changes (from external sources like buttons)
+  // Effect 3: Handle controlled snap point changes (from external sources like buttons)
   const prevSnapPointRef = React.useRef(activeSnapPointIndex);
   React.useEffect(() => {
     if (prevSnapPointRef.current !== activeSnapPointIndex && open) {
       // Skip if this change came from detection (CSS scroll-snap already handled it)
-      if (isStateFromDetectionRef.current) {
-        isStateFromDetectionRef.current = false;
+      if (scrollControlRef.current.isFromDetection) {
+        scrollControlRef.current.isFromDetection = false;
         prevSnapPointRef.current = activeSnapPointIndex;
         return;
       }
@@ -783,12 +694,72 @@ export function useScrollSnap({
     getScrollPositionForSnapPoint,
   ]);
 
-  // Calculate scroll positions for CSS animation-range
-  const firstSnapIndex = dismissible ? 1 : 0;
-  const lastSnapIndex = snapScrollPositions.length - 1;
-  const firstSnapScrollPos = snapScrollPositions[firstSnapIndex] ?? 0;
-  const lastSnapScrollPos = snapScrollPositions[lastSnapIndex] ?? 0;
-  const dismissScrollPos = snapScrollPositions[0] ?? 0;
+  // Effect 4: Event listeners (stable handlers, minimal dependencies)
+  React.useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !open) return;
+
+    // Attach event listeners
+    container.addEventListener("scroll", handleScroll, { passive: true });
+
+    // Touch/mouse tracking to distinguish "holding still" from "released with momentum"
+    // Note: We use touch/mouse events instead of Pointer Events because iOS Safari
+    // has quirky behavior with pointer events that causes flickering when holding still
+    container.addEventListener("touchstart", handleTouchStart, {
+      passive: true,
+    });
+    container.addEventListener("touchend", handleTouchEnd, { passive: true });
+    container.addEventListener("touchcancel", handleTouchEnd, {
+      passive: true,
+    });
+    container.addEventListener("mousedown", handleTouchStart);
+    container.addEventListener("mouseup", handleTouchEnd);
+
+    if (supportsScrollEnd) {
+      container.addEventListener("scrollend", handleScrollEnd);
+    }
+
+    if (supportsScrollSnapChange) {
+      container.addEventListener("scrollsnapchange", handleScrollSnapChange);
+    }
+
+    // Viewport resize handling
+    const updateViewportSize = () => {
+      const size = isVertical ? container.clientHeight : container.clientWidth;
+      setViewportSize(size);
+    };
+    window.addEventListener("resize", updateViewportSize);
+
+    return () => {
+      container.removeEventListener("scroll", handleScroll);
+      container.removeEventListener("touchstart", handleTouchStart);
+      container.removeEventListener("touchend", handleTouchEnd);
+      container.removeEventListener("touchcancel", handleTouchEnd);
+      container.removeEventListener("mousedown", handleTouchStart);
+      container.removeEventListener("mouseup", handleTouchEnd);
+
+      if (supportsScrollEnd) {
+        container.removeEventListener("scrollend", handleScrollEnd);
+      }
+
+      if (supportsScrollSnapChange) {
+        container.removeEventListener(
+          "scrollsnapchange",
+          handleScrollSnapChange,
+        );
+      }
+
+      window.removeEventListener("resize", updateViewportSize);
+    };
+  }, [
+    open,
+    isVertical,
+    handleScroll,
+    handleScrollEnd,
+    handleScrollSnapChange,
+    handleTouchStart,
+    handleTouchEnd,
+  ]);
 
   return {
     containerRef,
@@ -798,7 +769,7 @@ export function useScrollSnap({
     scrollToSnapPoint,
     scrollToClose,
     snapTargetRefs,
-    trackSize,
+    trackSize: geometry.trackSize,
     snapScrollPositions,
     isInitialized,
     isClosing,

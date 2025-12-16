@@ -13,6 +13,7 @@ import "./drawer.css";
 
 import type { SnapPoint, DrawerDirection } from "./lib/drawer-utils";
 import {
+  DIRECTION_CONFIG,
   parsePixelValue,
   findSnapPointIndex,
   getSnapPointValue,
@@ -282,7 +283,7 @@ function Drawer({
   // Track immediate close for swipe dismiss (skip exit animation)
   const [immediateClose, setImmediateClose] = React.useState(false);
 
-  const isVertical = direction === "top" || direction === "bottom";
+  const { isVertical } = DIRECTION_CONFIG[direction];
 
   // Clear animating when CSS animation completes
   const handleOpenChangeComplete = React.useCallback(() => {
@@ -317,9 +318,11 @@ function Drawer({
         onActiveSnapPointChange?.(defaultSnapValue);
       }
 
-      // Reset drag progress when opening (backdrop starts invisible, fades in with drawer)
+      // Reset state when opening (these persist across drawer sessions since they're in the root)
       if (nextOpen) {
         setDragProgress(1); // 1 = closed/invisible, will animate to 0 = open/visible
+        setIsDragging(false); // Reset dragging state (may be stale from swipe dismiss)
+        setImmediateClose(false); // Reset immediate close flag
         // Only reset snapProgress in uncontrolled mode
         // Controlled mode: scroll handler will set correct value when drawer positions itself
         if (!isSnapPointControlled) {
@@ -330,7 +333,6 @@ function Drawer({
               : 0;
           setSnapProgress(progress);
         }
-        setImmediateClose(false); // Reset immediate close flag
       }
     },
     [
@@ -868,7 +870,9 @@ function DrawerContentInner({
               )}
               style={
                 {
-                  scrollSnapAlign: "start",
+                  // Note: scroll-snap-align is NOT set here - we use dedicated invisible
+                  // snap targets instead. Setting it on the Popup creates conflicting
+                  // snap points for floating variant (due to margin offset).
 
                   // Dynamic starting offset for enter animation
                   "--drawer-start-offset": startingOffset,
@@ -916,7 +920,7 @@ interface DrawerHandleProps extends React.ComponentProps<"div"> {
 
 function DrawerHandle({ className, hidden, ...props }: DrawerHandleProps) {
   const { direction } = useDrawer();
-  const isVertical = direction === "top" || direction === "bottom";
+  const { isVertical } = DIRECTION_CONFIG[direction];
 
   if (hidden) return null;
 

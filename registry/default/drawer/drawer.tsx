@@ -696,216 +696,216 @@ function DrawerContentInner({
     >
       {/* Backdrop - view-driven opacity (Chrome 115+) with JS fallback */}
       <BaseDialog.Backdrop
-          data-slot="drawer-overlay"
-          className={cn(
-            "absolute inset-0 z-40 bg-black/35",
-            // Force GPU layer to prevent repaint flicker
-            "[transform:translateZ(0)] will-change-[opacity]",
-            // Disable pointer events during closing to avoid interfering with swipe dismiss
-            isClosing ? "pointer-events-none" : "pointer-events-auto",
-            // Prevent touch-drag on backdrop from scrolling the page underneath
-            "touch-none",
-            // Transition for smooth enter/exit (skip on immediate close or while dragging)
-            immediateClose || (isDragging && !isAnimating)
-              ? "transition-none"
-              : "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-opacity duration-450",
-            // Enter: start at opacity 0, transition animates to target
-            "[&[data-starting-style]]:opacity-0!",
-            // Exit: use animation to override scroll-driven animation (transition can't interpolate from animation-held values)
-            "[&[data-ending-style]]:[animation:drawer-backdrop-exit_450ms_cubic-bezier(0,0,0.58,1)_forwards]",
+        data-slot="drawer-overlay"
+        className={cn(
+          "absolute inset-0 z-40 bg-black/35",
+          // Force GPU layer to prevent repaint flicker
+          "[transform:translateZ(0)] will-change-[opacity]",
+          // Disable pointer events during closing to avoid interfering with swipe dismiss
+          isClosing ? "pointer-events-none" : "pointer-events-auto",
+          // Prevent touch-drag on backdrop from scrolling the page underneath
+          "touch-none",
+          // Transition for smooth enter/exit (skip on immediate close or while dragging)
+          immediateClose || (isDragging && !isAnimating)
+            ? "transition-none"
+            : "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-opacity duration-450",
+          // Enter: start at opacity 0, transition animates to target
+          "[&[data-starting-style]]:opacity-0!",
+          // Exit: use animation to override scroll-driven animation (transition can't interpolate from animation-held values)
+          "[&[data-ending-style]]:[animation:drawer-backdrop-exit_450ms_cubic-bezier(0,0,0.58,1)_forwards]",
 
-            isInitialized && !isAnimating && isDragging && dragProgress < 1
-              ? useScrollDrivenAnimation
-                ? // Scroll-driven backdrop animation (Chrome 115+)
-                  backdropAnimationStyles[direction]
-                : `opacity-(--drawer-backdrop-dynamic-opacity)`
-              : `opacity-(--drawer-backdrop-static-opacity)`,
-          )}
-          style={
-            {
-              "--drawer-backdrop-dynamic-opacity": 1 - dragProgress,
-              "--drawer-backdrop-static-opacity": targetBackdropOpacity,
-            } as React.CSSProperties
-          }
-        />
+          isInitialized && !isAnimating && isDragging && dragProgress < 1
+            ? useScrollDrivenAnimation
+              ? // Scroll-driven backdrop animation (Chrome 115+)
+                backdropAnimationStyles[direction]
+              : `opacity-(--drawer-backdrop-dynamic-opacity)`
+            : `opacity-(--drawer-backdrop-static-opacity)`,
+        )}
+        style={
+          {
+            "--drawer-backdrop-dynamic-opacity": 1 - dragProgress,
+            "--drawer-backdrop-static-opacity": targetBackdropOpacity,
+          } as React.CSSProperties
+        }
+      />
 
-        {/* Viewport - scroll container for scroll-snap gestures */}
-        <BaseDialog.Viewport
-          ref={containerRef}
-          data-slot="drawer-viewport"
-          data-direction={direction}
-          data-scrolling={isScrolling || undefined}
-          className={cn(
-            // Group for propagating data-starting-style/data-ending-style to children
-            "group/drawer",
-            // Fixed positioning
-            "fixed inset-0 z-50 outline-hidden",
-            // Extra 60px above viewport for bottom drawer prevents URL bar touch interaction
-            direction === "bottom" && "-top-[60px]",
-            // Viewport height with dvh fallback cascade
-            isVertical ? "h-[calc(100vh+60px)]" : "h-[100vh]",
-            isVertical && "[@supports(height:1dvh)]:h-[calc(100dvh+60px)]",
-            !isVertical && "[@supports(height:1dvh)]:h-dvh",
-            // iOS Safari: use max of dvh/lvh for consistent behavior
-            isVertical &&
-              "[@supports(-webkit-touch-callout:none)]:h-[calc(max(100dvh,100lvh)+60px)]",
-            !isVertical &&
-              "[@supports(-webkit-touch-callout:none)]:h-[max(100dvh,100lvh)]",
-            // Disable all interaction when animating or closing
-            isAnimating || isClosing
-              ? "pointer-events-none"
-              : "pointer-events-auto",
-            // Prevent Base UI's default animation and ensure transparent background
-            "bg-transparent opacity-100! [&[data-ending-style]]:opacity-100! [&[data-starting-style]]:opacity-100!",
-            // Transform transition for exit animation - Base UI detects this and waits before removing
-            // Skip transition on immediate close (swipe dismiss)
-            immediateClose
-              ? "transition-none"
-              : "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-transform duration-450",
+      {/* Viewport - scroll container for scroll-snap gestures */}
+      <BaseDialog.Viewport
+        ref={containerRef}
+        data-slot="drawer-viewport"
+        data-direction={direction}
+        data-scrolling={isScrolling || undefined}
+        className={cn(
+          // Group for propagating data-starting-style/data-ending-style to children
+          "group/drawer",
+          // Fixed positioning
+          "fixed inset-0 z-50 outline-hidden",
+          // Extra 60px above viewport for bottom drawer prevents URL bar touch interaction
+          direction === "bottom" && "-top-[60px]",
+          // Viewport height with dvh fallback cascade
+          isVertical ? "h-[calc(100vh+60px)]" : "h-[100vh]",
+          isVertical && "[@supports(height:1dvh)]:h-[calc(100dvh+60px)]",
+          !isVertical && "[@supports(height:1dvh)]:h-dvh",
+          // iOS Safari: use max of dvh/lvh for consistent behavior
+          isVertical &&
+            "[@supports(-webkit-touch-callout:none)]:h-[calc(max(100dvh,100lvh)+60px)]",
+          !isVertical &&
+            "[@supports(-webkit-touch-callout:none)]:h-[max(100dvh,100lvh)]",
+          // Disable all interaction when animating or closing
+          isAnimating || isClosing
+            ? "pointer-events-none"
+            : "pointer-events-auto",
+          // Prevent Base UI's default animation and ensure transparent background
+          "bg-transparent opacity-100! [&[data-ending-style]]:opacity-100! [&[data-starting-style]]:opacity-100!",
+          // Transform transition for exit animation - Base UI detects this and waits before removing
+          // Skip transition on immediate close (swipe dismiss)
+          immediateClose
+            ? "transition-none"
+            : "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-transform duration-450",
 
-            // Hide scrollbar
-            "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-            // Scroll snap configuration - disable scrolling when animating or closing
-            isAnimating || isClosing
-              ? "overflow-hidden"
-              : isVertical
-                ? "overflow-y-scroll"
-                : "overflow-x-scroll",
-            isAnimating || isClosing
-              ? "overflow-hidden"
-              : isVertical
-                ? "overflow-x-hidden"
-                : "overflow-y-hidden",
-            // Prevent scroll chaining to parent (none is more aggressive than contain)
-            "overscroll-none",
-            // Constrain touch gestures to drawer scroll direction only (prevents URL bar collapse/expand)
-            isVertical ? "touch-pan-y" : "touch-pan-x",
-            // Reduced motion: instant behavior
-            "motion-reduce:[scroll-behavior:auto]",
-          )}
-          style={
-            {
-              scrollSnapType: isVertical ? "y mandatory" : "x mandatory",
-              scrollBehavior: "smooth",
-              // Constrain touch to scroll direction only (prevents URL bar collapse on mobile)
-              // Disable touch entirely during animations or closing
-              touchAction:
-                isAnimating || isClosing
-                  ? "none"
-                  : isVertical
-                    ? "pan-y"
-                    : "pan-x",
-              // Adjust for keyboard on bottom drawer
-              paddingBottom:
-                direction === "bottom" && keyboardHeight > 0
-                  ? `${keyboardHeight}px`
-                  : undefined,
-              // Animate --drawer-snap-progress CSS custom property (Chrome 115+)
-              // Consumers can use: opacity: var(--drawer-snap-progress) for crossfades
-              ...(useScrollDrivenAnimation && {
-                animationName: "drawer-snap-progress",
-                animationTimingFunction: "linear",
-                animationFillMode: "both",
-                animationTimeline: "scroll(self)",
-                animationRange: `${firstSnapScrollPos}px ${lastSnapScrollPos}px`,
-              }),
-            } as React.CSSProperties
-          }
+          // Hide scrollbar
+          "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+          // Scroll snap configuration - disable scrolling when animating or closing
+          isAnimating || isClosing
+            ? "overflow-hidden"
+            : isVertical
+              ? "overflow-y-scroll"
+              : "overflow-x-scroll",
+          isAnimating || isClosing
+            ? "overflow-hidden"
+            : isVertical
+              ? "overflow-x-hidden"
+              : "overflow-y-hidden",
+          // Prevent scroll chaining to parent (none is more aggressive than contain)
+          "overscroll-none",
+          // Constrain touch gestures to drawer scroll direction only (prevents URL bar collapse/expand)
+          isVertical ? "touch-pan-y" : "touch-pan-x",
+          // Reduced motion: instant behavior
+          "motion-reduce:[scroll-behavior:auto]",
+        )}
+        style={
+          {
+            scrollSnapType: isVertical ? "y mandatory" : "x mandatory",
+            scrollBehavior: "smooth",
+            // Constrain touch to scroll direction only (prevents URL bar collapse on mobile)
+            // Disable touch entirely during animations or closing
+            touchAction:
+              isAnimating || isClosing
+                ? "none"
+                : isVertical
+                  ? "pan-y"
+                  : "pan-x",
+            // Adjust for keyboard on bottom drawer
+            paddingBottom:
+              direction === "bottom" && keyboardHeight > 0
+                ? `${keyboardHeight}px`
+                : undefined,
+            // Animate --drawer-snap-progress CSS custom property (Chrome 115+)
+            // Consumers can use: opacity: var(--drawer-snap-progress) for crossfades
+            ...(useScrollDrivenAnimation && {
+              animationName: "drawer-snap-progress",
+              animationTimingFunction: "linear",
+              animationFillMode: "both",
+              animationTimeline: "scroll(self)",
+              animationRange: `${firstSnapScrollPos}px ${lastSnapScrollPos}px`,
+            }),
+          } as React.CSSProperties
+        }
+      >
+        {/* Scroll track - creates the scrollable area */}
+        <div
+          data-slot="drawer-track"
+          className={drawerTrackVariants({ direction })}
+          style={{
+            // Track size: creates the scrollable space
+            [isVertical ? "height" : "width"]: `${trackSize}px`,
+          }}
         >
-          {/* Scroll track - creates the scrollable area */}
-          <div
-            data-slot="drawer-track"
-            className={drawerTrackVariants({ direction })}
-            style={{
-              // Track size: creates the scrollable space
-              [isVertical ? "height" : "width"]: `${trackSize}px`,
-            }}
-          >
-            {/* Snap targets - invisible elements for scroll-snap-align */}
-            {/* Also serve as scroll-state containers for CSS queries (Chrome 133+) */}
-            {snapScrollPositions.map((position, index) => (
-              <div
-                key={index}
-                ref={(el) => {
-                  snapTargetRefs.current[index] = el;
-                }}
-                data-slot="drawer-snap-target"
-                data-snap-index={index}
-                className={cn(
-                  "pointer-events-none absolute",
-                  isVertical ? "inset-x-0 h-px" : "inset-y-0 w-px",
-                )}
-                style={
-                  {
-                    [isVertical ? "top" : "left"]: `${position}px`,
-                    scrollSnapAlign: "start",
-                    scrollSnapStop: sequentialSnap ? "always" : undefined,
-                    // CSS scroll-state() container queries (Chrome 133+)
-                    // Enables: @container scroll-state(snapped: block) { ... }
-                    ...(supportsScrollState && {
-                      containerType: "scroll-state",
-                    }),
-                  } as React.CSSProperties
-                }
-                aria-hidden="true"
-              />
-            ))}
-
-            {/* Popup - the actual drawer panel (dialog element with accessibility) */}
-            <BaseDialog.Popup
-              ref={measureRef}
-              data-slot="drawer-content"
+          {/* Snap targets - invisible elements for scroll-snap-align */}
+          {/* Also serve as scroll-state containers for CSS queries (Chrome 133+) */}
+          {snapScrollPositions.map((position, index) => (
+            <div
+              key={index}
+              ref={(el) => {
+                snapTargetRefs.current[index] = el;
+              }}
+              data-slot="drawer-snap-target"
+              data-snap-index={index}
               className={cn(
-                drawerContentVariants({ variant, direction }),
-                // Hide until scroll is initialized to prevent flash at wrong position (iOS Safari)
-                // Only apply when opening (open=true), not during close animation
-                open && !isInitialized && "invisible",
-                // Disable pointer events during enter/exit animations to prevent interruption
-                isAnimating || isClosing
-                  ? "pointer-events-none"
-                  : "pointer-events-auto",
-                // Skip transition on immediate close (swipe dismiss)
-                immediateClose && "transition-none",
-                className,
+                "pointer-events-none absolute",
+                isVertical ? "inset-x-0 h-px" : "inset-y-0 w-px",
               )}
               style={
                 {
-                  // Note: scroll-snap-align is NOT set here - we use dedicated invisible
-                  // snap targets instead. Setting it on the Popup creates conflicting
-                  // snap points for floating variant (due to margin offset).
-
-                  // Dynamic starting offset for enter animation
-                  "--drawer-start-offset": startingOffset,
-
-                  // View timeline for backdrop animation (Chrome 115+)
-                  // Backdrop opacity tracks how much of drawer is visible
-                  ...(supportsScrollTimeline && {
-                    viewTimelineName: "--drawer-panel",
-                    viewTimelineAxis: isVertical ? "block" : "inline",
+                  [isVertical ? "top" : "left"]: `${position}px`,
+                  scrollSnapAlign: "start",
+                  scrollSnapStop: sequentialSnap ? "always" : undefined,
+                  // CSS scroll-state() container queries (Chrome 133+)
+                  // Enables: @container scroll-state(snapped: block) { ... }
+                  ...(supportsScrollState && {
+                    containerType: "scroll-state",
                   }),
                 } as React.CSSProperties
               }
-              {...props}
-            >
-              {children}
-            </BaseDialog.Popup>
-          </div>
-
-          {/* iOS 26 Safari: Fixed element at bottom for nav bar color detection */}
-          {/* Must be: within 3px of bottom, ≥80% wide, ≥3px tall */}
-          {/* Only visible on Safari; slides with drawer during exit */}
-          {(direction === "bottom" ||
-            direction === "left" ||
-            direction === "right") && (
-            <div
               aria-hidden="true"
-              className={cn(
-                "bg-popover pointer-events-none fixed inset-x-0 bottom-0 hidden h-10 bg-clip-text [@supports(-webkit-touch-callout:none)]:block",
-              )}
             />
-          )}
-        </BaseDialog.Viewport>
-      </div>
+          ))}
+
+          {/* Popup - the actual drawer panel (dialog element with accessibility) */}
+          <BaseDialog.Popup
+            ref={measureRef}
+            data-slot="drawer-content"
+            className={cn(
+              drawerContentVariants({ variant, direction }),
+              // Hide until scroll is initialized to prevent flash at wrong position (iOS Safari)
+              // Only apply when opening (open=true), not during close animation
+              open && !isInitialized && "invisible",
+              // Disable pointer events during enter/exit animations to prevent interruption
+              isAnimating || isClosing
+                ? "pointer-events-none"
+                : "pointer-events-auto",
+              // Skip transition on immediate close (swipe dismiss)
+              immediateClose && "transition-none",
+              className,
+            )}
+            style={
+              {
+                // Note: scroll-snap-align is NOT set here - we use dedicated invisible
+                // snap targets instead. Setting it on the Popup creates conflicting
+                // snap points for floating variant (due to margin offset).
+
+                // Dynamic starting offset for enter animation
+                "--drawer-start-offset": startingOffset,
+
+                // View timeline for backdrop animation (Chrome 115+)
+                // Backdrop opacity tracks how much of drawer is visible
+                ...(supportsScrollTimeline && {
+                  viewTimelineName: "--drawer-panel",
+                  viewTimelineAxis: isVertical ? "block" : "inline",
+                }),
+              } as React.CSSProperties
+            }
+            {...props}
+          >
+            {children}
+          </BaseDialog.Popup>
+        </div>
+
+        {/* iOS 26 Safari: Fixed element at bottom for nav bar color detection */}
+        {/* Must be: within 3px of bottom, ≥80% wide, ≥3px tall */}
+        {/* Only visible on Safari; slides with drawer during exit */}
+        {(direction === "bottom" ||
+          direction === "left" ||
+          direction === "right") && (
+          <div
+            aria-hidden="true"
+            className={cn(
+              "bg-popover pointer-events-none fixed inset-x-0 bottom-0 hidden h-10 bg-clip-text [@supports(-webkit-touch-callout:none)]:block",
+            )}
+          />
+        )}
+      </BaseDialog.Viewport>
+    </div>
   );
 }
 
@@ -1036,4 +1036,7 @@ export {
 export type { DrawerRenderProps, DrawerVariant };
 
 // Re-export feature detection for consumers who want to check browser support
-export { supportsScrollTimeline, supportsScrollState } from "./lib/drawer-utils";
+export {
+  supportsScrollTimeline,
+  supportsScrollState,
+} from "./lib/drawer-utils";

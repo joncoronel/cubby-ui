@@ -4,51 +4,139 @@ import * as React from "react";
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
+import { cva } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
 // Drawer-specific CSS animations (scroll-driven animations for progressive enhancement)
 import "./drawer.css";
 
-import type { SnapPoint, DrawerDirection } from "./hooks/use-snap-points";
+import type { SnapPoint, DrawerDirection } from "./lib/drawer-utils";
 import {
-  useScrollSnap,
+  parsePixelValue,
+  findSnapPointIndex,
+  getSnapPointValue,
   supportsScrollTimeline,
   supportsScrollState,
-} from "./hooks/use-scroll-snap";
+} from "./lib/drawer-utils";
+import { useScrollSnap } from "./hooks/use-scroll-snap";
 import { useVirtualKeyboard } from "./hooks/use-virtual-keyboard";
-import { useBodyScrollLock } from "./hooks/use-body-scroll-lock";
 
 // Re-export types for consumers
 export type { SnapPoint, DrawerDirection };
 
-/**
- * Parse a pixel value string (e.g., "200px") and return the number
- */
-function parsePixelValue(value: string): number | null {
-  const match = value.match(/^(\d+(?:\.\d+)?)px$/);
-  return match ? parseFloat(match[1]) : null;
-}
+/* -------------------------------------------------------------------------------------------------
+ * CVA Variants
+ * -------------------------------------------------------------------------------------------------*/
 
-/**
- * Find the index of a snap point value in the array
- * Returns the last index if value is null or not found
- */
-function findSnapPointIndex(
-  snapPoints: SnapPoint[],
-  value: SnapPoint | null,
-): number {
-  if (value === null) return snapPoints.length - 1;
-  const index = snapPoints.findIndex((sp) => sp === value);
-  return index === -1 ? snapPoints.length - 1 : index;
-}
+const drawerContentVariants = cva(
+  [
+    "bg-popover text-popover-foreground flex flex-col",
+    "relative z-10",
+    "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-transform duration-450",
+    "motion-reduce:transition-none",
+  ],
+  {
+    variants: {
+      variant: {
+        default: "",
+        floating: [
+          "m-4 rounded-2xl",
+          "ring-border ring-1",
+          "shadow-[0_16px_32px_0_oklch(0.18_0_0/0.16)]",
+        ],
+      },
+      direction: {
+        bottom: "",
+        top: "",
+        right: "",
+        left: "",
+      },
+    },
+    compoundVariants: [
+      // Default variant - direction-specific sizing and rounding
+      {
+        variant: "default",
+        direction: "bottom",
+        class:
+          "max-h-[95dvh] w-full rounded-t-xl [&[data-starting-style]]:translate-y-[var(--drawer-start-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-start-offset)]",
+      },
+      {
+        variant: "default",
+        direction: "top",
+        class:
+          "max-h-[95dvh] w-full rounded-b-xl [&[data-starting-style]]:-translate-y-[var(--drawer-start-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-start-offset)]",
+      },
+      {
+        variant: "default",
+        direction: "right",
+        class:
+          "h-dvh w-[100vw] rounded-l-xl sm:max-w-sm [&[data-starting-style]]:translate-x-[var(--drawer-start-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-start-offset)]",
+      },
+      {
+        variant: "default",
+        direction: "left",
+        class:
+          "h-dvh w-[100vw] rounded-r-xl sm:max-w-sm [&[data-starting-style]]:-translate-x-[var(--drawer-start-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-start-offset)]",
+      },
+      // Floating variant - direction-specific sizing and transforms
+      {
+        variant: "floating",
+        direction: "bottom",
+        class:
+          "max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] [&[data-starting-style]]:translate-y-[var(--drawer-start-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-start-offset)]",
+      },
+      {
+        variant: "floating",
+        direction: "top",
+        class:
+          "max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] [&[data-starting-style]]:-translate-y-[var(--drawer-start-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-start-offset)]",
+      },
+      {
+        variant: "floating",
+        direction: "right",
+        class:
+          "h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] sm:max-w-sm [&[data-starting-style]]:translate-x-[var(--drawer-start-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-start-offset)]",
+      },
+      {
+        variant: "floating",
+        direction: "left",
+        class:
+          "h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] sm:max-w-sm [&[data-starting-style]]:-translate-x-[var(--drawer-start-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-start-offset)]",
+      },
+    ],
+    defaultVariants: {
+      variant: "default",
+      direction: "bottom",
+    },
+  },
+);
 
-/**
- * Get the snap point value at a given index (clamped to valid range)
- */
-function getSnapPointValue(snapPoints: SnapPoint[], index: number): SnapPoint {
-  return snapPoints[Math.max(0, Math.min(index, snapPoints.length - 1))];
-}
+const drawerTrackVariants = cva("pointer-events-none relative flex", {
+  variants: {
+    direction: {
+      bottom: "w-full flex-col justify-end",
+      top: "w-full flex-col justify-start",
+      right: "h-full flex-row justify-end",
+      left: "h-full flex-row justify-start",
+    },
+  },
+  defaultVariants: {
+    direction: "bottom",
+  },
+});
+
+// Backdrop scroll-driven animation styles (used conditionally at runtime)
+const backdropAnimationStyles: Record<DrawerDirection, string> = {
+  // Bottom/Right: drawer enters from below/right → use entry range (0→1 opacity)
+  bottom:
+    "fill-mode-[both] [animation-name:drawer-backdrop-fade] [animation-range:entry_0%_entry_100%] [animation-timeline:--drawer-panel] [animation-timing-function:linear]",
+  right:
+    "fill-mode-[both] [animation-name:drawer-backdrop-fade] [animation-range:entry_0%_entry_100%] [animation-timeline:--drawer-panel] [animation-timing-function:linear]",
+  // Top/Left: drawer exits toward top/left → use exit range with reversed keyframe (1→0 opacity)
+  top: "fill-mode-[both] direction-[reverse] [animation-name:drawer-backdrop-fade] [animation-range:exit_0%_exit_100%] [animation-timeline:--drawer-panel] [animation-timing-function:linear]",
+  left: "fill-mode-[both] direction-[reverse] [animation-name:drawer-backdrop-fade] [animation-range:exit_0%_exit_100%] [animation-timeline:--drawer-panel] [animation-timing-function:linear]",
+};
 
 /* -------------------------------------------------------------------------------------------------
  * Drawer Context
@@ -200,10 +288,6 @@ function Drawer({
   const handleOpenChangeComplete = React.useCallback(() => {
     setIsAnimating(false);
   }, []);
-
-  // Lock body scroll when drawer is open or animating (prevents URL bar collapse/expand on mobile)
-  // Keep locked during exit animation so page can't be scrolled until animation completes
-  // useBodyScrollLock(open || isAnimating);
 
   // Handle open change
   const handleOpenChange = React.useCallback(
@@ -535,12 +619,8 @@ function DrawerContentInner({
     onSnapProgress: handleSnapProgress,
     onImmediateClose: handleImmediateClose,
     isAnimating,
+    onScrollingChange: setIsDragging,
   });
-
-  // Sync scrolling state to context
-  React.useEffect(() => {
-    setIsDragging(isScrolling);
-  }, [isScrolling, setIsDragging]);
 
   // Calculate snap point ratio (0-1) for backdrop opacity
   // This represents how "open" the drawer is at the target snap point
@@ -635,11 +715,7 @@ function DrawerContentInner({
             isInitialized && !isAnimating && isDragging && dragProgress < 1
               ? useScrollDrivenAnimation
                 ? // Scroll-driven backdrop animation (Chrome 115+)
-                  // Bottom/Right: drawer enters from below/right → use entry range (0→1 opacity)
-                  // Top/Left: drawer exits toward top/left → use exit range with reversed keyframe (1→0 opacity)
-                  direction === "top" || direction === "left"
-                  ? "fill-mode-[both] direction-[reverse] [animation-name:drawer-backdrop-fade] [animation-range:exit_0%_exit_100%] [animation-timeline:--drawer-panel] [animation-timing-function:linear]"
-                  : "fill-mode-[both] [animation-name:drawer-backdrop-fade] [animation-range:entry_0%_entry_100%] [animation-timeline:--drawer-panel] [animation-timing-function:linear]"
+                  backdropAnimationStyles[direction]
                 : `opacity-(--drawer-backdrop-dynamic-opacity)`
               : `opacity-(--drawer-backdrop-static-opacity)`,
           )}
@@ -737,19 +813,7 @@ function DrawerContentInner({
           {/* Scroll track - creates the scrollable area */}
           <div
             data-slot="drawer-track"
-            className={cn(
-              "pointer-events-none relative",
-              // Track sizing
-              isVertical ? "w-full" : "h-full",
-              // Flex layout to position drawer
-              // Bottom/Right: drawer at end, scroll 0 = hidden
-              // Top/Left: drawer at start, scroll MAX = hidden (inverted)
-              "flex",
-              direction === "bottom" && "flex-col justify-end",
-              direction === "top" && "flex-col justify-start",
-              direction === "right" && "flex-row justify-end",
-              direction === "left" && "flex-row justify-start",
-            )}
+            className={drawerTrackVariants({ direction })}
             style={{
               // Track size: creates the scrollable space
               [isVertical ? "height" : "width"]: `${trackSize}px`,
@@ -790,10 +854,7 @@ function DrawerContentInner({
               ref={measureRef}
               data-slot="drawer-content"
               className={cn(
-                // Base styles
-                "bg-popover text-popover-foreground flex flex-col",
-                // Positioning and layering
-                "relative z-10",
+                drawerContentVariants({ variant, direction }),
                 // Hide until scroll is initialized to prevent flash at wrong position (iOS Safari)
                 // Only apply when opening (open=true), not during close animation
                 open && !isInitialized && "invisible",
@@ -801,65 +862,8 @@ function DrawerContentInner({
                 isAnimating || isClosing
                   ? "pointer-events-none"
                   : "pointer-events-auto",
-                // Default variant: direction-specific styling
-                variant === "default" &&
-                  direction === "bottom" &&
-                  "max-h-[95dvh] w-full rounded-t-xl",
-                variant === "default" &&
-                  direction === "top" &&
-                  "max-h-[95dvh] w-full rounded-b-xl",
-                variant === "default" &&
-                  direction === "right" &&
-                  "h-dvh w-[100vw] rounded-l-xl sm:max-w-sm",
-                variant === "default" &&
-                  direction === "left" &&
-                  "h-dvh w-[100vw] rounded-r-xl sm:max-w-sm",
-
-                // Floating variant: inset with rounded corners, ring, and shadow
-                variant === "floating" && [
-                  "m-4 rounded-2xl",
-                  "ring-border ring-1",
-                  "shadow-[0_16px_32px_0_oklch(0.18_0_0/0.16)]",
-                ],
-                variant === "floating" &&
-                  direction === "bottom" &&
-                  "max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)]",
-                variant === "floating" &&
-                  direction === "top" &&
-                  "max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)]",
-                variant === "floating" &&
-                  direction === "right" &&
-                  "h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] sm:max-w-sm",
-                variant === "floating" &&
-                  direction === "left" &&
-                  "h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] sm:max-w-sm",
-                // CSS transitions for enter/exit animations
                 // Skip transition on immediate close (swipe dismiss)
-                immediateClose
-                  ? "transition-none"
-                  : "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-transform duration-450",
-                // Starting style (entering) - off-screen by snap point ratio
-                // Uses CSS variable for dynamic offset based on target snap point
-                direction === "bottom" &&
-                  "[&[data-starting-style]]:translate-y-[var(--drawer-start-offset)]",
-                direction === "top" &&
-                  "[&[data-starting-style]]:-translate-y-[var(--drawer-start-offset)]",
-                direction === "right" &&
-                  "[&[data-starting-style]]:translate-x-[var(--drawer-start-offset)]",
-                direction === "left" &&
-                  "[&[data-starting-style]]:-translate-x-[var(--drawer-start-offset)]",
-                // Ending style (exiting) - off-screen by snap point ratio
-                // Uses same CSS variable so exit matches current snap point position
-                direction === "bottom" &&
-                  "[&[data-ending-style]]:translate-y-[var(--drawer-start-offset)]",
-                direction === "top" &&
-                  "[&[data-ending-style]]:-translate-y-[var(--drawer-start-offset)]",
-                direction === "right" &&
-                  "[&[data-ending-style]]:translate-x-[var(--drawer-start-offset)]",
-                direction === "left" &&
-                  "[&[data-ending-style]]:-translate-x-[var(--drawer-start-offset)]",
-                // Reduced motion: instant transitions
-                "motion-reduce:transition-none",
+                immediateClose && "transition-none",
                 className,
               )}
               style={
@@ -1028,7 +1032,4 @@ export {
 export type { DrawerRenderProps, DrawerVariant };
 
 // Re-export feature detection for consumers who want to check browser support
-export {
-  supportsScrollTimeline,
-  supportsScrollState,
-} from "./hooks/use-scroll-snap";
+export { supportsScrollTimeline, supportsScrollState } from "./lib/drawer-utils";

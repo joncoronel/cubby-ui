@@ -536,34 +536,14 @@
           "target": "components/ui/cubby-ui/drawer.tsx"
         },
         {
-          "path": "registry/default/drawer/lib/easing.ts",
+          "path": "registry/default/drawer/lib/drawer-utils.ts",
           "type": "registry:lib",
-          "target": "lib/cubby-ui/easing.ts"
-        },
-        {
-          "path": "registry/default/drawer/hooks/use-body-scroll-lock.ts",
-          "type": "registry:hook",
-          "target": "hooks/cubby-ui/use-body-scroll-lock.ts"
-        },
-        {
-          "path": "registry/default/drawer/hooks/use-drawer-gesture.ts",
-          "type": "registry:hook",
-          "target": "hooks/cubby-ui/use-drawer-gesture.ts"
-        },
-        {
-          "path": "registry/default/drawer/hooks/use-nested-scroll.ts",
-          "type": "registry:hook",
-          "target": "hooks/cubby-ui/use-nested-scroll.ts"
+          "target": "lib/cubby-ui/drawer-utils.ts"
         },
         {
           "path": "registry/default/drawer/hooks/use-scroll-snap.ts",
           "type": "registry:hook",
           "target": "hooks/cubby-ui/use-scroll-snap.ts"
-        },
-        {
-          "path": "registry/default/drawer/hooks/use-snap-points.ts",
-          "type": "registry:hook",
-          "target": "hooks/cubby-ui/use-snap-points.ts"
         },
         {
           "path": "registry/default/drawer/hooks/use-virtual-keyboard.ts",
@@ -575,6 +555,9 @@
           "type": "registry:file",
           "target": "components/ui/cubby-ui/drawer.css"
         }
+      ],
+      "dependencies": [
+        "class-variance-authority"
       ]
     },
     {

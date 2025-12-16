@@ -1,6 +1,15 @@
 import * as React from "react";
 
-import type { DrawerDirection, SnapPoint } from "./use-snap-points";
+import type { DrawerDirection, SnapPoint } from "../lib/drawer-utils";
+import {
+  supportsScrollEnd,
+  supportsScrollTimeline,
+  supportsScrollSnapChange,
+  supportsScrollState,
+  parsePixelValue,
+  waitForScrollEnd,
+  prefersReducedMotion,
+} from "../lib/drawer-utils";
 
 /* -------------------------------------------------------------------------------------------------
  * Types
@@ -31,6 +40,8 @@ export interface UseScrollSnapOptions {
   onImmediateClose?: () => void;
   /** Whether the drawer is currently animating (enter/exit CSS transition) */
   isAnimating?: boolean;
+  /** Callback when scrolling state changes */
+  onScrollingChange?: (isScrolling: boolean) => void;
 }
 
 export interface UseScrollSnapReturn {
@@ -65,80 +76,11 @@ export interface UseScrollSnapReturn {
 }
 
 /* -------------------------------------------------------------------------------------------------
- * Browser Support Detection
- * -------------------------------------------------------------------------------------------------*/
-
-const supportsScrollEnd =
-  typeof window !== "undefined" && "onscrollend" in window;
-
-/**
- * Feature detection for scroll-driven animations (animation-timeline: scroll())
- * Chrome 115+, Safari 26+ (future), Firefox flag-only
- */
-export const supportsScrollTimeline =
-  typeof CSS !== "undefined" &&
-  CSS.supports("animation-timeline", "scroll()") &&
-  CSS.supports("timeline-scope", "--test");
-
-/**
- * Feature detection for scroll snap events (scrollsnapchange, scrollsnapchanging)
- * Chrome 129+ only
- */
-export const supportsScrollSnapChange =
-  typeof window !== "undefined" && "onscrollsnapchange" in window;
-
-/**
- * Feature detection for CSS scroll-state() container queries
- * Chrome 133+ only
- */
-export const supportsScrollState =
-  typeof CSS !== "undefined" && CSS.supports("container-type", "scroll-state");
-
-/* -------------------------------------------------------------------------------------------------
- * Utilities
- * -------------------------------------------------------------------------------------------------*/
-
-/**
- * Parse a pixel value string (e.g., "200px") and return the number
- */
-function parsePixelValue(value: string): number | null {
-  const match = value.match(/^(\d+(?:\.\d+)?)px$/);
-  return match ? parseFloat(match[1]) : null;
-}
-
-/**
- * Wait for scroll to end on an element
- */
-function waitForScrollEnd(element: HTMLElement): Promise<void> {
-  return new Promise((resolve) => {
-    if (supportsScrollEnd) {
-      element.addEventListener("scrollend", () => resolve(), { once: true });
-    } else {
-      // Fallback: debounced scroll detection
-      let timeout: ReturnType<typeof setTimeout>;
-      const handler = () => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-          element.removeEventListener("scroll", handler);
-          resolve();
-        }, 0);
-      };
-      element.addEventListener("scroll", handler, { passive: true });
-    }
-  });
-}
-
-/**
- * Check if user prefers reduced motion
- */
-function prefersReducedMotion(): boolean {
-  if (typeof window === "undefined") return false;
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
-
-/* -------------------------------------------------------------------------------------------------
  * Hook Implementation
  * -------------------------------------------------------------------------------------------------*/
+
+// Re-export browser support detection for consumers
+export { supportsScrollTimeline, supportsScrollState } from "../lib/drawer-utils";
 
 export function useScrollSnap({
   direction,
@@ -153,22 +95,36 @@ export function useScrollSnap({
   onSnapProgress,
   onImmediateClose,
   isAnimating,
+  onScrollingChange,
 }: UseScrollSnapOptions): UseScrollSnapReturn {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const snapTargetRefs = React.useRef<(HTMLDivElement | null)[]>([]);
   const [scrollProgress, setScrollProgress] = React.useState(0);
   const [snapProgress, setSnapProgress] = React.useState(0);
   const [isScrolling, setIsScrolling] = React.useState(false);
-  const [isClosing, setIsClosing] = React.useState(false);
+  const [isClosing, setIsClosingState] = React.useState(false);
 
   // Track whether we're programmatically scrolling (to avoid triggering snap change callbacks)
   const isProgrammaticScrollRef = React.useRef(false);
 
   // Track closing state with ref to avoid stale closures in scroll handler
+  // Updated synchronously alongside state to eliminate the sync effect
   const isClosingRef = React.useRef(false);
-  React.useEffect(() => {
-    isClosingRef.current = isClosing;
-  }, [isClosing]);
+
+  // Wrapper that updates both ref and state synchronously
+  const setIsClosing = React.useCallback((value: boolean) => {
+    isClosingRef.current = value;
+    setIsClosingState(value);
+  }, []);
+
+  // Wrapper that updates scrolling state and notifies parent
+  const updateIsScrolling = React.useCallback(
+    (value: boolean) => {
+      setIsScrolling(value);
+      onScrollingChange?.(value);
+    },
+    [onScrollingChange],
+  );
 
   const isVertical = direction === "top" || direction === "bottom";
 
@@ -385,7 +341,7 @@ export function useScrollSnap({
       hasInitializedRef.current = false;
       setIsInitialized(false);
       setIsClosing(false);
-      setIsScrolling(false);
+      updateIsScrolling(false);
       isProgrammaticScrollRef.current = false;
       prevScrollPosRef.current = null;
       isTouchingRef.current = false;
@@ -496,6 +452,8 @@ export function useScrollSnap({
     calculateSnapProgress,
     onScrollProgress,
     onSnapProgress,
+    updateIsScrolling,
+    setIsClosing,
   ]);
 
   // Track the last detected snap index to avoid duplicate callbacks
@@ -620,7 +578,7 @@ export function useScrollSnap({
 
       // Only set isScrolling for user-initiated scrolls with actual movement
       if (!isProgrammaticScrollRef.current && positionChanged) {
-        setIsScrolling(true);
+        updateIsScrolling(true);
         // Start RAF-based stability check only for browsers without native scrollend
         // Chrome's scrollend already has correct touch-awareness built in
         if (!supportsScrollEnd) {
@@ -645,7 +603,7 @@ export function useScrollSnap({
     };
 
     const handleScrollEnd = () => {
-      setIsScrolling(false);
+      updateIsScrolling(false);
 
       // Fallback snap detection for scrollend (catches cases where scrollsnapchange didn't fire)
       // This is especially important for fast swipes where scrollsnapchange may be unreliable
@@ -770,6 +728,8 @@ export function useScrollSnap({
     onDismiss,
     onImmediateClose,
     onSnapPointChange,
+    updateIsScrolling,
+    setIsClosing,
   ]);
 
   // Update viewport size when container is mounted and on resize

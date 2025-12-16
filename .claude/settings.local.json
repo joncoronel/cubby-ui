@@ -92,7 +92,11 @@
       "Bash(done)",
       "Bash(node replace-package-name.js:*)",
       "Bash(timeout 60 pnpm run lint:*)",
-      "Bash(timeout 120 pnpm run build:*)"
+      "Bash(timeout 120 pnpm run build:*)",
+      "Bash(cmd /c del \"c:\\Users\\jonny\\Documents\\Projects\\cubby-ui\\registry\\default\\drawer\\hooks\\use-body-scroll-lock.ts\")",
+      "Bash(cmd /c del \"c:\\Users\\jonny\\Documents\\Projects\\cubby-ui\\registry\\default\\drawer\\hooks\\use-snap-points.ts\")",
+      "Bash(cmd /c del \"c:\\Users\\jonny\\Documents\\Projects\\cubby-ui\\registry\\default\\drawer\\hooks\\use-drawer-gesture.ts\")",
+      "Bash(cmd /c del \"c:\\Users\\jonny\\Documents\\Projects\\cubby-ui\\registry\\default\\drawer\\hooks\\use-nested-scroll.ts\")"
     ],
     "deny": []
   }

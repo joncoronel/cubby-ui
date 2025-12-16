@@ -751,7 +751,7 @@ function DrawerContent({
                 data-snap-index={index}
                 className={cn(
                   "pointer-events-none absolute",
-                  isVertical ? "right-0 left-0 h-px" : "top-0 bottom-0 w-px",
+                  isVertical ? "inset-x-0 h-px" : "inset-y-0 w-px",
                 )}
                 style={
                   {

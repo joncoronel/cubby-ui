@@ -114,7 +114,7 @@ function SheetBackdrop({ className, ...props }: BaseSheet.Backdrop.Props) {
     <BaseSheet.Backdrop
       data-slot="sheet-backdrop"
       className={cn(
-        "ease-[cubic-bezier(0, 0, 0.58, 1)] fixed inset-0 bg-black/40 transition-all duration-250",
+        "ease-[cubic-bezier(0, 0, 0.58, 1)] fixed inset-0 min-h-dvh bg-black/40 transition-all duration-250 supports-[-webkit-touch-callout:none]:absolute",
         "backdrop-blur-sm data-ending-style:opacity-0 data-starting-style:opacity-0",
         className,
       )}

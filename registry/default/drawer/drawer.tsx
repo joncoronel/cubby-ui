@@ -419,7 +419,24 @@ function DrawerPortal({
  * DrawerContent
  * -------------------------------------------------------------------------------------------------*/
 
-function DrawerContent({
+/**
+ * DrawerContent - Outer wrapper that renders the Portal.
+ * The actual content is in DrawerContentInner, which only mounts when the Portal is visible.
+ * This ensures useScrollSnap gets fresh state on each open (no stale state between sessions).
+ */
+function DrawerContent(props: BaseDialog.Popup.Props) {
+  return (
+    <DrawerPortal>
+      <DrawerContentInner {...props} />
+    </DrawerPortal>
+  );
+}
+
+/**
+ * DrawerContentInner - The actual drawer content that mounts/unmounts with the dialog.
+ * Contains useScrollSnap hook which gets fresh state on each mount.
+ */
+function DrawerContentInner({
   className,
   children,
   ...props
@@ -586,18 +603,17 @@ function DrawerContent({
     supportsScrollTimeline && isInitialized && !isAnimating && !immediateClose;
 
   return (
-    <DrawerPortal>
-      {/* Timeline scope wrapper - enables cross-element timeline references */}
-      {/* Required for backdrop to reference drawer panel's view timeline */}
-      <div
-        style={
-          supportsScrollTimeline
-            ? ({ timelineScope: "--drawer-panel" } as React.CSSProperties)
-            : undefined
-        }
-      >
-        {/* Backdrop - view-driven opacity (Chrome 115+) with JS fallback */}
-        <BaseDialog.Backdrop
+    // Timeline scope wrapper - enables cross-element timeline references
+    // Required for backdrop to reference drawer panel's view timeline
+    <div
+      style={
+        supportsScrollTimeline
+          ? ({ timelineScope: "--drawer-panel" } as React.CSSProperties)
+          : undefined
+      }
+    >
+      {/* Backdrop - view-driven opacity (Chrome 115+) with JS fallback */}
+      <BaseDialog.Backdrop
           data-slot="drawer-overlay"
           className={cn(
             "absolute inset-0 z-40 bg-black/35",
@@ -882,7 +898,6 @@ function DrawerContent({
           )}
         </BaseDialog.Viewport>
       </div>
-    </DrawerPortal>
   );
 }
 

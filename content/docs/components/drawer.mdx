@@ -52,6 +52,12 @@ Enable `sequentialSnap` to prevent skipping snap points during fast swipes.
 
 <ComponentPreview component="drawer" example="drawer-sequential-snap" />
 
+### Floating Variant
+
+Use the floating variant for a more elevated, modal-like appearance with rounded corners and shadow.
+
+<ComponentPreview component="drawer" example="drawer-floating" />
+
 ### Music Player
 
 A music player demonstrating progressive disclosure with snap points: mini player, expanded controls, and full queue view.
@@ -89,6 +95,16 @@ For the complete Base UI API, see the [Base UI Dialog documentation](https://bas
   defaultValue='"bottom"'
 >
   Which edge of the screen the drawer slides in from.
+</ApiProp>
+
+<ApiProp
+  name="variant"
+  fullType='"default" | "floating"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Visual style of the drawer. Use `"floating"` for a modal-like appearance with
+  rounded corners, shadow, and inset from screen edges.
 </ApiProp>
 
 <ApiProp

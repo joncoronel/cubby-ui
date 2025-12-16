@@ -723,7 +723,9 @@ export function useScrollSnap({
       passive: true,
     });
     container.addEventListener("touchend", handleTouchEnd, { passive: true });
-    container.addEventListener("touchcancel", handleTouchEnd, { passive: true });
+    container.addEventListener("touchcancel", handleTouchEnd, {
+      passive: true,
+    });
     container.addEventListener("mousedown", handleTouchStart);
     container.addEventListener("mouseup", handleTouchEnd);
 

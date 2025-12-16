@@ -54,8 +54,11 @@ function getSnapPointValue(snapPoints: SnapPoint[], index: number): SnapPoint {
  * Drawer Context
  * -------------------------------------------------------------------------------------------------*/
 
+type DrawerVariant = "default" | "floating";
+
 interface DrawerContextValue {
   direction: DrawerDirection;
+  variant: DrawerVariant;
   snapPoints: SnapPoint[];
   activeSnapPoint: SnapPoint;
   setActiveSnapPoint: (snapPoint: SnapPoint) => void;
@@ -111,6 +114,8 @@ interface DrawerProps extends Omit<
 > {
   /** Direction the drawer opens from. Default: "bottom" */
   direction?: DrawerDirection;
+  /** Visual variant of the drawer. Default: "default" */
+  variant?: DrawerVariant;
   /** Snap points as percentages (0-1) or pixel values. Default: [1] (fully open) */
   snapPoints?: SnapPoint[];
   /** Initial snap point value when opened. Default: first snap point */
@@ -130,6 +135,7 @@ interface DrawerProps extends Omit<
 
 function Drawer({
   direction = "bottom",
+  variant = "default",
   snapPoints = [1],
   defaultSnapPoint,
   activeSnapPoint: controlledSnapPoint,
@@ -270,6 +276,7 @@ function Drawer({
   const contextValue = React.useMemo(
     () => ({
       direction,
+      variant,
       snapPoints,
       activeSnapPoint: activeSnapPointValue,
       setActiveSnapPoint,
@@ -292,6 +299,7 @@ function Drawer({
     }),
     [
       direction,
+      variant,
       snapPoints,
       activeSnapPointValue,
       setActiveSnapPoint,
@@ -418,6 +426,7 @@ function DrawerContent({
 }: BaseDialog.Popup.Props) {
   const {
     direction,
+    variant,
     snapPoints,
     activeSnapPoint,
     setActiveSnapPoint,
@@ -531,16 +540,21 @@ function DrawerContent({
   // Starting offset for enter/exit animations (drawer slides in by this amount)
   // For pixel snap points, use the value directly (e.g., "92px")
   // For percentage snap points, convert to percentage (e.g., 0.1 -> "10%")
-  const startingOffset =
+  // Floating variant: add 1rem to account for margin
+  const baseOffset =
     typeof activeSnapPoint === "number"
       ? `${activeSnapPoint * 100}%`
       : activeSnapPoint;
+  const startingOffset =
+    variant === "floating" ? `calc(${baseOffset} + 1rem)` : baseOffset;
 
   // Target backdrop opacity based on snap point (0.25 snap = 0.25 opacity)
   const targetBackdropOpacity = snapPointRatio;
 
   // Measure the drawer content size (now measures the Popup element)
+  // For floating variant, add margin to size so scroll calculations account for it
   const observerRef = React.useRef<ResizeObserver | null>(null);
+  const floatingMargin = variant === "floating" ? 16 : 0; // m-4 = 1rem = 16px
 
   const measureRef = React.useCallback(
     (node: HTMLDivElement | null) => {
@@ -551,14 +565,16 @@ function DrawerContent({
       if (!node) return;
 
       const measure = () => {
-        setContentSize(isVertical ? node.offsetHeight : node.offsetWidth);
+        const baseSize = isVertical ? node.offsetHeight : node.offsetWidth;
+        // Add margin for floating variant so drawer scrolls fully off-screen
+        setContentSize(baseSize + floatingMargin);
       };
 
       measure();
       observerRef.current = new ResizeObserver(measure);
       observerRef.current.observe(node);
     },
-    [isVertical, setContentSize],
+    [isVertical, setContentSize, floatingMargin],
   );
 
   // Cleanup on unmount
@@ -628,15 +644,19 @@ function DrawerContent({
           className={cn(
             // Group for propagating data-starting-style/data-ending-style to children
             "group/drawer",
-            // Fixed positioning for the scroll container
-            "fixed z-50 outline-hidden",
-            // Extra 60px height prevents URL bar from responding to touch gestures
-            // Offset position so extra space is outside viewport (prevents content cutoff)
-            "left-0 w-dvw",
+            // Fixed positioning
+            "fixed inset-0 z-50 outline-hidden",
+            // Extra 60px above viewport for bottom drawer prevents URL bar touch interaction
             direction === "bottom" && "-top-[60px]",
-            direction === "top" && "top-0",
-            direction === "left" && "top-0",
-            direction === "right" && "top-0",
+            // Viewport height with dvh fallback cascade
+            isVertical ? "h-[calc(100vh+60px)]" : "h-[100vh]",
+            isVertical && "[@supports(height:1dvh)]:h-[calc(100dvh+60px)]",
+            !isVertical && "[@supports(height:1dvh)]:h-dvh",
+            // iOS Safari: use max of dvh/lvh for consistent behavior
+            isVertical &&
+              "[@supports(-webkit-touch-callout:none)]:h-[calc(max(100dvh,100lvh)+60px)]",
+            !isVertical &&
+              "[@supports(-webkit-touch-callout:none)]:h-[max(100dvh,100lvh)]",
             // Disable all interaction when animating or closing
             isAnimating || isClosing
               ? "pointer-events-none"
@@ -668,19 +688,6 @@ function DrawerContent({
             isVertical ? "touch-pan-y" : "touch-pan-x",
             // Reduced motion: instant behavior
             "motion-reduce:[scroll-behavior:auto]",
-            // Progressive enhancement for viewport height via Tailwind arbitrary variants:
-            // 1. Default: vh fallback for old browsers (Firefox old, IE)
-            isVertical ? "h-[calc(100vh+60px)]" : "h-[100vh]",
-            // 2. Modern browsers: dvh adjusts with URL bar (Android Chrome)
-            isVertical && "[@supports(height:1dvh)]:h-[calc(100dvh+60px)]",
-            !isVertical && "[@supports(height:1dvh)]:h-dvh",
-            // 3. Safari: max(dvh, lvh) - self-detects iOS SFSafariViewController bug
-            // Normal iOS Safari: lvh > dvh → picks lvh (stable)
-            // Buggy iOS in-app browser: lvh < dvh → picks dvh (workaround)
-            isVertical &&
-              "[@supports(-webkit-touch-callout:none)]:h-[calc(max(100dvh,100lvh)+60px)]",
-            !isVertical &&
-              "[@supports(-webkit-touch-callout:none)]:h-[max(100dvh,100lvh)]",
           )}
           style={
             {
@@ -778,17 +785,38 @@ function DrawerContent({
                 isAnimating || isClosing
                   ? "pointer-events-none"
                   : "pointer-events-auto",
-                // Direction-specific styling (use dvh for mobile)
-                direction === "bottom" && "max-h-[95dvh] w-full rounded-t-xl",
-                direction === "top" && "max-h-[95dvh] w-full rounded-b-xl",
-                direction === "right" && "h-dvh w-[85vw] max-w-md rounded-l-xl",
-                direction === "left" && "h-dvh w-[85vw] max-w-md rounded-r-xl",
-                // Shadow and border
-                // "border-transparent ring-1 ring-transparent outline-transparent",
-                // direction === "bottom" && "border-t",
-                // direction === "top" && "border-b",
-                // direction === "right" && "border-l",
-                // direction === "left" && "border-r",
+                // Default variant: direction-specific styling
+                variant === "default" &&
+                  direction === "bottom" &&
+                  "max-h-[95dvh] w-full rounded-t-xl",
+                variant === "default" &&
+                  direction === "top" &&
+                  "max-h-[95dvh] w-full rounded-b-xl",
+                variant === "default" &&
+                  direction === "right" &&
+                  "h-dvh w-[100vw] rounded-l-xl sm:max-w-sm",
+                variant === "default" &&
+                  direction === "left" &&
+                  "h-dvh w-[100vw] rounded-r-xl sm:max-w-sm",
+
+                // Floating variant: inset with rounded corners, ring, and shadow
+                variant === "floating" && [
+                  "m-4 rounded-2xl",
+                  "ring-border ring-1",
+                  "shadow-[0_16px_32px_0_oklch(0.18_0_0/0.16)]",
+                ],
+                variant === "floating" &&
+                  direction === "bottom" &&
+                  "max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)]",
+                variant === "floating" &&
+                  direction === "top" &&
+                  "max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)]",
+                variant === "floating" &&
+                  direction === "right" &&
+                  "h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] sm:max-w-sm",
+                variant === "floating" &&
+                  direction === "left" &&
+                  "h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] sm:max-w-sm",
                 // CSS transitions for enter/exit animations
                 // Skip transition on immediate close (swipe dismiss)
                 immediateClose
@@ -982,7 +1010,7 @@ export {
   useDrawer,
 };
 
-export type { DrawerRenderProps };
+export type { DrawerRenderProps, DrawerVariant };
 
 // Re-export feature detection for consumers who want to check browser support
 export {

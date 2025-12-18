@@ -109,8 +109,8 @@ function DialogHeader({
     <div
       data-slot="dialog-header"
       className={cn(
-        "flex flex-col space-y-1.5 px-6 pt-6 pb-3",
-        // Reduce bottom padding when header is directly before footer (no body) to maintain p-4 total gap
+        "flex flex-col space-y-1.5 px-6 pt-6 pb-4",
+        // Reduce bottom padding when header is directly before footer (no body) to maintain p-5 total gap
         "not-has-[+[data-slot=dialog-body]]:has-[+[data-slot=dialog-footer]]:pb-1",
         // Add extra bottom padding when header is alone (no body or footer)
         "not-has-[+[data-slot=dialog-body]]:not-has-[+[data-slot=dialog-footer]]:pb-6",
@@ -155,7 +155,7 @@ function DialogFooter({
     <div
       data-slot="dialog-footer"
       className={cn(
-        "flex flex-col-reverse gap-2 px-6 pt-3 pb-6 sm:flex-row sm:justify-end",
+        "flex flex-col-reverse gap-2 px-6 pt-4 pb-6 sm:flex-row sm:justify-end",
         // Add extra top padding when footer is first (no header or body)
         "first:pt-6",
         // Inset variant: muted background with top border for separation

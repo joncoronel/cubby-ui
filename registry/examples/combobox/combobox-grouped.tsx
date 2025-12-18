@@ -31,9 +31,9 @@ export default function ComboboxGrouped() {
           </div>
         </ComboboxInputWrapper>
       </div>
-      <ComboboxPopup className="p-0">
+      <ComboboxPopup>
         <ComboboxEmpty>No produce found.</ComboboxEmpty>
-        <ComboboxList className="px-1 pb-1">
+        <ComboboxList className="not-empty:pt-0">
           {(group: ProduceGroup) => (
             <React.Fragment key={group.value}>
               <ComboboxGroup key={group.value} items={group.items}>

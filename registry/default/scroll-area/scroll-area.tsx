@@ -2,6 +2,47 @@ import { ScrollArea as BaseScrollArea } from "@base-ui/react/scroll-area";
 
 import { cn } from "@/lib/utils";
 
+type FadeEdge = "top" | "bottom" | "left" | "right" | "x" | "y";
+type FadeEdges = boolean | FadeEdge | FadeEdge[];
+
+function parseFadeEdges(fadeEdges: FadeEdges): {
+  top: boolean;
+  bottom: boolean;
+  left: boolean;
+  right: boolean;
+} {
+  if (fadeEdges === true) {
+    return { top: true, bottom: true, left: true, right: true };
+  }
+  if (fadeEdges === false) {
+    return { top: false, bottom: false, left: false, right: false };
+  }
+
+  const edges = Array.isArray(fadeEdges) ? fadeEdges : [fadeEdges];
+  const result = { top: false, bottom: false, left: false, right: false };
+
+  for (const edge of edges) {
+    if (edge === "x") {
+      result.left = true;
+      result.right = true;
+    } else if (edge === "y") {
+      result.top = true;
+      result.bottom = true;
+    } else {
+      result[edge] = true;
+    }
+  }
+
+  return result;
+}
+
+interface ScrollAreaProps extends BaseScrollArea.Root.Props {
+  fadeEdges?: FadeEdges;
+  scrollbarGutter?: boolean;
+  persistScrollbar?: boolean;
+  hideScrollbar?: boolean;
+}
+
 function ScrollArea({
   className,
   children,
@@ -10,12 +51,7 @@ function ScrollArea({
   persistScrollbar = false,
   hideScrollbar = false,
   ...props
-}: BaseScrollArea.Root.Props & {
-  fadeEdges?: boolean;
-  scrollbarGutter?: boolean;
-  persistScrollbar?: boolean;
-  hideScrollbar?: boolean;
-}) {
+}: ScrollAreaProps) {
   if (process.env.NODE_ENV !== "production") {
     if (persistScrollbar && hideScrollbar) {
       console.error(
@@ -24,24 +60,29 @@ function ScrollArea({
     }
   }
 
+  const fade = parseFadeEdges(fadeEdges);
+  const hasFade = fade.top || fade.bottom || fade.left || fade.right;
+
   return (
     <BaseScrollArea.Root
       data-slot="scroll-area"
-      className={cn("relative", className)}
+      className={cn("flex size-full min-h-0 flex-col", className)}
       {...props}
     >
       <BaseScrollArea.Viewport
         data-slot="scroll-area-viewport"
         className={cn(
-          "size-full overscroll-contain rounded-[inherit]",
+          "h-full overscroll-contain rounded-[inherit]",
           "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
-          fadeEdges && [
-            "[--scroll-fade-size:1.5rem]",
+          hasFade && "[--scroll-fade-size:1.5rem]",
+          fade.top &&
             "mask-t-from-[calc(100%-min(var(--scroll-fade-size),var(--scroll-area-overflow-y-start,0px)))]",
+          fade.bottom &&
             "mask-b-from-[calc(100%-min(var(--scroll-fade-size),var(--scroll-area-overflow-y-end,var(--scroll-fade-size))))]",
+          fade.left &&
             "mask-l-from-[calc(100%-min(var(--scroll-fade-size),var(--scroll-area-overflow-x-start,0px)))]",
+          fade.right &&
             "mask-r-from-[calc(100%-min(var(--scroll-fade-size),var(--scroll-area-overflow-x-end,var(--scroll-fade-size))))]",
-          ],
           scrollbarGutter &&
             "data-has-overflow-x:pb-2.5 data-has-overflow-y:pe-2.5",
         )}
@@ -86,3 +127,4 @@ function ScrollBar({
 }
 
 export { ScrollArea };
+export type { ScrollAreaProps, FadeEdges, FadeEdge };

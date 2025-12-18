@@ -5,6 +5,10 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { X, CheckIcon, ChevronDown } from "lucide-react";
 import { Label } from "@/registry/default/label/label";
+import {
+  ScrollArea,
+  type ScrollAreaProps,
+} from "@/registry/default/scroll-area/scroll-area";
 import { Combobox as BaseCombobox } from "@base-ui/react/combobox";
 
 const useFilter = BaseCombobox.useFilter;
@@ -187,7 +191,7 @@ function ComboboxPopupPrimitive({
     <BaseCombobox.Popup
       data-slot="combobox-popup"
       className={cn(
-        "bg-popover text-popover-foreground outline-border/70 ring-border/50 dark:ring-border ease-out-cubic max-h-[min(var(--available-height),20rem)] w-[var(--anchor-width)] max-w-[var(--available-width)] origin-[var(--transform-origin)] overflow-y-auto overscroll-contain rounded-xl p-1 shadow-[0_8px_20px_0_oklch(0.18_0_0_/_0.10)] ring-1 transition-[transform,scale,opacity] duration-100 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
+        "bg-popover text-popover-foreground outline-border/70 ring-border/50 dark:ring-border ease-out-cubic flex max-h-[min(var(--available-height),20rem)] w-[var(--anchor-width)] max-w-[var(--available-width)] origin-[var(--transform-origin)] flex-col overflow-clip overscroll-contain rounded-xl shadow-[0_8px_20px_0_oklch(0.18_0_0_/_0.10)] ring-1 transition-[transform,scale,opacity] duration-100 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
         className,
       )}
       {...props}
@@ -224,7 +228,7 @@ function ComboboxStatus({ className, ...props }: BaseCombobox.Status.Props) {
     <BaseCombobox.Status
       data-slot="combobox-status"
       className={cn(
-        "text-muted-foreground px-2 py-1.5 text-sm leading-5 empty:m-0 empty:p-0",
+        "text-muted-foreground px-3 py-2.5 text-sm leading-5 empty:m-0 empty:p-0",
         className,
       )}
       {...props}
@@ -237,7 +241,7 @@ function ComboboxEmpty({ className, ...props }: BaseCombobox.Empty.Props) {
     <BaseCombobox.Empty
       data-slot="combobox-empty"
       className={cn(
-        "text-muted-foreground px-2 py-1.5 text-sm empty:m-0 empty:p-0",
+        "text-muted-foreground px-3 py-2.5 text-sm empty:m-0 empty:p-0",
         className,
       )}
       {...props}
@@ -245,13 +249,40 @@ function ComboboxEmpty({ className, ...props }: BaseCombobox.Empty.Props) {
   );
 }
 
-function ComboboxList({ className, ...props }: BaseCombobox.List.Props) {
+function ComboboxList({
+  className,
+  nativeScroll = false,
+  fadeEdges = true,
+  scrollbarGutter = true,
+  persistScrollbar,
+  hideScrollbar,
+  ...props
+}: BaseCombobox.List.Props & {
+  nativeScroll?: boolean;
+} & Pick<ScrollAreaProps, "fadeEdges" | "scrollbarGutter" | "persistScrollbar" | "hideScrollbar">) {
+  if (nativeScroll) {
+    return (
+      <BaseCombobox.List
+        data-slot="combobox-list"
+        className={cn("overflow-y-auto not-empty:p-1", className)}
+        {...props}
+      />
+    );
+  }
+
   return (
-    <BaseCombobox.List
-      data-slot="combobox-list"
-      className={cn("", className)}
-      {...props}
-    />
+    <ScrollArea
+      fadeEdges={fadeEdges}
+      scrollbarGutter={scrollbarGutter}
+      persistScrollbar={persistScrollbar}
+      hideScrollbar={hideScrollbar}
+    >
+      <BaseCombobox.List
+        data-slot="combobox-list"
+        className={cn("not-empty:p-1", className)}
+        {...props}
+      />
+    </ScrollArea>
   );
 }
 

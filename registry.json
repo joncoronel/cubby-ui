@@ -378,7 +378,8 @@
         }
       ],
       "registryDependencies": [
-        "@cubby-ui/label"
+        "@cubby-ui/label",
+        "@cubby-ui/scroll-area"
       ],
       "dependencies": [
         "lucide-react"

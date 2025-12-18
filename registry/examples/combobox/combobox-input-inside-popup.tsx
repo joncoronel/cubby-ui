@@ -9,8 +9,6 @@ import {
   ComboboxList,
   ComboboxTrigger,
   ComboboxValue,
-  ComboboxPortal,
-  ComboboxPositioner,
   ComboboxPopup,
   ComboboxEmpty,
 } from "@/registry/default/combobox/combobox";
@@ -49,18 +47,16 @@ export default function ComboboxInputInsidePopup() {
         <div className="border-border border-b p-2">
           <ComboboxInput placeholder="e.g. United Kingdom" />
         </div>
-        <div className="flex-1 overflow-y-auto p-1">
-          <ComboboxEmpty className="text-muted-foreground text-sm">
-            No countries found.
-          </ComboboxEmpty>
-          <ComboboxList className="">
-            {(country: Country) => (
-              <ComboboxItem key={country.code} value={country}>
-                {country.label}
-              </ComboboxItem>
-            )}
-          </ComboboxList>
-        </div>
+        <ComboboxEmpty className="text-muted-foreground p-2 text-sm">
+          No countries found.
+        </ComboboxEmpty>
+        <ComboboxList>
+          {(country: Country) => (
+            <ComboboxItem key={country.code} value={country}>
+              {country.label}
+            </ComboboxItem>
+          )}
+        </ComboboxList>
       </ComboboxPopup>
     </Combobox>
   );

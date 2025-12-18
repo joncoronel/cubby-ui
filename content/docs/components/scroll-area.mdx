@@ -59,10 +59,16 @@ For the complete Base UI API, see the [Base UI ScrollArea documentation](https:/
 
 <ApiPropsList>
 
-<ApiProp name="fadeEdges" fullType="boolean" simpleType="boolean" defaultValue="false">
+<ApiProp name="fadeEdges" fullType="boolean | 'top' | 'bottom' | 'left' | 'right' | 'x' | 'y' | FadeEdge[]" defaultValue="false">
   Adds a subtle fade effect at the scroll edges using CSS masks. The fade
   appears when content is scrollable in that direction and disappears at
   boundaries. Works over any background color or pattern.
+
+  - `true` - fade all edges
+  - `"y"` - fade top and bottom
+  - `"x"` - fade left and right
+  - `"top"`, `"bottom"`, `"left"`, `"right"` - fade specific edge
+  - `["top", "left"]` - fade multiple specific edges
 </ApiProp>
 
 <ApiProp name="scrollbarGutter" fullType="boolean" simpleType="boolean" defaultValue="false">

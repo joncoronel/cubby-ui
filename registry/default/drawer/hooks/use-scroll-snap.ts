@@ -420,10 +420,14 @@ export function useScrollSnap(
     optionsRef.current.onSnapProgress?.(snapProg);
 
     // Only mark as scrolling for user-initiated scrolls
-    // Use 2px threshold to filter out scroll-snap micro-adjustments
-    const positionChanged =
-      interactionRef.current.prevScrollPos !== null &&
-      Math.abs(scrollPos - interactionRef.current.prevScrollPos) > 2;
+    // When pointer is down (user actively touching), use low threshold so slow drags register
+    // When pointer is up, use higher threshold to filter scroll-snap settling micro-adjustments
+    const scrollDelta =
+      interactionRef.current.prevScrollPos !== null
+        ? Math.abs(scrollPos - interactionRef.current.prevScrollPos)
+        : 0;
+    const threshold = interactionRef.current.isPointerDown ? 0.5 : 2;
+    const positionChanged = scrollDelta > threshold;
 
     interactionRef.current.prevScrollPos = scrollPos;
 

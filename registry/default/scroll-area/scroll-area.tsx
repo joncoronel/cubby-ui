@@ -8,12 +8,22 @@ function ScrollArea({
   fadeEdges = false,
   scrollbarGutter = false,
   persistScrollbar = false,
+  hideScrollbar = false,
   ...props
 }: BaseScrollArea.Root.Props & {
   fadeEdges?: boolean;
   scrollbarGutter?: boolean;
   persistScrollbar?: boolean;
+  hideScrollbar?: boolean;
 }) {
+  if (process.env.NODE_ENV !== "production") {
+    if (persistScrollbar && hideScrollbar) {
+      console.error(
+        "ScrollArea: `persistScrollbar` and `hideScrollbar` cannot be used together.",
+      );
+    }
+  }
+
   return (
     <BaseScrollArea.Root
       data-slot="scroll-area"
@@ -38,9 +48,13 @@ function ScrollArea({
       >
         {children}
       </BaseScrollArea.Viewport>
-      <ScrollBar orientation="vertical" persist={persistScrollbar} />
-      <ScrollBar orientation="horizontal" persist={persistScrollbar} />
-      <BaseScrollArea.Corner />
+      {!hideScrollbar && (
+        <>
+          <ScrollBar orientation="vertical" persist={persistScrollbar} />
+          <ScrollBar orientation="horizontal" persist={persistScrollbar} />
+          <BaseScrollArea.Corner />
+        </>
+      )}
     </BaseScrollArea.Root>
   );
 }

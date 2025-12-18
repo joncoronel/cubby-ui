@@ -2448,7 +2448,7 @@ export const exampleRegistry = {
     {
       "title": "Horizontal Scroll",
       "importPath": "scroll-area-horizontal-scroll",
-      "source": "import { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\n\nexport default function ScrollAreaHorizontalScroll() {\n  return (\n    <ScrollArea className=\"w-96 whitespace-nowrap rounded-md border\">\n      <div className=\"flex w-max space-x-4 p-4\">\n        {Array.from({ length: 20 }).map((_, i) => (\n          <div\n            key={i}\n            className=\"flex h-20 w-32 items-center justify-center rounded-md bg-secondary\"\n          >\n            Item {i + 1}\n          </div>\n        ))}\n      </div>\n    </ScrollArea>\n  );\n}"
+      "source": "import { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\n\nexport default function ScrollAreaHorizontalScroll() {\n  return (\n    <ScrollArea className=\"w-96 max-w-full whitespace-nowrap rounded-md border\">\n      <div className=\"flex w-max space-x-4 p-4\">\n        {Array.from({ length: 20 }).map((_, i) => (\n          <div\n            key={i}\n            className=\"flex h-20 w-32 items-center justify-center rounded-md bg-secondary\"\n          >\n            Item {i + 1}\n          </div>\n        ))}\n      </div>\n    </ScrollArea>\n  );\n}"
     },
     {
       "title": "Persist Scrollbar",

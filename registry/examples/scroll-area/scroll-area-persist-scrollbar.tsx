@@ -4,7 +4,7 @@ export default function ScrollAreaPersistScrollbar() {
   return (
     <ScrollArea
       persistScrollbar
-      className="h-48 w-80 rounded-md border bg-muted/30"
+      className="bg-muted/30 h-48 w-80 rounded-md border"
     >
       <div className="space-y-4 p-4 text-sm leading-relaxed">
         <p>

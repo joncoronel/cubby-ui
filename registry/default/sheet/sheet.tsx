@@ -14,7 +14,7 @@ const sheetContentVariants = cva(
     // Nested sheet support
     "scale-[calc(1-0.05*var(--nested-dialogs))]",
     // Overlay (hidden by default, fades in/out when nested using allow-discrete)
-    "after:pointer-events-none after:absolute after:inset-0 after:hidden after:rounded-[inherit] after:bg-black/5 after:opacity-0 after:transition-[opacity,display] after:duration-250 after:[transition-behavior:allow-discrete]",
+    "after:pointer-events-none after:absolute after:inset-0 after:hidden after:rounded-[inherit] after:bg-black/5 after:opacity-0 after:transition-[opacity,display] after:duration-250 after:transition-discrete",
     "data-nested-dialog-open:after:block data-nested-dialog-open:after:opacity-100",
     "starting:data-nested-dialog-open:after:opacity-0",
   ],

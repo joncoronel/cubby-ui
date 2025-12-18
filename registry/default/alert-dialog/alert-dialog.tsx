@@ -84,9 +84,10 @@ function AlertDialogContent({
             // Animations: scale and fade
             "data-starting-style:translate-y-[calc(1.25rem)] data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:translate-y-[calc(1.25rem)] data-ending-style:scale-95 data-ending-style:opacity-0",
-            // Nested dialog overlay
-            "data-nested-dialog-open:after:absolute data-nested-dialog-open:after:inset-0",
-            "data-nested-dialog-open:after:rounded-[inherit] data-nested-dialog-open:after:bg-black/5",
+            // Nested dialog overlay (hidden by default, fades in/out using allow-discrete)
+            "after:pointer-events-none after:absolute after:inset-0 after:hidden after:rounded-[inherit] after:bg-black/5 after:opacity-0 after:transition-[opacity,display] after:duration-200 after:transition-discrete",
+            "data-nested-dialog-open:after:block data-nested-dialog-open:after:opacity-100",
+            "starting:data-nested-dialog-open:after:opacity-0",
             className,
           )}
           {...props}

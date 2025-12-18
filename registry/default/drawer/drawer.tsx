@@ -712,7 +712,8 @@ function DrawerContentInner({
           // Enter: start at opacity 0, transition animates to target
           "[&[data-starting-style]]:opacity-0!",
           // Exit: use animation to override scroll-driven animation (transition can't interpolate from animation-held values)
-          "[&[data-ending-style]]:[animation:drawer-backdrop-exit_450ms_cubic-bezier(0,0,0.58,1)_forwards]",
+          // "[&[data-ending-style]]:[animation:drawer-backdrop-exit_450ms_cubic-bezier(0,0,0.58,1)_forwards]",
+          "[&[data-ending-style]]:opacity-0",
 
           isInitialized && !isAnimating && isDragging && dragProgress < 1
             ? useScrollDrivenAnimation

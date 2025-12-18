@@ -103,6 +103,8 @@ interface InteractionState {
   isPointerDown: boolean;
   /** Previous scroll position for movement detection */
   prevScrollPos: number | null;
+  /** Whether scrollend fired while pointer was down (Firefox: click stops momentum) */
+  scrollEndedWhilePointerDown: boolean;
 }
 
 interface InitState {
@@ -161,6 +163,7 @@ export function useScrollSnap(
     isClosing: false,
     isPointerDown: false,
     prevScrollPos: null,
+    scrollEndedWhilePointerDown: false,
   });
 
   const initRef = React.useRef<InitState>({
@@ -459,7 +462,14 @@ export function useScrollSnap(
 
   // Scroll end handler
   const handleScrollEnd = React.useCallback(() => {
-    updateIsScrolling(false);
+    // Firefox: clicking/touching stops momentum scroll and fires scrollend immediately.
+    // If pointer is down, don't clear isScrolling yet - let touchend handler do it
+    // so that click events can see we were scrolling and block the close.
+    if (interactionRef.current.isPointerDown) {
+      interactionRef.current.scrollEndedWhilePointerDown = true;
+    } else {
+      updateIsScrolling(false);
+    }
 
     // Fallback snap detection for scrollend
     if (
@@ -534,7 +544,17 @@ export function useScrollSnap(
     // from counts accumulated while user was holding still
     // This gives momentum scroll time to start
     initRef.current.rafStableCount = 0;
-  }, []);
+
+    // Firefox: if scrollend fired while pointer was down (click stopped momentum),
+    // start stability check to clear isScrolling once scroll position stabilizes.
+    // This handles both cases:
+    // - If snap animation occurs: scroll events keep firing, natural scrollend clears isScrolling
+    // - If already at snap point: stability check detects no movement and clears isScrolling
+    if (interactionRef.current.scrollEndedWhilePointerDown) {
+      interactionRef.current.scrollEndedWhilePointerDown = false;
+      startScrollStabilityCheck();
+    }
+  }, [startScrollStabilityCheck]);
 
   /* -------------------------------------------------------------------------------------------------
    * Effects (reduced from 5 to 4)

@@ -23,7 +23,8 @@ function ScrollArea({
       <BaseScrollArea.Viewport
         data-slot="scroll-area-viewport"
         className={cn(
-          "focus-visible:ring-ring/50 size-full overscroll-contain rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-2 focus-visible:outline",
+          "size-full overscroll-contain rounded-[inherit]",
+          "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
           fadeEdges && [
             "[--scroll-fade-size:1.5rem]",
             "mask-t-from-[calc(100%-min(var(--scroll-fade-size),var(--scroll-area-overflow-y-start,0px)))]",
@@ -64,7 +65,7 @@ function ScrollBar({
     >
       <BaseScrollArea.Thumb
         data-slot="scroll-area-thumb"
-        className="bg-muted-foreground/25 hover:bg-muted-foreground/50 relative flex-1 rounded-full transition-colors"
+        className="bg-muted-foreground/20 relative flex-1 rounded-full"
       />
     </BaseScrollArea.Scrollbar>
   );

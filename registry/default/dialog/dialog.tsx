@@ -159,7 +159,7 @@ function DialogFooter({
         // Add extra top padding when footer is first (no header or body)
         "first:pt-6",
         // Inset variant: muted background with top border for separation
-        "in-data-[variant=inset]:border-border in-data-[variant=inset]:bg-muted in-data-[variant=inset]:rounded-b-2xl in-data-[variant=inset]:border-t in-data-[variant=inset]:pb-4",
+        "in-data-[variant=inset]:border-border in-data-[variant=inset]:bg-muted in-data-[variant=inset]:rounded-b-2xl in-data-[variant=inset]:border-t in-data-[variant=inset]:pt-4 in-data-[variant=inset]:pb-4",
         className,
       )}
       {...props}

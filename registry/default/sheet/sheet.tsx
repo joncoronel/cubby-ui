@@ -244,7 +244,7 @@ function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
         // Add extra top padding when footer is first (no header or body)
         "first:pt-5",
         // Inset variant: muted background with top border for separation
-        "in-data-[footer-variant=inset]:border-border in-data-[footer-variant=inset]:bg-muted in-data-[footer-variant=inset]:border-t in-data-[footer-variant=inset]:pb-4",
+        "in-data-[footer-variant=inset]:border-border in-data-[footer-variant=inset]:bg-muted in-data-[footer-variant=inset]:border-t in-data-[footer-variant=inset]:pt-4 in-data-[footer-variant=inset]:pb-4",
         className,
       )}
       {...props}

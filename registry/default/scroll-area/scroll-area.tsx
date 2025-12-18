@@ -6,10 +6,12 @@ import { cn } from "@/lib/utils"
 function ScrollArea({
 	className,
 	children,
-	orientation,
+	scrollFade = false,
+	scrollbarGutter = false,
 	...props
 }: React.ComponentProps<typeof BaseScrollArea.Root> & {
-	orientation?: "horizontal" | "vertical"
+	scrollFade?: boolean
+	scrollbarGutter?: boolean
 }) {
 	return (
 		<BaseScrollArea.Root
@@ -19,11 +21,23 @@ function ScrollArea({
 		>
 			<BaseScrollArea.Viewport
 				data-slot="scroll-area-viewport"
-				className="focus-visible:ring-ring/50 size-full overscroll-contain rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-2 focus-visible:outline"
+				className={cn(
+					"size-full overscroll-contain rounded-[inherit] outline-none transition-[color,box-shadow] focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline",
+					scrollFade && [
+						"[--fade-size:1.5rem]",
+						"mask-t-from-[calc(100%-min(var(--fade-size),var(--scroll-area-overflow-y-start,0px)))]",
+						"mask-b-from-[calc(100%-min(var(--fade-size),var(--scroll-area-overflow-y-end,var(--fade-size))))]",
+						"mask-l-from-[calc(100%-min(var(--fade-size),var(--scroll-area-overflow-x-start,0px)))]",
+						"mask-r-from-[calc(100%-min(var(--fade-size),var(--scroll-area-overflow-x-end,var(--fade-size))))]",
+					],
+					scrollbarGutter &&
+						"data-has-overflow-y:pe-2.5 data-has-overflow-x:pb-2.5"
+				)}
 			>
 				{children}
 			</BaseScrollArea.Viewport>
-			<ScrollBar orientation={orientation} />
+			<ScrollBar orientation="vertical" />
+			<ScrollBar orientation="horizontal" />
 			<BaseScrollArea.Corner />
 		</BaseScrollArea.Root>
 	)
@@ -31,18 +45,15 @@ function ScrollArea({
 
 function ScrollBar({
 	className,
-	orientation = "vertical",
 	...props
 }: React.ComponentProps<typeof BaseScrollArea.Scrollbar>) {
 	return (
 		<BaseScrollArea.Scrollbar
 			data-slot="scroll-area-scrollbar"
-			orientation={orientation}
 			className={cn(
 				"m-1 flex touch-none p-px opacity-0 transition-[colors,opacity] delay-200 select-none data-hovering:opacity-100 data-hovering:delay-0 data-hovering:duration-100 data-scrolling:opacity-100 data-scrolling:delay-0 data-scrolling:duration-100",
-				orientation === "vertical" && "w-2.5 border-l border-l-transparent",
-				orientation === "horizontal" &&
-					"h-2.5 flex-col border-t border-t-transparent",
+				"data-[orientation=vertical]:w-2.5 data-[orientation=vertical]:border-l data-[orientation=vertical]:border-l-transparent",
+				"data-[orientation=horizontal]:h-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:border-t data-[orientation=horizontal]:border-t-transparent",
 				className
 			)}
 			{...props}

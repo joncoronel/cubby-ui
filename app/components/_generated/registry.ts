@@ -250,9 +250,10 @@ import resizable_resizable_nested from "@/registry/examples/resizable/resizable-
 import resizable_resizable_three_panels from "@/registry/examples/resizable/resizable-three-panels";
 import resizable_resizable_vertical from "@/registry/examples/resizable/resizable-vertical";
 import resizable_resizable_with_handle from "@/registry/examples/resizable/resizable-with-handle";
-import scroll_area_scroll_area_code_block from "@/registry/examples/scroll-area/scroll-area-code-block";
-import scroll_area_scroll_area_content_list from "@/registry/examples/scroll-area/scroll-area-content-list";
+import scroll_area_scroll_area_both_scrollbars from "@/registry/examples/scroll-area/scroll-area-both-scrollbars";
 import scroll_area_scroll_area_horizontal_scroll from "@/registry/examples/scroll-area/scroll-area-horizontal-scroll";
+import scroll_area_scroll_area_scroll_fade from "@/registry/examples/scroll-area/scroll-area-scroll-fade";
+import scroll_area_scroll_area_scrollbar_gutter from "@/registry/examples/scroll-area/scroll-area-scrollbar-gutter";
 import scroll_area_scroll_area_vertical_scroll from "@/registry/examples/scroll-area/scroll-area-vertical-scroll";
 import select_select_basic from "@/registry/examples/select/select-basic";
 import select_select_align_item_with_trigger from "@/registry/examples/select/select-align-item-with-trigger";
@@ -2439,19 +2440,24 @@ export const exampleRegistry = {
   ],
   "scroll-area": [
     {
-      "title": "Code Block",
-      "importPath": "scroll-area-code-block",
-      "source": "import { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\n\nexport default function ScrollAreaCodeBlock() {\n  return (\n    <ScrollArea className=\"h-[200px] w-full rounded-md border\">\n      <pre className=\"p-4\">\n        <code className=\"text-sm\">{`import React from 'react';\nimport { ScrollArea } from '@/components/ui/cubby-ui/scroll-area';\n\nfunction App() {\n  const items = Array.from({ length: 100 }).map((_, i) => ({\n    id: i,\n    name: \\`Item \\${i + 1}\\`,\n    description: \\`Description for item \\${i + 1}\\`\n  }));\n\n  return (\n    <ScrollArea className=\"h-96 w-full\">\n      <div className=\"p-4\">\n        {items.map((item) => (\n          <div key={item.id} className=\"mb-4 p-4 border rounded\">\n            <h3>{item.name}</h3>\n            <p>{item.description}</p>\n          </div>\n        ))}\n      </div>\n    </ScrollArea>\n  );\n}\n\nexport default App;`}</code>\n      </pre>\n    </ScrollArea>\n  );\n}"
-    },
-    {
-      "title": "Content List",
-      "importPath": "scroll-area-content-list",
-      "source": "import { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\n\nexport default function ScrollAreaContentList() {\n  return (\n    <ScrollArea className=\"h-[300px] w-[350px] rounded-md border p-4\">\n      <h4 className=\"mb-4 text-sm font-medium\">Notifications</h4>\n      <div className=\"space-y-4\">\n        {Array.from({ length: 10 }).map((_, i) => (\n          <div key={i} className=\"flex gap-3\">\n            <div className=\"h-8 w-8 rounded-full bg-accent\" />\n            <div className=\"space-y-1\">\n              <p className=\"text-sm font-medium\">New message from User {i + 1}</p>\n              <p className=\"text-sm text-muted-foreground\">\n                Hey, how are you doing? I wanted to check in...\n              </p>\n            </div>\n          </div>\n        ))}\n      </div>\n    </ScrollArea>\n  );\n}"
+      "title": "Both Scrollbars",
+      "importPath": "scroll-area-both-scrollbars",
+      "source": "import { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\n\nexport default function ScrollAreaBothScrollbars() {\n  return (\n    <ScrollArea className=\"h-72 w-72 rounded-md border\">\n      <div className=\"grid grid-cols-[repeat(8,5rem)] grid-rows-[repeat(8,5rem)] gap-2 p-3\">\n        {Array.from({ length: 64 }, (_, i) => (\n          <div\n            key={i}\n            className=\"flex items-center justify-center rounded-md bg-muted text-sm font-medium text-muted-foreground\"\n          >\n            {i + 1}\n          </div>\n        ))}\n      </div>\n    </ScrollArea>\n  );\n}\n"
     },
     {
       "title": "Horizontal Scroll",
       "importPath": "scroll-area-horizontal-scroll",
-      "source": "import { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\n\nexport default function ScrollAreaHorizontalScroll() {\n  return (\n    <ScrollArea className=\"w-96 whitespace-nowrap rounded-md border\" orientation=\"horizontal\">\n      <div className=\"flex w-max space-x-4 p-4\">\n        {Array.from({ length: 20 }).map((_, i) => (\n          <div\n            key={i}\n            className=\"flex h-20 w-32 items-center justify-center rounded-md bg-secondary\"\n          >\n            Item {i + 1}\n          </div>\n        ))}\n      </div>\n    </ScrollArea>\n  );\n}"
+      "source": "import { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\n\nexport default function ScrollAreaHorizontalScroll() {\n  return (\n    <ScrollArea className=\"w-96 whitespace-nowrap rounded-md border\">\n      <div className=\"flex w-max space-x-4 p-4\">\n        {Array.from({ length: 20 }).map((_, i) => (\n          <div\n            key={i}\n            className=\"flex h-20 w-32 items-center justify-center rounded-md bg-secondary\"\n          >\n            Item {i + 1}\n          </div>\n        ))}\n      </div>\n    </ScrollArea>\n  );\n}"
+    },
+    {
+      "title": "Scroll Fade",
+      "importPath": "scroll-area-scroll-fade",
+      "source": "import { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\n\nexport default function ScrollAreaScrollFade() {\n  return (\n    <ScrollArea scrollFade className=\"h-48 w-80 rounded-md border bg-muted/30\">\n      <div className=\"space-y-4 p-4 text-sm leading-relaxed\">\n        <p>\n          The scroll fade effect uses CSS masks to create a subtle fade at the\n          edges of the scroll container. This provides a visual hint that more\n          content is available.\n        </p>\n        <p>\n          As you scroll, the fade appears and disappears based on your position.\n          When at the top, only the bottom fade shows. When at the bottom, only\n          the top fade shows.\n        </p>\n        <p>\n          This approach uses Tailwind&apos;s mask utilities and works over any\n          background color or pattern without needing to match colors.\n        </p>\n        <p>\n          The fade size is set to 1.5rem by default, providing a clean\n          transition that&apos;s visible but not distracting.\n        </p>\n      </div>\n    </ScrollArea>\n  );\n}\n"
+    },
+    {
+      "title": "Scrollbar Gutter",
+      "importPath": "scroll-area-scrollbar-gutter",
+      "source": "import { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\n\nexport default function ScrollAreaScrollbarGutter() {\n  return (\n    <div className=\"flex gap-4\">\n      <div className=\"space-y-2\">\n        <p className=\"text-xs text-muted-foreground\">Without gutter</p>\n        <ScrollArea className=\"h-48 w-56 rounded-md border\">\n          <div className=\"space-y-2 p-4\">\n            {Array.from({ length: 12 }).map((_, i) => (\n              <div\n                key={i}\n                className=\"flex items-center gap-3 rounded-md bg-muted/50 p-2\"\n              >\n                <div className=\"size-6 rounded-full bg-primary/20\" />\n                <span className=\"text-sm\">Item {i + 1}</span>\n              </div>\n            ))}\n          </div>\n        </ScrollArea>\n      </div>\n      <div className=\"space-y-2\">\n        <p className=\"text-xs text-muted-foreground\">With gutter</p>\n        <ScrollArea scrollbarGutter className=\"h-48 w-56 rounded-md border\">\n          <div className=\"space-y-2 p-4\">\n            {Array.from({ length: 12 }).map((_, i) => (\n              <div\n                key={i}\n                className=\"flex items-center gap-3 rounded-md bg-muted/50 p-2\"\n              >\n                <div className=\"size-6 rounded-full bg-primary/20\" />\n                <span className=\"text-sm\">Item {i + 1}</span>\n              </div>\n            ))}\n          </div>\n        </ScrollArea>\n      </div>\n    </div>\n  );\n}\n"
     },
     {
       "title": "Vertical Scroll",
@@ -3133,9 +3139,10 @@ export const componentMap = {
   "resizable-three-panels": resizable_resizable_three_panels,
   "resizable-vertical": resizable_resizable_vertical,
   "resizable-with-handle": resizable_resizable_with_handle,
-  "scroll-area-code-block": scroll_area_scroll_area_code_block,
-  "scroll-area-content-list": scroll_area_scroll_area_content_list,
+  "scroll-area-both-scrollbars": scroll_area_scroll_area_both_scrollbars,
   "scroll-area-horizontal-scroll": scroll_area_scroll_area_horizontal_scroll,
+  "scroll-area-scroll-fade": scroll_area_scroll_area_scroll_fade,
+  "scroll-area-scrollbar-gutter": scroll_area_scroll_area_scrollbar_gutter,
   "scroll-area-vertical-scroll": scroll_area_scroll_area_vertical_scroll,
   "select-basic": select_select_basic,
   "select-align-item-with-trigger": select_select_align_item_with_trigger,

@@ -19,23 +19,29 @@ import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 
 ## Examples
 
+### Scroll Fade
+
+Use the `scrollFade` prop to add a subtle fade effect at the edges. The fade appears when content is scrollable in that direction and uses CSS masks, so it works over any background.
+
+<ComponentPreview component="scroll-area" example="scroll-area-scroll-fade" />
+
+### Scrollbar Gutter
+
+Use the `scrollbarGutter` prop to reserve space for the scrollbar when content overflows. This prevents layout shift when the scrollbar appears.
+
+<ComponentPreview component="scroll-area" example="scroll-area-scrollbar-gutter" />
+
 ### Horizontal Scroll
 
 Enable horizontal scrolling for wide content.
 
 <ComponentPreview component="scroll-area" example="scroll-area-horizontal-scroll" />
 
-### Content List
+### Both Scrollbars
 
-Display scrollable lists of items.
+When content overflows in both directions, both scrollbars appear automatically. The corner prevents them from intersecting.
 
-<ComponentPreview component="scroll-area" example="scroll-area-content-list" />
-
-### Code Block
-
-Scrollable container for code snippets.
-
-<ComponentPreview component="scroll-area" example="scroll-area-code-block" />
+<ComponentPreview component="scroll-area" example="scroll-area-both-scrollbars" />
 
 ## API Reference
 
@@ -47,9 +53,15 @@ For the complete Base UI API, see the [Base UI ScrollArea documentation](https:/
 
 <ApiPropsList>
 
-<ApiProp name="orientation" fullType='"horizontal" | "vertical"' simpleType="string">
-  Flattened from ScrollBar for convenience. Sets the scroll direction and is
-  passed to the internal ScrollBar component.
+<ApiProp name="scrollFade" fullType="boolean" simpleType="boolean" defaultValue="false">
+  Adds a subtle fade effect at the scroll edges using CSS masks. The fade
+  appears when content is scrollable in that direction and disappears at
+  boundaries. Works over any background color or pattern.
+</ApiProp>
+
+<ApiProp name="scrollbarGutter" fullType="boolean" simpleType="boolean" defaultValue="false">
+  Reserves space for the scrollbar when content overflows. This prevents layout
+  shift when the scrollbar appears or disappears.
 </ApiProp>
 
 </ApiPropsList>

@@ -1,5 +1,6 @@
 import {
   Drawer,
+  DrawerBody,
   DrawerClose,
   DrawerContent,
   DrawerDescription,
@@ -22,13 +23,13 @@ export default function DrawerDirections() {
               This drawer slides in from the top.
             </DrawerDescription>
           </DrawerHeader>
-          <div className="p-4">
+          <DrawerBody>
             <DrawerClose
               render={<Button variant="outline" className="w-full" />}
             >
               Close
             </DrawerClose>
-          </div>
+          </DrawerBody>
           <DrawerHandle />
         </DrawerContent>
       </Drawer>
@@ -38,20 +39,20 @@ export default function DrawerDirections() {
           Bottom
         </DrawerTrigger>
         <DrawerContent>
-          <DrawerHandle />
+          {/* <DrawerHandle /> */}
           <DrawerHeader>
             <DrawerTitle>Bottom Drawer</DrawerTitle>
             <DrawerDescription>
               This drawer slides in from the bottom.
             </DrawerDescription>
           </DrawerHeader>
-          <div className="p-4">
+          <DrawerBody>
             <DrawerClose
               render={<Button variant="outline" className="w-full" />}
             >
               Close
             </DrawerClose>
-          </div>
+          </DrawerBody>
         </DrawerContent>
       </Drawer>
 
@@ -60,20 +61,19 @@ export default function DrawerDirections() {
           Left
         </DrawerTrigger>
         <DrawerContent>
-          <DrawerHandle />
           <DrawerHeader>
             <DrawerTitle>Left Drawer</DrawerTitle>
             <DrawerDescription>
               This drawer slides in from the left.
             </DrawerDescription>
           </DrawerHeader>
-          <div className="p-4">
+          <DrawerBody>
             <DrawerClose
               render={<Button variant="outline" className="w-full" />}
             >
               Close
             </DrawerClose>
-          </div>
+          </DrawerBody>
         </DrawerContent>
       </Drawer>
 
@@ -82,20 +82,19 @@ export default function DrawerDirections() {
           Right
         </DrawerTrigger>
         <DrawerContent>
-          <DrawerHandle />
           <DrawerHeader>
             <DrawerTitle>Right Drawer</DrawerTitle>
             <DrawerDescription>
               This drawer slides in from the right.
             </DrawerDescription>
           </DrawerHeader>
-          <div className="p-4">
+          <DrawerBody>
             <DrawerClose
               render={<Button variant="outline" className="w-full" />}
             >
               Close
             </DrawerClose>
-          </div>
+          </DrawerBody>
         </DrawerContent>
       </Drawer>
     </div>

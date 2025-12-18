@@ -510,7 +510,11 @@ function DrawerPortal({
  * The actual content is in DrawerContentInner, which only mounts when the Portal is visible.
  * This ensures useScrollSnap gets fresh state on each open (no stale state between sessions).
  */
-function DrawerContent(props: BaseDialog.Popup.Props) {
+function DrawerContent(
+  props: BaseDialog.Popup.Props & {
+    footerVariant?: "default" | "inset";
+  },
+) {
   return (
     <DrawerPortal>
       <DrawerContentInner {...props} />
@@ -525,8 +529,11 @@ function DrawerContent(props: BaseDialog.Popup.Props) {
 function DrawerContentInner({
   className,
   children,
+  footerVariant = "default",
   ...props
-}: BaseDialog.Popup.Props) {
+}: BaseDialog.Popup.Props & {
+  footerVariant?: "default" | "inset";
+}) {
   const {
     direction,
     variant,
@@ -856,6 +863,7 @@ function DrawerContentInner({
           <BaseDialog.Popup
             ref={measureRef}
             data-slot="drawer-content"
+            data-footer-variant={footerVariant}
             className={cn(
               drawerContentVariants({ variant, direction }),
               // Hide until scroll is initialized to prevent flash at wrong position (iOS Safari)
@@ -947,7 +955,16 @@ function DrawerHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="drawer-header"
-      className={cn("flex flex-col gap-1.5 px-4 pt-2 pb-0", className)}
+      className={cn(
+        "flex flex-col gap-1.5 px-5 pt-5 pb-3",
+        // Reduce bottom padding when header is directly before footer (no body)
+        "not-has-[+[data-slot=drawer-body]]:has-[+[data-slot=drawer-footer]]:pb-1",
+        // Add extra bottom padding when header is alone (no body or footer)
+        "not-has-[+[data-slot=drawer-body]]:not-has-[+[data-slot=drawer-footer]]:pb-5",
+        // Inset footer variant: add extra bottom padding when header is directly before footer (no body)
+        "in-data-[footer-variant=inset]:not-has-[+[data-slot=drawer-body]]:has-[+[data-slot=drawer-footer]]:pb-5",
+        className,
+      )}
       {...props}
     />
   );
@@ -961,7 +978,16 @@ function DrawerFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="drawer-footer"
-      className={cn("mt-auto flex flex-col gap-2 p-4", className)}
+      className={cn(
+        "mt-auto flex flex-col gap-2 px-5 pt-3 pb-5",
+        // Add extra top padding when footer is first (no header or body before it)
+        // Note: first: works when no Handle precedes; for Handle-first layouts
+        // without header/body, add className="pt-5" manually
+        "first:pt-5",
+        // Inset variant: muted background with top border for separation
+        "in-data-[footer-variant=inset]:border-border in-data-[footer-variant=inset]:bg-muted in-data-[footer-variant=inset]:border-t in-data-[footer-variant=inset]:pb-4",
+        className,
+      )}
       {...props}
     />
   );
@@ -1006,10 +1032,28 @@ function DrawerDescription({
  * -------------------------------------------------------------------------------------------------*/
 
 function DrawerBody({ className, ...props }: React.ComponentProps<"div">) {
+  const { direction } = useDrawer();
+  const { isVertical } = DIRECTION_CONFIG[direction];
+
   return (
     <div
       data-slot="drawer-body"
-      className={cn("flex-1 overflow-y-auto px-4 py-2", className)}
+      className={cn(
+        "flex-1 overflow-y-auto px-5 pt-1 pb-1",
+        // Constrain touch gestures to drawer direction only
+        // For horizontal drawers, this prevents vertical swipes from triggering
+        // browser UI (URL bar collapse/expand on mobile)
+        isVertical ? "touch-pan-y" : "touch-pan-x",
+        // Add extra top padding when body is first (no header before it)
+        // Note: first: works when no Handle precedes; for Handle-first layouts,
+        // Header provides the top separation so pt-1 is sufficient
+        "first:pt-5",
+        // Add extra bottom padding when body is not followed by footer
+        "not-has-[+[data-slot=drawer-footer]]:pb-5",
+        // Inset footer variant: add bottom padding before bordered footer
+        "in-data-[footer-variant=inset]:has-[+[data-slot=drawer-footer]]:pb-5",
+        className,
+      )}
       {...props}
     />
   );

@@ -5,11 +5,13 @@ description: Swipeable slide-in panel with snap points for mobile-friendly inter
 
 import {
   Drawer,
+  DrawerBody,
+  DrawerClose,
   DrawerContent,
   DrawerDescription,
+  DrawerFooter,
   DrawerHandle,
   DrawerHeader,
-  DrawerScrollArea,
   DrawerTitle,
   DrawerTrigger,
 } from "@/registry/default/drawer/drawer";
@@ -66,7 +68,7 @@ A music player demonstrating progressive disclosure with snap points: mini playe
 
 ### Scrollable Content
 
-Use `DrawerScrollArea` for nested scrollable content that works seamlessly with swipe gestures.
+Use `DrawerBody` for scrollable content that works seamlessly with swipe gestures.
 
 <ComponentPreview component="drawer" example="drawer-with-scroll" />
 
@@ -75,6 +77,12 @@ Use `DrawerScrollArea` for nested scrollable content that works seamlessly with 
 Include form elements within the drawer.
 
 <ComponentPreview component="drawer" example="drawer-with-form" />
+
+### Inset Footer
+
+Use the `footerVariant="inset"` prop on `DrawerContent` for a visually separated footer with a muted background and top border.
+
+<ComponentPreview component="drawer" example="drawer-inset-footer" />
 
 ## API Reference
 
@@ -121,24 +129,30 @@ For the complete Base UI API, see the [Base UI Dialog documentation](https://bas
 
 <ApiProp
   name="defaultSnapPoint"
-  fullType="number"
-  simpleType="number"
-  defaultValue="last index"
+  fullType="number | `${number}px`"
+  simpleType="SnapPoint"
+  defaultValue="first snap point"
 >
-  Initial snap point index when the drawer opens (uncontrolled mode).
-</ApiProp>
-
-<ApiProp name="activeSnapPoint" fullType="number" simpleType="number">
-  Controlled snap point index. Use with `onSnapPointChange` for controlled mode.
+  Initial snap point value when the drawer opens (uncontrolled mode). Pass the
+  actual value from your `snapPoints` array.
 </ApiProp>
 
 <ApiProp
-  name="onSnapPointChange"
-  fullType="(snapPointIndex: number) => void"
+  name="activeSnapPoint"
+  fullType="number | `${number}px` | null"
+  simpleType="SnapPoint"
+>
+  Controlled snap point value. Use with `onActiveSnapPointChange` for controlled
+  mode. Pass the actual value from your `snapPoints` array.
+</ApiProp>
+
+<ApiProp
+  name="onActiveSnapPointChange"
+  fullType="(snapPoint: SnapPoint) => void"
   simpleType="function"
 >
   Callback fired when the active snap point changes (via swipe or
-  programmatically).
+  programmatically). Receives the snap point value.
 </ApiProp>
 
 <ApiProp
@@ -163,40 +177,53 @@ For the complete Base UI API, see the [Base UI Dialog documentation](https://bas
 </ApiProp>
 
 <ApiProp
-  name="easing"
-  fullType='"snappy" | "smooth" | "relaxed"'
-  simpleType="string"
-  defaultValue='"smooth"'
+  name="children"
+  fullType="ReactNode | ((props: DrawerRenderProps) => ReactNode)"
+  simpleType="ReactNode | function"
 >
-  Animation easing preset. `"snappy"` (200ms), `"smooth"` (300ms), or
-  `"relaxed"` (400ms).
+  Children can be a render function to access animation state: `snapProgress`,
+  `dragProgress`, `isDragging`, and `activeSnapPoint`. See "Animating Content"
+  section below.
+</ApiProp>
+
+</ApiPropsList>
+
+#### DrawerContent
+
+<ApiPropsList>
+
+<ApiProp
+  name="footerVariant"
+  fullType='"default" | "inset"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Footer styling variant. Use `"inset"` for a visually separated footer with a
+  muted background and top border.
 </ApiProp>
 
 </ApiPropsList>
 
 ### Components
 
-| Component           | Description                                                 |
-| ------------------- | ----------------------------------------------------------- |
-| `Drawer`            | Root component that manages state and provides context      |
-| `DrawerTrigger`     | Button that opens the drawer                                |
-| `DrawerContent`     | Main content container with swipe gesture handling          |
-| `DrawerHandle`      | Visual drag indicator (automatically adjusts for direction) |
-| `DrawerHeader`      | Container for title and description                         |
-| `DrawerTitle`       | Accessible title element                                    |
-| `DrawerDescription` | Accessible description element                              |
-| `DrawerBody`        | Flexible content area                                       |
-| `DrawerScrollArea`  | Scrollable area that integrates with swipe gestures         |
-| `DrawerFooter`      | Container for action buttons                                |
-| `DrawerClose`       | Button that closes the drawer                               |
+| Component           | Description                                                        |
+| ------------------- | ------------------------------------------------------------------ |
+| `Drawer`            | Root component that manages state and provides context             |
+| `DrawerTrigger`     | Button that opens the drawer                                       |
+| `DrawerPortal`      | Renders drawer content into a portal                               |
+| `DrawerContent`     | Main content container with swipe gesture handling                 |
+| `DrawerHandle`      | Visual drag indicator (automatically adjusts for direction)        |
+| `DrawerHeader`      | Container for title and description with adaptive padding          |
+| `DrawerTitle`       | Accessible title element                                           |
+| `DrawerDescription` | Accessible description element                                     |
+| `DrawerBody`        | Scrollable content area with adaptive padding                      |
+| `DrawerFooter`      | Container for action buttons, supports `inset` variant via content |
+| `DrawerClose`       | Button that closes the drawer                                      |
+| `useDrawer`         | Hook to access drawer context (direction, snap state, etc.)        |
 
 ### Nested Scrollable Content
 
-When using scrollable content inside the drawer, wrap it with `DrawerScrollArea`. This ensures:
-
-- When scrolled to top, swiping down dismisses the drawer
-- When scrolled down, swiping scrolls the content first
-- Smooth transition between content scroll and drawer swipe
+Use `DrawerBody` for scrollable content inside the drawer. The component handles overflow automatically and adapts its padding based on surrounding elements (header, footer).
 
 <CodeBlockMDX
   code={`<DrawerContent>
@@ -204,7 +231,10 @@ When using scrollable content inside the drawer, wrap it with `DrawerScrollArea`
   <DrawerHeader>
     <DrawerTitle>Long List</DrawerTitle>
   </DrawerHeader>
-  <DrawerScrollArea>{/* Your scrollable content */}</DrawerScrollArea>
+  <DrawerBody>{/* Your scrollable content */}</DrawerBody>
+  <DrawerFooter>
+    <DrawerClose render={<Button />}>Done</DrawerClose>
+  </DrawerFooter>
 </DrawerContent>`}
   language="tsx"
 />
@@ -245,29 +275,23 @@ Use the render prop pattern to access animation values in JavaScript:
 
 For browsers that support scroll-driven animations (Chrome 115+), the drawer exposes a `--drawer-snap-progress` CSS custom property that animates from 0 to 1 based on scroll position. This is more performant as it's GPU-accelerated and doesn't cause React re-renders.
 
-<CodeBlockMDX
-  code={`
-<Drawer snapPoints={["92px", 1]}>
-  <DrawerTrigger>Open</DrawerTrigger>
-  <DrawerContent>
-    <div className="mini-player">Mini Player</div>
-    <div className="full-player">Full Player</div>
-  </DrawerContent>
-</Drawer>
-`}
-  language="tsx"
-/>
+Use Tailwind's arbitrary value syntax to apply the CSS variable directly in your className:
 
 <CodeBlockMDX
-  code={`
-.mini-player {
-  opacity: calc(1 - var(--drawer-snap-progress, 0));
-}
-.full-player {
-  opacity: var(--drawer-snap-progress, 0);
-}
-`}
-  language="css"
+  code={`<Drawer snapPoints={["92px", 1]}>
+  <DrawerTrigger>Open</DrawerTrigger>
+  <DrawerContent>
+    {/* Mini player fades out as drawer expands */}
+    <div className="opacity-[calc(1-var(--drawer-snap-progress,0))]">
+      Mini Player
+    </div>
+    {/* Full player fades in as drawer expands */}
+    <div className="opacity-[var(--drawer-snap-progress,0)]">
+      Full Player
+    </div>
+  </DrawerContent>
+</Drawer>`}
+  language="tsx"
 />
 
 The `0` fallback ensures non-supporting browsers show the initial state. Combine with the render prop for full browser support:
@@ -276,9 +300,9 @@ The `0` fallback ensures non-supporting browsers show the initial state. Combine
   code={`<Drawer snapPoints={["92px", 1]}>
   {({ snapProgress }) => (
     <DrawerContent>
-      {/* CSS handles animation in Chrome 115+, JS fallback for others */}
+      {/* CSS variable for Chrome 115+, inline style fallback for others */}
       <div
-        className="mini-player"
+        className="opacity-[calc(1-var(--drawer-snap-progress,0))]"
         style={{ opacity: 1 - snapProgress }}
       >
         Mini Player
@@ -289,14 +313,4 @@ The `0` fallback ensures non-supporting browsers show the initial state. Combine
   language="tsx"
 />
 
-<CodeBlockMDX
-  code={`
-/* CSS overrides inline style when scroll-driven animations are supported */
-@supports (animation-timeline: scroll()) {
-  .mini-player {
-    opacity: calc(1 - var(--drawer-snap-progress, 0)) !important;
-  }
-}
-`}
-  language="css"
-/>
+In browsers that support scroll-driven animations, the CSS variable updates in real-time and takes precedence. In other browsers, the inline style provides the fallback behavior.

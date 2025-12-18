@@ -4,6 +4,7 @@ import * as React from "react";
 
 import {
   Drawer,
+  DrawerBody,
   DrawerContent,
   DrawerDescription,
   DrawerHandle,
@@ -73,7 +74,7 @@ export default function DrawerSnapPoints() {
             {snap === 1 ? "Full" : `${(snap as number) * 100}%`}
           </DrawerDescription>
         </DrawerHeader>
-        <div className="flex flex-col gap-4 overflow-y-auto p-4">
+        <DrawerBody className="flex flex-col gap-4">
           {cards.map((card) => (
             <div
               key={card.id}
@@ -83,7 +84,7 @@ export default function DrawerSnapPoints() {
               <p className="text-muted-foreground text-sm">{card.content}</p>
             </div>
           ))}
-        </div>
+        </DrawerBody>
       </DrawerContent>
     </Drawer>
   );

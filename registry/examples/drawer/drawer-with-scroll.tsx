@@ -1,8 +1,10 @@
 import {
   Drawer,
+  DrawerBody,
   DrawerClose,
   DrawerContent,
   DrawerDescription,
+  DrawerFooter,
   DrawerHandle,
   DrawerHeader,
   DrawerTitle,
@@ -30,8 +32,8 @@ export default function DrawerWithScroll() {
             Scroll within the drawer. Swipe down to dismiss when at the top.
           </DrawerDescription>
         </DrawerHeader>
-        <div className="flex-1 overflow-y-auto px-4">
-          <div className="flex flex-col gap-3 py-2">
+        <DrawerBody>
+          <div className="flex flex-col gap-3">
             {items.map((item) => (
               <div
                 key={item.id}
@@ -44,10 +46,10 @@ export default function DrawerWithScroll() {
               </div>
             ))}
           </div>
-        </div>
-        <div className="border-t p-4">
+        </DrawerBody>
+        <DrawerFooter>
           <DrawerClose render={<Button className="w-full" />}>Done</DrawerClose>
-        </div>
+        </DrawerFooter>
       </DrawerContent>
     </Drawer>
   );

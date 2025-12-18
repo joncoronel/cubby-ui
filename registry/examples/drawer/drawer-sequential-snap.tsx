@@ -4,6 +4,7 @@ import * as React from "react";
 
 import {
   Drawer,
+  DrawerBody,
   DrawerContent,
   DrawerDescription,
   DrawerHandle,
@@ -37,7 +38,7 @@ export default function DrawerSequentialSnap() {
             the drawer will stop at each snap point.
           </DrawerDescription>
         </DrawerHeader>
-        <div className="flex flex-col gap-4 p-4">
+        <DrawerBody className="flex flex-col gap-4">
           <div className="bg-muted/50 rounded-lg p-4">
             <p className="text-muted-foreground mb-2 text-sm font-medium">
               Current snap point
@@ -69,7 +70,7 @@ export default function DrawerSequentialSnap() {
               <div key={i} className="bg-muted/30 h-16 rounded-lg" />
             ))}
           </div>
-        </div>
+        </DrawerBody>
       </DrawerContent>
     </Drawer>
   );

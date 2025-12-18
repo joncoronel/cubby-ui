@@ -1,5 +1,6 @@
 import {
   Drawer,
+  DrawerBody,
   DrawerClose,
   DrawerContent,
   DrawerDescription,
@@ -25,7 +26,7 @@ export default function DrawerWithForm() {
             Make changes to your profile here. Click save when you're done.
           </DrawerDescription>
         </DrawerHeader>
-        <div className="px-4 pb-4">
+        <DrawerBody>
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
@@ -36,7 +37,7 @@ export default function DrawerWithForm() {
               <Input id="username" defaultValue="@peduarte" />
             </div>
           </div>
-        </div>
+        </DrawerBody>
         <DrawerFooter>
           <Button>Save changes</Button>
           <DrawerClose render={<Button variant="outline" />}>

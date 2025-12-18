@@ -252,6 +252,7 @@ import resizable_resizable_vertical from "@/registry/examples/resizable/resizabl
 import resizable_resizable_with_handle from "@/registry/examples/resizable/resizable-with-handle";
 import scroll_area_scroll_area_both_scrollbars from "@/registry/examples/scroll-area/scroll-area-both-scrollbars";
 import scroll_area_scroll_area_horizontal_scroll from "@/registry/examples/scroll-area/scroll-area-horizontal-scroll";
+import scroll_area_scroll_area_persist_scrollbar from "@/registry/examples/scroll-area/scroll-area-persist-scrollbar";
 import scroll_area_scroll_area_scroll_fade from "@/registry/examples/scroll-area/scroll-area-scroll-fade";
 import scroll_area_scroll_area_scrollbar_gutter from "@/registry/examples/scroll-area/scroll-area-scrollbar-gutter";
 import scroll_area_scroll_area_vertical_scroll from "@/registry/examples/scroll-area/scroll-area-vertical-scroll";
@@ -2450,9 +2451,14 @@ export const exampleRegistry = {
       "source": "import { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\n\nexport default function ScrollAreaHorizontalScroll() {\n  return (\n    <ScrollArea className=\"w-96 whitespace-nowrap rounded-md border\">\n      <div className=\"flex w-max space-x-4 p-4\">\n        {Array.from({ length: 20 }).map((_, i) => (\n          <div\n            key={i}\n            className=\"flex h-20 w-32 items-center justify-center rounded-md bg-secondary\"\n          >\n            Item {i + 1}\n          </div>\n        ))}\n      </div>\n    </ScrollArea>\n  );\n}"
     },
     {
+      "title": "Persist Scrollbar",
+      "importPath": "scroll-area-persist-scrollbar",
+      "source": "import { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\n\nexport default function ScrollAreaPersistScrollbar() {\n  return (\n    <ScrollArea\n      persistScrollbar\n      className=\"h-48 w-80 rounded-md border bg-muted/30\"\n    >\n      <div className=\"space-y-4 p-4 text-sm leading-relaxed\">\n        <p>\n          The scrollbar is always visible, providing constant awareness of\n          scroll position and content length.\n        </p>\n        <p>\n          This is useful for interfaces where users need to quickly gauge how\n          much content exists or navigate large lists efficiently.\n        </p>\n        <p>\n          Unlike the default behavior where the scrollbar fades in on hover or\n          scroll, persistent scrollbars remain visible at all times.\n        </p>\n      </div>\n    </ScrollArea>\n  );\n}\n"
+    },
+    {
       "title": "Scroll Fade",
       "importPath": "scroll-area-scroll-fade",
-      "source": "import { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\n\nexport default function ScrollAreaScrollFade() {\n  return (\n    <ScrollArea scrollFade className=\"h-48 w-80 rounded-md border bg-muted/30\">\n      <div className=\"space-y-4 p-4 text-sm leading-relaxed\">\n        <p>\n          The scroll fade effect uses CSS masks to create a subtle fade at the\n          edges of the scroll container. This provides a visual hint that more\n          content is available.\n        </p>\n        <p>\n          As you scroll, the fade appears and disappears based on your position.\n          When at the top, only the bottom fade shows. When at the bottom, only\n          the top fade shows.\n        </p>\n        <p>\n          This approach uses Tailwind&apos;s mask utilities and works over any\n          background color or pattern without needing to match colors.\n        </p>\n        <p>\n          The fade size is set to 1.5rem by default, providing a clean\n          transition that&apos;s visible but not distracting.\n        </p>\n      </div>\n    </ScrollArea>\n  );\n}\n"
+      "source": "import { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\n\nexport default function ScrollAreaScrollFade() {\n  return (\n    <ScrollArea fadeEdges className=\"h-48 w-80 rounded-md border bg-muted/30\">\n      <div className=\"space-y-4 p-4 text-sm leading-relaxed\">\n        <p>\n          The scroll fade effect uses CSS masks to create a subtle fade at the\n          edges of the scroll container. This provides a visual hint that more\n          content is available.\n        </p>\n        <p>\n          As you scroll, the fade appears and disappears based on your position.\n          When at the top, only the bottom fade shows. When at the bottom, only\n          the top fade shows.\n        </p>\n        <p>\n          This approach uses Tailwind&apos;s mask utilities and works over any\n          background color or pattern without needing to match colors.\n        </p>\n        <p>\n          The fade size is set to 1.5rem by default, providing a clean\n          transition that&apos;s visible but not distracting.\n        </p>\n      </div>\n    </ScrollArea>\n  );\n}\n"
     },
     {
       "title": "Scrollbar Gutter",
@@ -3141,6 +3147,7 @@ export const componentMap = {
   "resizable-with-handle": resizable_resizable_with_handle,
   "scroll-area-both-scrollbars": scroll_area_scroll_area_both_scrollbars,
   "scroll-area-horizontal-scroll": scroll_area_scroll_area_horizontal_scroll,
+  "scroll-area-persist-scrollbar": scroll_area_scroll_area_persist_scrollbar,
   "scroll-area-scroll-fade": scroll_area_scroll_area_scroll_fade,
   "scroll-area-scrollbar-gutter": scroll_area_scroll_area_scrollbar_gutter,
   "scroll-area-vertical-scroll": scroll_area_scroll_area_vertical_scroll,

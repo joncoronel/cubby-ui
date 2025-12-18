@@ -2,7 +2,7 @@ import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 
 export default function ScrollAreaScrollFade() {
   return (
-    <ScrollArea scrollFade className="h-48 w-80 rounded-md border bg-muted/30">
+    <ScrollArea fadeEdges className="h-48 w-80 rounded-md border bg-muted/30">
       <div className="space-y-4 p-4 text-sm leading-relaxed">
         <p>
           The scroll fade effect uses CSS masks to create a subtle fade at the

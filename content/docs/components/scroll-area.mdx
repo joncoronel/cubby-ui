@@ -19,9 +19,9 @@ import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 
 ## Examples
 
-### Scroll Fade
+### Fade Edges
 
-Use the `scrollFade` prop to add a subtle fade effect at the edges. The fade appears when content is scrollable in that direction and uses CSS masks, so it works over any background.
+Use the `fadeEdges` prop to add a subtle fade effect at the edges. The fade appears when content is scrollable in that direction and uses CSS masks, so it works over any background.
 
 <ComponentPreview component="scroll-area" example="scroll-area-scroll-fade" />
 
@@ -30,6 +30,12 @@ Use the `scrollFade` prop to add a subtle fade effect at the edges. The fade app
 Use the `scrollbarGutter` prop to reserve space for the scrollbar when content overflows. This prevents layout shift when the scrollbar appears.
 
 <ComponentPreview component="scroll-area" example="scroll-area-scrollbar-gutter" />
+
+### Persistent Scrollbar
+
+Use the `persistScrollbar` prop to always show the scrollbar instead of fading it in on hover or scroll.
+
+<ComponentPreview component="scroll-area" example="scroll-area-persist-scrollbar" />
 
 ### Horizontal Scroll
 
@@ -53,7 +59,7 @@ For the complete Base UI API, see the [Base UI ScrollArea documentation](https:/
 
 <ApiPropsList>
 
-<ApiProp name="scrollFade" fullType="boolean" simpleType="boolean" defaultValue="false">
+<ApiProp name="fadeEdges" fullType="boolean" simpleType="boolean" defaultValue="false">
   Adds a subtle fade effect at the scroll edges using CSS masks. The fade
   appears when content is scrollable in that direction and disappears at
   boundaries. Works over any background color or pattern.
@@ -62,6 +68,11 @@ For the complete Base UI API, see the [Base UI ScrollArea documentation](https:/
 <ApiProp name="scrollbarGutter" fullType="boolean" simpleType="boolean" defaultValue="false">
   Reserves space for the scrollbar when content overflows. This prevents layout
   shift when the scrollbar appears or disappears.
+</ApiProp>
+
+<ApiProp name="persistScrollbar" fullType="boolean" simpleType="boolean" defaultValue="false">
+  Always show the scrollbar instead of fading it in on hover or scroll. Useful
+  for interfaces where constant scroll position awareness is needed.
 </ApiProp>
 
 </ApiPropsList>

@@ -34,7 +34,7 @@ const drawerContentVariants = cva(
   [
     "bg-popover text-popover-foreground flex flex-col",
     "relative z-10",
-    "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-transform duration-450",
+    "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-transform duration-350",
     "motion-reduce:transition-none",
   ],
   {
@@ -715,7 +715,7 @@ function DrawerContentInner({
           // Transition for smooth enter/exit (skip on immediate close or while dragging)
           immediateClose || (isDragging && !isAnimating)
             ? "transition-none"
-            : "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-opacity duration-450",
+            : "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-opacity duration-350",
           // Enter: start at opacity 0, transition animates to target
           "[&[data-starting-style]]:opacity-0!",
           // Exit: use animation to override scroll-driven animation (transition can't interpolate from animation-held values)
@@ -769,7 +769,7 @@ function DrawerContentInner({
           // Skip transition on immediate close (swipe dismiss)
           immediateClose
             ? "transition-none"
-            : "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-transform duration-450",
+            : "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-transform duration-350",
 
           // Hide scrollbar
           "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",

@@ -47,6 +47,52 @@ Use nested alert dialogs for multi-step confirmations.
 
 </ApiPropsList>
 
+#### AlertDialogBody
+
+<ApiPropsList>
+
+<ApiProp
+  name="nativeScroll"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Use native browser scrolling instead of the custom ScrollArea component.
+</ApiProp>
+
+<ApiProp
+  name="fadeEdges"
+  fullType="boolean | 'top' | 'bottom' | 'left' | 'right' | 'x' | 'y' | FadeEdge[]"
+  defaultValue="true"
+>
+  Controls the fade effect on scroll edges. See [ScrollArea](/docs/components/scroll-area#custom-props) for all options.
+</ApiProp>
+
+<ApiProp
+  name="scrollbarGutter"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Reserves space for the scrollbar when content overflows, preventing layout shift.
+</ApiProp>
+
+<ApiProp
+  name="persistScrollbar"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Always show the scrollbar instead of fading it in on hover or scroll.
+</ApiProp>
+
+<ApiProp
+  name="hideScrollbar"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Hides the scrollbar while keeping scroll functionality.
+</ApiProp>
+
+</ApiPropsList>
+
 ### AlertDialogClose
 
 Use `AlertDialogClose` with the `render` prop to create action buttons:

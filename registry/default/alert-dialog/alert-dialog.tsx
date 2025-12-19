@@ -5,6 +5,10 @@ import { AlertDialog as BaseAlertDialog } from "@base-ui/react/alert-dialog";
 import { XIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import {
+  ScrollArea,
+  type ScrollAreaProps,
+} from "@/registry/default/scroll-area/scroll-area";
 
 const AlertDialog = BaseAlertDialog.Root;
 
@@ -129,23 +133,66 @@ function AlertDialogHeader({
 
 function AlertDialogBody({
   className,
+  nativeScroll = false,
+  fadeEdges = true,
+  scrollbarGutter = false,
+  persistScrollbar,
+  hideScrollbar,
+  children,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+}: React.HTMLAttributes<HTMLDivElement> & {
+  nativeScroll?: boolean;
+} & Pick<
+    ScrollAreaProps,
+    "fadeEdges" | "scrollbarGutter" | "persistScrollbar" | "hideScrollbar"
+  >) {
+  // Wrapper handles flex sizing and sibling-dependent padding
+  const wrapperClassName = cn(
+    "flex-1 min-h-0 overflow-hidden",
+    // Add extra top padding when body is first (no header)
+    "first:pt-5",
+    // Add extra bottom padding when body is not followed by footer
+    "not-has-[+[data-slot=alert-dialog-footer]]:pb-5",
+    // Inset variant: add bottom padding before bordered footer
+    "in-data-[variant=inset]:has-[+[data-slot=alert-dialog-footer]]:pb-5",
+  );
+
+  // Content padding and user layout classes
+  const contentClassName = cn(
+    // Padding with extra space for focus rings (py-1 = 4px accommodates 2px offset + 2px ring)
+    "px-6 py-1",
+    className,
+  );
+
+  if (nativeScroll) {
+    return (
+      <div
+        data-slot="alert-dialog-body"
+        className={cn(wrapperClassName, contentClassName, "overflow-y-auto")}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+
   return (
     <div
       data-slot="alert-dialog-body"
-      className={cn(
-        "flex-1 overflow-y-auto px-6 pt-1 pb-1",
-        // Add extra top padding when body is first (no header)
-        "first:pt-6",
-        // Add extra bottom padding when body is not followed by footer
-        "not-has-[+[data-slot=alert-dialog-footer]]:pb-6",
-        // Inset variant: add bottom padding before bordered footer
-        "in-data-[variant=inset]:has-[+[data-slot=alert-dialog-footer]]:pb-6",
-        className,
-      )}
-      {...props}
-    />
+      className={cn(wrapperClassName, "flex flex-col")}
+    >
+      <ScrollArea
+        className="flex-1"
+        fadeEdges={fadeEdges}
+        scrollbarGutter={scrollbarGutter}
+        persistScrollbar={persistScrollbar}
+        hideScrollbar={hideScrollbar}
+      >
+        <div className={contentClassName} {...props}>
+          {children}
+        </div>
+      </ScrollArea>
+    </div>
   );
 }
 

@@ -169,25 +169,11 @@ html {
     border-color: var(--color-border);
     outline-color: color-mix(in oklab, var(--color-ring) 50%, transparent);
     scrollbar-width: thin;
-    scrollbar-color: var(--color-border) transparent;
   }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     position: relative;
-  }
-  ::-webkit-scrollbar {
-    width: 5px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: var(--color-border);
-    border-radius: 5px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-muted-foreground);
   }
 
   .root {

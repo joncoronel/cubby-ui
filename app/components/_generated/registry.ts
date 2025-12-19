@@ -365,7 +365,9 @@ export const componentMetadata = {
     "title": "Alert-dialog",
     "description": "A alert-dialog component.",
     "category": "UI",
-    "registryDependencies": [],
+    "registryDependencies": [
+      "@cubby-ui/scroll-area"
+    ],
     "dependencies": [
       "lucide-react"
     ],
@@ -687,7 +689,9 @@ export const componentMetadata = {
     "title": "Drawer",
     "description": "A drawer component.",
     "category": "UI",
-    "registryDependencies": [],
+    "registryDependencies": [
+      "@cubby-ui/scroll-area"
+    ],
     "dependencies": [
       "class-variance-authority"
     ],
@@ -940,7 +944,9 @@ export const componentMetadata = {
     "title": "Sheet",
     "description": "A sheet component.",
     "category": "UI",
-    "registryDependencies": [],
+    "registryDependencies": [
+      "@cubby-ui/scroll-area"
+    ],
     "dependencies": [
       "class-variance-authority",
       "lucide-react"

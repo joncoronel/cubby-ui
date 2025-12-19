@@ -72,7 +72,7 @@ function ScrollArea({
       <BaseScrollArea.Viewport
         data-slot="scroll-area-viewport"
         className={cn(
-          "h-full overscroll-contain rounded-[inherit]",
+          "h-full rounded-[inherit]",
           "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
           hasFade && "[--scroll-fade-size:1.5rem]",
           fade.top &&

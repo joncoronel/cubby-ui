@@ -7,6 +7,10 @@ import { useRender } from "@base-ui/react/use-render";
 import { cva } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
+import {
+  ScrollArea,
+  type ScrollAreaProps,
+} from "@/registry/default/scroll-area/scroll-area";
 
 // Drawer-specific CSS animations (scroll-driven animations for progressive enhancement)
 import "./drawer.css";
@@ -34,7 +38,7 @@ const drawerContentVariants = cva(
   [
     "bg-popover text-popover-foreground flex flex-col",
     "relative z-10",
-    "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-transform duration-350",
+    "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-transform duration-350 will-change-transform",
     "motion-reduce:transition-none",
   ],
   {
@@ -1032,31 +1036,77 @@ function DrawerDescription({
  * DrawerBody
  * -------------------------------------------------------------------------------------------------*/
 
-function DrawerBody({ className, ...props }: React.ComponentProps<"div">) {
+function DrawerBody({
+  className,
+  nativeScroll = true,
+  fadeEdges = true,
+  scrollbarGutter = false,
+  persistScrollbar,
+  hideScrollbar,
+  children,
+  ...props
+}: React.ComponentProps<"div"> & {
+  nativeScroll?: boolean;
+} & Pick<
+    ScrollAreaProps,
+    "fadeEdges" | "scrollbarGutter" | "persistScrollbar" | "hideScrollbar"
+  >) {
   const { direction } = useDrawer();
   const { isVertical } = DIRECTION_CONFIG[direction];
+
+  // Wrapper handles flex sizing and sibling-dependent padding
+  const wrapperClassName = cn(
+    "flex-1 min-h-0 overflow-hidden",
+    // Add extra top padding when body is first (no header before it)
+    // Note: first: works when no Handle precedes; for Handle-first layouts,
+    // Header provides the top separation so pt-1 is sufficient
+    "first:pt-4",
+    // Add extra bottom padding when body is not followed by footer
+    "not-has-[+[data-slot=drawer-footer]]:pb-4",
+    // Inset footer variant: add bottom padding before bordered footer
+    "in-data-[footer-variant=inset]:has-[+[data-slot=drawer-footer]]:pb-4",
+  );
+
+  // Content padding and user layout classes
+  const contentClassName = cn(
+    // Padding with extra space for focus rings (py-1 = 4px accommodates 2px offset + 2px ring)
+    "px-5 py-1",
+    // Constrain touch gestures to drawer direction only
+    // For horizontal drawers, this prevents vertical swipes from triggering
+    // browser UI (URL bar collapse/expand on mobile)
+    isVertical ? "touch-pan-y" : "touch-pan-x",
+    className,
+  );
+
+  if (nativeScroll) {
+    return (
+      <div
+        data-slot="drawer-body"
+        className={cn(wrapperClassName, contentClassName, "overflow-y-auto")}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
 
   return (
     <div
       data-slot="drawer-body"
-      className={cn(
-        "flex-1 overflow-y-auto px-5 pt-1 pb-1",
-        // Constrain touch gestures to drawer direction only
-        // For horizontal drawers, this prevents vertical swipes from triggering
-        // browser UI (URL bar collapse/expand on mobile)
-        isVertical ? "touch-pan-y" : "touch-pan-x",
-        // Add extra top padding when body is first (no header before it)
-        // Note: first: works when no Handle precedes; for Handle-first layouts,
-        // Header provides the top separation so pt-1 is sufficient
-        "first:pt-5",
-        // Add extra bottom padding when body is not followed by footer
-        "not-has-[+[data-slot=drawer-footer]]:pb-5",
-        // Inset footer variant: add bottom padding before bordered footer
-        "in-data-[footer-variant=inset]:has-[+[data-slot=drawer-footer]]:pb-5",
-        className,
-      )}
-      {...props}
-    />
+      className={cn(wrapperClassName, "flex flex-col")}
+    >
+      <ScrollArea
+        className="flex-1"
+        fadeEdges={fadeEdges}
+        scrollbarGutter={scrollbarGutter}
+        persistScrollbar={persistScrollbar}
+        hideScrollbar={hideScrollbar}
+      >
+        <div className={contentClassName} {...props}>
+          {children}
+        </div>
+      </ScrollArea>
+    </div>
   );
 }
 

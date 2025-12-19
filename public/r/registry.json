@@ -47,6 +47,9 @@
           "target": "components/ui/cubby-ui/alert-dialog.tsx"
         }
       ],
+      "registryDependencies": [
+        "@cubby-ui/scroll-area"
+      ],
       "dependencies": [
         "lucide-react"
       ]
@@ -560,6 +563,9 @@
           "target": "components/ui/cubby-ui/drawer.css"
         }
       ],
+      "registryDependencies": [
+        "@cubby-ui/scroll-area"
+      ],
       "dependencies": [
         "class-variance-authority"
       ]
@@ -1052,6 +1058,9 @@
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/sheet.tsx"
         }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/scroll-area"
       ],
       "dependencies": [
         "class-variance-authority",

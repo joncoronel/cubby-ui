@@ -56,7 +56,9 @@ Use nested alert dialogs for multi-step confirmations.
   fullType="boolean"
   defaultValue="false"
 >
-  Use native browser scrolling instead of the custom ScrollArea component.
+  Use native browser scrolling instead of Base UI's ScrollArea. Fade edges still
+  work using CSS scroll-driven animations (Chrome 115+, with static fallback).
+  Note: `persistScrollbar` is not supported with `nativeScroll`.
 </ApiProp>
 
 <ApiProp

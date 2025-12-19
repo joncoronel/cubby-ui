@@ -1,6 +1,9 @@
+import * as React from "react";
 import { ScrollArea as BaseScrollArea } from "@base-ui/react/scroll-area";
 
 import { cn } from "@/lib/utils";
+
+import "./scroll-area.css";
 
 type FadeEdge = "top" | "bottom" | "left" | "right" | "x" | "y";
 type FadeEdges = boolean | FadeEdge | FadeEdge[];
@@ -41,6 +44,7 @@ interface ScrollAreaProps extends BaseScrollArea.Root.Props {
   scrollbarGutter?: boolean;
   persistScrollbar?: boolean;
   hideScrollbar?: boolean;
+  nativeScroll?: boolean;
 }
 
 function ScrollArea({
@@ -50,6 +54,7 @@ function ScrollArea({
   scrollbarGutter = false,
   persistScrollbar = false,
   hideScrollbar = false,
+  nativeScroll = false,
   ...props
 }: ScrollAreaProps) {
   if (process.env.NODE_ENV !== "production") {
@@ -58,6 +63,27 @@ function ScrollArea({
         "ScrollArea: `persistScrollbar` and `hideScrollbar` cannot be used together.",
       );
     }
+    if (nativeScroll && persistScrollbar) {
+      console.error(
+        "ScrollArea: `persistScrollbar` is not supported with `nativeScroll`.",
+      );
+    }
+  }
+
+  if (nativeScroll) {
+    // NativeScrollArea only accepts string className, not the function variant from Base UI
+    const nativeClassName =
+      typeof className === "string" ? className : undefined;
+    return (
+      <NativeScrollArea
+        className={nativeClassName}
+        fadeEdges={fadeEdges}
+        hideScrollbar={hideScrollbar}
+        scrollbarGutter={scrollbarGutter}
+      >
+        {children}
+      </NativeScrollArea>
+    );
   }
 
   const fade = parseFadeEdges(fadeEdges);
@@ -120,9 +146,86 @@ function ScrollBar({
     >
       <BaseScrollArea.Thumb
         data-slot="scroll-area-thumb"
-        className="bg-muted-foreground/20 relative flex-1 rounded-full"
+        className="bg-scrollbar relative flex-1 rounded-full"
       />
     </BaseScrollArea.Scrollbar>
+  );
+}
+
+/**
+ * Native scroll implementation using CSS scroll-driven animations for fade edges.
+ * Uses browser's native scrolling with styled scrollbars.
+ * Fade edges are animated based on scroll position (Chrome 115+, static fallback elsewhere).
+ */
+function NativeScrollArea({
+  className,
+  children,
+  fadeEdges = false,
+  hideScrollbar = false,
+  scrollbarGutter = false,
+  ...props
+}: Omit<
+  React.ComponentProps<"div">,
+  "onScroll" | "onScrollCapture" | "onWheel" | "onWheelCapture"
+> & {
+  fadeEdges?: FadeEdges;
+  hideScrollbar?: boolean;
+  scrollbarGutter?: boolean;
+}) {
+  const fade = parseFadeEdges(fadeEdges);
+  const hasFade = fade.top || fade.bottom || fade.left || fade.right;
+  const hasVerticalFade = fade.top || fade.bottom;
+  const hasHorizontalFade = fade.left || fade.right;
+
+  // Build animation styles for scroll-driven fade
+  const animationStyle: React.CSSProperties | undefined = hasFade
+    ? {
+        animationName: [
+          hasVerticalFade && "scroll-fade-y",
+          hasHorizontalFade && "scroll-fade-x",
+        ]
+          .filter(Boolean)
+          .join(", "),
+        animationTimeline: [
+          hasVerticalFade && "scroll(y self)",
+          hasHorizontalFade && "scroll(x self)",
+        ]
+          .filter(Boolean)
+          .join(", "),
+        animationTimingFunction: "linear",
+        animationFillMode: "both",
+      }
+    : undefined;
+
+  return (
+    <div
+      data-slot="scroll-area"
+      data-native-scroll
+      className={cn(
+        "size-full min-h-0 overflow-auto rounded-[inherit]",
+        "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+        hasFade && "[--scroll-fade-size:1.5rem]",
+        // Native scroll uses scroll-driven animation CSS variables
+        // Fallbacks: top/left default to hidden (at start), bottom/right default to visible (more content)
+        fade.top &&
+          "supports-[animation-timeline:scroll()]:mask-t-from-[calc(100%-var(--scroll-fade-top))]",
+        fade.bottom &&
+          "supports-[animation-timeline:scroll()]:mask-b-from-[calc(100%-var(--scroll-fade-bottom))]",
+        fade.left &&
+          "supports-[animation-timeline:scroll()]:mask-l-from-[calc(100%-var(--scroll-fade-left))]",
+        fade.right &&
+          "supports-[animation-timeline:scroll()]:mask-r-from-[calc(100%-var(--scroll-fade-right))]",
+        hideScrollbar ? "[scrollbar-width:none]" : "[scrollbar-width:thin]",
+        scrollbarGutter && "[scrollbar-gutter:stable]",
+        "[scrollbar-color:var(--color-scrollbar)_transparent]",
+        className,
+      )}
+      style={animationStyle}
+      tabIndex={0}
+      {...props}
+    >
+      {children}
+    </div>
   );
 }
 

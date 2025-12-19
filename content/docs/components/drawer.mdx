@@ -211,9 +211,11 @@ For the complete Base UI API, see the [Base UI Dialog documentation](https://bas
 <ApiProp
   name="nativeScroll"
   fullType="boolean"
-  defaultValue="true"
+  defaultValue="false"
 >
-  Use native browser scrolling instead of the custom ScrollArea component. Defaults to `true` for drawer because ScrollArea can cause animation stutter with the drawer's scroll-snap mechanics. Set to `false` to use ScrollArea features like fade edges and custom scrollbars.
+  Use native browser scrolling instead of Base UI's ScrollArea. Fade edges still
+  work using CSS scroll-driven animations (Chrome 115+, with static fallback).
+  Note: `persistScrollbar` is not supported with `nativeScroll`.
 </ApiProp>
 
 <ApiProp

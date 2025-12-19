@@ -1038,7 +1038,7 @@ function DrawerDescription({
 
 function DrawerBody({
   className,
-  nativeScroll = true,
+  nativeScroll = false,
   fadeEdges = true,
   scrollbarGutter = false,
   persistScrollbar,
@@ -1054,46 +1054,15 @@ function DrawerBody({
   const { direction } = useDrawer();
   const { isVertical } = DIRECTION_CONFIG[direction];
 
-  // Wrapper handles flex sizing and sibling-dependent padding
-  const wrapperClassName = cn(
-    "flex-1 min-h-0 overflow-hidden",
-    // Add extra top padding when body is first (no header before it)
-    // Note: first: works when no Handle precedes; for Handle-first layouts,
-    // Header provides the top separation so pt-1 is sufficient
-    "first:pt-4",
-    // Add extra bottom padding when body is not followed by footer
-    "not-has-[+[data-slot=drawer-footer]]:pb-4",
-    // Inset footer variant: add bottom padding before bordered footer
-    "in-data-[footer-variant=inset]:has-[+[data-slot=drawer-footer]]:pb-4",
-  );
-
-  // Content padding and user layout classes
-  const contentClassName = cn(
-    // Padding with extra space for focus rings (py-1 = 4px accommodates 2px offset + 2px ring)
-    "px-5 py-1",
-    // Constrain touch gestures to drawer direction only
-    // For horizontal drawers, this prevents vertical swipes from triggering
-    // browser UI (URL bar collapse/expand on mobile)
-    isVertical ? "touch-pan-y" : "touch-pan-x",
-    className,
-  );
-
-  if (nativeScroll) {
-    return (
-      <div
-        data-slot="drawer-body"
-        className={cn(wrapperClassName, contentClassName, "overflow-y-auto")}
-        {...props}
-      >
-        {children}
-      </div>
-    );
-  }
-
   return (
     <div
       data-slot="drawer-body"
-      className={cn(wrapperClassName, "flex flex-col")}
+      className={cn(
+        "flex flex-1 min-h-0 flex-col overflow-hidden",
+        "first:pt-4",
+        "not-has-[+[data-slot=drawer-footer]]:pb-4",
+        "in-data-[footer-variant=inset]:has-[+[data-slot=drawer-footer]]:pb-4",
+      )}
     >
       <ScrollArea
         className="flex-1"
@@ -1101,8 +1070,16 @@ function DrawerBody({
         scrollbarGutter={scrollbarGutter}
         persistScrollbar={persistScrollbar}
         hideScrollbar={hideScrollbar}
+        nativeScroll={nativeScroll}
       >
-        <div className={contentClassName} {...props}>
+        <div
+          className={cn(
+            "px-5 py-1",
+            isVertical ? "touch-pan-y" : "touch-pan-x",
+            className,
+          )}
+          {...props}
+        >
           {children}
         </div>
       </ScrollArea>

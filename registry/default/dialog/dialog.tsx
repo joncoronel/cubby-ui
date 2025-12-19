@@ -144,40 +144,15 @@ function DialogBody({
     ScrollAreaProps,
     "fadeEdges" | "scrollbarGutter" | "persistScrollbar" | "hideScrollbar"
   >) {
-  // Wrapper handles flex sizing and sibling-dependent padding
-  const wrapperClassName = cn(
-    "flex-1 min-h-0",
-    // Add extra top padding when body is first (no header)
-    "first:pt-5",
-    // Add extra bottom padding when body is not followed by footer
-    "not-has-[+[data-slot=dialog-footer]]:pb-5",
-    // Inset variant: add bottom padding before bordered footer
-    "in-data-[variant=inset]:has-[+[data-slot=dialog-footer]]:pb-5",
-  );
-
-  // Content padding and user layout classes
-  const contentClassName = cn(
-    // Padding with extra space for focus rings (p-1 = 4px accommodates 2px offset + 2px ring)
-    "px-6 py-1",
-    className,
-  );
-
-  if (nativeScroll) {
-    return (
-      <div
-        data-slot="dialog-body"
-        className={cn(wrapperClassName, contentClassName, "overflow-y-auto")}
-        {...props}
-      >
-        {children}
-      </div>
-    );
-  }
-
   return (
     <div
       data-slot="dialog-body"
-      className={cn(wrapperClassName, "flex flex-col")}
+      className={cn(
+        "flex flex-1 min-h-0 flex-col",
+        "first:pt-5",
+        "not-has-[+[data-slot=dialog-footer]]:pb-5",
+        "in-data-[variant=inset]:has-[+[data-slot=dialog-footer]]:pb-5",
+      )}
     >
       <ScrollArea
         className="flex-1"
@@ -185,8 +160,9 @@ function DialogBody({
         scrollbarGutter={scrollbarGutter}
         persistScrollbar={persistScrollbar}
         hideScrollbar={hideScrollbar}
+        nativeScroll={nativeScroll}
       >
-        <div className={contentClassName} {...props}>
+        <div className={cn("px-6 py-1", className)} {...props}>
           {children}
         </div>
       </ScrollArea>

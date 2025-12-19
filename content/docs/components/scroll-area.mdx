@@ -87,4 +87,15 @@ For the complete Base UI API, see the [Base UI ScrollArea documentation](https:/
   `persistScrollbar`.
 </ApiProp>
 
+<ApiProp name="nativeScroll" fullType="boolean" simpleType="boolean" defaultValue="false">
+  Uses native browser scrolling instead of Base UI's ScrollArea. The scrollbar
+  is styled to match using CSS, and fade edges use CSS scroll-driven animations
+  (Chrome 115+, with static fallback for other browsers). Useful when you need
+  native scroll behavior or want to avoid Base UI's overhead.
+
+  Note: `persistScrollbar` is not supported with `nativeScroll`. With `nativeScroll`,
+  `scrollbarGutter` always reserves space (CSS `scrollbar-gutter: stable`), while the
+  default only reserves space when content overflows.
+</ApiProp>
+
 </ApiPropsList>

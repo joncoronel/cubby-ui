@@ -651,6 +651,7 @@
           "color-border": "var(--border)",
           "color-input": "var(--input)",
           "color-ring": "var(--ring)",
+          "color-scrollbar": "var(--scrollbar)",
           "color-sidebar": "var(--sidebar)",
           "color-sidebar-foreground": "var(--sidebar-foreground)",
           "color-sidebar-primary": "var(--sidebar-primary)",
@@ -704,6 +705,7 @@
           "border": "oklch(0 0 0 / 8%)",
           "input": "oklch(0.95 0 0)",
           "ring": "oklch(0.55 0.2 250)",
+          "scrollbar": "oklch(0.87 0 0)",
           "sidebar": "oklch(0.98 0 0)",
           "sidebar-foreground": "oklch(0.22 0 0)",
           "sidebar-primary": "oklch(0.28 0 0)",
@@ -744,6 +746,7 @@
           "destructive-foreground": "oklch(1 0 0)",
           "border": "oklch(1 0 0 / 5%)",
           "input": "oklch(1 0 0 / 15%)",
+          "scrollbar": "oklch(0.7 0 0)",
           "sidebar": "oklch(0.19 0 0)",
           "sidebar-foreground": "oklch(0.88 0 0)",
           "sidebar-primary": "oklch(0.95 0 0)",
@@ -1008,6 +1011,11 @@
           "path": "registry/default/scroll-area/scroll-area.tsx",
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/scroll-area.tsx"
+        },
+        {
+          "path": "registry/default/scroll-area/scroll-area.css",
+          "type": "registry:file",
+          "target": "components/ui/cubby-ui/scroll-area.css"
         }
       ]
     },

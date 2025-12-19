@@ -47,6 +47,7 @@ html {
   --border: light-dark(oklch(0 0 0 / 8%), oklch(1 0 0 / 5%));
   --input: light-dark(oklch(0.95 0 0), oklch(1 0 0 / 15%));
   --ring: oklch(0.55 0.2 250);
+  --scrollbar: light-dark(oklch(0.87 0 0), oklch(0.7 0 0));
 
   /* Sidebar colors */
   --sidebar: light-dark(oklch(0.98 0 0), oklch(0.19 0 0));
@@ -103,7 +104,7 @@ html {
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-
+  --color-scrollbar: var(--scrollbar);
   /* Status colors */
   --color-success-border: var(--success-border);
   --color-success-foreground: var(--success-foreground);

@@ -33,7 +33,11 @@ export default function ComboboxGrouped() {
       </div>
       <ComboboxPopup>
         <ComboboxEmpty>No produce found.</ComboboxEmpty>
-        <ComboboxList fadeEdges={"top"} className="not-empty:pt-0">
+        <ComboboxList
+          fadeEdges={"bottom"}
+          nativeScroll
+          className="not-empty:pt-0"
+        >
           {(group: ProduceGroup) => (
             <React.Fragment key={group.value}>
               <ComboboxGroup key={group.value} items={group.items}>

@@ -297,8 +297,9 @@ function Drawer({
       if (isAnimating) return;
       // Prevent closing while actively scrolling/dragging (swipe momentum)
       // BUT allow swipe dismiss (which passes reason: "swipe-dismiss")
-      if (!nextOpen && isDragging && eventDetails?.reason !== "swipe-dismiss")
+      if (!nextOpen && isDragging && eventDetails?.reason !== "swipe-dismiss") {
         return;
+      }
 
       // Start animation state - will be cleared by onOpenChangeComplete
       setIsAnimating(true);

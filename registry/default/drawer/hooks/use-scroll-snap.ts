@@ -530,10 +530,11 @@ export function useScrollSnap(
     }
   }, []);
 
-  // Touch/mouse handlers to track if user is actively touching
+  // Touch handlers to track if user is actively touching (touch only, not mouse)
   // (Used by RAF stability check to distinguish "holding still" from "released")
-  // Note: We use touch/mouse instead of Pointer Events because iOS Safari
-  // has quirky behavior with pointer events that causes flickering
+  // Note: We use touch events only (not mouse) because:
+  // 1. iOS Safari has quirky behavior with pointer events that causes flickering
+  // 2. Mouse clicks on desktop can cause tiny scroll jitter that falsely triggers isScrolling
   const handleTouchStart = React.useCallback(() => {
     interactionRef.current.isPointerDown = true;
   }, []);
@@ -726,9 +727,9 @@ export function useScrollSnap(
     // Attach event listeners
     container.addEventListener("scroll", handleScroll, { passive: true });
 
-    // Touch/mouse tracking to distinguish "holding still" from "released with momentum"
-    // Note: We use touch/mouse events instead of Pointer Events because iOS Safari
-    // has quirky behavior with pointer events that causes flickering when holding still
+    // Touch tracking to distinguish "holding still" from "released with momentum"
+    // Note: We use touch events only (not mouse) to avoid false positives from
+    // mouse click jitter on desktop triggering scroll events
     container.addEventListener("touchstart", handleTouchStart, {
       passive: true,
     });
@@ -736,8 +737,6 @@ export function useScrollSnap(
     container.addEventListener("touchcancel", handleTouchEnd, {
       passive: true,
     });
-    container.addEventListener("mousedown", handleTouchStart);
-    container.addEventListener("mouseup", handleTouchEnd);
 
     if (supportsScrollEnd) {
       container.addEventListener("scrollend", handleScrollEnd);
@@ -759,8 +758,6 @@ export function useScrollSnap(
       container.removeEventListener("touchstart", handleTouchStart);
       container.removeEventListener("touchend", handleTouchEnd);
       container.removeEventListener("touchcancel", handleTouchEnd);
-      container.removeEventListener("mousedown", handleTouchStart);
-      container.removeEventListener("mouseup", handleTouchEnd);
 
       if (supportsScrollEnd) {
         container.removeEventListener("scrollend", handleScrollEnd);

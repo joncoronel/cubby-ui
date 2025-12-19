@@ -1014,6 +1014,9 @@
           "target": "components/ui/cubby-ui/select.tsx"
         }
       ],
+      "registryDependencies": [
+        "@cubby-ui/scroll-area"
+      ],
       "dependencies": [
         "@hugeicons/react",
         "@hugeicons/core-free-icons"

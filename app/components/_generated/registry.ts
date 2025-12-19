@@ -673,7 +673,9 @@ export const componentMetadata = {
     "title": "Dialog",
     "description": "A dialog component.",
     "category": "UI",
-    "registryDependencies": [],
+    "registryDependencies": [
+      "@cubby-ui/scroll-area"
+    ],
     "dependencies": [
       "lucide-react"
     ],

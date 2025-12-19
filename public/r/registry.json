@@ -521,6 +521,9 @@
           "target": "components/ui/cubby-ui/dialog.tsx"
         }
       ],
+      "registryDependencies": [
+        "@cubby-ui/scroll-area"
+      ],
       "dependencies": [
         "lucide-react"
       ]

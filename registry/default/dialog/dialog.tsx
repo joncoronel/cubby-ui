@@ -5,6 +5,10 @@ import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import { XIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import {
+  ScrollArea,
+  type ScrollAreaProps,
+} from "@/registry/default/scroll-area/scroll-area";
 
 const Dialog = BaseDialog.Root;
 
@@ -81,7 +85,7 @@ function DialogContent({
             "data-starting-style:translate-y-[calc(1.25rem)] data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:translate-y-[calc(1.25rem)] data-ending-style:scale-95 data-ending-style:opacity-0",
             // Nested dialog overlay (hidden by default, fades in/out using allow-discrete)
-            "after:pointer-events-none after:absolute after:inset-0 after:hidden after:rounded-[inherit] after:bg-black/5 after:opacity-0 after:transition-[opacity,display] after:duration-200 after:transition-discrete",
+            "after:pointer-events-none after:absolute after:inset-0 after:hidden after:rounded-[inherit] after:bg-black/5 after:opacity-0 after:transition-[opacity,display] after:transition-discrete after:duration-200",
             "data-nested-dialog-open:after:block data-nested-dialog-open:after:opacity-100",
             "starting:data-nested-dialog-open:after:opacity-0",
             className,
@@ -127,23 +131,66 @@ function DialogHeader({
 // Body component
 function DialogBody({
   className,
+  nativeScroll = false,
+  fadeEdges = true,
+  scrollbarGutter = false,
+  persistScrollbar,
+  hideScrollbar,
+  children,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+}: React.HTMLAttributes<HTMLDivElement> & {
+  nativeScroll?: boolean;
+} & Pick<
+    ScrollAreaProps,
+    "fadeEdges" | "scrollbarGutter" | "persistScrollbar" | "hideScrollbar"
+  >) {
+  // Wrapper handles flex sizing and sibling-dependent padding
+  const wrapperClassName = cn(
+    "flex-1 min-h-0",
+    // Add extra top padding when body is first (no header)
+    "first:pt-5",
+    // Add extra bottom padding when body is not followed by footer
+    "not-has-[+[data-slot=dialog-footer]]:pb-5",
+    // Inset variant: add bottom padding before bordered footer
+    "in-data-[variant=inset]:has-[+[data-slot=dialog-footer]]:pb-5",
+  );
+
+  // Content padding and user layout classes
+  const contentClassName = cn(
+    // Padding with extra space for focus rings (p-1 = 4px accommodates 2px offset + 2px ring)
+    "px-6 py-1",
+    className,
+  );
+
+  if (nativeScroll) {
+    return (
+      <div
+        data-slot="dialog-body"
+        className={cn(wrapperClassName, contentClassName, "overflow-y-auto")}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+
   return (
     <div
       data-slot="dialog-body"
-      className={cn(
-        "flex-1 overflow-y-auto px-6 pt-1 pb-1",
-        // Add extra top padding when body is first (no header)
-        "first:pt-6",
-        // Add extra bottom padding when body is not followed by footer
-        "not-has-[+[data-slot=dialog-footer]]:pb-6",
-        // Inset variant: add bottom padding before bordered footer
-        "in-data-[variant=inset]:has-[+[data-slot=dialog-footer]]:pb-6",
-        className,
-      )}
-      {...props}
-    />
+      className={cn(wrapperClassName, "flex flex-col")}
+    >
+      <ScrollArea
+        className="flex-1"
+        fadeEdges={fadeEdges}
+        scrollbarGutter={scrollbarGutter}
+        persistScrollbar={persistScrollbar}
+        hideScrollbar={hideScrollbar}
+      >
+        <div className={contentClassName} {...props}>
+          {children}
+        </div>
+      </ScrollArea>
+    </div>
   );
 }
 

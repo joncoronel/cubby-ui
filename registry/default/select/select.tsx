@@ -11,6 +11,10 @@ import {
 } from "@hugeicons/core-free-icons";
 
 import { cn } from "@/lib/utils";
+import {
+  ScrollArea,
+  type ScrollAreaProps,
+} from "@/registry/default/scroll-area/scroll-area";
 
 const Select = BaseSelect.Root;
 
@@ -122,10 +126,13 @@ function SelectTrigger({
   );
 }
 
-interface SelectContentProps extends Omit<
-  BaseSelect.Positioner.Props,
-  "render"
-> {
+interface SelectContentProps
+  extends
+    Omit<BaseSelect.Positioner.Props, "render">,
+    Pick<
+      ScrollAreaProps,
+      "fadeEdges" | "scrollbarGutter" | "persistScrollbar" | "hideScrollbar"
+    > {
   className?: string;
   showScrollArrows?: boolean;
 }
@@ -135,10 +142,29 @@ function SelectContent({
   sideOffset = 6,
   alignItemWithTrigger = false,
   showScrollArrows = false,
+  fadeEdges = true,
+  scrollbarGutter = false,
+  persistScrollbar,
+  hideScrollbar,
   children,
   ...props
 }: SelectContentProps) {
-  showScrollArrows = showScrollArrows || alignItemWithTrigger;
+  const useScrollArrows = showScrollArrows || alignItemWithTrigger;
+
+  const listContent = (
+    <BaseSelect.List
+      data-slot="select-list"
+      className={cn(
+        "rounded-xl p-1",
+        useScrollArrows && "scroll-py-6 overflow-y-auto",
+        "data-[side=none]:max-h-(--available-height)",
+        className,
+      )}
+    >
+      {children}
+    </BaseSelect.List>
+  );
+
   return (
     <SelectPortal>
       <SelectBackdrop />
@@ -159,8 +185,6 @@ function SelectContent({
             "min-w-[var(--anchor-width)]",
             // when data side does not equal none
             "not-data-[side=none]:max-h-[var(--available-height)]",
-            // "overflow-hidden",
-
             // Shadow
             "shadow-[0_8px_20px_0_oklch(0.18_0_0_/_0.10)]",
             // Animation
@@ -168,46 +192,39 @@ function SelectContent({
             "data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[side=none]:data-[ending-style]:transition-none data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[side=none]:data-[starting-style]:scale-100 data-[side=none]:data-[starting-style]:opacity-100 data-[side=none]:data-[starting-style]:transition-none",
           )}
         >
-          {showScrollArrows && (
-            <BaseSelect.ScrollUpArrow
-              data-slot="select-scroll-up-arrow"
-              className={cn(
-                "from-popover top-0 z-[1] hidden w-full cursor-default items-center justify-center rounded-t-xl bg-gradient-to-b from-50% to-transparent py-0.5",
-                showScrollArrows && "flex",
-              )}
+          {useScrollArrows ? (
+            <>
+              <BaseSelect.ScrollUpArrow
+                data-slot="select-scroll-up-arrow"
+                className="from-popover top-0 z-[1] flex w-full cursor-default items-center justify-center rounded-t-xl bg-gradient-to-b from-50% to-transparent py-0.5"
+              >
+                <HugeiconsIcon
+                  className="size-4"
+                  strokeWidth={2}
+                  icon={ArrowUp01Icon}
+                />
+              </BaseSelect.ScrollUpArrow>
+              {listContent}
+              <BaseSelect.ScrollDownArrow
+                data-slot="select-scroll-down-arrow"
+                className="from-popover bottom-0 z-[1] flex w-full cursor-default items-center justify-center rounded-b-xl bg-gradient-to-t from-50% to-transparent py-0.5"
+              >
+                <HugeiconsIcon
+                  className="size-4"
+                  strokeWidth={2}
+                  icon={ArrowDown01Icon}
+                />
+              </BaseSelect.ScrollDownArrow>
+            </>
+          ) : (
+            <ScrollArea
+              fadeEdges={fadeEdges}
+              scrollbarGutter={scrollbarGutter}
+              persistScrollbar={persistScrollbar}
+              hideScrollbar={hideScrollbar}
             >
-              <HugeiconsIcon
-                className="size-4"
-                strokeWidth={2}
-                icon={ArrowUp01Icon}
-              />
-            </BaseSelect.ScrollUpArrow>
-          )}
-          <BaseSelect.List
-            data-slot="select-list"
-            className={cn(
-              // Scrollable list container - max height and overflow are here now
-              "scroll-py-6 overflow-y-auto rounded-xl p-1",
-              "data-[side=none]:max-h-(--available-height)",
-              className,
-            )}
-          >
-            {children}
-          </BaseSelect.List>
-          {showScrollArrows && (
-            <BaseSelect.ScrollDownArrow
-              data-slot="select-scroll-down-arrow"
-              className={cn(
-                "from-popover bottom-0 z-[1] hidden w-full cursor-default items-center justify-center rounded-b-xl bg-gradient-to-t from-50% to-transparent py-0.5",
-                showScrollArrows && "flex",
-              )}
-            >
-              <HugeiconsIcon
-                className="size-4"
-                strokeWidth={2}
-                icon={ArrowDown01Icon}
-              />
-            </BaseSelect.ScrollDownArrow>
+              {listContent}
+            </ScrollArea>
           )}
         </BaseSelect.Popup>
       </BaseSelect.Positioner>

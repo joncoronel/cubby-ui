@@ -253,7 +253,7 @@ function ComboboxList({
   className,
   nativeScroll = false,
   fadeEdges = true,
-  scrollbarGutter = true,
+  scrollbarGutter = false,
   persistScrollbar,
   hideScrollbar,
   ...props

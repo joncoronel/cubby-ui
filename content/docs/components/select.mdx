@@ -131,7 +131,7 @@ For the complete Base UI API, see the [Base UI Select documentation](https://bas
   fullType="boolean"
   defaultValue="false"
 >
-  Show scroll indicator arrows when content is scrollable.
+  Show scroll indicator arrows when content is scrollable. When enabled, uses native scrolling instead of ScrollArea.
 </ApiProp>
 
 <ApiProp
@@ -139,7 +139,39 @@ For the complete Base UI API, see the [Base UI Select documentation](https://bas
   fullType="boolean"
   defaultValue="false"
 >
-  Align the selected item with the trigger button position.
+  Align the selected item with the trigger button position. Automatically enables scroll arrows.
+</ApiProp>
+
+<ApiProp
+  name="fadeEdges"
+  fullType="boolean | 'top' | 'bottom' | 'left' | 'right' | 'x' | 'y' | FadeEdge[]"
+  defaultValue="true"
+>
+  Controls the fade effect on scroll edges. Only applies when `showScrollArrows` is false. See [ScrollArea](/docs/components/scroll-area#custom-props) for all options.
+</ApiProp>
+
+<ApiProp
+  name="scrollbarGutter"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Reserves space for the scrollbar when content overflows, preventing layout shift. Only applies when `showScrollArrows` is false.
+</ApiProp>
+
+<ApiProp
+  name="persistScrollbar"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Always show the scrollbar instead of fading it in on hover or scroll. Only applies when `showScrollArrows` is false.
+</ApiProp>
+
+<ApiProp
+  name="hideScrollbar"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Hides the scrollbar while keeping scroll functionality. Only applies when `showScrollArrows` is false.
 </ApiProp>
 
 </ApiPropsList>

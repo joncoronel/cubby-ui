@@ -71,7 +71,7 @@ export default function SelectWithGroups() {
       </SelectTrigger>
       <SelectContent fadeEdges={"bottom"} className="max-h-[300px]">
         <SelectGroup>
-          <SelectGroupLabel className="sticky top-0 z-[1]">
+          <SelectGroupLabel className="sticky top-0 z-1">
             North America
           </SelectGroupLabel>
           {timezoneItems
@@ -84,7 +84,7 @@ export default function SelectWithGroups() {
         </SelectGroup>
         <SelectSeparator className="" />
         <SelectGroup>
-          <SelectGroupLabel className="sticky top-0 z-[1]">
+          <SelectGroupLabel className="sticky top-0 z-1">
             Europe & Africa
           </SelectGroupLabel>
           {timezoneItems
@@ -97,7 +97,7 @@ export default function SelectWithGroups() {
         </SelectGroup>
         <SelectSeparator className="" />
         <SelectGroup>
-          <SelectGroupLabel className="sticky top-0 z-[1]">
+          <SelectGroupLabel className="sticky top-0 z-1">
             Asia
           </SelectGroupLabel>
           {timezoneItems

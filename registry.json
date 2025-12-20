@@ -89,6 +89,9 @@
           "target": "hooks/cubby-ui/use-fuzzy-filter.ts"
         }
       ],
+      "registryDependencies": [
+        "@cubby-ui/scroll-area"
+      ],
       "dependencies": [
         "match-sorter"
       ]

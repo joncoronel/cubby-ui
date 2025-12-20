@@ -1,6 +1,10 @@
 import * as React from "react";
 import { Autocomplete as BaseAutocomplete } from "@base-ui/react/autocomplete";
 import { cn } from "@/lib/utils";
+import {
+  ScrollArea,
+  type ScrollAreaProps,
+} from "@/registry/default/scroll-area/scroll-area";
 
 const AutocompleteRoot = BaseAutocomplete.Root;
 
@@ -12,10 +16,10 @@ function AutocompleteInput({
     <BaseAutocomplete.Input
       data-slot="autocomplete-input"
       className={cn(
-        "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground bg-input border-border/80 flex w-full min-w-0 rounded-md border px-3 py-2 text-base shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.03)] transition-colors duration-200 outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm",
+        "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground bg-input dark:bg-input/30 border-border flex h-10 w-full min-w-0 rounded-lg border px-3 text-base font-normal shadow-[0_1px_2px_0_oklch(0.18_0_0/0.03)] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 sm:h-9 md:text-sm",
         "file:text-foreground file:inline-flex file:h-7 file:rounded-md file:border-0 file:bg-transparent file:text-sm file:font-medium",
-        "focus-visible:border-ring focus-visible:ring-ring/30 focus-visible:ring-3",
-        "aria-invalid:ring-destructive/30 aria-invalid:border-destructive",
+        "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+        "aria-invalid:ring-destructive/30 aria-invalid:border-destructive aria-invalid:ring-2",
         className,
       )}
       {...props}
@@ -32,8 +36,8 @@ function AutocompleteTrigger({
     <BaseAutocomplete.Trigger
       data-slot="autocomplete-trigger"
       className={cn(
-        "border-border/70 bg-card hover:bg-accent/5 inline-flex h-9 items-center justify-center rounded-md border px-3 py-2 text-sm font-medium shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.04)] transition-colors disabled:pointer-events-none disabled:opacity-60",
-        "focus-visible:border-ring focus-visible:ring-ring/30 focus-visible:ring-3",
+        "border-border/70 bg-card hover:bg-accent/5 inline-flex h-9 items-center justify-center rounded-lg border px-3 py-2 text-sm font-medium shadow-[0_1px_2px_0_oklch(0.18_0_0/0.04)] transition-colors disabled:pointer-events-none disabled:opacity-60",
+        "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
         className,
       )}
       {...props}
@@ -64,8 +68,9 @@ function AutocompleteClear({
     <BaseAutocomplete.Clear
       data-slot="autocomplete-clear"
       className={cn(
-        "inline-flex h-4 w-4 items-center justify-center rounded-sm opacity-70 transition-opacity hover:opacity-100 disabled:pointer-events-none",
-        "focus-visible:border-ring focus-visible:ring-ring/30 outline-none focus-visible:ring-3",
+        "inline-flex h-4 w-4 cursor-pointer items-center justify-center rounded-sm opacity-70 transition-[opacity,scale,transform,translate] hover:opacity-100 disabled:pointer-events-none",
+        "focus-visible:border-ring focus-visible:ring-ring/30 duration-100 outline-none focus-visible:ring-3",
+        "data-ending-style:translate-x-1 data-ending-style:opacity-0 data-starting-style:translate-x-1 data-starting-style:opacity-0",
         className,
       )}
       {...props}
@@ -89,7 +94,7 @@ function AutocompleteBackdrop({
     <BaseAutocomplete.Backdrop
       data-slot="autocomplete-backdrop"
       className={cn(
-        "fixed inset-0 z-30 bg-black/50 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+        "fixed inset-0 z-30 bg-black/50 data-ending-style:opacity-0 data-starting-style:opacity-0",
         className,
       )}
       {...props}
@@ -119,7 +124,7 @@ function AutocompletePopup({
     <BaseAutocomplete.Popup
       data-slot="autocomplete-popup"
       className={cn(
-        "bg-popover text-popover-foreground outline-border/70 max-h-[min(var(--available-height),23rem)] w-[var(--anchor-width)] max-w-[var(--available-width)] origin-[var(--transform-origin)] scroll-pt-2 scroll-pb-2 overflow-y-auto overscroll-contain rounded-md p-1 shadow-[0_8px_20px_0_oklch(0.18_0_0_/_0.10)] outline transition-[transform,scale,opacity] duration-100 ease-out data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
+        "bg-popover text-popover-foreground ring-border/50 dark:ring-border ease-out-cubic flex max-h-[var(--available-height)] w-[var(--anchor-width)] max-w-[var(--available-width)] origin-[var(--transform-origin)] flex-col overflow-clip overscroll-contain rounded-xl shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)] ring-1 transition-[transform,scale,opacity] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
         className,
       )}
       {...props}
@@ -188,14 +193,36 @@ function AutocompleteEmpty({
 
 function AutocompleteList({
   className,
+  nativeScroll = false,
+  fadeEdges = true,
+  scrollbarGutter = false,
+  persistScrollbar,
+  hideScrollbar,
   ...props
-}: BaseAutocomplete.List.Props) {
+}: BaseAutocomplete.List.Props &
+  Pick<
+    ScrollAreaProps,
+    | "nativeScroll"
+    | "fadeEdges"
+    | "scrollbarGutter"
+    | "persistScrollbar"
+    | "hideScrollbar"
+  >) {
   return (
-    <BaseAutocomplete.List
-      data-slot="autocomplete-list"
-      className={cn("", className)}
-      {...props}
-    />
+    <ScrollArea
+      nativeScroll={nativeScroll}
+      fadeEdges={fadeEdges}
+      scrollbarGutter={scrollbarGutter}
+      persistScrollbar={persistScrollbar}
+      hideScrollbar={hideScrollbar}
+      className={cn("max-h-80", className)}
+    >
+      <BaseAutocomplete.List
+        data-slot="autocomplete-list"
+        className="rounded-xl"
+        {...props}
+      />
+    </ScrollArea>
   );
 }
 
@@ -228,7 +255,9 @@ function AutocompleteItem({
     <BaseAutocomplete.Item
       data-slot="autocomplete-item"
       className={cn(
-        "data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground relative flex cursor-default items-center rounded-[8px] px-2.5 py-2 text-sm outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-60",
+        "data-highlighted:bg-accent/50 data-highlighted:text-accent-foreground relative flex cursor-default items-center rounded-md px-2.5 py-2 text-sm outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60",
+        // Spacing from list edges
+        "mx-1 first:mt-1 last:mb-1",
         className,
       )}
       {...props}
@@ -243,7 +272,7 @@ function AutocompleteGroup({
   return (
     <BaseAutocomplete.Group
       data-slot="autocomplete-group"
-      className={cn("text-foreground block pb-2", className)}
+      className={cn("text-foreground block", className)}
       {...props}
     />
   );
@@ -256,7 +285,10 @@ function AutocompleteGroupLabel({
   return (
     <BaseAutocomplete.GroupLabel
       data-slot="autocomplete-group-label"
-      className={cn("px-2 py-1.5 text-sm font-semibold", className)}
+      className={cn(
+        "text-muted-foreground bg-popover px-3.5 py-1.5 pt-2.5 text-xs font-semibold",
+        className,
+      )}
       {...props}
     />
   );
@@ -269,7 +301,7 @@ function AutocompleteSeparator({
   return (
     <BaseAutocomplete.Separator
       data-slot="autocomplete-separator"
-      className={cn("bg-border/20 -mx-1 my-1 h-px", className)}
+      className={cn("bg-border mx-1 my-1 h-px min-h-px", className)}
       {...props}
     />
   );

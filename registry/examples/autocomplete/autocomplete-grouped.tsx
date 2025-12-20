@@ -125,12 +125,12 @@ export default function AutocompleteGrouped() {
 
       <AutocompletePortal>
         <AutocompletePositioner>
-          <AutocompletePopup className="overflow-hidden p-0">
+          <AutocompletePopup>
             <AutocompleteEmpty>No tags found.</AutocompleteEmpty>
-            <AutocompleteList className="max-h-[min(22.5rem,var(--available-height))] scroll-pt-10 scroll-pb-[0.35rem] overflow-y-auto overscroll-contain px-2">
+            <AutocompleteList fadeEdges="bottom">
               {(group: TagGroup) => (
                 <AutocompleteGroup key={group.value} items={group.items}>
-                  <AutocompleteGroupLabel className="bg-popover sticky top-0 z-[1] mt-0 mr-2 mb-0 ml-0 w-[calc(100%-0.5rem)] px-2 py-2 text-xs font-semibold tracking-wider uppercase">
+                  <AutocompleteGroupLabel className="sticky top-0 z-1">
                     {group.value}
                   </AutocompleteGroupLabel>
                   <AutocompleteCollection>

@@ -191,7 +191,7 @@ function ComboboxPopupPrimitive({
     <BaseCombobox.Popup
       data-slot="combobox-popup"
       className={cn(
-        "bg-popover text-popover-foreground outline-border/70 ring-border/50 dark:ring-border ease-out-cubic flex max-h-[min(var(--available-height),20rem)] w-[var(--anchor-width)] max-w-[var(--available-width)] origin-[var(--transform-origin)] flex-col overflow-clip overscroll-contain rounded-xl shadow-[0_8px_20px_0_oklch(0.18_0_0_/_0.10)] ring-1 transition-[transform,scale,opacity] duration-100 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
+        "bg-popover text-popover-foreground outline-border/70 ring-border/50 dark:ring-border ease-out-cubic flex max-h-[var(--available-height)] w-[var(--anchor-width)] max-w-[var(--available-width)] origin-[var(--transform-origin)] flex-col overflow-clip overscroll-contain rounded-xl shadow-[0_8px_20px_0_oklch(0.18_0_0_/_0.10)] ring-1 transition-[transform,scale,opacity] duration-100 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
         className,
       )}
       {...props}
@@ -273,10 +273,11 @@ function ComboboxList({
       scrollbarGutter={scrollbarGutter}
       persistScrollbar={persistScrollbar}
       hideScrollbar={hideScrollbar}
+      className={cn("", className)}
     >
       <BaseCombobox.List
         data-slot="combobox-list"
-        className={cn("not-empty:p-1", className)}
+        className="max-h-80 rounded-xl"
         {...props}
       />
     </ScrollArea>
@@ -307,6 +308,8 @@ function ComboboxItem({
       data-slot="combobox-item"
       className={cn(
         "data-[highlighted]:bg-accent/50 data-[highlighted]:text-accent-foreground relative grid cursor-default grid-cols-[1fr_1rem] items-center gap-2 rounded-md px-2.5 py-2 pr-2 text-sm outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-60",
+        // Spacing from list edges
+        "mx-1 first:mt-1 last:mb-1",
         className,
       )}
       {...props}
@@ -348,7 +351,7 @@ function ComboboxGroupLabel({
     <BaseCombobox.GroupLabel
       data-slot="combobox-group-label"
       className={cn(
-        "text-muted-foreground bg-popover -mx-1 px-2 py-1.5 pt-2.5 pl-3.5 text-xs font-semibold",
+        "text-muted-foreground bg-popover px-3.5 py-1.5 pt-2.5 text-xs font-semibold",
         className,
       )}
       {...props}
@@ -363,7 +366,7 @@ function ComboboxSeparator({
   return (
     <BaseCombobox.Separator
       data-slot="combobox-separator"
-      className={cn("bg-border my-1 h-px", className)}
+      className={cn("bg-border mx-1 my-1 h-px min-h-px", className)}
       {...props}
     />
   );

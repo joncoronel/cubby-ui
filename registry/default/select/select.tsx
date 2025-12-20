@@ -197,14 +197,11 @@ function SelectContent({
             persistScrollbar={persistScrollbar}
             hideScrollbar={hideScrollbar}
             nativeScroll={nativeScroll}
-            className={cn("max-h-80", className)}
+            className={cn("max-h-80 in-data-[side=none]:max-h-full", className)}
           >
             <BaseSelect.List
               data-slot="select-list"
-              className={cn(
-                "rounded-xl",
-                alignItemWithTrigger && "scroll-py-6 overflow-y-auto",
-              )}
+              className={cn("rounded-xl")}
             >
               {children}
             </BaseSelect.List>

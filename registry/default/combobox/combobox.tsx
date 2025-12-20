@@ -257,21 +257,18 @@ function ComboboxList({
   persistScrollbar,
   hideScrollbar,
   ...props
-}: BaseCombobox.List.Props & {
-  nativeScroll?: boolean;
-} & Pick<ScrollAreaProps, "fadeEdges" | "scrollbarGutter" | "persistScrollbar" | "hideScrollbar">) {
-  if (nativeScroll) {
-    return (
-      <BaseCombobox.List
-        data-slot="combobox-list"
-        className={cn("overflow-y-auto not-empty:p-1", className)}
-        {...props}
-      />
-    );
-  }
-
+}: BaseCombobox.List.Props &
+  Pick<
+    ScrollAreaProps,
+    | "nativeScroll"
+    | "fadeEdges"
+    | "scrollbarGutter"
+    | "persistScrollbar"
+    | "hideScrollbar"
+  >) {
   return (
     <ScrollArea
+      nativeScroll={nativeScroll}
       fadeEdges={fadeEdges}
       scrollbarGutter={scrollbarGutter}
       persistScrollbar={persistScrollbar}

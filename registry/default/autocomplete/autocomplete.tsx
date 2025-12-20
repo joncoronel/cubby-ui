@@ -167,7 +167,7 @@ function AutocompleteStatus({
     <BaseAutocomplete.Status
       data-slot="autocomplete-status"
       className={cn(
-        "text-muted-foreground px-2 py-1.5 text-sm leading-5 empty:m-0 empty:p-0",
+        "text-muted-foreground px-3 py-2.5 text-sm leading-5 empty:m-0 empty:p-0",
         className,
       )}
       {...props}
@@ -183,7 +183,7 @@ function AutocompleteEmpty({
     <BaseAutocomplete.Empty
       data-slot="autocomplete-empty"
       className={cn(
-        "text-muted-foreground px-2.5 py-2 text-sm empty:m-0 empty:p-0",
+        "text-muted-foreground px-3 py-2.5 text-sm empty:m-0 empty:p-0",
         className,
       )}
       {...props}

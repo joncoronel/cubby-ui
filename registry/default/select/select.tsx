@@ -197,7 +197,7 @@ function SelectContent({
             persistScrollbar={persistScrollbar}
             hideScrollbar={hideScrollbar}
             nativeScroll={nativeScroll}
-            className={cn("", className)}
+            className={cn("max-h-80", className)}
           >
             <BaseSelect.List
               data-slot="select-list"

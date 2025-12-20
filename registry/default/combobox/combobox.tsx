@@ -273,11 +273,11 @@ function ComboboxList({
       scrollbarGutter={scrollbarGutter}
       persistScrollbar={persistScrollbar}
       hideScrollbar={hideScrollbar}
-      className={cn("", className)}
+      className={cn("max-h-80", className)}
     >
       <BaseCombobox.List
         data-slot="combobox-list"
-        className="max-h-80 rounded-xl"
+        className="rounded-xl"
         {...props}
       />
     </ScrollArea>

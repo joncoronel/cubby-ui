@@ -69,10 +69,7 @@ export default function SelectWithGroups() {
       <SelectTrigger className="w-[280px]">
         <SelectValue />
       </SelectTrigger>
-      <SelectContent
-        fadeEdges={"bottom"}
-        className="max-h-[300px] px-1 pt-0 pb-1"
-      >
+      <SelectContent fadeEdges={"bottom"} className="max-h-[300px]">
         <SelectGroup>
           <SelectGroupLabel className="sticky top-0 z-[1]">
             North America

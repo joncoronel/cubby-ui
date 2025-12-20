@@ -131,17 +131,20 @@ interface SelectContentProps
     Omit<BaseSelect.Positioner.Props, "render">,
     Pick<
       ScrollAreaProps,
-      "fadeEdges" | "scrollbarGutter" | "persistScrollbar" | "hideScrollbar"
+      | "fadeEdges"
+      | "scrollbarGutter"
+      | "persistScrollbar"
+      | "hideScrollbar"
+      | "nativeScroll"
     > {
   className?: string;
-  showScrollArrows?: boolean;
 }
 
 function SelectContent({
   className,
   sideOffset = 6,
   alignItemWithTrigger = false,
-  showScrollArrows = false,
+  nativeScroll = false,
   fadeEdges = true,
   scrollbarGutter = false,
   persistScrollbar,
@@ -149,22 +152,6 @@ function SelectContent({
   children,
   ...props
 }: SelectContentProps) {
-  const useScrollArrows = showScrollArrows || alignItemWithTrigger;
-
-  const listContent = (
-    <BaseSelect.List
-      data-slot="select-list"
-      className={cn(
-        "rounded-xl p-1",
-        useScrollArrows && "scroll-py-6 overflow-y-auto",
-        "data-[side=none]:max-h-(--available-height)",
-        className,
-      )}
-    >
-      {children}
-    </BaseSelect.List>
-  );
-
   return (
     <SelectPortal>
       <SelectBackdrop />
@@ -184,7 +171,7 @@ function SelectContent({
             "max-w-[var(--available-width)]",
             "min-w-[var(--anchor-width)]",
             // when data side does not equal none
-            "not-data-[side=none]:max-h-[var(--available-height)]",
+            "max-h-[var(--available-height)]",
             // Shadow
             "shadow-[0_8px_20px_0_oklch(0.18_0_0_/_0.10)]",
             // Animation
@@ -192,39 +179,47 @@ function SelectContent({
             "data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[side=none]:data-[ending-style]:transition-none data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[side=none]:data-[starting-style]:scale-100 data-[side=none]:data-[starting-style]:opacity-100 data-[side=none]:data-[starting-style]:transition-none",
           )}
         >
-          {useScrollArrows ? (
-            <>
-              <BaseSelect.ScrollUpArrow
-                data-slot="select-scroll-up-arrow"
-                className="from-popover top-0 z-[1] flex w-full cursor-default items-center justify-center rounded-t-xl bg-gradient-to-b from-50% to-transparent py-0.5"
-              >
-                <HugeiconsIcon
-                  className="size-4"
-                  strokeWidth={2}
-                  icon={ArrowUp01Icon}
-                />
-              </BaseSelect.ScrollUpArrow>
-              {listContent}
-              <BaseSelect.ScrollDownArrow
-                data-slot="select-scroll-down-arrow"
-                className="from-popover bottom-0 z-[1] flex w-full cursor-default items-center justify-center rounded-b-xl bg-gradient-to-t from-50% to-transparent py-0.5"
-              >
-                <HugeiconsIcon
-                  className="size-4"
-                  strokeWidth={2}
-                  icon={ArrowDown01Icon}
-                />
-              </BaseSelect.ScrollDownArrow>
-            </>
-          ) : (
-            <ScrollArea
-              fadeEdges={fadeEdges}
-              scrollbarGutter={scrollbarGutter}
-              persistScrollbar={persistScrollbar}
-              hideScrollbar={hideScrollbar}
+          {alignItemWithTrigger && (
+            <BaseSelect.ScrollUpArrow
+              data-slot="select-scroll-up-arrow"
+              className="from-popover top-0 z-[1] flex w-full cursor-default items-center justify-center rounded-t-xl bg-gradient-to-b from-50% to-transparent py-0.5"
             >
-              {listContent}
-            </ScrollArea>
+              <HugeiconsIcon
+                className="size-4"
+                strokeWidth={2}
+                icon={ArrowUp01Icon}
+              />
+            </BaseSelect.ScrollUpArrow>
+          )}
+          <ScrollArea
+            fadeEdges={fadeEdges}
+            scrollbarGutter={scrollbarGutter}
+            persistScrollbar={persistScrollbar}
+            hideScrollbar={hideScrollbar}
+            nativeScroll={nativeScroll}
+            className={cn("", className)}
+          >
+            <BaseSelect.List
+              data-slot="select-list"
+              className={cn(
+                "rounded-xl",
+                alignItemWithTrigger && "scroll-py-6 overflow-y-auto",
+              )}
+            >
+              {children}
+            </BaseSelect.List>
+          </ScrollArea>
+          {alignItemWithTrigger && (
+            <BaseSelect.ScrollDownArrow
+              data-slot="select-scroll-down-arrow"
+              className="from-popover bottom-0 z-[1] flex w-full cursor-default items-center justify-center rounded-b-xl bg-gradient-to-t from-50% to-transparent py-0.5"
+            >
+              <HugeiconsIcon
+                className="size-4"
+                strokeWidth={2}
+                icon={ArrowDown01Icon}
+              />
+            </BaseSelect.ScrollDownArrow>
           )}
         </BaseSelect.Popup>
       </BaseSelect.Positioner>
@@ -239,6 +234,8 @@ function SelectItem({ className, children, ...props }: BaseSelect.Item.Props) {
       className={cn(
         // Combobox-style item with grid layout
         "relative grid cursor-default grid-cols-[1fr_1rem] items-center gap-2 rounded-md px-3 py-2 text-sm outline-none select-none in-data-[side=none]:min-w-[calc(var(--anchor-width))]",
+        // Spacing from list edges
+        "mx-1 first:mt-1 last:mb-1",
         // Hover and highlight states
         "data-highlighted:bg-accent/50 data-highlighted:text-accent-foreground",
         // Icon and text styling
@@ -268,7 +265,7 @@ function SelectGroupLabel({
     <BaseSelect.GroupLabel
       data-slot="select-group-label"
       className={cn(
-        "text-muted-foreground bg-popover -mx-1 px-2 py-1.5 pt-2.5 pl-3.5 text-xs font-semibold",
+        "text-muted-foreground bg-popover px-3.5 py-1.5 pt-2.5 text-xs font-semibold",
         className,
       )}
       {...props}
@@ -280,7 +277,7 @@ function SelectSeparator({ className, ...props }: BaseSelect.Separator.Props) {
   return (
     <BaseSelect.Separator
       data-slot="select-separator"
-      className={cn("bg-border my-1 h-px min-h-px", className)}
+      className={cn("bg-border mx-1 my-1 h-px min-h-px", className)}
       {...props}
     />
   );

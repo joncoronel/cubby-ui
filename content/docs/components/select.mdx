@@ -55,12 +55,6 @@ Handle long lists with scrollable content.
 
 <ComponentPreview component="select" example="select-with-scroll" />
 
-### With Scroll Arrows
-
-Add scroll arrows for navigation through options.
-
-<ComponentPreview component="select" example="select-with-scroll-arrows" />
-
 ### Align Item with Trigger
 
 Align selected item with trigger position.
@@ -127,19 +121,11 @@ For the complete Base UI API, see the [Base UI Select documentation](https://bas
 <ApiPropsList>
 
 <ApiProp
-  name="showScrollArrows"
-  fullType="boolean"
-  defaultValue="false"
->
-  Show scroll indicator arrows when content is scrollable. When enabled, uses native scrolling instead of ScrollArea.
-</ApiProp>
-
-<ApiProp
   name="alignItemWithTrigger"
   fullType="boolean"
   defaultValue="false"
 >
-  Align the selected item with the trigger button position. Automatically enables scroll arrows.
+  Align the selected item with the trigger button position. Enables native-style scrolling with scroll arrows.
 </ApiProp>
 
 <ApiProp
@@ -147,7 +133,7 @@ For the complete Base UI API, see the [Base UI Select documentation](https://bas
   fullType="boolean | 'top' | 'bottom' | 'left' | 'right' | 'x' | 'y' | FadeEdge[]"
   defaultValue="true"
 >
-  Controls the fade effect on scroll edges. Only applies when `showScrollArrows` is false. See [ScrollArea](/docs/components/scroll-area#custom-props) for all options.
+  Controls the fade effect on scroll edges. See [ScrollArea](/docs/components/scroll-area#custom-props) for all options.
 </ApiProp>
 
 <ApiProp
@@ -155,7 +141,7 @@ For the complete Base UI API, see the [Base UI Select documentation](https://bas
   fullType="boolean"
   defaultValue="false"
 >
-  Reserves space for the scrollbar when content overflows, preventing layout shift. Only applies when `showScrollArrows` is false.
+  Reserves space for the scrollbar when content overflows, preventing layout shift.
 </ApiProp>
 
 <ApiProp
@@ -163,7 +149,7 @@ For the complete Base UI API, see the [Base UI Select documentation](https://bas
   fullType="boolean"
   defaultValue="false"
 >
-  Always show the scrollbar instead of fading it in on hover or scroll. Only applies when `showScrollArrows` is false.
+  Always show the scrollbar instead of fading it in on hover or scroll.
 </ApiProp>
 
 <ApiProp
@@ -171,7 +157,15 @@ For the complete Base UI API, see the [Base UI Select documentation](https://bas
   fullType="boolean"
   defaultValue="false"
 >
-  Hides the scrollbar while keeping scroll functionality. Only applies when `showScrollArrows` is false.
+  Hides the scrollbar while keeping scroll functionality.
+</ApiProp>
+
+<ApiProp
+  name="nativeScroll"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Use native browser scrolling with styled scrollbars instead of Base UI's scroll virtualization. Enables CSS scroll-driven animations for fade edges.
 </ApiProp>
 
 </ApiPropsList>

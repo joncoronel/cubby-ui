@@ -43,16 +43,26 @@ For the complete Base UI API, see the [Base UI Component documentation](https://
 
 ### Component Subsections
 
-Use H3 (`###`) for each component that has props worth documenting:
+Use H3 (`###`) for each component part that has props worth documenting.
+
+**Important:** When a component part wraps a specific Base UI component, state which one it wraps. This tells users what additional props are available via `...props`.
 
 ```mdx
 ### ComponentName
 
-Optional description of the component's purpose.
+Wraps Base UI's `Autocomplete.Root`. All Autocomplete.Root props are supported.
 
 <ApiPropsList>
   ...props...
 </ApiPropsList>
+```
+
+For simple wrappers without custom props, you can omit the `<ApiPropsList>` and just state the wrapping:
+
+```mdx
+### ComponentTrigger
+
+Wraps Base UI's `Dialog.Trigger`. All Dialog.Trigger props are supported.
 ```
 
 ## ApiProp Component Usage
@@ -157,20 +167,45 @@ For complex props, use line breaks and lists:
 
 ## Component Parts Table
 
-For compound components with many parts, include a Component Parts table:
+For compound components, **always use a table** (not a bullet list) to document component parts:
 
 ```mdx
 ### Component Parts
 
 | Component | Description |
 | --- | --- |
-| `Command` | Root component wrapping the autocomplete functionality |
-| `CommandInput` | Search input with icon |
+| `Command` | Root component. Wraps `Autocomplete.Root` |
+| `CommandInput` | Search input with icon. Wraps `Autocomplete.Input` |
 | `CommandList` | Scrollable list container with empty state |
-| `CommandItem` | Individual command item |
+| `CommandItem` | Individual command item. Wraps `Autocomplete.Item` |
 ```
 
-Keep descriptions brief (one short sentence).
+Guidelines:
+
+- Keep descriptions brief (one short sentence)
+- When a part wraps a Base UI component, mention it in the description
+- List parts in logical order (root first, then structural, then content)
+
+## Documenting Modified Defaults
+
+When your component changes default values from the base library, **include the prop in the `<ApiPropsList>`** and note the Base UI default in the description. This ensures users can see it as an actual prop they can configure.
+
+```mdx
+<ApiProp name="autoHighlight" fullType='boolean | "always"' defaultValue='"always"'>
+  Whether the first matching item is highlighted automatically. Base UI defaults to `false`.
+</ApiProp>
+
+<ApiProp name="open" fullType="boolean" defaultValue="true">
+  Keeps the list always open for command menu behavior. Base UI defaults to `false`.
+</ApiProp>
+```
+
+This approach:
+
+1. Shows the prop in the API reference so users know it exists
+2. Documents our default value via `defaultValue`
+3. Notes the Base UI default so users understand the difference
+4. Helps users revert to Base UI defaults if needed
 
 ## Complete Example
 
@@ -220,8 +255,10 @@ Before submitting documentation:
 
 - [ ] Only props explicitly used in the component are documented
 - [ ] Intro paragraph links to base library documentation
+- [ ] Each component part states which Base UI component it wraps (if applicable)
 - [ ] Each prop has `name` and `fullType`
 - [ ] String default values have proper quote escaping
 - [ ] Descriptions are concise and start with action verbs
 - [ ] Complex props have list formatting for options
-- [ ] Component parts table included for compound components (if applicable)
+- [ ] Component parts use a table format (not bullet lists)
+- [ ] Modified defaults are in `<ApiPropsList>` with Base UI default noted in description

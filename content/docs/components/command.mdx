@@ -37,7 +37,7 @@ For the complete Base UI API, see the [Base UI Autocomplete documentation](https
 
 ### Command
 
-The root component that wraps the autocomplete functionality.
+Wraps Base UI's `Autocomplete.Root`. All Autocomplete.Root props are supported.
 
 <ApiPropsList>
 
@@ -46,20 +46,22 @@ The root component that wraps the autocomplete functionality.
 </ApiProp>
 
 <ApiProp name="autoHighlight" fullType='boolean | "always"' defaultValue='"always"'>
-  Whether the first matching item is highlighted automatically. Set to `"always"` to ensure an item is always highlighted during keyboard navigation.
+  Whether the first matching item is highlighted automatically. Set to `"always"` to ensure an item is always highlighted during keyboard navigation. Base UI defaults to `false`.
 </ApiProp>
 
 <ApiProp name="open" fullType="boolean" defaultValue="true">
-  Keeps the autocomplete list always open. Appropriate for command menu behavior where the list is always visible.
+  Keeps the autocomplete list always open. Appropriate for command menu behavior where the list is always visible. Base UI defaults to `false`.
 </ApiProp>
 
 <ApiProp name="keepHighlight" fullType="boolean" defaultValue="true">
-  Whether the highlighted item should be preserved when the pointer leaves the list. Prevents the highlight from going to a "null" state during navigation.
+  Whether the highlighted item should be preserved when the pointer leaves the list. Prevents the highlight from going to a "null" state during navigation. Base UI defaults to `false`.
 </ApiProp>
 
 </ApiPropsList>
 
 ### CommandList
+
+Wraps Base UI's `Autocomplete.List`. All Autocomplete.List props are supported.
 
 <ApiPropsList>
 
@@ -113,17 +115,20 @@ The root component that wraps the autocomplete functionality.
 
 | Component | Description |
 | --- | --- |
-| `Command` | Root component wrapping the autocomplete functionality |
-| `CommandDialog` | Dialog root for modal command menus |
-| `CommandDialogTrigger` | Button or element that opens the dialog |
-| `CommandDialogPopup` | The dialog popup container with backdrop and animations |
-| `CommandContent` | Visual container for input and list with card styling |
-| `CommandInput` | Search input with icon |
-| `CommandList` | Scrollable list container with empty state |
-| `CommandGroup` | Groups related items together |
-| `CommandGroupLabel` | Label for a command group |
-| `CommandCollection` | Renders items within a group using render props |
-| `CommandItem` | Individual command item |
-| `CommandShortcut` | Displays keyboard shortcut hints |
-| `CommandSeparator` | Visual separator between groups |
-| `CommandFooter` | Footer area for navigation hints |
+| `Command` | Root component. Wraps `Autocomplete.Root` |
+| `CommandDialog` | Dialog root. Wraps `Dialog.Root` |
+| `CommandDialogTrigger` | Opens the dialog. Wraps `Dialog.Trigger` |
+| `CommandDialogPortal` | Portal container. Wraps `Dialog.Portal` |
+| `CommandDialogBackdrop` | Backdrop overlay. Wraps `Dialog.Backdrop` |
+| `CommandDialogViewport` | Centering container. Wraps `Dialog.Viewport` |
+| `CommandDialogPopup` | Dialog container. Wraps `Dialog.Popup` |
+| `CommandContent` | Visual container for input and list |
+| `CommandInput` | Search input. Wraps `Autocomplete.Input` |
+| `CommandList` | Scrollable list. Wraps `Autocomplete.List` |
+| `CommandGroup` | Groups items. Wraps `Autocomplete.Group` |
+| `CommandGroupLabel` | Group label. Wraps `Autocomplete.GroupLabel` |
+| `CommandCollection` | Render prop container. Wraps `Autocomplete.Collection` |
+| `CommandItem` | List item. Wraps `Autocomplete.Item` |
+| `CommandShortcut` | Keyboard shortcut display |
+| `CommandSeparator` | Visual separator. Wraps `Autocomplete.Separator` |
+| `CommandFooter` | Footer area for hints |

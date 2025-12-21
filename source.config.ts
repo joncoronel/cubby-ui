@@ -4,7 +4,20 @@ import {
   frontmatterSchema,
   metaSchema,
 } from "fumadocs-mdx/config";
-import { rehypeCode } from "fumadocs-core/mdx-plugins";
+import { rehypeCodeDefaultOptions } from "fumadocs-core/mdx-plugins";
+import type { ShikiTransformer } from "shiki";
+
+// Custom transformer to add data-language attribute for our MdxPreServer
+const transformerDataLanguage: ShikiTransformer = {
+  name: "data-language",
+  pre(pre) {
+    const lang = this.options.lang;
+    if (lang) {
+      pre.properties["data-language"] = lang;
+    }
+    return pre;
+  },
+};
 
 export const docs = defineDocs({
   dir: "content/docs",
@@ -21,6 +34,12 @@ export const docs = defineDocs({
 
 export default defineConfig({
   mdxOptions: {
-    rehypePlugins: [rehypeCode],
+    rehypeCodeOptions: {
+      ...rehypeCodeDefaultOptions,
+      transformers: [
+        ...(rehypeCodeDefaultOptions.transformers ?? []),
+        transformerDataLanguage,
+      ],
+    },
   },
 });

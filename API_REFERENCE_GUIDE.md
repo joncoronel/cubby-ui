@@ -235,6 +235,31 @@ This approach:
 3. Notes the Base UI default so users understand the difference
 4. Helps users revert to Base UI defaults if needed
 
+## Notes Section
+
+Use `### Notes` for additional information about component parts that don't have props to document but need usage guidance. This is useful for:
+
+- Components used with the `render` prop pattern
+- Usage patterns that aren't obvious from props alone
+- Important caveats or tips
+
+````mdx
+### Notes
+
+#### AlertDialogClose
+
+Use `AlertDialogClose` with the `render` prop to create action buttons that close the dialog. Wraps Base UI's `AlertDialog.Close`.
+
+```tsx
+<AlertDialogFooter>
+  <AlertDialogClose render={<Button variant="outline">Cancel</Button>} />
+  <AlertDialogClose render={<Button variant="destructive">Delete</Button>} />
+</AlertDialogFooter>
+```
+````
+
+Markdown code fences are automatically rendered using our custom CodeBlock component with server-side syntax highlighting.
+
 ## Complete Example
 
 ```mdx
@@ -296,3 +321,4 @@ Before submitting documentation:
 - [ ] Descriptions are concise and start with action verbs
 - [ ] Complex props have list formatting for options
 - [ ] Modified defaults are in `<ApiPropsList>` with Base UI default noted in description
+- [ ] Uses `### Notes` for usage patterns without props (e.g., render prop examples)

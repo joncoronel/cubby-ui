@@ -4,8 +4,7 @@ import { ComponentPreviewServer } from "@/components/mdx/component-preview-serve
 import { ComponentCodeServer } from "@/components/mdx/component-code-server";
 import { ComponentInstallServer } from "@/components/mdx/component-install-server";
 import { ComponentUsageServer } from "@/components/mdx/component-usage-server";
-import { MdxCodeBlockServer } from "@/components/mdx/mdx-code-block-server";
-// import { MdxPre } from "@/components/mdx/mdx-pre";
+import { MdxPreServer } from "@/components/mdx/mdx-pre-server";
 import { ApiProp, ApiPropsList } from "@/components/mdx/api-prop";
 import {
   Tabs,
@@ -21,8 +20,7 @@ export function getMDXComponents(
   return {
     ...defaultComponents,
     ...components,
-    // pre: MdxPre,
-    CodeBlockMDX: MdxCodeBlockServer,
+    pre: MdxPreServer as unknown as MDXComponents["pre"],
     Tabs,
     TabsList,
     TabsTrigger,

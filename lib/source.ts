@@ -53,9 +53,15 @@ function stripMDXForLLM(content: string): string {
       // Use backreferences to match opening/closing quotes of the same type
       // This handles cases like fullType='"value" | "other"' where inner quotes differ
       const nameMatch = attributes.match(/name\s*=\s*(["'])([^"']*)\1/);
-      const fullTypeMatch = attributes.match(/fullType\s*=\s*(["'])([\s\S]*?)\1/);
-      const simpleTypeMatch = attributes.match(/simpleType\s*=\s*(["'])([\s\S]*?)\1/);
-      const defaultValueMatch = attributes.match(/defaultValue\s*=\s*(["'])([\s\S]*?)\1/);
+      const fullTypeMatch = attributes.match(
+        /fullType\s*=\s*(["'])([\s\S]*?)\1/,
+      );
+      const simpleTypeMatch = attributes.match(
+        /simpleType\s*=\s*(["'])([\s\S]*?)\1/,
+      );
+      const defaultValueMatch = attributes.match(
+        /defaultValue\s*=\s*(["'])([\s\S]*?)\1/,
+      );
 
       // Extract values from capture group 2 (group 1 is the quote character)
       // Replace HTML entities in the extracted values

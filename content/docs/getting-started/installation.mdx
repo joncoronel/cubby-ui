@@ -28,20 +28,21 @@ If you haven't already, initialize shadcn/ui for your framework. Follow the offi
 
 Update your `components.json` to include the Cubby UI registry:
 
-<CodeBlockMDX
-  code={`{
+```json
+{
   "registries": {
     "@cubby-ui": "https://cubby-ui.dev/r/{name}.json"
   }
-}`}
-  language="json"
-/>
+}
+```
 
 ### 3. Initialize Cubby UI theme
 
 Run the init command to add Cubby UI's theme system to your project:
 
-<CodeBlockMDX code="npx shadcn@latest add @cubby-ui/init" language="bash" />
+```bash
+npx shadcn@latest add @cubby-ui/init
+```
 
 This adds to your `globals.css`:
 
@@ -52,7 +53,9 @@ This adds to your `globals.css`:
 
 Now you can add any Cubby UI component:
 
-<CodeBlockMDX code="npx shadcn@latest add @cubby-ui/button" language="bash" />
+```bash
+npx shadcn@latest add @cubby-ui/button
+```
 
 This will:
 
@@ -64,10 +67,9 @@ This will:
 
 Add multiple components in a single command:
 
-<CodeBlockMDX
-  code="npx shadcn@latest add @cubby-ui/button @cubby-ui/input @cubby-ui/card"
-  language="bash"
-/>
+```bash
+npx shadcn@latest add @cubby-ui/button @cubby-ui/input @cubby-ui/card
+```
 
 ## What's Included in Init
 
@@ -90,22 +92,21 @@ The init command adds the following CSS variables and utilities:
 
 After adding components, your project structure will look like this:
 
-<CodeBlockMDX
-  code={`components/
-└── ui/
-    └── cubby-ui/
-        ├── button.tsx
-        ├── input.tsx
-        └── card.tsx
+```
+components/
+  ui/
+    cubby-ui/
+      button.tsx
+      input.tsx
+      card.tsx
 hooks/
-└── cubby-ui/
-    └── use-mobile.ts
+  cubby-ui/
+    use-mobile.ts
 lib/
-└── cubby-ui/
-    └── utils.ts
-components.json`}
-  language="text"
-/>
+  cubby-ui/
+    utils.ts
+components.json
+```
 
 The exact paths depend on your `components.json` configuration.
 

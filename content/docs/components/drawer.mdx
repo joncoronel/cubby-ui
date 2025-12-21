@@ -273,8 +273,8 @@ For the complete Base UI API, see the [Base UI Dialog documentation](https://bas
 
 Use `DrawerBody` for scrollable content inside the drawer. The component handles overflow automatically and adapts its padding based on surrounding elements (header, footer).
 
-<CodeBlockMDX
-  code={`<DrawerContent>
+```tsx
+<DrawerContent>
   <DrawerHandle />
   <DrawerHeader>
     <DrawerTitle>Long List</DrawerTitle>
@@ -283,9 +283,8 @@ Use `DrawerBody` for scrollable content inside the drawer. The component handles
   <DrawerFooter>
     <DrawerClose render={<Button />}>Done</DrawerClose>
   </DrawerFooter>
-</DrawerContent>`}
-  language="tsx"
-/>
+</DrawerContent>
+```
 
 ### Animating Content Based on Snap Position
 
@@ -295,8 +294,8 @@ The drawer provides two ways to animate content based on the current snap positi
 
 Use the render prop pattern to access animation values in JavaScript:
 
-<CodeBlockMDX
-  code={`<Drawer snapPoints={["92px", 1]}>
+```tsx
+<Drawer snapPoints={["92px", 1]}>
   {({ snapProgress, dragProgress, isDragging, activeSnapPoint }) => (
     <>
       <DrawerTrigger>Open</DrawerTrigger>
@@ -308,9 +307,8 @@ Use the render prop pattern to access animation values in JavaScript:
       </DrawerContent>
     </>
   )}
-</Drawer>`}
-  language="tsx"
-/>
+</Drawer>
+```
 
 | Value             | Description                                                  |
 | ----------------- | ------------------------------------------------------------ |
@@ -325,8 +323,8 @@ For browsers that support scroll-driven animations (Chrome 115+), the drawer exp
 
 Use Tailwind's arbitrary value syntax to apply the CSS variable directly in your className:
 
-<CodeBlockMDX
-  code={`<Drawer snapPoints={["92px", 1]}>
+```tsx
+<Drawer snapPoints={["92px", 1]}>
   <DrawerTrigger>Open</DrawerTrigger>
   <DrawerContent>
     {/* Mini player fades out as drawer expands */}
@@ -338,14 +336,13 @@ Use Tailwind's arbitrary value syntax to apply the CSS variable directly in your
       Full Player
     </div>
   </DrawerContent>
-</Drawer>`}
-  language="tsx"
-/>
+</Drawer>
+```
 
 The `0` fallback ensures non-supporting browsers show the initial state. Combine with the render prop for full browser support:
 
-<CodeBlockMDX
-  code={`<Drawer snapPoints={["92px", 1]}>
+```tsx
+<Drawer snapPoints={["92px", 1]}>
   {({ snapProgress }) => (
     <DrawerContent>
       {/* CSS variable for Chrome 115+, inline style fallback for others */}
@@ -357,8 +354,7 @@ The `0` fallback ensures non-supporting browsers show the initial state. Combine
       </div>
     </DrawerContent>
   )}
-</Drawer>`}
-  language="tsx"
-/>
+</Drawer>
+```
 
 In browsers that support scroll-driven animations, the CSS variable updates in real-time and takes precedence. In other browsers, the inline style provides the fallback behavior.

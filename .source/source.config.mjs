@@ -5,7 +5,17 @@ import {
   frontmatterSchema,
   metaSchema
 } from "fumadocs-mdx/config";
-import { rehypeCode } from "fumadocs-core/mdx-plugins";
+import { rehypeCodeDefaultOptions } from "fumadocs-core/mdx-plugins";
+var transformerDataLanguage = {
+  name: "data-language",
+  pre(pre) {
+    const lang = this.options.lang;
+    if (lang) {
+      pre.properties["data-language"] = lang;
+    }
+    return pre;
+  }
+};
 var docs = defineDocs({
   dir: "content/docs",
   docs: {
@@ -20,7 +30,13 @@ var docs = defineDocs({
 });
 var source_config_default = defineConfig({
   mdxOptions: {
-    rehypePlugins: [rehypeCode]
+    rehypeCodeOptions: {
+      ...rehypeCodeDefaultOptions,
+      transformers: [
+        ...rehypeCodeDefaultOptions.transformers ?? [],
+        transformerDataLanguage
+      ]
+    }
   }
 });
 export {

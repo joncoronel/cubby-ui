@@ -35,9 +35,11 @@ The Command component is built on top of [Base UI's Autocomplete](https://base-u
 
 For the complete Base UI API, see the [Base UI Autocomplete documentation](https://base-ui.com/react/components/autocomplete).
 
-### Command
+### Props
 
-Wraps Base UI's `Autocomplete.Root`. All Autocomplete.Root props are supported.
+#### Command
+
+Root component that manages command menu state and keyboard navigation. Wraps Base UI's `Autocomplete.Root`.
 
 <ApiPropsList>
 
@@ -59,9 +61,9 @@ Wraps Base UI's `Autocomplete.Root`. All Autocomplete.Root props are supported.
 
 </ApiPropsList>
 
-### CommandList
+#### CommandList
 
-Wraps Base UI's `Autocomplete.List`. All Autocomplete.List props are supported.
+Scrollable container for command items with empty state handling. Wraps Base UI's `Autocomplete.List`.
 
 <ApiPropsList>
 
@@ -111,24 +113,3 @@ Wraps Base UI's `Autocomplete.List`. All Autocomplete.List props are supported.
 
 </ApiPropsList>
 
-### Component Parts
-
-| Component | Description |
-| --- | --- |
-| `Command` | Root component. Wraps `Autocomplete.Root` |
-| `CommandDialog` | Dialog root. Wraps `Dialog.Root` |
-| `CommandDialogTrigger` | Opens the dialog. Wraps `Dialog.Trigger` |
-| `CommandDialogPortal` | Portal container. Wraps `Dialog.Portal` |
-| `CommandDialogBackdrop` | Backdrop overlay. Wraps `Dialog.Backdrop` |
-| `CommandDialogViewport` | Centering container. Wraps `Dialog.Viewport` |
-| `CommandDialogPopup` | Dialog container. Wraps `Dialog.Popup` |
-| `CommandContent` | Visual container for input and list |
-| `CommandInput` | Search input. Wraps `Autocomplete.Input` |
-| `CommandList` | Scrollable list. Wraps `Autocomplete.List` |
-| `CommandGroup` | Groups items. Wraps `Autocomplete.Group` |
-| `CommandGroupLabel` | Group label. Wraps `Autocomplete.GroupLabel` |
-| `CommandCollection` | Render prop container. Wraps `Autocomplete.Collection` |
-| `CommandItem` | List item. Wraps `Autocomplete.Item` |
-| `CommandShortcut` | Keyboard shortcut display |
-| `CommandSeparator` | Visual separator. Wraps `Autocomplete.Separator` |
-| `CommandFooter` | Footer area for hints |

@@ -71,65 +71,67 @@ The Tree component is built with [Base UI's Collapsible](https://base-ui.com/rea
 
 For the complete Base UI Collapsible API, see the [Base UI Collapsible documentation](https://base-ui.com/react/components/collapsible).
 
-### Custom Props
+### Props
 
 #### Tree
+
+Hierarchical view for displaying nested data with selection and expansion. Uses Base UI's `Collapsible` internally.
 
 <ApiPropsList>
 
 <ApiProp name="data" fullType="TreeNode<TData>[]" simpleType="array" required>
-  The hierarchical data structure to display. Custom prop not available in Base UI.
+  The hierarchical data structure to display.
 </ApiProp>
 
 <ApiProp name="children" fullType="(item: TreeNode<TData>) => React.ReactElement" simpleType="function" required>
-  Render function for each node. Custom prop not available in Base UI.
+  Render function for each node.
 </ApiProp>
 
 <ApiProp name="selectedNode" fullType="string | null" simpleType="string">
-  Selected node ID (controlled). Custom prop not available in Base UI.
+  Selected node ID (controlled).
 </ApiProp>
 
 <ApiProp name="onNodeSelect" fullType="(nodeId: string) => void" simpleType="function">
-  Callback when node is selected. Custom prop not available in Base UI.
+  Callback when node is selected.
 </ApiProp>
 
 <ApiProp name="defaultExpanded" fullType="string[]" simpleType="array" defaultValue="[]">
-  Initially expanded node IDs (uncontrolled). Custom prop not available in Base UI.
+  Initially expanded node IDs (uncontrolled).
 </ApiProp>
 
 <ApiProp name="expanded" fullType="string[]" simpleType="array">
-  Expanded node IDs (controlled). Custom prop not available in Base UI.
+  Expanded node IDs (controlled).
 </ApiProp>
 
 <ApiProp name="onExpandedChange" fullType="(expanded: string[]) => void" simpleType="function">
-  Callback when expanded nodes change. Custom prop not available in Base UI.
+  Callback when expanded nodes change.
 </ApiProp>
 
 <ApiProp name="checkedNodes" fullType="string[]" simpleType="array">
-  Checked node IDs for checkbox mode. Custom prop not available in Base UI.
+  Checked node IDs for checkbox mode.
 </ApiProp>
 
 <ApiProp name="onCheckedNodesChange" fullType="(checked: string[]) => void" simpleType="function">
-  Callback when checked nodes change. Custom prop not available in Base UI.
+  Callback when checked nodes change.
 </ApiProp>
 
 <ApiProp name="variant" fullType='"default" | "filled" | "outline"' simpleType="string" defaultValue='"default"'>
-  Visual style variant. Custom prop not available in Base UI.
+  Visual style variant.
 </ApiProp>
 
 <ApiProp name="showLines" fullType="boolean" defaultValue="false">
-  Show connecting lines between nodes. Custom prop not available in Base UI.
+  Show connecting lines between nodes.
 </ApiProp>
 
 <ApiProp name="mode" fullType='"single" | "multiple" | "none"' simpleType="string" defaultValue='"single"'>
-  Selection mode. Custom prop not available in Base UI.
+  Selection mode.
 </ApiProp>
 
 </ApiPropsList>
 
 #### TreeNode Interface
 
-The TypeScript interface defining the shape of each tree node:
+TypeScript interface defining the shape of each tree node:
 
 <ApiPropsList>
 

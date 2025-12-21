@@ -109,9 +109,11 @@ The Accordion component is built on top of [Base UI's Accordion](https://base-ui
 
 For the complete Base UI API, see the [Base UI Accordion documentation](https://base-ui.com/react/components/accordion).
 
-### Custom Props
+### Props
 
 #### Accordion
+
+Collapsible container that groups expandable content sections. Wraps Base UI's `Accordion.Root`.
 
 <ApiPropsList>
 
@@ -121,12 +123,22 @@ For the complete Base UI API, see the [Base UI Accordion documentation](https://
   simpleType="string"
   defaultValue='"default"'
 >
-  Visual styling variant for the accordion. Custom prop not available in Base UI.
+  Visual styling variant for the accordion.
+</ApiProp>
+
+<ApiProp
+  name="multiple"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Allow multiple accordion items to be expanded at the same time. Base UI doesn't set a default.
 </ApiProp>
 
 </ApiPropsList>
 
 #### AccordionTrigger
+
+Clickable header that toggles content visibility. Wraps Base UI's `Accordion.Trigger`.
 
 <ApiPropsList>
 
@@ -171,9 +183,3 @@ For the complete Base UI API, see the [Base UI Accordion documentation](https://
 </ApiProp>
 
 </ApiPropsList>
-
-### Modified Defaults
-
-Our implementation changes the following Base UI prop default:
-
-- **Accordion**: `multiple` defaults to `false` (Base UI doesn't set a default)

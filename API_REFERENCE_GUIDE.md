@@ -16,7 +16,10 @@ Props to document include:
 
 1. **Custom props** - Props we created that don't exist in the base library
 2. **Modified defaults** - Base library props where we've changed the default value
-3. **Key data props** - Essential props like `items`, `value`, `children` that are central to how the component works
+3. **Explicitly exposed props** - Base library props that we destructure and explicitly use in our component code (not just passed through via `...props`)
+4. **Key data props** - Essential props like `items`, `value`, `children` that are central to how the component works
+
+The key distinction is whether a prop is **explicitly handled in our code** vs just passed through. If we destructure it and use it, document it. If it just flows through `...props`, don't list it—users can find it in the Base UI docs.
 
 ### What NOT to Document
 
@@ -41,29 +44,74 @@ The [Component] is built on top of [Base UI's Component](https://base-ui.com/rea
 For the complete Base UI API, see the [Base UI Component documentation](https://base-ui.com/react/components/component).
 ```
 
-### Component Subsections
+### Props Section
 
-Use H3 (`###`) for each component part that has props worth documenting.
-
-**Important:** When a component part wraps a specific Base UI component, state which one it wraps. This tells users what additional props are available via `...props`.
+Use `### Props` to contain all component prop documentation. Each component part gets a `####` heading:
 
 ```mdx
-### ComponentName
+### Props
 
-Wraps Base UI's `Autocomplete.Root`. All Autocomplete.Root props are supported.
+#### ComponentName
+
+<ApiPropsList>
+  ...props...
+</ApiPropsList>
+
+#### AnotherComponent
 
 <ApiPropsList>
   ...props...
 </ApiPropsList>
 ```
 
-For simple wrappers without custom props, you can omit the `<ApiPropsList>` and just state the wrapping:
+### Component Descriptions
+
+Each component part should have a brief description explaining what it does, followed by which Base UI component(s) it wraps. The description helps users understand the component's purpose at a glance.
+
+#### Simple Wrappers
+
+When a component part wraps a single Base UI component:
 
 ```mdx
-### ComponentTrigger
+#### CommandList
 
-Wraps Base UI's `Dialog.Trigger`. All Dialog.Trigger props are supported.
+Scrollable container for command items. Wraps Base UI's `Autocomplete.List`.
+
+<ApiPropsList>
+  ...props...
+</ApiPropsList>
 ```
+
+#### Compound Wrappers
+
+When a component part composes multiple Base UI components internally (e.g., combining Portal, Backdrop, and Popup), state:
+
+1. What the component does
+2. Which Base UI components are composed
+3. Which component receives the `...props`
+
+```mdx
+#### DialogContent
+
+Main dialog container with backdrop and positioning. Composes `Dialog.Portal`, `Dialog.Backdrop`, and `Dialog.Popup`. Props are forwarded to `Dialog.Popup`.
+
+<ApiPropsList>
+  ...props...
+</ApiPropsList>
+```
+
+This helps users understand:
+
+- What the component does
+- What Base UI props are available (from the component receiving `...props`)
+- The internal structure (for debugging or advanced customization)
+
+### Omitting Components
+
+For simple wrappers without props worth documenting, you can either:
+
+- Omit them from the Props section entirely, or
+- Include them briefly to show the Base UI mapping
 
 ## ApiProp Component Usage
 
@@ -131,6 +179,7 @@ defaultValue="0"
 2. Be concise - one to two sentences is usually enough
 3. Mention constraints or relationships with other props
 4. Use backticks for code references within descriptions
+5. Only add "Custom prop not available in Base UI" when needed to distinguish from Base UI props on a component that wraps Base UI. Skip it for entirely custom components (like Tree, Card) where the intro already explains all props are custom
 
 ```mdx
 <!-- Good -->
@@ -165,27 +214,6 @@ For complex props, use line breaks and lists:
 </ApiProp>
 ```
 
-## Component Parts Table
-
-For compound components, **always use a table** (not a bullet list) to document component parts:
-
-```mdx
-### Component Parts
-
-| Component | Description |
-| --- | --- |
-| `Command` | Root component. Wraps `Autocomplete.Root` |
-| `CommandInput` | Search input with icon. Wraps `Autocomplete.Input` |
-| `CommandList` | Scrollable list container with empty state |
-| `CommandItem` | Individual command item. Wraps `Autocomplete.Item` |
-```
-
-Guidelines:
-
-- Keep descriptions brief (one short sentence)
-- When a part wraps a Base UI component, mention it in the description
-- List parts in logical order (root first, then structural, then content)
-
 ## Documenting Modified Defaults
 
 When your component changes default values from the base library, **include the prop in the `<ApiPropsList>`** and note the Base UI default in the description. This ensures users can see it as an actual prop they can configure.
@@ -216,7 +244,11 @@ The Button component is built on top of [Base UI's Button](https://base-ui.com/r
 
 For the complete Base UI API, see the [Base UI Button documentation](https://base-ui.com/react/components/button).
 
-### Button
+### Props
+
+#### Button
+
+Clickable element that triggers actions. Wraps Base UI's `Button`.
 
 <ApiPropsList>
 
@@ -255,10 +287,12 @@ Before submitting documentation:
 
 - [ ] Only props explicitly used in the component are documented
 - [ ] Intro paragraph links to base library documentation
-- [ ] Each component part states which Base UI component it wraps (if applicable)
+- [ ] Uses `### Props` with `#### ComponentName` headings for each component part
+- [ ] Each component part has a brief description of what it does
+- [ ] Simple wrappers state which Base UI component they wrap
+- [ ] Compound wrappers state which components are composed and where `...props` go
 - [ ] Each prop has `name` and `fullType`
 - [ ] String default values have proper quote escaping
 - [ ] Descriptions are concise and start with action verbs
 - [ ] Complex props have list formatting for options
-- [ ] Component parts use a table format (not bullet lists)
 - [ ] Modified defaults are in `<ApiPropsList>` with Base UI default noted in description

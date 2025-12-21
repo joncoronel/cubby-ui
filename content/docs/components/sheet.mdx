@@ -55,9 +55,11 @@ The Sheet component is built on top of [Base UI's Dialog](https://base-ui.com/re
 
 For the complete Base UI API, see the [Base UI Dialog documentation](https://base-ui.com/react/components/dialog).
 
-### Custom Props
+### Props
 
 #### SheetContent
+
+Sliding panel container with backdrop and positioning. Composes `Dialog.Portal`, `Dialog.Backdrop`, and `Dialog.Popup`. Props are forwarded to `Dialog.Popup`.
 
 <ApiPropsList>
 
@@ -80,6 +82,8 @@ For the complete Base UI API, see the [Base UI Dialog documentation](https://bas
 </ApiPropsList>
 
 #### SheetBody
+
+Scrollable content area within the sheet.
 
 <ApiPropsList>
 

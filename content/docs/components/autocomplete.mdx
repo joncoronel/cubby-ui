@@ -67,9 +67,27 @@ The Autocomplete component is built on top of [Base UI's Autocomplete](https://b
 
 For the complete Base UI API, see the [Base UI Autocomplete documentation](https://base-ui.com/react/components/autocomplete).
 
-### Custom Props
+### Props
+
+#### AutocompletePositioner
+
+Positions the suggestions dropdown relative to the input. Wraps Base UI's `Autocomplete.Positioner`.
+
+<ApiPropsList>
+
+<ApiProp
+  name="sideOffset"
+  fullType="number"
+  defaultValue="6"
+>
+  Distance between the trigger and the popup. Base UI defaults to `0`.
+</ApiProp>
+
+</ApiPropsList>
 
 #### AutocompleteList
+
+Scrollable container for suggestion items. Wraps Base UI's `Autocomplete.List`.
 
 <ApiPropsList>
 
@@ -114,9 +132,3 @@ For the complete Base UI API, see the [Base UI Autocomplete documentation](https
 </ApiProp>
 
 </ApiPropsList>
-
-### Modified Defaults
-
-Our implementation changes the following Base UI prop default:
-
-- **AutocompletePositioner**: `sideOffset` defaults to `6` (Base UI defaults to `0`)

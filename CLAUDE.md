@@ -186,7 +186,7 @@ See [API_REFERENCE_GUIDE.md](./API_REFERENCE_GUIDE.md) for how to write API refe
 1. Only document props explicitly used in the component (custom props, modified defaults, key data props)
 2. Do not list all props from the base library - link to their docs instead
 3. Use `<ApiPropsList>` and `<ApiProp>` components for consistent formatting
-4. Include a Component Parts table for compound components
+4. Add a brief description for each component part explaining what it does
 
 **After writing or modifying code:**
 1. Run `pnpm run format` to auto-format with Prettier

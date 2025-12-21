@@ -80,9 +80,11 @@ The Dialog component is built on top of [Base UI's Dialog](https://base-ui.com/r
 
 For the complete Base UI API, see the [Base UI Dialog documentation](https://base-ui.com/react/components/dialog).
 
-### Custom Props
+### Props
 
 #### DialogContent
+
+Modal container with backdrop and centered positioning. Composes `Dialog.Portal`, `Dialog.Backdrop`, and `Dialog.Popup`. Props are forwarded to `Dialog.Popup`.
 
 <ApiPropsList>
 
@@ -99,6 +101,8 @@ For the complete Base UI API, see the [Base UI Dialog documentation](https://bas
 </ApiPropsList>
 
 #### DialogBody
+
+Scrollable content area within the dialog.
 
 <ApiPropsList>
 

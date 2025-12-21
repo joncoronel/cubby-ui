@@ -33,7 +33,15 @@ Use nested alert dialogs for multi-step confirmations.
 
 ## API Reference
 
-### AlertDialogContent
+The AlertDialog component is built on top of [Base UI's AlertDialog](https://base-ui.com/react/components/alert-dialog). All Base UI props are supported. The documentation below only covers custom props specific to our implementation.
+
+For the complete Base UI API, see the [Base UI AlertDialog documentation](https://base-ui.com/react/components/alert-dialog).
+
+### Props
+
+#### AlertDialogContent
+
+Modal container for important messages requiring user action. Composes `AlertDialog.Portal`, `AlertDialog.Backdrop`, and `AlertDialog.Popup`. Props are forwarded to `AlertDialog.Popup`.
 
 <ApiPropsList>
 
@@ -48,6 +56,8 @@ Use nested alert dialogs for multi-step confirmations.
 </ApiPropsList>
 
 #### AlertDialogBody
+
+Scrollable content area within the alert dialog.
 
 <ApiPropsList>
 
@@ -95,9 +105,9 @@ Use nested alert dialogs for multi-step confirmations.
 
 </ApiPropsList>
 
-### AlertDialogClose
+#### AlertDialogClose
 
-Use `AlertDialogClose` with the `render` prop to create action buttons:
+Button that closes the alert dialog. Wraps Base UI's `AlertDialog.Close`. Use with the `render` prop to create action buttons:
 
 ```tsx
 <AlertDialogFooter>
@@ -105,7 +115,3 @@ Use `AlertDialogClose` with the `render` prop to create action buttons:
   <AlertDialogClose render={<Button variant="destructive">Delete</Button>} />
 </AlertDialogFooter>
 ```
-
-### Additional Props
-
-AlertDialog components inherit all props from [Base UI Alert Dialog](https://base-ui.com/react/components/alert-dialog#api-reference), including open, defaultOpen, onOpenChange, modal, and accessibility props.

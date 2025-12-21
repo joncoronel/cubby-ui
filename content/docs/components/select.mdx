@@ -73,9 +73,11 @@ The Select component is built on top of [Base UI's Select](https://base-ui.com/r
 
 For the complete Base UI API, see the [Base UI Select documentation](https://base-ui.com/react/components/select).
 
-### Custom Props
+### Props
 
 #### SelectValue
+
+Displays the selected value or placeholder text. Wraps Base UI's `Select.Value`.
 
 <ApiPropsList>
 
@@ -94,6 +96,8 @@ For the complete Base UI API, see the [Base UI Select documentation](https://bas
 </ApiPropsList>
 
 #### SelectTrigger
+
+Button that opens the dropdown when clicked. Wraps Base UI's `Select.Trigger`.
 
 <ApiPropsList>
 
@@ -117,6 +121,8 @@ For the complete Base UI API, see the [Base UI Select documentation](https://bas
 </ApiPropsList>
 
 #### SelectContent
+
+Dropdown container for the option list with positioning. Composes Base UI's `Select.Positioner` and `Select.Popup`. Props are forwarded to `Select.Popup`.
 
 <ApiPropsList>
 
@@ -168,10 +174,12 @@ For the complete Base UI API, see the [Base UI Select documentation](https://bas
   Use native browser scrolling with styled scrollbars instead of Base UI's scroll virtualization. Enables CSS scroll-driven animations for fade edges.
 </ApiProp>
 
+<ApiProp
+  name="sideOffset"
+  fullType="number"
+  defaultValue="6"
+>
+  Distance between the trigger and the popup. Base UI defaults to `0`.
+</ApiProp>
+
 </ApiPropsList>
-
-### Modified Defaults
-
-Our implementation changes the following Base UI prop default:
-
-- **SelectContent**: `sideOffset` defaults to `6` (Base UI defaults to `0`)

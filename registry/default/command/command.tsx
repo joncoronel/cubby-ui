@@ -10,6 +10,10 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/registry/default/input-group/input-group";
+import {
+  ScrollArea,
+  type ScrollAreaProps,
+} from "@/registry/default/scroll-area/scroll-area";
 
 import { cn } from "@/lib/utils";
 
@@ -40,7 +44,7 @@ function CommandDialog({
   children,
   className,
   ...props
-}: Omit<React.ComponentProps<typeof Dialog>, 'children'> & {
+}: Omit<React.ComponentProps<typeof Dialog>, "children"> & {
   className?: string;
   children?: React.ReactNode;
 }) {
@@ -58,10 +62,7 @@ function CommandDialog({
   );
 }
 
-function CommandInput({
-  className,
-  ...props
-}: AutocompleteBase.Input.Props) {
+function CommandInput({ className, ...props }: AutocompleteBase.Input.Props) {
   return (
     <InputGroup className={cn("mt-2 w-[calc(100%-1rem)]", className)}>
       <AutocompleteBase.Input
@@ -99,10 +100,23 @@ function CommandList({
   className,
   children,
   emptyMessage = "No results found.",
+  nativeScroll = false,
+  fadeEdges = true,
+  scrollbarGutter = false,
+  persistScrollbar,
+  hideScrollbar,
   ...props
-}: AutocompleteBase.List.Props & {
-  emptyMessage?: React.ReactNode;
-}) {
+}: AutocompleteBase.List.Props &
+  Pick<
+    ScrollAreaProps,
+    | "nativeScroll"
+    | "fadeEdges"
+    | "scrollbarGutter"
+    | "persistScrollbar"
+    | "hideScrollbar"
+  > & {
+    emptyMessage?: React.ReactNode;
+  }) {
   return (
     <>
       <AutocompleteBase.Empty
@@ -111,16 +125,22 @@ function CommandList({
       >
         {emptyMessage}
       </AutocompleteBase.Empty>
-      <AutocompleteBase.List
-        data-slot="command-list"
-        className={cn(
-          "max-h-[300px] w-full overflow-x-hidden overflow-y-auto p-1 outline-hidden empty:m-0 empty:p-0",
-          className,
-        )}
-        {...props}
+      <ScrollArea
+        nativeScroll={nativeScroll}
+        fadeEdges={fadeEdges}
+        scrollbarGutter={scrollbarGutter}
+        persistScrollbar={persistScrollbar}
+        hideScrollbar={hideScrollbar}
+        className={cn("max-h-[300px] w-full", className)}
       >
-        {children}
-      </AutocompleteBase.List>
+        <AutocompleteBase.List
+          data-slot="command-list"
+          className="rounded-xl py-2 outline-hidden empty:m-0 empty:p-0"
+          {...props}
+        >
+          {children}
+        </AutocompleteBase.List>
+      </ScrollArea>
     </>
   );
 }
@@ -133,7 +153,7 @@ function CommandGroup({
   return (
     <AutocompleteBase.Group
       data-slot="command-group"
-      className={cn("text-foreground overflow-hidden p-1", className)}
+      className={cn("text-foreground block", className)}
       {...props}
     >
       {children}
@@ -149,7 +169,7 @@ function CommandGroupLabel({
     <AutocompleteBase.GroupLabel
       data-slot="command-group-label"
       className={cn(
-        "text-muted-foreground px-2.5 py-2 text-xs font-medium",
+        "text-muted-foreground bg-popover mx-2 px-2.5 py-1.5 text-xs font-semibold",
         className,
       )}
       {...props}
@@ -164,21 +184,20 @@ function CommandSeparator({
   return (
     <AutocompleteBase.Separator
       data-slot="command-separator"
-      className={cn("bg-border -mx-1 h-px", className)}
+      className={cn("bg-border mx-2 my-1 h-px min-h-px", className)}
       {...props}
     />
   );
 }
 
-function CommandItem({
-  className,
-  ...props
-}: AutocompleteBase.Item.Props) {
+function CommandItem({ className, ...props }: AutocompleteBase.Item.Props) {
   return (
     <AutocompleteBase.Item
       data-slot="command-item"
       className={cn(
-        "group data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground data-[highlighted]:[&_svg:not([class*='text-'])]:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground text-foreground data-[highlighted]:ring-border/70 relative flex cursor-default items-center gap-2 rounded-sm p-2.5 text-sm font-medium outline-hidden transition-[colors,background-color,box-shadow] duration-100 ease-out select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[highlighted]:ring-1 data-[highlighted]:duration-0 sm:py-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "group data-highlighted:bg-accent/50 data-highlighted:text-accent-foreground data-highlighted:[&_svg:not([class*='text-'])]:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground text-foreground data-highlighted:ring-border/70 relative flex cursor-default items-center gap-2 rounded-md p-2.5 text-sm font-medium outline-hidden transition-[colors,background-color,box-shadow] duration-100 ease-out select-none data-disabled:pointer-events-none data-disabled:opacity-50 data-highlighted:ring-1 data-highlighted:duration-0 sm:py-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        // Spacing from list edges (matches input's calc(100%-1rem) gap)
+        "mx-2",
         className,
       )}
       {...props}
@@ -186,9 +205,7 @@ function CommandItem({
   );
 }
 
-function CommandCollection({
-  ...props
-}: AutocompleteBase.Collection.Props) {
+function CommandCollection({ ...props }: AutocompleteBase.Collection.Props) {
   return (
     <AutocompleteBase.Collection data-slot="command-collection" {...props} />
   );
@@ -215,7 +232,7 @@ function CommandFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="command-footer"
       className={cn(
-        "text-muted-foreground hidden items-center justify-between px-3 py-2 pb-1 text-xs sm:flex",
+        "text-muted-foreground flex items-center justify-between px-3 py-2 pb-1 text-xs",
         className,
       )}
       {...props}

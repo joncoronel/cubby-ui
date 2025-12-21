@@ -405,7 +405,8 @@
       ],
       "registryDependencies": [
         "@cubby-ui/dialog",
-        "@cubby-ui/input-group"
+        "@cubby-ui/input-group",
+        "@cubby-ui/scroll-area"
       ],
       "dependencies": [
         "lucide-react"

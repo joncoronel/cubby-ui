@@ -149,7 +149,7 @@ function CommandContent({
     <div
       data-slot="command-content"
       className={cn(
-        "bg-card ring-border/25 dark:ring-border/10 flex min-h-0 flex-1 flex-col items-center rounded-2xl ring-1",
+        "bg-card ring-border/25 dark:ring-border/10 flex min-h-0 flex-1 flex-col items-center overflow-hidden rounded-2xl ring-1",
         className,
       )}
       {...props}

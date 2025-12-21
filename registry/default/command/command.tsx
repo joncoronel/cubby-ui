@@ -6,11 +6,6 @@ import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import { SearchIcon } from "lucide-react";
 
 import {
-  DialogBackdrop,
-  DialogPortal,
-  DialogViewport,
-} from "@/registry/default/dialog/dialog";
-import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
@@ -62,15 +57,52 @@ function CommandDialogTrigger({ ...props }: BaseDialog.Trigger.Props) {
   return <BaseDialog.Trigger data-slot="command-dialog-trigger" {...props} />;
 }
 
+function CommandDialogPortal({ ...props }: BaseDialog.Portal.Props) {
+  return <BaseDialog.Portal data-slot="command-dialog-portal" {...props} />;
+}
+
+function CommandDialogBackdrop({
+  className,
+  ...props
+}: BaseDialog.Backdrop.Props) {
+  return (
+    <BaseDialog.Backdrop
+      data-slot="command-dialog-backdrop"
+      className={cn(
+        "ease-out-cubic fixed inset-0 min-h-dvh bg-black/40 transition-all duration-200 supports-[-webkit-touch-callout:none]:absolute",
+        "backdrop-blur-sm data-ending-style:opacity-0 data-starting-style:opacity-0",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+function CommandDialogViewport({
+  className,
+  ...props
+}: BaseDialog.Viewport.Props) {
+  return (
+    <BaseDialog.Viewport
+      data-slot="command-dialog-viewport"
+      className={cn(
+        "fixed inset-0 flex flex-col items-center justify-center overflow-hidden px-4 py-6",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
 function CommandDialogPopup({
   className,
   children,
   ...props
 }: BaseDialog.Popup.Props) {
   return (
-    <DialogPortal>
-      <DialogBackdrop />
-      <DialogViewport>
+    <CommandDialogPortal>
+      <CommandDialogBackdrop />
+      <CommandDialogViewport>
         <BaseDialog.Popup
           data-slot="command-dialog-popup"
           className={cn(
@@ -88,8 +120,8 @@ function CommandDialogPopup({
         >
           {children}
         </BaseDialog.Popup>
-      </DialogViewport>
-    </DialogPortal>
+      </CommandDialogViewport>
+    </CommandDialogPortal>
   );
 }
 
@@ -275,6 +307,9 @@ export {
   Command,
   CommandDialog,
   CommandDialogTrigger,
+  CommandDialogPortal,
+  CommandDialogBackdrop,
+  CommandDialogViewport,
   CommandDialogPopup,
   CommandInput,
   CommandContent,

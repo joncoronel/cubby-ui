@@ -586,7 +586,6 @@ export const componentMetadata = {
     "description": "A command component.",
     "category": "UI",
     "registryDependencies": [
-      "@cubby-ui/dialog",
       "@cubby-ui/input-group",
       "@cubby-ui/scroll-area"
     ],

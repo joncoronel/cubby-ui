@@ -12,6 +12,7 @@ import {
   Command,
   CommandCollection,
   CommandDialog,
+  CommandDialogPopup,
   CommandGroup,
   CommandGroupLabel,
   CommandInput,
@@ -73,14 +74,13 @@ export function ComponentSearch() {
           <Search className="h-4 w-4" />
         </button>
       </div>
-      <CommandDialog
-        open={open}
-        onOpenChange={setOpen}
-        className={
-          "transition-all duration-150 ease-out max-sm:top-4 max-sm:translate-y-0 max-sm:has-[input:placeholder-shown]:shadow-none max-sm:data-[ending-style]:-translate-y-2 max-sm:data-[ending-style]:scale-none max-sm:data-[ending-style]:blur-xs max-sm:data-[starting-style]:-translate-y-4 max-sm:data-[starting-style]:scale-none max-sm:data-[starting-style]:blur-xs"
-        }
-      >
-        <Command
+      <CommandDialog open={open} onOpenChange={setOpen}>
+        <CommandDialogPopup
+          className={
+            "transition-all duration-150 ease-out max-sm:top-4 max-sm:translate-y-0 max-sm:has-[input:placeholder-shown]:shadow-none max-sm:data-ending-style:-translate-y-2 max-sm:data-ending-style:scale-none max-sm:data-ending-style:blur-xs max-sm:data-starting-style:-translate-y-4 max-sm:data-starting-style:scale-none max-sm:data-starting-style:blur-xs"
+          }
+        >
+          <Command
           items={componentGroups}
           autoHighlight
           open={open}
@@ -150,6 +150,7 @@ export function ComponentSearch() {
             </div>
           </CommandFooter>
         </Command>
+        </CommandDialogPopup>
       </CommandDialog>
     </>
   );

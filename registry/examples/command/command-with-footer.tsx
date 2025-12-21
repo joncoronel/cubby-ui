@@ -5,6 +5,8 @@ import {
   CommandCollection,
   CommandContent,
   CommandDialog,
+  CommandDialogPopup,
+  CommandDialogTrigger,
   CommandFooter,
   CommandGroup,
   CommandGroupLabel,
@@ -111,60 +113,62 @@ export default function CommandWithFooter() {
       <p className="text-muted-foreground mb-4 text-sm">
         Press <Kbd keys={["cmd", "k"]} /> to open
       </p>
-      <Button onClick={() => setDialogOpen(true)}>Open Command Menu</Button>
       <CommandDialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <Command items={commandGroups} open={dialogOpen}>
-          <CommandContent>
-            <CommandInput placeholder="Search for apps and commands..." />
-            <CommandList emptyMessage="No results found.">
-              {(group: CommandGroupData, index: number) => (
-                <React.Fragment key={group.label}>
-                  {index > 0 && <CommandSeparator />}
-                  <CommandGroup items={group.items}>
-                    <CommandGroupLabel>{group.label}</CommandGroupLabel>
-                    <CommandCollection>
-                      {(item: CommandItemData) => {
-                        const Icon = item.icon;
-                        return (
-                          <CommandItem key={item.value} value={item.value}>
-                            <Icon />
-                            <span>{item.label}</span>
-                            {item.type && (
-                              <CommandShortcut>{item.type}</CommandShortcut>
-                            )}
-                          </CommandItem>
-                        );
-                      }}
-                    </CommandCollection>
-                  </CommandGroup>
-                </React.Fragment>
-              )}
-            </CommandList>
-          </CommandContent>
-          <CommandFooter>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1.5">
-                <Kbd size="sm" className="px-1">
-                  <CornerDownLeftIcon className="size-3" />
-                </Kbd>
-                <span>to select</span>
+        <CommandDialogTrigger render={<Button>Open Command Menu</Button>} />
+        <CommandDialogPopup>
+          <Command items={commandGroups} open={dialogOpen}>
+            <CommandContent>
+              <CommandInput placeholder="Search for apps and commands..." />
+              <CommandList emptyMessage="No results found.">
+                {(group: CommandGroupData, index: number) => (
+                  <React.Fragment key={group.label}>
+                    {index > 0 && <CommandSeparator />}
+                    <CommandGroup items={group.items}>
+                      <CommandGroupLabel>{group.label}</CommandGroupLabel>
+                      <CommandCollection>
+                        {(item: CommandItemData) => {
+                          const Icon = item.icon;
+                          return (
+                            <CommandItem key={item.value} value={item.value}>
+                              <Icon />
+                              <span>{item.label}</span>
+                              {item.type && (
+                                <CommandShortcut>{item.type}</CommandShortcut>
+                              )}
+                            </CommandItem>
+                          );
+                        }}
+                      </CommandCollection>
+                    </CommandGroup>
+                  </React.Fragment>
+                )}
+              </CommandList>
+            </CommandContent>
+            <CommandFooter>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1.5">
+                  <Kbd size="sm" className="px-1">
+                    <CornerDownLeftIcon className="size-3" />
+                  </Kbd>
+                  <span>to select</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Kbd size="sm" className="px-1">
+                    <ArrowUpIcon className="size-3" />
+                  </Kbd>
+                  <Kbd size="sm" className="px-1">
+                    <ArrowDownIcon className="size-3" />
+                  </Kbd>
+                  <span>to navigate</span>
+                </div>
               </div>
               <div className="flex items-center gap-1.5">
-                <Kbd size="sm" className="px-1">
-                  <ArrowUpIcon className="size-3" />
-                </Kbd>
-                <Kbd size="sm" className="px-1">
-                  <ArrowDownIcon className="size-3" />
-                </Kbd>
-                <span>to navigate</span>
+                <Kbd size="sm">esc</Kbd>
+                <span>to close</span>
               </div>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Kbd size="sm">esc</Kbd>
-              <span>to close</span>
-            </div>
-          </CommandFooter>
-        </Command>
+            </CommandFooter>
+          </Command>
+        </CommandDialogPopup>
       </CommandDialog>
     </div>
   );

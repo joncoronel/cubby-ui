@@ -5,6 +5,8 @@ import {
   CommandCollection,
   CommandContent,
   CommandDialog,
+  CommandDialogPopup,
+  CommandDialogTrigger,
   CommandGroup,
   CommandGroupLabel,
   CommandInput,
@@ -76,37 +78,41 @@ export default function CommandCommandDialog() {
       <p className="text-muted-foreground mb-4 text-sm">
         Press <Kbd keys={["cmd", "k"]} /> to open
       </p>
-      <Button onClick={() => setDialogOpen(true)}>Open Command Palette</Button>
       <CommandDialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <Command items={commandGroups} open={dialogOpen}>
-          <CommandContent>
-            <CommandInput placeholder="Type a command or search..." />
-            <CommandList emptyMessage="No results found.">
-              {(group: CommandGroupData, index: number) => (
-                <React.Fragment key={group.label}>
-                  {index > 0 && <CommandSeparator />}
-                  <CommandGroup items={group.items}>
-                    <CommandGroupLabel>{group.label}</CommandGroupLabel>
-                    <CommandCollection>
-                      {(item: CommandItemData) => {
-                        const Icon = item.icon;
-                        return (
-                          <CommandItem key={item.value} value={item.value}>
-                            <Icon className="mr-2 h-4 w-4" />
-                            <span>{item.label}</span>
-                            {item.shortcut && (
-                              <CommandShortcut>{item.shortcut}</CommandShortcut>
-                            )}
-                          </CommandItem>
-                        );
-                      }}
-                    </CommandCollection>
-                  </CommandGroup>
-                </React.Fragment>
-              )}
-            </CommandList>
-          </CommandContent>
-        </Command>
+        <CommandDialogTrigger
+          render={<Button>Open Command Palette</Button>}
+        />
+        <CommandDialogPopup>
+          <Command items={commandGroups} open={dialogOpen}>
+            <CommandContent>
+              <CommandInput placeholder="Type a command or search..." />
+              <CommandList emptyMessage="No results found.">
+                {(group: CommandGroupData, index: number) => (
+                  <React.Fragment key={group.label}>
+                    {index > 0 && <CommandSeparator />}
+                    <CommandGroup items={group.items}>
+                      <CommandGroupLabel>{group.label}</CommandGroupLabel>
+                      <CommandCollection>
+                        {(item: CommandItemData) => {
+                          const Icon = item.icon;
+                          return (
+                            <CommandItem key={item.value} value={item.value}>
+                              <Icon className="mr-2 h-4 w-4" />
+                              <span>{item.label}</span>
+                              {item.shortcut && (
+                                <CommandShortcut>{item.shortcut}</CommandShortcut>
+                              )}
+                            </CommandItem>
+                          );
+                        }}
+                      </CommandCollection>
+                    </CommandGroup>
+                  </React.Fragment>
+                )}
+              </CommandList>
+            </CommandContent>
+          </Command>
+        </CommandDialogPopup>
       </CommandDialog>
     </div>
   );

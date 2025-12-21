@@ -177,6 +177,17 @@ This project follows strict quality standards for both code and user interface d
 
 See [CODE_STANDARDS.md](./CODE_STANDARDS.md) for comprehensive code quality guidelines enforced by ESLint and Prettier.
 
+### API Reference Documentation
+
+See [API_REFERENCE_GUIDE.md](./API_REFERENCE_GUIDE.md) for how to write API reference sections in component documentation.
+
+**When writing or updating component documentation:**
+
+1. Only document props explicitly used in the component (custom props, modified defaults, key data props)
+2. Do not list all props from the base library - link to their docs instead
+3. Use `<ApiPropsList>` and `<ApiProp>` components for consistent formatting
+4. Include a Component Parts table for compound components
+
 **After writing or modifying code:**
 1. Run `pnpm run format` to auto-format with Prettier
 2. Run `pnpm run lint` to check for ESLint issues

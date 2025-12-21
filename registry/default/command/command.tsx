@@ -2,9 +2,14 @@
 
 import * as React from "react";
 import { Autocomplete as AutocompleteBase } from "@base-ui/react/autocomplete";
+import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import { SearchIcon } from "lucide-react";
 
-import { Dialog, DialogContent } from "@/registry/default/dialog/dialog";
+import {
+  DialogBackdrop,
+  DialogPortal,
+  DialogViewport,
+} from "@/registry/default/dialog/dialog";
 import {
   InputGroup,
   InputGroupAddon,
@@ -17,10 +22,15 @@ import {
 
 import { cn } from "@/lib/utils";
 
-function Command<ItemValue = any>({
+const AutocompleteRoot = AutocompleteBase.Root;
+
+function Command<ItemValue>({
   className,
   items = [],
   children,
+  autoHighlight = "always",
+  open = true,
+  keepHighlight = true,
   ...props
 }: AutocompleteBase.Root.Props<ItemValue> & {
   className?: string;
@@ -33,32 +43,53 @@ function Command<ItemValue = any>({
         className,
       )}
     >
-      <AutocompleteBase.Root items={items} {...(props as any)}>
+      <AutocompleteRoot
+        items={items}
+        autoHighlight={autoHighlight}
+        keepHighlight={keepHighlight}
+        open={open}
+        {...props}
+      >
         {children}
-      </AutocompleteBase.Root>
+      </AutocompleteRoot>
     </div>
   );
 }
 
-function CommandDialog({
-  children,
+const CommandDialog = BaseDialog.Root;
+
+function CommandDialogTrigger({ ...props }: BaseDialog.Trigger.Props) {
+  return <BaseDialog.Trigger data-slot="command-dialog-trigger" {...props} />;
+}
+
+function CommandDialogPopup({
   className,
+  children,
   ...props
-}: Omit<React.ComponentProps<typeof Dialog>, "children"> & {
-  className?: string;
-  children?: React.ReactNode;
-}) {
+}: BaseDialog.Popup.Props) {
   return (
-    <Dialog {...props}>
-      <DialogContent
-        className={cn(
-          "max-h-100 min-h-0 rounded-4xl border-none bg-transparent p-0 shadow-lg ring-0 **:data-[slot='dialog-close']:hidden",
-          className,
-        )}
-      >
-        {children}
-      </DialogContent>
-    </Dialog>
+    <DialogPortal>
+      <DialogBackdrop />
+      <DialogViewport>
+        <BaseDialog.Popup
+          data-slot="command-dialog-popup"
+          className={cn(
+            "relative z-50 flex max-h-100 min-h-0 w-full max-w-lg min-w-0 flex-col overflow-hidden rounded-4xl bg-transparent shadow-lg",
+            // Nested dialog offset
+            "-translate-y-[calc(1.25rem*var(--nested-dialogs))]",
+            "scale-[calc(1-0.1*var(--nested-dialogs))]",
+            // Animation
+            "ease-out-cubic transition-all duration-200",
+            "data-starting-style:translate-y-5 data-starting-style:scale-95 data-starting-style:opacity-0",
+            "data-ending-style:translate-y-5 data-ending-style:scale-95 data-ending-style:opacity-0",
+            className,
+          )}
+          {...props}
+        >
+          {children}
+        </BaseDialog.Popup>
+      </DialogViewport>
+    </DialogPortal>
   );
 }
 
@@ -243,6 +274,8 @@ function CommandFooter({ className, ...props }: React.ComponentProps<"div">) {
 export {
   Command,
   CommandDialog,
+  CommandDialogTrigger,
+  CommandDialogPopup,
   CommandInput,
   CommandContent,
   CommandList,

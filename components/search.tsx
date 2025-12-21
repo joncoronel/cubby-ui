@@ -13,11 +13,13 @@ import {
 } from "fumadocs-ui/components/dialog/search";
 import { useI18n } from "fumadocs-ui/contexts/i18n";
 
-export default function DefaultSearchDialog(props: SharedProps) {
-  const { locale } = useI18n(); // (optional) for i18n
+export default function CustomSearchDialog(props: SharedProps) {
+  const { locale } = useI18n();
   const { search, setSearch, query } = useDocsSearch({
     type: "fetch",
     locale,
+    // Increase debounce from 100ms (default) to 300ms to reduce API calls
+    delayMs: 300,
   });
 
   return (

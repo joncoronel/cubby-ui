@@ -5,6 +5,7 @@ import "./globals.css";
 import { RootProvider } from "fumadocs-ui/provider/next";
 import { Providers } from "@/components/providers/providers";
 import { OpenPanelComponent } from "@openpanel/nextjs";
+import CustomSearchDialog from "@/components/search";
 
 const geistSans = Geist({
   variable: "--font-sans",
@@ -74,7 +75,7 @@ export default function RootLayout({
         // className={`${geistSans.variable} ${geistMono.variable} ${rubik.variable} flex min-h-screen max-w-full flex-col font-sans antialiased`}
       >
         <Providers>
-          <RootProvider>
+          <RootProvider search={{ SearchDialog: CustomSearchDialog }}>
             <div className="root bg-background" data-vaul-drawer-wrapper>
               {children}
             </div>

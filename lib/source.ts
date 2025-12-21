@@ -235,6 +235,54 @@ ${exampleData.source}
     },
   );
 
+  // Extract package manager commands from PackageManagerCommand tags
+  cleaned = cleaned.replace(
+    /<PackageManagerCommand\s+npm\s*=\s*"([^"]+)"\s*\/>/g,
+    (_match, npmCommand) => {
+      // Convert npm command to other package manager equivalents
+      let pnpmCommand = npmCommand;
+      let yarnCommand = npmCommand;
+      let bunCommand = npmCommand;
+
+      // npx -> pnpm dlx / bunx (yarn uses npx)
+      if (npmCommand.startsWith("npx ")) {
+        pnpmCommand = npmCommand.replace(/^npx /, "pnpm dlx ");
+        bunCommand = npmCommand.replace(/^npx /, "bunx ");
+      }
+
+      // npm install -> pnpm add / yarn add / bun add
+      if (npmCommand.startsWith("npm install ")) {
+        pnpmCommand = npmCommand.replace(/^npm install /, "pnpm add ");
+        yarnCommand = npmCommand.replace(/^npm install /, "yarn add ");
+        bunCommand = npmCommand.replace(/^npm install /, "bun add ");
+      }
+
+      const codeBlock = `
+**npm:**
+\`\`\`bash
+${npmCommand}
+\`\`\`
+
+**pnpm:**
+\`\`\`bash
+${pnpmCommand}
+\`\`\`
+
+**yarn:**
+\`\`\`bash
+${yarnCommand}
+\`\`\`
+
+**bun:**
+\`\`\`bash
+${bunCommand}
+\`\`\`
+`;
+      codeBlocks.push(codeBlock);
+      return `${CODE_BLOCK_PLACEHOLDER}${codeBlocks.length - 1}${CODE_BLOCK_PLACEHOLDER}`;
+    },
+  );
+
   // Remove any remaining self-closing component tags
   cleaned = cleaned.replace(
     /<[A-Z][^>]*\/>/g,

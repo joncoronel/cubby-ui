@@ -4,6 +4,7 @@ import { ComponentPreviewServer } from "@/components/mdx/component-preview-serve
 import { ComponentCodeServer } from "@/components/mdx/component-code-server";
 import { ComponentInstallServer } from "@/components/mdx/component-install-server";
 import { ComponentUsageServer } from "@/components/mdx/component-usage-server";
+import { PackageManagerCommandServer } from "@/components/mdx/package-manager-command-server";
 import { MdxPreServer } from "@/components/mdx/mdx-pre-server";
 import { ApiProp, ApiPropsList } from "@/components/mdx/api-prop";
 import {
@@ -30,6 +31,7 @@ export function getMDXComponents(
     ComponentCode: ComponentCodeServer,
     ComponentInstall: ComponentInstallServer,
     ComponentUsage: ComponentUsageServer,
+    PackageManagerCommand: PackageManagerCommandServer,
     ApiProp,
     ApiPropsList,
   };

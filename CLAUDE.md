@@ -112,6 +112,7 @@ The project uses **Fumadocs** for documentation with auto-syncing MDX components
 Documentation files live in `content/docs/components/` and use special MDX components that automatically sync with the registry:
 
 **ComponentPreview** - Shows interactive component preview with code tab
+
 ```mdx
 <ComponentPreview component="button" example="button-demo">
   <ButtonDemo />
@@ -119,25 +120,42 @@ Documentation files live in `content/docs/components/` and use special MDX compo
 ```
 
 **ComponentInstall** - Auto-generates installation instructions
+
 ```mdx
 <ComponentInstall component="button" />
 ```
+
 - Automatically pulls dependencies from registry metadata
 - Shows CLI and Manual installation tabs
 - Manual tab includes package manager selection (npm/pnpm/yarn/bun)
 - Component source code is auto-fetched from `registry/default/`
 
 **ComponentUsage** - Auto-generates usage examples
+
 ```mdx
 <ComponentUsage component="button" />
 ```
+
 - Shows two code blocks: imports and component anatomy
 - Imports are extracted from component metadata
 - Anatomy shows the basic JSX structure without function wrapper
 
+**PackageManagerCommand** - Shows CLI commands with package manager tabs
+
+```mdx
+<PackageManagerCommand npm="npx shadcn@latest add @cubby-ui/button" />
+```
+
+- Automatically converts npm commands to pnpm/yarn/bun equivalents
+- Handles `npx` → `pnpm dlx` / `bunx`, `npm install` → `pnpm add`, etc.
+- Use instead of plain code fences for installation commands
+
+**Markdown Code Fences** - Automatically rendered with custom CodeBlock. All markdown code fences use our `MdxPreServer` component with server-side Shiki highlighting and our styled CodeBlock with copy button.
+
 #### Server-Side Highlighting
 
 All code blocks are pre-highlighted on the server using Shiki for optimal performance:
+
 - `ComponentPreviewServer` wraps `ComponentPreview` (sync wrapper with async code provider)
 - `ComponentInstallServer` pre-highlights all installation commands
 - `ComponentUsageServer` pre-highlights imports and anatomy separately
@@ -189,12 +207,14 @@ See [API_REFERENCE_GUIDE.md](./API_REFERENCE_GUIDE.md) for how to write API refe
 4. Add a brief description for each component part explaining what it does
 
 **After writing or modifying code:**
+
 1. Run `pnpm run format` to auto-format with Prettier
 2. Run `pnpm run lint` to check for ESLint issues
 3. Fix any lint errors (use `--fix` flag for auto-fixable issues)
 4. Verify your code follows the standards in CODE_STANDARDS.md
 
 Key principles:
+
 - Write accessible, performant, type-safe, and maintainable code
 - Use explicit types and modern JavaScript/TypeScript patterns
 - Follow React best practices (hooks rules, proper component structure)
@@ -207,6 +227,7 @@ Key principles:
 See [WEB_INTERFACE_STANDARDS.md](./WEB_INTERFACE_STANDARDS.md) for comprehensive UI/UX guidelines.
 
 **When building or modifying UI components, interactions, or user-facing features:**
+
 1. Review relevant sections in WEB_INTERFACE_STANDARDS.md before implementation
 2. Apply appropriate guidelines for the interaction type (forms, buttons, animations, etc.)
 3. Test interactivity, especially for touch devices and keyboard navigation
@@ -215,6 +236,7 @@ See [WEB_INTERFACE_STANDARDS.md](./WEB_INTERFACE_STANDARDS.md) for comprehensive
 6. Ensure proper focus management and ARIA labels
 
 Key areas to check:
+
 - **Interactivity**: Form submissions, input labels, button states, focus management
 - **Typography**: Font smoothing, weights, fluid sizing, tabular numbers
 - **Motion**: Animation durations, theme switching, scroll behavior, respect for reduced motion

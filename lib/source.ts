@@ -237,24 +237,26 @@ ${exampleData.source}
 
   // Extract package manager commands from PackageManagerCommand tags
   cleaned = cleaned.replace(
-    /<PackageManagerCommand\s+npm\s*=\s*"([^"]+)"\s*\/>/g,
-    (_match, npmCommand) => {
-      // Convert npm command to other package manager equivalents
-      let pnpmCommand = npmCommand;
-      let yarnCommand = npmCommand;
-      let bunCommand = npmCommand;
+    /<PackageManagerCommand\s+command\s*=\s*"([^"]+)"(?:\s+type\s*=\s*"([^"]+)")?\s*\/>/g,
+    (_match, command, type = "run") => {
+      // Generate commands for each package manager based on type
+      let npmCommand: string;
+      let pnpmCommand: string;
+      let yarnCommand: string;
+      let bunCommand: string;
 
-      // npx -> pnpm dlx / bunx (yarn uses npx)
-      if (npmCommand.startsWith("npx ")) {
-        pnpmCommand = npmCommand.replace(/^npx /, "pnpm dlx ");
-        bunCommand = npmCommand.replace(/^npx /, "bunx ");
-      }
-
-      // npm install -> pnpm add / yarn add / bun add
-      if (npmCommand.startsWith("npm install ")) {
-        pnpmCommand = npmCommand.replace(/^npm install /, "pnpm add ");
-        yarnCommand = npmCommand.replace(/^npm install /, "yarn add ");
-        bunCommand = npmCommand.replace(/^npm install /, "bun add ");
+      if (type === "add") {
+        // Install dependencies
+        npmCommand = `npm install ${command}`;
+        pnpmCommand = `pnpm add ${command}`;
+        yarnCommand = `yarn add ${command}`;
+        bunCommand = `bun add ${command}`;
+      } else {
+        // Run command (default)
+        npmCommand = `npx ${command}`;
+        pnpmCommand = `pnpm dlx ${command}`;
+        yarnCommand = `yarn dlx ${command}`;
+        bunCommand = `bunx --bun ${command}`;
       }
 
       const codeBlock = `

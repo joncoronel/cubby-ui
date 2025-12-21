@@ -97,8 +97,8 @@ export async function ComponentInstallServer({
   const highlightedCliCommands = {
     npm: await highlight(`npx shadcn@latest add ${registryUrl}`, "bash"),
     pnpm: await highlight(`pnpm dlx shadcn@latest add ${registryUrl}`, "bash"),
-    yarn: await highlight(`npx shadcn@latest add ${registryUrl}`, "bash"),
-    bun: await highlight(`bunx shadcn@latest add ${registryUrl}`, "bash"),
+    yarn: await highlight(`yarn dlx shadcn@latest add ${registryUrl}`, "bash"),
+    bun: await highlight(`bunx --bun shadcn@latest add ${registryUrl}`, "bash"),
   };
 
   // Pre-highlight install commands if there are dependencies

@@ -143,11 +143,14 @@ Documentation files live in `content/docs/components/` and use special MDX compo
 **PackageManagerCommand** - Shows CLI commands with package manager tabs
 
 ```mdx
-<PackageManagerCommand npm="npx shadcn@latest add @cubby-ui/button" />
+<PackageManagerCommand command="shadcn@latest add @cubby-ui/button" />
+<PackageManagerCommand command="react" type="add" />
 ```
 
-- Automatically converts npm commands to pnpm/yarn/bun equivalents
-- Handles `npx` → `pnpm dlx` / `bunx`, `npm install` → `pnpm add`, etc.
+- `command`: The base command without package manager prefix
+- `type`: Optional, either `"run"` (default) or `"add"`
+  - `type="run"`: Generates `npx` / `pnpm dlx` / `bunx` commands
+  - `type="add"`: Generates `npm install` / `pnpm add` / `yarn add` / `bun add` commands
 - Use instead of plain code fences for installation commands
 
 **Markdown Code Fences** - Automatically rendered with custom CodeBlock. All markdown code fences use our `MdxPreServer` component with server-side Shiki highlighting and our styled CodeBlock with copy button.

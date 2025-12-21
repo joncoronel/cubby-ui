@@ -3,50 +3,53 @@ import { PackageManagerCommand } from "./package-manager-command";
 import { highlight } from "@/registry/default/code-block/lib/shiki-shared";
 
 type PackageManager = "npm" | "pnpm" | "yarn" | "bun";
+type CommandType = "run" | "add";
 
 interface PackageManagerCommandServerProps {
-  /** The npm version of the command (will be auto-converted for other package managers) */
-  npm: string;
+  /** The base command without package manager prefix */
+  command: string;
+  /** Type of command: "run" for npx-style, "add" for install-style. Defaults to "run" */
+  type?: CommandType;
 }
 
 /**
- * Converts an npm command to other package manager equivalents.
+ * Generates the full command for a package manager based on type.
  */
-function convertCommand(npmCommand: string, pm: PackageManager): string {
-  if (pm === "npm") return npmCommand;
-
-  let command = npmCommand;
-
-  // npx -> pnpm dlx / bunx (yarn uses npx)
-  if (command.startsWith("npx ")) {
-    if (pm === "pnpm") {
-      command = command.replace(/^npx /, "pnpm dlx ");
-    } else if (pm === "bun") {
-      command = command.replace(/^npx /, "bunx ");
+function generateCommand(
+  baseCommand: string,
+  pm: PackageManager,
+  type: CommandType,
+): string {
+  if (type === "add") {
+    // Install dependencies: npm install / pnpm add / yarn add / bun add
+    switch (pm) {
+      case "npm":
+        return `npm install ${baseCommand}`;
+      case "pnpm":
+        return `pnpm add ${baseCommand}`;
+      case "yarn":
+        return `yarn add ${baseCommand}`;
+      case "bun":
+        return `bun add ${baseCommand}`;
     }
   }
 
-  // npm install -> pnpm add / yarn add / bun add
-  if (command.startsWith("npm install ")) {
-    command = command.replace(
-      /^npm install /,
-      pm === "pnpm" ? "pnpm add " : pm === "yarn" ? "yarn add " : "bun add ",
-    );
+  // Run command: npx / pnpm dlx / yarn dlx / bunx --bun
+  switch (pm) {
+    case "npm":
+      return `npx ${baseCommand}`;
+    case "pnpm":
+      return `pnpm dlx ${baseCommand}`;
+    case "yarn":
+      return `yarn dlx ${baseCommand}`;
+    case "bun":
+      return `bunx --bun ${baseCommand}`;
   }
-
-  // npm run -> pnpm run / yarn run / bun run
-  if (command.startsWith("npm run ")) {
-    command = command.replace(
-      /^npm run /,
-      pm === "pnpm" ? "pnpm run " : pm === "yarn" ? "yarn run " : "bun run ",
-    );
-  }
-
-  return command;
 }
 
 export async function PackageManagerCommandServer({
-  npm,
+  command,
+  type = "run",
 }: PackageManagerCommandServerProps) {
   const packageManagers: PackageManager[] = ["npm", "pnpm", "yarn", "bun"];
 
@@ -56,9 +59,9 @@ export async function PackageManagerCommandServer({
 
   await Promise.all(
     packageManagers.map(async (pm) => {
-      const command = convertCommand(npm, pm);
-      commands[pm] = command;
-      highlighted[pm] = await highlight(command, "bash");
+      const fullCommand = generateCommand(command, pm, type);
+      commands[pm] = fullCommand;
+      highlighted[pm] = await highlight(fullCommand, "bash");
     }),
   );
 

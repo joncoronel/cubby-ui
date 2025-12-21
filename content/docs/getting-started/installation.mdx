@@ -11,6 +11,7 @@ Before installing components, ensure your project has:
 
 - **React 19** or later
 - **Tailwind CSS 4** configured
+- **Base UI** installed (step 2 below)
 - **TypeScript** (recommended)
 
 ## Quick Start
@@ -24,7 +25,13 @@ If you haven't already, initialize shadcn/ui for your framework. Follow the offi
 - [TanStack Start](https://ui.shadcn.com/docs/installation/tanstack)
 - [Other frameworks](https://ui.shadcn.com/docs/installation)
 
-### 2. Add the Cubby UI registry
+### 2. Install Base UI
+
+Cubby UI components are built on [Base UI](https://base-ui.com), a headless component library. Install it first:
+
+<PackageManagerCommand command="@base-ui/react" type="add" />
+
+### 3. Add the Cubby UI registry
 
 Update your `components.json` to include the Cubby UI registry:
 
@@ -36,22 +43,22 @@ Update your `components.json` to include the Cubby UI registry:
 }
 ```
 
-### 3. Initialize Cubby UI theme
+### 4. Initialize Cubby UI theme
 
 Run the init command to add Cubby UI's theme system to your project:
 
-<PackageManagerCommand npm="npx shadcn@latest add @cubby-ui/init" />
+<PackageManagerCommand command="shadcn@latest add @cubby-ui/init" />
 
 This adds to your `globals.css`:
 
 - CSS variables for light and dark modes (using OKLCH colors)
 - Tailwind theme configuration
 
-### 4. Add components
+### 5. Add components
 
 Now you can add any Cubby UI component:
 
-<PackageManagerCommand npm="npx shadcn@latest add @cubby-ui/button" />
+<PackageManagerCommand command="shadcn@latest add @cubby-ui/button" />
 
 This will:
 
@@ -63,7 +70,7 @@ This will:
 
 Add multiple components in a single command:
 
-<PackageManagerCommand npm="npx shadcn@latest add @cubby-ui/button @cubby-ui/input @cubby-ui/card" />
+<PackageManagerCommand command="shadcn@latest add @cubby-ui/button @cubby-ui/input @cubby-ui/card" />
 
 ## What's Included in Init
 

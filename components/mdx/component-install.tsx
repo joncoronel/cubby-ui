@@ -64,9 +64,9 @@ export function ComponentInstall({
       case "pnpm":
         return `pnpm dlx shadcn@latest add ${registryUrl}`;
       case "yarn":
-        return `npx shadcn@latest add ${registryUrl}`;
+        return `yarn dlx shadcn@latest add ${registryUrl}`;
       case "bun":
-        return `bunx shadcn@latest add ${registryUrl}`;
+        return `bunx --bun shadcn@latest add ${registryUrl}`;
       default:
         return `npx shadcn@latest add ${registryUrl}`;
     }

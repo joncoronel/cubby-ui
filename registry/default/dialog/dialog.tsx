@@ -44,7 +44,7 @@ function DialogViewport({ className, ...props }: BaseDialog.Viewport.Props) {
     <BaseDialog.Viewport
       data-slot="dialog-viewport"
       className={cn(
-        "fixed inset-0 flex items-center justify-center overflow-hidden px-4 py-6",
+        "fixed inset-0 flex flex-col items-center justify-center overflow-hidden px-4 py-6",
         className,
       )}
       {...props}
@@ -148,7 +148,7 @@ function DialogBody({
     <div
       data-slot="dialog-body"
       className={cn(
-        "flex flex-1 min-h-0 flex-col",
+        "flex min-h-0 flex-1 flex-col",
         "first:pt-5",
         "not-has-[+[data-slot=dialog-footer]]:pb-5",
         "in-data-[variant=inset]:has-[+[data-slot=dialog-footer]]:pb-5",

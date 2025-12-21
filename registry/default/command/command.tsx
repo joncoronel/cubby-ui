@@ -29,7 +29,7 @@ function Command<ItemValue = any>({
     <div
       data-slot="command"
       className={cn(
-        "text-popover-foreground bg-muted flex h-full w-full flex-col rounded-4xl p-1 dark:shadow-none",
+        "text-popover-foreground bg-muted flex min-h-0 flex-1 flex-col rounded-4xl p-1 dark:shadow-none",
         className,
       )}
     >
@@ -52,7 +52,7 @@ function CommandDialog({
     <Dialog {...props}>
       <DialogContent
         className={cn(
-          "rounded-4xl border-none bg-transparent p-0 shadow-lg ring-0 [&_[data-slot='dialog-close']]:hidden",
+          "max-h-100 min-h-0 rounded-4xl border-none bg-transparent p-0 shadow-lg ring-0 **:data-[slot='dialog-close']:hidden",
           className,
         )}
       >
@@ -86,7 +86,7 @@ function CommandContent({
     <div
       data-slot="command-content"
       className={cn(
-        "bg-card ring-border/25 dark:ring-border/10 flex flex-col items-center rounded-2xl ring-1",
+        "bg-card ring-border/25 dark:ring-border/10 flex min-h-0 flex-1 flex-col items-center rounded-2xl ring-1",
         className,
       )}
       {...props}
@@ -131,7 +131,7 @@ function CommandList({
         scrollbarGutter={scrollbarGutter}
         persistScrollbar={persistScrollbar}
         hideScrollbar={hideScrollbar}
-        className={cn("max-h-[300px] w-full", className)}
+        className={cn("flex-1", className)}
       >
         <AutocompleteBase.List
           data-slot="command-list"

@@ -306,6 +306,78 @@ Clickable element that triggers actions. Wraps Base UI's `Button`.
 </ApiPropsList>
 ```
 
+## Documenting Utilities and Hooks
+
+Some components include utility functions or hooks that are installed alongside the main component. These should be documented after the Props section.
+
+### Utilities Section
+
+Use `### Utilities` for helper functions. Each utility gets a `####` heading with its signature in a code block:
+
+````mdx
+### Utilities
+
+#### highlightText
+
+```ts
+function highlightText(text: string, query: string): ReactNode
+```
+
+Highlights matching portions of text by wrapping them in `<mark>` tags. Useful for showing which parts of a suggestion match the user's input.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `text` | `string` | The text to highlight matches in |
+| `query` | `string` | The search query to match against |
+
+**Returns:** `ReactNode` with matched portions wrapped in styled `<mark>` elements.
+````
+
+### Hooks Section
+
+Use `### Hooks` for custom hooks. Document the hook signature, options interface, and return value:
+
+````mdx
+### Hooks
+
+#### useFuzzyFilter
+
+```ts
+function useFuzzyFilter<T>(options: UseFuzzyFilterOptions): {
+  filter: (items: T[], query: string) => T[];
+  filterItem: (item: T, query: string) => boolean;
+}
+```
+
+Provides fuzzy matching capabilities using [match-sorter](https://github.com/kentcdodds/match-sorter). Returns filter functions compatible with Base UI's Autocomplete.
+
+**Options**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `keys` | `Array<string \| { key: string; threshold?: RankingValue }>` | Properties to search on. Can specify per-key thresholds. |
+| `threshold` | `RankingValue` | Minimum ranking for a match. Defaults to `MATCHES`. |
+
+**Returns**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `filter` | `(items: T[], query: string) => T[]` | Filters and sorts items by relevance |
+| `filterItem` | `(item: T, query: string) => boolean` | Checks if a single item matches |
+
+**Additional Exports**
+
+- `fuzzyRankings` - Re-export of `matchSorter.rankings` for setting thresholds
+````
+
+### Guidelines for Utilities/Hooks
+
+1. **Show the TypeScript signature** in a code block
+2. **Use tables** for parameters, options, and return values
+3. **Link to dependencies** if the utility wraps an external library
+4. **Include brief examples** if usage isn't obvious from the signature
+5. **Document additional exports** like constants or types
+
 ## Checklist
 
 Before submitting documentation:
@@ -322,3 +394,5 @@ Before submitting documentation:
 - [ ] Complex props have list formatting for options
 - [ ] Modified defaults are in `<ApiPropsList>` with Base UI default noted in description
 - [ ] Uses `### Notes` for usage patterns without props (e.g., render prop examples)
+- [ ] Utilities documented with signature, parameters table, and return value
+- [ ] Hooks documented with signature, options table, returns table, and additional exports

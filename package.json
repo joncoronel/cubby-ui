@@ -35,7 +35,7 @@
     "embla-carousel-react": "^8.6.0",
     "fumadocs-core": "^16.3.2",
     "fumadocs-mdx": "^14.2.2",
-    "fumadocs-ui": "^16.3.2",
+    "fumadocs-ui": "npm:@fumadocs/base-ui@latest",
     "hast-util-to-jsx-runtime": "^2.3.6",
     "input-otp": "^1.4.2",
     "jotai": "^2.15.2",

@@ -42,14 +42,6 @@ export default function Home() {
 
           <div className="flex items-center gap-3">
             <ThemeSwitcher />
-            <Button
-              render={<Link href="/docs" />}
-              variant="neutral"
-              className="hidden sm:flex"
-              nativeButton={false}
-            >
-              Get started
-            </Button>
           </div>
         </div>
       </header>

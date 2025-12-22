@@ -10,10 +10,7 @@ import {
   AutocompleteRoot,
   AutocompleteValue,
 } from "@/registry/default/autocomplete/autocomplete";
-import {
-  useFuzzyFilter,
-  fuzzyRankings,
-} from "@/registry/default/autocomplete/hooks/use-fuzzy-filter";
+import { useFuzzyFilter } from "@/registry/default/autocomplete/hooks/use-fuzzy-filter";
 import { highlightText } from "@/registry/default/autocomplete/lib/highlight-text";
 import { Label } from "@/registry/default/label/label";
 
@@ -108,11 +105,9 @@ const documentationItems: Documentation[] = [
 export default function AutocompleteFuzzy() {
   const { filterItem } = useFuzzyFilter<Documentation>({
     keys: [
-      "title",
-      "description",
+      { key: "title", threshold: "contains" },
+      { key: "description", threshold: "word-starts-with" },
       "category",
-      { key: "title", threshold: fuzzyRankings.CONTAINS },
-      { key: "description", threshold: fuzzyRankings.WORD_STARTS_WITH },
     ],
   });
 

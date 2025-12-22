@@ -1,21 +1,52 @@
 import { matchSorter } from "match-sorter";
 
-type RankingValue = (typeof matchSorter.rankings)[keyof typeof matchSorter.rankings];
+type Ranking = (typeof matchSorter.rankings)[keyof typeof matchSorter.rankings];
+
+export type FuzzyThreshold =
+  | "case-sensitive-equal"
+  | "equal"
+  | "starts-with"
+  | "word-starts-with"
+  | "contains"
+  | "acronym"
+  | "matches";
+
+const thresholdMap: Record<FuzzyThreshold, Ranking> = {
+  "case-sensitive-equal": matchSorter.rankings.CASE_SENSITIVE_EQUAL,
+  "equal": matchSorter.rankings.EQUAL,
+  "starts-with": matchSorter.rankings.STARTS_WITH,
+  "word-starts-with": matchSorter.rankings.WORD_STARTS_WITH,
+  "contains": matchSorter.rankings.CONTAINS,
+  "acronym": matchSorter.rankings.ACRONYM,
+  "matches": matchSorter.rankings.MATCHES,
+};
+
+function resolveThreshold(threshold: FuzzyThreshold | undefined): Ranking | undefined {
+  if (!threshold) return undefined;
+  return thresholdMap[threshold];
+}
 
 export interface UseFuzzyFilterOptions {
-  keys: Array<string | { key: string; threshold?: RankingValue }>;
-  threshold?: RankingValue;
+  keys: Array<string | { key: string; threshold?: FuzzyThreshold }>;
+  threshold?: FuzzyThreshold;
 }
 
 export function useFuzzyFilter<T>(options: UseFuzzyFilterOptions) {
+  const resolvedThreshold = resolveThreshold(options.threshold);
+  const resolvedKeys = options.keys.map((key) =>
+    typeof key === "string"
+      ? key
+      : { key: key.key, threshold: resolveThreshold(key.threshold) },
+  );
+
   const filter = (items: T[], query: string): T[] => {
     if (!query) {
       return items;
     }
 
     return matchSorter(items, query, {
-      keys: options.keys,
-      threshold: options.threshold,
+      keys: resolvedKeys,
+      threshold: resolvedThreshold,
     });
   };
 
@@ -25,8 +56,8 @@ export function useFuzzyFilter<T>(options: UseFuzzyFilterOptions) {
     }
 
     const results = matchSorter([item], query, {
-      keys: options.keys,
-      threshold: options.threshold,
+      keys: resolvedKeys,
+      threshold: resolvedThreshold,
     });
 
     return results.length > 0;
@@ -34,6 +65,3 @@ export function useFuzzyFilter<T>(options: UseFuzzyFilterOptions) {
 
   return { filter, filterItem };
 }
-
-// Export rankings separately to avoid circular reference
-export const fuzzyRankings = matchSorter.rankings;

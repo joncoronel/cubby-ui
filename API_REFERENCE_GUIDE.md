@@ -312,7 +312,7 @@ Some components include utility functions or hooks that are installed alongside 
 
 ### Utilities Section
 
-Use `### Utilities` for helper functions. Each utility gets a `####` heading with its signature in a code block:
+Use `### Utilities` for helper functions. Each utility gets a `####` heading with its signature in a code block. Use `<ApiPropsList>` and `<ApiProp>` for parameters, consistent with component props:
 
 ````mdx
 ### Utilities
@@ -325,17 +325,26 @@ function highlightText(text: string, query: string): ReactNode
 
 Highlights matching portions of text by wrapping them in `<mark>` tags. Useful for showing which parts of a suggestion match the user's input.
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `text` | `string` | The text to highlight matches in |
-| `query` | `string` | The search query to match against |
+**Parameters**
+
+<ApiPropsList>
+
+<ApiProp name="text" fullType="string">
+  The text to highlight matches in.
+</ApiProp>
+
+<ApiProp name="query" fullType="string">
+  The search query to match against.
+</ApiProp>
+
+</ApiPropsList>
 
 **Returns:** `ReactNode` with matched portions wrapped in styled `<mark>` elements.
 ````
 
 ### Hooks Section
 
-Use `### Hooks` for custom hooks. Document the hook signature, options interface, and return value:
+Use `### Hooks` for custom hooks. Document the hook signature, options, and return values using `<ApiPropsList>`:
 
 ````mdx
 ### Hooks
@@ -353,10 +362,20 @@ Provides fuzzy matching capabilities using [match-sorter](https://github.com/ken
 
 **Options**
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `keys` | `Array<string \| { key: string; threshold?: RankingValue }>` | Properties to search on. Can specify per-key thresholds. |
-| `threshold` | `RankingValue` | Minimum ranking for a match. Defaults to `MATCHES`. |
+<ApiPropsList>
+
+<ApiProp
+  name="keys"
+  fullType='Array<string | { key: string; threshold?: FuzzyThreshold }>'
+>
+  Properties to search on. Can specify per-key thresholds.
+</ApiProp>
+
+<ApiProp name="threshold" fullType="FuzzyThreshold" defaultValue='"matches"'>
+  Minimum ranking for a match.
+</ApiProp>
+
+</ApiPropsList>
 
 **Returns**
 
@@ -364,16 +383,12 @@ Provides fuzzy matching capabilities using [match-sorter](https://github.com/ken
 |----------|------|-------------|
 | `filter` | `(items: T[], query: string) => T[]` | Filters and sorts items by relevance |
 | `filterItem` | `(item: T, query: string) => boolean` | Checks if a single item matches |
-
-**Additional Exports**
-
-- `fuzzyRankings` - Re-export of `matchSorter.rankings` for setting thresholds
 ````
 
 ### Guidelines for Utilities/Hooks
 
 1. **Show the TypeScript signature** in a code block
-2. **Use tables** for parameters, options, and return values
+2. **Use `<ApiPropsList>` and `<ApiProp>`** for parameters, options, and return values
 3. **Link to dependencies** if the utility wraps an external library
 4. **Include brief examples** if usage isn't obvious from the signature
 5. **Document additional exports** like constants or types
@@ -394,5 +409,5 @@ Before submitting documentation:
 - [ ] Complex props have list formatting for options
 - [ ] Modified defaults are in `<ApiPropsList>` with Base UI default noted in description
 - [ ] Uses `### Notes` for usage patterns without props (e.g., render prop examples)
-- [ ] Utilities documented with signature, parameters table, and return value
-- [ ] Hooks documented with signature, options table, returns table, and additional exports
+- [ ] Utilities documented with signature, `<ApiPropsList>` for parameters, and return value
+- [ ] Hooks documented with signature, `<ApiPropsList>` for options, table for returns

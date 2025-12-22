@@ -39,12 +39,15 @@ function parseFadeEdges(fadeEdges: FadeEdges): {
   return result;
 }
 
+type OverscrollBehavior = "auto" | "contain" | "none";
+
 interface ScrollAreaProps extends BaseScrollArea.Root.Props {
   fadeEdges?: FadeEdges;
   scrollbarGutter?: boolean;
   persistScrollbar?: boolean;
   hideScrollbar?: boolean;
   nativeScroll?: boolean;
+  overscrollBehavior?: OverscrollBehavior;
 }
 
 function ScrollArea({
@@ -55,6 +58,7 @@ function ScrollArea({
   persistScrollbar = false,
   hideScrollbar = false,
   nativeScroll = false,
+  overscrollBehavior = "contain",
   ...props
 }: ScrollAreaProps) {
   if (process.env.NODE_ENV !== "production") {
@@ -80,6 +84,7 @@ function ScrollArea({
         fadeEdges={fadeEdges}
         hideScrollbar={hideScrollbar}
         scrollbarGutter={scrollbarGutter}
+        overscrollBehavior={overscrollBehavior}
       >
         {children}
       </NativeScrollArea>
@@ -111,6 +116,8 @@ function ScrollArea({
             "mask-r-from-[calc(100%-min(var(--scroll-fade-size),var(--scroll-area-overflow-x-end,var(--scroll-fade-size))))]",
           scrollbarGutter &&
             "data-has-overflow-x:pb-2.5 data-has-overflow-y:pe-2.5",
+          overscrollBehavior === "contain" && "overscroll-contain",
+          overscrollBehavior === "none" && "overscroll-none",
         )}
       >
         {children}
@@ -163,6 +170,7 @@ function NativeScrollArea({
   fadeEdges = false,
   hideScrollbar = false,
   scrollbarGutter = false,
+  overscrollBehavior,
   ...props
 }: Omit<
   React.ComponentProps<"div">,
@@ -171,6 +179,7 @@ function NativeScrollArea({
   fadeEdges?: FadeEdges;
   hideScrollbar?: boolean;
   scrollbarGutter?: boolean;
+  overscrollBehavior?: OverscrollBehavior;
 }) {
   const fade = parseFadeEdges(fadeEdges);
   const hasFade = fade.top || fade.bottom || fade.left || fade.right;
@@ -218,6 +227,8 @@ function NativeScrollArea({
         hideScrollbar ? "[scrollbar-width:none]" : "[scrollbar-width:thin]",
         scrollbarGutter && "[scrollbar-gutter:stable]",
         "[scrollbar-color:var(--color-scrollbar)_transparent]",
+        overscrollBehavior === "contain" && "overscroll-contain",
+        overscrollBehavior === "none" && "overscroll-none",
         className,
       )}
       style={animationStyle}
@@ -230,4 +241,4 @@ function NativeScrollArea({
 }
 
 export { ScrollArea };
-export type { ScrollAreaProps, FadeEdges, FadeEdge };
+export type { ScrollAreaProps, FadeEdges, FadeEdge, OverscrollBehavior };

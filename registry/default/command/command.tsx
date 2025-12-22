@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Autocomplete as AutocompleteBase } from "@base-ui/react/autocomplete";
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
-import { SearchIcon } from "lucide-react";
+import { LoaderIcon, SearchIcon } from "lucide-react";
 
 import {
   InputGroup,
@@ -51,6 +51,7 @@ function Command<ItemValue>({
         autoHighlight={autoHighlight}
         keepHighlight={keepHighlight}
         open={open}
+        inline={true}
         {...props}
       >
         {children}
@@ -133,7 +134,11 @@ function CommandDialogPopup({
   );
 }
 
-function CommandInput({ className, ...props }: AutocompleteBase.Input.Props) {
+function CommandInput({
+  className,
+  loading = false,
+  ...props
+}: AutocompleteBase.Input.Props & { loading?: boolean }) {
   return (
     <InputGroup className={cn("mt-2 w-[calc(100%-1rem)]", className)}>
       <AutocompleteBase.Input
@@ -143,6 +148,9 @@ function CommandInput({ className, ...props }: AutocompleteBase.Input.Props) {
       />
       <InputGroupAddon>
         <SearchIcon className="size-4" />
+      </InputGroupAddon>
+      <InputGroupAddon align="inline-end">
+        {loading && <LoaderIcon className="size-4 animate-spin" />}
       </InputGroupAddon>
     </InputGroup>
   );

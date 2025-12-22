@@ -25,21 +25,6 @@ export default function Home() {
             </span>
           </Link>
 
-          <nav className="text-muted-foreground hidden items-center gap-8 text-sm md:flex">
-            <Link
-              href="/docs"
-              className="hover:text-foreground transition-colors duration-200"
-            >
-              Documentation
-            </Link>
-            <Link
-              href="/docs/components/button"
-              className="hover:text-foreground transition-colors duration-200"
-            >
-              Components
-            </Link>
-          </nav>
-
           <div className="flex items-center gap-3">
             <ThemeSwitcher />
           </div>

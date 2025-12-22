@@ -1,16 +1,19 @@
 "use client";
 
-import * as React from "react";
 import { useDocsSearch } from "fumadocs-core/search/client";
 import type { SortedResult } from "fumadocs-core/search";
 import { useI18n } from "fumadocs-ui/contexts/i18n";
 import { useRouter } from "next/navigation";
 import { SharedProps } from "fumadocs-ui/contexts/search";
+import { useState } from "react";
 import {
   ArrowDownIcon,
   ArrowUpIcon,
+  BookOpenIcon,
   CornerDownLeftIcon,
   HashIcon,
+  LoaderIcon,
+  RocketIcon,
 } from "lucide-react";
 import {
   Command,
@@ -23,81 +26,84 @@ import {
   CommandList,
   highlightText,
 } from "@/registry/default/command/command";
+import { useDebouncedCallback } from "use-debounce";
 import { Kbd } from "@/registry/default/kbd/kbd";
+import { cn } from "@/lib/utils";
 
 export default function CustomSearchDialog({
   open,
   onOpenChange,
 }: SharedProps) {
+  const [text, setText] = useState("");
   const { locale } = useI18n();
   const router = useRouter();
   const { search, setSearch, query } = useDocsSearch({
     type: "fetch",
     locale,
-    delayMs: 300,
+    delayMs: 0,
   });
 
-  // Track our own searching state to handle the debounce period
-  // isSearching becomes true immediately on input change, and false only after fetch completes
-  const [isSearching, setIsSearching] = React.useState(false);
-  const wasLoading = React.useRef(false);
-
-  // Set isSearching to true immediately when search changes
-  const handleSearchChange = React.useCallback(
-    (value: string) => {
-      setSearch(value);
-      if (value) {
-        setIsSearching(true);
-      } else {
-        setIsSearching(false);
-      }
+  const defaultItems = [
+    {
+      id: "intro",
+      content: "Introduction",
+      url: "/docs",
+      type: "page" as const,
     },
-    [setSearch],
-  );
+    {
+      id: "install",
+      content: "Installation",
+      url: "/docs/installation",
+      type: "page" as const,
+    },
+  ];
 
-  // Set isSearching to false when query.isLoading transitions from true to false
-  React.useEffect(() => {
-    if (wasLoading.current && !query.isLoading) {
-      setIsSearching(false);
-    }
-    wasLoading.current = query.isLoading;
-  }, [query.isLoading]);
-
-  // Prepare items from search results
-  const items = query.data !== "empty" && query.data ? query.data : [];
+  const items =
+    Array.isArray(query.data) && query.data.length > 0
+      ? query.data
+      : (query.isLoading && query.data === "empty") || !search
+        ? defaultItems
+        : [];
 
   const handleSelect = (item: SortedResult) => {
     router.push(item.url);
     onOpenChange(false);
   };
+  const handleSearch = (value: string) => {
+    setText(value);
+    sendSearch(value);
+  };
+
+  const sendSearch = useDebouncedCallback((value: string) => {
+    setSearch(value);
+  }, 300);
 
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
-      <CommandDialogPopup>
+      <CommandDialogPopup className="mb-auto">
         <Command
           items={items}
-          value={search}
-          onValueChange={handleSearchChange}
+          value={text}
+          onValueChange={handleSearch}
           filter={null}
           open
         >
           <CommandContent>
-            <CommandInput placeholder="Search documentation..." />
+            <CommandInput
+              placeholder="Search documentation..."
+              loading={
+                ((query.isLoading && query.data === "empty") ||
+                  (text && !search)) as boolean
+              }
+            />
             <CommandList
               emptyMessage={
-                isSearching ? (
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="border-muted-foreground border-t-foreground animation-duration-[250ms] size-4 animate-spin rounded-full border-2"
-                      aria-hidden
-                    />
-                    Searching...
-                  </div>
-                ) : search ? (
-                  "No results found."
-                ) : (
-                  "Type to search..."
-                )
+                search &&
+                items.length === 0 &&
+                (!query.isLoading ||
+                  (Array.isArray(query.data) && query.data.length === 0))
+                  ? "No results found."
+                  : null
               }
             >
               {(item: SortedResult) => (
@@ -121,7 +127,8 @@ export default function CustomSearchDialog({
                       </span>
                     )}
                     <span className="truncate">
-                      {typeof item.content === "string"
+                      {typeof item.content === "string" &&
+                      query.data !== "empty"
                         ? highlightText(item.content, search)
                         : item.content}
                     </span>
@@ -130,7 +137,14 @@ export default function CustomSearchDialog({
               )}
             </CommandList>
           </CommandContent>
-          <CommandFooter>
+          <CommandFooter
+            className={cn(
+              "ease-out-cubic overflow-clip transition-[height,opacity,padding] duration-200",
+              // search && items.length === 0
+              //   ? "h-0 p-0 opacity-0"
+              //   : "h-[calc-size(min-content,size)] opacity-100",
+            )}
+          >
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1.5">
                 <Kbd size="sm" className="px-1">

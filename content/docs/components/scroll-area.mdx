@@ -102,4 +102,12 @@ Container with styled scrollbars and optional fade effects. Wraps Base UI's `Scr
   default only reserves space when content overflows.
 </ApiProp>
 
+<ApiProp name="overscrollBehavior" fullType="'auto' | 'contain' | 'none'" defaultValue="contain">
+  Controls the scroll chaining behavior when reaching the scroll boundary.
+
+  - `"auto"` - default browser behavior, scroll chains to parent containers
+  - `"contain"` - prevents scroll chaining to parent containers
+  - `"none"` - prevents scroll chaining and disables bounce/rubber-band effects
+</ApiProp>
+
 </ApiPropsList>

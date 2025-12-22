@@ -77,23 +77,12 @@
           "path": "registry/default/autocomplete/autocomplete.tsx",
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/autocomplete.tsx"
-        },
-        {
-          "path": "registry/default/autocomplete/lib/highlight-text.tsx",
-          "type": "registry:lib",
-          "target": "lib/cubby-ui/highlight-text.tsx"
-        },
-        {
-          "path": "registry/default/autocomplete/hooks/use-fuzzy-filter.ts",
-          "type": "registry:hook",
-          "target": "hooks/cubby-ui/use-fuzzy-filter.ts"
         }
       ],
       "registryDependencies": [
-        "@cubby-ui/scroll-area"
-      ],
-      "dependencies": [
-        "match-sorter"
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/use-fuzzy-filter",
+        "@cubby-ui/highlight-text"
       ]
     },
     {
@@ -405,7 +394,9 @@
       ],
       "registryDependencies": [
         "@cubby-ui/input-group",
-        "@cubby-ui/scroll-area"
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/use-fuzzy-filter",
+        "@cubby-ui/highlight-text"
       ],
       "dependencies": [
         "lucide-react"
@@ -622,6 +613,19 @@
       ],
       "dependencies": [
         "@conform-to/react"
+      ]
+    },
+    {
+      "name": "highlight-text",
+      "type": "registry:lib",
+      "title": "highlightText",
+      "description": "A utility function for highlight text.",
+      "files": [
+        {
+          "path": "registry/default/lib/highlight-text.tsx",
+          "type": "registry:lib",
+          "target": "lib/cubby-ui/highlight-text.tsx"
+        }
       ]
     },
     {
@@ -1296,6 +1300,22 @@
       ],
       "dependencies": [
         "lucide-react"
+      ]
+    },
+    {
+      "name": "use-fuzzy-filter",
+      "type": "registry:hook",
+      "title": "useFuzzyFilter",
+      "description": "A custom React hook for fuzzy filter.",
+      "files": [
+        {
+          "path": "registry/default/hooks/use-fuzzy-filter.ts",
+          "type": "registry:hook",
+          "target": "hooks/cubby-ui/use-fuzzy-filter.ts"
+        }
+      ],
+      "dependencies": [
+        "match-sorter"
       ]
     }
   ]

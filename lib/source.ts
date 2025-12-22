@@ -3,7 +3,6 @@ import { type InferPageType, loader } from "fumadocs-core/source";
 import { lucideIconsPlugin } from "fumadocs-core/source/lucide-icons";
 import {
   exampleRegistry,
-  componentMetadata,
   componentAnatomy,
 } from "@/app/components/_generated/registry";
 import { transformComponentImports } from "@/lib/transform-registry-imports";
@@ -142,69 +141,123 @@ ${exampleData.source}
   cleaned = cleaned.replace(
     /<ComponentInstall\s+component\s*=\s*"([^"]+)"\s*\/>/g,
     (_match, component) => {
-      const metadata =
-        componentMetadata[component as keyof typeof componentMetadata];
       let installBlock =
         "\n### Installation\n\n**CLI:**\n\n```bash\nnpx shadcn@latest add @cubby-ui/" +
         component +
         "\n```\n";
 
-      if (metadata && metadata.dependencies.length > 0) {
-        const deps = metadata.dependencies.join(" ");
-        installBlock +=
-          "\n**Manual:**\n\n1. Install dependencies:\n\n```bash\nnpm install " +
-          deps +
-          "\n```\n";
-        installBlock +=
-          "\n2. Copy the component source code to your project:\n\n";
-      } else {
-        installBlock +=
-          "\n**Manual:**\n\nCopy the component source code to your project:\n\n";
-      }
+      // Helper to read a registry JSON file
+      const readRegistryJson = (itemName: string): any | null => {
+        try {
+          const jsonPath = path.join(
+            process.cwd(),
+            "public",
+            "r",
+            `${itemName}.json`,
+          );
+          return JSON.parse(fs.readFileSync(jsonPath, "utf-8"));
+        } catch {
+          return null;
+        }
+      };
 
-      // Read component source from public/r/[component].json
+      // Collect all files and dependencies
+      const allFiles: Array<{ path: string; type: string; content: string; target?: string }> = [];
+      const allDependencies = new Set<string>();
+
       try {
-        const componentJsonPath = path.join(
-          process.cwd(),
-          "public",
-          "r",
-          `${component}.json`,
-        );
-        const componentJson = JSON.parse(
-          fs.readFileSync(componentJsonPath, "utf-8"),
-        );
+        const componentJson = readRegistryJson(component);
+
+        if (componentJson) {
+          // Add component's own files
+          if (componentJson.files && Array.isArray(componentJson.files)) {
+            allFiles.push(...componentJson.files);
+          }
+
+          // Add component's own dependencies
+          if (componentJson.dependencies) {
+            componentJson.dependencies.forEach((dep: string) =>
+              allDependencies.add(dep),
+            );
+          }
+
+          // Process registry dependencies (hooks and libs only)
+          if (
+            componentJson.registryDependencies &&
+            Array.isArray(componentJson.registryDependencies)
+          ) {
+            for (const regDep of componentJson.registryDependencies) {
+              // Extract item name from @cubby-ui/item-name format
+              const itemName = regDep.replace("@cubby-ui/", "");
+              const depJson = readRegistryJson(itemName);
+
+              if (depJson) {
+                // Only include hooks and libs in manual install files
+                const isHookOrLib =
+                  depJson.type === "registry:hook" ||
+                  depJson.type === "registry:lib";
+
+                if (isHookOrLib) {
+                  // Add files from this dependency
+                  if (depJson.files && Array.isArray(depJson.files)) {
+                    allFiles.push(...depJson.files);
+                  }
+
+                  // Add dependencies from this registry dependency
+                  if (depJson.dependencies) {
+                    depJson.dependencies.forEach((dep: string) =>
+                      allDependencies.add(dep),
+                    );
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // Add manual install section with dependencies
+        if (allDependencies.size > 0) {
+          const deps = Array.from(allDependencies).join(" ");
+          installBlock +=
+            "\n**Manual:**\n\n1. Install dependencies:\n\n```bash\nnpm install " +
+            deps +
+            "\n```\n";
+          installBlock +=
+            "\n2. Copy the component source code to your project:\n\n";
+        } else {
+          installBlock +=
+            "\n**Manual:**\n\nCopy the component source code to your project:\n\n";
+        }
 
         // Add source code for each file
-        if (componentJson.files && Array.isArray(componentJson.files)) {
-          for (const file of componentJson.files) {
-            if (file.content) {
-              // Convert registry path to typical installation path
-              let installPath = file.path;
-
+        for (const file of allFiles) {
+          if (file.content) {
+            // Use target path if available, otherwise compute from source path
+            let installPath = file.target;
+            if (!installPath) {
               if (file.type === "registry:ui") {
-                // Main component: registry/default/button/button.tsx -> components/ui/button.tsx
                 const filename = path.basename(file.path);
                 installPath = `components/ui/${filename}`;
               } else if (file.type === "registry:lib") {
-                // Library files: registry/default/autocomplete/lib/highlight-text.tsx -> lib/highlight-text.tsx
                 const filename = path.basename(file.path);
                 installPath = `lib/${filename}`;
               } else if (file.type === "registry:hook") {
-                // Hooks: registry/default/autocomplete/hooks/use-fuzzy-filter.ts -> hooks/use-fuzzy-filter.ts
                 const filename = path.basename(file.path);
                 installPath = `hooks/${filename}`;
+              } else {
+                installPath = file.path;
               }
-
-              // Transform imports to user-facing paths
-              const transformedContent = transformComponentImports(
-                file.content,
-                component,
-                file.path,
-                file.type,
-              );
-
-              installBlock += `Create \`${installPath}\`:\n\n\`\`\`tsx\n${transformedContent}\n\`\`\`\n\n`;
             }
+
+            // Transform imports to user-facing paths
+            const transformedContent = transformComponentImports(
+              file.content,
+              component,
+              file.path,
+              file.type,
+            );
+
+            installBlock += `Create \`${installPath}\`:\n\n\`\`\`tsx\n${transformedContent}\n\`\`\`\n\n`;
           }
         }
       } catch (error) {

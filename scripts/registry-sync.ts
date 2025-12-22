@@ -255,10 +255,7 @@ function transformComponentImports(
   // Transform imports based on file type
   // Handle lib and hooks files with potential subdirectories
   transformed = transformed.replace(
-    new RegExp(
-      `@/registry/default/${componentName}/(lib|hooks)/([^"']+)`,
-      "g",
-    ),
+    new RegExp(`@/registry/default/${componentName}/(lib|hooks)/([^"']+)`, "g"),
     (_match, type, relativePath) => {
       // Transform: @/registry/default/{component}/lib/... → @/lib/cubby-ui/...
       // Transform: @/registry/default/{component}/hooks/... → @/hooks/cubby-ui/...
@@ -661,6 +658,7 @@ function generateAnatomyStructure(
 function extractImports(filePath: string): {
   registryDependencies: string[];
   dependencies: string[];
+  sharedLibFiles: string[];
 } {
   const content = fsSync.readFileSync(filePath, "utf-8");
   const sourceFile = ts.createSourceFile(
@@ -672,27 +670,46 @@ function extractImports(filePath: string): {
 
   const registryDependencies = new Set<string>();
   const dependencies = new Set<string>();
+  const sharedLibFiles = new Set<string>();
+
+  function processModulePath(importPath: string) {
+    // Check if it's a shared lib or hooks import (@/registry/default/lib/... or @/registry/default/hooks/...)
+    if (importPath.startsWith("@/registry/")) {
+      const sharedItemMatch = importPath.match(
+        /@\/registry\/[^/]+\/(?:lib|hooks)\/(.+)/,
+      );
+      if (sharedItemMatch) {
+        // Extract the file path (e.g., "use-fuzzy-filter" from "@/registry/default/hooks/use-fuzzy-filter")
+        sharedLibFiles.add(sharedItemMatch[1]);
+      } else {
+        // Check if it's a component registry import
+        const match = importPath.match(/@\/registry\/[^/]+\/([^/]+)/);
+        if (match && match[1] !== "lib" && match[1] !== "hooks") {
+          registryDependencies.add(match[1]);
+        }
+      }
+    }
+    // Check if it's an external dependency
+    else if (!importPath.startsWith(".") && !importPath.startsWith("@/")) {
+      const pkgName = importPath.startsWith("@")
+        ? importPath.split("/").slice(0, 2).join("/")
+        : importPath.split("/")[0];
+      dependencies.add(pkgName);
+    }
+  }
 
   function visit(node: ts.Node) {
+    // Handle import declarations
     if (ts.isImportDeclaration(node)) {
       const moduleSpecifier = node.moduleSpecifier;
       if (ts.isStringLiteral(moduleSpecifier)) {
-        const importPath = moduleSpecifier.text;
-
-        // Check if it's a registry import
-        if (importPath.startsWith("@/registry/")) {
-          const match = importPath.match(/@\/registry\/[^/]+\/([^/]+)/);
-          if (match) {
-            registryDependencies.add(match[1]);
-          }
-        }
-        // Check if it's an external dependency
-        else if (!importPath.startsWith(".") && !importPath.startsWith("@/")) {
-          const pkgName = importPath.startsWith("@")
-            ? importPath.split("/").slice(0, 2).join("/")
-            : importPath.split("/")[0];
-          dependencies.add(pkgName);
-        }
+        processModulePath(moduleSpecifier.text);
+      }
+    }
+    // Handle export declarations with module specifier (re-exports like: export { foo } from "bar")
+    if (ts.isExportDeclaration(node) && node.moduleSpecifier) {
+      if (ts.isStringLiteral(node.moduleSpecifier)) {
+        processModulePath(node.moduleSpecifier.text);
       }
     }
     ts.forEachChild(node, visit);
@@ -703,6 +720,7 @@ function extractImports(filePath: string): {
   return {
     registryDependencies: Array.from(registryDependencies),
     dependencies: Array.from(dependencies),
+    sharedLibFiles: Array.from(sharedLibFiles),
   };
 }
 
@@ -1001,7 +1019,9 @@ function scanComponentFiles(
   }
 
   // Check for CSS files in component root (e.g., drawer.css)
-  const rootEntries = fsSync.readdirSync(componentPath, { withFileTypes: true });
+  const rootEntries = fsSync.readdirSync(componentPath, {
+    withFileTypes: true,
+  });
   for (const entry of rootEntries) {
     if (entry.isFile() && entry.name.endsWith(".css")) {
       files.push({
@@ -1012,6 +1032,93 @@ function scanComponentFiles(
   }
 
   return files;
+}
+
+// Scan the shared lib directory and create standalone registry items for hooks and utilities
+function scanSharedDirectories(): Array<{
+  name: string;
+  type: string;
+  title: string;
+  description: string;
+  files: Array<{ path: string; type: string; target?: string }>;
+  dependencies?: string[];
+}> {
+  const sharedItems: Array<{
+    name: string;
+    type: string;
+    title: string;
+    description: string;
+    files: Array<{ path: string; type: string; target?: string }>;
+    dependencies?: string[];
+  }> = [];
+
+  // Scan both hooks and lib directories
+  const dirsToScan = [
+    { dir: "hooks", defaultType: "registry:hook" },
+    { dir: "lib", defaultType: "registry:lib" },
+  ];
+
+  for (const { dir, defaultType } of dirsToScan) {
+    const dirPath = path.join(REGISTRY_PATH, DEFAULT_STYLE, dir);
+
+    if (!fsSync.existsSync(dirPath)) {
+      continue;
+    }
+
+    const files = fsSync.readdirSync(dirPath);
+
+    for (const file of files) {
+      // Only process .ts and .tsx files
+      if (!file.endsWith(".ts") && !file.endsWith(".tsx")) continue;
+
+      const filePath = path.join(dirPath, file);
+      const stat = fsSync.statSync(filePath);
+      if (!stat.isFile()) continue;
+
+      // Get the name without extension
+      const name = file.replace(/\.(ts|tsx)$/, "");
+
+      // Use directory-based type
+      const itemType = defaultType;
+      const fileType = defaultType;
+      const isHook = dir === "hooks";
+
+      // Generate title from name (e.g., "use-fuzzy-filter" -> "useFuzzyFilter")
+      const title = name.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+
+      // Generate description
+      const description = isHook
+        ? `A custom React hook for ${name.replace("use-", "").replace(/-/g, " ")}.`
+        : `A utility function for ${name.replace(/-/g, " ")}.`;
+
+      // Get target path
+      const registryPath = `registry/${DEFAULT_STYLE}/${dir}/${file}`;
+      const target = getTargetPath(registryPath, fileType);
+
+      // Extract dependencies from the file
+      const imports = extractImports(filePath);
+      const dependencies = imports.dependencies.filter(
+        (dep) => dep !== "react" && dep !== "@base-ui/react",
+      );
+
+      sharedItems.push({
+        name,
+        type: itemType,
+        title,
+        description,
+        files: [
+          {
+            path: registryPath,
+            type: fileType,
+            ...(target && { target }),
+          },
+        ],
+        ...(dependencies.length > 0 && { dependencies }),
+      });
+    }
+  }
+
+  return sharedItems;
 }
 
 async function scanRegistry() {
@@ -1052,6 +1159,7 @@ async function scanRegistry() {
     // Extract dependencies from all additional files
     const allDependencies = new Set(mainImports.dependencies);
     const allRegistryDependencies = new Set(mainImports.registryDependencies);
+    const allSharedLibFiles = new Set(mainImports.sharedLibFiles);
 
     for (const file of additionalFiles) {
       const filePath = path.join(process.cwd(), file.path);
@@ -1061,6 +1169,31 @@ async function scanRegistry() {
         fileImports.registryDependencies.forEach((dep) =>
           allRegistryDependencies.add(dep),
         );
+        fileImports.sharedLibFiles.forEach((f) => allSharedLibFiles.add(f));
+      }
+    }
+
+    // Convert shared lib/hooks imports to registry dependencies (not file entries)
+    // Each lib/hook file is registered as a standalone registry item
+    for (const sharedFile of allSharedLibFiles) {
+      // Check both lib and hooks directories
+      const dirsToCheck = ["lib", "hooks"];
+      let found = false;
+
+      for (const dir of dirsToCheck) {
+        const basePath = `registry/${DEFAULT_STYLE}/${dir}/${sharedFile}`;
+        const tsPath = `${basePath}.ts`;
+        const tsxPath = `${basePath}.tsx`;
+
+        if (
+          fsSync.existsSync(path.join(process.cwd(), tsPath)) ||
+          fsSync.existsSync(path.join(process.cwd(), tsxPath))
+        ) {
+          // Add as registry dependency (the item's own dependencies are on the item)
+          allRegistryDependencies.add(sharedFile);
+          found = true;
+          break;
+        }
       }
     }
 
@@ -1108,6 +1241,7 @@ async function scanRegistry() {
           ...(target && { target }),
         };
       }),
+      // Note: Shared lib files are now added as registryDependencies, not embedded files
     ];
 
     const item = {
@@ -1395,12 +1529,20 @@ async function syncRegistry() {
   console.log("Starting registry sync...");
 
   try {
-    // 1. Scan registry and build items
-    const { items, anatomyMap } = await scanRegistry();
-    console.log(`✓ Found ${items.length} components`);
+    // 1. Scan registry and build component items
+    const { items: componentItems, anatomyMap } = await scanRegistry();
 
-    // 2. Auto-update component-metadata.json with missing components
-    const componentNames = items.map((item) => item.name);
+    // 2. Scan lib directory for standalone hooks and utilities
+    const sharedItems = scanSharedDirectories();
+
+    // Merge all items
+    const items = [...componentItems, ...sharedItems];
+    console.log(
+      `✓ Found ${componentItems.length} components and ${sharedItems.length} shared items (hooks/libs)`,
+    );
+
+    // 3. Auto-update component-metadata.json with missing components
+    const componentNames = componentItems.map((item) => item.name);
     autoUpdateComponentMetadata(componentNames);
 
     // 3. Extract CSS content from globals.css

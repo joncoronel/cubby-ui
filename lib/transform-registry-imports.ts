@@ -77,13 +77,31 @@ export function transformComponentImports(
     `@/components/ui/cubby-ui/${componentName}`,
   );
 
-  // Transform lib and hooks files with subdirectories
+  // Transform lib and hooks files with subdirectories (component-specific)
   // @/registry/default/{component}/lib/{file} → @/lib/cubby-ui/{file}
   // @/registry/default/{component}/hooks/{file} → @/hooks/cubby-ui/{file}
   transformed = transformed.replace(
     new RegExp(`@/registry/default/${componentName}/(lib|hooks)/([^"']+)`, "g"),
     (_match, type, relativePath) => {
       return `@/${type}/cubby-ui/${relativePath}`;
+    },
+  );
+
+  // Transform shared hooks directory imports
+  // @/registry/default/hooks/use-fuzzy-filter → @/hooks/cubby-ui/use-fuzzy-filter
+  transformed = transformed.replace(
+    /@\/registry\/default\/hooks\/([^"']+)/g,
+    (_match, fileName) => {
+      return `@/hooks/cubby-ui/${fileName}`;
+    },
+  );
+
+  // Transform shared lib directory imports
+  // @/registry/default/lib/highlight-text → @/lib/cubby-ui/highlight-text
+  transformed = transformed.replace(
+    /@\/registry\/default\/lib\/([^"']+)/g,
+    (_match, fileName) => {
+      return `@/lib/cubby-ui/${fileName}`;
     },
   );
 

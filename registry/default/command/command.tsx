@@ -17,6 +17,14 @@ import {
 
 import { cn } from "@/lib/utils";
 
+// Re-export fuzzy filter utilities
+export {
+  useFuzzyFilter,
+  type FuzzyThreshold,
+  type UseFuzzyFilterOptions,
+} from "@/registry/default/hooks/use-fuzzy-filter";
+export { highlightText } from "@/registry/default/lib/highlight-text";
+
 const AutocompleteRoot = AutocompleteBase.Root;
 
 function Command<ItemValue>({

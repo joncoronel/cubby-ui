@@ -6,6 +6,14 @@ import {
   type ScrollAreaProps,
 } from "@/registry/default/scroll-area/scroll-area";
 
+// Re-export fuzzy filter utilities
+export {
+  useFuzzyFilter,
+  type FuzzyThreshold,
+  type UseFuzzyFilterOptions,
+} from "@/registry/default/hooks/use-fuzzy-filter";
+export { highlightText } from "@/registry/default/lib/highlight-text";
+
 const AutocompleteRoot = BaseAutocomplete.Root;
 
 function AutocompleteInput({

@@ -28,13 +28,16 @@ The project uses a sophisticated component registry system that auto-generates m
 ### Directory Structure
 
 - `registry/default/` - Source UI components (Button, Card, etc.)
+  - `registry/default/[component]/` - Individual component directories
+  - `registry/default/hooks/` - Shared React hooks (registered as `registry:hook`)
+  - `registry/default/lib/` - Shared utility functions (registered as `registry:lib`)
 - `registry/examples/` - Example implementations for each component
 - `content/docs/` - MDX documentation files (powered by Fumadocs)
 - `app/docs/` - Documentation pages and layouts
 - `components/mdx/` - MDX component wrappers for documentation
 - `components/` - Application-specific components (providers, theme)
-- `lib/` - Utility functions
-- `hooks/` - Custom React hooks
+- `lib/` - Application utility functions
+- `hooks/` - Application React hooks
 
 ### Key Technologies
 
@@ -55,6 +58,37 @@ Components follow a consistent pattern:
 - Main component file: `registry/default/[component]/[component].tsx`
 - Examples: `registry/examples/[component]/[component]-*.tsx`
 - Auto-generated imports and anatomy in unified registry
+
+#### Shared Hooks and Utilities
+
+Reusable code shared across multiple components lives in dedicated directories:
+
+- **Shared hooks**: `registry/default/hooks/` (e.g., `use-fuzzy-filter.ts`)
+- **Shared utilities**: `registry/default/lib/` (e.g., `highlight-text.tsx`)
+
+These are registered as separate registry items (`registry:hook` or `registry:lib`) and referenced via `registryDependencies`:
+
+```json
+{
+  "name": "autocomplete",
+  "registryDependencies": [
+    "@cubby-ui/use-fuzzy-filter",
+    "@cubby-ui/highlight-text"
+  ]
+}
+```
+
+**Important distinctions:**
+
+- `registry/default/hooks/` and `registry/default/lib/` → Shared registry items (installed via shadcn CLI)
+- `hooks/` and `lib/` (root level) → Application-specific code (not part of registry)
+- `registry/default/[component]/hooks/` → Component-specific hooks (bundled with component)
+
+When a component imports from `@/registry/default/hooks/` or `@/registry/default/lib/`, the sync script automatically:
+
+1. Registers the shared file as a standalone registry item
+2. Adds it to the component's `registryDependencies`
+3. Transforms imports to user-facing paths (e.g., `@/hooks/cubby-ui/use-fuzzy-filter`)
 
 #### Using Base UI's useRender and mergeProps
 

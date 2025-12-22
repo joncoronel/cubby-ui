@@ -2,7 +2,6 @@
 
 import type { ReactElement } from "react";
 import { useState } from "react";
-import { componentMetadata } from "@/app/components/_generated/registry";
 import {
   Tabs,
   TabsList,
@@ -29,6 +28,7 @@ interface ComponentInstallProps {
   }>;
   highlightedCliCommands?: Record<string, ReactElement>;
   highlightedInstallCommands?: Record<string, ReactElement>;
+  allDependencies?: string[];
 }
 
 export function ComponentInstall({
@@ -36,25 +36,13 @@ export function ComponentInstall({
   componentFiles,
   highlightedCliCommands,
   highlightedInstallCommands,
+  allDependencies = [],
 }: ComponentInstallProps) {
   const [cliPackageManager, setCliPackageManager] = useState("npm");
   const [manualPackageManager, setManualPackageManager] = useState("npm");
   const [activeFileTab, setActiveFileTab] = useState(
     componentFiles?.[0]?.relativePath || "",
   );
-
-  const metadata =
-    componentMetadata[component as keyof typeof componentMetadata];
-
-  if (!metadata) {
-    return (
-      <div className="border-destructive bg-destructive/10 rounded-md border p-4">
-        <p className="text-destructive text-sm">
-          Component not found: <code>{component}</code>
-        </p>
-      </div>
-    );
-  }
 
   const getCliCommand = (pm: string) => {
     const registryUrl = `@cubby-ui/${component}`;
@@ -73,7 +61,7 @@ export function ComponentInstall({
   };
 
   const getInstallCommand = (pm: string) => {
-    const deps = metadata.dependencies.join(" ");
+    const deps = allDependencies.join(" ");
     switch (pm) {
       case "npm":
         return `npm install ${deps}`;
@@ -123,7 +111,7 @@ export function ComponentInstall({
           </TabsContent>
           <TabsContent value="manual">
             <div className="space-y-4">
-              {metadata.dependencies.length > 0 && (
+              {highlightedInstallCommands && (
                 <div>
                   <p className="mb-2 text-sm font-medium">
                     Install dependencies:
@@ -132,7 +120,7 @@ export function ComponentInstall({
                     code={getInstallCommand(manualPackageManager)}
                     language="bash"
                     initial={
-                      highlightedInstallCommands?.[
+                      highlightedInstallCommands[
                         manualPackageManager as keyof typeof highlightedInstallCommands
                       ]
                     }

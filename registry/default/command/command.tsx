@@ -111,7 +111,7 @@ function CommandDialogPopup({
         <BaseDialog.Popup
           data-slot="command-dialog-popup"
           className={cn(
-            "relative z-50 flex max-h-100 min-h-0 w-full max-w-lg min-w-0 flex-col overflow-hidden rounded-4xl bg-transparent shadow-lg",
+            "relative z-50 mb-auto flex max-h-100 min-h-0 w-full max-w-lg min-w-0 flex-col overflow-hidden rounded-4xl bg-transparent shadow-lg sm:mt-[10%]",
             // Nested dialog offset
             "-translate-y-[calc(1.25rem*var(--nested-dialogs))]",
             "scale-[calc(1-0.1*var(--nested-dialogs))]",

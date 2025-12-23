@@ -22,6 +22,7 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
+  DialogBody,
   DialogTitle,
   DialogDescription,
   DialogFooter,
@@ -98,18 +99,20 @@ export default function ComboboxCreatable() {
 
       <Dialog {...dialogProps}>
         <DialogContent showCloseButton={false}>
-          <DialogHeader>
-            <DialogTitle>Create new label</DialogTitle>
-            <DialogDescription>Add a new label to select.</DialogDescription>
-          </DialogHeader>
           <form onSubmit={onDialogSubmit}>
-            <Input
-              key={dialogInputProps.defaultValue}
-              {...dialogInputProps}
-              placeholder="Label name"
-              autoFocus
-            />
-            <DialogFooter className="mt-4">
+            <DialogHeader>
+              <DialogTitle>Create new label</DialogTitle>
+              <DialogDescription>Add a new label to select.</DialogDescription>
+            </DialogHeader>
+            <DialogBody>
+              <Input
+                key={dialogInputProps.defaultValue}
+                {...dialogInputProps}
+                placeholder="Label name"
+                autoFocus
+              />
+            </DialogBody>
+            <DialogFooter>
               <Button
                 type="button"
                 variant="outline"

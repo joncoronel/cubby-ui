@@ -149,8 +149,16 @@ function CommandInput({
       <InputGroupAddon>
         <SearchIcon className="size-4" />
       </InputGroupAddon>
-      <InputGroupAddon align="inline-end">
-        {loading && <LoaderIcon className="size-4 animate-spin" />}
+
+      <InputGroupAddon
+        className={cn(
+          "ease-out-cubic hidden translate-x-1 opacity-0 transition-[opacity,transform,display,translate] transition-discrete duration-250",
+          loading &&
+            "flex translate-x-0 opacity-100 starting:translate-x-1 starting:opacity-0",
+        )}
+        align="inline-end"
+      >
+        <LoaderIcon className="size-4 animate-spin" />
       </InputGroupAddon>
     </InputGroup>
   );

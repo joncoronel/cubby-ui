@@ -1,0 +1,145 @@
+---
+title: useFuzzyFilter
+description: Fuzzy matching hook for filtering and sorting items by relevance
+---
+
+## Installation
+
+<ComponentInstall component="use-fuzzy-filter" />
+
+## Overview
+
+`useFuzzyFilter` provides fuzzy matching capabilities using [match-sorter](https://github.com/kentcdodds/match-sorter). It returns filter functions that work with any list component, including Command and Autocomplete.
+
+**When to use:**
+- Search across multiple fields (label, description, tags)
+- Relevance-sorted results (best matches first)
+- Flexible matching (acronyms, partial matches, typo tolerance)
+
+## Usage
+
+```tsx
+import { useFuzzyFilter } from "@/hooks/cubby-ui/use-fuzzy-filter";
+
+const { filter, filterItem } = useFuzzyFilter({
+  keys: ["label", "description"],
+  threshold: "contains",
+});
+
+// Filter and sort an array
+const results = filter(items, query);
+
+// Check if single item matches
+const matches = filterItem(item, query);
+```
+
+## Example with Command
+
+```tsx
+import { useFuzzyFilter } from "@/hooks/cubby-ui/use-fuzzy-filter";
+import { Command, CommandList, CommandItem } from "@/lib/cubby-ui/command";
+
+function FuzzyCommand({ items }) {
+  const [query, setQuery] = useState("");
+
+  const { filter } = useFuzzyFilter({
+    keys: ["label", "description"],
+  });
+
+  // Filter and sort by relevance
+  const filteredItems = filter(items, query);
+
+  return (
+    <Command
+      items={filteredItems}
+      value={query}
+      onValueChange={setQuery}
+      filter={null} // Disable built-in filter since we're filtering externally
+    >
+      <CommandInput placeholder="Search..." />
+      <CommandList>
+        {filteredItems.map((item) => (
+          <CommandItem key={item.id} value={item}>
+            {item.label}
+          </CommandItem>
+        ))}
+      </CommandList>
+    </Command>
+  );
+}
+```
+
+## API Reference
+
+### Options
+
+<ApiPropsList>
+
+<ApiProp name="keys" fullType='Array<string | { key: string; threshold?: FuzzyThreshold }>' required>
+  Properties to search on. Can specify per-key thresholds for fine-grained control.
+
+  ```tsx
+  // Simple keys
+  keys: ["label", "description"]
+
+  // With per-key thresholds
+  keys: [
+    { key: "label", threshold: "starts-with" },
+    { key: "description", threshold: "contains" },
+  ]
+  ```
+</ApiProp>
+
+<ApiProp name="threshold" fullType="FuzzyThreshold" defaultValue='"matches"'>
+  Minimum ranking for a match. Values from strictest to loosest:
+
+  - `"case-sensitive-equal"` - Exact match, case sensitive
+  - `"equal"` - Exact match, case insensitive
+  - `"starts-with"` - Query at start of string
+  - `"word-starts-with"` - Query at start of any word
+  - `"contains"` - Query anywhere in string
+  - `"acronym"` - Matches acronyms (e.g., "rhl" matches "React Hooks Library")
+  - `"matches"` - Very fuzzy matching (default)
+</ApiProp>
+
+</ApiPropsList>
+
+### Return Value
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `filter` | `(items: T[], query: string) => T[]` | Filters and sorts an array of items by relevance |
+| `filterItem` | `(item: T, query: string) => boolean` | Checks if a single item matches. Use with component's `filter` prop |
+
+## Filtering Patterns
+
+### External filtering with relevance sorting
+
+Use `filter` when you want results sorted by relevance:
+
+```tsx
+const { filter } = useFuzzyFilter({ keys: ["label"] });
+const [query, setQuery] = useState("");
+const filteredItems = filter(items, query);
+
+<Command items={filteredItems} filter={null}>
+  ...
+</Command>
+```
+
+### Internal filtering (boolean check)
+
+Use `filterItem` for simple boolean filtering without relevance sorting:
+
+```tsx
+const { filterItem } = useFuzzyFilter({ keys: ["label"] });
+
+<Command filter={filterItem}>
+  ...
+</Command>
+```
+
+## Used By
+
+- [Command](/docs/components/command) - For fuzzy search in command menus
+- [Autocomplete](/docs/components/autocomplete) - For fuzzy search in suggestions

@@ -9,9 +9,9 @@ import {
   AutocompletePositioner,
   AutocompleteRoot,
   AutocompleteValue,
-  useFuzzyFilter,
-  highlightText,
 } from "@/registry/default/autocomplete/autocomplete";
+import { useFuzzyFilter } from "@/registry/default/hooks/use-fuzzy-filter";
+import { highlightText } from "@/registry/default/lib/highlight-text";
 import { Label } from "@/registry/default/label/label";
 
 interface Documentation {

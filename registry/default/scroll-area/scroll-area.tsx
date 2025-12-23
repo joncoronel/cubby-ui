@@ -48,6 +48,10 @@ interface ScrollAreaProps extends BaseScrollArea.Root.Props {
   hideScrollbar?: boolean;
   nativeScroll?: boolean;
   overscrollBehavior?: OverscrollBehavior;
+  /** Ref callback for the scrollable viewport element. Useful for virtualization. */
+  viewportRef?: (element: HTMLDivElement | null) => void;
+  /** Additional className for the viewport element */
+  viewportClassName?: string;
 }
 
 function ScrollArea({
@@ -59,6 +63,8 @@ function ScrollArea({
   hideScrollbar = false,
   nativeScroll = false,
   overscrollBehavior = "contain",
+  viewportRef,
+  viewportClassName,
   ...props
 }: ScrollAreaProps) {
   if (process.env.NODE_ENV !== "production") {
@@ -80,7 +86,9 @@ function ScrollArea({
       typeof className === "string" ? className : undefined;
     return (
       <NativeScrollArea
+        ref={viewportRef}
         className={nativeClassName}
+        viewportClassName={viewportClassName}
         fadeEdges={fadeEdges}
         hideScrollbar={hideScrollbar}
         scrollbarGutter={scrollbarGutter}
@@ -101,6 +109,7 @@ function ScrollArea({
       {...props}
     >
       <BaseScrollArea.Viewport
+        ref={viewportRef}
         data-slot="scroll-area-viewport"
         className={cn(
           "h-full rounded-[inherit]",
@@ -118,6 +127,7 @@ function ScrollArea({
             "data-has-overflow-x:pb-2.5 data-has-overflow-y:pe-2.5",
           overscrollBehavior === "contain" && "overscroll-contain",
           overscrollBehavior === "none" && "overscroll-none",
+          viewportClassName,
         )}
       >
         {children}
@@ -166,11 +176,14 @@ function ScrollBar({
  */
 function NativeScrollArea({
   className,
+  viewportClassName,
   children,
   fadeEdges = false,
   hideScrollbar = false,
   scrollbarGutter = false,
   overscrollBehavior,
+  ref,
+  style,
   ...props
 }: Omit<
   React.ComponentProps<"div">,
@@ -180,6 +193,8 @@ function NativeScrollArea({
   hideScrollbar?: boolean;
   scrollbarGutter?: boolean;
   overscrollBehavior?: OverscrollBehavior;
+  viewportClassName?: string;
+  ref?: (element: HTMLDivElement | null) => void;
 }) {
   const fade = parseFadeEdges(fadeEdges);
   const hasFade = fade.top || fade.bottom || fade.left || fade.right;
@@ -208,6 +223,7 @@ function NativeScrollArea({
 
   return (
     <div
+      ref={ref}
       data-slot="scroll-area"
       data-native-scroll
       className={cn(
@@ -230,8 +246,9 @@ function NativeScrollArea({
         overscrollBehavior === "contain" && "overscroll-contain",
         overscrollBehavior === "none" && "overscroll-none",
         className,
+        viewportClassName,
       )}
-      style={animationStyle}
+      style={{ ...animationStyle, ...style }}
       tabIndex={0}
       {...props}
     >

@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Autocomplete as AutocompleteBase } from "@base-ui/react/autocomplete";
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
-import { LoaderIcon, SearchIcon } from "lucide-react";
+import { SearchIcon } from "lucide-react";
 
 import {
   InputGroup,
@@ -17,13 +17,9 @@ import {
 
 import { cn } from "@/lib/utils";
 
-// Re-export fuzzy filter utilities
-export {
-  useFuzzyFilter,
-  type FuzzyThreshold,
-  type UseFuzzyFilterOptions,
-} from "@/registry/default/hooks/use-fuzzy-filter";
-export { highlightText } from "@/registry/default/lib/highlight-text";
+// Expose Base UI's filter hook for virtualization use cases
+const useCommandFilter = AutocompleteBase.useFilter;
+export { useCommandFilter };
 
 const AutocompleteRoot = AutocompleteBase.Root;
 
@@ -147,18 +143,12 @@ function CommandInput({
         {...props}
       />
       <InputGroupAddon>
-        <SearchIcon className="size-4" />
-      </InputGroupAddon>
-
-      <InputGroupAddon
-        className={cn(
-          "ease-out-cubic hidden translate-x-1 opacity-0 transition-[opacity,transform,display,translate] transition-discrete duration-250",
-          loading &&
-            "flex translate-x-0 opacity-100 starting:translate-x-1 starting:opacity-0",
-        )}
-        align="inline-end"
-      >
-        <LoaderIcon className="size-4 animate-spin" />
+        <SearchIcon
+          className={cn(
+            "size-4",
+            loading && "animation-duration-400 animate-pulse",
+          )}
+        />
       </InputGroupAddon>
     </InputGroup>
   );
@@ -219,6 +209,7 @@ function CommandList({
         persistScrollbar={persistScrollbar}
         hideScrollbar={hideScrollbar}
         className={cn("flex-1", className)}
+        viewportClassName="scroll-py-2"
       >
         <AutocompleteBase.List
           data-slot="command-list"
@@ -228,6 +219,55 @@ function CommandList({
           {children}
         </AutocompleteBase.List>
       </ScrollArea>
+    </>
+  );
+}
+
+function CommandVirtualizedList({
+  className,
+  children,
+  scrollRef,
+  totalSize,
+  emptyMessage = "No results found.",
+  fadeEdges = "y",
+  nativeScroll = false,
+  ...props
+}: Omit<React.ComponentProps<"div">, "ref"> &
+  Pick<ScrollAreaProps, "fadeEdges" | "nativeScroll"> & {
+    scrollRef: (element: HTMLDivElement | null) => void;
+    totalSize: number;
+    emptyMessage?: React.ReactNode;
+  }) {
+  return (
+    <>
+      <AutocompleteBase.Empty
+        data-slot="command-empty"
+        className="text-muted-foreground px-1 py-7 text-center text-sm empty:m-0 empty:p-0"
+      >
+        {emptyMessage}
+      </AutocompleteBase.Empty>
+      <AutocompleteBase.List
+        data-slot="command-list"
+        className="w-full flex-1 overflow-hidden rounded-xl p-0 outline-hidden empty:m-0 empty:p-0"
+      >
+        <ScrollArea
+          viewportRef={scrollRef}
+          viewportClassName={cn("scroll-py-2", className)}
+          fadeEdges={fadeEdges}
+          nativeScroll={nativeScroll}
+          className="h-auto max-h-full w-full"
+          {...props}
+        >
+          {/* Virtual placeholder for total height */}
+          <div
+            role="presentation"
+            className="relative w-full"
+            style={{ height: totalSize }}
+          >
+            {children}
+          </div>
+        </ScrollArea>
+      </AutocompleteBase.List>
     </>
   );
 }
@@ -277,12 +317,19 @@ function CommandSeparator({
   );
 }
 
-function CommandItem({ className, ...props }: AutocompleteBase.Item.Props) {
+function CommandItem({
+  className,
+  ref,
+  ...props
+}: AutocompleteBase.Item.Props & {
+  ref?: React.Ref<HTMLDivElement>;
+}) {
   return (
     <AutocompleteBase.Item
+      ref={ref}
       data-slot="command-item"
       className={cn(
-        "group data-highlighted:bg-accent/50 data-highlighted:text-accent-foreground data-highlighted:[&_svg:not([class*='text-'])]:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground text-foreground data-highlighted:ring-border/70 relative flex cursor-default items-center gap-2 rounded-md p-2.5 text-sm font-medium outline-hidden transition-[colors,background-color,box-shadow] duration-100 ease-out select-none data-disabled:pointer-events-none data-disabled:opacity-50 data-highlighted:ring-1 data-highlighted:duration-0 sm:py-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "group data-highlighted:bg-accent/50 data-highlighted:text-accent-foreground data-highlighted:[&_svg:not([class*='text-'])]:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground text-foreground relative flex cursor-default items-center gap-2 rounded-md p-2.5 text-sm font-medium outline-hidden transition-[colors,background-color,box-shadow] duration-100 ease-out select-none data-disabled:pointer-events-none data-disabled:opacity-50 data-highlighted:duration-0 sm:py-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         // Spacing from list edges (matches input's calc(100%-1rem) gap)
         "mx-2",
         className,
@@ -338,6 +385,7 @@ export {
   CommandInput,
   CommandContent,
   CommandList,
+  CommandVirtualizedList,
   CommandGroup,
   CommandGroupLabel,
   CommandCollection,

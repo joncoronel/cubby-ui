@@ -1,0 +1,91 @@
+---
+title: highlightText
+description: Utility function to highlight matching text portions in search results
+---
+
+## Installation
+
+<ComponentInstall component="highlight-text" />
+
+## Overview
+
+`highlightText` wraps matching portions of text in styled `<mark>` elements, making it easy to show users which parts of a result match their search query.
+
+## Usage
+
+```tsx
+import { highlightText } from "@/lib/cubby-ui/highlight-text";
+
+// Returns ReactNode with matched portions wrapped in <mark>
+const highlighted = highlightText("React Hooks Library", "hook");
+// Result: React <mark>Hook</mark>s Library
+```
+
+## Example with Command
+
+```tsx
+import { highlightText } from "@/lib/cubby-ui/highlight-text";
+import { Command, CommandItem } from "@/lib/cubby-ui/command";
+
+function SearchResults({ items, query }) {
+  return (
+    <Command>
+      <CommandList>
+        {items.map((item) => (
+          <CommandItem key={item.id} value={item}>
+            {highlightText(item.label, query)}
+          </CommandItem>
+        ))}
+      </CommandList>
+    </Command>
+  );
+}
+```
+
+## API Reference
+
+```ts
+function highlightText(text: string, query: string): ReactNode
+```
+
+### Parameters
+
+<ApiPropsList>
+
+<ApiProp name="text" fullType="string" required>
+  The text to search within and highlight matches.
+</ApiProp>
+
+<ApiProp name="query" fullType="string" required>
+  The search query to match against. Matching is case-insensitive.
+</ApiProp>
+
+</ApiPropsList>
+
+### Returns
+
+`ReactNode` - The original text with matched portions wrapped in styled `<mark>` elements.
+
+### Styling
+
+Matched text is wrapped in `<mark>` elements with the following default styles:
+
+```tsx
+<mark className="text-primary bg-transparent font-bold">
+  {matchedText}
+</mark>
+```
+
+The highlight uses the `text-primary` color with bold weight and no background, providing a subtle but clear indication of matching text.
+
+## Implementation Details
+
+- **Case-insensitive matching**: Query "hook" matches "Hook", "HOOK", etc.
+- **Safe regex handling**: Special regex characters in the query are escaped
+- **Query length limit**: Queries are limited to 100 characters for performance
+- **Empty query handling**: Returns the original text unchanged if query is empty or whitespace-only
+
+## Used By
+
+- [Command](/docs/components/command) - For highlighting search matches
+- [Autocomplete](/docs/components/autocomplete) - For highlighting suggestion matches

@@ -1,0 +1,141 @@
+---
+title: useListVirtualizer
+description: Virtualization hook for rendering large lists efficiently
+---
+
+## Installation
+
+<ComponentInstall component="use-list-virtualizer" />
+
+## Overview
+
+`useListVirtualizer` provides virtualization for large lists using [TanStack Virtual](https://tanstack.com/virtual). It handles scroll positioning, item measurement, and keyboard navigation, making it easy to render thousands of items without performance issues.
+
+**When to use:**
+- Lists with 100+ items
+- Command menus, autocompletes, or selects with large datasets
+- Any scrollable list where DOM node count impacts performance
+
+## Usage
+
+```tsx
+import { useListVirtualizer } from "@/hooks/cubby-ui/use-list-virtualizer";
+
+const {
+  rootProps,       // Spread on root component
+  scrollRef,       // Attach to scroll container
+  measureRef,      // Attach to each item for dynamic heights
+  totalSize,       // Total height for virtual container
+  virtualItems,    // Array to map over
+  getItem,         // Get data for virtual item
+  getItemStyle,    // Get positioning styles
+  getItemProps,    // Get aria attributes
+} = useListVirtualizer({
+  items,           // All items (for aria-setsize)
+  filteredItems,   // Items to display
+  estimateSize: 40, // Item height in px
+});
+```
+
+## Example with Command
+
+```tsx
+import { useListVirtualizer } from "@/hooks/cubby-ui/use-list-virtualizer";
+import {
+  Command,
+  CommandVirtualizedList,
+  CommandItem,
+} from "@/lib/cubby-ui/command";
+
+function VirtualizedCommand({ items, filteredItems }) {
+  const {
+    rootProps,
+    scrollRef,
+    measureRef,
+    totalSize,
+    virtualItems,
+    getItem,
+    getItemStyle,
+    getItemProps,
+  } = useListVirtualizer({
+    items,
+    filteredItems,
+    estimateSize: 40,
+  });
+
+  return (
+    <Command {...rootProps} filter={null}>
+      <CommandVirtualizedList scrollRef={scrollRef} totalSize={totalSize}>
+        {virtualItems.map((virtualItem) => {
+          const item = getItem(virtualItem);
+          return (
+            <CommandItem
+              key={virtualItem.key}
+              ref={measureRef}
+              value={item}
+              style={getItemStyle(virtualItem)}
+              {...getItemProps(virtualItem)}
+            >
+              {item.label}
+            </CommandItem>
+          );
+        })}
+      </CommandVirtualizedList>
+    </Command>
+  );
+}
+```
+
+## API Reference
+
+### Options
+
+<ApiPropsList>
+
+<ApiProp name="items" fullType="T[]" required>
+  All items in the list (unfiltered). Used for proper `aria-setsize` accessibility attribute.
+</ApiProp>
+
+<ApiProp name="filteredItems" fullType="T[]" required>
+  The filtered items to display. Can equal `items` for server-side filtering.
+</ApiProp>
+
+<ApiProp name="enabled" fullType="boolean" defaultValue="true">
+  Whether virtualization is active. Typically tied to dialog/popover open state.
+</ApiProp>
+
+<ApiProp name="estimateSize" fullType="number | ((index: number, item: T) => number)" defaultValue="40">
+  Estimated height of each item in pixels. Use a function for variable heights based on item content.
+</ApiProp>
+
+<ApiProp name="overscan" fullType="number" defaultValue="10">
+  Number of items to render outside the visible area. Higher values improve scroll smoothness but use more memory.
+</ApiProp>
+
+<ApiProp name="paddingStart" fullType="number" defaultValue="8">
+  Padding at the start of the list in pixels. Should match your list container's padding.
+</ApiProp>
+
+<ApiProp name="paddingEnd" fullType="number" defaultValue="8">
+  Padding at the end of the list in pixels.
+</ApiProp>
+
+</ApiPropsList>
+
+### Return Value
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `rootProps` | `object` | Spread on root component. Includes `virtualized`, `items`, `filteredItems`, `onItemHighlighted` |
+| `scrollRef` | `(el: HTMLDivElement \| null) => void` | Ref callback for the scroll container |
+| `measureRef` | `(el: HTMLDivElement \| null) => void` | Ref callback for each item (enables dynamic heights) |
+| `totalSize` | `number` | Total height of all virtual items in pixels |
+| `virtualItems` | `VirtualItem[]` | Array of virtual items to render |
+| `getItem` | `(virtualItem) => T \| undefined` | Get the data item for a virtual item |
+| `getItemStyle` | `(virtualItem) => CSSProperties` | Get positioning styles for a virtual item |
+| `getItemProps` | `(virtualItem) => object` | Get aria attributes (`aria-setsize`, `aria-posinset`, `data-index`, `index`) |
+
+## Used By
+
+- [Command](/docs/components/command) - For virtualized command menus
+- [Autocomplete](/docs/components/autocomplete) - For virtualized autocomplete lists

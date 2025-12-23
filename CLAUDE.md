@@ -63,20 +63,13 @@ Components follow a consistent pattern:
 
 Reusable code shared across multiple components lives in dedicated directories:
 
-- **Shared hooks**: `registry/default/hooks/` (e.g., `use-fuzzy-filter.ts`)
+- **Shared hooks**: `registry/default/hooks/` (e.g., `use-fuzzy-filter.ts`, `use-list-virtualizer.ts`)
 - **Shared utilities**: `registry/default/lib/` (e.g., `highlight-text.tsx`)
 
-These are registered as separate registry items (`registry:hook` or `registry:lib`) and referenced via `registryDependencies`:
+These are registered as **standalone registry items** (`registry:hook` or `registry:lib`) with their own documentation pages:
 
-```json
-{
-  "name": "autocomplete",
-  "registryDependencies": [
-    "@cubby-ui/use-fuzzy-filter",
-    "@cubby-ui/highlight-text"
-  ]
-}
-```
+- **Hook docs**: `content/docs/hooks/` (e.g., `/docs/hooks/use-fuzzy-filter`)
+- **Utility docs**: `content/docs/utils/` (e.g., `/docs/utils/highlight-text`)
 
 **Important distinctions:**
 
@@ -84,11 +77,18 @@ These are registered as separate registry items (`registry:hook` or `registry:li
 - `hooks/` and `lib/` (root level) → Application-specific code (not part of registry)
 - `registry/default/[component]/hooks/` → Component-specific hooks (bundled with component)
 
-When a component imports from `@/registry/default/hooks/` or `@/registry/default/lib/`, the sync script automatically:
+**Usage pattern:**
 
-1. Registers the shared file as a standalone registry item
-2. Adds it to the component's `registryDependencies`
-3. Transforms imports to user-facing paths (e.g., `@/hooks/cubby-ui/use-fuzzy-filter`)
+- Components do NOT re-export hooks/utils - they are standalone items
+- Examples import directly from the hook/util paths:
+
+  ```tsx
+  import { useFuzzyFilter } from "@/registry/default/hooks/use-fuzzy-filter";
+  import { highlightText } from "@/registry/default/lib/highlight-text";
+  ```
+
+- Component docs link to dedicated hook/util docs instead of duplicating documentation
+- Users install hooks/utils separately when needed via `npx shadcn@latest add @cubby-ui/use-fuzzy-filter`
 
 #### Using Base UI's useRender and mergeProps
 

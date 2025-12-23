@@ -137,113 +137,14 @@ Scrollable container for suggestion items. Wraps Base UI's `Autocomplete.List`.
 
 #### highlightText
 
-```ts
-function highlightText(text: string, query: string): ReactNode
-```
-
 Highlights matching portions of text by wrapping them in `<mark>` tags. Useful for showing which parts of a suggestion match the user's input.
 
-**Parameters**
-
-<ApiPropsList>
-
-<ApiProp name="text" fullType="string">
-  The text to highlight matches in.
-</ApiProp>
-
-<ApiProp name="query" fullType="string">
-  The search query to match against.
-</ApiProp>
-
-</ApiPropsList>
-
-**Returns:** `ReactNode` with matched portions wrapped in styled `<mark>` elements.
-
-```tsx
-import { highlightText } from "@/lib/cubby-ui/highlight-text";
-
-<Autocomplete.Item>
-  {highlightText(item.label, inputValue)}
-</Autocomplete.Item>
-```
+See [highlightText](/docs/utils/highlight-text) for full documentation and API reference.
 
 ### Hooks
 
 #### useFuzzyFilter
 
-```ts
-function useFuzzyFilter<T>(options: UseFuzzyFilterOptions): {
-  filter: (items: T[], query: string) => T[];
-  filterItem: (item: T, query: string) => boolean;
-}
-```
+Provides fuzzy matching capabilities for flexible searching across multiple fields. Returns filter functions compatible with Base UI's Autocomplete.
 
-Provides fuzzy matching capabilities using [match-sorter](https://github.com/kentcdodds/match-sorter). Returns filter functions compatible with Base UI's Autocomplete.
-
-**Options**
-
-<ApiPropsList>
-
-<ApiProp
-  name="keys"
-  fullType='Array<string | { key: string; threshold?: FuzzyThreshold }>'
->
-  Properties to search on. Can specify per-key thresholds for fine-grained control.
-</ApiProp>
-
-<ApiProp
-  name="threshold"
-  fullType="FuzzyThreshold"
-  defaultValue='"matches"'
->
-  Minimum ranking for a match. Values from strictest to loosest:
-
-  - `"case-sensitive-equal"` - exact match, case sensitive
-  - `"equal"` - exact match, case insensitive
-  - `"starts-with"` - query at start of string
-  - `"word-starts-with"` - query at start of any word
-  - `"contains"` - query anywhere in string
-  - `"acronym"` - matches acronyms (e.g., "rhl" → "React Hooks Library")
-  - `"matches"` - very fuzzy (default)
-</ApiProp>
-
-</ApiPropsList>
-
-**Returns**
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `filter` | `(items: T[], query: string) => T[]` | Filters and sorts an array of items by relevance |
-| `filterItem` | `(item: T, query: string) => boolean` | Checks if a single item matches. Use with Base UI's `filter` prop |
-
-```tsx
-import { useFuzzyFilter } from "@/hooks/cubby-ui/use-fuzzy-filter";
-
-const { filterItem } = useFuzzyFilter<Item>({
-  keys: ["label", "description"],
-  threshold: "contains",
-});
-
-// Use with Autocomplete
-<Autocomplete.Root filter={filterItem}>
-  ...
-</Autocomplete.Root>
-```
-
-For relevance sorting, use `filter` with the `filteredItems` prop:
-
-```tsx
-const { filter } = useFuzzyFilter<Item>({
-  keys: ["label"],
-});
-
-const [query, setQuery] = useState("");
-const filteredItems = filter(items, query);
-
-<Autocomplete.Root
-  filteredItems={filteredItems}
-  onInputChange={(value) => setQuery(value ?? "")}
->
-  ...
-</Autocomplete.Root>
-```
+See [useFuzzyFilter](/docs/hooks/use-fuzzy-filter) for full documentation and API reference.

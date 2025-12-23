@@ -15,9 +15,9 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-  highlightText,
-  useFuzzyFilter,
 } from "@/registry/default/command/command";
+import { useFuzzyFilter } from "@/registry/default/hooks/use-fuzzy-filter";
+import { highlightText } from "@/registry/default/lib/highlight-text";
 import { Button } from "@/registry/default/button/button";
 import { Kbd } from "@/registry/default/kbd/kbd";
 import {

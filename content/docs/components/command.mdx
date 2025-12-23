@@ -35,6 +35,71 @@ Enable fuzzy matching for more flexible searching across multiple fields.
 
 <ComponentPreview component="command" example="command-fuzzy" />
 
+### Virtualized
+
+Use virtualization for large lists (100+ items) to maintain smooth performance. Only renders items visible in the viewport, dramatically reducing DOM nodes.
+
+<ComponentPreview component="command" example="command-virtualized" />
+
+**Key concepts:**
+
+1. **Use `useListVirtualizer` hook** - Handles scroll positioning, keyboard navigation, and item measurement. See [useListVirtualizer docs](/docs/hooks/use-list-virtualizer) for full API reference.
+2. **External filtering** - Compute `filteredItems` yourself and pass `filter={null}` to Command. The hook needs both arrays to calculate proper aria attributes.
+3. **Replace `CommandList` with `CommandVirtualizedList`** - Accepts `scrollRef` and `totalSize` from the hook.
+4. **Spread `rootProps`** - Contains virtualization state for Base UI integration.
+
+```tsx
+import { useListVirtualizer } from "@/hooks/cubby-ui/use-list-virtualizer";
+import { useCommandFilter } from "@/lib/cubby-ui/command";
+
+// 1. Set up filtering
+const { contains } = useCommandFilter();
+const filteredItems = useMemo(
+  () => items.filter((item) => contains(item, query, getItemLabel)),
+  [contains, query],
+);
+
+// 2. Initialize virtualizer
+const {
+  rootProps,       // Spread on Command
+  scrollRef,       // Pass to CommandVirtualizedList
+  measureRef,      // Pass to each CommandItem
+  totalSize,       // Pass to CommandVirtualizedList
+  virtualItems,    // Array to map over
+  getItem,         // Get data for virtual item
+  getItemStyle,    // Get positioning styles
+  getItemProps,    // Get aria attributes
+} = useListVirtualizer({
+  items,           // All items (for aria-setsize)
+  filteredItems,   // Items to display
+  estimateSize: 40, // Item height in px
+});
+
+// 3. Render
+<Command {...rootProps} filter={null}>
+  <CommandVirtualizedList scrollRef={scrollRef} totalSize={totalSize}>
+    {virtualItems.map((virtualItem) => (
+      <CommandItem
+        key={virtualItem.key}
+        ref={measureRef}
+        value={getItem(virtualItem)}
+        style={getItemStyle(virtualItem)}
+        {...getItemProps(virtualItem)}
+      >
+        {getItem(virtualItem)?.name}
+      </CommandItem>
+    ))}
+  </CommandVirtualizedList>
+</Command>
+```
+
+**Filtering options:**
+
+- **Default filtering**: Use `useCommandFilter` for the same `contains`/`startsWith`/`endsWith` matchers as Command's built-in filter
+- **Fuzzy search**: Use [useFuzzyFilter](/docs/hooks/use-fuzzy-filter) for relevance-sorted results across multiple fields
+- **Server-side filtering**: Pass the same array to both `items` and `filteredItems`
+- **Custom filtering**: Use any filtering method (native `.filter()`, third-party libraries, etc.)
+
 ## API Reference
 
 The Command component is built on top of [Base UI's Autocomplete](https://base-ui.com/react/components/autocomplete) and [Dialog](https://base-ui.com/react/components/dialog). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
@@ -119,120 +184,84 @@ Scrollable container for command items with empty state handling. Wraps Base UI'
 
 </ApiPropsList>
 
+#### CommandVirtualizedList
+
+Virtualized scrollable container for large lists. Use with `useListVirtualizer` hook for optimal performance with 100+ items.
+
+<ApiPropsList>
+
+<ApiProp name="scrollRef" fullType="(element: HTMLDivElement | null) => void" required>
+  Ref callback from `useListVirtualizer` for the scroll container.
+</ApiProp>
+
+<ApiProp name="totalSize" fullType="number" required>
+  Total height of all virtual items in pixels. Provided by `useListVirtualizer`.
+</ApiProp>
+
+<ApiProp name="emptyMessage" fullType="ReactNode" simpleType="node" defaultValue='"No results found."'>
+  Message shown when no results are found.
+</ApiProp>
+
+<ApiProp name="fadeEdges" fullType="boolean | 'x' | 'y' | FadeEdge[]" defaultValue='"y"'>
+  Controls the fade effect on scroll edges.
+</ApiProp>
+
+<ApiProp name="nativeScroll" fullType="boolean" defaultValue="false">
+  Use native browser scrolling instead of custom scrollbars.
+</ApiProp>
+
+</ApiPropsList>
+
 ### Utilities
 
 #### highlightText
 
-```ts
-function highlightText(text: string, query: string): ReactNode
-```
-
 Highlights matching portions of text by wrapping them in `<mark>` tags. Useful for showing which parts of a command match the user's input.
 
-**Parameters**
-
-<ApiPropsList>
-
-<ApiProp name="text" fullType="string">
-  The text to highlight matches in.
-</ApiProp>
-
-<ApiProp name="query" fullType="string">
-  The search query to match against.
-</ApiProp>
-
-</ApiPropsList>
-
-**Returns:** `ReactNode` with matched portions wrapped in styled `<mark>` elements.
-
-```tsx
-import { highlightText } from "@/lib/cubby-ui/highlight-text";
-
-<CommandItem>
-  {highlightText(item.label, query)}
-</CommandItem>
-```
+See [highlightText](/docs/utils/highlight-text) for full documentation and API reference.
 
 ### Hooks
 
-#### useFuzzyFilter
+#### useCommandFilter
 
 ```ts
-function useFuzzyFilter<T>(options: UseFuzzyFilterOptions): {
-  filter: (items: T[], query: string) => T[];
-  filterItem: (item: T, query: string) => boolean;
+function useCommandFilter(): {
+  contains: (item: T, query: string, getItemLabel: (item: T) => string) => boolean;
+  startsWith: (item: T, query: string, getItemLabel: (item: T) => string) => boolean;
+  endsWith: (item: T, query: string, getItemLabel: (item: T) => string) => boolean;
 }
 ```
 
-Provides fuzzy matching capabilities using [match-sorter](https://github.com/kentcdodds/match-sorter). Returns filter functions compatible with Base UI's Autocomplete.
-
-**Options**
-
-<ApiPropsList>
-
-<ApiProp
-  name="keys"
-  fullType='Array<string | { key: string; threshold?: FuzzyThreshold }>'
->
-  Properties to search on. Can specify per-key thresholds for fine-grained control.
-</ApiProp>
-
-<ApiProp
-  name="threshold"
-  fullType="FuzzyThreshold"
-  defaultValue='"matches"'
->
-  Minimum ranking for a match. Values from strictest to loosest:
-
-  - `"case-sensitive-equal"` - exact match, case sensitive
-  - `"equal"` - exact match, case insensitive
-  - `"starts-with"` - query at start of string
-  - `"word-starts-with"` - query at start of any word
-  - `"contains"` - query anywhere in string
-  - `"acronym"` - matches acronyms (e.g., "rhl" → "React Hooks Library")
-  - `"matches"` - very fuzzy (default)
-</ApiProp>
-
-</ApiPropsList>
+Exposes Base UI's built-in filter matchers for external filtering. Required when using virtualization since you must compute `filteredItems` yourself.
 
 **Returns**
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `filter` | `(items: T[], query: string) => T[]` | Filters and sorts an array of items by relevance |
-| `filterItem` | `(item: T, query: string) => boolean` | Checks if a single item matches. Use with Base UI's `filter` prop |
+| `contains` | `(item, query, getItemLabel) => boolean` | Returns true if item label contains query (case-insensitive) |
+| `startsWith` | `(item, query, getItemLabel) => boolean` | Returns true if item label starts with query |
+| `endsWith` | `(item, query, getItemLabel) => boolean` | Returns true if item label ends with query |
 
 ```tsx
-import { useFuzzyFilter } from "@/hooks/cubby-ui/use-fuzzy-filter";
+import { useCommandFilter } from "@/registry/default/command/command";
 
-const { filterItem } = useFuzzyFilter<CommandItemData>({
-  keys: ["label", "description"],
-  threshold: "contains",
-});
+const { contains } = useCommandFilter();
+const getItemLabel = (item: Item | null) => item?.name ?? "";
 
-// Use with Command
-<Command filter={filterItem}>
-  ...
-</Command>
+const filteredItems = useMemo(
+  () => items.filter((item) => contains(item, query, getItemLabel)),
+  [contains, query],
+);
 ```
 
-For relevance sorting, use `filter` with controlled value:
+#### useFuzzyFilter
 
-```tsx
-const { filter } = useFuzzyFilter<CommandItemData>({
-  keys: ["label"],
-});
+Provides fuzzy matching capabilities for flexible searching across multiple fields. Returns filter functions compatible with Base UI's Autocomplete.
 
-const [query, setQuery] = useState("");
-const filteredItems = filter(items, query);
+See [useFuzzyFilter](/docs/hooks/use-fuzzy-filter) for full documentation and API reference.
 
-<Command
-  items={filteredItems}
-  value={query}
-  onValueChange={setQuery}
-  filter={null}
->
-  ...
-</Command>
-```
+#### useListVirtualizer
 
+Provides virtualization for large command lists using TanStack Virtual. Abstracts scroll handling, item positioning, and keyboard navigation.
+
+See [useListVirtualizer](/docs/hooks/use-list-virtualizer) for full documentation and API reference.

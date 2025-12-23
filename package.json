@@ -26,6 +26,7 @@
     "@orama/orama": "^3.1.18",
     "@origin-space/image-cropper": "^0.1.9",
     "@tanstack/react-table": "^8.21.3",
+    "@tanstack/react-virtual": "^3.13.13",
     "@types/mdx": "^2.0.13",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

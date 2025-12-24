@@ -14,7 +14,7 @@ import {
   buildParentMap,
   collectVisibleIds,
   handleTreeKeyboardNavigation,
-} from "./lib/tree-utils";
+} from "@/registry/default/tree/lib/tree-utils";
 
 // ============================================================================
 // Types
@@ -184,7 +184,7 @@ function Tree<TData extends Record<string, unknown> = Record<string, unknown>>({
   if (process.env.NODE_ENV === "development") {
     React.useEffect(() => {
       try {
-        const { validateTreeStructure } = require("./lib/tree-utils");
+        const { validateTreeStructure } = require("@/registry/default/tree/lib/tree-utils");
         validateTreeStructure(data);
       } catch (error) {
         console.error("Tree validation error:", error);
@@ -1124,4 +1124,4 @@ export {
   type TreeMode,
 };
 
-export * as TreeUtils from "./lib/tree-utils";
+export * as TreeUtils from "@/registry/default/tree/lib/tree-utils";

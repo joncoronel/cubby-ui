@@ -15,7 +15,7 @@ import {
 // Drawer-specific CSS animations (scroll-driven animations for progressive enhancement)
 import "./drawer.css";
 
-import type { SnapPoint, DrawerDirection } from "./lib/drawer-utils";
+import type { SnapPoint, DrawerDirection } from "@/registry/default/drawer/lib/drawer-utils";
 import {
   DIRECTION_CONFIG,
   parsePixelValue,
@@ -23,9 +23,9 @@ import {
   getSnapPointValue,
   supportsScrollTimeline,
   supportsScrollState,
-} from "./lib/drawer-utils";
-import { useScrollSnap } from "./hooks/use-scroll-snap";
-import { useVirtualKeyboard } from "./hooks/use-virtual-keyboard";
+} from "@/registry/default/drawer/lib/drawer-utils";
+import { useScrollSnap } from "@/registry/default/drawer/hooks/use-scroll-snap";
+import { useVirtualKeyboard } from "@/registry/default/drawer/hooks/use-virtual-keyboard";
 
 // Re-export types for consumers
 export type { SnapPoint, DrawerDirection };

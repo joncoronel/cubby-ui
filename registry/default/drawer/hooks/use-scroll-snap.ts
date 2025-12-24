@@ -4,7 +4,7 @@ import type {
   DrawerDirection,
   SnapPoint,
   ScrollGeometry,
-} from "../lib/drawer-utils";
+} from "@/registry/default/drawer/lib/drawer-utils";
 import {
   DIRECTION_CONFIG,
   supportsScrollEnd,
@@ -17,7 +17,7 @@ import {
   calculateSnapScrollPositions,
   calculateScrollProgress,
   calculateSnapProgress,
-} from "../lib/drawer-utils";
+} from "@/registry/default/drawer/lib/drawer-utils";
 
 /* -------------------------------------------------------------------------------------------------
  * Types
@@ -128,7 +128,7 @@ interface InitState {
 export {
   supportsScrollTimeline,
   supportsScrollState,
-} from "../lib/drawer-utils";
+} from "@/registry/default/drawer/lib/drawer-utils";
 
 export function useScrollSnap(
   options: UseScrollSnapOptions,

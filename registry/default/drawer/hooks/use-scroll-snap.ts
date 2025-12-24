@@ -156,6 +156,9 @@ export function useScrollSnap(
     isFromDetection: false,
   });
 
+  // Ref for self-referential RAF callback (avoids ESLint react-hooks/immutability error)
+  const checkScrollStabilityRef = React.useRef<() => void>(() => {});
+
   const interactionRef = React.useRef<InteractionState>({
     isClosing: false,
     isPointerDown: false,
@@ -384,8 +387,14 @@ export function useScrollSnap(
     }
 
     initRef.current.rafLastPos = currentPos;
-    initRef.current.rafId = requestAnimationFrame(checkScrollStability);
+    // Use ref to avoid self-reference in useCallback (ESLint react-hooks/immutability)
+    initRef.current.rafId = requestAnimationFrame(
+      checkScrollStabilityRef.current,
+    );
   }, [updateIsScrolling, findNearestSnapIndex]);
+
+  // Keep ref in sync with latest callback
+  checkScrollStabilityRef.current = checkScrollStability;
 
   const startScrollStabilityCheck = React.useCallback(() => {
     if (initRef.current.rafId === null) {

@@ -1133,9 +1133,10 @@ async function scanRegistry() {
 
     const componentName = dir.name;
 
-    // Skip utility directories
+    // Skip utility directories (these are handled by scanSharedDirectories)
     if (
       componentName === "lib" ||
+      componentName === "hooks" ||
       componentName === "utils" ||
       componentName === "helpers"
     ) {
@@ -1462,9 +1463,10 @@ function validateComponentConsistency(
     }
   }
 
-  // Check that all components with metadata have anatomy
+  // Check that all UI components with metadata have anatomy
+  // (skip hooks and libs since they don't have JSX anatomy)
   for (const item of items) {
-    if (!anatomyMap[item.name]) {
+    if (item.type === "registry:ui" && !anatomyMap[item.name]) {
       errors.push(`Component '${item.name}' has metadata but no anatomy`);
     }
   }

@@ -1634,7 +1634,7 @@ function extractCssContent(): {
     for (const match of varMatches) {
       const varName = match[1];
       const varValue = match[2].trim();
-      if (!varValue.includes("/*") && !varValue.includes("inset")) {
+      if (!varValue.includes("/*")) {
         lightVars[varName] = varValue;
       }
     }
@@ -1648,7 +1648,7 @@ function extractCssContent(): {
     for (const match of varMatches) {
       const varName = match[1];
       const varValue = match[2].trim();
-      if (!varValue.includes("/*") && !varValue.includes("inset")) {
+      if (!varValue.includes("/*")) {
         darkVars[varName] = varValue;
       }
     }
@@ -1659,7 +1659,7 @@ function extractCssContent(): {
   if (themeMatch) {
     const themeContent = themeMatch[1];
     const varMatches = themeContent.matchAll(
-      /--([a-z-]+(?:-[a-z]+)*):\s*([^;]+);/g,
+      /--([a-z0-9-]+(?:-[a-z0-9]+)*):\s*([^;]+);/g,
     );
     for (const match of varMatches) {
       const varName = match[1];

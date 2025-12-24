@@ -681,6 +681,9 @@
           "radius-md": "calc(var(--radius) - 2px)",
           "radius-lg": "var(--radius)",
           "radius-xl": "calc(var(--radius) + 2px)",
+          "radius-2xl": "calc(var(--radius) + 4px)",
+          "radius-3xl": "calc(var(--radius) + 6px)",
+          "radius-4xl": "calc(var(--radius) + 8px)",
           "ease-in-cubic": "cubic-bezier(0.55, 0.055, 0.675, 0.19)",
           "ease-out-cubic": "cubic-bezier(0.215, 0.61, 0.355, 1)",
           "ease-in-out-cubic": "cubic-bezier(0.645, 0.045, 0.355, 1)"
@@ -728,7 +731,8 @@
           "info-border": "oklch(0.9 0.1 250)",
           "success": "oklch(0.97 0.04 145)",
           "success-foreground": "oklch(0.48 0.18 145)",
-          "success-border": "oklch(0.9 0.1 145)"
+          "success-border": "oklch(0.9 0.1 145)",
+          "top-highlight": "inset 0 0.75px 0.75px oklch(100 0 0 / 0.64)"
         },
         "dark": {
           "background": "oklch(0.19 0 0)",

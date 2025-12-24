@@ -24,8 +24,9 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  highlightText,
 } from "@/registry/default/command/command";
+
+import { highlightText } from "@/registry/default/lib/highlight-text";
 import { useDebouncedCallback } from "use-debounce";
 import { Kbd } from "@/registry/default/kbd/kbd";
 import { cn } from "@/lib/utils";
@@ -43,22 +44,22 @@ export default function CustomSearchDialog({
     delayMs: 0,
   });
 
-  const defaultItems = [
+  const defaultItems: SortedResult[] = [
     {
       id: "intro",
       content: "Introduction",
       url: "/docs",
-      type: "page" as const,
+      type: "page",
     },
     {
       id: "install",
       content: "Installation",
       url: "/docs/installation",
-      type: "page" as const,
+      type: "page",
     },
   ];
 
-  const items =
+  const items: SortedResult[] =
     Array.isArray(query.data) && query.data.length > 0
       ? query.data
       : (query.isLoading && query.data === "empty") || !search
@@ -78,9 +79,16 @@ export default function CustomSearchDialog({
     setSearch(value);
   }, 300);
 
+  const emptyMessage =
+    search &&
+    items.length === 0 &&
+    (!query.isLoading || (Array.isArray(query.data) && query.data.length === 0))
+      ? "No results found."
+      : null;
+
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
-      <CommandDialogPopup className="mb-auto">
+      <CommandDialogPopup>
         <Command
           items={items}
           value={text}
@@ -91,21 +99,9 @@ export default function CustomSearchDialog({
           <CommandContent>
             <CommandInput
               placeholder="Search documentation..."
-              loading={
-                ((query.isLoading && query.data === "empty") ||
-                  (text && !search)) as boolean
-              }
+              loading={Boolean(text) && (query.isLoading || !search)}
             />
-            <CommandList
-              emptyMessage={
-                search &&
-                items.length === 0 &&
-                (!query.isLoading ||
-                  (Array.isArray(query.data) && query.data.length === 0))
-                  ? "No results found."
-                  : null
-              }
-            >
+            <CommandList emptyMessage={emptyMessage}>
               {(item: SortedResult) => (
                 <CommandItem
                   key={item.id}

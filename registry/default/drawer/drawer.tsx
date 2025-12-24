@@ -777,20 +777,13 @@ function DrawerContentInner({
             : "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-transform duration-350",
 
           // Hide scrollbar
-          "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+          "[scrollbar-width:none_!important] [&::-webkit-scrollbar]:hidden!",
           // Scroll snap configuration - disable scrolling when animating or closing
           isAnimating || isClosing
-            ? "overflow-hidden"
+            ? "touch-none overflow-hidden"
             : isVertical
-              ? "overflow-y-scroll"
-              : "overflow-x-scroll",
-          isAnimating || isClosing
-            ? "overflow-hidden"
-            : isVertical
-              ? "overflow-x-hidden"
-              : "overflow-y-hidden",
-          // Prevent scroll chaining to parent (none is more aggressive than contain)
-          "overscroll-none",
+              ? "touch-pan-y overflow-x-hidden overflow-y-auto overscroll-y-none"
+              : "touch-pan-x overflow-x-auto overflow-y-hidden overscroll-x-none",
           // Constrain touch gestures to drawer scroll direction only (prevents URL bar collapse/expand)
           isVertical ? "touch-pan-y" : "touch-pan-x",
           // Reduced motion: instant behavior
@@ -800,14 +793,6 @@ function DrawerContentInner({
           {
             scrollSnapType: isVertical ? "y mandatory" : "x mandatory",
             scrollBehavior: "smooth",
-            // Constrain touch to scroll direction only (prevents URL bar collapse on mobile)
-            // Disable touch entirely during animations or closing
-            touchAction:
-              isAnimating || isClosing
-                ? "none"
-                : isVertical
-                  ? "pan-y"
-                  : "pan-x",
             // Adjust for keyboard on bottom drawer
             paddingBottom:
               direction === "bottom" && keyboardHeight > 0
@@ -1072,15 +1057,9 @@ function DrawerBody({
         hideScrollbar={hideScrollbar}
         nativeScroll={nativeScroll}
         overscrollBehavior="auto"
+        viewportClassName={isVertical ? "touch-pan-y" : "touch-pan-x"}
       >
-        <div
-          className={cn(
-            "px-5 py-1",
-            isVertical ? "touch-pan-y" : "touch-pan-x",
-            className,
-          )}
-          {...props}
-        >
+        <div className={cn("px-5 py-1", className)} {...props}>
           {children}
         </div>
       </ScrollArea>

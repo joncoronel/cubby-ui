@@ -125,10 +125,7 @@ interface InitState {
  * -------------------------------------------------------------------------------------------------*/
 
 // Re-export browser support detection for consumers
-export {
-  supportsScrollTimeline,
-  supportsScrollState,
-} from "@/registry/default/drawer/lib/drawer-utils";
+export { supportsScrollTimeline, supportsScrollState };
 
 export function useScrollSnap(
   options: UseScrollSnapOptions,

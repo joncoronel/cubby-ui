@@ -1124,4 +1124,6 @@ export {
   type TreeMode,
 };
 
-export * as TreeUtils from "@/registry/default/tree/lib/tree-utils";
+// Note: Using import + export pattern because shadcn CLI doesn't transform `export ... from` paths
+import * as TreeUtils from "@/registry/default/tree/lib/tree-utils";
+export { TreeUtils };

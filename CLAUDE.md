@@ -104,6 +104,25 @@ import { utils } from "../lib/drawer-utils";
 
 This is required because component files may be installed to different target directories (e.g., `hooks/cubby-ui/` and `lib/cubby-ui/`), breaking relative path relationships. The shadcn CLI transforms `@/registry/...` imports to the correct paths at install time.
 
+**Re-export pattern (shadcn CLI limitation):**
+
+The shadcn CLI only transforms `import ... from` statements, NOT `export ... from` statements. When re-exporting from internal files, use the import + export pattern:
+
+```tsx
+// ❌ Wrong - shadcn CLI won't transform this path
+export { myUtil } from "@/registry/default/component/lib/utils";
+
+// ✅ Correct - import first, then export (import path gets transformed)
+import { myUtil } from "@/registry/default/component/lib/utils";
+export { myUtil };
+
+// ✅ Also correct for namespace re-exports
+import * as Utils from "@/registry/default/component/lib/utils";
+export { Utils };
+```
+
+If the items are already imported elsewhere in the file, simply add an export statement without re-importing.
+
 #### Using Base UI's useRender and mergeProps
 
 When creating custom components that support polymorphic rendering (render prop pattern), **always** use Base UI's `useRender` and `mergeProps` utilities:

@@ -1090,7 +1090,4 @@ export {
 export type { DrawerRenderProps, DrawerVariant };
 
 // Re-export feature detection for consumers who want to check browser support
-export {
-  supportsScrollTimeline,
-  supportsScrollState,
-} from "@/registry/default/drawer/lib/drawer-utils";
+export { supportsScrollTimeline, supportsScrollState };

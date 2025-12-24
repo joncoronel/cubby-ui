@@ -176,7 +176,9 @@ export function useScrollSnap(
 
   // Options ref for stable callbacks (avoids effect dependency changes)
   const optionsRef = React.useRef(options);
-  optionsRef.current = options;
+  React.useLayoutEffect(() => {
+    optionsRef.current = options;
+  });
 
   // React state (only what needs to trigger re-renders)
   const [scrollProgress, setScrollProgress] = React.useState(0);
@@ -394,7 +396,9 @@ export function useScrollSnap(
   }, [updateIsScrolling, findNearestSnapIndex]);
 
   // Keep ref in sync with latest callback
-  checkScrollStabilityRef.current = checkScrollStability;
+  React.useLayoutEffect(() => {
+    checkScrollStabilityRef.current = checkScrollStability;
+  });
 
   const startScrollStabilityCheck = React.useCallback(() => {
     if (initRef.current.rafId === null) {
@@ -663,10 +667,12 @@ export function useScrollSnap(
       initRef.current.retryTimeout = setTimeout(performInitialScroll, 0);
     }
 
+    // Capture ref value for cleanup (avoids stale ref warning)
+    const currentInit = initRef.current;
     return () => {
-      if (initRef.current.retryTimeout) {
-        clearTimeout(initRef.current.retryTimeout);
-        initRef.current.retryTimeout = null;
+      if (currentInit.retryTimeout) {
+        clearTimeout(currentInit.retryTimeout);
+        currentInit.retryTimeout = null;
       }
     };
   }, [

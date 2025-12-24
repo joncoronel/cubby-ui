@@ -700,6 +700,7 @@ function DrawerContentInner({
     // Timeline scope wrapper - enables cross-element timeline references
     // Required for backdrop to reference drawer panel's view timeline
     <div
+      data-slot="drawer-timeline-scope"
       style={
         supportsScrollTimeline
           ? ({ timelineScope: "--drawer-panel" } as React.CSSProperties)

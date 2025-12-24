@@ -52,3 +52,18 @@
     opacity: 0;
   }
 }
+
+html:has([data-slot="drawer-viewport"][data-direction="left"]),
+html:has([data-slot="drawer-viewport"][data-direction="right"]) {
+  overscroll-behavior: none;
+  scrollbar-width: none;
+}
+
+html:has(
+    [data-slot="drawer-viewport"][data-direction="left"]
+  )::-webkit-scrollbar,
+html:has(
+    [data-slot="drawer-viewport"][data-direction="right"]
+  )::-webkit-scrollbar {
+  display: none !important;
+}

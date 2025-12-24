@@ -1093,4 +1093,4 @@ export type { DrawerRenderProps, DrawerVariant };
 export {
   supportsScrollTimeline,
   supportsScrollState,
-} from "./lib/drawer-utils";
+} from "@/registry/default/drawer/lib/drawer-utils";

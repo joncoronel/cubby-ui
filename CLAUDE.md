@@ -90,6 +90,20 @@ These are registered as **standalone registry items** (`registry:hook` or `regis
 - Component docs link to dedicated hook/util docs instead of duplicating documentation
 - Users install hooks/utils separately when needed via `npx shadcn@latest add @cubby-ui/use-fuzzy-filter`
 
+**Multi-file component imports:**
+
+When a component has internal files (e.g., `registry/default/drawer/hooks/` or `registry/default/drawer/lib/`), these files must use **absolute `@/registry/...` paths** for cross-file imports - NOT relative paths:
+
+```tsx
+// ✅ Correct - shadcn CLI will transform this at install time
+import { utils } from "@/registry/default/drawer/lib/drawer-utils";
+
+// ❌ Wrong - relative imports break when files are installed to different directories
+import { utils } from "../lib/drawer-utils";
+```
+
+This is required because component files may be installed to different target directories (e.g., `hooks/cubby-ui/` and `lib/cubby-ui/`), breaking relative path relationships. The shadcn CLI transforms `@/registry/...` imports to the correct paths at install time.
+
 #### Using Base UI's useRender and mergeProps
 
 When creating custom components that support polymorphic rendering (render prop pattern), **always** use Base UI's `useRender` and `mergeProps` utilities:

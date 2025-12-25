@@ -1,4 +1,4 @@
-import type { TreeNode } from "@/registry/default/tree/tree";
+import type { TreeNode } from "../tree";
 
 /**
  * Validate tree structure for circular references and duplicate IDs

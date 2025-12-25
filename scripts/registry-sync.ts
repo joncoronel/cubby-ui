@@ -899,17 +899,33 @@ function scanDirectoryRecursive(
 }
 
 // Generate target path for file installation with cubby-ui namespace
-function getTargetPath(registryPath: string, fileType: string): string {
+// isMultiFile: if true, component files are placed in a component subdirectory
+function getTargetPath(
+  registryPath: string,
+  fileType: string,
+  isMultiFile: boolean = false,
+): string {
   // Extract component name and relative path
   // registry/default/{component}/{...rest} → {component}, {...rest}
   const pathParts = registryPath.split("/");
   if (pathParts.length < 4) return ""; // Invalid path
 
+  const componentOrDir = pathParts[2]; // e.g., "drawer" or "hooks" or "lib"
   const relativePath = pathParts.slice(3).join("/"); // Everything after component name
+
+  // Check if this is a shared registry item (in registry/default/hooks/ or registry/default/lib/)
+  // vs a component-internal file (in registry/default/{component}/hooks/ or /lib/)
+  const isSharedItem = componentOrDir === "hooks" || componentOrDir === "lib";
 
   // Map file types to target directories with cubby-ui namespace
   switch (fileType) {
     case "registry:ui":
+      if (isMultiFile) {
+        // Multi-file component: put in subdirectory
+        // registry/default/drawer/drawer.tsx → components/ui/cubby-ui/drawer/drawer.tsx
+        return `components/ui/cubby-ui/${componentOrDir}/${relativePath}`;
+      }
+      // Single-file component: flat structure
       // registry/default/button/button.tsx → components/ui/cubby-ui/button.tsx
       return `components/ui/cubby-ui/${relativePath}`;
 
@@ -922,28 +938,37 @@ function getTargetPath(registryPath: string, fileType: string): string {
       return `components/cubby-ui/blocks/${relativePath}`;
 
     case "registry:lib":
-      // registry/default/button/lib/utils.ts → lib/cubby-ui/utils.ts
-      // Remove 'lib/' prefix from relativePath if present
-      const libPath = relativePath.replace(/^lib\//, "");
-      return `lib/cubby-ui/${libPath}`;
+      if (isSharedItem) {
+        // Shared lib: registry/default/lib/highlight-text.tsx → lib/cubby-ui/highlight-text.tsx
+        return `lib/cubby-ui/${relativePath}`;
+      }
+      // Component-internal lib: registry/default/drawer/lib/utils.ts → components/ui/cubby-ui/drawer/lib/utils.ts
+      // Keep the lib/ prefix and co-locate with component
+      return `components/ui/cubby-ui/${componentOrDir}/${relativePath}`;
 
     case "registry:hook":
-      // registry/default/button/hooks/use-foo.ts → hooks/cubby-ui/use-foo.ts
-      // Remove 'hooks/' prefix from relativePath if present
-      const hookPath = relativePath.replace(/^hooks\//, "");
-      return `hooks/cubby-ui/${hookPath}`;
+      if (isSharedItem) {
+        // Shared hook: registry/default/hooks/use-fuzzy-filter.ts → hooks/cubby-ui/use-fuzzy-filter.ts
+        return `hooks/cubby-ui/${relativePath}`;
+      }
+      // Component-internal hook: registry/default/drawer/hooks/use-scroll-snap.ts → components/ui/cubby-ui/drawer/hooks/use-scroll-snap.ts
+      // Keep the hooks/ prefix and co-locate with component
+      return `components/ui/cubby-ui/${componentOrDir}/${relativePath}`;
 
     case "registry:page":
       // Custom pages with explicit target - prepend cubby-ui to the path
       return `app/cubby-ui/${relativePath}`;
 
     case "registry:file":
-      // CSS files go next to their component
-      if (relativePath.endsWith(".css")) {
-        return `components/ui/cubby-ui/${relativePath}`;
+      // CSS and other files go next to their component
+      if (isMultiFile) {
+        // Multi-file component: put in subdirectory
+        // registry/default/drawer/drawer.css → components/ui/cubby-ui/drawer/drawer.css
+        return `components/ui/cubby-ui/${componentOrDir}/${relativePath}`;
       }
-      // Other miscellaneous files - prepend cubby-ui to maintain namespacing
-      return `cubby-ui/${relativePath}`;
+      // Single-file component: flat structure
+      // registry/default/button/button.css → components/ui/cubby-ui/button.css
+      return `components/ui/cubby-ui/${relativePath}`;
 
     case "registry:style":
     case "registry:theme":
@@ -1226,7 +1251,9 @@ async function scanRegistry() {
     // Create registry item
     const mainFilePath = `registry/${DEFAULT_STYLE}/${componentName}/${componentName}.tsx`;
     const mainFileType = "registry:ui";
-    const mainFileTarget = getTargetPath(mainFilePath, mainFileType);
+    // Multi-file components get a subdirectory structure for co-location
+    const isMultiFile = additionalFiles.length > 0;
+    const mainFileTarget = getTargetPath(mainFilePath, mainFileType, isMultiFile);
 
     // Add target fields to all files and filter out empty targets
     const filesWithTargets = [
@@ -1236,7 +1263,8 @@ async function scanRegistry() {
         ...(mainFileTarget && { target: mainFileTarget }),
       },
       ...additionalFiles.map((file) => {
-        const target = getTargetPath(file.path, file.type);
+        // Additional files are always part of multi-file components
+        const target = getTargetPath(file.path, file.type, true);
         return {
           ...file,
           ...(target && { target }),

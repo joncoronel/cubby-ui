@@ -260,27 +260,27 @@
         {
           "path": "registry/default/circular-slider/circular-slider.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/circular-slider.tsx"
+          "target": "components/ui/cubby-ui/circular-slider/circular-slider.tsx"
         },
         {
           "path": "registry/default/circular-slider/lib/angle-calculations.ts",
           "type": "registry:lib",
-          "target": "lib/cubby-ui/angle-calculations.ts"
+          "target": "components/ui/cubby-ui/circular-slider/lib/angle-calculations.ts"
         },
         {
           "path": "registry/default/circular-slider/lib/pointer-utils.ts",
           "type": "registry:lib",
-          "target": "lib/cubby-ui/pointer-utils.ts"
+          "target": "components/ui/cubby-ui/circular-slider/lib/pointer-utils.ts"
         },
         {
           "path": "registry/default/circular-slider/lib/svg-constants.ts",
           "type": "registry:lib",
-          "target": "lib/cubby-ui/svg-constants.ts"
+          "target": "components/ui/cubby-ui/circular-slider/lib/svg-constants.ts"
         },
         {
           "path": "registry/default/circular-slider/lib/svg-utils.ts",
           "type": "registry:lib",
-          "target": "lib/cubby-ui/svg-utils.ts"
+          "target": "components/ui/cubby-ui/circular-slider/lib/svg-utils.ts"
         }
       ],
       "dependencies": [
@@ -296,32 +296,32 @@
         {
           "path": "registry/default/code-block/code-block.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/code-block.tsx"
+          "target": "components/ui/cubby-ui/code-block/code-block.tsx"
         },
         {
           "path": "registry/default/code-block/lib/shiki-shared.ts",
           "type": "registry:lib",
-          "target": "lib/cubby-ui/shiki-shared.ts"
+          "target": "components/ui/cubby-ui/code-block/lib/shiki-shared.ts"
         },
         {
           "path": "registry/default/code-block/lib/transformers/diff.ts",
           "type": "registry:lib",
-          "target": "lib/cubby-ui/transformers/diff.ts"
+          "target": "components/ui/cubby-ui/code-block/lib/transformers/diff.ts"
         },
         {
           "path": "registry/default/code-block/lib/transformers/focus.ts",
           "type": "registry:lib",
-          "target": "lib/cubby-ui/transformers/focus.ts"
+          "target": "components/ui/cubby-ui/code-block/lib/transformers/focus.ts"
         },
         {
           "path": "registry/default/code-block/lib/transformers/highlight-lines.ts",
           "type": "registry:lib",
-          "target": "lib/cubby-ui/transformers/highlight-lines.ts"
+          "target": "components/ui/cubby-ui/code-block/lib/transformers/highlight-lines.ts"
         },
         {
           "path": "registry/default/code-block/lib/transformers/utils.ts",
           "type": "registry:lib",
-          "target": "lib/cubby-ui/transformers/utils.ts"
+          "target": "components/ui/cubby-ui/code-block/lib/transformers/utils.ts"
         }
       ],
       "registryDependencies": [
@@ -357,17 +357,17 @@
         {
           "path": "registry/default/combobox/combobox.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/combobox.tsx"
+          "target": "components/ui/cubby-ui/combobox/combobox.tsx"
         },
         {
           "path": "registry/default/combobox/hooks/use-async-combobox.ts",
           "type": "registry:hook",
-          "target": "hooks/cubby-ui/use-async-combobox.ts"
+          "target": "components/ui/cubby-ui/combobox/hooks/use-async-combobox.ts"
         },
         {
           "path": "registry/default/combobox/hooks/use-creatable-combobox.ts",
           "type": "registry:hook",
-          "target": "hooks/cubby-ui/use-creatable-combobox.ts"
+          "target": "components/ui/cubby-ui/combobox/hooks/use-creatable-combobox.ts"
         }
       ],
       "registryDependencies": [
@@ -423,12 +423,12 @@
         {
           "path": "registry/default/copy-button/copy-button.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/copy-button.tsx"
+          "target": "components/ui/cubby-ui/copy-button/copy-button.tsx"
         },
         {
           "path": "registry/default/copy-button/lib/copy-to-clipboard.ts",
           "type": "registry:lib",
-          "target": "lib/cubby-ui/copy-to-clipboard.ts"
+          "target": "components/ui/cubby-ui/copy-button/lib/copy-to-clipboard.ts"
         }
       ],
       "registryDependencies": [
@@ -530,27 +530,27 @@
         {
           "path": "registry/default/drawer/drawer.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/drawer.tsx"
+          "target": "components/ui/cubby-ui/drawer/drawer.tsx"
         },
         {
           "path": "registry/default/drawer/lib/drawer-utils.ts",
           "type": "registry:lib",
-          "target": "lib/cubby-ui/drawer-utils.ts"
+          "target": "components/ui/cubby-ui/drawer/lib/drawer-utils.ts"
         },
         {
           "path": "registry/default/drawer/hooks/use-scroll-snap.ts",
           "type": "registry:hook",
-          "target": "hooks/cubby-ui/use-scroll-snap.ts"
+          "target": "components/ui/cubby-ui/drawer/hooks/use-scroll-snap.ts"
         },
         {
           "path": "registry/default/drawer/hooks/use-virtual-keyboard.ts",
           "type": "registry:hook",
-          "target": "hooks/cubby-ui/use-virtual-keyboard.ts"
+          "target": "components/ui/cubby-ui/drawer/hooks/use-virtual-keyboard.ts"
         },
         {
           "path": "registry/default/drawer/drawer.css",
           "type": "registry:file",
-          "target": "components/ui/cubby-ui/drawer.css"
+          "target": "components/ui/cubby-ui/drawer/drawer.css"
         }
       ],
       "registryDependencies": [
@@ -1017,12 +1017,12 @@
         {
           "path": "registry/default/scroll-area/scroll-area.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/scroll-area.tsx"
+          "target": "components/ui/cubby-ui/scroll-area/scroll-area.tsx"
         },
         {
           "path": "registry/default/scroll-area/scroll-area.css",
           "type": "registry:file",
-          "target": "components/ui/cubby-ui/scroll-area.css"
+          "target": "components/ui/cubby-ui/scroll-area/scroll-area.css"
         }
       ]
     },
@@ -1287,12 +1287,12 @@
         {
           "path": "registry/default/tree/tree.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/tree.tsx"
+          "target": "components/ui/cubby-ui/tree/tree.tsx"
         },
         {
           "path": "registry/default/tree/lib/tree-utils.ts",
           "type": "registry:lib",
-          "target": "lib/cubby-ui/tree-utils.ts"
+          "target": "components/ui/cubby-ui/tree/lib/tree-utils.ts"
         }
       ],
       "registryDependencies": [

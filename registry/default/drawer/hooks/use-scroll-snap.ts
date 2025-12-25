@@ -4,7 +4,7 @@ import type {
   DrawerDirection,
   SnapPoint,
   ScrollGeometry,
-} from "@/registry/default/drawer/lib/drawer-utils";
+} from "../lib/drawer-utils";
 import {
   DIRECTION_CONFIG,
   supportsScrollEnd,
@@ -17,7 +17,7 @@ import {
   calculateSnapScrollPositions,
   calculateScrollProgress,
   calculateSnapProgress,
-} from "@/registry/default/drawer/lib/drawer-utils";
+} from "../lib/drawer-utils";
 
 /* -------------------------------------------------------------------------------------------------
  * Types

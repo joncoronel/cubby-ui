@@ -90,38 +90,53 @@ These are registered as **standalone registry items** (`registry:hook` or `regis
 - Component docs link to dedicated hook/util docs instead of duplicating documentation
 - Users install hooks/utils separately when needed via `npx shadcn@latest add @cubby-ui/use-fuzzy-filter`
 
-**Multi-file component imports:**
+**Multi-file component structure (co-location):**
 
-When a component has internal files (e.g., `registry/default/drawer/hooks/` or `registry/default/drawer/lib/`), these files must use **absolute `@/registry/...` paths** for cross-file imports - NOT relative paths:
+Multi-file components (with internal hooks/lib directories) use **relative imports** for internal files. These components are installed as co-located directories:
 
-```tsx
-// ✅ Correct - shadcn CLI will transform this at install time
-import { utils } from "@/registry/default/drawer/lib/drawer-utils";
+```text
+# Source structure
+registry/default/drawer/
+├── drawer.tsx
+├── drawer.css
+├── hooks/
+│   ├── use-scroll-snap.ts
+│   └── use-virtual-keyboard.ts
+└── lib/
+    └── drawer-utils.ts
 
-// ❌ Wrong - relative imports break when files are installed to different directories
-import { utils } from "../lib/drawer-utils";
+# Installed structure (via shadcn CLI)
+components/ui/cubby-ui/drawer/
+├── drawer.tsx
+├── drawer.css
+├── hooks/
+│   ├── use-scroll-snap.ts
+│   └── use-virtual-keyboard.ts
+└── lib/
+    └── drawer-utils.ts
 ```
 
-This is required because component files may be installed to different target directories (e.g., `hooks/cubby-ui/` and `lib/cubby-ui/`), breaking relative path relationships. The shadcn CLI transforms `@/registry/...` imports to the correct paths at install time.
-
-**Re-export pattern (shadcn CLI limitation):**
-
-The shadcn CLI only transforms `import ... from` statements, NOT `export ... from` statements. When re-exporting from internal files, use the import + export pattern:
+**Import patterns:**
 
 ```tsx
-// ❌ Wrong - shadcn CLI won't transform this path
-export { myUtil } from "@/registry/default/component/lib/utils";
+// ✅ Internal files use relative imports (no transformation needed)
+// In drawer.tsx:
+import { useScrollSnap } from "./hooks/use-scroll-snap";
+import { DIRECTION_CONFIG } from "./lib/drawer-utils";
 
-// ✅ Correct - import first, then export (import path gets transformed)
-import { myUtil } from "@/registry/default/component/lib/utils";
-export { myUtil };
+// In hooks/use-scroll-snap.ts:
+import type { DrawerDirection } from "../lib/drawer-utils";
 
-// ✅ Also correct for namespace re-exports
-import * as Utils from "@/registry/default/component/lib/utils";
-export { Utils };
+// ✅ External dependencies use absolute paths (transformed by CLI)
+import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 ```
 
-If the items are already imported elsewhere in the file, simply add an export statement without re-importing.
+**Single-file components** remain flat files (e.g., `components/ui/cubby-ui/button.tsx`).
+
+**Shared registry items** (`registry/default/hooks/` and `registry/default/lib/`) are installed distributed:
+
+- `hooks/cubby-ui/use-fuzzy-filter.ts`
+- `lib/cubby-ui/highlight-text.tsx`
 
 #### Using Base UI's useRender and mergeProps
 

@@ -12,20 +12,20 @@ import {
   describeArc,
   roundToStep,
   clamp,
-} from "@/registry/default/circular-slider/lib/angle-calculations";
+} from "./lib/angle-calculations";
 import {
   SVG_CONFIG,
   RADIUS_CONFIG,
   SLOT_NAMES,
   VARIANT_COLOR_MAP,
-} from "@/registry/default/circular-slider/lib/svg-constants";
+} from "./lib/svg-constants";
 import {
   pixelsToSvgUnits,
   createSvgOverlayProps,
   strokeWidthToSvgUnits,
   getTrackInnerEdge,
-} from "@/registry/default/circular-slider/lib/svg-utils";
-import { getValueFromPointerPosition } from "@/registry/default/circular-slider/lib/pointer-utils";
+} from "./lib/svg-utils";
+import { getValueFromPointerPosition } from "./lib/pointer-utils";
 
 // ============================================================================
 // Types

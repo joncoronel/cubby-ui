@@ -14,7 +14,7 @@ import {
   buildParentMap,
   collectVisibleIds,
   handleTreeKeyboardNavigation,
-} from "@/registry/default/tree/lib/tree-utils";
+} from "./lib/tree-utils";
 
 // ============================================================================
 // Types
@@ -184,7 +184,7 @@ function Tree<TData extends Record<string, unknown> = Record<string, unknown>>({
   if (process.env.NODE_ENV === "development") {
     React.useEffect(() => {
       try {
-        const { validateTreeStructure } = require("@/registry/default/tree/lib/tree-utils");
+        const { validateTreeStructure } = require("./lib/tree-utils");
         validateTreeStructure(data);
       } catch (error) {
         console.error("Tree validation error:", error);
@@ -1124,6 +1124,6 @@ export {
   type TreeMode,
 };
 
-// Note: Using import + export pattern because shadcn CLI doesn't transform `export ... from` paths
-import * as TreeUtils from "@/registry/default/tree/lib/tree-utils";
+// Re-export tree utilities for consumers
+import * as TreeUtils from "./lib/tree-utils";
 export { TreeUtils };

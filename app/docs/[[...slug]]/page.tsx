@@ -9,6 +9,9 @@ import {
 import { notFound } from "next/navigation";
 import { getMDXComponents } from "@/mdx-components";
 import { createRelativeLink } from "fumadocs-ui/mdx";
+// import { FillTOC } from "@/components/docs/toc-fill-css";
+import { FillTOC as FillTOCJavaScript } from "@/components/docs/toc-fill-javascript";
+// import { DefaultTOC } from "@/components/docs/toc";
 
 interface PageProps {
   params: Promise<{ slug?: string[] }>;
@@ -26,17 +29,15 @@ export default async function Page(props: PageProps) {
     <DocsPage
       toc={page.data.toc}
       full={page.data.full}
-      tableOfContent={{ single: true }}
-      // article={{
-      //   className: "xl:px-16",
-      // }}
+      tableOfContent={{
+        component: <FillTOCJavaScript toc={page.data.toc} stepped />,
+      }}
     >
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>
         <MDX
           components={getMDXComponents({
-            // This allows you to link to other pages with relative file paths
             a: createRelativeLink(source, page),
           })}
         />

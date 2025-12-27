@@ -12,7 +12,9 @@ import { createRelativeLink } from "fumadocs-ui/mdx";
 // import { FillTOC } from "@/components/docs/toc-fill-css";
 // import { FillTOC as FillTOCJavaScript } from "@/components/docs/toc-fill-javascript";
 // import { DefaultTOC } from "@/components/docs/toc";
-import { FillTOCServer } from "@/components/docs/toc-fill-server";
+// import { FillTOCServer } from "@/components/docs/toc-fill-server";
+
+import { DashedTOC } from "@/components/docs/toc-dashed";
 
 interface PageProps {
   params: Promise<{ slug?: string[] }>;
@@ -31,7 +33,7 @@ export default async function Page(props: PageProps) {
       toc={page.data.toc}
       full={page.data.full}
       tableOfContent={{
-        component: <FillTOCServer toc={page.data.toc} stepped />,
+        component: <DashedTOC toc={page.data.toc} />,
       }}
     >
       <DocsTitle>{page.data.title}</DocsTitle>

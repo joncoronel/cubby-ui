@@ -5,7 +5,7 @@ import * as Primitive from "fumadocs-core/toc";
 import type { TOCItemType } from "fumadocs-core/toc";
 import { cn } from "@/lib/utils";
 import { useOnChange } from "fumadocs-core/utils/use-on-change";
-import type { DefaultTocSvgData } from "./toc-utils";
+import { CORNER_RADIUS, type DefaultTocSvgData } from "./toc-utils";
 
 // Line offset for stepped mode (only 2 levels: depth 2 vs depth 3+)
 function getLineOffset(depth: number): number {
@@ -197,7 +197,6 @@ export function DefaultTOC({
     if (!containerRef.current) return;
 
     const container = containerRef.current;
-    const CORNER_RADIUS = 4;
 
     function onResize() {
       if (container.clientHeight === 0) return;

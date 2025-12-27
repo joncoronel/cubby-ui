@@ -98,7 +98,8 @@
       "Bash(cmd /c del \"c:\\Users\\jonny\\Documents\\Projects\\cubby-ui\\registry\\default\\drawer\\hooks\\use-drawer-gesture.ts\")",
       "Bash(cmd /c del \"c:\\Users\\jonny\\Documents\\Projects\\cubby-ui\\registry\\default\\drawer\\hooks\\use-nested-scroll.ts\")",
       "Bash(cmd /c del \"c:\\Users\\jonny\\Documents\\Projects\\cubby-ui\\registry\\default\\autocomplete\\hooks\\use-fuzzy-filter.ts\")",
-      "Bash(move:*)"
+      "Bash(move:*)",
+      "Bash(cmd /c del \"c:\\\\Users\\\\jonny\\\\Documents\\\\Projects\\\\cubby-ui\\\\components\\\\docs\\\\toc-utils.ts\")"
     ],
     "deny": []
   }

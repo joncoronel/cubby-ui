@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  type RefObject,
-  use,
-  useEffect,
-  useEffectEvent,
-  useRef,
-  useState,
-} from "react";
+import { type RefObject, useEffect, useEffectEvent, useRef, useState } from "react";
 import * as Primitive from "fumadocs-core/toc";
 import type { TOCItemType } from "fumadocs-core/toc";
 import { useOnChange } from "fumadocs-core/utils/use-on-change";
@@ -16,185 +8,15 @@ import { cn } from "@/lib/utils";
 import {
   type PathSegment,
   type TocSvgData,
-  CORNER_RADIUS,
-  MIN_X_OFFSET,
-  getLineOffset,
-  getItemOffset,
-} from "./toc-utils";
+  FillActiveContext,
+  TOCEmptyState,
+  TOCItem,
+  calcThumbPosition,
+  getCircleX,
+  useTocSegments,
+} from "./toc-shared";
 
 export type { TocSvgData };
-
-// Find x-coordinate on the path at a given y-coordinate
-function getCircleX(segments: PathSegment[], y: number): number {
-  for (const seg of segments) {
-    if (y >= seg.top && y <= seg.bottom) return seg.offset;
-  }
-  return segments[segments.length - 1]?.offset ?? 1;
-}
-
-// Hook to compute segments and SVG path data
-// Accepts optional initial value for server-side rendering
-function useTocSegments(
-  containerRef: RefObject<HTMLElement | null>,
-  toc: TOCItemType[],
-  stepped: boolean,
-  initialSvg: TocSvgData | null = null,
-): TocSvgData | null {
-  const [data, setData] = useState<TocSvgData | null>(initialSvg);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    function compute() {
-      if (!container || container.clientHeight === 0) return;
-
-      let w = 0;
-      let h = 0;
-      const d: string[] = [];
-      const segments: PathSegment[] = [];
-
-      // Build segments from DOM
-      for (let i = 0; i < toc.length; i++) {
-        const element = container.querySelector<HTMLElement>(
-          `a[href="${toc[i].url}"]`,
-        );
-        if (!element) continue;
-
-        const styles = getComputedStyle(element);
-        const offset = stepped
-          ? Math.max(MIN_X_OFFSET, getLineOffset(toc[i].depth) + 1)
-          : MIN_X_OFFSET;
-        const top = element.offsetTop + parseFloat(styles.paddingTop);
-
-        const isLastItem = i === toc.length - 1;
-        const paddingTop = parseFloat(styles.paddingTop);
-        const paddingBottom = parseFloat(styles.paddingBottom);
-        const contentHeight = element.clientHeight - paddingTop - paddingBottom;
-        const bottom = isLastItem
-          ? element.offsetTop + paddingTop + contentHeight / 2
-          : element.offsetTop + element.clientHeight - paddingBottom;
-
-        w = Math.max(offset, w);
-        h = Math.max(h, bottom);
-        segments.push({ offset, top, bottom });
-      }
-
-      // Build SVG path from segments
-      for (let i = 0; i < segments.length; i++) {
-        const seg = segments[i];
-        const prevSeg = segments[i - 1];
-        const nextSeg = segments[i + 1];
-
-        if (i === 0) {
-          d.push(`M${seg.offset} ${seg.top}`);
-        } else if (prevSeg && seg.offset !== prevSeg.offset) {
-          d.push(
-            `Q${seg.offset} ${seg.top},${seg.offset} ${seg.top + CORNER_RADIUS}`,
-          );
-        } else {
-          d.push(`L${seg.offset} ${seg.top}`);
-        }
-
-        if (nextSeg && seg.offset !== nextSeg.offset) {
-          const cornerBottom = seg.bottom;
-          d.push(`L${seg.offset} ${cornerBottom - CORNER_RADIUS}`);
-          const nextTop = nextSeg.top;
-          const dx = nextSeg.offset - seg.offset;
-          const dy = nextTop - cornerBottom;
-          const diagLength = Math.sqrt(dx * dx + dy * dy);
-          const ratio = Math.min(CORNER_RADIUS / diagLength, 0.5);
-          const midX = seg.offset + dx * ratio;
-          const midY = cornerBottom + dy * ratio;
-          d.push(`Q${seg.offset} ${cornerBottom},${midX} ${midY}`);
-          const endRatio = 1 - Math.min(CORNER_RADIUS / diagLength, 0.5);
-          const endX = seg.offset + dx * endRatio;
-          const endY = cornerBottom + dy * endRatio;
-          d.push(`L${endX} ${endY}`);
-        } else {
-          d.push(`L${seg.offset} ${seg.bottom}`);
-        }
-      }
-
-      const lastSeg = segments[segments.length - 1];
-      setData({
-        path: d.join(" "),
-        width: w + 1,
-        height: h,
-        endX: lastSeg?.offset ?? 1,
-        endY: lastSeg?.bottom ?? h,
-        segments,
-      });
-    }
-
-    const observer = new ResizeObserver(compute);
-    // Skip initial compute if server already provided the SVG data
-    if (!initialSvg) {
-      compute();
-    }
-    observer.observe(container);
-
-    return () => observer.disconnect();
-  }, [containerRef, toc, stepped, initialSvg]);
-
-  return data;
-}
-
-// Context for fill mode - tracks which item the circle is on
-const FillActiveContext = createContext<string | null>(null);
-
-// Calculate thumb position from active anchors
-function calcThumbPosition(
-  container: HTMLElement,
-  activeAnchors: string[],
-  toc: TOCItemType[],
-): [top: number, height: number, bottomY: number, lastActiveIndex: number] {
-  if (activeAnchors.length === 0 || container.clientHeight === 0) {
-    return [0, 0, 0, -1];
-  }
-
-  let lastActiveIndex = -1;
-
-  for (const item of activeAnchors) {
-    const tocIndex = toc.findIndex((t) => t.url === `#${item}`);
-    if (tocIndex !== -1 && tocIndex > lastActiveIndex) {
-      lastActiveIndex = tocIndex;
-    }
-  }
-
-  if (lastActiveIndex === -1) return [0, 0, 0, -1];
-
-  // Find center of last active item's content
-  const lastActiveElement = container.querySelector<HTMLElement>(
-    `a[href="${toc[lastActiveIndex]?.url}"]`,
-  );
-  if (!lastActiveElement) return [0, 0, 0, lastActiveIndex];
-
-  const lastStyles = getComputedStyle(lastActiveElement);
-  const paddingTop = parseFloat(lastStyles.paddingTop);
-  const paddingBottom = parseFloat(lastStyles.paddingBottom);
-  const contentHeight =
-    lastActiveElement.clientHeight - paddingTop - paddingBottom;
-  const lastItemCenter =
-    lastActiveElement.offsetTop + paddingTop + contentHeight / 2;
-
-  // Find start of first item
-  const firstElement = container.querySelector<HTMLElement>(
-    `a[href="${toc[0]?.url}"]`,
-  );
-  if (!firstElement)
-    return [0, lastItemCenter, lastItemCenter, lastActiveIndex];
-
-  const firstStyles = getComputedStyle(firstElement);
-  const lineStart = firstElement.offsetTop + parseFloat(firstStyles.paddingTop);
-
-  return [
-    lineStart,
-    lastItemCenter - lineStart,
-    lastItemCenter,
-    lastActiveIndex,
-  ];
-}
 
 // Component to manage thumb position updates via CSS variables
 interface TocThumbPositionProps {
@@ -315,30 +137,6 @@ function TocThumbCircle() {
   );
 }
 
-// TOC Item for fill mode
-function TOCItem({ item }: { item: TOCItemType }) {
-  const fillActive = use(FillActiveContext);
-  const isActive = fillActive === item.url.replace("#", "");
-
-  return (
-    <Primitive.TOCItem
-      href={item.url}
-      style={{
-        paddingInlineStart: getItemOffset(item.depth),
-      }}
-      className={cn(
-        "relative py-1.5 text-sm transition-colors duration-150 ease-out",
-        "text-fd-muted-foreground hover:text-fd-accent-foreground",
-        "first:pt-0 last:pb-0",
-        "line-clamp-1",
-        isActive && "text-fd-primary",
-      )}
-    >
-      {item.title}
-    </Primitive.TOCItem>
-  );
-}
-
 // Fill mode TOC component
 interface FillTOCProps {
   toc: TOCItemType[];
@@ -360,17 +158,7 @@ export function FillTOC({
   const svg = useTocSegments(containerRef, toc, stepped, initialSvg);
 
   if (toc.length === 0) {
-    return (
-      <div
-        id="nd-toc"
-        className="sticky top-(--fd-docs-row-3) flex h-[calc(var(--fd-docs-height)-var(--fd-docs-row-3))] w-(--fd-toc-width) flex-col pe-4 pt-12 pb-2 [grid-area:toc] max-xl:hidden"
-        data-slot="toc"
-      >
-        <div className="bg-fd-card text-fd-muted-foreground rounded-lg border p-3 text-xs">
-          No headings on this page
-        </div>
-      </div>
-    );
+    return <TOCEmptyState />;
   }
 
   return (

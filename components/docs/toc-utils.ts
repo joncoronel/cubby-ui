@@ -1,5 +1,9 @@
 import type { TOCItemType } from "fumadocs-core/toc";
 
+// ============================================================================
+// Configuration Constants
+// ============================================================================
+
 // Known constants from Tailwind v4 classes used in TOC items
 // py-1.5 = 0.375rem = 6px (with first:pt-0, last:pb-0)
 // text-sm = 0.875rem font-size with 1.25rem (20px) line-height
@@ -11,6 +15,8 @@ const NAV_PADDING_TOP = 16;
 export const CORNER_RADIUS = 4;
 // Minimum x-offset ensures circle (6px with -translate-x-1/2) doesn't clip
 export const MIN_X_OFFSET = 4;
+// Animation duration in milliseconds
+export const ANIMATION_DURATION = 150;
 
 // Line offset for stepped mode (only 2 levels: depth 2 vs depth 3+)
 // Value offset by 3px to maintain indent with MIN_X_OFFSET base position

@@ -5,6 +5,7 @@ import * as Primitive from "fumadocs-core/toc";
 import type { TOCItemType } from "fumadocs-core/toc";
 import { cn } from "@/lib/utils";
 import { useOnChange } from "fumadocs-core/utils/use-on-change";
+import type { DefaultTocSvgData } from "./toc-utils";
 
 // Line offset for stepped mode (only 2 levels: depth 2 vs depth 3+)
 function getLineOffset(depth: number): number {
@@ -178,20 +179,19 @@ interface DefaultTOCProps {
   single?: boolean;
   /** Enable stepped/indented line for depth 3+ headings */
   stepped?: boolean;
+  /** Pre-computed SVG data for server-side rendering */
+  initialSvg?: DefaultTocSvgData | null;
 }
 
 export function DefaultTOC({
   toc,
   single = true,
   stepped = false,
+  initialSvg = null,
 }: DefaultTOCProps) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const thumbRef = React.useRef<HTMLDivElement>(null);
-  const [svg, setSvg] = React.useState<{
-    path: string;
-    width: number;
-    height: number;
-  } | null>(null);
+  const [svg, setSvg] = React.useState<DefaultTocSvgData | null>(initialSvg);
 
   React.useEffect(() => {
     if (!containerRef.current) return;
@@ -268,11 +268,14 @@ export function DefaultTOC({
     }
 
     const observer = new ResizeObserver(onResize);
-    onResize();
+    // Skip initial compute if server already provided the SVG data
+    if (!initialSvg) {
+      onResize();
+    }
     observer.observe(container);
 
     return () => observer.disconnect();
-  }, [toc, stepped]);
+  }, [toc, stepped, initialSvg]);
 
   if (toc.length === 0) {
     return (

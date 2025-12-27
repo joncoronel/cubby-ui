@@ -13,37 +13,16 @@ import * as Primitive from "fumadocs-core/toc";
 import type { TOCItemType } from "fumadocs-core/toc";
 import { useOnChange } from "fumadocs-core/utils/use-on-change";
 import { cn } from "@/lib/utils";
+import {
+  type PathSegment,
+  type TocSvgData,
+  CORNER_RADIUS,
+  MIN_X_OFFSET,
+  getLineOffset,
+  getItemOffset,
+} from "./toc-utils";
 
-// Line offset for stepped mode (only 2 levels: depth 2 vs depth 3+)
-// Value offset by 3px to maintain indent with MIN_X_OFFSET base position
-function getLineOffset(depth: number): number {
-  return depth <= 2 ? 0 : 13;
-}
-
-// Text indentation based on heading depth
-// Values offset by 3px to maintain gap with MIN_X_OFFSET track position
-function getItemOffset(depth: number): number {
-  if (depth <= 2) return 15;
-  if (depth === 3) return 27;
-  return 39;
-}
-
-// Segment data for path tracing
-interface PathSegment {
-  offset: number;
-  top: number;
-  bottom: number;
-}
-
-// SVG data returned by useTocSegments
-interface TocSvgData {
-  path: string;
-  width: number;
-  height: number;
-  endX: number;
-  endY: number;
-  segments: PathSegment[];
-}
+export type { TocSvgData };
 
 // Find x-coordinate on the path at a given y-coordinate
 function getCircleX(segments: PathSegment[], y: number): number {
@@ -53,17 +32,15 @@ function getCircleX(segments: PathSegment[], y: number): number {
   return segments[segments.length - 1]?.offset ?? 1;
 }
 
-const CORNER_RADIUS = 4;
-// Minimum x-offset ensures circle (6px with -translate-x-1/2) doesn't clip
-const MIN_X_OFFSET = 4;
-
 // Hook to compute segments and SVG path data
+// Accepts optional initial value for server-side rendering
 function useTocSegments(
   containerRef: RefObject<HTMLElement | null>,
   toc: TOCItemType[],
   stepped: boolean,
+  initialSvg: TocSvgData | null = null,
 ): TocSvgData | null {
-  const [data, setData] = useState<TocSvgData | null>(null);
+  const [data, setData] = useState<TocSvgData | null>(initialSvg);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -151,11 +128,14 @@ function useTocSegments(
     }
 
     const observer = new ResizeObserver(compute);
-    compute();
+    // Skip initial compute if server already provided the SVG data
+    if (!initialSvg) {
+      compute();
+    }
     observer.observe(container);
 
     return () => observer.disconnect();
-  }, [containerRef, toc, stepped]);
+  }, [containerRef, toc, stepped, initialSvg]);
 
   return data;
 }
@@ -258,12 +238,9 @@ function TocThumbPosition({
     // On first valid update, show circle without transition
     if (!isInitialized.current && height > 0) {
       navRef.current.style.setProperty("--circle-opacity", "1");
-      // Enable transitions for subsequent updates (after paint)
+      // Enable Tailwind transitions for subsequent updates (after paint)
       requestAnimationFrame(() => {
-        navRef.current?.style.setProperty(
-          "--circle-transition",
-          "left 150ms ease-out, top 150ms ease-out",
-        );
+        navRef.current?.setAttribute("data-toc-ready", "");
       });
       isInitialized.current = true;
       return;
@@ -323,18 +300,16 @@ function TocThumb({ className }: { className?: string }) {
   );
 }
 
-// Thumb end circle - CSS variable animated
+// Thumb end circle - uses Tailwind transitions, enabled after initialization via parent data attribute
 function TocThumbCircle() {
   return (
     <div
       role="none"
       aria-hidden="true"
-      className="bg-fd-primary pointer-events-none absolute size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full"
+      className="bg-fd-primary pointer-events-none absolute size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-[var(--circle-opacity,0)] transition-none [[data-toc-ready]_&]:transition-[left,top] [[data-toc-ready]_&]:duration-150 [[data-toc-ready]_&]:ease-out"
       style={{
         left: "var(--circle-x, 0)",
         top: "var(--circle-y, 0)",
-        opacity: "var(--circle-opacity, 0)",
-        transition: "var(--circle-transition, none)",
       }}
     />
   );
@@ -355,6 +330,7 @@ function TOCItem({ item }: { item: TOCItemType }) {
         "relative py-1.5 text-sm transition-colors duration-150 ease-out",
         "text-fd-muted-foreground hover:text-fd-accent-foreground",
         "first:pt-0 last:pb-0",
+        "line-clamp-1",
         isActive && "text-fd-primary",
       )}
     >
@@ -368,14 +344,20 @@ interface FillTOCProps {
   toc: TOCItemType[];
   /** Enable stepped/indented line for depth 3+ headings */
   stepped?: boolean;
+  /** Pre-computed SVG data for server-side rendering */
+  initialSvg?: TocSvgData | null;
 }
 
-export function FillTOC({ toc, stepped = false }: FillTOCProps) {
+export function FillTOC({
+  toc,
+  stepped = false,
+  initialSvg = null,
+}: FillTOCProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
   const [fillActive, setFillActive] = useState<string | null>(null);
 
-  const svg = useTocSegments(containerRef, toc, stepped);
+  const svg = useTocSegments(containerRef, toc, stepped, initialSvg);
 
   if (toc.length === 0) {
     return (

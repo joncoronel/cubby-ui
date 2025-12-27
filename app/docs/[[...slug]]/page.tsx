@@ -10,8 +10,9 @@ import { notFound } from "next/navigation";
 import { getMDXComponents } from "@/mdx-components";
 import { createRelativeLink } from "fumadocs-ui/mdx";
 // import { FillTOC } from "@/components/docs/toc-fill-css";
-import { FillTOC as FillTOCJavaScript } from "@/components/docs/toc-fill-javascript";
+// import { FillTOC as FillTOCJavaScript } from "@/components/docs/toc-fill-javascript";
 // import { DefaultTOC } from "@/components/docs/toc";
+import { FillTOCServer } from "@/components/docs/toc-fill-server";
 
 interface PageProps {
   params: Promise<{ slug?: string[] }>;
@@ -30,7 +31,7 @@ export default async function Page(props: PageProps) {
       toc={page.data.toc}
       full={page.data.full}
       tableOfContent={{
-        component: <FillTOCJavaScript toc={page.data.toc} stepped />,
+        component: <FillTOCServer toc={page.data.toc} stepped />,
       }}
     >
       <DocsTitle>{page.data.title}</DocsTitle>

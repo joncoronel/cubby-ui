@@ -6,6 +6,9 @@ import type { TOCItemType } from "fumadocs-core/toc";
 import { cn } from "@/lib/utils";
 import { useOnChange } from "fumadocs-core/utils/use-on-change";
 
+// Context for forced active item (when near bottom of page)
+const ForcedActiveContext = React.createContext<string | null>(null);
+
 // Text indentation based on heading depth
 function getItemOffset(depth: number): number {
   if (depth <= 2) return 12;
@@ -71,26 +74,34 @@ function calcThumbPosition(
   return [top, height];
 }
 
-// Component to manage thumb position updates
-interface TocThumbPositionProps {
+// Component to manage thumb position and forced active state
+interface TocPositionManagerProps {
   containerRef: React.RefObject<HTMLElement | null>;
   thumbRef: React.RefObject<HTMLDivElement | null>;
   toc: TOCItemType[];
+  setForcedActive: (url: string | null) => void;
 }
 
-function TocThumbPosition({
+function TocPositionManager({
   containerRef,
   thumbRef,
   toc,
-}: TocThumbPositionProps) {
+  setForcedActive,
+}: TocPositionManagerProps) {
   const active = Primitive.useActiveAnchors();
 
   const update = React.useCallback(() => {
     if (!containerRef.current || !thumbRef.current) return;
 
     // Check if we should force the last item active (near bottom + last heading visible)
-    const forceLastItem =
-      isNearPageBottom(100) && isLastHeadingVisible(toc);
+    const forceLastItem = isNearPageBottom(50) && isLastHeadingVisible(toc);
+
+    // Update forced active context
+    if (forceLastItem && toc.length > 0) {
+      setForcedActive(toc[toc.length - 1].url);
+    } else {
+      setForcedActive(null);
+    }
 
     const [thumbTop, thumbHeight] = calcThumbPosition(
       containerRef.current,
@@ -100,7 +111,7 @@ function TocThumbPosition({
     );
     thumbRef.current.style.setProperty("--fd-top", `${thumbTop}px`);
     thumbRef.current.style.setProperty("--fd-height", `${thumbHeight}px`);
-  }, [containerRef, thumbRef, active, toc]);
+  }, [containerRef, thumbRef, active, toc, setForcedActive]);
 
   React.useEffect(() => {
     if (!containerRef.current) return;
@@ -144,6 +155,11 @@ const TocThumb = React.forwardRef<HTMLDivElement, { className?: string }>(
 
 // TOC Item - no vertical padding, spacing handled by container gap
 function TOCItem({ item }: { item: TOCItemType }) {
+  const forcedActive = React.useContext(ForcedActiveContext);
+  const isForcedActive = forcedActive === item.url;
+  // When forcing an item, suppress normal data-[active] styling for other items
+  const suppressNormalActive = forcedActive !== null && !isForcedActive;
+
   return (
     <Primitive.TOCItem
       href={item.url}
@@ -153,7 +169,9 @@ function TOCItem({ item }: { item: TOCItemType }) {
       className={cn(
         "relative ml-2 text-sm leading-5 transition-colors duration-150 ease-out",
         "text-muted-foreground hover:text-accent-foreground",
-        "data-[active=true]:text-accent-foreground",
+        // Only apply data-[active] styling when not suppressed
+        !suppressNormalActive && "data-[active=true]:text-accent-foreground",
+        isForcedActive && "text-accent-foreground",
       )}
     >
       {item.title}
@@ -171,6 +189,7 @@ export interface DashedTOCProps {
 export function DashedTOC({ toc, initialPosition = null }: DashedTOCProps) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const thumbRef = React.useRef<HTMLDivElement>(null);
+  const [forcedActive, setForcedActive] = React.useState<string | null>(null);
 
   // Apply initial position for SSR
   React.useEffect(() => {
@@ -213,30 +232,33 @@ export function DashedTOC({ toc, initialPosition = null }: DashedTOCProps) {
         On this page
       </h3>
       <Primitive.AnchorProvider toc={toc} single={true}>
-        <TocThumbPosition
+        <TocPositionManager
           containerRef={containerRef}
           thumbRef={thumbRef}
           toc={toc}
+          setForcedActive={setForcedActive}
         />
-        <Primitive.ScrollProvider containerRef={containerRef}>
-          <nav
-            aria-label="Table of contents"
-            className="relative min-h-0 overflow-auto mask-[linear-gradient(to_bottom,transparent,white_16px,white_calc(100%-16px),transparent)] py-4 pl-0.5 [scrollbar-width:none]"
-          >
-            {/* Items container - dashed track via background gradient */}
-            <div
-              ref={containerRef}
-              className="relative flex flex-col gap-3 bg-[linear-gradient(to_bottom,color-mix(in_oklch,var(--color-accent-foreground)_30%,transparent)_33%,transparent_0)] bg-size-[1px_4px] bg-repeat-y"
+        <ForcedActiveContext.Provider value={forcedActive}>
+          <Primitive.ScrollProvider containerRef={containerRef}>
+            <nav
+              aria-label="Table of contents"
+              className="relative min-h-0 overflow-auto mask-[linear-gradient(to_bottom,transparent,white_16px,white_calc(100%-16px),transparent)] py-4 pl-0.5 [scrollbar-width:none]"
             >
-              {/* Pill thumb - centered on track */}
-              <TocThumb ref={thumbRef} />
-              {/* TOC items */}
-              {toc.map((item) => (
-                <TOCItem key={item.url} item={item} />
-              ))}
-            </div>
-          </nav>
-        </Primitive.ScrollProvider>
+              {/* Items container - dashed track via background gradient */}
+              <div
+                ref={containerRef}
+                className="relative flex flex-col gap-3 bg-[linear-gradient(to_bottom,color-mix(in_oklch,var(--color-accent-foreground)_30%,transparent)_33%,transparent_0)] bg-size-[1px_4px] bg-repeat-y"
+              >
+                {/* Pill thumb - centered on track */}
+                <TocThumb ref={thumbRef} />
+                {/* TOC items */}
+                {toc.map((item) => (
+                  <TOCItem key={item.url} item={item} />
+                ))}
+              </div>
+            </nav>
+          </Primitive.ScrollProvider>
+        </ForcedActiveContext.Provider>
       </Primitive.AnchorProvider>
     </div>
   );

@@ -177,6 +177,17 @@ For the complete Base UI API, see the [Base UI Dialog documentation](https://bas
 </ApiProp>
 
 <ApiProp
+  name="repositionInputs"
+  fullType="boolean"
+  simpleType="boolean"
+  defaultValue="true"
+>
+  When enabled, automatically repositions bottom drawers when a virtual keyboard
+  appears on mobile devices, keeping form inputs visible. Only applies to
+  `direction="bottom"`.
+</ApiProp>
+
+<ApiProp
   name="children"
   fullType="ReactNode | ((props: DrawerRenderProps) => ReactNode)"
   simpleType="ReactNode | function"

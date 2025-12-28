@@ -13,16 +13,33 @@ export interface UseVirtualKeyboardReturn {
 }
 
 /**
+ * Helper to check if element is an input that would trigger a virtual keyboard.
+ */
+function isInput(element: HTMLElement | null): boolean {
+  if (!element) return false;
+  const tagName = element.tagName.toLowerCase();
+  return (
+    tagName === "input" ||
+    tagName === "textarea" ||
+    tagName === "select" ||
+    element.isContentEditable
+  );
+}
+
+/**
  * Hook to detect virtual keyboard visibility and height using the Visual Viewport API.
  *
  * On mobile devices, when a virtual keyboard appears, it reduces the visual viewport height.
  * This hook tracks that change so components can adjust their layout accordingly.
+ *
+ * Simplified approach:
+ * - Keyboard is visible if viewport is significantly smaller (>100px) AND an input is focused
+ * - No complex toggle state that can get out of sync
  */
 export function useVirtualKeyboard({
   enabled = true,
 }: UseVirtualKeyboardOptions = {}): UseVirtualKeyboardReturn {
   const [keyboardHeight, setKeyboardHeight] = React.useState(0);
-  const [isKeyboardVisible, setIsKeyboardVisible] = React.useState(false);
 
   React.useEffect(() => {
     if (!enabled || typeof window === "undefined") return;
@@ -30,54 +47,39 @@ export function useVirtualKeyboard({
     const visualViewport = window.visualViewport;
     if (!visualViewport) return;
 
-    // Store initial viewport height to compare against
-    let initialHeight = visualViewport.height;
-
     const handleResize = () => {
-      // The keyboard height is the difference between the initial viewport height
-      // and the current viewport height
-      const currentHeight = visualViewport.height;
-      const heightDiff = initialHeight - currentHeight;
+      const focusedElement = document.activeElement as HTMLElement;
+      const isInputFocused = isInput(focusedElement);
 
-      // Only consider it a keyboard if the difference is significant (> 100px)
-      // This avoids false positives from address bar hiding, etc.
-      const isKeyboard = heightDiff > 100;
+      // If no input is focused, keyboard can't be open for our purposes
+      if (!isInputFocused) {
+        setKeyboardHeight(0);
+        return;
+      }
 
-      setKeyboardHeight(isKeyboard ? heightDiff : 0);
-      setIsKeyboardVisible(isKeyboard);
-    };
+      const visualViewportHeight = visualViewport.height;
+      const totalHeight = window.innerHeight;
+      const diff = totalHeight - visualViewportHeight;
 
-    // Also handle scroll to keep track when keyboard scrolls content
-    const handleScroll = () => {
-      // Re-check on scroll as the viewport may have changed
-      handleResize();
-    };
-
-    // Update initial height on orientation change
-    const handleOrientationChange = () => {
-      // Wait a bit for the viewport to settle
-      setTimeout(() => {
-        initialHeight = visualViewport.height;
-        handleResize();
-      }, 100);
+      // Keyboard is visible if viewport is significantly smaller (>100px threshold)
+      // This avoids false positives from address bar changes
+      if (diff > 100) {
+        setKeyboardHeight(diff);
+      } else {
+        setKeyboardHeight(0);
+      }
     };
 
     visualViewport.addEventListener("resize", handleResize);
-    visualViewport.addEventListener("scroll", handleScroll);
-    window.addEventListener("orientationchange", handleOrientationChange);
 
-    // Initial check
+    // Initial check in case keyboard is already open
     handleResize();
 
-    return () => {
-      visualViewport.removeEventListener("resize", handleResize);
-      visualViewport.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("orientationchange", handleOrientationChange);
-    };
+    return () => visualViewport.removeEventListener("resize", handleResize);
   }, [enabled]);
 
   return {
     keyboardHeight,
-    isKeyboardVisible,
+    isKeyboardVisible: keyboardHeight > 0,
   };
 }

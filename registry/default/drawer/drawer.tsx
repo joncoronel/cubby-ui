@@ -173,6 +173,8 @@ interface DrawerContextValue {
   immediateClose: boolean;
   setImmediateClose: (value: boolean) => void;
   sequentialSnap: boolean;
+  /** Whether to reposition drawer when virtual keyboard appears. */
+  repositionInputs: boolean;
 }
 
 const DrawerContext = React.createContext<DrawerContextValue | null>(null);
@@ -222,6 +224,8 @@ interface DrawerProps extends Omit<
 
   /** When true, prevents skipping snap points during fast swipes. Default: false */
   sequentialSnap?: boolean;
+  /** When true, repositions drawer when virtual keyboard appears (bottom direction only). Default: true */
+  repositionInputs?: boolean;
   /** Children - can be ReactNode or render function for access to drag state */
   children?: React.ReactNode | ((props: DrawerRenderProps) => React.ReactNode);
 }
@@ -235,6 +239,7 @@ function Drawer({
   onActiveSnapPointChange,
   dismissible = true,
   sequentialSnap = false,
+  repositionInputs = true,
   open: controlledOpen,
   defaultOpen,
   onOpenChange: controlledOnOpenChange,
@@ -387,6 +392,7 @@ function Drawer({
       immediateClose,
       setImmediateClose,
       sequentialSnap,
+      repositionInputs,
     }),
     [
       direction,
@@ -405,6 +411,7 @@ function Drawer({
       isAnimating,
       immediateClose,
       sequentialSnap,
+      repositionInputs,
     ],
   );
 
@@ -560,6 +567,7 @@ function DrawerContentInner({
     setImmediateClose,
     isDragging,
     sequentialSnap,
+    repositionInputs,
   } = useDrawer();
 
   // Derive index locally - single conversion point for hooks
@@ -574,7 +582,7 @@ function DrawerContentInner({
   );
 
   // Virtual keyboard handling (for bottom drawers with form inputs)
-  const { keyboardHeight } = useVirtualKeyboard({
+  const { keyboardHeight, isKeyboardVisible } = useVirtualKeyboard({
     enabled: direction === "bottom",
   });
 
@@ -749,6 +757,11 @@ function DrawerContentInner({
         data-slot="drawer-viewport"
         data-direction={direction}
         data-scrolling={isScrolling || undefined}
+        data-keyboard-visible={
+          direction === "bottom" && repositionInputs && isKeyboardVisible
+            ? "true"
+            : undefined
+        }
         className={cn(
           // Group for propagating data-starting-style/data-ending-style to children
           "group/drawer",
@@ -768,11 +781,6 @@ function DrawerContentInner({
             : "pointer-events-auto",
           // Prevent Base UI's default animation and ensure transparent background
           "bg-transparent opacity-100! [&[data-ending-style]]:opacity-100! [&[data-starting-style]]:opacity-100!",
-          // Transform transition for exit animation - Base UI detects this and waits before removing
-          // Skip transition on immediate close (swipe dismiss)
-          immediateClose
-            ? "transition-none"
-            : "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-transform duration-350",
 
           // Hide scrollbar
           "[scrollbar-width:none_!important] [&::-webkit-scrollbar]:hidden!",
@@ -791,11 +799,16 @@ function DrawerContentInner({
           {
             scrollSnapType: isVertical ? "y mandatory" : "x mandatory",
             scrollBehavior: "smooth",
-            // Adjust for keyboard on bottom drawer
-            // paddingBottom:
-            //   direction === "bottom" && keyboardHeight > 0
-            //     ? `${keyboardHeight}px`
-            //     : undefined,
+            // Reposition drawer when virtual keyboard appears (bottom direction only)
+            // Uses transform (not bottom) to avoid resizing the scroll container
+            // which would mess with scroll positions and snap behavior
+            transform:
+              direction === "bottom" &&
+              repositionInputs &&
+              isKeyboardVisible &&
+              keyboardHeight > 0
+                ? `translateY(-${keyboardHeight}px)`
+                : undefined,
             // Animate --drawer-snap-progress CSS custom property (Chrome 115+)
             // Consumers can use: opacity: var(--drawer-snap-progress) for crossfades
             ...(useScrollDrivenAnimation && {

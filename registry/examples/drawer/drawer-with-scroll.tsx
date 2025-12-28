@@ -24,7 +24,7 @@ export default function DrawerWithScroll() {
       <DrawerTrigger render={<Button variant="outline" />}>
         Open Scrollable Drawer
       </DrawerTrigger>
-      <DrawerContent className="max-h-[80vh]">
+      <DrawerContent>
         <DrawerHandle />
         <DrawerHeader>
           <DrawerTitle>Scrollable Content</DrawerTitle>
@@ -35,10 +35,7 @@ export default function DrawerWithScroll() {
         <DrawerBody>
           <div className="flex flex-col gap-3">
             {items.map((item) => (
-              <div
-                key={item.id}
-                className="bg-muted/50 rounded-lg border p-3"
-              >
+              <div key={item.id} className="bg-muted/50 rounded-lg border p-3">
                 <h4 className="font-medium">{item.title}</h4>
                 <p className="text-muted-foreground text-sm">
                   {item.description}

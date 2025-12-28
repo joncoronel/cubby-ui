@@ -37,7 +37,7 @@ export type { SnapPoint, DrawerDirection };
 const drawerContentVariants = cva(
   [
     "bg-popover text-popover-foreground flex flex-col",
-    "relative z-10",
+    "relative ",
     "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-transform duration-350 will-change-transform",
     "motion-reduce:transition-none",
   ],
@@ -711,7 +711,7 @@ function DrawerContentInner({
       <BaseDialog.Backdrop
         data-slot="drawer-overlay"
         className={cn(
-          "absolute inset-0 z-40 bg-black/35",
+          "absolute inset-0 z-50 bg-black/35",
           // Force GPU layer to prevent repaint flicker
           "[transform:translateZ(0)] will-change-[opacity]",
           // Disable pointer events during closing to avoid interfering with swipe dismiss
@@ -754,17 +754,15 @@ function DrawerContentInner({
           "group/drawer",
           // Fixed positioning
           "fixed inset-0 z-50 outline-hidden",
-          // Extra 60px above viewport for bottom drawer prevents URL bar touch interaction
-          direction === "bottom" && "-top-[60px]",
-          // Viewport height with dvh fallback cascade
-          isVertical ? "h-[calc(100vh+60px)]" : "h-[100vh]",
-          isVertical && "[@supports(height:1dvh)]:h-[calc(100dvh+60px)]",
-          !isVertical && "[@supports(height:1dvh)]:h-dvh",
-          // iOS Safari: use max of dvh/lvh for consistent behavior
-          isVertical &&
-            "[@supports(-webkit-touch-callout:none)]:h-[calc(max(100dvh,100lvh)+60px)]",
+          // Bottom drawer: anchor to edges, let browser calculate height
+          // (also includes -60px top buffer to prevent URL bar collapse on drag)
+          direction === "bottom" && "top-[-60px]! bottom-0! h-auto!",
+          // Top drawer: explicit height with 60px buffer for URL bar
+          direction === "top" &&
+            "h-[calc(100vh+60px)] [@supports(-webkit-touch-callout:none)]:h-[calc(max(100dvh,100lvh)+60px)]! [@supports(height:1dvh)]:h-[calc(100dvh+60px)]",
+          // Horizontal drawers: full viewport height
           !isVertical &&
-            "[@supports(-webkit-touch-callout:none)]:h-[max(100dvh,100lvh)]",
+            "h-screen [@supports(-webkit-touch-callout:none)]:h-[max(100dvh,100lvh)] [@supports(height:1dvh)]:h-dvh",
           // Disable all interaction when animating or closing
           isAnimating || isClosing
             ? "pointer-events-none"
@@ -894,16 +892,21 @@ function DrawerContentInner({
         {/* iOS 26 Safari: Fixed element at bottom for nav bar color detection */}
         {/* Must be: within 3px of bottom, ≥80% wide, ≥3px tall */}
         {/* Only visible on Safari; slides with drawer during exit */}
-        {(direction === "bottom" ||
-          direction === "left" ||
-          direction === "right") && (
+
+        <>
           <div
             aria-hidden="true"
             className={cn(
               "bg-popover pointer-events-none fixed inset-x-0 bottom-0 hidden h-10 bg-clip-text [@supports(-webkit-touch-callout:none)]:block",
             )}
           />
-        )}
+          <div
+            aria-hidden="true"
+            className={cn(
+              "bg-popover pointer-events-none fixed inset-x-0 top-0 hidden h-10 bg-clip-text [@supports(-webkit-touch-callout:none)]:block",
+            )}
+          />
+        </>
       </BaseDialog.Viewport>
     </div>
   );

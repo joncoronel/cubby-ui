@@ -757,9 +757,8 @@ function DrawerContentInner({
           // Bottom drawer: anchor to edges, let browser calculate height
           // (also includes -60px top buffer to prevent URL bar collapse on drag)
           direction === "bottom" && "top-[-60px]! bottom-0! h-auto!",
-          // Top drawer: explicit height with 60px buffer for URL bar
-          direction === "top" &&
-            "h-[calc(100vh+60px)] [@supports(-webkit-touch-callout:none)]:h-[calc(max(100dvh,100lvh)+60px)]! [@supports(height:1dvh)]:h-[calc(100dvh+60px)]",
+          // Top drawer: anchor top, extend below for scroll space
+          direction === "top" && "top-0! bottom-[-60px]! h-auto!",
           // Horizontal drawers: full viewport height
           !isVertical &&
             "h-screen [@supports(-webkit-touch-callout:none)]:h-[max(100dvh,100lvh)] [@supports(height:1dvh)]:h-dvh",

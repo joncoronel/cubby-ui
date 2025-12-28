@@ -27,6 +27,15 @@ function isInput(element: HTMLElement | null): boolean {
 }
 
 /**
+ * Detect Firefox mobile which natively handles keyboard repositioning.
+ * We skip our custom transform on Firefox to avoid double-repositioning.
+ */
+const isFirefoxMobile =
+  typeof navigator !== "undefined" &&
+  /Firefox/i.test(navigator.userAgent) &&
+  /Android|Mobile/i.test(navigator.userAgent);
+
+/**
  * Hook to detect virtual keyboard visibility and height using the Visual Viewport API.
  *
  * On mobile devices, when a virtual keyboard appears, it reduces the visual viewport height.
@@ -42,7 +51,9 @@ export function useVirtualKeyboard({
   const [keyboardHeight, setKeyboardHeight] = React.useState(0);
 
   React.useEffect(() => {
-    if (!enabled || typeof window === "undefined") return;
+    // Firefox mobile natively handles keyboard repositioning, so we skip
+    // our custom detection to avoid double-repositioning the drawer
+    if (!enabled || typeof window === "undefined" || isFirefoxMobile) return;
 
     const visualViewport = window.visualViewport;
     if (!visualViewport) return;

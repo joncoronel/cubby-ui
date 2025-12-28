@@ -731,7 +731,45 @@ export function useScrollSnap(
     getScrollPositionForSnapPoint,
   ]);
 
-  // Effect 4: Event listeners (stable handlers, minimal dependencies)
+  // Effect 4: Re-position when geometry changes (e.g., keyboard appears on Android)
+  // This ensures the drawer stays at the correct snap point when viewport/content size changes
+  const prevGeometryRef = React.useRef({ trackSize: 0, maxScroll: 0 });
+  React.useEffect(() => {
+    if (!open || !initRef.current.hasInitialized) return;
+
+    const { trackSize, maxScroll } = geometry;
+    const prev = prevGeometryRef.current;
+
+    // Check if geometry actually changed (not just first render after init)
+    if (prev.trackSize !== 0 && prev.trackSize !== trackSize) {
+      // Geometry changed - re-scroll to current snap point to maintain position
+      const container = containerRef.current;
+      if (container && !scrollControlRef.current.isProgrammatic) {
+        const targetScrollPos =
+          getScrollPositionForSnapPoint(activeSnapPointIndex);
+        const prevScrollBehavior = container.style.scrollBehavior;
+
+        // Use instant scroll to avoid visible animation
+        container.style.scrollBehavior = "auto";
+        if (isVertical) {
+          container.scrollTop = targetScrollPos;
+        } else {
+          container.scrollLeft = targetScrollPos;
+        }
+        container.style.scrollBehavior = prevScrollBehavior;
+      }
+    }
+
+    prevGeometryRef.current = { trackSize, maxScroll };
+  }, [
+    open,
+    geometry,
+    isVertical,
+    activeSnapPointIndex,
+    getScrollPositionForSnapPoint,
+  ]);
+
+  // Effect 5: Event listeners (stable handlers, minimal dependencies)
   React.useEffect(() => {
     const container = containerRef.current;
     if (!container || !open) return;

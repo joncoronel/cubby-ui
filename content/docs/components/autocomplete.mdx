@@ -61,6 +61,20 @@ Limit the number of displayed suggestions.
 
 <ComponentPreview component="autocomplete" example="autocomplete-limit" />
 
+### Virtualized
+
+Use virtualization for large lists (100+ items) to maintain smooth performance. Only renders items visible in the viewport, dramatically reducing DOM nodes.
+
+<ComponentPreview component="autocomplete" example="autocomplete-virtualized" />
+
+**Key concepts:**
+
+1. **Use `useListVirtualizer` hook** - Handles scroll positioning, keyboard navigation, and item measurement. See [useListVirtualizer docs](/docs/hooks/use-list-virtualizer) for full API reference.
+2. **External filtering** - Compute `filteredItems` yourself and pass `filter={null}` to Autocomplete.Root. The hook needs both arrays to calculate proper aria attributes.
+3. **Replace `AutocompleteList` with `AutocompleteVirtualizedList`** - Accepts `scrollRef` and `totalSize` from the hook.
+4. **Spread `rootProps`** - Contains virtualization state for Base UI integration.
+5. **Override item margins** - Pass `className="mt-0! mb-0!"` to `AutocompleteItem` since virtualized items are absolutely positioned and the virtualizer handles padding.
+
 ## API Reference
 
 The Autocomplete component is built on top of [Base UI's Autocomplete](https://base-ui.com/react/components/autocomplete). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
@@ -133,6 +147,34 @@ Scrollable container for suggestion items. Wraps Base UI's `Autocomplete.List`.
 
 </ApiPropsList>
 
+#### AutocompleteVirtualizedList
+
+Virtualized scrollable container for large lists. Use with `useListVirtualizer` hook for optimal performance with 100+ items.
+
+<ApiPropsList>
+
+<ApiProp name="scrollRef" fullType="(element: HTMLDivElement | null) => void" required>
+  Ref callback from `useListVirtualizer` for the scroll container.
+</ApiProp>
+
+<ApiProp name="totalSize" fullType="number" required>
+  Total height of all virtual items in pixels. Provided by `useListVirtualizer`.
+</ApiProp>
+
+<ApiProp name="emptyMessage" fullType="ReactNode" simpleType="node" defaultValue='"No results found."'>
+  Message shown when no results are found.
+</ApiProp>
+
+<ApiProp name="fadeEdges" fullType="boolean | 'x' | 'y' | FadeEdge[]" defaultValue='"y"'>
+  Controls the fade effect on scroll edges.
+</ApiProp>
+
+<ApiProp name="nativeScroll" fullType="boolean" defaultValue="false">
+  Use native browser scrolling instead of custom scrollbars. Recommended for best virtualization performance.
+</ApiProp>
+
+</ApiPropsList>
+
 ### Utilities
 
 #### highlightText
@@ -148,3 +190,9 @@ See [highlightText](/docs/utils/highlight-text) for full documentation and API r
 Provides fuzzy matching capabilities for flexible searching across multiple fields. Returns filter functions compatible with Base UI's Autocomplete.
 
 See [useFuzzyFilter](/docs/hooks/use-fuzzy-filter) for full documentation and API reference.
+
+#### useListVirtualizer
+
+Provides virtualization for large autocomplete lists using TanStack Virtual. Abstracts scroll handling, item positioning, and keyboard navigation.
+
+See [useListVirtualizer](/docs/hooks/use-list-virtualizer) for full documentation and API reference.

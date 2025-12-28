@@ -226,6 +226,55 @@ function AutocompleteList({
   );
 }
 
+function AutocompleteVirtualizedList({
+  className,
+  children,
+  scrollRef,
+  totalSize,
+  emptyMessage = "No results found.",
+  fadeEdges = "y",
+  nativeScroll = false,
+  ...props
+}: Omit<React.ComponentProps<"div">, "ref"> &
+  Pick<ScrollAreaProps, "fadeEdges" | "nativeScroll"> & {
+    scrollRef: (element: HTMLDivElement | null) => void;
+    totalSize: number;
+    emptyMessage?: React.ReactNode;
+  }) {
+  return (
+    <>
+      <BaseAutocomplete.Empty
+        data-slot="autocomplete-empty"
+        className="text-muted-foreground px-3 py-2.5 text-sm empty:m-0 empty:p-0"
+      >
+        {emptyMessage}
+      </BaseAutocomplete.Empty>
+      <BaseAutocomplete.List
+        data-slot="autocomplete-list"
+        className="w-full flex-1 overflow-hidden rounded-xl p-0 outline-hidden empty:m-0 empty:p-0"
+      >
+        <ScrollArea
+          viewportRef={scrollRef}
+          viewportClassName={cn("scroll-py-2", className)}
+          fadeEdges={fadeEdges}
+          nativeScroll={nativeScroll}
+          className="h-auto max-h-80 w-full"
+          {...props}
+        >
+          {/* Virtual placeholder for total height */}
+          <div
+            role="presentation"
+            className="relative w-full"
+            style={{ height: totalSize }}
+          >
+            {children}
+          </div>
+        </ScrollArea>
+      </BaseAutocomplete.List>
+    </>
+  );
+}
+
 function AutocompleteCollection({
   ...props
 }: BaseAutocomplete.Collection.Props) {
@@ -249,10 +298,14 @@ function AutocompleteRow({ className, ...props }: BaseAutocomplete.Row.Props) {
 
 function AutocompleteItem({
   className,
+  ref,
   ...props
-}: BaseAutocomplete.Item.Props) {
+}: BaseAutocomplete.Item.Props & {
+  ref?: React.Ref<HTMLDivElement>;
+}) {
   return (
     <BaseAutocomplete.Item
+      ref={ref}
       data-slot="autocomplete-item"
       className={cn(
         "data-highlighted:bg-accent/50 data-highlighted:text-accent-foreground relative flex cursor-default items-center rounded-md px-2.5 py-2 text-sm outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60",
@@ -322,6 +375,7 @@ export const Autocomplete = {
   Status: AutocompleteStatus,
   Empty: AutocompleteEmpty,
   List: AutocompleteList,
+  VirtualizedList: AutocompleteVirtualizedList,
   Collection: AutocompleteCollection,
   Row: AutocompleteRow,
   Item: AutocompleteItem,
@@ -346,6 +400,7 @@ export {
   AutocompleteStatus,
   AutocompleteEmpty,
   AutocompleteList,
+  AutocompleteVirtualizedList,
   AutocompleteCollection,
   AutocompleteRow,
   AutocompleteItem,

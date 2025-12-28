@@ -31,7 +31,7 @@ export interface UseListVirtualizerOptions<T> {
   /**
    * Number of items to render outside the visible area.
    * Higher values = smoother scrolling, more memory.
-   * @default 10
+   * @default 20
    */
   overscan?: number;
 
@@ -120,7 +120,7 @@ export function useListVirtualizer<T>(
     items,
     filteredItems,
     estimateSize = 40,
-    overscan = 10,
+    overscan = 20,
     paddingStart = 8,
     paddingEnd = 8,
   } = options;

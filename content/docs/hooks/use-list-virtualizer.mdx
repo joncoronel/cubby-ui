@@ -47,6 +47,9 @@ import {
   CommandItem,
 } from "@/lib/cubby-ui/command";
 
+// Helper to extract searchable text from items
+const getItemLabel = (item: Item | null) => item?.label ?? "";
+
 function VirtualizedCommand({ items, filteredItems }) {
   const {
     rootProps,
@@ -64,8 +67,8 @@ function VirtualizedCommand({ items, filteredItems }) {
   });
 
   return (
-    <Command {...rootProps} filter={null}>
-      <CommandVirtualizedList scrollRef={scrollRef} totalSize={totalSize}>
+    <Command {...rootProps} filter={null} itemToStringValue={getItemLabel}>
+      <CommandVirtualizedList scrollRef={scrollRef} totalSize={totalSize} nativeScroll>
         {virtualItems.map((virtualItem) => {
           const item = getItem(virtualItem);
           return (
@@ -85,6 +88,25 @@ function VirtualizedCommand({ items, filteredItems }) {
   );
 }
 ```
+
+## Performance Tips
+
+For optimal scroll performance with large lists:
+
+1. **Use `useDeferredValue` for search queries** - Prevents filtering from blocking scroll rendering. Use the resolved pattern to avoid stale results when clearing:
+   ```tsx
+   const deferredQuery = React.useDeferredValue(query);
+   // Use immediate value when empty to avoid stale results
+   const resolvedQuery =
+     query === "" || deferredQuery === "" ? query : deferredQuery;
+
+   const filteredItems = React.useMemo(
+     () => items.filter((item) => contains(item, resolvedQuery, getLabel)),
+     [contains, resolvedQuery],
+   );
+   ```
+
+2. **Use `nativeScroll` on `CommandVirtualizedList`** - Avoids custom scroll container overhead for smoother fast scrolling.
 
 ## API Reference
 
@@ -108,7 +130,7 @@ function VirtualizedCommand({ items, filteredItems }) {
   Estimated height of each item in pixels. Use a function for variable heights based on item content.
 </ApiProp>
 
-<ApiProp name="overscan" fullType="number" defaultValue="10">
+<ApiProp name="overscan" fullType="number" defaultValue="20">
   Number of items to render outside the visible area. Higher values improve scroll smoothness but use more memory.
 </ApiProp>
 

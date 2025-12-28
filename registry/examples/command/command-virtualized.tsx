@@ -34,11 +34,18 @@ export default function CommandVirtualized() {
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState("");
 
+  const deferredQuery = React.useDeferredValue(query);
+
+  // Use immediate value when empty to avoid stale results when clearing search
+  const resolvedQuery =
+    query === "" || deferredQuery === "" ? query : deferredQuery;
+
   const { contains } = useCommandFilter();
 
   const filteredItems = React.useMemo(
-    () => allFiles.filter((file) => contains(file, query, getItemLabel)),
-    [contains, query],
+    () =>
+      allFiles.filter((file) => contains(file, resolvedQuery, getItemLabel)),
+    [contains, resolvedQuery],
   );
 
   const {
@@ -68,6 +75,7 @@ export default function CommandVirtualized() {
             onValueChange={setQuery}
             filter={null}
             open={open}
+            itemToStringValue={getItemLabel}
           >
             <CommandContent>
               <CommandInput placeholder="Search files..." />
@@ -75,6 +83,7 @@ export default function CommandVirtualized() {
                 scrollRef={scrollRef}
                 totalSize={totalSize}
                 emptyMessage="No files found."
+                nativeScroll={true}
               >
                 {virtualItems.map((virtualItem) => {
                   const item = getItem(virtualItem);

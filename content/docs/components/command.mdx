@@ -52,11 +52,17 @@ Use virtualization for large lists (100+ items) to maintain smooth performance. 
 import { useListVirtualizer } from "@/hooks/cubby-ui/use-list-virtualizer";
 import { useCommandFilter } from "@/lib/cubby-ui/command";
 
-// 1. Set up filtering
+// Helper to extract searchable text from items
+const getItemLabel = (item: Item | null) => item?.name ?? "";
+
+// 1. Set up filtering with deferred value for performance
 const { contains } = useCommandFilter();
+const deferredQuery = useDeferredValue(query);
+const resolvedQuery =
+  query === "" || deferredQuery === "" ? query : deferredQuery;
 const filteredItems = useMemo(
-  () => items.filter((item) => contains(item, query, getItemLabel)),
-  [contains, query],
+  () => items.filter((item) => contains(item, resolvedQuery, getItemLabel)),
+  [contains, resolvedQuery],
 );
 
 // 2. Initialize virtualizer
@@ -76,8 +82,8 @@ const {
 });
 
 // 3. Render
-<Command {...rootProps} filter={null}>
-  <CommandVirtualizedList scrollRef={scrollRef} totalSize={totalSize}>
+<Command {...rootProps} filter={null} itemToStringValue={getItemLabel}>
+  <CommandVirtualizedList scrollRef={scrollRef} totalSize={totalSize} nativeScroll>
     {virtualItems.map((virtualItem) => (
       <CommandItem
         key={virtualItem.key}

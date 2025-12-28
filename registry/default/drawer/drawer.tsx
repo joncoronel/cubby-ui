@@ -792,10 +792,10 @@ function DrawerContentInner({
             scrollSnapType: isVertical ? "y mandatory" : "x mandatory",
             scrollBehavior: "smooth",
             // Adjust for keyboard on bottom drawer
-            paddingBottom:
-              direction === "bottom" && keyboardHeight > 0
-                ? `${keyboardHeight}px`
-                : undefined,
+            // paddingBottom:
+            //   direction === "bottom" && keyboardHeight > 0
+            //     ? `${keyboardHeight}px`
+            //     : undefined,
             // Animate --drawer-snap-progress CSS custom property (Chrome 115+)
             // Consumers can use: opacity: var(--drawer-snap-progress) for crossfades
             ...(useScrollDrivenAnimation && {

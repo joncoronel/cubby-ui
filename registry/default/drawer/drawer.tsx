@@ -156,6 +156,8 @@ interface DrawerContextValue {
   activeSnapPoint: SnapPoint;
   setActiveSnapPoint: (snapPoint: SnapPoint) => void;
   dismissible: boolean;
+  /** Modal behavior passed to Base UI Dialog */
+  modal: boolean | "trap-focus";
   isDragging: boolean;
   setIsDragging: (dragging: boolean) => void;
   dragProgress: number;
@@ -205,7 +207,7 @@ interface DrawerRenderProps {
 
 interface DrawerProps extends Omit<
   React.ComponentProps<typeof BaseDialog.Root>,
-  "modal" | "children"
+  "children"
 > {
   /** Direction the drawer opens from. Default: "bottom" */
   direction?: DrawerDirection;
@@ -221,10 +223,18 @@ interface DrawerProps extends Omit<
   onActiveSnapPointChange?: (snapPoint: SnapPoint) => void;
   /** Whether dismissible by swipe. Default: true */
   dismissible?: boolean;
+  /**
+   * Modal behavior:
+   * - `true`: Focus trapped, outside pointer disabled, body scroll locked (default)
+   * - `"trap-focus"`: Focus trapped, outside pointer enabled, no scroll lock
+   * - `false`: Non-modal, no focus trapping
+   * @default true
+   */
+  modal?: boolean | "trap-focus";
 
   /** When true, prevents skipping snap points during fast swipes. Default: false */
   sequentialSnap?: boolean;
-  /** When true, repositions drawer when virtual keyboard appears (bottom direction only). Default: true */
+  /** When true, repositions drawer when virtual keyboard appears (bottom direction only). Default: false */
   repositionInputs?: boolean;
   /** Children - can be ReactNode or render function for access to drag state */
   children?: React.ReactNode | ((props: DrawerRenderProps) => React.ReactNode);
@@ -238,6 +248,7 @@ function Drawer({
   activeSnapPoint: controlledSnapPoint,
   onActiveSnapPointChange,
   dismissible = true,
+  modal = true,
   sequentialSnap = false,
   repositionInputs = false,
   open: controlledOpen,
@@ -377,6 +388,7 @@ function Drawer({
       activeSnapPoint: activeSnapPointValue,
       setActiveSnapPoint,
       dismissible,
+      modal,
       isDragging,
       setIsDragging,
       dragProgress,
@@ -400,6 +412,7 @@ function Drawer({
       snapPoints,
       activeSnapPointValue,
       setActiveSnapPoint,
+      modal,
       dismissible,
       isDragging,
       dragProgress,
@@ -433,10 +446,9 @@ function Drawer({
         open={open}
         onOpenChange={handleOpenChange}
         onOpenChangeComplete={handleOpenChangeComplete}
-        // Use "trap-focus" to keep focus trapping but let us handle scroll lock
-        // (modal={true} has its own scroll lock that conflicts with ours)
-        // modal="trap-focus"
-        // modal={true}
+        modal={modal}
+        // For non-modal modes, disable outside click dismissal so page interaction doesn't close drawer
+        disablePointerDismissal={modal !== true}
         {...props}
       >
         {resolvedChildren}
@@ -517,19 +529,42 @@ function DrawerPortal({
  * DrawerContent
  * -------------------------------------------------------------------------------------------------*/
 
+interface DrawerContentProps extends BaseDialog.Popup.Props {
+  /** Visual style variant for the footer. */
+  footerVariant?: "default" | "inset";
+}
+
 /**
  * DrawerContent - Outer wrapper that renders the Portal.
  * The actual content is in DrawerContentInner, which only mounts when the Portal is visible.
  * This ensures useScrollSnap gets fresh state on each open (no stale state between sessions).
+ *
+ * @param initialFocus - Determines the element to focus when the drawer is opened.
+ *   - `false`: Do not move focus.
+ *   - `true`: Move focus to first tabbable element or popup (default).
+ *   - `RefObject<HTMLElement>`: Move focus to the ref element.
+ *   - `function`: Called with interaction type, returns element to focus or boolean.
+ *
+ * @param finalFocus - Determines the element to focus when the drawer is closed.
+ *   - `false`: Do not move focus.
+ *   - `true`: Move focus to trigger or previously focused element (default).
+ *   - `RefObject<HTMLElement>`: Move focus to the ref element.
+ *   - `function`: Called with interaction type, returns element to focus or boolean.
  */
-function DrawerContent(
-  props: BaseDialog.Popup.Props & {
-    footerVariant?: "default" | "inset";
-  },
-) {
+function DrawerContent({
+  initialFocus,
+  finalFocus,
+  footerVariant = "default",
+  ...props
+}: DrawerContentProps) {
   return (
     <DrawerPortal>
-      <DrawerContentInner {...props} />
+      <DrawerContentInner
+        initialFocus={initialFocus}
+        finalFocus={finalFocus}
+        footerVariant={footerVariant}
+        {...props}
+      />
     </DrawerPortal>
   );
 }
@@ -542,10 +577,10 @@ function DrawerContentInner({
   className,
   children,
   footerVariant = "default",
+  initialFocus,
+  finalFocus,
   ...props
-}: BaseDialog.Popup.Props & {
-  footerVariant?: "default" | "inset";
-}) {
+}: DrawerContentProps) {
   const {
     direction,
     variant,
@@ -553,6 +588,7 @@ function DrawerContentInner({
     activeSnapPoint,
     setActiveSnapPoint,
     dismissible,
+    modal,
     contentSize,
     setContentSize,
     isVertical,
@@ -716,40 +752,43 @@ function DrawerContentInner({
       }
     >
       {/* Backdrop - view-driven opacity (Chrome 115+) with JS fallback */}
-      <BaseDialog.Backdrop
-        data-slot="drawer-overlay"
-        className={cn(
-          "absolute inset-0 z-50 bg-black/35",
-          // Force GPU layer to prevent repaint flicker
-          "[transform:translateZ(0)] will-change-[opacity]",
-          // Disable pointer events during closing to avoid interfering with swipe dismiss
-          isClosing ? "pointer-events-none" : "pointer-events-auto",
-          // Prevent touch-drag on backdrop from scrolling the page underneath
-          "touch-none",
-          // Transition for smooth enter/exit (skip on immediate close or while dragging)
-          immediateClose || (isDragging && !isAnimating)
-            ? "transition-none"
-            : "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-opacity duration-350",
-          // Enter: start at opacity 0, transition animates to target
-          "[&[data-starting-style]]:opacity-0!",
-          // Exit: use animation to override scroll-driven animation (transition can't interpolate from animation-held values)
-          // "[&[data-ending-style]]:[animation:drawer-backdrop-exit_450ms_cubic-bezier(0,0,0.58,1)_forwards]",
-          "[&[data-ending-style]]:opacity-0",
+      {/* Only render backdrop when modal={true} - other modes allow page interaction */}
+      {modal === true && (
+        <BaseDialog.Backdrop
+          data-slot="drawer-overlay"
+          className={cn(
+            "absolute inset-0 z-50 bg-black/35",
+            // Force GPU layer to prevent repaint flicker
+            "[transform:translateZ(0)] will-change-[opacity]",
+            // Disable pointer events during closing to avoid interfering with swipe dismiss
+            isClosing ? "pointer-events-none" : "pointer-events-auto",
+            // Prevent touch-drag on backdrop from scrolling the page underneath
+            "touch-none",
+            // Transition for smooth enter/exit (skip on immediate close or while dragging)
+            immediateClose || (isDragging && !isAnimating)
+              ? "transition-none"
+              : "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-opacity duration-350",
+            // Enter: start at opacity 0, transition animates to target
+            "[&[data-starting-style]]:opacity-0!",
+            // Exit: use animation to override scroll-driven animation (transition can't interpolate from animation-held values)
+            // "[&[data-ending-style]]:[animation:drawer-backdrop-exit_450ms_cubic-bezier(0,0,0.58,1)_forwards]",
+            "[&[data-ending-style]]:opacity-0",
 
-          isInitialized && !isAnimating && isDragging && dragProgress < 1
-            ? useScrollDrivenAnimation
-              ? // Scroll-driven backdrop animation (Chrome 115+)
-                backdropAnimationStyles[direction]
-              : `opacity-(--drawer-backdrop-dynamic-opacity)`
-            : `opacity-(--drawer-backdrop-static-opacity)`,
-        )}
-        style={
-          {
-            "--drawer-backdrop-dynamic-opacity": 1 - dragProgress,
-            "--drawer-backdrop-static-opacity": targetBackdropOpacity,
-          } as React.CSSProperties
-        }
-      />
+            isInitialized && !isAnimating && isDragging && dragProgress < 1
+              ? useScrollDrivenAnimation
+                ? // Scroll-driven backdrop animation (Chrome 115+)
+                  backdropAnimationStyles[direction]
+                : `opacity-(--drawer-backdrop-dynamic-opacity)`
+              : `opacity-(--drawer-backdrop-static-opacity)`,
+          )}
+          style={
+            {
+              "--drawer-backdrop-dynamic-opacity": 1 - dragProgress,
+              "--drawer-backdrop-static-opacity": targetBackdropOpacity,
+            } as React.CSSProperties
+          }
+        />
+      )}
 
       {/* Viewport - scroll container for scroll-snap gestures */}
       <BaseDialog.Viewport
@@ -767,16 +806,22 @@ function DrawerContentInner({
           "group/drawer",
           // Fixed positioning
           "fixed inset-0 z-50 outline-hidden",
-          // Bottom drawer: anchor to edges, let browser calculate height
-          // (also includes -60px top buffer to prevent URL bar collapse on drag)
-          direction === "bottom" && "top-[-60px]! bottom-0! h-auto!",
+          // Bottom drawer: anchor to bottom edge
+          // Modal mode: -60px top buffer + dynamic height to prevent URL bar collapse on drag
+          // Non-modal modes: anchor to bottom with fixed lvh height extending upward
+          // (top-auto unsets the top:0 from inset-0, so container anchors from bottom)
+          direction === "bottom" &&
+            (modal === true
+              ? "top-[-60px]! bottom-0! h-auto!"
+              : "top-auto! bottom-0! h-lvh"),
           // Top drawer: anchor top, extend below for scroll space
           direction === "top" && "top-0! bottom-[-60px]! h-auto!",
           // Horizontal drawers: full viewport height
           !isVertical &&
             "h-screen [@supports(-webkit-touch-callout:none)]:h-[max(100dvh,100lvh)] [@supports(height:1dvh)]:h-dvh",
-          // Disable all interaction when animating or closing
-          isAnimating || isClosing
+          // Disable all interaction when animating, closing, or non-modal
+          // (non-modal modes allow page interaction - Popup has its own pointer-events-auto)
+          isAnimating || isClosing || modal !== true
             ? "pointer-events-none"
             : "pointer-events-auto",
           // Prevent Base UI's default animation and ensure transparent background
@@ -865,11 +910,14 @@ function DrawerContentInner({
             ref={measureRef}
             data-slot="drawer-content"
             data-footer-variant={footerVariant}
+            initialFocus={initialFocus}
+            finalFocus={finalFocus}
             className={cn(
               drawerContentVariants({ variant, direction }),
               // Hide until scroll is initialized to prevent flash at wrong position (iOS Safari)
-              // Only apply when opening (open=true), not during close animation
-              open && !isInitialized && "invisible",
+              // Use opacity-0 instead of invisible so focus can still move into the drawer
+              // (visibility:hidden prevents focus, opacity:0 does not)
+              // open && !isInitialized && "opacity-0",
               // Disable pointer events during enter/exit animations to prevent interruption
               isAnimating || isClosing
                 ? "pointer-events-none"
@@ -928,24 +976,56 @@ function DrawerContentInner({
  * DrawerHandle
  * -------------------------------------------------------------------------------------------------*/
 
-interface DrawerHandleProps extends React.ComponentProps<"div"> {
+interface DrawerHandleProps extends Omit<
+  React.ComponentProps<"button">,
+  "children"
+> {
   /** Hide the handle visually */
   hidden?: boolean;
+  /** Disable click-to-close behavior (visual-only mode). Default: false */
+  preventClose?: boolean;
 }
 
-function DrawerHandle({ className, hidden, ...props }: DrawerHandleProps) {
-  const { direction } = useDrawer();
+/**
+ * DrawerHandle - Interactive handle that closes the drawer when clicked.
+ * On touch devices, users typically swipe the drawer to dismiss.
+ * On non-touch devices, clicking the handle provides an intuitive close action.
+ */
+function DrawerHandle({
+  className,
+  hidden,
+  preventClose = false,
+  onClick,
+  ...props
+}: DrawerHandleProps) {
+  const { direction, onOpenChange, isAnimating } = useDrawer();
   const { isVertical } = DIRECTION_CONFIG[direction];
 
   if (hidden) return null;
 
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    onClick?.(event);
+    if (event.defaultPrevented) return;
+    if (isAnimating || preventClose) return;
+    onOpenChange(false);
+  };
+
   return (
-    <div
+    <button
+      type="button"
       data-slot="drawer-handle"
-      aria-hidden="true"
+      aria-label="Close drawer"
+      onClick={handleClick}
       className={cn(
-        "bg-muted-foreground/30 shrink-0 rounded-full",
+        // Reset button styles
+        "appearance-none border-0 bg-transparent p-0",
+        // Focus ring for keyboard users
+        "focus-visible:ring-ring/50 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+        // Visual handle styles
+        "bg-muted-foreground/30 shrink-0 cursor-pointer rounded-full",
         isVertical ? "mx-auto my-3 h-1.5 w-12" : "mx-3 my-auto h-12 w-1.5",
+        // Hover state
+        "hover:bg-muted-foreground/50 transition-colors",
         className,
       )}
       {...props}

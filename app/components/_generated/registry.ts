@@ -2045,7 +2045,7 @@ export const exampleRegistry = {
     {
       "title": "Basic",
       "importPath": "drawer-basic",
-      "source": "import {\n  Drawer,\n  DrawerClose,\n  DrawerContent,\n  DrawerDescription,\n  DrawerFooter,\n  DrawerHandle,\n  DrawerHeader,\n  DrawerTitle,\n  DrawerTrigger,\n} from \"@/components/ui/cubby-ui/drawer\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nexport default function DrawerBasic() {\n  return (\n    <Drawer>\n      <DrawerTrigger render={<Button variant=\"outline\" />}>\n        Open Drawer\n      </DrawerTrigger>\n      <DrawerContent>\n        <DrawerHandle />\n        <DrawerHeader>\n          <DrawerTitle>Are you sure?</DrawerTitle>\n          <DrawerDescription>This action cannot be undone.</DrawerDescription>\n        </DrawerHeader>\n        <DrawerFooter>\n          <Button>Submit</Button>\n          <DrawerClose render={<Button variant=\"outline\" />}>\n            Cancel\n          </DrawerClose>\n        </DrawerFooter>\n      </DrawerContent>\n    </Drawer>\n  );\n}\n"
+      "source": "import {\n  Drawer,\n  DrawerClose,\n  DrawerContent,\n  DrawerDescription,\n  DrawerFooter,\n  DrawerHandle,\n  DrawerHeader,\n  DrawerTitle,\n  DrawerTrigger,\n} from \"@/components/ui/cubby-ui/drawer\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nexport default function DrawerBasic() {\n  return (\n    <Drawer direction=\"left\" modal={\"trap-focus\"}>\n      <DrawerTrigger render={<Button variant=\"outline\" />}>\n        Open Drawer\n      </DrawerTrigger>\n      <DrawerContent>\n        <DrawerHeader>\n          <DrawerTitle>Are you sure?</DrawerTitle>\n          <DrawerDescription>This action cannot be undone.</DrawerDescription>\n        </DrawerHeader>\n        <DrawerFooter>\n          <Button>Submit</Button>\n          <DrawerClose render={<Button variant=\"outline\" />}>\n            Cancel\n          </DrawerClose>\n        </DrawerFooter>\n        {/* <DrawerHandle /> */}\n      </DrawerContent>\n    </Drawer>\n  );\n}\n"
     },
     {
       "title": "Directions",
@@ -3394,7 +3394,7 @@ export const componentAnatomy = {
   },
   "drawer": {
     "imports": "import {\n  Drawer,\n  DrawerClose,\n  DrawerContent,\n  DrawerDescription,\n  DrawerFooter,\n  DrawerHandle,\n  DrawerHeader,\n  DrawerTitle,\n  DrawerTrigger,\n} from \"@/components/ui/cubby-ui/drawer\";",
-    "anatomy": "<Drawer>\n  <DrawerTrigger />\n  <DrawerContent>\n    <DrawerHandle />\n    <DrawerHeader>\n      <DrawerTitle />\n      <DrawerDescription />\n    </DrawerHeader>\n    <DrawerFooter>\n      <DrawerClose />\n    </DrawerFooter>\n  </DrawerContent>\n</Drawer>"
+    "anatomy": "<Drawer>\n  <DrawerTrigger />\n  <DrawerContent>\n    <DrawerHeader>\n      <DrawerTitle />\n      <DrawerDescription />\n    </DrawerHeader>\n    <DrawerFooter>\n      <DrawerClose />\n    </DrawerFooter>\n  </DrawerContent>\n</Drawer>"
   },
   "dropdown-menu": {
     "imports": "import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from \"@/components/ui/cubby-ui/dropdown-menu\";",

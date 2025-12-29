@@ -64,50 +64,50 @@ const drawerContentVariants = cva(
         variant: "default",
         direction: "bottom",
         class:
-          "max-h-[95dvh] w-full rounded-t-xl [&[data-starting-style]]:translate-y-[var(--drawer-start-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-start-offset)]",
+          "max-h-[95dvh] w-full max-w-full rounded-t-xl [&[data-starting-style]]:translate-y-[var(--drawer-start-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-start-offset)]",
       },
       {
         variant: "default",
         direction: "top",
         class:
-          "max-h-[95dvh] w-full rounded-b-xl [&[data-starting-style]]:-translate-y-[var(--drawer-start-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-start-offset)]",
+          "max-h-[95dvh] w-full max-w-full rounded-b-xl [&[data-starting-style]]:-translate-y-[var(--drawer-start-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-start-offset)]",
       },
       {
         variant: "default",
         direction: "right",
         class:
-          "h-dvh w-[100vw] rounded-l-xl sm:max-w-sm [&[data-starting-style]]:translate-x-[var(--drawer-start-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-start-offset)]",
+          "max-w-screen w-screen rounded-l-xl sm:max-w-sm [&[data-starting-style]]:translate-x-[var(--drawer-start-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-start-offset)]",
       },
       {
         variant: "default",
         direction: "left",
         class:
-          "h-dvh w-[100vw] rounded-r-xl sm:max-w-sm [&[data-starting-style]]:-translate-x-[var(--drawer-start-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-start-offset)]",
+          "max-w-screen w-screen rounded-r-xl sm:max-w-sm [&[data-starting-style]]:-translate-x-[var(--drawer-start-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-start-offset)]",
       },
       // Floating variant - direction-specific sizing and transforms
       {
         variant: "floating",
         direction: "bottom",
         class:
-          "max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] [&[data-starting-style]]:translate-y-[var(--drawer-start-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-start-offset)]",
+          "max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] [&[data-starting-style]]:translate-y-[var(--drawer-start-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-start-offset)]",
       },
       {
         variant: "floating",
         direction: "top",
         class:
-          "max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] [&[data-starting-style]]:-translate-y-[var(--drawer-start-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-start-offset)]",
+          "max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] [&[data-starting-style]]:-translate-y-[var(--drawer-start-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-start-offset)]",
       },
       {
         variant: "floating",
         direction: "right",
         class:
-          "h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] sm:max-w-sm [&[data-starting-style]]:translate-x-[var(--drawer-start-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-start-offset)]",
+          "h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-sm [&[data-starting-style]]:translate-x-[var(--drawer-start-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-start-offset)]",
       },
       {
         variant: "floating",
         direction: "left",
         class:
-          "h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] sm:max-w-sm [&[data-starting-style]]:-translate-x-[var(--drawer-start-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-start-offset)]",
+          "h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-sm [&[data-starting-style]]:-translate-x-[var(--drawer-start-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-start-offset)]",
       },
     ],
     defaultVariants: {
@@ -812,13 +812,12 @@ function DrawerContentInner({
           // (top-auto unsets the top:0 from inset-0, so container anchors from bottom)
           direction === "bottom" &&
             (modal === true
-              ? "top-[-60px]! bottom-0! h-auto!"
+              ? "top-[-60px]! bottom-0!"
               : "top-auto! bottom-0! h-lvh"),
           // Top drawer: anchor top, extend below for scroll space
-          direction === "top" && "top-0! bottom-[-60px]! h-auto!",
+          direction === "top" && "top-0! bottom-[-60px]!",
           // Horizontal drawers: full viewport height
-          !isVertical &&
-            "h-screen [@supports(-webkit-touch-callout:none)]:h-[max(100dvh,100lvh)] [@supports(height:1dvh)]:h-dvh",
+          !isVertical && "top-auto! bottom-0! h-dvh",
           // Disable all interaction when animating, closing, or non-modal
           // (non-modal modes allow page interaction - Popup has its own pointer-events-auto)
           isAnimating || isClosing || modal !== true
@@ -915,8 +914,6 @@ function DrawerContentInner({
             className={cn(
               drawerContentVariants({ variant, direction }),
               // Hide until scroll is initialized to prevent flash at wrong position (iOS Safari)
-              // Use opacity-0 instead of invisible so focus can still move into the drawer
-              // (visibility:hidden prevents focus, opacity:0 does not)
               // open && !isInitialized && "opacity-0",
               // Disable pointer events during enter/exit animations to prevent interruption
               isAnimating || isClosing

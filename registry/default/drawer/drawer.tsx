@@ -239,7 +239,7 @@ function Drawer({
   onActiveSnapPointChange,
   dismissible = true,
   sequentialSnap = false,
-  repositionInputs = true,
+  repositionInputs = false,
   open: controlledOpen,
   defaultOpen,
   onOpenChange: controlledOnOpenChange,

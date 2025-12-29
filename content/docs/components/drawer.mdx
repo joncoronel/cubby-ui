@@ -180,7 +180,7 @@ For the complete Base UI API, see the [Base UI Dialog documentation](https://bas
   name="repositionInputs"
   fullType="boolean"
   simpleType="boolean"
-  defaultValue="true"
+  defaultValue="false"
 >
   When enabled, automatically repositions bottom drawers when a virtual keyboard
   appears on mobile devices, keeping form inputs visible. Only applies to
@@ -219,11 +219,7 @@ For the complete Base UI API, see the [Base UI Dialog documentation](https://bas
 
 <ApiPropsList>
 
-<ApiProp
-  name="nativeScroll"
-  fullType="boolean"
-  defaultValue="false"
->
+<ApiProp name="nativeScroll" fullType="boolean" defaultValue="false">
   Use native browser scrolling instead of Base UI's ScrollArea. Fade edges still
   work using CSS scroll-driven animations (Chrome 115+, with static fallback).
   Note: `persistScrollbar` is not supported with `nativeScroll`.
@@ -234,30 +230,20 @@ For the complete Base UI API, see the [Base UI Dialog documentation](https://bas
   fullType="boolean | 'top' | 'bottom' | 'left' | 'right' | 'x' | 'y' | FadeEdge[]"
   defaultValue="true"
 >
-  Controls the fade effect on scroll edges. See [ScrollArea](/docs/components/scroll-area#custom-props) for all options.
+  Controls the fade effect on scroll edges. See
+  [ScrollArea](/docs/components/scroll-area#custom-props) for all options.
 </ApiProp>
 
-<ApiProp
-  name="scrollbarGutter"
-  fullType="boolean"
-  defaultValue="false"
->
-  Reserves space for the scrollbar when content overflows, preventing layout shift.
+<ApiProp name="scrollbarGutter" fullType="boolean" defaultValue="false">
+  Reserves space for the scrollbar when content overflows, preventing layout
+  shift.
 </ApiProp>
 
-<ApiProp
-  name="persistScrollbar"
-  fullType="boolean"
-  defaultValue="false"
->
+<ApiProp name="persistScrollbar" fullType="boolean" defaultValue="false">
   Always show the scrollbar instead of fading it in on hover or scroll.
 </ApiProp>
 
-<ApiProp
-  name="hideScrollbar"
-  fullType="boolean"
-  defaultValue="false"
->
+<ApiProp name="hideScrollbar" fullType="boolean" defaultValue="false">
   Hides the scrollbar while keeping scroll functionality.
 </ApiProp>
 
@@ -343,9 +329,7 @@ Use Tailwind's arbitrary value syntax to apply the CSS variable directly in your
       Mini Player
     </div>
     {/* Full player fades in as drawer expands */}
-    <div className="opacity-[var(--drawer-snap-progress,0)]">
-      Full Player
-    </div>
+    <div className="opacity-[var(--drawer-snap-progress,0)]">Full Player</div>
   </DrawerContent>
 </Drawer>
 ```

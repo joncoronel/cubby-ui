@@ -55,6 +55,13 @@ export function useVirtualKeyboard({
     // our custom detection to avoid double-repositioning the drawer
     if (!enabled || typeof window === "undefined" || isFirefoxMobile) return;
 
+    // Enable Virtual Keyboard API to get env(keyboard-inset-*) CSS variables
+    // This tells the browser that we'll handle the virtual keyboard geometry ourselves
+    if ("virtualKeyboard" in navigator) {
+      (navigator as Navigator & { virtualKeyboard: { overlaysContent: boolean } })
+        .virtualKeyboard.overlaysContent = true;
+    }
+
     const visualViewport = window.visualViewport;
     if (!visualViewport) return;
 

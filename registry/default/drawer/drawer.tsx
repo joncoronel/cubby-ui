@@ -83,7 +83,7 @@ const drawerContentVariants = cva(
         variant: "default",
         direction: "left",
         class:
-          "max-w-screen w-screen rounded-r-xl sm:max-w-sm [&[data-starting-style]]:-translate-x-[var(--drawer-start-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-start-offset)]",
+          "max-w-screen w-screen  rounded-r-xl sm:max-w-sm [&[data-starting-style]]:-translate-x-[var(--drawer-start-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-start-offset)]",
       },
       // Floating variant - direction-specific sizing and transforms
       {
@@ -932,6 +932,14 @@ function DrawerContentInner({
                 : "pointer-events-auto",
               // Skip transition on immediate close (swipe dismiss)
               immediateClose && "transition-none",
+              // Safari iOS touch fix: 1px cross-axis overflow (WebKit bug #183870)
+              // Only needed for non-modal modes where viewport has pointer-events:none
+              modal !== true && [
+                "[@supports(-webkit-touch-callout:none)]:relative [@supports(-webkit-touch-callout:none)]:[scrollbar-width:none]",
+                isVertical
+                  ? "[@supports(-webkit-touch-callout:none)]:overflow-x-scroll [@supports(-webkit-touch-callout:none)]:overscroll-x-none [@supports(-webkit-touch-callout:none)]:after:pointer-events-none [@supports(-webkit-touch-callout:none)]:after:absolute [@supports(-webkit-touch-callout:none)]:after:inset-0 [@supports(-webkit-touch-callout:none)]:after:w-[calc(100%+0.5px)] [@supports(-webkit-touch-callout:none)]:after:content-['']"
+                  : "[@supports(-webkit-touch-callout:none)]:overflow-y-scroll [@supports(-webkit-touch-callout:none)]:overscroll-y-none [@supports(-webkit-touch-callout:none)]:after:pointer-events-none [@supports(-webkit-touch-callout:none)]:after:absolute [@supports(-webkit-touch-callout:none)]:after:inset-0 [@supports(-webkit-touch-callout:none)]:after:h-[calc(100%+1px)] [@supports(-webkit-touch-callout:none)]:after:content-['']",
+              ],
               className,
             )}
             style={

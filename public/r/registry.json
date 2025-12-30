@@ -548,6 +548,11 @@
           "target": "components/ui/cubby-ui/drawer/hooks/use-virtual-keyboard.ts"
         },
         {
+          "path": "registry/default/drawer/hooks/use-visual-viewport-height.ts",
+          "type": "registry:hook",
+          "target": "components/ui/cubby-ui/drawer/hooks/use-visual-viewport-height.ts"
+        },
+        {
           "path": "registry/default/drawer/drawer.css",
           "type": "registry:file",
           "target": "components/ui/cubby-ui/drawer/drawer.css"

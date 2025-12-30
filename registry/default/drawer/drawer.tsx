@@ -26,7 +26,7 @@ import {
 } from "./lib/drawer-utils";
 import { useScrollSnap } from "./hooks/use-scroll-snap";
 import { useVirtualKeyboard } from "./hooks/use-virtual-keyboard";
-// import { useVisualViewportHeight } from "./hooks/use-visual-viewport-height";
+import { useVisualViewportHeight } from "./hooks/use-visual-viewport-height";
 
 // Re-export types for consumers
 export type { SnapPoint, DrawerDirection };
@@ -625,9 +625,9 @@ function DrawerContentInner({
 
   // Visual viewport height tracking (for horizontal drawers in non-modal mode)
   // This provides real-time viewport height that updates immediately with URL bar changes
-  // const visualViewportHeight = useVisualViewportHeight({
-  //   enabled: !isVertical && modal !== true,
-  // });
+  const visualViewportHeight = useVisualViewportHeight({
+    enabled: !isVertical && modal !== true,
+  });
 
   // Memoize dismiss handler to prevent effect re-runs
   const handleDismiss = React.useCallback(() => {
@@ -812,19 +812,22 @@ function DrawerContentInner({
           // Group for propagating data-starting-style/data-ending-style to children
           "group/drawer",
           // Fixed positioning
-          "fixed inset-0 z-50 outline-hidden",
+          "fixed inset-x-0 z-50 outline-hidden",
           // Bottom drawer: anchor to bottom edge
           // Modal mode: -60px top buffer + dynamic height to prevent URL bar collapse on drag
           // Non-modal modes: anchor to bottom with fixed lvh height extending upward
           // (top-auto unsets the top:0 from inset-0, so container anchors from bottom)
           direction === "bottom" &&
             (modal === true
-              ? "top-[-60px]! bottom-0!"
-              : "top-auto! bottom-0! h-lvh"),
+              ? "top-[-60px] bottom-[env(keyboard-inset-height,0)]"
+              : "top-auto! bottom-[env(keyboard-inset-height,0)] h-lvh"),
           // Top drawer: anchor top, extend below for scroll space
           direction === "top" && "top-0! bottom-[-60px]!",
           // Horizontal drawers: full viewport height
-          !isVertical && "top-0! bottom-0! h-lvh",
+          !isVertical &&
+            (modal === true
+              ? "top-0! bottom-0! h-dvh"
+              : "top-0! bottom-0 h-lvh"),
 
           // Disable all interaction when animating, closing, or non-modal
           // (non-modal modes allow page interaction - Popup has its own pointer-events-auto)
@@ -849,9 +852,9 @@ function DrawerContentInner({
         )}
         style={
           {
-            // ...(visualViewportHeight != null && {
-            //   "--visual-viewport-height": `${visualViewportHeight}px`,
-            // }),
+            ...(visualViewportHeight != null && {
+              "--visual-viewport-height": `${visualViewportHeight}px`,
+            }),
             scrollSnapType: isVertical ? "y mandatory" : "x mandatory",
             scrollBehavior: "smooth",
             // Reposition drawer when virtual keyboard appears (bottom direction only)

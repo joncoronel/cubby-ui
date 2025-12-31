@@ -579,10 +579,8 @@ export function useScrollSnap(
         scrollControlRef.current.isProgrammatic = true;
         scrollControlRef.current.lastDetectedSnapIndex = activeSnapPointIndex;
 
-        // Disable scroll-snap and smooth behavior for instant positioning
-        container.style.scrollSnapType = "none";
-        container.style.scrollBehavior = "auto";
-
+        // Set initial scroll position
+        // scroll-snap is disabled via React state until setIsInitialized(true)
         if (isVertical) {
           container.scrollTop = targetScrollPos;
         } else {
@@ -602,12 +600,6 @@ export function useScrollSnap(
           dismissible,
         );
         onSnapProgress?.(initialSnapProgress);
-
-        // Re-enable scroll-snap and smooth behavior
-        container.style.scrollSnapType = isVertical
-          ? "y mandatory"
-          : "x mandatory";
-        container.style.scrollBehavior = "smooth";
 
         // Clear programmatic flag after a tick
         setTimeout(() => {

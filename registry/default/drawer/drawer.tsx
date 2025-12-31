@@ -65,50 +65,50 @@ const drawerContentVariants = cva(
         variant: "default",
         direction: "bottom",
         class:
-          "max-h-[95dvh] w-full max-w-full rounded-t-xl [&[data-starting-style]]:translate-y-[var(--drawer-start-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-start-offset)]",
+          "max-h-[95dvh] w-full max-w-full rounded-t-xl [&[data-starting-style]]:translate-y-[var(--drawer-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-offset)]",
       },
       {
         variant: "default",
         direction: "top",
         class:
-          "max-h-[95dvh] w-full max-w-full rounded-b-xl [&[data-starting-style]]:-translate-y-[var(--drawer-start-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-start-offset)]",
+          "max-h-[95dvh] w-full max-w-full rounded-b-xl [&[data-starting-style]]:-translate-y-[var(--drawer-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-offset)]",
       },
       {
         variant: "default",
         direction: "right",
         class:
-          "max-w-screen w-screen rounded-l-xl sm:max-w-sm [&[data-starting-style]]:translate-x-[var(--drawer-start-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-start-offset)]",
+          "max-w-screen w-screen rounded-l-xl sm:max-w-sm [&[data-starting-style]]:translate-x-[var(--drawer-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-offset)]",
       },
       {
         variant: "default",
         direction: "left",
         class:
-          "max-w-screen w-screen  rounded-r-xl sm:max-w-sm [&[data-starting-style]]:-translate-x-[var(--drawer-start-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-start-offset)]",
+          "max-w-screen w-screen  rounded-r-xl sm:max-w-sm [&[data-starting-style]]:-translate-x-[var(--drawer-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-offset)]",
       },
       // Floating variant - direction-specific sizing and transforms
       {
         variant: "floating",
         direction: "bottom",
         class:
-          "max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] [&[data-starting-style]]:translate-y-[var(--drawer-start-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-start-offset)]",
+          "max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] [&[data-starting-style]]:translate-y-[var(--drawer-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-offset)]",
       },
       {
         variant: "floating",
         direction: "top",
         class:
-          "max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] [&[data-starting-style]]:-translate-y-[var(--drawer-start-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-start-offset)]",
+          "max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] [&[data-starting-style]]:-translate-y-[var(--drawer-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-offset)]",
       },
       {
         variant: "floating",
         direction: "right",
         class:
-          "h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-sm [&[data-starting-style]]:translate-x-[var(--drawer-start-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-start-offset)]",
+          "h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-sm [&[data-starting-style]]:translate-x-[var(--drawer-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-offset)]",
       },
       {
         variant: "floating",
         direction: "left",
         class:
-          "h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-sm [&[data-starting-style]]:-translate-x-[var(--drawer-start-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-start-offset)]",
+          "h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-sm [&[data-starting-style]]:-translate-x-[var(--drawer-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-offset)]",
       },
     ],
     defaultVariants: {
@@ -699,15 +699,14 @@ function DrawerContentInner({
     return pixels / contentSize;
   }, [activeSnapPoint, contentSize]);
 
-  // Starting offset for enter/exit animations (drawer slides in by this amount)
+  // Animation offset based on active snap point
   // For pixel snap points, use the value directly (e.g., "92px")
-  // For percentage snap points, convert to percentage (e.g., 0.1 -> "10%")
-  // Floating variant: add 1rem to account for margin
+  // For percentage snap points, convert to percentage (e.g., 0.25 -> "25%")
   const baseOffset =
     typeof activeSnapPoint === "number"
       ? `${activeSnapPoint * 100}%`
       : activeSnapPoint;
-  const startingOffset =
+  const animationOffset =
     variant === "floating" ? `calc(${baseOffset} + 1rem)` : baseOffset;
 
   // Target backdrop opacity based on snap point (0.25 snap = 0.25 opacity)
@@ -858,8 +857,14 @@ function DrawerContentInner({
             ...(repositionInputs && {
               "--keyboard-height": `${keyboardHeight}px`,
             }),
-            scrollSnapType: isVertical ? "y mandatory" : "x mandatory",
-            scrollBehavior: "smooth",
+            // Disable scroll-snap until initialized to prevent browser snapping to wrong position
+            // For inverted directions (top/left), scroll 0 = fully open, which causes incorrect initial state
+            scrollSnapType: isInitialized
+              ? isVertical
+                ? "y mandatory"
+                : "x mandatory"
+              : "none",
+            scrollBehavior: isInitialized ? "smooth" : "auto",
             // Reposition drawer when virtual keyboard appears (bottom direction only)
             // Uses transform (not bottom) to avoid resizing the scroll container
             // which would mess with scroll positions and snap behavior
@@ -955,8 +960,8 @@ function DrawerContentInner({
                 // snap targets instead. Setting it on the Popup creates conflicting
                 // snap points for floating variant (due to margin offset).
 
-                // Dynamic starting offset for enter animation
-                "--drawer-start-offset": startingOffset,
+                // Dynamic offset for enter/exit animations
+                "--drawer-offset": animationOffset,
 
                 // View timeline for backdrop animation (Chrome 115+)
                 // Backdrop opacity tracks how much of drawer is visible

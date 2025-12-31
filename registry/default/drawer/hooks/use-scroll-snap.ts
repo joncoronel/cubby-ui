@@ -55,16 +55,8 @@ export interface UseScrollSnapOptions {
 export interface UseScrollSnapReturn {
   /** Ref for the scroll container */
   containerRef: React.RefObject<HTMLDivElement | null>;
-  /** Current scroll progress (0 = fully open, 1 = fully closed) */
-  scrollProgress: number;
-  /** Progress between snap points (0 = first snap, 1 = last snap) */
-  snapProgress: number;
   /** Whether currently scrolling/dragging */
   isScrolling: boolean;
-  /** Programmatically scroll to a snap point */
-  scrollToSnapPoint: (index: number, behavior?: ScrollBehavior) => void;
-  /** Scroll to closed position (for close animation) */
-  scrollToClose: (behavior?: ScrollBehavior) => Promise<void>;
   /** Snap target refs for the snap elements */
   snapTargetRefs: React.RefObject<(HTMLDivElement | null)[]>;
   /** Track size for the scroll container */
@@ -79,8 +71,6 @@ export interface UseScrollSnapReturn {
   firstSnapScrollPos: number;
   /** Scroll position for last snap point (for CSS animation-range) */
   lastSnapScrollPos: number;
-  /** Scroll position for dismiss (0 or last depending on direction, for CSS animation-range) */
-  dismissScrollPos: number;
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -181,8 +171,6 @@ export function useScrollSnap(
   });
 
   // React state (only what needs to trigger re-renders)
-  const [scrollProgress, setScrollProgress] = React.useState(0);
-  const [snapProgress, setSnapProgress] = React.useState(0);
   const [isScrolling, setIsScrolling] = React.useState(false);
   const [isClosing, setIsClosingState] = React.useState(false);
   const [isInitialized, setIsInitialized] = React.useState(false);
@@ -236,7 +224,6 @@ export function useScrollSnap(
   const lastSnapIndex = snapScrollPositions.length - 1;
   const firstSnapScrollPos = snapScrollPositions[firstSnapIndex] ?? 0;
   const lastSnapScrollPos = snapScrollPositions[lastSnapIndex] ?? 0;
-  const dismissScrollPos = snapScrollPositions[0] ?? 0;
 
   // Get scroll position for a snap point index
   const getScrollPositionForSnapPoint = React.useCallback(
@@ -271,6 +258,29 @@ export function useScrollSnap(
     [snapScrollPositions, dismissible],
   );
 
+  // Helper to detect snap point changes and notify (used by scrollend and RAF fallback)
+  const detectAndNotifySnapChange = React.useCallback(
+    (scrollPos: number) => {
+      if (
+        scrollControlRef.current.isProgrammatic ||
+        interactionRef.current.isClosing
+      ) {
+        return;
+      }
+
+      const { index, isDismiss } = findNearestSnapIndex(scrollPos);
+      if (
+        !isDismiss &&
+        index !== scrollControlRef.current.lastDetectedSnapIndex
+      ) {
+        scrollControlRef.current.lastDetectedSnapIndex = index;
+        scrollControlRef.current.isFromDetection = true;
+        optionsRef.current.onSnapPointChange(index);
+      }
+    },
+    [findNearestSnapIndex],
+  );
+
   // Scroll to a specific snap point
   const scrollToSnapPoint = React.useCallback(
     (index: number, behavior: ScrollBehavior = "smooth") => {
@@ -295,30 +305,6 @@ export function useScrollSnap(
       }
     },
     [getScrollPositionForSnapPoint, isVertical],
-  );
-
-  // Scroll to close position
-  const scrollToClose = React.useCallback(
-    async (behavior: ScrollBehavior = "smooth"): Promise<void> => {
-      const container = containerRef.current;
-      if (!container) return;
-
-      const actualBehavior = prefersReducedMotion() ? "auto" : behavior;
-
-      setIsClosing(true);
-      scrollControlRef.current.isProgrammatic = true;
-
-      container.scrollTo({
-        [isVertical ? "top" : "left"]: 0,
-        behavior: actualBehavior,
-      });
-
-      if (actualBehavior !== "auto") {
-        await waitForScrollEnd(container);
-      }
-      scrollControlRef.current.isProgrammatic = false;
-    },
-    [isVertical, setIsClosing],
   );
 
   /* -------------------------------------------------------------------------------------------------
@@ -362,22 +348,7 @@ export function useScrollSnap(
         !interactionRef.current.isPointerDown
       ) {
         updateIsScrolling(false);
-
-        // Fallback snap detection
-        if (
-          !scrollControlRef.current.isProgrammatic &&
-          !interactionRef.current.isClosing
-        ) {
-          const { index, isDismiss } = findNearestSnapIndex(currentPos);
-          if (
-            !isDismiss &&
-            index !== scrollControlRef.current.lastDetectedSnapIndex
-          ) {
-            scrollControlRef.current.lastDetectedSnapIndex = index;
-            scrollControlRef.current.isFromDetection = true;
-            optionsRef.current.onSnapPointChange(index);
-          }
-        }
+        detectAndNotifySnapChange(currentPos);
 
         initRef.current.rafId = null;
         initRef.current.rafLastPos = null;
@@ -393,7 +364,7 @@ export function useScrollSnap(
     initRef.current.rafId = requestAnimationFrame(
       checkScrollStabilityRef.current,
     );
-  }, [updateIsScrolling, findNearestSnapIndex]);
+  }, [updateIsScrolling, detectAndNotifySnapChange]);
 
   // Keep ref in sync with latest callback
   React.useLayoutEffect(() => {
@@ -419,9 +390,8 @@ export function useScrollSnap(
       DIRECTION_CONFIG[optionsRef.current.direction];
     const scrollPos = isVert ? container.scrollTop : container.scrollLeft;
 
-    // Calculate and emit progress
+    // Calculate and emit progress via callbacks
     const progress = calculateScrollProgress(scrollPos, geometry);
-    setScrollProgress(progress);
     optionsRef.current.onScrollProgress?.(progress);
 
     const snapProg = calculateSnapProgress(
@@ -429,7 +399,6 @@ export function useScrollSnap(
       snapScrollPositions,
       optionsRef.current.dismissible,
     );
-    setSnapProgress(snapProg);
     optionsRef.current.onSnapProgress?.(snapProg);
 
     // Only mark as scrolling for user-initiated scrolls
@@ -481,29 +450,15 @@ export function useScrollSnap(
       updateIsScrolling(false);
     }
 
-    // Fallback snap detection for scrollend
-    if (
-      !scrollControlRef.current.isProgrammatic &&
-      !interactionRef.current.isClosing
-    ) {
-      const container = containerRef.current;
-      if (!container) return;
-
+    // Detect snap point change
+    const container = containerRef.current;
+    if (container) {
       const { isVertical: isVert } =
         DIRECTION_CONFIG[optionsRef.current.direction];
       const scrollPos = isVert ? container.scrollTop : container.scrollLeft;
-      const { index, isDismiss } = findNearestSnapIndex(scrollPos);
-
-      if (
-        !isDismiss &&
-        index !== scrollControlRef.current.lastDetectedSnapIndex
-      ) {
-        scrollControlRef.current.lastDetectedSnapIndex = index;
-        scrollControlRef.current.isFromDetection = true;
-        optionsRef.current.onSnapPointChange(index);
-      }
+      detectAndNotifySnapChange(scrollPos);
     }
-  }, [updateIsScrolling, findNearestSnapIndex]);
+  }, [updateIsScrolling, detectAndNotifySnapChange]);
 
   // Native scroll snap change handler (Chrome 129+)
   const handleScrollSnapChange = React.useCallback((event: Event) => {
@@ -634,12 +589,11 @@ export function useScrollSnap(
           container.scrollLeft = targetScrollPos;
         }
 
-        // Calculate and emit initial progress
+        // Calculate and emit initial progress via callbacks
         const initialProgress = calculateScrollProgress(
           targetScrollPos,
           geometry,
         );
-        setScrollProgress(initialProgress);
         onScrollProgress?.(initialProgress);
 
         const initialSnapProgress = calculateSnapProgress(
@@ -647,7 +601,6 @@ export function useScrollSnap(
           snapScrollPositions,
           dismissible,
         );
-        setSnapProgress(initialSnapProgress);
         onSnapProgress?.(initialSnapProgress);
 
         // Re-enable scroll-snap and smooth behavior
@@ -834,11 +787,7 @@ export function useScrollSnap(
 
   return {
     containerRef,
-    scrollProgress,
-    snapProgress,
     isScrolling,
-    scrollToSnapPoint,
-    scrollToClose,
     snapTargetRefs,
     trackSize: geometry.trackSize,
     snapScrollPositions,
@@ -846,6 +795,5 @@ export function useScrollSnap(
     isClosing,
     firstSnapScrollPos,
     lastSnapScrollPos,
-    dismissScrollPos,
   };
 }

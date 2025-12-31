@@ -855,7 +855,9 @@ function DrawerContentInner({
             ...(visualViewportHeight != null && {
               "--visual-viewport-height": `${visualViewportHeight}px`,
             }),
-            "--keyboard-height": `${keyboardHeight}px`,
+            ...(repositionInputs && {
+              "--keyboard-height": `${keyboardHeight}px`,
+            }),
             scrollSnapType: isVertical ? "y mandatory" : "x mandatory",
             scrollBehavior: "smooth",
             // Reposition drawer when virtual keyboard appears (bottom direction only)
@@ -1085,7 +1087,7 @@ function DrawerFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="drawer-footer"
       className={cn(
-        "mt-auto flex flex-col gap-2 px-5 pt-3 pb-5",
+        "bg-popover mt-auto flex flex-col gap-2 px-5 pt-3 pb-5",
         // Add extra top padding when footer is first (no header or body before it)
         // Note: first: works when no Handle precedes; for Handle-first layouts
         // without header/body, add className="pt-5" manually

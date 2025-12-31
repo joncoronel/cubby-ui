@@ -84,6 +84,18 @@ Use the `footerVariant="inset"` prop on `DrawerContent` for a visually separated
 
 <ComponentPreview component="drawer" example="drawer-inset-footer" />
 
+### Sticky Footer
+
+Add `className="sticky bottom-0"` to `DrawerFooter` to keep it fixed at the bottom of the viewport as you drag the drawer down.
+
+<ComponentPreview component="drawer" example="drawer-sticky-footer" />
+
+### Non-Modal
+
+Control modal behavior with the `modal` prop. `modal={false}` allows full page interaction with no focus trapping. `modal="trap-focus"` keeps focus within the drawer while still allowing page interaction.
+
+<ComponentPreview component="drawer" example="drawer-non-modal" />
+
 ## API Reference
 
 The Drawer component is built on top of [Base UI's Dialog](https://base-ui.com/react/components/dialog). All Base UI props are supported. The documentation below only covers custom props specific to our implementation.
@@ -185,6 +197,17 @@ For the complete Base UI API, see the [Base UI Dialog documentation](https://bas
   When enabled, automatically repositions bottom drawers when a virtual keyboard
   appears on mobile devices, keeping form inputs visible. Only applies to
   `direction="bottom"`.
+</ApiProp>
+
+<ApiProp
+  name="modal"
+  fullType='boolean | "trap-focus"'
+  simpleType="boolean | string"
+  defaultValue="true"
+>
+  Controls modal behavior. `true`: focus trapped, backdrop shown, body scroll
+  locked. `"trap-focus"`: focus trapped but page remains interactive.
+  `false`: non-modal, no focus trapping, no backdrop, page fully interactive.
 </ApiProp>
 
 <ApiProp

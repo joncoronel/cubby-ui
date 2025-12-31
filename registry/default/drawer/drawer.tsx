@@ -931,7 +931,8 @@ function DrawerContentInner({
             className={cn(
               drawerContentVariants({ variant, direction }),
               // Hide until scroll is initialized to prevent flash at wrong position (iOS Safari)
-              // open && !isInitialized && "opacity-0",
+              // Only apply when opening (open=true), not during close animation
+              open && !isInitialized && "opacity-0",
               // Disable pointer events during enter/exit animations to prevent interruption
               isAnimating || isClosing
                 ? "pointer-events-none"

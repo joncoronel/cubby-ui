@@ -342,6 +342,7 @@ function Drawer({
 
       // Reset state when opening (these persist across drawer sessions since they're in the root)
       if (nextOpen) {
+        setContentSize(null); // Reset to force fresh measurement (viewport may have changed)
         setDragProgress(1); // 1 = closed/invisible, will animate to 0 = open/visible
         setIsDragging(false); // Reset dragging state (may be stale from swipe dismiss)
         setImmediateClose(false); // Reset immediate close flag
@@ -935,9 +936,6 @@ function DrawerContentInner({
             finalFocus={finalFocus}
             className={cn(
               drawerContentVariants({ variant, direction }),
-              // Hide until scroll is initialized to prevent flash at wrong position (iOS Safari)
-              // Only apply when opening (open=true), not during close animation
-              open && !isInitialized && "opacity-0",
               // Disable pointer events during enter/exit animations to prevent interruption
               isAnimating || isClosing
                 ? "pointer-events-none"

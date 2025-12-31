@@ -526,10 +526,10 @@ export function useScrollSnap(
    * Effects (reduced from 5 to 4)
    * -------------------------------------------------------------------------------------------------*/
 
-  // Effect 1: Initialization
+  // Effect 1: Initialization (useLayoutEffect runs before paint)
   // Note: State/ref resets are unnecessary since DrawerContentInner unmounts on close,
   // giving us fresh state on remount. We only need to cancel pending callbacks.
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     if (!open) {
       // Cancel pending callbacks during exit animation
       if (initRef.current.rafId !== null) {
@@ -543,13 +543,28 @@ export function useScrollSnap(
       return;
     }
 
-    // Wait for contentSize to be measured before positioning
+    const container = containerRef.current;
+
+    // Immediately set scroll to "closed" position for inverted directions
+    // This prevents flash before measurements are ready (scroll 0 = fully open for top/left)
+    // For normal directions (bottom/right), scroll 0 is already "closed"
+    if (container && !initRef.current.hasInitialized && isInverted) {
+      const maxScroll = isVertical
+        ? container.scrollHeight - container.clientHeight
+        : container.scrollWidth - container.clientWidth;
+      if (isVertical) {
+        container.scrollTop = maxScroll;
+      } else {
+        container.scrollLeft = maxScroll;
+      }
+    }
+
+    // Wait for contentSize to be measured before precise positioning
     if (contentSize === null) return;
 
     // Perform initial scroll positioning (only once per open)
     if (!initRef.current.hasInitialized) {
       const performInitialScroll = () => {
-        const container = containerRef.current;
         if (!container) {
           initRef.current.retryTimeout = setTimeout(performInitialScroll, 0);
           return;
@@ -609,7 +624,8 @@ export function useScrollSnap(
         setIsInitialized(true);
       };
 
-      initRef.current.retryTimeout = setTimeout(performInitialScroll, 0);
+      // Try synchronous first, fall back to setTimeout if needed
+      performInitialScroll();
     }
 
     // Capture ref value for cleanup (avoids stale ref warning)
@@ -624,6 +640,7 @@ export function useScrollSnap(
     open,
     contentSize,
     isVertical,
+    isInverted,
     viewportSize,
     dismissible,
     activeSnapPointIndex,

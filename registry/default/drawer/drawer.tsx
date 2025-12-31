@@ -819,8 +819,8 @@ function DrawerContentInner({
           // (top-auto unsets the top:0 from inset-0, so container anchors from bottom)
           direction === "bottom" &&
             (modal === true
-              ? "top-[-60px] bottom-[env(keyboard-inset-height,0)]"
-              : "top-auto! bottom-[env(keyboard-inset-height,0)] h-lvh"),
+              ? "top-[-60px] bottom-[env(keyboard-inset-height,var(--keyboard-height,0))]"
+              : "top-auto! bottom-[env(keyboard-inset-height,var(--keyboard-height,0))] h-lvh"),
           // Top drawer: anchor top, extend below for scroll space
           direction === "top" && "top-0! bottom-[-60px]!",
           // Horizontal drawers: full viewport height
@@ -855,18 +855,19 @@ function DrawerContentInner({
             ...(visualViewportHeight != null && {
               "--visual-viewport-height": `${visualViewportHeight}px`,
             }),
+            "--keyboard-height": `${keyboardHeight}px`,
             scrollSnapType: isVertical ? "y mandatory" : "x mandatory",
             scrollBehavior: "smooth",
             // Reposition drawer when virtual keyboard appears (bottom direction only)
             // Uses transform (not bottom) to avoid resizing the scroll container
             // which would mess with scroll positions and snap behavior
-            transform:
-              direction === "bottom" &&
-              repositionInputs &&
-              isKeyboardVisible &&
-              keyboardHeight > 0
-                ? `translateY(-${keyboardHeight}px)`
-                : undefined,
+            // transform:
+            //   direction === "bottom" &&
+            //   repositionInputs &&
+            //   isKeyboardVisible &&
+            //   keyboardHeight > 0
+            //     ? `translateY(-${keyboardHeight}px)`
+            //     : undefined,
             // Animate --drawer-snap-progress CSS custom property (Chrome 115+)
             // Consumers can use: opacity: var(--drawer-snap-progress) for crossfades
             ...(useScrollDrivenAnimation && {

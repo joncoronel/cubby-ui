@@ -624,8 +624,8 @@ export function useScrollSnap(
         setIsInitialized(true);
       };
 
-      // Try synchronous first, fall back to setTimeout if needed
-      performInitialScroll();
+      // Use setTimeout to give browser time to compute snap target positions
+      initRef.current.retryTimeout = setTimeout(performInitialScroll, 0);
     }
 
     // Capture ref value for cleanup (avoids stale ref warning)

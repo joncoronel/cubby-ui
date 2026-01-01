@@ -526,10 +526,10 @@ export function useScrollSnap(
    * Effects (reduced from 5 to 4)
    * -------------------------------------------------------------------------------------------------*/
 
-  // Effect 1: Initialization (useLayoutEffect runs before paint)
+  // Effect 1: Initialization
   // Note: State/ref resets are unnecessary since DrawerContentInner unmounts on close,
   // giving us fresh state on remount. We only need to cancel pending callbacks.
-  React.useLayoutEffect(() => {
+  React.useEffect(() => {
     if (!open) {
       // Cancel pending callbacks during exit animation
       if (initRef.current.rafId !== null) {
@@ -543,28 +543,13 @@ export function useScrollSnap(
       return;
     }
 
-    const container = containerRef.current;
-
-    // Immediately set scroll to "closed" position for inverted directions
-    // This prevents flash before measurements are ready (scroll 0 = fully open for top/left)
-    // For normal directions (bottom/right), scroll 0 is already "closed"
-    if (container && !initRef.current.hasInitialized && isInverted) {
-      const maxScroll = isVertical
-        ? container.scrollHeight - container.clientHeight
-        : container.scrollWidth - container.clientWidth;
-      if (isVertical) {
-        container.scrollTop = maxScroll;
-      } else {
-        container.scrollLeft = maxScroll;
-      }
-    }
-
-    // Wait for contentSize to be measured before precise positioning
+    // Wait for contentSize to be measured before positioning
     if (contentSize === null) return;
 
     // Perform initial scroll positioning (only once per open)
     if (!initRef.current.hasInitialized) {
       const performInitialScroll = () => {
+        const container = containerRef.current;
         if (!container) {
           initRef.current.retryTimeout = setTimeout(performInitialScroll, 0);
           return;
@@ -640,7 +625,6 @@ export function useScrollSnap(
     open,
     contentSize,
     isVertical,
-    isInverted,
     viewportSize,
     dismissible,
     activeSnapPointIndex,

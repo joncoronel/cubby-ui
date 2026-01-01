@@ -1150,7 +1150,7 @@ function DrawerDescription({
 function DrawerBody({
   className,
   nativeScroll = false,
-  fadeEdges = true,
+  fadeEdges = false,
   scrollbarGutter = false,
   persistScrollbar,
   hideScrollbar,
@@ -1177,6 +1177,7 @@ function DrawerBody({
     >
       <ScrollArea
         className="flex-1"
+        // fadedges is false by default since it can cause issues with the drawer animation on mobile devices
         fadeEdges={fadeEdges}
         scrollbarGutter={scrollbarGutter}
         persistScrollbar={persistScrollbar}

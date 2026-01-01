@@ -68,13 +68,13 @@ const drawerContentVariants = cva(
         variant: "default",
         direction: "bottom",
         class:
-          "max-h-[95dvh] w-full max-w-full rounded-t-xl [&[data-starting-style]]:translate-y-[var(--drawer-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-offset)]",
+          "mx-auto max-h-[95dvh] w-full max-w-full rounded-t-xl [&[data-starting-style]]:translate-y-[var(--drawer-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-offset)]",
       },
       {
         variant: "default",
         direction: "top",
         class:
-          "max-h-[95dvh] w-full max-w-full rounded-b-xl [&[data-starting-style]]:-translate-y-[var(--drawer-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-offset)]",
+          "mx-auto max-h-[95dvh] w-full max-w-full rounded-b-xl [&[data-starting-style]]:-translate-y-[var(--drawer-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-offset)]",
       },
       {
         variant: "default",
@@ -93,13 +93,13 @@ const drawerContentVariants = cva(
         variant: "floating",
         direction: "bottom",
         class:
-          "max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] [&[data-starting-style]]:translate-y-[var(--drawer-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-offset)]",
+          "mx-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] [&[data-starting-style]]:translate-y-[var(--drawer-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-offset)]",
       },
       {
         variant: "floating",
         direction: "top",
         class:
-          "max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] [&[data-starting-style]]:-translate-y-[var(--drawer-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-offset)]",
+          "mx-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] [&[data-starting-style]]:-translate-y-[var(--drawer-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-offset)]",
       },
       {
         variant: "floating",

@@ -89,7 +89,7 @@ export default function CustomSearchDialog({
                 <CommandItem
                   key={item.id}
                   value={item}
-                  render={<Link href={item.url} />}
+                  render={<Link href={item.url} prefetch={false} />}
                   onClick={() => onOpenChange(false)}
                   className={
                     item.type === "heading" || item.type === "text"

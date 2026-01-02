@@ -257,6 +257,26 @@ All code blocks are pre-highlighted on the server using Shiki for optimal perfor
 - `components/mdx/component-usage.tsx` - Client component with two code blocks
 - `mdx-components.tsx` - Exports all MDX components for use in documentation
 
+#### Search System
+
+The documentation search uses **Orama** with static indexing:
+
+- **Search client**: `components/search.tsx` - Custom search dialog using static Orama search
+- **Search server**: `app/api/search/route.ts` - Generates static search index at build time
+
+**Search filtering by meta.json:**
+
+Only pages listed in their section's `meta.json` file are searchable. This allows work-in-progress pages to exist without appearing in search results.
+
+- `content/docs/components/meta.json` → Controls which components are searchable
+- `content/docs/hooks/meta.json` → Controls which hooks are searchable
+- `content/docs/utils/meta.json` → Controls which utilities are searchable
+- `content/docs/getting-started/meta.json` → Controls which getting-started pages are searchable
+
+**To hide a page from search:** Remove it from the `pages` array in the appropriate `meta.json` file. The page will still be accessible by URL but won't appear in search results.
+
+**To make a page searchable:** Add the page slug to the `pages` array in the appropriate `meta.json` file and rebuild.
+
 ### Development Workflow
 
 1. Add/modify components in `registry/default/`

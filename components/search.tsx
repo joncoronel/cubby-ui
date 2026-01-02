@@ -3,17 +3,13 @@
 import { useDocsSearch } from "fumadocs-core/search/client";
 import type { SortedResult } from "fumadocs-core/search";
 import { useI18n } from "fumadocs-ui/contexts/i18n";
-import { useRouter } from "next/navigation";
 import { SharedProps } from "fumadocs-ui/contexts/search";
-import { useState } from "react";
+import Link from "next/link";
 import {
   ArrowDownIcon,
   ArrowUpIcon,
-  BookOpenIcon,
   CornerDownLeftIcon,
   HashIcon,
-  LoaderIcon,
-  RocketIcon,
 } from "lucide-react";
 import {
   Command,
@@ -27,86 +23,74 @@ import {
 } from "@/registry/default/command/command";
 
 import { highlightText } from "@/registry/default/lib/highlight-text";
-import { useDebouncedCallback } from "use-debounce";
 import { Kbd } from "@/registry/default/kbd/kbd";
 import { cn } from "@/lib/utils";
+import { create } from "@orama/orama";
+
+function initOrama() {
+  return create({
+    schema: { _: "string" },
+    language: "english",
+  });
+}
 
 export default function CustomSearchDialog({
   open,
   onOpenChange,
 }: SharedProps) {
-  const [text, setText] = useState("");
   const { locale } = useI18n();
-  const router = useRouter();
   const { search, setSearch, query } = useDocsSearch({
-    type: "fetch",
+    type: "static",
+    initOrama,
     locale,
-    delayMs: 0,
+    delayMs: 100,
   });
 
   const defaultItems: SortedResult[] = [
     {
       id: "intro",
       content: "Introduction",
-      url: "/docs",
+      url: "/docs/getting-started/introduction",
       type: "page",
     },
     {
       id: "install",
       content: "Installation",
-      url: "/docs/installation",
+      url: "/docs/getting-started/installation",
       type: "page",
     },
   ];
 
-  const items: SortedResult[] =
-    Array.isArray(query.data) && query.data.length > 0
-      ? query.data
-      : (query.isLoading && query.data === "empty") || !search
-        ? defaultItems
-        : [];
-
-  const handleSelect = (item: SortedResult) => {
-    router.push(item.url);
-    onOpenChange(false);
-  };
-  const handleSearch = (value: string) => {
-    setText(value);
-    sendSearch(value);
-  };
-
-  const sendSearch = useDebouncedCallback((value: string) => {
-    setSearch(value);
-  }, 300);
+  const items =
+    !search || query.data === "empty" || !query.data
+      ? defaultItems
+      : query.data;
 
   const emptyMessage =
-    search &&
-    items.length === 0 &&
-    (!query.isLoading || (Array.isArray(query.data) && query.data.length === 0))
-      ? "No results found."
-      : null;
+    search && items.length === 0 ? "No results found." : null;
 
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
       <CommandDialogPopup>
         <Command
           items={items}
-          value={text}
-          onValueChange={handleSearch}
+          value={search}
+          onValueChange={setSearch}
           filter={null}
           open
         >
           <CommandContent>
             <CommandInput
               placeholder="Search documentation..."
-              loading={Boolean(text) && (query.isLoading || !search)}
+              loading={query.isLoading}
             />
             <CommandList emptyMessage={emptyMessage}>
               {(item: SortedResult) => (
                 <CommandItem
                   key={item.id}
                   value={item}
-                  onClick={() => handleSelect(item)}
+                  render={<Link href={item.url} prefetch={false} />}
+                  onClick={() => onOpenChange(false)}
                   className={
                     item.type === "heading" || item.type === "text"
                       ? "before:bg-border relative pl-6 before:absolute before:inset-y-0 before:left-2.5 before:w-px"

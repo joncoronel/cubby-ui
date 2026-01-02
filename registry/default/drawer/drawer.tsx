@@ -21,6 +21,7 @@ import {
   parsePixelValue,
   findSnapPointIndex,
   getSnapPointValue,
+  snapPointToRatio,
   supportsScrollTimeline,
   supportsScrollState,
 } from "./lib/drawer-utils";
@@ -599,6 +600,7 @@ function DrawerContentInner({
     setIsDragging,
     dragProgress,
     setDragProgress,
+    snapProgress,
     setSnapProgress,
     onOpenChange,
     open,
@@ -669,11 +671,8 @@ function DrawerContentInner({
     isScrolling,
     snapTargetRefs,
     trackSize,
-    snapScrollPositions,
     isInitialized,
     isClosing,
-    firstSnapScrollPos,
-    lastSnapScrollPos,
   } = useScrollSnap({
     direction,
     snapPoints,
@@ -701,6 +700,21 @@ function DrawerContentInner({
     if (!pixels || !contentSize) return 1;
     return pixels / contentSize;
   }, [activeSnapPoint, contentSize]);
+
+  // Calculate first and last snap ratios for CSS animation-range
+  // These are used in calc() expressions instead of pre-calculated pixel values
+  const firstSnapRatio =
+    contentSize != null
+      ? snapPointToRatio(snapPoints[0], contentSize)
+      : typeof snapPoints[0] === "number"
+        ? snapPoints[0]
+        : 1;
+  const lastSnapRatio =
+    contentSize != null
+      ? snapPointToRatio(snapPoints[snapPoints.length - 1], contentSize)
+      : typeof snapPoints[snapPoints.length - 1] === "number"
+        ? snapPoints[snapPoints.length - 1]
+        : 1;
 
   // Animation offset based on active snap point
   // For pixel snap points, use the value directly (e.g., "92px")
@@ -783,7 +797,7 @@ function DrawerContentInner({
             // "[&[data-ending-style]]:[animation:drawer-backdrop-exit_450ms_cubic-bezier(0,0,0.58,1)_forwards]",
             "[&[data-ending-style]]:opacity-0",
 
-            isInitialized && !isAnimating && isDragging && dragProgress < 1
+            isInitialized && !isAnimating && isDragging && dismissible
               ? useScrollDrivenAnimation
                 ? // Scroll-driven backdrop animation (Chrome 115+)
                   backdropAnimationStyles[direction]
@@ -860,6 +874,16 @@ function DrawerContentInner({
             ...(repositionInputs && {
               "--keyboard-height": `${keyboardHeight}px`,
             }),
+            // CSS variables for scroll-driven animation calc() expressions
+            // These enable animation-range to be computed in CSS instead of JS
+            ...{
+              "--content-size": `${contentSize ?? 0}px`,
+              "--dismiss-buffer": dismissible
+                ? `${(contentSize ?? 0) * 0.3}px`
+                : "0px",
+              "--first-snap-ratio": firstSnapRatio,
+              "--last-snap-ratio": lastSnapRatio,
+            },
             // Disable scroll-snap until initialized to prevent browser snapping to wrong position
             // For inverted directions (top/left), scroll 0 = fully open, which causes incorrect initial state
             scrollSnapType: isInitialized
@@ -878,15 +902,35 @@ function DrawerContentInner({
             //   keyboardHeight > 0
             //     ? `translateY(-${keyboardHeight}px)`
             //     : undefined,
-            // Animate --drawer-snap-progress CSS custom property (Chrome 115+)
+            // Animate --drawer-snap-progress CSS custom property
             // Consumers can use: opacity: var(--drawer-snap-progress) for crossfades
-            ...(useScrollDrivenAnimation && {
-              animationName: "drawer-snap-progress",
-              animationTimingFunction: "linear",
-              animationFillMode: "both",
-              animationTimeline: "scroll(self)",
-              animationRange: `${firstSnapScrollPos}px ${lastSnapScrollPos}px`,
-            }),
+            // Chrome 115+: uses CSS scroll-driven animation
+            // Fallback: sets variable via JS snapProgress state
+            ...(useScrollDrivenAnimation
+              ? {
+                  animationName: "drawer-snap-progress",
+                  animationTimingFunction: "linear",
+                  animationFillMode: "both",
+                  // Horizontal drawers need scroll(self x) to track horizontal scroll
+                  animationTimeline: isVertical
+                    ? "scroll(self)"
+                    : "scroll(self x)",
+                  // For inverted directions (top/left), scroll decreases as drawer opens
+                  // animation-range requires start < end, so swap values and reverse animation
+                  // Formula: dismissBuffer + ratio * contentSize (non-inverted)
+                  // Or: contentSize * (1 - ratio) (inverted, with reversed animation)
+                  ...(direction === "top" || direction === "left"
+                    ? {
+                        animationRange: `calc(var(--content-size) * (1 - var(--last-snap-ratio))) calc(var(--content-size) * (1 - var(--first-snap-ratio)))`,
+                        animationDirection: "reverse",
+                      }
+                    : {
+                        animationRange: `calc(var(--dismiss-buffer) + var(--first-snap-ratio) * var(--content-size)) calc(var(--dismiss-buffer) + var(--last-snap-ratio) * var(--content-size))`,
+                      }),
+                }
+              : {
+                  "--drawer-snap-progress": snapProgress,
+                }),
           } as React.CSSProperties
         }
       >
@@ -894,40 +938,83 @@ function DrawerContentInner({
         <div
           data-slot="drawer-track"
           className={drawerTrackVariants({ direction })}
-          style={{
-            // Track size: creates the scrollable space
-            [isVertical ? "height" : "width"]: `${trackSize}px`,
-          }}
+          style={
+            {
+              // Track size: creates the scrollable space
+              [isVertical ? "height" : "width"]: `${trackSize}px`,
+              // CSS variables for snap target positioning (see drawer.css)
+              "--content-size": `${contentSize ?? 0}px`,
+              "--dismiss-buffer": dismissible
+                ? `${(contentSize ?? 0) * 0.3}px`
+                : "0px",
+            } as React.CSSProperties
+          }
         >
           {/* Snap targets - invisible elements for scroll-snap-align */}
+          {/* Positioning handled by CSS using --snap-ratio variable (see drawer.css) */}
           {/* Also serve as scroll-state containers for CSS queries (Chrome 133+) */}
-          {snapScrollPositions.map((position, index) => (
-            <div
-              key={index}
-              ref={(el) => {
-                snapTargetRefs.current[index] = el;
-              }}
-              data-slot="drawer-snap-target"
-              data-snap-index={index}
-              className={cn(
-                "pointer-events-none absolute",
-                isVertical ? "inset-x-0 h-px" : "inset-y-0 w-px",
+          {/* Only render when contentSize is measured - drawer is hidden until then anyway */}
+          {contentSize != null && (
+            <>
+              {/* Dismiss snap target (if dismissible) */}
+              {dismissible && (
+                <div
+                  ref={(el) => {
+                    snapTargetRefs.current[0] = el;
+                  }}
+                  data-slot="drawer-snap-target"
+                  data-snap-index={0}
+                  data-snap-type="dismiss"
+                  className={cn(
+                    "pointer-events-none absolute",
+                    isVertical ? "inset-x-0 h-px" : "inset-y-0 w-px",
+                  )}
+                  style={
+                    {
+                      scrollSnapAlign: "start",
+                      scrollSnapStop: sequentialSnap ? "always" : undefined,
+                      ...(supportsScrollState && {
+                        containerType: "scroll-state",
+                      }),
+                    } as React.CSSProperties
+                  }
+                  aria-hidden="true"
+                />
               )}
-              style={
-                {
-                  [isVertical ? "top" : "left"]: `${position}px`,
-                  scrollSnapAlign: "start",
-                  scrollSnapStop: sequentialSnap ? "always" : undefined,
-                  // CSS scroll-state() container queries (Chrome 133+)
-                  // Enables: @container scroll-state(snapped: block) { ... }
-                  ...(supportsScrollState && {
-                    containerType: "scroll-state",
-                  }),
-                } as React.CSSProperties
-              }
-              aria-hidden="true"
-            />
-          ))}
+
+              {/* Snap point targets */}
+              {snapPoints.map((snapPoint, index) => {
+                const snapIndex = dismissible ? index + 1 : index;
+                const ratio = snapPointToRatio(snapPoint, contentSize);
+
+                return (
+                  <div
+                    key={snapIndex}
+                    ref={(el) => {
+                      snapTargetRefs.current[snapIndex] = el;
+                    }}
+                    data-slot="drawer-snap-target"
+                    data-snap-index={snapIndex}
+                    className={cn(
+                      "pointer-events-none absolute",
+                      isVertical ? "inset-x-0 h-px" : "inset-y-0 w-px",
+                    )}
+                    style={
+                      {
+                        "--snap-ratio": ratio,
+                        scrollSnapAlign: "start",
+                        scrollSnapStop: sequentialSnap ? "always" : undefined,
+                        ...(supportsScrollState && {
+                          containerType: "scroll-state",
+                        }),
+                      } as React.CSSProperties
+                    }
+                    aria-hidden="true"
+                  />
+                );
+              })}
+            </>
+          )}
 
           {/* Popup - the actual drawer panel (dialog element with accessibility) */}
           <BaseDialog.Popup

@@ -61,16 +61,10 @@ export interface UseScrollSnapReturn {
   snapTargetRefs: React.RefObject<(HTMLDivElement | null)[]>;
   /** Track size for the scroll container */
   trackSize: number;
-  /** Snap positions (scroll positions for each snap point) */
-  snapScrollPositions: number[];
   /** Whether the initial scroll positioning is complete */
   isInitialized: boolean;
   /** Whether the drawer is in the process of closing (pointer events should be disabled) */
   isClosing: boolean;
-  /** Scroll position for first snap point (for CSS animation-range) */
-  firstSnapScrollPos: number;
-  /** Scroll position for last snap point (for CSS animation-range) */
-  lastSnapScrollPos: number;
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -195,35 +189,34 @@ export function useScrollSnap(
   );
 
   // Calculate geometry using pure functions (memoized)
-  const effectiveSize = contentSize ?? viewportSize * 0.9;
+  // Only calculate when contentSize is measured - drawer is hidden until then anyway
+  const hasValidSize = contentSize != null && contentSize > 0;
 
-  const geometry = React.useMemo<ScrollGeometry>(
+  const geometry = React.useMemo<ScrollGeometry | null>(
     () =>
-      calculateScrollGeometry(
-        viewportSize,
-        effectiveSize,
-        dismissible,
-        isInverted,
-      ),
-    [viewportSize, effectiveSize, dismissible, isInverted],
+      hasValidSize
+        ? calculateScrollGeometry(
+            viewportSize,
+            contentSize,
+            dismissible,
+            isInverted,
+          )
+        : null,
+    [viewportSize, contentSize, dismissible, isInverted, hasValidSize],
   );
 
   const snapScrollPositions = React.useMemo(
     () =>
-      calculateSnapScrollPositions(
-        snapPoints,
-        geometry,
-        dismissible,
-        effectiveSize,
-      ),
-    [snapPoints, geometry, dismissible, effectiveSize],
+      geometry && hasValidSize
+        ? calculateSnapScrollPositions(
+            snapPoints,
+            geometry,
+            dismissible,
+            contentSize,
+          )
+        : [],
+    [snapPoints, geometry, dismissible, contentSize, hasValidSize],
   );
-
-  // Calculate scroll positions for CSS animation-range
-  const firstSnapIndex = dismissible ? 1 : 0;
-  const lastSnapIndex = snapScrollPositions.length - 1;
-  const firstSnapScrollPos = snapScrollPositions[firstSnapIndex] ?? 0;
-  const lastSnapScrollPos = snapScrollPositions[lastSnapIndex] ?? 0;
 
   // Get scroll position for a snap point index
   const getScrollPositionForSnapPoint = React.useCallback(
@@ -390,9 +383,16 @@ export function useScrollSnap(
       DIRECTION_CONFIG[optionsRef.current.direction];
     const scrollPos = isVert ? container.scrollTop : container.scrollLeft;
 
-    // Calculate and emit progress via callbacks
-    const progress = calculateScrollProgress(scrollPos, geometry);
-    optionsRef.current.onScrollProgress?.(progress);
+    // Calculate progress (null if geometry not ready)
+    const progress =
+      geometry && contentSize
+        ? calculateScrollProgress(scrollPos, geometry, contentSize)
+        : null;
+
+    // Emit progress via callbacks (skip if not ready)
+    if (progress !== null) {
+      optionsRef.current.onScrollProgress?.(progress);
+    }
 
     const snapProg = calculateSnapProgress(
       scrollPos,
@@ -426,6 +426,7 @@ export function useScrollSnap(
       if (
         optionsRef.current.dismissible &&
         !interactionRef.current.isClosing &&
+        progress !== null &&
         progress >= 1
       ) {
         triggerImmediateDismiss();
@@ -588,11 +589,14 @@ export function useScrollSnap(
         }
 
         // Calculate and emit initial progress via callbacks
-        const initialProgress = calculateScrollProgress(
-          targetScrollPos,
-          geometry,
-        );
-        onScrollProgress?.(initialProgress);
+        if (geometry && contentSize) {
+          const initialProgress = calculateScrollProgress(
+            targetScrollPos,
+            geometry,
+            contentSize,
+          );
+          onScrollProgress?.(initialProgress);
+        }
 
         const initialSnapProgress = calculateSnapProgress(
           targetScrollPos,
@@ -679,16 +683,14 @@ export function useScrollSnap(
 
   // Effect 4: Re-position when geometry changes (e.g., keyboard appears on Android)
   // This ensures the drawer stays at the correct snap point when viewport/content size changes
-  const prevGeometryRef = React.useRef({ trackSize: 0, maxScroll: 0 });
+  const prevTrackSizeRef = React.useRef(0);
   React.useEffect(() => {
-    if (!open || !initRef.current.hasInitialized) return;
+    if (!open || !initRef.current.hasInitialized || !geometry) return;
 
-    const { trackSize, maxScroll } = geometry;
-    const prev = prevGeometryRef.current;
+    const { trackSize } = geometry;
 
-    // Check if geometry actually changed (not just first render after init)
-    if (prev.trackSize !== 0 && prev.trackSize !== trackSize) {
-      // Geometry changed - re-scroll to current snap point to maintain position
+    // Re-snap when track size changes (skip first run when prev is 0)
+    if (prevTrackSizeRef.current !== 0 && prevTrackSizeRef.current !== trackSize) {
       const container = containerRef.current;
       if (container && !scrollControlRef.current.isProgrammatic) {
         const targetScrollPos =
@@ -706,7 +708,7 @@ export function useScrollSnap(
       }
     }
 
-    prevGeometryRef.current = { trackSize, maxScroll };
+    prevTrackSizeRef.current = trackSize;
   }, [
     open,
     geometry,
@@ -782,11 +784,8 @@ export function useScrollSnap(
     containerRef,
     isScrolling,
     snapTargetRefs,
-    trackSize: geometry.trackSize,
-    snapScrollPositions,
+    trackSize: geometry?.trackSize ?? 0,
     isInitialized,
     isClosing,
-    firstSnapScrollPos,
-    lastSnapScrollPos,
   };
 }

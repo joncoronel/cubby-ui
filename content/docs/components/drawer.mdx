@@ -308,27 +308,69 @@ Use `DrawerBody` for scrollable content inside the drawer. The component handles
 
 ### Animating Content Based on Snap Position
 
-The drawer provides two ways to animate content based on the current snap position:
+The drawer exposes a `--drawer-snap-progress` CSS custom property that animates from 0 (first snap) to 1 (last snap) as the drawer moves between snap points. This works in all browsers:
 
-#### Option 1: Render Props (Works Everywhere)
+- **Chrome 115+**: GPU-accelerated CSS scroll-driven animation (no React re-renders)
+- **Other browsers**: JavaScript fallback sets the variable automatically
 
-Use the render prop pattern to access animation values in JavaScript:
+#### Using the CSS Variable
+
+Use `--drawer-snap-progress` directly in your styles for crossfade effects:
 
 ```tsx
 <Drawer snapPoints={["92px", 1]}>
-  {({ snapProgress, dragProgress, isDragging, activeSnapPoint }) => (
-    <>
-      <DrawerTrigger>Open</DrawerTrigger>
-      <DrawerContent>
-        {/* Mini player fades out as drawer expands */}
-        <div style={{ opacity: 1 - snapProgress }}>Mini Player</div>
-        {/* Full player fades in as drawer expands */}
-        <div style={{ opacity: snapProgress }}>Full Player</div>
-      </DrawerContent>
-    </>
+  <DrawerTrigger>Open</DrawerTrigger>
+  <DrawerContent>
+    {/* Mini player fades out as drawer expands */}
+    <div style={{ opacity: "calc(1 - var(--drawer-snap-progress, 0))" }}>
+      Mini Player
+    </div>
+    {/* Full player fades in as drawer expands */}
+    <div style={{ opacity: "var(--drawer-snap-progress, 0)" }}>
+      Full Player
+    </div>
+  </DrawerContent>
+</Drawer>
+```
+
+Or with Tailwind's arbitrary value syntax:
+
+```tsx
+<div className="opacity-(calc(1-var(--drawer-snap-progress,0)))">Mini Player</div>
+<div className="opacity-(--drawer-snap-progress,0)">Full Player</div>
+```
+
+#### Conditional Logic with Render Props
+
+CSS variables work great for visual properties like `opacity`, but some properties like `pointer-events` need conditional logic. Use the render prop pattern for these:
+
+```tsx
+<Drawer snapPoints={["92px", 1]}>
+  {({ snapProgress }) => (
+    <DrawerContent>
+      {/* Opacity via CSS variable, pointer-events via JS */}
+      <div
+        style={{
+          opacity: "calc(1 - var(--drawer-snap-progress, 0))",
+          pointerEvents: snapProgress > 0.7 ? "none" : "auto",
+        }}
+      >
+        Mini Player
+      </div>
+      <div
+        style={{
+          opacity: "var(--drawer-snap-progress, 0)",
+          pointerEvents: snapProgress < 0.3 ? "none" : "auto",
+        }}
+      >
+        Full Player
+      </div>
+    </DrawerContent>
   )}
 </Drawer>
 ```
+
+#### Render Prop Values
 
 | Value             | Description                                                  |
 | ----------------- | ------------------------------------------------------------ |
@@ -336,43 +378,3 @@ Use the render prop pattern to access animation values in JavaScript:
 | `dragProgress`    | Progress toward closed (0 = open, 1 = closed)                |
 | `isDragging`      | Whether currently being dragged/scrolled                     |
 | `activeSnapPoint` | Current active snap point value                              |
-
-#### Option 2: CSS Custom Property (Progressive Enhancement)
-
-For browsers that support scroll-driven animations (Chrome 115+), the drawer exposes a `--drawer-snap-progress` CSS custom property that animates from 0 to 1 based on scroll position. This is more performant as it's GPU-accelerated and doesn't cause React re-renders.
-
-Use Tailwind's arbitrary value syntax to apply the CSS variable directly in your className:
-
-```tsx
-<Drawer snapPoints={["92px", 1]}>
-  <DrawerTrigger>Open</DrawerTrigger>
-  <DrawerContent>
-    {/* Mini player fades out as drawer expands */}
-    <div className="opacity-[calc(1-var(--drawer-snap-progress,0))]">
-      Mini Player
-    </div>
-    {/* Full player fades in as drawer expands */}
-    <div className="opacity-[var(--drawer-snap-progress,0)]">Full Player</div>
-  </DrawerContent>
-</Drawer>
-```
-
-The `0` fallback ensures non-supporting browsers show the initial state. Combine with the render prop for full browser support:
-
-```tsx
-<Drawer snapPoints={["92px", 1]}>
-  {({ snapProgress }) => (
-    <DrawerContent>
-      {/* CSS variable for Chrome 115+, inline style fallback for others */}
-      <div
-        className="opacity-[calc(1-var(--drawer-snap-progress,0))]"
-        style={{ opacity: 1 - snapProgress }}
-      >
-        Mini Player
-      </div>
-    </DrawerContent>
-  )}
-</Drawer>
-```
-
-In browsers that support scroll-driven animations, the CSS variable updates in real-time and takes precedence. In other browsers, the inline style provides the fallback behavior.

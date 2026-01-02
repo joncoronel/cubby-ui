@@ -53,6 +53,72 @@
   }
 }
 
+/* -------------------------------------------------------------------------------------------------
+ * CSS-Based Snap Target Positioning
+ * Snap targets use CSS custom properties for positioning instead of JavaScript calculations
+ *
+ * Required CSS variables (set on track element):
+ * --content-size: drawer content size in pixels
+ * --dismiss-buffer: dismiss buffer in pixels (30% of content when dismissible, 0 otherwise)
+ *
+ * Required CSS variables (set on each snap target):
+ * --snap-ratio: 0-1 value representing how much of drawer is visible
+ * -------------------------------------------------------------------------------------------------*/
+
+/**
+ * Non-inverted directions (bottom/right):
+ * - Scroll from 0 (closed) to max (fully open)
+ * - Dismiss at position 0
+ * - Snap position = dismissBuffer + ratio * contentSize
+ *
+ * Inverted directions (top/left):
+ * - Scroll from max (closed) to 0 (fully open)
+ * - Dismiss at position maxScroll
+ * - Snap position = contentSize * (1 - ratio)
+ */
+
+/* Bottom drawer (non-inverted): position from top */
+[data-direction="bottom"] [data-slot="drawer-snap-target"]:not([data-snap-type="dismiss"]) {
+  top: calc(var(--dismiss-buffer, 0px) + var(--snap-ratio, 1) * var(--content-size, 0px));
+}
+
+/* Top drawer (inverted): position from top, inverted formula */
+[data-direction="top"] [data-slot="drawer-snap-target"]:not([data-snap-type="dismiss"]) {
+  top: calc(var(--content-size, 0px) * (1 - var(--snap-ratio, 1)));
+}
+
+/* Right drawer (non-inverted): position from left */
+[data-direction="right"] [data-slot="drawer-snap-target"]:not([data-snap-type="dismiss"]) {
+  left: calc(var(--dismiss-buffer, 0px) + var(--snap-ratio, 1) * var(--content-size, 0px));
+}
+
+/* Left drawer (inverted): position from left, inverted formula */
+[data-direction="left"] [data-slot="drawer-snap-target"]:not([data-snap-type="dismiss"]) {
+  left: calc(var(--content-size, 0px) * (1 - var(--snap-ratio, 1)));
+}
+
+/* Dismiss snap targets - positioned at scroll boundary */
+/* Non-inverted: position 0, Inverted: position = maxScroll = contentSize + dismissBuffer */
+[data-direction="bottom"] [data-slot="drawer-snap-target"][data-snap-type="dismiss"] {
+  top: 0;
+}
+
+[data-direction="right"] [data-slot="drawer-snap-target"][data-snap-type="dismiss"] {
+  left: 0;
+}
+
+[data-direction="top"] [data-slot="drawer-snap-target"][data-snap-type="dismiss"] {
+  top: calc(var(--content-size, 0px) + var(--dismiss-buffer, 0px));
+}
+
+[data-direction="left"] [data-slot="drawer-snap-target"][data-snap-type="dismiss"] {
+  left: calc(var(--content-size, 0px) + var(--dismiss-buffer, 0px));
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Direction-Specific Overrides
+ * -------------------------------------------------------------------------------------------------*/
+
 html:has([data-slot="drawer-viewport"][data-direction="left"]),
 html:has([data-slot="drawer-viewport"][data-direction="right"]) {
   overscroll-behavior: none;

@@ -32,8 +32,6 @@ export interface ScrollGeometry {
   trackSize: number;
   /** Buffer space for dismiss gesture */
   dismissBuffer: number;
-  /** Range of visible drawer positions */
-  visibleRange: number;
   /** Maximum scroll position */
   maxScroll: number;
   /** Whether scroll direction is inverted (top/left) */
@@ -80,6 +78,22 @@ export const supportsScrollState =
 export function parsePixelValue(value: string): number | null {
   const match = value.match(/^(\d+(?:\.\d+)?)px$/);
   return match ? parseFloat(match[1]) : null;
+}
+
+/**
+ * Convert a snap point to a ratio (0-1).
+ * For percentage snap points, returns the value directly.
+ * For pixel snap points, divides by contentSize.
+ */
+export function snapPointToRatio(
+  snapPoint: SnapPoint,
+  contentSize: number,
+): number {
+  if (typeof snapPoint === "number") {
+    return snapPoint;
+  }
+  const pixels = parsePixelValue(snapPoint);
+  return pixels != null ? pixels / contentSize : 1;
 }
 
 /**
@@ -149,16 +163,14 @@ export function calculateScrollGeometry(
   dismissible: boolean,
   isInverted: boolean,
 ): ScrollGeometry {
-  const effectiveSize = contentSize || viewportSize * 0.9;
-  const dismissBuffer = dismissible ? effectiveSize * 0.3 : 0;
-  const trackSize = viewportSize + effectiveSize + dismissBuffer;
+  // Caller is responsible for ensuring contentSize is valid (> 0)
+  const dismissBuffer = dismissible ? contentSize * 0.3 : 0;
+  const trackSize = viewportSize + contentSize + dismissBuffer;
   const maxScroll = trackSize - viewportSize;
-  const visibleRange = maxScroll - dismissBuffer;
 
   return {
     trackSize,
     dismissBuffer,
-    visibleRange,
     maxScroll,
     isInverted,
   };
@@ -175,7 +187,7 @@ export function calculateSnapScrollPositions(
   dismissible: boolean,
   contentSize: number,
 ): number[] {
-  const { maxScroll, visibleRange, dismissBuffer, isInverted } = geometry;
+  const { maxScroll, dismissBuffer, isInverted } = geometry;
   const positions: number[] = [];
 
   // Add dismiss position first if dismissible
@@ -184,6 +196,7 @@ export function calculateSnapScrollPositions(
   }
 
   // Calculate positions for each snap point
+  // Note: contentSize here is effectiveSize (with fallback applied)
   for (const snapPoint of snapPoints) {
     const visibleRatio =
       typeof snapPoint === "string"
@@ -191,9 +204,11 @@ export function calculateSnapScrollPositions(
         : snapPoint;
 
     // Calculate scroll position based on direction
+    // Formula: dismissBuffer + visibleRatio * contentSize (non-inverted)
+    // Or: maxScroll - dismissBuffer - visibleRatio * contentSize (inverted)
     const scrollPos = isInverted
-      ? maxScroll - dismissBuffer - visibleRatio * visibleRange
-      : dismissBuffer + visibleRatio * visibleRange;
+      ? maxScroll - dismissBuffer - visibleRatio * contentSize
+      : dismissBuffer + visibleRatio * contentSize;
 
     positions.push(Math.min(maxScroll, Math.max(0, scrollPos)));
   }
@@ -208,17 +223,18 @@ export function calculateSnapScrollPositions(
 export function calculateScrollProgress(
   scrollPos: number,
   geometry: ScrollGeometry,
+  contentSize: number,
 ): number {
-  const { maxScroll, visibleRange, dismissBuffer, isInverted } = geometry;
+  const { dismissBuffer, isInverted } = geometry;
 
   let progress: number;
   if (isInverted) {
-    // Top/Left: maxScroll = closed (1), 0 = open (0)
-    const openScrollPos = maxScroll - dismissBuffer - visibleRange;
-    progress = (scrollPos - openScrollPos) / visibleRange;
+    // Top/Left: scroll 0 = open (0), maxScroll = closed (1)
+    // openScrollPos simplifies to 0 (maxScroll - dismissBuffer - contentSize = 0)
+    progress = scrollPos / contentSize;
   } else {
     // Bottom/Right: 0 = closed (1), maxScroll = open (0)
-    progress = 1 - (scrollPos - dismissBuffer) / visibleRange;
+    progress = 1 - (scrollPos - dismissBuffer) / contentSize;
   }
 
   return Math.min(1, Math.max(0, progress));

@@ -50,7 +50,8 @@ function TabsList({
         size === "small" && "data-[orientation=horizontal]:gap-x-0.5",
         size === "medium" && "data-[orientation=horizontal]:gap-x-1",
         variant === "capsule" && "bg-muted rounded-xl",
-        variant === "underline" && "data-[orientation=vertical]:py-0",
+        variant === "underline" &&
+          "data-[orientation=horizontal]:px-0 data-[orientation=horizontal]:pt-0 data-[orientation=vertical]:py-0",
         variant === "underline" &&
           side === "left" &&
           "data-[orientation=vertical]:**:data-[slot=tabs-trigger]:justify-end",
@@ -65,12 +66,16 @@ function TabsList({
       <div
         data-slot="tabs-divider"
         className={cn(
-          "bg-muted absolute top-0 bottom-0 w-[2px] rounded-full",
-          variant === "underline"
-            ? "hidden group-data-[orientation=vertical]/tabs-list:block"
-            : "hidden",
-          side === "left" && "right-0",
-          side === "right" && "left-0",
+          "bg-accent absolute rounded-full",
+          variant === "underline" ? "block" : "hidden",
+          // Vertical orientation - translated inward so indicator overlaps on both sides
+          "group-data-[orientation=vertical]/tabs-list:top-0 group-data-[orientation=vertical]/tabs-list:bottom-0 group-data-[orientation=vertical]/tabs-list:w-[2px]",
+          side === "left" &&
+            "group-data-[orientation=vertical]/tabs-list:right-0 group-data-[orientation=vertical]/tabs-list:-translate-x-[0.5px]",
+          side === "right" &&
+            "group-data-[orientation=vertical]/tabs-list:left-0 group-data-[orientation=vertical]/tabs-list:translate-x-[0.5px]",
+          // Horizontal orientation - translated inward so indicator overlaps on both sides
+          "group-data-[orientation=horizontal]/tabs-list:bottom-0 group-data-[orientation=horizontal]/tabs-list:right-0 group-data-[orientation=horizontal]/tabs-list:left-0 group-data-[orientation=horizontal]/tabs-list:h-[2px] group-data-[orientation=horizontal]/tabs-list:-translate-y-[0.5px]",
         )}
         aria-hidden="true"
       />
@@ -119,10 +124,12 @@ function TabIndicator({
         // Underline variant
         variant === "underline" && [
           "bg-neutral rounded-full",
-          "data-[orientation=vertical]:w-[2px]",
+          // Vertical: flush against edge, no translation
+          "data-[orientation=vertical]:w-0.75",
           side === "left" && "data-[orientation=vertical]:right-0",
           side === "right" && "data-[orientation=vertical]:left-0",
-          "data-[orientation=horizontal]:top-full data-[orientation=horizontal]:h-px",
+          // Horizontal: flush at bottom, reset translation from base
+          "data-[orientation=horizontal]:bottom-0 data-[orientation=horizontal]:top-auto data-[orientation=horizontal]:h-0.75 data-[orientation=horizontal]:translate-y-0",
         ],
         // Capsule variant
         variant === "capsule" && [

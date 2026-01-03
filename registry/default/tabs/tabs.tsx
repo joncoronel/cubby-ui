@@ -44,14 +44,19 @@ function TabsList({
       data-side={side}
       className={cn(
         "group/tabs-list text-muted-foreground relative inline-flex w-fit items-center justify-center gap-1",
-        "data-[size=medium]:p-1 data-[size=small]:p-0.5",
+        size === "small" && "p-0.5",
+        size === "medium" && "p-1",
         "data-[orientation=vertical]:flex-col data-[orientation=vertical]:self-start",
-        // box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.02) inset, 0px 0.75px 0.75px 0px rgba(0, 0, 0, 0.02) inset, 0px 0.25px 0.25px 0px rgba(0, 0, 0, 0.04) inset;
-        "data-[orientation=horizontal]:data-[size=medium]:gap-x-1 data-[orientation=horizontal]:data-[size=small]:gap-x-0.5",
-        "data-[variant=capsule]:bg-muted data-[variant=capsule]:rounded-xl",
-        "data-[variant=underline]:data-[orientation=vertical]:py-0",
-        "data-[variant=underline]:data-[orientation=vertical]:data-[side=left]:[&_[data-slot=tabs-trigger]]:justify-end",
-        "data-[variant=underline]:data-[orientation=vertical]:data-[side=right]:[&_[data-slot=tabs-trigger]]:justify-start",
+        size === "small" && "data-[orientation=horizontal]:gap-x-0.5",
+        size === "medium" && "data-[orientation=horizontal]:gap-x-1",
+        variant === "capsule" && "bg-muted rounded-xl",
+        variant === "underline" && "data-[orientation=vertical]:py-0",
+        variant === "underline" &&
+          side === "left" &&
+          "data-[orientation=vertical]:**:data-[slot=tabs-trigger]:justify-end",
+        variant === "underline" &&
+          side === "right" &&
+          "data-[orientation=vertical]:**:data-[slot=tabs-trigger]:justify-start",
         className,
       )}
       {...props}
@@ -59,7 +64,14 @@ function TabsList({
       {children}
       <div
         data-slot="tabs-divider"
-        className="bg-muted absolute top-0 bottom-0 hidden w-[2px] rounded-full group-data-[side=left]/tabs-list:right-0 group-data-[side=right]/tabs-list:left-0 group-data-[variant=underline]/tabs-list:group-data-[orientation=vertical]/tabs-list:block"
+        className={cn(
+          "bg-muted absolute top-0 bottom-0 w-[2px] rounded-full",
+          variant === "underline"
+            ? "hidden group-data-[orientation=vertical]/tabs-list:block"
+            : "hidden",
+          side === "left" && "right-0",
+          side === "right" && "left-0",
+        )}
         aria-hidden="true"
       />
       <TabIndicator variant={variant} size={size} side={side} />
@@ -85,9 +97,9 @@ function TabsTrigger({ className, ...props }: BaseTabs.Tab.Props) {
 }
 
 function TabIndicator({
-  variant,
-  size,
-  side,
+  variant = "capsule",
+  size = "medium",
+  side = "left",
   className,
   ...props
 }: BaseTabs.Indicator.Props & {
@@ -98,23 +110,32 @@ function TabIndicator({
   return (
     <BaseTabs.Indicator
       data-slot="tab-indicator"
-      data-variant={variant}
-      data-size={size}
-      data-side={side}
       className={cn(
         "ease-out-cubic absolute transition-all duration-200",
-        "data-[orientation=vertical]:top-0 data-[orientation=vertical]:h-[var(--active-tab-height)] data-[orientation=vertical]:translate-y-[var(--active-tab-top)]",
-        "data-[orientation=horizontal]:left-0 data-[orientation=horizontal]:w-[var(--active-tab-width)] data-[orientation=horizontal]:translate-x-[var(--active-tab-left)] data-[orientation=horizontal]:-translate-y-1/2",
+        // Vertical orientation (Base UI provides data-orientation)
+        "data-[orientation=vertical]:top-0 data-[orientation=vertical]:h-(--active-tab-height) data-[orientation=vertical]:translate-y-(--active-tab-top)",
+        // Horizontal orientation
+        "data-[orientation=horizontal]:left-0 data-[orientation=horizontal]:w-(--active-tab-width) data-[orientation=horizontal]:translate-x-(--active-tab-left) data-[orientation=horizontal]:-translate-y-1/2",
         // Underline variant
-        "data-[variant=underline]:data-[orientation=vertical]:bg-neutral data-[variant=underline]:data-[orientation=vertical]:w-[2px] data-[variant=underline]:data-[orientation=vertical]:rounded-full",
-        "data-[variant=underline]:data-[orientation=vertical]:data-[side=left]:right-0 data-[variant=underline]:data-[orientation=vertical]:data-[side=right]:left-0",
-        "data-[variant=underline]:data-[orientation=horizontal]:bg-neutral data-[variant=underline]:data-[orientation=horizontal]:top-full data-[variant=underline]:data-[orientation=horizontal]:h-px data-[variant=underline]:data-[orientation=horizontal]:rounded-full",
+        variant === "underline" && [
+          "bg-neutral rounded-full",
+          "data-[orientation=vertical]:w-[2px]",
+          side === "left" && "data-[orientation=vertical]:right-0",
+          side === "right" && "data-[orientation=vertical]:left-0",
+          "data-[orientation=horizontal]:top-full data-[orientation=horizontal]:h-px",
+        ],
         // Capsule variant
-        "data-[variant=capsule]:data-[orientation=vertical]:bg-card data-[variant=capsule]:data-[orientation=vertical]:dark:bg-accent data-[variant=capsule]:data-[orientation=vertical]:ring-border/25 data-[variant=capsule]:data-[orientation=vertical]:dark:ring-border data-[variant=capsule]:data-[orientation=vertical]:w-auto data-[variant=capsule]:data-[orientation=vertical]:shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.06)] data-[variant=capsule]:data-[orientation=vertical]:ring-1",
-        "data-[variant=capsule]:data-[orientation=vertical]:data-[size=small]:right-0.5 data-[variant=capsule]:data-[orientation=vertical]:data-[size=small]:left-0.5",
-        "data-[variant=capsule]:data-[orientation=vertical]:data-[size=medium]:right-1 data-[variant=capsule]:data-[orientation=vertical]:data-[size=medium]:left-1",
-        "data-[variant=capsule]:data-[orientation=horizontal]:bg-card data-[variant=capsule]:data-[orientation=horizontal]:dark:bg-accent data-[variant=capsule]:data-[orientation=horizontal]:ring-border/25 data-[variant=capsule]:data-[orientation=horizontal]:dark:ring-border data-[variant=capsule]:data-[orientation=horizontal]:top-1/2 data-[variant=capsule]:data-[orientation=horizontal]:h-[var(--active-tab-height)] data-[variant=capsule]:data-[orientation=horizontal]:shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.06)] data-[variant=capsule]:data-[orientation=horizontal]:ring-0",
-        "data-[variant=capsule]:rounded-sm data-[variant=capsule]:data-[size=medium]:rounded-md",
+        variant === "capsule" && [
+          "bg-card dark:bg-accent border-border/50 dark:border-border border bg-clip-padding shadow-[0_1px_2px_0_oklch(0.18_0_0/0.06)]",
+          size === "small" && "rounded-sm",
+          size === "medium" && "rounded-md",
+          // Vertical: full width with inset, ring visible
+          "data-[orientation=vertical]:w-auto",
+          size === "small" && "data-[orientation=vertical]:inset-x-0.5",
+          size === "medium" && "data-[orientation=vertical]:inset-x-1",
+          // Horizontal: height matches tab, no ring
+          "data-[orientation=horizontal]:top-1/2 data-[orientation=horizontal]:h-(--active-tab-height)",
+        ],
         className,
       )}
       {...props}

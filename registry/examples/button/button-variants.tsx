@@ -3,7 +3,7 @@ import { Button } from "@/registry/default/button/button";
 export default function ButtonVariants() {
   return (
     <div className="flex flex-wrap gap-2">
-      <Button>Default</Button>
+      <Button>Primary</Button>
       <Button variant="neutral">Neutral</Button>
       <Button variant="secondary">Secondary</Button>
       <Button variant="outline">Outline</Button>

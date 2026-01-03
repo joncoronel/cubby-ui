@@ -97,7 +97,7 @@ function SelectTrigger({
       className={cn(
         // Outline button style
         "group/select-trigger relative inline-flex w-fit items-center justify-between gap-2.5 rounded-lg",
-        "bg-card dark:bg-input/35 border",
+        "bg-card dark:bg-input/35 border-border/50 dark:border-border border bg-clip-padding shadow-xs",
         // Focus and hover states (outline button style)
         "hover:bg-accent/50 dark:hover:bg-input/50 hover:text-accent-foreground data-placeholder:text-muted-foreground",
         "focus-visible:outline-ring/50 ease-out-cubic outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",

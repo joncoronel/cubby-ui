@@ -6,7 +6,7 @@ import { Button as BaseButton } from "@base-ui/react/button";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center cursor-pointer justify-center whitespace-nowrap rounded-lg text-sm font-medium  data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,scale,opacity] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 aria-invalid:ring-destructive/30 aria-invalid:border-destructive active:shadow-none  ",
+  "inline-flex items-center cursor-pointer justify-center whitespace-nowrap rounded-lg text-sm font-medium  data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,scale,opacity,shadow] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 aria-invalid:ring-destructive/30 aria-invalid:border-destructive active:shadow-none  ",
   {
     variants: {
       variant: {
@@ -15,7 +15,7 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-destructive-foreground  hover:bg-destructive/90  border border-black/5 dark:border-white/5",
         outline:
-          "border bg-card dark:bg-input/35  hover:bg-accent/50 dark:hover:bg-input/50 hover:text-accent-foreground",
+          "border bg-clip-padding bg-card dark:bg-input/35  hover:bg-accent/50 dark:hover:bg-input/60 hover:text-accent-foreground shadow-xs",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-transparent ",
         ghost:

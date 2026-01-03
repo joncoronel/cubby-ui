@@ -44,7 +44,7 @@ html {
   --accent-foreground: light-dark(oklch(0.22 0 0), oklch(0.95 0 0));
   --destructive: light-dark(oklch(0.53 0.19 25), oklch(0.5 0.22 25));
   --destructive-foreground: light-dark(oklch(0.98 0 0), oklch(1 0 0));
-  --border: light-dark(oklch(0 0 0 / 8%), oklch(1 0 0 / 5%));
+  --border: light-dark(oklch(0 0 0 / 8%), oklch(1 0 0 / 10%));
   --input: light-dark(oklch(0.95 0 0), oklch(1 0 0 / 15%));
   --ring: oklch(0.55 0.2 250);
   --scrollbar: light-dark(oklch(0.87 0 0), oklch(0.7 0 0));

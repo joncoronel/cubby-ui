@@ -2,7 +2,7 @@ import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 
 export default function ScrollAreaBothScrollbars() {
   return (
-    <div className="bg-muted/30 h-72 w-72 rounded-md border">
+    <div className="bg-muted/30 h-72 w-72 overflow-clip rounded-md border">
       <ScrollArea>
         <div className="grid grid-cols-[repeat(8,5rem)] grid-rows-[repeat(8,5rem)] gap-2 p-3">
           {Array.from({ length: 64 }, (_, i) => (

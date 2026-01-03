@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-// import * as ComboboxPrimitive from "@base-ui/react/combobox";
 import { cn } from "@/lib/utils";
 import { X, CheckIcon, ChevronDown } from "lucide-react";
 import { Label } from "@/registry/default/label/label";
@@ -46,7 +45,7 @@ function ComboboxInput({
       id={id}
       data-slot="combobox-input"
       className={cn(
-        "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground bg-input dark:bg-input/30 border-border py- flex h-10 w-full min-w-0 rounded-lg border px-3 text-base font-normal shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.03)] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 sm:h-9 md:text-sm",
+        "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground bg-input dark:bg-input/30 border-border py- flex h-10 w-full min-w-0 rounded-lg border bg-clip-padding px-3 text-base font-normal shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.03)] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 sm:h-9 md:text-sm",
         "file:text-foreground file:inline-flex file:h-7 file:rounded-md file:border-0 file:bg-transparent file:text-sm file:font-medium",
         "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
         className,
@@ -191,7 +190,7 @@ function ComboboxPopupPrimitive({
     <BaseCombobox.Popup
       data-slot="combobox-popup"
       className={cn(
-        "bg-popover text-popover-foreground outline-border/70 ring-border/50 dark:ring-border ease-out-cubic flex max-h-[var(--available-height)] w-[var(--anchor-width)] max-w-[var(--available-width)] origin-[var(--transform-origin)] flex-col overflow-clip overscroll-contain rounded-xl shadow-[0_8px_20px_0_oklch(0.18_0_0_/_0.10)] ring-1 transition-[transform,scale,opacity] duration-100 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
+        "bg-popover text-popover-foreground ring-border/50 dark:ring-border ease-out-cubic flex max-h-[var(--available-height)] w-[var(--anchor-width)] max-w-[var(--available-width)] origin-[var(--transform-origin)] flex-col overflow-clip overscroll-contain rounded-xl shadow-[0_8px_20px_0_oklch(0.18_0_0_/_0.10)] ring-1 transition-[transform,scale,opacity] duration-100 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
         className,
       )}
       {...props}
@@ -380,7 +379,7 @@ function ComboboxChips({ className, ...props }: BaseCombobox.Chips.Props) {
       ref={context?.chipsRef}
       data-slot="combobox-chips"
       className={cn(
-        "bg-input dark:bg-input/30 flex min-h-9 w-full flex-wrap items-center gap-1.5 rounded-lg border px-1.5 py-1.5 shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.03)]",
+        "bg-input dark:bg-input/30 flex min-h-9 w-full flex-wrap items-center gap-1.5 rounded-lg border bg-clip-padding px-1.5 py-1.5 shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.03)]",
         "focus-within:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-within:outline-2 focus-within:outline-offset-2",
 
         className,
@@ -395,7 +394,7 @@ function ComboboxChip({ className, ...props }: BaseCombobox.Chip.Props) {
     <BaseCombobox.Chip
       data-slot="combobox-chip"
       className={cn(
-        "bg-accent text-accent-foreground flex items-center gap-1 rounded-sm border px-[calc(--spacing(2)-1px)] py-[calc(--spacing(1)-1px)] text-sm font-medium break-all sm:text-xs",
+        "bg-accent text-accent-foreground dark:border-border/50 flex items-center gap-1 rounded-sm border px-[calc(--spacing(2)-1px)] py-[calc(--spacing(1)-1px)] text-sm font-medium break-all sm:text-xs",
         className,
       )}
       {...props}

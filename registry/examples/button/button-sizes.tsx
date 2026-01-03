@@ -5,22 +5,28 @@ export default function ButtonSizes() {
   return (
     <div className="flex flex-col flex-wrap gap-2">
       <div className="flex flex-wrap items-end gap-2">
-        <Button size="xs">Label</Button>
-        <Button size="sm">Label</Button>
-        <Button>Label</Button>
-        <Button size="lg">Label</Button>
+        <Button variant="neutral" size="xs">
+          Label
+        </Button>
+        <Button variant="neutral" size="sm">
+          Label
+        </Button>
+        <Button variant="neutral">Label</Button>
+        <Button variant="neutral" size="lg">
+          Label
+        </Button>
       </div>
       <div className="flex flex-wrap items-end gap-2">
-        <Button size="icon_xs">
+        <Button variant="neutral" size="icon_xs">
           <Settings />
         </Button>
-        <Button size="icon_sm">
+        <Button variant="neutral" size="icon_sm">
           <Settings />
         </Button>
-        <Button size="icon">
+        <Button variant="neutral" size="icon">
           <Settings />
         </Button>
-        <Button size="icon_lg">
+        <Button variant="neutral" size="icon_lg">
           <Settings />
         </Button>
       </div>

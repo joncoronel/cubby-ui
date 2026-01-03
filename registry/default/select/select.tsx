@@ -168,10 +168,10 @@ function SelectContent({
             // Combobox-style popup
             "bg-popover text-popover-foreground border-border/50 dark:border-border data-[side=none]:ring-border/50 data-[side=none]:dark:ring-border relative flex flex-col overflow-clip rounded-xl border bg-clip-padding data-[side=none]:border-none data-[side=none]:ring-1",
             // Size constraints
-            "max-w-[var(--available-width)]",
-            "min-w-[var(--anchor-width)]",
+            "max-w-(--available-width)",
+            "min-w-(--anchor-width)",
             // when data side does not equal none
-            "max-h-[var(--available-height)]",
+            "not-data-[side=none]:max-h-(--available-height)",
             // Shadow
             "shadow-[0_8px_20px_0_oklch(0.18_0_0_/_0.10)]",
             // Animation

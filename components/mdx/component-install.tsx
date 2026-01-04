@@ -7,7 +7,6 @@ import {
   TabsList,
   TabsTrigger,
   TabsContent,
-  TabsPanels,
 } from "@/registry/default/tabs/tabs";
 import {
   CodeBlock,
@@ -83,121 +82,119 @@ export function ComponentInstall({
           <TabsTrigger value="cli">CLI</TabsTrigger>
           <TabsTrigger value="manual">Manual</TabsTrigger>
         </TabsList>
-        <TabsPanels>
-          <TabsContent value="cli">
-            <CodeBlock
-              code={getCliCommand(cliPackageManager)}
-              language="bash"
-              initial={
-                highlightedCliCommands?.[
-                  cliPackageManager as keyof typeof highlightedCliCommands
-                ]
-              }
-            >
-              <CodeBlockHeader
-                tabs={[
-                  { value: "npm", label: "npm" },
-                  { value: "pnpm", label: "pnpm" },
-                  { value: "yarn", label: "yarn" },
-                  { value: "bun", label: "bun" },
-                ]}
-                activeTab={cliPackageManager}
-                onTabChange={(value) => setCliPackageManager(value as string)}
-              />
-              <CodeBlockPre>
-                <CodeBlockCode />
-              </CodeBlockPre>
-            </CodeBlock>
-          </TabsContent>
-          <TabsContent value="manual">
-            <div className="space-y-4">
-              {highlightedInstallCommands && (
-                <div>
-                  <p className="mb-2 text-sm font-medium">
-                    Install dependencies:
-                  </p>
-                  <CodeBlock
-                    code={getInstallCommand(manualPackageManager)}
-                    language="bash"
-                    initial={
-                      highlightedInstallCommands[
-                        manualPackageManager as keyof typeof highlightedInstallCommands
-                      ]
+        <TabsContent value="cli">
+          <CodeBlock
+            code={getCliCommand(cliPackageManager)}
+            language="bash"
+            initial={
+              highlightedCliCommands?.[
+                cliPackageManager as keyof typeof highlightedCliCommands
+              ]
+            }
+          >
+            <CodeBlockHeader
+              tabs={[
+                { value: "npm", label: "npm" },
+                { value: "pnpm", label: "pnpm" },
+                { value: "yarn", label: "yarn" },
+                { value: "bun", label: "bun" },
+              ]}
+              activeTab={cliPackageManager}
+              onTabChange={(value) => setCliPackageManager(value as string)}
+            />
+            <CodeBlockPre>
+              <CodeBlockCode />
+            </CodeBlockPre>
+          </CodeBlock>
+        </TabsContent>
+        <TabsContent value="manual">
+          <div className="space-y-4">
+            {highlightedInstallCommands && (
+              <div>
+                <p className="mb-2 text-sm font-medium">
+                  Install dependencies:
+                </p>
+                <CodeBlock
+                  code={getInstallCommand(manualPackageManager)}
+                  language="bash"
+                  initial={
+                    highlightedInstallCommands[
+                      manualPackageManager as keyof typeof highlightedInstallCommands
+                    ]
+                  }
+                >
+                  <CodeBlockHeader
+                    tabs={[
+                      { value: "npm", label: "npm" },
+                      { value: "pnpm", label: "pnpm" },
+                      { value: "yarn", label: "yarn" },
+                      { value: "bun", label: "bun" },
+                    ]}
+                    activeTab={manualPackageManager}
+                    onTabChange={(value) =>
+                      setManualPackageManager(value as string)
                     }
+                  />
+                  <CodeBlockPre>
+                    <CodeBlockCode />
+                  </CodeBlockPre>
+                </CodeBlock>
+              </div>
+            )}
+            {componentFiles && componentFiles.length > 0 && (
+              <div>
+                <p className="mb-2 text-sm font-medium">
+                  Copy and paste the component files:
+                </p>
+                {componentFiles.length === 1 ? (
+                  // Single file: no tabs needed
+                  <CodeBlock
+                    code={componentFiles[0].content}
+                    language="tsx"
+                    initial={componentFiles[0].highlighted}
+                    floatingCopy
                   >
-                    <CodeBlockHeader
-                      tabs={[
-                        { value: "npm", label: "npm" },
-                        { value: "pnpm", label: "pnpm" },
-                        { value: "yarn", label: "yarn" },
-                        { value: "bun", label: "bun" },
-                      ]}
-                      activeTab={manualPackageManager}
-                      onTabChange={(value) =>
-                        setManualPackageManager(value as string)
-                      }
-                    />
                     <CodeBlockPre>
                       <CodeBlockCode />
                     </CodeBlockPre>
                   </CodeBlock>
-                </div>
-              )}
-              {componentFiles && componentFiles.length > 0 && (
-                <div>
-                  <p className="mb-2 text-sm font-medium">
-                    Copy and paste the component files:
-                  </p>
-                  {componentFiles.length === 1 ? (
-                    // Single file: no tabs needed
-                    <CodeBlock
-                      code={componentFiles[0].content}
-                      language="tsx"
-                      initial={componentFiles[0].highlighted}
-                      floatingCopy
-                    >
-                      <CodeBlockPre>
-                        <CodeBlockCode />
-                      </CodeBlockPre>
-                    </CodeBlock>
-                  ) : (
-                    // Multiple files: use tabs
-                    (() => {
-                      const activeFile =
-                        componentFiles.find(
-                          (f) => f.relativePath === activeFileTab,
-                        ) || componentFiles[0];
+                ) : (
+                  // Multiple files: use tabs
+                  (() => {
+                    const activeFile =
+                      componentFiles.find(
+                        (f) => f.relativePath === activeFileTab,
+                      ) || componentFiles[0];
 
-                      return (
-                        <CodeBlock
-                          code={activeFile.content}
-                          language="tsx"
-                          initial={activeFile.highlighted}
-                          floatingCopy
-                        >
-                          <CodeBlockHeader
-                            tabs={componentFiles.map((f) => ({
-                              value: f.relativePath,
-                              label: f.relativePath,
-                            }))}
-                            activeTab={activeFileTab}
-                            onTabChange={(value) =>
-                              setActiveFileTab(value as string)
-                            }
-                            showCopy={false}
-                          />
-                          <CodeBlockPre>
-                            <CodeBlockCode />
-                          </CodeBlockPre>
-                        </CodeBlock>
-                      );
-                    })()
-                  )}
-                </div>
-              )}
-            </div>
-          </TabsContent>
-        </TabsPanels>
+                    return (
+                      <CodeBlock
+                        code={activeFile.content}
+                        language="tsx"
+                        initial={activeFile.highlighted}
+                        floatingCopy
+                      >
+                        <CodeBlockHeader
+                          tabs={componentFiles.map((f) => ({
+                            value: f.relativePath,
+                            label: f.relativePath,
+                          }))}
+                          activeTab={activeFileTab}
+                          onTabChange={(value) =>
+                            setActiveFileTab(value as string)
+                          }
+                          showCopy={false}
+                        />
+                        <CodeBlockPre>
+                          <CodeBlockCode />
+                        </CodeBlockPre>
+                      </CodeBlock>
+                    );
+                  })()
+                )}
+              </div>
+            )}
+          </div>
+        </TabsContent>
       </Tabs>
     </div>
   );

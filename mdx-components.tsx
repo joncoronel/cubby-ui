@@ -12,7 +12,6 @@ import {
   TabsList,
   TabsTrigger,
   TabsContent,
-  TabsPanels,
 } from "@/registry/default/tabs/tabs";
 
 export function getMDXComponents(
@@ -26,7 +25,6 @@ export function getMDXComponents(
     TabsList,
     TabsTrigger,
     TabsContent,
-    TabsPanels,
     ComponentPreview: ComponentPreviewServer,
     ComponentCode: ComponentCodeServer,
     ComponentInstall: ComponentInstallServer,

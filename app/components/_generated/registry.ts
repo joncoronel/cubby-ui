@@ -1026,7 +1026,9 @@ export const componentMetadata = {
     "description": "A tabs component.",
     "category": "UI",
     "registryDependencies": [],
-    "dependencies": [],
+    "dependencies": [
+      "class-variance-authority"
+    ],
     "examples": {},
     "reference": []
   },

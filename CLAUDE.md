@@ -1,361 +1,204 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to AI coding agents (OpenCode, Claude Code, etc.) when working with code in this repository.
 
 ## Project Overview
 
-This is **Cubby UI**, a comprehensive UI component library built with Next.js 15, React 19, and modern web technologies. It serves as both a component showcase and a reusable component registry system.
+**Cubby UI** - A component library built with Next.js 15, React 19, Tailwind CSS 4, and Base UI. Uses pnpm as package manager.
 
 ## Build Commands
 
-- `pnpm run dev` - Start development server with Turbo (when running it, do it with a timeout)
-- `pnpm run build` - Build the project (includes registry sync)
-- `pnpm run start` - Start production server
-- `pnpm run lint` - Run ESLint
-- `pnpm run registry:sync` - Sync component registry (auto-runs before build)
+```bash
+pnpm run dev          # Start dev server (use timeout when running)
+pnpm run build        # Production build (includes registry sync)
+pnpm run lint         # Run ESLint
+pnpm run lint --fix   # Auto-fix lint issues
+pnpm run registry:sync # Sync component registry metadata
+```
 
-## Architecture Overview
+**No test framework configured** - This project does not currently have Jest/Vitest set up.
 
-### Component Registry System
+## Code Style Guidelines
 
-The project uses a sophisticated component registry system that auto-generates metadata and examples:
+### Formatting (Prettier)
 
-- **Registry Source**: `registry/default/` contains all UI components
-- **Registry Output**: `registry.json` is auto-generated from source components
-- **Unified Registry**: `app/components/_generated/registry.ts` provides TypeScript interfaces and component maps
-- **Sync Script**: `scripts/registry-sync.ts` handles automatic registry updates
+Prettier auto-formats code. Run before committing:
 
-### Directory Structure
+- Uses `prettier-plugin-tailwindcss` for class sorting
+- Let Prettier handle all formatting decisions
 
-- `registry/default/` - Source UI components (Button, Card, etc.)
-  - `registry/default/[component]/` - Individual component directories
-  - `registry/default/hooks/` - Shared React hooks (registered as `registry:hook`)
-  - `registry/default/lib/` - Shared utility functions (registered as `registry:lib`)
-- `registry/examples/` - Example implementations for each component
-- `content/docs/` - MDX documentation files (powered by Fumadocs)
-- `app/docs/` - Documentation pages and layouts
-- `components/mdx/` - MDX component wrappers for documentation
-- `components/` - Application-specific components (providers, theme)
-- `lib/` - Application utility functions
-- `hooks/` - Application React hooks
+### TypeScript
 
-### Key Technologies
+- **Strict mode enabled** - `tsconfig.json` has `"strict": true`
+- Use explicit types for function parameters and return values
+- Prefer `unknown` over `any` when type is genuinely unknown
+- Use `const` by default, `let` only when reassignment needed, never `var`
+- Use `ReactElement` instead of `JSX.Element` for better compatibility
 
-- **Next.js 15** with App Router and React 19
-- **Fumadocs** - Documentation framework with MDX support
-- **Tailwind CSS 4** for styling with CSS variables
-- **Base UI Components** and **React Aria Components** for accessibility
-- **Shiki** - Syntax highlighting (server-side and client-side)
-- **Jotai** for state management
-- **Recharts** for data visualization
-- **Embla Carousel** for carousel functionality
-- **next-themes** for dark/light mode
+### Imports
+
+Order imports as follows:
+
+1. `"use client"` or `"use server"` directive (if needed)
+2. React imports (`import * as React from "react"`)
+3. External dependencies
+4. Internal absolute imports (`@/...`)
+5. Relative imports (`./...`)
+
+```tsx
+"use client";
+
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+import { Button as BaseButton } from "@base-ui/react/button";
+import { cn } from "@/lib/utils";
+import { useLocalHook } from "./hooks/use-local-hook";
+```
+
+**Path aliases:**
+
+- `@/*` → project root
+- `@/registry/*` → `./registry/*`
+
+### Naming Conventions
+
+- **Files**: kebab-case (`button.tsx`, `use-fuzzy-filter.ts`)
+- **Components**: PascalCase (`Button`, `ComponentPreview`)
+- **Hooks**: camelCase with `use` prefix (`useFuzzyFilter`)
+- **Variables/functions**: camelCase (`buttonVariants`, `handleClick`)
+- **Constants**: SCREAMING_SNAKE_CASE for true constants (`DEFAULT_TIMEOUT`)
+- **Types/Interfaces**: PascalCase (`ButtonProps`, `ComponentMeta`)
 
 ### Component Structure
 
-Components follow a consistent pattern:
-
-- Main component file: `registry/default/[component]/[component].tsx`
-- Examples: `registry/examples/[component]/[component]-*.tsx`
-- Auto-generated imports and anatomy in unified registry
-
-#### Shared Hooks and Utilities
-
-Reusable code shared across multiple components lives in dedicated directories:
-
-- **Shared hooks**: `registry/default/hooks/` (e.g., `use-fuzzy-filter.ts`, `use-list-virtualizer.ts`)
-- **Shared utilities**: `registry/default/lib/` (e.g., `highlight-text.tsx`)
-
-These are registered as **standalone registry items** (`registry:hook` or `registry:lib`) with their own documentation pages:
-
-- **Hook docs**: `content/docs/hooks/` (e.g., `/docs/hooks/use-fuzzy-filter`)
-- **Utility docs**: `content/docs/utils/` (e.g., `/docs/utils/highlight-text`)
-
-**Important distinctions:**
-
-- `registry/default/hooks/` and `registry/default/lib/` → Shared registry items (installed via shadcn CLI)
-- `hooks/` and `lib/` (root level) → Application-specific code (not part of registry)
-- `registry/default/[component]/hooks/` → Component-specific hooks (bundled with component)
-
-**Usage pattern:**
-
-- Components do NOT re-export hooks/utils - they are standalone items
-- Examples import directly from the hook/util paths:
-
-  ```tsx
-  import { useFuzzyFilter } from "@/registry/default/hooks/use-fuzzy-filter";
-  import { highlightText } from "@/registry/default/lib/highlight-text";
-  ```
-
-- Component docs link to dedicated hook/util docs instead of duplicating documentation
-- Users install hooks/utils separately when needed via `npx shadcn@latest add @cubby-ui/use-fuzzy-filter`
-
-**Multi-file component structure (co-location):**
-
-Multi-file components (with internal hooks/lib directories) use **relative imports** for internal files. These components are installed as co-located directories:
-
-```text
-# Source structure
-registry/default/drawer/
-├── drawer.tsx
-├── drawer.css
-├── hooks/
-│   ├── use-scroll-snap.ts
-│   └── use-virtual-keyboard.ts
-└── lib/
-    └── drawer-utils.ts
-
-# Installed structure (via shadcn CLI)
-components/ui/cubby-ui/drawer/
-├── drawer.tsx
-├── drawer.css
-├── hooks/
-│   ├── use-scroll-snap.ts
-│   └── use-virtual-keyboard.ts
-└── lib/
-    └── drawer-utils.ts
-```
-
-**Import patterns:**
-
 ```tsx
-// ✅ Internal files use relative imports (no transformation needed)
-// In drawer.tsx:
-import { useScrollSnap } from "./hooks/use-scroll-snap";
-import { DIRECTION_CONFIG } from "./lib/drawer-utils";
+"use client";
 
-// In hooks/use-scroll-snap.ts:
-import type { DrawerDirection } from "../lib/drawer-utils";
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 
-// ✅ External dependencies use absolute paths (transformed by CLI)
-import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
-```
+// Variants defined with cva
+const buttonVariants = cva("base-classes", {
+  variants: {
+    /* ... */
+  },
+  defaultVariants: {
+    /* ... */
+  },
+});
 
-**Single-file components** remain flat files (e.g., `components/ui/cubby-ui/button.tsx`).
-
-**Shared registry items** (`registry/default/hooks/` and `registry/default/lib/`) are installed distributed:
-
-- `hooks/cubby-ui/use-fuzzy-filter.ts`
-- `lib/cubby-ui/highlight-text.tsx`
-
-#### Using Base UI's useRender and mergeProps
-
-When creating custom components that support polymorphic rendering (render prop pattern), **always** use Base UI's `useRender` and `mergeProps` utilities:
-
-```tsx
-import { mergeProps } from "@base-ui/react/merge-props";
-import { useRender } from "@base-ui/react/use-render";
-
-interface MyComponentProps extends useRender.ComponentProps<"button"> {
-  // Add your custom props here (NOT the render prop - it's included automatically)
-  variant?: "default" | "ghost";
-}
-
-function MyComponent({ className, render, ...props }: MyComponentProps) {
-  const defaultProps = {
-    className: cn("my-styles", className),
-    "data-slot": "my-component",
-    // ...other default props
+// Props type extends base + variants
+export type ButtonProps = React.ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    customProp?: string;
   };
 
-  const element = useRender({
-    defaultTagName: 'button', // Required: specify the default HTML element
-    render: render,           // Pass render prop directly (no fallback needed)
-    props: mergeProps<'button'>(defaultProps, props), // Merge with type parameter
-  });
-
-  return element;
+// Named function (not arrow) for components
+function Button({ className, variant, ...props }: ButtonProps) {
+  return (
+    <button
+      data-slot="button"
+      className={cn(buttonVariants({ variant }), className)}
+      {...props}
+    />
+  );
 }
+
+export { Button, buttonVariants };
 ```
 
-**Key Rules:**
+**Key patterns:**
 
-- Use `useRender.ComponentProps<'tagname'>` instead of `React.ComponentProps<'tagname'>` - this automatically includes the properly-typed `render` prop
-- Do NOT manually add `render?: React.ReactElement | ...` to your interface - it's included via `useRender.ComponentProps`
-- Always include `defaultTagName` parameter in `useRender()` (required)
-- Pass `render` prop directly without fallback (`render || <button />` is incorrect)
-- Use type parameter in `mergeProps<'tagname'>()` matching your defaultTagName
-- For components wrapping with Context or other elements, assign `useRender` result to a variable first
-- This pattern ensures proper prop merging, ref forwarding, and polymorphic rendering
+- Use `data-slot="component-name"` for styling hooks
+- Use `cn()` from `@/lib/utils` for class merging
+- Use `cva` from class-variance-authority for variants
+- Export both component and variants
 
-### Styling Approach
+### React Best Practices
 
-- Uses Tailwind CSS with design tokens
-- CSS variables for theming (light/dark mode)
-- Class variance authority for component variants
-- Geist fonts (Sans and Mono) as default typography
+- Function components only (no class components)
+- Hooks at top level only, never conditionally
+- Specify all dependencies in hook dependency arrays
+- Use `key` prop with unique IDs (not array indices)
+- Don't define components inside other components
 
-### Documentation System (Fumadocs + MDX)
+### Error Handling
 
-The project uses **Fumadocs** for documentation with auto-syncing MDX components:
+- Remove `console.log`, `debugger`, `alert` from production code
+- Throw `Error` objects with descriptive messages
+- Use early returns over nested conditionals
+- Handle promise rejections properly
 
-#### MDX Component Structure
+### Accessibility
 
-Documentation files live in `content/docs/components/` and use special MDX components that automatically sync with the registry:
+- Use semantic HTML (`<button>`, `<nav>`, not `<div>` with roles)
+- Provide meaningful `alt` text for images
+- Add labels for form inputs
+- Include keyboard event handlers alongside mouse events
+- Ensure interactive elements are keyboard accessible
 
-**ComponentPreview** - Shows interactive component preview with code tab
+## Directory Structure
 
-```mdx
-<ComponentPreview component="button" example="button-demo">
-  <ButtonDemo />
-</ComponentPreview>
+```
+registry/default/           # Source UI components
+registry/default/hooks/     # Shared hooks (registry:hook)
+registry/default/lib/       # Shared utilities (registry:lib)
+registry/examples/          # Component examples
+content/docs/               # MDX documentation
+components/                 # App-specific components
+lib/                        # App utilities
+hooks/                      # App hooks
 ```
 
-**ComponentInstall** - Auto-generates installation instructions
+**Important:** `registry/default/hooks/` ≠ `hooks/` (root). Registry items are installable via shadcn CLI.
 
-```mdx
-<ComponentInstall component="button" />
-```
+## Component Development Workflow
 
-- Automatically pulls dependencies from registry metadata
-- Shows CLI and Manual installation tabs
-- Manual tab includes package manager selection (npm/pnpm/yarn/bun)
-- Component source code is auto-fetched from `registry/default/`
-
-**ComponentUsage** - Auto-generates usage examples
-
-```mdx
-<ComponentUsage component="button" />
-```
-
-- Shows two code blocks: imports and component anatomy
-- Imports are extracted from component metadata
-- Anatomy shows the basic JSX structure without function wrapper
-
-**PackageManagerCommand** - Shows CLI commands with package manager tabs
-
-```mdx
-<PackageManagerCommand command="shadcn@latest add @cubby-ui/button" />
-<PackageManagerCommand command="react" type="add" />
-```
-
-- `command`: The base command without package manager prefix
-- `type`: Optional, either `"run"` (default) or `"add"`
-  - `type="run"`: Generates `npx` / `pnpm dlx` / `bunx` commands
-  - `type="add"`: Generates `npm install` / `pnpm add` / `yarn add` / `bun add` commands
-- Use instead of plain code fences for installation commands
-
-**Markdown Code Fences** - Automatically rendered with custom CodeBlock. All markdown code fences use our `MdxPreServer` component with server-side Shiki highlighting and our styled CodeBlock with copy button.
-
-#### Server-Side Highlighting
-
-All code blocks are pre-highlighted on the server using Shiki for optimal performance:
-
-- `ComponentPreviewServer` wraps `ComponentPreview` (sync wrapper with async code provider)
-- `ComponentInstallServer` pre-highlights all installation commands
-- `ComponentUsageServer` pre-highlights imports and anatomy separately
-
-**Important**: `ComponentPreviewServer` must be synchronous to avoid ref serialization issues with client components passed as children. Async highlighting is delegated to a separate `HighlightedCodeProvider` component.
-
-#### MDX Components Location
-
-- `components/mdx/component-preview-server.tsx` - Server wrapper (sync)
-- `components/mdx/component-preview.tsx` - Client component with tabs
-- `components/mdx/component-install-server.tsx` - Server wrapper (async)
-- `components/mdx/component-install.tsx` - Client component with package manager tabs
-- `components/mdx/component-usage-server.tsx` - Server wrapper (async)
-- `components/mdx/component-usage.tsx` - Client component with two code blocks
-- `mdx-components.tsx` - Exports all MDX components for use in documentation
-
-#### Search System
-
-The documentation search uses **Orama** with static indexing:
-
-- **Search client**: `components/search.tsx` - Custom search dialog using static Orama search
-- **Search server**: `app/api/search/route.ts` - Generates static search index at build time
-
-**Search filtering by meta.json:**
-
-Only pages listed in their section's `meta.json` file are searchable. This allows work-in-progress pages to exist without appearing in search results.
-
-- `content/docs/components/meta.json` → Controls which components are searchable
-- `content/docs/hooks/meta.json` → Controls which hooks are searchable
-- `content/docs/utils/meta.json` → Controls which utilities are searchable
-- `content/docs/getting-started/meta.json` → Controls which getting-started pages are searchable
-
-**To hide a page from search:** Remove it from the `pages` array in the appropriate `meta.json` file. The page will still be accessible by URL but won't appear in search results.
-
-**To make a page searchable:** Add the page slug to the `pages` array in the appropriate `meta.json` file and rebuild.
-
-### Development Workflow
-
-1. Add/modify components in `registry/default/`
-2. Create examples in `registry/examples/`
+1. Add/modify components in `registry/default/[component]/`
+2. Create examples in `registry/examples/[component]/`
 3. Run `pnpm run registry:sync` to update metadata
-4. Create/update MDX documentation in `content/docs/components/`
-5. Use `ComponentPreview`, `ComponentInstall`, and `ComponentUsage` components
-6. The build process automatically syncs registry before building
+4. Create/update MDX docs in `content/docs/components/`
 
-### Package Management
+## Key Dependencies
 
-- Uses **pnpm** as package manager
-- Special handling for esbuild and @tailwindcss/oxide in pnpm config
-- Built dependencies optimization enabled
+- **Base UI** (`@base-ui/react`) - Unstyled accessible components
+- **CVA** (`class-variance-authority`) - Component variants
+- **Tailwind CSS 4** - Styling with CSS variables
+- **Fumadocs** - Documentation framework
+- **Shiki** - Syntax highlighting
 
-## Code Quality & Interface Standards
+## Before Committing
 
-This project follows strict quality standards for both code and user interface design.
+1. Run `pnpm run lint` - fix any errors
+2. Ensure code follows patterns above
+3. Run `pnpm run registry:sync` if components changed
+4. Verify component examples work in dev server
 
-### Code Standards
+## Detailed Documentation
 
-See [CODE_STANDARDS.md](./CODE_STANDARDS.md) for comprehensive code quality guidelines enforced by ESLint and Prettier.
+For deeper context on specific areas, read these files:
 
-### API Reference Documentation
+| File                         | When to Read                                                              |
+| ---------------------------- | ------------------------------------------------------------------------- |
+| `REGISTRY_SYSTEM.md`         | Registry architecture, multi-file components, shared hooks/utils, imports |
+| `BASE_UI_PATTERNS.md`        | Creating polymorphic components with Base UI's useRender/mergeProps       |
+| `MDX_DOCUMENTATION.md`       | MDX components, server-side highlighting, search system                   |
+| `CODE_STANDARDS.md`          | Comprehensive code quality rules, async patterns, security, performance   |
+| `API_REFERENCE_GUIDE.md`     | Writing API reference sections in component docs                          |
+| `WEB_INTERFACE_STANDARDS.md` | UI/UX guidelines, animations, touch interactions, accessibility           |
 
-See [API_REFERENCE_GUIDE.md](./API_REFERENCE_GUIDE.md) for how to write API reference sections in component documentation.
+**Read `REGISTRY_SYSTEM.md` when:**
 
-**When writing or updating component documentation:**
+- Working with the component registry system
+- Understanding multi-file component import patterns
+- Adding shared hooks or utilities
 
-1. Only document props explicitly used in the component (custom props, modified defaults, key data props)
-2. Do not list all props from the base library - link to their docs instead
-3. Use `<ApiPropsList>` and `<ApiProp>` components for consistent formatting
-4. Add a brief description for each component part explaining what it does
+**Read `BASE_UI_PATTERNS.md` when:**
 
-**After writing or modifying code:**
+- Creating polymorphic components with Base UI's `useRender`
 
-1. Run `pnpm run format` to auto-format with Prettier
-2. Run `pnpm run lint` to check for ESLint issues
-3. Fix any lint errors (use `--fix` flag for auto-fixable issues)
-4. Verify your code follows the standards in CODE_STANDARDS.md
+**Read `MDX_DOCUMENTATION.md` when:**
 
-Key principles:
-
-- Write accessible, performant, type-safe, and maintainable code
-- Use explicit types and modern JavaScript/TypeScript patterns
-- Follow React best practices (hooks rules, proper component structure)
-- Ensure accessibility with semantic HTML and ARIA attributes
-- Handle errors properly and remove debug statements
-- Prefer clarity and explicit intent over brevity
-
-### Web Interface Standards
-
-See [WEB_INTERFACE_STANDARDS.md](./WEB_INTERFACE_STANDARDS.md) for comprehensive UI/UX guidelines.
-
-**When building or modifying UI components, interactions, or user-facing features:**
-
-1. Review relevant sections in WEB_INTERFACE_STANDARDS.md before implementation
-2. Apply appropriate guidelines for the interaction type (forms, buttons, animations, etc.)
-3. Test interactivity, especially for touch devices and keyboard navigation
-4. Verify accessibility with screen readers and keyboard-only navigation
-5. Check motion and animation durations (≤200ms for interactions)
-6. Ensure proper focus management and ARIA labels
-
-Key areas to check:
-
-- **Interactivity**: Form submissions, input labels, button states, focus management
-- **Typography**: Font smoothing, weights, fluid sizing, tabular numbers
-- **Motion**: Animation durations, theme switching, scroll behavior, respect for reduced motion
-- **Touch**: Hover states, input sizing, auto-focus behavior, touch gestures
-- **Accessibility**: Focus rings, keyboard navigation, ARIA labels, screen reader support
-- **Optimizations**: GPU usage, performance, lazy loading, adaptive experiences
-- **Design**: Empty states, error feedback, loading states, optimistic updates
-
-## Important Notes
-
-- Registry sync script auto-generates component metadata and validates consistency
-- Component anatomy is extracted from basic examples using TypeScript AST parsing
-- The unified registry provides both runtime and build-time access to component data
-- Always run registry sync after adding/modifying components
-- **Documentation auto-syncs**: When you edit components or examples, the MDX documentation automatically reflects changes on next build (no manual code updates needed)
-- **Server component patterns**: Use synchronous server components when passing children with refs to avoid serialization errors
-- **Type safety**: Always use `ReactElement` instead of `JSX.Element` for better TypeScript compatibility across configurations
+- Adding/modifying MDX documentation components
+- Working with the search system

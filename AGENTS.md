@@ -13,10 +13,10 @@ pnpm run dev          # Start dev server (use timeout when running)
 pnpm run build        # Production build (includes registry sync)
 pnpm run lint         # Run ESLint
 pnpm run lint --fix   # Auto-fix lint issues
+pnpm test             # Run tests in watch mode
+pnpm test:run         # Run tests once (CI)
 pnpm run registry:sync # Sync component registry metadata
 ```
-
-**No test framework configured** - This project does not currently have Jest/Vitest set up.
 
 ## Code Style Guidelines
 
@@ -171,9 +171,10 @@ hooks/                      # App hooks
 ## Before Committing
 
 1. Run `pnpm run lint` - fix any errors
-2. Ensure code follows patterns above
-3. Run `pnpm run registry:sync` if components changed
-4. Verify component examples work in dev server
+2. Run `pnpm test:run` - ensure all tests pass
+3. Ensure code follows patterns above
+4. Run `pnpm run registry:sync` if components changed
+5. Verify component examples work in dev server
 
 ## Detailed Documentation
 
@@ -187,6 +188,7 @@ For deeper context on specific areas, read these files:
 | `CODE_STANDARDS.md`          | Comprehensive code quality rules, async patterns, security, performance   |
 | `API_REFERENCE_GUIDE.md`     | Writing API reference sections in component docs                          |
 | `WEB_INTERFACE_STANDARDS.md` | UI/UX guidelines, animations, touch interactions, accessibility           |
+| `TESTING.md`                 | Testing conventions, Vitest setup, React Testing Library patterns         |
 
 **Read `REGISTRY_SYSTEM.md` when:**
 
@@ -202,3 +204,8 @@ For deeper context on specific areas, read these files:
 
 - Adding/modifying MDX documentation components
 - Working with the search system
+
+**Read `TESTING.md` when:**
+
+- Adding or modifying tests
+- Understanding test conventions and patterns

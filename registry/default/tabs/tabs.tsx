@@ -58,7 +58,7 @@ const tabsListVariants = cva(
 
 const tabIndicatorVariants = cva(
   [
-    "ease-out-cubic absolute transition-all duration-200",
+    "ease-out-cubic absolute z-[-1] transition-all duration-200",
     // Vertical orientation
     "data-[orientation=vertical]:top-0 data-[orientation=vertical]:h-(--active-tab-height) data-[orientation=vertical]:translate-y-(--active-tab-top)",
     // Horizontal orientation

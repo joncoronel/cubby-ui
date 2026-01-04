@@ -102,7 +102,8 @@
       "Bash(cmd /c del \"c:\\\\Users\\\\jonny\\\\Documents\\\\Projects\\\\cubby-ui\\\\components\\\\docs\\\\toc-utils.ts\")",
       "Bash(timeout 60 pnpm exec eslint:*)",
       "Bash(git rev-parse:*)",
-      "Bash(git symbolic-ref:*)"
+      "Bash(git symbolic-ref:*)",
+      "Bash(git add:*)"
     ],
     "deny": []
   }

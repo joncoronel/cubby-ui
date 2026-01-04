@@ -23,6 +23,10 @@ import {
 } from "@icons-pack/react-simple-icons";
 import type { BundledLanguage } from "shiki/langs";
 import { Tabs, TabsList, TabsTrigger } from "@/registry/default/tabs/tabs";
+import {
+  ScrollArea,
+  type FadeEdges,
+} from "@/registry/default/scroll-area/scroll-area";
 
 // Context for sharing code block state
 interface CodeBlockContextValue {
@@ -77,8 +81,10 @@ function getLanguageIcon(language: string) {
 }
 
 // Root component
-interface CodeBlockProps
-  extends Omit<useRender.ComponentProps<"div">, "children"> {
+interface CodeBlockProps extends Omit<
+  useRender.ComponentProps<"div">,
+  "children"
+> {
   code: string;
   language?: string;
   initial?: React.ReactElement;
@@ -162,8 +168,7 @@ function CodeBlock({
 
 // Header component
 interface CodeBlockHeaderProps
-  extends useRender.ComponentProps<"div">,
-    Partial<BaseTabsProps> {
+  extends useRender.ComponentProps<"div">, Partial<BaseTabsProps> {
   filename?: string;
   tabVariant?: React.ComponentProps<typeof TabsList>["variant"];
   customIcon?: React.ReactNode;
@@ -315,8 +320,7 @@ interface BaseTabsProps {
 }
 
 interface CodeBlockTabsProps
-  extends useRender.ComponentProps<"div">,
-    BaseTabsProps {
+  extends useRender.ComponentProps<"div">, BaseTabsProps {
   variant?: React.ComponentProps<typeof TabsList>["variant"];
 }
 
@@ -392,7 +396,14 @@ function CodeBlockFloatingCopy({
 
 // Pre component (wrapper for content)
 interface CodeBlockPreProps extends useRender.ComponentProps<"pre"> {
+  /** Show line numbers in the gutter */
   lineNumbers?: boolean;
+  /** Configure fade edges to indicate scrollable content. Defaults to true. */
+  fadeEdges?: FadeEdges;
+  /** Hide scrollbars while keeping scroll functionality */
+  hideScrollbar?: boolean;
+  /** Use native browser scrolling instead of Base UI ScrollArea */
+  nativeScroll?: boolean;
 }
 
 function CodeBlockPre({
@@ -400,6 +411,9 @@ function CodeBlockPre({
   render,
   children,
   lineNumbers = false,
+  fadeEdges = true,
+  hideScrollbar = false,
+  nativeScroll = false,
   ...props
 }: CodeBlockPreProps) {
   const context = useCodeBlock();
@@ -430,7 +444,15 @@ function CodeBlockPre({
     children: (
       <>
         {floatingCopy && <CodeBlockFloatingCopy />}
-        <div className="min-h-0 flex-1 overflow-auto py-3">{content}</div>
+        <ScrollArea
+          fadeEdges={fadeEdges}
+          hideScrollbar={hideScrollbar}
+          nativeScroll={nativeScroll}
+          viewportClassName="py-3"
+          className="min-h-0 flex-1"
+        >
+          {content}
+        </ScrollArea>
       </>
     ),
   };
@@ -547,3 +569,4 @@ export {
   CodeBlockCode,
   useCodeBlock,
 };
+export type { FadeEdges };

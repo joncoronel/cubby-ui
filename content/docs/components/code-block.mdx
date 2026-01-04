@@ -117,8 +117,8 @@ The main component that manages state and provides context to sub-components aut
 </ApiProp>
 
 <ApiProp name="floatingCopy" fullType="boolean" defaultValue="false">
-  Automatically append a floating copy button positioned at the top-right that appears on hover. Ideal for
-  headerless code blocks.
+  Automatically append a floating copy button positioned at the top-right that
+  appears on hover. Ideal for headerless code blocks.
 </ApiProp>
 
 <ApiProp
@@ -171,8 +171,8 @@ Smart header component that auto-arranges language icons, filenames, tabs, and c
 </ApiProp>
 
 <ApiProp name="customIcon" fullType="ReactNode" simpleType="node">
-  Custom icon to display instead of the default language icon.
-  Accepts any React node (component, JSX element, etc.).
+  Custom icon to display instead of the default language icon. Accepts any React
+  node (component, JSX element, etc.).
 </ApiProp>
 
 <ApiProp name="tabs" fullType="HeaderTab[]" simpleType="array">
@@ -181,15 +181,13 @@ Smart header component that auto-arranges language icons, filenames, tabs, and c
 </ApiProp>
 
 <ApiProp name="activeTab" fullType="string | undefined">
-  Currently active tab value (required if tabs are provided). Type is inferred from the Tabs component.
+  Currently active tab value (required if tabs are provided). Type is inferred
+  from the Tabs component.
 </ApiProp>
 
-<ApiProp
-  name="onTabChange"
-  fullType="function"
-  simpleType="function"
->
-  Tab change handler (required if tabs are provided). Type is inferred from the Tabs component's `onValueChange` prop.
+<ApiProp name="onTabChange" fullType="function" simpleType="function">
+  Tab change handler (required if tabs are provided). Type is inferred from the
+  Tabs component's `onValueChange` prop.
 </ApiProp>
 
 <ApiProp
@@ -197,7 +195,8 @@ Smart header component that auto-arranges language icons, filenames, tabs, and c
   fullType='"capsule" | "underline"'
   simpleType="string"
 >
-  Visual style variant of the tabs. Type is inferred from the TabsList component's `variant` prop.
+  Visual style variant of the tabs. Type is inferred from the TabsList
+  component's `variant` prop.
 </ApiProp>
 
 <ApiProp name="className" fullType="string">
@@ -217,13 +216,35 @@ Smart header component that auto-arranges language icons, filenames, tabs, and c
 
 #### CodeBlockPre
 
-The pre-formatted text container that wraps the code content. Automatically consumes `lines` from CodeBlock context for line numbers. Includes `group` and `relative` classes for floating button support.
+The pre-formatted text container that wraps the code content. Automatically consumes `lines` from CodeBlock context for line numbers. Includes `group` and `relative` classes for floating button support. Uses [ScrollArea](/docs/components/scroll-area) internally for styled scrollbars and fade edges.
 
 <ApiPropsList>
 
 <ApiProp name="lineNumbers" fullType="boolean" defaultValue="false">
   Automatically display line numbers alongside the code. When enabled, wraps
   children in proper flex layout.
+</ApiProp>
+
+<ApiProp
+  name="fadeEdges"
+  fullType="boolean | FadeEdge | FadeEdge[]"
+  simpleType="boolean | string | array"
+  defaultValue="true"
+>
+  Configure fade edges to indicate scrollable content. Accepts `true` (all
+  edges), `false` (none), a single edge (`"top"`, `"bottom"`, `"left"`,
+  `"right"`, `"x"`, `"y"`), or an array of edges (`["top", "right"]`).
+</ApiProp>
+
+<ApiProp name="hideScrollbar" fullType="boolean" defaultValue="false">
+  Hide scrollbars while keeping scroll functionality. Useful for cleaner
+  aesthetics when fade edges provide sufficient scroll indication.
+</ApiProp>
+
+<ApiProp name="nativeScroll" fullType="boolean" defaultValue="false">
+  Use native browser scrolling instead of Base UI ScrollArea. Native scroll uses
+  CSS scroll-driven animations for fade edges (Chrome 115+) with static fallback
+  elsewhere.
 </ApiProp>
 
 <ApiProp name="className" fullType="string">

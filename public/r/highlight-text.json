@@ -7,7 +7,7 @@
   "files": [
     {
       "path": "registry/default/lib/highlight-text.tsx",
-      "content": "import * as React from \"react\";\r\n\r\nexport function highlightText(text: string, query: string): React.ReactNode {\r\n  const trimmed = query.trim();\r\n  if (!trimmed) {\r\n    return text;\r\n  }\r\n\r\n  const limited = trimmed.slice(0, 100);\r\n  const escaped = limited.replace(/[.*+?^${}()|[\\]\\\\]/g, \"\\\\$&\");\r\n  const regex = new RegExp(`(${escaped})`, \"gi\");\r\n\r\n  return text.split(regex).map((part, idx) =>\r\n    regex.test(part) ? (\r\n      <mark key={idx} className=\"text-primary bg-transparent font-bold\">\r\n        {part}\r\n      </mark>\r\n    ) : (\r\n      part\r\n    ),\r\n  );\r\n}\r\n",
+      "content": "import * as React from \"react\";\r\n\r\nexport function highlightText(text: string, query: string): React.ReactNode {\r\n  const trimmed = query.trim();\r\n  if (!trimmed) {\r\n    return text;\r\n  }\r\n\r\n  const limited = trimmed.slice(0, 100);\r\n  const escaped = limited.replace(/[.*+?^${}()|[\\]\\\\]/g, \"\\\\$&\");\r\n  const regex = new RegExp(`(${escaped})`, \"gi\");\r\n\r\n  return text.split(regex).map((part, idx) =>\r\n    part.toLowerCase() === limited.toLowerCase() ? (\r\n      <mark key={idx} className=\"text-primary bg-transparent font-bold\">\r\n        {part}\r\n      </mark>\r\n    ) : (\r\n      part\r\n    ),\r\n  );\r\n}\r\n",
       "type": "registry:lib",
       "target": "lib/cubby-ui/highlight-text.tsx"
     }

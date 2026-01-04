@@ -15,7 +15,7 @@ type TabsSide = "left" | "right";
 
 const tabsListVariants = cva(
   [
-    "group/tabs-list text-muted-foreground relative inline-flex w-fit items-center justify-center gap-1",
+    "group/tabs-list text-muted-foreground relative z-0 inline-flex w-fit items-center justify-center gap-1",
     "data-[orientation=vertical]:flex-col data-[orientation=vertical]:self-start",
   ],
   {
@@ -157,7 +157,7 @@ function TabsList({
       <div
         data-slot="tabs-divider"
         className={cn(
-          "bg-accent absolute rounded-full",
+          "bg-accent absolute z-[-2] rounded-full",
           variant === "underline" ? "block" : "hidden",
           // Vertical orientation
           "group-data-[orientation=vertical]/tabs-list:top-0 group-data-[orientation=vertical]/tabs-list:bottom-0 group-data-[orientation=vertical]/tabs-list:w-[2px]",
@@ -181,7 +181,7 @@ function TabsTrigger({ className, ...props }: BaseTabs.Tab.Props) {
       data-slot="tabs-trigger"
       className={cn(
         // Base styles
-        "text-muted-foreground data-active:text-foreground z-1 flex cursor-pointer items-center gap-1.5 font-medium text-nowrap whitespace-nowrap",
+        "text-muted-foreground data-active:text-foreground flex cursor-pointer items-center gap-1.5 font-medium text-nowrap whitespace-nowrap",
         "transition-[outline-offset,color] duration-200 ease-out",
         "focus-visible:outline-ring/30 focus-visible:outline-2 focus-visible:outline-offset-2",
         "hover:text-muted-foreground/75",

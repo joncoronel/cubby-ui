@@ -11,7 +11,7 @@ export function highlightText(text: string, query: string): React.ReactNode {
   const regex = new RegExp(`(${escaped})`, "gi");
 
   return text.split(regex).map((part, idx) =>
-    regex.test(part) ? (
+    part.toLowerCase() === limited.toLowerCase() ? (
       <mark key={idx} className="text-primary bg-transparent font-bold">
         {part}
       </mark>

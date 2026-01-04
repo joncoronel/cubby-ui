@@ -40,6 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# fumadocs auto-generated
+.source/
+
 # Ignored for the template, you probably want to remove it:
 package-lock.json
 

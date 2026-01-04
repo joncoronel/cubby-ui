@@ -134,9 +134,24 @@ Shared hooks and utilities from `registry/default/hooks/` and `registry/default/
 
 1. Add/modify components in `registry/default/`
 2. Create examples in `registry/examples/`
-3. Run `pnpm run registry:sync` to update metadata
-4. Create/update MDX documentation in `content/docs/components/`
-5. The build process automatically syncs registry before building
+3. Run `pnpm run registry:sync` to update metadata in `registry.json`
+4. Run `pnpm run registry:build` to generate individual component JSON files in `public/r/`
+5. Create/update MDX documentation in `content/docs/components/`
+6. The build process automatically syncs registry before building
+
+### Registry Sync vs Registry Build
+
+| Command                   | Purpose                                                     | Output                    |
+| ------------------------- | ----------------------------------------------------------- | ------------------------- |
+| `pnpm run registry:sync`  | Scans source files, extracts metadata, detects dependencies | Updates `registry.json`   |
+| `pnpm run registry:build` | Runs `shadcn build` to generate installable component files | Creates `public/r/*.json` |
+
+**Both commands are required** when modifying components:
+
+- `registry:sync` updates the source of truth (`registry.json`) with detected imports and dependencies
+- `registry:build` generates the individual JSON files that the shadcn CLI uses for installation
+
+If you only run `registry:sync`, the `public/r/*.json` files won't reflect your changes.
 
 ## Important Notes
 

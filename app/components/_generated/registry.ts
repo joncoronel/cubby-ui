@@ -547,7 +547,8 @@ export const componentMetadata = {
     "category": "UI",
     "registryDependencies": [
       "@cubby-ui/copy-button",
-      "@cubby-ui/tabs"
+      "@cubby-ui/tabs",
+      "@cubby-ui/scroll-area"
     ],
     "dependencies": [
       "lucide-react",

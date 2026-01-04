@@ -160,6 +160,15 @@ hooks/                      # App hooks
 3. Run `pnpm run registry:sync` to update metadata
 4. Create/update MDX docs in `content/docs/components/`
 
+## When Adding Hooks or Utilities
+
+**Always add tests** when creating or modifying files in:
+
+- `registry/default/hooks/` → add test in `tests/hooks/[hook-name].test.ts`
+- `registry/default/lib/` → add test in `tests/lib/[util-name].test.ts`
+
+Components (thin wrappers around Base UI) do not need tests.
+
 ## Key Dependencies
 
 - **Base UI** (`@base-ui/react`) - Unstyled accessible components

@@ -43,6 +43,17 @@ describe("highlightText", () => {
       });
     });
 
+    it("handles adjacent matches correctly", () => {
+      const result = highlightText("aa aa aa", "aa");
+      render(<>{result}</>);
+
+      const marks = screen.getAllByText("aa");
+      expect(marks).toHaveLength(3);
+      marks.forEach((mark) => {
+        expect(mark.tagName).toBe("MARK");
+      });
+    });
+
     it("highlights partial matches", () => {
       const result = highlightText("Hello World", "llo");
       render(<>{result}</>);

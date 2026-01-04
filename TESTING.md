@@ -4,7 +4,7 @@ This document covers testing conventions and patterns for Cubby UI.
 
 ## Overview
 
-Cubby UI uses **Vitest** with **React Testing Library** for testing. Tests are located in a separate `tests/` directory (not co-located with components) to avoid polluting the registry.
+Cubby UI uses **Vitest** with **React Testing Library** for testing. Tests focus on **custom hooks and utilities** - not components, since those are thin wrappers around Base UI which is already well-tested.
 
 ## Test Commands
 
@@ -17,29 +17,27 @@ pnpm test:run    # Single run - good for CI
 
 ```
 tests/
-├── hooks/                    # Hook tests
-│   └── use-fuzzy-filter.test.ts
-└── components/               # Component tests
-    └── button.test.tsx
+└── hooks/                    # Hook and utility tests
+    ├── use-fuzzy-filter.test.ts
+    └── use-list-virtualizer.test.ts
 ```
 
 **Important:** Tests are kept separate from `registry/default/` because the registry sync script scans that directory. Placing test files there would include them in the component registry.
 
 ## Testing Stack
 
-| Tool                          | Purpose                                                  |
-| ----------------------------- | -------------------------------------------------------- |
-| `vitest`                      | Test runner                                              |
-| `@testing-library/react`      | Component rendering and queries                          |
-| `@testing-library/jest-dom`   | DOM matchers (`toBeDisabled`, `toBeInTheDocument`, etc.) |
-| `@testing-library/user-event` | User interaction simulation                              |
-| `jsdom`                       | Browser environment simulation                           |
+| Tool                        | Purpose                                                  |
+| --------------------------- | -------------------------------------------------------- |
+| `vitest`                    | Test runner                                              |
+| `@testing-library/react`    | Hook rendering via `renderHook`                          |
+| `@testing-library/jest-dom` | DOM matchers (`toBeDisabled`, `toBeInTheDocument`, etc.) |
+| `jsdom`                     | Browser environment simulation                           |
 
 ## What to Test
 
-### Priority 1: Hooks
+### Custom Hooks
 
-Hooks contain pure logic that you own entirely. They're the easiest to test.
+Hooks contain logic that you own entirely. Test their inputs, outputs, and edge cases.
 
 ```typescript
 import { describe, it, expect } from "vitest";
@@ -54,87 +52,34 @@ describe("useFuzzyFilter", () => {
 });
 ```
 
-### Priority 2: Component Composition/Wiring
+### Utility Functions
 
-Test that your components render correctly, handle props, and respond to interactions.
+Pure functions are the easiest to test:
 
-```tsx
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { Button } from "@/registry/default/button/button";
+```typescript
+import { describe, it, expect } from "vitest";
+import { someUtility } from "@/registry/default/lib/some-utility";
 
-describe("Button", () => {
-  it("renders children", () => {
-    render(<Button>Click me</Button>);
-    expect(
-      screen.getByRole("button", { name: /click me/i }),
-    ).toBeInTheDocument();
+describe("someUtility", () => {
+  it("handles normal input", () => {
+    expect(someUtility("input")).toBe("expected output");
   });
 
-  it("calls onClick when clicked", async () => {
-    const handleClick = vi.fn();
-    render(<Button onClick={handleClick}>Click</Button>);
-    await userEvent.click(screen.getByRole("button"));
-    expect(handleClick).toHaveBeenCalledTimes(1);
+  it("handles edge cases", () => {
+    expect(someUtility("")).toBe("");
+    expect(someUtility(null)).toBe(null);
   });
 });
 ```
 
-### Priority 3: Variant Application
+### What NOT to Test
 
-Verify CVA variants apply correctly.
-
-```tsx
-it("applies variant data attribute", () => {
-  render(<Button variant="destructive">Delete</Button>);
-  expect(screen.getByRole("button")).toHaveAttribute(
-    "data-variant",
-    "destructive",
-  );
-});
-```
-
-### What NOT to Test Extensively
-
-- **Base UI accessibility** - Base UI already tests ARIA, keyboard nav, focus management
+- **Components** - They're thin wrappers around Base UI; testing them is essentially testing Base UI
+- **Base UI behavior** - Base UI already tests ARIA, keyboard nav, focus management
 - **Tailwind CSS classes** - Visual testing is better suited for this
 - **Third-party library internals** - Trust that dependencies work
 
 ## Testing Patterns
-
-### Use Role Queries
-
-Prefer `getByRole` over `getByTestId` - it mirrors how users find elements:
-
-```tsx
-// Good - queries by accessibility role
-screen.getByRole("button", { name: /submit/i });
-
-// Avoid when possible - implementation detail
-screen.getByTestId("submit-button");
-```
-
-### Use `userEvent` Over `fireEvent`
-
-`userEvent` simulates real user interactions more accurately:
-
-```tsx
-// Good - simulates real click (focus, mousedown, mouseup, click)
-await userEvent.click(button);
-
-// Less realistic
-fireEvent.click(button);
-```
-
-### Mock Functions with `vi.fn()`
-
-```tsx
-const handleClick = vi.fn();
-render(<Button onClick={handleClick}>Click</Button>);
-await userEvent.click(screen.getByRole("button"));
-expect(handleClick).toHaveBeenCalledTimes(1);
-```
 
 ### Type Generic Hooks
 
@@ -149,10 +94,43 @@ interface TestItem {
 const { filter } = useFuzzyFilter<TestItem>({ keys: ["name"] });
 ```
 
+### Test Hook Return Values
+
+For hooks that return objects with multiple methods:
+
+```typescript
+describe("useListVirtualizer", () => {
+  describe("getItem", () => {
+    it("returns item at virtual index", () => {
+      const { result } = renderHook(() => useListVirtualizer(options));
+      const item = result.current.getItem({ index: 5 });
+      expect(item).toEqual({ id: 5, name: "Item 5" });
+    });
+  });
+
+  describe("getItemProps", () => {
+    it("returns aria-setsize based on filteredItems length", () => {
+      const { result } = renderHook(() => useListVirtualizer(options));
+      const props = result.current.getItemProps({ index: 0 });
+      expect(props["aria-setsize"]).toBe(100);
+    });
+  });
+});
+```
+
+### Mock Functions with `vi.fn()`
+
+```typescript
+const callback = vi.fn();
+// ... use callback
+expect(callback).toHaveBeenCalledTimes(1);
+expect(callback).toHaveBeenCalledWith("expected arg");
+```
+
 ## Test File Naming
 
 - Hook tests: `tests/hooks/[hook-name].test.ts`
-- Component tests: `tests/components/[component-name].test.tsx`
+- Utility tests: `tests/utils/[utility-name].test.ts`
 
 ## Configuration Files
 
@@ -187,51 +165,37 @@ import "@testing-library/jest-dom/vitest";
 
 ## Common Assertions
 
-```tsx
-// Element presence
-expect(element).toBeInTheDocument();
-expect(element).not.toBeInTheDocument();
+```typescript
+// Equality
+expect(result).toBe(expected);
+expect(result).toEqual({ key: "value" });
 
-// Disabled state
-expect(button).toBeDisabled();
-expect(button).not.toBeDisabled();
+// Truthiness
+expect(result).toBeTruthy();
+expect(result).toBeFalsy();
+expect(result).toBeUndefined();
 
-// Attributes
-expect(button).toHaveAttribute("data-variant", "primary");
-expect(button).toHaveAttribute("aria-disabled", "true");
+// Arrays
+expect(array).toHaveLength(3);
+expect(array).toContain(item);
 
-// Classes
-expect(button).toHaveClass("custom-class");
+// Objects
+expect(object).toHaveProperty("key");
+expect(object).toMatchObject({ key: "value" });
 
-// Text content
-expect(element).toHaveTextContent("Hello");
-
-// Function calls
+// Functions
 expect(mockFn).toHaveBeenCalled();
 expect(mockFn).toHaveBeenCalledTimes(1);
 expect(mockFn).toHaveBeenCalledWith("arg");
-```
 
-## Base UI Behavior Notes
-
-Base UI components have specific behaviors to be aware of when testing:
-
-### `focusableWhenDisabled`
-
-When a Button has `loading={true}`, it uses `aria-disabled="true"` with `tabindex="0"` instead of the native `disabled` attribute. This keeps the button focusable for accessibility:
-
-```tsx
-it("is aria-disabled but focusable when loading", () => {
-  render(<Button loading>Loading</Button>);
-  const button = screen.getByRole("button");
-  expect(button).toHaveAttribute("aria-disabled", "true");
-  expect(button).toHaveAttribute("tabindex", "0");
-});
+// Types
+expect(typeof result).toBe("function");
+expect(Array.isArray(result)).toBe(true);
 ```
 
 ## Adding New Tests
 
-1. Create test file in appropriate directory (`tests/hooks/` or `tests/components/`)
+1. Create test file in `tests/hooks/` or `tests/utils/`
 2. Import from `@/registry/default/...` using path alias
 3. Follow existing test patterns
 4. Run `pnpm test` to verify

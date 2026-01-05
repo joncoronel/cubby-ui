@@ -162,7 +162,12 @@ ${exampleData.source}
       };
 
       // Collect all files and dependencies
-      const allFiles: Array<{ path: string; type: string; content: string; target?: string }> = [];
+      const allFiles: Array<{
+        path: string;
+        type: string;
+        content: string;
+        target?: string;
+      }> = [];
       const allDependencies = new Set<string>();
 
       try {
@@ -260,7 +265,7 @@ ${exampleData.source}
             installBlock += `Create \`${installPath}\`:\n\n\`\`\`tsx\n${transformedContent}\n\`\`\`\n\n`;
           }
         }
-      } catch (error) {
+      } catch {
         // If we can't read the file, just note it
         installBlock += "[Component source code not available]\n";
       }

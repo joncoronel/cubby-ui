@@ -11,8 +11,9 @@ export default function AccordionDemo() {
       <AccordionItem value="item-1">
         <AccordionTrigger>What is your refund policy?</AccordionTrigger>
         <AccordionContent>
-          We offer a 30-day money-back guarantee for all purchases. If you're
-          not completely satisfied, contact our support team for a full refund.
+          We offer a 30-day money-back guarantee for all purchases. If
+          you&apos;re not completely satisfied, contact our support team for a
+          full refund.
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-2">

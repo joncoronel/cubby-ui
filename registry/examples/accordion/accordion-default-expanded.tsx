@@ -16,8 +16,8 @@ export default function AccordionDefaultExpanded() {
         <AccordionTrigger>Getting Started</AccordionTrigger>
         <AccordionContent>
           Learn the basics of our platform with our comprehensive onboarding
-          guide. We'll walk you through setting up your account and creating
-          your first project.
+          guide. We&apos;ll walk you through setting up your account and
+          creating your first project.
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-2">

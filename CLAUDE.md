@@ -175,6 +175,16 @@ hooks/                      # App hooks
 3. Run `pnpm run registry:sync` if components changed
 4. Verify component examples work in dev server
 
+## Git Commits
+
+When creating commit messages, do NOT include:
+
+- "Generated with Claude Code" footer
+- Co-Authored-By lines
+- Any AI attribution
+
+Just write the commit message itself.
+
 ## Detailed Documentation
 
 For deeper context on specific areas, read these files:

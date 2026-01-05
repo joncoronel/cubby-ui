@@ -105,7 +105,7 @@ export default function AutocompleteLimit() {
         <AutocompletePositioner sideOffset={4}>
           <AutocompletePopup>
             <AutocompleteEmpty>
-              No results found for "{value}"
+              No results found for &quot;{value}&quot;
             </AutocompleteEmpty>
 
             <AutocompleteList>

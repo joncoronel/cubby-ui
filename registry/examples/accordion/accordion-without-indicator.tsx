@@ -29,9 +29,9 @@ export default function AccordionWithoutIndicator() {
       <AccordionItem value="item-3">
         <AccordionTrigger showIndicator={false}>Global Impact</AccordionTrigger>
         <AccordionContent>
-          Through our platform, we've helped over 10,000 businesses streamline
-          their operations and reduce their environmental footprint by 40% on
-          average.
+          Through our platform, we&apos;ve helped over 10,000 businesses
+          streamline their operations and reduce their environmental footprint
+          by 40% on average.
         </AccordionContent>
       </AccordionItem>
     </Accordion>

@@ -84,7 +84,9 @@ export default function ComboboxCreatable() {
                 >
                   <div className="grid grid-cols-[1rem_1fr] items-center gap-2">
                     <Plus className="h-4 w-4" />
-                    <span className="break-all">Create "{item.creatable}"</span>
+                    <span className="break-all">
+                      Create &quot;{item.creatable}&quot;
+                    </span>
                   </div>
                 </ComboboxItem>
               ) : (
@@ -113,11 +115,7 @@ export default function ComboboxCreatable() {
               />
             </DialogBody>
             <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleCancel}
-              >
+              <Button type="button" variant="outline" onClick={handleCancel}>
                 Cancel
               </Button>
               <Button type="submit">Create</Button>

@@ -502,19 +502,17 @@ function DrawerClose({
   );
 
   // Don't use BaseDialog.Close - it has its own close handler that bypasses our animation
-  const mergedProps = mergeProps<"button">(
-    {
-      type: "button",
-      className,
-      onClick: handleClick,
-    } as React.ComponentProps<"button">,
-    props,
-  );
+  const defaultProps = {
+    "data-slot": "drawer-close",
+    type: "button" as const,
+    className,
+    onClick: handleClick,
+  };
 
   const element = useRender({
-    render,
     defaultTagName: "button",
-    props: { ...mergedProps, "data-slot": "drawer-close" },
+    render,
+    props: mergeProps<"button">(defaultProps, props),
   });
 
   return element;

@@ -159,11 +159,13 @@ function CodeBlock({
     children: content,
   };
 
-  return useRender({
+  const element = useRender({
     defaultTagName: "div",
     render,
     props: mergeProps<"div">(defaultProps, props),
   });
+
+  return element;
 }
 
 // Header component
@@ -192,25 +194,7 @@ function CodeBlockHeader({
   const language = context.language;
   const code = context.code;
 
-  // If children provided, use custom layout
-  if (children) {
-    const defaultProps = {
-      "data-slot": "code-block-header",
-      className: cn(
-        "flex items-center justify-between bg-transparent px-3 py-1",
-        className,
-      ),
-      children,
-    };
-
-    return useRender({
-      defaultTagName: "div",
-      render,
-      props: mergeProps<"div">(defaultProps, props),
-    });
-  }
-
-  // Auto-layout based on props
+  // Auto-layout content (only used when children not provided)
   const startContent = (
     <div className="flex min-w-0 items-center gap-2">
       {language && (
@@ -234,25 +218,30 @@ function CodeBlockHeader({
     </div>
   );
 
+  // Use custom children if provided, otherwise use auto-layout
+  const content = children ?? (
+    <>
+      {startContent}
+      {endContent}
+    </>
+  );
+
   const defaultProps = {
     "data-slot": "code-block-header",
     className: cn(
       "flex items-center justify-between bg-transparent px-3 py-1",
       className,
     ),
-    children: (
-      <>
-        {startContent}
-        {endContent}
-      </>
-    ),
+    children: content,
   };
 
-  return useRender({
+  const element = useRender({
     defaultTagName: "div",
     render,
     props: mergeProps<"div">(defaultProps, props),
   });
+
+  return element;
 }
 
 // Language icon component
@@ -277,15 +266,17 @@ function CodeBlockLanguage({
     children: icon,
   };
 
-  return useRender({
+  const element = useRender({
     defaultTagName: "div",
     render,
     props: mergeProps<"div">(defaultProps, props),
   });
+
+  return element;
 }
 
 // Filename component
-interface CodeBlockFilenameProps extends useRender.ComponentProps<"span"> {}
+type CodeBlockFilenameProps = useRender.ComponentProps<"span">;
 
 function CodeBlockFilename({
   className,
@@ -299,11 +290,13 @@ function CodeBlockFilename({
     children,
   };
 
-  return useRender({
+  const element = useRender({
     defaultTagName: "span",
     render,
     props: mergeProps<"span">(defaultProps, props),
   });
+
+  return element;
 }
 
 // Tabs component
@@ -357,15 +350,17 @@ function CodeBlockTabs({
     children: tabsElement,
   };
 
-  return useRender({
+  const element = useRender({
     defaultTagName: "div",
     render,
     props: mergeProps<"div">(defaultProps, props),
   });
+
+  return element;
 }
 
 // Floating copy button component (wrapper with positioning)
-interface CodeBlockFloatingCopyProps extends useRender.ComponentProps<"div"> {}
+type CodeBlockFloatingCopyProps = useRender.ComponentProps<"div">;
 
 function CodeBlockFloatingCopy({
   className,
@@ -387,11 +382,13 @@ function CodeBlockFloatingCopy({
     ),
   };
 
-  return useRender({
+  const element = useRender({
     defaultTagName: "div",
     render,
     props: mergeProps<"div">(defaultProps, props),
   });
+
+  return element;
 }
 
 // Pre component (wrapper for content)
@@ -457,11 +454,13 @@ function CodeBlockPre({
     ),
   };
 
-  return useRender({
+  const element = useRender({
     defaultTagName: "pre",
     render,
     props: mergeProps<"pre">(defaultProps, props),
   });
+
+  return element;
 }
 
 // Line numbers component
@@ -491,15 +490,17 @@ function CodeBlockLineNumbers({
     children: lineNumbers,
   };
 
-  return useRender({
+  const element = useRender({
     defaultTagName: "div",
     render,
     props: mergeProps<"div">(defaultProps, props),
   });
+
+  return element;
 }
 
 // Code component (the highlighted code)
-interface CodeBlockCodeProps extends useRender.ComponentProps<"div"> {}
+type CodeBlockCodeProps = useRender.ComponentProps<"div">;
 
 function CodeBlockCode({ className, render, ...props }: CodeBlockCodeProps) {
   const context = useCodeBlock();
@@ -553,11 +554,13 @@ function CodeBlockCode({ className, render, ...props }: CodeBlockCodeProps) {
     children: nodes || prehighlightedCode,
   };
 
-  return useRender({
+  const element = useRender({
     defaultTagName: "div",
     render,
     props: mergeProps<"div">(defaultProps, props),
   });
+
+  return element;
 }
 
 export {

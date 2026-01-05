@@ -181,16 +181,16 @@ function Tree<TData extends Record<string, unknown> = Record<string, unknown>>({
   const enableBulkActions = mode === "multiple";
   const disableSelection = mode === "none";
   // Validate tree structure in development
-  if (process.env.NODE_ENV === "development") {
-    React.useEffect(() => {
-      try {
-        const { validateTreeStructure } = require("./lib/tree-utils");
+  React.useEffect(() => {
+    if (process.env.NODE_ENV !== "development") return;
+    import("./lib/tree-utils")
+      .then(({ validateTreeStructure }) => {
         validateTreeStructure(data);
-      } catch (error) {
+      })
+      .catch((error) => {
         console.error("Tree validation error:", error);
-      }
-    }, [data]);
-  }
+      });
+  }, [data]);
 
   // Store renderItem in ref for stable context reference
   const renderItemRef = React.useRef(renderItem);
@@ -431,7 +431,7 @@ function Tree<TData extends Record<string, unknown> = Record<string, unknown>>({
 
   const element = useRender({
     defaultTagName: "div",
-    render: render,
+    render,
     props: mergeProps<"div">(defaultProps, props),
   });
 
@@ -582,7 +582,7 @@ function TreeItemInternal<
 
   const hasChildren = Boolean(
     (node.children && node.children.length > 0) ||
-      ("onLoadChildren" in node && node.onLoadChildren),
+    ("onLoadChildren" in node && node.onLoadChildren),
   );
   const isExpanded = context.expandedNodes.has(node.id);
   const isSelected = context.selectedNode === node.id;
@@ -978,12 +978,7 @@ export interface TreeItemProps extends useRender.ComponentProps<"div"> {
   children: React.ReactNode;
 }
 
-function TreeItem({
-  className,
-  children,
-  render,
-  ...props
-}: TreeItemProps) {
+function TreeItem({ className, children, render, ...props }: TreeItemProps) {
   const defaultProps = {
     "data-slot": "tree-item",
     className: cn("flex flex-1 items-center gap-2", className),
@@ -1026,8 +1021,6 @@ function TreeItemIcon({
         : children;
   }
 
-  if (!displayIcon) return null;
-
   const defaultProps = {
     "data-slot": "tree-item-icon",
     className: cn("text-muted-foreground shrink-0 [&>svg]:size-4", className),
@@ -1039,6 +1032,8 @@ function TreeItemIcon({
     render,
     props: mergeProps<"span">(defaultProps, props),
   });
+
+  if (!displayIcon) return null;
 
   return element;
 }
@@ -1057,8 +1052,6 @@ function TreeItemLabel({
   render,
   ...props
 }: TreeItemLabelProps) {
-  if (!children) return null;
-
   const defaultProps = {
     "data-slot": "tree-item-label",
     className: cn("truncate", className),
@@ -1070,6 +1063,8 @@ function TreeItemLabel({
     render,
     props: mergeProps<"span">(defaultProps, props),
   });
+
+  if (!children) return null;
 
   return element;
 }
@@ -1088,8 +1083,6 @@ function TreeItemBadge({
   render,
   ...props
 }: TreeItemBadgeProps) {
-  if (!children) return null;
-
   const defaultProps = {
     "data-slot": "tree-item-badge",
     className: cn(
@@ -1106,6 +1099,8 @@ function TreeItemBadge({
     render,
     props: mergeProps<"span">(defaultProps, props),
   });
+
+  if (!children) return null;
 
   return element;
 }

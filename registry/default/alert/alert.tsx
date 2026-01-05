@@ -27,8 +27,7 @@ const alertVariants = cva(
 );
 
 export interface AlertProps
-  extends useRender.ComponentProps<"div">,
-    VariantProps<typeof alertVariants> {}
+  extends useRender.ComponentProps<"div">, VariantProps<typeof alertVariants> {}
 
 function Alert({ className, variant, render, ...props }: AlertProps) {
   const defaultProps = {
@@ -39,14 +38,14 @@ function Alert({ className, variant, render, ...props }: AlertProps) {
 
   const element = useRender({
     defaultTagName: "div",
-    render: render,
+    render,
     props: mergeProps<"div">(defaultProps, props),
   });
 
   return element;
 }
 
-export interface AlertTitleProps extends useRender.ComponentProps<"h4"> {}
+export type AlertTitleProps = useRender.ComponentProps<"h4">;
 
 function AlertTitle({ className, render, ...props }: AlertTitleProps) {
   const defaultProps = {
@@ -59,15 +58,14 @@ function AlertTitle({ className, render, ...props }: AlertTitleProps) {
 
   const element = useRender({
     defaultTagName: "h4",
-    render: render,
+    render,
     props: mergeProps<"h4">(defaultProps, props),
   });
 
   return element;
 }
 
-export interface AlertDescriptionProps
-  extends useRender.ComponentProps<"div"> {}
+export type AlertDescriptionProps = useRender.ComponentProps<"div">;
 
 function AlertDescription({
   className,
@@ -84,14 +82,14 @@ function AlertDescription({
 
   const element = useRender({
     defaultTagName: "div",
-    render: render,
+    render,
     props: mergeProps<"div">(defaultProps, props),
   });
 
   return element;
 }
 
-export interface AlertActionProps extends useRender.ComponentProps<"div"> {}
+export type AlertActionProps = useRender.ComponentProps<"div">;
 
 function AlertAction({ className, render, ...props }: AlertActionProps) {
   const defaultProps = {
@@ -104,7 +102,7 @@ function AlertAction({ className, render, ...props }: AlertActionProps) {
 
   const element = useRender({
     defaultTagName: "div",
-    render: render,
+    render,
     props: mergeProps<"div">(defaultProps, props),
   });
 

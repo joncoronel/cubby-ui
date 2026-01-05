@@ -7,13 +7,7 @@ import {
   TreeItemLabel,
   TreeNode,
 } from "@/registry/default/tree/tree";
-import {
-  FolderIcon,
-  FolderOpenIcon,
-  FileIcon,
-  LockIcon,
-  LoaderIcon,
-} from "lucide-react";
+import { FolderIcon, FolderOpenIcon, FileIcon, LockIcon } from "lucide-react";
 
 const treeData: TreeNode[] = [
   {

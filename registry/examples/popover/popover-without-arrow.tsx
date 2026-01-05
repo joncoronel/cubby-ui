@@ -19,7 +19,7 @@ export default function PopoverWithoutArrow() {
           <div>
             <p className="text-sm font-medium">Information</p>
             <p className="text-sm text-muted-foreground">
-              This popover doesn't have an arrow pointer.
+              This popover doesn&apos;t have an arrow pointer.
             </p>
           </div>
         </div>

@@ -13,7 +13,7 @@ export default function AccordionWithSubtitle() {
           What is your refund policy?
         </AccordionTrigger>
         <AccordionContent>
-          We offer a 30-day money-back guarantee for all purchases. If you're
+          We offer a 30-day money-back guarantee for all purchases. If you&apos;re
           not completely satisfied, contact our support team for a full refund.
           No questions asked.
         </AccordionContent>

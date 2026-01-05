@@ -49,7 +49,7 @@ export default function AlertDialogNested() {
                 <AlertDialogTitle>Are you absolutely certain?</AlertDialogTitle>
                 <AlertDialogDescription>
                   This will permanently delete your account and all associated
-                  data. Type "DELETE" to confirm.
+                  data. Type &quot;DELETE&quot; to confirm.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

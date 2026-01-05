@@ -42,7 +42,7 @@ export default function CropperWithPreview() {
   // Debounced crop area to reduce preview updates
   const debouncedCropArea = useMemo(() => {
     let timeoutId: NodeJS.Timeout;
-    let debouncedArea: Area | null = null;
+    const debouncedArea: Area | null = null;
 
     const debounce = (area: Area | null) => {
       clearTimeout(timeoutId);

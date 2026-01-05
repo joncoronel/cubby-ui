@@ -440,7 +440,7 @@ export function CircularSliderRoot({
 
   const element = useRender({
     defaultTagName: "div",
-    render: render,
+    render,
     props: mergeProps<"div">(defaultProps, props),
   });
 
@@ -559,7 +559,7 @@ export function CircularSliderTrack({
 
   const element = useRender({
     defaultTagName: "svg",
-    render: render,
+    render,
     props: mergeProps<"svg">(defaultProps, {
       ...props,
       children: trackElement,
@@ -662,7 +662,7 @@ export function CircularSliderIndicator({
 
   const element = useRender({
     defaultTagName: "svg",
-    render: render,
+    render,
     props: mergeProps<"svg">(defaultProps, {
       ...props,
       children: indicatorElement,
@@ -760,7 +760,7 @@ export function CircularSliderThumb({
 
   const element = useRender({
     defaultTagName: "div",
-    render: render,
+    render,
     props: mergeProps<"div">(defaultProps, props),
   });
 
@@ -797,7 +797,7 @@ export function CircularSliderValue({
 
   const element = useRender({
     defaultTagName: "div",
-    render: render,
+    render,
     props: mergeProps<"div">(defaultProps, {
       ...props,
       children: displayValue,
@@ -907,7 +907,7 @@ export function CircularSliderMarkers({
 
   const element = useRender({
     defaultTagName: "svg",
-    render: render,
+    render,
     props: mergeProps<"svg">(defaultProps, {
       ...props,
       children: markerElements,

@@ -25,7 +25,8 @@ const timelineIndicatorVariants = cva(
   {
     variants: {
       state: {
-        pending: "border-border/80 bg-input shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.08)]",
+        pending:
+          "border-border/80 bg-input shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.08)]",
         current:
           "border-primary bg-primary/5 ring-2 ring-primary/20 ring-offset-2 ring-offset-background shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.08)]",
         completed:
@@ -90,7 +91,8 @@ type RenderFunction<T> = (
 
 // Components
 interface TimelineProps
-  extends useRender.ComponentProps<"div">,
+  extends
+    useRender.ComponentProps<"div">,
     VariantProps<typeof timelineVariants> {
   defaultValue?: number;
   value?: number;
@@ -130,9 +132,9 @@ function Timeline({
   };
 
   const element = useRender({
-    defaultTagName: 'div',
-    render: render,
-    props: mergeProps<'div'>(defaultProps, props),
+    defaultTagName: "div",
+    render,
+    props: mergeProps<"div">(defaultProps, props),
   });
 
   return (
@@ -163,11 +165,7 @@ function TimelineContent({
     "data-slot": "timeline-content",
   });
 
-  return render ? (
-    render(contentProps, React.createRef())
-  ) : (
-    <div {...contentProps} />
-  );
+  return render ? render(contentProps, null) : <div {...contentProps} />;
 }
 
 // TimelineDate
@@ -184,11 +182,7 @@ function TimelineDate({ className, render, ...props }: TimelineDateProps) {
     "data-slot": "timeline-date",
   });
 
-  return render ? (
-    render(dateProps, React.createRef())
-  ) : (
-    <time {...dateProps} />
-  );
+  return render ? render(dateProps, null) : <time {...dateProps} />;
 }
 
 // TimelineHeader
@@ -202,11 +196,7 @@ function TimelineHeader({ className, render, ...props }: TimelineHeaderProps) {
     "data-slot": "timeline-header",
   });
 
-  return render ? (
-    render(headerProps, React.createRef())
-  ) : (
-    <div {...headerProps} />
-  );
+  return render ? render(headerProps, null) : <div {...headerProps} />;
 }
 
 // TimelineIndicator
@@ -245,7 +235,7 @@ function TimelineIndicator({
   });
 
   return render ? (
-    render(indicatorProps, React.createRef())
+    render(indicatorProps, null)
   ) : (
     <div {...indicatorProps}>{children}</div>
   );
@@ -282,7 +272,7 @@ function TimelineItem({
 
   return (
     <TimelineItemContext.Provider value={{ step }}>
-      {render ? render(itemProps, React.createRef()) : <div {...itemProps} />}
+      {render ? render(itemProps, null) : <div {...itemProps} />}
     </TimelineItemContext.Provider>
   );
 }
@@ -316,11 +306,7 @@ function TimelineSeparator({
     "data-state": state,
   });
 
-  return render ? (
-    render(separatorProps, React.createRef())
-  ) : (
-    <div {...separatorProps} />
-  );
+  return render ? render(separatorProps, null) : <div {...separatorProps} />;
 }
 
 // TimelineTitle
@@ -334,11 +320,7 @@ function TimelineTitle({ className, render, ...props }: TimelineTitleProps) {
     "data-slot": "timeline-title",
   });
 
-  return render ? (
-    render(titleProps, React.createRef())
-  ) : (
-    <h3 {...titleProps} />
-  );
+  return render ? render(titleProps, null) : <h3 {...titleProps} />;
 }
 
 export {

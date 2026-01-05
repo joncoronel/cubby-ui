@@ -25,7 +25,7 @@ export default function AccordionIndicatorStart() {
         <AccordionContent>
           Download our mobile app for iOS and Android. Features include
           biometric authentication, push notifications, and full functionality
-          even when you're offline.
+          even when you&apos;re offline.
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-3">

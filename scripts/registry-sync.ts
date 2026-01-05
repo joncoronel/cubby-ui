@@ -192,7 +192,7 @@ function extractAnatomyFromExample(
     );
 
     let imports = "";
-    let componentImports: Set<string> = new Set();
+    const componentImports: Set<string> = new Set();
     let anatomy = "";
 
     function visit(node: ts.Node) {

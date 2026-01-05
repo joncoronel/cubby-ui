@@ -126,7 +126,9 @@ export default function AutocompleteFuzzy() {
         <AutocompletePositioner sideOffset={4}>
           <AutocompletePopup>
             <AutocompleteEmpty>
-              No results found for "<AutocompleteValue />"
+              No results found for &quot;
+              <AutocompleteValue />
+              &quot;
             </AutocompleteEmpty>
 
             <AutocompleteList>

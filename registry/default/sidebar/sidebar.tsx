@@ -420,11 +420,13 @@ function SidebarGroupLabel({
     "data-sidebar": "group-label",
   };
 
-  return useRender({
+  const element = useRender({
     defaultTagName: "div",
-    render: render,
+    render,
     props: mergeProps<"div">(defaultProps, props),
   });
+
+  return element;
 }
 
 function SidebarGroupAction({
@@ -446,11 +448,13 @@ function SidebarGroupAction({
     "data-sidebar": "group-action",
   };
 
-  return useRender({
+  const element = useRender({
     defaultTagName: "button",
-    render: render,
+    render,
     props: mergeProps<"button">(defaultProps, props),
   });
+
+  return element;
 }
 
 function SidebarGroupContent({
@@ -538,7 +542,7 @@ function SidebarMenuButton({
 
   const button = useRender({
     defaultTagName: "button",
-    render: render,
+    render,
     props: mergeProps<"button">(defaultProps, props),
   });
 
@@ -591,11 +595,13 @@ function SidebarMenuAction({
     "data-sidebar": "menu-action",
   };
 
-  return useRender({
+  const element = useRender({
     defaultTagName: "button",
-    render: render,
+    render,
     props: mergeProps<"button">(defaultProps, props),
   });
+
+  return element;
 }
 
 function SidebarMenuBadge({
@@ -713,11 +719,13 @@ function SidebarMenuSubButton({
     "data-active": isActive,
   };
 
-  return useRender({
+  const element = useRender({
     defaultTagName: "a",
-    render: render,
+    render,
     props: mergeProps<"a">(defaultProps, props),
   });
+
+  return element;
 }
 
 export {

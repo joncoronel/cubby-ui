@@ -69,7 +69,9 @@ export default function AutocompleteClearExample() {
       <AutocompletePortal>
         <AutocompletePositioner sideOffset={4}>
           <AutocompletePopup>
-            <AutocompleteEmpty>No tags found for "{value}"</AutocompleteEmpty>
+            <AutocompleteEmpty>
+              No tags found for &quot;{value}&quot;
+            </AutocompleteEmpty>
 
             <AutocompleteList>
               {(tag: Tag) => (

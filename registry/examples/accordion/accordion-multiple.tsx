@@ -13,7 +13,7 @@ export default function AccordionMultiple() {
         <AccordionContent>
           Our platform includes real-time collaboration, advanced analytics,
           automated workflows, and enterprise-grade security. All features work
-          seamlessly together to boost your team's productivity.
+          seamlessly together to boost your team&apos;s productivity.
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-2">

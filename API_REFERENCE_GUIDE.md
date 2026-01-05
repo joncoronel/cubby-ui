@@ -54,15 +54,11 @@ Use `### Props` to contain all component prop documentation. Each component part
 
 #### ComponentName
 
-<ApiPropsList>
-  ...props...
-</ApiPropsList>
+<ApiPropsList>...props...</ApiPropsList>
 
 #### AnotherComponent
 
-<ApiPropsList>
-  ...props...
-</ApiPropsList>
+<ApiPropsList>...props...</ApiPropsList>
 ```
 
 ### Component Descriptions
@@ -78,9 +74,7 @@ When a component part wraps a single Base UI component:
 
 Scrollable container for command items. Wraps Base UI's `Autocomplete.List`.
 
-<ApiPropsList>
-  ...props...
-</ApiPropsList>
+<ApiPropsList>...props...</ApiPropsList>
 ```
 
 #### Compound Wrappers
@@ -96,9 +90,7 @@ When a component part composes multiple Base UI components internally (e.g., com
 
 Main dialog container with backdrop and positioning. Composes `Dialog.Portal`, `Dialog.Backdrop`, and `Dialog.Popup`. Props are forwarded to `Dialog.Popup`.
 
-<ApiPropsList>
-  ...props...
-</ApiPropsList>
+<ApiPropsList>...props...</ApiPropsList>
 ```
 
 This helps users understand:
@@ -126,12 +118,12 @@ For simple wrappers without props worth documenting, you can either:
 
 ### Props for ApiProp
 
-| Prop | Required | Description |
-|------|----------|-------------|
-| `name` | Yes | The prop name exactly as used in code |
-| `fullType` | Yes | The complete TypeScript type |
-| `simpleType` | No | A simplified type for display (e.g., "string", "node", "function") |
-| `defaultValue` | No | The default value, wrapped in quotes if it's a string |
+| Prop           | Required | Description                                                        |
+| -------------- | -------- | ------------------------------------------------------------------ |
+| `name`         | Yes      | The prop name exactly as used in code                              |
+| `fullType`     | Yes      | The complete TypeScript type                                       |
+| `simpleType`   | No       | A simplified type for display (e.g., "string", "node", "function") |
+| `defaultValue` | No       | The default value, wrapped in quotes if it's a string              |
 
 ### Type Formatting
 
@@ -139,24 +131,31 @@ Use proper TypeScript syntax for `fullType`:
 
 ```mdx
 <!-- String literals -->
+
 fullType='"primary" | "secondary" | "ghost"'
 
 <!-- Boolean -->
+
 fullType="boolean"
 
 <!-- Union types -->
+
 fullType='boolean | "always"'
 
 <!-- Complex types -->
+
 fullType="boolean | 'top' | 'bottom' | 'x' | 'y' | FadeEdge[]"
 
 <!-- Functions -->
+
 fullType="(value: string) => void"
 
 <!-- Generic types -->
+
 fullType="T[] | { items: T[] }[]"
 
 <!-- ReactNode -->
+
 fullType="ReactNode"
 ```
 
@@ -164,11 +163,17 @@ fullType="ReactNode"
 
 ```mdx
 <!-- String defaults need inner quotes -->
+
 defaultValue='"primary"'
 
 <!-- Boolean/number defaults -->
+
 defaultValue="false"
 defaultValue="0"
+
+<!-- Variant-dependent defaults -->
+
+defaultValue="10 (filled) / 5 (default)"
 
 <!-- No default (optional prop) -->
 <!-- Simply omit the defaultValue prop -->
@@ -184,16 +189,20 @@ defaultValue="0"
 
 ```mdx
 <!-- Good -->
+
 <ApiProp name="fadeEdges" fullType="boolean" defaultValue="false">
   Adds a subtle fade effect at scroll edges using CSS masks.
 </ApiProp>
 
 <!-- Good - with additional context -->
+
 <ApiProp name="hideScrollbar" fullType="boolean" defaultValue="false">
-  Hides the scrollbar while keeping scroll functionality. Cannot be used with `persistScrollbar`.
+  Hides the scrollbar while keeping scroll functionality. Cannot be used with
+  `persistScrollbar`.
 </ApiProp>
 
 <!-- Avoid -->
+
 <ApiProp name="fadeEdges" fullType="boolean" defaultValue="false">
   This prop controls whether fade edges are shown.
 </ApiProp>
@@ -207,12 +216,12 @@ For complex props, use line breaks and lists:
 <ApiProp name="fadeEdges" fullType="boolean | 'top' | 'bottom' | 'x' | 'y' | FadeEdge[]" defaultValue="false">
   Adds a subtle fade effect at the scroll edges using CSS masks.
 
-  - `true` - fade all edges
-  - `"y"` - fade top and bottom
-  - `"x"` - fade left and right
-  - `"top"`, `"bottom"`, `"left"`, `"right"` - fade specific edge
-  - `["top", "left"]` - fade multiple specific edges
-</ApiProp>
+- `true` - fade all edges
+- `"y"` - fade top and bottom
+- `"x"` - fade left and right
+- `"top"`, `"bottom"`, `"left"`, `"right"` - fade specific edge
+- `["top", "left"]` - fade multiple specific edges
+  </ApiProp>
 ```
 
 ## Documenting Modified Defaults
@@ -220,12 +229,18 @@ For complex props, use line breaks and lists:
 When your component changes default values from the base library, **include the prop in the `<ApiPropsList>`** and note the Base UI default in the description. This ensures users can see it as an actual prop they can configure.
 
 ```mdx
-<ApiProp name="autoHighlight" fullType='boolean | "always"' defaultValue='"always"'>
-  Whether the first matching item is highlighted automatically. Base UI defaults to `false`.
+<ApiProp
+  name="autoHighlight"
+  fullType='boolean | "always"'
+  defaultValue='"always"'
+>
+  Whether the first matching item is highlighted automatically. Base UI defaults
+  to `false`.
 </ApiProp>
 
 <ApiProp name="open" fullType="boolean" defaultValue="true">
-  Keeps the list always open for command menu behavior. Base UI defaults to `false`.
+  Keeps the list always open for command menu behavior. Base UI defaults to
+  `false`.
 </ApiProp>
 ```
 
@@ -315,7 +330,7 @@ Shared hooks and utilities have their own dedicated documentation pages in `/doc
 
 Use `### Utilities` and `### Hooks` sections with brief descriptions and links:
 
-````mdx
+```mdx
 ### Utilities
 
 #### highlightText
@@ -331,7 +346,7 @@ See [highlightText](/docs/utils/highlight-text) for full documentation and API r
 Provides fuzzy matching capabilities for flexible searching across multiple fields. Returns filter functions compatible with Base UI's Autocomplete.
 
 See [useFuzzyFilter](/docs/hooks/use-fuzzy-filter) for full documentation and API reference.
-````
+```
 
 ### In Dedicated Hook/Utility Pages
 
@@ -374,7 +389,10 @@ const { filterItem } = useFuzzyFilter({
 
 <ApiPropsList>
 
-<ApiProp name="keys" fullType='Array<string | { key: string; threshold?: FuzzyThreshold }>'>
+<ApiProp
+  name="keys"
+  fullType="Array<string | { key: string; threshold?: FuzzyThreshold }>"
+>
   Properties to search on. Can specify per-key thresholds.
 </ApiProp>
 
@@ -382,10 +400,10 @@ const { filterItem } = useFuzzyFilter({
 
 ### Returns
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `filter` | `(items: T[], query: string) => T[]` | Filters and sorts items by relevance |
-| `filterItem` | `(item: T, query: string) => boolean` | Checks if a single item matches |
+| Property     | Type                                  | Description                          |
+| ------------ | ------------------------------------- | ------------------------------------ |
+| `filter`     | `(items: T[], query: string) => T[]`  | Filters and sorts items by relevance |
+| `filterItem` | `(item: T, query: string) => boolean` | Checks if a single item matches      |
 ````
 
 ### Component-Specific Hooks

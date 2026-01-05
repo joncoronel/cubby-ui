@@ -212,6 +212,7 @@ import kbd_kbd_single_keys from "@/registry/examples/kbd/kbd-single-keys";
 import kbd_kbd_size_variants from "@/registry/examples/kbd/kbd-size-variants";
 import kbd_kbd_special_keys_with_auto_conversion from "@/registry/examples/kbd/kbd-special-keys-with-auto-conversion";
 import kbd_kbd_states from "@/registry/examples/kbd/kbd-states";
+import label_label_demo from "@/registry/examples/label/label-demo";
 import menubar_menubar_basic from "@/registry/examples/menubar/menubar-basic";
 import meter_meter_basic from "@/registry/examples/meter/meter-basic";
 import meter_meter_different_sizes from "@/registry/examples/meter/meter-different-sizes";
@@ -2280,6 +2281,13 @@ export const exampleRegistry = {
       "source": "import { Kbd } from \"@/components/ui/cubby-ui/kbd\"\n\nexport default function KbdStates() {\n  return (\n    <div className=\"space-y-3\">\n      <div className=\"flex items-center gap-2\">\n        <span className=\"text-sm\">Normal:</span>\n        <Kbd>⌘</Kbd>\n      </div>\n      <div className=\"flex items-center gap-2\">\n        <span className=\"text-sm\">Pressed:</span>\n        <Kbd pressed>⌘</Kbd>\n      </div>\n      <div className=\"flex items-center gap-2\">\n        <span className=\"text-sm\">Disabled:</span>\n        <Kbd disabled>⌘</Kbd>\n      </div>\n    </div>\n  )\n}"
     }
   ],
+  "label": [
+    {
+      "title": "Demo",
+      "importPath": "label-demo",
+      "source": "import { Input } from \"@/components/ui/cubby-ui/input\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function LabelDemo() {\n  return (\n    <Label>\n      Email address\n      <Input type=\"email\" placeholder=\"you@example.com\" />\n    </Label>\n  );\n}\n"
+    }
+  ],
   "menubar": [
     {
       "title": "Basic",
@@ -3176,6 +3184,7 @@ export const componentMap = {
   "kbd-size-variants": kbd_kbd_size_variants,
   "kbd-special-keys-with-auto-conversion": kbd_kbd_special_keys_with_auto_conversion,
   "kbd-states": kbd_kbd_states,
+  "label-demo": label_label_demo,
   "menubar-basic": menubar_menubar_basic,
   "meter-basic": meter_meter_basic,
   "meter-different-sizes": meter_meter_different_sizes,
@@ -3442,7 +3451,7 @@ export const componentAnatomy = {
     "anatomy": "<Kbd />"
   },
   "label": {
-    "imports": "import { Label } from \"@/components/ui/cubby-ui/label\"",
+    "imports": "import { Label } from \"@/components/ui/cubby-ui/label\";",
     "anatomy": "<Label />"
   },
   "menubar": {

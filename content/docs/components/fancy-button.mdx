@@ -35,7 +35,10 @@ Add icons for visual context.
 
 Apply custom color schemes.
 
-<ComponentPreview component="fancy-button" example="fancy-button-custom-colors" />
+<ComponentPreview
+  component="fancy-button"
+  example="fancy-button-custom-colors"
+/>
 
 ### Loading State
 
@@ -69,16 +72,29 @@ Stylized button with gradient effects and animations. Wraps Base UI's `Button`.
 
 <ApiPropsList>
 
+<ApiProp
+  name="size"
+  fullType='"xs" | "sm" | "default" | "lg" | "icon" | "icon_xs" | "icon_sm" | "icon_lg"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Size of the button. Use icon variants for icon-only buttons with proper square
+  dimensions. Custom prop not available in Base UI.
+</ApiProp>
+
 <ApiProp name="color" fullType="string" simpleType="string">
-  Custom gradient color for the fancy button effect. Custom prop not available in Base UI.
+  Custom gradient color for the fancy button effect. Custom prop not available
+  in Base UI.
 </ApiProp>
 
 <ApiProp name="leftSection" fullType="ReactNode" simpleType="node">
-  Content (typically icon) to display before the button text. Custom prop not available in Base UI.
+  Content (typically icon) to display before the button text. Custom prop not
+  available in Base UI.
 </ApiProp>
 
 <ApiProp name="rightSection" fullType="ReactNode" simpleType="node">
-  Content (typically icon) to display after the button text. Custom prop not available in Base UI.
+  Content (typically icon) to display after the button text. Custom prop not
+  available in Base UI.
 </ApiProp>
 
 </ApiPropsList>

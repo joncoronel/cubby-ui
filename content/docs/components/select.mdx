@@ -86,7 +86,8 @@ Displays the selected value or placeholder text. Wraps Base UI's `Select.Value`.
   fullType="Record<string, string> | { label: string; value: string }[]"
   simpleType="object | array"
 >
-  Item mapping for rendering multi-select values. Maps value keys to display labels.
+  Item mapping for rendering multi-select values. Maps value keys to display
+  labels.
 </ApiProp>
 
 <ApiProp name="placeholder" fullType="string" simpleType="string">
@@ -105,16 +106,12 @@ Button that opens the dropdown when clicked. Wraps Base UI's `Select.Trigger`.
   name="size"
   fullType="'sm' | 'default'"
   simpleType="enum"
-  defaultValue="default"
+  defaultValue='"default"'
 >
   Size variant of the trigger button.
 </ApiProp>
 
-<ApiProp
-  name="hideChevronRotation"
-  fullType="boolean"
-  defaultValue="false"
->
+<ApiProp name="hideChevronRotation" fullType="boolean" defaultValue="false">
   Disable the chevron rotation animation when the select opens.
 </ApiProp>
 
@@ -126,12 +123,9 @@ Dropdown container for the option list with positioning. Composes Base UI's `Sel
 
 <ApiPropsList>
 
-<ApiProp
-  name="alignItemWithTrigger"
-  fullType="boolean"
-  defaultValue="false"
->
-  Align the selected item with the trigger button position. Enables native-style scrolling with scroll arrows.
+<ApiProp name="alignItemWithTrigger" fullType="boolean" defaultValue="false">
+  Align the selected item with the trigger button position. Enables native-style
+  scrolling with scroll arrows.
 </ApiProp>
 
 <ApiProp
@@ -139,46 +133,29 @@ Dropdown container for the option list with positioning. Composes Base UI's `Sel
   fullType="boolean | 'top' | 'bottom' | 'left' | 'right' | 'x' | 'y' | FadeEdge[]"
   defaultValue="true"
 >
-  Controls the fade effect on scroll edges. See [ScrollArea](/docs/components/scroll-area#custom-props) for all options.
+  Controls the fade effect on scroll edges. See
+  [ScrollArea](/docs/components/scroll-area#custom-props) for all options.
 </ApiProp>
 
-<ApiProp
-  name="scrollbarGutter"
-  fullType="boolean"
-  defaultValue="false"
->
-  Reserves space for the scrollbar when content overflows, preventing layout shift.
+<ApiProp name="scrollbarGutter" fullType="boolean" defaultValue="false">
+  Reserves space for the scrollbar when content overflows, preventing layout
+  shift.
 </ApiProp>
 
-<ApiProp
-  name="persistScrollbar"
-  fullType="boolean"
-  defaultValue="false"
->
+<ApiProp name="persistScrollbar" fullType="boolean" defaultValue="false">
   Always show the scrollbar instead of fading it in on hover or scroll.
 </ApiProp>
 
-<ApiProp
-  name="hideScrollbar"
-  fullType="boolean"
-  defaultValue="false"
->
+<ApiProp name="hideScrollbar" fullType="boolean" defaultValue="false">
   Hides the scrollbar while keeping scroll functionality.
 </ApiProp>
 
-<ApiProp
-  name="nativeScroll"
-  fullType="boolean"
-  defaultValue="false"
->
-  Use native browser scrolling with styled scrollbars instead of Base UI's scroll virtualization. Enables CSS scroll-driven animations for fade edges.
+<ApiProp name="nativeScroll" fullType="boolean" defaultValue="false">
+  Use native browser scrolling with styled scrollbars instead of Base UI's
+  scroll virtualization. Enables CSS scroll-driven animations for fade edges.
 </ApiProp>
 
-<ApiProp
-  name="sideOffset"
-  fullType="number"
-  defaultValue="6"
->
+<ApiProp name="sideOffset" fullType="number" defaultValue="6">
   Distance between the trigger and the popup. Base UI defaults to `0`.
 </ApiProp>
 

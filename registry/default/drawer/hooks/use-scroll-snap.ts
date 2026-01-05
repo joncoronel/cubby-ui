@@ -57,8 +57,8 @@ export interface UseScrollSnapReturn {
   containerRef: React.RefObject<HTMLDivElement | null>;
   /** Whether currently scrolling/dragging */
   isScrolling: boolean;
-  /** Snap target refs for the snap elements */
-  snapTargetRefs: React.RefObject<(HTMLDivElement | null)[]>;
+  /** Callback to set snap target ref at a given index */
+  setSnapTargetRef: (index: number, el: HTMLDivElement | null) => void;
   /** Track size for the scroll container */
   trackSize: number;
   /** Whether the initial scroll positioning is complete */
@@ -434,6 +434,7 @@ export function useScrollSnap(
     }
   }, [
     geometry,
+    contentSize,
     snapScrollPositions,
     updateIsScrolling,
     startScrollStabilityCheck,
@@ -690,7 +691,10 @@ export function useScrollSnap(
     const { trackSize } = geometry;
 
     // Re-snap when track size changes (skip first run when prev is 0)
-    if (prevTrackSizeRef.current !== 0 && prevTrackSizeRef.current !== trackSize) {
+    if (
+      prevTrackSizeRef.current !== 0 &&
+      prevTrackSizeRef.current !== trackSize
+    ) {
       const container = containerRef.current;
       if (container && !scrollControlRef.current.isProgrammatic) {
         const targetScrollPos =
@@ -780,10 +784,18 @@ export function useScrollSnap(
     handleTouchEnd,
   ]);
 
+  // Callback to set snap target refs (avoids exposing mutable ref to consumers)
+  const setSnapTargetRef = React.useCallback(
+    (index: number, el: HTMLDivElement | null) => {
+      snapTargetRefs.current[index] = el;
+    },
+    [],
+  );
+
   return {
     containerRef,
     isScrolling,
-    snapTargetRefs,
+    setSnapTargetRef,
     trackSize: geometry?.trackSize ?? 0,
     isInitialized,
     isClosing,

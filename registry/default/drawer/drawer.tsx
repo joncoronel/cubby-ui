@@ -667,7 +667,7 @@ function DrawerContentInner({
   const {
     containerRef,
     isScrolling,
-    snapTargetRefs,
+    setSnapTargetRef,
     trackSize,
     isInitialized,
     isClosing,
@@ -957,9 +957,7 @@ function DrawerContentInner({
               {/* Dismiss snap target (if dismissible) */}
               {dismissible && (
                 <div
-                  ref={(el) => {
-                    snapTargetRefs.current[0] = el;
-                  }}
+                  ref={(el) => setSnapTargetRef(0, el)}
                   data-slot="drawer-snap-target"
                   data-snap-index={0}
                   data-snap-type="dismiss"
@@ -988,9 +986,7 @@ function DrawerContentInner({
                 return (
                   <div
                     key={snapIndex}
-                    ref={(el) => {
-                      snapTargetRefs.current[snapIndex] = el;
-                    }}
+                    ref={(el) => setSnapTargetRef(snapIndex, el)}
                     data-slot="drawer-snap-target"
                     data-snap-index={snapIndex}
                     className={cn(

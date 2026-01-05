@@ -67,23 +67,27 @@ const filteredItems = useMemo(
 
 // 2. Initialize virtualizer
 const {
-  rootProps,       // Spread on Command
-  scrollRef,       // Pass to CommandVirtualizedList
-  measureRef,      // Pass to each CommandItem
-  totalSize,       // Pass to CommandVirtualizedList
-  virtualItems,    // Array to map over
-  getItem,         // Get data for virtual item
-  getItemStyle,    // Get positioning styles
-  getItemProps,    // Get aria attributes
+  rootProps, // Spread on Command
+  scrollRef, // Pass to CommandVirtualizedList
+  measureRef, // Pass to each CommandItem
+  totalSize, // Pass to CommandVirtualizedList
+  virtualItems, // Array to map over
+  getItem, // Get data for virtual item
+  getItemStyle, // Get positioning styles
+  getItemProps, // Get aria attributes
 } = useListVirtualizer({
-  items,           // All items (for aria-setsize)
-  filteredItems,   // Items to display
+  items, // All items (for aria-setsize)
+  filteredItems, // Items to display
   estimateSize: 40, // Item height in px
 });
 
 // 3. Render
 <Command {...rootProps} filter={null} itemToStringValue={getItemLabel}>
-  <CommandVirtualizedList scrollRef={scrollRef} totalSize={totalSize} nativeScroll>
+  <CommandVirtualizedList
+    scrollRef={scrollRef}
+    totalSize={totalSize}
+    nativeScroll
+  >
     {virtualItems.map((virtualItem) => (
       <CommandItem
         key={virtualItem.key}
@@ -96,7 +100,7 @@ const {
       </CommandItem>
     ))}
   </CommandVirtualizedList>
-</Command>
+</Command>;
 ```
 
 **Filtering options:**
@@ -120,20 +124,36 @@ Root component that manages command menu state and keyboard navigation. Wraps Ba
 
 <ApiPropsList>
 
-<ApiProp name="items" fullType="T[] | { items: T[] }[]" simpleType="array" defaultValue="[]">
-  Array of items or grouped items to display. Used with the collection pattern where `CommandList`, `CommandGroup`, and `CommandCollection` receive render functions as children.
+<ApiProp
+  name="items"
+  fullType="T[] | { items: T[] }[]"
+  simpleType="array"
+  defaultValue="[]"
+>
+  Array of items or grouped items to display. Used with the collection pattern
+  where `CommandList`, `CommandGroup`, and `CommandCollection` receive render
+  functions as children.
 </ApiProp>
 
-<ApiProp name="autoHighlight" fullType='boolean | "always"' defaultValue='"always"'>
-  Whether the first matching item is highlighted automatically. Set to `"always"` to ensure an item is always highlighted during keyboard navigation. Base UI defaults to `false`.
+<ApiProp
+  name="autoHighlight"
+  fullType='boolean | "always"'
+  defaultValue='"always"'
+>
+  Whether the first matching item is highlighted automatically. Set to
+  `"always"` to ensure an item is always highlighted during keyboard navigation.
+  Base UI defaults to `false`.
 </ApiProp>
 
 <ApiProp name="open" fullType="boolean" defaultValue="true">
-  Keeps the autocomplete list always open. Appropriate for command menu behavior where the list is always visible. Base UI defaults to `false`.
+  Keeps the autocomplete list always open. Appropriate for command menu behavior
+  where the list is always visible. Base UI defaults to `false`.
 </ApiProp>
 
 <ApiProp name="keepHighlight" fullType="boolean" defaultValue="true">
-  Whether the highlighted item should be preserved when the pointer leaves the list. Prevents the highlight from going to a "null" state during navigation. Base UI defaults to `false`.
+  Whether the highlighted item should be preserved when the pointer leaves the
+  list. Prevents the highlight from going to a "null" state during navigation.
+  Base UI defaults to `false`.
 </ApiProp>
 
 </ApiPropsList>
@@ -144,16 +164,19 @@ Scrollable container for command items with empty state handling. Wraps Base UI'
 
 <ApiPropsList>
 
-<ApiProp name="emptyMessage" fullType="ReactNode" simpleType="node" defaultValue='"No results found."'>
-  Custom prop not available in Base UI. Message shown when no results are found in the command list.
+<ApiProp
+  name="emptyMessage"
+  fullType="ReactNode"
+  simpleType="node"
+  defaultValue='"No results found."'
+>
+  Custom prop not available in Base UI. Message shown when no results are found
+  in the command list.
 </ApiProp>
 
-<ApiProp
-  name="nativeScroll"
-  fullType="boolean"
-  defaultValue="false"
->
-  Use native browser scrolling with styled scrollbars instead of Base UI's scroll virtualization. Enables CSS scroll-driven animations for fade edges.
+<ApiProp name="nativeScroll" fullType="boolean" defaultValue="false">
+  Use native browser scrolling with styled scrollbars instead of Base UI's
+  scroll virtualization. Enables CSS scroll-driven animations for fade edges.
 </ApiProp>
 
 <ApiProp
@@ -161,30 +184,20 @@ Scrollable container for command items with empty state handling. Wraps Base UI'
   fullType="boolean | 'top' | 'bottom' | 'left' | 'right' | 'x' | 'y' | FadeEdge[]"
   defaultValue="true"
 >
-  Controls the fade effect on scroll edges. See [ScrollArea](/docs/components/scroll-area#custom-props) for all options.
+  Controls the fade effect on scroll edges. See
+  [ScrollArea](/docs/components/scroll-area#custom-props) for all options.
 </ApiProp>
 
-<ApiProp
-  name="scrollbarGutter"
-  fullType="boolean"
-  defaultValue="false"
->
-  Reserves space for the scrollbar when content overflows, preventing layout shift.
+<ApiProp name="scrollbarGutter" fullType="boolean" defaultValue="false">
+  Reserves space for the scrollbar when content overflows, preventing layout
+  shift.
 </ApiProp>
 
-<ApiProp
-  name="persistScrollbar"
-  fullType="boolean"
-  defaultValue="false"
->
+<ApiProp name="persistScrollbar" fullType="boolean" defaultValue="false">
   Always show the scrollbar instead of fading it in on hover or scroll.
 </ApiProp>
 
-<ApiProp
-  name="hideScrollbar"
-  fullType="boolean"
-  defaultValue="false"
->
+<ApiProp name="hideScrollbar" fullType="boolean" defaultValue="false">
   Hides the scrollbar while keeping scroll functionality.
 </ApiProp>
 
@@ -196,7 +209,11 @@ Virtualized scrollable container for large lists. Use with `useListVirtualizer` 
 
 <ApiPropsList>
 
-<ApiProp name="scrollRef" fullType="(element: HTMLDivElement | null) => void" required>
+<ApiProp
+  name="scrollRef"
+  fullType="(element: HTMLDivElement | null) => void"
+  required
+>
   Ref callback from `useListVirtualizer` for the scroll container.
 </ApiProp>
 
@@ -204,11 +221,20 @@ Virtualized scrollable container for large lists. Use with `useListVirtualizer` 
   Total height of all virtual items in pixels. Provided by `useListVirtualizer`.
 </ApiProp>
 
-<ApiProp name="emptyMessage" fullType="ReactNode" simpleType="node" defaultValue='"No results found."'>
+<ApiProp
+  name="emptyMessage"
+  fullType="ReactNode"
+  simpleType="node"
+  defaultValue='"No results found."'
+>
   Message shown when no results are found.
 </ApiProp>
 
-<ApiProp name="fadeEdges" fullType="boolean | 'x' | 'y' | FadeEdge[]" defaultValue='"y"'>
+<ApiProp
+  name="fadeEdges"
+  fullType="boolean | 'x' | 'y' | FadeEdge[]"
+  defaultValue='"y"'
+>
   Controls the fade effect on scroll edges.
 </ApiProp>
 
@@ -232,21 +258,33 @@ See [highlightText](/docs/utils/highlight-text) for full documentation and API r
 
 ```ts
 function useCommandFilter(): {
-  contains: (item: T, query: string, getItemLabel: (item: T) => string) => boolean;
-  startsWith: (item: T, query: string, getItemLabel: (item: T) => string) => boolean;
-  endsWith: (item: T, query: string, getItemLabel: (item: T) => string) => boolean;
-}
+  contains: (
+    item: T,
+    query: string,
+    getItemLabel: (item: T) => string,
+  ) => boolean;
+  startsWith: (
+    item: T,
+    query: string,
+    getItemLabel: (item: T) => string,
+  ) => boolean;
+  endsWith: (
+    item: T,
+    query: string,
+    getItemLabel: (item: T) => string,
+  ) => boolean;
+};
 ```
 
 Exposes Base UI's built-in filter matchers for external filtering. Required when using virtualization since you must compute `filteredItems` yourself.
 
 **Returns**
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `contains` | `(item, query, getItemLabel) => boolean` | Returns true if item label contains query (case-insensitive) |
-| `startsWith` | `(item, query, getItemLabel) => boolean` | Returns true if item label starts with query |
-| `endsWith` | `(item, query, getItemLabel) => boolean` | Returns true if item label ends with query |
+| Property     | Type                                     | Description                                                  |
+| ------------ | ---------------------------------------- | ------------------------------------------------------------ |
+| `contains`   | `(item, query, getItemLabel) => boolean` | Returns true if item label contains query (case-insensitive) |
+| `startsWith` | `(item, query, getItemLabel) => boolean` | Returns true if item label starts with query                 |
+| `endsWith`   | `(item, query, getItemLabel) => boolean` | Returns true if item label ends with query                   |
 
 ```tsx
 import { useCommandFilter } from "@/registry/default/command/command";

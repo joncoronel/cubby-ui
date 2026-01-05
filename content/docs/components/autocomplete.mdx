@@ -29,7 +29,10 @@ Fetch suggestions asynchronously from an API.
 
 Automatically highlight the first suggestion.
 
-<ComponentPreview component="autocomplete" example="autocomplete-auto-highlight" />
+<ComponentPreview
+  component="autocomplete"
+  example="autocomplete-auto-highlight"
+/>
 
 ### Clearable Input
 
@@ -89,11 +92,7 @@ Positions the suggestions dropdown relative to the input. Wraps Base UI's `Autoc
 
 <ApiPropsList>
 
-<ApiProp
-  name="sideOffset"
-  fullType="number"
-  defaultValue="6"
->
+<ApiProp name="sideOffset" fullType="number" defaultValue="6">
   Distance between the trigger and the popup. Base UI defaults to `0`.
 </ApiProp>
 
@@ -105,12 +104,9 @@ Scrollable container for suggestion items. Wraps Base UI's `Autocomplete.List`.
 
 <ApiPropsList>
 
-<ApiProp
-  name="nativeScroll"
-  fullType="boolean"
-  defaultValue="false"
->
-  Use native browser scrolling with styled scrollbars instead of Base UI's scroll virtualization. Enables CSS scroll-driven animations for fade edges.
+<ApiProp name="nativeScroll" fullType="boolean" defaultValue="false">
+  Use native browser scrolling with styled scrollbars instead of Base UI's
+  scroll virtualization. Enables CSS scroll-driven animations for fade edges.
 </ApiProp>
 
 <ApiProp
@@ -118,30 +114,20 @@ Scrollable container for suggestion items. Wraps Base UI's `Autocomplete.List`.
   fullType="boolean | 'top' | 'bottom' | 'left' | 'right' | 'x' | 'y' | FadeEdge[]"
   defaultValue="true"
 >
-  Controls the fade effect on scroll edges. See [ScrollArea](/docs/components/scroll-area#custom-props) for all options.
+  Controls the fade effect on scroll edges. See
+  [ScrollArea](/docs/components/scroll-area#custom-props) for all options.
 </ApiProp>
 
-<ApiProp
-  name="scrollbarGutter"
-  fullType="boolean"
-  defaultValue="false"
->
-  Reserves space for the scrollbar when content overflows, preventing layout shift.
+<ApiProp name="scrollbarGutter" fullType="boolean" defaultValue="false">
+  Reserves space for the scrollbar when content overflows, preventing layout
+  shift.
 </ApiProp>
 
-<ApiProp
-  name="persistScrollbar"
-  fullType="boolean"
-  defaultValue="false"
->
+<ApiProp name="persistScrollbar" fullType="boolean" defaultValue="false">
   Always show the scrollbar instead of fading it in on hover or scroll.
 </ApiProp>
 
-<ApiProp
-  name="hideScrollbar"
-  fullType="boolean"
-  defaultValue="false"
->
+<ApiProp name="hideScrollbar" fullType="boolean" defaultValue="false">
   Hides the scrollbar while keeping scroll functionality.
 </ApiProp>
 
@@ -153,7 +139,11 @@ Virtualized scrollable container for large lists. Use with `useListVirtualizer` 
 
 <ApiPropsList>
 
-<ApiProp name="scrollRef" fullType="(element: HTMLDivElement | null) => void" required>
+<ApiProp
+  name="scrollRef"
+  fullType="(element: HTMLDivElement | null) => void"
+  required
+>
   Ref callback from `useListVirtualizer` for the scroll container.
 </ApiProp>
 
@@ -161,16 +151,26 @@ Virtualized scrollable container for large lists. Use with `useListVirtualizer` 
   Total height of all virtual items in pixels. Provided by `useListVirtualizer`.
 </ApiProp>
 
-<ApiProp name="emptyMessage" fullType="ReactNode" simpleType="node" defaultValue='"No results found."'>
+<ApiProp
+  name="emptyMessage"
+  fullType="ReactNode"
+  simpleType="node"
+  defaultValue='"No results found."'
+>
   Message shown when no results are found.
 </ApiProp>
 
-<ApiProp name="fadeEdges" fullType="boolean | 'x' | 'y' | FadeEdge[]" defaultValue='"y"'>
+<ApiProp
+  name="fadeEdges"
+  fullType="boolean | 'x' | 'y' | FadeEdge[]"
+  defaultValue='"y"'
+>
   Controls the fade effect on scroll edges.
 </ApiProp>
 
 <ApiProp name="nativeScroll" fullType="boolean" defaultValue="false">
-  Use native browser scrolling instead of custom scrollbars. Recommended for best virtualization performance.
+  Use native browser scrolling instead of custom scrollbars. Recommended for
+  best virtualization performance.
 </ApiProp>
 
 </ApiPropsList>
@@ -184,6 +184,50 @@ Highlights matching portions of text by wrapping them in `<mark>` tags. Useful f
 See [highlightText](/docs/utils/highlight-text) for full documentation and API reference.
 
 ### Hooks
+
+#### useAutocompleteFilter
+
+```ts
+function useAutocompleteFilter(): {
+  contains: (
+    item: T,
+    query: string,
+    getItemLabel: (item: T) => string,
+  ) => boolean;
+  startsWith: (
+    item: T,
+    query: string,
+    getItemLabel: (item: T) => string,
+  ) => boolean;
+  endsWith: (
+    item: T,
+    query: string,
+    getItemLabel: (item: T) => string,
+  ) => boolean;
+};
+```
+
+Exposes Base UI's built-in filter matchers for external filtering. Required when using virtualization since you must compute `filteredItems` yourself.
+
+**Returns**
+
+| Property     | Type                                     | Description                                                  |
+| ------------ | ---------------------------------------- | ------------------------------------------------------------ |
+| `contains`   | `(item, query, getItemLabel) => boolean` | Returns true if item label contains query (case-insensitive) |
+| `startsWith` | `(item, query, getItemLabel) => boolean` | Returns true if item label starts with query                 |
+| `endsWith`   | `(item, query, getItemLabel) => boolean` | Returns true if item label ends with query                   |
+
+```tsx
+import { useAutocompleteFilter } from "@/registry/default/autocomplete/autocomplete";
+
+const { contains } = useAutocompleteFilter();
+const getItemLabel = (item: Item | null) => item?.name ?? "";
+
+const filteredItems = useMemo(
+  () => items.filter((item) => contains(item, query, getItemLabel)),
+  [contains, query],
+);
+```
 
 #### useFuzzyFilter
 

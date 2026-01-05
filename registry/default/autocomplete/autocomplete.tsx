@@ -385,6 +385,8 @@ export const Autocomplete = {
   useFilter: BaseAutocomplete.useFilter,
 };
 
+const useAutocompleteFilter = BaseAutocomplete.useFilter;
+
 export {
   AutocompleteRoot,
   AutocompleteInput,
@@ -407,4 +409,5 @@ export {
   AutocompleteGroup,
   AutocompleteGroupLabel,
   AutocompleteSeparator,
+  useAutocompleteFilter,
 };

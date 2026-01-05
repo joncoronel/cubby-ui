@@ -7,7 +7,7 @@
     "build": "next build",
     "registry:sync": "npx tsx scripts/registry-sync.ts",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint",
     "test": "vitest",
     "test:run": "vitest run",
     "registry:build": "shadcn build",

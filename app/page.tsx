@@ -50,7 +50,7 @@ export default function Home() {
             <div className="flex flex-wrap items-center gap-3">
               <Button
                 size="lg"
-                render={<Link href="/docs" />}
+                render={<Link href="/docs/getting-started/introduction" />}
                 variant="neutral"
                 className="transition-all duration-200 hover:shadow-md"
                 nativeButton={false}

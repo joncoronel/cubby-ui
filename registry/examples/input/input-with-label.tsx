@@ -3,9 +3,9 @@ import { Label } from "@/registry/default/label/label";
 
 export default function InputWithLabel() {
   return (
-    <div className="space-y-2">
-      <Label htmlFor="email">Email</Label>
+    <Label>
+      Email
       <Input id="email" placeholder="Enter your email" type="email" />
-    </div>
+    </Label>
   );
 }

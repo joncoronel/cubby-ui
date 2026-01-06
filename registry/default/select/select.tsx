@@ -144,7 +144,7 @@ interface SelectContentProps
 
 function SelectContent({
   className,
-  sideOffset = 6,
+  sideOffset = 4,
   alignItemWithTrigger = false,
   nativeScroll = false,
   fadeEdges = true,
@@ -168,7 +168,7 @@ function SelectContent({
           data-slot="select-content"
           className={cn(
             // Combobox-style popup
-            "bg-popover text-popover-foreground border-border/50 dark:border-border data-[side=none]:ring-border/50 data-[side=none]:dark:ring-border relative flex flex-col overflow-clip rounded-xl border bg-clip-padding data-[side=none]:border-none data-[side=none]:ring-1",
+            "bg-popover text-popover-foreground data-[side=none]:ring-border relative flex flex-col overflow-clip rounded-xl border bg-clip-padding data-[side=none]:border-none data-[side=none]:ring-1",
             // Size constraints
             "max-w-(--available-width)",
             "min-w-(--anchor-width)",

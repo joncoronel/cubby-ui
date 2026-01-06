@@ -73,7 +73,7 @@ const tabIndicatorVariants = cva(
           "data-[orientation=horizontal]:bottom-0 data-[orientation=horizontal]:top-auto data-[orientation=horizontal]:h-0.75 data-[orientation=horizontal]:translate-y-0",
         ],
         capsule: [
-          "bg-card dark:bg-accent border-border/50 dark:border-border border bg-clip-padding shadow-[0_1px_2px_0_oklch(0.18_0_0/0.06)]",
+          "bg-card dark:bg-accent  border bg-clip-padding shadow-[0_1px_2px_0_oklch(0.18_0_0/0.06)]",
           "data-[orientation=vertical]:w-auto",
           "data-[orientation=horizontal]:top-1/2 data-[orientation=horizontal]:h-(--active-tab-height)",
         ],
@@ -183,15 +183,16 @@ function TabsTrigger({ className, ...props }: BaseTabs.Tab.Props) {
         // Base styles
         "text-muted-foreground data-active:text-foreground flex cursor-pointer items-center gap-1.5 font-medium text-nowrap whitespace-nowrap",
         "transition-[outline-offset,color] duration-200 ease-out",
-        "focus-visible:outline-ring/30 focus-visible:outline-2 focus-visible:outline-offset-2",
+        "focus-visible:outline-ring/50 focus-visible:outline-2 focus-visible:outline-offset-2",
         "hover:text-muted-foreground/75",
         "data-disabled:pointer-events-none data-disabled:opacity-60",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         // Orientation
         "data-[orientation=horizontal]:flex-1 data-[orientation=vertical]:w-full",
         "justify-center",
+        "group-data-[variant=underline]/tabs-list:focus-visible:outline-offset-0",
         // Default size (small) - overridden by group data attribute for medium
-        "rounded-lg px-2 py-1 text-xs",
+        "rounded-sm px-2 py-1 text-xs",
         // Medium size via parent group
         "group-data-[size=medium]/tabs-list:rounded-md group-data-[size=medium]/tabs-list:px-2.5 group-data-[size=medium]/tabs-list:py-1.5 group-data-[size=medium]/tabs-list:text-sm",
         className,

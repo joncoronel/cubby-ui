@@ -97,7 +97,9 @@ function SelectTrigger({
       className={cn(
         // Outline button style
         "group/select-trigger relative inline-flex w-fit items-center justify-between gap-2.5 rounded-lg",
-        "bg-card dark:bg-input/35 border-border/50 dark:border-border border bg-clip-padding shadow-xs",
+        "bg-card dark:bg-input/35 border bg-clip-padding shadow-xs",
+        "before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] not-disabled:not-active:not-data-pressed:not-in-data-[slot=button-group]:before:shadow-[0_1px_oklch(0_0_0/0.04)] dark:not-disabled:not-active:not-data-pressed:not-in-data-[slot=button-group]:before:shadow-[0_-1px_oklch(1_0_0/0.04)] [:disabled,:active,[data-pressed]]:shadow-none",
+
         // Focus and hover states (outline button style)
         "hover:bg-accent/50 dark:hover:bg-input/50 hover:text-accent-foreground data-placeholder:text-muted-foreground",
         "focus-visible:outline-ring/50 ease-out-cubic outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
@@ -142,7 +144,7 @@ interface SelectContentProps
 
 function SelectContent({
   className,
-  sideOffset = 6,
+  sideOffset = 4,
   alignItemWithTrigger = false,
   nativeScroll = false,
   fadeEdges = true,
@@ -166,23 +168,23 @@ function SelectContent({
           data-slot="select-content"
           className={cn(
             // Combobox-style popup
-            "bg-popover text-popover-foreground border-border/50 dark:border-border data-[side=none]:ring-border/50 data-[side=none]:dark:ring-border relative flex flex-col overflow-clip rounded-xl border bg-clip-padding data-[side=none]:border-none data-[side=none]:ring-1",
+            "bg-popover text-popover-foreground data-[side=none]:ring-border relative flex flex-col overflow-clip rounded-xl border bg-clip-padding data-[side=none]:border-none data-[side=none]:ring-1",
             // Size constraints
             "max-w-(--available-width)",
             "min-w-(--anchor-width)",
             // when data side does not equal none
             "not-data-[side=none]:max-h-(--available-height)",
             // Shadow
-            "shadow-[0_8px_20px_0_oklch(0.18_0_0_/_0.10)]",
+            "shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)]",
             // Animation
-            "ease-out-cubic origin-[var(--transform-origin)] transition-[transform,scale,opacity] duration-100",
-            "data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[side=none]:data-[ending-style]:transition-none data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[side=none]:data-[starting-style]:scale-100 data-[side=none]:data-[starting-style]:opacity-100 data-[side=none]:data-[starting-style]:transition-none",
+            "ease-out-cubic origin-(--transform-origin) transition-[transform,scale,opacity] duration-100",
+            "data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0 data-[side=none]:data-ending-style:transition-none data-[side=none]:data-starting-style:scale-100 data-[side=none]:data-starting-style:opacity-100 data-[side=none]:data-starting-style:transition-none",
           )}
         >
           {alignItemWithTrigger && (
             <BaseSelect.ScrollUpArrow
               data-slot="select-scroll-up-arrow"
-              className="from-popover top-0 z-[1] flex w-full cursor-default items-center justify-center rounded-t-xl bg-gradient-to-b from-50% to-transparent py-0.5"
+              className="from-popover top-0 z-1 flex w-full cursor-default items-center justify-center rounded-t-xl bg-linear-to-b from-50% to-transparent py-0.5"
             >
               <HugeiconsIcon
                 className="size-4"
@@ -209,7 +211,7 @@ function SelectContent({
           {alignItemWithTrigger && (
             <BaseSelect.ScrollDownArrow
               data-slot="select-scroll-down-arrow"
-              className="from-popover bottom-0 z-[1] flex w-full cursor-default items-center justify-center rounded-b-xl bg-gradient-to-t from-50% to-transparent py-0.5"
+              className="from-popover bottom-0 z-1 flex w-full cursor-default items-center justify-center rounded-b-xl bg-linear-to-t from-50% to-transparent py-0.5"
             >
               <HugeiconsIcon
                 className="size-4"
@@ -239,7 +241,7 @@ function SelectItem({ className, children, ...props }: BaseSelect.Item.Props) {
         "[&_svg:not([class*='text-'])]:text-muted-foreground",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         // Disabled state
-        "data-[disabled]:pointer-events-none data-[disabled]:opacity-60",
+        "data-disabled:pointer-events-none data-disabled:opacity-60",
         className,
       )}
       {...props}

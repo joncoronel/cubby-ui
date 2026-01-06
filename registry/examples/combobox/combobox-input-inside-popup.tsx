@@ -24,7 +24,7 @@ export default function ComboboxInputInsidePopup() {
       value={value}
       onValueChange={(value: Country | null) => setValue(value as Country)}
     >
-      <Label className="w-full max-w-xs">
+      <Label className="w-full max-w-2xs">
         Select country
         <ComboboxTrigger
           render={(props) => (
@@ -47,9 +47,7 @@ export default function ComboboxInputInsidePopup() {
         <div className="border-border border-b p-2">
           <ComboboxInput placeholder="e.g. United Kingdom" />
         </div>
-        <ComboboxEmpty className="text-muted-foreground p-2 text-sm">
-          No countries found.
-        </ComboboxEmpty>
+        <ComboboxEmpty>No countries found.</ComboboxEmpty>
         <ComboboxList>
           {(country: Country) => (
             <ComboboxItem key={country.code} value={country}>

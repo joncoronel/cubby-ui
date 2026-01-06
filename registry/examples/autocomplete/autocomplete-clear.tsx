@@ -5,6 +5,7 @@ import {
   AutocompleteClear,
   AutocompleteEmpty,
   AutocompleteInput,
+  AutocompleteInputWrapper,
   AutocompleteItem,
   AutocompleteList,
   AutocompletePopup,
@@ -56,14 +57,14 @@ export default function AutocompleteClearExample() {
     <AutocompleteRoot items={tags} value={value} onValueChange={setValue}>
       <Label className="w-full max-w-xs">
         Search with clear button
-        <div className="relative">
+        <AutocompleteInputWrapper>
           <AutocompleteInput placeholder="e.g. feature or component" />
-          {value && (
-            <AutocompleteClear className="absolute top-1/2 right-2 -translate-y-1/2">
+          <div className="absolute inset-y-0 right-3 flex items-center">
+            <AutocompleteClear>
               <X className="h-4 w-4" />
             </AutocompleteClear>
-          )}
-        </div>
+          </div>
+        </AutocompleteInputWrapper>
       </Label>
 
       <AutocompletePortal>

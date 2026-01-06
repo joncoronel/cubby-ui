@@ -97,7 +97,9 @@ function SelectTrigger({
       className={cn(
         // Outline button style
         "group/select-trigger relative inline-flex w-fit items-center justify-between gap-2.5 rounded-lg",
-        "bg-card dark:bg-input/35 border-border/50 dark:border-border border bg-clip-padding shadow-xs",
+        "bg-card dark:bg-input/35 border bg-clip-padding shadow-xs",
+        "before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] not-disabled:not-active:not-data-pressed:not-in-data-[slot=button-group]:before:shadow-[0_1px_oklch(0_0_0/0.04)] dark:not-disabled:not-active:not-data-pressed:not-in-data-[slot=button-group]:before:shadow-[0_-1px_oklch(1_0_0/0.04)] [:disabled,:active,[data-pressed]]:shadow-none",
+
         // Focus and hover states (outline button style)
         "hover:bg-accent/50 dark:hover:bg-input/50 hover:text-accent-foreground data-placeholder:text-muted-foreground",
         "focus-visible:outline-ring/50 ease-out-cubic outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",

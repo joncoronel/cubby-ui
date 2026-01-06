@@ -45,7 +45,7 @@ function ComboboxInput({
       id={id}
       data-slot="combobox-input"
       className={cn(
-        "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground bg-input dark:bg-input/30 border-border py- flex h-10 w-full min-w-0 rounded-lg border bg-clip-padding px-3 text-base font-normal shadow-xs disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 sm:h-9 md:text-sm",
+        "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground bg-input dark:bg-input/30 flex h-10 w-full min-w-0 rounded-lg border bg-clip-padding px-3 text-base font-normal shadow-xs disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 sm:h-9 md:text-sm",
         "file:text-foreground file:inline-flex file:h-7 file:rounded-md file:border-0 file:bg-transparent file:text-sm file:font-medium",
         "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
         className,
@@ -65,10 +65,10 @@ function ComboboxInputWrapper({
       className={cn(
         "relative",
         // Auto-adjust input padding based on buttons present (right-3 = 0.75rem, button = 1rem)
-        "has-[[data-slot=combobox-clear]]:[&_[data-slot=combobox-input]]:pr-[1.75rem]",
-        "has-[[data-slot=combobox-trigger]]:[&_[data-slot=combobox-input]]:pr-[1.75rem]",
+        "has-data-[slot=combobox-clear]:**:data-[slot=combobox-input]:pr-7",
+        "has-data-[slot=combobox-trigger]:**:data-[slot=combobox-input]:pr-7",
         // Both buttons present (0.75rem + 1rem + 0.5rem gap + 1rem button = 3.25rem)
-        "has-[[data-slot=combobox-clear]]:has-[[data-slot=combobox-trigger]]:[&_[data-slot=combobox-input]]:pr-[3.25rem]",
+        "has-data-[slot=combobox-clear]:has-data-[slot=combobox-trigger]:**:data-[slot=combobox-input]:pr-13",
         className,
       )}
       {...props}
@@ -134,7 +134,7 @@ function ComboboxClear({ className, ...props }: BaseCombobox.Clear.Props) {
       className={cn(
         "inline-flex h-4 w-4 cursor-pointer items-center justify-center rounded-sm opacity-70 transition-[opacity,scale,transform,translate] hover:opacity-100 disabled:pointer-events-none",
         "focus-visible:border-ring focus-visible:ring-ring/30 duration-100 outline-none focus-visible:ring-3",
-        "data-[ending-style]:translate-x-1 data-[ending-style]:opacity-0 data-[starting-style]:translate-x-1 data-[starting-style]:opacity-0",
+        "data-ending-style:translate-x-1 data-ending-style:opacity-0 data-starting-style:translate-x-1 data-starting-style:opacity-0",
         className,
       )}
       {...props}
@@ -160,7 +160,7 @@ function ComboboxBackdrop({
     <BaseCombobox.Backdrop
       data-slot="combobox-backdrop"
       className={cn(
-        "fixed inset-0 z-30 bg-black/50 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+        "fixed inset-0 z-30 bg-black/50 data-ending-style:opacity-0 data-starting-style:opacity-0",
         className,
       )}
       {...props}
@@ -190,7 +190,7 @@ function ComboboxPopupPrimitive({
     <BaseCombobox.Popup
       data-slot="combobox-popup"
       className={cn(
-        "bg-popover text-popover-foreground ring-border/50 dark:ring-border ease-out-cubic flex max-h-[var(--available-height)] w-[var(--anchor-width)] max-w-[var(--available-width)] origin-[var(--transform-origin)] flex-col overflow-clip overscroll-contain rounded-xl shadow-[0_8px_20px_0_oklch(0.18_0_0_/_0.10)] ring-1 transition-[transform,scale,opacity] duration-100 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
+        "bg-popover text-popover-foreground ring-border ease-out-cubic flex max-h-(--available-height) w-(--anchor-width) max-w-(--available-width) origin-(--transform-origin) flex-col overflow-clip overscroll-contain rounded-xl shadow-[0_8px_20px_0_oklch(0_0_0/0.08)] ring-1 transition-[transform,scale,opacity] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
         className,
       )}
       {...props}
@@ -306,7 +306,7 @@ function ComboboxItem({
     <BaseCombobox.Item
       data-slot="combobox-item"
       className={cn(
-        "data-[highlighted]:bg-accent/50 data-[highlighted]:text-accent-foreground relative grid cursor-default grid-cols-[1fr_1rem] items-center gap-2 rounded-md px-2.5 py-2 pr-2 text-sm outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-60",
+        "data-highlighted:bg-accent/50 data-highlighted:text-accent-foreground relative grid cursor-default grid-cols-[1fr_1rem] items-center gap-2 rounded-md px-2.5 py-2 pr-2 text-sm outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60",
         // Spacing from list edges
         "mx-1 first:mt-1 last:mb-1",
         className,
@@ -379,7 +379,7 @@ function ComboboxChips({ className, ...props }: BaseCombobox.Chips.Props) {
       ref={context?.chipsRef}
       data-slot="combobox-chips"
       className={cn(
-        "bg-input dark:bg-input/30 flex min-h-9 w-full flex-wrap items-center gap-1.5 rounded-lg border bg-clip-padding px-1.5 py-1.5 shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.03)]",
+        "bg-input dark:bg-input/30 flex min-h-9 w-full flex-wrap items-center gap-1.5 rounded-lg border bg-clip-padding px-1.5 py-1.5 shadow-xs",
         "focus-within:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-within:outline-2 focus-within:outline-offset-2",
 
         className,

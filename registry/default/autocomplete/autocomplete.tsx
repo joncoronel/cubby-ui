@@ -27,6 +27,27 @@ function AutocompleteInput({
   );
 }
 
+function AutocompleteInputWrapper({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="autocomplete-input-wrapper"
+      className={cn(
+        "relative",
+        // Auto-adjust input padding based on buttons present (right-3 = 0.75rem, button = 1rem)
+        "has-data-[slot=autocomplete-clear]:**:data-[slot=autocomplete-input]:pr-7",
+        "has-data-[slot=autocomplete-trigger]:**:data-[slot=autocomplete-input]:pr-7",
+        // Both buttons present (0.75rem + 1rem + 0.5rem gap + 1rem button = 3.25rem)
+        "has-data-[slot=autocomplete-clear]:has-data-[slot=autocomplete-trigger]:**:data-[slot=autocomplete-input]:pr-13",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
 function AutocompleteTrigger({
   className,
   children,
@@ -109,7 +130,7 @@ function AutocompletePositioner({
   return (
     <BaseAutocomplete.Positioner
       data-slot="autocomplete-positioner"
-      sideOffset={6}
+      sideOffset={4}
       className={cn("", className)}
       {...props}
     />
@@ -124,7 +145,7 @@ function AutocompletePopup({
     <BaseAutocomplete.Popup
       data-slot="autocomplete-popup"
       className={cn(
-        "bg-popover text-popover-foreground ring-border/50 dark:ring-border ease-out-cubic flex max-h-[var(--available-height)] w-[var(--anchor-width)] max-w-[var(--available-width)] origin-[var(--transform-origin)] flex-col overflow-clip overscroll-contain rounded-xl shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)] ring-1 transition-[transform,scale,opacity] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
+        "bg-popover text-popover-foreground ring-border ease-out-cubic flex max-h-(--available-height) w-(--anchor-width) max-w-(--available-width) origin-(--transform-origin) flex-col overflow-clip overscroll-contain rounded-xl shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)] ring-1 transition-[transform,scale,opacity] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
         className,
       )}
       {...props}
@@ -363,6 +384,7 @@ function AutocompleteSeparator({
 export const Autocomplete = {
   Root: AutocompleteRoot,
   Input: AutocompleteInput,
+  InputWrapper: AutocompleteInputWrapper,
   Trigger: AutocompleteTrigger,
   Icon: AutocompleteIcon,
   Clear: AutocompleteClear,
@@ -390,6 +412,7 @@ const useAutocompleteFilter = BaseAutocomplete.useFilter;
 export {
   AutocompleteRoot,
   AutocompleteInput,
+  AutocompleteInputWrapper,
   AutocompleteTrigger,
   AutocompleteIcon,
   AutocompleteClear,

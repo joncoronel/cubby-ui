@@ -175,16 +175,16 @@ function SelectContent({
             // when data side does not equal none
             "not-data-[side=none]:max-h-(--available-height)",
             // Shadow
-            "shadow-[0_8px_20px_0_oklch(0.18_0_0_/_0.10)]",
+            "shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)]",
             // Animation
-            "ease-out-cubic origin-[var(--transform-origin)] transition-[transform,scale,opacity] duration-100",
-            "data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[side=none]:data-[ending-style]:transition-none data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[side=none]:data-[starting-style]:scale-100 data-[side=none]:data-[starting-style]:opacity-100 data-[side=none]:data-[starting-style]:transition-none",
+            "ease-out-cubic origin-(--transform-origin) transition-[transform,scale,opacity] duration-100",
+            "data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0 data-[side=none]:data-ending-style:transition-none data-[side=none]:data-starting-style:scale-100 data-[side=none]:data-starting-style:opacity-100 data-[side=none]:data-starting-style:transition-none",
           )}
         >
           {alignItemWithTrigger && (
             <BaseSelect.ScrollUpArrow
               data-slot="select-scroll-up-arrow"
-              className="from-popover top-0 z-[1] flex w-full cursor-default items-center justify-center rounded-t-xl bg-gradient-to-b from-50% to-transparent py-0.5"
+              className="from-popover top-0 z-1 flex w-full cursor-default items-center justify-center rounded-t-xl bg-linear-to-b from-50% to-transparent py-0.5"
             >
               <HugeiconsIcon
                 className="size-4"
@@ -211,7 +211,7 @@ function SelectContent({
           {alignItemWithTrigger && (
             <BaseSelect.ScrollDownArrow
               data-slot="select-scroll-down-arrow"
-              className="from-popover bottom-0 z-[1] flex w-full cursor-default items-center justify-center rounded-b-xl bg-gradient-to-t from-50% to-transparent py-0.5"
+              className="from-popover bottom-0 z-1 flex w-full cursor-default items-center justify-center rounded-b-xl bg-linear-to-t from-50% to-transparent py-0.5"
             >
               <HugeiconsIcon
                 className="size-4"
@@ -241,7 +241,7 @@ function SelectItem({ className, children, ...props }: BaseSelect.Item.Props) {
         "[&_svg:not([class*='text-'])]:text-muted-foreground",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         // Disabled state
-        "data-[disabled]:pointer-events-none data-[disabled]:opacity-60",
+        "data-disabled:pointer-events-none data-disabled:opacity-60",
         className,
       )}
       {...props}

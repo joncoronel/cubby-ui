@@ -76,7 +76,7 @@ export function ComponentInstall({
   };
 
   return (
-    <div className="not-prose my-6 w-full max-w-full min-w-0 overflow-hidden">
+    <div className="not-prose my-6 w-full max-w-full min-w-0">
       <Tabs defaultValue="cli" className="gap-6">
         <TabsList variant="underline">
           <TabsTrigger value="cli">CLI</TabsTrigger>

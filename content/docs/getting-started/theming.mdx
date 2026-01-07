@@ -1,0 +1,244 @@
+---
+title: Theming
+description: A guide to styling components with our color system.
+---
+
+## Overview
+
+Cubby UI uses [OKLCH colors](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch) for theming. OKLCH provides perceptually uniform colors, making it easier to create accessible, consistent palettes across light and dark modes.
+
+Our styling system builds upon [shadcn/ui's CSS variables approach](https://ui.shadcn.com/docs/theming) with additional status colors and design tokens.
+
+## Installation
+
+<Tabs defaultValue="cli">
+
+<TabsList>
+  <TabsTrigger value="cli">CLI</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+
+<TabsContent value="cli">
+
+<PackageManagerCommand command="shadcn@latest add @cubby-ui/init" />
+
+This adds the theme CSS variables to your project.
+
+</TabsContent>
+
+<TabsContent value="manual">
+
+Copy and paste the following into your `globals.css` file:
+
+```css title="globals.css"
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --radius: 0.75rem;
+
+  /* Background colors */
+  --background: oklch(0.98 0 0);
+  --foreground: oklch(0.18 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.27 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.27 0 0);
+
+  /* Primary & accent colors */
+  --primary: oklch(0.6 0.2 250);
+  --primary-foreground: oklch(1 0 0);
+  --neutral: oklch(0.22 0 0);
+  --neutral-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.95 0 0);
+  --secondary-foreground: oklch(0.32 0 0);
+  --muted: oklch(0.95 0 0);
+  --muted-foreground: oklch(0.5 0 0);
+  --accent: oklch(0.91 0 0);
+  --accent-foreground: oklch(0.22 0 0);
+  --destructive: oklch(0.53 0.19 25);
+  --destructive-foreground: oklch(0.98 0 0);
+
+  /* Borders & inputs */
+  --border: oklch(0 0 0 / 8%);
+  --input: oklch(0.95 0 0);
+  --ring: oklch(0.55 0.2 250);
+  --scrollbar: oklch(0.87 0 0);
+
+  /* Sidebar colors */
+  --sidebar: oklch(0.98 0 0);
+  --sidebar-foreground: oklch(0.22 0 0);
+  --sidebar-primary: oklch(0.28 0 0);
+  --sidebar-primary-foreground: oklch(0.97 0 0);
+  --sidebar-accent: oklch(0.92 0 0);
+  --sidebar-accent-foreground: oklch(0.28 0 0);
+  --sidebar-border: oklch(0.9 0 0);
+  --sidebar-ring: oklch(0.65 0 0);
+
+  /* Status colors */
+  --danger: oklch(0.97 0.04 25);
+  --danger-foreground: oklch(0.55 0.18 25);
+  --danger-border: oklch(0.9 0.1 25);
+  --warning: oklch(0.98 0.06 85);
+  --warning-foreground: oklch(0.58 0.14 85);
+  --warning-border: oklch(0.92 0.1 85);
+  --info: oklch(0.97 0.04 250);
+  --info-foreground: oklch(0.45 0.2 250);
+  --info-border: oklch(0.9 0.1 250);
+  --success: oklch(0.97 0.04 145);
+  --success-foreground: oklch(0.48 0.18 145);
+  --success-border: oklch(0.9 0.1 145);
+
+  /* Effects */
+  --top-highlight: inset 0 0.75px 0.75px oklch(100 0 0 / 0.64);
+}
+
+.dark {
+  /* Background colors */
+  --background: oklch(0.19 0 0);
+  --foreground: oklch(0.94 0 0);
+  --card: oklch(0.21 0 0);
+  --card-foreground: oklch(0.94 0 0);
+  --popover: oklch(0.21 0 0);
+  --popover-foreground: oklch(0.94 0 0);
+
+  /* Primary & accent colors */
+  --neutral: oklch(0.95 0 0);
+  --neutral-foreground: oklch(0.13 0 0);
+  --secondary: oklch(0.28 0 0);
+  --secondary-foreground: oklch(0.94 0 0);
+  --muted: oklch(0.26 0 0);
+  --muted-foreground: oklch(0.73 0 0);
+  --accent: oklch(0.31 0 0);
+  --accent-foreground: oklch(0.95 0 0);
+  --destructive: oklch(0.5 0.22 25);
+  --destructive-foreground: oklch(1 0 0);
+
+  /* Borders & inputs */
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --scrollbar: oklch(0.7 0 0);
+
+  /* Sidebar colors */
+  --sidebar: oklch(0.19 0 0);
+  --sidebar-foreground: oklch(0.88 0 0);
+  --sidebar-primary: oklch(0.95 0 0);
+  --sidebar-primary-foreground: oklch(0.13 0 0);
+  --sidebar-accent: oklch(0.19 0 0);
+  --sidebar-accent-foreground: oklch(0.95 0 0);
+  --sidebar-border: oklch(0.28 0 0);
+  --sidebar-ring: oklch(0.83 0 0);
+
+  /* Status colors */
+  --danger: oklch(0.26 0.07 25);
+  --danger-foreground: oklch(0.75 0.15 25);
+  --danger-border: oklch(0.36 0.11 25);
+  --warning: oklch(0.28 0.06 85);
+  --warning-foreground: oklch(0.78 0.12 85);
+  --warning-border: oklch(0.38 0.09 85);
+  --info: oklch(0.26 0.07 250);
+  --info-foreground: oklch(0.72 0.16 250);
+  --info-border: oklch(0.36 0.11 250);
+  --success: oklch(0.26 0.07 145);
+  --success-foreground: oklch(0.72 0.15 145);
+  --success-border: oklch(0.36 0.11 145);
+}
+
+@theme inline {
+  /* Colors */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-neutral: var(--neutral);
+  --color-neutral-foreground: var(--neutral-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-scrollbar: var(--scrollbar);
+
+  /* Sidebar colors */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Status colors */
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-danger-border: var(--danger-border);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-border: var(--warning-border);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-info-border: var(--info-border);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-border: var(--success-border);
+
+  /* Shadows */
+  --shadow-top-highlight: var(--top-highlight);
+
+  /* Radius */
+  --radius-xs: calc(var(--radius) - 6px);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 2px);
+  --radius-2xl: calc(var(--radius) + 4px);
+  --radius-3xl: calc(var(--radius) + 6px);
+  --radius-4xl: calc(var(--radius) + 8px);
+
+  /* Easings */
+  --ease-in-cubic: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+```
+
+</TabsContent>
+
+</Tabs>
+
+## Extended Color Variables
+
+We've introduced additional color variables beyond the standard shadcn/ui palette to provide more control for specific components like badges and alerts:
+
+- `--neutral` / `--neutral-foreground`: Neutral button variant
+- `--danger` / `--danger-foreground` / `--danger-border`: Error states with background tint
+- `--warning` / `--warning-foreground` / `--warning-border`: Warning states
+- `--info` / `--info-foreground` / `--info-border`: Informational states
+- `--success` / `--success-foreground` / `--success-border`: Success states
+- `--sidebar-*`: Dedicated sidebar color tokens
+- `--scrollbar`: Scrollbar thumb color
+
+These additional variables ensure consistent styling across components that need to communicate different states or levels of importance.
+

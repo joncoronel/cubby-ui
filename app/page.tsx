@@ -61,7 +61,7 @@ export default function Home() {
                 variant="outline"
                 size="lg"
                 render={<Link href="/docs/components/button" />}
-                className="transition-all duration-200"
+                className="bg-background! transition-all duration-200"
                 nativeButton={false}
               >
                 Browse components

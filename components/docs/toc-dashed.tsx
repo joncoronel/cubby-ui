@@ -90,19 +90,16 @@ function TocPositionManager({
 }: TocPositionManagerProps) {
   const active = Primitive.useActiveAnchors();
 
-  const update = React.useCallback(() => {
+  // Memoize forceLastItem check
+  const checkForceLastItem = React.useCallback(() => {
+    return isNearPageBottom(50) && isLastHeadingVisible(toc);
+  }, [toc]);
+
+  // Update thumb position (DOM-only, safe during render)
+  const updateThumbPosition = React.useCallback(() => {
     if (!containerRef.current || !thumbRef.current) return;
 
-    // Check if we should force the last item active (near bottom + last heading visible)
-    const forceLastItem = isNearPageBottom(50) && isLastHeadingVisible(toc);
-
-    // Update forced active context
-    if (forceLastItem && toc.length > 0) {
-      setForcedActive(toc[toc.length - 1].url);
-    } else {
-      setForcedActive(null);
-    }
-
+    const forceLastItem = checkForceLastItem();
     const [thumbTop, thumbHeight] = calcThumbPosition(
       containerRef.current,
       active,
@@ -111,25 +108,44 @@ function TocPositionManager({
     );
     thumbRef.current.style.setProperty("--fd-top", `${thumbTop}px`);
     thumbRef.current.style.setProperty("--fd-height", `${thumbHeight}px`);
-  }, [containerRef, thumbRef, active, toc, setForcedActive]);
+  }, [containerRef, thumbRef, active, toc, checkForceLastItem]);
 
+  // Update forcedActive state (must be in effect, not during render)
+  const updateForcedActive = React.useCallback(() => {
+    const forceLastItem = checkForceLastItem();
+    if (forceLastItem && toc.length > 0) {
+      setForcedActive(toc[toc.length - 1].url);
+    } else {
+      setForcedActive(null);
+    }
+  }, [toc, setForcedActive, checkForceLastItem]);
+
+  // Run on active anchor changes
+  React.useEffect(() => {
+    updateForcedActive();
+  }, [active, updateForcedActive]);
+
+  // Combined scroll and resize handler
   React.useEffect(() => {
     if (!containerRef.current) return;
 
-    const container = containerRef.current;
-    const observer = new ResizeObserver(update);
-    observer.observe(container);
+    const handleScroll = () => {
+      updateThumbPosition();
+      updateForcedActive();
+    };
 
-    // Also listen for scroll to detect bottom of page
-    window.addEventListener("scroll", update, { passive: true });
+    const container = containerRef.current;
+    const observer = new ResizeObserver(updateThumbPosition);
+    observer.observe(container);
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
       observer.disconnect();
-      window.removeEventListener("scroll", update);
+      window.removeEventListener("scroll", handleScroll);
     };
-  }, [containerRef, update]);
+  }, [containerRef, updateThumbPosition, updateForcedActive]);
 
-  useOnChange(active, update);
+  useOnChange(active, updateThumbPosition);
 
   return null;
 }

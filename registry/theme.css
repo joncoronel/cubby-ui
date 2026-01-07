@@ -85,7 +85,7 @@
   --destructive-foreground: oklch(1 0 0);
 
   /* Borders & inputs */
-  --border: oklch(1 0 0 / 5%);
+  --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
 
   --scrollbar: oklch(0.7 0 0);

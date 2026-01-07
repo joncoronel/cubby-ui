@@ -104,7 +104,8 @@
       "Bash(git rev-parse:*)",
       "Bash(git symbolic-ref:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(wc:*)"
     ],
     "deny": []
   }

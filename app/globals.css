@@ -72,8 +72,6 @@ html {
   --success: light-dark(oklch(0.97 0.04 145), oklch(0.26 0.07 145));
   --success-foreground: light-dark(oklch(0.48 0.18 145), oklch(0.72 0.15 145));
   --success-border: light-dark(oklch(0.9 0.1 145), oklch(0.36 0.11 145));
-
-  --top-highlight: inset 0 0.75px 0.75px oklch(100 0 0 / 0.64);
 }
 
 @theme inline {
@@ -139,7 +137,6 @@ html {
   --radius-2xl: calc(var(--radius) + 4px);
   --radius-3xl: calc(var(--radius) + 6px);
   --radius-4xl: calc(var(--radius) + 8px);
-  --radius-5xl: calc(var(--radius) + 0px);
 
   /*Custom Easings */
   --ease-in-cubic: cubic-bezier(0.55, 0.055, 0.675, 0.19);

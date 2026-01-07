@@ -26,7 +26,7 @@ If you haven't already, initialize shadcn/ui for your framework. Follow the offi
 
 ### 2. Install Base UI
 
-Cubby UI components are built on [Base UI](https://base-ui.com), a headless component library. Install it first:
+Cubby UI components are built on [Base UI](https://base-ui.com), a headless component library:
 
 <PackageManagerCommand command="@base-ui/react" type="add" />
 
@@ -48,10 +48,19 @@ Run the init command to add Cubby UI's theme system to your project:
 
 <PackageManagerCommand command="shadcn@latest add @cubby-ui/init" />
 
-This adds to your `globals.css`:
+Then add a `root` class to your application wrapper. This creates a stacking context required by Base UI's portal-based components:
 
-- CSS variables for light and dark modes (using OKLCH colors)
-- Tailwind theme configuration
+```tsx title="app/layout.tsx"
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <div className="root">{children}</div>
+      </body>
+    </html>
+  );
+}
+```
 
 ### 5. Add components
 
@@ -73,20 +82,7 @@ Add multiple components in a single command:
 
 ## What's Included in Init
 
-The init command adds the following CSS variables and utilities:
-
-**Color Variables:**
-
-- Background, foreground, card, popover colors
-- Primary, secondary, muted, accent colors
-- Destructive color for error states
-- Border, input, and ring colors
-- Status colors: success, warning, danger, info
-- Sidebar colors
-
-**Border Radius:**
-
-- `--radius` with computed variants (xs, sm, md, lg, xl)
+The init command adds CSS variables for colors (including status colors), border radius variants, easing functions, and Base UI layout requirements. See [Theming](/docs/getting-started/theming) for full details.
 
 ## Project Structure
 

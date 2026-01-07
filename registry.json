@@ -780,7 +780,16 @@
           "success-border": "oklch(0.36 0.11 145)"
         }
       },
-      "css": {},
+      "css": {
+        "@layer base": {
+          "body": {
+            "position": "relative"
+          },
+          ".root": {
+            "isolation": "isolate"
+          }
+        }
+      },
       "registryDependencies": [],
       "dependencies": []
     },

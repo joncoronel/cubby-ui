@@ -5,8 +5,6 @@ description: A guide to styling components with our color system.
 
 ## Overview
 
-Cubby UI uses [OKLCH colors](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch) for theming. OKLCH provides perceptually uniform colors, making it easier to create accessible, consistent palettes across light and dark modes.
-
 Our styling system builds upon [shadcn/ui's CSS variables approach](https://ui.shadcn.com/docs/theming) with additional status colors and design tokens.
 
 ## Installation
@@ -202,6 +200,16 @@ Copy and paste the following into your `globals.css` file:
   --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
   --ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
 }
+
+/* Base UI requirements */
+@layer base {
+  body {
+    position: relative;
+  }
+  .root {
+    isolation: isolate;
+  }
+}
 ```
 
 </TabsContent>
@@ -222,3 +230,10 @@ We've introduced additional color variables beyond the standard shadcn/ui palett
 
 These additional variables ensure consistent styling across components that need to communicate different states or levels of importance.
 
+## Base UI Requirements
+
+The `@layer base` section includes styles required for [Base UI](https://base-ui.com) components to work correctly:
+
+- **`body { position: relative }`** - Fixes backdrop positioning issues on iOS Safari for dialog and popover components.
+
+- **`.root { isolation: isolate }`** - Creates a stacking context for Base UI's portal-based components (dialogs, popovers, tooltips). Apply the `root` class to your application wrapper element as shown in the [Installation](/docs/getting-started/installation) guide.

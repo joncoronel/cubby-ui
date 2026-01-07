@@ -171,3 +171,13 @@
   --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
   --ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
 }
+
+/* Base UI requirements */
+@layer base {
+  body {
+    position: relative;
+  }
+  .root {
+    isolation: isolate;
+  }
+}

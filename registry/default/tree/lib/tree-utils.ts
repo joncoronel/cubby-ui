@@ -1,40 +1,6 @@
 import type { TreeNode } from "../tree";
 
 /**
- * Validate tree structure for circular references and duplicate IDs
- * @param nodes - The tree data array
- * @param seen - Set of IDs already seen (for internal use)
- * @throws Error if circular reference or duplicate ID is detected
- */
-export function validateTreeStructure<
-  TData extends Record<string, unknown> = Record<string, unknown>,
->(nodes: TreeNode<TData>[], seen = new Set<string>()): void {
-  const idsInLevel = new Set<string>();
-
-  for (const node of nodes) {
-    // Check for duplicate IDs
-    if (idsInLevel.has(node.id)) {
-      throw new Error(`Tree validation error: Duplicate node ID "${node.id}"`);
-    }
-    idsInLevel.add(node.id);
-
-    // Check for circular references
-    if (seen.has(node.id)) {
-      throw new Error(
-        `Tree validation error: Circular reference detected for node ID "${node.id}"`,
-      );
-    }
-
-    const newSeen = new Set(seen);
-    newSeen.add(node.id);
-
-    if (node.children && node.children.length > 0) {
-      validateTreeStructure(node.children, newSeen);
-    }
-  }
-}
-
-/**
  * Get all descendant IDs of a node (recursive)
  * @param node - The parent node
  * @returns Array of all descendant node IDs
@@ -144,7 +110,7 @@ export function handleTreeKeyboardNavigation<
     visibleNodeIds: string[];
     disabledNodesMap: Map<string, boolean>;
     parentNodeMap: Map<string, string>;
-    focusableNodes: Map<string, HTMLElement>;
+    focusableNodes: React.MutableRefObject<Map<string, HTMLElement>>;
     enableBulkActions: boolean;
     disableSelection: boolean;
     onToggleNode: (nodeId: string) => void;
@@ -218,7 +184,7 @@ export function handleTreeKeyboardNavigation<
         } else {
           const firstChildId = node.children?.[0]?.id;
           if (firstChildId && !disabledNodesMap.has(firstChildId)) {
-            const firstChildElement = focusableNodes.get(firstChildId);
+            const firstChildElement = focusableNodes.current.get(firstChildId);
             if (firstChildElement) {
               firstChildElement.focus();
               setLastFocusedNodeId(firstChildId);
@@ -235,7 +201,7 @@ export function handleTreeKeyboardNavigation<
       } else {
         const parentId = parentNodeMap.get(nodeId);
         if (parentId) {
-          const parentElement = focusableNodes.get(parentId);
+          const parentElement = focusableNodes.current.get(parentId);
           if (parentElement) {
             parentElement.focus();
             setLastFocusedNodeId(parentId);
@@ -253,7 +219,7 @@ export function handleTreeKeyboardNavigation<
           nextIndex++;
           continue;
         }
-        const nextElement = focusableNodes.get(nextId);
+        const nextElement = focusableNodes.current.get(nextId);
         if (nextElement) {
           nextElement.focus();
           setLastFocusedNodeId(nextId);
@@ -273,7 +239,7 @@ export function handleTreeKeyboardNavigation<
           prevIndex--;
           continue;
         }
-        const prevElement = focusableNodes.get(prevId);
+        const prevElement = focusableNodes.current.get(prevId);
         if (prevElement) {
           prevElement.focus();
           setLastFocusedNodeId(prevId);
@@ -289,7 +255,7 @@ export function handleTreeKeyboardNavigation<
       for (let i = 0; i < visibleNodeIds.length; i++) {
         const firstId = visibleNodeIds[i];
         if (disabledNodesMap.has(firstId)) continue;
-        const firstElement = focusableNodes.get(firstId);
+        const firstElement = focusableNodes.current.get(firstId);
         if (firstElement) {
           firstElement.focus();
           setLastFocusedNodeId(firstId);
@@ -304,7 +270,7 @@ export function handleTreeKeyboardNavigation<
       for (let i = visibleNodeIds.length - 1; i >= 0; i--) {
         const lastId = visibleNodeIds[i];
         if (disabledNodesMap.has(lastId)) continue;
-        const lastElement = focusableNodes.get(lastId);
+        const lastElement = focusableNodes.current.get(lastId);
         if (lastElement) {
           lastElement.focus();
           setLastFocusedNodeId(lastId);

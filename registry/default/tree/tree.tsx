@@ -180,17 +180,6 @@ function Tree<TData extends Record<string, unknown> = Record<string, unknown>>({
   // Derive internal flags from mode
   const enableBulkActions = mode === "multiple";
   const disableSelection = mode === "none";
-  // Validate tree structure in development
-  React.useEffect(() => {
-    if (process.env.NODE_ENV !== "development") return;
-    import("./lib/tree-utils")
-      .then(({ validateTreeStructure }) => {
-        validateTreeStructure(data);
-      })
-      .catch((error) => {
-        console.error("Tree validation error:", error);
-      });
-  }, [data]);
 
   // Store renderItem in ref for stable context reference
   const renderItemRef = React.useRef(renderItem);
@@ -509,11 +498,6 @@ function useTreeCheckboxState<
     [hasChildren, node],
   );
 
-  const allLeafIds = React.useMemo(
-    () => (hasChildren ? getLeafNodeIds(node.children || []) : []),
-    [hasChildren, node.children],
-  );
-
   const localChildValues = React.useMemo(() => {
     if (!hasChildren || !context.checkedNodes || !context.enableBulkActions)
       return [];
@@ -666,7 +650,7 @@ function TreeItemInternal<
         visibleNodeIds: context.visibleNodeIds,
         disabledNodesMap: context.disabledNodesMap,
         parentNodeMap: context.parentNodeMap,
-        focusableNodes: context.focusableNodes.current,
+        focusableNodes: context.focusableNodes,
         enableBulkActions: context.enableBulkActions,
         disableSelection: context.disableSelection,
         onToggleNode: context.onToggleNode,

@@ -1,8 +1,3 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-
-@custom-variant dark (&:is(.dark *));
-
 :root {
   --radius: 0.75rem;
 
@@ -58,9 +53,6 @@
   --success: oklch(0.97 0.04 145);
   --success-foreground: oklch(0.48 0.18 145);
   --success-border: oklch(0.9 0.1 145);
-
-  /* Effects */
-  --top-highlight: inset 0 0.75px 0.75px oklch(100 0 0 / 0.64);
 }
 
 .dark {
@@ -178,13 +170,4 @@
   --ease-in-cubic: cubic-bezier(0.55, 0.055, 0.675, 0.19);
   --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
   --ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
 }

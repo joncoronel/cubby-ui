@@ -736,8 +736,7 @@
           "info-border": "oklch(0.9 0.1 250)",
           "success": "oklch(0.97 0.04 145)",
           "success-foreground": "oklch(0.48 0.18 145)",
-          "success-border": "oklch(0.9 0.1 145)",
-          "top-highlight": "inset 0 0.75px 0.75px oklch(100 0 0 / 0.64)"
+          "success-border": "oklch(0.9 0.1 145)"
         },
         "dark": {
           "background": "oklch(0.19 0 0)",
@@ -781,16 +780,7 @@
           "success-border": "oklch(0.36 0.11 145)"
         }
       },
-      "css": {
-        "@layer base": {
-          "*": {
-            "@apply": "border-border outline-ring/50"
-          },
-          "body": {
-            "@apply": "bg-background text-foreground"
-          }
-        }
-      },
+      "css": {},
       "registryDependencies": [],
       "dependencies": []
     },

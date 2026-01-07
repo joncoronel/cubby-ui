@@ -681,7 +681,6 @@
           "color-success": "var(--success)",
           "color-success-foreground": "var(--success-foreground)",
           "color-success-border": "var(--success-border)",
-          "shadow-top-highlight": "var(--top-highlight)",
           "radius-xs": "calc(var(--radius) - 6px)",
           "radius-sm": "calc(var(--radius) - 4px)",
           "radius-md": "calc(var(--radius) - 2px)",
@@ -737,8 +736,7 @@
           "info-border": "oklch(0.9 0.1 250)",
           "success": "oklch(0.97 0.04 145)",
           "success-foreground": "oklch(0.48 0.18 145)",
-          "success-border": "oklch(0.9 0.1 145)",
-          "top-highlight": "inset 0 0.75px 0.75px oklch(100 0 0 / 0.64)"
+          "success-border": "oklch(0.9 0.1 145)"
         },
         "dark": {
           "background": "oklch(0.19 0 0)",
@@ -757,7 +755,7 @@
           "accent-foreground": "oklch(0.95 0 0)",
           "destructive": "oklch(0.5 0.22 25)",
           "destructive-foreground": "oklch(1 0 0)",
-          "border": "oklch(1 0 0 / 5%)",
+          "border": "oklch(1 0 0 / 10%)",
           "input": "oklch(1 0 0 / 15%)",
           "scrollbar": "oklch(0.7 0 0)",
           "sidebar": "oklch(0.19 0 0)",
@@ -782,16 +780,7 @@
           "success-border": "oklch(0.36 0.11 145)"
         }
       },
-      "css": {
-        "@layer base": {
-          "*": {
-            "@apply": "border-border outline-ring/50"
-          },
-          "body": {
-            "@apply": "bg-background text-foreground"
-          }
-        }
-      },
+      "css": {},
       "registryDependencies": [],
       "dependencies": []
     },

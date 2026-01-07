@@ -76,9 +76,7 @@ export default function RootLayout({
       >
         <Providers>
           <RootProvider search={{ SearchDialog: CustomSearchDialog }}>
-            <div className="root bg-background" data-vaul-drawer-wrapper>
-              {children}
-            </div>
+            <div className="root bg-background">{children}</div>
           </RootProvider>
         </Providers>
         {process.env.NODE_ENV === "production" && (

@@ -32,7 +32,7 @@ Cubby UI components are built on [Base UI](https://base-ui.com), a headless comp
 
 ### 3. Add the Cubby UI registry
 
-Update your `components.json` to include the Cubby UI registry:
+Add the Cubby UI registry to your `components.json`:
 
 ```json
 {
@@ -41,6 +41,8 @@ Update your `components.json` to include the Cubby UI registry:
   }
 }
 ```
+
+Add the `registries` field to your existing configuration if it doesn't already exist.
 
 ### 4. Initialize Cubby UI theme
 
@@ -51,7 +53,11 @@ Run the init command to add Cubby UI's theme system to your project:
 Then add a `root` class to your application wrapper. This creates a stacking context required by Base UI's portal-based components:
 
 ```tsx title="app/layout.tsx"
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <body>

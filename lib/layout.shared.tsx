@@ -12,5 +12,6 @@ export const baseOptions: BaseLayoutProps = {
       </div>
     ),
   },
+  githubUrl: "https://github.com/joncoronel/cubby-ui",
   links: [],
 };

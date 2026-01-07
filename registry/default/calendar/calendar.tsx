@@ -16,7 +16,7 @@ function Calendar({
     <div
       className={cn(
         "size-fit rounded-md p-0.5 pt-0",
-        "bg-muted ring-border/60 shadow-top-highlight ring-1 dark:shadow-none",
+        "bg-muted ring-border/60 ring-1",
         props.className,
       )}
     >

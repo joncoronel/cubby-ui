@@ -164,9 +164,6 @@
   --color-success-foreground: var(--success-foreground);
   --color-success-border: var(--success-border);
 
-  /* Shadows */
-  --shadow-top-highlight: var(--top-highlight);
-
   /* Radius */
   --radius-xs: calc(var(--radius) - 6px);
   --radius-sm: calc(var(--radius) - 4px);

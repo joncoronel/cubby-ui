@@ -130,9 +130,6 @@ html {
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
 
-  /* Shadows */
-  --shadow-top-highlight: var(--top-highlight);
-
   /* Radius */
   --radius-xs: calc(var(--radius) - 6px);
   --radius-sm: calc(var(--radius) - 4px);

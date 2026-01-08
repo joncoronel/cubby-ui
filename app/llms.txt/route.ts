@@ -36,7 +36,7 @@ export async function GET() {
     lines.push("");
 
     for (const page of categoryPages) {
-      const llmsUrl = `${baseUrl}/docs/${page.slugs.join("/")}.mdx`;
+      const llmsUrl = `${baseUrl}${page.url}.mdx`;
       const description = page.data.description || "";
 
       if (description) {

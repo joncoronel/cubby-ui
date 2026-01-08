@@ -15,6 +15,11 @@ import { createRelativeLink } from "fumadocs-ui/mdx";
 // import { FillTOCServer } from "@/components/docs/toc-fill-server";
 
 import { DashedTOC } from "@/components/docs/toc-dashed";
+import { LLMCopyButton, ViewOptions } from "@/components/page-actions";
+
+const GITHUB_OWNER = "joncoronel";
+const GITHUB_REPO = "cubby-ui";
+const GITHUB_BRANCH = "main";
 
 interface PageProps {
   params: Promise<{ slug?: string[] }>;
@@ -28,6 +33,9 @@ export default async function Page(props: PageProps) {
 
   const MDX = page.data.body;
 
+  const markdownUrl = `${page.url}.mdx`;
+  const githubUrl = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/blob/${GITHUB_BRANCH}/content/docs/${page.slugs.join("/")}.mdx`;
+
   return (
     <DocsPage
       toc={page.data.toc}
@@ -38,6 +46,10 @@ export default async function Page(props: PageProps) {
     >
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
+      <div className="flex flex-row items-center gap-2 border-b pt-2 pb-6">
+        <LLMCopyButton markdownUrl={markdownUrl} />
+        <ViewOptions markdownUrl={markdownUrl} githubUrl={githubUrl} />
+      </div>
       <DocsBody>
         <MDX
           components={getMDXComponents({

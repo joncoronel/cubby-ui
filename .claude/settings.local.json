@@ -105,7 +105,10 @@
       "Bash(git symbolic-ref:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(pnpm dlx:*)",
+      "Bash(cmd /c del \"c:\\\\Users\\\\jonny\\\\Documents\\\\Projects\\\\cubby-ui\\\\lib\\\\cn.ts\")",
+      "Bash(cmd /c del \"c:\\\\Users\\\\jonny\\\\Documents\\\\Projects\\\\cubby-ui\\\\components\\\\ui\\\\button.tsx\")"
     ],
     "deny": []
   }

@@ -110,14 +110,24 @@ function CodeBlock({
 }: CodeBlockProps) {
   const [nodes, setNodes] = useState(initial);
 
+  // Track previous initial value to detect prop changes
+  const [prevInitial, setPrevInitial] = useState(initial);
+
+  // React 18+ pattern: update state during render when props change
+  // This avoids synchronous setState in effects which causes cascading renders
+  if (initial !== prevInitial) {
+    setPrevInitial(initial);
+    if (initial) {
+      setNodes(initial);
+    }
+  }
+
   // Memoize line calculations
   const lines = useMemo(() => code.split("\n"), [code]);
 
   useLayoutEffect(() => {
-    // Set initial content or highlight code
-    if (initial) {
-      setNodes(initial);
-    } else {
+    // Only run async highlighting when no pre-rendered content
+    if (!initial) {
       const normalizedLanguage = (language as BundledLanguage) || "javascript";
       void highlight(code, normalizedLanguage, {
         highlightLines,
@@ -328,7 +338,7 @@ function CodeBlockTabs({
 }: CodeBlockTabsProps) {
   const tabsElement = (
     <Tabs value={activeTab} onValueChange={onTabChange} className="gap-1">
-      <div className="scrollbar-hide max-w-full overflow-x-auto">
+      <div className="scrollbar-hide flex max-w-full items-center overflow-x-auto">
         <TabsList
           variant={variant}
           size="small"

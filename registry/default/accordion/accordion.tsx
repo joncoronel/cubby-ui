@@ -54,27 +54,27 @@ function AccordionItem({ className, ...props }: BaseAccordion.Item.Props) {
         "group-data-[variant=isolated-bordered]:bg-card group-data-[variant=isolated-bordered]:border-border group-data-[variant=isolated-bordered]:overflow-hidden group-data-[variant=isolated-bordered]:border",
         // Closed items: group together by overlapping borders with negative margin
         // Only apply to closed items that follow another closed item (not open items, first item, or items after open items)
-        "group-data-[variant=isolated-bordered]:relative group-data-[variant=isolated-bordered]:not-first:not-data-[open]:not-[[data-open]_+_&]:-mt-px",
+        "group-data-[variant=isolated-bordered]:relative group-data-[variant=isolated-bordered]:not-first:not-data-open:not-[[data-open]+&]:-mt-px",
         // Opened item - separated with margins
-        "group-data-[variant=isolated-bordered]:data-[open]:mt-2 group-data-[variant=isolated-bordered]:data-[open]:mb-2 group-data-[variant=isolated-bordered]:data-[open]:rounded-lg",
+        "group-data-[variant=isolated-bordered]:data-open:mt-2 group-data-[variant=isolated-bordered]:data-open:mb-2 group-data-[variant=isolated-bordered]:data-open:rounded-lg",
         // First item
-        "group-data-[variant=isolated-bordered]:first:rounded-t-lg group-data-[variant=isolated-bordered]:data-[open]:first:mt-0",
+        "group-data-[variant=isolated-bordered]:first:rounded-t-lg group-data-[variant=isolated-bordered]:data-open:first:mt-0",
         // Last item
-        "group-data-[variant=isolated-bordered]:last:rounded-b-lg group-data-[variant=isolated-bordered]:data-[open]:last:mb-0",
+        "group-data-[variant=isolated-bordered]:last:rounded-b-lg group-data-[variant=isolated-bordered]:data-open:last:mb-0",
         // Item after open item: round top corners (start of new group)
-        "group-data-[variant=isolated-bordered]:[[data-open]_+_&]:rounded-t-lg",
+        "group-data-[variant=isolated-bordered]:[[data-open]+&]:rounded-t-lg",
         // Item before open item: round bottom corners (end of group)
         "group-data-[variant=isolated-bordered]:[&:has(+_[data-open])]:rounded-b-lg",
         // Isolated filled variant
         "group-data-[variant=isolated-filled]:bg-muted group-data-[variant=isolated-filled]:overflow-hidden",
         // Opened item - separated with margins and rounded
-        "group-data-[variant=isolated-filled]:data-[open]:my-2 group-data-[variant=isolated-filled]:data-[open]:rounded-lg",
+        "group-data-[variant=isolated-filled]:data-open:my-2 group-data-[variant=isolated-filled]:data-open:rounded-lg",
         // First item
-        "group-data-[variant=isolated-filled]:first:rounded-t-lg group-data-[variant=isolated-filled]:data-[open]:first:mt-0",
+        "group-data-[variant=isolated-filled]:first:rounded-t-lg group-data-[variant=isolated-filled]:data-open:first:mt-0",
         // Last item
-        "group-data-[variant=isolated-filled]:last:rounded-b-lg group-data-[variant=isolated-filled]:data-[open]:last:mb-0",
+        "group-data-[variant=isolated-filled]:last:rounded-b-lg group-data-[variant=isolated-filled]:data-open:last:mb-0",
         // Item after open item: round top corners (start of new group)
-        "group-data-[variant=isolated-filled]:[[data-open]_+_&]:rounded-t-lg",
+        "group-data-[variant=isolated-filled]:[[data-open]+&]:rounded-t-lg",
         // Item before open item: round bottom corners (end of group)
         "group-data-[variant=isolated-filled]:[&:has(+_[data-open])]:rounded-b-lg",
         // Isolated filled bordered variant - filled background with borders between closed items
@@ -83,15 +83,15 @@ function AccordionItem({ className, ...props }: BaseAccordion.Item.Props) {
         "group-data-[variant=isolated-filled-bordered]:not-last:border-border group-data-[variant=isolated-filled-bordered]:not-last:border-b",
         // Make border transparent (invisible) for: items before open items, and open items themselves
         "group-data-[variant=isolated-filled-bordered]:[&:has(+_[data-open])]:border-transparent",
-        "group-data-[variant=isolated-filled-bordered]:data-[open]:border-transparent",
+        "group-data-[variant=isolated-filled-bordered]:data-open:border-transparent",
         // Opened item - separated with margins and rounded
-        "group-data-[variant=isolated-filled-bordered]:data-[open]:my-2 group-data-[variant=isolated-filled-bordered]:data-[open]:rounded-lg",
+        "group-data-[variant=isolated-filled-bordered]:data-open:my-2 group-data-[variant=isolated-filled-bordered]:data-open:rounded-lg",
         // First item
-        "group-data-[variant=isolated-filled-bordered]:first:rounded-t-lg group-data-[variant=isolated-filled-bordered]:data-[open]:first:mt-0",
+        "group-data-[variant=isolated-filled-bordered]:first:rounded-t-lg group-data-[variant=isolated-filled-bordered]:data-open:first:mt-0",
         // Last item
-        "group-data-[variant=isolated-filled-bordered]:last:rounded-b-lg group-data-[variant=isolated-filled-bordered]:data-[open]:last:mb-0",
+        "group-data-[variant=isolated-filled-bordered]:last:rounded-b-lg group-data-[variant=isolated-filled-bordered]:data-open:last:mb-0",
         // Item after open item: round top corners (start of new group)
-        "group-data-[variant=isolated-filled-bordered]:[[data-open]_+_&]:rounded-t-lg",
+        "group-data-[variant=isolated-filled-bordered]:[[data-open]+&]:rounded-t-lg",
         // Item before open item: round bottom corners (end of group)
         "group-data-[variant=isolated-filled-bordered]:[&:has(+_[data-open])]:rounded-b-lg",
 
@@ -218,7 +218,7 @@ function AccordionContent({
     <BaseAccordion.Panel
       data-slot="accordion-content"
       className={cn(
-        "ease-out-cubic h-[var(--accordion-panel-height)] overflow-hidden text-sm transition-[height,opacity] duration-250 data-ending-style:h-0 data-ending-style:opacity-0 data-[starting-style]:h-0 data-[starting-style]:opacity-0",
+        "ease-out-cubic h-(--accordion-panel-height) overflow-hidden text-sm transition-[height,opacity] duration-250 data-ending-style:h-0 data-ending-style:opacity-0 data-starting-style:h-0 data-starting-style:opacity-0",
       )}
       {...props}
     >
@@ -265,7 +265,7 @@ function PlusIcon(props: React.ComponentProps<"svg">) {
         clipRule="evenodd"
         d="M2.75 12C2.75 11.3096 3.30964 10.75 4 10.75H20C20.6904 10.75 21.25 11.3096 21.25 12C21.25 12.6904 20.6904 13.25 20 13.25H4C3.30964 13.25 2.75 12.6904 2.75 12Z"
         fill="currentColor"
-        className="ease-out-cubic transition-opacity duration-200 [[data-panel-open]_&]:opacity-0"
+        className="ease-out-cubic transition-opacity duration-200 in-data-panel-open:opacity-0"
       />
       {/* Vertical bar - remains visible (becomes horizontal after 90° rotation) */}
       <path

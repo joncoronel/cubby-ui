@@ -1,5 +1,5 @@
 import type { JSX } from "react";
-import type { HighlighterCore, ShikiTransformer } from "shiki/core";
+import type { ShikiTransformer } from "shiki/core";
 import type { BundledLanguage } from "shiki/langs";
 import { toJsxRuntime } from "hast-util-to-jsx-runtime";
 import { Fragment } from "react";
@@ -28,16 +28,16 @@ const loadedLanguages = new Set<string>();
 const BASE_TRANSFORMERS: ShikiTransformer[] = [
   {
     name: "remove-background",
-    pre(node: any) {
+    pre(node) {
       delete node.properties.style;
     },
-    code(node: any) {
+    code(node) {
       delete node.properties.style;
     },
   },
   {
     name: "fix-empty-lines",
-    line(node: any) {
+    line(node) {
       // Ensure empty lines have a space to maintain height
       // Shiki creates empty .line spans for blank lines which collapse
       if (!node.children || node.children.length === 0) {

@@ -26,7 +26,9 @@ export default function proxy(
 
     // Filter out placeholder/template requests and meta files
     const isPlaceholder =
-      componentName === "{name}" || componentName === "registry";
+      componentName === "{name}" ||
+      componentName === "registry" ||
+      componentName === "%7Bname%7D";
 
     if (!isPlaceholder) {
       event.waitUntil(

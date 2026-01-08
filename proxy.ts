@@ -24,12 +24,18 @@ export default function proxy(
   if (pathname.startsWith("/r/") && pathname.endsWith(".json")) {
     const componentName = pathname.replace("/r/", "").replace(".json", "");
 
-    event.waitUntil(
-      opServer.track("component_install", {
-        component: componentName,
-        userAgent: request.headers.get("user-agent") || "unknown",
-      }),
-    );
+    // Filter out placeholder/template requests and meta files
+    const isPlaceholder =
+      componentName === "{name}" || componentName === "registry";
+
+    if (!isPlaceholder) {
+      event.waitUntil(
+        opServer.track("component_install", {
+          component: componentName,
+          userAgent: request.headers.get("user-agent") || "unknown",
+        }),
+      );
+    }
   }
 
   // Existing Fumadocs LLM rewrite logic

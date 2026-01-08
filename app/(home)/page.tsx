@@ -11,7 +11,7 @@ export default function Home() {
         <CubbyUILogo className="text-foreground h-[120vh] w-[120vh] max-w-none -rotate-12 blur-lg" />
       </div>
 
-      <div className="bg-transparent relative z-2 flex min-h-[calc(100vh-var(--fd-nav-height,3.5rem))] flex-col">
+      <div className="relative z-2 flex min-h-[calc(100vh-var(--fd-nav-height,3.5rem))] flex-col bg-transparent">
         {/* Hero section - asymmetric layout */}
         <section className="relative flex flex-1 justify-center px-6 py-16 lg:items-center lg:py-24">
           <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[1.6fr_1fr] lg:gap-20">
@@ -19,12 +19,10 @@ export default function Home() {
             <div className="animate-fade-in-up flex flex-col space-y-8 opacity-0">
               <div className="space-y-5">
                 <h1 className="text-foreground text-4xl font-semibold tracking-[-0.02em] text-balance sm:text-5xl">
-                  Components that feel right at home.
+                  Styled primitives. Your code.
                 </h1>
                 <p className="text-muted-foreground max-w-xl text-lg leading-relaxed text-balance">
-                  A thoughtfully designed collection of React components for
-                  building interfaces that are accessible, beautiful, and a joy
-                  to work with.
+                  Built on Base UI with Tailwind CSS 4. Copy, paste, customize.
                 </p>
               </div>
 
@@ -51,19 +49,19 @@ export default function Home() {
 
               {/* Feature pills */}
               <div className="text-muted-foreground flex flex-wrap items-center gap-2 pt-4 text-sm">
-                <span className="bg-muted/50 border-border/50 rounded-full border px-3 py-1">
+                <span className="bg-muted border-border/50 rounded-full border px-3 py-1">
                   Dark mode
                 </span>
                 <span className="text-border/60">•</span>
-                <span className="bg-muted/50 border-border/50 rounded-full border px-3 py-1">
+                <span className="bg-muted border-border/50 rounded-full border px-3 py-1">
                   Motion
                 </span>
                 <span className="text-border/60">•</span>
-                <span className="bg-muted/50 border-border/50 rounded-full border px-3 py-1">
+                <span className="bg-muted border-border/50 rounded-full border px-3 py-1">
                   Accessible
                 </span>
                 <span className="text-border/60">•</span>
-                <span className="bg-muted/50 border-border/50 rounded-full border px-3 py-1">
+                <span className="bg-muted border-border/50 rounded-full border px-3 py-1">
                   TypeScript
                 </span>
               </div>

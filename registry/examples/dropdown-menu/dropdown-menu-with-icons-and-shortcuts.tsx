@@ -5,8 +5,7 @@ import { User, CreditCard, Settings, Keyboard, LogOut } from "lucide-react";
 export default function DropdownMenuWithIconsAndShortcuts() {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger render={<Button variant="outline" />}>
-        <User className="mr-2 h-4 w-4" />
+      <DropdownMenuTrigger render={<Button variant="outline" leftSection={<User />} />}>
         Account
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">

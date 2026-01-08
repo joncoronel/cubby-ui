@@ -45,7 +45,15 @@ Create nested submenus for hierarchical navigation.
 
 ## API Reference
 
-### DropdownMenuContent
+The DropdownMenu component is built on top of [Base UI's Menu](https://base-ui.com/react/components/menu). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Menu documentation](https://base-ui.com/react/components/menu).
+
+### Props
+
+#### DropdownMenuContent
+
+Dropdown container with positioning and animations. Composes `Menu.Portal`, `Menu.Positioner`, and `Menu.Popup`. Props are forwarded to `Menu.Popup`.
 
 <ApiPropsList>
 
@@ -76,7 +84,9 @@ Create nested submenus for hierarchical navigation.
 
 </ApiPropsList>
 
-### DropdownMenuItem
+#### DropdownMenuItem
+
+Individual menu item. Wraps Base UI's `Menu.Item`.
 
 <ApiPropsList>
 
@@ -91,13 +101,15 @@ Create nested submenus for hierarchical navigation.
   simpleType="string"
   defaultValue='"default"'
 >
-  Visual style variant. Use 'destructive' for dangerous actions like delete or
+  Visual style variant. Use `"destructive"` for dangerous actions like delete or
   remove operations.
 </ApiProp>
 
 </ApiPropsList>
 
-### DropdownMenuLabel
+#### DropdownMenuLabel
+
+Non-interactive label for grouping items.
 
 <ApiPropsList>
 
@@ -108,7 +120,9 @@ Create nested submenus for hierarchical navigation.
 
 </ApiPropsList>
 
-### DropdownMenuGroupLabel
+#### DropdownMenuGroupLabel
+
+Label for a menu group. Wraps Base UI's `Menu.GroupLabel`.
 
 <ApiPropsList>
 
@@ -119,7 +133,9 @@ Create nested submenus for hierarchical navigation.
 
 </ApiPropsList>
 
-### DropdownMenuSubTrigger
+#### DropdownMenuSubTrigger
+
+Item that opens a submenu on hover. Wraps Base UI's `Menu.SubmenuTrigger`.
 
 <ApiPropsList>
 
@@ -138,7 +154,9 @@ Create nested submenus for hierarchical navigation.
 
 </ApiPropsList>
 
-### DropdownMenuSubContent
+#### DropdownMenuSubContent
+
+Submenu container with positioning. Composes `Menu.Portal`, `Menu.Positioner`, and `Menu.Popup`. Props are forwarded to `Menu.Popup`.
 
 <ApiPropsList>
 
@@ -155,8 +173,9 @@ Create nested submenus for hierarchical navigation.
   How to align the submenu relative to its trigger.
 </ApiProp>
 
+<ApiProp name="alignOffset" fullType="number" defaultValue="-5">
+  Vertical offset to align the first submenu item with its trigger. Defaults to
+  `-5` when `align` is not `"center"`.
+</ApiProp>
+
 </ApiPropsList>
-
-### Additional Props
-
-DropdownMenu components inherit all props from [Base UI Menu](https://base-ui.com/react/components/menu#api-reference), including open, defaultOpen, onOpenChange, positioning options, and accessibility props.

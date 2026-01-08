@@ -1,4 +1,4 @@
 {
   "title": "Getting Started",
-  "pages": ["introduction", "installation", "theming"]
+  "pages": ["introduction", "installation", "theming", "[llms.txt](/llms.txt)"]
 }

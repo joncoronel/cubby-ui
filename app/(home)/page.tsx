@@ -14,9 +14,9 @@ export default function Home() {
       <div className="relative z-2 flex min-h-[calc(100vh-var(--fd-nav-height,3.5rem))] flex-col bg-transparent">
         {/* Hero section - asymmetric layout */}
         <section className="relative flex flex-1 justify-center px-6 py-16 lg:items-center lg:py-24">
-          <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[1.6fr_1fr] lg:gap-20">
+          <div className="mx-auto flex w-full max-w-7xl flex-col lg:flex-row lg:items-start lg:justify-between">
             {/* Content */}
-            <div className="animate-fade-in-up flex flex-col space-y-8 opacity-0">
+            <div className="animate-fade-in-up flex max-w-xl flex-col space-y-8 opacity-0">
               <div className="space-y-5">
                 <h1 className="text-foreground text-4xl font-semibold tracking-[-0.02em] text-balance sm:text-5xl">
                   Styled primitives. Your code.
@@ -69,7 +69,7 @@ export default function Home() {
 
             {/* Visual element - interactive cubby */}
             <div
-              className="animate-fade-in-up relative hidden opacity-0 lg:flex lg:items-start lg:justify-end"
+              className="animate-fade-in-up hidden opacity-0 lg:block"
               style={{ animationDelay: "0.2s" }}
             >
               <InteractiveCubby />

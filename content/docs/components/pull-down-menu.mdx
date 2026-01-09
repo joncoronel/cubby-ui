@@ -1,0 +1,129 @@
+---
+title: Pull Down Menu
+description: An iOS-inspired menu with a morphing animation where the trigger transforms into the menu
+---
+
+## Preview
+
+<ComponentPreview component="pull-down-menu" example="pull-down-menu-basic" />
+
+## Installation
+
+<ComponentInstall component="pull-down-menu" />
+
+## Usage
+
+<ComponentUsage component="pull-down-menu" />
+
+## Overview
+
+The Pull Down Menu uses Framer Motion's `layoutId` to create a smooth morphing animation where the trigger button transforms into the menu popup. This creates an iOS-inspired interaction pattern.
+
+Unlike the standard Dropdown Menu which uses a portal to render content, the Pull Down Menu renders inline to enable the layout animation. The trigger and menu content share a single morphing container.
+
+## API Differences from Dropdown Menu
+
+The Pull Down Menu has a different API pattern compared to Dropdown Menu:
+
+```tsx
+// Dropdown Menu - trigger and content are separate
+<DropdownMenu>
+  <DropdownMenuTrigger>Open</DropdownMenuTrigger>
+  <DropdownMenuContent>
+    <DropdownMenuItem>Item</DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>
+
+// Pull Down Menu - trigger is a prop on content
+<PullDownMenu>
+  <PullDownMenuContent trigger="Open">
+    <PullDownMenuItem>Item</PullDownMenuItem>
+  </PullDownMenuContent>
+</PullDownMenu>
+```
+
+This design is intentional - the trigger and content share the same morphing container, so they must be defined together.
+
+## Accessibility
+
+The component automatically respects `prefers-reduced-motion`. When reduced motion is preferred, the morph animation is replaced with a simple fade transition.
+
+All keyboard navigation and focus management is handled by Base UI Menu:
+- **Arrow keys**: Navigate between items
+- **Enter/Space**: Select focused item
+- **Escape**: Close the menu
+- **Tab**: Move focus out of menu
+
+## API Reference
+
+The PullDownMenu component is built on top of [Base UI's Menu](https://base-ui.com/react/components/menu) with Framer Motion for animations. Base UI props are supported on the root component.
+
+### Props
+
+#### PullDownMenuContent
+
+The main content component that handles both the trigger and menu rendering.
+
+<ApiPropsList>
+
+<ApiProp name="trigger" fullType="React.ReactNode" required>
+  The content to display in the trigger button. This can be text, icons, or any
+  React node.
+</ApiProp>
+
+<ApiProp name="triggerClassName" fullType="string">
+  Additional CSS classes to apply to the trigger element.
+</ApiProp>
+
+<ApiProp name="className" fullType="string">
+  Additional CSS classes to apply to the menu popup.
+</ApiProp>
+
+</ApiPropsList>
+
+#### PullDownMenuItem
+
+Individual menu item. Wraps Base UI's `Menu.Item`.
+
+<ApiPropsList>
+
+<ApiProp name="inset" fullType="boolean">
+  Add left padding to align with items that have icons, creating consistent
+  visual alignment.
+</ApiProp>
+
+<ApiProp
+  name="variant"
+  fullType='"default" | "destructive"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Visual style variant. Use `"destructive"` for dangerous actions like delete or
+  remove operations.
+</ApiProp>
+
+</ApiPropsList>
+
+#### PullDownMenuLabel
+
+Non-interactive label for grouping items.
+
+<ApiPropsList>
+
+<ApiProp name="inset" fullType="boolean">
+  Add left padding to align with items that have icons.
+</ApiProp>
+
+</ApiPropsList>
+
+#### PullDownMenuGroupLabel
+
+Label for a menu group. Wraps Base UI's `Menu.GroupLabel`.
+
+<ApiPropsList>
+
+<ApiProp name="inset" fullType="boolean">
+  Add left padding to align with items that have icons.
+</ApiProp>
+
+</ApiPropsList>

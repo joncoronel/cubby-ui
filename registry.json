@@ -116,6 +116,22 @@
       ]
     },
     {
+      "name": "bloom-menu",
+      "type": "registry:ui",
+      "title": "Bloom Menu",
+      "description": "A bloom-menu component.",
+      "files": [
+        {
+          "path": "registry/default/bloom-menu/bloom-menu.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/bloom-menu.tsx"
+        }
+      ],
+      "dependencies": [
+        "motion"
+      ]
+    },
+    {
       "name": "breadcrumbs",
       "type": "registry:ui",
       "title": "Breadcrumbs",
@@ -980,6 +996,22 @@
       ],
       "dependencies": [
         "class-variance-authority"
+      ]
+    },
+    {
+      "name": "pull-down-menu",
+      "type": "registry:ui",
+      "title": "Pull Down Menu",
+      "description": "A pull-down-menu component.",
+      "files": [
+        {
+          "path": "registry/default/pull-down-menu/pull-down-menu.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/pull-down-menu.tsx"
+        }
+      ],
+      "dependencies": [
+        "motion"
       ]
     },
     {

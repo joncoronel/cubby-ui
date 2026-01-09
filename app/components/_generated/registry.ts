@@ -51,6 +51,9 @@ import badge_badge_custom_colors from "@/registry/examples/badge/badge-custom-co
 import badge_badge_sizes from "@/registry/examples/badge/badge-sizes";
 import badge_badge_variants from "@/registry/examples/badge/badge-variants";
 import badge_badge_with_icons from "@/registry/examples/badge/badge-with-icons";
+import bloom_menu_bloom_menu_basic from "@/registry/examples/bloom-menu/bloom-menu-basic";
+import bloom_menu_bloom_menu_directions from "@/registry/examples/bloom-menu/bloom-menu-directions";
+import bloom_menu_bloom_menu_submenu from "@/registry/examples/bloom-menu/bloom-menu-submenu";
 import breadcrumbs_breadcrumbs_basic from "@/registry/examples/breadcrumbs/breadcrumbs-basic";
 import breadcrumbs_breadcrumbs_custom_separator from "@/registry/examples/breadcrumbs/breadcrumbs-custom-separator";
 import breadcrumbs_breadcrumbs_custom_separator_with_prop from "@/registry/examples/breadcrumbs/breadcrumbs-custom-separator-with-prop";
@@ -246,6 +249,7 @@ import progress_progress_different_sizes from "@/registry/examples/progress/prog
 import progress_progress_dynamic from "@/registry/examples/progress/progress-dynamic";
 import progress_progress_file_upload from "@/registry/examples/progress/progress-file-upload";
 import progress_progress_with_label from "@/registry/examples/progress/progress-with-label";
+import pull_down_menu_pull_down_menu_basic from "@/registry/examples/pull-down-menu/pull-down-menu-basic";
 import radio_group_radio_group_basic from "@/registry/examples/radio-group/radio-group-basic";
 import radio_group_radio_group_controlled from "@/registry/examples/radio-group/radio-group-controlled";
 import radio_group_radio_group_disabled_options from "@/registry/examples/radio-group/radio-group-disabled-options";
@@ -421,6 +425,18 @@ export const componentMetadata = {
     "registryDependencies": [],
     "dependencies": [
       "class-variance-authority"
+    ],
+    "examples": {},
+    "reference": []
+  },
+  "bloom-menu": {
+    "name": "bloom-menu",
+    "title": "Bloom Menu",
+    "description": "A bloom-menu component.",
+    "category": "UI",
+    "registryDependencies": [],
+    "dependencies": [
+      "motion"
     ],
     "examples": {},
     "reference": []
@@ -881,6 +897,18 @@ export const componentMetadata = {
     "registryDependencies": [],
     "dependencies": [
       "class-variance-authority"
+    ],
+    "examples": {},
+    "reference": []
+  },
+  "pull-down-menu": {
+    "name": "pull-down-menu",
+    "title": "Pull Down Menu",
+    "description": "A pull-down-menu component.",
+    "category": "UI",
+    "registryDependencies": [],
+    "dependencies": [
+      "motion"
     ],
     "examples": {},
     "reference": []
@@ -1422,6 +1450,23 @@ export const exampleRegistry = {
       "title": "With Icons",
       "importPath": "badge-with-icons",
       "source": "import { Badge } from \"@/components/ui/cubby-ui/badge\";\n\nexport default function BadgeWithIcons() {\n  return (\n    <div className=\"flex flex-wrap gap-2\">\n      <Badge variant=\"secondary\">\n        <svg\n          xmlns=\"http://www.w3.org/2000/svg\"\n          width=\"12\"\n          height=\"12\"\n          viewBox=\"0 0 24 24\"\n          fill=\"none\"\n          stroke=\"currentColor\"\n          strokeWidth=\"2\"\n          strokeLinecap=\"round\"\n          strokeLinejoin=\"round\"\n          className=\"mr-1\"\n        >\n          <circle cx=\"12\" cy=\"12\" r=\"10\" />\n          <polyline points=\"12 6 12 12 16 14\" />\n        </svg>\n        Pending\n      </Badge>\n      <Badge variant=\"secondary\" className=\"bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200\">\n        <svg\n          xmlns=\"http://www.w3.org/2000/svg\"\n          width=\"12\"\n          height=\"12\"\n          viewBox=\"0 0 24 24\"\n          fill=\"none\"\n          stroke=\"currentColor\"\n          strokeWidth=\"2\"\n          strokeLinecap=\"round\"\n          strokeLinejoin=\"round\"\n          className=\"mr-1\"\n        >\n          <polyline points=\"20 6 9 17 4 12\" />\n        </svg>\n        Completed\n      </Badge>\n    </div>\n  );\n}"
+    }
+  ],
+  "bloom-menu": [
+    {
+      "title": "Basic",
+      "importPath": "bloom-menu-basic",
+      "source": "import {\n  BloomMenu,\n  BloomMenuContainer,\n  BloomMenuTrigger,\n  BloomMenuContent,\n  BloomMenuItem,\n  BloomMenuSeparator,\n} from \"@/components/ui/cubby-ui/bloom-menu\";\nimport { MoreHorizontal, Pencil, Copy, Share, Archive } from \"lucide-react\";\n\nexport default function BloomMenuBasic() {\n  return (\n    <BloomMenu>\n      <BloomMenuContainer\n        buttonSize={40}\n        menuWidth={160}\n        menuRadius={12}\n        className=\"border bg-popover\"\n      >\n        <BloomMenuTrigger>\n          <MoreHorizontal className=\"size-5 text-muted-foreground\" />\n        </BloomMenuTrigger>\n\n        <BloomMenuContent className=\"p-1\">\n          <BloomMenuItem\n            className=\"flex items-center gap-2\"\n            onSelect={() => console.log(\"Edit\")}\n          >\n            <Pencil className=\"size-4 text-muted-foreground\" />\n            Edit\n          </BloomMenuItem>\n          <BloomMenuItem\n            className=\"flex items-center gap-2\"\n            onSelect={() => console.log(\"Copy\")}\n          >\n            <Copy className=\"size-4 text-muted-foreground\" />\n            Copy\n          </BloomMenuItem>\n          <BloomMenuItem\n            className=\"flex items-center gap-2\"\n            onSelect={() => console.log(\"Share\")}\n          >\n            <Share className=\"size-4 text-muted-foreground\" />\n            Share\n          </BloomMenuItem>\n          <BloomMenuSeparator />\n          <BloomMenuItem\n            className=\"flex items-center gap-2\"\n            onSelect={() => console.log(\"Archive\")}\n          >\n            <Archive className=\"size-4 text-muted-foreground\" />\n            Archive\n          </BloomMenuItem>\n        </BloomMenuContent>\n      </BloomMenuContainer>\n    </BloomMenu>\n  );\n}\n"
+    },
+    {
+      "title": "Directions",
+      "importPath": "bloom-menu-directions",
+      "source": "\"use client\";\n\nimport {\n  BloomMenu,\n  BloomMenuContainer,\n  BloomMenuTrigger,\n  BloomMenuContent,\n  BloomMenuItem,\n} from \"@/components/ui/cubby-ui/bloom-menu\";\nimport { ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from \"lucide-react\";\n\nexport default function BloomMenuDirections() {\n  return (\n    <div className=\"flex flex-wrap items-center justify-center gap-16 p-8\">\n      {/* Top direction */}\n      <div className=\"flex flex-col items-center gap-2\">\n        <span className=\"text-sm text-muted-foreground\">Top</span>\n        <BloomMenu direction=\"top\">\n          <BloomMenuContainer\n            buttonSize={40}\n            menuWidth={120}\n            menuRadius={12}\n            className=\"border bg-popover\"\n          >\n            <BloomMenuTrigger>\n              <ArrowUp className=\"size-5 text-muted-foreground\" />\n            </BloomMenuTrigger>\n            <BloomMenuContent className=\"p-1\">\n              <BloomMenuItem onSelect={() => {}}>Option 1</BloomMenuItem>\n              <BloomMenuItem onSelect={() => {}}>Option 2</BloomMenuItem>\n              <BloomMenuItem onSelect={() => {}}>Option 3</BloomMenuItem>\n            </BloomMenuContent>\n          </BloomMenuContainer>\n        </BloomMenu>\n      </div>\n\n      {/* Bottom direction */}\n      <div className=\"flex flex-col items-center gap-2\">\n        <span className=\"text-sm text-muted-foreground\">Bottom</span>\n        <BloomMenu direction=\"bottom\">\n          <BloomMenuContainer\n            buttonSize={40}\n            menuWidth={120}\n            menuRadius={12}\n            className=\"border bg-popover\"\n          >\n            <BloomMenuTrigger>\n              <ArrowDown className=\"size-5 text-muted-foreground\" />\n            </BloomMenuTrigger>\n            <BloomMenuContent className=\"p-1\">\n              <BloomMenuItem onSelect={() => {}}>Option 1</BloomMenuItem>\n              <BloomMenuItem onSelect={() => {}}>Option 2</BloomMenuItem>\n              <BloomMenuItem onSelect={() => {}}>Option 3</BloomMenuItem>\n            </BloomMenuContent>\n          </BloomMenuContainer>\n        </BloomMenu>\n      </div>\n\n      {/* Left direction */}\n      <div className=\"flex flex-col items-center gap-2\">\n        <span className=\"text-sm text-muted-foreground\">Left</span>\n        <BloomMenu direction=\"left\">\n          <BloomMenuContainer\n            buttonSize={40}\n            menuWidth={120}\n            menuRadius={12}\n            className=\"border bg-popover\"\n          >\n            <BloomMenuTrigger>\n              <ArrowLeft className=\"size-5 text-muted-foreground\" />\n            </BloomMenuTrigger>\n            <BloomMenuContent className=\"p-1\">\n              <BloomMenuItem onSelect={() => {}}>Option 1</BloomMenuItem>\n              <BloomMenuItem onSelect={() => {}}>Option 2</BloomMenuItem>\n              <BloomMenuItem onSelect={() => {}}>Option 3</BloomMenuItem>\n            </BloomMenuContent>\n          </BloomMenuContainer>\n        </BloomMenu>\n      </div>\n\n      {/* Right direction */}\n      <div className=\"flex flex-col items-center gap-2\">\n        <span className=\"text-sm text-muted-foreground\">Right</span>\n        <BloomMenu direction=\"right\">\n          <BloomMenuContainer\n            buttonSize={40}\n            menuWidth={120}\n            menuRadius={12}\n            className=\"border bg-popover\"\n          >\n            <BloomMenuTrigger>\n              <ArrowRight className=\"size-5 text-muted-foreground\" />\n            </BloomMenuTrigger>\n            <BloomMenuContent className=\"p-1\">\n              <BloomMenuItem onSelect={() => {}}>Option 1</BloomMenuItem>\n              <BloomMenuItem onSelect={() => {}}>Option 2</BloomMenuItem>\n              <BloomMenuItem onSelect={() => {}}>Option 3</BloomMenuItem>\n            </BloomMenuContent>\n          </BloomMenuContainer>\n        </BloomMenu>\n      </div>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Submenu",
+      "importPath": "bloom-menu-submenu",
+      "source": "\"use client\";\n\nimport {\n  BloomMenu,\n  BloomMenuContainer,\n  BloomMenuTrigger,\n  BloomMenuContent,\n  BloomMenuItem,\n  BloomMenuSeparator,\n  BloomMenuSub,\n  BloomMenuSubTrigger,\n  BloomMenuSubContent,\n} from \"@/components/ui/cubby-ui/bloom-menu\";\nimport {\n  MoreHorizontal,\n  Pencil,\n  Copy,\n  Share,\n  Archive,\n  ChevronRight,\n  Twitter,\n  Mail,\n  Link2,\n} from \"lucide-react\";\n\nexport default function BloomMenuSubmenu() {\n  return (\n    <BloomMenu direction=\"top\">\n      <BloomMenuContainer\n        buttonSize={40}\n        menuWidth={160}\n        menuRadius={12}\n        className=\"border bg-popover\"\n      >\n        <BloomMenuTrigger>\n          <MoreHorizontal className=\"size-5 text-muted-foreground\" />\n        </BloomMenuTrigger>\n\n        <BloomMenuContent className=\"p-1\">\n          <BloomMenuItem\n            className=\"flex items-center gap-2\"\n            onSelect={() => console.log(\"Edit\")}\n          >\n            <Pencil className=\"size-4 text-muted-foreground\" />\n            Edit\n          </BloomMenuItem>\n          <BloomMenuItem\n            className=\"flex items-center gap-2\"\n            onSelect={() => console.log(\"Copy\")}\n          >\n            <Copy className=\"size-4 text-muted-foreground\" />\n            Copy\n          </BloomMenuItem>\n\n          <BloomMenuSub id=\"share\">\n            <BloomMenuSubTrigger className=\"flex w-full items-center justify-between\">\n              {(isActive: boolean) => (\n                <>\n                  <span className=\"flex items-center gap-2\">\n                    <Share className=\"size-4 text-muted-foreground\" />\n                    Share\n                  </span>\n                  <ChevronRight\n                    className=\"size-4 text-muted-foreground transition-transform duration-200\"\n                    style={{\n                      transform: isActive ? \"rotate(90deg)\" : \"rotate(0deg)\",\n                    }}\n                  />\n                </>\n              )}\n            </BloomMenuSubTrigger>\n            <BloomMenuSubContent className=\"rounded-xl border p-1 shadow-lg\">\n              <BloomMenuItem\n                className=\"flex items-center gap-2\"\n                onSelect={() => console.log(\"Twitter\")}\n              >\n                <Twitter className=\"size-4 text-muted-foreground\" />\n                Twitter\n              </BloomMenuItem>\n              <BloomMenuItem\n                className=\"flex items-center gap-2\"\n                onSelect={() => console.log(\"Email\")}\n              >\n                <Mail className=\"size-4 text-muted-foreground\" />\n                Email\n              </BloomMenuItem>\n              <BloomMenuItem\n                className=\"flex items-center gap-2\"\n                onSelect={() => console.log(\"Copy Link\")}\n              >\n                <Link2 className=\"size-4 text-muted-foreground\" />\n                Copy Link\n              </BloomMenuItem>\n            </BloomMenuSubContent>\n          </BloomMenuSub>\n\n          <BloomMenuSeparator />\n\n          <BloomMenuItem\n            className=\"flex items-center gap-2\"\n            onSelect={() => console.log(\"Archive\")}\n          >\n            <Archive className=\"size-4 text-muted-foreground\" />\n            Archive\n          </BloomMenuItem>\n        </BloomMenuContent>\n      </BloomMenuContainer>\n    </BloomMenu>\n  );\n}\n"
     }
   ],
   "breadcrumbs": [
@@ -2467,6 +2512,13 @@ export const exampleRegistry = {
       "source": "import {\n  ProgressRoot,\n  ProgressTrack,\n  ProgressIndicator,\n  ProgressLabel,\n  ProgressValue,\n} from \"@/components/ui/cubby-ui/progress\";\n\nexport default function ProgressWithLabel() {\n  return (\n    <div className=\"space-y-4\">\n      <ProgressRoot value={65} animated className=\"w-[400px]\">\n        <div className=\"flex items-center justify-between\">\n          <ProgressLabel>File Upload</ProgressLabel>\n          <ProgressValue />\n        </div>\n        <ProgressTrack>\n          <ProgressIndicator />\n        </ProgressTrack>\n      </ProgressRoot>\n\n      <ProgressRoot value={100} animated>\n        <div className=\"flex items-center justify-between\">\n          <ProgressLabel>Installation</ProgressLabel>\n          <ProgressValue />\n        </div>\n        <ProgressTrack>\n          <ProgressIndicator />\n        </ProgressTrack>\n      </ProgressRoot>\n    </div>\n  );\n}\n"
     }
   ],
+  "pull-down-menu": [
+    {
+      "title": "Basic",
+      "importPath": "pull-down-menu-basic",
+      "source": "import {\n  PullDownMenu,\n  PullDownMenuContent,\n  PullDownMenuItem,\n  PullDownMenuSeparator,\n} from \"@/components/ui/cubby-ui/pull-down-menu\";\nimport { ChevronDownIcon } from \"lucide-react\";\n\nexport default function PullDownMenuBasic() {\n  return (\n    <PullDownMenu>\n      <PullDownMenuContent\n        trigger={\n          <>\n            Options\n            <ChevronDownIcon className=\"ml-1 size-4\" />\n          </>\n        }\n      >\n        <PullDownMenuItem>Profile</PullDownMenuItem>\n        <PullDownMenuItem>Settings</PullDownMenuItem>\n        <PullDownMenuItem>Notifications</PullDownMenuItem>\n        <PullDownMenuSeparator />\n        <PullDownMenuItem variant=\"destructive\">Log out</PullDownMenuItem>\n      </PullDownMenuContent>\n    </PullDownMenu>\n  );\n}\n"
+    }
+  ],
   "radio-group": [
     {
       "title": "Basic",
@@ -3023,6 +3075,9 @@ export const componentMap = {
   "badge-sizes": badge_badge_sizes,
   "badge-variants": badge_badge_variants,
   "badge-with-icons": badge_badge_with_icons,
+  "bloom-menu-basic": bloom_menu_bloom_menu_basic,
+  "bloom-menu-directions": bloom_menu_bloom_menu_directions,
+  "bloom-menu-submenu": bloom_menu_bloom_menu_submenu,
   "breadcrumbs-basic": breadcrumbs_breadcrumbs_basic,
   "breadcrumbs-custom-separator": breadcrumbs_breadcrumbs_custom_separator,
   "breadcrumbs-custom-separator-with-prop": breadcrumbs_breadcrumbs_custom_separator_with_prop,
@@ -3218,6 +3273,7 @@ export const componentMap = {
   "progress-dynamic": progress_progress_dynamic,
   "progress-file-upload": progress_progress_file_upload,
   "progress-with-label": progress_progress_with_label,
+  "pull-down-menu-basic": pull_down_menu_pull_down_menu_basic,
   "radio-group-basic": radio_group_radio_group_basic,
   "radio-group-controlled": radio_group_radio_group_controlled,
   "radio-group-disabled-options": radio_group_radio_group_disabled_options,
@@ -3341,6 +3397,10 @@ export const componentAnatomy = {
   "badge": {
     "imports": "import { Badge } from \"@/components/ui/cubby-ui/badge\";",
     "anatomy": "<Badge />"
+  },
+  "bloom-menu": {
+    "imports": "import {\n  BloomMenu,\n  BloomMenuContainer,\n  BloomMenuTrigger,\n  BloomMenuContent,\n  BloomMenuItem,\n  BloomMenuSeparator,\n} from \"@/components/ui/cubby-ui/bloom-menu\";",
+    "anatomy": "<BloomMenu>\n  <BloomMenuContainer>\n    <BloomMenuTrigger />\n    <BloomMenuContent>\n      <BloomMenuItem />\n      <BloomMenuSeparator />\n    </BloomMenuContent>\n  </BloomMenuContainer>\n</BloomMenu>"
   },
   "breadcrumbs": {
     "imports": "import {\n  Breadcrumb,\n  BreadcrumbItem,\n  BreadcrumbLink,\n  BreadcrumbList,\n  BreadcrumbPage,\n  BreadcrumbSeparator,\n} from \"@/components/ui/cubby-ui/breadcrumbs\";",
@@ -3481,6 +3541,10 @@ export const componentAnatomy = {
   "progress": {
     "imports": "import {\n  ProgressRoot,\n  ProgressTrack,\n  ProgressIndicator,\n} from \"@/components/ui/cubby-ui/progress\";",
     "anatomy": "<ProgressRoot>\n  <ProgressTrack>\n    <ProgressIndicator />\n  </ProgressTrack>\n</ProgressRoot>"
+  },
+  "pull-down-menu": {
+    "imports": "import {\n  PullDownMenu,\n  PullDownMenuContent,\n  PullDownMenuItem,\n  PullDownMenuSeparator,\n} from \"@/components/ui/cubby-ui/pull-down-menu\";",
+    "anatomy": "<PullDownMenu>\n  <PullDownMenuContent>\n    <PullDownMenuItem />\n    <PullDownMenuSeparator />\n  </PullDownMenuContent>\n</PullDownMenu>"
   },
   "radio-group": {
     "imports": "import { RadioGroup, RadioGroupItem } from \"@/components/ui/cubby-ui/radio-group\";",

@@ -1,0 +1,189 @@
+---
+title: Bloom Menu
+description: An iOS-inspired pull-down menu with morphing animations
+---
+
+## Preview
+
+<ComponentPreview component="bloom-menu" example="bloom-menu-basic" />
+
+## Installation
+
+<ComponentInstall component="bloom-menu" />
+
+## Usage
+
+<ComponentUsage component="bloom-menu" />
+
+## Examples
+
+### Different Directions
+
+The menu can expand in four directions: top, bottom, left, or right.
+
+<ComponentPreview component="bloom-menu" example="bloom-menu-directions" />
+
+### With Submenu
+
+Create nested submenus with the Bloom morphing effect.
+
+<ComponentPreview component="bloom-menu" example="bloom-menu-submenu" />
+
+## API Reference
+
+The BloomMenu component is a custom implementation inspired by [Bloom](https://github.com/joshpuckett/bloom) by Josh Puckett. It uses Framer Motion for animations and provides a morphing container effect.
+
+### Props
+
+#### BloomMenu
+
+Root component that provides context and state management.
+
+<ApiPropsList>
+
+<ApiProp name="open" fullType="boolean">
+  Controlled open state. Use with `onOpenChange` for controlled behavior.
+</ApiProp>
+
+<ApiProp name="onOpenChange" fullType="(open: boolean) => void">
+  Callback when the menu opens or closes.
+</ApiProp>
+
+<ApiProp name="defaultOpen" fullType="boolean" defaultValue="false">
+  Initial open state for uncontrolled usage.
+</ApiProp>
+
+<ApiProp
+  name="direction"
+  fullType='"top" | "bottom" | "left" | "right"'
+  simpleType="string"
+  defaultValue='"bottom"'
+>
+  Direction the menu expands from the trigger.
+</ApiProp>
+
+<ApiProp
+  name="anchor"
+  fullType='"start" | "center" | "end"'
+  simpleType="string"
+  defaultValue='"start"'
+>
+  Alignment of the menu relative to the trigger. For left/right directions, this is always "center".
+</ApiProp>
+
+<ApiProp name="closeOnClickOutside" fullType="boolean" defaultValue="true">
+  Whether clicking outside the menu closes it.
+</ApiProp>
+
+<ApiProp name="closeOnEscape" fullType="boolean" defaultValue="true">
+  Whether pressing Escape closes the menu.
+</ApiProp>
+
+</ApiPropsList>
+
+#### BloomMenuContainer
+
+The morphing container that animates between button and menu states.
+
+<ApiPropsList>
+
+<ApiProp
+  name="buttonSize"
+  fullType="number | { width: number; height: number }"
+  defaultValue="40"
+>
+  Size of the closed button state. Use a number for square, or object for rectangular.
+</ApiProp>
+
+<ApiProp name="menuWidth" fullType="number" defaultValue="200">
+  Width of the expanded menu.
+</ApiProp>
+
+<ApiProp name="menuRadius" fullType="number" defaultValue="12">
+  Border radius of the expanded menu.
+</ApiProp>
+
+<ApiProp name="buttonRadius" fullType="number">
+  Border radius of the closed button. Defaults to pill shape (half of smaller dimension).
+</ApiProp>
+
+</ApiPropsList>
+
+#### BloomMenuItem
+
+Individual menu item with hover highlighting and selection callback.
+
+<ApiPropsList>
+
+<ApiProp name="onSelect" fullType="() => void">
+  Callback when the item is selected.
+</ApiProp>
+
+<ApiProp name="disabled" fullType="boolean" defaultValue="false">
+  Whether the item is disabled.
+</ApiProp>
+
+<ApiProp name="closeOnSelect" fullType="boolean" defaultValue="true">
+  Whether selecting this item closes the menu.
+</ApiProp>
+
+<ApiProp
+  name="variant"
+  fullType='"default" | "destructive"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Visual style variant. Use "destructive" for dangerous actions.
+</ApiProp>
+
+</ApiPropsList>
+
+#### BloomMenuSub
+
+Wrapper for nested submenu functionality.
+
+<ApiPropsList>
+
+<ApiProp name="id" fullType="string" required>
+  Unique identifier for this submenu. Required.
+</ApiProp>
+
+</ApiPropsList>
+
+#### BloomMenuSubTrigger
+
+Item that toggles a submenu. Supports render prop for active state.
+
+<ApiPropsList>
+
+<ApiProp
+  name="children"
+  fullType="ReactNode | ((isActive: boolean) => ReactNode)"
+>
+  Content or render prop that receives the active state.
+</ApiProp>
+
+<ApiProp name="disabled" fullType="boolean" defaultValue="false">
+  Whether the trigger is disabled.
+</ApiProp>
+
+</ApiPropsList>
+
+## Keyboard Navigation
+
+- **Enter/Space** on trigger: Toggle menu
+- **ArrowDown** on trigger (when closed): Open menu
+- **ArrowDown/ArrowUp**: Navigate items
+- **Escape**: Close menu
+- **Enter/Space** on item: Select item
+- **ArrowRight** on submenu trigger: Open submenu
+- **ArrowLeft/Escape** in submenu: Close submenu
+
+## Accessibility
+
+The component includes proper ARIA attributes:
+- `role="button"` on trigger with `aria-expanded` and `aria-haspopup`
+- `role="menu"` on content
+- `role="menuitem"` on items with `aria-disabled` when disabled
+- Keyboard navigation support
+- Respects `prefers-reduced-motion` for users who prefer reduced animations

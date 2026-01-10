@@ -1242,9 +1242,34 @@ interface GroupedToastCardProps {
 }
 
 function GroupedToastCard({ data, isTop }: GroupedToastCardProps) {
+  const cardRef = React.useRef<HTMLDivElement>(null);
+
+  // Use native event listeners to stop propagation at the capture phase
+  React.useEffect(() => {
+    const card = cardRef.current;
+    if (!card) return;
+
+    const stopPropagation = (e: TouchEvent) => {
+      e.stopPropagation();
+    };
+
+    // Stop all touch events from reaching the toast's swipe handler
+    card.addEventListener("touchstart", stopPropagation, { passive: true });
+    card.addEventListener("touchmove", stopPropagation, { passive: true });
+    card.addEventListener("touchend", stopPropagation, { passive: true });
+
+    return () => {
+      card.removeEventListener("touchstart", stopPropagation);
+      card.removeEventListener("touchmove", stopPropagation);
+      card.removeEventListener("touchend", stopPropagation);
+    };
+  }, []);
+
   return (
     <div
+      ref={cardRef}
       data-slot="grouped-toast-card"
+      data-swipe-ignore
       className={cn(
         "absolute w-full",
         isTop ? "top-full mt-2" : "bottom-full mb-2",
@@ -1255,7 +1280,7 @@ function GroupedToastCard({ data, isTop }: GroupedToastCardProps) {
         isTop ? "slide-in-from-top-2" : "slide-in-from-bottom-2",
       )}
     >
-      <div className="max-h-64 overflow-y-auto">
+      <div className="max-h-64 overflow-y-auto overscroll-contain">
         {data.items.map((item, index) => (
           <GroupedToastCardItem
             key={item.id}

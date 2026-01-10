@@ -49,6 +49,12 @@ Toasts automatically adjust their stacking when content has different heights.
 
 <ComponentPreview component="toast" example="toast-varying-heights" />
 
+### Grouped Toasts
+
+Group multiple related toasts into a single summary toast with an expandable card. Ideal for long-running operations like deployments or file uploads.
+
+<ComponentPreview component="toast" example="toast-grouped" />
+
 ## API Reference
 
 The Toast component is built on top of [Base UI's Toast](https://base-ui.com/components/toast). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
@@ -142,6 +148,53 @@ toast.anchored({
 | `align`       | `"start" \| "center" \| "end"`           | `"center"` | Alignment along the anchor       |
 | `alignOffset` | `number`                                 | `0`        | Offset for alignment             |
 | `arrow`       | `boolean`                                | `false`    | Show arrow pointing to anchor    |
+
+### Grouped Toasts
+
+Group multiple related toasts into a single collapsible summary. When only one item exists, it renders as a normal toast. When multiple items share the same `groupId`, they collapse into a summary with a "Show" button that reveals an expandable card.
+
+```tsx
+toast.grouped({
+  groupId: "deployments",
+  title: "Deployment abc123 is building...",
+  type: "loading",
+  action: { label: "Cancel", onClick: () => cancelDeployment() },
+  groupSummary: (count) => `${count} deployments in progress`,
+  groupAction: { label: "Show", expandedLabel: "Hide" },
+});
+```
+
+#### GroupedToastOptions
+
+| Prop           | Type                                                               | Default  | Description                                        |
+| -------------- | ------------------------------------------------------------------ | -------- | -------------------------------------------------- |
+| `groupId`      | `string`                                                           | -        | **Required.** Identifier for the group             |
+| `title`        | `string`                                                           | -        | Title of this item                                 |
+| `description`  | `string`                                                           | -        | Description of this item                           |
+| `type`         | `"default" \| "loading" \| "success" \| "error" \| "warning" \| "info"` | `"default"` | Visual type (loading shows spinner)            |
+| `action`       | `{ label: string; onClick: () => void }`                           | -        | Action button for this item                        |
+| `groupSummary` | `string \| ((count: number) => string)`                            | -        | **Required.** Summary text when multiple items     |
+| `groupAction`  | `{ label: string; expandedLabel?: string }`                        | `{ label: "Show", expandedLabel: "Hide" }` | Toggle button labels |
+
+#### Helper Methods
+
+```tsx
+// Dismiss a single item from a group
+toast.dismissGroupItem(itemId);
+
+// Dismiss an entire group
+toast.dismissGroup(groupId);
+
+// Update a specific item
+toast.updateGroupItem(itemId, { title: "Updated title", type: "success" });
+```
+
+#### Behavior
+
+- **Single item**: Renders as a normal toast with close button
+- **Multiple items**: Collapses into summary with Show/Hide button
+- **No timeout**: Groups persist until manually dismissed (ideal for long-running tasks)
+- **Icon derivation**: Shows loading spinner if any item has `type: "loading"`
 
 ### ToastProvider
 

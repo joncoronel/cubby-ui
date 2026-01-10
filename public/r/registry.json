@@ -1227,8 +1227,7 @@
         "@cubby-ui/button"
       ],
       "dependencies": [
-        "lucide-react",
-        "class-variance-authority"
+        "lucide-react"
       ]
     },
     {

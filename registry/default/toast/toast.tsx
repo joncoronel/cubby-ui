@@ -20,6 +20,17 @@ const toastManager = Toast.createToastManager();
 const anchoredToastManager = Toast.createToastManager();
 
 // =============================================================================
+// Grouped Toast Mappings (simplified - no separate state manager)
+// =============================================================================
+
+// Map groupId -> Base UI toastId
+const groupToToastMap = new Map<string, string>();
+// Map itemId -> groupId for lookups
+const groupItemToGroupMap = new Map<string, string>();
+// Map groupId -> GroupedToastData (we track our own data since toastManager doesn't expose getSnapshot)
+const groupDataMap = new Map<string, GroupedToastData>();
+
+// =============================================================================
 // Types
 // =============================================================================
 
@@ -49,8 +60,9 @@ export interface ToastOptions<TData extends object = object> {
   onRemove?: () => void;
 }
 
-export interface AnchoredToastOptions<TData extends object = object>
-  extends Omit<ToastOptions<TData>, "type"> {
+export interface AnchoredToastOptions<
+  TData extends object = object,
+> extends Omit<ToastOptions<TData>, "type"> {
   anchor: Element | React.RefObject<Element | null>;
   side?: "top" | "bottom" | "left" | "right";
   sideOffset?: number;
@@ -75,6 +87,65 @@ interface ToastData {
     sideOffset?: number;
     align?: "start" | "center" | "end";
     alignOffset?: number;
+  };
+}
+
+// =============================================================================
+// Grouped Toast Types
+// =============================================================================
+
+type ToastType =
+  | "default"
+  | "loading"
+  | "success"
+  | "error"
+  | "warning"
+  | "info";
+
+/** Individual item within a grouped toast */
+export interface GroupedToastItem {
+  id: string;
+  title?: string;
+  description?: string;
+  type?: ToastType;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+  data?: object;
+  createdAt: number;
+}
+
+/** Options for creating a grouped toast item */
+export interface GroupedToastOptions<TData extends object = object> {
+  groupId: string;
+  title?: string;
+  description?: string;
+  type?: ToastType;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+  data?: TData;
+  onClose?: () => void;
+  onRemove?: () => void;
+  groupSummary: string | ((count: number) => string);
+  groupAction?: {
+    label: string;
+    expandedLabel?: string;
+  };
+}
+
+/** Data structure stored in Base UI toast for grouped toasts */
+interface GroupedToastData {
+  isGrouped: true;
+  groupId: string;
+  items: GroupedToastItem[];
+  isExpanded: boolean;
+  summary: string | ((count: number) => string);
+  action: {
+    label: string;
+    expandedLabel: string;
   };
 }
 
@@ -269,6 +340,163 @@ export const toast = Object.assign(baseToast, {
   dismissAnchored: (toastId: string) => {
     return anchoredToastManager.close(toastId);
   },
+  /** Show a grouped toast that collapses multiple items into a summary */
+  grouped: <TData extends object = object>(
+    options: GroupedToastOptions<TData>,
+  ) => {
+    const existingToastId = groupToToastMap.get(options.groupId);
+    const itemId = `grouped-${options.groupId}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
+    const newItem: GroupedToastItem = {
+      id: itemId,
+      title: options.title,
+      description: options.description,
+      type: options.type,
+      action: options.action,
+      data: options.data,
+      createdAt: Date.now(),
+    };
+
+    if (existingToastId) {
+      // Add to existing group
+      const existingData = groupDataMap.get(options.groupId);
+      if (existingData) {
+        const updatedData: GroupedToastData = {
+          ...existingData,
+          items: [...existingData.items, newItem],
+        };
+        groupDataMap.set(options.groupId, updatedData);
+        toastManager.update(existingToastId, { data: updatedData });
+      }
+    } else {
+      // Create new group
+      const groupId = options.groupId;
+      const groupData: GroupedToastData = {
+        isGrouped: true,
+        groupId,
+        items: [newItem],
+        isExpanded: false,
+        summary: options.groupSummary,
+        action: {
+          label: options.groupAction?.label ?? "Show",
+          expandedLabel: options.groupAction?.expandedLabel ?? "Hide",
+        },
+      };
+      const toastId = toastManager.add({
+        title: "",
+        description: "",
+        data: groupData,
+        timeout: 0, // Groups don't auto-dismiss
+        // Clean up our maps when the toast is closed (via close button or swipe)
+        onClose: () => {
+          const data = groupDataMap.get(groupId);
+          if (data) {
+            data.items.forEach((item) => groupItemToGroupMap.delete(item.id));
+          }
+          groupToToastMap.delete(groupId);
+          groupDataMap.delete(groupId);
+        },
+      });
+      if (toastId) {
+        groupToToastMap.set(groupId, toastId);
+        groupDataMap.set(groupId, groupData);
+      }
+    }
+
+    groupItemToGroupMap.set(itemId, options.groupId);
+    return itemId;
+  },
+  /** Dismiss a single item from a grouped toast */
+  dismissGroupItem: (itemId: string) => {
+    const groupId = groupItemToGroupMap.get(itemId);
+    if (!groupId) return;
+
+    const toastId = groupToToastMap.get(groupId);
+    if (!toastId) return;
+
+    const data = groupDataMap.get(groupId);
+    if (!data) return;
+
+    const newItems = data.items.filter((item) => item.id !== itemId);
+    groupItemToGroupMap.delete(itemId);
+
+    if (newItems.length === 0) {
+      // Last item - close the toast entirely
+      toastManager.close(toastId);
+      groupToToastMap.delete(groupId);
+      groupDataMap.delete(groupId);
+    } else if (newItems.length === 1 && newItems[0].type !== "loading") {
+      // Only 1 item remains and it's already complete - dismiss the whole toast
+      // This avoids the awkward transition from "All complete" to single-item view
+      toastManager.close(toastId);
+      groupItemToGroupMap.delete(newItems[0].id);
+      groupToToastMap.delete(groupId);
+      groupDataMap.delete(groupId);
+    } else {
+      // Update toast with remaining items
+      const updatedData: GroupedToastData = {
+        ...data,
+        items: newItems,
+        // Collapse if only 1 item remains
+        isExpanded: newItems.length === 1 ? false : data.isExpanded,
+      };
+      groupDataMap.set(groupId, updatedData);
+      toastManager.update(toastId, { data: updatedData });
+
+      // If only 1 item remains and it's still loading, it will complete later
+      // and trigger auto-dismiss via updateGroupItem
+    }
+  },
+  /** Dismiss an entire group of toasts */
+  dismissGroup: (groupId: string) => {
+    const toastId = groupToToastMap.get(groupId);
+    if (!toastId) return;
+
+    // Clean up item mappings
+    const data = groupDataMap.get(groupId);
+    if (data) {
+      data.items.forEach((item) => groupItemToGroupMap.delete(item.id));
+    }
+
+    toastManager.close(toastId);
+    groupToToastMap.delete(groupId);
+    groupDataMap.delete(groupId);
+  },
+  /** Update a single item in a grouped toast */
+  updateGroupItem: (
+    itemId: string,
+    options: Partial<Omit<GroupedToastItem, "id" | "createdAt">>,
+  ) => {
+    const groupId = groupItemToGroupMap.get(itemId);
+    if (!groupId) return;
+
+    const toastId = groupToToastMap.get(groupId);
+    if (!toastId) return;
+
+    const data = groupDataMap.get(groupId);
+    if (!data) return;
+
+    // Find the current item to check if type is changing from loading
+    const currentItem = data.items.find((item) => item.id === itemId);
+    const wasLoading = currentItem?.type === "loading";
+    const isNowComplete =
+      options.type !== undefined && options.type !== "loading";
+
+    const newItems = data.items.map((item) =>
+      item.id === itemId ? { ...item, ...options } : item,
+    );
+
+    const updatedData: GroupedToastData = { ...data, items: newItems };
+    groupDataMap.set(groupId, updatedData);
+    toastManager.update(toastId, { data: updatedData });
+
+    // If transitioning from loading to complete, start individual item dismiss timer
+    if (wasLoading && isNowComplete) {
+      setTimeout(() => {
+        toast.dismissGroupItem(itemId);
+      }, 5000);
+    }
+  },
 });
 
 // =============================================================================
@@ -299,11 +527,7 @@ export function ToastProvider({
   container,
 }: ToastProviderProps) {
   return (
-    <Toast.Provider
-      limit={limit}
-      timeout={timeout}
-      toastManager={toastManager}
-    >
+    <Toast.Provider limit={limit} timeout={timeout} toastManager={toastManager}>
       {children}
       <Toast.Portal container={container}>
         <Toast.Viewport
@@ -365,13 +589,30 @@ function StackedToastItem({
   position,
   swipeDirection,
 }: StackedToastItemProps) {
+  // Check if this is a grouped toast
+  const isGrouped =
+    toast.data &&
+    typeof toast.data === "object" &&
+    "isGrouped" in toast.data &&
+    (toast.data as GroupedToastData).isGrouped === true;
+
+  // For grouped toasts, render with GroupedToastContent
+  if (isGrouped) {
+    return (
+      <GroupedToastRoot
+        toast={toast}
+        position={position}
+        swipeDirection={swipeDirection}
+        data={toast.data as GroupedToastData}
+      />
+    );
+  }
+
   const type = toast.type || "default";
 
   // Check if this is a custom JSX toast
   const hasCustomJSX =
-    toast.data &&
-    typeof toast.data === "object" &&
-    "customJSX" in toast.data;
+    toast.data && typeof toast.data === "object" && "customJSX" in toast.data;
 
   // Get icon for toast type
   const Icon =
@@ -476,7 +717,7 @@ function StackedToastItem({
                     "in-data-[type=error]:text-danger-foreground",
                     "in-data-[type=warning]:text-warning-foreground",
                     "in-data-[type=info]:text-info-foreground",
-                    "in-data-[type=loading]:animate-spin in-data-[type=loading]:text-muted-foreground",
+                    "in-data-[type=loading]:text-muted-foreground in-data-[type=loading]:animate-spin",
                   )}
                 />
               </div>
@@ -484,11 +725,11 @@ function StackedToastItem({
             <div className="flex min-w-0 flex-1 flex-col gap-0.5">
               <Toast.Title
                 data-slot="toast-title"
-                className="text-sm font-medium leading-5"
+                className="text-sm leading-5 font-medium"
               />
               <Toast.Description
                 data-slot="toast-description"
-                className="text-sm leading-5 text-muted-foreground"
+                className="text-muted-foreground text-sm leading-5"
               />
             </div>
             <Toast.Action
@@ -497,7 +738,7 @@ function StackedToastItem({
             />
             <Toast.Close
               data-slot="toast-close"
-              className="-mr-1 -mt-1 flex size-6 shrink-0 items-center justify-center rounded-md border-none bg-transparent text-muted-foreground transition-colors duration-200 hover:bg-accent/50 hover:text-foreground"
+              className="text-muted-foreground hover:bg-accent/50 hover:text-foreground -mt-1 -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md border-none bg-transparent transition-colors duration-200"
               aria-label="Close"
             >
               <XIcon className="size-4" />
@@ -561,9 +802,9 @@ function AnchoredToasts() {
 function AnchoredToastItem({ toast }: { toast: ToastData }) {
   const showArrow = Boolean(
     toast.data &&
-      typeof toast.data === "object" &&
-      "arrow" in toast.data &&
-      (toast.data as Record<string, unknown>).arrow === true,
+    typeof toast.data === "object" &&
+    "arrow" in toast.data &&
+    (toast.data as Record<string, unknown>).arrow === true,
   );
 
   return (
@@ -577,7 +818,7 @@ function AnchoredToastItem({ toast }: { toast: ToastData }) {
         data-slot="toast"
         className={cn(
           "flex w-max origin-[var(--transform-origin)] flex-col rounded-md",
-          "border border-border bg-card text-card-foreground",
+          "border-border bg-card text-card-foreground border",
           "px-3 py-2 text-sm shadow-lg",
           "transition-all duration-200",
           "data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
@@ -591,14 +832,426 @@ function AnchoredToastItem({ toast }: { toast: ToastData }) {
           />
         )}
         <Toast.Content data-slot="toast-content">
-          <Toast.Title data-slot="toast-title" className="text-sm font-medium" />
+          <Toast.Title
+            data-slot="toast-title"
+            className="text-sm font-medium"
+          />
           <Toast.Description
             data-slot="toast-description"
-            className="text-sm text-muted-foreground"
+            className="text-muted-foreground text-sm"
           />
         </Toast.Content>
       </Toast.Root>
     </Toast.Positioner>
+  );
+}
+
+// =============================================================================
+// Grouped Toast Components (using Base UI primitives)
+// =============================================================================
+
+// Feature detection for calc-size() support (Chrome 129+, Edge 129+)
+// Used to conditionally render different DOM structures for height animation
+const supportsCalcSize =
+  typeof CSS !== "undefined" && CSS.supports("height", "calc-size(auto, size)");
+
+interface GroupedToastRootProps {
+  toast: ToastData;
+  position: ToastPosition;
+  swipeDirection:
+    | ("up" | "down" | "left" | "right")
+    | ("up" | "down" | "left" | "right")[];
+  data: GroupedToastData;
+}
+
+/** Helper to toggle expand/collapse for a grouped toast */
+function toggleGroupExpanded(toastId: string) {
+  // Find the groupId from toastId
+  let groupId: string | undefined;
+  for (const [gId, tId] of groupToToastMap.entries()) {
+    if (tId === toastId) {
+      groupId = gId;
+      break;
+    }
+  }
+  if (!groupId) return;
+
+  const data = groupDataMap.get(groupId);
+  if (!data) return;
+
+  const updatedData: GroupedToastData = {
+    ...data,
+    isExpanded: !data.isExpanded,
+  };
+  groupDataMap.set(groupId, updatedData);
+  toastManager.update(toastId, { data: updatedData });
+}
+
+function GroupedToastRoot({
+  toast,
+  position,
+  swipeDirection,
+  data,
+}: GroupedToastRootProps) {
+  const isTop = position.startsWith("top");
+
+  // Organized class arrays for readability (same as regular toast)
+  const cssVariables = [
+    "[--toast-gap:0.75rem] [--toast-peek:0.75rem]",
+    "[--toast-scale:calc(max(0,1-(var(--toast-index)*0.1)))]",
+    "[--toast-shrink:calc(1-var(--toast-scale))]",
+    "[--toast-calc-height:var(--toast-frontmost-height,var(--toast-height))]",
+    "data-[position*=top]:[--toast-calc-offset-y:calc(var(--toast-offset-y)+(var(--toast-index)*var(--toast-gap))+var(--toast-swipe-movement-y))]",
+    "data-[position*=bottom]:[--toast-calc-offset-y:calc(var(--toast-offset-y)*-1+(var(--toast-index)*var(--toast-gap)*-1)+var(--toast-swipe-movement-y))]",
+  ];
+
+  const positionClasses = [
+    "absolute z-[calc(1000-var(--toast-index))] w-full",
+    "data-[position*=top]:top-0 data-[position*=top]:right-0 data-[position*=top]:left-0 data-[position*=top]:origin-top",
+    "data-[position*=bottom]:right-0 data-[position*=bottom]:bottom-0 data-[position*=bottom]:left-0 data-[position*=bottom]:origin-bottom",
+  ];
+
+  const transformClasses = [
+    "data-[position*=top]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+(var(--toast-index)*var(--toast-peek))+(var(--toast-shrink)*var(--toast-calc-height))))_scale(var(--toast-scale))]",
+    "data-[position*=bottom]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-(var(--toast-index)*var(--toast-peek))-(var(--toast-shrink)*var(--toast-calc-height))))_scale(var(--toast-scale))]",
+    "data-expanded:h-(--toast-height)",
+    "data-position:data-expanded:transform-[translateX(var(--toast-swipe-movement-x))_translateY(var(--toast-calc-offset-y))]",
+  ];
+
+  const animationClasses = [
+    "data-[position*=top]:data-starting-style:transform-[translateY(calc(-100%-var(--toast-inset)))]",
+    "data-[position*=bottom]:data-starting-style:transform-[translateY(calc(100%+var(--toast-inset)))]",
+    "data-ending-style:opacity-0",
+    "data-ending-style:not-data-limited:not-data-swipe-direction:transform-[translateY(calc(100%+var(--toast-inset)))]",
+    "data-ending-style:data-[swipe-direction=down]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+100%+var(--toast-inset)))]",
+    "data-expanded:data-ending-style:data-[swipe-direction=down]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+100%+var(--toast-inset)))]",
+    "data-ending-style:data-[swipe-direction=left]:transform-[translateX(calc(var(--toast-swipe-movement-x)-100%-var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
+    "data-expanded:data-ending-style:data-[swipe-direction=left]:transform-[translateX(calc(var(--toast-swipe-movement-x)-100%-var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
+    "data-ending-style:data-[swipe-direction=right]:transform-[translateX(calc(var(--toast-swipe-movement-x)+100%+var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
+    "data-expanded:data-ending-style:data-[swipe-direction=right]:transform-[translateX(calc(var(--toast-swipe-movement-x)+100%+var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
+    "data-ending-style:data-[swipe-direction=up]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-100%-var(--toast-inset)))]",
+    "data-expanded:data-ending-style:data-[swipe-direction=up]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-100%-var(--toast-inset)))]",
+  ];
+
+  const visualClasses = [
+    "rounded-lg border border-border bg-card text-card-foreground",
+    "bg-clip-padding shadow-lg select-none overflow-visible",
+    'after:absolute after:left-0 after:h-[calc(var(--toast-gap)+1px)] after:w-full after:content-[""]',
+    "data-[position*=top]:after:bottom-full",
+    "data-[position*=bottom]:after:top-full",
+    "data-limited:opacity-0",
+    "h-(--toast-calc-height)",
+    "transition-[transform,opacity,height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+  ];
+
+  return (
+    <Toast.Root
+      toast={toast}
+      swipeDirection={swipeDirection}
+      data-slot="toast"
+      data-position={position}
+      className={cn(
+        cssVariables,
+        positionClasses,
+        transformClasses,
+        animationClasses,
+        visualClasses,
+      )}
+    >
+      <Toast.Content
+        data-slot="toast-content"
+        className={cn(
+          "text-sm",
+          "transition-[opacity,height] duration-300",
+          "data-behind:pointer-events-none data-behind:opacity-0",
+          "data-expanded:pointer-events-auto data-expanded:opacity-100",
+        )}
+      >
+        <GroupedToastSummaryOrSingle data={data} toastId={toast.id} />
+      </Toast.Content>
+      {/* Render expanded card outside Toast.Content to avoid clipping */}
+      {data.isExpanded && data.items.length > 1 && (
+        <GroupedToastCard data={data} isTop={isTop} />
+      )}
+    </Toast.Root>
+  );
+}
+
+interface GroupedToastSummaryOrSingleProps {
+  data: GroupedToastData;
+  toastId: string;
+}
+
+function GroupedToastSummaryOrSingle({
+  data,
+  toastId,
+}: GroupedToastSummaryOrSingleProps) {
+  const isSingle = data.items.length === 1;
+  const item = data.items[0];
+
+  // Modern browsers (Chrome 129+): single element with key switching
+  // Height animates from CSS var to calc-size(auto, size)
+  if (supportsCalcSize) {
+    return (
+      <div
+        key={isSingle ? "single" : "summary"}
+        className={cn(
+          "ease-out-cubic duration-200",
+          "transition-[height,opacity,filter,scale]",
+          "overflow-clip",
+          // Height: start from CSS var, animate to intrinsic size
+          "h-[calc-size(auto,size)]",
+          "starting:h-(--toast-calc-height)",
+          // Opacity/blur/scale entry animation
+          "starting:scale-95 starting:opacity-0 starting:blur-[2px]",
+          "blur-0 scale-100 opacity-100",
+        )}
+      >
+        {isSingle ? (
+          <GroupedSingleItemContent item={item} />
+        ) : (
+          <GroupedToastSummaryContent
+            data={data}
+            onToggle={() => toggleGroupExpanded(toastId)}
+          />
+        )}
+      </div>
+    );
+  }
+
+  // Fallback (Firefox/Safari): two elements with grid-based height animation
+  return (
+    <>
+      {/* Single item view */}
+      <div
+        className={cn(
+          "ease-out-cubic grid duration-200",
+          "transition-[grid-template-rows,opacity,filter,scale]",
+          isSingle
+            ? "blur-0 scale-100 grid-rows-[1fr] opacity-100"
+            : "pointer-events-none scale-95 grid-rows-[0fr] opacity-0 blur-[2px]",
+        )}
+      >
+        <div className="overflow-hidden">
+          <GroupedSingleItemContent item={item} />
+        </div>
+      </div>
+
+      {/* Summary view */}
+      <div
+        className={cn(
+          "ease-out-cubic grid duration-200",
+          "transition-[grid-template-rows,opacity,filter,scale]",
+          !isSingle
+            ? "blur-0 scale-100 grid-rows-[1fr] opacity-100"
+            : "pointer-events-none scale-95 grid-rows-[0fr] opacity-0 blur-[2px]",
+        )}
+      >
+        <div className="overflow-hidden">
+          <GroupedToastSummaryContent
+            data={data}
+            onToggle={() => toggleGroupExpanded(toastId)}
+          />
+        </div>
+      </div>
+    </>
+  );
+}
+
+interface GroupedSingleItemContentProps {
+  item: GroupedToastItem;
+}
+
+function GroupedSingleItemContent({ item }: GroupedSingleItemContentProps) {
+  const type = item.type || "default";
+  const Icon =
+    type !== "default" ? TOAST_ICONS[type as keyof typeof TOAST_ICONS] : null;
+
+  return (
+    <div className="flex items-start gap-3 px-3.5 py-3">
+      {Icon && (
+        <div data-slot="toast-icon" className="[&>svg]:size-4 [&>svg]:shrink-0">
+          <Icon
+            className={cn(
+              type === "success" && "text-success-foreground",
+              type === "error" && "text-danger-foreground",
+              type === "warning" && "text-warning-foreground",
+              type === "info" && "text-info-foreground",
+              type === "loading" && "text-muted-foreground animate-spin",
+            )}
+          />
+        </div>
+      )}
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        {item.title && (
+          <span className="text-sm leading-5 font-medium">{item.title}</span>
+        )}
+        {item.description && (
+          <span className="text-muted-foreground text-sm leading-5">
+            {item.description}
+          </span>
+        )}
+      </div>
+      {item.action && (
+        <button
+          onClick={item.action.onClick}
+          className={buttonVariants({ variant: "outline", size: "xs" })}
+        >
+          {item.action.label}
+        </button>
+      )}
+      <Toast.Close
+        data-slot="toast-close"
+        className="text-muted-foreground hover:bg-accent/50 hover:text-foreground -mt-1 -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md border-none bg-transparent transition-colors duration-200"
+        aria-label="Close"
+      >
+        <XIcon className="size-4" />
+      </Toast.Close>
+    </div>
+  );
+}
+
+interface GroupedToastSummaryContentProps {
+  data: GroupedToastData;
+  onToggle: () => void;
+}
+
+function GroupedToastSummaryContent({
+  data,
+  onToggle,
+}: GroupedToastSummaryContentProps) {
+  // Count items still in progress (loading)
+  const loadingCount = data.items.filter(
+    (item) => item.type === "loading",
+  ).length;
+  const hasLoadingItem = loadingCount > 0;
+  const iconType = hasLoadingItem ? "loading" : "success";
+  const Icon = TOAST_ICONS[iconType];
+
+  // Generate summary text - use loading count, not total count
+  const summaryText =
+    typeof data.summary === "function"
+      ? data.summary(loadingCount)
+      : data.summary;
+
+  const buttonLabel = data.isExpanded
+    ? data.action.expandedLabel
+    : data.action.label;
+
+  return (
+    <div className="flex items-center gap-3 px-3.5 py-3">
+      <div data-slot="toast-icon" className="[&>svg]:size-4 [&>svg]:shrink-0">
+        <Icon
+          className={cn(
+            iconType === "loading" && "text-muted-foreground animate-spin",
+            iconType === "success" && "text-success-foreground",
+          )}
+        />
+      </div>
+      <span className="flex-1 font-medium">{summaryText}</span>
+      <button
+        onClick={onToggle}
+        className={buttonVariants({ variant: "outline", size: "xs" })}
+      >
+        {buttonLabel}
+      </button>
+    </div>
+  );
+}
+
+interface GroupedToastCardProps {
+  data: GroupedToastData;
+  isTop: boolean;
+}
+
+function GroupedToastCard({ data, isTop }: GroupedToastCardProps) {
+  return (
+    <div
+      data-slot="grouped-toast-card"
+      className={cn(
+        "absolute w-full",
+        isTop ? "top-full mt-2" : "bottom-full mb-2",
+        "border-border bg-card text-card-foreground rounded-lg border",
+        "overflow-hidden shadow-lg",
+        "ease-out-cubic transition-all duration-200",
+        "animate-in fade-in-0 zoom-in-95",
+        isTop ? "slide-in-from-top-2" : "slide-in-from-bottom-2",
+      )}
+    >
+      <div className="max-h-64 overflow-y-auto">
+        {data.items.map((item, index) => (
+          <GroupedToastCardItem
+            key={item.id}
+            item={item}
+            showSeparator={index > 0}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+interface GroupedToastCardItemProps {
+  item: GroupedToastItem;
+  showSeparator: boolean;
+}
+
+function GroupedToastCardItem({
+  item,
+  showSeparator,
+}: GroupedToastCardItemProps) {
+  const type = item.type || "default";
+  const Icon =
+    type !== "default" ? TOAST_ICONS[type as keyof typeof TOAST_ICONS] : null;
+
+  return (
+    <>
+      {showSeparator && (
+        <div
+          className="bg-border h-px w-full"
+          data-slot="grouped-toast-separator"
+        />
+      )}
+      <div
+        data-slot="grouped-toast-card-item"
+        className="flex items-center gap-3 px-3.5 py-3 text-sm"
+      >
+        {Icon && (
+          <div
+            data-slot="toast-icon"
+            className="[&>svg]:size-4 [&>svg]:shrink-0"
+          >
+            <Icon
+              className={cn(
+                type === "success" && "text-success-foreground",
+                type === "error" && "text-danger-foreground",
+                type === "warning" && "text-warning-foreground",
+                type === "info" && "text-info-foreground",
+                type === "loading" && "text-muted-foreground animate-spin",
+              )}
+            />
+          </div>
+        )}
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          {item.title && (
+            <span className="leading-5 font-medium">{item.title}</span>
+          )}
+          {item.description && (
+            <span className="text-muted-foreground leading-5">
+              {item.description}
+            </span>
+          )}
+        </div>
+        {item.action && (
+          <button
+            onClick={item.action.onClick}
+            className={buttonVariants({ variant: "outline", size: "xs" })}
+          >
+            {item.action.label}
+          </button>
+        )}
+      </div>
+    </>
   );
 }
 

@@ -71,6 +71,7 @@ export default function ToastGrouped() {
     const branchName = deploymentCounter % 2 === 0 ? "main" : "develop";
 
     const toastId = toast.grouped({
+      showCloseButton: false,
       groupId: "deployments",
       title: `${deploymentId} is building on app - ${branchName}`,
       type: "loading",
@@ -79,7 +80,9 @@ export default function ToastGrouped() {
         onClick: () => cancelDeployment(deploymentId),
       },
       groupSummary: (count) =>
-        count > 0 ? `${count} deployments in progress` : "All deployments complete",
+        count > 0
+          ? `${count} deployments in progress`
+          : "All deployments complete",
       groupAction: {
         label: "Show",
         expandedLabel: "Hide",
@@ -111,12 +114,8 @@ export default function ToastGrouped() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-4">
-      <Button onClick={startDeployment}>Deploy App</Button>
-      <p className="text-sm text-muted-foreground">
-        Click multiple times to see grouped toasts in action. Deployments
-        auto-complete after 5-10 seconds.
-      </p>
-    </div>
+    <Button variant="outline" onClick={startDeployment}>
+      Deploy App
+    </Button>
   );
 }

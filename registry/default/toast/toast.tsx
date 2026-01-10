@@ -58,6 +58,8 @@ export interface ToastOptions<TData extends object = object> {
   data?: TData;
   onClose?: () => void;
   onRemove?: () => void;
+  /** Whether to show the close button. Defaults to true. */
+  showCloseButton?: boolean;
 }
 
 export interface AnchoredToastOptions<
@@ -80,6 +82,7 @@ interface ToastData {
     label: string;
     onClick: () => void;
   };
+  showCloseButton?: boolean;
   data?: unknown;
   positionerProps?: {
     anchor?: Element | null;
@@ -114,6 +117,7 @@ export interface GroupedToastItem {
   };
   data?: object;
   createdAt: number;
+  showCloseButton?: boolean;
 }
 
 /** Options for creating a grouped toast item */
@@ -129,6 +133,8 @@ export interface GroupedToastOptions<TData extends object = object> {
   data?: TData;
   onClose?: () => void;
   onRemove?: () => void;
+  /** Whether to show the close button. Defaults to true. */
+  showCloseButton?: boolean;
   groupSummary: string | ((count: number) => string);
   groupAction?: {
     label: string;
@@ -184,6 +190,7 @@ function baseToast<TData extends object = object>(
       data: {
         customJSX: optionsOrJSX,
         ...(jsxOptions?.data && jsxOptions.data),
+        showCloseButton: jsxOptions?.showCloseButton ?? true,
       },
       ...(jsxOptions?.onClose && { onClose: jsxOptions.onClose }),
       ...(jsxOptions?.onRemove && { onRemove: jsxOptions.onRemove }),
@@ -204,7 +211,10 @@ function baseToast<TData extends object = object>(
         onClick: options.action.onClick,
       },
     }),
-    ...(options.data && { data: options.data }),
+    data: {
+      ...(options.data || {}),
+      showCloseButton: options.showCloseButton ?? true,
+    },
     ...(options.onClose && { onClose: options.onClose }),
     ...(options.onRemove && { onRemove: options.onRemove }),
   });
@@ -355,6 +365,7 @@ export const toast = Object.assign(baseToast, {
       action: options.action,
       data: options.data,
       createdAt: Date.now(),
+      showCloseButton: options.showCloseButton ?? true,
     };
 
     if (existingToastId) {
@@ -614,6 +625,15 @@ function StackedToastItem({
   const hasCustomJSX =
     toast.data && typeof toast.data === "object" && "customJSX" in toast.data;
 
+  // Check if close button should be shown (defaults to true)
+  const showCloseButton =
+    toast.data &&
+    typeof toast.data === "object" &&
+    "showCloseButton" in toast.data &&
+    (toast.data as Record<string, unknown>).showCloseButton === false
+      ? false
+      : true;
+
   // Get icon for toast type
   const Icon =
     type !== "default" ? TOAST_ICONS[type as keyof typeof TOAST_ICONS] : null;
@@ -694,7 +714,8 @@ function StackedToastItem({
       <Toast.Content
         data-slot="toast-content"
         className={cn(
-          "flex items-start gap-3 overflow-hidden px-3.5 py-3 text-sm",
+          "flex gap-3 overflow-hidden px-3.5 py-3 text-sm",
+          showCloseButton ? "items-start" : "items-center",
           "transition-opacity duration-250",
           "data-behind:pointer-events-none data-behind:opacity-0",
           "data-expanded:pointer-events-auto data-expanded:opacity-100",
@@ -709,7 +730,10 @@ function StackedToastItem({
             {Icon && (
               <div
                 data-slot="toast-icon"
-                className="[&>svg]:size-4 [&>svg]:shrink-0"
+                className={cn(
+                  "[&>svg]:size-4 [&>svg]:shrink-0",
+                  showCloseButton && "mt-0.5",
+                )}
               >
                 <Icon
                   className={cn(
@@ -731,18 +755,33 @@ function StackedToastItem({
                 data-slot="toast-description"
                 className="text-muted-foreground text-sm leading-5"
               />
+              {/* Action underneath text when close button exists */}
+              {showCloseButton && (
+                <Toast.Action
+                  data-slot="toast-action"
+                  className={cn(
+                    buttonVariants({ variant: "outline", size: "xs" }),
+                    "mt-1.5 w-fit",
+                  )}
+                />
+              )}
             </div>
-            <Toast.Action
-              data-slot="toast-action"
-              className={buttonVariants({ variant: "outline", size: "xs" })}
-            />
-            <Toast.Close
-              data-slot="toast-close"
-              className="text-muted-foreground hover:bg-accent/50 hover:text-foreground -mt-1 -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md border-none bg-transparent transition-colors duration-200"
-              aria-label="Close"
-            >
-              <XIcon className="size-4" />
-            </Toast.Close>
+            {/* Action on right when no close button */}
+            {!showCloseButton && (
+              <Toast.Action
+                data-slot="toast-action"
+                className={buttonVariants({ variant: "outline", size: "xs" })}
+              />
+            )}
+            {showCloseButton && (
+              <Toast.Close
+                data-slot="toast-close"
+                className="text-muted-foreground hover:bg-accent/50 hover:text-foreground -mt-1 -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md border-none bg-transparent transition-colors duration-200"
+                aria-label="Close"
+              >
+                <XIcon className="size-4" />
+              </Toast.Close>
+            )}
           </>
         )}
       </Toast.Content>
@@ -1003,12 +1042,16 @@ function GroupedToastSummaryOrSingle({
           "h-[calc-size(auto,size)]",
           "starting:h-(--toast-calc-height)",
           // Opacity/blur/scale entry animation
+
           "starting:scale-95 starting:opacity-0 starting:blur-[2px]",
           "blur-0 scale-100 opacity-100",
         )}
       >
         {isSingle ? (
-          <GroupedSingleItemContent item={item} />
+          <GroupedSingleItemContent
+            item={item}
+            showCloseButton={item.showCloseButton}
+          />
         ) : (
           <GroupedToastSummaryContent
             data={data}
@@ -1033,7 +1076,10 @@ function GroupedToastSummaryOrSingle({
         )}
       >
         <div className="overflow-hidden">
-          <GroupedSingleItemContent item={item} />
+          <GroupedSingleItemContent
+            item={item}
+            showCloseButton={item.showCloseButton}
+          />
         </div>
       </div>
 
@@ -1060,17 +1106,34 @@ function GroupedToastSummaryOrSingle({
 
 interface GroupedSingleItemContentProps {
   item: GroupedToastItem;
+  showCloseButton?: boolean;
 }
 
-function GroupedSingleItemContent({ item }: GroupedSingleItemContentProps) {
+function GroupedSingleItemContent({
+  item,
+  showCloseButton = true,
+}: GroupedSingleItemContentProps) {
   const type = item.type || "default";
   const Icon =
     type !== "default" ? TOAST_ICONS[type as keyof typeof TOAST_ICONS] : null;
 
+  // When close button exists: action underneath text, items-start
+  // When no close button: action on right side, items-center
   return (
-    <div className="flex items-start gap-3 px-3.5 py-3">
+    <div
+      className={cn(
+        "flex gap-3 px-3.5 py-3",
+        showCloseButton ? "items-start" : "items-center",
+      )}
+    >
       {Icon && (
-        <div data-slot="toast-icon" className="[&>svg]:size-4 [&>svg]:shrink-0">
+        <div
+          data-slot="toast-icon"
+          className={cn(
+            "[&>svg]:size-4 [&>svg]:shrink-0",
+            showCloseButton && "mt-0.5",
+          )}
+        >
           <Icon
             className={cn(
               type === "success" && "text-success-foreground",
@@ -1091,8 +1154,20 @@ function GroupedSingleItemContent({ item }: GroupedSingleItemContentProps) {
             {item.description}
           </span>
         )}
+        {/* Action underneath text when close button exists */}
+        {showCloseButton && item.action && (
+          <div className="mt-1.5">
+            <button
+              onClick={item.action.onClick}
+              className={buttonVariants({ variant: "outline", size: "xs" })}
+            >
+              {item.action.label}
+            </button>
+          </div>
+        )}
       </div>
-      {item.action && (
+      {/* Action on right when no close button */}
+      {!showCloseButton && item.action && (
         <button
           onClick={item.action.onClick}
           className={buttonVariants({ variant: "outline", size: "xs" })}
@@ -1100,13 +1175,15 @@ function GroupedSingleItemContent({ item }: GroupedSingleItemContentProps) {
           {item.action.label}
         </button>
       )}
-      <Toast.Close
-        data-slot="toast-close"
-        className="text-muted-foreground hover:bg-accent/50 hover:text-foreground -mt-1 -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md border-none bg-transparent transition-colors duration-200"
-        aria-label="Close"
-      >
-        <XIcon className="size-4" />
-      </Toast.Close>
+      {showCloseButton && (
+        <Toast.Close
+          data-slot="toast-close"
+          className="text-muted-foreground hover:bg-accent/50 hover:text-foreground -mt-1 -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md border-none bg-transparent transition-colors duration-200"
+          aria-label="Close"
+        >
+          <XIcon className="size-4" />
+        </Toast.Close>
+      )}
     </div>
   );
 }

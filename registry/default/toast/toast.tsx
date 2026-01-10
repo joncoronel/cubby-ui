@@ -105,6 +105,9 @@ type ToastType =
   | "warning"
   | "info";
 
+/** Duration in ms before a completed group item auto-dismisses */
+const GROUP_ITEM_DISMISS_DURATION = 5000;
+
 /** Individual item within a grouped toast */
 export interface GroupedToastItem {
   id: string;
@@ -153,6 +156,8 @@ interface GroupedToastData {
     label: string;
     expandedLabel: string;
   };
+  /** True once we've shown "All complete" (2+ items completed simultaneously) - stays in summary mode */
+  hasShownAllComplete: boolean;
 }
 
 // =============================================================================
@@ -392,6 +397,7 @@ export const toast = Object.assign(baseToast, {
           label: options.groupAction?.label ?? "Show",
           expandedLabel: options.groupAction?.expandedLabel ?? "Hide",
         },
+        hasShownAllComplete: false,
       };
       const toastId = toastManager.add({
         title: "",
@@ -436,13 +442,6 @@ export const toast = Object.assign(baseToast, {
       toastManager.close(toastId);
       groupToToastMap.delete(groupId);
       groupDataMap.delete(groupId);
-    } else if (newItems.length === 1 && newItems[0].type !== "loading") {
-      // Only 1 item remains and it's already complete - dismiss the whole toast
-      // This avoids the awkward transition from "All complete" to single-item view
-      toastManager.close(toastId);
-      groupItemToGroupMap.delete(newItems[0].id);
-      groupToToastMap.delete(groupId);
-      groupDataMap.delete(groupId);
     } else {
       // Update toast with remaining items
       const updatedData: GroupedToastData = {
@@ -453,9 +452,6 @@ export const toast = Object.assign(baseToast, {
       };
       groupDataMap.set(groupId, updatedData);
       toastManager.update(toastId, { data: updatedData });
-
-      // If only 1 item remains and it's still loading, it will complete later
-      // and trigger auto-dismiss via updateGroupItem
     }
   },
   /** Dismiss an entire group of toasts */
@@ -497,7 +493,18 @@ export const toast = Object.assign(baseToast, {
       item.id === itemId ? { ...item, ...options } : item,
     );
 
-    const updatedData: GroupedToastData = { ...data, items: newItems };
+    // Check if we have 2+ complete items (triggers "All complete" summary)
+    const completeCount = newItems.filter(
+      (item) => item.type !== "loading",
+    ).length;
+    const shouldShowAllComplete = completeCount >= 2;
+
+    const updatedData: GroupedToastData = {
+      ...data,
+      items: newItems,
+      // Once true, stays true
+      hasShownAllComplete: data.hasShownAllComplete || shouldShowAllComplete,
+    };
     groupDataMap.set(groupId, updatedData);
     toastManager.update(toastId, { data: updatedData });
 
@@ -505,7 +512,7 @@ export const toast = Object.assign(baseToast, {
     if (wasLoading && isNowComplete) {
       setTimeout(() => {
         toast.dismissGroupItem(itemId);
-      }, 5000);
+      }, GROUP_ITEM_DISMISS_DURATION);
     }
   },
 });
@@ -1025,8 +1032,12 @@ function GroupedToastSummaryOrSingle({
   data,
   toastId,
 }: GroupedToastSummaryOrSingleProps) {
-  const isSingle = data.items.length === 1;
   const item = data.items[0];
+  // Show single-item view only if:
+  // 1. There's exactly 1 item, AND
+  // 2. We never showed "All complete" (which happens when 2+ items were complete at once)
+  // This ensures groups stay in summary mode once "All complete" was shown.
+  const isSingle = data.items.length === 1 && !data.hasShownAllComplete;
 
   // Modern browsers (Chrome 129+): single element with key switching
   // Height animates from CSS var to calc-size(auto, size)
@@ -1226,12 +1237,15 @@ function GroupedToastSummaryContent({
         />
       </div>
       <span className="flex-1 font-medium">{summaryText}</span>
-      <button
-        onClick={onToggle}
-        className={buttonVariants({ variant: "outline", size: "xs" })}
-      >
-        {buttonLabel}
-      </button>
+      {/* Only show Show/Hide button when there are multiple items to expand */}
+      {data.items.length > 1 && (
+        <button
+          onClick={onToggle}
+          className={buttonVariants({ variant: "outline", size: "xs" })}
+        >
+          {buttonLabel}
+        </button>
+      )}
     </div>
   );
 }

@@ -1223,8 +1223,11 @@
           "target": "components/ui/cubby-ui/toast.tsx"
         }
       ],
+      "registryDependencies": [
+        "@cubby-ui/button"
+      ],
       "dependencies": [
-        "clsx"
+        "lucide-react"
       ]
     },
     {

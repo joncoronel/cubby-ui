@@ -314,6 +314,11 @@ import timeline_timeline_basic from "@/registry/examples/timeline/timeline-basic
 import timeline_timeline_horizontal from "@/registry/examples/timeline/timeline-horizontal";
 import timeline_timeline_stepper from "@/registry/examples/timeline/timeline-stepper";
 import toast_toast_basic from "@/registry/examples/toast/toast-basic";
+import toast_toast_action from "@/registry/examples/toast/toast-action";
+import toast_toast_anchored from "@/registry/examples/toast/toast-anchored";
+import toast_toast_promise from "@/registry/examples/toast/toast-promise";
+import toast_toast_types from "@/registry/examples/toast/toast-types";
+import toast_toast_varying_heights from "@/registry/examples/toast/toast-varying-heights";
 import toast_toast_with_action from "@/registry/examples/toast/toast-with-action";
 import toggle_toggle_basic from "@/registry/examples/toggle/toggle-basic";
 import toggle_toggle_controlled from "@/registry/examples/toggle/toggle-controlled";
@@ -1061,9 +1066,11 @@ export const componentMetadata = {
     "title": "Toast",
     "description": "A toast component.",
     "category": "UI",
-    "registryDependencies": [],
+    "registryDependencies": [
+      "@cubby-ui/button"
+    ],
     "dependencies": [
-      "clsx"
+      "lucide-react"
     ],
     "examples": {},
     "reference": []
@@ -2832,7 +2839,32 @@ export const exampleRegistry = {
     {
       "title": "Basic",
       "importPath": "toast-basic",
-      "source": "\"use client\"\n\nimport { Button } from \"@/components/ui/cubby-ui/button\"\nimport { toast } from \"@/components/ui/cubby-ui/toast\"\n\nexport default function ToastBasic() {\n  return (\n    <div className=\"flex flex-col gap-2\">\n      <Button\n        onClick={() => {\n          toast({\n            title: \"Success!\",\n            description: \"Your action was completed successfully.\",\n          })\n        }}\n      >\n        Show Toast\n      </Button>\n      \n      <Button\n        onClick={() => {\n          toast.success({\n            title: \"Success!\",\n            description: \"Operation completed successfully.\",\n          })\n        }}\n      >\n        Show Success Toast\n      </Button>\n      \n      <Button\n        onClick={() => {\n          toast.error({\n            title: \"Error!\",\n            description: \"Something went wrong.\",\n          })\n        }}\n      >\n        Show Error Toast\n      </Button>\n      \n      <Button\n        onClick={() => {\n          toast.warning({\n            title: \"Warning!\",\n            description: \"Please review your input.\",\n          })\n        }}\n      >\n        Show Warning Toast\n      </Button>\n      \n      <Button\n        onClick={() => {\n          toast.info({\n            title: \"Info\",\n            description: \"Here's some useful information.\",\n          })\n        }}\n      >\n        Show Info Toast\n      </Button>\n    </div>\n  )\n}"
+      "source": "\"use client\"\n\nimport { Button } from \"@/components/ui/cubby-ui/button\"\nimport { toast } from \"@/components/ui/cubby-ui/toast\"\n\nexport default function ToastBasic() {\n  return (\n    <Button\n      onClick={() => {\n        toast({\n          title: \"Event has been created\",\n          description: \"Sunday, December 03, 2023 at 9:00 AM\",\n        })\n      }}\n    >\n      Show Toast\n    </Button>\n  )\n}\n"
+    },
+    {
+      "title": "Action",
+      "importPath": "toast-action",
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { toast } from \"@/components/ui/cubby-ui/toast\";\n\nexport default function ToastAction() {\n  const handleAction = () => {\n    const id = toast({\n      title: \"Action performed\",\n      description: \"You can undo this action.\",\n\n      action: {\n        label: \"Undo\",\n        onClick: () => {\n          if (id) {\n            toast.dismiss(id);\n          }\n          toast({\n            title: \"Action undone\",\n          });\n        },\n      },\n    });\n  };\n\n  return <Button onClick={handleAction}>Perform Action</Button>;\n}\n"
+    },
+    {
+      "title": "Anchored",
+      "importPath": "toast-anchored",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { toast } from \"@/components/ui/cubby-ui/toast\";\nimport { CopyButton } from \"@/components/ui/cubby-ui/copy-button\";\n\nexport default function ToastAnchored() {\n  const wrapperRef = React.useRef<HTMLDivElement>(null);\n\n  return (\n    <div\n      ref={wrapperRef}\n      className=\"inline-block\"\n      onClickCapture={() => {\n        toast.anchored({\n          description: \"Copied to clipboard!\",\n          anchor: wrapperRef,\n          side: \"top\",\n          sideOffset: 8,\n          arrow: true,\n          duration: 2000,\n        });\n      }}\n    >\n      <CopyButton content=\"npm install @cubby-ui/toast\" />\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Promise",
+      "importPath": "toast-promise",
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { toast } from \"@/components/ui/cubby-ui/toast\";\n\n// Simulated async operation\nfunction saveData(): Promise<{ name: string }> {\n  return new Promise((resolve, reject) => {\n    setTimeout(() => {\n      // Randomly succeed or fail for demo\n      if (Math.random() > 0.3) {\n        resolve({ name: \"Project Alpha\" });\n      } else {\n        reject(new Error(\"Connection failed\"));\n      }\n    }, 2000);\n  });\n}\n\nexport default function ToastPromise() {\n  const handleSave = () => {\n    toast.promise(saveData(), {\n      loading: {\n        title: \"Saving...\",\n        description: \"Please wait while we save your changes.\",\n      },\n      success: (data) => ({\n        title: \"Saved!\",\n        description: `${data.name} has been saved successfully.`,\n      }),\n      error: (err) => ({\n        title: \"Save failed\",\n        description: err.message,\n      }),\n    });\n  };\n\n  return <Button onClick={handleSave}>Save Changes</Button>;\n}\n"
+    },
+    {
+      "title": "Types",
+      "importPath": "toast-types",
+      "source": "\"use client\"\n\nimport { Button } from \"@/components/ui/cubby-ui/button\"\nimport { toast } from \"@/components/ui/cubby-ui/toast\"\n\nexport default function ToastTypes() {\n  return (\n    <div className=\"flex flex-wrap gap-2\">\n      <Button\n        variant=\"outline\"\n        onClick={() => toast({ title: \"Default\", description: \"This is a default toast.\" })}\n      >\n        Default\n      </Button>\n      <Button\n        variant=\"outline\"\n        onClick={() =>\n          toast.success({ title: \"Success\", description: \"Operation completed successfully.\" })\n        }\n      >\n        Success\n      </Button>\n      <Button\n        variant=\"outline\"\n        onClick={() =>\n          toast.error({ title: \"Error\", description: \"Something went wrong.\" })\n        }\n      >\n        Error\n      </Button>\n      <Button\n        variant=\"outline\"\n        onClick={() =>\n          toast.warning({ title: \"Warning\", description: \"Please review before continuing.\" })\n        }\n      >\n        Warning\n      </Button>\n      <Button\n        variant=\"outline\"\n        onClick={() =>\n          toast.info({ title: \"Info\", description: \"Here's some helpful information.\" })\n        }\n      >\n        Info\n      </Button>\n    </div>\n  )\n}\n"
+    },
+    {
+      "title": "Varying Heights",
+      "importPath": "toast-varying-heights",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { toast } from \"@/components/ui/cubby-ui/toast\";\n\nconst messages = [\n  {\n    title: \"Quick update\",\n    description: \"Task completed.\",\n  },\n  {\n    title: \"New comment on your post\",\n    description:\n      \"John Doe replied: 'This looks great! I especially like the attention to detail in the design. Can we schedule a call to discuss further?'\",\n  },\n  {\n    title: \"Meeting reminder\",\n    description:\n      \"Your meeting with the design team starts in 15 minutes. Make sure to prepare the prototype demos and gather feedback from last week's user testing session.\",\n  },\n  {\n    title: \"System notification\",\n    description: \"Updates installed successfully.\",\n  },\n];\n\nexport default function ToastVaryingHeights() {\n  const [index, setIndex] = React.useState(0);\n\n  const handleClick = () => {\n    const message = messages[index % messages.length];\n    toast({\n      title: message.title,\n      description: message.description,\n    });\n    setIndex((prev) => prev + 1);\n  };\n\n  return (\n    <Button variant=\"outline\" onClick={handleClick}>\n      Create Toast\n    </Button>\n  );\n}\n"
     },
     {
       "title": "With Action",
@@ -3286,6 +3318,11 @@ export const componentMap = {
   "timeline-horizontal": timeline_timeline_horizontal,
   "timeline-stepper": timeline_timeline_stepper,
   "toast-basic": toast_toast_basic,
+  "toast-action": toast_toast_action,
+  "toast-anchored": toast_toast_anchored,
+  "toast-promise": toast_toast_promise,
+  "toast-types": toast_toast_types,
+  "toast-varying-heights": toast_toast_varying_heights,
   "toast-with-action": toast_toast_with_action,
   "toggle-basic": toggle_toggle_basic,
   "toggle-controlled": toggle_toggle_controlled,

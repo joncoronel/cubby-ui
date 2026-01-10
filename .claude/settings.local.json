@@ -109,7 +109,8 @@
       "Bash(pnpm dlx:*)",
       "Bash(cmd /c del \"c:\\\\Users\\\\jonny\\\\Documents\\\\Projects\\\\cubby-ui\\\\lib\\\\cn.ts\")",
       "Bash(cmd /c del \"c:\\\\Users\\\\jonny\\\\Documents\\\\Projects\\\\cubby-ui\\\\components\\\\ui\\\\button.tsx\")",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(pnpm eslint:*)"
     ],
     "deny": []
   }

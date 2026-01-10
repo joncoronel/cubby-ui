@@ -3,7 +3,10 @@
 import { ThemeProvider } from "next-themes";
 import { LazyMotion } from "motion/react";
 
-import { ToastProvider } from "@/registry/default/toast/toast";
+import {
+  ToastProvider,
+  AnchoredToastProvider,
+} from "@/registry/default/toast/toast";
 import type { ReactNode } from "react";
 
 interface ProvidersProps {
@@ -23,7 +26,9 @@ export function Providers({ children }: ProvidersProps) {
         enableSystem
         disableTransitionOnChange
       >
-        <ToastProvider position="bottom-left">{children}</ToastProvider>
+        <ToastProvider position="bottom-right">
+          <AnchoredToastProvider>{children}</AnchoredToastProvider>
+        </ToastProvider>
       </ThemeProvider>
     </LazyMotion>
   );

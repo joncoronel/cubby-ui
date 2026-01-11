@@ -1678,11 +1678,7 @@ function CompletedItemRow({ item, showSeparator }: CompletedItemRowProps) {
         <div
           data-slot="completed-item-progress"
           className={cn(
-            "absolute inset-0 origin-left",
-            type === "success" && "bg-success/15",
-            type === "error" && "bg-danger/15",
-            type === "warning" && "bg-warning/15",
-            type === "info" && "bg-info/15",
+            "bg-card absolute inset-0 origin-left",
             "animate-[progress-fill_var(--dismiss-duration)_linear_forwards]",
           )}
         />
@@ -1768,7 +1764,7 @@ function CompletedItemsCard({ items, isTop }: CompletedItemsCardProps) {
       data-swipe-ignore
       className={cn(
         "max-h-48 w-full overflow-y-auto overscroll-contain",
-        "border-border bg-card text-card-foreground rounded-lg border",
+        "border-border bg-muted text-card-foreground rounded-lg border",
         "shadow-lg",
         "animate-in fade-in-0 zoom-in-95",
         isTop ? "slide-in-from-top-2" : "slide-in-from-bottom-2",

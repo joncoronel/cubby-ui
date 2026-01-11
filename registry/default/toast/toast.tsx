@@ -5,13 +5,15 @@ import { Popover } from "@base-ui/react/popover";
 import { Toast } from "@base-ui/react/toast";
 import { AnimatePresence } from "motion/react";
 import * as m from "motion/react-m";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  CircleAlertIcon,
-  CircleCheckIcon,
-  InfoIcon,
-  LoaderCircleIcon,
-  TriangleAlertIcon,
-} from "lucide-react";
+  AlertCircleIcon,
+  Alert02Icon,
+  CheckmarkCircle02Icon,
+  InformationCircleIcon,
+  Loading03Icon,
+  Cancel01Icon,
+} from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/registry/default/button/button";
 import "./toast.css";
@@ -39,11 +41,11 @@ const groupDataMap = new Map<string, GroupedToastData>();
 // =============================================================================
 
 const TOAST_ICONS = {
-  success: CircleCheckIcon,
-  error: CircleAlertIcon,
-  warning: TriangleAlertIcon,
-  info: InfoIcon,
-  loading: LoaderCircleIcon,
+  success: CheckmarkCircle02Icon,
+  error: AlertCircleIcon,
+  warning: Alert02Icon,
+  info: InformationCircleIcon,
+  loading: Loading03Icon,
 } as const;
 
 // Icon colors are handled via in-data-[type=*] selectors in the Icon className,
@@ -583,7 +585,8 @@ export const toast = Object.assign(baseToast, {
       toastManager.update(toastId, { data: updatedData });
 
       // Start dismiss timer for the completed item (use item's duration or default)
-      const dismissDuration = currentItem.duration ?? GROUP_ITEM_DISMISS_DURATION;
+      const dismissDuration =
+        currentItem.duration ?? GROUP_ITEM_DISMISS_DURATION;
       setTimeout(() => {
         toast.dismissCompletedItem(itemId);
       }, dismissDuration);
@@ -865,7 +868,9 @@ function StackedToastItem({
                   showCloseButton && "mt-0.5",
                 )}
               >
-                <Icon
+                <HugeiconsIcon
+                  icon={Icon}
+                  strokeWidth={2}
                   className={cn(
                     "in-data-[type=success]:text-success-foreground",
                     "in-data-[type=error]:text-danger-foreground",
@@ -909,7 +914,11 @@ function StackedToastItem({
                 className="text-muted-foreground hover:bg-accent/50 hover:text-foreground -mt-1 -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md border-none bg-transparent transition-colors duration-200"
                 aria-label="Close"
               >
-                <XIcon className="size-4" />
+                <HugeiconsIcon
+                  icon={Cancel01Icon}
+                  strokeWidth={2}
+                  className="size-4"
+                />
               </Toast.Close>
             )}
           </>
@@ -986,12 +995,12 @@ function AnchoredToastItem({ toast }: { toast: ToastData }) {
         toast={toast}
         data-slot="toast"
         className={cn(
-          "flex w-max origin-[var(--transform-origin)] flex-col rounded-md",
+          "flex w-max origin-(--transform-origin) flex-col rounded-md",
           "border-border bg-card text-card-foreground border",
           "px-3 py-2 text-sm shadow-lg",
           "transition-all duration-200",
-          "data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
-          "data-[ending-style]:scale-95 data-[ending-style]:opacity-0",
+          "data-starting-style:scale-95 data-starting-style:opacity-0",
+          "data-ending-style:scale-95 data-ending-style:opacity-0",
         )}
       >
         {showArrow && (
@@ -1178,7 +1187,7 @@ function GroupedToastRoot({
                   ? "top-full mt-2 origin-top"
                   : "bottom-full mb-2 origin-bottom",
                 // Only transition opacity and scale for enter/exit
-                "transition-[opacity,scale] duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+                "ease-out-cubic transition-[opacity,scale] duration-200",
                 "data-starting-style:scale-95 data-starting-style:opacity-0",
                 "data-ending-style:scale-95 data-ending-style:opacity-0",
               )}
@@ -1321,7 +1330,9 @@ function GroupedSingleItemContent({
             showCloseButton && "mt-0.5",
           )}
         >
-          <Icon
+          <HugeiconsIcon
+            icon={Icon}
+            strokeWidth={2}
             className={cn(
               type === "success" && "text-success-foreground",
               type === "error" && "text-danger-foreground",
@@ -1368,7 +1379,11 @@ function GroupedSingleItemContent({
           className="text-muted-foreground hover:bg-accent/50 hover:text-foreground -mt-1 -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md border-none bg-transparent transition-colors duration-200"
           aria-label="Close"
         >
-          <XIcon className="size-4" />
+          <HugeiconsIcon
+            icon={Cancel01Icon}
+            strokeWidth={2}
+            className="size-4"
+          />
         </Toast.Close>
       )}
     </div>
@@ -1407,7 +1422,9 @@ function GroupedToastSummaryContent({
   return (
     <div className="flex items-center gap-3 px-3.5 py-3">
       <div data-slot="toast-icon" className="[&>svg]:size-4 [&>svg]:shrink-0">
-        <Icon
+        <HugeiconsIcon
+          icon={Icon}
+          strokeWidth={2}
           className={cn(
             iconType === "loading" && "text-muted-foreground animate-spin",
             iconType === "success" && "text-success-foreground",
@@ -1490,10 +1507,7 @@ function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <CompletedItemsCard
-              items={data.completedItems}
-              isTop={isTop}
-            />
+            <CompletedItemsCard items={data.completedItems} isTop={isTop} />
           </m.div>
         )}
       </AnimatePresence>
@@ -1591,7 +1605,9 @@ function GroupedToastCardItem({
             data-slot="toast-icon"
             className="[&>svg]:size-4 [&>svg]:shrink-0"
           >
-            <Icon
+            <HugeiconsIcon
+              icon={Icon}
+              strokeWidth={2}
               className={cn(
                 type === "success" && "text-success-foreground",
                 type === "error" && "text-danger-foreground",
@@ -1634,10 +1650,7 @@ interface CompletedItemRowProps {
   showSeparator: boolean;
 }
 
-function CompletedItemRow({
-  item,
-  showSeparator,
-}: CompletedItemRowProps) {
+function CompletedItemRow({ item, showSeparator }: CompletedItemRowProps) {
   const type = item.type || "success";
   const Icon =
     type !== "default" ? TOAST_ICONS[type as keyof typeof TOAST_ICONS] : null;
@@ -1681,7 +1694,9 @@ function CompletedItemRow({
               data-slot="toast-icon"
               className="[&>svg]:size-4 [&>svg]:shrink-0"
             >
-              <Icon
+              <HugeiconsIcon
+                icon={Icon}
+                strokeWidth={2}
                 className={cn(
                   type === "success" && "text-success-foreground",
                   type === "error" && "text-danger-foreground",
@@ -1723,10 +1738,7 @@ interface CompletedItemsCardProps {
   isTop: boolean;
 }
 
-function CompletedItemsCard({
-  items,
-  isTop,
-}: CompletedItemsCardProps) {
+function CompletedItemsCard({ items, isTop }: CompletedItemsCardProps) {
   const cardRef = React.useRef<HTMLDivElement>(null);
 
   // Touch event isolation (same pattern as GroupedToastCard)
@@ -1772,38 +1784,11 @@ function CompletedItemsCard({
             transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
             className="overflow-hidden"
           >
-            <CompletedItemRow
-              item={item}
-              showSeparator={index > 0}
-            />
+            <CompletedItemRow item={item} showSeparator={index > 0} />
           </m.div>
         ))}
       </AnimatePresence>
     </div>
-  );
-}
-
-// =============================================================================
-// Utility Components
-// =============================================================================
-
-function XIcon(props: React.ComponentProps<"svg">) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-    >
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </svg>
   );
 }
 

@@ -1105,7 +1105,11 @@ function GroupedToastRoot({
         <GroupedToastSummaryOrSingle data={data} toastId={toast.id} />
       </Toast.Content>
       {/* Render expanded cards outside Toast.Content to avoid clipping */}
-      {data.isExpanded && <ExpandedCardsContainer data={data} isTop={isTop} />}
+      <AnimatePresence>
+        {data.isExpanded && (
+          <ExpandedCardsContainer data={data} isTop={isTop} />
+        )}
+      </AnimatePresence>
     </Toast.Root>
   );
 }
@@ -1371,11 +1375,15 @@ function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
   }
 
   return (
-    <div
+    <m.div
       data-slot="expanded-cards-container"
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
       className={cn(
         "absolute w-full",
-        isTop ? "top-full mt-2" : "bottom-full mb-2",
+        isTop ? "top-full mt-2 origin-top" : "bottom-full mb-2 origin-bottom",
         // Flex column with gap, reversed for bottom position
         "flex gap-2",
         isTop ? "flex-col" : "flex-col-reverse",
@@ -1414,7 +1422,7 @@ function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
           </m.div>
         )}
       </AnimatePresence>
-    </div>
+    </m.div>
   );
 }
 

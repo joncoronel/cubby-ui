@@ -1592,7 +1592,7 @@ function GroupedToastCardItem({
     <>
       {showSeparator && (
         <div
-          className="bg-border h-px w-full"
+          className="bg-border mx-2 h-px"
           data-slot="grouped-toast-separator"
         />
       )}

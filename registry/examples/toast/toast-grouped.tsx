@@ -66,7 +66,12 @@ function ToastGrouped() {
     // Get the deployment info from ref (always latest)
     const deployment = activeDeploymentsRef.current.get(deploymentId);
     if (deployment) {
-      toast.dismissGroupItem(deployment.toastId);
+      // Move to completed list with cancelled state
+      toast.updateGroupItem(deployment.toastId, {
+        title: `${deploymentId} deployment cancelled`,
+        type: "error",
+        action: undefined,
+      });
     }
     // Update local state
     setActiveDeployments((prev) => {

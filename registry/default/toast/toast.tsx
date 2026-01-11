@@ -2,6 +2,8 @@
 
 import * as React from "react";
 import { Toast } from "@base-ui/react/toast";
+import { AnimatePresence } from "motion/react";
+import * as m from "motion/react-m";
 import {
   CircleAlertIcon,
   CircleCheckIcon,
@@ -121,6 +123,8 @@ export interface GroupedToastItem {
   data?: object;
   createdAt: number;
   showCloseButton?: boolean;
+  /** Timestamp when this item transitioned to a completed state */
+  completedAt?: number;
 }
 
 /** Options for creating a grouped toast item */
@@ -149,7 +153,10 @@ export interface GroupedToastOptions<TData extends object = object> {
 interface GroupedToastData {
   isGrouped: true;
   groupId: string;
+  /** Pending items (loading state) */
   items: GroupedToastItem[];
+  /** Completed items that are transitioning out with progress bar */
+  completedItems: GroupedToastItem[];
   isExpanded: boolean;
   summary: string | ((count: number) => string);
   action: {
@@ -380,6 +387,7 @@ export const toast = Object.assign(baseToast, {
         const updatedData: GroupedToastData = {
           ...existingData,
           items: [...existingData.items, newItem],
+          completedItems: existingData.completedItems ?? [],
         };
         groupDataMap.set(options.groupId, updatedData);
         toastManager.update(existingToastId, { data: updatedData });
@@ -391,6 +399,7 @@ export const toast = Object.assign(baseToast, {
         isGrouped: true,
         groupId,
         items: [newItem],
+        completedItems: [],
         isExpanded: false,
         summary: options.groupSummary,
         action: {
@@ -409,6 +418,9 @@ export const toast = Object.assign(baseToast, {
           const data = groupDataMap.get(groupId);
           if (data) {
             data.items.forEach((item) => groupItemToGroupMap.delete(item.id));
+            (data.completedItems ?? []).forEach((item) =>
+              groupItemToGroupMap.delete(item.id),
+            );
           }
           groupToToastMap.delete(groupId);
           groupDataMap.delete(groupId);
@@ -423,7 +435,7 @@ export const toast = Object.assign(baseToast, {
     groupItemToGroupMap.set(itemId, options.groupId);
     return itemId;
   },
-  /** Dismiss a single item from a grouped toast */
+  /** Dismiss a single item from a grouped toast (checks both pending and completed arrays) */
   dismissGroupItem: (itemId: string) => {
     const groupId = groupItemToGroupMap.get(itemId);
     if (!groupId) return;
@@ -434,10 +446,27 @@ export const toast = Object.assign(baseToast, {
     const data = groupDataMap.get(groupId);
     if (!data) return;
 
-    const newItems = data.items.filter((item) => item.id !== itemId);
+    // Check both arrays
+    const inPending = data.items.some((item) => item.id === itemId);
+    const inCompleted = (data.completedItems ?? []).some(
+      (item) => item.id === itemId,
+    );
+
+    let newItems = data.items;
+    let newCompletedItems = data.completedItems ?? [];
+
+    if (inPending) {
+      newItems = data.items.filter((item) => item.id !== itemId);
+    }
+    if (inCompleted) {
+      newCompletedItems = newCompletedItems.filter(
+        (item) => item.id !== itemId,
+      );
+    }
+
     groupItemToGroupMap.delete(itemId);
 
-    if (newItems.length === 0) {
+    if (newItems.length === 0 && newCompletedItems.length === 0) {
       // Last item - close the toast entirely
       toastManager.close(toastId);
       groupToToastMap.delete(groupId);
@@ -447,8 +476,12 @@ export const toast = Object.assign(baseToast, {
       const updatedData: GroupedToastData = {
         ...data,
         items: newItems,
-        // Collapse if only 1 item remains
-        isExpanded: newItems.length === 1 ? false : data.isExpanded,
+        completedItems: newCompletedItems,
+        // Collapse if only 1 pending item remains and no completed
+        isExpanded:
+          newItems.length <= 1 && newCompletedItems.length === 0
+            ? false
+            : data.isExpanded,
       };
       groupDataMap.set(groupId, updatedData);
       toastManager.update(toastId, { data: updatedData });
@@ -459,10 +492,13 @@ export const toast = Object.assign(baseToast, {
     const toastId = groupToToastMap.get(groupId);
     if (!toastId) return;
 
-    // Clean up item mappings
+    // Clean up item mappings for both arrays
     const data = groupDataMap.get(groupId);
     if (data) {
       data.items.forEach((item) => groupItemToGroupMap.delete(item.id));
+      (data.completedItems ?? []).forEach((item) =>
+        groupItemToGroupMap.delete(item.id),
+      );
     }
 
     toastManager.close(toastId);
@@ -489,31 +525,84 @@ export const toast = Object.assign(baseToast, {
     const isNowComplete =
       options.type !== undefined && options.type !== "loading";
 
-    const newItems = data.items.map((item) =>
-      item.id === itemId ? { ...item, ...options } : item,
-    );
+    if (wasLoading && isNowComplete && currentItem) {
+      // Move item from pending to completed
+      const newItems = data.items.filter((item) => item.id !== itemId);
+      const completedItem: GroupedToastItem = {
+        ...currentItem,
+        ...options,
+        completedAt: Date.now(),
+      };
 
-    // Check if we have 2+ complete items (triggers "All complete" summary)
-    const completeCount = newItems.filter(
-      (item) => item.type !== "loading",
-    ).length;
-    const shouldShowAllComplete = completeCount >= 2;
+      // Insert at beginning (newest on top)
+      const newCompletedItems = [completedItem, ...(data.completedItems ?? [])];
+
+      // Check if we have 2+ complete items (triggers "All complete" summary)
+      const completeCount = newCompletedItems.length;
+      const shouldShowAllComplete = completeCount >= 2;
+
+      const updatedData: GroupedToastData = {
+        ...data,
+        items: newItems,
+        completedItems: newCompletedItems,
+        hasShownAllComplete: data.hasShownAllComplete || shouldShowAllComplete,
+      };
+      groupDataMap.set(groupId, updatedData);
+      toastManager.update(toastId, { data: updatedData });
+
+      // Start dismiss timer for the completed item
+      setTimeout(() => {
+        toast.dismissCompletedItem(itemId);
+      }, GROUP_ITEM_DISMISS_DURATION);
+    } else {
+      // Just update in place (not a loading->complete transition)
+      const newItems = data.items.map((item) =>
+        item.id === itemId ? { ...item, ...options } : item,
+      );
+
+      const updatedData: GroupedToastData = {
+        ...data,
+        items: newItems,
+      };
+      groupDataMap.set(groupId, updatedData);
+      toastManager.update(toastId, { data: updatedData });
+    }
+  },
+  /** Dismiss a completed item (removes from completedItems array) */
+  dismissCompletedItem: (itemId: string) => {
+    const groupId = groupItemToGroupMap.get(itemId);
+    if (!groupId) return;
+
+    const toastId = groupToToastMap.get(groupId);
+    if (!toastId) return;
+
+    const data = groupDataMap.get(groupId);
+    if (!data) return;
+
+    const newCompletedItems = (data.completedItems ?? []).filter(
+      (item) => item.id !== itemId,
+    );
+    groupItemToGroupMap.delete(itemId);
+
+    // Check if entire group should close
+    if (data.items.length === 0 && newCompletedItems.length === 0) {
+      toastManager.close(toastId);
+      groupToToastMap.delete(groupId);
+      groupDataMap.delete(groupId);
+      return;
+    }
 
     const updatedData: GroupedToastData = {
       ...data,
-      items: newItems,
-      // Once true, stays true
-      hasShownAllComplete: data.hasShownAllComplete || shouldShowAllComplete,
+      completedItems: newCompletedItems,
+      // Collapse if only 1 pending item remains and no completed
+      isExpanded:
+        data.items.length <= 1 && newCompletedItems.length === 0
+          ? false
+          : data.isExpanded,
     };
     groupDataMap.set(groupId, updatedData);
     toastManager.update(toastId, { data: updatedData });
-
-    // If transitioning from loading to complete, start individual item dismiss timer
-    if (wasLoading && isNowComplete) {
-      setTimeout(() => {
-        toast.dismissGroupItem(itemId);
-      }, GROUP_ITEM_DISMISS_DURATION);
-    }
   },
 });
 
@@ -1015,10 +1104,8 @@ function GroupedToastRoot({
       >
         <GroupedToastSummaryOrSingle data={data} toastId={toast.id} />
       </Toast.Content>
-      {/* Render expanded card outside Toast.Content to avoid clipping */}
-      {data.isExpanded && data.items.length > 1 && (
-        <GroupedToastCard data={data} isTop={isTop} />
-      )}
+      {/* Render expanded cards outside Toast.Content to avoid clipping */}
+      {data.isExpanded && <ExpandedCardsContainer data={data} isTop={isTop} />}
     </Toast.Root>
   );
 }
@@ -1032,12 +1119,17 @@ function GroupedToastSummaryOrSingle({
   data,
   toastId,
 }: GroupedToastSummaryOrSingleProps) {
-  const item = data.items[0];
-  // Show single-item view only if:
-  // 1. There's exactly 1 item, AND
-  // 2. We never showed "All complete" (which happens when 2+ items were complete at once)
-  // This ensures groups stay in summary mode once "All complete" was shown.
-  const isSingle = data.items.length === 1 && !data.hasShownAllComplete;
+  // Total items across both arrays
+  const totalPending = data.items.length;
+  const totalCompleted = (data.completedItems ?? []).length;
+  const totalItems = totalPending + totalCompleted;
+
+  // Show single-item view when there's exactly 1 total item (pending OR completed)
+  // and we haven't shown "All complete" mode yet
+  const isSingle = totalItems === 1 && !data.hasShownAllComplete;
+
+  // Get the single item to display (prefer pending, fallback to completed)
+  const singleItem = data.items[0] ?? data.completedItems?.[0];
 
   // Modern browsers (Chrome 129+): single element with key switching
   // Height animates from CSS var to calc-size(auto, size)
@@ -1058,10 +1150,10 @@ function GroupedToastSummaryOrSingle({
           "blur-0 scale-100 opacity-100",
         )}
       >
-        {isSingle ? (
+        {isSingle && singleItem ? (
           <GroupedSingleItemContent
-            item={item}
-            showCloseButton={item.showCloseButton}
+            item={singleItem}
+            showCloseButton={singleItem.showCloseButton}
           />
         ) : (
           <GroupedToastSummaryContent
@@ -1087,10 +1179,12 @@ function GroupedToastSummaryOrSingle({
         )}
       >
         <div className="overflow-hidden">
-          <GroupedSingleItemContent
-            item={item}
-            showCloseButton={item.showCloseButton}
-          />
+          {singleItem && (
+            <GroupedSingleItemContent
+              item={singleItem}
+              showCloseButton={singleItem.showCloseButton}
+            />
+          )}
         </div>
       </div>
 
@@ -1237,8 +1331,8 @@ function GroupedToastSummaryContent({
         />
       </div>
       <span className="flex-1 font-medium">{summaryText}</span>
-      {/* Only show Show/Hide button when there are multiple items to expand */}
-      {data.items.length > 1 && (
+      {/* Show button when there are items to expand (pending or completed) */}
+      {(data.items.length > 1 || (data.completedItems ?? []).length > 0) && (
         <button
           onClick={onToggle}
           className={buttonVariants({ variant: "outline", size: "xs" })}
@@ -1246,6 +1340,80 @@ function GroupedToastSummaryContent({
           {buttonLabel}
         </button>
       )}
+    </div>
+  );
+}
+
+interface ExpandedCardsContainerProps {
+  data: GroupedToastData;
+  isTop: boolean;
+}
+
+/**
+ * Container for expanded cards that handles stacking of pending and completed items.
+ * Uses flex layout to properly stack cards without needing to know heights.
+ * Cards are wrapped in AnimatePresence so they animate out smoothly when removed.
+ */
+function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
+  const completedCount = (data.completedItems ?? []).length;
+  const pendingCount = data.items.length;
+  const hasCompletedItems = completedCount > 0;
+
+  // Show pending card when:
+  // - There are 2+ pending items (original behavior), OR
+  // - There's at least 1 pending item AND completed items exist (so user can see it)
+  const hasPendingItems =
+    pendingCount > 1 || (pendingCount >= 1 && hasCompletedItems);
+
+  // Don't render if nothing to show
+  if (!hasCompletedItems && !hasPendingItems) {
+    return null;
+  }
+
+  return (
+    <div
+      data-slot="expanded-cards-container"
+      className={cn(
+        "absolute w-full",
+        isTop ? "top-full mt-2" : "bottom-full mb-2",
+        // Flex column with gap, reversed for bottom position
+        "flex gap-2",
+        isTop ? "flex-col" : "flex-col-reverse",
+      )}
+    >
+      <AnimatePresence initial={false} mode="popLayout">
+        {/* Pending items card (closer to summary toast) */}
+        {hasPendingItems && (
+          <m.div
+            key="pending-card"
+            layout
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95, y: -20 }}
+            transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+          >
+            <GroupedToastCard data={data} isTop={isTop} />
+          </m.div>
+        )}
+
+        {/* Completed items card (further from summary toast) */}
+        {hasCompletedItems && (
+          <m.div
+            key="completed-card"
+            layout
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+          >
+            <CompletedItemsCard
+              items={data.completedItems}
+              isTop={isTop}
+              dismissDuration={GROUP_ITEM_DISMISS_DURATION}
+            />
+          </m.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -1285,24 +1453,27 @@ function GroupedToastCard({ data, isTop }: GroupedToastCardProps) {
       data-slot="grouped-toast-card"
       data-swipe-ignore
       className={cn(
-        "absolute w-full",
-        isTop ? "top-full mt-2" : "bottom-full mb-2",
+        "max-h-64 w-full overflow-y-auto overscroll-contain",
         "border-border bg-card text-card-foreground rounded-lg border",
-        "overflow-hidden shadow-lg",
-        "ease-out-cubic transition-all duration-200",
+        "shadow-lg",
         "animate-in fade-in-0 zoom-in-95",
         isTop ? "slide-in-from-top-2" : "slide-in-from-bottom-2",
       )}
     >
-      <div className="max-h-64 overflow-y-auto overscroll-contain">
+      <AnimatePresence initial={false}>
         {data.items.map((item, index) => (
-          <GroupedToastCardItem
+          <m.div
             key={item.id}
-            item={item}
-            showSeparator={index > 0}
-          />
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+            className="overflow-hidden"
+          >
+            <GroupedToastCardItem item={item} showSeparator={index > 0} />
+          </m.div>
         ))}
-      </div>
+      </AnimatePresence>
     </div>
   );
 }
@@ -1368,6 +1539,168 @@ function GroupedToastCardItem({
         )}
       </div>
     </>
+  );
+}
+
+// =============================================================================
+// Completed Items Components (for grouped toasts)
+// =============================================================================
+
+interface CompletedItemRowProps {
+  item: GroupedToastItem;
+  showSeparator: boolean;
+  dismissDuration: number;
+}
+
+function CompletedItemRow({
+  item,
+  showSeparator,
+  dismissDuration,
+}: CompletedItemRowProps) {
+  const type = item.type || "success";
+  const Icon =
+    type !== "default" ? TOAST_ICONS[type as keyof typeof TOAST_ICONS] : null;
+
+  // Calculate CSS custom property for animation duration
+  const animationStyle = {
+    "--dismiss-duration": `${dismissDuration}ms`,
+  } as React.CSSProperties;
+
+  return (
+    <>
+      {showSeparator && (
+        <div
+          className="bg-border h-px w-full"
+          data-slot="completed-item-separator"
+        />
+      )}
+      <div
+        data-slot="completed-item-row"
+        className="relative flex items-center gap-3 overflow-hidden px-3.5 py-3 text-sm"
+        style={animationStyle}
+      >
+        {/* Progress bar background (fills left-to-right) */}
+        <div
+          data-slot="completed-item-progress"
+          className={cn(
+            "absolute inset-0 origin-left",
+            type === "success" && "bg-success/15",
+            type === "error" && "bg-danger/15",
+            type === "warning" && "bg-warning/15",
+            type === "info" && "bg-info/15",
+            "animate-[progress-fill_var(--dismiss-duration)_linear_forwards]",
+          )}
+        />
+
+        {/* Content layer (above progress bar) */}
+        <div className="relative z-10 flex w-full items-center gap-3">
+          {Icon && (
+            <div
+              data-slot="toast-icon"
+              className="[&>svg]:size-4 [&>svg]:shrink-0"
+            >
+              <Icon
+                className={cn(
+                  type === "success" && "text-success-foreground",
+                  type === "error" && "text-danger-foreground",
+                  type === "warning" && "text-warning-foreground",
+                  type === "info" && "text-info-foreground",
+                )}
+              />
+            </div>
+          )}
+
+          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+            {item.title && (
+              <span className="leading-5 font-medium">{item.title}</span>
+            )}
+            {item.description && (
+              <span className="text-muted-foreground leading-5">
+                {item.description}
+              </span>
+            )}
+          </div>
+
+          {/* Action button on right */}
+          {item.action && (
+            <button
+              onClick={item.action.onClick}
+              className={buttonVariants({ variant: "outline", size: "xs" })}
+            >
+              {item.action.label}
+            </button>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
+interface CompletedItemsCardProps {
+  items: GroupedToastItem[];
+  isTop: boolean;
+  dismissDuration: number;
+}
+
+function CompletedItemsCard({
+  items,
+  isTop,
+  dismissDuration,
+}: CompletedItemsCardProps) {
+  const cardRef = React.useRef<HTMLDivElement>(null);
+
+  // Touch event isolation (same pattern as GroupedToastCard)
+  React.useEffect(() => {
+    const card = cardRef.current;
+    if (!card) return;
+
+    const stopPropagation = (e: TouchEvent) => {
+      e.stopPropagation();
+    };
+
+    card.addEventListener("touchstart", stopPropagation, { passive: true });
+    card.addEventListener("touchmove", stopPropagation, { passive: true });
+    card.addEventListener("touchend", stopPropagation, { passive: true });
+
+    return () => {
+      card.removeEventListener("touchstart", stopPropagation);
+      card.removeEventListener("touchmove", stopPropagation);
+      card.removeEventListener("touchend", stopPropagation);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={cardRef}
+      data-slot="completed-items-card"
+      data-swipe-ignore
+      className={cn(
+        "max-h-48 w-full overflow-y-auto overscroll-contain",
+        "border-border bg-card text-card-foreground rounded-lg border",
+        "shadow-lg",
+        "animate-in fade-in-0 zoom-in-95",
+        isTop ? "slide-in-from-top-2" : "slide-in-from-bottom-2",
+      )}
+    >
+      <AnimatePresence initial={false}>
+        {items.map((item, index) => (
+          <m.div
+            key={item.id}
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+            className="overflow-hidden"
+          >
+            <CompletedItemRow
+              item={item}
+              showSeparator={index > 0}
+              dismissDuration={dismissDuration}
+            />
+          </m.div>
+        ))}
+      </AnimatePresence>
+    </div>
   );
 }
 

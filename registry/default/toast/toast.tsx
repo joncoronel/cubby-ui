@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { Popover } from "@base-ui/react/popover";
 import { Toast } from "@base-ui/react/toast";
 import { AnimatePresence } from "motion/react";
 import * as m from "motion/react-m";
@@ -766,8 +767,9 @@ function StackedToastItem({
     "data-[position*=bottom]:data-starting-style:transform-[translateY(calc(100%+var(--toast-inset)))]",
     // Ending opacity
     "data-ending-style:opacity-0",
-    // Default ending - close button
-    "data-ending-style:not-data-limited:not-data-swipe-direction:transform-[translateY(calc(100%+var(--toast-inset)))]",
+    // Default ending - close button (position-aware)
+    "data-[position*=top]:data-ending-style:not-data-limited:not-data-swipe-direction:transform-[translateY(calc(-100%-var(--toast-inset)))]",
+    "data-[position*=bottom]:data-ending-style:not-data-limited:not-data-swipe-direction:transform-[translateY(calc(100%+var(--toast-inset)))]",
     // Swipe endings
     "data-ending-style:data-[swipe-direction=down]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+100%+var(--toast-inset)))]",
     "data-expanded:data-ending-style:data-[swipe-direction=down]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+100%+var(--toast-inset)))]",
@@ -1028,7 +1030,23 @@ function GroupedToastRoot({
   swipeDirection,
   data,
 }: GroupedToastRootProps) {
+  const toastRootRef = React.useRef<HTMLDivElement>(null);
   const isTop = position.startsWith("top");
+
+  // Sync popover open state with toast data
+  const handlePopoverOpenChange = React.useCallback(
+    (open: boolean, eventDetails: Popover.Root.ChangeEventDetails) => {
+      // Prevent closing on outside clicks - only close via explicit toggle
+      if (!open && eventDetails.reason === "outside-press") {
+        eventDetails.cancel();
+        return;
+      }
+      if (open !== data.isExpanded) {
+        toggleGroupExpanded(toast.id);
+      }
+    },
+    [toast.id, data.isExpanded],
+  );
 
   // Organized class arrays for readability (same as regular toast)
   const cssVariables = [
@@ -1057,7 +1075,9 @@ function GroupedToastRoot({
     "data-[position*=top]:data-starting-style:transform-[translateY(calc(-100%-var(--toast-inset)))]",
     "data-[position*=bottom]:data-starting-style:transform-[translateY(calc(100%+var(--toast-inset)))]",
     "data-ending-style:opacity-0",
-    "data-ending-style:not-data-limited:not-data-swipe-direction:transform-[translateY(calc(100%+var(--toast-inset)))]",
+    // Default ending - close button (position-aware)
+    "data-[position*=top]:data-ending-style:not-data-limited:not-data-swipe-direction:transform-[translateY(calc(-100%-var(--toast-inset)))]",
+    "data-[position*=bottom]:data-ending-style:not-data-limited:not-data-swipe-direction:transform-[translateY(calc(100%+var(--toast-inset)))]",
     "data-ending-style:data-[swipe-direction=down]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+100%+var(--toast-inset)))]",
     "data-expanded:data-ending-style:data-[swipe-direction=down]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+100%+var(--toast-inset)))]",
     "data-ending-style:data-[swipe-direction=left]:transform-[translateX(calc(var(--toast-swipe-movement-x)-100%-var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
@@ -1081,6 +1101,7 @@ function GroupedToastRoot({
 
   return (
     <Toast.Root
+      ref={toastRootRef}
       toast={toast}
       swipeDirection={swipeDirection}
       data-slot="toast"
@@ -1104,12 +1125,37 @@ function GroupedToastRoot({
       >
         <GroupedToastSummaryOrSingle data={data} toastId={toast.id} />
       </Toast.Content>
-      {/* Render expanded cards outside Toast.Content to avoid clipping */}
-      <AnimatePresence>
-        {data.isExpanded && (
-          <ExpandedCardsContainer data={data} isTop={isTop} />
-        )}
-      </AnimatePresence>
+      {/* Expanded cards popover - uses CSS positioning to maintain stable layout */}
+      <Popover.Root
+        open={data.isExpanded}
+        onOpenChange={handlePopoverOpenChange}
+      >
+        <Popover.Portal container={toastRootRef}>
+          <Popover.Positioner
+            anchor={toastRootRef}
+            side={isTop ? "bottom" : "top"}
+            align="start"
+            sideOffset={8}
+          >
+            <Popover.Popup
+              data-slot="expanded-cards-popup"
+              className={cn(
+                "absolute w-(--anchor-width)",
+                // Override transform origin (align="start" sets it to left edge)
+                isTop
+                  ? "top-full mt-2 origin-top"
+                  : "bottom-full mb-2 origin-bottom",
+                // Only transition opacity and scale for enter/exit
+                "transition-[opacity,scale] duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+                "data-starting-style:scale-95 data-starting-style:opacity-0",
+                "data-ending-style:scale-95 data-ending-style:opacity-0",
+              )}
+            >
+              <ExpandedCardsContainer data={data} isTop={isTop} />
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Portal>
+      </Popover.Root>
     </Toast.Root>
   );
 }
@@ -1339,6 +1385,7 @@ function GroupedToastSummaryContent({
       {(data.items.length > 1 || (data.completedItems ?? []).length > 0) && (
         <button
           onClick={onToggle}
+          aria-expanded={data.isExpanded}
           className={buttonVariants({ variant: "outline", size: "xs" })}
         >
           {buttonLabel}
@@ -1357,6 +1404,7 @@ interface ExpandedCardsContainerProps {
  * Container for expanded cards that handles stacking of pending and completed items.
  * Uses flex layout to properly stack cards without needing to know heights.
  * Cards are wrapped in AnimatePresence so they animate out smoothly when removed.
+ * Note: Enter/exit animations for the container are handled by the parent Popover.Popup.
  */
 function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
   const completedCount = (data.completedItems ?? []).length;
@@ -1375,15 +1423,9 @@ function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
   }
 
   return (
-    <m.div
+    <div
       data-slot="expanded-cards-container"
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ duration: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
       className={cn(
-        "absolute w-full",
-        isTop ? "top-full mt-2 origin-top" : "bottom-full mb-2 origin-bottom",
         // Flex column with gap, reversed for bottom position
         "flex gap-2",
         isTop ? "flex-col" : "flex-col-reverse",
@@ -1422,7 +1464,7 @@ function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
           </m.div>
         )}
       </AnimatePresence>
-    </m.div>
+    </div>
   );
 }
 

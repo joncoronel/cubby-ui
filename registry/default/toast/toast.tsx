@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/registry/default/button/button";
+import "./toast.css";
 
 // =============================================================================
 // Module-level managers (like Coss UI / Base UI pattern)
@@ -126,6 +127,8 @@ export interface GroupedToastItem {
   showCloseButton?: boolean;
   /** Timestamp when this item transitioned to a completed state */
   completedAt?: number;
+  /** Duration for progress bar after completing (loading items only). Defaults to GROUP_ITEM_DISMISS_DURATION. */
+  duration?: number;
 }
 
 /** Counts passed to groupSummary function */
@@ -159,6 +162,8 @@ export interface GroupedToastOptions<TData extends object = object> {
     label: string;
     expandedLabel?: string;
   };
+  /** Duration in ms before the group auto-dismisses. Resets on each new item added. */
+  duration?: number;
 }
 
 /** Data structure stored in Base UI toast for grouped toasts */
@@ -177,6 +182,8 @@ interface GroupedToastData {
   };
   /** True once we've shown "All complete" (2+ items completed simultaneously) - stays in summary mode */
   hasShownAllComplete: boolean;
+  /** Duration in ms, stored so we can pass it on update to reset timer */
+  duration?: number;
 }
 
 // =============================================================================
@@ -381,6 +388,8 @@ export const toast = Object.assign(baseToast, {
     const existingToastId = groupToToastMap.get(options.groupId);
     const itemId = `grouped-${options.groupId}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
+    const isLoading = options.type === "loading";
+
     const newItem: GroupedToastItem = {
       id: itemId,
       title: options.title,
@@ -390,19 +399,24 @@ export const toast = Object.assign(baseToast, {
       data: options.data,
       createdAt: Date.now(),
       showCloseButton: options.showCloseButton ?? true,
+      // For loading items, duration controls progress bar time after success
+      duration: isLoading ? options.duration : undefined,
     };
 
     if (existingToastId) {
-      // Add to existing group
+      // Add to existing group - all new items go to `items` array
       const existingData = groupDataMap.get(options.groupId);
       if (existingData) {
         const updatedData: GroupedToastData = {
           ...existingData,
           items: [...existingData.items, newItem],
-          completedItems: existingData.completedItems ?? [],
         };
         groupDataMap.set(options.groupId, updatedData);
-        toastManager.update(existingToastId, { data: updatedData });
+        // Pass timeout to reset Base UI's built-in timer (pauses on hover/drag)
+        toastManager.update(existingToastId, {
+          data: updatedData,
+          timeout: existingData.duration,
+        });
       }
     } else {
       // Create new group
@@ -419,12 +433,17 @@ export const toast = Object.assign(baseToast, {
           expandedLabel: options.groupAction?.expandedLabel ?? "Hide",
         },
         hasShownAllComplete: false,
+        // For non-loading items, duration controls group auto-dismiss
+        // For loading items, duration is stored on the item for progress bar
+        duration: isLoading ? undefined : options.duration,
       };
       const toastId = toastManager.add({
         title: "",
         description: "",
         data: groupData,
-        timeout: 0, // Groups don't auto-dismiss
+        // Use Base UI's built-in timeout for auto-dismiss (only for non-loading items)
+        // Loading items don't auto-dismiss the group - they wait for updateGroupItem()
+        timeout: isLoading ? 0 : (options.duration ?? 0),
         // Clean up our maps when the toast is closed (via close button or swipe)
         onClose: () => {
           const data = groupDataMap.get(groupId);
@@ -445,6 +464,7 @@ export const toast = Object.assign(baseToast, {
     }
 
     groupItemToGroupMap.set(itemId, options.groupId);
+
     return itemId;
   },
   /** Dismiss a single item from a grouped toast (checks both pending and completed arrays) */
@@ -562,10 +582,11 @@ export const toast = Object.assign(baseToast, {
       groupDataMap.set(groupId, updatedData);
       toastManager.update(toastId, { data: updatedData });
 
-      // Start dismiss timer for the completed item
+      // Start dismiss timer for the completed item (use item's duration or default)
+      const dismissDuration = currentItem.duration ?? GROUP_ITEM_DISMISS_DURATION;
       setTimeout(() => {
         toast.dismissCompletedItem(itemId);
-      }, GROUP_ITEM_DISMISS_DURATION);
+      }, dismissDuration);
     } else {
       // Just update in place (not a loading->complete transition)
       const newItems = data.items.map((item) =>
@@ -1472,7 +1493,6 @@ function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
             <CompletedItemsCard
               items={data.completedItems}
               isTop={isTop}
-              dismissDuration={GROUP_ITEM_DISMISS_DURATION}
             />
           </m.div>
         )}
@@ -1612,19 +1632,18 @@ function GroupedToastCardItem({
 interface CompletedItemRowProps {
   item: GroupedToastItem;
   showSeparator: boolean;
-  dismissDuration: number;
 }
 
 function CompletedItemRow({
   item,
   showSeparator,
-  dismissDuration,
 }: CompletedItemRowProps) {
   const type = item.type || "success";
   const Icon =
     type !== "default" ? TOAST_ICONS[type as keyof typeof TOAST_ICONS] : null;
 
-  // Calculate CSS custom property for animation duration
+  // Use item's duration or default for progress bar animation
+  const dismissDuration = item.duration ?? GROUP_ITEM_DISMISS_DURATION;
   const animationStyle = {
     "--dismiss-duration": `${dismissDuration}ms`,
   } as React.CSSProperties;
@@ -1702,13 +1721,11 @@ function CompletedItemRow({
 interface CompletedItemsCardProps {
   items: GroupedToastItem[];
   isTop: boolean;
-  dismissDuration: number;
 }
 
 function CompletedItemsCard({
   items,
   isTop,
-  dismissDuration,
 }: CompletedItemsCardProps) {
   const cardRef = React.useRef<HTMLDivElement>(null);
 
@@ -1758,7 +1775,6 @@ function CompletedItemsCard({
             <CompletedItemRow
               item={item}
               showSeparator={index > 0}
-              dismissDuration={dismissDuration}
             />
           </m.div>
         ))}

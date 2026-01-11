@@ -138,6 +138,7 @@ function ToastGroupedNotifications() {
       groupId: "team-activity",
       title: notification.title,
       type: notification.type,
+      duration: 5000, // Dismiss entire toast 5s after last notification
       groupSummary: ({ totalCount }) =>
         `${totalCount} notification${totalCount !== 1 ? "s" : ""}`,
       groupAction: {

@@ -175,6 +175,7 @@ toast.grouped({
 | `action`       | `{ label: string; onClick: () => void }`                           | -        | Action button for this item                        |
 | `groupSummary` | `string \| ((counts: GroupSummaryCounts) => string)` | - | **Required.** Summary text when multiple items. `GroupSummaryCounts` has `loadingCount`, `completedCount`, and `totalCount`. |
 | `groupAction`  | `{ label: string; expandedLabel?: string }`                        | `{ label: "Show", expandedLabel: "Hide" }` | Toggle button labels |
+| `duration`     | `number`                                                           | `5000` for loading | For non-loading: group auto-dismiss (resets on new item, pauses on hover). For loading: progress bar duration after success. |
 
 #### Helper Methods
 

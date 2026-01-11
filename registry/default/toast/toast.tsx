@@ -128,6 +128,16 @@ export interface GroupedToastItem {
   completedAt?: number;
 }
 
+/** Counts passed to groupSummary function */
+export interface GroupSummaryCounts {
+  /** Number of items currently in loading state */
+  loadingCount: number;
+  /** Number of items that have completed (in completedItems array) */
+  completedCount: number;
+  /** Total number of items (pending + completed) */
+  totalCount: number;
+}
+
 /** Options for creating a grouped toast item */
 export interface GroupedToastOptions<TData extends object = object> {
   groupId: string;
@@ -143,7 +153,8 @@ export interface GroupedToastOptions<TData extends object = object> {
   onRemove?: () => void;
   /** Whether to show the close button. Defaults to true. */
   showCloseButton?: boolean;
-  groupSummary: string | ((count: number) => string);
+  /** Summary text or function. Function receives counts: loadingCount (in-progress items) and totalCount (all items including completed). */
+  groupSummary: string | ((counts: GroupSummaryCounts) => string);
   groupAction?: {
     label: string;
     expandedLabel?: string;
@@ -159,7 +170,7 @@ interface GroupedToastData {
   /** Completed items that are transitioning out with progress bar */
   completedItems: GroupedToastItem[];
   isExpanded: boolean;
-  summary: string | ((count: number) => string);
+  summary: string | ((counts: GroupSummaryCounts) => string);
   action: {
     label: string;
     expandedLabel: string;
@@ -1356,14 +1367,16 @@ function GroupedToastSummaryContent({
   const loadingCount = data.items.filter(
     (item) => item.type === "loading",
   ).length;
+  const completedCount = data.completedItems.length;
+  const totalCount = data.items.length + completedCount;
   const hasLoadingItem = loadingCount > 0;
   const iconType = hasLoadingItem ? "loading" : "success";
   const Icon = TOAST_ICONS[iconType];
 
-  // Generate summary text - use loading count, not total count
+  // Generate summary text
   const summaryText =
     typeof data.summary === "function"
-      ? data.summary(loadingCount)
+      ? data.summary({ loadingCount, completedCount, totalCount })
       : data.summary;
 
   const buttonLabel = data.isExpanded

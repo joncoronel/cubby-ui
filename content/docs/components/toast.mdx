@@ -159,7 +159,7 @@ toast.grouped({
   title: "Deployment abc123 is building...",
   type: "loading",
   action: { label: "Cancel", onClick: () => cancelDeployment() },
-  groupSummary: (count) => `${count} deployments in progress`,
+  groupSummary: ({ loadingCount }) => `${loadingCount} deployments in progress`,
   groupAction: { label: "Show", expandedLabel: "Hide" },
 });
 ```
@@ -173,7 +173,7 @@ toast.grouped({
 | `description`  | `string`                                                           | -        | Description of this item                           |
 | `type`         | `"default" \| "loading" \| "success" \| "error" \| "warning" \| "info"` | `"default"` | Visual type (loading shows spinner)            |
 | `action`       | `{ label: string; onClick: () => void }`                           | -        | Action button for this item                        |
-| `groupSummary` | `string \| ((count: number) => string)`                            | -        | **Required.** Summary text when multiple items     |
+| `groupSummary` | `string \| ((counts: GroupSummaryCounts) => string)` | - | **Required.** Summary text when multiple items. `GroupSummaryCounts` has `loadingCount`, `completedCount`, and `totalCount`. |
 | `groupAction`  | `{ label: string; expandedLabel?: string }`                        | `{ label: "Show", expandedLabel: "Hide" }` | Toggle button labels |
 
 #### Helper Methods

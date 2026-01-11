@@ -14,7 +14,17 @@ function generateDeploymentId() {
 // Store timeout IDs for cleanup
 const deploymentTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
 
-export default function ToastGrouped() {
+// Team activity notifications for the non-loading example
+const TEAM_NOTIFICATIONS = [
+  { title: "Alex joined the workspace", type: "info" as const },
+  { title: "Sarah completed a task", type: "success" as const },
+  { title: "Build failed on main branch", type: "error" as const },
+  { title: "Storage usage at 90%", type: "warning" as const },
+  { title: "New comment on PR #42", type: "info" as const },
+  { title: "Deployment to production succeeded", type: "success" as const },
+];
+
+function ToastGrouped() {
   const [activeDeployments, setActiveDeployments] = React.useState<
     Map<string, { toastId: string; name: string }>
   >(new Map());
@@ -79,9 +89,9 @@ export default function ToastGrouped() {
         label: "Cancel",
         onClick: () => cancelDeployment(deploymentId),
       },
-      groupSummary: (count) =>
-        count > 0
-          ? `${count} deployments in progress`
+      groupSummary: ({ loadingCount }) =>
+        loadingCount > 0
+          ? `${loadingCount} deployments in progress`
           : "All deployments complete",
       groupAction: {
         label: "Show",
@@ -117,5 +127,38 @@ export default function ToastGrouped() {
     <Button variant="outline" onClick={startDeployment}>
       Deploy App
     </Button>
+  );
+}
+
+function ToastGroupedNotifications() {
+  const sendNotification = React.useCallback(() => {
+    const notification =
+      TEAM_NOTIFICATIONS[Math.floor(Math.random() * TEAM_NOTIFICATIONS.length)];
+    toast.grouped({
+      groupId: "team-activity",
+      title: notification.title,
+      type: notification.type,
+      groupSummary: ({ totalCount }) =>
+        `${totalCount} notification${totalCount !== 1 ? "s" : ""}`,
+      groupAction: {
+        label: "Show",
+        expandedLabel: "Hide",
+      },
+    });
+  }, []);
+
+  return (
+    <Button variant="outline" onClick={sendNotification}>
+      Team Activity
+    </Button>
+  );
+}
+
+export default function ToastGroupedDemo() {
+  return (
+    <div className="flex gap-2">
+      <ToastGrouped />
+      <ToastGroupedNotifications />
+    </div>
   );
 }

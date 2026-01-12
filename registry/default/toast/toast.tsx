@@ -827,7 +827,7 @@ function StackedToastItem({
     "data-limited:opacity-0",
     // Height & transitions
     "h-(--toast-calc-height)",
-    "transition-[transform,opacity,height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+    "[transition:transform_.5s_cubic-bezier(.22,1,.36,1),opacity_.5s,height_.20s]",
   ];
 
   return (
@@ -1137,7 +1137,7 @@ function GroupedToastRoot({
     "data-[position*=bottom]:after:top-full",
     "data-limited:opacity-0",
     "h-(--toast-calc-height)",
-    "transition-[transform,opacity,height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+    "[transition:transform_.5s_cubic-bezier(.22,1,.36,1),opacity_.5s,height_.20s]",
   ];
 
   return (

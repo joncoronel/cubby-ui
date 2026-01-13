@@ -21,8 +21,6 @@ const TEAM_NOTIFICATIONS = [
   { title: "Deployment to production succeeded", type: "success" as const },
 ];
 
-// Note: This demo doesn't abort pending deployments on unmount for simplicity.
-// In production, store AbortControllers in a ref and abort them in a cleanup effect.
 function ToastGrouped() {
   const startDeployment = React.useCallback(() => {
     const deploymentId = generateDeploymentId();

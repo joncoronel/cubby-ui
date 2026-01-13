@@ -1050,8 +1050,9 @@ function GroupedToastRoot({
   // Sync popover open state with toast data
   const handlePopoverOpenChange = React.useCallback(
     (open: boolean, eventDetails: Popover.Root.ChangeEventDetails) => {
-      // Prevent closing on outside clicks - only close via explicit toggle
-      if (!open && eventDetails.reason === "outside-press") {
+      // Block all close reasons except escape key (accessibility pattern)
+      // State is managed via explicit Show/Hide button toggle
+      if (!open && eventDetails.reason !== "escape-key") {
         eventDetails.cancel();
         return;
       }

@@ -1220,11 +1220,21 @@
         {
           "path": "registry/default/toast/toast.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/toast.tsx"
+          "target": "components/ui/cubby-ui/toast/toast.tsx"
+        },
+        {
+          "path": "registry/default/toast/toast.css",
+          "type": "registry:file",
+          "target": "components/ui/cubby-ui/toast/toast.css"
         }
       ],
+      "registryDependencies": [
+        "@cubby-ui/button"
+      ],
       "dependencies": [
-        "clsx"
+        "motion",
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {

@@ -314,6 +314,12 @@ import timeline_timeline_basic from "@/registry/examples/timeline/timeline-basic
 import timeline_timeline_horizontal from "@/registry/examples/timeline/timeline-horizontal";
 import timeline_timeline_stepper from "@/registry/examples/timeline/timeline-stepper";
 import toast_toast_basic from "@/registry/examples/toast/toast-basic";
+import toast_toast_action from "@/registry/examples/toast/toast-action";
+import toast_toast_anchored from "@/registry/examples/toast/toast-anchored";
+import toast_toast_grouped from "@/registry/examples/toast/toast-grouped";
+import toast_toast_promise from "@/registry/examples/toast/toast-promise";
+import toast_toast_types from "@/registry/examples/toast/toast-types";
+import toast_toast_varying_heights from "@/registry/examples/toast/toast-varying-heights";
 import toast_toast_with_action from "@/registry/examples/toast/toast-with-action";
 import toggle_toggle_basic from "@/registry/examples/toggle/toggle-basic";
 import toggle_toggle_controlled from "@/registry/examples/toggle/toggle-controlled";
@@ -1061,9 +1067,13 @@ export const componentMetadata = {
     "title": "Toast",
     "description": "A toast component.",
     "category": "UI",
-    "registryDependencies": [],
+    "registryDependencies": [
+      "@cubby-ui/button"
+    ],
     "dependencies": [
-      "clsx"
+      "motion",
+      "@hugeicons/react",
+      "@hugeicons/core-free-icons"
     ],
     "examples": {},
     "reference": []
@@ -2832,7 +2842,37 @@ export const exampleRegistry = {
     {
       "title": "Basic",
       "importPath": "toast-basic",
-      "source": "\"use client\"\n\nimport { Button } from \"@/components/ui/cubby-ui/button\"\nimport { toast } from \"@/components/ui/cubby-ui/toast\"\n\nexport default function ToastBasic() {\n  return (\n    <div className=\"flex flex-col gap-2\">\n      <Button\n        onClick={() => {\n          toast({\n            title: \"Success!\",\n            description: \"Your action was completed successfully.\",\n          })\n        }}\n      >\n        Show Toast\n      </Button>\n      \n      <Button\n        onClick={() => {\n          toast.success({\n            title: \"Success!\",\n            description: \"Operation completed successfully.\",\n          })\n        }}\n      >\n        Show Success Toast\n      </Button>\n      \n      <Button\n        onClick={() => {\n          toast.error({\n            title: \"Error!\",\n            description: \"Something went wrong.\",\n          })\n        }}\n      >\n        Show Error Toast\n      </Button>\n      \n      <Button\n        onClick={() => {\n          toast.warning({\n            title: \"Warning!\",\n            description: \"Please review your input.\",\n          })\n        }}\n      >\n        Show Warning Toast\n      </Button>\n      \n      <Button\n        onClick={() => {\n          toast.info({\n            title: \"Info\",\n            description: \"Here's some useful information.\",\n          })\n        }}\n      >\n        Show Info Toast\n      </Button>\n    </div>\n  )\n}"
+      "source": "\"use client\"\n\nimport { Button } from \"@/components/ui/cubby-ui/button\"\nimport { toast } from \"@/components/ui/cubby-ui/toast\"\n\nexport default function ToastBasic() {\n  return (\n    <Button\n      onClick={() => {\n        toast({\n          title: \"Event has been created\",\n          description: \"Sunday, December 03, 2023 at 9:00 AM\",\n        })\n      }}\n    >\n      Show Toast\n    </Button>\n  )\n}\n"
+    },
+    {
+      "title": "Action",
+      "importPath": "toast-action",
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { toast } from \"@/components/ui/cubby-ui/toast\";\n\nexport default function ToastAction() {\n  const handleAction = () => {\n    const id = toast({\n      title: \"Action performed\",\n      description: \"You can undo this action.\",\n\n      action: {\n        label: \"Undo\",\n        onClick: () => {\n          if (id) {\n            toast.dismiss(id);\n          }\n          toast({\n            title: \"Action undone\",\n          });\n        },\n      },\n    });\n  };\n\n  return <Button onClick={handleAction}>Perform Action</Button>;\n}\n"
+    },
+    {
+      "title": "Anchored",
+      "importPath": "toast-anchored",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { toast } from \"@/components/ui/cubby-ui/toast\";\nimport { CopyButton } from \"@/components/ui/cubby-ui/copy-button\";\n\nexport default function ToastAnchored() {\n  const wrapperRef = React.useRef<HTMLDivElement>(null);\n\n  return (\n    <div\n      ref={wrapperRef}\n      className=\"inline-block\"\n      onClickCapture={() => {\n        toast.anchored({\n          description: \"Copied to clipboard!\",\n          anchor: wrapperRef,\n          side: \"top\",\n          sideOffset: 8,\n          arrow: true,\n          duration: 2000,\n        });\n      }}\n    >\n      <CopyButton content=\"npm install @cubby-ui/toast\" />\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Grouped",
+      "importPath": "toast-grouped",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { toast } from \"@/components/ui/cubby-ui/toast\";\n\n// Simulate deployment IDs\nlet deploymentCounter = 0;\nfunction generateDeploymentId() {\n  deploymentCounter++;\n  return Math.random().toString(16).slice(2, 9);\n}\n\n// Store timeout IDs for cleanup\nconst deploymentTimeouts = new Map<string, ReturnType<typeof setTimeout>>();\n\n// Team activity notifications for the non-loading example\nconst TEAM_NOTIFICATIONS = [\n  { title: \"Alex joined the workspace\", type: \"info\" as const },\n  { title: \"Sarah completed a task\", type: \"success\" as const },\n  { title: \"Build failed on main branch\", type: \"error\" as const },\n  { title: \"Storage usage at 90%\", type: \"warning\" as const },\n  { title: \"New comment on PR #42\", type: \"info\" as const },\n  { title: \"Deployment to production succeeded\", type: \"success\" as const },\n];\n\nfunction ToastGrouped() {\n  const [activeDeployments, setActiveDeployments] = React.useState<\n    Map<string, { toastId: string; name: string }>\n  >(new Map());\n\n  // Use ref to always access latest activeDeployments in callbacks\n  const activeDeploymentsRef = React.useRef(activeDeployments);\n  React.useEffect(() => {\n    activeDeploymentsRef.current = activeDeployments;\n  }, [activeDeployments]);\n\n  const completeDeployment = React.useCallback((deploymentId: string) => {\n    // Get the deployment info from ref (always latest)\n    const deployment = activeDeploymentsRef.current.get(deploymentId);\n    if (deployment) {\n      // Update to success state - component auto-dismisses after default duration\n      toast.updateGroupItem(deployment.toastId, {\n        title: `${deploymentId} deployed successfully`,\n        type: \"success\",\n        action: undefined, // Remove cancel button\n      });\n    }\n    // Update local state\n    setActiveDeployments((prev) => {\n      const next = new Map(prev);\n      next.delete(deploymentId);\n      return next;\n    });\n    deploymentTimeouts.delete(deploymentId);\n  }, []);\n\n  const cancelDeployment = React.useCallback((deploymentId: string) => {\n    // Clear the auto-completion timeout\n    const timeoutId = deploymentTimeouts.get(deploymentId);\n    if (timeoutId) {\n      clearTimeout(timeoutId);\n      deploymentTimeouts.delete(deploymentId);\n    }\n\n    // Get the deployment info from ref (always latest)\n    const deployment = activeDeploymentsRef.current.get(deploymentId);\n    if (deployment) {\n      // Move to completed list with cancelled state\n      toast.updateGroupItem(deployment.toastId, {\n        title: `${deploymentId} deployment cancelled`,\n        type: \"error\",\n        action: undefined,\n      });\n    }\n    // Update local state\n    setActiveDeployments((prev) => {\n      const next = new Map(prev);\n      next.delete(deploymentId);\n      return next;\n    });\n  }, []);\n\n  const startDeployment = React.useCallback(() => {\n    const deploymentId = generateDeploymentId();\n    const branchName = deploymentCounter % 2 === 0 ? \"main\" : \"develop\";\n\n    const toastId = toast.grouped({\n      showCloseButton: false,\n      groupId: \"deployments\",\n      title: `${deploymentId} is building on app - ${branchName}`,\n      type: \"loading\",\n      action: {\n        label: \"Cancel\",\n        onClick: () => cancelDeployment(deploymentId),\n      },\n      groupSummary: ({ loadingCount }) =>\n        loadingCount > 0\n          ? `${loadingCount} deployments in progress`\n          : \"All deployments complete\",\n      groupAction: {\n        label: \"Show\",\n        expandedLabel: \"Hide\",\n      },\n    });\n\n    if (toastId) {\n      setActiveDeployments((prev) => {\n        const next = new Map(prev);\n        next.set(deploymentId, { toastId, name: `app - ${branchName}` });\n        return next;\n      });\n\n      // Simulate deployment completion after 5-10 seconds\n      const completionTime = 5000 + Math.random() * 5000;\n      const timeoutId = setTimeout(() => {\n        completeDeployment(deploymentId);\n      }, completionTime);\n      deploymentTimeouts.set(deploymentId, timeoutId);\n    }\n  }, [cancelDeployment, completeDeployment]);\n\n  // Cleanup on unmount\n  React.useEffect(() => {\n    return () => {\n      deploymentTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));\n      deploymentTimeouts.clear();\n    };\n  }, []);\n\n  return (\n    <Button variant=\"outline\" onClick={startDeployment}>\n      Deploy App\n    </Button>\n  );\n}\n\nfunction ToastGroupedNotifications() {\n  const sendNotification = React.useCallback(() => {\n    const notification =\n      TEAM_NOTIFICATIONS[Math.floor(Math.random() * TEAM_NOTIFICATIONS.length)];\n    toast.grouped({\n      groupId: \"team-activity\",\n      title: notification.title,\n      type: notification.type,\n      duration: 5000, // Dismiss entire toast 5s after last notification\n      groupSummary: ({ totalCount }) =>\n        `${totalCount} notification${totalCount !== 1 ? \"s\" : \"\"}`,\n      groupAction: {\n        label: \"Show\",\n        expandedLabel: \"Hide\",\n      },\n    });\n  }, []);\n\n  return (\n    <Button variant=\"outline\" onClick={sendNotification}>\n      Team Activity\n    </Button>\n  );\n}\n\nexport default function ToastGroupedDemo() {\n  return (\n    <div className=\"flex gap-2\">\n      <ToastGrouped />\n      <ToastGroupedNotifications />\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Promise",
+      "importPath": "toast-promise",
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { toast } from \"@/components/ui/cubby-ui/toast\";\n\n// Simulated async operation\nfunction saveData(): Promise<{ name: string }> {\n  return new Promise((resolve, reject) => {\n    setTimeout(() => {\n      // Randomly succeed or fail for demo\n      if (Math.random() > 0.3) {\n        resolve({ name: \"Project Alpha\" });\n      } else {\n        reject(new Error(\"Connection failed\"));\n      }\n    }, 2000);\n  });\n}\n\nexport default function ToastPromise() {\n  const handleSave = () => {\n    toast.promise(saveData(), {\n      loading: {\n        title: \"Saving...\",\n        description: \"Please wait while we save your changes.\",\n      },\n      success: (data) => ({\n        title: \"Saved!\",\n        description: `${data.name} has been saved successfully.`,\n      }),\n      error: (err) => ({\n        title: \"Save failed\",\n        description: err.message,\n      }),\n    });\n  };\n\n  return <Button onClick={handleSave}>Save Changes</Button>;\n}\n"
+    },
+    {
+      "title": "Types",
+      "importPath": "toast-types",
+      "source": "\"use client\"\n\nimport { Button } from \"@/components/ui/cubby-ui/button\"\nimport { toast } from \"@/components/ui/cubby-ui/toast\"\n\nexport default function ToastTypes() {\n  return (\n    <div className=\"flex flex-wrap gap-2\">\n      <Button\n        variant=\"outline\"\n        onClick={() => toast({ title: \"Default\", description: \"This is a default toast.\" })}\n      >\n        Default\n      </Button>\n      <Button\n        variant=\"outline\"\n        onClick={() =>\n          toast.success({ title: \"Success\", description: \"Operation completed successfully.\" })\n        }\n      >\n        Success\n      </Button>\n      <Button\n        variant=\"outline\"\n        onClick={() =>\n          toast.error({ title: \"Error\", description: \"Something went wrong.\" })\n        }\n      >\n        Error\n      </Button>\n      <Button\n        variant=\"outline\"\n        onClick={() =>\n          toast.warning({ title: \"Warning\", description: \"Please review before continuing.\" })\n        }\n      >\n        Warning\n      </Button>\n      <Button\n        variant=\"outline\"\n        onClick={() =>\n          toast.info({ title: \"Info\", description: \"Here's some helpful information.\" })\n        }\n      >\n        Info\n      </Button>\n    </div>\n  )\n}\n"
+    },
+    {
+      "title": "Varying Heights",
+      "importPath": "toast-varying-heights",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { toast } from \"@/components/ui/cubby-ui/toast\";\n\nconst messages = [\n  {\n    title: \"Quick update\",\n    description: \"Task completed.\",\n  },\n  {\n    title: \"New comment on your post\",\n    description:\n      \"John Doe replied: 'This looks great! I especially like the attention to detail in the design. Can we schedule a call to discuss further?'\",\n  },\n  {\n    title: \"Meeting reminder\",\n    description:\n      \"Your meeting with the design team starts in 15 minutes. Make sure to prepare the prototype demos and gather feedback from last week's user testing session.\",\n  },\n  {\n    title: \"System notification\",\n    description: \"Updates installed successfully.\",\n  },\n];\n\nexport default function ToastVaryingHeights() {\n  const [index, setIndex] = React.useState(0);\n\n  const handleClick = () => {\n    const message = messages[index % messages.length];\n    toast({\n      title: message.title,\n      description: message.description,\n    });\n    setIndex((prev) => prev + 1);\n  };\n\n  return (\n    <Button variant=\"outline\" onClick={handleClick}>\n      Create Toast\n    </Button>\n  );\n}\n"
     },
     {
       "title": "With Action",
@@ -3286,6 +3326,12 @@ export const componentMap = {
   "timeline-horizontal": timeline_timeline_horizontal,
   "timeline-stepper": timeline_timeline_stepper,
   "toast-basic": toast_toast_basic,
+  "toast-action": toast_toast_action,
+  "toast-anchored": toast_toast_anchored,
+  "toast-grouped": toast_toast_grouped,
+  "toast-promise": toast_toast_promise,
+  "toast-types": toast_toast_types,
+  "toast-varying-heights": toast_toast_varying_heights,
   "toast-with-action": toast_toast_with_action,
   "toggle-basic": toggle_toggle_basic,
   "toggle-controlled": toggle_toggle_controlled,

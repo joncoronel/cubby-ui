@@ -1,3 +1,3 @@
-import { domAnimation } from "motion/react";
+import { domMax } from "motion/react";
 
-export default domAnimation;
+export default domMax;

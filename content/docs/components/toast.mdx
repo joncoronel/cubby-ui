@@ -3,7 +3,7 @@ title: Toast
 description: Brief notification message that appears temporarily
 ---
 
-import { Toast, useToast } from "@/registry/default/toast/toast";
+import { ToastProvider, AnchoredToastProvider, toast } from "@/registry/default/toast/toast";
 
 ## Preview
 
@@ -19,11 +19,41 @@ import { Toast, useToast } from "@/registry/default/toast/toast";
 
 ## Examples
 
+### Types
+
+Toast variants for different feedback scenarios: success, error, warning, and info.
+
+<ComponentPreview component="toast" example="toast-types" />
+
+### Anchored Toast
+
+Toasts can be anchored to a specific element, useful for contextual feedback like "Copied" confirmations.
+
+<ComponentPreview component="toast" example="toast-anchored" />
+
 ### With Action
 
-Include action buttons in toast notifications.
+Add action buttons to toasts. Clicking the action dismisses the current toast and can trigger follow-up toasts.
 
-<ComponentPreview component="toast" example="toast-with-action" />
+<ComponentPreview component="toast" example="toast-action" />
+
+### Promise
+
+Show loading, success, and error states based on promise resolution.
+
+<ComponentPreview component="toast" example="toast-promise" />
+
+### Varying Heights
+
+Toasts automatically adjust their stacking when content has different heights.
+
+<ComponentPreview component="toast" example="toast-varying-heights" />
+
+### Grouped Toasts
+
+Group multiple related toasts into a single summary toast with an expandable card. Ideal for long-running operations like deployments or file uploads.
+
+<ComponentPreview component="toast" example="toast-grouped" />
 
 ## API Reference
 
@@ -41,8 +71,8 @@ The primary API is the `toast()` function, which programmatically displays toast
 toast({
   title: "Success",
   description: "Your changes have been saved",
-  type: "success"
-})
+  type: "success",
+});
 ```
 
 **2. JSX-based**
@@ -51,31 +81,161 @@ toast({
 toast(<div>Custom JSX content</div>, { type: "info" });
 ```
 
-### Custom Props
+### ToastOptions
 
-- **title**: `string` - Toast title
-- **description**: `string` - Toast description
-- **type**: `"default" | "success" | "error" | "warning" | "info"` (default: `"default"`) - Visual type of the toast
-- **duration**: `number` - Duration in milliseconds before auto-dismissal
-- **priority**: `"low" | "high"` (default: `"low"`) - Display priority (high priority toasts appear at the top)
-- **action**: `{ label: string; onClick: () => void }` - Action button configuration
-- **data**: `TData` - Custom data attached to the toast
-- **onClose**: `() => void` - Lifecycle callback when toast closes
-- **onRemove**: `() => void` - Lifecycle callback when toast is removed from DOM
+| Prop          | Type                                                       | Default     | Description                                               |
+| ------------- | ---------------------------------------------------------- | ----------- | --------------------------------------------------------- |
+| `title`       | `string`                                                   | -           | Toast title                                               |
+| `description` | `string`                                                   | -           | Toast description                                         |
+| `type`        | `"default" \| "success" \| "error" \| "warning" \| "info"` | `"default"` | Visual type of the toast                                  |
+| `duration`    | `number`                                                   | `5000`      | Duration in milliseconds before auto-dismissal            |
+| `priority`    | `"low" \| "high"`                                          | `"low"`     | Display priority (high priority toasts appear at the top) |
+| `action`      | `{ label: string; onClick: () => void }`                   | -           | Action button configuration                               |
+| `data`        | `TData`                                                    | -           | Custom data attached to the toast                         |
+| `onClose`     | `() => void`                                               | -           | Callback when toast closes                                |
+| `onRemove`    | `() => void`                                               | -           | Callback when toast is removed from DOM                   |
 
 ### Helper Methods
 
-The toast system also provides type-specific helper methods:
+Type-specific helper methods for common toast types:
 
-- **toast.success()** - Display a success toast (green with checkmark)
-- **toast.error()** - Display an error toast (red with X)
-- **toast.warning()** - Display a warning toast (yellow with exclamation)
-- **toast.info()** - Display an info toast (blue with info icon)
-- **toast.promise()** - Display a toast that updates based on promise state:
-  ```tsx
-  toast.promise(fetchData(), {
-    loading: "Loading...",
-    success: "Data loaded!",
-    error: "Failed to load",
-  });
-  ```
+```tsx
+// Type variants
+toast.success({ title: "Saved!" });
+toast.error({ title: "Failed" });
+toast.warning({ title: "Warning" });
+toast.info({ title: "Info" });
+
+// Promise handling (simple)
+toast.promise(fetchData(), {
+  loading: "Loading...",
+  success: "Data loaded!",
+  error: "Failed to load",
+});
+
+// Promise handling (with title and description)
+toast.promise(fetchData(), {
+  loading: { title: "Loading...", description: "Fetching data" },
+  success: (data) => ({ title: "Success!", description: `Loaded ${data.name}` }),
+  error: (err) => ({ title: "Error", description: err.message }),
+});
+
+// Programmatic control
+toast.dismiss(toastId);
+toast.update(toastId, { title: "Updated" });
+```
+
+### Anchored Toasts
+
+Show toasts anchored to a specific element:
+
+```tsx
+toast.anchored({
+  description: "Copied!",
+  anchor: buttonRef,
+  side: "top",
+  sideOffset: 8,
+  arrow: true,
+  duration: 2000,
+});
+```
+
+| Prop          | Type                                     | Default    | Description                      |
+| ------------- | ---------------------------------------- | ---------- | -------------------------------- |
+| `anchor`      | `Element \| RefObject<Element>`          | -          | Element to anchor the toast to   |
+| `side`        | `"top" \| "bottom" \| "left" \| "right"` | `"top"`    | Side of anchor to position toast |
+| `sideOffset`  | `number`                                 | `8`        | Offset from anchor               |
+| `align`       | `"start" \| "center" \| "end"`           | `"center"` | Alignment along the anchor       |
+| `alignOffset` | `number`                                 | `0`        | Offset for alignment             |
+| `arrow`       | `boolean`                                | `false`    | Show arrow pointing to anchor    |
+
+### Grouped Toasts
+
+Group multiple related toasts into a single collapsible summary. When only one item exists, it renders as a normal toast. When multiple items share the same `groupId`, they collapse into a summary with a "Show" button that reveals an expandable card.
+
+```tsx
+toast.grouped({
+  groupId: "deployments",
+  title: "Deployment abc123 is building...",
+  type: "loading",
+  action: { label: "Cancel", onClick: () => cancelDeployment() },
+  groupSummary: ({ loadingCount }) => `${loadingCount} deployments in progress`,
+  groupAction: { label: "Show", expandedLabel: "Hide" },
+});
+```
+
+#### GroupedToastOptions
+
+| Prop           | Type                                                               | Default  | Description                                        |
+| -------------- | ------------------------------------------------------------------ | -------- | -------------------------------------------------- |
+| `groupId`      | `string`                                                           | -        | **Required.** Identifier for the group             |
+| `title`        | `string`                                                           | -        | Title of this item                                 |
+| `description`  | `string`                                                           | -        | Description of this item                           |
+| `type`         | `"default" \| "loading" \| "success" \| "error" \| "warning" \| "info"` | `"default"` | Visual type (loading shows spinner)            |
+| `action`       | `{ label: string; onClick: () => void }`                           | -        | Action button for this item                        |
+| `groupSummary` | `string \| ((counts: GroupSummaryCounts) => string)` | - | **Required.** Summary text when multiple items. `GroupSummaryCounts` has `loadingCount`, `completedCount`, and `totalCount`. |
+| `groupAction`  | `{ label: string; expandedLabel?: string }`                        | `{ label: "Show", expandedLabel: "Hide" }` | Toggle button labels |
+| `duration`     | `number`                                                           | `5000` for loading | For non-loading: group auto-dismiss (resets on new item, pauses on hover). For loading: progress bar duration after success. |
+
+#### Helper Methods
+
+```tsx
+// Dismiss a single item from a group
+toast.dismissGroupItem(itemId);
+
+// Dismiss an entire group
+toast.dismissGroup(groupId);
+
+// Update a specific item
+toast.updateGroupItem(itemId, { title: "Updated title", type: "success" });
+```
+
+#### Behavior
+
+- **Single item**: Renders as a normal toast with close button
+- **Multiple items**: Collapses into summary with Show/Hide button
+- **No timeout**: Groups persist until manually dismissed (ideal for long-running tasks)
+- **Icon derivation**: Shows loading spinner if any item has `type: "loading"`
+
+### ToastProvider
+
+Wraps your app to enable stacked toast notifications.
+
+| Prop        | Type                                                                                              | Default          | Description                        |
+| ----------- | ------------------------------------------------------------------------------------------------- | ---------------- | ---------------------------------- |
+| `position`  | `"top-left" \| "top-center" \| "top-right" \| "bottom-left" \| "bottom-center" \| "bottom-right"` | `"bottom-right"` | Position of the toast viewport     |
+| `limit`     | `number`                                                                                          | `3`              | Maximum number of toasts visible   |
+| `timeout`   | `number`                                                                                          | `5000`           | Default timeout for toasts in ms   |
+| `container` | `HTMLElement \| RefObject<HTMLElement>`                                                           | -                | Custom portal container            |
+
+### AnchoredToastProvider
+
+Wraps your app to enable anchored toasts (positioned relative to elements).
+
+| Prop        | Type                                    | Default | Description             |
+| ----------- | --------------------------------------- | ------- | ----------------------- |
+| `timeout`   | `number`                                | `5000`  | Default timeout in ms   |
+| `container` | `HTMLElement \| RefObject<HTMLElement>` | -       | Custom portal container |
+
+### Setup
+
+Wrap your app with both providers to enable all toast functionality:
+
+```tsx
+// app/layout.tsx or similar
+import { ToastProvider, AnchoredToastProvider } from "@/registry/default/toast/toast";
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        <ToastProvider position="bottom-right">
+          <AnchoredToastProvider>
+            {children}
+          </AnchoredToastProvider>
+        </ToastProvider>
+      </body>
+    </html>
+  );
+}
+```

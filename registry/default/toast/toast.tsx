@@ -1,70 +1,318 @@
 "use client";
 
 import * as React from "react";
+import { cva } from "class-variance-authority";
+import { Popover } from "@base-ui/react/popover";
 import { Toast } from "@base-ui/react/toast";
-import { clsx } from "clsx";
+import { AnimatePresence } from "motion/react";
+import * as m from "motion/react-m";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  AlertCircleIcon,
+  Alert02Icon,
+  CheckmarkCircle02Icon,
+  InformationCircleIcon,
+  Loading03Icon,
+  Cancel01Icon,
+} from "@hugeicons/core-free-icons";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/registry/default/button/button";
+import "./toast.css";
 
-export interface ToastOptions<TData = unknown> {
+// Module-level managers
+const toastManager = Toast.createToastManager();
+const anchoredToastManager = Toast.createToastManager();
+
+// Grouped Toast Mappings
+// Map groupId -> Base UI toastId
+const groupToToastMap = new Map<string, string>();
+// Map itemId -> groupId for lookups
+const groupItemToGroupMap = new Map<string, string>();
+// Map groupId -> GroupedToastData (we track our own data since toastManager doesn't expose getSnapshot)
+const groupDataMap = new Map<string, GroupedToastData>();
+
+// Types
+const TOAST_ICONS = {
+  success: CheckmarkCircle02Icon,
+  error: AlertCircleIcon,
+  warning: Alert02Icon,
+  info: InformationCircleIcon,
+  loading: Loading03Icon,
+} as const;
+
+const toastIconVariants = cva("", {
+  variants: {
+    type: {
+      default: "",
+      success: "text-success-foreground",
+      error: "text-danger-foreground",
+      warning: "text-warning-foreground",
+      info: "text-info-foreground",
+      loading: "text-muted-foreground animate-spin",
+    },
+  },
+});
+
+// Icon colors in StackedToastItem use in-data-[type=*] selectors,
+// which automatically style based on the data-type attribute set by Base UI on Toast.Root
+
+// Shared Toast CSS Classes (used by StackedToastItem and GroupedToastRoot)
+const TOAST_CSS_VARIABLES = [
+  "[--toast-gap:0.75rem] [--toast-peek:0.75rem]",
+  "[--toast-scale:calc(max(0,1-(var(--toast-index)*0.1)))]",
+  "[--toast-shrink:calc(1-var(--toast-scale))]",
+  "[--toast-calc-height:var(--toast-frontmost-height,var(--toast-height))]",
+  "data-[position*=top]:[--toast-calc-offset-y:calc(var(--toast-offset-y)+(var(--toast-index)*var(--toast-gap))+var(--toast-swipe-movement-y))]",
+  "data-[position*=bottom]:[--toast-calc-offset-y:calc(var(--toast-offset-y)*-1+(var(--toast-index)*var(--toast-gap)*-1)+var(--toast-swipe-movement-y))]",
+];
+
+const TOAST_POSITION_CLASSES = [
+  "absolute z-[calc(1000-var(--toast-index))] w-full",
+  "data-[position*=top]:top-0 data-[position*=top]:right-0 data-[position*=top]:left-0 data-[position*=top]:origin-top",
+  "data-[position*=bottom]:right-0 data-[position*=bottom]:bottom-0 data-[position*=bottom]:left-0 data-[position*=bottom]:origin-bottom",
+];
+
+const TOAST_TRANSFORM_CLASSES = [
+  "data-[position*=top]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+(var(--toast-index)*var(--toast-peek))+(var(--toast-shrink)*var(--toast-calc-height))))_scale(var(--toast-scale))]",
+  "data-[position*=bottom]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-(var(--toast-index)*var(--toast-peek))-(var(--toast-shrink)*var(--toast-calc-height))))_scale(var(--toast-scale))]",
+  "data-expanded:h-(--toast-height)",
+  "data-position:data-expanded:transform-[translateX(var(--toast-swipe-movement-x))_translateY(var(--toast-calc-offset-y))]",
+];
+
+const TOAST_ANIMATION_CLASSES = [
+  "data-[position*=top]:data-starting-style:transform-[translateY(calc(-100%-var(--toast-inset)))]",
+  "data-[position*=bottom]:data-starting-style:transform-[translateY(calc(100%+var(--toast-inset)))]",
+  "data-ending-style:opacity-0",
+  "data-[position*=top]:data-ending-style:not-data-limited:not-data-swipe-direction:transform-[translateY(calc(-100%-var(--toast-inset)))]",
+  "data-[position*=bottom]:data-ending-style:not-data-limited:not-data-swipe-direction:transform-[translateY(calc(100%+var(--toast-inset)))]",
+  "data-ending-style:data-[swipe-direction=down]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+100%+var(--toast-inset)))]",
+  "data-expanded:data-ending-style:data-[swipe-direction=down]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+100%+var(--toast-inset)))]",
+  "data-ending-style:data-[swipe-direction=left]:transform-[translateX(calc(var(--toast-swipe-movement-x)-100%-var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
+  "data-expanded:data-ending-style:data-[swipe-direction=left]:transform-[translateX(calc(var(--toast-swipe-movement-x)-100%-var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
+  "data-ending-style:data-[swipe-direction=right]:transform-[translateX(calc(var(--toast-swipe-movement-x)+100%+var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
+  "data-expanded:data-ending-style:data-[swipe-direction=right]:transform-[translateX(calc(var(--toast-swipe-movement-x)+100%+var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
+  "data-ending-style:data-[swipe-direction=up]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-100%-var(--toast-inset)))]",
+  "data-expanded:data-ending-style:data-[swipe-direction=up]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-100%-var(--toast-inset)))]",
+];
+
+const TOAST_VISUAL_CLASSES = [
+  "rounded-lg border border-border bg-card text-card-foreground",
+  "bg-clip-padding shadow-lg select-none",
+  'after:absolute after:left-0 after:h-[calc(var(--toast-gap)+1px)] after:w-full after:content-[""]',
+  "data-[position*=top]:after:bottom-full",
+  "data-[position*=bottom]:after:top-full",
+  "data-limited:opacity-0",
+  "h-(--toast-calc-height)",
+  "[transition:transform_.5s_cubic-bezier(.22,1,.36,1),opacity_.5s,height_.20s]",
+];
+
+export interface ToastOptions<TData extends object = object> {
   title?: string;
-  description?: string; // Made optional to support JSX-only toasts
+  description?: string;
   type?: "default" | "success" | "error" | "warning" | "info";
   duration?: number;
-  priority?: "low" | "high"; // Priority support from Base UI
+  priority?: "low" | "high";
   action?: {
     label: string;
     onClick: () => void;
   };
-  data?: TData; // Custom data support
-  onClose?: () => void; // Lifecycle callback
-  onRemove?: () => void; // Lifecycle callback
+  data?: TData;
+  onClose?: () => void;
+  onRemove?: () => void;
+  /** Whether to show the close button. Defaults to true. */
+  showCloseButton?: boolean;
+}
+
+export interface AnchoredToastOptions<
+  TData extends object = object,
+> extends Omit<ToastOptions<TData>, "type"> {
+  anchor: Element | React.RefObject<Element | null>;
+  side?: "top" | "bottom" | "left" | "right";
+  sideOffset?: number;
+  align?: "start" | "center" | "end";
+  alignOffset?: number;
+  arrow?: boolean;
 }
 
 interface ToastData {
   id: string;
   title?: string;
   description?: string;
-  type?: "default" | "success" | "error" | "warning" | "info";
+  type?: "default" | "success" | "error" | "warning" | "info" | "loading";
   action?: {
     label: string;
     onClick: () => void;
   };
-  data?: unknown; // Custom data that can be used in rendering logic
+  showCloseButton?: boolean;
+  data?: unknown;
+  positionerProps?: {
+    anchor?: Element | null;
+    side?: "top" | "bottom" | "left" | "right";
+    sideOffset?: number;
+    align?: "start" | "center" | "end";
+    alignOffset?: number;
+  };
 }
 
-// Global toast manager instance
-let toastManagerInstance: ReturnType<typeof Toast.useToastManager> | null =
-  null;
+// Grouped Toast Types
+type ToastType =
+  | "default"
+  | "loading"
+  | "success"
+  | "error"
+  | "warning"
+  | "info";
 
-const setToastManager = (manager: ReturnType<typeof Toast.useToastManager>) => {
-  toastManagerInstance = manager;
-};
+/** Duration in ms before a completed group item auto-dismisses */
+const GROUP_ITEM_DISMISS_DURATION = 5000;
 
+/** Individual item within a grouped toast */
+export interface GroupedToastItem {
+  id: string;
+  title?: string;
+  description?: string;
+  type?: ToastType;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+  data?: object;
+  createdAt: number;
+  showCloseButton?: boolean;
+  /** Timestamp when this item transitioned to a completed state */
+  completedAt?: number;
+  /** Duration for progress bar after completing (loading items only). Defaults to GROUP_ITEM_DISMISS_DURATION. */
+  duration?: number;
+}
+
+/**
+ * Counts passed to groupSummary function.
+ *
+ * Note: `completedCount`, `successCount`, `errorCount`, `warningCount`, and `infoCount`
+ * are **historical** - they persist even after completed items are auto-dismissed.
+ * This ensures accurate summaries like "3 of 5 succeeded" remain correct after items fade out.
+ * Only `loadingCount` reflects currently visible loading items.
+ */
+export interface GroupSummaryCounts {
+  /** Number of items currently in loading state (reflects visible items) */
+  loadingCount: number;
+  /** Total items that have completed historically (persists after dismiss) */
+  completedCount: number;
+  /** Total items: loadingCount + completedCount */
+  totalCount: number;
+  /** Items that completed with type 'success' (historical, persists after dismiss) */
+  successCount: number;
+  /** Items that completed with type 'error' (historical, persists after dismiss) */
+  errorCount: number;
+  /** Items that completed with type 'warning' (historical, persists after dismiss) */
+  warningCount: number;
+  /** Items that completed with type 'info' (historical, persists after dismiss) */
+  infoCount: number;
+}
+
+/** Options for creating a grouped toast item */
+export interface GroupedToastOptions<TData extends object = object> {
+  groupId: string;
+  title?: string;
+  description?: string;
+  type?: ToastType;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+  data?: TData;
+  onClose?: () => void;
+  onRemove?: () => void;
+  /** Whether to show the close button. Defaults to true. */
+  showCloseButton?: boolean;
+  /** Summary text or function. Function receives counts: loadingCount (in-progress items) and totalCount (all items including completed). */
+  groupSummary: string | ((counts: GroupSummaryCounts) => string);
+  groupAction?: {
+    label: string;
+    expandedLabel?: string;
+  };
+  /** Duration in ms before the group auto-dismisses. Resets on each new item added. */
+  duration?: number;
+}
+
+/** Message configuration for grouped promise toasts */
+interface GroupedPromiseMessage {
+  title?: string;
+  description?: string;
+  type?: ToastType;
+}
+
+/** Messages for each state of a grouped promise toast */
+export interface GroupedPromiseMessages<T> {
+  loading: GroupedPromiseMessage & {
+    action?: { label: string; onClick: () => void };
+  };
+  success: PromiseMessage | ((data: T) => GroupedPromiseMessage);
+  error: PromiseMessage | ((error: Error) => GroupedPromiseMessage);
+  /** Message to show when aborted via AbortController. Defaults to error message. */
+  aborted?: PromiseMessage | (() => GroupedPromiseMessage);
+}
+
+/** Options for grouped promise toasts */
+export interface GroupedPromiseOptions
+  extends Omit<
+    GroupedToastOptions,
+    "type" | "title" | "description" | "action"
+  > {
+  /** AbortSignal for cancellation support */
+  signal?: AbortSignal;
+}
+
+/** Historical counts that only increment (never decrement on item dismiss) */
+interface HistoricalCounts {
+  success: number;
+  error: number;
+  warning: number;
+  info: number;
+}
+
+/** Data structure stored in Base UI toast for grouped toasts */
+interface GroupedToastData {
+  isGrouped: true;
+  groupId: string;
+  /** Pending items (loading state) */
+  items: GroupedToastItem[];
+  /** Completed items that are transitioning out with progress bar */
+  completedItems: GroupedToastItem[];
+  isExpanded: boolean;
+  summary: string | ((counts: GroupSummaryCounts) => string);
+  action: {
+    label: string;
+    expandedLabel: string;
+  };
+  /** True once we've shown "All complete" (2+ items completed simultaneously) - stays in summary mode */
+  hasShownAllComplete: boolean;
+  /** Duration in ms, stored so we can pass it on update to reset timer */
+  duration?: number;
+  /** Historical counts that persist even after items are dismissed */
+  historicalCounts: HistoricalCounts;
+}
+
+// Toast Helper Functions
 // Overloaded function signatures for JSX support
 function baseToast(jsx: React.ReactElement): string | undefined;
-function baseToast<TData = unknown>(
+function baseToast<TData extends object = object>(
   jsx: React.ReactElement,
   options: Omit<ToastOptions<TData>, "title" | "description">,
 ): string | undefined;
-function baseToast<TData = unknown>(
+function baseToast<TData extends object = object>(
   options: ToastOptions<TData>,
 ): string | undefined;
 
-function baseToast<TData = unknown>(
+function baseToast<TData extends object = object>(
   optionsOrJSX: ToastOptions<TData> | React.ReactElement,
   jsxOptions?: Omit<ToastOptions<TData>, "title" | "description">,
 ): string | undefined {
-  if (!toastManagerInstance) {
-    console.error(
-      "Toast manager not initialized. Make sure ToastProvider is wrapping your app.",
-    );
-    return;
-  }
-
   // Handle JSX element passed directly (with optional options)
   if (React.isValidElement(optionsOrJSX)) {
-    return toastManagerInstance.add({
-      title: "", // Empty title for JSX toasts
-      description: "", // Empty description - JSX will be rendered as custom content
+    return toastManager.add({
+      title: "",
+      description: "",
       type: jsxOptions?.type || "default",
       timeout: jsxOptions?.duration || undefined,
       priority: jsxOptions?.priority || "low",
@@ -76,7 +324,8 @@ function baseToast<TData = unknown>(
       }),
       data: {
         customJSX: optionsOrJSX,
-        ...(jsxOptions?.data && jsxOptions.data), // Merge any additional data
+        ...(jsxOptions?.data && jsxOptions.data),
+        showCloseButton: jsxOptions?.showCloseButton ?? true,
       },
       ...(jsxOptions?.onClose && { onClose: jsxOptions.onClose }),
       ...(jsxOptions?.onRemove && { onRemove: jsxOptions.onRemove }),
@@ -85,7 +334,7 @@ function baseToast<TData = unknown>(
 
   // Handle options object
   const options = optionsOrJSX as ToastOptions<TData>;
-  return toastManagerInstance.add({
+  return toastManager.add({
     title: options.title,
     description: options.description || "",
     type: options.type || "default",
@@ -97,94 +346,63 @@ function baseToast<TData = unknown>(
         onClick: options.action.onClick,
       },
     }),
-    ...(options.data && { data: options.data }), // Pass custom data
+    data: {
+      ...(options.data || {}),
+      showCloseButton: options.showCloseButton ?? true,
+    },
     ...(options.onClose && { onClose: options.onClose }),
     ...(options.onRemove && { onRemove: options.onRemove }),
   });
 }
 
+/** Message format for promise toasts - can be a string or an object with title/description */
+type PromiseMessage = string | { title?: string; description?: string };
+
+/** Promise message that can also be a function returning the message */
+type PromiseMessageOrFn<T> = PromiseMessage | ((data: T) => PromiseMessage);
+
 const promise = async <T,>(
   promiseToResolve: Promise<T>,
   messages: {
-    loading: string;
-    success: string | ((data: T) => string);
-    error: string | ((error: Error) => string);
+    loading: PromiseMessage;
+    success: PromiseMessageOrFn<T>;
+    error: PromiseMessageOrFn<Error>;
   },
 ) => {
-  if (!toastManagerInstance) {
-    console.error(
-      "Toast manager not initialized. Make sure ToastProvider is wrapping your app.",
-    );
-    return;
-  }
+  const resolveMessage = <U,>(msg: PromiseMessageOrFn<U>, data: U) =>
+    typeof msg === "function" ? msg(data) : msg;
 
-  return toastManagerInstance.promise(promiseToResolve, {
+  return toastManager.promise(promiseToResolve, {
     loading: messages.loading,
-    success: messages.success,
-    error: messages.error,
+    success: (data: T) => resolveMessage(messages.success, data),
+    error: (err: Error) => resolveMessage(messages.error, err),
   });
 };
 
+// Factory function to create typed toast methods (DRY)
+function createTypedToast(type: NonNullable<ToastOptions["type"]>) {
+  return <TData extends object = object>(
+    optionsOrJSX: Omit<ToastOptions<TData>, "type"> | React.ReactElement,
+    jsxOptions?: Omit<ToastOptions<TData>, "title" | "description" | "type">,
+  ) => {
+    if (React.isValidElement(optionsOrJSX)) {
+      return baseToast(optionsOrJSX, { ...jsxOptions, type });
+    }
+    return baseToast({ ...optionsOrJSX, type });
+  };
+}
+
 // Create the toast object with methods like Sonner
 export const toast = Object.assign(baseToast, {
-  success: <TData = unknown,>(
-    optionsOrJSX: Omit<ToastOptions<TData>, "type"> | React.ReactElement,
-    jsxOptions?: Omit<ToastOptions<TData>, "title" | "description" | "type">,
-  ) => {
-    if (React.isValidElement(optionsOrJSX)) {
-      return baseToast(optionsOrJSX, { ...jsxOptions, type: "success" });
-    }
-    const options = optionsOrJSX as Omit<ToastOptions<TData>, "type">;
-    return baseToast({ ...options, type: "success" });
-  },
-  error: <TData = unknown,>(
-    optionsOrJSX: Omit<ToastOptions<TData>, "type"> | React.ReactElement,
-    jsxOptions?: Omit<ToastOptions<TData>, "title" | "description" | "type">,
-  ) => {
-    if (React.isValidElement(optionsOrJSX)) {
-      return baseToast(optionsOrJSX, { ...jsxOptions, type: "error" });
-    }
-    const options = optionsOrJSX as Omit<ToastOptions<TData>, "type">;
-    return baseToast({ ...options, type: "error" });
-  },
-  warning: <TData = unknown,>(
-    optionsOrJSX: Omit<ToastOptions<TData>, "type"> | React.ReactElement,
-    jsxOptions?: Omit<ToastOptions<TData>, "title" | "description" | "type">,
-  ) => {
-    if (React.isValidElement(optionsOrJSX)) {
-      return baseToast(optionsOrJSX, { ...jsxOptions, type: "warning" });
-    }
-    const options = optionsOrJSX as Omit<ToastOptions<TData>, "type">;
-    return baseToast({ ...options, type: "warning" });
-  },
-  info: <TData = unknown,>(
-    optionsOrJSX: Omit<ToastOptions<TData>, "type"> | React.ReactElement,
-    jsxOptions?: Omit<ToastOptions<TData>, "title" | "description" | "type">,
-  ) => {
-    if (React.isValidElement(optionsOrJSX)) {
-      return baseToast(optionsOrJSX, { ...jsxOptions, type: "info" });
-    }
-    const options = optionsOrJSX as Omit<ToastOptions<TData>, "type">;
-    return baseToast({ ...options, type: "info" });
-  },
+  success: createTypedToast("success"),
+  error: createTypedToast("error"),
+  warning: createTypedToast("warning"),
+  info: createTypedToast("info"),
   promise,
   dismiss: (toastId: string) => {
-    if (!toastManagerInstance) {
-      console.error(
-        "Toast manager not initialized. Make sure ToastProvider is wrapping your app.",
-      );
-      return;
-    }
-    return toastManagerInstance.close(toastId);
+    return toastManager.close(toastId);
   },
   update: (toastId: string, options: Partial<ToastOptions>) => {
-    if (!toastManagerInstance) {
-      console.error(
-        "Toast manager not initialized. Make sure ToastProvider is wrapping your app.",
-      );
-      return;
-    }
-    // Extract only the properties that Base UI's update method expects
     const updateOptions: Record<string, unknown> = {};
     if (options.title !== undefined) updateOptions.title = options.title;
     if (options.description !== undefined)
@@ -192,12 +410,435 @@ export const toast = Object.assign(baseToast, {
     if (options.type !== undefined) updateOptions.type = options.type;
     if (options.data !== undefined) updateOptions.data = options.data;
 
-    return toastManagerInstance.update(toastId, updateOptions);
+    return toastManager.update(toastId, updateOptions);
   },
-  custom: <TData = unknown,>(options: ToastOptions<TData>) =>
-    baseToast(options), // Explicit custom method for clarity
+  custom: <TData extends object = object>(options: ToastOptions<TData>) =>
+    baseToast(options),
+  /** Show an anchored toast near an element */
+  anchored: <TData extends object = object>(
+    options: AnchoredToastOptions<TData>,
+  ) => {
+    const anchor =
+      options.anchor instanceof Element
+        ? options.anchor
+        : options.anchor?.current;
+
+    if (!anchor) {
+      console.warn("Toast anchor element not found");
+      return;
+    }
+
+    return anchoredToastManager.add({
+      title: options.title,
+      description: options.description || "",
+      timeout: options.duration || undefined,
+      priority: options.priority || "low",
+      ...(options.action && {
+        actionProps: {
+          children: options.action.label,
+          onClick: options.action.onClick,
+        },
+      }),
+      data: {
+        ...(options.data || {}),
+        arrow: options.arrow ?? false,
+      },
+      positionerProps: {
+        anchor,
+        side: options.side ?? "top",
+        sideOffset: options.sideOffset ?? 8,
+        align: options.align,
+        alignOffset: options.alignOffset,
+      },
+      ...(options.onClose && { onClose: options.onClose }),
+      ...(options.onRemove && { onRemove: options.onRemove }),
+    });
+  },
+  /** Dismiss an anchored toast */
+  dismissAnchored: (toastId: string) => {
+    return anchoredToastManager.close(toastId);
+  },
+  /** Show a grouped toast that collapses multiple items into a summary */
+  grouped: <TData extends object = object>(
+    options: GroupedToastOptions<TData>,
+  ) => {
+    const existingToastId = groupToToastMap.get(options.groupId);
+    const itemId = `grouped-${options.groupId}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
+    const isLoading = options.type === "loading";
+
+    const newItem: GroupedToastItem = {
+      id: itemId,
+      title: options.title,
+      description: options.description,
+      type: options.type,
+      action: options.action,
+      data: options.data,
+      createdAt: Date.now(),
+      showCloseButton: options.showCloseButton ?? true,
+      // For loading items, duration controls progress bar time after success
+      duration: isLoading ? options.duration : undefined,
+    };
+
+    if (existingToastId) {
+      // Add to existing group - all new items go to `items` array
+      const existingData = groupDataMap.get(options.groupId);
+      if (existingData) {
+        const updatedData: GroupedToastData = {
+          ...existingData,
+          items: [...existingData.items, newItem],
+        };
+        groupDataMap.set(options.groupId, updatedData);
+        // Pass timeout to reset Base UI's built-in timer (pauses on hover/drag)
+        toastManager.update(existingToastId, {
+          data: updatedData,
+          timeout: existingData.duration,
+        });
+      }
+    } else {
+      // Create new group
+      const groupId = options.groupId;
+      const groupData: GroupedToastData = {
+        isGrouped: true,
+        groupId,
+        items: [newItem],
+        completedItems: [],
+        isExpanded: false,
+        summary: options.groupSummary,
+        action: {
+          label: options.groupAction?.label ?? "Show",
+          expandedLabel: options.groupAction?.expandedLabel ?? "Hide",
+        },
+        hasShownAllComplete: false,
+        // For non-loading items, duration controls group auto-dismiss
+        // For loading items, duration is stored on the item for progress bar
+        duration: isLoading ? undefined : options.duration,
+        historicalCounts: { success: 0, error: 0, warning: 0, info: 0 },
+      };
+      const toastId = toastManager.add({
+        title: "",
+        description: "",
+        data: groupData,
+        // Use Base UI's built-in timeout for auto-dismiss (only for non-loading items)
+        // Loading items don't auto-dismiss the group - they wait for updateGroupItem()
+        timeout: isLoading ? 0 : (options.duration ?? 0),
+        // Clean up our maps when the toast is closed (via close button or swipe)
+        onClose: () => {
+          const data = groupDataMap.get(groupId);
+          if (data) {
+            data.items.forEach((item) => groupItemToGroupMap.delete(item.id));
+            (data.completedItems ?? []).forEach((item) =>
+              groupItemToGroupMap.delete(item.id),
+            );
+          }
+          groupToToastMap.delete(groupId);
+          groupDataMap.delete(groupId);
+        },
+      });
+      if (toastId) {
+        groupToToastMap.set(groupId, toastId);
+        groupDataMap.set(groupId, groupData);
+      }
+    }
+
+    groupItemToGroupMap.set(itemId, options.groupId);
+
+    return itemId;
+  },
+  /** Dismiss a single item from a grouped toast (checks both pending and completed arrays) */
+  dismissGroupItem: (itemId: string) => {
+    const groupId = groupItemToGroupMap.get(itemId);
+    if (!groupId) return;
+
+    const toastId = groupToToastMap.get(groupId);
+    if (!toastId) return;
+
+    const data = groupDataMap.get(groupId);
+    if (!data) return;
+
+    // Check both arrays
+    const inPending = data.items.some((item) => item.id === itemId);
+    const inCompleted = (data.completedItems ?? []).some(
+      (item) => item.id === itemId,
+    );
+
+    let newItems = data.items;
+    let newCompletedItems = data.completedItems ?? [];
+
+    if (inPending) {
+      newItems = data.items.filter((item) => item.id !== itemId);
+    }
+    if (inCompleted) {
+      newCompletedItems = newCompletedItems.filter(
+        (item) => item.id !== itemId,
+      );
+    }
+
+    groupItemToGroupMap.delete(itemId);
+
+    if (newItems.length === 0 && newCompletedItems.length === 0) {
+      // Last item - close the toast entirely
+      toastManager.close(toastId);
+      groupToToastMap.delete(groupId);
+      groupDataMap.delete(groupId);
+    } else {
+      // Update toast with remaining items
+      const updatedData: GroupedToastData = {
+        ...data,
+        items: newItems,
+        completedItems: newCompletedItems,
+        // Collapse if only 1 pending item remains and no completed
+        isExpanded:
+          newItems.length <= 1 && newCompletedItems.length === 0
+            ? false
+            : data.isExpanded,
+      };
+      groupDataMap.set(groupId, updatedData);
+      toastManager.update(toastId, { data: updatedData });
+    }
+  },
+  /** Dismiss an entire group of toasts */
+  dismissGroup: (groupId: string) => {
+    const toastId = groupToToastMap.get(groupId);
+    if (!toastId) return;
+
+    // Clean up item mappings for both arrays
+    const data = groupDataMap.get(groupId);
+    if (data) {
+      data.items.forEach((item) => groupItemToGroupMap.delete(item.id));
+      (data.completedItems ?? []).forEach((item) =>
+        groupItemToGroupMap.delete(item.id),
+      );
+    }
+
+    toastManager.close(toastId);
+    groupToToastMap.delete(groupId);
+    groupDataMap.delete(groupId);
+  },
+  /** Update a single item in a grouped toast */
+  updateGroupItem: (
+    itemId: string,
+    options: Partial<Omit<GroupedToastItem, "id" | "createdAt">>,
+  ) => {
+    const groupId = groupItemToGroupMap.get(itemId);
+    if (!groupId) return;
+
+    const toastId = groupToToastMap.get(groupId);
+    if (!toastId) return;
+
+    const data = groupDataMap.get(groupId);
+    if (!data) return;
+
+    // Find the current item to check if type is changing from loading
+    const currentItem = data.items.find((item) => item.id === itemId);
+    const wasLoading = currentItem?.type === "loading";
+    const isNowComplete =
+      options.type !== undefined && options.type !== "loading";
+
+    if (wasLoading && isNowComplete && currentItem) {
+      // Move item from pending to completed
+      const newItems = data.items.filter((item) => item.id !== itemId);
+      const completedItem: GroupedToastItem = {
+        ...currentItem,
+        ...options,
+        completedAt: Date.now(),
+      };
+
+      // Insert at beginning (newest on top)
+      const newCompletedItems = [completedItem, ...(data.completedItems ?? [])];
+
+      // Check if we have 2+ complete items (triggers "All complete" summary)
+      const completeCount = newCompletedItems.length;
+      const shouldShowAllComplete = completeCount >= 2;
+
+      // Increment historical counts (these persist even after items are dismissed)
+      const completedType = completedItem.type as ToastType;
+      const newHistoricalCounts = { ...data.historicalCounts };
+      if (completedType === "success") newHistoricalCounts.success++;
+      else if (completedType === "error") newHistoricalCounts.error++;
+      else if (completedType === "warning") newHistoricalCounts.warning++;
+      else if (completedType === "info") newHistoricalCounts.info++;
+      // "default" is the unstyled/neutral variant - count as success
+      else if (completedType === "default") newHistoricalCounts.success++;
+
+      const updatedData: GroupedToastData = {
+        ...data,
+        items: newItems,
+        completedItems: newCompletedItems,
+        hasShownAllComplete: data.hasShownAllComplete || shouldShowAllComplete,
+        historicalCounts: newHistoricalCounts,
+      };
+      groupDataMap.set(groupId, updatedData);
+      toastManager.update(toastId, { data: updatedData });
+
+      // Start dismiss timer for the completed item (use item's duration or default)
+      const dismissDuration =
+        currentItem.duration ?? GROUP_ITEM_DISMISS_DURATION;
+      setTimeout(() => {
+        toast.dismissCompletedItem(itemId);
+      }, dismissDuration);
+    } else {
+      // Just update in place (not a loading->complete transition)
+      const newItems = data.items.map((item) =>
+        item.id === itemId ? { ...item, ...options } : item,
+      );
+
+      const updatedData: GroupedToastData = {
+        ...data,
+        items: newItems,
+      };
+      groupDataMap.set(groupId, updatedData);
+      toastManager.update(toastId, { data: updatedData });
+    }
+  },
+  /** Dismiss a completed item (removes from completedItems array) */
+  dismissCompletedItem: (itemId: string) => {
+    const groupId = groupItemToGroupMap.get(itemId);
+    if (!groupId) return;
+
+    const toastId = groupToToastMap.get(groupId);
+    if (!toastId) return;
+
+    const data = groupDataMap.get(groupId);
+    if (!data) return;
+
+    const newCompletedItems = (data.completedItems ?? []).filter(
+      (item) => item.id !== itemId,
+    );
+    groupItemToGroupMap.delete(itemId);
+
+    // Check if entire group should close
+    if (data.items.length === 0 && newCompletedItems.length === 0) {
+      toastManager.close(toastId);
+      groupToToastMap.delete(groupId);
+      groupDataMap.delete(groupId);
+      return;
+    }
+
+    const updatedData: GroupedToastData = {
+      ...data,
+      completedItems: newCompletedItems,
+      // Collapse if only 1 pending item remains and no completed (unless in group mode)
+      isExpanded:
+        data.items.length <= 1 &&
+        newCompletedItems.length === 0 &&
+        !data.hasShownAllComplete
+          ? false
+          : data.isExpanded,
+    };
+    groupDataMap.set(groupId, updatedData);
+    toastManager.update(toastId, { data: updatedData });
+  },
+  /** Show a grouped toast that resolves with a promise, handling loading/success/error states */
+  groupedPromise: async <T,>(
+    promiseToResolve: Promise<T>,
+    messages: GroupedPromiseMessages<T>,
+    options: GroupedPromiseOptions,
+  ): Promise<T> => {
+    // Helper to resolve message to GroupedPromiseMessage format
+    const resolveMessage = <U,>(
+      msg: PromiseMessage | ((data: U) => GroupedPromiseMessage),
+      data: U,
+    ): GroupedPromiseMessage => {
+      if (typeof msg === "function") {
+        return msg(data);
+      }
+      if (typeof msg === "string") {
+        return { title: msg };
+      }
+      return msg;
+    };
+
+    // Create loading item
+    const itemId = toast.grouped({
+      ...options,
+      title: messages.loading.title,
+      description: messages.loading.description,
+      type: "loading",
+      action: messages.loading.action,
+    });
+
+    if (!itemId) {
+      return promiseToResolve;
+    }
+
+    // Track if already handled and whether it was an abort
+    let handled = false;
+    let wasAborted = false;
+
+    // Set up abort listener if signal provided
+    if (options.signal) {
+      const handleAbort = () => {
+        if (handled) return;
+        handled = true;
+        wasAborted = true;
+
+        const abortedMsg: GroupedPromiseMessage = messages.aborted
+          ? typeof messages.aborted === "function"
+            ? messages.aborted()
+            : typeof messages.aborted === "string"
+              ? { title: messages.aborted }
+              : messages.aborted
+          : { title: "Cancelled" };
+
+        toast.updateGroupItem(itemId, {
+          title: abortedMsg.title,
+          description: abortedMsg.description,
+          type: abortedMsg.type ?? "error",
+          action: undefined,
+        });
+      };
+
+      if (options.signal.aborted) {
+        handleAbort();
+        throw new DOMException("Aborted", "AbortError");
+      }
+
+      options.signal.addEventListener("abort", handleAbort, { once: true });
+    }
+
+    try {
+      const result = await promiseToResolve;
+
+      if (!handled) {
+        handled = true;
+        const successMsg = resolveMessage(messages.success, result);
+        toast.updateGroupItem(itemId, {
+          title: successMsg.title,
+          description: successMsg.description,
+          type: successMsg.type ?? "success",
+          action: undefined,
+        });
+      }
+
+      return result;
+    } catch (error) {
+      if (!handled) {
+        handled = true;
+        const errorMsg = resolveMessage(
+          messages.error,
+          error instanceof Error ? error : new Error(String(error)),
+        );
+        toast.updateGroupItem(itemId, {
+          title: errorMsg.title,
+          description: errorMsg.description,
+          type: errorMsg.type ?? "error",
+          action: undefined,
+        });
+      }
+
+      // Throw AbortError for user-initiated abort (matches fetch() behavior)
+      // Callers can catch and check: error.name === 'AbortError'
+      if (wasAborted) {
+        throw new DOMException("Aborted", "AbortError");
+      }
+
+      throw error;
+    }
+  },
 });
 
+// Toast Provider
 export type ToastPosition =
   | "top-left"
   | "top-center"
@@ -209,27 +850,16 @@ export type ToastPosition =
 interface ToastProviderProps {
   children: React.ReactNode;
   position?: ToastPosition;
-  limit?: number; // Maximum number of toasts (default: 3)
-  timeout?: number; // Default timeout for toasts in ms (default: 5000)
-  toastManager?: ReturnType<typeof Toast.createToastManager>; // Global toast manager
-  container?: HTMLElement | React.RefObject<HTMLElement | null> | null; // Portal container
+  limit?: number;
+  timeout?: number;
+  container?: HTMLElement | React.RefObject<HTMLElement | null> | null;
 }
-
-const positionClasses: Record<ToastPosition, string> = {
-  "top-left": "fixed top-[1rem] left-[1rem] bottom-auto right-auto",
-  "top-center": "fixed top-[1rem] left-0 right-0 bottom-auto mx-auto",
-  "top-right": "fixed top-[1rem] right-[1rem] bottom-auto left-auto",
-  "bottom-left": "fixed bottom-[1rem] left-[1rem] top-auto right-auto",
-  "bottom-center": "fixed bottom-[1rem] left-0 right-0 top-auto mx-auto",
-  "bottom-right": "fixed bottom-[1rem] right-[1rem] top-auto left-auto",
-};
 
 export function ToastProvider({
   children,
   position = "bottom-right",
   limit = 3,
   timeout = 5000,
-  toastManager,
   container,
 }: ToastProviderProps) {
   return (
@@ -237,190 +867,996 @@ export function ToastProvider({
       {children}
       <Toast.Portal container={container}>
         <Toast.Viewport
-          className={clsx(
-            positionClasses[position],
-            "flex w-[250px] max-w-[calc(100vw-2rem)] sm:w-[300px]",
-          )}
+          data-slot="toast-viewport"
           data-position={position}
+          className={cn(
+            "fixed z-50 flex w-[calc(100%-var(--toast-inset)*2)] max-w-[360px]",
+            "[--toast-inset:1rem] sm:[--toast-inset:2rem]",
+            // Vertical positioning
+            "data-[position*=top]:top-(--toast-inset)",
+            "data-[position*=bottom]:bottom-(--toast-inset)",
+            // Horizontal positioning
+            "data-[position*=left]:left-(--toast-inset)",
+            "data-[position*=right]:right-(--toast-inset)",
+            "data-[position*=center]:left-1/2 data-[position*=center]:-translate-x-1/2",
+          )}
         >
-          <ToastList position={position} />
+          <StackedToasts position={position} />
         </Toast.Viewport>
       </Toast.Portal>
     </Toast.Provider>
   );
 }
 
-function ToastList({ position }: { position: ToastPosition }) {
-  const toastManager = Toast.useToastManager();
-  const { toasts } = toastManager;
-
-  // Initialize the global toast manager
-  React.useEffect(() => {
-    setToastManager(toastManager);
-  }, [toastManager]);
-
+function StackedToasts({ position }: { position: ToastPosition }) {
+  const { toasts } = Toast.useToastManager();
   const isTop = position.startsWith("top");
 
-  // Determine swipe directions based on position
-  let swipeDirection:
-    | ("up" | "down" | "left" | "right")
-    | ("up" | "down" | "left" | "right")[];
-
-  switch (position) {
-    case "top-left":
-      swipeDirection = ["left", "up"]; // Can swipe left or up
-      break;
-    case "top-center":
-      swipeDirection = "up"; // Only swipe up
-      break;
-    case "top-right":
-      swipeDirection = ["right", "up"]; // Can swipe right or up
-      break;
-    case "bottom-left":
-      swipeDirection = ["left", "down"]; // Can swipe left or down
-      break;
-    case "bottom-center":
-      swipeDirection = "down"; // Only swipe down
-      break;
-    case "bottom-right":
-      swipeDirection = ["right", "down"]; // Can swipe right or down (default)
-      break;
-    default:
-      swipeDirection = ["right", "down"];
-  }
-
-  return toasts.map((toast) => {
-    const toastData = toast as ToastData;
-    const type = toastData.type || "default";
-
-    // Check if this is a custom JSX toast
-    const hasCustomJSX =
-      toastData.data &&
-      typeof toastData.data === "object" &&
-      "customJSX" in toastData.data;
-
-    return (
-      <Toast.Root
-        key={toast.id}
-        toast={toast}
-        swipeDirection={swipeDirection}
-        className={clsx(
-          // CSS variables
-          "[--gap:0.75rem] [--peek:0.75rem]",
-          "[--scale:calc(max(0,1-(var(--toast-index)*0.1)))]",
-          "[--shrink:calc(1-var(--scale))]",
-          "[--height:var(--toast-frontmost-height,var(--toast-height))]",
-          isTop
-            ? "[--offset-y:calc(var(--toast-offset-y)+(var(--toast-index)*var(--gap))+var(--toast-swipe-movement-y))]"
-            : "[--offset-y:calc(var(--toast-offset-y)*-1+(var(--toast-index)*var(--gap)*-1)+var(--toast-swipe-movement-y))]",
-          // Position
-          "absolute z-[calc(1000-var(--toast-index))] w-full",
-          isTop ? "top-0 right-0 left-0" : "right-0 bottom-0 left-0",
-          isTop ? "origin-top" : "origin-bottom",
-          // Default transform
-          isTop
-            ? "[transform:translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+(var(--toast-index)*var(--peek))+(var(--shrink)*var(--height))))_scale(var(--scale))]"
-            : "[transform:translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-(var(--toast-index)*var(--peek))-(var(--shrink)*var(--height))))_scale(var(--scale))]",
-          // Visual styles
-          "rounded-md border bg-clip-padding p-4 shadow-[0_6px_20px_0_oklch(0.18_0_0_/_0.12)] select-none",
-          "border-border/70",
-          // After element for spacing
-          'after:absolute after:left-0 after:h-[calc(var(--gap)+1px)] after:w-full after:content-[""]',
-          isTop ? "after:bottom-full" : "after:top-full",
-          // Opacity
-          "data-[ending-style]:opacity-0",
-          // Expanded state
-          "data-[expanded]:[transform:translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--offset-y)))]",
-          "data-[limited]:opacity-0",
-          // Starting animation
-          isTop
-            ? "data-[starting-style]:[transform:translateY(-150%)]"
-            : "data-[starting-style]:[transform:translateY(150%)]",
-          // Default ending (X button - no swipe)
-          isTop
-            ? "[&[data-ending-style]:not([data-limited]):not([data-swipe-direction])]:[transform:translateY(-150%)]"
-            : "[&[data-ending-style]:not([data-limited]):not([data-swipe-direction])]:[transform:translateY(150%)]",
-          // Swipe endings
-          "data-[ending-style]:data-[swipe-direction=down]:[transform:translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+150%))]",
-          "data-[expanded]:data-[ending-style]:data-[swipe-direction=down]:[transform:translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+150%))]",
-          "data-[ending-style]:data-[swipe-direction=left]:[transform:translateX(calc(var(--toast-swipe-movement-x)-150%))_translateY(var(--offset-y))]",
-          "data-[expanded]:data-[ending-style]:data-[swipe-direction=left]:[transform:translateX(calc(var(--toast-swipe-movement-x)-150%))_translateY(var(--offset-y))]",
-          "data-[ending-style]:data-[swipe-direction=right]:[transform:translateX(calc(var(--toast-swipe-movement-x)+150%))_translateY(var(--offset-y))]",
-          "data-[expanded]:data-[ending-style]:data-[swipe-direction=right]:[transform:translateX(calc(var(--toast-swipe-movement-x)+150%))_translateY(var(--offset-y))]",
-          "data-[ending-style]:data-[swipe-direction=up]:[transform:translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-150%))]",
-          "data-[expanded]:data-[ending-style]:data-[swipe-direction=up]:[transform:translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-150%))]",
-          // Height
-          "h-[var(--height)]",
-          "data-[expanded]:h-[var(--toast-height)]",
-          // Transitions
-          "[transition:transform_0.5s_cubic-bezier(0.22,1,0.36,1),opacity_0.5s,height_0.15s]",
-          // Type-based colors
-          {
-            "border-border bg-card text-card-foreground": type === "default",
-            "border-success-border bg-success text-success-foreground":
-              type === "success",
-            "border-danger-border bg-danger text-danger-foreground":
-              type === "error",
-            "border-warning-border bg-warning text-warning-foreground":
-              type === "warning",
-            "border-info-border bg-info text-info-foreground": type === "info",
-          },
-        )}
-      >
-        <Toast.Content
-          className={clsx(
-            "overflow-hidden transition-opacity duration-[250ms]",
-            "data-[behind]:opacity-0 data-[expanded]:opacity-100",
-          )}
-        >
-          {hasCustomJSX ? (
-            // Render custom JSX content
-            <div className="w-full">
-              {hasCustomJSX &&
-              toastData.data &&
-              typeof toastData.data === "object" &&
-              "customJSX" in toastData.data
-                ? (toastData.data as Record<string, React.ReactNode>).customJSX
-                : null}
-            </div>
-          ) : (
-            // Render standard toast content
-            <>
-              <Toast.Title className="text-[0.975rem] leading-5 font-medium" />
-              <Toast.Description className="text-[0.925rem] leading-5 text-gray-700 dark:text-gray-300" />
-              <Toast.Action className="ml-auto cursor-pointer text-xs font-medium underline-offset-2 hover:underline" />
-              <Toast.Close
-                className="text-muted-foreground hover:bg-accent/50 hover:text-foreground absolute top-2.5 right-2.5 flex h-6 w-6 items-center justify-center rounded-md border-none bg-transparent transition-colors duration-200"
-                aria-label="Close"
-              >
-                <XIcon className="h-4 w-4" />
-              </Toast.Close>
-            </>
-          )}
-        </Toast.Content>
-      </Toast.Root>
-    );
-  });
-}
-
-function XIcon(props: React.ComponentProps<"svg">) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-    >
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </svg>
+    <>
+      {toasts.map((toast) => (
+        <StackedToastItem
+          key={toast.id}
+          toast={toast as ToastData}
+          position={position}
+          swipeDirection={
+            position.includes("center")
+              ? [isTop ? "up" : "down"]
+              : position.includes("left")
+                ? ["left", isTop ? "up" : "down"]
+                : ["right", isTop ? "up" : "down"]
+          }
+        />
+      ))}
+    </>
   );
 }
 
-export { Toast };
+interface StackedToastItemProps {
+  toast: ToastData;
+  position: ToastPosition;
+  swipeDirection:
+    | ("up" | "down" | "left" | "right")
+    | ("up" | "down" | "left" | "right")[];
+}
+
+function StackedToastItem({
+  toast,
+  position,
+  swipeDirection,
+}: StackedToastItemProps) {
+  // Check if this is a grouped toast
+  const isGrouped =
+    toast.data &&
+    typeof toast.data === "object" &&
+    "isGrouped" in toast.data &&
+    (toast.data as GroupedToastData).isGrouped === true;
+
+  // For grouped toasts, render with GroupedToastContent
+  if (isGrouped) {
+    return (
+      <GroupedToastRoot
+        toast={toast}
+        position={position}
+        swipeDirection={swipeDirection}
+        data={toast.data as GroupedToastData}
+      />
+    );
+  }
+
+  const type = toast.type || "default";
+
+  // Check if this is a custom JSX toast
+  const hasCustomJSX =
+    toast.data && typeof toast.data === "object" && "customJSX" in toast.data;
+
+  // Check if close button should be shown (defaults to true)
+  const showCloseButton =
+    toast.data &&
+    typeof toast.data === "object" &&
+    "showCloseButton" in toast.data &&
+    (toast.data as Record<string, unknown>).showCloseButton === false
+      ? false
+      : true;
+
+  const Icon =
+    type !== "default" ? TOAST_ICONS[type as keyof typeof TOAST_ICONS] : null;
+
+  return (
+    <Toast.Root
+      toast={toast}
+      swipeDirection={swipeDirection}
+      data-slot="toast"
+      data-position={position}
+      className={cn(
+        TOAST_CSS_VARIABLES,
+        TOAST_POSITION_CLASSES,
+        TOAST_TRANSFORM_CLASSES,
+        TOAST_ANIMATION_CLASSES,
+        TOAST_VISUAL_CLASSES,
+      )}
+    >
+      <Toast.Content
+        data-slot="toast-content"
+        className={cn(
+          "flex gap-3 overflow-hidden px-3.5 py-3 text-sm",
+          showCloseButton ? "items-start" : "items-center",
+          "transition-opacity duration-250",
+          "data-behind:pointer-events-none data-behind:opacity-0",
+          "data-expanded:pointer-events-auto data-expanded:opacity-100",
+        )}
+      >
+        {hasCustomJSX ? (
+          <div className="w-full">
+            {(toast.data as Record<string, React.ReactNode>).customJSX}
+          </div>
+        ) : (
+          <>
+            {Icon && (
+              <div
+                data-slot="toast-icon"
+                className={cn(
+                  "[&>svg]:size-4 [&>svg]:shrink-0",
+                  showCloseButton && "mt-0.5",
+                )}
+              >
+                <HugeiconsIcon
+                  icon={Icon}
+                  strokeWidth={2}
+                  className={cn(
+                    "in-data-[type=success]:text-success-foreground",
+                    "in-data-[type=error]:text-danger-foreground",
+                    "in-data-[type=warning]:text-warning-foreground",
+                    "in-data-[type=info]:text-info-foreground",
+                    "in-data-[type=loading]:text-muted-foreground in-data-[type=loading]:animate-spin",
+                  )}
+                />
+              </div>
+            )}
+            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+              <Toast.Title
+                data-slot="toast-title"
+                className="text-sm leading-5 font-medium"
+              />
+              <Toast.Description
+                data-slot="toast-description"
+                className="text-muted-foreground text-sm leading-5"
+              />
+              {showCloseButton && (
+                <Toast.Action
+                  data-slot="toast-action"
+                  className={cn(
+                    buttonVariants({ variant: "outline", size: "xs" }),
+                    "mt-1.5 w-fit",
+                  )}
+                />
+              )}
+            </div>
+            {!showCloseButton && (
+              <Toast.Action
+                data-slot="toast-action"
+                className={buttonVariants({ variant: "outline", size: "xs" })}
+              />
+            )}
+            {showCloseButton && (
+              <Toast.Close
+                data-slot="toast-close"
+                className="text-muted-foreground hover:bg-accent/50 hover:text-foreground -mt-1 -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md border-none bg-transparent transition-colors duration-200"
+                aria-label="Close"
+              >
+                <HugeiconsIcon
+                  icon={Cancel01Icon}
+                  strokeWidth={2}
+                  className="size-4"
+                />
+              </Toast.Close>
+            )}
+          </>
+        )}
+      </Toast.Content>
+    </Toast.Root>
+  );
+}
+
+// Anchored Toast Provider
+interface AnchoredToastProviderProps {
+  children: React.ReactNode;
+  limit?: number;
+  timeout?: number;
+  container?: HTMLElement | React.RefObject<HTMLElement | null> | null;
+}
+
+export function AnchoredToastProvider({
+  children,
+  limit = 5,
+  timeout = 2000,
+  container,
+}: AnchoredToastProviderProps) {
+  return (
+    <Toast.Provider
+      limit={limit}
+      timeout={timeout}
+      toastManager={anchoredToastManager}
+    >
+      {children}
+      <Toast.Portal container={container}>
+        <Toast.Viewport data-slot="toast-viewport" className="outline-none">
+          <AnchoredToasts />
+        </Toast.Viewport>
+      </Toast.Portal>
+    </Toast.Provider>
+  );
+}
+
+function AnchoredToasts() {
+  const { toasts } = Toast.useToastManager();
+
+  return (
+    <>
+      {toasts.map((toast) => {
+        const toastData = toast as ToastData;
+        if (!toastData.positionerProps?.anchor) {
+          return null;
+        }
+        return <AnchoredToastItem key={toast.id} toast={toastData} />;
+      })}
+    </>
+  );
+}
+
+function AnchoredToastItem({ toast }: { toast: ToastData }) {
+  const showArrow = Boolean(
+    toast.data &&
+    typeof toast.data === "object" &&
+    "arrow" in toast.data &&
+    (toast.data as Record<string, unknown>).arrow === true,
+  );
+
+  return (
+    <Toast.Positioner
+      toast={toast}
+      data-slot="toast-positioner"
+      className="z-[calc(1000-var(--toast-index))]"
+    >
+      <Toast.Root
+        toast={toast}
+        data-slot="toast"
+        className={cn(
+          "flex w-max origin-(--transform-origin) flex-col rounded-md",
+          "border-border bg-card text-card-foreground border",
+          "px-3 py-2 text-sm shadow-lg",
+          "transition-all duration-200",
+          "data-starting-style:scale-95 data-starting-style:opacity-0",
+          "data-ending-style:scale-95 data-ending-style:opacity-0",
+        )}
+      >
+        {showArrow && (
+          <Toast.Arrow
+            data-slot="toast-arrow"
+            className="fill-card [&>path:first-child]:fill-card [&>path:not(:first-child)]:stroke-border"
+          />
+        )}
+        <Toast.Content data-slot="toast-content">
+          <Toast.Title
+            data-slot="toast-title"
+            className="text-sm font-medium"
+          />
+          <Toast.Description
+            data-slot="toast-description"
+            className="text-muted-foreground text-sm"
+          />
+        </Toast.Content>
+      </Toast.Root>
+    </Toast.Positioner>
+  );
+}
+
+// Grouped Toast Components
+
+// Feature detection for calc-size() support (Chrome 129+, Edge 129+)
+// Used to conditionally render different DOM structures for height animation
+const supportsCalcSize =
+  typeof CSS !== "undefined" && CSS.supports("height", "calc-size(auto, size)");
+
+interface GroupedToastRootProps {
+  toast: ToastData;
+  position: ToastPosition;
+  swipeDirection:
+    | ("up" | "down" | "left" | "right")
+    | ("up" | "down" | "left" | "right")[];
+  data: GroupedToastData;
+}
+
+/** Helper to toggle expand/collapse for a grouped toast */
+function toggleGroupExpanded(toastId: string) {
+  // Find the groupId from toastId
+  let groupId: string | undefined;
+  for (const [gId, tId] of groupToToastMap.entries()) {
+    if (tId === toastId) {
+      groupId = gId;
+      break;
+    }
+  }
+  if (!groupId) return;
+
+  const data = groupDataMap.get(groupId);
+  if (!data) return;
+
+  const updatedData: GroupedToastData = {
+    ...data,
+    isExpanded: !data.isExpanded,
+  };
+  groupDataMap.set(groupId, updatedData);
+  toastManager.update(toastId, { data: updatedData });
+}
+
+function GroupedToastRoot({
+  toast,
+  position,
+  swipeDirection,
+  data,
+}: GroupedToastRootProps) {
+  const toastRootRef = React.useRef<HTMLDivElement>(null);
+  const isTop = position.startsWith("top");
+
+  // Sync popover open state with toast data
+  const handlePopoverOpenChange = React.useCallback(
+    (open: boolean, eventDetails: Popover.Root.ChangeEventDetails) => {
+      // Block all close reasons except escape key (accessibility pattern)
+      // State is managed via explicit Show/Hide button toggle
+      if (!open && eventDetails.reason !== "escape-key") {
+        eventDetails.cancel();
+        return;
+      }
+      if (open !== data.isExpanded) {
+        toggleGroupExpanded(toast.id);
+      }
+    },
+    [toast.id, data.isExpanded],
+  );
+
+  return (
+    <Toast.Root
+      ref={toastRootRef}
+      toast={toast}
+      swipeDirection={swipeDirection}
+      data-slot="toast"
+      data-position={position}
+      className={cn(
+        TOAST_CSS_VARIABLES,
+        TOAST_POSITION_CLASSES,
+        TOAST_TRANSFORM_CLASSES,
+        TOAST_ANIMATION_CLASSES,
+        TOAST_VISUAL_CLASSES,
+        "overflow-visible", // Additional class for grouped toasts (popover needs to overflow)
+      )}
+    >
+      <Toast.Content
+        data-slot="toast-content"
+        className={cn(
+          "text-sm",
+          "transition-[opacity,height] duration-300",
+          "data-behind:pointer-events-none data-behind:opacity-0",
+          "data-expanded:pointer-events-auto data-expanded:opacity-100",
+        )}
+      >
+        <GroupedToastSummaryOrSingle data={data} toastId={toast.id} />
+      </Toast.Content>
+      {/* Expanded cards popover - uses CSS positioning to maintain stable layout */}
+      <Popover.Root
+        open={data.isExpanded}
+        onOpenChange={handlePopoverOpenChange}
+      >
+        <Popover.Portal container={toastRootRef}>
+          <Popover.Positioner
+            anchor={toastRootRef}
+            side={isTop ? "bottom" : "top"}
+            align="start"
+            sideOffset={8}
+          >
+            <Popover.Popup
+              data-slot="expanded-cards-popup"
+              className={cn(
+                "absolute w-(--anchor-width)",
+                // Override transform origin (align="start" sets it to left edge)
+                isTop
+                  ? "top-full mt-2 origin-top"
+                  : "bottom-full mb-2 origin-bottom",
+                // Only transition opacity and scale for enter/exit
+                "ease-out-cubic transition-[opacity,scale] duration-200",
+                "data-starting-style:scale-95 data-starting-style:opacity-0",
+                "data-ending-style:scale-95 data-ending-style:opacity-0",
+              )}
+            >
+              <ExpandedCardsContainer data={data} isTop={isTop} />
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Portal>
+      </Popover.Root>
+    </Toast.Root>
+  );
+}
+
+interface GroupedToastSummaryOrSingleProps {
+  data: GroupedToastData;
+  toastId: string;
+}
+
+function GroupedToastSummaryOrSingle({
+  data,
+  toastId,
+}: GroupedToastSummaryOrSingleProps) {
+  // Total items across both arrays
+  const totalPending = data.items.length;
+  const totalCompleted = (data.completedItems ?? []).length;
+  const totalItems = totalPending + totalCompleted;
+
+  // Show single-item view when there's exactly 1 total item (pending OR completed)
+  // and we haven't shown "All complete" mode yet
+  const isSingle = totalItems === 1 && !data.hasShownAllComplete;
+
+  // Get the single item to display (prefer pending, fallback to completed)
+  const singleItem = data.items[0] ?? data.completedItems?.[0];
+
+  // Modern browsers (Chrome 129+): single element with key switching
+  // Height animates from CSS var to calc-size(auto, size)
+  if (supportsCalcSize) {
+    return (
+      <div
+        key={isSingle ? "single" : "summary"}
+        className={cn(
+          "ease-out-cubic duration-200",
+          "transition-[height,opacity,filter,scale]",
+          "overflow-clip",
+          // Height: start from CSS var, animate to intrinsic size
+          "h-[calc-size(auto,size)]",
+          "starting:h-(--toast-calc-height)",
+          // Opacity/blur/scale entry animation
+
+          "starting:scale-95 starting:opacity-0 starting:blur-[2px]",
+          "blur-0 scale-100 opacity-100",
+        )}
+      >
+        {isSingle && singleItem ? (
+          <GroupedSingleItemContent
+            item={singleItem}
+            showCloseButton={singleItem.showCloseButton}
+          />
+        ) : (
+          <GroupedToastSummaryContent
+            data={data}
+            onToggle={() => toggleGroupExpanded(toastId)}
+          />
+        )}
+      </div>
+    );
+  }
+
+  // Fallback (Firefox/Safari): two elements with grid-based height animation
+  return (
+    <>
+      {/* Single item view */}
+      <div
+        className={cn(
+          "ease-out-cubic grid duration-200",
+          "transition-[grid-template-rows,opacity,filter,scale]",
+          isSingle
+            ? "blur-0 scale-100 grid-rows-[1fr] opacity-100"
+            : "pointer-events-none scale-95 grid-rows-[0fr] opacity-0 blur-[2px]",
+        )}
+      >
+        <div className="overflow-hidden">
+          {singleItem && (
+            <GroupedSingleItemContent
+              item={singleItem}
+              showCloseButton={singleItem.showCloseButton}
+            />
+          )}
+        </div>
+      </div>
+
+      {/* Summary view */}
+      <div
+        className={cn(
+          "ease-out-cubic grid duration-200",
+          "transition-[grid-template-rows,opacity,filter,scale]",
+          !isSingle
+            ? "blur-0 scale-100 grid-rows-[1fr] opacity-100"
+            : "pointer-events-none scale-95 grid-rows-[0fr] opacity-0 blur-[2px]",
+        )}
+      >
+        <div className="overflow-hidden">
+          <GroupedToastSummaryContent
+            data={data}
+            onToggle={() => toggleGroupExpanded(toastId)}
+          />
+        </div>
+      </div>
+    </>
+  );
+}
+
+interface GroupedSingleItemContentProps {
+  item: GroupedToastItem;
+  showCloseButton?: boolean;
+}
+
+function GroupedSingleItemContent({
+  item,
+  showCloseButton = true,
+}: GroupedSingleItemContentProps) {
+  const type = item.type || "default";
+  const Icon =
+    type !== "default" ? TOAST_ICONS[type as keyof typeof TOAST_ICONS] : null;
+
+  // When close button exists: action underneath text, items-start
+  // When no close button: action on right side, items-center
+  return (
+    <div
+      className={cn(
+        "flex gap-3 px-3.5 py-3",
+        showCloseButton ? "items-start" : "items-center",
+      )}
+    >
+      {Icon && (
+        <div
+          data-slot="toast-icon"
+          className={cn(
+            "[&>svg]:size-4 [&>svg]:shrink-0",
+            showCloseButton && "mt-0.5",
+          )}
+        >
+          <HugeiconsIcon
+            icon={Icon}
+            strokeWidth={2}
+            className={toastIconVariants({ type })}
+          />
+        </div>
+      )}
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        {item.title && (
+          <span className="text-sm leading-5 font-medium">{item.title}</span>
+        )}
+        {item.description && (
+          <span className="text-muted-foreground text-sm leading-5">
+            {item.description}
+          </span>
+        )}
+        {showCloseButton && item.action && (
+          <div className="mt-1.5">
+            <button
+              onClick={item.action.onClick}
+              className={buttonVariants({ variant: "outline", size: "xs" })}
+            >
+              {item.action.label}
+            </button>
+          </div>
+        )}
+      </div>
+      {!showCloseButton && item.action && (
+        <button
+          onClick={item.action.onClick}
+          className={buttonVariants({ variant: "outline", size: "xs" })}
+        >
+          {item.action.label}
+        </button>
+      )}
+      {showCloseButton && (
+        <Toast.Close
+          data-slot="toast-close"
+          className="text-muted-foreground hover:bg-accent/50 hover:text-foreground -mt-1 -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md border-none bg-transparent transition-colors duration-200"
+          aria-label="Close"
+        >
+          <HugeiconsIcon
+            icon={Cancel01Icon}
+            strokeWidth={2}
+            className="size-4"
+          />
+        </Toast.Close>
+      )}
+    </div>
+  );
+}
+
+interface GroupedToastSummaryContentProps {
+  data: GroupedToastData;
+  onToggle: () => void;
+}
+
+function GroupedToastSummaryContent({
+  data,
+  onToggle,
+}: GroupedToastSummaryContentProps) {
+  // Compute counts - use historical counts for accuracy (don't decrement on dismiss)
+  const loadingCount = data.items.filter(
+    (item) => item.type === "loading",
+  ).length;
+
+  // Use historical counts for type breakdown (persist after items dismiss)
+  const { success: successCount, error: errorCount, warning: warningCount, info: infoCount } = data.historicalCounts;
+  const completedCount = successCount + errorCount + warningCount + infoCount;
+  const totalCount = loadingCount + completedCount;
+
+  // Determine icon type based on state
+  let iconType: "loading" | "success" | "error" | "warning";
+  if (loadingCount > 0) {
+    iconType = "loading";
+  } else if (errorCount === 0) {
+    iconType = "success"; // All succeeded
+  } else if (successCount === 0 && warningCount === 0 && infoCount === 0) {
+    iconType = "error"; // All failed
+  } else {
+    iconType = "warning"; // Mixed results
+  }
+  const Icon = TOAST_ICONS[iconType];
+
+  const summaryText =
+    typeof data.summary === "function"
+      ? data.summary({
+          loadingCount,
+          completedCount,
+          totalCount,
+          successCount,
+          errorCount,
+          warningCount,
+          infoCount,
+        })
+      : data.summary;
+
+  const buttonLabel = data.isExpanded
+    ? data.action.expandedLabel
+    : data.action.label;
+
+  return (
+    <div className="flex items-center gap-3 px-3.5 py-3">
+      <div data-slot="toast-icon" className="[&>svg]:size-4 [&>svg]:shrink-0">
+        <HugeiconsIcon
+          icon={Icon}
+          strokeWidth={2}
+          className={toastIconVariants({ type: iconType })}
+        />
+      </div>
+      <span className="flex-1 font-medium">{summaryText}</span>
+      {/* Show button when in group mode (historical or current expandable items) */}
+      {(data.hasShownAllComplete ||
+        data.items.length > 1 ||
+        (data.completedItems ?? []).length > 0) && (
+        <button
+          onClick={onToggle}
+          aria-expanded={data.isExpanded}
+          className={buttonVariants({ variant: "outline", size: "xs" })}
+        >
+          {buttonLabel}
+        </button>
+      )}
+    </div>
+  );
+}
+
+interface ExpandedCardsContainerProps {
+  data: GroupedToastData;
+  isTop: boolean;
+}
+
+/** Container for expanded pending/completed item cards with enter/exit animations */
+function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
+  const completedCount = (data.completedItems ?? []).length;
+  const pendingCount = data.items.length;
+  const hasCompletedItems = completedCount > 0;
+
+  // Show pending card when:
+  // - There are 2+ pending items (original behavior), OR
+  // - There's at least 1 pending item AND completed items exist, OR
+  // - There's at least 1 pending item AND we've been in group mode (historical context)
+  const hasPendingItems =
+    pendingCount > 1 ||
+    (pendingCount >= 1 && hasCompletedItems) ||
+    (pendingCount >= 1 && data.hasShownAllComplete);
+
+  if (!hasCompletedItems && !hasPendingItems) {
+    return null;
+  }
+
+  return (
+    <div
+      data-slot="expanded-cards-container"
+      className={cn(
+        // Flex column with gap, reversed for bottom position
+        "flex gap-2",
+        isTop ? "flex-col" : "flex-col-reverse",
+      )}
+    >
+      <AnimatePresence initial={false} mode="popLayout">
+        {/* Pending items card (closer to summary toast) */}
+        {hasPendingItems && (
+          <m.div
+            key="pending-card"
+            layout
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95, y: -20 }}
+            transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+          >
+            <GroupedToastCard data={data} isTop={isTop} />
+          </m.div>
+        )}
+
+        {/* Completed items card (further from summary toast) */}
+        {hasCompletedItems && (
+          <m.div
+            key="completed-card"
+            layout
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+          >
+            <CompletedItemsCard items={data.completedItems} isTop={isTop} />
+          </m.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+interface GroupedToastCardProps {
+  data: GroupedToastData;
+  isTop: boolean;
+}
+
+function GroupedToastCard({ data, isTop }: GroupedToastCardProps) {
+  const cardRef = React.useRef<HTMLDivElement>(null);
+
+  // Use native event listeners to stop propagation at the capture phase
+  React.useEffect(() => {
+    const card = cardRef.current;
+    if (!card) return;
+
+    const stopPropagation = (e: TouchEvent) => {
+      e.stopPropagation();
+    };
+
+    // Stop all touch events from reaching the toast's swipe handler
+    card.addEventListener("touchstart", stopPropagation, { passive: true });
+    card.addEventListener("touchmove", stopPropagation, { passive: true });
+    card.addEventListener("touchend", stopPropagation, { passive: true });
+
+    return () => {
+      card.removeEventListener("touchstart", stopPropagation);
+      card.removeEventListener("touchmove", stopPropagation);
+      card.removeEventListener("touchend", stopPropagation);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={cardRef}
+      data-slot="grouped-toast-card"
+      data-swipe-ignore
+      className={cn(
+        "max-h-64 w-full overflow-y-auto overscroll-contain",
+        "border-border bg-card text-card-foreground rounded-lg border",
+        "shadow-lg",
+        "animate-in fade-in-0 zoom-in-95",
+        isTop ? "slide-in-from-top-2" : "slide-in-from-bottom-2",
+      )}
+    >
+      <AnimatePresence initial={false}>
+        {data.items.map((item, index) => (
+          <m.div
+            key={item.id}
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+            className="overflow-hidden"
+          >
+            <GroupedToastCardItem item={item} showSeparator={index > 0} />
+          </m.div>
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+interface GroupedToastCardItemProps {
+  item: GroupedToastItem;
+  showSeparator: boolean;
+}
+
+function GroupedToastCardItem({
+  item,
+  showSeparator,
+}: GroupedToastCardItemProps) {
+  const type = item.type || "default";
+  const Icon =
+    type !== "default" ? TOAST_ICONS[type as keyof typeof TOAST_ICONS] : null;
+
+  return (
+    <>
+      {showSeparator && (
+        <div
+          className="bg-border mx-2 h-px"
+          data-slot="grouped-toast-separator"
+        />
+      )}
+      <div
+        data-slot="grouped-toast-card-item"
+        className="flex items-center gap-3 px-3.5 py-3 text-sm"
+      >
+        {Icon && (
+          <div
+            data-slot="toast-icon"
+            className="[&>svg]:size-4 [&>svg]:shrink-0"
+          >
+            <HugeiconsIcon
+              icon={Icon}
+              strokeWidth={2}
+              className={toastIconVariants({ type })}
+            />
+          </div>
+        )}
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          {item.title && (
+            <span className="leading-5 font-medium">{item.title}</span>
+          )}
+          {item.description && (
+            <span className="text-muted-foreground leading-5">
+              {item.description}
+            </span>
+          )}
+        </div>
+        {item.action && (
+          <button
+            onClick={item.action.onClick}
+            className={buttonVariants({ variant: "outline", size: "xs" })}
+          >
+            {item.action.label}
+          </button>
+        )}
+      </div>
+    </>
+  );
+}
+
+// Completed Items Components
+interface CompletedItemRowProps {
+  item: GroupedToastItem;
+  showSeparator: boolean;
+}
+
+function CompletedItemRow({ item, showSeparator }: CompletedItemRowProps) {
+  const type = item.type || "success";
+  const Icon =
+    type !== "default" ? TOAST_ICONS[type as keyof typeof TOAST_ICONS] : null;
+
+  // Use item's duration or default for progress bar animation
+  const dismissDuration = item.duration ?? GROUP_ITEM_DISMISS_DURATION;
+  const animationStyle = {
+    "--dismiss-duration": `${dismissDuration}ms`,
+  } as React.CSSProperties;
+
+  return (
+    <>
+      {showSeparator && (
+        <div
+          className="bg-border h-px w-full"
+          data-slot="completed-item-separator"
+        />
+      )}
+      <div
+        data-slot="completed-item-row"
+        className="relative flex items-center gap-3 overflow-hidden px-3.5 py-3 text-sm"
+        style={animationStyle}
+      >
+        {/* Progress bar background (fills left-to-right) */}
+        <div
+          data-slot="completed-item-progress"
+          className={cn(
+            "bg-card absolute inset-0 origin-left",
+            "animate-[progress-fill_var(--dismiss-duration)_linear_forwards]",
+          )}
+        />
+
+        {/* Content layer (above progress bar) */}
+        <div className="relative z-10 flex w-full items-center gap-3">
+          {Icon && (
+            <div
+              data-slot="toast-icon"
+              className="[&>svg]:size-4 [&>svg]:shrink-0"
+            >
+              <HugeiconsIcon
+                icon={Icon}
+                strokeWidth={2}
+                className={toastIconVariants({ type })}
+              />
+            </div>
+          )}
+
+          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+            {item.title && (
+              <span className="leading-5 font-medium">{item.title}</span>
+            )}
+            {item.description && (
+              <span className="text-muted-foreground leading-5">
+                {item.description}
+              </span>
+            )}
+          </div>
+
+          {/* Action button on right */}
+          {item.action && (
+            <button
+              onClick={item.action.onClick}
+              className={buttonVariants({ variant: "outline", size: "xs" })}
+            >
+              {item.action.label}
+            </button>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
+interface CompletedItemsCardProps {
+  items: GroupedToastItem[];
+  isTop: boolean;
+}
+
+function CompletedItemsCard({ items, isTop }: CompletedItemsCardProps) {
+  const cardRef = React.useRef<HTMLDivElement>(null);
+
+  // Touch event isolation (same pattern as GroupedToastCard)
+  React.useEffect(() => {
+    const card = cardRef.current;
+    if (!card) return;
+
+    const stopPropagation = (e: TouchEvent) => {
+      e.stopPropagation();
+    };
+
+    card.addEventListener("touchstart", stopPropagation, { passive: true });
+    card.addEventListener("touchmove", stopPropagation, { passive: true });
+    card.addEventListener("touchend", stopPropagation, { passive: true });
+
+    return () => {
+      card.removeEventListener("touchstart", stopPropagation);
+      card.removeEventListener("touchmove", stopPropagation);
+      card.removeEventListener("touchend", stopPropagation);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={cardRef}
+      data-slot="completed-items-card"
+      data-swipe-ignore
+      className={cn(
+        "max-h-48 w-full overflow-y-auto overscroll-contain",
+        "border-border bg-muted text-card-foreground rounded-lg border",
+        "shadow-lg",
+        "animate-in fade-in-0 zoom-in-95",
+        isTop ? "slide-in-from-top-2" : "slide-in-from-bottom-2",
+      )}
+    >
+      <AnimatePresence initial={false}>
+        {items.map((item, index) => (
+          <m.div
+            key={item.id}
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+            className="overflow-hidden"
+          >
+            <CompletedItemRow item={item} showSeparator={index > 0} />
+          </m.div>
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// Exports
+export { Toast, toastManager, anchoredToastManager };

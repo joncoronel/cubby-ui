@@ -57,47 +57,71 @@ Group multiple related toasts into a single summary toast with an expandable car
 
 ## API Reference
 
-The Toast component is built on top of [Base UI's Toast](https://base-ui.com/components/toast). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+The Toast component is built on top of [Base UI's Toast](https://base-ui.com/react/components/toast). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
 
-For the complete Base UI API, see the [Base UI Toast documentation](https://base-ui.com/components/toast).
+For the complete Base UI API, see the [Base UI Toast documentation](https://base-ui.com/react/components/toast).
 
-### toast() Function
+### Props
 
-The primary API is the `toast()` function, which programmatically displays toast notifications. It supports two call signatures:
+#### toast()
 
-**1. Object-based (recommended)**
-
-```tsx
-toast({
-  title: "Success",
-  description: "Your changes have been saved",
-  type: "success",
-});
-```
-
-**2. JSX-based**
+Programmatically displays toast notifications. Supports object-based and JSX-based call signatures.
 
 ```tsx
+// Object-based (recommended)
+toast({ title: "Success", description: "Your changes have been saved", type: "success" });
+
+// JSX-based
 toast(<div>Custom JSX content</div>, { type: "info" });
 ```
 
-### ToastOptions
+<ApiPropsList>
 
-| Prop          | Type                                                       | Default     | Description                                               |
-| ------------- | ---------------------------------------------------------- | ----------- | --------------------------------------------------------- |
-| `title`       | `string`                                                   | -           | Toast title                                               |
-| `description` | `string`                                                   | -           | Toast description                                         |
-| `type`        | `"default" \| "success" \| "error" \| "warning" \| "info"` | `"default"` | Visual type of the toast                                  |
-| `duration`    | `number`                                                   | `5000`      | Duration in milliseconds before auto-dismissal            |
-| `priority`    | `"low" \| "high"`                                          | `"low"`     | Display priority (high priority toasts appear at the top) |
-| `action`      | `{ label: string; onClick: () => void }`                   | -           | Action button configuration                               |
-| `data`        | `TData`                                                    | -           | Custom data attached to the toast                         |
-| `onClose`     | `() => void`                                               | -           | Callback when toast closes                                |
-| `onRemove`    | `() => void`                                               | -           | Callback when toast is removed from DOM                   |
+<ApiProp name="title" fullType="string">
+  Toast title.
+</ApiProp>
 
-### Helper Methods
+<ApiProp name="description" fullType="string">
+  Toast description.
+</ApiProp>
 
-Type-specific helper methods for common toast types:
+<ApiProp name="type" fullType='"default" | "success" | "error" | "warning" | "info"' defaultValue='"default"'>
+  Visual type of the toast.
+</ApiProp>
+
+<ApiProp name="duration" fullType="number">
+  Duration in milliseconds before auto-dismissal. Uses provider's `timeout` if not specified.
+</ApiProp>
+
+<ApiProp name="priority" fullType='"low" | "high"' defaultValue='"low"'>
+  Display priority. High priority toasts appear at the top of the stack.
+</ApiProp>
+
+<ApiProp name="action" fullType="{ label: string; onClick: () => void }">
+  Action button configuration.
+</ApiProp>
+
+<ApiProp name="data" fullType="TData">
+  Custom data attached to the toast.
+</ApiProp>
+
+<ApiProp name="onClose" fullType="() => void">
+  Callback when toast closes.
+</ApiProp>
+
+<ApiProp name="onRemove" fullType="() => void">
+  Callback when toast is removed from DOM.
+</ApiProp>
+
+<ApiProp name="showCloseButton" fullType="boolean" defaultValue="true">
+  Whether to show the close button.
+</ApiProp>
+
+</ApiPropsList>
+
+#### Helper Methods
+
+Type-specific methods for common toast types and programmatic control.
 
 ```tsx
 // Type variants
@@ -106,28 +130,30 @@ toast.error({ title: "Failed" });
 toast.warning({ title: "Warning" });
 toast.info({ title: "Info" });
 
-// Promise handling (simple)
-toast.promise(fetchData(), {
-  loading: "Loading...",
-  success: "Data loaded!",
-  error: "Failed to load",
+// Async operations - toast.promise() handles loading/success/error automatically
+toast.promise(saveData(), {
+  loading: "Saving...",
+  success: "Saved!",
+  error: "Failed to save",
 });
 
-// Promise handling (with title and description)
+// With dynamic messages based on result
 toast.promise(fetchData(), {
   loading: { title: "Loading...", description: "Fetching data" },
   success: (data) => ({ title: "Success!", description: `Loaded ${data.name}` }),
   error: (err) => ({ title: "Error", description: err.message }),
 });
 
-// Programmatic control
+// Manual control (for advanced use cases)
+// All toast methods return an ID that can be used for updates or dismissal
+const toastId = toast({ title: "Processing..." });
+toast.update(toastId, { title: "Done!", type: "success" });
 toast.dismiss(toastId);
-toast.update(toastId, { title: "Updated" });
 ```
 
-### Anchored Toasts
+#### toast.anchored()
 
-Show toasts anchored to a specific element:
+Shows toasts anchored to a specific element, useful for contextual feedback like "Copied" confirmations. Inherits all base toast options except `type`.
 
 ```tsx
 toast.anchored({
@@ -138,20 +164,42 @@ toast.anchored({
   arrow: true,
   duration: 2000,
 });
+
+// Dismiss an anchored toast
+toast.dismissAnchored(toastId);
 ```
 
-| Prop          | Type                                     | Default    | Description                      |
-| ------------- | ---------------------------------------- | ---------- | -------------------------------- |
-| `anchor`      | `Element \| RefObject<Element>`          | -          | Element to anchor the toast to   |
-| `side`        | `"top" \| "bottom" \| "left" \| "right"` | `"top"`    | Side of anchor to position toast |
-| `sideOffset`  | `number`                                 | `8`        | Offset from anchor               |
-| `align`       | `"start" \| "center" \| "end"`           | `"center"` | Alignment along the anchor       |
-| `alignOffset` | `number`                                 | `0`        | Offset for alignment             |
-| `arrow`       | `boolean`                                | `false`    | Show arrow pointing to anchor    |
+<ApiPropsList>
 
-### Grouped Toasts
+<ApiProp name="anchor" fullType="Element | RefObject<Element | null>">
+  **Required.** Element or ref to anchor the toast to.
+</ApiProp>
 
-Group multiple related toasts into a single collapsible summary. When only one item exists, it renders as a normal toast. When multiple items share the same `groupId`, they collapse into a summary with a "Show" button that reveals an expandable card.
+<ApiProp name="side" fullType='"top" | "bottom" | "left" | "right"' defaultValue='"top"'>
+  Side of anchor to position toast.
+</ApiProp>
+
+<ApiProp name="sideOffset" fullType="number" defaultValue="8">
+  Offset from anchor in pixels.
+</ApiProp>
+
+<ApiProp name="align" fullType='"start" | "center" | "end"'>
+  Alignment along the anchor edge.
+</ApiProp>
+
+<ApiProp name="alignOffset" fullType="number">
+  Offset for alignment in pixels.
+</ApiProp>
+
+<ApiProp name="arrow" fullType="boolean" defaultValue="false">
+  Show arrow pointing to anchor.
+</ApiProp>
+
+</ApiPropsList>
+
+#### toast.grouped()
+
+Groups multiple related toasts into a single collapsible summary. When only one item exists, it renders as a normal toast. When multiple items share the same `groupId`, they collapse into a summary with a "Show" button that reveals an expandable card.
 
 ```tsx
 toast.grouped({
@@ -164,20 +212,71 @@ toast.grouped({
 });
 ```
 
-#### GroupedToastOptions
+<ApiPropsList>
 
-| Prop           | Type                                                               | Default  | Description                                        |
-| -------------- | ------------------------------------------------------------------ | -------- | -------------------------------------------------- |
-| `groupId`      | `string`                                                           | -        | **Required.** Identifier for the group             |
-| `title`        | `string`                                                           | -        | Title of this item                                 |
-| `description`  | `string`                                                           | -        | Description of this item                           |
-| `type`         | `"default" \| "loading" \| "success" \| "error" \| "warning" \| "info"` | `"default"` | Visual type (loading shows spinner)            |
-| `action`       | `{ label: string; onClick: () => void }`                           | -        | Action button for this item                        |
-| `groupSummary` | `string \| ((counts: GroupSummaryCounts) => string)` | - | **Required.** Summary text when multiple items. `GroupSummaryCounts` has `loadingCount`, `completedCount`, and `totalCount`. |
-| `groupAction`  | `{ label: string; expandedLabel?: string }`                        | `{ label: "Show", expandedLabel: "Hide" }` | Toggle button labels |
-| `duration`     | `number`                                                           | `5000` for loading | For non-loading: group auto-dismiss (resets on new item, pauses on hover). For loading: progress bar duration after success. |
+<ApiProp name="groupId" fullType="string">
+  **Required.** Identifier for the group. Items with the same `groupId` are grouped together.
+</ApiProp>
 
-#### Helper Methods
+<ApiProp name="title" fullType="string">
+  Title of this item.
+</ApiProp>
+
+<ApiProp name="description" fullType="string">
+  Description of this item.
+</ApiProp>
+
+<ApiProp name="type" fullType='"default" | "loading" | "success" | "error" | "warning" | "info"' defaultValue='"default"'>
+  Visual type. Use `"loading"` for in-progress operations (shows spinner).
+</ApiProp>
+
+<ApiProp name="action" fullType="{ label: string; onClick: () => void }">
+  Action button for this item.
+</ApiProp>
+
+<ApiProp name="groupSummary" fullType="string | ((counts: GroupSummaryCounts) => string)">
+  **Required.** Summary text when multiple items exist. Can be a string or function receiving counts.
+</ApiProp>
+
+<ApiProp name="groupAction" fullType="{ label: string; expandedLabel?: string }" defaultValue='{ label: "Show", expandedLabel: "Hide" }'>
+  Toggle button labels for expand/collapse.
+</ApiProp>
+
+<ApiProp name="duration" fullType="number">
+  For non-loading items: group auto-dismiss duration (resets on new item, pauses on hover). For loading items: progress bar duration after transitioning to success/error.
+</ApiProp>
+
+<ApiProp name="showCloseButton" fullType="boolean" defaultValue="true">
+  Whether to show the close button.
+</ApiProp>
+
+<ApiProp name="data" fullType="TData">
+  Custom data attached to this item.
+</ApiProp>
+
+<ApiProp name="onClose" fullType="() => void">
+  Callback when this item closes.
+</ApiProp>
+
+<ApiProp name="onRemove" fullType="() => void">
+  Callback when this item is removed from DOM.
+</ApiProp>
+
+</ApiPropsList>
+
+**GroupSummaryCounts**
+
+The `groupSummary` function receives a `GroupSummaryCounts` object with these fields:
+
+- `loadingCount` - Items currently in loading state (reflects visible items)
+- `completedCount` - Total items that have completed (historical, persists after dismiss)
+- `totalCount` - `loadingCount + completedCount`
+- `successCount` - Items completed with type `"success"` (historical)
+- `errorCount` - Items completed with type `"error"` (historical)
+- `warningCount` - Items completed with type `"warning"` (historical)
+- `infoCount` - Items completed with type `"info"` (historical)
+
+**Helper methods:**
 
 ```tsx
 // Dismiss a single item from a group
@@ -186,36 +285,110 @@ toast.dismissGroupItem(itemId);
 // Dismiss an entire group
 toast.dismissGroup(groupId);
 
-// Update a specific item
-toast.updateGroupItem(itemId, { title: "Updated title", type: "success" });
+// Update a specific item (e.g., loading -> success)
+toast.updateGroupItem(itemId, { title: "Deployed!", type: "success" });
 ```
 
-#### Behavior
+**Behavior:**
 
 - **Single item**: Renders as a normal toast with close button
 - **Multiple items**: Collapses into summary with Show/Hide button
-- **No timeout**: Groups persist until manually dismissed (ideal for long-running tasks)
-- **Icon derivation**: Shows loading spinner if any item has `type: "loading"`
+- **Loading items**: Groups persist until all loading items complete or are dismissed
+- **Icon derivation**: Shows loading spinner while any item has `type: "loading"`, then success/warning/error based on results
 
-### ToastProvider
+#### toast.groupedPromise()
 
-Wraps your app to enable stacked toast notifications.
+Shows a grouped toast that resolves with a promise, handling loading/success/error states automatically. Supports cancellation via `AbortSignal`.
 
-| Prop        | Type                                                                                              | Default          | Description                        |
-| ----------- | ------------------------------------------------------------------------------------------------- | ---------------- | ---------------------------------- |
-| `position`  | `"top-left" \| "top-center" \| "top-right" \| "bottom-left" \| "bottom-center" \| "bottom-right"` | `"bottom-right"` | Position of the toast viewport     |
-| `limit`     | `number`                                                                                          | `3`              | Maximum number of toasts visible   |
-| `timeout`   | `number`                                                                                          | `5000`           | Default timeout for toasts in ms   |
-| `container` | `HTMLElement \| RefObject<HTMLElement>`                                                           | -                | Custom portal container            |
+```tsx
+const controller = new AbortController();
 
-### AnchoredToastProvider
+await toast.groupedPromise(
+  uploadFile(file),
+  {
+    loading: { title: "Uploading...", action: { label: "Cancel", onClick: () => controller.abort() } },
+    success: (data) => ({ title: "Uploaded!", description: data.filename }),
+    error: (err) => ({ title: "Failed", description: err.message }),
+    aborted: { title: "Cancelled" }, // Optional
+  },
+  {
+    groupId: "uploads",
+    groupSummary: ({ loadingCount, completedCount }) =>
+      loadingCount > 0 ? `${loadingCount} uploading...` : `${completedCount} uploaded`,
+    signal: controller.signal,
+  }
+);
+```
 
-Wraps your app to enable anchored toasts (positioned relative to elements).
+<ApiPropsList>
 
-| Prop        | Type                                    | Default | Description             |
-| ----------- | --------------------------------------- | ------- | ----------------------- |
-| `timeout`   | `number`                                | `5000`  | Default timeout in ms   |
-| `container` | `HTMLElement \| RefObject<HTMLElement>` | -       | Custom portal container |
+<ApiProp name="loading" fullType="{ title?: string; description?: string; action?: { label: string; onClick: () => void } }">
+  **Required.** Message configuration for the loading state.
+</ApiProp>
+
+<ApiProp name="success" fullType="PromiseMessage | ((data: T) => { title?: string; description?: string; type?: ToastType })">
+  **Required.** Message for success state. Can be a string, object, or function receiving the resolved data.
+</ApiProp>
+
+<ApiProp name="error" fullType="PromiseMessage | ((error: Error) => { title?: string; description?: string; type?: ToastType })">
+  **Required.** Message for error state. Can be a string, object, or function receiving the error.
+</ApiProp>
+
+<ApiProp name="aborted" fullType="PromiseMessage | (() => { title?: string; description?: string; type?: ToastType })">
+  Message when aborted via `AbortController`. Defaults to error message if not specified.
+</ApiProp>
+
+<ApiProp name="signal" fullType="AbortSignal">
+  `AbortSignal` for cancellation support. When aborted, shows the `aborted` message.
+</ApiProp>
+
+</ApiPropsList>
+
+All other `GroupedToastOptions` props (`groupId`, `groupSummary`, `groupAction`, etc.) are also supported.
+
+#### ToastProvider
+
+Wraps your app to enable stacked toast notifications. Composes Base UI's `Toast.Provider`, `Toast.Portal`, and `Toast.Viewport`.
+
+<ApiPropsList>
+
+<ApiProp name="position" fullType='"top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right"' defaultValue='"bottom-right"'>
+  Position of the toast viewport.
+</ApiProp>
+
+<ApiProp name="limit" fullType="number" defaultValue="3">
+  Maximum number of toasts visible at once.
+</ApiProp>
+
+<ApiProp name="timeout" fullType="number" defaultValue="5000">
+  Default timeout for toasts in milliseconds.
+</ApiProp>
+
+<ApiProp name="container" fullType="HTMLElement | RefObject<HTMLElement | null>">
+  Custom portal container element.
+</ApiProp>
+
+</ApiPropsList>
+
+#### AnchoredToastProvider
+
+Wraps your app to enable anchored toasts (positioned relative to elements). Composes Base UI's `Toast.Provider`, `Toast.Portal`, and `Toast.Viewport`.
+
+<ApiPropsList>
+
+<ApiProp name="limit" fullType="number" defaultValue="5">
+  Maximum number of anchored toasts visible at once.
+</ApiProp>
+
+<ApiProp name="timeout" fullType="number" defaultValue="2000">
+  Default timeout for anchored toasts in milliseconds.
+</ApiProp>
+
+<ApiProp name="container" fullType="HTMLElement | RefObject<HTMLElement | null>">
+  Custom portal container element.
+</ApiProp>
+
+</ApiPropsList>
 
 ### Setup
 

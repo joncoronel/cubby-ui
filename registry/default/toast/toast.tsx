@@ -484,9 +484,20 @@ export const toast = Object.assign(baseToast, {
       // Add to existing group - all new items go to `items` array
       const existingData = groupDataMap.get(options.groupId);
       if (existingData) {
+        // Increment historical counts for non-loading items immediately
+        const updatedHistoricalCounts = { ...existingData.historicalCounts };
+        if (
+          newItem.type === "success" ||
+          newItem.type === "error" ||
+          newItem.type === "warning" ||
+          newItem.type === "info"
+        ) {
+          updatedHistoricalCounts[newItem.type]++;
+        }
         const updatedData: GroupedToastData = {
           ...existingData,
           items: [...existingData.items, newItem],
+          historicalCounts: updatedHistoricalCounts,
         };
         groupDataMap.set(options.groupId, updatedData);
         // Pass timeout to reset Base UI's built-in timer (pauses on hover/drag)
@@ -513,7 +524,12 @@ export const toast = Object.assign(baseToast, {
         // For non-loading items, duration controls group auto-dismiss
         // For loading items, duration is stored on the item for progress bar
         duration: isLoading ? undefined : options.duration,
-        historicalCounts: { success: 0, error: 0, warning: 0, info: 0 },
+        historicalCounts: {
+          success: newItem.type === "success" ? 1 : 0,
+          error: newItem.type === "error" ? 1 : 0,
+          warning: newItem.type === "warning" ? 1 : 0,
+          info: newItem.type === "info" ? 1 : 0,
+        },
       };
       const toastId = toastManager.add({
         title: "",

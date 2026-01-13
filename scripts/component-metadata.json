@@ -157,7 +157,11 @@
       "cmdk-base",
       "lucide-react"
     ],
-    "reference": []
+    "reference": [],
+    "usage": {
+      "imports": "import {\n  Command,\n  CommandInput,\n  CommandList,\n  CommandGroup,\n  CommandGroupLabel,\n  CommandItem,\n} from \"@/components/ui/cubby-ui/command\"",
+      "anatomy": "<Command>\n  <CommandInput placeholder=\"Search...\" />\n  <CommandList>\n    <CommandGroup>\n      <CommandGroupLabel>Suggestions</CommandGroupLabel>\n      <CommandItem>Calendar</CommandItem>\n      <CommandItem>Search</CommandItem>\n    </CommandGroup>\n  </CommandList>\n</Command>"
+    }
   },
   "context-menu": {
     "title": "Context-menu",
@@ -453,7 +457,11 @@
       "@base-ui/react",
       "clsx"
     ],
-    "reference": []
+    "reference": [],
+    "usage": {
+      "imports": "import { toast } from \"@/components/ui/cubby-ui/toast\"",
+      "anatomy": "toast({\n  title: \"Event has been created\",\n  description: \"Friday, February 10, 2023 at 5:57 PM\"\n})"
+    }
   },
   "toggle": {
     "title": "Toggle",

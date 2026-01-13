@@ -1232,6 +1232,7 @@
         "@cubby-ui/button"
       ],
       "dependencies": [
+        "class-variance-authority",
         "motion",
         "@hugeicons/react",
         "@hugeicons/core-free-icons"

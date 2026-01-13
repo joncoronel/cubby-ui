@@ -550,7 +550,13 @@ function extractComponentAnatomy(
   filePath: string,
   componentName: string,
 ): ComponentAnatomy {
-  // First try to extract from basic example
+  // First check for manual usage override in metadata
+  const metadata = getComponentMetadata(componentName);
+  if (metadata.usage) {
+    return metadata.usage;
+  }
+
+  // Then try to extract from basic example
   const exampleAnatomy = extractAnatomyFromExample(componentName);
   if (exampleAnatomy) {
     return exampleAnatomy;
@@ -809,6 +815,7 @@ function getComponentMetadata(componentName: string): {
   category: string;
   author?: string;
   reference?: string[];
+  usage?: ComponentAnatomy;
 } {
   // Try to read from component-metadata.json if it exists
   const metadataPath = path.join(
@@ -827,6 +834,9 @@ function getComponentMetadata(componentName: string): {
         }),
         ...(metadata[componentName].reference && {
           reference: metadata[componentName].reference,
+        }),
+        ...(metadata[componentName].usage && {
+          usage: metadata[componentName].usage,
         }),
       };
     }

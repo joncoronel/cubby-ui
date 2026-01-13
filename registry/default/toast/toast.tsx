@@ -258,8 +258,7 @@ const promise = async <T,>(
     data?: U,
   ): string | { title?: string; description?: string } => {
     if (typeof msg === "function") {
-      const result = data !== undefined ? msg(data) : msg;
-      return result as string | { title?: string; description?: string };
+      return msg(data as U);
     }
     return msg;
   };

@@ -19,7 +19,7 @@ const loadFeatures = () =>
 
 export function Providers({ children }: ProvidersProps) {
   return (
-    <LazyMotion features={loadFeatures} strict>
+    <LazyMotion features={loadFeatures}>
       <ThemeProvider
         attribute="data-theme"
         defaultTheme="system"

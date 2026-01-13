@@ -5,7 +5,7 @@ import { cva } from "class-variance-authority";
 import { Popover } from "@base-ui/react/popover";
 import { Toast } from "@base-ui/react/toast";
 import { AnimatePresence } from "motion/react";
-import * as m from "motion/react-m";
+import { motion } from "motion/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   AlertCircleIcon,
@@ -96,8 +96,8 @@ const TOAST_ANIMATION_CLASSES = [
 ];
 
 const TOAST_VISUAL_CLASSES = [
-  "rounded-lg border border-border bg-card text-card-foreground",
-  "bg-clip-padding shadow-lg select-none",
+  "rounded-lg ring-1 ring-border bg-card text-card-foreground",
+  "bg-clip-padding shadow-lg/4 select-none",
   'after:absolute after:left-0 after:h-[calc(var(--toast-gap)+1px)] after:w-full after:content-[""]',
   "data-[position*=top]:after:bottom-full",
   "data-[position*=bottom]:after:top-full",
@@ -254,11 +254,10 @@ export interface GroupedPromiseMessages<T> {
 }
 
 /** Options for grouped promise toasts */
-export interface GroupedPromiseOptions
-  extends Omit<
-    GroupedToastOptions,
-    "type" | "title" | "description" | "action"
-  > {
+export interface GroupedPromiseOptions extends Omit<
+  GroupedToastOptions,
+  "type" | "title" | "description" | "action"
+> {
   /** AbortSignal for cancellation support */
   signal?: AbortSignal;
 }
@@ -1139,8 +1138,8 @@ function AnchoredToastItem({ toast }: { toast: ToastData }) {
         data-slot="toast"
         className={cn(
           "flex w-max origin-(--transform-origin) flex-col rounded-md",
-          "border-border bg-card text-card-foreground border",
-          "px-3 py-2 text-sm shadow-lg",
+          "ring-border bg-card text-card-foreground ring-1",
+          "px-3 py-2 text-sm shadow-lg/4",
           "transition-all duration-200",
           "data-starting-style:scale-95 data-starting-style:opacity-0",
           "data-ending-style:scale-95 data-ending-style:opacity-0",
@@ -1489,7 +1488,12 @@ function GroupedToastSummaryContent({
   ).length;
 
   // Use historical counts for type breakdown (persist after items dismiss)
-  const { success: successCount, error: errorCount, warning: warningCount, info: infoCount } = data.historicalCounts;
+  const {
+    success: successCount,
+    error: errorCount,
+    warning: warningCount,
+    info: infoCount,
+  } = data.historicalCounts;
   const completedCount = successCount + errorCount + warningCount + infoCount;
   const totalCount = loadingCount + completedCount;
 
@@ -1585,7 +1589,7 @@ function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
       <AnimatePresence initial={false} mode="popLayout">
         {/* Pending items card (closer to summary toast) */}
         {hasPendingItems && (
-          <m.div
+          <motion.div
             key="pending-card"
             layout
             initial={{ opacity: 0, scale: 0.95 }}
@@ -1594,12 +1598,12 @@ function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
             transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
           >
             <GroupedToastCard data={data} isTop={isTop} />
-          </m.div>
+          </motion.div>
         )}
 
         {/* Completed items card (further from summary toast) */}
         {hasCompletedItems && (
-          <m.div
+          <motion.div
             key="completed-card"
             layout
             initial={{ opacity: 0, scale: 0.95 }}
@@ -1608,7 +1612,7 @@ function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
             transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
           >
             <CompletedItemsCard items={data.completedItems} isTop={isTop} />
-          </m.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
@@ -1651,15 +1655,15 @@ function GroupedToastCard({ data, isTop }: GroupedToastCardProps) {
       data-swipe-ignore
       className={cn(
         "max-h-64 w-full overflow-y-auto overscroll-contain",
-        "border-border bg-card text-card-foreground rounded-lg border",
-        "shadow-lg",
+        "ring-border bg-card text-card-foreground rounded-lg ring-1",
+        "shadow-lg/4",
         "animate-in fade-in-0 zoom-in-95",
         isTop ? "slide-in-from-top-2" : "slide-in-from-bottom-2",
       )}
     >
       <AnimatePresence initial={false}>
         {data.items.map((item, index) => (
-          <m.div
+          <motion.div
             key={item.id}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
@@ -1668,7 +1672,7 @@ function GroupedToastCard({ data, isTop }: GroupedToastCardProps) {
             className="overflow-hidden"
           >
             <GroupedToastCardItem item={item} showSeparator={index > 0} />
-          </m.div>
+          </motion.div>
         ))}
       </AnimatePresence>
     </div>
@@ -1850,15 +1854,15 @@ function CompletedItemsCard({ items, isTop }: CompletedItemsCardProps) {
       data-swipe-ignore
       className={cn(
         "max-h-48 w-full overflow-y-auto overscroll-contain",
-        "border-border bg-muted text-card-foreground rounded-lg border",
-        "shadow-lg",
+        "ring-border bg-muted text-card-foreground rounded-lg ring-1",
+        "shadow-lg/4",
         "animate-in fade-in-0 zoom-in-95",
         isTop ? "slide-in-from-top-2" : "slide-in-from-bottom-2",
       )}
     >
       <AnimatePresence initial={false}>
         {items.map((item, index) => (
-          <m.div
+          <motion.div
             key={item.id}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
@@ -1867,7 +1871,7 @@ function CompletedItemsCard({ items, isTop }: CompletedItemsCardProps) {
             className="overflow-hidden"
           >
             <CompletedItemRow item={item} showSeparator={index > 0} />
-          </m.div>
+          </motion.div>
         ))}
       </AnimatePresence>
     </div>

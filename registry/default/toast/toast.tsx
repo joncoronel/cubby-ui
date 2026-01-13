@@ -1580,14 +1580,28 @@ function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
   return (
     <div
       data-slot="expanded-cards-container"
-      className={cn(
-        // Flex column with gap, reversed for bottom position
-        "flex gap-2",
-        isTop ? "flex-col" : "flex-col-reverse",
-      )}
+      // Use flex-col with conditional DOM order instead of flex-col-reverse for Safari animation compatibility
+      className="flex flex-col gap-2"
     >
       <AnimatePresence initial={false} mode="popLayout">
-        {/* Pending items card (closer to summary toast) */}
+        {/* Flat conditional rendering for Safari AnimatePresence compatibility.
+            Order: completed first for bottom position, pending, completed last for top position */}
+
+        {/* Completed card first (for bottom position only) */}
+        {!isTop && hasCompletedItems && (
+          <motion.div
+            key="completed-card"
+            layout
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+          >
+            <CompletedItemsCard items={data.completedItems} isTop={isTop} />
+          </motion.div>
+        )}
+
+        {/* Pending card (always in middle position) */}
         {hasPendingItems && (
           <motion.div
             key="pending-card"
@@ -1601,8 +1615,8 @@ function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
           </motion.div>
         )}
 
-        {/* Completed items card (further from summary toast) */}
-        {hasCompletedItems && (
+        {/* Completed card last (for top position only) */}
+        {isTop && hasCompletedItems && (
           <motion.div
             key="completed-card"
             layout

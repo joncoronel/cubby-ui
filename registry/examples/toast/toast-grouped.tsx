@@ -11,9 +11,6 @@ function generateDeploymentId() {
   return Math.random().toString(16).slice(2, 9);
 }
 
-// Store timeout IDs for cleanup
-const deploymentTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
-
 // Team activity notifications for the non-loading example
 const TEAM_NOTIFICATIONS = [
   { title: "Alex joined the workspace", type: "info" as const },
@@ -24,108 +21,62 @@ const TEAM_NOTIFICATIONS = [
   { title: "Deployment to production succeeded", type: "success" as const },
 ];
 
+// Note: This demo doesn't abort pending deployments on unmount for simplicity.
+// In production, store AbortControllers in a ref and abort them in a cleanup effect.
 function ToastGrouped() {
-  const [activeDeployments, setActiveDeployments] = React.useState<
-    Map<string, { toastId: string; name: string }>
-  >(new Map());
-
-  // Use ref to always access latest activeDeployments in callbacks
-  const activeDeploymentsRef = React.useRef(activeDeployments);
-  React.useEffect(() => {
-    activeDeploymentsRef.current = activeDeployments;
-  }, [activeDeployments]);
-
-  const completeDeployment = React.useCallback((deploymentId: string) => {
-    // Get the deployment info from ref (always latest)
-    const deployment = activeDeploymentsRef.current.get(deploymentId);
-    if (deployment) {
-      // Update to success state - component auto-dismisses after default duration
-      toast.updateGroupItem(deployment.toastId, {
-        title: `${deploymentId} deployed successfully`,
-        type: "success",
-        action: undefined, // Remove cancel button
-      });
-    }
-    // Update local state
-    setActiveDeployments((prev) => {
-      const next = new Map(prev);
-      next.delete(deploymentId);
-      return next;
-    });
-    deploymentTimeouts.delete(deploymentId);
-  }, []);
-
-  const cancelDeployment = React.useCallback((deploymentId: string) => {
-    // Clear the auto-completion timeout
-    const timeoutId = deploymentTimeouts.get(deploymentId);
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-      deploymentTimeouts.delete(deploymentId);
-    }
-
-    // Get the deployment info from ref (always latest)
-    const deployment = activeDeploymentsRef.current.get(deploymentId);
-    if (deployment) {
-      // Move to completed list with cancelled state
-      toast.updateGroupItem(deployment.toastId, {
-        title: `${deploymentId} deployment cancelled`,
-        type: "error",
-        action: undefined,
-      });
-    }
-    // Update local state
-    setActiveDeployments((prev) => {
-      const next = new Map(prev);
-      next.delete(deploymentId);
-      return next;
-    });
-  }, []);
-
   const startDeployment = React.useCallback(() => {
     const deploymentId = generateDeploymentId();
     const branchName = deploymentCounter % 2 === 0 ? "main" : "develop";
+    const controller = new AbortController();
 
-    const toastId = toast.grouped({
-      showCloseButton: false,
-      groupId: "deployments",
-      title: `${deploymentId} is building on app - ${branchName}`,
-      type: "loading",
-      action: {
-        label: "Cancel",
-        onClick: () => cancelDeployment(deploymentId),
-      },
-      groupSummary: ({ loadingCount }) =>
-        loadingCount > 0
-          ? `${loadingCount} deployments in progress`
-          : "All deployments complete",
-      groupAction: {
-        label: "Show",
-        expandedLabel: "Hide",
-      },
+    // Simulate deployment (5-10 seconds)
+    const deployPromise = new Promise<{ id: string }>((resolve, reject) => {
+      const timeoutId = setTimeout(
+        () => {
+          resolve({ id: deploymentId });
+        },
+        5000 + Math.random() * 5000,
+      );
+
+      // Handle abort
+      controller.signal.addEventListener("abort", () => {
+        clearTimeout(timeoutId);
+        reject(new Error("Cancelled"));
+      });
     });
 
-    if (toastId) {
-      setActiveDeployments((prev) => {
-        const next = new Map(prev);
-        next.set(deploymentId, { toastId, name: `app - ${branchName}` });
-        return next;
-      });
-
-      // Simulate deployment completion after 5-10 seconds
-      const completionTime = 5000 + Math.random() * 5000;
-      const timeoutId = setTimeout(() => {
-        completeDeployment(deploymentId);
-      }, completionTime);
-      deploymentTimeouts.set(deploymentId, timeoutId);
-    }
-  }, [cancelDeployment, completeDeployment]);
-
-  // Cleanup on unmount
-  React.useEffect(() => {
-    return () => {
-      deploymentTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
-      deploymentTimeouts.clear();
-    };
+    toast.groupedPromise(
+      deployPromise,
+      {
+        loading: {
+          title: `${deploymentId} is building on app - ${branchName}`,
+          action: { label: "Cancel", onClick: () => controller.abort() },
+        },
+        success: () => ({ title: `${deploymentId} deployed successfully` }),
+        error: () => ({ title: `${deploymentId} deployment failed` }),
+        aborted: () => ({
+          title: `${deploymentId} deployment cancelled`,
+          type: "error",
+        }),
+      },
+      {
+        groupId: "deployments",
+        showCloseButton: false,
+        signal: controller.signal,
+        groupSummary: ({
+          loadingCount,
+          successCount,
+          errorCount,
+          completedCount,
+        }) => {
+          if (loadingCount > 0) return `${loadingCount} deploying`;
+          if (errorCount === 0) return `All ${completedCount} succeeded`;
+          if (successCount === 0) return `All ${completedCount} failed`;
+          return `${successCount} of ${completedCount} succeeded`;
+        },
+        groupAction: { label: "Show", expandedLabel: "Hide" },
+      },
+    );
   }, []);
 
   return (
@@ -143,13 +94,10 @@ function ToastGroupedNotifications() {
       groupId: "team-activity",
       title: notification.title,
       type: notification.type,
-      duration: 5000, // Dismiss entire toast 5s after last notification
+      duration: 5000,
       groupSummary: ({ totalCount }) =>
         `${totalCount} notification${totalCount !== 1 ? "s" : ""}`,
-      groupAction: {
-        label: "Show",
-        expandedLabel: "Hide",
-      },
+      groupAction: { label: "Show", expandedLabel: "Hide" },
     });
   }, []);
 

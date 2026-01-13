@@ -42,6 +42,56 @@ const TOAST_ICONS = {
 // Icon colors are handled via in-data-[type=*] selectors in the Icon className,
 // which automatically style based on the data-type attribute set by Base UI on Toast.Root
 
+// Shared Toast CSS Classes (used by StackedToastItem and GroupedToastRoot)
+const TOAST_CSS_VARIABLES = [
+  "[--toast-gap:0.75rem] [--toast-peek:0.75rem]",
+  "[--toast-scale:calc(max(0,1-(var(--toast-index)*0.1)))]",
+  "[--toast-shrink:calc(1-var(--toast-scale))]",
+  "[--toast-calc-height:var(--toast-frontmost-height,var(--toast-height))]",
+  "data-[position*=top]:[--toast-calc-offset-y:calc(var(--toast-offset-y)+(var(--toast-index)*var(--toast-gap))+var(--toast-swipe-movement-y))]",
+  "data-[position*=bottom]:[--toast-calc-offset-y:calc(var(--toast-offset-y)*-1+(var(--toast-index)*var(--toast-gap)*-1)+var(--toast-swipe-movement-y))]",
+];
+
+const TOAST_POSITION_CLASSES = [
+  "absolute z-[calc(1000-var(--toast-index))] w-full",
+  "data-[position*=top]:top-0 data-[position*=top]:right-0 data-[position*=top]:left-0 data-[position*=top]:origin-top",
+  "data-[position*=bottom]:right-0 data-[position*=bottom]:bottom-0 data-[position*=bottom]:left-0 data-[position*=bottom]:origin-bottom",
+];
+
+const TOAST_TRANSFORM_CLASSES = [
+  "data-[position*=top]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+(var(--toast-index)*var(--toast-peek))+(var(--toast-shrink)*var(--toast-calc-height))))_scale(var(--toast-scale))]",
+  "data-[position*=bottom]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-(var(--toast-index)*var(--toast-peek))-(var(--toast-shrink)*var(--toast-calc-height))))_scale(var(--toast-scale))]",
+  "data-expanded:h-(--toast-height)",
+  "data-position:data-expanded:transform-[translateX(var(--toast-swipe-movement-x))_translateY(var(--toast-calc-offset-y))]",
+];
+
+const TOAST_ANIMATION_CLASSES = [
+  "data-[position*=top]:data-starting-style:transform-[translateY(calc(-100%-var(--toast-inset)))]",
+  "data-[position*=bottom]:data-starting-style:transform-[translateY(calc(100%+var(--toast-inset)))]",
+  "data-ending-style:opacity-0",
+  "data-[position*=top]:data-ending-style:not-data-limited:not-data-swipe-direction:transform-[translateY(calc(-100%-var(--toast-inset)))]",
+  "data-[position*=bottom]:data-ending-style:not-data-limited:not-data-swipe-direction:transform-[translateY(calc(100%+var(--toast-inset)))]",
+  "data-ending-style:data-[swipe-direction=down]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+100%+var(--toast-inset)))]",
+  "data-expanded:data-ending-style:data-[swipe-direction=down]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+100%+var(--toast-inset)))]",
+  "data-ending-style:data-[swipe-direction=left]:transform-[translateX(calc(var(--toast-swipe-movement-x)-100%-var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
+  "data-expanded:data-ending-style:data-[swipe-direction=left]:transform-[translateX(calc(var(--toast-swipe-movement-x)-100%-var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
+  "data-ending-style:data-[swipe-direction=right]:transform-[translateX(calc(var(--toast-swipe-movement-x)+100%+var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
+  "data-expanded:data-ending-style:data-[swipe-direction=right]:transform-[translateX(calc(var(--toast-swipe-movement-x)+100%+var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
+  "data-ending-style:data-[swipe-direction=up]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-100%-var(--toast-inset)))]",
+  "data-expanded:data-ending-style:data-[swipe-direction=up]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-100%-var(--toast-inset)))]",
+];
+
+const TOAST_VISUAL_CLASSES = [
+  "rounded-lg border border-border bg-card text-card-foreground",
+  "bg-clip-padding shadow-lg select-none",
+  'after:absolute after:left-0 after:h-[calc(var(--toast-gap)+1px)] after:w-full after:content-[""]',
+  "data-[position*=top]:after:bottom-full",
+  "data-[position*=bottom]:after:top-full",
+  "data-limited:opacity-0",
+  "h-(--toast-calc-height)",
+  "[transition:transform_.5s_cubic-bezier(.22,1,.36,1),opacity_.5s,height_.20s]",
+];
+
 export interface ToastOptions<TData extends object = object> {
   title?: string;
   description?: string;
@@ -121,14 +171,29 @@ export interface GroupedToastItem {
   duration?: number;
 }
 
-/** Counts passed to groupSummary function */
+/**
+ * Counts passed to groupSummary function.
+ *
+ * Note: `completedCount`, `successCount`, `errorCount`, `warningCount`, and `infoCount`
+ * are **historical** - they persist even after completed items are auto-dismissed.
+ * This ensures accurate summaries like "3 of 5 succeeded" remain correct after items fade out.
+ * Only `loadingCount` reflects currently visible loading items.
+ */
 export interface GroupSummaryCounts {
-  /** Number of items currently in loading state */
+  /** Number of items currently in loading state (reflects visible items) */
   loadingCount: number;
-  /** Number of items that have completed (in completedItems array) */
+  /** Total items that have completed historically (persists after dismiss) */
   completedCount: number;
-  /** Total number of items (pending + completed) */
+  /** Total items: loadingCount + completedCount */
   totalCount: number;
+  /** Items that completed with type 'success' (historical, persists after dismiss) */
+  successCount: number;
+  /** Items that completed with type 'error' (historical, persists after dismiss) */
+  errorCount: number;
+  /** Items that completed with type 'warning' (historical, persists after dismiss) */
+  warningCount: number;
+  /** Items that completed with type 'info' (historical, persists after dismiss) */
+  infoCount: number;
 }
 
 /** Options for creating a grouped toast item */
@@ -156,6 +221,42 @@ export interface GroupedToastOptions<TData extends object = object> {
   duration?: number;
 }
 
+/** Message configuration for grouped promise toasts */
+interface GroupedPromiseMessage {
+  title?: string;
+  description?: string;
+  type?: ToastType;
+}
+
+/** Messages for each state of a grouped promise toast */
+export interface GroupedPromiseMessages<T> {
+  loading: GroupedPromiseMessage & {
+    action?: { label: string; onClick: () => void };
+  };
+  success: PromiseMessage | ((data: T) => GroupedPromiseMessage);
+  error: PromiseMessage | ((error: Error) => GroupedPromiseMessage);
+  /** Message to show when aborted via AbortController. Defaults to error message. */
+  aborted?: PromiseMessage | (() => GroupedPromiseMessage);
+}
+
+/** Options for grouped promise toasts */
+export interface GroupedPromiseOptions
+  extends Omit<
+    GroupedToastOptions,
+    "type" | "title" | "description" | "action"
+  > {
+  /** AbortSignal for cancellation support */
+  signal?: AbortSignal;
+}
+
+/** Historical counts that only increment (never decrement on item dismiss) */
+interface HistoricalCounts {
+  success: number;
+  error: number;
+  warning: number;
+  info: number;
+}
+
 /** Data structure stored in Base UI toast for grouped toasts */
 interface GroupedToastData {
   isGrouped: true;
@@ -174,6 +275,8 @@ interface GroupedToastData {
   hasShownAllComplete: boolean;
   /** Duration in ms, stored so we can pass it on update to reset timer */
   duration?: number;
+  /** Historical counts that persist even after items are dismissed */
+  historicalCounts: HistoricalCounts;
 }
 
 // Toast Helper Functions
@@ -252,39 +355,13 @@ const promise = async <T,>(
     error: PromiseMessageOrFn<Error>;
   },
 ) => {
-  // Helper to normalize message to Base UI format
-  const normalizeMessage = <U,>(
-    msg: PromiseMessageOrFn<U>,
-    data?: U,
-  ): string | { title?: string; description?: string } => {
-    if (typeof msg === "function") {
-      return msg(data as U);
-    }
-    return msg;
-  };
+  const resolveMessage = <U,>(msg: PromiseMessageOrFn<U>, data: U) =>
+    typeof msg === "function" ? msg(data) : msg;
 
   return toastManager.promise(promiseToResolve, {
-    loading: normalizeMessage(messages.loading) as
-      | string
-      | { title?: string; description?: string },
-    success:
-      typeof messages.success === "function"
-        ? (data: T) =>
-            normalizeMessage(messages.success, data) as
-              | string
-              | { title?: string; description?: string }
-        : (normalizeMessage(messages.success) as
-            | string
-            | { title?: string; description?: string }),
-    error:
-      typeof messages.error === "function"
-        ? (err: Error) =>
-            normalizeMessage(messages.error, err) as
-              | string
-              | { title?: string; description?: string }
-        : (normalizeMessage(messages.error) as
-            | string
-            | { title?: string; description?: string }),
+    loading: messages.loading,
+    success: (data: T) => resolveMessage(messages.success, data),
+    error: (err: Error) => resolveMessage(messages.error, err),
   });
 };
 
@@ -422,6 +499,7 @@ export const toast = Object.assign(baseToast, {
         // For non-loading items, duration controls group auto-dismiss
         // For loading items, duration is stored on the item for progress bar
         duration: isLoading ? undefined : options.duration,
+        historicalCounts: { success: 0, error: 0, warning: 0, info: 0 },
       };
       const toastId = toastManager.add({
         title: "",
@@ -559,11 +637,22 @@ export const toast = Object.assign(baseToast, {
       const completeCount = newCompletedItems.length;
       const shouldShowAllComplete = completeCount >= 2;
 
+      // Increment historical counts (these persist even after items are dismissed)
+      const completedType = completedItem.type as ToastType;
+      const newHistoricalCounts = { ...data.historicalCounts };
+      if (completedType === "success") newHistoricalCounts.success++;
+      else if (completedType === "error") newHistoricalCounts.error++;
+      else if (completedType === "warning") newHistoricalCounts.warning++;
+      else if (completedType === "info") newHistoricalCounts.info++;
+      // "default" is the unstyled/neutral variant - count as success
+      else if (completedType === "default") newHistoricalCounts.success++;
+
       const updatedData: GroupedToastData = {
         ...data,
         items: newItems,
         completedItems: newCompletedItems,
         hasShownAllComplete: data.hasShownAllComplete || shouldShowAllComplete,
+        historicalCounts: newHistoricalCounts,
       };
       groupDataMap.set(groupId, updatedData);
       toastManager.update(toastId, { data: updatedData });
@@ -615,14 +704,123 @@ export const toast = Object.assign(baseToast, {
     const updatedData: GroupedToastData = {
       ...data,
       completedItems: newCompletedItems,
-      // Collapse if only 1 pending item remains and no completed
+      // Collapse if only 1 pending item remains and no completed (unless in group mode)
       isExpanded:
-        data.items.length <= 1 && newCompletedItems.length === 0
+        data.items.length <= 1 &&
+        newCompletedItems.length === 0 &&
+        !data.hasShownAllComplete
           ? false
           : data.isExpanded,
     };
     groupDataMap.set(groupId, updatedData);
     toastManager.update(toastId, { data: updatedData });
+  },
+  /** Show a grouped toast that resolves with a promise, handling loading/success/error states */
+  groupedPromise: async <T,>(
+    promiseToResolve: Promise<T>,
+    messages: GroupedPromiseMessages<T>,
+    options: GroupedPromiseOptions,
+  ): Promise<T> => {
+    // Helper to resolve message to GroupedPromiseMessage format
+    const resolveMessage = <U,>(
+      msg: PromiseMessage | ((data: U) => GroupedPromiseMessage),
+      data: U,
+    ): GroupedPromiseMessage => {
+      if (typeof msg === "function") {
+        return msg(data);
+      }
+      if (typeof msg === "string") {
+        return { title: msg };
+      }
+      return msg;
+    };
+
+    // Create loading item
+    const itemId = toast.grouped({
+      ...options,
+      title: messages.loading.title,
+      description: messages.loading.description,
+      type: "loading",
+      action: messages.loading.action,
+    });
+
+    if (!itemId) {
+      return promiseToResolve;
+    }
+
+    // Track if already handled and whether it was an abort
+    let handled = false;
+    let wasAborted = false;
+
+    // Set up abort listener if signal provided
+    if (options.signal) {
+      const handleAbort = () => {
+        if (handled) return;
+        handled = true;
+        wasAborted = true;
+
+        const abortedMsg: GroupedPromiseMessage = messages.aborted
+          ? typeof messages.aborted === "function"
+            ? messages.aborted()
+            : typeof messages.aborted === "string"
+              ? { title: messages.aborted }
+              : messages.aborted
+          : { title: "Cancelled" };
+
+        toast.updateGroupItem(itemId, {
+          title: abortedMsg.title,
+          description: abortedMsg.description,
+          type: abortedMsg.type ?? "error",
+          action: undefined,
+        });
+      };
+
+      if (options.signal.aborted) {
+        handleAbort();
+        throw new DOMException("Aborted", "AbortError");
+      }
+
+      options.signal.addEventListener("abort", handleAbort, { once: true });
+    }
+
+    try {
+      const result = await promiseToResolve;
+
+      if (!handled) {
+        handled = true;
+        const successMsg = resolveMessage(messages.success, result);
+        toast.updateGroupItem(itemId, {
+          title: successMsg.title,
+          description: successMsg.description,
+          type: successMsg.type ?? "success",
+          action: undefined,
+        });
+      }
+
+      return result;
+    } catch (error) {
+      if (!handled) {
+        handled = true;
+        const errorMsg = resolveMessage(
+          messages.error,
+          error instanceof Error ? error : new Error(String(error)),
+        );
+        toast.updateGroupItem(itemId, {
+          title: errorMsg.title,
+          description: errorMsg.description,
+          type: errorMsg.type ?? "error",
+          action: undefined,
+        });
+      }
+
+      // Throw AbortError for user-initiated abort (matches fetch() behavior)
+      // Callers can catch and check: error.name === 'AbortError'
+      if (wasAborted) {
+        throw new DOMException("Aborted", "AbortError");
+      }
+
+      throw error;
+    }
   },
 });
 
@@ -750,65 +948,6 @@ function StackedToastItem({
   const Icon =
     type !== "default" ? TOAST_ICONS[type as keyof typeof TOAST_ICONS] : null;
 
-  const cssVariables = [
-    "[--toast-gap:0.75rem] [--toast-peek:0.75rem]",
-    "[--toast-scale:calc(max(0,1-(var(--toast-index)*0.1)))]",
-    "[--toast-shrink:calc(1-var(--toast-scale))]",
-    "[--toast-calc-height:var(--toast-frontmost-height,var(--toast-height))]",
-    // Offset-y variable (position-aware)
-    "data-[position*=top]:[--toast-calc-offset-y:calc(var(--toast-offset-y)+(var(--toast-index)*var(--toast-gap))+var(--toast-swipe-movement-y))]",
-    "data-[position*=bottom]:[--toast-calc-offset-y:calc(var(--toast-offset-y)*-1+(var(--toast-index)*var(--toast-gap)*-1)+var(--toast-swipe-movement-y))]",
-  ];
-
-  const positionClasses = [
-    "absolute z-[calc(1000-var(--toast-index))] w-full",
-    "data-[position*=top]:top-0 data-[position*=top]:right-0 data-[position*=top]:left-0 data-[position*=top]:origin-top",
-    "data-[position*=bottom]:right-0 data-[position*=bottom]:bottom-0 data-[position*=bottom]:left-0 data-[position*=bottom]:origin-bottom",
-  ];
-
-  const transformClasses = [
-    // Default transform (position-aware)
-    "data-[position*=top]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+(var(--toast-index)*var(--toast-peek))+(var(--toast-shrink)*var(--toast-calc-height))))_scale(var(--toast-scale))]",
-    "data-[position*=bottom]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-(var(--toast-index)*var(--toast-peek))-(var(--toast-shrink)*var(--toast-calc-height))))_scale(var(--toast-scale))]",
-    // Expanded state
-    "data-expanded:h-(--toast-height)",
-    "data-position:data-expanded:transform-[translateX(var(--toast-swipe-movement-x))_translateY(var(--toast-calc-offset-y))]",
-  ];
-
-  const animationClasses = [
-    // Starting animation (position-aware)
-    "data-[position*=top]:data-starting-style:transform-[translateY(calc(-100%-var(--toast-inset)))]",
-    "data-[position*=bottom]:data-starting-style:transform-[translateY(calc(100%+var(--toast-inset)))]",
-    // Ending opacity
-    "data-ending-style:opacity-0",
-    // Default ending - close button (position-aware)
-    "data-[position*=top]:data-ending-style:not-data-limited:not-data-swipe-direction:transform-[translateY(calc(-100%-var(--toast-inset)))]",
-    "data-[position*=bottom]:data-ending-style:not-data-limited:not-data-swipe-direction:transform-[translateY(calc(100%+var(--toast-inset)))]",
-    // Swipe endings
-    "data-ending-style:data-[swipe-direction=down]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+100%+var(--toast-inset)))]",
-    "data-expanded:data-ending-style:data-[swipe-direction=down]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+100%+var(--toast-inset)))]",
-    "data-ending-style:data-[swipe-direction=left]:transform-[translateX(calc(var(--toast-swipe-movement-x)-100%-var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
-    "data-expanded:data-ending-style:data-[swipe-direction=left]:transform-[translateX(calc(var(--toast-swipe-movement-x)-100%-var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
-    "data-ending-style:data-[swipe-direction=right]:transform-[translateX(calc(var(--toast-swipe-movement-x)+100%+var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
-    "data-expanded:data-ending-style:data-[swipe-direction=right]:transform-[translateX(calc(var(--toast-swipe-movement-x)+100%+var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
-    "data-ending-style:data-[swipe-direction=up]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-100%-var(--toast-inset)))]",
-    "data-expanded:data-ending-style:data-[swipe-direction=up]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-100%-var(--toast-inset)))]",
-  ];
-
-  const visualClasses = [
-    "rounded-lg border border-border bg-card text-card-foreground",
-    "bg-clip-padding shadow-lg select-none",
-    // After element for spacing
-    'after:absolute after:left-0 after:h-[calc(var(--toast-gap)+1px)] after:w-full after:content-[""]',
-    "data-[position*=top]:after:bottom-full",
-    "data-[position*=bottom]:after:top-full",
-    // States
-    "data-limited:opacity-0",
-    // Height & transitions
-    "h-(--toast-calc-height)",
-    "[transition:transform_.5s_cubic-bezier(.22,1,.36,1),opacity_.5s,height_.20s]",
-  ];
-
   return (
     <Toast.Root
       toast={toast}
@@ -816,11 +955,11 @@ function StackedToastItem({
       data-slot="toast"
       data-position={position}
       className={cn(
-        cssVariables,
-        positionClasses,
-        transformClasses,
-        animationClasses,
-        visualClasses,
+        TOAST_CSS_VARIABLES,
+        TOAST_POSITION_CLASSES,
+        TOAST_TRANSFORM_CLASSES,
+        TOAST_ANIMATION_CLASSES,
+        TOAST_VISUAL_CLASSES,
       )}
     >
       <Toast.Content
@@ -1062,56 +1201,6 @@ function GroupedToastRoot({
     [toast.id, data.isExpanded],
   );
 
-  const cssVariables = [
-    "[--toast-gap:0.75rem] [--toast-peek:0.75rem]",
-    "[--toast-scale:calc(max(0,1-(var(--toast-index)*0.1)))]",
-    "[--toast-shrink:calc(1-var(--toast-scale))]",
-    "[--toast-calc-height:var(--toast-frontmost-height,var(--toast-height))]",
-    "data-[position*=top]:[--toast-calc-offset-y:calc(var(--toast-offset-y)+(var(--toast-index)*var(--toast-gap))+var(--toast-swipe-movement-y))]",
-    "data-[position*=bottom]:[--toast-calc-offset-y:calc(var(--toast-offset-y)*-1+(var(--toast-index)*var(--toast-gap)*-1)+var(--toast-swipe-movement-y))]",
-  ];
-
-  const positionClasses = [
-    "absolute z-[calc(1000-var(--toast-index))] w-full",
-    "data-[position*=top]:top-0 data-[position*=top]:right-0 data-[position*=top]:left-0 data-[position*=top]:origin-top",
-    "data-[position*=bottom]:right-0 data-[position*=bottom]:bottom-0 data-[position*=bottom]:left-0 data-[position*=bottom]:origin-bottom",
-  ];
-
-  const transformClasses = [
-    "data-[position*=top]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+(var(--toast-index)*var(--toast-peek))+(var(--toast-shrink)*var(--toast-calc-height))))_scale(var(--toast-scale))]",
-    "data-[position*=bottom]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-(var(--toast-index)*var(--toast-peek))-(var(--toast-shrink)*var(--toast-calc-height))))_scale(var(--toast-scale))]",
-    "data-expanded:h-(--toast-height)",
-    "data-position:data-expanded:transform-[translateX(var(--toast-swipe-movement-x))_translateY(var(--toast-calc-offset-y))]",
-  ];
-
-  const animationClasses = [
-    "data-[position*=top]:data-starting-style:transform-[translateY(calc(-100%-var(--toast-inset)))]",
-    "data-[position*=bottom]:data-starting-style:transform-[translateY(calc(100%+var(--toast-inset)))]",
-    "data-ending-style:opacity-0",
-    // Default ending - close button (position-aware)
-    "data-[position*=top]:data-ending-style:not-data-limited:not-data-swipe-direction:transform-[translateY(calc(-100%-var(--toast-inset)))]",
-    "data-[position*=bottom]:data-ending-style:not-data-limited:not-data-swipe-direction:transform-[translateY(calc(100%+var(--toast-inset)))]",
-    "data-ending-style:data-[swipe-direction=down]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+100%+var(--toast-inset)))]",
-    "data-expanded:data-ending-style:data-[swipe-direction=down]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+100%+var(--toast-inset)))]",
-    "data-ending-style:data-[swipe-direction=left]:transform-[translateX(calc(var(--toast-swipe-movement-x)-100%-var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
-    "data-expanded:data-ending-style:data-[swipe-direction=left]:transform-[translateX(calc(var(--toast-swipe-movement-x)-100%-var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
-    "data-ending-style:data-[swipe-direction=right]:transform-[translateX(calc(var(--toast-swipe-movement-x)+100%+var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
-    "data-expanded:data-ending-style:data-[swipe-direction=right]:transform-[translateX(calc(var(--toast-swipe-movement-x)+100%+var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
-    "data-ending-style:data-[swipe-direction=up]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-100%-var(--toast-inset)))]",
-    "data-expanded:data-ending-style:data-[swipe-direction=up]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-100%-var(--toast-inset)))]",
-  ];
-
-  const visualClasses = [
-    "rounded-lg border border-border bg-card text-card-foreground",
-    "bg-clip-padding shadow-lg select-none overflow-visible",
-    'after:absolute after:left-0 after:h-[calc(var(--toast-gap)+1px)] after:w-full after:content-[""]',
-    "data-[position*=top]:after:bottom-full",
-    "data-[position*=bottom]:after:top-full",
-    "data-limited:opacity-0",
-    "h-(--toast-calc-height)",
-    "[transition:transform_.5s_cubic-bezier(.22,1,.36,1),opacity_.5s,height_.20s]",
-  ];
-
   return (
     <Toast.Root
       ref={toastRootRef}
@@ -1120,11 +1209,12 @@ function GroupedToastRoot({
       data-slot="toast"
       data-position={position}
       className={cn(
-        cssVariables,
-        positionClasses,
-        transformClasses,
-        animationClasses,
-        visualClasses,
+        TOAST_CSS_VARIABLES,
+        TOAST_POSITION_CLASSES,
+        TOAST_TRANSFORM_CLASSES,
+        TOAST_ANIMATION_CLASSES,
+        TOAST_VISUAL_CLASSES,
+        "overflow-visible", // Additional class for grouped toasts (popover needs to overflow)
       )}
     >
       <Toast.Content
@@ -1369,18 +1459,40 @@ function GroupedToastSummaryContent({
   data,
   onToggle,
 }: GroupedToastSummaryContentProps) {
+  // Compute counts - use historical counts for accuracy (don't decrement on dismiss)
   const loadingCount = data.items.filter(
     (item) => item.type === "loading",
   ).length;
-  const completedCount = data.completedItems.length;
-  const totalCount = data.items.length + completedCount;
-  const hasLoadingItem = loadingCount > 0;
-  const iconType = hasLoadingItem ? "loading" : "success";
+
+  // Use historical counts for type breakdown (persist after items dismiss)
+  const { success: successCount, error: errorCount, warning: warningCount, info: infoCount } = data.historicalCounts;
+  const completedCount = successCount + errorCount + warningCount + infoCount;
+  const totalCount = loadingCount + completedCount;
+
+  // Determine icon type based on state
+  let iconType: "loading" | "success" | "error" | "warning";
+  if (loadingCount > 0) {
+    iconType = "loading";
+  } else if (errorCount === 0) {
+    iconType = "success"; // All succeeded
+  } else if (successCount === 0 && warningCount === 0 && infoCount === 0) {
+    iconType = "error"; // All failed
+  } else {
+    iconType = "warning"; // Mixed results
+  }
   const Icon = TOAST_ICONS[iconType];
 
   const summaryText =
     typeof data.summary === "function"
-      ? data.summary({ loadingCount, completedCount, totalCount })
+      ? data.summary({
+          loadingCount,
+          completedCount,
+          totalCount,
+          successCount,
+          errorCount,
+          warningCount,
+          infoCount,
+        })
       : data.summary;
 
   const buttonLabel = data.isExpanded
@@ -1396,12 +1508,16 @@ function GroupedToastSummaryContent({
           className={cn(
             iconType === "loading" && "text-muted-foreground animate-spin",
             iconType === "success" && "text-success-foreground",
+            iconType === "error" && "text-danger-foreground",
+            iconType === "warning" && "text-warning-foreground",
           )}
         />
       </div>
       <span className="flex-1 font-medium">{summaryText}</span>
-      {/* Show button when there are items to expand (pending or completed) */}
-      {(data.items.length > 1 || (data.completedItems ?? []).length > 0) && (
+      {/* Show button when in group mode (historical or current expandable items) */}
+      {(data.hasShownAllComplete ||
+        data.items.length > 1 ||
+        (data.completedItems ?? []).length > 0) && (
         <button
           onClick={onToggle}
           aria-expanded={data.isExpanded}
@@ -1427,9 +1543,12 @@ function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
 
   // Show pending card when:
   // - There are 2+ pending items (original behavior), OR
-  // - There's at least 1 pending item AND completed items exist (so user can see it)
+  // - There's at least 1 pending item AND completed items exist, OR
+  // - There's at least 1 pending item AND we've been in group mode (historical context)
   const hasPendingItems =
-    pendingCount > 1 || (pendingCount >= 1 && hasCompletedItems);
+    pendingCount > 1 ||
+    (pendingCount >= 1 && hasCompletedItems) ||
+    (pendingCount >= 1 && data.hasShownAllComplete);
 
   if (!hasCompletedItems && !hasPendingItems) {
     return null;

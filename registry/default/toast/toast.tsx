@@ -18,17 +18,11 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/registry/default/button/button";
 import "./toast.css";
 
-// =============================================================================
-// Module-level managers (like Coss UI / Base UI pattern)
-// =============================================================================
-
+// Module-level managers
 const toastManager = Toast.createToastManager();
 const anchoredToastManager = Toast.createToastManager();
 
-// =============================================================================
-// Grouped Toast Mappings (simplified - no separate state manager)
-// =============================================================================
-
+// Grouped Toast Mappings
 // Map groupId -> Base UI toastId
 const groupToToastMap = new Map<string, string>();
 // Map itemId -> groupId for lookups
@@ -36,10 +30,7 @@ const groupItemToGroupMap = new Map<string, string>();
 // Map groupId -> GroupedToastData (we track our own data since toastManager doesn't expose getSnapshot)
 const groupDataMap = new Map<string, GroupedToastData>();
 
-// =============================================================================
 // Types
-// =============================================================================
-
 const TOAST_ICONS = {
   success: CheckmarkCircle02Icon,
   error: AlertCircleIcon,
@@ -99,10 +90,7 @@ interface ToastData {
   };
 }
 
-// =============================================================================
 // Grouped Toast Types
-// =============================================================================
-
 type ToastType =
   | "default"
   | "loading"
@@ -188,10 +176,7 @@ interface GroupedToastData {
   duration?: number;
 }
 
-// =============================================================================
 // Toast Helper Functions
-// =============================================================================
-
 // Overloaded function signatures for JSX support
 function baseToast(jsx: React.ReactElement): string | undefined;
 function baseToast<TData extends object = object>(
@@ -642,10 +627,7 @@ export const toast = Object.assign(baseToast, {
   },
 });
 
-// =============================================================================
-// Toast Provider (Stacked Toasts)
-// =============================================================================
-
+// Toast Provider
 export type ToastPosition =
   | "top-left"
   | "top-center"
@@ -766,11 +748,9 @@ function StackedToastItem({
       ? false
       : true;
 
-  // Get icon for toast type
   const Icon =
     type !== "default" ? TOAST_ICONS[type as keyof typeof TOAST_ICONS] : null;
 
-  // Organized class arrays for readability
   const cssVariables = [
     "[--toast-gap:0.75rem] [--toast-peek:0.75rem]",
     "[--toast-scale:calc(max(0,1-(var(--toast-index)*0.1)))]",
@@ -890,7 +870,6 @@ function StackedToastItem({
                 data-slot="toast-description"
                 className="text-muted-foreground text-sm leading-5"
               />
-              {/* Action underneath text when close button exists */}
               {showCloseButton && (
                 <Toast.Action
                   data-slot="toast-action"
@@ -901,7 +880,6 @@ function StackedToastItem({
                 />
               )}
             </div>
-            {/* Action on right when no close button */}
             {!showCloseButton && (
               <Toast.Action
                 data-slot="toast-action"
@@ -928,10 +906,7 @@ function StackedToastItem({
   );
 }
 
-// =============================================================================
 // Anchored Toast Provider
-// =============================================================================
-
 interface AnchoredToastProviderProps {
   children: React.ReactNode;
   limit?: number;
@@ -1024,9 +999,7 @@ function AnchoredToastItem({ toast }: { toast: ToastData }) {
   );
 }
 
-// =============================================================================
-// Grouped Toast Components (using Base UI primitives)
-// =============================================================================
+// Grouped Toast Components
 
 // Feature detection for calc-size() support (Chrome 129+, Edge 129+)
 // Used to conditionally render different DOM structures for height animation
@@ -1089,7 +1062,6 @@ function GroupedToastRoot({
     [toast.id, data.isExpanded],
   );
 
-  // Organized class arrays for readability (same as regular toast)
   const cssVariables = [
     "[--toast-gap:0.75rem] [--toast-peek:0.75rem]",
     "[--toast-scale:calc(max(0,1-(var(--toast-index)*0.1)))]",
@@ -1352,7 +1324,6 @@ function GroupedSingleItemContent({
             {item.description}
           </span>
         )}
-        {/* Action underneath text when close button exists */}
         {showCloseButton && item.action && (
           <div className="mt-1.5">
             <button
@@ -1364,7 +1335,6 @@ function GroupedSingleItemContent({
           </div>
         )}
       </div>
-      {/* Action on right when no close button */}
       {!showCloseButton && item.action && (
         <button
           onClick={item.action.onClick}
@@ -1399,7 +1369,6 @@ function GroupedToastSummaryContent({
   data,
   onToggle,
 }: GroupedToastSummaryContentProps) {
-  // Count items still in progress (loading)
   const loadingCount = data.items.filter(
     (item) => item.type === "loading",
   ).length;
@@ -1409,7 +1378,6 @@ function GroupedToastSummaryContent({
   const iconType = hasLoadingItem ? "loading" : "success";
   const Icon = TOAST_ICONS[iconType];
 
-  // Generate summary text
   const summaryText =
     typeof data.summary === "function"
       ? data.summary({ loadingCount, completedCount, totalCount })
@@ -1451,12 +1419,7 @@ interface ExpandedCardsContainerProps {
   isTop: boolean;
 }
 
-/**
- * Container for expanded cards that handles stacking of pending and completed items.
- * Uses flex layout to properly stack cards without needing to know heights.
- * Cards are wrapped in AnimatePresence so they animate out smoothly when removed.
- * Note: Enter/exit animations for the container are handled by the parent Popover.Popup.
- */
+/** Container for expanded pending/completed item cards with enter/exit animations */
 function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
   const completedCount = (data.completedItems ?? []).length;
   const pendingCount = data.items.length;
@@ -1468,7 +1431,6 @@ function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
   const hasPendingItems =
     pendingCount > 1 || (pendingCount >= 1 && hasCompletedItems);
 
-  // Don't render if nothing to show
   if (!hasCompletedItems && !hasPendingItems) {
     return null;
   }
@@ -1641,10 +1603,7 @@ function GroupedToastCardItem({
   );
 }
 
-// =============================================================================
-// Completed Items Components (for grouped toasts)
-// =============================================================================
-
+// Completed Items Components
 interface CompletedItemRowProps {
   item: GroupedToastItem;
   showSeparator: boolean;
@@ -1788,8 +1747,5 @@ function CompletedItemsCard({ items, isTop }: CompletedItemsCardProps) {
   );
 }
 
-// =============================================================================
 // Exports
-// =============================================================================
-
 export { Toast, toastManager, anchoredToastManager };

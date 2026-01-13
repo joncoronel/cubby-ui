@@ -1752,8 +1752,13 @@ function CompletedItemRow({ item, showSeparator }: CompletedItemRowProps) {
 
   // Use item's duration or default for progress bar animation
   const dismissDuration = item.duration ?? GROUP_ITEM_DISMISS_DURATION;
+  // Calculate elapsed time on mount to sync animation with actual timer
+  const [elapsed] = React.useState(() =>
+    item.completedAt ? Date.now() - item.completedAt : 0,
+  );
   const animationStyle = {
     "--dismiss-duration": `${dismissDuration}ms`,
+    "--animation-delay": `-${Math.min(elapsed, dismissDuration)}ms`,
   } as React.CSSProperties;
 
   return (
@@ -1775,6 +1780,7 @@ function CompletedItemRow({ item, showSeparator }: CompletedItemRowProps) {
           className={cn(
             "bg-card absolute inset-0 origin-left",
             "animate-[progress-fill_var(--dismiss-duration)_linear_forwards]",
+            "[animation-delay:var(--animation-delay)]",
           )}
         />
 

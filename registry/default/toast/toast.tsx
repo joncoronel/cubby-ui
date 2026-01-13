@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { cva } from "class-variance-authority";
 import { Popover } from "@base-ui/react/popover";
 import { Toast } from "@base-ui/react/toast";
 import { AnimatePresence } from "motion/react";
@@ -39,7 +40,20 @@ const TOAST_ICONS = {
   loading: Loading03Icon,
 } as const;
 
-// Icon colors are handled via in-data-[type=*] selectors in the Icon className,
+const toastIconVariants = cva("", {
+  variants: {
+    type: {
+      default: "",
+      success: "text-success-foreground",
+      error: "text-danger-foreground",
+      warning: "text-warning-foreground",
+      info: "text-info-foreground",
+      loading: "text-muted-foreground animate-spin",
+    },
+  },
+});
+
+// Icon colors in StackedToastItem use in-data-[type=*] selectors,
 // which automatically style based on the data-type attribute set by Base UI on Toast.Root
 
 // Shared Toast CSS Classes (used by StackedToastItem and GroupedToastRoot)
@@ -1395,13 +1409,7 @@ function GroupedSingleItemContent({
           <HugeiconsIcon
             icon={Icon}
             strokeWidth={2}
-            className={cn(
-              type === "success" && "text-success-foreground",
-              type === "error" && "text-danger-foreground",
-              type === "warning" && "text-warning-foreground",
-              type === "info" && "text-info-foreground",
-              type === "loading" && "text-muted-foreground animate-spin",
-            )}
+            className={toastIconVariants({ type })}
           />
         </div>
       )}
@@ -1505,12 +1513,7 @@ function GroupedToastSummaryContent({
         <HugeiconsIcon
           icon={Icon}
           strokeWidth={2}
-          className={cn(
-            iconType === "loading" && "text-muted-foreground animate-spin",
-            iconType === "success" && "text-success-foreground",
-            iconType === "error" && "text-danger-foreground",
-            iconType === "warning" && "text-warning-foreground",
-          )}
+          className={toastIconVariants({ type: iconType })}
         />
       </div>
       <span className="flex-1 font-medium">{summaryText}</span>
@@ -1689,13 +1692,7 @@ function GroupedToastCardItem({
             <HugeiconsIcon
               icon={Icon}
               strokeWidth={2}
-              className={cn(
-                type === "success" && "text-success-foreground",
-                type === "error" && "text-danger-foreground",
-                type === "warning" && "text-warning-foreground",
-                type === "info" && "text-info-foreground",
-                type === "loading" && "text-muted-foreground animate-spin",
-              )}
+              className={toastIconVariants({ type })}
             />
           </div>
         )}
@@ -1771,12 +1768,7 @@ function CompletedItemRow({ item, showSeparator }: CompletedItemRowProps) {
               <HugeiconsIcon
                 icon={Icon}
                 strokeWidth={2}
-                className={cn(
-                  type === "success" && "text-success-foreground",
-                  type === "error" && "text-danger-foreground",
-                  type === "warning" && "text-warning-foreground",
-                  type === "info" && "text-info-foreground",
-                )}
+                className={toastIconVariants({ type })}
               />
             </div>
           )}

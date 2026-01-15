@@ -1151,6 +1151,9 @@
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/switch.tsx"
         }
+      ],
+      "dependencies": [
+        "class-variance-authority"
       ]
     },
     {

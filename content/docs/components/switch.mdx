@@ -19,26 +19,39 @@ import { Switch } from "@/registry/default/switch/switch";
 
 ## Examples
 
-### With Label
+### Card
 
-Add descriptive labels to switches.
+Use a Label as a clickable card container.
 
-<ComponentPreview component="switch" example="switch-with-label" />
+<ComponentPreview component="switch" example="switch-card" />
 
-### Controlled
+### Pill Shape
 
-Manage switch state externally.
+Use the `shape="pill"` variant for a wider thumb.
 
-<ComponentPreview component="switch" example="switch-controlled" />
+<ComponentPreview component="switch" example="switch-pill" />
 
-### Disabled State
+## API Reference
 
-Prevent interaction with disabled switches.
+The Switch component is built on top of [Base UI's Switch](https://base-ui.com/react/components/switch). All Base UI props are supported. The documentation below only covers custom props specific to our implementation.
 
-<ComponentPreview component="switch" example="switch-disabled-state" />
+For the complete Base UI API, see the [Base UI Switch documentation](https://base-ui.com/react/components/switch).
 
-### Settings Form
+### Props
 
-Use switches in settings and preferences forms.
+#### Switch
 
-<ComponentPreview component="switch" example="switch-settings-form" />
+Toggle control for binary on/off states. Wraps Base UI's `Switch.Root` and `Switch.Thumb`.
+
+<ApiPropsList>
+
+<ApiProp
+  name="shape"
+  fullType='"circle" | "pill"'
+  simpleType="string"
+  defaultValue='"circle"'
+>
+  Controls the aspect ratio and animation travel distance of the switch thumb. Use `"pill"` for a wider, more rectangular thumb.
+</ApiProp>
+
+</ApiPropsList>

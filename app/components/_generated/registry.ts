@@ -295,6 +295,7 @@ import slider_slider_with_value from "@/registry/examples/slider/slider-with-val
 import switch_switch_basic from "@/registry/examples/switch/switch-basic";
 import switch_switch_controlled from "@/registry/examples/switch/switch-controlled";
 import switch_switch_disabled_state from "@/registry/examples/switch/switch-disabled-state";
+import switch_switch_pill from "@/registry/examples/switch/switch-pill";
 import switch_switch_settings_form from "@/registry/examples/switch/switch-settings-form";
 import switch_switch_with_label from "@/registry/examples/switch/switch-with-label";
 import table_table_basic from "@/registry/examples/table/table-basic";
@@ -1014,7 +1015,9 @@ export const componentMetadata = {
     "description": "A switch component.",
     "category": "UI",
     "registryDependencies": [],
-    "dependencies": [],
+    "dependencies": [
+      "class-variance-authority"
+    ],
     "examples": {},
     "reference": []
   },
@@ -2741,6 +2744,11 @@ export const exampleRegistry = {
       "source": "import { Switch } from \"@/components/ui/cubby-ui/switch\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function SwitchDisabledState() {\n  return (\n    <div className=\"space-y-3\">\n      <div className=\"flex items-center space-x-2\">\n        <Switch id=\"disabled-off\" disabled />\n        <Label htmlFor=\"disabled-off\" className=\"text-muted-foreground\">\n          Disabled (off)\n        </Label>\n      </div>\n      <div className=\"flex items-center space-x-2\">\n        <Switch id=\"disabled-on\" disabled checked />\n        <Label htmlFor=\"disabled-on\" className=\"text-muted-foreground\">\n          Disabled (on)\n        </Label>\n      </div>\n    </div>\n  );\n}"
     },
     {
+      "title": "Pill",
+      "importPath": "switch-pill",
+      "source": "import { Switch } from \"@/components/ui/cubby-ui/switch\";\n\nexport default function SwitchPill() {\n  return <Switch shape=\"pill\" />;\n}\n"
+    },
+    {
       "title": "Settings Form",
       "importPath": "switch-settings-form",
       "source": "\"use client\";\n\nimport { Switch } from \"@/components/ui/cubby-ui/switch\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\nimport { useState } from \"react\";\n\nexport default function SwitchSettingsForm() {\n  const [settings, setSettings] = useState({\n    marketing: false,\n    security: true,\n    analytics: false,\n  });\n\n  return (\n    <div className=\"space-y-4\">\n      <h4 className=\"font-medium\">Email Notifications</h4>\n      <div className=\"space-y-3\">\n        <div className=\"flex items-center justify-between\">\n          <div className=\"space-y-0.5\">\n            <Label htmlFor=\"marketing\">Marketing emails</Label>\n            <p className=\"text-sm text-muted-foreground\">\n              Receive emails about new products and features.\n            </p>\n          </div>\n          <Switch\n            id=\"marketing\"\n            checked={settings.marketing}\n            onCheckedChange={(checked) => \n              setSettings({ ...settings, marketing: checked })\n            }\n          />\n        </div>\n        <div className=\"flex items-center justify-between\">\n          <div className=\"space-y-0.5\">\n            <Label htmlFor=\"security\">Security alerts</Label>\n            <p className=\"text-sm text-muted-foreground\">\n              Receive alerts about your account security.\n            </p>\n          </div>\n          <Switch\n            id=\"security\"\n            checked={settings.security}\n            onCheckedChange={(checked) => \n              setSettings({ ...settings, security: checked })\n            }\n          />\n        </div>\n        <div className=\"flex items-center justify-between\">\n          <div className=\"space-y-0.5\">\n            <Label htmlFor=\"analytics\">Analytics reports</Label>\n            <p className=\"text-sm text-muted-foreground\">\n              Receive monthly analytics reports.\n            </p>\n          </div>\n          <Switch\n            id=\"analytics\"\n            checked={settings.analytics}\n            onCheckedChange={(checked) => \n              setSettings({ ...settings, analytics: checked })\n            }\n          />\n        </div>\n      </div>\n    </div>\n  );\n}"
@@ -3308,6 +3316,7 @@ export const componentMap = {
   "switch-basic": switch_switch_basic,
   "switch-controlled": switch_switch_controlled,
   "switch-disabled-state": switch_switch_disabled_state,
+  "switch-pill": switch_switch_pill,
   "switch-settings-form": switch_switch_settings_form,
   "switch-with-label": switch_switch_with_label,
   "table-basic": table_table_basic,

@@ -293,11 +293,8 @@ import slider_slider_vertical from "@/registry/examples/slider/slider-vertical";
 import slider_slider_with_steps from "@/registry/examples/slider/slider-with-steps";
 import slider_slider_with_value from "@/registry/examples/slider/slider-with-value";
 import switch_switch_basic from "@/registry/examples/switch/switch-basic";
-import switch_switch_controlled from "@/registry/examples/switch/switch-controlled";
-import switch_switch_disabled_state from "@/registry/examples/switch/switch-disabled-state";
+import switch_switch_card from "@/registry/examples/switch/switch-card";
 import switch_switch_pill from "@/registry/examples/switch/switch-pill";
-import switch_switch_settings_form from "@/registry/examples/switch/switch-settings-form";
-import switch_switch_with_label from "@/registry/examples/switch/switch-with-label";
 import table_table_basic from "@/registry/examples/table/table-basic";
 import table_table_with_footer from "@/registry/examples/table/table-with-footer";
 import tabs_tabs_basic from "@/registry/examples/tabs/tabs-basic";
@@ -2734,29 +2731,14 @@ export const exampleRegistry = {
       "source": "import { Switch } from \"@/components/ui/cubby-ui/switch\";\n\nexport default function SwitchBasic() {\n  return <Switch />;\n}"
     },
     {
-      "title": "Controlled",
-      "importPath": "switch-controlled",
-      "source": "\"use client\";\n\nimport { Switch } from \"@/components/ui/cubby-ui/switch\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\nimport { useState } from \"react\";\n\nexport default function SwitchControlled() {\n  const [isEnabled, setIsEnabled] = useState(false);\n\n  return (\n    <div className=\"space-y-2\">\n      <div className=\"flex items-center space-x-2\">\n        <Switch \n          id=\"notifications\" \n          checked={isEnabled}\n          onCheckedChange={setIsEnabled}\n        />\n        <Label htmlFor=\"notifications\">\n          Enable notifications\n        </Label>\n      </div>\n      <p className=\"text-sm text-muted-foreground\">\n        {isEnabled ? \"You will receive notifications\" : \"Notifications are disabled\"}\n      </p>\n    </div>\n  );\n}"
-    },
-    {
-      "title": "Disabled State",
-      "importPath": "switch-disabled-state",
-      "source": "import { Switch } from \"@/components/ui/cubby-ui/switch\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function SwitchDisabledState() {\n  return (\n    <div className=\"space-y-3\">\n      <div className=\"flex items-center space-x-2\">\n        <Switch id=\"disabled-off\" disabled />\n        <Label htmlFor=\"disabled-off\" className=\"text-muted-foreground\">\n          Disabled (off)\n        </Label>\n      </div>\n      <div className=\"flex items-center space-x-2\">\n        <Switch id=\"disabled-on\" disabled checked />\n        <Label htmlFor=\"disabled-on\" className=\"text-muted-foreground\">\n          Disabled (on)\n        </Label>\n      </div>\n    </div>\n  );\n}"
+      "title": "Card",
+      "importPath": "switch-card",
+      "source": "import { Switch } from \"@/components/ui/cubby-ui/switch\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function SwitchCard() {\n  return (\n    <Label\n      htmlFor=\"notifications\"\n      className=\"has-[data-checked]:border-primary has-[data-checked]:bg-accent cursor-pointer flex-row items-center justify-between gap-4 rounded-lg border p-4\"\n    >\n      <div className=\"space-y-0.5\">\n        <div className=\"font-medium\">Push Notifications</div>\n        <div className=\"text-muted-foreground text-sm\">\n          Receive notifications when someone mentions you.\n        </div>\n      </div>\n      <Switch className=\"[--thumb-size:--spacing(4)]\" id=\"notifications\" />\n    </Label>\n  );\n}\n"
     },
     {
       "title": "Pill",
       "importPath": "switch-pill",
       "source": "import { Switch } from \"@/components/ui/cubby-ui/switch\";\n\nexport default function SwitchPill() {\n  return <Switch shape=\"pill\" />;\n}\n"
-    },
-    {
-      "title": "Settings Form",
-      "importPath": "switch-settings-form",
-      "source": "\"use client\";\n\nimport { Switch } from \"@/components/ui/cubby-ui/switch\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\nimport { useState } from \"react\";\n\nexport default function SwitchSettingsForm() {\n  const [settings, setSettings] = useState({\n    marketing: false,\n    security: true,\n    analytics: false,\n  });\n\n  return (\n    <div className=\"space-y-4\">\n      <h4 className=\"font-medium\">Email Notifications</h4>\n      <div className=\"space-y-3\">\n        <div className=\"flex items-center justify-between\">\n          <div className=\"space-y-0.5\">\n            <Label htmlFor=\"marketing\">Marketing emails</Label>\n            <p className=\"text-sm text-muted-foreground\">\n              Receive emails about new products and features.\n            </p>\n          </div>\n          <Switch\n            id=\"marketing\"\n            checked={settings.marketing}\n            onCheckedChange={(checked) => \n              setSettings({ ...settings, marketing: checked })\n            }\n          />\n        </div>\n        <div className=\"flex items-center justify-between\">\n          <div className=\"space-y-0.5\">\n            <Label htmlFor=\"security\">Security alerts</Label>\n            <p className=\"text-sm text-muted-foreground\">\n              Receive alerts about your account security.\n            </p>\n          </div>\n          <Switch\n            id=\"security\"\n            checked={settings.security}\n            onCheckedChange={(checked) => \n              setSettings({ ...settings, security: checked })\n            }\n          />\n        </div>\n        <div className=\"flex items-center justify-between\">\n          <div className=\"space-y-0.5\">\n            <Label htmlFor=\"analytics\">Analytics reports</Label>\n            <p className=\"text-sm text-muted-foreground\">\n              Receive monthly analytics reports.\n            </p>\n          </div>\n          <Switch\n            id=\"analytics\"\n            checked={settings.analytics}\n            onCheckedChange={(checked) => \n              setSettings({ ...settings, analytics: checked })\n            }\n          />\n        </div>\n      </div>\n    </div>\n  );\n}"
-    },
-    {
-      "title": "With Label",
-      "importPath": "switch-with-label",
-      "source": "import { Switch } from \"@/components/ui/cubby-ui/switch\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function SwitchWithLabel() {\n  return (\n    <div className=\"flex items-center space-x-2\">\n      <Switch id=\"airplane-mode\" />\n      <Label htmlFor=\"airplane-mode\">Airplane Mode</Label>\n    </div>\n  );\n}"
     }
   ],
   "table": [
@@ -3314,11 +3296,8 @@ export const componentMap = {
   "slider-with-steps": slider_slider_with_steps,
   "slider-with-value": slider_slider_with_value,
   "switch-basic": switch_switch_basic,
-  "switch-controlled": switch_switch_controlled,
-  "switch-disabled-state": switch_switch_disabled_state,
+  "switch-card": switch_switch_card,
   "switch-pill": switch_switch_pill,
-  "switch-settings-form": switch_switch_settings_form,
-  "switch-with-label": switch_switch_with_label,
   "table-basic": table_table_basic,
   "table-with-footer": table_table_with_footer,
   "tabs-basic": tabs_tabs_basic,

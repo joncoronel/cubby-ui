@@ -6,13 +6,13 @@ import { cn } from "@/lib/utils";
 
 const switchVariants = cva(
   [
-    "peer inline-flex shrink-0 items-center rounded-full p-0.5 outline-none",
+    "peer inline-flex shrink-0 items-center rounded-full p-0.5 outline-none cursor-pointer",
     "h-[calc(var(--thumb-size)+4px)]",
     "w-[calc(var(--thumb-size)*var(--thumb-aspect)*(1+var(--travel-ratio))+4px)]",
     "data-checked:bg-primary data-unchecked:bg-accent bg-muted",
     "inset-shadow-xs transition-all duration-200",
     "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2",
-    "disabled:cursor-not-allowed disabled:opacity-60",
+    "data-disabled:cursor-not-allowed data-disabled:opacity-60",
   ],
   {
     variants: {
@@ -42,11 +42,11 @@ function Switch({ className, shape, ...props }: SwitchProps) {
       <BaseSwitch.Thumb
         data-slot="switch-thumb"
         className={cn(
-          "bg-background pointer-events-none block rounded-full",
+          "dark:not-data-checked:bg-background pointer-events-none block rounded-full bg-white",
           "aspect-(--thumb-aspect) h-(--thumb-size)",
           "shadow-[0_1px_2px_0_oklch(0.18_0_0/0.15)]",
           "ease-out-cubic transition-all duration-200",
-          "data-checked:translate-x-[calc(var(--thumb-size)*var(--thumb-aspect)*var(--travel-ratio))]",
+          "transform-gpu will-change-transform data-checked:translate-x-[calc(var(--thumb-size)*var(--thumb-aspect)*var(--travel-ratio))]",
         )}
       />
     </BaseSwitch.Root>

@@ -2733,7 +2733,7 @@ export const exampleRegistry = {
     {
       "title": "Card",
       "importPath": "switch-card",
-      "source": "import { Switch } from \"@/components/ui/cubby-ui/switch\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function SwitchCard() {\n  return (\n    <Label\n      htmlFor=\"notifications\"\n      className=\"has-[data-checked]:border-primary has-[data-checked]:bg-accent cursor-pointer flex-row items-center justify-between gap-4 rounded-lg border p-4\"\n    >\n      <div className=\"space-y-0.5\">\n        <div className=\"font-medium\">Push Notifications</div>\n        <div className=\"text-muted-foreground text-sm\">\n          Receive notifications when someone mentions you.\n        </div>\n      </div>\n      <Switch className=\"[--thumb-size:--spacing(4)]\" id=\"notifications\" />\n    </Label>\n  );\n}\n"
+      "source": "import { Switch } from \"@/components/ui/cubby-ui/switch\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function SwitchCard() {\n  return (\n    <Label\n      htmlFor=\"notifications\"\n      className=\"has-[data-checked]:border-primary has-[data-checked]:bg-accent flex cursor-pointer flex-row items-center justify-between gap-4 rounded-lg border p-4\"\n    >\n      <div className=\"space-y-0.5\">\n        <div className=\"font-medium\">Push Notifications</div>\n        <div className=\"text-muted-foreground text-sm\">\n          Receive notifications when someone mentions you.\n        </div>\n      </div>\n      <Switch className=\"[--thumb-size:--spacing(4)]\" id=\"notifications\" />\n    </Label>\n  );\n}\n"
     },
     {
       "title": "Pill",

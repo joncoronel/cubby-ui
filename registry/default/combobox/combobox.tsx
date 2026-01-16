@@ -116,7 +116,10 @@ function ComboboxTrigger({ className, ...props }: BaseCombobox.Trigger.Props) {
   );
 }
 
-function ComboboxIcon({ className, ...props }: BaseCombobox.Icon.Props) {
+function ComboboxIcon({
+  className,
+  ...props
+}: React.ComponentProps<typeof BaseCombobox.Icon>) {
   return (
     <BaseCombobox.Icon
       data-slot="combobox-icon"
@@ -419,18 +422,16 @@ function ComboboxChipRemove({
   );
 }
 
-interface ComboboxPopupProps extends BaseCombobox.Popup.Props {
-  sideOffset?: BaseCombobox.Positioner.Props["sideOffset"];
-  backdrop?: boolean;
-}
-
 function ComboboxPopup({
   className,
   children,
   sideOffset = 6,
   backdrop = false,
   ...props
-}: ComboboxPopupProps) {
+}: BaseCombobox.Popup.Props & {
+  sideOffset?: number;
+  backdrop?: boolean;
+}) {
   const context = React.useContext(ComboboxContext);
 
   return (

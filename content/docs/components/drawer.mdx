@@ -102,9 +102,11 @@ The Drawer component is built on top of [Base UI's Dialog](https://base-ui.com/r
 
 For the complete Base UI API, see the [Base UI Dialog documentation](https://base-ui.com/react/components/dialog).
 
-### Custom Props
+### Props
 
-#### Drawer (Root)
+#### Drawer
+
+Root component that manages drawer state and provides context to child components. Wraps Base UI's `Dialog.Root`.
 
 <ApiPropsList>
 
@@ -224,6 +226,8 @@ For the complete Base UI API, see the [Base UI Dialog documentation](https://bas
 
 #### DrawerContent
 
+Main drawer container with swipe gesture handling and positioning. Composes `Dialog.Portal`, `Dialog.Backdrop`, `Dialog.Viewport`, and `Dialog.Popup`. Props are forwarded to `Dialog.Popup`.
+
 <ApiPropsList>
 
 <ApiProp
@@ -240,6 +244,8 @@ For the complete Base UI API, see the [Base UI Dialog documentation](https://bas
 
 #### DrawerBody
 
+Scrollable content area with adaptive padding based on surrounding elements. Wraps `ScrollArea`.
+
 <ApiPropsList>
 
 <ApiProp name="nativeScroll" fullType="boolean" defaultValue="false">
@@ -251,7 +257,7 @@ For the complete Base UI API, see the [Base UI Dialog documentation](https://bas
 <ApiProp
   name="fadeEdges"
   fullType="boolean | 'top' | 'bottom' | 'left' | 'right' | 'x' | 'y' | FadeEdge[]"
-  defaultValue="true"
+  defaultValue="false"
 >
   Controls the fade effect on scroll edges. See
   [ScrollArea](/docs/components/scroll-area#custom-props) for all options.
@@ -268,6 +274,22 @@ For the complete Base UI API, see the [Base UI Dialog documentation](https://bas
 
 <ApiProp name="hideScrollbar" fullType="boolean" defaultValue="false">
   Hides the scrollbar while keeping scroll functionality.
+</ApiProp>
+
+</ApiPropsList>
+
+#### DrawerHandle
+
+Visual drag indicator that doubles as a close button. Automatically adjusts orientation based on drawer direction.
+
+<ApiPropsList>
+
+<ApiProp name="hidden" fullType="boolean">
+  When true, the handle is not rendered.
+</ApiProp>
+
+<ApiProp name="preventClose" fullType="boolean" defaultValue="false">
+  When true, clicking the handle will not close the drawer.
 </ApiProp>
 
 </ApiPropsList>

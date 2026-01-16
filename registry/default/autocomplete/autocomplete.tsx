@@ -71,7 +71,7 @@ function AutocompleteTrigger({
 function AutocompleteIcon({
   className,
   ...props
-}: BaseAutocomplete.Icon.Props) {
+}: React.ComponentProps<typeof BaseAutocomplete.Icon>) {
   return (
     <BaseAutocomplete.Icon
       data-slot="autocomplete-icon"

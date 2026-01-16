@@ -41,7 +41,7 @@ function parseFadeEdges(fadeEdges: FadeEdges): {
 
 type OverscrollBehavior = "auto" | "contain" | "none";
 
-interface ScrollAreaProps extends BaseScrollArea.Root.Props {
+type ScrollAreaProps = BaseScrollArea.Root.Props & {
   fadeEdges?: FadeEdges;
   scrollbarGutter?: boolean;
   persistScrollbar?: boolean;
@@ -52,7 +52,7 @@ interface ScrollAreaProps extends BaseScrollArea.Root.Props {
   viewportRef?: (element: HTMLDivElement | null) => void;
   /** Additional className for the viewport element */
   viewportClassName?: string;
-}
+};
 
 function ScrollArea({
   className,
@@ -147,7 +147,9 @@ function ScrollBar({
   className,
   persist = false,
   ...props
-}: BaseScrollArea.Scrollbar.Props & { persist?: boolean }) {
+}: BaseScrollArea.Scrollbar.Props & {
+  persist?: boolean;
+}) {
   return (
     <BaseScrollArea.Scrollbar
       data-slot="scroll-area-scrollbar"

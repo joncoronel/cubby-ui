@@ -318,8 +318,6 @@ function Drawer({
   // Handle open change
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean, eventDetails?: { reason?: string }) => {
-      // Prevent state changes during animations (user can't interrupt enter/exit)
-      if (isAnimating) return;
       // Prevent closing while actively scrolling/dragging (swipe momentum)
       // BUT allow swipe dismiss (which passes reason: "swipe-dismiss")
       if (!nextOpen && isDragging && eventDetails?.reason !== "swipe-dismiss") {
@@ -362,7 +360,6 @@ function Drawer({
       }
     },
     [
-      isAnimating,
       isDragging,
       isOpenControlled,
       controlledOnOpenChange,
@@ -452,8 +449,9 @@ function Drawer({
         onOpenChange={handleOpenChange}
         onOpenChangeComplete={handleOpenChangeComplete}
         modal={modal}
-        // For non-modal modes, disable outside click dismissal so page interaction doesn't close drawer
-        disablePointerDismissal={modal !== true}
+        // Disable pointer dismissal during animations (prevents interrupting enter/exit transitions)
+        // Also disable for non-modal modes so page interaction doesn't close drawer
+        disablePointerDismissal={isAnimating || modal !== true}
         {...props}
       >
         {resolvedChildren}
@@ -792,10 +790,9 @@ function DrawerContentInner({
             // Enter: start at opacity 0, transition animates to target
             "[&[data-starting-style]]:opacity-0!",
             // Exit: use animation to override scroll-driven animation (transition can't interpolate from animation-held values)
-            // "[&[data-ending-style]]:[animation:drawer-backdrop-exit_450ms_cubic-bezier(0,0,0.58,1)_forwards]",
-            "[&[data-ending-style]]:opacity-0",
+            "data-ending-style:animate-[drawer-backdrop-exit_450ms_cubic-bezier(0,0,0.58,1)_forwards]",
 
-            isInitialized && !isAnimating && isDragging && dismissible
+            isInitialized && !isAnimating && dismissible
               ? useScrollDrivenAnimation
                 ? // Scroll-driven backdrop animation (Chrome 115+)
                   backdropAnimationStyles[direction]

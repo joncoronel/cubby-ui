@@ -136,6 +136,22 @@ const drawerTrackVariants = cva("pointer-events-none relative flex", {
   },
 });
 
+// iOS 26 Safari: Fixed elements for nav bar color detection
+// Must be: within 3px of edge, ≥80% wide, ≥3px tall
+// Only visible on Safari; static JSX hoisted for performance
+const SafariNavColorDetectors = (
+  <>
+    <div
+      aria-hidden="true"
+      className="bg-popover pointer-events-none fixed inset-x-0 bottom-0 hidden h-10 bg-clip-text [@supports(-webkit-touch-callout:none)]:block"
+    />
+    <div
+      aria-hidden="true"
+      className="bg-popover pointer-events-none fixed inset-x-0 top-0 hidden h-10 bg-clip-text [@supports(-webkit-touch-callout:none)]:block"
+    />
+  </>
+);
+
 // Backdrop scroll-driven animation styles (used conditionally at runtime)
 const backdropAnimationStyles: Record<DrawerDirection, string> = {
   // Bottom/Right: drawer enters from below/right → use entry range (0→1 opacity)
@@ -154,15 +170,22 @@ const backdropAnimationStyles: Record<DrawerDirection, string> = {
 
 type DrawerVariant = "default" | "floating";
 
-interface DrawerContextValue {
+/** Static configuration that rarely changes */
+interface DrawerConfigContextValue {
   direction: DrawerDirection;
   variant: DrawerVariant;
   snapPoints: SnapPoint[];
-  activeSnapPoint: SnapPoint;
-  setActiveSnapPoint: (snapPoint: SnapPoint) => void;
   dismissible: boolean;
   /** Modal behavior passed to Base UI Dialog */
   modal: boolean | "trap-focus";
+  isVertical: boolean;
+  sequentialSnap: boolean;
+  /** Whether to reposition drawer when virtual keyboard appears. */
+  repositionInputs: boolean;
+}
+
+/** Animation state that changes frequently during drag */
+interface DrawerAnimationContextValue {
   isDragging: boolean;
   setIsDragging: (dragging: boolean) => void;
   dragProgress: number;
@@ -170,28 +193,41 @@ interface DrawerContextValue {
   /** Progress between snap points (0 = first snap, 1 = last snap) */
   snapProgress: number;
   setSnapProgress: (progress: number) => void;
+  activeSnapPoint: SnapPoint;
+  setActiveSnapPoint: (snapPoint: SnapPoint) => void;
   open: boolean;
   onOpenChange: (open: boolean, eventDetails?: { reason?: string }) => void;
-
   contentSize: number | null;
   setContentSize: (size: number | null) => void;
-  isVertical: boolean;
   isAnimating: boolean;
   immediateClose: boolean;
   setImmediateClose: (value: boolean) => void;
-  sequentialSnap: boolean;
-  /** Whether to reposition drawer when virtual keyboard appears. */
-  repositionInputs: boolean;
 }
 
-const DrawerContext = React.createContext<DrawerContextValue | null>(null);
+const DrawerConfigContext =
+  React.createContext<DrawerConfigContextValue | null>(null);
+const DrawerAnimationContext =
+  React.createContext<DrawerAnimationContextValue | null>(null);
 
-function useDrawer() {
-  const context = React.useContext(DrawerContext);
+function useDrawerConfig() {
+  const context = React.useContext(DrawerConfigContext);
   if (!context) {
     throw new Error("Drawer components must be used within a <Drawer />");
   }
   return context;
+}
+
+function useDrawerAnimation() {
+  const context = React.useContext(DrawerAnimationContext);
+  if (!context) {
+    throw new Error("Drawer components must be used within a <Drawer />");
+  }
+  return context;
+}
+
+/** Combined hook for components that need both config and animation state */
+function useDrawer() {
+  return { ...useDrawerConfig(), ...useDrawerAnimation() };
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -382,29 +418,15 @@ function Drawer({
     [snapPoints, isSnapPointControlled, onActiveSnapPointChange],
   );
 
-  const contextValue = React.useMemo(
+  // Static config context (rarely changes - only on prop changes)
+  const configValue = React.useMemo(
     () => ({
       direction,
       variant,
       snapPoints,
-      activeSnapPoint: activeSnapPointValue,
-      setActiveSnapPoint,
       dismissible,
       modal,
-      isDragging,
-      setIsDragging,
-      dragProgress,
-      setDragProgress,
-      snapProgress,
-      setSnapProgress,
-      open,
-      onOpenChange: handleOpenChange,
-      contentSize,
-      setContentSize,
       isVertical,
-      isAnimating,
-      immediateClose,
-      setImmediateClose,
       sequentialSnap,
       repositionInputs,
     }),
@@ -412,21 +434,44 @@ function Drawer({
       direction,
       variant,
       snapPoints,
-      activeSnapPointValue,
-      setActiveSnapPoint,
-      modal,
       dismissible,
+      modal,
+      isVertical,
+      sequentialSnap,
+      repositionInputs,
+    ],
+  );
+
+  // Animation context (changes frequently during drag)
+  const animationValue = React.useMemo(
+    () => ({
+      isDragging,
+      setIsDragging,
+      dragProgress,
+      setDragProgress,
+      snapProgress,
+      setSnapProgress,
+      activeSnapPoint: activeSnapPointValue,
+      setActiveSnapPoint,
+      open,
+      onOpenChange: handleOpenChange,
+      contentSize,
+      setContentSize,
+      isAnimating,
+      immediateClose,
+      setImmediateClose,
+    }),
+    [
       isDragging,
       dragProgress,
       snapProgress,
+      activeSnapPointValue,
+      setActiveSnapPoint,
       open,
       handleOpenChange,
       contentSize,
-      isVertical,
       isAnimating,
       immediateClose,
-      sequentialSnap,
-      repositionInputs,
     ],
   );
 
@@ -442,21 +487,23 @@ function Drawer({
       : children;
 
   return (
-    <DrawerContext.Provider value={contextValue}>
-      <BaseDialog.Root
-        data-slot="drawer"
-        open={open}
-        onOpenChange={handleOpenChange}
-        onOpenChangeComplete={handleOpenChangeComplete}
-        modal={modal}
-        // Disable pointer dismissal during animations (prevents interrupting enter/exit transitions)
-        // Also disable for non-modal modes so page interaction doesn't close drawer
-        disablePointerDismissal={isAnimating || modal !== true}
-        {...props}
-      >
-        {resolvedChildren}
-      </BaseDialog.Root>
-    </DrawerContext.Provider>
+    <DrawerConfigContext.Provider value={configValue}>
+      <DrawerAnimationContext.Provider value={animationValue}>
+        <BaseDialog.Root
+          data-slot="drawer"
+          open={open}
+          onOpenChange={handleOpenChange}
+          onOpenChangeComplete={handleOpenChangeComplete}
+          modal={modal}
+          // Disable pointer dismissal during animations (prevents interrupting enter/exit transitions)
+          // Also disable for non-modal modes so page interaction doesn't close drawer
+          disablePointerDismissal={isAnimating || modal !== true}
+          {...props}
+        >
+          {resolvedChildren}
+        </BaseDialog.Root>
+      </DrawerAnimationContext.Provider>
+    </DrawerConfigContext.Provider>
   );
 }
 
@@ -484,7 +531,7 @@ function DrawerClose({
   render,
   ...props
 }: DrawerCloseProps) {
-  const { onOpenChange, isAnimating } = useDrawer();
+  const { onOpenChange, isAnimating } = useDrawerAnimation();
 
   const handleClick = React.useCallback(
     (event: React.MouseEvent) => {
@@ -759,6 +806,72 @@ function DrawerContentInner({
   const useScrollDrivenAnimation =
     supportsScrollTimeline && isInitialized && !isAnimating && !immediateClose;
 
+  // Memoize viewport style to avoid object recreation on every render
+  const viewportStyle = React.useMemo<React.CSSProperties>(
+    () => ({
+      ...(visualViewportHeight != null && {
+        "--visual-viewport-height": `${visualViewportHeight}px`,
+      }),
+      ...(repositionInputs && {
+        "--keyboard-height": `${keyboardHeight}px`,
+      }),
+      "--content-size": `${contentSize ?? 0}px`,
+      "--dismiss-buffer": dismissible ? `${(contentSize ?? 0) * 0.3}px` : "0px",
+      "--first-snap-ratio": firstSnapRatio,
+      "--last-snap-ratio": lastSnapRatio,
+      scrollSnapType: isInitialized
+        ? isVertical
+          ? "y mandatory"
+          : "x mandatory"
+        : "none",
+      scrollBehavior: isInitialized ? "smooth" : "auto",
+      ...(useScrollDrivenAnimation
+        ? {
+            animationName: "drawer-snap-progress",
+            animationTimingFunction: "linear",
+            animationFillMode: "both",
+            animationTimeline: isVertical ? "scroll(self)" : "scroll(self x)",
+            ...(direction === "top" || direction === "left"
+              ? {
+                  animationRange: `calc(var(--content-size) * (1 - var(--last-snap-ratio))) calc(var(--content-size) * (1 - var(--first-snap-ratio)))`,
+                  animationDirection: "reverse",
+                }
+              : {
+                  animationRange: `calc(var(--dismiss-buffer) + var(--first-snap-ratio) * var(--content-size)) calc(var(--dismiss-buffer) + var(--last-snap-ratio) * var(--content-size))`,
+                }),
+          }
+        : {
+            "--drawer-snap-progress": snapProgress,
+          }),
+    }),
+    [
+      visualViewportHeight,
+      repositionInputs,
+      keyboardHeight,
+      contentSize,
+      dismissible,
+      firstSnapRatio,
+      lastSnapRatio,
+      isInitialized,
+      isVertical,
+      useScrollDrivenAnimation,
+      snapProgress,
+      direction,
+    ],
+  );
+
+  // Memoize popup style to avoid object recreation on every render
+  const popupStyle = React.useMemo<React.CSSProperties>(
+    () => ({
+      "--drawer-offset": animationOffset,
+      ...(supportsScrollTimeline && {
+        viewTimelineName: "--drawer-panel",
+        viewTimelineAxis: isVertical ? "block" : "inline",
+      }),
+    }),
+    [animationOffset, isVertical],
+  );
+
   return (
     // Timeline scope wrapper - enables cross-element timeline references
     // Required for backdrop to reference drawer panel's view timeline
@@ -792,7 +905,7 @@ function DrawerContentInner({
             // Exit: use animation to override scroll-driven animation (transition can't interpolate from animation-held values)
             "data-ending-style:animate-[drawer-backdrop-exit_450ms_cubic-bezier(0,0,0.58,1)_forwards]",
 
-            isInitialized && !isAnimating && dismissible
+            isInitialized && !isAnimating && dismissible && dragProgress < 1
               ? useScrollDrivenAnimation
                 ? // Scroll-driven backdrop animation (Chrome 115+)
                   backdropAnimationStyles[direction]
@@ -861,73 +974,7 @@ function DrawerContentInner({
           // Reduced motion: instant behavior
           "motion-reduce:[scroll-behavior:auto]",
         )}
-        style={
-          {
-            ...(visualViewportHeight != null && {
-              "--visual-viewport-height": `${visualViewportHeight}px`,
-            }),
-            ...(repositionInputs && {
-              "--keyboard-height": `${keyboardHeight}px`,
-            }),
-            // CSS variables for scroll-driven animation calc() expressions
-            // These enable animation-range to be computed in CSS instead of JS
-            ...{
-              "--content-size": `${contentSize ?? 0}px`,
-              "--dismiss-buffer": dismissible
-                ? `${(contentSize ?? 0) * 0.3}px`
-                : "0px",
-              "--first-snap-ratio": firstSnapRatio,
-              "--last-snap-ratio": lastSnapRatio,
-            },
-            // Disable scroll-snap until initialized to prevent browser snapping to wrong position
-            // For inverted directions (top/left), scroll 0 = fully open, which causes incorrect initial state
-            scrollSnapType: isInitialized
-              ? isVertical
-                ? "y mandatory"
-                : "x mandatory"
-              : "none",
-            scrollBehavior: isInitialized ? "smooth" : "auto",
-            // Reposition drawer when virtual keyboard appears (bottom direction only)
-            // Uses transform (not bottom) to avoid resizing the scroll container
-            // which would mess with scroll positions and snap behavior
-            // transform:
-            //   direction === "bottom" &&
-            //   repositionInputs &&
-            //   isKeyboardVisible &&
-            //   keyboardHeight > 0
-            //     ? `translateY(-${keyboardHeight}px)`
-            //     : undefined,
-            // Animate --drawer-snap-progress CSS custom property
-            // Consumers can use: opacity: var(--drawer-snap-progress) for crossfades
-            // Chrome 115+: uses CSS scroll-driven animation
-            // Fallback: sets variable via JS snapProgress state
-            ...(useScrollDrivenAnimation
-              ? {
-                  animationName: "drawer-snap-progress",
-                  animationTimingFunction: "linear",
-                  animationFillMode: "both",
-                  // Horizontal drawers need scroll(self x) to track horizontal scroll
-                  animationTimeline: isVertical
-                    ? "scroll(self)"
-                    : "scroll(self x)",
-                  // For inverted directions (top/left), scroll decreases as drawer opens
-                  // animation-range requires start < end, so swap values and reverse animation
-                  // Formula: dismissBuffer + ratio * contentSize (non-inverted)
-                  // Or: contentSize * (1 - ratio) (inverted, with reversed animation)
-                  ...(direction === "top" || direction === "left"
-                    ? {
-                        animationRange: `calc(var(--content-size) * (1 - var(--last-snap-ratio))) calc(var(--content-size) * (1 - var(--first-snap-ratio)))`,
-                        animationDirection: "reverse",
-                      }
-                    : {
-                        animationRange: `calc(var(--dismiss-buffer) + var(--first-snap-ratio) * var(--content-size)) calc(var(--dismiss-buffer) + var(--last-snap-ratio) * var(--content-size))`,
-                      }),
-                }
-              : {
-                  "--drawer-snap-progress": snapProgress,
-                }),
-          } as React.CSSProperties
-        }
+        style={viewportStyle}
       >
         {/* Scroll track - creates the scrollable area */}
         <div
@@ -1034,47 +1081,14 @@ function DrawerContentInner({
               ],
               className,
             )}
-            style={
-              {
-                // Note: scroll-snap-align is NOT set here - we use dedicated invisible
-                // snap targets instead. Setting it on the Popup creates conflicting
-                // snap points for floating variant (due to margin offset).
-
-                // Dynamic offset for enter/exit animations
-                "--drawer-offset": animationOffset,
-
-                // View timeline for backdrop animation (Chrome 115+)
-                // Backdrop opacity tracks how much of drawer is visible
-                ...(supportsScrollTimeline && {
-                  viewTimelineName: "--drawer-panel",
-                  viewTimelineAxis: isVertical ? "block" : "inline",
-                }),
-              } as React.CSSProperties
-            }
+            style={popupStyle}
             {...props}
           >
             {children}
           </BaseDialog.Popup>
         </div>
 
-        {/* iOS 26 Safari: Fixed element at bottom for nav bar color detection */}
-        {/* Must be: within 3px of bottom, ≥80% wide, ≥3px tall */}
-        {/* Only visible on Safari; slides with drawer during exit */}
-
-        <>
-          <div
-            aria-hidden="true"
-            className={cn(
-              "bg-popover pointer-events-none fixed inset-x-0 bottom-0 hidden h-10 bg-clip-text [@supports(-webkit-touch-callout:none)]:block",
-            )}
-          />
-          <div
-            aria-hidden="true"
-            className={cn(
-              "bg-popover pointer-events-none fixed inset-x-0 top-0 hidden h-10 bg-clip-text [@supports(-webkit-touch-callout:none)]:block",
-            )}
-          />
-        </>
+        {SafariNavColorDetectors}
       </BaseDialog.Viewport>
     </div>
   );
@@ -1106,8 +1120,8 @@ function DrawerHandle({
   onClick,
   ...props
 }: DrawerHandleProps) {
-  const { direction, onOpenChange, isAnimating } = useDrawer();
-  const { isVertical } = DIRECTION_CONFIG[direction];
+  const { isVertical } = useDrawerConfig();
+  const { onOpenChange, isAnimating } = useDrawerAnimation();
 
   if (hidden) return null;
 
@@ -1240,8 +1254,7 @@ function DrawerBody({
     ScrollAreaProps,
     "fadeEdges" | "scrollbarGutter" | "persistScrollbar" | "hideScrollbar"
   >) {
-  const { direction } = useDrawer();
-  const { isVertical } = DIRECTION_CONFIG[direction];
+  const { isVertical } = useDrawerConfig();
 
   return (
     <div
@@ -1289,6 +1302,8 @@ export {
   DrawerDescription,
   DrawerBody,
   useDrawer,
+  useDrawerConfig,
+  useDrawerAnimation,
   createDrawerHandle,
 };
 

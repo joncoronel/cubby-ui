@@ -231,15 +231,19 @@ export function useScrollSnap(
   const findNearestSnapIndex = React.useCallback(
     (scrollPos: number): { index: number; isDismiss: boolean } => {
       let closestIndex = 0;
-      let closestDistance = Infinity;
+      let closestDistance = Math.abs(
+        scrollPos - (snapScrollPositions[0] ?? 0),
+      );
 
-      snapScrollPositions.forEach((pos, i) => {
-        const distance = Math.abs(scrollPos - pos);
+      // Use for loop instead of forEach to avoid function call overhead
+      // (Can't break early since positions aren't monotonic for inverted directions)
+      for (let i = 1; i < snapScrollPositions.length; i++) {
+        const distance = Math.abs(scrollPos - snapScrollPositions[i]);
         if (distance < closestDistance) {
           closestDistance = distance;
           closestIndex = i;
         }
-      });
+      }
 
       if (dismissible && closestIndex === 0) {
         return { index: 0, isDismiss: true };

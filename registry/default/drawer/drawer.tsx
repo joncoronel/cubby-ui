@@ -29,10 +29,8 @@ import { useScrollSnap } from "./hooks/use-scroll-snap";
 import { useVirtualKeyboard } from "./hooks/use-virtual-keyboard";
 import { useVisualViewportHeight } from "./hooks/use-visual-viewport-height";
 
-// Re-export types for consumers
 export type { SnapPoint, DrawerDirection };
 
-// Create handle for detached triggers (triggers outside the Drawer component)
 const createDrawerHandle = BaseDialog.createHandle;
 
 /* -------------------------------------------------------------------------------------------------
@@ -43,7 +41,7 @@ const drawerContentVariants = cva(
   [
     "bg-popover text-popover-foreground flex flex-col",
     "relative ",
-    "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-transform duration-350 will-change-transform",
+    "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-transform duration-300 will-change-transform",
     "motion-reduce:transition-none",
   ],
   {
@@ -136,14 +134,26 @@ const drawerTrackVariants = cva("pointer-events-none relative flex", {
   },
 });
 
-// Backdrop scroll-driven animation styles (used conditionally at runtime)
+// iOS 26 Safari: Fixed elements for nav bar color detection (must be within 3px of edge, ≥80% wide, ≥3px tall)
+const SafariNavColorDetectors = (
+  <>
+    <div
+      aria-hidden="true"
+      className="bg-popover pointer-events-none fixed inset-x-0 bottom-0 hidden h-10 bg-clip-text [@supports(-webkit-touch-callout:none)]:block"
+    />
+    <div
+      aria-hidden="true"
+      className="bg-popover pointer-events-none fixed inset-x-0 top-0 hidden h-10 bg-clip-text [@supports(-webkit-touch-callout:none)]:block"
+    />
+  </>
+);
+
+// Scroll-driven backdrop animation styles per direction
 const backdropAnimationStyles: Record<DrawerDirection, string> = {
-  // Bottom/Right: drawer enters from below/right → use entry range (0→1 opacity)
   bottom:
     "fill-mode-[both] [animation-name:drawer-backdrop-fade] [animation-range:entry_0%_entry_100%] [animation-timeline:--drawer-panel] [animation-timing-function:linear]",
   right:
     "fill-mode-[both] [animation-name:drawer-backdrop-fade] [animation-range:entry_0%_entry_100%] [animation-timeline:--drawer-panel] [animation-timing-function:linear]",
-  // Top/Left: drawer exits toward top/left → use exit range with reversed keyframe (1→0 opacity)
   top: "fill-mode-[both] direction-[reverse] [animation-name:drawer-backdrop-fade] [animation-range:exit_0%_exit_100%] [animation-timeline:--drawer-panel] [animation-timing-function:linear]",
   left: "fill-mode-[both] direction-[reverse] [animation-name:drawer-backdrop-fade] [animation-range:exit_0%_exit_100%] [animation-timeline:--drawer-panel] [animation-timing-function:linear]",
 };
@@ -154,59 +164,70 @@ const backdropAnimationStyles: Record<DrawerDirection, string> = {
 
 type DrawerVariant = "default" | "floating";
 
-interface DrawerContextValue {
+interface DrawerConfigContextValue {
   direction: DrawerDirection;
   variant: DrawerVariant;
   snapPoints: SnapPoint[];
-  activeSnapPoint: SnapPoint;
-  setActiveSnapPoint: (snapPoint: SnapPoint) => void;
   dismissible: boolean;
-  /** Modal behavior passed to Base UI Dialog */
   modal: boolean | "trap-focus";
+  isVertical: boolean;
+  sequentialSnap: boolean;
+  repositionInputs: boolean;
+}
+
+interface DrawerAnimationContextValue {
   isDragging: boolean;
   setIsDragging: (dragging: boolean) => void;
   dragProgress: number;
   setDragProgress: (progress: number) => void;
-  /** Progress between snap points (0 = first snap, 1 = last snap) */
   snapProgress: number;
   setSnapProgress: (progress: number) => void;
+  activeSnapPoint: SnapPoint;
+  setActiveSnapPoint: (snapPoint: SnapPoint) => void;
   open: boolean;
   onOpenChange: (open: boolean, eventDetails?: { reason?: string }) => void;
-
   contentSize: number | null;
   setContentSize: (size: number | null) => void;
-  isVertical: boolean;
   isAnimating: boolean;
   immediateClose: boolean;
   setImmediateClose: (value: boolean) => void;
-  sequentialSnap: boolean;
-  /** Whether to reposition drawer when virtual keyboard appears. */
-  repositionInputs: boolean;
 }
 
-const DrawerContext = React.createContext<DrawerContextValue | null>(null);
+const DrawerConfigContext =
+  React.createContext<DrawerConfigContextValue | null>(null);
+const DrawerAnimationContext =
+  React.createContext<DrawerAnimationContextValue | null>(null);
 
-function useDrawer() {
-  const context = React.useContext(DrawerContext);
+function useDrawerConfig() {
+  const context = React.useContext(DrawerConfigContext);
   if (!context) {
     throw new Error("Drawer components must be used within a <Drawer />");
   }
   return context;
 }
 
+function useDrawerAnimation() {
+  const context = React.useContext(DrawerAnimationContext);
+  if (!context) {
+    throw new Error("Drawer components must be used within a <Drawer />");
+  }
+  return context;
+}
+
+function useDrawer() {
+  return { ...useDrawerConfig(), ...useDrawerAnimation() };
+}
+
 /* -------------------------------------------------------------------------------------------------
  * Drawer (Root)
  * -------------------------------------------------------------------------------------------------*/
 
-/** Props passed to render function children */
 interface DrawerRenderProps {
-  /** Progress between snap points (0 = first snap, 1 = last snap) */
+  /** 0 = first snap, 1 = last snap */
   snapProgress: number;
-  /** Progress toward closed (0 = open, 1 = closed) */
+  /** 0 = open, 1 = closed */
   dragProgress: number;
-  /** Whether currently being dragged/scrolled */
   isDragging: boolean;
-  /** Current active snap point value */
   activeSnapPoint: SnapPoint;
 }
 
@@ -214,34 +235,20 @@ interface DrawerProps extends Omit<
   React.ComponentProps<typeof BaseDialog.Root>,
   "children"
 > {
-  /** Direction the drawer opens from. Default: "bottom" */
   direction?: DrawerDirection;
-  /** Visual variant of the drawer. Default: "default" */
   variant?: DrawerVariant;
-  /** Snap points as percentages (0-1) or pixel values. Default: [1] (fully open) */
+  /** Percentages (0-1) or pixel strings (e.g., "200px") */
   snapPoints?: SnapPoint[];
-  /** Initial snap point value when opened. Default: first snap point */
   defaultSnapPoint?: SnapPoint;
-  /** Controlled snap point value (the actual value, not index) */
   activeSnapPoint?: SnapPoint | null;
-  /** Callback when snap point changes - receives the actual value */
   onActiveSnapPointChange?: (snapPoint: SnapPoint) => void;
-  /** Whether dismissible by swipe. Default: true */
   dismissible?: boolean;
-  /**
-   * Modal behavior:
-   * - `true`: Focus trapped, outside pointer disabled, body scroll locked (default)
-   * - `"trap-focus"`: Focus trapped, outside pointer enabled, no scroll lock
-   * - `false`: Non-modal, no focus trapping
-   * @default true
-   */
+  /** `true` = modal, `"trap-focus"` = focus trapped but no scroll lock, `false` = non-modal */
   modal?: boolean | "trap-focus";
-
-  /** When true, prevents skipping snap points during fast swipes. Default: false */
+  /** Prevents skipping snap points during fast swipes */
   sequentialSnap?: boolean;
-  /** When true, repositions drawer when virtual keyboard appears (bottom direction only). Default: false */
+  /** Repositions drawer when virtual keyboard appears (bottom only) */
   repositionInputs?: boolean;
-  /** Children - can be ReactNode or render function for access to drag state */
   children?: React.ReactNode | ((props: DrawerRenderProps) => React.ReactNode);
 }
 
@@ -262,71 +269,51 @@ function Drawer({
   children,
   ...props
 }: DrawerProps) {
-  // Internal open state (uncontrolled mode)
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(
     defaultOpen ?? false,
   );
   const isOpenControlled = controlledOpen !== undefined;
   const open = isOpenControlled ? controlledOpen : uncontrolledOpen;
 
-  // Convert default value to index (defaults to first snap point)
   const defaultSnapPointIndex =
     defaultSnapPoint !== undefined
       ? findSnapPointIndex(snapPoints, defaultSnapPoint)
       : 0;
 
-  // Internal snap point state (uses index internally)
   const [internalSnapPointIndex, setInternalSnapPointIndex] = React.useState(
     defaultSnapPointIndex,
   );
 
-  // Controlled mode: convert value to index
   const isSnapPointControlled = controlledSnapPoint !== undefined;
   const activeSnapPointIndex = isSnapPointControlled
     ? findSnapPointIndex(snapPoints, controlledSnapPoint)
     : internalSnapPointIndex;
 
-  // The actual value for context
   const activeSnapPointValue = getSnapPointValue(
     snapPoints,
     activeSnapPointIndex,
   );
 
-  // Drag state (now represents scroll state)
   const [isDragging, setIsDragging] = React.useState(false);
-  // Start at 1 (backdrop invisible) - will be updated by scroll events
   const [dragProgress, setDragProgress] = React.useState(1);
-  // Progress between snap points (0 = first snap, 1 = last snap)
   const [snapProgress, setSnapProgress] = React.useState(0);
-
-  // Content size for measurements (set by DrawerContent)
   const [contentSize, setContentSize] = React.useState<number | null>(null);
-
-  // Track CSS animation state to prevent interaction during transitions
   const [isAnimating, setIsAnimating] = React.useState(false);
-
-  // Track immediate close for swipe dismiss (skip exit animation)
   const [immediateClose, setImmediateClose] = React.useState(false);
 
   const { isVertical } = DIRECTION_CONFIG[direction];
 
-  // Clear animating when CSS animation completes
   const handleOpenChangeComplete = React.useCallback(() => {
     setIsAnimating(false);
   }, []);
 
-  // Handle open change
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean, eventDetails?: { reason?: string }) => {
-      // Prevent state changes during animations (user can't interrupt enter/exit)
-      if (isAnimating) return;
-      // Prevent closing while actively scrolling/dragging (swipe momentum)
-      // BUT allow swipe dismiss (which passes reason: "swipe-dismiss")
+      // Prevent closing while scrolling, but allow explicit swipe dismiss
       if (!nextOpen && isDragging && eventDetails?.reason !== "swipe-dismiss") {
         return;
       }
 
-      // Start animation state - will be cleared by onOpenChangeComplete
       setIsAnimating(true);
 
       if (!isOpenControlled) {
@@ -334,7 +321,6 @@ function Drawer({
       }
       controlledOnOpenChange?.(nextOpen, eventDetails as never);
 
-      // Reset to default snap point when opening (only in uncontrolled mode)
       if (nextOpen && !isSnapPointControlled) {
         setInternalSnapPointIndex(defaultSnapPointIndex);
         const defaultSnapValue = getSnapPointValue(
@@ -344,15 +330,11 @@ function Drawer({
         onActiveSnapPointChange?.(defaultSnapValue);
       }
 
-      // Reset state when opening (these persist across drawer sessions since they're in the root)
       if (nextOpen) {
-        setDragProgress(1); // 1 = closed/invisible, will animate to 0 = open/visible
-        setIsDragging(false); // Reset dragging state (may be stale from swipe dismiss)
-        setImmediateClose(false); // Reset immediate close flag
-        // Only reset snapProgress in uncontrolled mode
-        // Controlled mode: scroll handler will set correct value when drawer positions itself
+        setDragProgress(1);
+        setIsDragging(false);
+        setImmediateClose(false);
         if (!isSnapPointControlled) {
-          // Calculate snapProgress based on default snap point
           const progress =
             snapPoints.length > 1
               ? defaultSnapPointIndex / (snapPoints.length - 1)
@@ -362,7 +344,6 @@ function Drawer({
       }
     },
     [
-      isAnimating,
       isDragging,
       isOpenControlled,
       controlledOnOpenChange,
@@ -373,7 +354,6 @@ function Drawer({
     ],
   );
 
-  // Handle snap point change (accepts value, converts to index internally)
   const setActiveSnapPoint = React.useCallback(
     (value: SnapPoint) => {
       const index = findSnapPointIndex(snapPoints, value);
@@ -385,29 +365,14 @@ function Drawer({
     [snapPoints, isSnapPointControlled, onActiveSnapPointChange],
   );
 
-  const contextValue = React.useMemo(
+  const configValue = React.useMemo(
     () => ({
       direction,
       variant,
       snapPoints,
-      activeSnapPoint: activeSnapPointValue,
-      setActiveSnapPoint,
       dismissible,
       modal,
-      isDragging,
-      setIsDragging,
-      dragProgress,
-      setDragProgress,
-      snapProgress,
-      setSnapProgress,
-      open,
-      onOpenChange: handleOpenChange,
-      contentSize,
-      setContentSize,
       isVertical,
-      isAnimating,
-      immediateClose,
-      setImmediateClose,
       sequentialSnap,
       repositionInputs,
     }),
@@ -415,25 +380,46 @@ function Drawer({
       direction,
       variant,
       snapPoints,
-      activeSnapPointValue,
-      setActiveSnapPoint,
-      modal,
       dismissible,
-      isDragging,
-      dragProgress,
-      snapProgress,
-      open,
-      handleOpenChange,
-      contentSize,
+      modal,
       isVertical,
-      isAnimating,
-      immediateClose,
       sequentialSnap,
       repositionInputs,
     ],
   );
 
-  // Resolve render function children
+  const animationValue = React.useMemo(
+    () => ({
+      isDragging,
+      setIsDragging,
+      dragProgress,
+      setDragProgress,
+      snapProgress,
+      setSnapProgress,
+      activeSnapPoint: activeSnapPointValue,
+      setActiveSnapPoint,
+      open,
+      onOpenChange: handleOpenChange,
+      contentSize,
+      setContentSize,
+      isAnimating,
+      immediateClose,
+      setImmediateClose,
+    }),
+    [
+      isDragging,
+      dragProgress,
+      snapProgress,
+      activeSnapPointValue,
+      setActiveSnapPoint,
+      open,
+      handleOpenChange,
+      contentSize,
+      isAnimating,
+      immediateClose,
+    ],
+  );
+
   const resolvedChildren =
     typeof children === "function"
       ? children({
@@ -445,20 +431,21 @@ function Drawer({
       : children;
 
   return (
-    <DrawerContext.Provider value={contextValue}>
-      <BaseDialog.Root
-        data-slot="drawer"
-        open={open}
-        onOpenChange={handleOpenChange}
-        onOpenChangeComplete={handleOpenChangeComplete}
-        modal={modal}
-        // For non-modal modes, disable outside click dismissal so page interaction doesn't close drawer
-        disablePointerDismissal={modal !== true}
-        {...props}
-      >
-        {resolvedChildren}
-      </BaseDialog.Root>
-    </DrawerContext.Provider>
+    <DrawerConfigContext.Provider value={configValue}>
+      <DrawerAnimationContext.Provider value={animationValue}>
+        <BaseDialog.Root
+          data-slot="drawer"
+          open={open}
+          onOpenChange={handleOpenChange}
+          onOpenChangeComplete={handleOpenChangeComplete}
+          modal={modal}
+          disablePointerDismissal={isAnimating || modal !== true}
+          {...props}
+        >
+          {resolvedChildren}
+        </BaseDialog.Root>
+      </DrawerAnimationContext.Provider>
+    </DrawerConfigContext.Provider>
   );
 }
 
@@ -486,22 +473,18 @@ function DrawerClose({
   render,
   ...props
 }: DrawerCloseProps) {
-  const { onOpenChange, isAnimating } = useDrawer();
+  const { onOpenChange, isAnimating } = useDrawerAnimation();
 
   const handleClick = React.useCallback(
     (event: React.MouseEvent) => {
       onClick?.(event);
       if (event.defaultPrevented) return;
-      // Prevent closing during animations
       if (isAnimating) return;
-
-      // Let Base UI handle the exit animation via data-ending-style
       onOpenChange(false);
     },
     [onClick, onOpenChange, isAnimating],
   );
 
-  // Don't use BaseDialog.Close - it has its own close handler that bypasses our animation
   const defaultProps = {
     "data-slot": "drawer-close",
     type: "button" as const,
@@ -533,27 +516,9 @@ function DrawerPortal({
  * -------------------------------------------------------------------------------------------------*/
 
 interface DrawerContentProps extends BaseDialog.Popup.Props {
-  /** Visual style variant for the footer. */
   footerVariant?: "default" | "inset";
 }
 
-/**
- * DrawerContent - Outer wrapper that renders the Portal.
- * The actual content is in DrawerContentInner, which only mounts when the Portal is visible.
- * This ensures useScrollSnap gets fresh state on each open (no stale state between sessions).
- *
- * @param initialFocus - Determines the element to focus when the drawer is opened.
- *   - `false`: Do not move focus.
- *   - `true`: Move focus to first tabbable element or popup (default).
- *   - `RefObject<HTMLElement>`: Move focus to the ref element.
- *   - `function`: Called with interaction type, returns element to focus or boolean.
- *
- * @param finalFocus - Determines the element to focus when the drawer is closed.
- *   - `false`: Do not move focus.
- *   - `true`: Move focus to trigger or previously focused element (default).
- *   - `RefObject<HTMLElement>`: Move focus to the ref element.
- *   - `function`: Called with interaction type, returns element to focus or boolean.
- */
 function DrawerContent({
   initialFocus,
   finalFocus,
@@ -572,10 +537,6 @@ function DrawerContent({
   );
 }
 
-/**
- * DrawerContentInner - The actual drawer content that mounts/unmounts with the dialog.
- * Contains useScrollSnap hook which gets fresh state on each mount.
- */
 function DrawerContentInner({
   className,
   children,
@@ -610,10 +571,8 @@ function DrawerContentInner({
     repositionInputs,
   } = useDrawer();
 
-  // Derive index locally - single conversion point for hooks
   const activeSnapPointIndex = findSnapPointIndex(snapPoints, activeSnapPoint);
 
-  // Handler converts index back to value for context
   const handleSnapPointChange = React.useCallback(
     (index: number) => {
       setActiveSnapPoint(getSnapPointValue(snapPoints, index));
@@ -621,29 +580,24 @@ function DrawerContentInner({
     [snapPoints, setActiveSnapPoint],
   );
 
-  // Virtual keyboard handling (for bottom drawers with form inputs)
   const { keyboardHeight, isKeyboardVisible } = useVirtualKeyboard({
     enabled: direction === "bottom",
   });
 
-  // Visual viewport height tracking (for horizontal drawers in non-modal mode)
-  // This provides real-time viewport height that updates immediately with URL bar changes
+  // Provides real-time viewport height that updates with URL bar changes
   const visualViewportHeight = useVisualViewportHeight({
     enabled: !isVertical && modal !== true,
   });
 
-  // Memoize dismiss handler to prevent effect re-runs
   const handleDismiss = React.useCallback(() => {
     onOpenChange(false, { reason: "swipe-dismiss" });
   }, [onOpenChange]);
 
-  // Handler for immediate close (swipe dismiss - skip exit animation)
   const handleImmediateClose = React.useCallback(() => {
     setImmediateClose(true);
   }, [setImmediateClose]);
 
-  // Wrap scroll progress callback to skip updates during enter/exit animations
-  // This lets CSS transitions control the backdrop opacity during animations
+  // Skip progress updates during enter/exit animations (let CSS control backdrop)
   const handleScrollProgress = React.useCallback(
     (progress: number) => {
       if (!isAnimating) {
@@ -653,7 +607,6 @@ function DrawerContentInner({
     [isAnimating, setDragProgress],
   );
 
-  // Wrap snap progress callback to skip updates during enter/exit animations
   const handleSnapProgress = React.useCallback(
     (progress: number) => {
       if (!isAnimating) {
@@ -663,12 +616,12 @@ function DrawerContentInner({
     [isAnimating, setSnapProgress],
   );
 
-  // Scroll snap hook - containerRef now attaches to Viewport
   const {
     containerRef,
     isScrolling,
     setSnapTargetRef,
     trackSize,
+    snapScrollPositions,
     isInitialized,
     isClosing,
   } = useScrollSnap({
@@ -687,20 +640,15 @@ function DrawerContentInner({
     onScrollingChange: setIsDragging,
   });
 
-  // Calculate snap point ratio (0-1) for backdrop opacity
-  // This represents how "open" the drawer is at the target snap point
   const snapPointRatio = React.useMemo(() => {
     if (typeof activeSnapPoint === "number") {
       return activeSnapPoint;
     }
-    // Pixel value - need contentSize to calculate ratio
     const pixels = parsePixelValue(activeSnapPoint);
     if (!pixels || !contentSize) return 1;
     return pixels / contentSize;
   }, [activeSnapPoint, contentSize]);
 
-  // Calculate first and last snap ratios for CSS animation-range
-  // These are used in calc() expressions instead of pre-calculated pixel values
   const firstSnapRatio =
     contentSize != null
       ? snapPointToRatio(snapPoints[0], contentSize)
@@ -714,9 +662,6 @@ function DrawerContentInner({
         ? snapPoints[snapPoints.length - 1]
         : 1;
 
-  // Animation offset based on active snap point
-  // For pixel snap points, use the value directly (e.g., "92px")
-  // For percentage snap points, convert to percentage (e.g., 0.25 -> "25%")
   const baseOffset =
     typeof activeSnapPoint === "number"
       ? `${activeSnapPoint * 100}%`
@@ -724,17 +669,13 @@ function DrawerContentInner({
   const animationOffset =
     variant === "floating" ? `calc(${baseOffset} + 1rem)` : baseOffset;
 
-  // Target backdrop opacity based on snap point (0.25 snap = 0.25 opacity)
   const targetBackdropOpacity = snapPointRatio;
 
-  // Measure the drawer content size (now measures the Popup element)
-  // For floating variant, add margin to size so scroll calculations account for it
   const observerRef = React.useRef<ResizeObserver | null>(null);
-  const floatingMargin = variant === "floating" ? 16 : 0; // m-4 = 1rem = 16px
+  const floatingMargin = variant === "floating" ? 16 : 0;
 
   const measureRef = React.useCallback(
     (node: HTMLDivElement | null) => {
-      // Cleanup previous observer
       observerRef.current?.disconnect();
       observerRef.current = null;
 
@@ -742,7 +683,6 @@ function DrawerContentInner({
 
       const measure = () => {
         const baseSize = isVertical ? node.offsetHeight : node.offsetWidth;
-        // Add margin for floating variant so drawer scrolls fully off-screen
         setContentSize(baseSize + floatingMargin);
       };
 
@@ -753,17 +693,76 @@ function DrawerContentInner({
     [isVertical, setContentSize, floatingMargin],
   );
 
-  // Cleanup on unmount
   React.useEffect(() => () => observerRef.current?.disconnect(), []);
 
-  // Determine if scroll-driven animations should be active
-  // Requires: browser support + initialized + not during enter/exit animation
   const useScrollDrivenAnimation =
     supportsScrollTimeline && isInitialized && !isAnimating && !immediateClose;
 
+  const viewportStyle = React.useMemo<React.CSSProperties>(
+    () => ({
+      ...(visualViewportHeight != null && {
+        "--visual-viewport-height": `${visualViewportHeight}px`,
+      }),
+      ...(repositionInputs && {
+        "--keyboard-height": `${keyboardHeight}px`,
+      }),
+      "--content-size": `${contentSize ?? 0}px`,
+      "--dismiss-buffer": dismissible ? `${(contentSize ?? 0) * 0.3}px` : "0px",
+      "--first-snap-ratio": firstSnapRatio,
+      "--last-snap-ratio": lastSnapRatio,
+      scrollSnapType: isInitialized
+        ? isVertical
+          ? "y mandatory"
+          : "x mandatory"
+        : "none",
+      scrollBehavior: isInitialized ? "smooth" : "auto",
+      ...(useScrollDrivenAnimation
+        ? {
+            animationName: "drawer-snap-progress",
+            animationTimingFunction: "linear",
+            animationFillMode: "both",
+            animationTimeline: isVertical ? "scroll(self)" : "scroll(self x)",
+            ...(direction === "top" || direction === "left"
+              ? {
+                  animationRange: `calc(var(--content-size) * (1 - var(--last-snap-ratio))) calc(var(--content-size) * (1 - var(--first-snap-ratio)))`,
+                  animationDirection: "reverse",
+                }
+              : {
+                  animationRange: `calc(var(--dismiss-buffer) + var(--first-snap-ratio) * var(--content-size)) calc(var(--dismiss-buffer) + var(--last-snap-ratio) * var(--content-size))`,
+                }),
+          }
+        : {
+            "--drawer-snap-progress": snapProgress,
+          }),
+    }),
+    [
+      visualViewportHeight,
+      repositionInputs,
+      keyboardHeight,
+      contentSize,
+      dismissible,
+      firstSnapRatio,
+      lastSnapRatio,
+      isInitialized,
+      isVertical,
+      useScrollDrivenAnimation,
+      snapProgress,
+      direction,
+    ],
+  );
+
+  const popupStyle = React.useMemo<React.CSSProperties>(
+    () => ({
+      "--drawer-offset": animationOffset,
+      ...(supportsScrollTimeline && {
+        viewTimelineName: "--drawer-panel",
+        viewTimelineAxis: isVertical ? "block" : "inline",
+      }),
+    }),
+    [animationOffset, isVertical],
+  );
+
   return (
-    // Timeline scope wrapper - enables cross-element timeline references
-    // Required for backdrop to reference drawer panel's view timeline
     <div
       data-slot="drawer-timeline-scope"
       style={
@@ -772,33 +771,23 @@ function DrawerContentInner({
           : undefined
       }
     >
-      {/* Backdrop - view-driven opacity (Chrome 115+) with JS fallback */}
-      {/* Only render backdrop when modal={true} - other modes allow page interaction */}
       {modal === true && (
         <BaseDialog.Backdrop
           data-slot="drawer-overlay"
           className={cn(
             "absolute inset-0 z-50 bg-black/35",
-            // Force GPU layer to prevent repaint flicker
             "[transform:translateZ(0)] will-change-[opacity]",
-            // Disable pointer events during closing to avoid interfering with swipe dismiss
             isClosing ? "pointer-events-none" : "pointer-events-auto",
-            // Prevent touch-drag on backdrop from scrolling the page underneath
             "touch-none",
-            // Transition for smooth enter/exit (skip on immediate close or while dragging)
             immediateClose || (isDragging && !isAnimating)
               ? "transition-none"
-              : "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-opacity duration-350",
-            // Enter: start at opacity 0, transition animates to target
+              : "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-opacity duration-300",
             "[&[data-starting-style]]:opacity-0!",
-            // Exit: use animation to override scroll-driven animation (transition can't interpolate from animation-held values)
-            // "[&[data-ending-style]]:[animation:drawer-backdrop-exit_450ms_cubic-bezier(0,0,0.58,1)_forwards]",
-            "[&[data-ending-style]]:opacity-0",
-
-            isInitialized && !isAnimating && isDragging && dismissible
+            // Exit animation overrides scroll-driven animation (transitions can't interpolate from animation-held values)
+            "data-ending-style:animate-[drawer-backdrop-exit_300ms_cubic-bezier(0,0,0.58,1)_forwards]",
+            isInitialized && !isAnimating && dismissible && dragProgress < 1
               ? useScrollDrivenAnimation
-                ? // Scroll-driven backdrop animation (Chrome 115+)
-                  backdropAnimationStyles[direction]
+                ? backdropAnimationStyles[direction]
                 : `opacity-(--drawer-backdrop-dynamic-opacity)`
               : `opacity-(--drawer-backdrop-static-opacity)`,
           )}
@@ -811,7 +800,6 @@ function DrawerContentInner({
         />
       )}
 
-      {/* Viewport - scroll container for scroll-snap gestures */}
       <BaseDialog.Viewport
         ref={containerRef}
         data-slot="drawer-viewport"
@@ -823,124 +811,39 @@ function DrawerContentInner({
             : undefined
         }
         className={cn(
-          // Group for propagating data-starting-style/data-ending-style to children
           "group/drawer",
-          // Fixed positioning
           "fixed inset-x-0 z-50 outline-hidden",
-          // Bottom drawer: anchor to bottom edge
-          // Modal mode: -60px top buffer + dynamic height to prevent URL bar collapse on drag
-          // Non-modal modes: anchor to bottom with fixed lvh height extending upward
-          // (top-auto unsets the top:0 from inset-0, so container anchors from bottom)
+          // Bottom: -60px top buffer prevents URL bar collapse; non-modal uses lvh
           direction === "bottom" &&
             (modal === true
               ? "top-[-60px] bottom-[env(keyboard-inset-height,var(--keyboard-height,0))]"
               : "top-auto! bottom-[env(keyboard-inset-height,var(--keyboard-height,0))] h-lvh"),
-          // Top drawer: anchor top, extend below for scroll space
           direction === "top" && "top-0! bottom-[-60px]!",
-          // Horizontal drawers: full viewport height
           !isVertical &&
             (modal === true
               ? "top-0! bottom-0! h-dvh"
               : "top-0! bottom-0 h-lvh"),
-
-          // Disable all interaction when animating, closing, or non-modal
-          // (non-modal modes allow page interaction - Popup has its own pointer-events-auto)
           isAnimating || isClosing || modal !== true
             ? "pointer-events-none"
             : "pointer-events-auto",
-          // Prevent Base UI's default animation and ensure transparent background
           "bg-transparent opacity-100! [&[data-ending-style]]:opacity-100! [&[data-starting-style]]:opacity-100!",
-
-          // Hide scrollbar
           "[scrollbar-width:none_!important] [&::-webkit-scrollbar]:hidden!",
-          // Scroll snap configuration - disable scrolling when animating or closing
           isAnimating || isClosing
             ? "touch-none overflow-hidden"
             : isVertical
               ? "touch-pan-y overflow-x-hidden overflow-y-auto overscroll-y-none"
               : "touch-pan-x overflow-x-auto overflow-y-hidden overscroll-x-none",
-          // Constrain touch gestures to drawer scroll direction only (prevents URL bar collapse/expand)
           isVertical ? "touch-pan-y" : "touch-pan-x",
-          // Reduced motion: instant behavior
           "motion-reduce:[scroll-behavior:auto]",
         )}
-        style={
-          {
-            ...(visualViewportHeight != null && {
-              "--visual-viewport-height": `${visualViewportHeight}px`,
-            }),
-            ...(repositionInputs && {
-              "--keyboard-height": `${keyboardHeight}px`,
-            }),
-            // CSS variables for scroll-driven animation calc() expressions
-            // These enable animation-range to be computed in CSS instead of JS
-            ...{
-              "--content-size": `${contentSize ?? 0}px`,
-              "--dismiss-buffer": dismissible
-                ? `${(contentSize ?? 0) * 0.3}px`
-                : "0px",
-              "--first-snap-ratio": firstSnapRatio,
-              "--last-snap-ratio": lastSnapRatio,
-            },
-            // Disable scroll-snap until initialized to prevent browser snapping to wrong position
-            // For inverted directions (top/left), scroll 0 = fully open, which causes incorrect initial state
-            scrollSnapType: isInitialized
-              ? isVertical
-                ? "y mandatory"
-                : "x mandatory"
-              : "none",
-            scrollBehavior: isInitialized ? "smooth" : "auto",
-            // Reposition drawer when virtual keyboard appears (bottom direction only)
-            // Uses transform (not bottom) to avoid resizing the scroll container
-            // which would mess with scroll positions and snap behavior
-            // transform:
-            //   direction === "bottom" &&
-            //   repositionInputs &&
-            //   isKeyboardVisible &&
-            //   keyboardHeight > 0
-            //     ? `translateY(-${keyboardHeight}px)`
-            //     : undefined,
-            // Animate --drawer-snap-progress CSS custom property
-            // Consumers can use: opacity: var(--drawer-snap-progress) for crossfades
-            // Chrome 115+: uses CSS scroll-driven animation
-            // Fallback: sets variable via JS snapProgress state
-            ...(useScrollDrivenAnimation
-              ? {
-                  animationName: "drawer-snap-progress",
-                  animationTimingFunction: "linear",
-                  animationFillMode: "both",
-                  // Horizontal drawers need scroll(self x) to track horizontal scroll
-                  animationTimeline: isVertical
-                    ? "scroll(self)"
-                    : "scroll(self x)",
-                  // For inverted directions (top/left), scroll decreases as drawer opens
-                  // animation-range requires start < end, so swap values and reverse animation
-                  // Formula: dismissBuffer + ratio * contentSize (non-inverted)
-                  // Or: contentSize * (1 - ratio) (inverted, with reversed animation)
-                  ...(direction === "top" || direction === "left"
-                    ? {
-                        animationRange: `calc(var(--content-size) * (1 - var(--last-snap-ratio))) calc(var(--content-size) * (1 - var(--first-snap-ratio)))`,
-                        animationDirection: "reverse",
-                      }
-                    : {
-                        animationRange: `calc(var(--dismiss-buffer) + var(--first-snap-ratio) * var(--content-size)) calc(var(--dismiss-buffer) + var(--last-snap-ratio) * var(--content-size))`,
-                      }),
-                }
-              : {
-                  "--drawer-snap-progress": snapProgress,
-                }),
-          } as React.CSSProperties
-        }
+        style={viewportStyle}
       >
-        {/* Scroll track - creates the scrollable area */}
         <div
           data-slot="drawer-track"
           className={drawerTrackVariants({ direction })}
           style={
             {
-              // Track size: creates the scrollable space
               [isVertical ? "height" : "width"]: `${trackSize}px`,
-              // CSS variables for snap target positioning (see drawer.css)
               "--content-size": `${contentSize ?? 0}px`,
               "--dismiss-buffer": dismissible
                 ? `${(contentSize ?? 0) * 0.3}px`
@@ -948,69 +851,31 @@ function DrawerContentInner({
             } as React.CSSProperties
           }
         >
-          {/* Snap targets - invisible elements for scroll-snap-align */}
-          {/* Positioning handled by CSS using --snap-ratio variable (see drawer.css) */}
-          {/* Also serve as scroll-state containers for CSS queries (Chrome 133+) */}
-          {/* Only render when contentSize is measured - drawer is hidden until then anyway */}
-          {contentSize != null && (
-            <>
-              {/* Dismiss snap target (if dismissible) */}
-              {dismissible && (
-                <div
-                  ref={(el) => setSnapTargetRef(0, el)}
-                  data-slot="drawer-snap-target"
-                  data-snap-index={0}
-                  data-snap-type="dismiss"
-                  className={cn(
-                    "pointer-events-none absolute",
-                    isVertical ? "inset-x-0 h-px" : "inset-y-0 w-px",
-                  )}
-                  style={
-                    {
-                      scrollSnapAlign: "start",
-                      scrollSnapStop: sequentialSnap ? "always" : undefined,
-                      ...(supportsScrollState && {
-                        containerType: "scroll-state",
-                      }),
-                    } as React.CSSProperties
-                  }
-                  aria-hidden="true"
-                />
+          {/* Snap targets with JS-calculated positions (CSS calc() has issues on iOS Safari) */}
+          {snapScrollPositions.map((position, index) => (
+            <div
+              key={index}
+              ref={(el) => setSnapTargetRef(index, el)}
+              data-slot="drawer-snap-target"
+              data-snap-index={index}
+              className={cn(
+                "pointer-events-none absolute",
+                isVertical ? "inset-x-0 h-px" : "inset-y-0 w-px",
               )}
+              style={
+                {
+                  [isVertical ? "top" : "left"]: `${position}px`,
+                  scrollSnapAlign: "start",
+                  scrollSnapStop: sequentialSnap ? "always" : undefined,
+                  ...(supportsScrollState && {
+                    containerType: "scroll-state",
+                  }),
+                } as React.CSSProperties
+              }
+              aria-hidden="true"
+            />
+          ))}
 
-              {/* Snap point targets */}
-              {snapPoints.map((snapPoint, index) => {
-                const snapIndex = dismissible ? index + 1 : index;
-                const ratio = snapPointToRatio(snapPoint, contentSize);
-
-                return (
-                  <div
-                    key={snapIndex}
-                    ref={(el) => setSnapTargetRef(snapIndex, el)}
-                    data-slot="drawer-snap-target"
-                    data-snap-index={snapIndex}
-                    className={cn(
-                      "pointer-events-none absolute",
-                      isVertical ? "inset-x-0 h-px" : "inset-y-0 w-px",
-                    )}
-                    style={
-                      {
-                        "--snap-ratio": ratio,
-                        scrollSnapAlign: "start",
-                        scrollSnapStop: sequentialSnap ? "always" : undefined,
-                        ...(supportsScrollState && {
-                          containerType: "scroll-state",
-                        }),
-                      } as React.CSSProperties
-                    }
-                    aria-hidden="true"
-                  />
-                );
-              })}
-            </>
-          )}
-
-          {/* Popup - the actual drawer panel (dialog element with accessibility) */}
           <BaseDialog.Popup
             ref={measureRef}
             data-slot="drawer-content"
@@ -1019,16 +884,12 @@ function DrawerContentInner({
             finalFocus={finalFocus}
             className={cn(
               drawerContentVariants({ variant, direction }),
-              // Hide until scroll is initialized to prevent flash at wrong position
               open && !isInitialized && "opacity-0",
-              // Disable pointer events during enter/exit animations to prevent interruption
               isAnimating || isClosing
                 ? "pointer-events-none"
                 : "pointer-events-auto",
-              // Skip transition on immediate close (swipe dismiss)
               immediateClose && "transition-none",
               // Safari iOS touch fix: 1px cross-axis overflow (WebKit bug #183870)
-              // Only needed for non-modal modes where viewport has pointer-events:none
               modal !== true && [
                 "[@supports(-webkit-touch-callout:none)]:relative [@supports(-webkit-touch-callout:none)]:[scrollbar-width:none]",
                 isVertical
@@ -1037,47 +898,14 @@ function DrawerContentInner({
               ],
               className,
             )}
-            style={
-              {
-                // Note: scroll-snap-align is NOT set here - we use dedicated invisible
-                // snap targets instead. Setting it on the Popup creates conflicting
-                // snap points for floating variant (due to margin offset).
-
-                // Dynamic offset for enter/exit animations
-                "--drawer-offset": animationOffset,
-
-                // View timeline for backdrop animation (Chrome 115+)
-                // Backdrop opacity tracks how much of drawer is visible
-                ...(supportsScrollTimeline && {
-                  viewTimelineName: "--drawer-panel",
-                  viewTimelineAxis: isVertical ? "block" : "inline",
-                }),
-              } as React.CSSProperties
-            }
+            style={popupStyle}
             {...props}
           >
             {children}
           </BaseDialog.Popup>
         </div>
 
-        {/* iOS 26 Safari: Fixed element at bottom for nav bar color detection */}
-        {/* Must be: within 3px of bottom, ≥80% wide, ≥3px tall */}
-        {/* Only visible on Safari; slides with drawer during exit */}
-
-        <>
-          <div
-            aria-hidden="true"
-            className={cn(
-              "bg-popover pointer-events-none fixed inset-x-0 bottom-0 hidden h-10 bg-clip-text [@supports(-webkit-touch-callout:none)]:block",
-            )}
-          />
-          <div
-            aria-hidden="true"
-            className={cn(
-              "bg-popover pointer-events-none fixed inset-x-0 top-0 hidden h-10 bg-clip-text [@supports(-webkit-touch-callout:none)]:block",
-            )}
-          />
-        </>
+        {SafariNavColorDetectors}
       </BaseDialog.Viewport>
     </div>
   );
@@ -1091,17 +919,10 @@ interface DrawerHandleProps extends Omit<
   React.ComponentProps<"button">,
   "children"
 > {
-  /** Hide the handle visually */
   hidden?: boolean;
-  /** Disable click-to-close behavior (visual-only mode). Default: false */
   preventClose?: boolean;
 }
 
-/**
- * DrawerHandle - Interactive handle that closes the drawer when clicked.
- * On touch devices, users typically swipe the drawer to dismiss.
- * On non-touch devices, clicking the handle provides an intuitive close action.
- */
 function DrawerHandle({
   className,
   hidden,
@@ -1109,8 +930,8 @@ function DrawerHandle({
   onClick,
   ...props
 }: DrawerHandleProps) {
-  const { direction, onOpenChange, isAnimating } = useDrawer();
-  const { isVertical } = DIRECTION_CONFIG[direction];
+  const { isVertical } = useDrawerConfig();
+  const { onOpenChange, isAnimating } = useDrawerAnimation();
 
   if (hidden) return null;
 
@@ -1128,14 +949,10 @@ function DrawerHandle({
       aria-label="Close drawer"
       onClick={handleClick}
       className={cn(
-        // Reset button styles
         "appearance-none border-0 bg-transparent p-0",
-        // Focus ring for keyboard users
         "focus-visible:ring-ring/50 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
-        // Visual handle styles
         "bg-muted-foreground/30 shrink-0 cursor-pointer rounded-full",
         isVertical ? "mx-auto my-3 h-1.5 w-12" : "mx-3 my-auto h-12 w-1.5",
-        // Hover state
         "hover:bg-muted-foreground/50 transition-colors",
         className,
       )}
@@ -1154,11 +971,8 @@ function DrawerHeader({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="drawer-header"
       className={cn(
         "flex flex-col gap-1.5 px-5 pt-5 pb-3",
-        // Reduce bottom padding when header is directly before footer (no body)
         "not-has-[+[data-slot=drawer-body]]:has-[+[data-slot=drawer-footer]]:pb-1",
-        // Add extra bottom padding when header is alone (no body or footer)
         "not-has-[+[data-slot=drawer-body]]:not-has-[+[data-slot=drawer-footer]]:pb-5",
-        // Inset footer variant: add extra bottom padding when header is directly before footer (no body)
         "in-data-[footer-variant=inset]:not-has-[+[data-slot=drawer-body]]:has-[+[data-slot=drawer-footer]]:pb-5",
         className,
       )}
@@ -1177,11 +991,7 @@ function DrawerFooter({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="drawer-footer"
       className={cn(
         "bg-popover mt-auto flex flex-col gap-2 px-5 pt-3 pb-5",
-        // Add extra top padding when footer is first (no header or body before it)
-        // Note: first: works when no Handle precedes; for Handle-first layouts
-        // without header/body, add className="pt-5" manually
         "first:pt-5",
-        // Inset variant: muted background with top border for separation
         "in-data-[footer-variant=inset]:border-border in-data-[footer-variant=inset]:bg-muted in-data-[footer-variant=inset]:border-t in-data-[footer-variant=inset]:pt-4 in-data-[footer-variant=inset]:pb-4",
         className,
       )}
@@ -1201,7 +1011,7 @@ function DrawerTitle({
   return (
     <BaseDialog.Title
       data-slot="drawer-title"
-      className={cn("text-foreground text-lg font-semibold", className)}
+      className={cn("text-foreground text-lg font-semibold text-balance", className)}
       {...props}
     />
   );
@@ -1218,7 +1028,7 @@ function DrawerDescription({
   return (
     <BaseDialog.Description
       data-slot="drawer-description"
-      className={cn("text-muted-foreground text-sm", className)}
+      className={cn("text-muted-foreground text-sm text-pretty", className)}
       {...props}
     />
   );
@@ -1243,14 +1053,14 @@ function DrawerBody({
     ScrollAreaProps,
     "fadeEdges" | "scrollbarGutter" | "persistScrollbar" | "hideScrollbar"
   >) {
-  const { direction } = useDrawer();
-  const { isVertical } = DIRECTION_CONFIG[direction];
+  const { isVertical } = useDrawerConfig();
 
   return (
     <div
       data-slot="drawer-body"
       className={cn(
-        "flex min-h-0 flex-1 flex-col overflow-hidden",
+        // z-0: stays below sticky footer during iOS Safari enter animation
+        "relative z-0 flex min-h-0 flex-1 flex-col overflow-hidden",
         "first:pt-4",
         "not-has-[+[data-slot=drawer-footer]]:pb-4",
         "in-data-[footer-variant=inset]:has-[+[data-slot=drawer-footer]]:pb-4",
@@ -1258,7 +1068,6 @@ function DrawerBody({
     >
       <ScrollArea
         className="flex-1"
-        // fadedges is false by default since it can cause issues with the drawer animation on mobile devices
         fadeEdges={fadeEdges}
         scrollbarGutter={scrollbarGutter}
         persistScrollbar={persistScrollbar}
@@ -1292,10 +1101,11 @@ export {
   DrawerDescription,
   DrawerBody,
   useDrawer,
+  useDrawerConfig,
+  useDrawerAnimation,
   createDrawerHandle,
 };
 
 export type { DrawerRenderProps, DrawerVariant };
 
-// Re-export feature detection for consumers who want to check browser support
 export { supportsScrollTimeline, supportsScrollState };

@@ -14,6 +14,9 @@ import {
 } from "@/registry/default/drawer/drawer";
 import { Button } from "@/registry/default/button/button";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ShoppingCart01Icon } from "@hugeicons/core-free-icons";
+
 const cartItems = [
   { id: 1, name: "Wireless Headphones", price: 149.99, qty: 1 },
   { id: 2, name: "Phone Case", price: 29.99, qty: 2 },
@@ -38,20 +41,20 @@ export default function DrawerPixelSnapPoints() {
       activeSnapPoint={snap}
       onActiveSnapPointChange={setSnap}
     >
-      <DrawerTrigger render={<Button variant="outline" />}>
-        <svg
-          className="mr-2 size-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+      <DrawerTrigger
+        render={
+          <Button
+            variant="outline"
+            leftSection={
+              <HugeiconsIcon
+                icon={ShoppingCart01Icon}
+                strokeWidth={2}
+                className="size-4"
+              />
+            }
           />
-        </svg>
+        }
+      >
         Cart ({cartItems.length})
       </DrawerTrigger>
       <DrawerContent className={"max-w-3xl"}>

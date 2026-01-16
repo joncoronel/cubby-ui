@@ -19,96 +19,56 @@ import {
   calculateSnapProgress,
 } from "../lib/drawer-utils";
 
-/* -------------------------------------------------------------------------------------------------
- * Types
- * -------------------------------------------------------------------------------------------------*/
-
 export interface UseScrollSnapOptions {
-  /** Direction the drawer opens from */
   direction: DrawerDirection;
-  /** Snap points configuration */
   snapPoints: SnapPoint[];
-  /** Current active snap point index */
   activeSnapPointIndex: number;
-  /** Callback when snap point changes */
   onSnapPointChange: (index: number) => void;
-  /** Callback when drawer should be dismissed */
   onDismiss: () => void;
-  /** Whether drawer can be dismissed by swiping */
   dismissible: boolean;
-  /** Size of the drawer content */
   contentSize: number | null;
-  /** Whether the drawer is open */
   open: boolean;
-  /** Callback during scroll with progress (0-1, where 0 = open, 1 = closed) */
+  /** 0 = open, 1 = closed */
   onScrollProgress?: (progress: number) => void;
-  /** Callback during scroll with snap progress (0 = first snap, 1 = last snap) */
+  /** 0 = first snap, 1 = last snap */
   onSnapProgress?: (progress: number) => void;
-  /** Callback to signal immediate close (skip exit animation) for swipe dismiss */
   onImmediateClose?: () => void;
-  /** Whether the drawer is currently animating (enter/exit CSS transition) */
   isAnimating?: boolean;
-  /** Callback when scrolling state changes */
   onScrollingChange?: (isScrolling: boolean) => void;
 }
 
 export interface UseScrollSnapReturn {
-  /** Ref for the scroll container */
   containerRef: React.RefObject<HTMLDivElement | null>;
-  /** Whether currently scrolling/dragging */
   isScrolling: boolean;
-  /** Callback to set snap target ref at a given index */
   setSnapTargetRef: (index: number, el: HTMLDivElement | null) => void;
-  /** Track size for the scroll container */
   trackSize: number;
-  /** Whether the initial scroll positioning is complete */
+  snapScrollPositions: number[];
   isInitialized: boolean;
-  /** Whether the drawer is in the process of closing (pointer events should be disabled) */
   isClosing: boolean;
 }
 
-/* -------------------------------------------------------------------------------------------------
- * Consolidated Ref Types
- * -------------------------------------------------------------------------------------------------*/
-
 interface ScrollControlState {
-  /** Whether currently in a programmatic scroll (not user-initiated) */
   isProgrammatic: boolean;
-  /** Last detected snap index to avoid duplicate callbacks */
   lastDetectedSnapIndex: number;
-  /** Whether state change came from detection (CSS snap) vs external */
   isFromDetection: boolean;
 }
 
 interface InteractionState {
-  /** Whether drawer is closing (disables pointer events) */
   isClosing: boolean;
-  /** Whether user is actively touching/pressing */
   isPointerDown: boolean;
-  /** Previous scroll position for movement detection */
   prevScrollPos: number | null;
-  /** Whether scrollend fired while pointer was down (Firefox: click stops momentum) */
+  /** Firefox: click stops momentum scroll, need to track if scrollend fired while pointer down */
   scrollEndedWhilePointerDown: boolean;
 }
 
 interface InitState {
-  /** Whether initial scroll positioning is complete */
   hasInitialized: boolean;
-  /** Timeout for DOM ready retry */
   retryTimeout: ReturnType<typeof setTimeout> | null;
-  /** RAF ID for stability check */
   rafId: number | null;
-  /** Last scroll position for RAF check */
   rafLastPos: number | null;
-  /** Count of stable frames */
   rafStableCount: number;
 }
 
-/* -------------------------------------------------------------------------------------------------
- * Hook Implementation
- * -------------------------------------------------------------------------------------------------*/
-
-// Re-export browser support detection for consumers
 export { supportsScrollTimeline, supportsScrollState };
 
 export function useScrollSnap(
@@ -129,18 +89,15 @@ export function useScrollSnap(
   // Get direction config (replaces repeated conditionals)
   const { isVertical, isInverted } = DIRECTION_CONFIG[direction];
 
-  // DOM refs
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const snapTargetRefs = React.useRef<(HTMLDivElement | null)[]>([]);
 
-  // Consolidated refs (instead of 8+ scattered refs)
   const scrollControlRef = React.useRef<ScrollControlState>({
     isProgrammatic: false,
     lastDetectedSnapIndex: activeSnapPointIndex,
     isFromDetection: false,
   });
 
-  // Ref for self-referential RAF callback (avoids ESLint react-hooks/immutability error)
   const checkScrollStabilityRef = React.useRef<() => void>(() => {});
 
   const interactionRef = React.useRef<InteractionState>({
@@ -158,13 +115,11 @@ export function useScrollSnap(
     rafStableCount: 0,
   });
 
-  // Options ref for stable callbacks (avoids effect dependency changes)
   const optionsRef = React.useRef(options);
   React.useLayoutEffect(() => {
     optionsRef.current = options;
   });
 
-  // React state (only what needs to trigger re-renders)
   const [isScrolling, setIsScrolling] = React.useState(false);
   const [isClosing, setIsClosingState] = React.useState(false);
   const [isInitialized, setIsInitialized] = React.useState(false);
@@ -173,13 +128,11 @@ export function useScrollSnap(
     return isVertical ? window.innerHeight : window.innerWidth;
   });
 
-  // Wrapper that updates both ref and state synchronously
   const setIsClosing = React.useCallback((value: boolean) => {
     interactionRef.current.isClosing = value;
     setIsClosingState(value);
   }, []);
 
-  // Wrapper that updates scrolling state and notifies parent
   const updateIsScrolling = React.useCallback(
     (value: boolean) => {
       setIsScrolling(value);
@@ -188,37 +141,31 @@ export function useScrollSnap(
     [onScrollingChange],
   );
 
-  // Calculate geometry using pure functions (memoized)
-  // Only calculate when contentSize is measured - drawer is hidden until then anyway
-  const hasValidSize = contentSize != null && contentSize > 0;
+  // Fallback size until measured (prevents iOS Safari timing issues)
+  const effectiveSize = contentSize ?? viewportSize * 0.9;
 
-  const geometry = React.useMemo<ScrollGeometry | null>(
+  const geometry = React.useMemo<ScrollGeometry>(
     () =>
-      hasValidSize
-        ? calculateScrollGeometry(
-            viewportSize,
-            contentSize,
-            dismissible,
-            isInverted,
-          )
-        : null,
-    [viewportSize, contentSize, dismissible, isInverted, hasValidSize],
+      calculateScrollGeometry(
+        viewportSize,
+        effectiveSize,
+        dismissible,
+        isInverted,
+      ),
+    [viewportSize, effectiveSize, dismissible, isInverted],
   );
 
   const snapScrollPositions = React.useMemo(
     () =>
-      geometry && hasValidSize
-        ? calculateSnapScrollPositions(
-            snapPoints,
-            geometry,
-            dismissible,
-            contentSize,
-          )
-        : [],
-    [snapPoints, geometry, dismissible, contentSize, hasValidSize],
+      calculateSnapScrollPositions(
+        snapPoints,
+        geometry,
+        dismissible,
+        effectiveSize,
+      ),
+    [snapPoints, geometry, dismissible, effectiveSize],
   );
 
-  // Get scroll position for a snap point index
   const getScrollPositionForSnapPoint = React.useCallback(
     (index: number): number => {
       const adjustedIndex = dismissible ? index + 1 : index;
@@ -227,19 +174,20 @@ export function useScrollSnap(
     [snapScrollPositions, dismissible],
   );
 
-  // Find nearest snap point from scroll position
   const findNearestSnapIndex = React.useCallback(
     (scrollPos: number): { index: number; isDismiss: boolean } => {
       let closestIndex = 0;
-      let closestDistance = Infinity;
+      let closestDistance = Math.abs(
+        scrollPos - (snapScrollPositions[0] ?? 0),
+      );
 
-      snapScrollPositions.forEach((pos, i) => {
-        const distance = Math.abs(scrollPos - pos);
+      for (let i = 1; i < snapScrollPositions.length; i++) {
+        const distance = Math.abs(scrollPos - snapScrollPositions[i]);
         if (distance < closestDistance) {
           closestDistance = distance;
           closestIndex = i;
         }
-      });
+      }
 
       if (dismissible && closestIndex === 0) {
         return { index: 0, isDismiss: true };
@@ -251,7 +199,6 @@ export function useScrollSnap(
     [snapScrollPositions, dismissible],
   );
 
-  // Helper to detect snap point changes and notify (used by scrollend and RAF fallback)
   const detectAndNotifySnapChange = React.useCallback(
     (scrollPos: number) => {
       if (
@@ -274,7 +221,6 @@ export function useScrollSnap(
     [findNearestSnapIndex],
   );
 
-  // Scroll to a specific snap point
   const scrollToSnapPoint = React.useCallback(
     (index: number, behavior: ScrollBehavior = "smooth") => {
       const container = containerRef.current;
@@ -300,11 +246,6 @@ export function useScrollSnap(
     [getScrollPositionForSnapPoint, isVertical],
   );
 
-  /* -------------------------------------------------------------------------------------------------
-   * Event Handlers (defined outside effects for stability)
-   * -------------------------------------------------------------------------------------------------*/
-
-  // Helper to trigger dismiss when drawer exits viewport
   const triggerImmediateDismiss = React.useCallback(() => {
     if (interactionRef.current.isClosing) return;
 
@@ -322,7 +263,7 @@ export function useScrollSnap(
     optionsRef.current.onDismiss();
   }, [setIsClosing]);
 
-  // RAF-based scroll end detection (fallback for browsers without scrollend)
+  // Fallback for browsers without scrollend event
   const checkScrollStability = React.useCallback(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -334,8 +275,7 @@ export function useScrollSnap(
 
     if (rafLastPos !== null && Math.abs(currentPos - rafLastPos) < 0.5) {
       initRef.current.rafStableCount++;
-      // After 3 stable frames (~50ms), consider scroll ended
-      // But only if user is not actively touching
+      // 3 stable frames (~50ms) = scroll ended (if not touching)
       if (
         initRef.current.rafStableCount >= 3 &&
         !interactionRef.current.isPointerDown
@@ -353,13 +293,11 @@ export function useScrollSnap(
     }
 
     initRef.current.rafLastPos = currentPos;
-    // Use ref to avoid self-reference in useCallback (ESLint react-hooks/immutability)
     initRef.current.rafId = requestAnimationFrame(
       checkScrollStabilityRef.current,
     );
   }, [updateIsScrolling, detectAndNotifySnapChange]);
 
-  // Keep ref in sync with latest callback
   React.useLayoutEffect(() => {
     checkScrollStabilityRef.current = checkScrollStability;
   });
@@ -372,7 +310,6 @@ export function useScrollSnap(
     }
   }, [checkScrollStability]);
 
-  // Main scroll handler
   const handleScroll = React.useCallback(() => {
     if (!initRef.current.hasInitialized) return;
 
@@ -383,16 +320,8 @@ export function useScrollSnap(
       DIRECTION_CONFIG[optionsRef.current.direction];
     const scrollPos = isVert ? container.scrollTop : container.scrollLeft;
 
-    // Calculate progress (null if geometry not ready)
-    const progress =
-      geometry && contentSize
-        ? calculateScrollProgress(scrollPos, geometry, contentSize)
-        : null;
-
-    // Emit progress via callbacks (skip if not ready)
-    if (progress !== null) {
-      optionsRef.current.onScrollProgress?.(progress);
-    }
+    const progress = calculateScrollProgress(scrollPos, geometry, effectiveSize);
+    optionsRef.current.onScrollProgress?.(progress);
 
     const snapProg = calculateSnapProgress(
       scrollPos,
@@ -401,58 +330,46 @@ export function useScrollSnap(
     );
     optionsRef.current.onSnapProgress?.(snapProg);
 
-    // Only mark as scrolling for user-initiated scrolls
-    // When pointer is down (user actively touching), use low threshold so slow drags register
-    // When pointer is up, use higher threshold to filter scroll-snap settling micro-adjustments
-    const scrollDelta =
-      interactionRef.current.prevScrollPos !== null
-        ? Math.abs(scrollPos - interactionRef.current.prevScrollPos)
-        : 0;
-    const threshold = interactionRef.current.isPointerDown ? 0.5 : 2;
-    const positionChanged = scrollDelta > threshold;
+    // 2px threshold filters scroll-snap micro-adjustments
+    const positionChanged =
+      interactionRef.current.prevScrollPos !== null &&
+      Math.abs(scrollPos - interactionRef.current.prevScrollPos) > 2;
 
     interactionRef.current.prevScrollPos = scrollPos;
 
     if (!scrollControlRef.current.isProgrammatic && positionChanged) {
       updateIsScrolling(true);
-      // Start RAF-based stability check only for browsers without native scrollend
       if (!supportsScrollEnd) {
         startScrollStabilityCheck();
       }
     }
 
-    // Trigger dismiss when drawer exits viewport
     if (!scrollControlRef.current.isProgrammatic) {
       if (
         optionsRef.current.dismissible &&
         !interactionRef.current.isClosing &&
-        progress !== null &&
         progress >= 1
       ) {
         triggerImmediateDismiss();
       }
     }
   }, [
+    effectiveSize,
     geometry,
-    contentSize,
     snapScrollPositions,
     updateIsScrolling,
     startScrollStabilityCheck,
     triggerImmediateDismiss,
   ]);
 
-  // Scroll end handler
   const handleScrollEnd = React.useCallback(() => {
-    // Firefox: clicking/touching stops momentum scroll and fires scrollend immediately.
-    // If pointer is down, don't clear isScrolling yet - let touchend handler do it
-    // so that click events can see we were scrolling and block the close.
+    // Firefox: clicking stops momentum, fires scrollend while pointer down
     if (interactionRef.current.isPointerDown) {
       interactionRef.current.scrollEndedWhilePointerDown = true;
     } else {
       updateIsScrolling(false);
     }
 
-    // Detect snap point change
     const container = containerRef.current;
     if (container) {
       const { isVertical: isVert } =
@@ -462,7 +379,6 @@ export function useScrollSnap(
     }
   }, [updateIsScrolling, detectAndNotifySnapChange]);
 
-  // Native scroll snap change handler (Chrome 129+)
   const handleScrollSnapChange = React.useCallback((event: Event) => {
     if (interactionRef.current.isClosing) return;
 
@@ -497,43 +413,25 @@ export function useScrollSnap(
     }
   }, []);
 
-  // Touch handlers to track if user is actively touching (touch only, not mouse)
-  // (Used by RAF stability check to distinguish "holding still" from "released")
-  // Note: We use touch events only (not mouse) because:
-  // 1. iOS Safari has quirky behavior with pointer events that causes flickering
-  // 2. Mouse clicks on desktop can cause tiny scroll jitter that falsely triggers isScrolling
+  // Touch events only (not mouse) - iOS Safari has quirky pointer event behavior
   const handleTouchStart = React.useCallback(() => {
     interactionRef.current.isPointerDown = true;
   }, []);
 
   const handleTouchEnd = React.useCallback(() => {
     interactionRef.current.isPointerDown = false;
-    // Reset stable count so we don't immediately fire handleScrollEnd
-    // from counts accumulated while user was holding still
-    // This gives momentum scroll time to start
     initRef.current.rafStableCount = 0;
 
-    // Firefox: if scrollend fired while pointer was down (click stopped momentum),
-    // start stability check to clear isScrolling once scroll position stabilizes.
-    // This handles both cases:
-    // - If snap animation occurs: scroll events keep firing, natural scrollend clears isScrolling
-    // - If already at snap point: stability check detects no movement and clears isScrolling
+    // Firefox: if scrollend fired while pointer down, start stability check
     if (interactionRef.current.scrollEndedWhilePointerDown) {
       interactionRef.current.scrollEndedWhilePointerDown = false;
       startScrollStabilityCheck();
     }
   }, [startScrollStabilityCheck]);
 
-  /* -------------------------------------------------------------------------------------------------
-   * Effects (reduced from 5 to 4)
-   * -------------------------------------------------------------------------------------------------*/
-
-  // Effect 1: Initialization
-  // Note: State/ref resets are unnecessary since DrawerContentInner unmounts on close,
-  // giving us fresh state on remount. We only need to cancel pending callbacks.
+  // Initialization (DrawerContentInner unmounts on close, giving fresh state)
   React.useEffect(() => {
     if (!open) {
-      // Cancel pending callbacks during exit animation
       if (initRef.current.rafId !== null) {
         cancelAnimationFrame(initRef.current.rafId);
         initRef.current.rafId = null;
@@ -545,10 +443,8 @@ export function useScrollSnap(
       return;
     }
 
-    // Wait for contentSize to be measured before positioning
     if (contentSize === null) return;
 
-    // Perform initial scroll positioning (only once per open)
     if (!initRef.current.hasInitialized) {
       const performInitialScroll = () => {
         const container = containerRef.current;
@@ -571,33 +467,26 @@ export function useScrollSnap(
           setViewportSize(size);
         }
 
-        // Calculate target scroll position
         const targetIndex = dismissible
           ? activeSnapPointIndex + 1
           : activeSnapPointIndex;
         const targetScrollPos = snapScrollPositions[targetIndex] ?? 0;
 
-        // Mark as programmatic scroll
         scrollControlRef.current.isProgrammatic = true;
         scrollControlRef.current.lastDetectedSnapIndex = activeSnapPointIndex;
 
-        // Set initial scroll position
-        // scroll-snap is disabled via React state until setIsInitialized(true)
         if (isVertical) {
           container.scrollTop = targetScrollPos;
         } else {
           container.scrollLeft = targetScrollPos;
         }
 
-        // Calculate and emit initial progress via callbacks
-        if (geometry && contentSize) {
-          const initialProgress = calculateScrollProgress(
-            targetScrollPos,
-            geometry,
-            contentSize,
-          );
-          onScrollProgress?.(initialProgress);
-        }
+        const initialProgress = calculateScrollProgress(
+          targetScrollPos,
+          geometry,
+          effectiveSize,
+        );
+        onScrollProgress?.(initialProgress);
 
         const initialSnapProgress = calculateSnapProgress(
           targetScrollPos,
@@ -606,7 +495,6 @@ export function useScrollSnap(
         );
         onSnapProgress?.(initialSnapProgress);
 
-        // Clear programmatic flag after a tick
         setTimeout(() => {
           scrollControlRef.current.isProgrammatic = false;
         }, 0);
@@ -614,11 +502,9 @@ export function useScrollSnap(
         setIsInitialized(true);
       };
 
-      // Use setTimeout to give browser time to compute snap target positions
       initRef.current.retryTimeout = setTimeout(performInitialScroll, 0);
     }
 
-    // Capture ref value for cleanup (avoids stale ref warning)
     const currentInit = initRef.current;
     return () => {
       if (currentInit.retryTimeout) {
@@ -629,6 +515,7 @@ export function useScrollSnap(
   }, [
     open,
     contentSize,
+    effectiveSize,
     isVertical,
     viewportSize,
     dismissible,
@@ -639,26 +526,23 @@ export function useScrollSnap(
     onSnapProgress,
   ]);
 
-  // Effect 2: Keep lastDetectedSnapIndex in sync with activeSnapPointIndex
-  // This prevents handleScrollSnapChange from setting isFromDetection=true after programmatic scrolls
+  // Sync lastDetectedSnapIndex to prevent false isFromDetection after programmatic scrolls
   React.useEffect(() => {
     if (open) {
       scrollControlRef.current.lastDetectedSnapIndex = activeSnapPointIndex;
     }
   }, [open, activeSnapPointIndex]);
 
-  // Effect 3: Handle controlled snap point changes (from external sources like buttons)
+  // Handle controlled snap point changes
   const prevSnapPointRef = React.useRef(activeSnapPointIndex);
   React.useEffect(() => {
     if (prevSnapPointRef.current !== activeSnapPointIndex && open) {
-      // Skip if this change came from detection (CSS scroll-snap already handled it)
       if (scrollControlRef.current.isFromDetection) {
         scrollControlRef.current.isFromDetection = false;
         prevSnapPointRef.current = activeSnapPointIndex;
         return;
       }
 
-      // Only scroll if we're not already at the target position
       const container = containerRef.current;
       if (container) {
         const currentScrollPos = isVertical
@@ -666,9 +550,8 @@ export function useScrollSnap(
           : container.scrollLeft;
         const targetScrollPos =
           getScrollPositionForSnapPoint(activeSnapPointIndex);
-        const tolerance = 10; // pixels
 
-        if (Math.abs(currentScrollPos - targetScrollPos) > tolerance) {
+        if (Math.abs(currentScrollPos - targetScrollPos) > 10) {
           scrollToSnapPoint(activeSnapPointIndex, "smooth");
         }
       }
@@ -682,15 +565,13 @@ export function useScrollSnap(
     getScrollPositionForSnapPoint,
   ]);
 
-  // Effect 4: Re-position when geometry changes (e.g., keyboard appears on Android)
-  // This ensures the drawer stays at the correct snap point when viewport/content size changes
+  // Re-position when geometry changes (e.g., keyboard appears)
   const prevTrackSizeRef = React.useRef(0);
   React.useEffect(() => {
-    if (!open || !initRef.current.hasInitialized || !geometry) return;
+    if (!open || !initRef.current.hasInitialized) return;
 
     const { trackSize } = geometry;
 
-    // Re-snap when track size changes (skip first run when prev is 0)
     if (
       prevTrackSizeRef.current !== 0 &&
       prevTrackSizeRef.current !== trackSize
@@ -701,7 +582,6 @@ export function useScrollSnap(
           getScrollPositionForSnapPoint(activeSnapPointIndex);
         const prevScrollBehavior = container.style.scrollBehavior;
 
-        // Use instant scroll to avoid visible animation
         container.style.scrollBehavior = "auto";
         if (isVertical) {
           container.scrollTop = targetScrollPos;
@@ -721,17 +601,11 @@ export function useScrollSnap(
     getScrollPositionForSnapPoint,
   ]);
 
-  // Effect 5: Event listeners (stable handlers, minimal dependencies)
   React.useEffect(() => {
     const container = containerRef.current;
     if (!container || !open) return;
 
-    // Attach event listeners
     container.addEventListener("scroll", handleScroll, { passive: true });
-
-    // Touch tracking to distinguish "holding still" from "released with momentum"
-    // Note: We use touch events only (not mouse) to avoid false positives from
-    // mouse click jitter on desktop triggering scroll events
     container.addEventListener("touchstart", handleTouchStart, {
       passive: true,
     });
@@ -748,7 +622,6 @@ export function useScrollSnap(
       container.addEventListener("scrollsnapchange", handleScrollSnapChange);
     }
 
-    // Viewport resize handling
     const updateViewportSize = () => {
       const size = isVertical ? container.clientHeight : container.clientWidth;
       setViewportSize(size);
@@ -784,7 +657,6 @@ export function useScrollSnap(
     handleTouchEnd,
   ]);
 
-  // Callback to set snap target refs (avoids exposing mutable ref to consumers)
   const setSnapTargetRef = React.useCallback(
     (index: number, el: HTMLDivElement | null) => {
       snapTargetRefs.current[index] = el;
@@ -796,7 +668,8 @@ export function useScrollSnap(
     containerRef,
     isScrolling,
     setSnapTargetRef,
-    trackSize: geometry?.trackSize ?? 0,
+    trackSize: geometry.trackSize,
+    snapScrollPositions,
     isInitialized,
     isClosing,
   };

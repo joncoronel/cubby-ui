@@ -19,10 +19,10 @@ export default function InputOtpCustomStyling() {
         className="gap-2"
       >
         <InputOTPGroup className="gap-2">
-          <InputOTPSlot index={0} className="rounded-md border-2" />
-          <InputOTPSlot index={1} className="rounded-md border-2" />
-          <InputOTPSlot index={2} className="rounded-md border-2" />
-          <InputOTPSlot index={3} className="rounded-md border-2" />
+          <InputOTPSlot index={0} className="rounded-lg border" />
+          <InputOTPSlot index={1} className="rounded-lg border" />
+          <InputOTPSlot index={2} className="rounded-lg border" />
+          <InputOTPSlot index={3} className="rounded-lg border" />
         </InputOTPGroup>
       </InputOTP>
       <p className="text-sm text-muted-foreground">Value: {value}</p>

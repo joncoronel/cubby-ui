@@ -7,7 +7,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const toggleVariants = cva(
-	"inline-flex bg-transparent items-center justify-center gap-2.5 rounded-lg text-sm font-medium hover:bg-accent/50 hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-60 data-[pressed]:bg-accent/80 data-[pressed]:text-accent-foreground [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 focus-visible:border-ring focus-visible:ring-ring/30 focus-visible:ring-2 outline-none transition-all duration-200 aria-invalid:ring-destructive/30 aria-invalid:border-destructive whitespace-nowrap",
+	"inline-flex bg-transparent items-center justify-center gap-2.5 rounded-lg text-sm font-medium hover:bg-accent/50 hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-60 data-[pressed]:bg-accent/80 data-[pressed]:text-accent-foreground [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,background-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid whitespace-nowrap",
 	{
 		variants: {
 			variant: {

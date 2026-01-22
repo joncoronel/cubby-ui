@@ -104,7 +104,7 @@ function SelectTrigger({
         "hover:bg-accent/50 dark:hover:bg-input/50 hover:text-accent-foreground data-placeholder:text-muted-foreground",
         "focus-visible:outline-ring/50 ease-out-cubic outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
         // Invalid state
-        "aria-invalid:ring-destructive/30 aria-invalid:border-destructive aria-invalid:ring-2",
+        "aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
         // Size variants
         "h-10 sm:h-9",
         // Text and icon styling

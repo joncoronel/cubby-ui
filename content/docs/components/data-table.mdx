@@ -1,0 +1,225 @@
+---
+title: Data Table
+description: A powerful data table component built on TanStack Table for sorting, filtering, and row selection.
+---
+
+import { DataTable } from "@/registry/default/data-table/data-table";
+
+## Preview
+
+<ComponentPreview component="data-table" example="data-table-basic" />
+
+## Installation
+
+<ComponentInstall component="data-table" />
+
+## Usage
+
+<ComponentUsage component="data-table" />
+
+## Examples
+
+### Sorting
+
+Enable column sorting with the `enableSorting` prop. Columns with string headers automatically render clickable sort buttons with direction indicators.
+
+<ComponentPreview component="data-table" example="data-table-sorting" />
+
+### Row Selection
+
+Enable row selection with the `enableRowSelection` prop. Checkboxes are automatically added as the first column. Control selection state with `rowSelection` and `onRowSelectionChange`.
+
+<ComponentPreview component="data-table" example="data-table-row-selection" />
+
+### Striped
+
+Use the `striped` variant for alternating row backgrounds.
+
+<ComponentPreview component="data-table" example="data-table-striped" />
+
+## Column Definitions
+
+Define columns using the `ColumnDef` type from TanStack Table. Each column can have:
+
+- `accessorKey` - The key to access data from the row
+- `header` - Header content (string or render function)
+- `cell` - Cell content render function
+- `enableSorting` - Whether the column is sortable (default: `true` when `enableSorting` prop is set)
+
+When `enableSorting` is enabled, columns with string headers automatically render a sortable button with direction indicators. Use `meta.align` to control header alignment, or a render function for fully custom headers.
+
+```tsx
+import { type ColumnDef } from "@/registry/default/data-table/data-table"
+
+const columns: ColumnDef<YourDataType>[] = [
+  {
+    accessorKey: "name",
+    header: "Name", // Auto-renders with sort UI when enableSorting is true
+  },
+  {
+    accessorKey: "amount",
+    header: "Amount",
+    meta: { align: "right" as const }, // Right-align the header
+    cell: ({ row }) => {
+      const amount = parseFloat(row.getValue("amount"))
+      return <div className="text-right">${amount.toFixed(2)}</div>
+    },
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    enableSorting: false, // Disable sorting for this column
+  },
+]
+```
+
+## API Reference
+
+### Props
+
+#### DataTable
+
+A data-driven table component built on TanStack Table. Renders using the styled Table primitives.
+
+<ApiPropsList>
+
+<ApiProp
+  name="columns"
+  fullType="ColumnDef<TData, TValue>[]"
+  required
+>
+  Array of column definitions. See TanStack Table documentation for full options.
+</ApiProp>
+
+<ApiProp
+  name="data"
+  fullType="TData[]"
+  required
+>
+  Array of data objects to display in the table.
+</ApiProp>
+
+<ApiProp
+  name="enableSorting"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Enables column sorting. String headers automatically render with sort indicators. Set `enableSorting: false` on individual columns to disable sorting for that column.
+</ApiProp>
+
+<ApiProp
+  name="enableRowSelection"
+  fullType="boolean | ((row: Row<TData>) => boolean)"
+  defaultValue="false"
+>
+  Enables row selection. Pass a function for conditional selection.
+</ApiProp>
+
+<ApiProp
+  name="enableMultiRowSelection"
+  fullType="boolean"
+  defaultValue="true"
+>
+  Allows multiple rows to be selected. Set to `false` for single selection (radio button behavior).
+</ApiProp>
+
+<ApiProp
+  name="showSelectionColumn"
+  fullType="boolean"
+  defaultValue="true"
+>
+  When `enableRowSelection` is true, automatically adds a checkbox column. Set to `false` to handle selection UI yourself.
+</ApiProp>
+
+<ApiProp
+  name="enableFiltering"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Enables column filtering.
+</ApiProp>
+
+<ApiProp
+  name="enablePagination"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Enables pagination.
+</ApiProp>
+
+<ApiProp
+  name="sorting"
+  fullType="SortingState"
+>
+  Controlled sorting state. Use with `onSortingChange` for controlled mode.
+</ApiProp>
+
+<ApiProp
+  name="onSortingChange"
+  fullType="OnChangeFn<SortingState>"
+>
+  Callback when sorting changes.
+</ApiProp>
+
+<ApiProp
+  name="rowSelection"
+  fullType="RowSelectionState"
+>
+  Controlled row selection state. Use with `onRowSelectionChange` for controlled mode.
+</ApiProp>
+
+<ApiProp
+  name="onRowSelectionChange"
+  fullType="OnChangeFn<RowSelectionState>"
+>
+  Callback when row selection changes.
+</ApiProp>
+
+<ApiProp
+  name="getRowId"
+  fullType="(originalRow: TData, index: number) => string"
+>
+  Function to derive a unique ID for each row. Defaults to using the row index.
+</ApiProp>
+
+<ApiProp
+  name="emptyState"
+  fullType="React.ReactNode"
+  defaultValue='"No results."'
+>
+  Content to display when the table has no data.
+</ApiProp>
+
+<ApiProp
+  name="bordered"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Adds borders to all table cells for a grid appearance.
+</ApiProp>
+
+<ApiProp
+  name="striped"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Adds alternating background colors to rows.
+</ApiProp>
+
+<ApiProp
+  name="hoverable"
+  fullType="boolean"
+  defaultValue="true"
+>
+  Enables hover effect on rows.
+</ApiProp>
+
+<ApiProp
+  name="stickyHeader"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Makes the table header sticky when scrolling.
+</ApiProp>
+
+</ApiPropsList>

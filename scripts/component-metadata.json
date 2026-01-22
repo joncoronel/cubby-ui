@@ -186,6 +186,12 @@
     ],
     "reference": []
   },
+  "data-table": {
+    "title": "Data Table",
+    "description": "A data-table component.",
+    "dependencies": [],
+    "reference": []
+  },
   "date-picker": {
     "title": "Date-picker",
     "description": "A date-picker component.",

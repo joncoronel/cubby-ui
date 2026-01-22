@@ -110,7 +110,10 @@
       "Bash(cmd /c del \"c:\\\\Users\\\\jonny\\\\Documents\\\\Projects\\\\cubby-ui\\\\lib\\\\cn.ts\")",
       "Bash(cmd /c del \"c:\\\\Users\\\\jonny\\\\Documents\\\\Projects\\\\cubby-ui\\\\components\\\\ui\\\\button.tsx\")",
       "Bash(ls:*)",
-      "Bash(pnpm eslint:*)"
+      "Bash(pnpm eslint:*)",
+      "Skill(vercel-react-best-practices)",
+      "Skill(vercel-react-best-practices:*)",
+      "mcp__context7__resolve-library-id"
     ],
     "deny": []
   }

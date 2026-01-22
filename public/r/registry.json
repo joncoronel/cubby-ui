@@ -459,6 +459,27 @@
       ]
     },
     {
+      "name": "data-table",
+      "type": "registry:ui",
+      "title": "Data Table",
+      "description": "A data-table component.",
+      "files": [
+        {
+          "path": "registry/default/data-table/data-table.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/data-table.tsx"
+        }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/checkbox",
+        "@cubby-ui/table"
+      ],
+      "dependencies": [
+        "@tanstack/react-table",
+        "lucide-react"
+      ]
+    },
+    {
       "name": "date-picker",
       "type": "registry:ui",
       "title": "Date-picker",
@@ -1169,6 +1190,9 @@
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/table.tsx"
         }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/scroll-area"
       ]
     },
     {

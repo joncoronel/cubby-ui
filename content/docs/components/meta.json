@@ -23,6 +23,8 @@
     "select",
     "sheet",
     "switch",
+    "table",
+    "data-table",
     "tabs",
     "toast",
     "tree"

@@ -3,7 +3,7 @@ title: Table
 description: Organized display of data in rows and columns with customizable styling
 ---
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/registry/default/table/table";
+import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/registry/default/table/table";
 
 ## Preview
 
@@ -24,3 +24,179 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 Add footer rows for totals or summaries.
 
 <ComponentPreview component="table" example="table-with-footer" />
+
+### Sticky Header
+
+Keep the header visible while scrolling through long tables.
+
+<ComponentPreview component="table" example="table-sticky-header" />
+
+### Bordered
+
+Add borders to all cells for a grid appearance.
+
+<ComponentPreview component="table" example="table-bordered" />
+
+### Striped
+
+Alternate row backgrounds for better readability.
+
+<ComponentPreview component="table" example="table-striped" />
+
+### Row Selection
+
+Select rows with visual feedback.
+
+<ComponentPreview component="table" example="table-row-selection" />
+
+## API Reference
+
+### Props
+
+#### Table
+
+Root container that wraps the table and provides variant context to children via data attributes. Features a card-like appearance with a muted background border.
+
+<ApiPropsList>
+
+<ApiProp
+  name="bordered"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Adds borders to all table cells for a grid appearance.
+</ApiProp>
+
+<ApiProp
+  name="striped"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Adds alternating background colors to rows for better readability.
+</ApiProp>
+
+<ApiProp
+  name="hoverable"
+  fullType="boolean"
+  defaultValue="true"
+>
+  Enables hover effect on rows.
+</ApiProp>
+
+<ApiProp
+  name="stickyHeader"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Makes the table header sticky when scrolling. Enables vertical scrolling with a max height.
+</ApiProp>
+
+<ApiProp
+  name="fadeEdges"
+  fullType="boolean | 'x' | 'y'"
+  defaultValue="true (or 'x' with stickyHeader)"
+>
+  Adds gradient fade effect at scroll edges to indicate more content. Defaults to horizontal-only when `stickyHeader` is enabled to avoid overlapping the header.
+</ApiProp>
+
+<ApiProp
+  name="nativeScroll"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Uses native browser scrollbars instead of custom styled scrollbars.
+</ApiProp>
+
+<ApiProp
+  name="hideScrollbar"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Hides the scrollbar while maintaining scroll functionality.
+</ApiProp>
+
+<ApiProp
+  name="persistScrollbar"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Always shows the scrollbar instead of auto-hiding.
+</ApiProp>
+
+<ApiProp
+  name="scrollbarGutter"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Reserves space for scrollbar to prevent layout shift.
+</ApiProp>
+
+</ApiPropsList>
+
+#### TableRow
+
+Represents a row in the table. Supports polymorphic rendering via the `render` prop.
+
+<ApiPropsList>
+
+<ApiProp
+  name="selected"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Marks the row as selected with a highlighted background.
+</ApiProp>
+
+<ApiProp
+  name="render"
+  fullType="ReactElement | ((props, state) => ReactElement)"
+>
+  Polymorphic render prop to change the underlying element or customize rendering.
+</ApiProp>
+
+</ApiPropsList>
+
+#### TableHeader, TableBody, TableFooter
+
+Semantic table sections. All support polymorphic rendering via the `render` prop.
+
+<ApiPropsList>
+
+<ApiProp
+  name="render"
+  fullType="ReactElement | ((props, state) => ReactElement)"
+>
+  Polymorphic render prop to change the underlying element or customize rendering.
+</ApiProp>
+
+</ApiPropsList>
+
+#### TableHead, TableCell
+
+Table header and data cells. Inherit bordered variant from the parent Table. Both support polymorphic rendering via the `render` prop.
+
+<ApiPropsList>
+
+<ApiProp
+  name="render"
+  fullType="ReactElement | ((props, state) => ReactElement)"
+>
+  Polymorphic render prop to change the underlying element or customize rendering.
+</ApiProp>
+
+</ApiPropsList>
+
+#### TableCaption
+
+Table caption element. Supports polymorphic rendering via the `render` prop.
+
+<ApiPropsList>
+
+<ApiProp
+  name="render"
+  fullType="ReactElement | ((props, state) => ReactElement)"
+>
+  Polymorphic render prop to change the underlying element or customize rendering.
+</ApiProp>
+
+</ApiPropsList>

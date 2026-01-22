@@ -51,7 +51,7 @@ function Table({
 			data-sticky-header={stickyHeader ? "" : undefined}
 			data-row-dividers={rowDividers ? "" : undefined}
 			className={cn(
-				"group/table bg-card ring-border/60 relative w-full rounded-2xl p-2 ring-1",
+				"group/table bg-card ring-border/60 relative w-full rounded-2xl ring-1",
 				stickyHeader && "overflow-hidden"
 			)}
 		>
@@ -62,7 +62,7 @@ function Table({
 				persistScrollbar={persistScrollbar}
 				hideScrollbar={hideScrollbar}
 				className={stickyHeader ? "max-h-[400px]" : undefined}
-				viewportClassName={stickyHeader ? "overflow-y-auto" : undefined}
+				viewportClassName={cn("p-2", stickyHeader && "overflow-y-auto")}
 			>
 				<table
 					data-slot="table"

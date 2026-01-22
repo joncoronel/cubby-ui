@@ -33,7 +33,7 @@ function Table({
 	striped = false,
 	hoverable = true,
 	stickyHeader = false,
-	rowDividers = false,
+	rowDividers = true,
 	nativeScroll = false,
 	fadeEdges = "bottom",
 	scrollbarGutter = false,
@@ -110,20 +110,20 @@ function TableBody({ className, render, ...props }: TableBodyProps) {
 	const defaultProps = {
 		"data-slot": "table-body",
 		className: cn(
-			// Remove border from last row when row dividers enabled
-			"group-data-[row-dividers]/table:[&_tr:last-child]:border-0",
 			// Gap between header and first body row
 			"before:block before:h-2 before:content-['']",
 			// Rounded top corners on first row
 			"[&_tr:first-child_td:first-child]:rounded-tl-lg [&_tr:first-child_td:last-child]:rounded-tr-lg",
 			// Rounded bottom corners on last row
 			"[&_tr:last-child_td:first-child]:rounded-bl-lg [&_tr:last-child_td:last-child]:rounded-br-lg",
+			// Row dividers (only for body rows, not last row)
+			"group-data-[row-dividers]/table:[&_tr:not(:last-child)]:border-b group-data-[row-dividers]/table:[&_tr]:border-border/60",
 			// Bordered variant - top border on first row cells
 			"group-data-bordered/table:[&_tr:first-child_td]:border-t group-data-bordered/table:[&_tr:first-child_td]:border-border",
 			// Hover variant (only for body rows)
 			"group-data-hoverable/table:[&_tr:hover]:bg-muted/40",
 			// Striped variant (only for body rows)
-			"group-data-striped/table:[&_tr:nth-child(even)]:bg-muted/20",
+			"group-data-striped/table:[&_tr:nth-child(even)]:bg-muted/50",
 			className
 		),
 	}
@@ -172,8 +172,6 @@ function TableRow({ className, render, selected, ...props }: TableRowProps) {
 		className: cn(
 			// Transition for fade-out only (instant-in via hover:transition-none)
 			"transition-colors duration-100 hover:transition-none",
-			// Row dividers (only when enabled)
-			"group-data-[row-dividers]/table:border-b group-data-[row-dividers]/table:border-border/60",
 			// Selection state
 			selected ? "bg-muted/60" : null,
 			className

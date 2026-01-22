@@ -502,7 +502,7 @@ export const toast = Object.assign(baseToast, {
         // Pass timeout to reset Base UI's built-in timer (pauses on hover/drag)
         toastManager.update(existingToastId, {
           data: updatedData,
-          timeout: existingData.duration,
+          timeout: existingData.duration ?? 0,
         });
       }
     } else {

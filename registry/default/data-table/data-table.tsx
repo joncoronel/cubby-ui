@@ -17,7 +17,12 @@ import {
 	type Row,
 	type Column,
 } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, ChevronUp } from "lucide-react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+	SortByDown01Icon,
+	SortByUp01Icon,
+	ArrowUpDownIcon
+} from "@hugeicons/core-free-icons"
 
 import { cn } from "@/lib/utils"
 import { Checkbox } from "@/registry/default/checkbox/checkbox"
@@ -59,11 +64,11 @@ function SortableHeader<TData>({
 		>
 			{children}
 			{column.getIsSorted() === "asc" ? (
-				<ChevronUp className="size-4" />
+				<HugeiconsIcon icon={SortByUp01Icon} strokeWidth={2} className="size-4" />
 			) : column.getIsSorted() === "desc" ? (
-				<ChevronDown className="size-4" />
+				<HugeiconsIcon icon={SortByDown01Icon} strokeWidth={2} className="size-4" />
 			) : (
-				<ArrowUpDown className="size-4 opacity-0 group-hover:opacity-50" />
+				<HugeiconsIcon icon={ArrowUpDownIcon} strokeWidth={2} className="size-4 opacity-0 group-hover:opacity-50" />
 			)}
 		</button>
 	)

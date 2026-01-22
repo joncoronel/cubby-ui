@@ -147,8 +147,8 @@ function TableFooter({ className, render, ...props }: TableFooterProps) {
 			"[&_tr]:bg-muted [&_tr]:border-0",
 			// Round all corners of the footer "card"
 			"[&_tr_td:first-child]:rounded-l-lg [&_tr_td:last-child]:rounded-r-lg",
-			// Match header cell height
-			"[&_tr_td]:h-10 [&_tr_td]:py-0",
+			// Match header cell padding
+			"[&_tr_td]:py-2",
 			"font-medium",
 			className
 		),
@@ -193,7 +193,7 @@ function TableHead({ className, render, ...props }: TableHeadProps) {
 	const defaultProps = {
 		"data-slot": "table-head",
 		className: cn(
-			"text-muted-foreground h-10 px-3 text-left align-middle text-sm font-medium whitespace-nowrap",
+			"text-muted-foreground px-3 py-2 text-left align-middle text-sm font-medium whitespace-nowrap",
 			"[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
 			// Bordered variant - only vertical dividers between columns
 			"group-data-[bordered]/table:border-r group-data-[bordered]/table:border-border group-data-[bordered]/table:last:border-r-0",

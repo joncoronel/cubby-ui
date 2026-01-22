@@ -15,7 +15,7 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-destructive-foreground  hover:bg-destructive/90  border border-black/5 dark:border-white/5",
         outline:
-          "border bg-clip-padding bg-card dark:bg-input/35 hover:bg-accent/50 dark:hover:bg-input/60 hover:text-accent-foreground shadow-xs not-disabled:not-active:not-data-pressed:not-in-data-[slot=button-group]:before:shadow-[0_1px_oklch(0_0_0/0.04)] dark:not-disabled:not-active:not-data-pressed:not-in-data-[slot=button-group]:before:shadow-[0_-1px_oklch(1_0_0/0.04)] [:disabled,:active,[data-pressed]]:shadow-none ",
+          "border bg-clip-padding bg-card dark:bg-input/35 hover:bg-accent/50 dark:hover:bg-input/60 hover:text-accent-foreground in-data-[slot=button-group]:shadow-xs not-disabled:not-active:not-data-pressed:not-in-data-[slot=button-group]:before:shadow-inset dark:not-disabled:not-active:not-data-pressed:not-in-data-[slot=button-group]:before:shadow-inset-highlight [:disabled,:active,[data-pressed]]:shadow-none",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-transparent ",
         ghost:

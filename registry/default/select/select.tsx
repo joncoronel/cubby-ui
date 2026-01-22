@@ -97,8 +97,8 @@ function SelectTrigger({
       className={cn(
         // Outline button style
         "group/select-trigger relative inline-flex w-fit items-center justify-between gap-2.5 rounded-lg",
-        "bg-card dark:bg-input/35 border bg-clip-padding shadow-xs",
-        "before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] not-disabled:not-active:not-data-pressed:not-in-data-[slot=button-group]:before:shadow-[0_1px_oklch(0_0_0/0.04)] dark:not-disabled:not-active:not-data-pressed:not-in-data-[slot=button-group]:before:shadow-[0_-1px_oklch(1_0_0/0.04)] [:disabled,:active,[data-pressed]]:shadow-none",
+        "bg-card dark:bg-input/35 border bg-clip-padding in-data-[slot=button-group]:shadow-xs",
+        "before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] not-disabled:not-active:not-data-pressed:not-in-data-[slot=button-group]:before:shadow-inset dark:not-disabled:not-active:not-data-pressed:not-in-data-[slot=button-group]:before:shadow-inset-highlight [:disabled,:active,[data-pressed]]:shadow-none",
 
         // Focus and hover states (outline button style)
         "hover:bg-accent/50 dark:hover:bg-input/50 hover:text-accent-foreground data-placeholder:text-muted-foreground",

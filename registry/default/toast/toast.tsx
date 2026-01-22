@@ -684,14 +684,24 @@ export const toast = Object.assign(baseToast, {
         historicalCounts: newHistoricalCounts,
       };
       groupDataMap.set(groupId, updatedData);
-      toastManager.update(toastId, { data: updatedData });
 
-      // Start dismiss timer for the completed item (use item's duration or default)
       const dismissDuration =
         currentItem.duration ?? GROUP_ITEM_DISMISS_DURATION;
-      setTimeout(() => {
-        toast.dismissCompletedItem(itemId);
-      }, dismissDuration);
+
+      if (newItems.length === 0) {
+        // Last pending item completed - use Base UI's native timer
+        // This timer pauses when user is dragging/hovering the toast
+        toastManager.update(toastId, {
+          data: updatedData,
+          timeout: dismissDuration,
+        });
+      } else {
+        // Still have pending items - use raw setTimeout for this completed item
+        toastManager.update(toastId, { data: updatedData });
+        setTimeout(() => {
+          toast.dismissCompletedItem(itemId);
+        }, dismissDuration);
+      }
     } else {
       // Just update in place (not a loading->complete transition)
       const newItems = data.items.map((item) =>

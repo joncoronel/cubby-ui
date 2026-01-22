@@ -78,15 +78,15 @@ toast(<div>Custom JSX content</div>, { type: "info" });
 <ApiPropsList>
 
 <ApiProp name="title" fullType="string">
-  Toast title.
+  Displays the title text.
 </ApiProp>
 
 <ApiProp name="description" fullType="string">
-  Toast description.
+  Displays the description text below the title.
 </ApiProp>
 
 <ApiProp name="type" fullType='"default" | "success" | "error" | "warning" | "info"' defaultValue='"default"'>
-  Visual type of the toast.
+  Visual type of the toast. Alternatively, use `toast.success()`, `toast.error()`, etc. as shorthand.
 </ApiProp>
 
 <ApiProp name="duration" fullType="number">
@@ -94,23 +94,23 @@ toast(<div>Custom JSX content</div>, { type: "info" });
 </ApiProp>
 
 <ApiProp name="priority" fullType='"low" | "high"' defaultValue='"low"'>
-  Display priority. High priority toasts appear at the top of the stack.
+  Screen reader announcement urgency. `"low"` announces politely without interrupting, `"high"` announces urgently.
 </ApiProp>
 
 <ApiProp name="action" fullType="{ label: string; onClick: () => void }">
-  Action button configuration.
+  Configures an action button with label and click handler.
 </ApiProp>
 
 <ApiProp name="data" fullType="TData">
-  Custom data attached to the toast.
+  Attaches custom data to the toast for use in callbacks or custom rendering.
 </ApiProp>
 
 <ApiProp name="onClose" fullType="() => void">
-  Callback when toast closes.
+  Fires when the toast closes.
 </ApiProp>
 
 <ApiProp name="onRemove" fullType="() => void">
-  Callback when toast is removed from DOM.
+  Fires when the toast is removed from the DOM.
 </ApiProp>
 
 <ApiProp name="showCloseButton" fullType="boolean" defaultValue="true">
@@ -137,11 +137,11 @@ toast.promise(saveData(), {
   error: "Failed to save",
 });
 
-// With dynamic messages based on result
+// With dynamic messages based on promise result
 toast.promise(fetchData(), {
   loading: { title: "Loading...", description: "Fetching data" },
-  success: (data) => ({ title: "Success!", description: `Loaded ${data.name}` }),
-  error: (err) => ({ title: "Error", description: err.message }),
+  success: (data) => ({ title: "Success!", description: `Loaded ${data.name}` }), // data = resolved value
+  error: (err) => ({ title: "Error", description: err.message }), // err = Error object
 });
 
 // Manual control (for advanced use cases)
@@ -287,6 +287,9 @@ toast.dismissGroup(groupId);
 
 // Update a specific item (e.g., loading -> success)
 toast.updateGroupItem(itemId, { title: "Deployed!", type: "success" });
+
+// Dismiss a completed item (removes from progress state)
+toast.dismissCompletedItem(itemId);
 ```
 
 **Behavior:**

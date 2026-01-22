@@ -4,6 +4,10 @@ description: Combine input fields with buttons, icons, or text for enhanced func
 ---
 
 import { InputGroup } from "@/registry/default/input-group/input-group";
+import InputGroupPassword from "@/registry/examples/input-group/input-group-password";
+import InputGroupWithSuffix from "@/registry/examples/input-group/input-group-with-suffix";
+import InputGroupKeyboardShortcut from "@/registry/examples/input-group/input-group-keyboard-shortcut";
+import InputGroupValidation from "@/registry/examples/input-group/input-group-validation";
 
 ## Preview
 
@@ -16,3 +20,102 @@ import { InputGroup } from "@/registry/default/input-group/input-group";
 ## Usage
 
 <ComponentUsage component="input-group" />
+
+## Examples
+
+### Password Toggle
+
+Use `InputGroupButton` to create a visibility toggle for password fields.
+
+<ComponentPreview component="input-group" example="input-group-password">
+  <InputGroupPassword />
+</ComponentPreview>
+
+### With Suffix
+
+Add unit labels or currency codes using `align="inline-end"`.
+
+<ComponentPreview component="input-group" example="input-group-with-suffix">
+  <InputGroupWithSuffix />
+</ComponentPreview>
+
+### Keyboard Shortcut
+
+Display keyboard shortcuts using the `Kbd` component inside an addon.
+
+<ComponentPreview component="input-group" example="input-group-keyboard-shortcut">
+  <InputGroupKeyboardShortcut />
+</ComponentPreview>
+
+### Validation State
+
+Use `aria-invalid="true"` on the input to show error styling on the group.
+
+<ComponentPreview component="input-group" example="input-group-validation">
+  <InputGroupValidation />
+</ComponentPreview>
+
+## API Reference
+
+The Input Group is a custom layout component for combining inputs with addons. All props listed below are custom to this implementation.
+
+### Props
+
+#### InputGroup
+
+Container that combines inputs with addons. Renders a `div` with `role="group"`. Accepts standard `div` props.
+
+#### InputGroupAddon
+
+Container for icons, text, or buttons positioned relative to the input.
+
+<ApiPropsList>
+
+<ApiProp
+  name="align"
+  fullType='"inline-start" | "inline-end" | "block-start" | "block-end"'
+  simpleType="string"
+  defaultValue='"inline-start"'
+>
+  Position of the addon relative to the input. Use `inline-start` for left side, `inline-end` for right side, `block-start` for above, and `block-end` for below.
+</ApiProp>
+
+</ApiPropsList>
+
+#### InputGroupButton
+
+Styled button for use inside addons. Wraps the [Button](/docs/components/button) component with size variants optimized for input groups. Accepts all Button props except `size`.
+
+<ApiPropsList>
+
+<ApiProp
+  name="variant"
+  fullType='"primary" | "neutral" | "secondary" | "outline" | "ghost" | "link" | "destructive"'
+  simpleType="string"
+  defaultValue='"ghost"'
+>
+  Visual style variant of the button. Inherits from the Button component.
+</ApiProp>
+
+<ApiProp
+  name="size"
+  fullType='"xs" | "sm" | "icon_xs" | "icon_sm"'
+  simpleType="string"
+  defaultValue='"xs"'
+>
+  Size of the button. Use `icon_xs` or `icon_sm` for icon-only buttons.
+</ApiProp>
+
+</ApiPropsList>
+
+#### InputGroupText
+
+Styled text container for labels or static content inside addons. Renders a `span`. Accepts standard `span` props.
+
+#### InputGroupInput
+
+Styled input for use inside the group. Wraps the [Input](/docs/components/input) component with transparent styling. Accepts all Input props.
+
+#### InputGroupTextarea
+
+Styled textarea for multi-line inputs. Wraps the [Textarea](/docs/components/textarea) component with transparent styling. Accepts all Textarea props.

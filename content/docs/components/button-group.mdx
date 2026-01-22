@@ -105,3 +105,47 @@ Use popovers within button groups to provide contextual interfaces and assistant
 <ComponentPreview component="button-group" example="button-group-popover">
   <ButtonGroupPopover />
 </ComponentPreview>
+
+## API Reference
+
+The Button Group is a custom layout component for grouping related buttons. All props listed below are custom to this implementation.
+
+### Props
+
+#### ButtonGroup
+
+Container that groups buttons together with connected styling. Renders a `div` with `role="group"`.
+
+<ApiPropsList>
+
+<ApiProp
+  name="orientation"
+  fullType='"horizontal" | "vertical"'
+  simpleType="string"
+  defaultValue='"horizontal"'
+>
+  Layout direction of the button group. Horizontal arranges buttons in a row, vertical stacks them.
+</ApiProp>
+
+</ApiPropsList>
+
+#### ButtonGroupSeparator
+
+Visual divider between buttons within a group. Wraps the [`Separator`](/docs/components/separator) component. Accepts all Separator props.
+
+<ApiPropsList>
+
+<ApiProp
+  name="orientation"
+  fullType='"horizontal" | "vertical"'
+  simpleType="string"
+  defaultValue='"vertical"'
+>
+  Direction of the separator line. Use `"vertical"` for horizontal button groups and `"horizontal"` for vertical button groups.
+</ApiProp>
+
+</ApiPropsList>
+
+#### ButtonGroupText
+
+Styled container for non-button content (text, icons) within a button group. Renders a `div` with muted background styling. Accepts standard `div` props.

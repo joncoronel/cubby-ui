@@ -196,6 +196,10 @@ import input_input_demo from "@/registry/examples/input/input-demo";
 import input_input_disabled from "@/registry/examples/input/input-disabled";
 import input_input_with_label from "@/registry/examples/input/input-with-label";
 import input_group_input_group_demo from "@/registry/examples/input-group/input-group-demo";
+import input_group_input_group_keyboard_shortcut from "@/registry/examples/input-group/input-group-keyboard-shortcut";
+import input_group_input_group_password from "@/registry/examples/input-group/input-group-password";
+import input_group_input_group_validation from "@/registry/examples/input-group/input-group-validation";
+import input_group_input_group_with_suffix from "@/registry/examples/input-group/input-group-with-suffix";
 import input_otp_input_otp_basic from "@/registry/examples/input-otp/input-otp-basic";
 import input_otp_input_otp_custom_pattern from "@/registry/examples/input-otp/input-otp-custom-pattern";
 import input_otp_input_otp_custom_styling from "@/registry/examples/input-otp/input-otp-custom-styling";
@@ -2206,6 +2210,26 @@ export const exampleRegistry = {
       "title": "Demo",
       "importPath": "input-group-demo",
       "source": "import {\n  ArrowUpIcon,\n  CheckIcon,\n  InfoIcon,\n  PlusIcon,\n  Search,\n} from \"lucide-react\";\n\nimport {\n  DropdownMenu,\n  DropdownMenuContent,\n  DropdownMenuItem,\n  DropdownMenuTrigger,\n} from \"@/components/ui/cubby-ui/dropdown-menu\";\nimport {\n  InputGroup,\n  InputGroupAddon,\n  InputGroupButton,\n  InputGroupInput,\n  InputGroupText,\n  InputGroupTextarea,\n} from \"@/components/ui/cubby-ui/input-group\";\nimport { Separator } from \"@/components/ui/cubby-ui/separator\";\nimport {\n  Tooltip,\n  TooltipContent,\n  TooltipTrigger,\n} from \"@/components/ui/cubby-ui/tooltip\";\n\nexport default function InputGroupDemo() {\n  return (\n    <div className=\"grid w-full max-w-sm gap-6\">\n      <InputGroup>\n        <InputGroupInput placeholder=\"Search...\" />\n        <InputGroupAddon>\n          <Search />\n        </InputGroupAddon>\n        <InputGroupAddon align=\"inline-end\">12 results</InputGroupAddon>\n      </InputGroup>\n      <InputGroup>\n        <InputGroupInput placeholder=\"example.com\" className=\"!pl-1\" />\n        <InputGroupAddon>\n          <InputGroupText>https://</InputGroupText>\n        </InputGroupAddon>\n        <InputGroupAddon align=\"inline-end\">\n          <Tooltip>\n            <InputGroupButton\n              className=\"rounded-full\"\n              size=\"icon_xs\"\n              render={(props) => <TooltipTrigger {...props} />}\n            >\n              <InfoIcon />\n            </InputGroupButton>\n            <TooltipContent>This is content in a tooltip.</TooltipContent>\n          </Tooltip>\n        </InputGroupAddon>\n      </InputGroup>\n      <InputGroup>\n        <InputGroupTextarea placeholder=\"Ask, Search or Chat...\" />\n        <InputGroupAddon align=\"block-end\">\n          <InputGroupButton\n            variant=\"outline\"\n            className=\"rounded-full\"\n            size=\"icon_xs\"\n          >\n            <PlusIcon />\n          </InputGroupButton>\n          <DropdownMenu>\n            <InputGroupButton\n              variant=\"ghost\"\n              render={(props) => <DropdownMenuTrigger {...props} />}\n            >\n              Auto\n            </InputGroupButton>\n            <DropdownMenuContent side=\"top\" align=\"start\">\n              <DropdownMenuItem>Auto</DropdownMenuItem>\n              <DropdownMenuItem>Agent</DropdownMenuItem>\n              <DropdownMenuItem>Manual</DropdownMenuItem>\n            </DropdownMenuContent>\n          </DropdownMenu>\n          <InputGroupText className=\"ml-auto\">52% used</InputGroupText>\n          <Separator orientation=\"vertical\" className=\"!h-4\" />\n          <InputGroupButton\n            variant=\"neutral\"\n            className=\"rounded-full\"\n            size=\"icon_xs\"\n            disabled\n          >\n            <ArrowUpIcon />\n            <span className=\"sr-only\">Send</span>\n          </InputGroupButton>\n        </InputGroupAddon>\n      </InputGroup>\n      <InputGroup>\n        <InputGroupInput placeholder=\"@shadcn\" />\n        <InputGroupAddon align=\"inline-end\">\n          <div className=\"bg-primary text-primary-foreground flex size-4 items-center justify-center rounded-full\">\n            <CheckIcon className=\"size-3\" />\n          </div>\n        </InputGroupAddon>\n      </InputGroup>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Keyboard Shortcut",
+      "importPath": "input-group-keyboard-shortcut",
+      "source": "import { Search } from \"lucide-react\";\n\nimport { Kbd } from \"@/components/ui/cubby-ui/kbd\";\nimport {\n  InputGroup,\n  InputGroupAddon,\n  InputGroupInput,\n} from \"@/components/ui/cubby-ui/input-group\";\n\nexport default function InputGroupKeyboardShortcut() {\n  return (\n    <InputGroup className=\"max-w-sm\">\n      <InputGroupInput placeholder=\"Search...\" />\n      <InputGroupAddon>\n        <Search />\n      </InputGroupAddon>\n      <InputGroupAddon align=\"inline-end\">\n        <Kbd>⌘K</Kbd>\n      </InputGroupAddon>\n    </InputGroup>\n  );\n}\n"
+    },
+    {
+      "title": "Password",
+      "importPath": "input-group-password",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { EyeIcon, EyeOffIcon } from \"lucide-react\";\n\nimport {\n  InputGroup,\n  InputGroupAddon,\n  InputGroupButton,\n  InputGroupInput,\n} from \"@/components/ui/cubby-ui/input-group\";\n\nexport default function InputGroupPassword() {\n  const [showPassword, setShowPassword] = React.useState(false);\n\n  return (\n    <InputGroup className=\"max-w-sm\">\n      <InputGroupInput\n        type={showPassword ? \"text\" : \"password\"}\n        placeholder=\"Enter password\"\n      />\n      <InputGroupAddon align=\"inline-end\">\n        <InputGroupButton\n          size=\"icon_xs\"\n          variant=\"ghost\"\n          onClick={() => setShowPassword(!showPassword)}\n          aria-label={showPassword ? \"Hide password\" : \"Show password\"}\n        >\n          {showPassword ? <EyeOffIcon /> : <EyeIcon />}\n        </InputGroupButton>\n      </InputGroupAddon>\n    </InputGroup>\n  );\n}\n"
+    },
+    {
+      "title": "Validation",
+      "importPath": "input-group-validation",
+      "source": "import { AlertCircleIcon, CheckCircleIcon, Mail } from \"lucide-react\";\n\nimport {\n  InputGroup,\n  InputGroupAddon,\n  InputGroupInput,\n} from \"@/components/ui/cubby-ui/input-group\";\n\nexport default function InputGroupValidation() {\n  return (\n    <div className=\"grid w-full max-w-sm gap-4\">\n      <InputGroup>\n        <InputGroupInput\n          type=\"email\"\n          placeholder=\"Email\"\n          defaultValue=\"invalid-email\"\n          aria-invalid=\"true\"\n        />\n        <InputGroupAddon>\n          <Mail />\n        </InputGroupAddon>\n        <InputGroupAddon align=\"inline-end\">\n          <AlertCircleIcon className=\"text-destructive size-4\" />\n        </InputGroupAddon>\n      </InputGroup>\n      <InputGroup>\n        <InputGroupInput\n          type=\"email\"\n          placeholder=\"Email\"\n          defaultValue=\"user@example.com\"\n        />\n        <InputGroupAddon>\n          <Mail />\n        </InputGroupAddon>\n        <InputGroupAddon align=\"inline-end\">\n          <CheckCircleIcon className=\"size-4 text-emerald-500\" />\n        </InputGroupAddon>\n      </InputGroup>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "With Suffix",
+      "importPath": "input-group-with-suffix",
+      "source": "import {\n  InputGroup,\n  InputGroupAddon,\n  InputGroupInput,\n  InputGroupText,\n} from \"@/components/ui/cubby-ui/input-group\";\n\nexport default function InputGroupWithSuffix() {\n  return (\n    <div className=\"grid w-full max-w-sm gap-4\">\n      <InputGroup>\n        <InputGroupInput type=\"number\" placeholder=\"0.00\" />\n        <InputGroupAddon align=\"inline-end\">\n          <InputGroupText>USD</InputGroupText>\n        </InputGroupAddon>\n      </InputGroup>\n      <InputGroup>\n        <InputGroupInput type=\"number\" placeholder=\"0\" />\n        <InputGroupAddon align=\"inline-end\">\n          <InputGroupText>kg</InputGroupText>\n        </InputGroupAddon>\n      </InputGroup>\n    </div>\n  );\n}\n"
     }
   ],
   "input-otp": [
@@ -3199,6 +3223,10 @@ export const componentMap = {
   "input-disabled": input_input_disabled,
   "input-with-label": input_input_with_label,
   "input-group-demo": input_group_input_group_demo,
+  "input-group-keyboard-shortcut": input_group_input_group_keyboard_shortcut,
+  "input-group-password": input_group_input_group_password,
+  "input-group-validation": input_group_input_group_validation,
+  "input-group-with-suffix": input_group_input_group_with_suffix,
   "input-otp-basic": input_otp_input_otp_basic,
   "input-otp-custom-pattern": input_otp_input_otp_custom_pattern,
   "input-otp-custom-styling": input_otp_input_otp_custom_styling,

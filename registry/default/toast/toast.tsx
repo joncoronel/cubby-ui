@@ -411,8 +411,6 @@ export const toast = Object.assign(baseToast, {
 
     return toastManager.update(toastId, updateOptions);
   },
-  custom: <TData extends object = object>(options: ToastOptions<TData>) =>
-    baseToast(options),
   /** Show an anchored toast near an element */
   anchored: <TData extends object = object>(
     options: AnchoredToastOptions<TData>,

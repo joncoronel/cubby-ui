@@ -80,11 +80,29 @@ function calcThumbPosition(
   return [top, height];
 }
 
+// Calculate position for a specific URL
+function calcPositionForUrl(
+  container: HTMLElement,
+  url: string | null,
+): [top: number, height: number] {
+  if (!url || container.clientHeight === 0) {
+    return [0, 0];
+  }
+
+  const element = container.querySelector<HTMLElement>(`a[href="${url}"]`);
+  if (!element) return [0, 0];
+
+  return [element.offsetTop, element.clientHeight];
+}
+
 // Component to manage thumb position and forced active state
 interface TocPositionManagerProps {
   containerRef: React.RefObject<HTMLElement | null>;
   thumbRef: React.RefObject<HTMLDivElement | null>;
+  ghostRef: React.RefObject<HTMLDivElement | null>;
   toc: TOCItemType[];
+  hoveredUrl: string | null;
+  activeAnchor: string | null;
   setForcedActive: (url: string | null) => void;
   setActiveAnchor: (url: string | null) => void;
 }
@@ -92,7 +110,10 @@ interface TocPositionManagerProps {
 function TocPositionManager({
   containerRef,
   thumbRef,
+  ghostRef,
   toc,
+  hoveredUrl,
+  activeAnchor,
   setForcedActive,
   setActiveAnchor,
 }: TocPositionManagerProps) {
@@ -122,6 +143,22 @@ function TocPositionManager({
     thumbRef.current.style.setProperty("--fd-top", `${thumbTop}px`);
     thumbRef.current.style.setProperty("--fd-height", `${thumbHeight}px`);
   }, [containerRef, thumbRef, active, toc, checkForceLastItem, usesCssAnchoring]);
+
+  // Update ghost thumb position (JS fallback)
+  const updateGhostPosition = React.useCallback(() => {
+    // Skip JS positioning if CSS anchor positioning is supported
+    if (usesCssAnchoring) return;
+    if (!containerRef.current || !ghostRef.current) return;
+
+    // Ghost follows hovered item, or defaults to active item
+    const targetUrl = hoveredUrl ?? activeAnchor;
+    const [ghostTop, ghostHeight] = calcPositionForUrl(
+      containerRef.current,
+      targetUrl,
+    );
+    ghostRef.current.style.setProperty("--fd-ghost-top", `${ghostTop}px`);
+    ghostRef.current.style.setProperty("--fd-ghost-height", `${ghostHeight}px`);
+  }, [containerRef, ghostRef, hoveredUrl, activeAnchor, usesCssAnchoring]);
 
   // Update forcedActive and activeAnchor state
   // This is needed for text styling and CSS anchor-name assignment
@@ -157,18 +194,29 @@ function TocPositionManager({
     updateActiveStates();
   }, [active, updateActiveStates]);
 
+  // Update ghost position when hovered URL changes
+  React.useEffect(() => {
+    updateGhostPosition();
+  }, [updateGhostPosition]);
+
   // Combined scroll and resize handler
   React.useEffect(() => {
     if (!containerRef.current) return;
 
     const handleScroll = () => {
       updateThumbPosition();
+      updateGhostPosition();
       updateActiveStates();
     };
 
     const container = containerRef.current;
     // Only observe resize if we need JS positioning
-    const observer = usesCssAnchoring ? null : new ResizeObserver(updateThumbPosition);
+    const observer = usesCssAnchoring
+      ? null
+      : new ResizeObserver(() => {
+          updateThumbPosition();
+          updateGhostPosition();
+        });
     observer?.observe(container);
     window.addEventListener("scroll", handleScroll, { passive: true });
 
@@ -176,7 +224,13 @@ function TocPositionManager({
       observer?.disconnect();
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [containerRef, updateThumbPosition, updateActiveStates, usesCssAnchoring]);
+  }, [
+    containerRef,
+    updateThumbPosition,
+    updateGhostPosition,
+    updateActiveStates,
+    usesCssAnchoring,
+  ]);
 
   useOnChange(active, updateThumbPosition);
 
@@ -212,24 +266,30 @@ const TocThumb = React.forwardRef<HTMLDivElement, { className?: string }>(
 );
 
 // Ghost thumb - semi-transparent preview that follows hovered items
-function TocGhostThumb() {
-  return (
-    <div
-      role="presentation"
-      className={cn(
-        "bg-neutral pointer-events-none absolute w-1 rounded-full opacity-30",
-        "start-[-1.5px]",
-        "transition-[top,height] duration-150 ease-out-cubic",
-      )}
-      style={{
-        // CSS anchor positioning - follows hovered item
-        positionAnchor: "--hovered-toc",
-        top: "anchor(top)",
-        height: "anchor-size(height)",
-      } as React.CSSProperties}
-    />
-  );
-}
+// Uses CSS anchor positioning when supported, falls back to JS-calculated CSS variables
+const TocGhostThumb = React.forwardRef<HTMLDivElement>(
+  function TocGhostThumb(_, ref) {
+    return (
+      <div
+        ref={ref}
+        role="presentation"
+        className={cn(
+          "bg-neutral pointer-events-none absolute w-1 rounded-full opacity-30",
+          "start-[-1.5px]",
+          // Fallback: JS-based positioning (browsers without anchor positioning)
+          "h-(--fd-ghost-height) top-(--fd-ghost-top)",
+          "transition-[top,height] duration-150 ease-out-cubic",
+        )}
+        style={{
+          // CSS anchor positioning - follows hovered item
+          positionAnchor: "--hovered-toc",
+          top: "anchor(top)",
+          height: "anchor-size(height)",
+        } as React.CSSProperties}
+      />
+    );
+  },
+);
 
 // TOC Item - no vertical padding, spacing handled by container gap
 interface TOCItemProps {
@@ -237,6 +297,7 @@ interface TOCItemProps {
   isAnchor: boolean;
   isForcedActive: boolean;
   suppressDataActive: boolean;
+  onHover?: (url: string | null) => void;
 }
 
 function TOCItem({
@@ -244,6 +305,7 @@ function TOCItem({
   isAnchor,
   isForcedActive,
   suppressDataActive,
+  onHover,
 }: TOCItemProps) {
   return (
     <Primitive.TOCItem
@@ -252,6 +314,8 @@ function TOCItem({
       style={{
         paddingInlineStart: getItemOffset(item.depth),
       }}
+      onMouseEnter={() => onHover?.(item.url)}
+      onMouseLeave={() => onHover?.(null)}
       className={cn(
         "relative ml-2 text-sm leading-5 transition-colors duration-150 ease-out",
         "text-muted-foreground hover:text-accent-foreground",
@@ -287,11 +351,14 @@ export interface DashedTOCProps {
 export function DashedTOC({ toc, initialPosition = null }: DashedTOCProps) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const thumbRef = React.useRef<HTMLDivElement>(null);
+  const ghostRef = React.useRef<HTMLDivElement>(null);
   const [forcedActive, setForcedActive] = React.useState<string | null>(null);
   // Track which item should be the CSS anchor (defaults to first item)
   const [activeAnchor, setActiveAnchor] = React.useState<string | null>(
     toc.length > 0 ? toc[0].url : null,
   );
+  // Track hovered item for ghost thumb (JS fallback)
+  const [hoveredUrl, setHoveredUrl] = React.useState<string | null>(null);
 
   // Apply initial position for SSR
   React.useEffect(() => {
@@ -338,7 +405,10 @@ export function DashedTOC({ toc, initialPosition = null }: DashedTOCProps) {
         <TocPositionManager
           containerRef={containerRef}
           thumbRef={thumbRef}
+          ghostRef={ghostRef}
           toc={toc}
+          hoveredUrl={hoveredUrl}
+          activeAnchor={activeAnchor}
           setForcedActive={setForcedActive}
           setActiveAnchor={setActiveAnchor}
         />
@@ -355,7 +425,7 @@ export function DashedTOC({ toc, initialPosition = null }: DashedTOCProps) {
               {/* Pill thumb - centered on track */}
               <TocThumb ref={thumbRef} />
               {/* Ghost thumb - follows hovered item */}
-              <TocGhostThumb />
+              <TocGhostThumb ref={ghostRef} />
               {/* TOC items */}
               {toc.map((item) => (
                 <TOCItem
@@ -364,6 +434,7 @@ export function DashedTOC({ toc, initialPosition = null }: DashedTOCProps) {
                   isAnchor={activeAnchor === item.url}
                   isForcedActive={forcedActive === item.url}
                   suppressDataActive={forcedActive !== null && forcedActive !== item.url}
+                  onHover={setHoveredUrl}
                 />
               ))}
             </div>

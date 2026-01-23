@@ -3,6 +3,8 @@
 import * as React from "react";
 import * as Primitive from "fumadocs-core/toc";
 import type { TOCItemType } from "fumadocs-core/toc";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { NoteIcon, File01Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 import { useOnChange } from "fumadocs-core/utils/use-on-change";
 
@@ -243,8 +245,9 @@ export function DashedTOC({ toc, initialPosition = null }: DashedTOCProps) {
     >
       <h3
         id="toc-title"
-        className="text-muted-foreground text-xs font-medium tracking-wide uppercase"
+        className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium tracking-wide uppercase"
       >
+        <HugeiconsIcon icon={File01Icon} className="size-4" strokeWidth={2} />
         On this page
       </h3>
       <Primitive.AnchorProvider toc={toc} single={true}>

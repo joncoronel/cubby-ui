@@ -163,7 +163,7 @@ const TocThumb = React.forwardRef<HTMLDivElement, { className?: string }>(
           "bg-neutral absolute w-1 rounded-full",
           "start-[-1.5px]",
           "h-(--fd-height) translate-y-(--fd-top)",
-          "transition-[translate,height] duration-150 ease-out",
+          "transition-[translate,height] duration-200 ease-out-cubic",
           className,
         )}
       />

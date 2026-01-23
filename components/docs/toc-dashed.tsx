@@ -4,12 +4,16 @@ import * as React from "react";
 import * as Primitive from "fumadocs-core/toc";
 import type { TOCItemType } from "fumadocs-core/toc";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { NoteIcon, File01Icon } from "@hugeicons/core-free-icons";
+import { File01Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 import { useOnChange } from "fumadocs-core/utils/use-on-change";
 
-// Context for forced active item (when near bottom of page)
-const ForcedActiveContext = React.createContext<string | null>(null);
+
+// Check if CSS anchor positioning is supported
+function supportsAnchorPositioning(): boolean {
+  if (typeof CSS === "undefined") return false;
+  return CSS.supports("anchor-name", "--test");
+}
 
 // Text indentation based on heading depth
 function getItemOffset(depth: number): number {
@@ -82,6 +86,7 @@ interface TocPositionManagerProps {
   thumbRef: React.RefObject<HTMLDivElement | null>;
   toc: TOCItemType[];
   setForcedActive: (url: string | null) => void;
+  setActiveAnchor: (url: string | null) => void;
 }
 
 function TocPositionManager({
@@ -89,8 +94,11 @@ function TocPositionManager({
   thumbRef,
   toc,
   setForcedActive,
+  setActiveAnchor,
 }: TocPositionManagerProps) {
   const active = Primitive.useActiveAnchors();
+  // Check once on mount if CSS anchor positioning is supported
+  const usesCssAnchoring = React.useMemo(() => supportsAnchorPositioning(), []);
 
   // Memoize forceLastItem check
   const checkForceLastItem = React.useCallback(() => {
@@ -98,7 +106,10 @@ function TocPositionManager({
   }, [toc]);
 
   // Update thumb position (DOM-only, safe during render)
+  // Only needed for browsers without CSS anchor positioning
   const updateThumbPosition = React.useCallback(() => {
+    // Skip JS positioning if CSS anchor positioning is supported
+    if (usesCssAnchoring) return;
     if (!containerRef.current || !thumbRef.current) return;
 
     const forceLastItem = checkForceLastItem();
@@ -110,22 +121,41 @@ function TocPositionManager({
     );
     thumbRef.current.style.setProperty("--fd-top", `${thumbTop}px`);
     thumbRef.current.style.setProperty("--fd-height", `${thumbHeight}px`);
-  }, [containerRef, thumbRef, active, toc, checkForceLastItem]);
+  }, [containerRef, thumbRef, active, toc, checkForceLastItem, usesCssAnchoring]);
 
-  // Update forcedActive state (must be in effect, not during render)
-  const updateForcedActive = React.useCallback(() => {
+  // Update forcedActive and activeAnchor state
+  // This is needed for text styling and CSS anchor-name assignment
+  const updateActiveStates = React.useCallback(() => {
     const forceLastItem = checkForceLastItem();
+
+    // Update forced active (for text styling when near bottom)
     if (forceLastItem && toc.length > 0) {
       setForcedActive(toc[toc.length - 1].url);
+      setActiveAnchor(toc[toc.length - 1].url);
     } else {
       setForcedActive(null);
+
+      // Determine which item should be the CSS anchor
+      // Find the active anchor from the primitive, or default to first item
+      let anchorUrl: string | null = null;
+      for (const item of active) {
+        const tocItem = toc.find((t) => t.url === `#${item}`);
+        if (tocItem) {
+          anchorUrl = tocItem.url;
+        }
+      }
+      // Default to first item if no active anchor
+      if (!anchorUrl && toc.length > 0) {
+        anchorUrl = toc[0].url;
+      }
+      setActiveAnchor(anchorUrl);
     }
-  }, [toc, setForcedActive, checkForceLastItem]);
+  }, [toc, setForcedActive, setActiveAnchor, checkForceLastItem, active]);
 
   // Run on active anchor changes
   React.useEffect(() => {
-    updateForcedActive();
-  }, [active, updateForcedActive]);
+    updateActiveStates();
+  }, [active, updateActiveStates]);
 
   // Combined scroll and resize handler
   React.useEffect(() => {
@@ -133,19 +163,20 @@ function TocPositionManager({
 
     const handleScroll = () => {
       updateThumbPosition();
-      updateForcedActive();
+      updateActiveStates();
     };
 
     const container = containerRef.current;
-    const observer = new ResizeObserver(updateThumbPosition);
-    observer.observe(container);
+    // Only observe resize if we need JS positioning
+    const observer = usesCssAnchoring ? null : new ResizeObserver(updateThumbPosition);
+    observer?.observe(container);
     window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
-      observer.disconnect();
+      observer?.disconnect();
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [containerRef, updateThumbPosition, updateForcedActive]);
+  }, [containerRef, updateThumbPosition, updateActiveStates, usesCssAnchoring]);
 
   useOnChange(active, updateThumbPosition);
 
@@ -153,6 +184,7 @@ function TocPositionManager({
 }
 
 // Pill-shaped thumb - centered on track (track is 1px, thumb is 4px, offset by -1.5px)
+// Uses CSS anchor positioning when supported, falls back to JS-calculated CSS variables
 const TocThumb = React.forwardRef<HTMLDivElement, { className?: string }>(
   function TocThumb({ className }, ref) {
     return (
@@ -162,33 +194,51 @@ const TocThumb = React.forwardRef<HTMLDivElement, { className?: string }>(
         className={cn(
           "bg-neutral absolute w-1 rounded-full",
           "start-[-1.5px]",
-          "h-(--fd-height) translate-y-(--fd-top)",
-          "transition-[translate,height] duration-200 ease-out-cubic",
+          // Fallback: JS-based positioning (browsers without anchor positioning)
+          "h-(--fd-height) top-(--fd-top)",
+          "transition-[top,height] duration-200 ease-out-cubic",
           className,
         )}
+        style={{
+          // CSS anchor positioning (modern browsers)
+          // These override the fallback when the browser supports anchor positioning
+          positionAnchor: "--active-toc",
+          top: "anchor(top)",
+          height: "anchor-size(height)",
+        } as React.CSSProperties}
       />
     );
   },
 );
 
 // TOC Item - no vertical padding, spacing handled by container gap
-function TOCItem({ item }: { item: TOCItemType }) {
-  const forcedActive = React.useContext(ForcedActiveContext);
-  const isForcedActive = forcedActive === item.url;
-  // When forcing an item, suppress normal data-[active] styling for other items
-  const suppressNormalActive = forcedActive !== null && !isForcedActive;
+interface TOCItemProps {
+  item: TOCItemType;
+  isAnchor: boolean;
+  isForcedActive: boolean;
+  suppressDataActive: boolean;
+}
 
+function TOCItem({
+  item,
+  isAnchor,
+  isForcedActive,
+  suppressDataActive,
+}: TOCItemProps) {
   return (
     <Primitive.TOCItem
       href={item.url}
+      data-toc-anchor={isAnchor || undefined}
       style={{
         paddingInlineStart: getItemOffset(item.depth),
-      }}
+        // CSS anchor positioning - item with data-toc-anchor becomes the anchor
+        anchorName: isAnchor ? "--active-toc" : undefined,
+      } as React.CSSProperties}
       className={cn(
         "relative ml-2 text-sm leading-5 transition-colors duration-150 ease-out",
         "text-muted-foreground hover:text-accent-foreground",
         // Only apply data-[active] styling when not suppressed
-        !suppressNormalActive && "data-[active=true]:text-accent-foreground",
+        !suppressDataActive && "data-[active=true]:text-accent-foreground",
         isForcedActive && "text-accent-foreground",
       )}
     >
@@ -208,6 +258,10 @@ export function DashedTOC({ toc, initialPosition = null }: DashedTOCProps) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const thumbRef = React.useRef<HTMLDivElement>(null);
   const [forcedActive, setForcedActive] = React.useState<string | null>(null);
+  // Track which item should be the CSS anchor (defaults to first item)
+  const [activeAnchor, setActiveAnchor] = React.useState<string | null>(
+    toc.length > 0 ? toc[0].url : null,
+  );
 
   // Apply initial position for SSR
   React.useEffect(() => {
@@ -256,28 +310,33 @@ export function DashedTOC({ toc, initialPosition = null }: DashedTOCProps) {
           thumbRef={thumbRef}
           toc={toc}
           setForcedActive={setForcedActive}
+          setActiveAnchor={setActiveAnchor}
         />
-        <ForcedActiveContext.Provider value={forcedActive}>
-          <Primitive.ScrollProvider containerRef={containerRef}>
-            <nav
-              aria-label="Table of contents"
-              className="relative min-h-0 overflow-auto mask-[linear-gradient(to_bottom,transparent,white_16px,white_calc(100%-16px),transparent)] py-4 pl-0.5 [scrollbar-width:none]"
+        <Primitive.ScrollProvider containerRef={containerRef}>
+          <nav
+            aria-label="Table of contents"
+            className="relative min-h-0 overflow-auto mask-[linear-gradient(to_bottom,transparent,white_16px,white_calc(100%-16px),transparent)] py-4 pl-0.5 [scrollbar-width:none]"
+          >
+            {/* Items container - dashed track via background gradient */}
+            <div
+              ref={containerRef}
+              className="relative flex flex-col gap-3 bg-[linear-gradient(to_bottom,color-mix(in_oklch,var(--color-accent-foreground)_30%,transparent)_33%,transparent_0)] bg-size-[1px_4px] bg-repeat-y"
             >
-              {/* Items container - dashed track via background gradient */}
-              <div
-                ref={containerRef}
-                className="relative flex flex-col gap-3 bg-[linear-gradient(to_bottom,color-mix(in_oklch,var(--color-accent-foreground)_30%,transparent)_33%,transparent_0)] bg-size-[1px_4px] bg-repeat-y"
-              >
-                {/* Pill thumb - centered on track */}
-                <TocThumb ref={thumbRef} />
-                {/* TOC items */}
-                {toc.map((item) => (
-                  <TOCItem key={item.url} item={item} />
-                ))}
-              </div>
-            </nav>
-          </Primitive.ScrollProvider>
-        </ForcedActiveContext.Provider>
+              {/* Pill thumb - centered on track */}
+              <TocThumb ref={thumbRef} />
+              {/* TOC items */}
+              {toc.map((item) => (
+                <TOCItem
+                  key={item.url}
+                  item={item}
+                  isAnchor={activeAnchor === item.url}
+                  isForcedActive={forcedActive === item.url}
+                  suppressDataActive={forcedActive !== null && forcedActive !== item.url}
+                />
+              ))}
+            </div>
+          </nav>
+        </Primitive.ScrollProvider>
       </Primitive.AnchorProvider>
     </div>
   );

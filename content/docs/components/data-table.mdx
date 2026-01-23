@@ -31,6 +31,12 @@ Enable row selection with the `enableRowSelection` prop. Checkboxes are automati
 
 <ComponentPreview component="data-table" example="data-table-row-selection" />
 
+### Toolbar
+
+Add a toolbar with search and custom filters using the `toolbarLeft`, `toolbarRight`, and `onGlobalFilterChange` props. Enable `enableColumnVisibility` to show a column toggle button. The toolbar visually connects with the table header.
+
+<ComponentPreview component="data-table" example="data-table-toolbar" />
+
 ### Striped
 
 Use the `striped` variant for alternating row backgrounds.
@@ -148,6 +154,28 @@ A data-driven table component built on TanStack Table. Renders using the styled 
 </ApiProp>
 
 <ApiProp
+  name="enableColumnVisibility"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Enables column visibility toggle. When enabled, a button appears in the toolbar that opens a popover to show/hide columns.
+</ApiProp>
+
+<ApiProp
+  name="columnVisibility"
+  fullType="VisibilityState"
+>
+  Controlled column visibility state. Use with `onColumnVisibilityChange` for controlled mode.
+</ApiProp>
+
+<ApiProp
+  name="onColumnVisibilityChange"
+  fullType="OnChangeFn<VisibilityState>"
+>
+  Callback when column visibility changes.
+</ApiProp>
+
+<ApiProp
   name="sorting"
   fullType="SortingState"
 >
@@ -188,6 +216,49 @@ A data-driven table component built on TanStack Table. Renders using the styled 
   defaultValue='"No results."'
 >
   Content to display when the table has no data.
+</ApiProp>
+
+<ApiProp
+  name="globalFilter"
+  fullType="string"
+>
+  Controlled global filter value. Filters across all columns. Use with `onGlobalFilterChange`.
+</ApiProp>
+
+<ApiProp
+  name="onGlobalFilterChange"
+  fullType="(value: string) => void"
+>
+  Callback when global filter changes. When provided, shows a search input in the toolbar.
+</ApiProp>
+
+<ApiProp
+  name="searchPlaceholder"
+  fullType="string"
+  defaultValue='"Search and filter"'
+>
+  Placeholder text for the search input in the toolbar.
+</ApiProp>
+
+<ApiProp
+  name="toolbar"
+  fullType="React.ReactNode"
+>
+  Custom toolbar content. Replaces the default search input when provided.
+</ApiProp>
+
+<ApiProp
+  name="toolbarLeft"
+  fullType="React.ReactNode"
+>
+  Content to render on the left side of the toolbar, before the search input.
+</ApiProp>
+
+<ApiProp
+  name="toolbarRight"
+  fullType="React.ReactNode"
+>
+  Content to render on the right side of the toolbar, after the search input.
 </ApiProp>
 
 <ApiProp

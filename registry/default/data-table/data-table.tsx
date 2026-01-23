@@ -13,6 +13,7 @@ import {
 	type RowSelectionState,
 	type ColumnFiltersState,
 	type PaginationState,
+	type VisibilityState,
 	type OnChangeFn,
 	type Row,
 	type Column,
@@ -21,7 +22,8 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import {
 	SortByDown01Icon,
 	SortByUp01Icon,
-	ArrowUpDownIcon
+	ArrowUpDownIcon,
+	Search01Icon,
 } from "@hugeicons/core-free-icons"
 
 import { cn } from "@/lib/utils"
@@ -35,6 +37,7 @@ import {
 	TableRow,
 	type TableProps,
 } from "@/registry/default/table/table"
+import { ColumnVisibilityPopover } from "@/registry/default/data-table/column-visibility-popover"
 
 // Internal component for sortable column headers
 function SortableHeader<TData>({
@@ -85,6 +88,7 @@ export interface DataTableProps<TData, TValue>
 	enableMultiRowSelection?: boolean
 	enableFiltering?: boolean
 	enablePagination?: boolean
+	enableColumnVisibility?: boolean
 
 	// Selection options
 	showSelectionColumn?: boolean
@@ -98,12 +102,22 @@ export interface DataTableProps<TData, TValue>
 	onColumnFiltersChange?: OnChangeFn<ColumnFiltersState>
 	pagination?: PaginationState
 	onPaginationChange?: OnChangeFn<PaginationState>
+	columnVisibility?: VisibilityState
+	onColumnVisibilityChange?: OnChangeFn<VisibilityState>
 
 	// Row identity
 	getRowId?: (originalRow: TData, index: number, parent?: Row<TData>) => string
 
 	// Customization
 	emptyState?: React.ReactNode
+
+	// Toolbar
+	globalFilter?: string
+	onGlobalFilterChange?: (value: string) => void
+	searchPlaceholder?: string
+	toolbar?: React.ReactNode
+	toolbarLeft?: React.ReactNode
+	toolbarRight?: React.ReactNode
 }
 
 function DataTable<TData, TValue>({
@@ -115,6 +129,7 @@ function DataTable<TData, TValue>({
 	enableMultiRowSelection = true,
 	enableFiltering = false,
 	enablePagination = false,
+	enableColumnVisibility = false,
 	// Selection options
 	showSelectionColumn = true,
 	// Controlled state
@@ -126,10 +141,19 @@ function DataTable<TData, TValue>({
 	onColumnFiltersChange,
 	pagination: controlledPagination,
 	onPaginationChange,
+	columnVisibility: controlledColumnVisibility,
+	onColumnVisibilityChange,
 	// Row identity
 	getRowId,
 	// Customization
 	emptyState,
+	// Toolbar
+	globalFilter: controlledGlobalFilter,
+	onGlobalFilterChange,
+	searchPlaceholder,
+	toolbar,
+	toolbarLeft,
+	toolbarRight,
 	// Table visual props
 	bordered,
 	striped,
@@ -148,12 +172,22 @@ function DataTable<TData, TValue>({
 			pageIndex: 0,
 			pageSize: 10,
 		})
+	const [internalGlobalFilter, setInternalGlobalFilter] = React.useState("")
+	const [internalColumnVisibility, setInternalColumnVisibility] =
+		React.useState<VisibilityState>({})
 
 	// Use controlled state if provided, otherwise use internal state
 	const sorting = controlledSorting ?? internalSorting
 	const rowSelection = controlledRowSelection ?? internalRowSelection
 	const columnFilters = controlledColumnFilters ?? internalColumnFilters
 	const pagination = controlledPagination ?? internalPagination
+	const globalFilter = controlledGlobalFilter ?? internalGlobalFilter
+	const columnVisibility = controlledColumnVisibility ?? internalColumnVisibility
+
+	// Determine if toolbar should be shown
+	const hasToolbar = Boolean(
+		toolbar || toolbarLeft || toolbarRight || onGlobalFilterChange || enableColumnVisibility
+	)
 
 	// Build columns with optional selection column
 	const columns = React.useMemo(() => {
@@ -205,17 +239,22 @@ function DataTable<TData, TValue>({
 			rowSelection,
 			columnFilters,
 			pagination,
+			globalFilter,
+			columnVisibility,
 		},
 		onSortingChange: onSortingChange ?? setInternalSorting,
 		onRowSelectionChange: onRowSelectionChange ?? setInternalRowSelection,
 		onColumnFiltersChange: onColumnFiltersChange ?? setInternalColumnFilters,
 		onPaginationChange: onPaginationChange ?? setInternalPagination,
+		onGlobalFilterChange: onGlobalFilterChange ?? setInternalGlobalFilter,
+		onColumnVisibilityChange: onColumnVisibilityChange ?? setInternalColumnVisibility,
 		getCoreRowModel: getCoreRowModel(),
 		...(enableSorting && { getSortedRowModel: getSortedRowModel() }),
-		...(enableFiltering && { getFilteredRowModel: getFilteredRowModel() }),
+		...((enableFiltering || hasToolbar) && { getFilteredRowModel: getFilteredRowModel() }),
 		...(enablePagination && { getPaginationRowModel: getPaginationRowModel() }),
 		enableRowSelection,
 		enableMultiRowSelection,
+		globalFilterFn: "includesString",
 	})
 
 	// Calculate total columns for empty state
@@ -251,12 +290,13 @@ function DataTable<TData, TValue>({
 		return flexRender(headerDef, header.getContext())
 	}
 
-	return (
+	const tableElement = (
 		<Table
 			bordered={bordered}
 			striped={striped}
 			hoverable={hoverable}
 			stickyHeader={stickyHeader}
+			className={cn(hasToolbar && "rounded-t-none ring-0")}
 			{...tableProps}
 		>
 			<TableHeader>
@@ -294,7 +334,50 @@ function DataTable<TData, TValue>({
 			</TableBody>
 		</Table>
 	)
+
+	if (!hasToolbar) {
+		return tableElement
+	}
+
+	return (
+		<div className="bg-card ring-border/60 w-full rounded-2xl ring-1 md:max-w-2xl">
+			<div className="flex items-center gap-2 px-2 pt-2">
+				{toolbar ?? (
+					<>
+						{toolbarLeft}
+						{toolbarLeft && <div className="bg-border/60 h-5 w-px" />}
+
+						<div className="flex flex-1 items-center gap-2">
+							<HugeiconsIcon
+								icon={Search01Icon}
+								className="text-muted-foreground size-4"
+								strokeWidth={2}
+							/>
+							<input
+								type="text"
+								placeholder={searchPlaceholder ?? "Search and filter"}
+								value={globalFilter}
+								onChange={(e) =>
+									onGlobalFilterChange
+										? onGlobalFilterChange(e.target.value)
+										: setInternalGlobalFilter(e.target.value)
+								}
+								className="placeholder:text-muted-foreground flex-1 bg-transparent text-sm outline-none"
+							/>
+						</div>
+
+						{enableColumnVisibility && (
+							<ColumnVisibilityPopover table={table} />
+						)}
+
+						{toolbarRight}
+					</>
+				)}
+			</div>
+			{tableElement}
+		</div>
+	)
 }
 
 export { DataTable }
-export type { ColumnDef, SortingState, RowSelectionState, ColumnFiltersState }
+export type { ColumnDef, SortingState, RowSelectionState, ColumnFiltersState, VisibilityState }

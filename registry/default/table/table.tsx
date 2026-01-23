@@ -51,8 +51,9 @@ function Table({
 			data-sticky-header={stickyHeader ? "" : undefined}
 			data-row-dividers={rowDividers ? "" : undefined}
 			className={cn(
-				"group/table bg-card ring-border/60 relative w-full rounded-2xl ring-1",
-				stickyHeader && "overflow-hidden"
+				"group/table bg-card ring-border/60 relative w-full rounded-2xl ring-1 md:max-w-2xl",
+				stickyHeader && "overflow-hidden",
+				className
 			)}
 		>
 			<ScrollArea

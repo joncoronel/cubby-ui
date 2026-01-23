@@ -476,7 +476,8 @@
       ],
       "dependencies": [
         "@tanstack/react-table",
-        "lucide-react"
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {

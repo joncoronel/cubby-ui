@@ -1,0 +1,59 @@
+"use client"
+
+import * as React from "react"
+import { type Table } from "@tanstack/react-table"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { FilterHorizontalIcon } from "@hugeicons/core-free-icons"
+
+import {
+	DropdownMenu,
+	DropdownMenuTrigger,
+	DropdownMenuContent,
+	DropdownMenuLabel,
+	DropdownMenuCheckboxItem,
+} from "@/registry/default/dropdown-menu/dropdown-menu"
+import { Button } from "@/registry/default/button/button"
+
+interface ColumnVisibilityPopoverProps<TData> {
+	table: Table<TData>
+}
+
+function ColumnVisibilityPopover<TData>({
+	table,
+}: ColumnVisibilityPopoverProps<TData>) {
+	// Get toggleable columns (exclude selection column)
+	const toggleableColumns = table
+		.getAllColumns()
+		.filter((col) => col.id !== "__select__" && col.getCanHide())
+
+	return (
+		<DropdownMenu>
+			<DropdownMenuTrigger render={<Button variant="ghost" size="icon_sm" />}>
+				<HugeiconsIcon icon={FilterHorizontalIcon} className="size-4" />
+			</DropdownMenuTrigger>
+			<DropdownMenuContent side="bottom" align="end">
+				<DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+				{toggleableColumns.map((column) => {
+					const label =
+						typeof column.columnDef.header === "string"
+							? column.columnDef.header
+							: column.id
+
+					return (
+						<DropdownMenuCheckboxItem
+							key={column.id}
+							checked={column.getIsVisible()}
+							onCheckedChange={(checked) =>
+								column.toggleVisibility(!!checked)
+							}
+						>
+							{label}
+						</DropdownMenuCheckboxItem>
+					)
+				})}
+			</DropdownMenuContent>
+		</DropdownMenu>
+	)
+}
+
+export { ColumnVisibilityPopover }

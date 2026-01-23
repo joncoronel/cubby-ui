@@ -55,7 +55,7 @@ export default function DataTableRowSelection() {
 	const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
 
 	return (
-		<div className="space-y-4">
+		<div className="w-full space-y-4 md:max-w-2xl">
 			<DataTable
 				columns={columns}
 				data={data}

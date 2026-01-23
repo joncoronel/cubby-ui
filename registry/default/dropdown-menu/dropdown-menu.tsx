@@ -2,7 +2,14 @@
 
 import * as React from "react";
 import { Menu as BaseMenu } from "@base-ui/react/menu";
-import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  Tick02Icon,
+  ArrowRight01Icon,
+  RecordIcon,
+  CircleIcon,
+  Tick01Icon
+} from "@hugeicons/core-free-icons";
 
 import { cn } from "@/lib/utils";
 
@@ -182,7 +189,7 @@ function DropdownMenuCheckboxItem({
     >
       <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
         <BaseMenu.CheckboxItemIndicator>
-          <CheckIcon className="size-4" />
+          <HugeiconsIcon icon={Tick02Icon} className="size-4" strokeWidth={2} />
         </BaseMenu.CheckboxItemIndicator>
       </span>
       {children}
@@ -212,9 +219,9 @@ function DropdownMenuRadioItem({
       )}
       {...props}
     >
-      <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
-        <BaseMenu.RadioItemIndicator>
-          <CircleIcon className="size-2 fill-current" />
+      <span className="pointer-events-none absolute left-2 flex items-center justify-center rounded-full bg-accent size-3.5 overflow-clip ">
+        <BaseMenu.RadioItemIndicator keepMounted className="rounded-full data-starting-style:opacity-0 data-ending-style:opacity-0 data-unchecked:opacity-0 transition-[opacity,transform] duration-250 bg-primary size-full before:absolute before:inset-0 before:bg-primary  before:content-[''] data-checked:before:scale-50  before:size-full before:rounded-full before:bg-white  before:transition-[scale] before:duration-250">
+
         </BaseMenu.RadioItemIndicator>
       </span>
       {children}
@@ -251,7 +258,11 @@ function DropdownMenuSubTrigger({
       {...props}
     >
       {children}
-      <ChevronRightIcon className="ml-auto size-4" />
+      <HugeiconsIcon
+        icon={ArrowRight01Icon}
+        className="ml-auto size-4"
+        strokeWidth={2}
+      />
     </BaseMenu.SubmenuTrigger>
   );
 }

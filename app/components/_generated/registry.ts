@@ -745,7 +745,8 @@ export const componentMetadata = {
     "category": "UI",
     "registryDependencies": [],
     "dependencies": [
-      "lucide-react"
+      "@hugeicons/react",
+      "@hugeicons/core-free-icons"
     ],
     "examples": {},
     "reference": []

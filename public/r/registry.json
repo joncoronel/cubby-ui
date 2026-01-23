@@ -601,7 +601,8 @@
         }
       ],
       "dependencies": [
-        "lucide-react"
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {

@@ -211,6 +211,26 @@ const TocThumb = React.forwardRef<HTMLDivElement, { className?: string }>(
   },
 );
 
+// Ghost thumb - semi-transparent preview that follows hovered items
+function TocGhostThumb() {
+  return (
+    <div
+      role="presentation"
+      className={cn(
+        "bg-neutral pointer-events-none absolute w-1 rounded-full opacity-30",
+        "start-[-1.5px]",
+        "transition-[top,height] duration-150 ease-out-cubic",
+      )}
+      style={{
+        // CSS anchor positioning - follows hovered item
+        positionAnchor: "--hovered-toc",
+        top: "anchor(top)",
+        height: "anchor-size(height)",
+      } as React.CSSProperties}
+    />
+  );
+}
+
 // TOC Item - no vertical padding, spacing handled by container gap
 interface TOCItemProps {
   item: TOCItemType;
@@ -231,15 +251,25 @@ function TOCItem({
       data-toc-anchor={isAnchor || undefined}
       style={{
         paddingInlineStart: getItemOffset(item.depth),
-        // CSS anchor positioning - item with data-toc-anchor becomes the anchor
-        anchorName: isAnchor ? "--active-toc" : undefined,
-      } as React.CSSProperties}
+      }}
       className={cn(
         "relative ml-2 text-sm leading-5 transition-colors duration-150 ease-out",
         "text-muted-foreground hover:text-accent-foreground",
         // Only apply data-[active] styling when not suppressed
         !suppressDataActive && "data-[active=true]:text-accent-foreground",
         isForcedActive && "text-accent-foreground",
+        // Extend hover area to cover gaps between items (pseudo-element trick)
+        "before:absolute before:inset-x-0 before:-top-1.5 before:-bottom-1.5 before:content-['']",
+        // CSS anchor positioning:
+        // - Active item has both anchors (ghost overlaps with active thumb)
+        // - When container has a hovered item, active item only keeps --active-toc
+        // - Non-active hovered item takes --hovered-toc
+        isAnchor && "[anchor-name:--active-toc,--hovered-toc]",
+        isAnchor &&
+          "group-has-[a:hover]/toc-items:not-hover:[anchor-name:--active-toc]",
+        // Only non-active items get --hovered-toc on hover
+        // (active item keeps both anchors so active thumb doesn't lose its anchor)
+        !isAnchor && "[&:hover]:[anchor-name:--hovered-toc]",
       )}
     >
       {item.title}
@@ -320,10 +350,12 @@ export function DashedTOC({ toc, initialPosition = null }: DashedTOCProps) {
             {/* Items container - dashed track via background gradient */}
             <div
               ref={containerRef}
-              className="relative flex flex-col gap-3 bg-[linear-gradient(to_bottom,color-mix(in_oklch,var(--color-accent-foreground)_30%,transparent)_33%,transparent_0)] bg-size-[1px_4px] bg-repeat-y"
+              className="group/toc-items relative flex flex-col gap-3 bg-[linear-gradient(to_bottom,color-mix(in_oklch,var(--color-accent-foreground)_30%,transparent)_33%,transparent_0)] bg-size-[1px_4px] bg-repeat-y"
             >
               {/* Pill thumb - centered on track */}
               <TocThumb ref={thumbRef} />
+              {/* Ghost thumb - follows hovered item */}
+              <TocGhostThumb />
               {/* TOC items */}
               {toc.map((item) => (
                 <TOCItem

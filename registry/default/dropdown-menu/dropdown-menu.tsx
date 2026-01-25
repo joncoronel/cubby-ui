@@ -3,15 +3,33 @@
 import * as React from "react";
 import { Menu as BaseMenu } from "@base-ui/react/menu";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  Tick02Icon,
-  ArrowRight01Icon,
-  RecordIcon,
-  CircleIcon,
-  Tick01Icon
-} from "@hugeicons/core-free-icons";
+import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 
 import { cn } from "@/lib/utils";
+
+// Custom checkmark with stroke-dashoffset animation
+// Path length ≈ 22 (calculated from the path geometry)
+function CheckmarkIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path
+        d="M5 14L8.5 17.5L19 6.5"
+        style={{
+          strokeDasharray: 22,
+        }}
+        className="in-data-checked:[stroke-dashoffset:0] in-data-unchecked:[stroke-dashoffset:22] transition-[stroke-dashoffset] duration-150 ease-out-cubic"
+      />
+    </svg>
+  );
+}
 
 function DropdownMenu({
   ...props
@@ -189,11 +207,7 @@ function DropdownMenuCheckboxItem({
     >
       <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
         <BaseMenu.CheckboxItemIndicator keepMounted>
-          <HugeiconsIcon
-            icon={Tick02Icon}
-            className="size-4 transition-[clip-path,opacity,transform,scale] duration-150 ease-out-cubic in-data-checked:[clip-path:inset(0)] in-data-checked:opacity-100 in-data-checked:scale-100 in-data-unchecked:[clip-path:inset(0_100%_0_0)] in-data-unchecked:opacity-0 in-data-unchecked:scale-95"
-            strokeWidth={2}
-          />
+          <CheckmarkIcon className="size-4" />
         </BaseMenu.CheckboxItemIndicator>
       </span>
       {children}

@@ -16,14 +16,21 @@ function CheckmarkIcon({ className }: { className?: string }) {
       strokeWidth={2.5}
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={className}
+      className={cn(
+        // Opacity + scale crossfade: visible when checked (not indeterminate), hidden otherwise
+        "opacity-0 scale-90 in-data-checked:not-in-data-indeterminate:opacity-100 in-data-checked:not-in-data-indeterminate:scale-100",
+        "transition-[opacity,filter,transform,scale] duration-150 ease-out-cubic motion-reduce:transition-none",
+        // Subtle blur during transition for smoother crossfade
+        "in-data-indeterminate:blur-[2px]",
+        className,
+      )}
     >
       <path
         d="M5 14L8.5 17.5L19 6.5"
         style={{
           strokeDasharray: 22,
         }}
-        className="in-data-checked:not-in-data-indeterminate:[stroke-dashoffset:0] in-data-unchecked:[stroke-dashoffset:22] in-data-indeterminate:[stroke-dashoffset:22] transition-[stroke-dashoffset] duration-150 ease-out-cubic"
+        className="in-data-checked:not-in-data-indeterminate:[stroke-dashoffset:0] in-data-unchecked:[stroke-dashoffset:22] in-data-indeterminate:[stroke-dashoffset:22] transition-[stroke-dashoffset] duration-150 ease-out-cubic in-data-checked:delay-15 motion-reduce:transition-none"
       />
     </svg>
   );
@@ -40,14 +47,21 @@ function MinusIcon({ className }: { className?: string }) {
       strokeWidth={2.5}
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={className}
+      className={cn(
+        // Opacity + scale crossfade: visible when indeterminate, hidden otherwise
+        "opacity-0 scale-90 in-data-indeterminate:opacity-100 in-data-indeterminate:scale-100",
+        "transition-[opacity,filter,transform,scale] duration-150 ease-out-cubic motion-reduce:transition-none",
+        // Subtle blur when transitioning away from indeterminate
+        "not-in-data-indeterminate:blur-[2px]",
+        className,
+      )}
     >
       <path
         d="M20 12L4 12"
         style={{
           strokeDasharray: 16,
         }}
-        className="in-data-indeterminate:[stroke-dashoffset:0] not-in-data-indeterminate:[stroke-dashoffset:16] transition-[stroke-dashoffset] duration-150 ease-out-cubic"
+        className="in-data-indeterminate:[stroke-dashoffset:0] not-in-data-indeterminate:[stroke-dashoffset:16] transition-[stroke-dashoffset] duration-150 ease-out-cubic in-data-indeterminate:delay-15 motion-reduce:transition-none"
       />
     </svg>
   );
@@ -61,7 +75,12 @@ function Checkbox({
     <BaseCheckbox.Root
       data-slot="checkbox"
       className={cn(
-        "peer bg-input aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid aria-invalid:text-destructive data-checked:border-primary data-checked:bg-primary data-checked:text-primary-foreground data-indeterminate:border-primary data-indeterminate:bg-primary data-indeterminate:text-primary-foreground border-border focus-visible:outline-ring/50 flex size-4 items-center justify-center rounded-xs border shadow-[0_1px_2px_0_oklch(0.18_0_0/0.08)] outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,background-color,border-color] duration-150 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60",
+        "peer relative bg-card text-primary-foreground aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid aria-invalid:text-destructive focus-visible:outline-ring/50 flex size-4 items-center justify-center rounded-xs border shadow-sm outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-150 ease-out-cubic outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none",
+        // Background scale animation using ::before pseudo-element
+        "before:absolute before:size-[calc(100%+2px)] before:rounded-xs before:bg-primary before:content-['']",
+        "before:scale-90 before:opacity-0 before:transition-[transform,opacity,scale] before:duration-150 before:ease-out-cubic before:origin-center before:transform-gpu before:will-change-transform motion-reduce:before:transition-none",
+        "data-checked:before:scale-100 data-checked:before:opacity-100",
+        "data-indeterminate:before:scale-100 data-indeterminate:before:opacity-100",
         className,
       )}
       {...props}
@@ -69,7 +88,7 @@ function Checkbox({
       <BaseCheckbox.Indicator
         keepMounted
         data-slot="checkbox-indicator"
-        className="grid place-items-center *:col-start-1 *:row-start-1"
+        className="z-10 grid place-items-center *:col-start-1 *:row-start-1"
       >
         <CheckmarkIcon className="size-3.5" />
         <MinusIcon className="size-3.5" />

@@ -25,7 +25,7 @@ function CheckmarkIcon({ className }: { className?: string }) {
         style={{
           strokeDasharray: 22,
         }}
-        className="in-data-checked:[stroke-dashoffset:0] in-data-unchecked:[stroke-dashoffset:22] transition-[stroke-dashoffset] duration-150 ease-out-cubic"
+        className="in-data-checked:[stroke-dashoffset:0] in-data-unchecked:[stroke-dashoffset:22] transition-[stroke-dashoffset] duration-150 ease-out-cubic motion-reduce:transition-none"
       />
     </svg>
   );

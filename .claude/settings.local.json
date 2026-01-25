@@ -113,7 +113,9 @@
       "Bash(pnpm eslint:*)",
       "Skill(vercel-react-best-practices)",
       "Skill(vercel-react-best-practices:*)",
-      "mcp__context7__resolve-library-id"
+      "mcp__context7__resolve-library-id",
+      "Skill(web-animation-design)",
+      "Skill(web-animation-design:*)"
     ],
     "deny": []
   }

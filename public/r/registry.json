@@ -233,9 +233,6 @@
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/checkbox.tsx"
         }
-      ],
-      "dependencies": [
-        "lucide-react"
       ]
     },
     {

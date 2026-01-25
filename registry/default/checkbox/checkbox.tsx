@@ -75,7 +75,7 @@ function Checkbox({
     <BaseCheckbox.Root
       data-slot="checkbox"
       className={cn(
-        "peer relative bg-card text-primary-foreground aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid aria-invalid:text-destructive focus-visible:outline-ring/50 flex size-4 items-center justify-center rounded-xs border outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-150 ease-out-cubic outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none",
+        "peer relative bg-card bg-clip-padding text-primary-foreground aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid aria-invalid:text-destructive focus-visible:outline-ring/50 flex size-4 items-center justify-center rounded-xs border outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-150 ease-out-cubic outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none",
         // Background scale animation using ::before pseudo-element
         "before:absolute before:size-[calc(100%+2px)] before:rounded-xs before:bg-primary before:content-['']",
         "before:scale-90 before:opacity-0 before:transition-[transform,opacity,scale] before:duration-150 before:ease-out-cubic before:origin-center before:transform-gpu before:will-change-transform motion-reduce:before:transition-none",

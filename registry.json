@@ -850,6 +850,9 @@
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/input.tsx"
         }
+      ],
+      "dependencies": [
+        "class-variance-authority"
       ]
     },
     {
@@ -1092,6 +1095,7 @@
         "@cubby-ui/scroll-area"
       ],
       "dependencies": [
+        "class-variance-authority",
         "@hugeicons/react",
         "@hugeicons/core-free-icons"
       ]

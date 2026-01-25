@@ -128,10 +128,10 @@ export default function DataTableToolbarExample() {
 					value={statusFilter}
 					onValueChange={(value) => setStatusFilter(value ?? "all")}
 				>
-					<SelectTrigger className="w-auto min-w-16 border-transparent bg-transparent shadow-none before:hidden dark:bg-transparent">
+					<SelectTrigger size="sm" className="w-auto min-w-16 border-transparent bg-transparent shadow-none before:hidden dark:bg-transparent">
 						<SelectValue />
 					</SelectTrigger>
-					<SelectContent alignItemWithTrigger>
+					<SelectContent size="sm" alignItemWithTrigger>
 						{statusOptions.map((option) => (
 							<SelectItem key={option.value} value={option.value}>
 								{option.label}

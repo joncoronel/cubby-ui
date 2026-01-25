@@ -24,7 +24,7 @@ function DataTableColumnToggle() {
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger render={<Button variant="ghost" size="icon" />}>
+			<DropdownMenuTrigger render={<Button variant="ghost" size="icon_sm" />}>
 				<HugeiconsIcon
 					icon={FilterHorizontalIcon}
 					className="size-4"

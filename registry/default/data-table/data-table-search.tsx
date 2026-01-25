@@ -14,12 +14,14 @@ import {
 } from "@/registry/default/input-group/input-group"
 
 interface DataTableSearchProps
-	extends Omit<React.ComponentProps<"input">, "value" | "onChange"> {
+	extends Omit<React.ComponentProps<"input">, "value" | "onChange" | "size"> {
 	placeholder?: string
+	size?: "default" | "sm"
 }
 
 function DataTableSearch({
 	placeholder = "Search and filter",
+	size = "sm",
 	className,
 	...props
 }: DataTableSearchProps) {
@@ -36,9 +38,10 @@ function DataTableSearch({
 			</InputGroupAddon>
 			<InputGroupInput
 				placeholder={placeholder}
+				size={size}
 				value={table.getState().globalFilter ?? ""}
 				onChange={(e) => table.setGlobalFilter(e.target.value)}
-				className={cn("h-auto py-0", className)}
+				className={cn("py-0", className)}
 				render={<Toolbar.Input />}
 				{...props}
 			/>

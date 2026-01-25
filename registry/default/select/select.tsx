@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 import { Select as BaseSelect } from "@base-ui/react/select";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -83,41 +84,56 @@ function SelectValue({
   );
 }
 
+const selectTriggerVariants = cva(
+  [
+    // Outline button style
+    "group/select-trigger relative inline-flex w-fit items-center justify-between gap-2.5 rounded-lg",
+    "bg-card dark:bg-input/35 border bg-clip-padding in-data-[slot=button-group]:shadow-xs",
+    "before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] not-disabled:not-active:not-data-pressed:not-in-data-[slot=button-group]:before:shadow-inset dark:not-disabled:not-active:not-data-pressed:not-in-data-[slot=button-group]:before:shadow-inset-highlight [:disabled,:active,[data-pressed]]:shadow-none",
+    // Focus and hover states (outline button style)
+    "hover:bg-accent/50 dark:hover:bg-input/50 hover:text-accent-foreground data-placeholder:text-muted-foreground",
+    "focus-visible:outline-ring/50 ease-out-cubic outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+    // Invalid state
+    "aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
+    // Text and icon styling
+    "text-sm font-normal whitespace-nowrap",
+    "[&_svg:not([class*='text-'])]:text-muted-foreground",
+    "*:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 *:data-[slot=select-value]:overflow-hidden",
+    "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+    // Disabled state
+    "data-disabled:pointer-events-none data-disabled:opacity-50",
+    // Other
+    "cursor-pointer select-none",
+  ],
+  {
+    variants: {
+      size: {
+        default: "h-10 px-3 py-2 sm:h-9",
+        sm: "h-9 px-2.5 py-1.5 sm:h-8",
+      },
+    },
+    defaultVariants: {
+      size: "default",
+    },
+  }
+);
+
+type SelectTriggerProps = BaseSelect.Trigger.Props &
+  VariantProps<typeof selectTriggerVariants> & {
+    hideChevronRotation?: boolean;
+  };
+
 function SelectTrigger({
   className,
   children,
+  size,
   hideChevronRotation = false,
   ...props
-}: BaseSelect.Trigger.Props & {
-  hideChevronRotation?: boolean;
-}) {
+}: SelectTriggerProps) {
   return (
     <BaseSelect.Trigger
       data-slot="select-trigger"
-      className={cn(
-        // Outline button style
-        "group/select-trigger relative inline-flex w-fit items-center justify-between gap-2.5 rounded-lg",
-        "bg-card dark:bg-input/35 border bg-clip-padding in-data-[slot=button-group]:shadow-xs",
-        "before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] not-disabled:not-active:not-data-pressed:not-in-data-[slot=button-group]:before:shadow-inset dark:not-disabled:not-active:not-data-pressed:not-in-data-[slot=button-group]:before:shadow-inset-highlight [:disabled,:active,[data-pressed]]:shadow-none",
-
-        // Focus and hover states (outline button style)
-        "hover:bg-accent/50 dark:hover:bg-input/50 hover:text-accent-foreground data-placeholder:text-muted-foreground",
-        "focus-visible:outline-ring/50 ease-out-cubic outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
-        // Invalid state
-        "aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
-        // Size variants
-        "h-10 sm:h-9",
-        // Text and icon styling
-        "px-3 py-2 text-sm font-normal whitespace-nowrap",
-        "[&_svg:not([class*='text-'])]:text-muted-foreground",
-        "*:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 *:data-[slot=select-value]:overflow-hidden",
-        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        // Disabled state
-        "data-disabled:pointer-events-none data-disabled:opacity-50",
-        // Other
-        "cursor-pointer select-none",
-        className,
-      )}
+      className={cn(selectTriggerVariants({ size }), className)}
       {...props}
     >
       {children}
@@ -140,6 +156,7 @@ interface SelectContentProps
       | "nativeScroll"
     > {
   className?: string;
+  size?: "default" | "sm";
 }
 
 function SelectContent({
@@ -151,6 +168,7 @@ function SelectContent({
   scrollbarGutter = false,
   persistScrollbar,
   hideScrollbar,
+  size,
   children,
   ...props
 }: SelectContentProps) {
@@ -166,6 +184,7 @@ function SelectContent({
       >
         <BaseSelect.Popup
           data-slot="select-content"
+          data-size={size}
           className={cn(
             // Combobox-style popup
             "bg-popover text-popover-foreground data-[side=none]:ring-border relative flex flex-col overflow-clip rounded-xl border bg-clip-padding data-[side=none]:border-none data-[side=none]:ring-1",
@@ -233,6 +252,8 @@ function SelectItem({ className, children, ...props }: BaseSelect.Item.Props) {
       className={cn(
         // Combobox-style item with grid layout
         "relative grid cursor-default grid-cols-[1fr_1rem] items-center gap-2 rounded-md px-3 py-2 text-sm outline-none select-none in-data-[side=none]:min-w-[calc(var(--anchor-width))]",
+        // Size variants (inherited from SelectContent via data-size attribute)
+        "in-data-[size=sm]:px-2.5 in-data-[size=sm]:py-1.5",
         // Spacing from list edges
         "mx-1 first:mt-1 last:mb-1",
         // Hover and highlight states
@@ -295,6 +316,7 @@ function SelectList({ className, ...props }: BaseSelect.List.Props) {
 export {
   Select,
   SelectTrigger,
+  selectTriggerVariants,
   SelectContent,
   SelectItem,
   SelectValue,

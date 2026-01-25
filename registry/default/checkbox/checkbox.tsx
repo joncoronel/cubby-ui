@@ -75,12 +75,17 @@ function Checkbox({
     <BaseCheckbox.Root
       data-slot="checkbox"
       className={cn(
-        "peer relative bg-card text-primary-foreground aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid aria-invalid:text-destructive focus-visible:outline-ring/50 flex size-4 items-center justify-center rounded-xs border shadow-sm outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-150 ease-out-cubic outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none",
+        "peer relative bg-card text-primary-foreground aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid aria-invalid:text-destructive focus-visible:outline-ring/50 flex size-4 items-center justify-center rounded-xs border outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-150 ease-out-cubic outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none",
         // Background scale animation using ::before pseudo-element
         "before:absolute before:size-[calc(100%+2px)] before:rounded-xs before:bg-primary before:content-['']",
         "before:scale-90 before:opacity-0 before:transition-[transform,opacity,scale] before:duration-150 before:ease-out-cubic before:origin-center before:transform-gpu before:will-change-transform motion-reduce:before:transition-none",
         "data-checked:before:scale-100 data-checked:before:opacity-100",
         "data-indeterminate:before:scale-100 data-indeterminate:before:opacity-100",
+        // Inset shadow using ::after pseudo-element (sits inside border)
+        "after:pointer-events-none after:absolute after:inset-0 after:rounded-[calc(var(--radius-xs)-1px)] after:content-['']",
+        "after:shadow-inset dark:after:shadow-inset-highlight",
+        "after:transition-opacity after:duration-150 after:ease-out-cubic",
+        "data-checked:after:opacity-0 data-indeterminate:after:opacity-0",
         className,
       )}
       {...props}

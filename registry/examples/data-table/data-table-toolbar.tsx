@@ -95,7 +95,7 @@ export default function DataTableToolbar() {
 					onValueChange={(value) => setStatusFilter(value ?? "all")}
 					
 				>
-					<SelectTrigger className="w-auto min-w-16">
+					<SelectTrigger className="w-auto min-w-16 border-transparent bg-transparent shadow-none before:hidden dark:bg-transparent">
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent alignItemWithTrigger>

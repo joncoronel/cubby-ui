@@ -28,8 +28,8 @@ function ColumnVisibilityPopover<TData>({
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger render={<Button variant="ghost" size="icon_sm" />}>
-				<HugeiconsIcon icon={FilterHorizontalIcon} className="size-4" />
+			<DropdownMenuTrigger render={<Button variant="ghost" size="icon" />}>
+				<HugeiconsIcon icon={FilterHorizontalIcon} className="size-4" strokeWidth={2} />
 			</DropdownMenuTrigger>
 			<DropdownMenuContent side="bottom" align="end">
 				<DropdownMenuLabel>Toggle columns</DropdownMenuLabel>

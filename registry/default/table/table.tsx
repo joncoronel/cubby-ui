@@ -65,8 +65,7 @@ function Table({
 					data-slot="table"
 					className={cn(
 						"w-full caption-bottom text-sm",
-						// Use border-separate for bordered to allow rounded corners on cells
-						bordered && "border-separate border-spacing-0 "
+						bordered && "border-separate border-spacing-0"
 					)}
 					{...props}
 				>
@@ -83,14 +82,13 @@ function TableHeader({ className, render, ...props }: TableHeaderProps) {
 	const defaultProps = {
 		"data-slot": "table-header",
 		className: cn(
-			// Header row styling - creates the "card within card" look
 			"[&_tr]:border-0",
-			// Apply bg-muted to cells (not row) for Firefox border-radius compatibility
 			"[&_tr_th]:bg-muted",
-			// Round the corners of the header "card"
 			"[&_tr_th:first-child]:rounded-l-lg [&_tr_th:last-child]:rounded-r-lg",
-			// Always sticky - works when parent constrains height
 			"sticky top-0 z-10",
+			"before:pointer-events-none before:absolute before:inset-0 before:z-[1] before:content-['']",
+			"before:rounded-lg before:border",
+			"before:shadow-xs",
 			className
 		),
 	}
@@ -108,19 +106,12 @@ function TableBody({ className, render, ...props }: TableBodyProps) {
 	const defaultProps = {
 		"data-slot": "table-body",
 		className: cn(
-			// Gap between header and first body row
 			"before:block before:h-2 before:content-['']",
-			// Rounded top corners on first row
 			"[&_tr:first-child_td:first-child]:rounded-tl-lg [&_tr:first-child_td:last-child]:rounded-tr-lg",
-			// Rounded bottom corners on last row
 			"[&_tr:last-child_td:first-child]:rounded-bl-lg [&_tr:last-child_td:last-child]:rounded-br-lg",
-			// Row dividers (only for body rows, not last row)
 			"group-data-[row-dividers]/table:[&_tr:not(:last-child)]:border-b group-data-[row-dividers]/table:[&_tr]:border-border/60",
-			// Bordered variant - top border on first row cells
 			"group-data-bordered/table:[&_tr:first-child_td]:border-t group-data-bordered/table:[&_tr:first-child_td]:border-border",
-			// Hover variant (only for body rows)
 			"group-data-hoverable/table:[&_tr:hover]:bg-muted/40",
-			// Striped variant (only for body rows)
 			"group-data-striped/table:[&_tr:nth-child(even)]:bg-muted/50",
 			className
 		),
@@ -139,15 +130,10 @@ function TableFooter({ className, render, ...props }: TableFooterProps) {
 	const defaultProps = {
 		"data-slot": "table-footer",
 		className: cn(
-			// Gap between body and footer
 			"before:block before:h-2 before:content-['']",
-			// Footer row styling - matches header "card within card" look
 			"[&_tr]:border-0",
-			// Apply bg-muted to cells (not row) for Firefox border-radius compatibility
 			"[&_tr_td]:bg-muted",
-			// Round all corners of the footer "card"
 			"[&_tr_td:first-child]:rounded-l-lg [&_tr_td:last-child]:rounded-r-lg",
-			// Match header cell padding
 			"[&_tr_td]:py-2",
 			"font-medium",
 			className
@@ -170,10 +156,8 @@ function TableRow({ className, render, selected, ...props }: TableRowProps) {
 		"data-slot": "table-row",
 		"data-state": selected ? "selected" : undefined,
 		className: cn(
-			// Transition for fade-out only (instant-in via hover:transition-none)
 			"transition-colors duration-100 hover:transition-none",
-			// Selection state
-			selected ? "bg-muted/60" : null,
+			selected && "bg-muted/60",
 			className
 		),
 	}
@@ -193,7 +177,6 @@ function TableHead({ className, render, ...props }: TableHeadProps) {
 		className: cn(
 			"text-muted-foreground px-3 py-2 text-left align-middle text-sm font-medium whitespace-nowrap",
 			"[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-			// Bordered variant - only vertical dividers between columns
 			"group-data-[bordered]/table:border-r group-data-[bordered]/table:border-border group-data-[bordered]/table:last:border-r-0",
 			className
 		),
@@ -214,7 +197,6 @@ function TableCell({ className, render, ...props }: TableCellProps) {
 		className: cn(
 			"px-3 py-2.5 align-middle whitespace-nowrap",
 			"[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-			// Bordered variant - use border-b and border-r to avoid doubles, with left on first column
 			"group-data-bordered/table:border-b group-data-bordered/table:border-r group-data-bordered/table:first:border-l group-data-bordered/table:border-border",
 			className
 		),

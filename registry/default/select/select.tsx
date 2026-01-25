@@ -195,9 +195,10 @@ function SelectContent({
             "not-data-[side=none]:max-h-(--available-height)",
             // Shadow
             "shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)]",
-            // Animation
+            // Animation (disabled for alignItemWithTrigger via data-[side=none] to prevent Firefox jiggle)
             "ease-out-cubic origin-(--transform-origin) transition-[transform,scale,opacity] duration-100",
-            "data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0 data-[side=none]:data-ending-style:transition-none data-[side=none]:data-starting-style:scale-100 data-[side=none]:data-starting-style:opacity-100 data-[side=none]:data-starting-style:transition-none",
+            "data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
+            "data-[side=none]:transition-none data-[side=none]:data-starting-style:scale-100 data-[side=none]:data-starting-style:opacity-100 data-[side=none]:data-ending-style:scale-100 data-[side=none]:data-ending-style:opacity-100",
           )}
         >
           {alignItemWithTrigger && (

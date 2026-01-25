@@ -530,9 +530,7 @@ export const componentMetadata = {
     "description": "A checkbox component.",
     "category": "UI",
     "registryDependencies": [],
-    "dependencies": [
-      "lucide-react"
-    ],
+    "dependencies": [],
     "examples": {},
     "reference": []
   },

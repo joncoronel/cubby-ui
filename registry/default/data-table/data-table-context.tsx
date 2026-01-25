@@ -7,6 +7,7 @@ interface DataTableContextValue<TData> {
 	table: Table<TData>
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Generic context requires any; type safety is enforced via useDataTable<TData>()
 const DataTableContext = React.createContext<DataTableContextValue<any> | null>(
 	null
 )

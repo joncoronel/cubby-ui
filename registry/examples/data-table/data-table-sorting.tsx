@@ -4,6 +4,8 @@ import {
 	type ColumnDef,
 	DataTable,
 	DataTableContent,
+	DataTableHeader,
+	DataTableBody,
 } from "@/registry/default/data-table/data-table"
 
 type Employee = {
@@ -54,7 +56,10 @@ const data: Employee[] = [
 export default function DataTableSorting() {
 	return (
 		<DataTable columns={columns} data={data} enableSorting>
-			<DataTableContent enableSorting />
+			<DataTableContent>
+				<DataTableHeader enableSorting />
+				<DataTableBody />
+			</DataTableContent>
 		</DataTable>
 	)
 }

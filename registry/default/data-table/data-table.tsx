@@ -7,6 +7,7 @@ import {
 	getSortedRowModel,
 	getFilteredRowModel,
 	getPaginationRowModel,
+	flexRender,
 	type ColumnDef,
 	type SortingState,
 	type RowSelectionState,
@@ -15,7 +16,14 @@ import {
 	type VisibilityState,
 	type OnChangeFn,
 	type Row,
+	type Column,
 } from "@tanstack/react-table"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+	SortByDown01Icon,
+	SortByUp01Icon,
+	ArrowUpDownIcon,
+} from "@hugeicons/core-free-icons"
 
 import { cn } from "@/lib/utils"
 import { Checkbox } from "@/registry/default/checkbox/checkbox"
@@ -28,9 +36,18 @@ import {
 	ToolbarSeparator,
 	type ToolbarProps,
 } from "@/registry/default/toolbar/toolbar"
+import {
+	Table,
+	TableHeader,
+	TableBody,
+	TableFooter,
+	TableHead,
+	TableRow,
+	TableCell,
+	type TableProps,
+} from "@/registry/default/table/table"
 import { DataTableSearch } from "@/registry/default/data-table/data-table-search"
 import { DataTableColumnToggle } from "@/registry/default/data-table/data-table-column-toggle"
-import { DataTableContent } from "@/registry/default/data-table/data-table-content"
 import { DataTablePagination } from "@/registry/default/data-table/data-table-pagination"
 
 export interface DataTableProps<TData, TValue> {
@@ -222,6 +239,185 @@ function DataTableToolbar({ className, ...props }: ToolbarProps) {
 	)
 }
 
+export interface DataTableContentProps
+	extends Omit<TableProps, "children"> {
+	children: React.ReactNode
+}
+
+function DataTableContent({
+	bordered,
+	striped,
+	hoverable,
+	rowDividers = true,
+	className,
+	children,
+	...tableProps
+}: DataTableContentProps) {
+	return (
+		<Table
+			bordered={bordered}
+			striped={striped}
+			hoverable={hoverable}
+			rowDividers={rowDividers}
+			className={cn("rounded-none bg-transparent ring-0", className)}
+			{...tableProps}
+		>
+			{children}
+		</Table>
+	)
+}
+
+function SortableHeader<TData>({
+	column,
+	children,
+	align,
+	isFirst,
+	isLast,
+}: {
+	column: Column<TData, unknown>
+	children: React.ReactNode
+	align?: "left" | "center" | "right"
+	isFirst?: boolean
+	isLast?: boolean
+}) {
+	return (
+		<button
+			type="button"
+			className={cn(
+				"group -mx-3 -my-2 flex w-[calc(100%+1.5rem)] cursor-pointer items-center gap-1.5 px-3 py-2 hover:bg-accent/50",
+				align === "right" && "justify-end",
+				align === "center" && "justify-center",
+				isFirst && "rounded-l-lg",
+				isLast && "rounded-r-lg"
+			)}
+			onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+		>
+			{children}
+			{column.getIsSorted() === "asc" ? (
+				<HugeiconsIcon
+					icon={SortByUp01Icon}
+					strokeWidth={2}
+					className="size-4"
+				/>
+			) : column.getIsSorted() === "desc" ? (
+				<HugeiconsIcon
+					icon={SortByDown01Icon}
+					strokeWidth={2}
+					className="size-4"
+				/>
+			) : (
+				<HugeiconsIcon
+					icon={ArrowUpDownIcon}
+					strokeWidth={2}
+					className="size-4 opacity-0 group-hover:opacity-50"
+				/>
+			)}
+		</button>
+	)
+}
+
+export interface DataTableHeaderProps
+	extends React.ComponentProps<typeof TableHeader> {
+	enableSorting?: boolean
+}
+
+function DataTableHeader({
+	enableSorting = false,
+	className,
+	...props
+}: DataTableHeaderProps) {
+	const { table } = useDataTable()
+
+	const renderHeader = (
+		header: ReturnType<typeof table.getHeaderGroups>[0]["headers"][0],
+		index: number,
+		totalHeaders: number
+	) => {
+		if (header.isPlaceholder) return null
+
+		const headerDef = header.column.columnDef.header
+		const canSort = header.column.getCanSort()
+		const meta = header.column.columnDef.meta as
+			| { align?: "left" | "center" | "right" }
+			| undefined
+
+		if (typeof headerDef === "string" && enableSorting && canSort) {
+			return (
+				<SortableHeader
+					column={header.column}
+					align={meta?.align}
+					isFirst={index === 0}
+					isLast={index === totalHeaders - 1}
+				>
+					{headerDef}
+				</SortableHeader>
+			)
+		}
+
+		return flexRender(headerDef, header.getContext())
+	}
+
+	return (
+		<TableHeader className={className} {...props}>
+			{table.getHeaderGroups().map((headerGroup) => (
+				<TableRow key={headerGroup.id}>
+					{headerGroup.headers.map((header, index) => (
+						<TableHead key={header.id} colSpan={header.colSpan}>
+							{renderHeader(header, index, headerGroup.headers.length)}
+						</TableHead>
+					))}
+				</TableRow>
+			))}
+		</TableHeader>
+	)
+}
+
+export interface DataTableBodyProps
+	extends React.ComponentProps<typeof TableBody> {
+	emptyState?: React.ReactNode
+}
+
+function DataTableBody({
+	emptyState,
+	className,
+	...props
+}: DataTableBodyProps) {
+	const { table } = useDataTable()
+	const totalColumns = table.getAllColumns().length
+
+	return (
+		<TableBody className={className} {...props}>
+			{table.getRowModel().rows?.length ? (
+				table.getRowModel().rows.map((row) => (
+					<TableRow key={row.id} selected={row.getIsSelected()}>
+						{row.getVisibleCells().map((cell) => (
+							<TableCell key={cell.id}>
+								{flexRender(cell.column.columnDef.cell, cell.getContext())}
+							</TableCell>
+						))}
+					</TableRow>
+				))
+			) : (
+				<TableRow>
+					<TableCell colSpan={totalColumns} className="h-24 text-center">
+						{emptyState ?? "No results."}
+					</TableCell>
+				</TableRow>
+			)}
+		</TableBody>
+	)
+}
+
+export type DataTableFooterProps = React.ComponentProps<typeof TableFooter>
+
+function DataTableFooter({ className, children, ...props }: DataTableFooterProps) {
+	return (
+		<TableFooter className={className} {...props}>
+			{children}
+		</TableFooter>
+	)
+}
+
 export {
 	DataTable,
 	DataTableToolbar,
@@ -229,6 +425,9 @@ export {
 	DataTableSearch,
 	DataTableColumnToggle,
 	DataTableContent,
+	DataTableHeader,
+	DataTableBody,
+	DataTableFooter,
 	DataTablePagination,
 	useDataTable,
 }

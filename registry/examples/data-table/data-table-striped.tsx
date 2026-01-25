@@ -4,6 +4,8 @@ import {
 	type ColumnDef,
 	DataTable,
 	DataTableContent,
+	DataTableHeader,
+	DataTableBody,
 } from "@/registry/default/data-table/data-table"
 
 type Product = {
@@ -63,7 +65,10 @@ const data: Product[] = [
 export default function DataTableStriped() {
 	return (
 		<DataTable columns={columns} data={data}>
-			<DataTableContent striped hoverable={false} />
+			<DataTableContent striped hoverable={false}>
+				<DataTableHeader />
+				<DataTableBody />
+			</DataTableContent>
 		</DataTable>
 	)
 }

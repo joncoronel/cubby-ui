@@ -10,6 +10,8 @@ import {
 	DataTableSearch,
 	DataTableColumnToggle,
 	DataTableContent,
+	DataTableHeader,
+	DataTableBody,
 } from "@/registry/default/data-table/data-table"
 import { Badge } from "@/registry/default/badge/badge"
 import {
@@ -36,6 +38,13 @@ const columns: ColumnDef<Bill>[] = [
 	{
 		accessorKey: "dateIssued",
 		header: "Date issued",
+		cell: ({ row }) => {
+			return new Date(row.getValue("dateIssued")).toLocaleDateString("en-US", {
+				month: "short",
+				day: "numeric",
+				year: "numeric",
+			})
+		},
 	},
 	{
 		accessorKey: "total",
@@ -72,21 +81,21 @@ const columns: ColumnDef<Bill>[] = [
 ]
 
 const data: Bill[] = [
-	{ id: "1", billNumber: "448895349", dateIssued: "Nov 22, 2025", total: 39.99, status: "paid" },
-	{ id: "2", billNumber: "551238764", dateIssued: "Nov 18, 2025", total: 124.50, status: "paid" },
-	{ id: "3", billNumber: "662341987", dateIssued: "Nov 15, 2025", total: 89.00, status: "pending" },
-	{ id: "4", billNumber: "773456210", dateIssued: "Nov 10, 2025", total: 250.75, status: "overdue" },
-	{ id: "5", billNumber: "884567321", dateIssued: "Nov 8, 2025", total: 67.25, status: "paid" },
-	{ id: "6", billNumber: "995678432", dateIssued: "Nov 5, 2025", total: 189.99, status: "pending" },
-	{ id: "7", billNumber: "106789543", dateIssued: "Nov 1, 2025", total: 45.00, status: "paid" },
-	{ id: "8", billNumber: "217890654", dateIssued: "Oct 28, 2025", total: 320.00, status: "overdue" },
-	{ id: "9", billNumber: "328901765", dateIssued: "Oct 25, 2025", total: 55.50, status: "paid" },
-	{ id: "10", billNumber: "439012876", dateIssued: "Oct 22, 2025", total: 175.25, status: "pending" },
-	{ id: "11", billNumber: "540123987", dateIssued: "Oct 18, 2025", total: 92.00, status: "paid" },
-	{ id: "12", billNumber: "651234098", dateIssued: "Oct 15, 2025", total: 410.50, status: "overdue" },
-	{ id: "13", billNumber: "762345109", dateIssued: "Oct 12, 2025", total: 28.75, status: "paid" },
-	{ id: "14", billNumber: "873456210", dateIssued: "Oct 8, 2025", total: 145.00, status: "pending" },
-	{ id: "15", billNumber: "984567321", dateIssued: "Oct 5, 2025", total: 78.99, status: "paid" },
+	{ id: "1", billNumber: "448895349", dateIssued: "2025-11-22", total: 39.99, status: "paid" },
+	{ id: "2", billNumber: "551238764", dateIssued: "2025-11-18", total: 124.50, status: "paid" },
+	{ id: "3", billNumber: "662341987", dateIssued: "2025-11-15", total: 89.00, status: "pending" },
+	{ id: "4", billNumber: "773456210", dateIssued: "2025-11-10", total: 250.75, status: "overdue" },
+	{ id: "5", billNumber: "884567321", dateIssued: "2025-11-08", total: 67.25, status: "paid" },
+	{ id: "6", billNumber: "995678432", dateIssued: "2025-11-05", total: 189.99, status: "pending" },
+	{ id: "7", billNumber: "106789543", dateIssued: "2025-11-01", total: 45.00, status: "paid" },
+	{ id: "8", billNumber: "217890654", dateIssued: "2025-10-28", total: 320.00, status: "overdue" },
+	{ id: "9", billNumber: "328901765", dateIssued: "2025-10-25", total: 55.50, status: "paid" },
+	{ id: "10", billNumber: "439012876", dateIssued: "2025-10-22", total: 175.25, status: "pending" },
+	{ id: "11", billNumber: "540123987", dateIssued: "2025-10-18", total: 92.00, status: "paid" },
+	{ id: "12", billNumber: "651234098", dateIssued: "2025-10-15", total: 410.50, status: "overdue" },
+	{ id: "13", billNumber: "762345109", dateIssued: "2025-10-12", total: 28.75, status: "paid" },
+	{ id: "14", billNumber: "873456210", dateIssued: "2025-10-08", total: 145.00, status: "pending" },
+	{ id: "15", billNumber: "984567321", dateIssued: "2025-10-05", total: 78.99, status: "paid" },
 ]
 
 const statusOptions = [
@@ -109,6 +118,7 @@ export default function DataTableToolbarExample() {
 		<DataTable
 			columns={columns}
 			data={filteredData}
+			enableSorting
 			enableFiltering
 			enableRowSelection
 		>
@@ -133,7 +143,10 @@ export default function DataTableToolbarExample() {
 				<DataTableSearch placeholder="Search and filter" />
 				<DataTableColumnToggle />
 			</DataTableToolbar>
-			<DataTableContent className="max-h-[400px]" />
+			<DataTableContent className="max-h-[400px]">
+				<DataTableHeader enableSorting />
+				<DataTableBody />
+			</DataTableContent>
 		</DataTable>
 	)
 }

@@ -4,6 +4,8 @@ import {
 	type ColumnDef,
 	DataTable,
 	DataTableContent,
+	DataTableHeader,
+	DataTableBody,
 } from "@/registry/default/data-table/data-table"
 
 type Invoice = {
@@ -54,7 +56,10 @@ const data: Invoice[] = [
 export default function DataTableBasic() {
 	return (
 		<DataTable columns={columns} data={data}>
-			<DataTableContent />
+			<DataTableContent>
+				<DataTableHeader />
+				<DataTableBody />
+			</DataTableContent>
 		</DataTable>
 	)
 }

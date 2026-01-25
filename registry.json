@@ -472,11 +472,6 @@
           "target": "components/ui/cubby-ui/data-table/data-table-column-toggle.tsx"
         },
         {
-          "path": "registry/default/data-table/data-table-content.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/cubby-ui/data-table/data-table-content.tsx"
-        },
-        {
           "path": "registry/default/data-table/data-table-context.tsx",
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/data-table/data-table-context.tsx"
@@ -495,9 +490,9 @@
       "registryDependencies": [
         "@cubby-ui/checkbox",
         "@cubby-ui/toolbar",
+        "@cubby-ui/table",
         "@cubby-ui/dropdown-menu",
         "@cubby-ui/button",
-        "@cubby-ui/table",
         "@cubby-ui/input-group"
       ],
       "dependencies": [

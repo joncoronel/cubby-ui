@@ -6,6 +6,8 @@ import {
 	type ColumnDef,
 	DataTable,
 	DataTableContent,
+	DataTableHeader,
+	DataTableBody,
 	type RowSelectionState,
 } from "@/registry/default/data-table/data-table"
 
@@ -64,7 +66,10 @@ export default function DataTableRowSelection() {
 				rowSelection={rowSelection}
 				onRowSelectionChange={setRowSelection}
 			>
-				<DataTableContent />
+				<DataTableContent>
+					<DataTableHeader />
+					<DataTableBody />
+				</DataTableContent>
 			</DataTable>
 			<div className="text-muted-foreground text-sm">
 				{Object.keys(rowSelection).length} of {data.length} row(s) selected.

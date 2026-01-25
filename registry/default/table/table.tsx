@@ -208,7 +208,7 @@ function TableCell({ className, render, ...props }: TableCellProps) {
 	const defaultProps = {
 		"data-slot": "table-cell",
 		className: cn(
-			"p-3 align-middle whitespace-nowrap",
+			"px-3 py-2.5 align-middle whitespace-nowrap",
 			"[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
 			// Bordered variant - use border-b and border-r to avoid doubles, with left on first column
 			"group-data-bordered/table:border-b group-data-bordered/table:border-r group-data-bordered/table:first:border-l group-data-bordered/table:border-border",

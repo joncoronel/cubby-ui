@@ -111,8 +111,9 @@ function TableBody({ className, render, ...props }: TableBodyProps) {
 			"[&_tr:last-child_td:first-child]:rounded-bl-lg [&_tr:last-child_td:last-child]:rounded-br-lg",
 			"group-data-[row-dividers]/table:[&_tr:not(:last-child)]:border-b group-data-[row-dividers]/table:[&_tr]:border-border/60",
 			"group-data-bordered/table:[&_tr:first-child_td]:border-t group-data-bordered/table:[&_tr:first-child_td]:border-border",
-			"group-data-hoverable/table:[&_tr:hover]:bg-muted/40",
-			"group-data-striped/table:[&_tr:nth-child(even)]:bg-muted/50",
+		
+			"group-data-hoverable/table:[&_tr:hover_td]:bg-muted/40",
+			"group-data-striped/table:[&_tr:nth-child(even)_td]:bg-muted/50",
 			className
 		),
 	}
@@ -157,7 +158,6 @@ function TableRow({ className, render, selected, ...props }: TableRowProps) {
 		"data-state": selected ? "selected" : undefined,
 		className: cn(
 			"transition-colors duration-100 hover:transition-none",
-			selected && "bg-muted/60",
 			className
 		),
 	}
@@ -198,6 +198,7 @@ function TableCell({ className, render, ...props }: TableCellProps) {
 			"px-3 py-2.5 align-middle whitespace-nowrap",
 			"[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
 			"group-data-bordered/table:border-b group-data-bordered/table:border-r group-data-bordered/table:first:border-l group-data-bordered/table:border-border",
+			"[[data-state=selected]_&]:bg-muted/60",
 			className
 		),
 	}

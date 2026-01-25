@@ -5,6 +5,7 @@ import * as React from "react"
 import {
 	type ColumnDef,
 	DataTable,
+	DataTableContent,
 	type RowSelectionState,
 } from "@/registry/default/data-table/data-table"
 
@@ -62,7 +63,9 @@ export default function DataTableRowSelection() {
 				enableRowSelection
 				rowSelection={rowSelection}
 				onRowSelectionChange={setRowSelection}
-			/>
+			>
+				<DataTableContent />
+			</DataTable>
 			<div className="text-muted-foreground text-sm">
 				{Object.keys(rowSelection).length} of {data.length} row(s) selected.
 			</div>

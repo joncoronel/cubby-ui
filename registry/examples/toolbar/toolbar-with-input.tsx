@@ -49,10 +49,7 @@ export default function ToolbarWithInput() {
       
       <ToolbarSeparator />
       
-      <ToolbarInput
-        placeholder="Search..."
-        className="w-32 h-8 px-2 rounded border border-input bg-background text-sm"
-      />
+      <ToolbarInput placeholder="Search..." className="w-32" />
       
       <ToolbarSeparator />
       

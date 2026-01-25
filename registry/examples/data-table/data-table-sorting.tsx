@@ -1,6 +1,10 @@
 "use client"
 
-import { type ColumnDef, DataTable } from "@/registry/default/data-table/data-table"
+import {
+	type ColumnDef,
+	DataTable,
+	DataTableContent,
+} from "@/registry/default/data-table/data-table"
 
 type Employee = {
 	id: string
@@ -48,5 +52,9 @@ const data: Employee[] = [
 ]
 
 export default function DataTableSorting() {
-	return <DataTable columns={columns} data={data} enableSorting />
+	return (
+		<DataTable columns={columns} data={data} enableSorting>
+			<DataTableContent enableSorting />
+		</DataTable>
+	)
 }

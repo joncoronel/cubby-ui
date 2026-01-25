@@ -1,6 +1,10 @@
 "use client"
 
-import { type ColumnDef, DataTable } from "@/registry/default/data-table/data-table"
+import {
+	type ColumnDef,
+	DataTable,
+	DataTableContent,
+} from "@/registry/default/data-table/data-table"
 
 type Product = {
 	id: string
@@ -57,5 +61,9 @@ const data: Product[] = [
 ]
 
 export default function DataTableStriped() {
-	return <DataTable columns={columns} data={data} striped hoverable={false} />
+	return (
+		<DataTable columns={columns} data={data}>
+			<DataTableContent striped hoverable={false} />
+		</DataTable>
+	)
 }

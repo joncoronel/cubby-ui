@@ -1053,16 +1053,27 @@ function scanComponentFiles(
     }
   }
 
-  // Check for CSS files in component root (e.g., drawer.css)
+  // Check for sibling .tsx files in component root (e.g., data-table-search.tsx)
+  // These are co-located UI components that should be included with the main component
   const rootEntries = fsSync.readdirSync(componentPath, {
     withFileTypes: true,
   });
+  const mainFileName = `${componentName}.tsx`;
   for (const entry of rootEntries) {
-    if (entry.isFile() && entry.name.endsWith(".css")) {
-      files.push({
-        path: `registry/${DEFAULT_STYLE}/${componentName}/${entry.name}`,
-        type: "registry:file",
-      });
+    if (entry.isFile()) {
+      if (entry.name.endsWith(".tsx") && entry.name !== mainFileName) {
+        // Sibling .tsx files get registry:ui type for flat co-location
+        files.push({
+          path: `registry/${DEFAULT_STYLE}/${componentName}/${entry.name}`,
+          type: "registry:ui",
+        });
+      } else if (entry.name.endsWith(".css")) {
+        // CSS files
+        files.push({
+          path: `registry/${DEFAULT_STYLE}/${componentName}/${entry.name}`,
+          type: "registry:file",
+        });
+      }
     }
   }
 

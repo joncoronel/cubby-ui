@@ -1,6 +1,10 @@
 "use client"
 
-import { type ColumnDef, DataTable } from "@/registry/default/data-table/data-table"
+import {
+	type ColumnDef,
+	DataTable,
+	DataTableContent,
+} from "@/registry/default/data-table/data-table"
 
 type Invoice = {
 	id: string
@@ -48,5 +52,9 @@ const data: Invoice[] = [
 ]
 
 export default function DataTableBasic() {
-	return <DataTable columns={columns} data={data} />
+	return (
+		<DataTable columns={columns} data={data}>
+			<DataTableContent />
+		</DataTable>
+	)
 }

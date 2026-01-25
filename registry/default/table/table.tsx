@@ -23,7 +23,6 @@ export interface TableProps
 	bordered?: boolean
 	striped?: boolean
 	hoverable?: boolean
-	stickyHeader?: boolean
 	rowDividers?: boolean
 }
 
@@ -32,7 +31,6 @@ function Table({
 	bordered = false,
 	striped = false,
 	hoverable = true,
-	stickyHeader = false,
 	rowDividers = true,
 	nativeScroll = false,
 	fadeEdges = "bottom",
@@ -48,11 +46,9 @@ function Table({
 			data-bordered={bordered ? "" : undefined}
 			data-striped={striped ? "" : undefined}
 			data-hoverable={hoverable ? "" : undefined}
-			data-sticky-header={stickyHeader ? "" : undefined}
 			data-row-dividers={rowDividers ? "" : undefined}
 			className={cn(
-				"group/table bg-card ring-border/60 relative w-full rounded-2xl ring-1 md:max-w-2xl",
-				stickyHeader && "overflow-hidden",
+				"group/table bg-card ring-border/60 relative flex w-full flex-col overflow-hidden rounded-2xl ring-1 md:max-w-2xl",
 				className
 			)}
 		>
@@ -62,16 +58,15 @@ function Table({
 				scrollbarGutter={scrollbarGutter}
 				persistScrollbar={persistScrollbar}
 				hideScrollbar={hideScrollbar}
-				className={stickyHeader ? "max-h-[400px]" : undefined}
-				viewportClassName={cn("p-2", stickyHeader && "overflow-y-auto")}
+				className="min-h-0 flex-1"
+				viewportClassName="p-2"
 			>
 				<table
 					data-slot="table"
 					className={cn(
 						"w-full caption-bottom text-sm",
 						// Use border-separate for bordered to allow rounded corners on cells
-						bordered && "border-separate border-spacing-0",
-						className
+						bordered && "border-separate border-spacing-0"
 					)}
 					{...props}
 				>
@@ -92,8 +87,8 @@ function TableHeader({ className, render, ...props }: TableHeaderProps) {
 			"[&_tr]:bg-muted [&_tr]:border-0",
 			// Round the corners of the header "card"
 			"[&_tr_th:first-child]:rounded-l-lg [&_tr_th:last-child]:rounded-r-lg",
-			// Sticky header support
-			"group-data-[sticky-header]/table:sticky group-data-[sticky-header]/table:top-0 group-data-[sticky-header]/table:z-10",
+			// Always sticky - works when parent constrains height
+			"sticky top-0 z-10",
 			className
 		),
 	}

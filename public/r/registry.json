@@ -464,12 +464,41 @@
         {
           "path": "registry/default/data-table/data-table.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/data-table.tsx"
+          "target": "components/ui/cubby-ui/data-table/data-table.tsx"
+        },
+        {
+          "path": "registry/default/data-table/data-table-column-toggle.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/data-table/data-table-column-toggle.tsx"
+        },
+        {
+          "path": "registry/default/data-table/data-table-content.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/data-table/data-table-content.tsx"
+        },
+        {
+          "path": "registry/default/data-table/data-table-context.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/data-table/data-table-context.tsx"
+        },
+        {
+          "path": "registry/default/data-table/data-table-pagination.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/data-table/data-table-pagination.tsx"
+        },
+        {
+          "path": "registry/default/data-table/data-table-search.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/data-table/data-table-search.tsx"
         }
       ],
       "registryDependencies": [
         "@cubby-ui/checkbox",
-        "@cubby-ui/table"
+        "@cubby-ui/toolbar",
+        "@cubby-ui/dropdown-menu",
+        "@cubby-ui/button",
+        "@cubby-ui/table",
+        "@cubby-ui/input-group"
       ],
       "dependencies": [
         "@tanstack/react-table",
@@ -1309,6 +1338,9 @@
       ],
       "registryDependencies": [
         "@cubby-ui/button"
+      ],
+      "dependencies": [
+        "class-variance-authority"
       ]
     },
     {

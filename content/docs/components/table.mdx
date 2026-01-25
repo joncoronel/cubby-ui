@@ -25,9 +25,9 @@ Add footer rows for totals or summaries.
 
 <ComponentPreview component="table" example="table-with-footer" />
 
-### Sticky Header
+### Scrollable
 
-Keep the header visible while scrolling through long tables.
+Constrain the table height with `className` to enable scrolling. The header stays sticky automatically.
 
 <ComponentPreview component="table" example="table-sticky-header" />
 
@@ -84,19 +84,11 @@ Root container that wraps the table and provides variant context to children via
 </ApiProp>
 
 <ApiProp
-  name="stickyHeader"
-  fullType="boolean"
-  defaultValue="false"
->
-  Makes the table header sticky when scrolling. Enables vertical scrolling with a max height.
-</ApiProp>
-
-<ApiProp
   name="fadeEdges"
-  fullType="boolean | 'x' | 'y'"
-  defaultValue="true (or 'x' with stickyHeader)"
+  fullType="boolean | 'x' | 'y' | 'top' | 'bottom' | 'left' | 'right'"
+  defaultValue="'bottom'"
 >
-  Adds gradient fade effect at scroll edges to indicate more content. Defaults to horizontal-only when `stickyHeader` is enabled to avoid overlapping the header.
+  Adds gradient fade effect at scroll edges to indicate more content.
 </ApiProp>
 
 <ApiProp

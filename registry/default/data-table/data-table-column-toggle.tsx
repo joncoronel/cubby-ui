@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { type Table } from "@tanstack/react-table"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { FilterHorizontalIcon } from "@hugeicons/core-free-icons"
 
@@ -13,14 +12,11 @@ import {
 	DropdownMenuCheckboxItem,
 } from "@/registry/default/dropdown-menu/dropdown-menu"
 import { Button } from "@/registry/default/button/button"
+import { useDataTable } from "@/registry/default/data-table/data-table-context"
 
-interface ColumnVisibilityPopoverProps<TData> {
-	table: Table<TData>
-}
+function DataTableColumnToggle() {
+	const { table } = useDataTable()
 
-function ColumnVisibilityPopover<TData>({
-	table,
-}: ColumnVisibilityPopoverProps<TData>) {
 	// Get toggleable columns (exclude selection column)
 	const toggleableColumns = table
 		.getAllColumns()
@@ -29,7 +25,11 @@ function ColumnVisibilityPopover<TData>({
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger render={<Button variant="ghost" size="icon" />}>
-				<HugeiconsIcon icon={FilterHorizontalIcon} className="size-4" strokeWidth={2} />
+				<HugeiconsIcon
+					icon={FilterHorizontalIcon}
+					className="size-4"
+					strokeWidth={2}
+				/>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent side="bottom" align="end">
 				<DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
@@ -56,4 +56,4 @@ function ColumnVisibilityPopover<TData>({
 	)
 }
 
-export { ColumnVisibilityPopover }
+export { DataTableColumnToggle }

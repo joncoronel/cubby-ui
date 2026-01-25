@@ -24,7 +24,7 @@ const transactions = [
 
 export default function TableStickyHeader() {
 	return (
-		<Table stickyHeader>
+		<Table className="max-h-[300px]">
 			<TableHeader>
 				<TableRow>
 					<TableHead>Transaction ID</TableHead>

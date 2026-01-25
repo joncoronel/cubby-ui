@@ -105,7 +105,7 @@ Button that opens the dropdown when clicked. Wraps Base UI's `Select.Trigger`.
 <ApiProp
   name="size"
   fullType="'sm' | 'default'"
-  simpleType="enum"
+  simpleType="string"
   defaultValue='"default"'
 >
   Size variant of the trigger button.
@@ -122,6 +122,15 @@ Button that opens the dropdown when clicked. Wraps Base UI's `Select.Trigger`.
 Dropdown container for the option list with positioning. Composes Base UI's `Select.Positioner` and `Select.Popup`. Props are forwarded to `Select.Popup`.
 
 <ApiPropsList>
+
+<ApiProp
+  name="size"
+  fullType="'sm' | 'default'"
+  simpleType="string"
+>
+  Size variant for the popup items. Should match the trigger's size when using
+  `alignItemWithTrigger` to ensure proper alignment.
+</ApiProp>
 
 <ApiProp name="alignItemWithTrigger" fullType="boolean" defaultValue="false">
   Align the selected item with the trigger button position. Enables native-style

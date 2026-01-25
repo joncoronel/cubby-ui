@@ -17,11 +17,28 @@ import { DataTable } from "@/registry/default/data-table/data-table";
 
 <ComponentUsage component="data-table" />
 
+## Architecture
+
+DataTable uses a **composition-based architecture**. The root `DataTable` component provides context to child components, allowing you to compose the exact table structure you need.
+
+```tsx
+<DataTable columns={columns} data={data} enableSorting>
+  <DataTableToolbar>
+    <DataTableSearch />
+    <DataTableColumnToggle />
+  </DataTableToolbar>
+  <DataTableContent>
+    <DataTableHeader enableSorting />
+    <DataTableBody emptyState="No results found." />
+  </DataTableContent>
+</DataTable>
+```
+
 ## Examples
 
 ### Sorting
 
-Enable column sorting with the `enableSorting` prop. Columns with string headers automatically render clickable sort buttons with direction indicators.
+Enable column sorting with the `enableSorting` prop on `DataTable`, then pass `enableSorting` to `DataTableHeader` to render sort controls. Columns with string headers automatically render clickable sort buttons with direction indicators.
 
 <ComponentPreview component="data-table" example="data-table-sorting" />
 
@@ -33,13 +50,13 @@ Enable row selection with the `enableRowSelection` prop. Checkboxes are automati
 
 ### Toolbar
 
-Add a toolbar with search and custom filters using the `toolbarLeft`, `toolbarRight`, and `onGlobalFilterChange` props. Enable `enableColumnVisibility` to show a column toggle button. The toolbar visually connects with the table header.
+Add a toolbar with search and column toggles by composing `DataTableToolbar` with `DataTableSearch` and `DataTableColumnToggle`. Enable `enableFiltering` on `DataTable` for search to work. This example also demonstrates sorting and row selection.
 
 <ComponentPreview component="data-table" example="data-table-toolbar" />
 
 ### Striped
 
-Use the `striped` variant for alternating row backgrounds.
+Use the `striped` prop on `DataTableContent` for alternating row backgrounds.
 
 <ComponentPreview component="data-table" example="data-table-striped" />
 
@@ -81,11 +98,9 @@ const columns: ColumnDef<YourDataType>[] = [
 
 ## API Reference
 
-### Props
+### DataTable
 
-#### DataTable
-
-A data-driven table component built on TanStack Table. Renders using the styled Table primitives.
+Root component that creates the TanStack Table instance and provides context to children.
 
 <ApiPropsList>
 
@@ -106,11 +121,19 @@ A data-driven table component built on TanStack Table. Renders using the styled 
 </ApiProp>
 
 <ApiProp
+  name="children"
+  fullType="React.ReactNode"
+  required
+>
+  Composition slot for toolbar, content, and other sub-components.
+</ApiProp>
+
+<ApiProp
   name="enableSorting"
   fullType="boolean"
   defaultValue="false"
 >
-  Enables column sorting. String headers automatically render with sort indicators. Set `enableSorting: false` on individual columns to disable sorting for that column.
+  Enables column sorting at the table level. Pass `enableSorting` to `DataTableHeader` to render sort UI.
 </ApiProp>
 
 <ApiProp
@@ -126,7 +149,7 @@ A data-driven table component built on TanStack Table. Renders using the styled 
   fullType="boolean"
   defaultValue="true"
 >
-  Allows multiple rows to be selected. Set to `false` for single selection (radio button behavior).
+  Allows multiple rows to be selected. Set to `false` for single selection.
 </ApiProp>
 
 <ApiProp
@@ -150,29 +173,7 @@ A data-driven table component built on TanStack Table. Renders using the styled 
   fullType="boolean"
   defaultValue="false"
 >
-  Enables pagination.
-</ApiProp>
-
-<ApiProp
-  name="enableColumnVisibility"
-  fullType="boolean"
-  defaultValue="false"
->
-  Enables column visibility toggle. When enabled, a button appears in the toolbar that opens a popover to show/hide columns.
-</ApiProp>
-
-<ApiProp
-  name="columnVisibility"
-  fullType="VisibilityState"
->
-  Controlled column visibility state. Use with `onColumnVisibilityChange` for controlled mode.
-</ApiProp>
-
-<ApiProp
-  name="onColumnVisibilityChange"
-  fullType="OnChangeFn<VisibilityState>"
->
-  Callback when column visibility changes.
+  Enables pagination. Use with `DataTablePagination` component.
 </ApiProp>
 
 <ApiProp
@@ -204,62 +205,128 @@ A data-driven table component built on TanStack Table. Renders using the styled 
 </ApiProp>
 
 <ApiProp
-  name="getRowId"
-  fullType="(originalRow: TData, index: number) => string"
+  name="columnFilters"
+  fullType="ColumnFiltersState"
 >
-  Function to derive a unique ID for each row. Defaults to using the row index.
+  Controlled column filters state. Use with `onColumnFiltersChange`.
 </ApiProp>
 
 <ApiProp
-  name="emptyState"
-  fullType="React.ReactNode"
-  defaultValue='"No results."'
+  name="onColumnFiltersChange"
+  fullType="OnChangeFn<ColumnFiltersState>"
 >
-  Content to display when the table has no data.
+  Callback when column filters change.
+</ApiProp>
+
+<ApiProp
+  name="pagination"
+  fullType="PaginationState"
+>
+  Controlled pagination state. Use with `onPaginationChange`.
+</ApiProp>
+
+<ApiProp
+  name="onPaginationChange"
+  fullType="OnChangeFn<PaginationState>"
+>
+  Callback when pagination changes.
+</ApiProp>
+
+<ApiProp
+  name="columnVisibility"
+  fullType="VisibilityState"
+>
+  Controlled column visibility state. Use with `onColumnVisibilityChange` for controlled mode.
+</ApiProp>
+
+<ApiProp
+  name="onColumnVisibilityChange"
+  fullType="OnChangeFn<VisibilityState>"
+>
+  Callback when column visibility changes.
 </ApiProp>
 
 <ApiProp
   name="globalFilter"
   fullType="string"
 >
-  Controlled global filter value. Filters across all columns. Use with `onGlobalFilterChange`.
+  Controlled global filter value. Filters across all columns.
 </ApiProp>
 
 <ApiProp
   name="onGlobalFilterChange"
-  fullType="(value: string) => void"
+  fullType="OnChangeFn<string>"
 >
-  Callback when global filter changes. When provided, shows a search input in the toolbar.
+  Callback when global filter changes.
 </ApiProp>
 
 <ApiProp
-  name="searchPlaceholder"
+  name="getRowId"
+  fullType="(originalRow: TData, index: number) => string"
+>
+  Function to derive a unique ID for each row. Defaults to using the row index.
+</ApiProp>
+
+</ApiPropsList>
+
+### DataTableToolbar
+
+Container for toolbar controls. Renders above the table content with visual connection to the header.
+
+<ApiPropsList>
+
+<ApiProp
+  name="variant"
+  fullType="'default' | 'ghost'"
+  defaultValue="'default'"
+>
+  Visual style of the toolbar.
+</ApiProp>
+
+<ApiProp
+  name="children"
+  fullType="React.ReactNode"
+>
+  Toolbar contents such as search, filters, and column toggle.
+</ApiProp>
+
+</ApiPropsList>
+
+### DataTableSearch
+
+Search input that filters across all columns using the global filter.
+
+<ApiPropsList>
+
+<ApiProp
+  name="placeholder"
   fullType="string"
   defaultValue='"Search and filter"'
 >
-  Placeholder text for the search input in the toolbar.
+  Placeholder text for the search input.
 </ApiProp>
 
 <ApiProp
-  name="toolbar"
-  fullType="React.ReactNode"
+  name="size"
+  fullType="'default' | 'sm'"
+  defaultValue="'sm'"
 >
-  Custom toolbar content. Replaces the default search input when provided.
+  Size of the search input.
 </ApiProp>
 
-<ApiProp
-  name="toolbarLeft"
-  fullType="React.ReactNode"
->
-  Content to render on the left side of the toolbar, before the search input.
-</ApiProp>
+</ApiPropsList>
 
-<ApiProp
-  name="toolbarRight"
-  fullType="React.ReactNode"
->
-  Content to render on the right side of the toolbar, after the search input.
-</ApiProp>
+### DataTableColumnToggle
+
+Dropdown button that allows users to show/hide columns.
+
+This component has no configurable props. It automatically reads column visibility state from the DataTable context.
+
+### DataTableContent
+
+Wrapper for the table that applies styling props. Accepts all `Table` component props.
+
+<ApiPropsList>
 
 <ApiProp
   name="bordered"
@@ -285,4 +352,64 @@ A data-driven table component built on TanStack Table. Renders using the styled 
   Enables hover effect on rows.
 </ApiProp>
 
+<ApiProp
+  name="rowDividers"
+  fullType="boolean"
+  defaultValue="true"
+>
+  Shows horizontal dividers between body rows.
+</ApiProp>
+
 </ApiPropsList>
+
+### DataTableHeader
+
+Renders the table header with optional sort controls.
+
+<ApiPropsList>
+
+<ApiProp
+  name="enableSorting"
+  fullType="boolean"
+  defaultValue="false"
+>
+  When true, columns with string headers render clickable sort buttons with direction indicators.
+</ApiProp>
+
+</ApiPropsList>
+
+### DataTableBody
+
+Renders the table body with support for empty state.
+
+<ApiPropsList>
+
+<ApiProp
+  name="emptyState"
+  fullType="React.ReactNode"
+  defaultValue='"No results."'
+>
+  Content to display when the table has no data.
+</ApiProp>
+
+</ApiPropsList>
+
+### DataTablePagination
+
+Pagination controls with previous/next buttons and selection count.
+
+<ApiPropsList>
+
+<ApiProp
+  name="showSelectedCount"
+  fullType="boolean"
+  defaultValue="true"
+>
+  Shows the count of selected rows (e.g., "2 of 10 row(s) selected").
+</ApiProp>
+
+</ApiPropsList>
+
+### DataTableToolbarSeparator
+
+Visual separator for toolbar items. No configurable props.

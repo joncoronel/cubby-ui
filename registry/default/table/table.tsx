@@ -84,7 +84,9 @@ function TableHeader({ className, render, ...props }: TableHeaderProps) {
 		"data-slot": "table-header",
 		className: cn(
 			// Header row styling - creates the "card within card" look
-			"[&_tr]:bg-muted [&_tr]:border-0",
+			"[&_tr]:border-0",
+			// Apply bg-muted to cells (not row) for Firefox border-radius compatibility
+			"[&_tr_th]:bg-muted",
 			// Round the corners of the header "card"
 			"[&_tr_th:first-child]:rounded-l-lg [&_tr_th:last-child]:rounded-r-lg",
 			// Always sticky - works when parent constrains height
@@ -140,7 +142,9 @@ function TableFooter({ className, render, ...props }: TableFooterProps) {
 			// Gap between body and footer
 			"before:block before:h-2 before:content-['']",
 			// Footer row styling - matches header "card within card" look
-			"[&_tr]:bg-muted [&_tr]:border-0",
+			"[&_tr]:border-0",
+			// Apply bg-muted to cells (not row) for Firefox border-radius compatibility
+			"[&_tr_td]:bg-muted",
 			// Round all corners of the footer "card"
 			"[&_tr_td:first-child]:rounded-l-lg [&_tr_td:last-child]:rounded-r-lg",
 			// Match header cell padding

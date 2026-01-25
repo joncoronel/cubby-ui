@@ -93,7 +93,7 @@ function Checkbox({
       <BaseCheckbox.Indicator
         keepMounted
         data-slot="checkbox-indicator"
-        className="z-10 grid place-items-center *:col-start-1 *:row-start-1"
+        className="grid place-items-center *:col-start-1 *:row-start-1"
       >
         <CheckmarkIcon className="size-3.5" />
         <MinusIcon className="size-3.5" />

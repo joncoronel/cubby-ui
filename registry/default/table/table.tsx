@@ -48,7 +48,7 @@ function Table({
 			data-hoverable={hoverable ? "" : undefined}
 			data-row-dividers={rowDividers ? "" : undefined}
 			className={cn(
-				"group/table bg-card ring-border/60 relative flex w-full flex-col overflow-hidden rounded-2xl ring-1 md:max-w-2xl",
+				"group/table bg-card ring-border/60 relative flex w-full flex-col overflow-hidden rounded-2xl px-2 pt-2 ring-1 md:max-w-2xl",
 				className
 			)}
 		>
@@ -58,15 +58,15 @@ function Table({
 				scrollbarGutter={scrollbarGutter}
 				persistScrollbar={persistScrollbar}
 				hideScrollbar={hideScrollbar}
-				className="min-h-0 flex-1"
-				viewportClassName="p-2"
+				className="min-h-0 flex-1 rounded-lg"
+				viewportClassName="pb-2"
 			>
 				<table
 					data-slot="table"
 					className={cn(
 						"w-full caption-bottom text-sm",
 						// Use border-separate for bordered to allow rounded corners on cells
-						bordered && "border-separate border-spacing-0"
+						bordered && "border-separate border-spacing-0 "
 					)}
 					{...props}
 				>

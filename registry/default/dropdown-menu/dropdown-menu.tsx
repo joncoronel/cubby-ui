@@ -188,8 +188,12 @@ function DropdownMenuCheckboxItem({
       {...props}
     >
       <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
-        <BaseMenu.CheckboxItemIndicator>
-          <HugeiconsIcon icon={Tick02Icon} className="size-4" strokeWidth={2} />
+        <BaseMenu.CheckboxItemIndicator keepMounted>
+          <HugeiconsIcon
+            icon={Tick02Icon}
+            className="size-4 transition-[clip-path,opacity,transform,scale] duration-150 ease-out-cubic in-data-checked:[clip-path:inset(0)] in-data-checked:opacity-100 in-data-checked:scale-100 in-data-unchecked:[clip-path:inset(0_100%_0_0)] in-data-unchecked:opacity-0 in-data-unchecked:scale-95"
+            strokeWidth={2}
+          />
         </BaseMenu.CheckboxItemIndicator>
       </span>
       {children}
@@ -220,7 +224,7 @@ function DropdownMenuRadioItem({
       {...props}
     >
       <span className="pointer-events-none absolute left-2 flex items-center justify-center rounded-full bg-accent size-3.5 overflow-clip ">
-        <BaseMenu.RadioItemIndicator keepMounted className="rounded-full data-starting-style:opacity-0 data-ending-style:opacity-0 data-unchecked:opacity-0 transition-[opacity,transform] duration-250 bg-primary size-full before:absolute before:inset-0 before:bg-primary  before:content-[''] data-checked:before:scale-50  before:size-full before:rounded-full before:bg-white  before:transition-[scale] before:duration-250">
+        <BaseMenu.RadioItemIndicator keepMounted className="rounded-full data-starting-style:opacity-0 data-ending-style:opacity-0 data-unchecked:opacity-0 transition-[opacity,transform] duration-150 bg-primary size-full before:absolute before:inset-0 before:bg-primary  before:content-[''] before:origin-center data-checked:before:scale-50   before:rounded-full before:bg-white  before:transition-[scale] before:duration-250">
 
         </BaseMenu.RadioItemIndicator>
       </span>

@@ -6,55 +6,47 @@ import { Checkbox } from "@/registry/default/checkbox/checkbox";
 import { Label } from "@/registry/default/label/label";
 
 export default function CheckboxGroupWithDescriptions() {
-  const id = React.useId();
   const [value, setValue] = React.useState<string[]>(["security"]);
 
   return (
-    <CheckboxGroup value={value} onValueChange={setValue} className="space-y-3">
-      <div className="flex items-start space-x-3">
-        <Checkbox id={`${id}-security`} value="security" className="mt-1" />
-        <div className="space-y-1 leading-none">
-          <Label htmlFor={`${id}-security`} className="font-medium">
-            Security alerts
-          </Label>
-          <p className="text-sm text-muted-foreground">
-            Get notified about important security updates and suspicious activities.
-          </p>
+    <CheckboxGroup value={value} onValueChange={setValue} className="gap-3">
+      <Label className="flex-row items-start gap-3 font-normal">
+        <Checkbox value="security" className="mt-0.5" />
+        <div className="grid gap-1">
+          <span className="font-medium">Security alerts</span>
+          <span className="text-sm text-muted-foreground">
+            Get notified about important security updates and suspicious
+            activities.
+          </span>
         </div>
-      </div>
-      <div className="flex items-start space-x-3">
-        <Checkbox id={`${id}-product`} value="product" className="mt-1" />
-        <div className="space-y-1 leading-none">
-          <Label htmlFor={`${id}-product`} className="font-medium">
-            Product updates
-          </Label>
-          <p className="text-sm text-muted-foreground">
+      </Label>
+      <Label className="flex-row items-start gap-3 font-normal">
+        <Checkbox value="product" className="mt-0.5" />
+        <div className="grid gap-1">
+          <span className="font-medium">Product updates</span>
+          <span className="text-sm text-muted-foreground">
             Stay informed about new features, improvements, and bug fixes.
-          </p>
+          </span>
         </div>
-      </div>
-      <div className="flex items-start space-x-3">
-        <Checkbox id={`${id}-newsletter`} value="newsletter" className="mt-1" />
-        <div className="space-y-1 leading-none">
-          <Label htmlFor={`${id}-newsletter`} className="font-medium">
-            Newsletter
-          </Label>
-          <p className="text-sm text-muted-foreground">
+      </Label>
+      <Label className="flex-row items-start gap-3 font-normal">
+        <Checkbox value="newsletter" className="mt-0.5" />
+        <div className="grid gap-1">
+          <span className="font-medium">Newsletter</span>
+          <span className="text-sm text-muted-foreground">
             Weekly digest with tips, tutorials, and community highlights.
-          </p>
+          </span>
         </div>
-      </div>
-      <div className="flex items-start space-x-3">
-        <Checkbox id={`${id}-events`} value="events" className="mt-1" />
-        <div className="space-y-1 leading-none">
-          <Label htmlFor={`${id}-events`} className="font-medium">
-            Events & webinars
-          </Label>
-          <p className="text-sm text-muted-foreground">
+      </Label>
+      <Label className="flex-row items-start gap-3 font-normal">
+        <Checkbox value="events" className="mt-0.5" />
+        <div className="grid gap-1">
+          <span className="font-medium">Events & webinars</span>
+          <span className="text-sm text-muted-foreground">
             Invitations to online events, workshops, and educational webinars.
-          </p>
+          </span>
         </div>
-      </div>
+      </Label>
     </CheckboxGroup>
   );
 }

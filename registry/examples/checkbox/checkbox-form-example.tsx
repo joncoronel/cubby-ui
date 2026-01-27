@@ -1,33 +1,44 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Checkbox } from "@/registry/default/checkbox/checkbox"
-import { Label } from "@/registry/default/label/label"
+import * as React from "react";
+import { Checkbox } from "@/registry/default/checkbox/checkbox";
+import { Label } from "@/registry/default/label/label";
+import { Button } from "@/registry/default/button/button";
+import { toast } from "@/registry/default/toast/toast";
 
 export default function CheckboxFormExample() {
-  const [items, setItems] = useState({
-    option1: false,
-    option2: true,
-    option3: false,
-  })
+  const [accepted, setAccepted] = React.useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!accepted) {
+      toast.error({
+        title: "Terms not accepted",
+        description: "Please accept the terms and conditions to continue.",
+      });
+      return;
+    }
+
+    toast.success({
+      title: "Form submitted",
+      description: "Thank you for accepting the terms.",
+    });
+  };
 
   return (
-    <div className="space-y-3">
-      <h4 className="font-medium">Select your preferences:</h4>
-      {Object.entries(items).map(([key, value]) => (
-        <div key={key} className="flex items-center space-x-2">
-          <Checkbox
-            id={key}
-            checked={value}
-            onCheckedChange={(checked) =>
-              setItems({ ...items, [key]: checked as boolean })
-            }
-          />
-          <Label htmlFor={key}>
-            {key.charAt(0).toUpperCase() + key.slice(1).replace(/(\d+)/, ' $1')}
-          </Label>
-        </div>
-      ))}
-    </div>
-  )
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <Label className="flex-row items-start gap-3 font-normal">
+        <Checkbox
+          checked={accepted}
+          onCheckedChange={(value) => setAccepted(value as boolean)}
+          className="mt-0.5"
+        />
+        <span>
+          I agree to the terms and conditions
+        </span>
+      </Label>
+      <Button type="submit">Submit</Button>
+    </form>
+  );
 }

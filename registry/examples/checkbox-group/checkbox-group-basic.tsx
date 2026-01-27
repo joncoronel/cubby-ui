@@ -10,7 +10,7 @@ export default function CheckboxGroupBasic() {
   const [value, setValue] = React.useState<string[]>(["react"]);
 
   return (
-    <div className="space-y-4">
+
       <CheckboxGroup value={value} onValueChange={setValue}>
         <div className="flex items-center space-x-2">
           <Checkbox id={`${id}-react`} value="react" />
@@ -29,9 +29,7 @@ export default function CheckboxGroupBasic() {
           <Label htmlFor={`${id}-svelte`}>Svelte</Label>
         </div>
       </CheckboxGroup>
-      <div className="text-sm text-muted-foreground">
-        Selected: {value.length > 0 ? value.join(", ") : "None"}
-      </div>
-    </div>
+ 
+
   );
 }

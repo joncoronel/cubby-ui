@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Checkbox } from "@/registry/default/checkbox/checkbox"
-import { Label } from "@/registry/default/label/label"
+import * as React from "react";
+import { Checkbox } from "@/registry/default/checkbox/checkbox";
+import { Label } from "@/registry/default/label/label";
 
 export default function CheckboxControlled() {
-  const [checked, setChecked] = useState(false)
+  const [checked, setChecked] = React.useState(false);
 
   return (
-    <div className="space-y-2">
-      <Label className="flex items-center gap-2">
+    <div className="space-y-3">
+      <Label className="flex-row items-center gap-2">
         <Checkbox
           checked={checked}
           onCheckedChange={(value) => setChecked(value as boolean)}
@@ -20,5 +20,5 @@ export default function CheckboxControlled() {
         Notifications are {checked ? "enabled" : "disabled"}
       </p>
     </div>
-  )
+  );
 }

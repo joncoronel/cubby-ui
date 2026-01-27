@@ -37,24 +37,23 @@ export default function CheckboxGroupControlled() {
           </div>
         </div>
       </CheckboxGroup>
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          {value.length} of 4 selected
-        </div>
-        <div className="space-x-2">
-          <button
-            onClick={handleClearAll}
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Clear all
-          </button>
-          <button
-            onClick={handleSelectAll}
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Select all
-          </button>
-        </div>
+      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+        <span>{value.length} of 4 selected</span>
+        <span aria-hidden="true">·</span>
+        <button
+          type="button"
+          onClick={handleClearAll}
+          className="hover:text-foreground"
+        >
+          Clear all
+        </button>
+        <button
+          type="button"
+          onClick={handleSelectAll}
+          className="hover:text-foreground"
+        >
+          Select all
+        </button>
       </div>
     </div>
   );

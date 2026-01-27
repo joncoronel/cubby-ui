@@ -47,7 +47,6 @@ import avatar_avatar_group from "@/registry/examples/avatar/avatar-group";
 import avatar_avatar_sizes from "@/registry/examples/avatar/avatar-sizes";
 import avatar_avatar_with_status_indicator from "@/registry/examples/avatar/avatar-with-status-indicator";
 import badge_badge_default from "@/registry/examples/badge/badge-default";
-import badge_badge_custom_colors from "@/registry/examples/badge/badge-custom-colors";
 import badge_badge_sizes from "@/registry/examples/badge/badge-sizes";
 import badge_badge_variants from "@/registry/examples/badge/badge-variants";
 import badge_badge_with_icons from "@/registry/examples/badge/badge-with-icons";
@@ -1454,11 +1453,6 @@ export const exampleRegistry = {
       "source": "import { Badge } from \"@/components/ui/cubby-ui/badge\";\n\nexport default function BadgeDefault() {\n  return <Badge>Badge</Badge>;\n}"
     },
     {
-      "title": "Custom Colors",
-      "importPath": "badge-custom-colors",
-      "source": "import { Badge } from \"@/components/ui/cubby-ui/badge\";\n\nexport default function BadgeCustomColors() {\n  return (\n    <div className=\"flex flex-wrap gap-2\">\n      <Badge className=\"bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200\">\n        Blue\n      </Badge>\n      <Badge className=\"bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200\">\n        Green\n      </Badge>\n      <Badge className=\"bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200\">\n        Amber\n      </Badge>\n      <Badge className=\"bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200\">\n        Purple\n      </Badge>\n    </div>\n  );\n}"
-    },
-    {
       "title": "Sizes",
       "importPath": "badge-sizes",
       "source": "import { Badge } from \"@/components/ui/cubby-ui/badge\";\n\nexport default function BadgeSizes() {\n  return (\n    <div className=\"flex flex-wrap items-center gap-2\">\n      <Badge className=\"text-xs py-0 px-2\">Small</Badge>\n      <Badge>Default</Badge>\n      <Badge className=\"text-base py-1 px-3\">Large</Badge>\n    </div>\n  );\n}"
@@ -1466,12 +1460,12 @@ export const exampleRegistry = {
     {
       "title": "Variants",
       "importPath": "badge-variants",
-      "source": "import { Badge } from \"@/components/ui/cubby-ui/badge\";\n\nexport default function BadgeVariants() {\n  return (\n    <div className=\"flex flex-wrap gap-2\">\n      <Badge>Default</Badge>\n      <Badge variant=\"secondary\">Secondary</Badge>\n      <Badge variant=\"outline\">Outline</Badge>\n      <Badge variant=\"danger\">Destructive</Badge>\n    </div>\n  );\n}\n"
+      "source": "import { Badge } from \"@/components/ui/cubby-ui/badge\";\n\nexport default function BadgeVariants() {\n  return (\n    <div className=\"flex flex-wrap gap-2\">\n      <Badge>Default</Badge>\n      <Badge variant=\"secondary\">Secondary</Badge>\n      <Badge variant=\"outline\">Outline</Badge>\n      <Badge variant=\"success\">Success</Badge>\n      <Badge variant=\"warning\">Warning</Badge>\n      <Badge variant=\"info\">Info</Badge>\n      <Badge variant=\"danger\">Danger</Badge>\n    </div>\n  );\n}\n"
     },
     {
       "title": "With Icons",
       "importPath": "badge-with-icons",
-      "source": "import { Badge } from \"@/components/ui/cubby-ui/badge\";\n\nexport default function BadgeWithIcons() {\n  return (\n    <div className=\"flex flex-wrap gap-2\">\n      <Badge variant=\"secondary\">\n        <svg\n          xmlns=\"http://www.w3.org/2000/svg\"\n          width=\"12\"\n          height=\"12\"\n          viewBox=\"0 0 24 24\"\n          fill=\"none\"\n          stroke=\"currentColor\"\n          strokeWidth=\"2\"\n          strokeLinecap=\"round\"\n          strokeLinejoin=\"round\"\n          className=\"mr-1\"\n        >\n          <circle cx=\"12\" cy=\"12\" r=\"10\" />\n          <polyline points=\"12 6 12 12 16 14\" />\n        </svg>\n        Pending\n      </Badge>\n      <Badge variant=\"secondary\" className=\"bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200\">\n        <svg\n          xmlns=\"http://www.w3.org/2000/svg\"\n          width=\"12\"\n          height=\"12\"\n          viewBox=\"0 0 24 24\"\n          fill=\"none\"\n          stroke=\"currentColor\"\n          strokeWidth=\"2\"\n          strokeLinecap=\"round\"\n          strokeLinejoin=\"round\"\n          className=\"mr-1\"\n        >\n          <polyline points=\"20 6 9 17 4 12\" />\n        </svg>\n        Completed\n      </Badge>\n    </div>\n  );\n}"
+      "source": "import { Badge } from \"@/components/ui/cubby-ui/badge\";\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport { Clock01Icon, Tick02Icon } from \"@hugeicons/core-free-icons\";\n\nexport default function BadgeWithIcons() {\n  return (\n    <div className=\"flex flex-wrap gap-2\">\n      <Badge variant=\"warning\">\n        <HugeiconsIcon icon={Clock01Icon} strokeWidth={2}   />\n        Pending\n      </Badge>\n      <Badge variant=\"success\">\n        <HugeiconsIcon icon={Tick02Icon} strokeWidth={2} />\n        Completed\n      </Badge>\n    </div>\n  );\n}"
     }
   ],
   "breadcrumbs": [
@@ -3151,7 +3145,6 @@ export const componentMap = {
   "avatar-sizes": avatar_avatar_sizes,
   "avatar-with-status-indicator": avatar_avatar_with_status_indicator,
   "badge-default": badge_badge_default,
-  "badge-custom-colors": badge_badge_custom_colors,
   "badge-sizes": badge_badge_sizes,
   "badge-variants": badge_badge_variants,
   "badge-with-icons": badge_badge_with_icons,

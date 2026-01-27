@@ -38,7 +38,7 @@ export default function CheckboxFormExample() {
           I agree to the terms and conditions
         </span>
       </Label>
-      <Button type="submit">Submit</Button>
+      <Button variant="neutral" type="submit">Submit</Button>
     </form>
   );
 }

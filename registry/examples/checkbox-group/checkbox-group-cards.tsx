@@ -14,19 +14,19 @@ export default function CheckboxGroupCards() {
       id: "free",
       name: "Free",
       description: "Basic features for personal use",
-      price: "$0/month",
+      price: 0,
     },
     {
       id: "pro",
       name: "Pro",
       description: "Advanced features for professionals",
-      price: "$9/month",
+      price: 9,
     },
     {
       id: "team",
       name: "Team",
       description: "Collaboration features for teams",
-      price: "$29/month",
+      price: 29,
     },
   ];
 
@@ -43,7 +43,7 @@ export default function CheckboxGroupCards() {
             <Label
               key={plan.id}
               htmlFor={`${id}-${plan.id}`}
-              className="gap-3 rounded-lg border bg-card p-4 has-data-checked:border-primary/50 has-data-checked:bg-muted hover:bg-muted"
+              className="h-full gap-3 rounded-lg border bg-card p-4 has-data-checked:border-primary/50 has-data-checked:bg-muted hover:bg-muted"
             >
               <div className="flex items-start justify-between">
                 <div className="flex flex-col gap-1">
@@ -54,19 +54,17 @@ export default function CheckboxGroupCards() {
                 </div>
                 <Checkbox id={`${id}-${plan.id}`} value={plan.id} />
               </div>
-              <span className="text-primary font-semibold">{plan.price}</span>
+              <span className="mt-auto text-primary font-semibold">${plan.price}/month</span>
             </Label>
           ))}
         </CheckboxGroup>
       </div>
       <div className="text-muted-foreground text-sm">
         Total: $
-        {value
-          .reduce((total, planId) => {
-            const plan = plans.find((p) => p.id === planId);
-            const price = plan?.price.match(/\d+/)?.[0] || "0";
-            return total + parseInt(price);
-          }, 0)}
+        {value.reduce((total, planId) => {
+          const plan = plans.find((p) => p.id === planId);
+          return total + (plan?.price ?? 0);
+        }, 0)}
         /month
       </div>
     </div>

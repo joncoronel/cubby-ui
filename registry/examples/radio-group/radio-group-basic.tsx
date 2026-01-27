@@ -4,18 +4,18 @@ import { Label } from "@/registry/default/label/label";
 export default function RadioGroupBasic() {
   return (
     <RadioGroup defaultValue="comfortable">
-      <div className="flex items-center space-x-2">
-        <RadioGroupItem value="default" id="r1" />
-        <Label htmlFor="r1">Default</Label>
-      </div>
-      <div className="flex items-center space-x-2">
-        <RadioGroupItem value="comfortable" id="r2" />
-        <Label htmlFor="r2">Comfortable</Label>
-      </div>
-      <div className="flex items-center space-x-2">
-        <RadioGroupItem value="compact" id="r3" />
-        <Label htmlFor="r3">Compact</Label>
-      </div>
+      <Label className="flex-row items-center gap-2">
+        <RadioGroupItem value="default" />
+        Default
+      </Label>
+      <Label className="flex-row items-center gap-2">
+        <RadioGroupItem value="comfortable" />
+        Comfortable
+      </Label>
+      <Label className="flex-row items-center gap-2">
+        <RadioGroupItem value="compact" />
+        Compact
+      </Label>
     </RadioGroup>
   );
 }

@@ -10,18 +10,18 @@ export default function RadioGroupControlled() {
   return (
     <div>
       <RadioGroup value={selectedValue} onValueChange={(value) => setSelectedValue(value as string)}>
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="light" id="light" />
-          <Label htmlFor="light">Light</Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="dark" id="dark" />
-          <Label htmlFor="dark">Dark</Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="system" id="system" />
-          <Label htmlFor="system">System</Label>
-        </div>
+        <Label className="flex-row items-center gap-2">
+          <RadioGroupItem value="light" />
+          Light
+        </Label>
+        <Label className="flex-row items-center gap-2">
+          <RadioGroupItem value="dark" />
+          Dark
+        </Label>
+        <Label className="flex-row items-center gap-2">
+          <RadioGroupItem value="system" />
+          System
+        </Label>
       </RadioGroup>
       <p className="text-sm text-muted-foreground mt-2">
         Selected: {selectedValue}

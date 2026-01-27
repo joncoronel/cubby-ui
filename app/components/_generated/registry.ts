@@ -1457,7 +1457,7 @@ export const exampleRegistry = {
     {
       "title": "Variants",
       "importPath": "badge-variants",
-      "source": "import { Badge } from \"@/components/ui/cubby-ui/badge\";\n\nexport default function BadgeVariants() {\n  return (\n    <div className=\"flex flex-wrap gap-2\">\n      <Badge>Default</Badge>\n      <Badge variant=\"secondary\">Secondary</Badge>\n      <Badge variant=\"outline\">Outline</Badge>\n      <Badge variant=\"success\">Success</Badge>\n      <Badge variant=\"warning\">Warning</Badge>\n      <Badge variant=\"info\">Info</Badge>\n      <Badge variant=\"danger\">Danger</Badge>\n    </div>\n  );\n}\n"
+      "source": "import { Badge } from \"@/components/ui/cubby-ui/badge\";\n\nexport default function BadgeVariants() {\n  return (\n    <div className=\"flex flex-wrap gap-2\">\n      <Badge>Default</Badge>\n      <Badge variant=\"neutral\">Neutral</Badge>\n      <Badge variant=\"secondary\">Secondary</Badge>\n      <Badge variant=\"outline\">Outline</Badge>\n      <Badge variant=\"success\">Success</Badge>\n      <Badge variant=\"warning\">Warning</Badge>\n      <Badge variant=\"info\">Info</Badge>\n      <Badge variant=\"danger\">Danger</Badge>\n    </div>\n  );\n}\n"
     },
     {
       "title": "With Icons",

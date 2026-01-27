@@ -4,6 +4,7 @@ export default function BadgeVariants() {
   return (
     <div className="flex flex-wrap gap-2">
       <Badge>Default</Badge>
+      <Badge variant="neutral">Neutral</Badge>
       <Badge variant="secondary">Secondary</Badge>
       <Badge variant="outline">Outline</Badge>
       <Badge variant="success">Success</Badge>

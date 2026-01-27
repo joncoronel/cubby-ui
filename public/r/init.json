@@ -5,8 +5,6 @@
   "title": "Cubby UI Theme",
   "author": "Cubby UI",
   "description": "Initialize your project with Cubby UI's theme system including OKLCH colors and CSS variables.",
-  "dependencies": [],
-  "registryDependencies": [],
   "files": [],
   "cssVars": {
     "theme": {
@@ -63,8 +61,7 @@
       "ease-in-cubic": "cubic-bezier(0.55, 0.055, 0.675, 0.19)",
       "ease-out-cubic": "cubic-bezier(0.215, 0.61, 0.355, 1)",
       "ease-in-out-cubic": "cubic-bezier(0.645, 0.045, 0.355, 1)",
-      "shadow-inset": "0 1px 2px 0 oklch(0 0 0 / 0.06)",
-      "shadow-inset-highlight": "0 -1px oklch(1 0 0 / 0.04)"
+      "--animate-skeleton": "skeleton 2s -1s linear infinite"
     },
     "light": {
       "radius": "0.75rem",
@@ -154,6 +151,11 @@
     }
   },
   "css": {
+    "@keyframes skeleton": {
+      "to": {
+        "background-position-x": "-200%"
+      }
+    },
     "@layer base": {
       "body": {
         "position": "relative"

@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 const cardVariants = cva("text-card-foreground flex flex-col", {
   variants: {
     variant: {
-      default: "bg-card gap-6 rounded-2xl border py-6",
+      default: "bg-card gap-6 rounded-2xl border dark:border-border/50 py-6",
       inset: "rounded-2xl p-1 bg-muted",
     },
   },

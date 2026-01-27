@@ -1552,7 +1552,14 @@ function generateInitItem(cssContent: {
   theme: Record<string, string>;
   utilities: Record<string, any>;
   layerBase: Record<string, any>;
+  keyframes: Record<string, any>;
 }) {
+  const css = {
+    ...cssContent.keyframes,
+    ...cssContent.utilities,
+    ...cssContent.layerBase,
+  };
+
   return {
     name: "init",
     type: "registry:style",
@@ -1560,18 +1567,14 @@ function generateInitItem(cssContent: {
     description:
       "Initialize your project with Cubby UI's theme system including OKLCH colors and CSS variables.",
     author: "Cubby UI",
-    files: [],
-    dependencies: [],
-    registryDependencies: [],
+    files: [], // Required by schema
     cssVars: {
       theme: cssContent.theme,
       light: cssContent.light,
       dark: cssContent.dark,
     },
-    css: {
-      ...cssContent.utilities,
-      ...cssContent.layerBase,
-    },
+    // Only include css if there's content
+    ...(Object.keys(css).length > 0 && { css }),
   };
 }
 
@@ -1599,7 +1602,7 @@ async function syncRegistry() {
     // 3. Extract CSS content from globals.css
     const cssContent = extractCssContent();
     console.log(
-      `✓ Extracted ${Object.keys(cssContent.light).length} light mode, ${Object.keys(cssContent.dark).length} dark mode CSS variables, ${Object.keys(cssContent.theme).length} theme variables, ${Object.keys(cssContent.utilities).length} utilities, and ${Object.keys(cssContent.layerBase).length} layer base rules`,
+      `✓ Extracted ${Object.keys(cssContent.light).length} light mode, ${Object.keys(cssContent.dark).length} dark mode CSS variables, ${Object.keys(cssContent.theme).length} theme variables, ${Object.keys(cssContent.utilities).length} utilities, ${Object.keys(cssContent.keyframes).length} keyframes, and ${Object.keys(cssContent.layerBase).length} layer base rules`,
     );
 
     // 4. Read existing registry.json
@@ -1662,10 +1665,11 @@ function extractCssContent(): {
   theme: Record<string, string>;
   utilities: Record<string, any>;
   layerBase: Record<string, any>;
+  keyframes: Record<string, any>;
 } {
   if (!fsSync.existsSync(THEME_CSS_PATH)) {
     console.warn(`⚠️  theme.css not found at ${THEME_CSS_PATH}`);
-    return { light: {}, dark: {}, theme: {}, utilities: {}, layerBase: {} };
+    return { light: {}, dark: {}, theme: {}, utilities: {}, layerBase: {}, keyframes: {} };
   }
 
   const content = fsSync.readFileSync(THEME_CSS_PATH, "utf-8");
@@ -1674,6 +1678,7 @@ function extractCssContent(): {
   const themeVars: Record<string, string> = {};
   const utilities: Record<string, any> = {};
   const layerBase: Record<string, any> = {};
+  const keyframes: Record<string, any> = {};
 
   // Extract :root variables (light mode)
   const rootMatch = content.match(/:root\s*\{([\s\S]*?)\}/);
@@ -1714,7 +1719,9 @@ function extractCssContent(): {
       const varName = match[1];
       const varValue = match[2].trim();
       if (!varValue.includes("/*") && !varValue.includes("*/")) {
-        themeVars[varName] = varValue;
+        // Per shadcn docs, animation variables should keep the -- prefix
+        const key = varName.startsWith("animate-") ? `--${varName}` : varName;
+        themeVars[key] = varValue;
       }
     }
   }
@@ -1766,12 +1773,41 @@ function extractCssContent(): {
     }
   }
 
+  // Extract @keyframes blocks
+  let keyframesPos = 0;
+  while (keyframesPos < content.length) {
+    const keyframesMatch = content
+      .substring(keyframesPos)
+      .match(/@keyframes\s+([a-z-]+)\s*\{/);
+    if (!keyframesMatch || keyframesMatch.index === undefined) break;
+
+    const keyframeName = keyframesMatch[1];
+    const startPos = keyframesPos + keyframesMatch.index + keyframesMatch[0].length;
+    let braceCount = 1;
+    let endPos = startPos;
+
+    // Find matching closing brace
+    while (endPos < content.length && braceCount > 0) {
+      if (content[endPos] === "{") braceCount++;
+      else if (content[endPos] === "}") braceCount--;
+      endPos++;
+    }
+
+    if (braceCount === 0) {
+      const keyframeContent = content.substring(startPos, endPos - 1).trim();
+      keyframes[`@keyframes ${keyframeName}`] = parseKeyframeRules(keyframeContent);
+    }
+
+    keyframesPos = endPos;
+  }
+
   return {
     light: lightVars,
     dark: darkVars,
     theme: themeVars,
     utilities,
     layerBase,
+    keyframes,
   };
 }
 
@@ -1865,6 +1901,55 @@ function parseLayerBaseRules(content: string): Record<string, any> {
 
       // Parse regular CSS properties
       const propMatches = properties.matchAll(/(?<!@)([a-z-]+):\s*([^;]+);/g);
+      for (const propMatch of propMatches) {
+        const propName = propMatch[1].trim();
+        const propValue = propMatch[2].trim();
+        parsedProperties[propName] = propValue;
+      }
+
+      if (Object.keys(parsedProperties).length > 0) {
+        rules[selector] = parsedProperties;
+      }
+    }
+  }
+
+  return rules;
+}
+
+// Helper function to parse @keyframes rules
+function parseKeyframeRules(content: string): Record<string, any> {
+  const rules: Record<string, any> = {};
+
+  // Parse content by finding keyframe selectors (from, to, percentages) and their blocks
+  let pos = 0;
+  while (pos < content.length) {
+    // Skip whitespace
+    while (pos < content.length && /\s/.test(content[pos])) pos++;
+    if (pos >= content.length) break;
+
+    // Find selector (everything before {)
+    const selectorStart = pos;
+    while (pos < content.length && content[pos] !== "{") pos++;
+    if (pos >= content.length) break;
+
+    const selector = content.substring(selectorStart, pos).trim();
+    pos++; // Skip {
+
+    // Find matching closing brace
+    let braceCount = 1;
+    const propStart = pos;
+    while (pos < content.length && braceCount > 0) {
+      if (content[pos] === "{") braceCount++;
+      else if (content[pos] === "}") braceCount--;
+      pos++;
+    }
+
+    if (braceCount === 0 && selector) {
+      const properties = content.substring(propStart, pos - 1).trim();
+      const parsedProperties: Record<string, string> = {};
+
+      // Parse CSS properties
+      const propMatches = properties.matchAll(/([a-z-]+):\s*([^;]+);/g);
       for (const propMatch of propMatches) {
         const propName = propMatch[1].trim();
         const propValue = propMatch[2].trim();

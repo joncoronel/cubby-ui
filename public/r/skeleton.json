@@ -7,7 +7,7 @@
   "files": [
     {
       "path": "registry/default/skeleton/skeleton.tsx",
-      "content": "import * as React from \"react\"\n\nimport { cn } from \"@/lib/utils\"\n\nfunction Skeleton({ className, ...props }: React.ComponentProps<\"div\">) {\n\treturn (\n\t\t<div\n\t\t\tdata-slot=\"skeleton\"\n\t\t\tclassName={cn(\"bg-muted/60 animate-pulse rounded-md\", className)}\n\t\t\t{...props}\n\t\t/>\n\t)\n}\nexport { Skeleton }\n",
+      "content": "import * as React from \"react\"\n\nimport { cn } from \"@/lib/utils\"\n\ntype SkeletonProps = React.ComponentProps<\"div\"> & {\n\tvisible?: boolean\n\tanimate?: boolean\n}\n\nfunction Skeleton({\n\tclassName,\n\tchildren,\n\tvisible = true,\n\tanimate = true,\n\t...props\n}: SkeletonProps) {\n\tif (!visible && children) {\n\t\treturn <>{children}</>\n\t}\n\n\treturn (\n\t\t<div\n\t\t\tdata-slot=\"skeleton\"\n\t\t\tclassName={cn(\n\t\t\t\t\"bg-muted rounded-md\",\n\t\t\t\tanimate && [\n\t\t\t\t\t\"animate-skeleton bg-fixed\",\n\t\t\t\t\t\"bg-[linear-gradient(90deg,transparent_35%,oklch(1_0_0/50%),transparent_65%)]\",\n\t\t\t\t\t\"bg-size-[200%_100%]\",\n\t\t\t\t\t\"dark:bg-[linear-gradient(90deg,transparent_35%,oklch(1_0_0/5%),transparent_65%)]\",\n\t\t\t\t],\n\t\t\t\tchildren && \"*:invisible\",\n\t\t\t\tclassName,\n\t\t\t)}\n\t\t\t{...props}\n\t\t>\n\t\t\t{children}\n\t\t</div>\n\t)\n}\nexport { Skeleton }\n",
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/skeleton.tsx"
     }

@@ -19,26 +19,32 @@ import { Skeleton } from "@/registry/default/skeleton/skeleton";
 
 ## Examples
 
-### Card Skeleton
+### Wrapping Content
 
-Loading placeholder for card components.
+Wrap existing elements to automatically match their dimensions. The skeleton inherits the size of its children while hiding them with a shimmer overlay.
 
-<ComponentPreview component="skeleton" example="skeleton-card" />
+<ComponentPreview component="skeleton" example="skeleton-wrap" />
 
-### Form Skeleton
+## API Reference
 
-Loading placeholder for form layouts.
+### Props
 
-<ComponentPreview component="skeleton" example="skeleton-form" />
+#### Skeleton
 
-### List Skeleton
+Animated placeholder that displays a shimmer effect. Can be used standalone with explicit dimensions or as a wrapper around content.
 
-Loading placeholder for list items.
+<ApiPropsList>
 
-<ComponentPreview component="skeleton" example="skeleton-list" />
+<ApiProp name="visible" fullType="boolean" defaultValue="true">
+  Controls skeleton visibility. When `false` and children are present, renders children directly without the skeleton wrapper.
+</ApiProp>
 
-### Table Skeleton
+<ApiProp name="animate" fullType="boolean" defaultValue="true">
+  Enables the shimmer animation. When `false`, displays a static `bg-muted` background.
+</ApiProp>
 
-Loading placeholder for table structures.
+<ApiProp name="children" fullType="ReactNode" simpleType="node">
+  Content to wrap. When provided, children are rendered but hidden (`invisible`) while the skeleton overlay is visible. The skeleton inherits the children's dimensions.
+</ApiProp>
 
-<ComponentPreview component="skeleton" example="skeleton-table" />
+</ApiPropsList>

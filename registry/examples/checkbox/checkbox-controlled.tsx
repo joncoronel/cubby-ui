@@ -9,16 +9,13 @@ export default function CheckboxControlled() {
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center space-x-2">
-        <Checkbox 
-          id="controlled" 
+      <Label className="flex items-center gap-2">
+        <Checkbox
           checked={checked}
           onCheckedChange={(value) => setChecked(value as boolean)}
         />
-        <Label htmlFor="controlled">
-          Enable notifications
-        </Label>
-      </div>
+        Enable notifications
+      </Label>
       <p className="text-sm text-muted-foreground">
         Notifications are {checked ? "enabled" : "disabled"}
       </p>

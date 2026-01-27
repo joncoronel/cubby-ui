@@ -4,9 +4,9 @@ import * as React from "react";
 import { CheckboxGroup } from "@/registry/default/checkbox-group/checkbox-group";
 import { Checkbox } from "@/registry/default/checkbox/checkbox";
 import { Label } from "@/registry/default/label/label";
-import { Card } from "@/registry/default/card/card";
 
 export default function CheckboxGroupCards() {
+  const id = React.useId();
   const [value, setValue] = React.useState<string[]>(["pro"]);
 
   const plans = [
@@ -40,33 +40,26 @@ export default function CheckboxGroupCards() {
           className="grid gap-4 md:grid-cols-3"
         >
           {plans.map((plan) => (
-            <Card
+            <Label
               key={plan.id}
-              className={cn(
-                "relative cursor-pointer p-4 hover:bg-accent",
-                value.includes(plan.id) && "border-primary bg-accent"
-              )}
+              htmlFor={`${id}-${plan.id}`}
+              className="gap-3 rounded-lg border bg-card p-4 has-data-checked:border-primary/50 has-data-checked:bg-muted hover:bg-muted"
             >
-              <Label
-                htmlFor={plan.id}
-                className="flex cursor-pointer flex-col space-y-2"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <h4 className="font-medium">{plan.name}</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {plan.description}
-                    </p>
-                  </div>
-                  <Checkbox id={plan.id} value={plan.id} className="mt-1" />
+              <div className="flex items-start justify-between">
+                <div className="flex flex-col gap-1">
+                  <span className="font-medium">{plan.name}</span>
+                  <span className="text-muted-foreground text-sm">
+                    {plan.description}
+                  </span>
                 </div>
-                <div className="font-semibold text-primary">{plan.price}</div>
-              </Label>
-            </Card>
+                <Checkbox id={`${id}-${plan.id}`} value={plan.id} />
+              </div>
+              <span className="text-primary font-semibold">{plan.price}</span>
+            </Label>
           ))}
         </CheckboxGroup>
       </div>
-      <div className="text-sm text-muted-foreground">
+      <div className="text-muted-foreground text-sm">
         Total: $
         {value
           .reduce((total, planId) => {
@@ -78,8 +71,4 @@ export default function CheckboxGroupCards() {
       </div>
     </div>
   );
-}
-
-function cn(...classes: (string | boolean | undefined)[]): string {
-  return classes.filter(Boolean).join(" ");
 }

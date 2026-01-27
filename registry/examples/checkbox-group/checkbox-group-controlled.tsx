@@ -6,6 +6,7 @@ import { Checkbox } from "@/registry/default/checkbox/checkbox";
 import { Label } from "@/registry/default/label/label";
 
 export default function CheckboxGroupControlled() {
+  const id = React.useId();
   const [value, setValue] = React.useState<string[]>(["email", "sms"]);
 
   const handleClearAll = () => setValue([]);
@@ -18,20 +19,20 @@ export default function CheckboxGroupControlled() {
           <h3 className="text-sm font-medium">Notification Preferences</h3>
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
-              <Checkbox id="email" value="email" />
-              <Label htmlFor="email">Email notifications</Label>
+              <Checkbox id={`${id}-email`} value="email" />
+              <Label htmlFor={`${id}-email`}>Email notifications</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <Checkbox id="sms" value="sms" />
-              <Label htmlFor="sms">SMS notifications</Label>
+              <Checkbox id={`${id}-sms`} value="sms" />
+              <Label htmlFor={`${id}-sms`}>SMS notifications</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <Checkbox id="push" value="push" />
-              <Label htmlFor="push">Push notifications</Label>
+              <Checkbox id={`${id}-push`} value="push" />
+              <Label htmlFor={`${id}-push`}>Push notifications</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <Checkbox id="in-app" value="in-app" />
-              <Label htmlFor="in-app">In-app notifications</Label>
+              <Checkbox id={`${id}-in-app`} value="in-app" />
+              <Label htmlFor={`${id}-in-app`}>In-app notifications</Label>
             </div>
           </div>
         </div>

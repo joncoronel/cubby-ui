@@ -6,6 +6,7 @@ import { Checkbox } from "@/registry/default/checkbox/checkbox";
 import { Label } from "@/registry/default/label/label";
 
 export default function CheckboxGroupHorizontal() {
+  const id = React.useId();
   const [value, setValue] = React.useState<string[]>(["small"]);
 
   return (
@@ -18,24 +19,24 @@ export default function CheckboxGroupHorizontal() {
           className="flex flex-row flex-wrap gap-4"
         >
           <div className="flex items-center space-x-2">
-            <Checkbox id="xs" value="xs" />
-            <Label htmlFor="xs">XS</Label>
+            <Checkbox id={`${id}-xs`} value="xs" />
+            <Label htmlFor={`${id}-xs`}>XS</Label>
           </div>
           <div className="flex items-center space-x-2">
-            <Checkbox id="small" value="small" />
-            <Label htmlFor="small">Small</Label>
+            <Checkbox id={`${id}-small`} value="small" />
+            <Label htmlFor={`${id}-small`}>Small</Label>
           </div>
           <div className="flex items-center space-x-2">
-            <Checkbox id="medium" value="medium" />
-            <Label htmlFor="medium">Medium</Label>
+            <Checkbox id={`${id}-medium`} value="medium" />
+            <Label htmlFor={`${id}-medium`}>Medium</Label>
           </div>
           <div className="flex items-center space-x-2">
-            <Checkbox id="large" value="large" />
-            <Label htmlFor="large">Large</Label>
+            <Checkbox id={`${id}-large`} value="large" />
+            <Label htmlFor={`${id}-large`}>Large</Label>
           </div>
           <div className="flex items-center space-x-2">
-            <Checkbox id="xl" value="xl" />
-            <Label htmlFor="xl">XL</Label>
+            <Checkbox id={`${id}-xl`} value="xl" />
+            <Label htmlFor={`${id}-xl`}>XL</Label>
           </div>
         </CheckboxGroup>
       </div>

@@ -6,14 +6,15 @@ import { Checkbox } from "@/registry/default/checkbox/checkbox";
 import { Label } from "@/registry/default/label/label";
 
 export default function CheckboxGroupWithDescriptions() {
+  const id = React.useId();
   const [value, setValue] = React.useState<string[]>(["security"]);
 
   return (
     <CheckboxGroup value={value} onValueChange={setValue} className="space-y-3">
       <div className="flex items-start space-x-3">
-        <Checkbox id="security" value="security" className="mt-1" />
+        <Checkbox id={`${id}-security`} value="security" className="mt-1" />
         <div className="space-y-1 leading-none">
-          <Label htmlFor="security" className="font-medium">
+          <Label htmlFor={`${id}-security`} className="font-medium">
             Security alerts
           </Label>
           <p className="text-sm text-muted-foreground">
@@ -22,9 +23,9 @@ export default function CheckboxGroupWithDescriptions() {
         </div>
       </div>
       <div className="flex items-start space-x-3">
-        <Checkbox id="product" value="product" className="mt-1" />
+        <Checkbox id={`${id}-product`} value="product" className="mt-1" />
         <div className="space-y-1 leading-none">
-          <Label htmlFor="product" className="font-medium">
+          <Label htmlFor={`${id}-product`} className="font-medium">
             Product updates
           </Label>
           <p className="text-sm text-muted-foreground">
@@ -33,9 +34,9 @@ export default function CheckboxGroupWithDescriptions() {
         </div>
       </div>
       <div className="flex items-start space-x-3">
-        <Checkbox id="newsletter" value="newsletter" className="mt-1" />
+        <Checkbox id={`${id}-newsletter`} value="newsletter" className="mt-1" />
         <div className="space-y-1 leading-none">
-          <Label htmlFor="newsletter" className="font-medium">
+          <Label htmlFor={`${id}-newsletter`} className="font-medium">
             Newsletter
           </Label>
           <p className="text-sm text-muted-foreground">
@@ -44,9 +45,9 @@ export default function CheckboxGroupWithDescriptions() {
         </div>
       </div>
       <div className="flex items-start space-x-3">
-        <Checkbox id="events" value="events" className="mt-1" />
+        <Checkbox id={`${id}-events`} value="events" className="mt-1" />
         <div className="space-y-1 leading-none">
-          <Label htmlFor="events" className="font-medium">
+          <Label htmlFor={`${id}-events`} className="font-medium">
             Events & webinars
           </Label>
           <p className="text-sm text-muted-foreground">

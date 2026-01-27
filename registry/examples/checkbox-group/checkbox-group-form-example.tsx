@@ -8,11 +8,12 @@ import { Button } from "@/registry/default/button/button";
 import { toast } from "@/registry/default/toast/toast";
 
 export default function CheckboxGroupFormExample() {
+  const id = React.useId();
   const [selectedSkills, setSelectedSkills] = React.useState<string[]>([]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (selectedSkills.length === 0) {
       toast.error({
         title: "No skills selected",
@@ -36,28 +37,28 @@ export default function CheckboxGroupFormExample() {
         </p>
         <CheckboxGroup value={selectedSkills} onValueChange={setSelectedSkills}>
           <div className="flex items-center space-x-2">
-            <Checkbox id="javascript" value="javascript" />
-            <Label htmlFor="javascript">JavaScript</Label>
+            <Checkbox id={`${id}-javascript`} value="javascript" />
+            <Label htmlFor={`${id}-javascript`}>JavaScript</Label>
           </div>
           <div className="flex items-center space-x-2">
-            <Checkbox id="typescript" value="typescript" />
-            <Label htmlFor="typescript">TypeScript</Label>
+            <Checkbox id={`${id}-typescript`} value="typescript" />
+            <Label htmlFor={`${id}-typescript`}>TypeScript</Label>
           </div>
           <div className="flex items-center space-x-2">
-            <Checkbox id="react" value="react" />
-            <Label htmlFor="react">React</Label>
+            <Checkbox id={`${id}-react`} value="react" />
+            <Label htmlFor={`${id}-react`}>React</Label>
           </div>
           <div className="flex items-center space-x-2">
-            <Checkbox id="nodejs" value="nodejs" />
-            <Label htmlFor="nodejs">Node.js</Label>
+            <Checkbox id={`${id}-nodejs`} value="nodejs" />
+            <Label htmlFor={`${id}-nodejs`}>Node.js</Label>
           </div>
           <div className="flex items-center space-x-2">
-            <Checkbox id="python" value="python" />
-            <Label htmlFor="python">Python</Label>
+            <Checkbox id={`${id}-python`} value="python" />
+            <Label htmlFor={`${id}-python`}>Python</Label>
           </div>
           <div className="flex items-center space-x-2">
-            <Checkbox id="rust" value="rust" />
-            <Label htmlFor="rust">Rust</Label>
+            <Checkbox id={`${id}-rust`} value="rust" />
+            <Label htmlFor={`${id}-rust`}>Rust</Label>
           </div>
         </CheckboxGroup>
       </div>

@@ -6,6 +6,7 @@ import { Checkbox } from "@/registry/default/checkbox/checkbox";
 import { Label } from "@/registry/default/label/label";
 
 export default function CheckboxGroupParent() {
+  const id = React.useId();
   const allOptions = ["notifications", "emails", "sms", "push"];
   const [value, setValue] = React.useState<string[]>([]);
 
@@ -21,32 +22,32 @@ export default function CheckboxGroupParent() {
       <div className="space-y-2">
         <div className="flex items-center space-x-2">
           <Checkbox
-            id="all"
+            id={`${id}-all`}
             checked={isAllSelected}
             indeterminate={isIndeterminate}
             onCheckedChange={handleParentChange}
           />
-          <Label htmlFor="all" className="font-medium">
+          <Label htmlFor={`${id}-all`} className="font-medium">
             Select All Notifications
           </Label>
         </div>
         <div className="ml-6 space-y-2">
           <CheckboxGroup value={value} onValueChange={setValue}>
             <div className="flex items-center space-x-2">
-              <Checkbox id="notifications" value="notifications" />
-              <Label htmlFor="notifications">Browser notifications</Label>
+              <Checkbox id={`${id}-notifications`} value="notifications" />
+              <Label htmlFor={`${id}-notifications`}>Browser notifications</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <Checkbox id="emails" value="emails" />
-              <Label htmlFor="emails">Email notifications</Label>
+              <Checkbox id={`${id}-emails`} value="emails" />
+              <Label htmlFor={`${id}-emails`}>Email notifications</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <Checkbox id="sms" value="sms" />
-              <Label htmlFor="sms">SMS notifications</Label>
+              <Checkbox id={`${id}-sms`} value="sms" />
+              <Label htmlFor={`${id}-sms`}>SMS notifications</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <Checkbox id="push" value="push" />
-              <Label htmlFor="push">Push notifications</Label>
+              <Checkbox id={`${id}-push`} value="push" />
+              <Label htmlFor={`${id}-push`}>Push notifications</Label>
             </div>
           </CheckboxGroup>
         </div>

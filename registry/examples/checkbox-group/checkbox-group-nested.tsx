@@ -6,6 +6,7 @@ import { Checkbox } from "@/registry/default/checkbox/checkbox";
 import { Label } from "@/registry/default/label/label";
 
 export default function CheckboxGroupNested() {
+  const id = React.useId();
   const communicationOptions = ["email", "sms", "push"];
   const marketingOptions = ["newsletter", "promotions", "updates"];
   const allOptions = [...communicationOptions, ...marketingOptions];
@@ -53,12 +54,12 @@ export default function CheckboxGroupNested() {
       <div className="space-y-2">
         <div className="flex items-center space-x-2">
           <Checkbox
-            id="all"
+            id={`${id}-all`}
             checked={isAllSelected}
             indeterminate={isAllIndeterminate}
             onCheckedChange={handleMasterChange}
           />
-          <Label htmlFor="all" className="text-base font-semibold">
+          <Label htmlFor={`${id}-all`} className="text-base font-semibold">
             All Notifications
           </Label>
         </div>
@@ -67,28 +68,28 @@ export default function CheckboxGroupNested() {
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
               <Checkbox
-                id="communication"
+                id={`${id}-communication`}
                 checked={isCommunicationSelected}
                 indeterminate={isCommunicationIndeterminate}
                 onCheckedChange={handleCommunicationChange}
               />
-              <Label htmlFor="communication" className="font-medium">
+              <Label htmlFor={`${id}-communication`} className="font-medium">
                 Communication Preferences
               </Label>
             </div>
             <div className="ml-6 space-y-2">
               <CheckboxGroup value={value} onValueChange={setValue}>
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="email" value="email" />
-                  <Label htmlFor="email">Email notifications</Label>
+                  <Checkbox id={`${id}-email`} value="email" />
+                  <Label htmlFor={`${id}-email`}>Email notifications</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="sms" value="sms" />
-                  <Label htmlFor="sms">SMS notifications</Label>
+                  <Checkbox id={`${id}-sms`} value="sms" />
+                  <Label htmlFor={`${id}-sms`}>SMS notifications</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="push" value="push" />
-                  <Label htmlFor="push">Push notifications</Label>
+                  <Checkbox id={`${id}-push`} value="push" />
+                  <Label htmlFor={`${id}-push`}>Push notifications</Label>
                 </div>
               </CheckboxGroup>
             </div>
@@ -97,28 +98,28 @@ export default function CheckboxGroupNested() {
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
               <Checkbox
-                id="marketing"
+                id={`${id}-marketing`}
                 checked={isMarketingSelected}
                 indeterminate={isMarketingIndeterminate}
                 onCheckedChange={handleMarketingChange}
               />
-              <Label htmlFor="marketing" className="font-medium">
+              <Label htmlFor={`${id}-marketing`} className="font-medium">
                 Marketing Communications
               </Label>
             </div>
             <div className="ml-6 space-y-2">
               <CheckboxGroup value={value} onValueChange={setValue}>
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="newsletter" value="newsletter" />
-                  <Label htmlFor="newsletter">Weekly newsletter</Label>
+                  <Checkbox id={`${id}-newsletter`} value="newsletter" />
+                  <Label htmlFor={`${id}-newsletter`}>Weekly newsletter</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="promotions" value="promotions" />
-                  <Label htmlFor="promotions">Promotional offers</Label>
+                  <Checkbox id={`${id}-promotions`} value="promotions" />
+                  <Label htmlFor={`${id}-promotions`}>Promotional offers</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="updates" value="updates" />
-                  <Label htmlFor="updates">Product updates</Label>
+                  <Checkbox id={`${id}-updates`} value="updates" />
+                  <Label htmlFor={`${id}-updates`}>Product updates</Label>
                 </div>
               </CheckboxGroup>
             </div>

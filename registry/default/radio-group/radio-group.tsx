@@ -30,7 +30,7 @@ function RadioGroupItem({
         "disabled:cursor-not-allowed disabled:opacity-60",
         "aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
 
-        "before:bg-card before:absolute before:size-full before:rounded-full before:border before:bg-clip-padding before:content-['']",
+        "before:bg-card dark:before:bg-input/35 hover:before:bg-muted dark:hover:before:bg-input/60 before:absolute before:size-full before:rounded-full before:border before:bg-clip-padding before:transition-colors before:content-['']",
         "after:shadow-inset dark:after:shadow-inset-highlight after:absolute after:inset-px after:rounded-full after:content-['']",
 
         className,

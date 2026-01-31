@@ -133,7 +133,7 @@ export default function PopoverAnimated() {
 
       <Popover handle={animatedPopover}>
         {({ payload: Payload }) => (
-          <PopoverContent arrow>
+          <PopoverContent>
             {Payload !== undefined && <Payload />}
           </PopoverContent>
         )}

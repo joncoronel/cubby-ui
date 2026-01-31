@@ -141,7 +141,7 @@ function PopoverContent({
             "max-h-(--available-height) max-w-(--available-width)",
             "origin-(--transform-origin) overflow-hidden rounded-md shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)] ring-1",
             // Size/opacity transitions
-            "ease-out-cubic transition-[width,height,scale,opacity] duration-150",
+            "ease-out-cubic transition-[width,height,scale,opacity] duration-100",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
             "motion-reduce:transition-none",

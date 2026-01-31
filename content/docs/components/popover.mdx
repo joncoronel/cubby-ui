@@ -39,7 +39,7 @@ Use `createPopoverHandle()` to link a trigger outside the `Popover` component.
 
 ### Animated Transitions
 
-Animate the popover's position, size, and content when switching between triggers. Uses `PopoverViewport` for direction-aware content transitions.
+Animate the popover's position, size, and content when switching between multiple triggers with different payloads.
 
 <ComponentPreview component="popover" example="popover-animated" />
 
@@ -55,7 +55,9 @@ The Popover component is built on top of [Base UI's Popover](https://base-ui.com
 
 For the complete Base UI API, see the [Base UI Popover documentation](https://base-ui.com/react/components/popover).
 
-### createPopoverHandle
+### Utilities
+
+#### createPopoverHandle
 
 A function to create a handle for connecting detached triggers to a popover. Useful when the trigger needs to be placed outside the `Popover` component.
 
@@ -69,9 +71,11 @@ const handle = createPopoverHandle();
 const handle = createPopoverHandle<{ title: string }>();
 ```
 
-### Custom Props
+### Props
 
 #### PopoverContent
+
+Composed component for common popover layouts. Combines `Popover.Portal`, `Popover.Positioner`, `Popover.Popup`, and `Popover.Viewport`. Optionally renders `Popover.Arrow`. Props are forwarded to the Positioner and Popup components.
 
 <ApiPropsList>
 
@@ -85,14 +89,16 @@ const handle = createPopoverHandle<{ title: string }>();
 
 <ApiProp
   name="side"
-  fullType="'top' | 'right' | 'bottom' | 'left'"
+  fullType="'top' | 'right' | 'bottom' | 'left' | 'inline-start' | 'inline-end'"
+  defaultValue='"bottom"'
 >
-  Which side of the trigger to position the popover. Flattened from Positioner for easier API.
+  Which side of the trigger to position the popover. Flattened from Positioner.
 </ApiProp>
 
 <ApiProp
   name="align"
   fullType="'start' | 'center' | 'end'"
+  defaultValue='"center"'
 >
   How to align the popover relative to the trigger. Flattened from Positioner.
 </ApiProp>
@@ -100,13 +106,15 @@ const handle = createPopoverHandle<{ title: string }>();
 <ApiProp
   name="sideOffset"
   fullType="number"
+  defaultValue="8"
 >
-  Distance in pixels between trigger and popover. Flattened from Positioner.
+  Distance in pixels between trigger and popover. Flattened from Positioner. Base UI defaults to `0`.
 </ApiProp>
 
 <ApiProp
   name="alignOffset"
   fullType="number"
+  defaultValue="0"
 >
   Offset along the alignment axis. Flattened from Positioner.
 </ApiProp>
@@ -121,13 +129,15 @@ const handle = createPopoverHandle<{ title: string }>();
 <ApiProp
   name="collisionPadding"
   fullType="number | Partial<Record<Side, number>>"
+  defaultValue="10"
 >
-  Padding from collision boundary. Flattened from Positioner.
+  Padding from collision boundary. Flattened from Positioner. Base UI defaults to `5`.
 </ApiProp>
 
 <ApiProp
   name="sticky"
   fullType="boolean"
+  defaultValue="false"
 >
   Whether popover should stick to trigger during scroll. Flattened from Positioner.
 </ApiProp>
@@ -135,6 +145,7 @@ const handle = createPopoverHandle<{ title: string }>();
 <ApiProp
   name="positionMethod"
   fullType="'absolute' | 'fixed'"
+  defaultValue='"absolute"'
 >
   CSS position method. Flattened from Positioner.
 </ApiProp>
@@ -143,38 +154,14 @@ const handle = createPopoverHandle<{ title: string }>();
   name="arrowPadding"
   fullType="number"
 >
-  Minimum padding between arrow and popover edges. Flattened from Positioner.
+  Minimum padding between arrow and popover edges. Flattened from Positioner. Base UI defaults to `5`.
 </ApiProp>
 
 <ApiProp
   name="container"
-  fullType="HTMLElement | null | undefined"
+  fullType="HTMLElement | undefined"
 >
-  Portal container element. Flattened from Positioner.
+  Portal container element. Flattened from Portal.
 </ApiProp>
 
 </ApiPropsList>
-
-#### PopoverViewport
-
-A viewport container for content transitions. Use when multiple triggers share a popover with animated content switching.
-
-**Data Attributes:**
-
-- `data-activation-direction` - Space-separated horizontal (`left`/`right`) and vertical (`top`/`bottom`) direction indicating the new trigger's position relative to the previous one
-- `data-current` - Applied to the incoming content wrapper
-- `data-previous` - Applied to the outgoing content during transitions
-- `data-transitioning` - Present while transitioning between content
-
-### Modified Defaults
-
-Our implementation changes the following Base UI prop defaults:
-
-- **PopoverContent**: `side` defaults to `'bottom'` (Base UI defaults to `'top'`)
-- **PopoverContent**: `align` defaults to `'center'` (Base UI defaults to `'center'` but we make it explicit)
-- **PopoverContent**: `sideOffset` defaults to `8` (Base UI defaults to `0`)
-- **PopoverContent**: `alignOffset` defaults to `0`
-- **PopoverContent**: `collisionPadding` defaults to `10`
-- **PopoverContent**: `sticky` defaults to `false`
-- **PopoverContent**: `positionMethod` defaults to `'absolute'`
-- **PopoverContent**: `arrow` defaults to `false`

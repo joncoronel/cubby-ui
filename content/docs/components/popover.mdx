@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/registry/default/popo
 
 ## Preview
 
-<ComponentPreview component="popover" example="popover-basic" />
+<ComponentPreview component="popover" example="popover-demo" />
 
 ## Installation
 
@@ -19,41 +19,55 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/registry/default/popo
 
 ## Examples
 
-### Advanced Positioning
-
-Control popover placement with advanced positioning options.
-
-<ComponentPreview component="popover" example="popover-advanced-positioning" />
-
 ### Hover Trigger
 
-Open popover on hover instead of click.
+Open popover on hover instead of click using the `openOnHover` prop.
 
-<ComponentPreview component="popover" example="popover-hover-trigger" />
+<ComponentPreview component="popover" example="popover-hover" />
 
 ### With Backdrop
 
-Add backdrop overlay when popover is open.
+Add a backdrop overlay when popover is open for a modal-like experience.
 
 <ComponentPreview component="popover" example="popover-with-backdrop" />
 
-### With Header and Footer
+### Detached Trigger
 
-Include structured header and footer sections.
+Use `createPopoverHandle()` to link a trigger outside the `Popover` component.
 
-<ComponentPreview component="popover" example="popover-with-header-and-footer" />
+<ComponentPreview component="popover" example="popover-detached-trigger" />
 
-### Without Arrow
+### Multiple Triggers
 
-Hide the arrow pointer for a cleaner look.
+Multiple triggers can share the same popover. Use the `payload` prop to render different content based on which trigger was clicked.
 
-<ComponentPreview component="popover" example="popover-without-arrow" />
+<ComponentPreview component="popover" example="popover-multiple-triggers" />
+
+### Controlled
+
+Control the popover's open state externally using the `open` and `onOpenChange` props.
+
+<ComponentPreview component="popover" example="popover-controlled" />
 
 ## API Reference
 
 The Popover component is built on top of [Base UI's Popover](https://base-ui.com/react/components/popover). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
 
 For the complete Base UI API, see the [Base UI Popover documentation](https://base-ui.com/react/components/popover).
+
+### createPopoverHandle
+
+A function to create a handle for connecting detached triggers to a popover. Useful when the trigger needs to be placed outside the `Popover` component.
+
+```tsx
+import { createPopoverHandle } from "@/registry/default/popover/popover";
+
+// Without payload typing
+const handle = createPopoverHandle();
+
+// With payload typing
+const handle = createPopoverHandle<{ title: string }>();
+```
 
 ### Custom Props
 
@@ -64,7 +78,7 @@ For the complete Base UI API, see the [Base UI Popover documentation](https://ba
 <ApiProp
   name="arrow"
   fullType="boolean"
-  defaultValue="true"
+  defaultValue="false"
 >
   Show or hide the popover arrow pointing to the trigger. Custom prop not available in Base UI.
 </ApiProp>
@@ -152,4 +166,4 @@ Our implementation changes the following Base UI prop defaults:
 - **PopoverContent**: `collisionPadding` defaults to `10`
 - **PopoverContent**: `sticky` defaults to `false`
 - **PopoverContent**: `positionMethod` defaults to `'absolute'`
-- **PopoverContent**: `arrow` defaults to `true`
+- **PopoverContent**: `arrow` defaults to `false`

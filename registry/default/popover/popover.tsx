@@ -45,7 +45,8 @@ function PopoverBackdrop({
     <BasePopover.Backdrop
       data-slot="popover-backdrop"
       className={cn(
-        "fixed inset-0 z-30 bg-black/50 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+        "ease-out-cubic fixed inset-0 z-30 min-h-dvh bg-black/40 transition-all duration-200 supports-[-webkit-touch-callout:none]:absolute",
+        "backdrop-blur-sm data-ending-style:opacity-0 data-starting-style:opacity-0",
         className,
       )}
       {...props}
@@ -53,15 +54,6 @@ function PopoverBackdrop({
   );
 }
 
-function PopoverHeader({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="popover-header"
-      className={cn("relative flex flex-col gap-y-1.5", className)}
-      {...props}
-    />
-  );
-}
 
 function PopoverTitle({
   className,
@@ -100,7 +92,7 @@ function PopoverContent({
   collisionPadding = 10,
   sticky = false,
   positionMethod = "absolute",
-  arrow = true,
+  arrow = false,
   arrowPadding,
   container,
   ...props
@@ -134,7 +126,7 @@ function PopoverContent({
         <BasePopover.Popup
           data-slot="popover-content"
           className={cn(
-            "bg-popover ring-border/60 text-popover-foreground outline-border/70 max-h-[var(--available-height)] w-72 max-w-[var(--available-width)] origin-[var(--transform-origin)] overflow-y-auto rounded-md p-4 shadow-[0_8px_20px_0_oklch(0.18_0_0_/_0.10)] ring-1 outline -outline-offset-1 transition-[transform,scale,opacity] duration-100 ease-out data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
+            "bg-popover text-popover-foreground ring-border/60 ease-out-cubic max-h-(--available-height) w-72 max-w-(--available-width) origin-(--transform-origin) overflow-y-auto rounded-md p-4 shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)] ring-1 transition-[transform,scale,opacity] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0 motion-reduce:transition-none",
             className,
           )}
           {...props}
@@ -148,7 +140,7 @@ function PopoverContent({
                 />
                 <path
                   d="M10.3333 3.34539L5.47654 7.71648C4.55842 8.54279 3.36693 9 2.13172 9H0V8H2.13172C3.11989 8 4.07308 7.63423 4.80758 6.97318L9.66437 2.60207C10.0447 2.25979 10.622 2.2598 11.0023 2.60207L15.8591 6.97318C16.5936 7.63423 17.5468 8 18.5349 8H20V9H18.5349C17.2998 9 16.1083 8.54278 15.1901 7.71648L10.3333 3.34539Z"
-                  className="fill-border/70 dark:fill-border/70"
+                  className="fill-border/70"
                 />
               </svg>
             </PopoverArrow>
@@ -160,30 +152,19 @@ function PopoverContent({
   );
 }
 
-function PopoverFooter({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="popover-footer"
-      className={cn(
-        "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
+
+const createPopoverHandle = BasePopover.createHandle;
 
 export {
   Popover,
   PopoverTrigger,
-  PopoverHeader,
   PopoverTitle,
   PopoverDescription,
   PopoverContent,
-  PopoverFooter,
   PopoverClose,
   PopoverArrow,
   PopoverPositioner,
   PopoverPortal,
   PopoverBackdrop,
+  createPopoverHandle,
 };

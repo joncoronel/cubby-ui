@@ -34,6 +34,7 @@
     "tabs",
     "toast",
     "toolbar",
+    "tooltip",
     "tree"
   ]
 }

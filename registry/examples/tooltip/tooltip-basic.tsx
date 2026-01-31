@@ -1,14 +1,21 @@
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/registry/default/tooltip/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/registry/default/tooltip/tooltip";
+import { Button } from "@/registry/default/button/button";
+import { Plus } from "lucide-react";
 
 export default function TooltipBasic() {
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger>Hover me</TooltipTrigger>
-        <TooltipContent>
-          <p>Add to library</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger render={<Button variant="outline" size="icon" />}>
+        <Plus className="size-4" />
+        <span className="sr-only">Add to library</span>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>Add to library</p>
+      </TooltipContent>
+    </Tooltip>
   );
 }

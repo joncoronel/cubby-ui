@@ -169,9 +169,9 @@ function PopoverContent({
               // Base viewport styles
               "relative size-full overflow-clip px-4 py-4 [--viewport-padding:1rem]",
               "not-data-transitioning:overflow-y-auto",
-              // Content width calculation (edge-to-edge minus padding and border)
-              "**:data-current:w-[calc(var(--popup-width)-2*var(--viewport-padding)-2px)]",
-              "**:data-previous:w-[calc(var(--popup-width)-2*var(--viewport-padding)-2px)]",
+              // Content width calculation (edge-to-edge minus padding)
+              "**:data-current:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
+              "**:data-previous:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
               // Content base state and transitions
               "**:data-current:translate-x-0 **:data-current:opacity-100",
               "**:data-previous:translate-x-0 **:data-previous:opacity-100",

@@ -3,7 +3,11 @@ title: Tooltip
 description: Contextual information that appears on hover or focus
 ---
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/registry/default/tooltip/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/registry/default/tooltip/tooltip";
 
 ## Preview
 
@@ -19,29 +23,23 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/regi
 
 ## Examples
 
-### With Button
+### Detached Trigger
 
-Add tooltips to button elements.
+Use `createTooltipHandle()` to link a trigger outside the `Tooltip` component.
 
-<ComponentPreview component="tooltip" example="tooltip-with-button" />
+<ComponentPreview component="tooltip" example="tooltip-detached-trigger" />
 
-### Positions
+### Controlled
 
-Control tooltip placement around the trigger.
+Control the tooltip's open state externally using the `open` and `onOpenChange` props.
 
-<ComponentPreview component="tooltip" example="tooltip-positions" />
+<ComponentPreview component="tooltip" example="tooltip-controlled" />
 
-### With Delay
+### Animated Transitions
 
-Add custom delay before tooltip appears.
+Animate the tooltip when switching between multiple triggers with different payloads.
 
-<ComponentPreview component="tooltip" example="tooltip-with-delay" />
-
-### Icon Toolbar
-
-Use tooltips in icon-only toolbars.
-
-<ComponentPreview component="tooltip" example="tooltip-icon-toolbar" />
+<ComponentPreview component="tooltip" example="tooltip-animated" />
 
 ## API Reference
 
@@ -49,15 +47,39 @@ The Tooltip component is built on top of [Base UI's Tooltip](https://base-ui.com
 
 For the complete Base UI API, see the [Base UI Tooltip documentation](https://base-ui.com/react/components/tooltip).
 
-### Custom Props
+### Utilities
+
+#### createTooltipHandle
+
+A function to create a handle for connecting detached triggers to a tooltip. Useful when the trigger needs to be placed outside the `Tooltip` component.
+
+```tsx
+import { createTooltipHandle } from "@/registry/default/tooltip/tooltip";
+
+// Without payload typing
+const handle = createTooltipHandle();
+
+// With payload typing
+const handle = createTooltipHandle<{ title: string }>();
+```
+
+### Props
 
 #### TooltipContent
 
+Composed component for common tooltip layouts. Combines `Tooltip.Portal`, `Tooltip.Positioner`, and `Tooltip.Popup`. Optionally renders `Tooltip.Arrow`. Props are forwarded to the Positioner and Popup components.
+
 <ApiPropsList>
+
+<ApiProp name="arrow" fullType="boolean" defaultValue="false">
+  Show or hide the tooltip arrow pointing to the trigger. Custom prop not
+  available in Base UI.
+</ApiProp>
 
 <ApiProp
   name="side"
-  fullType="'top' | 'right' | 'bottom' | 'left'"
+  fullType="'top' | 'right' | 'bottom' | 'left' | 'inline-start' | 'inline-end'"
+  defaultValue='"top"'
 >
   Which side of the trigger to position the tooltip. Flattened from Positioner.
 </ApiProp>
@@ -65,15 +87,56 @@ For the complete Base UI API, see the [Base UI Tooltip documentation](https://ba
 <ApiProp
   name="align"
   fullType="'start' | 'center' | 'end'"
+  defaultValue='"center"'
 >
   How to align the tooltip relative to the trigger. Flattened from Positioner.
 </ApiProp>
 
-<ApiProp
-  name="sideOffset"
-  fullType="number"
->
+<ApiProp name="sideOffset" fullType="number" defaultValue="8">
   Distance in pixels between trigger and tooltip. Flattened from Positioner.
+  Base UI defaults to `0`.
+</ApiProp>
+
+<ApiProp name="alignOffset" fullType="number" defaultValue="0">
+  Offset along the alignment axis. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp
+  name="collisionBoundary"
+  fullType="Element | Element[] | 'clipping-ancestors'"
+>
+  Boundary for collision detection. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp
+  name="collisionPadding"
+  fullType="number | Partial<Record<Side, number>>"
+  defaultValue="10"
+>
+  Padding from collision boundary. Flattened from Positioner. Base UI defaults
+  to `5`.
+</ApiProp>
+
+<ApiProp name="sticky" fullType="boolean" defaultValue="false">
+  Whether to keep the tooltip visible in the viewport after the anchor element
+  has scrolled out of view. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp
+  name="positionMethod"
+  fullType="'absolute' | 'fixed'"
+  defaultValue='"absolute"'
+>
+  CSS position method. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp name="arrowPadding" fullType="number">
+  Minimum padding between arrow and tooltip edges. Flattened from Positioner.
+  Base UI defaults to `5`.
+</ApiProp>
+
+<ApiProp name="container" fullType="HTMLElement | undefined">
+  Portal container element. Flattened from Portal.
 </ApiProp>
 
 </ApiPropsList>
@@ -82,8 +145,5 @@ For the complete Base UI API, see the [Base UI Tooltip documentation](https://ba
 
 Our implementation changes the following Base UI prop defaults:
 
-- **TooltipTrigger**: `delay` defaults to `0` (Base UI defaults to `600`)
-- **TooltipTrigger**: `closeDelay` defaults to `0` (Base UI defaults to `0` but we make it explicit)
-- **TooltipContent**: `side` defaults to `'top'` (Base UI defaults to `'top'` but we make it explicit)
-- **TooltipContent**: `align` defaults to `'center'`
 - **TooltipContent**: `sideOffset` defaults to `8` (Base UI defaults to `0`)
+- **TooltipContent**: `collisionPadding` defaults to `10` (Base UI defaults to `5`)

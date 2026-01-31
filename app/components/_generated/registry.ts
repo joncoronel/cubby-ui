@@ -338,10 +338,9 @@ import toggle_group_toggle_group_with_icons from "@/registry/examples/toggle-gro
 import toolbar_toolbar_basic from "@/registry/examples/toolbar/toolbar-basic";
 import toolbar_toolbar_with_input from "@/registry/examples/toolbar/toolbar-with-input";
 import tooltip_tooltip_basic from "@/registry/examples/tooltip/tooltip-basic";
-import tooltip_tooltip_icon_toolbar from "@/registry/examples/tooltip/tooltip-icon-toolbar";
-import tooltip_tooltip_positions from "@/registry/examples/tooltip/tooltip-positions";
-import tooltip_tooltip_with_button from "@/registry/examples/tooltip/tooltip-with-button";
-import tooltip_tooltip_with_delay from "@/registry/examples/tooltip/tooltip-with-delay";
+import tooltip_tooltip_animated from "@/registry/examples/tooltip/tooltip-animated";
+import tooltip_tooltip_controlled from "@/registry/examples/tooltip/tooltip-controlled";
+import tooltip_tooltip_detached_trigger from "@/registry/examples/tooltip/tooltip-detached-trigger";
 import tree_tree_basic from "@/registry/examples/tree/tree-basic";
 import tree_tree_async_loading from "@/registry/examples/tree/tree-async-loading";
 import tree_tree_controlled from "@/registry/examples/tree/tree-controlled";
@@ -3008,27 +3007,22 @@ export const exampleRegistry = {
     {
       "title": "Basic",
       "importPath": "tooltip-basic",
-      "source": "import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from \"@/components/ui/cubby-ui/tooltip\";\n\nexport default function TooltipBasic() {\n  return (\n    <TooltipProvider>\n      <Tooltip>\n        <TooltipTrigger>Hover me</TooltipTrigger>\n        <TooltipContent>\n          <p>Add to library</p>\n        </TooltipContent>\n      </Tooltip>\n    </TooltipProvider>\n  );\n}"
+      "source": "import {\n  Tooltip,\n  TooltipContent,\n  TooltipTrigger,\n} from \"@/components/ui/cubby-ui/tooltip\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Plus } from \"lucide-react\";\n\nexport default function TooltipBasic() {\n  return (\n    <Tooltip>\n      <TooltipTrigger render={<Button variant=\"outline\" size=\"icon\" />}>\n        <Plus className=\"size-4\" />\n        <span className=\"sr-only\">Add to library</span>\n      </TooltipTrigger>\n      <TooltipContent>\n        <p>Add to library</p>\n      </TooltipContent>\n    </Tooltip>\n  );\n}"
     },
     {
-      "title": "Icon Toolbar",
-      "importPath": "tooltip-icon-toolbar",
-      "source": "import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from \"@/components/ui/cubby-ui/tooltip\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Bold, Italic, Underline } from \"lucide-react\";\n\nexport default function TooltipIconToolbar() {\n  return (\n    <TooltipProvider>\n      <div className=\"flex gap-1\">\n        <Tooltip>\n          <TooltipTrigger render={<Button variant=\"ghost\" size=\"icon\">\n              <Bold className=\"h-4 w-4\" />\n            </Button>} />\n          <TooltipContent>\n            <p>Bold</p>\n          </TooltipContent>\n        </Tooltip>\n        \n        <Tooltip>\n          <TooltipTrigger render={<Button variant=\"ghost\" size=\"icon\">\n              <Italic className=\"h-4 w-4\" />\n            </Button>} />\n          <TooltipContent>\n            <p>Italic</p>\n          </TooltipContent>\n        </Tooltip>\n        \n        <Tooltip>\n          <TooltipTrigger render={<Button variant=\"ghost\" size=\"icon\">\n              <Underline className=\"h-4 w-4\" />\n            </Button>} />\n          <TooltipContent>\n            <p>Underline</p>\n          </TooltipContent>\n        </Tooltip>\n      </div>\n    </TooltipProvider>\n  );\n}"
+      "title": "Animated",
+      "importPath": "tooltip-animated",
+      "source": "\"use client\";\n\nimport {\n  Tooltip,\n  TooltipContent,\n  TooltipProvider,\n  TooltipTrigger,\n  createTooltipHandle,\n} from \"@/components/ui/cubby-ui/tooltip\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { ButtonGroup } from \"@/components/ui/cubby-ui/button-group\";\nimport { FileText, ImageIcon, Video } from \"lucide-react\";\n\ninterface TooltipPayload {\n  title: string;\n  description: string;\n}\n\nconst animatedTooltip = createTooltipHandle<TooltipPayload>();\n\nexport default function TooltipAnimated() {\n  return (\n    <TooltipProvider>\n      <ButtonGroup>\n        <TooltipTrigger\n          handle={animatedTooltip}\n          payload={{ title: \"Documents\", description: \"View your documents\" }}\n          render={<Button variant=\"outline\" size=\"icon\" />}\n        >\n          <FileText className=\"size-4\" />\n          <span className=\"sr-only\">Documents</span>\n        </TooltipTrigger>\n\n        <TooltipTrigger\n          handle={animatedTooltip}\n          payload={{ title: \"Images\", description: \"Browse your images\" }}\n          render={<Button variant=\"outline\" size=\"icon\" />}\n        >\n          <ImageIcon className=\"size-4\" />\n          <span className=\"sr-only\">Images</span>\n        </TooltipTrigger>\n\n        <TooltipTrigger\n          handle={animatedTooltip}\n          payload={{ title: \"Videos\", description: \"Watch your videos\" }}\n          render={<Button variant=\"outline\" size=\"icon\" />}\n        >\n          <Video className=\"size-4\" />\n          <span className=\"sr-only\">Videos</span>\n        </TooltipTrigger>\n      </ButtonGroup>\n      <Tooltip handle={animatedTooltip}>\n        {({ payload }) => (\n          <TooltipContent arrow={false}>\n            {payload && (\n              <div className=\"text-center\">\n                <p className=\"font-medium\">{payload.title}</p>\n                <p className=\"text-muted-foreground text-xs\">\n                  {payload.description}\n                </p>\n              </div>\n            )}\n          </TooltipContent>\n        )}\n      </Tooltip>\n    </TooltipProvider>\n  );\n}\n"
     },
     {
-      "title": "Positions",
-      "importPath": "tooltip-positions",
-      "source": "import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from \"@/components/ui/cubby-ui/tooltip\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nexport default function TooltipPositions() {\n  return (\n    <TooltipProvider>\n      <div className=\"flex gap-2\">\n        <Tooltip>\n          <TooltipTrigger render={<Button variant=\"outline\">Top</Button>} />\n          <TooltipContent>\n            <p>Top tooltip</p>\n          </TooltipContent>\n        </Tooltip>\n        \n        <Tooltip>\n          <TooltipTrigger render={<Button variant=\"outline\">Right</Button>} />\n          <TooltipContent side=\"right\">\n            <p>Right tooltip</p>\n          </TooltipContent>\n        </Tooltip>\n        \n        <Tooltip>\n          <TooltipTrigger render={<Button variant=\"outline\">Bottom</Button>} />\n          <TooltipContent side=\"bottom\">\n            <p>Bottom tooltip</p>\n          </TooltipContent>\n        </Tooltip>\n        \n        <Tooltip>\n          <TooltipTrigger render={<Button variant=\"outline\">Left</Button>} />\n          <TooltipContent side=\"left\">\n            <p>Left tooltip</p>\n          </TooltipContent>\n        </Tooltip>\n      </div>\n    </TooltipProvider>\n  );\n}"
+      "title": "Controlled",
+      "importPath": "tooltip-controlled",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { Tooltip as BaseTooltip } from \"@base-ui/react/tooltip\";\nimport {\n  Tooltip,\n  TooltipContent,\n  TooltipProvider,\n  TooltipTrigger,\n  createTooltipHandle,\n} from \"@/components/ui/cubby-ui/tooltip\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { ButtonGroup } from \"@/components/ui/cubby-ui/button-group\";\nimport { HelpCircle } from \"lucide-react\";\n\nconst controlledTooltip = createTooltipHandle();\n\nexport default function TooltipControlled() {\n  const [open, setOpen] = React.useState(false);\n  const [triggerId, setTriggerId] = React.useState<string | null>(null);\n\n  const handleOpenChange = (\n    isOpen: boolean,\n    eventDetails: BaseTooltip.Root.ChangeEventDetails,\n  ) => {\n    setOpen(isOpen);\n    setTriggerId(eventDetails.trigger?.id ?? null);\n  };\n\n  return (\n    <TooltipProvider>\n      <div className=\"flex flex-wrap items-center gap-4\">\n        <ButtonGroup>\n          <TooltipTrigger\n            id=\"help-1\"\n            handle={controlledTooltip}\n            render={<Button variant=\"outline\" size=\"icon\" />}\n          >\n            <HelpCircle className=\"size-4\" />\n            <span className=\"sr-only\">Help 1</span>\n          </TooltipTrigger>\n\n          <TooltipTrigger\n            id=\"help-2\"\n            handle={controlledTooltip}\n            render={<Button variant=\"outline\" size=\"icon\" />}\n          >\n            <HelpCircle className=\"size-4\" />\n            <span className=\"sr-only\">Help 2</span>\n          </TooltipTrigger>\n\n          <TooltipTrigger\n            id=\"help-3\"\n            handle={controlledTooltip}\n            render={<Button variant=\"outline\" size=\"icon\" />}\n          >\n            <HelpCircle className=\"size-4\" />\n            <span className=\"sr-only\">Help 3</span>\n          </TooltipTrigger>\n        </ButtonGroup>\n\n        <Button\n          variant=\"outline\"\n          onClick={() => {\n            setTriggerId(\"help-2\");\n            setOpen(true);\n          }}\n        >\n          Open programmatically\n        </Button>\n\n        <Tooltip\n          handle={controlledTooltip}\n          open={open}\n          onOpenChange={handleOpenChange}\n          triggerId={triggerId}\n        >\n          <TooltipContent>\n            <p>Controlled tooltip</p>\n          </TooltipContent>\n        </Tooltip>\n      </div>\n    </TooltipProvider>\n  );\n}\n"
     },
     {
-      "title": "With Button",
-      "importPath": "tooltip-with-button",
-      "source": "import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from \"@/components/ui/cubby-ui/tooltip\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Plus } from \"lucide-react\";\n\nexport default function TooltipWithButton() {\n  return (\n    <TooltipProvider>\n      <Tooltip>\n        <TooltipTrigger render={<Button variant=\"outline\" size=\"icon\">\n            <Plus className=\"h-4 w-4\" />\n          </Button>} />\n        <TooltipContent>\n          <p>Add new item</p>\n        </TooltipContent>\n      </Tooltip>\n    </TooltipProvider>\n  );\n}"
-    },
-    {
-      "title": "With Delay",
-      "importPath": "tooltip-with-delay",
-      "source": "import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from \"@/components/ui/cubby-ui/tooltip\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nexport default function TooltipWithDelay() {\n  return (\n    <div className=\"flex gap-4\">\n      <TooltipProvider delay={0}>\n        <Tooltip>\n          <TooltipTrigger render={<Button variant=\"outline\">No delay</Button>} />\n          <TooltipContent>\n            <p>Instant tooltip</p>\n          </TooltipContent>\n        </Tooltip>\n      </TooltipProvider>\n      \n      <TooltipProvider delay={1000}>\n        <Tooltip>\n          <TooltipTrigger render={<Button variant=\"outline\">1s delay</Button>} />\n          <TooltipContent>\n            <p>Delayed tooltip</p>\n          </TooltipContent>\n        </Tooltip>\n      </TooltipProvider>\n    </div>\n  );\n}"
+      "title": "Detached Trigger",
+      "importPath": "tooltip-detached-trigger",
+      "source": "\"use client\";\n\nimport {\n  Tooltip,\n  TooltipContent,\n  TooltipTrigger,\n  createTooltipHandle,\n} from \"@/components/ui/cubby-ui/tooltip\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Info } from \"lucide-react\";\n\nconst infoTooltip = createTooltipHandle();\n\nexport default function TooltipDetachedTrigger() {\n  return (\n    <>\n      <TooltipTrigger\n        handle={infoTooltip}\n        render={<Button variant=\"outline\" size=\"icon\" />}\n      >\n        <Info className=\"size-4\" />\n        <span className=\"sr-only\">More information</span>\n      </TooltipTrigger>\n\n      <Tooltip handle={infoTooltip}>\n        <TooltipContent>\n          <p>This tooltip is connected via a handle</p>\n        </TooltipContent>\n      </Tooltip>\n    </>\n  );\n}\n"
     }
   ],
   "tree": [
@@ -3418,10 +3412,9 @@ export const componentMap = {
   "toolbar-basic": toolbar_toolbar_basic,
   "toolbar-with-input": toolbar_toolbar_with_input,
   "tooltip-basic": tooltip_tooltip_basic,
-  "tooltip-icon-toolbar": tooltip_tooltip_icon_toolbar,
-  "tooltip-positions": tooltip_tooltip_positions,
-  "tooltip-with-button": tooltip_tooltip_with_button,
-  "tooltip-with-delay": tooltip_tooltip_with_delay,
+  "tooltip-animated": tooltip_tooltip_animated,
+  "tooltip-controlled": tooltip_tooltip_controlled,
+  "tooltip-detached-trigger": tooltip_tooltip_detached_trigger,
   "tree-basic": tree_tree_basic,
   "tree-async-loading": tree_tree_async_loading,
   "tree-controlled": tree_tree_controlled,
@@ -3679,8 +3672,8 @@ export const componentAnatomy = {
     "anatomy": "<Toolbar>\n  <ToolbarGroup>\n    <ToolbarButton />\n  </ToolbarGroup>\n  <ToolbarSeparator />\n</Toolbar>"
   },
   "tooltip": {
-    "imports": "import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from \"@/components/ui/cubby-ui/tooltip\";",
-    "anatomy": "<TooltipProvider>\n  <Tooltip>\n    <TooltipTrigger />\n    <TooltipContent />\n  </Tooltip>\n</TooltipProvider>"
+    "imports": "import {\n  Tooltip,\n  TooltipContent,\n  TooltipTrigger,\n} from \"@/components/ui/cubby-ui/tooltip\";",
+    "anatomy": "<Tooltip>\n  <TooltipTrigger />\n  <TooltipContent />\n</Tooltip>"
   },
   "tree": {
     "imports": "import {\n  Tree,\n  TreeItem,\n  TreeItemLabel,\n  TreeNode,\n} from \"@/components/ui/cubby-ui/tree\";",

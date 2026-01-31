@@ -3,7 +3,9 @@ import { Popover as BasePopover } from "@base-ui/react/popover";
 
 import { cn } from "@/lib/utils";
 
-function Popover({ ...props }: BasePopover.Root.Props) {
+function Popover<Payload = unknown>({
+  ...props
+}: BasePopover.Root.Props<Payload>) {
   return <BasePopover.Root data-slot="popover" {...props} />;
 }
 

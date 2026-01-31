@@ -57,8 +57,8 @@ function PopoverBackdrop({ className, ...props }: BasePopover.Backdrop.Props) {
     <BasePopover.Backdrop
       data-slot="popover-backdrop"
       className={cn(
-        "ease-out-cubic fixed inset-0 z-30 min-h-dvh bg-black/40 transition-all duration-200 supports-[-webkit-touch-callout:none]:absolute",
-        "backdrop-blur-sm data-ending-style:opacity-0 data-starting-style:opacity-0",
+        "ease-out-cubic fixed inset-0 z-30 min-h-dvh bg-black/40 transition-all duration-150 supports-[-webkit-touch-callout:none]:absolute",
+        "backdrop-blur-sm data-ending-style:opacity-0 data-starting-style:opacity-0 motion-reduce:transition-none",
         className,
       )}
       {...props}
@@ -130,7 +130,7 @@ function PopoverContent({
         sticky={sticky}
         positionMethod={positionMethod}
         arrowPadding={arrowPadding}
-        className="z-50 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 data-instant:transition-none"
+        className="ease-out-cubic z-50 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-150 data-instant:transition-none"
       >
         <BasePopover.Popup
           data-slot="popover-content"
@@ -141,7 +141,7 @@ function PopoverContent({
             "max-h-(--available-height) max-w-(--available-width)",
             "origin-(--transform-origin) overflow-hidden rounded-md shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)] ring-1",
             // Size/opacity transitions
-            "ease-out-cubic transition-[width,height,scale,opacity] duration-100",
+            "ease-out-cubic transition-[width,height,scale,opacity] duration-150",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
             "motion-reduce:transition-none",
@@ -150,7 +150,7 @@ function PopoverContent({
           {...props}
         >
           {arrow && (
-            <PopoverArrow className="transition-[left] data-instant:transition-none data-[side=bottom]:top-[-8px] data-[side=left]:right-[-13px] data-[side=left]:rotate-90 data-[side=right]:left-[-13px] data-[side=right]:-rotate-90 data-[side=top]:bottom-[-8px] data-[side=top]:rotate-180">
+            <PopoverArrow className="ease-out-cubic transition-[left,right,top,bottom] duration-150 data-instant:transition-none data-[side=bottom]:top-[-8px] data-[side=left]:right-[-13px] data-[side=left]:rotate-90 data-[side=right]:left-[-13px] data-[side=right]:-rotate-90 data-[side=top]:bottom-[-8px] data-[side=top]:rotate-180">
               <svg width="20" height="10" viewBox="0 0 20 10" fill="none">
                 <path
                   d="M9.66437 2.60207L4.80758 6.97318C4.07308 7.63423 3.11989 8 2.13172 8H0V9H20V8H18.5349C17.5468 8 16.5936 7.63423 15.8591 6.97318L11.0023 2.60207C10.622 2.2598 10.0447 2.25979 9.66437 2.60207Z"
@@ -175,7 +175,7 @@ function PopoverContent({
               // Content base state and transitions
               "**:data-current:translate-x-0 **:data-current:opacity-100",
               "**:data-previous:translate-x-0 **:data-previous:opacity-100",
-              "**:data-current:transition-[translate,opacity,filter] **:data-current:duration-200 **:data-previous:transition-[translate,opacity,filter] **:data-previous:duration-200",
+              "**:data-current:ease-out-cubic **:data-current:transition-[translate,opacity,filter] **:data-current:duration-200 **:data-previous:ease-out-cubic **:data-previous:transition-[translate,opacity,filter] **:data-previous:duration-200",
               // Direction-aware slide animations for incoming content
               "data-[activation-direction~=left]:**:data-current:data-starting-style:-translate-x-1/2",
               "data-[activation-direction~=left]:**:data-current:data-starting-style:opacity-0",
@@ -191,6 +191,7 @@ function PopoverContent({
               "**:data-previous:data-starting-style:blur-[4px]",
               "**:data-previous:data-ending-style:blur-[4px]",
               "data-instant:transition-none",
+              "motion-reduce:**:data-current:transition-none motion-reduce:**:data-previous:transition-none",
             )}
           >
             {children}

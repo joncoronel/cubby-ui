@@ -37,11 +37,11 @@ Use `createPopoverHandle()` to link a trigger outside the `Popover` component.
 
 <ComponentPreview component="popover" example="popover-detached-trigger" />
 
-### Multiple Triggers
+### Animated Transitions
 
-Multiple triggers can share the same popover. Use the `payload` prop to render different content based on which trigger was clicked.
+Animate the popover's position, size, and content when switching between triggers. Uses `PopoverViewport` for direction-aware content transitions.
 
-<ComponentPreview component="popover" example="popover-multiple-triggers" />
+<ComponentPreview component="popover" example="popover-animated" />
 
 ### Controlled
 
@@ -154,6 +154,17 @@ const handle = createPopoverHandle<{ title: string }>();
 </ApiProp>
 
 </ApiPropsList>
+
+#### PopoverViewport
+
+A viewport container for content transitions. Use when multiple triggers share a popover with animated content switching.
+
+**Data Attributes:**
+
+- `data-activation-direction` - Space-separated horizontal (`left`/`right`) and vertical (`top`/`bottom`) direction indicating the new trigger's position relative to the previous one
+- `data-current` - Applied to the incoming content wrapper
+- `data-previous` - Applied to the outgoing content during transitions
+- `data-transitioning` - Present while transitioning between content
 
 ### Modified Defaults
 

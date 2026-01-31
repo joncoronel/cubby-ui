@@ -116,7 +116,12 @@
       "mcp__context7__resolve-library-id",
       "Skill(web-animation-design)",
       "Skill(web-animation-design:*)",
-      "Bash(pnpm run registry:build:*)"
+      "Bash(pnpm run registry:build:*)",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_evaluate",
+      "mcp__playwright__browser_close",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_run_code"
     ],
     "deny": []
   }

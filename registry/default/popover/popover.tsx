@@ -9,40 +9,50 @@ function Popover<Payload = unknown>({
   return <BasePopover.Root data-slot="popover" {...props} />;
 }
 
-function PopoverPortal({
-  ...props
-}: BasePopover.Portal.Props) {
+function PopoverPortal({ ...props }: BasePopover.Portal.Props) {
   return <BasePopover.Portal data-slot="popover-portal" {...props} />;
 }
 
-function PopoverTrigger({
-  ...props
-}: BasePopover.Trigger.Props) {
+function PopoverTrigger({ ...props }: BasePopover.Trigger.Props) {
   return <BasePopover.Trigger data-slot="popover-trigger" {...props} />;
 }
 
-function PopoverClose({
-  ...props
-}: BasePopover.Close.Props) {
+function PopoverClose({ ...props }: BasePopover.Close.Props) {
   return <BasePopover.Close data-slot="popover-close" {...props} />;
 }
 
-function PopoverArrow({
-  ...props
-}: BasePopover.Arrow.Props) {
+function PopoverArrow({ ...props }: BasePopover.Arrow.Props) {
   return <BasePopover.Arrow data-slot="popover-arrow" {...props} />;
 }
 
-function PopoverPositioner({
-  ...props
-}: BasePopover.Positioner.Props) {
+function PopoverPositioner({ ...props }: BasePopover.Positioner.Props) {
   return <BasePopover.Positioner data-slot="popover-positioner" {...props} />;
 }
 
-function PopoverBackdrop({
-  className,
-  ...props
-}: BasePopover.Backdrop.Props) {
+function PopoverViewport({ className, ...props }: BasePopover.Viewport.Props) {
+  return (
+    <BasePopover.Viewport
+      data-slot="popover-viewport"
+      className={cn("relative h-full w-full overflow-clip", className)}
+      {...props}
+    />
+  );
+}
+
+function PopoverPopup({ className, ...props }: BasePopover.Popup.Props) {
+  return (
+    <BasePopover.Popup
+      data-slot="popover-popup"
+      className={cn(
+        "bg-popover text-popover-foreground ring-border/60 max-h-(--available-height) max-w-(--available-width) origin-(--transform-origin) rounded-md shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)] ring-1",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+function PopoverBackdrop({ className, ...props }: BasePopover.Backdrop.Props) {
   return (
     <BasePopover.Backdrop
       data-slot="popover-backdrop"
@@ -56,11 +66,7 @@ function PopoverBackdrop({
   );
 }
 
-
-function PopoverTitle({
-  className,
-  ...props
-}: BasePopover.Title.Props) {
+function PopoverTitle({ className, ...props }: BasePopover.Title.Props) {
   return (
     <BasePopover.Title
       data-slot="popover-title"
@@ -113,7 +119,8 @@ function PopoverContent({
 }) {
   return (
     <PopoverPortal container={container}>
-      <PopoverPositioner
+      <BasePopover.Positioner
+        data-slot="popover-positioner"
         side={side}
         align={align}
         sideOffset={sideOffset}
@@ -123,18 +130,27 @@ function PopoverContent({
         sticky={sticky}
         positionMethod={positionMethod}
         arrowPadding={arrowPadding}
-        className={"z-50"}
+        className="z-50 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 data-instant:transition-none"
       >
         <BasePopover.Popup
           data-slot="popover-content"
           className={cn(
-            "bg-popover text-popover-foreground ring-border/60 ease-out-cubic max-h-(--available-height) w-72 max-w-(--available-width) origin-(--transform-origin) overflow-y-auto rounded-md p-4 shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)] ring-1 transition-[transform,scale,opacity] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0 motion-reduce:transition-none",
+            // Base styles
+            "bg-popover text-popover-foreground ring-border/60 relative",
+            "h-(--popup-height,auto) w-(--popup-width,auto)",
+            "max-h-(--available-height) max-w-(--available-width)",
+            "origin-(--transform-origin) overflow-hidden rounded-md shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)] ring-1",
+            // Size/opacity transitions
+            "ease-out-cubic transition-[width,height,scale,opacity] duration-150",
+            "data-starting-style:scale-95 data-starting-style:opacity-0",
+            "data-ending-style:scale-95 data-ending-style:opacity-0",
+            "motion-reduce:transition-none",
             className,
           )}
           {...props}
         >
           {arrow && (
-            <PopoverArrow className="data-[side=bottom]:top-[-8px] data-[side=left]:right-[-13px] data-[side=left]:rotate-90 data-[side=right]:left-[-13px] data-[side=right]:-rotate-90 data-[side=top]:bottom-[-8px] data-[side=top]:rotate-180">
+            <PopoverArrow className="transition-[left] data-instant:transition-none data-[side=bottom]:top-[-8px] data-[side=left]:right-[-13px] data-[side=left]:rotate-90 data-[side=right]:left-[-13px] data-[side=right]:-rotate-90 data-[side=top]:bottom-[-8px] data-[side=top]:rotate-180">
               <svg width="20" height="10" viewBox="0 0 20 10" fill="none">
                 <path
                   d="M9.66437 2.60207L4.80758 6.97318C4.07308 7.63423 3.11989 8 2.13172 8H0V9H20V8H18.5349C17.5468 8 16.5936 7.63423 15.8591 6.97318L11.0023 2.60207C10.622 2.2598 10.0447 2.25979 9.66437 2.60207Z"
@@ -147,13 +163,43 @@ function PopoverContent({
               </svg>
             </PopoverArrow>
           )}
-          {children}
+          <BasePopover.Viewport
+            data-slot="popover-viewport"
+            className={cn(
+              // Base viewport styles
+              "relative size-full overflow-clip px-4 py-4 [--viewport-padding:1rem]",
+              "not-data-transitioning:overflow-y-auto",
+              // Content width calculation (edge-to-edge minus padding and border)
+              "**:data-current:w-[calc(var(--popup-width)-2*var(--viewport-padding)-2px)]",
+              "**:data-previous:w-[calc(var(--popup-width)-2*var(--viewport-padding)-2px)]",
+              // Content base state and transitions
+              "**:data-current:translate-x-0 **:data-current:opacity-100",
+              "**:data-previous:translate-x-0 **:data-previous:opacity-100",
+              "**:data-current:transition-[translate,opacity,filter] **:data-current:duration-200 **:data-previous:transition-[translate,opacity,filter] **:data-previous:duration-200",
+              // Direction-aware slide animations for incoming content
+              "data-[activation-direction~=left]:**:data-current:data-starting-style:-translate-x-1/2",
+              "data-[activation-direction~=left]:**:data-current:data-starting-style:opacity-0",
+              "data-[activation-direction~=right]:**:data-current:data-starting-style:translate-x-1/2",
+              "data-[activation-direction~=right]:**:data-current:data-starting-style:opacity-0",
+              // Direction-aware slide animations for outgoing content
+              "data-[activation-direction~=left]:**:data-previous:data-ending-style:translate-x-1/2",
+              "data-[activation-direction~=left]:**:data-previous:data-ending-style:opacity-0",
+              "data-[activation-direction~=right]:**:data-previous:data-ending-style:-translate-x-1/2",
+              "data-[activation-direction~=right]:**:data-previous:data-ending-style:opacity-0",
+              "**:data-current:data-starting-style:blur-[4px]",
+              "**:data-current:data-ending-style:blur-[4px]",
+              "**:data-previous:data-starting-style:blur-[4px]",
+              "**:data-previous:data-ending-style:blur-[4px]",
+              "data-instant:transition-none",
+            )}
+          >
+            {children}
+          </BasePopover.Viewport>
         </BasePopover.Popup>
-      </PopoverPositioner>
+      </BasePopover.Positioner>
     </PopoverPortal>
   );
 }
-
 
 const createPopoverHandle = BasePopover.createHandle;
 
@@ -167,6 +213,8 @@ export {
   PopoverArrow,
   PopoverPositioner,
   PopoverPortal,
+  PopoverPopup,
   PopoverBackdrop,
+  PopoverViewport,
   createPopoverHandle,
 };

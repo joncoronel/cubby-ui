@@ -3,8 +3,9 @@ import { NavigationMenu as NavigationMenuPrimitive } from "@base-ui/react/naviga
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-interface NavigationMenuProps
-  extends React.ComponentProps<typeof NavigationMenuPrimitive.Root> {
+interface NavigationMenuProps extends React.ComponentProps<
+  typeof NavigationMenuPrimitive.Root
+> {
   contentProps?: Omit<
     React.ComponentProps<typeof NavigationMenuPrimitive.Positioner>,
     "render"
@@ -21,7 +22,7 @@ function NavigationMenu({
     <NavigationMenuPrimitive.Root
       data-slot="navigation-menu"
       className={cn(
-        "bg-card border-border/70 text-foreground min-w-max rounded-md border p-1 shadow-[0_2px_6px_0_oklch(0.18_0_0_/_0.05)]",
+        "bg-card border-border/70 text-foreground min-w-max rounded-xl border p-1 shadow-[0_2px_6px_0_oklch(0.18_0_0_/_0.05)]",
         className,
       )}
       {...props}
@@ -59,7 +60,7 @@ function NavigationMenuItem({
 }
 
 const navigationMenuTriggerStyle = cva(
-  "box-border flex items-center justify-center gap-1.5 h-10 px-2.5 xs:px-3 m-0 rounded-sm bg-card text-foreground font-medium text-[0.925rem] xs:text-base leading-6 select-none no-underline transition-colors duration-200 hover:bg-accent/80 hover:text-accent-foreground active:bg-accent active:text-accent-foreground data-[popup-open]:bg-accent data-[popup-open]:text-accent-foreground focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-ring focus-visible:relative",
+  "box-border flex items-center justify-center gap-1.5 h-10 px-2.5 xs:px-3 m-0 rounded-md bg-card text-foreground font-medium text-[0.925rem] xs:text-base leading-6 select-none no-underline transition-colors duration-150 hover:duration-0 hover:bg-accent/50 hover:text-accent-foreground data-[popup-open]:bg-accent/50 data-[popup-open]:text-accent-foreground focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-ring focus-visible:relative",
 );
 
 function NavigationMenuTrigger({
@@ -97,7 +98,7 @@ function NavigationMenuIcon({
 }
 
 const navigationMenuSubTriggerStyle = cva(
-  "w-full text-left relative block rounded-md p-2.5 xs:p-3 no-underline text-inherit transition-colors duration-200 hover:bg-accent/80 hover:text-accent-foreground focus-visible:relative focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-ring data-[popup-open]:bg-accent data-[popup-open]:text-accent-foreground",
+  "w-full text-left relative block rounded-md p-2.5 xs:p-3 no-underline text-inherit transition-colors duration-150 hover:duration-0 hover:bg-accent/50 hover:text-accent-foreground focus-visible:relative focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-ring data-[popup-open]:bg-accent/50 data-[popup-open]:text-accent-foreground",
 );
 
 function NavigationMenuSubTrigger({
@@ -128,7 +129,23 @@ function NavigationMenuContent({
     <NavigationMenuPrimitive.Content
       data-slot="navigation-menu-content"
       className={cn(
-        "h-full w-max max-w-[90vw] p-4 transition-[opacity,transform,translate] duration-[var(--duration)] ease-[var(--easing)] data-[ending-style]:opacity-0 data-[ending-style]:data-[activation-direction=left]:translate-x-[50%] data-[ending-style]:data-[activation-direction=right]:translate-x-[-50%] data-[starting-style]:opacity-0 data-[starting-style]:data-[activation-direction=left]:translate-x-[-50%] data-[starting-style]:data-[activation-direction=right]:translate-x-[50%]",
+        "h-full w-max max-w-[90vw] p-4",
+        // Transitions for opacity/transform/filter
+        "transition-[opacity,transform,filter,scale,translate] duration-(--duration) ease-(--easing)",
+        // Starting/ending opacity
+        "data-ending-style:opacity-0 data-starting-style:opacity-0",
+        // Direction-aware slide (starting)
+        "data-starting-style:data-[activation-direction=left]:-translate-x-1/2",
+        "data-starting-style:data-[activation-direction=right]:translate-x-1/2",
+        // Direction-aware slide (ending)
+        "data-ending-style:data-[activation-direction=left]:translate-x-1/2",
+        "data-ending-style:data-[activation-direction=right]:-translate-x-1/2",
+        // Blur effect during transitions
+        "data-ending-style:blur-[4px] data-starting-style:blur-[4px]",
+        // scale effect during transitions
+        "data-ending-style:scale-97 data-starting-style:scale-97",
+        // Motion reduce support
+        "motion-reduce:transition-none",
         className,
       )}
       {...props}
@@ -136,8 +153,9 @@ function NavigationMenuContent({
   );
 }
 
-interface NavigationMenuLinkProps
-  extends React.ComponentProps<typeof NavigationMenuPrimitive.Link> {
+interface NavigationMenuLinkProps extends React.ComponentProps<
+  typeof NavigationMenuPrimitive.Link
+> {
   /**
    * When true, applies trigger button styling for top-level navigation links
    */
@@ -155,7 +173,7 @@ function NavigationMenuLink({
       className={cn(
         standalone
           ? navigationMenuTriggerStyle()
-          : "xs:p-3 hover:bg-accent/80 hover:text-accent-foreground focus-visible:outline-ring block rounded-md p-2.5 text-inherit no-underline transition-colors duration-200 focus-visible:relative focus-visible:outline-2 focus-visible:-outline-offset-1",
+          : "xs:p-3 hover:bg-accent/50 hover:text-accent-foreground focus-visible:outline-ring block rounded-md p-2.5 text-inherit no-underline transition-colors duration-150 hover:duration-0 focus-visible:relative focus-visible:outline-2 focus-visible:-outline-offset-1",
         className,
       )}
       {...props}
@@ -198,8 +216,9 @@ function NavigationMenuArrow({
   );
 }
 
-interface NavigationMenuViewportProps
-  extends React.ComponentProps<typeof NavigationMenuPrimitive.Viewport> {
+interface NavigationMenuViewportProps extends React.ComponentProps<
+  typeof NavigationMenuPrimitive.Viewport
+> {
   contentProps?: Omit<
     React.ComponentProps<typeof NavigationMenuPrimitive.Positioner>,
     "render"
@@ -226,7 +245,7 @@ function NavigationMenuViewport({
         sideOffset={sideOffset}
         collisionPadding={collisionPadding}
         className={cn(
-          "box-border h-[var(--positioner-height)] w-[var(--positioner-width)] max-w-[var(--available-width)] transition-[top,left,right,bottom] duration-[var(--duration)] ease-[var(--easing)] before:absolute before:content-[''] data-[instant]:transition-none data-[side=bottom]:before:top-[-10px] data-[side=bottom]:before:right-0 data-[side=bottom]:before:left-0 data-[side=bottom]:before:h-2.5 data-[side=left]:before:top-0 data-[side=left]:before:right-[-10px] data-[side=left]:before:bottom-0 data-[side=left]:before:w-2.5 data-[side=right]:before:top-0 data-[side=right]:before:bottom-0 data-[side=right]:before:left-[-10px] data-[side=right]:before:w-2.5 data-[side=top]:before:right-0 data-[side=top]:before:bottom-[-10px] data-[side=top]:before:left-0 data-[side=top]:before:h-2.5",
+          "box-border h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom] duration-(--duration) ease-(--easing) before:absolute before:content-[''] data-instant:transition-none data-[side=bottom]:before:top-[-10px] data-[side=bottom]:before:right-0 data-[side=bottom]:before:left-0 data-[side=bottom]:before:h-2.5 data-[side=left]:before:top-0 data-[side=left]:before:right-[-10px] data-[side=left]:before:bottom-0 data-[side=left]:before:w-2.5 data-[side=right]:before:top-0 data-[side=right]:before:bottom-0 data-[side=right]:before:left-[-10px] data-[side=right]:before:w-2.5 data-[side=top]:before:right-0 data-[side=top]:before:bottom-[-10px] data-[side=top]:before:left-0 data-[side=top]:before:h-2.5",
           className,
         )}
         style={{
@@ -237,7 +256,7 @@ function NavigationMenuViewport({
       >
         <NavigationMenuPrimitive.Popup
           data-slot="navigation-menu-content"
-          className="data-[ending-style]:easing-[ease] bg-popover text-popover-foreground border-border/60 relative h-[var(--popup-height)] w-[var(--popup-width)] origin-[var(--transform-origin)] rounded-lg border shadow-[0_6px_20px_0_oklch(0.18_0_0_/_0.10)] transition-[opacity,transform,width,height,scale,translate] duration-[var(--duration)] ease-[var(--easing)] data-[ending-style]:scale-90 data-[ending-style]:opacity-0 data-[ending-style]:duration-150 data-[starting-style]:scale-90 data-[starting-style]:opacity-0"
+          className="bg-popover text-popover-foreground relative h-(--popup-height) w-(--popup-width) origin-(--transform-origin) overflow-hidden rounded-xl border bg-clip-padding shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)] transition-[opacity,transform,width,height,scale,translate] duration-(--duration) ease-(--easing) data-ending-style:scale-90 data-ending-style:opacity-0 data-ending-style:duration-150 data-starting-style:scale-90 data-starting-style:opacity-0"
         >
           {/* <NavigationMenuArrow /> */}
           <NavigationMenuPrimitive.Viewport
@@ -256,8 +275,9 @@ function NavigationMenuViewport({
   );
 }
 
-interface NavigationMenuSubProps
-  extends React.ComponentProps<typeof NavigationMenuPrimitive.Root> {
+interface NavigationMenuSubProps extends React.ComponentProps<
+  typeof NavigationMenuPrimitive.Root
+> {
   contentProps?: Omit<
     React.ComponentProps<typeof NavigationMenuPrimitive.Positioner>,
     "render"
@@ -296,7 +316,7 @@ function NavigationMenuSub({
           align={align}
           side={side}
           className={cn(
-            "box-border h-[var(--positioner-height)] w-[var(--positioner-width)] max-w-[var(--available-width)] transition-[top,left,right,bottom] duration-[var(--duration)] ease-[var(--easing)] before:absolute before:content-[''] data-[instant]:transition-none data-[side=bottom]:before:top-[-10px] data-[side=bottom]:before:right-0 data-[side=bottom]:before:left-0 data-[side=bottom]:before:h-2.5 data-[side=left]:before:top-0 data-[side=left]:before:right-[-10px] data-[side=left]:before:bottom-0 data-[side=left]:before:w-2.5 data-[side=right]:before:top-0 data-[side=right]:before:bottom-0 data-[side=right]:before:left-[-10px] data-[side=right]:before:w-2.5 data-[side=top]:before:right-0 data-[side=top]:before:bottom-[-10px] data-[side=top]:before:left-0 data-[side=top]:before:h-2.5",
+            "box-border h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom] duration-(--duration) ease-(--easing) before:absolute before:content-[''] data-instant:transition-none data-[side=bottom]:before:top-[-10px] data-[side=bottom]:before:right-0 data-[side=bottom]:before:left-0 data-[side=bottom]:before:h-2.5 data-[side=left]:before:top-0 data-[side=left]:before:right-[-10px] data-[side=left]:before:bottom-0 data-[side=left]:before:w-2.5 data-[side=right]:before:top-0 data-[side=right]:before:bottom-0 data-[side=right]:before:left-[-10px] data-[side=right]:before:w-2.5 data-[side=top]:before:right-0 data-[side=top]:before:bottom-[-10px] data-[side=top]:before:left-0 data-[side=top]:before:h-2.5",
             positionerClassName,
           )}
           style={{
@@ -307,7 +327,7 @@ function NavigationMenuSub({
         >
           <NavigationMenuPrimitive.Popup
             data-slot="navigation-menu-sub-content"
-            className="data-[ending-style]:easing-[ease] bg-popover text-popover-foreground border-border/60 relative h-[var(--popup-height)] w-[var(--popup-width)] origin-[var(--transform-origin)] rounded-lg border shadow-[0_6px_20px_0_oklch(0.18_0_0_/_0.10)] transition-[opacity,transform,width,height,scale,translate] duration-[var(--duration)] ease-[var(--easing)] data-[ending-style]:scale-90 data-[ending-style]:opacity-0 data-[ending-style]:duration-150 data-[starting-style]:scale-90 data-[starting-style]:opacity-0"
+            className="bg-popover text-popover-foreground relative h-(--popup-height) w-(--popup-width) origin-(--transform-origin) overflow-hidden rounded-xl border bg-clip-padding shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)] transition-[opacity,transform,width,height,scale,translate] duration-(--duration) ease-(--easing) data-ending-style:scale-90 data-ending-style:opacity-0 data-ending-style:duration-150 data-starting-style:scale-90 data-starting-style:opacity-0"
           >
             <NavigationMenuPrimitive.Viewport
               data-slot="navigation-menu-sub-viewport"

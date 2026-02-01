@@ -22,7 +22,7 @@ export default function NavigationMenuCustomStyledDropdown() {
                 </h4>
                 <NavigationMenuLink
                   href="/api"
-                  className="flex items-center gap-3 p-2 rounded-md hover:bg-accent"
+                  className="flex items-center gap-3 p-2 rounded-md hover:bg-accent/50"
                 >
                   <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center">
                     <span className="text-white text-sm font-bold">
@@ -43,7 +43,7 @@ export default function NavigationMenuCustomStyledDropdown() {
                 </h4>
                 <NavigationMenuLink
                   href="/enterprise"
-                  className="flex items-center gap-3 p-2 rounded-md hover:bg-accent"
+                  className="flex items-center gap-3 p-2 rounded-md hover:bg-accent/50"
                 >
                   <div className="w-10 h-10 rounded-lg bg-purple-500 flex items-center justify-center">
                     <span className="text-white text-sm font-bold">
@@ -78,7 +78,7 @@ export default function NavigationMenuCustomStyledDropdown() {
                   render={
                     <Link
                       href="/docs"
-                      className="flex items-center gap-3 p-2 rounded-md hover:bg-accent"
+                      className="flex items-center gap-3 p-2 rounded-md hover:bg-accent/50"
                     >
                       <div className="w-10 h-10 rounded-lg bg-green-500 flex items-center justify-center">
                         <span className="text-white text-sm font-bold">
@@ -98,7 +98,7 @@ export default function NavigationMenuCustomStyledDropdown() {
                   render={
                     <Link
                       href="/community"
-                      className="flex items-center gap-3 p-2 rounded-md hover:bg-accent"
+                      className="flex items-center gap-3 p-2 rounded-md hover:bg-accent/50"
                     >
                       <div className="w-10 h-10 rounded-lg bg-indigo-500 flex items-center justify-center">
                         <span className="text-white text-sm font-bold">

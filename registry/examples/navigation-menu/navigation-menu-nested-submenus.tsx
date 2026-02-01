@@ -18,10 +18,7 @@ export default function NavigationMenuNestedSubmenus() {
           <NavigationMenuContent>
             <ul className="grid list-none grid-cols-1 gap-0 sm:grid-cols-[12rem_12rem]">
               <li>
-                <NavigationMenuLink
-                  href="/docs/quick-start"
-                  className="block rounded-md p-2 xs:p-3 no-underline text-inherit hover:bg-accent hover:text-accent-foreground"
-                >
+                <NavigationMenuLink href="/docs/quick-start">
                   <h3 className="mb-1 text-base leading-5 font-medium">
                     Quick Start
                   </h3>
@@ -31,10 +28,7 @@ export default function NavigationMenuNestedSubmenus() {
                 </NavigationMenuLink>
               </li>
               <li>
-                <NavigationMenuLink
-                  href="/docs/accessibility"
-                  className="block rounded-md p-2 xs:p-3 no-underline text-inherit hover:bg-accent hover:text-accent-foreground"
-                >
+                <NavigationMenuLink href="/docs/accessibility">
                   <h3 className="mb-1 text-base leading-5 font-medium">
                     Accessibility
                   </h3>
@@ -45,7 +39,8 @@ export default function NavigationMenuNestedSubmenus() {
               </li>
               <li>
                 <NavigationMenuSub orientation="vertical">
-                  <NavigationMenuItem>
+                  <NavigationMenuList>
+                    <NavigationMenuItem>
                     <NavigationMenuSubTrigger>
                       <span className="mb-1 text-base leading-5 font-medium">
                         Handbook
@@ -57,10 +52,7 @@ export default function NavigationMenuNestedSubmenus() {
                     <NavigationMenuContent>
                       <ul className="flex max-w-[400px] flex-col justify-center">
                         <li>
-                          <NavigationMenuLink
-                            href="/handbook/styling"
-                            className="block rounded-md p-2 xs:p-3 no-underline text-inherit hover:bg-accent hover:text-accent-foreground"
-                          >
+                          <NavigationMenuLink href="/handbook/styling">
                             <h3 className="mb-1 text-base leading-5 font-medium">
                               Styling
                             </h3>
@@ -70,10 +62,7 @@ export default function NavigationMenuNestedSubmenus() {
                           </NavigationMenuLink>
                         </li>
                         <li>
-                          <NavigationMenuLink
-                            href="/handbook/animation"
-                            className="block rounded-md p-2 xs:p-3 no-underline text-inherit hover:bg-accent hover:text-accent-foreground"
-                          >
+                          <NavigationMenuLink href="/handbook/animation">
                             <h3 className="mb-1 text-base leading-5 font-medium">
                               Animation
                             </h3>
@@ -83,10 +72,7 @@ export default function NavigationMenuNestedSubmenus() {
                           </NavigationMenuLink>
                         </li>
                         <li>
-                          <NavigationMenuLink
-                            href="/handbook/composition"
-                            className="block rounded-md p-2 xs:p-3 no-underline text-inherit hover:bg-accent hover:text-accent-foreground"
-                          >
+                          <NavigationMenuLink href="/handbook/composition">
                             <h3 className="mb-1 text-base leading-5 font-medium">
                               Composition
                             </h3>
@@ -97,7 +83,8 @@ export default function NavigationMenuNestedSubmenus() {
                         </li>
                       </ul>
                     </NavigationMenuContent>
-                  </NavigationMenuItem>
+                    </NavigationMenuItem>
+                  </NavigationMenuList>
                 </NavigationMenuSub>
               </li>
             </ul>

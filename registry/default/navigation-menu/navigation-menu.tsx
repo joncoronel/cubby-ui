@@ -3,19 +3,37 @@ import { NavigationMenu as NavigationMenuPrimitive } from "@base-ui/react/naviga
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-interface NavigationMenuProps extends React.ComponentProps<
-  typeof NavigationMenuPrimitive.Root
-> {
-  contentProps?: Omit<
-    React.ComponentProps<typeof NavigationMenuPrimitive.Positioner>,
-    "render"
-  >;
+interface NavigationMenuProps
+  extends React.ComponentProps<typeof NavigationMenuPrimitive.Root> {
+  side?: React.ComponentProps<typeof NavigationMenuPrimitive.Positioner>["side"];
+  sideOffset?: React.ComponentProps<
+    typeof NavigationMenuPrimitive.Positioner
+  >["sideOffset"];
+  align?: React.ComponentProps<
+    typeof NavigationMenuPrimitive.Positioner
+  >["align"];
+  alignOffset?: React.ComponentProps<
+    typeof NavigationMenuPrimitive.Positioner
+  >["alignOffset"];
+  collisionPadding?: React.ComponentProps<
+    typeof NavigationMenuPrimitive.Positioner
+  >["collisionPadding"];
+  collisionBoundary?: React.ComponentProps<
+    typeof NavigationMenuPrimitive.Positioner
+  >["collisionBoundary"];
+  arrow?: boolean;
 }
 
 function NavigationMenu({
   className,
   children,
-  contentProps,
+  side,
+  sideOffset = 10,
+  align,
+  alignOffset,
+  collisionPadding = { top: 5, bottom: 5, left: 20, right: 20 },
+  collisionBoundary,
+  arrow = false,
   ...props
 }: NavigationMenuProps) {
   return (
@@ -28,7 +46,15 @@ function NavigationMenu({
       {...props}
     >
       {children}
-      <NavigationMenuViewport contentProps={contentProps} />
+      <NavigationMenuViewport
+        side={side}
+        sideOffset={sideOffset}
+        align={align}
+        alignOffset={alignOffset}
+        collisionPadding={collisionPadding}
+        collisionBoundary={collisionBoundary}
+        arrow={arrow}
+      />
     </NavigationMenuPrimitive.Root>
   );
 }
@@ -216,55 +242,63 @@ function NavigationMenuArrow({
   );
 }
 
-interface NavigationMenuViewportProps extends React.ComponentProps<
-  typeof NavigationMenuPrimitive.Viewport
-> {
-  contentProps?: Omit<
-    React.ComponentProps<typeof NavigationMenuPrimitive.Positioner>,
-    "render"
-  >;
+interface NavigationMenuViewportProps
+  extends React.ComponentProps<typeof NavigationMenuPrimitive.Viewport> {
+  side?: React.ComponentProps<typeof NavigationMenuPrimitive.Positioner>["side"];
+  sideOffset?: React.ComponentProps<
+    typeof NavigationMenuPrimitive.Positioner
+  >["sideOffset"];
+  align?: React.ComponentProps<
+    typeof NavigationMenuPrimitive.Positioner
+  >["align"];
+  alignOffset?: React.ComponentProps<
+    typeof NavigationMenuPrimitive.Positioner
+  >["alignOffset"];
+  collisionPadding?: React.ComponentProps<
+    typeof NavigationMenuPrimitive.Positioner
+  >["collisionPadding"];
+  collisionBoundary?: React.ComponentProps<
+    typeof NavigationMenuPrimitive.Positioner
+  >["collisionBoundary"];
+  arrow?: boolean;
 }
 
 function NavigationMenuViewport({
-  className: viewportClassName,
+  className,
   children,
-  contentProps,
+  side,
+  sideOffset,
+  align,
+  alignOffset,
+  collisionPadding,
+  collisionBoundary,
+  arrow = false,
   ...props
 }: NavigationMenuViewportProps) {
-  const {
-    sideOffset = 10,
-    collisionPadding = { top: 5, bottom: 5, left: 20, right: 20 },
-    className,
-    ...rest
-  } = contentProps ?? {};
-
   return (
     <NavigationMenuPortal>
       <NavigationMenuPrimitive.Positioner
         data-slot="navigation-menu-positioner"
+        side={side}
         sideOffset={sideOffset}
+        align={align}
+        alignOffset={alignOffset}
         collisionPadding={collisionPadding}
-        className={cn(
-          "box-border h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom] duration-(--duration) ease-(--easing) before:absolute before:content-[''] data-instant:transition-none data-[side=bottom]:before:top-[-10px] data-[side=bottom]:before:right-0 data-[side=bottom]:before:left-0 data-[side=bottom]:before:h-2.5 data-[side=left]:before:top-0 data-[side=left]:before:right-[-10px] data-[side=left]:before:bottom-0 data-[side=left]:before:w-2.5 data-[side=right]:before:top-0 data-[side=right]:before:bottom-0 data-[side=right]:before:left-[-10px] data-[side=right]:before:w-2.5 data-[side=top]:before:right-0 data-[side=top]:before:bottom-[-10px] data-[side=top]:before:left-0 data-[side=top]:before:h-2.5",
-          className,
-        )}
+        collisionBoundary={collisionBoundary}
+        className="box-border h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom] duration-(--duration) ease-(--easing) before:absolute before:content-[''] data-instant:transition-none data-[side=bottom]:before:top-[-10px] data-[side=bottom]:before:right-0 data-[side=bottom]:before:left-0 data-[side=bottom]:before:h-2.5 data-[side=left]:before:top-0 data-[side=left]:before:right-[-10px] data-[side=left]:before:bottom-0 data-[side=left]:before:w-2.5 data-[side=right]:before:top-0 data-[side=right]:before:bottom-0 data-[side=right]:before:left-[-10px] data-[side=right]:before:w-2.5 data-[side=top]:before:right-0 data-[side=top]:before:bottom-[-10px] data-[side=top]:before:left-0 data-[side=top]:before:h-2.5"
         style={{
           ["--duration" as string]: "0.35s",
           ["--easing" as string]: "cubic-bezier(0.22, 1, 0.36, 1)",
         }}
-        {...rest}
       >
         <NavigationMenuPrimitive.Popup
           data-slot="navigation-menu-content"
           className="bg-popover text-popover-foreground relative h-(--popup-height) w-(--popup-width) origin-(--transform-origin) overflow-hidden rounded-xl border bg-clip-padding shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)] transition-[opacity,transform,width,height,scale,translate] duration-(--duration) ease-(--easing) data-ending-style:scale-90 data-ending-style:opacity-0 data-ending-style:duration-150 data-starting-style:scale-90 data-starting-style:opacity-0"
         >
-          {/* <NavigationMenuArrow /> */}
+          {arrow && <NavigationMenuArrow />}
           <NavigationMenuPrimitive.Viewport
             data-slot="navigation-menu-viewport"
-            className={cn(
-              "relative h-full w-full overflow-hidden",
-              viewportClassName,
-            )}
+            className={cn("relative h-full w-full overflow-hidden", className)}
             {...props}
           >
             {children}
@@ -275,31 +309,32 @@ function NavigationMenuViewport({
   );
 }
 
-interface NavigationMenuSubProps extends React.ComponentProps<
-  typeof NavigationMenuPrimitive.Root
-> {
-  contentProps?: Omit<
-    React.ComponentProps<typeof NavigationMenuPrimitive.Positioner>,
-    "render"
-  >;
+interface NavigationMenuSubProps
+  extends React.ComponentProps<typeof NavigationMenuPrimitive.Root> {
+  side?: React.ComponentProps<typeof NavigationMenuPrimitive.Positioner>["side"];
+  sideOffset?: React.ComponentProps<
+    typeof NavigationMenuPrimitive.Positioner
+  >["sideOffset"];
+  align?: React.ComponentProps<
+    typeof NavigationMenuPrimitive.Positioner
+  >["align"];
+  alignOffset?: React.ComponentProps<
+    typeof NavigationMenuPrimitive.Positioner
+  >["alignOffset"];
+  arrow?: boolean;
 }
 
 function NavigationMenuSub({
   className,
   children,
-  contentProps,
   orientation = "vertical",
+  side = "right",
+  sideOffset = 24,
+  align = "end",
+  alignOffset = -24,
+  arrow = false,
   ...props
 }: NavigationMenuSubProps) {
-  const {
-    sideOffset = 24,
-    alignOffset = -24,
-    align = "end",
-    side = "right",
-    className: positionerClassName,
-    ...rest
-  } = contentProps ?? {};
-
   return (
     <NavigationMenuPrimitive.Root
       data-slot="navigation-menu-sub"
@@ -315,20 +350,17 @@ function NavigationMenuSub({
           alignOffset={alignOffset}
           align={align}
           side={side}
-          className={cn(
-            "box-border h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom] duration-(--duration) ease-(--easing) before:absolute before:content-[''] data-instant:transition-none data-[side=bottom]:before:top-[-10px] data-[side=bottom]:before:right-0 data-[side=bottom]:before:left-0 data-[side=bottom]:before:h-2.5 data-[side=left]:before:top-0 data-[side=left]:before:right-[-10px] data-[side=left]:before:bottom-0 data-[side=left]:before:w-2.5 data-[side=right]:before:top-0 data-[side=right]:before:bottom-0 data-[side=right]:before:left-[-10px] data-[side=right]:before:w-2.5 data-[side=top]:before:right-0 data-[side=top]:before:bottom-[-10px] data-[side=top]:before:left-0 data-[side=top]:before:h-2.5",
-            positionerClassName,
-          )}
+          className="box-border h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom] duration-(--duration) ease-(--easing) before:absolute before:content-[''] data-instant:transition-none data-[side=bottom]:before:top-[-10px] data-[side=bottom]:before:right-0 data-[side=bottom]:before:left-0 data-[side=bottom]:before:h-2.5 data-[side=left]:before:top-0 data-[side=left]:before:right-[-10px] data-[side=left]:before:bottom-0 data-[side=left]:before:w-2.5 data-[side=right]:before:top-0 data-[side=right]:before:bottom-0 data-[side=right]:before:left-[-10px] data-[side=right]:before:w-2.5 data-[side=top]:before:right-0 data-[side=top]:before:bottom-[-10px] data-[side=top]:before:left-0 data-[side=top]:before:h-2.5"
           style={{
             ["--duration" as string]: "0.35s",
             ["--easing" as string]: "cubic-bezier(0.22, 1, 0.36, 1)",
           }}
-          {...rest}
         >
           <NavigationMenuPrimitive.Popup
             data-slot="navigation-menu-sub-content"
             className="bg-popover text-popover-foreground relative h-(--popup-height) w-(--popup-width) origin-(--transform-origin) overflow-hidden rounded-xl border bg-clip-padding shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)] transition-[opacity,transform,width,height,scale,translate] duration-(--duration) ease-(--easing) data-ending-style:scale-90 data-ending-style:opacity-0 data-ending-style:duration-150 data-starting-style:scale-90 data-starting-style:opacity-0"
           >
+            {arrow && <NavigationMenuArrow />}
             <NavigationMenuPrimitive.Viewport
               data-slot="navigation-menu-sub-viewport"
               className="relative h-full w-full overflow-hidden"

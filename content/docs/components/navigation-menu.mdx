@@ -49,72 +49,84 @@ The Navigation Menu component is built on top of [Base UI's Navigation Menu](htt
 
 For the complete Base UI API, see the [Base UI Navigation Menu documentation](https://base-ui.com/react/components/navigation-menu).
 
-### Custom Props
+### Props
 
 #### NavigationMenu
 
+Root navigation menu container. Composes `NavigationMenu.Root` with an internal viewport. Props are forwarded to `NavigationMenu.Root`.
+
 <ApiPropsList>
 
-<ApiProp
-  name="contentProps"
-  fullType="Omit<NavigationMenuPrimitive.Positioner.Props, 'render'>"
-  simpleType="object"
->
-  Props to pass to the underlying Positioner component for positioning the navigation menu viewport. Allows configuration of positioning behavior without accessing internal components. Custom prop not available in Base UI.
+<ApiProp name="sideOffset" fullType="number" defaultValue="10">
+  Distance between the trigger and the popup. Base UI defaults to `0`.
+</ApiProp>
+
+<ApiProp name="collisionPadding" fullType="number | Padding" defaultValue="{ top: 5, bottom: 5, left: 20, right: 20 }">
+  Space between the popup and viewport edges.
+</ApiProp>
+
+<ApiProp name="side" fullType='"top" | "bottom" | "left" | "right"'>
+  Preferred side for the popup to appear.
+</ApiProp>
+
+<ApiProp name="align" fullType='"start" | "center" | "end"'>
+  Alignment of the popup relative to the trigger.
+</ApiProp>
+
+<ApiProp name="alignOffset" fullType="number">
+  Offset from the aligned edge.
+</ApiProp>
+
+<ApiProp name="collisionBoundary" fullType="Element | Element[]">
+  Element(s) to use as collision boundaries.
+</ApiProp>
+
+<ApiProp name="arrow" fullType="boolean" defaultValue="false">
+  Shows an arrow pointing to the trigger.
 </ApiProp>
 
 </ApiPropsList>
 
 #### NavigationMenuLink
 
-<ApiPropsList>
-
-<ApiProp
-  name="standalone"
-  fullType="boolean"
-  defaultValue="false"
->
-  When true, applies trigger button styling to make the link appear as a top-level navigation item rather than a menu link. Custom prop not available in Base UI.
-</ApiProp>
-
-</ApiPropsList>
-
-#### NavigationMenuViewport
+Navigation link element. Wraps `NavigationMenu.Link`.
 
 <ApiPropsList>
 
-<ApiProp
-  name="contentProps"
-  fullType="Omit<NavigationMenuPrimitive.Positioner.Props, 'render'>"
-  simpleType="object"
->
-  Props to pass to the underlying Positioner for viewport positioning. Custom prop not available in Base UI.
+<ApiProp name="standalone" fullType="boolean" defaultValue="false">
+  Applies trigger button styling to make the link appear as a top-level navigation item.
 </ApiProp>
 
 </ApiPropsList>
 
 #### NavigationMenuSub
 
+Nested submenu container for multi-level navigation. Composes `NavigationMenu.Root` with internal positioning. Props are forwarded to `NavigationMenu.Root`.
+
 <ApiPropsList>
 
-<ApiProp
-  name="contentProps"
-  fullType="Omit<NavigationMenuPrimitive.Positioner.Props, 'render'>"
-  simpleType="object"
->
-  Props to pass to the underlying Positioner for submenu positioning. Custom prop not available in Base UI.
+<ApiProp name="side" fullType='"top" | "bottom" | "left" | "right"' defaultValue='"right"'>
+  Preferred side for the submenu to appear.
+</ApiProp>
+
+<ApiProp name="sideOffset" fullType="number" defaultValue="24">
+  Distance between the trigger and the submenu. Base UI defaults to `0`.
+</ApiProp>
+
+<ApiProp name="align" fullType='"start" | "center" | "end"' defaultValue='"end"'>
+  Alignment of the submenu relative to the trigger.
+</ApiProp>
+
+<ApiProp name="alignOffset" fullType="number" defaultValue="-24">
+  Offset from the aligned edge.
+</ApiProp>
+
+<ApiProp name="arrow" fullType="boolean" defaultValue="false">
+  Shows an arrow pointing to the trigger.
+</ApiProp>
+
+<ApiProp name="orientation" fullType='"horizontal" | "vertical"' defaultValue='"vertical"'>
+  Navigation orientation. Base UI defaults to `"horizontal"`.
 </ApiProp>
 
 </ApiPropsList>
-
-### Modified Defaults
-
-Our implementation changes the following Base UI prop defaults:
-
-- **NavigationMenuViewport Positioner**: `sideOffset` defaults to `10` (Base UI defaults to `0`)
-- **NavigationMenuViewport Positioner**: `collisionPadding` defaults to `{ top: 5, bottom: 5, left: 20, right: 20 }`
-- **NavigationMenuSub Positioner**: `sideOffset` defaults to `24` (Base UI defaults to `0`)
-- **NavigationMenuSub Positioner**: `alignOffset` defaults to `-24`
-- **NavigationMenuSub Positioner**: `align` defaults to `'end'`
-- **NavigationMenuSub Positioner**: `side` defaults to `'right'`
-- **NavigationMenuSub**: `orientation` defaults to `'vertical'`

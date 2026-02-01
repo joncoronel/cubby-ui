@@ -9,55 +9,60 @@ import {
 } from "@/registry/default/tooltip/tooltip";
 import { Button } from "@/registry/default/button/button";
 import { ButtonGroup } from "@/registry/default/button-group/button-group";
-import { FileText, ImageIcon, Video } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  TextAlignLeftIcon,
+  TextAlignCenterIcon,
+  TextAlignRightIcon,
+} from "@hugeicons/core-free-icons";
 
 interface TooltipPayload {
-  title: string;
-  description: string;
+  label: string;
+  shortcut: string;
 }
 
-const animatedTooltip = createTooltipHandle<TooltipPayload>();
+const alignmentTooltip = createTooltipHandle<TooltipPayload>();
 
 export default function TooltipAnimated() {
   return (
     <TooltipProvider>
       <ButtonGroup>
         <TooltipTrigger
-          handle={animatedTooltip}
-          payload={{ title: "Documents", description: "View your documents" }}
+          handle={alignmentTooltip}
+          payload={{ label: "Align left", shortcut: "⌘⇧L" }}
           render={<Button variant="outline" size="icon" />}
         >
-          <FileText className="size-4" />
-          <span className="sr-only">Documents</span>
+          <HugeiconsIcon icon={TextAlignLeftIcon} size={16} strokeWidth={2} />
+          <span className="sr-only">Align left</span>
         </TooltipTrigger>
 
         <TooltipTrigger
-          handle={animatedTooltip}
-          payload={{ title: "Images", description: "Browse your images" }}
+          handle={alignmentTooltip}
+          payload={{ label: "Align center", shortcut: "⌘⇧E" }}
           render={<Button variant="outline" size="icon" />}
         >
-          <ImageIcon className="size-4" />
-          <span className="sr-only">Images</span>
+          <HugeiconsIcon icon={TextAlignCenterIcon} size={16} strokeWidth={2} />
+          <span className="sr-only">Align center</span>
         </TooltipTrigger>
 
         <TooltipTrigger
-          handle={animatedTooltip}
-          payload={{ title: "Videos", description: "Watch your videos" }}
+          handle={alignmentTooltip}
+          payload={{ label: "Align right", shortcut: "⌘⇧R" }}
           render={<Button variant="outline" size="icon" />}
         >
-          <Video className="size-4" />
-          <span className="sr-only">Videos</span>
+          <HugeiconsIcon icon={TextAlignRightIcon} size={16} strokeWidth={2} />
+          <span className="sr-only">Align right</span>
         </TooltipTrigger>
       </ButtonGroup>
-      <Tooltip handle={animatedTooltip}>
+      <Tooltip handle={alignmentTooltip}>
         {({ payload }) => (
           <TooltipContent arrow={false}>
             {payload && (
-              <div className="text-center">
-                <p className="font-medium">{payload.title}</p>
-                <p className="text-muted-foreground text-xs">
-                  {payload.description}
-                </p>
+              <div className="flex items-center gap-2">
+                <span>{payload.label}</span>
+                <kbd className="bg-muted text-muted-foreground rounded px-1.5 py-0.5 text-[10px] font-medium">
+                  {payload.shortcut}
+                </kbd>
               </div>
             )}
           </TooltipContent>

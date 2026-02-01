@@ -7,7 +7,8 @@ import {
   createTooltipHandle,
 } from "@/registry/default/tooltip/tooltip";
 import { Button } from "@/registry/default/button/button";
-import { Info } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { InformationCircleIcon } from "@hugeicons/core-free-icons";
 
 const infoTooltip = createTooltipHandle();
 
@@ -18,7 +19,7 @@ export default function TooltipDetachedTrigger() {
         handle={infoTooltip}
         render={<Button variant="outline" size="icon" />}
       >
-        <Info className="size-4" />
+        <HugeiconsIcon icon={InformationCircleIcon} size={16} strokeWidth={2} />
         <span className="sr-only">More information</span>
       </TooltipTrigger>
 

@@ -11,7 +11,8 @@ import {
 } from "@/registry/default/tooltip/tooltip";
 import { Button } from "@/registry/default/button/button";
 import { ButtonGroup } from "@/registry/default/button-group/button-group";
-import { HelpCircle } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { HelpCircleIcon } from "@hugeicons/core-free-icons";
 
 const controlledTooltip = createTooltipHandle();
 
@@ -36,7 +37,7 @@ export default function TooltipControlled() {
             handle={controlledTooltip}
             render={<Button variant="outline" size="icon" />}
           >
-            <HelpCircle className="size-4" />
+            <HugeiconsIcon icon={HelpCircleIcon} size={16} strokeWidth={2} />
             <span className="sr-only">Help 1</span>
           </TooltipTrigger>
 
@@ -45,7 +46,7 @@ export default function TooltipControlled() {
             handle={controlledTooltip}
             render={<Button variant="outline" size="icon" />}
           >
-            <HelpCircle className="size-4" />
+            <HugeiconsIcon icon={HelpCircleIcon} size={16} strokeWidth={2} />
             <span className="sr-only">Help 2</span>
           </TooltipTrigger>
 
@@ -54,7 +55,7 @@ export default function TooltipControlled() {
             handle={controlledTooltip}
             render={<Button variant="outline" size="icon" />}
           >
-            <HelpCircle className="size-4" />
+            <HugeiconsIcon icon={HelpCircleIcon} size={16} strokeWidth={2} />
             <span className="sr-only">Help 3</span>
           </TooltipTrigger>
         </ButtonGroup>

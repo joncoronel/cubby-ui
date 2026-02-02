@@ -18,8 +18,8 @@ function CheckmarkIcon({ className }: { className?: string }) {
       strokeLinejoin="round"
       className={cn(
         // Opacity + scale crossfade: visible when checked (not indeterminate), hidden otherwise
-        "opacity-0 scale-90 in-data-checked:not-in-data-indeterminate:opacity-100 in-data-checked:not-in-data-indeterminate:scale-100",
-        "transition-[opacity,filter,transform,scale] duration-150 ease-out-cubic motion-reduce:transition-none",
+        "scale-90 opacity-0 in-data-checked:not-in-data-indeterminate:scale-100 in-data-checked:not-in-data-indeterminate:opacity-100",
+        "ease-out-cubic transition-[opacity,filter,transform,scale] duration-150 motion-reduce:transition-none",
         // Subtle blur during transition for smoother crossfade
         "in-data-indeterminate:blur-[2px]",
         className,
@@ -30,7 +30,7 @@ function CheckmarkIcon({ className }: { className?: string }) {
         style={{
           strokeDasharray: 22,
         }}
-        className="in-data-checked:not-in-data-indeterminate:[stroke-dashoffset:0] in-data-unchecked:[stroke-dashoffset:22] in-data-indeterminate:[stroke-dashoffset:22] transition-[stroke-dashoffset] duration-150 ease-out-cubic in-data-checked:delay-15 motion-reduce:transition-none"
+        className="ease-out-cubic transition-[stroke-dashoffset] duration-150 in-data-checked:delay-15 in-data-checked:not-in-data-indeterminate:[stroke-dashoffset:0] in-data-indeterminate:[stroke-dashoffset:22] in-data-unchecked:[stroke-dashoffset:22] motion-reduce:transition-none"
       />
     </svg>
   );
@@ -49,8 +49,8 @@ function MinusIcon({ className }: { className?: string }) {
       strokeLinejoin="round"
       className={cn(
         // Opacity + scale crossfade: visible when indeterminate, hidden otherwise
-        "opacity-0 scale-90 in-data-indeterminate:opacity-100 in-data-indeterminate:scale-100",
-        "transition-[opacity,filter,transform,scale] duration-150 ease-out-cubic motion-reduce:transition-none",
+        "scale-90 opacity-0 in-data-indeterminate:scale-100 in-data-indeterminate:opacity-100",
+        "ease-out-cubic transition-[opacity,filter,transform,scale] duration-150 motion-reduce:transition-none",
         // Subtle blur when transitioning away from indeterminate
         "not-in-data-indeterminate:blur-[2px]",
         className,
@@ -61,7 +61,7 @@ function MinusIcon({ className }: { className?: string }) {
         style={{
           strokeDasharray: 16,
         }}
-        className="in-data-indeterminate:[stroke-dashoffset:0] not-in-data-indeterminate:[stroke-dashoffset:16] transition-[stroke-dashoffset] duration-150 ease-out-cubic in-data-indeterminate:delay-15 motion-reduce:transition-none"
+        className="ease-out-cubic transition-[stroke-dashoffset] duration-150 not-in-data-indeterminate:[stroke-dashoffset:16] in-data-indeterminate:delay-15 in-data-indeterminate:[stroke-dashoffset:0] motion-reduce:transition-none"
       />
     </svg>
   );
@@ -75,16 +75,16 @@ function Checkbox({
     <BaseCheckbox.Root
       data-slot="checkbox"
       className={cn(
-        "peer relative bg-card bg-clip-padding text-primary-foreground aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid aria-invalid:text-destructive focus-visible:outline-ring/50 flex size-4 items-center justify-center rounded-xs border outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-150 ease-out-cubic outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 data-disabled:cursor-not-allowed data-disabled:opacity-60 motion-reduce:transition-none",
+        "peer bg-card text-primary-foreground aria-invalid:outline-destructive/50 aria-invalid:text-destructive focus-visible:outline-ring/50 ease-out-cubic relative flex size-4.5 items-center justify-center rounded-xs border bg-clip-padding outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-150 outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid data-disabled:cursor-not-allowed data-disabled:opacity-60 motion-reduce:transition-none sm:size-4",
         // Background scale animation using ::before pseudo-element
-        "before:absolute before:-inset-px before:rounded-xs before:bg-primary before:content-['']",
-        "before:scale-80 before:opacity-0 before:transition-[transform,opacity,scale] before:duration-150 before:ease-out-cubic before:origin-center before:transform-gpu before:will-change-transform motion-reduce:before:transition-none",
+        "before:bg-primary before:absolute before:-inset-px before:rounded-xs before:content-['']",
+        "before:ease-out-cubic before:origin-center before:scale-80 before:transform-gpu before:opacity-0 before:transition-[transform,opacity,scale] before:duration-150 before:will-change-transform motion-reduce:before:transition-none",
         "data-checked:before:scale-100 data-checked:before:opacity-100",
         "data-indeterminate:before:scale-100 data-indeterminate:before:opacity-100",
         // Inset shadow using ::after pseudo-element (sits inside border)
         "after:pointer-events-none after:absolute after:inset-0 after:rounded-[calc(var(--radius-xs)-1px)] after:content-['']",
         "after:shadow-inset dark:after:shadow-inset-highlight",
-        "after:transition-opacity after:duration-150 after:ease-out-cubic",
+        "after:ease-out-cubic after:transition-opacity after:duration-150",
         "data-checked:after:opacity-0 data-indeterminate:after:opacity-0",
         className,
       )}

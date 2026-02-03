@@ -1578,6 +1578,23 @@ function generateInitItem(cssContent: {
   };
 }
 
+// Generate "all" registry item that installs everything
+function generateAllItem(componentNames: string[]) {
+  return {
+    name: "all",
+    type: "registry:block",
+    title: "All Components",
+    description:
+      "Install all Cubby UI components and theme with a single command.",
+    author: "Cubby UI",
+    files: [],
+    registryDependencies: [
+      "@cubby-ui/init",
+      ...componentNames.map((name) => `@cubby-ui/${name}`),
+    ],
+  };
+}
+
 // Main sync function
 async function syncRegistry() {
   console.log("Starting registry sync...");
@@ -1613,29 +1630,34 @@ async function syncRegistry() {
     // 5. Generate init item with extracted CSS content
     const initItem = generateInitItem(cssContent);
 
-    // 6. Update items while preserving other fields and adding init item
+    // 6. Generate "all" item with all component dependencies
+    const allItem = generateAllItem(componentItems.map((item) => item.name));
+
+    // 7. Update items while preserving other fields and adding init/all items
     const updatedRegistry = {
       ...existingRegistry,
-      items: [...items, initItem].sort((a, b) => a.name.localeCompare(b.name)),
+      items: [...items, initItem, allItem].sort((a, b) =>
+        a.name.localeCompare(b.name),
+      ),
     };
 
-    // 7. Validate against schema
+    // 8. Validate against schema
     const validated = registrySchema.parse(updatedRegistry);
 
-    // 8. Write updated registry.json
+    // 9. Write updated registry.json
     await fs.writeFile(
       REGISTRY_JSON_PATH,
       JSON.stringify(validated, null, 2) + "\n",
     );
     console.log("✓ Updated registry.json with init item");
 
-    // 9. Collect example data for unified registry
+    // 10. Collect example data for unified registry
     const exampleData = await collectExampleData();
 
-    // 10. Generate unified registry (replaces separate files)
+    // 11. Generate unified registry (replaces separate files)
     await generateUnifiedRegistry(items, exampleData, anatomyMap);
 
-    // 11. Validate consistency
+    // 12. Validate consistency
     const validationErrors = validateComponentConsistency(
       items,
       exampleData,
@@ -1648,7 +1670,7 @@ async function syncRegistry() {
       console.log("✓ All components validated successfully");
     }
 
-    // 12. Generate static JSON files for each component (for production deployment) - replaced by shadcn build
+    // 13. Generate static JSON files for each component (for production deployment) - replaced by shadcn build
     // await generateStaticComponentFiles([...items, initItem]);
 
     console.log("\n✅ Registry sync completed successfully!");

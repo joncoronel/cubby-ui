@@ -14,7 +14,7 @@ export default function NavigationMenuWithDirectLinks() {
         <NavigationMenuItem>
           <NavigationMenuTrigger>Features</NavigationMenuTrigger>
           <NavigationMenuContent>
-            <ul className="grid w-[400px] gap-3">
+            <ul className="grid max-w-[400px] gap-3">
               <li>
                 <NavigationMenuLink href="/features/analytics">
                   <div className="text-sm font-medium leading-none">Analytics</div>
@@ -38,7 +38,7 @@ export default function NavigationMenuWithDirectLinks() {
         <NavigationMenuItem>
           <NavigationMenuTrigger>Company</NavigationMenuTrigger>
           <NavigationMenuContent>
-            <ul className="grid w-[200px] gap-3">
+            <ul className="grid max-w-[200px] gap-3">
               <li>
                 <NavigationMenuLink href="/about">About</NavigationMenuLink>
               </li>

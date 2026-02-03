@@ -3,9 +3,12 @@ import { NavigationMenu as NavigationMenuPrimitive } from "@base-ui/react/naviga
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-interface NavigationMenuProps
-  extends React.ComponentProps<typeof NavigationMenuPrimitive.Root> {
-  side?: React.ComponentProps<typeof NavigationMenuPrimitive.Positioner>["side"];
+interface NavigationMenuProps extends React.ComponentProps<
+  typeof NavigationMenuPrimitive.Root
+> {
+  side?: React.ComponentProps<
+    typeof NavigationMenuPrimitive.Positioner
+  >["side"];
   sideOffset?: React.ComponentProps<
     typeof NavigationMenuPrimitive.Positioner
   >["sideOffset"];
@@ -155,7 +158,7 @@ function NavigationMenuContent({
     <NavigationMenuPrimitive.Content
       data-slot="navigation-menu-content"
       className={cn(
-        "h-full w-max max-w-[90vw] p-4",
+        "h-full w-[calc(100vw-2.5rem)] p-4 sm:w-max",
         // Transitions for opacity/transform/filter
         "transition-[opacity,transform,filter,scale,translate] duration-(--duration) ease-(--easing)",
         // Starting/ending opacity
@@ -242,9 +245,12 @@ function NavigationMenuArrow({
   );
 }
 
-interface NavigationMenuViewportProps
-  extends React.ComponentProps<typeof NavigationMenuPrimitive.Viewport> {
-  side?: React.ComponentProps<typeof NavigationMenuPrimitive.Positioner>["side"];
+interface NavigationMenuViewportProps extends React.ComponentProps<
+  typeof NavigationMenuPrimitive.Viewport
+> {
+  side?: React.ComponentProps<
+    typeof NavigationMenuPrimitive.Positioner
+  >["side"];
   sideOffset?: React.ComponentProps<
     typeof NavigationMenuPrimitive.Positioner
   >["sideOffset"];
@@ -309,9 +315,12 @@ function NavigationMenuViewport({
   );
 }
 
-interface NavigationMenuSubProps
-  extends React.ComponentProps<typeof NavigationMenuPrimitive.Root> {
-  side?: React.ComponentProps<typeof NavigationMenuPrimitive.Positioner>["side"];
+interface NavigationMenuSubProps extends React.ComponentProps<
+  typeof NavigationMenuPrimitive.Root
+> {
+  side?: React.ComponentProps<
+    typeof NavigationMenuPrimitive.Positioner
+  >["side"];
   sideOffset?: React.ComponentProps<
     typeof NavigationMenuPrimitive.Positioner
   >["sideOffset"];

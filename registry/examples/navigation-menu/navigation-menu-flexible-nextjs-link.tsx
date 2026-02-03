@@ -71,7 +71,7 @@ export default function NavigationMenuFlexibleNextjsLink() {
         <NavigationMenuItem>
           <NavigationMenuTrigger>Components</NavigationMenuTrigger>
           <NavigationMenuContent>
-            <ul className="grid w-[400px] gap-3 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+            <ul className="grid max-w-[600px] gap-3 sm:grid-cols-2">
               <ListItem href="/components/button" title="Button">
                 Trigger actions and events with button components.
               </ListItem>

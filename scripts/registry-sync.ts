@@ -1578,20 +1578,16 @@ function generateInitItem(cssContent: {
   };
 }
 
-// Generate "all" registry item that installs everything
+// Generate "all" registry item that installs all components
 function generateAllItem(componentNames: string[]) {
   return {
     name: "all",
     type: "registry:block",
     title: "All Components",
-    description:
-      "Install all Cubby UI components and theme with a single command.",
+    description: "Install all Cubby UI components with a single command.",
     author: "Cubby UI",
     files: [],
-    registryDependencies: [
-      "@cubby-ui/init",
-      ...componentNames.map((name) => `@cubby-ui/${name}`),
-    ],
+    registryDependencies: componentNames.map((name) => `@cubby-ui/${name}`),
   };
 }
 

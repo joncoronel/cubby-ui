@@ -58,11 +58,10 @@
       "name": "all",
       "type": "registry:block",
       "title": "All Components",
-      "description": "Install all Cubby UI components and theme with a single command.",
+      "description": "Install all Cubby UI components with a single command.",
       "author": "Cubby UI",
       "files": [],
       "registryDependencies": [
-        "@cubby-ui/init",
         "@cubby-ui/accordion",
         "@cubby-ui/alert",
         "@cubby-ui/alert-dialog",

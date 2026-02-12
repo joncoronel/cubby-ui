@@ -122,7 +122,8 @@
       "mcp__playwright__browser_close",
       "mcp__playwright__browser_navigate",
       "mcp__playwright__browser_run_code",
-      "Bash(pnpm run registry:all:*)"
+      "Bash(pnpm run registry:all:*)",
+      "Bash(fi)"
     ],
     "deny": []
   }

@@ -38,9 +38,14 @@ function RadioGroupItem({
       {...props}
     >
       <Radio.Indicator
-        keepMounted
         className={cn(
-          "ease-out-cubic before:bg-primary-foreground bg-primary before:ease-out-cubic z-1 flex size-full items-center justify-center rounded-full transition-opacity duration-200 before:size-full before:origin-center before:rounded-full before:transition-[scale] before:duration-200 in-data-checked:before:scale-50 data-checked:opacity-100 data-unchecked:opacity-0",
+          "z-1 flex size-full items-center justify-center rounded-full bg-primary before:bg-primary-foreground",
+          "ease-out-cubic transition-opacity duration-150",
+          "data-starting-style:opacity-0",
+          "data-ending-style:opacity-0",
+          "before:size-full before:origin-center before:rounded-full before:content-[''] before:ease-out-cubic before:scale-50 before:transition-[scale] before:duration-250",
+          "data-starting-style:before:scale-100",
+          "data-ending-style:before:scale-100",
         )}
       />
     </Radio.Root>

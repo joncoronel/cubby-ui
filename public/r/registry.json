@@ -1309,6 +1309,9 @@
           "target": "components/ui/cubby-ui/tabs.tsx"
         }
       ],
+      "registryDependencies": [
+        "@cubby-ui/use-animated-height"
+      ],
       "dependencies": [
         "class-variance-authority"
       ]
@@ -1452,6 +1455,19 @@
       ],
       "dependencies": [
         "lucide-react"
+      ]
+    },
+    {
+      "name": "use-animated-height",
+      "type": "registry:hook",
+      "title": "useAnimatedHeight",
+      "description": "A custom React hook for animated height.",
+      "files": [
+        {
+          "path": "registry/default/hooks/use-animated-height.ts",
+          "type": "registry:hook",
+          "target": "hooks/cubby-ui/use-animated-height.ts"
+        }
       ]
     },
     {

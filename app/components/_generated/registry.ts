@@ -1067,7 +1067,9 @@ export const componentMetadata = {
     "title": "Tabs",
     "description": "A tabs component.",
     "category": "UI",
-    "registryDependencies": [],
+    "registryDependencies": [
+      "@cubby-ui/use-animated-height"
+    ],
     "dependencies": [
       "class-variance-authority"
     ],
@@ -1172,6 +1174,15 @@ export const componentMetadata = {
     ],
     "examples": {},
     "reference": []
+  },
+  "use-animated-height": {
+    "name": "use-animated-height",
+    "title": "useAnimatedHeight",
+    "description": "A custom React hook for animated height.",
+    "category": "UI",
+    "registryDependencies": [],
+    "dependencies": [],
+    "examples": {}
   },
   "use-fuzzy-filter": {
     "name": "use-fuzzy-filter",

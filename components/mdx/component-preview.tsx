@@ -64,26 +64,26 @@ export function ComponentPreview({
           <TabsTrigger value="preview">Preview</TabsTrigger>
           <TabsTrigger value="code">Code</TabsTrigger>
         </TabsList>
-        <TabsPanels>
-        <TabsContent value="preview">
-          <div className="bg-muted rounded-2xl border p-1">
-            <div className="bg-background flex min-h-[300px] items-center justify-center rounded-lg border p-8">
-              {exampleNode}
+        <TabsPanels className="duration-0">
+          <TabsContent value="preview">
+            <div className="bg-muted rounded-2xl border p-1">
+              <div className="bg-background flex min-h-[300px] items-center justify-center rounded-lg border p-8">
+                {exampleNode}
+              </div>
             </div>
-          </div>
-        </TabsContent>
-        <TabsContent value="code">
-          <CodeBlock
-            code={code}
-            language={language}
-            floatingCopy
-            initial={initialHighlighted}
-          >
-            <CodeBlockPre>
-              <CodeBlockCode />
-            </CodeBlockPre>
-          </CodeBlock>
-        </TabsContent>
+          </TabsContent>
+          <TabsContent value="code">
+            <CodeBlock
+              code={code}
+              language={language}
+              floatingCopy
+              initial={initialHighlighted}
+            >
+              <CodeBlockPre>
+                <CodeBlockCode />
+              </CodeBlockPre>
+            </CodeBlock>
+          </TabsContent>
         </TabsPanels>
       </Tabs>
     </div>

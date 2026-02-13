@@ -2,6 +2,7 @@ import {
   Tabs,
   TabsContent,
   TabsList,
+  TabsPanels,
   TabsTrigger,
 } from "@/registry/default/tabs/tabs";
 import {
@@ -31,7 +32,7 @@ export default function TabsVerticalUnderlineBoth() {
             <TabsTrigger value="reports">Reports</TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
           </TabsList>
-          <div className="flex-1 min-w-0">
+          <TabsPanels className="min-w-0">
             <TabsContent value="overview">
               <Card>
                 <CardHeader>
@@ -123,7 +124,7 @@ export default function TabsVerticalUnderlineBoth() {
                 </CardContent>
               </Card>
             </TabsContent>
-          </div>
+          </TabsPanels>
         </Tabs>
       </div>
 
@@ -136,7 +137,7 @@ export default function TabsVerticalUnderlineBoth() {
           orientation="vertical"
           className="flex w-full gap-6"
         >
-          <div className="flex-1 min-w-0">
+          <TabsPanels className="min-w-0">
             <TabsContent value="overview">
               <Card>
                 <CardHeader>
@@ -228,7 +229,7 @@ export default function TabsVerticalUnderlineBoth() {
                 </CardContent>
               </Card>
             </TabsContent>
-          </div>
+          </TabsPanels>
           <TabsList variant="underline" side="right">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>

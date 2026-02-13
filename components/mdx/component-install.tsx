@@ -6,6 +6,7 @@ import {
   Tabs,
   TabsList,
   TabsTrigger,
+  TabsPanels,
   TabsContent,
 } from "@/registry/default/tabs/tabs";
 import {
@@ -82,6 +83,7 @@ export function ComponentInstall({
           <TabsTrigger value="cli">CLI</TabsTrigger>
           <TabsTrigger value="manual">Manual</TabsTrigger>
         </TabsList>
+        <TabsPanels>
         <TabsContent value="cli">
           <CodeBlock
             code={getCliCommand(cliPackageManager)}
@@ -195,6 +197,7 @@ export function ComponentInstall({
             )}
           </div>
         </TabsContent>
+        </TabsPanels>
       </Tabs>
     </div>
   );

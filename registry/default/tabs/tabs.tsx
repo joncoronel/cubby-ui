@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { Tabs as BaseTabs } from "@base-ui/react/tabs";
 import { cva } from "class-variance-authority";
 
@@ -222,14 +223,44 @@ function TabIndicator({
   );
 }
 
-function TabsContent({ className, ...props }: BaseTabs.Panel.Props) {
+function TabsPanels({ className, ...props }: React.ComponentProps<"div">) {
   return (
-    <BaseTabs.Panel
-      data-slot="tabs-content"
-      className={cn("min-w-0 flex-1 outline-none", className)}
+    <div
+      data-slot="tabs-panels"
+      className={cn("grid flex-1 overflow-hidden", className)}
       {...props}
     />
   );
 }
 
-export { Tabs, TabsList, TabsTrigger, TabsContent };
+function TabsContent({ className, ...props }: BaseTabs.Panel.Props) {
+  return (
+    <BaseTabs.Panel
+      data-slot="tabs-content"
+      className={cn(
+        "min-w-0 flex-1 outline-none",
+        "[grid-area:1/1]",
+        "ease-out-cubic transition-[opacity,transform,translate] duration-150",
+        "data-starting-style:opacity-0",
+        "data-ending-style:opacity-0",
+        // Exiting panel: don't contribute to grid height
+        "data-ending-style:contain-[size]",
+        // Horizontal directional slide
+        "data-starting-style:data-[activation-direction=left]:-translate-x-6",
+        "data-starting-style:data-[activation-direction=right]:translate-x-6",
+        "data-ending-style:data-[activation-direction=left]:translate-x-6",
+        "data-ending-style:data-[activation-direction=right]:-translate-x-6",
+        // Vertical directional slide
+        "data-starting-style:data-[activation-direction=up]:-translate-y-6",
+        "data-starting-style:data-[activation-direction=down]:translate-y-6",
+        "data-ending-style:data-[activation-direction=up]:translate-y-6",
+        "data-ending-style:data-[activation-direction=down]:-translate-y-6",
+        "motion-reduce:transition-none",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+export { Tabs, TabsList, TabsTrigger, TabsPanels, TabsContent };

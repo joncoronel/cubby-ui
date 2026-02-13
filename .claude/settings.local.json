@@ -123,7 +123,8 @@
       "mcp__playwright__browser_navigate",
       "mcp__playwright__browser_run_code",
       "Bash(pnpm run registry:all:*)",
-      "Bash(fi)"
+      "Bash(fi)",
+      "Bash(npx eslint:*)"
     ],
     "deny": []
   }

@@ -5,6 +5,7 @@ import {
   Tabs,
   TabsList,
   TabsTrigger,
+  TabsPanels,
   TabsContent,
 } from "@/registry/default/tabs/tabs";
 import {
@@ -63,6 +64,7 @@ export function ComponentPreview({
           <TabsTrigger value="preview">Preview</TabsTrigger>
           <TabsTrigger value="code">Code</TabsTrigger>
         </TabsList>
+        <TabsPanels>
         <TabsContent value="preview">
           <div className="bg-muted rounded-2xl border p-1">
             <div className="bg-background flex min-h-[300px] items-center justify-center rounded-lg border p-8">
@@ -82,6 +84,7 @@ export function ComponentPreview({
             </CodeBlockPre>
           </CodeBlock>
         </TabsContent>
+        </TabsPanels>
       </Tabs>
     </div>
   );

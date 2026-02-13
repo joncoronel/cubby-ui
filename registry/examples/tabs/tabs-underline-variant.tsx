@@ -2,6 +2,7 @@ import {
   Tabs,
   TabsContent,
   TabsList,
+  TabsPanels,
   TabsTrigger,
 } from "@/registry/default/tabs/tabs";
 import { Card, CardContent } from "@/registry/default/card/card";
@@ -15,7 +16,8 @@ export default function TabsUnderlineVariant() {
         <TabsTrigger value="analytics">Analytics</TabsTrigger>
         <TabsTrigger value="reports">Reports</TabsTrigger>
       </TabsList>
-      <TabsContent value="overview">
+      <TabsPanels>
+        <TabsContent value="overview">
         <Card className="border-0 shadow-none">
           <CardContent className="space-y-4">
             <div>
@@ -99,6 +101,7 @@ export default function TabsUnderlineVariant() {
           </CardContent>
         </Card>
       </TabsContent>
+      </TabsPanels>
     </Tabs>
   );
 }

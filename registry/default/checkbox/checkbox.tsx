@@ -91,7 +91,6 @@ function Checkbox({
       {...props}
     >
       <BaseCheckbox.Indicator
-        keepMounted
         data-slot="checkbox-indicator"
         className="grid place-items-center *:col-start-1 *:row-start-1"
       >

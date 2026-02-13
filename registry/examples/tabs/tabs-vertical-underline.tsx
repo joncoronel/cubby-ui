@@ -2,6 +2,7 @@ import {
   Tabs,
   TabsContent,
   TabsList,
+  TabsPanels,
   TabsTrigger,
 } from "@/registry/default/tabs/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/registry/default/card/card";
@@ -21,7 +22,7 @@ export default function TabsVerticalUnderline() {
         <TabsTrigger value="reports">Reports</TabsTrigger>
         <TabsTrigger value="notifications">Notifications</TabsTrigger>
       </TabsList>
-      <div className="flex-1 min-w-0">
+      <TabsPanels className="min-w-0">
         <TabsContent value="overview">
           <Card>
             <CardHeader>
@@ -152,7 +153,7 @@ export default function TabsVerticalUnderline() {
             </CardContent>
           </Card>
         </TabsContent>
-      </div>
+      </TabsPanels>
     </Tabs>
   );
 }

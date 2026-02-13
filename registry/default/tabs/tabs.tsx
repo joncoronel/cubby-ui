@@ -227,7 +227,7 @@ function TabsPanels({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="tabs-panels"
-      className={cn("grid flex-1 overflow-hidden", className)}
+      className={cn("grid flex-1 overflow-y-clip", className)}
       {...props}
     />
   );
@@ -240,11 +240,11 @@ function TabsContent({ className, ...props }: BaseTabs.Panel.Props) {
       className={cn(
         "min-w-0 flex-1 outline-none",
         "[grid-area:1/1]",
-        "ease-out-cubic transition-[opacity,transform,translate] duration-150",
-        "data-starting-style:opacity-0",
-        "data-ending-style:opacity-0",
-        // Exiting panel: don't contribute to grid height
-        "data-ending-style:contain-[size]",
+        "will-change-[opacity,filter,translate]",
+        "ease-out-cubic transition-[opacity,translate,filter] duration-[200ms,400ms,300ms]",
+        // Enter/exit: fade and blur
+        "data-starting-style:opacity-0 data-starting-style:blur-sm",
+        "data-ending-style:opacity-0 data-ending-style:blur-sm",
         // Horizontal directional slide
         "data-starting-style:data-[activation-direction=left]:-translate-x-6",
         "data-starting-style:data-[activation-direction=right]:translate-x-6",
@@ -255,7 +255,7 @@ function TabsContent({ className, ...props }: BaseTabs.Panel.Props) {
         "data-starting-style:data-[activation-direction=down]:translate-y-6",
         "data-ending-style:data-[activation-direction=up]:translate-y-6",
         "data-ending-style:data-[activation-direction=down]:-translate-y-6",
-        "motion-reduce:transition-none",
+        "motion-reduce:blur-none motion-reduce:transition-none",
         className,
       )}
       {...props}

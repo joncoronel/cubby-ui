@@ -89,6 +89,54 @@ function VirtualizedCommand({ items, filteredItems }) {
 }
 ```
 
+## Usage with useFilteredItems
+
+When using Base UI's `useFilteredItems()` hook, filtered items come from inside the Root component. This requires a child component pattern with `virtualizerRef` + `useHighlightHandler`:
+
+```tsx
+import {
+  AutocompleteRoot,
+  AutocompleteVirtualizedList,
+  useAutocompleteFilteredItems,
+} from "@/components/ui/cubby-ui/autocomplete";
+import {
+  useListVirtualizer,
+  useHighlightHandler,
+  type ListVirtualizerInstance,
+} from "@/hooks/cubby-ui/use-list-virtualizer";
+
+function MyAutocomplete({ items }) {
+  const virtualizerRef = React.useRef<ListVirtualizerInstance>(null);
+  const onItemHighlighted = useHighlightHandler(virtualizerRef);
+
+  return (
+    <AutocompleteRoot
+      items={items}
+      virtualized
+      itemToStringValue={getLabel}
+      onItemHighlighted={onItemHighlighted}
+    >
+      {/* Input, positioner, etc. */}
+      <VirtualizedContent items={items} virtualizerRef={virtualizerRef} />
+    </AutocompleteRoot>
+  );
+}
+
+function VirtualizedContent({ items, virtualizerRef }) {
+  const filteredItems = useAutocompleteFilteredItems();
+  const { scrollRef, measureRef, totalSize, virtualItems, getItem, getItemStyle, getItemProps } =
+    useListVirtualizer({ items, filteredItems, virtualizerRef });
+
+  return (
+    <AutocompleteVirtualizedList scrollRef={scrollRef} totalSize={totalSize}>
+      {virtualItems.map((vi) => { /* ... */ })}
+    </AutocompleteVirtualizedList>
+  );
+}
+```
+
+This eliminates manual query state, `useDeferredValue`, `useFilter()`, and `useMemo` filtering. The Root handles filtering internally, and `useFilteredItems()` provides the result to the virtualizer.
+
 ## Performance Tips
 
 For optimal scroll performance with large lists:
@@ -142,7 +190,29 @@ For optimal scroll performance with large lists:
   Padding at the end of the list in pixels.
 </ApiProp>
 
+<ApiProp name="virtualizerRef" fullType="React.RefObject<ListVirtualizerInstance | null>">
+  Ref to expose the virtualizer instance to a parent component via `useImperativeHandle`. Use with `useHighlightHandler` for the `useFilteredItems` pattern.
+</ApiProp>
+
 </ApiPropsList>
+
+### useHighlightHandler
+
+```ts
+function useHighlightHandler(
+  virtualizerRef: React.RefObject<ListVirtualizerInstance | null>,
+): (item: unknown, details: { reason: string; index: number }) => void;
+```
+
+Returns a stable `onItemHighlighted` callback that scrolls the virtualizer to the highlighted item on keyboard navigation. Use this on the Root component when the virtualizer lives in a child component.
+
+### ListVirtualizerInstance
+
+```ts
+type ListVirtualizerInstance = ReturnType<typeof useVirtualizer>;
+```
+
+Type alias for the virtualizer instance. Use to type the `virtualizerRef`.
 
 ### Return Value
 
@@ -161,3 +231,4 @@ For optimal scroll performance with large lists:
 
 - [Command](/docs/components/command) - For virtualized command menus
 - [Autocomplete](/docs/components/autocomplete) - For virtualized autocomplete lists
+- [Combobox](/docs/components/combobox) - For virtualized combobox lists

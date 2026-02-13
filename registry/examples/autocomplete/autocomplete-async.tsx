@@ -10,7 +10,7 @@ import {
   AutocompletePositioner,
   AutocompleteRoot,
   AutocompleteStatus,
-  Autocomplete,
+  useAutocompleteFilter,
 } from "@/registry/default/autocomplete/autocomplete";
 import { Label } from "@/registry/default/label/label";
 
@@ -91,7 +91,7 @@ export default function AutocompleteAsync() {
   const [searchResults, setSearchResults] = React.useState<Movie[]>([]);
   const [error, setError] = React.useState<string | null>(null);
 
-  const { contains } = Autocomplete.useFilter({ sensitivity: "base" });
+  const { contains } = useAutocompleteFilter({ sensitivity: "base" });
 
   React.useEffect(() => {
     if (!searchValue) {

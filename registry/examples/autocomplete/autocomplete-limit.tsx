@@ -9,7 +9,7 @@ import {
   AutocompletePositioner,
   AutocompleteRoot,
   AutocompleteStatus,
-  Autocomplete,
+  useAutocompleteFilter,
 } from "@/registry/default/autocomplete/autocomplete";
 import { Label } from "@/registry/default/label/label";
 
@@ -77,7 +77,7 @@ const limit = 8;
 export default function AutocompleteLimit() {
   const [value, setValue] = React.useState("");
 
-  const { contains } = Autocomplete.useFilter({ sensitivity: "base" });
+  const { contains } = useAutocompleteFilter({ sensitivity: "base" });
 
   const totalMatches = React.useMemo(() => {
     const trimmed = value.trim();

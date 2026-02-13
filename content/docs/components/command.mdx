@@ -44,71 +44,12 @@ Use virtualization for large lists (100+ items) to maintain smooth performance. 
 **Key concepts:**
 
 1. **Use `useListVirtualizer` hook** - Handles scroll positioning, keyboard navigation, and item measurement. See [useListVirtualizer docs](/docs/hooks/use-list-virtualizer) for full API reference.
-2. **External filtering** - Compute `filteredItems` yourself and pass `filter={null}` to Command. The hook needs both arrays to calculate proper aria attributes.
+2. **Use `useCommandFilteredItems()` inside Command** - Call `useCommandFilteredItems()` in a child component of `Command` to get internally filtered items without manual filtering boilerplate.
 3. **Replace `CommandList` with `CommandVirtualizedList`** - Accepts `scrollRef` and `totalSize` from the hook.
-4. **Spread `rootProps`** - Contains virtualization state for Base UI integration.
+4. **Pass `virtualized` and `items` on Command** - Enables virtualized mode with your full item list.
+5. **Use `useHighlightHandler`** - Pass a `virtualizerRef` to the child and use `useHighlightHandler(virtualizerRef)` on the parent so keyboard navigation scrolls to the highlighted item.
 
-```tsx
-import { useListVirtualizer } from "@/hooks/cubby-ui/use-list-virtualizer";
-import { useCommandFilter } from "@/lib/cubby-ui/command";
-
-// Helper to extract searchable text from items
-const getItemLabel = (item: Item | null) => item?.name ?? "";
-
-// 1. Set up filtering with deferred value for performance
-const { contains } = useCommandFilter();
-const deferredQuery = useDeferredValue(query);
-const resolvedQuery =
-  query === "" || deferredQuery === "" ? query : deferredQuery;
-const filteredItems = useMemo(
-  () => items.filter((item) => contains(item, resolvedQuery, getItemLabel)),
-  [contains, resolvedQuery],
-);
-
-// 2. Initialize virtualizer
-const {
-  rootProps, // Spread on Command
-  scrollRef, // Pass to CommandVirtualizedList
-  measureRef, // Pass to each CommandItem
-  totalSize, // Pass to CommandVirtualizedList
-  virtualItems, // Array to map over
-  getItem, // Get data for virtual item
-  getItemStyle, // Get positioning styles
-  getItemProps, // Get aria attributes
-} = useListVirtualizer({
-  items, // All items (for aria-setsize)
-  filteredItems, // Items to display
-  estimateSize: 40, // Item height in px
-});
-
-// 3. Render
-<Command {...rootProps} filter={null} itemToStringValue={getItemLabel}>
-  <CommandVirtualizedList
-    scrollRef={scrollRef}
-    totalSize={totalSize}
-    nativeScroll
-  >
-    {virtualItems.map((virtualItem) => (
-      <CommandItem
-        key={virtualItem.key}
-        ref={measureRef}
-        value={getItem(virtualItem)}
-        style={getItemStyle(virtualItem)}
-        {...getItemProps(virtualItem)}
-      >
-        {getItem(virtualItem)?.name}
-      </CommandItem>
-    ))}
-  </CommandVirtualizedList>
-</Command>;
-```
-
-**Filtering options:**
-
-- **Default filtering**: Use `useCommandFilter` for the same `contains`/`startsWith`/`endsWith` matchers as Command's built-in filter
-- **Fuzzy search**: Use [useFuzzyFilter](/docs/hooks/use-fuzzy-filter) for relevance-sorted results across multiple fields
-- **Server-side filtering**: Pass the same array to both `items` and `filteredItems`
-- **Custom filtering**: Use any filtering method (native `.filter()`, third-party libraries, etc.)
+> **Manual filtering still works** — If you need custom filter logic (fuzzy search, server-side filtering), you can still compute `filteredItems` externally, pass `filter={null}` to `Command`, and spread `rootProps` from `useListVirtualizer`. See [useCommandFilter](#usecommandfilter).
 
 ## API Reference
 
@@ -276,7 +217,7 @@ function useCommandFilter(): {
 };
 ```
 
-Exposes Base UI's built-in filter matchers for external filtering. Required when using virtualization since you must compute `filteredItems` yourself.
+Exposes Base UI's built-in filter matchers for external filtering. Useful when you need manual control over filtering (e.g., with custom logic or server-side filtering).
 
 **Returns**
 
@@ -296,6 +237,29 @@ const filteredItems = useMemo(
   () => items.filter((item) => contains(item, query, getItemLabel)),
   [contains, query],
 );
+```
+
+#### useCommandFilteredItems
+
+```ts
+function useCommandFilteredItems<T>(): T[];
+```
+
+Returns the internally filtered items from the Command root. Must be called inside `Command`. Simplifies virtualized implementations by eliminating manual query state, `useDeferredValue`, `useFilter()`, and `useMemo` filtering.
+
+```tsx
+import { useCommandFilteredItems } from "@/registry/default/command/command";
+
+function VirtualizedListContent() {
+  // Must be called inside Command
+  const filteredItems = useCommandFilteredItems<MyItem>();
+
+  const virtualizer = useListVirtualizer({
+    items: allItems,
+    filteredItems,
+  });
+  // ...
+}
 ```
 
 #### useFuzzyFilter

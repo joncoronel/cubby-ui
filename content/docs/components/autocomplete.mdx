@@ -73,10 +73,13 @@ Use virtualization for large lists (100+ items) to maintain smooth performance. 
 **Key concepts:**
 
 1. **Use `useListVirtualizer` hook** - Handles scroll positioning, keyboard navigation, and item measurement. See [useListVirtualizer docs](/docs/hooks/use-list-virtualizer) for full API reference.
-2. **External filtering** - Compute `filteredItems` yourself and pass `filter={null}` to Autocomplete.Root. The hook needs both arrays to calculate proper aria attributes.
+2. **Use `useAutocompleteFilteredItems()` inside Root** - Call `useAutocompleteFilteredItems()` in a child component of `AutocompleteRoot` to get internally filtered items without manual filtering boilerplate.
 3. **Replace `AutocompleteList` with `AutocompleteVirtualizedList`** - Accepts `scrollRef` and `totalSize` from the hook.
-4. **Spread `rootProps`** - Contains virtualization state for Base UI integration.
-5. **Override item margins** - Pass `className="mt-0! mb-0!"` to `AutocompleteItem` since virtualized items are absolutely positioned and the virtualizer handles padding.
+4. **Pass `virtualized` and `items` on Root** - Enables virtualized mode with your full item list.
+5. **Use `useHighlightHandler`** - Pass a `virtualizerRef` to the child and use `useHighlightHandler(virtualizerRef)` on Root so keyboard navigation scrolls to the highlighted item.
+6. **Override item margins** - Pass `className="mt-0! mb-0!"` to `AutocompleteItem` since virtualized items are absolutely positioned and the virtualizer handles padding.
+
+> **Manual filtering still works** — If you need custom filter logic (fuzzy search, server-side filtering), you can still compute `filteredItems` externally, pass `filter={null}` to `Autocomplete.Root`, and spread `rootProps` from `useListVirtualizer`. See [useAutocompleteFilter](#useautocompletefilter).
 
 ## API Reference
 
@@ -227,6 +230,29 @@ const filteredItems = useMemo(
   () => items.filter((item) => contains(item, query, getItemLabel)),
   [contains, query],
 );
+```
+
+#### useAutocompleteFilteredItems
+
+```ts
+function useAutocompleteFilteredItems<T>(): T[];
+```
+
+Returns the internally filtered items from the Autocomplete Root. Must be called inside `AutocompleteRoot`. Simplifies virtualized implementations by eliminating the need for manual query state, `useDeferredValue`, `useFilter()`, and `useMemo` filtering.
+
+```tsx
+import { useAutocompleteFilteredItems } from "@/registry/default/autocomplete/autocomplete";
+
+function VirtualizedListContent() {
+  // Must be called inside AutocompleteRoot
+  const filteredItems = useAutocompleteFilteredItems<MyItem>();
+
+  const virtualizer = useListVirtualizer({
+    items: allItems,
+    filteredItems,
+  });
+  // ...
+}
 ```
 
 #### useFuzzyFilter

@@ -2,6 +2,7 @@ import {
   Tabs,
   TabsContent,
   TabsList,
+  TabsPanels,
   TabsTrigger,
 } from "@/registry/default/tabs/tabs";
 import {
@@ -27,7 +28,7 @@ export default function TabsVertical() {
         <TabsTrigger value="reports">Reports</TabsTrigger>
         <TabsTrigger value="notifications">Notifications</TabsTrigger>
       </TabsList>
-      <div className="min-w-0 flex-1">
+      <TabsPanels className="min-w-0">
         <TabsContent value="overview">
           <Card>
             <CardHeader>
@@ -149,7 +150,7 @@ export default function TabsVertical() {
             </CardContent>
           </Card>
         </TabsContent>
-      </div>
+      </TabsPanels>
     </Tabs>
   );
 }

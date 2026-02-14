@@ -20,6 +20,9 @@ import { cn } from "@/lib/utils";
 // Expose Base UI's filter hook for virtualization use cases
 const useCommandFilter = AutocompleteBase.useFilter;
 
+// Expose Base UI's filtered items hook for simplified virtualization
+const useCommandFilteredItems = AutocompleteBase.useFilteredItems;
+
 const AutocompleteRoot = AutocompleteBase.Root;
 
 function Command<ItemValue>({
@@ -393,4 +396,5 @@ export {
   CommandSeparator,
   CommandFooter,
   useCommandFilter,
+  useCommandFilteredItems,
 };

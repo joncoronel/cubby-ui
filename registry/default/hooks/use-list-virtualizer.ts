@@ -1,6 +1,55 @@
 import * as React from "react";
 import { useVirtualizer, type VirtualItem } from "@tanstack/react-virtual";
 
+/**
+ * The virtualizer instance type. Use to type a ref that receives
+ * the virtualizer via the `virtualizerRef` option.
+ */
+export type ListVirtualizerInstance = ReturnType<
+  typeof useVirtualizer<HTMLDivElement, Element>
+>;
+
+/**
+ * Returns a stable `onItemHighlighted` handler that scrolls the virtualizer
+ * to the highlighted item on keyboard navigation.
+ *
+ * Use this on the Root component when the virtualizer lives in a child
+ * component (e.g. when using `useFilteredItems`).
+ */
+export function useHighlightHandler(
+  virtualizerRef: React.RefObject<ListVirtualizerInstance | null>,
+) {
+  return React.useCallback(
+    (
+      item: unknown,
+      {
+        reason,
+        index,
+      }: { reason: "none" | "keyboard" | "pointer"; index: number },
+    ) => {
+      const virtualizer = virtualizerRef.current;
+      if (!item || !virtualizer) return;
+
+      const isStart = index === 0;
+      const isEnd = index === virtualizer.options.count - 1;
+
+      const shouldScroll =
+        reason === "none" || (reason === "keyboard" && (isStart || isEnd));
+
+      if (shouldScroll) {
+        queueMicrotask(() => {
+          virtualizer.scrollToIndex(index, {
+            align: isEnd ? "start" : "end",
+          });
+        });
+      }
+    },
+    // virtualizerRef is a stable ref object
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+}
+
 export interface UseListVirtualizerOptions<T> {
   /**
    * Whether virtualization is enabled.
@@ -47,6 +96,13 @@ export interface UseListVirtualizerOptions<T> {
    * @default 8
    */
   paddingEnd?: number;
+
+  /**
+   * Ref to expose the virtualizer instance to a parent component.
+   * When provided, the virtualizer is exposed via `useImperativeHandle`.
+   * Use with `createHighlightHandler` for the `useFilteredItems` pattern.
+   */
+  virtualizerRef?: React.RefObject<ListVirtualizerInstance | null>;
 }
 
 export interface UseListVirtualizerReturn<T> {
@@ -123,6 +179,7 @@ export function useListVirtualizer<T>(
     overscan = 20,
     paddingStart = 8,
     paddingEnd = 8,
+    virtualizerRef,
   } = options;
 
   const scrollElementRef = React.useRef<HTMLDivElement | null>(null);
@@ -142,6 +199,9 @@ export function useListVirtualizer<T>(
     scrollPaddingStart: paddingStart,
     scrollPaddingEnd: paddingEnd,
   });
+
+  // Expose virtualizer to parent when ref is provided
+  React.useImperativeHandle(virtualizerRef, () => virtualizer, [virtualizer]);
 
   // Ref callback that stores the element and triggers measurement
   const scrollRef = React.useCallback(

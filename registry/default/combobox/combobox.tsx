@@ -10,7 +10,8 @@ import {
 } from "@/registry/default/scroll-area/scroll-area";
 import { Combobox as BaseCombobox } from "@base-ui/react/combobox";
 
-const useFilter = BaseCombobox.useFilter;
+const useComboboxFilter = BaseCombobox.useFilter;
+const useComboboxFilteredItems = BaseCombobox.useFilteredItems;
 
 const ComboboxContext = React.createContext<{
   id: string;
@@ -286,6 +287,54 @@ function ComboboxList({
   );
 }
 
+function ComboboxVirtualizedList({
+  className,
+  children,
+  scrollRef,
+  totalSize,
+  emptyMessage = "No results found.",
+  fadeEdges = "y",
+  nativeScroll = false,
+  ...props
+}: Omit<React.ComponentProps<"div">, "ref"> &
+  Pick<ScrollAreaProps, "fadeEdges" | "nativeScroll"> & {
+    scrollRef: (element: HTMLDivElement | null) => void;
+    totalSize: number;
+    emptyMessage?: React.ReactNode;
+  }) {
+  return (
+    <>
+      <BaseCombobox.Empty
+        data-slot="combobox-empty"
+        className="text-muted-foreground px-3 py-2.5 text-sm empty:m-0 empty:p-0"
+      >
+        {emptyMessage}
+      </BaseCombobox.Empty>
+      <BaseCombobox.List
+        data-slot="combobox-list"
+        className="w-full flex-1 overflow-hidden rounded-xl p-0 outline-hidden empty:m-0 empty:p-0"
+      >
+        <ScrollArea
+          viewportRef={scrollRef}
+          viewportClassName={cn("scroll-py-2", className)}
+          fadeEdges={fadeEdges}
+          nativeScroll={nativeScroll}
+          className="h-auto max-h-80 w-full"
+          {...props}
+        >
+          <div
+            role="presentation"
+            className="relative w-full"
+            style={{ height: totalSize }}
+          >
+            {children}
+          </div>
+        </ScrollArea>
+      </BaseCombobox.List>
+    </>
+  );
+}
+
 function ComboboxCollection({ ...props }: BaseCombobox.Collection.Props) {
   return <BaseCombobox.Collection data-slot="combobox-collection" {...props} />;
 }
@@ -303,10 +352,14 @@ function ComboboxRow({ className, ...props }: BaseCombobox.Row.Props) {
 function ComboboxItem({
   className,
   children,
+  ref,
   ...props
-}: BaseCombobox.Item.Props) {
+}: BaseCombobox.Item.Props & {
+  ref?: React.Ref<HTMLDivElement>;
+}) {
   return (
     <BaseCombobox.Item
+      ref={ref}
       data-slot="combobox-item"
       className={cn(
         "data-highlighted:bg-accent/50 data-highlighted:text-accent-foreground relative grid cursor-default grid-cols-[1fr_1rem] items-center gap-2 rounded-md px-2.5 py-2 pr-2 text-sm outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60",
@@ -483,6 +536,8 @@ export {
   ComboboxChips,
   ComboboxChip,
   ComboboxChipRemove,
+  ComboboxVirtualizedList,
   ComboboxLabel,
-  useFilter,
+  useComboboxFilter,
+  useComboboxFilteredItems,
 };

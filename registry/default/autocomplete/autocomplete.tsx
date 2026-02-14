@@ -404,10 +404,10 @@ export const Autocomplete = {
   Group: AutocompleteGroup,
   GroupLabel: AutocompleteGroupLabel,
   Separator: AutocompleteSeparator,
-  useFilter: BaseAutocomplete.useFilter,
 };
 
 const useAutocompleteFilter = BaseAutocomplete.useFilter;
+const useAutocompleteFilteredItems = BaseAutocomplete.useFilteredItems;
 
 export {
   AutocompleteRoot,
@@ -433,4 +433,5 @@ export {
   AutocompleteGroupLabel,
   AutocompleteSeparator,
   useAutocompleteFilter,
+  useAutocompleteFilteredItems,
 };

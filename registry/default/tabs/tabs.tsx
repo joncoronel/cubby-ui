@@ -1,9 +1,11 @@
 "use client";
 
+import * as React from "react";
 import { Tabs as BaseTabs } from "@base-ui/react/tabs";
 import { cva } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
+import { useAnimatedHeight } from "@/registry/default/hooks/use-animated-height";
 
 type TabsVariant = "capsule" | "underline";
 type TabsSize = "small" | "medium";
@@ -222,14 +224,51 @@ function TabIndicator({
   );
 }
 
+function TabsPanels({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<"div">) {
+  const { outerRef, innerRef } = useAnimatedHeight();
+
+  return (
+    <div
+      ref={outerRef}
+      data-slot="tabs-panels"
+      className={cn(
+        "min-h-0 grow overflow-y-clip",
+        "transition-[height] duration-270 ease-[cubic-bezier(0.25,1,0.5,1)]",
+        className,
+      )}
+      {...props}
+    >
+      <div ref={innerRef} className="grid">
+        {children}
+      </div>
+    </div>
+  );
+}
+
 function TabsContent({ className, ...props }: BaseTabs.Panel.Props) {
   return (
     <BaseTabs.Panel
       data-slot="tabs-content"
-      className={cn("min-w-0 flex-1 outline-none", className)}
+      className={cn(
+        "min-w-0 flex-1 outline-none",
+        "[grid-area:1/1]",
+        "ease-out-cubic transition-[opacity,translate,filter,scale] duration-[var(--fade-duration,0.2s),400ms,300ms,200ms]",
+        // Enter/exit: fade and blur
+        "data-starting-style:opacity-0",
+        "data-ending-style:opacity-0 data-ending-style:contain-[size]",
+        // Horizontal directional slide
+        "data-starting-style:scale-97",
+        "data-ending-style:scale-97",
+        "motion-reduce:blur-none motion-reduce:transition-none",
+        className,
+      )}
       {...props}
     />
   );
 }
 
-export { Tabs, TabsList, TabsTrigger, TabsContent };
+export { Tabs, TabsList, TabsTrigger, TabsPanels, TabsContent };

@@ -3,7 +3,7 @@ title: Tabs
 description: Organize content into multiple panels with tab navigation
 ---
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/registry/default/tabs/tabs";
+import { Tabs, TabsContent, TabsList, TabsPanels, TabsTrigger } from "@/registry/default/tabs/tabs";
 
 ## Preview
 
@@ -49,6 +49,12 @@ Vertical tabs with side-positioned underlines.
 
 <ComponentPreview component="tabs" example="tabs-vertical-underline-with-sides" />
 
+### Animated
+
+Enable smooth transitions when switching between tabs.
+
+<ComponentPreview component="tabs" example="tabs-animated" />
+
 ## API Reference
 
 The Tabs component is built on top of [Base UI's Tabs](https://base-ui.com/react/components/tabs). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
@@ -89,18 +95,10 @@ Container for tab triggers with visual styling. Wraps Base UI's `Tabs.List`.
 
 </ApiPropsList>
 
+#### TabsPanels
+
+Grid container for tab panels. Wrap all `TabsContent` items in `TabsPanels` to enable proper layout and smooth directional slide and fade transitions between panels.
+
 #### TabsContent
 
 Panel that displays content for the active tab. Wraps Base UI's `Tabs.Panel`.
-
-<ApiPropsList>
-
-<ApiProp
-  name="animate"
-  fullType="boolean"
-  defaultValue="false"
->
-  Enable animated transitions when switching between tabs. Custom prop not available in Base UI.
-</ApiProp>
-
-</ApiPropsList>

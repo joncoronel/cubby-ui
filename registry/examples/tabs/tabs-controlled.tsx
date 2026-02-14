@@ -1,6 +1,6 @@
 "use client"
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/registry/default/tabs/tabs"
+import { Tabs, TabsContent, TabsList, TabsPanels, TabsTrigger } from "@/registry/default/tabs/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/registry/default/card/card"
 import { Badge } from "@/registry/default/badge/badge"
 import { useState } from "react"
@@ -15,7 +15,8 @@ export default function TabsControlled() {
         <TabsTrigger value="analytics">Analytics</TabsTrigger>
         <TabsTrigger value="reports">Reports</TabsTrigger>
       </TabsList>
-      <TabsContent value="overview">
+      <TabsPanels>
+        <TabsContent value="overview">
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -82,6 +83,7 @@ export default function TabsControlled() {
           </CardContent>
         </Card>
       </TabsContent>
+      </TabsPanels>
     </Tabs>
   )
 }

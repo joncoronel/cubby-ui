@@ -55,6 +55,21 @@ Organize options into logical groups with sticky headers.
 
 <ComponentPreview component="combobox" example="combobox-grouped" />
 
+### Virtualized
+
+Use virtualization for large lists (100+ items) to maintain smooth performance. Only renders items visible in the viewport, dramatically reducing DOM nodes.
+
+<ComponentPreview component="combobox" example="combobox-virtualized" />
+
+**Key concepts:**
+
+1. **Use `useListVirtualizer` hook** - Handles scroll positioning, keyboard navigation, and item measurement. See [useListVirtualizer docs](/docs/hooks/use-list-virtualizer) for full API reference.
+2. **Use `useComboboxFilteredItems()` inside Root** - Call `useComboboxFilteredItems()` in a child component of `Combobox` to get internally filtered items without manual filtering boilerplate.
+3. **Replace `ComboboxList` with `ComboboxVirtualizedList`** - Accepts `scrollRef` and `totalSize` from the hook.
+4. **Pass `virtualized` and `items` on Root** - Enables virtualized mode with your full item list.
+5. **Use `useHighlightHandler`** - Pass a `virtualizerRef` to the child and use `useHighlightHandler(virtualizerRef)` on Root so keyboard navigation scrolls to the highlighted item.
+6. **Override item margins** - Pass `className="mt-0! mb-0!"` to `ComboboxItem` since virtualized items are absolutely positioned and the virtualizer handles padding.
+
 ## API Reference
 
 The Combobox component is built on top of [Base UI's Combobox](https://base-ui.com/react/components/combobox). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
@@ -134,3 +149,70 @@ Scrollable list of selectable options. Wraps Base UI's `Combobox.Listbox`.
 </ApiProp>
 
 </ApiPropsList>
+
+#### ComboboxVirtualizedList
+
+Virtualized scrollable container for large lists. Use with `useListVirtualizer` hook for optimal performance with 100+ items.
+
+<ApiPropsList>
+
+<ApiProp
+  name="scrollRef"
+  fullType="(element: HTMLDivElement | null) => void"
+  required
+>
+  Ref callback from `useListVirtualizer` for the scroll container.
+</ApiProp>
+
+<ApiProp name="totalSize" fullType="number" required>
+  Total height of all virtual items in pixels. Provided by `useListVirtualizer`.
+</ApiProp>
+
+<ApiProp
+  name="emptyMessage"
+  fullType="ReactNode"
+  simpleType="node"
+  defaultValue='"No results found."'
+>
+  Message shown when no results are found.
+</ApiProp>
+
+<ApiProp
+  name="fadeEdges"
+  fullType="boolean | 'x' | 'y' | FadeEdge[]"
+  defaultValue='"y"'
+>
+  Controls the fade effect on scroll edges.
+</ApiProp>
+
+<ApiProp name="nativeScroll" fullType="boolean" defaultValue="false">
+  Use native browser scrolling instead of custom scrollbars. Recommended for
+  best virtualization performance.
+</ApiProp>
+
+</ApiPropsList>
+
+### Hooks
+
+#### useComboboxFilteredItems
+
+```ts
+function useComboboxFilteredItems<T>(): T[];
+```
+
+Returns the internally filtered items from the Combobox Root. Must be called inside `Combobox` (Root). Simplifies virtualized implementations by eliminating manual query state, `useDeferredValue`, `useFilter()`, and `useMemo` filtering.
+
+```tsx
+import { useComboboxFilteredItems } from "@/registry/default/combobox/combobox";
+
+function VirtualizedListContent() {
+  // Must be called inside Combobox root
+  const filteredItems = useComboboxFilteredItems<MyItem>();
+
+  const virtualizer = useListVirtualizer({
+    items: allItems,
+    filteredItems,
+  });
+  // ...
+}
+```

@@ -115,7 +115,7 @@ const selectTriggerVariants = cva(
     defaultVariants: {
       size: "default",
     },
-  }
+  },
 );
 
 type SelectTriggerProps = BaseSelect.Trigger.Props &
@@ -198,7 +198,6 @@ function SelectContent({
             // Animation (disabled for alignItemWithTrigger via data-[side=none] to prevent Firefox jiggle)
             "ease-out-cubic origin-(--transform-origin) transition-[transform,scale,opacity] duration-100",
             "data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
-            "data-[side=none]:transition-none data-[side=none]:data-starting-style:scale-100 data-[side=none]:data-starting-style:opacity-100 data-[side=none]:data-ending-style:scale-100 data-[side=none]:data-ending-style:opacity-100",
           )}
         >
           {alignItemWithTrigger && (

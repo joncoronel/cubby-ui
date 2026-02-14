@@ -256,13 +256,14 @@ function TabsContent({ className, ...props }: BaseTabs.Panel.Props) {
       className={cn(
         "min-w-0 flex-1 outline-none",
         "[grid-area:1/1]",
-        "ease-out-cubic transition-[opacity,translate,filter,scale] duration-[var(--fade-duration,0.2s),400ms,300ms,200ms]",
+        "ease-out-cubic transition-[opacity,translate,filter,scale] duration-[var(--fade-duration,0.2s),400ms,var(--fade-duration,0.2s),200ms]",
         // Enter/exit: fade and blur
         "data-starting-style:opacity-0",
         "data-ending-style:opacity-0 data-ending-style:contain-[size]",
         // Horizontal directional slide
         "data-starting-style:scale-97",
         "data-ending-style:scale-97",
+        "origin-top",
         "motion-reduce:blur-none motion-reduce:transition-none",
         className,
       )}

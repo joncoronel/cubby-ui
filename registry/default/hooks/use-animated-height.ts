@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 const MIN_FADE_DURATION = 0.15;
 const MAX_FADE_DURATION = 0.27;
@@ -35,6 +35,12 @@ export function useAnimatedHeight() {
 
     observer.observe(node);
     observerRef.current = observer;
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      observerRef.current?.disconnect();
+    };
   }, []);
 
   return { outerRef, innerRef };

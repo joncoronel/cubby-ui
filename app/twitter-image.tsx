@@ -1,7 +1,5 @@
 import { ImageResponse } from "next/og";
 
-export const revalidate = false;
-
 export const alt = "Cubby UI - Modern React Component Library";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";

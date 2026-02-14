@@ -1,6 +1,6 @@
 import { source } from "@/lib/source";
 
-export const revalidate = false;
+export const dynamic = "force-static";
 
 const CATEGORIES = [
   { slug: "getting-started", title: "Getting Started" },

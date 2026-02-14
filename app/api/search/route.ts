@@ -16,8 +16,7 @@ const allowedPages: Record<string, string[]> = {
   "getting-started": gettingStartedMeta.pages,
 };
 
-// statically cached
-export const revalidate = false;
+export const dynamic = "force-static";
 
 // Check if a page should be indexed based on its section's meta.json
 function isPageAllowed(slugs: string[]): boolean {

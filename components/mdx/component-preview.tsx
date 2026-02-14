@@ -64,7 +64,7 @@ export function ComponentPreview({
           <TabsTrigger value="preview">Preview</TabsTrigger>
           <TabsTrigger value="code">Code</TabsTrigger>
         </TabsList>
-        <TabsPanels className="duration-0">
+        <TabsPanels className="">
           <TabsContent value="preview">
             <div className="bg-muted rounded-2xl border p-1">
               <div className="bg-background flex min-h-[300px] items-center justify-center rounded-lg border p-8">

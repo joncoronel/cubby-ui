@@ -236,8 +236,8 @@ function TabsPanels({
       ref={outerRef}
       data-slot="tabs-panels"
       className={cn(
-        "min-h-0 grow overflow-y-clip",
-        "transition-[height] duration-270 ease-[cubic-bezier(0.25,1,0.5,1)]",
+        "min-h-0 grow",
+        "has-[>_*_>_[data-ending-style]]:overflow-y-clip has-[>_*_>_[data-ending-style]]:transition-[height] has-[>_*_>_[data-ending-style]]:duration-270 has-[>_*_>_[data-ending-style]]:ease-[cubic-bezier(0.25,1,0.5,1)]",
         className,
       )}
       {...props}

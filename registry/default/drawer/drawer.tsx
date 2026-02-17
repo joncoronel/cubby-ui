@@ -945,6 +945,10 @@ function DrawerHandle({
   return (
     <button
       type="button"
+      // tabIndex={-1} prevents Base UI from auto-focusing the handle on dialog open.
+      // Without this, focus-induced scrolling overrides the scroll position set by
+      // performInitialScroll, causing snap-point drawers to open at the wrong position.
+      tabIndex={-1}
       data-slot="drawer-handle"
       aria-label="Close drawer"
       onClick={handleClick}
@@ -1011,7 +1015,10 @@ function DrawerTitle({
   return (
     <BaseDialog.Title
       data-slot="drawer-title"
-      className={cn("text-foreground text-lg font-semibold text-balance", className)}
+      className={cn(
+        "text-foreground text-lg font-semibold text-balance",
+        className,
+      )}
       {...props}
     />
   );

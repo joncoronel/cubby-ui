@@ -365,16 +365,9 @@ function Drawer({
   }, []);
 
   const handleOpenChange = React.useCallback(
-    (
-      nextOpen: boolean,
-      eventDetails?: DialogRootChangeEventDetails,
-    ) => {
+    (nextOpen: boolean, eventDetails?: DialogRootChangeEventDetails) => {
       // Prevent closing while scrolling, but allow explicit swipe dismiss
-      if (
-        !nextOpen &&
-        isDraggingRef.current &&
-        !swipeDismissRef.current
-      ) {
+      if (!nextOpen && isDraggingRef.current && !swipeDismissRef.current) {
         return;
       }
       swipeDismissRef.current = false;
@@ -1094,8 +1087,10 @@ function DrawerContentInner({
  * DrawerHandle
  * -------------------------------------------------------------------------------------------------*/
 
-interface DrawerHandleProps
-  extends Omit<useRender.ComponentProps<"button">, "children"> {
+interface DrawerHandleProps extends Omit<
+  useRender.ComponentProps<"button">,
+  "children"
+> {
   hidden?: boolean;
   preventClose?: boolean;
 }
@@ -1176,7 +1171,10 @@ function DrawerFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="drawer-footer"
       className={cn(
-        "bg-popover mt-auto flex flex-col gap-2 px-5 pt-3 pb-5",
+        // z-1 + translateZ(0): stays above DrawerBody(z-0); Safari-only GPU layer
+        // promotion fixes sticky/transform compositing flash during enter animation
+        "bg-popover z-1 mt-auto flex flex-col gap-2 px-5 pt-3 pb-5",
+        "[@supports(-webkit-touch-callout:none)]:transform-[translateZ(0)]",
         "first:pt-5",
         "in-data-[footer-variant=inset]:border-border in-data-[footer-variant=inset]:bg-muted in-data-[footer-variant=inset]:border-t in-data-[footer-variant=inset]:pt-4 in-data-[footer-variant=inset]:pb-4",
         className,

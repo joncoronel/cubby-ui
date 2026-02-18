@@ -695,6 +695,16 @@ function DrawerContentInner({
     [isVertical, setContentSize, floatingMargin],
   );
 
+  const popupRef = React.useRef<HTMLDivElement>(null);
+
+  const mergedRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      popupRef.current = node;
+      measureRef(node);
+    },
+    [measureRef],
+  );
+
   React.useEffect(() => () => observerRef.current?.disconnect(), []);
 
   const useScrollDrivenAnimation =
@@ -879,10 +889,10 @@ function DrawerContentInner({
           ))}
 
           <BaseDialog.Popup
-            ref={measureRef}
+            ref={mergedRef}
             data-slot="drawer-content"
             data-footer-variant={footerVariant}
-            initialFocus={initialFocus}
+            initialFocus={initialFocus ?? popupRef}
             finalFocus={finalFocus}
             className={cn(
               drawerContentVariants({ variant, direction }),
@@ -947,10 +957,6 @@ function DrawerHandle({
   return (
     <button
       type="button"
-      // tabIndex={-1} prevents Base UI from auto-focusing the handle on dialog open.
-      // Without this, focus-induced scrolling overrides the scroll position set by
-      // performInitialScroll, causing snap-point drawers to open at the wrong position.
-      tabIndex={-1}
       data-slot="drawer-handle"
       aria-label="Close drawer"
       onClick={handleClick}

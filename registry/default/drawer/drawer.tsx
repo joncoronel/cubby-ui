@@ -40,7 +40,7 @@ const createDrawerHandle = BaseDialog.createHandle;
 const drawerContentVariants = cva(
   [
     "bg-popover text-popover-foreground flex flex-col",
-    "relative ",
+    "relative",
     "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-transform duration-300 will-change-transform",
     "motion-reduce:transition-none",
   ],
@@ -85,7 +85,7 @@ const drawerContentVariants = cva(
         variant: "default",
         direction: "left",
         class:
-          "max-w-screen w-screen  rounded-r-xl sm:max-w-sm [&[data-starting-style]]:-translate-x-[var(--drawer-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-offset)]",
+          "max-w-screen w-screen rounded-r-xl sm:max-w-sm [&[data-starting-style]]:-translate-x-[var(--drawer-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-offset)]",
       },
       // Floating variant - direction-specific sizing and transforms
       {
@@ -214,6 +214,12 @@ function useDrawerAnimation() {
   return context;
 }
 
+/**
+ * Convenience hook that returns all drawer context values.
+ * For granular subscriptions (fewer re-renders), use
+ * `useDrawerConfig()` for static config or
+ * `useDrawerAnimation()` for animation state.
+ */
 function useDrawer() {
   return { ...useDrawerConfig(), ...useDrawerAnimation() };
 }
@@ -539,6 +545,200 @@ function DrawerContent({
   );
 }
 
+/* -------------------------------------------------------------------------------------------------
+ * Content Hooks (extracted from DrawerContentInner for readability)
+ * -------------------------------------------------------------------------------------------------*/
+
+/**
+ * Measures drawer content size via ResizeObserver and provides merged refs
+ * for the popup element.
+ */
+function useContentMeasurement(
+  isVertical: boolean,
+  floatingMargin: number,
+  setContentSize: (size: number | null) => void,
+) {
+  const observerRef = React.useRef<ResizeObserver | null>(null);
+
+  const measureRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      observerRef.current?.disconnect();
+      observerRef.current = null;
+
+      if (!node) return;
+
+      const measure = () => {
+        const baseSize = isVertical ? node.offsetHeight : node.offsetWidth;
+        setContentSize(baseSize + floatingMargin);
+      };
+
+      measure();
+      observerRef.current = new ResizeObserver(measure);
+      observerRef.current.observe(node);
+    },
+    [isVertical, setContentSize, floatingMargin],
+  );
+
+  const popupRef = React.useRef<HTMLDivElement>(null);
+
+  const mergedRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      popupRef.current = node;
+      measureRef(node);
+    },
+    [measureRef],
+  );
+
+  React.useEffect(() => () => observerRef.current?.disconnect(), []);
+
+  return { mergedRef, popupRef };
+}
+
+/**
+ * Computes all CSS style objects for the drawer viewport, popup, and backdrop.
+ * Handles scroll-driven animation detection, snap ratios, and CSS custom properties.
+ */
+function useDrawerContentStyles({
+  direction,
+  variant,
+  activeSnapPoint,
+  snapPoints,
+  contentSize,
+  isVertical,
+  isInitialized,
+  isAnimating,
+  immediateClose,
+  dismissible,
+  snapProgress,
+  repositionInputs,
+  keyboardHeight,
+  visualViewportHeight,
+}: {
+  direction: DrawerDirection;
+  variant: DrawerVariant;
+  activeSnapPoint: SnapPoint;
+  snapPoints: SnapPoint[];
+  contentSize: number | null;
+  isVertical: boolean;
+  isInitialized: boolean;
+  isAnimating: boolean;
+  immediateClose: boolean;
+  dismissible: boolean;
+  snapProgress: number;
+  repositionInputs: boolean;
+  keyboardHeight: number;
+  visualViewportHeight: number | null;
+}) {
+  const snapPointRatio = React.useMemo(() => {
+    if (typeof activeSnapPoint === "number") {
+      return activeSnapPoint;
+    }
+    const pixels = parsePixelValue(activeSnapPoint);
+    if (!pixels || !contentSize) return 1;
+    return pixels / contentSize;
+  }, [activeSnapPoint, contentSize]);
+
+  const firstSnapRatio =
+    contentSize != null
+      ? snapPointToRatio(snapPoints[0], contentSize)
+      : typeof snapPoints[0] === "number"
+        ? snapPoints[0]
+        : 1;
+  const lastSnapRatio =
+    contentSize != null
+      ? snapPointToRatio(snapPoints[snapPoints.length - 1], contentSize)
+      : typeof snapPoints[snapPoints.length - 1] === "number"
+        ? snapPoints[snapPoints.length - 1]
+        : 1;
+
+  const baseOffset =
+    typeof activeSnapPoint === "number"
+      ? `${activeSnapPoint * 100}%`
+      : activeSnapPoint;
+  const animationOffset =
+    variant === "floating" ? `calc(${baseOffset} + 1rem)` : baseOffset;
+
+  const targetBackdropOpacity = snapPointRatio;
+
+  const useScrollDrivenAnimation =
+    supportsScrollTimeline && isInitialized && !isAnimating && !immediateClose;
+
+  const viewportStyle = React.useMemo<React.CSSProperties>(
+    () => ({
+      ...(visualViewportHeight != null && {
+        "--visual-viewport-height": `${visualViewportHeight}px`,
+      }),
+      ...(repositionInputs && {
+        "--keyboard-height": `${keyboardHeight}px`,
+      }),
+      "--content-size": `${contentSize ?? 0}px`,
+      "--dismiss-buffer": dismissible ? `${(contentSize ?? 0) * 0.3}px` : "0px",
+      "--first-snap-ratio": firstSnapRatio,
+      "--last-snap-ratio": lastSnapRatio,
+      scrollSnapType: isInitialized
+        ? isVertical
+          ? "y mandatory"
+          : "x mandatory"
+        : "none",
+      scrollBehavior: isInitialized ? "smooth" : "auto",
+      ...(useScrollDrivenAnimation
+        ? {
+            animationName: "drawer-snap-progress",
+            animationTimingFunction: "linear",
+            animationFillMode: "both",
+            animationTimeline: isVertical ? "scroll(self)" : "scroll(self x)",
+            ...(direction === "top" || direction === "left"
+              ? {
+                  animationRange: `calc(var(--content-size) * (1 - var(--last-snap-ratio))) calc(var(--content-size) * (1 - var(--first-snap-ratio)))`,
+                  animationDirection: "reverse",
+                }
+              : {
+                  animationRange: `calc(var(--dismiss-buffer) + var(--first-snap-ratio) * var(--content-size)) calc(var(--dismiss-buffer) + var(--last-snap-ratio) * var(--content-size))`,
+                }),
+          }
+        : {
+            "--drawer-snap-progress": snapProgress,
+          }),
+    }),
+    [
+      visualViewportHeight,
+      repositionInputs,
+      keyboardHeight,
+      contentSize,
+      dismissible,
+      firstSnapRatio,
+      lastSnapRatio,
+      isInitialized,
+      isVertical,
+      useScrollDrivenAnimation,
+      snapProgress,
+      direction,
+    ],
+  );
+
+  const popupStyle = React.useMemo<React.CSSProperties>(
+    () => ({
+      "--drawer-offset": animationOffset,
+      ...(supportsScrollTimeline && {
+        viewTimelineName: "--drawer-panel",
+        viewTimelineAxis: isVertical ? "block" : "inline",
+      }),
+    }),
+    [animationOffset, isVertical],
+  );
+
+  return {
+    viewportStyle,
+    popupStyle,
+    useScrollDrivenAnimation,
+    targetBackdropOpacity,
+  };
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * DrawerContentInner
+ * -------------------------------------------------------------------------------------------------*/
+
 function DrawerContentInner({
   className,
   children,
@@ -642,137 +842,34 @@ function DrawerContentInner({
     onScrollingChange: setIsDragging,
   });
 
-  const snapPointRatio = React.useMemo(() => {
-    if (typeof activeSnapPoint === "number") {
-      return activeSnapPoint;
-    }
-    const pixels = parsePixelValue(activeSnapPoint);
-    if (!pixels || !contentSize) return 1;
-    return pixels / contentSize;
-  }, [activeSnapPoint, contentSize]);
-
-  const firstSnapRatio =
-    contentSize != null
-      ? snapPointToRatio(snapPoints[0], contentSize)
-      : typeof snapPoints[0] === "number"
-        ? snapPoints[0]
-        : 1;
-  const lastSnapRatio =
-    contentSize != null
-      ? snapPointToRatio(snapPoints[snapPoints.length - 1], contentSize)
-      : typeof snapPoints[snapPoints.length - 1] === "number"
-        ? snapPoints[snapPoints.length - 1]
-        : 1;
-
-  const baseOffset =
-    typeof activeSnapPoint === "number"
-      ? `${activeSnapPoint * 100}%`
-      : activeSnapPoint;
-  const animationOffset =
-    variant === "floating" ? `calc(${baseOffset} + 1rem)` : baseOffset;
-
-  const targetBackdropOpacity = snapPointRatio;
-
-  const observerRef = React.useRef<ResizeObserver | null>(null);
   const floatingMargin = variant === "floating" ? 16 : 0;
-
-  const measureRef = React.useCallback(
-    (node: HTMLDivElement | null) => {
-      observerRef.current?.disconnect();
-      observerRef.current = null;
-
-      if (!node) return;
-
-      const measure = () => {
-        const baseSize = isVertical ? node.offsetHeight : node.offsetWidth;
-        setContentSize(baseSize + floatingMargin);
-      };
-
-      measure();
-      observerRef.current = new ResizeObserver(measure);
-      observerRef.current.observe(node);
-    },
-    [isVertical, setContentSize, floatingMargin],
+  const { mergedRef, popupRef } = useContentMeasurement(
+    isVertical,
+    floatingMargin,
+    setContentSize,
   );
 
-  const popupRef = React.useRef<HTMLDivElement>(null);
-
-  const mergedRef = React.useCallback(
-    (node: HTMLDivElement | null) => {
-      popupRef.current = node;
-      measureRef(node);
-    },
-    [measureRef],
-  );
-
-  React.useEffect(() => () => observerRef.current?.disconnect(), []);
-
-  const useScrollDrivenAnimation =
-    supportsScrollTimeline && isInitialized && !isAnimating && !immediateClose;
-
-  const viewportStyle = React.useMemo<React.CSSProperties>(
-    () => ({
-      ...(visualViewportHeight != null && {
-        "--visual-viewport-height": `${visualViewportHeight}px`,
-      }),
-      ...(repositionInputs && {
-        "--keyboard-height": `${keyboardHeight}px`,
-      }),
-      "--content-size": `${contentSize ?? 0}px`,
-      "--dismiss-buffer": dismissible ? `${(contentSize ?? 0) * 0.3}px` : "0px",
-      "--first-snap-ratio": firstSnapRatio,
-      "--last-snap-ratio": lastSnapRatio,
-      scrollSnapType: isInitialized
-        ? isVertical
-          ? "y mandatory"
-          : "x mandatory"
-        : "none",
-      scrollBehavior: isInitialized ? "smooth" : "auto",
-      ...(useScrollDrivenAnimation
-        ? {
-            animationName: "drawer-snap-progress",
-            animationTimingFunction: "linear",
-            animationFillMode: "both",
-            animationTimeline: isVertical ? "scroll(self)" : "scroll(self x)",
-            ...(direction === "top" || direction === "left"
-              ? {
-                  animationRange: `calc(var(--content-size) * (1 - var(--last-snap-ratio))) calc(var(--content-size) * (1 - var(--first-snap-ratio)))`,
-                  animationDirection: "reverse",
-                }
-              : {
-                  animationRange: `calc(var(--dismiss-buffer) + var(--first-snap-ratio) * var(--content-size)) calc(var(--dismiss-buffer) + var(--last-snap-ratio) * var(--content-size))`,
-                }),
-          }
-        : {
-            "--drawer-snap-progress": snapProgress,
-          }),
-    }),
-    [
-      visualViewportHeight,
-      repositionInputs,
-      keyboardHeight,
-      contentSize,
-      dismissible,
-      firstSnapRatio,
-      lastSnapRatio,
-      isInitialized,
-      isVertical,
-      useScrollDrivenAnimation,
-      snapProgress,
-      direction,
-    ],
-  );
-
-  const popupStyle = React.useMemo<React.CSSProperties>(
-    () => ({
-      "--drawer-offset": animationOffset,
-      ...(supportsScrollTimeline && {
-        viewTimelineName: "--drawer-panel",
-        viewTimelineAxis: isVertical ? "block" : "inline",
-      }),
-    }),
-    [animationOffset, isVertical],
-  );
+  const {
+    viewportStyle,
+    popupStyle,
+    useScrollDrivenAnimation,
+    targetBackdropOpacity,
+  } = useDrawerContentStyles({
+    direction,
+    variant,
+    activeSnapPoint,
+    snapPoints,
+    contentSize,
+    isVertical,
+    isInitialized,
+    isAnimating,
+    immediateClose,
+    dismissible,
+    snapProgress,
+    repositionInputs,
+    keyboardHeight,
+    visualViewportHeight,
+  });
 
   return (
     <div
@@ -927,10 +1024,8 @@ function DrawerContentInner({
  * DrawerHandle
  * -------------------------------------------------------------------------------------------------*/
 
-interface DrawerHandleProps extends Omit<
-  React.ComponentProps<"button">,
-  "children"
-> {
+interface DrawerHandleProps
+  extends Omit<useRender.ComponentProps<"button">, "children"> {
   hidden?: boolean;
   preventClose?: boolean;
 }
@@ -940,37 +1035,46 @@ function DrawerHandle({
   hidden,
   preventClose = false,
   onClick,
+  render,
   ...props
 }: DrawerHandleProps) {
   const { isVertical } = useDrawerConfig();
   const { onOpenChange, isAnimating } = useDrawerAnimation();
 
-  if (hidden) return null;
+  const handleClick = React.useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      onClick?.(event);
+      if (event.defaultPrevented) return;
+      if (isAnimating || preventClose) return;
+      onOpenChange(false);
+    },
+    [onClick, onOpenChange, isAnimating, preventClose],
+  );
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    onClick?.(event);
-    if (event.defaultPrevented) return;
-    if (isAnimating || preventClose) return;
-    onOpenChange(false);
+  const defaultProps = {
+    "data-slot": "drawer-handle" as const,
+    type: "button" as const,
+    "aria-label": "Close drawer",
+    onClick: handleClick,
+    className: cn(
+      "appearance-none border-0 bg-transparent p-0",
+      "focus-visible:ring-ring/50 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+      "bg-muted-foreground/30 shrink-0 cursor-pointer rounded-full",
+      isVertical ? "mx-auto my-3 h-1.5 w-12" : "mx-3 my-auto h-12 w-1.5",
+      "hover:bg-muted-foreground/50 transition-colors",
+      className,
+    ),
   };
 
-  return (
-    <button
-      type="button"
-      data-slot="drawer-handle"
-      aria-label="Close drawer"
-      onClick={handleClick}
-      className={cn(
-        "appearance-none border-0 bg-transparent p-0",
-        "focus-visible:ring-ring/50 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
-        "bg-muted-foreground/30 shrink-0 cursor-pointer rounded-full",
-        isVertical ? "mx-auto my-3 h-1.5 w-12" : "mx-3 my-auto h-12 w-1.5",
-        "hover:bg-muted-foreground/50 transition-colors",
-        className,
-      )}
-      {...props}
-    />
-  );
+  const element = useRender({
+    defaultTagName: "button",
+    render,
+    props: mergeProps<"button">(defaultProps, props),
+  });
+
+  if (hidden) return null;
+
+  return element;
 }
 
 /* -------------------------------------------------------------------------------------------------

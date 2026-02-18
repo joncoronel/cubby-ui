@@ -81,8 +81,6 @@ export function useScrollSnap(
     dismissible,
     contentSize,
     open,
-    onScrollProgress,
-    onSnapProgress,
     onScrollingChange,
   } = options;
 
@@ -429,6 +427,21 @@ export function useScrollSnap(
     }
   }, [startScrollStabilityCheck]);
 
+  // Stable handler refs — keeps the event listener effect from re-running
+  // when handler dependencies change (geometry, snapScrollPositions, etc.)
+  const handleScrollRef = React.useRef(handleScroll);
+  const handleScrollEndRef = React.useRef(handleScrollEnd);
+  const handleScrollSnapChangeRef = React.useRef(handleScrollSnapChange);
+  const handleTouchStartRef = React.useRef(handleTouchStart);
+  const handleTouchEndRef = React.useRef(handleTouchEnd);
+  React.useLayoutEffect(() => {
+    handleScrollRef.current = handleScroll;
+    handleScrollEndRef.current = handleScrollEnd;
+    handleScrollSnapChangeRef.current = handleScrollSnapChange;
+    handleTouchStartRef.current = handleTouchStart;
+    handleTouchEndRef.current = handleTouchEnd;
+  });
+
   // Initialization (DrawerContentInner unmounts on close, giving fresh state)
   React.useEffect(() => {
     if (!open) {
@@ -486,14 +499,14 @@ export function useScrollSnap(
           geometry,
           effectiveSize,
         );
-        onScrollProgress?.(initialProgress);
+        optionsRef.current.onScrollProgress?.(initialProgress);
 
         const initialSnapProgress = calculateSnapProgress(
           targetScrollPos,
           snapScrollPositions,
           dismissible,
         );
-        onSnapProgress?.(initialSnapProgress);
+        optionsRef.current.onSnapProgress?.(initialSnapProgress);
 
         setTimeout(() => {
           scrollControlRef.current.isProgrammatic = false;
@@ -522,8 +535,6 @@ export function useScrollSnap(
     activeSnapPointIndex,
     snapScrollPositions,
     geometry,
-    onScrollProgress,
-    onSnapProgress,
   ]);
 
   // Sync lastDetectedSnapIndex to prevent false isFromDetection after programmatic scrolls
@@ -605,21 +616,26 @@ export function useScrollSnap(
     const container = containerRef.current;
     if (!container || !open) return;
 
-    container.addEventListener("scroll", handleScroll, { passive: true });
-    container.addEventListener("touchstart", handleTouchStart, {
-      passive: true,
-    });
-    container.addEventListener("touchend", handleTouchEnd, { passive: true });
-    container.addEventListener("touchcancel", handleTouchEnd, {
-      passive: true,
-    });
+    // Stable wrappers dispatch through refs so handler dep changes
+    // don't tear down and re-register all listeners.
+    const onScroll = () => handleScrollRef.current();
+    const onScrollEnd = () => handleScrollEndRef.current();
+    const onScrollSnapChange = (e: Event) =>
+      handleScrollSnapChangeRef.current(e);
+    const onTouchStart = () => handleTouchStartRef.current();
+    const onTouchEnd = () => handleTouchEndRef.current();
+
+    container.addEventListener("scroll", onScroll, { passive: true });
+    container.addEventListener("touchstart", onTouchStart, { passive: true });
+    container.addEventListener("touchend", onTouchEnd, { passive: true });
+    container.addEventListener("touchcancel", onTouchEnd, { passive: true });
 
     if (supportsScrollEnd) {
-      container.addEventListener("scrollend", handleScrollEnd);
+      container.addEventListener("scrollend", onScrollEnd);
     }
 
     if (supportsScrollSnapChange) {
-      container.addEventListener("scrollsnapchange", handleScrollSnapChange);
+      container.addEventListener("scrollsnapchange", onScrollSnapChange);
     }
 
     const updateViewportSize = () => {
@@ -629,33 +645,22 @@ export function useScrollSnap(
     window.addEventListener("resize", updateViewportSize);
 
     return () => {
-      container.removeEventListener("scroll", handleScroll);
-      container.removeEventListener("touchstart", handleTouchStart);
-      container.removeEventListener("touchend", handleTouchEnd);
-      container.removeEventListener("touchcancel", handleTouchEnd);
+      container.removeEventListener("scroll", onScroll);
+      container.removeEventListener("touchstart", onTouchStart);
+      container.removeEventListener("touchend", onTouchEnd);
+      container.removeEventListener("touchcancel", onTouchEnd);
 
       if (supportsScrollEnd) {
-        container.removeEventListener("scrollend", handleScrollEnd);
+        container.removeEventListener("scrollend", onScrollEnd);
       }
 
       if (supportsScrollSnapChange) {
-        container.removeEventListener(
-          "scrollsnapchange",
-          handleScrollSnapChange,
-        );
+        container.removeEventListener("scrollsnapchange", onScrollSnapChange);
       }
 
       window.removeEventListener("resize", updateViewportSize);
     };
-  }, [
-    open,
-    isVertical,
-    handleScroll,
-    handleScrollEnd,
-    handleScrollSnapChange,
-    handleTouchStart,
-    handleTouchEnd,
-  ]);
+  }, [open, isVertical]);
 
   const setSnapTargetRef = React.useCallback(
     (index: number, el: HTMLDivElement | null) => {

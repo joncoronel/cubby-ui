@@ -252,10 +252,12 @@ interface DrawerProps extends Omit<
   children?: React.ReactNode | ((props: DrawerRenderProps) => React.ReactNode);
 }
 
+const DEFAULT_SNAP_POINTS: SnapPoint[] = [1];
+
 function Drawer({
   direction = "bottom",
   variant = "default",
-  snapPoints = [1],
+  snapPoints = DEFAULT_SNAP_POINTS,
   defaultSnapPoint,
   activeSnapPoint: controlledSnapPoint,
   onActiveSnapPointChange,

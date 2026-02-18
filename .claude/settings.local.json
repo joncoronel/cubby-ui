@@ -125,7 +125,8 @@
       "Bash(pnpm run registry:all:*)",
       "Bash(fi)",
       "Bash(npx eslint:*)",
-      "mcp__playwright__browser_wait_for"
+      "mcp__playwright__browser_wait_for",
+      "Bash(python -c:*)"
     ],
     "deny": []
   }

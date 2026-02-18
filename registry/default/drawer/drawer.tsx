@@ -1,7 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { Dialog as BaseDialog } from "@base-ui/react/dialog";
+import {
+  Dialog as BaseDialog,
+  type DialogRootChangeEventDetails,
+} from "@base-ui/react/dialog";
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import { cva } from "class-variance-authority";
@@ -175,28 +178,39 @@ interface DrawerConfigContextValue {
   repositionInputs: boolean;
 }
 
-interface DrawerAnimationContextValue {
+/** High-frequency values updated during scroll/drag */
+interface DrawerScrollContextValue {
   isDragging: boolean;
-  setIsDragging: (dragging: boolean) => void;
   dragProgress: number;
-  setDragProgress: (progress: number) => void;
   snapProgress: number;
-  setSnapProgress: (progress: number) => void;
+}
+
+/** Low-frequency control values and stable setters */
+interface DrawerControlContextValue {
+  open: boolean;
+  onOpenChange: (
+    open: boolean,
+    eventDetails?: DialogRootChangeEventDetails,
+  ) => void;
+  dismissViaSwipe: () => void;
   activeSnapPoint: SnapPoint;
   setActiveSnapPoint: (snapPoint: SnapPoint) => void;
-  open: boolean;
-  onOpenChange: (open: boolean, eventDetails?: { reason?: string }) => void;
   contentSize: number | null;
   setContentSize: (size: number | null) => void;
   isAnimating: boolean;
   immediateClose: boolean;
   setImmediateClose: (value: boolean) => void;
+  setIsDragging: (dragging: boolean) => void;
+  setDragProgress: (progress: number) => void;
+  setSnapProgress: (progress: number) => void;
 }
 
 const DrawerConfigContext =
   React.createContext<DrawerConfigContextValue | null>(null);
-const DrawerAnimationContext =
-  React.createContext<DrawerAnimationContextValue | null>(null);
+const DrawerScrollContext =
+  React.createContext<DrawerScrollContextValue | null>(null);
+const DrawerControlContext =
+  React.createContext<DrawerControlContextValue | null>(null);
 
 function useDrawerConfig() {
   const context = React.useContext(DrawerConfigContext);
@@ -206,8 +220,18 @@ function useDrawerConfig() {
   return context;
 }
 
-function useDrawerAnimation() {
-  const context = React.useContext(DrawerAnimationContext);
+/** High-frequency scroll/drag state. Subscribing causes re-renders during drag. */
+function useDrawerScroll() {
+  const context = React.useContext(DrawerScrollContext);
+  if (!context) {
+    throw new Error("Drawer components must be used within a <Drawer />");
+  }
+  return context;
+}
+
+/** Low-frequency control state and stable setters. Does not re-render during drag. */
+function useDrawerControl() {
+  const context = React.useContext(DrawerControlContext);
   if (!context) {
     throw new Error("Drawer components must be used within a <Drawer />");
   }
@@ -215,13 +239,23 @@ function useDrawerAnimation() {
 }
 
 /**
+ * Convenience hook combining scroll and control contexts.
+ * Subscribes to both — re-renders on any animation state change.
+ * For fewer re-renders, use `useDrawerControl()` or `useDrawerScroll()`.
+ */
+function useDrawerAnimation() {
+  return { ...useDrawerScroll(), ...useDrawerControl() };
+}
+
+/**
  * Convenience hook that returns all drawer context values.
  * For granular subscriptions (fewer re-renders), use
- * `useDrawerConfig()` for static config or
- * `useDrawerAnimation()` for animation state.
+ * `useDrawerConfig()` for static config,
+ * `useDrawerControl()` for control state, or
+ * `useDrawerScroll()` for scroll/drag state.
  */
 function useDrawer() {
-  return { ...useDrawerConfig(), ...useDrawerAnimation() };
+  return { ...useDrawerConfig(), ...useDrawerScroll(), ...useDrawerControl() };
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -239,7 +273,7 @@ interface DrawerRenderProps {
 
 interface DrawerProps extends Omit<
   React.ComponentProps<typeof BaseDialog.Root>,
-  "children"
+  "children" | "onOpenChange"
 > {
   direction?: DrawerDirection;
   variant?: DrawerVariant;
@@ -255,6 +289,14 @@ interface DrawerProps extends Omit<
   sequentialSnap?: boolean;
   /** Repositions drawer when virtual keyboard appears (bottom only) */
   repositionInputs?: boolean;
+  /**
+   * Event handler called when the drawer is opened or closed.
+   * `eventDetails` may be undefined for internal close actions (e.g., DrawerClose, DrawerHandle).
+   */
+  onOpenChange?: (
+    open: boolean,
+    eventDetails?: DialogRootChangeEventDetails,
+  ) => void;
   children?: React.ReactNode | ((props: DrawerRenderProps) => React.ReactNode);
 }
 
@@ -311,23 +353,38 @@ function Drawer({
 
   const { isVertical } = DIRECTION_CONFIG[direction];
 
+  // Refs for stable access in callbacks without adding deps
+  const isDraggingRef = React.useRef(false);
+  const swipeDismissRef = React.useRef(false);
+  React.useLayoutEffect(() => {
+    isDraggingRef.current = isDragging;
+  });
+
   const handleOpenChangeComplete = React.useCallback(() => {
     setIsAnimating(false);
   }, []);
 
   const handleOpenChange = React.useCallback(
-    (nextOpen: boolean, eventDetails?: { reason?: string }) => {
+    (
+      nextOpen: boolean,
+      eventDetails?: DialogRootChangeEventDetails,
+    ) => {
       // Prevent closing while scrolling, but allow explicit swipe dismiss
-      if (!nextOpen && isDragging && eventDetails?.reason !== "swipe-dismiss") {
+      if (
+        !nextOpen &&
+        isDraggingRef.current &&
+        !swipeDismissRef.current
+      ) {
         return;
       }
+      swipeDismissRef.current = false;
 
       setIsAnimating(true);
 
       if (!isOpenControlled) {
         setUncontrolledOpen(nextOpen);
       }
-      controlledOnOpenChange?.(nextOpen, eventDetails as never);
+      controlledOnOpenChange?.(nextOpen, eventDetails);
 
       if (nextOpen && !isSnapPointControlled) {
         setInternalSnapPointIndex(defaultSnapPointIndex);
@@ -352,7 +409,6 @@ function Drawer({
       }
     },
     [
-      isDragging,
       isOpenControlled,
       controlledOnOpenChange,
       snapPoints,
@@ -361,6 +417,11 @@ function Drawer({
       defaultSnapPointIndex,
     ],
   );
+
+  const dismissViaSwipe = React.useCallback(() => {
+    swipeDismissRef.current = true;
+    handleOpenChange(false);
+  }, [handleOpenChange]);
 
   const setActiveSnapPoint = React.useCallback(
     (value: SnapPoint) => {
@@ -396,32 +457,37 @@ function Drawer({
     ],
   );
 
-  const animationValue = React.useMemo(
+  const scrollValue = React.useMemo(
     () => ({
       isDragging,
-      setIsDragging,
       dragProgress,
-      setDragProgress,
       snapProgress,
-      setSnapProgress,
-      activeSnapPoint: activeSnapPointValue,
-      setActiveSnapPoint,
+    }),
+    [isDragging, dragProgress, snapProgress],
+  );
+
+  const controlValue = React.useMemo(
+    () => ({
       open,
       onOpenChange: handleOpenChange,
+      dismissViaSwipe,
+      activeSnapPoint: activeSnapPointValue,
+      setActiveSnapPoint,
       contentSize,
       setContentSize,
       isAnimating,
       immediateClose,
       setImmediateClose,
+      setIsDragging,
+      setDragProgress,
+      setSnapProgress,
     }),
     [
-      isDragging,
-      dragProgress,
-      snapProgress,
-      activeSnapPointValue,
-      setActiveSnapPoint,
       open,
       handleOpenChange,
+      dismissViaSwipe,
+      activeSnapPointValue,
+      setActiveSnapPoint,
       contentSize,
       isAnimating,
       immediateClose,
@@ -440,19 +506,21 @@ function Drawer({
 
   return (
     <DrawerConfigContext.Provider value={configValue}>
-      <DrawerAnimationContext.Provider value={animationValue}>
-        <BaseDialog.Root
-          data-slot="drawer"
-          open={open}
-          onOpenChange={handleOpenChange}
-          onOpenChangeComplete={handleOpenChangeComplete}
-          modal={modal}
-          disablePointerDismissal={isAnimating || modal !== true}
-          {...props}
-        >
-          {resolvedChildren}
-        </BaseDialog.Root>
-      </DrawerAnimationContext.Provider>
+      <DrawerScrollContext.Provider value={scrollValue}>
+        <DrawerControlContext.Provider value={controlValue}>
+          <BaseDialog.Root
+            data-slot="drawer"
+            open={open}
+            onOpenChange={handleOpenChange}
+            onOpenChangeComplete={handleOpenChangeComplete}
+            modal={modal}
+            disablePointerDismissal={isAnimating || modal !== true}
+            {...props}
+          >
+            {resolvedChildren}
+          </BaseDialog.Root>
+        </DrawerControlContext.Provider>
+      </DrawerScrollContext.Provider>
     </DrawerConfigContext.Provider>
   );
 }
@@ -481,7 +549,7 @@ function DrawerClose({
   render,
   ...props
 }: DrawerCloseProps) {
-  const { onOpenChange, isAnimating } = useDrawerAnimation();
+  const { onOpenChange, isAnimating } = useDrawerControl();
 
   const handleClick = React.useCallback(
     (event: React.MouseEvent) => {
@@ -751,27 +819,29 @@ function DrawerContentInner({
     direction,
     variant,
     snapPoints,
-    activeSnapPoint,
-    setActiveSnapPoint,
     dismissible,
     modal,
+    isVertical,
+    sequentialSnap,
+    repositionInputs,
+  } = useDrawerConfig();
+
+  const { isDragging, dragProgress, snapProgress } = useDrawerScroll();
+
+  const {
+    activeSnapPoint,
+    setActiveSnapPoint,
     contentSize,
     setContentSize,
-    isVertical,
     setIsDragging,
-    dragProgress,
     setDragProgress,
-    snapProgress,
     setSnapProgress,
-    onOpenChange,
+    dismissViaSwipe,
     open,
     isAnimating,
     immediateClose,
     setImmediateClose,
-    isDragging,
-    sequentialSnap,
-    repositionInputs,
-  } = useDrawer();
+  } = useDrawerControl();
 
   const activeSnapPointIndex = findSnapPointIndex(snapPoints, activeSnapPoint);
 
@@ -792,8 +862,8 @@ function DrawerContentInner({
   });
 
   const handleDismiss = React.useCallback(() => {
-    onOpenChange(false, { reason: "swipe-dismiss" });
-  }, [onOpenChange]);
+    dismissViaSwipe();
+  }, [dismissViaSwipe]);
 
   const handleImmediateClose = React.useCallback(() => {
     setImmediateClose(true);
@@ -1039,7 +1109,7 @@ function DrawerHandle({
   ...props
 }: DrawerHandleProps) {
   const { isVertical } = useDrawerConfig();
-  const { onOpenChange, isAnimating } = useDrawerAnimation();
+  const { onOpenChange, isAnimating } = useDrawerControl();
 
   const handleClick = React.useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -1054,7 +1124,7 @@ function DrawerHandle({
   const defaultProps = {
     "data-slot": "drawer-handle" as const,
     type: "button" as const,
-    "aria-label": "Close drawer",
+    "aria-label": preventClose ? "Drawer handle" : "Close drawer",
     onClick: handleClick,
     className: cn(
       "appearance-none border-0 bg-transparent p-0",
@@ -1222,6 +1292,8 @@ export {
   useDrawer,
   useDrawerConfig,
   useDrawerAnimation,
+  useDrawerScroll,
+  useDrawerControl,
   createDrawerHandle,
 };
 

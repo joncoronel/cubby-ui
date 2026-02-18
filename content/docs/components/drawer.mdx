@@ -289,7 +289,11 @@ Visual drag indicator that doubles as a close button. Automatically adjusts orie
 </ApiProp>
 
 <ApiProp name="preventClose" fullType="boolean" defaultValue="false">
-  When true, clicking the handle will not close the drawer.
+  When true, clicking the handle will not close the drawer. The default `aria-label` changes from "Close drawer" to "Drawer handle" accordingly.
+</ApiProp>
+
+<ApiProp name="aria-label" fullType="string" defaultValue='"Close drawer"'>
+  Override for internationalization. Passed via props and merged with defaults using `mergeProps`.
 </ApiProp>
 
 </ApiPropsList>

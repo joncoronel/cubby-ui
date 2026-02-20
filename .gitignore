@@ -48,3 +48,5 @@ package-lock.json
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+pure-web-bottom-sheet-main/

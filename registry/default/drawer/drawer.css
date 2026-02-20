@@ -50,3 +50,328 @@ html:has(
   )::-webkit-scrollbar {
   display: none !important;
 }
+
+/* -------------------------------------------------------------------------------------------------
+ * Height-Driven Mode (bottom direction)
+ *
+ * Bottom drawers with multiple snap points use a height-driven layout where
+ * the sheet's height grows/shrinks based on scroll position, providing a
+ * native iOS-like bottom sheet experience.
+ * Scoped via [data-drawer-mode="height-driven"] on the viewport element.
+ * -------------------------------------------------------------------------------------------------*/
+
+/* Snap elements use relative positioning with --snap CSS custom property */
+[data-drawer-mode="height-driven"] [data-slot="drawer-snap-element"] {
+  position: relative;
+  top: var(--snap);
+}
+
+[data-drawer-mode="height-driven"] [data-slot="drawer-snap-element"]::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1px; /* Required for Safari to snap */
+  scroll-snap-align: var(--snap-point-align, start);
+  content: "";
+}
+
+/* Dismiss snap target — placed at the very top of the scroll range.
+   When swiped past the lowest snap point, scroll-snap momentum carries
+   toward this target BELOW the viewport edge, so the sheet closes smoothly. */
+[data-drawer-mode="height-driven"] [data-slot="drawer-dismiss-snap"]::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1px;
+  scroll-snap-align: var(--snap-point-align, start);
+  content: "";
+}
+
+/* Dismiss buffer spacer — creates a dead zone between dismiss snap and
+   first snap point so scroll-snap momentum doesn't decelerate at the visible edge */
+[data-drawer-mode="height-driven"] [data-slot="drawer-dismiss-buffer"] {
+  height: var(--dismiss-buffer, 0px);
+}
+
+/* Bottom spacer creates the scroll range below the sheet */
+[data-drawer-mode="height-driven"] [data-slot="drawer-snap-bottom"] {
+  position: static;
+  top: initial;
+  height: auto;
+}
+
+[data-drawer-mode="height-driven"] [data-slot="drawer-snap-bottom"]::after {
+  display: block;
+  position: static;
+  height: var(--sheet-max-height);
+  content: "";
+}
+
+/* Sentinels for IntersectionObserver-based snap detection */
+[data-drawer-mode="height-driven"] [data-slot="drawer-sentinel"] {
+  position: relative;
+}
+
+[data-drawer-mode="height-driven"]
+  [data-slot="drawer-sentinel"][data-snap="0"] {
+  top: -1px; /* Extra -1px needed for Safari */
+}
+
+[data-drawer-mode="height-driven"]
+  [data-slot="drawer-sentinel"][data-snap="1"] {
+  top: 1px;
+}
+
+/* Sheet wrapper: sticky bottom, anchors the sheet */
+[data-drawer-mode="height-driven"] [data-slot="drawer-sheet-wrapper"] {
+  display: flex;
+  position: sticky;
+  bottom: 0;
+  flex-direction: column;
+  justify-content: end;
+  /* Fixes scroll-chaining issue on Firefox when sheet content is scrollable */
+  contain: strict;
+  height: 100%;
+  border-radius: inherit;
+}
+
+/* Sheet panel: flex column, height driven by scroll */
+[data-drawer-mode="height-driven"] [data-slot="drawer-sheet-panel"] {
+  display: flex;
+  position: sticky;
+  bottom: 0;
+  flex-direction: column;
+  height: 100%;
+  overflow: clip;
+  /* No scroll-snap-align here — snap elements handle all user-defined snap points.
+     Adding snap-align would create an extra snap target at 100% container height. */
+  pointer-events: all;
+}
+
+/* The Popup inside the panel inherits layout but must NOT have scroll-driven
+   animations, otherwise Base UI listens for animationend which never fires
+   and isAnimating stays stuck. */
+[data-drawer-mode="height-driven"] [data-slot="drawer-content"] {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow: clip;
+}
+
+/* Prevent shrinking header/footer */
+[data-drawer-mode="height-driven"] [data-slot="drawer-header"],
+[data-drawer-mode="height-driven"] [data-slot="drawer-footer"] {
+  flex: 0 0 auto;
+}
+
+/* Handle wrapper: flex prevents the handle's margins from collapsing
+   through the wrapper, so its inherited background covers the full area
+   (pill + margins). z-index keeps it above the body's transform stacking
+   context during scroll optimization. */
+[data-drawer-mode="height-driven"] [data-slot="drawer-handle-wrapper"] {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  background: inherit;
+}
+
+/* Header: same z-index/background treatment as handle wrapper to stay
+   above body content during transform mode. */
+[data-drawer-mode="height-driven"] [data-slot="drawer-header"] {
+  position: relative;
+  z-index: 1;
+  background: inherit;
+}
+
+/* Sheet footer sticky */
+[data-drawer-mode="height-driven"] [data-slot="drawer-footer"] {
+  position: sticky;
+  bottom: 0;
+}
+
+/* Body scrolls independently */
+[data-drawer-mode="height-driven"] [data-slot="drawer-body"] {
+  flex: 1 1 auto;
+  min-height: 0;
+  will-change: scroll-position;
+  overflow-y: auto;
+}
+
+/* Initial snap animation: temporarily disable all snap points except the initial one */
+[data-drawer-mode="height-driven"] {
+  animation: drawer-initial-snap 0.01s both;
+}
+
+@supports (-webkit-touch-callout: none) or (-webkit-hyphens: none) {
+  [data-drawer-mode="height-driven"] {
+    animation: drawer-initial-snap 0.1s both;
+  }
+}
+
+@keyframes drawer-initial-snap {
+  0% {
+    --snap-point-align: none;
+  }
+  50% {
+    scroll-snap-type: initial;
+    --snap-point-align: none;
+  }
+}
+
+/* Mark initial snap element so it keeps its scroll-snap-align during the animation */
+[data-drawer-mode="height-driven"]
+  [data-slot="drawer-snap-element"][data-initial] {
+  --snap-point-align: start;
+}
+
+/* ----- Scroll-Driven Animations (progressive enhancement) ----- */
+
+@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
+  [data-drawer-mode="height-driven"] {
+    scroll-timeline: --sheet-timeline y;
+  }
+
+  /* Height-driven animation: sheet panel height from 0 to lastSnapRatio*100%
+     based on scroll position. --last-snap-ratio defaults to 1 (full height)
+     but when the last snap point is a pixel value below max height, the
+     animation caps at that ratio so the sheet can't visually grow past it.
+     Target the sheet-panel wrapper (NOT drawer-content/Popup) to avoid
+     scroll-driven animationend blocking Base UI's onOpenChangeComplete.
+     animation-range skips the dismiss buffer zone so height stays 0 during dismiss,
+     and ends at the last snap's scroll position so fill-mode:both holds the cap.
+     */
+  [data-drawer-mode="height-driven"] [data-slot="drawer-sheet-panel"] {
+    animation: drawer-expand-height linear both;
+    animation-timeline: --sheet-timeline;
+    animation-range: var(--dismiss-buffer, 0px)
+      calc(
+        var(--dismiss-buffer, 0px) + var(--last-snap-ratio, 1) *
+          (100% - var(--dismiss-buffer, 0px))
+      );
+  }
+
+  @keyframes drawer-expand-height {
+    from {
+      height: 0;
+    }
+    to {
+      height: calc(var(--last-snap-ratio, 1) * 100%);
+    }
+  }
+
+  /* Performance optimization: during active user scrolling, switch from
+     height animation (triggers layout reflow per frame) to translateY
+     animation (compositor-only, zero layout cost). The visual positions
+     match between modes — sheet appears identical at any scroll progress.
+     Modeled after pure-web-bottom-sheet's nested-scroll-optimization. */
+  [data-drawer-mode="height-driven"][data-scrolling]
+    [data-slot="drawer-sheet-panel"] {
+    animation-name: drawer-translate-sheet;
+    height: 100%;
+  }
+
+  [data-drawer-mode="height-driven"][data-scrolling]
+    [data-slot="drawer-header"] {
+    z-index: 1;
+  }
+
+  [data-drawer-mode="height-driven"][data-scrolling] [data-slot="drawer-body"] {
+    /* Compensate for body expansion when switching to transform mode.
+       The scroll-driven translateY keeps visible content in place during drag.
+       Offsets are calculated in JS based on current scroll position.
+       MUST use same animation-range as sheet panel/footer so all three
+       animations progress at the same rate — prevents content drift. */
+    animation: drawer-translate-body linear both;
+    animation-timeline: --sheet-timeline;
+    animation-range: var(--dismiss-buffer, 0px)
+      calc(
+        var(--dismiss-buffer, 0px) + var(--last-snap-ratio, 1) *
+          (100% - var(--dismiss-buffer, 0px))
+      );
+    /* Hide scrollbar during outer-scroll drag to prevent visual artifacts */
+    scrollbar-color: transparent transparent;
+  }
+
+  @keyframes drawer-translate-body {
+    from {
+      transform: translateY(var(--body-offset-start, 0));
+    }
+    to {
+      transform: translateY(var(--body-offset-end, 0));
+    }
+  }
+
+  /* Footer compensation: in transform mode the footer is below the clip edge,
+     so it needs its own opposing translateY to stay visible at the bottom.
+     Uses the same capped animation-range as the sheet panel. */
+  [data-drawer-mode="height-driven"][data-scrolling]
+    [data-slot="drawer-footer"] {
+    animation: drawer-translate-footer linear both;
+    animation-timeline: --sheet-timeline;
+    animation-range: var(--dismiss-buffer, 0px)
+      calc(
+        var(--dismiss-buffer, 0px) + var(--last-snap-ratio, 1) *
+          (100% - var(--dismiss-buffer, 0px))
+      );
+  }
+
+  @keyframes drawer-translate-sheet {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(calc((1 - var(--last-snap-ratio, 1)) * 100%));
+    }
+  }
+
+  @keyframes drawer-translate-footer {
+    from {
+      transform: translateY(calc(-1 * var(--sheet-max-height)));
+    }
+    to {
+      transform: translateY(
+        calc(-1 * (1 - var(--last-snap-ratio, 1)) * var(--sheet-max-height))
+      );
+    }
+  }
+}
+
+/* ----- JS Fallback (browsers without scroll-driven animations) ----- */
+
+@supports not ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
+  /* Sheet panel height driven by JS-set --sheet-position variable */
+  [data-drawer-mode="height-driven"] [data-slot="drawer-sheet-panel"] {
+    height: var(--sheet-position);
+  }
+}
+
+/* Safari iOS touch fix for nested scroll mode */
+@supports (-webkit-touch-callout: none) {
+  [data-drawer-mode="height-driven"] [data-slot="drawer-body"],
+  [data-drawer-mode="height-driven"] [data-slot="drawer-header"],
+  [data-drawer-mode="height-driven"] [data-slot="drawer-footer"] {
+    overflow-x: scroll;
+    overscroll-behavior-x: none;
+    scrollbar-width: none;
+  }
+
+  [data-drawer-mode="height-driven"] [data-slot="drawer-body"]::after,
+  [data-drawer-mode="height-driven"] [data-slot="drawer-header"]::after,
+  [data-drawer-mode="height-driven"] [data-slot="drawer-footer"]::after {
+    display: block;
+    box-sizing: content-box;
+    padding: inherit;
+    padding-left: 0;
+    width: calc(100% + 1px);
+    height: 1px;
+    content: "";
+  }
+
+  [data-drawer-mode="height-driven"] [data-slot="drawer-body"] {
+    scrollbar-width: auto;
+  }
+}

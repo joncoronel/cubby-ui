@@ -264,3 +264,78 @@ export function calculateSnapProgress(
     (scrollPos - firstSnapPos) / (lastSnapPos - firstSnapPos);
   return Math.min(1, Math.max(0, progress));
 }
+
+/* -------------------------------------------------------------------------------------------------
+ * Height-Driven Mode Utilities
+ * -------------------------------------------------------------------------------------------------*/
+
+/**
+ * Convert a snap point to a CSS percentage for the --snap variable.
+ * In height-driven mode, snap elements use `position: relative; top: var(--snap)`.
+ * The scroll container's scrollHeight = clientHeight + all snap offsets.
+ * Scrolling down moves the viewport, and the sheet height is driven by scroll position.
+ *
+ * --snap: 100% means the snap element is at the bottom of the scroll range = max scroll = sheet fully open.
+ * --snap: 40% means snap at 40% of scroll range = sheet 40% visible.
+ * --snap: 0% means snap at top = sheet collapsed/closed.
+ */
+/**
+ * Resolve a snap point to a ratio (0-1) relative to the container height.
+ * Fractional snap points are capped at maxContentHeight so the sheet
+ * doesn't grow beyond its content. Pixel snap points are not capped.
+ */
+export function resolveSnapPointRatio(
+  snapPoint: SnapPoint,
+  containerHeight: number,
+  maxContentHeight?: number,
+): number {
+  if (typeof snapPoint === "number") {
+    let ratio = snapPoint;
+    if (maxContentHeight != null && maxContentHeight > 0 && containerHeight > 0) {
+      ratio = Math.min(ratio, maxContentHeight / containerHeight);
+    }
+    return ratio;
+  }
+  const pixels = parsePixelValue(snapPoint);
+  if (pixels == null || containerHeight <= 0) return 1;
+  return pixels / containerHeight;
+}
+
+export function snapPointToSnapPercent(
+  snapPoint: SnapPoint,
+  containerHeight: number,
+  maxContentHeight?: number,
+): string {
+  const ratio = resolveSnapPointRatio(
+    snapPoint,
+    containerHeight,
+    maxContentHeight,
+  );
+  return `${ratio * 100}%`;
+}
+
+/**
+ * Calculate scroll progress for height-driven mode.
+ * In this mode, scrollTop directly maps to sheet height.
+ * Returns 0 = fully open, 1 = fully closed.
+ *
+ * When dismissBuffer > 0, the first `dismissBuffer` pixels of scroll range
+ * are a dead zone (progress stays at 1). The sheet height animation starts
+ * after the buffer zone.
+ */
+export function calculateHeightDrivenScrollProgress(
+  scrollTop: number,
+  scrollHeight: number,
+  clientHeight: number,
+  dismissBuffer: number = 0,
+): number {
+  const maxScroll = scrollHeight - clientHeight;
+  if (maxScroll <= 0) return 0;
+  // The sheet range excludes the dismiss buffer zone at the start
+  const sheetScroll = maxScroll - dismissBuffer;
+  if (sheetScroll <= 0) return 0;
+  const adjustedScroll = Math.max(0, scrollTop - dismissBuffer);
+  // At max adjusted scroll, the sheet is fully expanded (progress = 0 = open)
+  // At 0 adjusted scroll, the sheet is collapsed (progress = 1 = closed)
+  return 1 - adjustedScroll / sheetScroll;
+}

@@ -655,6 +655,11 @@
           "target": "components/ui/cubby-ui/drawer/lib/drawer-utils.ts"
         },
         {
+          "path": "registry/default/drawer/hooks/use-scroll-snap-height-driven.ts",
+          "type": "registry:hook",
+          "target": "components/ui/cubby-ui/drawer/hooks/use-scroll-snap-height-driven.ts"
+        },
+        {
           "path": "registry/default/drawer/hooks/use-scroll-snap.ts",
           "type": "registry:hook",
           "target": "components/ui/cubby-ui/drawer/hooks/use-scroll-snap.ts"

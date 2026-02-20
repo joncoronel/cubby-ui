@@ -25,10 +25,14 @@ import {
   findSnapPointIndex,
   getSnapPointValue,
   snapPointToRatio,
+  snapPointToSnapPercent,
+  resolveSnapPointRatio,
+  calculateHeightDrivenScrollProgress,
   supportsScrollTimeline,
   supportsScrollState,
 } from "./lib/drawer-utils";
 import { useScrollSnap } from "./hooks/use-scroll-snap";
+import { useScrollSnapHeightDriven } from "./hooks/use-scroll-snap-height-driven";
 import { useVirtualKeyboard } from "./hooks/use-virtual-keyboard";
 import { useVisualViewportHeight } from "./hooks/use-visual-viewport-height";
 
@@ -594,9 +598,15 @@ function DrawerContent({
   footerVariant = "default",
   ...props
 }: DrawerContentProps) {
+  const { direction, snapPoints } = useDrawerConfig();
+  const Inner =
+    direction === "bottom" && snapPoints.length > 1
+      ? DrawerContentInnerHeightDriven
+      : DrawerContentInner;
+
   return (
     <DrawerPortal>
-      <DrawerContentInner
+      <Inner
         initialFocus={initialFocus}
         finalFocus={finalFocus}
         footerVariant={footerVariant}
@@ -1084,6 +1094,502 @@ function DrawerContentInner({
 }
 
 /* -------------------------------------------------------------------------------------------------
+ * DrawerContentInnerHeightDriven (bottom direction with multiple snap points)
+ * -------------------------------------------------------------------------------------------------*/
+
+function DrawerContentInnerHeightDriven({
+  className,
+  children,
+  footerVariant = "default",
+  initialFocus,
+  finalFocus,
+  ...props
+}: DrawerContentProps) {
+  const { snapPoints, dismissible, modal, sequentialSnap, repositionInputs } =
+    useDrawerConfig();
+
+  const { isDragging, dragProgress, snapProgress } = useDrawerScroll();
+
+  const {
+    activeSnapPoint,
+    setActiveSnapPoint,
+    contentSize,
+    setContentSize,
+    setIsDragging,
+    setDragProgress,
+    setSnapProgress,
+    dismissViaSwipe,
+    open,
+    isAnimating,
+    immediateClose,
+    setImmediateClose,
+  } = useDrawerControl();
+
+  const activeSnapPointIndex = findSnapPointIndex(snapPoints, activeSnapPoint);
+
+  const handleSnapPointChange = React.useCallback(
+    (index: number) => {
+      setActiveSnapPoint(getSnapPointValue(snapPoints, index));
+    },
+    [snapPoints, setActiveSnapPoint],
+  );
+
+  const { keyboardHeight, isKeyboardVisible } = useVirtualKeyboard({
+    enabled: true,
+  });
+
+  const handleDismiss = React.useCallback(() => {
+    dismissViaSwipe();
+  }, [dismissViaSwipe]);
+
+  const handleImmediateClose = React.useCallback(() => {
+    setImmediateClose(true);
+  }, [setImmediateClose]);
+
+  const handleScrollProgress = React.useCallback(
+    (progress: number) => {
+      if (!isAnimating) {
+        setDragProgress(progress);
+      }
+    },
+    [isAnimating, setDragProgress],
+  );
+
+  const handleSnapProgress = React.useCallback(
+    (progress: number) => {
+      if (!isAnimating) {
+        setSnapProgress(progress);
+      }
+    },
+    [isAnimating, setSnapProgress],
+  );
+
+  const [sheetNaturalHeight, setSheetNaturalHeight] = React.useState<
+    number | null
+  >(null);
+
+  // Dismiss buffer: 30% of the sheet height at the lowest snap point.
+  // Places the dismiss snap target below the viewport edge so scroll-snap
+  // momentum doesn't decelerate at the visible edge during swipe-to-dismiss.
+  const dismissBuffer = React.useMemo(() => {
+    if (!dismissible || !contentSize) return 0;
+    const firstRatio = resolveSnapPointRatio(
+      snapPoints[0],
+      contentSize,
+      sheetNaturalHeight ?? undefined,
+    );
+    return Math.round(contentSize * firstRatio * 0.3);
+  }, [dismissible, contentSize, snapPoints, sheetNaturalHeight]);
+
+  const {
+    containerRef,
+    sheetWrapperRef,
+    isScrolling,
+    isInitialized,
+    isClosing,
+    snapPosition,
+  } = useScrollSnapHeightDriven({
+    snapPoints,
+    activeSnapPointIndex,
+    onSnapPointChange: handleSnapPointChange,
+    onDismiss: handleDismiss,
+    dismissible,
+    open,
+    // When CSS scroll-driven animations are available, skip JS progress callbacks
+    // to eliminate React re-renders on every scroll frame during drag.
+    // CSS handles backdrop opacity (via --sheet-timeline) and snap progress
+    // (via drawer-snap-progress animation). JS fallback path still needs these.
+    onScrollProgress: supportsScrollTimeline ? undefined : handleScrollProgress,
+    onSnapProgress: supportsScrollTimeline ? undefined : handleSnapProgress,
+    onImmediateClose: handleImmediateClose,
+    isAnimating,
+    onScrollingChange: setIsDragging,
+    maxContentHeight: sheetNaturalHeight ?? undefined,
+    dismissBuffer,
+  });
+
+  // In height-driven mode, contentSize is the container height (max sheet height).
+  // useLayoutEffect ensures contentSize is available before paint so snap elements
+  // render with correct --snap positions on the first visible frame.
+  React.useLayoutEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const measure = () => {
+      const size = container.clientHeight;
+      setContentSize(size);
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [containerRef, setContentSize]);
+
+  const popupRef = React.useRef<HTMLDivElement>(null);
+
+  // Measure the natural content height of the sheet (header + body content + footer).
+  // Used to cap fractional snap points (e.g. snap point 1 = content height, not viewport).
+  React.useLayoutEffect(() => {
+    const wrapper = sheetWrapperRef.current;
+    if (!wrapper) return;
+
+    const measure = () => {
+      const popup = wrapper.querySelector<HTMLElement>(
+        '[data-slot="drawer-content"]',
+      );
+      if (!popup) return;
+
+      let totalHeight = 0;
+      for (const child of popup.children) {
+        if (!(child instanceof HTMLElement)) continue;
+        const style = getComputedStyle(child);
+        const marginTop = parseFloat(style.marginTop) || 0;
+        const marginBottom = parseFloat(style.marginBottom) || 0;
+
+        if (child.dataset.slot === "drawer-body") {
+          // Body may be overflow-constrained due to flex layout,
+          // so measure inner content directly + body's own padding.
+          // Use getBoundingClientRect for sub-pixel precision —
+          // offsetHeight rounds to integers, losing up to 0.5px per element.
+          const inner = child.firstElementChild as HTMLElement | null;
+          const bodyPaddingTop = parseFloat(style.paddingTop) || 0;
+          const bodyPaddingBottom = parseFloat(style.paddingBottom) || 0;
+          const contentHeight = inner
+            ? inner.getBoundingClientRect().height
+            : child.scrollHeight;
+          totalHeight +=
+            contentHeight +
+            bodyPaddingTop +
+            bodyPaddingBottom +
+            marginTop +
+            marginBottom;
+        } else {
+          // getBoundingClientRect includes padding+border (like offsetHeight)
+          // but with sub-pixel precision instead of integer rounding.
+          totalHeight +=
+            child.getBoundingClientRect().height + marginTop + marginBottom;
+        }
+      }
+
+      // Math.ceil ensures the snap point is never under the actual content
+      // height due to accumulated floating-point imprecision.
+      setSheetNaturalHeight(totalHeight > 0 ? Math.ceil(totalHeight) : null);
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    const popup = wrapper.querySelector('[data-slot="drawer-content"]');
+    if (popup) observer.observe(popup);
+    const body = popup?.querySelector('[data-slot="drawer-body"]');
+    const bodyContent = body?.firstElementChild;
+    if (bodyContent) observer.observe(bodyContent);
+    return () => observer.disconnect();
+  }, [sheetWrapperRef]);
+
+  // Compute snap element CSS values
+  const snapElements = React.useMemo(() => {
+    const containerHeight = contentSize ?? 0;
+    return snapPoints.map((sp, i) => ({
+      snapPercent: snapPointToSnapPercent(
+        sp,
+        containerHeight,
+        sheetNaturalHeight ?? undefined,
+      ),
+      isInitial: i === activeSnapPointIndex,
+    }));
+  }, [snapPoints, activeSnapPointIndex, contentSize, sheetNaturalHeight]);
+
+  // Sync dragProgress after enter animation completes.
+  // During enter, isAnimating=true prevents scroll progress from updating dragProgress,
+  // so it stays at 1 (the initial "closed" value). Once animation ends, read the
+  // current scroll position to set the correct progress for backdrop opacity.
+  React.useEffect(() => {
+    if (!isAnimating && isInitialized) {
+      const container = containerRef.current;
+      if (!container) return;
+      const progress = calculateHeightDrivenScrollProgress(
+        container.scrollTop,
+        container.scrollHeight,
+        container.clientHeight,
+        dismissBuffer,
+      );
+      setDragProgress(progress);
+    }
+  }, [
+    isAnimating,
+    isInitialized,
+    containerRef,
+    dismissBuffer,
+    setDragProgress,
+  ]);
+
+  // Backdrop styles
+  const snapPointRatio = React.useMemo(() => {
+    const containerHeight = contentSize ?? 0;
+    return resolveSnapPointRatio(
+      activeSnapPoint,
+      containerHeight,
+      sheetNaturalHeight ?? undefined,
+    );
+  }, [activeSnapPoint, contentSize, sheetNaturalHeight]);
+
+  const targetBackdropOpacity = snapPointRatio;
+
+  const firstSnapRatio = React.useMemo(() => {
+    const containerHeight = contentSize ?? 0;
+    if (containerHeight <= 0)
+      return typeof snapPoints[0] === "number" ? snapPoints[0] : 1;
+    return resolveSnapPointRatio(
+      snapPoints[0],
+      containerHeight,
+      sheetNaturalHeight ?? undefined,
+    );
+  }, [snapPoints, contentSize, sheetNaturalHeight]);
+
+  const lastSnapRatio = React.useMemo(() => {
+    const containerHeight = contentSize ?? 0;
+    if (containerHeight <= 0)
+      return typeof snapPoints[snapPoints.length - 1] === "number"
+        ? snapPoints[snapPoints.length - 1]
+        : 1;
+    return resolveSnapPointRatio(
+      snapPoints[snapPoints.length - 1],
+      containerHeight,
+      sheetNaturalHeight ?? undefined,
+    );
+  }, [snapPoints, contentSize, sheetNaturalHeight]);
+
+  // CSS scroll-driven animation gate: only active when initialized, not animating,
+  // and not in immediate-close mode. Eliminates React re-renders during drag by
+  // letting CSS handle backdrop opacity and snap progress via scroll timeline.
+  const useScrollDrivenAnimation =
+    supportsScrollTimeline && isInitialized && !isAnimating && !immediateClose;
+
+  // Viewport style for height-driven mode
+  const sheetMaxHeight = repositionInputs
+    ? `calc(100dvh - 24px - env(keyboard-inset-height, ${keyboardHeight}px))`
+    : "calc(100dvh - 24px)";
+
+  const viewportStyle = React.useMemo<React.CSSProperties>(
+    () => ({
+      "--sheet-max-height": sheetMaxHeight,
+      "--dismiss-buffer": `${dismissBuffer}px`,
+      "--last-snap-ratio": lastSnapRatio,
+      ...(repositionInputs && {
+        "--keyboard-height": `${keyboardHeight}px`,
+      }),
+      // Always y mandatory — the CSS initial-snap animation handles temporarily
+      // disabling snap points on first render. Don't gate on isInitialized,
+      // as that would prevent the initial snap from working.
+      scrollSnapType: "y mandatory",
+      scrollBehavior: isInitialized ? "smooth" : "auto",
+      // Scroll-driven snap progress: CSS animation drives --drawer-snap-progress
+      // variable from 0 (first snap) to 1 (last snap) based on scroll position.
+      // Eliminates React re-renders — consumers use var(--drawer-snap-progress).
+      ...(useScrollDrivenAnimation
+        ? {
+            animationName: "drawer-snap-progress",
+            animationTimingFunction: "linear",
+            animationFillMode: "both",
+            animationTimeline: "--sheet-timeline",
+            animationRange: `calc(${dismissBuffer}px + ${firstSnapRatio} * (100% - ${dismissBuffer}px)) calc(${dismissBuffer}px + ${lastSnapRatio} * (100% - ${dismissBuffer}px))`,
+          }
+        : {
+            "--drawer-snap-progress": snapProgress,
+          }),
+    }),
+    [
+      sheetMaxHeight,
+      dismissBuffer,
+      repositionInputs,
+      keyboardHeight,
+      isInitialized,
+      useScrollDrivenAnimation,
+      firstSnapRatio,
+      lastSnapRatio,
+      snapProgress,
+    ],
+  );
+
+  // In height-driven mode, the scroll position IS the animation.
+  // No popup CSS transition needed — scroll-driven animation handles height.
+  // We use isInitialized (not isAnimating) to gate user interaction,
+  // because the popup has no CSS transition — Base UI fires
+  // onOpenChangeComplete immediately, making isAnimating short-lived.
+
+  return (
+    <div
+      data-slot="drawer-timeline-scope"
+      style={
+        supportsScrollTimeline
+          ? ({ timelineScope: "--sheet-timeline" } as React.CSSProperties)
+          : undefined
+      }
+    >
+      {modal === true && (
+        <BaseDialog.Backdrop
+          data-slot="drawer-overlay"
+          className={cn(
+            // Use fixed positioning so backdrop covers full screen
+            // regardless of parent positioning context
+            "fixed inset-0 z-50 bg-black/35",
+            "transform-[translateZ(0)] will-change-[opacity]",
+            isClosing ? "pointer-events-none" : "pointer-events-auto",
+            "touch-none",
+            // Disable transitions when CSS scroll-driven animation is active or
+            // during drag/immediateClose to prevent interference.
+            immediateClose ||
+              useScrollDrivenAnimation ||
+              (isDragging && !isAnimating)
+              ? "transition-none"
+              : "transition-opacity duration-300 ease-[cubic-bezier(0,0,0.58,1)]",
+            "data-starting-style:opacity-0!",
+            "data-ending-style:animate-[drawer-backdrop-exit_300ms_cubic-bezier(0,0,0.58,1)_forwards]",
+            // Height-driven backdrop strategy:
+            // 1. CSS scroll-driven animation (Chrome 115+): backdrop opacity driven
+            //    by --sheet-timeline, zero JS/React overhead during drag.
+            // 2. JS fallback: dragProgress state drives opacity via CSS variable.
+            // When immediateClose (swipe dismiss), force opacity-0 to prevent a flash.
+            immediateClose
+              ? "opacity-0"
+              : useScrollDrivenAnimation
+                ? "fill-mode-[both] [animation-name:drawer-backdrop-fade] [animation-timeline:--sheet-timeline] [animation-timing-function:linear]"
+                : isInitialized &&
+                    !isAnimating &&
+                    dismissible &&
+                    dragProgress < 1
+                  ? `opacity-(--drawer-backdrop-dynamic-opacity)`
+                  : `opacity-(--drawer-backdrop-static-opacity)`,
+          )}
+          style={
+            {
+              ...(useScrollDrivenAnimation && {
+                animationRange: `${dismissBuffer}px calc(${dismissBuffer}px + ${lastSnapRatio} * (100% - ${dismissBuffer}px))`,
+              }),
+              "--drawer-backdrop-dynamic-opacity": 1 - dragProgress,
+              "--drawer-backdrop-static-opacity": targetBackdropOpacity,
+            } as React.CSSProperties
+          }
+        />
+      )}
+
+      <BaseDialog.Viewport
+        ref={containerRef}
+        data-slot="drawer-viewport"
+        data-direction="bottom"
+        data-drawer-mode="height-driven"
+        data-dismissible={dismissible || undefined}
+        data-sheet-snap-position={snapPosition ?? undefined}
+        data-scrolling={isScrolling || undefined}
+        data-keyboard-visible={
+          repositionInputs && isKeyboardVisible ? "true" : undefined
+        }
+        className={cn(
+          "group/drawer",
+          "fixed inset-x-0 z-50 outline-hidden",
+          // Height-driven mode: explicit height matching pure-web-bottom-sheet.
+          // The scroll container uses height: var(--sheet-max-height) so that
+          // clientHeight = max scroll range, making snap % = sheet height %.
+          "bottom-[env(keyboard-inset-height,var(--keyboard-height,0))]",
+          "h-(--sheet-max-height)",
+          "contain-strict",
+          // Viewport is always pointer-events-none; the sheet panel has pointer-events-all
+          "pointer-events-none",
+          "bg-transparent opacity-100! [&[data-ending-style]]:opacity-100! [&[data-starting-style]]:opacity-100!",
+          "[scrollbar-width:none_!important] [&::-webkit-scrollbar]:hidden!",
+          // Always overflow-y: scroll — scroll-driven animation needs scrollable container.
+          "overflow-x-hidden overflow-y-scroll overscroll-y-none",
+          "motion-reduce:[scroll-behavior:auto]",
+          "will-change-scroll",
+        )}
+        style={viewportStyle}
+      >
+        {/* Dismiss snap target — at scroll position 0 (before buffer) */}
+        {dismissible && (
+          <div data-slot="drawer-dismiss-snap" aria-hidden="true" />
+        )}
+
+        {/* Dismiss buffer spacer — dead zone between dismiss snap and first snap point */}
+        {dismissible && (
+          <div data-slot="drawer-dismiss-buffer" aria-hidden="true" />
+        )}
+
+        {/* Snap elements positioned via CSS --snap */}
+        {snapElements.map((snap, i) => (
+          <div
+            key={i}
+            data-slot="drawer-snap-element"
+            data-snap={String(snapPoints.length - 1 - i)}
+            data-initial={snap.isInitial || undefined}
+            style={
+              {
+                "--snap": snap.snapPercent,
+                scrollSnapStop: sequentialSnap ? "always" : undefined,
+              } as React.CSSProperties
+            }
+            aria-hidden="true"
+          />
+        ))}
+
+        {/* Sentinel for IntersectionObserver snap detection */}
+        <div data-slot="drawer-sentinel" data-snap="1" aria-hidden="true" />
+
+        {/* Bottom spacer: creates scroll range below the sheet */}
+        <div
+          data-slot="drawer-snap-bottom"
+          style={
+            { "--sheet-max-height": sheetMaxHeight } as React.CSSProperties
+          }
+          aria-hidden="true"
+        />
+
+        {/* Sentinel for top position */}
+        <div data-slot="drawer-sentinel" data-snap="0" aria-hidden="true" />
+
+        {/* Sheet wrapper: sticky bottom, anchors the sheet */}
+        <div ref={sheetWrapperRef} data-slot="drawer-sheet-wrapper">
+          {/* Sheet panel: carries the scroll-driven height animation.
+              Separate from the Popup so that scroll-driven animationend
+              doesn't block Base UI's onOpenChangeComplete. */}
+          <div data-slot="drawer-sheet-panel" className="rounded-t-xl">
+            <BaseDialog.Popup
+              ref={popupRef}
+              data-slot="drawer-content"
+              data-footer-variant={footerVariant}
+              initialFocus={initialFocus ?? popupRef}
+              finalFocus={finalFocus}
+              className={cn(
+                "bg-popover text-popover-foreground",
+                "rounded-t-xl",
+                // Same slide transition as regular drawer: translateY to slide in/out.
+                // The sheet-panel has overflow:clip so the popup clips as it slides.
+                // --drawer-offset is 100% because the panel height IS the snap height,
+                // so sliding by 100% of its own height always matches the snap distance.
+                "transition-transform duration-300 ease-[cubic-bezier(0_0_0.58_1)] will-change-transform",
+                "motion-reduce:transition-none",
+                "data-starting-style:translate-y-(--drawer-offset)",
+                "data-ending-style:translate-y-(--drawer-offset)",
+                // When dismissed via swipe, remove CSS transition so Base UI fires
+                // onOpenChangeComplete immediately (no 300ms wait for transitionend).
+                immediateClose && "transition-none",
+                className,
+              )}
+              style={{ "--drawer-offset": "100%" } as React.CSSProperties}
+              {...props}
+            >
+              {children}
+            </BaseDialog.Popup>
+          </div>
+        </div>
+
+        {SafariNavColorDetectors}
+      </BaseDialog.Viewport>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------------------------------
  * DrawerHandle
  * -------------------------------------------------------------------------------------------------*/
 
@@ -1139,7 +1645,14 @@ function DrawerHandle({
 
   if (hidden) return null;
 
-  return element;
+  return (
+    <div
+      className="flex items-center justify-center"
+      data-slot="drawer-handle-wrapper"
+    >
+      {element}
+    </div>
+  );
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -1240,7 +1753,27 @@ function DrawerBody({
     ScrollAreaProps,
     "fadeEdges" | "scrollbarGutter" | "persistScrollbar" | "hideScrollbar"
   >) {
-  const { isVertical } = useDrawerConfig();
+  const { isVertical, direction, snapPoints } = useDrawerConfig();
+
+  // In height-driven mode (bottom with multiple snaps), CSS handles overflow-y: auto
+  // directly on drawer-body. No ScrollArea wrapper needed — the body scrolls natively.
+  if (direction === "bottom" && snapPoints.length > 1) {
+    return (
+      <div
+        data-slot="drawer-body"
+        className={cn(
+          "relative z-0 min-h-0 flex-1",
+          "first:pt-4",
+          "not-has-[+[data-slot=drawer-footer]]:pb-4",
+          "in-data-[footer-variant=inset]:has-[+[data-slot=drawer-footer]]:pb-4",
+        )}
+      >
+        <div className={cn("px-5 py-1", className)} {...props}>
+          {children}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

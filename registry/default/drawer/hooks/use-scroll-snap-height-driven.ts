@@ -269,6 +269,11 @@ export function useScrollSnapHeightDriven(
             if (yOffset > 0) {
               body.scrollTop = yOffset + body.scrollTop;
             }
+
+            // Restore body scrolling (may have been locked during momentum
+            // in handleTouchEnd to prevent scroll-driven translateY from
+            // fighting user-initiated body scrolls).
+            body.style.removeProperty("overflow-y");
           } else {
             container.removeAttribute("data-scrolling");
           }
@@ -620,7 +625,7 @@ export function useScrollSnapHeightDriven(
   );
 
   // Touch events
-  const handleTouchStart = React.useCallback(() => {
+  const handleTouchStart = React.useCallback((e: Event) => {
     interactionRef.current.isPointerDown = true;
     // Capture body scrollTop before any scrolling occurs. The CSS
     // scroll-driven height animation runs synchronously with scroll,
@@ -633,12 +638,43 @@ export function useScrollSnapHeightDriven(
     if (body) {
       interactionRef.current.savedBodyScrollTop = body.scrollTop;
       interactionRef.current.savedBodyHeight = body.offsetHeight;
+
+      // Cancel any elastic overscroll animation on the body (Chrome 145+
+      // shows elastic effects on non-root scrollers). During the elastic
+      // animation, the body's scroll state interferes with the outer
+      // container's scroll-snap behavior. Only cancel for non-body touches
+      // — body touches need auto for scroll chaining to the outer container.
+      const target = e.target instanceof Node ? e.target : null;
+      if (target && !body.contains(target)) {
+        body.style.overscrollBehaviorY = "none";
+      }
     }
   }, []);
 
   const handleTouchEnd = React.useCallback(() => {
     interactionRef.current.isPointerDown = false;
     initRef.current.rafStableCount = 0;
+
+    // Restore elastic overscroll on the body (may have been cancelled
+    // in handleTouchStart for non-body touches).
+    const wrapper = sheetWrapperRef.current;
+    const body = wrapper?.querySelector<HTMLElement>(
+      '[data-slot="drawer-body"]',
+    );
+    if (body) {
+      body.style.removeProperty("overscroll-behavior-y");
+
+      // Lock body scrolling during momentum. When the finger lifts while
+      // transform mode is active, the drawer continues via momentum. The
+      // body's scroll-driven translateY would fight any user-initiated body
+      // scroll during that momentum. Setting overflow-y: hidden makes the
+      // body non-scrollable so touches pass through to the outer container,
+      // letting the user control the drawer instead. Restored on transform
+      // mode exit in updateIsScrolling(false).
+      if (scrollOptActiveRef.current) {
+        body.style.overflowY = "hidden";
+      }
+    }
 
     if (interactionRef.current.scrollEndedWhilePointerDown) {
       interactionRef.current.scrollEndedWhilePointerDown = false;
@@ -872,7 +908,7 @@ export function useScrollSnapHeightDriven(
     const onScrollEnd = () => handleScrollEndRef.current();
     const onScrollSnapChange = (e: Event) =>
       handleScrollSnapChangeRef.current(e);
-    const onTouchStart = () => handleTouchStartRef.current();
+    const onTouchStart = (e: Event) => handleTouchStartRef.current(e);
     const onTouchEnd = () => handleTouchEndRef.current();
 
     container.addEventListener("scroll", onScroll, { passive: true });

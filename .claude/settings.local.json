@@ -126,7 +126,8 @@
       "Bash(fi)",
       "Bash(npx eslint:*)",
       "mcp__playwright__browser_wait_for",
-      "Bash(python -c:*)"
+      "Bash(python -c:*)",
+      "Read(//c/Users/jonny/Documents/Projects/**)"
     ],
     "deny": []
   }

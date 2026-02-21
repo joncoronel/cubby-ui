@@ -261,11 +261,13 @@ export function useScrollSnapHeightDriven(
             wrapper.style.removeProperty("--body-offset-end");
             container.removeAttribute("data-scrolling");
 
-            // Restore scrollTop: rAF runs before next paint, so no visual flash
+            // Restore scrollTop synchronously. Reading body.scrollTop forces
+            // a layout reflow after removeAttribute, but this only happens once
+            // per drag cycle and prevents a one-frame flash when called from
+            // rAF (e.g. the stability check) where a nested rAF would defer
+            // to the next frame.
             if (yOffset > 0) {
-              requestAnimationFrame(() => {
-                body.scrollTop = yOffset + body.scrollTop;
-              });
+              body.scrollTop = yOffset + body.scrollTop;
             }
           } else {
             container.removeAttribute("data-scrolling");

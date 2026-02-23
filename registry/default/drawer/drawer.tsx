@@ -1184,10 +1184,10 @@ function DrawerContentInnerHeightDriven({
   const {
     containerRef,
     sheetWrapperRef,
-    isScrolling,
     isInitialized,
     isClosing,
     snapPosition,
+    isTransformMode,
   } = useScrollSnapHeightDriven({
     snapPoints,
     activeSnapPointIndex,
@@ -1286,6 +1286,50 @@ function DrawerContentInnerHeightDriven({
     if (bodyContent) observer.observe(bodyContent);
     return () => observer.disconnect();
   }, [sheetWrapperRef]);
+
+  // Measure the combined height of non-body children (handle + header + footer).
+  // Sets two CSS variables on the wrapper for the split footer animations:
+  // --non-body-height: px value used in the clamped/linear translateY keyframes
+  // --non-body-ratio: unitless ratio (nonBodyHeight / containerHeight) used in
+  //   animation-range to compute the crossover scroll position between the
+  //   clamped and linear footer animations.
+  React.useLayoutEffect(() => {
+    const wrapper = sheetWrapperRef.current;
+    const container = containerRef.current;
+    if (!wrapper || !container) return;
+
+    const measure = () => {
+      const popup = wrapper.querySelector<HTMLElement>(
+        '[data-slot="drawer-content"]',
+      );
+      if (!popup) return;
+
+      let nonBodyHeight = 0;
+      for (const child of popup.children) {
+        if (!(child instanceof HTMLElement)) continue;
+        if (child.dataset.slot === "drawer-body") continue;
+        nonBodyHeight += child.getBoundingClientRect().height;
+      }
+      wrapper.style.setProperty("--non-body-height", `${nonBodyHeight}px`);
+
+      const containerHeight = container.clientHeight;
+      const ratio =
+        containerHeight > 0 ? nonBodyHeight / containerHeight : 0;
+      wrapper.style.setProperty("--non-body-ratio", String(ratio));
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    const popup = wrapper.querySelector('[data-slot="drawer-content"]');
+    if (popup) observer.observe(popup);
+    // Also observe container so ratio updates on viewport resize
+    observer.observe(container);
+    return () => {
+      observer.disconnect();
+      wrapper.style.removeProperty("--non-body-height");
+      wrapper.style.removeProperty("--non-body-ratio");
+    };
+  }, [sheetWrapperRef, containerRef]);
 
   // Compute snap element CSS values
   const snapElements = React.useMemo(() => {
@@ -1481,7 +1525,7 @@ function DrawerContentInnerHeightDriven({
         data-drawer-mode="height-driven"
         data-dismissible={dismissible || undefined}
         data-sheet-snap-position={snapPosition ?? undefined}
-        data-scrolling={isScrolling || undefined}
+        data-scrolling={isTransformMode || undefined}
         data-keyboard-visible={
           repositionInputs && isKeyboardVisible ? "true" : undefined
         }

@@ -161,7 +161,14 @@ html:has(
   overflow: clip;
 }
 
-/* Prevent shrinking header/footer */
+/* Prevent handle, header and footer from shrinking so that:
+   1) In height mode, the body (flex-basis:0) collapses first. When the
+      sheet shrinks past the fixed content, the footer overflows past the
+      sheet panel bottom and overflow:clip clips from below.
+   2) In transform mode, items keep their natural sizes for correct
+      translateY compensation.
+   Matches PWBS's nested-scroll: .sheet-header, .sheet-footer { flex: 0 0 auto } */
+[data-drawer-mode="height-driven"] [data-slot="drawer-handle-wrapper"],
 [data-drawer-mode="height-driven"] [data-slot="drawer-header"],
 [data-drawer-mode="height-driven"] [data-slot="drawer-footer"] {
   flex: 0 0 auto;
@@ -187,15 +194,15 @@ html:has(
   background: inherit;
 }
 
-/* Sheet footer sticky */
-[data-drawer-mode="height-driven"] [data-slot="drawer-footer"] {
-  position: sticky;
-  bottom: 0;
-}
+/* Footer: no sticky positioning — flex layout handles it naturally.
+   Body (flex: 1 1 0) collapses first, then footer sits after header.
+   When the sheet shrinks past the fixed content, footer overflows past
+   the sheet panel bottom and overflow:clip clips from below — creating
+   the "dragged down with the sheet" effect. */
 
 /* Body scrolls independently */
 [data-drawer-mode="height-driven"] [data-slot="drawer-body"] {
-  flex: 1 1 auto;
+  flex: 1 1 0;
   min-height: 0;
   will-change: scroll-position;
   overflow-y: auto;
@@ -305,20 +312,6 @@ html:has(
     }
   }
 
-  /* Footer compensation: in transform mode the footer is below the clip edge,
-     so it needs its own opposing translateY to stay visible at the bottom.
-     Uses the same capped animation-range as the sheet panel. */
-  [data-drawer-mode="height-driven"][data-scrolling]
-    [data-slot="drawer-footer"] {
-    animation: drawer-translate-footer linear both;
-    animation-timeline: --sheet-timeline;
-    animation-range: var(--dismiss-buffer, 0px)
-      calc(
-        var(--dismiss-buffer, 0px) + var(--last-snap-ratio, 1) *
-          (100% - var(--dismiss-buffer, 0px))
-      );
-  }
-
   @keyframes drawer-translate-sheet {
     from {
       transform: translateY(100%);
@@ -328,9 +321,44 @@ html:has(
     }
   }
 
+  /* Footer: in transform mode the sheet is full-height with translateY,
+     so the footer needs its own reverse-translateY to stay at the visible
+     bottom. A single animation with linear() easing creates two phases:
+     1. Clamped phase (0 → crossover%): footer holds constant translateY
+        so its top aligns with handle/header — matching height-mode flex
+        layout where overflow:clip clips from below.
+     2. Linear phase (crossover% → 100%): footer tracks the visible bottom.
+     The crossover point = nonBodyRatio / lastSnapRatio (where visible
+     area equals non-body content height).
+     linear() easing keeps this as a single compositor-eligible transform
+     animation — no @property or multi-animation state issues.
+     position:relative avoids the sticky/transform conflict (transform on
+     sheet-panel creates a new containing block). */
+  [data-drawer-mode="height-driven"][data-scrolling]
+    [data-slot="drawer-footer"] {
+    position: relative;
+    animation: drawer-translate-footer linear both;
+    animation-timeline: --sheet-timeline;
+    animation-timing-function: linear(
+      0,
+      0 calc(var(--non-body-ratio, 0) / var(--last-snap-ratio, 1) * 100%),
+      1
+    );
+    animation-range: var(--dismiss-buffer, 0px)
+      calc(
+        var(--dismiss-buffer, 0px) + var(--last-snap-ratio, 1) *
+          (100% - var(--dismiss-buffer, 0px))
+      );
+  }
+
+  /* Footer transform: from clamped position to final visible-bottom position.
+     linear() easing holds the `from` value during the clamped phase, then
+     interpolates to `to` during the linear phase. */
   @keyframes drawer-translate-footer {
     from {
-      transform: translateY(calc(-1 * var(--sheet-max-height)));
+      transform: translateY(
+        calc(-1 * var(--sheet-max-height) + var(--non-body-height, 0px))
+      );
     }
     to {
       transform: translateY(
@@ -338,6 +366,7 @@ html:has(
       );
     }
   }
+
 }
 
 /* ----- JS Fallback (browsers without scroll-driven animations) ----- */

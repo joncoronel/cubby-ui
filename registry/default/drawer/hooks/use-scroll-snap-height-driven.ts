@@ -41,6 +41,8 @@ export interface UseScrollSnapHeightDrivenReturn {
   isClosing: boolean;
   /** Current snap position identifier for data attribute */
   snapPosition: string | null;
+  /** Whether the scroll optimization (transform mode) is active */
+  isTransformMode: boolean;
 }
 
 interface ScrollControlState {
@@ -107,6 +109,7 @@ export function useScrollSnapHeightDriven(
   });
 
   const [isScrolling, setIsScrolling] = React.useState(false);
+  const [isTransformMode, setIsTransformMode] = React.useState(false);
   const [isClosing, setIsClosingState] = React.useState(false);
   const [isInitialized, setIsInitialized] = React.useState(false);
   const [snapPosition, setSnapPosition] = React.useState<string | null>(null);
@@ -120,6 +123,7 @@ export function useScrollSnapHeightDriven(
   // matrix and restore scrollTop.
   const scrollOptActiveRef = React.useRef(false);
 
+
   const setIsClosing = React.useCallback((value: boolean) => {
     interactionRef.current.isClosing = value;
     setIsClosingState(value);
@@ -130,35 +134,35 @@ export function useScrollSnapHeightDriven(
       if (supportsScrollTimeline) {
         const container = containerRef.current;
         const wrapper = sheetWrapperRef.current;
-        const body = wrapper?.querySelector<HTMLElement>(
-          '[data-slot="drawer-body"]',
-        );
-        const sheetPanel = wrapper?.querySelector<HTMLElement>(
-          '[data-slot="drawer-sheet-panel"]',
-        );
 
-        if (
-          value &&
-          !scrollOptActiveRef.current &&
-          container &&
-          body &&
-          sheetPanel
-        ) {
+        if (value && !scrollOptActiveRef.current && container && wrapper) {
+          // querySelector only runs once per drag gesture (entering transform mode)
+          const body = wrapper.querySelector<HTMLElement>(
+            '[data-slot="drawer-body"]',
+          );
+          const sheetPanel = wrapper.querySelector<HTMLElement>(
+            '[data-slot="drawer-sheet-panel"]',
+          );
+
+          if (!body || !sheetPanel) {
+            setIsScrolling(value);
+            onScrollingChange?.(value);
+            return;
+          }
+
+          const scrollTopBefore =
+            interactionRef.current.savedBodyScrollTop ?? body.scrollTop;
+
           // Save dimensions BEFORE layout change.
           // These are needed by the pure-web-bottom-sheet offset formula.
           const bodyHeightBefore = body.offsetHeight;
           const panelHeightBefore = sheetPanel.offsetHeight;
-          // Use the scrollTop saved on touchstart (before any height-mode
-          // clamping) when available. By the time the scroll event fires,
-          // the CSS height animation may have already expanded the body and
-          // clamped scrollTop, causing cumulative drift on each drag cycle.
-          const scrollTopBefore =
-            interactionRef.current.savedBodyScrollTop ?? body.scrollTop;
           const overhead = panelHeightBefore - bodyHeightBefore;
           const bodyHeightAtFull = container.offsetHeight - overhead;
           const contentFitsAtFull = body.scrollHeight <= bodyHeightAtFull;
 
           scrollOptActiveRef.current = true;
+          setIsTransformMode(true);
 
           // Set data-scrolling imperatively — triggers CSS layout change:
           // panel switches from height animation to transform + height:100%.
@@ -250,6 +254,11 @@ export function useScrollSnapHeightDriven(
         } else if (!value && scrollOptActiveRef.current && container) {
           scrollOptActiveRef.current = false;
 
+          // querySelector only runs once per drag gesture (exiting transform mode)
+          const body = wrapper?.querySelector<HTMLElement>(
+            '[data-slot="drawer-body"]',
+          );
+
           if (body && wrapper) {
             // Read current translateY from the body's scroll-driven animation
             const style = getComputedStyle(body);
@@ -280,6 +289,9 @@ export function useScrollSnapHeightDriven(
         }
       }
 
+      if (!value) {
+        setIsTransformMode(false);
+      }
       setIsScrolling(value);
       onScrollingChange?.(value);
     },
@@ -415,6 +427,12 @@ export function useScrollSnapHeightDriven(
 
   // --- Scroll progress reporting ---
   const reportProgress = React.useCallback(() => {
+    if (
+      !optionsRef.current.onScrollProgress &&
+      !optionsRef.current.onSnapProgress
+    )
+      return;
+
     const container = containerRef.current;
     if (!container) return;
 
@@ -949,5 +967,6 @@ export function useScrollSnapHeightDriven(
     isInitialized,
     isClosing,
     snapPosition,
+    isTransformMode,
   };
 }

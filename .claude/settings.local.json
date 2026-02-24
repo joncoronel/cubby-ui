@@ -130,7 +130,14 @@
       "Read(//c/Users/jonny/Documents/Projects/**)",
       "Read(//c/Users/jonny/Documents/**)",
       "Read(//c/Users/jonny/**)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "WebFetch(domain:gist.github.com)",
+      "WebFetch(domain:medium.com)",
+      "WebFetch(domain:bugs.webkit.org)",
+      "Bash(python3:*)",
+      "WebFetch(domain:stripearmy.medium.com)",
+      "WebFetch(domain:pqina.nl)",
+      "WebFetch(domain:www.jayfreestone.com)"
     ],
     "deny": []
   }

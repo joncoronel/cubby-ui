@@ -224,7 +224,6 @@ html:has(
     --snap-point-align: none;
   }
   50% {
-    scroll-snap-type: initial;
     --snap-point-align: none;
   }
 }
@@ -378,19 +377,23 @@ html:has(
   }
 }
 
-/* Safari iOS touch fix for nested scroll mode */
+/* Safari iOS touch fix for nested scroll mode.
+   Only the body needs the overflow-x: scroll hack — it's the nested
+   scrollable element that requires a horizontal scroll context for
+   correct scroll chaining with the outer viewport on iOS Safari.
+   Header and footer are non-scrollable, so touches on them propagate
+   to the outer scroll container naturally without the hack. */
 @supports (-webkit-touch-callout: none) {
-  [data-drawer-mode="height-driven"] [data-slot="drawer-body"],
-  [data-drawer-mode="height-driven"] [data-slot="drawer-header"],
-  [data-drawer-mode="height-driven"] [data-slot="drawer-footer"] {
+  [data-drawer-mode="height-driven"] [data-slot="drawer-body"] {
     overflow-x: scroll;
     overscroll-behavior-x: none;
-    scrollbar-width: none;
+    /* Prevent the 1px horizontal scroll from being user-perceptible.
+       overflow-x: scroll is needed for scroll chaining but touch-action
+       restricts actual panning to vertical + pinch-zoom only. */
+    touch-action: pan-y pinch-zoom;
   }
 
-  [data-drawer-mode="height-driven"] [data-slot="drawer-body"]::after,
-  [data-drawer-mode="height-driven"] [data-slot="drawer-header"]::after,
-  [data-drawer-mode="height-driven"] [data-slot="drawer-footer"]::after {
+  [data-drawer-mode="height-driven"] [data-slot="drawer-body"]::after {
     display: block;
     box-sizing: content-box;
     padding: inherit;
@@ -398,9 +401,5 @@ html:has(
     width: calc(100% + 1px);
     height: 1px;
     content: "";
-  }
-
-  [data-drawer-mode="height-driven"] [data-slot="drawer-body"] {
-    scrollbar-width: auto;
   }
 }

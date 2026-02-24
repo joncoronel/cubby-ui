@@ -1423,10 +1423,15 @@ function DrawerContentInnerHeightDriven({
       ...(repositionInputs && {
         "--keyboard-height": `${keyboardHeight}px`,
       }),
-      // Always y mandatory — the CSS initial-snap animation handles temporarily
-      // disabling snap points on first render. Don't gate on isInitialized,
-      // as that would prevent the initial snap from working.
-      scrollSnapType: "y mandatory",
+      // Disable scroll-snap until initialized. On first render, contentSize
+      // is null so snap elements have wrong --snap positions (100% instead of
+      // the correct ratio). With scroll-snap active, the browser overrides
+      // the programmatic scrollTop to snap to the wrong position, causing
+      // the sheet to flash at full height before correcting. Starting with
+      // "none" lets the init effect set scrollTop freely; after the
+      // synchronous re-render (contentSize measured, snap elements correct),
+      // "y mandatory" activates with correct snap targets.
+      scrollSnapType: isInitialized ? "y mandatory" : "none",
       scrollBehavior: isInitialized ? "smooth" : "auto",
       // Scroll-driven snap progress: CSS animation drives --drawer-snap-progress
       // variable from 0 (first snap) to 1 (last snap) based on scroll position.

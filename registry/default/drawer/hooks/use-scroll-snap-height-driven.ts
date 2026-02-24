@@ -54,6 +54,8 @@ interface ScrollControlState {
 interface InteractionState {
   isClosing: boolean;
   isPointerDown: boolean;
+  /** Set on first touchstart, prevents dismiss-buffer correction after user drags */
+  hasInteracted: boolean;
   prevScrollPos: number | null;
   scrollEndedWhilePointerDown: boolean;
   /** Body scrollTop saved on touchstart, before any height-mode clamping */
@@ -73,7 +75,7 @@ interface InitState {
 export function useScrollSnapHeightDriven(
   options: UseScrollSnapHeightDrivenOptions,
 ): UseScrollSnapHeightDrivenReturn {
-  const { snapPoints, activeSnapPointIndex, open, onScrollingChange } = options;
+  const { snapPoints, activeSnapPointIndex, open, onScrollingChange, dismissBuffer: dismissBufferOpt } = options;
 
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const sheetWrapperRef = React.useRef<HTMLDivElement | null>(null);
@@ -89,6 +91,7 @@ export function useScrollSnapHeightDriven(
   const interactionRef = React.useRef<InteractionState>({
     isClosing: false,
     isPointerDown: false,
+    hasInteracted: false,
     prevScrollPos: null,
     scrollEndedWhilePointerDown: false,
     savedBodyScrollTop: null,
@@ -289,6 +292,27 @@ export function useScrollSnapHeightDriven(
         }
       }
 
+      // JS fallback (non-scroll-timeline): restore body scroll after drag.
+      // Without scroll-driven animations, --sheet-position changes on every
+      // scroll event, resizing the body and clamping body.scrollTop. Restore
+      // from the savedBodyScrollTop captured at touchstart.
+      if (!supportsScrollTimeline && !value) {
+        const savedScroll = interactionRef.current.savedBodyScrollTop;
+        if (savedScroll != null && savedScroll > 0) {
+          const fallbackWrapper = sheetWrapperRef.current;
+          const body = fallbackWrapper?.querySelector<HTMLElement>(
+            '[data-slot="drawer-body"]',
+          );
+          if (body) {
+            const maxScroll = Math.max(
+              0,
+              body.scrollHeight - body.clientHeight,
+            );
+            body.scrollTop = Math.min(savedScroll, maxScroll);
+          }
+        }
+      }
+
       if (!value) {
         setIsTransformMode(false);
       }
@@ -308,7 +332,8 @@ export function useScrollSnapHeightDriven(
       if (
         position === "dismiss" &&
         optionsRef.current.dismissible &&
-        !interactionRef.current.isClosing
+        !interactionRef.current.isClosing &&
+        !optionsRef.current.isAnimating
       ) {
         // Dismiss via swipe
         interactionRef.current.isClosing = true;
@@ -353,19 +378,22 @@ export function useScrollSnapHeightDriven(
 
   // IntersectionObserver for snap detection (fallback for browsers without scrollsnapchange)
   const observerRef = React.useRef<IntersectionObserver | null>(null);
+  // Accumulated intersection state across observer callbacks. The observer
+  // only delivers entries for elements whose state *changed*, not all observed
+  // elements. Without accumulation, a partial callback (e.g. one sentinel
+  // leaving intersection while the other stays unchanged) could falsely
+  // report "no intersecting sentinels = dismiss".
+  const intersectionStateRef = React.useRef<Map<string, boolean>>(new Map());
 
   const setupIntersectionObserver = React.useCallback(() => {
     const container = containerRef.current;
     if (!container) return;
 
     observerRef.current?.disconnect();
+    intersectionStateRef.current.clear();
 
     observerRef.current = new IntersectionObserver(
       (entries) => {
-        let lowestIntersectingSnap = Infinity;
-        let highestNonIntersectingSnap = -Infinity;
-        let hasIntersectingElement = false;
-
         for (const entry of entries) {
           if (
             !(entry.target instanceof HTMLElement) ||
@@ -373,17 +401,21 @@ export function useScrollSnapHeightDriven(
           ) {
             continue;
           }
+          intersectionStateRef.current.set(
+            entry.target.dataset.snap,
+            entry.isIntersecting,
+          );
+        }
 
-          const snap = parseInt(entry.target.dataset.snap, 10);
+        // Determine position from full accumulated state
+        let lowestIntersectingSnap = Infinity;
+        let hasIntersectingElement = false;
 
-          if (entry.isIntersecting) {
+        for (const [snap, isIntersecting] of intersectionStateRef.current) {
+          if (isIntersecting) {
             hasIntersectingElement = true;
-            lowestIntersectingSnap = Math.min(lowestIntersectingSnap, snap);
-          } else {
-            highestNonIntersectingSnap = Math.max(
-              highestNonIntersectingSnap,
-              snap,
-            );
+            const snapNum = parseInt(snap, 10);
+            lowestIntersectingSnap = Math.min(lowestIntersectingSnap, snapNum);
           }
         }
 
@@ -420,7 +452,13 @@ export function useScrollSnapHeightDriven(
 
     if (!supportsScrollTimeline) {
       const db = optionsRef.current.dismissBuffer ?? 0;
-      const adjustedScroll = Math.max(0, container.scrollTop - db);
+      // Clamp scrollTop to the actual scrollable range. On iOS Safari,
+      // elastic overscroll can push scrollTop past scrollHeight-clientHeight,
+      // which would set --sheet-position larger than the last snap point's
+      // height, causing the sheet to flash at full height for one frame.
+      const maxScroll = container.scrollHeight - container.clientHeight;
+      const clampedScroll = Math.min(container.scrollTop, maxScroll);
+      const adjustedScroll = Math.max(0, clampedScroll - db);
       wrapper.style.setProperty("--sheet-position", `${adjustedScroll}px`);
     }
   }, []);
@@ -479,7 +517,7 @@ export function useScrollSnapHeightDriven(
 
   // --- Dismiss logic ---
   const triggerImmediateDismiss = React.useCallback(() => {
-    if (interactionRef.current.isClosing) return;
+    if (interactionRef.current.isClosing || optionsRef.current.isAnimating) return;
 
     const container = containerRef.current;
     if (container) {
@@ -589,6 +627,7 @@ export function useScrollSnapHeightDriven(
       if (
         optionsRef.current.dismissible &&
         !interactionRef.current.isClosing &&
+        !optionsRef.current.isAnimating &&
         progress >= 1
       ) {
         triggerImmediateDismiss();
@@ -645,6 +684,7 @@ export function useScrollSnapHeightDriven(
   // Touch events
   const handleTouchStart = React.useCallback((e: Event) => {
     interactionRef.current.isPointerDown = true;
+    interactionRef.current.hasInteracted = true;
     // Capture body scrollTop before any scrolling occurs. The CSS
     // scroll-driven height animation runs synchronously with scroll,
     // so by the time the first scroll event fires, body.scrollTop may
@@ -731,6 +771,7 @@ export function useScrollSnapHeightDriven(
 
       interactionRef.current.isClosing = false;
       interactionRef.current.isPointerDown = false;
+      interactionRef.current.hasInteracted = false;
       interactionRef.current.prevScrollPos = null;
       interactionRef.current.scrollEndedWhilePointerDown = false;
       interactionRef.current.savedBodyScrollTop = null;
@@ -747,6 +788,7 @@ export function useScrollSnapHeightDriven(
       updateIsScrolling(false);
 
       observerRef.current?.disconnect();
+      intersectionStateRef.current.clear();
 
       // Reset container styles
       const container = containerRef.current;
@@ -808,7 +850,24 @@ export function useScrollSnapHeightDriven(
         const sheetScroll = maxScroll - db;
         const targetScroll = db + ratio * sheetScroll;
 
-        container.scrollTop = targetScroll;
+        // Use 'instant' to bypass CSS scroll-behavior: smooth, which takes
+        // effect after isInitialized (set below) triggers a synchronous re-render.
+        container.scrollTo({ top: targetScroll, behavior: "instant" });
+
+        // For JS fallback (no scroll-driven animations): set --sheet-position
+        // before the first paint so the sheet panel has the correct height
+        // immediately. Without this, the panel defaults to height: auto on
+        // the first frame, causing a visible flash on Safari.
+        if (!supportsScrollTimeline) {
+          const wrapper = sheetWrapperRef.current;
+          if (wrapper) {
+            const adjustedScroll = Math.max(0, targetScroll - db);
+            wrapper.style.setProperty(
+              "--sheet-position",
+              `${adjustedScroll}px`,
+            );
+          }
+        }
 
         // Report initial progress
         const progress = calculateHeightDrivenScrollProgress(
@@ -867,6 +926,68 @@ export function useScrollSnapHeightDriven(
       }
     };
   }, [open, activeSnapPointIndex, snapPoints, setupIntersectionObserver]);
+
+  // Re-adjust scroll position when dismiss buffer changes after initialization.
+  // The init effect runs BEFORE the component measures contentSize, so
+  // dismissBuffer is always 0 at init time. When contentSize becomes available
+  // and dismissBuffer recalculates to a non-zero value, all snap targets shift
+  // in the DOM but scrollTop stays at the old value. This correction runs in
+  // useLayoutEffect (before paint) so the adjustment is invisible.
+  //
+  // Only runs before the first user interaction. After the user has dragged,
+  // the dismiss buffer is stable and the transform teardown sets scrollTop
+  // correctly. Running this correction post-drag can trigger scroll-snap
+  // settling events that re-enter transform mode and clobber body.scrollTop.
+  React.useLayoutEffect(() => {
+    if (!initRef.current.hasInitialized || !open) return;
+
+    // After the first touch, dismiss buffer is stable — skip correction
+    // to avoid interfering with the transform teardown's scroll restoration.
+    if (interactionRef.current.hasInteracted) return;
+
+    const container = containerRef.current;
+    if (!container) return;
+
+    const db = dismissBufferOpt ?? 0;
+    const snapPoint =
+      snapPoints[optionsRef.current.activeSnapPointIndex];
+    const mch = optionsRef.current.maxContentHeight;
+    const ratio = resolveSnapPointRatio(
+      snapPoint,
+      container.clientHeight,
+      mch,
+    );
+
+    const maxScroll = container.scrollHeight - container.clientHeight;
+    const sheetScroll = maxScroll - db;
+    const targetScroll = db + ratio * sheetScroll;
+
+    // Only correct if the current scroll position has drifted from the target.
+    // A small threshold avoids fighting sub-pixel rounding or active user drags.
+    if (Math.abs(container.scrollTop - targetScroll) > 5) {
+      scrollControlRef.current.isProgrammatic = true;
+      // Use 'instant' to bypass CSS scroll-behavior: smooth so the
+      // correction is applied before paint with no visible animation.
+      container.scrollTo({ top: targetScroll, behavior: "instant" });
+
+      // Also update --sheet-position for JS fallback so the sheet panel
+      // height matches the corrected scrollTop before the next paint.
+      if (!supportsScrollTimeline) {
+        const wrapper = sheetWrapperRef.current;
+        if (wrapper) {
+          const adjustedScroll = Math.max(0, targetScroll - db);
+          wrapper.style.setProperty(
+            "--sheet-position",
+            `${adjustedScroll}px`,
+          );
+        }
+      }
+
+      setTimeout(() => {
+        scrollControlRef.current.isProgrammatic = false;
+      }, 0);
+    }
+  }, [dismissBufferOpt, open, snapPoints]);
 
   // Sync lastDetectedSnapIndex
   React.useEffect(() => {

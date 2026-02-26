@@ -273,11 +273,35 @@ html:has(
      height animation (triggers layout reflow per frame) to translateY
      animation (compositor-only, zero layout cost). The visual positions
      match between modes — sheet appears identical at any scroll progress.
-     Modeled after pure-web-bottom-sheet's nested-scroll-optimization. */
+     Modeled after pure-web-bottom-sheet's nested-scroll-optimization.
+
+     IMPORTANT: drawer-expand-height MUST stay at list index 0 so the browser
+     recognizes it as the SAME animation when data-scrolling is removed.
+     If it were replaced (e.g. animation-name: drawer-translate-sheet only),
+     the browser treats the re-addition as a NEW animation that restarts.
+     Safari's scroll-driven animation needs one frame to evaluate the scroll
+     timeline on restart, causing a one-frame flash at the wrong height.
+     Keeping it at index 0 and adding drawer-translate-sheet at index 1
+     means drawer-expand-height persists across the transition — no restart.
+     height: 100% !important overrides the running animation's computed height
+     during transform mode (!important beats animation values in the cascade). */
   [data-drawer-mode="height-driven"][data-scrolling]
     [data-slot="drawer-sheet-panel"] {
-    animation-name: drawer-translate-sheet;
-    height: 100%;
+    animation-name: drawer-expand-height, drawer-translate-sheet;
+    animation-timeline: --sheet-timeline, --sheet-timeline;
+    animation-timing-function: linear, linear;
+    animation-fill-mode: both, both;
+    animation-range: var(--dismiss-buffer, 0px)
+        calc(
+          var(--dismiss-buffer, 0px) + var(--last-snap-ratio, 1) *
+            (100% - var(--dismiss-buffer, 0px))
+        ),
+      var(--dismiss-buffer, 0px)
+        calc(
+          var(--dismiss-buffer, 0px) + var(--last-snap-ratio, 1) *
+            (100% - var(--dismiss-buffer, 0px))
+        );
+    height: 100% !important;
   }
 
   [data-drawer-mode="height-driven"][data-scrolling]

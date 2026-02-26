@@ -329,11 +329,18 @@ export function useScrollSnapHeightDriven(
       setSnapPosition(position);
 
       // "dismiss" = swiped past all snap points toward close
+      // Guard with both isAnimating AND isProgrammatic. In height-driven mode,
+      // isAnimating becomes false almost immediately (the popup's entrance
+      // transition fires with 0 height → no visible change → Base UI calls
+      // onOpenChangeComplete immediately). isProgrammatic stays true during
+      // init/correction, blocking false dismiss from IntersectionObserver
+      // callbacks that fire while the scroll position is still settling.
       if (
         position === "dismiss" &&
         optionsRef.current.dismissible &&
         !interactionRef.current.isClosing &&
-        !optionsRef.current.isAnimating
+        !optionsRef.current.isAnimating &&
+        !scrollControlRef.current.isProgrammatic
       ) {
         // Dismiss via swipe
         interactionRef.current.isClosing = true;
@@ -517,7 +524,12 @@ export function useScrollSnapHeightDriven(
 
   // --- Dismiss logic ---
   const triggerImmediateDismiss = React.useCallback(() => {
-    if (interactionRef.current.isClosing || optionsRef.current.isAnimating) return;
+    if (
+      interactionRef.current.isClosing ||
+      optionsRef.current.isAnimating ||
+      scrollControlRef.current.isProgrammatic
+    )
+      return;
 
     const container = containerRef.current;
     if (container) {
@@ -850,9 +862,25 @@ export function useScrollSnapHeightDriven(
         const sheetScroll = maxScroll - db;
         const targetScroll = db + ratio * sheetScroll;
 
-        // Use 'instant' to bypass CSS scroll-behavior: smooth, which takes
-        // effect after isInitialized (set below) triggers a synchronous re-render.
-        container.scrollTo({ top: targetScroll, behavior: "instant" });
+        // Direct scrollTop assignment is more reliable than scrollTo({behavior: "instant"})
+        // across browsers. Safari 18 supports scroll-driven animations but may not
+        // handle scrollTo with "instant" behavior correctly, leaving scrollTop at 0.
+        container.scrollTop = targetScroll;
+
+        // DEBUG: Store target scroll for debug overlay
+        container.dataset.debugTarget = String(Math.round(targetScroll));
+        container.dataset.debugAfterSet = String(Math.round(container.scrollTop));
+
+        // Safari 18 with scroll-driven animations may defer the scroll position
+        // update. Verify on the next frame and retry if needed.
+        if (supportsScrollTimeline) {
+          requestAnimationFrame(() => {
+            if (container.scrollTop < 1 && targetScroll > 1) {
+              container.scrollTop = targetScroll;
+              container.dataset.debugRetry = "1";
+            }
+          });
+        }
 
         // For JS fallback (no scroll-driven animations): set --sheet-position
         // before the first paint so the sheet panel has the correct height
@@ -901,9 +929,13 @@ export function useScrollSnapHeightDriven(
           );
         }
 
+        // Keep isProgrammatic=true long enough for the scroll position to
+        // settle after the drawer-initial-snap CSS animation ends (0.1s on
+        // Safari). This prevents IntersectionObserver callbacks from falsely
+        // triggering dismiss during the settling period.
         setTimeout(() => {
           scrollControlRef.current.isProgrammatic = false;
-        }, 0);
+        }, 200);
 
         setIsInitialized(true);
 
@@ -966,9 +998,9 @@ export function useScrollSnapHeightDriven(
     // A small threshold avoids fighting sub-pixel rounding or active user drags.
     if (Math.abs(container.scrollTop - targetScroll) > 5) {
       scrollControlRef.current.isProgrammatic = true;
-      // Use 'instant' to bypass CSS scroll-behavior: smooth so the
-      // correction is applied before paint with no visible animation.
-      container.scrollTo({ top: targetScroll, behavior: "instant" });
+      // Direct scrollTop assignment for cross-browser reliability.
+      // scrollTo({behavior: "instant"}) may not work on Safari 18.
+      container.scrollTop = targetScroll;
 
       // Also update --sheet-position for JS fallback so the sheet panel
       // height matches the corrected scrollTop before the next paint.
@@ -985,7 +1017,7 @@ export function useScrollSnapHeightDriven(
 
       setTimeout(() => {
         scrollControlRef.current.isProgrammatic = false;
-      }, 0);
+      }, 200);
     }
   }, [dismissBufferOpt, open, snapPoints]);
 

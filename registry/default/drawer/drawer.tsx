@@ -1208,6 +1208,68 @@ function DrawerContentInnerHeightDriven({
     dismissBuffer,
   });
 
+  // Snap activation phases prevent Safari from resetting scrollTop to 0:
+  //
+  // Phase 1 (isInitialized=false): scrollSnapType "none", scrollTo sets position
+  // Phase 2 (isSnapReady=true, isSnapSettled=false): scrollSnapType "y mandatory"
+  //   kicks in, but --snap-point-align: none is set inline on the viewport.
+  //   All non-initial snap elements inherit "none" → scroll-snap-align: none.
+  //   The initial snap element has its own CSS rule (--snap-point-align: start)
+  //   that overrides the inherited value. Safari MUST snap to it (only target).
+  // Phase 3 (isSnapSettled=true): inline --snap-point-align removed, all snap
+  //   points become active for user interaction.
+  //
+  // Phase 2→3 is triggered by the FIRST touch on the viewport, NOT a timeout.
+  // Safari re-evaluates scroll-snap when snap targets change. Even if the scroll
+  // is at a valid snap point, adding new targets can cause Safari to re-snap to
+  // dismiss (position 0). By deferring to user touch:
+  // - During active scrolling, scroll-snap doesn't re-snap (only on finger lift)
+  // - By the time the user lifts their finger, all targets are active and the
+  //   browser snaps to the nearest one naturally.
+  const [isSnapReady, setIsSnapReady] = React.useState(false);
+  React.useEffect(() => {
+    if (isInitialized) {
+      const id = requestAnimationFrame(() => {
+        setIsSnapReady(true);
+      });
+      return () => cancelAnimationFrame(id);
+    } else {
+      setIsSnapReady(false);
+    }
+  }, [isInitialized]);
+
+  // Snap protection: --snap-point-align: none on the viewport restricts
+  // scroll-snap to only the initial snap element (which has its own CSS
+  // rule overriding the inherited value). This prevents Safari from
+  // re-snapping to dismiss (position 0) when scrollSnapType transitions
+  // from "none" to "y mandatory".
+  //
+  // Managed via direct DOM manipulation (not React state) to avoid
+  // re-render-induced frame gaps that cause visual flashes. The property
+  // is set when isSnapReady activates and removed on the first scroll
+  // event (user actively dragging → snap evaluation deferred to finger lift).
+  React.useEffect(() => {
+    if (!isSnapReady) return;
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Set protection directly on DOM
+    container.style.setProperty("--snap-point-align", "none");
+
+    const release = () => {
+      // Remove protection synchronously during scroll gesture.
+      // Safari defers snap evaluation until finger lift, so all targets
+      // are safely active before re-evaluation.
+      container.style.removeProperty("--snap-point-align");
+    };
+
+    container.addEventListener("scroll", release, { once: true, passive: true });
+    return () => {
+      container.style.removeProperty("--snap-point-align");
+      container.removeEventListener("scroll", release);
+    };
+  }, [isSnapReady, containerRef]);
+
   // In height-driven mode, contentSize is the container height (max sheet height).
   // useLayoutEffect ensures contentSize is available before paint so snap elements
   // render with correct --snap positions on the first visible frame.
@@ -1415,6 +1477,41 @@ function DrawerContentInnerHeightDriven({
     ? `calc(100dvh - 24px - env(keyboard-inset-height, ${keyboardHeight}px))`
     : "calc(100dvh - 24px)";
 
+  // Scroll-driven snap progress animation goes on the timeline-scope wrapper
+  // (NOT the viewport) so it doesn't replace the CSS drawer-initial-snap
+  // animation on the viewport. drawer-initial-snap sets --snap-point-align: none
+  // to disable non-initial snap targets during opening. If an inline animationName
+  // is set on the viewport, it kills drawer-initial-snap, removing that protection.
+  // When scroll-snap then activates, all snap targets (including dismiss at 0)
+  // become valid and Safari may snap to dismiss, resetting scrollTop to 0.
+  // Moving the animation to the wrapper avoids this conflict entirely.
+  // --drawer-snap-progress inherits (via @property), so setting it on the
+  // wrapper makes it available to all descendants.
+  const timelineScopeStyle = React.useMemo<React.CSSProperties | undefined>(
+    () =>
+      supportsScrollTimeline
+        ? {
+            timelineScope: "--sheet-timeline",
+            ...(useScrollDrivenAnimation
+              ? {
+                  animationName: "drawer-snap-progress",
+                  animationDuration: "auto",
+                  animationTimingFunction: "linear",
+                  animationFillMode: "both",
+                  animationTimeline: "--sheet-timeline",
+                  animationRange: `calc(${dismissBuffer}px + ${firstSnapRatio} * (100% - ${dismissBuffer}px)) calc(${dismissBuffer}px + ${lastSnapRatio} * (100% - ${dismissBuffer}px))`,
+                }
+              : undefined),
+          }
+        : undefined,
+    [
+      useScrollDrivenAnimation,
+      dismissBuffer,
+      firstSnapRatio,
+      lastSnapRatio,
+    ],
+  );
+
   const viewportStyle = React.useMemo<React.CSSProperties>(
     () => ({
       "--sheet-max-height": sheetMaxHeight,
@@ -1423,39 +1520,32 @@ function DrawerContentInnerHeightDriven({
       ...(repositionInputs && {
         "--keyboard-height": `${keyboardHeight}px`,
       }),
-      // Disable scroll-snap until initialized. On first render, contentSize
-      // is null so snap elements have wrong --snap positions (100% instead of
-      // the correct ratio). With scroll-snap active, the browser overrides
-      // the programmatic scrollTop to snap to the wrong position, causing
-      // the sheet to flash at full height before correcting. Starting with
-      // "none" lets the init effect set scrollTop freely; after the
-      // synchronous re-render (contentSize measured, snap elements correct),
-      // "y mandatory" activates with correct snap targets.
-      scrollSnapType: isInitialized ? "y mandatory" : "none",
-      scrollBehavior: isInitialized ? "smooth" : "auto",
-      // Scroll-driven snap progress: CSS animation drives --drawer-snap-progress
-      // variable from 0 (first snap) to 1 (last snap) based on scroll position.
-      // Eliminates React re-renders — consumers use var(--drawer-snap-progress).
-      ...(useScrollDrivenAnimation
-        ? {
-            animationName: "drawer-snap-progress",
-            animationTimingFunction: "linear",
-            animationFillMode: "both",
-            animationTimeline: "--sheet-timeline",
-            animationRange: `calc(${dismissBuffer}px + ${firstSnapRatio} * (100% - ${dismissBuffer}px)) calc(${dismissBuffer}px + ${lastSnapRatio} * (100% - ${dismissBuffer}px))`,
-          }
-        : {
-            "--drawer-snap-progress": snapProgress,
-          }),
+      // Disable scroll-snap until one frame after initialization. Two-phase
+      // protection prevents Safari from snapping to the dismiss zone:
+      // Phase 1 (isInitialized=false): scrollSnapType "none" lets init and
+      //   correction effects set scrollTop freely without snap interference.
+      // Phase 2 (isInitialized=true, isSnapReady=false): one-frame delay
+      //   lets the programmatic scrollTo settle before snap enforcement.
+      //   By the time isSnapReady activates, the CSS drawer-initial-snap
+      //   animation is running, limiting valid snap targets to only the
+      //   initial element.
+      scrollSnapType: isSnapReady ? "y mandatory" : "none",
+      scrollBehavior: isSnapReady ? "smooth" : "auto",
+      // Note: --snap-point-align protection is managed via direct DOM manipulation
+      // in the useEffect above (not React state) to avoid re-render flash.
+      // JS fallback for --drawer-snap-progress when scroll-driven animations
+      // are not available.
+      ...(!useScrollDrivenAnimation && {
+        "--drawer-snap-progress": snapProgress,
+      }),
     }),
     [
       sheetMaxHeight,
       dismissBuffer,
       repositionInputs,
       keyboardHeight,
-      isInitialized,
+      isSnapReady,
       useScrollDrivenAnimation,
-      firstSnapRatio,
       lastSnapRatio,
       snapProgress,
     ],
@@ -1470,11 +1560,7 @@ function DrawerContentInnerHeightDriven({
   return (
     <div
       data-slot="drawer-timeline-scope"
-      style={
-        supportsScrollTimeline
-          ? ({ timelineScope: "--sheet-timeline" } as React.CSSProperties)
-          : undefined
-      }
+      style={timelineScopeStyle}
     >
       {modal === true && (
         <BaseDialog.Backdrop
@@ -1543,8 +1629,14 @@ function DrawerContentInnerHeightDriven({
           "bottom-[env(keyboard-inset-height,var(--keyboard-height,0))]",
           "h-(--sheet-max-height)",
           "contain-strict",
-          // Viewport is always pointer-events-none; the sheet panel has pointer-events-all
-          "pointer-events-none",
+          // Viewport uses pointer-events-auto in height-driven mode so iOS Safari
+          // propagates touch-initiated scrolling from non-scrollable children
+          // (header, handle) to the viewport scroll container. With pointer-events-none,
+          // Safari won't initiate scrolling on the viewport for touches originating
+          // from children — only the body works (via its own overflow-y: auto and
+          // scroll chaining). Dismiss-on-outside-click still works via Base UI's
+          // click-outside detection on the popup element.
+          "pointer-events-auto",
           "bg-transparent opacity-100! [&[data-ending-style]]:opacity-100! [&[data-starting-style]]:opacity-100!",
           "[scrollbar-width:none_!important] [&::-webkit-scrollbar]:hidden!",
           // Always overflow-y: scroll — scroll-driven animation needs scrollable container.
@@ -1634,6 +1726,86 @@ function DrawerContentInnerHeightDriven({
 
         {SafariNavColorDetectors}
       </BaseDialog.Viewport>
+
+      {/* DEBUG: Temporary overlay to diagnose iOS Safari issue */}
+      <DrawerDebugOverlay
+        containerRef={containerRef}
+        isInitialized={isInitialized}
+        isSnapReady={isSnapReady}
+        isAnimating={isAnimating}
+        dismissBuffer={dismissBuffer}
+        snapPosition={snapPosition}
+        isClosing={isClosing}
+      />
+    </div>
+  );
+}
+
+function DrawerDebugOverlay({
+  containerRef,
+  isInitialized,
+  isSnapReady,
+  isAnimating,
+  dismissBuffer,
+  snapPosition,
+  isClosing,
+}: {
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  isInitialized: boolean;
+  isSnapReady: boolean;
+  isAnimating: boolean;
+  dismissBuffer: number;
+  snapPosition: string | null;
+  isClosing: boolean;
+}) {
+  const [info, setInfo] = React.useState("");
+
+  React.useEffect(() => {
+    let id: number;
+    const poll = () => {
+      const c = containerRef.current;
+      const scrollTop = c?.scrollTop ?? -1;
+      const scrollHeight = c?.scrollHeight ?? -1;
+      const clientHeight = c?.clientHeight ?? -1;
+      const debugTarget = c?.dataset.debugTarget ?? "?";
+      const debugAfterSet = c?.dataset.debugAfterSet ?? "?";
+      const debugRetry = c?.dataset.debugRetry ?? "0";
+      setInfo(
+        `sT:${Math.round(scrollTop)} sH:${scrollHeight} cH:${clientHeight} db:${dismissBuffer}\ntgt:${debugTarget} afterSet:${debugAfterSet} retry:${debugRetry}\nsnap:${snapPosition ?? "?"} init:${isInitialized ? 1 : 0} ready:${isSnapReady ? 1 : 0} anim:${isAnimating ? 1 : 0} closing:${isClosing ? 1 : 0}`,
+      );
+      id = requestAnimationFrame(poll);
+    };
+    id = requestAnimationFrame(poll);
+    return () => cancelAnimationFrame(id);
+  }, [
+    containerRef,
+    isInitialized,
+    isSnapReady,
+    isAnimating,
+    dismissBuffer,
+    snapPosition,
+    isClosing,
+  ]);
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 99999,
+        background: "rgba(0,0,0,0.85)",
+        color: "#0f0",
+        fontSize: "10px",
+        fontFamily: "monospace",
+        padding: "4px 6px",
+        pointerEvents: "none",
+        whiteSpace: "pre-wrap",
+        wordBreak: "break-all",
+      }}
+    >
+      {info}
     </div>
   );
 }

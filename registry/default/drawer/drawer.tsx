@@ -1558,6 +1558,7 @@ function DrawerContentInnerHeightDriven({
   // onOpenChangeComplete immediately, making isAnimating short-lived.
 
   return (
+    <>
     <div
       data-slot="drawer-timeline-scope"
       style={timelineScopeStyle}
@@ -1724,7 +1725,6 @@ function DrawerContentInnerHeightDriven({
           </div>
         </div>
 
-        {SafariNavColorDetectors}
       </BaseDialog.Viewport>
 
       {/* DEBUG: Temporary overlay to diagnose iOS Safari issue */}
@@ -1738,6 +1738,23 @@ function DrawerContentInnerHeightDriven({
         isClosing={isClosing}
       />
     </div>
+
+    {/* Safari nav bar color detectors for height-driven mode.
+        Regular drawers use bg-clip-text detectors inside the viewport, but here
+        the popup is inside contain-strict which prevents Safari from sampling
+        the bg-popover color at the screen edge. These detectors render actual
+        visible pixels outside all containing blocks. The 3px height matches
+        Safari's minimum detection threshold (≥3px tall, ≥80% wide, within 3px
+        of edge). z-60 ensures they paint above the z-50 viewport/backdrop. */}
+    <div
+      aria-hidden="true"
+      className="bg-popover pointer-events-none fixed inset-x-0 bottom-0 z-60 hidden h-[3px] [@supports(-webkit-touch-callout:none)]:block"
+    />
+    <div
+      aria-hidden="true"
+      className="bg-popover pointer-events-none fixed inset-x-0 top-0 z-60 hidden h-[3px] [@supports(-webkit-touch-callout:none)]:block"
+    />
+    </>
   );
 }
 

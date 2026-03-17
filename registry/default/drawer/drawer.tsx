@@ -351,6 +351,19 @@ function Drawer({
   const [isAnimating, setIsAnimating] = React.useState(false);
   const [immediateClose, setImmediateClose] = React.useState(false);
 
+  // Sync animation state when controlled `open` transitions to true.
+  // Base UI doesn't call onOpenChange for external prop changes, so
+  // handleOpenChange(true) never runs — we set isAnimating here to
+  // block dismiss gestures during the enter transition.
+  const prevOpenRef = React.useRef(open);
+  React.useLayoutEffect(() => {
+    if (open && !prevOpenRef.current) {
+      setIsAnimating(true);
+      setImmediateClose(false);
+    }
+    prevOpenRef.current = open;
+  }, [open]);
+
   const { isVertical } = DIRECTION_CONFIG[direction];
 
   // Refs for stable access in callbacks without adding deps
@@ -362,6 +375,7 @@ function Drawer({
 
   const handleOpenChangeComplete = React.useCallback(() => {
     setIsAnimating(false);
+    setImmediateClose(false);
   }, []);
 
   const handleOpenChange = React.useCallback(

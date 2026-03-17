@@ -173,6 +173,7 @@ import dialog_dialog_nested from "@/registry/examples/dialog/dialog-nested";
 import dialog_dialog_no_close_button from "@/registry/examples/dialog/dialog-no-close-button";
 import dialog_dialog_scroll from "@/registry/examples/dialog/dialog-scroll";
 import drawer_drawer_basic from "@/registry/examples/drawer/drawer-basic";
+import drawer_drawer_controlled from "@/registry/examples/drawer/drawer-controlled";
 import drawer_drawer_directions from "@/registry/examples/drawer/drawer-directions";
 import drawer_drawer_floating from "@/registry/examples/drawer/drawer-floating";
 import drawer_drawer_inset_footer from "@/registry/examples/drawer/drawer-inset-footer";
@@ -1639,7 +1640,7 @@ export const exampleRegistry = {
     {
       "title": "Article",
       "importPath": "card-article",
-      "source": "import {\n  Card,\n  CardAction,\n  CardContent,\n  CardDescription,\n  CardFooter,\n  CardHeader,\n  CardTitle,\n} from \"@/components/ui/cubby-ui/card\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { MoreVertical } from \"lucide-react\";\n\nexport default function CardWithFooter() {\n  return (\n    <Card variant=\"inset\" className=\"w-[350px]\">\n      <CardHeader>\n        <CardTitle>Team Meeting</CardTitle>\n        <CardDescription>Scheduled for tomorrow at 2:00 PM</CardDescription>\n        <CardAction>\n          <Button variant=\"ghost\" size=\"icon_sm\">\n            <MoreVertical />\n          </Button>\n        </CardAction>\n      </CardHeader>\n      <CardContent>\n        <p className=\"text-sm\">\n          Discuss Q4 roadmap and project priorities with the team.\n        </p>\n      </CardContent>\n      <CardFooter>\n        <Button variant=\"outline\" size=\"sm\" className=\"ml-auto\">\n          View Details\n        </Button>\n      </CardFooter>\n    </Card>\n  );\n}\n"
+      "source": "import {\n  Card,\n  CardAction,\n  CardContent,\n  CardDescription,\n  CardFooter,\n  CardHeader,\n  CardTitle,\n} from \"@/components/ui/cubby-ui/card\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { MoreVertical } from \"lucide-react\";\n\nexport default function CardWithFooter() {\n  return (\n    <Card className=\"w-[350px]\">\n      <CardHeader>\n        <CardTitle>Team Meeting</CardTitle>\n        <CardDescription>Scheduled for tomorrow at 2:00 PM</CardDescription>\n        <CardAction>\n          <Button variant=\"ghost\" size=\"icon_sm\">\n            <MoreVertical />\n          </Button>\n        </CardAction>\n      </CardHeader>\n      <CardContent>\n        <p className=\"text-sm\">\n          Discuss Q4 roadmap and project priorities with the team.\n        </p>\n      </CardContent>\n      <CardFooter>\n        <Button variant=\"outline\" size=\"sm\" className=\"ml-auto\">\n          View Details\n        </Button>\n      </CardFooter>\n    </Card>\n  );\n}"
     },
     {
       "title": "Variant",
@@ -2132,6 +2133,11 @@ export const exampleRegistry = {
       "title": "Basic",
       "importPath": "drawer-basic",
       "source": "import {\n  Drawer,\n  DrawerClose,\n  DrawerContent,\n  DrawerDescription,\n  DrawerFooter,\n  DrawerHandle,\n  DrawerHeader,\n  DrawerTitle,\n  DrawerTrigger,\n} from \"@/components/ui/cubby-ui/drawer\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nexport default function DrawerBasic() {\n  return (\n    <Drawer>\n      <DrawerTrigger render={<Button variant=\"outline\" />}>\n        Open Drawer\n      </DrawerTrigger>\n      <DrawerContent>\n        <DrawerHandle />\n        <DrawerHeader>\n          <DrawerTitle>Are you sure?</DrawerTitle>\n          <DrawerDescription>This action cannot be undone.</DrawerDescription>\n        </DrawerHeader>\n        <DrawerFooter>\n          <Button>Submit</Button>\n          <DrawerClose render={<Button variant=\"outline\" />}>\n            Cancel\n          </DrawerClose>\n        </DrawerFooter>\n      </DrawerContent>\n    </Drawer>\n  );\n}\n"
+    },
+    {
+      "title": "Controlled",
+      "importPath": "drawer-controlled",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  Drawer,\n  DrawerBody,\n  DrawerClose,\n  DrawerContent,\n  DrawerDescription,\n  DrawerFooter,\n  DrawerHandle,\n  DrawerHeader,\n  DrawerTitle,\n} from \"@/components/ui/cubby-ui/drawer\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nexport default function DrawerControlled() {\n  const [open, setOpen] = React.useState(false);\n\n  return (\n    <>\n      <div className=\"flex items-center gap-2\">\n        <Button variant=\"outline\" onClick={() => setOpen(true)}>\n          Open Drawer\n        </Button>\n        <p className=\"text-muted-foreground text-sm\">\n          Drawer is {open ? \"open\" : \"closed\"}\n        </p>\n      </div>\n      <Drawer open={open} onOpenChange={setOpen}>\n        <DrawerContent>\n          <DrawerHandle />\n          <DrawerHeader>\n            <DrawerTitle>Controlled Drawer</DrawerTitle>\n            <DrawerDescription>\n              This drawer is controlled via external state.\n            </DrawerDescription>\n          </DrawerHeader>\n          <DrawerBody>\n            <p className=\"text-muted-foreground text-sm\">\n              The open state is managed outside the component, giving you full\n              control over when the drawer opens and closes.\n            </p>\n          </DrawerBody>\n          <DrawerFooter>\n            <Button onClick={() => setOpen(false)}>Done</Button>\n            <DrawerClose render={<Button variant=\"outline\" />}>\n              Cancel\n            </DrawerClose>\n          </DrawerFooter>\n        </DrawerContent>\n      </Drawer>\n    </>\n  );\n}\n"
     },
     {
       "title": "Directions",
@@ -3270,6 +3276,7 @@ export const componentMap = {
   "dialog-no-close-button": dialog_dialog_no_close_button,
   "dialog-scroll": dialog_dialog_scroll,
   "drawer-basic": drawer_drawer_basic,
+  "drawer-controlled": drawer_drawer_controlled,
   "drawer-directions": drawer_drawer_directions,
   "drawer-floating": drawer_drawer_floating,
   "drawer-inset-footer": drawer_drawer_inset_footer,

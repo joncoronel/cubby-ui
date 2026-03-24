@@ -11,6 +11,7 @@ const config = {
   turbopack: {
     root: process.cwd(),
   },
+  allowedDevOrigins: ['192.168.1.128'],
   async rewrites() {
     return [
       {

@@ -73,55 +73,55 @@ const drawerContentVariants = cva(
       },
     },
     compoundVariants: [
-      // Default variant - direction-specific sizing and rounding
+      // Default variant - direction-specific sizing, rounding, and nesting origin/offset
       {
         variant: "default",
         direction: "bottom",
         class:
-          "mx-auto max-h-[95dvh] w-full max-w-full rounded-t-xl -translate-y-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-y-[var(--drawer-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-offset)]",
+          "origin-bottom mx-auto max-h-[95dvh] w-full max-w-full rounded-t-xl -translate-y-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-y-[var(--drawer-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-offset)]",
       },
       {
         variant: "default",
         direction: "top",
         class:
-          "mx-auto max-h-[95dvh] w-full max-w-full rounded-b-xl translate-y-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-y-[var(--drawer-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-offset)]",
+          "origin-top mx-auto max-h-[95dvh] w-full max-w-full rounded-b-xl translate-y-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-y-[var(--drawer-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-offset)]",
       },
       {
         variant: "default",
         direction: "right",
         class:
-          "max-w-screen w-screen rounded-l-xl sm:max-w-sm -translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-x-[var(--drawer-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-offset)]",
+          "origin-right max-w-screen w-screen rounded-l-xl sm:max-w-sm -translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-x-[var(--drawer-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-offset)]",
       },
       {
         variant: "default",
         direction: "left",
         class:
-          "max-w-screen w-screen rounded-r-xl sm:max-w-sm translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-x-[var(--drawer-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-offset)]",
+          "origin-left max-w-screen w-screen rounded-r-xl sm:max-w-sm translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-x-[var(--drawer-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-offset)]",
       },
-      // Floating variant - direction-specific sizing and transforms
+      // Floating variant - direction-specific sizing, transforms, and nesting origin/offset
       {
         variant: "floating",
         direction: "bottom",
         class:
-          "mx-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] -translate-y-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-y-[var(--drawer-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-offset)]",
+          "origin-bottom mx-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] -translate-y-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-y-[var(--drawer-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-offset)]",
       },
       {
         variant: "floating",
         direction: "top",
         class:
-          "mx-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] translate-y-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-y-[var(--drawer-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-offset)]",
+          "origin-top mx-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] translate-y-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-y-[var(--drawer-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-offset)]",
       },
       {
         variant: "floating",
         direction: "right",
         class:
-          "h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-sm -translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-x-[var(--drawer-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-offset)]",
+          "origin-right h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-sm -translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-x-[var(--drawer-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-offset)]",
       },
       {
         variant: "floating",
         direction: "left",
         class:
-          "h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-sm translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-x-[var(--drawer-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-offset)]",
+          "origin-left h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-sm translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-x-[var(--drawer-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-offset)]",
       },
     ],
     defaultVariants: {
@@ -1145,6 +1145,8 @@ function DrawerContentInner({
                   ? "pointer-events-none"
                   : "pointer-events-auto",
                 immediateClose && "transition-none",
+                // Lock parent height/overflow when nested drawer opens
+                "data-nested-dialog-open:overflow-hidden",
                 // Safari iOS touch fix: 1px cross-axis overflow (WebKit bug #183870)
                 modal !== true && [
                   "[@supports(-webkit-touch-callout:none)]:relative [@supports(-webkit-touch-callout:none)]:[scrollbar-width:none]",
@@ -1211,7 +1213,9 @@ function DrawerHandle({
       "focus-visible:ring-ring/50 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
       "bg-muted-foreground/30 shrink-0 cursor-pointer rounded-full",
       isVertical ? "mx-auto my-3 h-1.5 w-12" : "mx-3 my-auto h-12 w-1.5",
-      "hover:bg-muted-foreground/50 transition-colors",
+      "hover:bg-muted-foreground/50 transition-[color,opacity]",
+      // Fade out when nested drawer opens, fade back when nested drawer is being dragged
+      // "in-data-nested-dialog-open:opacity-0 in-data-nested-dragging:opacity-100",
       className,
     ),
   };
@@ -1240,6 +1244,7 @@ function DrawerHeader({ className, ...props }: React.ComponentProps<"div">) {
         "not-has-[+[data-slot=drawer-body]]:has-[+[data-slot=drawer-footer]]:pb-1",
         "not-has-[+[data-slot=drawer-body]]:not-has-[+[data-slot=drawer-footer]]:pb-5",
         "in-data-[footer-variant=inset]:not-has-[+[data-slot=drawer-body]]:has-[+[data-slot=drawer-footer]]:pb-5",
+        // "transition-opacity in-data-nested-dialog-open:opacity-0 in-data-nested-dragging:opacity-100",
         className,
       )}
       {...props}
@@ -1262,6 +1267,7 @@ function DrawerFooter({ className, ...props }: React.ComponentProps<"div">) {
         "[@supports(-webkit-touch-callout:none)]:transform-[translateZ(0)]",
         "first:pt-5",
         "in-data-[footer-variant=inset]:border-border in-data-[footer-variant=inset]:bg-muted in-data-[footer-variant=inset]:border-t in-data-[footer-variant=inset]:pt-4 in-data-[footer-variant=inset]:pb-4",
+        // "transition-opacity in-data-nested-dialog-open:opacity-0 in-data-nested-dragging:opacity-100",
         className,
       )}
       {...props}
@@ -1336,6 +1342,7 @@ function DrawerBody({
         "first:pt-4",
         "not-has-[+[data-slot=drawer-footer]]:pb-4",
         "in-data-[footer-variant=inset]:has-[+[data-slot=drawer-footer]]:pb-4",
+        // "transition-opacity in-data-nested-dialog-open:opacity-0 in-data-nested-dragging:opacity-100",
       )}
     >
       <ScrollArea

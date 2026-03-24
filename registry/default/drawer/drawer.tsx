@@ -44,8 +44,16 @@ const drawerContentVariants = cva(
   [
     "bg-popover text-popover-foreground flex flex-col",
     "relative",
-    "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-transform duration-300 will-change-transform",
+    "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-[transform,scale,translate] duration-300 will-change-transform",
     "motion-reduce:transition-none",
+    // Nested drawer support: scale down parent when child opens (interpolated during drag)
+    "scale-[calc(1-0.05*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))]",
+    // Disable transitions on parent while child is being dragged
+    "data-[nested-dragging]:transition-none",
+    // Nested drawer support: overlay dim effect (using before: to avoid conflict with Safari ::after touch fix)
+    "before:pointer-events-none before:absolute before:inset-0 before:z-50 before:hidden before:rounded-[inherit] before:bg-black/5 before:opacity-0 before:transition-[opacity,display] before:transition-discrete before:duration-300",
+    "data-nested-dialog-open:before:block data-nested-dialog-open:before:opacity-100",
+    "starting:data-nested-dialog-open:before:opacity-0",
   ],
   {
     variants: {
@@ -70,50 +78,50 @@ const drawerContentVariants = cva(
         variant: "default",
         direction: "bottom",
         class:
-          "mx-auto max-h-[95dvh] w-full max-w-full rounded-t-xl [&[data-starting-style]]:translate-y-[var(--drawer-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-offset)]",
+          "mx-auto max-h-[95dvh] w-full max-w-full rounded-t-xl -translate-y-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-y-[var(--drawer-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-offset)]",
       },
       {
         variant: "default",
         direction: "top",
         class:
-          "mx-auto max-h-[95dvh] w-full max-w-full rounded-b-xl [&[data-starting-style]]:-translate-y-[var(--drawer-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-offset)]",
+          "mx-auto max-h-[95dvh] w-full max-w-full rounded-b-xl translate-y-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-y-[var(--drawer-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-offset)]",
       },
       {
         variant: "default",
         direction: "right",
         class:
-          "max-w-screen w-screen rounded-l-xl sm:max-w-sm [&[data-starting-style]]:translate-x-[var(--drawer-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-offset)]",
+          "max-w-screen w-screen rounded-l-xl sm:max-w-sm -translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-x-[var(--drawer-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-offset)]",
       },
       {
         variant: "default",
         direction: "left",
         class:
-          "max-w-screen w-screen rounded-r-xl sm:max-w-sm [&[data-starting-style]]:-translate-x-[var(--drawer-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-offset)]",
+          "max-w-screen w-screen rounded-r-xl sm:max-w-sm translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-x-[var(--drawer-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-offset)]",
       },
       // Floating variant - direction-specific sizing and transforms
       {
         variant: "floating",
         direction: "bottom",
         class:
-          "mx-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] [&[data-starting-style]]:translate-y-[var(--drawer-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-offset)]",
+          "mx-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] -translate-y-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-y-[var(--drawer-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-offset)]",
       },
       {
         variant: "floating",
         direction: "top",
         class:
-          "mx-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] [&[data-starting-style]]:-translate-y-[var(--drawer-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-offset)]",
+          "mx-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] translate-y-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-y-[var(--drawer-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-offset)]",
       },
       {
         variant: "floating",
         direction: "right",
         class:
-          "h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-sm [&[data-starting-style]]:translate-x-[var(--drawer-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-offset)]",
+          "h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-sm -translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-x-[var(--drawer-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-offset)]",
       },
       {
         variant: "floating",
         direction: "left",
         class:
-          "h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-sm [&[data-starting-style]]:-translate-x-[var(--drawer-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-offset)]",
+          "h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-sm translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-x-[var(--drawer-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-offset)]",
       },
     ],
     defaultVariants: {
@@ -160,6 +168,23 @@ const backdropAnimationStyles: Record<DrawerDirection, string> = {
   top: "fill-mode-[both] direction-[reverse] [animation-name:drawer-backdrop-fade] [animation-range:exit_0%_exit_100%] [animation-timeline:--drawer-panel] [animation-timing-function:linear]",
   left: "fill-mode-[both] direction-[reverse] [animation-name:drawer-backdrop-fade] [animation-range:exit_0%_exit_100%] [animation-timeline:--drawer-panel] [animation-timing-function:linear]",
 };
+
+/* -------------------------------------------------------------------------------------------------
+ * Drawer Nesting Context
+ * Allows child drawers to propagate drag progress to parent drawer for smooth stacking effects.
+ * -------------------------------------------------------------------------------------------------*/
+
+interface DrawerNestingContextValue {
+  /** Set the child's drag progress (0 = open, 1 = closed) on the parent popup */
+  setNestedDragProgress: (progress: number) => void;
+  /** Toggle transition-disabling attribute on the parent popup */
+  setNestedDragging: (dragging: boolean) => void;
+  /** Remove the drag progress CSS variable from the parent popup */
+  clearNestedDragProgress: () => void;
+}
+
+const DrawerNestingContext =
+  React.createContext<DrawerNestingContextValue | null>(null);
 
 /* -------------------------------------------------------------------------------------------------
  * Drawer Context
@@ -876,14 +901,19 @@ function DrawerContentInner({
     setImmediateClose(true);
   }, [setImmediateClose]);
 
+  // Propagate child drag progress to parent drawer for smooth nesting effects
+  const parentNesting = React.useContext(DrawerNestingContext);
+
   // Skip progress updates during enter/exit animations (let CSS control backdrop)
   const handleScrollProgress = React.useCallback(
     (progress: number) => {
       if (!isAnimating) {
         setDragProgress(progress);
+        // Update parent's CSS variable for interpolated nesting scale/translate
+        parentNesting?.setNestedDragProgress(progress);
       }
     },
-    [isAnimating, setDragProgress],
+    [isAnimating, setDragProgress, parentNesting],
   );
 
   const handleSnapProgress = React.useCallback(
@@ -919,11 +949,48 @@ function DrawerContentInner({
     onScrollingChange: setIsDragging,
   });
 
+  // Toggle transition-disabling attribute on parent popup during drag
+  React.useLayoutEffect(() => {
+    parentNesting?.setNestedDragging(isDragging);
+  }, [isDragging, parentNesting]);
+
+  // Clean up parent's CSS variable when this drawer closes
+  React.useLayoutEffect(() => {
+    if (!open) {
+      parentNesting?.clearNestedDragProgress();
+      parentNesting?.setNestedDragging(false);
+    }
+  }, [open, parentNesting]);
+
   const floatingMargin = variant === "floating" ? 16 : 0;
   const { mergedRef, popupRef } = useContentMeasurement(
     isVertical,
     floatingMargin,
     setContentSize,
+  );
+
+  // Provide nesting context so child drawers can propagate drag progress to this popup
+  const nestingValue = React.useMemo<DrawerNestingContextValue>(
+    () => ({
+      setNestedDragProgress(progress: number) {
+        popupRef.current?.style.setProperty(
+          "--nested-drag-progress",
+          String(progress),
+        );
+      },
+      setNestedDragging(dragging: boolean) {
+        if (!popupRef.current) return;
+        if (dragging) {
+          popupRef.current.dataset.nestedDragging = "";
+        } else {
+          delete popupRef.current.dataset.nestedDragging;
+        }
+      },
+      clearNestedDragProgress() {
+        popupRef.current?.style.removeProperty("--nested-drag-progress");
+      },
+    }),
+    [popupRef],
   );
 
   const {
@@ -949,151 +1016,155 @@ function DrawerContentInner({
   });
 
   return (
-    <div
-      data-slot="drawer-timeline-scope"
-      style={
-        supportsScrollTimeline
-          ? ({ timelineScope: "--drawer-panel" } as React.CSSProperties)
-          : undefined
-      }
-    >
-      {modal === true && (
-        <BaseDialog.Backdrop
-          data-slot="drawer-overlay"
-          className={cn(
-            "absolute inset-0 z-50 bg-black/35",
-            "[transform:translateZ(0)] will-change-[opacity]",
-            isClosing ? "pointer-events-none" : "pointer-events-auto",
-            "touch-none",
-            immediateClose || (isDragging && !isAnimating)
-              ? "transition-none"
-              : "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-opacity duration-300",
-            "[&[data-starting-style]]:opacity-0!",
-            // Exit animation overrides scroll-driven animation (transitions can't interpolate from animation-held values)
-            "data-ending-style:animate-[drawer-backdrop-exit_300ms_cubic-bezier(0,0,0.58,1)_forwards]",
-            isInitialized && !isAnimating && dismissible && dragProgress < 1
-              ? useScrollDrivenAnimation
-                ? backdropAnimationStyles[direction]
-                : `opacity-(--drawer-backdrop-dynamic-opacity)`
-              : `opacity-(--drawer-backdrop-static-opacity)`,
-          )}
-          style={
-            {
-              "--drawer-backdrop-dynamic-opacity": 1 - dragProgress,
-              "--drawer-backdrop-static-opacity": targetBackdropOpacity,
-            } as React.CSSProperties
-          }
-        />
-      )}
-
-      <BaseDialog.Viewport
-        ref={containerRef}
-        data-slot="drawer-viewport"
-        data-direction={direction}
-        data-scrolling={isScrolling || undefined}
-        data-keyboard-visible={
-          direction === "bottom" && repositionInputs && isKeyboardVisible
-            ? "true"
+    <DrawerNestingContext.Provider value={nestingValue}>
+      <div
+        data-slot="drawer-timeline-scope"
+        style={
+          supportsScrollTimeline
+            ? ({ timelineScope: "--drawer-panel" } as React.CSSProperties)
             : undefined
         }
-        className={cn(
-          "group/drawer",
-          "fixed inset-x-0 z-50 outline-hidden",
-          // Bottom: -60px top buffer prevents URL bar collapse; non-modal uses lvh
-          direction === "bottom" &&
-            (modal === true
-              ? "top-[-60px] bottom-[env(keyboard-inset-height,var(--keyboard-height,0))]"
-              : "top-auto! bottom-[env(keyboard-inset-height,var(--keyboard-height,0))] h-lvh"),
-          direction === "top" && "top-0! bottom-[-60px]!",
-          !isVertical &&
-            (modal === true
-              ? "top-0! bottom-0! h-dvh"
-              : "top-0! bottom-0 h-lvh"),
-          isAnimating || isClosing || modal !== true
-            ? "pointer-events-none"
-            : "pointer-events-auto",
-          "bg-transparent opacity-100! [&[data-ending-style]]:opacity-100! [&[data-starting-style]]:opacity-100!",
-          "[scrollbar-width:none_!important] [&::-webkit-scrollbar]:hidden!",
-          isAnimating || isClosing
-            ? "touch-none overflow-hidden"
-            : isVertical
-              ? "touch-pan-y overflow-x-hidden overflow-y-auto overscroll-y-none"
-              : "touch-pan-x overflow-x-auto overflow-y-hidden overscroll-x-none",
-          isVertical ? "touch-pan-y" : "touch-pan-x",
-          "motion-reduce:[scroll-behavior:auto]",
-        )}
-        style={viewportStyle}
       >
-        <div
-          data-slot="drawer-track"
-          className={drawerTrackVariants({ direction })}
-          style={
-            {
-              [isVertical ? "height" : "width"]: `${trackSize}px`,
-              "--content-size": `${contentSize ?? 0}px`,
-              "--dismiss-buffer": dismissible
-                ? `${(contentSize ?? 0) * 0.3}px`
-                : "0px",
-            } as React.CSSProperties
-          }
-        >
-          {/* Snap targets with JS-calculated positions (CSS calc() has issues on iOS Safari) */}
-          {snapScrollPositions.map((position, index) => (
-            <div
-              key={index}
-              ref={(el) => setSnapTargetRef(index, el)}
-              data-slot="drawer-snap-target"
-              data-snap-index={index}
-              className={cn(
-                "pointer-events-none absolute",
-                isVertical ? "inset-x-0 h-px" : "inset-y-0 w-px",
-              )}
-              style={
-                {
-                  [isVertical ? "top" : "left"]: `${position}px`,
-                  scrollSnapAlign: "start",
-                  scrollSnapStop: sequentialSnap ? "always" : undefined,
-                  ...(supportsScrollState && {
-                    containerType: "scroll-state",
-                  }),
-                } as React.CSSProperties
-              }
-              aria-hidden="true"
-            />
-          ))}
-
-          <BaseDialog.Popup
-            ref={mergedRef}
-            data-slot="drawer-content"
-            data-footer-variant={footerVariant}
-            initialFocus={initialFocus ?? popupRef}
-            finalFocus={finalFocus}
+        {modal === true && (
+          <BaseDialog.Backdrop
+            data-slot="drawer-overlay"
             className={cn(
-              drawerContentVariants({ variant, direction }),
-              open && !isInitialized && "opacity-0",
-              isAnimating || isClosing
-                ? "pointer-events-none"
-                : "pointer-events-auto",
-              immediateClose && "transition-none",
-              // Safari iOS touch fix: 1px cross-axis overflow (WebKit bug #183870)
-              modal !== true && [
-                "[@supports(-webkit-touch-callout:none)]:relative [@supports(-webkit-touch-callout:none)]:[scrollbar-width:none]",
-                isVertical
-                  ? "[@supports(-webkit-touch-callout:none)]:overflow-x-scroll [@supports(-webkit-touch-callout:none)]:overscroll-x-none [@supports(-webkit-touch-callout:none)]:after:pointer-events-none [@supports(-webkit-touch-callout:none)]:after:absolute [@supports(-webkit-touch-callout:none)]:after:inset-0 [@supports(-webkit-touch-callout:none)]:after:w-[calc(100%+0.5px)] [@supports(-webkit-touch-callout:none)]:after:content-['']"
-                  : "[@supports(-webkit-touch-callout:none)]:overflow-y-scroll [@supports(-webkit-touch-callout:none)]:overscroll-y-none [@supports(-webkit-touch-callout:none)]:after:pointer-events-none [@supports(-webkit-touch-callout:none)]:after:absolute [@supports(-webkit-touch-callout:none)]:after:inset-0 [@supports(-webkit-touch-callout:none)]:after:h-[calc(100%+1px)] [@supports(-webkit-touch-callout:none)]:after:content-['']",
-              ],
-              className,
+              "absolute inset-0 z-50 bg-black/35",
+              "[transform:translateZ(0)] will-change-[opacity]",
+              isClosing ? "pointer-events-none" : "pointer-events-auto",
+              "touch-none",
+              immediateClose || (isDragging && !isAnimating)
+                ? "transition-none"
+                : "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-opacity duration-300",
+              "[&[data-starting-style]]:opacity-0!",
+              // Exit animation overrides scroll-driven animation (transitions can't interpolate from animation-held values)
+              "data-ending-style:animate-[drawer-backdrop-exit_300ms_cubic-bezier(0,0,0.58,1)_forwards]",
+              isInitialized && !isAnimating && dismissible && dragProgress < 1
+                ? useScrollDrivenAnimation
+                  ? backdropAnimationStyles[direction]
+                  : `opacity-(--drawer-backdrop-dynamic-opacity)`
+                : `opacity-(--drawer-backdrop-static-opacity)`,
             )}
-            style={popupStyle}
-            {...props}
-          >
-            {children}
-          </BaseDialog.Popup>
-        </div>
+            style={
+              {
+                "--drawer-backdrop-dynamic-opacity": 1 - dragProgress,
+                "--drawer-backdrop-static-opacity": targetBackdropOpacity,
+              } as React.CSSProperties
+            }
+          />
+        )}
 
-        {SafariNavColorDetectors}
-      </BaseDialog.Viewport>
-    </div>
+        <BaseDialog.Viewport
+          ref={containerRef}
+          data-slot="drawer-viewport"
+          data-direction={direction}
+          data-scrolling={isScrolling || undefined}
+          data-keyboard-visible={
+            direction === "bottom" && repositionInputs && isKeyboardVisible
+              ? "true"
+              : undefined
+          }
+          className={cn(
+            "group/drawer",
+            "fixed inset-x-0 z-50 outline-hidden",
+            // Bottom: -60px top buffer prevents URL bar collapse; non-modal uses lvh
+            direction === "bottom" &&
+              (modal === true
+                ? "top-[-60px] bottom-[env(keyboard-inset-height,var(--keyboard-height,0))]"
+                : "top-auto! bottom-[env(keyboard-inset-height,var(--keyboard-height,0))] h-lvh"),
+            direction === "top" && "top-0! bottom-[-60px]!",
+            !isVertical &&
+              (modal === true
+                ? "top-0! bottom-0! h-dvh"
+                : "top-0! bottom-0 h-lvh"),
+            isAnimating || isClosing || modal !== true
+              ? "pointer-events-none"
+              : "pointer-events-auto",
+            "bg-transparent opacity-100! [&[data-ending-style]]:opacity-100! [&[data-starting-style]]:opacity-100!",
+            "[scrollbar-width:none]! [&::-webkit-scrollbar]:hidden!",
+            isAnimating || isClosing
+              ? "touch-none overflow-hidden"
+              : isVertical
+                ? "touch-pan-y overflow-x-hidden overflow-y-auto overscroll-y-none"
+                : "touch-pan-x overflow-x-auto overflow-y-hidden overscroll-x-none",
+            isVertical ? "touch-pan-y" : "touch-pan-x",
+            "motion-reduce:[scroll-behavior:auto]",
+            // Freeze parent viewport scroll when nested drawer opens
+            "has-data-nested-dialog-open:touch-none has-data-nested-dialog-open:overflow-hidden",
+          )}
+          style={viewportStyle}
+        >
+          <div
+            data-slot="drawer-track"
+            className={drawerTrackVariants({ direction })}
+            style={
+              {
+                [isVertical ? "height" : "width"]: `${trackSize}px`,
+                "--content-size": `${contentSize ?? 0}px`,
+                "--dismiss-buffer": dismissible
+                  ? `${(contentSize ?? 0) * 0.3}px`
+                  : "0px",
+              } as React.CSSProperties
+            }
+          >
+            {/* Snap targets with JS-calculated positions (CSS calc() has issues on iOS Safari) */}
+            {snapScrollPositions.map((position, index) => (
+              <div
+                key={index}
+                ref={(el) => setSnapTargetRef(index, el)}
+                data-slot="drawer-snap-target"
+                data-snap-index={index}
+                className={cn(
+                  "pointer-events-none absolute",
+                  isVertical ? "inset-x-0 h-px" : "inset-y-0 w-px",
+                )}
+                style={
+                  {
+                    [isVertical ? "top" : "left"]: `${position}px`,
+                    scrollSnapAlign: "start",
+                    scrollSnapStop: sequentialSnap ? "always" : undefined,
+                    ...(supportsScrollState && {
+                      containerType: "scroll-state",
+                    }),
+                  } as React.CSSProperties
+                }
+                aria-hidden="true"
+              />
+            ))}
+
+            <BaseDialog.Popup
+              ref={mergedRef}
+              data-slot="drawer-content"
+              data-footer-variant={footerVariant}
+              initialFocus={initialFocus ?? popupRef}
+              finalFocus={finalFocus}
+              className={cn(
+                drawerContentVariants({ variant, direction }),
+                open && !isInitialized && "opacity-0",
+                isAnimating || isClosing
+                  ? "pointer-events-none"
+                  : "pointer-events-auto",
+                immediateClose && "transition-none",
+                // Safari iOS touch fix: 1px cross-axis overflow (WebKit bug #183870)
+                modal !== true && [
+                  "[@supports(-webkit-touch-callout:none)]:relative [@supports(-webkit-touch-callout:none)]:[scrollbar-width:none]",
+                  isVertical
+                    ? "[@supports(-webkit-touch-callout:none)]:overflow-x-scroll [@supports(-webkit-touch-callout:none)]:overscroll-x-none [@supports(-webkit-touch-callout:none)]:after:pointer-events-none [@supports(-webkit-touch-callout:none)]:after:absolute [@supports(-webkit-touch-callout:none)]:after:inset-0 [@supports(-webkit-touch-callout:none)]:after:w-[calc(100%+0.5px)] [@supports(-webkit-touch-callout:none)]:after:content-['']"
+                    : "[@supports(-webkit-touch-callout:none)]:overflow-y-scroll [@supports(-webkit-touch-callout:none)]:overscroll-y-none [@supports(-webkit-touch-callout:none)]:after:pointer-events-none [@supports(-webkit-touch-callout:none)]:after:absolute [@supports(-webkit-touch-callout:none)]:after:inset-0 [@supports(-webkit-touch-callout:none)]:after:h-[calc(100%+1px)] [@supports(-webkit-touch-callout:none)]:after:content-['']",
+                ],
+                className,
+              )}
+              style={popupStyle}
+              {...props}
+            >
+              {children}
+            </BaseDialog.Popup>
+          </div>
+
+          {SafariNavColorDetectors}
+        </BaseDialog.Viewport>
+      </div>
+    </DrawerNestingContext.Provider>
   );
 }
 

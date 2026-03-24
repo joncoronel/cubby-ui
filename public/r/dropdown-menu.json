@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "dropdown-menu",
-  "type": "registry:ui",
   "title": "Dropdown-menu",
   "description": "A dropdown-menu component.",
   "dependencies": [
@@ -15,5 +14,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/dropdown-menu.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "label",
-  "type": "registry:ui",
   "title": "Label",
   "description": "A label component.",
   "files": [
@@ -11,5 +10,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/label.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

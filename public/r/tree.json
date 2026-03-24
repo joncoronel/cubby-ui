@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "tree",
-  "type": "registry:ui",
   "title": "Tree",
   "description": "A tree component.",
   "dependencies": [
@@ -23,5 +22,6 @@
       "type": "registry:lib",
       "target": "components/ui/cubby-ui/tree/lib/tree-utils.ts"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

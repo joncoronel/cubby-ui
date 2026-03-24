@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "sheet",
-  "type": "registry:ui",
   "title": "Sheet",
   "description": "A sheet component.",
   "dependencies": [
@@ -18,5 +17,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/sheet.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "navigation-menu",
-  "type": "registry:ui",
   "title": "Navigation-menu",
   "description": "A navigation-menu component.",
   "dependencies": [
@@ -14,5 +13,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/navigation-menu.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "switch",
-  "type": "registry:ui",
   "title": "Switch",
   "description": "A switch component.",
   "dependencies": [
@@ -14,5 +13,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/switch.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

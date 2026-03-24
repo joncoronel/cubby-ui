@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "date-range-picker",
-  "type": "registry:ui",
   "title": "Date-range-picker",
   "description": "A date-range-picker component.",
   "dependencies": [
@@ -21,5 +20,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/date-range-picker.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

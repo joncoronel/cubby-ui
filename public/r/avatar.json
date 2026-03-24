@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "avatar",
-  "type": "registry:ui",
   "title": "Avatar",
   "description": "A avatar component.",
   "dependencies": [
@@ -14,5 +13,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/avatar.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

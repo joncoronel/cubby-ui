@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "highlight-text",
-  "type": "registry:lib",
   "title": "highlightText",
   "description": "A utility function for highlight text.",
   "files": [
@@ -11,5 +10,6 @@
       "type": "registry:lib",
       "target": "lib/cubby-ui/highlight-text.tsx"
     }
-  ]
+  ],
+  "type": "registry:lib"
 }

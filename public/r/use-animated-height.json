@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "use-animated-height",
-  "type": "registry:hook",
   "title": "useAnimatedHeight",
   "description": "A custom React hook for animated height.",
   "files": [
@@ -11,5 +10,6 @@
       "type": "registry:hook",
       "target": "hooks/cubby-ui/use-animated-height.ts"
     }
-  ]
+  ],
+  "type": "registry:hook"
 }

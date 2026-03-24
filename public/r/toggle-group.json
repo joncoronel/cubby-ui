@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "toggle-group",
-  "type": "registry:ui",
   "title": "Toggle-group",
   "description": "A toggle-group component.",
   "files": [
@@ -11,5 +10,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/toggle-group.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

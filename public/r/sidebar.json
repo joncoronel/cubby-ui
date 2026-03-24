@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "sidebar",
-  "type": "registry:ui",
   "title": "Sidebar",
   "description": "A sidebar component.",
   "dependencies": [
@@ -23,5 +22,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/sidebar.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "skeleton",
-  "type": "registry:ui",
   "title": "Skeleton",
   "description": "A skeleton component.",
   "files": [
@@ -11,5 +10,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/skeleton.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

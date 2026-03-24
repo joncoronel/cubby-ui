@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "cropper",
-  "type": "registry:ui",
   "title": "Cropper",
   "description": "A cropper component.",
   "dependencies": [
@@ -15,5 +14,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/cropper.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

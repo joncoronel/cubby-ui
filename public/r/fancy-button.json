@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "fancy-button",
-  "type": "registry:ui",
   "title": "Fancy Button",
   "description": "A fancy-button component.",
   "dependencies": [
@@ -14,5 +13,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/fancy-button.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

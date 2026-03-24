@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "resizable",
-  "type": "registry:ui",
   "title": "Resizable",
   "description": "A resizable component.",
   "dependencies": [
@@ -15,5 +14,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/resizable.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

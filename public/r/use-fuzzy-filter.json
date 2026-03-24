@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "use-fuzzy-filter",
-  "type": "registry:hook",
   "title": "useFuzzyFilter",
   "description": "A custom React hook for fuzzy filter.",
   "dependencies": [
@@ -14,5 +13,6 @@
       "type": "registry:hook",
       "target": "hooks/cubby-ui/use-fuzzy-filter.ts"
     }
-  ]
+  ],
+  "type": "registry:hook"
 }

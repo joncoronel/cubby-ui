@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "toolbar",
-  "type": "registry:ui",
   "title": "Toolbar",
   "description": "A toolbar component.",
   "dependencies": [
@@ -17,5 +16,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/toolbar.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

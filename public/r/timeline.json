@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "timeline",
-  "type": "registry:ui",
   "title": "Timeline",
   "description": "A timeline component.",
   "dependencies": [
@@ -14,5 +13,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/timeline.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

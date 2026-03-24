@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "copy-button",
-  "type": "registry:ui",
   "title": "Copy Button",
   "description": "A copy-button component.",
   "dependencies": [
@@ -25,5 +24,6 @@
       "type": "registry:lib",
       "target": "components/ui/cubby-ui/copy-button/lib/copy-to-clipboard.ts"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

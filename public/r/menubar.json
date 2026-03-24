@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "menubar",
-  "type": "registry:ui",
   "title": "Menubar",
   "description": "A menubar component.",
   "dependencies": [
@@ -14,5 +13,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/menubar.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

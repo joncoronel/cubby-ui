@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "carousel",
-  "type": "registry:ui",
   "title": "Carousel",
   "description": "A carousel component.",
   "dependencies": [
@@ -18,5 +17,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/carousel.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

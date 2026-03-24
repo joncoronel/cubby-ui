@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "date-picker",
-  "type": "registry:ui",
   "title": "Date-picker",
   "description": "A date-picker component.",
   "dependencies": [
@@ -20,5 +19,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/date-picker.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

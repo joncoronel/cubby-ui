@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "circular-slider",
-  "type": "registry:ui",
   "title": "Circular Slider",
   "description": "A circular-slider component.",
   "dependencies": [
@@ -38,5 +37,6 @@
       "type": "registry:lib",
       "target": "components/ui/cubby-ui/circular-slider/lib/svg-utils.ts"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

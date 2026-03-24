@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "autocomplete",
-  "type": "registry:ui",
   "title": "Autocomplete",
   "description": "A autocomplete component.",
   "registryDependencies": [
@@ -14,5 +13,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/autocomplete.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

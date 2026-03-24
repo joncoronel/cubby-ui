@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "tooltip",
-  "type": "registry:ui",
   "title": "Tooltip",
   "description": "A tooltip component.",
   "files": [
@@ -11,5 +10,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/tooltip.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

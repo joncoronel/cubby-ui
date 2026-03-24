@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "use-list-virtualizer",
-  "type": "registry:hook",
   "title": "useListVirtualizer",
   "description": "A custom React hook for list virtualizer.",
   "dependencies": [
@@ -14,5 +13,6 @@
       "type": "registry:hook",
       "target": "hooks/cubby-ui/use-list-virtualizer.ts"
     }
-  ]
+  ],
+  "type": "registry:hook"
 }

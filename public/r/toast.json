@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "toast",
-  "type": "registry:ui",
   "title": "Toast",
   "description": "A toast component.",
   "dependencies": [
@@ -26,5 +25,6 @@
       "type": "registry:file",
       "target": "components/ui/cubby-ui/toast/toast.css"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

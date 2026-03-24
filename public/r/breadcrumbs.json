@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "breadcrumbs",
-  "type": "registry:ui",
   "title": "Breadcrumbs",
   "description": "A breadcrumbs component.",
   "dependencies": [
@@ -14,5 +13,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/breadcrumbs.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

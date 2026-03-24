@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "code-block",
-  "type": "registry:ui",
   "title": "Code-block",
   "description": "A code-block component.",
   "dependencies": [
@@ -52,5 +51,6 @@
       "type": "registry:lib",
       "target": "components/ui/cubby-ui/code-block/lib/transformers/utils.ts"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "radio-group",
-  "type": "registry:ui",
   "title": "Radio-group",
   "description": "A radio-group component.",
   "files": [
@@ -11,5 +10,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/radio-group.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

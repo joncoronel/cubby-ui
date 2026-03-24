@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "input-otp",
-  "type": "registry:ui",
   "title": "Input-otp",
   "description": "A input-otp component.",
   "dependencies": [
@@ -15,5 +14,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/input-otp.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

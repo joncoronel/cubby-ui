@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "input-group",
-  "type": "registry:ui",
   "title": "Input Group",
   "description": "A input-group component.",
   "dependencies": [
@@ -19,5 +18,6 @@
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/input-group.tsx"
     }
-  ]
+  ],
+  "type": "registry:ui"
 }

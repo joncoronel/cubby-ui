@@ -1,0 +1,53 @@
+import {
+  BaseDrawer,
+  BaseDrawerClose,
+  BaseDrawerDescription,
+  BaseDrawerFooter,
+  BaseDrawerHeader,
+  BaseDrawerPanel,
+  BaseDrawerPopup,
+  BaseDrawerTitle,
+  BaseDrawerTrigger,
+} from "@/registry/default/base-drawer/base-drawer";
+import { Button } from "@/registry/default/button/button";
+
+const items = Array.from({ length: 50 }, (_, i) => ({
+  id: i + 1,
+  title: `Item ${i + 1}`,
+  description: `This is the description for item ${i + 1}. It contains some sample text.`,
+}));
+
+export default function BaseDrawerWithScroll() {
+  return (
+    <BaseDrawer>
+      <BaseDrawerTrigger render={<Button variant="outline" />}>
+        Open Scrollable Drawer
+      </BaseDrawerTrigger>
+      <BaseDrawerPopup showBar>
+        <BaseDrawerHeader>
+          <BaseDrawerTitle>Scrollable Content</BaseDrawerTitle>
+          <BaseDrawerDescription>
+            Scroll within the drawer. Swipe down to dismiss when at the top.
+          </BaseDrawerDescription>
+        </BaseDrawerHeader>
+        <BaseDrawerPanel>
+          <div className="flex flex-col gap-3">
+            {items.map((item) => (
+              <div key={item.id} className="bg-muted/50 rounded-lg border p-3">
+                <h4 className="font-medium">{item.title}</h4>
+                <p className="text-muted-foreground text-sm">
+                  {item.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </BaseDrawerPanel>
+        <BaseDrawerFooter>
+          <BaseDrawerClose render={<Button className="w-full" />}>
+            Done
+          </BaseDrawerClose>
+        </BaseDrawerFooter>
+      </BaseDrawerPopup>
+    </BaseDrawer>
+  );
+}

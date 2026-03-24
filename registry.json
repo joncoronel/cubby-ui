@@ -69,6 +69,7 @@
         "@cubby-ui/autocomplete",
         "@cubby-ui/avatar",
         "@cubby-ui/badge",
+        "@cubby-ui/base-drawer",
         "@cubby-ui/breadcrumbs",
         "@cubby-ui/button",
         "@cubby-ui/button-group",
@@ -186,6 +187,26 @@
       ],
       "dependencies": [
         "class-variance-authority"
+      ]
+    },
+    {
+      "name": "base-drawer",
+      "type": "registry:ui",
+      "title": "Base Drawer",
+      "description": "A base-drawer component.",
+      "files": [
+        {
+          "path": "registry/default/base-drawer/base-drawer.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/base-drawer.tsx"
+        }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/button",
+        "@cubby-ui/scroll-area"
+      ],
+      "dependencies": [
+        "lucide-react"
       ]
     },
     {

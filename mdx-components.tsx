@@ -21,7 +21,7 @@ export function getMDXComponents(
   return {
     ...defaultComponents,
     ...components,
-    pre: MdxPreServer as unknown as MDXComponents["pre"],
+    pre: MdxPreServer as unknown as NonNullable<MDXComponents["pre"]>,
     Tabs,
     TabsList,
     TabsTrigger,

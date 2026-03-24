@@ -22,10 +22,28 @@ import {
   CommandList,
 } from "@/registry/default/command/command";
 
-import { highlightText } from "@/registry/default/lib/highlight-text";
 import { Kbd } from "@/registry/default/kbd/kbd";
 import { cn } from "@/lib/utils";
 import { create } from "@orama/orama";
+
+/**
+ * Renders a string containing `<mark>` tags into React elements.
+ * fumadocs now returns search results with `<mark>` in the content string.
+ */
+function renderHighlightedContent(content: string): React.ReactNode {
+  const parts = content.split(/(<mark>.*?<\/mark>)/g);
+  return parts.map((part, i) => {
+    const match = part.match(/^<mark>(.*?)<\/mark>$/);
+    if (match) {
+      return (
+        <mark key={i} className="text-primary bg-transparent font-bold">
+          {match[1]}
+        </mark>
+      );
+    }
+    return part;
+  });
+}
 
 function initOrama() {
   return create({
@@ -109,7 +127,7 @@ export default function CustomSearchDialog({
                     <span className="truncate">
                       {typeof item.content === "string" &&
                       query.data !== "empty"
-                        ? highlightText(item.content, search)
+                        ? renderHighlightedContent(item.content)
                         : item.content}
                     </span>
                   </div>

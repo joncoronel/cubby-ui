@@ -1,9 +1,9 @@
 import {
   Drawer,
-  DrawerBody,
   DrawerClose,
   DrawerContent,
   DrawerDescription,
+  DrawerFooter,
   DrawerHandle,
   DrawerHeader,
   DrawerTitle,
@@ -23,13 +23,13 @@ export default function DrawerFloating() {
               A floating drawer from the top edge.
             </DrawerDescription>
           </DrawerHeader>
-          <DrawerBody>
+          <DrawerFooter>
             <DrawerClose
               render={<Button variant="outline" className="w-full" />}
             >
               Close
             </DrawerClose>
-          </DrawerBody>
+          </DrawerFooter>
           <DrawerHandle />
         </DrawerContent>
       </Drawer>
@@ -46,18 +46,20 @@ export default function DrawerFloating() {
               A floating drawer from the bottom edge.
             </DrawerDescription>
           </DrawerHeader>
-          <DrawerBody>
+          <DrawerFooter>
             <DrawerClose
               render={<Button variant="outline" className="w-full" />}
             >
               Close
             </DrawerClose>
-          </DrawerBody>
+          </DrawerFooter>
         </DrawerContent>
       </Drawer>
 
       <Drawer variant="floating" direction="left">
-        <DrawerTrigger render={<Button variant="outline" />}>Left</DrawerTrigger>
+        <DrawerTrigger render={<Button variant="outline" />}>
+          Left
+        </DrawerTrigger>
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>Floating Left</DrawerTitle>
@@ -65,13 +67,13 @@ export default function DrawerFloating() {
               A floating drawer from the left edge.
             </DrawerDescription>
           </DrawerHeader>
-          <DrawerBody>
+          <DrawerFooter>
             <DrawerClose
               render={<Button variant="outline" className="w-full" />}
             >
               Close
             </DrawerClose>
-          </DrawerBody>
+          </DrawerFooter>
         </DrawerContent>
       </Drawer>
 
@@ -86,13 +88,13 @@ export default function DrawerFloating() {
               A floating drawer from the right edge.
             </DrawerDescription>
           </DrawerHeader>
-          <DrawerBody>
+          <DrawerFooter>
             <DrawerClose
               render={<Button variant="outline" className="w-full" />}
             >
               Close
             </DrawerClose>
-          </DrawerBody>
+          </DrawerFooter>
         </DrawerContent>
       </Drawer>
     </div>

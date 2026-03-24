@@ -697,10 +697,12 @@
         }
       ],
       "registryDependencies": [
+        "@cubby-ui/button",
         "@cubby-ui/scroll-area"
       ],
       "dependencies": [
-        "class-variance-authority"
+        "class-variance-authority",
+        "lucide-react"
       ]
     },
     {

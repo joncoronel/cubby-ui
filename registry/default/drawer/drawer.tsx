@@ -8,8 +8,10 @@ import {
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import { cva } from "class-variance-authority";
+import { XIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { Button } from "@/registry/default/button/button";
 import {
   ScrollArea,
   type ScrollAreaProps,
@@ -60,7 +62,7 @@ const drawerContentVariants = cva(
       variant: {
         default: "",
         floating: [
-          "m-4 rounded-2xl",
+          "m-4 overflow-clip rounded-2xl",
           "ring-border ring-1",
           "shadow-[0_16px_32px_0_oklch(0.18_0_0/0.16)]",
         ],
@@ -90,13 +92,13 @@ const drawerContentVariants = cva(
         variant: "default",
         direction: "right",
         class:
-          "origin-right max-w-screen w-screen rounded-l-xl sm:max-w-sm -translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-x-[var(--drawer-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-offset)]",
+          "origin-right max-w-screen w-screen sm:max-w-sm -translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-x-[var(--drawer-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-offset)]",
       },
       {
         variant: "default",
         direction: "left",
         class:
-          "origin-left max-w-screen w-screen rounded-r-xl sm:max-w-sm translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-x-[var(--drawer-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-offset)]",
+          "origin-left max-w-screen w-screen sm:max-w-sm translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-x-[var(--drawer-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-offset)]",
       },
       // Floating variant - direction-specific sizing, transforms, and nesting origin/offset
       {
@@ -625,12 +627,14 @@ function DrawerPortal({
 
 interface DrawerContentProps extends BaseDialog.Popup.Props {
   footerVariant?: "default" | "inset";
+  showCloseButton?: boolean;
 }
 
 function DrawerContent({
   initialFocus,
   finalFocus,
   footerVariant = "default",
+  showCloseButton,
   ...props
 }: DrawerContentProps) {
   return (
@@ -639,6 +643,7 @@ function DrawerContent({
         initialFocus={initialFocus}
         finalFocus={finalFocus}
         footerVariant={footerVariant}
+        showCloseButton={showCloseButton}
         {...props}
       />
     </DrawerPortal>
@@ -843,6 +848,7 @@ function DrawerContentInner({
   className,
   children,
   footerVariant = "default",
+  showCloseButton = false,
   initialFocus,
   finalFocus,
   ...props
@@ -1160,6 +1166,15 @@ function DrawerContentInner({
               {...props}
             >
               {children}
+              {showCloseButton && (
+                <DrawerClose
+                  aria-label="Close"
+                  className="absolute end-2 top-2"
+                  render={<Button size="icon_sm" variant="ghost" />}
+                >
+                  <XIcon />
+                </DrawerClose>
+              )}
             </BaseDialog.Popup>
           </div>
 
@@ -1190,8 +1205,11 @@ function DrawerHandle({
   render,
   ...props
 }: DrawerHandleProps) {
-  const { isVertical } = useDrawerConfig();
+  const { isVertical, direction } = useDrawerConfig();
   const { onOpenChange, isAnimating } = useDrawerControl();
+
+  // Auto-hide for left/right positioned drawers
+  const isHorizontalDrawer = direction === "left" || direction === "right";
 
   const handleClick = React.useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -1226,7 +1244,7 @@ function DrawerHandle({
     props: mergeProps<"button">(defaultProps, props),
   });
 
-  if (hidden) return null;
+  if (hidden || isHorizontalDrawer) return null;
 
   return element;
 }

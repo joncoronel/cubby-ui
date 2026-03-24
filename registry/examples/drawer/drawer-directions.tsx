@@ -1,9 +1,9 @@
 import {
   Drawer,
-  DrawerBody,
   DrawerClose,
   DrawerContent,
   DrawerDescription,
+  DrawerFooter,
   DrawerHandle,
   DrawerHeader,
   DrawerTitle,
@@ -23,13 +23,13 @@ export default function DrawerDirections() {
               This drawer slides in from the top.
             </DrawerDescription>
           </DrawerHeader>
-          <DrawerBody>
+          <DrawerFooter>
             <DrawerClose
               render={<Button variant="outline" className="w-full" />}
             >
               Close
             </DrawerClose>
-          </DrawerBody>
+          </DrawerFooter>
           <DrawerHandle />
         </DrawerContent>
       </Drawer>
@@ -39,20 +39,20 @@ export default function DrawerDirections() {
           Bottom
         </DrawerTrigger>
         <DrawerContent>
-          {/* <DrawerHandle /> */}
+          <DrawerHandle />
           <DrawerHeader>
             <DrawerTitle>Bottom Drawer</DrawerTitle>
             <DrawerDescription>
               This drawer slides in from the bottom.
             </DrawerDescription>
           </DrawerHeader>
-          <DrawerBody>
+          <DrawerFooter>
             <DrawerClose
               render={<Button variant="outline" className="w-full" />}
             >
               Close
             </DrawerClose>
-          </DrawerBody>
+          </DrawerFooter>
         </DrawerContent>
       </Drawer>
 
@@ -67,13 +67,13 @@ export default function DrawerDirections() {
               This drawer slides in from the left.
             </DrawerDescription>
           </DrawerHeader>
-          <DrawerBody>
+          <DrawerFooter>
             <DrawerClose
               render={<Button variant="outline" className="w-full" />}
             >
               Close
             </DrawerClose>
-          </DrawerBody>
+          </DrawerFooter>
         </DrawerContent>
       </Drawer>
 
@@ -88,13 +88,13 @@ export default function DrawerDirections() {
               This drawer slides in from the right.
             </DrawerDescription>
           </DrawerHeader>
-          <DrawerBody>
+          <DrawerFooter>
             <DrawerClose
               render={<Button variant="outline" className="w-full" />}
             >
               Close
             </DrawerClose>
-          </DrawerBody>
+          </DrawerFooter>
         </DrawerContent>
       </Drawer>
     </div>

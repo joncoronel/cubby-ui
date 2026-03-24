@@ -53,6 +53,12 @@
     ],
     "reference": []
   },
+  "base-drawer": {
+    "title": "Base Drawer",
+    "description": "A base-drawer component.",
+    "dependencies": [],
+    "reference": []
+  },
   "breadcrumbs": {
     "title": "Breadcrumbs",
     "description": "A breadcrumbs component.",

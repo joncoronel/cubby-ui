@@ -50,6 +50,17 @@ import badge_badge_default from "@/registry/examples/badge/badge-default";
 import badge_badge_sizes from "@/registry/examples/badge/badge-sizes";
 import badge_badge_variants from "@/registry/examples/badge/badge-variants";
 import badge_badge_with_icons from "@/registry/examples/badge/badge-with-icons";
+import base_drawer_base_drawer_basic from "@/registry/examples/base-drawer/base-drawer-basic";
+import base_drawer_base_drawer_controlled from "@/registry/examples/base-drawer/base-drawer-controlled";
+import base_drawer_base_drawer_directions from "@/registry/examples/base-drawer/base-drawer-directions";
+import base_drawer_base_drawer_floating from "@/registry/examples/base-drawer/base-drawer-floating";
+import base_drawer_base_drawer_indent from "@/registry/examples/base-drawer/base-drawer-indent";
+import base_drawer_base_drawer_inset_footer from "@/registry/examples/base-drawer/base-drawer-inset-footer";
+import base_drawer_base_drawer_nested from "@/registry/examples/base-drawer/base-drawer-nested";
+import base_drawer_base_drawer_side from "@/registry/examples/base-drawer/base-drawer-side";
+import base_drawer_base_drawer_snap_points from "@/registry/examples/base-drawer/base-drawer-snap-points";
+import base_drawer_base_drawer_with_form from "@/registry/examples/base-drawer/base-drawer-with-form";
+import base_drawer_base_drawer_with_scroll from "@/registry/examples/base-drawer/base-drawer-with-scroll";
 import breadcrumbs_breadcrumbs_basic from "@/registry/examples/breadcrumbs/breadcrumbs-basic";
 import breadcrumbs_breadcrumbs_custom_separator from "@/registry/examples/breadcrumbs/breadcrumbs-custom-separator";
 import breadcrumbs_breadcrumbs_custom_separator_with_prop from "@/registry/examples/breadcrumbs/breadcrumbs-custom-separator-with-prop";
@@ -435,6 +446,21 @@ export const componentMetadata = {
     "registryDependencies": [],
     "dependencies": [
       "class-variance-authority"
+    ],
+    "examples": {},
+    "reference": []
+  },
+  "base-drawer": {
+    "name": "base-drawer",
+    "title": "Base Drawer",
+    "description": "A base-drawer component.",
+    "category": "UI",
+    "registryDependencies": [
+      "@cubby-ui/button",
+      "@cubby-ui/scroll-area"
+    ],
+    "dependencies": [
+      "lucide-react"
     ],
     "examples": {},
     "reference": []
@@ -1476,6 +1502,63 @@ export const exampleRegistry = {
       "title": "With Icons",
       "importPath": "badge-with-icons",
       "source": "import { Badge } from \"@/components/ui/cubby-ui/badge\";\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport { Clock01Icon, Tick02Icon } from \"@hugeicons/core-free-icons\";\n\nexport default function BadgeWithIcons() {\n  return (\n    <div className=\"flex flex-wrap gap-2\">\n      <Badge variant=\"warning\">\n        <HugeiconsIcon icon={Clock01Icon} strokeWidth={2}   />\n        Pending\n      </Badge>\n      <Badge variant=\"success\">\n        <HugeiconsIcon icon={Tick02Icon} strokeWidth={2} />\n        Completed\n      </Badge>\n    </div>\n  );\n}"
+    }
+  ],
+  "base-drawer": [
+    {
+      "title": "Basic",
+      "importPath": "base-drawer-basic",
+      "source": "import {\n  BaseDrawer,\n  BaseDrawerClose,\n  BaseDrawerDescription,\n  BaseDrawerFooter,\n  BaseDrawerHeader,\n  BaseDrawerPopup,\n  BaseDrawerTitle,\n  BaseDrawerTrigger,\n} from \"@/components/ui/cubby-ui/base-drawer\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nexport default function BaseDrawerBasic() {\n  return (\n    <BaseDrawer>\n      <BaseDrawerTrigger render={<Button variant=\"outline\" />}>\n        Open Drawer\n      </BaseDrawerTrigger>\n      <BaseDrawerPopup showBar>\n        <BaseDrawerHeader>\n          <BaseDrawerTitle>Notifications</BaseDrawerTitle>\n          <BaseDrawerDescription>\n            You are all caught up. Good job!\n          </BaseDrawerDescription>\n        </BaseDrawerHeader>\n        <BaseDrawerFooter>\n          <BaseDrawerClose render={<Button variant=\"outline\" />}>\n            Close\n          </BaseDrawerClose>\n        </BaseDrawerFooter>\n      </BaseDrawerPopup>\n    </BaseDrawer>\n  );\n}\n"
+    },
+    {
+      "title": "Controlled",
+      "importPath": "base-drawer-controlled",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  BaseDrawer,\n  BaseDrawerClose,\n  BaseDrawerDescription,\n  BaseDrawerFooter,\n  BaseDrawerHeader,\n  BaseDrawerPanel,\n  BaseDrawerPopup,\n  BaseDrawerTitle,\n} from \"@/components/ui/cubby-ui/base-drawer\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nexport default function BaseDrawerControlled() {\n  const [open, setOpen] = React.useState(false);\n\n  return (\n    <>\n      <div className=\"flex items-center gap-2\">\n        <Button variant=\"outline\" onClick={() => setOpen(true)}>\n          Open Drawer\n        </Button>\n        <p className=\"text-muted-foreground text-sm\">\n          Drawer is {open ? \"open\" : \"closed\"}\n        </p>\n      </div>\n      <BaseDrawer open={open} onOpenChange={setOpen}>\n        <BaseDrawerPopup showBar>\n          <BaseDrawerHeader>\n            <BaseDrawerTitle>Controlled Drawer</BaseDrawerTitle>\n            <BaseDrawerDescription>\n              This drawer is controlled via external state.\n            </BaseDrawerDescription>\n          </BaseDrawerHeader>\n          <BaseDrawerPanel>\n            <p className=\"text-muted-foreground text-sm\">\n              The open state is managed outside the component, giving you full\n              control over when the drawer opens and closes.\n            </p>\n          </BaseDrawerPanel>\n          <BaseDrawerFooter>\n            <Button onClick={() => setOpen(false)}>Done</Button>\n            <BaseDrawerClose render={<Button variant=\"outline\" />}>\n              Cancel\n            </BaseDrawerClose>\n          </BaseDrawerFooter>\n        </BaseDrawerPopup>\n      </BaseDrawer>\n    </>\n  );\n}\n"
+    },
+    {
+      "title": "Directions",
+      "importPath": "base-drawer-directions",
+      "source": "import {\n  BaseDrawer,\n  BaseDrawerClose,\n  BaseDrawerDescription,\n  BaseDrawerFooter,\n  BaseDrawerHeader,\n  BaseDrawerPopup,\n  BaseDrawerTitle,\n  BaseDrawerTrigger,\n  type DrawerPosition,\n} from \"@/components/ui/cubby-ui/base-drawer\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nconst directions: { position: DrawerPosition; label: string }[] = [\n  { position: \"top\", label: \"Top\" },\n  { position: \"bottom\", label: \"Bottom\" },\n  { position: \"left\", label: \"Left\" },\n  { position: \"right\", label: \"Right\" },\n];\n\nexport default function BaseDrawerDirections() {\n  return (\n    <div className=\"grid grid-cols-2 gap-4\">\n      {directions.map(({ position, label }) => (\n        <BaseDrawer key={position} position={position}>\n          <BaseDrawerTrigger render={<Button variant=\"outline\" />}>\n            {label}\n          </BaseDrawerTrigger>\n          <BaseDrawerPopup showBar>\n            <BaseDrawerHeader>\n              <BaseDrawerTitle>{label} Drawer</BaseDrawerTitle>\n              <BaseDrawerDescription>\n                This drawer slides in from the {label.toLowerCase()}. Swipe to\n                dismiss.\n              </BaseDrawerDescription>\n            </BaseDrawerHeader>\n            <BaseDrawerFooter>\n              <BaseDrawerClose render={<Button variant=\"outline\" />}>\n                Close\n              </BaseDrawerClose>\n            </BaseDrawerFooter>\n          </BaseDrawerPopup>\n        </BaseDrawer>\n      ))}\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Floating",
+      "importPath": "base-drawer-floating",
+      "source": "import {\n  BaseDrawer,\n  BaseDrawerClose,\n  BaseDrawerDescription,\n  BaseDrawerFooter,\n  BaseDrawerHeader,\n  BaseDrawerPopup,\n  BaseDrawerTitle,\n  BaseDrawerTrigger,\n} from \"@/components/ui/cubby-ui/base-drawer\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nexport default function BaseDrawerFloating() {\n  return (\n    <div className=\"flex flex-wrap gap-4\">\n      <BaseDrawer>\n        <BaseDrawerTrigger render={<Button variant=\"outline\" />}>\n          Bottom Floating\n        </BaseDrawerTrigger>\n        <BaseDrawerPopup variant=\"floating\" showBar>\n          <BaseDrawerHeader>\n            <BaseDrawerTitle>Floating Drawer</BaseDrawerTitle>\n            <BaseDrawerDescription>\n              On desktop, this drawer has inset spacing and fully rounded\n              corners.\n            </BaseDrawerDescription>\n          </BaseDrawerHeader>\n          <BaseDrawerFooter>\n            <BaseDrawerClose render={<Button variant=\"outline\" />}>\n              Close\n            </BaseDrawerClose>\n          </BaseDrawerFooter>\n        </BaseDrawerPopup>\n      </BaseDrawer>\n\n      <BaseDrawer position=\"right\">\n        <BaseDrawerTrigger render={<Button variant=\"outline\" />}>\n          Right Floating\n        </BaseDrawerTrigger>\n        <BaseDrawerPopup variant=\"floating\" showBar>\n          <BaseDrawerHeader>\n            <BaseDrawerTitle>Floating Side Drawer</BaseDrawerTitle>\n            <BaseDrawerDescription>\n              The floating variant works with all positions.\n            </BaseDrawerDescription>\n          </BaseDrawerHeader>\n          <BaseDrawerFooter>\n            <BaseDrawerClose render={<Button variant=\"outline\" />}>\n              Close\n            </BaseDrawerClose>\n          </BaseDrawerFooter>\n        </BaseDrawerPopup>\n      </BaseDrawer>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Indent",
+      "importPath": "base-drawer-indent",
+      "source": "\"use client\";\n\nimport {\n  BaseDrawer,\n  BaseDrawerClose,\n  BaseDrawerDescription,\n  BaseDrawerFooter,\n  BaseDrawerHeader,\n  BaseDrawerIndent,\n  BaseDrawerIndentBackground,\n  BaseDrawerPopup,\n  BaseDrawerProvider,\n  BaseDrawerTitle,\n  BaseDrawerTrigger,\n} from \"@/components/ui/cubby-ui/base-drawer\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nexport default function BaseDrawerIndentExample() {\n  return (\n    <div className=\"relative overflow-hidden rounded-lg\">\n      <BaseDrawerProvider>\n        <BaseDrawerIndentBackground className=\"absolute\" />\n        <BaseDrawerIndent className=\"relative flex min-h-[300px] flex-col items-center justify-center gap-4 rounded-lg border bg-white p-8 dark:bg-gray-950\">\n          <p className=\"text-muted-foreground text-sm\">\n            The content behind the drawer scales and rounds when the drawer\n            opens.\n          </p>\n          <BaseDrawer>\n            <BaseDrawerTrigger render={<Button variant=\"outline\" />}>\n              Open with Indent Effect\n            </BaseDrawerTrigger>\n            <BaseDrawerPopup showBar>\n              <BaseDrawerHeader>\n                <BaseDrawerTitle>Indent Effect</BaseDrawerTitle>\n                <BaseDrawerDescription>\n                  The background content scales down and rounds its corners to\n                  create a layered effect.\n                </BaseDrawerDescription>\n              </BaseDrawerHeader>\n              <BaseDrawerFooter>\n                <BaseDrawerClose render={<Button variant=\"outline\" />}>\n                  Close\n                </BaseDrawerClose>\n              </BaseDrawerFooter>\n            </BaseDrawerPopup>\n          </BaseDrawer>\n        </BaseDrawerIndent>\n      </BaseDrawerProvider>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Inset Footer",
+      "importPath": "base-drawer-inset-footer",
+      "source": "import {\n  BaseDrawer,\n  BaseDrawerClose,\n  BaseDrawerDescription,\n  BaseDrawerFooter,\n  BaseDrawerHeader,\n  BaseDrawerPanel,\n  BaseDrawerPopup,\n  BaseDrawerTitle,\n  BaseDrawerTrigger,\n} from \"@/components/ui/cubby-ui/base-drawer\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nexport default function BaseDrawerInsetFooter() {\n  return (\n    <BaseDrawer>\n      <BaseDrawerTrigger render={<Button variant=\"outline\" />}>\n        Inset Footer\n      </BaseDrawerTrigger>\n      <BaseDrawerPopup showBar>\n        <BaseDrawerHeader>\n          <BaseDrawerTitle>Confirm Action</BaseDrawerTitle>\n          <BaseDrawerDescription>\n            The inset footer variant adds a border-top and muted background for\n            visual separation.\n          </BaseDrawerDescription>\n        </BaseDrawerHeader>\n        <BaseDrawerPanel>\n          <p className=\"text-muted-foreground text-sm\">\n            This is useful when the footer contains important actions that should\n            be visually distinct from the content above.\n          </p>\n        </BaseDrawerPanel>\n        <BaseDrawerFooter variant=\"inset\">\n          <Button>Confirm</Button>\n          <BaseDrawerClose render={<Button variant=\"outline\" />}>\n            Cancel\n          </BaseDrawerClose>\n        </BaseDrawerFooter>\n      </BaseDrawerPopup>\n    </BaseDrawer>\n  );\n}\n"
+    },
+    {
+      "title": "Nested",
+      "importPath": "base-drawer-nested",
+      "source": "import {\n  BaseDrawer,\n  BaseDrawerClose,\n  BaseDrawerDescription,\n  BaseDrawerFooter,\n  BaseDrawerHeader,\n  BaseDrawerPanel,\n  BaseDrawerPopup,\n  BaseDrawerTitle,\n  BaseDrawerTrigger,\n} from \"@/components/ui/cubby-ui/base-drawer\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nexport default function BaseDrawerNested() {\n  return (\n    <BaseDrawer>\n      <BaseDrawerTrigger render={<Button variant=\"outline\" />}>\n        Open Drawer Stack\n      </BaseDrawerTrigger>\n      <BaseDrawerPopup showBar>\n        <BaseDrawerHeader className=\"text-center\">\n          <BaseDrawerTitle>First Step</BaseDrawerTitle>\n          <BaseDrawerDescription>\n            This is the first step. Tap the button below to continue to the next\n            screen.\n          </BaseDrawerDescription>\n        </BaseDrawerHeader>\n        <BaseDrawerFooter className=\"justify-center sm:justify-center\">\n          <BaseDrawerClose render={<Button variant=\"ghost\" />}>\n            Cancel\n          </BaseDrawerClose>\n          <BaseDrawer>\n            <BaseDrawerTrigger render={<Button variant=\"outline\" />}>\n              Continue\n            </BaseDrawerTrigger>\n            <BaseDrawerPopup showBar>\n              <BaseDrawerHeader className=\"text-center\">\n                <BaseDrawerTitle>Second Step</BaseDrawerTitle>\n                <BaseDrawerDescription>\n                  You&apos;ve reached the second step. Tap the button below to\n                  continue.\n                </BaseDrawerDescription>\n              </BaseDrawerHeader>\n              <BaseDrawerPanel>\n                <div className=\"flex justify-center\">\n                  <div className=\"bg-muted size-48 shrink-0 rounded-xl border\" />\n                </div>\n              </BaseDrawerPanel>\n              <BaseDrawerFooter className=\"justify-center sm:justify-center\">\n                <BaseDrawerClose render={<Button variant=\"ghost\" />}>\n                  Back\n                </BaseDrawerClose>\n                <BaseDrawer>\n                  <BaseDrawerTrigger render={<Button variant=\"outline\" />}>\n                    Continue\n                  </BaseDrawerTrigger>\n                  <BaseDrawerPopup showBar>\n                    <BaseDrawerHeader className=\"text-center\">\n                      <BaseDrawerTitle>Third Step</BaseDrawerTitle>\n                      <BaseDrawerDescription>\n                        You&apos;ve reached the final step. You can close this\n                        drawer or go back.\n                      </BaseDrawerDescription>\n                    </BaseDrawerHeader>\n                    <BaseDrawerPanel>\n                      <div className=\"flex justify-center\">\n                        <div className=\"bg-muted size-32 shrink-0 rounded-full border\" />\n                      </div>\n                    </BaseDrawerPanel>\n                  </BaseDrawerPopup>\n                </BaseDrawer>\n              </BaseDrawerFooter>\n            </BaseDrawerPopup>\n          </BaseDrawer>\n        </BaseDrawerFooter>\n      </BaseDrawerPopup>\n    </BaseDrawer>\n  );\n}\n"
+    },
+    {
+      "title": "Side",
+      "importPath": "base-drawer-side",
+      "source": "import {\n  BaseDrawer,\n  BaseDrawerClose,\n  BaseDrawerDescription,\n  BaseDrawerFooter,\n  BaseDrawerHeader,\n  BaseDrawerPanel,\n  BaseDrawerPopup,\n  BaseDrawerTitle,\n  BaseDrawerTrigger,\n} from \"@/components/ui/cubby-ui/base-drawer\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nexport default function BaseDrawerSide() {\n  return (\n    <BaseDrawer position=\"right\">\n      <BaseDrawerTrigger render={<Button variant=\"outline\" />}>\n        Open Side Drawer\n      </BaseDrawerTrigger>\n      <BaseDrawerPopup showBar>\n        <BaseDrawerHeader>\n          <BaseDrawerTitle>Navigation</BaseDrawerTitle>\n          <BaseDrawerDescription>\n            Swipe right to dismiss this drawer.\n          </BaseDrawerDescription>\n        </BaseDrawerHeader>\n        <BaseDrawerPanel>\n          <nav className=\"flex flex-col gap-1\">\n            {[\"Dashboard\", \"Projects\", \"Settings\", \"Help\"].map((item) => (\n              <button\n                key={item}\n                className=\"hover:bg-muted rounded-md px-3 py-2 text-left text-sm font-medium transition-colors\"\n              >\n                {item}\n              </button>\n            ))}\n          </nav>\n        </BaseDrawerPanel>\n        <BaseDrawerFooter>\n          <BaseDrawerClose render={<Button variant=\"outline\" />}>\n            Close\n          </BaseDrawerClose>\n        </BaseDrawerFooter>\n      </BaseDrawerPopup>\n    </BaseDrawer>\n  );\n}\n"
+    },
+    {
+      "title": "Snap Points",
+      "importPath": "base-drawer-snap-points",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  BaseDrawer,\n  BaseDrawerClose,\n  BaseDrawerDescription,\n  BaseDrawerHeader,\n  BaseDrawerPanel,\n  BaseDrawerPopup,\n  BaseDrawerTitle,\n  BaseDrawerTrigger,\n} from \"@/components/ui/cubby-ui/base-drawer\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nconst snapPoints = [\"300px\", 1] as const;\n\nexport default function BaseDrawerSnapPoints() {\n  const [snapPoint, setSnapPoint] = React.useState<\n    (typeof snapPoints)[number] | null\n  >(snapPoints[0]);\n\n  return (\n    <BaseDrawer\n      snapPoints={[...snapPoints]}\n      snapPoint={snapPoint}\n      onSnapPointChange={(point) =>\n        setSnapPoint(point as (typeof snapPoints)[number] | null)\n      }\n      snapToSequentialPoints\n    >\n      <BaseDrawerTrigger render={<Button variant=\"outline\" />}>\n        Open Snap Drawer\n      </BaseDrawerTrigger>\n      <BaseDrawerPopup showBar>\n        <BaseDrawerHeader>\n          <BaseDrawerTitle>Snap Points</BaseDrawerTitle>\n          <BaseDrawerDescription>\n            Drag the drawer to snap between a compact peek and full-height view.\n          </BaseDrawerDescription>\n        </BaseDrawerHeader>\n        <BaseDrawerPanel>\n          <div className=\"flex flex-col gap-2\">\n            {Array.from({ length: 48 }, (_, i) => (\n              <div\n                key={i}\n                className=\"bg-muted h-12 shrink-0 rounded-xl border\"\n              />\n            ))}\n          </div>\n          <div className=\"mt-4 flex justify-end\">\n            <BaseDrawerClose render={<Button variant=\"outline\" />}>\n              Close\n            </BaseDrawerClose>\n          </div>\n        </BaseDrawerPanel>\n      </BaseDrawerPopup>\n    </BaseDrawer>\n  );\n}\n"
+    },
+    {
+      "title": "With Form",
+      "importPath": "base-drawer-with-form",
+      "source": "import {\n  BaseDrawer,\n  BaseDrawerClose,\n  BaseDrawerDescription,\n  BaseDrawerFooter,\n  BaseDrawerHeader,\n  BaseDrawerPanel,\n  BaseDrawerPopup,\n  BaseDrawerTitle,\n  BaseDrawerTrigger,\n} from \"@/components/ui/cubby-ui/base-drawer\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Input } from \"@/components/ui/cubby-ui/input\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function BaseDrawerWithForm() {\n  return (\n    <BaseDrawer>\n      <BaseDrawerTrigger render={<Button />}>Edit Profile</BaseDrawerTrigger>\n      <BaseDrawerPopup showBar>\n        <BaseDrawerHeader>\n          <BaseDrawerTitle>Edit profile</BaseDrawerTitle>\n          <BaseDrawerDescription>\n            Make changes to your profile here. Click save when you&apos;re done.\n          </BaseDrawerDescription>\n        </BaseDrawerHeader>\n        <BaseDrawerPanel>\n          <div className=\"space-y-4\">\n            <div className=\"space-y-2\">\n              <Label htmlFor=\"bd-name\">Name</Label>\n              <Input id=\"bd-name\" defaultValue=\"Pedro Duarte\" />\n            </div>\n            <div className=\"space-y-2\">\n              <Label htmlFor=\"bd-username\">Username</Label>\n              <Input id=\"bd-username\" defaultValue=\"@peduarte\" />\n            </div>\n          </div>\n        </BaseDrawerPanel>\n        <BaseDrawerFooter>\n          <Button>Save changes</Button>\n          <BaseDrawerClose render={<Button variant=\"outline\" />}>\n            Cancel\n          </BaseDrawerClose>\n        </BaseDrawerFooter>\n      </BaseDrawerPopup>\n    </BaseDrawer>\n  );\n}\n"
+    },
+    {
+      "title": "With Scroll",
+      "importPath": "base-drawer-with-scroll",
+      "source": "import {\n  BaseDrawer,\n  BaseDrawerClose,\n  BaseDrawerDescription,\n  BaseDrawerFooter,\n  BaseDrawerHeader,\n  BaseDrawerPanel,\n  BaseDrawerPopup,\n  BaseDrawerTitle,\n  BaseDrawerTrigger,\n} from \"@/components/ui/cubby-ui/base-drawer\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nconst items = Array.from({ length: 50 }, (_, i) => ({\n  id: i + 1,\n  title: `Item ${i + 1}`,\n  description: `This is the description for item ${i + 1}. It contains some sample text.`,\n}));\n\nexport default function BaseDrawerWithScroll() {\n  return (\n    <BaseDrawer>\n      <BaseDrawerTrigger render={<Button variant=\"outline\" />}>\n        Open Scrollable Drawer\n      </BaseDrawerTrigger>\n      <BaseDrawerPopup showBar>\n        <BaseDrawerHeader>\n          <BaseDrawerTitle>Scrollable Content</BaseDrawerTitle>\n          <BaseDrawerDescription>\n            Scroll within the drawer. Swipe down to dismiss when at the top.\n          </BaseDrawerDescription>\n        </BaseDrawerHeader>\n        <BaseDrawerPanel>\n          <div className=\"flex flex-col gap-3\">\n            {items.map((item) => (\n              <div key={item.id} className=\"bg-muted/50 rounded-lg border p-3\">\n                <h4 className=\"font-medium\">{item.title}</h4>\n                <p className=\"text-muted-foreground text-sm\">\n                  {item.description}\n                </p>\n              </div>\n            ))}\n          </div>\n        </BaseDrawerPanel>\n        <BaseDrawerFooter>\n          <BaseDrawerClose render={<Button className=\"w-full\" />}>\n            Done\n          </BaseDrawerClose>\n        </BaseDrawerFooter>\n      </BaseDrawerPopup>\n    </BaseDrawer>\n  );\n}\n"
     }
   ],
   "breadcrumbs": [
@@ -3153,6 +3236,17 @@ export const componentMap = {
   "badge-sizes": badge_badge_sizes,
   "badge-variants": badge_badge_variants,
   "badge-with-icons": badge_badge_with_icons,
+  "base-drawer-basic": base_drawer_base_drawer_basic,
+  "base-drawer-controlled": base_drawer_base_drawer_controlled,
+  "base-drawer-directions": base_drawer_base_drawer_directions,
+  "base-drawer-floating": base_drawer_base_drawer_floating,
+  "base-drawer-indent": base_drawer_base_drawer_indent,
+  "base-drawer-inset-footer": base_drawer_base_drawer_inset_footer,
+  "base-drawer-nested": base_drawer_base_drawer_nested,
+  "base-drawer-side": base_drawer_base_drawer_side,
+  "base-drawer-snap-points": base_drawer_base_drawer_snap_points,
+  "base-drawer-with-form": base_drawer_base_drawer_with_form,
+  "base-drawer-with-scroll": base_drawer_base_drawer_with_scroll,
   "breadcrumbs-basic": breadcrumbs_breadcrumbs_basic,
   "breadcrumbs-custom-separator": breadcrumbs_breadcrumbs_custom_separator,
   "breadcrumbs-custom-separator-with-prop": breadcrumbs_breadcrumbs_custom_separator_with_prop,
@@ -3486,6 +3580,10 @@ export const componentAnatomy = {
   "badge": {
     "imports": "import { Badge } from \"@/components/ui/cubby-ui/badge\";",
     "anatomy": "<Badge />"
+  },
+  "base-drawer": {
+    "imports": "import {\n  BaseDrawer,\n  BaseDrawerClose,\n  BaseDrawerDescription,\n  BaseDrawerFooter,\n  BaseDrawerHeader,\n  BaseDrawerPopup,\n  BaseDrawerTitle,\n  BaseDrawerTrigger,\n} from \"@/components/ui/cubby-ui/base-drawer\";",
+    "anatomy": "<BaseDrawer>\n  <BaseDrawerTrigger />\n  <BaseDrawerPopup>\n    <BaseDrawerHeader>\n      <BaseDrawerTitle />\n      <BaseDrawerDescription />\n    </BaseDrawerHeader>\n    <BaseDrawerFooter>\n      <BaseDrawerClose />\n    </BaseDrawerFooter>\n  </BaseDrawerPopup>\n</BaseDrawer>"
   },
   "breadcrumbs": {
     "imports": "import {\n  Breadcrumb,\n  BreadcrumbItem,\n  BreadcrumbLink,\n  BreadcrumbList,\n  BreadcrumbPage,\n  BreadcrumbSeparator,\n} from \"@/components/ui/cubby-ui/breadcrumbs\";",

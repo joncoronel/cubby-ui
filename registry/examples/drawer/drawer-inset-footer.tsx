@@ -43,8 +43,8 @@ export default function DrawerInsetFooter() {
           </div>
         </DrawerBody>
         <DrawerFooter>
-          <Button className="w-full">Confirm Order</Button>
-          <DrawerClose render={<Button variant="outline" className="w-full" />}>
+          <Button>Confirm Order</Button>
+          <DrawerClose render={<Button variant="outline" />}>
             Cancel
           </DrawerClose>
         </DrawerFooter>

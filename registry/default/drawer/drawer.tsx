@@ -46,26 +46,22 @@ const drawerContentVariants = cva(
   [
     "bg-popover text-popover-foreground flex flex-col",
     "relative",
-    "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-[transform,scale,translate] duration-300 will-change-transform",
+    "ease-[cubic-bezier(0.32,0.72,0,1)] transition-[transform,scale,translate] duration-400 will-change-transform",
     "motion-reduce:transition-none",
     // Nested drawer support: scale down parent when child opens (interpolated during drag)
     "scale-[calc(1-0.05*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))]",
     // Disable transitions on parent while child is being dragged
     "data-[nested-dragging]:transition-none",
     // Nested drawer support: overlay dim effect (using before: to avoid conflict with Safari ::after touch fix)
-    "before:pointer-events-none before:absolute before:inset-0 before:z-50 before:hidden before:rounded-[inherit] before:bg-black/5 before:opacity-0 before:transition-[opacity,display] before:transition-discrete before:duration-300",
+    "before:pointer-events-none before:absolute before:inset-0 before:z-50 before:hidden before:rounded-[inherit] before:bg-black/10 before:opacity-0 before:transition-[opacity,display] before:transition-discrete before:duration-400",
     "data-nested-dialog-open:before:block data-nested-dialog-open:before:opacity-100",
     "starting:data-nested-dialog-open:before:opacity-0",
   ],
   {
     variants: {
       variant: {
-        default: "",
-        floating: [
-          "m-4 overflow-clip rounded-2xl",
-          "ring-border ring-1",
-          "shadow-[0_16px_32px_0_oklch(0.18_0_0/0.16)]",
-        ],
+        default: "shadow-lg ring-border ring-1",
+        floating: ["m-4 overflow-clip rounded-2xl"],
       },
       direction: {
         bottom: "",
@@ -80,25 +76,25 @@ const drawerContentVariants = cva(
         variant: "default",
         direction: "bottom",
         class:
-          "origin-bottom mx-auto max-h-[95dvh] w-full max-w-full rounded-t-xl -translate-y-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-y-[var(--drawer-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-offset)]",
+          "origin-bottom mx-auto max-h-[95dvh] w-full max-w-full rounded-t-2xl -translate-y-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-y-[var(--drawer-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-offset)]",
       },
       {
         variant: "default",
         direction: "top",
         class:
-          "origin-top mx-auto max-h-[95dvh] w-full max-w-full rounded-b-xl translate-y-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-y-[var(--drawer-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-offset)]",
+          "origin-top mx-auto max-h-[95dvh] w-full max-w-full rounded-b-2xl translate-y-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-y-[var(--drawer-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-offset)]",
       },
       {
         variant: "default",
         direction: "right",
         class:
-          "origin-right max-w-screen w-screen sm:max-w-sm -translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-x-[var(--drawer-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-offset)]",
+          "origin-right max-w-screen w-screen sm:max-w-md -translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-x-[var(--drawer-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-offset)]",
       },
       {
         variant: "default",
         direction: "left",
         class:
-          "origin-left max-w-screen w-screen sm:max-w-sm translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-x-[var(--drawer-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-offset)]",
+          "origin-left max-w-screen w-screen sm:max-w-md translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-x-[var(--drawer-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-offset)]",
       },
       // Floating variant - direction-specific sizing, transforms, and nesting origin/offset
       {
@@ -117,13 +113,13 @@ const drawerContentVariants = cva(
         variant: "floating",
         direction: "right",
         class:
-          "origin-right h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-sm -translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-x-[var(--drawer-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-offset)]",
+          "origin-right h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-md -translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-x-[var(--drawer-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-offset)]",
       },
       {
         variant: "floating",
         direction: "left",
         class:
-          "origin-left h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-sm translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-x-[var(--drawer-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-offset)]",
+          "origin-left h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-md translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-x-[var(--drawer-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-offset)]",
       },
     ],
     defaultVariants: {
@@ -1035,16 +1031,16 @@ function DrawerContentInner({
           <BaseDialog.Backdrop
             data-slot="drawer-overlay"
             className={cn(
-              "absolute inset-0 z-50 bg-black/35",
+              "absolute inset-0 z-50 bg-black/40 backdrop-blur-sm",
               "[transform:translateZ(0)] will-change-[opacity]",
               isClosing ? "pointer-events-none" : "pointer-events-auto",
               "touch-none",
               immediateClose || (isDragging && !isAnimating)
                 ? "transition-none"
-                : "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-opacity duration-300",
+                : "transition-opacity duration-400 ease-[cubic-bezier(0.32,0.72,0,1)]",
               "[&[data-starting-style]]:opacity-0!",
               // Exit animation overrides scroll-driven animation (transitions can't interpolate from animation-held values)
-              "data-ending-style:animate-[drawer-backdrop-exit_300ms_cubic-bezier(0,0,0.58,1)_forwards]",
+              "data-ending-style:animate-[drawer-backdrop-exit_450ms_cubic-bezier(0.32,0.72,0,1)_forwards]",
               isInitialized && !isAnimating && dismissible && dragProgress < 1
                 ? useScrollDrivenAnimation
                   ? backdropAnimationStyles[direction]
@@ -1230,7 +1226,7 @@ function DrawerHandle({
       "appearance-none border-0 bg-transparent p-0",
       "focus-visible:ring-ring/50 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
       "bg-muted-foreground/30 shrink-0 cursor-pointer rounded-full",
-      isVertical ? "mx-auto my-3 h-1.5 w-12" : "mx-3 my-auto h-12 w-1.5",
+      isVertical ? "mx-auto my-3 h-1 w-12" : "mx-3 my-auto h-12 w-1",
       "hover:bg-muted-foreground/50 transition-[color,opacity]",
       // Fade out when nested drawer opens, fade back when nested drawer is being dragged
       // "in-data-nested-dialog-open:opacity-0 in-data-nested-dragging:opacity-100",
@@ -1258,10 +1254,11 @@ function DrawerHeader({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="drawer-header"
       className={cn(
-        "flex flex-col gap-1.5 px-5 pt-5 pb-3",
-        "not-has-[+[data-slot=drawer-body]]:has-[+[data-slot=drawer-footer]]:pb-1",
-        "not-has-[+[data-slot=drawer-body]]:not-has-[+[data-slot=drawer-footer]]:pb-5",
-        "in-data-[footer-variant=inset]:not-has-[+[data-slot=drawer-body]]:has-[+[data-slot=drawer-footer]]:pb-5",
+        "flex flex-col gap-2 px-6 pt-6 pb-3",
+        "in-data-[direction=bottom]:in-[[data-slot=drawer-content]:has([data-slot=drawer-handle])]:pt-1",
+        "not-has-[+[data-slot=drawer-body]]:has-[+[data-slot=drawer-footer]]:pb-6",
+        "not-has-[+[data-slot=drawer-body]]:not-has-[+[data-slot=drawer-footer]]:pb-6",
+        "in-data-[footer-variant=inset]:not-has-[+[data-slot=drawer-body]]:has-[+[data-slot=drawer-footer]]:pb-6",
         // "transition-opacity in-data-nested-dialog-open:opacity-0 in-data-nested-dragging:opacity-100",
         className,
       )}
@@ -1281,10 +1278,11 @@ function DrawerFooter({ className, ...props }: React.ComponentProps<"div">) {
       className={cn(
         // z-1 + translateZ(0): stays above DrawerBody(z-0); Safari-only GPU layer
         // promotion fixes sticky/transform compositing flash during enter animation
-        "bg-popover z-1 mt-auto flex flex-col gap-2 px-5 pt-3 pb-5",
+        "bg-popover z-1 mt-auto flex flex-col-reverse gap-2 px-6 pt-4 pb-6 sm:flex-row sm:justify-end",
         "[@supports(-webkit-touch-callout:none)]:transform-[translateZ(0)]",
-        "first:pt-5",
-        "in-data-[footer-variant=inset]:border-border in-data-[footer-variant=inset]:bg-muted in-data-[footer-variant=inset]:border-t in-data-[footer-variant=inset]:pt-4 in-data-[footer-variant=inset]:pb-4",
+        "first:pt-6",
+        "in-[[data-slot=drawer-content]:has([data-slot=drawer-body])]:pt-3",
+        "in-data-[footer-variant=inset]:border-border in-data-[footer-variant=inset]:bg-muted/72 in-data-[footer-variant=inset]:border-t in-data-[footer-variant=inset]:pt-4 in-data-[footer-variant=inset]:pb-4",
         // "transition-opacity in-data-nested-dialog-open:opacity-0 in-data-nested-dragging:opacity-100",
         className,
       )}
@@ -1305,7 +1303,7 @@ function DrawerTitle({
     <BaseDialog.Title
       data-slot="drawer-title"
       className={cn(
-        "text-foreground text-lg font-semibold text-balance",
+        "text-foreground text-lg leading-none font-semibold tracking-tight",
         className,
       )}
       {...props}
@@ -1355,8 +1353,7 @@ function DrawerBody({
   const { isVertical, snapPoints } = useDrawerConfig();
   const { activeSnapPoint } = useDrawerControl();
 
-  const isAtFullSnap =
-    activeSnapPoint === snapPoints[snapPoints.length - 1];
+  const isAtFullSnap = activeSnapPoint === snapPoints[snapPoints.length - 1];
 
   return (
     <div
@@ -1364,9 +1361,9 @@ function DrawerBody({
       className={cn(
         // z-0: stays below sticky footer during iOS Safari enter animation
         "relative z-0 flex min-h-0 flex-1 flex-col overflow-hidden",
-        "first:pt-4",
-        "not-has-[+[data-slot=drawer-footer]]:pb-4",
-        "in-data-[footer-variant=inset]:has-[+[data-slot=drawer-footer]]:pb-4",
+        "first:pt-5",
+        "not-has-[+[data-slot=drawer-footer]]:pb-5",
+        "in-data-[footer-variant=inset]:has-[+[data-slot=drawer-footer]]:pb-5",
         // "transition-opacity in-data-nested-dialog-open:opacity-0 in-data-nested-dragging:opacity-100",
       )}
     >
@@ -1383,7 +1380,7 @@ function DrawerBody({
           scrollLock && !isAtFullSnap && "!overflow-hidden",
         )}
       >
-        <div className={cn("px-5 py-1", className)} {...props}>
+        <div className={cn("px-6 py-1", className)} {...props}>
           {children}
         </div>
       </ScrollArea>

@@ -1341,15 +1341,22 @@ function DrawerBody({
   scrollbarGutter = false,
   persistScrollbar,
   hideScrollbar,
+  scrollLock = false,
   children,
   ...props
 }: React.ComponentProps<"div"> & {
   nativeScroll?: boolean;
+  /** Disable scrolling when the drawer is not at its last (full) snap point */
+  scrollLock?: boolean;
 } & Pick<
     ScrollAreaProps,
     "fadeEdges" | "scrollbarGutter" | "persistScrollbar" | "hideScrollbar"
   >) {
-  const { isVertical } = useDrawerConfig();
+  const { isVertical, snapPoints } = useDrawerConfig();
+  const { activeSnapPoint } = useDrawerControl();
+
+  const isAtFullSnap =
+    activeSnapPoint === snapPoints[snapPoints.length - 1];
 
   return (
     <div
@@ -1371,7 +1378,10 @@ function DrawerBody({
         hideScrollbar={hideScrollbar}
         nativeScroll={nativeScroll}
         overscrollBehavior="auto"
-        viewportClassName={isVertical ? "touch-pan-y" : "touch-pan-x"}
+        viewportClassName={cn(
+          isVertical ? "touch-pan-y" : "touch-pan-x",
+          scrollLock && !isAtFullSnap && "!overflow-hidden",
+        )}
       >
         <div className={cn("px-5 py-1", className)} {...props}>
           {children}

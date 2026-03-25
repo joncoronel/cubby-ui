@@ -113,7 +113,7 @@ export default function DrawerComments() {
             </span>
           </div>
         </DrawerHeader>
-        <DrawerBody className="py-4">
+        <DrawerBody className="py-4" scrollLock>
           <div className="flex flex-col gap-4">
             {comments.map((comment) => (
               <div key={comment.id} className="flex gap-3">

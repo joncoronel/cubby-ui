@@ -75,6 +75,7 @@ function AlertDialogContent({
       <AlertDialogBackdrop />
       <AlertDialogViewport>
         <BaseAlertDialog.Popup
+          data-slot="alert-dialog-content"
           data-variant={variant}
           className={cn(
             "bg-popover text-popover-foreground relative z-50 flex max-h-full min-h-0 w-full max-w-full min-w-0 flex-col overflow-hidden shadow-lg",
@@ -117,9 +118,9 @@ function AlertDialogHeader({
     <div
       data-slot="alert-dialog-header"
       className={cn(
-        "flex flex-col space-y-1.5 px-6 pt-6 pb-4",
-        // Reduce bottom padding when header is directly before footer (no body) to maintain p-5 total gap
-        "not-has-[+[data-slot=alert-dialog-body]]:has-[+[data-slot=alert-dialog-footer]]:pb-1",
+        "flex flex-col gap-2 px-6 pt-6 pb-3",
+        // Reduce bottom padding when header is directly before footer (no body)
+        "not-has-[+[data-slot=alert-dialog-body]]:has-[+[data-slot=alert-dialog-footer]]:pb-6",
         // Add extra bottom padding when header is alone (no body or footer)
         "not-has-[+[data-slot=alert-dialog-body]]:not-has-[+[data-slot=alert-dialog-footer]]:pb-6",
         // Inset variant: add extra bottom padding when header is directly before footer (no body)
@@ -183,8 +184,10 @@ function AlertDialogFooter({
         "flex flex-col-reverse gap-2 px-6 pt-4 pb-6 sm:flex-row sm:justify-end",
         // Add extra top padding when footer is first (no header or body)
         "first:pt-6",
+        // Reduce top padding when body is present
+        "not-in-data-[variant=inset]:in-[[data-slot=alert-dialog-content]:has([data-slot=alert-dialog-body])]:pt-3",
         // Inset variant: muted background with top border for separation
-        "in-data-[variant=inset]:border-border in-data-[variant=inset]:bg-muted in-data-[variant=inset]:rounded-b-2xl in-data-[variant=inset]:border-t in-data-[variant=inset]:pt-4 in-data-[variant=inset]:pb-4",
+        "in-data-[variant=inset]:border-border in-data-[variant=inset]:bg-muted/72 in-data-[variant=inset]:rounded-b-2xl in-data-[variant=inset]:border-t in-data-[variant=inset]:pt-4 in-data-[variant=inset]:pb-4",
         className,
       )}
       {...props}
@@ -199,7 +202,7 @@ function AlertDialogTitle({
   return (
     <BaseAlertDialog.Title
       className={cn(
-        "text-lg leading-none font-semibold tracking-tight",
+        "text-foreground text-lg leading-none font-semibold tracking-tight text-balance",
         className,
       )}
       {...props}
@@ -213,7 +216,7 @@ function AlertDialogDescription({
 }: BaseAlertDialog.Description.Props) {
   return (
     <BaseAlertDialog.Description
-      className={cn("text-muted-foreground text-sm", className)}
+      className={cn("text-muted-foreground text-sm text-pretty", className)}
       {...props}
     />
   );

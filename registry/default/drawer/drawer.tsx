@@ -1281,7 +1281,7 @@ function DrawerFooter({ className, ...props }: React.ComponentProps<"div">) {
         "bg-popover z-1 mt-auto flex flex-col-reverse gap-2 px-6 pt-4 pb-6 sm:flex-row sm:justify-end",
         "[@supports(-webkit-touch-callout:none)]:transform-[translateZ(0)]",
         "first:pt-6",
-        "in-[[data-slot=drawer-content]:has([data-slot=drawer-body])]:pt-3",
+        "not-in-data-[footer-variant=inset]:in-[[data-slot=drawer-content]:has([data-slot=drawer-body])]:pt-3",
         "in-data-[footer-variant=inset]:border-border in-data-[footer-variant=inset]:bg-muted/72 in-data-[footer-variant=inset]:border-t in-data-[footer-variant=inset]:pt-4 in-data-[footer-variant=inset]:pb-4",
         // "transition-opacity in-data-nested-dialog-open:opacity-0 in-data-nested-dragging:opacity-100",
         className,
@@ -1303,7 +1303,7 @@ function DrawerTitle({
     <BaseDialog.Title
       data-slot="drawer-title"
       className={cn(
-        "text-foreground text-lg leading-none font-semibold tracking-tight",
+        "text-foreground text-lg leading-none font-semibold tracking-tight text-balance",
         className,
       )}
       {...props}

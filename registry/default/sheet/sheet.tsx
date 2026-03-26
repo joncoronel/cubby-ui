@@ -180,13 +180,13 @@ function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sheet-header"
       className={cn(
-        "flex flex-col space-y-1.5 px-5 pt-5 pb-3",
-        // Reduce bottom padding when header is directly before footer (no body)
-        "not-has-[+[data-slot=sheet-body]]:has-[+[data-slot=sheet-footer]]:pb-1",
+        "flex flex-col gap-2 px-6 pt-6 pb-3",
+        // Spacious bottom padding when header is directly before footer (no body)
+        "not-has-[+[data-slot=sheet-body]]:has-[+[data-slot=sheet-footer]]:pb-6",
         // Add extra bottom padding when header is alone (no body or footer)
-        "not-has-[+[data-slot=sheet-body]]:not-has-[+[data-slot=sheet-footer]]:pb-5",
+        "not-has-[+[data-slot=sheet-body]]:not-has-[+[data-slot=sheet-footer]]:pb-6",
         // Inset footer variant: add extra bottom padding when header is directly before footer (no body)
-        "in-data-[footer-variant=inset]:not-has-[+[data-slot=sheet-body]]:has-[+[data-slot=sheet-footer]]:pb-5",
+        "in-data-[footer-variant=inset]:not-has-[+[data-slot=sheet-body]]:has-[+[data-slot=sheet-footer]]:pb-6",
         className,
       )}
       {...props}
@@ -214,9 +214,9 @@ function SheetBody({
       data-slot="sheet-body"
       className={cn(
         "flex flex-1 min-h-0 flex-col overflow-hidden",
-        "first:pt-4",
-        "not-has-[+[data-slot=sheet-footer]]:pb-4",
-        "in-data-[footer-variant=inset]:has-[+[data-slot=sheet-footer]]:pb-4",
+        "first:pt-5",
+        "not-has-[+[data-slot=sheet-footer]]:pb-5",
+        "in-data-[footer-variant=inset]:has-[+[data-slot=sheet-footer]]:pb-5",
       )}
     >
       <ScrollArea
@@ -227,7 +227,7 @@ function SheetBody({
         hideScrollbar={hideScrollbar}
         nativeScroll={nativeScroll}
       >
-        <div className={cn("px-5 py-1", className)} {...props}>
+        <div className={cn("px-6 py-1", className)} {...props}>
           {children}
         </div>
       </ScrollArea>
@@ -240,7 +240,7 @@ function SheetTitle({ className, ...props }: BaseSheet.Title.Props) {
     <BaseSheet.Title
       data-slot="sheet-title"
       className={cn(
-        "text-lg leading-none font-semibold tracking-tight",
+        "text-foreground text-lg leading-none font-semibold tracking-tight text-balance",
         className,
       )}
       {...props}
@@ -255,7 +255,7 @@ function SheetDescription({
   return (
     <BaseSheet.Description
       data-slot="sheet-description"
-      className={cn("text-muted-foreground text-sm", className)}
+      className={cn("text-muted-foreground text-sm text-pretty", className)}
       {...props}
     />
   );
@@ -266,11 +266,13 @@ function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sheet-footer"
       className={cn(
-        "mt-auto flex flex-col-reverse gap-2 px-5 pt-3 pb-5 sm:flex-row sm:justify-end",
+        "mt-auto flex flex-col-reverse gap-2 px-6 pt-4 pb-6 sm:flex-row sm:justify-end",
         // Add extra top padding when footer is first (no header or body)
-        "first:pt-5",
+        "first:pt-6",
+        // Reduce top padding when body is present
+        "not-in-data-[footer-variant=inset]:in-[[data-slot=sheet-content]:has([data-slot=sheet-body])]:pt-3",
         // Inset variant: muted background with top border for separation
-        "in-data-[footer-variant=inset]:border-border in-data-[footer-variant=inset]:bg-muted in-data-[footer-variant=inset]:border-t in-data-[footer-variant=inset]:pt-4 in-data-[footer-variant=inset]:pb-4",
+        "in-data-[footer-variant=inset]:border-border in-data-[footer-variant=inset]:bg-muted/72 in-data-[footer-variant=inset]:border-t in-data-[footer-variant=inset]:pt-4 in-data-[footer-variant=inset]:pb-4",
         className,
       )}
       {...props}

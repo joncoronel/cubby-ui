@@ -155,9 +155,9 @@ export default function DrawerComments() {
           </div>
         </DrawerBody>
 
-        <DrawerFooter className="sticky bottom-0 border-t">
+        <DrawerFooter className="sticky bottom-0 border-t py-4">
           <form
-            className="flex gap-2"
+            className="flex w-full gap-2"
             onSubmit={(e) => {
               e.preventDefault();
               setNewComment("");

@@ -6,6 +6,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { XIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { Button } from "@/registry/default/button/button";
 import {
   ScrollArea,
   type ScrollAreaProps,
@@ -14,26 +15,26 @@ import {
 const sheetContentVariants = cva(
   [
     "bg-popover text-popover-foreground fixed z-50 flex max-h-full min-h-0 w-full max-w-full min-w-0 flex-col outline-hidden",
-    "ease-[cubic-bezier(0, 0, 0.58, 1)] transition-all duration-250",
+    "ease-[cubic-bezier(0.32,0.72,0,1)] transition-all duration-450",
     // Nested sheet support
     "scale-[calc(1-0.05*var(--nested-dialogs))]",
     // Overlay (hidden by default, fades in/out when nested using allow-discrete)
-    "after:pointer-events-none after:absolute after:inset-0 after:hidden after:rounded-[inherit] after:bg-black/5 after:opacity-0 after:transition-[opacity,display] after:duration-250 after:transition-discrete",
+    "after:pointer-events-none after:absolute after:inset-0 after:hidden after:rounded-[inherit] after:bg-black/5 after:opacity-0 after:transition-[opacity,display] after:duration-450 after:transition-discrete",
     "data-nested-dialog-open:after:block data-nested-dialog-open:after:opacity-100",
     "starting:data-nested-dialog-open:after:opacity-0",
   ],
   {
     variants: {
       variant: {
-        default: "shadow-lg",
+        default: "shadow-lg ring-border ring-1",
         floating:
-          "ring-border max-h-[calc(100%-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] rounded-2xl shadow-[0_16px_32px_0_oklch(0.18_0_0/0.16)] ring-1",
+          "max-h-[calc(100%-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] rounded-2xl",
       },
       side: {
         top: "",
-        right: "sm:max-w-sm",
+        right: "sm:max-w-md",
         bottom: "",
-        left: "sm:max-w-sm",
+        left: "sm:max-w-md",
       },
     },
     compoundVariants: [
@@ -118,7 +119,7 @@ function SheetBackdrop({ className, ...props }: BaseSheet.Backdrop.Props) {
     <BaseSheet.Backdrop
       data-slot="sheet-backdrop"
       className={cn(
-        "ease-[cubic-bezier(0, 0, 0.58, 1)] fixed inset-0 min-h-dvh bg-black/40 transition-all duration-250 supports-[-webkit-touch-callout:none]:absolute",
+        "ease-[cubic-bezier(0.32,0.72,0,1)] fixed inset-0 min-h-dvh bg-black/40 transition-all duration-450 supports-[-webkit-touch-callout:none]:absolute",
         "backdrop-blur-sm data-ending-style:opacity-0 data-starting-style:opacity-0",
         className,
       )}
@@ -164,9 +165,12 @@ function SheetContent({
         >
           {children}
           {showCloseButton && (
-            <SheetClose className="ring-offset-popover focus:ring-ring text-muted-foreground absolute top-5 right-5 rounded-lg opacity-50 transition-opacity duration-200 hover:opacity-100 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
-              <XIcon className="size-4" />
-              <span className="sr-only">Close</span>
+            <SheetClose
+              aria-label="Close"
+              className="absolute end-2 top-2"
+              render={<Button size="icon_sm" variant="ghost" />}
+            >
+              <XIcon />
             </SheetClose>
           )}
         </BaseSheet.Popup>

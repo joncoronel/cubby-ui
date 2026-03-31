@@ -5,6 +5,7 @@ import { AlertDialog as BaseAlertDialog } from "@base-ui/react/alert-dialog";
 import { XIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { Button } from "@/registry/default/button/button";
 import {
   ScrollArea,
   type ScrollAreaProps,
@@ -99,9 +100,12 @@ function AlertDialogContent({
         >
           {children}
           {showCloseButton && (
-            <AlertDialogClose className="focus-visible:outline-ring/50 absolute top-4 right-4 rounded-sm opacity-70 outline-0 outline-offset-0 outline-transparent transition-opacity outline-solid hover:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none">
-              <XIcon className="h-4 w-4" />
-              <span className="sr-only">Close</span>
+            <AlertDialogClose
+              aria-label="Close"
+              className="absolute end-2 top-2"
+              render={<Button size="icon_sm" variant="ghost" />}
+            >
+              <XIcon />
             </AlertDialogClose>
           )}
         </BaseAlertDialog.Popup>

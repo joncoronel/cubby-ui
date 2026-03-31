@@ -397,6 +397,7 @@ export const componentMetadata = {
     "description": "A alert-dialog component.",
     "category": "UI",
     "registryDependencies": [
+      "@cubby-ui/button",
       "@cubby-ui/scroll-area"
     ],
     "dependencies": [
@@ -742,6 +743,7 @@ export const componentMetadata = {
     "description": "A dialog component.",
     "category": "UI",
     "registryDependencies": [
+      "@cubby-ui/button",
       "@cubby-ui/scroll-area"
     ],
     "dependencies": [
@@ -1017,6 +1019,7 @@ export const componentMetadata = {
     "description": "A sheet component.",
     "category": "UI",
     "registryDependencies": [
+      "@cubby-ui/button",
       "@cubby-ui/scroll-area"
     ],
     "dependencies": [

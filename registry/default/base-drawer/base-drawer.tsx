@@ -61,8 +61,7 @@ function BaseDrawer({
 // Primitives (pass-through)
 // ---------------------------------------------------------------------------
 
-const BaseDrawerPortal: typeof DrawerPrimitive.Portal =
-  DrawerPrimitive.Portal;
+const BaseDrawerPortal: typeof DrawerPrimitive.Portal = DrawerPrimitive.Portal;
 
 function BaseDrawerTrigger(
   props: DrawerPrimitive.Trigger.Props,
@@ -83,9 +82,7 @@ const BaseDrawerContent: typeof DrawerPrimitive.Content =
 // Provider / Indent
 // ---------------------------------------------------------------------------
 
-function BaseDrawerProvider({
-  ...props
-}: DrawerPrimitive.Provider.Props) {
+function BaseDrawerProvider({ ...props }: DrawerPrimitive.Provider.Props) {
   return <DrawerPrimitive.Provider {...props} />;
 }
 
@@ -97,7 +94,7 @@ function BaseDrawerIndent({
     <DrawerPrimitive.Indent
       data-slot="base-drawer-indent"
       className={cn(
-        "transition-[transform,border-radius] duration-[450ms] ease-[cubic-bezier(0.32,0.72,0,1)]",
+        "ease-smooth transition-[transform,border-radius] duration-(--duration-smooth) data-ending-style:duration-(--duration-snappy)",
         "data-[active]:scale-[0.94] data-[active]:overflow-hidden data-[active]:rounded-lg",
         className,
       )}
@@ -160,7 +157,7 @@ function BaseDrawerBackdrop({
   return (
     <DrawerPrimitive.Backdrop
       className={cn(
-        "fixed inset-0 z-50 bg-black/40 opacity-[calc(1-var(--drawer-swipe-progress))] backdrop-blur-sm transition-opacity duration-[450ms] ease-[cubic-bezier(0.32,0.72,0,1)] data-ending-style:opacity-0 data-starting-style:opacity-0 data-ending-style:duration-[calc(var(--drawer-swipe-strength)*400ms)] data-swiping:duration-0 supports-[-webkit-touch-callout:none]:absolute",
+        "ease-smooth fixed inset-0 z-50 bg-black/40 opacity-[calc(1-var(--drawer-swipe-progress))] backdrop-blur-sm transition-opacity duration-(--duration-smooth) data-ending-style:opacity-0 data-ending-style:duration-[calc(var(--drawer-swipe-strength)*var(--duration-snappy))] data-starting-style:opacity-0 data-swiping:duration-0 supports-[-webkit-touch-callout:none]:absolute",
         className,
       )}
       data-slot="base-drawer-backdrop"
@@ -230,9 +227,9 @@ function BaseDrawerPopup({
         <DrawerPrimitive.Popup
           className={cn(
             // Base layout
-            "relative flex max-h-full min-h-0 w-full min-w-0 flex-col bg-popover text-popover-foreground shadow-lg outline-none will-change-transform",
+            "bg-popover text-popover-foreground relative flex max-h-full min-h-0 w-full min-w-0 flex-col shadow-lg will-change-transform outline-none",
             // Transition
-            "transition-[transform,box-shadow,height,background-color] duration-[450ms] ease-[cubic-bezier(0.32,0.72,0,1)]",
+            "ease-smooth transition-[transform,box-shadow,height,background-color] duration-(--duration-smooth) data-ending-style:duration-(--duration-snappy)",
             "touch-none",
             // Stack calculation variables
             "[--peek:1.5rem] [--stack-step:0.05]",
@@ -244,12 +241,12 @@ function BaseDrawerPopup({
             // Subtle border ring
             "ring-border ring-1",
             // Bleed pseudo (fills gap when dragged past edge)
-            "after:pointer-events-none after:absolute after:bg-popover",
+            "after:bg-popover after:pointer-events-none after:absolute",
             // States
             "data-swiping:select-none",
             "data-nested-drawer-open:overflow-hidden",
             "data-ending-style:shadow-transparent data-starting-style:shadow-transparent",
-            "data-ending-style:duration-[calc(var(--drawer-swipe-strength)*400ms)]",
+            "data-ending-style:duration-[calc(var(--drawer-swipe-strength)*var(--duration-snappy))]",
             // --- Position: bottom ---
             position === "bottom" &&
               cn(
@@ -261,8 +258,8 @@ function BaseDrawerPopup({
                 // Dynamic bleed: adjusts for snap points automatically
                 "-mb-[max(0px,calc(var(--drawer-snap-point-offset,0px)+clamp(0,1,var(--drawer-snap-point-offset,0px)/1px)*var(--drawer-swipe-movement-y,0px)))]",
                 "pb-[max(0px,calc(env(safe-area-inset-bottom,0px)+var(--drawer-snap-point-offset,0px)+clamp(0,1,var(--drawer-snap-point-offset,0px)/1px)*var(--drawer-swipe-movement-y,0px)))]",
-                "data-starting-style:mb-0 data-ending-style:mb-0",
-                "data-starting-style:pb-0 data-ending-style:pb-0",
+                "data-ending-style:mb-0 data-starting-style:mb-0",
+                "data-ending-style:pb-0 data-starting-style:pb-0",
                 // Transition includes margin/padding for snap changes but not enter/exit
                 "not-data-starting-style:not-data-ending-style:transition-[transform,box-shadow,height,background-color,margin,padding]",
                 // Bleed pseudo
@@ -416,10 +413,7 @@ function BaseDrawerFooter({
 // Title / Description
 // ---------------------------------------------------------------------------
 
-function BaseDrawerTitle({
-  className,
-  ...props
-}: DrawerPrimitive.Title.Props) {
+function BaseDrawerTitle({ className, ...props }: DrawerPrimitive.Title.Props) {
   return (
     <DrawerPrimitive.Title
       className={cn(
@@ -636,7 +630,7 @@ function BaseDrawerMenuTrigger({
   return (
     <BaseDrawerTrigger
       className={cn(
-        "flex min-h-9 w-full cursor-default select-none items-center gap-2 rounded-sm px-2 py-1 text-base text-foreground outline-none hover:bg-accent hover:text-accent-foreground sm:min-h-8 sm:text-sm [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+        "text-foreground hover:bg-accent hover:text-accent-foreground flex min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none sm:min-h-8 sm:text-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       data-slot="base-drawer-menu-trigger"
@@ -666,7 +660,7 @@ function BaseDrawerMenuCheckboxItem({
     <CheckboxPrimitive.Root
       checked={checked}
       className={cn(
-        "grid min-h-9 w-full cursor-default select-none items-center gap-2 rounded-sm px-2 py-1 text-base text-foreground outline-none hover:bg-accent hover:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-64 sm:min-h-8 sm:text-sm [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0",
+        "text-foreground hover:bg-accent hover:text-accent-foreground grid min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-64 sm:min-h-8 sm:text-sm [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
         variant === "switch"
           ? "grid-cols-[1fr_auto] gap-4 pe-1.5"
           : "grid-cols-[1rem_1fr] pe-4",
@@ -683,10 +677,10 @@ function BaseDrawerMenuCheckboxItem({
         <>
           <span className="col-start-1">{children}</span>
           <CheckboxPrimitive.Indicator
-            className="col-start-2 inline-flex h-[calc(var(--thumb-size)+2px)] w-[calc(var(--thumb-size)*2-2px)] shrink-0 items-center rounded-full p-px outline-none transition-[background-color,box-shadow] duration-200 [--thumb-size:1rem] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background data-checked:bg-primary data-unchecked:bg-input data-disabled:opacity-64 sm:[--thumb-size:0.75rem]"
+            className="focus-visible:ring-ring focus-visible:ring-offset-background data-checked:bg-primary data-unchecked:bg-input col-start-2 inline-flex h-[calc(var(--thumb-size)+2px)] w-[calc(var(--thumb-size)*2-2px)] shrink-0 items-center rounded-full p-px transition-[background-color,box-shadow] duration-200 outline-none [--thumb-size:1rem] focus-visible:ring-2 focus-visible:ring-offset-1 data-disabled:opacity-64 sm:[--thumb-size:0.75rem]"
             keepMounted
           >
-            <span className="pointer-events-none block aspect-square h-full origin-left rounded-[var(--thumb-size)] bg-background shadow-sm will-change-transform in-[[data-slot=base-drawer-menu-checkbox-item][data-checked]]:origin-[var(--thumb-size)_50%] in-[[data-slot=base-drawer-menu-checkbox-item][data-checked]]:translate-x-[calc(var(--thumb-size)-4px)] in-[[data-slot=base-drawer-menu-checkbox-item]:active]:not-data-disabled:scale-x-110 [transition:translate_.15s,border-radius_.15s,scale_.1s_.1s,transform-origin_.15s]" />
+            <span className="bg-background pointer-events-none block aspect-square h-full origin-left rounded-[var(--thumb-size)] shadow-sm will-change-transform [transition:translate_.15s,border-radius_.15s,scale_.1s_.1s,transform-origin_.15s] in-[[data-slot=base-drawer-menu-checkbox-item]:active]:not-data-disabled:scale-x-110 in-[[data-slot=base-drawer-menu-checkbox-item][data-checked]]:origin-[var(--thumb-size)_50%] in-[[data-slot=base-drawer-menu-checkbox-item][data-checked]]:translate-x-[calc(var(--thumb-size)-4px)]" />
           </CheckboxPrimitive.Indicator>
         </>
       ) : (
@@ -740,7 +734,7 @@ function BaseDrawerMenuRadioItem({
   return (
     <RadioPrimitive.Root
       className={cn(
-        "grid min-h-9 w-full cursor-default select-none items-center gap-2 rounded-sm px-2 py-1 text-base text-foreground outline-none hover:bg-accent hover:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-64 sm:min-h-8 sm:text-sm [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0",
+        "text-foreground hover:bg-accent hover:text-accent-foreground grid min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-64 sm:min-h-8 sm:text-sm [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
         "grid-cols-[1rem_1fr] items-center pe-4",
         className,
       )}

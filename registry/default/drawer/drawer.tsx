@@ -46,14 +46,14 @@ const drawerContentVariants = cva(
   [
     "bg-popover text-popover-foreground flex flex-col",
     "relative",
-    "ease-[cubic-bezier(0.32,0.72,0,1)] transition-[transform,scale,translate] duration-400 will-change-transform",
+    "ease-smooth transition-[transform,scale,translate] duration-(--duration-smooth) data-ending-style:duration-(--duration-snappy) will-change-transform",
     "motion-reduce:transition-none",
     // Nested drawer support: scale down parent when child opens (interpolated during drag)
     "scale-[calc(1-0.05*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))]",
     // Disable transitions on parent while child is being dragged
     "data-[nested-dragging]:transition-none",
     // Nested drawer support: overlay dim effect (using before: to avoid conflict with Safari ::after touch fix)
-    "before:pointer-events-none before:absolute before:inset-0 before:z-50 before:hidden before:rounded-[inherit] before:bg-black/10 before:opacity-0 before:transition-[opacity,display] before:transition-discrete before:duration-400",
+    "before:pointer-events-none before:absolute before:inset-0 before:z-50 before:hidden before:rounded-[inherit] before:bg-black/10 before:opacity-0 before:transition-[opacity,display] before:transition-discrete before:duration-(--duration-smooth)",
     "data-nested-dialog-open:before:block data-nested-dialog-open:before:opacity-100",
     "starting:data-nested-dialog-open:before:opacity-0",
   ],
@@ -1031,16 +1031,16 @@ function DrawerContentInner({
           <BaseDialog.Backdrop
             data-slot="drawer-overlay"
             className={cn(
-              "absolute inset-0 z-50 bg-black/40 backdrop-blur-sm",
+              "absolute inset-0 z-50 bg-black/32 backdrop-blur-sm",
               "[transform:translateZ(0)] will-change-[opacity]",
               isClosing ? "pointer-events-none" : "pointer-events-auto",
               "touch-none",
               immediateClose || (isDragging && !isAnimating)
                 ? "transition-none"
-                : "transition-opacity duration-400 ease-[cubic-bezier(0.32,0.72,0,1)]",
+                : "ease-smooth transition-opacity duration-(--duration-smooth) data-ending-style:duration-(--duration-snappy)",
               "[&[data-starting-style]]:opacity-0!",
               // Exit animation overrides scroll-driven animation (transitions can't interpolate from animation-held values)
-              "data-ending-style:animate-[drawer-backdrop-exit_450ms_cubic-bezier(0.32,0.72,0,1)_forwards]",
+              "data-ending-style:animate-[drawer-backdrop-exit_var(--duration-snappy)_var(--ease-smooth)_forwards]",
               isInitialized && !isAnimating && dismissible && dragProgress < 1
                 ? useScrollDrivenAnimation
                   ? backdropAnimationStyles[direction]

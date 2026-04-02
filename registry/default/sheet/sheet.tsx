@@ -15,11 +15,11 @@ import {
 const sheetContentVariants = cva(
   [
     "bg-popover text-popover-foreground fixed z-50 flex max-h-full min-h-0 w-full max-w-full min-w-0 flex-col outline-hidden",
-    "ease-[cubic-bezier(0.32,0.72,0,1)] transition-all duration-450",
+    "ease-smooth transition-all duration-(--duration-smooth) data-ending-style:duration-(--duration-snappy)",
     // Nested sheet support
     "scale-[calc(1-0.05*var(--nested-dialogs))]",
     // Overlay (hidden by default, fades in/out when nested using allow-discrete)
-    "after:pointer-events-none after:absolute after:inset-0 after:hidden after:rounded-[inherit] after:bg-black/5 after:opacity-0 after:transition-[opacity,display] after:duration-450 after:transition-discrete",
+    "after:pointer-events-none after:absolute after:inset-0 after:hidden after:rounded-[inherit] after:bg-black/10 after:opacity-0 after:transition-[opacity,display] after:duration-(--duration-smooth) after:transition-discrete",
     "data-nested-dialog-open:after:block data-nested-dialog-open:after:opacity-100",
     "starting:data-nested-dialog-open:after:opacity-0",
   ],
@@ -119,7 +119,7 @@ function SheetBackdrop({ className, ...props }: BaseSheet.Backdrop.Props) {
     <BaseSheet.Backdrop
       data-slot="sheet-backdrop"
       className={cn(
-        "ease-[cubic-bezier(0.32,0.72,0,1)] fixed inset-0 min-h-dvh bg-black/40 transition-all duration-450 supports-[-webkit-touch-callout:none]:absolute",
+        "ease-smooth fixed inset-0 min-h-dvh bg-black/40 transition-all duration-(--duration-smooth) data-ending-style:duration-(--duration-snappy) supports-[-webkit-touch-callout:none]:absolute",
         "backdrop-blur-sm data-ending-style:opacity-0 data-starting-style:opacity-0",
         className,
       )}
@@ -217,7 +217,7 @@ function SheetBody({
     <div
       data-slot="sheet-body"
       className={cn(
-        "flex flex-1 min-h-0 flex-col overflow-hidden",
+        "flex min-h-0 flex-1 flex-col overflow-hidden",
         "first:pt-5",
         "not-has-[+[data-slot=sheet-footer]]:pb-5",
         "in-data-[footer-variant=inset]:has-[+[data-slot=sheet-footer]]:pb-5",

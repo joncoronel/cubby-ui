@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "registry:sync": "npx tsx scripts/registry-sync.ts",
+    "spring:generate": "npx tsx scripts/generate-spring-easings.ts",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest",

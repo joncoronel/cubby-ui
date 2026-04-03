@@ -153,8 +153,8 @@ function SelectContent({
             // Shadow
             "shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)]",
             // Animation (disabled for alignItemWithTrigger via data-[side=none] to prevent Firefox jiggle)
-            "ease-out-cubic origin-(--transform-origin) transition-[transform,scale,opacity] duration-100",
-            "data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
+            "ease-out-cubic origin-(--transform-origin) transition-[transform,scale,opacity] duration-100 data-[side=none]:duration-50",
+            "data-ending-style:scale-97 data-ending-style:opacity-0 data-starting-style:scale-97 data-starting-style:opacity-0",
           )}
         >
           {alignItemWithTrigger && (

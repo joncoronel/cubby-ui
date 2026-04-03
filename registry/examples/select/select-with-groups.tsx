@@ -11,7 +11,6 @@ import {
 
 export default function SelectWithGroups() {
   const timezoneItems = [
-    { label: "Select a timezone", value: null },
     {
       label: "Eastern Standard Time (EST)",
       value: "est",
@@ -67,7 +66,7 @@ export default function SelectWithGroups() {
   return (
     <Select items={timezoneItems}>
       <SelectTrigger className="w-[280px]">
-        <SelectValue />
+        <SelectValue placeholder="Select a timezone" />
       </SelectTrigger>
       <SelectContent fadeEdges={"bottom"} className="max-h-[300px]">
         <SelectGroup>

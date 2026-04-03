@@ -8,7 +8,6 @@ import {
 
 export default function SelectAlignItemWithTrigger() {
   const items = [
-    { label: "Select font", value: "select-font" },
     { label: "Times New Roman", value: "times-new-roman" },
     { label: "Arial", value: "arial" },
     { label: "Helvetica", value: "helvetica" },
@@ -22,9 +21,9 @@ export default function SelectAlignItemWithTrigger() {
   ];
 
   return (
-    <Select items={items} defaultValue="select-font">
+    <Select items={items}>
       <SelectTrigger className="w-[180px]">
-        <SelectValue />
+        <SelectValue placeholder="Select font" />
       </SelectTrigger>
       <SelectContent alignItemWithTrigger>
         {items.map((item) => (

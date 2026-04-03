@@ -16,7 +16,7 @@ import { Label } from "@/registry/default/label/label";
 import { Button } from "@/registry/default/button/button";
 
 export default function ComboboxInputInsidePopup() {
-  const [value, setValue] = React.useState<Country | null>(countries[0]);
+  const [value, setValue] = React.useState<Country | null>(null);
 
   return (
     <Combobox
@@ -34,9 +34,7 @@ export default function ComboboxInputInsidePopup() {
               className="justify-between font-normal"
               rightSection={<ChevronDown className="h-4 w-4 opacity-50" />}
             >
-              <ComboboxValue>
-                {(val: Country) => val?.label || "Select country"}
-              </ComboboxValue>
+              <ComboboxValue placeholder="Select country" />
               {/* <ChevronDown className="h-4 w-4 opacity-50" /> */}
             </Button>
           )}
@@ -62,13 +60,12 @@ export default function ComboboxInputInsidePopup() {
 
 interface Country {
   code: string;
-  value: string | null;
+  value: string;
   continent: string;
   label: string;
 }
 
 const countries: Country[] = [
-  { code: "", value: null, continent: "", label: "Select country" },
   { code: "af", value: "afghanistan", label: "Afghanistan", continent: "Asia" },
   { code: "al", value: "albania", label: "Albania", continent: "Europe" },
   { code: "dz", value: "algeria", label: "Algeria", continent: "Africa" },

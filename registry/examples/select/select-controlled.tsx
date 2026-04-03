@@ -11,7 +11,6 @@ import {
 
 export default function SelectControlled() {
   const themeItems = [
-    { label: "Select a theme", value: null },
     { label: "Light", value: "light" },
     { label: "Dark", value: "dark" },
     { label: "System", value: "system" },
@@ -27,11 +26,11 @@ export default function SelectControlled() {
         items={themeItems}
       >
         <SelectTrigger className="w-[180px]">
-          <SelectValue />
+          <SelectValue placeholder="Select a theme" />
         </SelectTrigger>
         <SelectContent>
           {themeItems.map((item) => (
-            <SelectItem key={item.value ?? "placeholder"} value={item.value}>
+            <SelectItem key={item.value} value={item.value}>
               {item.label}
             </SelectItem>
           ))}

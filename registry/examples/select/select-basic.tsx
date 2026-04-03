@@ -7,7 +7,6 @@ import {
 } from "@/registry/default/select/select";
 
 const items = [
-  { label: "Select a fruit", value: null },
   { label: "Apple", value: "apple" },
   { label: "Banana", value: "banana" },
   { label: "Orange", value: "orange" },
@@ -15,9 +14,9 @@ const items = [
 
 export default function SelectBasic() {
   return (
-    <Select items={items} defaultValue={null}>
+    <Select items={items}>
       <SelectTrigger className="w-[180px]">
-        <SelectValue />
+        <SelectValue placeholder="Select a fruit" />
       </SelectTrigger>
       <SelectContent>
         {items.map((item) => (

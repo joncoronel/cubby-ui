@@ -8,7 +8,6 @@ import {
 
 export default function SelectWithScroll() {
   const countries = [
-    { label: "Select a country", value: null },
     { label: "United States", value: "us" },
     { label: "Canada", value: "ca" },
     { label: "United Kingdom", value: "uk" },
@@ -42,9 +41,9 @@ export default function SelectWithScroll() {
   ];
 
   return (
-    <Select items={countries} defaultValue={null}>
+    <Select items={countries}>
       <SelectTrigger className="w-[200px]">
-        <SelectValue />
+        <SelectValue placeholder="Select a country" />
       </SelectTrigger>
       <SelectContent className="max-h-[200px]">
         {countries.map((country) => (

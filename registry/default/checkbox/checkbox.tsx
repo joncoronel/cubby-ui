@@ -17,10 +17,13 @@ function CheckmarkIcon({ className }: { className?: string }) {
       strokeLinecap="round"
       strokeLinejoin="round"
       className={cn(
-        // Opacity + scale crossfade: visible when checked (not indeterminate), hidden otherwise
-        "scale-90 opacity-0 in-data-checked:not-in-data-indeterminate:scale-100 in-data-checked:not-in-data-indeterminate:opacity-100",
+        // Crossfade: visible when checked (not indeterminate), hidden when indeterminate
+        "not-in-data-indeterminate:scale-100 not-in-data-indeterminate:opacity-100",
+        "scale-90 opacity-0",
         "ease-out-cubic transition-[opacity,filter,transform,scale] duration-150 motion-reduce:transition-none",
-        // Subtle blur during transition for smoother crossfade
+        // Start hidden on mount for enter animation
+        "in-data-starting-style:scale-90 in-data-starting-style:opacity-0",
+        // Subtle blur during indeterminate crossfade
         "in-data-indeterminate:blur-[2px]",
         className,
       )}
@@ -30,7 +33,7 @@ function CheckmarkIcon({ className }: { className?: string }) {
         style={{
           strokeDasharray: 22,
         }}
-        className="ease-out-cubic transition-[stroke-dashoffset] duration-150 in-data-checked:delay-15 in-data-checked:not-in-data-indeterminate:[stroke-dashoffset:0] in-data-indeterminate:[stroke-dashoffset:22] in-data-unchecked:[stroke-dashoffset:22] motion-reduce:transition-none"
+        className="ease-out-cubic transition-[stroke-dashoffset] duration-150 not-in-data-indeterminate:delay-15 not-in-data-indeterminate:[stroke-dashoffset:0] in-data-indeterminate:[stroke-dashoffset:22] in-data-starting-style:[stroke-dashoffset:22] motion-reduce:transition-none"
       />
     </svg>
   );
@@ -48,9 +51,12 @@ function MinusIcon({ className }: { className?: string }) {
       strokeLinecap="round"
       strokeLinejoin="round"
       className={cn(
-        // Opacity + scale crossfade: visible when indeterminate, hidden otherwise
-        "scale-90 opacity-0 in-data-indeterminate:scale-100 in-data-indeterminate:opacity-100",
+        // Crossfade: visible when indeterminate, hidden when checked
+        "in-data-indeterminate:scale-100 in-data-indeterminate:opacity-100",
+        "scale-90 opacity-0",
         "ease-out-cubic transition-[opacity,filter,transform,scale] duration-150 motion-reduce:transition-none",
+        // Start hidden on mount for enter animation
+        "in-data-starting-style:scale-90 in-data-starting-style:opacity-0",
         // Subtle blur when transitioning away from indeterminate
         "not-in-data-indeterminate:blur-[2px]",
         className,
@@ -61,7 +67,7 @@ function MinusIcon({ className }: { className?: string }) {
         style={{
           strokeDasharray: 16,
         }}
-        className="ease-out-cubic transition-[stroke-dashoffset] duration-150 not-in-data-indeterminate:[stroke-dashoffset:16] in-data-indeterminate:delay-15 in-data-indeterminate:[stroke-dashoffset:0] motion-reduce:transition-none"
+        className="ease-out-cubic transition-[stroke-dashoffset] duration-150 not-in-data-indeterminate:[stroke-dashoffset:16] in-data-indeterminate:delay-15 in-data-indeterminate:[stroke-dashoffset:0] in-data-starting-style:[stroke-dashoffset:16] motion-reduce:transition-none"
       />
     </svg>
   );
@@ -91,9 +97,8 @@ function Checkbox({
       {...props}
     >
       <BaseCheckbox.Indicator
-        keepMounted
         data-slot="checkbox-indicator"
-        className="grid place-items-center *:col-start-1 *:row-start-1"
+        className="ease-out-cubic grid place-items-center transition-opacity duration-150 *:col-start-1 *:row-start-1 data-ending-style:opacity-0 data-starting-style:opacity-0 motion-reduce:transition-none"
       >
         <CheckmarkIcon className="size-3.5" />
         <MinusIcon className="size-3.5" />

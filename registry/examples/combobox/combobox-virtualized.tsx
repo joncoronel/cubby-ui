@@ -3,13 +3,10 @@
 import * as React from "react";
 import {
   Combobox,
-  ComboboxClear,
   ComboboxInput,
-  ComboboxInputWrapper,
   ComboboxItem,
   ComboboxLabel,
   ComboboxPopup,
-  ComboboxTrigger,
   ComboboxVirtualizedList,
   useComboboxFilteredItems,
 } from "@/registry/default/combobox/combobox";
@@ -45,13 +42,7 @@ export default function ComboboxVirtualized() {
     >
       <div className="flex w-full max-w-3xs flex-col gap-1">
         <ComboboxLabel>Search 1,000 cities</ComboboxLabel>
-        <ComboboxInputWrapper>
-          <ComboboxInput placeholder="e.g. City 0001" />
-          <div className="absolute inset-y-0 right-3 flex items-center gap-2">
-            <ComboboxClear />
-            <ComboboxTrigger />
-          </div>
-        </ComboboxInputWrapper>
+        <ComboboxInput placeholder="e.g. City 0001" />
       </div>
       <ComboboxPopup>
         <VirtualizedListContent virtualizerRef={virtualizerRef} />

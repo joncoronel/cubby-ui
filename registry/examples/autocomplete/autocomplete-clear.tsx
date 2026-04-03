@@ -2,10 +2,8 @@
 
 import * as React from "react";
 import {
-  AutocompleteClear,
   AutocompleteEmpty,
   AutocompleteInput,
-  AutocompleteInputWrapper,
   AutocompleteItem,
   AutocompleteList,
   AutocompletePopup,
@@ -14,7 +12,6 @@ import {
   AutocompleteRoot,
 } from "@/registry/default/autocomplete/autocomplete";
 import { Label } from "@/registry/default/label/label";
-import { X } from "lucide-react";
 
 interface Tag {
   id: string;
@@ -57,14 +54,7 @@ export default function AutocompleteClearExample() {
     <AutocompleteRoot items={tags} value={value} onValueChange={setValue}>
       <Label className="w-full max-w-xs">
         Search with clear button
-        <AutocompleteInputWrapper>
-          <AutocompleteInput placeholder="e.g. feature or component" />
-          <div className="absolute inset-y-0 right-3 flex items-center">
-            <AutocompleteClear>
-              <X className="h-4 w-4" />
-            </AutocompleteClear>
-          </div>
-        </AutocompleteInputWrapper>
+        <AutocompleteInput placeholder="e.g. feature or component" showClear />
       </Label>
 
       <AutocompletePortal>

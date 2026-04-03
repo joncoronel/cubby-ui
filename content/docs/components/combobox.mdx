@@ -78,6 +78,22 @@ For the complete Base UI API, see the [Base UI Combobox documentation](https://b
 
 ### Props
 
+#### ComboboxInput
+
+Text input with built-in trigger and clear buttons. Wraps Base UI's `Combobox.Input` inside a `Combobox.InputGroup`.
+
+<ApiPropsList>
+
+<ApiProp name="showTrigger" fullType="boolean" defaultValue="true">
+  Show a chevron trigger button to open the popup.
+</ApiProp>
+
+<ApiProp name="showClear" fullType="boolean" defaultValue="true">
+  Show a clear button to reset the input value. Only visible when the input has a value.
+</ApiProp>
+
+</ApiPropsList>
+
 #### ComboboxPopup
 
 Dropdown container for the option list with positioning. Composes Base UI's `Combobox.Positioner` and `Combobox.Popup`. Props are forwarded to `Combobox.Popup`.

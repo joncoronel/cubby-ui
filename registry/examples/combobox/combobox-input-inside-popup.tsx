@@ -35,7 +35,6 @@ export default function ComboboxInputInsidePopup() {
               rightSection={<ChevronDown className="h-4 w-4 opacity-50" />}
             >
               <ComboboxValue placeholder="Select country" />
-              {/* <ChevronDown className="h-4 w-4 opacity-50" /> */}
             </Button>
           )}
         />
@@ -43,7 +42,11 @@ export default function ComboboxInputInsidePopup() {
 
       <ComboboxPopup className="flex flex-col p-0" aria-label="Select country">
         <div className="border-border border-b p-2">
-          <ComboboxInput placeholder="e.g. United Kingdom" />
+          <ComboboxInput
+            placeholder="e.g. United Kingdom"
+            showTrigger={false}
+            showClear={false}
+          />
         </div>
         <ComboboxEmpty>No countries found.</ComboboxEmpty>
         <ComboboxList>

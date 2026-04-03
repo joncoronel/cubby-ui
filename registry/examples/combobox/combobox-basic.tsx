@@ -2,12 +2,9 @@
 
 import {
   Combobox,
-  ComboboxClear,
   ComboboxInput,
-  ComboboxInputWrapper,
   ComboboxItem,
   ComboboxList,
-  ComboboxTrigger,
   ComboboxPopup,
   ComboboxEmpty,
   ComboboxLabel,
@@ -18,13 +15,7 @@ export default function ComboboxBasic() {
     <Combobox items={fruits}>
       <div className="flex w-full max-w-3xs flex-col gap-1">
         <ComboboxLabel>Choose a fruit</ComboboxLabel>
-        <ComboboxInputWrapper>
-          <ComboboxInput placeholder="e.g. Apple" />
-          <div className="absolute inset-y-0 right-3 flex items-center gap-2">
-            <ComboboxClear />
-            <ComboboxTrigger />
-          </div>
-        </ComboboxInputWrapper>
+        <ComboboxInput placeholder="e.g. Apple" />
       </div>
       <ComboboxPopup>
         <ComboboxEmpty>No fruits found.</ComboboxEmpty>

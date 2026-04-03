@@ -89,6 +89,22 @@ For the complete Base UI API, see the [Base UI Autocomplete documentation](https
 
 ### Props
 
+#### AutocompleteInput
+
+Text input with optional trigger and clear buttons. When `showTrigger` or `showClear` is enabled, wraps the input inside an `Autocomplete.InputGroup`.
+
+<ApiPropsList>
+
+<ApiProp name="showTrigger" fullType="boolean" defaultValue="false">
+  Show a trigger button to open the popup.
+</ApiProp>
+
+<ApiProp name="showClear" fullType="boolean" defaultValue="false">
+  Show a clear button to reset the input value. Only visible when the input has a value.
+</ApiProp>
+
+</ApiPropsList>
+
 #### AutocompletePositioner
 
 Positions the suggestions dropdown relative to the input. Wraps Base UI's `Autocomplete.Positioner`.

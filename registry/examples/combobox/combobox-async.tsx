@@ -4,12 +4,9 @@ import * as React from "react";
 import { Loader2 } from "lucide-react";
 import {
   Combobox,
-  ComboboxClear,
   ComboboxInput,
-  ComboboxInputWrapper,
   ComboboxItem,
   ComboboxList,
-  ComboboxTrigger,
   ComboboxPopup,
   ComboboxEmpty,
   ComboboxLabel,
@@ -62,13 +59,7 @@ export default function ComboboxAsync() {
     >
       <div className="flex w-full max-w-xs flex-col gap-1">
         <ComboboxLabel>Search employees</ComboboxLabel>
-        <ComboboxInputWrapper>
-          <ComboboxInput placeholder="e.g. Sarah" />
-          <div className="absolute inset-y-0 right-3 flex items-center gap-2">
-            <ComboboxClear />
-            <ComboboxTrigger />
-          </div>
-        </ComboboxInputWrapper>
+        <ComboboxInput placeholder="e.g. Sarah" />
       </div>
       <ComboboxPopup>
         <ComboboxStatus className="flex items-center gap-2">

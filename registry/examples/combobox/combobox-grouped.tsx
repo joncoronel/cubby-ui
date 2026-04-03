@@ -2,12 +2,9 @@
 
 import {
   Combobox,
-  ComboboxClear,
   ComboboxInput,
-  ComboboxInputWrapper,
   ComboboxItem,
   ComboboxList,
-  ComboboxTrigger,
   ComboboxPopup,
   ComboboxEmpty,
   ComboboxLabel,
@@ -23,13 +20,7 @@ export default function ComboboxGrouped() {
     <Combobox items={groupedProduce}>
       <div className="flex w-full max-w-3xs flex-col gap-1">
         <ComboboxLabel>Select produce</ComboboxLabel>
-        <ComboboxInputWrapper>
-          <ComboboxInput placeholder="e.g. Mango" />
-          <div className="absolute inset-y-0 right-3 flex items-center gap-2">
-            <ComboboxClear />
-            <ComboboxTrigger />
-          </div>
-        </ComboboxInputWrapper>
+        <ComboboxInput placeholder="e.g. Mango" />
       </div>
       <ComboboxPopup>
         <ComboboxEmpty>No produce found.</ComboboxEmpty>

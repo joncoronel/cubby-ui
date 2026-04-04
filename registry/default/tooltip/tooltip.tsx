@@ -86,10 +86,10 @@ function TooltipContent({
           data-slot="tooltip-content"
           className={cn(
             "bg-card ring-border/60 h-(--popup-height,auto) w-(--popup-width,auto) origin-(--transform-origin) rounded-sm text-xs shadow-[0_3px_8px_0_oklch(0.18_0_0/0.12)] ring-1",
-            "transition-[width,height,scale,opacity] duration-350 ease-[cubic-bezier(0.22,1,0.36,1)]",
+            "transition-[width,height,scale,opacity] duration-[350ms,350ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-cubic),var(--ease-out-cubic)]",
             "data-starting-style:scale-90 data-starting-style:opacity-0",
             "data-ending-style:scale-90 data-ending-style:opacity-0",
-            "data-instant:duration-0 motion-reduce:transition-none",
+            "motion-reduce:transition-none",
             className,
           )}
           {...props}
@@ -106,8 +106,8 @@ function TooltipContent({
               // Content base state and transitions
               "**:data-current:translate-x-0 **:data-current:opacity-100",
               "**:data-previous:translate-x-0 **:data-previous:opacity-100",
-              "**:data-current:transition-[translate,opacity,filter] **:data-current:duration-[350ms,175ms,175ms]",
-              "**:data-previous:transition-[translate,opacity,filter] **:data-previous:duration-[350ms,175ms,175ms]",
+              "**:data-current:transition-[translate,opacity,filter] **:data-current:duration-[350ms,175ms,350ms]",
+              "**:data-previous:transition-[translate,opacity,filter] **:data-previous:duration-[350ms,175ms,350ms]",
               "**:data-current:ease-[cubic-bezier(0.22,1,0.36,1)] **:data-previous:ease-[cubic-bezier(0.22,1,0.36,1)]",
               // Direction-aware slide animations for incoming content
               "data-[activation-direction~=left]:**:data-current:data-starting-style:-translate-x-1/2",

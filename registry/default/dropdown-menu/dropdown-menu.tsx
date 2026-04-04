@@ -25,15 +25,15 @@ function CheckmarkIcon({ className }: { className?: string }) {
         style={{
           strokeDasharray: 22,
         }}
-        className="in-data-checked:[stroke-dashoffset:0] in-data-unchecked:[stroke-dashoffset:22] transition-[stroke-dashoffset] duration-150 ease-out-cubic motion-reduce:transition-none"
+        className="ease-out-cubic transition-[stroke-dashoffset] duration-150 in-data-checked:[stroke-dashoffset:0] in-data-unchecked:[stroke-dashoffset:22] motion-reduce:transition-none"
       />
     </svg>
   );
 }
 
-function DropdownMenu({
+function DropdownMenu<Payload = unknown>({
   ...props
-}: React.ComponentProps<typeof BaseMenu.Root>) {
+}: BaseMenu.Root.Props<Payload>) {
   return <BaseMenu.Root data-slot="dropdown-menu" {...props} />;
 }
 
@@ -59,6 +59,7 @@ function DropdownMenuPositioner({
 
 function DropdownMenuContent({
   className,
+  children,
   sideOffset = 4,
   align = "center",
   side = "bottom",
@@ -71,7 +72,7 @@ function DropdownMenuContent({
   return (
     <DropdownMenuPortal>
       <DropdownMenuPositioner
-        className="max-h-[var(--available-height)]"
+        className="z-50 h-(--positioner-height) max-h-(--available-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-350 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none"
         sideOffset={sideOffset}
         align={align}
         side={side}
@@ -79,13 +80,52 @@ function DropdownMenuContent({
         <BaseMenu.Popup
           data-slot="dropdown-menu-content"
           className={cn(
-            "bg-popover text-popover-foreground z-50 min-w-[12rem] overflow-hidden rounded-xl border bg-clip-padding p-1 shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)]",
-            "ease-out-cubic origin-(--transform-origin) transition-[transform,scale,opacity] duration-100",
-            "data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
+            "bg-popover text-popover-foreground relative min-w-[12rem] overflow-hidden rounded-xl border bg-clip-padding shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)]",
+            "h-(--popup-height,auto) w-(--popup-width,auto)",
+            "origin-(--transform-origin) transition-[width,height,scale,opacity] duration-[350ms,350ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-cubic),var(--ease-out-cubic)]",
+            "data-starting-style:scale-95 data-starting-style:opacity-0",
+            "data-ending-style:scale-95 data-ending-style:opacity-0",
+            "motion-reduce:transition-none",
+            "data-instant:transition-none",
             className,
           )}
           {...props}
-        />
+        >
+          <BaseMenu.Viewport
+            data-slot="dropdown-menu-viewport"
+            className={cn(
+              "relative size-full overflow-clip p-1 [--viewport-padding:0.25rem]",
+              "not-data-transitioning:overflow-y-auto",
+              // Content width
+              "**:data-current:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
+              "**:data-previous:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
+              // Content base state and transitions
+              "**:data-current:translate-x-0 **:data-current:opacity-100",
+              "**:data-previous:translate-x-0 **:data-previous:opacity-100",
+              "**:data-current:transition-[translate,opacity,filter] **:data-current:duration-[350ms,175ms,350ms] **:data-current:ease-[cubic-bezier(0.22,1,0.36,1)]",
+              "**:data-previous:transition-[translate,opacity,filter] **:data-previous:duration-[350ms,175ms,350ms] **:data-previous:ease-[cubic-bezier(0.22,1,0.36,1)]",
+              // Direction-aware slide animations for incoming content
+              "data-[activation-direction~=left]:**:data-current:data-starting-style:-translate-x-1/2",
+              "data-[activation-direction~=left]:**:data-current:data-starting-style:opacity-0",
+              "data-[activation-direction~=right]:**:data-current:data-starting-style:translate-x-1/2",
+              "data-[activation-direction~=right]:**:data-current:data-starting-style:opacity-0",
+              // Direction-aware slide animations for outgoing content
+              "data-[activation-direction~=left]:**:data-previous:data-ending-style:translate-x-1/2",
+              "data-[activation-direction~=left]:**:data-previous:data-ending-style:opacity-0",
+              "data-[activation-direction~=right]:**:data-previous:data-ending-style:-translate-x-1/2",
+              "data-[activation-direction~=right]:**:data-previous:data-ending-style:opacity-0",
+              // Blur effects during transitions
+              "**:data-current:data-starting-style:blur-[4px]",
+              "**:data-current:data-ending-style:blur-[4px]",
+              "**:data-previous:data-starting-style:blur-[4px]",
+              "**:data-previous:data-ending-style:blur-[4px]",
+
+              "motion-reduce:**:data-current:transition-none motion-reduce:**:data-previous:transition-none",
+            )}
+          >
+            {children}
+          </BaseMenu.Viewport>
+        </BaseMenu.Popup>
       </DropdownMenuPositioner>
     </DropdownMenuPortal>
   );
@@ -237,10 +277,11 @@ function DropdownMenuRadioItem({
       )}
       {...props}
     >
-      <span className="pointer-events-none absolute left-2 flex items-center justify-center rounded-full bg-accent size-3.5 overflow-clip ">
-        <BaseMenu.RadioItemIndicator keepMounted className="rounded-full data-starting-style:opacity-0 data-ending-style:opacity-0 data-unchecked:opacity-0 transition-[opacity,transform] duration-150 bg-primary size-full before:absolute before:inset-0 before:bg-primary  before:content-[''] before:origin-center data-checked:before:scale-50   before:rounded-full before:bg-white  before:transition-[scale] before:duration-250">
-
-        </BaseMenu.RadioItemIndicator>
+      <span className="bg-accent pointer-events-none absolute left-2 flex size-3.5 items-center justify-center overflow-clip rounded-full">
+        <BaseMenu.RadioItemIndicator
+          keepMounted
+          className="bg-primary before:bg-primary size-full rounded-full transition-[opacity,transform] duration-150 before:absolute before:inset-0 before:origin-center before:rounded-full before:bg-white before:transition-[scale] before:duration-250 before:content-[''] data-checked:before:scale-50 data-ending-style:opacity-0 data-starting-style:opacity-0 data-unchecked:opacity-0"
+        ></BaseMenu.RadioItemIndicator>
       </span>
       {children}
     </BaseMenu.RadioItem>
@@ -307,6 +348,7 @@ function DropdownMenuSubTrigger({
 
 function DropdownMenuSubContent({
   className,
+  children,
   sideOffset = 0,
   align = "start",
   alignOffset,
@@ -322,7 +364,7 @@ function DropdownMenuSubContent({
   return (
     <DropdownMenuPortal>
       <DropdownMenuPositioner
-        className="max-h-[var(--available-height)]"
+        className="z-50 max-h-(--available-height)"
         sideOffset={sideOffset}
         align={align}
         alignOffset={alignOffset ?? defaultAlignOffset}
@@ -330,17 +372,23 @@ function DropdownMenuSubContent({
         <BaseMenu.Popup
           data-slot="dropdown-menu-content"
           className={cn(
-            "bg-popover text-popover-foreground z-50 min-w-[12rem] overflow-hidden rounded-xl border bg-clip-padding p-1 shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)]",
+            "bg-popover text-popover-foreground min-w-[12rem] overflow-hidden rounded-xl border bg-clip-padding shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)]",
             "ease-out-cubic origin-(--transform-origin) transition-[transform,scale,opacity] duration-100",
-            "data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
+            "data-starting-style:scale-95 data-starting-style:opacity-0",
+            "data-ending-style:scale-95 data-ending-style:opacity-0",
+            "motion-reduce:transition-none",
             className,
           )}
           {...props}
-        />
+        >
+          <div className="p-1">{children}</div>
+        </BaseMenu.Popup>
       </DropdownMenuPositioner>
     </DropdownMenuPortal>
   );
 }
+
+const createDropdownMenuHandle = BaseMenu.createHandle;
 
 export {
   DropdownMenu,
@@ -360,4 +408,5 @@ export {
   DropdownMenuSub,
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
+  createDropdownMenuHandle,
 };

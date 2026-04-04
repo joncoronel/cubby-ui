@@ -78,6 +78,8 @@ export interface SliderProps
   extends React.ComponentProps<typeof BaseSlider.Root>,
     VariantProps<typeof sliderVariants> {
   showSteps?: boolean;
+  label?: React.ReactNode;
+  getAriaLabel?: ((index: number) => string) | null;
 }
 
 function Slider({
@@ -89,6 +91,8 @@ function Slider({
   max = 100,
   variant,
   showSteps = false,
+  label,
+  getAriaLabel,
   ...props
 }: SliderProps) {
   const thumbCount = React.useMemo(() => {
@@ -115,6 +119,7 @@ function Slider({
       thumbAlignment={variant === "contained" ? "edge" : "center"}
       {...props}
     >
+      {label && <SliderLabel>{label}</SliderLabel>}
       <BaseSlider.Control
         data-slot="slider-control"
         className="flex flex-1 items-center data-[orientation=horizontal]:py-1 data-[orientation=vertical]:min-h-full data-[orientation=vertical]:flex-col data-[orientation=vertical]:justify-center data-[orientation=vertical]:px-1"
@@ -192,6 +197,7 @@ function Slider({
               data-orientation={props.orientation}
               key={index}
               index={index}
+              getAriaLabel={getAriaLabel}
               className={cn(sliderThumbVariants({ variant }))}
             />
           ))}
@@ -221,4 +227,20 @@ function SliderValue({
   );
 }
 
-export { Slider, SliderValue };
+function SliderLabel({
+  className,
+  ...props
+}: BaseSlider.Label.Props) {
+  return (
+    <BaseSlider.Label
+      data-slot="slider-label"
+      className={cn(
+        "text-foreground text-sm leading-5 font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+export { Slider, SliderValue, SliderLabel };

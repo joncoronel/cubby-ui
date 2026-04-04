@@ -511,6 +511,22 @@ function ComboboxLabel({
   return <Label htmlFor={context?.id} className={className} {...props} />;
 }
 
+function ComboboxTriggerLabel({
+  className,
+  ...props
+}: BaseCombobox.Label.Props) {
+  return (
+    <BaseCombobox.Label
+      data-slot="combobox-trigger-label"
+      className={cn(
+        "text-foreground text-sm leading-5 font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
 export {
   Combobox,
   ComboboxInput,
@@ -540,6 +556,7 @@ export {
   ComboboxChipRemove,
   ComboboxVirtualizedList,
   ComboboxLabel,
+  ComboboxTriggerLabel,
   useComboboxFilter,
   useComboboxFilteredItems,
 };

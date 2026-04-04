@@ -77,6 +77,14 @@ Prevent interaction with disabled slider.
   aligned to edges), or squareThumb styles.
 </ApiProp>
 
+<ApiProp name="label" fullType="ReactNode" simpleType="node">
+  Visible label rendered above the slider control. Uses Base UI's `Slider.Label` for automatic accessibility association with the thumbs.
+</ApiProp>
+
+<ApiProp name="getAriaLabel" fullType="((index: number) => string) | null">
+  A function that returns an accessible name for each thumb. Use for sliders without a visible label, or for range sliders where each thumb needs a distinct label.
+</ApiProp>
+
 <ApiProp name="showSteps" fullType="boolean" defaultValue="false">
   Show step indicator dots along the slider track for discrete value
   visualization.

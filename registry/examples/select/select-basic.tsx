@@ -1,5 +1,6 @@
 import {
   Select,
+  SelectLabel,
   SelectTrigger,
   SelectContent,
   SelectItem,
@@ -15,9 +16,12 @@ const items = [
 export default function SelectBasic() {
   return (
     <Select items={items}>
-      <SelectTrigger className="w-[180px]">
-        <SelectValue placeholder="Select a fruit" />
-      </SelectTrigger>
+      <div className="flex flex-col gap-1">
+        <SelectLabel>Fruit</SelectLabel>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Select a fruit" />
+        </SelectTrigger>
+      </div>
       <SelectContent>
         {items.map((item) => (
           <SelectItem key={item.value} value={item.value}>

@@ -11,8 +11,8 @@ import {
   ComboboxValue,
   ComboboxPopup,
   ComboboxEmpty,
+  ComboboxTriggerLabel,
 } from "@/registry/default/combobox/combobox";
-import { Label } from "@/registry/default/label/label";
 import { Button } from "@/registry/default/button/button";
 
 export default function ComboboxInputInsidePopup() {
@@ -24,8 +24,8 @@ export default function ComboboxInputInsidePopup() {
       value={value}
       onValueChange={(value: Country | null) => setValue(value as Country)}
     >
-      <Label className="w-full max-w-2xs">
-        Select country
+      <div className="flex w-full max-w-2xs flex-col gap-1">
+        <ComboboxTriggerLabel>Select country</ComboboxTriggerLabel>
         <ComboboxTrigger
           render={(props) => (
             <Button
@@ -38,7 +38,7 @@ export default function ComboboxInputInsidePopup() {
             </Button>
           )}
         />
-      </Label>
+      </div>
 
       <ComboboxPopup className="flex flex-col p-0" aria-label="Select country">
         <div className="border-border border-b p-2">

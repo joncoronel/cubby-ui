@@ -1,5 +1,5 @@
 import { Slider } from "@/registry/default/slider/slider";
 
 export default function SliderDisabledState() {
-  return <Slider className="max-w-sm" defaultValue={50} disabled />;
+  return <Slider className="max-w-sm" defaultValue={50} disabled getAriaLabel={() => "Disabled slider"} />;
 }

@@ -260,6 +260,19 @@ function SelectSeparator({ className, ...props }: BaseSelect.Separator.Props) {
   );
 }
 
+function SelectLabel({ className, ...props }: BaseSelect.Label.Props) {
+  return (
+    <BaseSelect.Label
+      data-slot="select-label"
+      className={cn(
+        "text-foreground text-sm leading-5 font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
 function SelectList({ className, ...props }: BaseSelect.List.Props) {
   return (
     <BaseSelect.List
@@ -281,5 +294,6 @@ export {
   SelectGroupLabel,
   SelectSeparator,
   SelectBackdrop,
+  SelectLabel,
   SelectList,
 };

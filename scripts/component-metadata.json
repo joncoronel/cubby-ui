@@ -323,6 +323,12 @@
     ],
     "reference": []
   },
+  "otp-field": {
+    "title": "Otp Field",
+    "description": "A otp-field component.",
+    "dependencies": [],
+    "reference": []
+  },
   "pagination": {
     "title": "Pagination",
     "description": "A pagination component.",

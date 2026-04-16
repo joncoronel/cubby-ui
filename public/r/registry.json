@@ -103,6 +103,7 @@
         "@cubby-ui/menubar",
         "@cubby-ui/meter",
         "@cubby-ui/navigation-menu",
+        "@cubby-ui/otp-field",
         "@cubby-ui/pagination",
         "@cubby-ui/popover",
         "@cubby-ui/preview-card",
@@ -1083,6 +1084,24 @@
       ],
       "dependencies": [
         "class-variance-authority"
+      ]
+    },
+    {
+      "name": "otp-field",
+      "type": "registry:ui",
+      "title": "Otp Field",
+      "description": "A otp-field component.",
+      "files": [
+        {
+          "path": "registry/default/otp-field/otp-field.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/otp-field/otp-field.tsx"
+        },
+        {
+          "path": "registry/default/otp-field/hooks/use-invalid-feedback.ts",
+          "type": "registry:hook",
+          "target": "components/ui/cubby-ui/otp-field/hooks/use-invalid-feedback.ts"
+        }
       ]
     },
     {

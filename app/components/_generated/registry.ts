@@ -248,6 +248,12 @@ import navigation_menu_navigation_menu_custom_styled_dropdown from "@/registry/e
 import navigation_menu_navigation_menu_flexible_nextjs_link from "@/registry/examples/navigation-menu/navigation-menu-flexible-nextjs-link";
 import navigation_menu_navigation_menu_nested_submenus from "@/registry/examples/navigation-menu/navigation-menu-nested-submenus";
 import navigation_menu_navigation_menu_with_direct_links from "@/registry/examples/navigation-menu/navigation-menu-with-direct-links";
+import otp_field_otp_field_basic from "@/registry/examples/otp-field/otp-field-basic";
+import otp_field_otp_field_alphanumeric from "@/registry/examples/otp-field/otp-field-alphanumeric";
+import otp_field_otp_field_custom_sanitization from "@/registry/examples/otp-field/otp-field-custom-sanitization";
+import otp_field_otp_field_grouped from "@/registry/examples/otp-field/otp-field-grouped";
+import otp_field_otp_field_masked from "@/registry/examples/otp-field/otp-field-masked";
+import otp_field_otp_field_placeholder from "@/registry/examples/otp-field/otp-field-placeholder";
 import pagination_pagination_basic_pagination from "@/registry/examples/pagination/pagination-basic-pagination";
 import pagination_pagination_interactive_pagination from "@/registry/examples/pagination/pagination-interactive-pagination";
 import pagination_pagination_minimal_pagination from "@/registry/examples/pagination/pagination-minimal-pagination";
@@ -906,6 +912,16 @@ export const componentMetadata = {
     "dependencies": [
       "class-variance-authority"
     ],
+    "examples": {},
+    "reference": []
+  },
+  "otp-field": {
+    "name": "otp-field",
+    "title": "Otp Field",
+    "description": "A otp-field component.",
+    "category": "UI",
+    "registryDependencies": [],
+    "dependencies": [],
     "examples": {},
     "reference": []
   },
@@ -2567,6 +2583,38 @@ export const exampleRegistry = {
       "source": "import {\n  NavigationMenu,\n  NavigationMenuList,\n  NavigationMenuItem,\n  NavigationMenuTrigger,\n  NavigationMenuContent,\n  NavigationMenuLink,\n} from \"@/components/ui/cubby-ui/navigation-menu\";\n\nexport default function NavigationMenuWithDirectLinks() {\n  return (\n    <NavigationMenu>\n      <NavigationMenuList>\n        <NavigationMenuItem>\n          <NavigationMenuTrigger>Features</NavigationMenuTrigger>\n          <NavigationMenuContent>\n            <ul className=\"grid max-w-[400px] gap-3\">\n              <li>\n                <NavigationMenuLink href=\"/features/analytics\">\n                  <div className=\"text-sm font-medium leading-none\">Analytics</div>\n                  <p className=\"line-clamp-2 text-sm leading-snug text-muted-foreground\">\n                    Track user behavior and measure performance\n                  </p>\n                </NavigationMenuLink>\n              </li>\n              <li>\n                <NavigationMenuLink href=\"/features/integrations\">\n                  <div className=\"text-sm font-medium leading-none\">Integrations</div>\n                  <p className=\"line-clamp-2 text-sm leading-snug text-muted-foreground\">\n                    Connect with your favorite tools\n                  </p>\n                </NavigationMenuLink>\n              </li>\n            </ul>\n          </NavigationMenuContent>\n        </NavigationMenuItem>\n        \n        <NavigationMenuItem>\n          <NavigationMenuTrigger>Company</NavigationMenuTrigger>\n          <NavigationMenuContent>\n            <ul className=\"grid max-w-[200px] gap-3\">\n              <li>\n                <NavigationMenuLink href=\"/about\">About</NavigationMenuLink>\n              </li>\n              <li>\n                <NavigationMenuLink href=\"/team\">Team</NavigationMenuLink>\n              </li>\n              <li>\n                <NavigationMenuLink href=\"/careers\">Careers</NavigationMenuLink>\n              </li>\n              <li>\n                <NavigationMenuLink href=\"/contact\">Contact</NavigationMenuLink>\n              </li>\n            </ul>\n          </NavigationMenuContent>\n        </NavigationMenuItem>\n        \n        {/* Direct links styled as triggers */}\n        <NavigationMenuItem>\n          <NavigationMenuLink href=\"/pricing\" standalone>\n            Pricing\n          </NavigationMenuLink>\n        </NavigationMenuItem>\n        \n        <NavigationMenuItem>\n          <NavigationMenuLink href=\"/docs\" standalone>\n            Documentation\n          </NavigationMenuLink>\n        </NavigationMenuItem>\n      </NavigationMenuList>\n    </NavigationMenu>\n  );\n}"
     }
   ],
+  "otp-field": [
+    {
+      "title": "Basic",
+      "importPath": "otp-field-basic",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  OTPField,\n  OTPFieldInput,\n} from \"@/components/ui/cubby-ui/otp-field\";\n\nconst OTP_LENGTH = 6;\n\nexport default function OtpFieldBasic() {\n  const id = React.useId();\n  const descriptionId = `${id}-description`;\n\n  return (\n    <div className=\"flex w-full max-w-80 flex-col items-start gap-1\">\n      <label htmlFor={id} className=\"text-sm font-medium\">\n        Verification code\n      </label>\n      <OTPField\n        id={id}\n        length={OTP_LENGTH}\n        aria-describedby={descriptionId}\n      >\n        {Array.from({ length: OTP_LENGTH }, (_, index) => (\n          <OTPFieldInput\n            key={index}\n            aria-label={`Character ${index + 1} of ${OTP_LENGTH}`}\n          />\n        ))}\n      </OTPField>\n      <p id={descriptionId} className=\"text-muted-foreground m-0 text-sm\">\n        Enter the 6-character code we sent to your device.\n      </p>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Alphanumeric",
+      "importPath": "otp-field-alphanumeric",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  OTPField,\n  OTPFieldInput,\n} from \"@/components/ui/cubby-ui/otp-field\";\n\nconst CODE_LENGTH = 6;\n\nexport default function OtpFieldAlphanumeric() {\n  const id = React.useId();\n  const descriptionId = `${id}-description`;\n\n  return (\n    <div className=\"flex w-full max-w-80 flex-col items-start gap-1\">\n      <label htmlFor={id} className=\"text-sm font-medium\">\n        Recovery code\n      </label>\n      <OTPField\n        id={id}\n        length={CODE_LENGTH}\n        validationType=\"alphanumeric\"\n        aria-describedby={descriptionId}\n      >\n        {Array.from({ length: CODE_LENGTH }, (_, index) => (\n          <OTPFieldInput\n            key={index}\n            aria-label={`Character ${index + 1} of ${CODE_LENGTH}`}\n          />\n        ))}\n      </OTPField>\n      <p id={descriptionId} className=\"text-muted-foreground m-0 text-sm\">\n        Accept letters and numbers for backup codes such as{\" \"}\n        <code className=\"font-mono\">A7C9XZ</code>.\n      </p>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Custom Sanitization",
+      "importPath": "otp-field-custom-sanitization",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  OTPField,\n  OTPFieldInput,\n} from \"@/components/ui/cubby-ui/otp-field\";\nimport { useInvalidFeedback } from \"@/hooks/cubby-ui/use-invalid-feedback\";\n\nconst CODE_LENGTH = 6;\n\nfunction sanitizeTierCode(value: string) {\n  return value.replace(/[^0-3]/g, \"\");\n}\n\nexport default function OtpFieldCustomSanitization() {\n  const id = React.useId();\n  const descriptionId = `${id}-description`;\n  const invalidFeedback = useInvalidFeedback();\n\n  return (\n    <div className=\"flex w-full max-w-80 flex-col items-start gap-1\">\n      <label htmlFor={id} className=\"text-sm font-medium\">\n        Tier code\n      </label>\n      <OTPField\n        id={id}\n        length={CODE_LENGTH}\n        validationType=\"none\"\n        inputMode=\"numeric\"\n        sanitizeValue={sanitizeTierCode}\n        onValueChange={invalidFeedback.handleValueChange}\n        onValueInvalid={invalidFeedback.handleValueInvalid}\n        aria-describedby={descriptionId}\n      >\n        {Array.from({ length: CODE_LENGTH }, (_, index) => (\n          <OTPFieldInput\n            key={index}\n            className={invalidFeedback.getInvalidClassName(index)}\n            aria-label={`Character ${index + 1} of ${CODE_LENGTH}`}\n            onFocus={() => invalidFeedback.setFocusedIndex(index)}\n          />\n        ))}\n      </OTPField>\n      <p id={descriptionId} className=\"text-muted-foreground m-0 text-sm\">\n        Digits <code className=\"font-mono\">0-3</code> only.\n      </p>\n      <span aria-live=\"polite\" className=\"sr-only\">\n        {invalidFeedback.statusMessage}\n      </span>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Grouped",
+      "importPath": "otp-field-grouped",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  OTPField,\n  OTPFieldGroup,\n  OTPFieldInput,\n  OTPFieldSeparator,\n} from \"@/components/ui/cubby-ui/otp-field\";\n\nconst OTP_LENGTH = 6;\n\nexport default function OtpFieldGrouped() {\n  const id = React.useId();\n\n  return (\n    <div className=\"flex w-full max-w-80 flex-col items-start gap-1\">\n      <label htmlFor={id} className=\"text-sm font-medium\">\n        Verification code\n      </label>\n      <OTPField id={id} length={OTP_LENGTH}>\n        <OTPFieldGroup>\n          {Array.from({ length: 3 }, (_, index) => (\n            <OTPFieldInput\n              key={index}\n              aria-label={`Character ${index + 1} of ${OTP_LENGTH}`}\n            />\n          ))}\n        </OTPFieldGroup>\n        <OTPFieldSeparator />\n        <OTPFieldGroup>\n          {Array.from({ length: 3 }, (_, index) => (\n            <OTPFieldInput\n              key={index + 3}\n              aria-label={`Character ${index + 4} of ${OTP_LENGTH}`}\n            />\n          ))}\n        </OTPFieldGroup>\n      </OTPField>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Masked",
+      "importPath": "otp-field-masked",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  OTPField,\n  OTPFieldInput,\n} from \"@/components/ui/cubby-ui/otp-field\";\n\nconst CODE_LENGTH = 6;\n\nexport default function OtpFieldMasked() {\n  const id = React.useId();\n  const descriptionId = `${id}-description`;\n\n  return (\n    <div className=\"flex w-full max-w-80 flex-col items-start gap-1\">\n      <label htmlFor={id} className=\"text-sm font-medium\">\n        Access code\n      </label>\n      <OTPField\n        id={id}\n        length={CODE_LENGTH}\n        mask\n        aria-describedby={descriptionId}\n      >\n        {Array.from({ length: CODE_LENGTH }, (_, index) => (\n          <OTPFieldInput\n            key={index}\n            aria-label={`Character ${index + 1} of ${CODE_LENGTH}`}\n          />\n        ))}\n      </OTPField>\n      <p id={descriptionId} className=\"text-muted-foreground m-0 text-sm\">\n        Use <code className=\"font-mono\">mask</code> to obscure the code on\n        shared screens.\n      </p>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Placeholder",
+      "importPath": "otp-field-placeholder",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  OTPField,\n  OTPFieldInput,\n} from \"@/components/ui/cubby-ui/otp-field\";\n\nconst CODE_LENGTH = 6;\n\nexport default function OtpFieldPlaceholder() {\n  const id = React.useId();\n  const descriptionId = `${id}-description`;\n\n  return (\n    <div className=\"flex w-full max-w-80 flex-col items-start gap-1\">\n      <label htmlFor={id} className=\"text-sm font-medium\">\n        Verification code\n      </label>\n      <OTPField\n        id={id}\n        length={CODE_LENGTH}\n        aria-describedby={descriptionId}\n      >\n        {Array.from({ length: CODE_LENGTH }, (_, index) => (\n          <OTPFieldInput\n            key={index}\n            placeholder=\"•\"\n            aria-label={`Character ${index + 1} of ${CODE_LENGTH}`}\n          />\n        ))}\n      </OTPField>\n      <p id={descriptionId} className=\"text-muted-foreground m-0 text-sm\">\n        Placeholder hints stay visible until the active slot is focused.\n      </p>\n    </div>\n  );\n}\n"
+    }
+  ],
   "pagination": [
     {
       "title": "Basic Pagination",
@@ -3453,6 +3501,12 @@ export const componentMap = {
   "navigation-menu-flexible-nextjs-link": navigation_menu_navigation_menu_flexible_nextjs_link,
   "navigation-menu-nested-submenus": navigation_menu_navigation_menu_nested_submenus,
   "navigation-menu-with-direct-links": navigation_menu_navigation_menu_with_direct_links,
+  "otp-field-basic": otp_field_otp_field_basic,
+  "otp-field-alphanumeric": otp_field_otp_field_alphanumeric,
+  "otp-field-custom-sanitization": otp_field_otp_field_custom_sanitization,
+  "otp-field-grouped": otp_field_otp_field_grouped,
+  "otp-field-masked": otp_field_otp_field_masked,
+  "otp-field-placeholder": otp_field_otp_field_placeholder,
   "pagination-basic-pagination": pagination_pagination_basic_pagination,
   "pagination-interactive-pagination": pagination_pagination_interactive_pagination,
   "pagination-minimal-pagination": pagination_pagination_minimal_pagination,
@@ -3733,6 +3787,10 @@ export const componentAnatomy = {
   "navigation-menu": {
     "imports": "import {\n  NavigationMenu,\n  NavigationMenuList,\n  NavigationMenuItem,\n  NavigationMenuTrigger,\n  NavigationMenuContent,\n  NavigationMenuLink,\n} from \"@/components/ui/cubby-ui/navigation-menu\";",
     "anatomy": "<NavigationMenu>\n  <NavigationMenuList>\n    <NavigationMenuItem>\n      <NavigationMenuTrigger />\n      <NavigationMenuContent>\n        <NavigationMenuLink />\n      </NavigationMenuContent>\n    </NavigationMenuItem>\n    <NavigationMenuItem>\n      <NavigationMenuTrigger />\n      <NavigationMenuContent>\n        <NavigationMenuLink />\n      </NavigationMenuContent>\n    </NavigationMenuItem>\n  </NavigationMenuList>\n</NavigationMenu>"
+  },
+  "otp-field": {
+    "imports": "import {\n  OTPField,\n  OTPFieldInput,\n} from \"@/components/ui/cubby-ui/otp-field\";",
+    "anatomy": "<OTPField />"
   },
   "pagination": {
     "imports": "import {\n  Pagination,\n  PaginationContent,\n  PaginationItem,\n  PaginationLink,\n  PaginationNext,\n  PaginationPrevious,\n} from \"@/components/ui/cubby-ui/pagination\";",

@@ -6,3 +6,39 @@
     transform: scaleX(1);
   }
 }
+
+@keyframes pulse-even {
+  0%,
+  100% {
+    scale: 1;
+  }
+  50% {
+    scale: 1.04;
+  }
+}
+
+@keyframes pulse-odd {
+  0%,
+  100% {
+    scale: 1;
+  }
+  50% {
+    scale: 1.04;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes pulse-even {
+    from,
+    to {
+      scale: 1;
+    }
+  }
+
+  @keyframes pulse-odd {
+    from,
+    to {
+      scale: 1;
+    }
+  }
+}

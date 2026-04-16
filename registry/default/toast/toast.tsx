@@ -107,6 +107,8 @@ const TOAST_VISUAL_CLASSES = [
 ];
 
 export interface ToastOptions<TData extends object = object> {
+  /** Fixed ID for deduplication. If a toast with this ID already exists, it updates in place. */
+  id?: string;
   title?: string;
   description?: string;
   type?: "default" | "success" | "error" | "warning" | "info";
@@ -136,6 +138,7 @@ export interface AnchoredToastOptions<
 
 interface ToastData {
   id: string;
+  updateKey?: number;
   title?: string;
   description?: string;
   type?: "default" | "success" | "error" | "warning" | "info" | "loading";
@@ -310,6 +313,7 @@ function baseToast<TData extends object = object>(
   // Handle JSX element passed directly (with optional options)
   if (React.isValidElement(optionsOrJSX)) {
     return toastManager.add({
+      ...(jsxOptions?.id && { id: jsxOptions.id }),
       title: "",
       description: "",
       type: jsxOptions?.type || "default",
@@ -334,6 +338,7 @@ function baseToast<TData extends object = object>(
   // Handle options object
   const options = optionsOrJSX as ToastOptions<TData>;
   return toastManager.add({
+    ...(options.id && { id: options.id }),
     title: options.title,
     description: options.description || "",
     type: options.type || "default",
@@ -985,18 +990,27 @@ function StackedToastItem({
   const Icon =
     type !== "default" ? TOAST_ICONS[type as keyof typeof TOAST_ICONS] : null;
 
+  // Pulse animation for deduplicated toasts (updateKey > 0 means upserted)
+  const pulseClassName = toast.updateKey
+    ? toast.updateKey % 2 === 0
+      ? "animate-[pulse-even_0.28s_ease]"
+      : "animate-[pulse-odd_0.28s_ease]"
+    : null;
+
   return (
     <Toast.Root
       toast={toast}
       swipeDirection={swipeDirection}
       data-slot="toast"
       data-position={position}
+      data-updated={toast.updateKey ? toast.updateKey : undefined}
       className={cn(
         TOAST_CSS_VARIABLES,
         TOAST_POSITION_CLASSES,
         TOAST_TRANSFORM_CLASSES,
         TOAST_ANIMATION_CLASSES,
         TOAST_VISUAL_CLASSES,
+        pulseClassName,
       )}
     >
       <Toast.Content

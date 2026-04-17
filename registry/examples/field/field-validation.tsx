@@ -12,30 +12,15 @@ import { Form } from "@/registry/default/form/form";
 export default function FieldValidation() {
   return (
     <Form className="w-full max-w-sm space-y-4">
-      <Field name="email">
-        <FieldLabel>Email</FieldLabel>
-        <FieldControl type="email" required placeholder="you@example.com" />
-        <FieldError match="valueMissing">Please enter your email</FieldError>
-        <FieldError match="typeMismatch">
-          Please enter a valid email address
-        </FieldError>
-      </Field>
-      <Field name="password">
-        <FieldLabel>Password</FieldLabel>
+      <Field name="website">
+        <FieldLabel>Website</FieldLabel>
         <FieldControl
-          type="password"
+          type="url"
           required
-          minLength={8}
-          pattern="(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).*"
-          placeholder="Enter a password"
+          pattern="https?://.*"
+          placeholder="https://example.com"
         />
-        <FieldError match="valueMissing">Please enter a password</FieldError>
-        <FieldError match="tooShort">
-          Password must be at least 8 characters
-        </FieldError>
-        <FieldError match="patternMismatch">
-          Must include uppercase, lowercase, and a number
-        </FieldError>
+        <FieldError />
       </Field>
       <Button type="submit" variant="neutral">
         Submit

@@ -1,11 +1,16 @@
 "use client";
 
 import { Button } from "@/registry/default/button/button";
-import { Checkbox } from "@/registry/default/checkbox/checkbox";
-import { Field, FieldError, FieldLabel } from "@/registry/default/field/field";
+import {
+  Field,
+  FieldControl,
+  FieldError,
+  FieldErrorSlot,
+  FieldLabel,
+} from "@/registry/default/field/field";
 import { Form } from "@/registry/default/form/form";
 
-export default function FieldWithCheckbox() {
+export default function FieldWithErrorSlot() {
   return (
     <Form
       className="w-full max-w-sm space-y-4"
@@ -13,12 +18,12 @@ export default function FieldWithCheckbox() {
         alert(JSON.stringify(values, null, 2));
       }}
     >
-      <Field name="terms">
-        <FieldLabel>
-          <Checkbox required />
-          I accept the terms and conditions
-        </FieldLabel>
-        <FieldError />
+      <Field name="email">
+        <FieldLabel>Email</FieldLabel>
+        <FieldControl type="email" required placeholder="you@example.com" />
+        <FieldErrorSlot>
+          <FieldError />
+        </FieldErrorSlot>
       </Field>
       <Button type="submit" variant="neutral">
         Submit

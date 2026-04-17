@@ -4,7 +4,6 @@ import { Button } from "@/registry/default/button/button";
 import {
   Field,
   FieldControl,
-  FieldDescription,
   FieldError,
   FieldLabel,
 } from "@/registry/default/field/field";
@@ -26,12 +25,7 @@ export default function FormConstraintValidation() {
           pattern="https?://.*"
           placeholder="https://example.com"
         />
-        <FieldDescription>Must start with http:// or https://</FieldDescription>
-        <FieldError match="valueMissing">Please enter a URL</FieldError>
-        <FieldError match="typeMismatch">Please enter a valid URL</FieldError>
-        <FieldError match="patternMismatch">
-          URL must start with http:// or https://
-        </FieldError>
+        <FieldError />
       </Field>
       <Field name="age">
         <FieldLabel>Age</FieldLabel>
@@ -42,13 +36,7 @@ export default function FormConstraintValidation() {
           max={120}
           placeholder="Enter your age"
         />
-        <FieldError match="valueMissing">Please enter your age</FieldError>
-        <FieldError match="rangeUnderflow">
-          You must be at least 13 years old
-        </FieldError>
-        <FieldError match="rangeOverflow">
-          Please enter a valid age
-        </FieldError>
+        <FieldError />
       </Field>
       <Button type="submit" variant="neutral">
         Submit

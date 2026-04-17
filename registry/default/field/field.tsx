@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { Field as BaseField } from "@base-ui/react/field";
 
 import { cn } from "@/lib/utils";
@@ -9,7 +10,7 @@ function Field({ className, ...props }: BaseField.Root.Props) {
   return (
     <BaseField.Root
       data-slot="field"
-      className={cn("grid gap-2", className)}
+      className={cn("space-y-2", className)}
       {...props}
     />
   );
@@ -40,7 +41,10 @@ function FieldControl({ className, ...props }: BaseField.Control.Props) {
   );
 }
 
-function FieldDescription({ className, ...props }: BaseField.Description.Props) {
+function FieldDescription({
+  className,
+  ...props
+}: BaseField.Description.Props) {
   return (
     <BaseField.Description
       data-slot="field-description"
@@ -55,6 +59,27 @@ function FieldError({ className, ...props }: BaseField.Error.Props) {
     <BaseField.Error
       data-slot="field-error"
       className={cn("text-destructive text-sm", className)}
+      {...props}
+    />
+  );
+}
+
+function FieldErrorSlot({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="field-error-slot"
+      className={cn(
+        "-mt-2 grid h-0 overflow-clip [interpolate-size:allow-keywords] *:col-start-1 *:row-start-1",
+        "ease-out-cubic transition-[height,margin-top] duration-140 motion-reduce:transition-none",
+        "has-[[data-slot=field-error]:not([data-ending-style])]:mt-0 has-[[data-slot=field-error]:not([data-ending-style])]:h-auto",
+        // Opacity fade on child FieldError
+        "*:data-[slot=field-error]:transition-opacity *:data-[slot=field-error]:duration-140 motion-reduce:*:data-[slot=field-error]:transition-none",
+        "[&>[data-slot=field-error][data-ending-style]]:opacity-0 [&>[data-slot=field-error][data-starting-style]]:opacity-0",
+        // When switching between multiple FieldErrors, hide the exiting one and show the entering one instantly
+        "[&:has(>[data-slot=field-error]:not([data-ending-style]))>[data-slot=field-error][data-ending-style]]:hidden",
+        "[&:has(>[data-slot=field-error][data-ending-style])>[data-slot=field-error][data-starting-style]]:opacity-100",
+        className,
+      )}
       {...props}
     />
   );
@@ -78,6 +103,7 @@ export {
   FieldControl,
   FieldDescription,
   FieldError,
+  FieldErrorSlot,
   FieldItem,
   FieldValidity,
 };

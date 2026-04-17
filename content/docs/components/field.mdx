@@ -35,9 +35,17 @@ Display helper text below the control.
 
 ### Constraint Validation
 
-Use native HTML validation attributes with custom error messages via the `match` prop.
+Use native HTML validation attributes (`required`, `pattern`, `minLength`, `type`, etc.) with a single `FieldError` that displays the browser's native error message.
 
 <ComponentPreview component="field" example="field-validation" />
+
+### Per-State Messages
+
+Customize messages for specific validity states by pairing multiple `FieldError` components with different `match` props. Useful for i18n or overriding the browser's default messages.
+
+<ComponentPreview component="field" example="field-per-state-messages" />
+
+For other ways to customize messages, see [Custom Validation](#custom-validation) (via a `validate` function) and server-side errors via the [Form](/docs/components/form) component's `errors` prop.
 
 ### Custom Validation
 
@@ -86,6 +94,12 @@ Wrap a Slider component with Field. Use `SliderLabel` (not `FieldLabel`) since S
 Disable the entire field, cascading to all child components.
 
 <ComponentPreview component="field" example="field-disabled" />
+
+### Animating Error Visibility
+
+Wrap `FieldError` in `FieldErrorSlot` to smoothly animate the error's height and opacity on mount/unmount. When empty, the slot collapses to zero space - so you get the animation without extra gap in the layout when no error is present.
+
+<ComponentPreview component="field" example="field-with-error-slot" />
 
 ## API Reference
 
@@ -166,6 +180,12 @@ An error message displayed when the field fails validation. Renders a `<div>` el
 </ApiProp>
 
 </ApiPropsList>
+
+#### FieldErrorSlot
+
+Optional wrapper for `FieldError` that animates the error's height (via `interpolate-size`) and opacity on mount/unmount. When empty, uses a negative top margin to collapse to zero space, so there's no layout difference versus not using a slot at all. When switching between multiple match-specific `FieldError` components, the switch is instant (no cross-fade). Renders a `<div>` element.
+
+Assumes the parent `Field` uses the default `space-y-2` spacing. If you customize the Field's spacing, override the slot's margin classes to match.
 
 #### FieldItem
 

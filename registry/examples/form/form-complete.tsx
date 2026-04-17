@@ -45,16 +45,13 @@ export default function FormComplete() {
       <Field name="fullName">
         <FieldLabel>Full name</FieldLabel>
         <FieldControl required placeholder="Jane Doe" />
-        <FieldError match="valueMissing">Please enter your name</FieldError>
+        <FieldError />
       </Field>
 
       <Field name="email">
         <FieldLabel>Email</FieldLabel>
         <FieldControl type="email" required placeholder="jane@company.com" />
-        <FieldError match="valueMissing">Email is required</FieldError>
-        <FieldError match="typeMismatch">
-          Please enter a valid email address
-        </FieldError>
+        <FieldError />
       </Field>
 
       <Field name="department">
@@ -128,9 +125,7 @@ export default function FormComplete() {
         <FieldLabel>
           <Checkbox required />I agree to the terms of service
         </FieldLabel>
-        <FieldError match="valueMissing">
-          You must agree to the terms
-        </FieldError>
+        <FieldError />
       </Field>
 
       <Button type="submit" variant="neutral">

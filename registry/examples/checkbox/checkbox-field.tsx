@@ -18,9 +18,7 @@ export default function CheckboxField() {
           <Checkbox required />
           I accept the terms and conditions
         </FieldLabel>
-        <FieldError match="valueMissing">
-          You must accept the terms to continue
-        </FieldError>
+        <FieldError />
       </Field>
       <Button type="submit" variant="neutral">
         Submit

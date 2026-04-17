@@ -24,8 +24,7 @@ export default function InputField() {
         <FieldDescription>
           We&apos;ll never share your email with anyone else.
         </FieldDescription>
-        <FieldError match="valueMissing">Email is required</FieldError>
-        <FieldError match="typeMismatch">Enter a valid email address</FieldError>
+        <FieldError />
       </Field>
       <Button type="submit" variant="neutral">
         Submit

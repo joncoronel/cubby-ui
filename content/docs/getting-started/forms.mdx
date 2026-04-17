@@ -116,7 +116,19 @@ Use `FieldItem` to wrap each individual option so it gets its own label and desc
 
 ### Constraint validation
 
-Use native HTML attributes on `FieldControl` and display errors with `FieldError`'s `match` prop:
+Use native HTML attributes on `FieldControl` (`required`, `pattern`, `minLength`, `type`, `min`, `max`, etc.) and `FieldError` to display the browser's native error message:
+
+```tsx
+<Field name="website">
+  <FieldLabel>Website</FieldLabel>
+  <FieldControl type="url" required pattern="https?://.*" />
+  <FieldError />
+</Field>
+```
+
+### Per-state custom messages
+
+To override native messages (for i18n or branding), use multiple `FieldError` components with the `match` prop — each one renders only for the specified validity state:
 
 ```tsx
 <Field name="password">

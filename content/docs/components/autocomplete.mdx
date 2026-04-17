@@ -81,6 +81,12 @@ Use virtualization for large lists (100+ items) to maintain smooth performance. 
 
 > **Manual filtering still works** — If you need custom filter logic (fuzzy search, server-side filtering), you can still compute `filteredItems` externally, pass `filter={null}` to `Autocomplete.Root`, and spread `rootProps` from `useListVirtualizer`. See [useAutocompleteFilter](#useautocompletefilter).
 
+### Form Integration
+
+Use [Field](/docs/components/field) with `FieldLabel` for labeling. See the [Forms guide](/docs/getting-started/forms) for more patterns.
+
+<ComponentPreview component="autocomplete" example="autocomplete-field" />
+
 ## API Reference
 
 The Autocomplete component is built on top of [Base UI's Autocomplete](https://base-ui.com/react/components/autocomplete). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.

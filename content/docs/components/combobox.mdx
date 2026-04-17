@@ -70,6 +70,12 @@ Use virtualization for large lists (100+ items) to maintain smooth performance. 
 5. **Use `useHighlightHandler`** - Pass a `virtualizerRef` to the child and use `useHighlightHandler(virtualizerRef)` on Root so keyboard navigation scrolls to the highlighted item.
 6. **Override item margins** - Pass `className="mt-0! mb-0!"` to `ComboboxItem` since virtualized items are absolutely positioned and the virtualizer handles padding.
 
+### Form Integration
+
+Use [Field](/docs/components/field) with `FieldLabel` for labeling. See the [Forms guide](/docs/getting-started/forms) for more patterns.
+
+<ComponentPreview component="combobox" example="combobox-field" />
+
 ## API Reference
 
 The Combobox component is built on top of [Base UI's Combobox](https://base-ui.com/react/components/combobox). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.

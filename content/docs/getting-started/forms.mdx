@@ -1,0 +1,255 @@
+---
+title: Forms
+description: A guide to building forms with Cubby UI components
+---
+
+## Overview
+
+Cubby UI provides three components for building accessible forms: [Form](/docs/components/form), [Field](/docs/components/field), and [Fieldset](/docs/components/fieldset). These wrap Base UI's form primitives, providing native constraint validation, custom validation, accessible labeling, error display, and integration with third-party libraries.
+
+## Quick start
+
+```tsx
+import { Button } from "@/components/ui/cubby-ui/button";
+import { Field, FieldControl, FieldError, FieldLabel } from "@/components/ui/cubby-ui/field";
+import { Form } from "@/components/ui/cubby-ui/form";
+
+<Form onFormSubmit={(values) => console.log(values)}>
+  <Field name="email">
+    <FieldLabel>Email</FieldLabel>
+    <FieldControl type="email" required />
+    <FieldError match="valueMissing">Email is required</FieldError>
+    <FieldError match="typeMismatch">Enter a valid email</FieldError>
+  </Field>
+  <Button type="submit">Submit</Button>
+</Form>
+```
+
+## Labeling form controls
+
+Every form control needs an accessible label. The correct label component depends on the control type.
+
+### Input-type controls
+
+Use `FieldLabel` to label these controls:
+
+- [Input](/docs/components/input)
+- [Number Field](/docs/components/number-field)
+- [Combobox](/docs/components/combobox) (when the input is outside the popup)
+- [Checkbox](/docs/components/checkbox)
+- [Radio](/docs/components/radio-group)
+- [Switch](/docs/components/switch)
+
+For Checkbox, Radio, and Switch, wrap the control inside `FieldLabel` for implicit labeling:
+
+```tsx
+<Field name="terms">
+  <FieldLabel>
+    <Checkbox required />
+    I accept the terms
+  </FieldLabel>
+</Field>
+```
+
+### Trigger-based controls
+
+These controls have their own label component. Do **not** use `FieldLabel` for them:
+
+- [Select](/docs/components/select): use `SelectLabel`
+- [Slider](/docs/components/slider): use `SliderLabel`
+
+```tsx
+<Field name="country">
+  <Select items={countries} required>
+    <SelectLabel>Country</SelectLabel>
+    <SelectTrigger>
+      <SelectValue placeholder="Select a country" />
+    </SelectTrigger>
+    <SelectContent>...</SelectContent>
+  </Select>
+  <FieldError />
+</Field>
+```
+
+### Descriptions
+
+`FieldDescription` adds accessible helper text to any field, regardless of control type:
+
+```tsx
+<Field name="timezone">
+  <Select items={timezones}>
+    <SelectLabel>Time zone</SelectLabel>
+    <SelectTrigger>...</SelectTrigger>
+    <SelectContent>...</SelectContent>
+  </Select>
+  <FieldDescription>Used for notifications and reminders</FieldDescription>
+</Field>
+```
+
+## Grouping controls with Fieldset
+
+Use `Fieldset` with `FieldsetLegend` when a single label applies to multiple controls, such as radio groups, checkbox groups, or multi-thumb sliders. Compose with the `render` prop to merge the fieldset element with a group component:
+
+```tsx
+<Field name="role">
+  <Fieldset render={<RadioGroup defaultValue="member" />}>
+    <FieldsetLegend>Role</FieldsetLegend>
+    <FieldItem>
+      <FieldLabel>
+        <RadioGroupItem value="member" />
+        Member
+      </FieldLabel>
+    </FieldItem>
+    <FieldItem>
+      <FieldLabel>
+        <RadioGroupItem value="admin" />
+        Admin
+      </FieldLabel>
+    </FieldItem>
+  </Fieldset>
+</Field>
+```
+
+Use `FieldItem` to wrap each individual option so it gets its own label and description.
+
+## Validation
+
+### Constraint validation
+
+Use native HTML attributes on `FieldControl` and display errors with `FieldError`'s `match` prop:
+
+```tsx
+<Field name="password">
+  <FieldLabel>Password</FieldLabel>
+  <FieldControl type="password" required minLength={8} />
+  <FieldError match="valueMissing">Password is required</FieldError>
+  <FieldError match="tooShort">Must be at least 8 characters</FieldError>
+</Field>
+```
+
+Available `match` values: `valueMissing`, `typeMismatch`, `patternMismatch`, `tooShort`, `tooLong`, `rangeUnderflow`, `rangeOverflow`, `stepMismatch`, `badInput`, `customError`.
+
+### Custom validation
+
+Use the `validate` prop on `Field` for custom logic. Supports async functions:
+
+```tsx
+<Field
+  name="username"
+  validationMode="onChange"
+  validationDebounceTime={300}
+  validate={async (value) => {
+    const taken = await checkUsername(value);
+    return taken ? "Username is taken" : null;
+  }}
+>
+  <FieldLabel>Username</FieldLabel>
+  <FieldControl />
+  <FieldError />
+</Field>
+```
+
+### Server-side validation
+
+Pass errors from your server to `Form`'s `errors` prop. Keys match field `name` attributes:
+
+```tsx
+const [errors, setErrors] = React.useState({});
+
+<Form
+  errors={errors}
+  onSubmit={async (event) => {
+    event.preventDefault();
+    const response = await submitToServer(new FormData(event.currentTarget));
+    if (response.errors) setErrors(response.errors);
+  }}
+>
+  <Field name="email">...</Field>
+</Form>
+```
+
+## Submitting data
+
+### Native onSubmit
+
+Use `onSubmit` with `FormData` for standard form submission:
+
+```tsx
+<Form onSubmit={(event) => {
+  event.preventDefault();
+  const formData = new FormData(event.currentTarget);
+  // send formData
+}} />
+```
+
+### JavaScript object with onFormSubmit
+
+Use `onFormSubmit` to receive values as a plain object. `preventDefault` is called automatically:
+
+```tsx
+<Form onFormSubmit={(values) => {
+  // values is { name: "...", email: "...", ... }
+}} />
+```
+
+## Third-party library integration
+
+### React Hook Form
+
+Use `Controller` to bridge RHF state with Field's `invalid`, `dirty`, and `touched` props:
+
+```tsx
+<Controller
+  name="name"
+  control={control}
+  rules={{ required: "Required" }}
+  render={({ field: rhfField, fieldState }) => (
+    <Field
+      name="name"
+      invalid={fieldState.invalid}
+      dirty={fieldState.isDirty}
+      touched={fieldState.isTouched}
+    >
+      <FieldLabel>Name</FieldLabel>
+      <FieldControl {...rhfField} />
+      {fieldState.error && (
+        <FieldError match={true}>{fieldState.error.message}</FieldError>
+      )}
+    </Field>
+  )}
+/>
+```
+
+### TanStack Form
+
+Use `form.Field` (TanStack's field) to manage state, and `Field` (Cubby UI) for the UI:
+
+```tsx
+<form.Field name="email" validators={{ onChange: ({ value }) => !value ? "Required" : undefined }}>
+  {(field) => (
+    <Field
+      name="email"
+      invalid={field.state.meta.errors.length > 0}
+      touched={field.state.meta.isTouched}
+    >
+      <FieldLabel>Email</FieldLabel>
+      <FieldControl
+        value={field.state.value}
+        onChange={(e) => field.handleChange(e.target.value)}
+        onBlur={field.handleBlur}
+      />
+      {field.state.meta.errors.length > 0 && (
+        <FieldError match={true}>{field.state.meta.errors[0]?.toString()}</FieldError>
+      )}
+    </Field>
+  )}
+</form.Field>
+```
+
+## Component reference
+
+| Component | Use for |
+| --- | --- |
+| [Form](/docs/components/form) | Form wrapper with `errors`, `onFormSubmit`, `validationMode` |
+| [Field](/docs/components/field) | Field wrapper with label, control, description, error, validation |
+| [Fieldset](/docs/components/fieldset) | Grouping related fields with a shared legend |

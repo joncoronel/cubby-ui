@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "fieldset",
+  "title": "Fieldset",
+  "description": "A fieldset component.",
+  "files": [
+    {
+      "path": "registry/default/fieldset/fieldset.tsx",
+      "content": "\"use client\";\n\nimport { Fieldset as BaseFieldset } from \"@base-ui/react/fieldset\";\n\nimport { cn } from \"@/lib/utils\";\n\nfunction Fieldset({ className, ...props }: BaseFieldset.Root.Props) {\n  return (\n    <BaseFieldset.Root\n      data-slot=\"fieldset\"\n      className={cn(\"grid gap-4 border-none p-0\", className)}\n      {...props}\n    />\n  );\n}\n\nfunction FieldsetLegend({ className, ...props }: BaseFieldset.Legend.Props) {\n  return (\n    <BaseFieldset.Legend\n      data-slot=\"fieldset-legend\"\n      className={cn(\"text-foreground text-base font-semibold leading-6\", className)}\n      {...props}\n    />\n  );\n}\n\nexport { Fieldset, FieldsetLegend };\n",
+      "type": "registry:ui",
+      "target": "components/ui/cubby-ui/fieldset.tsx"
+    }
+  ],
+  "type": "registry:ui"
+}

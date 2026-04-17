@@ -120,6 +120,7 @@ function Slider({
       {...props}
     >
       {label && <SliderLabel>{label}</SliderLabel>}
+      {children}
       <BaseSlider.Control
         data-slot="slider-control"
         className="flex flex-1 items-center data-[orientation=horizontal]:py-1 data-[orientation=vertical]:min-h-full data-[orientation=vertical]:flex-col data-[orientation=vertical]:justify-center data-[orientation=vertical]:px-1"
@@ -203,7 +204,6 @@ function Slider({
           ))}
         </BaseSlider.Track>
       </BaseSlider.Control>
-      {children}
     </BaseSlider.Root>
   );
 }

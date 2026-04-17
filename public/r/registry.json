@@ -94,6 +94,8 @@
         "@cubby-ui/drawer",
         "@cubby-ui/dropdown-menu",
         "@cubby-ui/fancy-button",
+        "@cubby-ui/field",
+        "@cubby-ui/fieldset",
         "@cubby-ui/form",
         "@cubby-ui/input",
         "@cubby-ui/input-group",
@@ -745,6 +747,35 @@
       ]
     },
     {
+      "name": "field",
+      "type": "registry:ui",
+      "title": "Field",
+      "description": "A field component.",
+      "files": [
+        {
+          "path": "registry/default/field/field.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/field.tsx"
+        }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/input"
+      ]
+    },
+    {
+      "name": "fieldset",
+      "type": "registry:ui",
+      "title": "Fieldset",
+      "description": "A fieldset component.",
+      "files": [
+        {
+          "path": "registry/default/fieldset/fieldset.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/fieldset.tsx"
+        }
+      ]
+    },
+    {
       "name": "form",
       "type": "registry:ui",
       "title": "Form",
@@ -755,12 +786,6 @@
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/form.tsx"
         }
-      ],
-      "registryDependencies": [
-        "@cubby-ui/label"
-      ],
-      "dependencies": [
-        "@conform-to/react"
       ]
     },
     {

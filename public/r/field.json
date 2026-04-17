@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "field",
+  "title": "Field",
+  "description": "A field component.",
+  "registryDependencies": [
+    "@cubby-ui/input"
+  ],
+  "files": [
+    {
+      "path": "registry/default/field/field.tsx",
+      "content": "\"use client\";\n\nimport { Field as BaseField } from \"@base-ui/react/field\";\n\nimport { cn } from \"@/lib/utils\";\nimport { inputVariants } from \"@/registry/default/input/input\";\n\nfunction Field({ className, ...props }: BaseField.Root.Props) {\n  return (\n    <BaseField.Root\n      data-slot=\"field\"\n      className={cn(\"grid gap-2\", className)}\n      {...props}\n    />\n  );\n}\n\nfunction FieldLabel({ className, ...props }: BaseField.Label.Props) {\n  return (\n    <BaseField.Label\n      data-slot=\"field-label\"\n      className={cn(\n        \"text-foreground flex items-center gap-2 text-sm leading-5 font-medium select-none\",\n        \"data-disabled:pointer-events-none data-disabled:opacity-50\",\n        \"data-invalid:text-destructive\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nfunction FieldControl({ className, ...props }: BaseField.Control.Props) {\n  return (\n    <BaseField.Control\n      data-slot=\"field-control\"\n      className={cn(inputVariants(), className)}\n      {...props}\n    />\n  );\n}\n\nfunction FieldDescription({ className, ...props }: BaseField.Description.Props) {\n  return (\n    <BaseField.Description\n      data-slot=\"field-description\"\n      className={cn(\"text-muted-foreground text-sm\", className)}\n      {...props}\n    />\n  );\n}\n\nfunction FieldError({ className, ...props }: BaseField.Error.Props) {\n  return (\n    <BaseField.Error\n      data-slot=\"field-error\"\n      className={cn(\"text-destructive text-sm\", className)}\n      {...props}\n    />\n  );\n}\n\nfunction FieldItem({ className, ...props }: BaseField.Item.Props) {\n  return (\n    <BaseField.Item\n      data-slot=\"field-item\"\n      className={cn(\"flex items-center gap-3\", className)}\n      {...props}\n    />\n  );\n}\n\nconst FieldValidity = BaseField.Validity;\n\nexport {\n  Field,\n  FieldLabel,\n  FieldControl,\n  FieldDescription,\n  FieldError,\n  FieldItem,\n  FieldValidity,\n};\n",
+      "type": "registry:ui",
+      "target": "components/ui/cubby-ui/field.tsx"
+    }
+  ],
+  "type": "registry:ui"
+}

@@ -36,6 +36,8 @@
     "@cubby-ui/drawer",
     "@cubby-ui/dropdown-menu",
     "@cubby-ui/fancy-button",
+    "@cubby-ui/field",
+    "@cubby-ui/fieldset",
     "@cubby-ui/form",
     "@cubby-ui/input",
     "@cubby-ui/input-group",

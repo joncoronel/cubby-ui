@@ -36,6 +36,7 @@ import autocomplete_autocomplete_basic from "@/registry/examples/autocomplete/au
 import autocomplete_autocomplete_async from "@/registry/examples/autocomplete/autocomplete-async";
 import autocomplete_autocomplete_auto_highlight from "@/registry/examples/autocomplete/autocomplete-auto-highlight";
 import autocomplete_autocomplete_clear from "@/registry/examples/autocomplete/autocomplete-clear";
+import autocomplete_autocomplete_field from "@/registry/examples/autocomplete/autocomplete-field";
 import autocomplete_autocomplete_fuzzy from "@/registry/examples/autocomplete/autocomplete-fuzzy";
 import autocomplete_autocomplete_grouped from "@/registry/examples/autocomplete/autocomplete-grouped";
 import autocomplete_autocomplete_inline from "@/registry/examples/autocomplete/autocomplete-inline";
@@ -100,12 +101,14 @@ import carousel_carousel_responsive_sizes from "@/registry/examples/carousel/car
 import checkbox_checkbox_basic from "@/registry/examples/checkbox/checkbox-basic";
 import checkbox_checkbox_controlled from "@/registry/examples/checkbox/checkbox-controlled";
 import checkbox_checkbox_disabled_state from "@/registry/examples/checkbox/checkbox-disabled-state";
+import checkbox_checkbox_field from "@/registry/examples/checkbox/checkbox-field";
 import checkbox_checkbox_form_example from "@/registry/examples/checkbox/checkbox-form-example";
 import checkbox_checkbox_with_label from "@/registry/examples/checkbox/checkbox-with-label";
 import checkbox_group_checkbox_group_basic from "@/registry/examples/checkbox-group/checkbox-group-basic";
 import checkbox_group_checkbox_group_cards from "@/registry/examples/checkbox-group/checkbox-group-cards";
 import checkbox_group_checkbox_group_controlled from "@/registry/examples/checkbox-group/checkbox-group-controlled";
 import checkbox_group_checkbox_group_disabled_options from "@/registry/examples/checkbox-group/checkbox-group-disabled-options";
+import checkbox_group_checkbox_group_field from "@/registry/examples/checkbox-group/checkbox-group-field";
 import checkbox_group_checkbox_group_form_example from "@/registry/examples/checkbox-group/checkbox-group-form-example";
 import checkbox_group_checkbox_group_nested from "@/registry/examples/checkbox-group/checkbox-group-nested";
 import checkbox_group_checkbox_group_parent from "@/registry/examples/checkbox-group/checkbox-group-parent";
@@ -139,6 +142,7 @@ import combobox_combobox_basic from "@/registry/examples/combobox/combobox-basic
 import combobox_combobox_async from "@/registry/examples/combobox/combobox-async";
 import combobox_combobox_async_multiple from "@/registry/examples/combobox/combobox-async-multiple";
 import combobox_combobox_creatable from "@/registry/examples/combobox/combobox-creatable";
+import combobox_combobox_field from "@/registry/examples/combobox/combobox-field";
 import combobox_combobox_grouped from "@/registry/examples/combobox/combobox-grouped";
 import combobox_combobox_input_inside_popup from "@/registry/examples/combobox/combobox-input-inside-popup";
 import combobox_combobox_multiple from "@/registry/examples/combobox/combobox-multiple";
@@ -210,8 +214,32 @@ import fancy_button_fancy_button_disabled from "@/registry/examples/fancy-button
 import fancy_button_fancy_button_loading from "@/registry/examples/fancy-button/fancy-button-loading";
 import fancy_button_fancy_button_sizes from "@/registry/examples/fancy-button/fancy-button-sizes";
 import fancy_button_fancy_button_with_icons from "@/registry/examples/fancy-button/fancy-button-with-icons";
+import field_field_demo from "@/registry/examples/field/field-demo";
+import field_field_custom_validation from "@/registry/examples/field/field-custom-validation";
+import field_field_disabled from "@/registry/examples/field/field-disabled";
+import field_field_validation from "@/registry/examples/field/field-validation";
+import field_field_with_checkbox from "@/registry/examples/field/field-with-checkbox";
+import field_field_with_checkbox_group from "@/registry/examples/field/field-with-checkbox-group";
+import field_field_with_description from "@/registry/examples/field/field-with-description";
+import field_field_with_radio_group from "@/registry/examples/field/field-with-radio-group";
+import field_field_with_select from "@/registry/examples/field/field-with-select";
+import field_field_with_slider from "@/registry/examples/field/field-with-slider";
+import field_field_with_switch from "@/registry/examples/field/field-with-switch";
+import fieldset_fieldset_demo from "@/registry/examples/fieldset/fieldset-demo";
+import fieldset_fieldset_with_checkbox_group from "@/registry/examples/fieldset/fieldset-with-checkbox-group";
+import fieldset_fieldset_with_radio_group from "@/registry/examples/fieldset/fieldset-with-radio-group";
+import form_form_demo from "@/registry/examples/form/form-demo";
+import form_form_complete from "@/registry/examples/form/form-complete";
+import form_form_constraint_validation from "@/registry/examples/form/form-constraint-validation";
+import form_form_on_form_submit from "@/registry/examples/form/form-on-form-submit";
+import form_form_react_hook_form from "@/registry/examples/form/form-react-hook-form";
+import form_form_server_validation from "@/registry/examples/form/form-server-validation";
+import form_form_tanstack_form from "@/registry/examples/form/form-tanstack-form";
+import form_form_use_action_state from "@/registry/examples/form/form-use-action-state";
+import form_form_zod_validation from "@/registry/examples/form/form-zod-validation";
 import input_input_demo from "@/registry/examples/input/input-demo";
 import input_input_disabled from "@/registry/examples/input/input-disabled";
+import input_input_field from "@/registry/examples/input/input-field";
 import input_input_with_label from "@/registry/examples/input/input-with-label";
 import input_group_input_group_demo from "@/registry/examples/input-group/input-group-demo";
 import input_group_input_group_keyboard_shortcut from "@/registry/examples/input-group/input-group-keyboard-shortcut";
@@ -248,9 +276,17 @@ import navigation_menu_navigation_menu_custom_styled_dropdown from "@/registry/e
 import navigation_menu_navigation_menu_flexible_nextjs_link from "@/registry/examples/navigation-menu/navigation-menu-flexible-nextjs-link";
 import navigation_menu_navigation_menu_nested_submenus from "@/registry/examples/navigation-menu/navigation-menu-nested-submenus";
 import navigation_menu_navigation_menu_with_direct_links from "@/registry/examples/navigation-menu/navigation-menu-with-direct-links";
+import number_field_number_field_demo from "@/registry/examples/number-field/number-field-demo";
+import number_field_number_field_controlled from "@/registry/examples/number-field/number-field-controlled";
+import number_field_number_field_disabled from "@/registry/examples/number-field/number-field-disabled";
+import number_field_number_field_field from "@/registry/examples/number-field/number-field-field";
+import number_field_number_field_format from "@/registry/examples/number-field/number-field-format";
+import number_field_number_field_min_max from "@/registry/examples/number-field/number-field-min-max";
+import number_field_number_field_scrub_area from "@/registry/examples/number-field/number-field-scrub-area";
 import otp_field_otp_field_basic from "@/registry/examples/otp-field/otp-field-basic";
 import otp_field_otp_field_alphanumeric from "@/registry/examples/otp-field/otp-field-alphanumeric";
 import otp_field_otp_field_custom_sanitization from "@/registry/examples/otp-field/otp-field-custom-sanitization";
+import otp_field_otp_field_field from "@/registry/examples/otp-field/otp-field-field";
 import otp_field_otp_field_grouped from "@/registry/examples/otp-field/otp-field-grouped";
 import otp_field_otp_field_masked from "@/registry/examples/otp-field/otp-field-masked";
 import otp_field_otp_field_placeholder from "@/registry/examples/otp-field/otp-field-placeholder";
@@ -277,6 +313,7 @@ import progress_progress_with_label from "@/registry/examples/progress/progress-
 import radio_group_radio_group_basic from "@/registry/examples/radio-group/radio-group-basic";
 import radio_group_radio_group_controlled from "@/registry/examples/radio-group/radio-group-controlled";
 import radio_group_radio_group_disabled_options from "@/registry/examples/radio-group/radio-group-disabled-options";
+import radio_group_radio_group_field from "@/registry/examples/radio-group/radio-group-field";
 import radio_group_radio_group_with_descriptions from "@/registry/examples/radio-group/radio-group-with-descriptions";
 import resizable_resizable_basic from "@/registry/examples/resizable/resizable-basic";
 import resizable_resizable_min_max_size from "@/registry/examples/resizable/resizable-min-max-size";
@@ -293,6 +330,7 @@ import scroll_area_scroll_area_vertical_scroll from "@/registry/examples/scroll-
 import select_select_basic from "@/registry/examples/select/select-basic";
 import select_select_align_item_with_trigger from "@/registry/examples/select/select-align-item-with-trigger";
 import select_select_controlled from "@/registry/examples/select/select-controlled";
+import select_select_field from "@/registry/examples/select/select-field";
 import select_select_multiple from "@/registry/examples/select/select-multiple";
 import select_select_object_values from "@/registry/examples/select/select-object-values";
 import select_select_with_groups from "@/registry/examples/select/select-with-groups";
@@ -312,6 +350,7 @@ import skeleton_skeleton_wrap from "@/registry/examples/skeleton/skeleton-wrap";
 import slider_slider_basic from "@/registry/examples/slider/slider-basic";
 import slider_slider_controlled from "@/registry/examples/slider/slider-controlled";
 import slider_slider_disabled_state from "@/registry/examples/slider/slider-disabled-state";
+import slider_slider_field from "@/registry/examples/slider/slider-field";
 import slider_slider_range from "@/registry/examples/slider/slider-range";
 import slider_slider_variant from "@/registry/examples/slider/slider-variant";
 import slider_slider_vertical from "@/registry/examples/slider/slider-vertical";
@@ -319,6 +358,7 @@ import slider_slider_with_steps from "@/registry/examples/slider/slider-with-ste
 import slider_slider_with_value from "@/registry/examples/slider/slider-with-value";
 import switch_switch_basic from "@/registry/examples/switch/switch-basic";
 import switch_switch_card from "@/registry/examples/switch/switch-card";
+import switch_switch_field from "@/registry/examples/switch/switch-field";
 import switch_switch_pill from "@/registry/examples/switch/switch-pill";
 import table_table_basic from "@/registry/examples/table/table-basic";
 import table_table_bordered from "@/registry/examples/table/table-bordered";
@@ -803,17 +843,35 @@ export const componentMetadata = {
     "examples": {},
     "reference": []
   },
+  "field": {
+    "name": "field",
+    "title": "Field",
+    "description": "A field component.",
+    "category": "UI",
+    "registryDependencies": [
+      "@cubby-ui/input"
+    ],
+    "dependencies": [],
+    "examples": {},
+    "reference": []
+  },
+  "fieldset": {
+    "name": "fieldset",
+    "title": "Fieldset",
+    "description": "A fieldset component.",
+    "category": "UI",
+    "registryDependencies": [],
+    "dependencies": [],
+    "examples": {},
+    "reference": []
+  },
   "form": {
     "name": "form",
     "title": "Form",
     "description": "A form component.",
     "category": "UI",
-    "registryDependencies": [
-      "@cubby-ui/label"
-    ],
-    "dependencies": [
-      "@conform-to/react"
-    ],
+    "registryDependencies": [],
+    "dependencies": [],
     "examples": {},
     "reference": []
   },
@@ -913,6 +971,16 @@ export const componentMetadata = {
     "dependencies": [
       "class-variance-authority"
     ],
+    "examples": {},
+    "reference": []
+  },
+  "number-field": {
+    "name": "number-field",
+    "title": "Number Field",
+    "description": "A number-field component.",
+    "category": "UI",
+    "registryDependencies": [],
+    "dependencies": [],
     "examples": {},
     "reference": []
   },
@@ -1456,6 +1524,11 @@ export const exampleRegistry = {
       "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  AutocompleteEmpty,\n  AutocompleteInput,\n  AutocompleteItem,\n  AutocompleteList,\n  AutocompletePopup,\n  AutocompletePortal,\n  AutocompletePositioner,\n  AutocompleteRoot,\n} from \"@/components/ui/cubby-ui/autocomplete\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\ninterface Tag {\n  id: string;\n  value: string;\n}\n\nconst tags: Tag[] = [\n  { id: \"t1\", value: \"feature\" },\n  { id: \"t2\", value: \"fix\" },\n  { id: \"t3\", value: \"bug\" },\n  { id: \"t4\", value: \"docs\" },\n  { id: \"t5\", value: \"internal\" },\n  { id: \"t6\", value: \"mobile\" },\n  { id: \"c-accordion\", value: \"component: accordion\" },\n  { id: \"c-alert-dialog\", value: \"component: alert dialog\" },\n  { id: \"c-autocomplete\", value: \"component: autocomplete\" },\n  { id: \"c-avatar\", value: \"component: avatar\" },\n  { id: \"c-checkbox\", value: \"component: checkbox\" },\n  { id: \"c-checkbox-group\", value: \"component: checkbox group\" },\n  { id: \"c-collapsible\", value: \"component: collapsible\" },\n  { id: \"c-combobox\", value: \"component: combobox\" },\n  { id: \"c-context-menu\", value: \"component: context menu\" },\n  { id: \"c-dialog\", value: \"component: dialog\" },\n  { id: \"c-field\", value: \"component: field\" },\n  { id: \"c-fieldset\", value: \"component: fieldset\" },\n  { id: \"c-form\", value: \"component: form\" },\n  { id: \"c-input\", value: \"component: input\" },\n  { id: \"c-menu\", value: \"component: menu\" },\n  { id: \"c-popover\", value: \"component: popover\" },\n  { id: \"c-select\", value: \"component: select\" },\n  { id: \"c-tabs\", value: \"component: tabs\" },\n  { id: \"c-toast\", value: \"component: toast\" },\n  { id: \"c-tooltip\", value: \"component: tooltip\" },\n];\n\nexport default function AutocompleteClearExample() {\n  const [value, setValue] = React.useState(\"\");\n\n  return (\n    <AutocompleteRoot items={tags} value={value} onValueChange={setValue}>\n      <Label className=\"w-full max-w-xs\">\n        Search with clear button\n        <AutocompleteInput placeholder=\"e.g. feature or component\" showClear />\n      </Label>\n\n      <AutocompletePortal>\n        <AutocompletePositioner sideOffset={4}>\n          <AutocompletePopup>\n            <AutocompleteEmpty>\n              No tags found for &quot;{value}&quot;\n            </AutocompleteEmpty>\n\n            <AutocompleteList>\n              {(tag: Tag) => (\n                <AutocompleteItem key={tag.id} value={tag}>\n                  {tag.value}\n                </AutocompleteItem>\n              )}\n            </AutocompleteList>\n          </AutocompletePopup>\n        </AutocompletePositioner>\n      </AutocompletePortal>\n    </AutocompleteRoot>\n  );\n}\n"
     },
     {
+      "title": "Field",
+      "importPath": "autocomplete-field",
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  AutocompleteRoot,\n  AutocompleteInput,\n  AutocompleteItem,\n  AutocompleteList,\n  AutocompletePopup,\n  AutocompletePortal,\n  AutocompletePositioner,\n  AutocompleteEmpty,\n} from \"@/components/ui/cubby-ui/autocomplete\";\nimport {\n  Field,\n  FieldDescription,\n  FieldError,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\n\ninterface Image {\n  url: string;\n  name: string;\n}\n\nconst images: Image[] = [\n  { url: \"docker.io/library/nginx:1.29-alpine\", name: \"nginx:1.29-alpine\" },\n  { url: \"docker.io/library/node:22-slim\", name: \"node:22-slim\" },\n  { url: \"docker.io/library/postgres:18\", name: \"postgres:18\" },\n  { url: \"docker.io/library/redis:8.2.2-alpine\", name: \"redis:8.2.2-alpine\" },\n];\n\nexport default function AutocompleteField() {\n  return (\n    <Form\n      className=\"space-y-4\"\n      onFormSubmit={(values) => {\n        alert(JSON.stringify(values, null, 2));\n      }}\n    >\n      <Field name=\"containerImage\">\n        <AutocompleteRoot\n          items={images}\n          itemToStringValue={(item: Image) => item.url}\n          required\n        >\n          <FieldLabel>Container image</FieldLabel>\n          <AutocompleteInput placeholder=\"e.g. docker.io/library/node:latest\" />\n          <FieldDescription>\n            Enter a registry URL with optional tags\n          </FieldDescription>\n          <AutocompletePortal>\n            <AutocompletePositioner>\n              <AutocompletePopup>\n                <AutocompleteEmpty>No images found.</AutocompleteEmpty>\n                <AutocompleteList>\n                  {(image: Image) => (\n                    <AutocompleteItem key={image.url} value={image}>\n                      {image.name}\n                    </AutocompleteItem>\n                  )}\n                </AutocompleteList>\n              </AutocompletePopup>\n            </AutocompletePositioner>\n          </AutocompletePortal>\n        </AutocompleteRoot>\n        <FieldError />\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\">\n        Submit\n      </Button>\n    </Form>\n  );\n}\n"
+    },
+    {
       "title": "Fuzzy",
       "importPath": "autocomplete-fuzzy",
       "source": "import * as React from \"react\";\nimport {\n  AutocompleteEmpty,\n  AutocompleteInput,\n  AutocompleteItem,\n  AutocompleteList,\n  AutocompletePopup,\n  AutocompletePortal,\n  AutocompletePositioner,\n  AutocompleteRoot,\n  AutocompleteValue,\n} from \"@/components/ui/cubby-ui/autocomplete\";\nimport { useFuzzyFilter } from \"@/registry/default/hooks/use-fuzzy-filter\";\nimport { highlightText } from \"@/registry/default/lib/highlight-text\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\ninterface Documentation {\n  title: string;\n  description: string;\n  category: string;\n}\n\nconst documentationItems: Documentation[] = [\n  {\n    title: \"React Hooks Guide\",\n    description:\n      \"Learn how to use React Hooks like useState, useEffect, and custom hooks\",\n    category: \"React\",\n  },\n  {\n    title: \"JavaScript Array Methods\",\n    description:\n      \"Master array methods like map, filter, reduce, and forEach in JavaScript\",\n    category: \"JavaScript\",\n  },\n  {\n    title: \"CSS Flexbox Layout\",\n    description: \"Complete guide to CSS Flexbox for responsive web design\",\n    category: \"CSS\",\n  },\n  {\n    title: \"TypeScript Interfaces\",\n    description: \"Understanding TypeScript interfaces and type definitions\",\n    category: \"TypeScript\",\n  },\n  {\n    title: \"React Performance Optimization\",\n    description:\n      \"Tips and techniques for optimizing React application performance\",\n    category: \"React\",\n  },\n  {\n    title: \"HTML Semantic Elements\",\n    description:\n      \"Using semantic HTML elements for better accessibility and SEO\",\n    category: \"HTML\",\n  },\n  {\n    title: \"Node.js Express Server\",\n    description: \"Building RESTful APIs with Node.js and Express framework\",\n    category: \"Node.js\",\n  },\n  {\n    title: \"Vue Composition API\",\n    description: \"Modern Vue.js development using the Composition API\",\n    category: \"Vue.js\",\n  },\n  {\n    title: \"Angular Components\",\n    description: \"Creating reusable Angular components with TypeScript\",\n    category: \"Angular\",\n  },\n  {\n    title: \"Python Django Framework\",\n    description: \"Web development with Python Django framework\",\n    category: \"Python\",\n  },\n  {\n    title: \"CSS Grid Layout\",\n    description: \"Advanced CSS Grid techniques for complex layouts\",\n    category: \"CSS\",\n  },\n  {\n    title: \"React Testing Library\",\n    description: \"Testing React components with React Testing Library\",\n    category: \"React\",\n  },\n  {\n    title: \"MongoDB Queries\",\n    description: \"Advanced MongoDB queries and aggregation pipelines\",\n    category: \"Database\",\n  },\n  {\n    title: \"Webpack Configuration\",\n    description: \"Optimizing Webpack configuration for production builds\",\n    category: \"Build Tools\",\n  },\n  {\n    title: \"SASS/SCSS Guide\",\n    description: \"Writing maintainable CSS with SASS and SCSS\",\n    category: \"CSS\",\n  },\n];\n\nexport default function AutocompleteFuzzy() {\n  const { filterItem } = useFuzzyFilter<Documentation>({\n    keys: [\n      { key: \"title\", threshold: \"contains\" },\n      { key: \"description\", threshold: \"word-starts-with\" },\n      \"category\",\n    ],\n  });\n\n  return (\n    <AutocompleteRoot\n      items={documentationItems}\n      filter={filterItem}\n      itemToStringValue={(item) => item.title}\n    >\n      <Label className=\"w-full max-w-xs\">\n        Fuzzy search documentation\n        <AutocompleteInput placeholder=\"e.g. React, hooks, css grid\" />\n      </Label>\n\n      <AutocompletePortal>\n        <AutocompletePositioner sideOffset={4}>\n          <AutocompletePopup>\n            <AutocompleteEmpty>\n              No results found for &quot;\n              <AutocompleteValue />\n              &quot;\n            </AutocompleteEmpty>\n\n            <AutocompleteList>\n              {(item: Documentation) => (\n                <AutocompleteItem key={item.title} value={item}>\n                  <AutocompleteValue>\n                    {(value) => (\n                      <div className=\"flex w-full flex-col gap-1\">\n                        <div className=\"flex items-center justify-between gap-3\">\n                          <div className=\"flex-1 leading-5 font-medium\">\n                            {highlightText(item.title, value)}\n                          </div>\n                          <span className=\"text-muted-foreground bg-muted rounded px-2 py-1 text-xs\">\n                            {item.category}\n                          </span>\n                        </div>\n                        <div className=\"text-muted-foreground text-sm leading-5\">\n                          {highlightText(item.description, value)}\n                        </div>\n                      </div>\n                    )}\n                  </AutocompleteValue>\n                </AutocompleteItem>\n              )}\n            </AutocompleteList>\n          </AutocompletePopup>\n        </AutocompletePositioner>\n      </AutocompletePortal>\n    </AutocompleteRoot>\n  );\n}\n"
@@ -1796,6 +1869,11 @@ export const exampleRegistry = {
       "source": "import { Checkbox } from \"@/components/ui/cubby-ui/checkbox\"\nimport { Label } from \"@/components/ui/cubby-ui/label\"\n\nexport default function CheckboxDisabledState() {\n  return (\n    <div className=\"space-y-2\">\n      <div className=\"flex items-center space-x-2\">\n        <Checkbox id=\"disabled1\" disabled />\n        <Label htmlFor=\"disabled1\" className=\"text-muted-foreground\">\n          Disabled unchecked\n        </Label>\n      </div>\n      <div className=\"flex items-center space-x-2\">\n        <Checkbox id=\"disabled2\" disabled checked />\n        <Label htmlFor=\"disabled2\" className=\"text-muted-foreground\">\n          Disabled checked\n        </Label>\n      </div>\n    </div>\n  )\n}"
     },
     {
+      "title": "Field",
+      "importPath": "checkbox-field",
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Checkbox } from \"@/components/ui/cubby-ui/checkbox\";\nimport { Field, FieldError, FieldLabel } from \"@/components/ui/cubby-ui/field\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\n\nexport default function CheckboxField() {\n  return (\n    <Form\n      className=\"space-y-4\"\n      onFormSubmit={(values) => {\n        alert(JSON.stringify(values, null, 2));\n      }}\n    >\n      <Field name=\"terms\">\n        <FieldLabel>\n          <Checkbox required />\n          I accept the terms and conditions\n        </FieldLabel>\n        <FieldError match=\"valueMissing\">\n          You must accept the terms to continue\n        </FieldError>\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\">\n        Submit\n      </Button>\n    </Form>\n  );\n}\n"
+    },
+    {
       "title": "Form Example",
       "importPath": "checkbox-form-example",
       "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { Checkbox } from \"@/components/ui/cubby-ui/checkbox\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { toast } from \"@/components/ui/cubby-ui/toast\";\n\nexport default function CheckboxFormExample() {\n  const [accepted, setAccepted] = React.useState(false);\n\n  const handleSubmit = (e: React.FormEvent) => {\n    e.preventDefault();\n\n    if (!accepted) {\n      toast.error({\n        title: \"Terms not accepted\",\n        description: \"Please accept the terms and conditions to continue.\",\n      });\n      return;\n    }\n\n    toast.success({\n      title: \"Form submitted\",\n      description: \"Thank you for accepting the terms.\",\n    });\n  };\n\n  return (\n    <form onSubmit={handleSubmit} className=\"space-y-4\">\n      <Label className=\"flex-row items-start gap-3 font-normal\">\n        <Checkbox\n          checked={accepted}\n          onCheckedChange={(value) => setAccepted(value as boolean)}\n          className=\"mt-0.5\"\n        />\n        <span>\n          I agree to the terms and conditions\n        </span>\n      </Label>\n      <Button variant=\"neutral\" type=\"submit\">Submit</Button>\n    </form>\n  );\n}\n"
@@ -1826,6 +1904,11 @@ export const exampleRegistry = {
       "title": "Disabled Options",
       "importPath": "checkbox-group-disabled-options",
       "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { CheckboxGroup } from \"@/components/ui/cubby-ui/checkbox-group\";\nimport { Checkbox } from \"@/components/ui/cubby-ui/checkbox\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function CheckboxGroupDisabledOptions() {\n  const id = React.useId();\n\n  return (\n    <CheckboxGroup>\n      <div className=\"flex items-center space-x-2\">\n        <Checkbox id={`${id}-read`} defaultChecked />\n        <Label htmlFor={`${id}-read`}>Read</Label>\n      </div>\n      <div className=\"flex items-center space-x-2\">\n        <Checkbox id={`${id}-write`} />\n        <Label htmlFor={`${id}-write`}>Write</Label>\n      </div>\n      <div className=\"flex items-center space-x-2\">\n        <Checkbox id={`${id}-admin`} disabled />\n        <Label htmlFor={`${id}-admin`} className=\"text-muted-foreground\">\n          Admin (requires upgrade)\n        </Label>\n      </div>\n    </CheckboxGroup>\n  );\n}"
+    },
+    {
+      "title": "Field",
+      "importPath": "checkbox-group-field",
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Checkbox } from \"@/components/ui/cubby-ui/checkbox\";\nimport { CheckboxGroup } from \"@/components/ui/cubby-ui/checkbox-group\";\nimport {\n  Field,\n  FieldError,\n  FieldItem,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Fieldset, FieldsetLegend } from \"@/components/ui/cubby-ui/fieldset\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\n\nexport default function CheckboxGroupField() {\n  return (\n    <Form\n      className=\"space-y-4\"\n      onFormSubmit={(values) => {\n        alert(JSON.stringify(values, null, 2));\n      }}\n    >\n      <Field name=\"skills\">\n        <Fieldset render={<CheckboxGroup defaultValue={[]} />}>\n          <FieldsetLegend>Skills</FieldsetLegend>\n          {[\"React\", \"TypeScript\", \"Node.js\", \"Python\"].map((skill) => (\n            <FieldItem key={skill}>\n              <FieldLabel>\n                <Checkbox value={skill.toLowerCase().replace(\".\", \"\")} />\n                {skill}\n              </FieldLabel>\n            </FieldItem>\n          ))}\n        </Fieldset>\n        <FieldError />\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\">\n        Submit\n      </Button>\n    </Form>\n  );\n}\n"
     },
     {
       "title": "Form Example",
@@ -1999,6 +2082,11 @@ export const exampleRegistry = {
       "title": "Creatable",
       "importPath": "combobox-creatable",
       "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { X, Plus } from \"lucide-react\";\nimport {\n  Combobox,\n  ComboboxChipInput,\n  ComboboxItem,\n  ComboboxList,\n  ComboboxChips,\n  ComboboxChip,\n  ComboboxChipRemove,\n  ComboboxValue,\n  ComboboxPopup,\n  ComboboxEmpty,\n  ComboboxLabel,\n} from \"@/components/ui/cubby-ui/combobox\";\nimport { useCreatableCombobox } from \"@/hooks/cubby-ui/use-creatable-combobox\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Input } from \"@/components/ui/cubby-ui/input\";\nimport {\n  Dialog,\n  DialogContent,\n  DialogHeader,\n  DialogBody,\n  DialogTitle,\n  DialogDescription,\n  DialogFooter,\n} from \"@/components/ui/cubby-ui/dialog\";\n\nexport default function ComboboxCreatable() {\n  const [items, setItems] = React.useState<LabelItem[]>(initialLabels);\n  const [selectedItems, setSelectedItems] = React.useState<LabelItem[]>([]);\n\n  const {\n    itemsWithCreatable,\n    comboboxProps,\n    dialogProps,\n    dialogInputProps,\n    onDialogSubmit,\n    handleCancel,\n  } = useCreatableCombobox({\n    items,\n    onItemsChange: setItems,\n    selectedItems,\n    onSelectedItemsChange: setSelectedItems,\n  });\n\n  return (\n    <>\n      <Combobox items={itemsWithCreatable} multiple {...comboboxProps}>\n        <div className=\"flex w-full max-w-xs flex-col gap-1\">\n          <ComboboxLabel>Labels</ComboboxLabel>\n          <ComboboxChips>\n            <ComboboxValue>\n              {(value: LabelItem[]) => (\n                <>\n                  {value.map((label) => (\n                    <ComboboxChip key={label.id} aria-label={label.value}>\n                      {label.value}\n                      <ComboboxChipRemove aria-label=\"Remove\">\n                        <X className=\"h-3 w-3\" />\n                      </ComboboxChipRemove>\n                    </ComboboxChip>\n                  ))}\n                  <ComboboxChipInput\n                    placeholder={value.length > 0 ? \"\" : \"e.g. bug\"}\n                  />\n                </>\n              )}\n            </ComboboxValue>\n          </ComboboxChips>\n        </div>\n\n        <ComboboxPopup>\n          <ComboboxEmpty>No labels found.</ComboboxEmpty>\n          <ComboboxList>\n            {(item: LabelItem) =>\n              item.creatable ? (\n                <ComboboxItem\n                  key={item.id}\n                  value={item}\n                  className=\"grid-cols-auto\"\n                >\n                  <div className=\"grid grid-cols-[1rem_1fr] items-center gap-2\">\n                    <Plus className=\"h-4 w-4\" />\n                    <span className=\"break-all\">\n                      Create &quot;{item.creatable}&quot;\n                    </span>\n                  </div>\n                </ComboboxItem>\n              ) : (\n                <ComboboxItem key={item.id} value={item}>\n                  {item.value}\n                </ComboboxItem>\n              )\n            }\n          </ComboboxList>\n        </ComboboxPopup>\n      </Combobox>\n\n      <Dialog {...dialogProps}>\n        <DialogContent showCloseButton={false}>\n          <form onSubmit={onDialogSubmit}>\n            <DialogHeader>\n              <DialogTitle>Create new label</DialogTitle>\n              <DialogDescription>Add a new label to select.</DialogDescription>\n            </DialogHeader>\n            <DialogBody>\n              <Input\n                key={dialogInputProps.defaultValue}\n                {...dialogInputProps}\n                placeholder=\"Label name\"\n                autoFocus\n              />\n            </DialogBody>\n            <DialogFooter>\n              <Button type=\"button\" variant=\"outline\" onClick={handleCancel}>\n                Cancel\n              </Button>\n              <Button type=\"submit\">Create</Button>\n            </DialogFooter>\n          </form>\n        </DialogContent>\n      </Dialog>\n    </>\n  );\n}\n\ninterface LabelItem {\n  creatable?: string;\n  id: string;\n  value: string;\n}\n\nconst initialLabels: LabelItem[] = [\n  { id: \"bug\", value: \"bug\" },\n  { id: \"docs\", value: \"documentation\" },\n  { id: \"enhancement\", value: \"enhancement\" },\n  { id: \"help-wanted\", value: \"help wanted\" },\n  { id: \"good-first-issue\", value: \"good first issue\" },\n];\n"
+    },
+    {
+      "title": "Field",
+      "importPath": "combobox-field",
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Combobox,\n  ComboboxEmpty,\n  ComboboxInput,\n  ComboboxItem,\n  ComboboxList,\n  ComboboxPopup,\n} from \"@/components/ui/cubby-ui/combobox\";\nimport { Field, FieldError, FieldLabel } from \"@/components/ui/cubby-ui/field\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\n\nconst regions = [\n  \"us-east-1\",\n  \"us-west-2\",\n  \"eu-central-1\",\n  \"eu-west-1\",\n  \"ap-southeast-1\",\n  \"ap-northeast-1\",\n];\n\nexport default function ComboboxField() {\n  return (\n    <Form\n      className=\"w-full max-w-3xs space-y-4\"\n      onFormSubmit={(values) => {\n        alert(JSON.stringify(values, null, 2));\n      }}\n    >\n      <Field name=\"region\">\n        <Combobox items={regions} required>\n          <FieldLabel>Region</FieldLabel>\n          <ComboboxInput placeholder=\"Search regions...\" />\n          <ComboboxPopup>\n            <ComboboxEmpty>No regions found.</ComboboxEmpty>\n            <ComboboxList>\n              {(region: string) => (\n                <ComboboxItem key={region} value={region}>\n                  {region}\n                </ComboboxItem>\n              )}\n            </ComboboxList>\n          </ComboboxPopup>\n        </Combobox>\n        <FieldError />\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\">\n        Submit\n      </Button>\n    </Form>\n  );\n}\n"
     },
     {
       "title": "Grouped",
@@ -2378,6 +2466,127 @@ export const exampleRegistry = {
       "source": "import { FancyButton } from \"@/components/ui/cubby-ui/fancy-button\";\nimport { Plus, Heart, Settings, Download, ArrowRight } from \"lucide-react\";\n\nexport default function FancyButtonWithIcons() {\n  return (\n    <div className=\"flex flex-col gap-6\">\n      {/* Icon only buttons */}\n      <div className=\"flex items-center gap-4\">\n        <FancyButton size=\"icon\">\n          <Plus />\n        </FancyButton>\n\n        <FancyButton size=\"icon\" color=\"#3b82f6\">\n          <Settings />\n        </FancyButton>\n      </div>\n\n      {/* Text with leading icons (with optical padding) */}\n      <div className=\"flex items-center gap-4\">\n        <FancyButton leftSection={<Download />}>Download</FancyButton>\n\n        <FancyButton leftSection={<Heart />} color=\"#ef4444\">\n          Favorite\n        </FancyButton>\n      </div>\n\n      {/* Text with trailing icons (with optical padding) */}\n      <div className=\"flex items-center gap-4\">\n        <FancyButton rightSection={<ArrowRight />}>Continue</FancyButton>\n\n        <FancyButton rightSection={<ArrowRight />} color=\"#8b5cf6\">\n          Next Step\n        </FancyButton>\n      </div>\n    </div>\n  );\n}\n"
     }
   ],
+  "field": [
+    {
+      "title": "Demo",
+      "importPath": "field-demo",
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Field,\n  FieldControl,\n  FieldDescription,\n  FieldError,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\n\nexport default function FieldDemo() {\n  return (\n    <Form\n      className=\"w-full max-w-sm space-y-4\"\n      onFormSubmit={(values) => {\n        alert(JSON.stringify(values, null, 2));\n      }}\n    >\n      <Field name=\"username\">\n        <FieldLabel>Username</FieldLabel>\n        <FieldControl required minLength={3} placeholder=\"Enter a username\" />\n        <FieldDescription>Must be at least 3 characters long</FieldDescription>\n        <FieldError />\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\">\n        Submit\n      </Button>\n    </Form>\n  );\n}\n"
+    },
+    {
+      "title": "Custom Validation",
+      "importPath": "field-custom-validation",
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Field,\n  FieldControl,\n  FieldDescription,\n  FieldError,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\n\nconst TAKEN_USERNAMES = [\"admin\", \"root\", \"superuser\", \"moderator\"];\n\nexport default function FieldCustomValidation() {\n  return (\n    <Form\n      className=\"w-full max-w-sm space-y-4\"\n      onFormSubmit={(values) => {\n        alert(`Username \"${values.username}\" is available!`);\n      }}\n    >\n      <Field\n        name=\"username\"\n        validationMode=\"onChange\"\n        validationDebounceTime={300}\n        validate={(value) => {\n          if (typeof value === \"string\" && TAKEN_USERNAMES.includes(value)) {\n            return `\"${value}\" is already taken`;\n          }\n          return null;\n        }}\n      >\n        <FieldLabel>Username</FieldLabel>\n        <FieldControl required minLength={3} placeholder=\"Choose a username\" />\n        <FieldDescription>\n          Try &quot;admin&quot; or &quot;root&quot; to see validation\n        </FieldDescription>\n        <FieldError />\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\">\n        Check availability\n      </Button>\n    </Form>\n  );\n}\n"
+    },
+    {
+      "title": "Disabled",
+      "importPath": "field-disabled",
+      "source": "import {\n  Field,\n  FieldControl,\n  FieldDescription,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\n\nexport default function FieldDisabled() {\n  return (\n    <Field name=\"username\" disabled>\n      <FieldLabel>Username</FieldLabel>\n      <FieldControl defaultValue=\"johndoe\" />\n      <FieldDescription>\n        Contact an administrator to change your username.\n      </FieldDescription>\n    </Field>\n  );\n}\n"
+    },
+    {
+      "title": "Validation",
+      "importPath": "field-validation",
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Field,\n  FieldControl,\n  FieldError,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\n\nexport default function FieldValidation() {\n  return (\n    <Form className=\"w-full max-w-sm space-y-4\">\n      <Field name=\"email\">\n        <FieldLabel>Email</FieldLabel>\n        <FieldControl type=\"email\" required placeholder=\"you@example.com\" />\n        <FieldError match=\"valueMissing\">Please enter your email</FieldError>\n        <FieldError match=\"typeMismatch\">\n          Please enter a valid email address\n        </FieldError>\n      </Field>\n      <Field name=\"password\">\n        <FieldLabel>Password</FieldLabel>\n        <FieldControl\n          type=\"password\"\n          required\n          minLength={8}\n          pattern=\"(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).*\"\n          placeholder=\"Enter a password\"\n        />\n        <FieldError match=\"valueMissing\">Please enter a password</FieldError>\n        <FieldError match=\"tooShort\">\n          Password must be at least 8 characters\n        </FieldError>\n        <FieldError match=\"patternMismatch\">\n          Must include uppercase, lowercase, and a number\n        </FieldError>\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\">\n        Submit\n      </Button>\n    </Form>\n  );\n}\n"
+    },
+    {
+      "title": "With Checkbox",
+      "importPath": "field-with-checkbox",
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Checkbox } from \"@/components/ui/cubby-ui/checkbox\";\nimport { Field, FieldError, FieldLabel } from \"@/components/ui/cubby-ui/field\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\n\nexport default function FieldWithCheckbox() {\n  return (\n    <Form\n      className=\"w-full max-w-sm space-y-4\"\n      onFormSubmit={(values) => {\n        alert(JSON.stringify(values, null, 2));\n      }}\n    >\n      <Field name=\"terms\">\n        <FieldLabel>\n          <Checkbox required />\n          I accept the terms and conditions\n        </FieldLabel>\n        <FieldError match=\"valueMissing\">\n          You must accept the terms to continue\n        </FieldError>\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\">\n        Submit\n      </Button>\n    </Form>\n  );\n}\n"
+    },
+    {
+      "title": "With Checkbox Group",
+      "importPath": "field-with-checkbox-group",
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Checkbox } from \"@/components/ui/cubby-ui/checkbox\";\nimport { CheckboxGroup } from \"@/components/ui/cubby-ui/checkbox-group\";\nimport {\n  Field,\n  FieldError,\n  FieldItem,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Fieldset, FieldsetLegend } from \"@/components/ui/cubby-ui/fieldset\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\n\nexport default function FieldWithCheckboxGroup() {\n  return (\n    <Form\n      className=\"w-full max-w-sm space-y-4\"\n      onFormSubmit={(values) => {\n        alert(JSON.stringify(values, null, 2));\n      }}\n    >\n      <Field name=\"interests\">\n        <Fieldset render={<CheckboxGroup defaultValue={[]} />}>\n          <FieldsetLegend>Interests</FieldsetLegend>\n          {[\"Design\", \"Development\", \"Marketing\"].map((interest) => (\n            <FieldItem key={interest}>\n              <FieldLabel>\n                <Checkbox value={interest.toLowerCase()} />\n                {interest}\n              </FieldLabel>\n            </FieldItem>\n          ))}\n        </Fieldset>\n        <FieldError />\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\">\n        Submit\n      </Button>\n    </Form>\n  );\n}\n"
+    },
+    {
+      "title": "With Description",
+      "importPath": "field-with-description",
+      "source": "import {\n  Field,\n  FieldControl,\n  FieldDescription,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\n\nexport default function FieldWithDescription() {\n  return (\n    <Field name=\"email\">\n      <FieldLabel>Email address</FieldLabel>\n      <FieldControl type=\"email\" placeholder=\"you@example.com\" />\n      <FieldDescription>\n        We&apos;ll never share your email with anyone else.\n      </FieldDescription>\n    </Field>\n  );\n}\n"
+    },
+    {
+      "title": "With Radio Group",
+      "importPath": "field-with-radio-group",
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Field,\n  FieldError,\n  FieldItem,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Fieldset, FieldsetLegend } from \"@/components/ui/cubby-ui/fieldset\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\nimport {\n  RadioGroup,\n  RadioGroupItem,\n} from \"@/components/ui/cubby-ui/radio-group\";\n\nexport default function FieldWithRadioGroup() {\n  return (\n    <Form\n      className=\"w-full max-w-sm space-y-4\"\n      onFormSubmit={(values) => {\n        alert(JSON.stringify(values, null, 2));\n      }}\n    >\n      <Field name=\"plan\">\n        <Fieldset render={<RadioGroup defaultValue=\"free\" />}>\n          <FieldsetLegend>Select a plan</FieldsetLegend>\n          <FieldItem>\n            <FieldLabel>\n              <RadioGroupItem value=\"free\" />\n              Free\n            </FieldLabel>\n          </FieldItem>\n          <FieldItem>\n            <FieldLabel>\n              <RadioGroupItem value=\"pro\" />\n              Pro\n            </FieldLabel>\n          </FieldItem>\n          <FieldItem>\n            <FieldLabel>\n              <RadioGroupItem value=\"enterprise\" />\n              Enterprise\n            </FieldLabel>\n          </FieldItem>\n        </Fieldset>\n        <FieldError />\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\">\n        Submit\n      </Button>\n    </Form>\n  );\n}\n"
+    },
+    {
+      "title": "With Select",
+      "importPath": "field-with-select",
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Field, FieldError } from \"@/components/ui/cubby-ui/field\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\nimport {\n  Select,\n  SelectContent,\n  SelectItem,\n  SelectLabel,\n  SelectTrigger,\n  SelectValue,\n} from \"@/components/ui/cubby-ui/select\";\n\nconst items = [\n  { label: \"United States\", value: \"us\" },\n  { label: \"Canada\", value: \"ca\" },\n  { label: \"United Kingdom\", value: \"uk\" },\n  { label: \"Germany\", value: \"de\" },\n  { label: \"Japan\", value: \"jp\" },\n];\n\nexport default function FieldWithSelect() {\n  return (\n    <Form\n      className=\"w-full max-w-sm space-y-4\"\n      onFormSubmit={(values) => {\n        alert(JSON.stringify(values, null, 2));\n      }}\n    >\n      <Field name=\"country\">\n        <Select items={items} required>\n          <div className=\"flex flex-col gap-1\">\n            <SelectLabel>Country</SelectLabel>\n            <SelectTrigger className=\"w-[200px]\">\n              <SelectValue placeholder=\"Select a country\" />\n            </SelectTrigger>\n          </div>\n          <SelectContent>\n            {items.map((item) => (\n              <SelectItem key={item.value} value={item.value}>\n                {item.label}\n              </SelectItem>\n            ))}\n          </SelectContent>\n        </Select>\n        <FieldError />\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\">\n        Submit\n      </Button>\n    </Form>\n  );\n}\n"
+    },
+    {
+      "title": "With Slider",
+      "importPath": "field-with-slider",
+      "source": "import {\n  Field,\n  FieldDescription,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Slider, SliderLabel, SliderValue } from \"@/components/ui/cubby-ui/slider\";\n\nexport default function FieldWithSlider() {\n  return (\n    <Field name=\"volume\">\n      <Slider defaultValue={[50]} className=\"w-full max-w-xs\">\n        <div className=\"flex items-center justify-between\">\n          <SliderLabel>Volume</SliderLabel>\n          <SliderValue />\n        </div>\n      </Slider>\n      <FieldDescription>Adjust the output volume level.</FieldDescription>\n    </Field>\n  );\n}\n"
+    },
+    {
+      "title": "With Switch",
+      "importPath": "field-with-switch",
+      "source": "import { Field, FieldDescription, FieldLabel } from \"@/components/ui/cubby-ui/field\";\nimport { Switch } from \"@/components/ui/cubby-ui/switch\";\n\nexport default function FieldWithSwitch() {\n  return (\n    <Field name=\"notifications\">\n      <FieldLabel>\n        Email notifications\n        <Switch defaultChecked />\n      </FieldLabel>\n      <FieldDescription>\n        Receive email notifications when someone mentions you.\n      </FieldDescription>\n    </Field>\n  );\n}\n"
+    }
+  ],
+  "fieldset": [
+    {
+      "title": "Demo",
+      "importPath": "fieldset-demo",
+      "source": "import {\n  Field,\n  FieldControl,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Fieldset, FieldsetLegend } from \"@/components/ui/cubby-ui/fieldset\";\n\nexport default function FieldsetDemo() {\n  return (\n    <Fieldset>\n      <FieldsetLegend>Shipping address</FieldsetLegend>\n      <Field name=\"firstName\">\n        <FieldLabel>First name</FieldLabel>\n        <FieldControl placeholder=\"John\" />\n      </Field>\n      <Field name=\"lastName\">\n        <FieldLabel>Last name</FieldLabel>\n        <FieldControl placeholder=\"Doe\" />\n      </Field>\n      <Field name=\"address\">\n        <FieldLabel>Street address</FieldLabel>\n        <FieldControl placeholder=\"123 Main St\" />\n      </Field>\n    </Fieldset>\n  );\n}\n"
+    },
+    {
+      "title": "With Checkbox Group",
+      "importPath": "fieldset-with-checkbox-group",
+      "source": "import { Checkbox } from \"@/components/ui/cubby-ui/checkbox\";\nimport { CheckboxGroup } from \"@/components/ui/cubby-ui/checkbox-group\";\nimport {\n  Field,\n  FieldDescription,\n  FieldItem,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Fieldset, FieldsetLegend } from \"@/components/ui/cubby-ui/fieldset\";\n\nexport default function FieldsetWithCheckboxGroup() {\n  return (\n    <Field name=\"permissions\">\n      <Fieldset render={<CheckboxGroup defaultValue={[\"read\"]} />}>\n        <FieldsetLegend>Permissions</FieldsetLegend>\n        <FieldItem>\n          <FieldLabel>\n            <Checkbox value=\"read\" />\n            Read\n          </FieldLabel>\n        </FieldItem>\n        <FieldItem>\n          <FieldLabel>\n            <Checkbox value=\"write\" />\n            Write\n          </FieldLabel>\n        </FieldItem>\n        <FieldItem>\n          <FieldLabel>\n            <Checkbox value=\"admin\" />\n            Admin\n          </FieldLabel>\n        </FieldItem>\n        <FieldDescription>\n          Select which permissions to grant this user.\n        </FieldDescription>\n      </Fieldset>\n    </Field>\n  );\n}\n"
+    },
+    {
+      "title": "With Radio Group",
+      "importPath": "fieldset-with-radio-group",
+      "source": "import { Field, FieldItem, FieldLabel } from \"@/components/ui/cubby-ui/field\";\nimport { Fieldset, FieldsetLegend } from \"@/components/ui/cubby-ui/fieldset\";\nimport {\n  RadioGroup,\n  RadioGroupItem,\n} from \"@/components/ui/cubby-ui/radio-group\";\n\nexport default function FieldsetWithRadioGroup() {\n  return (\n    <Field name=\"notifications\">\n      <Fieldset render={<RadioGroup defaultValue=\"all\" />}>\n        <FieldsetLegend>Notification preferences</FieldsetLegend>\n        <FieldItem>\n          <FieldLabel>\n            <RadioGroupItem value=\"all\" />\n            All notifications\n          </FieldLabel>\n        </FieldItem>\n        <FieldItem>\n          <FieldLabel>\n            <RadioGroupItem value=\"mentions\" />\n            Mentions only\n          </FieldLabel>\n        </FieldItem>\n        <FieldItem>\n          <FieldLabel>\n            <RadioGroupItem value=\"none\" />\n            None\n          </FieldLabel>\n        </FieldItem>\n      </Fieldset>\n    </Field>\n  );\n}\n"
+    }
+  ],
+  "form": [
+    {
+      "title": "Demo",
+      "importPath": "form-demo",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Field,\n  FieldControl,\n  FieldError,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\n\nasync function submitForm(\n  value: string,\n): Promise<{ error: string } | { error: null }> {\n  await new Promise((resolve) => setTimeout(resolve, 500));\n\n  try {\n    const url = new URL(value);\n    if (url.hostname.endsWith(\"example.com\")) {\n      return { error: \"The example domain is not allowed\" };\n    }\n  } catch {\n    return { error: \"This is not a valid URL\" };\n  }\n\n  return { error: null };\n}\n\nexport default function FormDemo() {\n  const [errors, setErrors] = React.useState<Record<string, string>>({});\n  const [loading, setLoading] = React.useState(false);\n\n  return (\n    <Form\n      className=\"w-full max-w-sm space-y-4\"\n      errors={errors}\n      onSubmit={async (event) => {\n        event.preventDefault();\n        const formData = new FormData(event.currentTarget);\n        const value = formData.get(\"url\") as string;\n\n        setLoading(true);\n        const response = await submitForm(value);\n        setLoading(false);\n\n        if (response.error) {\n          setErrors({ url: response.error });\n        } else {\n          setErrors({});\n          alert(\"Form submitted successfully!\");\n        }\n      }}\n    >\n      <Field name=\"url\">\n        <FieldLabel>Homepage</FieldLabel>\n        <FieldControl\n          type=\"url\"\n          required\n          defaultValue=\"https://example.com\"\n          placeholder=\"https://example.com\"\n          pattern=\"https?://.*\"\n        />\n        <FieldError />\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\" disabled={loading}>\n        {loading ? \"Submitting...\" : \"Submit\"}\n      </Button>\n    </Form>\n  );\n}\n"
+    },
+    {
+      "title": "Complete",
+      "importPath": "form-complete",
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Checkbox } from \"@/components/ui/cubby-ui/checkbox\";\nimport { CheckboxGroup } from \"@/components/ui/cubby-ui/checkbox-group\";\nimport {\n  Field,\n  FieldControl,\n  FieldDescription,\n  FieldError,\n  FieldItem,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Fieldset, FieldsetLegend } from \"@/components/ui/cubby-ui/fieldset\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\nimport {\n  RadioGroup,\n  RadioGroupItem,\n} from \"@/components/ui/cubby-ui/radio-group\";\nimport {\n  Select,\n  SelectContent,\n  SelectItem,\n  SelectLabel,\n  SelectTrigger,\n  SelectValue,\n} from \"@/components/ui/cubby-ui/select\";\nimport { Switch } from \"@/components/ui/cubby-ui/switch\";\n\nconst departments = [\n  { label: \"Engineering\", value: \"engineering\" },\n  { label: \"Design\", value: \"design\" },\n  { label: \"Marketing\", value: \"marketing\" },\n  { label: \"Sales\", value: \"sales\" },\n];\n\nexport default function FormComplete() {\n  return (\n    <Form\n      className=\"w-full max-w-md space-y-5\"\n      onFormSubmit={(values) => {\n        alert(JSON.stringify(values, null, 2));\n      }}\n    >\n      <Field name=\"fullName\">\n        <FieldLabel>Full name</FieldLabel>\n        <FieldControl required placeholder=\"Jane Doe\" />\n        <FieldError match=\"valueMissing\">Please enter your name</FieldError>\n      </Field>\n\n      <Field name=\"email\">\n        <FieldLabel>Email</FieldLabel>\n        <FieldControl type=\"email\" required placeholder=\"jane@company.com\" />\n        <FieldError match=\"valueMissing\">Email is required</FieldError>\n        <FieldError match=\"typeMismatch\">\n          Please enter a valid email address\n        </FieldError>\n      </Field>\n\n      <Field name=\"department\">\n        <Select items={departments} required>\n          <div className=\"flex flex-col gap-1\">\n            <SelectLabel>Department</SelectLabel>\n            <SelectTrigger className=\"w-[200px]\">\n              <SelectValue placeholder=\"Select department\" />\n            </SelectTrigger>\n          </div>\n          <SelectContent>\n            {departments.map((dept) => (\n              <SelectItem key={dept.value} value={dept.value}>\n                {dept.label}\n              </SelectItem>\n            ))}\n          </SelectContent>\n        </Select>\n        <FieldError />\n      </Field>\n\n      <Field name=\"role\">\n        <Fieldset render={<RadioGroup defaultValue=\"member\" />}>\n          <FieldsetLegend>Role</FieldsetLegend>\n          <FieldItem>\n            <FieldLabel>\n              <RadioGroupItem value=\"member\" />\n              Member\n            </FieldLabel>\n          </FieldItem>\n          <FieldItem>\n            <FieldLabel>\n              <RadioGroupItem value=\"lead\" />\n              Team Lead\n            </FieldLabel>\n          </FieldItem>\n          <FieldItem>\n            <FieldLabel>\n              <RadioGroupItem value=\"manager\" />\n              Manager\n            </FieldLabel>\n          </FieldItem>\n        </Fieldset>\n      </Field>\n\n      <Field name=\"skills\">\n        <Fieldset render={<CheckboxGroup defaultValue={[]} />}>\n          <FieldsetLegend>Skills</FieldsetLegend>\n          {[\"React\", \"TypeScript\", \"Node.js\", \"Python\"].map((skill) => (\n            <FieldItem key={skill}>\n              <FieldLabel>\n                <Checkbox value={skill.toLowerCase().replace(\".\", \"\")} />\n                {skill}\n              </FieldLabel>\n            </FieldItem>\n          ))}\n        </Fieldset>\n      </Field>\n\n      <Field name=\"notifications\">\n        <FieldLabel>\n          Email notifications\n          <Switch defaultChecked />\n        </FieldLabel>\n        <FieldDescription>\n          Receive updates about team activity.\n        </FieldDescription>\n      </Field>\n\n      <Field name=\"terms\">\n        <FieldLabel>\n          <Checkbox required />I agree to the terms of service\n        </FieldLabel>\n        <FieldError match=\"valueMissing\">\n          You must agree to the terms\n        </FieldError>\n      </Field>\n\n      <Button type=\"submit\" variant=\"neutral\">\n        Create account\n      </Button>\n    </Form>\n  );\n}\n"
+    },
+    {
+      "title": "Constraint Validation",
+      "importPath": "form-constraint-validation",
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Field,\n  FieldControl,\n  FieldDescription,\n  FieldError,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\n\nexport default function FormConstraintValidation() {\n  return (\n    <Form\n      className=\"w-full max-w-sm space-y-4\"\n      onFormSubmit={(values) => {\n        alert(JSON.stringify(values, null, 2));\n      }}\n    >\n      <Field name=\"website\">\n        <FieldLabel>Website</FieldLabel>\n        <FieldControl\n          type=\"url\"\n          required\n          pattern=\"https?://.*\"\n          placeholder=\"https://example.com\"\n        />\n        <FieldDescription>Must start with http:// or https://</FieldDescription>\n        <FieldError match=\"valueMissing\">Please enter a URL</FieldError>\n        <FieldError match=\"typeMismatch\">Please enter a valid URL</FieldError>\n        <FieldError match=\"patternMismatch\">\n          URL must start with http:// or https://\n        </FieldError>\n      </Field>\n      <Field name=\"age\">\n        <FieldLabel>Age</FieldLabel>\n        <FieldControl\n          type=\"number\"\n          required\n          min={13}\n          max={120}\n          placeholder=\"Enter your age\"\n        />\n        <FieldError match=\"valueMissing\">Please enter your age</FieldError>\n        <FieldError match=\"rangeUnderflow\">\n          You must be at least 13 years old\n        </FieldError>\n        <FieldError match=\"rangeOverflow\">\n          Please enter a valid age\n        </FieldError>\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\">\n        Submit\n      </Button>\n    </Form>\n  );\n}\n"
+    },
+    {
+      "title": "On Form Submit",
+      "importPath": "form-on-form-submit",
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Field,\n  FieldControl,\n  FieldDescription,\n  FieldError,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\n\nexport default function FormOnFormSubmit() {\n  return (\n    <Form\n      className=\"w-full max-w-sm space-y-4\"\n      onFormSubmit={(values) => {\n        alert(JSON.stringify(values, null, 2));\n      }}\n    >\n      <Field name=\"name\">\n        <FieldLabel>Name</FieldLabel>\n        <FieldControl required placeholder=\"Enter your name\" />\n        <FieldError />\n      </Field>\n      <Field name=\"email\">\n        <FieldLabel>Email</FieldLabel>\n        <FieldControl type=\"email\" required placeholder=\"you@example.com\" />\n        <FieldDescription>We&apos;ll send a confirmation email.</FieldDescription>\n        <FieldError />\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\">\n        Submit\n      </Button>\n    </Form>\n  );\n}\n"
+    },
+    {
+      "title": "React Hook Form",
+      "importPath": "form-react-hook-form",
+      "source": "\"use client\";\n\nimport { useForm, Controller } from \"react-hook-form\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Field,\n  FieldControl,\n  FieldError,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport {\n  Select,\n  SelectContent,\n  SelectItem,\n  SelectLabel,\n  SelectTrigger,\n  SelectValue,\n} from \"@/components/ui/cubby-ui/select\";\n\ninterface FormValues {\n  name: string;\n  email: string;\n  role: string;\n}\n\nconst roles = [\n  { label: \"Developer\", value: \"developer\" },\n  { label: \"Designer\", value: \"designer\" },\n  { label: \"Manager\", value: \"manager\" },\n];\n\nexport default function FormReactHookForm() {\n  const { control, handleSubmit } = useForm<FormValues>({\n    defaultValues: {\n      name: \"\",\n      email: \"\",\n      role: \"\",\n    },\n  });\n\n  function onSubmit(data: FormValues) {\n    alert(JSON.stringify(data, null, 2));\n  }\n\n  return (\n    <form\n      onSubmit={handleSubmit(onSubmit)}\n      className=\"w-full max-w-sm space-y-4\"\n    >\n      <Controller\n        name=\"name\"\n        control={control}\n        rules={{ required: \"Name is required\", minLength: { value: 2, message: \"At least 2 characters\" } }}\n        render={({ field: rhfField, fieldState }) => (\n          <Field\n            name=\"name\"\n            invalid={fieldState.invalid}\n            dirty={fieldState.isDirty}\n            touched={fieldState.isTouched}\n          >\n            <FieldLabel>Name</FieldLabel>\n            <FieldControl\n              placeholder=\"Enter your name\"\n              value={rhfField.value}\n              onChange={rhfField.onChange}\n              onBlur={rhfField.onBlur}\n              ref={rhfField.ref}\n            />\n            {fieldState.error && (\n              <FieldError match={true}>{fieldState.error.message}</FieldError>\n            )}\n          </Field>\n        )}\n      />\n      <Controller\n        name=\"email\"\n        control={control}\n        rules={{\n          required: \"Email is required\",\n          pattern: { value: /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/, message: \"Invalid email\" },\n        }}\n        render={({ field: rhfField, fieldState }) => (\n          <Field\n            name=\"email\"\n            invalid={fieldState.invalid}\n            dirty={fieldState.isDirty}\n            touched={fieldState.isTouched}\n          >\n            <FieldLabel>Email</FieldLabel>\n            <FieldControl\n              type=\"email\"\n              placeholder=\"you@example.com\"\n              value={rhfField.value}\n              onChange={rhfField.onChange}\n              onBlur={rhfField.onBlur}\n              ref={rhfField.ref}\n            />\n            {fieldState.error && (\n              <FieldError match={true}>{fieldState.error.message}</FieldError>\n            )}\n          </Field>\n        )}\n      />\n      <Controller\n        name=\"role\"\n        control={control}\n        rules={{ required: \"Please select a role\" }}\n        render={({ field: rhfField, fieldState }) => (\n          <Field\n            name=\"role\"\n            invalid={fieldState.invalid}\n            dirty={fieldState.isDirty}\n            touched={fieldState.isTouched}\n          >\n            <Select\n              items={roles}\n              value={rhfField.value}\n              onValueChange={rhfField.onChange}\n            >\n              <div className=\"flex flex-col gap-1\">\n                <SelectLabel>Role</SelectLabel>\n                <SelectTrigger className=\"w-[200px]\">\n                  <SelectValue placeholder=\"Select a role\" />\n                </SelectTrigger>\n              </div>\n              <SelectContent>\n                {roles.map((role) => (\n                  <SelectItem key={role.value} value={role.value}>\n                    {role.label}\n                  </SelectItem>\n                ))}\n              </SelectContent>\n            </Select>\n            {fieldState.error && (\n              <FieldError match={true}>{fieldState.error.message}</FieldError>\n            )}\n          </Field>\n        )}\n      />\n      <Button type=\"submit\" variant=\"neutral\">\n        Submit\n      </Button>\n    </form>\n  );\n}\n"
+    },
+    {
+      "title": "Server Validation",
+      "importPath": "form-server-validation",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Field,\n  FieldControl,\n  FieldError,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\n\nasync function simulateServerValidation(values: Record<string, unknown>) {\n  // Simulate network delay\n  await new Promise((resolve) => setTimeout(resolve, 500));\n\n  const errors: Record<string, string> = {};\n\n  if (values.email === \"taken@example.com\") {\n    errors.email = \"This email is already registered\";\n  }\n\n  if (values.username === \"admin\") {\n    errors.username = \"This username is reserved\";\n  }\n\n  return Object.keys(errors).length > 0 ? errors : null;\n}\n\nexport default function FormServerValidation() {\n  const [errors, setErrors] = React.useState<Record<string, string>>();\n  const [loading, setLoading] = React.useState(false);\n\n  return (\n    <Form\n      className=\"w-full max-w-sm space-y-4\"\n      errors={errors}\n      onFormSubmit={async (values) => {\n        setLoading(true);\n        setErrors(undefined);\n        const serverErrors = await simulateServerValidation(values);\n        setLoading(false);\n\n        if (serverErrors) {\n          setErrors(serverErrors);\n        } else {\n          alert(\"Form submitted successfully!\");\n        }\n      }}\n    >\n      <Field name=\"username\">\n        <FieldLabel>Username</FieldLabel>\n        <FieldControl required placeholder=\"Choose a username\" />\n        <FieldError />\n      </Field>\n      <Field name=\"email\">\n        <FieldLabel>Email</FieldLabel>\n        <FieldControl type=\"email\" required placeholder=\"you@example.com\" />\n        <FieldError />\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\" disabled={loading}>\n        {loading ? \"Submitting...\" : \"Submit\"}\n      </Button>\n    </Form>\n  );\n}\n"
+    },
+    {
+      "title": "Tanstack Form",
+      "importPath": "form-tanstack-form",
+      "source": "\"use client\";\n\nimport { useForm } from \"@tanstack/react-form\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Field,\n  FieldControl,\n  FieldDescription,\n  FieldError,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\n\nexport default function FormTanstackForm() {\n  const form = useForm({\n    defaultValues: {\n      username: \"\",\n      email: \"\",\n    },\n    onSubmit: ({ value }) => {\n      alert(JSON.stringify(value, null, 2));\n    },\n  });\n\n  return (\n    <form\n      onSubmit={(e) => {\n        e.preventDefault();\n        form.handleSubmit();\n      }}\n      className=\"w-full max-w-sm space-y-4\"\n    >\n      <form.Field\n        name=\"username\"\n        validators={{\n          onChange: ({ value }) => {\n            if (value.length < 3) return \"Must be at least 3 characters\";\n            if (!/^[a-zA-Z0-9_]+$/.test(value))\n              return \"Only letters, numbers, and underscores\";\n            return undefined;\n          },\n        }}\n      >\n        {(field) => (\n          <Field\n            name=\"username\"\n            invalid={field.state.meta.errors.length > 0}\n            touched={field.state.meta.isTouched}\n            dirty={field.state.meta.isDirty}\n          >\n            <FieldLabel>Username</FieldLabel>\n            <FieldControl\n              placeholder=\"Choose a username\"\n              value={field.state.value}\n              onChange={(e) => field.handleChange(e.target.value)}\n              onBlur={field.handleBlur}\n            />\n            <FieldDescription>Letters, numbers, and underscores only</FieldDescription>\n            {field.state.meta.errors.length > 0 && (\n              <FieldError match={true}>\n                {field.state.meta.errors[0]?.toString()}\n              </FieldError>\n            )}\n          </Field>\n        )}\n      </form.Field>\n      <form.Field\n        name=\"email\"\n        validators={{\n          onChange: ({ value }) => {\n            if (!value) return \"Email is required\";\n            if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(value))\n              return \"Invalid email address\";\n            return undefined;\n          },\n        }}\n      >\n        {(field) => (\n          <Field\n            name=\"email\"\n            invalid={field.state.meta.errors.length > 0}\n            touched={field.state.meta.isTouched}\n            dirty={field.state.meta.isDirty}\n          >\n            <FieldLabel>Email</FieldLabel>\n            <FieldControl\n              type=\"email\"\n              placeholder=\"you@example.com\"\n              value={field.state.value}\n              onChange={(e) => field.handleChange(e.target.value)}\n              onBlur={field.handleBlur}\n            />\n            {field.state.meta.errors.length > 0 && (\n              <FieldError match={true}>\n                {field.state.meta.errors[0]?.toString()}\n              </FieldError>\n            )}\n          </Field>\n        )}\n      </form.Field>\n      <form.Subscribe selector={(state) => state.canSubmit}>\n        {(canSubmit) => (\n          <Button type=\"submit\" variant=\"neutral\" disabled={!canSubmit}>\n            Submit\n          </Button>\n        )}\n      </form.Subscribe>\n    </form>\n  );\n}\n"
+    },
+    {
+      "title": "Use Action State",
+      "importPath": "form-use-action-state",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Field,\n  FieldControl,\n  FieldError,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\n\ninterface FormState {\n  serverErrors?: Record<string, string>;\n}\n\n// In a real app, mark this with 'use server' in a framework like Next.js\nasync function submitForm(\n  _previousState: FormState,\n  formData: FormData,\n): Promise<FormState> {\n  await new Promise((resolve) => setTimeout(resolve, 500));\n\n  const username = formData.get(\"username\") as string | null;\n\n  if (username === \"admin\") {\n    return {\n      serverErrors: { username: \"'admin' is reserved for system use\" },\n    };\n  }\n\n  if (username && username.length < 3) {\n    return {\n      serverErrors: { username: \"Username must be at least 3 characters\" },\n    };\n  }\n\n  return {};\n}\n\nexport default function FormUseActionState() {\n  const [state, formAction, loading] = React.useActionState(submitForm, {});\n\n  return (\n    <Form\n      action={formAction}\n      errors={state.serverErrors}\n      className=\"w-full max-w-sm space-y-4\"\n    >\n      <Field name=\"username\">\n        <FieldLabel>Username</FieldLabel>\n        <FieldControl\n          required\n          defaultValue=\"admin\"\n          placeholder=\"e.g. alice132\"\n        />\n        <FieldError />\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\" disabled={loading}>\n        {loading ? \"Submitting...\" : \"Submit\"}\n      </Button>\n    </Form>\n  );\n}\n"
+    },
+    {
+      "title": "Zod Validation",
+      "importPath": "form-zod-validation",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { z } from \"zod\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Field,\n  FieldControl,\n  FieldError,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\n\nconst schema = z.object({\n  name: z.string().min(1, \"Name is required\"),\n  age: z.coerce\n    .number({ message: \"Age must be a number\" })\n    .positive(\"Age must be a positive number\"),\n});\n\nexport default function FormZodValidation() {\n  const [errors, setErrors] = React.useState<Record<string, string[]>>({});\n\n  return (\n    <Form\n      className=\"w-full max-w-sm space-y-4\"\n      errors={errors}\n      onFormSubmit={async (formValues) => {\n        const result = schema.safeParse(formValues);\n\n        if (!result.success) {\n          setErrors(z.flattenError(result.error).fieldErrors);\n        } else {\n          setErrors({});\n          alert(JSON.stringify(result.data, null, 2));\n        }\n      }}\n    >\n      <Field name=\"name\">\n        <FieldLabel>Name</FieldLabel>\n        <FieldControl placeholder=\"Enter name\" />\n        <FieldError />\n      </Field>\n      <Field name=\"age\">\n        <FieldLabel>Age</FieldLabel>\n        <FieldControl placeholder=\"Enter age\" />\n        <FieldError />\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\">\n        Submit\n      </Button>\n    </Form>\n  );\n}\n"
+    }
+  ],
   "input": [
     {
       "title": "Demo",
@@ -2388,6 +2597,11 @@ export const exampleRegistry = {
       "title": "Disabled",
       "importPath": "input-disabled",
       "source": "import { Input } from \"@/components/ui/cubby-ui/input\";\n\nexport default function InputDisabled() {\n  return <Input className=\"w-fit\" placeholder=\"Disabled input\" disabled />;\n}\n"
+    },
+    {
+      "title": "Field",
+      "importPath": "input-field",
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Field,\n  FieldDescription,\n  FieldError,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\nimport { Input } from \"@/components/ui/cubby-ui/input\";\n\nexport default function InputField() {\n  return (\n    <Form\n      className=\"w-full max-w-sm space-y-4\"\n      onFormSubmit={(values) => {\n        alert(JSON.stringify(values, null, 2));\n      }}\n    >\n      <Field name=\"email\">\n        <FieldLabel>Email</FieldLabel>\n        <Input type=\"email\" required placeholder=\"you@example.com\" />\n        <FieldDescription>\n          We&apos;ll never share your email with anyone else.\n        </FieldDescription>\n        <FieldError match=\"valueMissing\">Email is required</FieldError>\n        <FieldError match=\"typeMismatch\">Enter a valid email address</FieldError>\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\">\n        Submit\n      </Button>\n    </Form>\n  );\n}\n"
     },
     {
       "title": "With Label",
@@ -2584,6 +2798,43 @@ export const exampleRegistry = {
       "source": "import {\n  NavigationMenu,\n  NavigationMenuList,\n  NavigationMenuItem,\n  NavigationMenuTrigger,\n  NavigationMenuContent,\n  NavigationMenuLink,\n} from \"@/components/ui/cubby-ui/navigation-menu\";\n\nexport default function NavigationMenuWithDirectLinks() {\n  return (\n    <NavigationMenu>\n      <NavigationMenuList>\n        <NavigationMenuItem>\n          <NavigationMenuTrigger>Features</NavigationMenuTrigger>\n          <NavigationMenuContent>\n            <ul className=\"grid max-w-[400px] gap-3\">\n              <li>\n                <NavigationMenuLink href=\"/features/analytics\">\n                  <div className=\"text-sm font-medium leading-none\">Analytics</div>\n                  <p className=\"line-clamp-2 text-sm leading-snug text-muted-foreground\">\n                    Track user behavior and measure performance\n                  </p>\n                </NavigationMenuLink>\n              </li>\n              <li>\n                <NavigationMenuLink href=\"/features/integrations\">\n                  <div className=\"text-sm font-medium leading-none\">Integrations</div>\n                  <p className=\"line-clamp-2 text-sm leading-snug text-muted-foreground\">\n                    Connect with your favorite tools\n                  </p>\n                </NavigationMenuLink>\n              </li>\n            </ul>\n          </NavigationMenuContent>\n        </NavigationMenuItem>\n        \n        <NavigationMenuItem>\n          <NavigationMenuTrigger>Company</NavigationMenuTrigger>\n          <NavigationMenuContent>\n            <ul className=\"grid max-w-[200px] gap-3\">\n              <li>\n                <NavigationMenuLink href=\"/about\">About</NavigationMenuLink>\n              </li>\n              <li>\n                <NavigationMenuLink href=\"/team\">Team</NavigationMenuLink>\n              </li>\n              <li>\n                <NavigationMenuLink href=\"/careers\">Careers</NavigationMenuLink>\n              </li>\n              <li>\n                <NavigationMenuLink href=\"/contact\">Contact</NavigationMenuLink>\n              </li>\n            </ul>\n          </NavigationMenuContent>\n        </NavigationMenuItem>\n        \n        {/* Direct links styled as triggers */}\n        <NavigationMenuItem>\n          <NavigationMenuLink href=\"/pricing\" standalone>\n            Pricing\n          </NavigationMenuLink>\n        </NavigationMenuItem>\n        \n        <NavigationMenuItem>\n          <NavigationMenuLink href=\"/docs\" standalone>\n            Documentation\n          </NavigationMenuLink>\n        </NavigationMenuItem>\n      </NavigationMenuList>\n    </NavigationMenu>\n  );\n}"
     }
   ],
+  "number-field": [
+    {
+      "title": "Demo",
+      "importPath": "number-field-demo",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { Minus, Plus } from \"lucide-react\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\nimport {\n  NumberField,\n  NumberFieldDecrement,\n  NumberFieldGroup,\n  NumberFieldIncrement,\n  NumberFieldInput,\n} from \"@/components/ui/cubby-ui/number-field\";\n\nexport default function NumberFieldDemo() {\n  const id = React.useId();\n\n  return (\n    <NumberField id={id} defaultValue={100}>\n      <Label htmlFor={id}>Amount</Label>\n      <NumberFieldGroup>\n        <NumberFieldDecrement>\n          <Minus className=\"size-4\" />\n        </NumberFieldDecrement>\n        <NumberFieldInput />\n        <NumberFieldIncrement>\n          <Plus className=\"size-4\" />\n        </NumberFieldIncrement>\n      </NumberFieldGroup>\n    </NumberField>\n  );\n}\n"
+    },
+    {
+      "title": "Controlled",
+      "importPath": "number-field-controlled",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { Minus, Plus } from \"lucide-react\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\nimport {\n  NumberField,\n  NumberFieldDecrement,\n  NumberFieldGroup,\n  NumberFieldIncrement,\n  NumberFieldInput,\n} from \"@/components/ui/cubby-ui/number-field\";\n\nexport default function NumberFieldControlled() {\n  const id = React.useId();\n  const [value, setValue] = React.useState<number | null>(50);\n\n  return (\n    <div className=\"space-y-2\">\n      <NumberField id={id} value={value} onValueChange={setValue}>\n        <Label htmlFor={id}>Quantity</Label>\n        <NumberFieldGroup>\n          <NumberFieldDecrement>\n            <Minus className=\"size-4\" />\n          </NumberFieldDecrement>\n          <NumberFieldInput />\n          <NumberFieldIncrement>\n            <Plus className=\"size-4\" />\n          </NumberFieldIncrement>\n        </NumberFieldGroup>\n      </NumberField>\n      <p className=\"text-muted-foreground text-sm\">\n        Current value: {value ?? \"empty\"}\n      </p>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Disabled",
+      "importPath": "number-field-disabled",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { Minus, Plus } from \"lucide-react\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\nimport {\n  NumberField,\n  NumberFieldDecrement,\n  NumberFieldGroup,\n  NumberFieldIncrement,\n  NumberFieldInput,\n} from \"@/components/ui/cubby-ui/number-field\";\n\nexport default function NumberFieldDisabled() {\n  const id = React.useId();\n\n  return (\n    <NumberField id={id} defaultValue={42} disabled>\n      <Label htmlFor={id}>Locked value</Label>\n      <NumberFieldGroup>\n        <NumberFieldDecrement>\n          <Minus className=\"size-4\" />\n        </NumberFieldDecrement>\n        <NumberFieldInput />\n        <NumberFieldIncrement>\n          <Plus className=\"size-4\" />\n        </NumberFieldIncrement>\n      </NumberFieldGroup>\n    </NumberField>\n  );\n}\n"
+    },
+    {
+      "title": "Field",
+      "importPath": "number-field-field",
+      "source": "\"use client\";\n\nimport { Minus, Plus } from \"lucide-react\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Field, FieldError, FieldLabel } from \"@/components/ui/cubby-ui/field\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\nimport {\n  NumberField,\n  NumberFieldDecrement,\n  NumberFieldGroup,\n  NumberFieldIncrement,\n  NumberFieldInput,\n} from \"@/components/ui/cubby-ui/number-field\";\n\nexport default function NumberFieldField() {\n  return (\n    <Form\n      className=\"space-y-4\"\n      onFormSubmit={(values) => {\n        alert(JSON.stringify(values, null, 2));\n      }}\n    >\n      <Field name=\"quantity\">\n        <NumberField min={1} max={99} required>\n          <FieldLabel>Quantity</FieldLabel>\n          <NumberFieldGroup>\n            <NumberFieldDecrement>\n              <Minus className=\"size-4\" />\n            </NumberFieldDecrement>\n            <NumberFieldInput />\n            <NumberFieldIncrement>\n              <Plus className=\"size-4\" />\n            </NumberFieldIncrement>\n          </NumberFieldGroup>\n        </NumberField>\n        <FieldError />\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\">\n        Submit\n      </Button>\n    </Form>\n  );\n}\n"
+    },
+    {
+      "title": "Format",
+      "importPath": "number-field-format",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { Minus, Plus } from \"lucide-react\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\nimport {\n  NumberField,\n  NumberFieldDecrement,\n  NumberFieldGroup,\n  NumberFieldIncrement,\n  NumberFieldInput,\n} from \"@/components/ui/cubby-ui/number-field\";\n\nexport default function NumberFieldFormat() {\n  const id = React.useId();\n\n  return (\n    <NumberField\n      id={id}\n      defaultValue={99.99}\n      step={0.01}\n      format={{ style: \"currency\", currency: \"USD\" }}\n    >\n      <Label htmlFor={id}>Price</Label>\n      <NumberFieldGroup>\n        <NumberFieldDecrement>\n          <Minus className=\"size-4\" />\n        </NumberFieldDecrement>\n        <NumberFieldInput className=\"w-32\" />\n        <NumberFieldIncrement>\n          <Plus className=\"size-4\" />\n        </NumberFieldIncrement>\n      </NumberFieldGroup>\n    </NumberField>\n  );\n}\n"
+    },
+    {
+      "title": "Min Max",
+      "importPath": "number-field-min-max",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { Minus, Plus } from \"lucide-react\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\nimport {\n  NumberField,\n  NumberFieldDecrement,\n  NumberFieldGroup,\n  NumberFieldIncrement,\n  NumberFieldInput,\n} from \"@/components/ui/cubby-ui/number-field\";\n\nexport default function NumberFieldMinMax() {\n  const id = React.useId();\n\n  return (\n    <NumberField id={id} defaultValue={5} min={1} max={10}>\n      <Label htmlFor={id}>Rating (1-10)</Label>\n      <NumberFieldGroup>\n        <NumberFieldDecrement>\n          <Minus className=\"size-4\" />\n        </NumberFieldDecrement>\n        <NumberFieldInput />\n        <NumberFieldIncrement>\n          <Plus className=\"size-4\" />\n        </NumberFieldIncrement>\n      </NumberFieldGroup>\n    </NumberField>\n  );\n}\n"
+    },
+    {
+      "title": "Scrub Area",
+      "importPath": "number-field-scrub-area",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { Minus, Plus } from \"lucide-react\";\nimport {\n  NumberField,\n  NumberFieldDecrement,\n  NumberFieldGroup,\n  NumberFieldIncrement,\n  NumberFieldInput,\n  NumberFieldScrubArea,\n  NumberFieldScrubAreaCursor,\n} from \"@/components/ui/cubby-ui/number-field\";\n\nfunction CursorGrowIcon(props: React.ComponentProps<\"svg\">) {\n  return (\n    <svg\n      width=\"26\"\n      height=\"14\"\n      viewBox=\"0 0 24 14\"\n      fill=\"black\"\n      stroke=\"white\"\n      xmlns=\"http://www.w3.org/2000/svg\"\n      {...props}\n    >\n      <path d=\"M19.5 5.5L6.49737 5.51844V2L1 6.9999L6.5 12L6.49737 8.5L19.5 8.5V12L25 6.9999L19.5 2V5.5Z\" />\n    </svg>\n  );\n}\n\nexport default function NumberFieldScrubAreaDemo() {\n  const id = React.useId();\n\n  return (\n    <NumberField id={id} defaultValue={100}>\n      <NumberFieldScrubArea>\n        <label\n          htmlFor={id}\n          className=\"cursor-ew-resize text-sm font-medium select-none\"\n        >\n          Amount\n        </label>\n        <NumberFieldScrubAreaCursor>\n          <CursorGrowIcon />\n        </NumberFieldScrubAreaCursor>\n      </NumberFieldScrubArea>\n      <NumberFieldGroup>\n        <NumberFieldDecrement>\n          <Minus className=\"size-4\" />\n        </NumberFieldDecrement>\n        <NumberFieldInput />\n        <NumberFieldIncrement>\n          <Plus className=\"size-4\" />\n        </NumberFieldIncrement>\n      </NumberFieldGroup>\n    </NumberField>\n  );\n}\n"
+    }
+  ],
   "otp-field": [
     {
       "title": "Basic",
@@ -2599,6 +2850,11 @@ export const exampleRegistry = {
       "title": "Custom Sanitization",
       "importPath": "otp-field-custom-sanitization",
       "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  OTPField,\n  OTPFieldInput,\n} from \"@/components/ui/cubby-ui/otp-field\";\nimport { useInvalidFeedback } from \"@/hooks/cubby-ui/use-invalid-feedback\";\n\nconst CODE_LENGTH = 6;\n\nfunction sanitizeTierCode(value: string) {\n  return value.replace(/[^0-3]/g, \"\");\n}\n\nexport default function OtpFieldCustomSanitization() {\n  const id = React.useId();\n  const descriptionId = `${id}-description`;\n  const invalidFeedback = useInvalidFeedback();\n\n  return (\n    <div className=\"flex w-full max-w-80 flex-col items-start gap-1\">\n      <label htmlFor={id} className=\"text-sm font-medium\">\n        Tier code\n      </label>\n      <OTPField\n        id={id}\n        length={CODE_LENGTH}\n        validationType=\"none\"\n        inputMode=\"numeric\"\n        sanitizeValue={sanitizeTierCode}\n        onValueChange={invalidFeedback.handleValueChange}\n        onValueInvalid={invalidFeedback.handleValueInvalid}\n        aria-describedby={descriptionId}\n      >\n        {Array.from({ length: CODE_LENGTH }, (_, index) => (\n          <OTPFieldInput\n            key={index}\n            className={invalidFeedback.getInvalidClassName(index)}\n            aria-label={`Character ${index + 1} of ${CODE_LENGTH}`}\n            onFocus={() => invalidFeedback.setFocusedIndex(index)}\n          />\n        ))}\n      </OTPField>\n      <p id={descriptionId} className=\"text-muted-foreground m-0 text-sm\">\n        Digits <code className=\"font-mono\">0-3</code> only.\n      </p>\n      <span aria-live=\"polite\" className=\"sr-only\">\n        {invalidFeedback.statusMessage}\n      </span>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Field",
+      "importPath": "otp-field-field",
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Field,\n  FieldDescription,\n  FieldError,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\nimport {\n  OTPField,\n  OTPFieldInput,\n} from \"@/components/ui/cubby-ui/otp-field\";\n\nconst OTP_LENGTH = 6;\n\nexport default function OtpFieldField() {\n  return (\n    <Form\n      className=\"space-y-4\"\n      onFormSubmit={(values) => {\n        alert(JSON.stringify(values, null, 2));\n      }}\n    >\n      <Field name=\"verificationCode\">\n        <FieldLabel>Verification code</FieldLabel>\n        <FieldDescription>\n          Enter the 6-character code we sent to your device.\n        </FieldDescription>\n        <OTPField length={OTP_LENGTH}>\n          {Array.from({ length: OTP_LENGTH }, (_, index) => (\n            <OTPFieldInput\n              key={index}\n              aria-label={`Character ${index + 1} of ${OTP_LENGTH}`}\n            />\n          ))}\n        </OTPField>\n        <FieldError />\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\">\n        Verify\n      </Button>\n    </Form>\n  );\n}\n"
     },
     {
       "title": "Grouped",
@@ -2741,6 +2997,11 @@ export const exampleRegistry = {
       "source": "import { RadioGroup, RadioGroupItem } from \"@/components/ui/cubby-ui/radio-group\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function RadioGroupDisabledOptions() {\n  return (\n    <RadioGroup defaultValue=\"option2\">\n      <Label className=\"flex-row items-center gap-2\">\n        <RadioGroupItem value=\"option1\" />\n        Available Option\n      </Label>\n      <Label className=\"flex-row items-center gap-2\">\n        <RadioGroupItem value=\"option2\" />\n        Selected Option\n      </Label>\n      <Label className=\"flex-row items-center gap-2 opacity-50\">\n        <RadioGroupItem value=\"option3\" disabled />\n        Disabled Option\n      </Label>\n    </RadioGroup>\n  );\n}"
     },
     {
+      "title": "Field",
+      "importPath": "radio-group-field",
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Field,\n  FieldError,\n  FieldItem,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Fieldset, FieldsetLegend } from \"@/components/ui/cubby-ui/fieldset\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\nimport {\n  RadioGroup,\n  RadioGroupItem,\n} from \"@/components/ui/cubby-ui/radio-group\";\n\nexport default function RadioGroupField() {\n  return (\n    <Form\n      className=\"space-y-4\"\n      onFormSubmit={(values) => {\n        alert(JSON.stringify(values, null, 2));\n      }}\n    >\n      <Field name=\"plan\">\n        <Fieldset render={<RadioGroup defaultValue=\"free\" />}>\n          <FieldsetLegend>Select a plan</FieldsetLegend>\n          <FieldItem>\n            <FieldLabel>\n              <RadioGroupItem value=\"free\" />\n              Free\n            </FieldLabel>\n          </FieldItem>\n          <FieldItem>\n            <FieldLabel>\n              <RadioGroupItem value=\"pro\" />\n              Pro\n            </FieldLabel>\n          </FieldItem>\n          <FieldItem>\n            <FieldLabel>\n              <RadioGroupItem value=\"enterprise\" />\n              Enterprise\n            </FieldLabel>\n          </FieldItem>\n        </Fieldset>\n        <FieldError />\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\">\n        Submit\n      </Button>\n    </Form>\n  );\n}\n"
+    },
+    {
       "title": "With Descriptions",
       "importPath": "radio-group-with-descriptions",
       "source": "import { RadioGroup, RadioGroupItem } from \"@/components/ui/cubby-ui/radio-group\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function RadioGroupWithDescriptions() {\n  return (\n    <RadioGroup defaultValue=\"standard\">\n      <Label className=\"flex-row items-start gap-2 mb-4\">\n        <RadioGroupItem value=\"free\" className=\"mt-0.5\" />\n        <div>\n          <span className=\"font-medium\">Free Plan</span>\n          <p className=\"text-sm text-muted-foreground font-normal\">\n            Basic features for personal use\n          </p>\n        </div>\n      </Label>\n      <Label className=\"flex-row items-start gap-2 mb-4\">\n        <RadioGroupItem value=\"standard\" className=\"mt-0.5\" />\n        <div>\n          <span className=\"font-medium\">Standard Plan</span>\n          <p className=\"text-sm text-muted-foreground font-normal\">\n            Advanced features for teams\n          </p>\n        </div>\n      </Label>\n      <Label className=\"flex-row items-start gap-2\">\n        <RadioGroupItem value=\"premium\" className=\"mt-0.5\" />\n        <div>\n          <span className=\"font-medium\">Premium Plan</span>\n          <p className=\"text-sm text-muted-foreground font-normal\">\n            All features with priority support\n          </p>\n        </div>\n      </Label>\n    </RadioGroup>\n  );\n}"
@@ -2825,6 +3086,11 @@ export const exampleRegistry = {
       "title": "Controlled",
       "importPath": "select-controlled",
       "source": "\"use client\";\n\nimport { useState } from \"react\";\nimport {\n  Select,\n  SelectTrigger,\n  SelectContent,\n  SelectItem,\n  SelectValue,\n} from \"@/components/ui/cubby-ui/select\";\n\nexport default function SelectControlled() {\n  const themeItems = [\n    { label: \"Light\", value: \"light\" },\n    { label: \"Dark\", value: \"dark\" },\n    { label: \"System\", value: \"system\" },\n  ];\n\n  const [value, setValue] = useState<string | null>(null);\n\n  return (\n    <div>\n      <Select\n        value={value}\n        onValueChange={(value) => setValue(value)}\n        items={themeItems}\n      >\n        <SelectTrigger className=\"w-[180px]\">\n          <SelectValue placeholder=\"Select a theme\" />\n        </SelectTrigger>\n        <SelectContent>\n          {themeItems.map((item) => (\n            <SelectItem key={item.value} value={item.value}>\n              {item.label}\n            </SelectItem>\n          ))}\n        </SelectContent>\n      </Select>\n      <p className=\"text-muted-foreground mt-2 text-sm\">\n        Selected: {value || \"none\"}\n      </p>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Field",
+      "importPath": "select-field",
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Field, FieldError } from \"@/components/ui/cubby-ui/field\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\nimport {\n  Select,\n  SelectContent,\n  SelectItem,\n  SelectLabel,\n  SelectTrigger,\n  SelectValue,\n} from \"@/components/ui/cubby-ui/select\";\n\nconst items = [\n  { label: \"United States\", value: \"us\" },\n  { label: \"Canada\", value: \"ca\" },\n  { label: \"United Kingdom\", value: \"uk\" },\n  { label: \"Germany\", value: \"de\" },\n  { label: \"Japan\", value: \"jp\" },\n];\n\nexport default function SelectField() {\n  return (\n    <Form\n      className=\"space-y-4\"\n      onFormSubmit={(values) => {\n        alert(JSON.stringify(values, null, 2));\n      }}\n    >\n      <Field name=\"country\">\n        <Select items={items} required>\n          <div className=\"flex flex-col gap-1\">\n            <SelectLabel>Country</SelectLabel>\n            <SelectTrigger className=\"w-[200px]\">\n              <SelectValue placeholder=\"Select a country\" />\n            </SelectTrigger>\n          </div>\n          <SelectContent>\n            {items.map((item) => (\n              <SelectItem key={item.value} value={item.value}>\n                {item.label}\n              </SelectItem>\n            ))}\n          </SelectContent>\n        </Select>\n        <FieldError />\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\">\n        Submit\n      </Button>\n    </Form>\n  );\n}\n"
     },
     {
       "title": "Multiple",
@@ -2930,6 +3196,11 @@ export const exampleRegistry = {
       "source": "import { Slider } from \"@/components/ui/cubby-ui/slider\";\n\nexport default function SliderDisabledState() {\n  return <Slider className=\"max-w-sm\" defaultValue={50} disabled getAriaLabel={() => \"Disabled slider\"} />;\n}\n"
     },
     {
+      "title": "Field",
+      "importPath": "slider-field",
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Field } from \"@/components/ui/cubby-ui/field\";\nimport { Fieldset, FieldsetLegend } from \"@/components/ui/cubby-ui/fieldset\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\nimport { Slider, SliderLabel, SliderValue } from \"@/components/ui/cubby-ui/slider\";\n\nexport default function SliderField() {\n  return (\n    <Form\n      className=\"w-full max-w-xs space-y-6\"\n      onFormSubmit={(values) => {\n        alert(JSON.stringify(values, null, 2));\n      }}\n    >\n      <Slider name=\"volume\" defaultValue={[50]}>\n        <div className=\"flex items-center justify-between\">\n          <SliderLabel>Volume</SliderLabel>\n          <SliderValue />\n        </div>\n      </Slider>\n\n      <Field name=\"priceRange\">\n        <Fieldset\n          render={\n            <Slider\n              defaultValue={[20, 80]}\n              getAriaLabel={(index) =>\n                index === 0 ? \"Minimum price\" : \"Maximum price\"\n              }\n            />\n          }\n        >\n          <div className=\"flex items-center justify-between\">\n            <FieldsetLegend>Price range</FieldsetLegend>\n            <SliderValue />\n          </div>\n        </Fieldset>\n      </Field>\n\n      <Button type=\"submit\" variant=\"neutral\">\n        Submit\n      </Button>\n    </Form>\n  );\n}\n"
+    },
+    {
       "title": "Range",
       "importPath": "slider-range",
       "source": "import { Slider } from \"@/components/ui/cubby-ui/slider\";\n\nexport default function SliderRange() {\n  return (\n    <Slider\n      className=\"max-w-sm\"\n      defaultValue={[25, 75]}\n      label=\"Price range\"\n      getAriaLabel={(index) =>\n        index === 0 ? \"Minimum price\" : \"Maximum price\"\n      }\n    />\n  );\n}\n"
@@ -2965,6 +3236,11 @@ export const exampleRegistry = {
       "title": "Card",
       "importPath": "switch-card",
       "source": "import { Switch } from \"@/components/ui/cubby-ui/switch\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function SwitchCard() {\n  return (\n    <Label\n      htmlFor=\"notifications\"\n      className=\"flex-row items-start justify-between gap-4 rounded-lg border bg-card p-4 has-data-checked:border-primary/50 has-data-checked:bg-muted hover:bg-muted\"\n    >\n      <div className=\"flex flex-col gap-1\">\n        <span className=\"font-medium\">Push Notifications</span>\n        <span className=\"text-muted-foreground text-sm\">\n          Receive notifications when someone mentions you.\n        </span>\n      </div>\n      <Switch className=\"[--thumb-size:--spacing(4)]\" id=\"notifications\" />\n    </Label>\n  );\n}\n"
+    },
+    {
+      "title": "Field",
+      "importPath": "switch-field",
+      "source": "import {\n  Field,\n  FieldDescription,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Switch } from \"@/components/ui/cubby-ui/switch\";\n\nexport default function SwitchField() {\n  return (\n    <Field name=\"notifications\">\n      <FieldLabel>\n        Email notifications\n        <Switch defaultChecked />\n      </FieldLabel>\n      <FieldDescription>\n        Receive email notifications when someone mentions you.\n      </FieldDescription>\n    </Field>\n  );\n}\n"
     },
     {
       "title": "Pill",
@@ -3295,6 +3571,7 @@ export const componentMap = {
   "autocomplete-async": autocomplete_autocomplete_async,
   "autocomplete-auto-highlight": autocomplete_autocomplete_auto_highlight,
   "autocomplete-clear": autocomplete_autocomplete_clear,
+  "autocomplete-field": autocomplete_autocomplete_field,
   "autocomplete-fuzzy": autocomplete_autocomplete_fuzzy,
   "autocomplete-grouped": autocomplete_autocomplete_grouped,
   "autocomplete-inline": autocomplete_autocomplete_inline,
@@ -3359,12 +3636,14 @@ export const componentMap = {
   "checkbox-basic": checkbox_checkbox_basic,
   "checkbox-controlled": checkbox_checkbox_controlled,
   "checkbox-disabled-state": checkbox_checkbox_disabled_state,
+  "checkbox-field": checkbox_checkbox_field,
   "checkbox-form-example": checkbox_checkbox_form_example,
   "checkbox-with-label": checkbox_checkbox_with_label,
   "checkbox-group-basic": checkbox_group_checkbox_group_basic,
   "checkbox-group-cards": checkbox_group_checkbox_group_cards,
   "checkbox-group-controlled": checkbox_group_checkbox_group_controlled,
   "checkbox-group-disabled-options": checkbox_group_checkbox_group_disabled_options,
+  "checkbox-group-field": checkbox_group_checkbox_group_field,
   "checkbox-group-form-example": checkbox_group_checkbox_group_form_example,
   "checkbox-group-nested": checkbox_group_checkbox_group_nested,
   "checkbox-group-parent": checkbox_group_checkbox_group_parent,
@@ -3398,6 +3677,7 @@ export const componentMap = {
   "combobox-async": combobox_combobox_async,
   "combobox-async-multiple": combobox_combobox_async_multiple,
   "combobox-creatable": combobox_combobox_creatable,
+  "combobox-field": combobox_combobox_field,
   "combobox-grouped": combobox_combobox_grouped,
   "combobox-input-inside-popup": combobox_combobox_input_inside_popup,
   "combobox-multiple": combobox_combobox_multiple,
@@ -3469,8 +3749,32 @@ export const componentMap = {
   "fancy-button-loading": fancy_button_fancy_button_loading,
   "fancy-button-sizes": fancy_button_fancy_button_sizes,
   "fancy-button-with-icons": fancy_button_fancy_button_with_icons,
+  "field-demo": field_field_demo,
+  "field-custom-validation": field_field_custom_validation,
+  "field-disabled": field_field_disabled,
+  "field-validation": field_field_validation,
+  "field-with-checkbox": field_field_with_checkbox,
+  "field-with-checkbox-group": field_field_with_checkbox_group,
+  "field-with-description": field_field_with_description,
+  "field-with-radio-group": field_field_with_radio_group,
+  "field-with-select": field_field_with_select,
+  "field-with-slider": field_field_with_slider,
+  "field-with-switch": field_field_with_switch,
+  "fieldset-demo": fieldset_fieldset_demo,
+  "fieldset-with-checkbox-group": fieldset_fieldset_with_checkbox_group,
+  "fieldset-with-radio-group": fieldset_fieldset_with_radio_group,
+  "form-demo": form_form_demo,
+  "form-complete": form_form_complete,
+  "form-constraint-validation": form_form_constraint_validation,
+  "form-on-form-submit": form_form_on_form_submit,
+  "form-react-hook-form": form_form_react_hook_form,
+  "form-server-validation": form_form_server_validation,
+  "form-tanstack-form": form_form_tanstack_form,
+  "form-use-action-state": form_form_use_action_state,
+  "form-zod-validation": form_form_zod_validation,
   "input-demo": input_input_demo,
   "input-disabled": input_input_disabled,
+  "input-field": input_input_field,
   "input-with-label": input_input_with_label,
   "input-group-demo": input_group_input_group_demo,
   "input-group-keyboard-shortcut": input_group_input_group_keyboard_shortcut,
@@ -3507,9 +3811,17 @@ export const componentMap = {
   "navigation-menu-flexible-nextjs-link": navigation_menu_navigation_menu_flexible_nextjs_link,
   "navigation-menu-nested-submenus": navigation_menu_navigation_menu_nested_submenus,
   "navigation-menu-with-direct-links": navigation_menu_navigation_menu_with_direct_links,
+  "number-field-demo": number_field_number_field_demo,
+  "number-field-controlled": number_field_number_field_controlled,
+  "number-field-disabled": number_field_number_field_disabled,
+  "number-field-field": number_field_number_field_field,
+  "number-field-format": number_field_number_field_format,
+  "number-field-min-max": number_field_number_field_min_max,
+  "number-field-scrub-area": number_field_number_field_scrub_area,
   "otp-field-basic": otp_field_otp_field_basic,
   "otp-field-alphanumeric": otp_field_otp_field_alphanumeric,
   "otp-field-custom-sanitization": otp_field_otp_field_custom_sanitization,
+  "otp-field-field": otp_field_otp_field_field,
   "otp-field-grouped": otp_field_otp_field_grouped,
   "otp-field-masked": otp_field_otp_field_masked,
   "otp-field-placeholder": otp_field_otp_field_placeholder,
@@ -3536,6 +3848,7 @@ export const componentMap = {
   "radio-group-basic": radio_group_radio_group_basic,
   "radio-group-controlled": radio_group_radio_group_controlled,
   "radio-group-disabled-options": radio_group_radio_group_disabled_options,
+  "radio-group-field": radio_group_radio_group_field,
   "radio-group-with-descriptions": radio_group_radio_group_with_descriptions,
   "resizable-basic": resizable_resizable_basic,
   "resizable-min-max-size": resizable_resizable_min_max_size,
@@ -3552,6 +3865,7 @@ export const componentMap = {
   "select-basic": select_select_basic,
   "select-align-item-with-trigger": select_select_align_item_with_trigger,
   "select-controlled": select_select_controlled,
+  "select-field": select_select_field,
   "select-multiple": select_select_multiple,
   "select-object-values": select_select_object_values,
   "select-with-groups": select_select_with_groups,
@@ -3571,6 +3885,7 @@ export const componentMap = {
   "slider-basic": slider_slider_basic,
   "slider-controlled": slider_slider_controlled,
   "slider-disabled-state": slider_slider_disabled_state,
+  "slider-field": slider_slider_field,
   "slider-range": slider_slider_range,
   "slider-variant": slider_slider_variant,
   "slider-vertical": slider_slider_vertical,
@@ -3578,6 +3893,7 @@ export const componentMap = {
   "slider-with-value": slider_slider_with_value,
   "switch-basic": switch_switch_basic,
   "switch-card": switch_switch_card,
+  "switch-field": switch_switch_field,
   "switch-pill": switch_switch_pill,
   "table-basic": table_table_basic,
   "table-bordered": table_table_bordered,
@@ -3759,9 +4075,17 @@ export const componentAnatomy = {
     "imports": "import { FancyButton } from \"@/components/ui/cubby-ui/fancy-button\";",
     "anatomy": "<FancyButton />"
   },
+  "field": {
+    "imports": "import {\n  Field,\n  FieldControl,\n  FieldDescription,\n  FieldError,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";",
+    "anatomy": "<Field>\n  <FieldLabel />\n  <FieldControl />\n  <FieldDescription />\n  <FieldError />\n</Field>"
+  },
+  "fieldset": {
+    "imports": "import { Fieldset, FieldsetLegend } from \"@/components/ui/cubby-ui/fieldset\";",
+    "anatomy": "<Fieldset>\n  <FieldsetLegend />\n</Fieldset>"
+  },
   "form": {
-    "imports": "import {\n  Form,\n  FormItem,\n  FormLabel,\n  FormControl,\n  FormDescription,\n  FormMessage,\n  FormField\n} from \"@/components/ui/cubby-ui/form\"",
-    "anatomy": "<Form>\n  {/* Your content */}\n</Form>"
+    "imports": "import { Form } from \"@/components/ui/cubby-ui/form\";",
+    "anatomy": "<Form />"
   },
   "input": {
     "imports": "import { Input } from \"@/components/ui/cubby-ui/input\";",
@@ -3794,6 +4118,10 @@ export const componentAnatomy = {
   "navigation-menu": {
     "imports": "import {\n  NavigationMenu,\n  NavigationMenuList,\n  NavigationMenuItem,\n  NavigationMenuTrigger,\n  NavigationMenuContent,\n  NavigationMenuLink,\n} from \"@/components/ui/cubby-ui/navigation-menu\";",
     "anatomy": "<NavigationMenu>\n  <NavigationMenuList>\n    <NavigationMenuItem>\n      <NavigationMenuTrigger />\n      <NavigationMenuContent>\n        <NavigationMenuLink />\n      </NavigationMenuContent>\n    </NavigationMenuItem>\n    <NavigationMenuItem>\n      <NavigationMenuTrigger />\n      <NavigationMenuContent>\n        <NavigationMenuLink />\n      </NavigationMenuContent>\n    </NavigationMenuItem>\n  </NavigationMenuList>\n</NavigationMenu>"
+  },
+  "number-field": {
+    "imports": "import {\n  NumberField,\n  NumberFieldDecrement,\n  NumberFieldGroup,\n  NumberFieldIncrement,\n  NumberFieldInput,\n} from \"@/components/ui/cubby-ui/number-field\";",
+    "anatomy": "<NumberField>\n  <NumberFieldGroup>\n    <NumberFieldDecrement />\n    <NumberFieldInput />\n    <NumberFieldIncrement />\n  </NumberFieldGroup>\n</NumberField>"
   },
   "otp-field": {
     "imports": "import {\n  OTPField,\n  OTPFieldInput,\n} from \"@/components/ui/cubby-ui/otp-field\";",

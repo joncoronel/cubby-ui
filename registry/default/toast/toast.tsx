@@ -53,58 +53,23 @@ const toastIconVariants = cva("", {
   },
 });
 
-// Icon colors in StackedToastItem use in-data-[type=*] selectors,
-// which automatically style based on the data-type attribute set by Base UI on Toast.Root
+type SwipeDirection = "up" | "down" | "left" | "right";
 
-// Shared Toast CSS Classes (used by StackedToastItem and GroupedToastRoot)
-const TOAST_CSS_VARIABLES = [
-  "[--toast-gap:0.75rem] [--toast-peek:0.75rem]",
-  "[--toast-scale:calc(max(0,1-(var(--toast-index)*0.1)))]",
-  "[--toast-shrink:calc(1-var(--toast-scale))]",
-  "[--toast-calc-height:var(--toast-frontmost-height,var(--toast-height))]",
-  "data-[position*=top]:[--toast-calc-offset-y:calc(var(--toast-offset-y)+(var(--toast-index)*var(--toast-gap))+var(--toast-swipe-movement-y))]",
-  "data-[position*=bottom]:[--toast-calc-offset-y:calc(var(--toast-offset-y)*-1+(var(--toast-index)*var(--toast-gap)*-1)+var(--toast-swipe-movement-y))]",
-];
+function getSwipeDirection(position: ToastPosition): SwipeDirection[] {
+  const vertical: SwipeDirection = position.startsWith("top") ? "up" : "down";
+  if (position.includes("center")) return [vertical];
+  if (position.includes("left")) return ["left", vertical];
+  return ["right", vertical];
+}
 
-const TOAST_POSITION_CLASSES = [
-  "absolute z-[calc(1000-var(--toast-index))] w-full",
-  "data-[position*=top]:top-0 data-[position*=top]:right-0 data-[position*=top]:left-0 data-[position*=top]:origin-top",
-  "data-[position*=bottom]:right-0 data-[position*=bottom]:bottom-0 data-[position*=bottom]:left-0 data-[position*=bottom]:origin-bottom",
-];
-
-const TOAST_TRANSFORM_CLASSES = [
-  "data-[position*=top]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+(var(--toast-index)*var(--toast-peek))+(var(--toast-shrink)*var(--toast-calc-height))))_scale(var(--toast-scale))]",
-  "data-[position*=bottom]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-(var(--toast-index)*var(--toast-peek))-(var(--toast-shrink)*var(--toast-calc-height))))_scale(var(--toast-scale))]",
-  "data-expanded:h-(--toast-height)",
-  "data-position:data-expanded:transform-[translateX(var(--toast-swipe-movement-x))_translateY(var(--toast-calc-offset-y))]",
-];
-
-const TOAST_ANIMATION_CLASSES = [
-  "data-[position*=top]:data-starting-style:transform-[translateY(calc(-100%-var(--toast-inset)))]",
-  "data-[position*=bottom]:data-starting-style:transform-[translateY(calc(100%+var(--toast-inset)))]",
-  "data-ending-style:opacity-0",
-  "data-[position*=top]:data-ending-style:not-data-limited:not-data-swipe-direction:transform-[translateY(calc(-100%-var(--toast-inset)))]",
-  "data-[position*=bottom]:data-ending-style:not-data-limited:not-data-swipe-direction:transform-[translateY(calc(100%+var(--toast-inset)))]",
-  "data-ending-style:data-[swipe-direction=down]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+100%+var(--toast-inset)))]",
-  "data-expanded:data-ending-style:data-[swipe-direction=down]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+100%+var(--toast-inset)))]",
-  "data-ending-style:data-[swipe-direction=left]:transform-[translateX(calc(var(--toast-swipe-movement-x)-100%-var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
-  "data-expanded:data-ending-style:data-[swipe-direction=left]:transform-[translateX(calc(var(--toast-swipe-movement-x)-100%-var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
-  "data-ending-style:data-[swipe-direction=right]:transform-[translateX(calc(var(--toast-swipe-movement-x)+100%+var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
-  "data-expanded:data-ending-style:data-[swipe-direction=right]:transform-[translateX(calc(var(--toast-swipe-movement-x)+100%+var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
-  "data-ending-style:data-[swipe-direction=up]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-100%-var(--toast-inset)))]",
-  "data-expanded:data-ending-style:data-[swipe-direction=up]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-100%-var(--toast-inset)))]",
-];
-
-const TOAST_VISUAL_CLASSES = [
-  "rounded-lg ring-1 ring-border bg-card text-card-foreground",
-  "bg-clip-padding shadow-lg/4 select-none",
-  'after:absolute after:left-0 after:h-[calc(var(--toast-gap)+1px)] after:w-full after:content-[""]',
-  "data-[position*=top]:after:bottom-full",
-  "data-[position*=bottom]:after:top-full",
-  "data-limited:opacity-0",
-  "h-(--toast-calc-height)",
-  "[transition:transform_.5s_cubic-bezier(.22,1,.36,1),opacity_.5s,height_.20s]",
-];
+function upsertReplayClassName(toast: {
+  updateKey?: number;
+}): string | undefined {
+  if (!toast.updateKey) return undefined;
+  return toast.updateKey % 2 === 0
+    ? "animate-[pulse-even_0.28s_ease]"
+    : "animate-[pulse-odd_0.28s_ease]";
+}
 
 export interface ToastOptions<TData extends object = object> {
   /** Fixed ID for deduplication. If a toast with this ID already exists, it updates in place. */
@@ -918,7 +883,7 @@ export function ToastProvider({
 
 function StackedToasts({ position }: { position: ToastPosition }) {
   const { toasts } = Toast.useToastManager();
-  const isTop = position.startsWith("top");
+  const swipeDirection = getSwipeDirection(position);
 
   return (
     <>
@@ -927,13 +892,7 @@ function StackedToasts({ position }: { position: ToastPosition }) {
           key={toast.id}
           toast={toast as ToastData}
           position={position}
-          swipeDirection={
-            position.includes("center")
-              ? [isTop ? "up" : "down"]
-              : position.includes("left")
-                ? ["left", isTop ? "up" : "down"]
-                : ["right", isTop ? "up" : "down"]
-          }
+          swipeDirection={swipeDirection}
         />
       ))}
     </>
@@ -943,9 +902,7 @@ function StackedToasts({ position }: { position: ToastPosition }) {
 interface StackedToastItemProps {
   toast: ToastData;
   position: ToastPosition;
-  swipeDirection:
-    | ("up" | "down" | "left" | "right")
-    | ("up" | "down" | "left" | "right")[];
+  swipeDirection: SwipeDirection[];
 }
 
 function StackedToastItem({
@@ -990,27 +947,53 @@ function StackedToastItem({
   const Icon =
     type !== "default" ? TOAST_ICONS[type as keyof typeof TOAST_ICONS] : null;
 
-  // Pulse animation for deduplicated toasts (updateKey > 0 means upserted)
-  const pulseClassName = toast.updateKey
-    ? toast.updateKey % 2 === 0
-      ? "animate-[pulse-even_0.28s_ease]"
-      : "animate-[pulse-odd_0.28s_ease]"
-    : null;
-
   return (
     <Toast.Root
       toast={toast}
       swipeDirection={swipeDirection}
       data-slot="toast"
       data-position={position}
-      data-updated={toast.updateKey ? toast.updateKey : undefined}
       className={cn(
-        TOAST_CSS_VARIABLES,
-        TOAST_POSITION_CLASSES,
-        TOAST_TRANSFORM_CLASSES,
-        TOAST_ANIMATION_CLASSES,
-        TOAST_VISUAL_CLASSES,
-        pulseClassName,
+        // Base styles & visual
+        "text-card-foreground data-expanded:bg-card absolute z-[calc(9999-var(--toast-index))] h-(--toast-calc-height) w-full rounded-lg border bg-[color-mix(in_srgb,var(--card),var(--color-black)_calc(1%*max(0,var(--toast-index,0))))] bg-clip-padding shadow-lg/4 select-none [transition:transform_.5s_cubic-bezier(.22,1,.36,1),opacity_.5s,height_.15s,background-color_.5s]",
+        // Positioning
+        "data-[position*=top]:top-0 data-[position*=top]:right-0 data-[position*=top]:left-0 data-[position*=top]:origin-[50%_calc(50%-50%*min(var(--toast-index,0),1))]",
+        "data-[position*=bottom]:right-0 data-[position*=bottom]:bottom-0 data-[position*=bottom]:left-0 data-[position*=bottom]:origin-[50%_calc(50%+50%*min(var(--toast-index,0),1))]",
+        // Gap fill for hover
+        "after:absolute after:left-0 after:h-[calc(var(--toast-gap)+1px)] after:w-full",
+        "data-[position*=top]:after:bottom-full",
+        "data-[position*=bottom]:after:top-full",
+        // CSS variables
+        "[--toast-calc-height:var(--toast-frontmost-height,var(--toast-height))] [--toast-gap:--spacing(3)] [--toast-peek:--spacing(3)] [--toast-scale:calc(max(0,1-(var(--toast-index)*0.1)))] [--toast-shrink:calc(1-var(--toast-scale))]",
+        "data-[position*=top]:[--toast-calc-offset-y:calc(var(--toast-offset-y)+(var(--toast-index)*var(--toast-gap))+var(--toast-swipe-movement-y))]",
+        "data-[position*=bottom]:[--toast-calc-offset-y:calc(var(--toast-offset-y)*-1+(var(--toast-index)*var(--toast-gap)*-1)+var(--toast-swipe-movement-y))]",
+        // Default state transform
+        "data-[position*=top]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+(var(--toast-index)*var(--toast-peek))+(var(--toast-shrink)*var(--toast-calc-height))))_scale(var(--toast-scale))]",
+        "data-[position*=bottom]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-(var(--toast-index)*var(--toast-peek))-(var(--toast-shrink)*var(--toast-calc-height))))_scale(var(--toast-scale))]",
+        // Limited state
+        "data-limited:opacity-0",
+        // Expanded state
+        "data-expanded:h-(--toast-height)",
+        "data-position:data-expanded:transform-[translateX(var(--toast-swipe-movement-x))_translateY(var(--toast-calc-offset-y))]",
+        // Starting style
+        "data-[position*=top]:data-starting-style:transform-[translateY(calc(-100%-var(--toast-inset)))]",
+        "data-[position*=bottom]:data-starting-style:transform-[translateY(calc(100%+var(--toast-inset)))]",
+        // Ending style
+        "data-ending-style:opacity-0",
+        "data-[position*=top]:data-ending-style:not-data-limited:not-data-swipe-direction:transform-[translateY(calc(-100%-var(--toast-inset)))]",
+        "data-[position*=bottom]:data-ending-style:not-data-limited:not-data-swipe-direction:transform-[translateY(calc(100%+var(--toast-inset)))]",
+        // Swipe direction ending styles
+        "data-ending-style:data-[swipe-direction=down]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+100%+var(--toast-inset)))]",
+        "data-ending-style:data-[swipe-direction=left]:transform-[translateX(calc(var(--toast-swipe-movement-x)-100%-var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
+        "data-ending-style:data-[swipe-direction=right]:transform-[translateX(calc(var(--toast-swipe-movement-x)+100%+var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
+        "data-ending-style:data-[swipe-direction=up]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-100%-var(--toast-inset)))]",
+        // Expanded swipe direction ending styles
+        "data-expanded:data-ending-style:data-[swipe-direction=down]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+100%+var(--toast-inset)))]",
+        "data-expanded:data-ending-style:data-[swipe-direction=left]:transform-[translateX(calc(var(--toast-swipe-movement-x)-100%-var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
+        "data-expanded:data-ending-style:data-[swipe-direction=right]:transform-[translateX(calc(var(--toast-swipe-movement-x)+100%+var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
+        "data-expanded:data-ending-style:data-[swipe-direction=up]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-100%-var(--toast-inset)))]",
+        // Deduplicated toast pulse
+        upsertReplayClassName(toast),
       )}
     >
       <Toast.Content
@@ -1160,7 +1143,7 @@ function AnchoredToastItem({ toast }: { toast: ToastData }) {
         data-slot="toast"
         className={cn(
           "flex w-max origin-(--transform-origin) flex-col rounded-md",
-          "ring-border bg-card text-card-foreground ring-1",
+          "border bg-card text-card-foreground",
           "px-3 py-2 text-sm shadow-lg/4",
           "transition-all duration-200",
           "data-starting-style:scale-95 data-starting-style:opacity-0",
@@ -1198,9 +1181,7 @@ const supportsCalcSize =
 interface GroupedToastRootProps {
   toast: ToastData;
   position: ToastPosition;
-  swipeDirection:
-    | ("up" | "down" | "left" | "right")
-    | ("up" | "down" | "left" | "right")[];
+  swipeDirection: SwipeDirection[];
   data: GroupedToastData;
 }
 
@@ -1260,12 +1241,44 @@ function GroupedToastRoot({
       data-slot="toast"
       data-position={position}
       className={cn(
-        TOAST_CSS_VARIABLES,
-        TOAST_POSITION_CLASSES,
-        TOAST_TRANSFORM_CLASSES,
-        TOAST_ANIMATION_CLASSES,
-        TOAST_VISUAL_CLASSES,
-        "overflow-visible", // Additional class for grouped toasts (popover needs to overflow)
+        // Base styles & visual
+        "text-card-foreground data-expanded:bg-card absolute z-[calc(9999-var(--toast-index))] h-(--toast-calc-height) w-full overflow-visible rounded-lg border bg-[color-mix(in_srgb,var(--card),var(--color-black)_calc(1%*max(0,var(--toast-index,0))))] bg-clip-padding shadow-lg/4 select-none [transition:transform_.5s_cubic-bezier(.22,1,.36,1),opacity_.5s,height_.15s,background-color_.5s]",
+        // Positioning
+        "data-[position*=top]:top-0 data-[position*=top]:right-0 data-[position*=top]:left-0 data-[position*=top]:origin-[50%_calc(50%-50%*min(var(--toast-index,0),1))]",
+        "data-[position*=bottom]:right-0 data-[position*=bottom]:bottom-0 data-[position*=bottom]:left-0 data-[position*=bottom]:origin-[50%_calc(50%+50%*min(var(--toast-index,0),1))]",
+        // Gap fill for hover
+        "after:absolute after:left-0 after:h-[calc(var(--toast-gap)+1px)] after:w-full",
+        "data-[position*=top]:after:bottom-full",
+        "data-[position*=bottom]:after:top-full",
+        // CSS variables
+        "[--toast-calc-height:var(--toast-frontmost-height,var(--toast-height))] [--toast-gap:--spacing(3)] [--toast-peek:--spacing(3)] [--toast-scale:calc(max(0,1-(var(--toast-index)*0.1)))] [--toast-shrink:calc(1-var(--toast-scale))]",
+        "data-[position*=top]:[--toast-calc-offset-y:calc(var(--toast-offset-y)+(var(--toast-index)*var(--toast-gap))+var(--toast-swipe-movement-y))]",
+        "data-[position*=bottom]:[--toast-calc-offset-y:calc(var(--toast-offset-y)*-1+(var(--toast-index)*var(--toast-gap)*-1)+var(--toast-swipe-movement-y))]",
+        // Default state transform
+        "data-[position*=top]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+(var(--toast-index)*var(--toast-peek))+(var(--toast-shrink)*var(--toast-calc-height))))_scale(var(--toast-scale))]",
+        "data-[position*=bottom]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-(var(--toast-index)*var(--toast-peek))-(var(--toast-shrink)*var(--toast-calc-height))))_scale(var(--toast-scale))]",
+        // Limited state
+        "data-limited:opacity-0",
+        // Expanded state
+        "data-expanded:h-(--toast-height)",
+        "data-position:data-expanded:transform-[translateX(var(--toast-swipe-movement-x))_translateY(var(--toast-calc-offset-y))]",
+        // Starting style
+        "data-[position*=top]:data-starting-style:transform-[translateY(calc(-100%-var(--toast-inset)))]",
+        "data-[position*=bottom]:data-starting-style:transform-[translateY(calc(100%+var(--toast-inset)))]",
+        // Ending style
+        "data-ending-style:opacity-0",
+        "data-[position*=top]:data-ending-style:not-data-limited:not-data-swipe-direction:transform-[translateY(calc(-100%-var(--toast-inset)))]",
+        "data-[position*=bottom]:data-ending-style:not-data-limited:not-data-swipe-direction:transform-[translateY(calc(100%+var(--toast-inset)))]",
+        // Swipe direction ending styles
+        "data-ending-style:data-[swipe-direction=down]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+100%+var(--toast-inset)))]",
+        "data-ending-style:data-[swipe-direction=left]:transform-[translateX(calc(var(--toast-swipe-movement-x)-100%-var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
+        "data-ending-style:data-[swipe-direction=right]:transform-[translateX(calc(var(--toast-swipe-movement-x)+100%+var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
+        "data-ending-style:data-[swipe-direction=up]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-100%-var(--toast-inset)))]",
+        // Expanded swipe direction ending styles
+        "data-expanded:data-ending-style:data-[swipe-direction=down]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+100%+var(--toast-inset)))]",
+        "data-expanded:data-ending-style:data-[swipe-direction=left]:transform-[translateX(calc(var(--toast-swipe-movement-x)-100%-var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
+        "data-expanded:data-ending-style:data-[swipe-direction=right]:transform-[translateX(calc(var(--toast-swipe-movement-x)+100%+var(--toast-inset)))_translateY(var(--toast-calc-offset-y))]",
+        "data-expanded:data-ending-style:data-[swipe-direction=up]:transform-[translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-100%-var(--toast-inset)))]",
       )}
     >
       <Toast.Content

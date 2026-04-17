@@ -105,6 +105,7 @@
         "@cubby-ui/menubar",
         "@cubby-ui/meter",
         "@cubby-ui/navigation-menu",
+        "@cubby-ui/number-field",
         "@cubby-ui/otp-field",
         "@cubby-ui/pagination",
         "@cubby-ui/popover",
@@ -1109,6 +1110,19 @@
       ],
       "dependencies": [
         "class-variance-authority"
+      ]
+    },
+    {
+      "name": "number-field",
+      "type": "registry:ui",
+      "title": "Number Field",
+      "description": "A number-field component.",
+      "files": [
+        {
+          "path": "registry/default/number-field/number-field.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/number-field.tsx"
+        }
       ]
     },
     {

@@ -196,54 +196,92 @@ Use `onFormSubmit` to receive values as a plain object. `preventDefault` is call
 
 ### React Hook Form
 
-Use `Controller` to bridge RHF state with Field's `invalid`, `dirty`, and `touched` props:
+Use `Controller` to bridge RHF state with Field's `invalid`, `dirty`, and `touched` props. Use `onValueChange` on `FieldControl` (not `onChange`) and `match={!!error}` on `FieldError`:
 
 ```tsx
 <Controller
-  name="name"
+  name="username"
   control={control}
-  rules={{ required: "Required" }}
-  render={({ field: rhfField, fieldState }) => (
-    <Field
-      name="name"
-      invalid={fieldState.invalid}
-      dirty={fieldState.isDirty}
-      touched={fieldState.isTouched}
-    >
-      <FieldLabel>Name</FieldLabel>
-      <FieldControl {...rhfField} />
-      {fieldState.error && (
-        <FieldError match={true}>{fieldState.error.message}</FieldError>
-      )}
+  rules={{
+    required: "This is a required field.",
+    minLength: { value: 3, message: "At least 3 characters." },
+  }}
+  render={({
+    field: { ref, name, value, onBlur, onChange },
+    fieldState: { invalid, isTouched, isDirty, error },
+  }) => (
+    <Field name={name} invalid={invalid} touched={isTouched} dirty={isDirty}>
+      <FieldLabel>Username</FieldLabel>
+      <FieldControl
+        ref={ref}
+        value={value}
+        onBlur={onBlur}
+        onValueChange={onChange}
+        placeholder="e.g. alice132"
+      />
+      <FieldError match={!!error}>{error?.message}</FieldError>
     </Field>
   )}
 />
 ```
 
+For RHF to focus invalid fields, forward `ref` to the underlying control - typically via `inputRef` on wrapper components (Select, Switch, Checkbox, RadioGroup) or directly as `ref` on input-like components.
+
 ### TanStack Form
 
-Use `form.Field` (TanStack's field) to manage state, and `Field` (Cubby UI) for the UI:
+Use `form.Field` (TanStack's field) to manage state, and `Field` (Cubby UI) for the UI. Note: the Base UI `Form` component isn't needed with TanStack Form - use a native `<form>` element instead.
 
 ```tsx
-<form.Field name="email" validators={{ onChange: ({ value }) => !value ? "Required" : undefined }}>
-  {(field) => (
-    <Field
-      name="email"
-      invalid={field.state.meta.errors.length > 0}
-      touched={field.state.meta.isTouched}
-    >
-      <FieldLabel>Email</FieldLabel>
-      <FieldControl
-        value={field.state.value}
-        onChange={(e) => field.handleChange(e.target.value)}
-        onBlur={field.handleBlur}
-      />
-      {field.state.meta.errors.length > 0 && (
-        <FieldError match={true}>{field.state.meta.errors[0]?.toString()}</FieldError>
-      )}
-    </Field>
-  )}
-</form.Field>
+import { useForm, revalidateLogic } from "@tanstack/react-form";
+
+const form = useForm({
+  defaultValues: { email: "" },
+  onSubmit: ({ value }) => {
+    // submit value
+  },
+  validationLogic: revalidateLogic({
+    mode: "submit",
+    modeAfterSubmission: "change",
+  }),
+  validators: {
+    onDynamic: ({ value }) => {
+      const errors: Record<string, string> = {};
+      if (!value.email) errors.email = "Email is required";
+      return Object.keys(errors).length === 0
+        ? undefined
+        : { form: errors, fields: errors };
+    },
+  },
+});
+
+<form
+  onSubmit={(event) => {
+    event.preventDefault();
+    form.handleSubmit();
+  }}
+  noValidate
+>
+  <form.Field name="email">
+    {(field) => (
+      <Field
+        name={field.name}
+        invalid={!field.state.meta.isValid}
+        dirty={field.state.meta.isDirty}
+        touched={field.state.meta.isTouched}
+      >
+        <FieldLabel>Email</FieldLabel>
+        <FieldControl
+          value={field.state.value}
+          onValueChange={field.handleChange}
+          onBlur={field.handleBlur}
+        />
+        <FieldError match={!field.state.meta.isValid}>
+          {field.state.meta.errors.join(",")}
+        </FieldError>
+      </Field>
+    )}
+  </form.Field>
+</form>
 ```
 
 ## Component reference

@@ -47,6 +47,7 @@
     "@cubby-ui/menubar",
     "@cubby-ui/meter",
     "@cubby-ui/navigation-menu",
+    "@cubby-ui/number-field",
     "@cubby-ui/otp-field",
     "@cubby-ui/pagination",
     "@cubby-ui/popover",

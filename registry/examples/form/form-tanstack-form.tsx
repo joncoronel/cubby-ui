@@ -1,6 +1,11 @@
 "use client";
 
-import { useForm } from "@tanstack/react-form";
+import {
+  useForm,
+  revalidateLogic,
+  type DeepKeys,
+  type ValidationError,
+} from "@tanstack/react-form";
 import { Button } from "@/registry/default/button/button";
 import {
   Field,
@@ -10,100 +15,108 @@ import {
   FieldLabel,
 } from "@/registry/default/field/field";
 
+interface FormValues {
+  username: string;
+  email: string;
+}
+
+const defaultValues: FormValues = {
+  username: "",
+  email: "",
+};
+
 export default function FormTanstackForm() {
   const form = useForm({
-    defaultValues: {
-      username: "",
-      email: "",
+    defaultValues,
+    onSubmit: ({ value: formValues }) => {
+      alert(JSON.stringify(formValues, null, 2));
     },
-    onSubmit: ({ value }) => {
-      alert(JSON.stringify(value, null, 2));
+    validationLogic: revalidateLogic({
+      mode: "submit",
+      modeAfterSubmission: "change",
+    }),
+    validators: {
+      onDynamic: ({ value: formValues }) => {
+        const errors: Partial<Record<DeepKeys<FormValues>, ValidationError>> =
+          {};
+
+        if (!formValues.username) {
+          errors.username = "Username is required.";
+        } else if (formValues.username.length < 3) {
+          errors.username = "At least 3 characters.";
+        }
+
+        if (!formValues.email) {
+          errors.email = "Email is required.";
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formValues.email)) {
+          errors.email = "Invalid email address.";
+        }
+
+        return Object.keys(errors).length === 0
+          ? undefined
+          : { form: errors, fields: errors };
+      },
     },
   });
 
   return (
     <form
-      onSubmit={(e) => {
-        e.preventDefault();
+      onSubmit={(event) => {
+        event.preventDefault();
         form.handleSubmit();
       }}
       className="w-full max-w-sm space-y-4"
+      noValidate
     >
-      <form.Field
-        name="username"
-        validators={{
-          onChange: ({ value }) => {
-            if (value.length < 3) return "Must be at least 3 characters";
-            if (!/^[a-zA-Z0-9_]+$/.test(value))
-              return "Only letters, numbers, and underscores";
-            return undefined;
-          },
-        }}
-      >
+      <form.Field name="username">
         {(field) => (
           <Field
-            name="username"
-            invalid={field.state.meta.errors.length > 0}
-            touched={field.state.meta.isTouched}
+            name={field.name}
+            invalid={!field.state.meta.isValid}
             dirty={field.state.meta.isDirty}
+            touched={field.state.meta.isTouched}
           >
             <FieldLabel>Username</FieldLabel>
             <FieldControl
-              placeholder="Choose a username"
               value={field.state.value}
-              onChange={(e) => field.handleChange(e.target.value)}
+              onValueChange={field.handleChange}
               onBlur={field.handleBlur}
+              placeholder="Choose a username"
             />
-            <FieldDescription>Letters, numbers, and underscores only</FieldDescription>
-            {field.state.meta.errors.length > 0 && (
-              <FieldError match={true}>
-                {field.state.meta.errors[0]?.toString()}
-              </FieldError>
-            )}
+            <FieldDescription>At least 3 characters</FieldDescription>
+            <FieldError match={!field.state.meta.isValid}>
+              {field.state.meta.errors.join(",")}
+            </FieldError>
           </Field>
         )}
       </form.Field>
-      <form.Field
-        name="email"
-        validators={{
-          onChange: ({ value }) => {
-            if (!value) return "Email is required";
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-              return "Invalid email address";
-            return undefined;
-          },
-        }}
-      >
+
+      <form.Field name="email">
         {(field) => (
           <Field
-            name="email"
-            invalid={field.state.meta.errors.length > 0}
-            touched={field.state.meta.isTouched}
+            name={field.name}
+            invalid={!field.state.meta.isValid}
             dirty={field.state.meta.isDirty}
+            touched={field.state.meta.isTouched}
           >
             <FieldLabel>Email</FieldLabel>
             <FieldControl
               type="email"
-              placeholder="you@example.com"
               value={field.state.value}
-              onChange={(e) => field.handleChange(e.target.value)}
+              onValueChange={field.handleChange}
               onBlur={field.handleBlur}
+              placeholder="you@example.com"
             />
-            {field.state.meta.errors.length > 0 && (
-              <FieldError match={true}>
-                {field.state.meta.errors[0]?.toString()}
-              </FieldError>
-            )}
+            <FieldError match={!field.state.meta.isValid}>
+              {field.state.meta.errors.join(",")}
+            </FieldError>
           </Field>
         )}
       </form.Field>
-      <form.Subscribe selector={(state) => state.canSubmit}>
-        {(canSubmit) => (
-          <Button type="submit" variant="neutral" disabled={!canSubmit}>
-            Submit
-          </Button>
-        )}
-      </form.Subscribe>
+
+      <Button type="submit" variant="neutral">
+        Submit
+      </Button>
     </form>
   );
 }

@@ -31,7 +31,7 @@ export default function SliderField() {
         </p>
 
         <Field name="volume">
-          <Slider defaultValue={[50]}>
+          <Slider defaultValue={50}>
             <div className="flex items-center justify-between">
               <SliderLabel>Volume</SliderLabel>
               <SliderValue />
@@ -81,7 +81,7 @@ export default function SliderField() {
           <code>Slider</code>.
         </p>
 
-        <Slider name="volume" defaultValue={[50]}>
+        <Slider name="volume" defaultValue={50}>
           <div className="flex items-center justify-between">
             <SliderLabel>Volume</SliderLabel>
             <SliderValue />

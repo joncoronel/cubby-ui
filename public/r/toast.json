@@ -21,7 +21,7 @@
     },
     {
       "path": "registry/default/toast/toast.css",
-      "content": "@keyframes progress-fill {\r\n  from {\r\n    transform: scaleX(0);\r\n  }\r\n  to {\r\n    transform: scaleX(1);\r\n  }\r\n}\r\n\r\n@keyframes pulse-even {\r\n  0%,\r\n  100% {\r\n    scale: 1;\r\n  }\r\n  50% {\r\n    scale: 1.04;\r\n  }\r\n}\r\n\r\n@keyframes pulse-odd {\r\n  0%,\r\n  100% {\r\n    scale: 1;\r\n  }\r\n  50% {\r\n    scale: 1.04;\r\n  }\r\n}\r\n\r\n@media (prefers-reduced-motion: reduce) {\r\n  @keyframes pulse-even {\r\n    from,\r\n    to {\r\n      scale: 1;\r\n    }\r\n  }\r\n\r\n  @keyframes pulse-odd {\r\n    from,\r\n    to {\r\n      scale: 1;\r\n    }\r\n  }\r\n}\r\n",
+      "content": "@keyframes progress-fill {\r\n  from {\r\n    transform: scaleX(0);\r\n  }\r\n  to {\r\n    transform: scaleX(1);\r\n  }\r\n}\r\n\r\n/*\r\n * Paired identical keyframes.\r\n * CSS animations don't restart when re-applied to the same element with the\r\n * same animation-name, so on each toast update we alternate between the two\r\n * names to force the browser to treat it as a new animation and replay it.\r\n * Keep both bodies in sync — the toggling is what makes the replay work.\r\n */\r\n@keyframes pulse-even {\r\n  0%,\r\n  100% {\r\n    scale: 1;\r\n  }\r\n  50% {\r\n    scale: 1.04;\r\n  }\r\n}\r\n\r\n@keyframes pulse-odd {\r\n  0%,\r\n  100% {\r\n    scale: 1;\r\n  }\r\n  50% {\r\n    scale: 1.04;\r\n  }\r\n}\r\n\r\n@media (prefers-reduced-motion: reduce) {\r\n  @keyframes pulse-even {\r\n    from,\r\n    to {\r\n      scale: 1;\r\n    }\r\n  }\r\n\r\n  @keyframes pulse-odd {\r\n    from,\r\n    to {\r\n      scale: 1;\r\n    }\r\n  }\r\n}\r\n",
       "type": "registry:file",
       "target": "components/ui/cubby-ui/toast/toast.css"
     }

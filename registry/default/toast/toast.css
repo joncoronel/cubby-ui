@@ -7,6 +7,13 @@
   }
 }
 
+/*
+ * Paired identical keyframes.
+ * CSS animations don't restart when re-applied to the same element with the
+ * same animation-name, so on each toast update we alternate between the two
+ * names to force the browser to treat it as a new animation and replay it.
+ * Keep both bodies in sync — the toggling is what makes the replay work.
+ */
 @keyframes pulse-even {
   0%,
   100% {

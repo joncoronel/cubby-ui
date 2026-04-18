@@ -17,6 +17,21 @@ import { Slider } from "@/registry/default/slider/slider";
 
 <ComponentUsage component="slider" />
 
+### Children Layout
+
+Children render **above** the track, not below. This enables the common pattern of a header row (`SliderLabel` + `SliderValue` side by side) sitting directly above the slider control:
+
+```tsx
+<Slider defaultValue={[50]}>
+  <div className="flex items-center justify-between">
+    <SliderLabel>Volume</SliderLabel>
+    <SliderValue />
+  </div>
+</Slider>
+```
+
+If you want content *below* the track, render it as a sibling of the `Slider` instead of a child — for example, a `<FieldDescription>` inside the enclosing `<Field>`.
+
 ## Examples
 
 ### Controlled
@@ -55,6 +70,12 @@ Apply different visual styles.
 
 <ComponentPreview component="slider" example="slider-variant" />
 
+### With Reference Scale
+
+Render annotations (like a reference scale) as a sibling of `Slider` — content outside the `Slider` root doesn't need the slider's context, so it avoids the label/value composition rules. A `SliderLabel` child keeps the visible label above the track.
+
+<ComponentPreview component="slider" example="slider-with-scale" />
+
 ### Disabled State
 
 Prevent interaction with disabled slider.
@@ -81,10 +102,6 @@ Slider works with two submission flows. With Base UI's `onFormSubmit`, values co
 >
   Visual style variant for the slider. Choose from default, contained (thumb
   aligned to edges), or squareThumb styles.
-</ApiProp>
-
-<ApiProp name="label" fullType="ReactNode" simpleType="node">
-  Visible label rendered above the slider control. Uses Base UI's `Slider.Label` for automatic accessibility association with the thumbs.
 </ApiProp>
 
 <ApiProp name="getAriaLabel" fullType="((index: number) => string) | null">

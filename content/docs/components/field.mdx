@@ -101,6 +101,10 @@ Wrap `FieldError` in `FieldErrorSlot` to smoothly animate the error's height and
 
 <ComponentPreview component="field" example="field-with-error-slot" />
 
+<Callout type="info">
+  The height animation relies on CSS `interpolate-size: allow-keywords`, which at the time of writing is only supported in Chromium 129+ (Chrome, Edge, Arc, Brave). Safari and Firefox do not yet support it, so on those browsers the error appears/disappears instantly (opacity still cross-fades). The component still works; only the height tween is degraded.
+</Callout>
+
 ## API Reference
 
 The Field component is built on top of [Base UI's Field](https://base-ui.com/react/components/field). All Base UI props are supported.
@@ -164,6 +168,8 @@ An accessible label automatically associated with the field control. Renders a `
 #### FieldControl
 
 The form control to label and validate. Renders an `<input>` element. You can omit this and use any Base UI input component directly inside Field instead.
+
+`FieldControl` inherits its visual styling from the [Input](/docs/components/input) component (`inputVariants`). Changes to Input's variant styles propagate to every `FieldControl` — keep that in mind when customizing either.
 
 #### FieldDescription
 

@@ -78,7 +78,6 @@ export interface SliderProps
   extends React.ComponentProps<typeof BaseSlider.Root>,
     VariantProps<typeof sliderVariants> {
   showSteps?: boolean;
-  label?: React.ReactNode;
   getAriaLabel?: ((index: number) => string) | null;
 }
 
@@ -91,15 +90,20 @@ function Slider({
   max = 100,
   variant,
   showSteps = false,
-  label,
   getAriaLabel,
   ...props
 }: SliderProps) {
-  const thumbCount = React.useMemo(() => {
-    if (Array.isArray(value)) return value.length;
-    if (Array.isArray(defaultValue)) return defaultValue.length;
-    return 1; // Single thumb for single values
-  }, [value, defaultValue]);
+  const values = React.useMemo(() => {
+    if (value !== undefined) {
+      return Array.isArray(value) ? value : [value];
+    }
+    if (defaultValue !== undefined) {
+      return Array.isArray(defaultValue) ? defaultValue : [defaultValue];
+    }
+    return [min];
+  }, [value, defaultValue, min]);
+
+  const isRange = values.length > 1;
 
   const steps = React.useMemo(() => {
     if (!showSteps) return [];
@@ -119,7 +123,6 @@ function Slider({
       thumbAlignment={variant === "contained" ? "edge" : "center"}
       {...props}
     >
-      {label && <SliderLabel>{label}</SliderLabel>}
       {children}
       <BaseSlider.Control
         data-slot="slider-control"
@@ -133,9 +136,7 @@ function Slider({
             data-slot="slider-indicator"
             className={cn(
               sliderIndicatorVariants({ variant }),
-              ((Array.isArray(defaultValue) && defaultValue.length > 1) ||
-                (Array.isArray(value) && value.length > 1)) &&
-                "rounded-none",
+              isRange && "rounded-none",
             )}
           />
 
@@ -192,7 +193,7 @@ function Slider({
             })}
 
           {/* Automatically render the correct number of thumbs based on value/defaultValue */}
-          {Array.from({ length: thumbCount }, (_, index) => (
+          {values.map((_, index) => (
             <BaseSlider.Thumb
               data-slot="slider-thumb"
               data-orientation={props.orientation}
@@ -217,7 +218,7 @@ function SliderValue({
     <BaseSlider.Value
       data-slot="slider-value"
       className={cn(
-        "text-foreground mt-2 flex justify-end text-sm font-medium",
+        "text-foreground text-sm font-medium",
         className,
       )}
       {...props}

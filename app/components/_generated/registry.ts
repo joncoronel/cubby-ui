@@ -357,6 +357,7 @@ import slider_slider_field from "@/registry/examples/slider/slider-field";
 import slider_slider_range from "@/registry/examples/slider/slider-range";
 import slider_slider_variant from "@/registry/examples/slider/slider-variant";
 import slider_slider_vertical from "@/registry/examples/slider/slider-vertical";
+import slider_slider_with_scale from "@/registry/examples/slider/slider-with-scale";
 import slider_slider_with_steps from "@/registry/examples/slider/slider-with-steps";
 import slider_slider_with_value from "@/registry/examples/slider/slider-with-value";
 import switch_switch_basic from "@/registry/examples/switch/switch-basic";
@@ -3201,12 +3202,12 @@ export const exampleRegistry = {
     {
       "title": "Basic",
       "importPath": "slider-basic",
-      "source": "import { Slider } from \"@/components/ui/cubby-ui/slider\";\n\nexport default function SliderBasic() {\n  return <Slider className=\"max-w-sm\" defaultValue={50} label=\"Volume\" />;\n}\n"
+      "source": "import { Slider, SliderLabel } from \"@/components/ui/cubby-ui/slider\";\n\nexport default function SliderBasic() {\n  return (\n    <Slider className=\"max-w-sm\" defaultValue={50}>\n      <SliderLabel>Volume</SliderLabel>\n    </Slider>\n  );\n}\n"
     },
     {
       "title": "Controlled",
       "importPath": "slider-controlled",
-      "source": "\"use client\";\n\nimport { Slider, SliderValue } from \"@/components/ui/cubby-ui/slider\";\nimport { useState } from \"react\";\n\nexport default function SliderControlled() {\n  const [value, setValue] = useState([50]);\n\n  return (\n    <Slider\n      className=\"max-w-sm\"\n      value={value}\n      onValueChange={(value) =>\n        setValue(Array.isArray(value) ? value : [value])\n      }\n      max={100}\n      step={1}\n      label=\"Controlled\"\n    >\n      <SliderValue />\n    </Slider>\n  );\n}\n"
+      "source": "\"use client\";\n\nimport { useState } from \"react\";\nimport {\n  Slider,\n  SliderLabel,\n  SliderValue,\n} from \"@/components/ui/cubby-ui/slider\";\n\nexport default function SliderControlled() {\n  const [value, setValue] = useState(50);\n\n  return (\n    <Slider\n      className=\"max-w-sm\"\n      value={value}\n      onValueChange={(next) =>\n        setValue(Array.isArray(next) ? next[0] : next)\n      }\n      max={100}\n      step={1}\n    >\n      <div className=\"flex items-center justify-between\">\n        <SliderLabel>Controlled</SliderLabel>\n        <SliderValue />\n      </div>\n    </Slider>\n  );\n}\n"
     },
     {
       "title": "Disabled State",
@@ -3216,12 +3217,12 @@ export const exampleRegistry = {
     {
       "title": "Field",
       "importPath": "slider-field",
-      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Field } from \"@/components/ui/cubby-ui/field\";\nimport { Fieldset, FieldsetLegend } from \"@/components/ui/cubby-ui/fieldset\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\nimport {\n  Slider,\n  SliderLabel,\n  SliderValue,\n} from \"@/components/ui/cubby-ui/slider\";\n\nexport default function SliderField() {\n  return (\n    <div className=\"flex w-full max-w-xs flex-col gap-10\">\n      {/*\n       * Pattern 1 — Base UI's `onFormSubmit`.\n       * Values are collected from registered Fields, so every slider must be\n       * wrapped in <Field name=\"...\"> (Fieldset is used for multi-thumb groups\n       * so each thumb keeps its own aria-label under a shared legend).\n       */}\n      <Form\n        className=\"space-y-6\"\n        onFormSubmit={(values) => {\n          alert(\"onFormSubmit values\\n\" + JSON.stringify(values, null, 2));\n        }}\n      >\n        <p className=\"text-muted-foreground text-xs\">\n          Using <code>onFormSubmit</code> — wrap each slider in{\" \"}\n          <code>Field</code>.\n        </p>\n\n        <Field name=\"volume\">\n          <Slider defaultValue={[50]}>\n            <div className=\"flex items-center justify-between\">\n              <SliderLabel>Volume</SliderLabel>\n              <SliderValue />\n            </div>\n          </Slider>\n        </Field>\n\n        <Field name=\"priceRange\">\n          <Fieldset\n            render={\n              <Slider\n                defaultValue={[20, 80]}\n                getAriaLabel={(index) =>\n                  index === 0 ? \"Minimum price\" : \"Maximum price\"\n                }\n              />\n            }\n          >\n            <div className=\"flex items-center justify-between\">\n              <FieldsetLegend>Price range</FieldsetLegend>\n              <SliderValue />\n            </div>\n          </Fieldset>\n        </Field>\n\n        <Button type=\"submit\" variant=\"neutral\">\n          Submit (onFormSubmit)\n        </Button>\n      </Form>\n\n      {/*\n       * Pattern 2 — Native `onSubmit` + FormData.\n       * Slider renders a hidden input from its `name` prop, so the browser\n       * picks it up via FormData. No Field wrapper required.\n       */}\n      <Form\n        className=\"space-y-6\"\n        onSubmit={(event) => {\n          event.preventDefault();\n          const formData = new FormData(event.currentTarget);\n          const values = Object.fromEntries(formData.entries());\n          alert(\"FormData values\\n\" + JSON.stringify(values, null, 2));\n        }}\n      >\n        <p className=\"text-muted-foreground text-xs\">\n          Using native <code>onSubmit</code> — put <code>name</code> directly on{\" \"}\n          <code>Slider</code>.\n        </p>\n\n        <Slider name=\"volume\" defaultValue={[50]}>\n          <div className=\"flex items-center justify-between\">\n            <SliderLabel>Volume</SliderLabel>\n            <SliderValue />\n          </div>\n        </Slider>\n\n        <Button type=\"submit\" variant=\"neutral\">\n          Submit (FormData)\n        </Button>\n      </Form>\n    </div>\n  );\n}\n"
+      "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Field } from \"@/components/ui/cubby-ui/field\";\nimport { Fieldset, FieldsetLegend } from \"@/components/ui/cubby-ui/fieldset\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\nimport {\n  Slider,\n  SliderLabel,\n  SliderValue,\n} from \"@/components/ui/cubby-ui/slider\";\n\nexport default function SliderField() {\n  return (\n    <div className=\"flex w-full max-w-xs flex-col gap-10\">\n      {/*\n       * Pattern 1 — Base UI's `onFormSubmit`.\n       * Values are collected from registered Fields, so every slider must be\n       * wrapped in <Field name=\"...\"> (Fieldset is used for multi-thumb groups\n       * so each thumb keeps its own aria-label under a shared legend).\n       */}\n      <Form\n        className=\"space-y-6\"\n        onFormSubmit={(values) => {\n          alert(\"onFormSubmit values\\n\" + JSON.stringify(values, null, 2));\n        }}\n      >\n        <p className=\"text-muted-foreground text-xs\">\n          Using <code>onFormSubmit</code> — wrap each slider in{\" \"}\n          <code>Field</code>.\n        </p>\n\n        <Field name=\"volume\">\n          <Slider defaultValue={50}>\n            <div className=\"flex items-center justify-between\">\n              <SliderLabel>Volume</SliderLabel>\n              <SliderValue />\n            </div>\n          </Slider>\n        </Field>\n\n        <Field name=\"priceRange\">\n          <Fieldset\n            render={\n              <Slider\n                defaultValue={[20, 80]}\n                getAriaLabel={(index) =>\n                  index === 0 ? \"Minimum price\" : \"Maximum price\"\n                }\n              />\n            }\n          >\n            <div className=\"flex items-center justify-between\">\n              <FieldsetLegend>Price range</FieldsetLegend>\n              <SliderValue />\n            </div>\n          </Fieldset>\n        </Field>\n\n        <Button type=\"submit\" variant=\"neutral\">\n          Submit (onFormSubmit)\n        </Button>\n      </Form>\n\n      {/*\n       * Pattern 2 — Native `onSubmit` + FormData.\n       * Slider renders a hidden input from its `name` prop, so the browser\n       * picks it up via FormData. No Field wrapper required.\n       */}\n      <Form\n        className=\"space-y-6\"\n        onSubmit={(event) => {\n          event.preventDefault();\n          const formData = new FormData(event.currentTarget);\n          const values = Object.fromEntries(formData.entries());\n          alert(\"FormData values\\n\" + JSON.stringify(values, null, 2));\n        }}\n      >\n        <p className=\"text-muted-foreground text-xs\">\n          Using native <code>onSubmit</code> — put <code>name</code> directly on{\" \"}\n          <code>Slider</code>.\n        </p>\n\n        <Slider name=\"volume\" defaultValue={50}>\n          <div className=\"flex items-center justify-between\">\n            <SliderLabel>Volume</SliderLabel>\n            <SliderValue />\n          </div>\n        </Slider>\n\n        <Button type=\"submit\" variant=\"neutral\">\n          Submit (FormData)\n        </Button>\n      </Form>\n    </div>\n  );\n}\n"
     },
     {
       "title": "Range",
       "importPath": "slider-range",
-      "source": "import { Slider } from \"@/components/ui/cubby-ui/slider\";\n\nexport default function SliderRange() {\n  return (\n    <Slider\n      className=\"max-w-sm\"\n      defaultValue={[25, 75]}\n      label=\"Price range\"\n      getAriaLabel={(index) =>\n        index === 0 ? \"Minimum price\" : \"Maximum price\"\n      }\n    />\n  );\n}\n"
+      "source": "import { Slider, SliderLabel } from \"@/components/ui/cubby-ui/slider\";\n\nexport default function SliderRange() {\n  return (\n    <Slider\n      className=\"max-w-sm\"\n      defaultValue={[25, 75]}\n      getAriaLabel={(index) =>\n        index === 0 ? \"Minimum price\" : \"Maximum price\"\n      }\n    >\n      <SliderLabel>Price range</SliderLabel>\n    </Slider>\n  );\n}\n"
     },
     {
       "title": "Variant",
@@ -3234,14 +3235,19 @@ export const exampleRegistry = {
       "source": "import { Slider } from \"@/components/ui/cubby-ui/slider\";\n\nexport default function SliderVertical() {\n  return <Slider className=\"h-44\" orientation=\"vertical\" defaultValue={50} getAriaLabel={() => \"Vertical slider\"} />;\n}\n"
     },
     {
+      "title": "With Scale",
+      "importPath": "slider-with-scale",
+      "source": "import { Slider, SliderLabel } from \"@/components/ui/cubby-ui/slider\";\n\nexport default function SliderWithScale() {\n  return (\n    <div className=\"w-full max-w-sm\">\n      <Slider defaultValue={15} min={5} max={35}>\n        <SliderLabel>Storage size</SliderLabel>\n      </Slider>\n      <div\n        role=\"group\"\n        aria-label=\"Storage size reference values\"\n        className=\"text-muted-foreground mt-3 flex w-full items-center justify-between gap-1 text-xs font-medium\"\n      >\n        <span>5 GB</span>\n        <span>20 GB</span>\n        <span>35 GB</span>\n      </div>\n    </div>\n  );\n}\n"
+    },
+    {
       "title": "With Steps",
       "importPath": "slider-with-steps",
-      "source": "import { Slider } from \"@/components/ui/cubby-ui/slider\";\n\nexport default function SliderWithSteps() {\n  return <Slider className=\"max-w-sm\" defaultValue={50} step={25} showSteps label=\"Step: 25\" />;\n}\n"
+      "source": "import { Slider, SliderLabel } from \"@/components/ui/cubby-ui/slider\";\n\nexport default function SliderWithSteps() {\n  return (\n    <Slider className=\"max-w-sm\" defaultValue={50} step={25} showSteps>\n      <SliderLabel>Step: 25</SliderLabel>\n    </Slider>\n  );\n}\n"
     },
     {
       "title": "With Value",
       "importPath": "slider-with-value",
-      "source": "import { Slider, SliderValue } from \"@/components/ui/cubby-ui/slider\";\n\nexport default function SliderWithValue() {\n  return (\n    <Slider className=\"max-w-sm\" defaultValue={75} label=\"Progress\">\n      <SliderValue />\n    </Slider>\n  );\n}\n"
+      "source": "import {\n  Slider,\n  SliderLabel,\n  SliderValue,\n} from \"@/components/ui/cubby-ui/slider\";\n\nexport default function SliderWithValue() {\n  return (\n    <Slider className=\"max-w-sm\" defaultValue={75}>\n      <div className=\"flex items-center justify-between\">\n        <SliderLabel>Progress</SliderLabel>\n        <SliderValue />\n      </div>\n    </Slider>\n  );\n}\n"
     }
   ],
   "switch": [
@@ -3910,6 +3916,7 @@ export const componentMap = {
   "slider-range": slider_slider_range,
   "slider-variant": slider_slider_variant,
   "slider-vertical": slider_slider_vertical,
+  "slider-with-scale": slider_slider_with_scale,
   "slider-with-steps": slider_slider_with_steps,
   "slider-with-value": slider_slider_with_value,
   "switch-basic": switch_switch_basic,
@@ -4197,8 +4204,8 @@ export const componentAnatomy = {
     "anatomy": "<Skeleton />"
   },
   "slider": {
-    "imports": "import { Slider } from \"@/components/ui/cubby-ui/slider\";",
-    "anatomy": "<Slider />"
+    "imports": "import { Slider, SliderLabel } from \"@/components/ui/cubby-ui/slider\";",
+    "anatomy": "<Slider>\n  <SliderLabel />\n</Slider>"
   },
   "switch": {
     "imports": "import { Switch } from \"@/components/ui/cubby-ui/switch\";",

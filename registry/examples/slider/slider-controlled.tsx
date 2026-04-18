@@ -1,23 +1,29 @@
 "use client";
 
-import { Slider, SliderValue } from "@/registry/default/slider/slider";
 import { useState } from "react";
+import {
+  Slider,
+  SliderLabel,
+  SliderValue,
+} from "@/registry/default/slider/slider";
 
 export default function SliderControlled() {
-  const [value, setValue] = useState([50]);
+  const [value, setValue] = useState(50);
 
   return (
     <Slider
       className="max-w-sm"
       value={value}
-      onValueChange={(value) =>
-        setValue(Array.isArray(value) ? value : [value])
+      onValueChange={(next) =>
+        setValue(Array.isArray(next) ? next[0] : next)
       }
       max={100}
       step={1}
-      label="Controlled"
     >
-      <SliderValue />
+      <div className="flex items-center justify-between">
+        <SliderLabel>Controlled</SliderLabel>
+        <SliderValue />
+      </div>
     </Slider>
   );
 }

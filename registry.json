@@ -876,7 +876,9 @@
           "duration-bouncy": "532ms",
           "ease-elastic": "linear(\r\n    0,\r\n    0.097,\r\n    0.3089,\r\n    0.546,\r\n    0.7552,\r\n    0.9123,\r\n    1.0133,\r\n    1.066,\r\n    1.0831,\r\n    1.0778,\r\n    1.0612,\r\n    1.0414,\r\n    1.0233,\r\n    1.0093,\r\n    1.0001,\r\n    0.995,\r\n    0.9932,\r\n    0.9933,\r\n    0.9946,\r\n    0.9963,\r\n    0.9978,\r\n    0.999,\r\n    0.9999,\r\n    1\r\n  )",
           "duration-elastic": "684ms",
-          "--animate-skeleton": "skeleton 2s -1s linear infinite"
+          "--animate-skeleton": "skeleton 2s -1s linear infinite",
+          "--animate-otp-field-shake-a": "otp-field-shake-a 180ms ease-in-out",
+          "--animate-otp-field-shake-b": "otp-field-shake-b 180ms ease-in-out"
         },
         "light": {
           "radius": "0.75rem",
@@ -969,6 +971,28 @@
         "@keyframes skeleton": {
           "to": {
             "background-position-x": "-200%"
+          }
+        },
+        "@keyframes otp-field-shake-a": {
+          "0%,\r\n    100%": {
+            "transform": "translateX(0)"
+          },
+          "25%": {
+            "transform": "translateX(-4px)"
+          },
+          "75%": {
+            "transform": "translateX(4px)"
+          }
+        },
+        "@keyframes otp-field-shake-b": {
+          "0%,\r\n    100%": {
+            "transform": "translateX(0)"
+          },
+          "25%": {
+            "transform": "translateX(-4px)"
+          },
+          "75%": {
+            "transform": "translateX(4px)"
           }
         },
         "@layer base": {

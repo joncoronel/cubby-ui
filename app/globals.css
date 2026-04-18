@@ -300,7 +300,6 @@ html {
   --duration-elastic: 684ms;
   /* Custom Animations */
   --animate-fade-in-up: fade-in-up 0.8s ease-out forwards;
-  --animate-float: float 4s ease-in-out infinite;
   --animate-skeleton: skeleton 2s -1s linear infinite;
   --animate-otp-field-shake-a: otp-field-shake-a 180ms ease-in-out;
   --animate-otp-field-shake-b: otp-field-shake-b 180ms ease-in-out;
@@ -326,6 +325,13 @@ html {
     }
   }
 
+  /*
+   * Paired identical keyframes.
+   * CSS animations don't restart when re-applied to the same element with
+   * the same animation-name, so on each invalid OTP entry we alternate
+   * between the two names to force the browser to treat it as a new
+   * animation and replay the shake. Keep both bodies in sync.
+   */
   @keyframes otp-field-shake-a {
     0%,
     100% {

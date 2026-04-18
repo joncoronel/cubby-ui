@@ -15,7 +15,7 @@ import { Form } from "@/registry/default/form/form";
 export default function FieldWithCheckboxGroup() {
   return (
     <Form
-      className="w-full max-w-sm space-y-4"
+      className="space-y-4"
       onFormSubmit={(values) => {
         alert(JSON.stringify(values, null, 2));
       }}

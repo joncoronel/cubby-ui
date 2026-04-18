@@ -532,7 +532,8 @@
         }
       ],
       "registryDependencies": [
-        "@cubby-ui/button"
+        "@cubby-ui/button",
+        "@cubby-ui/toast"
       ],
       "dependencies": [
         "@hugeicons/react",

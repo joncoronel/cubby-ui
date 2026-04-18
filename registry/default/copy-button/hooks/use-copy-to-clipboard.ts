@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 async function writeToClipboard(text: string): Promise<boolean> {
   try {
@@ -25,22 +25,37 @@ async function writeToClipboard(text: string): Promise<boolean> {
   }
 }
 
-export function useCopyToClipboard(timeout: number = 2000) {
+export interface UseCopyToClipboardOptions {
+  /** ms before `isCopied` auto-resets. Pass `null` to disable (e.g. when another mechanism owns the lifecycle). */
+  timeout?: number | null;
+  onCopied?: (text: string) => void;
+}
+
+export function useCopyToClipboard({
+  timeout = 2000,
+  onCopied,
+}: UseCopyToClipboardOptions = {}) {
   const [isCopied, setIsCopied] = useState(false);
 
   useEffect(() => {
-    if (isCopied) {
+    if (isCopied && timeout != null) {
       const timer = setTimeout(() => setIsCopied(false), timeout);
       return () => clearTimeout(timer);
     }
   }, [isCopied, timeout]);
 
-  const copyToClipboard = async (text: string) => {
-    const success = await writeToClipboard(text);
-    if (success) {
-      setIsCopied(true);
-    }
-  };
+  const copyToClipboard = useCallback(
+    async (text: string) => {
+      const success = await writeToClipboard(text);
+      if (success) {
+        setIsCopied(true);
+        onCopied?.(text);
+      }
+    },
+    [onCopied],
+  );
 
-  return { isCopied, copyToClipboard };
+  const reset = useCallback(() => setIsCopied(false), []);
+
+  return { isCopied, copyToClipboard, reset };
 }

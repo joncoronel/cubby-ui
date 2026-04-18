@@ -158,6 +158,7 @@ import context_menu_context_menu_with_separators_and_shortcuts from "@/registry/
 import context_menu_context_menu_with_submenus from "@/registry/examples/context-menu/context-menu-with-submenus";
 import copy_button_copy_button_custom_icons_demo from "@/registry/examples/copy-button/copy-button-custom-icons-demo";
 import copy_button_copy_button_demo from "@/registry/examples/copy-button/copy-button-demo";
+import copy_button_copy_button_with_toast from "@/registry/examples/copy-button/copy-button-with-toast";
 import cropper_cropper_simple from "@/registry/examples/cropper/cropper-simple";
 import cropper_cropper_aspect_ratios from "@/registry/examples/cropper/cropper-aspect-ratios";
 import cropper_cropper_download from "@/registry/examples/cropper/cropper-download";
@@ -710,7 +711,8 @@ export const componentMetadata = {
     "description": "A copy-button component.",
     "category": "UI",
     "registryDependencies": [
-      "@cubby-ui/button"
+      "@cubby-ui/button",
+      "@cubby-ui/toast"
     ],
     "dependencies": [
       "@hugeicons/react",
@@ -2169,6 +2171,11 @@ export const exampleRegistry = {
       "title": "Demo",
       "importPath": "copy-button-demo",
       "source": "\"use client\";\n\nimport { CopyButton } from \"@/components/ui/cubby-ui/copy-button\";\n\nexport default function CopyButtonDemo() {\n  const textToCopy = \"npm install @base-ui/react\";\n\n  return (\n    <div className=\"flex items-center gap-2\">\n      <CopyButton content={textToCopy} />\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "With Toast",
+      "importPath": "copy-button-with-toast",
+      "source": "\"use client\";\n\nimport { CopyButton } from \"@/components/ui/cubby-ui/copy-button\";\n\nexport default function CopyButtonWithToast() {\n  return (\n    <div className=\"flex items-center gap-2\">\n      <CopyButton content=\"npm install @cubby-ui/copy-button\" toast />\n    </div>\n  );\n}\n"
     }
   ],
   "cropper": [
@@ -3386,7 +3393,7 @@ export const exampleRegistry = {
     {
       "title": "Anchored",
       "importPath": "toast-anchored",
-      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { toast } from \"@/components/ui/cubby-ui/toast\";\nimport { CopyButton } from \"@/components/ui/cubby-ui/copy-button\";\n\nexport default function ToastAnchored() {\n  const wrapperRef = React.useRef<HTMLDivElement>(null);\n\n  return (\n    <div\n      ref={wrapperRef}\n      className=\"inline-block\"\n      onClickCapture={() => {\n        toast.anchored({\n          description: \"Copied to clipboard!\",\n          anchor: wrapperRef,\n          side: \"top\",\n          sideOffset: 8,\n          arrow: true,\n          duration: 2000,\n        });\n      }}\n    >\n      <CopyButton content=\"npm install @cubby-ui/toast\" />\n    </div>\n  );\n}\n"
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { toast } from \"@/components/ui/cubby-ui/toast\";\n\nexport default function ToastAnchored() {\n  const buttonRef = React.useRef<HTMLButtonElement>(null);\n  const [open, setOpen] = React.useState(false);\n\n  return (\n    <Button\n      ref={buttonRef}\n      variant=\"outline\"\n      disabled={open}\n      onClick={() => {\n        setOpen(true);\n        toast.anchored({\n          description: \"Anchored to the button above\",\n          anchor: buttonRef,\n          side: \"top\",\n          sideOffset: 8,\n          arrow: true,\n          duration: 2000,\n          onClose: () => setOpen(false),\n        });\n      }}\n    >\n      Show toast\n    </Button>\n  );\n}\n"
     },
     {
       "title": "Deduplicated",
@@ -3704,6 +3711,7 @@ export const componentMap = {
   "context-menu-with-submenus": context_menu_context_menu_with_submenus,
   "copy-button-custom-icons-demo": copy_button_copy_button_custom_icons_demo,
   "copy-button-demo": copy_button_copy_button_demo,
+  "copy-button-with-toast": copy_button_copy_button_with_toast,
   "cropper-simple": cropper_cropper_simple,
   "cropper-aspect-ratios": cropper_cropper_aspect_ratios,
   "cropper-download": cropper_cropper_download,

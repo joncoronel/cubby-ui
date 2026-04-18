@@ -51,17 +51,39 @@ For the complete Base UI API, see the [Base UI Tooltip documentation](https://ba
 
 #### createTooltipHandle
 
-A function to create a handle for connecting detached triggers to a tooltip. Useful when the trigger needs to be placed outside the `Tooltip` component.
+Creates a handle that connects a tooltip to one or more external `TooltipTrigger` components. Useful when the triggers need to live outside the `Tooltip` — for example, when each row in a list has its own trigger but they all share one tooltip.
 
 ```tsx
 import { createTooltipHandle } from "@/registry/default/tooltip/tooltip";
 
-// Without payload typing
 const handle = createTooltipHandle();
-
-// With payload typing
-const handle = createTooltipHandle<{ title: string }>();
 ```
+
+##### Passing data from the trigger to the tooltip
+
+The handle accepts an optional `<Payload>` generic that types a value each trigger can pass along. The tooltip reads it through a render-prop child, so you can render different content per trigger without duplicating the tooltip markup.
+
+```tsx
+type User = { id: string; name: string };
+
+const handle = createTooltipHandle<User>();
+
+// Multiple triggers, each with its own payload:
+users.map((user) => (
+  <TooltipTrigger key={user.id} handle={handle} payload={user}>
+    {user.name}
+  </TooltipTrigger>
+));
+
+// One shared tooltip that renders based on the active trigger:
+<Tooltip handle={handle}>
+  <TooltipContent>
+    {({ payload: user }) => <p>{user?.name}</p>}
+  </TooltipContent>
+</Tooltip>;
+```
+
+Without the `<User>` generic, `payload` inside the render prop resolves to `unknown`.
 
 ### Props
 

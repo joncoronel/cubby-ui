@@ -68,6 +68,12 @@ Place the trigger outside of the Dialog component using `createDialogHandle()`.
 
 <ComponentPreview component="dialog" example="dialog-detached-trigger" />
 
+### Non-Modal
+
+Pass `modal={false}` for a floating dialog that keeps the page interactive. The backdrop is hidden, pointer events pass through the empty area around the popup, and outside clicks don't dismiss the dialog.
+
+<ComponentPreview component="dialog" example="dialog-non-modal" />
+
 ### Elements Outside Popup
 
 Place elements visually outside the popup card while keeping them inside the popup component for accessibility (tab order, screen reader support). The popup uses `pointer-events: none` so backdrop clicks work, while inner content uses `pointer-events: auto`.
@@ -80,11 +86,75 @@ The Dialog component is built on top of [Base UI's Dialog](https://base-ui.com/r
 
 For the complete Base UI API, see the [Base UI Dialog documentation](https://base-ui.com/react/components/dialog).
 
+### Utilities
+
+#### createDialogHandle
+
+Creates a handle that connects a dialog to one or more external `DialogTrigger` components. Useful when the triggers need to live outside the `Dialog` — for example, when each row in a list has its own trigger but they all share one dialog.
+
+```tsx
+import { createDialogHandle } from "@/registry/default/dialog/dialog";
+
+const handle = createDialogHandle();
+```
+
+##### Passing data from the trigger to the dialog
+
+The handle accepts an optional `<Payload>` generic that types a value each trigger can pass along. The dialog reads it through a render-prop child, so you can render different content per trigger without duplicating the dialog markup.
+
+```tsx
+type User = { id: string; name: string };
+
+const handle = createDialogHandle<User>();
+
+// Multiple triggers, each with its own payload:
+users.map((user) => (
+  <DialogTrigger key={user.id} handle={handle} payload={user}>
+    Edit {user.name}
+  </DialogTrigger>
+));
+
+// One shared dialog that renders based on the active trigger:
+<Dialog handle={handle}>
+  <DialogContent>
+    {({ payload: user }) => (
+      <DialogHeader>
+        <DialogTitle>{user?.name}</DialogTitle>
+      </DialogHeader>
+    )}
+  </DialogContent>
+</Dialog>;
+```
+
+Without the `<User>` generic, `payload` inside the render prop resolves to `unknown`.
+
 ### Props
+
+#### Dialog
+
+Root component. Forwards all props to Base UI's `Dialog.Root`, with modified defaults for the `modal` prop.
+
+<ApiPropsList>
+
+<ApiProp
+  name="modal"
+  fullType='boolean | "trap-focus"'
+  simpleType="boolean"
+  defaultValue="true"
+>
+  Behavior is unchanged from Base UI, but when set to `false` or
+  `"trap-focus"`, `DialogContent` skips the backdrop and wires
+  `pointer-events` so the page remains interactive. Also changes the default
+  of `disablePointerDismissal` to `true` so clicks on the page don't close
+  the dialog. Pass `disablePointerDismissal={false}` explicitly to opt back
+  into outside-click dismissal.
+</ApiProp>
+
+</ApiPropsList>
 
 #### DialogContent
 
-Modal container with backdrop and centered positioning. Composes `Dialog.Portal`, `Dialog.Backdrop`, and `Dialog.Popup`. Props are forwarded to `Dialog.Popup`.
+Dialog container with centered positioning. Composes `Dialog.Portal`, `Dialog.Viewport`, and `Dialog.Popup`. Also renders `Dialog.Backdrop` when the dialog is modal. Props are forwarded to `Dialog.Popup`.
 
 <ApiPropsList>
 

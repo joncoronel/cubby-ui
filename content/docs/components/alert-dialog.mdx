@@ -31,11 +31,59 @@ Use nested alert dialogs for multi-step confirmations.
 
 <ComponentPreview component="alert-dialog" example="alert-dialog-nested" />
 
+### Detached Trigger
+
+Place the trigger outside of the AlertDialog component using `createAlertDialogHandle()`.
+
+<ComponentPreview component="alert-dialog" example="alert-dialog-detached-trigger" />
+
 ## API Reference
 
 The AlertDialog component is built on top of [Base UI's AlertDialog](https://base-ui.com/react/components/alert-dialog). All Base UI props are supported. The documentation below only covers custom props specific to our implementation.
 
 For the complete Base UI API, see the [Base UI AlertDialog documentation](https://base-ui.com/react/components/alert-dialog).
+
+### Utilities
+
+#### createAlertDialogHandle
+
+Creates a handle that connects an alert dialog to one or more external `AlertDialogTrigger` components. Useful when the triggers need to live outside the `AlertDialog` — for example, when each row in a list has its own delete button but they all share one confirmation dialog.
+
+```tsx
+import { createAlertDialogHandle } from "@/registry/default/alert-dialog/alert-dialog";
+
+const handle = createAlertDialogHandle();
+```
+
+##### Passing data from the trigger to the alert dialog
+
+The handle accepts an optional `<Payload>` generic that types a value each trigger can pass along. The alert dialog reads it through a render-prop child, so you can render different content (or target different resources) per trigger without duplicating the dialog markup.
+
+```tsx
+type User = { id: string; name: string };
+
+const handle = createAlertDialogHandle<User>();
+
+// Multiple triggers, each with its own payload:
+users.map((user) => (
+  <AlertDialogTrigger key={user.id} handle={handle} payload={user}>
+    Delete {user.name}
+  </AlertDialogTrigger>
+));
+
+// One shared alert dialog that renders based on the active trigger:
+<AlertDialog handle={handle}>
+  <AlertDialogContent>
+    {({ payload: user }) => (
+      <AlertDialogHeader>
+        <AlertDialogTitle>Delete {user?.name}?</AlertDialogTitle>
+      </AlertDialogHeader>
+    )}
+  </AlertDialogContent>
+</AlertDialog>;
+```
+
+Without the `<User>` generic, `payload` inside the render prop resolves to `unknown`.
 
 ### Props
 

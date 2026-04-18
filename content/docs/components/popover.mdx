@@ -59,17 +59,39 @@ For the complete Base UI API, see the [Base UI Popover documentation](https://ba
 
 #### createPopoverHandle
 
-A function to create a handle for connecting detached triggers to a popover. Useful when the trigger needs to be placed outside the `Popover` component.
+Creates a handle that connects a popover to one or more external `PopoverTrigger` components. Useful when the triggers need to live outside the `Popover` — for example, when each row in a list has its own trigger but they all share one popover.
 
 ```tsx
 import { createPopoverHandle } from "@/registry/default/popover/popover";
 
-// Without payload typing
 const handle = createPopoverHandle();
-
-// With payload typing
-const handle = createPopoverHandle<{ title: string }>();
 ```
+
+##### Passing data from the trigger to the popover
+
+The handle accepts an optional `<Payload>` generic that types a value each trigger can pass along. The popover reads it through a render-prop child, so you can render different content per trigger without duplicating the popover markup.
+
+```tsx
+type User = { id: string; name: string };
+
+const handle = createPopoverHandle<User>();
+
+// Multiple triggers, each with its own payload:
+users.map((user) => (
+  <PopoverTrigger key={user.id} handle={handle} payload={user}>
+    {user.name}
+  </PopoverTrigger>
+));
+
+// One shared popover that renders based on the active trigger:
+<Popover handle={handle}>
+  <PopoverContent>
+    {({ payload: user }) => <p>{user?.name}</p>}
+  </PopoverContent>
+</Popover>;
+```
+
+Without the `<User>` generic, `payload` inside the render prop resolves to `unknown`.
 
 ### Props
 

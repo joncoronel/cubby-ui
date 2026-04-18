@@ -2534,7 +2534,7 @@ export const exampleRegistry = {
     {
       "title": "With Slider",
       "importPath": "field-with-slider",
-      "source": "import {\n  Field,\n  FieldDescription,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Slider, SliderLabel, SliderValue } from \"@/components/ui/cubby-ui/slider\";\n\nexport default function FieldWithSlider() {\n  return (\n    <Field name=\"volume\">\n      <Slider defaultValue={[50]} className=\"w-full max-w-xs\">\n        <div className=\"flex items-center justify-between\">\n          <SliderLabel>Volume</SliderLabel>\n          <SliderValue />\n        </div>\n      </Slider>\n      <FieldDescription>Adjust the output volume level.</FieldDescription>\n    </Field>\n  );\n}\n"
+      "source": "import {\n  Field,\n  FieldDescription,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Slider, SliderLabel, SliderValue } from \"@/components/ui/cubby-ui/slider\";\n\nexport default function FieldWithSlider() {\n  return (\n    <Field name=\"volume\">\n      <Slider defaultValue={50} className=\"w-full max-w-xs\">\n        <div className=\"flex items-center justify-between\">\n          <SliderLabel>Volume</SliderLabel>\n          <SliderValue />\n        </div>\n      </Slider>\n      <FieldDescription>Adjust the output volume level.</FieldDescription>\n    </Field>\n  );\n}\n"
     },
     {
       "title": "With Switch",

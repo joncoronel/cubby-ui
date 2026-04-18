@@ -1,13 +1,14 @@
+import { Field, FieldDescription } from "@/registry/default/field/field";
 import {
-  Field,
-  FieldDescription,
-} from "@/registry/default/field/field";
-import { Slider, SliderLabel, SliderValue } from "@/registry/default/slider/slider";
+  Slider,
+  SliderLabel,
+  SliderValue,
+} from "@/registry/default/slider/slider";
 
 export default function FieldWithSlider() {
   return (
-    <Field name="volume">
-      <Slider defaultValue={[50]} className="w-full max-w-xs">
+    <Field name="volume" className="w-full max-w-xs">
+      <Slider defaultValue={50}>
         <div className="flex items-center justify-between">
           <SliderLabel>Volume</SliderLabel>
           <SliderValue />

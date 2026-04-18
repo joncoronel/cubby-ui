@@ -96,11 +96,9 @@ const sheetContentVariants = cva(
   },
 );
 
-const createSheetHandle = BaseSheet.createHandle;
+const Sheet = BaseSheet.Root;
 
-function Sheet({ ...props }: BaseSheet.Root.Props) {
-  return <BaseSheet.Root data-slot="sheet" {...props} />;
-}
+const createSheetHandle = BaseSheet.createHandle;
 
 function SheetTrigger({ ...props }: BaseSheet.Trigger.Props) {
   return <BaseSheet.Trigger data-slot="sheet-trigger" {...props} />;

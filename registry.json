@@ -526,16 +526,15 @@
           "target": "components/ui/cubby-ui/copy-button/copy-button.tsx"
         },
         {
-          "path": "registry/default/copy-button/lib/copy-to-clipboard.ts",
-          "type": "registry:lib",
-          "target": "components/ui/cubby-ui/copy-button/lib/copy-to-clipboard.ts"
+          "path": "registry/default/copy-button/hooks/use-copy-to-clipboard.ts",
+          "type": "registry:hook",
+          "target": "components/ui/cubby-ui/copy-button/hooks/use-copy-to-clipboard.ts"
         }
       ],
       "registryDependencies": [
         "@cubby-ui/button"
       ],
       "dependencies": [
-        "lucide-react",
         "@hugeicons/react",
         "@hugeicons/core-free-icons"
       ]

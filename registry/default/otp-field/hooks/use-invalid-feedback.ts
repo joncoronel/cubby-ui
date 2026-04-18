@@ -68,9 +68,9 @@ export interface UseInvalidFeedbackReturn {
 }
 
 const SHAKE_CLASS_A =
-  "animate-otp-field-shake-a focus:outline-destructive/80";
+  "animate-otp-field-shake-a focus:outline-destructive/80 motion-reduce:animate-none";
 const SHAKE_CLASS_B =
-  "animate-otp-field-shake-b focus:outline-destructive/80";
+  "animate-otp-field-shake-b focus:outline-destructive/80 motion-reduce:animate-none";
 
 /**
  * Hook that manages shake animation and screen reader feedback

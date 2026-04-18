@@ -713,7 +713,6 @@ export const componentMetadata = {
       "@cubby-ui/button"
     ],
     "dependencies": [
-      "lucide-react",
       "@hugeicons/react",
       "@hugeicons/core-free-icons"
     ],

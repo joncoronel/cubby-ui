@@ -37,6 +37,12 @@ Add action buttons to toasts. Clicking the action dismisses the current toast an
 
 <ComponentPreview component="toast" example="toast-action" />
 
+### Deduplicated
+
+Prevent duplicate toasts by passing a fixed `id`. If a toast with the same ID is already visible, it updates in place with a pulse animation instead of creating a new one.
+
+<ComponentPreview component="toast" example="toast-deduplicated" />
+
 ### Promise
 
 Show loading, success, and error states based on promise resolution.
@@ -76,6 +82,10 @@ toast(<div>Custom JSX content</div>, { type: "info" });
 ```
 
 <ApiPropsList>
+
+<ApiProp name="id" fullType="string">
+  Fixed identifier for deduplication. If a toast with this ID already exists, it updates in place instead of creating a duplicate.
+</ApiProp>
 
 <ApiProp name="title" fullType="string">
   Displays the title text.

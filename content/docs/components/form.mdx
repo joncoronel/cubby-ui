@@ -1,0 +1,96 @@
+---
+title: Form
+description: Form wrapper with consolidated error handling and validation
+---
+
+import { Form } from "@/registry/default/form/form";
+
+## Preview
+
+<ComponentPreview component="form" example="form-demo" />
+
+## Installation
+
+<ComponentInstall component="form" />
+
+## Usage
+
+<ComponentUsage component="form" />
+
+## Examples
+
+### Submit as JavaScript Object
+
+Use `onFormSubmit` instead of `onSubmit` to receive form values as a JavaScript object.
+
+<ComponentPreview component="form" example="form-on-form-submit" />
+
+### Constraint Validation
+
+Use native HTML validation attributes (`required`, `pattern`, `minLength`, `type`, `min`, `max`, etc.) with a single `FieldError` that displays the browser's native error message.
+
+<ComponentPreview component="form" example="form-constraint-validation" />
+
+### Server-side Validation
+
+Display errors returned by server-side validation via the `errors` prop.
+
+<ComponentPreview component="form" example="form-server-validation" />
+
+### Server Function with useActionState
+
+Submit with a Server Function using `useActionState` and the `action` prop.
+
+<ComponentPreview component="form" example="form-use-action-state" />
+
+### Zod Validation
+
+Use Zod schemas with `z.flattenError` to map validation errors to fields.
+
+<ComponentPreview component="form" example="form-zod-validation" />
+
+### React Hook Form
+
+Integrate with React Hook Form using `Controller` and Base UI Field's external state props.
+
+<ComponentPreview component="form" example="form-react-hook-form" />
+
+### TanStack Form
+
+Integrate with TanStack Form using `useForm` and `form.Field` render props.
+
+<ComponentPreview component="form" example="form-tanstack-form" />
+
+### Complete Form
+
+A comprehensive form combining multiple field types.
+
+<ComponentPreview component="form" example="form-complete" />
+
+## API Reference
+
+The Form component is built on top of [Base UI's Form](https://base-ui.com/react/components/form). All Base UI props are supported.
+
+For the complete Base UI API, see the [Base UI Form documentation](https://base-ui.com/react/components/form).
+
+### Props
+
+#### Form
+
+A native form element with consolidated error handling. Renders a `<form>` element.
+
+<ApiPropsList>
+
+<ApiProp name="onFormSubmit" fullType="(formValues: Record<string, any>, eventDetails: SubmitEventDetails) => void">
+  Called when the form is submitted. Receives form values as a JavaScript object. `preventDefault()` is automatically called on the native submit event.
+</ApiProp>
+
+<ApiProp name="errors" fullType="Record<string, string | string[]>">
+  Server-side validation errors. Keys correspond to field `name` attributes. Errors are cleared from a field when its value changes.
+</ApiProp>
+
+<ApiProp name="validationMode" fullType="'onSubmit' | 'onBlur' | 'onChange'" defaultValue="'onSubmit'">
+  When fields should be validated. Individual fields can override this with their own `validationMode`.
+</ApiProp>
+
+</ApiPropsList>

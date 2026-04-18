@@ -249,6 +249,18 @@
     "dependencies": [],
     "reference": []
   },
+  "field": {
+    "title": "Field",
+    "description": "A field component.",
+    "dependencies": [],
+    "reference": []
+  },
+  "fieldset": {
+    "title": "Fieldset",
+    "description": "A fieldset component.",
+    "dependencies": [],
+    "reference": []
+  },
   "form": {
     "title": "Form",
     "description": "A form component.",
@@ -321,6 +333,18 @@
       "@base-ui/react",
       "class-variance-authority"
     ],
+    "reference": []
+  },
+  "number-field": {
+    "title": "Number Field",
+    "description": "A number-field component.",
+    "dependencies": [],
+    "reference": []
+  },
+  "otp-field": {
+    "title": "Otp Field",
+    "description": "A otp-field component.",
+    "dependencies": [],
     "reference": []
   },
   "pagination": {

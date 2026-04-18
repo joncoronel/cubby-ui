@@ -16,7 +16,7 @@
     "dev:build": "pnpm run registry:sync && pnpm run registry:build && next build"
   },
   "dependencies": {
-    "@base-ui/react": "^1.3.0",
+    "@base-ui/react": "^1.4.0",
     "@conform-to/react": "^1.17.1",
     "@conform-to/zod": "^1.17.1",
     "@headless-tree/core": "^1.6.3",
@@ -28,6 +28,7 @@
     "@openpanel/nextjs": "^1.4.0",
     "@orama/orama": "^3.1.18",
     "@origin-space/image-cropper": "^0.1.9",
+    "@tanstack/react-form": "^1.29.0",
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/react-virtual": "^3.13.23",
     "@types/mdx": "^2.0.13",

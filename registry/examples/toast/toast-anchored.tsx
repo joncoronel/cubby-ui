@@ -1,28 +1,32 @@
 "use client";
 
 import * as React from "react";
+import { Button } from "@/registry/default/button/button";
 import { toast } from "@/registry/default/toast/toast";
-import { CopyButton } from "@/registry/default/copy-button/copy-button";
 
 export default function ToastAnchored() {
-  const wrapperRef = React.useRef<HTMLDivElement>(null);
+  const buttonRef = React.useRef<HTMLButtonElement>(null);
+  const [open, setOpen] = React.useState(false);
 
   return (
-    <div
-      ref={wrapperRef}
-      className="inline-block"
-      onClickCapture={() => {
+    <Button
+      ref={buttonRef}
+      variant="outline"
+      disabled={open}
+      onClick={() => {
+        setOpen(true);
         toast.anchored({
-          description: "Copied to clipboard!",
-          anchor: wrapperRef,
+          description: "Anchored to the button above",
+          anchor: buttonRef,
           side: "top",
           sideOffset: 8,
           arrow: true,
           duration: 2000,
+          onClose: () => setOpen(false),
         });
       }}
     >
-      <CopyButton content="npm install @cubby-ui/toast" />
-    </div>
+      Show toast
+    </Button>
   );
 }

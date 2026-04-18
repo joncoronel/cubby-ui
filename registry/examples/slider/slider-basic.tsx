@@ -1,5 +1,9 @@
-import { Slider } from "@/registry/default/slider/slider";
+import { Slider, SliderLabel } from "@/registry/default/slider/slider";
 
 export default function SliderBasic() {
-  return <Slider className="max-w-sm" defaultValue={50} label="Volume" />;
+  return (
+    <Slider className="max-w-sm" defaultValue={50}>
+      <SliderLabel>Volume</SliderLabel>
+    </Slider>
+  );
 }

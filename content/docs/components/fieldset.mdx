@@ -1,0 +1,48 @@
+---
+title: Fieldset
+description: Groups related form fields with a shared legend
+---
+
+import { Fieldset, FieldsetLegend } from "@/registry/default/fieldset/fieldset";
+
+## Preview
+
+<ComponentPreview component="fieldset" example="fieldset-demo" />
+
+## Installation
+
+<ComponentInstall component="fieldset" />
+
+## Usage
+
+<ComponentUsage component="fieldset" />
+
+## Examples
+
+### With Radio Group
+
+Compose Fieldset with RadioGroup using the `render` prop to merge elements.
+
+<ComponentPreview component="fieldset" example="fieldset-with-radio-group" />
+
+### With Checkbox Group
+
+Compose Fieldset with CheckboxGroup using the `render` prop.
+
+<ComponentPreview component="fieldset" example="fieldset-with-checkbox-group" />
+
+## API Reference
+
+The Fieldset component is built on top of [Base UI's Fieldset](https://base-ui.com/react/components/fieldset). All Base UI props are supported.
+
+For the complete Base UI API, see the [Base UI Fieldset documentation](https://base-ui.com/react/components/fieldset).
+
+### Props
+
+#### Fieldset
+
+Groups a shared legend with related controls. Renders a `<fieldset>` element. Supports the `render` prop for composing with other components like RadioGroup or CheckboxGroup.
+
+#### FieldsetLegend
+
+An accessible label automatically associated with the fieldset. Renders a `<div>` element (not a native `<legend>` to avoid browser styling issues).

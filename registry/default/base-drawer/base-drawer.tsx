@@ -94,7 +94,7 @@ function BaseDrawerIndent({
     <DrawerPrimitive.Indent
       data-slot="base-drawer-indent"
       className={cn(
-        "ease-smooth transition-[transform,border-radius] duration-(--duration-smooth) data-ending-style:duration-(--duration-snappy)",
+        "transition-[transform,border-radius] duration-400 ease-[cubic-bezier(.32,.72,0,1)]",
         "data-[active]:scale-[0.94] data-[active]:overflow-hidden data-[active]:rounded-lg",
         className,
       )}
@@ -157,7 +157,7 @@ function BaseDrawerBackdrop({
   return (
     <DrawerPrimitive.Backdrop
       className={cn(
-        "ease-smooth fixed inset-0 z-50 bg-black/40 opacity-[calc(1-var(--drawer-swipe-progress))] backdrop-blur-sm transition-opacity duration-(--duration-smooth) data-ending-style:opacity-0 data-ending-style:duration-[calc(var(--drawer-swipe-strength)*var(--duration-snappy))] data-starting-style:opacity-0 data-swiping:duration-0 supports-[-webkit-touch-callout:none]:absolute",
+        "fixed inset-0 z-50 bg-black/40 opacity-[calc(1-var(--drawer-swipe-progress))] backdrop-blur-sm transition-opacity duration-400 ease-[cubic-bezier(.32,.72,0,1)] data-ending-style:opacity-0 data-ending-style:duration-[calc(var(--drawer-swipe-strength)*var(--duration-snappy))] data-starting-style:opacity-0 data-swiping:duration-0 supports-[-webkit-touch-callout:none]:absolute",
         className,
       )}
       data-slot="base-drawer-backdrop"
@@ -229,7 +229,7 @@ function BaseDrawerPopup({
             // Base layout
             "bg-popover text-popover-foreground relative flex max-h-full min-h-0 w-full min-w-0 flex-col shadow-lg will-change-transform outline-none",
             // Transition
-            "ease-smooth transition-[transform,box-shadow,height,background-color] duration-(--duration-smooth) data-ending-style:duration-(--duration-snappy)",
+            "transition-[transform,box-shadow,height,background-color] duration-400 ease-[cubic-bezier(.32,.72,0,1)]",
             "touch-none",
             // Stack calculation variables
             "[--peek:1.5rem] [--stack-step:0.05]",

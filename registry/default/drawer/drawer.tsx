@@ -46,7 +46,7 @@ const drawerContentVariants = cva(
   [
     "bg-popover text-popover-foreground flex flex-col",
     "relative",
-    "ease-smooth transition-[transform,scale,translate] duration-(--duration-smooth) data-ending-style:duration-(--duration-snappy) will-change-transform",
+    "ease-[cubic-bezier(.32,.72,0,1)] transition-[transform,scale,translate] duration-400  will-change-transform",
     "motion-reduce:transition-none",
     // Nested drawer support: scale down parent when child opens (interpolated during drag)
     "scale-[calc(1-0.05*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))]",
@@ -1037,10 +1037,11 @@ function DrawerContentInner({
               "touch-none",
               immediateClose || (isDragging && !isAnimating)
                 ? "transition-none"
-                : "ease-smooth transition-opacity duration-(--duration-smooth) data-ending-style:duration-(--duration-snappy)",
+                : "transition-opacity duration-400 ease-[cubic-bezier(.32,.72,0,1)]",
               "[&[data-starting-style]]:opacity-0!",
               // Exit animation overrides scroll-driven animation (transitions can't interpolate from animation-held values)
-              "data-ending-style:animate-[drawer-backdrop-exit_var(--duration-snappy)_var(--ease-smooth)_forwards]",
+
+              "data-ending-style:animate-[drawer-backdrop-exit_400ms_cubic-bezier(.32,.72,0,1)_forwards]",
               isInitialized && !isAnimating && dismissible && dragProgress < 1
                 ? useScrollDrivenAnimation
                   ? backdropAnimationStyles[direction]

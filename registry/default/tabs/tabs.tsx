@@ -256,14 +256,22 @@ function TabsContent({ className, ...props }: BaseTabs.Panel.Props) {
       className={cn(
         "min-w-0 flex-1 outline-none",
         "[grid-area:1/1]",
-        "ease-out-cubic transition-[opacity,translate,filter,scale] duration-[var(--fade-duration,0.2s),400ms,var(--fade-duration,0.2s),200ms]",
-        // Enter/exit: fade and blur
-        "data-starting-style:opacity-0",
-        "data-ending-style:opacity-0 data-ending-style:contain-[size]",
-        // Horizontal directional slide
-        "data-starting-style:scale-97",
-        "data-ending-style:scale-97",
-        "origin-top",
+        "ease-out-cubic transition-[opacity,translate,filter] duration-200",
+        // Enter/exit: fade + blur (scale with height diff via --fade-duration)
+        "data-starting-style:opacity-0 data-starting-style:blur-sm",
+        "data-ending-style:opacity-0 data-ending-style:blur-sm data-ending-style:contain-[size]",
+        // Directional slide (fixed 400ms)
+        "data-[activation-direction=right]:data-starting-style:translate-x-3",
+        "data-[activation-direction=right]:data-ending-style:-translate-x-3",
+        "data-[activation-direction=left]:data-starting-style:-translate-x-3",
+        "data-[activation-direction=left]:data-ending-style:translate-x-3",
+        "data-[activation-direction=down]:data-starting-style:translate-y-3",
+        "data-[activation-direction=down]:data-ending-style:-translate-y-3",
+        "data-[activation-direction=up]:data-starting-style:-translate-y-3",
+        "data-[activation-direction=up]:data-ending-style:translate-y-3",
+        // Fallback for none/initial mount
+        "data-[activation-direction=none]:data-starting-style:translate-y-3",
+        "data-[activation-direction=none]:data-ending-style:translate-y-3",
         "motion-reduce:blur-none motion-reduce:transition-none",
         className,
       )}

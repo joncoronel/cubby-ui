@@ -96,7 +96,30 @@ const sheetContentVariants = cva(
   },
 );
 
-const Sheet = BaseSheet.Root;
+interface SheetConfigContextValue {
+  modal: boolean | "trap-focus";
+}
+
+const SheetConfigContext = React.createContext<SheetConfigContextValue>({
+  modal: true,
+});
+
+function Sheet<Payload>({
+  modal = true,
+  disablePointerDismissal,
+  ...props
+}: BaseSheet.Root.Props<Payload>) {
+  const configValue = React.useMemo(() => ({ modal }), [modal]);
+  return (
+    <SheetConfigContext.Provider value={configValue}>
+      <BaseSheet.Root
+        modal={modal}
+        disablePointerDismissal={disablePointerDismissal ?? modal !== true}
+        {...props}
+      />
+    </SheetConfigContext.Provider>
+  );
+}
 
 const createSheetHandle = BaseSheet.createHandle;
 
@@ -149,16 +172,22 @@ function SheetContent({
     footerVariant?: "default" | "inset";
     showCloseButton?: boolean;
   }) {
+  const { modal } = React.useContext(SheetConfigContext);
+  const isModal = modal === true;
   return (
     <SheetPortal>
-      <SheetBackdrop />
-      <SheetViewport>
+      {isModal && <SheetBackdrop />}
+      <SheetViewport className={cn(!isModal && "pointer-events-none")}>
         <BaseSheet.Popup
           data-slot="sheet-content"
           data-side={side}
           data-variant={variant}
           data-footer-variant={footerVariant}
-          className={cn(sheetContentVariants({ variant, side }), className)}
+          className={cn(
+            sheetContentVariants({ variant, side }),
+            !isModal && "pointer-events-auto",
+            className,
+          )}
           {...props}
         >
           {children}

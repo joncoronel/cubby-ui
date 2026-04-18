@@ -11,7 +11,30 @@ import {
   type ScrollAreaProps,
 } from "@/registry/default/scroll-area/scroll-area";
 
-const Dialog = BaseDialog.Root;
+interface DialogConfigContextValue {
+  modal: boolean | "trap-focus";
+}
+
+const DialogConfigContext = React.createContext<DialogConfigContextValue>({
+  modal: true,
+});
+
+function Dialog<Payload>({
+  modal = true,
+  disablePointerDismissal,
+  ...props
+}: BaseDialog.Root.Props<Payload>) {
+  const configValue = React.useMemo(() => ({ modal }), [modal]);
+  return (
+    <DialogConfigContext.Provider value={configValue}>
+      <BaseDialog.Root
+        modal={modal}
+        disablePointerDismissal={disablePointerDismissal ?? modal !== true}
+        {...props}
+      />
+    </DialogConfigContext.Provider>
+  );
+}
 
 const createDialogHandle = BaseDialog.createHandle;
 
@@ -64,10 +87,12 @@ function DialogContent({
   showCloseButton?: boolean;
   variant?: "default" | "inset";
 }) {
+  const { modal } = React.useContext(DialogConfigContext);
+  const isModal = modal === true;
   return (
     <DialogPortal>
-      <DialogBackdrop />
-      <DialogViewport>
+      {isModal && <DialogBackdrop />}
+      <DialogViewport className={cn(!isModal && "pointer-events-none")}>
         <BaseDialog.Popup
           data-slot="dialog-content"
           data-variant={variant}
@@ -90,6 +115,7 @@ function DialogContent({
             "after:pointer-events-none after:absolute after:inset-0 after:hidden after:rounded-[inherit] after:bg-black/5 after:opacity-0 after:transition-[opacity,display] after:transition-discrete after:duration-200",
             "data-nested-dialog-open:after:block data-nested-dialog-open:after:opacity-100",
             "starting:data-nested-dialog-open:after:opacity-0",
+            !isModal && "pointer-events-auto",
             className,
           )}
           {...props}

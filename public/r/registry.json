@@ -16,7 +16,8 @@
         }
       ],
       "dependencies": [
-        "lucide-react"
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {
@@ -52,7 +53,8 @@
         "@cubby-ui/scroll-area"
       ],
       "dependencies": [
-        "lucide-react"
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {
@@ -162,7 +164,8 @@
         "@cubby-ui/scroll-area"
       ],
       "dependencies": [
-        "lucide-react"
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {
@@ -214,7 +217,8 @@
         "@cubby-ui/scroll-area"
       ],
       "dependencies": [
-        "lucide-react"
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {
@@ -230,7 +234,8 @@
         }
       ],
       "dependencies": [
-        "lucide-react"
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {
@@ -284,8 +289,9 @@
         "@cubby-ui/button"
       ],
       "dependencies": [
-        "lucide-react",
-        "react-day-picker"
+        "react-day-picker",
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {
@@ -321,7 +327,8 @@
       ],
       "dependencies": [
         "embla-carousel-react",
-        "lucide-react"
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {
@@ -429,9 +436,10 @@
         "@cubby-ui/scroll-area"
       ],
       "dependencies": [
-        "lucide-react",
         "@icons-pack/react-simple-icons",
         "shiki",
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons",
         "hast-util-to-jsx-runtime"
       ]
     },
@@ -475,7 +483,8 @@
         "@cubby-ui/scroll-area"
       ],
       "dependencies": [
-        "lucide-react"
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {
@@ -495,7 +504,8 @@
         "@cubby-ui/scroll-area"
       ],
       "dependencies": [
-        "lucide-react"
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {
@@ -511,7 +521,8 @@
         }
       ],
       "dependencies": [
-        "lucide-react"
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {
@@ -554,7 +565,8 @@
       ],
       "dependencies": [
         "@origin-space/image-cropper",
-        "lucide-react"
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {
@@ -622,7 +634,8 @@
       ],
       "dependencies": [
         "dayjs",
-        "lucide-react"
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {
@@ -644,8 +657,9 @@
       ],
       "dependencies": [
         "dayjs",
-        "lucide-react",
-        "react-day-picker"
+        "react-day-picker",
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {
@@ -665,7 +679,8 @@
         "@cubby-ui/scroll-area"
       ],
       "dependencies": [
-        "lucide-react"
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {
@@ -711,7 +726,8 @@
       ],
       "dependencies": [
         "class-variance-authority",
-        "lucide-react"
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {
@@ -1056,7 +1072,8 @@
       ],
       "dependencies": [
         "input-otp",
-        "lucide-react"
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {
@@ -1101,7 +1118,8 @@
         }
       ],
       "dependencies": [
-        "lucide-react"
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {
@@ -1183,7 +1201,8 @@
         "@cubby-ui/button"
       ],
       "dependencies": [
-        "lucide-react"
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {
@@ -1254,8 +1273,9 @@
         }
       ],
       "dependencies": [
-        "lucide-react",
-        "react-resizable-panels"
+        "react-resizable-panels",
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {
@@ -1331,7 +1351,8 @@
       ],
       "dependencies": [
         "class-variance-authority",
-        "lucide-react"
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {
@@ -1356,7 +1377,8 @@
       ],
       "dependencies": [
         "class-variance-authority",
-        "lucide-react"
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {
@@ -1577,7 +1599,8 @@
         "@cubby-ui/checkbox"
       ],
       "dependencies": [
-        "lucide-react"
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {

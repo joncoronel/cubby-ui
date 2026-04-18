@@ -33,7 +33,11 @@ export default function ComboboxAsyncMultiple() {
     if (isPending) {
       return (
         <>
-          <HugeiconsIcon icon={Loading03Icon} className="size-3 animate-spin"  strokeWidth={2} />
+          <HugeiconsIcon
+            icon={Loading03Icon}
+            className="size-4 animate-spin"
+            strokeWidth={2}
+          />
           Searching...
         </>
       );
@@ -73,14 +77,16 @@ export default function ComboboxAsyncMultiple() {
                   <ComboboxChip key={employee.id} aria-label={employee.name}>
                     {employee.name}
                     <ComboboxChipRemove aria-label="Remove">
-                      <HugeiconsIcon icon={Cancel01Icon} className="h-3 w-3"  strokeWidth={2} />
+                      <HugeiconsIcon
+                        icon={Cancel01Icon}
+                        className="h-3 w-3"
+                        strokeWidth={2}
+                      />
                     </ComboboxChipRemove>
                   </ComboboxChip>
                 ))}
                 <ComboboxChipInput
-                  placeholder={
-                    selectedEmployees.length > 0 ? "" : "e.g. Sarah"
-                  }
+                  placeholder={selectedEmployees.length > 0 ? "" : "e.g. Sarah"}
                 />
               </>
             )}

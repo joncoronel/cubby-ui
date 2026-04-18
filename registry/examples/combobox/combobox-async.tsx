@@ -28,7 +28,11 @@ export default function ComboboxAsync() {
     if (isPending) {
       return (
         <>
-          <HugeiconsIcon icon={Loading03Icon} className="size-3 animate-spin"  strokeWidth={2} />
+          <HugeiconsIcon
+            icon={Loading03Icon}
+            className="size-4 animate-spin"
+            strokeWidth={2}
+          />
           Searching...
         </>
       );

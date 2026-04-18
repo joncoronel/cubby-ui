@@ -2,8 +2,6 @@
 
 import * as React from "react";
 import { AlertDialog as BaseAlertDialog } from "@base-ui/react/alert-dialog";
-import { XIcon } from "lucide-react";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/registry/default/button/button";
 import {
@@ -11,6 +9,8 @@ import {
   type ScrollAreaProps,
 } from "@/registry/default/scroll-area/scroll-area";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
 const AlertDialog = BaseAlertDialog.Root;
 
 const createAlertDialogHandle = BaseAlertDialog.createHandle;
@@ -105,7 +105,7 @@ function AlertDialogContent({
               className="absolute end-2 top-2"
               render={<Button size="icon_sm" variant="ghost" />}
             >
-              <XIcon />
+              <HugeiconsIcon icon={Cancel01Icon}  strokeWidth={2} />
             </AlertDialogClose>
           )}
         </BaseAlertDialog.Popup>

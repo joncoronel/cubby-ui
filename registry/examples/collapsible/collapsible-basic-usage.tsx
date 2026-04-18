@@ -4,14 +4,14 @@ import {
   CollapsibleTrigger,
 } from "@/registry/default/collapsible/collapsible";
 import { Checkbox } from "@/registry/default/checkbox/checkbox";
-import { ChevronRight } from "lucide-react";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 export default function CollapsibleBasicUsage() {
   return (
     <Collapsible className="w-full max-w-xs">
       <CollapsibleTrigger>
         <span>Advanced Settings</span>
-        <ChevronRight className="size-4 transition-transform duration-200 ease-out group-data-[panel-open]:rotate-90" />
+        <HugeiconsIcon icon={ArrowRight01Icon} className="size-4 transition-transform duration-200 ease-out group-data-[panel-open]:rotate-90"  strokeWidth={2} />
       </CollapsibleTrigger>
       <CollapsibleContent>
         <div className="border-border bg-card mt-2 space-y-4 rounded-md border px-4 py-3">

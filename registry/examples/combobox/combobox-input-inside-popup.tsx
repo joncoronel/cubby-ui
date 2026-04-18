@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { ChevronDown } from "lucide-react";
 import {
   Combobox,
   ComboboxInput,
@@ -15,6 +14,8 @@ import {
 } from "@/registry/default/combobox/combobox";
 import { Button } from "@/registry/default/button/button";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
 export default function ComboboxInputInsidePopup() {
   const [value, setValue] = React.useState<Country | null>(null);
 
@@ -32,7 +33,7 @@ export default function ComboboxInputInsidePopup() {
               {...props}
               variant="outline"
               className="justify-between font-normal"
-              rightSection={<ChevronDown className="h-4 w-4 opacity-50" />}
+              rightSection={<HugeiconsIcon icon={ArrowDown01Icon} className="h-4 w-4 opacity-50"  strokeWidth={2} />}
             >
               <ComboboxValue placeholder="Select country" />
             </Button>

@@ -3,8 +3,6 @@
 import * as React from "react";
 import { Autocomplete as AutocompleteBase } from "@base-ui/react/autocomplete";
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
-import { SearchIcon } from "lucide-react";
-
 import {
   InputGroup,
   InputGroupAddon,
@@ -17,6 +15,8 @@ import {
 
 import { cn } from "@/lib/utils";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Search01Icon } from "@hugeicons/core-free-icons";
 // Expose Base UI's filter hook for virtualization use cases
 const useCommandFilter = AutocompleteBase.useFilter;
 
@@ -145,12 +145,12 @@ function CommandInput({
         {...props}
       />
       <InputGroupAddon>
-        <SearchIcon
+        <HugeiconsIcon icon={Search01Icon}
           className={cn(
             "size-4",
             loading && "animation-duration-400 animate-pulse",
           )}
-        />
+         strokeWidth={2} />
       </InputGroupAddon>
     </InputGroup>
   );

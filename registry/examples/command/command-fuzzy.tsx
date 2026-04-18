@@ -20,25 +20,25 @@ import { useFuzzyFilter } from "@/registry/default/hooks/use-fuzzy-filter";
 import { highlightText } from "@/registry/default/lib/highlight-text";
 import { Button } from "@/registry/default/button/button";
 import { Kbd } from "@/registry/default/kbd/kbd";
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  Calculator,
-  Calendar,
-  CornerDownLeftIcon,
-  CreditCard,
-  FileText,
-  Mail,
-  MessageSquare,
-  Settings,
-  User,
-} from "lucide-react";
-
+  ArrowDown01Icon,
+  ArrowTurnBackwardIcon,
+  ArrowUp01Icon,
+  BubbleChatIcon,
+  CalculatorIcon,
+  Calendar01Icon,
+  CreditCardIcon,
+  File02Icon,
+  Mail01Icon,
+  Settings01Icon,
+  UserIcon,
+} from "@hugeicons/core-free-icons";
 interface CommandItemData {
   value: string;
   label: string;
   description: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: IconSvgElement;
 }
 
 interface CommandGroupData {
@@ -54,19 +54,19 @@ const commandGroups: CommandGroupData[] = [
         value: "new-document",
         label: "New Document",
         description: "Create a new blank document",
-        icon: FileText,
+        icon: File02Icon,
       },
       {
         value: "send-message",
         label: "Send Message",
         description: "Compose and send a new message",
-        icon: MessageSquare,
+        icon: BubbleChatIcon,
       },
       {
         value: "schedule-event",
         label: "Schedule Event",
         description: "Add an event to your calendar",
-        icon: Calendar,
+        icon: Calendar01Icon,
       },
     ],
   },
@@ -77,13 +77,13 @@ const commandGroups: CommandGroupData[] = [
         value: "calculator",
         label: "Calculator",
         description: "Open the calculator tool",
-        icon: Calculator,
+        icon: CalculatorIcon,
       },
       {
         value: "email-client",
         label: "Email Client",
         description: "Check your inbox and emails",
-        icon: Mail,
+        icon: Mail01Icon,
       },
     ],
   },
@@ -94,19 +94,19 @@ const commandGroups: CommandGroupData[] = [
         value: "profile-settings",
         label: "Profile Settings",
         description: "Manage your profile information",
-        icon: User,
+        icon: UserIcon,
       },
       {
         value: "billing-info",
         label: "Billing Information",
         description: "View and update payment methods",
-        icon: CreditCard,
+        icon: CreditCardIcon,
       },
       {
         value: "preferences",
         label: "Preferences",
         description: "Customize app settings and behavior",
-        icon: Settings,
+        icon: Settings01Icon,
       },
     ],
   },
@@ -160,14 +160,17 @@ export default function CommandFuzzy() {
                       <CommandGroupLabel>{group.label}</CommandGroupLabel>
                       <CommandCollection>
                         {(item: CommandItemData) => {
-                          const Icon = item.icon;
                           return (
                             <CommandItem
                               key={item.value}
                               value={item}
                               className="items-start"
                             >
-                              <Icon className="mt-0.5 size-4 shrink-0" />
+                              <HugeiconsIcon
+                                icon={item.icon}
+                                strokeWidth={2}
+                                className="mt-0.5 size-4 shrink-0"
+                              />
                               <div className="flex flex-col gap-0.5">
                                 <span className="font-medium leading-5">
                                   {highlightText(item.label, query)}
@@ -189,16 +192,16 @@ export default function CommandFuzzy() {
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1.5">
                   <Kbd size="sm" className="px-1">
-                    <CornerDownLeftIcon className="size-3" />
+                    <HugeiconsIcon icon={ArrowTurnBackwardIcon} className="size-3"  strokeWidth={2} />
                   </Kbd>
                   <span>to select</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Kbd size="sm" className="px-1">
-                    <ArrowUpIcon className="size-3" />
+                    <HugeiconsIcon icon={ArrowUp01Icon} className="size-3"  strokeWidth={2} />
                   </Kbd>
                   <Kbd size="sm" className="px-1">
-                    <ArrowDownIcon className="size-3" />
+                    <HugeiconsIcon icon={ArrowDown01Icon} className="size-3"  strokeWidth={2} />
                   </Kbd>
                   <span>to navigate</span>
                 </div>

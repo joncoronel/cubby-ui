@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { FileText, Settings, User } from "lucide-react";
 import { Button } from "@/registry/default/button/button";
 import {
   DropdownMenu,
@@ -14,6 +13,8 @@ import {
   createDropdownMenuHandle,
 } from "@/registry/default/dropdown-menu/dropdown-menu";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { File02Icon, Settings01Icon, UserIcon } from "@hugeicons/core-free-icons";
 type MenuContent = {
   heading: string;
   items: string[][];
@@ -55,7 +56,7 @@ export default function DropdownMenuAnimated() {
         payload={"file" as const}
         render={<Button variant="outline" size="icon" />}
       >
-        <FileText className="size-4" />
+        <HugeiconsIcon icon={File02Icon} className="size-4"  strokeWidth={2} />
         <span className="sr-only">File</span>
       </DropdownMenuTrigger>
 
@@ -64,7 +65,7 @@ export default function DropdownMenuAnimated() {
         payload={"account" as const}
         render={<Button variant="outline" size="icon" />}
       >
-        <User className="size-4" />
+        <HugeiconsIcon icon={UserIcon} className="size-4"  strokeWidth={2} />
         <span className="sr-only">Account</span>
       </DropdownMenuTrigger>
 
@@ -73,7 +74,7 @@ export default function DropdownMenuAnimated() {
         payload={"preferences" as const}
         render={<Button variant="outline" size="icon" />}
       >
-        <Settings className="size-4" />
+        <HugeiconsIcon icon={Settings01Icon} className="size-4"  strokeWidth={2} />
         <span className="sr-only">Preferences</span>
       </DropdownMenuTrigger>
 

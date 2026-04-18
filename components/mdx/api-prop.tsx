@@ -6,9 +6,10 @@ import type { ReactNode } from "react";
 //   CollapsibleTrigger,
 //   CollapsibleContent,
 // } from "@/registry/default/collapsible/collapsible";
-import { ChevronRight } from "lucide-react";
 import { Collapsible } from "@base-ui/react/collapsible";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 interface ApiPropProps {
   name: string;
   fullType: string;
@@ -63,7 +64,7 @@ export function ApiProp({
 
         {/* Chevron - Column 2 (mobile), Column 3 (sm+), Column 4 (md+) */}
         <div className="flex cursor-pointer items-center justify-center px-3 sm:col-start-3 md:col-start-4">
-          <ChevronRight className="text-muted-foreground ease-out-cubic size-4 shrink-0 transition-transform duration-250 group-data-[panel-open]/collapsible-trigger:rotate-90" />
+          <HugeiconsIcon icon={ArrowRight01Icon} className="text-muted-foreground ease-out-cubic size-4 shrink-0 transition-transform duration-250 group-data-[panel-open]/collapsible-trigger:rotate-90"  strokeWidth={2} />
         </div>
       </Collapsible.Trigger>
 

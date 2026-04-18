@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { X, CheckIcon, ChevronDown } from "lucide-react";
 import { Label } from "@/registry/default/label/label";
 import {
   ScrollArea,
@@ -10,6 +9,8 @@ import {
 } from "@/registry/default/scroll-area/scroll-area";
 import { Combobox as BaseCombobox } from "@base-ui/react/combobox";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowDown01Icon, Cancel01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 const useComboboxFilter = BaseCombobox.useFilter;
 const useComboboxFilteredItems = BaseCombobox.useFilteredItems;
 
@@ -115,7 +116,7 @@ function ComboboxTrigger({
       )}
       {...props}
     >
-      {children ?? <ChevronDown className="h-4 w-4" />}
+      {children ?? <HugeiconsIcon icon={ArrowDown01Icon} className="h-4 w-4"  strokeWidth={2} />}
     </BaseCombobox.Trigger>
   );
 }
@@ -146,7 +147,7 @@ function ComboboxClear({ className, ...props }: BaseCombobox.Clear.Props) {
       )}
       {...props}
     >
-      <X className="h-4 w-4" />
+      <HugeiconsIcon icon={Cancel01Icon} className="h-4 w-4"  strokeWidth={2} />
     </BaseCombobox.Clear>
   );
 }
@@ -373,7 +374,7 @@ function ComboboxItem({
       {...props}
     >
       <div className="break-all">{children}</div>
-      <BaseCombobox.ItemIndicator render={<CheckIcon className="size-4" />} />
+      <BaseCombobox.ItemIndicator render={<HugeiconsIcon icon={Tick02Icon} className="size-4"  strokeWidth={2} />} />
     </BaseCombobox.Item>
   );
 }

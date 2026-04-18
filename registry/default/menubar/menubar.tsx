@@ -1,9 +1,9 @@
 import { Menu as BaseMenu } from "@base-ui/react/menu";
 import { Menubar as BaseMenubar } from "@base-ui/react/menubar";
-import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react";
-
 import { cn } from "@/lib/utils";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01Icon, CircleIcon, Tick02Icon } from "@hugeicons/core-free-icons";
 function Menubar({
   className,
   ...props
@@ -155,7 +155,7 @@ function MenubarCheckboxItem({
     >
       <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
         <BaseMenu.CheckboxItemIndicator>
-          <CheckIcon className="size-4" />
+          <HugeiconsIcon icon={Tick02Icon} className="size-4"  strokeWidth={2} />
         </BaseMenu.CheckboxItemIndicator>
       </span>
       {children}
@@ -179,7 +179,7 @@ function MenubarRadioItem({
     >
       <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
         <BaseMenu.RadioItemIndicator>
-          <CircleIcon className="size-2 fill-current" />
+          <HugeiconsIcon icon={CircleIcon} className="size-2 fill-current"  strokeWidth={2} />
         </BaseMenu.RadioItemIndicator>
       </span>
       {children}
@@ -261,7 +261,7 @@ function MenubarSubTrigger({
       {...props}
     >
       {children}
-      <ChevronRightIcon className="ml-auto h-4 w-4" />
+      <HugeiconsIcon icon={ArrowRight01Icon} className="ml-auto h-4 w-4"  strokeWidth={2} />
     </BaseMenu.SubmenuTrigger>
   );
 }

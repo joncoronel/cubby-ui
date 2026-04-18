@@ -44,7 +44,6 @@
     "hast-util-to-jsx-runtime": "^2.3.6",
     "input-otp": "^1.4.2",
     "jotai": "^2.18.1",
-    "lucide-react": "^0.544.0",
     "match-sorter": "^8.2.0",
     "motion": "^12.38.0",
     "next": "16.2.1",

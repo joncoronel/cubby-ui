@@ -6,8 +6,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/registry/default/breadcrumbs/breadcrumbs";
-import { Slash } from "lucide-react";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import { DivideSignIcon } from "@hugeicons/core-free-icons";
 export default function BreadcrumbsCustomSeparator() {
   return (
     <Breadcrumb>
@@ -16,13 +16,13 @@ export default function BreadcrumbsCustomSeparator() {
           <BreadcrumbLink href="/">Home</BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator>
-          <Slash className="h-4 w-4" />
+          <HugeiconsIcon icon={DivideSignIcon} className="h-4 w-4"  strokeWidth={2} />
         </BreadcrumbSeparator>
         <BreadcrumbItem>
           <BreadcrumbLink href="/blog">Blog</BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator>
-          <Slash className="h-4 w-4" />
+          <HugeiconsIcon icon={DivideSignIcon} className="h-4 w-4"  strokeWidth={2} />
         </BreadcrumbSeparator>
         <BreadcrumbItem>
           <BreadcrumbPage>Article Title</BreadcrumbPage>

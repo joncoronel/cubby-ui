@@ -1,12 +1,13 @@
 import * as React from "react";
 import { Autocomplete as BaseAutocomplete } from "@base-ui/react/autocomplete";
-import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   ScrollArea,
   type ScrollAreaProps,
 } from "@/registry/default/scroll-area/scroll-area";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
 const AutocompleteRoot = BaseAutocomplete.Root;
 
 function AutocompleteInput({
@@ -43,7 +44,7 @@ function AutocompleteInput({
         <div className="absolute inset-y-0 right-3 flex items-center gap-2">
           {showClear && (
             <AutocompleteClear>
-              <X className="h-4 w-4" />
+              <HugeiconsIcon icon={Cancel01Icon} className="h-4 w-4"  strokeWidth={2} />
             </AutocompleteClear>
           )}
           {showTrigger && <AutocompleteTrigger />}

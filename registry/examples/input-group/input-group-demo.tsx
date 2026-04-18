@@ -1,12 +1,4 @@
 import {
-  ArrowUpIcon,
-  CheckIcon,
-  InfoIcon,
-  PlusIcon,
-  Search,
-} from "lucide-react";
-
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -27,13 +19,21 @@ import {
   TooltipTrigger,
 } from "@/registry/default/tooltip/tooltip";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  ArrowUp01Icon,
+  InformationCircleIcon,
+  PlusSignIcon,
+  Search01Icon,
+  Tick02Icon,
+} from "@hugeicons/core-free-icons";
 export default function InputGroupDemo() {
   return (
     <div className="grid w-full max-w-sm gap-6">
       <InputGroup>
         <InputGroupInput placeholder="Search..." />
         <InputGroupAddon>
-          <Search />
+          <HugeiconsIcon icon={Search01Icon}  strokeWidth={2} />
         </InputGroupAddon>
         <InputGroupAddon align="inline-end">12 results</InputGroupAddon>
       </InputGroup>
@@ -49,7 +49,7 @@ export default function InputGroupDemo() {
               size="icon_xs"
               render={(props) => <TooltipTrigger {...props} />}
             >
-              <InfoIcon />
+              <HugeiconsIcon icon={InformationCircleIcon}  strokeWidth={2} />
             </InputGroupButton>
             <TooltipContent>This is content in a tooltip.</TooltipContent>
           </Tooltip>
@@ -63,7 +63,7 @@ export default function InputGroupDemo() {
             className="rounded-full"
             size="icon_xs"
           >
-            <PlusIcon />
+            <HugeiconsIcon icon={PlusSignIcon}  strokeWidth={2} />
           </InputGroupButton>
           <DropdownMenu>
             <InputGroupButton
@@ -86,7 +86,7 @@ export default function InputGroupDemo() {
             size="icon_xs"
             disabled
           >
-            <ArrowUpIcon />
+            <HugeiconsIcon icon={ArrowUp01Icon}  strokeWidth={2} />
             <span className="sr-only">Send</span>
           </InputGroupButton>
         </InputGroupAddon>
@@ -95,7 +95,7 @@ export default function InputGroupDemo() {
         <InputGroupInput placeholder="@shadcn" />
         <InputGroupAddon align="inline-end">
           <div className="bg-primary text-primary-foreground flex size-4 items-center justify-center rounded-full">
-            <CheckIcon className="size-3" />
+            <HugeiconsIcon icon={Tick02Icon} className="size-3"  strokeWidth={2} />
           </div>
         </InputGroupAddon>
       </InputGroup>

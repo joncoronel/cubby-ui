@@ -18,23 +18,24 @@ import {
 } from "@/registry/default/command/command";
 import { Button } from "@/registry/default/button/button";
 import { Kbd } from "@/registry/default/kbd/kbd";
-import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  CornerDownLeftIcon,
-  FileIcon,
-  FolderIcon,
-  HomeIcon,
-  SearchIcon,
-  SettingsIcon,
-} from "lucide-react";
 import * as React from "react";
 import { useState, useEffect } from "react";
 
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
+import {
+  ArrowDown01Icon,
+  ArrowTurnBackwardIcon,
+  ArrowUp01Icon,
+  File01Icon,
+  Folder01Icon,
+  Home01Icon,
+  Search01Icon,
+  Settings01Icon,
+} from "@hugeicons/core-free-icons";
 interface CommandItemData {
   value: string;
   label: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: IconSvgElement;
   type?: string;
 }
 
@@ -47,9 +48,9 @@ const commandGroups: CommandGroupData[] = [
   {
     label: "Navigation",
     items: [
-      { value: "home", label: "Home", icon: HomeIcon },
-      { value: "settings", label: "Settings", icon: SettingsIcon },
-      { value: "search", label: "Search", icon: SearchIcon },
+      { value: "home", label: "Home", icon: Home01Icon },
+      { value: "settings", label: "Settings", icon: Settings01Icon },
+      { value: "search", label: "Search", icon: Search01Icon },
     ],
   },
   {
@@ -58,38 +59,38 @@ const commandGroups: CommandGroupData[] = [
       {
         value: "documents",
         label: "Documents",
-        icon: FolderIcon,
+        icon: Folder01Icon,
         type: "Folder",
       },
-      { value: "readme", label: "README.md", icon: FileIcon, type: "File" },
-      { value: "package", label: "package.json", icon: FileIcon, type: "File" },
-      { value: "config", label: "config.json", icon: FileIcon, type: "File" },
+      { value: "readme", label: "README.md", icon: File01Icon, type: "File" },
+      { value: "package", label: "package.json", icon: File01Icon, type: "File" },
+      { value: "config", label: "config.json", icon: File01Icon, type: "File" },
       {
         value: "settings",
         label: "settings.json",
-        icon: FileIcon,
+        icon: File01Icon,
         type: "File",
       },
-      { value: "index", label: "index.html", icon: FileIcon, type: "File" },
-      { value: "style", label: "style.css", icon: FileIcon, type: "File" },
-      { value: "script", label: "script.js", icon: FileIcon, type: "File" },
-      { value: "image", label: "image.png", icon: FileIcon, type: "File" },
-      { value: "video", label: "video.mp4", icon: FileIcon, type: "File" },
-      { value: "audio", label: "audio.mp3", icon: FileIcon, type: "File" },
-      { value: "pdf", label: "pdf.pdf", icon: FileIcon, type: "File" },
-      { value: "word", label: "word.docx", icon: FileIcon, type: "File" },
-      { value: "excel", label: "excel.xlsx", icon: FileIcon, type: "File" },
+      { value: "index", label: "index.html", icon: File01Icon, type: "File" },
+      { value: "style", label: "style.css", icon: File01Icon, type: "File" },
+      { value: "script", label: "script.js", icon: File01Icon, type: "File" },
+      { value: "image", label: "image.png", icon: File01Icon, type: "File" },
+      { value: "video", label: "video.mp4", icon: File01Icon, type: "File" },
+      { value: "audio", label: "audio.mp3", icon: File01Icon, type: "File" },
+      { value: "pdf", label: "pdf.pdf", icon: File01Icon, type: "File" },
+      { value: "word", label: "word.docx", icon: File01Icon, type: "File" },
+      { value: "excel", label: "excel.xlsx", icon: File01Icon, type: "File" },
       {
         value: "powerpoint",
         label: "powerpoint.pptx",
-        icon: FileIcon,
+        icon: File01Icon,
         type: "File",
       },
-      { value: "zip", label: "zip.zip", icon: FileIcon, type: "File" },
-      { value: "rar", label: "rar.rar", icon: FileIcon, type: "File" },
-      { value: "7z", label: "7z.7z", icon: FileIcon, type: "File" },
-      { value: "tar", label: "tar.tar", icon: FileIcon, type: "File" },
-      { value: "gz", label: "gz.gz", icon: FileIcon, type: "File" },
+      { value: "zip", label: "zip.zip", icon: File01Icon, type: "File" },
+      { value: "rar", label: "rar.rar", icon: File01Icon, type: "File" },
+      { value: "7z", label: "7z.7z", icon: File01Icon, type: "File" },
+      { value: "tar", label: "tar.tar", icon: File01Icon, type: "File" },
+      { value: "gz", label: "gz.gz", icon: File01Icon, type: "File" },
     ],
   },
 ];
@@ -127,10 +128,9 @@ export default function CommandWithFooter() {
                       <CommandGroupLabel>{group.label}</CommandGroupLabel>
                       <CommandCollection>
                         {(item: CommandItemData) => {
-                          const Icon = item.icon;
                           return (
                             <CommandItem key={item.value} value={item.value}>
-                              <Icon />
+                              <HugeiconsIcon icon={item.icon} strokeWidth={2} />
                               <span>{item.label}</span>
                               {item.type && (
                                 <CommandShortcut>{item.type}</CommandShortcut>
@@ -148,16 +148,16 @@ export default function CommandWithFooter() {
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1.5">
                   <Kbd size="sm" className="px-1">
-                    <CornerDownLeftIcon className="size-3" />
+                    <HugeiconsIcon icon={ArrowTurnBackwardIcon} className="size-3"  strokeWidth={2} />
                   </Kbd>
                   <span>to select</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Kbd size="sm" className="px-1">
-                    <ArrowUpIcon className="size-3" />
+                    <HugeiconsIcon icon={ArrowUp01Icon} className="size-3"  strokeWidth={2} />
                   </Kbd>
                   <Kbd size="sm" className="px-1">
-                    <ArrowDownIcon className="size-3" />
+                    <HugeiconsIcon icon={ArrowDown01Icon} className="size-3"  strokeWidth={2} />
                   </Kbd>
                   <span>to navigate</span>
                 </div>

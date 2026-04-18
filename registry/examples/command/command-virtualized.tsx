@@ -19,8 +19,8 @@ import {
 } from "@/registry/default/hooks/use-list-virtualizer";
 import { highlightText } from "@/registry/default/lib/highlight-text";
 import { Button } from "@/registry/default/button/button";
-import { FileIcon } from "lucide-react";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import { File01Icon } from "@hugeicons/core-free-icons";
 interface FileItem {
   id: string;
   name: string;
@@ -114,7 +114,7 @@ function VirtualizedListContent({
             style={getItemStyle(virtualItem)}
             {...getItemProps(virtualItem)}
           >
-            <FileIcon />
+            <HugeiconsIcon icon={File01Icon}  strokeWidth={2} />
             <span className="truncate">
               {highlightText(item.name, query)}
             </span>

@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { X, Plus } from "lucide-react";
 import {
   Combobox,
   ComboboxChipInput,
@@ -28,6 +27,8 @@ import {
   DialogFooter,
 } from "@/registry/default/dialog/dialog";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
 export default function ComboboxCreatable() {
   const [items, setItems] = React.useState<LabelItem[]>(initialLabels);
   const [selectedItems, setSelectedItems] = React.useState<LabelItem[]>([]);
@@ -59,7 +60,7 @@ export default function ComboboxCreatable() {
                     <ComboboxChip key={label.id} aria-label={label.value}>
                       {label.value}
                       <ComboboxChipRemove aria-label="Remove">
-                        <X className="h-3 w-3" />
+                        <HugeiconsIcon icon={Cancel01Icon} className="h-3 w-3"  strokeWidth={2} />
                       </ComboboxChipRemove>
                     </ComboboxChip>
                   ))}
@@ -83,7 +84,7 @@ export default function ComboboxCreatable() {
                   className="grid-cols-auto"
                 >
                   <div className="grid grid-cols-[1rem_1fr] items-center gap-2">
-                    <Plus className="h-4 w-4" />
+                    <HugeiconsIcon icon={PlusSignIcon} className="h-4 w-4"  strokeWidth={2} />
                     <span className="break-all">
                       Create &quot;{item.creatable}&quot;
                     </span>

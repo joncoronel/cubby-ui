@@ -1,30 +1,35 @@
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/registry/default/select/select";
-import { Github, Mail, Phone, MessageCircle } from "lucide-react";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  ChatIcon,
+  GithubIcon,
+  Mail01Icon,
+  TelephoneIcon,
+} from "@hugeicons/core-free-icons";
 export default function SelectWithIcons() {
   const contactMethods = [
     { 
       label: "Email", 
       value: "email", 
-      icon: <Mail className="size-4" />,
+      icon: <HugeiconsIcon icon={Mail01Icon} className="size-4"  strokeWidth={2} />,
       description: "Send us an email"
     },
     { 
       label: "Phone", 
       value: "phone", 
-      icon: <Phone className="size-4" />,
+      icon: <HugeiconsIcon icon={TelephoneIcon} className="size-4"  strokeWidth={2} />,
       description: "Call us directly"
     },
     { 
       label: "Chat", 
       value: "chat", 
-      icon: <MessageCircle className="size-4" />,
+      icon: <HugeiconsIcon icon={ChatIcon} className="size-4"  strokeWidth={2} />,
       description: "Live chat support"
     },
     { 
       label: "GitHub", 
       value: "github", 
-      icon: <Github className="size-4" />,
+      icon: <HugeiconsIcon icon={GithubIcon} className="size-4"  strokeWidth={2} />,
       description: "Create an issue"
     },
   ];

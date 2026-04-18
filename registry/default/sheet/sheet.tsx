@@ -3,8 +3,6 @@
 import * as React from "react";
 import { Dialog as BaseSheet } from "@base-ui/react/dialog";
 import { cva, type VariantProps } from "class-variance-authority";
-import { XIcon } from "lucide-react";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/registry/default/button/button";
 import {
@@ -12,6 +10,8 @@ import {
   type ScrollAreaProps,
 } from "@/registry/default/scroll-area/scroll-area";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
 const sheetContentVariants = cva(
   [
     "bg-popover text-popover-foreground fixed z-50 flex max-h-full min-h-0 w-full max-w-full min-w-0 flex-col outline-hidden",
@@ -197,7 +197,7 @@ function SheetContent({
               className="absolute end-2 top-2"
               render={<Button size="icon_sm" variant="ghost" />}
             >
-              <XIcon />
+              <HugeiconsIcon icon={Cancel01Icon}  strokeWidth={2} />
             </SheetClose>
           )}
         </BaseSheet.Popup>

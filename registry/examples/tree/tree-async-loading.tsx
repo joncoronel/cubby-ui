@@ -7,8 +7,8 @@ import {
   TreeItemLabel,
   TreeNode,
 } from "@/registry/default/tree/tree";
-import { FolderIcon, FolderOpenIcon, FileIcon } from "lucide-react";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import { File01Icon, Folder01Icon, FolderOpenIcon } from "@hugeicons/core-free-icons";
 // Simulate async API call
 const fetchChildren = async (parentId: string): Promise<TreeNode[]> => {
   // Simulate network delay
@@ -20,8 +20,8 @@ const fetchChildren = async (parentId: string): Promise<TreeNode[]> => {
       {
         id: "work",
         name: "Work",
-        icon: <FolderIcon className="text-blue-500" />,
-        iconOpen: <FolderOpenIcon className="text-blue-500" />,
+        icon: <HugeiconsIcon icon={Folder01Icon} className="text-blue-500"  strokeWidth={2} />,
+        iconOpen: <HugeiconsIcon icon={FolderOpenIcon} className="text-blue-500"  strokeWidth={2} />,
         children: [],
         onLoadChildren: async () => {
           await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -29,12 +29,12 @@ const fetchChildren = async (parentId: string): Promise<TreeNode[]> => {
             {
               id: "report.pdf",
               name: "Report.pdf",
-              icon: <FileIcon className="text-muted-foreground" />,
+              icon: <HugeiconsIcon icon={File01Icon} className="text-muted-foreground"  strokeWidth={2} />,
             },
             {
               id: "proposal.pdf",
               name: "Proposal.pdf",
-              icon: <FileIcon className="text-muted-foreground" />,
+              icon: <HugeiconsIcon icon={File01Icon} className="text-muted-foreground"  strokeWidth={2} />,
             },
           ];
         },
@@ -42,13 +42,13 @@ const fetchChildren = async (parentId: string): Promise<TreeNode[]> => {
       {
         id: "personal",
         name: "Personal",
-        icon: <FolderIcon className="text-blue-500" />,
-        iconOpen: <FolderOpenIcon className="text-blue-500" />,
+        icon: <HugeiconsIcon icon={Folder01Icon} className="text-blue-500"  strokeWidth={2} />,
+        iconOpen: <HugeiconsIcon icon={FolderOpenIcon} className="text-blue-500"  strokeWidth={2} />,
         children: [
           {
             id: "resume.pdf",
             name: "Resume.pdf",
-            icon: <FileIcon className="text-muted-foreground" />,
+            icon: <HugeiconsIcon icon={File01Icon} className="text-muted-foreground"  strokeWidth={2} />,
           },
         ],
       },
@@ -60,12 +60,12 @@ const fetchChildren = async (parentId: string): Promise<TreeNode[]> => {
       {
         id: "vacation.jpg",
         name: "Vacation.jpg",
-        icon: <FileIcon className="text-muted-foreground" />,
+        icon: <HugeiconsIcon icon={File01Icon} className="text-muted-foreground"  strokeWidth={2} />,
       },
       {
         id: "family.jpg",
         name: "Family.jpg",
-        icon: <FileIcon className="text-muted-foreground" />,
+        icon: <HugeiconsIcon icon={File01Icon} className="text-muted-foreground"  strokeWidth={2} />,
       },
     ];
   }
@@ -77,23 +77,23 @@ const treeData: TreeNode[] = [
   {
     id: "documents",
     name: "Documents (Click to load)",
-    icon: <FolderIcon className="text-blue-500" />,
-    iconOpen: <FolderOpenIcon className="text-blue-500" />,
+    icon: <HugeiconsIcon icon={Folder01Icon} className="text-blue-500"  strokeWidth={2} />,
+    iconOpen: <HugeiconsIcon icon={FolderOpenIcon} className="text-blue-500"  strokeWidth={2} />,
     children: [],
     onLoadChildren: () => fetchChildren("documents"),
   },
   {
     id: "pictures",
     name: "Pictures (Click to load)",
-    icon: <FolderIcon className="text-blue-500" />,
-    iconOpen: <FolderOpenIcon className="text-blue-500" />,
+    icon: <HugeiconsIcon icon={Folder01Icon} className="text-blue-500"  strokeWidth={2} />,
+    iconOpen: <HugeiconsIcon icon={FolderOpenIcon} className="text-blue-500"  strokeWidth={2} />,
     children: [],
     onLoadChildren: () => fetchChildren("pictures"),
   },
   {
     id: "readme.txt",
     name: "Readme.txt",
-    icon: <FileIcon className="text-muted-foreground" />,
+    icon: <HugeiconsIcon icon={File01Icon} className="text-muted-foreground"  strokeWidth={2} />,
   },
 ];
 

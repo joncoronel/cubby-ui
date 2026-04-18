@@ -1,5 +1,3 @@
-import { Search } from "lucide-react";
-
 import { Kbd } from "@/registry/default/kbd/kbd";
 import {
   InputGroup,
@@ -7,12 +5,14 @@ import {
   InputGroupInput,
 } from "@/registry/default/input-group/input-group";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Search01Icon } from "@hugeicons/core-free-icons";
 export default function InputGroupKeyboardShortcut() {
   return (
     <InputGroup className="max-w-sm">
       <InputGroupInput placeholder="Search..." />
       <InputGroupAddon>
-        <Search />
+        <HugeiconsIcon icon={Search01Icon}  strokeWidth={2} />
       </InputGroupAddon>
       <InputGroupAddon align="inline-end">
         <Kbd>⌘K</Kbd>

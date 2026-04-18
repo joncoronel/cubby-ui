@@ -2,15 +2,6 @@
 
 import * as React from "react";
 import {
-  Play,
-  Pause,
-  SkipBack,
-  SkipForward,
-  Shuffle,
-  Repeat,
-} from "lucide-react";
-
-import {
   Drawer,
   DrawerContent,
   DrawerHandle,
@@ -19,6 +10,15 @@ import {
 import { Button } from "@/registry/default/button/button";
 import { Slider } from "@/registry/default/slider/slider";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  Backward01Icon,
+  Forward01Icon,
+  PauseIcon,
+  PlayIcon,
+  RepeatIcon,
+  ShuffleIcon,
+} from "@hugeicons/core-free-icons";
 const currentTrack = {
   title: "Bohemian Rhapsody",
   artist: "Queen",
@@ -85,16 +85,16 @@ export default function DrawerMusicPlayer() {
                   </p>
                 </div>
 
-                {/* Play/Pause */}
+                {/* PlayIcon/PauseIcon */}
                 <Button
                   size="icon"
                   variant="ghost"
                   onClick={() => setIsPlaying(!isPlaying)}
                 >
                   {isPlaying ? (
-                    <Pause className="size-5" />
+                    <HugeiconsIcon icon={PauseIcon} className="size-5"  strokeWidth={2} />
                   ) : (
-                    <Play className="size-5" />
+                    <HugeiconsIcon icon={PlayIcon} className="size-5"  strokeWidth={2} />
                   )}
                 </Button>
               </div>
@@ -141,10 +141,10 @@ export default function DrawerMusicPlayer() {
               {/* Playback Controls */}
               <div className="flex shrink-0 items-center justify-center gap-4">
                 <Button size="icon" variant="ghost">
-                  <Shuffle className="size-5" />
+                  <HugeiconsIcon icon={ShuffleIcon} className="size-5"  strokeWidth={2} />
                 </Button>
                 <Button size="icon" variant="ghost">
-                  <SkipBack className="size-6" />
+                  <HugeiconsIcon icon={Backward01Icon} className="size-6"  strokeWidth={2} />
                 </Button>
                 <Button
                   size="icon"
@@ -152,16 +152,16 @@ export default function DrawerMusicPlayer() {
                   onClick={() => setIsPlaying(!isPlaying)}
                 >
                   {isPlaying ? (
-                    <Pause className="size-7" />
+                    <HugeiconsIcon icon={PauseIcon} className="size-7"  strokeWidth={2} />
                   ) : (
-                    <Play className="ml-0.5 size-7" />
+                    <HugeiconsIcon icon={PlayIcon} className="ml-0.5 size-7"  strokeWidth={2} />
                   )}
                 </Button>
                 <Button size="icon" variant="ghost">
-                  <SkipForward className="size-6" />
+                  <HugeiconsIcon icon={Forward01Icon} className="size-6"  strokeWidth={2} />
                 </Button>
                 <Button size="icon" variant="ghost">
-                  <Repeat className="size-5" />
+                  <HugeiconsIcon icon={RepeatIcon} className="size-5"  strokeWidth={2} />
                 </Button>
               </div>
 

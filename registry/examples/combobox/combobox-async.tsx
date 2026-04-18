@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { Loader2 } from "lucide-react";
 import {
   Combobox,
   ComboboxInput,
@@ -14,6 +13,8 @@ import {
 } from "@/registry/default/combobox/combobox";
 import { useAsyncCombobox } from "@/registry/default/combobox/hooks/use-async-combobox";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Loading03Icon } from "@hugeicons/core-free-icons";
 export default function ComboboxAsync() {
   const [value, setValue] = React.useState<Employee | null>(null);
 
@@ -27,7 +28,7 @@ export default function ComboboxAsync() {
     if (isPending) {
       return (
         <>
-          <Loader2 className="size-3 animate-spin" />
+          <HugeiconsIcon icon={Loading03Icon} className="size-3 animate-spin"  strokeWidth={2} />
           Searching...
         </>
       );

@@ -7,43 +7,43 @@ import {
   TreeItemLabel,
   TreeNode,
 } from "@/registry/default/tree/tree";
-import { FolderIcon, FolderOpenIcon, FileIcon } from "lucide-react";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import { File01Icon, Folder01Icon, FolderOpenIcon } from "@hugeicons/core-free-icons";
 const treeData: TreeNode[] = [
   {
     id: "src",
     name: "src",
-    icon: <FolderIcon className="text-blue-500" />,
-    iconOpen: <FolderOpenIcon className="text-blue-500" />,
+    icon: <HugeiconsIcon icon={Folder01Icon} className="text-blue-500"  strokeWidth={2} />,
+    iconOpen: <HugeiconsIcon icon={FolderOpenIcon} className="text-blue-500"  strokeWidth={2} />,
     children: [
       {
         id: "components",
         name: "components",
-        icon: <FolderIcon className="text-blue-500" />,
-        iconOpen: <FolderOpenIcon className="text-blue-500" />,
+        icon: <HugeiconsIcon icon={Folder01Icon} className="text-blue-500"  strokeWidth={2} />,
+        iconOpen: <HugeiconsIcon icon={FolderOpenIcon} className="text-blue-500"  strokeWidth={2} />,
         children: [
           {
             id: "button.tsx",
             name: "Button.tsx",
-            icon: <FileIcon className="text-muted-foreground" />,
+            icon: <HugeiconsIcon icon={File01Icon} className="text-muted-foreground"  strokeWidth={2} />,
           },
           {
             id: "input.tsx",
             name: "Input.tsx",
-            icon: <FileIcon className="text-muted-foreground" />,
+            icon: <HugeiconsIcon icon={File01Icon} className="text-muted-foreground"  strokeWidth={2} />,
           },
         ],
       },
       {
         id: "lib",
         name: "lib",
-        icon: <FolderIcon className="text-blue-500" />,
-        iconOpen: <FolderOpenIcon className="text-blue-500" />,
+        icon: <HugeiconsIcon icon={Folder01Icon} className="text-blue-500"  strokeWidth={2} />,
+        iconOpen: <HugeiconsIcon icon={FolderOpenIcon} className="text-blue-500"  strokeWidth={2} />,
         children: [
           {
             id: "utils.ts",
             name: "utils.ts",
-            icon: <FileIcon className="text-muted-foreground" />,
+            icon: <HugeiconsIcon icon={File01Icon} className="text-muted-foreground"  strokeWidth={2} />,
           },
         ],
       },

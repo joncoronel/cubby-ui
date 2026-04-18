@@ -3,67 +3,67 @@
 import * as m from "motion/react-m";
 import { useMotionValue, useTransform, useSpring } from "motion/react";
 import { useRef, useState, useEffect } from "react";
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import {
-  Square,
-  RectangleHorizontal,
-  Type,
-  Circle,
-  ToggleLeft,
-  ListChecks,
-  ChevronDown,
-  MessageSquare,
-  Info,
-  Menu,
-  Layers,
-  Bell,
-  User,
-  Minus,
-  Radio,
-  BarChart3,
-  SlidersHorizontal,
-  Table,
-  Calendar,
-  ChevronRight,
-  Images,
-  Terminal,
-  PanelLeft,
-  Navigation2,
-  Loader,
-} from "lucide-react";
-
+  ArrowDown01Icon,
+  ArrowRight01Icon,
+  BarChartIcon,
+  BubbleChatIcon,
+  Calendar01Icon,
+  CheckListIcon,
+  CircleIcon,
+  ComputerTerminal01Icon,
+  Image02Icon,
+  InformationCircleIcon,
+  Layers01Icon,
+  Loading03Icon,
+  Menu01Icon,
+  MinusSignIcon,
+  Navigation03Icon,
+  Notification03Icon,
+  Radio01Icon,
+  RectangularIcon,
+  SidebarLeft01Icon,
+  SlidersHorizontalIcon,
+  Square01Icon,
+  Table01Icon,
+  TextFontIcon,
+  ToggleOffIcon,
+  UserIcon,
+} from "@hugeicons/core-free-icons";
 interface Component {
   id: string;
   name: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: IconSvgElement;
 }
 
 const allComponents: Component[] = [
-  { id: "button", name: "Button", icon: Square },
-  { id: "card", name: "Card", icon: RectangleHorizontal },
-  { id: "input", name: "Input", icon: Type },
-  { id: "badge", name: "Badge", icon: Circle },
-  { id: "switch", name: "Switch", icon: ToggleLeft },
-  { id: "checkbox", name: "Checkbox", icon: ListChecks },
-  { id: "select", name: "Select", icon: ChevronDown },
-  { id: "dialog", name: "Dialog", icon: MessageSquare },
-  { id: "tooltip", name: "Tooltip", icon: Info },
-  { id: "popover", name: "Popover", icon: MessageSquare },
-  { id: "tabs", name: "Tabs", icon: Layers },
-  { id: "accordion", name: "Accordion", icon: Menu },
-  { id: "alert", name: "Alert", icon: Bell },
-  { id: "avatar", name: "Avatar", icon: User },
-  { id: "separator", name: "Separator", icon: Minus },
-  { id: "radio", name: "Radio", icon: Radio },
-  { id: "progress", name: "Progress", icon: BarChart3 },
-  { id: "slider", name: "Slider", icon: SlidersHorizontal },
-  { id: "table", name: "Table", icon: Table },
-  { id: "calendar", name: "Calendar", icon: Calendar },
-  { id: "breadcrumb", name: "Breadcrumb", icon: ChevronRight },
-  { id: "carousel", name: "Carousel", icon: Images },
-  { id: "command", name: "Command", icon: Terminal },
-  { id: "drawer", name: "Drawer", icon: PanelLeft },
-  { id: "navigation", name: "Navigation", icon: Navigation2 },
-  { id: "skeleton", name: "Skeleton", icon: Loader },
+  { id: "button", name: "Button", icon: Square01Icon },
+  { id: "card", name: "Card", icon: RectangularIcon },
+  { id: "input", name: "Input", icon: TextFontIcon },
+  { id: "badge", name: "Badge", icon: CircleIcon },
+  { id: "switch", name: "Switch", icon: ToggleOffIcon },
+  { id: "checkbox", name: "Checkbox", icon: CheckListIcon },
+  { id: "select", name: "Select", icon: ArrowDown01Icon },
+  { id: "dialog", name: "Dialog", icon: BubbleChatIcon },
+  { id: "tooltip", name: "Tooltip", icon: InformationCircleIcon },
+  { id: "popover", name: "Popover", icon: BubbleChatIcon },
+  { id: "tabs", name: "Tabs", icon: Layers01Icon },
+  { id: "accordion", name: "Accordion", icon: Menu01Icon },
+  { id: "alert", name: "Alert", icon: Notification03Icon },
+  { id: "avatar", name: "Avatar", icon: UserIcon },
+  { id: "separator", name: "Separator", icon: MinusSignIcon },
+  { id: "radio", name: "Radio", icon: Radio01Icon },
+  { id: "progress", name: "Progress", icon: BarChartIcon },
+  { id: "slider", name: "Slider", icon: SlidersHorizontalIcon },
+  { id: "table", name: "Table", icon: Table01Icon },
+  { id: "calendar", name: "Calendar", icon: Calendar01Icon },
+  { id: "breadcrumb", name: "Breadcrumb", icon: ArrowRight01Icon },
+  { id: "carousel", name: "Carousel", icon: Image02Icon },
+  { id: "command", name: "Command", icon: ComputerTerminal01Icon },
+  { id: "drawer", name: "Drawer", icon: SidebarLeft01Icon },
+  { id: "navigation", name: "Navigation", icon: Navigation03Icon },
+  { id: "skeleton", name: "Skeleton", icon: Loading03Icon },
 ];
 
 interface MagneticChipProps {
@@ -126,8 +126,6 @@ function MagneticChip({ component, mouseX, mouseY }: MagneticChipProps) {
   const springX = useSpring(offsetX, { stiffness: 150, damping: 15 });
   const springY = useSpring(offsetY, { stiffness: 150, damping: 15 });
 
-  const Icon = component.icon;
-
   return (
     <m.div
       ref={ref}
@@ -137,7 +135,7 @@ function MagneticChip({ component, mouseX, mouseY }: MagneticChipProps) {
       }}
       className="border-border/60 bg-background flex cursor-default items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium"
     >
-      <Icon className="size-4" />
+      <HugeiconsIcon icon={component.icon} strokeWidth={2} className="size-4" />
       <span>{component.name}</span>
     </m.div>
   );

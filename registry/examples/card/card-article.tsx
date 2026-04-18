@@ -8,8 +8,8 @@ import {
   CardTitle,
 } from "@/registry/default/card/card";
 import { Button } from "@/registry/default/button/button";
-import { MoreVertical } from "lucide-react";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import { MoreVerticalIcon } from "@hugeicons/core-free-icons";
 export default function CardWithFooter() {
   return (
     <Card className="w-[350px]">
@@ -18,7 +18,7 @@ export default function CardWithFooter() {
         <CardDescription>Scheduled for tomorrow at 2:00 PM</CardDescription>
         <CardAction>
           <Button variant="ghost" size="icon_sm">
-            <MoreVertical />
+            <HugeiconsIcon icon={MoreVerticalIcon}  strokeWidth={2} />
           </Button>
         </CardAction>
       </CardHeader>

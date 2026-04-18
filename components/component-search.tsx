@@ -3,12 +3,6 @@
 import * as React from "react";
 import Link from "next/link";
 import {
-  CornerDownLeftIcon,
-  Search,
-  ArrowUpIcon,
-  ArrowDownIcon,
-} from "lucide-react";
-import {
   Command,
   CommandCollection,
   CommandDialog,
@@ -25,6 +19,13 @@ import {
 import { Kbd } from "@/registry/default/kbd/kbd";
 import { componentGroups, type ComponentItem, type ComponentGroup } from "@/config/components";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  ArrowDown01Icon,
+  ArrowTurnBackwardIcon,
+  ArrowUp01Icon,
+  Search01Icon,
+} from "@hugeicons/core-free-icons";
 export function ComponentSearch() {
   const [open, setOpen] = React.useState(false);
 
@@ -71,7 +72,7 @@ export function ComponentSearch() {
           className="focus-visible:ring-ring hover:bg-accent hover:text-accent-foreground text-muted-foreground inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-1 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
           aria-label="Search components"
         >
-          <Search className="h-4 w-4" />
+          <HugeiconsIcon icon={Search01Icon} className="h-4 w-4"  strokeWidth={2} />
         </button>
       </div>
       <CommandDialog open={open} onOpenChange={setOpen}>
@@ -102,7 +103,6 @@ export function ComponentSearch() {
                     <CommandGroupLabel>{group.label}</CommandGroupLabel>
                     <CommandCollection>
                       {(item: ComponentItem) => {
-                        const Icon = item.icon;
                         return (
                           <CommandItem
                             key={item.title}
@@ -112,10 +112,16 @@ export function ComponentSearch() {
                               <Link href={item.url} {...props} />
                             )}
                           >
-                            {Icon && <Icon />}
+                            {item.icon && (
+                              <HugeiconsIcon
+                                icon={item.icon}
+                                strokeWidth={2}
+                                className="size-4"
+                              />
+                            )}
                             <span>{item.title}</span>
                             <CommandShortcut className="translate-x-2 opacity-0 transition-[translate,opacity] duration-100 ease-out group-data-[highlighted]:translate-x-0 group-data-[highlighted]:opacity-100">
-                              <CornerDownLeftIcon className="size-3" />
+                              <HugeiconsIcon icon={ArrowTurnBackwardIcon} className="size-3"  strokeWidth={2} />
                             </CommandShortcut>
                           </CommandItem>
                         );
@@ -130,16 +136,16 @@ export function ComponentSearch() {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1.5">
                 <Kbd size="sm" className="px-1">
-                  <CornerDownLeftIcon className="size-3" />
+                  <HugeiconsIcon icon={ArrowTurnBackwardIcon} className="size-3"  strokeWidth={2} />
                 </Kbd>
                 <span>to open</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Kbd size="sm" className="px-1">
-                  <ArrowUpIcon className="size-3" />
+                  <HugeiconsIcon icon={ArrowUp01Icon} className="size-3"  strokeWidth={2} />
                 </Kbd>
                 <Kbd size="sm" className="px-1">
-                  <ArrowDownIcon className="size-3" />
+                  <HugeiconsIcon icon={ArrowDown01Icon} className="size-3"  strokeWidth={2} />
                 </Kbd>
                 <span>to navigate</span>
               </div>

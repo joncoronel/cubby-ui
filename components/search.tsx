@@ -6,12 +6,6 @@ import { useI18n } from "fumadocs-ui/contexts/i18n";
 import { SharedProps } from "fumadocs-ui/contexts/search";
 import Link from "next/link";
 import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  CornerDownLeftIcon,
-  HashIcon,
-} from "lucide-react";
-import {
   Command,
   CommandContent,
   CommandDialog,
@@ -26,6 +20,35 @@ import { Kbd } from "@/registry/default/kbd/kbd";
 import { cn } from "@/lib/utils";
 import { create } from "@orama/orama";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  ArrowDown01Icon,
+  ArrowTurnBackwardIcon,
+  ArrowUp01Icon,
+} from "@hugeicons/core-free-icons";
+
+function HashtagIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      width="24"
+      height="24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M14 21L18 3" />
+      <path d="M6 21L10 3" />
+      <path d="M5 8H21" />
+      <path d="M3 16H19" />
+    </svg>
+  );
+}
 /**
  * Renders a string containing `<mark>` tags into React elements.
  * fumadocs now returns search results with `<mark>` in the content string.
@@ -116,7 +139,7 @@ export default function CustomSearchDialog({
                   }
                 >
                   {item.type === "heading" && (
-                    <HashIcon className="text-muted-foreground size-3.5 shrink-0" />
+                    <HashtagIcon className="text-muted-foreground size-3.5 shrink-0" />
                   )}
                   <div className="flex min-w-0 flex-col gap-0.5">
                     {item.breadcrumbs && item.breadcrumbs.length > 0 && (
@@ -146,16 +169,16 @@ export default function CustomSearchDialog({
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1.5">
                 <Kbd size="sm" className="px-1">
-                  <CornerDownLeftIcon className="size-3" />
+                  <HugeiconsIcon icon={ArrowTurnBackwardIcon} className="size-3"  strokeWidth={2} />
                 </Kbd>
                 <span>to select</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Kbd size="sm" className="px-1">
-                  <ArrowUpIcon className="size-3" />
+                  <HugeiconsIcon icon={ArrowUp01Icon} className="size-3"  strokeWidth={2} />
                 </Kbd>
                 <Kbd size="sm" className="px-1">
-                  <ArrowDownIcon className="size-3" />
+                  <HugeiconsIcon icon={ArrowDown01Icon} className="size-3"  strokeWidth={2} />
                 </Kbd>
                 <span>to navigate</span>
               </div>

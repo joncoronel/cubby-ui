@@ -2,10 +2,10 @@
 
 import * as React from "react";
 import { ContextMenu as BaseContextMenu } from "@base-ui/react/context-menu";
-import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react";
-
 import { cn } from "@/lib/utils";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01Icon, CircleIcon, Tick02Icon } from "@hugeicons/core-free-icons";
 function ContextMenu({
   ...props
 }: React.ComponentProps<typeof BaseContextMenu.Root>) {
@@ -144,7 +144,7 @@ function ContextMenuCheckboxItem({
     >
       <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
         <BaseContextMenu.CheckboxItemIndicator>
-          <CheckIcon className="size-4" />
+          <HugeiconsIcon icon={Tick02Icon} className="size-4"  strokeWidth={2} />
         </BaseContextMenu.CheckboxItemIndicator>
       </span>
       {children}
@@ -168,7 +168,7 @@ function ContextMenuRadioItem({
     >
       <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
         <BaseContextMenu.RadioItemIndicator>
-          <CircleIcon className="size-2 fill-current" />
+          <HugeiconsIcon icon={CircleIcon} className="size-2 fill-current"  strokeWidth={2} />
         </BaseContextMenu.RadioItemIndicator>
       </span>
       {children}
@@ -276,7 +276,7 @@ function ContextMenuSubTrigger({
       {...props}
     >
       {children}
-      <ChevronRightIcon className="ml-auto size-4" />
+      <HugeiconsIcon icon={ArrowRight01Icon} className="ml-auto size-4"  strokeWidth={2} />
     </BaseContextMenu.SubmenuTrigger>
   );
 }

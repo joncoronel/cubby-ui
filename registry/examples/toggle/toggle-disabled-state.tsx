@@ -1,10 +1,10 @@
 import { Toggle } from "@/registry/default/toggle/toggle";
-import { Italic } from "lucide-react";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import { TextItalicIcon } from "@hugeicons/core-free-icons";
 export default function ToggleDisabledState() {
   return (
     <Toggle disabled>
-      <Italic className="h-4 w-4" />
+      <HugeiconsIcon icon={TextItalicIcon} className="h-4 w-4"  strokeWidth={2} />
     </Toggle>
   );
 }

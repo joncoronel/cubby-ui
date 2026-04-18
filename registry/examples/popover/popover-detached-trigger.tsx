@@ -9,8 +9,8 @@ import {
   createPopoverHandle,
 } from "@/registry/default/popover/popover";
 import { Button } from "@/registry/default/button/button";
-import { Bell } from "lucide-react";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Notification03Icon } from "@hugeicons/core-free-icons";
 const notificationsPopover = createPopoverHandle();
 
 export default function PopoverDetachedTrigger() {
@@ -20,7 +20,7 @@ export default function PopoverDetachedTrigger() {
         handle={notificationsPopover}
         render={<Button variant="outline" size="icon" />}
       >
-        <Bell className="size-4" />
+        <HugeiconsIcon icon={Notification03Icon} className="size-4"  strokeWidth={2} />
         <span className="sr-only">Notifications</span>
       </PopoverTrigger>
 

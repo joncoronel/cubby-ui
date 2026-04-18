@@ -1,5 +1,3 @@
-import { SparklesIcon } from "lucide-react";
-
 import { Button } from "@/registry/default/button/button";
 import { ButtonGroup } from "@/registry/default/button-group/button-group";
 import { Input } from "@/registry/default/input/input";
@@ -10,6 +8,8 @@ import {
   PopoverTrigger,
 } from "@/registry/default/popover/popover";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { SparklesIcon } from "@hugeicons/core-free-icons";
 export default function ButtonGroupPopover() {
   return (
     <ButtonGroup>
@@ -18,7 +18,7 @@ export default function ButtonGroupPopover() {
           render={
             <Button
               variant="outline"
-              leftSection={<SparklesIcon />}
+              leftSection={<HugeiconsIcon icon={SparklesIcon}  strokeWidth={2} />}
               aria-label="Open Copilot assistant"
             />
           }

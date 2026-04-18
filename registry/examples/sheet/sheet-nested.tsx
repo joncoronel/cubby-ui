@@ -14,8 +14,8 @@ import {
 import { Button } from "@/registry/default/button/button";
 import { Input } from "@/registry/default/input/input";
 import { Label } from "@/registry/default/label/label";
-import { SettingsIcon } from "lucide-react";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Settings01Icon } from "@hugeicons/core-free-icons";
 export default function SheetNested() {
   return (
     <Sheet>
@@ -23,7 +23,7 @@ export default function SheetNested() {
         render={
           <Button
             variant="outline"
-            leftSection={<SettingsIcon className="size-4" />}
+            leftSection={<HugeiconsIcon icon={Settings01Icon} className="size-4"  strokeWidth={2} />}
           />
         }
       >

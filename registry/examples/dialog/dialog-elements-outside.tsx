@@ -1,6 +1,5 @@
 "use client";
 
-import { XIcon } from "lucide-react";
 import {
   Dialog,
   DialogBody,
@@ -14,6 +13,8 @@ import {
 } from "@/registry/default/dialog/dialog";
 import { Button } from "@/registry/default/button/button";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
 export default function DialogElementsOutside() {
   return (
     <Dialog>
@@ -25,7 +26,7 @@ export default function DialogElementsOutside() {
       >
         {/* Close button positioned OUTSIDE the card visually */}
         <DialogClose className="text-foreground/70 hover:text-foreground focus-visible:outline-ring/50 pointer-events-auto absolute top-0 right-2 mb-2 flex h-8 w-8 items-center justify-center self-end rounded-full outline-0 transition-colors focus-visible:outline-2">
-          <XIcon className="h-8 w-8" />
+          <HugeiconsIcon icon={Cancel01Icon} className="h-8 w-8"  strokeWidth={2} />
           <span className="sr-only">Close</span>
         </DialogClose>
         {/* The actual popup card */}

@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { Loader2, X } from "lucide-react";
 import {
   Combobox,
   ComboboxChipInput,
@@ -18,6 +17,8 @@ import {
 } from "@/registry/default/combobox/combobox";
 import { useAsyncCombobox } from "@/registry/default/combobox/hooks/use-async-combobox";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon, Loading03Icon } from "@hugeicons/core-free-icons";
 export default function ComboboxAsyncMultiple() {
   const [value, setValue] = React.useState<Employee[]>([]);
 
@@ -32,7 +33,7 @@ export default function ComboboxAsyncMultiple() {
     if (isPending) {
       return (
         <>
-          <Loader2 className="size-3 animate-spin" />
+          <HugeiconsIcon icon={Loading03Icon} className="size-3 animate-spin"  strokeWidth={2} />
           Searching...
         </>
       );
@@ -72,7 +73,7 @@ export default function ComboboxAsyncMultiple() {
                   <ComboboxChip key={employee.id} aria-label={employee.name}>
                     {employee.name}
                     <ComboboxChipRemove aria-label="Remove">
-                      <X className="h-3 w-3" />
+                      <HugeiconsIcon icon={Cancel01Icon} className="h-3 w-3"  strokeWidth={2} />
                     </ComboboxChipRemove>
                   </ComboboxChip>
                 ))}

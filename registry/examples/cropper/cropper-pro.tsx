@@ -21,17 +21,17 @@ import {
   SelectGroup,
   SelectGroupLabel,
 } from "@/registry/default/select/select";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  Download,
-  Settings,
-  Instagram,
-  Facebook,
-  Twitter,
-  Linkedin,
-  Youtube,
-  Circle,
-} from "lucide-react";
-
+  CircleIcon,
+  Download01Icon,
+  Facebook01Icon,
+  InstagramIcon,
+  Linkedin01Icon,
+  NewTwitterIcon,
+  Settings01Icon,
+  YoutubeIcon,
+} from "@hugeicons/core-free-icons";
 export default function CropperPro() {
   const [imageUrl, setImageUrl] = useState(
     "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop",
@@ -51,7 +51,7 @@ export default function CropperPro() {
       name: "Instagram Post",
       ratio: 1,
       size: "1080×1080",
-      icon: Instagram,
+      icon: InstagramIcon,
       category: "Instagram",
     },
     {
@@ -59,7 +59,7 @@ export default function CropperPro() {
       name: "Instagram Story",
       ratio: 9 / 16,
       size: "1080×1920",
-      icon: Instagram,
+      icon: InstagramIcon,
       category: "Instagram",
     },
     {
@@ -67,7 +67,7 @@ export default function CropperPro() {
       name: "Facebook Post",
       ratio: 1.91,
       size: "1200×630",
-      icon: Facebook,
+      icon: Facebook01Icon,
       category: "Facebook",
     },
     {
@@ -75,7 +75,7 @@ export default function CropperPro() {
       name: "Facebook Cover",
       ratio: 2.7,
       size: "1640×859",
-      icon: Facebook,
+      icon: Facebook01Icon,
       category: "Facebook",
     },
     {
@@ -83,7 +83,7 @@ export default function CropperPro() {
       name: "Twitter Post",
       ratio: 16 / 9,
       size: "1200×675",
-      icon: Twitter,
+      icon: NewTwitterIcon,
       category: "Twitter",
     },
     {
@@ -91,7 +91,7 @@ export default function CropperPro() {
       name: "Twitter Header",
       ratio: 3,
       size: "1500×500",
-      icon: Twitter,
+      icon: NewTwitterIcon,
       category: "Twitter",
     },
     {
@@ -99,7 +99,7 @@ export default function CropperPro() {
       name: "LinkedIn Post",
       ratio: 1.91,
       size: "1200×630",
-      icon: Linkedin,
+      icon: Linkedin01Icon,
       category: "LinkedIn",
     },
     {
@@ -107,7 +107,7 @@ export default function CropperPro() {
       name: "YouTube Thumbnail",
       ratio: 16 / 9,
       size: "1280×720",
-      icon: Youtube,
+      icon: YoutubeIcon,
       category: "YouTube",
     },
     {
@@ -115,7 +115,7 @@ export default function CropperPro() {
       name: "Circle Crop",
       ratio: 1,
       size: "1:1 Circle",
-      icon: Circle,
+      icon: CircleIcon,
       category: "Custom",
       isCircle: true,
     },
@@ -124,7 +124,7 @@ export default function CropperPro() {
       name: "Custom Dimensions",
       ratio: 1,
       size: "Custom",
-      icon: Settings,
+      icon: Settings01Icon,
       category: "Custom",
     },
   ];
@@ -230,7 +230,11 @@ export default function CropperPro() {
             {currentPreset && (
               <div className="absolute top-4 left-4 rounded-lg bg-black/75 px-3 py-2 text-sm text-white backdrop-blur-sm">
                 <div className="flex items-center gap-2">
-                  <currentPreset.icon className="h-4 w-4" />
+                  <HugeiconsIcon
+                    icon={currentPreset.icon}
+                    strokeWidth={2}
+                    className="h-4 w-4"
+                  />
                   <div>
                     <div className="font-medium">{currentPreset.name}</div>
                     <div className="text-xs text-white/70">
@@ -255,7 +259,11 @@ export default function CropperPro() {
                   <SelectValue>
                     {currentPreset && (
                       <div className="flex items-center gap-2">
-                        <currentPreset.icon className="h-4 w-4" />
+                        <HugeiconsIcon
+                    icon={currentPreset.icon}
+                    strokeWidth={2}
+                    className="h-4 w-4"
+                  />
                         <span>{currentPreset.name}</span>
                       </div>
                     )}
@@ -270,7 +278,11 @@ export default function CropperPro() {
                         .map((preset) => (
                           <SelectItem key={preset.id} value={preset.id}>
                             <div className="flex items-center gap-2">
-                              <preset.icon className="h-4 w-4" />
+                              <HugeiconsIcon
+                                icon={preset.icon}
+                                strokeWidth={2}
+                                className="h-4 w-4"
+                              />
                               <span className="font-medium">{preset.name}</span>
                             </div>
                           </SelectItem>
@@ -283,7 +295,7 @@ export default function CropperPro() {
               {selectedPreset === "custom-dimensions" && (
                 <div className="space-y-4 border-t pt-3">
                   <div className="flex items-center gap-2">
-                    <Settings className="text-muted-foreground h-4 w-4" />
+                    <HugeiconsIcon icon={Settings01Icon} className="text-muted-foreground h-4 w-4"  strokeWidth={2} />
                     <span className="text-sm font-medium">
                       Custom Configuration
                     </span>
@@ -386,7 +398,7 @@ export default function CropperPro() {
                 size="sm"
                 className="w-full"
               >
-                <Download />
+                <HugeiconsIcon icon={Download01Icon}  strokeWidth={2} />
                 Download
               </Button>
 

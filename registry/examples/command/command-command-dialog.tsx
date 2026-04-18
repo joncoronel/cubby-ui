@@ -17,21 +17,23 @@ import {
 } from "@/registry/default/command/command";
 import { Button } from "@/registry/default/button/button";
 import { Kbd } from "@/registry/default/kbd/kbd";
-import {
-  Calculator,
-  Calendar,
-  CreditCard,
-  Settings,
-  Smile,
-  User,
-} from "lucide-react";
 import * as React from "react";
 import { useState, useEffect } from "react";
+
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
+import {
+  CalculatorIcon,
+  Calendar01Icon,
+  CreditCardIcon,
+  Settings01Icon,
+  SmileIcon,
+  UserIcon,
+} from "@hugeicons/core-free-icons";
 
 interface CommandItemData {
   value: string;
   label: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: IconSvgElement;
   shortcut?: string;
 }
 
@@ -44,17 +46,17 @@ const commandGroups: CommandGroupData[] = [
   {
     label: "Suggestions",
     items: [
-      { value: "calendar", label: "Calendar", icon: Calendar },
-      { value: "search-emoji", label: "Search Emoji", icon: Smile },
-      { value: "calculator", label: "Calculator", icon: Calculator },
+      { value: "calendar", label: "Calendar", icon: Calendar01Icon },
+      { value: "search-emoji", label: "Search Emoji", icon: SmileIcon },
+      { value: "calculator", label: "Calculator", icon: CalculatorIcon },
     ],
   },
   {
     label: "Settings",
     items: [
-      { value: "profile", label: "Profile", icon: User, shortcut: "⌘P" },
-      { value: "billing", label: "Billing", icon: CreditCard, shortcut: "⌘B" },
-      { value: "settings", label: "Settings", icon: Settings, shortcut: "⌘S" },
+      { value: "profile", label: "Profile", icon: UserIcon, shortcut: "⌘P" },
+      { value: "billing", label: "Billing", icon: CreditCardIcon, shortcut: "⌘B" },
+      { value: "settings", label: "Settings", icon: Settings01Icon, shortcut: "⌘S" },
     ],
   },
 ];
@@ -94,10 +96,13 @@ export default function CommandCommandDialog() {
                       <CommandGroupLabel>{group.label}</CommandGroupLabel>
                       <CommandCollection>
                         {(item: CommandItemData) => {
-                          const Icon = item.icon;
                           return (
                             <CommandItem key={item.value} value={item.value}>
-                              <Icon className="mr-2 h-4 w-4" />
+                              <HugeiconsIcon
+                                icon={item.icon}
+                                strokeWidth={2}
+                                className="mr-2 h-4 w-4"
+                              />
                               <span>{item.label}</span>
                               {item.shortcut && (
                                 <CommandShortcut>{item.shortcut}</CommandShortcut>

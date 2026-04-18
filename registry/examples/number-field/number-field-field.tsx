@@ -1,6 +1,5 @@
 "use client";
 
-import { Minus, Plus } from "lucide-react";
 import { Button } from "@/registry/default/button/button";
 import { Field, FieldError, FieldLabel } from "@/registry/default/field/field";
 import { Form } from "@/registry/default/form/form";
@@ -12,6 +11,8 @@ import {
   NumberFieldInput,
 } from "@/registry/default/number-field/number-field";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { MinusSignIcon, PlusSignIcon } from "@hugeicons/core-free-icons";
 export default function NumberFieldField() {
   return (
     <Form
@@ -25,11 +26,11 @@ export default function NumberFieldField() {
           <FieldLabel>Quantity</FieldLabel>
           <NumberFieldGroup>
             <NumberFieldDecrement>
-              <Minus className="size-4" />
+              <HugeiconsIcon icon={MinusSignIcon} className="size-4"  strokeWidth={2} />
             </NumberFieldDecrement>
             <NumberFieldInput />
             <NumberFieldIncrement>
-              <Plus className="size-4" />
+              <HugeiconsIcon icon={PlusSignIcon} className="size-4"  strokeWidth={2} />
             </NumberFieldIncrement>
           </NumberFieldGroup>
         </NumberField>

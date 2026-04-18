@@ -2,9 +2,10 @@
 
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { Moon, Sun, Monitor } from "lucide-react";
 import { Button } from "@/registry/default/button/button";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ComputerIcon, Moon02Icon, Sun01Icon } from "@hugeicons/core-free-icons";
 export function ThemeSwitcher() {
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -42,14 +43,14 @@ export function ThemeSwitcher() {
 
   const getIcon = () => {
     if (theme === "system") {
-      return <Monitor className="h-4 w-4" />;
+      return <HugeiconsIcon icon={ComputerIcon} className="h-4 w-4"  strokeWidth={2} />;
     }
     // Use resolvedTheme for system theme to show actual icon
     const currentTheme = theme === "system" ? resolvedTheme : theme;
     return currentTheme === "dark" ? (
-      <Moon className="h-4 w-4" />
+      <HugeiconsIcon icon={Moon02Icon} className="h-4 w-4"  strokeWidth={2} />
     ) : (
-      <Sun className="h-4 w-4" />
+      <HugeiconsIcon icon={Sun01Icon} className="h-4 w-4"  strokeWidth={2} />
     );
   };
 

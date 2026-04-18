@@ -6,8 +6,8 @@ import {
   PopoverDescription,
 } from "@/registry/default/popover/popover";
 import { Button } from "@/registry/default/button/button";
-import { Bell } from "lucide-react";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Notification03Icon } from "@hugeicons/core-free-icons";
 export default function PopoverHover() {
   return (
     <Popover>
@@ -15,7 +15,7 @@ export default function PopoverHover() {
         openOnHover
         render={<Button variant="outline" size="icon" />}
       >
-        <Bell className="size-4" />
+        <HugeiconsIcon icon={Notification03Icon} className="size-4"  strokeWidth={2} />
         <span className="sr-only">Notifications</span>
       </PopoverTrigger>
       <PopoverContent>

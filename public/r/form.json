@@ -6,7 +6,7 @@
   "files": [
     {
       "path": "registry/default/form/form.tsx",
-      "content": "\"use client\";\n\nimport { Form as BaseForm } from \"@base-ui/react/form\";\n\nimport { cn } from \"@/lib/utils\";\n\nfunction Form({ className, ...props }: BaseForm.Props) {\n  return (\n    <BaseForm\n      data-slot=\"form\"\n      className={cn(className)}\n      {...props}\n    />\n  );\n}\n\nexport { Form };\n",
+      "content": "\"use client\";\r\n\r\nimport { Form as BaseForm } from \"@base-ui/react/form\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\n\r\nfunction Form({ className, ...props }: BaseForm.Props) {\r\n  return (\r\n    <BaseForm\r\n      data-slot=\"form\"\r\n      className={cn(className)}\r\n      {...props}\r\n    />\r\n  );\r\n}\r\n\r\nexport { Form };\r\n",
       "type": "registry:ui",
       "target": "components/ui/cubby-ui/form.tsx"
     }

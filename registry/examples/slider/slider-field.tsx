@@ -41,6 +41,7 @@ export default function SliderField() {
 
         <Field name="priceRange">
           <Fieldset
+            className="gap-0"
             render={
               <Slider
                 defaultValue={[20, 80]}
@@ -51,7 +52,9 @@ export default function SliderField() {
             }
           >
             <div className="flex items-center justify-between">
-              <FieldsetLegend>Price range</FieldsetLegend>
+              <FieldsetLegend className="text-sm leading-5 font-medium">
+                Price range
+              </FieldsetLegend>
               <SliderValue />
             </div>
           </Fieldset>

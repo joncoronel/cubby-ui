@@ -53,7 +53,7 @@ const drawerContentVariants = cva(
     // Disable transitions on parent while child is being dragged
     "data-[nested-dragging]:transition-none",
     // Nested drawer support: overlay dim effect (using before: to avoid conflict with Safari ::after touch fix)
-    "before:pointer-events-none before:absolute before:inset-0 before:z-50 before:hidden before:rounded-[inherit] before:bg-black/10 before:opacity-0 before:transition-[opacity,display] before:transition-discrete before:duration-(--duration-smooth)",
+    "before:pointer-events-none before:absolute before:inset-0 before:z-50 before:hidden before:rounded-[inherit] before:bg-black/15 before:opacity-0 before:transition-[opacity,display] before:transition-discrete before:duration-300",
     "data-nested-dialog-open:before:block data-nested-dialog-open:before:opacity-100",
     "starting:data-nested-dialog-open:before:opacity-0",
   ],
@@ -1037,11 +1037,11 @@ function DrawerContentInner({
               "touch-none",
               immediateClose || (isDragging && !isAnimating)
                 ? "transition-none"
-                : "transition-opacity duration-400 ease-[cubic-bezier(.32,.72,0,1)]",
+                : "transition-opacity duration-300",
               "[&[data-starting-style]]:opacity-0!",
               // Exit animation overrides scroll-driven animation (transitions can't interpolate from animation-held values)
 
-              "data-ending-style:animate-[drawer-backdrop-exit_400ms_cubic-bezier(.32,.72,0,1)_forwards]",
+              "data-ending-style:animate-[drawer-backdrop-exit_300ms_cubic-bezier(.32,.72,0,1)_forwards]",
               isInitialized && !isAnimating && dismissible && dragProgress < 1
                 ? useScrollDrivenAnimation
                   ? backdropAnimationStyles[direction]

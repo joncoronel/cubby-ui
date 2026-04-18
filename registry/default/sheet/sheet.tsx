@@ -19,7 +19,7 @@ const sheetContentVariants = cva(
     // Nested sheet support
     "scale-[calc(1-0.05*var(--nested-dialogs))]",
     // Overlay (hidden by default, fades in/out when nested using allow-discrete)
-    "after:pointer-events-none after:absolute after:inset-0 after:hidden after:rounded-[inherit] after:bg-black/10 after:opacity-0 after:transition-[opacity,display] after:duration-400 after:transition-discrete",
+    "after:pointer-events-none after:absolute after:inset-0 after:hidden after:rounded-[inherit] after:bg-black/15 after:opacity-0 after:transition-[opacity,display] after:duration-300 after:transition-discrete",
     "data-nested-dialog-open:after:block data-nested-dialog-open:after:opacity-100",
     "starting:data-nested-dialog-open:after:opacity-0",
   ],
@@ -140,7 +140,7 @@ function SheetBackdrop({ className, ...props }: BaseSheet.Backdrop.Props) {
     <BaseSheet.Backdrop
       data-slot="sheet-backdrop"
       className={cn(
-        "fixed inset-0 min-h-dvh bg-black/40 transition-all duration-400 ease-[cubic-bezier(.32,.72,0,1)] supports-[-webkit-touch-callout:none]:absolute",
+        "fixed inset-0 min-h-dvh bg-black/40 transition-all duration-300 supports-[-webkit-touch-callout:none]:absolute",
         "backdrop-blur-sm data-ending-style:opacity-0 data-starting-style:opacity-0",
         className,
       )}

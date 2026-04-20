@@ -1,0 +1,18 @@
+/* -------------------------------------------------------------------------------------------------
+ * Skeleton shimmer animation.
+ *
+ * Uses background-position-x on a static gradient (bg-size 200%) so the
+ * browser can composite the shift instead of re-rasterizing the gradient
+ * every frame. Combined with bg-fixed on the skeleton element, all skeletons
+ * on the page sample the same viewport-aligned gradient and stay in phase.
+ * -------------------------------------------------------------------------------------------------*/
+
+.skeleton-shimmer {
+  animation: shimmer 1.5s linear infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position-x: -200%;
+  }
+}

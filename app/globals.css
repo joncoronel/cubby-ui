@@ -146,7 +146,6 @@ html {
 
   /* Custom Animations */
   --animate-fade-in-up: fade-in-up 0.8s ease-out forwards;
-  --animate-shimmer: shimmer 1.5s linear infinite;
   --animate-otp-field-shake-a: otp-field-shake-a 180ms ease-in-out;
   --animate-otp-field-shake-b: otp-field-shake-b 180ms ease-in-out;
 
@@ -162,12 +161,6 @@ html {
     to {
       opacity: 1;
       transform: translateY(0);
-    }
-  }
-
-  @keyframes shimmer {
-    to {
-      background-position-x: -200%;
     }
   }
 

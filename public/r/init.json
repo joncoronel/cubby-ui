@@ -61,7 +61,6 @@
       "ease-out-cubic": "cubic-bezier(0.215, 0.61, 0.355, 1)",
       "ease-in-out-cubic": "cubic-bezier(0.645, 0.045, 0.355, 1)",
       "ease-out-expo": "cubic-bezier(0.19, 1, 0.22, 1)",
-      "--animate-shimmer": "shimmer 1.5s linear infinite",
       "--animate-otp-field-shake-a": "otp-field-shake-a 180ms ease-in-out",
       "--animate-otp-field-shake-b": "otp-field-shake-b 180ms ease-in-out"
     },
@@ -153,11 +152,6 @@
     }
   },
   "css": {
-    "@keyframes shimmer": {
-      "to": {
-        "background-position-x": "-200%"
-      }
-    },
     "@keyframes otp-field-shake-a": {
       "0%,\r\n    100%": {
         "transform": "translateX(0)"

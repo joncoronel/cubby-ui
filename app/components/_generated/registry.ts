@@ -354,6 +354,7 @@ import sheet_sheet_variants from "@/registry/examples/sheet/sheet-variants";
 import sheet_sheet_with_form from "@/registry/examples/sheet/sheet-with-form";
 import skeleton_skeleton_basic from "@/registry/examples/skeleton/skeleton-basic";
 import skeleton_skeleton_inverted from "@/registry/examples/skeleton/skeleton-inverted";
+import skeleton_skeleton_multiline from "@/registry/examples/skeleton/skeleton-multiline";
 import skeleton_skeleton_sync from "@/registry/examples/skeleton/skeleton-sync";
 import skeleton_skeleton_wrap from "@/registry/examples/skeleton/skeleton-wrap";
 import slider_slider_basic from "@/registry/examples/slider/slider-basic";
@@ -3247,6 +3248,11 @@ export const exampleRegistry = {
       "source": "import { Skeleton } from \"@/components/ui/cubby-ui/skeleton\";\n\nexport default function SkeletonInverted() {\n  return (\n    <div className=\"space-y-2\">\n      <Skeleton inverted className=\"h-4 w-[250px]\" />\n      <Skeleton inverted className=\"h-4 w-[200px]\" />\n    </div>\n  );\n}\n"
     },
     {
+      "title": "Multiline",
+      "importPath": "skeleton-multiline",
+      "source": "import { Skeleton } from \"@/components/ui/cubby-ui/skeleton\";\n\nexport default function SkeletonMultiline() {\n  return (\n    <p className=\"max-w-[400px] text-sm leading-relaxed\">\n      <Skeleton multiline>\n        This is a paragraph with a skeleton loading effect that spans multiple\n        lines. The shimmer flows across every line fragment as one continuous\n        wave, not a separate animation per line.\n      </Skeleton>\n    </p>\n  );\n}\n"
+    },
+    {
       "title": "Sync",
       "importPath": "skeleton-sync",
       "source": "import { Skeleton } from \"@/components/ui/cubby-ui/skeleton\";\n\nconst ITEMS = [\"a\", \"b\", \"c\", \"d\", \"e\"];\n\nexport default function SkeletonSync() {\n  return (\n    <div className=\"grid w-full grid-cols-5 gap-4\">\n      {ITEMS.map((id) => (\n        <div key={id} className=\"space-y-3\">\n          <Skeleton className=\"aspect-square w-full rounded-lg\" />\n          <Skeleton className=\"h-3 w-full\" />\n          <Skeleton className=\"h-3 w-2/3\" />\n        </div>\n      ))}\n    </div>\n  );\n}\n"
@@ -3972,6 +3978,7 @@ export const componentMap = {
   "sheet-with-form": sheet_sheet_with_form,
   "skeleton-basic": skeleton_skeleton_basic,
   "skeleton-inverted": skeleton_skeleton_inverted,
+  "skeleton-multiline": skeleton_skeleton_multiline,
   "skeleton-sync": skeleton_skeleton_sync,
   "skeleton-wrap": skeleton_skeleton_wrap,
   "slider-basic": slider_slider_basic,

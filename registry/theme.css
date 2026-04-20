@@ -173,15 +173,8 @@
   --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
 
   /* Animations */
-  --animate-shimmer: shimmer 1.5s linear infinite;
   --animate-otp-field-shake-a: otp-field-shake-a 180ms ease-in-out;
   --animate-otp-field-shake-b: otp-field-shake-b 180ms ease-in-out;
-
-  @keyframes shimmer {
-    to {
-      background-position-x: -200%;
-    }
-  }
 
   /*
    * Paired identical keyframes.

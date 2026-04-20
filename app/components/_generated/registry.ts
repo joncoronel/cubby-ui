@@ -353,6 +353,8 @@ import sheet_sheet_positions from "@/registry/examples/sheet/sheet-positions";
 import sheet_sheet_variants from "@/registry/examples/sheet/sheet-variants";
 import sheet_sheet_with_form from "@/registry/examples/sheet/sheet-with-form";
 import skeleton_skeleton_basic from "@/registry/examples/skeleton/skeleton-basic";
+import skeleton_skeleton_inverted from "@/registry/examples/skeleton/skeleton-inverted";
+import skeleton_skeleton_sync from "@/registry/examples/skeleton/skeleton-sync";
 import skeleton_skeleton_wrap from "@/registry/examples/skeleton/skeleton-wrap";
 import slider_slider_basic from "@/registry/examples/slider/slider-basic";
 import slider_slider_controlled from "@/registry/examples/slider/slider-controlled";
@@ -3240,6 +3242,16 @@ export const exampleRegistry = {
       "source": "import { Skeleton } from \"@/components/ui/cubby-ui/skeleton\";\n\nexport default function SkeletonBasic() {\n  return (\n    <div className=\"space-y-2\">\n      <Skeleton className=\"h-4 w-[250px]\" />\n      <Skeleton className=\"h-4 w-[200px]\" />\n    </div>\n  );\n}"
     },
     {
+      "title": "Inverted",
+      "importPath": "skeleton-inverted",
+      "source": "import { Skeleton } from \"@/components/ui/cubby-ui/skeleton\";\n\nexport default function SkeletonInverted() {\n  return (\n    <div className=\"space-y-2\">\n      <Skeleton inverted className=\"h-4 w-[250px]\" />\n      <Skeleton inverted className=\"h-4 w-[200px]\" />\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Sync",
+      "importPath": "skeleton-sync",
+      "source": "import { Skeleton } from \"@/components/ui/cubby-ui/skeleton\";\n\nconst ITEMS = [\"a\", \"b\", \"c\", \"d\", \"e\"];\n\nexport default function SkeletonSync() {\n  return (\n    <div className=\"grid w-full grid-cols-5 gap-4\">\n      {ITEMS.map((id) => (\n        <div key={id} className=\"space-y-3\">\n          <Skeleton className=\"aspect-square w-full rounded-lg\" />\n          <Skeleton className=\"h-3 w-full\" />\n          <Skeleton className=\"h-3 w-2/3\" />\n        </div>\n      ))}\n    </div>\n  );\n}\n"
+    },
+    {
       "title": "Wrap",
       "importPath": "skeleton-wrap",
       "source": "\"use client\"\n\nimport * as React from \"react\"\nimport {\n\tAvatar,\n\tAvatarFallback,\n\tAvatarImage,\n} from \"@/components/ui/cubby-ui/avatar\"\nimport { Label } from \"@/components/ui/cubby-ui/label\"\nimport { Skeleton } from \"@/components/ui/cubby-ui/skeleton\"\nimport { Switch } from \"@/components/ui/cubby-ui/switch\"\n\nexport default function SkeletonWrap() {\n\tconst [loading, setLoading] = React.useState(true)\n\n\treturn (\n\t\t<div className=\"space-y-6\">\n\t\t\t<div className=\"flex items-center gap-4\">\n\t\t\t\t<Skeleton visible={loading} className=\"rounded-full\">\n\t\t\t\t\t<Avatar>\n\t\t\t\t\t\t<AvatarImage src=\"https://github.com/shadcn.png\" alt=\"@shadcn\" />\n\t\t\t\t\t\t<AvatarFallback>CN</AvatarFallback>\n\t\t\t\t\t</Avatar>\n\t\t\t\t</Skeleton>\n\t\t\t\t<div className=\"space-y-1\">\n\t\t\t\t\t<Skeleton visible={loading}>\n\t\t\t\t\t\t<p className=\"text-sm font-medium\">shadcn</p>\n\t\t\t\t\t</Skeleton>\n\t\t\t\t\t<Skeleton visible={loading}>\n\t\t\t\t\t\t<p className=\"text-muted-foreground text-sm\">@shadcn</p>\n\t\t\t\t\t</Skeleton>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div className=\"flex items-center gap-2\">\n\t\t\t\t<Switch\n\t\t\t\t\tid=\"loading\"\n\t\t\t\t\tchecked={loading}\n\t\t\t\t\tonCheckedChange={setLoading}\n\t\t\t\t/>\n\t\t\t\t<Label htmlFor=\"loading\">Loading</Label>\n\t\t\t</div>\n\t\t</div>\n\t)\n}\n"
@@ -3959,6 +3971,8 @@ export const componentMap = {
   "sheet-variants": sheet_sheet_variants,
   "sheet-with-form": sheet_sheet_with_form,
   "skeleton-basic": skeleton_skeleton_basic,
+  "skeleton-inverted": skeleton_skeleton_inverted,
+  "skeleton-sync": skeleton_skeleton_sync,
   "skeleton-wrap": skeleton_skeleton_wrap,
   "slider-basic": slider_slider_basic,
   "slider-controlled": slider_slider_controlled,

@@ -72,7 +72,6 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${rubik.variable} font-sans antialiased`}
-        // className={`${geistSans.variable} ${geistMono.variable} ${rubik.variable} flex min-h-screen max-w-full flex-col font-sans antialiased`}
       >
         <Providers>
           <RootProvider search={{ SearchDialog: CustomSearchDialog }}>

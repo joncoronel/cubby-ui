@@ -1,7 +1,11 @@
-import { HomeLayout } from "fumadocs-ui/layouts/home";
-import { baseOptions } from "@/lib/layout.shared";
 import type { ReactNode } from "react";
+import { TopNav } from "@/components/home/top-nav";
 
 export default function Layout({ children }: { children: ReactNode }) {
-  return <HomeLayout {...baseOptions}>{children}</HomeLayout>;
+  return (
+    <div className="relative flex min-h-dvh flex-col overflow-x-clip">
+      <TopNav />
+      <main className="flex-1">{children}</main>
+    </div>
+  );
 }

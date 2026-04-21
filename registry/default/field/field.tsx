@@ -70,7 +70,7 @@ function FieldErrorSlot({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="field-error-slot"
       className={cn(
         "-mt-2 grid h-0 overflow-clip [interpolate-size:allow-keywords] *:col-start-1 *:row-start-1",
-        "ease-out-cubic transition-[height,margin-top] duration-140 motion-reduce:transition-none",
+        "ease-out-expo transition-[height,margin-top] duration-140 motion-reduce:transition-none",
         "has-[[data-slot=field-error]:not([data-ending-style])]:mt-0 has-[[data-slot=field-error]:not([data-ending-style])]:h-auto",
         // Opacity fade on child FieldError
         "*:data-[slot=field-error]:transition-opacity *:data-[slot=field-error]:duration-140 motion-reduce:*:data-[slot=field-error]:transition-none",

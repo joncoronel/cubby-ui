@@ -6,9 +6,10 @@ import type { ReactNode } from "react";
 //   CollapsibleTrigger,
 //   CollapsibleContent,
 // } from "@/registry/default/collapsible/collapsible";
-import { ChevronRight } from "lucide-react";
 import { Collapsible } from "@base-ui/react/collapsible";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 interface ApiPropProps {
   name: string;
   fullType: string;
@@ -33,7 +34,7 @@ export function ApiProp({
     >
       <Collapsible.Trigger
         data-slot="collapsible-trigger"
-        className="group/collapsible-trigger bg-card hover:bg-accent focus-visible:outline-ring/50 ease-out-cubic col-span-2 grid grid-cols-subgrid transition-[outline-width,outline-offset,outline-color,border-radius] duration-100 group-last:rounded-b-lg group-last/collapsible:not-data-[panel-open]:rounded-b-lg focus-visible:outline-2 focus-visible:outline-offset-2 sm:col-span-3 md:col-span-4 [div[data-slot='header']+*>&]:rounded-t-lg"
+        className="group/collapsible-trigger bg-card hover:bg-accent focus-visible:outline-ring/50 ease-out-expo col-span-2 grid grid-cols-subgrid transition-[outline-width,outline-offset,outline-color,border-radius] duration-100 group-last:rounded-b-lg group-last/collapsible:not-data-[panel-open]:rounded-b-lg focus-visible:outline-2 focus-visible:outline-offset-2 sm:col-span-3 md:col-span-4 [div[data-slot='header']+*>&]:rounded-t-lg"
       >
         {/* Column 1 - Prop name */}
         <div className="flex cursor-pointer items-center gap-2 px-3">
@@ -63,14 +64,18 @@ export function ApiProp({
 
         {/* Chevron - Column 2 (mobile), Column 3 (sm+), Column 4 (md+) */}
         <div className="flex cursor-pointer items-center justify-center px-3 sm:col-start-3 md:col-start-4">
-          <ChevronRight className="text-muted-foreground ease-out-cubic size-4 shrink-0 transition-transform duration-250 group-data-[panel-open]/collapsible-trigger:rotate-90" />
+          <HugeiconsIcon
+            icon={ArrowRight01Icon}
+            className="text-muted-foreground ease-out-expo size-4 shrink-0 transition-transform duration-250 group-data-[panel-open]/collapsible-trigger:rotate-90"
+            strokeWidth={2}
+          />
         </div>
       </Collapsible.Trigger>
 
       {/* Content - spans all columns (responsive) */}
       <Collapsible.Panel
         data-slot="collapsible-panel"
-        className="ease-out-cubic col-span-2 grid h-[var(--collapsible-panel-height)] grid-cols-subgrid overflow-hidden text-sm transition-all duration-250 group-last/collapsible:rounded-b-lg data-[ending-style]:h-0 data-[ending-style]:opacity-0 data-[starting-style]:h-0 data-[starting-style]:opacity-0 sm:col-span-3 md:col-span-4"
+        className="ease-out-expo col-span-2 grid h-[var(--collapsible-panel-height)] grid-cols-subgrid overflow-hidden text-sm transition-all duration-250 group-last/collapsible:rounded-b-lg data-[ending-style]:h-0 data-[ending-style]:opacity-0 data-[starting-style]:h-0 data-[starting-style]:opacity-0 sm:col-span-3 md:col-span-4"
       >
         <div className="bg-muted text-foreground col-span-2 grid grid-cols-subgrid sm:col-span-3 md:col-span-4">
           {/* Row 2: Description */}

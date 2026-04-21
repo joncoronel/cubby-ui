@@ -9,46 +9,47 @@ import {
   TreeItemBadge,
   TreeNode,
 } from "@/registry/default/tree/tree";
-import { FolderIcon, FolderOpenIcon, FileIcon } from "lucide-react";
 import { Badge } from "@/registry/default/badge/badge";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { File01Icon, Folder01Icon, FolderOpenIcon } from "@hugeicons/core-free-icons";
 const treeData: TreeNode[] = [
   {
     id: "documents",
     name: "Documents",
-    icon: <FolderIcon className="text-blue-500" />,
-    iconOpen: <FolderOpenIcon className="text-blue-500" />,
+    icon: <HugeiconsIcon icon={Folder01Icon} className="text-blue-500"  strokeWidth={2} />,
+    iconOpen: <HugeiconsIcon icon={FolderOpenIcon} className="text-blue-500"  strokeWidth={2} />,
     badge: <Badge variant="secondary">New</Badge>,
     children: [
       {
         id: "work",
         name: "Work",
-        icon: <FolderIcon className="text-blue-500" />,
-        iconOpen: <FolderOpenIcon className="text-blue-500" />,
+        icon: <HugeiconsIcon icon={Folder01Icon} className="text-blue-500"  strokeWidth={2} />,
+        iconOpen: <HugeiconsIcon icon={FolderOpenIcon} className="text-blue-500"  strokeWidth={2} />,
         badge: <Badge>2</Badge>,
         children: [
           {
             id: "report.pdf",
             name: "Report.pdf",
-            icon: <FileIcon className="text-muted-foreground" />,
+            icon: <HugeiconsIcon icon={File01Icon} className="text-muted-foreground"  strokeWidth={2} />,
           },
           {
             id: "proposal.pdf",
             name: "Proposal.pdf",
-            icon: <FileIcon className="text-muted-foreground" />,
+            icon: <HugeiconsIcon icon={File01Icon} className="text-muted-foreground"  strokeWidth={2} />,
           },
         ],
       },
       {
         id: "personal",
         name: "Personal",
-        icon: <FolderIcon className="text-blue-500" />,
-        iconOpen: <FolderOpenIcon className="text-blue-500" />,
+        icon: <HugeiconsIcon icon={Folder01Icon} className="text-blue-500"  strokeWidth={2} />,
+        iconOpen: <HugeiconsIcon icon={FolderOpenIcon} className="text-blue-500"  strokeWidth={2} />,
         children: [
           {
             id: "resume.pdf",
             name: "Resume.pdf",
-            icon: <FileIcon className="text-muted-foreground" />,
+            icon: <HugeiconsIcon icon={File01Icon} className="text-muted-foreground"  strokeWidth={2} />,
           },
         ],
       },
@@ -57,25 +58,25 @@ const treeData: TreeNode[] = [
   {
     id: "pictures",
     name: "Pictures",
-    icon: <FolderIcon className="text-blue-500" />,
-    iconOpen: <FolderOpenIcon className="text-blue-500" />,
+    icon: <HugeiconsIcon icon={Folder01Icon} className="text-blue-500"  strokeWidth={2} />,
+    iconOpen: <HugeiconsIcon icon={FolderOpenIcon} className="text-blue-500"  strokeWidth={2} />,
     children: [
       {
         id: "vacation.jpg",
         name: "Vacation.jpg",
-        icon: <FileIcon className="text-muted-foreground" />,
+        icon: <HugeiconsIcon icon={File01Icon} className="text-muted-foreground"  strokeWidth={2} />,
       },
       {
         id: "family.jpg",
         name: "Family.jpg",
-        icon: <FileIcon className="text-muted-foreground" />,
+        icon: <HugeiconsIcon icon={File01Icon} className="text-muted-foreground"  strokeWidth={2} />,
       },
     ],
   },
   {
     id: "families.jpg",
     name: "Families.jpg",
-    icon: <FileIcon className="text-muted-foreground" />,
+    icon: <HugeiconsIcon icon={File01Icon} className="text-muted-foreground"  strokeWidth={2} />,
   },
 ];
 

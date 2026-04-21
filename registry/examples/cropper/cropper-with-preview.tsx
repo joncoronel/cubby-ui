@@ -11,8 +11,8 @@ import {
   type Area,
 } from "@/registry/default/cropper/cropper";
 import { Button } from "@/registry/default/button/button";
-import { Image as ImageIcon, Circle } from "lucide-react";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import { CircleIcon, Image01Icon } from "@hugeicons/core-free-icons";
 export default function CropperWithPreview() {
   const [aspectRatio, setAspectRatio] = useState(1);
   const [cropArea, setCropArea] = useState<Area | null>(null);
@@ -119,7 +119,7 @@ export default function CropperWithPreview() {
                   }}
                   className="flex-1"
                 >
-                  {preset.isCircle && <Circle className="h-4 w-4" />}
+                  {preset.isCircle && <HugeiconsIcon icon={CircleIcon} className="h-4 w-4"  strokeWidth={2} />}
                   {preset.label}
                 </Button>
               ))}
@@ -140,7 +140,7 @@ export default function CropperWithPreview() {
               ) : (
                 <div className="text-muted-foreground space-y-2 text-center">
                   <div className="bg-muted-foreground/10 mx-auto flex h-12 w-12 items-center justify-center rounded-lg">
-                    <ImageIcon className="h-6 w-6" />
+                    <HugeiconsIcon icon={Image01Icon} className="h-6 w-6"  strokeWidth={2} />
                   </div>
                   <div className="text-sm">Crop preview will appear here</div>
                   <div className="text-xs">Adjust the crop area above</div>

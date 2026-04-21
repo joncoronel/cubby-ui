@@ -10,8 +10,8 @@ import {
   type Area,
 } from "@/registry/default/cropper/cropper";
 import { Button } from "@/registry/default/button/button";
-import { Circle } from "lucide-react";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import { CircleIcon } from "@hugeicons/core-free-icons";
 export default function CropperAspectRatios() {
   const [aspectRatio, setAspectRatio] = useState(1);
   const [cropArea, setCropArea] = useState<Area | null>(null);
@@ -57,7 +57,7 @@ export default function CropperAspectRatios() {
                 setIsCircular(!!preset.isCircle);
               }}
             >
-              {preset.isCircle && <Circle className="h-4 w-4" />}
+              {preset.isCircle && <HugeiconsIcon icon={CircleIcon} className="h-4 w-4"  strokeWidth={2} />}
               {preset.label}
             </Button>
           ))}

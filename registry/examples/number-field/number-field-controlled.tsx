@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { Minus, Plus } from "lucide-react";
 import { Label } from "@/registry/default/label/label";
 import {
   NumberField,
@@ -11,6 +10,8 @@ import {
   NumberFieldInput,
 } from "@/registry/default/number-field/number-field";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { MinusSignIcon, PlusSignIcon } from "@hugeicons/core-free-icons";
 export default function NumberFieldControlled() {
   const id = React.useId();
   const [value, setValue] = React.useState<number | null>(50);
@@ -21,11 +22,11 @@ export default function NumberFieldControlled() {
         <Label htmlFor={id}>Quantity</Label>
         <NumberFieldGroup>
           <NumberFieldDecrement>
-            <Minus className="size-4" />
+            <HugeiconsIcon icon={MinusSignIcon} className="size-4"  strokeWidth={2} />
           </NumberFieldDecrement>
           <NumberFieldInput />
           <NumberFieldIncrement>
-            <Plus className="size-4" />
+            <HugeiconsIcon icon={PlusSignIcon} className="size-4"  strokeWidth={2} />
           </NumberFieldIncrement>
         </NumberFieldGroup>
       </NumberField>

@@ -7,14 +7,14 @@ import {
   PopoverBackdrop,
 } from "@/registry/default/popover/popover";
 import { Button } from "@/registry/default/button/button";
-import { Layers } from "lucide-react";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Layers01Icon } from "@hugeicons/core-free-icons";
 export default function PopoverWithBackdrop() {
   return (
     <Popover>
       <PopoverTrigger
         render={
-          <Button variant="outline" leftSection={<Layers className="size-4" />} />
+          <Button variant="outline" leftSection={<HugeiconsIcon icon={Layers01Icon} className="size-4"  strokeWidth={2} />} />
         }
       >
         Open Modal Popover

@@ -11,15 +11,15 @@ import {
   DropdownMenuShortcut,
 } from "@/registry/default/dropdown-menu/dropdown-menu";
 import { Button } from "@/registry/default/button/button";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  Users,
-  UserPlus,
-  Mail,
-  MessageSquare,
-  PlusCircle,
-  Plus,
-} from "lucide-react";
-
+  BubbleChatIcon,
+  Mail01Icon,
+  PlusSignCircleIcon,
+  PlusSignIcon,
+  UserAdd01Icon,
+  UserMultipleIcon,
+} from "@hugeicons/core-free-icons";
 export default function DropdownMenuWithSubMenu() {
   return (
     <DropdownMenu>
@@ -29,32 +29,32 @@ export default function DropdownMenuWithSubMenu() {
       <DropdownMenuContent className="w-56">
         <DropdownMenuGroup>
           <DropdownMenuItem>
-            <Users className="mr-2 h-4 w-4" />
+            <HugeiconsIcon icon={UserMultipleIcon} className="mr-2 h-4 w-4"  strokeWidth={2} />
             <span>Team</span>
           </DropdownMenuItem>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
-              <UserPlus className="mr-2 h-4 w-4" />
+              <HugeiconsIcon icon={UserAdd01Icon} className="mr-2 h-4 w-4"  strokeWidth={2} />
               <span>Invite users</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuSubContent>
               <DropdownMenuItem>
-                <Mail className="mr-2 h-4 w-4" />
+                <HugeiconsIcon icon={Mail01Icon} className="mr-2 h-4 w-4"  strokeWidth={2} />
                 <span>Email</span>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <MessageSquare className="mr-2 h-4 w-4" />
+                <HugeiconsIcon icon={BubbleChatIcon} className="mr-2 h-4 w-4"  strokeWidth={2} />
                 <span>Message</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
-                <PlusCircle className="mr-2 h-4 w-4" />
+                <HugeiconsIcon icon={PlusSignCircleIcon} className="mr-2 h-4 w-4"  strokeWidth={2} />
                 <span>More...</span>
               </DropdownMenuItem>
             </DropdownMenuSubContent>
           </DropdownMenuSub>
           <DropdownMenuItem>
-            <Plus className="mr-2 h-4 w-4" />
+            <HugeiconsIcon icon={PlusSignIcon} className="mr-2 h-4 w-4"  strokeWidth={2} />
             <span>New Team</span>
             <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
           </DropdownMenuItem>

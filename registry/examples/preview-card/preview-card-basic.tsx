@@ -3,8 +3,8 @@ import {
   PreviewCardTrigger,
   PreviewCardContent,
 } from "@/registry/default/preview-card/preview-card";
-import { Calendar, MapPin } from "lucide-react";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Calendar01Icon, MapPinIcon } from "@hugeicons/core-free-icons";
 export default function PreviewCardBasic() {
   return (
     <PreviewCard>
@@ -30,11 +30,11 @@ export default function PreviewCardBasic() {
           </p>
           <div className="text-muted-foreground flex items-center gap-4 text-sm">
             <div className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
+              <HugeiconsIcon icon={Calendar01Icon} className="h-4 w-4"  strokeWidth={2} />
               <span>Joined March 2020</span>
             </div>
             <div className="flex items-center gap-1">
-              <MapPin className="h-4 w-4" />
+              <HugeiconsIcon icon={MapPinIcon} className="h-4 w-4"  strokeWidth={2} />
               <span>San Francisco, CA</span>
             </div>
           </div>

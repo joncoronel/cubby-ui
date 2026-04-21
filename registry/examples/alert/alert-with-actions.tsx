@@ -5,12 +5,12 @@ import {
   AlertTitle,
 } from "@/registry/default/alert/alert";
 import { Button } from "@/registry/default/button/button";
-import { Info } from "lucide-react";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import { InformationCircleIcon } from "@hugeicons/core-free-icons";
 export default function AlertWithActions() {
   return (
     <Alert variant="info">
-      <Info />
+      <HugeiconsIcon icon={InformationCircleIcon}  strokeWidth={2} />
       <AlertTitle>Heads up!</AlertTitle>
       <AlertDescription>
         Describe what can be done about it here.

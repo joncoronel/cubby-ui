@@ -1,6 +1,5 @@
 "use client";
 
-import { X } from "lucide-react";
 import {
   Combobox,
   ComboboxChipInput,
@@ -15,6 +14,8 @@ import {
   ComboboxLabel,
 } from "@/registry/default/combobox/combobox";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
 export default function ComboboxMultiple() {
   return (
     <Combobox items={langs} multiple>
@@ -28,7 +29,7 @@ export default function ComboboxMultiple() {
                   <ComboboxChip key={language.id} aria-label={language.value}>
                     {language.value}
                     <ComboboxChipRemove aria-label="Remove">
-                      <X className="h-3 w-3" />
+                      <HugeiconsIcon icon={Cancel01Icon} className="h-3 w-3"  strokeWidth={2} />
                     </ComboboxChipRemove>
                   </ComboboxChip>
                 ))}

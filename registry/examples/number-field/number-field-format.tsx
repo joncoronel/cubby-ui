@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { Minus, Plus } from "lucide-react";
 import { Label } from "@/registry/default/label/label";
 import {
   NumberField,
@@ -11,6 +10,8 @@ import {
   NumberFieldInput,
 } from "@/registry/default/number-field/number-field";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { MinusSignIcon, PlusSignIcon } from "@hugeicons/core-free-icons";
 export default function NumberFieldFormat() {
   const id = React.useId();
 
@@ -24,11 +25,11 @@ export default function NumberFieldFormat() {
       <Label htmlFor={id}>Price</Label>
       <NumberFieldGroup>
         <NumberFieldDecrement>
-          <Minus className="size-4" />
+          <HugeiconsIcon icon={MinusSignIcon} className="size-4"  strokeWidth={2} />
         </NumberFieldDecrement>
         <NumberFieldInput className="w-32" />
         <NumberFieldIncrement>
-          <Plus className="size-4" />
+          <HugeiconsIcon icon={PlusSignIcon} className="size-4"  strokeWidth={2} />
         </NumberFieldIncrement>
       </NumberFieldGroup>
     </NumberField>

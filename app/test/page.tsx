@@ -140,7 +140,7 @@ export default function TestPage() {
           <div
             className={cn(
               "overflow-y-clip rounded-lg border",
-              "ease-out-cubic transition-[height] duration-200",
+              "ease-out-expo transition-[height] duration-200",
             )}
             ref={outerRef}
           >

@@ -2,8 +2,6 @@
 
 import * as React from "react";
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
-import { XIcon } from "lucide-react";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/registry/default/button/button";
 import {
@@ -11,6 +9,8 @@ import {
   type ScrollAreaProps,
 } from "@/registry/default/scroll-area/scroll-area";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
 interface DialogConfigContextValue {
   modal: boolean | "trap-focus";
 }
@@ -54,7 +54,7 @@ function DialogBackdrop({ className, ...props }: BaseDialog.Backdrop.Props) {
   return (
     <BaseDialog.Backdrop
       className={cn(
-        "ease-out-cubic fixed inset-0 min-h-dvh bg-black/40 transition-all duration-200 supports-[-webkit-touch-callout:none]:absolute",
+        "ease-out-expo fixed inset-0 min-h-dvh bg-black/40 transition-all duration-200 supports-[-webkit-touch-callout:none]:absolute",
         "backdrop-blur-sm data-ending-style:opacity-0 data-starting-style:opacity-0",
         className,
       )}
@@ -107,7 +107,7 @@ function DialogContent({
             // Scale effect for nested dialogs on desktop
             "scale-[calc(1-0.1*var(--nested-dialogs))]",
             // Animation duration
-            "ease-out-cubic transition-all duration-200",
+            "ease-out-expo transition-all duration-200",
             // Desktop animations: scale and fade
             "data-starting-style:translate-y-[calc(1.25rem)] data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:translate-y-[calc(1.25rem)] data-ending-style:scale-95 data-ending-style:opacity-0",
@@ -127,7 +127,7 @@ function DialogContent({
               className="absolute end-2 top-2"
               render={<Button size="icon_sm" variant="ghost" />}
             >
-              <XIcon />
+              <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} />
             </DialogClose>
           )}
         </BaseDialog.Popup>

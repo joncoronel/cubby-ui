@@ -60,19 +60,7 @@
       "ease-in-cubic": "cubic-bezier(0.55, 0.055, 0.675, 0.19)",
       "ease-out-cubic": "cubic-bezier(0.215, 0.61, 0.355, 1)",
       "ease-in-out-cubic": "cubic-bezier(0.645, 0.045, 0.355, 1)",
-      "ease-gentle": "linear(\r\n    0,\r\n    0.1119,\r\n    0.3107,\r\n    0.4981,\r\n    0.6473,\r\n    0.7573,\r\n    0.8352,\r\n    0.889,\r\n    0.9257,\r\n    0.9504,\r\n    0.967,\r\n    0.9781,\r\n    0.9854,\r\n    0.9903,\r\n    0.9936,\r\n    0.9958,\r\n    0.9972,\r\n    0.9981,\r\n    0.9988,\r\n    1\r\n  )",
-      "duration-gentle": "614ms",
-      "ease-smooth": "linear(\r\n    0,\r\n    0.118,\r\n    0.3228,\r\n    0.5118,\r\n    0.6596,\r\n    0.7671,\r\n    0.8425,\r\n    0.8942,\r\n    0.9292,\r\n    0.9527,\r\n    0.9685,\r\n    0.979,\r\n    0.9861,\r\n    0.9907,\r\n    0.9938,\r\n    0.9959,\r\n    0.9973,\r\n    0.9982,\r\n    0.9988,\r\n    1\r\n  )",
-      "duration-smooth": "532ms",
-      "ease-snappy": "linear(\r\n    0,\r\n    0.0539,\r\n    0.1716,\r\n    0.3096,\r\n    0.4442,\r\n    0.5642,\r\n    0.6655,\r\n    0.7476,\r\n    0.8125,\r\n    0.8626,\r\n    0.9006,\r\n    0.9289,\r\n    0.9497,\r\n    0.9649,\r\n    0.9757,\r\n    0.9834,\r\n    0.9888,\r\n    0.9925,\r\n    0.9951,\r\n    0.9968,\r\n    0.998,\r\n    0.9988,\r\n    0.9993,\r\n    1\r\n  )",
-      "duration-snappy": "415ms",
-      "ease-brisk": "linear(\r\n    0,\r\n    0.0469,\r\n    0.1526,\r\n    0.2806,\r\n    0.4098,\r\n    0.5286,\r\n    0.6317,\r\n    0.7179,\r\n    0.7876,\r\n    0.8428,\r\n    0.8855,\r\n    0.9179,\r\n    0.9421,\r\n    0.9599,\r\n    0.9728,\r\n    0.9819,\r\n    0.9883,\r\n    0.9927,\r\n    0.9957,\r\n    0.9976,\r\n    0.9989,\r\n    0.9996,\r\n    1.0001,\r\n    1\r\n  )",
-      "duration-brisk": "322ms",
-      "ease-bouncy": "linear(\r\n    0,\r\n    0.0778,\r\n    0.2481,\r\n    0.4431,\r\n    0.6236,\r\n    0.7711,\r\n    0.8807,\r\n    0.9549,\r\n    1.0002,\r\n    1.0239,\r\n    1.033,\r\n    1.0331,\r\n    1.0285,\r\n    1.0221,\r\n    1.0157,\r\n    1.0101,\r\n    1.0057,\r\n    1.0026,\r\n    1.0006,\r\n    0.9995,\r\n    0.999,\r\n    0.9989,\r\n    0.9989,\r\n    1\r\n  )",
-      "duration-bouncy": "532ms",
-      "ease-elastic": "linear(\r\n    0,\r\n    0.097,\r\n    0.3089,\r\n    0.546,\r\n    0.7552,\r\n    0.9123,\r\n    1.0133,\r\n    1.066,\r\n    1.0831,\r\n    1.0778,\r\n    1.0612,\r\n    1.0414,\r\n    1.0233,\r\n    1.0093,\r\n    1.0001,\r\n    0.995,\r\n    0.9932,\r\n    0.9933,\r\n    0.9946,\r\n    0.9963,\r\n    0.9978,\r\n    0.999,\r\n    0.9999,\r\n    1\r\n  )",
-      "duration-elastic": "684ms",
-      "--animate-skeleton": "skeleton 2s -1s linear infinite",
+      "ease-out-expo": "cubic-bezier(0.19, 1, 0.22, 1)",
       "--animate-otp-field-shake-a": "otp-field-shake-a 180ms ease-in-out",
       "--animate-otp-field-shake-b": "otp-field-shake-b 180ms ease-in-out"
     },
@@ -164,11 +152,6 @@
     }
   },
   "css": {
-    "@keyframes skeleton": {
-      "to": {
-        "background-position-x": "-200%"
-      }
-    },
     "@keyframes otp-field-shake-a": {
       "0%,\r\n    100%": {
         "transform": "translateX(0)"

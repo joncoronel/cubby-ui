@@ -1,11 +1,11 @@
-import { AlertCircleIcon, CheckCircleIcon, Mail } from "lucide-react";
-
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@/registry/default/input-group/input-group";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { AlertCircleIcon, CheckmarkCircle02Icon, Mail01Icon } from "@hugeicons/core-free-icons";
 export default function InputGroupValidation() {
   return (
     <div className="grid w-full max-w-sm gap-4">
@@ -17,10 +17,10 @@ export default function InputGroupValidation() {
           aria-invalid="true"
         />
         <InputGroupAddon>
-          <Mail />
+          <HugeiconsIcon icon={Mail01Icon}  strokeWidth={2} />
         </InputGroupAddon>
         <InputGroupAddon align="inline-end">
-          <AlertCircleIcon className="text-destructive size-4" />
+          <HugeiconsIcon icon={AlertCircleIcon} className="text-destructive size-4"  strokeWidth={2} />
         </InputGroupAddon>
       </InputGroup>
       <InputGroup>
@@ -30,10 +30,10 @@ export default function InputGroupValidation() {
           defaultValue="user@example.com"
         />
         <InputGroupAddon>
-          <Mail />
+          <HugeiconsIcon icon={Mail01Icon}  strokeWidth={2} />
         </InputGroupAddon>
         <InputGroupAddon align="inline-end">
-          <CheckCircleIcon className="size-4 text-emerald-500" />
+          <HugeiconsIcon icon={CheckmarkCircle02Icon} className="size-4 text-emerald-500"  strokeWidth={2} />
         </InputGroupAddon>
       </InputGroup>
     </div>

@@ -7,43 +7,48 @@ import {
   TreeItemLabel,
   TreeNode,
 } from "@/registry/default/tree/tree";
-import { FolderIcon, FolderOpenIcon, FileIcon, LockIcon } from "lucide-react";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  File01Icon,
+  Folder01Icon,
+  FolderOpenIcon,
+  LockIcon,
+} from "@hugeicons/core-free-icons";
 const treeData: TreeNode[] = [
   {
     id: "public",
     name: "Public Files",
-    icon: <FolderIcon className="text-blue-500" />,
-    iconOpen: <FolderOpenIcon className="text-blue-500" />,
+    icon: <HugeiconsIcon icon={Folder01Icon} className="text-blue-500"  strokeWidth={2} />,
+    iconOpen: <HugeiconsIcon icon={FolderOpenIcon} className="text-blue-500"  strokeWidth={2} />,
     children: [
       {
         id: "public-1.pdf",
         name: "Document.pdf",
-        icon: <FileIcon className="text-muted-foreground" />,
+        icon: <HugeiconsIcon icon={File01Icon} className="text-muted-foreground"  strokeWidth={2} />,
       },
       {
         id: "public-2.pdf",
         name: "Image.jpg",
-        icon: <FileIcon className="text-muted-foreground" />,
+        icon: <HugeiconsIcon icon={File01Icon} className="text-muted-foreground"  strokeWidth={2} />,
       },
     ],
   },
   {
     id: "private",
     name: "Private Files (Disabled)",
-    icon: <LockIcon className="text-destructive" />,
+    icon: <HugeiconsIcon icon={LockIcon} className="text-destructive"  strokeWidth={2} />,
     disabled: true,
     children: [
       {
         id: "private-1.pdf",
         name: "Secret.pdf",
-        icon: <FileIcon className="text-muted-foreground" />,
+        icon: <HugeiconsIcon icon={File01Icon} className="text-muted-foreground"  strokeWidth={2} />,
         disabled: true,
       },
       {
         id: "private-2.pdf",
         name: "Confidential.pdf",
-        icon: <FileIcon className="text-muted-foreground" />,
+        icon: <HugeiconsIcon icon={File01Icon} className="text-muted-foreground"  strokeWidth={2} />,
         disabled: true,
       },
     ],
@@ -51,27 +56,27 @@ const treeData: TreeNode[] = [
   {
     id: "loading",
     name: "Loading Folder",
-    icon: <FolderIcon className="text-blue-500" />,
-    iconOpen: <FolderOpenIcon className="text-blue-500" />,
+    icon: <HugeiconsIcon icon={Folder01Icon} className="text-blue-500"  strokeWidth={2} />,
+    iconOpen: <HugeiconsIcon icon={FolderOpenIcon} className="text-blue-500"  strokeWidth={2} />,
     loading: true,
     children: [
       {
         id: "temp-1.pdf",
         name: "File.pdf",
-        icon: <FileIcon className="text-muted-foreground" />,
+        icon: <HugeiconsIcon icon={File01Icon} className="text-muted-foreground"  strokeWidth={2} />,
       },
     ],
   },
   {
     id: "single-disabled",
     name: "Disabled File.pdf",
-    icon: <FileIcon className="text-muted-foreground" />,
+    icon: <HugeiconsIcon icon={File01Icon} className="text-muted-foreground"  strokeWidth={2} />,
     disabled: true,
   },
   {
     id: "single-loading",
     name: "Loading File.pdf",
-    icon: <FileIcon className="text-muted-foreground" />,
+    icon: <HugeiconsIcon icon={File01Icon} className="text-muted-foreground"  strokeWidth={2} />,
     loading: true,
   },
 ];

@@ -16,23 +16,6 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import {
-  ChevronDownIcon,
-  ChevronFirstIcon,
-  ChevronLastIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronUpIcon,
-  CircleAlertIcon,
-  CircleXIcon,
-  Columns3Icon,
-  EllipsisIcon,
-  FilterIcon,
-  ListFilterIcon,
-  PlusIcon,
-  TrashIcon,
-} from "lucide-react";
-
 import { cn } from "@/lib/utils";
 import {
   AlertDialog,
@@ -90,6 +73,22 @@ import {
   TableRow,
 } from "@/registry/default/table/table";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  AlertCircleIcon,
+  ArrowDown01Icon,
+  ArrowLeft01Icon,
+  ArrowLeftDoubleIcon,
+  ArrowRight01Icon,
+  ArrowRightDoubleIcon,
+  ArrowUp01Icon,
+  CancelCircleIcon,
+  Delete02Icon,
+  FilterIcon,
+  LayoutGridIcon,
+  MoreHorizontalIcon,
+  PlusSignIcon,
+} from "@hugeicons/core-free-icons";
 type Item = {
   id: string;
   name: string;
@@ -335,7 +334,7 @@ export default function Component() {
               aria-label="Filter by name or email"
             />
             <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
-              <ListFilterIcon size={16} aria-hidden="true" />
+              <HugeiconsIcon icon={FilterIcon} size={16} aria-hidden="true"  strokeWidth={2} />
             </div>
             {Boolean(table.getColumn("name")?.getFilterValue()) && (
               <button
@@ -348,7 +347,7 @@ export default function Component() {
                   }
                 }}
               >
-                <CircleXIcon size={16} aria-hidden="true" />
+                <HugeiconsIcon icon={CancelCircleIcon} size={16} aria-hidden="true"  strokeWidth={2} />
               </button>
             )}
           </div>
@@ -357,11 +356,11 @@ export default function Component() {
             <PopoverTrigger
               render={
                 <Button variant="outline">
-                  <FilterIcon
+                  <HugeiconsIcon icon={FilterIcon}
                     className="-ms-1 opacity-60"
                     size={16}
                     aria-hidden="true"
-                  />
+                   strokeWidth={2} />
                   Status
                   {selectedStatuses.length > 0 && (
                     <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
@@ -406,11 +405,11 @@ export default function Component() {
             <DropdownMenuTrigger
               render={
                 <Button variant="outline">
-                  <Columns3Icon
+                  <HugeiconsIcon icon={LayoutGridIcon}
                     className="-ms-1 opacity-60"
                     size={16}
                     aria-hidden="true"
-                  />
+                   strokeWidth={2} />
                   View
                 </Button>
               }
@@ -447,11 +446,11 @@ export default function Component() {
               <AlertDialogTrigger
                 render={
                   <Button className="ml-auto" variant="outline">
-                    <TrashIcon
+                    <HugeiconsIcon icon={Delete02Icon}
                       className="-ms-1 opacity-60"
                       size={16}
                       aria-hidden="true"
-                    />
+                     strokeWidth={2} />
                     Delete
                     <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
                       {table.getSelectedRowModel().rows.length}
@@ -465,7 +464,7 @@ export default function Component() {
                     className="flex size-9 shrink-0 items-center justify-center rounded-full border"
                     aria-hidden="true"
                   >
-                    <CircleAlertIcon className="opacity-80" size={16} />
+                    <HugeiconsIcon icon={AlertCircleIcon} className="opacity-80" size={16}  strokeWidth={2} />
                   </div>
                   <AlertDialogHeader>
                     <AlertDialogTitle>
@@ -496,11 +495,11 @@ export default function Component() {
           )}
           {/* Add user button */}
           <Button className="ml-auto" variant="outline">
-            <PlusIcon
+            <HugeiconsIcon icon={PlusSignIcon}
               className="-ms-1 opacity-60"
               size={16}
               aria-hidden="true"
-            />
+             strokeWidth={2} />
             Add user
           </Button>
         </div>
@@ -544,18 +543,18 @@ export default function Component() {
                           )}
                           {{
                             asc: (
-                              <ChevronUpIcon
+                              <HugeiconsIcon icon={ArrowUp01Icon}
                                 className="shrink-0 opacity-60"
                                 size={16}
                                 aria-hidden="true"
-                              />
+                               strokeWidth={2} />
                             ),
                             desc: (
-                              <ChevronDownIcon
+                              <HugeiconsIcon icon={ArrowDown01Icon}
                                 className="shrink-0 opacity-60"
                                 size={16}
                                 aria-hidden="true"
-                              />
+                               strokeWidth={2} />
                             ),
                           }[header.column.getIsSorted() as string] ?? null}
                         </div>
@@ -669,7 +668,7 @@ export default function Component() {
                   disabled={!table.getCanPreviousPage()}
                   aria-label="Go to first page"
                 >
-                  <ChevronFirstIcon size={16} aria-hidden="true" />
+                  <HugeiconsIcon icon={ArrowLeftDoubleIcon} size={16} aria-hidden="true"  strokeWidth={2} />
                 </Button>
               </PaginationItem>
               {/* Previous page button */}
@@ -682,7 +681,7 @@ export default function Component() {
                   disabled={!table.getCanPreviousPage()}
                   aria-label="Go to previous page"
                 >
-                  <ChevronLeftIcon size={16} aria-hidden="true" />
+                  <HugeiconsIcon icon={ArrowLeft01Icon} size={16} aria-hidden="true"  strokeWidth={2} />
                 </Button>
               </PaginationItem>
               {/* Next page button */}
@@ -695,7 +694,7 @@ export default function Component() {
                   disabled={!table.getCanNextPage()}
                   aria-label="Go to next page"
                 >
-                  <ChevronRightIcon size={16} aria-hidden="true" />
+                  <HugeiconsIcon icon={ArrowRight01Icon} size={16} aria-hidden="true"  strokeWidth={2} />
                 </Button>
               </PaginationItem>
               {/* Last page button */}
@@ -708,7 +707,7 @@ export default function Component() {
                   disabled={!table.getCanNextPage()}
                   aria-label="Go to last page"
                 >
-                  <ChevronLastIcon size={16} aria-hidden="true" />
+                  <HugeiconsIcon icon={ArrowRightDoubleIcon} size={16} aria-hidden="true"  strokeWidth={2} />
                 </Button>
               </PaginationItem>
             </PaginationContent>
@@ -742,7 +741,7 @@ function RowActions() {
               className="shadow-none"
               aria-label="Edit item"
             >
-              <EllipsisIcon size={16} aria-hidden="true" />
+              <HugeiconsIcon icon={MoreHorizontalIcon} size={16} aria-hidden="true"  strokeWidth={2} />
             </Button>
           </div>
         }

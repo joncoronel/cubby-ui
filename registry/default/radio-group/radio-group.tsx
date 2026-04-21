@@ -26,7 +26,7 @@ function RadioGroupItem({
       data-slot="radio-group-item"
       className={cn(
         "group relative inline-flex size-4 shrink-0 items-center justify-center rounded-full",
-        "focus-visible:outline-ring/50 ease-out-cubic outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-150 outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+        "focus-visible:outline-ring/50 ease-out-expo outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-150 outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
         "disabled:cursor-not-allowed disabled:opacity-60",
         "aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
 
@@ -39,11 +39,11 @@ function RadioGroupItem({
     >
       <Radio.Indicator
         className={cn(
-          "z-1 flex size-full items-center justify-center rounded-full bg-primary before:bg-primary-foreground",
-          "ease-out-cubic transition-opacity duration-150",
+          "bg-primary before:bg-primary-foreground z-1 flex size-full items-center justify-center rounded-full",
+          "ease-out-expo transition-opacity duration-150",
           "data-starting-style:opacity-0",
           "data-ending-style:opacity-0",
-          "before:size-full before:origin-center before:rounded-full before:content-[''] before:ease-out-cubic before:scale-50 before:transition-[scale] before:duration-250",
+          "before:ease-out-expo before:size-full before:origin-center before:scale-50 before:rounded-full before:transition-[scale] before:duration-250 before:content-['']",
           "data-starting-style:before:scale-100",
           "data-ending-style:before:scale-100",
         )}

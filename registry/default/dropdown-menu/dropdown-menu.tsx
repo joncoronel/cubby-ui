@@ -25,7 +25,7 @@ function CheckmarkIcon({ className }: { className?: string }) {
         style={{
           strokeDasharray: 22,
         }}
-        className="ease-out-cubic transition-[stroke-dashoffset] duration-150 in-data-checked:[stroke-dashoffset:0] in-data-unchecked:[stroke-dashoffset:22] motion-reduce:transition-none"
+        className="ease-out-expo transition-[stroke-dashoffset] duration-150 in-data-checked:[stroke-dashoffset:0] in-data-unchecked:[stroke-dashoffset:22] motion-reduce:transition-none"
       />
     </svg>
   );
@@ -82,7 +82,7 @@ function DropdownMenuContent({
           className={cn(
             "bg-popover text-popover-foreground relative min-w-[12rem] overflow-hidden rounded-xl border bg-clip-padding shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)]",
             "h-(--popup-height,auto) w-(--popup-width,auto)",
-            "origin-(--transform-origin) transition-[width,height,scale,opacity] duration-[350ms,350ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-cubic),var(--ease-out-cubic)]",
+            "origin-(--transform-origin) transition-[width,height,scale,opacity] duration-[350ms,350ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
             "motion-reduce:transition-none",
@@ -373,7 +373,7 @@ function DropdownMenuSubContent({
           data-slot="dropdown-menu-content"
           className={cn(
             "bg-popover text-popover-foreground min-w-[12rem] overflow-hidden rounded-xl border bg-clip-padding shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)]",
-            "ease-out-cubic origin-(--transform-origin) transition-[transform,scale,opacity] duration-100",
+            "ease-out-expo origin-(--transform-origin) transition-[transform,scale,opacity] duration-100",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
             "motion-reduce:transition-none",

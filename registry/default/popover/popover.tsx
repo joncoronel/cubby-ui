@@ -57,7 +57,7 @@ function PopoverBackdrop({ className, ...props }: BasePopover.Backdrop.Props) {
     <BasePopover.Backdrop
       data-slot="popover-backdrop"
       className={cn(
-        "ease-out-cubic fixed inset-0 z-30 min-h-dvh bg-black/40 transition-all duration-150 supports-[-webkit-touch-callout:none]:absolute",
+        "ease-out-expo fixed inset-0 z-30 min-h-dvh bg-black/40 transition-all duration-150 supports-[-webkit-touch-callout:none]:absolute",
         "backdrop-blur-sm data-ending-style:opacity-0 data-starting-style:opacity-0 motion-reduce:transition-none",
         className,
       )}
@@ -141,7 +141,7 @@ function PopoverContent({
             "max-h-(--available-height) max-w-(--available-width)",
             "origin-(--transform-origin) overflow-hidden rounded-md shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)] ring-1",
             // Size/opacity transitions
-            "transition-[width,height,scale,opacity] duration-[350ms,350ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-cubic),var(--ease-out-cubic)]",
+            "transition-[width,height,scale,opacity] duration-[350ms,350ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
             "motion-reduce:transition-none",

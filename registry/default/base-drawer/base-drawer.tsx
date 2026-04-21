@@ -7,12 +7,12 @@ import { mergeProps } from "@base-ui/react/merge-props";
 import { Radio as RadioPrimitive } from "@base-ui/react/radio";
 import { RadioGroup as RadioGroupPrimitive } from "@base-ui/react/radio-group";
 import { useRender } from "@base-ui/react/use-render";
-import { ChevronRightIcon, XIcon } from "lucide-react";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/registry/default/button/button";
 import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
 // ---------------------------------------------------------------------------
 // Types & context
 // ---------------------------------------------------------------------------
@@ -337,7 +337,7 @@ function BaseDrawerPopup({
               className="absolute end-2 top-2"
               render={<Button size="icon_sm" variant="ghost" />}
             >
-              <XIcon />
+              <HugeiconsIcon icon={Cancel01Icon}  strokeWidth={2} />
             </DrawerPrimitive.Close>
           )}
           {showBar && <BaseDrawerBar />}
@@ -637,7 +637,7 @@ function BaseDrawerMenuTrigger({
       {...props}
     >
       {children}
-      <ChevronRightIcon className="ms-auto -me-0.5 opacity-80" />
+      <HugeiconsIcon icon={ArrowRight01Icon} className="ms-auto -me-0.5 opacity-80"  strokeWidth={2} />
     </BaseDrawerTrigger>
   );
 }

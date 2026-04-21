@@ -1,5 +1,3 @@
-import { SendIcon } from "lucide-react";
-
 import { Button } from "@/registry/default/button/button";
 import { ButtonGroup } from "@/registry/default/button-group/button-group";
 import { Input } from "@/registry/default/input/input";
@@ -11,6 +9,8 @@ import {
   SelectValue,
 } from "@/registry/default/select/select";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Sent02Icon } from "@hugeicons/core-free-icons";
 export default function ButtonGroupSelect() {
   return (
     <ButtonGroup>
@@ -28,7 +28,7 @@ export default function ButtonGroupSelect() {
       <Input type="number" placeholder="0.00" />
 
       <Button size="icon" aria-label="Send" variant="outline">
-        <SendIcon />
+        <HugeiconsIcon icon={Sent02Icon}  strokeWidth={2} />
       </Button>
     </ButtonGroup>
   );

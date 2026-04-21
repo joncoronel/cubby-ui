@@ -10,13 +10,13 @@ import {
   SheetTrigger,
 } from "@/registry/default/sheet/sheet";
 import { Button } from "@/registry/default/button/button";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronUpIcon,
-} from "lucide-react";
-
+  ArrowDown01Icon,
+  ArrowLeft01Icon,
+  ArrowRight01Icon,
+  ArrowUp01Icon,
+} from "@hugeicons/core-free-icons";
 export default function SheetVariants() {
   return (
     <div className="flex flex-wrap items-center justify-center gap-2">
@@ -25,7 +25,7 @@ export default function SheetVariants() {
           render={
             <Button
               variant="outline"
-              leftSection={<ChevronUpIcon className="size-4" />}
+              leftSection={<HugeiconsIcon icon={ArrowUp01Icon} className="size-4"  strokeWidth={2} />}
             />
           }
         >
@@ -52,7 +52,7 @@ export default function SheetVariants() {
           render={
             <Button
               variant="outline"
-              leftSection={<ChevronRightIcon className="size-4" />}
+              leftSection={<HugeiconsIcon icon={ArrowRight01Icon} className="size-4"  strokeWidth={2} />}
             />
           }
         >
@@ -79,7 +79,7 @@ export default function SheetVariants() {
           render={
             <Button
               variant="outline"
-              leftSection={<ChevronDownIcon className="size-4" />}
+              leftSection={<HugeiconsIcon icon={ArrowDown01Icon} className="size-4"  strokeWidth={2} />}
             />
           }
         >
@@ -106,7 +106,7 @@ export default function SheetVariants() {
           render={
             <Button
               variant="outline"
-              leftSection={<ChevronLeftIcon className="size-4" />}
+              leftSection={<HugeiconsIcon icon={ArrowLeft01Icon} className="size-4"  strokeWidth={2} />}
             />
           }
         >

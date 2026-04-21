@@ -19,6 +19,24 @@ import { Skeleton } from "@/registry/default/skeleton/skeleton";
 
 ## Examples
 
+### Synchronized Sweep
+
+The shimmer is positioned relative to the viewport, so a single highlight passes across every skeleton on the page in unison. This makes grouped loading states feel coordinated rather than each element animating on its own.
+
+<ComponentPreview component="skeleton" example="skeleton-sync" />
+
+### Inverted
+
+Flips the shimmer highlight from light to dark. Useful when the skeleton sits on a light surface where a bright sheen is too loud, or on a dark surface in dark mode where a darker band reads more naturally.
+
+<ComponentPreview component="skeleton" example="skeleton-inverted" />
+
+### Multi-line Text
+
+Pass `multiline` to render the skeleton as an inline element that wraps with its parent text. Each line fragment picks up the shimmer as the same viewport-wide wave sweeps across.
+
+<ComponentPreview component="skeleton" example="skeleton-multiline" />
+
 ### Wrapping Content
 
 Wrap existing elements to automatically match their dimensions. The skeleton inherits the size of its children while hiding them with a shimmer overlay.
@@ -40,7 +58,15 @@ Animated placeholder that displays a shimmer effect. Can be used standalone with
 </ApiProp>
 
 <ApiProp name="animate" fullType="boolean" defaultValue="true">
-  Enables the shimmer animation. When `false`, displays a static `bg-muted` background.
+  Enables the shimmer animation. When `false`, displays a static background.
+</ApiProp>
+
+<ApiProp name="inverted" fullType="boolean" defaultValue="false">
+  Inverts the shimmer highlight color. By default the sheen is light (white-tinted); when `true` it becomes dark (black-tinted). Use on surfaces where the default highlight is too bright.
+</ApiProp>
+
+<ApiProp name="multiline" fullType="boolean" defaultValue="false">
+  Renders the skeleton as an inline `<span>` so it can wrap across multiple lines of text. Uses `box-decoration-break: clone` so each line fragment carries the skeleton styling, and `color: transparent` so the underlying text reserves its natural dimensions while staying invisible.
 </ApiProp>
 
 <ApiProp name="children" fullType="ReactNode" simpleType="node">

@@ -1,7 +1,5 @@
 import * as React from "react";
 import dayjs from "dayjs";
-import { CalendarIcon, ChevronsUpDownIcon } from "lucide-react";
-
 import { Button } from "@/registry/default/button/button";
 import { Calendar } from "@/registry/default/calendar/calendar";
 import {
@@ -13,6 +11,8 @@ import { cn } from "@/lib/utils";
 
 import type { DateRange } from "react-day-picker";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Calendar01Icon, UnfoldMoreIcon } from "@hugeicons/core-free-icons";
 export interface DateRangePickerProps {
   value?: DateRange;
   onSelect?: (range: DateRange | undefined) => void;
@@ -165,12 +165,12 @@ export function DateRangePicker({
             disabled={disabled}
           >
             <span className="flex w-full items-center">
-              <CalendarIcon className="mr-2 size-4" />
+              <HugeiconsIcon icon={Calendar01Icon} className="mr-2 size-4"  strokeWidth={2} />
               <span className={cn(!value?.from && "text-muted-foreground")}>
                 {formatDateRange()}
               </span>
             </span>
-            <ChevronsUpDownIcon className="ml-2 size-4 shrink-0 opacity-50" />
+            <HugeiconsIcon icon={UnfoldMoreIcon} className="ml-2 size-4 shrink-0 opacity-50"  strokeWidth={2} />
           </Button>
         )}
       />

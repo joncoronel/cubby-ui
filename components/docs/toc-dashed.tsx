@@ -15,12 +15,12 @@ const emptyTocContent = (
   </div>
 );
 
-
 // Check if CSS anchor positioning is fully supported (including transitions)
 // Firefox supports anchor positioning but transitions don't work there,
 // so we explicitly exclude it and fall back to JS positioning
 function supportsAnchorPositioning(): boolean {
-  if (typeof CSS === "undefined" || typeof navigator === "undefined") return false;
+  if (typeof CSS === "undefined" || typeof navigator === "undefined")
+    return false;
   // Firefox has anchor positioning but transitions don't animate
   if (navigator.userAgent.includes("Firefox")) return false;
   // Check for anchor() function support
@@ -163,7 +163,10 @@ function TocPositionManager({
 
     // If user clicked a TOC item, position thumb there (overrides scroll-spy)
     if (clickedUrl) {
-      const [top, height] = calcPositionForUrl(containerRef.current, clickedUrl);
+      const [top, height] = calcPositionForUrl(
+        containerRef.current,
+        clickedUrl,
+      );
       setThumbPosition({ top, height });
       return;
     }
@@ -177,7 +180,16 @@ function TocPositionManager({
       forceLastItem,
     );
     setThumbPosition({ top, height });
-  }, [containerRef, active, toc, tocByAnchor, checkForceLastItem, usesCssAnchoring, clickedUrl, setThumbPosition]);
+  }, [
+    containerRef,
+    active,
+    toc,
+    tocByAnchor,
+    checkForceLastItem,
+    usesCssAnchoring,
+    clickedUrl,
+    setThumbPosition,
+  ]);
 
   // Update ghost thumb position via state (JS fallback)
   const updateGhostPosition = React.useCallback(() => {
@@ -189,7 +201,13 @@ function TocPositionManager({
     const targetUrl = hoveredUrl ?? activeAnchor;
     const [top, height] = calcPositionForUrl(containerRef.current, targetUrl);
     setGhostPosition({ top, height });
-  }, [containerRef, hoveredUrl, activeAnchor, usesCssAnchoring, setGhostPosition]);
+  }, [
+    containerRef,
+    hoveredUrl,
+    activeAnchor,
+    usesCssAnchoring,
+    setGhostPosition,
+  ]);
 
   // Update forcedActive and activeAnchor state
   // This is needed for text styling and CSS anchor-name assignment
@@ -226,7 +244,15 @@ function TocPositionManager({
       }
       setActiveAnchor(anchorUrl);
     }
-  }, [toc, tocByAnchor, setForcedActive, setActiveAnchor, checkForceLastItem, active, clickedUrl]);
+  }, [
+    toc,
+    tocByAnchor,
+    setForcedActive,
+    setActiveAnchor,
+    checkForceLastItem,
+    active,
+    clickedUrl,
+  ]);
 
   // Run on active anchor changes
   React.useEffect(() => {
@@ -295,21 +321,23 @@ function TocThumb({ position, usesCssAnchoring, className }: TocThumbProps) {
         "bg-neutral absolute w-1 rounded-full",
         "start-[-1.5px]",
         // Fallback: state-based positioning via CSS variables
-        "h-(--fd-height) top-(--fd-top)",
-        "transition-[top,height] duration-200 ease-out-cubic",
+        "top-(--fd-top) h-(--fd-height)",
+        "ease-out-expo transition-[top,height] duration-200",
         className,
       )}
-      style={{
-        // CSS anchor positioning (only when supported)
-        ...(usesCssAnchoring && {
-          positionAnchor: "--active-toc",
-          top: "anchor(top)",
-          height: "anchor-size(height)",
-        }),
-        // Fallback values (used by h-(--fd-height) and top-(--fd-top) classes)
-        "--fd-top": `${position.top}px`,
-        "--fd-height": `${position.height}px`,
-      } as React.CSSProperties}
+      style={
+        {
+          // CSS anchor positioning (only when supported)
+          ...(usesCssAnchoring && {
+            positionAnchor: "--active-toc",
+            top: "anchor(top)",
+            height: "anchor-size(height)",
+          }),
+          // Fallback values (used by h-(--fd-height) and top-(--fd-top) classes)
+          "--fd-top": `${position.top}px`,
+          "--fd-height": `${position.height}px`,
+        } as React.CSSProperties
+      }
     />
   );
 }
@@ -329,20 +357,22 @@ function TocGhostThumb({ position, usesCssAnchoring }: TocGhostThumbProps) {
         "bg-neutral pointer-events-none absolute w-1 rounded-full opacity-30",
         "start-[-1.5px]",
         // Fallback: state-based positioning via CSS variables
-        "h-(--fd-ghost-height) top-(--fd-ghost-top)",
-        "transition-[top,height] duration-150 ease-out-cubic",
+        "top-(--fd-ghost-top) h-(--fd-ghost-height)",
+        "ease-out-expo transition-[top,height] duration-150",
       )}
-      style={{
-        // CSS anchor positioning (only when supported)
-        ...(usesCssAnchoring && {
-          positionAnchor: "--hovered-toc",
-          top: "anchor(top)",
-          height: "anchor-size(height)",
-        }),
-        // Fallback values (used by h-(--fd-ghost-height) and top-(--fd-ghost-top) classes)
-        "--fd-ghost-top": `${position.top}px`,
-        "--fd-ghost-height": `${position.height}px`,
-      } as React.CSSProperties}
+      style={
+        {
+          // CSS anchor positioning (only when supported)
+          ...(usesCssAnchoring && {
+            positionAnchor: "--hovered-toc",
+            top: "anchor(top)",
+            height: "anchor-size(height)",
+          }),
+          // Fallback values (used by h-(--fd-ghost-height) and top-(--fd-ghost-top) classes)
+          "--fd-ghost-top": `${position.top}px`,
+          "--fd-ghost-height": `${position.height}px`,
+        } as React.CSSProperties
+      }
     />
   );
 }
@@ -540,9 +570,15 @@ export function DashedTOC({ toc, initialPosition = null }: DashedTOCProps) {
               className="group/toc-items relative flex flex-col gap-3 bg-[linear-gradient(to_bottom,color-mix(in_oklch,var(--color-accent-foreground)_30%,transparent)_33%,transparent_0)] bg-size-[1px_4px] bg-repeat-y"
             >
               {/* Pill thumb - centered on track */}
-              <TocThumb position={thumbPosition} usesCssAnchoring={usesCssAnchoring} />
+              <TocThumb
+                position={thumbPosition}
+                usesCssAnchoring={usesCssAnchoring}
+              />
               {/* Ghost thumb - follows hovered item */}
-              <TocGhostThumb position={ghostPosition} usesCssAnchoring={usesCssAnchoring} />
+              <TocGhostThumb
+                position={ghostPosition}
+                usesCssAnchoring={usesCssAnchoring}
+              />
               {/* TOC items */}
               {toc.map((item) => (
                 <TOCItem
@@ -550,7 +586,9 @@ export function DashedTOC({ toc, initialPosition = null }: DashedTOCProps) {
                   item={item}
                   isAnchor={activeAnchor === item.url}
                   isForcedActive={forcedActive === item.url}
-                  suppressDataActive={forcedActive !== null && forcedActive !== item.url}
+                  suppressDataActive={
+                    forcedActive !== null && forcedActive !== item.url
+                  }
                   onHover={setHoveredUrl}
                   onClick={handleItemClick}
                 />

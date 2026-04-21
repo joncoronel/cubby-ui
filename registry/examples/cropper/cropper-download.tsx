@@ -11,8 +11,8 @@ import {
   type Area,
 } from "@/registry/default/cropper/cropper";
 import { Button } from "@/registry/default/button/button";
-import { Download } from "lucide-react";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Download01Icon } from "@hugeicons/core-free-icons";
 export default function CropperDownload() {
   const [cropArea, setCropArea] = useState<Area | null>(null);
   const imageUrl = "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop";
@@ -57,7 +57,7 @@ export default function CropperDownload() {
             disabled={!cropArea}
             size="default"
           >
-            <Download />
+            <HugeiconsIcon icon={Download01Icon}  strokeWidth={2} />
             Download
           </Button>
         </div>

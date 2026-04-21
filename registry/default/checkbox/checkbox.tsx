@@ -20,7 +20,7 @@ function CheckmarkIcon({ className }: { className?: string }) {
         // Crossfade: visible when checked (not indeterminate), hidden when indeterminate
         "not-in-data-indeterminate:scale-100 not-in-data-indeterminate:opacity-100",
         "scale-90 opacity-0",
-        "ease-out-cubic transition-[opacity,filter,transform,scale] duration-150 motion-reduce:transition-none",
+        "ease-out-expo transition-[opacity,filter,transform,scale] duration-200 motion-reduce:transition-none",
         // Start hidden on mount for enter animation
         "in-data-starting-style:scale-90 in-data-starting-style:opacity-0",
         // Subtle blur during indeterminate crossfade
@@ -33,7 +33,7 @@ function CheckmarkIcon({ className }: { className?: string }) {
         style={{
           strokeDasharray: 22,
         }}
-        className="ease-out-cubic transition-[stroke-dashoffset] duration-150 not-in-data-indeterminate:delay-15 not-in-data-indeterminate:[stroke-dashoffset:0] in-data-indeterminate:[stroke-dashoffset:22] in-data-starting-style:[stroke-dashoffset:22] motion-reduce:transition-none"
+        className="ease-out-expo transition-[stroke-dashoffset] duration-200 not-in-data-indeterminate:delay-15 not-in-data-indeterminate:[stroke-dashoffset:0] in-data-indeterminate:[stroke-dashoffset:22] in-data-starting-style:[stroke-dashoffset:22] motion-reduce:transition-none"
       />
     </svg>
   );
@@ -54,7 +54,7 @@ function MinusIcon({ className }: { className?: string }) {
         // Crossfade: visible when indeterminate, hidden when checked
         "in-data-indeterminate:scale-100 in-data-indeterminate:opacity-100",
         "scale-90 opacity-0",
-        "ease-out-cubic transition-[opacity,filter,transform,scale] duration-150 motion-reduce:transition-none",
+        "ease-out-expo transition-[opacity,filter,transform,scale] duration-200 motion-reduce:transition-none",
         // Start hidden on mount for enter animation
         "in-data-starting-style:scale-90 in-data-starting-style:opacity-0",
         // Subtle blur when transitioning away from indeterminate
@@ -67,7 +67,7 @@ function MinusIcon({ className }: { className?: string }) {
         style={{
           strokeDasharray: 16,
         }}
-        className="ease-out-cubic transition-[stroke-dashoffset] duration-150 not-in-data-indeterminate:[stroke-dashoffset:16] in-data-indeterminate:delay-15 in-data-indeterminate:[stroke-dashoffset:0] in-data-starting-style:[stroke-dashoffset:16] motion-reduce:transition-none"
+        className="ease-out-expo transition-[stroke-dashoffset] duration-200 not-in-data-indeterminate:[stroke-dashoffset:16] in-data-indeterminate:delay-15 in-data-indeterminate:[stroke-dashoffset:0] in-data-starting-style:[stroke-dashoffset:16] motion-reduce:transition-none"
       />
     </svg>
   );
@@ -81,16 +81,16 @@ function Checkbox({
     <BaseCheckbox.Root
       data-slot="checkbox"
       className={cn(
-        "peer bg-card text-primary-foreground aria-invalid:outline-destructive/50 aria-invalid:text-destructive focus-visible:outline-ring/50 ease-out-cubic relative flex aspect-square size-4.5 shrink-0 items-center justify-center rounded-xs border bg-clip-padding outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-150 outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid data-disabled:cursor-not-allowed data-disabled:opacity-60 motion-reduce:transition-none sm:size-4",
+        "peer bg-card text-primary-foreground aria-invalid:outline-destructive/50 aria-invalid:text-destructive focus-visible:outline-ring/50 ease-out-expo relative flex aspect-square size-4.5 shrink-0 items-center justify-center rounded-xs border bg-clip-padding outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-200 outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid data-disabled:cursor-not-allowed data-disabled:opacity-60 motion-reduce:transition-none sm:size-4",
         // Background scale animation using ::before pseudo-element
         "before:bg-primary before:absolute before:-inset-px before:rounded-xs before:content-['']",
-        "before:ease-out-cubic before:origin-center before:scale-80 before:transform-gpu before:opacity-0 before:transition-[transform,opacity,scale] before:duration-150 before:will-change-transform motion-reduce:before:transition-none",
+        "before:ease-out-expo before:origin-center before:scale-80 before:transform-gpu before:opacity-0 before:transition-[transform,opacity,scale] before:duration-200 before:will-change-transform motion-reduce:before:transition-none",
         "data-checked:before:scale-100 data-checked:before:opacity-100",
         "data-indeterminate:before:scale-100 data-indeterminate:before:opacity-100",
         // Inset shadow using ::after pseudo-element (sits inside border)
         "after:pointer-events-none after:absolute after:inset-0 after:rounded-[calc(var(--radius-xs)-1px)] after:content-['']",
         "after:shadow-inset dark:after:shadow-inset-highlight",
-        "after:ease-out-cubic after:transition-opacity after:duration-150",
+        "after:ease-out-expo after:transition-opacity after:duration-200",
         "data-checked:after:opacity-0 data-indeterminate:after:opacity-0",
         className,
       )}
@@ -98,7 +98,7 @@ function Checkbox({
     >
       <BaseCheckbox.Indicator
         data-slot="checkbox-indicator"
-        className="ease-out-cubic grid place-items-center transition-opacity duration-150 *:col-start-1 *:row-start-1 data-ending-style:opacity-0 data-starting-style:opacity-0 motion-reduce:transition-none"
+        className="ease-out-expo grid place-items-center transition-opacity duration-200 *:col-start-1 *:row-start-1 data-ending-style:opacity-0 data-starting-style:opacity-0 motion-reduce:transition-none"
       >
         <CheckmarkIcon className="size-3.5" />
         <MinusIcon className="size-3.5" />

@@ -1,17 +1,17 @@
 import { Toggle } from "@/registry/default/toggle/toggle";
-import { Bold } from "lucide-react";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import { TextBoldIcon } from "@hugeicons/core-free-icons";
 export default function ToggleDifferentSizes() {
   return (
     <div className="flex items-center space-x-2">
       <Toggle size="sm">
-        <Bold className="h-4 w-4" />
+        <HugeiconsIcon icon={TextBoldIcon} className="h-4 w-4"  strokeWidth={2} />
       </Toggle>
       <Toggle size="default">
-        <Bold className="h-4 w-4" />
+        <HugeiconsIcon icon={TextBoldIcon} className="h-4 w-4"  strokeWidth={2} />
       </Toggle>
       <Toggle size="lg">
-        <Bold className="h-4 w-4" />
+        <HugeiconsIcon icon={TextBoldIcon} className="h-4 w-4"  strokeWidth={2} />
       </Toggle>
     </div>
   );

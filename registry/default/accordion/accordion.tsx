@@ -1,8 +1,9 @@
 import * as React from "react";
 import { Accordion as BaseAccordion } from "@base-ui/react/accordion";
-import { ChevronDownIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
 type AccordionVariant =
   | "default"
   | "split"
@@ -40,7 +41,7 @@ function AccordionItem({ className, ...props }: BaseAccordion.Item.Props) {
     <BaseAccordion.Item
       data-slot="accordion-item"
       className={cn(
-        "ease-out-cubic transition-[margin,border-radius,border] duration-250",
+        "ease-out-expo transition-[margin,border-radius,border] duration-250",
         // Default variant styles
         "group-data-[variant=default]:border-b group-data-[variant=default]:last:border-b-0",
         // Split variant styles (individual cards)
@@ -140,14 +141,16 @@ function AccordionTrigger({
 
     const indicatorIcon =
       indicatorType === "chevron" ? (
-        <ChevronDownIcon
+        <HugeiconsIcon
+          icon={ArrowDown01Icon}
           data-slot="accordion-indicator"
-          className="text-muted-foreground ease-out-cubic size-4 shrink-0 transition-transform duration-200"
+          className="text-muted-foreground ease-out-expo size-4 shrink-0 transition-transform duration-200"
+          strokeWidth={2}
         />
       ) : (
         <PlusIcon
           data-slot="accordion-indicator"
-          className="text-muted-foreground ease-out-cubic size-4 shrink-0 transition-transform duration-200"
+          className="text-muted-foreground ease-out-expo size-4 shrink-0 transition-transform duration-200"
         />
       );
 
@@ -218,7 +221,7 @@ function AccordionContent({
     <BaseAccordion.Panel
       data-slot="accordion-content"
       className={cn(
-        "ease-out-cubic h-(--accordion-panel-height) overflow-hidden text-sm transition-[height,opacity] duration-250 data-ending-style:h-0 data-ending-style:opacity-0 data-starting-style:h-0 data-starting-style:opacity-0",
+        "ease-out-expo h-(--accordion-panel-height) overflow-hidden text-sm transition-[height,opacity] duration-250 data-ending-style:h-0 data-ending-style:opacity-0 data-starting-style:h-0 data-starting-style:opacity-0",
       )}
       {...props}
     >
@@ -265,7 +268,7 @@ function PlusIcon(props: React.ComponentProps<"svg">) {
         clipRule="evenodd"
         d="M2.75 12C2.75 11.3096 3.30964 10.75 4 10.75H20C20.6904 10.75 21.25 11.3096 21.25 12C21.25 12.6904 20.6904 13.25 20 13.25H4C3.30964 13.25 2.75 12.6904 2.75 12Z"
         fill="currentColor"
-        className="ease-out-cubic transition-opacity duration-200 in-data-panel-open:opacity-0"
+        className="ease-out-expo transition-opacity duration-200 in-data-panel-open:opacity-0"
       />
       {/* Vertical bar - remains visible (becomes horizontal after 90° rotation) */}
       <path

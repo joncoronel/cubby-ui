@@ -15,8 +15,8 @@ import {
   AvatarImage,
   AvatarFallback,
 } from "@/registry/default/avatar/avatar";
-import { Bell, Activity, User } from "lucide-react";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Activity01Icon, Notification03Icon, UserIcon } from "@hugeicons/core-free-icons";
 const animatedPopover = createPopoverHandle<React.ComponentType>();
 
 function NotificationsPanel() {
@@ -109,7 +109,7 @@ export default function PopoverAnimated() {
         payload={NotificationsPanel}
         render={<Button variant="outline" size="icon" />}
       >
-        <Bell className="size-4" />
+        <HugeiconsIcon icon={Notification03Icon} className="size-4"  strokeWidth={2} />
         <span className="sr-only">Notifications</span>
       </PopoverTrigger>
 
@@ -118,7 +118,7 @@ export default function PopoverAnimated() {
         payload={ActivityPanel}
         render={<Button variant="outline" size="icon" />}
       >
-        <Activity className="size-4" />
+        <HugeiconsIcon icon={Activity01Icon} className="size-4"  strokeWidth={2} />
         <span className="sr-only">Activity</span>
       </PopoverTrigger>
 
@@ -127,7 +127,7 @@ export default function PopoverAnimated() {
         payload={ProfilePanel}
         render={<Button variant="outline" size="icon" />}
       >
-        <User className="size-4" />
+        <HugeiconsIcon icon={UserIcon} className="size-4"  strokeWidth={2} />
         <span className="sr-only">Profile</span>
       </PopoverTrigger>
 

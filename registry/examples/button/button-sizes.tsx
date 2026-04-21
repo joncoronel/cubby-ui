@@ -1,6 +1,6 @@
 import { Button } from "@/registry/default/button/button";
-import { Settings } from "lucide-react";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Settings01Icon } from "@hugeicons/core-free-icons";
 export default function ButtonSizes() {
   return (
     <div className="flex flex-col flex-wrap gap-2">
@@ -18,16 +18,16 @@ export default function ButtonSizes() {
       </div>
       <div className="flex flex-wrap items-end gap-2">
         <Button variant="neutral" size="icon_xs">
-          <Settings />
+          <HugeiconsIcon icon={Settings01Icon}  strokeWidth={2} />
         </Button>
         <Button variant="neutral" size="icon_sm">
-          <Settings />
+          <HugeiconsIcon icon={Settings01Icon}  strokeWidth={2} />
         </Button>
         <Button variant="neutral" size="icon">
-          <Settings />
+          <HugeiconsIcon icon={Settings01Icon}  strokeWidth={2} />
         </Button>
         <Button variant="neutral" size="icon_lg">
-          <Settings />
+          <HugeiconsIcon icon={Settings01Icon}  strokeWidth={2} />
         </Button>
       </div>
     </div>

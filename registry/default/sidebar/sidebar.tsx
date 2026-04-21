@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { cva, VariantProps } from "class-variance-authority";
-import { PanelLeftIcon } from "lucide-react";
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 
@@ -26,6 +25,8 @@ import {
   TooltipTrigger,
 } from "@/registry/default/tooltip/tooltip";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { SidebarLeft01Icon } from "@hugeicons/core-free-icons";
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_WIDTH = "16rem";
@@ -275,7 +276,7 @@ function SidebarTrigger({
       }}
       {...props}
     >
-      <PanelLeftIcon />
+      <HugeiconsIcon icon={SidebarLeft01Icon}  strokeWidth={2} />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   );

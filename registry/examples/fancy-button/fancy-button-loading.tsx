@@ -1,6 +1,6 @@
 import { FancyButton } from "@/registry/default/fancy-button/fancy-button";
-import { Loader2 } from "lucide-react";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Loading03Icon } from "@hugeicons/core-free-icons";
 export default function FancyButtonLoading() {
   return (
     <div className="flex flex-col gap-6">
@@ -8,14 +8,14 @@ export default function FancyButtonLoading() {
       <div className="flex items-center gap-4">
         <FancyButton
           disabled
-          leftSection={<Loader2 className="animate-spin" />}
+          leftSection={<HugeiconsIcon icon={Loading03Icon} className="animate-spin"  strokeWidth={2} />}
         >
           Loading...
         </FancyButton>
 
         <FancyButton
           disabled
-          leftSection={<Loader2 className="animate-spin" />}
+          leftSection={<HugeiconsIcon icon={Loading03Icon} className="animate-spin"  strokeWidth={2} />}
           color="#3b82f6"
         >
           Processing...
@@ -25,11 +25,11 @@ export default function FancyButtonLoading() {
       {/* Icon only loading */}
       <div className="flex items-center gap-4">
         <FancyButton size="icon" disabled>
-          <Loader2 className="animate-spin" />
+          <HugeiconsIcon icon={Loading03Icon} className="animate-spin"  strokeWidth={2} />
         </FancyButton>
 
         <FancyButton size="icon" disabled color="#10b981">
-          <Loader2 className="animate-spin" />
+          <HugeiconsIcon icon={Loading03Icon} className="animate-spin"  strokeWidth={2} />
         </FancyButton>
       </div>
     </div>

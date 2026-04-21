@@ -9,13 +9,13 @@ import {
   SheetTrigger,
 } from "@/registry/default/sheet/sheet";
 import { Button } from "@/registry/default/button/button";
-import { MenuIcon } from "lucide-react";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Menu01Icon } from "@hugeicons/core-free-icons";
 export default function SheetBasic() {
   return (
     <Sheet>
       <SheetTrigger render={<Button variant="outline" size="icon" />}>
-        <MenuIcon className="size-4" />
+        <HugeiconsIcon icon={Menu01Icon} className="size-4"  strokeWidth={2} />
       </SheetTrigger>
       <SheetContent side="left">
         <SheetHeader>

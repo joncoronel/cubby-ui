@@ -1,6 +1,5 @@
 "use client";
 
-import { AudioLinesIcon, PlusIcon } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/registry/default/button/button";
@@ -17,6 +16,8 @@ import {
   TooltipTrigger,
 } from "@/registry/default/tooltip/tooltip";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { AudioWave02Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
 export default function ButtonGroupInputGroup() {
   const [voiceEnabled, setVoiceEnabled] = React.useState(false);
 
@@ -24,7 +25,7 @@ export default function ButtonGroupInputGroup() {
     <ButtonGroup className="[--radius:9999rem]">
       <ButtonGroup>
         <Button variant="outline" size="icon">
-          <PlusIcon />
+          <HugeiconsIcon icon={PlusSignIcon}  strokeWidth={2} />
         </Button>
       </ButtonGroup>
       <ButtonGroup>
@@ -46,7 +47,7 @@ export default function ButtonGroupInputGroup() {
                     className="data-[active=true]:bg-orange-100 data-[active=true]:text-orange-700 dark:data-[active=true]:bg-orange-800 dark:data-[active=true]:text-orange-100"
                     aria-pressed={voiceEnabled}
                   >
-                    <AudioLinesIcon />
+                    <HugeiconsIcon icon={AudioWave02Icon}  strokeWidth={2} />
                   </InputGroupButton>
                 }
               />

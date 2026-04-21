@@ -86,9 +86,11 @@ function TooltipContent({
           data-slot="tooltip-content"
           className={cn(
             "bg-card ring-border/60 h-(--popup-height,auto) w-(--popup-width,auto) origin-(--transform-origin) rounded-sm text-xs shadow-[0_3px_8px_0_oklch(0.18_0_0/0.12)] ring-1",
-            "transition-[width,height,scale,opacity] duration-[350ms,350ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
-            "data-starting-style:scale-90 data-starting-style:opacity-0",
-            "data-ending-style:scale-90 data-ending-style:opacity-0",
+            "transition-[width,height,scale,translate,opacity] duration-[350ms,350ms,100ms,175ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo),var(--ease-out-expo)]",
+            "data-starting-style:scale-95 data-starting-style:opacity-0",
+            "data-starting-style:data-[side=bottom]:-translate-y-1 data-starting-style:data-[side=left]:translate-x-1 data-starting-style:data-[side=right]:-translate-x-1 data-starting-style:data-[side=top]:translate-y-1",
+            "data-ending-style:scale-95 data-ending-style:opacity-0",
+            "data-ending-style:data-[side=bottom]:-translate-y-1 data-ending-style:data-[side=left]:translate-x-1 data-ending-style:data-[side=right]:-translate-x-1 data-ending-style:data-[side=top]:translate-y-1",
             "motion-reduce:transition-none",
             className,
           )}

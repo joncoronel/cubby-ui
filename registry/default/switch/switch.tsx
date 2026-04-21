@@ -42,10 +42,10 @@ function Switch({ className, shape, ...props }: SwitchProps) {
       <BaseSwitch.Thumb
         data-slot="switch-thumb"
         className={cn(
-          " pointer-events-none block rounded-full bg-white dark:bg-background",
+          "dark:bg-background pointer-events-none block rounded-full bg-white",
           "aspect-(--thumb-aspect) h-(--thumb-size)",
           "shadow-[0_1px_2px_0_oklch(0.18_0_0/0.15)]",
-          "ease-out-cubic transition-all duration-200",
+          "ease-out-expo transition-all duration-200",
           "transform-gpu will-change-transform data-checked:translate-x-[calc(var(--thumb-size)*var(--thumb-aspect)*var(--travel-ratio))]",
         )}
       />

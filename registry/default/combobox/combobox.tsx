@@ -10,7 +10,11 @@ import {
 import { Combobox as BaseCombobox } from "@base-ui/react/combobox";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowDown01Icon, Cancel01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
+import {
+  ArrowDown01Icon,
+  Cancel01Icon,
+  Tick02Icon,
+} from "@hugeicons/core-free-icons";
 const useComboboxFilter = BaseCombobox.useFilter;
 const useComboboxFilteredItems = BaseCombobox.useFilteredItems;
 
@@ -116,7 +120,13 @@ function ComboboxTrigger({
       )}
       {...props}
     >
-      {children ?? <HugeiconsIcon icon={ArrowDown01Icon} className="h-4 w-4"  strokeWidth={2} />}
+      {children ?? (
+        <HugeiconsIcon
+          icon={ArrowDown01Icon}
+          className="h-4 w-4"
+          strokeWidth={2}
+        />
+      )}
     </BaseCombobox.Trigger>
   );
 }
@@ -147,7 +157,7 @@ function ComboboxClear({ className, ...props }: BaseCombobox.Clear.Props) {
       )}
       {...props}
     >
-      <HugeiconsIcon icon={Cancel01Icon} className="h-4 w-4"  strokeWidth={2} />
+      <HugeiconsIcon icon={Cancel01Icon} className="h-4 w-4" strokeWidth={2} />
     </BaseCombobox.Clear>
   );
 }
@@ -198,7 +208,7 @@ function ComboboxPopupPrimitive({
     <BaseCombobox.Popup
       data-slot="combobox-popup"
       className={cn(
-        "bg-popover text-popover-foreground ring-border ease-out-cubic flex max-h-(--available-height) w-(--anchor-width) max-w-(--available-width) origin-(--transform-origin) flex-col overflow-clip overscroll-contain rounded-xl shadow-[0_8px_20px_0_oklch(0_0_0/0.08)] ring-1 transition-[transform,scale,opacity] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
+        "bg-popover text-popover-foreground ring-border ease-out-expo flex max-h-(--available-height) w-(--anchor-width) max-w-(--available-width) origin-(--transform-origin) flex-col overflow-clip overscroll-contain rounded-xl shadow-[0_8px_20px_0_oklch(0_0_0/0.08)] ring-1 transition-[transform,scale,opacity] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
         className,
       )}
       {...props}
@@ -374,7 +384,11 @@ function ComboboxItem({
       {...props}
     >
       <div className="break-all">{children}</div>
-      <BaseCombobox.ItemIndicator render={<HugeiconsIcon icon={Tick02Icon} className="size-4"  strokeWidth={2} />} />
+      <BaseCombobox.ItemIndicator
+        render={
+          <HugeiconsIcon icon={Tick02Icon} className="size-4" strokeWidth={2} />
+        }
+      />
     </BaseCombobox.Item>
   );
 }

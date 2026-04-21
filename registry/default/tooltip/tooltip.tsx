@@ -86,7 +86,7 @@ function TooltipContent({
           data-slot="tooltip-content"
           className={cn(
             "bg-card ring-border/60 h-(--popup-height,auto) w-(--popup-width,auto) origin-(--transform-origin) rounded-sm text-xs shadow-[0_3px_8px_0_oklch(0.18_0_0/0.12)] ring-1",
-            "transition-[width,height,scale,opacity] duration-[350ms,350ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-cubic),var(--ease-out-cubic)]",
+            "transition-[width,height,scale,opacity] duration-[350ms,350ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
             "data-starting-style:scale-90 data-starting-style:opacity-0",
             "data-ending-style:scale-90 data-ending-style:opacity-0",
             "motion-reduce:transition-none",
@@ -113,7 +113,7 @@ function TooltipContent({
               // Truncate outgoing content as popup shrinks
               "**:data-previous:truncate",
               // Disable transitions when instant or motion-reduce
-              "[[data-instant]_&_[data-previous]]:transition-none [[data-instant]_&_[data-current]]:transition-none",
+              "[[data-instant]_&_[data-current]]:transition-none [[data-instant]_&_[data-previous]]:transition-none",
               "motion-reduce:**:data-current:transition-none motion-reduce:**:data-previous:transition-none",
             )}
           >

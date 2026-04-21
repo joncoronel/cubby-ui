@@ -1169,7 +1169,7 @@ function DrawerContentInner({
                   className="absolute end-2 top-2"
                   render={<Button size="icon_sm" variant="ghost" />}
                 >
-                  <HugeiconsIcon icon={Cancel01Icon}  strokeWidth={2} />
+                  <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} />
                 </DrawerClose>
               )}
             </BaseDialog.Popup>

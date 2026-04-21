@@ -160,7 +160,7 @@ export default function CustomSearchDialog({
           </CommandContent>
           <CommandFooter
             className={cn(
-              "ease-out-cubic overflow-clip transition-[height,opacity,padding] duration-200",
+              "ease-out-expo overflow-clip transition-[height,opacity,padding] duration-200",
               // search && items.length === 0
               //   ? "h-0 p-0 opacity-0"
               //   : "h-[calc-size(min-content,size)] opacity-100",
@@ -169,16 +169,28 @@ export default function CustomSearchDialog({
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1.5">
                 <Kbd size="sm" className="px-1">
-                  <HugeiconsIcon icon={ArrowTurnBackwardIcon} className="size-3"  strokeWidth={2} />
+                  <HugeiconsIcon
+                    icon={ArrowTurnBackwardIcon}
+                    className="size-3"
+                    strokeWidth={2}
+                  />
                 </Kbd>
                 <span>to select</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Kbd size="sm" className="px-1">
-                  <HugeiconsIcon icon={ArrowUp01Icon} className="size-3"  strokeWidth={2} />
+                  <HugeiconsIcon
+                    icon={ArrowUp01Icon}
+                    className="size-3"
+                    strokeWidth={2}
+                  />
                 </Kbd>
                 <Kbd size="sm" className="px-1">
-                  <HugeiconsIcon icon={ArrowDown01Icon} className="size-3"  strokeWidth={2} />
+                  <HugeiconsIcon
+                    icon={ArrowDown01Icon}
+                    className="size-3"
+                    strokeWidth={2}
+                  />
                 </Kbd>
                 <span>to navigate</span>
               </div>

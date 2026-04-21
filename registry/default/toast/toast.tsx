@@ -1149,7 +1149,7 @@ function AnchoredToastItem({ toast }: { toast: ToastData }) {
         data-slot="toast"
         className={cn(
           "flex w-max origin-(--transform-origin) flex-col rounded-md",
-          "border bg-card text-card-foreground",
+          "bg-card text-card-foreground border",
           "px-3 py-2 text-sm shadow-lg/4",
           "transition-all duration-200",
           "data-starting-style:scale-95 data-starting-style:opacity-0",
@@ -1284,7 +1284,7 @@ function GroupedToastRoot({
                   ? "top-full mt-2 origin-top"
                   : "bottom-full mb-2 origin-bottom",
                 // Only transition opacity and scale for enter/exit
-                "ease-out-cubic transition-[opacity,scale] duration-200",
+                "ease-out-expo transition-[opacity,scale] duration-200",
                 "data-starting-style:scale-95 data-starting-style:opacity-0",
                 "data-ending-style:scale-95 data-ending-style:opacity-0",
               )}
@@ -1326,7 +1326,7 @@ function GroupedToastSummaryOrSingle({
       <div
         key={isSingle ? "single" : "summary"}
         className={cn(
-          "ease-out-cubic duration-200",
+          "ease-out-expo duration-200",
           "transition-[height,opacity,filter,scale]",
           "overflow-clip",
           // Height: start from CSS var, animate to intrinsic size
@@ -1359,7 +1359,7 @@ function GroupedToastSummaryOrSingle({
       {/* Single item view */}
       <div
         className={cn(
-          "ease-out-cubic grid duration-200",
+          "ease-out-expo grid duration-200",
           "transition-[grid-template-rows,opacity,filter,scale]",
           isSingle
             ? "blur-0 scale-100 grid-rows-[1fr] opacity-100"
@@ -1379,7 +1379,7 @@ function GroupedToastSummaryOrSingle({
       {/* Summary view */}
       <div
         className={cn(
-          "ease-out-cubic grid duration-200",
+          "ease-out-expo grid duration-200",
           "transition-[grid-template-rows,opacity,filter,scale]",
           !isSingle
             ? "blur-0 scale-100 grid-rows-[1fr] opacity-100"

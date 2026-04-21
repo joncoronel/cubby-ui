@@ -44,7 +44,11 @@ function AutocompleteInput({
         <div className="absolute inset-y-0 right-3 flex items-center gap-2">
           {showClear && (
             <AutocompleteClear>
-              <HugeiconsIcon icon={Cancel01Icon} className="h-4 w-4"  strokeWidth={2} />
+              <HugeiconsIcon
+                icon={Cancel01Icon}
+                className="h-4 w-4"
+                strokeWidth={2}
+              />
             </AutocompleteClear>
           )}
           {showTrigger && <AutocompleteTrigger />}
@@ -151,7 +155,7 @@ function AutocompletePopup({
     <BaseAutocomplete.Popup
       data-slot="autocomplete-popup"
       className={cn(
-        "bg-popover text-popover-foreground ring-border ease-out-cubic flex max-h-(--available-height) w-(--anchor-width) max-w-(--available-width) origin-(--transform-origin) flex-col overflow-clip overscroll-contain rounded-xl shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)] ring-1 transition-[transform,scale,opacity] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
+        "bg-popover text-popover-foreground ring-border ease-out-expo flex max-h-(--available-height) w-(--anchor-width) max-w-(--available-width) origin-(--transform-origin) flex-col overflow-clip overscroll-contain rounded-xl shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)] ring-1 transition-[transform,scale,opacity] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
         className,
       )}
       {...props}

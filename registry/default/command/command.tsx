@@ -76,7 +76,7 @@ function CommandDialogBackdrop({
     <BaseDialog.Backdrop
       data-slot="command-dialog-backdrop"
       className={cn(
-        "ease-out-cubic fixed inset-0 min-h-dvh bg-black/40 transition-all duration-200 supports-[-webkit-touch-callout:none]:absolute",
+        "ease-out-expo fixed inset-0 min-h-dvh bg-black/40 transition-all duration-200 supports-[-webkit-touch-callout:none]:absolute",
         "backdrop-blur-sm data-ending-style:opacity-0 data-starting-style:opacity-0",
         className,
       )}
@@ -118,7 +118,7 @@ function CommandDialogPopup({
             "-translate-y-[calc(1.25rem*var(--nested-dialogs))]",
             "scale-[calc(1-0.1*var(--nested-dialogs))]",
             // Animation
-            "ease-out-cubic transition-all duration-200",
+            "ease-out-expo transition-all duration-200",
             "data-starting-style:translate-y-5 data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:translate-y-5 data-ending-style:scale-95 data-ending-style:opacity-0",
             className,
@@ -145,12 +145,14 @@ function CommandInput({
         {...props}
       />
       <InputGroupAddon>
-        <HugeiconsIcon icon={Search01Icon}
+        <HugeiconsIcon
+          icon={Search01Icon}
           className={cn(
             "size-4",
             loading && "animation-duration-400 animate-pulse",
           )}
-         strokeWidth={2} />
+          strokeWidth={2}
+        />
       </InputGroupAddon>
     </InputGroup>
   );

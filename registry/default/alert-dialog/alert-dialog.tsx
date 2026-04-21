@@ -36,7 +36,7 @@ function AlertDialogBackdrop({
   return (
     <BaseAlertDialog.Backdrop
       className={cn(
-        "ease-out-cubic fixed inset-0 min-h-dvh bg-black/40 transition-all duration-200 supports-[-webkit-touch-callout:none]:absolute",
+        "ease-out-expo fixed inset-0 min-h-dvh bg-black/40 transition-all duration-200 supports-[-webkit-touch-callout:none]:absolute",
         "backdrop-blur-sm data-ending-style:opacity-0 data-starting-style:opacity-0",
         className,
       )}
@@ -86,12 +86,12 @@ function AlertDialogContent({
             // Scale effect for nested dialogs
             "scale-[calc(1-0.1*var(--nested-dialogs))]",
             // Animation duration
-            "ease-out-cubic transition-all duration-200",
+            "ease-out-expo transition-all duration-200",
             // Animations: scale and fade
             "data-starting-style:translate-y-[calc(1.25rem)] data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:translate-y-[calc(1.25rem)] data-ending-style:scale-95 data-ending-style:opacity-0",
             // Nested dialog overlay (hidden by default, fades in/out using allow-discrete)
-            "after:pointer-events-none after:absolute after:inset-0 after:hidden after:rounded-[inherit] after:bg-black/5 after:opacity-0 after:transition-[opacity,display] after:duration-200 after:transition-discrete",
+            "after:pointer-events-none after:absolute after:inset-0 after:hidden after:rounded-[inherit] after:bg-black/5 after:opacity-0 after:transition-[opacity,display] after:transition-discrete after:duration-200",
             "data-nested-dialog-open:after:block data-nested-dialog-open:after:opacity-100",
             "starting:data-nested-dialog-open:after:opacity-0",
             className,
@@ -105,7 +105,7 @@ function AlertDialogContent({
               className="absolute end-2 top-2"
               render={<Button size="icon_sm" variant="ghost" />}
             >
-              <HugeiconsIcon icon={Cancel01Icon}  strokeWidth={2} />
+              <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} />
             </AlertDialogClose>
           )}
         </BaseAlertDialog.Popup>
@@ -155,7 +155,7 @@ function AlertDialogBody({
     <div
       data-slot="alert-dialog-body"
       className={cn(
-        "flex flex-1 min-h-0 flex-col overflow-hidden",
+        "flex min-h-0 flex-1 flex-col overflow-hidden",
         "first:pt-5",
         "not-has-[+[data-slot=alert-dialog-footer]]:pb-5",
         "in-data-[variant=inset]:has-[+[data-slot=alert-dialog-footer]]:pb-5",

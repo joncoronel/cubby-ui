@@ -49,7 +49,7 @@ const selectTriggerVariants = cva(
     "before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] not-disabled:not-active:not-data-pressed:not-in-data-[slot=button-group]:before:shadow-inset dark:not-disabled:not-active:not-data-pressed:not-in-data-[slot=button-group]:before:shadow-inset-highlight [:disabled,:active,[data-pressed]]:shadow-none",
     // Focus and hover states (outline button style)
     "hover:bg-accent/50 dark:hover:bg-input/50 hover:text-accent-foreground data-placeholder:text-muted-foreground",
-    "focus-visible:outline-ring/50 ease-out-cubic outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+    "focus-visible:outline-ring/50 ease-out-expo outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
     // Invalid state
     "aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
     // Text and icon styling
@@ -153,7 +153,7 @@ function SelectContent({
             // Shadow
             "shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)]",
             // Animation (disabled for alignItemWithTrigger via data-[side=none] to prevent Firefox jiggle)
-            "ease-out-cubic origin-(--transform-origin) transition-[transform,scale,opacity] duration-100 data-[side=none]:duration-50",
+            "ease-out-expo origin-(--transform-origin) transition-[transform,scale,opacity] duration-100 data-[side=none]:duration-50",
             "data-ending-style:scale-97 data-ending-style:opacity-0 data-starting-style:scale-97 data-starting-style:opacity-0",
           )}
         >

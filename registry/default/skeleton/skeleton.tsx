@@ -29,12 +29,12 @@ function Skeleton({
     animate && [
       "skeleton-shimmer bg-fixed",
       inverted
-        ? "bg-[linear-gradient(120deg,transparent_25%,oklch(0_0_0/15%)_50%,transparent_60%)]"
-        : "bg-[linear-gradient(120deg,transparent_25%,oklch(1_0_0/75%)_50%,transparent_60%)]",
+        ? "bg-[linear-gradient(90deg,transparent_25%,oklch(0_0_0/15%)_50%,transparent_60%)]"
+        : "bg-[linear-gradient(90deg,transparent_25%,oklch(1_0_0/75%)_50%,transparent_60%)]",
       "bg-size-[200%_100%]",
       inverted
-        ? "dark:bg-[linear-gradient(120deg,transparent_25%,oklch(0_0_0/75%)_50%,transparent_60%)]"
-        : "dark:bg-[linear-gradient(120deg,transparent_25%,oklch(1_0_0/15%)_50%,transparent_60%)]",
+        ? "dark:bg-[linear-gradient(90deg,transparent_25%,oklch(0_0_0/75%)_50%,transparent_60%)]"
+        : "dark:bg-[linear-gradient(90deg,transparent_25%,oklch(1_0_0/15%)_50%,transparent_60%)]",
     ],
     className,
   );

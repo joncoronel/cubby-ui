@@ -61,8 +61,8 @@
       "ease-out-cubic": "cubic-bezier(0.215, 0.61, 0.355, 1)",
       "ease-in-out-cubic": "cubic-bezier(0.645, 0.045, 0.355, 1)",
       "ease-out-expo": "cubic-bezier(0.19, 1, 0.22, 1)",
-      "--animate-otp-field-shake-a": "otp-field-shake-a 180ms ease-in-out",
-      "--animate-otp-field-shake-b": "otp-field-shake-b 180ms ease-in-out"
+      "shadow-inset": "0 1px 2px 0 oklch(0 0 0 / 0.08)",
+      "shadow-inset-highlight": "0 -1px oklch(1 0 0 / 0.04)"
     },
     "light": {
       "radius": "0.75rem",
@@ -152,28 +152,6 @@
     }
   },
   "css": {
-    "@keyframes otp-field-shake-a": {
-      "0%,\r\n    100%": {
-        "transform": "translateX(0)"
-      },
-      "25%": {
-        "transform": "translateX(-4px)"
-      },
-      "75%": {
-        "transform": "translateX(4px)"
-      }
-    },
-    "@keyframes otp-field-shake-b": {
-      "0%,\r\n    100%": {
-        "transform": "translateX(0)"
-      },
-      "25%": {
-        "transform": "translateX(-4px)"
-      },
-      "75%": {
-        "transform": "translateX(4px)"
-      }
-    },
     "@layer base": {
       "body": {
         "position": "relative"

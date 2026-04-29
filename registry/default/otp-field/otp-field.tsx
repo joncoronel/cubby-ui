@@ -5,6 +5,8 @@ import { OTPFieldPreview as BaseOTPField } from "@base-ui/react/otp-field";
 
 import { cn } from "@/lib/utils";
 
+import "./otp-field.css";
+
 function OTPField({
   className,
   ...props

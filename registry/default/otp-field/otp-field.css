@@ -1,0 +1,49 @@
+/* -------------------------------------------------------------------------------------------------
+ * OTP field invalid-input shake animation.
+ *
+ * Paired identical keyframes. CSS animations don't restart when re-applied to
+ * the same element with the same animation-name, so on each invalid OTP entry
+ * we alternate between the two classes to force the browser to treat it as a
+ * new animation and replay the shake. Keep both bodies in sync.
+ * -------------------------------------------------------------------------------------------------*/
+
+.otp-field-shake-a {
+  animation: otp-field-shake-a 180ms ease-in-out;
+}
+
+.otp-field-shake-b {
+  animation: otp-field-shake-b 180ms ease-in-out;
+}
+
+@keyframes otp-field-shake-a {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes otp-field-shake-b {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .otp-field-shake-a,
+  .otp-field-shake-b {
+    animation: none;
+  }
+}

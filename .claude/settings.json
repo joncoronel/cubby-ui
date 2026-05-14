@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm \"app/llms.mdx/[[...slug]]/route.ts\")",
+      "Bash(rmdir \"app/llms.mdx/[[...slug]]\")",
+      "Bash(grep -E \"\\(proxy\\\\.ts|next\\\\.config|llms\\\\.mdx|llms\\\\.txt|app[\\\\\\\\/]docs[\\\\\\\\/]\\)\")"
+    ]
+  }
+}

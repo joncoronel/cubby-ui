@@ -33,7 +33,7 @@ export default async function Page(props: PageProps) {
 
   const MDX = page.data.body;
 
-  const markdownUrl = `${page.url}.mdx`;
+  const markdownUrl = `${page.url}.md`;
   const githubUrl = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/blob/${GITHUB_BRANCH}/content/docs/${page.slugs.join("/")}.mdx`;
 
   return (

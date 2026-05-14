@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { isMarkdownPreferred, rewritePath } from "fumadocs-core/negotiation";
 import { opServer } from "@/lib/openpanel";
 
-const { rewrite: rewriteLLM } = rewritePath("/docs/*path", "/llms.mdx/*path");
+const { rewrite: rewriteLLM } = rewritePath(
+  "/docs{/*path}",
+  "/llms.mdx/docs{/*path}",
+);
 
 export const config = {
   matcher: [
@@ -40,9 +43,9 @@ export default function proxy(
     }
   }
 
-  // Existing Fumadocs LLM rewrite logic
+  // Content negotiation: serve markdown when the client prefers it.
   if (isMarkdownPreferred(request)) {
-    const result = rewriteLLM(request.nextUrl.pathname);
+    const result = rewriteLLM(pathname);
 
     if (result) {
       return NextResponse.rewrite(new URL(result, request.nextUrl));

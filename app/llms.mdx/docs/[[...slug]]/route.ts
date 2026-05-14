@@ -2,9 +2,11 @@ import { getLLMText } from "@/lib/source";
 import { source } from "@/lib/source";
 import { notFound } from "next/navigation";
 
+export const revalidate = false;
+
 export async function GET(
   _req: Request,
-  { params }: RouteContext<"/llms.mdx/[[...slug]]">,
+  { params }: RouteContext<"/llms.mdx/docs/[[...slug]]">,
 ) {
   const { slug } = await params;
   const page = source.getPage(slug);
@@ -16,8 +18,6 @@ export async function GET(
     },
   });
 }
-
-export const dynamicParams = false;
 
 export function generateStaticParams() {
   return source.generateParams();

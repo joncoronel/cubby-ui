@@ -6,10 +6,15 @@ const { rewrite: rewriteLLM } = rewritePath(
   "/docs{/*path}",
   "/llms.mdx/docs{/*path}",
 );
+const { rewrite: rewriteMd } = rewritePath(
+  "/docs{/*path}.md",
+  "/llms.mdx/docs{/*path}",
+);
 
 export const config = {
   matcher: [
     "/r/:path*.json", // Registry component installs
+    "/docs/:path*.md", // Direct .md URLs (any Accept header)
     {
       source: "/docs/:path*",
       has: [{ type: "header", key: "accept", value: ".*text/markdown.*" }],
@@ -41,6 +46,14 @@ export default function proxy(
         }),
       );
     }
+  }
+
+  // Strip .md extension and rewrite to the LLM route (handles all clients).
+  // Must run before the Accept-based rewrite so the .md suffix doesn't leak
+  // into the route handler slug.
+  const mdResult = rewriteMd(pathname);
+  if (mdResult) {
+    return NextResponse.rewrite(new URL(mdResult, request.nextUrl));
   }
 
   // Content negotiation: serve markdown when the client prefers it.

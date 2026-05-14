@@ -15,10 +15,6 @@ const config = {
   async rewrites() {
     return [
       {
-        source: "/docs/:path*.md",
-        destination: "/llms.mdx/docs/:path*",
-      },
-      {
         source: "/op/analytics/:path*",
         destination: "https://api.openpanel.dev/:path*",
       },

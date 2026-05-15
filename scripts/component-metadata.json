@@ -532,6 +532,12 @@
     ],
     "reference": []
   },
+  "transition-panel": {
+    "title": "Transition Panel",
+    "description": "A transition-panel component.",
+    "dependencies": [],
+    "reference": []
+  },
   "tree": {
     "title": "Tree",
     "description": "A tree component.",

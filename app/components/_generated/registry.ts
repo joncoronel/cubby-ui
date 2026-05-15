@@ -415,6 +415,8 @@ import tooltip_tooltip_basic from "@/registry/examples/tooltip/tooltip-basic";
 import tooltip_tooltip_animated from "@/registry/examples/tooltip/tooltip-animated";
 import tooltip_tooltip_controlled from "@/registry/examples/tooltip/tooltip-controlled";
 import tooltip_tooltip_detached_trigger from "@/registry/examples/tooltip/tooltip-detached-trigger";
+import transition_panel_transition_panel_basic from "@/registry/examples/transition-panel/transition-panel-basic";
+import transition_panel_transition_panel_vertical from "@/registry/examples/transition-panel/transition-panel-vertical";
 import tree_tree_basic from "@/registry/examples/tree/tree-basic";
 import tree_tree_async_loading from "@/registry/examples/tree/tree-async-loading";
 import tree_tree_controlled from "@/registry/examples/tree/tree-controlled";
@@ -1311,6 +1313,18 @@ export const componentMetadata = {
     "description": "A tooltip component.",
     "category": "UI",
     "registryDependencies": [],
+    "dependencies": [],
+    "examples": {},
+    "reference": []
+  },
+  "transition-panel": {
+    "name": "transition-panel",
+    "title": "Transition Panel",
+    "description": "A transition-panel component.",
+    "category": "UI",
+    "registryDependencies": [
+      "@cubby-ui/use-animated-height"
+    ],
     "dependencies": [],
     "examples": {},
     "reference": []
@@ -3575,6 +3589,18 @@ export const exampleRegistry = {
       "source": "\"use client\";\n\nimport {\n  Tooltip,\n  TooltipContent,\n  TooltipTrigger,\n  createTooltipHandle,\n} from \"@/components/ui/cubby-ui/tooltip\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport { InformationCircleIcon } from \"@hugeicons/core-free-icons\";\n\nconst infoTooltip = createTooltipHandle();\n\nexport default function TooltipDetachedTrigger() {\n  return (\n    <>\n      <TooltipTrigger\n        handle={infoTooltip}\n        render={<Button variant=\"outline\" size=\"icon\" />}\n      >\n        <HugeiconsIcon icon={InformationCircleIcon} size={16} strokeWidth={2} />\n        <span className=\"sr-only\">More information</span>\n      </TooltipTrigger>\n\n      <Tooltip handle={infoTooltip}>\n        <TooltipContent>\n          <p>This tooltip is connected via a handle</p>\n        </TooltipContent>\n      </Tooltip>\n    </>\n  );\n}\n"
     }
   ],
+  "transition-panel": [
+    {
+      "title": "Basic",
+      "importPath": "transition-panel-basic",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  TransitionPanel,\n  TransitionPanelView,\n} from \"@/components/ui/cubby-ui/transition-panel\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Input } from \"@/components/ui/cubby-ui/input\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\ntype Step = \"email\" | \"code\" | \"done\";\n\nexport default function TransitionPanelBasic() {\n  const [step, setStep] = React.useState<Step>(\"email\");\n\n  return (\n    <div className=\"w-[360px] rounded-xl border bg-card p-4 shadow-sm\">\n      <TransitionPanel activeKey={step}>\n        <TransitionPanelView viewKey=\"email\">\n          <div className=\"space-y-3\">\n            <div className=\"space-y-1\">\n              <h3 className=\"text-base font-semibold\">Sign in</h3>\n              <p className=\"text-muted-foreground text-sm\">\n                Enter your email to receive a code.\n              </p>\n            </div>\n            <div className=\"space-y-1.5\">\n              <Label htmlFor=\"tp-email\">Email</Label>\n              <Input\n                id=\"tp-email\"\n                type=\"email\"\n                placeholder=\"you@example.com\"\n              />\n            </div>\n            <Button\n              className=\"w-full\"\n              onClick={() => setStep(\"code\")}\n            >\n              Continue\n            </Button>\n          </div>\n        </TransitionPanelView>\n\n        <TransitionPanelView viewKey=\"code\">\n          <div className=\"space-y-3\">\n            <div className=\"space-y-1\">\n              <h3 className=\"text-base font-semibold\">Check your email</h3>\n              <p className=\"text-muted-foreground text-sm\">\n                We sent a 6-digit code. Paste it below.\n              </p>\n            </div>\n            <div className=\"space-y-1.5\">\n              <Label htmlFor=\"tp-code\">Verification code</Label>\n              <Input id=\"tp-code\" inputMode=\"numeric\" placeholder=\"123456\" />\n            </div>\n            <div className=\"flex gap-2\">\n              <Button\n                variant=\"outline\"\n                className=\"flex-1\"\n                onClick={() => setStep(\"email\")}\n              >\n                Back\n              </Button>\n              <Button\n                className=\"flex-1\"\n                onClick={() => setStep(\"done\")}\n              >\n                Verify\n              </Button>\n            </div>\n          </div>\n        </TransitionPanelView>\n\n        <TransitionPanelView viewKey=\"done\">\n          <div className=\"space-y-3\">\n            <div className=\"space-y-1\">\n              <h3 className=\"text-base font-semibold\">You're in</h3>\n              <p className=\"text-muted-foreground text-sm\">\n                Welcome back. Heading to your dashboard.\n              </p>\n            </div>\n            <Button\n              variant=\"outline\"\n              className=\"w-full\"\n              onClick={() => setStep(\"email\")}\n            >\n              Start over\n            </Button>\n          </div>\n        </TransitionPanelView>\n      </TransitionPanel>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Vertical",
+      "importPath": "transition-panel-vertical",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  TransitionPanel,\n  TransitionPanelView,\n} from \"@/components/ui/cubby-ui/transition-panel\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nconst VIEWS = [\"overview\", \"details\", \"summary\"] as const;\ntype View = (typeof VIEWS)[number];\n\nconst COPY: Record<View, { title: string; body: string }> = {\n  overview: {\n    title: \"Overview\",\n    body: \"High-level snapshot of the workspace. Click next to drill in.\",\n  },\n  details: {\n    title: \"Details\",\n    body: \"Deeper breakdown of recent activity, with a longer block of text so the panel grows vertically when this view becomes active. The container animates its height as the content size changes between views.\",\n  },\n  summary: {\n    title: \"Summary\",\n    body: \"Compact recap before continuing.\",\n  },\n};\n\nexport default function TransitionPanelVertical() {\n  const [index, setIndex] = React.useState(0);\n  const view = VIEWS[index];\n\n  return (\n    <div className=\"w-[360px] space-y-3\">\n      <div className=\"rounded-xl border bg-card p-4 shadow-sm\">\n        <TransitionPanel activeKey={view} axis=\"y\">\n          {VIEWS.map((key) => (\n            <TransitionPanelView key={key} viewKey={key}>\n              <div className=\"space-y-1.5\">\n                <h3 className=\"text-base font-semibold\">{COPY[key].title}</h3>\n                <p className=\"text-muted-foreground text-sm leading-relaxed\">\n                  {COPY[key].body}\n                </p>\n              </div>\n            </TransitionPanelView>\n          ))}\n        </TransitionPanel>\n      </div>\n\n      <div className=\"flex items-center justify-between\">\n        <Button\n          variant=\"outline\"\n          size=\"sm\"\n          onClick={() => setIndex((i) => Math.max(0, i - 1))}\n          disabled={index === 0}\n        >\n          Previous\n        </Button>\n        <span className=\"text-muted-foreground text-xs tabular-nums\">\n          {index + 1} / {VIEWS.length}\n        </span>\n        <Button\n          size=\"sm\"\n          onClick={() =>\n            setIndex((i) => Math.min(VIEWS.length - 1, i + 1))\n          }\n          disabled={index === VIEWS.length - 1}\n        >\n          Next\n        </Button>\n      </div>\n    </div>\n  );\n}\n"
+    }
+  ],
   "tree": [
     {
       "title": "Basic",
@@ -4039,6 +4065,8 @@ export const componentMap = {
   "tooltip-animated": tooltip_tooltip_animated,
   "tooltip-controlled": tooltip_tooltip_controlled,
   "tooltip-detached-trigger": tooltip_tooltip_detached_trigger,
+  "transition-panel-basic": transition_panel_transition_panel_basic,
+  "transition-panel-vertical": transition_panel_transition_panel_vertical,
   "tree-basic": tree_tree_basic,
   "tree-async-loading": tree_tree_async_loading,
   "tree-controlled": tree_tree_controlled,
@@ -4318,6 +4346,10 @@ export const componentAnatomy = {
   "tooltip": {
     "imports": "import {\n  Tooltip,\n  TooltipContent,\n  TooltipTrigger,\n} from \"@/components/ui/cubby-ui/tooltip\";",
     "anatomy": "<Tooltip>\n  <TooltipTrigger />\n  <TooltipContent />\n</Tooltip>"
+  },
+  "transition-panel": {
+    "imports": "import {\n  TransitionPanel,\n  TransitionPanelView,\n} from \"@/components/ui/cubby-ui/transition-panel\";",
+    "anatomy": "<TransitionPanel>\n  <TransitionPanelView />\n</TransitionPanel>"
   },
   "tree": {
     "imports": "import {\n  Tree,\n  TreeItem,\n  TreeItemLabel,\n  TreeNode,\n} from \"@/components/ui/cubby-ui/tree\";",

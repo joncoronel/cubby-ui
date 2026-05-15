@@ -132,6 +132,7 @@
         "@cubby-ui/toggle-group",
         "@cubby-ui/toolbar",
         "@cubby-ui/tooltip",
+        "@cubby-ui/transition-panel",
         "@cubby-ui/tree"
       ]
     },
@@ -1547,6 +1548,22 @@
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/tooltip.tsx"
         }
+      ]
+    },
+    {
+      "name": "transition-panel",
+      "type": "registry:ui",
+      "title": "Transition Panel",
+      "description": "A transition-panel component.",
+      "files": [
+        {
+          "path": "registry/default/transition-panel/transition-panel.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/transition-panel.tsx"
+        }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/use-animated-height"
       ]
     },
     {

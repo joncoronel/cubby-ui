@@ -268,6 +268,9 @@ import kbd_kbd_size_variants from "@/registry/examples/kbd/kbd-size-variants";
 import kbd_kbd_special_keys_with_auto_conversion from "@/registry/examples/kbd/kbd-special-keys-with-auto-conversion";
 import kbd_kbd_states from "@/registry/examples/kbd/kbd-states";
 import label_label_demo from "@/registry/examples/label/label-demo";
+import marching_border_marching_border_basic from "@/registry/examples/marching-border/marching-border-basic";
+import marching_border_marching_border_explicit_radius from "@/registry/examples/marching-border/marching-border-explicit-radius";
+import marching_border_marching_border_variants from "@/registry/examples/marching-border/marching-border-variants";
 import menubar_menubar_basic from "@/registry/examples/menubar/menubar-basic";
 import meter_meter_basic from "@/registry/examples/meter/meter-basic";
 import meter_meter_different_sizes from "@/registry/examples/meter/meter-different-sizes";
@@ -962,6 +965,16 @@ export const componentMetadata = {
     "name": "label",
     "title": "Label",
     "description": "A label component.",
+    "category": "UI",
+    "registryDependencies": [],
+    "dependencies": [],
+    "examples": {},
+    "reference": []
+  },
+  "marching-border": {
+    "name": "marching-border",
+    "title": "Marching Border",
+    "description": "A marching-border component.",
     "category": "UI",
     "registryDependencies": [],
     "dependencies": [],
@@ -2800,6 +2813,23 @@ export const exampleRegistry = {
       "source": "import { Input } from \"@/components/ui/cubby-ui/input\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function LabelDemo() {\n  return (\n    <Label>\n      Email address\n      <Input type=\"email\" placeholder=\"you@example.com\" />\n    </Label>\n  );\n}\n"
     }
   ],
+  "marching-border": [
+    {
+      "title": "Basic",
+      "importPath": "marching-border-basic",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { MarchingBorder } from \"@/components/ui/cubby-ui/marching-border\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nexport default function MarchingBorderBasic() {\n  const [editing, setEditing] = React.useState(true);\n\n  return (\n    <div className=\"flex w-[360px] flex-col items-start gap-3\">\n      <div className=\"bg-card text-foreground relative w-full rounded-xl border p-4 shadow-sm\">\n        <div className=\"space-y-1\">\n          <h3 className=\"text-base font-semibold\">Bundle: Reading list</h3>\n          <p className=\"text-muted-foreground text-sm\">\n            3 unsaved changes. Confirm to publish, or discard to revert.\n          </p>\n        </div>\n        {editing && <MarchingBorder className=\"text-primary\" />}\n      </div>\n\n      <Button\n        size=\"sm\"\n        variant=\"outline\"\n        onClick={() => setEditing((v) => !v)}\n      >\n        {editing ? \"Confirm changes\" : \"Edit\"}\n      </Button>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Explicit Radius",
+      "importPath": "marching-border-explicit-radius",
+      "source": "import { MarchingBorder } from \"@/components/ui/cubby-ui/marching-border\";\n\nexport default function MarchingBorderExplicitRadius() {\n  return (\n    <div className=\"flex w-[360px] flex-col gap-4\">\n      <div className=\"text-foreground bg-muted relative flex h-24 items-center justify-center text-sm\">\n        <span className=\"text-muted-foreground\">No rounded-* class</span>\n        <MarchingBorder className=\"text-primary\" radius={0} />\n      </div>\n\n      <div className=\"text-foreground bg-muted relative flex h-24 items-center justify-center text-sm\">\n        <span className=\"text-muted-foreground\">radius=24</span>\n        <MarchingBorder className=\"text-primary\" radius={24} />\n      </div>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Variants",
+      "importPath": "marching-border-variants",
+      "source": "import { MarchingBorder } from \"@/components/ui/cubby-ui/marching-border\";\n\ntype Variant = {\n  label: string;\n  color: string;\n  dash: number;\n  gap: number;\n  duration: number;\n  strokeWidth?: number;\n};\n\nconst VARIANTS: Variant[] = [\n  {\n    label: \"Default\",\n    color: \"text-primary\",\n    dash: 1,\n    gap: 0.75,\n    duration: 0.75,\n  },\n  {\n    label: \"Fine + fast\",\n    color: \"text-foreground\",\n    dash: 0.6,\n    gap: 0.6,\n    duration: 0.5,\n    strokeWidth: 1,\n  },\n  {\n    label: \"Chunky + slow\",\n    color: \"text-destructive\",\n    dash: 2,\n    gap: 1.5,\n    duration: 1.6,\n    strokeWidth: 3,\n  },\n];\n\nexport default function MarchingBorderVariants() {\n  return (\n    <div className=\"grid w-[420px] grid-cols-1 gap-3 sm:grid-cols-3\">\n      {VARIANTS.map((v) => (\n        <div\n          key={v.label}\n          className=\"bg-card text-foreground relative flex aspect-square items-center justify-center rounded-lg border text-xs\"\n        >\n          <span className=\"text-muted-foreground\">{v.label}</span>\n          <MarchingBorder\n            className={v.color}\n            dash={v.dash}\n            gap={v.gap}\n            duration={v.duration}\n            strokeWidth={v.strokeWidth}\n          />\n        </div>\n      ))}\n    </div>\n  );\n}\n"
+    }
+  ],
   "menubar": [
     {
       "title": "Basic",
@@ -3593,7 +3623,7 @@ export const exampleRegistry = {
     {
       "title": "Basic",
       "importPath": "transition-panel-basic",
-      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  TransitionPanel,\n  TransitionPanelView,\n} from \"@/components/ui/cubby-ui/transition-panel\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Input } from \"@/components/ui/cubby-ui/input\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\ntype Step = \"email\" | \"code\" | \"done\";\n\nexport default function TransitionPanelBasic() {\n  const [step, setStep] = React.useState<Step>(\"email\");\n\n  return (\n    <div className=\"w-[360px] rounded-xl border bg-card p-4 shadow-sm\">\n      <TransitionPanel activeKey={step}>\n        <TransitionPanelView viewKey=\"email\">\n          <div className=\"space-y-3\">\n            <div className=\"space-y-1\">\n              <h3 className=\"text-base font-semibold\">Sign in</h3>\n              <p className=\"text-muted-foreground text-sm\">\n                Enter your email to receive a code.\n              </p>\n            </div>\n            <div className=\"space-y-1.5\">\n              <Label htmlFor=\"tp-email\">Email</Label>\n              <Input\n                id=\"tp-email\"\n                type=\"email\"\n                placeholder=\"you@example.com\"\n              />\n            </div>\n            <Button\n              className=\"w-full\"\n              onClick={() => setStep(\"code\")}\n            >\n              Continue\n            </Button>\n          </div>\n        </TransitionPanelView>\n\n        <TransitionPanelView viewKey=\"code\">\n          <div className=\"space-y-3\">\n            <div className=\"space-y-1\">\n              <h3 className=\"text-base font-semibold\">Check your email</h3>\n              <p className=\"text-muted-foreground text-sm\">\n                We sent a 6-digit code. Paste it below.\n              </p>\n            </div>\n            <div className=\"space-y-1.5\">\n              <Label htmlFor=\"tp-code\">Verification code</Label>\n              <Input id=\"tp-code\" inputMode=\"numeric\" placeholder=\"123456\" />\n            </div>\n            <div className=\"flex gap-2\">\n              <Button\n                variant=\"outline\"\n                className=\"flex-1\"\n                onClick={() => setStep(\"email\")}\n              >\n                Back\n              </Button>\n              <Button\n                className=\"flex-1\"\n                onClick={() => setStep(\"done\")}\n              >\n                Verify\n              </Button>\n            </div>\n          </div>\n        </TransitionPanelView>\n\n        <TransitionPanelView viewKey=\"done\">\n          <div className=\"space-y-3\">\n            <div className=\"space-y-1\">\n              <h3 className=\"text-base font-semibold\">You're in</h3>\n              <p className=\"text-muted-foreground text-sm\">\n                Welcome back. Heading to your dashboard.\n              </p>\n            </div>\n            <Button\n              variant=\"outline\"\n              className=\"w-full\"\n              onClick={() => setStep(\"email\")}\n            >\n              Start over\n            </Button>\n          </div>\n        </TransitionPanelView>\n      </TransitionPanel>\n    </div>\n  );\n}\n"
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  TransitionPanel,\n  TransitionPanelView,\n} from \"@/components/ui/cubby-ui/transition-panel\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Input } from \"@/components/ui/cubby-ui/input\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\ntype Step = \"email\" | \"code\" | \"done\";\n\nexport default function TransitionPanelBasic() {\n  const [step, setStep] = React.useState<Step>(\"email\");\n\n  return (\n    <TransitionPanel\n      activeKey={step}\n      className=\"w-[360px] rounded-xl border bg-card shadow-sm\"\n    >\n      <TransitionPanelView viewKey=\"email\">\n        <div className=\"space-y-3 p-4\">\n          <div className=\"space-y-1\">\n            <h3 className=\"text-base font-semibold\">Sign in</h3>\n            <p className=\"text-muted-foreground text-sm\">\n              Enter your email to receive a code.\n            </p>\n          </div>\n          <div className=\"space-y-1.5\">\n            <Label htmlFor=\"tp-email\">Email</Label>\n            <Input id=\"tp-email\" type=\"email\" placeholder=\"you@example.com\" />\n          </div>\n          <Button className=\"w-full\" onClick={() => setStep(\"code\")}>\n            Continue\n          </Button>\n        </div>\n      </TransitionPanelView>\n\n      <TransitionPanelView viewKey=\"code\">\n        <div className=\"space-y-3 p-4\">\n          <div className=\"space-y-1\">\n            <h3 className=\"text-base font-semibold\">Check your email</h3>\n            <p className=\"text-muted-foreground text-sm\">\n              We sent a 6-digit code. Paste it below.\n            </p>\n          </div>\n          <div className=\"space-y-1.5\">\n            <Label htmlFor=\"tp-code\">Verification code</Label>\n            <Input id=\"tp-code\" inputMode=\"numeric\" placeholder=\"123456\" />\n          </div>\n          <div className=\"flex gap-2\">\n            <Button\n              variant=\"outline\"\n              className=\"flex-1\"\n              onClick={() => setStep(\"email\")}\n            >\n              Back\n            </Button>\n            <Button className=\"flex-1\" onClick={() => setStep(\"done\")}>\n              Verify\n            </Button>\n          </div>\n        </div>\n      </TransitionPanelView>\n\n      <TransitionPanelView viewKey=\"done\">\n        <div className=\"space-y-3 p-4\">\n          <div className=\"space-y-1\">\n            <h3 className=\"text-base font-semibold\">You&apos;re in</h3>\n            <p className=\"text-muted-foreground text-sm\">\n              Welcome back. Heading to your dashboard.\n            </p>\n          </div>\n          <Button\n            variant=\"outline\"\n            className=\"w-full\"\n            onClick={() => setStep(\"email\")}\n          >\n            Start over\n          </Button>\n        </div>\n      </TransitionPanelView>\n    </TransitionPanel>\n  );\n}\n"
     },
     {
       "title": "Vertical",
@@ -3918,6 +3948,9 @@ export const componentMap = {
   "kbd-special-keys-with-auto-conversion": kbd_kbd_special_keys_with_auto_conversion,
   "kbd-states": kbd_kbd_states,
   "label-demo": label_label_demo,
+  "marching-border-basic": marching_border_marching_border_basic,
+  "marching-border-explicit-radius": marching_border_marching_border_explicit_radius,
+  "marching-border-variants": marching_border_marching_border_variants,
   "menubar-basic": menubar_menubar_basic,
   "meter-basic": meter_meter_basic,
   "meter-different-sizes": meter_meter_different_sizes,
@@ -4234,6 +4267,10 @@ export const componentAnatomy = {
   "label": {
     "imports": "import { Label } from \"@/components/ui/cubby-ui/label\";",
     "anatomy": "<Label />"
+  },
+  "marching-border": {
+    "imports": "import { MarchingBorder } from \"@/components/ui/cubby-ui/marching-border\"",
+    "anatomy": "<undefined>\n  {/* Your content */}\n</undefined>"
   },
   "menubar": {
     "imports": "import {\n  Menubar,\n  MenubarContent,\n  MenubarItem,\n  MenubarMenu,\n  MenubarSeparator,\n  MenubarShortcut,\n  MenubarSub,\n  MenubarSubContent,\n  MenubarSubTrigger,\n  MenubarTrigger,\n} from \"@/components/ui/cubby-ui/menubar\"",

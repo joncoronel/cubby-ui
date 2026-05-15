@@ -104,6 +104,7 @@
         "@cubby-ui/input-otp",
         "@cubby-ui/kbd",
         "@cubby-ui/label",
+        "@cubby-ui/marching-border",
         "@cubby-ui/menubar",
         "@cubby-ui/meter",
         "@cubby-ui/navigation-menu",
@@ -1064,6 +1065,19 @@
           "path": "registry/default/label/label.tsx",
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/label.tsx"
+        }
+      ]
+    },
+    {
+      "name": "marching-border",
+      "type": "registry:ui",
+      "title": "Marching Border",
+      "description": "A marching-border component.",
+      "files": [
+        {
+          "path": "registry/default/marching-border/marching-border.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/marching-border.tsx"
         }
       ]
     },

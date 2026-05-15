@@ -308,6 +308,12 @@
     "dependencies": [],
     "reference": []
   },
+  "marching-border": {
+    "title": "Marching Border",
+    "description": "A marching-border component.",
+    "dependencies": [],
+    "reference": []
+  },
   "menubar": {
     "title": "Menubar",
     "description": "A menubar component.",

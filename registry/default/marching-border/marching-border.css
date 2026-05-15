@@ -1,0 +1,15 @@
+/* -------------------------------------------------------------------------------------------------
+ * MarchingBorder dash animation.
+ *
+ * One static keyframe shared across every instance. The end offset
+ * (one full dash + gap cycle) comes from the `--march-offset` CSS
+ * custom property set per-instance on the <path>, so any
+ * (dash, gap) combination loops seamlessly without generating
+ * per-instance keyframes.
+ * -------------------------------------------------------------------------------------------------*/
+
+@keyframes dash-march {
+  to {
+    stroke-dashoffset: var(--march-offset);
+  }
+}

@@ -44,6 +44,7 @@
     "@cubby-ui/input-otp",
     "@cubby-ui/kbd",
     "@cubby-ui/label",
+    "@cubby-ui/marching-border",
     "@cubby-ui/menubar",
     "@cubby-ui/meter",
     "@cubby-ui/navigation-menu",
@@ -72,6 +73,7 @@
     "@cubby-ui/toggle-group",
     "@cubby-ui/toolbar",
     "@cubby-ui/tooltip",
+    "@cubby-ui/transition-panel",
     "@cubby-ui/tree"
   ],
   "files": [],

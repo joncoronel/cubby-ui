@@ -104,6 +104,7 @@
         "@cubby-ui/input-otp",
         "@cubby-ui/kbd",
         "@cubby-ui/label",
+        "@cubby-ui/marching-border",
         "@cubby-ui/menubar",
         "@cubby-ui/meter",
         "@cubby-ui/navigation-menu",
@@ -132,6 +133,7 @@
         "@cubby-ui/toggle-group",
         "@cubby-ui/toolbar",
         "@cubby-ui/tooltip",
+        "@cubby-ui/transition-panel",
         "@cubby-ui/tree"
       ]
     },
@@ -1067,6 +1069,24 @@
       ]
     },
     {
+      "name": "marching-border",
+      "type": "registry:ui",
+      "title": "Marching Border",
+      "description": "A marching-border component.",
+      "files": [
+        {
+          "path": "registry/default/marching-border/marching-border.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/marching-border/marching-border.tsx"
+        },
+        {
+          "path": "registry/default/marching-border/marching-border.css",
+          "type": "registry:file",
+          "target": "components/ui/cubby-ui/marching-border/marching-border.css"
+        }
+      ]
+    },
+    {
       "name": "menubar",
       "type": "registry:ui",
       "title": "Menubar",
@@ -1547,6 +1567,22 @@
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/tooltip.tsx"
         }
+      ]
+    },
+    {
+      "name": "transition-panel",
+      "type": "registry:ui",
+      "title": "Transition Panel",
+      "description": "A transition-panel component.",
+      "files": [
+        {
+          "path": "registry/default/transition-panel/transition-panel.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/transition-panel.tsx"
+        }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/use-animated-height"
       ]
     },
     {

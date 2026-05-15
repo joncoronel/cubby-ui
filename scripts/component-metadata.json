@@ -308,6 +308,12 @@
     "dependencies": [],
     "reference": []
   },
+  "marching-border": {
+    "title": "Marching Border",
+    "description": "A marching-border component.",
+    "dependencies": [],
+    "reference": []
+  },
   "menubar": {
     "title": "Menubar",
     "description": "A menubar component.",
@@ -530,6 +536,12 @@
     "dependencies": [
       "@base-ui/react"
     ],
+    "reference": []
+  },
+  "transition-panel": {
+    "title": "Transition Panel",
+    "description": "A transition-panel component.",
+    "dependencies": [],
     "reference": []
   },
   "tree": {

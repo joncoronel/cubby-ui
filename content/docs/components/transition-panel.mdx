@@ -65,6 +65,13 @@ Set on the root element so consumers can style based on transition state.
 <ApiPropsList>
 
 <ApiProp
+  name="data-slot"
+  fullType='"transition-panel"'
+>
+  Styling hook for the root element.
+</ApiProp>
+
+<ApiProp
   name="data-axis"
   fullType='"x" | "y"'
 >
@@ -106,7 +113,7 @@ Set on the root and inherited by view wrappers. Override via the `style` prop or
 
 #### TransitionPanelView
 
-A single view registered with the parent panel. Renders a `<div>` whose visibility, slide offset, and `inert` state are driven by the parent's `activeKey`. Inactive views stay mounted (their internal state survives swaps) but are marked `inert` and `aria-hidden` so focus and assistive tech skip them.
+A single view registered with the parent panel. Renders a `<div>` and accepts any native div prop (`className`, `style`, `id`, `aria-label`, `aria-labelledby`, `ref`, `data-*`, etc.) in addition to those documented below — spread props land on the view wrapper. The consumer `ref` is composed with the internal ref used for registration with the parent panel. Visibility, slide offset, and `inert` state are driven by the parent's `activeKey`. Inactive views stay mounted (their internal state survives swaps) but are marked `inert` and `aria-hidden` so focus and assistive tech skip them.
 
 <ApiPropsList>
 
@@ -131,6 +138,13 @@ A single view registered with the parent panel. Renders a `<div>` whose visibili
 ##### Data attributes
 
 <ApiPropsList>
+
+<ApiProp
+  name="data-slot"
+  fullType='"transition-panel-view"'
+>
+  Styling hook for the view wrapper.
+</ApiProp>
 
 <ApiProp
   name="data-active"

@@ -3,7 +3,9 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-export type MarchingBorderProps = Omit<React.ComponentProps<"svg">, "ref"> & {
+import "./marching-border.css";
+
+export type MarchingBorderProps = React.ComponentProps<"svg"> & {
   /**
    * Override the auto-detected corner radius (in pixels). When omitted,
    * MarchingBorder reads its parent element's computed
@@ -79,10 +81,10 @@ function buildRoundedRectPath(
  *  2. The path's `M` is at the midpoint of the top edge so any residual
  *     subpixel error falls mid-straight-edge instead of at a corner.
  *
- * A single static keyframe is shared across every instance; the end
- * offset (one full cycle) comes from a CSS variable on the path so any
- * `(dash, gap)` combination loops seamlessly without per-cycle keyframe
- * generation.
+ * The `@keyframes dash-march` rule lives in `marching-border.css` and
+ * is shared across every instance. The end offset (one full cycle)
+ * comes from a CSS variable on the path so any `(dash, gap)`
+ * combination loops seamlessly without per-cycle keyframe generation.
  *
  * Under `prefers-reduced-motion`, only the marching animation is
  * suppressed — the dashed border itself still renders, since for staged
@@ -94,6 +96,7 @@ export function MarchingBorder({
   dash = 1,
   gap = 0.75,
   duration = 0.75,
+  ref,
   className,
   ...rest
 }: MarchingBorderProps) {
@@ -101,6 +104,21 @@ export function MarchingBorder({
   const pathRef = React.useRef<SVGPathElement | null>(null);
   const cycle = dash + gap;
   const pathLength = Math.max(cycle, Math.round(100 / cycle) * cycle);
+
+  // Compose the consumer `ref` with the internal `svgRef` used by the
+  // ResizeObserver. Mirrors the pattern used in `TransitionPanel` so a
+  // forwarded ref still works alongside the component's own DOM reads.
+  const setSvgRef = React.useCallback(
+    (node: SVGSVGElement | null) => {
+      svgRef.current = node;
+      if (typeof ref === "function") {
+        ref(node);
+      } else if (ref) {
+        (ref as React.RefObject<SVGSVGElement | null>).current = node;
+      }
+    },
+    [ref],
+  );
 
   // useLayoutEffect so the first paint includes the path's `d` — without
   // this there's a one-frame gap waiting for ResizeObserver to fire its
@@ -149,19 +167,15 @@ export function MarchingBorder({
 
   return (
     <svg
-      ref={svgRef}
+      ref={setSvgRef}
       aria-hidden
+      data-slot="marching-border"
       {...rest}
       className={cn(
         "pointer-events-none absolute inset-0 size-full",
         className,
       )}
     >
-      {/* Single static keyframe shared across every instance. The end
-          offset comes from a CSS variable set per-instance on the path,
-          so any (dash, gap) combination loops seamlessly without
-          per-cycle keyframe duplication. */}
-      <style>{`@keyframes dash-march{to{stroke-dashoffset:var(--march-offset)}}`}</style>
       <path
         ref={pathRef}
         fill="none"

@@ -20,7 +20,7 @@ type TransitionPanelProps = React.ComponentProps<"div"> & {
   axis?: "x" | "y";
 };
 
-type TransitionPanelViewProps = {
+type TransitionPanelViewProps = React.ComponentProps<"div"> & {
   /**
    * Identifier matched against the parent's `activeKey` to determine which
    * view is visible.
@@ -41,17 +41,20 @@ type TransitionPanelViewProps = {
    * follow the focused element.
    */
   initialFocus?: TransitionPanelInitialFocus;
-  children: React.ReactNode;
 };
 
 const X_SLIDE = "18%";
 const Y_SLIDE = "12px";
 
-// Selector for elements that can hold focus. Mirrors floating-ui's tabbable
-// utility's set, stripped to the common cases we care about for in-page
-// focus management (no audio/video controls, no iframe/object/embed, etc).
+// Selector for elements that can hold focus. Mirrors Base UI's tabbable
+// candidate set, minus the rarely-relevant `iframe`, `object`, `embed`,
+// `details`, and `audio/video[controls]` cases — consumers in those niches
+// should pass an explicit `initialFocus` ref. Includes `[contenteditable]`
+// so rich-text editor surfaces (TipTap, Lexical, ProseMirror, etc.) are
+// caught automatically, and excludes `input[type="hidden"]` since hidden
+// inputs are never a focus target.
 const FOCUSABLE_SELECTOR =
-  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"]), [contenteditable]:not([contenteditable="false"])';
 
 type ViewEntry = {
   el: HTMLElement;
@@ -383,6 +386,7 @@ function TransitionPanel({
     <div
       {...rest}
       ref={setRootRef}
+      data-slot="transition-panel"
       data-axis={axis}
       data-activation-direction={activationDirection}
       style={
@@ -445,7 +449,11 @@ TransitionPanel.displayName = "TransitionPanel";
 function TransitionPanelView({
   viewKey,
   initialFocus = true,
+  ref,
+  className,
+  style,
   children,
+  ...rest
 }: TransitionPanelViewProps) {
   const ctx = React.use(TransitionPanelContext);
   if (!ctx) {
@@ -455,7 +463,23 @@ function TransitionPanelView({
   }
   const { activeKey, axis, enterFrom, exitTo, mounted, registerView } = ctx;
   const isActive = viewKey === activeKey;
-  const wrapperRef = React.useRef<HTMLDivElement>(null);
+  const wrapperRef = React.useRef<HTMLDivElement | null>(null);
+
+  // Compose the consumer `ref` with the internal `wrapperRef` used by
+  // `registerView`. Mirrors the pattern on `TransitionPanel` so callers
+  // can attach observers or imperatively measure the view wrapper without
+  // breaking the panel's own DOM reads.
+  const setWrapperRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      wrapperRef.current = node;
+      if (typeof ref === "function") {
+        ref(node);
+      } else if (ref) {
+        (ref as React.RefObject<HTMLDivElement | null>).current = node;
+      }
+    },
+    [ref],
+  );
 
   // useLayoutEffect (not useEffect) so registration happens before the
   // panel's own layout-effect-driven focus move. React runs layout effects
@@ -469,13 +493,21 @@ function TransitionPanelView({
 
   return (
     <div
-      ref={wrapperRef}
+      {...rest}
+      ref={setWrapperRef}
       aria-hidden={!isActive}
       inert={!isActive}
+      data-slot="transition-panel-view"
       data-active={isActive ? "" : undefined}
       data-viewkey={viewKey}
       style={
         {
+          // Consumer style spreads first so they can add their own
+          // properties (padding, background, custom CSS vars). The
+          // direction-aware slide vars override after — these are
+          // panel-controlled and change every render, so a consumer
+          // setting them would just break the slide animation.
+          ...style,
           "--tp-enter": enterFrom,
           "--tp-exit": exitTo,
         } as React.CSSProperties
@@ -497,6 +529,7 @@ function TransitionPanelView({
                 ? "translate-x-(--tp-exit)"
                 : "translate-y-(--tp-exit)",
             ),
+        className,
       )}
     >
       {children}

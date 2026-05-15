@@ -90,7 +90,7 @@ function buildRoundedRectPath(
  * suppressed — the dashed border itself still renders, since for staged
  * edit-mode it's the primary visual signal of pending state.
  */
-export function MarchingBorder({
+function MarchingBorder({
   radius,
   strokeWidth = 2,
   dash = 1,
@@ -196,3 +196,5 @@ export function MarchingBorder({
     </svg>
   );
 }
+
+export { MarchingBorder };

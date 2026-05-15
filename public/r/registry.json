@@ -1077,7 +1077,12 @@
         {
           "path": "registry/default/marching-border/marching-border.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/marching-border.tsx"
+          "target": "components/ui/cubby-ui/marching-border/marching-border.tsx"
+        },
+        {
+          "path": "registry/default/marching-border/marching-border.css",
+          "type": "registry:file",
+          "target": "components/ui/cubby-ui/marching-border/marching-border.css"
         }
       ]
     },

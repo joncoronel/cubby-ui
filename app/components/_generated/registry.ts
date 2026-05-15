@@ -4270,7 +4270,7 @@ export const componentAnatomy = {
   },
   "marching-border": {
     "imports": "import { MarchingBorder } from \"@/components/ui/cubby-ui/marching-border\"",
-    "anatomy": "<undefined>\n  {/* Your content */}\n</undefined>"
+    "anatomy": "<MarchingBorder />"
   },
   "menubar": {
     "imports": "import {\n  Menubar,\n  MenubarContent,\n  MenubarItem,\n  MenubarMenu,\n  MenubarSeparator,\n  MenubarShortcut,\n  MenubarSub,\n  MenubarSubContent,\n  MenubarSubTrigger,\n  MenubarTrigger,\n} from \"@/components/ui/cubby-ui/menubar\"",

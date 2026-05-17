@@ -127,7 +127,8 @@
       "Bash(npx eslint:*)",
       "mcp__playwright__browser_wait_for",
       "Bash(python -c:*)",
-      "Bash(grep -E \"\\\\.\\(json|ts\\)$\")"
+      "Bash(grep -E \"\\\\.\\(json|ts\\)$\")",
+      "Bash(grep -E \"registry.default.\\(sheet|drawer|base-drawer\\).{0,30}tsx$\" -A2)"
     ],
     "deny": []
   }

@@ -11,6 +11,13 @@ import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { Button } from "@/registry/default/button/button";
 import {
+  innerEdgeRim,
+  INNER_EDGE_FROM_ATTACH_SIDE,
+  solidSurface,
+  surfaceClasses,
+  type SurfaceLevel,
+} from "@/registry/default/lib/elevated";
+import {
   ScrollArea,
   type ScrollAreaProps,
 } from "@/registry/default/scroll-area/scroll-area";
@@ -44,7 +51,7 @@ const createDrawerHandle = BaseDialog.createHandle;
 
 const drawerContentVariants = cva(
   [
-    "bg-popover text-popover-foreground flex flex-col",
+    "text-popover-foreground flex flex-col",
     "relative",
     "ease-[cubic-bezier(.32,.72,0,1)] transition-[transform,scale,translate] duration-400  will-change-transform",
     "motion-reduce:transition-none",
@@ -52,7 +59,7 @@ const drawerContentVariants = cva(
     "scale-[calc(1-0.05*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))]",
     // Disable transitions on parent while child is being dragged
     "data-[nested-dragging]:transition-none",
-    // Nested drawer support: overlay dim effect (using before: to avoid conflict with Safari ::after touch fix)
+    // Nested drawer support: overlay dim effect (using before: to avoid conflict with Safari ::after touch fix AND the elevation rim's ::after)
     "before:pointer-events-none before:absolute before:inset-0 before:z-50 before:hidden before:rounded-[inherit] before:bg-black/15 before:opacity-0 before:transition-[opacity,display] before:transition-discrete before:duration-300",
     "data-nested-dialog-open:before:block data-nested-dialog-open:before:opacity-100",
     "starting:data-nested-dialog-open:before:opacity-0",
@@ -60,7 +67,8 @@ const drawerContentVariants = cva(
   {
     variants: {
       variant: {
-        default: "shadow-lg ring-border ring-1",
+        // `default` no longer needs its own shadow/ring — the elevation system provides that
+        default: "",
         floating: ["m-4 overflow-clip rounded-2xl"],
       },
       direction: {
@@ -624,6 +632,10 @@ function DrawerPortal({
 interface DrawerContentProps extends BaseDialog.Popup.Props {
   footerVariant?: "default" | "inset";
   showCloseButton?: boolean;
+  /** Surface elevation level for the drawer bg (1-8). Defaults to 5 — the dialog/sheet/drawer tier. */
+  level?: SurfaceLevel;
+  /** Shadow weight (1-8). Pinned to 5 by default. */
+  shadowLevel?: SurfaceLevel;
 }
 
 function DrawerContent({
@@ -631,6 +643,8 @@ function DrawerContent({
   finalFocus,
   footerVariant = "default",
   showCloseButton,
+  level = 5,
+  shadowLevel = 5,
   ...props
 }: DrawerContentProps) {
   return (
@@ -640,6 +654,8 @@ function DrawerContent({
         finalFocus={finalFocus}
         footerVariant={footerVariant}
         showCloseButton={showCloseButton}
+        level={level}
+        shadowLevel={shadowLevel}
         {...props}
       />
     </DrawerPortal>
@@ -847,6 +863,8 @@ function DrawerContentInner({
   showCloseButton = false,
   initialFocus,
   finalFocus,
+  level = 5,
+  shadowLevel = 5,
   ...props
 }: DrawerContentProps) {
   const {
@@ -1139,10 +1157,21 @@ function DrawerContentInner({
               ref={mergedRef}
               data-slot="drawer-content"
               data-footer-variant={footerVariant}
+              data-level={level}
               initialFocus={initialFocus ?? popupRef}
               finalFocus={finalFocus}
               className={cn(
                 drawerContentVariants({ variant, direction }),
+                // Surface elevation — floating variants get the full 4-edge
+                // rim overlay; flush (`default`) variants get a single-edge
+                // rim only on the inner-facing edge so the other edges don't
+                // show a 1px line at the viewport boundary.
+                variant === "floating"
+                  ? solidSurface(level, shadowLevel)
+                  : cn(
+                      surfaceClasses(level, shadowLevel),
+                      innerEdgeRim(INNER_EDGE_FROM_ATTACH_SIDE[direction]),
+                    ),
                 open && !isInitialized && "opacity-0",
                 isAnimating || isClosing
                   ? "pointer-events-none"
@@ -1151,6 +1180,7 @@ function DrawerContentInner({
                 // Lock parent height/overflow when nested drawer opens
                 "data-nested-dialog-open:overflow-hidden",
                 // Safari iOS touch fix: 1px cross-axis overflow (WebKit bug #183870)
+                // This co-exists with the rim's ::after — Tailwind merges both onto the same pseudo-element
                 modal !== true && [
                   "[@supports(-webkit-touch-callout:none)]:relative [@supports(-webkit-touch-callout:none)]:[scrollbar-width:none]",
                   isVertical
@@ -1279,7 +1309,7 @@ function DrawerFooter({ className, ...props }: React.ComponentProps<"div">) {
       className={cn(
         // z-1 + translateZ(0): stays above DrawerBody(z-0); Safari-only GPU layer
         // promotion fixes sticky/transform compositing flash during enter animation
-        "bg-popover z-1 mt-auto flex flex-col-reverse gap-2 px-6 pt-4 pb-6 sm:flex-row sm:justify-end",
+        "bg-(--popup-surface,var(--popover)) z-1 mt-auto flex flex-col-reverse gap-2 px-6 pt-4 pb-6 sm:flex-row sm:justify-end",
         "[@supports(-webkit-touch-callout:none)]:transform-[translateZ(0)]",
         "first:pt-6",
         "not-in-data-[footer-variant=inset]:in-[[data-slot=drawer-content]:has([data-slot=drawer-body])]:pt-3",

@@ -2,11 +2,15 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
+import {
+  solidSurface,
+  type SurfaceLevel,
+} from "@/registry/default/lib/elevated";
 
 const cardVariants = cva("text-card-foreground flex flex-col", {
   variants: {
     variant: {
-      default: "bg-card gap-6 rounded-2xl border dark:border-border/50 py-6",
+      default: "gap-6 rounded-2xl py-6",
       inset: "rounded-2xl p-1 bg-muted",
     },
   },
@@ -16,15 +20,30 @@ const cardVariants = cva("text-card-foreground flex flex-col", {
 });
 
 export interface CardProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof cardVariants> {}
+  extends
+    React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof cardVariants> {
+  level?: SurfaceLevel;
+  shadowLevel?: SurfaceLevel;
+}
 
-function Card({ className, variant = "default", ...props }: CardProps) {
+function Card({
+  className,
+  variant = "default",
+  level = 3,
+  shadowLevel = 3,
+  ...props
+}: CardProps) {
   return (
     <div
       data-slot="card"
       data-variant={variant}
-      className={cn(cardVariants({ variant }), className)}
+      data-level={variant === "default" ? level : undefined}
+      className={cn(
+        cardVariants({ variant }),
+        variant === "default" && solidSurface(level, shadowLevel),
+        className,
+      )}
       {...props}
     />
   );

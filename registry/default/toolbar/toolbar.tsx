@@ -126,7 +126,7 @@ function ToolbarLink({
 			data-slot="toolbar-link"
 			className={cn(
 				"text-muted-foreground inline-flex h-8 shrink-0 items-center gap-2 rounded-md px-2.5 text-sm no-underline",
-				"hover:text-foreground hover:bg-accent/50",
+				"hover:text-foreground hover:bg-(--surface-hover)",
 				"transition-[color,background-color,outline-width,outline-offset,outline-color] duration-100 ease-out",
 				"focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent",
 				"outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",

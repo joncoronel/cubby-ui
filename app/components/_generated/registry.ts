@@ -463,7 +463,8 @@ export const componentMetadata = {
     "category": "UI",
     "registryDependencies": [
       "@cubby-ui/button",
-      "@cubby-ui/scroll-area"
+      "@cubby-ui/scroll-area",
+      "@cubby-ui/elevated"
     ],
     "dependencies": [
       "@hugeicons/react",
@@ -488,7 +489,8 @@ export const componentMetadata = {
     "description": "A autocomplete component.",
     "category": "UI",
     "registryDependencies": [
-      "@cubby-ui/scroll-area"
+      "@cubby-ui/scroll-area",
+      "@cubby-ui/elevated"
     ],
     "dependencies": [
       "@hugeicons/react",
@@ -528,7 +530,8 @@ export const componentMetadata = {
     "category": "UI",
     "registryDependencies": [
       "@cubby-ui/button",
-      "@cubby-ui/scroll-area"
+      "@cubby-ui/scroll-area",
+      "@cubby-ui/elevated"
     ],
     "dependencies": [
       "@hugeicons/react",
@@ -599,7 +602,9 @@ export const componentMetadata = {
     "title": "Card",
     "description": "A card component.",
     "category": "UI",
-    "registryDependencies": [],
+    "registryDependencies": [
+      "@cubby-ui/elevated"
+    ],
     "dependencies": [
       "class-variance-authority"
     ],
@@ -691,7 +696,8 @@ export const componentMetadata = {
     "category": "UI",
     "registryDependencies": [
       "@cubby-ui/label",
-      "@cubby-ui/scroll-area"
+      "@cubby-ui/scroll-area",
+      "@cubby-ui/elevated"
     ],
     "dependencies": [
       "@hugeicons/react",
@@ -707,7 +713,8 @@ export const componentMetadata = {
     "category": "UI",
     "registryDependencies": [
       "@cubby-ui/input-group",
-      "@cubby-ui/scroll-area"
+      "@cubby-ui/scroll-area",
+      "@cubby-ui/elevated"
     ],
     "dependencies": [
       "@hugeicons/react",
@@ -721,7 +728,9 @@ export const componentMetadata = {
     "title": "Context-menu",
     "description": "A context-menu component.",
     "category": "UI",
-    "registryDependencies": [],
+    "registryDependencies": [
+      "@cubby-ui/elevated"
+    ],
     "dependencies": [
       "@hugeicons/react",
       "@hugeicons/core-free-icons"
@@ -824,7 +833,8 @@ export const componentMetadata = {
     "category": "UI",
     "registryDependencies": [
       "@cubby-ui/button",
-      "@cubby-ui/scroll-area"
+      "@cubby-ui/scroll-area",
+      "@cubby-ui/elevated"
     ],
     "dependencies": [
       "@hugeicons/react",
@@ -840,7 +850,8 @@ export const componentMetadata = {
     "category": "UI",
     "registryDependencies": [
       "@cubby-ui/button",
-      "@cubby-ui/scroll-area"
+      "@cubby-ui/scroll-area",
+      "@cubby-ui/elevated"
     ],
     "dependencies": [
       "class-variance-authority",
@@ -855,7 +866,9 @@ export const componentMetadata = {
     "title": "Dropdown-menu",
     "description": "A dropdown-menu component.",
     "category": "UI",
-    "registryDependencies": [],
+    "registryDependencies": [
+      "@cubby-ui/elevated"
+    ],
     "dependencies": [
       "@hugeicons/react",
       "@hugeicons/core-free-icons"
@@ -986,7 +999,9 @@ export const componentMetadata = {
     "title": "Menubar",
     "description": "A menubar component.",
     "category": "UI",
-    "registryDependencies": [],
+    "registryDependencies": [
+      "@cubby-ui/elevated"
+    ],
     "dependencies": [
       "@hugeicons/react",
       "@hugeicons/core-free-icons"
@@ -1011,7 +1026,9 @@ export const componentMetadata = {
     "title": "Navigation-menu",
     "description": "A navigation-menu component.",
     "category": "UI",
-    "registryDependencies": [],
+    "registryDependencies": [
+      "@cubby-ui/elevated"
+    ],
     "dependencies": [
       "class-variance-authority"
     ],
@@ -1058,7 +1075,9 @@ export const componentMetadata = {
     "title": "Popover",
     "description": "A popover component.",
     "category": "UI",
-    "registryDependencies": [],
+    "registryDependencies": [
+      "@cubby-ui/elevated"
+    ],
     "dependencies": [],
     "examples": {},
     "reference": []
@@ -1125,7 +1144,8 @@ export const componentMetadata = {
     "description": "A select component.",
     "category": "UI",
     "registryDependencies": [
-      "@cubby-ui/scroll-area"
+      "@cubby-ui/scroll-area",
+      "@cubby-ui/elevated"
     ],
     "dependencies": [
       "class-variance-authority",
@@ -1154,7 +1174,8 @@ export const componentMetadata = {
     "category": "UI",
     "registryDependencies": [
       "@cubby-ui/button",
-      "@cubby-ui/scroll-area"
+      "@cubby-ui/scroll-area",
+      "@cubby-ui/elevated"
     ],
     "dependencies": [
       "class-variance-authority",
@@ -1237,6 +1258,7 @@ export const componentMetadata = {
     "description": "A tabs component.",
     "category": "UI",
     "registryDependencies": [
+      "@cubby-ui/elevated",
       "@cubby-ui/use-animated-height"
     ],
     "dependencies": [
@@ -1273,7 +1295,8 @@ export const componentMetadata = {
     "description": "A toast component.",
     "category": "UI",
     "registryDependencies": [
-      "@cubby-ui/button"
+      "@cubby-ui/button",
+      "@cubby-ui/elevated"
     ],
     "dependencies": [
       "class-variance-authority",
@@ -1325,7 +1348,9 @@ export const componentMetadata = {
     "title": "Tooltip",
     "description": "A tooltip component.",
     "category": "UI",
-    "registryDependencies": [],
+    "registryDependencies": [
+      "@cubby-ui/elevated"
+    ],
     "dependencies": [],
     "examples": {},
     "reference": []
@@ -1386,6 +1411,15 @@ export const componentMetadata = {
     "dependencies": [
       "@tanstack/react-virtual"
     ],
+    "examples": {}
+  },
+  "elevated": {
+    "name": "elevated",
+    "title": "elevated",
+    "description": "A utility function for elevated.",
+    "category": "UI",
+    "registryDependencies": [],
+    "dependencies": [],
     "examples": {}
   },
   "highlight-text": {
@@ -2883,7 +2917,7 @@ export const exampleRegistry = {
     {
       "title": "Custom Styled Dropdown",
       "importPath": "navigation-menu-custom-styled-dropdown",
-      "source": "import Link from \"next/link\";\nimport { \n  NavigationMenu,\n  NavigationMenuList,\n  NavigationMenuItem,\n  NavigationMenuTrigger,\n  NavigationMenuContent,\n  NavigationMenuLink\n} from \"@/components/ui/cubby-ui/navigation-menu\";\n\nexport default function NavigationMenuCustomStyledDropdown() {\n  return (\n    <NavigationMenu>\n      <NavigationMenuList>\n        <NavigationMenuItem>\n          <NavigationMenuTrigger>Products</NavigationMenuTrigger>\n          <NavigationMenuContent>\n            <div className=\"grid gap-3 md:w-[500px] md:grid-cols-2 lg:w-[600px]\">\n              <div className=\"grid gap-1\">\n                <h4 className=\"font-medium leading-none mb-2 text-sm text-muted-foreground uppercase tracking-wide\">\n                  For Developers\n                </h4>\n                <NavigationMenuLink\n                  href=\"/api\"\n                  className=\"flex items-center gap-3 p-2 rounded-md hover:bg-accent/50\"\n                >\n                  <div className=\"w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center\">\n                    <span className=\"text-white text-sm font-bold\">\n                      API\n                    </span>\n                  </div>\n                  <div>\n                    <div className=\"font-medium\">REST API</div>\n                    <div className=\"text-sm text-muted-foreground\">\n                      Build with our API\n                    </div>\n                  </div>\n                </NavigationMenuLink>\n              </div>\n              <div className=\"grid gap-1\">\n                <h4 className=\"font-medium leading-none mb-2 text-sm text-muted-foreground uppercase tracking-wide\">\n                  For Teams\n                </h4>\n                <NavigationMenuLink\n                  href=\"/enterprise\"\n                  className=\"flex items-center gap-3 p-2 rounded-md hover:bg-accent/50\"\n                >\n                  <div className=\"w-10 h-10 rounded-lg bg-purple-500 flex items-center justify-center\">\n                    <span className=\"text-white text-sm font-bold\">\n                      ENT\n                    </span>\n                  </div>\n                  <div className=\"flex-1\">\n                    <div className=\"flex items-center gap-2\">\n                      <div className=\"font-medium\">Enterprise</div>\n                      <span className=\"bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full\">\n                        New\n                      </span>\n                    </div>\n                    <div className=\"text-sm text-muted-foreground\">\n                      Advanced features for teams\n                    </div>\n                  </div>\n                </NavigationMenuLink>\n              </div>\n            </div>\n          </NavigationMenuContent>\n        </NavigationMenuItem>\n        <NavigationMenuItem>\n          <NavigationMenuTrigger>Resources</NavigationMenuTrigger>\n          <NavigationMenuContent>\n            <div className=\"grid gap-3 md:w-[400px] lg:w-[500px]\">\n              <div className=\"grid gap-2\">\n                <h4 className=\"font-medium leading-none mb-2 text-sm text-muted-foreground uppercase tracking-wide\">\n                  Learn & Support\n                </h4>\n                <NavigationMenuLink\n                  render={\n                    <Link\n                      href=\"/docs\"\n                      className=\"flex items-center gap-3 p-2 rounded-md hover:bg-accent/50\"\n                    >\n                      <div className=\"w-10 h-10 rounded-lg bg-green-500 flex items-center justify-center\">\n                        <span className=\"text-white text-sm font-bold\">\n                          📚\n                        </span>\n                      </div>\n                      <div>\n                        <div className=\"font-medium\">Documentation</div>\n                        <div className=\"text-sm text-muted-foreground\">\n                          Complete guides and references\n                        </div>\n                      </div>\n                    </Link>\n                  }\n                />\n                <NavigationMenuLink\n                  render={\n                    <Link\n                      href=\"/community\"\n                      className=\"flex items-center gap-3 p-2 rounded-md hover:bg-accent/50\"\n                    >\n                      <div className=\"w-10 h-10 rounded-lg bg-indigo-500 flex items-center justify-center\">\n                        <span className=\"text-white text-sm font-bold\">\n                          👥\n                        </span>\n                      </div>\n                      <div className=\"flex-1\">\n                        <div className=\"flex items-center gap-2\">\n                          <div className=\"font-medium\">Community</div>\n                          <span className=\"bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full\">\n                            Active\n                          </span>\n                        </div>\n                        <div className=\"text-sm text-muted-foreground\">\n                          Join our developer community\n                        </div>\n                      </div>\n                    </Link>\n                  }\n                />\n              </div>\n            </div>\n          </NavigationMenuContent>\n        </NavigationMenuItem>\n      </NavigationMenuList>\n    </NavigationMenu>\n  );\n}"
+      "source": "import Link from \"next/link\";\nimport { \n  NavigationMenu,\n  NavigationMenuList,\n  NavigationMenuItem,\n  NavigationMenuTrigger,\n  NavigationMenuContent,\n  NavigationMenuLink\n} from \"@/components/ui/cubby-ui/navigation-menu\";\n\nexport default function NavigationMenuCustomStyledDropdown() {\n  return (\n    <NavigationMenu>\n      <NavigationMenuList>\n        <NavigationMenuItem>\n          <NavigationMenuTrigger>Products</NavigationMenuTrigger>\n          <NavigationMenuContent>\n            <div className=\"grid gap-3 md:w-[500px] md:grid-cols-2 lg:w-[600px]\">\n              <div className=\"grid gap-1\">\n                <h4 className=\"font-medium leading-none mb-2 text-sm text-muted-foreground uppercase tracking-wide\">\n                  For Developers\n                </h4>\n                <NavigationMenuLink\n                  href=\"/api\"\n                  className=\"flex items-center gap-3 p-2 rounded-md hover:bg-(--surface-hover)\"\n                >\n                  <div className=\"w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center\">\n                    <span className=\"text-white text-sm font-bold\">\n                      API\n                    </span>\n                  </div>\n                  <div>\n                    <div className=\"font-medium\">REST API</div>\n                    <div className=\"text-sm text-muted-foreground\">\n                      Build with our API\n                    </div>\n                  </div>\n                </NavigationMenuLink>\n              </div>\n              <div className=\"grid gap-1\">\n                <h4 className=\"font-medium leading-none mb-2 text-sm text-muted-foreground uppercase tracking-wide\">\n                  For Teams\n                </h4>\n                <NavigationMenuLink\n                  href=\"/enterprise\"\n                  className=\"flex items-center gap-3 p-2 rounded-md hover:bg-(--surface-hover)\"\n                >\n                  <div className=\"w-10 h-10 rounded-lg bg-purple-500 flex items-center justify-center\">\n                    <span className=\"text-white text-sm font-bold\">\n                      ENT\n                    </span>\n                  </div>\n                  <div className=\"flex-1\">\n                    <div className=\"flex items-center gap-2\">\n                      <div className=\"font-medium\">Enterprise</div>\n                      <span className=\"bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full\">\n                        New\n                      </span>\n                    </div>\n                    <div className=\"text-sm text-muted-foreground\">\n                      Advanced features for teams\n                    </div>\n                  </div>\n                </NavigationMenuLink>\n              </div>\n            </div>\n          </NavigationMenuContent>\n        </NavigationMenuItem>\n        <NavigationMenuItem>\n          <NavigationMenuTrigger>Resources</NavigationMenuTrigger>\n          <NavigationMenuContent>\n            <div className=\"grid gap-3 md:w-[400px] lg:w-[500px]\">\n              <div className=\"grid gap-2\">\n                <h4 className=\"font-medium leading-none mb-2 text-sm text-muted-foreground uppercase tracking-wide\">\n                  Learn & Support\n                </h4>\n                <NavigationMenuLink\n                  render={\n                    <Link\n                      href=\"/docs\"\n                      className=\"flex items-center gap-3 p-2 rounded-md hover:bg-(--surface-hover)\"\n                    >\n                      <div className=\"w-10 h-10 rounded-lg bg-green-500 flex items-center justify-center\">\n                        <span className=\"text-white text-sm font-bold\">\n                          📚\n                        </span>\n                      </div>\n                      <div>\n                        <div className=\"font-medium\">Documentation</div>\n                        <div className=\"text-sm text-muted-foreground\">\n                          Complete guides and references\n                        </div>\n                      </div>\n                    </Link>\n                  }\n                />\n                <NavigationMenuLink\n                  render={\n                    <Link\n                      href=\"/community\"\n                      className=\"flex items-center gap-3 p-2 rounded-md hover:bg-(--surface-hover)\"\n                    >\n                      <div className=\"w-10 h-10 rounded-lg bg-indigo-500 flex items-center justify-center\">\n                        <span className=\"text-white text-sm font-bold\">\n                          👥\n                        </span>\n                      </div>\n                      <div className=\"flex-1\">\n                        <div className=\"flex items-center gap-2\">\n                          <div className=\"font-medium\">Community</div>\n                          <span className=\"bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full\">\n                            Active\n                          </span>\n                        </div>\n                        <div className=\"text-sm text-muted-foreground\">\n                          Join our developer community\n                        </div>\n                      </div>\n                    </Link>\n                  }\n                />\n              </div>\n            </div>\n          </NavigationMenuContent>\n        </NavigationMenuItem>\n      </NavigationMenuList>\n    </NavigationMenu>\n  );\n}"
     },
     {
       "title": "Flexible Nextjs Link",

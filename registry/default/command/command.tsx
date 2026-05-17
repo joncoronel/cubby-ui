@@ -14,6 +14,10 @@ import {
 } from "@/registry/default/scroll-area/scroll-area";
 
 import { cn } from "@/lib/utils";
+import {
+  solidSurface,
+  type SurfaceLevel,
+} from "@/registry/default/lib/elevated";
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Search01Icon } from "@hugeicons/core-free-icons";
@@ -32,15 +36,31 @@ function Command<ItemValue>({
   autoHighlight = "always",
   open = true,
   keepHighlight = true,
+  level = 3,
+  shadowLevel = 3,
   ...props
 }: AutocompleteBase.Root.Props<ItemValue> & {
   className?: string;
+  /** Surface elevation level for the outer Command frame (1-8). Defaults to 3. Bump to 7 when used inside CommandDialog so the palette pops above the dialog. */
+  level?: SurfaceLevel;
+  /** Shadow weight (1-8). Pinned to 3 by default. */
+  shadowLevel?: SurfaceLevel;
 }) {
   return (
     <div
       data-slot="command"
+      data-level={level}
       className={cn(
-        "text-popover-foreground bg-muted flex min-h-0 flex-1 flex-col rounded-4xl p-1 dark:shadow-none",
+        // Outer frame is the "panel" — subtly lifted above the page (surface-2
+        // via bg-muted). The inner CommandContent drops back to surface-1
+        // (page color) creating a "well" inside the panel. solidSurface still
+        // contributes the rim + drop shadow (weighted by the level prop) and
+        // exposes --popup-surface for sticky descendants like CommandGroupLabel.
+        // The bg-muted override pins the outer to surface-2 regardless of the
+        // level prop — only the shadow weight is level-sensitive.
+        "text-popover-foreground flex min-h-0 flex-1 flex-col rounded-4xl p-1",
+        solidSurface(level, shadowLevel),
+        "bg-muted",
         className,
       )}
     >
@@ -167,7 +187,11 @@ function CommandContent({
     <div
       data-slot="command-content"
       className={cn(
-        "bg-card ring-border/25 dark:ring-border/10 flex min-h-0 flex-1 flex-col items-center overflow-hidden rounded-2xl ring-1",
+        // The well — drops back to surface-1 (page color) inside the
+        // surface-2 outer frame. Creates the "panel-with-cutout" feel.
+        // 1px ring defines the well's edge. Not elevated — it's the page
+        // peeking through the lifted panel.
+        "bg-surface-3 dark:bg-surface-1 ring-border/25 dark:ring-border/10 flex min-h-0 flex-1 flex-col items-center overflow-hidden rounded-2xl ring-1",
         className,
       )}
       {...props}
@@ -300,7 +324,7 @@ function CommandGroupLabel({
     <AutocompleteBase.GroupLabel
       data-slot="command-group-label"
       className={cn(
-        "text-muted-foreground bg-popover mx-2 px-2.5 py-1.5 text-xs font-semibold",
+        "text-muted-foreground mx-2 bg-(--popup-surface,var(--popover)) px-2.5 py-1.5 text-xs font-semibold",
         className,
       )}
       {...props}
@@ -333,7 +357,7 @@ function CommandItem({
       ref={ref}
       data-slot="command-item"
       className={cn(
-        "group data-highlighted:bg-accent/50 data-highlighted:text-accent-foreground data-highlighted:[&_svg:not([class*='text-'])]:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground text-foreground relative flex cursor-default items-center gap-2 rounded-md p-2.5 text-sm font-medium outline-hidden transition-[colors,background-color,box-shadow] duration-100 ease-out select-none data-disabled:pointer-events-none data-disabled:opacity-50 data-highlighted:duration-0 sm:py-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "group data-highlighted:text-accent-foreground data-highlighted:[&_svg:not([class*='text-'])]:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground text-foreground relative flex cursor-default items-center gap-2 rounded-md p-2.5 text-sm font-medium outline-hidden transition-[colors,background-color,box-shadow] duration-100 ease-out select-none data-disabled:pointer-events-none data-disabled:opacity-50 data-highlighted:bg-(--surface-hover) data-highlighted:duration-0 sm:py-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         // Spacing from list edges (matches input's calc(100%-1rem) gap)
         "mx-2",
         className,

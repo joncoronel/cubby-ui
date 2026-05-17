@@ -13,6 +13,10 @@ import {
 
 import { cn } from "@/lib/utils";
 import {
+  elevatedSurface,
+  type SurfaceLevel,
+} from "@/registry/default/lib/elevated";
+import {
   ScrollArea,
   type ScrollAreaProps,
 } from "@/registry/default/scroll-area/scroll-area";
@@ -114,6 +118,10 @@ interface SelectContentProps
     > {
   className?: string;
   size?: "default" | "sm";
+  /** Surface elevation level for the popup bg (1-8). Bump when nesting inside a Dialog or other elevated container. Defaults to 3. */
+  level?: SurfaceLevel;
+  /** Shadow weight (1-8). Pinned to 3 by default so the dropdown reads the same regardless of nesting depth. */
+  shadowLevel?: SurfaceLevel;
 }
 
 function SelectContent({
@@ -126,6 +134,8 @@ function SelectContent({
   persistScrollbar,
   hideScrollbar,
   size,
+  level = 3,
+  shadowLevel = 3,
   children,
   ...props
 }: SelectContentProps) {
@@ -142,16 +152,17 @@ function SelectContent({
         <BaseSelect.Popup
           data-slot="select-content"
           data-size={size}
+          data-level={level}
           className={cn(
             // Combobox-style popup
-            "bg-popover text-popover-foreground data-[side=none]:ring-border relative flex flex-col overflow-clip rounded-xl border bg-clip-padding data-[side=none]:border-none data-[side=none]:ring-1",
+            "text-popover-foreground relative flex flex-col overflow-clip rounded-xl bg-clip-padding",
+            // Surface elevation — bg tracks `level`, shadow weight tracks `shadowLevel` (defaults to `level`)
+            elevatedSurface(level, shadowLevel),
             // Size constraints
             "max-w-(--available-width)",
             "min-w-(--anchor-width)",
             // when data side does not equal none
             "not-data-[side=none]:max-h-(--available-height)",
-            // Shadow
-            "shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)]",
             // Animation (disabled for alignItemWithTrigger via data-[side=none] to prevent Firefox jiggle)
             "ease-out-expo origin-(--transform-origin) transition-[transform,scale,opacity] duration-100 data-[side=none]:duration-50",
             "data-ending-style:scale-97 data-ending-style:opacity-0 data-starting-style:scale-97 data-starting-style:opacity-0",
@@ -160,7 +171,7 @@ function SelectContent({
           {alignItemWithTrigger && (
             <BaseSelect.ScrollUpArrow
               data-slot="select-scroll-up-arrow"
-              className="from-popover top-0 z-1 flex w-full cursor-default items-center justify-center rounded-t-xl bg-linear-to-b from-50% to-transparent py-0.5"
+              className="from-(--popup-surface,var(--popover)) top-0 z-1 flex w-full cursor-default items-center justify-center rounded-t-xl bg-linear-to-b from-50% to-transparent py-0.5"
             >
               <HugeiconsIcon
                 className="size-4"
@@ -187,7 +198,7 @@ function SelectContent({
           {alignItemWithTrigger && (
             <BaseSelect.ScrollDownArrow
               data-slot="select-scroll-down-arrow"
-              className="from-popover bottom-0 z-1 flex w-full cursor-default items-center justify-center rounded-b-xl bg-linear-to-t from-50% to-transparent py-0.5"
+              className="from-(--popup-surface,var(--popover)) bottom-0 z-1 flex w-full cursor-default items-center justify-center rounded-b-xl bg-linear-to-t from-50% to-transparent py-0.5"
             >
               <HugeiconsIcon
                 className="size-4"
@@ -213,8 +224,9 @@ function SelectItem({ className, children, ...props }: BaseSelect.Item.Props) {
         "in-data-[size=sm]:px-2.5 in-data-[size=sm]:py-1.5",
         // Spacing from list edges
         "mx-1 first:mt-1 last:mb-1",
-        // Hover and highlight states
-        "data-highlighted:bg-accent/50 data-highlighted:text-accent-foreground",
+        // Hover and highlight states — uses --surface-hover overlay so the
+        // delta is the same regardless of the popup's surface level.
+        "data-highlighted:bg-(--surface-hover) data-highlighted:text-accent-foreground",
         // Icon and text styling
         "[&_svg:not([class*='text-'])]:text-muted-foreground",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
@@ -242,7 +254,7 @@ function SelectGroupLabel({
     <BaseSelect.GroupLabel
       data-slot="select-group-label"
       className={cn(
-        "text-muted-foreground bg-popover px-3.5 py-1.5 pt-2.5 text-xs font-semibold",
+        "text-muted-foreground bg-(--popup-surface,var(--popover)) px-3.5 py-1.5 pt-2.5 text-xs font-semibold",
         className,
       )}
       {...props}

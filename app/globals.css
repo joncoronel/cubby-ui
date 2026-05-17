@@ -24,33 +24,36 @@ html {
 
   /* Colors using light-dark() */
 
-  /* Background colors */
-  --background: light-dark(oklch(0.98 0 0), oklch(0.19 0 0));
+  /* Background colors — aliased to the surface ladder.
+     The page is surface-1; cards and floating popovers/dropdowns share
+     surface-3. Bump any of these by editing the surface ladder below;
+     the rest of the system follows. */
+  --background: var(--surface-1);
   --foreground: light-dark(oklch(0.18 0 0), oklch(0.94 0 0));
 
-  --card: light-dark(oklch(1 0 0), oklch(0.21 0 0));
-  --card-foreground: light-dark(oklch(0.27 0 0), oklch(0.94 0 0));
-  --popover: light-dark(oklch(1 0 0), oklch(0.21 0 0));
-  --popover-foreground: light-dark(oklch(0.27 0 0), oklch(0.94 0 0));
+  --card: var(--surface-3);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface-3);
+  --popover-foreground: var(--foreground);
   --primary: oklch(0.6 0.2 250);
   --primary-foreground: oklch(1 0 0);
   --neutral: light-dark(oklch(0.22 0 0), oklch(0.95 0 0));
   --neutral-foreground: light-dark(oklch(0.98 0 0), oklch(0.13 0 0));
   --secondary: light-dark(oklch(0.95 0 0), oklch(0.28 0 0));
   --secondary-foreground: light-dark(oklch(0.32 0 0), oklch(0.94 0 0));
-  --muted: light-dark(oklch(0.95 0 0), oklch(0.26 0 0));
+  --muted: light-dark(oklch(0.94 0 0), oklch(0.24 0 0));
   --muted-foreground: light-dark(oklch(0.5 0 0), oklch(0.73 0 0));
   --accent: light-dark(oklch(0.91 0 0), oklch(0.31 0 0));
   --accent-foreground: light-dark(oklch(0.22 0 0), oklch(0.95 0 0));
   --destructive: light-dark(oklch(0.53 0.19 25), oklch(0.5 0.22 25));
   --destructive-foreground: light-dark(oklch(0.98 0 0), oklch(1 0 0));
   --border: light-dark(oklch(0 0 0 / 8%), oklch(1 0 0 / 10%));
-  --input: light-dark(oklch(0.95 0 0), oklch(1 0 0 / 15%));
+  --input: light-dark(oklch(0.93 0 0), oklch(1 0 0 / 15%));
   --ring: oklch(0.55 0.2 250);
   --scrollbar: light-dark(oklch(0.87 0 0), oklch(0.7 0 0));
 
   /* Sidebar colors */
-  --sidebar: light-dark(oklch(0.98 0 0), oklch(0.19 0 0));
+  --sidebar: var(--surface-1);
   --sidebar-foreground: light-dark(oklch(0.22 0 0), oklch(0.88 0 0));
   --sidebar-primary: light-dark(oklch(0.28 0 0), oklch(0.95 0 0));
   --sidebar-primary-foreground: light-dark(oklch(0.97 0 0), oklch(0.13 0 0));
@@ -72,6 +75,157 @@ html {
   --success: light-dark(oklch(0.97 0.04 145), oklch(0.26 0.07 145));
   --success-foreground: light-dark(oklch(0.48 0.18 145), oklch(0.72 0.15 145));
   --success-border: light-dark(oklch(0.9 0.1 145), oklch(0.36 0.11 145));
+
+  /* Surface elevation ladder (1-8).
+     Light mode: surfaces 1-2 tint slightly, 3-8 stay white; shadow alone carries elevation.
+     Dark mode: progressive white-opacity tint + layered inset highlights and outer drops. */
+  --surface-1: light-dark(oklch(0.97 0 0), oklch(0.205 0 0));
+  --surface-2: light-dark(oklch(0.985 0 0), oklch(0.235 0 0));
+  --surface-3: light-dark(oklch(1 0 0), oklch(0.264 0 0));
+  --surface-4: light-dark(oklch(1 0 0), oklch(0.293 0 0));
+  --surface-5: light-dark(oklch(1 0 0), oklch(0.321 0 0));
+  --surface-6: light-dark(oklch(1 0 0), oklch(0.348 0 0));
+  --surface-7: light-dark(oklch(1 0 0), oklch(0.375 0 0));
+  --surface-8: light-dark(oklch(1 0 0), oklch(0.402 0 0));
+
+  /* State overlays — applied via `bg-(--surface-hover)` etc. These are
+     translucent overlays, so they raise the underlying surface by a fixed
+     perceptual delta no matter what level it's sitting on. Light mode uses
+     black-on-white, dark mode uses white-on-black. */
+  --surface-hover: light-dark(oklch(0 0 0 / 0.06), oklch(1 0 0 / 0.06));
+  --surface-selected: light-dark(oklch(0 0 0 / 0.1), oklch(1 0 0 / 0.1));
+
+  /* Single-edge rim color — used by viewport-flush elevated containers
+     (Sheet/Drawer in `default` variant) to paint a 1px inset line ONLY on
+     the inner-facing edge. The full 4-edge rim from --surface-rim-N doesn't
+     read correctly when 3 of 4 edges sit at the viewport boundary. */
+  --surface-rim-color: light-dark(oklch(0 0 0 / 0), oklch(1 0 0 / 0.04));
+
+  /* Light shadow recipe — single ring color, additive drop layers. */
+  --surface-shadow-color: oklch(0 0 0 / 0.06);
+  --surface-shadow-1: 0 0 0 1px var(--surface-shadow-color);
+  --surface-shadow-2:
+    0 0 0 1px var(--surface-shadow-color),
+    0 1px 1px -0.5px var(--surface-shadow-color);
+  --surface-shadow-3:
+    0 0 0 1px var(--surface-shadow-color),
+    0 1px 1px -0.5px var(--surface-shadow-color),
+    0 3px 3px -1.5px var(--surface-shadow-color);
+  --surface-shadow-4:
+    0 0 0 1px var(--surface-shadow-color),
+    0 1px 1px -0.5px var(--surface-shadow-color),
+    0 3px 3px -1.5px var(--surface-shadow-color),
+    0 6px 6px -3px var(--surface-shadow-color);
+  --surface-shadow-5:
+    0 0 0 1px var(--surface-shadow-color),
+    0 1px 1px -0.5px var(--surface-shadow-color),
+    0 3px 3px -1.5px var(--surface-shadow-color),
+    0 6px 6px -3px var(--surface-shadow-color),
+    0 12px 12px -6px var(--surface-shadow-color);
+  --surface-shadow-6:
+    0 0 0 1px var(--surface-shadow-color),
+    0 1px 1px -0.5px var(--surface-shadow-color),
+    0 3px 3px -1.5px var(--surface-shadow-color),
+    0 6px 6px -3px var(--surface-shadow-color),
+    0 12px 12px -6px var(--surface-shadow-color),
+    0 24px 24px -12px var(--surface-shadow-color);
+  --surface-shadow-7:
+    0 0 0 1px var(--surface-shadow-color),
+    0 1px 1px -0.5px var(--surface-shadow-color),
+    0 3px 3px -1.5px var(--surface-shadow-color),
+    0 6px 6px -3px var(--surface-shadow-color),
+    0 12px 12px -6px var(--surface-shadow-color),
+    0 24px 24px -12px var(--surface-shadow-color),
+    0 48px 48px -24px var(--surface-shadow-color);
+  --surface-shadow-8:
+    0 0 0 1px var(--surface-shadow-color),
+    0 1px 1px -0.5px var(--surface-shadow-color),
+    0 3px 3px -1.5px var(--surface-shadow-color),
+    0 6px 6px -3px var(--surface-shadow-color),
+    0 12px 12px -6px var(--surface-shadow-color),
+    0 24px 24px -12px var(--surface-shadow-color),
+    0 48px 48px -24px var(--surface-shadow-color),
+    0 96px 96px -48px var(--surface-shadow-color);
+
+  /* Rim overlay (inset parts of the shadow recipe).
+     Applied via a pseudo-element on elevated containers so the rim stays
+     visible above opaque children (sticky headers, group labels, etc).
+     Light mode uses outer rings only — no rim needed, so these are no-ops. */
+  --surface-rim-1: 0 0 transparent;
+  --surface-rim-2: 0 0 transparent;
+  --surface-rim-3: 0 0 transparent;
+  --surface-rim-4: 0 0 transparent;
+  --surface-rim-5: 0 0 transparent;
+  --surface-rim-6: 0 0 transparent;
+  --surface-rim-7: 0 0 transparent;
+  --surface-rim-8: 0 0 transparent;
+}
+
+/* Dark shadow recipe — outer drops only. Inset highlights/rings live in
+   --surface-rim-N below and are applied via a pseudo-element overlay so
+   they stay visible above opaque children (sticky group labels, etc). */
+[data-theme="dark"] {
+  --surface-hi-base: oklch(1 0 0 / 0.01);
+  --surface-hi-mid: oklch(1 0 0 / 0.02);
+  --surface-hi-high: oklch(1 0 0 / 0.04);
+  --surface-hi-peak: oklch(1 0 0 / 0.06);
+  --surface-ring-base: oklch(1 0 0 / 0.02);
+  --surface-ring-mid: oklch(1 0 0 / 0.04);
+  --surface-ring-high: oklch(1 0 0 / 0.06);
+  --surface-drop: oklch(0 0 0 / 0.18);
+
+  /* Drop-shadow + outer-ring portion of the dark recipe (no insets here). */
+  --surface-shadow-1: 0 0 transparent;
+  --surface-shadow-2: 0 1px 1px -0.5px var(--surface-drop);
+  --surface-shadow-3:
+    0 0 0 1px oklch(0 0 0 / 0.12), 0 1px 1px -0.5px var(--surface-drop),
+    0 3px 3px -1.5px var(--surface-drop);
+  --surface-shadow-4:
+    0 0 0 1px oklch(0 0 0 / 0.14), 0 1px 1px -0.5px var(--surface-drop),
+    0 3px 3px -1.5px var(--surface-drop), 0 6px 6px -3px var(--surface-drop);
+  --surface-shadow-5:
+    0 0 0 1px oklch(0 0 0 / 0.16), 0 1px 1px -0.5px var(--surface-drop),
+    0 3px 3px -1.5px var(--surface-drop), 0 6px 6px -3px var(--surface-drop),
+    0 12px 12px -6px var(--surface-drop);
+  --surface-shadow-6:
+    0 0 0 1px oklch(0 0 0 / 0.18), 0 1px 1px -0.5px var(--surface-drop),
+    0 3px 3px -1.5px var(--surface-drop), 0 6px 6px -3px var(--surface-drop),
+    0 12px 12px -6px var(--surface-drop), 0 24px 24px -12px var(--surface-drop);
+  --surface-shadow-7:
+    0 0 0 1px oklch(0 0 0 / 0.2), 0 1px 1px -0.5px var(--surface-drop),
+    0 3px 3px -1.5px var(--surface-drop), 0 6px 6px -3px var(--surface-drop),
+    0 12px 12px -6px var(--surface-drop), 0 24px 24px -12px var(--surface-drop),
+    0 48px 48px -24px var(--surface-drop);
+  --surface-shadow-8:
+    0 0 0 1px oklch(0 0 0 / 0.22), 0 1px 1px -0.5px var(--surface-drop),
+    0 3px 3px -1.5px var(--surface-drop), 0 6px 6px -3px var(--surface-drop),
+    0 12px 12px -6px var(--surface-drop), 0 24px 24px -12px var(--surface-drop),
+    0 48px 48px -24px var(--surface-drop), 0 96px 96px -48px var(--surface-drop);
+
+  /* Inset portion of the dark recipe — painted via a pseudo-element so
+     it always sits above opaque children (sticky labels, headers, etc). */
+  --surface-rim-1: inset 0 0 0 1px var(--surface-ring-base);
+  --surface-rim-2:
+    inset 0 1px 0 0 var(--surface-hi-base),
+    inset 0 0 0 1px var(--surface-ring-base);
+  --surface-rim-3:
+    inset 0 1px 0 0 var(--surface-hi-mid),
+    inset 0 0 0 1px var(--surface-ring-base);
+  --surface-rim-4:
+    inset 0 1px 0 0 var(--surface-hi-mid),
+    inset 0 0 0 1px var(--surface-ring-mid);
+  --surface-rim-5:
+    inset 0 1px 0 0 var(--surface-hi-high),
+    inset 0 0 0 1px var(--surface-ring-mid);
+  --surface-rim-6:
+    inset 0 1px 0 0 var(--surface-hi-high),
+    inset 0 0 0 1px var(--surface-ring-high);
+  --surface-rim-7:
+    inset 0 1px 0 0 var(--surface-hi-peak),
+    inset 0 0 0 1px var(--surface-ring-high);
+  --surface-rim-8:
+    inset 0 1px 0 0 var(--surface-hi-peak),
+    inset 0 0 0 1px var(--surface-ring-high);
 }
 
 @theme inline {
@@ -150,6 +304,34 @@ html {
   /* Inset shadows for bordered elements (applied to before pseudo-element inset by 1px) */
   --shadow-inset: 0 1px 2px 0 oklch(0 0 0 / 0.08);
   --shadow-inset-highlight: 0 -1px oklch(1 0 0 / 0.04);
+
+  /* Surface elevation utilities — generates bg-surface-{1..8} and shadow-surface-{1..8}. */
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-surface-4: var(--surface-4);
+  --color-surface-5: var(--surface-5);
+  --color-surface-6: var(--surface-6);
+  --color-surface-7: var(--surface-7);
+  --color-surface-8: var(--surface-8);
+
+  --shadow-surface-1: var(--surface-shadow-1);
+  --shadow-surface-2: var(--surface-shadow-2);
+  --shadow-surface-3: var(--surface-shadow-3);
+  --shadow-surface-4: var(--surface-shadow-4);
+  --shadow-surface-5: var(--surface-shadow-5);
+  --shadow-surface-6: var(--surface-shadow-6);
+  --shadow-surface-7: var(--surface-shadow-7);
+  --shadow-surface-8: var(--surface-shadow-8);
+
+  --shadow-surface-rim-1: var(--surface-rim-1);
+  --shadow-surface-rim-2: var(--surface-rim-2);
+  --shadow-surface-rim-3: var(--surface-rim-3);
+  --shadow-surface-rim-4: var(--surface-rim-4);
+  --shadow-surface-rim-5: var(--surface-rim-5);
+  --shadow-surface-rim-6: var(--surface-rim-6);
+  --shadow-surface-rim-7: var(--surface-rim-7);
+  --shadow-surface-rim-8: var(--surface-rim-8);
 
   @keyframes fade-in-up {
     from {

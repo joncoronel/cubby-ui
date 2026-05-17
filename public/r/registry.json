@@ -50,7 +50,8 @@
       ],
       "registryDependencies": [
         "@cubby-ui/button",
-        "@cubby-ui/scroll-area"
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -163,7 +164,8 @@
         }
       ],
       "registryDependencies": [
-        "@cubby-ui/scroll-area"
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -216,7 +218,8 @@
       ],
       "registryDependencies": [
         "@cubby-ui/button",
-        "@cubby-ui/scroll-area"
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -307,6 +310,9 @@
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/card.tsx"
         }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "class-variance-authority"
@@ -482,7 +488,8 @@
       ],
       "registryDependencies": [
         "@cubby-ui/label",
-        "@cubby-ui/scroll-area"
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -503,7 +510,8 @@
       ],
       "registryDependencies": [
         "@cubby-ui/input-group",
-        "@cubby-ui/scroll-area"
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -521,6 +529,9 @@
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/context-menu.tsx"
         }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -678,7 +689,8 @@
       ],
       "registryDependencies": [
         "@cubby-ui/button",
-        "@cubby-ui/scroll-area"
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -724,7 +736,8 @@
       ],
       "registryDependencies": [
         "@cubby-ui/button",
-        "@cubby-ui/scroll-area"
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "class-variance-authority",
@@ -744,9 +757,25 @@
           "target": "components/ui/cubby-ui/dropdown-menu.tsx"
         }
       ],
+      "registryDependencies": [
+        "@cubby-ui/elevated"
+      ],
       "dependencies": [
         "@hugeicons/react",
         "@hugeicons/core-free-icons"
+      ]
+    },
+    {
+      "name": "elevated",
+      "type": "registry:lib",
+      "title": "elevated",
+      "description": "A utility function for elevated.",
+      "files": [
+        {
+          "path": "registry/default/lib/elevated.tsx",
+          "type": "registry:lib",
+          "target": "lib/cubby-ui/elevated.tsx"
+        }
       ]
     },
     {
@@ -1098,6 +1127,9 @@
           "target": "components/ui/cubby-ui/menubar.tsx"
         }
       ],
+      "registryDependencies": [
+        "@cubby-ui/elevated"
+      ],
       "dependencies": [
         "@hugeicons/react",
         "@hugeicons/core-free-icons"
@@ -1130,6 +1162,9 @@
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/navigation-menu.tsx"
         }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "class-variance-authority"
@@ -1202,6 +1237,9 @@
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/popover.tsx"
         }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/elevated"
       ]
     },
     {
@@ -1295,7 +1333,8 @@
         }
       ],
       "registryDependencies": [
-        "@cubby-ui/scroll-area"
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "class-variance-authority",
@@ -1333,7 +1372,8 @@
       ],
       "registryDependencies": [
         "@cubby-ui/button",
-        "@cubby-ui/scroll-area"
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "class-variance-authority",
@@ -1446,6 +1486,7 @@
         }
       ],
       "registryDependencies": [
+        "@cubby-ui/elevated",
         "@cubby-ui/use-animated-height"
       ],
       "dependencies": [
@@ -1499,7 +1540,8 @@
         }
       ],
       "registryDependencies": [
-        "@cubby-ui/button"
+        "@cubby-ui/button",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "class-variance-authority",
@@ -1567,6 +1609,9 @@
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/tooltip.tsx"
         }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/elevated"
       ]
     },
     {

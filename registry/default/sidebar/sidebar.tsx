@@ -495,13 +495,13 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<"li">) {
 }
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 pl-3.5 text-left text-sm outline-hidden transition-[colors,background-color] duration-100 ease-out hover:bg-accent/80 hover:text-accent-foreground hover:duration-0 active:bg-accent active:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=true]:font-medium data-[state=open]:bg-accent data-[state=open]:text-accent-foreground group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 select-none focus-visible:outline-ring/30 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 pl-3.5 text-left text-sm outline-hidden transition-[colors,background-color] duration-100 ease-out hover:bg-(--surface-hover) hover:text-accent-foreground hover:duration-0 active:bg-(--surface-selected) active:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=true]:font-medium data-[state=open]:bg-(--surface-selected) data-[state=open]:text-accent-foreground group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 select-none focus-visible:outline-ring/30 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
   {
     variants: {
       variant: {
-        default: "hover:bg-accent/80 hover:text-accent-foreground",
+        default: "hover:bg-(--surface-hover) hover:text-accent-foreground",
         outline:
-          "bg-background shadow-xs border border-border hover:bg-accent/80 hover:text-accent-foreground",
+          "bg-background shadow-xs border border-border hover:bg-(--surface-hover) hover:text-accent-foreground",
       },
       size: {
         default: "h-8 text-sm",
@@ -707,7 +707,7 @@ function SidebarMenuSubButton({
 }) {
   const defaultProps = {
     className: cn(
-      "text-foreground hover:bg-accent/80 hover:text-accent-foreground hover:duration-0 active:bg-accent active:text-accent-foreground [&>svg]:text-muted-foreground flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2.5 py-1.5 outline-hidden transition-[colors,background-color] duration-100 ease-out select-none [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 focus-visible:outline-ring/30 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+      "text-foreground hover:bg-(--surface-hover) hover:text-accent-foreground hover:duration-0 active:bg-(--surface-selected) active:text-accent-foreground [&>svg]:text-muted-foreground flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2.5 py-1.5 outline-hidden transition-[colors,background-color] duration-100 ease-out select-none [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 focus-visible:outline-ring/30 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
       "data-[active=true]:bg-accent data-[active=true]:text-accent-foreground data-[active=true]:font-medium",
       size === "sm" && "text-xs px-2 py-1",
       size === "md" && "text-sm",

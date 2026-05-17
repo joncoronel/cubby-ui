@@ -284,7 +284,7 @@ function SortableHeader<TData>({
 		<button
 			type="button"
 			className={cn(
-				"group -mx-3 -my-2 flex w-[calc(100%+1.5rem)] cursor-pointer items-center gap-1.5 px-3 py-2 hover:bg-accent/50",
+				"group -mx-3 -my-2 flex w-[calc(100%+1.5rem)] cursor-pointer items-center gap-1.5 px-3 py-2 hover:bg-(--surface-hover)",
 				align === "right" && "justify-end",
 				align === "center" && "justify-center",
 				isFirst && "rounded-l-lg",

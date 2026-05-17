@@ -17,6 +17,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/registry/default/button/button";
+import { solidSurface } from "@/registry/default/lib/elevated";
 import "./toast.css";
 
 // Module-level managers
@@ -73,9 +74,20 @@ function upsertReplayClassName(toast: {
 
 // Shared classes for stacked toast roots (StackedToastItem + GroupedToastRoot).
 // Each callsite appends its own extras (pulse animation, overflow behavior, etc).
+// Surface elevation: level=3 (popover tier), shadowLevel=4 (heavier than a popover
+// since a toast floats unattached from any anchor). The bg uses a color-mix so
+// stacked toasts get progressively darker; the underlying surface is
+// --popup-surface (set inline as var(--surface-3)).
 const TOAST_ROOT_CLASSES = [
   // Base styles & visual
-  "text-card-foreground data-expanded:bg-card absolute z-[calc(9999-var(--toast-index))] h-(--toast-calc-height) w-full rounded-lg border bg-[color-mix(in_srgb,var(--card),var(--color-black)_calc(1%*max(0,var(--toast-index,0))))] bg-clip-padding shadow-lg/4 select-none [transition:transform_.5s_cubic-bezier(.22,1,.36,1),opacity_.5s,height_.15s,background-color_.5s]",
+  "text-popover-foreground data-expanded:bg-(--popup-surface) absolute z-[calc(9999-var(--toast-index))] h-(--toast-calc-height) w-full rounded-lg bg-clip-padding select-none [transition:transform_.5s_cubic-bezier(.22,1,.36,1),opacity_.5s,height_.15s,background-color_.5s]",
+  // Surface elevation — manual composition because the bg uses color-mix for stacking.
+  // `[--popup-surface:var(--surface-3)]` exposes the surface color to descendants;
+  // `shadow-[drops-4,rim-3]` pairs a level-4 shadow weight with a level-3 rim color.
+  "[--popup-surface:var(--surface-3)]",
+  "shadow-[var(--surface-shadow-4),var(--surface-rim-3)]",
+  // Stacked-depth bg: tints --popup-surface 1% darker per toast-index layer
+  "bg-[color-mix(in_srgb,var(--popup-surface),var(--color-black)_calc(1%*max(0,var(--toast-index,0))))]",
   // Positioning
   "data-[position*=top]:top-0 data-[position*=top]:right-0 data-[position*=top]:left-0 data-[position*=top]:origin-[50%_calc(50%-50%*min(var(--toast-index,0),1))]",
   "data-[position*=bottom]:right-0 data-[position*=bottom]:bottom-0 data-[position*=bottom]:left-0 data-[position*=bottom]:origin-[50%_calc(50%+50%*min(var(--toast-index,0),1))]",
@@ -1067,7 +1079,7 @@ function StackedToastItem({
             {showCloseButton && (
               <Toast.Close
                 data-slot="toast-close"
-                className="text-muted-foreground hover:bg-accent/50 hover:text-foreground -mt-1 -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md border-none bg-transparent transition-colors duration-200"
+                className="text-muted-foreground hover:bg-(--surface-hover) hover:text-foreground -mt-1 -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md border-none bg-transparent transition-colors duration-200"
                 aria-label="Close"
               >
                 <HugeiconsIcon
@@ -1149,8 +1161,10 @@ function AnchoredToastItem({ toast }: { toast: ToastData }) {
         data-slot="toast"
         className={cn(
           "flex w-max origin-(--transform-origin) flex-col rounded-md",
-          "bg-card text-card-foreground border",
-          "px-3 py-2 text-sm shadow-lg/4",
+          // Surface elevation — level=3 (tooltip/popover tier), shadow matches.
+          solidSurface(3, 3),
+          "text-popover-foreground",
+          "px-3 py-2 text-sm",
           "transition-all duration-200",
           "data-starting-style:scale-95 data-starting-style:opacity-0",
           "data-ending-style:scale-95 data-ending-style:opacity-0",
@@ -1159,7 +1173,7 @@ function AnchoredToastItem({ toast }: { toast: ToastData }) {
         {showArrow && (
           <Toast.Arrow
             data-slot="toast-arrow"
-            className="fill-card [&>path:first-child]:fill-card [&>path:not(:first-child)]:stroke-border"
+            className="fill-(--popup-surface,var(--card)) [&>path:first-child]:fill-(--popup-surface,var(--card)) [&>path:not(:first-child)]:stroke-border"
           />
         )}
         <Toast.Content data-slot="toast-content">
@@ -1465,7 +1479,7 @@ function GroupedSingleItemContent({
       {showCloseButton && (
         <Toast.Close
           data-slot="toast-close"
-          className="text-muted-foreground hover:bg-accent/50 hover:text-foreground -mt-1 -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md border-none bg-transparent transition-colors duration-200"
+          className="text-muted-foreground hover:bg-(--surface-hover) hover:text-foreground -mt-1 -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md border-none bg-transparent transition-colors duration-200"
           aria-label="Close"
         >
           <HugeiconsIcon
@@ -1674,9 +1688,10 @@ function GroupedToastCard({ data, isTop }: GroupedToastCardProps) {
       data-slot="grouped-toast-card"
       data-swipe-ignore
       className={cn(
-        "max-h-64 w-full overflow-y-auto overscroll-contain",
-        "ring-border bg-card text-card-foreground rounded-lg ring-1",
-        "shadow-lg/4",
+        "max-h-64 w-full overflow-y-auto overscroll-contain rounded-lg",
+        // Surface elevation — level=5 because it pops above the level-3 toast.
+        solidSurface(5, 5),
+        "text-popover-foreground",
         "animate-in fade-in-0 zoom-in-95",
         isTop ? "slide-in-from-top-2" : "slide-in-from-bottom-2",
       )}
@@ -1798,7 +1813,7 @@ function CompletedItemRow({ item, showSeparator }: CompletedItemRowProps) {
         <div
           data-slot="completed-item-progress"
           className={cn(
-            "bg-card absolute inset-0 origin-left",
+            "bg-(--popup-surface,var(--card)) absolute inset-0 origin-left",
             "animate-[progress-fill_var(--dismiss-duration)_linear_forwards]",
             "[animation-delay:var(--animation-delay)]",
           )}
@@ -1879,9 +1894,12 @@ function CompletedItemsCard({ items, isTop }: CompletedItemsCardProps) {
       data-slot="completed-items-card"
       data-swipe-ignore
       className={cn(
-        "max-h-48 w-full overflow-y-auto overscroll-contain",
-        "ring-border bg-muted text-card-foreground rounded-lg ring-1",
-        "shadow-lg/4",
+        "max-h-48 w-full overflow-y-auto overscroll-contain rounded-lg",
+        // bg stays as `bg-muted` (intentionally recessed/quiet vs the active card),
+        // but the shadow + rim come from the elevation system at level=5 to pair
+        // with the GroupedToastCard above it.
+        "bg-muted text-popover-foreground",
+        "shadow-[var(--surface-shadow-5),var(--surface-rim-5)]",
         "animate-in fade-in-0 zoom-in-95",
         isTop ? "slide-in-from-top-2" : "slide-in-from-bottom-2",
       )}

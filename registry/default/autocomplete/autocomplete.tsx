@@ -2,6 +2,10 @@ import * as React from "react";
 import { Autocomplete as BaseAutocomplete } from "@base-ui/react/autocomplete";
 import { cn } from "@/lib/utils";
 import {
+  elevatedSurface,
+  type SurfaceLevel,
+} from "@/registry/default/lib/elevated";
+import {
   ScrollArea,
   type ScrollAreaProps,
 } from "@/registry/default/scroll-area/scroll-area";
@@ -149,13 +153,24 @@ function AutocompletePositioner({
 
 function AutocompletePopup({
   className,
+  level = 3,
+  shadowLevel = 3,
   ...props
-}: BaseAutocomplete.Popup.Props) {
+}: BaseAutocomplete.Popup.Props & {
+  /** Surface elevation level for the popup bg (1-8). Bump when nesting inside a Dialog. Defaults to 3. */
+  level?: SurfaceLevel;
+  /** Shadow weight (1-8). Pinned to 3 by default so the autocomplete reads the same regardless of nesting depth. */
+  shadowLevel?: SurfaceLevel;
+}) {
   return (
     <BaseAutocomplete.Popup
       data-slot="autocomplete-popup"
+      data-level={level}
       className={cn(
-        "bg-popover text-popover-foreground ring-border ease-out-expo flex max-h-(--available-height) w-(--anchor-width) max-w-(--available-width) origin-(--transform-origin) flex-col overflow-clip overscroll-contain rounded-xl shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)] ring-1 transition-[transform,scale,opacity] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
+        "text-popover-foreground ease-out-expo flex max-h-(--available-height) w-(--anchor-width) max-w-(--available-width) origin-(--transform-origin) flex-col overflow-clip overscroll-contain rounded-xl transition-[transform,scale,opacity] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
+        // Use elevatedSurface (rim on ::after) because group labels can be
+        // sticky and would otherwise hide the rim where they sit.
+        elevatedSurface(level, shadowLevel),
         className,
       )}
       {...props}
@@ -179,7 +194,7 @@ function AutocompleteArrow({
       <svg width="20" height="10" viewBox="0 0 20 10" fill="none">
         <path
           d="M9.66437 2.60207L4.80758 6.97318C4.07308 7.63423 3.11989 8 2.13172 8H0V9H20V8H18.5349C17.5468 8 16.5936 7.63423 15.8591 6.97318L11.0023 2.60207C10.622 2.2598 10.0447 2.25979 9.66437 2.60207Z"
-          className="fill-popover"
+          className="fill-(--popup-surface,var(--popover))"
         />
         <path
           d="M10.3333 3.34539L5.47654 7.71648C4.55842 8.54279 3.36693 9 2.13172 9H0V8H2.13172C3.11989 8 4.07308 7.63423 4.80758 6.97318L9.66437 2.60207C10.0447 2.25979 10.622 2.2598 11.0023 2.60207L15.8591 6.97318C16.5936 7.63423 17.5468 8 18.5349 8H20V9H18.5349C17.2998 9 16.1083 8.54278 15.1901 7.71648L10.3333 3.34539Z"
@@ -339,7 +354,7 @@ function AutocompleteItem({
       ref={ref}
       data-slot="autocomplete-item"
       className={cn(
-        "data-highlighted:bg-accent/50 data-highlighted:text-accent-foreground relative flex cursor-default items-center rounded-md px-2.5 py-2 text-sm outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60",
+        "data-highlighted:bg-(--surface-hover) data-highlighted:text-accent-foreground relative flex cursor-default items-center rounded-md px-2.5 py-2 text-sm outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60",
         // Spacing from list edges
         "mx-1 first:mt-1 last:mb-1",
         className,
@@ -370,7 +385,7 @@ function AutocompleteGroupLabel({
     <BaseAutocomplete.GroupLabel
       data-slot="autocomplete-group-label"
       className={cn(
-        "text-muted-foreground bg-popover px-3.5 py-1.5 pt-2.5 text-xs font-semibold",
+        "text-muted-foreground bg-(--popup-surface,var(--popover)) px-3.5 py-1.5 pt-2.5 text-xs font-semibold",
         className,
       )}
       {...props}

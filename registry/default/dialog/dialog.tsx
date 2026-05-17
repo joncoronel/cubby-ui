@@ -5,6 +5,10 @@ import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import { cn } from "@/lib/utils";
 import { Button } from "@/registry/default/button/button";
 import {
+  solidSurface,
+  type SurfaceLevel,
+} from "@/registry/default/lib/elevated";
+import {
   ScrollArea,
   type ScrollAreaProps,
 } from "@/registry/default/scroll-area/scroll-area";
@@ -82,10 +86,16 @@ function DialogContent({
   children,
   showCloseButton = true,
   variant = "default",
+  level = 5,
+  shadowLevel = 5,
   ...props
 }: BaseDialog.Popup.Props & {
   showCloseButton?: boolean;
   variant?: "default" | "inset";
+  /** Surface elevation level for the dialog bg (1-8). Defaults to 5 — the standard "dialog tier" above page/cards/popovers. Bump to 7 for a hero/critical modal. */
+  level?: SurfaceLevel;
+  /** Shadow weight (1-8). Pinned to 5 by default — matches the dialog tier, dramatic enough to anchor the modal without overpowering. Bump to 7 for hero modals. */
+  shadowLevel?: SurfaceLevel;
 }) {
   const { modal } = React.useContext(DialogConfigContext);
   const isModal = modal === true;
@@ -96,9 +106,12 @@ function DialogContent({
         <BaseDialog.Popup
           data-slot="dialog-content"
           data-variant={variant}
+          data-level={level}
           className={cn(
-            "bg-popover text-popover-foreground relative z-50 flex max-h-full min-h-0 w-full max-w-full min-w-0 flex-col overflow-hidden shadow-lg",
-            "ring-border rounded-2xl ring-1 sm:max-w-lg",
+            "text-popover-foreground relative z-50 flex max-h-full min-h-0 w-full max-w-full min-w-0 flex-col overflow-hidden",
+            "rounded-2xl sm:max-w-lg",
+            // Surface elevation — bg + shadow + rim overlay (rim uses ::after at z-[2])
+            solidSurface(level, shadowLevel),
             // Mobile: bottom sheet style
             // "right-0 bottom-0 left-0 rounded-t-lg",
             // Desktop: centered modal
@@ -111,10 +124,10 @@ function DialogContent({
             // Desktop animations: scale and fade
             "data-starting-style:translate-y-[calc(1.25rem)] data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:translate-y-[calc(1.25rem)] data-ending-style:scale-95 data-ending-style:opacity-0",
-            // Nested dialog overlay (hidden by default, fades in/out using allow-discrete)
-            "after:pointer-events-none after:absolute after:inset-0 after:hidden after:rounded-[inherit] after:bg-black/5 after:opacity-0 after:transition-[opacity,display] after:transition-discrete after:duration-200",
-            "data-nested-dialog-open:after:block data-nested-dialog-open:after:opacity-100",
-            "starting:data-nested-dialog-open:after:opacity-0",
+            // Nested dialog overlay — uses ::before (not ::after, that's the rim) at z-[3] so it paints above content AND above the rim
+            "before:pointer-events-none before:absolute before:inset-0 before:z-3 before:hidden before:rounded-[inherit] before:bg-black/5 before:opacity-0 before:transition-[opacity,display] before:transition-discrete before:duration-200",
+            "data-nested-dialog-open:before:block data-nested-dialog-open:before:opacity-100",
+            "starting:data-nested-dialog-open:before:opacity-0",
             !isModal && "pointer-events-auto",
             className,
           )}

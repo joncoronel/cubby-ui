@@ -1,0 +1,243 @@
+---
+title: Surfaces
+description: An eight-level elevation system for popovers, dropdowns, dialogs, sheets, and drawers — so floating UI stays visible at any nesting depth, in both light and dark mode.
+---
+
+## Overview
+
+Cubby UI's elevation system is an eight-step ladder of substrate colors and shadow recipes. Every floating component — Popover, Dropdown, Dialog, Sheet, Drawer, and so on — picks a level on this ladder. The system is designed so that a popover opened *inside* a dialog still clearly pops above the dialog, even three layers deep.
+
+Inspired by [fluidfunctionalism.com/elevated](https://www.fluidfunctionalism.com/elevated), adapted to a prop-based API instead of context.
+
+### Why eight levels
+
+Most apps need three or four. The full eight-level ladder exists so a nested case never collapses:
+
+```
+Page             →  surface-1
+Card on page     →  surface-2
+Popover          →  surface-3
+Dropdown         →  surface-3
+Dialog           →  surface-5
+Popover in dialog→  surface-7
+Theoretical max  →  surface-8
+```
+
+In light mode the upper levels (3–8) are all pure white — shadows do the heavy lifting. In dark mode the colors progress from `#171717` to `#484848` so each layer reads as visibly lifted.
+
+## Quick start
+
+Every elevated component (Popover, Dropdown, Dialog, Sheet, etc.) accepts a `level` and `shadowLevel` prop. The defaults match most cases. You only override when nesting deeper than usual.
+
+```tsx
+// Defaults — uses level=3, shadowLevel=3
+<Popover>
+  <PopoverTrigger>Open</PopoverTrigger>
+  <PopoverContent>Default popover</PopoverContent>
+</Popover>
+
+// Inside a Dialog (substrate=5), bump the inner popover to level=7
+<Dialog>
+  <DialogContent>
+    <Popover>
+      <PopoverTrigger>Open inside dialog</PopoverTrigger>
+      <PopoverContent level={7}>Pops above the dialog</PopoverContent>
+    </Popover>
+  </DialogContent>
+</Dialog>
+```
+
+That's the whole API for consumers. `shadowLevel` is independent of `level`: it controls the drop-shadow weight, which is pinned per-component so a popover always reads visually like a popover regardless of depth.
+
+## The ladder
+
+### Substrate colors
+
+| Level | Light | Dark | Typical use |
+|---|---|---|---|
+| `surface-1` | `oklch(0.97)` | `oklch(0.205)` (#171717) | Page background |
+| `surface-2` | `oklch(0.985)` | `oklch(0.235)` (#1E1E1E) | Cards, sidebars, inline toolbars |
+| `surface-3` | `oklch(1)` | `oklch(0.264)` (#252525) | Popovers, dropdowns, tooltips |
+| `surface-4` | `oklch(1)` | `oklch(0.293)` (#2C2C2C) | (Transitional) |
+| `surface-5` | `oklch(1)` | `oklch(0.321)` (#333333) | Dialogs, sheets, drawers |
+| `surface-6` | `oklch(1)` | `oklch(0.348)` (#3A3A3A) | (Transitional) |
+| `surface-7` | `oklch(1)` | `oklch(0.375)` (#414141) | Popovers nested inside dialogs |
+| `surface-8` | `oklch(1)` | `oklch(0.402)` (#484848) | Maximum elevation — rare |
+
+The named tokens you've used elsewhere are aliased to the ladder:
+
+```css
+--background: var(--surface-1);
+--card:       var(--surface-2);
+--popover:    var(--surface-3);
+```
+
+If you tune the ladder, `bg-background`, `bg-card`, and `bg-popover` follow automatically.
+
+### Shadow recipes
+
+Shadows scale with the visual weight of the floating element, not its surface level:
+
+| Shadow | Drop layers | Visual feel |
+|---|---|---|
+| `shadow-surface-1` | 0 (just a 1px ring) | Barely there |
+| `shadow-surface-2` | 1 | Tooltip / quiet |
+| `shadow-surface-3` | 2 | **Dropdown / popover** |
+| `shadow-surface-4` | 3 | (Transitional) |
+| `shadow-surface-5` | 4 | **Dialog / sheet** |
+| `shadow-surface-7` | 6 | Dramatic — hero modals |
+| `shadow-surface-8` | 7 | Maximum gravity — rare |
+
+The dark recipe additionally adds an inset highlight + inset ring that gives elevated surfaces a "lit from above" feel. In light mode, those insets are no-ops (light mode relies on the drop shadow alone).
+
+### Size rule of thumb
+
+When picking `shadowLevel`:
+
+- Element width < ~400px → `3`
+- Element width ~400–800px → `5`
+- Element width > ~800px or fullscreen → `7`
+- Never let `shadowLevel` exceed `level` by more than 2
+
+## Default levels per component
+
+You usually don't need to think about these — the defaults are tuned for the typical case.
+
+| Component | Default `level` | Default `shadowLevel` |
+|---|---|---|
+| Tooltip | `2` | `2` |
+| Popover | `3` | `3` |
+| Dropdown menu | `3` | `3` |
+| Dropdown sub-menu | `5` | `3` |
+| Context menu | `3` | `3` |
+| Menubar (the bar) | `2` | `2` |
+| Menubar dropdown | `3` | `3` |
+| Select | `3` | `3` |
+| Toast | `3` | `4` |
+| Dialog | `5` | `5` |
+| Alert dialog | `5` | `5` |
+| Sheet | `5` | `5` |
+| Drawer | `5` | `5` |
+| Command / Combobox | `3` | `3` |
+
+When in doubt: leave the defaults alone, bump `level` (not `shadowLevel`) when nesting.
+
+## State overlays
+
+Hover and selected backgrounds use translucent overlays so they always raise the underlying surface by a fixed perceptual delta, regardless of what level the surface sits at:
+
+```css
+--surface-hover:    light-dark(oklch(0 0 0 / 0.04), oklch(1 0 0 / 0.06));
+--surface-selected: light-dark(oklch(0 0 0 / 0.08), oklch(1 0 0 / 0.10));
+```
+
+Apply them on interactive items:
+
+```tsx
+<div className="bg-(--surface-hover)">Hovered row</div>
+<div className="bg-(--surface-selected)">Active row</div>
+```
+
+Because they're overlays (not fixed colors), `bg-(--surface-hover)` on a `surface-3` row brightens by the same perceptual step as on a `surface-7` row. Hover always reads as hover, even deeply nested.
+
+## Building your own elevated containers
+
+Three helpers live in `@/lib/cubby-ui/elevated`. Each returns Tailwind class strings — drop them on whatever element you want elevated.
+
+### `solidSurface(level, shadowLevel?)`
+
+**Default choice.** Returns `bg-surface-N`, the combined drop + rim shadow, and exposes `--popup-surface` for descendants.
+
+```tsx
+import { solidSurface } from "@/lib/cubby-ui/elevated";
+
+function Card({ children }) {
+  return (
+    <div className={solidSurface(3)}>{children}</div>
+  );
+}
+```
+
+Use this for any floating container that doesn't have sticky or opaque children near its edges.
+
+### `elevatedSurface(level, shadowLevel?)`
+
+Same effect as `solidSurface`, but paints the rim on an `::after` pseudo-element at `z-[2]` instead of on the popup's own box-shadow. Use this when sticky or opaque children might cover the rim (Select's sticky group labels are the canonical case).
+
+```tsx
+import { elevatedSurface } from "@/lib/cubby-ui/elevated";
+
+function MenuWithStickyHeader({ children }) {
+  return (
+    <div className={`relative overflow-clip rounded-xl ${elevatedSurface(3)}`}>
+      <div className="sticky top-0 bg-(--popup-surface)">Sticky header</div>
+      {children}
+    </div>
+  );
+}
+```
+
+Requires the host to be positioned (`relative` or otherwise) and have a border-radius for the rim to clip correctly.
+
+### `surfaceClasses(level, shadowLevel?)`
+
+The primitive — just `bg-surface-N` + drops, no rim. Building block for specialized treatments. The viewport-flush Sheet and Drawer variants use this together with `innerEdgeRim(side)` to paint a rim only on the inner-facing edge (a full four-edge rim would render as a thin line along the screen edge).
+
+```tsx
+import { surfaceClasses, innerEdgeRim } from "@/lib/cubby-ui/elevated";
+
+// Right-flush sheet — rim on the left (inner-facing) edge only
+function RightSheet({ children }) {
+  return (
+    <div
+      className={`fixed inset-y-0 right-0 ${surfaceClasses(5)} ${innerEdgeRim("left")}`}
+    >
+      {children}
+    </div>
+  );
+}
+```
+
+## Tracking the level from descendants
+
+When you set `level` on a popup, the helpers automatically expose `--popup-surface` as a CSS variable on that element. Children can match the popup's bg color without hardcoding a level:
+
+```tsx
+// Arrow that matches whatever level the popup is at
+<svg className="fill-(--popup-surface,var(--popover))" />
+
+// Sticky label inside a Select that blends with the popup bg
+<div className="sticky top-0 bg-(--popup-surface)">Group label</div>
+```
+
+The fallback `var(--popover)` keeps things working if the var isn't set in some context.
+
+## Token reference
+
+All tokens live on `:root` and are exposed as Tailwind utilities via `@theme inline`.
+
+### Substrate
+
+```css
+--surface-1 .. --surface-8       /* substrate colors */
+--shadow-surface-1 .. -8         /* drop shadow recipes (Tailwind: shadow-surface-N) */
+--surface-rim-1 .. -8            /* inset rim recipes (Tailwind: shadow-surface-rim-N) */
+```
+
+### State
+
+```css
+--surface-hover                  /* +4% perceived brightness overlay */
+--surface-selected               /* +8% perceived brightness overlay */
+--surface-rim-color              /* single-edge rim color (flush sheets) */
+```
+
+### Aliases
+
+```css
+--background  →  var(--surface-1)
+--card        →  var(--surface-2)
+--popover     →  var(--surface-3)
+```
+
+Tune any token in your `globals.css` to customize the system without changing the components.

@@ -25,25 +25,25 @@ export default function SheetBasic() {
           <nav className="flex flex-col gap-1">
             <a
               href="#"
-              className="hover:bg-muted rounded-md px-3 py-2 text-sm font-medium"
+              className="hover:bg-(--surface-hover) rounded-md px-3 py-2 text-sm font-medium"
             >
               Dashboard
             </a>
             <a
               href="#"
-              className="hover:bg-muted rounded-md px-3 py-2 text-sm font-medium"
+              className="hover:bg-(--surface-hover) rounded-md px-3 py-2 text-sm font-medium"
             >
               Projects
             </a>
             <a
               href="#"
-              className="hover:bg-muted rounded-md px-3 py-2 text-sm font-medium"
+              className="hover:bg-(--surface-hover) rounded-md px-3 py-2 text-sm font-medium"
             >
               Team
             </a>
             <a
               href="#"
-              className="hover:bg-muted rounded-md px-3 py-2 text-sm font-medium"
+              className="hover:bg-(--surface-hover) rounded-md px-3 py-2 text-sm font-medium"
             >
               Settings
             </a>

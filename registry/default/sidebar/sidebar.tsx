@@ -439,7 +439,7 @@ function SidebarGroupAction({
 }) {
   const defaultProps = {
     className: cn(
-      "text-foreground hover:bg-accent hover:text-accent-foreground hover:duration-0 absolute top-3.5 right-3 flex aspect-square w-5 items-center justify-center rounded-md p-0 outline-hidden transition-[colors,background-color] duration-100 ease-out [&>svg]:size-4 [&>svg]:shrink-0 focus-visible:outline-ring/30 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+      "text-foreground hover:bg-(--surface-hover) hover:text-accent-foreground hover:duration-0 absolute top-3.5 right-3 flex aspect-square w-5 items-center justify-center rounded-md p-0 outline-hidden transition-[colors,background-color] duration-100 ease-out [&>svg]:size-4 [&>svg]:shrink-0 focus-visible:outline-ring/30 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
       // Increases the hit area of the button on mobile.
       "after:absolute after:-inset-2 md:after:hidden",
       "group-data-[collapsible=icon]:hidden",
@@ -581,7 +581,7 @@ function SidebarMenuAction({
 }) {
   const defaultProps = {
     className: cn(
-      "text-muted-foreground hover:bg-accent hover:text-accent-foreground hover:duration-0 peer-hover/menu-button:text-accent-foreground absolute top-1.5 right-1 flex aspect-square w-5 items-center justify-center rounded-md p-0 outline-hidden transition-[colors,background-color] duration-100 ease-out [&>svg]:size-4 [&>svg]:shrink-0 focus-visible:outline-ring/30 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+      "text-muted-foreground hover:bg-(--surface-hover) hover:text-accent-foreground hover:duration-0 peer-hover/menu-button:text-accent-foreground absolute top-1.5 right-1 flex aspect-square w-5 items-center justify-center rounded-md p-0 outline-hidden transition-[colors,background-color] duration-100 ease-out [&>svg]:size-4 [&>svg]:shrink-0 focus-visible:outline-ring/30 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
       // Increases the hit area of the button on mobile.
       "after:absolute after:-inset-2 md:after:hidden",
       "peer-data-[size=sm]/menu-button:top-1",
@@ -708,7 +708,7 @@ function SidebarMenuSubButton({
   const defaultProps = {
     className: cn(
       "text-foreground hover:bg-(--surface-hover) hover:text-accent-foreground hover:duration-0 active:bg-(--surface-selected) active:text-accent-foreground [&>svg]:text-muted-foreground flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2.5 py-1.5 outline-hidden transition-[colors,background-color] duration-100 ease-out select-none [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 focus-visible:outline-ring/30 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
-      "data-[active=true]:bg-accent data-[active=true]:text-accent-foreground data-[active=true]:font-medium",
+      "data-[active=true]:bg-(--surface-selected) data-[active=true]:text-accent-foreground data-[active=true]:font-medium",
       size === "sm" && "text-xs px-2 py-1",
       size === "md" && "text-sm",
       "group-data-[collapsible=icon]:hidden",

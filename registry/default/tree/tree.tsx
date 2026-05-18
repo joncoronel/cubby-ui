@@ -708,10 +708,10 @@ function TreeItemInternal<
             <div
               className={cn(
                 "flex flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors",
-                "hover:bg-accent",
+                "hover:bg-(--surface-hover)",
                 isSelected &&
                   !context.disableSelection &&
-                  "bg-accent text-accent-foreground",
+                  "bg-(--surface-selected) text-accent-foreground",
                 isDisabled && "cursor-not-allowed opacity-50",
               )}
             >
@@ -802,10 +802,10 @@ function TreeItemInternal<
             <div
               className={cn(
                 "flex flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors",
-                "hover:bg-accent",
+                "hover:bg-(--surface-hover)",
                 isSelected &&
                   !context.disableSelection &&
-                  "bg-accent text-accent-foreground",
+                  "bg-(--surface-selected) text-accent-foreground",
                 isDisabled && "cursor-not-allowed opacity-50",
               )}
             >

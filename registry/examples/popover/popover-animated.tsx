@@ -86,13 +86,13 @@ function ProfilePanel() {
       <div className="border-border mt-3 flex flex-col gap-1 border-t pt-3">
         <a
           href="#"
-          className="hover:bg-accent rounded-md px-2 py-1.5 text-sm transition-colors"
+          className="hover:bg-(--surface-hover) rounded-md px-2 py-1.5 text-sm transition-colors"
         >
           Profile settings
         </a>
         <a
           href="#"
-          className="hover:bg-accent rounded-md px-2 py-1.5 text-sm transition-colors"
+          className="hover:bg-(--surface-hover) rounded-md px-2 py-1.5 text-sm transition-colors"
         >
           Log out
         </a>

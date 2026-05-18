@@ -22,6 +22,19 @@ html {
   /* --fd-layout-width: 100vw; */
   /* --fd-page-width: 1232px; */
 
+  /* Neutral tint — applied to every neutral via oklch().
+     Change these two values to retune the entire surface/foreground stack:
+     --neutral-hue     : hue angle for the tint (0–360). Brand-direction.
+     --neutral-chroma  : chroma for mid-tone neutrals (L roughly 0.10–0.95).
+     --neutral-chroma-low : chroma for near-extreme L (> 0.95 or < 0.05),
+                            kept lower because high chroma at extremes looks
+                            garish (impeccable rule).
+     Pure-black / pure-white translucent overlays stay at chroma 0 — they
+     borrow their visible color from the tinted substrate via alpha. */
+  --neutral-hue: 275;
+  --neutral-chroma: 0.004;
+  --neutral-chroma-low: 0.002;
+
   /* Colors using light-dark() */
 
   /* Background colors — aliased to the surface ladder.
@@ -29,7 +42,10 @@ html {
      surface-3. Bump any of these by editing the surface ladder below;
      the rest of the system follows. */
   --background: var(--surface-1);
-  --foreground: light-dark(oklch(0.18 0 0), oklch(0.94 0 0));
+  --foreground: light-dark(
+    oklch(0.18 var(--neutral-chroma) var(--neutral-hue)),
+    oklch(0.94 var(--neutral-chroma) var(--neutral-hue))
+  );
 
   --card: var(--surface-3);
   --card-foreground: var(--foreground);
@@ -37,30 +53,81 @@ html {
   --popover-foreground: var(--foreground);
   --primary: oklch(0.6 0.2 250);
   --primary-foreground: oklch(1 0 0);
-  --neutral: light-dark(oklch(0.22 0 0), oklch(0.95 0 0));
-  --neutral-foreground: light-dark(oklch(0.98 0 0), oklch(0.13 0 0));
-  --secondary: light-dark(oklch(0.95 0 0), oklch(0.28 0 0));
-  --secondary-foreground: light-dark(oklch(0.32 0 0), oklch(0.94 0 0));
-  --muted: light-dark(oklch(0.94 0 0), oklch(0.24 0 0));
-  --muted-foreground: light-dark(oklch(0.5 0 0), oklch(0.73 0 0));
-  --accent: light-dark(oklch(0.91 0 0), oklch(0.31 0 0));
-  --accent-foreground: light-dark(oklch(0.22 0 0), oklch(0.95 0 0));
+  --neutral: light-dark(
+    oklch(0.22 0 0),
+    oklch(0.95 var(--neutral-chroma) var(--neutral-hue))
+  );
+  --neutral-foreground: light-dark(
+    oklch(0.98 var(--neutral-chroma-low) var(--neutral-hue)),
+    oklch(0.13 var(--neutral-chroma) var(--neutral-hue))
+  );
+  --secondary: light-dark(
+    oklch(0.95 0 0),
+    oklch(0.28 var(--neutral-chroma) var(--neutral-hue))
+  );
+  --secondary-foreground: light-dark(
+    oklch(0.32 var(--neutral-chroma) var(--neutral-hue)),
+    oklch(0.94 var(--neutral-chroma) var(--neutral-hue))
+  );
+  --muted: light-dark(
+    oklch(0.94 0 0),
+    oklch(0.24 var(--neutral-chroma) var(--neutral-hue))
+  );
+  --muted-foreground: light-dark(
+    oklch(0.5 var(--neutral-chroma) var(--neutral-hue)),
+    oklch(0.73 var(--neutral-chroma) var(--neutral-hue))
+  );
+  --accent: light-dark(
+    oklch(0.91 0 0),
+    oklch(0.31 var(--neutral-chroma) var(--neutral-hue))
+  );
+  --accent-foreground: light-dark(
+    oklch(0.22 var(--neutral-chroma) var(--neutral-hue)),
+    oklch(0.95 var(--neutral-chroma) var(--neutral-hue))
+  );
   --destructive: light-dark(oklch(0.53 0.19 25), oklch(0.5 0.22 25));
-  --destructive-foreground: light-dark(oklch(0.98 0 0), oklch(1 0 0));
+  --destructive-foreground: light-dark(
+    oklch(0.98 var(--neutral-chroma-low) var(--neutral-hue)),
+    oklch(1 0 0)
+  );
   --border: light-dark(oklch(0 0 0 / 8%), oklch(1 0 0 / 10%));
   --input: light-dark(oklch(0.93 0 0), oklch(1 0 0 / 15%));
   --ring: oklch(0.55 0.2 250);
-  --scrollbar: light-dark(oklch(0.87 0 0), oklch(0.7 0 0));
+  --scrollbar: light-dark(
+    oklch(0.87 0 0),
+    oklch(0.7 var(--neutral-chroma) var(--neutral-hue))
+  );
 
   /* Sidebar colors */
   --sidebar: var(--surface-1);
-  --sidebar-foreground: light-dark(oklch(0.22 0 0), oklch(0.88 0 0));
-  --sidebar-primary: light-dark(oklch(0.28 0 0), oklch(0.95 0 0));
-  --sidebar-primary-foreground: light-dark(oklch(0.97 0 0), oklch(0.13 0 0));
-  --sidebar-accent: light-dark(oklch(0.92 0 0), oklch(0.19 0 0));
-  --sidebar-accent-foreground: light-dark(oklch(0.28 0 0), oklch(0.95 0 0));
-  --sidebar-border: light-dark(oklch(0.9 0 0), oklch(0.28 0 0));
-  --sidebar-ring: light-dark(oklch(0.65 0 0), oklch(0.83 0 0));
+  --sidebar-foreground: light-dark(
+    oklch(0.22 var(--neutral-chroma) var(--neutral-hue)),
+    oklch(0.88 var(--neutral-chroma) var(--neutral-hue))
+  );
+  --sidebar-primary: light-dark(
+    oklch(0.28 0 0),
+    oklch(0.95 var(--neutral-chroma) var(--neutral-hue))
+  );
+  --sidebar-primary-foreground: light-dark(
+    oklch(0.97 var(--neutral-chroma) var(--neutral-hue)),
+    oklch(0.13 var(--neutral-chroma) var(--neutral-hue))
+  );
+  --sidebar-accent: light-dark(
+    oklch(0.92 0 0),
+    oklch(0.19 var(--neutral-chroma) var(--neutral-hue))
+  );
+  --sidebar-accent-foreground: light-dark(
+    oklch(0.28 var(--neutral-chroma) var(--neutral-hue)),
+    oklch(0.95 var(--neutral-chroma) var(--neutral-hue))
+  );
+  --sidebar-border: light-dark(
+    oklch(0.9 var(--neutral-chroma) var(--neutral-hue)),
+    oklch(0.28 var(--neutral-chroma) var(--neutral-hue))
+  );
+  --sidebar-ring: light-dark(
+    oklch(0.65 var(--neutral-chroma) var(--neutral-hue)),
+    oklch(0.83 var(--neutral-chroma) var(--neutral-hue))
+  );
 
   /* Status colors - derived from primary (hue 250) */
   --danger: light-dark(oklch(0.97 0.04 25), oklch(0.26 0.07 25));
@@ -77,16 +144,43 @@ html {
   --success-border: light-dark(oklch(0.9 0.1 145), oklch(0.36 0.11 145));
 
   /* Surface elevation ladder (1-8).
-     Light mode: surfaces 1-2 tint slightly, 3-8 stay white; shadow alone carries elevation.
-     Dark mode: progressive white-opacity tint + layered inset highlights and outer drops. */
-  --surface-1: light-dark(oklch(0.97 0 0), oklch(0.205 0 0));
-  --surface-2: light-dark(oklch(0.985 0 0), oklch(0.235 0 0));
-  --surface-3: light-dark(oklch(1 0 0), oklch(0.264 0 0));
-  --surface-4: light-dark(oklch(1 0 0), oklch(0.293 0 0));
-  --surface-5: light-dark(oklch(1 0 0), oklch(0.321 0 0));
-  --surface-6: light-dark(oklch(1 0 0), oklch(0.348 0 0));
-  --surface-7: light-dark(oklch(1 0 0), oklch(0.375 0 0));
-  --surface-8: light-dark(oklch(1 0 0), oklch(0.402 0 0));
+     Light mode: all surfaces stay neutral (no chroma) — light is the "clean canvas"
+       mode. surfaces 3-8 are pure white; 1-2 step down through pure neutral grays.
+       Shadow alone carries elevation here.
+     Dark mode: progressive lightness step + neutral-chroma tint + layered
+       inset highlights and outer drops; the brand tint expresses here. */
+  --surface-1: light-dark(
+    oklch(0.97 0 0),
+    oklch(0.205 var(--neutral-chroma) var(--neutral-hue))
+  );
+  --surface-2: light-dark(
+    oklch(0.985 0 0),
+    oklch(0.235 var(--neutral-chroma) var(--neutral-hue))
+  );
+  --surface-3: light-dark(
+    oklch(1 0 0),
+    oklch(0.264 var(--neutral-chroma) var(--neutral-hue))
+  );
+  --surface-4: light-dark(
+    oklch(1 0 0),
+    oklch(0.293 var(--neutral-chroma) var(--neutral-hue))
+  );
+  --surface-5: light-dark(
+    oklch(1 0 0),
+    oklch(0.321 var(--neutral-chroma) var(--neutral-hue))
+  );
+  --surface-6: light-dark(
+    oklch(1 0 0),
+    oklch(0.348 var(--neutral-chroma) var(--neutral-hue))
+  );
+  --surface-7: light-dark(
+    oklch(1 0 0),
+    oklch(0.375 var(--neutral-chroma) var(--neutral-hue))
+  );
+  --surface-8: light-dark(
+    oklch(1 0 0),
+    oklch(0.402 var(--neutral-chroma) var(--neutral-hue))
+  );
 
   /* State overlays — applied via `bg-(--surface-hover)` etc. These are
      translucent overlays, so they raise the underlying surface by a fixed

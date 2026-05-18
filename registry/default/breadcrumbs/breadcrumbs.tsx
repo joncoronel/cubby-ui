@@ -1,8 +1,12 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import { solidSurface } from "@/registry/default/lib/elevated";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowRight01Icon, MoreHorizontalIcon } from "@hugeicons/core-free-icons";
+import {
+  ArrowRight01Icon,
+  MoreHorizontalIcon,
+} from "@hugeicons/core-free-icons";
 type BreadcrumbSize = "sm" | "md" | "lg";
 
 interface BreadcrumbProps extends React.ComponentProps<"nav"> {
@@ -36,7 +40,9 @@ function BreadcrumbList({ className, ...props }: React.ComponentProps<"ol">) {
         "group-data-[size=sm]:gap-1 group-data-[size=sm]:text-xs group-data-[size=sm]:sm:gap-2",
         "group-data-[size=lg]:gap-2 group-data-[size=lg]:text-base group-data-[size=lg]:sm:gap-3",
         "rounded-lg p-1",
-        "bg-muted border-border/25 border",
+        // Gray-frame outer with elevation shadow + rim.
+        solidSurface(3, 2),
+        "bg-muted",
         className,
       )}
       {...props}
@@ -95,8 +101,10 @@ function BreadcrumbPage({ className, ...props }: React.ComponentProps<"span">) {
       data-slot="breadcrumb-page"
       aria-current="page"
       className={cn(
-        "bg-card dark:bg-accent ring-border/25 dark:ring-border text-foreground rounded-sm px-2 py-1 font-normal ring-1",
-        "shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.06)]",
+        "text-foreground rounded-sm px-2 py-1 font-normal",
+        // Current-page pill — lifted out of the muted track, same elevation
+        // treatment as the Tabs capsule indicator.
+        solidSurface(4, 2),
         className,
       )}
       {...props}
@@ -127,7 +135,9 @@ function BreadcrumbSeparator({
       )}
       {...props}
     >
-      {children ?? separator ?? <HugeiconsIcon icon={ArrowRight01Icon}  strokeWidth={2} />}
+      {children ?? separator ?? (
+        <HugeiconsIcon icon={ArrowRight01Icon} strokeWidth={2} />
+      )}
     </li>
   );
 }
@@ -154,7 +164,11 @@ function BreadcrumbEllipsis({
       )}
       {...props}
     >
-      <HugeiconsIcon icon={MoreHorizontalIcon} className="size-4 group-data-[size=lg]:size-5 group-data-[size=sm]:size-3"  strokeWidth={2} />
+      <HugeiconsIcon
+        icon={MoreHorizontalIcon}
+        className="size-4 group-data-[size=lg]:size-5 group-data-[size=sm]:size-3"
+        strokeWidth={2}
+      />
       <span className="sr-only">{ariaLabel}</span>
     </span>
   );

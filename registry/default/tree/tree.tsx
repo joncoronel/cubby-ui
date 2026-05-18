@@ -7,6 +7,7 @@ import { Checkbox } from "@/registry/default/checkbox/checkbox";
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import { cn } from "@/lib/utils";
+import { solidSurface } from "@/registry/default/lib/elevated";
 import {
   getAllDescendantIds,
   getLeafNodeIds,
@@ -395,9 +396,9 @@ function Tree<TData extends Record<string, unknown> = Record<string, unknown>>({
     className: cn(
       "w-full min-w-0 text-sm",
       variant === "filled" &&
-        "ring ring-border/60 ring-1 bg-muted rounded-2xl p-2 shadow-sm",
+        cn("rounded-2xl p-2", solidSurface(3, 2), "bg-muted"),
       variant === "outline" &&
-        "overflow-hidden rounded-2xl ring ring-border/60 bg-card p-2 shadow-sm",
+        cn("overflow-hidden rounded-2xl p-2", solidSurface(3, 2)),
       className,
     ),
     role: "tree",

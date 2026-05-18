@@ -25,6 +25,22 @@ For the complete Base UI API, see the [Base UI Menubar documentation](https://ba
 
 ### Custom Props
 
+#### Menubar
+
+The bar element itself is a subtle inline toolbar — it sits visibly elevated above the page.
+
+<ApiPropsList>
+
+<ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="2">
+  Surface elevation level for the bar. Defaults to `2` — a subtle toolbar that lifts gently from the page. See the [Surfaces](/docs/getting-started/surfaces) docs.
+</ApiProp>
+
+<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="2">
+  Shadow weight for the bar.
+</ApiProp>
+
+</ApiPropsList>
+
 #### MenubarContent
 
 <ApiPropsList>
@@ -52,6 +68,28 @@ For the complete Base UI API, see the [Base UI Menubar documentation](https://ba
   defaultValue="8"
 >
   Distance in pixels for positioning. Flattened from Positioner. Base UI defaults to `0`.
+</ApiProp>
+
+<ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
+  Surface elevation level for the dropdown popup.
+</ApiProp>
+
+<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
+  Shadow weight for the dropdown popup.
+</ApiProp>
+
+</ApiPropsList>
+
+#### MenubarSubContent
+
+<ApiPropsList>
+
+<ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="5">
+  Surface elevation level. Submenus default to `5` so they pop above the parent menu.
+</ApiProp>
+
+<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
+  Shadow weight. Kept at `3` — submenus are still small popups.
 </ApiProp>
 
 </ApiPropsList>

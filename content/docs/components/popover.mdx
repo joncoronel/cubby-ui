@@ -186,4 +186,20 @@ Composed component for common popover layouts. Combines `Popover.Portal`, `Popov
   Portal container element. Flattened from Portal.
 </ApiProp>
 
+<ApiProp
+  name="level"
+  fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8"
+  defaultValue="3"
+>
+  Surface elevation level. See the [Surfaces](/docs/getting-started/surfaces) docs. Bump higher when this popover lives inside an already-elevated parent (e.g., `level={7}` when nested inside a Dialog).
+</ApiProp>
+
+<ApiProp
+  name="shadowLevel"
+  fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8"
+  defaultValue="3"
+>
+  Shadow weight. Controls drop-shadow intensity independently of substrate color.
+</ApiProp>
+
 </ApiPropsList>

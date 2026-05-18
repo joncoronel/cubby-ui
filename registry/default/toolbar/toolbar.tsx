@@ -7,14 +7,17 @@ import { Toolbar as BaseToolbar } from "@base-ui/react/toolbar"
 import { ButtonProps, buttonVariants } from "@/registry/default/button/button"
 
 import { cn } from "@/lib/utils"
+import {
+	solidSurface,
+	type SurfaceLevel,
+} from "@/registry/default/lib/elevated"
 
 const toolbarVariants = cva(
 	"flex items-center gap-1 rounded-lg p-1 data-[orientation=vertical]:flex-col data-disabled:pointer-events-none data-disabled:opacity-50",
 	{
 		variants: {
 			variant: {
-				default:
-					"bg-popover border border-border/60 shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)] ring-1 ring-border/15 dark:ring-0",
+				default: "",
 				outline: "bg-transparent border border-border",
 				ghost: "bg-transparent",
 			},
@@ -26,13 +29,29 @@ const toolbarVariants = cva(
 )
 
 type ToolbarProps = React.ComponentProps<typeof BaseToolbar.Root> &
-	VariantProps<typeof toolbarVariants>
+	VariantProps<typeof toolbarVariants> & {
+		/** Surface elevation level for the `default` variant (1-8). Defaults to 3. */
+		level?: SurfaceLevel
+		/** Shadow weight (1-8). Defaults to 3. */
+		shadowLevel?: SurfaceLevel
+	}
 
-function Toolbar({ className, variant, ...props }: ToolbarProps) {
+function Toolbar({
+	className,
+	variant = "default",
+	level = 3,
+	shadowLevel = 3,
+	...props
+}: ToolbarProps) {
 	return (
 		<BaseToolbar.Root
 			data-slot="toolbar"
-			className={cn(toolbarVariants({ variant }), className)}
+			data-level={variant === "default" ? level : undefined}
+			className={cn(
+				toolbarVariants({ variant }),
+				variant === "default" && solidSurface(level, shadowLevel),
+				className,
+			)}
 			{...props}
 		/>
 	)

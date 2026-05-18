@@ -58,6 +58,14 @@ Include checkbox and radio group menu items.
   component for convenience.
 </ApiProp>
 
+<ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
+  Surface elevation level. See the [Surfaces](/docs/getting-started/surfaces) docs.
+</ApiProp>
+
+<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
+  Shadow weight. Controls drop-shadow intensity independently of substrate color.
+</ApiProp>
+
 </ApiPropsList>
 
 ### ContextMenuItem
@@ -150,6 +158,14 @@ Menu item that renders as an anchor (`<a>`) for navigation links. Wraps Base UI'
   defaultValue='"start"'
 >
   How to align the submenu relative to its trigger.
+</ApiProp>
+
+<ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="5">
+  Surface elevation level. Submenus default to `5` so they pop above the parent menu at level 3.
+</ApiProp>
+
+<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
+  Shadow weight. Kept at `3` — submenus are still small popups.
 </ApiProp>
 
 </ApiPropsList>

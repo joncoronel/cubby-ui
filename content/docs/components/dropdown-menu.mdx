@@ -88,6 +88,14 @@ Dropdown container with positioning and animations. Composes `Menu.Portal`, `Men
   Positioner component for convenience.
 </ApiProp>
 
+<ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
+  Surface elevation level. See the [Surfaces](/docs/getting-started/surfaces) docs. Bump higher when the menu lives inside an already-elevated parent (e.g., `level={7}` inside a Dialog).
+</ApiProp>
+
+<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
+  Shadow weight. Controls drop-shadow intensity independently of substrate color.
+</ApiProp>
+
 </ApiPropsList>
 
 #### DropdownMenuItem
@@ -195,6 +203,14 @@ Submenu container with positioning. Composes `Menu.Portal`, `Menu.Positioner`, a
 <ApiProp name="alignOffset" fullType="number" defaultValue="-5">
   Vertical offset to align the first submenu item with its trigger. Defaults to
   `-5` when `align` is not `"center"`.
+</ApiProp>
+
+<ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="5">
+  Surface elevation level. Submenus default to `5` so they pop above the parent dropdown at level 3.
+</ApiProp>
+
+<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
+  Shadow weight. Kept at `3` (same as parent dropdown) — submenus are still small popups.
 </ApiProp>
 
 </ApiPropsList>

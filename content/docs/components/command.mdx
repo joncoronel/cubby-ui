@@ -97,6 +97,14 @@ Root component that manages command menu state and keyboard navigation. Wraps Ba
   Base UI defaults to `false`.
 </ApiProp>
 
+<ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
+  Surface elevation level for the outer Command frame. See the [Surfaces](/docs/getting-started/surfaces) docs. Bump to `7` when rendered inside `CommandDialog` so the palette pops above the dialog.
+</ApiProp>
+
+<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
+  Shadow weight for the outer frame. The bg is pinned to `bg-muted` (gray frame) — only the shadow + rim track this prop.
+</ApiProp>
+
 </ApiPropsList>
 
 #### CommandList

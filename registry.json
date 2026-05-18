@@ -238,6 +238,9 @@
           "target": "components/ui/cubby-ui/breadcrumbs.tsx"
         }
       ],
+      "registryDependencies": [
+        "@cubby-ui/elevated"
+      ],
       "dependencies": [
         "@hugeicons/react",
         "@hugeicons/core-free-icons"
@@ -1254,6 +1257,9 @@
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/preview-card.tsx"
         }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/elevated"
       ]
     },
     {
@@ -1593,7 +1599,8 @@
         }
       ],
       "registryDependencies": [
-        "@cubby-ui/button"
+        "@cubby-ui/button",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "class-variance-authority"
@@ -1649,7 +1656,8 @@
         }
       ],
       "registryDependencies": [
-        "@cubby-ui/checkbox"
+        "@cubby-ui/checkbox",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "@hugeicons/react",

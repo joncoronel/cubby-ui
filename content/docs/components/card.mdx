@@ -58,6 +58,17 @@ Container component for grouping related content with optional header, body, and
   defaultValue='"default"'
 >
   Visual style variant of the card.
+
+  - `"default"` — a single elevated surface (the standard card).
+  - `"inset"` — a gray-framed outer with a lifted inner card. Reads as "a Default Card wrapped in a tray."
+</ApiProp>
+
+<ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
+  Surface elevation level for the card. See the [Surfaces](/docs/getting-started/surfaces) docs. For the `inset` variant, only the outer frame's shadow/rim tracks this prop — the gray-frame bg and the inner card's level are pinned for the visual idiom to hold.
+</ApiProp>
+
+<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
+  Shadow weight. Controls drop-shadow intensity independently of substrate color.
 </ApiProp>
 
 </ApiPropsList>

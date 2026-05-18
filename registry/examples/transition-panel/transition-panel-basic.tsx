@@ -8,6 +8,8 @@ import {
 import { Button } from "@/registry/default/button/button";
 import { Input } from "@/registry/default/input/input";
 import { Label } from "@/registry/default/label/label";
+import { solidSurface } from "@/registry/default/lib/elevated";
+import { cn } from "@/lib/utils";
 
 type Step = "email" | "code" | "done";
 
@@ -17,7 +19,7 @@ export default function TransitionPanelBasic() {
   return (
     <TransitionPanel
       activeKey={step}
-      className="w-[360px] rounded-xl border bg-card shadow-sm"
+      className={cn("w-[360px] rounded-xl", solidSurface(3, 3))}
     >
       <TransitionPanelView viewKey="email">
         <div className="space-y-3 p-4">

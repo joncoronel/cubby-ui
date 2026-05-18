@@ -6,6 +6,8 @@ import {
   TransitionPanelView,
 } from "@/registry/default/transition-panel/transition-panel";
 import { Button } from "@/registry/default/button/button";
+import { solidSurface } from "@/registry/default/lib/elevated";
+import { cn } from "@/lib/utils";
 
 const VIEWS = ["overview", "details", "summary"] as const;
 type View = (typeof VIEWS)[number];
@@ -31,7 +33,7 @@ export default function TransitionPanelVertical() {
 
   return (
     <div className="w-[360px] space-y-3">
-      <div className="rounded-xl border bg-card p-4 shadow-sm">
+      <div className={cn("rounded-xl p-4", solidSurface(3, 3))}>
         <TransitionPanel activeKey={view} axis="y">
           {VIEWS.map((key) => (
             <TransitionPanelView key={key} viewKey={key}>

@@ -84,6 +84,35 @@ Every floating component exposes `level`/`shadowLevel` props that flow through t
 - Tabs (capsule indicator uses `solidSurface(4)`)
 - Code block (outer gray frame + inner code body)
 - ComponentPreview docs frame (outer gray frame)
+- Table + DataTable (outer; same Card-inset pattern — bg-muted frame + body cells `bg-surface-3 dark:bg-surface-1`)
+- PreviewCard (popup, exposes `level`/`shadowLevel`)
+- Toolbar (`default` variant exposes `level`/`shadowLevel`; `outline` and `ghost` variants unchanged)
+- Tree (`filled` and `outline` variants migrated; `default` variant unchanged)
+- Breadcrumbs (BreadcrumbList outer + BreadcrumbPage current-page pill)
+
+### Standardized "flat-card" defaults
+
+Card, Table, DataTable, code-block, and ComponentPreview all default to `solidSurface(3, 1)` — surface-3 bg + 1px rim only, no drop shadow. They're embedded containers (not floating popups), so they read as "lifted off the page just enough to define an edge." Documented in [surfaces.mdx — default levels](content/docs/getting-started/surfaces.mdx).
+
+### Mode-asymmetric inset patterns (extended)
+
+In addition to Command and Card inset, the **Table redesign** now also uses this pattern:
+
+- Table outer: `bg-muted` + `solidSurface(3, 1)` — gray frame with rim
+- Table body cells: `bg-surface-3 dark:bg-surface-1` — surface-3 (pure white) in light, surface-1 (page color) in dark
+- Header cells stay `bg-muted` (match the outer frame, opaque for sticky scrolling)
+- Footer cells stay `bg-muted` (match the outer)
+- Body card gets rounded bottom corners via Viewport `rounded-lg` clipping against the outer; top is flat (sticky header bottom — known limitation, see "Open / Visual regression sweep")
+
+### Table polish (this session)
+
+- **`p-1 pt-0` outer padding** — `pt-0` because TableHead's `py-2` already provides the header's top breathing room; `has-[tfoot]:pb-0` mirrors the same for footers when present (footer's `py-2` covers it). Outer keeps `pb-1` when no footer.
+- **Header tick separators** — short 16px-tall `::after` pseudo on each `<th>` (`bg-border`, vertically centered, right-edge), `last:after:hidden` on the rightmost cell. Replaces full-height borders with subtle dividers.
+- **Sortable header redesign** (in `data-table.tsx`):
+  - Removed `hover:bg-(--surface-hover)` — now uses `hover:text-foreground` instead (text brightens from muted to full foreground on hover, `transition-colors` for smooth easing).
+  - Sort icon pinned to right edge via a `flex-1` wrapper around the children — icon always at the cell's right edge regardless of column `align`.
+- **Selected row specificity fix** — `[[data-state=selected]_&]:bg-(--surface-selected)!` (Tailwind important) so it wins against the dark-mode body bg-surface-1, which would otherwise out-specify it.
+- **DataTable's inner Table** — when DataTable wraps a Table via `DataTableContent`, the inner Table's elevation is suppressed (`bg-transparent shadow-none ring-0 rounded-none`) so only the DataTable wrapper carries the rim. Avoids double-rim artifact.
 
 ### Mode-asymmetric inset patterns
 

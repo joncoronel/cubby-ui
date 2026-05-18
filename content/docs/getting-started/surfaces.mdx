@@ -110,7 +110,11 @@ You usually don't need to think about these — the defaults are tuned for the t
 | Component | Default `level` | Default `shadowLevel` |
 |---|---|---|
 | Tooltip | `2` | `2` |
-| Card | `3` | `3` |
+| Card | `3` | `1` |
+| Table | `3` | `1` |
+| DataTable | `3` | `1` |
+| Code block | `3` | `1` |
+| ComponentPreview frame | `3` | `1` |
 | Popover | `3` | `3` |
 | Dropdown menu | `3` | `3` |
 | Dropdown sub-menu | `5` | `3` |
@@ -131,6 +135,8 @@ You usually don't need to think about these — the defaults are tuned for the t
 | Command | `3` | `3` |
 | Combobox | `3` | `3` |
 | Autocomplete | `3` | `3` |
+
+The **flat-card family** (Card, Table, DataTable, code-block, ComponentPreview) all share `solidSurface(3, 1)` — a surface-3 bg with a 1px rim only, no drop shadows. They're embedded containers, not floating popups, so they read as "lifted off the page just enough to define an edge" rather than "casting a shadow over content."
 
 When in doubt: leave the defaults alone, bump `level` (not `shadowLevel`) when nesting.
 

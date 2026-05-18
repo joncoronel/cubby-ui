@@ -131,6 +131,14 @@ Root container that wraps the table and provides variant context to children via
   Reserves space for scrollbar to prevent layout shift.
 </ApiProp>
 
+<ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
+  Surface elevation level for the Table's outer frame. See the [Surfaces](/docs/getting-started/surfaces) docs. The outer is a `bg-muted` gray frame; body cells drop to `bg-surface-3 dark:bg-surface-1` to form the inner card.
+</ApiProp>
+
+<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="1">
+  Shadow weight for the outer frame. Defaults to `1` — flat outlined card (rim only, no drops), matching the rest of the flat-card family.
+</ApiProp>
+
 </ApiPropsList>
 
 #### TableRow

@@ -269,6 +269,8 @@ Root component that creates the TanStack Table instance and provides context to 
 
 </ApiPropsList>
 
+DataTable's outer wrapper uses the same `solidSurface(3, 1)` + `bg-muted` pattern as Card inset and Table — a flat outlined gray frame. The inner `DataTableContent` Table inside has its own bg-muted/inner-card visual (body cells `bg-surface-3 dark:bg-surface-1`), with its outer Table styling suppressed (`bg-transparent shadow-none ring-0`) so the elevation lives on the DataTable wrapper only. See the [Surfaces](/docs/getting-started/surfaces) docs.
+
 ### DataTableToolbar
 
 Container for toolbar controls. Renders above the table content with visual connection to the header.

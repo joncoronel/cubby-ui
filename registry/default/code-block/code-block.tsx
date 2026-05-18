@@ -189,7 +189,7 @@ function CodeBlock({
       "group max-w-full w-full rounded-2xl p-1 pt-0 relative",
       // Gray-frame outer with shadow + rim from the elevation system.
       // bg-muted comes after solidSurface so it overrides the bg-surface-3.
-      solidSurface(3, 3),
+      solidSurface(3, 1),
       "bg-muted",
       // Restore top padding when there's no header
       "has-[[data-slot='code-block-pre']:first-child]:pt-1",

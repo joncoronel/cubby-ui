@@ -782,7 +782,8 @@ export const componentMetadata = {
       "@cubby-ui/table",
       "@cubby-ui/dropdown-menu",
       "@cubby-ui/button",
-      "@cubby-ui/input-group"
+      "@cubby-ui/input-group",
+      "@cubby-ui/elevated"
     ],
     "dependencies": [
       "@tanstack/react-table",
@@ -1251,7 +1252,8 @@ export const componentMetadata = {
     "description": "A table component.",
     "category": "UI",
     "registryDependencies": [
-      "@cubby-ui/scroll-area"
+      "@cubby-ui/scroll-area",
+      "@cubby-ui/elevated"
     ],
     "dependencies": [],
     "examples": {},

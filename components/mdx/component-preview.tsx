@@ -49,7 +49,7 @@ export function ComponentPreview({
   if (!code) {
     return (
       <div className={`not-prose my-6 w-full max-w-full min-w-0 ${className}`}>
-        <div className={cn("rounded-md p-1", solidSurface(3, 3), "bg-muted")}>
+        <div className={cn("rounded-md p-1", solidSurface(3, 1), "bg-muted")}>
           <div className="bg-background flex min-h-[300px] items-center justify-center rounded-sm border p-8">
             {exampleNode}
           </div>
@@ -68,7 +68,9 @@ export function ComponentPreview({
         </TabsList>
         <TabsPanels className="">
           <TabsContent value="preview">
-            <div className={cn("rounded-2xl p-1", solidSurface(3, 3), "bg-muted")}>
+            <div
+              className={cn("rounded-2xl p-1", solidSurface(3, 1), "bg-muted")}
+            >
               <div className="bg-background flex min-h-[300px] items-center justify-center rounded-lg border p-8">
                 {exampleNode}
               </div>

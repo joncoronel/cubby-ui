@@ -238,7 +238,7 @@ function TabsPanels({
       data-slot="tabs-panels"
       className={cn(
         "min-h-0 grow",
-        "has-[>_*_>_[data-ending-style]]:ease-out-expo has-[>_*_>_[data-ending-style]]:overflow-y-clip has-[>_*_>_[data-ending-style]]:transition-[height] has-[>_*_>_[data-ending-style]]:duration-400",
+        "has-[>_*_>_[data-ending-style]]:ease-out-expo has-[>_*_>_[data-ending-style]]:transition-[height] has-[>_*_>_[data-ending-style]]:duration-400",
         className,
       )}
       {...props}

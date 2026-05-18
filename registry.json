@@ -441,7 +441,8 @@
       "registryDependencies": [
         "@cubby-ui/copy-button",
         "@cubby-ui/tabs",
-        "@cubby-ui/scroll-area"
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "@icons-pack/react-simple-icons",

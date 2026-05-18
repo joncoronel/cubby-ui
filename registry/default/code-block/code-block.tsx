@@ -13,6 +13,7 @@ import { useRender } from "@base-ui/react/use-render";
 import { highlight } from "@/registry/default/code-block/lib/shiki-shared";
 import { stripDiffMarker } from "@/registry/default/code-block/lib/transformers/utils";
 import { cn } from "@/lib/utils";
+import { solidSurface } from "@/registry/default/lib/elevated";
 import { CopyButton } from "@/registry/default/copy-button/copy-button";
 import {
   SiTypescript,
@@ -185,7 +186,11 @@ function CodeBlock({
   const defaultProps = {
     "data-slot": "code-block",
     className: cn(
-      "group bg-muted border border-border/60 max-w-full w-full rounded-2xl p-1 pt-0 relative",
+      "group max-w-full w-full rounded-2xl p-1 pt-0 relative",
+      // Gray-frame outer with shadow + rim from the elevation system.
+      // bg-muted comes after solidSurface so it overrides the bg-surface-3.
+      solidSurface(3, 3),
+      "bg-muted",
       // Restore top padding when there's no header
       "has-[[data-slot='code-block-pre']:first-child]:pt-1",
       className,
@@ -467,7 +472,9 @@ function CodeBlockPre({
     "data-slot": "code-block-pre",
     "data-has-focus": hasFocus ? "true" : undefined,
     className: cn(
-      "relative bg-card border border-border/60 rounded-lg whitespace-pre overflow-hidden max-h-96 flex flex-col",
+      "relative rounded-lg whitespace-pre overflow-hidden max-h-96 flex flex-col",
+      // Inner code body — looks like a Default Card sitting in the gray tray.
+      solidSurface(3),
       // Focus mode: blur and dim non-focused lines
       "[&[data-has-focus]_.line:not([data-focused])]:opacity-50 [&[data-has-focus]_.line:not([data-focused])]:blur-[1px] [&[data-has-focus]_.line:not([data-focused])]:transition-all",
       className,

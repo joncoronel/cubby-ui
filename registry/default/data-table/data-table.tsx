@@ -26,7 +26,7 @@ import {
 } from "@hugeicons/core-free-icons";
 
 import { cn } from "@/lib/utils";
-import { solidSurface } from "@/registry/default/lib/elevated";
+import { elevatedSurface } from "@/registry/default/lib/elevated";
 import { Checkbox } from "@/registry/default/checkbox/checkbox";
 import {
   DataTableContext,
@@ -218,8 +218,14 @@ function DataTable<TData, TValue>({
     <DataTableContext.Provider value={{ table }}>
       <div
         className={cn(
-          "w-full rounded-2xl md:max-w-2xl",
-          solidSurface(3, 1),
+          // `relative` is required by elevatedSurface so the rim ::after
+          // positions inside this container instead of climbing to the
+          // nearest positioned ancestor.
+          "relative w-full rounded-2xl md:max-w-2xl",
+          // elevatedSurface (rim on ::after) because DataTableToolbar +
+          // sticky Table header are opaque children near the top edge — the
+          // pseudo-element keeps the rim line visible above them in dark mode.
+          elevatedSurface(3, 1),
           "bg-muted",
           className,
         )}
@@ -259,7 +265,13 @@ function DataTableContent({
       hoverable={hoverable}
       rowDividers={rowDividers}
       className={cn(
-        "rounded-none bg-transparent shadow-none ring-0",
+        // Strip Table's own elevation — the outer DataTable container owns it.
+        // `shadow-none!` (important) because twMerge doesn't know about
+        // custom shadow utilities (shadow-surface-N), so without ! the inner
+        // Table's 1px ring stays visible in light mode. `after:hidden` kills
+        // the dark-mode rim ::after, which would otherwise paint a
+        // square-cornered rim on top of the DataTable's rounded one.
+        "rounded-none bg-transparent shadow-none! ring-0 after:hidden",
         className,
       )}
       {...tableProps}
@@ -286,7 +298,7 @@ function SortableHeader<TData>({
     <button
       type="button"
       className={cn(
-        "group -mx-3 -my-2 flex w-[calc(100%+1.5rem)] cursor-pointer items-center gap-1.5 px-3 py-2 transition-colors hover:text-foreground",
+        "group hover:text-foreground -mx-3 -my-2 flex w-[calc(100%+1.5rem)] cursor-pointer items-center gap-1.5 px-3 py-2 transition-colors",
         isFirst && "rounded-l-lg",
         isLast && "rounded-r-lg",
       )}

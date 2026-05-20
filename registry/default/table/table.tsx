@@ -6,7 +6,7 @@ import { useRender } from "@base-ui/react/use-render";
 
 import { cn } from "@/lib/utils";
 import {
-  solidSurface,
+  elevatedSurface,
   type SurfaceLevel,
 } from "@/registry/default/lib/elevated";
 import {
@@ -70,7 +70,10 @@ function Table({
         // py-2 carries the bottom padding. Without a footer, the outer keeps
         // pb-1 to give the body's last row breathing room before the frame edge.
         "has-[tfoot]:pb-0",
-        solidSurface(level, shadowLevel),
+        // elevatedSurface (rim on ::after) because the sticky TableHeader is
+        // an opaque child near the top edge — solidSurface's combined shadow
+        // would let the header bg cover the rim line at the top in dark mode.
+        elevatedSurface(level, shadowLevel),
         "bg-muted",
         className,
       )}
@@ -110,7 +113,9 @@ function TableHeader({ className, render, ...props }: TableHeaderProps) {
       // sticky header an opaque bg so scrolling body content doesn't bleed
       // through it.
       "[&_tr_th]:bg-muted",
-      "sticky top-0 z-10",
+      // z-1 keeps the header above scrolling body rows but below the table
+      // container's ::after rim (z-2) so the rim stays visible in dark mode.
+      "sticky top-0 z-1",
       className,
     ),
   };

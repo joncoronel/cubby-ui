@@ -141,8 +141,13 @@ When in doubt: leave the defaults alone, bump `level` (not `shadowLevel`) when n
 Hover and selected backgrounds use translucent overlays so they always raise the underlying surface by a fixed perceptual delta, regardless of what level the surface sits at:
 
 ```css
---surface-hover:    light-dark(oklch(0 0 0 / 0.06), oklch(1 0 0 / 0.06));
---surface-selected: light-dark(oklch(0 0 0 / 0.1),  oklch(1 0 0 / 0.1));
+/* :root (light) */
+--surface-hover:    oklch(0 0 0 / 0.06);
+--surface-selected: oklch(0 0 0 / 0.1);
+
+/* .dark */
+--surface-hover:    oklch(1 0 0 / 0.06);
+--surface-selected: oklch(1 0 0 / 0.1);
 ```
 
 Apply them on interactive items:
@@ -288,14 +293,15 @@ Form fields come in two appearances, exposed as a `variant` prop on Input, Texta
 The two tokens:
 
 ```css
---input:          var(--surface-3);
-   /* Opaque, "clean lifted" form-field bg. Same value as a Card surface —
-      pure white in light, surface-3 in dark. */
+/* :root (light) */
+--input:          var(--surface-3);          /* opaque, "clean lifted" */
+--input-elevated: oklch(0 0 0 / 0.08);       /* 8% black overlay */
 
---input-elevated: light-dark(oklch(0 0 0 / 0.08), oklch(1 0 0 / 0.12));
-   /* Translucent overlay, same family as --surface-hover / --surface-selected
-      but stronger (8% black light / 12% white dark). Adapts to any substrate. */
+/* .dark */
+--input-elevated: oklch(1 0 0 / 0.09);       /* 9% white overlay */
 ```
+
+`--input` resolves to `var(--surface-3)` in both modes (pure white in light, surface-3 dark in dark). `--input-elevated` is the same family as `--surface-hover`/`--surface-selected` but stronger — it adapts to any substrate.
 
 Why two? A single token can't satisfy every context cleanly:
 
@@ -308,7 +314,7 @@ The variant prop lets the caller choose per context. It's the same pattern HeroU
 
 ### Pure-black / pure-white overlays stay untinted
 
-`--border`, `--surface-hover`, `--surface-selected`, the dark-mode shadow `oklch(0 0 0 / X)` ring values, `--surface-drop`, etc. all use literal `oklch(0 0 0)` or `oklch(1 0 0)` rather than tinted-near-black/white. At translucent alpha they borrow most of their visible color from the tinted substrate beneath — tinting the overlay itself contributes essentially nothing while making the CSS harder to read.
+`--border`, `--surface-hover`, `--surface-selected`, the dark-mode shadow `oklch(0 0 0 / X)` ring values, `--surface-shadow-{near,mid,far,ambient}`, etc. all use literal `oklch(0 0 0)` or `oklch(1 0 0)` rather than tinted-near-black/white. At translucent alpha they borrow most of their visible color from the tinted substrate beneath — tinting the overlay itself contributes essentially nothing while making the CSS harder to read.
 
 ### Inset patterns are mode-asymmetric
 

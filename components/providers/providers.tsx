@@ -21,7 +21,7 @@ export function Providers({ children }: ProvidersProps) {
   return (
     <LazyMotion features={loadFeatures}>
       <ThemeProvider
-        attribute="data-theme"
+        attribute="class"
         defaultTheme="system"
         enableSystem
         disableTransitionOnChange

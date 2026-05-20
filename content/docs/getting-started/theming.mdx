@@ -33,43 +33,54 @@ Copy and paste the following into your `globals.css` file:
 :root {
   --radius: 0.75rem;
 
-  /* Background colors */
-  --background: oklch(0.98 0 0);
-  --foreground: oklch(0.18 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.27 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.27 0 0);
+  /* Brand-hue tint controls — change these to retune the entire
+     neutral palette. */
+  --neutral-hue: 270;
+  --neutral-chroma: 0.004;
+  --neutral-chroma-low: 0.002;
+
+  /* Background colors — aliased to the surface ladder */
+  --background: var(--surface-1);
+  --foreground: oklch(0.18 var(--neutral-chroma) var(--neutral-hue));
+  --card: var(--surface-3);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface-3);
+  --popover-foreground: var(--foreground);
 
   /* Primary & accent colors */
   --primary: oklch(0.6 0.2 250);
   --primary-foreground: oklch(1 0 0);
   --neutral: oklch(0.22 0 0);
-  --neutral-foreground: oklch(0.98 0 0);
+  --neutral-foreground: oklch(0.98 var(--neutral-chroma-low) var(--neutral-hue));
   --secondary: oklch(0.95 0 0);
-  --secondary-foreground: oklch(0.32 0 0);
-  --muted: oklch(0.95 0 0);
-  --muted-foreground: oklch(0.5 0 0);
+  --secondary-foreground: oklch(0.32 var(--neutral-chroma) var(--neutral-hue));
+  --muted: oklch(0.94 0 0);
+  --muted-foreground: oklch(0.5 var(--neutral-chroma) var(--neutral-hue));
   --accent: oklch(0.91 0 0);
-  --accent-foreground: oklch(0.22 0 0);
+  --accent-foreground: oklch(0.22 var(--neutral-chroma) var(--neutral-hue));
   --destructive: oklch(0.53 0.19 25);
-  --destructive-foreground: oklch(0.98 0 0);
+  --destructive-foreground: oklch(0.98 var(--neutral-chroma-low) var(--neutral-hue));
 
-  /* Borders & inputs */
+  /* Borders & form fields */
   --border: oklch(0 0 0 / 8%);
-  --input: oklch(0.95 0 0);
+  --input: var(--surface-3);
+  --input-elevated: oklch(0 0 0 / 8%);
+  --input-shadow:
+    0 2px 4px 0 oklch(0 0 0 / 0.04),
+    0 1px 2px 0 oklch(0 0 0 / 0.06),
+    0 0 1px 0 oklch(0 0 0 / 0.06);
   --ring: oklch(0.55 0.2 250);
   --scrollbar: oklch(0.87 0 0);
 
   /* Sidebar colors */
-  --sidebar: oklch(0.98 0 0);
-  --sidebar-foreground: oklch(0.22 0 0);
+  --sidebar: var(--surface-1);
+  --sidebar-foreground: oklch(0.22 var(--neutral-chroma) var(--neutral-hue));
   --sidebar-primary: oklch(0.28 0 0);
-  --sidebar-primary-foreground: oklch(0.97 0 0);
+  --sidebar-primary-foreground: oklch(0.97 var(--neutral-chroma) var(--neutral-hue));
   --sidebar-accent: oklch(0.92 0 0);
-  --sidebar-accent-foreground: oklch(0.28 0 0);
-  --sidebar-border: oklch(0.9 0 0);
-  --sidebar-ring: oklch(0.65 0 0);
+  --sidebar-accent-foreground: oklch(0.28 var(--neutral-chroma) var(--neutral-hue));
+  --sidebar-border: oklch(0.9 var(--neutral-chroma) var(--neutral-hue));
+  --sidebar-ring: oklch(0.65 var(--neutral-chroma) var(--neutral-hue));
 
   /* Status colors */
   --danger: oklch(0.97 0.04 25);
@@ -84,45 +95,112 @@ Copy and paste the following into your `globals.css` file:
   --success: oklch(0.97 0.04 145);
   --success-foreground: oklch(0.48 0.18 145);
   --success-border: oklch(0.9 0.1 145);
+
+  /* Surface elevation ladder (1-8) — light surfaces stay neutral.
+     Shadow alone carries elevation here. */
+  --surface-1: oklch(0.97 0 0);
+  --surface-2: oklch(0.985 0 0);
+  --surface-3: oklch(1 0 0);
+  --surface-4: oklch(1 0 0);
+  --surface-5: oklch(1 0 0);
+  --surface-6: oklch(1 0 0);
+  --surface-7: oklch(1 0 0);
+  --surface-8: oklch(1 0 0);
+
+  /* State overlays */
+  --surface-hover: oklch(0 0 0 / 0.06);
+  --surface-selected: oklch(0 0 0 / 0.1);
+  --surface-rim-color: oklch(0 0 0 / 0);
+
+  /* Light shadow recipe — opacity decreases with blur radius for
+     natural light fall-off. */
+  --surface-shadow-ring: oklch(0 0 0 / 0.06);
+  --surface-shadow-near: oklch(0 0 0 / 0.06);
+  --surface-shadow-mid: oklch(0 0 0 / 0.05);
+  --surface-shadow-far: oklch(0 0 0 / 0.04);
+  --surface-shadow-ambient: oklch(0 0 0 / 0.03);
+  --surface-shadow-1: 0 0 0 1px var(--surface-shadow-ring);
+  --surface-shadow-2:
+    0 0 0 1px var(--surface-shadow-ring),
+    0 1px 1px -0.5px var(--surface-shadow-near);
+  --surface-shadow-3:
+    0 0 0 1px var(--surface-shadow-ring),
+    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid);
+  --surface-shadow-4:
+    0 0 0 1px var(--surface-shadow-ring),
+    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid),
+    0 6px 6px -3px var(--surface-shadow-mid);
+  --surface-shadow-5:
+    0 0 0 1px var(--surface-shadow-ring),
+    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid),
+    0 6px 6px -3px var(--surface-shadow-mid),
+    0 12px 12px -6px var(--surface-shadow-far);
+  --surface-shadow-6:
+    0 0 0 1px var(--surface-shadow-ring),
+    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid),
+    0 6px 6px -3px var(--surface-shadow-mid),
+    0 12px 12px -6px var(--surface-shadow-far),
+    0 24px 24px -12px var(--surface-shadow-far);
+  --surface-shadow-7:
+    0 0 0 1px var(--surface-shadow-ring),
+    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid),
+    0 6px 6px -3px var(--surface-shadow-mid),
+    0 12px 12px -6px var(--surface-shadow-far),
+    0 24px 24px -12px var(--surface-shadow-far),
+    0 48px 48px -24px var(--surface-shadow-ambient);
+  --surface-shadow-8:
+    0 0 0 1px var(--surface-shadow-ring),
+    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid),
+    0 6px 6px -3px var(--surface-shadow-mid),
+    0 12px 12px -6px var(--surface-shadow-far),
+    0 24px 24px -12px var(--surface-shadow-far),
+    0 48px 48px -24px var(--surface-shadow-ambient),
+    0 96px 96px -48px var(--surface-shadow-ambient);
+
+  /* Rim overlay — no-op in light mode */
+  --surface-rim-1: 0 0 transparent;
+  --surface-rim-2: 0 0 transparent;
+  --surface-rim-3: 0 0 transparent;
+  --surface-rim-4: 0 0 transparent;
+  --surface-rim-5: 0 0 transparent;
+  --surface-rim-6: 0 0 transparent;
+  --surface-rim-7: 0 0 transparent;
+  --surface-rim-8: 0 0 transparent;
 }
 
 .dark {
-  /* Background colors */
-  --background: oklch(0.19 0 0);
-  --foreground: oklch(0.94 0 0);
-  --card: oklch(0.21 0 0);
-  --card-foreground: oklch(0.94 0 0);
-  --popover: oklch(0.21 0 0);
-  --popover-foreground: oklch(0.94 0 0);
-
-  /* Primary & accent colors */
-  --neutral: oklch(0.95 0 0);
-  --neutral-foreground: oklch(0.13 0 0);
-  --secondary: oklch(0.28 0 0);
-  --secondary-foreground: oklch(0.94 0 0);
-  --muted: oklch(0.26 0 0);
-  --muted-foreground: oklch(0.73 0 0);
-  --accent: oklch(0.31 0 0);
-  --accent-foreground: oklch(0.95 0 0);
+  /* Color overrides */
+  --foreground: oklch(0.94 var(--neutral-chroma) var(--neutral-hue));
+  --neutral: oklch(0.95 var(--neutral-chroma) var(--neutral-hue));
+  --neutral-foreground: oklch(0.13 var(--neutral-chroma) var(--neutral-hue));
+  --secondary: oklch(0.28 var(--neutral-chroma) var(--neutral-hue));
+  --secondary-foreground: oklch(0.94 var(--neutral-chroma) var(--neutral-hue));
+  --muted: oklch(0.24 var(--neutral-chroma) var(--neutral-hue));
+  --muted-foreground: oklch(0.73 var(--neutral-chroma) var(--neutral-hue));
+  --accent: oklch(0.31 var(--neutral-chroma) var(--neutral-hue));
+  --accent-foreground: oklch(0.95 var(--neutral-chroma) var(--neutral-hue));
   --destructive: oklch(0.5 0.22 25);
   --destructive-foreground: oklch(1 0 0);
-
-  /* Borders & inputs */
   --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --scrollbar: oklch(0.7 0 0);
+  --input-elevated: oklch(1 0 0 / 9%);
+  --scrollbar: oklch(0.7 var(--neutral-chroma) var(--neutral-hue));
 
-  /* Sidebar colors */
-  --sidebar: oklch(0.19 0 0);
-  --sidebar-foreground: oklch(0.88 0 0);
-  --sidebar-primary: oklch(0.95 0 0);
-  --sidebar-primary-foreground: oklch(0.13 0 0);
-  --sidebar-accent: oklch(0.19 0 0);
-  --sidebar-accent-foreground: oklch(0.95 0 0);
-  --sidebar-border: oklch(0.28 0 0);
-  --sidebar-ring: oklch(0.83 0 0);
+  /* Sidebar */
+  --sidebar-foreground: oklch(0.88 var(--neutral-chroma) var(--neutral-hue));
+  --sidebar-primary: oklch(0.95 var(--neutral-chroma) var(--neutral-hue));
+  --sidebar-primary-foreground: oklch(0.13 var(--neutral-chroma) var(--neutral-hue));
+  --sidebar-accent: oklch(0.19 var(--neutral-chroma) var(--neutral-hue));
+  --sidebar-accent-foreground: oklch(0.95 var(--neutral-chroma) var(--neutral-hue));
+  --sidebar-border: oklch(0.28 var(--neutral-chroma) var(--neutral-hue));
+  --sidebar-ring: oklch(0.83 var(--neutral-chroma) var(--neutral-hue));
 
-  /* Status colors */
+  /* Status */
   --danger: oklch(0.26 0.07 25);
   --danger-foreground: oklch(0.75 0.15 25);
   --danger-border: oklch(0.36 0.11 25);
@@ -135,6 +213,106 @@ Copy and paste the following into your `globals.css` file:
   --success: oklch(0.26 0.07 145);
   --success-foreground: oklch(0.72 0.15 145);
   --success-border: oklch(0.36 0.11 145);
+
+  /* Dark surface ladder */
+  --surface-1: oklch(0.205 var(--neutral-chroma) var(--neutral-hue));
+  --surface-2: oklch(0.235 var(--neutral-chroma) var(--neutral-hue));
+  --surface-3: oklch(0.264 var(--neutral-chroma) var(--neutral-hue));
+  --surface-4: oklch(0.293 var(--neutral-chroma) var(--neutral-hue));
+  --surface-5: oklch(0.321 var(--neutral-chroma) var(--neutral-hue));
+  --surface-6: oklch(0.348 var(--neutral-chroma) var(--neutral-hue));
+  --surface-7: oklch(0.375 var(--neutral-chroma) var(--neutral-hue));
+  --surface-8: oklch(0.402 var(--neutral-chroma) var(--neutral-hue));
+
+  /* State overlays flip to white-on-black */
+  --surface-hover: oklch(1 0 0 / 0.06);
+  --surface-selected: oklch(1 0 0 / 0.1);
+  --surface-rim-color: oklch(1 0 0 / 0.04);
+
+  /* Dark-only tokens for the rim recipe */
+  --surface-hi-base: oklch(1 0 0 / 0.01);
+  --surface-hi-mid: oklch(1 0 0 / 0.02);
+  --surface-hi-high: oklch(1 0 0 / 0.04);
+  --surface-hi-peak: oklch(1 0 0 / 0.06);
+  --surface-ring-base: oklch(1 0 0 / 0.02);
+  --surface-ring-mid: oklch(1 0 0 / 0.04);
+  --surface-ring-high: oklch(1 0 0 / 0.06);
+
+  /* Dark drop alphas — tighter range than light so wider layers don't fade */
+  --surface-shadow-near: oklch(0 0 0 / 0.18);
+  --surface-shadow-mid: oklch(0 0 0 / 0.16);
+  --surface-shadow-far: oklch(0 0 0 / 0.14);
+  --surface-shadow-ambient: oklch(0 0 0 / 0.12);
+
+  /* Form fields drop their lift in dark — hairline border per component */
+  --input-shadow: 0 0 transparent;
+
+  /* Dark shadow recipe — drops + per-level outer ring */
+  --surface-shadow-1: 0 0 transparent;
+  --surface-shadow-2: 0 1px 1px -0.5px var(--surface-shadow-near);
+  --surface-shadow-3:
+    0 0 0 1px oklch(0 0 0 / 0.12),
+    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid);
+  --surface-shadow-4:
+    0 0 0 1px oklch(0 0 0 / 0.14),
+    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid),
+    0 6px 6px -3px var(--surface-shadow-mid);
+  --surface-shadow-5:
+    0 0 0 1px oklch(0 0 0 / 0.16),
+    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid),
+    0 6px 6px -3px var(--surface-shadow-mid),
+    0 12px 12px -6px var(--surface-shadow-far);
+  --surface-shadow-6:
+    0 0 0 1px oklch(0 0 0 / 0.18),
+    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid),
+    0 6px 6px -3px var(--surface-shadow-mid),
+    0 12px 12px -6px var(--surface-shadow-far),
+    0 24px 24px -12px var(--surface-shadow-far);
+  --surface-shadow-7:
+    0 0 0 1px oklch(0 0 0 / 0.2),
+    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid),
+    0 6px 6px -3px var(--surface-shadow-mid),
+    0 12px 12px -6px var(--surface-shadow-far),
+    0 24px 24px -12px var(--surface-shadow-far),
+    0 48px 48px -24px var(--surface-shadow-ambient);
+  --surface-shadow-8:
+    0 0 0 1px oklch(0 0 0 / 0.22),
+    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid),
+    0 6px 6px -3px var(--surface-shadow-mid),
+    0 12px 12px -6px var(--surface-shadow-far),
+    0 24px 24px -12px var(--surface-shadow-far),
+    0 48px 48px -24px var(--surface-shadow-ambient),
+    0 96px 96px -48px var(--surface-shadow-ambient);
+
+  /* Dark rim — inset highlight + inset ring per level */
+  --surface-rim-1: inset 0 0 0 1px var(--surface-ring-base);
+  --surface-rim-2:
+    inset 0 1px 0 0 var(--surface-hi-base),
+    inset 0 0 0 1px var(--surface-ring-base);
+  --surface-rim-3:
+    inset 0 1px 0 0 var(--surface-hi-mid),
+    inset 0 0 0 1px var(--surface-ring-base);
+  --surface-rim-4:
+    inset 0 1px 0 0 var(--surface-hi-mid),
+    inset 0 0 0 1px var(--surface-ring-mid);
+  --surface-rim-5:
+    inset 0 1px 0 0 var(--surface-hi-high),
+    inset 0 0 0 1px var(--surface-ring-mid);
+  --surface-rim-6:
+    inset 0 1px 0 0 var(--surface-hi-high),
+    inset 0 0 0 1px var(--surface-ring-high);
+  --surface-rim-7:
+    inset 0 1px 0 0 var(--surface-hi-peak),
+    inset 0 0 0 1px var(--surface-ring-high);
+  --surface-rim-8:
+    inset 0 1px 0 0 var(--surface-hi-peak),
+    inset 0 0 0 1px var(--surface-ring-high);
 }
 
 @theme inline {
@@ -159,6 +337,7 @@ Copy and paste the following into your `globals.css` file:
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
+  --color-input-elevated: var(--input-elevated);
   --color-ring: var(--ring);
   --color-scrollbar: var(--scrollbar);
 
@@ -200,10 +379,40 @@ Copy and paste the following into your `globals.css` file:
   --ease-in-cubic: cubic-bezier(0.55, 0.055, 0.675, 0.19);
   --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
   --ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
 
   /* Inset shadows */
-  --shadow-inset: 0 1px 2px 0 oklch(0 0 0 / 0.06);
+  --shadow-inset: 0 1px 2px 0 oklch(0 0 0 / 0.08);
   --shadow-inset-highlight: 0 -1px oklch(1 0 0 / 0.04);
+  --shadow-input: var(--input-shadow);
+
+  /* Surface elevation utilities */
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-surface-4: var(--surface-4);
+  --color-surface-5: var(--surface-5);
+  --color-surface-6: var(--surface-6);
+  --color-surface-7: var(--surface-7);
+  --color-surface-8: var(--surface-8);
+
+  --shadow-surface-1: var(--surface-shadow-1);
+  --shadow-surface-2: var(--surface-shadow-2);
+  --shadow-surface-3: var(--surface-shadow-3);
+  --shadow-surface-4: var(--surface-shadow-4);
+  --shadow-surface-5: var(--surface-shadow-5);
+  --shadow-surface-6: var(--surface-shadow-6);
+  --shadow-surface-7: var(--surface-shadow-7);
+  --shadow-surface-8: var(--surface-shadow-8);
+
+  --shadow-surface-rim-1: var(--surface-rim-1);
+  --shadow-surface-rim-2: var(--surface-rim-2);
+  --shadow-surface-rim-3: var(--surface-rim-3);
+  --shadow-surface-rim-4: var(--surface-rim-4);
+  --shadow-surface-rim-5: var(--surface-rim-5);
+  --shadow-surface-rim-6: var(--surface-rim-6);
+  --shadow-surface-rim-7: var(--surface-rim-7);
+  --shadow-surface-rim-8: var(--surface-rim-8);
 }
 
 /* Base UI requirements */
@@ -224,7 +433,7 @@ Copy and paste the following into your `globals.css` file:
 
 ## Extended Color Variables
 
-We've introduced additional color variables beyond the standard shadcn/ui palette to provide more control for specific components like badges and alerts:
+Cubby UI extends the standard shadcn/ui palette with additional tokens:
 
 - `--neutral` / `--neutral-foreground`: Neutral button variant
 - `--danger` / `--danger-foreground` / `--danger-border`: Error states with background tint
@@ -234,7 +443,41 @@ We've introduced additional color variables beyond the standard shadcn/ui palett
 - `--sidebar-*`: Dedicated sidebar color tokens
 - `--scrollbar`: Scrollbar thumb color
 
-These additional variables ensure consistent styling across components that need to communicate different states or levels of importance.
+## Brand-hue tint controls
+
+Three tokens at the top of `:root` control the warmth of the entire neutral palette:
+
+- `--neutral-hue`: hue angle (0–360). The default `270` is a cool violet.
+- `--neutral-chroma`: chroma for mid-tone neutrals. The default `0.004` is barely tinted.
+- `--neutral-chroma-low`: chroma for near-extreme L (very light / very dark). Kept lower because high chroma at the extremes looks garish.
+
+Change these to retune the whole stack — every neutral surface, foreground, and sidebar color references them. Try `--neutral-hue: 220` for a cooler blue tilt or `30` for a warm tan tilt.
+
+## Surface elevation system
+
+Cubby UI ships with an 8-level surface elevation ladder used by Cards, Popovers, Dialogs, Sheets, Drawers, and more. Each level has paired tokens:
+
+- `--surface-1` through `--surface-8`: Substrate colors (light: pure neutrals; dark: progressive lightness with brand tint)
+- `--surface-shadow-1` through `--surface-shadow-8`: Drop-shadow recipes (composed from `--surface-shadow-ring/near/mid/far/ambient`)
+- `--surface-rim-1` through `--surface-rim-8`: Inset highlight + ring (no-op in light, painted in dark)
+
+State overlays raise an underlying surface by a fixed perceptual delta:
+
+- `--surface-hover`: hover state overlay
+- `--surface-selected`: selected state overlay
+- `--surface-rim-color`: single-edge rim color (used by viewport-flush Sheet/Drawer)
+
+For the full elevation system docs, see [Surfaces](/docs/getting-started/surfaces).
+
+## Form-field tokens
+
+Form fields (Input, Textarea, Checkbox, Radio, etc.) use three dedicated tokens:
+
+- `--input`: Default bg — aliased to `--surface-3` so it matches Card surfaces
+- `--input-elevated`: Translucent overlay for the `elevated` variant — adapts to any substrate (use inside Cards, Dialogs, popovers)
+- `--input-shadow`: 3-layer soft drop shadow for the `default` variant in light mode (transparent in dark; dark mode uses a hairline border instead)
+
+See the [Forms](/docs/getting-started/forms) guide for when to use which variant.
 
 ## Base UI Requirements
 

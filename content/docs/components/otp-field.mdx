@@ -54,6 +54,12 @@ Obscure entered characters for shared screens.
 
 <ComponentPreview component="otp-field" example="otp-field-masked" />
 
+### Elevated Variant
+
+On a Card, Dialog, or popover surface, the opaque `default` slots collapse into the parent. Use `variant="elevated"` on each `OTPFieldInput` for a translucent overlay that adapts to the substrate. See the [Surfaces](/docs/getting-started/surfaces) docs.
+
+<ComponentPreview component="otp-field" example="otp-field-elevated" />
+
 ### Form Integration
 
 Use [Field](/docs/components/field) for labeling and form participation. See the [Forms guide](/docs/getting-started/forms) for more patterns.
@@ -78,7 +84,18 @@ No custom props — all Base UI Root props are passed through, including `length
 
 Individual character input slot. Wraps Base UI's `OTPField.Input`. Renders an `<input>`.
 
-No custom props — all Base UI Input props are passed through.
+<ApiPropsList>
+
+<ApiProp
+  name="variant"
+  fullType='"default" | "elevated"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Surface appearance of the slot. `default` uses opaque `bg-input`. `elevated` uses translucent `bg-input-elevated` for use inside Card, Dialog, or popover surfaces. See the [Surfaces](/docs/getting-started/surfaces) docs.
+</ApiProp>
+
+</ApiPropsList>
 
 #### OTPFieldSeparator
 

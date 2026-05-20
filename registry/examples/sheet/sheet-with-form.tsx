@@ -29,11 +29,11 @@ export default function SheetWithForm() {
         <SheetBody className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="name">Name</Label>
-            <Input id="name" placeholder="Your name" />
+            <Input id="name" variant="elevated" placeholder="Your name" />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="you@example.com" />
+            <Input id="email" variant="elevated" type="email" placeholder="you@example.com" />
           </div>
         </SheetBody>
         <SheetFooter>

@@ -139,9 +139,36 @@ In addition to Command and Card inset, the **Table redesign** now also uses this
 - Dark surfaces stepped through L 0.205–0.402 with chroma 0.004 at hue `--neutral-hue` (275).
 - Light surface-3 through surface-8 are pure white (`oklch(1 0 0)`); shadow alone carries elevation here.
 
-### `--input` token
+### Form-field bg — `default` / `elevated` variants
 
-`--input` kept standalone (`oklch(0.93 0 0)` light / translucent white at 15% dark) — same off-ladder recessed category as `--muted`. Matches fluid-functionalism's pattern of input being below page lightness despite their up-only ladder.
+Form fields take a `variant="default" | "elevated"` prop on Input, Textarea, NumberField input, InputGroup, OTP slot (both `InputOTPSlot` and `OTPFieldInput`), Combobox input + chips, Autocomplete input, Checkbox, Radio, Switch.
+
+Two tokens:
+
+```css
+--input:          var(--surface-3);
+   /* default opaque — "clean lifted card" look. Pure white light / surface-3 dark. */
+--input-elevated: light-dark(oklch(0 0 0 / 0.08), oklch(1 0 0 / 0.15));
+   /* elevated translucent overlay — adapts to substrate. Same family as
+      --surface-hover/--surface-selected but stronger (8% / 15%). */
+```
+
+Why both: a single token can't satisfy every context. On the page (surface-1), opaque white feels lifted and clean. On a Card / Dialog (both surface-3 / surface-5 = white in light), opaque white is invisible against its parent — the translucent overlay is needed. The variant prop lets the caller choose. Same pattern HeroUI uses.
+
+Migration notes:
+
+- Previous session had `--input` translucent in light; reverted to opaque (= `var(--surface-3)`) and added `--input-elevated` for the translucent value. Variant names match the token suffix (e.g., `variant="elevated"` → `bg-input-elevated`).
+- Form-field components dropped manual `dark:bg-input/N` overrides and `shadow-xs` (form fields aren't lifted, no drop shadow needed).
+
+Non-form usages of `bg-input` (where it was being used as a "fixed gray surface") migrated earlier in the session:
+
+- base-drawer drag handle → `bg-muted-foreground/30`
+- base-drawer switch unchecked track → `bg-muted` (now also gets the form-field variant treatment)
+- timeline pending node → `bg-muted`
+
+Cropper's `border-input/60` → `border-border` (semantic correctness — those were border colors).
+
+Dark-mode-only usages of `dark:bg-input/N` (button outline, select trigger, number-field increment/decrement, radio-group hover) keep working — they leverage the dark value via Tailwind's opacity modifier, which composites to similar visual on dark surfaces.
 
 ### Misc
 

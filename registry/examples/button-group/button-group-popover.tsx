@@ -35,7 +35,7 @@ export default function ButtonGroupPopover() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="task">Task</Label>
-              <Input id="task" placeholder="E.g., Write a blog post about..." />
+              <Input id="task" variant="elevated" placeholder="E.g., Write a blog post about..." />
             </div>
           </div>
         </PopoverContent>

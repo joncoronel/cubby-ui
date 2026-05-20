@@ -224,7 +224,7 @@ const CropperZoomControls = forwardRef<
         type="button"
         onClick={handleZoomOut}
         disabled={zoom <= minZoom}
-        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-input/60 bg-background text-sm font-medium ring-offset-background transition-colors duration-200 hover:bg-accent/80 hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-sm font-medium ring-offset-background transition-colors duration-200 hover:bg-accent/80 hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
         aria-label="Zoom out"
       >
         <HugeiconsIcon icon={ZoomOutAreaIcon} className="h-4 w-4"  strokeWidth={2} />
@@ -238,7 +238,7 @@ const CropperZoomControls = forwardRef<
         type="button"
         onClick={handleZoomIn}
         disabled={zoom >= maxZoom}
-        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-input/60 bg-background text-sm font-medium ring-offset-background transition-colors duration-200 hover:bg-accent/80 hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-sm font-medium ring-offset-background transition-colors duration-200 hover:bg-accent/80 hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
         aria-label="Zoom in"
       >
         <HugeiconsIcon icon={ZoomInAreaIcon} className="h-4 w-4"  strokeWidth={2} />
@@ -248,7 +248,7 @@ const CropperZoomControls = forwardRef<
         <button
           type="button"
           onClick={onReset}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-input/60 bg-background text-sm font-medium ring-offset-background transition-colors duration-200 hover:bg-accent/80 hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-sm font-medium ring-offset-background transition-colors duration-200 hover:bg-accent/80 hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           aria-label="Reset zoom"
         >
           <HugeiconsIcon icon={RotateLeft02Icon} className="h-4 w-4"  strokeWidth={2} />
@@ -290,7 +290,7 @@ const CropperAspectRatioControls = forwardRef<
             "inline-flex h-9 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium ring-offset-background transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             isActive
               ? "border-primary bg-primary text-primary-foreground shadow-[0_1px_3px_0_oklch(0.18_0_0_/_0.08)]"
-              : "border-input/60 bg-background hover:bg-accent/80 hover:text-accent-foreground"
+              : "border-border bg-background hover:bg-accent/80 hover:text-accent-foreground"
           )}
           aria-label={`Set aspect ratio to ${preset.label}`}
         >
@@ -370,7 +370,7 @@ const CropperActions = forwardRef<
       <button
         type="button"
         onClick={onDownload}
-        className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-input/60 bg-background px-3 text-xs font-medium ring-offset-background transition-colors duration-200 hover:bg-accent/80 hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-background px-3 text-xs font-medium ring-offset-background transition-colors duration-200 hover:bg-accent/80 hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
         <HugeiconsIcon icon={Download01Icon} className="h-3 w-3"  strokeWidth={2} />
         {downloadLabel}
@@ -380,7 +380,7 @@ const CropperActions = forwardRef<
       <button
         type="button"
         onClick={onExport}
-        className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-input/60 bg-background px-3 text-xs font-medium ring-offset-background transition-colors duration-200 hover:bg-accent/80 hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-background px-3 text-xs font-medium ring-offset-background transition-colors duration-200 hover:bg-accent/80 hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
         <HugeiconsIcon icon={CropIcon} className="h-3 w-3"  strokeWidth={2} />
         {exportLabel}

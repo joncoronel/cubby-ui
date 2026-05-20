@@ -91,7 +91,7 @@ function DropdownMenuContent({
           data-slot="dropdown-menu-content"
           data-level={level}
           className={cn(
-            "text-popover-foreground relative min-w-[12rem] overflow-hidden rounded-xl bg-clip-padding",
+            "text-popover-foreground relative min-w-[12rem] overflow-hidden rounded-xl",
             solidSurface(level, shadowLevel),
             "h-(--popup-height,auto) w-(--popup-width,auto)",
             "origin-(--transform-origin) transition-[width,height,scale,opacity] duration-[350ms,350ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
@@ -391,7 +391,7 @@ function DropdownMenuSubContent({
           data-slot="dropdown-menu-content"
           data-level={level}
           className={cn(
-            "text-popover-foreground relative min-w-[12rem] overflow-hidden rounded-xl bg-clip-padding",
+            "text-popover-foreground relative min-w-[12rem] overflow-hidden rounded-xl",
             solidSurface(level, shadowLevel),
             "ease-out-expo origin-(--transform-origin) transition-[transform,scale,opacity] duration-100",
             "data-starting-style:scale-95 data-starting-style:opacity-0",

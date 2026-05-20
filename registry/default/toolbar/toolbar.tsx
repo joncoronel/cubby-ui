@@ -104,7 +104,7 @@ function ToolbarInput({
 		<BaseToolbar.Input
 			data-slot="toolbar-input"
 			className={cn(
-				"placeholder:text-muted-foreground bg-input dark:bg-input/35 border-border",
+				"placeholder:text-muted-foreground bg-input border-border",
 				"flex h-8 min-w-0 rounded-md border bg-clip-padding px-2 py-1 text-sm",
 				"transition-colors duration-100",
 				"focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent",

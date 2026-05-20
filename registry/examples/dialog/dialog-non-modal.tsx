@@ -39,7 +39,7 @@ export default function DialogNonModal() {
               <Label htmlFor="note" className="sr-only">
                 Note
               </Label>
-              <Input id="note" placeholder="Type a note..." />
+              <Input id="note" variant="elevated" placeholder="Type a note..." />
             </DialogBody>
             <DialogFooter>
               <DialogClose render={<Button variant="outline">Done</Button>} />

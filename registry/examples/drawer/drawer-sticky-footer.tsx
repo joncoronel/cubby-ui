@@ -164,6 +164,7 @@ export default function DrawerComments() {
             }}
           >
             <Input
+              variant="elevated"
               placeholder="Add a comment..."
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}

@@ -155,7 +155,7 @@ function SelectContent({
           data-level={level}
           className={cn(
             // Combobox-style popup
-            "text-popover-foreground relative flex flex-col overflow-clip rounded-xl bg-clip-padding",
+            "text-popover-foreground relative flex flex-col overflow-clip rounded-xl",
             // Surface elevation — bg tracks `level`, shadow weight tracks `shadowLevel` (defaults to `level`)
             elevatedSurface(level, shadowLevel),
             // Size constraints

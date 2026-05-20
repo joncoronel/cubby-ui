@@ -31,6 +31,12 @@ Prevent interaction with disabled inputs.
 
 <ComponentPreview component="input" example="input-disabled" />
 
+### Elevated Variant
+
+On a Card, Dialog, or popover surface, the opaque `default` input collapses into its parent. Use `variant="elevated"` for a translucent overlay that adapts to the substrate. See the [Surfaces](/docs/getting-started/surfaces) docs for the full reasoning.
+
+<ComponentPreview component="input" example="input-elevated" />
+
 ### Form Integration
 
 Use [Field](/docs/components/field) for labeling, validation, and error display. See the [Forms guide](/docs/getting-started/forms) for more patterns.
@@ -54,6 +60,15 @@ For the complete Base UI API, see the [Base UI Input documentation](https://base
   defaultValue='"default"'
 >
   Size variant of the input field.
+</ApiProp>
+
+<ApiProp
+  name="variant"
+  fullType="'default' | 'elevated'"
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Surface appearance. `default` uses opaque `bg-input` (clean "lifted card" feel on the page). `elevated` uses translucent `bg-input-elevated` — use this when the input sits inside a Card, Dialog, popover, or any elevated surface where the opaque default would visually collapse into its parent. See the [Surfaces](/docs/getting-started/surfaces) docs.
 </ApiProp>
 
 </ApiPropsList>

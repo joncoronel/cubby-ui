@@ -110,6 +110,7 @@ export default function ComboboxCreatable() {
             <DialogBody>
               <Input
                 key={dialogInputProps.defaultValue}
+                variant="elevated"
                 {...dialogInputProps}
                 placeholder="Label name"
                 autoFocus

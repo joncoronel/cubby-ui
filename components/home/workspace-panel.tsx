@@ -95,6 +95,7 @@ export function WorkspacePanel() {
               <Label htmlFor="project-name">Project name</Label>
               <Input
                 id="project-name"
+                variant="elevated"
                 defaultValue="Cubby UI — landing page"
                 placeholder="e.g. Website redesign"
               />
@@ -136,6 +137,7 @@ export function WorkspacePanel() {
               <Label htmlFor="client">Client</Label>
               <Input
                 id="client"
+                variant="elevated"
                 defaultValue="Atelier Studio"
                 placeholder="Who is this for?"
               />
@@ -144,7 +146,7 @@ export function WorkspacePanel() {
             <div className="flex flex-col gap-1.5 sm:col-span-2">
               <Label htmlFor="budget">Budgeted hours / week</Label>
               <NumberField id="budget" defaultValue={20} min={0} max={60}>
-                <NumberFieldGroup>
+                <NumberFieldGroup variant="elevated">
                   <NumberFieldDecrement>
                     <HugeiconsIcon
                       icon={MinusSignIcon}
@@ -182,7 +184,7 @@ export function WorkspacePanel() {
           <div className="flex flex-col gap-1.5">
             <Label>Assign lead</Label>
             <Combobox items={teammates} defaultValue="Alma Ibarra">
-              <ComboboxInput placeholder="Search teammates" />
+              <ComboboxInput variant="elevated" placeholder="Search teammates" />
               <ComboboxPopup>
                 <ComboboxList>
                   {(item: string) => (

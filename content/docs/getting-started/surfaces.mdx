@@ -269,9 +269,46 @@ Net effect: light mode reads as "clean canvas," dark mode carries the brand iden
 
 ### `--muted` lives off-ladder
 
-`--muted` is a standalone token (`oklch(0.94 0 0)` light / `oklch(0.24 ◇ ◆)` dark), not aliased to a surface level. The surface ladder represents *lifted* surfaces (up-only from page); `--muted` represents the **recessed** category — inset wells, input backgrounds, code blocks, command palette wells, quiet differentiation strips.
+`--muted` is a standalone token (`oklch(0.94 0 0)` light / `oklch(0.24 ◇ ◆)` dark), not aliased to a surface level. The surface ladder represents *lifted* surfaces (up-only from page); `--muted` represents the **recessed** category — inset wells, code blocks, command palette wells, quiet differentiation strips.
 
 The reference (fluid-functionalism) aliases `--muted: var(--surface-2)` because their system doesn't have a recessed concept. We do, so `--muted` stays standalone.
+
+### Form-field bg — `--input` + `--input-elevated`
+
+Form fields come in two appearances, exposed as a `variant` prop on Input, Textarea, NumberField, InputGroup, OTP, Combobox, Autocomplete, Checkbox, and Radio (Switch is the exception — see below):
+
+```tsx
+// Default — opaque "clean lifted card" look. Use on the page.
+<Input />
+
+// Elevated — translucent overlay that adapts to substrate. Use inside Card,
+// Dialog, popovers, or any surface where the opaque default would collapse
+// into its parent.
+<Card>
+  <Input variant="elevated" />
+</Card>
+```
+
+The two tokens:
+
+```css
+--input:          var(--surface-3);
+   /* Opaque, "clean lifted" form-field bg. Same value as a Card surface —
+      pure white in light, surface-3 in dark. */
+
+--input-elevated: light-dark(oklch(0 0 0 / 0.08), oklch(1 0 0 / 0.12));
+   /* Translucent overlay, same family as --surface-hover / --surface-selected
+      but stronger (8% black light / 12% white dark). Adapts to any substrate. */
+```
+
+Why two? A single token can't satisfy every context cleanly:
+
+- On the page (`surface-1`), an opaque white input feels right — lifted, clean.
+- On a Card or inside a Dialog (also surface-3 / surface-5 = pure white in light), an opaque white input is invisible against its parent. The translucent overlay is needed instead.
+
+The variant prop lets the caller choose per context. It's the same pattern HeroUI uses for its form fields. Trade-off: callers need to know which to reach for, but it avoids the "form field that disappears on a Card" failure mode.
+
+**Switch skips the variant.** Switch's unchecked track has to contrast with *both* its thumb (white in light, page-dark in dark) AND the parent surface. A single translucent `bg-input-elevated` overlay handles both constraints — it adapts to whatever substrate it sits on (page, Card, `bg-muted` toolbar) while always reading as a clear gray against the thumb. So Switch has no `variant` prop; it just uses `bg-input-elevated` always.
 
 ### Pure-black / pure-white overlays stay untinted
 
@@ -298,6 +335,8 @@ All tokens live on `:root` and are exposed as Tailwind utilities via `@theme inl
 ```css
 --surface-hover                  /* +6% perceived brightness overlay */
 --surface-selected               /* +10% perceived brightness overlay */
+--input                          /* opaque form-field bg = surface-3 */
+--input-elevated                 /* +8% / +12% overlay for elevated form fields and Switch tracks */
 --surface-rim-color              /* single-edge rim color (flush sheets) */
 --popup-surface                  /* set by helpers, read by descendants */
 ```

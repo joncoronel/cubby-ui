@@ -7,8 +7,11 @@ import { cn } from "@/lib/utils";
 const inputVariants = cva(
   [
     "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground",
-    "bg-input dark:bg-input/35 border-border",
-    "flex w-full min-w-0 rounded-lg border bg-clip-padding shadow-xs",
+    // Edge: light has no edge (lift comes from shadow-input on default).
+    // Dark uses the elevation system's level-1 rim (inset 1px ring via
+    // box-shadow) for definition without any layout impact.
+    "dark:shadow-surface-rim-1",
+    "flex w-full min-w-0 rounded-lg",
     "text-base transition-colors duration-200 md:text-sm",
     "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60",
     "file:text-foreground file:inline-flex file:h-7 file:rounded-md file:border-0 file:bg-transparent file:text-sm file:font-medium",
@@ -17,25 +20,36 @@ const inputVariants = cva(
   ],
   {
     variants: {
+      variant: {
+        // Opaque "lifted" bg + soft drop shadow (light only — see
+        // --input-shadow). Use on the page or anywhere the substrate is not
+        // pure white / surface-3. See the Surfaces docs.
+        default: "bg-input shadow-input",
+        // Translucent overlay that adapts to substrate. No shadow. Use inside
+        // Cards, Dialogs, popovers, or any surface where the opaque default
+        // would collapse into its parent.
+        elevated: "bg-input-elevated",
+      },
       size: {
         default: "h-10 px-3 py-2 sm:h-9",
         sm: "h-9 px-2.5 py-1.5 sm:h-8",
       },
     },
     defaultVariants: {
+      variant: "default",
       size: "default",
     },
-  }
+  },
 );
 
 type InputProps = Omit<React.ComponentProps<typeof BaseInput>, "size"> &
   VariantProps<typeof inputVariants>;
 
-function Input({ className, size, ...props }: InputProps) {
+function Input({ className, size, variant, ...props }: InputProps) {
   return (
     <BaseInput
       data-slot="input"
-      className={cn(inputVariants({ size }), className)}
+      className={cn(inputVariants({ size, variant }), className)}
       {...props}
     />
   );

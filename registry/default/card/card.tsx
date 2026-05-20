@@ -110,7 +110,7 @@ function CardContent({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="card-content"
       className={cn(
         "[[data-variant=default]>_&]:px-6",
-        "[[data-variant=inset]>_&]:bg-surface-3 [[data-variant=inset]>_&]:flex [[data-variant=inset]>_&]:flex-1 [[data-variant=inset]>_&]:flex-col [[data-variant=inset]>_&]:rounded-lg [[data-variant=inset]>_&]:bg-clip-padding [[data-variant=inset]>_&]:p-4 [[data-variant=inset]>_&]:shadow-[var(--surface-shadow-3),var(--surface-rim-3)] [[data-variant=inset]>_&]:[--popup-surface:var(--surface-3)]",
+        "[[data-variant=inset]>_&]:bg-surface-3 [[data-variant=inset]>_&]:flex [[data-variant=inset]>_&]:flex-1 [[data-variant=inset]>_&]:flex-col [[data-variant=inset]>_&]:rounded-lg [[data-variant=inset]>_&]:p-4 [[data-variant=inset]>_&]:shadow-[var(--surface-shadow-3),var(--surface-rim-3)] [[data-variant=inset]>_&]:[--popup-surface:var(--surface-3)]",
         className,
       )}
       {...props}

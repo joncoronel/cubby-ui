@@ -55,6 +55,12 @@ Use `aria-invalid="true"` on the input to show error styling on the group.
   <InputGroupValidation />
 </ComponentPreview>
 
+### Elevated Variant
+
+On a Card, Dialog, or popover surface, the opaque `default` group collapses into its parent. Use `variant="elevated"` on `InputGroup` — the inner Input is transparent, so the container's variant controls the entire group's appearance. See the [Surfaces](/docs/getting-started/surfaces) docs.
+
+<ComponentPreview component="input-group" example="input-group-elevated" />
+
 ## API Reference
 
 The Input Group is a custom layout component for combining inputs with addons. All props listed below are custom to this implementation.
@@ -64,6 +70,19 @@ The Input Group is a custom layout component for combining inputs with addons. A
 #### InputGroup
 
 Container that combines inputs with addons. Renders a `div` with `role="group"`. Accepts standard `div` props.
+
+<ApiPropsList>
+
+<ApiProp
+  name="variant"
+  fullType='"default" | "elevated"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Surface appearance of the group container. `default` uses opaque `bg-input`. `elevated` uses translucent `bg-input-elevated` for use inside Card, Dialog, or popover surfaces. The inner Input/Textarea inherits visually (it's transparent inside the group). See the [Surfaces](/docs/getting-started/surfaces) docs.
+</ApiProp>
+
+</ApiPropsList>
 
 #### InputGroupAddon
 

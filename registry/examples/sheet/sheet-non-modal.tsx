@@ -39,7 +39,7 @@ export default function SheetNonModal() {
               <Label htmlFor="search" className="sr-only">
                 Search
               </Label>
-              <Input id="search" placeholder="Search filters..." />
+              <Input id="search" variant="elevated" placeholder="Search filters..." />
             </SheetBody>
             <SheetFooter>
               <SheetClose render={<Button variant="outline">Done</Button>} />

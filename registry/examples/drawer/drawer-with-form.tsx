@@ -30,11 +30,11 @@ export default function DrawerWithForm() {
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
-              <Input id="name" defaultValue="Pedro Duarte" />
+              <Input id="name" variant="elevated" defaultValue="Pedro Duarte" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
-              <Input id="username" defaultValue="@peduarte" />
+              <Input id="username" variant="elevated" defaultValue="@peduarte" />
             </div>
           </div>
         </DrawerBody>

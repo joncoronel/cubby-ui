@@ -8,13 +8,21 @@ import { Button } from "@/registry/default/button/button";
 import { Input, type InputProps } from "@/registry/default/input/input";
 import { Textarea } from "@/registry/default/textarea/textarea";
 
-function InputGroup({ className, ...props }: React.ComponentProps<"div">) {
+function InputGroup({
+  className,
+  variant = "default",
+  ...props
+}: React.ComponentProps<"div"> & { variant?: "default" | "elevated" }) {
   return (
     <div
       data-slot="input-group"
       role="group"
       className={cn(
-        "group/input-group bg-input dark:bg-input/35 relative flex w-full items-center rounded-lg border bg-clip-padding shadow-xs",
+        "group/input-group relative flex w-full items-center rounded-lg",
+        // Edge: light has no edge (lift from shadow-input on default),
+        // dark uses level-1 inset rim for definition.
+        "dark:shadow-surface-rim-1",
+        variant === "default" ? "bg-input shadow-input" : "bg-input-elevated",
         "min-w-0 has-[>textarea]:h-auto",
 
         // Variants based on alignment.
@@ -131,17 +139,13 @@ function InputGroupText({ className, ...props }: React.ComponentProps<"span">) {
 
 export type InputGroupInputProps = InputProps;
 
-function InputGroupInput({
-  className,
-  size,
-  ...props
-}: InputGroupInputProps) {
+function InputGroupInput({ className, size, ...props }: InputGroupInputProps) {
   return (
     <Input
       data-slot="input-group-control"
       size={size}
       className={cn(
-        "flex-1 rounded-none border-0 bg-transparent shadow-none focus-visible:outline-0 aria-invalid:outline-0 dark:bg-transparent",
+        "flex-1 rounded-none bg-transparent shadow-none focus-visible:outline-0 aria-invalid:outline-0 dark:bg-transparent dark:shadow-none!",
         className,
       )}
       {...props}
@@ -157,7 +161,7 @@ function InputGroupTextarea({
     <Textarea
       data-slot="input-group-control"
       className={cn(
-        "flex-1 resize-none rounded-none border-0 bg-transparent py-3 shadow-none focus-visible:outline-0 aria-invalid:outline-0 dark:bg-transparent",
+        "flex-1 resize-none rounded-none bg-transparent py-3 shadow-none focus-visible:outline-0 aria-invalid:outline-0 dark:bg-transparent dark:shadow-none!",
         className,
       )}
       {...props}

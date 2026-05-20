@@ -22,14 +22,21 @@ function OTPField({
 
 function OTPFieldInput({
   className,
+  variant = "default",
   ...props
-}: React.ComponentProps<typeof BaseOTPField.Input>) {
+}: React.ComponentProps<typeof BaseOTPField.Input> & {
+  variant?: "default" | "elevated";
+}) {
   return (
     <BaseOTPField.Input
       data-slot="otp-field-input"
       className={cn(
         // Base styling
-        "bg-input dark:bg-input/35 border-border flex h-10 w-10 items-center justify-center rounded-lg border text-center text-base font-medium shadow-xs sm:h-9 sm:w-9 md:text-sm",
+        "flex h-10 w-10 items-center justify-center rounded-lg text-center text-base font-medium sm:h-9 sm:w-9 md:text-sm",
+        // Edge: light has no edge (lift from shadow on default), dark uses
+        // level-1 inset rim.
+        "dark:shadow-surface-rim-1",
+        variant === "default" ? "bg-input shadow-input" : "bg-input-elevated",
         // Selection
         "selection:bg-primary selection:text-primary-foreground",
         // Placeholder

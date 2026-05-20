@@ -31,11 +31,11 @@ export default function SheetInsetFooter() {
         <SheetBody className="space-y-4">
           <div className="grid gap-2">
             <Label htmlFor="name">Name</Label>
-            <Input id="name" defaultValue="Jane Cooper" />
+            <Input id="name" variant="elevated" defaultValue="Jane Cooper" />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="username">Username</Label>
-            <Input id="username" defaultValue="@janecooper" />
+            <Input id="username" variant="elevated" defaultValue="@janecooper" />
           </div>
         </SheetBody>
         <SheetFooter>

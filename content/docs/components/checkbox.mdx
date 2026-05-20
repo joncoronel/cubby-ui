@@ -37,8 +37,33 @@ Prevent interaction with disabled checkboxes.
 
 <ComponentPreview component="checkbox" example="checkbox-disabled-state" />
 
+### Elevated Variant
+
+On a Card, Dialog, or popover surface, the opaque `default` checkbox collapses into its parent. Use `variant="elevated"` for a translucent overlay that adapts to the substrate. See the [Surfaces](/docs/getting-started/surfaces) docs.
+
+<ComponentPreview component="checkbox" example="checkbox-elevated" />
+
 ### Form Integration
 
 Use [Field](/docs/components/field) and [Form](/docs/components/form) for labeling and validation. See the [Forms guide](/docs/getting-started/forms) for more patterns.
 
 <ComponentPreview component="checkbox" example="checkbox-field" />
+
+## API Reference
+
+The Checkbox component is built on top of [Base UI's Checkbox](https://base-ui.com/react/components/checkbox). All Base UI props are supported. The documentation below only covers custom props specific to our implementation.
+
+### Props
+
+<ApiPropsList>
+
+<ApiProp
+  name="variant"
+  fullType='"default" | "elevated"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Surface appearance. `default` uses opaque `bg-input`. `elevated` uses translucent `bg-input-elevated` for use inside Card, Dialog, or popover surfaces. See the [Surfaces](/docs/getting-started/surfaces) docs.
+</ApiProp>
+
+</ApiPropsList>

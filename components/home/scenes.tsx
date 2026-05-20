@@ -303,7 +303,7 @@ export function FormControlsScene() {
         <div className="flex flex-col gap-2">
           <Label htmlFor="session-length">Focus block (min)</Label>
           <NumberField id="session-length" defaultValue={45} min={5} max={180}>
-            <NumberFieldGroup>
+            <NumberFieldGroup variant="elevated">
               <NumberFieldDecrement>
                 <HugeiconsIcon
                   icon={MinusSignIcon}

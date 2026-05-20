@@ -296,6 +296,24 @@ const form = useForm({
 </form>
 ```
 
+## Forms on elevated surfaces
+
+When a form lives inside a Card, Dialog, Sheet, Drawer, or any other elevated container, the form-field defaults will collapse into the parent's white background in light mode. Switch every field that takes a `variant` prop to `variant="elevated"`:
+
+```tsx
+<Dialog>
+  <DialogContent>
+    <Field name="email">
+      <FieldLabel>Email</FieldLabel>
+      <FieldControl render={<Input variant="elevated" />} type="email" required />
+    </Field>
+    <Checkbox variant="elevated" />
+  </DialogContent>
+</Dialog>
+```
+
+Applies to Input, Textarea, NumberFieldGroup (not NumberFieldInput), InputGroup, InputOTPSlot, OTPFieldInput, ComboboxInput, ComboboxChips, AutocompleteInput, Checkbox, and RadioGroupItem. Switch handles this automatically — no variant prop needed. See the [Surfaces](/docs/getting-started/surfaces) docs for the full reasoning.
+
 ## Component reference
 
 | Component | Use for |

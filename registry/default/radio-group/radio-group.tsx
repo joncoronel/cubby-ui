@@ -19,8 +19,11 @@ function RadioGroup({
 
 function RadioGroupItem({
   className,
+  variant = "default",
   ...props
-}: React.ComponentProps<typeof Radio.Root>) {
+}: React.ComponentProps<typeof Radio.Root> & {
+  variant?: "default" | "elevated";
+}) {
   return (
     <Radio.Root
       data-slot="radio-group-item"
@@ -30,8 +33,13 @@ function RadioGroupItem({
         "disabled:cursor-not-allowed disabled:opacity-60",
         "aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
 
-        "before:bg-card dark:before:bg-input/35 hover:before:bg-muted dark:hover:before:bg-input/60 before:absolute before:size-full before:rounded-full before:border before:bg-clip-padding before:transition-colors before:content-['']",
-        "after:shadow-inset dark:after:shadow-inset-highlight after:absolute after:inset-px after:rounded-full after:content-['']",
+        // Surface plate. Edge: light has no edge (lift from before:shadow-input
+        // on default variant). Dark adds level-1 inset rim on the plate.
+        "before:absolute before:size-full before:rounded-full before:transition-colors before:content-['']",
+        "dark:before:shadow-surface-rim-1",
+        variant === "default"
+          ? "before:bg-input before:shadow-input"
+          : "before:bg-input-elevated",
 
         className,
       )}

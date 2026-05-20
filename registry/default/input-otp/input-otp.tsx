@@ -37,9 +37,11 @@ function InputOTPGroup({ className, ...props }: React.ComponentProps<"div">) {
 function InputOTPSlot({
 	index,
 	className,
+	variant = "default",
 	...props
 }: React.ComponentProps<"div"> & {
 	index: number
+	variant?: "default" | "elevated"
 }) {
 	const inputOTPContext = React.useContext(OTPInputContext)
 	const { char, hasFakeCaret, isActive } = inputOTPContext?.slots[index] ?? {}
@@ -50,8 +52,11 @@ function InputOTPSlot({
 			data-active={isActive}
 			className={cn(
 				// Base styles
-				"bg-input dark:bg-input/35 relative flex h-9 w-9 items-center justify-center text-sm shadow-xs",
-				// Border handling for adjacent slots
+				"relative flex h-9 w-9 items-center justify-center text-sm",
+				variant === "default" ? "bg-input" : "bg-input-elevated",
+				// Borders serve dual purpose here: outer perimeter + dividers
+				// between slots. Kept visible in both modes (unlike the other
+				// form fields which use shadow-input/rim for edge definition).
 				"border-border border-y border-r first:rounded-l-lg first:border-l last:rounded-r-lg",
 				// Outline transition base
 				"outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out",

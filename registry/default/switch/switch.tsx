@@ -9,7 +9,12 @@ const switchVariants = cva(
     "peer inline-flex shrink-0 items-center rounded-full p-0.5 outline-none cursor-pointer",
     "h-[calc(var(--thumb-size)+4px)]",
     "w-[calc(var(--thumb-size)*var(--thumb-aspect)*(1+var(--travel-ratio))+4px)]",
-    "data-checked:bg-primary data-unchecked:bg-accent bg-muted",
+    // Unchecked track: --input-elevated is a translucent overlay that adapts
+    // to whatever substrate it sits on (page, Card, bg-muted toolbar). Switch
+    // doesn't need a `default`/`elevated` variant pair like the other form
+    // fields — a single translucent track contrasts with both the thumb
+    // (white in light / bg-background in dark) and the parent everywhere.
+    "data-unchecked:bg-input-elevated data-checked:bg-primary",
     "inset-shadow-xs transition-all duration-200",
     "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2",
     "data-disabled:cursor-not-allowed data-disabled:opacity-60",

@@ -380,6 +380,7 @@ export default function Component() {
                     <div key={value} className="flex items-center gap-2">
                       <Checkbox
                         id={`${id}-${i}`}
+                        variant="elevated"
                         checked={selectedStatuses.includes(value)}
                         onCheckedChange={(checked: boolean) =>
                           handleStatusChange(checked, value)

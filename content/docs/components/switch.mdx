@@ -61,3 +61,5 @@ Toggle control for binary on/off states. Wraps Base UI's `Switch.Root` and `Swit
 </ApiProp>
 
 </ApiPropsList>
+
+Switch does not expose a `variant` prop like the other form fields. The unchecked track always uses `bg-input-elevated` — a translucent overlay that adapts to whatever substrate it sits on. This contrasts with both the thumb (white in light, page-dark in dark) AND the parent surface, so a single behavior works everywhere. See the [Surfaces](/docs/getting-started/surfaces) docs.

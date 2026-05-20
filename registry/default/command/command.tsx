@@ -158,7 +158,10 @@ function CommandInput({
   ...props
 }: AutocompleteBase.Input.Props & { loading?: boolean }) {
   return (
-    <InputGroup className={cn("mt-2 w-[calc(100%-1rem)]", className)}>
+    <InputGroup
+      variant="elevated"
+      className={cn("mt-2 w-[calc(100%-1rem)]", className)}
+    >
       <AutocompleteBase.Input
         data-slot="command-input"
         render={(props) => <InputGroupInput {...props} />}

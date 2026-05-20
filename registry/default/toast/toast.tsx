@@ -80,7 +80,7 @@ function upsertReplayClassName(toast: {
 // --popup-surface (set inline as var(--surface-3)).
 const TOAST_ROOT_CLASSES = [
   // Base styles & visual
-  "text-popover-foreground data-expanded:bg-(--popup-surface) absolute z-[calc(9999-var(--toast-index))] h-(--toast-calc-height) w-full rounded-lg bg-clip-padding select-none [transition:transform_.5s_cubic-bezier(.22,1,.36,1),opacity_.5s,height_.15s,background-color_.5s]",
+  "text-popover-foreground data-expanded:bg-(--popup-surface) absolute z-[calc(9999-var(--toast-index))] h-(--toast-calc-height) w-full rounded-lg select-none [transition:transform_.5s_cubic-bezier(.22,1,.36,1),opacity_.5s,height_.15s,background-color_.5s]",
   // Surface elevation — manual composition because the bg uses color-mix for stacking.
   // `[--popup-surface:var(--surface-3)]` exposes the surface color to descendants;
   // `shadow-[drops-4,rim-3]` pairs a level-4 shadow weight with a level-3 rim color.

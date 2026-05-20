@@ -1309,11 +1309,11 @@ function DrawerFooter({ className, ...props }: React.ComponentProps<"div">) {
       className={cn(
         // z-1 + translateZ(0): stays above DrawerBody(z-0); Safari-only GPU layer
         // promotion fixes sticky/transform compositing flash during enter animation
-        "bg-(--popup-surface,var(--popover)) z-1 mt-auto flex flex-col-reverse gap-2 px-6 pt-4 pb-6 sm:flex-row sm:justify-end",
+        "z-1 mt-auto flex flex-col-reverse gap-2 bg-(--popup-surface,var(--popover)) px-6 pt-4 pb-6 sm:flex-row sm:justify-end",
         "[@supports(-webkit-touch-callout:none)]:transform-[translateZ(0)]",
         "first:pt-6",
         "not-in-data-[footer-variant=inset]:in-[[data-slot=drawer-content]:has([data-slot=drawer-body])]:pt-3",
-        "in-data-[footer-variant=inset]:border-border in-data-[footer-variant=inset]:bg-muted/72 in-data-[footer-variant=inset]:border-t in-data-[footer-variant=inset]:pt-4 in-data-[footer-variant=inset]:pb-4",
+        "in-data-[footer-variant=inset]:border-border in-data-[footer-variant=inset]:bg-muted in-data-[footer-variant=inset]:border-t in-data-[footer-variant=inset]:pt-4 in-data-[footer-variant=inset]:pb-4",
         // "transition-opacity in-data-nested-dialog-open:opacity-0 in-data-nested-dragging:opacity-100",
         className,
       )}

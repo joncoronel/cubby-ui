@@ -28,13 +28,13 @@ export default function DrawerInsetFooter() {
         </DrawerHeader>
         <DrawerBody>
           <div className="space-y-3">
-            <div className="bg-muted/50 rounded-lg p-3">
+            <div className="bg-muted rounded-lg p-3">
               <p className="text-sm font-medium">Order Summary</p>
               <p className="text-muted-foreground text-sm">
                 3 items totaling $127.99
               </p>
             </div>
-            <div className="bg-muted/50 rounded-lg p-3">
+            <div className="bg-muted rounded-lg p-3">
               <p className="text-sm font-medium">Shipping Address</p>
               <p className="text-muted-foreground text-sm">
                 123 Main St, City, State 12345

@@ -7,6 +7,8 @@ import { ComponentUsageServer } from "@/components/mdx/component-usage-server";
 import { PackageManagerCommandServer } from "@/components/mdx/package-manager-command-server";
 import { MdxPreServer } from "@/components/mdx/mdx-pre-server";
 import { ApiProp, ApiPropsList } from "@/components/mdx/api-prop";
+import { SurfaceNestingDemo } from "@/components/mdx/surface-nesting-demo";
+import { SurfaceTokensDemo } from "@/components/mdx/surface-tokens-demo";
 import {
   Tabs,
   TabsList,
@@ -34,5 +36,7 @@ export function getMDXComponents(
     PackageManagerCommand: PackageManagerCommandServer,
     ApiProp,
     ApiPropsList,
+    SurfaceNestingDemo,
+    SurfaceTokensDemo,
   };
 }

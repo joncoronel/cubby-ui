@@ -11,19 +11,11 @@ Inspired by [fluidfunctionalism.com/elevated](https://www.fluidfunctionalism.com
 
 ### Why eight levels
 
-Most apps need three or four. The full eight-level ladder exists so a nested case never collapses:
+Most apps need three or four. The full eight-level ladder exists so a nested case never collapses. Wrap a panel and its substrate settles at the level it belongs to — the shadow stays the same, so a popover still reads as a popover three layers down.
 
-```
-Page             →  surface-1
-Card on page     →  surface-3
-Popover          →  surface-3
-Dropdown         →  surface-3
-Dialog           →  surface-5
-Popover in dialog→  surface-7
-Theoretical max  →  surface-8
-```
+<SurfaceNestingDemo />
 
-In light mode, surfaces 3–8 are all pure white — shadows do the heavy lifting. In dark mode the colors progress from `oklch(0.205)` to `oklch(0.402)` so each layer reads as visibly lifted.
+In light mode, surfaces 3–8 are all pure white — shadows do the heavy lifting. In dark mode the substrate colors progress from `oklch(0.205)` to `oklch(0.402)` so each layer reads as visibly lifted.
 
 ## Quick start
 
@@ -50,6 +42,10 @@ Every elevated component (Popover, Dropdown, Dialog, Sheet, etc.) accepts a `lev
 That's the whole API for consumers. `shadowLevel` is independent of `level`: it controls the drop-shadow weight, which is pinned per-component so a popover always reads visually like a popover regardless of depth.
 
 ## The ladder
+
+Eight bg/shadow pairs. Light mode flattens to pure white from level 3 up — the shadow recipe alone carries elevation. Dark mode keeps adding white-opacity to the substrate *and* progressing the shadow recipe.
+
+<SurfaceTokensDemo />
 
 ### Substrate colors
 

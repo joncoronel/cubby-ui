@@ -76,7 +76,7 @@ const tabIndicatorVariants = cva(
           "data-[orientation=horizontal]:bottom-0 data-[orientation=horizontal]:top-auto data-[orientation=horizontal]:h-0.75 data-[orientation=horizontal]:translate-y-0",
         ],
         capsule: [
-          solidSurface(4, 3),
+          solidSurface(5, 1),
           "data-[orientation=vertical]:w-auto",
           "data-[orientation=horizontal]:top-1/2 data-[orientation=horizontal]:h-(--active-tab-height)",
         ],

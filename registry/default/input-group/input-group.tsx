@@ -8,40 +8,54 @@ import { Button } from "@/registry/default/button/button";
 import { Input, type InputProps } from "@/registry/default/input/input";
 import { Textarea } from "@/registry/default/textarea/textarea";
 
+const inputGroupVariants = cva(
+  [
+    "group/input-group relative flex w-full items-center rounded-lg border bg-clip-padding",
+    "min-w-0 has-[>textarea]:h-auto",
+
+    // Variants based on alignment.
+    "has-[>[data-align=inline-start]]:[&>input]:pl-2",
+    "has-[>[data-align=inline-end]]:[&>input]:pr-2",
+    "has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col has-[>[data-align=block-start]]:[&>input]:pb-3",
+    "has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-end]]:[&>input]:pt-3",
+
+    // Focus state.
+    "has-[[data-slot=input-group-control]:focus-visible]:outline-ring/50 has-[[data-slot=input-group-control]:focus-visible]:outline-2 has-[[data-slot=input-group-control]:focus-visible]:outline-offset-2 has-[[data-slot=input-group-control]:focus-visible]:outline-solid",
+
+    // Error state.
+    "has-[[data-slot][aria-invalid=true]]:outline-destructive/50 has-[[data-slot][aria-invalid=true]]:outline-2 has-[[data-slot][aria-invalid=true]]:outline-offset-2 has-[[data-slot][aria-invalid=true]]:outline-solid",
+
+    // Transition outline
+    "outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out",
+  ],
+  {
+    variants: {
+      variant: {
+        // Opaque "lifted" bg — matches Input default. Use on the page or any
+        // non-elevated substrate.
+        default: "bg-input",
+        // Translucent overlay that adapts to substrate. Use inside Cards,
+        // Dialogs, popovers, or any surface where the opaque default would
+        // collapse into its parent.
+        elevated: "bg-input-elevated",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  },
+);
+
 function InputGroup({
   className,
-  variant = "default",
+  variant,
   ...props
-}: React.ComponentProps<"div"> & { variant?: "default" | "elevated" }) {
+}: React.ComponentProps<"div"> & VariantProps<typeof inputGroupVariants>) {
   return (
     <div
       data-slot="input-group"
       role="group"
-      className={cn(
-        "group/input-group relative flex w-full items-center rounded-lg",
-        // Edge: light has no edge (lift from shadow-input on default),
-        // dark uses level-1 inset rim for definition.
-        "dark:shadow-surface-rim-1",
-        variant === "default" ? "bg-input shadow-input" : "bg-input-elevated",
-        "min-w-0 has-[>textarea]:h-auto",
-
-        // Variants based on alignment.
-        "has-[>[data-align=inline-start]]:[&>input]:pl-2",
-        "has-[>[data-align=inline-end]]:[&>input]:pr-2",
-        "has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col has-[>[data-align=block-start]]:[&>input]:pb-3",
-        "has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-end]]:[&>input]:pt-3",
-
-        // Focus state.
-        "has-[[data-slot=input-group-control]:focus-visible]:outline-ring/50 has-[[data-slot=input-group-control]:focus-visible]:outline-2 has-[[data-slot=input-group-control]:focus-visible]:outline-offset-2 has-[[data-slot=input-group-control]:focus-visible]:outline-solid",
-
-        // Error state.
-        "has-[[data-slot][aria-invalid=true]]:outline-destructive/50 has-[[data-slot][aria-invalid=true]]:outline-2 has-[[data-slot][aria-invalid=true]]:outline-offset-2 has-[[data-slot][aria-invalid=true]]:outline-solid",
-
-        // Transition outline
-        "outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out",
-
-        className,
-      )}
+      className={cn(inputGroupVariants({ variant }), className)}
       {...props}
     />
   );
@@ -145,7 +159,7 @@ function InputGroupInput({ className, size, ...props }: InputGroupInputProps) {
       data-slot="input-group-control"
       size={size}
       className={cn(
-        "flex-1 rounded-none bg-transparent shadow-none focus-visible:outline-0 aria-invalid:outline-0 dark:bg-transparent dark:shadow-none!",
+        "flex-1 rounded-none border-0 bg-transparent shadow-none focus-visible:outline-0 aria-invalid:outline-0 dark:bg-transparent",
         className,
       )}
       {...props}
@@ -161,7 +175,7 @@ function InputGroupTextarea({
     <Textarea
       data-slot="input-group-control"
       className={cn(
-        "flex-1 resize-none rounded-none bg-transparent py-3 shadow-none focus-visible:outline-0 aria-invalid:outline-0 dark:bg-transparent dark:shadow-none!",
+        "flex-1 resize-none rounded-none border-0 bg-transparent py-3 shadow-none focus-visible:outline-0 aria-invalid:outline-0 dark:bg-transparent",
         className,
       )}
       {...props}

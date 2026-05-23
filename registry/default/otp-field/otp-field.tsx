@@ -32,11 +32,8 @@ function OTPFieldInput({
       data-slot="otp-field-input"
       className={cn(
         // Base styling
-        "flex h-10 w-10 items-center justify-center rounded-lg text-center text-base font-medium sm:h-9 sm:w-9 md:text-sm",
-        // Edge: light has no edge (lift from shadow on default), dark uses
-        // level-1 inset rim.
-        "dark:shadow-surface-rim-1",
-        variant === "default" ? "bg-input shadow-input" : "bg-input-elevated",
+        "flex h-10 w-10 items-center justify-center rounded-lg border bg-clip-padding text-center text-base font-medium sm:h-9 sm:w-9 md:text-sm",
+        variant === "default" ? "bg-input" : "bg-input-elevated",
         // Selection
         "selection:bg-primary selection:text-primary-foreground",
         // Placeholder

@@ -51,24 +51,33 @@ Copy and paste the following into your `globals.css` file:
   --primary: oklch(0.6 0.2 250);
   --primary-foreground: oklch(1 0 0);
   --neutral: oklch(0.22 0 0);
-  --neutral-foreground: oklch(0.98 var(--neutral-chroma-low) var(--neutral-hue));
-  --secondary: oklch(0.95 0 0);
+  --neutral-foreground: oklch(
+    0.98 var(--neutral-chroma-low) var(--neutral-hue)
+  );
+  --secondary: oklch(0.92 0 0);
   --secondary-foreground: oklch(0.32 var(--neutral-chroma) var(--neutral-hue));
   --muted: oklch(0.94 0 0);
   --muted-foreground: oklch(0.5 var(--neutral-chroma) var(--neutral-hue));
   --accent: oklch(0.91 0 0);
   --accent-foreground: oklch(0.22 var(--neutral-chroma) var(--neutral-hue));
   --destructive: oklch(0.53 0.19 25);
-  --destructive-foreground: oklch(0.98 var(--neutral-chroma-low) var(--neutral-hue));
+  --destructive-foreground: oklch(
+    0.98 var(--neutral-chroma-low) var(--neutral-hue)
+  );
+
+  /* Hover-state colors — mix direction chosen per-token to shift away
+     from each token's natural lightness, so the change is always visible.
+     --neutral is already dark (0.22) so it lightens instead of darkens. */
+  --primary-hover: color-mix(in oklch, var(--primary), black 5%);
+  --neutral-hover: color-mix(in oklch, var(--neutral), white 10%);
+  --destructive-hover: color-mix(in oklch, var(--destructive), black 5%);
+  --secondary-hover: color-mix(in oklch, var(--secondary), black 5%);
+  --outline-hover: color-mix(in oklch, var(--card), black 5%);
 
   /* Borders & form fields */
-  --border: oklch(0 0 0 / 8%);
+  --border: oklch(0 0 0 / 10%);
   --input: var(--surface-3);
   --input-elevated: oklch(0 0 0 / 8%);
-  --input-shadow:
-    0 2px 4px 0 oklch(0 0 0 / 0.04),
-    0 1px 2px 0 oklch(0 0 0 / 0.06),
-    0 0 1px 0 oklch(0 0 0 / 0.06);
   --ring: oklch(0.55 0.2 250);
   --scrollbar: oklch(0.87 0 0);
 
@@ -76,9 +85,13 @@ Copy and paste the following into your `globals.css` file:
   --sidebar: var(--surface-1);
   --sidebar-foreground: oklch(0.22 var(--neutral-chroma) var(--neutral-hue));
   --sidebar-primary: oklch(0.28 0 0);
-  --sidebar-primary-foreground: oklch(0.97 var(--neutral-chroma) var(--neutral-hue));
+  --sidebar-primary-foreground: oklch(
+    0.97 var(--neutral-chroma) var(--neutral-hue)
+  );
   --sidebar-accent: oklch(0.92 0 0);
-  --sidebar-accent-foreground: oklch(0.28 var(--neutral-chroma) var(--neutral-hue));
+  --sidebar-accent-foreground: oklch(
+    0.28 var(--neutral-chroma) var(--neutral-hue)
+  );
   --sidebar-border: oklch(0.9 var(--neutral-chroma) var(--neutral-hue));
   --sidebar-ring: oklch(0.65 var(--neutral-chroma) var(--neutral-hue));
 
@@ -187,6 +200,15 @@ Copy and paste the following into your `globals.css` file:
   --accent-foreground: oklch(0.95 var(--neutral-chroma) var(--neutral-hue));
   --destructive: oklch(0.5 0.22 25);
   --destructive-foreground: oklch(1 0 0);
+
+  /* Dark-mode hover colors — same per-token logic. --neutral is near-white
+     in dark (0.95) so it darkens instead of brightens. */
+  --primary-hover: color-mix(in oklch, var(--primary), white 10%);
+  --neutral-hover: color-mix(in oklch, var(--neutral), black 10%);
+  --destructive-hover: color-mix(in oklch, var(--destructive), white 15%);
+  --secondary-hover: color-mix(in oklch, var(--secondary), white 5%);
+  --outline-hover: color-mix(in oklch, var(--card), white 5%);
+
   --border: oklch(1 0 0 / 10%);
   --input-elevated: oklch(1 0 0 / 9%);
   --scrollbar: oklch(0.7 var(--neutral-chroma) var(--neutral-hue));
@@ -194,9 +216,13 @@ Copy and paste the following into your `globals.css` file:
   /* Sidebar */
   --sidebar-foreground: oklch(0.88 var(--neutral-chroma) var(--neutral-hue));
   --sidebar-primary: oklch(0.95 var(--neutral-chroma) var(--neutral-hue));
-  --sidebar-primary-foreground: oklch(0.13 var(--neutral-chroma) var(--neutral-hue));
+  --sidebar-primary-foreground: oklch(
+    0.13 var(--neutral-chroma) var(--neutral-hue)
+  );
   --sidebar-accent: oklch(0.19 var(--neutral-chroma) var(--neutral-hue));
-  --sidebar-accent-foreground: oklch(0.95 var(--neutral-chroma) var(--neutral-hue));
+  --sidebar-accent-foreground: oklch(
+    0.95 var(--neutral-chroma) var(--neutral-hue)
+  );
   --sidebar-border: oklch(0.28 var(--neutral-chroma) var(--neutral-hue));
   --sidebar-ring: oklch(0.83 var(--neutral-chroma) var(--neutral-hue));
 
@@ -244,45 +270,36 @@ Copy and paste the following into your `globals.css` file:
   --surface-shadow-far: oklch(0 0 0 / 0.14);
   --surface-shadow-ambient: oklch(0 0 0 / 0.12);
 
-  /* Form fields drop their lift in dark — hairline border per component */
-  --input-shadow: 0 0 transparent;
-
   /* Dark shadow recipe — drops + per-level outer ring */
   --surface-shadow-1: 0 0 transparent;
   --surface-shadow-2: 0 1px 1px -0.5px var(--surface-shadow-near);
   --surface-shadow-3:
-    0 0 0 1px oklch(0 0 0 / 0.12),
-    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 0 0 1px oklch(0 0 0 / 0.12), 0 1px 1px -0.5px var(--surface-shadow-near),
     0 3px 3px -1.5px var(--surface-shadow-mid);
   --surface-shadow-4:
-    0 0 0 1px oklch(0 0 0 / 0.14),
-    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 0 0 1px oklch(0 0 0 / 0.14), 0 1px 1px -0.5px var(--surface-shadow-near),
     0 3px 3px -1.5px var(--surface-shadow-mid),
     0 6px 6px -3px var(--surface-shadow-mid);
   --surface-shadow-5:
-    0 0 0 1px oklch(0 0 0 / 0.16),
-    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 0 0 1px oklch(0 0 0 / 0.16), 0 1px 1px -0.5px var(--surface-shadow-near),
     0 3px 3px -1.5px var(--surface-shadow-mid),
     0 6px 6px -3px var(--surface-shadow-mid),
     0 12px 12px -6px var(--surface-shadow-far);
   --surface-shadow-6:
-    0 0 0 1px oklch(0 0 0 / 0.18),
-    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 0 0 1px oklch(0 0 0 / 0.18), 0 1px 1px -0.5px var(--surface-shadow-near),
     0 3px 3px -1.5px var(--surface-shadow-mid),
     0 6px 6px -3px var(--surface-shadow-mid),
     0 12px 12px -6px var(--surface-shadow-far),
     0 24px 24px -12px var(--surface-shadow-far);
   --surface-shadow-7:
-    0 0 0 1px oklch(0 0 0 / 0.2),
-    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 0 0 1px oklch(0 0 0 / 0.2), 0 1px 1px -0.5px var(--surface-shadow-near),
     0 3px 3px -1.5px var(--surface-shadow-mid),
     0 6px 6px -3px var(--surface-shadow-mid),
     0 12px 12px -6px var(--surface-shadow-far),
     0 24px 24px -12px var(--surface-shadow-far),
     0 48px 48px -24px var(--surface-shadow-ambient);
   --surface-shadow-8:
-    0 0 0 1px oklch(0 0 0 / 0.22),
-    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 0 0 1px oklch(0 0 0 / 0.22), 0 1px 1px -0.5px var(--surface-shadow-near),
     0 3px 3px -1.5px var(--surface-shadow-mid),
     0 6px 6px -3px var(--surface-shadow-mid),
     0 12px 12px -6px var(--surface-shadow-far),
@@ -384,7 +401,6 @@ Copy and paste the following into your `globals.css` file:
   /* Inset shadows */
   --shadow-inset: 0 1px 2px 0 oklch(0 0 0 / 0.08);
   --shadow-inset-highlight: 0 -1px oklch(1 0 0 / 0.04);
-  --shadow-input: var(--input-shadow);
 
   /* Surface elevation utilities */
   --color-surface-1: var(--surface-1);
@@ -475,7 +491,6 @@ Form fields (Input, Textarea, Checkbox, Radio, etc.) use three dedicated tokens:
 
 - `--input`: Default bg — aliased to `--surface-3` so it matches Card surfaces
 - `--input-elevated`: Translucent overlay for the `elevated` variant — adapts to any substrate (use inside Cards, Dialogs, popovers)
-- `--input-shadow`: 3-layer soft drop shadow for the `default` variant in light mode (transparent in dark; dark mode uses a hairline border instead)
 
 See the [Forms](/docs/getting-started/forms) guide for when to use which variant.
 

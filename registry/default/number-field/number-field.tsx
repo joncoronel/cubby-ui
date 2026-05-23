@@ -7,16 +7,25 @@ import { cn } from "@/lib/utils";
 
 const numberFieldGroupVariants = cva(
   [
-    // Composite group surface — shadow lives here (not on the individual
-    // input/buttons) so the [-][input][+] cluster reads as a single lifted
-    // element. Light: shadow-input. Dark: level-1 inset rim.
-    "flex rounded-lg overflow-hidden dark:shadow-surface-rim-1",
+    "flex rounded-lg",
+    // Focus + invalid state live on the wrapper (triggered by the input
+    // inside), so the outline wraps the entire cluster instead of just the
+    // middle segment.
+    "outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid",
+    "has-[[data-slot=number-field-input]:focus-visible]:outline-ring/50 has-[[data-slot=number-field-input]:focus-visible]:outline-2 has-[[data-slot=number-field-input]:focus-visible]:outline-offset-2",
+    "has-[[data-slot=number-field-input][aria-invalid=true]]:outline-destructive/50 has-[[data-slot=number-field-input][aria-invalid=true]]:outline-2 has-[[data-slot=number-field-input][aria-invalid=true]]:outline-offset-2",
   ],
   {
     variants: {
       variant: {
-        default: "bg-input shadow-input",
-        elevated: "bg-input-elevated",
+        // Opaque base — hover uses --outline-hover (a deliberate -5% darken of
+        // --card/--input) for a sharp delta against the opaque plate.
+        default:
+          "[--number-field-bg:var(--input)] [--number-field-hover:var(--outline-hover)]",
+        // Translucent overlay base — hover uses --surface-hover (alpha overlay)
+        // so translucency is preserved on any substrate.
+        elevated:
+          "[--number-field-bg:var(--input-elevated)] [--number-field-hover:var(--surface-hover)]",
       },
     },
     defaultVariants: {
@@ -25,10 +34,7 @@ const numberFieldGroupVariants = cva(
   },
 );
 
-function NumberField({
-  className,
-  ...props
-}: BaseNumberField.Root.Props) {
+function NumberField({ className, ...props }: BaseNumberField.Root.Props) {
   return (
     <BaseNumberField.Root
       data-slot="number-field"
@@ -62,10 +68,11 @@ function NumberFieldInput({
       data-slot="number-field-input"
       className={cn(
         "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground",
-        "h-10 w-24 bg-transparent text-center text-base font-normal tabular-nums transition-colors duration-200 sm:h-9 md:text-sm",
+        // Own card. border-y only — left/right edges come from the adjacent
+        // buttons' borders, fusing the three segments into one cluster.
+        "border-y bg-(--number-field-bg) bg-clip-padding",
+        "h-10 w-24 text-center text-base font-normal tabular-nums transition-colors duration-200 outline-none sm:h-9 md:text-sm",
         "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60",
-        "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:z-1 focus-visible:outline-2 focus-visible:outline-offset-2",
-        "aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
         className,
       )}
       {...props}
@@ -81,11 +88,14 @@ function NumberFieldIncrement({
     <BaseNumberField.Increment
       data-slot="number-field-increment"
       className={cn(
-        // Hairline divider on the left only (between input and button).
-        "border-border border-l hover:bg-accent/50 active:bg-accent",
-        "flex size-10 items-center justify-center bg-transparent select-none sm:size-9",
+        // Own card. Borders on top/right/bottom only — no left border so the
+        // segment fuses seamlessly into the input.
+        "rounded-r-lg border-y border-r bg-(--number-field-bg) bg-clip-padding",
+        "hover:bg-(--number-field-hover)",
+        "flex size-10 items-center justify-center select-none sm:size-9",
         "disabled:pointer-events-none disabled:opacity-60",
-        "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+        "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,scale] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+        "origin-left active:scale-[0.98]",
         className,
       )}
       {...props}
@@ -101,11 +111,14 @@ function NumberFieldDecrement({
     <BaseNumberField.Decrement
       data-slot="number-field-decrement"
       className={cn(
-        // Hairline divider on the right only (between button and input).
-        "border-border border-r hover:bg-accent/50 active:bg-accent",
-        "flex size-10 items-center justify-center bg-transparent select-none sm:size-9",
+        // Own card. Borders on top/left/bottom only — no right border so the
+        // segment fuses seamlessly into the input.
+        "rounded-l-lg border-y border-l bg-(--number-field-bg) bg-clip-padding",
+        "hover:bg-(--number-field-hover)",
+        "flex size-10 items-center justify-center select-none sm:size-9",
         "disabled:pointer-events-none disabled:opacity-60",
-        "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+        "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,scale] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+        "origin-right active:scale-[0.98]",
         className,
       )}
       {...props}

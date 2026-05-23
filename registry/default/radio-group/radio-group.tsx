@@ -32,22 +32,18 @@ function RadioGroupItem({
         "focus-visible:outline-ring/50 ease-out-expo outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-150 outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
         "disabled:cursor-not-allowed disabled:opacity-60",
         "aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
-
-        // Surface plate. Edge: light has no edge (lift from before:shadow-input
-        // on default variant). Dark adds level-1 inset rim on the plate.
-        "before:absolute before:size-full before:rounded-full before:transition-colors before:content-['']",
-        "dark:before:shadow-surface-rim-1",
-        variant === "default"
-          ? "before:bg-input before:shadow-input"
-          : "before:bg-input-elevated",
-
+        // Surface plate. Real border + bg-clip-padding so the border draws
+        // on the substrate (matches Input). The Indicator uses -inset-px to
+        // extend over the border area when selected, hiding it completely.
+        "border bg-clip-padding",
+        variant === "default" ? "bg-input" : "bg-input-elevated",
         className,
       )}
       {...props}
     >
       <Radio.Indicator
         className={cn(
-          "bg-primary before:bg-primary-foreground z-1 flex size-full items-center justify-center rounded-full",
+          "bg-primary before:bg-primary-foreground absolute -inset-px z-1 flex items-center justify-center rounded-full",
           "ease-out-expo transition-opacity duration-150",
           "data-starting-style:opacity-0",
           "data-ending-style:opacity-0",

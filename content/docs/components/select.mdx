@@ -67,6 +67,12 @@ Use objects as values instead of primitives. The `itemToStringValue` prop conver
 
 <ComponentPreview component="select" example="select-object-values" />
 
+### Elevated Variant
+
+On a Card, Dialog, or popover surface, the opaque `default` trigger collapses into its parent. Use `variant="elevated"` on `SelectTrigger` for a translucent overlay that adapts to the substrate. See the [Surfaces](/docs/getting-started/surfaces) docs.
+
+<ComponentPreview component="select" example="select-elevated" />
+
 ### Form Integration
 
 Use [Field](/docs/components/field) with `SelectLabel` for labeling. See the [Forms guide](/docs/getting-started/forms) for more patterns.
@@ -98,6 +104,15 @@ Button that opens the dropdown when clicked. Wraps Base UI's `Select.Trigger`.
   defaultValue='"default"'
 >
   Size variant of the trigger button.
+</ApiProp>
+
+<ApiProp
+  name="variant"
+  fullType="'default' | 'elevated'"
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Surface appearance. `default` uses opaque `bg-input` with a soft drop shadow in light mode. `elevated` uses translucent `bg-input-elevated` for use inside Card, Dialog, or popover surfaces. Matches the same prop on Input, Combobox, and Autocomplete. See the [Surfaces](/docs/getting-started/surfaces) docs.
 </ApiProp>
 
 <ApiProp name="hideChevronRotation" fullType="boolean" defaultValue="false">

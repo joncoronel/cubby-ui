@@ -6,20 +6,26 @@ import { Button as BaseButton } from "@base-ui/react/button";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "relative inline-flex items-center cursor-pointer justify-center whitespace-nowrap rounded-lg text-sm font-medium data-disabled:pointer-events-none data-disabled:opacity-65 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,scale,opacity,shadow] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid active:shadow-none before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)]",
+  "relative inline-flex items-center cursor-pointer justify-center whitespace-nowrap rounded-lg text-sm font-medium data-disabled:pointer-events-none data-disabled:opacity-65 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,scale,opacity,shadow,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid active:shadow-none active:not-aria-[haspopup]:scale-[0.98]",
   {
     variants: {
       variant: {
-        primary: "bg-primary text-primary-foreground hover:bg-primary/90",
-        neutral: "bg-neutral text-neutral-foreground  hover:bg-neutral/90",
+        primary:
+          "bg-primary text-primary-foreground hover:bg-(--primary-hover)",
+        "primary-soft":
+          "bg-secondary text-primary hover:bg-(--secondary-hover)",
+        neutral:
+          "bg-neutral text-neutral-foreground hover:bg-(--neutral-hover)",
         destructive:
-          "bg-destructive text-destructive-foreground  hover:bg-destructive/90  border border-black/5 dark:border-white/5",
+          "bg-destructive text-destructive-foreground hover:bg-(--destructive-hover) border border-black/5 dark:border-white/5",
+        "destructive-soft":
+          "bg-destructive/12 text-destructive hover:bg-destructive/20",
         outline:
-          "border bg-clip-padding bg-card dark:bg-input/35 hover:bg-accent/50 dark:hover:bg-input/60 hover:text-accent-foreground in-data-[slot=button-group]:shadow-xs not-disabled:not-active:not-data-pressed:not-in-data-[slot=button-group]:before:shadow-inset dark:not-disabled:not-active:not-data-pressed:not-in-data-[slot=button-group]:before:shadow-inset-highlight [:disabled,:active,[data-pressed]]:shadow-none",
+          "border bg-clip-padding bg-transparent hover:bg-(--surface-hover) hover:text-accent-foreground",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-transparent ",
+          "bg-secondary text-secondary-foreground hover:bg-(--secondary-hover) border border-transparent",
         ghost:
-          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent shadow-none border border-transparent",
+          "text-muted-foreground hover:bg-(--surface-hover) hover:text-foreground shadow-none border border-transparent",
         link: "text-primary underline-offset-4 hover:underline shadow-none",
       },
       size: {

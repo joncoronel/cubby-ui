@@ -727,7 +727,7 @@ function TreeItemInternal<
                 className={cn(
                   "-my-1.5 flex flex-1 items-center gap-2 rounded-md px-2 py-1.5 transition-colors outline-none select-none",
                   "-mx-2",
-                  "focus-visible:bg-accent focus-visible:ring-ring/50 focus-visible:ring-2",
+                  "focus-visible:bg-(--surface-hover) focus-visible:ring-ring/50 focus-visible:ring-2",
                   !isDisabled && "cursor-pointer",
                 )}
                 onClick={handleClick}
@@ -822,7 +822,7 @@ function TreeItemInternal<
                   }}
                   className={cn(
                     "group/trigger -mx-2 -my-1.5 flex flex-1 items-center gap-2 rounded-md border-0 bg-transparent px-2 py-1.5 text-left transition-colors outline-none select-none",
-                    "focus-visible:bg-accent focus-visible:ring-ring/50 focus-visible:ring-2",
+                    "focus-visible:bg-(--surface-hover) focus-visible:ring-ring/50 focus-visible:ring-2",
                     !isDisabled && "cursor-pointer",
                   )}
                   onClick={() => {
@@ -875,7 +875,7 @@ function TreeItemInternal<
                   }}
                   className={cn(
                     "group/trigger -mx-2 -my-1.5 flex flex-1 items-center gap-2 rounded-md border-0 bg-transparent px-2 py-1.5 text-left transition-colors outline-none select-none",
-                    "focus-visible:bg-accent focus-visible:ring-ring/50 focus-visible:ring-2",
+                    "focus-visible:bg-(--surface-hover) focus-visible:ring-ring/50 focus-visible:ring-2",
                     !isDisabled && "cursor-pointer",
                   )}
                   onClick={(e) => {

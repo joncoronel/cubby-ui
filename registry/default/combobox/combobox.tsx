@@ -491,7 +491,7 @@ function ComboboxChip({ className, ...props }: BaseCombobox.Chip.Props) {
     <BaseCombobox.Chip
       data-slot="combobox-chip"
       className={cn(
-        "bg-accent text-accent-foreground dark:border-border/50 flex items-center gap-1 rounded-sm border px-[calc(--spacing(2)-1px)] py-[calc(--spacing(1)-1px)] text-sm font-medium break-all sm:text-xs",
+        "bg-(--surface-selected) text-accent-foreground flex items-center gap-1 rounded-sm px-2 py-1 text-sm font-medium break-all sm:text-xs",
         className,
       )}
       {...props}

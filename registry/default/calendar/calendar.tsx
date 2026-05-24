@@ -41,7 +41,7 @@ function Calendar({
           today: cn("bg-accent", classNames?.today),
           week: cn("flex justify-center py-0.5 last:pb-2", classNames?.week),
           day: cn(
-            "flex size-9 items-center justify-center rounded-md text-sm font-normal  hover:[&:has(>button)]:bg-accent hover:[&:has(>button)]:text-accent-foreground",
+            "flex size-9 items-center justify-center rounded-md text-sm font-normal hover:[&:has(>button)]:bg-(--surface-hover) hover:[&:has(>button)]:text-accent-foreground",
             classNames?.day,
           ),
           day_button: cn(
@@ -100,7 +100,7 @@ function Calendar({
               {...props}
               className={cn(
                 buttonVariants({ variant: "ghost", size: "icon" }),
-                "hover:bg-accent absolute top-0.5 right-2 z-1 size-8",
+                "absolute top-0.5 right-2 z-1 size-8",
                 classNames?.button_next,
               )}
             >
@@ -112,7 +112,7 @@ function Calendar({
               {...props}
               className={cn(
                 buttonVariants({ variant: "ghost", size: "icon" }),
-                "hover:bg-accent absolute top-0.5 left-2 z-1 size-8",
+                "absolute top-0.5 left-2 z-1 size-8",
                 classNames?.button_previous,
               )}
             >

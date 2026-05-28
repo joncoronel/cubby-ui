@@ -476,7 +476,7 @@ function CodeBlockPre({
       // Inner code body — looks like a Default Card sitting in the gray tray.
       solidSurface(3),
       // Focus mode: blur and dim non-focused lines
-      "[&[data-has-focus]_.line:not([data-focused])]:opacity-50 [&[data-has-focus]_.line:not([data-focused])]:blur-[1px] [&[data-has-focus]_.line:not([data-focused])]:transition-all",
+      "[&[data-has-focus]_.line:not([data-focused])]:opacity-60 [&[data-has-focus]_.line:not([data-focused])]:blur-[1px] [&[data-has-focus]_.line:not([data-focused])]:transition-all",
       className,
     ),
     children: (

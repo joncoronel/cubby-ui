@@ -138,7 +138,7 @@ function Kbd({
       data-slot="kbd"
       className={cn(
         kbdVariants({ size, variant, pressed }),
-        disabled && "cursor-not-allowed opacity-50",
+        disabled && "cursor-not-allowed opacity-60",
         className,
       )}
       aria-label={ariaLabel}

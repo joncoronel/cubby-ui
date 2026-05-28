@@ -713,7 +713,7 @@ function TreeItemInternal<
                 isSelected &&
                   !context.disableSelection &&
                   "bg-(--surface-selected) text-accent-foreground",
-                isDisabled && "cursor-not-allowed opacity-50",
+                isDisabled && "cursor-not-allowed opacity-60",
               )}
             >
               <div
@@ -727,7 +727,7 @@ function TreeItemInternal<
                 className={cn(
                   "-my-1.5 flex flex-1 items-center gap-2 rounded-md px-2 py-1.5 transition-colors outline-none select-none",
                   "-mx-2",
-                  "focus-visible:bg-(--surface-hover) focus-visible:ring-ring/50 focus-visible:ring-2",
+                  "focus-visible:bg-(--surface-hover) focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
                   !isDisabled && "cursor-pointer",
                 )}
                 onClick={handleClick}
@@ -807,7 +807,7 @@ function TreeItemInternal<
                 isSelected &&
                   !context.disableSelection &&
                   "bg-(--surface-selected) text-accent-foreground",
-                isDisabled && "cursor-not-allowed opacity-50",
+                isDisabled && "cursor-not-allowed opacity-60",
               )}
             >
               {context.enableBulkActions ? (
@@ -822,7 +822,7 @@ function TreeItemInternal<
                   }}
                   className={cn(
                     "group/trigger -mx-2 -my-1.5 flex flex-1 items-center gap-2 rounded-md border-0 bg-transparent px-2 py-1.5 text-left transition-colors outline-none select-none",
-                    "focus-visible:bg-(--surface-hover) focus-visible:ring-ring/50 focus-visible:ring-2",
+                    "focus-visible:bg-(--surface-hover) focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
                     !isDisabled && "cursor-pointer",
                   )}
                   onClick={() => {
@@ -857,7 +857,7 @@ function TreeItemInternal<
                     className={cn(
                       "text-muted-foreground ease-out-expo size-4 shrink-0 transition-transform duration-[325ms]",
                       isExpanded && "rotate-90",
-                      isDisabled && "opacity-50",
+                      isDisabled && "opacity-60",
                     )}
                     strokeWidth={2}
                   />
@@ -875,7 +875,7 @@ function TreeItemInternal<
                   }}
                   className={cn(
                     "group/trigger -mx-2 -my-1.5 flex flex-1 items-center gap-2 rounded-md border-0 bg-transparent px-2 py-1.5 text-left transition-colors outline-none select-none",
-                    "focus-visible:bg-(--surface-hover) focus-visible:ring-ring/50 focus-visible:ring-2",
+                    "focus-visible:bg-(--surface-hover) focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
                     !isDisabled && "cursor-pointer",
                   )}
                   onClick={(e) => {
@@ -896,7 +896,7 @@ function TreeItemInternal<
                     className={cn(
                       "text-muted-foreground ease-out-expo size-4 shrink-0 transition-transform duration-[325ms]",
                       isExpanded && "rotate-90",
-                      isDisabled && "opacity-50",
+                      isDisabled && "opacity-60",
                     )}
                     strokeWidth={2}
                   />

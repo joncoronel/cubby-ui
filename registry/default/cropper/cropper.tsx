@@ -224,7 +224,7 @@ const CropperZoomControls = forwardRef<
         type="button"
         onClick={handleZoomOut}
         disabled={zoom <= minZoom}
-        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-sm font-medium ring-offset-background transition-colors duration-200 hover:bg-(--surface-hover) hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-sm font-medium hover:bg-(--surface-hover) hover:text-accent-foreground focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-60"
         aria-label="Zoom out"
       >
         <HugeiconsIcon icon={ZoomOutAreaIcon} className="h-4 w-4"  strokeWidth={2} />
@@ -238,7 +238,7 @@ const CropperZoomControls = forwardRef<
         type="button"
         onClick={handleZoomIn}
         disabled={zoom >= maxZoom}
-        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-sm font-medium ring-offset-background transition-colors duration-200 hover:bg-(--surface-hover) hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-sm font-medium hover:bg-(--surface-hover) hover:text-accent-foreground focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-60"
         aria-label="Zoom in"
       >
         <HugeiconsIcon icon={ZoomInAreaIcon} className="h-4 w-4"  strokeWidth={2} />
@@ -287,7 +287,7 @@ const CropperAspectRatioControls = forwardRef<
           type="button"
           onClick={() => onAspectRatioChange(preset.value)}
           className={cn(
-            "inline-flex h-9 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium ring-offset-background transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+            "inline-flex h-9 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
             isActive
               ? "border-primary bg-primary text-primary-foreground shadow-[0_1px_3px_0_oklch(0.18_0_0_/_0.08)]"
               : "border-border bg-background hover:bg-(--surface-hover) hover:text-accent-foreground"

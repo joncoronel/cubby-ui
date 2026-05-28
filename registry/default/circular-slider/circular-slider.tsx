@@ -77,7 +77,7 @@ const circularSliderVariants = cva(
         filled: "",
       },
       disabled: {
-        true: "opacity-50 cursor-not-allowed pointer-events-none",
+        true: "opacity-60 cursor-not-allowed pointer-events-none",
         false: "",
       },
     },

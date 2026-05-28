@@ -45,7 +45,7 @@ function Calendar({
             classNames?.day,
           ),
           day_button: cn(
-            "size-9 rounded-md focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring/30",
+            "size-9 rounded-md focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
             classNames?.day_button,
           ),
           weekdays: cn(
@@ -83,7 +83,7 @@ function Calendar({
             classNames?.range_end,
           ),
           disabled: cn(
-            "pointer-events-none text-muted-foreground opacity-50",
+            "pointer-events-none text-muted-foreground opacity-60",
             classNames?.disabled,
           ),
           hidden: cn("pointer-events-none", classNames?.hidden),

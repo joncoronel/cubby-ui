@@ -6,7 +6,7 @@ import { Button as BaseButton } from "@base-ui/react/button";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "relative inline-flex items-center cursor-pointer justify-center whitespace-nowrap rounded-lg text-sm font-medium data-disabled:pointer-events-none data-disabled:opacity-65 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,scale,opacity,shadow,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid active:shadow-none active:not-aria-[haspopup]:scale-[0.98]",
+  "relative inline-flex items-center cursor-pointer justify-center whitespace-nowrap rounded-lg text-sm font-medium data-disabled:pointer-events-none data-disabled:opacity-60 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,scale,opacity,shadow,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid active:shadow-none active:not-aria-[haspopup]:scale-[0.98]",
   {
     variants: {
       variant: {

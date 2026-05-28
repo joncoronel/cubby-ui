@@ -11,7 +11,7 @@ import {
 } from "@/registry/default/scroll-area/scroll-area";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Cancel01Icon } from "@hugeicons/core-free-icons";
+import { ArrowDown01Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
 const AutocompleteRoot = BaseAutocomplete.Root;
 
 function AutocompleteInput({
@@ -49,15 +49,7 @@ function AutocompleteInput({
       />
       {(showClear || showTrigger) && (
         <div className="absolute inset-y-0 right-3 flex items-center gap-2">
-          {showClear && (
-            <AutocompleteClear>
-              <HugeiconsIcon
-                icon={Cancel01Icon}
-                className="h-4 w-4"
-                strokeWidth={2}
-              />
-            </AutocompleteClear>
-          )}
+          {showClear && <AutocompleteClear />}
           {showTrigger && <AutocompleteTrigger />}
         </div>
       )}
@@ -73,14 +65,21 @@ function AutocompleteTrigger({
   return (
     <BaseAutocomplete.Trigger
       data-slot="autocomplete-trigger"
+      aria-label="Open popup"
       className={cn(
-        "border-border/70 bg-card hover:bg-accent/5 inline-flex h-9 items-center justify-center rounded-lg border px-3 py-2 text-sm font-medium shadow-[0_1px_2px_0_oklch(0.18_0_0/0.04)] transition-colors disabled:pointer-events-none disabled:opacity-60",
-        "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+        "inline-flex size-4 cursor-pointer items-center justify-center rounded-md border-none bg-transparent p-0 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-60",
+        "focus-visible:border-ring focus-visible:ring-ring/30 focus-visible:ring-3",
         className,
       )}
       {...props}
     >
-      {children}
+      {children ?? (
+        <HugeiconsIcon
+          icon={ArrowDown01Icon}
+          className="h-4 w-4"
+          strokeWidth={2}
+        />
+      )}
     </BaseAutocomplete.Trigger>
   );
 }
@@ -100,11 +99,13 @@ function AutocompleteIcon({
 
 function AutocompleteClear({
   className,
+  children,
   ...props
 }: BaseAutocomplete.Clear.Props) {
   return (
     <BaseAutocomplete.Clear
       data-slot="autocomplete-clear"
+      aria-label="Clear selection"
       className={cn(
         "inline-flex h-4 w-4 cursor-pointer items-center justify-center rounded-sm opacity-70 transition-[opacity,scale,transform,translate] hover:opacity-100 disabled:pointer-events-none",
         "focus-visible:border-ring focus-visible:ring-ring/30 duration-100 outline-none focus-visible:ring-3",
@@ -112,7 +113,15 @@ function AutocompleteClear({
         className,
       )}
       {...props}
-    />
+    >
+      {children ?? (
+        <HugeiconsIcon
+          icon={Cancel01Icon}
+          className="h-4 w-4"
+          strokeWidth={2}
+        />
+      )}
+    </BaseAutocomplete.Clear>
   );
 }
 

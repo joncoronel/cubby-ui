@@ -28,7 +28,7 @@ const timelineIndicatorVariants = cva(
         pending:
           "border-border/80 bg-muted shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.08)]",
         current:
-          "border-primary bg-primary/5 ring-2 ring-primary/20 ring-offset-2 ring-offset-background shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.08)]",
+          "border-primary bg-primary/5 outline-2 outline-primary/20 outline-offset-2 shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.08)]",
         completed:
           "border-primary bg-primary text-primary-foreground shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.08)]",
       },

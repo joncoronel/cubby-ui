@@ -16,7 +16,7 @@ const switchVariants = cva(
     // (white in light / bg-background in dark) and the parent everywhere.
     "data-unchecked:bg-input-elevated data-checked:bg-primary",
     "inset-shadow-xs transition-all duration-200",
-    "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2",
+    "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
     "data-disabled:cursor-not-allowed data-disabled:opacity-60",
   ],
   {

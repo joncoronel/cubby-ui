@@ -1255,7 +1255,7 @@ function DrawerHandle({
     onClick: handleClick,
     className: cn(
       "appearance-none border-0 bg-transparent p-0",
-      "focus-visible:ring-ring/50 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+      "focus-visible:outline-ring/50 rounded-sm outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
       "bg-muted-foreground/30 shrink-0 cursor-pointer rounded-full",
       isVertical ? "mx-auto my-3 h-1 w-12" : "mx-3 my-auto h-12 w-1",
       "hover:bg-muted-foreground/50 transition-[color,opacity]",

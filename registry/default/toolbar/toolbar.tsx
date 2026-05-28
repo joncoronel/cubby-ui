@@ -13,7 +13,7 @@ import {
 } from "@/registry/default/lib/elevated"
 
 const toolbarVariants = cva(
-	"flex items-center gap-1 rounded-lg p-1 data-[orientation=vertical]:flex-col data-disabled:pointer-events-none data-disabled:opacity-50",
+	"flex items-center gap-1 rounded-lg p-1 data-[orientation=vertical]:flex-col data-disabled:pointer-events-none data-disabled:opacity-60",
 	{
 		variants: {
 			variant: {
@@ -110,7 +110,7 @@ function ToolbarInput({
 				"focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent",
 				"transition-[outline-width,outline-offset,outline-color] duration-100 ease-out",
 				"outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
-				"data-disabled:pointer-events-none data-disabled:cursor-not-allowed data-disabled:opacity-50",
+				"data-disabled:pointer-events-none data-disabled:cursor-not-allowed data-disabled:opacity-60",
 				className
 			)}
 			{...props}
@@ -128,7 +128,7 @@ function ToolbarGroup({
 			className={cn(
 				"flex items-center gap-0.5",
 				"data-[orientation=vertical]:flex-col",
-				"data-disabled:pointer-events-none data-disabled:opacity-50",
+				"data-disabled:pointer-events-none data-disabled:opacity-60",
 				className
 			)}
 			{...props}

@@ -22,7 +22,7 @@ function FieldLabel({ className, ...props }: BaseField.Label.Props) {
       data-slot="field-label"
       className={cn(
         "text-foreground flex items-center gap-2 text-sm leading-5 font-medium select-none",
-        "data-disabled:pointer-events-none data-disabled:opacity-50",
+        "data-disabled:pointer-events-none data-disabled:opacity-60",
         "data-invalid:text-destructive",
         className,
       )}

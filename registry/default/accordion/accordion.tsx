@@ -167,7 +167,7 @@ function AccordionTrigger({
         data-slot="accordion-trigger"
         data-has-icon={hasStartIndicator ? "true" : undefined}
         className={cn(
-          "group/trigger flex w-full cursor-pointer items-center justify-between gap-3 p-3.5 text-left text-sm font-medium outline-none disabled:pointer-events-none disabled:opacity-50",
+          "group/trigger flex w-full cursor-pointer items-center justify-between gap-3 p-3.5 text-left text-sm font-medium outline-none disabled:pointer-events-none disabled:opacity-60",
           // Default variant styles
           "group-data-[variant=default]:px-0",
           // Split variant styles

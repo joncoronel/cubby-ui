@@ -88,6 +88,7 @@ import button_group_button_group_orientation from "@/registry/examples/button-gr
 import button_group_button_group_popover from "@/registry/examples/button-group/button-group-popover";
 import button_group_button_group_select from "@/registry/examples/button-group/button-group-select";
 import button_group_button_group_size from "@/registry/examples/button-group/button-group-size";
+import button_group_button_group_text from "@/registry/examples/button-group/button-group-text";
 import calendar_calendar_basic from "@/registry/examples/calendar/calendar-basic";
 import calendar_calendar_date_range_selection from "@/registry/examples/calendar/calendar-date-range-selection";
 import calendar_calendar_disabled_dates from "@/registry/examples/calendar/calendar-disabled-dates";
@@ -1914,6 +1915,11 @@ export const exampleRegistry = {
       "title": "Size",
       "importPath": "button-group-size",
       "source": "import { Button } from \"@/components/ui/cubby-ui/button\";\nimport { ButtonGroup } from \"@/components/ui/cubby-ui/button-group\";\n\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport { MinusSignIcon, PlusSignIcon } from \"@hugeicons/core-free-icons\";\nexport default function ButtonGroupSize() {\n  return (\n    <div className=\"flex flex-col items-start gap-4\">\n      <ButtonGroup>\n        <Button variant=\"outline\" size=\"icon_sm\" aria-label=\"Decrease\">\n          <HugeiconsIcon icon={MinusSignIcon} className=\"size-3.5\"  strokeWidth={2} />\n        </Button>\n        <Button variant=\"outline\" size=\"icon_sm\" aria-label=\"Increase\">\n          <HugeiconsIcon icon={PlusSignIcon} className=\"size-3.5\"  strokeWidth={2} />\n        </Button>\n      </ButtonGroup>\n\n      <ButtonGroup>\n        <Button variant=\"outline\" size=\"icon\" aria-label=\"Decrease\">\n          <HugeiconsIcon icon={MinusSignIcon}  strokeWidth={2} />\n        </Button>\n        <Button variant=\"outline\" size=\"icon\" aria-label=\"Increase\">\n          <HugeiconsIcon icon={PlusSignIcon}  strokeWidth={2} />\n        </Button>\n      </ButtonGroup>\n\n      <ButtonGroup>\n        <Button variant=\"outline\" size=\"icon_lg\" aria-label=\"Decrease\">\n          <HugeiconsIcon icon={MinusSignIcon} className=\"size-5\"  strokeWidth={2} />\n        </Button>\n        <Button variant=\"outline\" size=\"icon_lg\" aria-label=\"Increase\">\n          <HugeiconsIcon icon={PlusSignIcon} className=\"size-5\"  strokeWidth={2} />\n        </Button>\n      </ButtonGroup>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Text",
+      "importPath": "button-group-text",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  ButtonGroup,\n  ButtonGroupText,\n} from \"@/components/ui/cubby-ui/button-group\";\n\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport {\n  ArrowLeft01Icon,\n  ArrowRight01Icon,\n} from \"@hugeicons/core-free-icons\";\n\nexport default function ButtonGroupTextExample() {\n  const [page, setPage] = React.useState(1);\n  const totalPages = 24;\n\n  return (\n    <ButtonGroup>\n      <Button\n        variant=\"outline\"\n        size=\"icon\"\n        aria-label=\"Previous page\"\n        disabled={page <= 1}\n        onClick={() => setPage((p) => Math.max(1, p - 1))}\n      >\n        <HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} />\n      </Button>\n      <ButtonGroupText>\n        Page {page} of {totalPages}\n      </ButtonGroupText>\n      <Button\n        variant=\"outline\"\n        size=\"icon\"\n        aria-label=\"Next page\"\n        disabled={page >= totalPages}\n        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}\n      >\n        <HugeiconsIcon icon={ArrowRight01Icon} strokeWidth={2} />\n      </Button>\n    </ButtonGroup>\n  );\n}\n"
     }
   ],
   "calendar": [
@@ -3887,6 +3893,7 @@ export const componentMap = {
   "button-group-popover": button_group_button_group_popover,
   "button-group-select": button_group_button_group_select,
   "button-group-size": button_group_button_group_size,
+  "button-group-text": button_group_button_group_text,
   "calendar-basic": calendar_calendar_basic,
   "calendar-date-range-selection": calendar_calendar_date_range_selection,
   "calendar-disabled-dates": calendar_calendar_disabled_dates,

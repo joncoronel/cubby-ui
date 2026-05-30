@@ -68,7 +68,7 @@ function AutocompleteTrigger({
       aria-label="Open popup"
       className={cn(
         "inline-flex size-4 cursor-pointer items-center justify-center rounded-md border-none bg-transparent p-0 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-60",
-        "focus-visible:border-ring focus-visible:ring-ring/30 focus-visible:ring-3",
+        "outline-none focus-visible:ring-2 focus-visible:ring-ring/70",
         className,
       )}
       {...props}
@@ -108,7 +108,7 @@ function AutocompleteClear({
       aria-label="Clear selection"
       className={cn(
         "inline-flex h-4 w-4 cursor-pointer items-center justify-center rounded-sm opacity-70 transition-[opacity,scale,transform,translate] hover:opacity-100 disabled:pointer-events-none",
-        "focus-visible:border-ring focus-visible:ring-ring/30 duration-100 outline-none focus-visible:ring-3",
+        "focus-visible:ring-2 focus-visible:ring-ring/70 duration-100 outline-none",
         "data-ending-style:translate-x-1 data-ending-style:opacity-0 data-starting-style:translate-x-1 data-starting-style:opacity-0",
         className,
       )}

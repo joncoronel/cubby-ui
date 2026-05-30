@@ -27,7 +27,7 @@ const sliderTrackVariants = cva(
       variant: {
         default: "",
         contained:
-          "data-[orientation=horizontal]:h-6 data-[orientation=vertical]:w-6 rounded-full overflow-clip",
+          "data-[orientation=horizontal]:h-6 data-[orientation=vertical]:w-6 rounded-full ",
         squareThumb: "",
       },
     },
@@ -55,13 +55,13 @@ const sliderIndicatorVariants = cva(
 );
 
 const sliderThumbVariants = cva(
-  "bg-background border-primary relative block size-5 shrink-0 rounded-full border-2 shadow-[0_2px_4px_0_oklch(0.18_0_0_/_0.15)] transition-[box-shadow] duration-200 hover:shadow-[0_3px_8px_0_oklch(0.18_0_0_/_0.2)] has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-ring/60 has-[:focus-visible]:outline-hidden",
+  "bg-background border-primary relative block size-5 shrink-0 rounded-full border-2 shadow-[0_2px_4px_0_oklch(0.18_0_0_/_0.15)] transition-[box-shadow] duration-200 hover:shadow-[0_3px_8px_0_oklch(0.18_0_0_/_0.2)] has-[:focus-visible]:outline-hidden has-[:focus-visible]:z-10 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background",
   {
     variants: {
       variant: {
         default: "",
         contained:
-          "h-full w-6 bg-primary border-none hover:shadow-none shadow-none rounded-full has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-border/70 data-[orientation=vertical]:h-6 data-[orientation=vertical]:w-full after:bg-primary-foreground flex items-center justify-center after:size-[60%]  after:rounded-full  after:origin-center data-[dragging]:after:scale-85 after:transition-transform after:ease-out after:duration-100 after:shadow-[0_2px_4px_0_oklch(0.18_0_0_/_0.15)]",
+          "h-full w-6 bg-primary border-none hover:shadow-none shadow-none rounded-full data-[orientation=vertical]:h-6 data-[orientation=vertical]:w-full after:bg-primary-foreground flex items-center justify-center after:size-[60%]  after:rounded-full  after:origin-center data-[dragging]:after:scale-85 after:transition-transform after:ease-out after:duration-100 after:shadow-[0_2px_4px_0_oklch(0.18_0_0_/_0.15)]",
         squareThumb:
           "h-5 w-2.5 bg-card border-1 border-border/70 rounded-[.125rem] data-[orientation=vertical]:h-2.5 data-[orientation=vertical]:w-5",
 
@@ -75,7 +75,8 @@ const sliderThumbVariants = cva(
 );
 
 export interface SliderProps
-  extends React.ComponentProps<typeof BaseSlider.Root>,
+  extends
+    React.ComponentProps<typeof BaseSlider.Root>,
     VariantProps<typeof sliderVariants> {
   showSteps?: boolean;
   getAriaLabel?: ((index: number) => string) | null;
@@ -217,10 +218,7 @@ function SliderValue({
   return (
     <BaseSlider.Value
       data-slot="slider-value"
-      className={cn(
-        "text-foreground text-sm font-medium",
-        className,
-      )}
+      className={cn("text-foreground text-sm font-medium", className)}
       {...props}
     >
       {children}
@@ -228,10 +226,7 @@ function SliderValue({
   );
 }
 
-function SliderLabel({
-  className,
-  ...props
-}: BaseSlider.Label.Props) {
+function SliderLabel({ className, ...props }: BaseSlider.Label.Props) {
   return (
     <BaseSlider.Label
       data-slot="slider-label"

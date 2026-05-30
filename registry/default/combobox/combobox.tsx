@@ -122,7 +122,7 @@ function ComboboxTrigger({
       aria-label="Open popup"
       className={cn(
         "inline-flex size-4 cursor-pointer items-center justify-center rounded-md border-none bg-transparent p-0 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-60",
-        "focus-visible:border-ring focus-visible:ring-ring/30 focus-visible:ring-3",
+        "outline-none focus-visible:ring-2 focus-visible:ring-ring/70",
         className,
       )}
       {...props}
@@ -158,7 +158,7 @@ function ComboboxClear({ className, ...props }: BaseCombobox.Clear.Props) {
       aria-label="Clear selection"
       className={cn(
         "inline-flex h-4 w-4 cursor-pointer items-center justify-center rounded-sm opacity-70 transition-[opacity,scale,transform,translate] hover:opacity-100 disabled:pointer-events-none",
-        "focus-visible:border-ring focus-visible:ring-ring/30 duration-100 outline-none focus-visible:ring-3",
+        "focus-visible:ring-2 focus-visible:ring-ring/70 duration-100 outline-none",
         "data-ending-style:translate-x-1 data-ending-style:opacity-0 data-starting-style:translate-x-1 data-starting-style:opacity-0",
         className,
       )}
@@ -492,6 +492,11 @@ function ComboboxChip({ className, ...props }: BaseCombobox.Chip.Props) {
       data-slot="combobox-chip"
       className={cn(
         "bg-(--surface-selected) text-accent-foreground flex items-center gap-1 rounded-sm px-2 py-1 text-sm font-medium break-all sm:text-xs",
+        // In-field control focus: a crisp ring (not outline) so it doesn't
+        // clip against neighbors in the packed chip row, and outline-none to
+        // suppress the browser default (which tracked currentColor — read as a
+        // white ring in dark mode). Matches the trigger/clear/chip-remove.
+        "outline-none focus-visible:ring-2 focus-visible:ring-ring/70",
         className,
       )}
       {...props}
@@ -508,7 +513,7 @@ function ComboboxChipRemove({
       data-slot="combobox-chip-remove"
       className={cn(
         "ml-1 inline-flex h-4 w-4 items-center justify-center rounded-sm opacity-70 transition-opacity hover:opacity-100 disabled:pointer-events-none",
-        "focus-visible:border-ring focus-visible:ring-ring/30 cursor-pointer outline-none focus-visible:ring-3",
+        "focus-visible:ring-2 focus-visible:ring-ring/70 cursor-pointer outline-none",
         className,
       )}
       {...props}

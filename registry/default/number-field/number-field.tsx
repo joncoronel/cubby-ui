@@ -146,7 +146,10 @@ function NumberFieldScrubAreaCursor({
   return (
     <BaseNumberField.ScrubAreaCursor
       data-slot="number-field-scrub-area-cursor"
-      className={cn("drop-shadow-[0_1px_1px_#0008] filter", className)}
+      className={cn(
+        "drop-shadow-[0_1px_1px_oklch(0_0_0/0.53)] filter",
+        className,
+      )}
       {...props}
     />
   );

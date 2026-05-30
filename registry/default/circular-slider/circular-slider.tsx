@@ -89,12 +89,12 @@ const circularSliderVariants = cva(
 );
 
 const thumbVariants = cva(
-  "absolute outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid",
+  "absolute transition-[box-shadow] duration-200 ease-out",
   {
     variants: {
       variant: {
         default:
-          "rounded-full border-3 border-primary dark:bg-black bg-white group-data-focused:outline-ring group-data-focused:outline-2 group-data-focused:outline-offset-2",
+          "rounded-full border-3 border-primary bg-background group-data-focused:z-10 group-data-focused:ring-2 group-data-focused:ring-ring group-data-focused:ring-offset-2 group-data-focused:ring-offset-background",
         filled: "rounded-none bg-foreground",
       },
       dragging: {
@@ -197,6 +197,7 @@ export interface CircularSliderRootProps
 export function CircularSliderRoot({
   className,
   render,
+  ref: forwardedRef,
   value: valueProp,
   defaultValue = 0,
   onValueChange,
@@ -230,7 +231,6 @@ export function CircularSliderRoot({
 
   const [isDragging, setIsDragging] = React.useState(false);
   const [isFocused, setIsFocused] = React.useState(false);
-  const containerRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const previousValue = React.useRef<number | null>(null);
 
@@ -277,11 +277,11 @@ export function CircularSliderRoot({
 
   // Handle pointer events
   const handlePointerDown = React.useCallback(
-    (e: React.PointerEvent) => {
+    (e: React.PointerEvent<HTMLDivElement>) => {
       if (disabled) return;
 
-      const container = containerRef.current;
-      if (!container) return;
+      // The root element is the event's currentTarget — no element ref needed.
+      const container = e.currentTarget;
 
       const newValue = getValueFromPointerPosition(
         e,
@@ -315,11 +315,10 @@ export function CircularSliderRoot({
   );
 
   const handlePointerMove = React.useCallback(
-    (e: React.PointerEvent) => {
+    (e: React.PointerEvent<HTMLDivElement>) => {
       if (!isDragging || disabled) return;
 
-      const container = containerRef.current;
-      if (!container) return;
+      const container = e.currentTarget;
 
       const newValue = getValueFromPointerPosition(
         e,
@@ -420,7 +419,6 @@ export function CircularSliderRoot({
   );
 
   const defaultProps = {
-    ref: containerRef,
     "data-slot": SLOT_NAMES.ROOT,
     "data-size": size,
     "data-variant": variant,
@@ -438,9 +436,22 @@ export function CircularSliderRoot({
     onPointerUp: handlePointerUp,
   };
 
+  // The consumer's ref goes through useRender's dedicated `ref` param, never
+  // through the mergeProps object — and it's destructured out of `props`
+  // (above) — so a ref is never passed into a function call during render. No
+  // internal element ref is needed: pointer handlers read the element via
+  // `event.currentTarget`.
   const element = useRender({
     defaultTagName: "div",
     render,
+    ref: forwardedRef ?? null,
+    // The pointer handlers in defaultProps transitively close over the
+    // `previousValue` value-ref (continuous-drag direction tracking). That ref
+    // is read only in event handlers, never during render, and mergeProps just
+    // assembles props — it never invokes the handlers or reads `.current`. The
+    // React Compiler can't prove that, so it flags this safe, documented Base UI
+    // pattern. False positive.
+    // eslint-disable-next-line react-hooks/refs
     props: mergeProps<"div">(defaultProps, props),
   });
 

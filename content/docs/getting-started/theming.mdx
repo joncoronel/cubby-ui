@@ -50,6 +50,11 @@ Copy and paste the following into your `globals.css` file:
   /* Primary & accent colors */
   --primary: oklch(0.6 0.2 250);
   --primary-foreground: oklch(1 0 0);
+  /* Primary as text on a neutral plate (primary-soft button); derived from
+     --primary so it tracks any brand color. Brightened in dark below. */
+  --primary-soft-foreground: var(--primary);
+  /* Destructive as text on a tinted plate (destructive-soft button); derived */
+  --destructive-soft-foreground: var(--destructive);
   --neutral: oklch(0.22 0 0);
   --neutral-foreground: oklch(
     0.98 var(--neutral-chroma-low) var(--neutral-hue)
@@ -192,7 +197,7 @@ Copy and paste the following into your `globals.css` file:
   --foreground: oklch(0.94 var(--neutral-chroma) var(--neutral-hue));
   --neutral: oklch(0.95 var(--neutral-chroma) var(--neutral-hue));
   --neutral-foreground: oklch(0.13 var(--neutral-chroma) var(--neutral-hue));
-  --secondary: oklch(0.32 var(--neutral-chroma) var(--neutral-hue));
+  --secondary: oklch(0.35 var(--neutral-chroma) var(--neutral-hue));
   --secondary-foreground: oklch(0.94 var(--neutral-chroma) var(--neutral-hue));
   --muted: oklch(0.24 var(--neutral-chroma) var(--neutral-hue));
   --muted-foreground: oklch(0.73 var(--neutral-chroma) var(--neutral-hue));
@@ -200,6 +205,11 @@ Copy and paste the following into your `globals.css` file:
   --accent-foreground: oklch(0.95 var(--neutral-chroma) var(--neutral-hue));
   --destructive: oklch(0.5 0.22 25);
   --destructive-foreground: oklch(1 0 0);
+  /* Brighten --primary toward white so primary-soft stays readable on the
+     darker secondary plate. Derived, so it tracks the consumer's brand color. */
+  --primary-soft-foreground: color-mix(in oklch, var(--primary), white 30%);
+  /* Same treatment for destructive-soft's label on its tinted plate. */
+  --destructive-soft-foreground: color-mix(in oklch, var(--destructive), white 30%);
 
   /* Dark-mode hover colors — same per-token logic. --neutral is near-white
      in dark (0.95) so it darkens instead of brightens. */

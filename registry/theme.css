@@ -24,6 +24,11 @@
   /* Primary & accent colors */
   --primary: oklch(0.6 0.2 250);
   --primary-foreground: oklch(1 0 0);
+  /* Primary used AS TEXT on a neutral plate (e.g. the `primary-soft` button).
+     Derived from --primary so it tracks any brand color. In light the solid
+     primary reads fine; dark brightens it (see .dark) since --primary is too
+     dim as text on the darker secondary surface. */
+  --primary-soft-foreground: var(--primary);
   --neutral: oklch(0.22 0 0);
   --neutral-foreground: oklch(
     0.98 var(--neutral-chroma-low) var(--neutral-hue)
@@ -38,6 +43,10 @@
   --destructive-foreground: oklch(
     0.98 var(--neutral-chroma-low) var(--neutral-hue)
   );
+  /* Destructive used AS TEXT on a destructive-tinted plate (the
+     `destructive-soft` button). Derived from --destructive so it tracks the
+     consumer's danger color; brightened in dark (see .dark) for readability. */
+  --destructive-soft-foreground: var(--destructive);
 
   /* Hover-state colors — mix direction is chosen per-token to shift AWAY
      from the token's natural lightness, so the change always reads as a
@@ -175,7 +184,7 @@
   --foreground: oklch(0.94 var(--neutral-chroma) var(--neutral-hue));
   --neutral: oklch(0.95 var(--neutral-chroma) var(--neutral-hue));
   --neutral-foreground: oklch(0.13 var(--neutral-chroma) var(--neutral-hue));
-  --secondary: oklch(0.32 var(--neutral-chroma) var(--neutral-hue));
+  --secondary: oklch(0.35 var(--neutral-chroma) var(--neutral-hue));
   --secondary-foreground: oklch(0.94 var(--neutral-chroma) var(--neutral-hue));
   --muted: oklch(0.24 var(--neutral-chroma) var(--neutral-hue));
   --muted-foreground: oklch(0.73 var(--neutral-chroma) var(--neutral-hue));
@@ -183,6 +192,12 @@
   --accent-foreground: oklch(0.95 var(--neutral-chroma) var(--neutral-hue));
   --destructive: oklch(0.5 0.22 25);
   --destructive-foreground: oklch(1 0 0);
+  /* Brighten --primary toward white so primary-soft's label stays readable on
+     the darker secondary plate (solid --primary is too dim as text in dark).
+     Derived, so it tracks whatever --primary the consumer sets. */
+  --primary-soft-foreground: color-mix(in oklch, var(--primary), white 30%);
+  /* Same treatment for destructive-soft's label on its tinted plate. */
+  --destructive-soft-foreground: color-mix(in oklch, var(--destructive), white 30%);
 
   /* Dark-mode hover colors — same per-token logic as :root above. Most
      tokens brighten (mix toward white), but --neutral is near-white in dark

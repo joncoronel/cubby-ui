@@ -248,7 +248,7 @@ const CropperZoomControls = forwardRef<
         <button
           type="button"
           onClick={onReset}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-sm font-medium ring-offset-background transition-colors duration-200 hover:bg-(--surface-hover) hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-sm font-medium hover:bg-(--surface-hover) hover:text-accent-foreground focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2"
           aria-label="Reset zoom"
         >
           <HugeiconsIcon icon={RotateLeft02Icon} className="h-4 w-4"  strokeWidth={2} />
@@ -370,7 +370,7 @@ const CropperActions = forwardRef<
       <button
         type="button"
         onClick={onDownload}
-        className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-background px-3 text-xs font-medium ring-offset-background transition-colors duration-200 hover:bg-(--surface-hover) hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-background px-3 text-xs font-medium hover:bg-(--surface-hover) hover:text-accent-foreground focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2"
       >
         <HugeiconsIcon icon={Download01Icon} className="h-3 w-3"  strokeWidth={2} />
         {downloadLabel}
@@ -380,7 +380,7 @@ const CropperActions = forwardRef<
       <button
         type="button"
         onClick={onExport}
-        className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-background px-3 text-xs font-medium ring-offset-background transition-colors duration-200 hover:bg-(--surface-hover) hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-background px-3 text-xs font-medium hover:bg-(--surface-hover) hover:text-accent-foreground focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2"
       >
         <HugeiconsIcon icon={CropIcon} className="h-3 w-3"  strokeWidth={2} />
         {exportLabel}

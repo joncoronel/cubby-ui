@@ -2,15 +2,21 @@ import { source } from "@/lib/source";
 import { createFromSource } from "fumadocs-core/search/server";
 import type { StructuredData } from "fumadocs-core/mdx-plugins";
 
-// Import meta.json files to filter search results
-import componentsMeta from "@/content/docs/components/meta.json";
+// Import meta.json files to filter search results.
+// Components live in two folder groups ((primitives) / (composables)); the
+// parent components/meta.json only lists those folder names, so the per-component
+// allowlist is the UNION of both group metas. A component left out of its group
+// meta is hidden from both the sidebar and search (handy for work-in-progress
+// docs), preserving the original allowlist behaviour.
+import primitivesMeta from "@/content/docs/components/(primitives)/meta.json";
+import composablesMeta from "@/content/docs/components/(composables)/meta.json";
 import hooksMeta from "@/content/docs/hooks/meta.json";
 import utilsMeta from "@/content/docs/utils/meta.json";
 import gettingStartedMeta from "@/content/docs/getting-started/meta.json";
 
 // Map section to allowed pages from meta.json
 const allowedPages: Record<string, string[]> = {
-  components: componentsMeta.pages,
+  components: [...primitivesMeta.pages, ...composablesMeta.pages],
   hooks: hooksMeta.pages,
   utils: utilsMeta.pages,
   "getting-started": gettingStartedMeta.pages,

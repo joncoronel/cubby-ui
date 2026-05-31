@@ -1,6 +1,5 @@
 {
   "title": "Primitives",
-  "defaultOpen": true,
   "pages": [
     "accordion",
     "alert",

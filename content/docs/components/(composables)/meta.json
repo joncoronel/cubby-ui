@@ -1,6 +1,5 @@
 {
   "title": "Composables",
-  "defaultOpen": true,
   "pages": [
     "button-group",
     "calendar",

@@ -57,7 +57,7 @@ function PopoverPopup({
       data-slot="popover-popup"
       data-level={level}
       className={cn(
-        "text-popover-foreground relative max-h-(--available-height) max-w-(--available-width) origin-(--transform-origin) rounded-md",
+        "text-popover-foreground relative max-h-(--available-height) max-w-(--available-width) origin-(--transform-origin) rounded-xl",
         solidSurface(level, shadowLevel),
         className,
       )}
@@ -160,7 +160,7 @@ function PopoverContent({
             "text-popover-foreground relative",
             "h-(--popup-height,auto) w-(--popup-width,auto)",
             "max-h-(--available-height) max-w-(--available-width)",
-            "origin-(--transform-origin) overflow-hidden rounded-md",
+            "origin-(--transform-origin) overflow-hidden rounded-xl",
             // Surface elevation — bg tracks `level`, shadow weight tracks `shadowLevel`
             solidSurface(level, shadowLevel),
             // Size/opacity transitions
@@ -190,7 +190,7 @@ function PopoverContent({
             data-slot="popover-viewport"
             className={cn(
               // Base viewport styles
-              "relative size-full overflow-clip px-4 py-4 [--viewport-padding:1rem]",
+              "relative size-full overflow-clip px-3 py-3 [--viewport-padding:0.75rem]",
               "not-data-transitioning:overflow-y-auto",
               // Content width calculation (edge-to-edge minus padding)
               "**:data-current:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",

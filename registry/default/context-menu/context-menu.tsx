@@ -88,7 +88,13 @@ function ContextMenuContent({
           data-slot="context-menu-content"
           data-level={level}
           className={cn(
-            "text-popover-foreground data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 min-w-[12rem] origin-(--transform-origin) overflow-hidden rounded-lg p-1",
+            "text-popover-foreground relative z-50 min-w-[12rem] origin-(--transform-origin) overflow-hidden rounded-xl p-1",
+            // Modern enter/exit — scale + fade from the transform origin, matching
+            // popover/dropdown-menu (replaces the legacy animate-in/zoom/slide classes)
+            "transition-[scale,opacity] duration-100 ease-out-expo",
+            "data-starting-style:scale-95 data-starting-style:opacity-0",
+            "data-ending-style:scale-95 data-ending-style:opacity-0",
+            "motion-reduce:transition-none data-instant:transition-none",
             solidSurface(level, shadowLevel),
             className,
           )}
@@ -331,7 +337,13 @@ function ContextMenuSubContent({
           data-slot="context-menu-sub-content"
           data-level={level}
           className={cn(
-            "text-popover-foreground data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 min-w-[12rem] origin-(--transform-origin) overflow-hidden rounded-lg p-1",
+            "text-popover-foreground relative z-50 min-w-[12rem] origin-(--transform-origin) overflow-hidden rounded-xl p-1",
+            // Modern enter/exit — scale + fade from the transform origin, matching
+            // popover/dropdown-menu (replaces the legacy animate-in/zoom/slide classes)
+            "transition-[scale,opacity] duration-100 ease-out-expo",
+            "data-starting-style:scale-95 data-starting-style:opacity-0",
+            "data-ending-style:scale-95 data-ending-style:opacity-0",
+            "motion-reduce:transition-none data-instant:transition-none",
             solidSurface(level, shadowLevel),
             className,
           )}

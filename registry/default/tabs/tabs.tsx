@@ -24,7 +24,7 @@ const tabsListVariants = cva(
   {
     variants: {
       variant: {
-        capsule: "bg-muted rounded-xl",
+        capsule: "bg-muted",
         underline:
           "data-[orientation=horizontal]:px-0 data-[orientation=horizontal]:pt-0 data-[orientation=vertical]:py-0",
       },
@@ -38,6 +38,16 @@ const tabsListVariants = cva(
       },
     },
     compoundVariants: [
+      {
+        variant: "capsule",
+        size: "small",
+        class: "rounded-md",
+      },
+      {
+        variant: "capsule",
+        size: "medium",
+        class: "rounded-xl",
+      },
       {
         variant: "underline",
         side: "left",
@@ -250,30 +260,36 @@ function TabsPanels({
   );
 }
 
-function TabsContent({ className, ...props }: BaseTabs.Panel.Props) {
+function TabsContent({
+  className,
+  disableAnimation = false,
+  ...props
+}: BaseTabs.Panel.Props & { disableAnimation?: boolean }) {
   return (
     <BaseTabs.Panel
       data-slot="tabs-content"
       className={cn(
         "min-w-0 flex-1 outline-none",
         "[grid-area:1/1]",
-        "ease-out-expo transition-[opacity,translate,filter] duration-[350ms,350ms,350ms]",
-        // Enter/exit: fade + blur (scale with height diff via --fade-duration)
-        "data-starting-style:opacity-0 data-starting-style:blur-sm",
-        "data-ending-style:opacity-0 data-ending-style:blur-sm data-ending-style:contain-[size]",
-        // Directional slide (fixed 400ms)
-        "data-[activation-direction=right]:data-starting-style:translate-x-3",
-        "data-[activation-direction=right]:data-ending-style:-translate-x-3",
-        "data-[activation-direction=left]:data-starting-style:-translate-x-3",
-        "data-[activation-direction=left]:data-ending-style:translate-x-3",
-        "data-[activation-direction=down]:data-starting-style:translate-y-3",
-        "data-[activation-direction=down]:data-ending-style:-translate-y-3",
-        "data-[activation-direction=up]:data-starting-style:-translate-y-3",
-        "data-[activation-direction=up]:data-ending-style:translate-y-3",
-        // Fallback for none/initial mount
-        "data-[activation-direction=none]:data-starting-style:translate-y-3",
-        "data-[activation-direction=none]:data-ending-style:translate-y-3",
-        "motion-reduce:blur-none motion-reduce:transition-none",
+        !disableAnimation && [
+          "ease-out-expo transition-[opacity,translate,filter] duration-[350ms,350ms,350ms]",
+          // Enter/exit: fade + blur (scale with height diff via --fade-duration)
+          "data-starting-style:opacity-0 data-starting-style:blur-sm",
+          "data-ending-style:opacity-0 data-ending-style:blur-sm data-ending-style:contain-[size]",
+          // Directional slide (fixed 400ms)
+          "data-[activation-direction=right]:data-starting-style:translate-x-3",
+          "data-[activation-direction=right]:data-ending-style:-translate-x-3",
+          "data-[activation-direction=left]:data-starting-style:-translate-x-3",
+          "data-[activation-direction=left]:data-ending-style:translate-x-3",
+          "data-[activation-direction=down]:data-starting-style:translate-y-3",
+          "data-[activation-direction=down]:data-ending-style:-translate-y-3",
+          "data-[activation-direction=up]:data-starting-style:-translate-y-3",
+          "data-[activation-direction=up]:data-ending-style:translate-y-3",
+          // Fallback for none/initial mount
+          "data-[activation-direction=none]:data-starting-style:translate-y-3",
+          "data-[activation-direction=none]:data-ending-style:translate-y-3",
+          "motion-reduce:blur-none motion-reduce:transition-none",
+        ],
         className,
       )}
       {...props}

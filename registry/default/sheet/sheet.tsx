@@ -231,18 +231,21 @@ function SheetContent({
   );
 }
 
+// Slot-presence checks use ancestor `:has()` queries on
+// `[data-slot=sheet-content]` rather than adjacent-sibling selectors,
+// so consumers can wrap header/body/footer in form, ErrorBoundary, Suspense,
+// or conditional fragments without breaking padding. Matches the Dialog
+// primitive's approach.
 function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="sheet-header"
       className={cn(
         "flex flex-col gap-2 px-6 pt-6 pb-3",
-        // Spacious bottom padding when header is directly before footer (no body)
-        "not-has-[+[data-slot=sheet-body]]:has-[+[data-slot=sheet-footer]]:pb-6",
-        // Add extra bottom padding when header is alone (no body or footer)
-        "not-has-[+[data-slot=sheet-body]]:not-has-[+[data-slot=sheet-footer]]:pb-6",
-        // Inset footer variant: add extra bottom padding when header is directly before footer (no body)
-        "in-data-[footer-variant=inset]:not-has-[+[data-slot=sheet-body]]:has-[+[data-slot=sheet-footer]]:pb-6",
+        // Header alone with footer (no body anywhere in content)
+        "in-[[data-slot=sheet-content]:not(:has([data-slot=sheet-body])):has([data-slot=sheet-footer])]:pb-6",
+        // Header alone (no body, no footer)
+        "in-[[data-slot=sheet-content]:not(:has([data-slot=sheet-body])):not(:has([data-slot=sheet-footer]))]:pb-6",
         className,
       )}
       {...props}
@@ -270,9 +273,13 @@ function SheetBody({
       data-slot="sheet-body"
       className={cn(
         "flex min-h-0 flex-1 flex-col overflow-hidden",
-        "first:pt-5",
-        "not-has-[+[data-slot=sheet-footer]]:pb-5",
-        "in-data-[footer-variant=inset]:has-[+[data-slot=sheet-footer]]:pb-5",
+        // No header anywhere in content → body needs its own top padding
+        "in-[[data-slot=sheet-content]:not(:has([data-slot=sheet-header]))]:pt-5",
+        // No footer anywhere in content → body needs its own bottom padding
+        "in-[[data-slot=sheet-content]:not(:has([data-slot=sheet-footer]))]:pb-5",
+        // Inset footer variant: still need bottom padding when a footer follows
+        // so the body's content doesn't crowd the footer's top border
+        "in-data-[footer-variant=inset]:in-[[data-slot=sheet-content]:has([data-slot=sheet-footer])]:pb-5",
       )}
     >
       <ScrollArea
@@ -323,12 +330,12 @@ function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="sheet-footer"
       className={cn(
         "mt-auto flex flex-col-reverse gap-2 px-6 pt-4 pb-6 sm:flex-row sm:justify-end",
-        // Add extra top padding when footer is first (no header or body)
-        "first:pt-6",
+        // No header AND no body → footer alone, needs its own top padding
+        "in-[[data-slot=sheet-content]:not(:has([data-slot=sheet-header])):not(:has([data-slot=sheet-body]))]:pt-6",
         // Reduce top padding when body is present
         "not-in-data-[footer-variant=inset]:in-[[data-slot=sheet-content]:has([data-slot=sheet-body])]:pt-3",
         // Inset variant: muted background with top border for separation
-        "in-data-[footer-variant=inset]:border-border in-data-[footer-variant=inset]:bg-muted/72 in-data-[footer-variant=inset]:border-t in-data-[footer-variant=inset]:pt-4 in-data-[footer-variant=inset]:pb-4",
+        "in-data-[footer-variant=inset]:border-border in-data-[footer-variant=inset]:bg-muted in-data-[footer-variant=inset]:border-t in-data-[footer-variant=inset]:pt-4 in-data-[footer-variant=inset]:pb-4",
         className,
       )}
       {...props}

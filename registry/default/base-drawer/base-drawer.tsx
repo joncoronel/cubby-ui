@@ -418,7 +418,7 @@ function BaseDrawerFooter({
       variant === "default" &&
         "in-[[data-slot=base-drawer-popup]:has([data-slot=base-drawer-panel])]:pt-3 pt-4 pb-[calc(env(safe-area-inset-bottom,0px)+1.5rem)]",
       variant === "inset" &&
-        "border-t bg-muted/72 pt-4 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)]",
+        "border-t bg-muted pt-4 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)]",
       className,
     ),
     "data-slot": "base-drawer-footer",

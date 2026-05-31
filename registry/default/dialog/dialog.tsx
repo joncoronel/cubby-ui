@@ -150,6 +150,13 @@ function DialogContent({
 }
 
 // Header component
+//
+// Slot-presence checks (header/body/footer "is X around?") use ancestor `:has()`
+// queries on `[data-slot=dialog-content]` rather than adjacent-sibling selectors.
+// Ancestor `:has()` descends through arbitrary wrappers (form, ErrorBoundary,
+// Suspense, conditional fragments) so consumers don't have to keep these slots
+// as direct DOM siblings of DialogContent. The footer's `pt-3` rule already
+// used this pattern; bringing the rest in line.
 function DialogHeader({
   className,
   ...props
@@ -159,12 +166,10 @@ function DialogHeader({
       data-slot="dialog-header"
       className={cn(
         "flex flex-col gap-2 px-6 pt-6 pb-3",
-        // Reduce bottom padding when header is directly before footer (no body)
-        "not-has-[+[data-slot=dialog-body]]:has-[+[data-slot=dialog-footer]]:pb-6",
-        // Add extra bottom padding when header is alone (no body or footer)
-        "not-has-[+[data-slot=dialog-body]]:not-has-[+[data-slot=dialog-footer]]:pb-6",
-        // Inset variant: add extra bottom padding when header is directly before footer (no body)
-        "in-data-[variant=inset]:not-has-[+[data-slot=dialog-body]]:has-[+[data-slot=dialog-footer]]:pb-6",
+        // Header alone with footer (no body anywhere in content)
+        "in-[[data-slot=dialog-content]:not(:has([data-slot=dialog-body])):has([data-slot=dialog-footer])]:pb-6",
+        // Header alone (no body, no footer)
+        "in-[[data-slot=dialog-content]:not(:has([data-slot=dialog-body])):not(:has([data-slot=dialog-footer]))]:pb-6",
         className,
       )}
       {...props}
@@ -193,9 +198,13 @@ function DialogBody({
       data-slot="dialog-body"
       className={cn(
         "flex min-h-0 flex-1 flex-col",
-        "first:pt-5",
-        "not-has-[+[data-slot=dialog-footer]]:pb-5",
-        "in-data-[variant=inset]:has-[+[data-slot=dialog-footer]]:pb-5",
+        // No header anywhere in content → body needs its own top padding
+        "in-[[data-slot=dialog-content]:not(:has([data-slot=dialog-header]))]:pt-5",
+        // No footer anywhere in content → body needs its own bottom padding
+        "in-[[data-slot=dialog-content]:not(:has([data-slot=dialog-footer]))]:pb-5",
+        // Inset variant: still need bottom padding when a footer follows so the
+        // body's content doesn't crowd the footer's top border
+        "in-data-[variant=inset]:in-[[data-slot=dialog-content]:has([data-slot=dialog-footer])]:pb-5",
       )}
     >
       <ScrollArea
@@ -224,8 +233,8 @@ function DialogFooter({
       data-slot="dialog-footer"
       className={cn(
         "flex flex-col-reverse gap-2 px-6 pt-4 pb-6 sm:flex-row sm:justify-end",
-        // Add extra top padding when footer is first (no header or body)
-        "first:pt-6",
+        // No header AND no body → footer alone, needs its own top padding
+        "in-[[data-slot=dialog-content]:not(:has([data-slot=dialog-header])):not(:has([data-slot=dialog-body]))]:pt-6",
         // Reduce top padding when body is present
         "not-in-data-[variant=inset]:in-[[data-slot=dialog-content]:has([data-slot=dialog-body])]:pt-3",
         // Inset variant: muted background with top border for separation

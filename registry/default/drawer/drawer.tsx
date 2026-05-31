@@ -1280,6 +1280,13 @@ function DrawerHandle({
  * DrawerHeader
  * -------------------------------------------------------------------------------------------------*/
 
+// Slot-presence checks use ancestor `:has()` queries on
+// `[data-slot=drawer-content]` rather than adjacent-sibling selectors, so
+// consumers can wrap header/body/footer in form, ErrorBoundary, Suspense, or
+// conditional fragments without breaking padding. This also makes the rules
+// robust to DrawerHandle sitting between content slots (the sibling selectors
+// silently lost padding when a handle preceded a header-less body). Matches
+// the Dialog primitive's approach.
 function DrawerHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -1287,9 +1294,10 @@ function DrawerHeader({ className, ...props }: React.ComponentProps<"div">) {
       className={cn(
         "flex flex-col gap-2 px-6 pt-6 pb-3",
         "in-data-[direction=bottom]:in-[[data-slot=drawer-content]:has([data-slot=drawer-handle])]:pt-1",
-        "not-has-[+[data-slot=drawer-body]]:has-[+[data-slot=drawer-footer]]:pb-6",
-        "not-has-[+[data-slot=drawer-body]]:not-has-[+[data-slot=drawer-footer]]:pb-6",
-        "in-data-[footer-variant=inset]:not-has-[+[data-slot=drawer-body]]:has-[+[data-slot=drawer-footer]]:pb-6",
+        // Header alone with footer (no body anywhere in content)
+        "in-[[data-slot=drawer-content]:not(:has([data-slot=drawer-body])):has([data-slot=drawer-footer])]:pb-6",
+        // Header alone (no body, no footer)
+        "in-[[data-slot=drawer-content]:not(:has([data-slot=drawer-body])):not(:has([data-slot=drawer-footer]))]:pb-6",
         // "transition-opacity in-data-nested-dialog-open:opacity-0 in-data-nested-dragging:opacity-100",
         className,
       )}
@@ -1311,7 +1319,8 @@ function DrawerFooter({ className, ...props }: React.ComponentProps<"div">) {
         // promotion fixes sticky/transform compositing flash during enter animation
         "z-1 mt-auto flex flex-col-reverse gap-2 bg-(--popup-surface,var(--popover)) px-6 pt-4 pb-6 sm:flex-row sm:justify-end",
         "[@supports(-webkit-touch-callout:none)]:transform-[translateZ(0)]",
-        "first:pt-6",
+        // No header AND no body → footer alone, needs its own top padding
+        "in-[[data-slot=drawer-content]:not(:has([data-slot=drawer-header])):not(:has([data-slot=drawer-body]))]:pt-6",
         "not-in-data-[footer-variant=inset]:in-[[data-slot=drawer-content]:has([data-slot=drawer-body])]:pt-3",
         "in-data-[footer-variant=inset]:border-border in-data-[footer-variant=inset]:bg-muted in-data-[footer-variant=inset]:border-t in-data-[footer-variant=inset]:pt-4 in-data-[footer-variant=inset]:pb-4",
         // "transition-opacity in-data-nested-dialog-open:opacity-0 in-data-nested-dragging:opacity-100",
@@ -1392,9 +1401,13 @@ function DrawerBody({
       className={cn(
         // z-0: stays below sticky footer during iOS Safari enter animation
         "relative z-0 flex min-h-0 flex-1 flex-col overflow-hidden",
-        "first:pt-5",
-        "not-has-[+[data-slot=drawer-footer]]:pb-5",
-        "in-data-[footer-variant=inset]:has-[+[data-slot=drawer-footer]]:pb-5",
+        // No header anywhere in content → body needs its own top padding
+        "in-[[data-slot=drawer-content]:not(:has([data-slot=drawer-header]))]:pt-5",
+        // No footer anywhere in content → body needs its own bottom padding
+        "in-[[data-slot=drawer-content]:not(:has([data-slot=drawer-footer]))]:pb-5",
+        // Inset footer variant: still need bottom padding when a footer follows
+        // so the body's content doesn't crowd the footer's top border
+        "in-data-[footer-variant=inset]:in-[[data-slot=drawer-content]:has([data-slot=drawer-footer])]:pb-5",
         // "transition-opacity in-data-nested-dialog-open:opacity-0 in-data-nested-dragging:opacity-100",
       )}
     >

@@ -19,7 +19,16 @@ export function useAnimatedHeight() {
     const observer = new ResizeObserver((entries) => {
       const outer = outerRef.current;
       if (!outer) return;
-      const height = entries[0].target.getBoundingClientRect().height;
+      // Use the layout border-box height, not `getBoundingClientRect`. The
+      // bounding rect includes ancestor transforms (e.g. a parent popover's
+      // open-time `scale-95` → `scale-100`), which previously caused this
+      // hook to write the *scaled* height onto the outer element on first
+      // observation — under-sizing the container until a later layout
+      // change happened to trigger another ResizeObserver tick.
+      const entry = entries[0];
+      const height =
+        entry.borderBoxSize?.[0]?.blockSize ??
+        (entry.target as HTMLElement).offsetHeight;
       if (height > 0) {
         const diff = Math.abs(height - previousHeight.current);
         previousHeight.current = height;

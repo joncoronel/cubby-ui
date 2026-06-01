@@ -67,19 +67,22 @@
   --ring: oklch(0.55 0.2 250);
   --scrollbar: oklch(0.87 0 0);
 
-  /* Sidebar colors */
+  /* Sidebar colors — aliased to the core tokens so the sidebar palette tracks
+     the rest of the system. (The Sidebar component currently derives its
+     interactive states from --surface-hover/--surface-selected/--primary
+     directly, but these aliases keep the sidebar-* set on-system for anyone who
+     references them.) Because they're aliases, no `.dark` overrides are needed —
+     the referenced tokens resolve per mode. */
   --sidebar: var(--surface-1);
-  --sidebar-foreground: oklch(0.22 var(--neutral-chroma) var(--neutral-hue));
-  --sidebar-primary: oklch(0.28 0 0);
-  --sidebar-primary-foreground: oklch(
-    0.97 var(--neutral-chroma) var(--neutral-hue)
-  );
-  --sidebar-accent: oklch(0.92 0 0);
-  --sidebar-accent-foreground: oklch(
-    0.28 var(--neutral-chroma) var(--neutral-hue)
-  );
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
+  /* Opaque equivalent of --border pre-composited on the sidebar surface — used
+     as a solid bg on the resize rail, where a translucent border is too faint. */
   --sidebar-border: oklch(0.9 var(--neutral-chroma) var(--neutral-hue));
-  --sidebar-ring: oklch(0.65 var(--neutral-chroma) var(--neutral-hue));
+  --sidebar-ring: var(--ring);
 
   /* Status colors */
   --danger: oklch(0.97 0.04 25);
@@ -212,18 +215,9 @@
   --input-elevated: oklch(1 0 0 / 9%);
   --scrollbar: oklch(0.7 var(--neutral-chroma) var(--neutral-hue));
 
-  /* Sidebar */
-  --sidebar-foreground: oklch(0.88 var(--neutral-chroma) var(--neutral-hue));
-  --sidebar-primary: oklch(0.95 var(--neutral-chroma) var(--neutral-hue));
-  --sidebar-primary-foreground: oklch(
-    0.13 var(--neutral-chroma) var(--neutral-hue)
-  );
-  --sidebar-accent: oklch(0.19 var(--neutral-chroma) var(--neutral-hue));
-  --sidebar-accent-foreground: oklch(
-    0.95 var(--neutral-chroma) var(--neutral-hue)
-  );
+  /* Sidebar — only --sidebar-border needs a dark value; the rest are aliases
+     (set in :root) that resolve per mode automatically. */
   --sidebar-border: oklch(0.28 var(--neutral-chroma) var(--neutral-hue));
-  --sidebar-ring: oklch(0.83 var(--neutral-chroma) var(--neutral-hue));
 
   /* Status */
   --danger: oklch(0.26 0.07 25);

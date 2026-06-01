@@ -128,7 +128,12 @@
       "mcp__playwright__browser_wait_for",
       "Bash(python -c:*)",
       "Bash(grep -E \"\\\\.\\(json|ts\\)$\")",
-      "Bash(grep -E \"registry.default.\\(sheet|drawer|base-drawer\\).{0,30}tsx$\" -A2)"
+      "Bash(grep -E \"registry.default.\\(sheet|drawer|base-drawer\\).{0,30}tsx$\" -A2)",
+      "Bash(node .claude/skills/impeccable/scripts/context.mjs)",
+      "Bash(node \"C:\\\\Users\\\\jonny\\\\.claude\\\\skills\\\\impeccable\\\\scripts\\\\context.mjs\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\jonny\\\\Documents\\\\Projects\\\\cubby-ui\" -Recurse -Directory -Filter \"registry\")",
+      "Bash(Select-Object -First 5)",
+      "Bash(Get-Content \"C:\\\\Users\\\\jonny\\\\Documents\\\\Projects\\\\cubby-ui\\\\tailwind.config.ts\" -ErrorAction SilentlyContinue)"
     ],
     "deny": []
   }

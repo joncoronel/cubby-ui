@@ -110,24 +110,19 @@ function NavLink({
   return (
     <Link
       href={href}
+      aria-current={active ? "page" : undefined}
       className={cn(
-        "group relative inline-flex h-8 items-center px-1 text-sm font-medium transition-colors duration-200",
+        // Mirrors the ghost Button / sidebar item: surface-overlay fill on
+        // hover with a muted->foreground text shift, held at the stronger
+        // selected overlay when active.
+        "inline-flex h-8 items-center rounded-md px-2.5 text-sm font-medium transition-colors duration-150 ease-out",
+        "focus-visible:outline-ring/50 outline-none focus-visible:outline-2 focus-visible:outline-offset-2",
         active
-          ? "text-foreground"
-          : "text-muted-foreground hover:text-foreground",
+          ? "text-foreground bg-(--surface-selected)"
+          : "text-muted-foreground hover:text-foreground hover:bg-(--surface-hover)",
       )}
     >
       {label}
-      {/* Underline that grows from the left on hover, and is held open when active. */}
-      <span
-        aria-hidden="true"
-        className={cn(
-          "bg-foreground/80 absolute inset-x-1 -bottom-0.5 h-px origin-left transition-transform duration-300 ease-out",
-          active
-            ? "scale-x-100"
-            : "scale-x-0 group-hover:scale-x-100",
-        )}
-      />
     </Link>
   );
 }
@@ -173,7 +168,7 @@ export function TopNav() {
         </Link>
 
         {/* Center — nav links */}
-        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-7 md:flex">
+        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 md:flex">
           {NAV_ITEMS.map((item) => {
             const active =
               pathname === item.href ||

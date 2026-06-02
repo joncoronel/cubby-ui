@@ -21,7 +21,8 @@ type TransitionPanelProps = React.ComponentProps<"div"> & {
    *    direction-aware (forward slides in from the right, back from the left).
    *  - `"fade"`: views crossfade with a subtle scale (`0.96 → 1`). The
    *    transition is non-directional and the opacity / scale duration adapts
-   *    to the height change via the dynamic `--fade-duration`.
+   *    to the height change via `--tp-fade-duration` (override it for a fixed
+   *    crossfade).
    */
   transition?: "slide" | "fade";
 };
@@ -122,8 +123,9 @@ const TransitionPanelContext =
  *    new one, and slides forward (entering from the right) or backward
  *    (entering from the left) accordingly.
  *  - `transition="fade"`: non-directional crossfade with a subtle scale
- *    (`0.96 → 1`). Opacity / scale ride the dynamic `--fade-duration` so the
- *    fade speed adapts to how much the height changed between views.
+ *    (`0.96 → 1`). Opacity / scale ride `--tp-fade-duration`, which defaults
+ *    to the size-adaptive `--fade-duration` so the fade speed tracks how much
+ *    the height changed between views (override for a fixed crossfade).
  *
  * Pure CSS animation — no Motion. Uses `@starting-style` for the entry
  * keyframe, `transition-discrete` for the `display: block ↔ none` swap of
@@ -164,12 +166,18 @@ const TransitionPanelContext =
  *           `data-activation-direction="left" | "right" | "none"`
  *   - View: `data-active` (presence when active), `data-viewkey="..."`
  *
- * CSS custom properties (set on root, inherited by views):
+ * CSS custom properties (set on root, inherited by views). All overridable
+ * per-instance via the `style` prop or per-app via a CSS rule:
  *   - `--tp-duration` (default `240ms`) — height transition duration, plus the
- *     slide / opacity transition duration in `slide` mode. Override per-instance
- *     via `style` prop or per-app via CSS rule.
- *   - `--fade-duration` — opacity / scale duration in `fade` mode. Written by
- *     the height observer and adapts to the size change between views.
+ *     slide / opacity transition duration in `slide` mode.
+ *   - `--tp-fade-duration` — opacity / scale duration in `fade` mode. Defaults
+ *     to the size-adaptive value the height observer writes to `--fade-duration`
+ *     (falling back to `--tp-duration` before the first measure). Set it to a
+ *     fixed value to opt out of the adaptive crossfade.
+ *   - `--tp-ease` — easing for the height + slide transitions.
+ *   - `--tp-fade-ease` — easing for the crossfade.
+ *   (`--fade-duration` is the internal, observer-written source for the
+ *   adaptive `--tp-fade-duration` default — don't set it directly.)
  *
  * Browser support: the entrance animation relies on `@starting-style` and
  * `transition-behavior: allow-discrete` (Chrome 117+, Safari 17.4+,
@@ -404,11 +412,17 @@ function TransitionPanel({
           // (which inherit the property). Consumer's inline style spreads
           // after, so any `--tp-duration` they set wins.
           "--tp-duration": "240ms",
-          // Fallback for the dynamic opacity/scale duration used in `fade`
-          // mode. The height observer overwrites this with a size-adaptive
-          // value once it has measured; this default covers the first swap
-          // before the observer has run.
-          "--fade-duration": "0.24s",
+          // Crossfade (`fade` mode) duration. Defaults to the size-adaptive
+          // value the height observer writes to `--fade-duration`, falling
+          // back to `--tp-duration` before the first measurement. Because the
+          // consumer `style` spreads after, setting `--tp-fade-duration`
+          // pins the crossfade to a fixed duration (the observer writes
+          // `--fade-duration`, not this var, so it can't clobber an override).
+          "--tp-fade-duration": "var(--fade-duration, var(--tp-duration))",
+          // Easing for the height + slide transitions (`--tp-ease`) and the
+          // crossfade (`--tp-fade-ease`). Both overridable via `style` / CSS.
+          "--tp-ease": "cubic-bezier(0.32, 0.72, 0, 1)",
+          "--tp-fade-ease": "cubic-bezier(0.26, 0.08, 0.25, 1)",
           // Bleed area for the overflow clip. Defaults to 0 because the
           // recommended composition puts internal padding inside each
           // view, so focus rings / shadows already render in safe
@@ -443,7 +457,7 @@ function TransitionPanel({
         // fixed` / `absolute` descendants. Unlikely to matter for typical
         // panel content; flag if you put a viewport-positioned element here.
         "overflow-clip contain-layout [overflow-clip-margin:var(--tp-clip-margin)]",
-        "transition-[height] duration-(--tp-duration) ease-[cubic-bezier(0.32,0.72,0,1)]",
+        "transition-[height] duration-(--tp-duration) ease-(--tp-ease)",
         "motion-reduce:transition-none",
         className,
       )}
@@ -530,13 +544,13 @@ function TransitionPanelView({
       }
       className={cn(
         "[grid-area:1/1]",
-        // Per-mode transition: `slide` translates on the fixed --tp-duration;
-        // `fade` scales + crossfades on the dynamic --fade-duration (so the
-        // fade speed adapts to the height change) with the article's content
-        // easing.
+        // Per-mode transition: `slide` translates on --tp-duration with
+        // --tp-ease; `fade` scales + crossfades on --tp-fade-duration (which
+        // defaults to the size-adaptive --fade-duration) with --tp-fade-ease.
+        // All four vars are inherited from the root and overridable there.
         isFade
-          ? "transition-[opacity,scale,display] duration-(--fade-duration) ease-[cubic-bezier(0.26,0.08,0.25,1)]"
-          : "transition-[opacity,translate,display] duration-(--tp-duration) ease-[cubic-bezier(0.32,0.72,0,1)]",
+          ? "transition-[opacity,scale,display] duration-(--tp-fade-duration) ease-(--tp-fade-ease)"
+          : "transition-[opacity,translate,display] duration-(--tp-duration) ease-(--tp-ease)",
         "transition-discrete",
         "motion-reduce:transition-none",
         mounted && "starting:opacity-0",

@@ -26,6 +26,12 @@ Set `transition="fade"` to swap views with a non-directional crossfade (opacity 
 
 <ComponentPreview component="transition-panel" example="transition-panel-crossfade" />
 
+### Multi-step dialog
+
+A real-world composition: a multi-step authenticator-setup wizard inside a [Dialog](/docs/components/dialog). Each step lives in its own `TransitionPanelView` — including the icon, title, and description — so the whole surface crossfades and the dialog grows or shrinks to fit the active step. The verify step auto-focuses the [Input OTP](/docs/components/input-otp) field because focus moves to the first tabbable element of the newly active view on each swap.
+
+<ComponentPreview component="transition-panel" example="transition-panel-dialog" />
+
 ## API Reference
 
 `TransitionPanel` is a pure-CSS compound component — there is no underlying Base UI primitive. Views register themselves through context, so `TransitionPanelView` does not need to be a direct child: wrappers, fragments, conditional rendering, and Suspense boundaries are all supported.
@@ -54,7 +60,7 @@ Outer container. Renders a `<div>` and accepts any native div prop (`id`, `role`
   simpleType="string"
   defaultValue='"slide"'
 >
-  Transition style. `"slide"` slides views horizontally and is direction-aware (forward enters from the right, back from the left). `"fade"` crossfades with a subtle `0.96 → 1` scale, is non-directional, and uses the dynamic `--fade-duration` for the opacity / scale so the fade speed adapts to the height change.
+  Transition style. `"slide"` slides views horizontally and is direction-aware (forward enters from the right, back from the left). `"fade"` crossfades with a subtle `0.96 → 1` scale, is non-directional, and uses `--tp-fade-duration` for the opacity / scale (size-adaptive by default, so the fade speed tracks the height change).
 </ApiProp>
 
 </ApiPropsList>
@@ -103,10 +109,27 @@ Set on the root and inherited by view wrappers. Override via the `style` prop or
 </ApiProp>
 
 <ApiProp
-  name="--fade-duration"
+  name="--tp-fade-duration"
   fullType="time"
+  defaultValue="adaptive (~0.15s–0.27s)"
 >
-  Duration of the opacity / scale transition on views in `fade` mode. Written by the height observer and adapts to the size change between views (clamped to roughly `0.15s`–`0.27s`), so larger height changes fade a little slower. Not used in `slide` mode.
+  Duration of the opacity / scale transition on views in `fade` mode. Defaults to a size-adaptive value (the height observer adapts it to the size change between views, clamped to roughly `0.15s`–`0.27s`, so larger height changes fade a little slower). Set it to a fixed time to opt out of the adaptive behavior. Not used in `slide` mode.
+</ApiProp>
+
+<ApiProp
+  name="--tp-ease"
+  fullType="easing-function"
+  defaultValue="cubic-bezier(0.32, 0.72, 0, 1)"
+>
+  Easing for the height transition and, in `slide` mode, the slide / opacity transition.
+</ApiProp>
+
+<ApiProp
+  name="--tp-fade-ease"
+  fullType="easing-function"
+  defaultValue="cubic-bezier(0.26, 0.08, 0.25, 1)"
+>
+  Easing for the crossfade in `fade` mode.
 </ApiProp>
 
 <ApiProp

@@ -53,11 +53,10 @@ function Command<ItemValue>({
       className={cn(
         // Outer frame is the "panel" — subtly lifted above the page (surface-2
         // via bg-muted). The inner CommandContent drops back to surface-1
-        // (page color) creating a "well" inside the panel. solidSurface still
-        // contributes the rim + drop shadow (weighted by the level prop) and
-        // exposes --popup-surface for sticky descendants like CommandGroupLabel.
-        // The bg-muted override pins the outer to surface-2 regardless of the
-        // level prop — only the shadow weight is level-sensitive.
+        // (page color) creating a "well" inside the panel. solidSurface
+        // contributes the rim + drop shadow (weighted by the level prop). The
+        // bg-muted override pins the outer to surface-2 regardless of the level
+        // prop — only the shadow weight is level-sensitive.
         "text-popover-foreground flex min-h-0 flex-1 flex-col rounded-4xl p-1",
         solidSurface(level, shadowLevel),
         "bg-muted",
@@ -327,7 +326,7 @@ function CommandGroupLabel({
     <AutocompleteBase.GroupLabel
       data-slot="command-group-label"
       className={cn(
-        "text-muted-foreground mx-2 bg-(--popup-surface,var(--popover)) px-2.5 py-1.5 text-xs font-semibold",
+        "text-muted-foreground mx-2 px-2.5 py-1.5 text-xs font-semibold",
         className,
       )}
       {...props}

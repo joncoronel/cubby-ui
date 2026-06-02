@@ -91,10 +91,14 @@ function ContextMenuContent({
             "text-popover-foreground relative z-50 min-w-[12rem] origin-(--transform-origin) overflow-hidden rounded-xl p-1",
             // Modern enter/exit — scale + fade from the transform origin, matching
             // popover/dropdown-menu (replaces the legacy animate-in/zoom/slide classes)
-            "transition-[scale,opacity] duration-100 ease-out-expo",
+            "ease-out-expo transition-[scale,opacity] duration-100",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
-            "motion-reduce:transition-none data-instant:transition-none",
+            // NOTE: intentionally NOT suppressing on data-instant. Base UI flags
+            // every right-click open as instant="click" because the native
+            // `contextmenu` event has detail===0 (same as a keyboard activation),
+            // which would kill the enter animation. Only honor reduced motion.
+            "motion-reduce:transition-none",
             solidSurface(level, shadowLevel),
             className,
           )}
@@ -340,10 +344,12 @@ function ContextMenuSubContent({
             "text-popover-foreground relative z-50 min-w-[12rem] origin-(--transform-origin) overflow-hidden rounded-xl p-1",
             // Modern enter/exit — scale + fade from the transform origin, matching
             // popover/dropdown-menu (replaces the legacy animate-in/zoom/slide classes)
-            "transition-[scale,opacity] duration-100 ease-out-expo",
+            "ease-out-expo transition-[scale,opacity] duration-100",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
-            "motion-reduce:transition-none data-instant:transition-none",
+            // See ContextMenuContent: data-instant is a false positive on
+            // right-click open, so we don't suppress on it — only reduced motion.
+            "motion-reduce:transition-none",
             solidSurface(level, shadowLevel),
             className,
           )}

@@ -111,7 +111,7 @@ export function CategoryTiles() {
             </div>
             {/* Caption */}
             <div className="flex items-center justify-between gap-3 px-4 py-3.5">
-              <div className="flex flex-col gap-0.5">
+              <div className="flex flex-col items-start gap-0.5">
                 <span className="text-foreground font-(family-name:--font-display) text-base leading-none font-semibold tracking-tight">
                   {tile.label}
                 </span>

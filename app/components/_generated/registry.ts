@@ -320,6 +320,7 @@ import popover_popover_hover from "@/registry/examples/popover/popover-hover";
 import popover_popover_with_backdrop from "@/registry/examples/popover/popover-with-backdrop";
 import preview_card_preview_card_basic from "@/registry/examples/preview-card/preview-card-basic";
 import preview_card_preview_card_simple from "@/registry/examples/preview-card/preview-card-simple";
+import preview_card_preview_card_inline from "@/registry/examples/preview-card/preview-card-inline";
 import preview_card_preview_card_product from "@/registry/examples/preview-card/preview-card-product";
 import preview_card_preview_card_text_trigger from "@/registry/examples/preview-card/preview-card-text-trigger";
 import progress_progress_basic from "@/registry/examples/progress/progress-basic";
@@ -3152,6 +3153,11 @@ export const exampleRegistry = {
       "source": "import { PreviewCard, PreviewCardTrigger, PreviewCardContent } from \"@/components/ui/cubby-ui/preview-card\";\n\nexport default function PreviewCardSimple() {\n  return (\n    <PreviewCard>\n      <PreviewCardTrigger>\n        <button className=\"px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600\">\n          Hover me\n        </button>\n      </PreviewCardTrigger>\n      <PreviewCardContent>\n        <div className=\"p-4\">\n          <h3 className=\"font-semibold mb-2\">Preview Title</h3>\n          <p className=\"text-sm text-muted-foreground\">\n            This is a simple preview card that appears when you hover over\n            the trigger.\n          </p>\n        </div>\n      </PreviewCardContent>\n    </PreviewCard>\n  );\n}"
     },
     {
+      "title": "Inline",
+      "importPath": "preview-card-inline",
+      "source": "import {\n  PreviewCard,\n  PreviewCardTrigger,\n  PreviewCardContent,\n} from \"@/components/ui/cubby-ui/preview-card\";\n\nexport default function PreviewCardInline() {\n  return (\n    <p className=\"text-foreground max-w-72 text-sm leading-7\">\n      The framework was first announced at a small developer conference and\n      grew out of work on{\" \"}\n      <PreviewCard>\n        <PreviewCardTrigger className=\"text-primary decoration-primary/40 hover:decoration-primary cursor-pointer font-medium underline underline-offset-4 transition-colors\">\n          a long-running internal rendering engine\n        </PreviewCardTrigger>\n        <PreviewCardContent className=\"w-64\">\n          <p className=\"text-foreground text-sm leading-6 font-medium\">\n            Internal rendering engine\n          </p>\n          <p className=\"text-muted-foreground mt-1 text-sm leading-6\">\n            Hover anywhere along the linked phrase — even where it wraps to a\n            new line — and the card anchors to that exact line box.\n          </p>\n        </PreviewCardContent>\n      </PreviewCard>{\" \"}\n      that the team had maintained for years before open-sourcing it.\n    </p>\n  );\n}\n"
+    },
+    {
       "title": "Product",
       "importPath": "preview-card-product",
       "source": "import { PreviewCard, PreviewCardTrigger, PreviewCardContent } from \"@/components/ui/cubby-ui/preview-card\";\n\nexport default function PreviewCardProduct() {\n  return (\n    <PreviewCard>\n      <PreviewCardTrigger>\n        <div className=\"inline-flex items-center gap-2 px-3 py-1 rounded-md bg-secondary hover:bg-secondary/80 cursor-pointer\">\n          <div className=\"w-6 h-6 bg-gradient-to-br from-orange-400 to-red-500 rounded\" />\n          <span className=\"font-medium\">Design System</span>\n        </div>\n      </PreviewCardTrigger>\n      <PreviewCardContent>\n        <div className=\"flex flex-col gap-3\">\n          <div className=\"flex items-center gap-3\">\n            <div className=\"w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg flex items-center justify-center\">\n              <span className=\"text-white font-bold text-xl\">DS</span>\n            </div>\n            <div>\n              <h3 className=\"font-semibold text-lg\">Design System</h3>\n              <p className=\"text-sm text-muted-foreground\">\n                Component Library\n              </p>\n            </div>\n          </div>\n          <p className=\"text-sm\">\n            A comprehensive design system with reusable components, design\n            tokens, and guidelines.\n          </p>\n          <div className=\"flex items-center gap-2 text-sm\">\n            <span className=\"px-2 py-1 bg-green-100 text-green-800 rounded-full\">\n              Active\n            </span>\n            <span className=\"text-muted-foreground\">•</span>\n            <span className=\"text-muted-foreground\">\n              Last updated 2 days ago\n            </span>\n          </div>\n        </div>\n      </PreviewCardContent>\n    </PreviewCard>\n  );\n}"
@@ -4131,6 +4137,7 @@ export const componentMap = {
   "popover-with-backdrop": popover_popover_with_backdrop,
   "preview-card-basic": preview_card_preview_card_basic,
   "preview-card-simple": preview_card_preview_card_simple,
+  "preview-card-inline": preview_card_preview_card_inline,
   "preview-card-product": preview_card_preview_card_product,
   "preview-card-text-trigger": preview_card_preview_card_text_trigger,
   "progress-basic": progress_progress_basic,

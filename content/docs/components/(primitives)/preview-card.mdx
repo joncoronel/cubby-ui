@@ -38,6 +38,12 @@ Trigger preview from inline text.
 
 <ComponentPreview component="preview-card" example="preview-card-text-trigger" />
 
+### Inline (wrapping text)
+
+When the trigger is a phrase inside a paragraph that wraps across lines, the card anchors to the specific line box under the pointer rather than the full multi-line bounding box. Hover near the start of the phrase and the card points there; hover where it wraps to the next line and the card follows. This works automatically with no extra props.
+
+<ComponentPreview component="preview-card" example="preview-card-inline" />
+
 ## API Reference
 
 The PreviewCard component is built on top of [Base UI's PreviewCard](https://base-ui.com/react/components/preview-card). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.

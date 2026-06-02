@@ -79,7 +79,7 @@ For the complete Base UI API, see the [Base UI OTP Field documentation](https://
 
 Groups all OTP field parts and manages their state. Wraps Base UI's `OTPField.Root`. Renders a `<div>`.
 
-No custom props — all Base UI Root props are passed through, including `length`, `value`, `onValueChange`, `validationType`, `mask`, `sanitizeValue`, and `onValueInvalid`.
+No custom props — all Base UI Root props are passed through, including `length`, `value`, `onValueChange`, `validationType`, `mask`, `normalizeValue`, and `onValueInvalid`.
 
 #### OTPFieldInput
 
@@ -134,7 +134,7 @@ const invalidFeedback = useInvalidFeedback();
 <OTPField
   length={6}
   validationType="none"
-  sanitizeValue={myCustomSanitizer}
+  normalizeValue={myCustomNormalizer}
   onValueChange={invalidFeedback.handleValueChange}
   onValueInvalid={invalidFeedback.handleValueInvalid}
 >

@@ -81,7 +81,7 @@ const SHAKE_CLASS_B = "otp-field-shake-b focus:outline-destructive/80";
  * <OTPField
  *   length={6}
  *   validationType="none"
- *   sanitizeValue={sanitizeTierCode}
+ *   normalizeValue={normalizeTierCode}
  *   onValueChange={invalidFeedback.handleValueChange}
  *   onValueInvalid={invalidFeedback.handleValueInvalid}
  * >

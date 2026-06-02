@@ -38,7 +38,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         <CubbyUILogoDots
           dotGap={2}
           dotSize={0.5}
-          className="text-foreground h-[1200px] w-[1200px] max-w-none -rotate-12 opacity-[0.1] dark:opacity-[0.14]"
+          className="text-foreground h-[1200px] w-[1200px] max-w-none -rotate-12 opacity-[0.15] dark:text-[oklch(0.1_0.004_270)] dark:opacity-[0.6]"
         />
       </div>
 

@@ -133,7 +133,8 @@
       "Bash(node \"C:\\\\Users\\\\jonny\\\\.claude\\\\skills\\\\impeccable\\\\scripts\\\\context.mjs\")",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\jonny\\\\Documents\\\\Projects\\\\cubby-ui\" -Recurse -Directory -Filter \"registry\")",
       "Bash(Select-Object -First 5)",
-      "Bash(Get-Content \"C:\\\\Users\\\\jonny\\\\Documents\\\\Projects\\\\cubby-ui\\\\tailwind.config.ts\" -ErrorAction SilentlyContinue)"
+      "Bash(Get-Content \"C:\\\\Users\\\\jonny\\\\Documents\\\\Projects\\\\cubby-ui\\\\tailwind.config.ts\" -ErrorAction SilentlyContinue)",
+      "Bash(grep -E \"\\\\.\\(ts|js|json\\)$\")"
     ],
     "deny": []
   }

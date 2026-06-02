@@ -20,11 +20,11 @@ import { TransitionPanel, TransitionPanelView } from "@/registry/default/transit
 
 ## Examples
 
-### Vertical Axis
+### Crossfade
 
-Slide views along the Y axis instead of X. Useful for stepped flows where movement should feel like turning a page rather than navigating left/right. The container's height also animates as the active view's content size changes.
+Set `transition="fade"` to swap views with a non-directional crossfade (opacity plus a subtle `0.96 → 1` scale) instead of a slide. Useful for in-place content swaps — dialogs, popovers, settings panels — where a directional slide would feel out of place. The container's height still animates as the active view's content size changes, and the opacity duration adapts to the size change so a short-to-short swap fades faster than a short-to-tall one.
 
-<ComponentPreview component="transition-panel" example="transition-panel-vertical" />
+<ComponentPreview component="transition-panel" example="transition-panel-crossfade" />
 
 ## API Reference
 
@@ -49,12 +49,12 @@ Outer container. Renders a `<div>` and accepts any native div prop (`id`, `role`
 </ApiProp>
 
 <ApiProp
-  name="axis"
-  fullType='"x" | "y"'
+  name="transition"
+  fullType='"slide" | "fade"'
   simpleType="string"
-  defaultValue='"x"'
+  defaultValue='"slide"'
 >
-  Slide axis for the view transition. `"x"` slides horizontally; `"y"` slides vertically.
+  Transition style. `"slide"` slides views horizontally and is direction-aware (forward enters from the right, back from the left). `"fade"` crossfades with a subtle `0.96 → 1` scale, is non-directional, and uses the dynamic `--fade-duration` for the opacity / scale so the fade speed adapts to the height change.
 </ApiProp>
 
 </ApiPropsList>
@@ -73,17 +73,17 @@ Set on the root element so consumers can style based on transition state.
 </ApiProp>
 
 <ApiProp
-  name="data-axis"
-  fullType='"x" | "y"'
+  name="data-transition"
+  fullType='"slide" | "fade"'
 >
-  Mirrors the `axis` prop.
+  Mirrors the `transition` prop.
 </ApiProp>
 
 <ApiProp
   name="data-activation-direction"
-  fullType='"left" | "right" | "up" | "down" | "none"'
+  fullType='"left" | "right" | "none"'
 >
-  Direction of the most recent swap. `"none"` before any activation has happened (first render). Matches Base UI's `Tabs.Panel` vocabulary.
+  Direction of the most recent swap. `"none"` before any activation has happened (first render). Matches Base UI's `Tabs.Panel` vocabulary. In `fade` mode the built-in animation is non-directional, but this still reports the logical forward (`"right"`) / back (`"left"`) direction for consumers who want to drive their own directional styling.
 </ApiProp>
 
 </ApiPropsList>
@@ -99,7 +99,14 @@ Set on the root and inherited by view wrappers. Override via the `style` prop or
   fullType="time"
   defaultValue="240ms"
 >
-  Duration of both the height transition and the slide / opacity transition on views.
+  Duration of the height transition, plus the slide / opacity transition on views in `slide` mode.
+</ApiProp>
+
+<ApiProp
+  name="--fade-duration"
+  fullType="time"
+>
+  Duration of the opacity / scale transition on views in `fade` mode. Written by the height observer and adapts to the size change between views (clamped to roughly `0.15s`–`0.27s`), so larger height changes fade a little slower. Not used in `slide` mode.
 </ApiProp>
 
 <ApiProp

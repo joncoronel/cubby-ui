@@ -15,9 +15,15 @@ type TransitionPanelProps = React.ComponentProps<"div"> & {
    */
   activeKey: string;
   /**
-   * Slide axis. Defaults to "x" (horizontal).
+   * Transition style. Defaults to "slide".
+   *
+   *  - `"slide"`: views slide horizontally and the transition is
+   *    direction-aware (forward slides in from the right, back from the left).
+   *  - `"fade"`: views crossfade with a subtle scale (`0.96 → 1`). The
+   *    transition is non-directional and the opacity / scale duration adapts
+   *    to the height change via the dynamic `--fade-duration`.
    */
-  axis?: "x" | "y";
+  transition?: "slide" | "fade";
 };
 
 type TransitionPanelViewProps = React.ComponentProps<"div"> & {
@@ -43,8 +49,7 @@ type TransitionPanelViewProps = React.ComponentProps<"div"> & {
   initialFocus?: TransitionPanelInitialFocus;
 };
 
-const X_SLIDE = "18%";
-const Y_SLIDE = "12px";
+const SLIDE_DISTANCE = "18%";
 
 // Selector for elements that can hold focus. Mirrors Base UI's tabbable
 // candidate set, minus the rarely-relevant `iframe`, `object`, `embed`,
@@ -63,7 +68,7 @@ type ViewEntry = {
 
 type TransitionPanelContextValue = {
   activeKey: string;
-  axis: "x" | "y";
+  transition: "slide" | "fade";
   enterFrom: string;
   exitTo: string;
   mounted: boolean;
@@ -110,10 +115,15 @@ const TransitionPanelContext =
 // Motion in a fork or sibling component when there's actual measured need.
 
 /**
- * Animated swap between N named views. Direction-aware: tracks the previous
- * activeKey, compares its position in the view registry to the new one,
- * and slides forward (entering view from the right / down) or backward
- * (entering view from the left / up) accordingly.
+ * Animated swap between N named views. Two transition styles:
+ *
+ *  - `transition="slide"` (default): direction-aware horizontal slide. Tracks
+ *    the previous activeKey, compares its position in the view registry to the
+ *    new one, and slides forward (entering from the right) or backward
+ *    (entering from the left) accordingly.
+ *  - `transition="fade"`: non-directional crossfade with a subtle scale
+ *    (`0.96 → 1`). Opacity / scale ride the dynamic `--fade-duration` so the
+ *    fade speed adapts to how much the height changed between views.
  *
  * Pure CSS animation — no Motion. Uses `@starting-style` for the entry
  * keyframe, `transition-discrete` for the `display: block ↔ none` swap of
@@ -123,8 +133,8 @@ const TransitionPanelContext =
  *
  * Compound component pattern: state is shared with `TransitionPanelView`
  * via `TransitionPanelContext`. Each view renders its own DOM and reads
- * `activeKey`, axis, direction-aware CSS vars, and the `mounted` gate from
- * context. Views register themselves with the panel via the context's
+ * `activeKey`, the transition style, direction-aware CSS vars, and the
+ * `mounted` gate from context. Views register themselves with the panel via the context's
  * `registerView` callback; the registry is the source of truth for view
  * order (used by direction calculation) and view DOM lookup (used by the
  * focus effect). On registration we re-derive order from DOM position, so
@@ -150,22 +160,25 @@ const TransitionPanelContext =
  * used for height measurement.
  *
  * Data attributes (Base UI conventions):
- *   - Root: `data-axis="x" | "y"`,
- *           `data-activation-direction="left" | "right" | "up" | "down" | "none"`
+ *   - Root: `data-transition="slide" | "fade"`,
+ *           `data-activation-direction="left" | "right" | "none"`
  *   - View: `data-active` (presence when active), `data-viewkey="..."`
  *
  * CSS custom properties (set on root, inherited by views):
- *   - `--tp-duration` (default `240ms`) — height + slide transition duration.
- *     Override per-instance via `style` prop or per-app via CSS rule.
+ *   - `--tp-duration` (default `240ms`) — height transition duration, plus the
+ *     slide / opacity transition duration in `slide` mode. Override per-instance
+ *     via `style` prop or per-app via CSS rule.
+ *   - `--fade-duration` — opacity / scale duration in `fade` mode. Written by
+ *     the height observer and adapts to the size change between views.
  *
  * Browser support: the entrance animation relies on `@starting-style` and
  * `transition-behavior: allow-discrete` (Chrome 117+, Safari 17.4+,
  * Firefox 129+). Older browsers degrade to an instant view swap with no
- * slide animation — no broken state, just no motion.
+ * slide / fade animation — no broken state, just no motion.
  *
  * Usage:
  * ```tsx
- * <TransitionPanel activeKey={step} axis="x">
+ * <TransitionPanel activeKey={step} transition="fade">
  *   <TransitionPanelView viewKey="list">...</TransitionPanelView>
  *   <TransitionPanelView viewKey="create">...</TransitionPanelView>
  * </TransitionPanel>
@@ -173,7 +186,7 @@ const TransitionPanelContext =
  */
 function TransitionPanel({
   activeKey,
-  axis = "x",
+  transition = "slide",
   ref,
   className,
   style,
@@ -348,54 +361,54 @@ function TransitionPanel({
 
   // Direction-aware slide values, exposed via context to view children as
   // CSS custom properties. Tailwind's JIT sees the literal class names in
-  // the view source (translate-*-(var(--tp-enter))); the var values change
-  // per render based on direction.
-  const distance = axis === "x" ? X_SLIDE : Y_SLIDE;
-  const enterFrom = direction === 1 ? distance : `-${distance}`;
-  const exitTo = direction === 1 ? `-${distance}` : distance;
+  // the view source (translate-x-(var(--tp-enter))); the var values change
+  // per render based on direction. Only consumed in `slide` mode.
+  const enterFrom = direction === 1 ? SLIDE_DISTANCE : `-${SLIDE_DISTANCE}`;
+  const exitTo = direction === 1 ? `-${SLIDE_DISTANCE}` : SLIDE_DISTANCE;
 
   const contextValue = React.useMemo<TransitionPanelContextValue>(
     () => ({
       activeKey,
-      axis,
+      transition,
       enterFrom,
       exitTo,
       mounted,
       registerView,
     }),
-    [activeKey, axis, enterFrom, exitTo, mounted, registerView],
+    [activeKey, transition, enterFrom, exitTo, mounted, registerView],
   );
 
-  // `data-activation-direction` matches Base UI's Tabs.Panel vocabulary
-  // verbatim: "left" | "right" | "up" | "down" | "none". The value encodes
-  // both axis and direction so consumers don't need to combine attrs in
-  // CSS. "none" before any activation has happened — same convention Base
-  // UI uses for the pre-interaction state.
-  const activationDirection: "left" | "right" | "up" | "down" | "none" =
-    !hasActivated
-      ? "none"
-      : axis === "x"
-        ? direction === 1
-          ? "right"
-          : "left"
-        : direction === 1
-          ? "down"
-          : "up";
+  // `data-activation-direction` matches Base UI's Tabs.Panel vocabulary:
+  // "left" | "right" | "none" (slide is horizontal-only). "none" before any
+  // activation has happened — same convention Base UI uses for the
+  // pre-interaction state. In `fade` mode the built-in animation is
+  // non-directional, but this still reports the logical forward/back
+  // direction for consumers who want to drive their own directional styling.
+  const activationDirection: "left" | "right" | "none" = !hasActivated
+    ? "none"
+    : direction === 1
+      ? "right"
+      : "left";
 
   return (
     <div
       {...rest}
       ref={setRootRef}
       data-slot="transition-panel"
-      data-axis={axis}
+      data-transition={transition}
       data-activation-direction={activationDirection}
       style={
         {
-          // Default duration for both the height transition (on this
-          // element) and the slide/opacity transition (on view wrappers,
-          // which inherit the property). Consumer's inline style spreads
+          // Default duration for the height transition (on this element) and,
+          // in `slide` mode, the slide/opacity transition on view wrappers
+          // (which inherit the property). Consumer's inline style spreads
           // after, so any `--tp-duration` they set wins.
           "--tp-duration": "240ms",
+          // Fallback for the dynamic opacity/scale duration used in `fade`
+          // mode. The height observer overwrites this with a size-adaptive
+          // value once it has measured; this default covers the first swap
+          // before the observer has run.
+          "--fade-duration": "0.24s",
           // Bleed area for the overflow clip. Defaults to 0 because the
           // recommended composition puts internal padding inside each
           // view, so focus rings / shadows already render in safe
@@ -461,8 +474,10 @@ function TransitionPanelView({
       "TransitionPanelView must be rendered inside a TransitionPanel.",
     );
   }
-  const { activeKey, axis, enterFrom, exitTo, mounted, registerView } = ctx;
+  const { activeKey, transition, enterFrom, exitTo, mounted, registerView } =
+    ctx;
   const isActive = viewKey === activeKey;
+  const isFade = transition === "fade";
   const wrapperRef = React.useRef<HTMLDivElement | null>(null);
 
   // Compose the consumer `ref` with the internal `wrapperRef` used by
@@ -506,7 +521,8 @@ function TransitionPanelView({
           // properties (padding, background, custom CSS vars). The
           // direction-aware slide vars override after — these are
           // panel-controlled and change every render, so a consumer
-          // setting them would just break the slide animation.
+          // setting them would just break the slide animation. Unused in
+          // `fade` mode (the className doesn't reference them there).
           ...style,
           "--tp-enter": enterFrom,
           "--tp-exit": exitTo,
@@ -514,20 +530,27 @@ function TransitionPanelView({
       }
       className={cn(
         "[grid-area:1/1]",
-        "transition-[opacity,translate,display] transition-discrete duration-(--tp-duration) ease-[cubic-bezier(0.32,0.72,0,1)]",
+        // Per-mode transition: `slide` translates on the fixed --tp-duration;
+        // `fade` scales + crossfades on the dynamic --fade-duration (so the
+        // fade speed adapts to the height change) with the article's content
+        // easing.
+        isFade
+          ? "transition-[opacity,scale,display] duration-(--fade-duration) ease-[cubic-bezier(0.26,0.08,0.25,1)]"
+          : "transition-[opacity,translate,display] duration-(--tp-duration) ease-[cubic-bezier(0.32,0.72,0,1)]",
+        "transition-discrete",
         "motion-reduce:transition-none",
         mounted && "starting:opacity-0",
         mounted &&
-          (axis === "x"
-            ? "starting:translate-x-(--tp-enter)"
-            : "starting:translate-y-(--tp-enter)"),
+          (isFade
+            ? "starting:scale-[0.96]"
+            : "starting:translate-x-(--tp-enter)"),
         isActive
-          ? "translate-x-0 translate-y-0 opacity-100"
+          ? isFade
+            ? "scale-100 opacity-100"
+            : "translate-x-0 opacity-100"
           : cn(
               "pointer-events-none hidden opacity-0 contain-[size]",
-              axis === "x"
-                ? "translate-x-(--tp-exit)"
-                : "translate-y-(--tp-exit)",
+              isFade ? "scale-[0.96]" : "translate-x-(--tp-exit)",
             ),
         className,
       )}

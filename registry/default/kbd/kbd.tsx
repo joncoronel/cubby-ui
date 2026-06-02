@@ -78,19 +78,22 @@ function useClientPlatform(): "mac" | "windows" {
   const [platform, setPlatform] = React.useState<"mac" | "windows">("mac");
 
   React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      setPlatform(
-        navigator.platform.toLowerCase().includes("mac") ? "mac" : "windows",
-      );
-    }
+    if (typeof navigator === "undefined") return;
+    // `navigator.platform` is deprecated. Prefer userAgentData.platform
+    // (Chromium) and fall back to the userAgent string, which is supported
+    // everywhere and not deprecated.
+    const uaData = (
+      navigator as Navigator & { userAgentData?: { platform?: string } }
+    ).userAgentData;
+    const platformHint = uaData?.platform ?? navigator.userAgent;
+    setPlatform(/mac/i.test(platformHint) ? "mac" : "windows");
   }, []);
 
   return platform;
 }
 
 export interface KbdProps
-  extends React.ComponentProps<"kbd">,
-    VariantProps<typeof kbdVariants> {
+  extends React.ComponentProps<"kbd">, VariantProps<typeof kbdVariants> {
   keys?: string[];
   separator?: string;
   platform?: "mac" | "windows" | "auto";

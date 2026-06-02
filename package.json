@@ -16,7 +16,7 @@
     "dev:build": "pnpm run registry:sync && pnpm run registry:build && next build"
   },
   "dependencies": {
-    "@base-ui/react": "^1.4.0",
+    "@base-ui/react": "^1.5.0",
     "@conform-to/react": "^1.17.1",
     "@conform-to/zod": "^1.17.1",
     "@headless-tree/core": "^1.6.3",

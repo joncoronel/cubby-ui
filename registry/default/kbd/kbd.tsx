@@ -4,11 +4,15 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const kbdVariants = cva(
-  // Tiny raised "keycap": surface-3 chip + 1px --border, sharing the form-field
-  // surface vocabulary (border + bg-clip-padding). A soft drop gives the
-  // physical key lift (shadow color matches the surface-shadow base, oklch(0 0
-  // 0)); flat variants (outline/ghost) and the pressed state drop it.
-  "inline-flex items-center justify-center rounded-sm border bg-clip-padding text-center font-medium tracking-tight shadow-[0_1px_2px_0_oklch(0_0_0/0.06)] transition-colors duration-150 font-mono",
+  // Tiny raised "keycap": a 1px --border + a soft drop for the physical key
+  // lift (shadow color matches the surface-shadow base, oklch(0 0 0)). Flat
+  // variants (outline/ghost) and the pressed state drop the shadow.
+  // bg-clip-padding lives on the `default` variant only: its --border is
+  // translucent, so the bg must clip to the padding box for the border to
+  // composite on the substrate (the form-field trick). The colored variants
+  // have opaque borders and outline/ghost have no opaque bg behind the border,
+  // so they don't need it (and on ghost it would leave a 1px substrate halo).
+  "inline-flex items-center justify-center rounded-sm border text-center font-medium tracking-tight shadow-[0_1px_2px_0_oklch(0_0_0/0.06)] transition-colors duration-150 font-mono",
   {
     variants: {
       size: {
@@ -17,7 +21,7 @@ const kbdVariants = cva(
         lg: "h-7 min-w-7 px-2.5 text-sm",
       },
       variant: {
-        default: "bg-card text-foreground",
+        default: "bg-card bg-clip-padding text-foreground",
         primary: "bg-primary text-primary-foreground border-primary",
         secondary: "bg-secondary text-secondary-foreground border-secondary",
         outline: "bg-transparent text-foreground shadow-none",

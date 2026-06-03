@@ -99,7 +99,7 @@ export default function TransitionPanelDialog() {
           </DialogDescription>
 
           <TransitionPanel activeKey={step} transition="fade">
-            <TransitionPanelView viewKey="scan" className="px-6 pt-8 pb-6">
+            <TransitionPanelView viewKey="scan" className="p-6">
               <div className="flex flex-col items-center text-center">
                 <HugeiconsIcon
                   icon={LockIcon}
@@ -132,7 +132,7 @@ export default function TransitionPanelDialog() {
               </div>
             </TransitionPanelView>
 
-            <TransitionPanelView viewKey="verify" className="px-6 pt-8 pb-6">
+            <TransitionPanelView viewKey="verify" className="p-6">
               <Form
                 onFormSubmit={() => {
                   if (code === CORRECT_CODE) {
@@ -209,7 +209,7 @@ export default function TransitionPanelDialog() {
               </Form>
             </TransitionPanelView>
 
-            <TransitionPanelView viewKey="recovery" className="px-6 pt-8 pb-6">
+            <TransitionPanelView viewKey="recovery" className="p-6">
               <div className="flex flex-col items-center text-center">
                 <HugeiconsIcon
                   icon={File01Icon}

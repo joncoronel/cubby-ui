@@ -24,7 +24,11 @@ export function toSVGString(options: QRExportOptions): string {
     ecLevel: resolveEcLevel(options.ecLevel, hasLogo),
     minVersion: options.minVersion,
   });
-  return buildQRCodeSVG(matrix, options, options.size);
+  return buildQRCodeSVG(
+    matrix,
+    { ...options, title: options.title ?? options.value },
+    options.size,
+  );
 }
 
 /** Builds a vector `data:image/svg+xml` URL from an SVG string. */

@@ -44,6 +44,11 @@ export type QRCodeProps = Omit<
   minVersion?: number;
   /** Rendered size in pixels. The `viewBox` stays in module units. */
   size?: number | string;
+  /**
+   * Accessible name, rendered as an SVG `<title>`. Defaults to `value`. Pass
+   * `aria-hidden` instead to mark a decorative code.
+   */
+  title?: string;
   /** Imperative handle exposing `toSVGString`, `toDataURL`, and `getMatrix`. */
   ref?: React.Ref<QRCodeHandle>;
 };
@@ -75,6 +80,7 @@ function QRCode({
   logoPadding,
   minVersion,
   size,
+  title,
   className,
   ref,
   ...props
@@ -82,18 +88,22 @@ function QRCode({
   const imageLogo = logo != null && isImageLogo(logo);
   const hasLogo = logo != null && logo !== false;
   const elementLogo = hasLogo && !imageLogo;
+  const resolvedEcLevel = resolveEcLevel(ecLevel, hasLogo);
+  const accessibleTitle = title ?? value;
 
-  const { model, matrix, renderOptions } = React.useMemo(() => {
+  // Encoding is the expensive step (8-mask penalty scoring), so it is memoized
+  // separately on primitive deps — style and logo changes never re-encode.
+  const matrix = React.useMemo(
+    () => encode(value, { ecLevel: resolvedEcLevel, minVersion }),
+    [value, resolvedEcLevel, minVersion],
+  );
+
+  const { model, renderOptions } = React.useMemo(() => {
     const logoObject: QRLogoObject | undefined = imageLogo
       ? (logo as QRLogoObject)
       : hasLogo
         ? { src: "" }
         : undefined;
-
-    const encoded = encode(value, {
-      ecLevel: resolveEcLevel(ecLevel, hasLogo),
-      minVersion,
-    });
 
     const options: QRRenderOptions = {
       dotStyle,
@@ -104,16 +114,12 @@ function QRCode({
       logoSize,
       logoPadding,
       logo: logoObject,
+      title: accessibleTitle,
     };
 
-    return {
-      matrix: encoded,
-      renderOptions: options,
-      model: buildRenderModel(encoded, options),
-    };
+    return { renderOptions: options, model: buildRenderModel(matrix, options) };
   }, [
-    value,
-    ecLevel,
+    matrix,
     dotStyle,
     margin,
     foreground,
@@ -124,7 +130,7 @@ function QRCode({
     hasLogo,
     logoSize,
     logoPadding,
-    minVersion,
+    accessibleTitle,
   ]);
 
   React.useImperativeHandle(
@@ -144,11 +150,13 @@ function QRCode({
       {...props}
       {...dimension}
       data-slot="qr-code"
+      data-dot-style={dotStyle ?? "square"}
       role={props.role ?? "img"}
       viewBox={`0 0 ${model.viewBox} ${model.viewBox}`}
       shapeRendering={model.crisp ? "crispEdges" : undefined}
       className={cn("block", className)}
     >
+      {model.title ? <title>{model.title}</title> : null}
       {model.background ? (
         <rect width={model.viewBox} height={model.viewBox} fill={model.background} />
       ) : null}
@@ -196,7 +204,8 @@ function QRCode({
 }
 
 export { QRCode };
-export { encode, toSVGString, toDataURL } from "./lib";
+export { encode } from "./lib/encoder";
+export { toSVGString, toDataURL } from "./lib/export";
 export type {
   ECLevel,
   QRMode,
@@ -208,5 +217,6 @@ export type {
   QRLogoObject,
   QRCodeHandle,
   QRExportOptions,
+  QRDataURLType,
   QRDataURLOptions,
 } from "./lib/types";

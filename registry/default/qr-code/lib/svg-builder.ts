@@ -68,6 +68,8 @@ export interface QRRenderModel {
   finders: FinderRender[];
   knockout?: KnockoutRect;
   image?: ImageRender;
+  /** Accessible name, rendered as an SVG `<title>`. */
+  title?: string;
   /** Whether every shape is axis-aligned (enables `crispEdges` rendering). */
   crisp: boolean;
 }
@@ -202,6 +204,7 @@ export function buildRenderModel(
     finders,
     knockout,
     image,
+    title: options.title,
     crisp,
   };
 }
@@ -228,8 +231,11 @@ export function serializeModel(
 
   const shapeRendering = model.crisp ? ` shape-rendering="crispEdges"` : "";
   let svg =
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${vb} ${vb}"${dimension}${shapeRendering}>`;
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${vb} ${vb}"${dimension}${shapeRendering} role="img">`;
 
+  if (model.title) {
+    svg += `<title>${escapeAttr(model.title)}</title>`;
+  }
   if (model.background) {
     svg += `<rect width="${vb}" height="${vb}" fill="${escapeAttr(model.background)}"/>`;
   }

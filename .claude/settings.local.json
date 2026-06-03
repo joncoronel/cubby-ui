@@ -137,7 +137,10 @@
       "Bash(grep -E \"\\\\.\\(ts|js|json\\)$\")",
       "Bash(agent-browser eval *)",
       "Bash(echo \"interpolate-size supported? $\\(agent-browser eval \"CSS.supports\\('interpolate-size','allow-keywords'\\)\" 2>&1\\)\")",
-      "Bash(echo \"browser UA: $\\(agent-browser eval \"navigator.userAgent\" 2>&1\\)\")"
+      "Bash(echo \"browser UA: $\\(agent-browser eval \"navigator.userAgent\" 2>&1\\)\")",
+      "Bash(echo \"tsc total: $\\(npx tsc --noEmit 2>&1)",
+      "Bash(echo \"eslint exit: $?\")",
+      "Bash(agent-browser close *)"
     ],
     "deny": []
   }

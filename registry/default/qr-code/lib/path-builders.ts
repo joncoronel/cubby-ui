@@ -14,9 +14,9 @@ const DOT_RADIUS = 0.5;
 /** Inscribed radius used by the circle dot style. */
 const DOT_CIRCLE_RADIUS = 0.5;
 
-/** Formats a number compactly: up to 4 decimals, no trailing zeros. */
+/** Formats a number compactly: up to 3 decimals, no trailing zeros. */
 function f(n: number): string {
-  return Number(n.toFixed(4)).toString();
+  return Number(n.toFixed(3)).toString();
 }
 
 /** A full-cell square subpath at module (x, y), offset by `o`. */

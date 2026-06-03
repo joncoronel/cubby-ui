@@ -102,6 +102,8 @@ export interface QRRenderOptions {
   logo?: QRLogoObject;
   /** Minimum QR version. */
   minVersion?: number;
+  /** Accessible name rendered as an SVG `<title>` element. */
+  title?: string;
 }
 
 /** Options for the standalone {@link toSVGString} / {@link toDataURL} helpers. */

@@ -68,6 +68,14 @@ export async function rasterize(
     }
     context.drawImage(image, 0, 0, pixelSize, pixelSize);
     return await canvasToDataURL(canvas, type, options.quality);
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "SecurityError") {
+      throw new Error(
+        "Cannot export this QR code to PNG/JPEG: the canvas was tainted by a " +
+          'cross-origin image. Use a same-origin or data-URI logo, or export with type: "svg".',
+      );
+    }
+    throw error;
   } finally {
     URL.revokeObjectURL(url);
   }
@@ -89,7 +97,11 @@ export async function toDataURL(
   });
   // Size the SVG to the target raster resolution for a crisp rasterization.
   const size = type === "svg" ? options.size : pixelSize;
-  const svg = buildQRCodeSVG(matrix, options as QRRenderOptions, size);
+  const renderOptions =
+    type === "svg"
+      ? (options as QRRenderOptions)
+      : await inlineCrossOriginLogo(options as QRRenderOptions);
+  const svg = buildQRCodeSVG(matrix, renderOptions, size);
   return rasterize(svg, { type, quality: options.quality, pixelSize });
 }
 
@@ -102,8 +114,54 @@ export async function matrixToDataURL(
   const type = options.type ?? "png";
   const pixelSize = options.pixelSize ?? DEFAULT_PIXEL_SIZE;
   const size = type === "svg" ? options.size : pixelSize;
-  const svg = buildQRCodeSVG(matrix, renderOptions, size);
+  const resolved =
+    type === "svg" ? renderOptions : await inlineCrossOriginLogo(renderOptions);
+  const svg = buildQRCodeSVG(matrix, resolved, size);
   return rasterize(svg, { type, quality: options.quality, pixelSize });
+}
+
+/** Whether a logo `src` points to a different origin (and is not inlined). */
+function isCrossOriginUrl(src: string): boolean {
+  if (/^(data:|blob:)/i.test(src)) {
+    return false;
+  }
+  if (typeof location === "undefined") {
+    return /^[a-z]+:\/\//i.test(src);
+  }
+  try {
+    return new URL(src, location.href).origin !== location.origin;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Rasterizing an SVG that references a cross-origin image taints the canvas, so
+ * `toDataURL` would throw a `SecurityError`. When the logo is cross-origin we
+ * fetch it (which only succeeds if the host sends CORS headers) and inline it as
+ * a data URI. If that fails, we throw a clear, actionable error.
+ */
+async function inlineCrossOriginLogo(
+  options: QRRenderOptions,
+): Promise<QRRenderOptions> {
+  const src = options.logo?.src;
+  if (!src || !isCrossOriginUrl(src)) {
+    return options;
+  }
+  try {
+    const response = await fetch(src, { mode: "cors" });
+    if (!response.ok) {
+      throw new Error(`status ${response.status}`);
+    }
+    const dataUrl = await blobToDataURL(await response.blob());
+    return { ...options, logo: { ...options.logo!, src: dataUrl } };
+  } catch {
+    throw new Error(
+      `Cannot rasterize a QR code with a cross-origin logo ("${src}") to PNG/JPEG — ` +
+        `the canvas would be tainted. Use a same-origin or data-URI logo, ensure the ` +
+        `image host sends CORS headers, or export with type: "svg".`,
+    );
+  }
 }
 
 async function loadImage(url: string): Promise<CanvasImageSource> {

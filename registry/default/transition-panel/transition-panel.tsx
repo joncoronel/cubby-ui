@@ -300,29 +300,18 @@ function TransitionPanel({
   // running — that produces two out-of-sync height tweens. When not swapping,
   // the observer's pixel-height writes apply instantly, so the panel tracks
   // self-animating content frame-for-frame instead of lagging behind it.
+  //
+  // Set on swap (render-time), cleared by the height transition's own
+  // `transitionend` on the root (see `onTransitionEnd` below) — no timer, so
+  // it respects any `--tp-duration` override exactly. A same-height swap
+  // (rare) fires no height transition, so the flag stays set until the next
+  // height change clears it; harmless, since there's nothing to animate.
   const [isSwapping, setIsSwapping] = React.useState(false);
   if (activeKey !== renderedKey) {
     setPreviousKey(renderedKey);
     setRenderedKey(activeKey);
     setIsSwapping(true);
   }
-
-  // Clear the swap flag once the height transition has had time to finish.
-  // Re-derive the duration from `--tp-duration` so consumer overrides are
-  // respected; re-runs on each swap (activeKey dep) to reset the timer.
-  React.useEffect(() => {
-    if (!isSwapping) return;
-    const el = outerRef.current;
-    let ms = 240;
-    if (el) {
-      const raw = getComputedStyle(el).getPropertyValue("--tp-duration").trim();
-      const parsed = parseFloat(raw);
-      if (!Number.isNaN(parsed))
-        ms = raw.endsWith("ms") ? parsed : parsed * 1000;
-    }
-    const id = setTimeout(() => setIsSwapping(false), ms + 50);
-    return () => clearTimeout(id);
-  }, [isSwapping, activeKey, outerRef]);
 
   // Direction calculation from registry order (not from React.Children, so
   // views can be wrapped / conditional / Suspense-gated). On the very first
@@ -436,6 +425,18 @@ function TransitionPanel({
       data-slot="transition-panel"
       data-transition={transition}
       data-activation-direction={activationDirection}
+      onTransitionEnd={(event) => {
+        rest.onTransitionEnd?.(event);
+        // End of the swap: clear the flag when the root's own height
+        // transition finishes. `target === currentTarget` ignores transitions
+        // bubbling up from the view wrappers (opacity / translate / scale).
+        if (
+          event.target === event.currentTarget &&
+          event.propertyName === "height"
+        ) {
+          setIsSwapping(false);
+        }
+      }}
       style={
         {
           // Default duration for the height transition (on this element) and,

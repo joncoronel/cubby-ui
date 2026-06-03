@@ -31,12 +31,10 @@ const inputGroupVariants = cva(
   {
     variants: {
       variant: {
-        // Opaque "lifted" bg — matches Input default. Use on the page or any
-        // non-elevated substrate.
+        // Opaque "lifted" bg — use on the page or any non-elevated substrate.
         default: "bg-input",
-        // Translucent overlay that adapts to substrate. Use inside Cards,
-        // Dialogs, popovers, or any surface where the opaque default would
-        // collapse into its parent.
+        // Translucent overlay — use inside Cards, Dialogs, or any surface
+        // where the opaque default would collapse into its parent.
         elevated: "bg-input-elevated",
       },
     },

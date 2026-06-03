@@ -64,8 +64,6 @@ const sliderThumbVariants = cva(
           "h-full w-6 bg-primary border-none hover:shadow-none shadow-none rounded-full data-[orientation=vertical]:h-6 data-[orientation=vertical]:w-full after:bg-primary-foreground flex items-center justify-center after:size-[60%]  after:rounded-full  after:origin-center data-[dragging]:after:scale-85 after:transition-transform after:ease-out after:duration-100 after:shadow-[0_2px_4px_0_oklch(0.18_0_0_/_0.15)]",
         squareThumb:
           "h-5 w-2.5 bg-card border-1 border-border/70 rounded-[.125rem] data-[orientation=vertical]:h-2.5 data-[orientation=vertical]:w-5",
-
-        // Add more variants here as needed
       },
     },
     defaultVariants: {
@@ -141,7 +139,6 @@ function Slider({
             )}
           />
 
-          {/* Step dots */}
           {showSteps &&
             steps.map((step, index) => {
               // Skip first and last step when using center alignment
@@ -154,8 +151,7 @@ function Slider({
 
               const percentage = ((step - min) / (max - min)) * 100;
 
-              // For contained variant with edge alignment, we need to adjust positioning
-              // because the thumb width affects the available track space
+              // Contained variant uses edge alignment, so offset by half the thumb width.
               const isContained = variant === "contained";
               const thumbWidth = isContained ? 24 : 0; // w-6 = 24px for contained variant
 
@@ -193,7 +189,6 @@ function Slider({
               );
             })}
 
-          {/* Automatically render the correct number of thumbs based on value/defaultValue */}
           {values.map((_, index) => (
             <BaseSlider.Thumb
               data-slot="slider-thumb"

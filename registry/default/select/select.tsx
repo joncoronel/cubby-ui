@@ -67,15 +67,11 @@ const selectTriggerVariants = cva(
   {
     variants: {
       variant: {
-        // Opaque bg — matches Input default. Use on the page or any
-        // non-elevated substrate. Hover uses --outline-hover (a deliberate
-        // -5% darken of --card/--input) for a sharp, predictable delta
-        // against the opaque base.
+        // Opaque bg for page-level or non-elevated substrates. --outline-hover
+        // is a deliberate -5% darken of --card/--input for a sharp hover delta.
         default: "bg-input hover:bg-(--outline-hover)",
-        // Translucent overlay that adapts to substrate. Use inside Cards,
-        // Dialogs, popovers, or any surface where the opaque default would
-        // collapse into its parent. Hover uses --surface-hover (an alpha
-        // overlay) so the translucency is preserved on any substrate.
+        // Translucent overlay for Cards, Dialogs, etc. --surface-hover (alpha
+        // overlay) preserves translucency on any substrate depth.
         elevated: "bg-input-elevated hover:bg-(--surface-hover)",
       },
       size: {

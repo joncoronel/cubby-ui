@@ -231,11 +231,9 @@ function SheetContent({
   );
 }
 
-// Slot-presence checks use ancestor `:has()` queries on
-// `[data-slot=sheet-content]` rather than adjacent-sibling selectors,
-// so consumers can wrap header/body/footer in form, ErrorBoundary, Suspense,
-// or conditional fragments without breaking padding. Matches the Dialog
-// primitive's approach.
+// Slot-presence padding uses ancestor `:has()` on `[data-slot=sheet-content]`
+// so header/body/footer can be wrapped in forms, ErrorBoundaries, or fragments
+// without breaking spacing — adjacent-sibling selectors wouldn't reach through.
 function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div

@@ -20,19 +20,16 @@ import { buttonVariants } from "@/registry/default/button/button";
 import { solidSurface } from "@/registry/default/lib/elevated";
 import "./toast.css";
 
-// Module-level managers
 const toastManager = Toast.createToastManager();
 const anchoredToastManager = Toast.createToastManager();
 
-// Grouped Toast Mappings
 // Map groupId -> Base UI toastId
 const groupToToastMap = new Map<string, string>();
 // Map itemId -> groupId for lookups
 const groupItemToGroupMap = new Map<string, string>();
-// Map groupId -> GroupedToastData (we track our own data since toastManager doesn't expose getSnapshot)
+// Map groupId -> GroupedToastData (toastManager doesn't expose getSnapshot)
 const groupDataMap = new Map<string, GroupedToastData>();
 
-// Types
 const TOAST_ICONS = {
   success: CheckmarkCircle02Icon,
   error: AlertCircleIcon,
@@ -74,10 +71,8 @@ function upsertReplayClassName(toast: {
 
 // Shared classes for stacked toast roots (StackedToastItem + GroupedToastRoot).
 // Each callsite appends its own extras (pulse animation, overflow behavior, etc).
-// Surface elevation: level=3 (popover tier), shadowLevel=4 (heavier than a popover
-// since a toast floats unattached from any anchor). The bg uses a color-mix so
-// stacked toasts get progressively darker; the underlying surface is
-// --popup-surface (set inline as var(--surface-3)).
+// Shadow level=4 (heavier than a popover — toast floats unattached from any anchor);
+// the bg uses color-mix so stacked toasts get progressively darker.
 const TOAST_ROOT_CLASSES = [
   // Base styles & visual
   "text-popover-foreground data-expanded:bg-(--popup-surface) absolute z-[calc(9999-var(--toast-index))] h-(--toast-calc-height) w-full rounded-lg select-none [transition:transform_.5s_cubic-bezier(.22,1,.36,1),opacity_.5s,height_.15s,background-color_.5s]",
@@ -177,7 +172,6 @@ interface ToastData {
   };
 }
 
-// Grouped Toast Types
 type ToastType =
   | "default"
   | "loading"
@@ -233,7 +227,6 @@ export interface GroupSummaryCounts {
   infoCount: number;
 }
 
-/** Options for creating a grouped toast item */
 export interface GroupedToastOptions<TData extends object = object> {
   groupId: string;
   title?: string;
@@ -258,7 +251,6 @@ export interface GroupedToastOptions<TData extends object = object> {
   duration?: number;
 }
 
-/** Message configuration for grouped promise toasts */
 interface GroupedPromiseMessage {
   title?: string;
   description?: string;
@@ -276,7 +268,6 @@ export interface GroupedPromiseMessages<T> {
   aborted?: PromiseMessage | (() => GroupedPromiseMessage);
 }
 
-/** Options for grouped promise toasts */
 export interface GroupedPromiseOptions extends Omit<
   GroupedToastOptions,
   "type" | "title" | "description" | "action"
@@ -293,7 +284,6 @@ interface HistoricalCounts {
   info: number;
 }
 
-/** Data structure stored in Base UI toast for grouped toasts */
 interface GroupedToastData {
   isGrouped: true;
   groupId: string;
@@ -315,8 +305,6 @@ interface GroupedToastData {
   historicalCounts: HistoricalCounts;
 }
 
-// Toast Helper Functions
-// Overloaded function signatures for JSX support
 function baseToast(jsx: React.ReactElement): string | undefined;
 function baseToast<TData extends object = object>(
   jsx: React.ReactElement,
@@ -330,7 +318,6 @@ function baseToast<TData extends object = object>(
   optionsOrJSX: ToastOptions<TData> | React.ReactElement,
   jsxOptions?: Omit<ToastOptions<TData>, "title" | "description">,
 ): string | undefined {
-  // Handle JSX element passed directly (with optional options)
   if (React.isValidElement(optionsOrJSX)) {
     return toastManager.add({
       ...(jsxOptions?.id && { id: jsxOptions.id }),
@@ -355,7 +342,6 @@ function baseToast<TData extends object = object>(
     });
   }
 
-  // Handle options object
   const options = optionsOrJSX as ToastOptions<TData>;
   return toastManager.add({
     ...(options.id && { id: options.id }),
@@ -403,7 +389,6 @@ const promise = async <T,>(
   });
 };
 
-// Factory function to create typed toast methods (DRY)
 function createTypedToast(type: NonNullable<ToastOptions["type"]>) {
   return <TData extends object = object>(
     optionsOrJSX: Omit<ToastOptions<TData>, "type"> | React.ReactElement,
@@ -416,7 +401,6 @@ function createTypedToast(type: NonNullable<ToastOptions["type"]>) {
   };
 }
 
-// Create the toast object with methods like Sonner
 export const toast = Object.assign(baseToast, {
   success: createTypedToast("success"),
   error: createTypedToast("error"),
@@ -503,10 +487,8 @@ export const toast = Object.assign(baseToast, {
     };
 
     if (existingToastId) {
-      // Add to existing group - all new items go to `items` array
       const existingData = groupDataMap.get(options.groupId);
       if (existingData) {
-        // Increment historical counts for non-loading items immediately
         const updatedHistoricalCounts = { ...existingData.historicalCounts };
         if (
           newItem.type === "success" ||
@@ -529,7 +511,6 @@ export const toast = Object.assign(baseToast, {
         });
       }
     } else {
-      // Create new group
       const groupId = options.groupId;
       const groupData: GroupedToastData = {
         isGrouped: true,
@@ -557,10 +538,8 @@ export const toast = Object.assign(baseToast, {
         title: "",
         description: "",
         data: groupData,
-        // Use Base UI's built-in timeout for auto-dismiss (only for non-loading items)
-        // Loading items don't auto-dismiss the group - they wait for updateGroupItem()
+        // Use Base UI's timeout for auto-dismiss; loading items pass 0 (wait for updateGroupItem).
         timeout: isLoading ? 0 : (options.duration ?? 0),
-        // Clean up our maps when the toast is closed (via close button or swipe)
         onClose: () => {
           const data = groupDataMap.get(groupId);
           if (data) {
@@ -594,7 +573,6 @@ export const toast = Object.assign(baseToast, {
     const data = groupDataMap.get(groupId);
     if (!data) return;
 
-    // Check both arrays
     const inPending = data.items.some((item) => item.id === itemId);
     const inCompleted = (data.completedItems ?? []).some(
       (item) => item.id === itemId,
@@ -615,12 +593,10 @@ export const toast = Object.assign(baseToast, {
     groupItemToGroupMap.delete(itemId);
 
     if (newItems.length === 0 && newCompletedItems.length === 0) {
-      // Last item - close the toast entirely
       toastManager.close(toastId);
       groupToToastMap.delete(groupId);
       groupDataMap.delete(groupId);
     } else {
-      // Update toast with remaining items
       const updatedData: GroupedToastData = {
         ...data,
         items: newItems,
@@ -640,7 +616,6 @@ export const toast = Object.assign(baseToast, {
     const toastId = groupToToastMap.get(groupId);
     if (!toastId) return;
 
-    // Clean up item mappings for both arrays
     const data = groupDataMap.get(groupId);
     if (data) {
       data.items.forEach((item) => groupItemToGroupMap.delete(item.id));
@@ -667,7 +642,6 @@ export const toast = Object.assign(baseToast, {
     const data = groupDataMap.get(groupId);
     if (!data) return;
 
-    // Find the current item to check if type is changing from loading
     const currentItem = data.items.find((item) => item.id === itemId);
     const wasLoading = currentItem?.type === "loading";
     const isNowComplete =
@@ -685,7 +659,6 @@ export const toast = Object.assign(baseToast, {
       // Insert at beginning (newest on top)
       const newCompletedItems = [completedItem, ...(data.completedItems ?? [])];
 
-      // Check if we have 2+ complete items (triggers "All complete" summary)
       const completeCount = newCompletedItems.length;
       const shouldShowAllComplete = completeCount >= 2;
 
@@ -712,21 +685,19 @@ export const toast = Object.assign(baseToast, {
         currentItem.duration ?? GROUP_ITEM_DISMISS_DURATION;
 
       if (newItems.length === 0) {
-        // Last pending item completed - use Base UI's native timer
-        // This timer pauses when user is dragging/hovering the toast
+        // Last pending item — use Base UI's native timer (pauses on drag/hover).
         toastManager.update(toastId, {
           data: updatedData,
           timeout: dismissDuration,
         });
       } else {
-        // Still have pending items - use raw setTimeout for this completed item
+        // Still pending items remain — Base UI timer can't be per-item, use setTimeout.
         toastManager.update(toastId, { data: updatedData });
         setTimeout(() => {
           toast.dismissCompletedItem(itemId);
         }, dismissDuration);
       }
     } else {
-      // Just update in place (not a loading->complete transition)
       const newItems = data.items.map((item) =>
         item.id === itemId ? { ...item, ...options } : item,
       );
@@ -783,7 +754,6 @@ export const toast = Object.assign(baseToast, {
     messages: GroupedPromiseMessages<T>,
     options: GroupedPromiseOptions,
   ): Promise<T> => {
-    // Helper to resolve message to GroupedPromiseMessage format
     const resolveMessage = <U,>(
       msg: PromiseMessage | ((data: U) => GroupedPromiseMessage),
       data: U,
@@ -797,7 +767,6 @@ export const toast = Object.assign(baseToast, {
       return msg;
     };
 
-    // Create loading item
     const itemId = toast.grouped({
       ...options,
       title: messages.loading.title,
@@ -810,11 +779,9 @@ export const toast = Object.assign(baseToast, {
       return promiseToResolve;
     }
 
-    // Track if already handled and whether it was an abort
     let handled = false;
     let wasAborted = false;
 
-    // Set up abort listener if signal provided
     if (options.signal) {
       const handleAbort = () => {
         if (handled) return;
@@ -875,8 +842,7 @@ export const toast = Object.assign(baseToast, {
         });
       }
 
-      // Throw AbortError for user-initiated abort (matches fetch() behavior)
-      // Callers can catch and check: error.name === 'AbortError'
+      // Re-throw as AbortError to match fetch() behavior (error.name === 'AbortError').
       if (wasAborted) {
         throw new DOMException("Aborted", "AbortError");
       }
@@ -886,7 +852,6 @@ export const toast = Object.assign(baseToast, {
   },
 });
 
-// Toast Provider
 export type ToastPosition =
   | "top-left"
   | "top-center"
@@ -965,14 +930,12 @@ function StackedToastItem({
   position,
   swipeDirection,
 }: StackedToastItemProps) {
-  // Check if this is a grouped toast
   const isGrouped =
     toast.data &&
     typeof toast.data === "object" &&
     "isGrouped" in toast.data &&
     (toast.data as GroupedToastData).isGrouped === true;
 
-  // For grouped toasts, render with GroupedToastContent
   if (isGrouped) {
     return (
       <GroupedToastRoot
@@ -986,11 +949,9 @@ function StackedToastItem({
 
   const type = toast.type || "default";
 
-  // Check if this is a custom JSX toast
   const hasCustomJSX =
     toast.data && typeof toast.data === "object" && "customJSX" in toast.data;
 
-  // Check if close button should be shown (defaults to true)
   const showCloseButton =
     toast.data &&
     typeof toast.data === "object" &&
@@ -1096,7 +1057,6 @@ function StackedToastItem({
   );
 }
 
-// Anchored Toast Provider
 interface AnchoredToastProviderProps {
   children: React.ReactNode;
   limit?: number;
@@ -1191,10 +1151,8 @@ function AnchoredToastItem({ toast }: { toast: ToastData }) {
   );
 }
 
-// Grouped Toast Components
-
-// Feature detection for calc-size() support (Chrome 129+, Edge 129+)
-// Used to conditionally render different DOM structures for height animation
+// Feature detection for calc-size() (Chrome 129+, Edge 129+).
+// Used to conditionally render different DOM structures for height animation.
 const supportsCalcSize =
   typeof CSS !== "undefined" && CSS.supports("height", "calc-size(auto, size)");
 
@@ -1205,9 +1163,8 @@ interface GroupedToastRootProps {
   data: GroupedToastData;
 }
 
-/** Helper to toggle expand/collapse for a grouped toast */
+/** Toggle expand/collapse for a grouped toast. */
 function toggleGroupExpanded(toastId: string) {
-  // Find the groupId from toastId
   let groupId: string | undefined;
   for (const [gId, tId] of groupToToastMap.entries()) {
     if (tId === toastId) {
@@ -1240,8 +1197,7 @@ function GroupedToastRoot({
   // Sync popover open state with toast data
   const handlePopoverOpenChange = React.useCallback(
     (open: boolean, eventDetails: Popover.Root.ChangeEventDetails) => {
-      // Block all close reasons except escape key (accessibility pattern)
-      // State is managed via explicit Show/Hide button toggle
+      // Only allow escape-key to close; all other closes are managed by the Show/Hide button.
       if (!open && eventDetails.reason !== "escape-key") {
         eventDetails.cancel();
         return;
@@ -1262,7 +1218,7 @@ function GroupedToastRoot({
       data-position={position}
       className={cn(
         TOAST_ROOT_CLASSES,
-        // Grouped toasts need overflow-visible for the expanded popover
+        // overflow-visible required — the expanded popover renders outside the toast's bounds.
         "overflow-visible",
       )}
     >
@@ -1293,7 +1249,7 @@ function GroupedToastRoot({
               data-slot="expanded-cards-popup"
               className={cn(
                 "absolute w-(--anchor-width)",
-                // Override transform origin (align="start" sets it to left edge)
+                // align="start" sets origin to the left edge; override to center.
                 isTop
                   ? "top-full mt-2 origin-top"
                   : "bottom-full mb-2 origin-bottom",
@@ -1321,20 +1277,14 @@ function GroupedToastSummaryOrSingle({
   data,
   toastId,
 }: GroupedToastSummaryOrSingleProps) {
-  // Total items across both arrays
   const totalPending = data.items.length;
   const totalCompleted = (data.completedItems ?? []).length;
   const totalItems = totalPending + totalCompleted;
 
-  // Show single-item view when there's exactly 1 total item (pending OR completed)
-  // and we haven't shown "All complete" mode yet
   const isSingle = totalItems === 1 && !data.hasShownAllComplete;
-
-  // Get the single item to display (prefer pending, fallback to completed)
   const singleItem = data.items[0] ?? data.completedItems?.[0];
 
-  // Modern browsers (Chrome 129+): single element with key switching
-  // Height animates from CSS var to calc-size(auto, size)
+  // Chrome 129+: single element with key-swap; height animates via calc-size(auto, size).
   if (supportsCalcSize) {
     return (
       <div
@@ -1343,11 +1293,9 @@ function GroupedToastSummaryOrSingle({
           "ease-out-expo duration-200",
           "transition-[height,opacity,filter,scale]",
           "overflow-clip",
-          // Height: start from CSS var, animate to intrinsic size
+          // Start from the known CSS var height, animate to intrinsic auto size.
           "h-[calc-size(auto,size)]",
           "starting:h-(--toast-calc-height)",
-          // Opacity/blur/scale entry animation
-
           "starting:scale-95 starting:opacity-0 starting:blur-[2px]",
           "blur-0 scale-100 opacity-100",
         )}
@@ -1367,10 +1315,9 @@ function GroupedToastSummaryOrSingle({
     );
   }
 
-  // Fallback (Firefox/Safari): two elements with grid-based height animation
+  // Fallback (Firefox/Safari): two elements with grid-row height animation.
   return (
     <>
-      {/* Single item view */}
       <div
         className={cn(
           "ease-out-expo grid duration-200",
@@ -1390,7 +1337,6 @@ function GroupedToastSummaryOrSingle({
         </div>
       </div>
 
-      {/* Summary view */}
       <div
         className={cn(
           "ease-out-expo grid duration-200",
@@ -1424,8 +1370,6 @@ function GroupedSingleItemContent({
   const Icon =
     type !== "default" ? TOAST_ICONS[type as keyof typeof TOAST_ICONS] : null;
 
-  // When close button exists: action underneath text, items-start
-  // When no close button: action on right side, items-center
   return (
     <div
       className={cn(
@@ -1502,12 +1446,10 @@ function GroupedToastSummaryContent({
   data,
   onToggle,
 }: GroupedToastSummaryContentProps) {
-  // Compute counts - use historical counts for accuracy (don't decrement on dismiss)
   const loadingCount = data.items.filter(
     (item) => item.type === "loading",
   ).length;
 
-  // Use historical counts for type breakdown (persist after items dismiss)
   const {
     success: successCount,
     error: errorCount,
@@ -1517,7 +1459,6 @@ function GroupedToastSummaryContent({
   const completedCount = successCount + errorCount + warningCount + infoCount;
   const totalCount = loadingCount + completedCount;
 
-  // Determine icon type based on state
   let iconType: "loading" | "success" | "error" | "warning";
   if (loadingCount > 0) {
     iconType = "loading";
@@ -1584,10 +1525,7 @@ function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
   const pendingCount = data.items.length;
   const hasCompletedItems = completedCount > 0;
 
-  // Show pending card when:
-  // - There are 2+ pending items (original behavior), OR
-  // - There's at least 1 pending item AND completed items exist, OR
-  // - There's at least 1 pending item AND we've been in group mode (historical context)
+  // Show pending card when 2+ pending, or 1 pending alongside completed/historical items.
   const hasPendingItems =
     pendingCount > 1 ||
     (pendingCount >= 1 && hasCompletedItems) ||
@@ -1600,14 +1538,13 @@ function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
   return (
     <div
       data-slot="expanded-cards-container"
-      // Use flex-col with conditional DOM order instead of flex-col-reverse for Safari animation compatibility
+      // flex-col with conditional DOM order (not flex-col-reverse) for Safari AnimatePresence compat.
       className="flex flex-col gap-2"
     >
       <AnimatePresence initial={false} mode="popLayout">
-        {/* Flat conditional rendering for Safari AnimatePresence compatibility.
-            Order: completed first for bottom position, pending, completed last for top position */}
+        {/* Flat conditional rendering (no fragments) required for Safari + AnimatePresence.
+            Completed card renders first for bottom, last for top — so it's always outermost. */}
 
-        {/* Completed card first (for bottom position only) */}
         {!isTop && hasCompletedItems && (
           <motion.div
             key="completed-card"
@@ -1661,7 +1598,7 @@ interface GroupedToastCardProps {
 function GroupedToastCard({ data, isTop }: GroupedToastCardProps) {
   const cardRef = React.useRef<HTMLDivElement>(null);
 
-  // Use native event listeners to stop propagation at the capture phase
+  // Capture-phase native listeners prevent touch events from reaching the toast's swipe handler.
   React.useEffect(() => {
     const card = cardRef.current;
     if (!card) return;
@@ -1670,7 +1607,6 @@ function GroupedToastCard({ data, isTop }: GroupedToastCardProps) {
       e.stopPropagation();
     };
 
-    // Stop all touch events from reaching the toast's swipe handler
     card.addEventListener("touchstart", stopPropagation, { passive: true });
     card.addEventListener("touchmove", stopPropagation, { passive: true });
     card.addEventListener("touchend", stopPropagation, { passive: true });
@@ -1785,9 +1721,8 @@ function CompletedItemRow({ item, showSeparator }: CompletedItemRowProps) {
   const Icon =
     type !== "default" ? TOAST_ICONS[type as keyof typeof TOAST_ICONS] : null;
 
-  // Use item's duration or default for progress bar animation
   const dismissDuration = item.duration ?? GROUP_ITEM_DISMISS_DURATION;
-  // Calculate elapsed time on mount to sync animation with actual timer
+  // Negative delay syncs the CSS animation with the real timer that started at completedAt.
   const [elapsed] = React.useState(() =>
     item.completedAt ? Date.now() - item.completedAt : 0,
   );
@@ -1845,7 +1780,6 @@ function CompletedItemRow({ item, showSeparator }: CompletedItemRowProps) {
             )}
           </div>
 
-          {/* Action button on right */}
           {item.action && (
             <button
               onClick={item.action.onClick}
@@ -1868,7 +1802,7 @@ interface CompletedItemsCardProps {
 function CompletedItemsCard({ items, isTop }: CompletedItemsCardProps) {
   const cardRef = React.useRef<HTMLDivElement>(null);
 
-  // Touch event isolation (same pattern as GroupedToastCard)
+  // Same touch isolation as GroupedToastCard.
   React.useEffect(() => {
     const card = cardRef.current;
     if (!card) return;
@@ -1895,9 +1829,7 @@ function CompletedItemsCard({ items, isTop }: CompletedItemsCardProps) {
       data-swipe-ignore
       className={cn(
         "max-h-48 w-full overflow-y-auto overscroll-contain rounded-lg",
-        // bg stays as `bg-muted` (intentionally recessed/quiet vs the active card),
-        // but the shadow + rim come from the elevation system at level=5 to pair
-        // with the GroupedToastCard above it.
+        // bg-muted is intentionally recessed vs the active card; shadow stays at level=5 to match.
         "bg-muted text-popover-foreground",
         "shadow-[var(--surface-shadow-5),var(--surface-rim-5)]",
         "animate-in fade-in-0 zoom-in-95",
@@ -1922,5 +1854,4 @@ function CompletedItemsCard({ items, isTop }: CompletedItemsCardProps) {
   );
 }
 
-// Exports
 export { Toast, toastManager, anchoredToastManager };

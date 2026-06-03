@@ -492,10 +492,8 @@ function ComboboxChip({ className, ...props }: BaseCombobox.Chip.Props) {
       data-slot="combobox-chip"
       className={cn(
         "bg-(--surface-selected) text-accent-foreground flex items-center gap-1 rounded-sm px-2 py-1 text-sm font-medium break-all sm:text-xs",
-        // In-field control focus: a crisp ring (not outline) so it doesn't
-        // clip against neighbors in the packed chip row, and outline-none to
-        // suppress the browser default (which tracked currentColor — read as a
-        // white ring in dark mode). Matches the trigger/clear/chip-remove.
+        // Ring (not outline) avoids clipping neighbors in the packed chip row;
+        // outline-none suppresses the browser default (currentColor → white in dark mode).
         "outline-none focus-visible:ring-2 focus-visible:ring-ring/70",
         className,
       )}

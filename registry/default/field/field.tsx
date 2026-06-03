@@ -75,7 +75,7 @@ function FieldErrorSlot({ className, ...props }: React.ComponentProps<"div">) {
         // Opacity fade on child FieldError
         "*:data-[slot=field-error]:transition-opacity *:data-[slot=field-error]:duration-140 motion-reduce:*:data-[slot=field-error]:transition-none",
         "[&>[data-slot=field-error][data-ending-style]]:opacity-0 [&>[data-slot=field-error][data-starting-style]]:opacity-0",
-        // When switching between multiple FieldErrors, hide the exiting one and show the entering one instantly
+        // When swapping errors: instantly hide the exiting one, show the entering one.
         "[&:has(>[data-slot=field-error]:not([data-ending-style]))>[data-slot=field-error][data-ending-style]]:hidden",
         "[&:has(>[data-slot=field-error][data-ending-style])>[data-slot=field-error][data-starting-style]]:opacity-100",
         className,

@@ -52,7 +52,6 @@ const createCropCanvas = (image: HTMLImageElement, cropArea: Area, isCircular: b
   canvas.height = cropArea.height;
   
   if (isCircular) {
-    // Create circular clipping path
     const centerX = cropArea.width / 2;
     const centerY = cropArea.height / 2;
     const radius = Math.min(centerX, centerY);
@@ -414,7 +413,6 @@ const useCropper = (options: UseCropperOptions = {}) => {
   const zoomRef = useRef(zoom);
   const aspectRatioRef = useRef(aspectRatio);
   
-  // Update refs when state changes
   zoomRef.current = zoom;
   aspectRatioRef.current = aspectRatio;
 

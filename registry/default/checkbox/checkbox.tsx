@@ -5,8 +5,7 @@ import { Checkbox as BaseCheckbox } from "@base-ui/react/checkbox";
 
 import { cn } from "@/lib/utils";
 
-// Custom checkmark with stroke-dashoffset animation
-// Path length ≈ 20 (calculated from the path geometry)
+// strokeDasharray 22 matches this path's computed length (~20px, rounded up for a clean draw-on).
 function CheckmarkIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -39,8 +38,7 @@ function CheckmarkIcon({ className }: { className?: string }) {
   );
 }
 
-// Custom minus icon with stroke-dashoffset animation
-// Path length = 16 (horizontal line from x=4 to x=20)
+// strokeDasharray 16 = exact length of the M20,12 L4,12 segment.
 function MinusIcon({ className }: { className?: string }) {
   return (
     <svg

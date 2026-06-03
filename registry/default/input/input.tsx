@@ -18,12 +18,10 @@ const inputVariants = cva(
   {
     variants: {
       variant: {
-        // Opaque bg — matches surface-3. Use on the page or any non-elevated
-        // substrate.
+        // Opaque bg — use on the page or any non-elevated substrate.
         default: "bg-input",
-        // Translucent overlay that adapts to substrate. Use inside Cards,
-        // Dialogs, popovers, or any surface where the opaque default would
-        // collapse into its parent.
+        // Translucent overlay — use inside Cards, Dialogs, or any elevated
+        // surface where the opaque default would collapse into its parent.
         elevated: "bg-input-elevated",
       },
       size: {

@@ -54,10 +54,9 @@ function InputOTPSlot({
 				// Base styles
 				"relative flex h-9 w-9 items-center justify-center text-sm",
 				variant === "default" ? "bg-input" : "bg-input-elevated",
-				// Borders serve dual purpose here: outer perimeter + dividers
-				// between slots. bg-clip-padding so the translucent --border
-				// composites against the substrate, matching the rest of the
-				// form-field family.
+				// Border-y + border-r forms both the outer perimeter and inter-slot
+				// dividers. bg-clip-padding composites the translucent --border
+				// against the substrate, matching the rest of the form-field family.
 				"border-border border-y border-r bg-clip-padding first:rounded-l-lg first:border-l last:rounded-r-lg",
 				// Outline transition base
 				"outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out",

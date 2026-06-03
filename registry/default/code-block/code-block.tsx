@@ -29,7 +29,7 @@ import {
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ComputerTerminal01Icon } from "@hugeicons/core-free-icons";
-// Context for sharing code block state
+
 interface CodeBlockContextValue {
   code: string;
   language: string;
@@ -52,7 +52,6 @@ function useCodeBlock() {
   return context;
 }
 
-// Language icon mapping
 type LanguageIconRenderer = React.ComponentType<{
   size: number;
   className: string;
@@ -105,7 +104,6 @@ function getLanguageIcon(language: string) {
   return <span className="text-muted-foreground text-sm">{language}</span>;
 }
 
-// Root component
 interface CodeBlockProps extends Omit<
   useRender.ComponentProps<"div">,
   "children"
@@ -135,11 +133,9 @@ function CodeBlock({
 }: CodeBlockProps) {
   const [nodes, setNodes] = useState(initial);
 
-  // Track previous initial value to detect prop changes
+  // Update during render (React 18+ state-from-props pattern) to avoid a
+  // cascading effect render when the `initial` prop changes.
   const [prevInitial, setPrevInitial] = useState(initial);
-
-  // React 18+ pattern: update state during render when props change
-  // This avoids synchronous setState in effects which causes cascading renders
   if (initial !== prevInitial) {
     setPrevInitial(initial);
     if (initial) {
@@ -147,11 +143,9 @@ function CodeBlock({
     }
   }
 
-  // Memoize line calculations
   const lines = useMemo(() => code.split("\n"), [code]);
 
   useLayoutEffect(() => {
-    // Only run async highlighting when no pre-rendered content
     if (!initial) {
       const normalizedLanguage = (language as BundledLanguage) || "javascript";
       void highlight(code, normalizedLanguage, {
@@ -162,7 +156,6 @@ function CodeBlock({
     }
   }, [code, language, initial, highlightLines, showDiff, focusLines]);
 
-  // Memoize context value to prevent unnecessary re-renders
   const contextValue = useMemo(
     () => ({
       language,
@@ -176,7 +169,6 @@ function CodeBlock({
     [language, code, nodes, lines, focusLines, showDiff, floatingCopy],
   );
 
-  // Wrap children with context
   const content = (
     <CodeBlockContext.Provider value={contextValue}>
       {children}
@@ -187,11 +179,10 @@ function CodeBlock({
     "data-slot": "code-block",
     className: cn(
       "group max-w-full w-full rounded-2xl p-1 pt-0 relative",
-      // Gray-frame outer with shadow + rim from the elevation system.
-      // bg-muted comes after solidSurface so it overrides the bg-surface-3.
+      // bg-muted follows solidSurface to override its bg-surface-3.
       solidSurface(3, 1),
       "bg-muted",
-      // Restore top padding when there's no header
+      // Restore top padding when there's no header.
       "has-[[data-slot='code-block-pre']:first-child]:pt-1",
       className,
     ),
@@ -207,7 +198,6 @@ function CodeBlock({
   return element;
 }
 
-// Header component
 interface CodeBlockHeaderProps
   extends useRender.ComponentProps<"div">, Partial<BaseTabsProps> {
   filename?: string;
@@ -233,7 +223,6 @@ function CodeBlockHeader({
   const language = context.language;
   const code = context.code;
 
-  // Auto-layout content (only used when children not provided)
   const startContent = (
     <div className="flex min-w-0 items-center gap-2">
       {language && (
@@ -257,7 +246,6 @@ function CodeBlockHeader({
     </div>
   );
 
-  // Use custom children if provided, otherwise use auto-layout
   const content = children ?? (
     <>
       {startContent}
@@ -283,7 +271,6 @@ function CodeBlockHeader({
   return element;
 }
 
-// Language icon component
 interface CodeBlockLanguageProps extends useRender.ComponentProps<"div"> {
   language: string;
   customIcon?: React.ReactNode;
@@ -296,7 +283,6 @@ function CodeBlockLanguage({
   render,
   ...props
 }: CodeBlockLanguageProps) {
-  // Use custom icon if provided, otherwise get default language icon
   const icon = customIcon ?? getLanguageIcon(language);
 
   const defaultProps = {
@@ -314,7 +300,6 @@ function CodeBlockLanguage({
   return element;
 }
 
-// Filename component
 type CodeBlockFilenameProps = useRender.ComponentProps<"span">;
 
 function CodeBlockFilename({
@@ -338,13 +323,11 @@ function CodeBlockFilename({
   return element;
 }
 
-// Tabs component
 interface HeaderTab {
   value: string;
   label: string;
 }
 
-// Shared base type for tabs configuration
 interface BaseTabsProps {
   tabs: HeaderTab[];
   activeTab: React.ComponentProps<typeof Tabs>["value"];
@@ -398,7 +381,6 @@ function CodeBlockTabs({
   return element;
 }
 
-// Floating copy button component (wrapper with positioning)
 type CodeBlockFloatingCopyProps = useRender.ComponentProps<"div">;
 
 function CodeBlockFloatingCopy({
@@ -430,7 +412,6 @@ function CodeBlockFloatingCopy({
   return element;
 }
 
-// Pre component (wrapper for content)
 interface CodeBlockPreProps extends useRender.ComponentProps<"pre"> {
   /** Show line numbers in the gutter */
   lineNumbers?: boolean;
@@ -457,7 +438,6 @@ function CodeBlockPre({
   const hasFocus = context.hasFocus;
   const floatingCopy = context.floatingCopy;
 
-  // If lineNumbers is enabled, wrap children in flex layout
   const content =
     lineNumbers && lines.length > 0 ? (
       <div className="flex">
@@ -473,9 +453,9 @@ function CodeBlockPre({
     "data-has-focus": hasFocus ? "true" : undefined,
     className: cn(
       "relative rounded-lg whitespace-pre overflow-hidden max-h-96 flex flex-col",
-      // Inner code body — looks like a Default Card sitting in the gray tray.
+      // Inner code body card sitting in the gray tray.
       solidSurface(3),
-      // Focus mode: blur and dim non-focused lines
+      // Focus mode: blur non-focused lines
       "[&[data-has-focus]_.line:not([data-focused])]:opacity-60 [&[data-has-focus]_.line:not([data-focused])]:blur-[1px] [&[data-has-focus]_.line:not([data-focused])]:transition-all",
       className,
     ),
@@ -504,7 +484,6 @@ function CodeBlockPre({
   return element;
 }
 
-// Line numbers component
 interface CodeBlockLineNumbersProps extends useRender.ComponentProps<"div"> {
   lines: string[];
 }
@@ -540,7 +519,6 @@ function CodeBlockLineNumbers({
   return element;
 }
 
-// Code component (the highlighted code)
 type CodeBlockCodeProps = useRender.ComponentProps<"div">;
 
 function CodeBlockCode({ className, render, ...props }: CodeBlockCodeProps) {
@@ -553,12 +531,11 @@ function CodeBlockCode({ className, render, ...props }: CodeBlockCodeProps) {
     const originalLines = code.split("\n");
     let lines = [...originalLines];
 
-    // Strip diff markers if showDiff is enabled (match Shiki behavior)
     if (showDiff) {
       lines = lines.map((line) => stripDiffMarker(line));
     }
 
-    // Create structure matching Shiki: spans with newlines between them
+    // Mirror Shiki's output structure: `.line` spans separated by newline text nodes.
     const elements: React.ReactNode[] = [];
     lines.forEach((line, index) => {
       elements.push(
@@ -566,7 +543,6 @@ function CodeBlockCode({ className, render, ...props }: CodeBlockCodeProps) {
           {line || " "}
         </span>,
       );
-      // Add newline after each line except the last
       if (index < lines.length - 1) {
         elements.push("\n");
       }
@@ -578,11 +554,11 @@ function CodeBlockCode({ className, render, ...props }: CodeBlockCodeProps) {
     "data-slot": "code-block-code",
     className: cn(
       "block text-[.8125rem] leading-normal whitespace-pre w-fit min-w-full",
-      // Base padding
+      // Uniform padding: raw text (no `.line`) vs. Shiki `.line` spans.
       "[&:not(:has(.line))]:px-3 [&_.line]:!px-3 [&:not(:has(.line))]:pr-8 [&_.line]:!pr-8",
-      // Make lines span full width with inline-block and 100% width
+      // Full-width lines so bg highlights stretch edge-to-edge.
       "[&_.line]:inline-block [&_.line]:min-w-full",
-      // Highlighted lines - match pre-highlighted padding so border fits in the space
+      // Left-border highlight: pl offset = px - border-width so text stays aligned.
       "[&_.line[data-highlighted]]:bg-primary/10 [&_.line[data-highlighted]]:border-l-2 [&_.line[data-highlighted]]:border-primary/50 [&_.line[data-highlighted]]:!pl-[calc(0.75rem-2px)]",
       // Diff: added lines
       "[&_.line[data-diff='added']]:bg-green-500/10 [&_.line[data-diff='added']]:border-l-2 [&_.line[data-diff='added']]:border-green-500/70 [&_.line[data-diff='added']]:!pl-[calc(0.75rem-2px)]",

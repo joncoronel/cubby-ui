@@ -27,10 +27,6 @@ import {
 } from "./lib/svg-utils";
 import { getValueFromPointerPosition } from "./lib/pointer-utils";
 
-// ============================================================================
-// Types
-// ============================================================================
-
 export type ChangeReason = "drag" | "keyboard" | "click";
 
 interface CircularSliderContextValue {
@@ -63,10 +59,6 @@ function useCircularSliderContext() {
   }
   return context;
 }
-
-// ============================================================================
-// Variants
-// ============================================================================
 
 const circularSliderVariants = cva(
   "group relative inline-block touch-none select-none outline-none",
@@ -109,13 +101,10 @@ const thumbVariants = cva(
   },
 );
 
-// ============================================================================
-// Helper Functions
-// ============================================================================
-
 /**
- * Wrap value for continuous mode with direction tracking (max inclusive)
- * Detects boundary crossings to determine if position should show min or max
+ * Wraps `value` into [min, max] for continuous mode, detecting boundary
+ * crossings via `previousValue` so crossing max→min resolves to min (not max)
+ * and vice-versa.
  */
 function wrapValueWithDirection(
   value: number,
@@ -125,28 +114,20 @@ function wrapValueWithDirection(
 ): number {
   const range = max - min;
 
-  // If we have a previous value, detect boundary crossing
   if (previousValue !== null) {
-    // Check if we crossed the boundary (value jumped more than half the range)
     const diff = value - previousValue;
     const absDiff = Math.abs(diff);
 
     if (absDiff > range / 2) {
-      // Boundary crossing detected
-      // If previous was near max and new is near min → crossing clockwise → allow max
       if (previousValue > min + range * 0.75 && value < min + range * 0.25) {
-        // User is incrementing past max, wrap to min
         return min;
       }
-      // If previous was near min and new is near max → crossing counterclockwise → wrap to max
       if (previousValue < min + range * 0.25 && value > min + range * 0.75) {
-        // User is decrementing past min, wrap to max
         return max;
       }
     }
   }
 
-  // Standard wrapping when not crossing boundary
   if (value > max) {
     return min + (value - max);
   }
@@ -156,10 +137,6 @@ function wrapValueWithDirection(
 
   return value;
 }
-
-// ============================================================================
-// Root Component
-// ============================================================================
 
 export interface CircularSliderRootProps
   extends
@@ -238,12 +215,9 @@ export function CircularSliderRoot({
     (newValue: number, reason: ChangeReason) => {
       if (disabled) return;
 
-      // Apply step rounding
       let processedValue = roundToStep(newValue, step, min);
 
-      // Handle wrapping and clamping
       if (continuous) {
-        // Wrapping for continuous mode with direction tracking (max is inclusive)
         processedValue = wrapValueWithDirection(
           processedValue,
           min,
@@ -251,11 +225,9 @@ export function CircularSliderRoot({
           previousValue.current,
         );
       } else {
-        // Clamp to min/max in non-continuous mode
         processedValue = clamp(processedValue, min, max);
       }
 
-      // Update previous value for direction tracking
       previousValue.current = processedValue;
 
       if (!isControlled) {
@@ -275,12 +247,11 @@ export function CircularSliderRoot({
     [disabled, onValueCommitted],
   );
 
-  // Handle pointer events
   const handlePointerDown = React.useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
       if (disabled) return;
 
-      // The root element is the event's currentTarget — no element ref needed.
+      // `currentTarget` is always the root div; no element ref needed.
       const container = e.currentTarget;
 
       const newValue = getValueFromPointerPosition(
@@ -293,13 +264,11 @@ export function CircularSliderRoot({
         continuous,
       );
 
-      // Initialize previous value for direction tracking
       previousValue.current = value;
 
       setIsDragging(true);
       (e.target as HTMLElement).setPointerCapture(e.pointerId);
 
-      // Update value immediately
       handleValueChange(newValue, "drag");
     },
     [
@@ -355,7 +324,6 @@ export function CircularSliderRoot({
     [isDragging, value, handleValueCommitted],
   );
 
-  // Handle input change from native range input
   const handleInputChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       previousValue.current = value;
@@ -364,8 +332,7 @@ export function CircularSliderRoot({
     [value, handleValueChange],
   );
 
-  // Handle keyboard navigation for largeStep (PageUp/PageDown)
-  // Native input handles arrows, Home, End automatically
+  // Only PageUp/PageDown need handling — arrows, Home, End are native range input behavior.
   const handleInputKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (disabled) return;
@@ -436,21 +403,12 @@ export function CircularSliderRoot({
     onPointerUp: handlePointerUp,
   };
 
-  // The consumer's ref goes through useRender's dedicated `ref` param, never
-  // through the mergeProps object — and it's destructured out of `props`
-  // (above) — so a ref is never passed into a function call during render. No
-  // internal element ref is needed: pointer handlers read the element via
-  // `event.currentTarget`.
   const element = useRender({
     defaultTagName: "div",
     render,
     ref: forwardedRef ?? null,
-    // The pointer handlers in defaultProps transitively close over the
-    // `previousValue` value-ref (continuous-drag direction tracking). That ref
-    // is read only in event handlers, never during render, and mergeProps just
-    // assembles props — it never invokes the handlers or reads `.current`. The
-    // React Compiler can't prove that, so it flags this safe, documented Base UI
-    // pattern. False positive.
+    // Pointer handlers close over `previousValue` (a ref). mergeProps never
+    // invokes them or reads `.current` — the React Compiler false-positive is safe.
     // eslint-disable-next-line react-hooks/refs
     props: mergeProps<"div">(defaultProps, props),
   });
@@ -460,7 +418,6 @@ export function CircularSliderRoot({
 
   return (
     <CircularSliderContext.Provider value={contextValue}>
-      {/* Hidden native input for accessibility and form integration */}
       <input
         ref={inputRef}
         type="range"
@@ -491,10 +448,6 @@ export function CircularSliderRoot({
   );
 }
 
-// ============================================================================
-// Track Component
-// ============================================================================
-
 export interface CircularSliderTrackProps extends useRender.ComponentProps<"svg"> {
   strokeWidth?: number;
 }
@@ -522,7 +475,6 @@ export function CircularSliderTrack({
 
   const trackElement = (
     <>
-      {/* Filled background circle for filled variant */}
       {variant === "filled" && (
         <circle
           cx={SVG_CONFIG.CENTER_X}
@@ -534,7 +486,6 @@ export function CircularSliderTrack({
       )}
 
       {continuous ? (
-        // Full circle for continuous mode
         <circle
           cx={SVG_CONFIG.CENTER_X}
           cy={SVG_CONFIG.CENTER_Y}
@@ -549,7 +500,6 @@ export function CircularSliderTrack({
           )}
         />
       ) : (
-        // 270° arc for non-continuous mode (gap centered at bottom)
         <path
           d={trackArcPath || ""}
           fill="none"
@@ -580,10 +530,6 @@ export function CircularSliderTrack({
   return element;
 }
 
-// ============================================================================
-// Indicator Component
-// ============================================================================
-
 export interface CircularSliderIndicatorProps extends useRender.ComponentProps<"svg"> {
   strokeWidth?: number;
 }
@@ -599,13 +545,12 @@ export function CircularSliderIndicator({
 
   const svgStrokeWidth = strokeWidthToSvgUnits(strokeWidth, size);
 
-  // In continuous mode, when value equals max, show full circle instead of arc
+  // At max in continuous mode, a zero-length arc degenerates — use a full circle instead.
   const isFullCircle = continuous && value === max;
 
   let indicatorElement: React.ReactNode = null;
 
   if (isFullCircle) {
-    // Draw full circle when at max in continuous mode
     indicatorElement = (
       <circle
         cx={SVG_CONFIG.CENTER_X}
@@ -623,7 +568,6 @@ export function CircularSliderIndicator({
       />
     );
   } else {
-    // Draw arc for normal cases
     const arcStartAngle = valueToAngle(
       min,
       min,
@@ -683,10 +627,6 @@ export function CircularSliderIndicator({
   return element;
 }
 
-// ============================================================================
-// Thumb Component
-// ============================================================================
-
 export interface CircularSliderThumbProps extends useRender.ComponentProps<"div"> {
   size?: number;
 }
@@ -718,14 +658,10 @@ export function CircularSliderThumb({
     continuous,
   );
 
-  // Calculate position on circle
-  // Default variant: position at track edge
-  // Filled variant: position so outer tip is at background circle edge
   let radius = RADIUS_CONFIG.TRACK;
   if (variant === "filled") {
-    // Convert thumbSize pixels to SVG units
     const thumbSizeInSvgUnits = pixelsToSvgUnits(thumbSize, containerSize);
-    // Position center so outer tip is at background circle edge
+    // Center offset so the thumb's outer tip aligns with the background circle edge.
     radius = RADIUS_CONFIG.FILLED_BACKGROUND - thumbSizeInSvgUnits / 2;
   }
 
@@ -738,8 +674,7 @@ export function CircularSliderThumb({
   const leftPercent = (thumbPos.x / SVG_CONFIG.VIEWBOX_SIZE) * 100;
   const topPercent = (thumbPos.y / SVG_CONFIG.VIEWBOX_SIZE) * 100;
 
-  // For filled variant, the thumb is a line that points toward the center
-  // We rotate it by the angle to make it radial (pointing inward)
+  // Filled thumb is a radial line — rotate by `angle` so it points toward the center.
   const transform =
     variant === "filled"
       ? `translate(-50%, -50%) rotate(${angle}deg)`
@@ -778,10 +713,6 @@ export function CircularSliderThumb({
   return element;
 }
 
-// ============================================================================
-// Value Component
-// ============================================================================
-
 export interface CircularSliderValueProps extends useRender.ComponentProps<"div"> {
   formatValue?: (value: number) => string;
 }
@@ -818,10 +749,6 @@ export function CircularSliderValue({
   return element;
 }
 
-// ============================================================================
-// Markers Component
-// ============================================================================
-
 export interface CircularSliderMarkersProps extends useRender.ComponentProps<"svg"> {
   count?: number;
   showLabels?: boolean;
@@ -839,8 +766,7 @@ export function CircularSliderMarkers({
   const { min, max, startAngle, direction, continuous, size, variant } =
     useCircularSliderContext();
 
-  // Convert marker length from pixels to SVG units
-  // Default length: 10px for filled variant, 5px for default variant
+  // Default marker length: 10px (filled) / 5px (default)
   const defaultLength = variant === "filled" ? 10 : 5;
   const markerLengthInPixels = length ?? defaultLength;
   const markerLengthInSvgUnits = pixelsToSvgUnits(markerLengthInPixels, size);
@@ -860,11 +786,9 @@ export function CircularSliderMarkers({
     let innerRadius: number;
 
     if (variant === "filled") {
-      // For filled variant, position outer end at background circle edge
       outerRadius = RADIUS_CONFIG.FILLED_BACKGROUND;
       innerRadius = RADIUS_CONFIG.FILLED_BACKGROUND - markerLengthInSvgUnits;
     } else {
-      // For default variant, position outer end at track inner edge
       const trackInnerEdge = getTrackInnerEdge(16, size);
       outerRadius = trackInnerEdge;
       innerRadius = trackInnerEdge - markerLengthInSvgUnits;

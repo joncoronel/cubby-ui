@@ -57,17 +57,14 @@ export interface DataTableProps<TData, TValue> {
   children: React.ReactNode;
   className?: string;
 
-  // Feature flags
   enableSorting?: boolean;
   enableRowSelection?: boolean | ((row: Row<TData>) => boolean);
   enableMultiRowSelection?: boolean;
   enableFiltering?: boolean;
   enablePagination?: boolean;
 
-  // Selection options
   showSelectionColumn?: boolean;
 
-  // Controlled state
   sorting?: SortingState;
   onSortingChange?: OnChangeFn<SortingState>;
   rowSelection?: RowSelectionState;
@@ -81,7 +78,6 @@ export interface DataTableProps<TData, TValue> {
   globalFilter?: string;
   onGlobalFilterChange?: OnChangeFn<string>;
 
-  // Row identity
   getRowId?: (originalRow: TData, index: number, parent?: Row<TData>) => string;
 }
 
@@ -90,15 +86,12 @@ function DataTable<TData, TValue>({
   data,
   children,
   className,
-  // Feature flags
   enableSorting = false,
   enableRowSelection = false,
   enableMultiRowSelection = true,
   enableFiltering = false,
   enablePagination = false,
-  // Selection options
   showSelectionColumn = true,
-  // Controlled state
   sorting: controlledSorting,
   onSortingChange,
   rowSelection: controlledRowSelection,
@@ -111,10 +104,8 @@ function DataTable<TData, TValue>({
   onColumnVisibilityChange,
   globalFilter: controlledGlobalFilter,
   onGlobalFilterChange,
-  // Row identity
   getRowId,
 }: DataTableProps<TData, TValue>) {
-  // Internal state for uncontrolled mode
   const [internalSorting, setInternalSorting] = React.useState<SortingState>(
     [],
   );
@@ -131,7 +122,6 @@ function DataTable<TData, TValue>({
   const [internalColumnVisibility, setInternalColumnVisibility] =
     React.useState<VisibilityState>({});
 
-  // Use controlled state if provided, otherwise use internal state
   const sorting = controlledSorting ?? internalSorting;
   const rowSelection = controlledRowSelection ?? internalRowSelection;
   const columnFilters = controlledColumnFilters ?? internalColumnFilters;
@@ -140,7 +130,6 @@ function DataTable<TData, TValue>({
   const columnVisibility =
     controlledColumnVisibility ?? internalColumnVisibility;
 
-  // Build columns with optional selection column
   const columns = React.useMemo(() => {
     if (!enableRowSelection || !showSelectionColumn) {
       return userColumns;
@@ -218,13 +207,11 @@ function DataTable<TData, TValue>({
     <DataTableContext.Provider value={{ table }}>
       <div
         className={cn(
-          // `relative` is required by elevatedSurface so the rim ::after
-          // positions inside this container instead of climbing to the
-          // nearest positioned ancestor.
+          // `relative` required: elevatedSurface's rim ::after must position inside
+          // this container, not climb to the nearest positioned ancestor.
           "relative w-full rounded-2xl md:max-w-2xl",
-          // elevatedSurface (rim on ::after) because DataTableToolbar +
-          // sticky Table header are opaque children near the top edge — the
-          // pseudo-element keeps the rim line visible above them in dark mode.
+          // pseudo-element rim keeps the border line visible above opaque sticky
+          // children (DataTableToolbar, table header) in dark mode.
           elevatedSurface(3, 1),
           "bg-muted",
           className,
@@ -265,12 +252,11 @@ function DataTableContent({
       hoverable={hoverable}
       rowDividers={rowDividers}
       className={cn(
-        // Strip Table's own elevation — the outer DataTable container owns it.
-        // `shadow-none!` (important) because twMerge doesn't know about
-        // custom shadow utilities (shadow-surface-N), so without ! the inner
-        // Table's 1px ring stays visible in light mode. `after:hidden` kills
-        // the dark-mode rim ::after, which would otherwise paint a
-        // square-cornered rim on top of the DataTable's rounded one.
+        // Strips Table's own elevation; outer DataTable container owns it.
+        // `shadow-none!` needed because twMerge doesn't resolve custom shadow
+        // utilities, so without `!` the inner ring persists in light mode.
+        // `after:hidden` removes the dark-mode rim ::after (would paint a
+        // square-cornered rim over the DataTable's rounded one).
         "rounded-none bg-transparent shadow-none! ring-0 after:hidden",
         className,
       )}

@@ -17,7 +17,6 @@ import { useDataTable } from "@/registry/default/data-table/data-table-context"
 function DataTableColumnToggle() {
 	const { table } = useDataTable()
 
-	// Get toggleable columns (exclude selection column)
 	const toggleableColumns = table
 		.getAllColumns()
 		.filter((col) => col.id !== "__select__" && col.getCanHide())

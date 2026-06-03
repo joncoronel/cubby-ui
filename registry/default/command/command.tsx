@@ -21,10 +21,7 @@ import {
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Search01Icon } from "@hugeicons/core-free-icons";
-// Expose Base UI's filter hook for virtualization use cases
 const useCommandFilter = AutocompleteBase.useFilter;
-
-// Expose Base UI's filtered items hook for simplified virtualization
 const useCommandFilteredItems = AutocompleteBase.useFilteredItems;
 
 const AutocompleteRoot = AutocompleteBase.Root;
@@ -51,12 +48,9 @@ function Command<ItemValue>({
       data-slot="command"
       data-level={level}
       className={cn(
-        // Outer frame is the "panel" — subtly lifted above the page (surface-2
-        // via bg-muted). The inner CommandContent drops back to surface-1
-        // (page color) creating a "well" inside the panel. solidSurface
-        // contributes the rim + drop shadow (weighted by the level prop). The
-        // bg-muted override pins the outer to surface-2 regardless of the level
-        // prop — only the shadow weight is level-sensitive.
+        // Outer frame is surface-2 (bg-muted); CommandContent drops back to
+        // surface-1 inside, creating a "panel with well" effect. bg-muted pins
+        // the outer color regardless of level — only shadow weight varies.
         "text-popover-foreground flex min-h-0 flex-1 flex-col rounded-4xl p-1",
         solidSurface(level, shadowLevel),
         "bg-muted",
@@ -189,10 +183,7 @@ function CommandContent({
     <div
       data-slot="command-content"
       className={cn(
-        // The well — drops back to surface-1 (page color) inside the
-        // surface-2 outer frame. Creates the "panel-with-cutout" feel.
-        // 1px ring defines the well's edge. Not elevated — it's the page
-        // peeking through the lifted panel.
+        // Surface-1 "well" inside the surface-2 outer frame; ring defines the edge.
         "bg-surface-3 dark:bg-surface-1 ring-border/25 dark:ring-border/10 flex min-h-0 flex-1 flex-col items-center overflow-hidden rounded-2xl ring-1",
         className,
       )}
@@ -288,7 +279,7 @@ function CommandVirtualizedList({
           className="h-auto max-h-full w-full"
           {...props}
         >
-          {/* Virtual placeholder for total height */}
+          {/* Spacer that gives TanStack Virtual its total scroll height */}
           <div
             role="presentation"
             className="relative w-full"

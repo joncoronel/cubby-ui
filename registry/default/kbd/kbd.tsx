@@ -4,14 +4,9 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const kbdVariants = cva(
-  // Tiny raised "keycap": a 1px --border + a soft drop for the physical key
-  // lift (shadow color matches the surface-shadow base, oklch(0 0 0)). Flat
-  // variants (outline/ghost) and the pressed state drop the shadow.
-  // bg-clip-padding lives on the `default` variant only: its --border is
-  // translucent, so the bg must clip to the padding box for the border to
-  // composite on the substrate (the form-field trick). The colored variants
-  // have opaque borders and outline/ghost have no opaque bg behind the border,
-  // so they don't need it (and on ghost it would leave a 1px substrate halo).
+  // `bg-clip-padding` on `default` only: the translucent border needs the bg
+  // clipped to the padding box to composite correctly. Colored variants use
+  // opaque borders; ghost has no bg, so it would leave a 1px substrate halo.
   "inline-flex items-center justify-center rounded-sm border text-center font-medium tracking-tight shadow-[0_1px_2px_0_oklch(0_0_0/0.06)] transition-colors duration-150 font-mono",
   {
     variants: {
@@ -83,9 +78,8 @@ function useClientPlatform(): "mac" | "windows" {
 
   React.useEffect(() => {
     if (typeof navigator === "undefined") return;
-    // `navigator.platform` is deprecated. Prefer userAgentData.platform
-    // (Chromium) and fall back to the userAgent string, which is supported
-    // everywhere and not deprecated.
+    // `navigator.platform` is deprecated; prefer userAgentData.platform
+    // (Chromium) with userAgent string as the universal fallback.
     const uaData = (
       navigator as Navigator & { userAgentData?: { platform?: string } }
     ).userAgentData;

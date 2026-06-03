@@ -53,7 +53,6 @@ export type QRCodeProps = Omit<
   ref?: React.Ref<QRCodeHandle>;
 };
 
-/** Narrows an unknown logo value to a {@link QRLogoObject}. */
 function isImageLogo(logo: QRLogo): logo is QRLogoObject {
   return (
     typeof logo === "object" &&

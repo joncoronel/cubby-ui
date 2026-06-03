@@ -38,7 +38,8 @@ function OTPFieldInput({
         "selection:bg-primary selection:text-primary-foreground",
         // Placeholder
         "placeholder:text-muted-foreground focus:placeholder:text-transparent",
-        // Focus ring (use :focus not data-[focused], which applies to all inputs)
+        // :focus not data-[focused] — data-[focused] propagates to all inputs
+        // in the group, not just the active one.
         "outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid",
         "focus:outline-ring/50 focus:outline-2 focus:outline-offset-2",
         // Invalid state

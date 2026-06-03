@@ -8,9 +8,7 @@ import { cn } from "@/lib/utils";
 const numberFieldGroupVariants = cva(
   [
     "flex rounded-lg",
-    // Focus + invalid state live on the wrapper (triggered by the input
-    // inside), so the outline wraps the entire cluster instead of just the
-    // middle segment.
+    // Outline on the wrapper so focus/invalid rings wrap the full cluster, not just the input.
     "outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid",
     "has-[[data-slot=number-field-input]:focus-visible]:outline-ring/50 has-[[data-slot=number-field-input]:focus-visible]:outline-2 has-[[data-slot=number-field-input]:focus-visible]:outline-offset-2",
     "has-[[data-slot=number-field-input][aria-invalid=true]]:outline-destructive/50 has-[[data-slot=number-field-input][aria-invalid=true]]:outline-2 has-[[data-slot=number-field-input][aria-invalid=true]]:outline-offset-2",
@@ -18,12 +16,10 @@ const numberFieldGroupVariants = cva(
   {
     variants: {
       variant: {
-        // Opaque base — hover uses --outline-hover (a deliberate -5% darken of
-        // --card/--input) for a sharp delta against the opaque plate.
+        // Opaque base: --outline-hover is a -5% darken, giving a sharp hover delta.
         default:
           "[--number-field-bg:var(--input)] [--number-field-hover:var(--outline-hover)]",
-        // Translucent overlay base — hover uses --surface-hover (alpha overlay)
-        // so translucency is preserved on any substrate.
+        // Translucent base: --surface-hover is an alpha overlay, preserving translucency.
         elevated:
           "[--number-field-bg:var(--input-elevated)] [--number-field-hover:var(--surface-hover)]",
       },
@@ -68,8 +64,7 @@ function NumberFieldInput({
       data-slot="number-field-input"
       className={cn(
         "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground",
-        // Own card. border-y only — left/right edges come from the adjacent
-        // buttons' borders, fusing the three segments into one cluster.
+        // border-y only — left/right edges come from the adjacent buttons, fusing into one cluster.
         "border-y bg-(--number-field-bg) bg-clip-padding",
         "h-10 w-24 text-center text-base font-normal tabular-nums transition-colors duration-200 outline-none sm:h-9 md:text-sm",
         "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60",
@@ -88,8 +83,7 @@ function NumberFieldIncrement({
     <BaseNumberField.Increment
       data-slot="number-field-increment"
       className={cn(
-        // Own card. Borders on top/right/bottom only — no left border so the
-        // segment fuses seamlessly into the input.
+        // No left border — fuses seamlessly with the input's right edge.
         "rounded-r-lg border-y border-r bg-(--number-field-bg) bg-clip-padding",
         "hover:bg-(--number-field-hover)",
         "flex size-10 items-center justify-center select-none sm:size-9",
@@ -111,8 +105,7 @@ function NumberFieldDecrement({
     <BaseNumberField.Decrement
       data-slot="number-field-decrement"
       className={cn(
-        // Own card. Borders on top/left/bottom only — no right border so the
-        // segment fuses seamlessly into the input.
+        // No right border — fuses seamlessly with the input's left edge.
         "rounded-l-lg border-y border-l bg-(--number-field-bg) bg-clip-padding",
         "hover:bg-(--number-field-hover)",
         "flex size-10 items-center justify-center select-none sm:size-9",

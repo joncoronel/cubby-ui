@@ -11,8 +11,7 @@ import {
   type SurfaceLevel,
 } from "@/registry/default/lib/elevated";
 
-// Custom checkmark with stroke-dashoffset animation
-// Path length ≈ 22 (calculated from the path geometry)
+// Path length ≈ 22 (from the path geometry)
 function CheckmarkIcon({ className }: { className?: string }) {
   return (
     <svg

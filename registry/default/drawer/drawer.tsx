@@ -22,7 +22,6 @@ import {
   type ScrollAreaProps,
 } from "@/registry/default/scroll-area/scroll-area";
 
-// Drawer-specific CSS animations (scroll-driven animations for progressive enhancement)
 import "./drawer.css";
 
 import type { SnapPoint, DrawerDirection } from "./lib/drawer-utils";
@@ -44,10 +43,6 @@ import { Cancel01Icon } from "@hugeicons/core-free-icons";
 export type { SnapPoint, DrawerDirection };
 
 const createDrawerHandle = BaseDialog.createHandle;
-
-/* -------------------------------------------------------------------------------------------------
- * CVA Variants
- * -------------------------------------------------------------------------------------------------*/
 
 const drawerContentVariants = cva(
   [
@@ -165,7 +160,6 @@ const SafariNavColorDetectors = (
   </>
 );
 
-// Scroll-driven backdrop animation styles per direction
 const backdropAnimationStyles: Record<DrawerDirection, string> = {
   bottom:
     "fill-mode-[both] [animation-name:drawer-backdrop-fade] [animation-range:entry_0%_entry_100%] [animation-timeline:--drawer-panel] [animation-timing-function:linear]",
@@ -175,11 +169,7 @@ const backdropAnimationStyles: Record<DrawerDirection, string> = {
   left: "fill-mode-[both] direction-[reverse] [animation-name:drawer-backdrop-fade] [animation-range:exit_0%_exit_100%] [animation-timeline:--drawer-panel] [animation-timing-function:linear]",
 };
 
-/* -------------------------------------------------------------------------------------------------
- * Drawer Nesting Context
- * Allows child drawers to propagate drag progress to parent drawer for smooth stacking effects.
- * -------------------------------------------------------------------------------------------------*/
-
+// Allows child drawers to propagate drag progress to parent for smooth stacking effects.
 interface DrawerNestingContextValue {
   /** Set the child's drag progress (0 = open, 1 = closed) on the parent popup */
   setNestedDragProgress: (progress: number) => void;
@@ -191,10 +181,6 @@ interface DrawerNestingContextValue {
 
 const DrawerNestingContext =
   React.createContext<DrawerNestingContextValue | null>(null);
-
-/* -------------------------------------------------------------------------------------------------
- * Drawer Context
- * -------------------------------------------------------------------------------------------------*/
 
 type DrawerVariant = "default" | "floating";
 
@@ -209,14 +195,12 @@ interface DrawerConfigContextValue {
   repositionInputs: boolean;
 }
 
-/** High-frequency values updated during scroll/drag */
 interface DrawerScrollContextValue {
   isDragging: boolean;
   dragProgress: number;
   snapProgress: number;
 }
 
-/** Low-frequency control values and stable setters */
 interface DrawerControlContextValue {
   open: boolean;
   onOpenChange: (
@@ -251,7 +235,7 @@ function useDrawerConfig() {
   return context;
 }
 
-/** High-frequency scroll/drag state. Subscribing causes re-renders during drag. */
+/** Subscribes to high-frequency scroll/drag state — re-renders during drag. */
 function useDrawerScroll() {
   const context = React.useContext(DrawerScrollContext);
   if (!context) {
@@ -260,7 +244,7 @@ function useDrawerScroll() {
   return context;
 }
 
-/** Low-frequency control state and stable setters. Does not re-render during drag. */
+/** Low-frequency control state and stable setters — does not re-render during drag. */
 function useDrawerControl() {
   const context = React.useContext(DrawerControlContext);
   if (!context) {
@@ -269,29 +253,15 @@ function useDrawerControl() {
   return context;
 }
 
-/**
- * Convenience hook combining scroll and control contexts.
- * Subscribes to both — re-renders on any animation state change.
- * For fewer re-renders, use `useDrawerControl()` or `useDrawerScroll()`.
- */
+/** Combines scroll + control contexts. For fewer re-renders use `useDrawerControl()` or `useDrawerScroll()`. */
 function useDrawerAnimation() {
   return { ...useDrawerScroll(), ...useDrawerControl() };
 }
 
-/**
- * Convenience hook that returns all drawer context values.
- * For granular subscriptions (fewer re-renders), use
- * `useDrawerConfig()` for static config,
- * `useDrawerControl()` for control state, or
- * `useDrawerScroll()` for scroll/drag state.
- */
+/** All drawer context values. For fewer re-renders use `useDrawerConfig`, `useDrawerControl`, or `useDrawerScroll`. */
 function useDrawer() {
   return { ...useDrawerConfig(), ...useDrawerScroll(), ...useDrawerControl() };
 }
-
-/* -------------------------------------------------------------------------------------------------
- * Drawer (Root)
- * -------------------------------------------------------------------------------------------------*/
 
 interface DrawerRenderProps {
   /** 0 = first snap, 1 = last snap */
@@ -382,10 +352,8 @@ function Drawer({
   const [isAnimating, setIsAnimating] = React.useState(false);
   const [immediateClose, setImmediateClose] = React.useState(false);
 
-  // Sync animation state when controlled `open` transitions to true.
-  // Base UI doesn't call onOpenChange for external prop changes, so
-  // handleOpenChange(true) never runs — we set isAnimating here to
-  // block dismiss gestures during the enter transition.
+  // Base UI doesn't call onOpenChange for external prop changes, so handleOpenChange(true)
+  // never fires — set isAnimating here to block dismiss gestures during the enter transition.
   const prevOpenRef = React.useRef(open);
   React.useLayoutEffect(() => {
     if (open && !prevOpenRef.current) {
@@ -397,7 +365,6 @@ function Drawer({
 
   const { isVertical } = DIRECTION_CONFIG[direction];
 
-  // Refs for stable access in callbacks without adding deps
   const isDraggingRef = React.useRef(false);
   const swipeDismissRef = React.useRef(false);
   React.useLayoutEffect(() => {
@@ -563,19 +530,11 @@ function Drawer({
   );
 }
 
-/* -------------------------------------------------------------------------------------------------
- * DrawerTrigger
- * -------------------------------------------------------------------------------------------------*/
-
 function DrawerTrigger({
   ...props
 }: React.ComponentProps<typeof BaseDialog.Trigger>) {
   return <BaseDialog.Trigger data-slot="drawer-trigger" {...props} />;
 }
-
-/* -------------------------------------------------------------------------------------------------
- * DrawerClose
- * -------------------------------------------------------------------------------------------------*/
 
 interface DrawerCloseProps extends useRender.ComponentProps<"button"> {
   onClick?: (event: React.MouseEvent) => void;
@@ -615,19 +574,11 @@ function DrawerClose({
   return element;
 }
 
-/* -------------------------------------------------------------------------------------------------
- * DrawerPortal
- * -------------------------------------------------------------------------------------------------*/
-
 function DrawerPortal({
   ...props
 }: React.ComponentProps<typeof BaseDialog.Portal>) {
   return <BaseDialog.Portal data-slot="drawer-portal" {...props} />;
 }
-
-/* -------------------------------------------------------------------------------------------------
- * DrawerContent
- * -------------------------------------------------------------------------------------------------*/
 
 interface DrawerContentProps extends BaseDialog.Popup.Props {
   footerVariant?: "default" | "inset";
@@ -662,14 +613,6 @@ function DrawerContent({
   );
 }
 
-/* -------------------------------------------------------------------------------------------------
- * Content Hooks (extracted from DrawerContentInner for readability)
- * -------------------------------------------------------------------------------------------------*/
-
-/**
- * Measures drawer content size via ResizeObserver and provides merged refs
- * for the popup element.
- */
 function useContentMeasurement(
   isVertical: boolean,
   floatingMargin: number,
@@ -711,10 +654,6 @@ function useContentMeasurement(
   return { mergedRef, popupRef };
 }
 
-/**
- * Computes all CSS style objects for the drawer viewport, popup, and backdrop.
- * Handles scroll-driven animation detection, snap ratios, and CSS custom properties.
- */
 function useDrawerContentStyles({
   direction,
   variant,
@@ -852,10 +791,6 @@ function useDrawerContentStyles({
   };
 }
 
-/* -------------------------------------------------------------------------------------------------
- * DrawerContentInner
- * -------------------------------------------------------------------------------------------------*/
-
 function DrawerContentInner({
   className,
   children,
@@ -908,7 +843,6 @@ function DrawerContentInner({
     enabled: direction === "bottom",
   });
 
-  // Provides real-time viewport height that updates with URL bar changes
   const visualViewportHeight = useVisualViewportHeight({
     enabled: !isVertical && modal !== true,
   });
@@ -921,10 +855,9 @@ function DrawerContentInner({
     setImmediateClose(true);
   }, [setImmediateClose]);
 
-  // Propagate child drag progress to parent drawer for smooth nesting effects
   const parentNesting = React.useContext(DrawerNestingContext);
 
-  // Skip progress updates during enter/exit animations (let CSS control backdrop)
+  // Skip updates during enter/exit animations — let CSS control the backdrop then.
   const handleScrollProgress = React.useCallback(
     (progress: number) => {
       if (!isAnimating) {
@@ -969,12 +902,10 @@ function DrawerContentInner({
     onScrollingChange: setIsDragging,
   });
 
-  // Toggle transition-disabling attribute on parent popup during drag
   React.useLayoutEffect(() => {
     parentNesting?.setNestedDragging(isDragging);
   }, [isDragging, parentNesting]);
 
-  // Clean up parent's CSS variable when this drawer closes
   React.useLayoutEffect(() => {
     if (!open) {
       parentNesting?.clearNestedDragProgress();
@@ -989,7 +920,6 @@ function DrawerContentInner({
     setContentSize,
   );
 
-  // Provide nesting context so child drawers can propagate drag progress to this popup
   const nestingValue = React.useMemo<DrawerNestingContextValue>(
     () => ({
       setNestedDragProgress(progress: number) {
@@ -1057,8 +987,7 @@ function DrawerContentInner({
                 ? "transition-none"
                 : "transition-opacity duration-300",
               "[&[data-starting-style]]:opacity-0!",
-              // Exit animation overrides scroll-driven animation (transitions can't interpolate from animation-held values)
-
+              // Exit animation overrides scroll-driven animation — transitions can't interpolate from animation-held values.
               "data-ending-style:animate-[drawer-backdrop-exit_300ms_cubic-bezier(.32,.72,0,1)_forwards]",
               isInitialized && !isAnimating && dismissible && dragProgress < 1
                 ? useScrollDrivenAnimation
@@ -1110,7 +1039,6 @@ function DrawerContentInner({
                 : "touch-pan-x overflow-x-auto overflow-y-hidden overscroll-x-none",
             isVertical ? "touch-pan-y" : "touch-pan-x",
             "motion-reduce:[scroll-behavior:auto]",
-            // Freeze parent viewport scroll when nested drawer opens
             "has-data-nested-dialog-open:touch-none has-data-nested-dialog-open:overflow-hidden",
           )}
           style={viewportStyle}
@@ -1162,10 +1090,8 @@ function DrawerContentInner({
               finalFocus={finalFocus}
               className={cn(
                 drawerContentVariants({ variant, direction }),
-                // Surface elevation — floating variants get the full 4-edge
-                // rim overlay; flush (`default`) variants get a single-edge
-                // rim only on the inner-facing edge so the other edges don't
-                // show a 1px line at the viewport boundary.
+                // Floating: full 4-edge rim. Flush (`default`): single-edge rim on the
+                // inner-facing side only — other edges would show a 1px line at the viewport boundary.
                 variant === "floating"
                   ? solidSurface(level, shadowLevel)
                   : cn(
@@ -1177,10 +1103,9 @@ function DrawerContentInner({
                   ? "pointer-events-none"
                   : "pointer-events-auto",
                 immediateClose && "transition-none",
-                // Lock parent height/overflow when nested drawer opens
                 "data-nested-dialog-open:overflow-hidden",
-                // Safari iOS touch fix: 1px cross-axis overflow (WebKit bug #183870)
-                // This co-exists with the rim's ::after — Tailwind merges both onto the same pseudo-element
+                // Safari iOS touch fix: 1px cross-axis overflow (WebKit bug #183870).
+                // Co-exists with the rim's ::after — Tailwind merges both onto the same pseudo-element.
                 modal !== true && [
                   "[@supports(-webkit-touch-callout:none)]:relative [@supports(-webkit-touch-callout:none)]:[scrollbar-width:none]",
                   isVertical
@@ -1212,10 +1137,6 @@ function DrawerContentInner({
   );
 }
 
-/* -------------------------------------------------------------------------------------------------
- * DrawerHandle
- * -------------------------------------------------------------------------------------------------*/
-
 interface DrawerHandleProps extends Omit<
   useRender.ComponentProps<"button">,
   "children"
@@ -1235,7 +1156,6 @@ function DrawerHandle({
   const { isVertical, direction } = useDrawerConfig();
   const { onOpenChange, isAnimating } = useDrawerControl();
 
-  // Auto-hide for left/right positioned drawers
   const isHorizontalDrawer = direction === "left" || direction === "right";
 
   const handleClick = React.useCallback(
@@ -1276,17 +1196,10 @@ function DrawerHandle({
   return element;
 }
 
-/* -------------------------------------------------------------------------------------------------
- * DrawerHeader
- * -------------------------------------------------------------------------------------------------*/
-
-// Slot-presence checks use ancestor `:has()` queries on
-// `[data-slot=drawer-content]` rather than adjacent-sibling selectors, so
-// consumers can wrap header/body/footer in form, ErrorBoundary, Suspense, or
-// conditional fragments without breaking padding. This also makes the rules
-// robust to DrawerHandle sitting between content slots (the sibling selectors
-// silently lost padding when a handle preceded a header-less body). Matches
-// the Dialog primitive's approach.
+// Padding rules use ancestor `:has()` on `[data-slot=drawer-content]` instead of
+// adjacent-sibling selectors so consumers can wrap slots in forms, Suspense, etc.
+// without breaking padding, and so a DrawerHandle between slots doesn't silently
+// drop the header's padding (sibling selectors would miss it).
 function DrawerHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -1294,9 +1207,8 @@ function DrawerHeader({ className, ...props }: React.ComponentProps<"div">) {
       className={cn(
         "flex flex-col gap-2 px-6 pt-6 pb-3",
         "in-data-[direction=bottom]:in-[[data-slot=drawer-content]:has([data-slot=drawer-handle])]:pt-1",
-        // Header alone with footer (no body anywhere in content)
+        // Header alone (with or without footer, no body): expand bottom padding.
         "in-[[data-slot=drawer-content]:not(:has([data-slot=drawer-body])):has([data-slot=drawer-footer])]:pb-6",
-        // Header alone (no body, no footer)
         "in-[[data-slot=drawer-content]:not(:has([data-slot=drawer-body])):not(:has([data-slot=drawer-footer]))]:pb-6",
         // "transition-opacity in-data-nested-dialog-open:opacity-0 in-data-nested-dragging:opacity-100",
         className,
@@ -1306,20 +1218,15 @@ function DrawerHeader({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-/* -------------------------------------------------------------------------------------------------
- * DrawerFooter
- * -------------------------------------------------------------------------------------------------*/
-
 function DrawerFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="drawer-footer"
       className={cn(
-        // z-1 + translateZ(0): stays above DrawerBody(z-0); Safari-only GPU layer
-        // promotion fixes sticky/transform compositing flash during enter animation
+        // z-1 above DrawerBody(z-0); translateZ(0) is Safari-only GPU promotion to fix
+        // sticky/transform compositing flash during enter animation.
         "z-1 mt-auto flex flex-col-reverse gap-2 bg-(--popup-surface,var(--popover)) px-6 pt-4 pb-6 sm:flex-row sm:justify-end",
         "[@supports(-webkit-touch-callout:none)]:transform-[translateZ(0)]",
-        // No header AND no body → footer alone, needs its own top padding
         "in-[[data-slot=drawer-content]:not(:has([data-slot=drawer-header])):not(:has([data-slot=drawer-body]))]:pt-6",
         "not-in-data-[footer-variant=inset]:in-[[data-slot=drawer-content]:has([data-slot=drawer-body])]:pt-3",
         "in-data-[footer-variant=inset]:border-border in-data-[footer-variant=inset]:bg-muted in-data-[footer-variant=inset]:border-t in-data-[footer-variant=inset]:pt-4 in-data-[footer-variant=inset]:pb-4",
@@ -1330,10 +1237,6 @@ function DrawerFooter({ className, ...props }: React.ComponentProps<"div">) {
     />
   );
 }
-
-/* -------------------------------------------------------------------------------------------------
- * DrawerTitle
- * -------------------------------------------------------------------------------------------------*/
 
 function DrawerTitle({
   className,
@@ -1351,10 +1254,6 @@ function DrawerTitle({
   );
 }
 
-/* -------------------------------------------------------------------------------------------------
- * DrawerDescription
- * -------------------------------------------------------------------------------------------------*/
-
 function DrawerDescription({
   className,
   ...props
@@ -1367,10 +1266,6 @@ function DrawerDescription({
     />
   );
 }
-
-/* -------------------------------------------------------------------------------------------------
- * DrawerBody
- * -------------------------------------------------------------------------------------------------*/
 
 function DrawerBody({
   className,
@@ -1399,14 +1294,11 @@ function DrawerBody({
     <div
       data-slot="drawer-body"
       className={cn(
-        // z-0: stays below sticky footer during iOS Safari enter animation
+        // z-0: stays below sticky footer during iOS Safari enter animation.
         "relative z-0 flex min-h-0 flex-1 flex-col overflow-hidden",
-        // No header anywhere in content → body needs its own top padding
         "in-[[data-slot=drawer-content]:not(:has([data-slot=drawer-header]))]:pt-5",
-        // No footer anywhere in content → body needs its own bottom padding
         "in-[[data-slot=drawer-content]:not(:has([data-slot=drawer-footer]))]:pb-5",
-        // Inset footer variant: still need bottom padding when a footer follows
-        // so the body's content doesn't crowd the footer's top border
+        // Inset footer: still pad body bottom so content doesn't crowd the footer's top border.
         "in-data-[footer-variant=inset]:in-[[data-slot=drawer-content]:has([data-slot=drawer-footer])]:pb-5",
         // "transition-opacity in-data-nested-dialog-open:opacity-0 in-data-nested-dragging:opacity-100",
       )}
@@ -1431,10 +1323,6 @@ function DrawerBody({
     </div>
   );
 }
-
-/* -------------------------------------------------------------------------------------------------
- * Exports
- * -------------------------------------------------------------------------------------------------*/
 
 export {
   Drawer,

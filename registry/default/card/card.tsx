@@ -42,9 +42,8 @@ function Card({
       className={cn(
         cardVariants({ variant }),
         solidSurface(level, shadowLevel),
-        // Inset variant: override the bg from solidSurface with bg-muted so
-        // the outer reads as a gray frame, while keeping the shadow + rim
-        // and --popup-surface from the elevation system.
+        // bg-muted overrides solidSurface's bg, making the outer a gray frame
+        // while keeping its shadow, rim, and --popup-surface.
         variant === "inset" && "bg-muted",
         className,
       )}

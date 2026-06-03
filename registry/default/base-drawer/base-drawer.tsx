@@ -20,10 +20,6 @@ import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
-// ---------------------------------------------------------------------------
-// Types & context
-// ---------------------------------------------------------------------------
-
 type DrawerPosition = "right" | "left" | "top" | "bottom";
 
 const DrawerContext = React.createContext<{ position: DrawerPosition }>({
@@ -39,10 +35,6 @@ const directionMap: Record<
   right: "right",
   top: "up",
 };
-
-// ---------------------------------------------------------------------------
-// Root
-// ---------------------------------------------------------------------------
 
 const createBaseDrawerHandle: typeof DrawerPrimitive.createHandle =
   DrawerPrimitive.createHandle;
@@ -64,10 +56,6 @@ function BaseDrawer({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Primitives (pass-through)
-// ---------------------------------------------------------------------------
-
 const BaseDrawerPortal: typeof DrawerPrimitive.Portal = DrawerPrimitive.Portal;
 
 function BaseDrawerTrigger(
@@ -84,10 +72,6 @@ function BaseDrawerClose(
 
 const BaseDrawerContent: typeof DrawerPrimitive.Content =
   DrawerPrimitive.Content;
-
-// ---------------------------------------------------------------------------
-// Provider / Indent
-// ---------------------------------------------------------------------------
 
 function BaseDrawerProvider({ ...props }: DrawerPrimitive.Provider.Props) {
   return <DrawerPrimitive.Provider {...props} />;
@@ -123,10 +107,6 @@ function BaseDrawerIndentBackground({
   );
 }
 
-// ---------------------------------------------------------------------------
-// SwipeArea
-// ---------------------------------------------------------------------------
-
 function BaseDrawerSwipeArea({
   className,
   position: positionProp,
@@ -153,10 +133,6 @@ function BaseDrawerSwipeArea({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Backdrop
-// ---------------------------------------------------------------------------
-
 function BaseDrawerBackdrop({
   className,
   ...props
@@ -172,10 +148,6 @@ function BaseDrawerBackdrop({
     />
   );
 }
-
-// ---------------------------------------------------------------------------
-// Viewport
-// ---------------------------------------------------------------------------
 
 function BaseDrawerViewport({
   className,
@@ -205,10 +177,6 @@ function BaseDrawerViewport({
     />
   );
 }
-
-// ---------------------------------------------------------------------------
-// Popup (convenience composite: Portal + Backdrop + Viewport + Popup)
-// ---------------------------------------------------------------------------
 
 function BaseDrawerPopup({
   className,
@@ -369,10 +337,6 @@ function BaseDrawerPopup({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Header
-// ---------------------------------------------------------------------------
-
 function BaseDrawerHeader({
   className,
   allowSelection = false,
@@ -396,10 +360,6 @@ function BaseDrawerHeader({
     render: allowSelection ? <BaseDrawerContent render={render} /> : render,
   });
 }
-
-// ---------------------------------------------------------------------------
-// Footer
-// ---------------------------------------------------------------------------
 
 function BaseDrawerFooter({
   className,
@@ -431,10 +391,6 @@ function BaseDrawerFooter({
   });
 }
 
-// ---------------------------------------------------------------------------
-// Title / Description
-// ---------------------------------------------------------------------------
-
 function BaseDrawerTitle({ className, ...props }: DrawerPrimitive.Title.Props) {
   return (
     <DrawerPrimitive.Title
@@ -460,10 +416,6 @@ function BaseDrawerDescription({
     />
   );
 }
-
-// ---------------------------------------------------------------------------
-// Panel (scrollable body)
-// ---------------------------------------------------------------------------
 
 function BaseDrawerPanel({
   className,
@@ -503,10 +455,6 @@ function BaseDrawerPanel({
   return content;
 }
 
-// ---------------------------------------------------------------------------
-// Bar (drag handle indicator)
-// ---------------------------------------------------------------------------
-
 function BaseDrawerBar({
   className,
   position: positionProp,
@@ -541,10 +489,6 @@ function BaseDrawerBar({
     render,
   });
 }
-
-// ---------------------------------------------------------------------------
-// Menu components
-// ---------------------------------------------------------------------------
 
 function BaseDrawerMenu({
   className,
@@ -785,10 +729,6 @@ function BaseDrawerMenuRadioItem({
     </RadioPrimitive.Root>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Exports
-// ---------------------------------------------------------------------------
 
 export {
   BaseDrawer,

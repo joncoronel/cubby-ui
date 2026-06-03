@@ -94,10 +94,9 @@ function ContextMenuContent({
             "ease-out-expo transition-[scale,opacity] duration-100",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
-            // NOTE: intentionally NOT suppressing on data-instant. Base UI flags
-            // every right-click open as instant="click" because the native
-            // `contextmenu` event has detail===0 (same as a keyboard activation),
-            // which would kill the enter animation. Only honor reduced motion.
+            // Not suppressing on data-instant: Base UI marks every right-click open
+            // as instant="click" (contextmenu detail===0 looks like keyboard), which
+            // would kill the enter animation. Only honor reduced motion.
             "motion-reduce:transition-none",
             solidSurface(level, shadowLevel),
             className,
@@ -347,8 +346,7 @@ function ContextMenuSubContent({
             "ease-out-expo transition-[scale,opacity] duration-100",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
-            // See ContextMenuContent: data-instant is a false positive on
-            // right-click open, so we don't suppress on it — only reduced motion.
+            // See ContextMenuContent: not suppressing on data-instant (right-click false positive).
             "motion-reduce:transition-none",
             solidSurface(level, shadowLevel),
             className,

@@ -80,7 +80,6 @@ function DialogViewport({ className, ...props }: BaseDialog.Viewport.Props) {
   );
 }
 
-// Content component
 function DialogContent({
   className,
   children,
@@ -149,14 +148,9 @@ function DialogContent({
   );
 }
 
-// Header component
-//
-// Slot-presence checks (header/body/footer "is X around?") use ancestor `:has()`
-// queries on `[data-slot=dialog-content]` rather than adjacent-sibling selectors.
-// Ancestor `:has()` descends through arbitrary wrappers (form, ErrorBoundary,
-// Suspense, conditional fragments) so consumers don't have to keep these slots
-// as direct DOM siblings of DialogContent. The footer's `pt-3` rule already
-// used this pattern; bringing the rest in line.
+// Slot-presence padding uses ancestor `:has()` on `[data-slot=dialog-content]`
+// so header/body/footer can be wrapped in forms, ErrorBoundaries, or fragments
+// without breaking spacing — adjacent-sibling selectors wouldn't reach through.
 function DialogHeader({
   className,
   ...props
@@ -177,7 +171,6 @@ function DialogHeader({
   );
 }
 
-// Body component
 function DialogBody({
   className,
   nativeScroll = false,
@@ -223,7 +216,6 @@ function DialogBody({
   );
 }
 
-// Footer component
 function DialogFooter({
   className,
   ...props
@@ -246,7 +238,6 @@ function DialogFooter({
   );
 }
 
-// Title component
 function DialogTitle({ className, ...props }: BaseDialog.Title.Props) {
   return (
     <BaseDialog.Title
@@ -259,7 +250,6 @@ function DialogTitle({ className, ...props }: BaseDialog.Title.Props) {
   );
 }
 
-// Description component
 function DialogDescription({
   className,
   ...props

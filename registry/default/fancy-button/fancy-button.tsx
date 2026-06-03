@@ -5,11 +5,9 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Button as BaseButton } from "@base-ui/react/button";
 import { cn } from "@/lib/utils";
 
-// NOTE: This is an intentionally non-themeable showpiece. Its surfaces, rings,
-// and glossy inset shadows are hardcoded OKLCH values (not design-system
-// tokens) because it renders as a dark glossy button in BOTH light and dark —
-// it can't map to --neutral, which inverts to near-white in dark. Slated for a
-// proper tokenized refactor; until then it deliberately ignores the theme.
+// Intentionally non-themeable: hardcoded OKLCH values because this renders as
+// a dark glossy button in both light AND dark — it can't map to --neutral,
+// which inverts to near-white in dark mode.
 const fancyButtonVariants = cva(
   "relative inline-flex cursor-pointer items-center justify-center whitespace-nowrap text-sm font-medium transition-[color,background-color,--tw-gradient-from,--tw-gradient-via,--tw-gradient-to,transform,scale,opacity,outline-width,outline-offset,outline-color]  outline-0 outline-offset-0 outline-transparent  disabled:pointer-events-none disabled:opacity-60 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 rounded-lg active:scale-[0.98] focus-visible:outline-ring/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid",
   {
@@ -61,7 +59,6 @@ export const FancyButton = ({
   let dynamicStyle: React.CSSProperties = {};
 
   if (color && variant === "custom") {
-    // Set CSS variables for color-mix values, then use them in Tailwind classes
     dynamicStyle = {
       "--btn-from": `color-mix(in oklch, ${color}, black 0%)`,
       "--btn-to": `color-mix(in oklch, ${color}, black 10%)`,

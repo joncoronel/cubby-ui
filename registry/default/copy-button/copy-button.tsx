@@ -104,7 +104,6 @@ function CopyButton({
       title={isCopied ? "Copied!" : "Copy"}
       {...props}
     >
-      {/* Copy Icon - Exits with scale down, fade, and blur */}
       <span
         aria-hidden="true"
         className={cn(
@@ -115,7 +114,6 @@ function CopyButton({
         {copyIcon ?? DEFAULT_COPY_ICON}
       </span>
 
-      {/* Check Icon - Enters with scale up and fade in */}
       <span
         aria-hidden="true"
         className={cn(

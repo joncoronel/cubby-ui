@@ -81,7 +81,7 @@ function ScrollArea({
   }
 
   if (nativeScroll) {
-    // NativeScrollArea only accepts string className, not the function variant from Base UI
+    // Base UI className can be a function; NativeScrollArea only accepts string.
     const nativeClassName =
       typeof className === "string" ? className : undefined;
     return (
@@ -172,9 +172,8 @@ function ScrollBar({
 }
 
 /**
- * Native scroll implementation using CSS scroll-driven animations for fade edges.
- * Uses browser's native scrolling with styled scrollbars.
- * Fade edges are animated based on scroll position (Chrome 115+, static fallback elsewhere).
+ * Native scroll variant. Fade edges use CSS scroll-driven animations
+ * (Chrome 115+); static fallback elsewhere.
  */
 function NativeScrollArea({
   className,
@@ -203,7 +202,6 @@ function NativeScrollArea({
   const hasVerticalFade = fade.top || fade.bottom;
   const hasHorizontalFade = fade.left || fade.right;
 
-  // Build animation styles for scroll-driven fade
   const animationStyle: React.CSSProperties | undefined = hasFade
     ? {
         animationName: [
@@ -233,7 +231,7 @@ function NativeScrollArea({
         "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
         hasFade && "[--scroll-fade-size:1.5rem]",
         // Native scroll uses scroll-driven animation CSS variables
-        // Fallbacks: top/left default to hidden (at start), bottom/right default to visible (more content)
+        // Fallbacks: top/left hidden at start, bottom/right visible (more content below/right).
         fade.top &&
           "supports-[animation-timeline:scroll()]:mask-t-from-[calc(100%-var(--scroll-fade-top))]",
         fade.bottom &&

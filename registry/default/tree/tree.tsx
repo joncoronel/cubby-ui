@@ -16,10 +16,6 @@ import {
   handleTreeKeyboardNavigation,
 } from "./lib/tree-utils";
 
-// ============================================================================
-// Types
-// ============================================================================
-
 export interface TreeNodeBase<
   TData extends Record<string, unknown> = Record<string, unknown>,
 > {
@@ -65,10 +61,6 @@ export interface TreeExpandEvent {
 
 type TreeVariant = "default" | "filled" | "outline";
 type TreeMode = "single" | "multiple" | "none";
-
-// ============================================================================
-// Context
-// ============================================================================
 
 interface TreeContextValue<
   TData extends Record<string, unknown> = Record<string, unknown>,
@@ -139,10 +131,6 @@ function useTreeItemContext<
   };
 }
 
-// ============================================================================
-// Tree Root
-// ============================================================================
-
 export interface TreeProps<
   TData extends Record<string, unknown> = Record<string, unknown>,
 > extends Omit<useRender.ComponentProps<"div">, "children"> {
@@ -177,11 +165,9 @@ function Tree<TData extends Record<string, unknown> = Record<string, unknown>>({
   render,
   ...props
 }: TreeProps<TData>): React.ReactElement {
-  // Derive internal flags from mode
   const enableBulkActions = mode === "multiple";
   const disableSelection = mode === "none";
 
-  // Store renderItem in ref for stable context reference
   const renderItemRef = React.useRef(renderItem);
   renderItemRef.current = renderItem;
 
@@ -194,15 +180,12 @@ function Tree<TData extends Record<string, unknown> = Record<string, unknown>>({
     string | null
   >(null);
 
-  // Track nodes that are currently loading children
   const [loadingNodes, setLoadingNodes] = React.useState<Set<string>>(
     () => new Set(),
   );
 
-  // Track nodes that have already loaded their children
   const loadedNodesRef = React.useRef<Set<string>>(new Set());
 
-  // Store dynamically loaded children
   const [loadedChildren, setLoadedChildren] = React.useState<
     Map<string, TreeNode<TData>[]>
   >(() => new Map());
@@ -211,7 +194,6 @@ function Tree<TData extends Record<string, unknown> = Record<string, unknown>>({
     return expanded ? new Set(expanded) : internalExpanded;
   }, [expanded, internalExpanded]);
 
-  // Merge loaded children into the tree data
   const mergedData = React.useMemo(() => {
     if (loadedChildren.size === 0) return data;
 
@@ -236,7 +218,6 @@ function Tree<TData extends Record<string, unknown> = Record<string, unknown>>({
       const isCurrentlyExpanded = expandedNodes.has(nodeId);
       const isExpanding = !isCurrentlyExpanded;
 
-      // Find the node to check if it needs to load children
       const findNode = (
         nodes: TreeNode<TData>[],
       ): TreeNode<TData> | undefined => {
@@ -258,7 +239,6 @@ function Tree<TData extends Record<string, unknown> = Record<string, unknown>>({
         node.onLoadChildren &&
         !loadedNodesRef.current.has(nodeId);
 
-      // If we need to load children, delay expansion until loaded
       if (needsToLoad) {
         setLoadingNodes((prev) => new Set(prev).add(nodeId));
         loadedNodesRef.current.add(nodeId);
@@ -271,7 +251,6 @@ function Tree<TData extends Record<string, unknown> = Record<string, unknown>>({
             return next;
           });
 
-          // NOW expand the node after children are loaded
           const newExpanded = new Set(expandedNodes);
           newExpanded.add(nodeId);
           if (expanded && onExpandedChange) {
@@ -292,7 +271,6 @@ function Tree<TData extends Record<string, unknown> = Record<string, unknown>>({
         return;
       }
 
-      // Standard toggle for collapsing or nodes that don't need to load
       const newExpanded = new Set(expandedNodes);
       if (isCurrentlyExpanded) {
         newExpanded.delete(nodeId);
@@ -313,7 +291,6 @@ function Tree<TData extends Record<string, unknown> = Record<string, unknown>>({
     return checkedNodes ? new Set(checkedNodes) : undefined;
   }, [checkedNodes]);
 
-  // Compute parent node map for ALL nodes (not just visible ones)
   const parentNodeMap = React.useMemo(
     () => buildParentMap(mergedData),
     [mergedData],
@@ -324,14 +301,12 @@ function Tree<TData extends Record<string, unknown> = Record<string, unknown>>({
     [mergedData, expandedNodes],
   );
 
-  // Create loading nodes map
   const loadingNodesMap = React.useMemo(() => {
     const map = new Map<string, boolean>();
     loadingNodes.forEach((id) => map.set(id, true));
     return map;
   }, [loadingNodes]);
 
-  // Focus restoration: when data changes and focused node is removed, focus first node
   React.useEffect(() => {
     if (!lastFocusedNodeId || visibleNodeIds.includes(lastFocusedNodeId))
       return;
@@ -427,19 +402,11 @@ function Tree<TData extends Record<string, unknown> = Record<string, unknown>>({
   return element;
 }
 
-// ============================================================================
-// Constants
-// ============================================================================
-
 const INDENT_SIZE = 20;
 const INDENT_SIZE_WITH_CHECKBOX = 12;
 const VERTICAL_LINE_OFFSET = 4.5;
 const CHILD_VERTICAL_LINE_OFFSET = 15.5;
 const BADGE_TEXT_SIZE = "text-[10px]";
-
-// ============================================================================
-// Helper Functions - Defined outside component for stable references
-// ============================================================================
 
 /**
  * Updates parent nodes based on their children's checked state.
@@ -450,13 +417,9 @@ function updateParentCheckStates<
 >(nodes: TreeNode<TData>[], checkedSet: Set<string>): void {
   for (const node of nodes) {
     if (node.children && node.children.length > 0) {
-      // Recursively update children first (bottom-up)
       updateParentCheckStates(node.children, checkedSet);
 
-      // Get all leaf descendants of this parent
       const leafIds = getLeafNodeIds(node.children);
-
-      // Parent should be checked if all leaf descendants are checked
       const allLeavesChecked = leafIds.every((id) => checkedSet.has(id));
 
       if (allLeavesChecked) {
@@ -467,10 +430,6 @@ function updateParentCheckStates<
     }
   }
 }
-
-// ============================================================================
-// Custom Hooks
-// ============================================================================
 
 interface UseTreeCheckboxStateParams<
   TData extends Record<string, unknown> = Record<string, unknown>,
@@ -515,18 +474,14 @@ function useTreeCheckboxState<
 
       const currentSet = new Set(context.checkedNodes);
 
-      // Remove all descendants
       for (const id of allDescendantIds) {
         currentSet.delete(id);
       }
 
-      // Add back the selected values (these are all descendants now)
       for (const id of newValues) {
         currentSet.add(id);
       }
 
-      // Update all parent nodes based on their children's checked state
-      // This will correctly set all ancestors (parent, grandparent, etc.)
       updateParentCheckStates(context.data, currentSet);
 
       context.onCheckedNodesChange(Array.from(currentSet));
@@ -540,10 +495,6 @@ function useTreeCheckboxState<
     handleLocalCheckboxChange,
   };
 }
-
-// ============================================================================
-// TreeItemInternal - Handles recursion internally
-// ============================================================================
 
 interface TreeItemInternalProps<
   TData extends Record<string, unknown> = Record<string, unknown>,
@@ -578,14 +529,12 @@ function TreeItemInternal<
       ? context.checkedNodes.has(node.id)
       : false;
 
-  // Roving tabindex: only the last focused node should be tabbable
-  // If no node has been focused yet, the first node is tabbable
+  // Roving tabindex: last focused node is tabbable; first node if none focused yet.
   const isFirstNode = context.visibleNodeIds[0] === node.id;
   const isLastFocused = context.lastFocusedNodeId === node.id;
   const isTabbable =
     isLastFocused || (!context.lastFocusedNodeId && isFirstNode);
 
-  // Create merged context value with item-level state
   const mergedContextValue = React.useMemo(
     () => ({
       ...context,
@@ -606,20 +555,17 @@ function TreeItemInternal<
     const allDescendantIds = hasChildren ? getAllDescendantIds(node) : [];
 
     if (isChecked) {
-      // Uncheck this node and all descendants
       currentSet.delete(node.id);
       for (const id of allDescendantIds) {
         currentSet.delete(id);
       }
     } else {
-      // Check this node and all descendants
       currentSet.add(node.id);
       for (const id of allDescendantIds) {
         currentSet.add(id);
       }
     }
 
-    // Update all parent nodes based on their children's checked state
     updateParentCheckStates(context.data, currentSet);
 
     context.onCheckedNodesChange(Array.from(currentSet));
@@ -681,7 +627,6 @@ function TreeItemInternal<
     depth *
     (context.enableBulkActions ? INDENT_SIZE_WITH_CHECKBOX : INDENT_SIZE);
 
-  // Checkbox state management
   const { allDescendantIds, localChildValues, handleLocalCheckboxChange } =
     useTreeCheckboxState({
       node,
@@ -689,7 +634,6 @@ function TreeItemInternal<
       context,
     });
 
-  // Render leaf node (no children)
   if (!hasChildren) {
     return (
       <TreeContext.Provider value={mergedContextValue as TreeContextValue}>
@@ -769,8 +713,6 @@ function TreeItemInternal<
     );
   }
 
-  // Render parent node (has children)
-
   const parentContent = (
     <TreeContext.Provider value={mergedContextValue as TreeContextValue}>
       <div
@@ -811,7 +753,7 @@ function TreeItemInternal<
               )}
             >
               {context.enableBulkActions ? (
-                // In bulk actions mode, use plain div to avoid Collapsible.Trigger keyboard handling
+                // Plain div in bulk-actions mode: avoids Collapsible.Trigger's built-in keyboard handling.
                 <div
                   ref={(el) => {
                     if (el) {
@@ -826,7 +768,6 @@ function TreeItemInternal<
                     !isDisabled && "cursor-pointer",
                   )}
                   onClick={() => {
-                    // Clicking node text/content expands/collapses
                     if (!isDisabled) {
                       context.onToggleNode(node.id);
                     }
@@ -839,7 +780,6 @@ function TreeItemInternal<
                 >
                   <span
                     onClick={(e: React.MouseEvent) => {
-                      // Clicking checkbox toggles checked state
                       e.stopPropagation();
                       handleToggleChecked();
                     }}
@@ -864,7 +804,6 @@ function TreeItemInternal<
                   {context.renderItem(node)}
                 </div>
               ) : (
-                // In navigation/selection mode, use Collapsible.Trigger for built-in behavior
                 <BaseCollapsible.Trigger
                   ref={(el) => {
                     if (el) {
@@ -958,10 +897,6 @@ function TreeItemInternal<
   return parentContent;
 }
 
-// ============================================================================
-// TreeItem Component (Public API)
-// ============================================================================
-
 export interface TreeItemProps extends useRender.ComponentProps<"div"> {
   children: React.ReactNode;
 }
@@ -982,10 +917,6 @@ function TreeItem({ className, children, render, ...props }: TreeItemProps) {
   return element;
 }
 
-// ============================================================================
-// TreeItemIcon Component
-// ============================================================================
-
 export interface TreeItemIconProps extends useRender.ComponentProps<"span"> {
   children?: React.ReactNode;
 }
@@ -998,7 +929,6 @@ function TreeItemIcon({
 }: TreeItemIconProps) {
   const { item, isExpanded, isLoading } = useTreeItemContext();
 
-  // Show loading spinner if node is loading
   let displayIcon: React.ReactNode;
   if (isLoading) {
     displayIcon = (
@@ -1032,10 +962,6 @@ function TreeItemIcon({
   return element;
 }
 
-// ============================================================================
-// TreeItemLabel Component
-// ============================================================================
-
 export interface TreeItemLabelProps extends useRender.ComponentProps<"span"> {
   children: React.ReactNode;
 }
@@ -1063,10 +989,6 @@ function TreeItemLabel({
   return element;
 }
 
-// ============================================================================
-// TreeItemBadge Component
-// ============================================================================
-
 export interface TreeItemBadgeProps extends useRender.ComponentProps<"span"> {
   children?: React.ReactNode;
 }
@@ -1081,7 +1003,7 @@ function TreeItemBadge({
     "data-slot": "tree-item-badge",
     className: cn(
       "ml-auto flex shrink-0 items-center",
-      // Scale down badges to match tree text size and prevent height increase
+      // Shrink badge text/padding to tree row height without reflowing it.
       `[&_[data-slot=badge]]:py-0.5 [&_[data-slot=badge]]:${BADGE_TEXT_SIZE} [&_[data-slot=badge]]:leading-tight`,
       className,
     ),
@@ -1099,10 +1021,6 @@ function TreeItemBadge({
   return element;
 }
 
-// ============================================================================
-// Exports
-// ============================================================================
-
 export {
   Tree,
   TreeItem,
@@ -1113,7 +1031,6 @@ export {
   type TreeMode,
 };
 
-// Re-export tree utilities for consumers
 import * as TreeUtils from "./lib/tree-utils";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon, Loading03Icon } from "@hugeicons/core-free-icons";

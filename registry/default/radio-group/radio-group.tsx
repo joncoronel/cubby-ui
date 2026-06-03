@@ -32,9 +32,8 @@ function RadioGroupItem({
         "focus-visible:outline-ring/50 ease-out-expo outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-150 outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
         "disabled:cursor-not-allowed disabled:opacity-60",
         "aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
-        // Surface plate. Real border + bg-clip-padding so the border draws
-        // on the substrate (matches Input). The Indicator uses -inset-px to
-        // extend over the border area when selected, hiding it completely.
+        // bg-clip-padding keeps the border on the substrate (matches Input);
+        // Indicator uses -inset-px to cover the border when selected.
         "border bg-clip-padding",
         variant === "default" ? "bg-input" : "bg-input-elevated",
         className,

@@ -124,7 +124,7 @@ function TooltipContent({
               "**:data-current:data-starting-style:opacity-0",
               "**:data-current:data-ending-style:opacity-0",
               "**:data-previous:data-ending-style:opacity-0",
-              // Truncate outgoing content as popup shrinks
+              // Truncate outgoing content as popup shrinks.
               "**:data-previous:truncate",
               // Disable transitions when instant or motion-reduce
               "[[data-instant]_&_[data-current]]:transition-none [[data-instant]_&_[data-previous]]:transition-none",

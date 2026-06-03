@@ -38,10 +38,9 @@ export const SURFACE_RIM: Record<SurfaceLevel, string> = {
 };
 
 /**
- * Static map that exposes the chosen surface level to descendants as the
- * `--popup-surface` CSS variable. Used by every elevation helper so children
+ * Exposes the surface level to descendants as `--popup-surface` so children
  * (arrow fills, sticky labels, fade gradients) can track the popup's level
- * via `bg-(--popup-surface,var(--popover))` and friends.
+ * via `bg-(--popup-surface,var(--popover))`.
  */
 export const SURFACE_VAR: Record<SurfaceLevel, string> = {
   1: "[--popup-surface:var(--surface-1)]",
@@ -55,9 +54,8 @@ export const SURFACE_VAR: Record<SurfaceLevel, string> = {
 };
 
 /**
- * Combined-shadow utility classes — drops + rim insets in a single
- * `box-shadow` on the popup itself (no `::after`). Used by `solidSurface()`.
- * Each entry is a literal Tailwind class so the scanner picks them up.
+ * Drops + rim insets in a single `box-shadow` (no `::after`). Used by `solidSurface()`.
+ * Literal Tailwind classes so the scanner picks them up.
  */
 export const SURFACE_SHADOW_COMBINED: Record<SurfaceLevel, string> = {
   1: "shadow-[var(--surface-shadow-1),var(--surface-rim-1)]",
@@ -78,15 +76,12 @@ export function surfaceClasses(
 }
 
 /**
- * Like `surfaceClasses`, but also adds a pseudo-element overlay that re-paints
- * the rim (inset highlight + ring) above the container's children. Use this on
- * elevated containers that hold opaque children near their edges — sticky group
- * labels, pinned search inputs, dialog headers, etc.
+ * Like `surfaceClasses`, but adds a `::after` overlay that re-paints the rim
+ * above the container's children. Use on elevated containers with opaque
+ * children near their edges (sticky labels, pinned inputs, dialog headers).
  *
- * Requirements on the host element: `position: relative` (or any positioned),
- * a border-radius class (the overlay inherits it), and a clipped overflow so
- * the overlay doesn't escape. The overlay sits at z-index 2; bump if you have
- * children with z-index > 2.
+ * Host requirements: positioned, `border-radius` class, clipped overflow.
+ * Overlay is `z-index: 2` — bump if children exceed that.
  */
 export function elevatedSurface(
   level: SurfaceLevel,
@@ -96,33 +91,24 @@ export function elevatedSurface(
 }
 
 /**
- * Like `elevatedSurface`, but paints the rim *in the popup's own box-shadow*
- * (no `::after`). Use this for elevated containers that have no opaque
- * children near their edges — leaves `::after` free for other purposes.
+ * Like `elevatedSurface`, but paints the rim in the popup's own `box-shadow`
+ * (no `::after`) — leaves `::after` free for other purposes. Use for elevated
+ * containers with no opaque children near their edges; switch to
+ * `elevatedSurface()` if you add a sticky/opaque child.
  *
- * Composition: `bg-surface-N` + combined `box-shadow` (drops + rim insets).
- *
- * If you ever add a sticky/opaque child near an edge, switch the component
- * back to `elevatedSurface()` so the rim renders above the child.
+ * When `level !== shadowLevel` the rim color tracks `shadowLevel`; for
+ * independent rim/drop control use `elevatedSurface` instead.
  */
 export function solidSurface(
   level: SurfaceLevel,
   shadowLevel: SurfaceLevel = level,
 ): string {
-  // The combined shadow class is keyed by a single level. In practice level
-  // and shadowLevel are equal for nearly all callers; when they differ, the
-  // rim color tracks shadowLevel (slightly off if shadowLevel is much lower
-  // than level). For cases that need rim-tracks-level + drops-track-shadow
-  // independently, use `elevatedSurface` instead.
   return `${SURFACE_BG[level]} ${SURFACE_SHADOW_COMBINED[shadowLevel]} ${SURFACE_VAR[level]}`;
 }
 
 /**
- * Static map of `::after` classes that paint a 1px inset rim on a single
- * edge — used by viewport-flush elevated containers (Sheet/Drawer `default`
- * variant) so the rim only shows on the inner-facing edge and doesn't render
- * as a thin line at the screen boundary.
- *
+ * `::after` classes for a 1px inset rim on a single edge — for viewport-flush
+ * containers (Sheet/Drawer) so the rim only shows on the inner-facing edge.
  * Color is `--surface-rim-color` (transparent in light, ~4% white in dark).
  */
 export const SURFACE_RIM_EDGE: Record<
@@ -136,12 +122,8 @@ export const SURFACE_RIM_EDGE: Record<
 };
 
 /**
- * Returns classes for an `::after` overlay that paints a 1px rim only on
- * the specified inner-facing edge. Pair with `surfaceClasses()` (NOT
- * `elevatedSurface()`) for flush variants.
- *
- * Map of "which side the popup attaches to" → "inner-facing edge":
- *   right → left, left → right, top → bottom, bottom → top
+ * `::after` overlay with a 1px rim on the specified inner-facing edge.
+ * Pair with `surfaceClasses()` (NOT `elevatedSurface()`) for flush variants.
  */
 export function innerEdgeRim(
   innerEdge: "top" | "bottom" | "left" | "right",
@@ -149,10 +131,7 @@ export function innerEdgeRim(
   return `after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:z-[2] ${SURFACE_RIM_EDGE[innerEdge]}`;
 }
 
-/**
- * Map a "popup attaches to this side" value to the inner-facing edge that
- * a single-edge rim should sit on.
- */
+/** Maps attach-side → inner-facing edge for `innerEdgeRim`. */
 export const INNER_EDGE_FROM_ATTACH_SIDE: Record<
   "top" | "bottom" | "left" | "right",
   "top" | "bottom" | "left" | "right"

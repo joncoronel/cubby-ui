@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { mergeProps } from "@base-ui/react/merge-props";
+import { useRender } from "@base-ui/react/use-render";
 import { useAnimatedHeight } from "@/registry/default/hooks/use-animated-height";
 import { cn } from "@/lib/utils";
 
@@ -8,7 +10,7 @@ type TransitionPanelInitialFocus =
   | boolean
   | React.RefObject<HTMLElement | null>;
 
-type TransitionPanelProps = React.ComponentProps<"div"> & {
+type TransitionPanelProps = useRender.ComponentProps<"div"> & {
   /**
    * The viewKey of the currently visible view. Must match the `viewKey` of
    * one of the `<TransitionPanelView>` descendants.
@@ -27,7 +29,7 @@ type TransitionPanelProps = React.ComponentProps<"div"> & {
   transition?: "slide" | "fade";
 };
 
-type TransitionPanelViewProps = React.ComponentProps<"div"> & {
+type TransitionPanelViewProps = useRender.ComponentProps<"div"> & {
   /**
    * Identifier matched against the parent's `activeKey` to determine which
    * view is visible.
@@ -163,7 +165,9 @@ const TransitionPanelContext =
  *
  * Spread accepts any `<div>` prop (`id`, `role`, `aria-label`, `ref`,
  * `data-*`, etc.). The optional `ref` is composed with an internal ref
- * used for height measurement.
+ * used for height measurement. Both `TransitionPanel` and
+ * `TransitionPanelView` accept a Base UI `render` prop to swap the element
+ * or merge it with another component (e.g. render a view as a `Card`).
  *
  * Data attributes (Base UI conventions):
  *   - Root: `data-transition="slide" | "fade"`,
@@ -200,10 +204,11 @@ function TransitionPanel({
   activeKey,
   transition = "slide",
   ref,
+  render,
   className,
   style,
   children,
-  ...rest
+  ...props
 }: TransitionPanelProps) {
   const { outerRef, innerRef } = useAnimatedHeight();
 
@@ -218,24 +223,6 @@ function TransitionPanel({
       innerRef(node);
     },
     [innerRef],
-  );
-
-  // Compose consumer `ref` with the internal `outerRef` used by
-  // useAnimatedHeight (it reads `.current` inside its ResizeObserver
-  // callback, so it needs a stable RefObject). Mutating `outerRef.current`
-  // directly is safe — it's the same imperative pattern `useRef` uses
-  // internally — and lets us forward the node to the consumer's ref shape
-  // (callback or RefObject) without changing the hook's contract.
-  const setRootRef = React.useCallback(
-    (node: HTMLDivElement | null) => {
-      outerRef.current = node;
-      if (typeof ref === "function") {
-        ref(node);
-      } else if (ref) {
-        (ref as React.RefObject<HTMLDivElement | null>).current = node;
-      }
-    },
-    [outerRef, ref],
   );
 
   // View registry. The ref holds DOM elements + focus contracts (read
@@ -418,94 +405,98 @@ function TransitionPanel({
       ? "right"
       : "left";
 
-  return (
-    <div
-      {...rest}
-      ref={setRootRef}
-      data-slot="transition-panel"
-      data-transition={transition}
-      data-activation-direction={activationDirection}
-      onTransitionEnd={(event) => {
-        rest.onTransitionEnd?.(event);
-        // End of the swap: clear the flag when the root's own height
-        // transition finishes. `target === currentTarget` ignores transitions
-        // bubbling up from the view wrappers (opacity / translate / scale).
-        if (
-          event.target === event.currentTarget &&
-          event.propertyName === "height"
-        ) {
-          setIsSwapping(false);
-        }
-      }}
-      style={
-        {
-          // Default duration for the height transition (on this element) and,
-          // in `slide` mode, the slide/opacity transition on view wrappers
-          // (which inherit the property). Consumer's inline style spreads
-          // after, so any `--tp-duration` they set wins.
-          "--tp-duration": "240ms",
-          // Crossfade (`fade` mode) duration. Defaults to the size-adaptive
-          // value the height observer writes to `--fade-duration`, falling
-          // back to `--tp-duration` before the first measurement. Because the
-          // consumer `style` spreads after, setting `--tp-fade-duration`
-          // pins the crossfade to a fixed duration (the observer writes
-          // `--fade-duration`, not this var, so it can't clobber an override).
-          "--tp-fade-duration": "var(--fade-duration, var(--tp-duration))",
-          // Easing for the height + slide transitions (`--tp-ease`) and the
-          // crossfade (`--tp-fade-ease`). Both overridable via `style` / CSS.
-          "--tp-ease": "cubic-bezier(0.32, 0.72, 0, 1)",
-          "--tp-fade-ease": "cubic-bezier(0.26, 0.08, 0.25, 1)",
-          // Bleed area for the overflow clip. Defaults to 0 because the
-          // recommended composition puts internal padding inside each
-          // view, so focus rings / shadows already render in safe
-          // territory. Bump (e.g. "8px") when the panel is nested inside
-          // a padded container where view content sits flush with the
-          // panel's clip edge.
-          "--tp-clip-margin": "0px",
-          ...style,
-        } as React.CSSProperties
+  const defaultProps = {
+    "data-slot": "transition-panel",
+    "data-transition": transition,
+    "data-activation-direction": activationDirection,
+    onTransitionEnd: (event: React.TransitionEvent<HTMLDivElement>) => {
+      // End of the swap: clear the flag when the root's own height transition
+      // finishes. `target === currentTarget` ignores transitions bubbling up
+      // from the view wrappers (opacity / translate / scale).
+      if (
+        event.target === event.currentTarget &&
+        event.propertyName === "height"
+      ) {
+        setIsSwapping(false);
       }
-      className={cn(
-        // `overflow-clip` (not `overflow-hidden`) so the browser doesn't
-        // treat this as a scrollable ancestor. `overflow: hidden` blocks
-        // visible scrollbars but still allows *programmatic* scrolling,
-        // which means `scrollIntoView` (fired when focus moves to a deep
-        // descendant via label click etc.) will scroll this container,
-        // shifting all content up and exposing any clipped bottom region.
-        // `overflow: clip` makes the element a true non-scroll container.
-        //
-        // `overflow-clip-margin` gives the clip box a bleed area so
-        // focus rings, drop shadows, and other decorations that extend
-        // just outside an element's box can still render. Defaults to
-        // 0 (see `--tp-clip-margin` above) because the recommended
-        // composition keeps decoration-bearing elements inside view
-        // padding, so they're already inside the clip box. Set it to a
-        // few pixels when the panel is nested inside a padded container
-        // where content sits flush with the clip edge.
-        //
-        // `contain-layout` scopes the height-driven layout work to this
-        // subtree so the browser can skip recalculating surrounding layouts.
-        // Side effect: this element becomes a containing block for `position:
-        // fixed` / `absolute` descendants. Unlikely to matter for typical
-        // panel content; flag if you put a viewport-positioned element here.
-        "overflow-clip contain-layout [overflow-clip-margin:var(--tp-clip-margin)]",
-        // Only animate height while swapping views. Outside a swap the
-        // observer's height writes apply instantly, so self-animating content
-        // (e.g. an expanding error message) drives the single height tween and
-        // the panel follows it exactly instead of running a competing one.
-        isSwapping &&
-          "transition-[height] duration-(--tp-duration) ease-(--tp-ease)",
-        "motion-reduce:transition-none",
-        className,
-      )}
-    >
+    },
+    style: {
+      // Default duration for the height transition (on this element) and,
+      // in `slide` mode, the slide/opacity transition on view wrappers
+      // (which inherit the property). Consumer's inline style spreads
+      // after, so any `--tp-duration` they set wins.
+      "--tp-duration": "240ms",
+      // Crossfade (`fade` mode) duration. Defaults to the size-adaptive
+      // value the height observer writes to `--fade-duration`, falling
+      // back to `--tp-duration` before the first measurement. Because the
+      // consumer `style` spreads after, setting `--tp-fade-duration`
+      // pins the crossfade to a fixed duration (the observer writes
+      // `--fade-duration`, not this var, so it can't clobber an override).
+      "--tp-fade-duration": "var(--fade-duration, var(--tp-duration))",
+      // Easing for the height + slide transitions (`--tp-ease`) and the
+      // crossfade (`--tp-fade-ease`). Both overridable via `style` / CSS.
+      "--tp-ease": "cubic-bezier(0.32, 0.72, 0, 1)",
+      "--tp-fade-ease": "cubic-bezier(0.26, 0.08, 0.25, 1)",
+      // Bleed area for the overflow clip. Defaults to 0 because the
+      // recommended composition puts internal padding inside each
+      // view, so focus rings / shadows already render in safe
+      // territory. Bump (e.g. "8px") when the panel is nested inside
+      // a padded container where view content sits flush with the
+      // panel's clip edge.
+      "--tp-clip-margin": "0px",
+      ...style,
+    } as React.CSSProperties,
+    className: cn(
+      // `overflow-clip` (not `overflow-hidden`) so the browser doesn't
+      // treat this as a scrollable ancestor. `overflow: hidden` blocks
+      // visible scrollbars but still allows *programmatic* scrolling,
+      // which means `scrollIntoView` (fired when focus moves to a deep
+      // descendant via label click etc.) will scroll this container,
+      // shifting all content up and exposing any clipped bottom region.
+      // `overflow: clip` makes the element a true non-scroll container.
+      //
+      // `overflow-clip-margin` gives the clip box a bleed area so
+      // focus rings, drop shadows, and other decorations that extend
+      // just outside an element's box can still render. Defaults to
+      // 0 (see `--tp-clip-margin` above) because the recommended
+      // composition keeps decoration-bearing elements inside view
+      // padding, so they're already inside the clip box. Set it to a
+      // few pixels when the panel is nested inside a padded container
+      // where content sits flush with the clip edge.
+      //
+      // `contain-layout` scopes the height-driven layout work to this
+      // subtree so the browser can skip recalculating surrounding layouts.
+      // Side effect: this element becomes a containing block for `position:
+      // fixed` / `absolute` descendants. Unlikely to matter for typical
+      // panel content; flag if you put a viewport-positioned element here.
+      "overflow-clip contain-layout [overflow-clip-margin:var(--tp-clip-margin)]",
+      // Only animate height while swapping views. Outside a swap the
+      // observer's height writes apply instantly, so self-animating content
+      // (e.g. an expanding error message) drives the single height tween and
+      // the panel follows it exactly instead of running a competing one.
+      isSwapping &&
+        "transition-[height] duration-(--tp-duration) ease-(--tp-ease)",
+      "motion-reduce:transition-none",
+      className,
+    ),
+    children: (
       <div ref={setInnerRef} className="grid grid-cols-[minmax(0,1fr)]">
         <TransitionPanelContext value={contextValue}>
           {children}
         </TransitionPanelContext>
       </div>
-    </div>
-  );
+    ),
+  };
+
+  // `outerRef` (read by useAnimatedHeight's ResizeObserver) is composed with
+  // the consumer `ref` via the ref array. `render` lets consumers swap the
+  // root element or merge it with another component (Base UI convention).
+  return useRender({
+    defaultTagName: "div",
+    render,
+    ref: [outerRef, ref ?? null],
+    props: mergeProps<"div">(defaultProps, props),
+  });
 }
 
 TransitionPanel.displayName = "TransitionPanel";
@@ -514,10 +505,11 @@ function TransitionPanelView({
   viewKey,
   initialFocus = true,
   ref,
+  render,
   className,
   style,
   children,
-  ...rest
+  ...props
 }: TransitionPanelViewProps) {
   const ctx = React.use(TransitionPanelContext);
   if (!ctx) {
@@ -531,22 +523,6 @@ function TransitionPanelView({
   const isFade = transition === "fade";
   const wrapperRef = React.useRef<HTMLDivElement | null>(null);
 
-  // Compose the consumer `ref` with the internal `wrapperRef` used by
-  // `registerView`. Mirrors the pattern on `TransitionPanel` so callers
-  // can attach observers or imperatively measure the view wrapper without
-  // breaking the panel's own DOM reads.
-  const setWrapperRef = React.useCallback(
-    (node: HTMLDivElement | null) => {
-      wrapperRef.current = node;
-      if (typeof ref === "function") {
-        ref(node);
-      } else if (ref) {
-        (ref as React.RefObject<HTMLDivElement | null>).current = node;
-      }
-    },
-    [ref],
-  );
-
   // useLayoutEffect (not useEffect) so registration happens before the
   // panel's own layout-effect-driven focus move. React runs layout effects
   // child-to-parent, so a view that mounts in the same render as an
@@ -557,58 +533,60 @@ function TransitionPanelView({
     return registerView(viewKey, el, initialFocus);
   }, [viewKey, initialFocus, registerView]);
 
-  return (
-    <div
-      {...rest}
-      ref={setWrapperRef}
-      aria-hidden={!isActive}
-      inert={!isActive}
-      data-slot="transition-panel-view"
-      data-active={isActive ? "" : undefined}
-      data-viewkey={viewKey}
-      style={
-        {
-          // Consumer style spreads first so they can add their own
-          // properties (padding, background, custom CSS vars). The
-          // direction-aware slide vars override after — these are
-          // panel-controlled and change every render, so a consumer
-          // setting them would just break the slide animation. Unused in
-          // `fade` mode (the className doesn't reference them there).
-          ...style,
-          "--tp-enter": enterFrom,
-          "--tp-exit": exitTo,
-        } as React.CSSProperties
-      }
-      className={cn(
-        "[grid-area:1/1]",
-        // Per-mode transition: `slide` translates on --tp-duration with
-        // --tp-ease; `fade` scales + crossfades on --tp-fade-duration (which
-        // defaults to the size-adaptive --fade-duration) with --tp-fade-ease.
-        // All four vars are inherited from the root and overridable there.
-        isFade
-          ? "transition-[opacity,scale,display] duration-(--tp-fade-duration) ease-(--tp-fade-ease)"
-          : "transition-[opacity,translate,display] duration-(--tp-duration) ease-(--tp-ease)",
-        "transition-discrete",
-        "motion-reduce:transition-none",
-        mounted && "starting:opacity-0",
-        mounted &&
-          (isFade
-            ? "starting:scale-[0.96]"
-            : "starting:translate-x-(--tp-enter)"),
-        isActive
-          ? isFade
-            ? "scale-100 opacity-100"
-            : "translate-x-0 opacity-100"
-          : cn(
-              "pointer-events-none hidden opacity-0 contain-[size]",
-              isFade ? "scale-[0.96]" : "translate-x-(--tp-exit)",
-            ),
-        className,
-      )}
-    >
-      {children}
-    </div>
-  );
+  const defaultProps = {
+    "aria-hidden": !isActive,
+    inert: !isActive,
+    "data-slot": "transition-panel-view",
+    "data-active": isActive ? "" : undefined,
+    "data-viewkey": viewKey,
+    style: {
+      // Consumer style spreads first so they can add their own
+      // properties (padding, background, custom CSS vars). The
+      // direction-aware slide vars override after — these are
+      // panel-controlled and change every render, so a consumer
+      // setting them would just break the slide animation. Unused in
+      // `fade` mode (the className doesn't reference them there).
+      ...style,
+      "--tp-enter": enterFrom,
+      "--tp-exit": exitTo,
+    } as React.CSSProperties,
+    className: cn(
+      "[grid-area:1/1]",
+      // Per-mode transition: `slide` translates on --tp-duration with
+      // --tp-ease; `fade` scales + crossfades on --tp-fade-duration (which
+      // defaults to the size-adaptive --fade-duration) with --tp-fade-ease.
+      // All four vars are inherited from the root and overridable there.
+      isFade
+        ? "transition-[opacity,scale,display] duration-(--tp-fade-duration) ease-(--tp-fade-ease)"
+        : "transition-[opacity,translate,display] duration-(--tp-duration) ease-(--tp-ease)",
+      "transition-discrete",
+      "motion-reduce:transition-none",
+      mounted && "starting:opacity-0",
+      mounted &&
+        (isFade ? "starting:scale-[0.96]" : "starting:translate-x-(--tp-enter)"),
+      isActive
+        ? isFade
+          ? "scale-100 opacity-100"
+          : "translate-x-0 opacity-100"
+        : cn(
+            "pointer-events-none hidden opacity-0 contain-[size]",
+            isFade ? "scale-[0.96]" : "translate-x-(--tp-exit)",
+          ),
+      className,
+    ),
+    children,
+  };
+
+  // `wrapperRef` (read by the panel's registry / focus effect) is composed
+  // with the consumer `ref`. `render` lets a view be rendered as a semantic
+  // element or merged with another component (e.g. a Card) without an extra
+  // wrapper div.
+  return useRender({
+    defaultTagName: "div",
+    render,
+    ref: [wrapperRef, ref ?? null],
+    props: mergeProps<"div">(defaultProps, props),
+  });
 }
 
 TransitionPanelView.displayName = "TransitionPanelView";

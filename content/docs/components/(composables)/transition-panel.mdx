@@ -63,6 +63,14 @@ Outer container. Renders a `<div>` and accepts any native div prop (`id`, `role`
   Transition style. `"slide"` slides views horizontally and is direction-aware (forward enters from the right, back from the left). `"fade"` crossfades with a subtle `0.96 → 1` scale, is non-directional, and uses `--tp-fade-duration` for the opacity / scale (size-adaptive by default, so the fade speed tracks the height change).
 </ApiProp>
 
+<ApiProp
+  name="render"
+  fullType="ReactElement | ((props, state) => ReactElement)"
+  simpleType="element"
+>
+  Replace the root element or merge it with another component (Base UI's render-prop polymorphism). The internal height-measurement ref and the consumer `ref` are composed onto whatever element you render.
+</ApiProp>
+
 </ApiPropsList>
 
 ##### Data attributes
@@ -162,6 +170,14 @@ A single view registered with the parent panel. Renders a `<div>` and accepts an
   defaultValue="true"
 >
   What to focus when this view becomes active after a swap. `true` focuses the first tabbable element inside the view; `false` opts out; a ref focuses that specific element. Skipped on the initial render — the parent surface (popover, dialog, sheet, page) owns first-mount focus. Focus is applied with `{ preventScroll: true }` so the entrance animation can finish without scroll-jank.
+</ApiProp>
+
+<ApiProp
+  name="render"
+  fullType="ReactElement | ((props, state) => ReactElement)"
+  simpleType="element"
+>
+  Render the view as a different element or merge it with another component (e.g. a `Card`) instead of the default `<div>` wrapper. The registration ref and consumer `ref` are composed onto the rendered element.
 </ApiProp>
 
 </ApiPropsList>

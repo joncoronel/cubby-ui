@@ -115,6 +115,7 @@
         "@cubby-ui/popover",
         "@cubby-ui/preview-card",
         "@cubby-ui/progress",
+        "@cubby-ui/qr-code",
         "@cubby-ui/radio-group",
         "@cubby-ui/resizable",
         "@cubby-ui/scroll-area",
@@ -1309,6 +1310,89 @@
       ],
       "dependencies": [
         "class-variance-authority"
+      ]
+    },
+    {
+      "name": "qr-code",
+      "type": "registry:ui",
+      "title": "QR Code",
+      "description": "A from-scratch, zero-dependency QR code generator rendered as pure scalable SVG.",
+      "files": [
+        {
+          "path": "registry/default/qr-code/qr-code.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/qr-code/qr-code.tsx"
+        },
+        {
+          "path": "registry/default/qr-code/lib/bit-buffer.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/bit-buffer.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/encoder.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/encoder.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/export.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/export.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/galois.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/galois.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/index.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/index.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/mask.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/mask.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/matrix.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/matrix.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/mode.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/mode.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/path-builders.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/path-builders.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/reed-solomon.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/reed-solomon.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/rounded.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/rounded.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/svg-builder.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/svg-builder.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/tables.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/tables.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/types.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/types.ts"
+        }
       ]
     },
     {

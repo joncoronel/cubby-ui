@@ -384,6 +384,12 @@
     ],
     "reference": []
   },
+  "qr-code": {
+    "title": "QR Code",
+    "description": "A from-scratch, zero-dependency QR code generator rendered as pure scalable SVG.",
+    "dependencies": [],
+    "reference": []
+  },
   "radio-group": {
     "title": "Radio-group",
     "description": "A radio-group component.",

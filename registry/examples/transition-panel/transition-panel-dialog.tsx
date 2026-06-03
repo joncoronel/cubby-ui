@@ -28,11 +28,17 @@ import {
 } from "@/registry/default/field/field";
 import { Form } from "@/registry/default/form/form";
 import { Button } from "@/registry/default/button/button";
+import { QRCode } from "@/registry/default/qr-code/qr-code";
 
 type Step = "scan" | "verify" | "recovery";
 
 const MANUAL_CODE = "JBSW Y3DP EHPK 3PXP";
 const CORRECT_CODE = "123456";
+
+// otpauth URI the QR encodes — built from the same secret shown as the manual
+// code so the two stay in sync. A real app would generate the secret server-side.
+const OTP_SECRET = MANUAL_CODE.replace(/\s/g, "");
+const OTP_AUTH_URI = `otpauth://totp/Cubby%20UI:alex@example.com?secret=${OTP_SECRET}&issuer=Cubby%20UI`;
 
 const RECOVERY_CODES = [
   "a1b2c-3d4e5",
@@ -44,47 +50,6 @@ const RECOVERY_CODES = [
   "e1f2g-3h4i5",
   "j6k7l-8m9n0",
 ];
-
-// Decorative QR placeholder — a deterministic pattern with three finder
-// squares so it reads as a QR code without pulling in a generator dependency.
-function QrPlaceholder() {
-  const SIZE = 25;
-  const inBox = (x: number, y: number, ox: number, oy: number) =>
-    x >= ox && x < ox + 7 && y >= oy && y < oy + 7;
-  const finder = (x: number, y: number, ox: number, oy: number) => {
-    const lx = x - ox;
-    const ly = y - oy;
-    const ring = lx === 0 || ly === 0 || lx === 6 || ly === 6;
-    const core = lx >= 2 && lx <= 4 && ly >= 2 && ly <= 4;
-    return ring || core;
-  };
-
-  const cells: React.ReactElement[] = [];
-  for (let y = 0; y < SIZE; y++) {
-    for (let x = 0; x < SIZE; x++) {
-      let on: boolean;
-      if (inBox(x, y, 0, 0)) on = finder(x, y, 0, 0);
-      else if (inBox(x, y, SIZE - 7, 0)) on = finder(x, y, SIZE - 7, 0);
-      else if (inBox(x, y, 0, SIZE - 7)) on = finder(x, y, 0, SIZE - 7);
-      else on = (x * 3 + y * 7 + x * y) % 3 === 0;
-      if (on) {
-        cells.push(<rect key={`${x}-${y}`} x={x} y={y} width={1} height={1} />);
-      }
-    }
-  }
-
-  return (
-    <svg
-      viewBox={`0 0 ${SIZE} ${SIZE}`}
-      className="text-foreground size-48 [shape-rendering:crispEdges]"
-      fill="currentColor"
-      role="img"
-      aria-label="Authenticator setup QR code"
-    >
-      {cells}
-    </svg>
-  );
-}
 
 export default function TransitionPanelDialog() {
   const [open, setOpen] = React.useState(false);
@@ -149,7 +114,11 @@ export default function TransitionPanelDialog() {
                   Authenticator, 1Password, Authy, etc.
                 </p>
                 <div className="mt-6">
-                  <QrPlaceholder />
+                  <QRCode
+                    value={OTP_AUTH_URI}
+                    size={192}
+                    aria-label="Authenticator setup QR code"
+                  />
                 </div>
                 <p className="text-muted-foreground mt-6 text-sm">
                   Or enter this code manually

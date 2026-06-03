@@ -1,0 +1,188 @@
+---
+title: QR Code
+description: From-scratch, zero-dependency QR generator rendered as pure scalable SVG
+type: composable
+---
+
+import { QRCode } from "@/registry/default/qr-code/qr-code";
+
+## Preview
+
+<ComponentPreview component="qr-code" example="qr-code-branded" />
+
+## Installation
+
+<ComponentInstall component="qr-code" />
+
+## Usage
+
+<ComponentUsage component="qr-code" />
+
+## Examples
+
+### Dot styles
+
+`dotStyle` controls how data modules are drawn: `"square"` (default), `"circle"`, or `"rounded"`. The rounded style is neighbor-aware — runs of adjacent modules merge into continuous "snake" shapes while isolated modules become full dots.
+
+<ComponentPreview component="qr-code" example="qr-code-dot-styles" />
+
+### Custom finders
+
+The three finder patterns (the large corner "eyes") are styled independently from the data modules. Pass a single `finder` object to style all three, or a `[topLeft, topRight, bottomLeft]` tuple to style each. The outer ring and inner eye each take their own `style` and `color`.
+
+<ComponentPreview component="qr-code" example="qr-code-custom-finders" />
+
+### With a logo
+
+Pass a `logo` to embed an image (or any React element) in the center. The modules behind it are cleared and a quiet area is knocked out so the symbol stays scannable. When a logo is present the error correction level is automatically raised to `"H"` (≈30% recovery) unless you explicitly request `"Q"` or `"H"` yourself.
+
+<ComponentPreview component="qr-code" example="qr-code-with-logo" />
+
+### Export & download
+
+The component exposes an imperative handle via `ref` with `toSVGString()`, `toDataURL()`, and `getMatrix()`. `toDataURL()` renders PNG or JPEG through an offscreen canvas at export time (the display itself is always pure SVG), or returns a vector SVG data URL with `type: "svg"`.
+
+<ComponentPreview component="qr-code" example="qr-code-download" />
+
+## API Reference
+
+`QRCode` is an original composable — there is no underlying Base UI primitive. The QR encoder is implemented from scratch per ISO/IEC 18004, supporting Numeric, Alphanumeric, and Byte (UTF-8) modes across versions 1–40 and all four error correction levels, with automatic mode, version, and mask selection. The symbol is rendered entirely as SVG `<path>` elements, so it scales crisply at any size.
+
+### Props
+
+#### QRCode
+
+Renders an `<svg>` element and accepts any native SVG prop (`className`, `style`, `aria-*`, `data-*`, etc.) in addition to those below. The `ref` exposes a [`QRCodeHandle`](#qrcodehandle) rather than the DOM node.
+
+<ApiPropsList>
+
+<ApiProp name="value" fullType="string" required>
+  The data to encode — a URL, text, or any string.
+</ApiProp>
+
+<ApiProp
+  name="dotStyle"
+  fullType='"square" | "circle" | "rounded"'
+  simpleType="string"
+  defaultValue='"square"'
+>
+  Visual style of the data modules. `"rounded"` is the neighbor-connected "snake" style.
+</ApiProp>
+
+<ApiProp
+  name="ecLevel"
+  fullType='"L" | "M" | "Q" | "H"'
+  simpleType="string"
+  defaultValue='"M"'
+>
+  Error correction level (≈7% / 15% / 25% / 30% recovery). Automatically raised to `"H"` when a `logo` is set and a higher level was not requested. The encoder also boosts the level for free when the chosen version has spare capacity.
+</ApiProp>
+
+<ApiProp name="foreground" fullType="string" defaultValue='"currentColor"'>
+  Color of the dark modules. Defaults to `currentColor`, so it inherits the surrounding text color.
+</ApiProp>
+
+<ApiProp name="background" fullType="string" defaultValue='"transparent"'>
+  Background color. Omitted from the SVG entirely when transparent.
+</ApiProp>
+
+<ApiProp
+  name="finder"
+  fullType="QRFinderStyle | [QRFinderStyle, QRFinderStyle, QRFinderStyle]"
+  simpleType="object"
+>
+  Independent styling for the finder patterns. A single object styles all three; a tuple styles `[topLeft, topRight, bottomLeft]`. Each accepts `outerStyle`, `outerColor`, `innerStyle`, and `innerColor`.
+</ApiProp>
+
+<ApiProp
+  name="logo"
+  fullType="{ src: string; width?: number; height?: number; alt?: string } | React.ReactNode"
+  simpleType="node"
+>
+  A center logo. An object with `src` renders an `<image>` (serialized by `toSVGString()`); any other React node renders in a `<foreignObject>`.
+</ApiProp>
+
+<ApiProp name="logoSize" fullType="number" defaultValue="0.22">
+  Fraction of the symbol width occupied by the logo, clamped to a maximum of `0.3`.
+</ApiProp>
+
+<ApiProp name="logoPadding" fullType="number" defaultValue="1">
+  Quiet area, in modules, knocked out around the logo.
+</ApiProp>
+
+<ApiProp name="margin" fullType="number" defaultValue="4">
+  Quiet-zone width around the symbol, in modules.
+</ApiProp>
+
+<ApiProp name="minVersion" fullType="number">
+  Minimum QR version (1–40). The encoder still grows beyond this if the data requires it.
+</ApiProp>
+
+<ApiProp name="size" fullType="number | string">
+  Rendered pixel size, applied as the SVG `width`/`height`. The `viewBox` stays in module units, so the code scales independently.
+</ApiProp>
+
+<ApiProp name="ref" fullType="React.Ref<QRCodeHandle>">
+  Receives the imperative [`QRCodeHandle`](#qrcodehandle).
+</ApiProp>
+
+</ApiPropsList>
+
+#### QRCodeHandle
+
+The object exposed through `ref`.
+
+<ApiPropsList>
+
+<ApiProp name="toSVGString" fullType="() => string">
+  Returns the rendered SVG markup as a string. Identical to the on-screen output (React-element logos are not serialized).
+</ApiProp>
+
+<ApiProp
+  name="toDataURL"
+  fullType='(options?: { type?: "png" | "jpeg" | "svg"; quality?: number; pixelSize?: number }) => Promise<string>'
+  simpleType="function"
+>
+  Resolves to a data URL. PNG/JPEG rasterize via an offscreen canvas (`pixelSize` defaults to `1024`); `"svg"` returns a vector data URL with no canvas.
+</ApiProp>
+
+<ApiProp name="getMatrix" fullType="() => QRMatrix">
+  Returns the underlying encoded matrix (`{ size, modules, version, ecLevel, mode, maskPattern }`).
+</ApiProp>
+
+</ApiPropsList>
+
+### Utilities
+
+These named exports are framework-agnostic and tree-shakeable.
+
+<ApiPropsList>
+
+<ApiProp name="encode" fullType="(data: string, options?: EncodeOptions) => QRMatrix">
+  The standalone encoder. Returns the raw module matrix for custom rendering.
+</ApiProp>
+
+<ApiProp
+  name="toSVGString"
+  fullType="(options: QRExportOptions) => string"
+  simpleType="function"
+>
+  Pure, SSR-safe SVG string builder. Usable in route handlers, server components, and Node scripts.
+</ApiProp>
+
+<ApiProp
+  name="toDataURL"
+  fullType="(options: QRDataURLOptions & { value: string }) => Promise<string>"
+  simpleType="function"
+>
+  Standalone data URL generator. PNG/JPEG output requires a browser environment.
+</ApiProp>
+
+</ApiPropsList>
+
+### Notes
+
+- **Pure SVG.** The display is rendered entirely as SVG paths — no canvas and no raster images — so it stays sharp at any resolution. A canvas is used only momentarily inside `toDataURL()` to produce PNG/JPEG bytes.
+- **Logos and scannability.** Keep `logoSize` modest (≤ `0.3`) and prefer a light `background` behind the logo. The automatic `"H"` error correction compensates for the cleared center, but very large logos can still defeat a scanner.
+- **`toSVGString()` and React-element logos.** Image (`src`) logos are serialized into the string output; arbitrary React-element logos are not (only the knockout area is). Use an image logo when you need identical string/DOM output.
+- **Styling hook.** The root carries `data-slot="qr-code"`; `foreground` defaults to `currentColor` so the code themes with surrounding text.

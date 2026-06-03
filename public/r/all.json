@@ -54,6 +54,7 @@
     "@cubby-ui/popover",
     "@cubby-ui/preview-card",
     "@cubby-ui/progress",
+    "@cubby-ui/qr-code",
     "@cubby-ui/radio-group",
     "@cubby-ui/resizable",
     "@cubby-ui/scroll-area",

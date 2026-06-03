@@ -131,7 +131,11 @@ const TransitionPanelContext =
  * keyframe, `transition-discrete` for the `display: block ↔ none` swap of
  * inactive views, and CSS custom properties for direction-aware slide
  * values. Height animates via `useAnimatedHeight` (ResizeObserver writes a
- * pixel height onto the outer container, CSS transitions it).
+ * pixel height onto the outer container, CSS transitions it). The height
+ * transition is applied only while swapping views, so content that animates
+ * its own height inside the active view (an expanding error, an accordion,
+ * etc.) drives a single height tween and the panel tracks it exactly rather
+ * than running a second, competing transition.
  *
  * Compound component pattern: state is shared with `TransitionPanelView`
  * via `TransitionPanelContext`. Each view renders its own DOM and reads
@@ -288,10 +292,36 @@ function TransitionPanel({
   // reflect the new state in the committed render.
   const [previousKey, setPreviousKey] = React.useState(activeKey);
   const [renderedKey, setRenderedKey] = React.useState(activeKey);
+
+  // Gate the height transition so it only animates during a view swap. The
+  // height observer fires on *any* content size change (e.g. an error message
+  // expanding inside the active view), and we don't want the panel's own
+  // height transition to compete with an animation the content is already
+  // running — that produces two out-of-sync height tweens. When not swapping,
+  // the observer's pixel-height writes apply instantly, so the panel tracks
+  // self-animating content frame-for-frame instead of lagging behind it.
+  const [isSwapping, setIsSwapping] = React.useState(false);
   if (activeKey !== renderedKey) {
     setPreviousKey(renderedKey);
     setRenderedKey(activeKey);
+    setIsSwapping(true);
   }
+
+  // Clear the swap flag once the height transition has had time to finish.
+  // Re-derive the duration from `--tp-duration` so consumer overrides are
+  // respected; re-runs on each swap (activeKey dep) to reset the timer.
+  React.useEffect(() => {
+    if (!isSwapping) return;
+    const el = outerRef.current;
+    let ms = 240;
+    if (el) {
+      const raw = getComputedStyle(el).getPropertyValue("--tp-duration").trim();
+      const parsed = parseFloat(raw);
+      if (!Number.isNaN(parsed)) ms = raw.endsWith("ms") ? parsed : parsed * 1000;
+    }
+    const id = setTimeout(() => setIsSwapping(false), ms + 50);
+    return () => clearTimeout(id);
+  }, [isSwapping, activeKey, outerRef]);
 
   // Direction calculation from registry order (not from React.Children, so
   // views can be wrapped / conditional / Suspense-gated). On the very first
@@ -457,7 +487,12 @@ function TransitionPanel({
         // fixed` / `absolute` descendants. Unlikely to matter for typical
         // panel content; flag if you put a viewport-positioned element here.
         "overflow-clip contain-layout [overflow-clip-margin:var(--tp-clip-margin)]",
-        "transition-[height] duration-(--tp-duration) ease-(--tp-ease)",
+        // Only animate height while swapping views. Outside a swap the
+        // observer's height writes apply instantly, so self-animating content
+        // (e.g. an expanding error message) drives the single height tween and
+        // the panel follows it exactly instead of running a competing one.
+        isSwapping &&
+          "transition-[height] duration-(--tp-duration) ease-(--tp-ease)",
         "motion-reduce:transition-none",
         className,
       )}

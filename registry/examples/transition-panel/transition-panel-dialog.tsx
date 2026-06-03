@@ -151,10 +151,13 @@ export default function TransitionPanelDialog() {
                 <h2 className="mt-4 text-lg font-semibold tracking-tight">
                   Set Up Authenticator App
                 </h2>
+                {/* Field is a flex column to center its contents. The error
+                    slot needs `min-h-0` so its interpolate-size height tween
+                    isn't clamped by the flex item's automatic min-height. */}
                 <Field
                   name="code"
                   invalid={showError}
-                  className="mt-2 flex w-full flex-col items-center space-y-0"
+                  className="mt-2 flex flex-col items-center"
                 >
                   <FieldLabel className="sr-only">Verification code</FieldLabel>
                   <FieldDescription className="text-balance">
@@ -162,12 +165,9 @@ export default function TransitionPanelDialog() {
                     setup.
                   </FieldDescription>
                   <OTPField
-                    className="mt-6"
                     value={code}
                     onValueChange={(value) => {
                       setCode(value);
-                      // Clear the error as soon as the user edits the code so
-                      // the red state and message animate away before retry.
                       setShowError(false);
                     }}
                     length={6}
@@ -185,12 +185,10 @@ export default function TransitionPanelDialog() {
                       ))}
                     </OTPFieldGroup>
                   </OTPField>
-                  <FieldErrorSlot>
-                    {showError && (
-                      <FieldError match className="pt-2">
-                        That code isn&apos;t right. Try again.
-                      </FieldError>
-                    )}
+                  <FieldErrorSlot className="min-h-0">
+                    <FieldError match={showError} className="pt-2">
+                      That code isn&apos;t right. Try again.
+                    </FieldError>
                   </FieldErrorSlot>
                 </Field>
                 <div className="mt-6 flex justify-center gap-2">

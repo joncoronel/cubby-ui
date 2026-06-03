@@ -106,6 +106,10 @@ Wrap `FieldError` in `FieldErrorSlot` to smoothly animate the error's height and
   The height animation relies on CSS `interpolate-size: allow-keywords`, which at the time of writing is only supported in Chromium 129+ (Chrome, Edge, Arc, Brave). Safari and Firefox do not yet support it, so on those browsers the error appears/disappears instantly (opacity still cross-fades). The component still works; only the height tween is degraded.
 </Callout>
 
+<Callout type="warn">
+  Keep the slot in normal **block** flow. `interpolate-size` animates the slot's height from `0` to `auto`, but flex and grid items have an automatic `min-height: auto` that clamps them to their content's height — so the moment the error mounts the slot jumps straight to full height instead of animating. Don't put `display: flex`/`grid` on the `Field`; if you need to center or lay out the field's contents, wrap the inner controls (e.g. an OTP field) in their own flex container. If the slot genuinely must be a flex/grid item, give it `min-h-0` (`min-height: 0`) to remove the clamp.
+</Callout>
+
 ## API Reference
 
 The Field component is built on top of [Base UI's Field](https://base-ui.com/react/components/field). All Base UI props are supported.
@@ -192,7 +196,7 @@ An error message displayed when the field fails validation. Renders a `<div>` el
 
 Optional wrapper for `FieldError` that animates the error's height (via `interpolate-size`) and opacity on mount/unmount. When empty, uses a negative top margin to collapse to zero space, so there's no layout difference versus not using a slot at all. When switching between multiple match-specific `FieldError` components, the switch is instant (no cross-fade). Renders a `<div>` element.
 
-Assumes the parent `Field` uses the default `space-y-2` spacing. If you customize the Field's spacing, override the slot's margin classes to match.
+Assumes the parent `Field` uses the default `space-y-2` spacing. If you customize the Field's spacing, override the slot's margin classes to match. Keep the slot in block flow — flex/grid items have an automatic `min-height: auto` that clamps the slot to its content height and breaks the `interpolate-size` height tween (the error jumps instead of animating). Don't put `display: flex`/`grid` on the `Field`; if the slot must be a flex/grid item, add `min-h-0` to it.
 
 #### FieldItem
 

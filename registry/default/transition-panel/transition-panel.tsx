@@ -336,8 +336,6 @@ function TransitionPanel({
     ),
   };
 
-  // `useRender` composes the consumer ref (in `props`) with our `outerRef`
-  // (read by useAnimatedHeight); `render` lets consumers swap/merge the element.
   return useRender({
     defaultTagName: "div",
     render,
@@ -417,9 +415,6 @@ function TransitionPanelView({
     children,
   };
 
-  // `useRender` composes the consumer ref (in `props`) with our `wrapperRef`
-  // (read by the registry / focus effect); `render` lets a view be a semantic
-  // element or merged component (e.g. a Card) without an extra wrapper div.
   return useRender({
     defaultTagName: "div",
     render,

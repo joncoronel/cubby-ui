@@ -93,8 +93,6 @@ function MarchingBorder({
   const cycle = dash + gap;
   const pathLength = Math.max(cycle, Math.round(100 / cycle) * cycle);
 
-  // Compose the consumer `ref` with the internal `svgRef` (read by the
-  // ResizeObserver) so a forwarded ref works alongside the component's DOM reads.
   const setSvgRef = React.useCallback(
     (node: SVGSVGElement | null) => {
       svgRef.current = node;

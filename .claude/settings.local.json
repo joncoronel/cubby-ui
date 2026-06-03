@@ -140,7 +140,11 @@
       "Bash(echo \"browser UA: $\\(agent-browser eval \"navigator.userAgent\" 2>&1\\)\")",
       "Bash(echo \"tsc total: $\\(npx tsc --noEmit 2>&1)",
       "Bash(echo \"eslint exit: $?\")",
-      "Bash(agent-browser close *)"
+      "Bash(agent-browser close *)",
+      "Bash(grep -cE '^-\\\\s*\\(//|\\\\*|/\\\\*\\\\*|\\\\*/\\)')",
+      "Bash(xargs -I{} echo \"comment lines removed: {}\")",
+      "Bash(grep -cE '^\\\\+\\\\s*\\(//|\\\\*|/\\\\*\\\\*|\\\\*/\\)')",
+      "Bash(xargs -I{} echo \"comment lines added: {}\")"
     ],
     "deny": []
   }

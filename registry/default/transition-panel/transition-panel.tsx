@@ -317,7 +317,8 @@ function TransitionPanel({
     if (el) {
       const raw = getComputedStyle(el).getPropertyValue("--tp-duration").trim();
       const parsed = parseFloat(raw);
-      if (!Number.isNaN(parsed)) ms = raw.endsWith("ms") ? parsed : parsed * 1000;
+      if (!Number.isNaN(parsed))
+        ms = raw.endsWith("ms") ? parsed : parsed * 1000;
     }
     const id = setTimeout(() => setIsSwapping(false), ms + 50);
     return () => clearTimeout(id);

@@ -203,7 +203,6 @@ const TransitionPanelContext =
 function TransitionPanel({
   activeKey,
   transition = "slide",
-  ref,
   render,
   className,
   style,
@@ -494,7 +493,9 @@ function TransitionPanel({
   return useRender({
     defaultTagName: "div",
     render,
-    ref: [outerRef, ref ?? null],
+    // React 19: the consumer ref is already in `props`; `useRender` composes
+    // it with our internal `outerRef` (read by useAnimatedHeight).
+    ref: outerRef,
     props: mergeProps<"div">(defaultProps, props),
   });
 }
@@ -504,7 +505,6 @@ TransitionPanel.displayName = "TransitionPanel";
 function TransitionPanelView({
   viewKey,
   initialFocus = true,
-  ref,
   render,
   className,
   style,
@@ -584,7 +584,9 @@ function TransitionPanelView({
   return useRender({
     defaultTagName: "div",
     render,
-    ref: [wrapperRef, ref ?? null],
+    // React 19: the consumer ref is already in `props`; `useRender` composes
+    // it with our internal `wrapperRef` (read by the registry / focus effect).
+    ref: wrapperRef,
     props: mergeProps<"div">(defaultProps, props),
   });
 }

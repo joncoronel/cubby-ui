@@ -50,16 +50,20 @@ function buildRoundedRectPath(
   const top = inset;
   const right = inset + innerW;
   const bottom = inset + innerH;
+  // Round to 2 decimals to keep the `d` attribute compact. 0.01px is well
+  // below a visible subpixel, so corner alignment with the parent's
+  // border-radius is unaffected.
+  const f = (n: number) => Math.round(n * 100) / 100;
   return [
-    `M ${left + innerW / 2} ${top}`,
-    `L ${right - r} ${top}`,
-    `A ${r} ${r} 0 0 1 ${right} ${top + r}`,
-    `L ${right} ${bottom - r}`,
-    `A ${r} ${r} 0 0 1 ${right - r} ${bottom}`,
-    `L ${left + r} ${bottom}`,
-    `A ${r} ${r} 0 0 1 ${left} ${bottom - r}`,
-    `L ${left} ${top + r}`,
-    `A ${r} ${r} 0 0 1 ${left + r} ${top}`,
+    `M ${f(left + innerW / 2)} ${f(top)}`,
+    `L ${f(right - r)} ${f(top)}`,
+    `A ${f(r)} ${f(r)} 0 0 1 ${f(right)} ${f(top + r)}`,
+    `L ${f(right)} ${f(bottom - r)}`,
+    `A ${f(r)} ${f(r)} 0 0 1 ${f(right - r)} ${f(bottom)}`,
+    `L ${f(left + r)} ${f(bottom)}`,
+    `A ${f(r)} ${f(r)} 0 0 1 ${f(left)} ${f(bottom - r)}`,
+    `L ${f(left)} ${f(top + r)}`,
+    `A ${f(r)} ${f(r)} 0 0 1 ${f(left + r)} ${f(top)}`,
     "Z",
   ].join(" ");
 }

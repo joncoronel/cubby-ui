@@ -88,7 +88,11 @@ function QRCode({
   const hasLogo = logo != null && logo !== false;
   const elementLogo = hasLogo && !imageLogo;
   const resolvedEcLevel = resolveEcLevel(ecLevel, hasLogo);
-  const accessibleTitle = title ?? value;
+  // A consumer marking the code decorative (`aria-hidden`) shouldn't get an
+  // auto-filled accessible name from `value`.
+  const isDecorative =
+    props["aria-hidden"] === true || props["aria-hidden"] === "true";
+  const accessibleTitle = isDecorative ? title : (title ?? value);
 
   // Encoding is the expensive step (8-mask penalty scoring), so it is memoized
   // separately on primitive deps — style and logo changes never re-encode.
@@ -160,8 +164,8 @@ function QRCode({
         <rect width={model.viewBox} height={model.viewBox} fill={model.background} />
       ) : null}
       {model.dataPath ? <path d={model.dataPath} fill={model.foreground} /> : null}
-      {model.finders.map((f, i) => (
-        <React.Fragment key={i}>
+      {model.finders.map((f) => (
+        <React.Fragment key={f.id}>
           <path d={f.outerPath} fill={f.outerColor} fillRule="evenodd" />
           <path d={f.innerPath} fill={f.innerColor} />
         </React.Fragment>

@@ -28,9 +28,13 @@ const DEFAULT_DOT_STYLE: QRDotStyle = "square";
 const DEFAULT_LOGO_SIZE = 0.22;
 const MAX_LOGO_SIZE = 0.3;
 const DEFAULT_LOGO_PADDING = 1;
+/** Corner ids in `finderOrigins` order: top-left, top-right, bottom-left. */
+const FINDER_IDS = ["tl", "tr", "bl"] as const;
 
 /** A resolved finder pattern: outer ring and inner eye, with paths and colors. */
 export interface FinderRender {
+  /** Corner identity (top-left, top-right, bottom-left) — a stable React key. */
+  id: "tl" | "tr" | "bl";
   outerPath: string;
   outerColor: string;
   innerPath: string;
@@ -187,6 +191,7 @@ export function buildRenderModel(
       crisp = false;
     }
     return {
+      id: FINDER_IDS[i],
       outerPath: buildFinderOuter(fx, fy, margin, resolved.outerStyle),
       outerColor: resolved.outerColor,
       innerPath: buildFinderInner(fx, fy, margin, resolved.innerStyle),
@@ -250,7 +255,9 @@ export function serializeModel(
     const k = model.knockout;
     svg += `<rect x="${k.x}" y="${k.y}" width="${k.size}" height="${k.size}" fill="${escapeAttr(k.color)}"/>`;
   }
-  if (model.image) {
+  // Element logos carry no `href` (they render as a live <foreignObject> and
+  // can't be serialized), so skip emitting an empty <image> on export.
+  if (model.image && model.image.href) {
     const img = model.image;
     const alt = img.alt ? ` aria-label="${escapeAttr(img.alt)}"` : "";
     svg +=

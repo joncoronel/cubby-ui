@@ -120,13 +120,16 @@ export async function matrixToDataURL(
   return rasterize(svg, { type, quality: options.quality, pixelSize });
 }
 
+const INLINE_URL_RE = /^(data:|blob:)/i;
+const ABSOLUTE_URL_RE = /^[a-z]+:\/\//i;
+
 /** Whether a logo `src` points to a different origin (and is not inlined). */
 function isCrossOriginUrl(src: string): boolean {
-  if (/^(data:|blob:)/i.test(src)) {
+  if (INLINE_URL_RE.test(src)) {
     return false;
   }
   if (typeof location === "undefined") {
-    return /^[a-z]+:\/\//i.test(src);
+    return ABSOLUTE_URL_RE.test(src);
   }
   try {
     return new URL(src, location.href).origin !== location.origin;

@@ -122,7 +122,6 @@
         "@cubby-ui/select",
         "@cubby-ui/separator",
         "@cubby-ui/sheet",
-        "@cubby-ui/sidebar",
         "@cubby-ui/skeleton",
         "@cubby-ui/slider",
         "@cubby-ui/switch",
@@ -1498,32 +1497,6 @@
         "@cubby-ui/button",
         "@cubby-ui/scroll-area",
         "@cubby-ui/elevated"
-      ],
-      "dependencies": [
-        "class-variance-authority",
-        "@hugeicons/react",
-        "@hugeicons/core-free-icons"
-      ]
-    },
-    {
-      "name": "sidebar",
-      "type": "registry:ui",
-      "title": "Sidebar",
-      "description": "A sidebar component.",
-      "files": [
-        {
-          "path": "registry/default/sidebar/sidebar.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/cubby-ui/sidebar.tsx"
-        }
-      ],
-      "registryDependencies": [
-        "@cubby-ui/button",
-        "@cubby-ui/input",
-        "@cubby-ui/separator",
-        "@cubby-ui/sheet",
-        "@cubby-ui/skeleton",
-        "@cubby-ui/tooltip"
       ],
       "dependencies": [
         "class-variance-authority",

@@ -61,7 +61,6 @@
     "@cubby-ui/select",
     "@cubby-ui/separator",
     "@cubby-ui/sheet",
-    "@cubby-ui/sidebar",
     "@cubby-ui/skeleton",
     "@cubby-ui/slider",
     "@cubby-ui/switch",

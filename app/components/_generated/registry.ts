@@ -1225,27 +1225,6 @@ export const componentMetadata = {
     "examples": {},
     "reference": []
   },
-  "sidebar": {
-    "name": "sidebar",
-    "title": "Sidebar",
-    "description": "A sidebar component.",
-    "category": "UI",
-    "registryDependencies": [
-      "@cubby-ui/button",
-      "@cubby-ui/input",
-      "@cubby-ui/separator",
-      "@cubby-ui/sheet",
-      "@cubby-ui/skeleton",
-      "@cubby-ui/tooltip"
-    ],
-    "dependencies": [
-      "class-variance-authority",
-      "@hugeicons/react",
-      "@hugeicons/core-free-icons"
-    ],
-    "examples": {},
-    "reference": []
-  },
   "skeleton": {
     "name": "skeleton",
     "title": "Skeleton",
@@ -3809,7 +3788,7 @@ export const exampleRegistry = {
     {
       "title": "Basic",
       "importPath": "transition-panel-basic",
-      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  TransitionPanel,\n  TransitionPanelView,\n} from \"@/components/ui/cubby-ui/transition-panel\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Input } from \"@/components/ui/cubby-ui/input\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\nimport { solidSurface } from \"@/registry/default/lib/elevated\";\nimport { cn } from \"@/lib/utils\";\n\ntype Step = \"email\" | \"code\" | \"done\";\n\nexport default function TransitionPanelBasic() {\n  const [step, setStep] = React.useState<Step>(\"email\");\n\n  return (\n    <TransitionPanel\n      activeKey={step}\n      className={cn(\"w-[360px] rounded-xl\", solidSurface(3, 3))}\n    >\n      <TransitionPanelView viewKey=\"email\">\n        <div className=\"space-y-3 p-4\">\n          <div className=\"space-y-1\">\n            <h3 className=\"text-base font-semibold\">Sign in</h3>\n            <p className=\"text-muted-foreground text-sm\">\n              Enter your email to receive a code.\n            </p>\n          </div>\n          <div className=\"space-y-1.5\">\n            <Label htmlFor=\"tp-email\">Email</Label>\n            <Input id=\"tp-email\" type=\"email\" placeholder=\"you@example.com\" />\n          </div>\n          <Button className=\"w-full\" onClick={() => setStep(\"code\")}>\n            Continue\n          </Button>\n        </div>\n      </TransitionPanelView>\n\n      <TransitionPanelView viewKey=\"code\">\n        <div className=\"space-y-3 p-4\">\n          <div className=\"space-y-1\">\n            <h3 className=\"text-base font-semibold\">Check your email</h3>\n            <p className=\"text-muted-foreground text-sm\">\n              We sent a 6-digit code. Paste it below.\n            </p>\n          </div>\n          <div className=\"space-y-1.5\">\n            <Label htmlFor=\"tp-code\">Verification code</Label>\n            <Input id=\"tp-code\" inputMode=\"numeric\" placeholder=\"123456\" />\n          </div>\n          <div className=\"flex gap-2\">\n            <Button\n              variant=\"outline\"\n              className=\"flex-1\"\n              onClick={() => setStep(\"email\")}\n            >\n              Back\n            </Button>\n            <Button className=\"flex-1\" onClick={() => setStep(\"done\")}>\n              Verify\n            </Button>\n          </div>\n        </div>\n      </TransitionPanelView>\n\n      <TransitionPanelView viewKey=\"done\">\n        <div className=\"space-y-3 p-4\">\n          <div className=\"space-y-1\">\n            <h3 className=\"text-base font-semibold\">You&apos;re in</h3>\n            <p className=\"text-muted-foreground text-sm\">\n              Welcome back. Heading to your dashboard.\n            </p>\n          </div>\n          <Button\n            variant=\"outline\"\n            className=\"w-full\"\n            onClick={() => setStep(\"email\")}\n          >\n            Start over\n          </Button>\n        </div>\n      </TransitionPanelView>\n    </TransitionPanel>\n  );\n}\n"
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  TransitionPanel,\n  TransitionPanelView,\n} from \"@/components/ui/cubby-ui/transition-panel\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Input } from \"@/components/ui/cubby-ui/input\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\nimport { solidSurface } from \"@/registry/default/lib/elevated\";\nimport { cn } from \"@/lib/utils\";\n\ntype Step = \"email\" | \"code\" | \"done\";\n\nexport default function TransitionPanelBasic() {\n  const [step, setStep] = React.useState<Step>(\"email\");\n\n  return (\n    <TransitionPanel\n      activeKey={step}\n      className={cn(\"w-[360px] rounded-xl\", solidSurface(3, 3))}\n      style={{ \"--tp-duration\": \"1000ms\" } as React.CSSProperties}\n    >\n      <TransitionPanelView viewKey=\"email\">\n        <div className=\"space-y-3 p-4\">\n          <div className=\"space-y-1\">\n            <h3 className=\"text-base font-semibold\">Sign in</h3>\n            <p className=\"text-muted-foreground text-sm\">\n              Enter your email to receive a code.\n            </p>\n          </div>\n          <div className=\"space-y-1.5\">\n            <Label htmlFor=\"tp-email\">Email</Label>\n            <Input id=\"tp-email\" type=\"email\" placeholder=\"you@example.com\" />\n          </div>\n          <Button className=\"w-full\" onClick={() => setStep(\"code\")}>\n            Continue\n          </Button>\n        </div>\n      </TransitionPanelView>\n\n      <TransitionPanelView viewKey=\"code\">\n        <div className=\"space-y-3 p-4\">\n          <div className=\"space-y-1\">\n            <h3 className=\"text-base font-semibold\">Check your email</h3>\n            <p className=\"text-muted-foreground text-sm\">\n              We sent a 6-digit code. Paste it below.\n            </p>\n          </div>\n          <div className=\"space-y-1.5\">\n            <Label htmlFor=\"tp-code\">Verification code</Label>\n            <Input id=\"tp-code\" inputMode=\"numeric\" placeholder=\"123456\" />\n          </div>\n          <div className=\"flex gap-2\">\n            <Button\n              variant=\"outline\"\n              className=\"flex-1\"\n              onClick={() => setStep(\"email\")}\n            >\n              Back\n            </Button>\n            <Button className=\"flex-1\" onClick={() => setStep(\"done\")}>\n              Verify\n            </Button>\n          </div>\n        </div>\n      </TransitionPanelView>\n\n      <TransitionPanelView viewKey=\"done\">\n        <div className=\"space-y-3 p-4\">\n          <div className=\"space-y-1\">\n            <h3 className=\"text-base font-semibold\">You&apos;re in</h3>\n            <p className=\"text-muted-foreground text-sm\">\n              Welcome back. Heading to your dashboard.\n            </p>\n          </div>\n          <Button\n            variant=\"outline\"\n            className=\"w-full\"\n            onClick={() => setStep(\"email\")}\n          >\n            Start over\n          </Button>\n        </div>\n      </TransitionPanelView>\n    </TransitionPanel>\n  );\n}\n"
     },
     {
       "title": "Crossfade",
@@ -4548,10 +4527,6 @@ export const componentAnatomy = {
   "sheet": {
     "imports": "import {\n  Sheet,\n  SheetBody,\n  SheetContent,\n  SheetHeader,\n  SheetTitle,\n  SheetTrigger,\n} from \"@/components/ui/cubby-ui/sheet\";",
     "anatomy": "<Sheet>\n  <SheetTrigger />\n  <SheetContent>\n    <SheetHeader>\n      <SheetTitle />\n    </SheetHeader>\n    <SheetBody />\n  </SheetContent>\n</Sheet>"
-  },
-  "sidebar": {
-    "imports": "import {\n  Sidebar,\n  SidebarContent,\n  SidebarFooter,\n  SidebarGroup,\n  SidebarGroupAction,\n  SidebarGroupContent,\n  SidebarGroupLabel,\n  SidebarHeader,\n  SidebarInput,\n  SidebarInset,\n  SidebarMenu,\n  SidebarMenuAction,\n  SidebarMenuBadge,\n  SidebarMenuButton,\n  SidebarMenuItem,\n  SidebarMenuSkeleton,\n  SidebarMenuSub,\n  SidebarMenuSubButton,\n  SidebarMenuSubItem,\n  SidebarProvider,\n  SidebarRail,\n  SidebarSeparator,\n  SidebarTrigger\n} from \"@/components/ui/cubby-ui/sidebar\"",
-    "anatomy": "<Sidebar>\n  {/* Your content */}\n</Sidebar>"
   },
   "skeleton": {
     "imports": "import { Skeleton } from \"@/components/ui/cubby-ui/skeleton\";",

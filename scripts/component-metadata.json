@@ -438,16 +438,6 @@
     ],
     "reference": []
   },
-  "sidebar": {
-    "title": "Sidebar",
-    "description": "A sidebar component.",
-    "dependencies": [
-      "@base-ui/react",
-      "class-variance-authority",
-      "lucide-react"
-    ],
-    "reference": []
-  },
   "skeleton": {
     "title": "Skeleton",
     "description": "A skeleton component.",

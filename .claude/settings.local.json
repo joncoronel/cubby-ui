@@ -144,7 +144,10 @@
       "Bash(grep -cE '^-\\\\s*\\(//|\\\\*|/\\\\*\\\\*|\\\\*/\\)')",
       "Bash(xargs -I{} echo \"comment lines removed: {}\")",
       "Bash(grep -cE '^\\\\+\\\\s*\\(//|\\\\*|/\\\\*\\\\*|\\\\*/\\)')",
-      "Bash(xargs -I{} echo \"comment lines added: {}\")"
+      "Bash(xargs -I{} echo \"comment lines added: {}\")",
+      "Bash(grep -iE \"\\\\.tsx?$|\\\\.ts$\")",
+      "Bash(awk '/^[A-Za-z]:\\\\\\\\|^\\\\//{f=$0} /error/{print f\"  ::  \"$0}')",
+      "Bash(awk '/^C:\\\\\\\\/{f=$0; sub\\(/.*cubby-ui\\\\\\\\/,\"\",f\\)} / error/{print f\"  ::  \"$2\"  \"$0}')"
     ],
     "deny": []
   }

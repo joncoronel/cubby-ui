@@ -22,21 +22,21 @@ import { TransitionPanel, TransitionPanelView } from "@/registry/default/transit
 
 ### Crossfade
 
-Set `transition="fade"` to swap views with a non-directional crossfade (opacity plus a subtle `0.96 → 1` scale) instead of a slide. Useful for in-place content swaps — dialogs, popovers, settings panels — where a directional slide would feel out of place. The container's height still animates as the active view's content size changes, and the opacity duration adapts to the size change so a short-to-short swap fades faster than a short-to-tall one.
+Set `transition="fade"` to swap views with a non-directional crossfade (opacity plus a subtle `0.96 → 1` scale) instead of a slide. Good for in-place swaps like dialogs, popovers, or settings panels, where a directional slide feels out of place. Height still animates as the active view's content size changes, and the fade duration adapts to that change, so a short-to-short swap fades faster than a short-to-tall one.
 
 <ComponentPreview component="transition-panel" example="transition-panel-crossfade" />
 
 ### Multi-step dialog
 
-A real-world composition: a multi-step authenticator-setup wizard inside a [Dialog](/docs/components/dialog). Each step lives in its own `TransitionPanelView` — including the icon, title, and description — so the whole surface crossfades and the dialog grows or shrinks to fit the active step. The verify step auto-focuses the [Input OTP](/docs/components/input-otp) field because focus moves to the first tabbable element of the newly active view on each swap.
+A multi-step authenticator-setup wizard inside a [Dialog](/docs/components/dialog). Each step (icon, title, and description included) lives in its own `TransitionPanelView`, so the whole surface crossfades and the dialog grows or shrinks to fit the active step. The verify step auto-focuses the [Input OTP](/docs/components/input-otp) field, since focus moves to the first tabbable element of the newly active view on each swap.
 
 <ComponentPreview component="transition-panel" example="transition-panel-dialog" />
 
 ## API Reference
 
-`TransitionPanel` is a pure-CSS compound component — there is no underlying Base UI primitive. Views register themselves through context, so `TransitionPanelView` does not need to be a direct child: wrappers, fragments, conditional rendering, and Suspense boundaries are all supported.
+`TransitionPanel` is a pure-CSS compound component with no underlying Base UI primitive. Views register through context, so `TransitionPanelView` doesn't need to be a direct child. Wrappers, fragments, conditional rendering, and Suspense boundaries all work.
 
-The entrance animation uses `@starting-style`; older browsers that lack it degrade to an instant swap with no slide — no broken state, just no motion. The exit defers `display:none` via `transition-behavior: allow-discrete` in browsers that honor it (Chrome, Safari) and falls back to a JS-deferred hide in Firefox (which doesn't honor `allow-discrete` on the way out), so the exit animation works in every modern engine. The component also respects `prefers-reduced-motion`.
+The entrance animation uses `@starting-style`. Browsers that lack it fall back to an instant swap with no slide, which is harmless: no broken state, just no motion. The exit defers `display:none` with `transition-behavior: allow-discrete` where it's honored (Chrome, Safari) and uses a JS-deferred hide in Firefox (which doesn't honor `allow-discrete` on exit), so the exit animation runs in every modern engine. The component also respects `prefers-reduced-motion`.
 
 ### Props
 
@@ -152,7 +152,7 @@ Set on the root and inherited by view wrappers. Override via the `style` prop or
 
 #### TransitionPanelView
 
-A single view registered with the parent panel. Renders a `<div>` and accepts any native div prop (`className`, `style`, `id`, `aria-label`, `aria-labelledby`, `ref`, `data-*`, etc.) in addition to those documented below — spread props land on the view wrapper. The consumer `ref` is composed with the internal ref used for registration with the parent panel. Visibility, slide offset, and `inert` state are driven by the parent's `activeKey`. Inactive views stay mounted (their internal state survives swaps) but are marked `inert` and `aria-hidden` so focus and assistive tech skip them.
+A single view registered with the parent panel. Renders a `<div>` and accepts any native div prop (`className`, `style`, `id`, `aria-label`, `aria-labelledby`, `ref`, `data-*`, etc.) alongside those documented below; spread props land on the view wrapper. The consumer `ref` is composed with the internal ref used for registration. Visibility, slide offset, and `inert` state come from the parent's `activeKey`. Inactive views stay mounted (their internal state survives swaps) but are marked `inert` and `aria-hidden` so focus and assistive tech skip them.
 
 <ApiPropsList>
 
@@ -169,7 +169,7 @@ A single view registered with the parent panel. Renders a `<div>` and accepts an
   fullType="boolean | React.RefObject<HTMLElement | null>"
   defaultValue="true"
 >
-  What to focus when this view becomes active after a swap. `true` focuses the first tabbable element inside the view; `false` opts out; a ref focuses that specific element. Skipped on the initial render — the parent surface (popover, dialog, sheet, page) owns first-mount focus. Focus is applied with `{ preventScroll: true }` so the entrance animation can finish without scroll-jank.
+  What to focus when this view becomes active after a swap. `true` focuses the first tabbable element inside the view, `false` opts out, and a ref focuses that specific element. Skipped on the initial render, since the parent surface (popover, dialog, sheet, page) owns first-mount focus. Focus uses `{ preventScroll: true }` so the entrance animation can finish without scroll-jank.
 </ApiProp>
 
 <ApiProp
@@ -211,7 +211,7 @@ A single view registered with the parent panel. Renders a `<div>` and accepts an
 
 ### Notes
 
-- **Composability.** Views can be wrapped in HOCs, fragments, error boundaries, Suspense boundaries, or rendered via `.map()` and conditional logic — registration routes through context, not React children.
+- **Composability.** Views can be wrapped in HOCs, fragments, error boundaries, or Suspense boundaries, or rendered via `.map()` and conditional logic. Registration routes through context, not React children.
 - **Direction inference.** Direction is computed by comparing the new and previous `activeKey` against the registered view order, so back-navigation slides the opposite way automatically. Re-deriving from DOM position on each registration means a view that unmounts and remounts (e.g. `{isPro && <TransitionPanelView ...>}`) keeps its source-order slot.
 - **Focus management.** Focus moves in a `useLayoutEffect`, before the browser paints, to minimize the gap between the outgoing view becoming `inert` and the incoming view receiving focus.
-- **Height animation.** Animates the real `height` property (via `ResizeObserver`) rather than `transform: scale`, so descendant layout doesn't warp. The transition runs **only while swapping views** — content that animates its own height inside the active view (an expanding error, an accordion) drives a single height tween that the panel tracks exactly, instead of the panel running a second, competing one. Acceptable for typical panel use cases; if you need compositor-only height animation for a high-frequency surface, fork to a Motion / FLIP implementation.
+- **Height animation.** Animates the real `height` property (via `ResizeObserver`) rather than `transform: scale`, so descendant layout doesn't warp. The transition runs **only while swapping views**, so content that animates its own height inside the active view (an expanding error, an accordion) drives a single height tween the panel tracks exactly, instead of the panel running a second, competing one. That's fine for typical panels. If you need compositor-only height animation for a high-frequency surface, fork to a Motion / FLIP implementation.

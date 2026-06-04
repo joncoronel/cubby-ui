@@ -17,8 +17,8 @@ type TransitionPanelProps = useRender.ComponentProps<"div"> & {
    * Transition style (default `"slide"`):
    *  - `"slide"`: direction-aware horizontal slide (forward from the right,
    *    back from the left).
-   *  - `"fade"`: non-directional crossfade with a subtle scale (`0.96 → 1`),
-   *    duration adapting to the height change via `--tp-fade-duration`.
+   *  - `"fade"`: non-directional crossfade with a subtle scale from `0.96` to
+   *    `1`, duration adapting to the height change via `--tp-fade-duration`.
    */
   transition?: "slide" | "fade";
 };
@@ -40,9 +40,9 @@ type TransitionPanelViewProps = useRender.ComponentProps<"div"> & {
 
 const SLIDE_DISTANCE = "18%";
 
-// Tabbable candidate set, mirroring Base UI (minus niche cases like `iframe` /
-// `object` / media-with-controls — pass an explicit `initialFocus` ref there).
-// Includes `[contenteditable]` for rich-text surfaces; excludes hidden inputs.
+// Tabbable candidate set, mirroring Base UI. Skips niche cases (iframe, object,
+// media with controls); pass an explicit `initialFocus` ref for those. Includes
+// `[contenteditable]` for rich-text surfaces, and excludes hidden inputs.
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"]), [contenteditable]:not([contenteditable="false"])';
 
@@ -67,24 +67,48 @@ type TransitionPanelContextValue = {
 const TransitionPanelContext =
   React.createContext<TransitionPanelContextValue | null>(null);
 
-// Why CSS over Motion: the height animation drives the real `height` property
-// (layout per frame), which is fine for the typical isolated, brief, small-area
-// panel swap. A Motion `layout` approach would animate via transform (compositor
-// only) but adds ~25–30kb to every consumer and FLIP edge cases on rapid swaps —
-// not worth it as a design-system default. Reach for Motion in a fork if a
-// high-frequency / large-surface use case ever measures the difference.
+// Does the browser defer `display: block` to `none` until the exit transition
+// finishes (via `transition-behavior: allow-discrete`)? Chrome and Safari do.
+// Firefox parses `allow-discrete` (it shows up in computed style) but still
+// flips `display:none` instantly, killing the exit animation. There's no
+// `@supports` query that catches this (Firefox claims support), so we sniff the
+// UA. When this returns false the exit runs through a JS deferred-hide instead
+// (see `TransitionPanelView`). Entering works everywhere regardless: it uses
+// `@starting-style`, not the discrete exit.
+function supportsDiscreteDisplayExit(): boolean {
+  if (typeof navigator === "undefined") return true; // SSR: assume the CSS path
+  return !/firefox/i.test(navigator.userAgent);
+}
+
+function useCssExitSupported(): boolean {
+  // Start as `true` so SSR and the first client render agree (both take the CSS
+  // path, and inactive views are `display:none` either way so nothing flashes).
+  // Correct it after mount, which happens before any swap can fire.
+  const [supported, setSupported] = React.useState(true);
+  React.useEffect(() => {
+    setSupported(supportsDiscreteDisplayExit());
+  }, []);
+  return supported;
+}
+
+// Why CSS instead of Motion: the height animation drives the real `height`
+// property (layout per frame), which is fine for the typical isolated, brief,
+// small-area panel swap. A Motion `layout` approach animates via transform
+// (compositor only) but adds ~25-30kb to every consumer plus FLIP edge cases on
+// rapid swaps. Not worth it as a design-system default. Reach for Motion in a
+// fork if a high-frequency or large-surface case ever proves it's needed.
 
 /**
  * Animated swap between N named views, in two styles: `slide` (default,
  * direction-aware horizontal slide) and `fade` (non-directional crossfade with
- * a subtle `0.96 → 1` scale). Pure CSS — no Motion — using `@starting-style`,
+ * a subtle scale from `0.96` to `1`). Pure CSS, no Motion: `@starting-style`,
  * `transition-discrete` for the `display` swap, and CSS custom properties.
  * Height animates via `useAnimatedHeight`, gated to swaps only so content that
  * animates its own height isn't fought by a competing tween.
  *
  * Compound component: `TransitionPanelView` children share state through
  * `TransitionPanelContext` and register themselves via `registerView`. Views
- * needn't be direct children — HOCs, fragments, Suspense, and conditional /
+ * needn't be direct children. HOCs, fragments, Suspense, and conditional or
  * mapped renderings all route through context, and registration re-derives view
  * order from DOM position so a remounted view keeps its source-order slot.
  *
@@ -98,19 +122,20 @@ const TransitionPanelContext =
  *
  * CSS custom properties (set on root, inherited by views; overridable via the
  * `style` prop or a CSS rule):
- *   - `--tp-duration` (default `240ms`) — height + slide/opacity duration.
- *   - `--tp-fade-duration` — crossfade duration in `fade` mode. Defaults to the
+ *   - `--tp-duration` (default `240ms`): height plus slide/opacity duration.
+ *   - `--tp-fade-duration`: crossfade duration in `fade` mode. Defaults to the
  *     size-adaptive `--fade-duration` the height observer writes; set a fixed
  *     value to opt out of the adaptive crossfade. (Don't set `--fade-duration`
- *     directly — it's the observer-written source for this default.)
- *   - `--tp-ease` / `--tp-fade-ease` — easing for height+slide / crossfade.
+ *     yourself, it's the observer-written source for this default.)
+ *   - `--tp-ease` / `--tp-fade-ease`: easing for height/slide and crossfade.
  *
- * Browser support: the entrance animation needs `@starting-style` +
- * `transition-behavior: allow-discrete` (Chrome 117+, Safari 17.4+, Firefox
- * 129+). Older browsers degrade to an instant, motionless swap. Firefox honors
- * `allow-discrete` on the way in but not on the way out (`display: block →
- * none`), so the exit animation is skipped there — the leaving view just
- * disappears; entering still animates.
+ * Browser support: the entrance animation needs `@starting-style` (Chrome 117+,
+ * Safari 17.4+, Firefox 129+); older browsers degrade to an instant, motionless
+ * swap. The exit defers `display:none` via `transition-behavior: allow-discrete`
+ * where the browser supports it (Chrome/Safari). Firefox doesn't defer it on the
+ * way out, so there the exit falls back to a JS-deferred hide (see
+ * `TransitionPanelView`). That keeps the exit animation in every engine while
+ * Chrome/Safari stay pure-CSS at runtime.
  *
  * Usage:
  * ```tsx
@@ -305,7 +330,7 @@ function TransitionPanel({
     // Defaults for the inherited CSS vars. Consumer `style` spreads after, so
     // any override wins. `--tp-fade-duration` falls back to the observer-written
     // `--fade-duration` (adaptive crossfade) until overridden to a fixed value;
-    // `--tp-clip-margin` is the overflow-clip bleed (0 by default — bump it when
+    // `--tp-clip-margin` is the overflow-clip bleed (0 by default; bump it when
     // view content sits flush with a padded container's edge).
     style: {
       "--tp-duration": "240ms",
@@ -320,9 +345,9 @@ function TransitionPanel({
       // `scrollIntoView` (e.g. focusing a deep descendant), which would scroll
       // this container and expose the clipped region; clip is a true non-scroll
       // container. `overflow-clip-margin` adds a bleed for focus rings / shadows
-      // (see `--tp-clip-margin`). `contain-layout` scopes height-driven layout
-      // work here — side effect: it becomes a containing block for fixed /
-      // absolute descendants (flag if you position one inside).
+      // (see `--tp-clip-margin`). `contain-layout` scopes the height-driven
+      // layout work here. Side effect: it becomes a containing block for
+      // fixed/absolute descendants (flag if you position one inside).
       "overflow-clip contain-layout [overflow-clip-margin:var(--tp-clip-margin)]",
       // Only animate height while swapping (see `isSwapping` above).
       isSwapping &&
@@ -368,16 +393,59 @@ function TransitionPanelView({
     ctx;
   const isActive = viewKey === activeKey;
   const isFade = transition === "fade";
+  const cssExit = useCssExitSupported();
   const wrapperRef = React.useRef<HTMLDivElement | null>(null);
 
-  // useLayoutEffect (not useEffect), and child-to-parent ordering, ensures a
-  // view registers before the panel's focus move reads the registry — even
+  // useLayoutEffect (not useEffect), plus child-to-parent ordering, makes a
+  // view register before the panel's focus move reads the registry, even
   // when it mounts in the same render as the activeKey change.
   React.useLayoutEffect(() => {
     const el = wrapperRef.current;
     if (!el) return;
     return registerView(viewKey, el, initialFocus);
   }, [viewKey, initialFocus, registerView]);
+
+  // JS-path exit hide (Firefox only; no-ops on the CSS path, see
+  // `supportsDiscreteDisplayExit`). Lets the leaving view animate out as
+  // `block`, then sets `display:none` once its transitions finish. We wait on
+  // the Web Animations API (`el.getAnimations()`, then each `.finished`), like
+  // Base UI's `useAnimationsFinished`: it covers every animated property at
+  // once, is exact (no duration math), resolves right away under reduced motion,
+  // and re-checks on abort so an interrupted swap waits for whatever replaced it.
+  const [hidden, setHidden] = React.useState(!isActive);
+  React.useEffect(() => {
+    if (cssExit) return;
+    if (isActive) {
+      setHidden(false);
+      return;
+    }
+    if (hidden) return;
+    const el = wrapperRef.current;
+    if (!el || typeof el.getAnimations !== "function") {
+      setHidden(true);
+      return;
+    }
+    let cancelled = false;
+    const waitForExit = () => {
+      Promise.all(el.getAnimations().map((animation) => animation.finished))
+        .then(() => {
+          if (!cancelled) setHidden(true);
+        })
+        .catch(() => {
+          // A transition was aborted (e.g. an interrupted swap replaced it).
+          // Wait for whatever is running now; if nothing is, just hide.
+          if (cancelled) return;
+          if (el.getAnimations().length > 0) waitForExit();
+          else setHidden(true);
+        });
+    };
+    // Defer a frame so the exit transition is registered before we read it.
+    const id = requestAnimationFrame(waitForExit);
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(id);
+    };
+  }, [cssExit, isActive, hidden]);
 
   const defaultProps = {
     "aria-hidden": !isActive,
@@ -387,32 +455,36 @@ function TransitionPanelView({
     "data-viewkey": viewKey,
     style: {
       // Consumer style spreads first; the panel-controlled slide vars override
-      // after (they change every render — a consumer value would just break the
-      // slide). Unused in `fade` mode.
+      // after (they change every render, so a consumer value would just break
+      // the slide). Unused in `fade` mode.
       ...style,
       "--tp-enter": enterFrom,
       "--tp-exit": exitTo,
     } as React.CSSProperties,
     className: cn(
       "[grid-area:1/1]",
-      // Per-mode transition: `slide` translates on --tp-duration/--tp-ease;
-      // `fade` scales + crossfades on --tp-fade-duration/--tp-fade-ease.
-      // `transition-discrete` (allow-discrete) defers the `display:none` swap of
-      // an exiting view until its fade/slide finishes. NOTE: Firefox doesn't
-      // honor allow-discrete on the `block → none` exit, so the leaving view
-      // disappears instantly there (no exit animation) — a graceful degradation;
-      // entering still animates everywhere via `@starting-style`.
+      // Transitioned properties. `slide` translates on --tp-duration/--tp-ease;
+      // `fade` scales + crossfades on --tp-fade-duration/--tp-fade-ease. `display`
+      // is included only on the CSS-exit path (the JS path hides via the effect
+      // above).
       isFade
-        ? "transition-[opacity,scale,display] duration-(--tp-fade-duration) ease-(--tp-fade-ease)"
-        : "transition-[opacity,translate,display] duration-(--tp-duration) ease-(--tp-ease)",
-      "transition-discrete",
+        ? cssExit
+          ? "transition-[opacity,scale,display]"
+          : "transition-[opacity,scale]"
+        : cssExit
+          ? "transition-[opacity,translate,display]"
+          : "transition-[opacity,translate]",
+      isFade
+        ? "duration-(--tp-fade-duration) ease-(--tp-fade-ease)"
+        : "duration-(--tp-duration) ease-(--tp-ease)",
+      cssExit && "transition-discrete",
       "motion-reduce:transition-none",
       mounted && "starting:opacity-0",
       // Slide sets the `translate` property *directly* rather than via Tailwind's
       // `translate-x-*` (which routes through the `@property`-registered var
       // `--tw-translate-x`). WebKit drops an `@starting-style` value on a
       // registered custom property when it's a `var()` reference, falling back to
-      // the registered `initial-value: 0` — so `--tw-translate-x: var(--tp-enter)`
+      // the registered `initial-value: 0`. So `--tw-translate-x: var(--tp-enter)`
       // collapses to 0 and the entering view jumps in with no slide (only the
       // crossfade survives). Chrome resolves it fine. Setting `translate` directly
       // bypasses the registered var. Fade's `scale-*` is a literal, so it's safe.
@@ -423,8 +495,11 @@ function TransitionPanelView({
           ? "scale-100 opacity-100"
           : "[translate:0_0] opacity-100"
         : cn(
-            "pointer-events-none hidden opacity-0 contain-[size]",
+            "pointer-events-none opacity-0 contain-[size]",
             isFade ? "scale-[0.96]" : "[translate:var(--tp-exit)_0]",
+            // CSS path hides now (`allow-discrete` defers the real
+            // `display:none`); JS path waits for the deferred-hide effect above.
+            (cssExit || hidden) && "hidden",
           ),
       className,
     ),

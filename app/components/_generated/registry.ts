@@ -2920,7 +2920,7 @@ export const exampleRegistry = {
     {
       "title": "Explicit Radius",
       "importPath": "marching-border-explicit-radius",
-      "source": "import { MarchingBorder } from \"@/components/ui/cubby-ui/marching-border\";\n\nexport default function MarchingBorderExplicitRadius() {\n  return (\n    <div className=\"flex w-[360px] flex-col gap-4\">\n      <div className=\"text-foreground bg-muted relative flex h-24 items-center justify-center text-sm\">\n        <span className=\"text-muted-foreground\">No rounded-* class</span>\n        <MarchingBorder className=\"text-primary\" radius={0} />\n      </div>\n\n      <div className=\"text-foreground bg-muted relative flex h-24 items-center justify-center text-sm\">\n        <span className=\"text-muted-foreground\">radius=24</span>\n        <MarchingBorder className=\"text-primary\" radius={24} />\n      </div>\n    </div>\n  );\n}\n"
+      "source": "import { MarchingBorder } from \"@/components/ui/cubby-ui/marching-border\";\n\nexport default function MarchingBorderExplicitRadius() {\n  return (\n    <div className=\"flex w-[360px] flex-col gap-4\">\n      <div className=\"text-foreground bg-muted relative flex h-24 items-center justify-center text-sm\">\n        <span className=\"text-muted-foreground\">Inherited (square)</span>\n        <MarchingBorder className=\"text-primary\" />\n      </div>\n\n      <div className=\"text-foreground bg-muted relative flex h-24 items-center justify-center text-sm\">\n        <span className=\"text-muted-foreground\">rounded-[24px]</span>\n        <MarchingBorder className=\"text-primary rounded-[24px]\" />\n      </div>\n    </div>\n  );\n}\n"
     },
     {
       "title": "Variants",

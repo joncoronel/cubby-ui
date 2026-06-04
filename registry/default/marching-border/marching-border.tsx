@@ -6,12 +6,6 @@ import { cn } from "@/lib/utils";
 import "./marching-border.css";
 
 export type MarchingBorderProps = React.ComponentProps<"svg"> & {
-  /**
-   * Corner radius in pixels. Omit to auto-detect from the parent's computed
-   * `border-top-left-radius` — the typical usage is to drop it inside a
-   * positioned, `rounded-*` parent and let the border conform.
-   */
-  radius?: number;
   /** Stroke thickness in pixels. */
   strokeWidth?: number;
   /** Dash length as a percentage of the path's perimeter. */
@@ -66,7 +60,8 @@ function buildRoundedRectPath(
  * Marching-ants dashed border, drawn as an absolutely-positioned SVG overlay
  * outside the wrapped element's box model so toggling it causes zero layout
  * shift. Parent must be positioned and should have a `rounded-*` class to
- * conform to.
+ * conform to. The SVG defaults to `rounded-[inherit]`, so it adopts the
+ * parent's corner radius automatically; pass a `rounded-*` class to override.
  *
  * Seam-free loop via two techniques: (1) `pathLength` is rounded to a whole
  * multiple of `(dash + gap)` so the pattern tiles an integer number of times at
@@ -79,7 +74,6 @@ function buildRoundedRectPath(
  * border still renders as the primary signal of pending/staged state.
  */
 function MarchingBorder({
-  radius,
   strokeWidth = 2,
   dash = 1,
   gap = 0.75,
@@ -118,14 +112,10 @@ function MarchingBorder({
       const { width, height } = svg.getBoundingClientRect();
       if (width <= 0 || height <= 0) return;
 
-      // Explicit `radius` prop, else auto-detect from the parent's computed
-      // border-radius. Re-read each resize to track theme / dynamic updates.
-      const parent = svg.parentElement;
-      const detected =
-        radius ??
-        (parent
-          ? parseFloat(getComputedStyle(parent).borderTopLeftRadius)
-          : NaN);
+      // Read the SVG's own computed border-radius. With the default
+      // `rounded-[inherit]` this resolves to the parent's radius; a `rounded-*`
+      // class overrides it. Re-read each resize to track theme / dynamic updates.
+      const detected = parseFloat(getComputedStyle(svg).borderTopLeftRadius);
       const outerRadius = Number.isFinite(detected) ? detected : 0;
       // pathRadius = outerRadius − inset: the stroke is centered on the path,
       // so its outer edge sits at (pathRadius + inset) = the parent's
@@ -143,7 +133,7 @@ function MarchingBorder({
     const observer = new ResizeObserver(apply);
     observer.observe(svg);
     return () => observer.disconnect();
-  }, [radius, strokeWidth]);
+  }, [strokeWidth]);
 
   return (
     <svg
@@ -152,7 +142,7 @@ function MarchingBorder({
       data-slot="marching-border"
       {...rest}
       className={cn(
-        "pointer-events-none absolute inset-0 size-full",
+        "pointer-events-none absolute inset-0 size-full rounded-[inherit]",
         className,
       )}
     >

@@ -36,7 +36,7 @@ A real-world composition: a multi-step authenticator-setup wizard inside a [Dial
 
 `TransitionPanel` is a pure-CSS compound component — there is no underlying Base UI primitive. Views register themselves through context, so `TransitionPanelView` does not need to be a direct child: wrappers, fragments, conditional rendering, and Suspense boundaries are all supported.
 
-The entrance animation uses `@starting-style` and `transition-behavior: allow-discrete`. Older browsers degrade to an instant swap with no slide — no broken state, just no motion. The component also respects `prefers-reduced-motion`.
+The entrance animation uses `@starting-style` and `transition-behavior: allow-discrete`. Older browsers degrade to an instant swap with no slide — no broken state, just no motion. Firefox honors `allow-discrete` on the way in but not on the way out, so the exiting view disappears instantly there (the entering view still animates). The component also respects `prefers-reduced-motion`.
 
 ### Props
 

@@ -107,7 +107,10 @@ const TransitionPanelContext =
  *
  * Browser support: the entrance animation needs `@starting-style` +
  * `transition-behavior: allow-discrete` (Chrome 117+, Safari 17.4+, Firefox
- * 129+). Older browsers degrade to an instant, motionless swap.
+ * 129+). Older browsers degrade to an instant, motionless swap. Firefox honors
+ * `allow-discrete` on the way in but not on the way out (`display: block →
+ * none`), so the exit animation is skipped there — the leaving view just
+ * disappears; entering still animates.
  *
  * Usage:
  * ```tsx
@@ -394,6 +397,11 @@ function TransitionPanelView({
       "[grid-area:1/1]",
       // Per-mode transition: `slide` translates on --tp-duration/--tp-ease;
       // `fade` scales + crossfades on --tp-fade-duration/--tp-fade-ease.
+      // `transition-discrete` (allow-discrete) defers the `display:none` swap of
+      // an exiting view until its fade/slide finishes. NOTE: Firefox doesn't
+      // honor allow-discrete on the `block → none` exit, so the leaving view
+      // disappears instantly there (no exit animation) — a graceful degradation;
+      // entering still animates everywhere via `@starting-style`.
       isFade
         ? "transition-[opacity,scale,display] duration-(--tp-fade-duration) ease-(--tp-fade-ease)"
         : "transition-[opacity,translate,display] duration-(--tp-duration) ease-(--tp-ease)",

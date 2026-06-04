@@ -97,3 +97,45 @@ export function CubbyUILogo({ className }: CubbyUILogoProps) {
     </svg>
   );
 }
+
+/**
+ * Dot-matrix rendering of the same mark: the cubby silhouettes are filled with
+ * a tiled grid of dots (an SVG pattern), so the logo reads as if printed on a
+ * dot-matrix display. Used as the homepage backdrop watermark. `dotSize` and
+ * `dotGap` are in the 354×255 viewBox coordinate space, so they scale with the
+ * rendered size.
+ */
+export function CubbyUILogoDots({
+  className,
+  dotGap = 8,
+  dotSize = 2,
+}: CubbyUILogoProps & { dotGap?: number; dotSize?: number }) {
+  // Stable id (single backdrop instance) so the pattern resolves predictably.
+  const patternId = "cubby-dot-matrix";
+  return (
+    <svg
+      width="354"
+      height="255"
+      viewBox="0 0 354 255"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      className={cn("h-6 w-auto max-w-full shrink-0", className)}
+    >
+      <defs>
+        <pattern
+          id={patternId}
+          width={dotGap}
+          height={dotGap}
+          patternUnits="userSpaceOnUse"
+        >
+          <circle cx={dotGap / 2} cy={dotGap / 2} r={dotSize} fill="currentColor" />
+        </pattern>
+      </defs>
+      <g fill={`url(#${patternId})`}>
+        <path d={leftCubbyPath} />
+        <path d={centerCubbyPath} />
+        <path d={rightCubbyPath} />
+      </g>
+    </svg>
+  );
+}

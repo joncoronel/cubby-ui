@@ -6,7 +6,6 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
-// Root component with size variants and threshold support
 const meterRootVariants = cva("max-w-[300px] w-full flex flex-col", {
   variants: {
     size: {
@@ -48,7 +47,6 @@ function MeterRoot({
   showThresholdColors = true,
   ...props
 }: MeterRootProps) {
-  // Calculate CSS custom properties for optimum markers
   const optimumStyles =
     optimumMin !== undefined && optimumMax !== undefined
       ? {
@@ -58,50 +56,43 @@ function MeterRoot({
         }
       : {};
 
-  // Determine status based on thresholds
+  // Status from thresholds, most-specific config first:
   const getStatus = () => {
-    // 1. Optimum range (both min and max) - range is best
+    // Range (optimumMin + optimumMax): in-range is optimal, low/high mark danger
     if (optimumMin !== undefined && optimumMax !== undefined) {
-      // Check if we're in danger zone first (if low/high provided)
       if (low !== undefined && value < low) return "danger";
       if (high !== undefined && value > high) return "danger";
-
-      // Check if we're in optimum range
       if (value >= optimumMin && value <= optimumMax) return "optimal";
-
-      // Outside optimum but not in danger
       return "suboptimal";
     }
 
-    // 2. Directional three-tier with optimumMin (higher is better: low < optimumMin < value)
-    // Example: battery with low={15} optimumMin={75}
+    // Directional three-tier, higher is better (e.g. battery: low=15, optimumMin=75)
     if (optimumMin !== undefined && low !== undefined) {
       if (value < low) return "danger";
       if (value >= optimumMin) return "optimal";
-      return "suboptimal"; // Between low and optimumMin
+      return "suboptimal";
     }
 
-    // 3. Directional three-tier with optimumMax (lower is better: value < optimumMax < high)
-    // Example: temperature with optimumMax={60} high={80}
+    // Directional three-tier, lower is better (e.g. temp: optimumMax=60, high=80)
     if (optimumMax !== undefined && high !== undefined) {
       if (value > high) return "danger";
       if (value <= optimumMax) return "optimal";
-      return "suboptimal"; // Between optimumMax and high
+      return "suboptimal";
     }
 
-    // 4. Only low threshold (higher is better, two-tier)
+    // Two-tier: low only (higher is better)
     if (low !== undefined && high === undefined) {
       if (value < low) return "danger";
       return "optimal";
     }
 
-    // 5. Only high threshold (lower is better, two-tier)
+    // Two-tier: high only (lower is better)
     if (high !== undefined && low === undefined) {
       if (value > high) return "danger";
       return "optimal";
     }
 
-    // 6. Both low and high (middle is best, two-tier)
+    // Two-tier: both (middle is best)
     if (low !== undefined && high !== undefined) {
       if (value < low || value > high) return "danger";
       return "optimal";
@@ -132,7 +123,6 @@ function MeterRoot({
   );
 }
 
-// Track component with size variants and segment support
 interface MeterTrackProps extends React.ComponentProps<typeof BaseMeter.Track> {
   segments?: number;
   striped?: boolean;
@@ -174,7 +164,6 @@ function MeterTrack({
   );
 }
 
-// Helper component for rendering segments
 function MeterSegments({ segments }: { segments: number }) {
   return (
     <div className="absolute inset-0">
@@ -189,19 +178,19 @@ function MeterSegments({ segments }: { segments: number }) {
   );
 }
 
-// Helper component for optimum tick markers (vertical lines above track)
-// Only shows when BOTH optimumMin AND optimumMax are provided (range-based thresholds)
+// Vertical tick markers above the track. Shown only when both optimumMin and
+// optimumMax are set (the doubled group-data selector).
 function MeterOptimumTicks() {
   return (
     <div className="pointer-events-none absolute inset-0 hidden group-data-[optimum-min]/meter:group-data-[optimum-max]/meter:block">
-      {/* Start marker - tick above track with border for visibility */}
+      {/* Start marker */}
       <div
         className="absolute -top-2 h-3 w-px"
         style={{ left: "calc(var(--meter-optimum-min-percent) - 0.5px)" }}
       >
         <div className="bg-foreground ring-background h-full w-full rounded-full ring-1" />
       </div>
-      {/* End marker - tick above track with border for visibility */}
+      {/* End marker */}
       <div
         className="absolute -top-2 h-3 w-px"
         style={{ left: "calc(var(--meter-optimum-max-percent) - 0.5px)" }}
@@ -212,12 +201,10 @@ function MeterOptimumTicks() {
   );
 }
 
-// Helper component for optimum range line (horizontal line below track)
-// Only shows when BOTH optimumMin AND optimumMax are provided (range-based thresholds)
+// Horizontal range line below the track. Same dual-optimum visibility gate.
 function MeterOptimumRangeLine() {
   return (
     <div className="pointer-events-none absolute inset-x-0 top-full hidden group-data-[optimum-min]/meter:group-data-[optimum-max]/meter:block">
-      {/* Range indicator - line below track with border for visibility */}
       <div
         className="absolute top-0.5 h-0.5"
         style={{
@@ -231,7 +218,6 @@ function MeterOptimumRangeLine() {
   );
 }
 
-// Indicator component with animation and color threshold support
 function MeterIndicator({
   className,
   ...props
@@ -254,7 +240,6 @@ function MeterIndicator({
   );
 }
 
-// Label component with size variants
 function MeterLabel({
   className,
   ...props
@@ -272,7 +257,6 @@ function MeterLabel({
   );
 }
 
-// Value component with formatting support
 function MeterValue({
   className,
   ...props
@@ -317,7 +301,6 @@ function Meter({
   );
 }
 
-// Named exports for subcomponents
 export {
   Meter,
   MeterRoot,

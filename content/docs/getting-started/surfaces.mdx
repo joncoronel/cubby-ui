@@ -1,0 +1,363 @@
+---
+title: Surfaces
+description: An eight-level elevation system for popovers, dropdowns, dialogs, sheets, and drawers — so floating UI stays visible at any nesting depth, in both light and dark mode.
+---
+
+## Overview
+
+Cubby UI's elevation system is an eight-step ladder of substrate colors and shadow recipes. Every floating component — Popover, Dropdown, Dialog, Sheet, Drawer, and so on — picks a level on this ladder. The system is designed so that a popover opened *inside* a dialog still clearly pops above the dialog, even three layers deep.
+
+Inspired by [fluidfunctionalism.com/elevated](https://www.fluidfunctionalism.com/elevated), adapted to a prop-based API instead of context, and with a few intentional divergences (see "Design decisions" below).
+
+### Why eight levels
+
+Most apps need three or four. The full eight-level ladder exists so a nested case never collapses. Wrap a panel and its substrate settles at the level it belongs to — the shadow stays the same, so a popover still reads as a popover three layers down.
+
+<SurfaceNestingDemo />
+
+In light mode, surfaces 3–8 are all pure white — shadows do the heavy lifting. In dark mode the substrate colors progress from `oklch(0.205)` to `oklch(0.402)` so each layer reads as visibly lifted.
+
+## Quick start
+
+Every elevated component (Popover, Dropdown, Dialog, Sheet, etc.) accepts a `level` and `shadowLevel` prop. The defaults match most cases. You only override when nesting deeper than usual.
+
+```tsx
+// Defaults — uses level=3, shadowLevel=3
+<Popover>
+  <PopoverTrigger>Open</PopoverTrigger>
+  <PopoverContent>Default popover</PopoverContent>
+</Popover>
+
+// Inside a Dialog (substrate=5), bump the inner popover to level=7
+<Dialog>
+  <DialogContent>
+    <Popover>
+      <PopoverTrigger>Open inside dialog</PopoverTrigger>
+      <PopoverContent level={7}>Pops above the dialog</PopoverContent>
+    </Popover>
+  </DialogContent>
+</Dialog>
+```
+
+That's the whole API for consumers. `shadowLevel` is independent of `level`: it controls the drop-shadow weight, which is pinned per-component so a popover always reads visually like a popover regardless of depth.
+
+## The ladder
+
+Eight bg/shadow pairs. Light mode flattens to pure white from level 3 up — the shadow recipe alone carries elevation. Dark mode keeps adding white-opacity to the substrate *and* progressing the shadow recipe.
+
+<SurfaceTokensDemo />
+
+### Substrate colors
+
+| Level | Light | Dark | Typical use |
+|---|---|---|---|
+| `surface-1` | `oklch(0.97 0 0)` | `oklch(0.205 ◇ ◆)` | Page background |
+| `surface-2` | `oklch(0.985 0 0)` | `oklch(0.235 ◇ ◆)` | Inline toolbars, menubars |
+| `surface-3` | `oklch(1 0 0)` | `oklch(0.264 ◇ ◆)` | Cards, popovers, dropdowns, tooltips |
+| `surface-4` | `oklch(1 0 0)` | `oklch(0.293 ◇ ◆)` | Tabs indicator, transitional |
+| `surface-5` | `oklch(1 0 0)` | `oklch(0.321 ◇ ◆)` | Dialogs, sheets, drawers, sub-menus |
+| `surface-6` | `oklch(1 0 0)` | `oklch(0.348 ◇ ◆)` | Transitional |
+| `surface-7` | `oklch(1 0 0)` | `oklch(0.375 ◇ ◆)` | Popovers nested inside dialogs |
+| `surface-8` | `oklch(1 0 0)` | `oklch(0.402 ◇ ◆)` | Maximum elevation — rare |
+
+*`◇` is `var(--neutral-chroma)`, `◆` is `var(--neutral-hue)` — see "Brand tint" below.*
+
+The named tokens you've used elsewhere are aliased to the ladder:
+
+```css
+--background: var(--surface-1);
+--card:       var(--surface-3);   /* Card and Popover share level 3 */
+--popover:    var(--surface-3);
+--sidebar:    var(--surface-1);
+```
+
+If you tune the ladder, `bg-background`, `bg-card`, `bg-popover`, and `bg-sidebar` all follow automatically.
+
+### Shadow recipes
+
+Shadows scale with the visual weight of the floating element, not its surface level:
+
+| Shadow | Drop layers | Visual feel |
+|---|---|---|
+| `shadow-surface-1` | 0 (just a 1px ring) | Barely there |
+| `shadow-surface-2` | 1 | Tooltip / quiet |
+| `shadow-surface-3` | 2 | **Dropdown / popover / card** |
+| `shadow-surface-4` | 3 | Toast / floating elements unattached to a trigger |
+| `shadow-surface-5` | 4 | **Dialog / sheet** |
+| `shadow-surface-6` | 5 | Transitional |
+| `shadow-surface-7` | 6 | Dramatic — hero modals |
+| `shadow-surface-8` | 7 | Maximum gravity — rare |
+
+The dark recipe additionally adds an inset highlight + inset ring that gives elevated surfaces a "lit from above" feel. In light mode, those insets are no-ops (light mode relies on the drop shadow alone).
+
+### Size rule of thumb
+
+When picking `shadowLevel`:
+
+- Element width < ~400px → `3`
+- Element width ~400–800px → `5`
+- Element width > ~800px or fullscreen → `7`
+- Never let `shadowLevel` exceed `level` by more than 2
+
+## Default levels per component
+
+You usually don't need to think about these — the defaults are tuned for the typical case.
+
+| Component | Default `level` | Default `shadowLevel` |
+|---|---|---|
+| Tooltip | `2` | `2` |
+| Card | `3` | `1` |
+| Table | `3` | `1` |
+| DataTable | `3` | `1` |
+| Code block | `3` | `1` |
+| ComponentPreview frame | `3` | `1` |
+| Popover | `3` | `3` |
+| Dropdown menu | `3` | `3` |
+| Dropdown sub-menu | `5` | `3` |
+| Context menu | `3` | `3` |
+| Context sub-menu | `5` | `3` |
+| Menubar (the bar) | `2` | `2` |
+| Menubar dropdown | `3` | `3` |
+| Menubar sub-menu | `5` | `3` |
+| NavigationMenu (bar) | `2` | `2` |
+| NavigationMenu popup | `3` | `3` |
+| NavigationMenu sub-popup | `5` | `5` |
+| Select | `3` | `3` |
+| Toast | `3` | `4` (heavier — floats unattached) |
+| Dialog | `5` | `5` |
+| Alert dialog | `5` | `5` |
+| Sheet | `5` | `5` |
+| Drawer | `5` | `5` |
+| Command | `3` | `3` |
+| Combobox | `3` | `3` |
+| Autocomplete | `3` | `3` |
+
+The **flat-card family** (Card, Table, DataTable, code-block, ComponentPreview) all share `solidSurface(3, 1)` — a surface-3 bg with a 1px rim only, no drop shadows. They're embedded containers, not floating popups, so they read as "lifted off the page just enough to define an edge" rather than "casting a shadow over content."
+
+When in doubt: leave the defaults alone, bump `level` (not `shadowLevel`) when nesting.
+
+## State overlays
+
+Hover and selected backgrounds use translucent overlays so they always raise the underlying surface by a fixed perceptual delta, regardless of what level the surface sits at:
+
+```css
+/* :root (light) */
+--surface-hover:    oklch(0 0 0 / 0.06);
+--surface-selected: oklch(0 0 0 / 0.1);
+
+/* .dark */
+--surface-hover:    oklch(1 0 0 / 0.06);
+--surface-selected: oklch(1 0 0 / 0.1);
+```
+
+Apply them on interactive items:
+
+```tsx
+<div className="bg-(--surface-hover)">Hovered row</div>
+<div className="bg-(--surface-selected)">Active row</div>
+```
+
+Because they're overlays (not fixed colors), `bg-(--surface-hover)` on a `surface-3` row brightens by the same perceptual step as on a `surface-7` row. Hover always reads as hover, even deeply nested.
+
+The values are matched to fluid-functionalism: 6% black/white overlay for hover, 10% for selected/active.
+
+## Building your own elevated containers
+
+Three helpers live in `@/registry/default/lib/elevated`. Each returns Tailwind class strings — drop them on whatever element you want elevated.
+
+### `solidSurface(level, shadowLevel?)`
+
+**Default choice.** Returns `bg-surface-N`, the combined drop + rim shadow, and exposes `--popup-surface` for descendants.
+
+```tsx
+import { solidSurface } from "@/registry/default/lib/elevated";
+
+function Card({ children }) {
+  return (
+    <div className={solidSurface(3)}>{children}</div>
+  );
+}
+```
+
+Use this for any floating container that doesn't have sticky or opaque children near its edges.
+
+### `elevatedSurface(level, shadowLevel?)`
+
+Same effect as `solidSurface`, but paints the rim on an `::after` pseudo-element at `z-[2]` instead of on the popup's own box-shadow. Use this when sticky or opaque children might cover the rim (Select's sticky group labels are the canonical case).
+
+```tsx
+import { elevatedSurface } from "@/registry/default/lib/elevated";
+
+function MenuWithStickyHeader({ children }) {
+  return (
+    <div className={`relative overflow-clip rounded-xl ${elevatedSurface(3)}`}>
+      <div className="sticky top-0 bg-(--popup-surface)">Sticky header</div>
+      {children}
+    </div>
+  );
+}
+```
+
+Requires the host to be positioned (`relative` or otherwise) and have a border-radius for the rim to clip correctly.
+
+### `surfaceClasses(level, shadowLevel?)`
+
+The primitive — just `bg-surface-N` + drops, no rim. Building block for specialized treatments. The viewport-flush Sheet and Drawer variants use this together with `innerEdgeRim(side)` to paint a rim only on the inner-facing edge (a full four-edge rim would render as a thin line along the screen edge).
+
+```tsx
+import { surfaceClasses, innerEdgeRim } from "@/registry/default/lib/elevated";
+
+// Right-flush sheet — rim on the left (inner-facing) edge only
+function RightSheet({ children }) {
+  return (
+    <div
+      className={`fixed inset-y-0 right-0 ${surfaceClasses(5)} ${innerEdgeRim("left")}`}
+    >
+      {children}
+    </div>
+  );
+}
+```
+
+## Tracking the level from descendants
+
+When you set `level` on a popup, the helpers automatically expose `--popup-surface` as a CSS variable on that element. Children can match the popup's bg color without hardcoding a level:
+
+```tsx
+// Arrow that matches whatever level the popup is at
+<svg className="fill-(--popup-surface,var(--popover))" />
+
+// Sticky label inside a Select that blends with the popup bg
+<div className="sticky top-0 bg-(--popup-surface)">Group label</div>
+```
+
+The fallback `var(--popover)` keeps things working if the var isn't set in some context.
+
+## Brand tint
+
+Two CSS variables at the top of `:root` control the entire neutral tint:
+
+```css
+--neutral-hue:        275;     /* hue angle (0–360). Cool purple-blue. */
+--neutral-chroma:     0.004;   /* tint strength for mid-tone neutrals */
+--neutral-chroma-low: 0.002;   /* tint strength at extreme lightness (L > 0.97 or < 0.03) */
+```
+
+Every tinted neutral references these via `var()` — surface ladder dark values, foregrounds in both modes, `--muted`/`--secondary`/`--accent` dark values, sidebar dark values, scrollbar.
+
+**Change `--neutral-hue` to retune the whole system** without touching individual tokens. Suggested ranges:
+
+- `0–90` — warm (red, orange, amber, yellow). Try ~70 for amber.
+- `90–180` — green territory.
+- `180–270` — cool (cyan, blue). Current primary lives at 250.
+- `270–330` — cool purple/violet. Current neutral tint at 275 sits here.
+- `330–360` — pink/magenta back toward warm.
+
+`--neutral-chroma` between `0.005–0.01` is the visibility floor — below that the tint is sub-perceptual. We sit slightly below at `0.004` for a quieter feel.
+
+## Design decisions
+
+A few places where the system deliberately differs from a strict "tint everything on the ladder" interpretation:
+
+### Light surfaces are pure neutral
+
+All light-mode backgrounds (surface ladder, `--muted`, `--secondary`, `--accent`, `--input`, sidebar surfaces) have **chroma 0** — they're literally neutral gray/white. The brand tint applies only to:
+
+- Text foregrounds in light mode (subtle warmth in `--foreground`, `--muted-foreground`, etc.)
+- All dark-mode surfaces and tokens.
+
+Net effect: light mode reads as "clean canvas," dark mode carries the brand identity. This is a common pattern (Linear, Vercel, Stripe) — tint on a near-white page tends to read as a "wash" rather than a brand signature, while in dark mode the same chroma has room to express.
+
+### `--muted` lives off-ladder
+
+`--muted` is a standalone token (`oklch(0.94 0 0)` light / `oklch(0.24 ◇ ◆)` dark), not aliased to a surface level. The surface ladder represents *lifted* surfaces (up-only from page); `--muted` represents the **recessed** category — inset wells, code blocks, command palette wells, quiet differentiation strips.
+
+The reference (fluid-functionalism) aliases `--muted: var(--surface-2)` because their system doesn't have a recessed concept. We do, so `--muted` stays standalone.
+
+### Form-field bg — `--input` + `--input-elevated`
+
+Form fields come in two appearances, exposed as a `variant` prop on Input, Textarea, NumberField, InputGroup, OTP, Combobox, Autocomplete, Checkbox, and Radio (Switch is the exception — see below):
+
+```tsx
+// Default — opaque "clean lifted card" look. Use on the page.
+<Input />
+
+// Elevated — translucent overlay that adapts to substrate. Use inside Card,
+// Dialog, popovers, or any surface where the opaque default would collapse
+// into its parent.
+<Card>
+  <Input variant="elevated" />
+</Card>
+```
+
+The two tokens:
+
+```css
+/* :root (light) */
+--input:          var(--surface-3);          /* opaque, "clean lifted" */
+--input-elevated: oklch(0 0 0 / 0.08);       /* 8% black overlay */
+
+/* .dark */
+--input-elevated: oklch(1 0 0 / 0.09);       /* 9% white overlay */
+```
+
+`--input` resolves to `var(--surface-3)` in both modes (pure white in light, surface-3 dark in dark). `--input-elevated` is the same family as `--surface-hover`/`--surface-selected` but stronger — it adapts to any substrate.
+
+Why two? A single token can't satisfy every context cleanly:
+
+- On the page (`surface-1`), an opaque white input feels right — lifted, clean.
+- On a Card or inside a Dialog (also surface-3 / surface-5 = pure white in light), an opaque white input is invisible against its parent. The translucent overlay is needed instead.
+
+The variant prop lets the caller choose per context. It's the same pattern HeroUI uses for its form fields. Trade-off: callers need to know which to reach for, but it avoids the "form field that disappears on a Card" failure mode.
+
+**Switch skips the variant.** Switch's unchecked track has to contrast with *both* its thumb (white in light, page-dark in dark) AND the parent surface. A single translucent `bg-input-elevated` overlay handles both constraints — it adapts to whatever substrate it sits on (page, Card, `bg-muted` toolbar) while always reading as a clear gray against the thumb. So Switch has no `variant` prop; it just uses `bg-input-elevated` always.
+
+### Pure-black / pure-white overlays stay untinted
+
+`--border`, `--surface-hover`, `--surface-selected`, the dark-mode shadow `oklch(0 0 0 / X)` ring values, `--surface-shadow-{near,mid,far,ambient}`, etc. all use literal `oklch(0 0 0)` or `oklch(1 0 0)` rather than tinted-near-black/white. At translucent alpha they borrow most of their visible color from the tinted substrate beneath — tinting the overlay itself contributes essentially nothing while making the CSS harder to read.
+
+### Inset patterns are mode-asymmetric
+
+The Command well's inner uses `bg-surface-3 dark:bg-surface-1`. In light mode that's "lifted white card inside a gray strip"; in dark mode it's "cutout to the page color." Each mode gets strong contrast in its own way — a symmetric version (single token both modes) has a weak mode by construction.
+
+## Token reference
+
+All tokens live on `:root` and are exposed as Tailwind utilities via `@theme inline`.
+
+### Substrate
+
+```css
+--surface-1 .. --surface-8       /* substrate colors */
+--surface-shadow-1 .. -8         /* drop shadow recipes (Tailwind: shadow-surface-N) */
+--surface-rim-1 .. -8            /* inset rim recipes (Tailwind: shadow-surface-rim-N) */
+```
+
+### State
+
+```css
+--surface-hover                  /* +6% perceived brightness overlay */
+--surface-selected               /* +10% perceived brightness overlay */
+--input                          /* opaque form-field bg = surface-3 */
+--input-elevated                 /* +8% / +12% overlay for elevated form fields and Switch tracks */
+--surface-rim-color              /* single-edge rim color (flush sheets) */
+--popup-surface                  /* set by helpers, read by descendants */
+```
+
+### Tint controls
+
+```css
+--neutral-hue                    /* one knob: rotates the whole tint */
+--neutral-chroma                 /* tint strength for mid-tone neutrals */
+--neutral-chroma-low             /* tint strength near gamut extremes */
+```
+
+### Aliases
+
+```css
+--background  →  var(--surface-1)
+--card        →  var(--surface-3)
+--popover     →  var(--surface-3)
+--sidebar     →  var(--surface-1)
+```
+
+Tune any token in your `globals.css` to customize the system without changing the components.

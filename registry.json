@@ -50,7 +50,8 @@
       ],
       "registryDependencies": [
         "@cubby-ui/button",
-        "@cubby-ui/scroll-area"
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -114,13 +115,13 @@
         "@cubby-ui/popover",
         "@cubby-ui/preview-card",
         "@cubby-ui/progress",
+        "@cubby-ui/qr-code",
         "@cubby-ui/radio-group",
         "@cubby-ui/resizable",
         "@cubby-ui/scroll-area",
         "@cubby-ui/select",
         "@cubby-ui/separator",
         "@cubby-ui/sheet",
-        "@cubby-ui/sidebar",
         "@cubby-ui/skeleton",
         "@cubby-ui/slider",
         "@cubby-ui/switch",
@@ -163,7 +164,8 @@
         }
       ],
       "registryDependencies": [
-        "@cubby-ui/scroll-area"
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -216,7 +218,8 @@
       ],
       "registryDependencies": [
         "@cubby-ui/button",
-        "@cubby-ui/scroll-area"
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -234,6 +237,9 @@
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/breadcrumbs.tsx"
         }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -307,6 +313,9 @@
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/card.tsx"
         }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "class-variance-authority"
@@ -435,7 +444,8 @@
       "registryDependencies": [
         "@cubby-ui/copy-button",
         "@cubby-ui/tabs",
-        "@cubby-ui/scroll-area"
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "@icons-pack/react-simple-icons",
@@ -482,7 +492,8 @@
       ],
       "registryDependencies": [
         "@cubby-ui/label",
-        "@cubby-ui/scroll-area"
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -503,7 +514,8 @@
       ],
       "registryDependencies": [
         "@cubby-ui/input-group",
-        "@cubby-ui/scroll-area"
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -521,6 +533,9 @@
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/context-menu.tsx"
         }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -609,7 +624,8 @@
         "@cubby-ui/table",
         "@cubby-ui/dropdown-menu",
         "@cubby-ui/button",
-        "@cubby-ui/input-group"
+        "@cubby-ui/input-group",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "@tanstack/react-table",
@@ -678,7 +694,8 @@
       ],
       "registryDependencies": [
         "@cubby-ui/button",
-        "@cubby-ui/scroll-area"
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -724,7 +741,8 @@
       ],
       "registryDependencies": [
         "@cubby-ui/button",
-        "@cubby-ui/scroll-area"
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "class-variance-authority",
@@ -744,9 +762,25 @@
           "target": "components/ui/cubby-ui/dropdown-menu.tsx"
         }
       ],
+      "registryDependencies": [
+        "@cubby-ui/elevated"
+      ],
       "dependencies": [
         "@hugeicons/react",
         "@hugeicons/core-free-icons"
+      ]
+    },
+    {
+      "name": "elevated",
+      "type": "registry:lib",
+      "title": "elevated",
+      "description": "A utility function for elevated.",
+      "files": [
+        {
+          "path": "registry/default/lib/elevated.tsx",
+          "type": "registry:lib",
+          "target": "lib/cubby-ui/elevated.tsx"
+        }
       ]
     },
     {
@@ -849,6 +883,7 @@
           "color-destructive-foreground": "var(--destructive-foreground)",
           "color-border": "var(--border)",
           "color-input": "var(--input)",
+          "color-input-elevated": "var(--input-elevated)",
           "color-ring": "var(--ring)",
           "color-scrollbar": "var(--scrollbar)",
           "color-sidebar": "var(--sidebar)",
@@ -888,36 +923,47 @@
         },
         "light": {
           "radius": "0.75rem",
-          "background": "oklch(0.98 0 0)",
-          "foreground": "oklch(0.18 0 0)",
-          "card": "oklch(1 0 0)",
-          "card-foreground": "oklch(0.27 0 0)",
-          "popover": "oklch(1 0 0)",
-          "popover-foreground": "oklch(0.27 0 0)",
+          "neutral-hue": "270",
+          "neutral-chroma": "0.004",
+          "neutral-chroma-low": "0.002",
+          "background": "var(--surface-1)",
+          "foreground": "oklch(0.18 var(--neutral-chroma) var(--neutral-hue))",
+          "card": "var(--surface-3)",
+          "card-foreground": "var(--foreground)",
+          "popover": "var(--surface-3)",
+          "popover-foreground": "var(--foreground)",
           "primary": "oklch(0.6 0.2 250)",
           "primary-foreground": "oklch(1 0 0)",
+          "primary-soft-foreground": "var(--primary)",
           "neutral": "oklch(0.22 0 0)",
-          "neutral-foreground": "oklch(0.98 0 0)",
-          "secondary": "oklch(0.95 0 0)",
-          "secondary-foreground": "oklch(0.32 0 0)",
-          "muted": "oklch(0.95 0 0)",
-          "muted-foreground": "oklch(0.5 0 0)",
+          "neutral-foreground": "oklch(\n    0.98 var(--neutral-chroma-low) var(--neutral-hue)\n  )",
+          "secondary": "oklch(0.92 0 0)",
+          "secondary-foreground": "oklch(0.32 var(--neutral-chroma) var(--neutral-hue))",
+          "muted": "oklch(0.94 0 0)",
+          "muted-foreground": "oklch(0.5 var(--neutral-chroma) var(--neutral-hue))",
           "accent": "oklch(0.91 0 0)",
-          "accent-foreground": "oklch(0.22 0 0)",
+          "accent-foreground": "oklch(0.22 var(--neutral-chroma) var(--neutral-hue))",
           "destructive": "oklch(0.53 0.19 25)",
-          "destructive-foreground": "oklch(0.98 0 0)",
-          "border": "oklch(0 0 0 / 8%)",
-          "input": "oklch(0.95 0 0)",
+          "destructive-foreground": "oklch(\n    0.98 var(--neutral-chroma-low) var(--neutral-hue)\n  )",
+          "destructive-soft-foreground": "var(--destructive)",
+          "primary-hover": "color-mix(in oklch, var(--primary), black 5%)",
+          "neutral-hover": "color-mix(in oklch, var(--neutral), white 10%)",
+          "destructive-hover": "color-mix(in oklch, var(--destructive), black 5%)",
+          "secondary-hover": "color-mix(in oklch, var(--secondary), black 5%)",
+          "outline-hover": "color-mix(in oklch, var(--card), black 5%)",
+          "border": "oklch(0 0 0 / 10%)",
+          "input": "var(--surface-3)",
+          "input-elevated": "oklch(0 0 0 / 8%)",
           "ring": "oklch(0.55 0.2 250)",
           "scrollbar": "oklch(0.87 0 0)",
-          "sidebar": "oklch(0.98 0 0)",
-          "sidebar-foreground": "oklch(0.22 0 0)",
-          "sidebar-primary": "oklch(0.28 0 0)",
-          "sidebar-primary-foreground": "oklch(0.97 0 0)",
-          "sidebar-accent": "oklch(0.92 0 0)",
-          "sidebar-accent-foreground": "oklch(0.28 0 0)",
-          "sidebar-border": "oklch(0.9 0 0)",
-          "sidebar-ring": "oklch(0.65 0 0)",
+          "sidebar": "var(--surface-1)",
+          "sidebar-foreground": "var(--foreground)",
+          "sidebar-primary": "var(--primary)",
+          "sidebar-primary-foreground": "var(--primary-foreground)",
+          "sidebar-accent": "var(--accent)",
+          "sidebar-accent-foreground": "var(--accent-foreground)",
+          "sidebar-border": "oklch(0.9 var(--neutral-chroma) var(--neutral-hue))",
+          "sidebar-ring": "var(--ring)",
           "danger": "oklch(0.97 0.04 25)",
           "danger-foreground": "oklch(0.55 0.18 25)",
           "danger-border": "oklch(0.9 0.1 25)",
@@ -929,36 +975,39 @@
           "info-border": "oklch(0.9 0.1 250)",
           "success": "oklch(0.97 0.04 145)",
           "success-foreground": "oklch(0.48 0.18 145)",
-          "success-border": "oklch(0.9 0.1 145)"
+          "success-border": "oklch(0.9 0.1 145)",
+          "surface-hover": "oklch(0 0 0 / 0.06)",
+          "surface-selected": "oklch(0 0 0 / 0.1)",
+          "surface-rim-color": "oklch(0 0 0 / 0)",
+          "surface-shadow-ring": "oklch(0 0 0 / 0.06)",
+          "surface-shadow-near": "oklch(0 0 0 / 0.06)",
+          "surface-shadow-mid": "oklch(0 0 0 / 0.05)",
+          "surface-shadow-far": "oklch(0 0 0 / 0.04)",
+          "surface-shadow-ambient": "oklch(0 0 0 / 0.03)"
         },
         "dark": {
-          "background": "oklch(0.19 0 0)",
-          "foreground": "oklch(0.94 0 0)",
-          "card": "oklch(0.21 0 0)",
-          "card-foreground": "oklch(0.94 0 0)",
-          "popover": "oklch(0.21 0 0)",
-          "popover-foreground": "oklch(0.94 0 0)",
-          "neutral": "oklch(0.95 0 0)",
-          "neutral-foreground": "oklch(0.13 0 0)",
-          "secondary": "oklch(0.28 0 0)",
-          "secondary-foreground": "oklch(0.94 0 0)",
-          "muted": "oklch(0.26 0 0)",
-          "muted-foreground": "oklch(0.73 0 0)",
-          "accent": "oklch(0.31 0 0)",
-          "accent-foreground": "oklch(0.95 0 0)",
+          "foreground": "oklch(0.94 var(--neutral-chroma) var(--neutral-hue))",
+          "neutral": "oklch(0.95 var(--neutral-chroma) var(--neutral-hue))",
+          "neutral-foreground": "oklch(0.13 var(--neutral-chroma) var(--neutral-hue))",
+          "secondary": "oklch(0.35 var(--neutral-chroma) var(--neutral-hue))",
+          "secondary-foreground": "oklch(0.94 var(--neutral-chroma) var(--neutral-hue))",
+          "muted": "oklch(0.24 var(--neutral-chroma) var(--neutral-hue))",
+          "muted-foreground": "oklch(0.73 var(--neutral-chroma) var(--neutral-hue))",
+          "accent": "oklch(0.31 var(--neutral-chroma) var(--neutral-hue))",
+          "accent-foreground": "oklch(0.95 var(--neutral-chroma) var(--neutral-hue))",
           "destructive": "oklch(0.5 0.22 25)",
           "destructive-foreground": "oklch(1 0 0)",
+          "primary-soft-foreground": "color-mix(in oklch, var(--primary), white 30%)",
+          "destructive-soft-foreground": "color-mix(in oklch, var(--destructive), white 30%)",
+          "primary-hover": "color-mix(in oklch, var(--primary), white 10%)",
+          "neutral-hover": "color-mix(in oklch, var(--neutral), black 10%)",
+          "destructive-hover": "color-mix(in oklch, var(--destructive), white 15%)",
+          "secondary-hover": "color-mix(in oklch, var(--secondary), white 5%)",
+          "outline-hover": "color-mix(in oklch, var(--card), white 5%)",
           "border": "oklch(1 0 0 / 10%)",
-          "input": "oklch(1 0 0 / 15%)",
-          "scrollbar": "oklch(0.7 0 0)",
-          "sidebar": "oklch(0.19 0 0)",
-          "sidebar-foreground": "oklch(0.88 0 0)",
-          "sidebar-primary": "oklch(0.95 0 0)",
-          "sidebar-primary-foreground": "oklch(0.13 0 0)",
-          "sidebar-accent": "oklch(0.19 0 0)",
-          "sidebar-accent-foreground": "oklch(0.95 0 0)",
-          "sidebar-border": "oklch(0.28 0 0)",
-          "sidebar-ring": "oklch(0.83 0 0)",
+          "input-elevated": "oklch(1 0 0 / 9%)",
+          "scrollbar": "oklch(0.7 var(--neutral-chroma) var(--neutral-hue))",
+          "sidebar-border": "oklch(0.28 var(--neutral-chroma) var(--neutral-hue))",
           "danger": "oklch(0.26 0.07 25)",
           "danger-foreground": "oklch(0.75 0.15 25)",
           "danger-border": "oklch(0.36 0.11 25)",
@@ -970,7 +1019,21 @@
           "info-border": "oklch(0.36 0.11 250)",
           "success": "oklch(0.26 0.07 145)",
           "success-foreground": "oklch(0.72 0.15 145)",
-          "success-border": "oklch(0.36 0.11 145)"
+          "success-border": "oklch(0.36 0.11 145)",
+          "surface-hover": "oklch(1 0 0 / 0.06)",
+          "surface-selected": "oklch(1 0 0 / 0.1)",
+          "surface-rim-color": "oklch(1 0 0 / 0.04)",
+          "surface-hi-base": "oklch(1 0 0 / 0.01)",
+          "surface-hi-mid": "oklch(1 0 0 / 0.02)",
+          "surface-hi-high": "oklch(1 0 0 / 0.04)",
+          "surface-hi-peak": "oklch(1 0 0 / 0.06)",
+          "surface-ring-base": "oklch(1 0 0 / 0.02)",
+          "surface-ring-mid": "oklch(1 0 0 / 0.04)",
+          "surface-ring-high": "oklch(1 0 0 / 0.06)",
+          "surface-shadow-near": "oklch(0 0 0 / 0.18)",
+          "surface-shadow-mid": "oklch(0 0 0 / 0.16)",
+          "surface-shadow-far": "oklch(0 0 0 / 0.14)",
+          "surface-shadow-ambient": "oklch(0 0 0 / 0.12)"
         }
       },
       "css": {
@@ -1098,6 +1161,9 @@
           "target": "components/ui/cubby-ui/menubar.tsx"
         }
       ],
+      "registryDependencies": [
+        "@cubby-ui/elevated"
+      ],
       "dependencies": [
         "@hugeicons/react",
         "@hugeicons/core-free-icons"
@@ -1131,6 +1197,9 @@
           "target": "components/ui/cubby-ui/navigation-menu.tsx"
         }
       ],
+      "registryDependencies": [
+        "@cubby-ui/elevated"
+      ],
       "dependencies": [
         "class-variance-authority"
       ]
@@ -1146,6 +1215,9 @@
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/number-field.tsx"
         }
+      ],
+      "dependencies": [
+        "class-variance-authority"
       ]
     },
     {
@@ -1202,6 +1274,9 @@
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/popover.tsx"
         }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/elevated"
       ]
     },
     {
@@ -1215,6 +1290,9 @@
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/preview-card.tsx"
         }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/elevated"
       ]
     },
     {
@@ -1231,6 +1309,89 @@
       ],
       "dependencies": [
         "class-variance-authority"
+      ]
+    },
+    {
+      "name": "qr-code",
+      "type": "registry:ui",
+      "title": "QR Code",
+      "description": "A from-scratch, zero-dependency QR code generator rendered as pure scalable SVG.",
+      "files": [
+        {
+          "path": "registry/default/qr-code/qr-code.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/qr-code/qr-code.tsx"
+        },
+        {
+          "path": "registry/default/qr-code/lib/bit-buffer.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/bit-buffer.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/encoder.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/encoder.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/export.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/export.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/galois.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/galois.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/index.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/index.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/mask.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/mask.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/matrix.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/matrix.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/mode.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/mode.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/path-builders.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/path-builders.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/reed-solomon.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/reed-solomon.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/rounded.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/rounded.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/svg-builder.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/svg-builder.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/tables.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/tables.ts"
+        },
+        {
+          "path": "registry/default/qr-code/lib/types.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/qr-code/lib/types.ts"
+        }
       ]
     },
     {
@@ -1295,7 +1456,8 @@
         }
       ],
       "registryDependencies": [
-        "@cubby-ui/scroll-area"
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "class-variance-authority",
@@ -1333,33 +1495,8 @@
       ],
       "registryDependencies": [
         "@cubby-ui/button",
-        "@cubby-ui/scroll-area"
-      ],
-      "dependencies": [
-        "class-variance-authority",
-        "@hugeicons/react",
-        "@hugeicons/core-free-icons"
-      ]
-    },
-    {
-      "name": "sidebar",
-      "type": "registry:ui",
-      "title": "Sidebar",
-      "description": "A sidebar component.",
-      "files": [
-        {
-          "path": "registry/default/sidebar/sidebar.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/cubby-ui/sidebar.tsx"
-        }
-      ],
-      "registryDependencies": [
-        "@cubby-ui/button",
-        "@cubby-ui/input",
-        "@cubby-ui/separator",
-        "@cubby-ui/sheet",
-        "@cubby-ui/skeleton",
-        "@cubby-ui/tooltip"
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "class-variance-authority",
@@ -1430,7 +1567,8 @@
         }
       ],
       "registryDependencies": [
-        "@cubby-ui/scroll-area"
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/elevated"
       ]
     },
     {
@@ -1446,6 +1584,7 @@
         }
       ],
       "registryDependencies": [
+        "@cubby-ui/elevated",
         "@cubby-ui/use-animated-height"
       ],
       "dependencies": [
@@ -1463,6 +1602,9 @@
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/textarea.tsx"
         }
+      ],
+      "dependencies": [
+        "class-variance-authority"
       ]
     },
     {
@@ -1499,7 +1641,8 @@
         }
       ],
       "registryDependencies": [
-        "@cubby-ui/button"
+        "@cubby-ui/button",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "class-variance-authority",
@@ -1550,7 +1693,8 @@
         }
       ],
       "registryDependencies": [
-        "@cubby-ui/button"
+        "@cubby-ui/button",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "class-variance-authority"
@@ -1567,6 +1711,9 @@
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/tooltip.tsx"
         }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/elevated"
       ]
     },
     {
@@ -1603,7 +1750,8 @@
         }
       ],
       "registryDependencies": [
-        "@cubby-ui/checkbox"
+        "@cubby-ui/checkbox",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "@hugeicons/react",

@@ -1,0 +1,28 @@
+{
+  "title": "Composables",
+  "pages": [
+    "button-group",
+    "calendar",
+    "carousel",
+    "circular-slider",
+    "code-block",
+    "command",
+    "copy-button",
+    "cropper",
+    "data-table",
+    "date-picker",
+    "date-range-picker",
+    "drawer",
+    "fancy-button",
+    "input-group",
+    "input-otp",
+    "marching-border",
+    "pagination",
+    "qr-code",
+    "resizable",
+    "sheet",
+    "timeline",
+    "transition-panel",
+    "tree"
+  ]
+}

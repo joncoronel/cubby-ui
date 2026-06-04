@@ -6,9 +6,12 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 
 import { cn } from "@/lib/utils";
+import {
+  solidSurface,
+  type SurfaceLevel,
+} from "@/registry/default/lib/elevated";
 
-// Custom checkmark with stroke-dashoffset animation
-// Path length ≈ 22 (calculated from the path geometry)
+// Path length ≈ 22 (from the path geometry)
 function CheckmarkIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -63,11 +66,17 @@ function DropdownMenuContent({
   sideOffset = 4,
   align = "center",
   side = "bottom",
+  level = 3,
+  shadowLevel = 3,
   ...props
 }: React.ComponentProps<typeof BaseMenu.Popup> & {
   align?: BaseMenu.Positioner.Props["align"];
   sideOffset?: BaseMenu.Positioner.Props["sideOffset"];
   side?: BaseMenu.Positioner.Props["side"];
+  /** Surface elevation level for the popup bg (1-8). Bump when nesting inside a Dialog or other elevated container. Defaults to 3. */
+  level?: SurfaceLevel;
+  /** Shadow weight (1-8). Pinned to 3 by default so the menu reads the same regardless of nesting depth. */
+  shadowLevel?: SurfaceLevel;
 }) {
   return (
     <DropdownMenuPortal>
@@ -79,8 +88,10 @@ function DropdownMenuContent({
       >
         <BaseMenu.Popup
           data-slot="dropdown-menu-content"
+          data-level={level}
           className={cn(
-            "bg-popover text-popover-foreground relative min-w-[12rem] overflow-hidden rounded-xl border bg-clip-padding shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)]",
+            "text-popover-foreground relative min-w-[12rem] overflow-hidden rounded-xl",
+            solidSurface(level, shadowLevel),
             "h-(--popup-height,auto) w-(--popup-width,auto)",
             "origin-(--transform-origin) transition-[width,height,scale,opacity] duration-[350ms,350ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
@@ -152,7 +163,7 @@ function DropdownMenuItem({
       data-inset={inset}
       data-variant={variant}
       className={cn(
-        "data-highlighted:bg-accent/50 data-highlighted:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:data-highlighted:bg-destructive/20 data-[variant=destructive]:data-highlighted:text-destructive-foreground data-[variant=destructive]:*:[svg]:text-destructive! data-highlighted:data-[variant=destructive]:*:[svg]:text-destructive-foreground! [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "data-highlighted:bg-(--surface-hover) data-highlighted:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:data-highlighted:bg-destructive/20 data-[variant=destructive]:data-highlighted:text-destructive-foreground data-[variant=destructive]:*:[svg]:text-destructive! data-highlighted:data-[variant=destructive]:*:[svg]:text-destructive-foreground! [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
@@ -239,7 +250,7 @@ function DropdownMenuCheckboxItem({
     <BaseMenu.CheckboxItem
       data-slot="dropdown-menu-checkbox-item"
       className={cn(
-        "data-highlighted:bg-accent/50 data-highlighted:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-md py-1.5 pr-2.5 pl-8 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "data-highlighted:bg-(--surface-hover) data-highlighted:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-md py-1.5 pr-2.5 pl-8 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       checked={checked}
@@ -272,7 +283,7 @@ function DropdownMenuRadioItem({
     <BaseMenu.RadioItem
       data-slot="dropdown-menu-radio-item"
       className={cn(
-        "data-highlighted:bg-accent/50 data-highlighted:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-md py-1.5 pr-2.5 pl-8 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "data-highlighted:bg-(--surface-hover) data-highlighted:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-md py-1.5 pr-2.5 pl-8 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
@@ -300,7 +311,7 @@ function DropdownMenuLinkItem({
       data-slot="dropdown-menu-link-item"
       data-inset={inset}
       className={cn(
-        "data-highlighted:bg-accent/50 data-highlighted:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-md px-2.5 py-1.5 text-sm no-underline outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "data-highlighted:bg-(--surface-hover) data-highlighted:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-md px-2.5 py-1.5 text-sm no-underline outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
@@ -331,7 +342,7 @@ function DropdownMenuSubTrigger({
       delay={delay}
       closeDelay={closeDelay}
       className={cn(
-        "data-highlighted:bg-accent/50 data-highlighted:text-accent-foreground data-popup-open:bg-accent/50 data-popup-open:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground flex cursor-default items-center gap-2 rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "data-highlighted:bg-(--surface-hover) data-highlighted:text-accent-foreground data-popup-open:bg-(--surface-hover) data-popup-open:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground flex cursor-default items-center gap-2 rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
@@ -352,11 +363,17 @@ function DropdownMenuSubContent({
   sideOffset = 0,
   align = "start",
   alignOffset,
+  level = 5,
+  shadowLevel = 3,
   ...props
 }: React.ComponentProps<typeof BaseMenu.Popup> & {
   align?: BaseMenu.Positioner.Props["align"];
   alignOffset?: BaseMenu.Positioner.Props["alignOffset"];
   sideOffset?: BaseMenu.Positioner.Props["sideOffset"];
+  /** Surface elevation level for the submenu bg (1-8). Defaults to 5 — one tier above the parent menu's default of 3. Bump higher when nesting inside a Dialog. */
+  level?: SurfaceLevel;
+  /** Shadow weight (1-8). Pinned to 3 by default so the submenu reads the same dropdown weight as its parent. */
+  shadowLevel?: SurfaceLevel;
 }) {
   // Default alignOffset to -5 when align is not "center" to line up first item with trigger
   const defaultAlignOffset = align !== "center" ? -4 : undefined;
@@ -371,8 +388,10 @@ function DropdownMenuSubContent({
       >
         <BaseMenu.Popup
           data-slot="dropdown-menu-content"
+          data-level={level}
           className={cn(
-            "bg-popover text-popover-foreground min-w-[12rem] overflow-hidden rounded-xl border bg-clip-padding shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)]",
+            "text-popover-foreground relative min-w-[12rem] overflow-hidden rounded-xl",
+            solidSurface(level, shadowLevel),
             "ease-out-expo origin-(--transform-origin) transition-[transform,scale,opacity] duration-100",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",

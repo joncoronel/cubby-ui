@@ -41,7 +41,6 @@ export function DateRangePicker({
   const [hoverDate, setHoverDate] = React.useState<Date | undefined>(undefined);
   const previousTempRangeRef = React.useRef<DateRange | undefined>(undefined);
 
-  // Initialize temp range with current value when popover opens
   React.useEffect(() => {
     if (open) {
       setTempRange(value);
@@ -57,9 +56,7 @@ export function DateRangePicker({
   };
 
   const displayRange = React.useMemo(() => {
-    // Show hover preview when selecting second date
     if (tempRange?.from && !tempRange?.to && hoverDate) {
-      // Ensure proper range order
       const start = tempRange.from;
       const end = hoverDate;
       if (start.getTime() <= end.getTime()) {
@@ -74,31 +71,24 @@ export function DateRangePicker({
   const handleSelect = (range: DateRange | undefined) => {
     const prevRange = previousTempRangeRef.current;
 
-    // Clear hover state when a selection is made
     setHoverDate(undefined);
 
-    // Prevent deselecting all dates - if range is undefined or empty, ignore
     if (!range?.from) {
       return;
     }
 
-    // Detect if user is starting a new selection
     if (prevRange?.from && prevRange?.to) {
-      // Had a complete range before
       if (range?.from && range?.to) {
-        // Still have a complete range
         if (range.from.getTime() === range.to.getTime()) {
-          // Single date clicked - start new selection
           setTempRange({ from: range.from, to: undefined });
           previousTempRangeRef.current = { from: range.from, to: undefined };
           return;
         } else if (
-          // Check if it's just extending/modifying the existing range
+          // Calendar extends an existing range instead of starting fresh —
+          // detect that and restart from the clicked date.
           range.from.getTime() === prevRange.from.getTime() ||
           range.to.getTime() === prevRange.to.getTime()
         ) {
-          // This is modifying the existing range, but we want to start fresh
-          // So we need to clear and start over with just the newly clicked date
           const clickedDate =
             range.from.getTime() !== prevRange.from.getTime()
               ? range.from
@@ -109,15 +99,12 @@ export function DateRangePicker({
         }
       }
 
-      // Special case: if we had a single-day range and user clicks on a single date
-      // This happens when Calendar is in range mode but user clicks on the same date that was selected
+      // Clicking the same single-day range clears it and restarts selection.
       if (range?.from && !range?.to) {
-        // Check if this is clicking on the same single-day range
         if (
           prevRange.from.getTime() === prevRange.to.getTime() &&
           range.from.getTime() === prevRange.from.getTime()
         ) {
-          // Clicking on the same single-day range - start new selection
           setTempRange({ from: range.from, to: undefined });
           previousTempRangeRef.current = { from: range.from, to: undefined };
           return;
@@ -125,9 +112,7 @@ export function DateRangePicker({
       }
     }
 
-    // If user is selecting a second date
     if (range.from && !range.to && prevRange?.from && !prevRange?.to) {
-      // User clicked on the first date again - create single-day range
       if (range.from.getTime() === prevRange.from.getTime()) {
         const singleDayRange = { from: range.from, to: range.from };
         setTempRange(singleDayRange);
@@ -141,9 +126,7 @@ export function DateRangePicker({
     setTempRange(range);
     previousTempRangeRef.current = range;
 
-    // Update the actual value and close when both dates are selected
     if (range?.from && range?.to) {
-      // Ensure proper range order - from should be earlier than to
       const normalizedRange = {
         from:
           range.from.getTime() <= range.to.getTime() ? range.from : range.to,
@@ -179,7 +162,6 @@ export function DateRangePicker({
         sideOffset={4}
         arrow={false}
         onMouseLeave={() => {
-          // Clear hover when leaving the popover content
           setHoverDate(undefined);
         }}
       >
@@ -191,14 +173,14 @@ export function DateRangePicker({
           fixedWeeks={fixedWeeks}
           selected={displayRange}
           onSelect={(range) => {
-            // Prevent auto-completion when starting fresh (no existing tempRange)
+            // Calendar auto-sets both dates on first click — convert to a single
+            // anchor date so the user can pick the end of the range normally.
             if (
               !tempRange?.from &&
               range?.from &&
               range?.to &&
               range.from.getTime() === range.to.getTime()
             ) {
-              // This is a fresh selection where Calendar auto-set both dates - convert to single date selection
               setTempRange({ from: range.from, to: undefined });
               previousTempRangeRef.current = {
                 from: range.from,
@@ -207,10 +189,9 @@ export function DateRangePicker({
               return;
             }
 
-            // Important: when we have a hover preview active, we need to handle the selection differently
+            // With hover preview active, `range.to` is the hovered date; use it
+            // as the actual end date rather than relying on the preview state.
             if (tempRange?.from && !tempRange?.to && hoverDate && range?.to) {
-              // This is the second date selection with hover preview
-              // Use the actual clicked date, not the hover preview
               const actualRange = {
                 from:
                   tempRange.from.getTime() <= range.to.getTime()
@@ -227,14 +208,12 @@ export function DateRangePicker({
             }
           }}
           onDayClick={(date) => {
-            // Handle case where there's no existing selection - start new range selection
             if (!tempRange?.from) {
               setTempRange({ from: date, to: undefined });
               previousTempRangeRef.current = { from: date, to: undefined };
               return;
             }
 
-            // Handle case where user clicks the same date while selecting
             if (
               tempRange?.from &&
               !tempRange?.to &&
@@ -244,27 +223,24 @@ export function DateRangePicker({
               return;
             }
 
-            // Handle case where user clicks on a single-day range to start new selection
             if (
               tempRange?.from &&
               tempRange?.to &&
               tempRange.from.getTime() === tempRange.to.getTime() &&
               date.getTime() === tempRange.from.getTime()
             ) {
-              // Clicking on the same single-day range - start new selection
               setTempRange({ from: date, to: undefined });
               previousTempRangeRef.current = { from: date, to: undefined };
               return;
             }
           }}
           onDayMouseEnter={(date) => {
-            // Only show hover preview when selecting the second date
             if (tempRange?.from && !tempRange?.to) {
               setHoverDate(date);
             }
           }}
           onDayMouseLeave={() => {
-            // Let the Calendar handle its own mouse leave
+            // Calendar handles its own mouse-leave; no action needed here.
           }}
         />
       </PopoverContent>

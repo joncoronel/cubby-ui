@@ -69,13 +69,13 @@ export default function SheetPositions() {
           </SheetHeader>
           <SheetBody>
             <nav className="flex flex-col gap-1">
-              <a href="#" className="hover:bg-muted rounded-md px-3 py-2 text-sm">
+              <a href="#" className="hover:bg-(--surface-hover) rounded-md px-3 py-2 text-sm">
                 Home
               </a>
-              <a href="#" className="hover:bg-muted rounded-md px-3 py-2 text-sm">
+              <a href="#" className="hover:bg-(--surface-hover) rounded-md px-3 py-2 text-sm">
                 About
               </a>
-              <a href="#" className="hover:bg-muted rounded-md px-3 py-2 text-sm">
+              <a href="#" className="hover:bg-(--surface-hover) rounded-md px-3 py-2 text-sm">
                 Contact
               </a>
             </nav>

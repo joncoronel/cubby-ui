@@ -384,6 +384,12 @@
     ],
     "reference": []
   },
+  "qr-code": {
+    "title": "QR Code",
+    "description": "A from-scratch, zero-dependency QR code generator rendered as pure scalable SVG.",
+    "dependencies": [],
+    "reference": []
+  },
   "radio-group": {
     "title": "Radio-group",
     "description": "A radio-group component.",
@@ -428,16 +434,6 @@
     "description": "A sheet component.",
     "dependencies": [
       "@base-ui/react",
-      "lucide-react"
-    ],
-    "reference": []
-  },
-  "sidebar": {
-    "title": "Sidebar",
-    "description": "A sidebar component.",
-    "dependencies": [
-      "@base-ui/react",
-      "class-variance-authority",
       "lucide-react"
     ],
     "reference": []

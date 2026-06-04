@@ -2,22 +2,28 @@ import * as React from "react";
 import { Autocomplete as BaseAutocomplete } from "@base-ui/react/autocomplete";
 import { cn } from "@/lib/utils";
 import {
+  elevatedSurface,
+  type SurfaceLevel,
+} from "@/registry/default/lib/elevated";
+import {
   ScrollArea,
   type ScrollAreaProps,
 } from "@/registry/default/scroll-area/scroll-area";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Cancel01Icon } from "@hugeicons/core-free-icons";
+import { ArrowDown01Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
 const AutocompleteRoot = BaseAutocomplete.Root;
 
 function AutocompleteInput({
   className,
   showTrigger = false,
   showClear = false,
+  variant = "default",
   ...props
 }: BaseAutocomplete.Input.Props & {
   showTrigger?: boolean;
   showClear?: boolean;
+  variant?: "default" | "elevated";
 }) {
   return (
     <BaseAutocomplete.InputGroup
@@ -32,7 +38,8 @@ function AutocompleteInput({
       <BaseAutocomplete.Input
         data-slot="autocomplete-input"
         className={cn(
-          "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground bg-input dark:bg-input/30 flex h-10 w-full min-w-0 rounded-lg border bg-clip-padding px-3 text-base font-normal shadow-xs disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 sm:h-9 md:text-sm",
+          "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground flex h-10 w-full min-w-0 rounded-lg border bg-clip-padding px-3 text-base font-normal disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 sm:h-9 md:text-sm",
+          variant === "default" ? "bg-input" : "bg-input-elevated",
           "file:text-foreground file:inline-flex file:h-7 file:rounded-md file:border-0 file:bg-transparent file:text-sm file:font-medium",
           "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
           "aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
@@ -42,15 +49,7 @@ function AutocompleteInput({
       />
       {(showClear || showTrigger) && (
         <div className="absolute inset-y-0 right-3 flex items-center gap-2">
-          {showClear && (
-            <AutocompleteClear>
-              <HugeiconsIcon
-                icon={Cancel01Icon}
-                className="h-4 w-4"
-                strokeWidth={2}
-              />
-            </AutocompleteClear>
-          )}
+          {showClear && <AutocompleteClear />}
           {showTrigger && <AutocompleteTrigger />}
         </div>
       )}
@@ -66,14 +65,21 @@ function AutocompleteTrigger({
   return (
     <BaseAutocomplete.Trigger
       data-slot="autocomplete-trigger"
+      aria-label="Open popup"
       className={cn(
-        "border-border/70 bg-card hover:bg-accent/5 inline-flex h-9 items-center justify-center rounded-lg border px-3 py-2 text-sm font-medium shadow-[0_1px_2px_0_oklch(0.18_0_0/0.04)] transition-colors disabled:pointer-events-none disabled:opacity-60",
-        "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+        "inline-flex size-4 cursor-pointer items-center justify-center rounded-md border-none bg-transparent p-0 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-60",
+        "outline-none focus-visible:ring-2 focus-visible:ring-ring/70",
         className,
       )}
       {...props}
     >
-      {children}
+      {children ?? (
+        <HugeiconsIcon
+          icon={ArrowDown01Icon}
+          className="h-4 w-4"
+          strokeWidth={2}
+        />
+      )}
     </BaseAutocomplete.Trigger>
   );
 }
@@ -93,19 +99,29 @@ function AutocompleteIcon({
 
 function AutocompleteClear({
   className,
+  children,
   ...props
 }: BaseAutocomplete.Clear.Props) {
   return (
     <BaseAutocomplete.Clear
       data-slot="autocomplete-clear"
+      aria-label="Clear selection"
       className={cn(
         "inline-flex h-4 w-4 cursor-pointer items-center justify-center rounded-sm opacity-70 transition-[opacity,scale,transform,translate] hover:opacity-100 disabled:pointer-events-none",
-        "focus-visible:border-ring focus-visible:ring-ring/30 duration-100 outline-none focus-visible:ring-3",
+        "focus-visible:ring-2 focus-visible:ring-ring/70 duration-100 outline-none",
         "data-ending-style:translate-x-1 data-ending-style:opacity-0 data-starting-style:translate-x-1 data-starting-style:opacity-0",
         className,
       )}
       {...props}
-    />
+    >
+      {children ?? (
+        <HugeiconsIcon
+          icon={Cancel01Icon}
+          className="h-4 w-4"
+          strokeWidth={2}
+        />
+      )}
+    </BaseAutocomplete.Clear>
   );
 }
 
@@ -149,13 +165,24 @@ function AutocompletePositioner({
 
 function AutocompletePopup({
   className,
+  level = 3,
+  shadowLevel = 3,
   ...props
-}: BaseAutocomplete.Popup.Props) {
+}: BaseAutocomplete.Popup.Props & {
+  /** Surface elevation level for the popup bg (1-8). Bump when nesting inside a Dialog. Defaults to 3. */
+  level?: SurfaceLevel;
+  /** Shadow weight (1-8). Pinned to 3 by default so the autocomplete reads the same regardless of nesting depth. */
+  shadowLevel?: SurfaceLevel;
+}) {
   return (
     <BaseAutocomplete.Popup
       data-slot="autocomplete-popup"
+      data-level={level}
       className={cn(
-        "bg-popover text-popover-foreground ring-border ease-out-expo flex max-h-(--available-height) w-(--anchor-width) max-w-(--available-width) origin-(--transform-origin) flex-col overflow-clip overscroll-contain rounded-xl shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)] ring-1 transition-[transform,scale,opacity] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
+        "text-popover-foreground ease-out-expo flex max-h-(--available-height) w-(--anchor-width) max-w-(--available-width) origin-(--transform-origin) flex-col overflow-clip overscroll-contain rounded-xl transition-[transform,scale,opacity] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
+        // Use elevatedSurface (rim on ::after) because group labels can be
+        // sticky and would otherwise hide the rim where they sit.
+        elevatedSurface(level, shadowLevel),
         className,
       )}
       {...props}
@@ -179,7 +206,7 @@ function AutocompleteArrow({
       <svg width="20" height="10" viewBox="0 0 20 10" fill="none">
         <path
           d="M9.66437 2.60207L4.80758 6.97318C4.07308 7.63423 3.11989 8 2.13172 8H0V9H20V8H18.5349C17.5468 8 16.5936 7.63423 15.8591 6.97318L11.0023 2.60207C10.622 2.2598 10.0447 2.25979 9.66437 2.60207Z"
-          className="fill-popover"
+          className="fill-(--popup-surface,var(--popover))"
         />
         <path
           d="M10.3333 3.34539L5.47654 7.71648C4.55842 8.54279 3.36693 9 2.13172 9H0V8H2.13172C3.11989 8 4.07308 7.63423 4.80758 6.97318L9.66437 2.60207C10.0447 2.25979 10.622 2.2598 11.0023 2.60207L15.8591 6.97318C16.5936 7.63423 17.5468 8 18.5349 8H20V9H18.5349C17.2998 9 16.1083 8.54278 15.1901 7.71648L10.3333 3.34539Z"
@@ -339,7 +366,7 @@ function AutocompleteItem({
       ref={ref}
       data-slot="autocomplete-item"
       className={cn(
-        "data-highlighted:bg-accent/50 data-highlighted:text-accent-foreground relative flex cursor-default items-center rounded-md px-2.5 py-2 text-sm outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60",
+        "data-highlighted:text-accent-foreground relative flex cursor-default items-center rounded-md px-2.5 py-2 text-sm outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-highlighted:bg-(--surface-hover)",
         // Spacing from list edges
         "mx-1 first:mt-1 last:mb-1",
         className,
@@ -370,7 +397,7 @@ function AutocompleteGroupLabel({
     <BaseAutocomplete.GroupLabel
       data-slot="autocomplete-group-label"
       className={cn(
-        "text-muted-foreground bg-popover px-3.5 py-1.5 pt-2.5 text-xs font-semibold",
+        "text-muted-foreground bg-(--popup-surface,var(--popover)) px-3.5 py-1.5 pt-2.5 text-xs font-semibold",
         className,
       )}
       {...props}

@@ -1,0 +1,217 @@
+---
+title: Transition Panel
+description: Direction-aware animated swap between named views with auto-animated height
+type: composable
+---
+
+import { TransitionPanel, TransitionPanelView } from "@/registry/default/transition-panel/transition-panel";
+
+## Preview
+
+<ComponentPreview component="transition-panel" example="transition-panel-basic" />
+
+## Installation
+
+<ComponentInstall component="transition-panel" />
+
+## Usage
+
+<ComponentUsage component="transition-panel" />
+
+## Examples
+
+### Crossfade
+
+Set `transition="fade"` to swap views with a non-directional crossfade (opacity plus a subtle `0.96 → 1` scale) instead of a slide. Useful for in-place content swaps — dialogs, popovers, settings panels — where a directional slide would feel out of place. The container's height still animates as the active view's content size changes, and the opacity duration adapts to the size change so a short-to-short swap fades faster than a short-to-tall one.
+
+<ComponentPreview component="transition-panel" example="transition-panel-crossfade" />
+
+### Multi-step dialog
+
+A real-world composition: a multi-step authenticator-setup wizard inside a [Dialog](/docs/components/dialog). Each step lives in its own `TransitionPanelView` — including the icon, title, and description — so the whole surface crossfades and the dialog grows or shrinks to fit the active step. The verify step auto-focuses the [Input OTP](/docs/components/input-otp) field because focus moves to the first tabbable element of the newly active view on each swap.
+
+<ComponentPreview component="transition-panel" example="transition-panel-dialog" />
+
+## API Reference
+
+`TransitionPanel` is a pure-CSS compound component — there is no underlying Base UI primitive. Views register themselves through context, so `TransitionPanelView` does not need to be a direct child: wrappers, fragments, conditional rendering, and Suspense boundaries are all supported.
+
+The entrance animation uses `@starting-style` and `transition-behavior: allow-discrete`. Older browsers degrade to an instant swap with no slide — no broken state, just no motion. The component also respects `prefers-reduced-motion`.
+
+### Props
+
+#### TransitionPanel
+
+Outer container. Renders a `<div>` and accepts any native div prop (`id`, `role`, `aria-label`, `ref`, `data-*`, `style`, etc.). Composes a consumer `ref` with the internal ref used for height measurement.
+
+<ApiPropsList>
+
+<ApiProp
+  name="activeKey"
+  fullType="string"
+  required
+>
+  The `viewKey` of the currently visible view. Must match the `viewKey` of one of the `TransitionPanelView` descendants. Changing this value triggers the slide and height animation.
+</ApiProp>
+
+<ApiProp
+  name="transition"
+  fullType='"slide" | "fade"'
+  simpleType="string"
+  defaultValue='"slide"'
+>
+  Transition style. `"slide"` slides views horizontally and is direction-aware (forward enters from the right, back from the left). `"fade"` crossfades with a subtle `0.96 → 1` scale, is non-directional, and uses `--tp-fade-duration` for the opacity / scale (size-adaptive by default, so the fade speed tracks the height change).
+</ApiProp>
+
+<ApiProp
+  name="render"
+  fullType="ReactElement | ((props, state) => ReactElement)"
+  simpleType="element"
+>
+  Replace the root element or merge it with another component (Base UI's render-prop polymorphism). The internal height-measurement ref and the consumer `ref` are composed onto whatever element you render.
+</ApiProp>
+
+</ApiPropsList>
+
+##### Data attributes
+
+Set on the root element so consumers can style based on transition state.
+
+<ApiPropsList>
+
+<ApiProp
+  name="data-slot"
+  fullType='"transition-panel"'
+>
+  Styling hook for the root element.
+</ApiProp>
+
+<ApiProp
+  name="data-transition"
+  fullType='"slide" | "fade"'
+>
+  Mirrors the `transition` prop.
+</ApiProp>
+
+<ApiProp
+  name="data-activation-direction"
+  fullType='"left" | "right" | "none"'
+>
+  Direction of the most recent swap. `"none"` before any activation has happened (first render). Matches Base UI's `Tabs.Panel` vocabulary. In `fade` mode the built-in animation is non-directional, but this still reports the logical forward (`"right"`) / back (`"left"`) direction for consumers who want to drive their own directional styling.
+</ApiProp>
+
+</ApiPropsList>
+
+##### CSS custom properties
+
+Set on the root and inherited by view wrappers. Override via the `style` prop or a CSS rule.
+
+<ApiPropsList>
+
+<ApiProp
+  name="--tp-duration"
+  fullType="time"
+  defaultValue="240ms"
+>
+  Duration of the height transition, plus the slide / opacity transition on views in `slide` mode.
+</ApiProp>
+
+<ApiProp
+  name="--tp-fade-duration"
+  fullType="time"
+  defaultValue="adaptive (~0.15s–0.27s)"
+>
+  Duration of the opacity / scale transition on views in `fade` mode. Defaults to a size-adaptive value (the height observer adapts it to the size change between views, clamped to roughly `0.15s`–`0.27s`, so larger height changes fade a little slower). Set it to a fixed time to opt out of the adaptive behavior. Not used in `slide` mode.
+</ApiProp>
+
+<ApiProp
+  name="--tp-ease"
+  fullType="easing-function"
+  defaultValue="cubic-bezier(0.32, 0.72, 0, 1)"
+>
+  Easing for the height transition and, in `slide` mode, the slide / opacity transition.
+</ApiProp>
+
+<ApiProp
+  name="--tp-fade-ease"
+  fullType="easing-function"
+  defaultValue="cubic-bezier(0.26, 0.08, 0.25, 1)"
+>
+  Easing for the crossfade in `fade` mode.
+</ApiProp>
+
+<ApiProp
+  name="--tp-clip-margin"
+  fullType="length"
+  defaultValue="0px"
+>
+  Bleed area for the panel's overflow clip. Defaults to `0` because the recommended composition (frame on the panel, padding inside each view) keeps focus rings and shadows well inside the clip box. Bump it (e.g. `8px`) only when the panel is nested inside a padded container where view content sits flush with the clip edge.
+</ApiProp>
+
+</ApiPropsList>
+
+#### TransitionPanelView
+
+A single view registered with the parent panel. Renders a `<div>` and accepts any native div prop (`className`, `style`, `id`, `aria-label`, `aria-labelledby`, `ref`, `data-*`, etc.) in addition to those documented below — spread props land on the view wrapper. The consumer `ref` is composed with the internal ref used for registration with the parent panel. Visibility, slide offset, and `inert` state are driven by the parent's `activeKey`. Inactive views stay mounted (their internal state survives swaps) but are marked `inert` and `aria-hidden` so focus and assistive tech skip them.
+
+<ApiPropsList>
+
+<ApiProp
+  name="viewKey"
+  fullType="string"
+  required
+>
+  Identifier matched against the parent's `activeKey` to determine when this view is visible.
+</ApiProp>
+
+<ApiProp
+  name="initialFocus"
+  fullType="boolean | React.RefObject<HTMLElement | null>"
+  defaultValue="true"
+>
+  What to focus when this view becomes active after a swap. `true` focuses the first tabbable element inside the view; `false` opts out; a ref focuses that specific element. Skipped on the initial render — the parent surface (popover, dialog, sheet, page) owns first-mount focus. Focus is applied with `{ preventScroll: true }` so the entrance animation can finish without scroll-jank.
+</ApiProp>
+
+<ApiProp
+  name="render"
+  fullType="ReactElement | ((props, state) => ReactElement)"
+  simpleType="element"
+>
+  Render the view as a different element or merge it with another component (e.g. a `Card`) instead of the default `<div>` wrapper. The registration ref and consumer `ref` are composed onto the rendered element.
+</ApiProp>
+
+</ApiPropsList>
+
+##### Data attributes
+
+<ApiPropsList>
+
+<ApiProp
+  name="data-slot"
+  fullType='"transition-panel-view"'
+>
+  Styling hook for the view wrapper.
+</ApiProp>
+
+<ApiProp
+  name="data-active"
+  fullType="present when active"
+>
+  Present on the currently visible view.
+</ApiProp>
+
+<ApiProp
+  name="data-viewkey"
+  fullType="string"
+>
+  Mirrors the `viewKey` prop. Used internally to re-derive view order from DOM position on each registration.
+</ApiProp>
+
+</ApiPropsList>
+
+### Notes
+
+- **Composability.** Views can be wrapped in HOCs, fragments, error boundaries, Suspense boundaries, or rendered via `.map()` and conditional logic — registration routes through context, not React children.
+- **Direction inference.** Direction is computed by comparing the new and previous `activeKey` against the registered view order, so back-navigation slides the opposite way automatically. Re-deriving from DOM position on each registration means a view that unmounts and remounts (e.g. `{isPro && <TransitionPanelView ...>}`) keeps its source-order slot.
+- **Focus management.** Focus moves in a `useLayoutEffect`, before the browser paints, to minimize the gap between the outgoing view becoming `inert` and the incoming view receiving focus.
+- **Height animation.** Animates the real `height` property (via `ResizeObserver`) rather than `transform: scale`, so descendant layout doesn't warp. The transition runs **only while swapping views** — content that animates its own height inside the active view (an expanding error, an accordion) drives a single height tween that the panel tracks exactly, instead of the panel running a second, competing one. Acceptable for typical panel use cases; if you need compositor-only height animation for a high-frequency surface, fork to a Motion / FLIP implementation.

@@ -9,7 +9,7 @@ import { useInvalidFeedback } from "@/registry/default/otp-field/hooks/use-inval
 
 const CODE_LENGTH = 6;
 
-function sanitizeTierCode(value: string) {
+function normalizeTierCode(value: string) {
   return value.replace(/[^0-3]/g, "");
 }
 
@@ -28,7 +28,7 @@ export default function OtpFieldCustomSanitization() {
         length={CODE_LENGTH}
         validationType="none"
         inputMode="numeric"
-        sanitizeValue={sanitizeTierCode}
+        normalizeValue={normalizeTierCode}
         onValueChange={invalidFeedback.handleValueChange}
         onValueInvalid={invalidFeedback.handleValueInvalid}
         aria-describedby={descriptionId}

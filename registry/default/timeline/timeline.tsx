@@ -7,7 +7,6 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
-// Variants
 const timelineVariants = cva("group/timeline flex", {
   variants: {
     orientation: {
@@ -26,9 +25,9 @@ const timelineIndicatorVariants = cva(
     variants: {
       state: {
         pending:
-          "border-border/80 bg-input shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.08)]",
+          "border-border/80 bg-muted shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.08)]",
         current:
-          "border-primary bg-primary/5 ring-2 ring-primary/20 ring-offset-2 ring-offset-background shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.08)]",
+          "border-primary bg-primary/5 outline-2 outline-primary/20 outline-offset-2 shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.08)]",
         completed:
           "border-primary bg-primary text-primary-foreground shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.08)]",
       },
@@ -59,14 +58,12 @@ const timelineSeparatorVariants = cva(
   },
 );
 
-// Types
 type TimelineContextValue = {
   activeStep: number;
   setActiveStep: (step: number) => void;
   orientation: "horizontal" | "vertical";
 };
 
-// Context
 const TimelineContext = React.createContext<TimelineContextValue | undefined>(
   undefined,
 );
@@ -83,13 +80,11 @@ const useTimeline = () => {
   return context;
 };
 
-// Base render function type
 type RenderFunction<T> = (
   props: T,
   ref: React.Ref<HTMLElement>,
 ) => React.ReactElement | null;
 
-// Components
 interface TimelineProps
   extends
     useRender.ComponentProps<"div">,
@@ -150,7 +145,6 @@ function Timeline({
   );
 }
 
-// TimelineContent
 interface TimelineContentProps extends React.HTMLAttributes<HTMLDivElement> {
   render?: RenderFunction<React.HTMLAttributes<HTMLDivElement>>;
 }
@@ -168,7 +162,6 @@ function TimelineContent({
   return render ? render(contentProps, null) : <div {...contentProps} />;
 }
 
-// TimelineDate
 interface TimelineDateProps extends React.HTMLAttributes<HTMLTimeElement> {
   render?: RenderFunction<React.HTMLAttributes<HTMLTimeElement>>;
 }
@@ -185,7 +178,6 @@ function TimelineDate({ className, render, ...props }: TimelineDateProps) {
   return render ? render(dateProps, null) : <time {...dateProps} />;
 }
 
-// TimelineHeader
 interface TimelineHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   render?: RenderFunction<React.HTMLAttributes<HTMLDivElement>>;
 }
@@ -199,7 +191,6 @@ function TimelineHeader({ className, render, ...props }: TimelineHeaderProps) {
   return render ? render(headerProps, null) : <div {...headerProps} />;
 }
 
-// TimelineIndicator
 interface TimelineIndicatorProps extends React.HTMLAttributes<HTMLDivElement> {
   render?: RenderFunction<React.HTMLAttributes<HTMLDivElement>>;
 }
@@ -241,7 +232,6 @@ function TimelineIndicator({
   );
 }
 
-// TimelineItem
 interface TimelineItemProps extends React.HTMLAttributes<HTMLDivElement> {
   step: number;
   render?: RenderFunction<React.HTMLAttributes<HTMLDivElement>>;
@@ -277,7 +267,6 @@ function TimelineItem({
   );
 }
 
-// TimelineSeparator
 interface TimelineSeparatorProps extends React.HTMLAttributes<HTMLDivElement> {
   render?: RenderFunction<React.HTMLAttributes<HTMLDivElement>>;
 }
@@ -309,7 +298,6 @@ function TimelineSeparator({
   return render ? render(separatorProps, null) : <div {...separatorProps} />;
 }
 
-// TimelineTitle
 interface TimelineTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
   render?: RenderFunction<React.HTMLAttributes<HTMLHeadingElement>>;
 }

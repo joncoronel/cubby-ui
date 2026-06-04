@@ -7,11 +7,9 @@ import "./marching-border.css";
 
 export type MarchingBorderProps = React.ComponentProps<"svg"> & {
   /**
-   * Override the auto-detected corner radius (in pixels). When omitted,
-   * MarchingBorder reads its parent element's computed
-   * `border-top-left-radius` — so the typical usage is to drop it inside
-   * any positioned parent that already has a `rounded-*` class and have
-   * the border conform automatically.
+   * Corner radius in pixels. Omit to auto-detect from the parent's computed
+   * `border-top-left-radius` — the typical usage is to drop it inside a
+   * positioned, `rounded-*` parent and let the border conform.
    */
   radius?: number;
   /** Stroke thickness in pixels. */
@@ -28,13 +26,10 @@ export type MarchingBorderProps = React.ComponentProps<"svg"> & {
 };
 
 /**
- * Builds the `d` attribute for a rounded-rect path that starts at the
- * midpoint of the top edge. Starting mid-edge (rather than at a corner,
- * the default for `<rect>`) puts any residual subpixel seam on a straight
- * side where it's invisible.
- *
- * `inset` shifts every coordinate inward by half the stroke so the stroke
- * sits inside the SVG bounding box instead of being clipped at the edges.
+ * Builds the `d` for a rounded-rect path starting at the midpoint of the top
+ * edge, so any residual subpixel seam falls on a straight side (invisible)
+ * rather than at a corner. `inset` shifts coordinates inward by half the stroke
+ * so the stroke sits inside the SVG box instead of clipping at the edges.
  */
 function buildRoundedRectPath(
   width: number,
@@ -50,45 +45,38 @@ function buildRoundedRectPath(
   const top = inset;
   const right = inset + innerW;
   const bottom = inset + innerH;
+  // Round to 2 decimals to keep `d` compact; 0.01px is sub-visible so corner
+  // alignment with the parent's border-radius is unaffected.
+  const f = (n: number) => Math.round(n * 100) / 100;
   return [
-    `M ${left + innerW / 2} ${top}`,
-    `L ${right - r} ${top}`,
-    `A ${r} ${r} 0 0 1 ${right} ${top + r}`,
-    `L ${right} ${bottom - r}`,
-    `A ${r} ${r} 0 0 1 ${right - r} ${bottom}`,
-    `L ${left + r} ${bottom}`,
-    `A ${r} ${r} 0 0 1 ${left} ${bottom - r}`,
-    `L ${left} ${top + r}`,
-    `A ${r} ${r} 0 0 1 ${left + r} ${top}`,
+    `M ${f(left + innerW / 2)} ${f(top)}`,
+    `L ${f(right - r)} ${f(top)}`,
+    `A ${f(r)} ${f(r)} 0 0 1 ${f(right)} ${f(top + r)}`,
+    `L ${f(right)} ${f(bottom - r)}`,
+    `A ${f(r)} ${f(r)} 0 0 1 ${f(right - r)} ${f(bottom)}`,
+    `L ${f(left + r)} ${f(bottom)}`,
+    `A ${f(r)} ${f(r)} 0 0 1 ${f(left)} ${f(bottom - r)}`,
+    `L ${f(left)} ${f(top + r)}`,
+    `A ${f(r)} ${f(r)} 0 0 1 ${f(left + r)} ${f(top)}`,
     "Z",
   ].join(" ");
 }
 
 /**
- * Marching-ants dashed border drawn as an absolutely-positioned SVG
- * overlay. Lives outside the wrapped element's box model so toggling it
- * on/off causes zero layout shift. Parent must be `position: relative`
- * (or another positioned ancestor) and should have a `rounded-*` class
- * for the border to conform to.
+ * Marching-ants dashed border, drawn as an absolutely-positioned SVG overlay
+ * outside the wrapped element's box model so toggling it causes zero layout
+ * shift. Parent must be positioned and should have a `rounded-*` class to
+ * conform to.
  *
- * Seam-free loop, two techniques combined:
+ * Seam-free loop via two techniques: (1) `pathLength` is rounded to a whole
+ * multiple of `(dash + gap)` so the pattern tiles an integer number of times at
+ * any size — making `dash`/`gap` perimeter percentages; (2) the path's `M` sits
+ * mid-top-edge so residual subpixel error falls on a straight side. The shared
+ * `@keyframes dash-march` (in `marching-border.css`) reads the one-cycle end
+ * offset from a CSS var, so any `(dash, gap)` loops without per-cycle keyframes.
  *
- *  1. `pathLength` is set to a constant near 100, rounded to the nearest
- *     whole multiple of `(dash + gap)`. The dash pattern tiles the path
- *     an exact integer number of times regardless of element size — so
- *     `dash` and `gap` act as percentages of the perimeter.
- *
- *  2. The path's `M` is at the midpoint of the top edge so any residual
- *     subpixel error falls mid-straight-edge instead of at a corner.
- *
- * The `@keyframes dash-march` rule lives in `marching-border.css` and
- * is shared across every instance. The end offset (one full cycle)
- * comes from a CSS variable on the path so any `(dash, gap)`
- * combination loops seamlessly without per-cycle keyframe generation.
- *
- * Under `prefers-reduced-motion`, only the marching animation is
- * suppressed — the dashed border itself still renders, since for staged
- * edit-mode it's the primary visual signal of pending state.
+ * Under `prefers-reduced-motion` only the animation is suppressed — the dashed
+ * border still renders as the primary signal of pending/staged state.
  */
 function MarchingBorder({
   radius,
@@ -105,9 +93,6 @@ function MarchingBorder({
   const cycle = dash + gap;
   const pathLength = Math.max(cycle, Math.round(100 / cycle) * cycle);
 
-  // Compose the consumer `ref` with the internal `svgRef` used by the
-  // ResizeObserver. Mirrors the pattern used in `TransitionPanel` so a
-  // forwarded ref still works alongside the component's own DOM reads.
   const setSvgRef = React.useCallback(
     (node: SVGSVGElement | null) => {
       svgRef.current = node;
@@ -120,10 +105,8 @@ function MarchingBorder({
     [ref],
   );
 
-  // useLayoutEffect so the first paint includes the path's `d` — without
-  // this there's a one-frame gap waiting for ResizeObserver to fire its
-  // initial callback, which reads as a visible flash on staged-state
-  // entry.
+  // useLayoutEffect so the first paint already has the path's `d`; otherwise
+  // the wait for ResizeObserver's initial callback flashes on staged-state entry.
   React.useLayoutEffect(() => {
     const svg = svgRef.current;
     const path = pathRef.current;
@@ -135,9 +118,8 @@ function MarchingBorder({
       const { width, height } = svg.getBoundingClientRect();
       if (width <= 0 || height <= 0) return;
 
-      // Use the explicit `radius` prop when provided, otherwise auto-
-      // detect from the parent's computed border-radius. Read on each
-      // resize so theme changes / dynamic radius updates are picked up.
+      // Explicit `radius` prop, else auto-detect from the parent's computed
+      // border-radius. Re-read each resize to track theme / dynamic updates.
       const parent = svg.parentElement;
       const detected =
         radius ??
@@ -145,11 +127,9 @@ function MarchingBorder({
           ? parseFloat(getComputedStyle(parent).borderTopLeftRadius)
           : NaN);
       const outerRadius = Number.isFinite(detected) ? detected : 0;
-      // Path arc radius = outer radius − stroke inset. The stroke
-      // renders centered on the path, so the stroke's outer edge sits on
-      // a curve of (pathRadius + inset), which equals the parent's
-      // border-radius. Without the subtraction the rounded corners
-      // wouldn't align with the underlying element.
+      // pathRadius = outerRadius − inset: the stroke is centered on the path,
+      // so its outer edge sits at (pathRadius + inset) = the parent's
+      // border-radius. Without the subtraction the corners wouldn't align.
       const pathRadius = Math.max(0, outerRadius - inset);
 
       path.setAttribute(

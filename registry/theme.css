@@ -1,44 +1,88 @@
 :root {
   --radius: 0.75rem;
 
-  /* Background colors */
-  --background: oklch(0.98 0 0);
-  --foreground: oklch(0.18 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.27 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.27 0 0);
+  /* Neutral tint — applied to every neutral via oklch().
+     Change these two values to retune the entire surface/foreground stack:
+     --neutral-hue     : hue angle for the tint (0–360). Brand-direction.
+     --neutral-chroma  : chroma for mid-tone neutrals (L roughly 0.10–0.95).
+     --neutral-chroma-low : chroma for near-extreme L (> 0.95 or < 0.05). */
+  --neutral-hue: 270;
+  --neutral-chroma: 0.004;
+  --neutral-chroma-low: 0.002;
+
+  /* Background colors — aliased to the surface ladder.
+     The page is surface-1; cards and floating popovers/dropdowns share
+     surface-3. */
+  --background: var(--surface-1);
+  --foreground: oklch(0.18 var(--neutral-chroma) var(--neutral-hue));
+
+  --card: var(--surface-3);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface-3);
+  --popover-foreground: var(--foreground);
 
   /* Primary & accent colors */
   --primary: oklch(0.6 0.2 250);
   --primary-foreground: oklch(1 0 0);
+  /* Primary used AS TEXT on a neutral plate (e.g. the `primary-soft` button).
+     Derived from --primary so it tracks any brand color. In light the solid
+     primary reads fine; dark brightens it (see .dark) since --primary is too
+     dim as text on the darker secondary surface. */
+  --primary-soft-foreground: var(--primary);
   --neutral: oklch(0.22 0 0);
-  --neutral-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.95 0 0);
-  --secondary-foreground: oklch(0.32 0 0);
-  --muted: oklch(0.95 0 0);
-  --muted-foreground: oklch(0.5 0 0);
+  --neutral-foreground: oklch(
+    0.98 var(--neutral-chroma-low) var(--neutral-hue)
+  );
+  --secondary: oklch(0.92 0 0);
+  --secondary-foreground: oklch(0.32 var(--neutral-chroma) var(--neutral-hue));
+  --muted: oklch(0.94 0 0);
+  --muted-foreground: oklch(0.5 var(--neutral-chroma) var(--neutral-hue));
   --accent: oklch(0.91 0 0);
-  --accent-foreground: oklch(0.22 0 0);
+  --accent-foreground: oklch(0.22 var(--neutral-chroma) var(--neutral-hue));
   --destructive: oklch(0.53 0.19 25);
-  --destructive-foreground: oklch(0.98 0 0);
+  --destructive-foreground: oklch(
+    0.98 var(--neutral-chroma-low) var(--neutral-hue)
+  );
+  /* Destructive used AS TEXT on a destructive-tinted plate (the
+     `destructive-soft` button). Derived from --destructive so it tracks the
+     consumer's danger color; brightened in dark (see .dark) for readability. */
+  --destructive-soft-foreground: var(--destructive);
+
+  /* Hover-state colors — mix direction is chosen per-token to shift AWAY
+     from the token's natural lightness, so the change always reads as a
+     visible hover. Most light-mode tokens darken (mix toward black), but
+     --neutral is already dark (0.22) and barely shifts when blacked, so it
+     lightens instead. Mix amounts are tuned per token for similar visual
+     "step" — saturated tokens (destructive in dark) need a larger mix. */
+  --primary-hover: color-mix(in oklch, var(--primary), black 5%);
+  --neutral-hover: color-mix(in oklch, var(--neutral), white 10%);
+  --destructive-hover: color-mix(in oklch, var(--destructive), black 5%);
+  --secondary-hover: color-mix(in oklch, var(--secondary), black 5%);
+  --outline-hover: color-mix(in oklch, var(--card), black 5%);
 
   /* Borders & inputs */
-  --border: oklch(0 0 0 / 8%);
-  --input: oklch(0.95 0 0);
+  --border: oklch(0 0 0 / 10%);
+  --input: var(--surface-3);
+  --input-elevated: oklch(0 0 0 / 8%);
   --ring: oklch(0.55 0.2 250);
-
   --scrollbar: oklch(0.87 0 0);
 
-  /* Sidebar colors */
-  --sidebar: oklch(0.98 0 0);
-  --sidebar-foreground: oklch(0.22 0 0);
-  --sidebar-primary: oklch(0.28 0 0);
-  --sidebar-primary-foreground: oklch(0.97 0 0);
-  --sidebar-accent: oklch(0.92 0 0);
-  --sidebar-accent-foreground: oklch(0.28 0 0);
-  --sidebar-border: oklch(0.9 0 0);
-  --sidebar-ring: oklch(0.65 0 0);
+  /* Sidebar colors — aliased to the core tokens so the sidebar palette tracks
+     the rest of the system. (The Sidebar component currently derives its
+     interactive states from --surface-hover/--surface-selected/--primary
+     directly, but these aliases keep the sidebar-* set on-system for anyone who
+     references them.) Because they're aliases, no `.dark` overrides are needed —
+     the referenced tokens resolve per mode. */
+  --sidebar: var(--surface-1);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
+  /* Opaque equivalent of --border pre-composited on the sidebar surface — used
+     as a solid bg on the resize rail, where a translucent border is too faint. */
+  --sidebar-border: oklch(0.9 var(--neutral-chroma) var(--neutral-hue));
+  --sidebar-ring: var(--ring);
 
   /* Status colors */
   --danger: oklch(0.97 0.04 25);
@@ -53,46 +97,129 @@
   --success: oklch(0.97 0.04 145);
   --success-foreground: oklch(0.48 0.18 145);
   --success-border: oklch(0.9 0.1 145);
+
+  /* Surface elevation ladder (1-8).
+     Light mode: all surfaces stay neutral (no chroma). Surfaces 3-8 are pure
+     white; 1-2 step down through pure neutral grays. Shadow alone carries
+     elevation here. */
+  --surface-1: oklch(0.97 0 0);
+  --surface-2: oklch(0.985 0 0);
+  --surface-3: oklch(1 0 0);
+  --surface-4: oklch(1 0 0);
+  --surface-5: oklch(1 0 0);
+  --surface-6: oklch(1 0 0);
+  --surface-7: oklch(1 0 0);
+  --surface-8: oklch(1 0 0);
+
+  /* State overlays — translucent overlays that raise the underlying surface
+     by a fixed perceptual delta no matter what level it's sitting on. Light
+     mode uses black-on-white. */
+  --surface-hover: oklch(0 0 0 / 0.06);
+  --surface-selected: oklch(0 0 0 / 0.1);
+  --surface-rim-color: oklch(0 0 0 / 0);
+
+  /* Light shadow recipe — opacity decreases with blur radius to mimic
+     natural light fall-off. The crisp 1px ring stays at full opacity;
+     drop layers soften progressively. */
+  --surface-shadow-ring: oklch(0 0 0 / 0.06); /* crisp edge */
+  --surface-shadow-near: oklch(0 0 0 / 0.06); /* 1px blur (contact) */
+  --surface-shadow-mid: oklch(0 0 0 / 0.05); /* 3–6px blur */
+  --surface-shadow-far: oklch(0 0 0 / 0.04); /* 12–24px blur */
+  --surface-shadow-ambient: oklch(0 0 0 / 0.03); /* 48–96px blur */
+  --surface-shadow-1: 0 0 0 1px var(--surface-shadow-ring);
+  --surface-shadow-2:
+    0 0 0 1px var(--surface-shadow-ring),
+    0 1px 1px -0.5px var(--surface-shadow-near);
+  --surface-shadow-3:
+    0 0 0 1px var(--surface-shadow-ring),
+    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid);
+  --surface-shadow-4:
+    0 0 0 1px var(--surface-shadow-ring),
+    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid),
+    0 6px 6px -3px var(--surface-shadow-mid);
+  --surface-shadow-5:
+    0 0 0 1px var(--surface-shadow-ring),
+    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid),
+    0 6px 6px -3px var(--surface-shadow-mid),
+    0 12px 12px -6px var(--surface-shadow-far);
+  --surface-shadow-6:
+    0 0 0 1px var(--surface-shadow-ring),
+    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid),
+    0 6px 6px -3px var(--surface-shadow-mid),
+    0 12px 12px -6px var(--surface-shadow-far),
+    0 24px 24px -12px var(--surface-shadow-far);
+  --surface-shadow-7:
+    0 0 0 1px var(--surface-shadow-ring),
+    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid),
+    0 6px 6px -3px var(--surface-shadow-mid),
+    0 12px 12px -6px var(--surface-shadow-far),
+    0 24px 24px -12px var(--surface-shadow-far),
+    0 48px 48px -24px var(--surface-shadow-ambient);
+  --surface-shadow-8:
+    0 0 0 1px var(--surface-shadow-ring),
+    0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid),
+    0 6px 6px -3px var(--surface-shadow-mid),
+    0 12px 12px -6px var(--surface-shadow-far),
+    0 24px 24px -12px var(--surface-shadow-far),
+    0 48px 48px -24px var(--surface-shadow-ambient),
+    0 96px 96px -48px var(--surface-shadow-ambient);
+
+  /* Rim overlay (inset parts of the shadow recipe). Light mode uses outer
+     rings only — no rim needed, so these are no-ops. */
+  --surface-rim-1: 0 0 transparent;
+  --surface-rim-2: 0 0 transparent;
+  --surface-rim-3: 0 0 transparent;
+  --surface-rim-4: 0 0 transparent;
+  --surface-rim-5: 0 0 transparent;
+  --surface-rim-6: 0 0 transparent;
+  --surface-rim-7: 0 0 transparent;
+  --surface-rim-8: 0 0 transparent;
 }
 
 .dark {
-  /* Background colors */
-  --background: oklch(0.19 0 0);
-  --foreground: oklch(0.94 0 0);
-  --card: oklch(0.21 0 0);
-  --card-foreground: oklch(0.94 0 0);
-  --popover: oklch(0.21 0 0);
-  --popover-foreground: oklch(0.94 0 0);
-
-  /* Primary & accent colors */
-  --neutral: oklch(0.95 0 0);
-  --neutral-foreground: oklch(0.13 0 0);
-  --secondary: oklch(0.28 0 0);
-  --secondary-foreground: oklch(0.94 0 0);
-  --muted: oklch(0.26 0 0);
-  --muted-foreground: oklch(0.73 0 0);
-  --accent: oklch(0.31 0 0);
-  --accent-foreground: oklch(0.95 0 0);
+  /* Dark-mode color overrides */
+  --foreground: oklch(0.94 var(--neutral-chroma) var(--neutral-hue));
+  --neutral: oklch(0.95 var(--neutral-chroma) var(--neutral-hue));
+  --neutral-foreground: oklch(0.13 var(--neutral-chroma) var(--neutral-hue));
+  --secondary: oklch(0.35 var(--neutral-chroma) var(--neutral-hue));
+  --secondary-foreground: oklch(0.94 var(--neutral-chroma) var(--neutral-hue));
+  --muted: oklch(0.24 var(--neutral-chroma) var(--neutral-hue));
+  --muted-foreground: oklch(0.73 var(--neutral-chroma) var(--neutral-hue));
+  --accent: oklch(0.31 var(--neutral-chroma) var(--neutral-hue));
+  --accent-foreground: oklch(0.95 var(--neutral-chroma) var(--neutral-hue));
   --destructive: oklch(0.5 0.22 25);
   --destructive-foreground: oklch(1 0 0);
+  /* Brighten --primary toward white so primary-soft's label stays readable on
+     the darker secondary plate (solid --primary is too dim as text in dark).
+     Derived, so it tracks whatever --primary the consumer sets. */
+  --primary-soft-foreground: color-mix(in oklch, var(--primary), white 30%);
+  /* Same treatment for destructive-soft's label on its tinted plate. */
+  --destructive-soft-foreground: color-mix(in oklch, var(--destructive), white 30%);
 
-  /* Borders & inputs */
+  /* Dark-mode hover colors — same per-token logic as :root above. Most
+     tokens brighten (mix toward white), but --neutral is near-white in dark
+     (0.95) so it darkens instead. */
+  --primary-hover: color-mix(in oklch, var(--primary), white 10%);
+  --neutral-hover: color-mix(in oklch, var(--neutral), black 10%);
+  --destructive-hover: color-mix(in oklch, var(--destructive), white 15%);
+  --secondary-hover: color-mix(in oklch, var(--secondary), white 5%);
+  --outline-hover: color-mix(in oklch, var(--card), white 5%);
+
   --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
+  --input-elevated: oklch(1 0 0 / 9%);
+  --scrollbar: oklch(0.7 var(--neutral-chroma) var(--neutral-hue));
 
-  --scrollbar: oklch(0.7 0 0);
+  /* Sidebar — only --sidebar-border needs a dark value; the rest are aliases
+     (set in :root) that resolve per mode automatically. */
+  --sidebar-border: oklch(0.28 var(--neutral-chroma) var(--neutral-hue));
 
-  /* Sidebar colors */
-  --sidebar: oklch(0.19 0 0);
-  --sidebar-foreground: oklch(0.88 0 0);
-  --sidebar-primary: oklch(0.95 0 0);
-  --sidebar-primary-foreground: oklch(0.13 0 0);
-  --sidebar-accent: oklch(0.19 0 0);
-  --sidebar-accent-foreground: oklch(0.95 0 0);
-  --sidebar-border: oklch(0.28 0 0);
-  --sidebar-ring: oklch(0.83 0 0);
-
-  /* Status colors */
+  /* Status */
   --danger: oklch(0.26 0.07 25);
   --danger-foreground: oklch(0.75 0.15 25);
   --danger-border: oklch(0.36 0.11 25);
@@ -105,6 +232,101 @@
   --success: oklch(0.26 0.07 145);
   --success-foreground: oklch(0.72 0.15 145);
   --success-border: oklch(0.36 0.11 145);
+
+  /* Surface ladder — progressive lightness with brand-hue tint */
+  --surface-1: oklch(0.205 var(--neutral-chroma) var(--neutral-hue));
+  --surface-2: oklch(0.235 var(--neutral-chroma) var(--neutral-hue));
+  --surface-3: oklch(0.264 var(--neutral-chroma) var(--neutral-hue));
+  --surface-4: oklch(0.293 var(--neutral-chroma) var(--neutral-hue));
+  --surface-5: oklch(0.321 var(--neutral-chroma) var(--neutral-hue));
+  --surface-6: oklch(0.348 var(--neutral-chroma) var(--neutral-hue));
+  --surface-7: oklch(0.375 var(--neutral-chroma) var(--neutral-hue));
+  --surface-8: oklch(0.402 var(--neutral-chroma) var(--neutral-hue));
+
+  /* State overlays flip to white-on-black */
+  --surface-hover: oklch(1 0 0 / 0.06);
+  --surface-selected: oklch(1 0 0 / 0.1);
+  --surface-rim-color: oklch(1 0 0 / 0.04);
+
+  /* Dark-only tokens used by the rim recipe */
+  --surface-hi-base: oklch(1 0 0 / 0.01);
+  --surface-hi-mid: oklch(1 0 0 / 0.02);
+  --surface-hi-high: oklch(1 0 0 / 0.04);
+  --surface-hi-peak: oklch(1 0 0 / 0.06);
+  --surface-ring-base: oklch(1 0 0 / 0.02);
+  --surface-ring-mid: oklch(1 0 0 / 0.04);
+  --surface-ring-high: oklch(1 0 0 / 0.06);
+
+  /* Same per-layer alpha tokens as light mode (--surface-shadow-near/mid/far/
+     ambient) — overridden here with darker values. Tighter range than light
+     (0.18 → 0.12 vs 0.06 → 0.03) so wider layers don't fade against the dark
+     substrate. */
+  --surface-shadow-near: oklch(0 0 0 / 0.18);
+  --surface-shadow-mid: oklch(0 0 0 / 0.16);
+  --surface-shadow-far: oklch(0 0 0 / 0.14);
+  --surface-shadow-ambient: oklch(0 0 0 / 0.12);
+
+  /* Drop-shadow + outer-ring portion of the dark recipe (no insets here) */
+  --surface-shadow-1: 0 0 transparent;
+  --surface-shadow-2: 0 1px 1px -0.5px var(--surface-shadow-near);
+  --surface-shadow-3:
+    0 0 0 1px oklch(0 0 0 / 0.12), 0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid);
+  --surface-shadow-4:
+    0 0 0 1px oklch(0 0 0 / 0.14), 0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid),
+    0 6px 6px -3px var(--surface-shadow-mid);
+  --surface-shadow-5:
+    0 0 0 1px oklch(0 0 0 / 0.16), 0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid),
+    0 6px 6px -3px var(--surface-shadow-mid),
+    0 12px 12px -6px var(--surface-shadow-far);
+  --surface-shadow-6:
+    0 0 0 1px oklch(0 0 0 / 0.18), 0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid),
+    0 6px 6px -3px var(--surface-shadow-mid),
+    0 12px 12px -6px var(--surface-shadow-far),
+    0 24px 24px -12px var(--surface-shadow-far);
+  --surface-shadow-7:
+    0 0 0 1px oklch(0 0 0 / 0.2), 0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid),
+    0 6px 6px -3px var(--surface-shadow-mid),
+    0 12px 12px -6px var(--surface-shadow-far),
+    0 24px 24px -12px var(--surface-shadow-far),
+    0 48px 48px -24px var(--surface-shadow-ambient);
+  --surface-shadow-8:
+    0 0 0 1px oklch(0 0 0 / 0.22), 0 1px 1px -0.5px var(--surface-shadow-near),
+    0 3px 3px -1.5px var(--surface-shadow-mid),
+    0 6px 6px -3px var(--surface-shadow-mid),
+    0 12px 12px -6px var(--surface-shadow-far),
+    0 24px 24px -12px var(--surface-shadow-far),
+    0 48px 48px -24px var(--surface-shadow-ambient),
+    0 96px 96px -48px var(--surface-shadow-ambient);
+
+  /* Inset portion of the dark recipe — painted via a pseudo-element so
+     it always sits above opaque children (sticky labels, headers, etc). */
+  --surface-rim-1: inset 0 0 0 1px var(--surface-ring-base);
+  --surface-rim-2:
+    inset 0 1px 0 0 var(--surface-hi-base),
+    inset 0 0 0 1px var(--surface-ring-base);
+  --surface-rim-3:
+    inset 0 1px 0 0 var(--surface-hi-mid),
+    inset 0 0 0 1px var(--surface-ring-base);
+  --surface-rim-4:
+    inset 0 1px 0 0 var(--surface-hi-mid),
+    inset 0 0 0 1px var(--surface-ring-mid);
+  --surface-rim-5:
+    inset 0 1px 0 0 var(--surface-hi-high),
+    inset 0 0 0 1px var(--surface-ring-mid);
+  --surface-rim-6:
+    inset 0 1px 0 0 var(--surface-hi-high),
+    inset 0 0 0 1px var(--surface-ring-high);
+  --surface-rim-7:
+    inset 0 1px 0 0 var(--surface-hi-peak),
+    inset 0 0 0 1px var(--surface-ring-high);
+  --surface-rim-8:
+    inset 0 1px 0 0 var(--surface-hi-peak),
+    inset 0 0 0 1px var(--surface-ring-high);
 }
 
 @theme inline {
@@ -129,6 +351,7 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
+  --color-input-elevated: var(--input-elevated);
   --color-ring: var(--ring);
   --color-scrollbar: var(--scrollbar);
 
@@ -175,6 +398,35 @@
   /* Inset shadows for bordered elements (applied to before pseudo-element inset by 1px) */
   --shadow-inset: 0 1px 2px 0 oklch(0 0 0 / 0.08);
   --shadow-inset-highlight: 0 -1px oklch(1 0 0 / 0.04);
+
+  /* Surface elevation utilities — generates bg-surface-{1..8},
+     shadow-surface-{1..8}, and shadow-surface-rim-{1..8}. */
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-surface-4: var(--surface-4);
+  --color-surface-5: var(--surface-5);
+  --color-surface-6: var(--surface-6);
+  --color-surface-7: var(--surface-7);
+  --color-surface-8: var(--surface-8);
+
+  --shadow-surface-1: var(--surface-shadow-1);
+  --shadow-surface-2: var(--surface-shadow-2);
+  --shadow-surface-3: var(--surface-shadow-3);
+  --shadow-surface-4: var(--surface-shadow-4);
+  --shadow-surface-5: var(--surface-shadow-5);
+  --shadow-surface-6: var(--surface-shadow-6);
+  --shadow-surface-7: var(--surface-shadow-7);
+  --shadow-surface-8: var(--surface-shadow-8);
+
+  --shadow-surface-rim-1: var(--surface-rim-1);
+  --shadow-surface-rim-2: var(--surface-rim-2);
+  --shadow-surface-rim-3: var(--surface-rim-3);
+  --shadow-surface-rim-4: var(--surface-rim-4);
+  --shadow-surface-rim-5: var(--surface-rim-5);
+  --shadow-surface-rim-6: var(--surface-rim-6);
+  --shadow-surface-rim-7: var(--surface-rim-7);
+  --shadow-surface-rim-8: var(--surface-rim-8);
 }
 
 /* Base UI requirements */

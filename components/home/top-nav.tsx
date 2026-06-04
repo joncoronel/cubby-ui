@@ -60,22 +60,18 @@ function SearchTrigger() {
       type="button"
       onClick={() => setOpenSearch(true)}
       className={cn(
-        "group text-muted-foreground hover:text-foreground flex h-9 items-center gap-2 rounded-md border border-transparent px-2.5 text-sm font-normal transition-colors",
-        "hover:border-border/60 hover:bg-muted/60",
+        "group text-muted-foreground hover:text-foreground flex h-9 items-center gap-2 rounded-full border border-transparent pr-1.5 pl-3 text-sm font-normal transition-colors",
+        "hover:border-border/70 hover:bg-card/70",
         "focus-visible:outline-ring/50 outline-none focus-visible:outline-2 focus-visible:outline-offset-2",
       )}
     >
-      <HugeiconsIcon
-        icon={Search01Icon}
-        className="size-4"
-        strokeWidth={2}
-      />
+      <HugeiconsIcon icon={Search01Icon} className="size-4" strokeWidth={2} />
       <span>Search</span>
       <Kbd
         size="sm"
         variant="outline"
         keys={["cmd", "k"]}
-        className="ml-2 hidden lg:inline-flex"
+        className="ml-1 hidden lg:inline-flex"
       />
     </button>
   );
@@ -114,11 +110,16 @@ function NavLink({
   return (
     <Link
       href={href}
+      aria-current={active ? "page" : undefined}
       className={cn(
-        "relative inline-flex items-center text-sm font-medium transition-colors",
+        // Mirrors the ghost Button / sidebar item: surface-overlay fill on
+        // hover with a muted->foreground text shift, held at the stronger
+        // selected overlay when active.
+        "inline-flex h-8 items-center rounded-md px-2.5 text-sm font-medium transition-colors duration-150 ease-out",
+        "focus-visible:outline-ring/50 outline-none focus-visible:outline-2 focus-visible:outline-offset-2",
         active
-          ? "text-foreground"
-          : "text-muted-foreground hover:text-foreground",
+          ? "text-foreground bg-(--surface-selected)"
+          : "text-muted-foreground hover:text-foreground hover:bg-(--surface-hover)",
       )}
     >
       {label}
@@ -126,29 +127,48 @@ function NavLink({
   );
 }
 
+function useScrolled(threshold = 6) {
+  const [scrolled, setScrolled] = React.useState(false);
+
+  React.useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > threshold);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [threshold]);
+
+  return scrolled;
+}
+
 export function TopNav() {
   const pathname = usePathname();
+  const scrolled = useScrolled();
 
   return (
     <header
       style={{ ["--fd-nav-height" as string]: "3.5rem" }}
-      className="border-border/60 bg-background/80 sticky top-0 z-40 w-full border-b backdrop-blur-md"
+      className={cn(
+        "sticky top-0 z-40 w-full transition-colors duration-300 ease-out",
+        scrolled
+          ? "border-border/60 bg-background/72 border-b backdrop-blur-md"
+          : "border-b border-transparent bg-transparent",
+      )}
     >
       <div className="mx-auto flex h-14 max-w-[1400px] items-center justify-between gap-6 px-5 sm:px-8">
         {/* Left — logo + wordmark */}
         <Link
           href="/"
-          className="group flex items-center gap-2"
+          className="group flex items-center gap-2.5"
           aria-label="Cubby UI — home"
         >
           <CubbyUILogo className="text-foreground h-5 w-auto" />
-          <span className="font-rubik text-foreground text-base leading-none font-semibold tracking-tight">
+          <span className="text-foreground font-(family-name:--font-display) text-[1.05rem] leading-none font-semibold tracking-tight">
             Cubby UI
           </span>
         </Link>
 
         {/* Center — nav links */}
-        <nav className="hidden items-center gap-6 md:flex">
+        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 md:flex">
           {NAV_ITEMS.map((item) => {
             const active =
               pathname === item.href ||

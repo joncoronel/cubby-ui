@@ -12,6 +12,8 @@ import {
   DialogTrigger,
 } from "@/registry/default/dialog/dialog";
 import { Button } from "@/registry/default/button/button";
+import { solidSurface } from "@/registry/default/lib/elevated";
+import { cn } from "@/lib/utils";
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon } from "@hugeicons/core-free-icons";
@@ -33,8 +35,13 @@ export default function DialogElementsOutside() {
           />
           <span className="sr-only">Close</span>
         </DialogClose>
-        {/* The actual popup card */}
-        <div className="bg-popover text-popover-foreground ring-border ease-out-expo pointer-events-auto w-full max-w-full rounded-2xl shadow-lg ring-1 transition-transform duration-200 group-data-ending-style/popup:translate-y-[calc(1.25rem)] group-data-ending-style/popup:scale-95 group-data-starting-style/popup:translate-y-[calc(1.25rem)] group-data-starting-style/popup:scale-95 sm:max-w-lg">
+        {/* The actual popup card — uses the same elevation as a default Dialog */}
+        <div
+          className={cn(
+            "text-popover-foreground ease-out-expo pointer-events-auto w-full max-w-full rounded-2xl transition-transform duration-200 group-data-ending-style/popup:translate-y-[calc(1.25rem)] group-data-ending-style/popup:scale-95 group-data-starting-style/popup:translate-y-[calc(1.25rem)] group-data-starting-style/popup:scale-95 sm:max-w-lg",
+            solidSurface(5, 5),
+          )}
+        >
           <DialogHeader>
             <DialogTitle>Image Preview</DialogTitle>
             <DialogDescription>

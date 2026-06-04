@@ -44,6 +44,7 @@ export default function ComboboxInputInsidePopup() {
       <ComboboxPopup className="flex flex-col p-0" aria-label="Select country">
         <div className="border-border border-b p-2">
           <ComboboxInput
+            variant="elevated"
             placeholder="e.g. United Kingdom"
             showTrigger={false}
             showClear={false}

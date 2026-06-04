@@ -2,6 +2,10 @@ import * as React from "react";
 import { Popover as BasePopover } from "@base-ui/react/popover";
 
 import { cn } from "@/lib/utils";
+import {
+  solidSurface,
+  type SurfaceLevel,
+} from "@/registry/default/lib/elevated";
 
 function Popover<Payload = unknown>({
   ...props
@@ -39,12 +43,22 @@ function PopoverViewport({ className, ...props }: BasePopover.Viewport.Props) {
   );
 }
 
-function PopoverPopup({ className, ...props }: BasePopover.Popup.Props) {
+function PopoverPopup({
+  className,
+  level = 3,
+  shadowLevel = 3,
+  ...props
+}: BasePopover.Popup.Props & {
+  level?: SurfaceLevel;
+  shadowLevel?: SurfaceLevel;
+}) {
   return (
     <BasePopover.Popup
       data-slot="popover-popup"
+      data-level={level}
       className={cn(
-        "bg-popover text-popover-foreground ring-border/60 max-h-(--available-height) max-w-(--available-width) origin-(--transform-origin) rounded-md shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)] ring-1",
+        "text-popover-foreground relative max-h-(--available-height) max-w-(--available-width) origin-(--transform-origin) rounded-xl",
+        solidSurface(level, shadowLevel),
         className,
       )}
       {...props}
@@ -103,6 +117,8 @@ function PopoverContent({
   arrow = false,
   arrowPadding,
   container,
+  level = 3,
+  shadowLevel = 3,
   ...props
 }: BasePopover.Popup.Props & {
   side?: BasePopover.Positioner.Props["side"];
@@ -116,6 +132,10 @@ function PopoverContent({
   arrow?: boolean;
   arrowPadding?: number;
   container?: HTMLElement | undefined;
+  /** Surface elevation level for the popup bg (1-8). Bump when nesting inside a Dialog or other elevated container. Defaults to 3. */
+  level?: SurfaceLevel;
+  /** Shadow weight (1-8). Pinned to 3 by default so the popover reads the same regardless of nesting depth. */
+  shadowLevel?: SurfaceLevel;
 }) {
   return (
     <PopoverPortal container={container}>
@@ -134,12 +154,15 @@ function PopoverContent({
       >
         <BasePopover.Popup
           data-slot="popover-content"
+          data-level={level}
           className={cn(
             // Base styles
-            "bg-popover text-popover-foreground ring-border/60 relative",
+            "text-popover-foreground relative",
             "h-(--popup-height,auto) w-(--popup-width,auto)",
             "max-h-(--available-height) max-w-(--available-width)",
-            "origin-(--transform-origin) overflow-hidden rounded-md shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)] ring-1",
+            "origin-(--transform-origin) overflow-hidden rounded-xl",
+            // Surface elevation — bg tracks `level`, shadow weight tracks `shadowLevel`
+            solidSurface(level, shadowLevel),
             // Size/opacity transitions
             "transition-[width,height,scale,opacity] duration-[350ms,350ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
@@ -154,7 +177,7 @@ function PopoverContent({
               <svg width="20" height="10" viewBox="0 0 20 10" fill="none">
                 <path
                   d="M9.66437 2.60207L4.80758 6.97318C4.07308 7.63423 3.11989 8 2.13172 8H0V9H20V8H18.5349C17.5468 8 16.5936 7.63423 15.8591 6.97318L11.0023 2.60207C10.622 2.2598 10.0447 2.25979 9.66437 2.60207Z"
-                  className="fill-popover"
+                  className="fill-(--popup-surface,var(--popover))"
                 />
                 <path
                   d="M10.3333 3.34539L5.47654 7.71648C4.55842 8.54279 3.36693 9 2.13172 9H0V8H2.13172C3.11989 8 4.07308 7.63423 4.80758 6.97318L9.66437 2.60207C10.0447 2.25979 10.622 2.2598 11.0023 2.60207L15.8591 6.97318C16.5936 7.63423 17.5468 8 18.5349 8H20V9H18.5349C17.2998 9 16.1083 8.54278 15.1901 7.71648L10.3333 3.34539Z"
@@ -167,7 +190,7 @@ function PopoverContent({
             data-slot="popover-viewport"
             className={cn(
               // Base viewport styles
-              "relative size-full overflow-clip px-4 py-4 [--viewport-padding:1rem]",
+              "relative size-full overflow-clip px-3 py-3 [--viewport-padding:0.75rem]",
               "not-data-transitioning:overflow-y-auto",
               // Content width calculation (edge-to-edge minus padding)
               "**:data-current:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",

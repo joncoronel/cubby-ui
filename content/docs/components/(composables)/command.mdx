@@ -1,0 +1,285 @@
+---
+title: Command
+description: Fast, composable command menu for keyboard-first navigation and actions
+type: composable
+builtOn: ["dialog"]
+---
+
+## Preview
+
+<ComponentPreview component="command" example="command-basic-command-menu" />
+
+## Installation
+
+<ComponentInstall component="command" />
+
+## Usage
+
+<ComponentUsage component="command" />
+
+## Examples
+
+### Command Dialog
+
+Display command menu in a modal dialog with keyboard shortcut support.
+
+<ComponentPreview component="command" example="command-command-dialog" />
+
+### With Footer
+
+Add footer content with keyboard navigation hints.
+
+<ComponentPreview component="command" example="command-with-footer" />
+
+### Fuzzy Search
+
+Enable fuzzy matching for more flexible searching across multiple fields.
+
+<ComponentPreview component="command" example="command-fuzzy" />
+
+### Virtualized
+
+Use virtualization for large lists (100+ items) to maintain smooth performance. Only renders items visible in the viewport, dramatically reducing DOM nodes.
+
+<ComponentPreview component="command" example="command-virtualized" />
+
+**Key concepts:**
+
+1. **Use `useListVirtualizer` hook** - Handles scroll positioning, keyboard navigation, and item measurement. See [useListVirtualizer docs](/docs/hooks/use-list-virtualizer) for full API reference.
+2. **Use `useCommandFilteredItems()` inside Command** - Call `useCommandFilteredItems()` in a child component of `Command` to get internally filtered items without manual filtering boilerplate.
+3. **Replace `CommandList` with `CommandVirtualizedList`** - Accepts `scrollRef` and `totalSize` from the hook.
+4. **Pass `virtualized` and `items` on Command** - Enables virtualized mode with your full item list.
+5. **Use `useHighlightHandler`** - Pass a `virtualizerRef` to the child and use `useHighlightHandler(virtualizerRef)` on the parent so keyboard navigation scrolls to the highlighted item.
+
+> **Manual filtering still works** — If you need custom filter logic (fuzzy search, server-side filtering), you can still compute `filteredItems` externally, pass `filter={null}` to `Command`, and spread `rootProps` from `useListVirtualizer`. See [useCommandFilter](#usecommandfilter).
+
+## API Reference
+
+The Command component is built on top of [Base UI's Autocomplete](https://base-ui.com/react/components/autocomplete) and [Dialog](https://base-ui.com/react/components/dialog). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Autocomplete documentation](https://base-ui.com/react/components/autocomplete).
+
+### Props
+
+#### Command
+
+Root component that manages command menu state and keyboard navigation. Wraps Base UI's `Autocomplete.Root`.
+
+<ApiPropsList>
+
+<ApiProp
+  name="items"
+  fullType="T[] | { items: T[] }[]"
+  simpleType="array"
+  defaultValue="[]"
+>
+  Array of items or grouped items to display. Used with the collection pattern
+  where `CommandList`, `CommandGroup`, and `CommandCollection` receive render
+  functions as children.
+</ApiProp>
+
+<ApiProp
+  name="autoHighlight"
+  fullType='boolean | "always"'
+  defaultValue='"always"'
+>
+  Whether the first matching item is highlighted automatically. Set to
+  `"always"` to ensure an item is always highlighted during keyboard navigation.
+  Base UI defaults to `false`.
+</ApiProp>
+
+<ApiProp name="open" fullType="boolean" defaultValue="true">
+  Keeps the autocomplete list always open. Appropriate for command menu behavior
+  where the list is always visible. Base UI defaults to `false`.
+</ApiProp>
+
+<ApiProp name="keepHighlight" fullType="boolean" defaultValue="true">
+  Whether the highlighted item should be preserved when the pointer leaves the
+  list. Prevents the highlight from going to a "null" state during navigation.
+  Base UI defaults to `false`.
+</ApiProp>
+
+<ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
+  Surface elevation level for the outer Command frame. See the [Surfaces](/docs/getting-started/surfaces) docs. Bump to `7` when rendered inside `CommandDialog` so the palette pops above the dialog.
+</ApiProp>
+
+<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
+  Shadow weight for the outer frame. The bg is pinned to `bg-muted` (gray frame) — only the shadow + rim track this prop.
+</ApiProp>
+
+</ApiPropsList>
+
+#### CommandList
+
+Scrollable container for command items with empty state handling. Wraps Base UI's `Autocomplete.List`.
+
+<ApiPropsList>
+
+<ApiProp
+  name="emptyMessage"
+  fullType="ReactNode"
+  simpleType="node"
+  defaultValue='"No results found."'
+>
+  Custom prop not available in Base UI. Message shown when no results are found
+  in the command list.
+</ApiProp>
+
+<ApiProp name="nativeScroll" fullType="boolean" defaultValue="false">
+  Use native browser scrolling with styled scrollbars instead of Base UI's
+  scroll virtualization. Enables CSS scroll-driven animations for fade edges.
+</ApiProp>
+
+<ApiProp
+  name="fadeEdges"
+  fullType="boolean | 'top' | 'bottom' | 'left' | 'right' | 'x' | 'y' | FadeEdge[]"
+  defaultValue="true"
+>
+  Controls the fade effect on scroll edges. See
+  [ScrollArea](/docs/components/scroll-area#custom-props) for all options.
+</ApiProp>
+
+<ApiProp name="scrollbarGutter" fullType="boolean" defaultValue="false">
+  Reserves space for the scrollbar when content overflows, preventing layout
+  shift.
+</ApiProp>
+
+<ApiProp name="persistScrollbar" fullType="boolean" defaultValue="false">
+  Always show the scrollbar instead of fading it in on hover or scroll.
+</ApiProp>
+
+<ApiProp name="hideScrollbar" fullType="boolean" defaultValue="false">
+  Hides the scrollbar while keeping scroll functionality.
+</ApiProp>
+
+</ApiPropsList>
+
+#### CommandVirtualizedList
+
+Virtualized scrollable container for large lists. Use with `useListVirtualizer` hook for optimal performance with 100+ items.
+
+<ApiPropsList>
+
+<ApiProp
+  name="scrollRef"
+  fullType="(element: HTMLDivElement | null) => void"
+  required
+>
+  Ref callback from `useListVirtualizer` for the scroll container.
+</ApiProp>
+
+<ApiProp name="totalSize" fullType="number" required>
+  Total height of all virtual items in pixels. Provided by `useListVirtualizer`.
+</ApiProp>
+
+<ApiProp
+  name="emptyMessage"
+  fullType="ReactNode"
+  simpleType="node"
+  defaultValue='"No results found."'
+>
+  Message shown when no results are found.
+</ApiProp>
+
+<ApiProp
+  name="fadeEdges"
+  fullType="boolean | 'x' | 'y' | FadeEdge[]"
+  defaultValue='"y"'
+>
+  Controls the fade effect on scroll edges.
+</ApiProp>
+
+<ApiProp name="nativeScroll" fullType="boolean" defaultValue="false">
+  Use native browser scrolling instead of custom scrollbars.
+</ApiProp>
+
+</ApiPropsList>
+
+### Utilities
+
+#### highlightText
+
+Highlights matching portions of text by wrapping them in `<mark>` tags. Useful for showing which parts of a command match the user's input.
+
+See [highlightText](/docs/utils/highlight-text) for full documentation and API reference.
+
+### Hooks
+
+#### useCommandFilter
+
+```ts
+function useCommandFilter(): {
+  contains: (
+    item: T,
+    query: string,
+    getItemLabel: (item: T) => string,
+  ) => boolean;
+  startsWith: (
+    item: T,
+    query: string,
+    getItemLabel: (item: T) => string,
+  ) => boolean;
+  endsWith: (
+    item: T,
+    query: string,
+    getItemLabel: (item: T) => string,
+  ) => boolean;
+};
+```
+
+Exposes Base UI's built-in filter matchers for external filtering. Useful when you need manual control over filtering (e.g., with custom logic or server-side filtering).
+
+**Returns**
+
+| Property     | Type                                     | Description                                                  |
+| ------------ | ---------------------------------------- | ------------------------------------------------------------ |
+| `contains`   | `(item, query, getItemLabel) => boolean` | Returns true if item label contains query (case-insensitive) |
+| `startsWith` | `(item, query, getItemLabel) => boolean` | Returns true if item label starts with query                 |
+| `endsWith`   | `(item, query, getItemLabel) => boolean` | Returns true if item label ends with query                   |
+
+```tsx
+import { useCommandFilter } from "@/registry/default/command/command";
+
+const { contains } = useCommandFilter();
+const getItemLabel = (item: Item | null) => item?.name ?? "";
+
+const filteredItems = useMemo(
+  () => items.filter((item) => contains(item, query, getItemLabel)),
+  [contains, query],
+);
+```
+
+#### useCommandFilteredItems
+
+```ts
+function useCommandFilteredItems<T>(): T[];
+```
+
+Returns the internally filtered items from the Command root. Must be called inside `Command`. Simplifies virtualized implementations by eliminating manual query state, `useDeferredValue`, `useFilter()`, and `useMemo` filtering.
+
+```tsx
+import { useCommandFilteredItems } from "@/registry/default/command/command";
+
+function VirtualizedListContent() {
+  // Must be called inside Command
+  const filteredItems = useCommandFilteredItems<MyItem>();
+
+  const virtualizer = useListVirtualizer({
+    items: allItems,
+    filteredItems,
+  });
+  // ...
+}
+```
+
+#### useFuzzyFilter
+
+Provides fuzzy matching capabilities for flexible searching across multiple fields. Returns filter functions compatible with Base UI's Autocomplete.
+
+See [useFuzzyFilter](/docs/hooks/use-fuzzy-filter) for full documentation and API reference.
+
+#### useListVirtualizer
+
+Provides virtualization for large command lists using TanStack Virtual. Abstracts scroll handling, item positioning, and keyboard navigation.
+
+See [useListVirtualizer](/docs/hooks/use-list-virtualizer) for full documentation and API reference.

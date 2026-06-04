@@ -2,12 +2,16 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
+import {
+  solidSurface,
+  type SurfaceLevel,
+} from "@/registry/default/lib/elevated";
 
 const cardVariants = cva("text-card-foreground flex flex-col", {
   variants: {
     variant: {
-      default: "bg-card gap-6 rounded-2xl border dark:border-border/50 py-6",
-      inset: "rounded-2xl p-1 bg-muted",
+      default: "gap-6 rounded-2xl py-6",
+      inset: "rounded-2xl p-1",
     },
   },
   defaultVariants: {
@@ -16,15 +20,33 @@ const cardVariants = cva("text-card-foreground flex flex-col", {
 });
 
 export interface CardProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof cardVariants> {}
+  extends
+    React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof cardVariants> {
+  level?: SurfaceLevel;
+  shadowLevel?: SurfaceLevel;
+}
 
-function Card({ className, variant = "default", ...props }: CardProps) {
+function Card({
+  className,
+  variant = "default",
+  level = 3,
+  shadowLevel = 1,
+  ...props
+}: CardProps) {
   return (
     <div
       data-slot="card"
       data-variant={variant}
-      className={cn(cardVariants({ variant }), className)}
+      data-level={level}
+      className={cn(
+        cardVariants({ variant }),
+        solidSurface(level, shadowLevel),
+        // bg-muted overrides solidSurface's bg, making the outer a gray frame
+        // while keeping its shadow, rim, and --popup-surface.
+        variant === "inset" && "bg-muted",
+        className,
+      )}
       {...props}
     />
   );
@@ -87,7 +109,7 @@ function CardContent({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="card-content"
       className={cn(
         "[[data-variant=default]>_&]:px-6",
-        "[[data-variant=inset]>_&]:bg-card [[data-variant=inset]>_&]:border-border/25 [[data-variant=inset]>_&]:flex [[data-variant=inset]>_&]:flex-1 [[data-variant=inset]>_&]:flex-col [[data-variant=inset]>_&]:rounded-lg [[data-variant=inset]>_&]:border [[data-variant=inset]>_&]:bg-clip-padding [[data-variant=inset]>_&]:p-4",
+        "[[data-variant=inset]>_&]:bg-surface-3 [[data-variant=inset]>_&]:flex [[data-variant=inset]>_&]:flex-1 [[data-variant=inset]>_&]:flex-col [[data-variant=inset]>_&]:rounded-lg [[data-variant=inset]>_&]:p-4 [[data-variant=inset]>_&]:shadow-[var(--surface-shadow-3),var(--surface-rim-3)] [[data-variant=inset]>_&]:[--popup-surface:var(--surface-3)]",
         className,
       )}
       {...props}

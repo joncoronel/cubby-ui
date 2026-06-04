@@ -28,11 +28,11 @@ export default function BaseDrawerWithForm() {
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="bd-name">Name</Label>
-              <Input id="bd-name" defaultValue="Pedro Duarte" />
+              <Input id="bd-name" variant="elevated" defaultValue="Pedro Duarte" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="bd-username">Username</Label>
-              <Input id="bd-username" defaultValue="@peduarte" />
+              <Input id="bd-username" variant="elevated" defaultValue="@peduarte" />
             </div>
           </div>
         </BaseDrawerPanel>

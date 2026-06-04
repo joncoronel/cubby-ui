@@ -1,0 +1,176 @@
+---
+title: Alert Dialog
+description: Modal dialog that interrupts the user with important content and requires an action
+type: primitive
+---
+
+import { AlertDialog, AlertDialogClose, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/registry/default/alert-dialog/alert-dialog";
+
+## Preview
+
+<ComponentPreview component="alert-dialog" example="alert-dialog-basic" />
+
+## Installation
+
+<ComponentInstall component="alert-dialog" />
+
+## Usage
+
+<ComponentUsage component="alert-dialog" />
+
+## Examples
+
+### Controlled
+
+Control the alert dialog open state programmatically.
+
+<ComponentPreview component="alert-dialog" example="alert-dialog-controlled" />
+
+### Nested
+
+Use nested alert dialogs for multi-step confirmations.
+
+<ComponentPreview component="alert-dialog" example="alert-dialog-nested" />
+
+### Detached Trigger
+
+Place the trigger outside of the AlertDialog component using `createAlertDialogHandle()`.
+
+<ComponentPreview component="alert-dialog" example="alert-dialog-detached-trigger" />
+
+## API Reference
+
+The AlertDialog component is built on top of [Base UI's AlertDialog](https://base-ui.com/react/components/alert-dialog). All Base UI props are supported. The documentation below only covers custom props specific to our implementation.
+
+For the complete Base UI API, see the [Base UI AlertDialog documentation](https://base-ui.com/react/components/alert-dialog).
+
+### Utilities
+
+#### createAlertDialogHandle
+
+Creates a handle that connects an alert dialog to one or more external `AlertDialogTrigger` components. Useful when the triggers need to live outside the `AlertDialog` — for example, when each row in a list has its own delete button but they all share one confirmation dialog.
+
+```tsx
+import { createAlertDialogHandle } from "@/registry/default/alert-dialog/alert-dialog";
+
+const handle = createAlertDialogHandle();
+```
+
+##### Passing data from the trigger to the alert dialog
+
+The handle accepts an optional `<Payload>` generic that types a value each trigger can pass along. The alert dialog reads it through a render-prop child, so you can render different content (or target different resources) per trigger without duplicating the dialog markup.
+
+```tsx
+type User = { id: string; name: string };
+
+const handle = createAlertDialogHandle<User>();
+
+// Multiple triggers, each with its own payload:
+users.map((user) => (
+  <AlertDialogTrigger key={user.id} handle={handle} payload={user}>
+    Delete {user.name}
+  </AlertDialogTrigger>
+));
+
+// One shared alert dialog that renders based on the active trigger:
+<AlertDialog handle={handle}>
+  <AlertDialogContent>
+    {({ payload: user }) => (
+      <AlertDialogHeader>
+        <AlertDialogTitle>Delete {user?.name}?</AlertDialogTitle>
+      </AlertDialogHeader>
+    )}
+  </AlertDialogContent>
+</AlertDialog>;
+```
+
+Without the `<User>` generic, `payload` inside the render prop resolves to `unknown`.
+
+### Props
+
+#### AlertDialogContent
+
+Modal container for important messages requiring user action. Composes `AlertDialog.Portal`, `AlertDialog.Backdrop`, and `AlertDialog.Popup`. Props are forwarded to `AlertDialog.Popup`.
+
+<ApiPropsList>
+
+<ApiProp name="showCloseButton" fullType="boolean" defaultValue="false">
+  Whether to show a close button in the top-right corner of the dialog.
+</ApiProp>
+
+<ApiProp name="variant" fullType='"default" | "inset"' defaultValue='"default"'>
+  The visual variant of the dialog. The `inset` variant adds a muted background with a top border to the footer.
+</ApiProp>
+
+<ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="5">
+  Surface elevation level. See the [Surfaces](/docs/getting-started/surfaces) docs.
+</ApiProp>
+
+<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="5">
+  Shadow weight.
+</ApiProp>
+
+</ApiPropsList>
+
+#### AlertDialogBody
+
+Scrollable content area within the alert dialog.
+
+<ApiPropsList>
+
+<ApiProp
+  name="nativeScroll"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Use native browser scrolling instead of Base UI's ScrollArea. Fade edges still
+  work using CSS scroll-driven animations (Chrome 115+, with static fallback).
+  Note: `persistScrollbar` is not supported with `nativeScroll`.
+</ApiProp>
+
+<ApiProp
+  name="fadeEdges"
+  fullType="boolean | 'top' | 'bottom' | 'left' | 'right' | 'x' | 'y' | FadeEdge[]"
+  defaultValue="true"
+>
+  Controls the fade effect on scroll edges. See [ScrollArea](/docs/components/scroll-area#custom-props) for all options.
+</ApiProp>
+
+<ApiProp
+  name="scrollbarGutter"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Reserves space for the scrollbar when content overflows, preventing layout shift.
+</ApiProp>
+
+<ApiProp
+  name="persistScrollbar"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Always show the scrollbar instead of fading it in on hover or scroll.
+</ApiProp>
+
+<ApiProp
+  name="hideScrollbar"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Hides the scrollbar while keeping scroll functionality.
+</ApiProp>
+
+</ApiPropsList>
+
+### Notes
+
+#### AlertDialogClose
+
+Use `AlertDialogClose` with the `render` prop to create action buttons that close the dialog. Wraps Base UI's `AlertDialog.Close`.
+
+```tsx
+<AlertDialogFooter>
+  <AlertDialogClose render={<Button variant="outline">Cancel</Button>} />
+  <AlertDialogClose render={<Button variant="destructive">Delete</Button>} />
+</AlertDialogFooter>
+```

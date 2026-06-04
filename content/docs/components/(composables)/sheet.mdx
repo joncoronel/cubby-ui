@@ -1,0 +1,218 @@
+---
+title: Sheet
+description: Sliding panel from screen edge for navigation, forms, or content
+type: composable
+builtOn: ["dialog"]
+---
+
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/registry/default/sheet/sheet";
+
+## Preview
+
+<ComponentPreview component="sheet" example="sheet-basic" />
+
+## Installation
+
+<ComponentInstall component="sheet" />
+
+## Usage
+
+<ComponentUsage component="sheet" />
+
+## Examples
+
+### Positions
+
+Open sheet from different screen edges.
+
+<ComponentPreview component="sheet" example="sheet-positions" />
+
+### Floating Variant
+
+Use `variant="floating"` for a card-like appearance with rounded corners and margins from screen edges. Great for action sheets and share menus.
+
+<ComponentPreview component="sheet" example="sheet-variants" />
+
+### With Form
+
+Include form elements within the sheet.
+
+<ComponentPreview component="sheet" example="sheet-with-form" />
+
+### Nested Sheets
+
+Sheets can be nested within each other. When a nested sheet opens, the parent sheet scales down slightly and shifts away from its edge, revealing a sliver of it behind the nested sheet.
+
+<ComponentPreview component="sheet" example="sheet-nested" />
+
+### Inset Footer
+
+Use `footerVariant="inset"` to give the footer a muted background with a top border, visually separating it from the content.
+
+<ComponentPreview component="sheet" example="sheet-inset-footer" />
+
+### Detached Trigger
+
+Place the trigger outside of the Sheet component using `createSheetHandle()`.
+
+<ComponentPreview component="sheet" example="sheet-detached-trigger" />
+
+### Non-Modal
+
+Pass `modal={false}` for a floating sheet that keeps the page interactive. The backdrop is hidden, pointer events pass through the empty area around the popup, and outside clicks don't dismiss the sheet.
+
+<ComponentPreview component="sheet" example="sheet-non-modal" />
+
+## API Reference
+
+The Sheet component is built on top of [Base UI's Dialog](https://base-ui.com/react/components/dialog). All Base UI props are supported. The documentation below only covers custom props specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Dialog documentation](https://base-ui.com/react/components/dialog).
+
+### Utilities
+
+#### createSheetHandle
+
+Creates a handle that connects a sheet to one or more external `SheetTrigger` components. Useful when the triggers need to live outside the `Sheet` — for example, when each row in a list has its own trigger but they all share one sheet.
+
+```tsx
+import { createSheetHandle } from "@/registry/default/sheet/sheet";
+
+const handle = createSheetHandle();
+```
+
+##### Passing data from the trigger to the sheet
+
+The handle accepts an optional `<Payload>` generic that types a value each trigger can pass along. The sheet reads it through a render-prop child, so you can render different content per trigger without duplicating the sheet markup.
+
+```tsx
+type Skill = { id: string; name: string };
+
+const handle = createSheetHandle<Skill>();
+
+// Multiple triggers, each with its own payload:
+skills.map((skill) => (
+  <SheetTrigger key={skill.id} handle={handle} payload={skill}>
+    View {skill.name}
+  </SheetTrigger>
+));
+
+// One shared sheet that renders based on the active trigger:
+<Sheet handle={handle}>
+  <SheetContent>
+    {({ payload: skill }) => (
+      <SheetHeader>
+        <SheetTitle>{skill?.name}</SheetTitle>
+      </SheetHeader>
+    )}
+  </SheetContent>
+</Sheet>;
+```
+
+Without the `<Skill>` generic, `payload` inside the render prop resolves to `unknown`.
+
+### Props
+
+#### Sheet
+
+Root component. Forwards all props to Base UI's `Dialog.Root`, with modified defaults for the `modal` prop.
+
+<ApiPropsList>
+
+<ApiProp
+  name="modal"
+  fullType='boolean | "trap-focus"'
+  simpleType="boolean"
+  defaultValue="true"
+>
+  Behavior is unchanged from Base UI, but when set to `false` or
+  `"trap-focus"`, `SheetContent` skips the backdrop and wires
+  `pointer-events` so the page remains interactive. Also changes the default
+  of `disablePointerDismissal` to `true` so clicks on the page don't close
+  the sheet. Pass `disablePointerDismissal={false}` explicitly to opt back
+  into outside-click dismissal.
+</ApiProp>
+
+</ApiPropsList>
+
+#### SheetContent
+
+Sliding panel container with positioning. Composes `Dialog.Portal`, `Dialog.Viewport`, and `Dialog.Popup`. Also renders `Dialog.Backdrop` when the sheet is modal. Props are forwarded to `Dialog.Popup`.
+
+<ApiPropsList>
+
+<ApiProp name="side" fullType='"top" | "right" | "bottom" | "left"' simpleType="string" defaultValue='"right"'>
+  Which side of the screen the sheet slides in from. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="variant" fullType='"default" | "floating"' simpleType="string" defaultValue='"default"'>
+  Visual style variant. `"floating"` adds margins from screen edges and rounded corners for a card-like appearance.
+</ApiProp>
+
+<ApiProp name="footerVariant" fullType='"default" | "inset"' simpleType="string" defaultValue='"default"'>
+  Footer style variant. `"inset"` gives the footer a muted background with a top border for visual separation.
+</ApiProp>
+
+<ApiProp name="showCloseButton" fullType="boolean" simpleType="boolean" defaultValue="true">
+  Whether to show the close button in the top-right corner.
+</ApiProp>
+
+<ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="5">
+  Surface elevation level. See the [Surfaces](/docs/getting-started/surfaces) docs. The `default` (viewport-flush) variant uses a single-edge rim on the inner-facing side; the `popup` variant uses the full four-edge rim.
+</ApiProp>
+
+<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="5">
+  Shadow weight.
+</ApiProp>
+
+</ApiPropsList>
+
+#### SheetBody
+
+Scrollable content area within the sheet.
+
+<ApiPropsList>
+
+<ApiProp
+  name="nativeScroll"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Use native browser scrolling instead of Base UI's ScrollArea. Fade edges still
+  work using CSS scroll-driven animations (Chrome 115+, with static fallback).
+  Note: `persistScrollbar` is not supported with `nativeScroll`.
+</ApiProp>
+
+<ApiProp
+  name="fadeEdges"
+  fullType="boolean | 'top' | 'bottom' | 'left' | 'right' | 'x' | 'y' | FadeEdge[]"
+  defaultValue="true"
+>
+  Controls the fade effect on scroll edges. See [ScrollArea](/docs/components/scroll-area#custom-props) for all options.
+</ApiProp>
+
+<ApiProp
+  name="scrollbarGutter"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Reserves space for the scrollbar when content overflows, preventing layout shift.
+</ApiProp>
+
+<ApiProp
+  name="persistScrollbar"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Always show the scrollbar instead of fading it in on hover or scroll.
+</ApiProp>
+
+<ApiProp
+  name="hideScrollbar"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Hides the scrollbar while keeping scroll functionality.
+</ApiProp>
+
+</ApiPropsList>

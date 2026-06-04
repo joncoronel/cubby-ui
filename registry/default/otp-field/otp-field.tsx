@@ -22,25 +22,30 @@ function OTPField({
 
 function OTPFieldInput({
   className,
+  variant = "default",
   ...props
-}: React.ComponentProps<typeof BaseOTPField.Input>) {
+}: React.ComponentProps<typeof BaseOTPField.Input> & {
+  variant?: "default" | "elevated";
+}) {
   return (
     <BaseOTPField.Input
       data-slot="otp-field-input"
       className={cn(
         // Base styling
-        "bg-input dark:bg-input/35 border-border flex h-10 w-10 items-center justify-center rounded-lg border text-center text-base font-medium shadow-xs sm:h-9 sm:w-9 md:text-sm",
+        "flex h-10 w-10 items-center justify-center rounded-lg border bg-clip-padding text-center text-base font-medium sm:h-9 sm:w-9 md:text-sm",
+        variant === "default" ? "bg-input" : "bg-input-elevated",
         // Selection
         "selection:bg-primary selection:text-primary-foreground",
         // Placeholder
         "placeholder:text-muted-foreground focus:placeholder:text-transparent",
-        // Focus ring (use :focus not data-[focused], which applies to all inputs)
+        // :focus not data-[focused] — data-[focused] propagates to all inputs
+        // in the group, not just the active one.
         "outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid",
         "focus:outline-ring/50 focus:outline-2 focus:outline-offset-2",
         // Invalid state
         "aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
         // Disabled state
-        "data-[disabled]:pointer-events-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
+        "data-[disabled]:pointer-events-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60",
         className,
       )}
       {...props}

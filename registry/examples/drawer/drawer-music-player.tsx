@@ -181,7 +181,7 @@ export default function DrawerMusicPlayer() {
                   {queue.map((track) => (
                     <button
                       key={track.id}
-                      className="hover:bg-muted flex shrink-0 items-center gap-3 rounded-lg p-2 text-left transition-colors"
+                      className="hover:bg-(--surface-hover) flex shrink-0 items-center gap-3 rounded-lg p-2 text-left transition-colors"
                     >
                       <div className="size-10 shrink-0 rounded bg-gradient-to-br from-purple-600/50 to-pink-500/50" />
                       <div className="min-w-0 flex-1">

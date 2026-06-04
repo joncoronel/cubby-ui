@@ -1,0 +1,207 @@
+---
+title: Field
+description: Form field with automatic label association, validation, and error display
+type: primitive
+---
+
+import {
+  Field,
+  FieldLabel,
+  FieldControl,
+  FieldDescription,
+  FieldError,
+  FieldItem,
+  FieldValidity,
+} from "@/registry/default/field/field";
+
+## Preview
+
+<ComponentPreview component="field" example="field-demo" />
+
+## Installation
+
+<ComponentInstall component="field" />
+
+## Usage
+
+<ComponentUsage component="field" />
+
+## Examples
+
+### With Description
+
+Display helper text below the control.
+
+<ComponentPreview component="field" example="field-with-description" />
+
+### Constraint Validation
+
+Use native HTML validation attributes (`required`, `pattern`, `minLength`, `type`, etc.) with a single `FieldError` that displays the browser's native error message.
+
+<ComponentPreview component="field" example="field-validation" />
+
+### Per-State Messages
+
+Customize messages for specific validity states by pairing multiple `FieldError` components with different `match` props. Useful for i18n or overriding the browser's default messages.
+
+<ComponentPreview component="field" example="field-per-state-messages" />
+
+For other ways to customize messages, see [Custom Validation](#custom-validation) (via a `validate` function) and server-side errors via the [Form](/docs/components/form) component's `errors` prop.
+
+### Custom Validation
+
+Run custom validation logic with the `validate` prop. Supports async functions and debouncing.
+
+<ComponentPreview component="field" example="field-custom-validation" />
+
+### With Select
+
+Wrap a Select component with Field for labeling and validation.
+
+<ComponentPreview component="field" example="field-with-select" />
+
+### With Checkbox
+
+Use implicit labeling by placing a Checkbox inside `FieldLabel`.
+
+<ComponentPreview component="field" example="field-with-checkbox" />
+
+### With Switch
+
+Use implicit labeling by placing a Switch inside `FieldLabel`.
+
+<ComponentPreview component="field" example="field-with-switch" />
+
+### With Radio Group
+
+Compose Field with Fieldset and RadioGroup using `FieldItem` for each option.
+
+<ComponentPreview component="field" example="field-with-radio-group" />
+
+### With Checkbox Group
+
+Compose Field with Fieldset and CheckboxGroup using `FieldItem` for each option.
+
+<ComponentPreview component="field" example="field-with-checkbox-group" />
+
+### With Slider
+
+Wrap a Slider component with Field. Use `SliderLabel` (not `FieldLabel`) since Slider is a trigger-based control.
+
+<ComponentPreview component="field" example="field-with-slider" />
+
+### Disabled
+
+Disable the entire field, cascading to all child components.
+
+<ComponentPreview component="field" example="field-disabled" />
+
+### Animating Error Visibility
+
+Wrap `FieldError` in `FieldErrorSlot` to smoothly animate the error's height and opacity on mount/unmount. When empty, the slot collapses to zero space - so you get the animation without extra gap in the layout when no error is present.
+
+<ComponentPreview component="field" example="field-with-error-slot" />
+
+<Callout type="info">
+  The height animation relies on CSS `interpolate-size: allow-keywords`, which at the time of writing is only supported in Chromium 129+ (Chrome, Edge, Arc, Brave). Safari and Firefox do not yet support it, so on those browsers the error appears/disappears instantly (opacity still cross-fades). The component still works; only the height tween is degraded.
+</Callout>
+
+<Callout type="warn">
+  Keep the slot in normal **block** flow. `interpolate-size` animates the slot's height from `0` to `auto`, but flex and grid items have an automatic `min-height: auto` that clamps them to their content's height — so the moment the error mounts the slot jumps straight to full height instead of animating. Don't put `display: flex`/`grid` on the `Field`; if you need to center or lay out the field's contents, wrap the inner controls (e.g. an OTP field) in their own flex container. If the slot genuinely must be a flex/grid item, give it `min-h-0` (`min-height: 0`) to remove the clamp.
+</Callout>
+
+## API Reference
+
+The Field component is built on top of [Base UI's Field](https://base-ui.com/react/components/field). All Base UI props are supported.
+
+For the complete Base UI API, see the [Base UI Field documentation](https://base-ui.com/react/components/field).
+
+### Props
+
+#### Field
+
+Groups all parts of the field. Renders a `<div>` element.
+
+<ApiPropsList>
+
+<ApiProp name="name" fullType="string">
+  Identifies the field when a form is submitted.
+</ApiProp>
+
+<ApiProp name="validate" fullType="(value: unknown, formValues: Record<string, any>) => string | string[] | null | Promise<...>">
+  Custom validation function. Return a string with the error message if invalid, or `null` if valid. Supports async.
+</ApiProp>
+
+<ApiProp name="validationMode" fullType="'onSubmit' | 'onBlur' | 'onChange'" defaultValue="'onSubmit'">
+  When validation is triggered. Takes precedence over the Form's `validationMode`.
+</ApiProp>
+
+<ApiProp name="validationDebounceTime" fullType="number" defaultValue="0">
+  Debounce delay in milliseconds for the `validate` function.
+</ApiProp>
+
+<ApiProp name="disabled" fullType="boolean" defaultValue="false">
+  Disables the field and all its children.
+</ApiProp>
+
+<ApiProp name="invalid" fullType="boolean">
+  Externally control the invalid state. Useful with third-party form libraries.
+</ApiProp>
+
+<ApiProp name="dirty" fullType="boolean">
+  Externally control the dirty state. Useful with third-party form libraries.
+</ApiProp>
+
+<ApiProp name="touched" fullType="boolean">
+  Externally control the touched state. Useful with third-party form libraries.
+</ApiProp>
+
+</ApiPropsList>
+
+#### FieldLabel
+
+An accessible label automatically associated with the field control. Renders a `<label>` element. Use for input-type controls (Input, NumberField, OTPField, Autocomplete, Combobox) and toggle controls (Checkbox, Radio, Switch). For trigger-based controls like Select, use `SelectLabel` instead.
+
+<ApiPropsList>
+
+<ApiProp name="nativeLabel" fullType="boolean" defaultValue="true">
+  Whether to render a native `<label>`. Set to `false` when the labeled element is a button (e.g., Select trigger) to avoid inheriting label hover/click behaviors. When `false`, you must also provide a `render` prop with a non-label element (e.g., `render={<div />}`).
+</ApiProp>
+
+</ApiPropsList>
+
+#### FieldControl
+
+The form control to label and validate. Renders an `<input>` element. You can omit this and use any Base UI input component directly inside Field instead.
+
+`FieldControl` inherits its visual styling from the [Input](/docs/components/input) component (`inputVariants`). Changes to Input's variant styles propagate to every `FieldControl` — keep that in mind when customizing either.
+
+#### FieldDescription
+
+A paragraph with additional information about the field. Renders a `<p>` element.
+
+#### FieldError
+
+An error message displayed when the field fails validation. Renders a `<div>` element.
+
+<ApiPropsList>
+
+<ApiProp name="match" fullType="boolean | keyof ValidityState">
+  Show the error based on a specific validity state (`valueMissing`, `typeMismatch`, `patternMismatch`, `tooShort`, `tooLong`, `rangeUnderflow`, `rangeOverflow`, `stepMismatch`, `badInput`, `customError`). Pass `true` to always show when invalid.
+</ApiProp>
+
+</ApiPropsList>
+
+#### FieldErrorSlot
+
+Optional wrapper for `FieldError` that animates the error's height (via `interpolate-size`) and opacity on mount/unmount. When empty, uses a negative top margin to collapse to zero space, so there's no layout difference versus not using a slot at all. When switching between multiple match-specific `FieldError` components, the switch is instant (no cross-fade). Renders a `<div>` element.
+
+Assumes the parent `Field` uses the default `space-y-2` spacing. If you customize the Field's spacing, override the slot's margin classes to match. Keep the slot in block flow — flex/grid items have an automatic `min-height: auto` that clamps the slot to its content height and breaks the `interpolate-size` height tween (the error jumps instead of animating). Don't put `display: flex`/`grid` on the `Field`; if the slot must be a flex/grid item, add `min-h-0` to it.
+
+#### FieldItem
+
+Groups individual items in a checkbox group or radio group with a label and description. Renders a `<div>` element.
+
+#### FieldValidity
+
+Render prop component for custom validity display. Does not render any DOM element.

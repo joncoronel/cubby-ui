@@ -2,6 +2,10 @@
 
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import {
+  elevatedSurface,
+  type SurfaceLevel,
+} from "@/registry/default/lib/elevated";
 import { Label } from "@/registry/default/label/label";
 import {
   ScrollArea,
@@ -43,10 +47,12 @@ function ComboboxInput({
   className,
   showTrigger = true,
   showClear = true,
+  variant = "default",
   ...props
 }: BaseCombobox.Input.Props & {
   showTrigger?: boolean;
   showClear?: boolean;
+  variant?: "default" | "elevated";
 }) {
   const context = React.useContext(ComboboxContext);
   const id = idProp ?? context?.id;
@@ -65,7 +71,8 @@ function ComboboxInput({
         id={id}
         data-slot="combobox-input"
         className={cn(
-          "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground bg-input dark:bg-input/30 flex h-10 w-full min-w-0 rounded-lg border bg-clip-padding px-3 text-base font-normal shadow-xs disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 sm:h-9 md:text-sm",
+          "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground flex h-10 w-full min-w-0 rounded-lg border bg-clip-padding px-3 text-base font-normal disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 sm:h-9 md:text-sm",
+          variant === "default" ? "bg-input" : "bg-input-elevated",
           "file:text-foreground file:inline-flex file:h-7 file:rounded-md file:border-0 file:bg-transparent file:text-sm file:font-medium",
           "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
           className,
@@ -115,7 +122,7 @@ function ComboboxTrigger({
       aria-label="Open popup"
       className={cn(
         "inline-flex size-4 cursor-pointer items-center justify-center rounded-md border-none bg-transparent p-0 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-60",
-        "focus-visible:border-ring focus-visible:ring-ring/30 focus-visible:ring-3",
+        "outline-none focus-visible:ring-2 focus-visible:ring-ring/70",
         className,
       )}
       {...props}
@@ -151,7 +158,7 @@ function ComboboxClear({ className, ...props }: BaseCombobox.Clear.Props) {
       aria-label="Clear selection"
       className={cn(
         "inline-flex h-4 w-4 cursor-pointer items-center justify-center rounded-sm opacity-70 transition-[opacity,scale,transform,translate] hover:opacity-100 disabled:pointer-events-none",
-        "focus-visible:border-ring focus-visible:ring-ring/30 duration-100 outline-none focus-visible:ring-3",
+        "focus-visible:ring-2 focus-visible:ring-ring/70 duration-100 outline-none",
         "data-ending-style:translate-x-1 data-ending-style:opacity-0 data-starting-style:translate-x-1 data-starting-style:opacity-0",
         className,
       )}
@@ -202,13 +209,24 @@ function ComboboxPositioner({
 
 function ComboboxPopupPrimitive({
   className,
+  level = 3,
+  shadowLevel = 3,
   ...props
-}: BaseCombobox.Popup.Props) {
+}: BaseCombobox.Popup.Props & {
+  /** Surface elevation level for the popup bg (1-8). Bump when nesting inside a Dialog. Defaults to 3. */
+  level?: SurfaceLevel;
+  /** Shadow weight (1-8). Pinned to 3 by default so the combobox reads the same regardless of nesting depth. */
+  shadowLevel?: SurfaceLevel;
+}) {
   return (
     <BaseCombobox.Popup
       data-slot="combobox-popup"
+      data-level={level}
       className={cn(
-        "bg-popover text-popover-foreground ring-border ease-out-expo flex max-h-(--available-height) w-(--anchor-width) max-w-(--available-width) origin-(--transform-origin) flex-col overflow-clip overscroll-contain rounded-xl shadow-[0_8px_20px_0_oklch(0_0_0/0.08)] ring-1 transition-[transform,scale,opacity] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
+        "text-popover-foreground ease-out-expo flex max-h-(--available-height) w-(--anchor-width) max-w-(--available-width) origin-(--transform-origin) flex-col overflow-clip overscroll-contain rounded-xl transition-[transform,scale,opacity] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
+        // Use elevatedSurface (rim on ::after) because combobox group labels are
+        // often sticky and would otherwise hide the rim where they sit.
+        elevatedSurface(level, shadowLevel),
         className,
       )}
       {...props}
@@ -229,7 +247,7 @@ function ComboboxArrow({ className, ...props }: BaseCombobox.Arrow.Props) {
       <svg width="20" height="10" viewBox="0 0 20 10" fill="none">
         <path
           d="M9.66437 2.60207L4.80758 6.97318C4.07308 7.63423 3.11989 8 2.13172 8H0V9H20V8H18.5349C17.5468 8 16.5936 7.63423 15.8591 6.97318L11.0023 2.60207C10.622 2.2598 10.0447 2.25979 9.66437 2.60207Z"
-          className="fill-popover"
+          className="fill-(--popup-surface,var(--popover))"
         />
         <path
           d="M10.3333 3.34539L5.47654 7.71648C4.55842 8.54279 3.36693 9 2.13172 9H0V8H2.13172C3.11989 8 4.07308 7.63423 4.80758 6.97318L9.66437 2.60207C10.0447 2.25979 10.622 2.2598 11.0023 2.60207L15.8591 6.97318C16.5936 7.63423 17.5468 8 18.5349 8H20V9H18.5349C17.2998 9 16.1083 8.54278 15.1901 7.71648L10.3333 3.34539Z"
@@ -376,7 +394,7 @@ function ComboboxItem({
       ref={ref}
       data-slot="combobox-item"
       className={cn(
-        "data-highlighted:bg-accent/50 data-highlighted:text-accent-foreground relative grid cursor-default grid-cols-[1fr_1rem] items-center gap-2 rounded-md px-2.5 py-2 pr-2 text-sm outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60",
+        "data-highlighted:text-accent-foreground relative grid cursor-default grid-cols-[1fr_1rem] items-center gap-2 rounded-md px-2.5 py-2 pr-2 text-sm outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-highlighted:bg-(--surface-hover)",
         // Spacing from list edges
         "mx-1 first:mt-1 last:mb-1",
         className,
@@ -424,7 +442,7 @@ function ComboboxGroupLabel({
     <BaseCombobox.GroupLabel
       data-slot="combobox-group-label"
       className={cn(
-        "text-muted-foreground bg-popover px-3.5 py-1.5 pt-2.5 text-xs font-semibold",
+        "text-muted-foreground bg-(--popup-surface,var(--popover)) px-3.5 py-1.5 pt-2.5 text-xs font-semibold",
         className,
       )}
       {...props}
@@ -445,7 +463,11 @@ function ComboboxSeparator({
   );
 }
 
-function ComboboxChips({ className, ...props }: BaseCombobox.Chips.Props) {
+function ComboboxChips({
+  className,
+  variant = "default",
+  ...props
+}: BaseCombobox.Chips.Props & { variant?: "default" | "elevated" }) {
   const context = React.useContext(ComboboxContext);
 
   return (
@@ -453,7 +475,8 @@ function ComboboxChips({ className, ...props }: BaseCombobox.Chips.Props) {
       ref={context?.chipsRef}
       data-slot="combobox-chips"
       className={cn(
-        "bg-input dark:bg-input/30 flex min-h-9 w-full flex-wrap items-center gap-1.5 rounded-lg border bg-clip-padding px-1.5 py-1.5 shadow-xs",
+        "flex min-h-9 w-full flex-wrap items-center gap-1.5 rounded-lg border bg-clip-padding px-1.5 py-1.5",
+        variant === "default" ? "bg-input" : "bg-input-elevated",
         "focus-within:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-within:outline-2 focus-within:outline-offset-2",
 
         className,
@@ -468,7 +491,10 @@ function ComboboxChip({ className, ...props }: BaseCombobox.Chip.Props) {
     <BaseCombobox.Chip
       data-slot="combobox-chip"
       className={cn(
-        "bg-accent text-accent-foreground dark:border-border/50 flex items-center gap-1 rounded-sm border px-[calc(--spacing(2)-1px)] py-[calc(--spacing(1)-1px)] text-sm font-medium break-all sm:text-xs",
+        "bg-(--surface-selected) text-accent-foreground flex items-center gap-1 rounded-sm px-2 py-1 text-sm font-medium break-all sm:text-xs",
+        // Ring (not outline) avoids clipping neighbors in the packed chip row;
+        // outline-none suppresses the browser default (currentColor → white in dark mode).
+        "outline-none focus-visible:ring-2 focus-visible:ring-ring/70",
         className,
       )}
       {...props}
@@ -485,7 +511,7 @@ function ComboboxChipRemove({
       data-slot="combobox-chip-remove"
       className={cn(
         "ml-1 inline-flex h-4 w-4 items-center justify-center rounded-sm opacity-70 transition-opacity hover:opacity-100 disabled:pointer-events-none",
-        "focus-visible:border-ring focus-visible:ring-ring/30 cursor-pointer outline-none focus-visible:ring-3",
+        "focus-visible:ring-2 focus-visible:ring-ring/70 cursor-pointer outline-none",
         className,
       )}
       {...props}
@@ -498,10 +524,16 @@ function ComboboxPopup({
   children,
   sideOffset = 6,
   backdrop = false,
+  level,
+  shadowLevel,
   ...props
 }: BaseCombobox.Popup.Props & {
   sideOffset?: number;
   backdrop?: boolean;
+  /** Surface elevation level for the popup bg (1-8). Defaults to 3. */
+  level?: SurfaceLevel;
+  /** Shadow weight (1-8). Defaults to 3. */
+  shadowLevel?: SurfaceLevel;
 }) {
   const context = React.useContext(ComboboxContext);
 
@@ -509,7 +541,12 @@ function ComboboxPopup({
     <ComboboxPortal>
       {backdrop && <ComboboxBackdrop />}
       <ComboboxPositioner anchor={context?.chipsRef} sideOffset={sideOffset}>
-        <ComboboxPopupPrimitive className={className} {...props}>
+        <ComboboxPopupPrimitive
+          className={className}
+          level={level}
+          shadowLevel={shadowLevel}
+          {...props}
+        >
           {children}
         </ComboboxPopupPrimitive>
       </ComboboxPositioner>
@@ -534,7 +571,7 @@ function ComboboxTriggerLabel({
     <BaseCombobox.Label
       data-slot="combobox-trigger-label"
       className={cn(
-        "text-foreground text-sm leading-5 font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
+        "text-foreground text-sm leading-5 font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-60 peer-disabled:cursor-not-allowed peer-disabled:opacity-60",
         className,
       )}
       {...props}

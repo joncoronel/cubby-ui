@@ -13,6 +13,13 @@ Cubby UI is a collection of opinionated components built on [Base UI](https://ba
 - **Common patterns built-in** - Abstracts common use cases so you don't have to wire up the same functionality repeatedly.
 - **Full ownership** - Components are copied into your project via the [shadcn registry](https://ui.shadcn.com/docs/registry), not imported from a package. Customize freely.
 
+## Primitives and Composables
+
+The component library is split into two groups, labelled on every component page and grouped in the sidebar:
+
+- **Primitives** - A styled wrapper around a single Base UI primitive. [Button](/docs/components/button), [Dialog](/docs/components/dialog), and [Select](/docs/components/select) take an unstyled, accessible primitive and add Cubby UI's defaults. If Base UI ships it, you'll find the styled version here.
+- **Composables** - A higher-level pattern composed from primitives, or an original component with no Base UI counterpart. [Command](/docs/components/command) builds a command menu on top of Dialog; [Circular Slider](/docs/components/circular-slider) is built from scratch. Composables list what they're **built on** so you can trace them back to their foundation.
+
 ## Other Options
 
 There are several great UI libraries built on Base UI. Here are some worth checking out:

@@ -1,0 +1,172 @@
+---
+title: OTP Field
+description: One-time password input with individual character slots, powered by Base UI
+type: primitive
+---
+
+import {
+  OTPField,
+  OTPFieldInput,
+  OTPFieldSeparator,
+  OTPFieldGroup,
+} from "@/registry/default/otp-field/otp-field";
+
+## Preview
+
+<ComponentPreview component="otp-field" example="otp-field-basic" />
+
+## Installation
+
+<ComponentInstall component="otp-field" />
+
+## Usage
+
+<ComponentUsage component="otp-field" />
+
+## Examples
+
+### Alphanumeric
+
+Accept letters and numbers for recovery or backup codes.
+
+<ComponentPreview component="otp-field" example="otp-field-alphanumeric" />
+
+### Grouped
+
+Split inputs into visual groups with a separator.
+
+<ComponentPreview component="otp-field" example="otp-field-grouped" />
+
+### Placeholder Hints
+
+Show placeholder characters that hide when the slot is focused.
+
+<ComponentPreview component="otp-field" example="otp-field-placeholder" />
+
+### Custom Sanitization
+
+Restrict input to specific characters with shake animation feedback on invalid input. Uses the bundled `useInvalidFeedback` hook.
+
+<ComponentPreview component="otp-field" example="otp-field-custom-sanitization" />
+
+### Masked Entry
+
+Obscure entered characters for shared screens.
+
+<ComponentPreview component="otp-field" example="otp-field-masked" />
+
+### Elevated Variant
+
+On a Card, Dialog, or popover surface, the opaque `default` slots collapse into the parent. Use `variant="elevated"` on each `OTPFieldInput` for a translucent overlay that adapts to the substrate. See the [Surfaces](/docs/getting-started/surfaces) docs.
+
+<ComponentPreview component="otp-field" example="otp-field-elevated" />
+
+### Form Integration
+
+Use [Field](/docs/components/field) for labeling and form participation. See the [Forms guide](/docs/getting-started/forms) for more patterns.
+
+<ComponentPreview component="otp-field" example="otp-field-field" />
+
+## API Reference
+
+The OTP Field is built on top of [Base UI's OTP Field](https://base-ui.com/react/components/otp-field). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI OTP Field documentation](https://base-ui.com/react/components/otp-field).
+
+### Props
+
+#### OTPField
+
+Groups all OTP field parts and manages their state. Wraps Base UI's `OTPField.Root`. Renders a `<div>`.
+
+No custom props — all Base UI Root props are passed through, including `length`, `value`, `onValueChange`, `validationType`, `mask`, `normalizeValue`, and `onValueInvalid`.
+
+#### OTPFieldInput
+
+Individual character input slot. Wraps Base UI's `OTPField.Input`. Renders an `<input>`.
+
+<ApiPropsList>
+
+<ApiProp
+  name="variant"
+  fullType='"default" | "elevated"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Surface appearance of the slot. `default` uses opaque `bg-input`. `elevated` uses translucent `bg-input-elevated` for use inside Card, Dialog, or popover surfaces. See the [Surfaces](/docs/getting-started/surfaces) docs.
+</ApiProp>
+
+</ApiPropsList>
+
+#### OTPFieldSeparator
+
+Visual separator between input groups. Wraps Base UI's `Separator`. Renders a `<div>`.
+
+<ApiPropsList>
+
+<ApiProp name="children" fullType="ReactNode" simpleType="node">
+  Content to render inside the separator. Defaults to a horizontal dash icon when no children are provided.
+</ApiProp>
+
+</ApiPropsList>
+
+#### OTPFieldGroup
+
+Layout wrapper for grouping inputs together. Not a Base UI component — renders a plain `<div>` with `display: flex` and `gap`.
+
+### Hooks
+
+#### useInvalidFeedback
+
+```ts
+function useInvalidFeedback(options?: UseInvalidFeedbackOptions): UseInvalidFeedbackReturn;
+```
+
+Manages shake animation and screen reader feedback for invalid OTP input. Bundled with the component — installed automatically when you install `otp-field`.
+
+Wire its handlers to `OTPField` and its className getter to each `OTPFieldInput`:
+
+```tsx
+import { useInvalidFeedback } from "@/components/ui/cubby-ui/otp-field/hooks/use-invalid-feedback";
+
+const invalidFeedback = useInvalidFeedback();
+
+<OTPField
+  length={6}
+  validationType="none"
+  normalizeValue={myCustomNormalizer}
+  onValueChange={invalidFeedback.handleValueChange}
+  onValueInvalid={invalidFeedback.handleValueInvalid}
+>
+  {Array.from({ length: 6 }, (_, index) => (
+    <OTPFieldInput
+      key={index}
+      className={invalidFeedback.getInvalidClassName(index)}
+      onFocus={() => invalidFeedback.setFocusedIndex(index)}
+    />
+  ))}
+</OTPField>
+<span aria-live="polite" className="sr-only">
+  {invalidFeedback.statusMessage}
+</span>
+```
+
+##### Options
+
+<ApiPropsList>
+
+<ApiProp name="duration" fullType="number" defaultValue="400">
+  Duration in milliseconds before the shake animation clears.
+</ApiProp>
+
+</ApiPropsList>
+
+##### Returns
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `handleValueChange` | `() => void` | Clears invalid feedback. Wire to `OTPField`'s `onValueChange`. |
+| `handleValueInvalid` | `(value: string) => void` | Triggers shake animation and status message. Wire to `OTPField`'s `onValueInvalid`. |
+| `getInvalidClassName` | `(index: number) => string \| undefined` | Returns the shake animation className for the active invalid slot, or `undefined`. |
+| `setFocusedIndex` | `(index: number) => void` | Tracks which slot is focused. Wire to each input's `onFocus`. |
+| `statusMessage` | `string` | Screen reader announcement. Render inside an `aria-live="polite"` region. |

@@ -34,13 +34,14 @@ export default function DialogForm() {
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
+              variant="elevated"
               type="email"
               placeholder="name@example.com"
             />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" />
+            <Input id="password" variant="elevated" type="password" />
           </div>
         </DialogBody>
         <DialogFooter>

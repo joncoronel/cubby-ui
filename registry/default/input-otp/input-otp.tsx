@@ -15,7 +15,7 @@ function InputOTP({
 		<OTPInput
 			data-slot="input-otp"
 			containerClassName={cn(
-				"flex items-center gap-2 has-disabled:opacity-50",
+				"flex items-center gap-2 has-disabled:opacity-60",
 				containerClassName
 			)}
 			className={cn("disabled:cursor-not-allowed", className)}
@@ -37,9 +37,11 @@ function InputOTPGroup({ className, ...props }: React.ComponentProps<"div">) {
 function InputOTPSlot({
 	index,
 	className,
+	variant = "default",
 	...props
 }: React.ComponentProps<"div"> & {
 	index: number
+	variant?: "default" | "elevated"
 }) {
 	const inputOTPContext = React.useContext(OTPInputContext)
 	const { char, hasFakeCaret, isActive } = inputOTPContext?.slots[index] ?? {}
@@ -50,9 +52,12 @@ function InputOTPSlot({
 			data-active={isActive}
 			className={cn(
 				// Base styles
-				"bg-input dark:bg-input/35 relative flex h-9 w-9 items-center justify-center text-sm shadow-xs",
-				// Border handling for adjacent slots
-				"border-border border-y border-r first:rounded-l-lg first:border-l last:rounded-r-lg",
+				"relative flex h-9 w-9 items-center justify-center text-sm",
+				variant === "default" ? "bg-input" : "bg-input-elevated",
+				// Border-y + border-r forms both the outer perimeter and inter-slot
+				// dividers. bg-clip-padding composites the translucent --border
+				// against the substrate, matching the rest of the form-field family.
+				"border-border border-y border-r bg-clip-padding first:rounded-l-lg first:border-l last:rounded-r-lg",
 				// Outline transition base
 				"outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out",
 				// Active state

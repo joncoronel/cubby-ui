@@ -1,0 +1,265 @@
+---
+title: Combobox
+description: Searchable dropdown for selecting from a list of options with keyboard navigation
+type: primitive
+---
+
+import { Combobox } from "@/registry/default/combobox/combobox";
+
+## Preview
+
+<ComponentPreview component="combobox" example="combobox-basic" />
+
+## Installation
+
+<ComponentInstall component="combobox" />
+
+## Usage
+
+<ComponentUsage component="combobox" />
+
+## Examples
+
+### Creatable
+
+Allow users to create new options.
+
+<ComponentPreview component="combobox" example="combobox-creatable" />
+
+### Multiple Selection
+
+Select multiple options from the combobox.
+
+<ComponentPreview component="combobox" example="combobox-multiple" />
+
+### Input Inside Popup
+
+Place the search input within the dropdown popup.
+
+<ComponentPreview component="combobox" example="combobox-input-inside-popup" />
+
+### Async Search
+
+Load options from a remote source by fetching on input changes. The `useAsyncCombobox` hook handles request cancellation, loading states, and keeps the selected value visible while new results stream in.
+
+<ComponentPreview component="combobox" example="combobox-async" />
+
+### Async Search (Multiple)
+
+Async search with multiple selection support. Selected items remain visible in the dropdown while searching for new matches.
+
+<ComponentPreview component="combobox" example="combobox-async-multiple" />
+
+### Grouped
+
+Organize options into logical groups with sticky headers.
+
+<ComponentPreview component="combobox" example="combobox-grouped" />
+
+### Virtualized
+
+Use virtualization for large lists (100+ items) to maintain smooth performance. Only renders items visible in the viewport, dramatically reducing DOM nodes.
+
+<ComponentPreview component="combobox" example="combobox-virtualized" />
+
+**Key concepts:**
+
+1. **Use `useListVirtualizer` hook** - Handles scroll positioning, keyboard navigation, and item measurement. See [useListVirtualizer docs](/docs/hooks/use-list-virtualizer) for full API reference.
+2. **Use `useComboboxFilteredItems()` inside Root** - Call `useComboboxFilteredItems()` in a child component of `Combobox` to get internally filtered items without manual filtering boilerplate.
+3. **Replace `ComboboxList` with `ComboboxVirtualizedList`** - Accepts `scrollRef` and `totalSize` from the hook.
+4. **Pass `virtualized` and `items` on Root** - Enables virtualized mode with your full item list.
+5. **Use `useHighlightHandler`** - Pass a `virtualizerRef` to the child and use `useHighlightHandler(virtualizerRef)` on Root so keyboard navigation scrolls to the highlighted item.
+6. **Override item margins** - Pass `className="mt-0! mb-0!"` to `ComboboxItem` since virtualized items are absolutely positioned and the virtualizer handles padding.
+
+### Elevated Variant
+
+On a Card, Dialog, or popover surface, the opaque `default` input collapses into its parent. Use `variant="elevated"` on `ComboboxInput` for a translucent overlay that adapts to the substrate. See the [Surfaces](/docs/getting-started/surfaces) docs.
+
+<ComponentPreview component="combobox" example="combobox-elevated" />
+
+### Form Integration
+
+Use [Field](/docs/components/field) with `FieldLabel` for labeling. See the [Forms guide](/docs/getting-started/forms) for more patterns.
+
+<ComponentPreview component="combobox" example="combobox-field" />
+
+## API Reference
+
+The Combobox component is built on top of [Base UI's Combobox](https://base-ui.com/react/components/combobox). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Combobox documentation](https://base-ui.com/react/components/combobox).
+
+### Props
+
+#### ComboboxInput
+
+Text input with built-in trigger and clear buttons. Wraps Base UI's `Combobox.Input` inside a `Combobox.InputGroup`.
+
+<ApiPropsList>
+
+<ApiProp name="showTrigger" fullType="boolean" defaultValue="true">
+  Show a chevron trigger button to open the popup.
+</ApiProp>
+
+<ApiProp name="showClear" fullType="boolean" defaultValue="true">
+  Show a clear button to reset the input value. Only visible when the input has a value.
+</ApiProp>
+
+<ApiProp name="variant" fullType='"default" | "elevated"' defaultValue='"default"'>
+  Surface appearance of the input. `default` uses opaque `bg-input`. `elevated` uses translucent `bg-input-elevated` for use inside Card, Dialog, or popover surfaces. See the [Surfaces](/docs/getting-started/surfaces) docs.
+</ApiProp>
+
+</ApiPropsList>
+
+#### ComboboxTriggerLabel
+
+Accessible label for the input-inside-popup pattern, where the trigger is the form control. Wraps Base UI's `Combobox.Label`. Renders a `<div>` — clicking it focuses the trigger without opening the popup.
+
+For the standard combobox pattern (input outside popup), use `ComboboxLabel` which renders a native `<label>` associated with the input.
+
+#### ComboboxPopup
+
+Dropdown container for the option list with positioning. Composes Base UI's `Combobox.Positioner` and `Combobox.Popup`. Props are forwarded to `Combobox.Popup`.
+
+<ApiPropsList>
+
+<ApiProp
+  name="sideOffset"
+  fullType="number"
+  defaultValue="6"
+>
+  Distance in pixels between the popup and the anchor element. Convenience prop that passes through to the internal Positioner component. Type is inferred from Base UI's Positioner component.
+</ApiProp>
+
+<ApiProp
+  name="backdrop"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Show a backdrop overlay behind the popup. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
+  Surface elevation level for the popup. See the [Surfaces](/docs/getting-started/surfaces) docs. Uses `elevatedSurface` (rim on `::after`) so sticky group labels stay below the rim edge.
+</ApiProp>
+
+<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
+  Shadow weight. Controls drop-shadow intensity independently of substrate color.
+</ApiProp>
+
+</ApiPropsList>
+
+#### ComboboxList
+
+Scrollable list of selectable options. Wraps Base UI's `Combobox.Listbox`.
+
+<ApiPropsList>
+
+<ApiProp
+  name="nativeScroll"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Use native browser scrolling instead of the custom ScrollArea component. Useful for custom layouts where you need more control over scroll behavior, or when nesting the list inside your own scroll container.
+</ApiProp>
+
+<ApiProp
+  name="fadeEdges"
+  fullType="boolean | 'top' | 'bottom' | 'left' | 'right' | 'x' | 'y' | FadeEdge[]"
+  defaultValue="true"
+>
+  Controls the fade effect on scroll edges. See [ScrollArea](/docs/components/scroll-area#custom-props) for all options.
+</ApiProp>
+
+<ApiProp
+  name="scrollbarGutter"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Reserves space for the scrollbar when content overflows, preventing layout shift.
+</ApiProp>
+
+<ApiProp
+  name="persistScrollbar"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Always show the scrollbar instead of fading it in on hover or scroll.
+</ApiProp>
+
+<ApiProp
+  name="hideScrollbar"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Hides the scrollbar while keeping scroll functionality.
+</ApiProp>
+
+</ApiPropsList>
+
+#### ComboboxVirtualizedList
+
+Virtualized scrollable container for large lists. Use with `useListVirtualizer` hook for optimal performance with 100+ items.
+
+<ApiPropsList>
+
+<ApiProp
+  name="scrollRef"
+  fullType="(element: HTMLDivElement | null) => void"
+  required
+>
+  Ref callback from `useListVirtualizer` for the scroll container.
+</ApiProp>
+
+<ApiProp name="totalSize" fullType="number" required>
+  Total height of all virtual items in pixels. Provided by `useListVirtualizer`.
+</ApiProp>
+
+<ApiProp
+  name="emptyMessage"
+  fullType="ReactNode"
+  simpleType="node"
+  defaultValue='"No results found."'
+>
+  Message shown when no results are found.
+</ApiProp>
+
+<ApiProp
+  name="fadeEdges"
+  fullType="boolean | 'x' | 'y' | FadeEdge[]"
+  defaultValue='"y"'
+>
+  Controls the fade effect on scroll edges.
+</ApiProp>
+
+<ApiProp name="nativeScroll" fullType="boolean" defaultValue="false">
+  Use native browser scrolling instead of custom scrollbars. Recommended for
+  best virtualization performance.
+</ApiProp>
+
+</ApiPropsList>
+
+### Hooks
+
+#### useComboboxFilteredItems
+
+```ts
+function useComboboxFilteredItems<T>(): T[];
+```
+
+Returns the internally filtered items from the Combobox Root. Must be called inside `Combobox` (Root). Simplifies virtualized implementations by eliminating manual query state, `useDeferredValue`, `useFilter()`, and `useMemo` filtering.
+
+```tsx
+import { useComboboxFilteredItems } from "@/registry/default/combobox/combobox";
+
+function VirtualizedListContent() {
+  // Must be called inside Combobox root
+  const filteredItems = useComboboxFilteredItems<MyItem>();
+
+  const virtualizer = useListVirtualizer({
+    items: allItems,
+    filteredItems,
+  });
+  // ...
+}
+```

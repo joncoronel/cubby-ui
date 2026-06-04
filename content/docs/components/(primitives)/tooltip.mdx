@@ -1,0 +1,180 @@
+---
+title: Tooltip
+description: Contextual information that appears on hover or focus
+type: primitive
+---
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/registry/default/tooltip/tooltip";
+
+## Preview
+
+<ComponentPreview component="tooltip" example="tooltip-basic" />
+
+## Installation
+
+<ComponentInstall component="tooltip" />
+
+## Usage
+
+<ComponentUsage component="tooltip" />
+
+## Examples
+
+### Detached Trigger
+
+Use `createTooltipHandle()` to link a trigger outside the `Tooltip` component.
+
+<ComponentPreview component="tooltip" example="tooltip-detached-trigger" />
+
+### Controlled
+
+Control the tooltip's open state externally using the `open` and `onOpenChange` props.
+
+<ComponentPreview component="tooltip" example="tooltip-controlled" />
+
+### Animated Transitions
+
+Animate the tooltip when switching between multiple triggers with different payloads.
+
+<ComponentPreview component="tooltip" example="tooltip-animated" />
+
+## API Reference
+
+The Tooltip component is built on top of [Base UI's Tooltip](https://base-ui.com/react/components/tooltip). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Tooltip documentation](https://base-ui.com/react/components/tooltip).
+
+### Utilities
+
+#### createTooltipHandle
+
+Creates a handle that connects a tooltip to one or more external `TooltipTrigger` components. Useful when the triggers need to live outside the `Tooltip` — for example, when each row in a list has its own trigger but they all share one tooltip.
+
+```tsx
+import { createTooltipHandle } from "@/registry/default/tooltip/tooltip";
+
+const handle = createTooltipHandle();
+```
+
+##### Passing data from the trigger to the tooltip
+
+The handle accepts an optional `<Payload>` generic that types a value each trigger can pass along. The tooltip reads it through a render-prop child, so you can render different content per trigger without duplicating the tooltip markup.
+
+```tsx
+type User = { id: string; name: string };
+
+const handle = createTooltipHandle<User>();
+
+// Multiple triggers, each with its own payload:
+users.map((user) => (
+  <TooltipTrigger key={user.id} handle={handle} payload={user}>
+    {user.name}
+  </TooltipTrigger>
+));
+
+// One shared tooltip that renders based on the active trigger:
+<Tooltip handle={handle}>
+  <TooltipContent>
+    {({ payload: user }) => <p>{user?.name}</p>}
+  </TooltipContent>
+</Tooltip>;
+```
+
+Without the `<User>` generic, `payload` inside the render prop resolves to `unknown`.
+
+### Props
+
+#### TooltipContent
+
+Composed component for common tooltip layouts. Combines `Tooltip.Portal`, `Tooltip.Positioner`, and `Tooltip.Popup`. Optionally renders `Tooltip.Arrow`. Props are forwarded to the Positioner and Popup components.
+
+<ApiPropsList>
+
+<ApiProp name="arrow" fullType="boolean" defaultValue="false">
+  Show or hide the tooltip arrow pointing to the trigger. Custom prop not
+  available in Base UI.
+</ApiProp>
+
+<ApiProp
+  name="side"
+  fullType="'top' | 'right' | 'bottom' | 'left' | 'inline-start' | 'inline-end'"
+  defaultValue='"top"'
+>
+  Which side of the trigger to position the tooltip. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp
+  name="align"
+  fullType="'start' | 'center' | 'end'"
+  defaultValue='"center"'
+>
+  How to align the tooltip relative to the trigger. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp name="sideOffset" fullType="number" defaultValue="8">
+  Distance in pixels between trigger and tooltip. Flattened from Positioner.
+  Base UI defaults to `0`.
+</ApiProp>
+
+<ApiProp name="alignOffset" fullType="number" defaultValue="0">
+  Offset along the alignment axis. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp
+  name="collisionBoundary"
+  fullType="Element | Element[] | 'clipping-ancestors'"
+>
+  Boundary for collision detection. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp
+  name="collisionPadding"
+  fullType="number | Partial<Record<Side, number>>"
+  defaultValue="10"
+>
+  Padding from collision boundary. Flattened from Positioner. Base UI defaults
+  to `5`.
+</ApiProp>
+
+<ApiProp name="sticky" fullType="boolean" defaultValue="false">
+  Whether to keep the tooltip visible in the viewport after the anchor element
+  has scrolled out of view. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp
+  name="positionMethod"
+  fullType="'absolute' | 'fixed'"
+  defaultValue='"absolute"'
+>
+  CSS position method. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp name="arrowPadding" fullType="number">
+  Minimum padding between arrow and tooltip edges. Flattened from Positioner.
+  Base UI defaults to `5`.
+</ApiProp>
+
+<ApiProp name="container" fullType="HTMLElement | undefined">
+  Portal container element. Flattened from Portal.
+</ApiProp>
+
+<ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="2">
+  Surface elevation level. Tooltip defaults to `2` (lightest tier) — quieter than popovers and dropdowns. See the [Surfaces](/docs/getting-started/surfaces) docs.
+</ApiProp>
+
+<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="2">
+  Shadow weight. Defaults to `2` to match the lightweight visual of tooltips.
+</ApiProp>
+
+</ApiPropsList>
+
+### Modified Defaults
+
+Our implementation changes the following Base UI prop defaults:
+
+- **TooltipContent**: `sideOffset` defaults to `8` (Base UI defaults to `0`)
+- **TooltipContent**: `collisionPadding` defaults to `10` (Base UI defaults to `5`)

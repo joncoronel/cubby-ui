@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { mergeProps } from "@base-ui/react/merge-props";
+import { useRender } from "@base-ui/react/use-render";
 import { useAnimatedHeight } from "@/registry/default/hooks/use-animated-height";
 import { cn } from "@/lib/utils";
 
@@ -8,51 +10,39 @@ type TransitionPanelInitialFocus =
   | boolean
   | React.RefObject<HTMLElement | null>;
 
-type TransitionPanelProps = React.ComponentProps<"div"> & {
-  /**
-   * The viewKey of the currently visible view. Must match the `viewKey` of
-   * one of the `<TransitionPanelView>` descendants.
-   */
+type TransitionPanelProps = useRender.ComponentProps<"div"> & {
+  /** viewKey of the visible view. Must match a `<TransitionPanelView>` descendant. */
   activeKey: string;
   /**
-   * Slide axis. Defaults to "x" (horizontal).
+   * Transition style (default `"slide"`):
+   *  - `"slide"`: direction-aware horizontal slide (forward from the right,
+   *    back from the left).
+   *  - `"fade"`: non-directional crossfade with a subtle scale (`0.96 → 1`),
+   *    duration adapting to the height change via `--tp-fade-duration`.
    */
-  axis?: "x" | "y";
+  transition?: "slide" | "fade";
 };
 
-type TransitionPanelViewProps = React.ComponentProps<"div"> & {
-  /**
-   * Identifier matched against the parent's `activeKey` to determine which
-   * view is visible.
-   */
+type TransitionPanelViewProps = useRender.ComponentProps<"div"> & {
+  /** Matched against the parent's `activeKey` to determine visibility. */
   viewKey: string;
   /**
-   * What to focus when this view becomes active after a swap. Mirrors Base
-   * UI's `initialFocus` convention so the API feels familiar.
-   *
-   *  - `true` (default): focus the first tabbable element inside the view
+   * What to focus when this view becomes active after a swap (Base UI's
+   * `initialFocus` convention):
+   *  - `true` (default): first tabbable element inside the view
    *  - `false`: don't move focus
-   *  - `RefObject<HTMLElement>`: focus that specific element
+   *  - `RefObject<HTMLElement>`: that specific element
    *
-   * Skipped on the initial render — the parent (popover / dialog / sheet /
-   * page) owns first-mount focus via its own focus manager. Focus is
-   * applied with `{ preventScroll: true }` so the entrance animation can
-   * still translate the view in without the browser scroll-jumping to
-   * follow the focused element.
+   * Skipped on initial render (the parent owns first-mount focus).
    */
   initialFocus?: TransitionPanelInitialFocus;
 };
 
-const X_SLIDE = "18%";
-const Y_SLIDE = "12px";
+const SLIDE_DISTANCE = "18%";
 
-// Selector for elements that can hold focus. Mirrors Base UI's tabbable
-// candidate set, minus the rarely-relevant `iframe`, `object`, `embed`,
-// `details`, and `audio/video[controls]` cases — consumers in those niches
-// should pass an explicit `initialFocus` ref. Includes `[contenteditable]`
-// so rich-text editor surfaces (TipTap, Lexical, ProseMirror, etc.) are
-// caught automatically, and excludes `input[type="hidden"]` since hidden
-// inputs are never a focus target.
+// Tabbable candidate set, mirroring Base UI (minus niche cases like `iframe` /
+// `object` / media-with-controls — pass an explicit `initialFocus` ref there).
+// Includes `[contenteditable]` for rich-text surfaces; excludes hidden inputs.
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"]), [contenteditable]:not([contenteditable="false"])';
 
@@ -63,7 +53,7 @@ type ViewEntry = {
 
 type TransitionPanelContextValue = {
   activeKey: string;
-  axis: "x" | "y";
+  transition: "slide" | "fade";
   enterFrom: string;
   exitTo: string;
   mounted: boolean;
@@ -77,95 +67,51 @@ type TransitionPanelContextValue = {
 const TransitionPanelContext =
   React.createContext<TransitionPanelContextValue | null>(null);
 
-// ---------------------------------------------------------------------------
-// Alternative implementation note (Motion / FLIP)
-// ---------------------------------------------------------------------------
-// The height animation here is D-tier in the render-pipeline classification
-// (animates the real `height` CSS property → triggers layout per frame). The
-// cost is negligible for the typical popover/panel use case: isolated subtree,
-// brief interaction-driven transition, small content area.
-//
-// If a future consumer has a high-frequency or large-surface use case where
-// S-tier (compositor-only) height animation matters, the Motion-based
-// alternative looks like:
-//
-//   <motion.div layout>                  // parent: animates via transform:scale
-//     {views.map(({ key, node }) => (
-//       <motion.div key={key} layout="position">
-//         {node}                          // layout="position" applies inverse
-//       </motion.div>                     // scale so descendants don't warp
-//     ))}
-//   </motion.div>
-//
-// Trade-offs to consider before switching:
-//   + S-tier height animation (composite-only, runs on the compositor thread).
-//   − Adds ~25–30kb gzipped Motion dep to any consumer that doesn't already
-//     use Motion. That's the main reason this primitive defaults to CSS.
-//   − Every direct view wrapper needs `layout="position"`; miss one and the
-//     parent's scale transform warps that subtree.
-//   − Motion's FLIP measurement adds edge cases (rapid swaps, interrupted
-//     transitions) that the CSS path avoids.
-//
-// Recommendation: keep CSS as the default for design-system reuse; switch to
-// Motion in a fork or sibling component when there's actual measured need.
+// Why CSS over Motion: the height animation drives the real `height` property
+// (layout per frame), which is fine for the typical isolated, brief, small-area
+// panel swap. A Motion `layout` approach would animate via transform (compositor
+// only) but adds ~25–30kb to every consumer and FLIP edge cases on rapid swaps —
+// not worth it as a design-system default. Reach for Motion in a fork if a
+// high-frequency / large-surface use case ever measures the difference.
 
 /**
- * Animated swap between N named views. Direction-aware: tracks the previous
- * activeKey, compares its position in the view registry to the new one,
- * and slides forward (entering view from the right / down) or backward
- * (entering view from the left / up) accordingly.
+ * Animated swap between N named views, in two styles: `slide` (default,
+ * direction-aware horizontal slide) and `fade` (non-directional crossfade with
+ * a subtle `0.96 → 1` scale). Pure CSS — no Motion — using `@starting-style`,
+ * `transition-discrete` for the `display` swap, and CSS custom properties.
+ * Height animates via `useAnimatedHeight`, gated to swaps only so content that
+ * animates its own height isn't fought by a competing tween.
  *
- * Pure CSS animation — no Motion. Uses `@starting-style` for the entry
- * keyframe, `transition-discrete` for the `display: block ↔ none` swap of
- * inactive views, and CSS custom properties for direction-aware slide
- * values. Height animates via `useAnimatedHeight` (ResizeObserver writes a
- * pixel height onto the outer container, CSS transitions it).
+ * Compound component: `TransitionPanelView` children share state through
+ * `TransitionPanelContext` and register themselves via `registerView`. Views
+ * needn't be direct children — HOCs, fragments, Suspense, and conditional /
+ * mapped renderings all route through context, and registration re-derives view
+ * order from DOM position so a remounted view keeps its source-order slot.
  *
- * Compound component pattern: state is shared with `TransitionPanelView`
- * via `TransitionPanelContext`. Each view renders its own DOM and reads
- * `activeKey`, axis, direction-aware CSS vars, and the `mounted` gate from
- * context. Views register themselves with the panel via the context's
- * `registerView` callback; the registry is the source of truth for view
- * order (used by direction calculation) and view DOM lookup (used by the
- * focus effect). On registration we re-derive order from DOM position, so
- * a view that unmounts and remounts (conditional rendering, Suspense,
- * lazy-loaded content) gets its source-order slot back instead of being
- * appended at the end of the Map.
- *
- * Composability: `TransitionPanelView` does not have to be a direct child
- * of `TransitionPanel`. Views can be wrapped in HOCs, fragments, error
- * boundaries, Suspense boundaries, or conditional/mapped renderings — all
- * routing through context.
- *
- * Inactive views are marked `inert` so focus can't land on hidden controls
- * during the swap's exit transition (display stays `block` for ~240ms while
- * the leaving view fades out under `transition-discrete`). Focus is moved
- * to the new view's target in `useLayoutEffect` so it happens before the
- * browser paints — minimizing the window where focus has been released by
- * the inert flip on the outgoing view but not yet moved to the incoming
- * one. Consumers can still opt out per-view via `initialFocus={false}`.
- *
- * Spread accepts any `<div>` prop (`id`, `role`, `aria-label`, `ref`,
- * `data-*`, etc.). The optional `ref` is composed with an internal ref
- * used for height measurement.
+ * Both `TransitionPanel` and `TransitionPanelView` accept any `<div>` prop, a
+ * composed `ref`, and a Base UI `render` prop (e.g. render a view as a `Card`).
  *
  * Data attributes (Base UI conventions):
- *   - Root: `data-axis="x" | "y"`,
- *           `data-activation-direction="left" | "right" | "up" | "down" | "none"`
+ *   - Root: `data-transition="slide" | "fade"`,
+ *           `data-activation-direction="left" | "right" | "none"`
  *   - View: `data-active` (presence when active), `data-viewkey="..."`
  *
- * CSS custom properties (set on root, inherited by views):
- *   - `--tp-duration` (default `240ms`) — height + slide transition duration.
- *     Override per-instance via `style` prop or per-app via CSS rule.
+ * CSS custom properties (set on root, inherited by views; overridable via the
+ * `style` prop or a CSS rule):
+ *   - `--tp-duration` (default `240ms`) — height + slide/opacity duration.
+ *   - `--tp-fade-duration` — crossfade duration in `fade` mode. Defaults to the
+ *     size-adaptive `--fade-duration` the height observer writes; set a fixed
+ *     value to opt out of the adaptive crossfade. (Don't set `--fade-duration`
+ *     directly — it's the observer-written source for this default.)
+ *   - `--tp-ease` / `--tp-fade-ease` — easing for height+slide / crossfade.
  *
- * Browser support: the entrance animation relies on `@starting-style` and
- * `transition-behavior: allow-discrete` (Chrome 117+, Safari 17.4+,
- * Firefox 129+). Older browsers degrade to an instant view swap with no
- * slide animation — no broken state, just no motion.
+ * Browser support: the entrance animation needs `@starting-style` +
+ * `transition-behavior: allow-discrete` (Chrome 117+, Safari 17.4+, Firefox
+ * 129+). Older browsers degrade to an instant, motionless swap.
  *
  * Usage:
  * ```tsx
- * <TransitionPanel activeKey={step} axis="x">
+ * <TransitionPanel activeKey={step} transition="fade">
  *   <TransitionPanelView viewKey="list">...</TransitionPanelView>
  *   <TransitionPanelView viewKey="create">...</TransitionPanelView>
  * </TransitionPanel>
@@ -173,19 +119,17 @@ const TransitionPanelContext =
  */
 function TransitionPanel({
   activeKey,
-  axis = "x",
-  ref,
+  transition = "slide",
+  render,
   className,
   style,
   children,
-  ...rest
+  ...props
 }: TransitionPanelProps) {
   const { outerRef, innerRef } = useAnimatedHeight();
 
-  // Shadow the inner-div callback ref from useAnimatedHeight with a
-  // RefObject we can read inside `registerView` (for the DOM-order rebuild).
-  // The chained callback also forwards the node to useAnimatedHeight so its
-  // ResizeObserver setup still runs.
+  // Shadow useAnimatedHeight's inner callback ref with a RefObject we can read
+  // in `registerView` (for the DOM-order rebuild), still forwarding the node on.
   const innerDivRef = React.useRef<HTMLDivElement | null>(null);
   const setInnerRef = React.useCallback(
     (node: HTMLDivElement | null) => {
@@ -195,39 +139,16 @@ function TransitionPanel({
     [innerRef],
   );
 
-  // Compose consumer `ref` with the internal `outerRef` used by
-  // useAnimatedHeight (it reads `.current` inside its ResizeObserver
-  // callback, so it needs a stable RefObject). Mutating `outerRef.current`
-  // directly is safe — it's the same imperative pattern `useRef` uses
-  // internally — and lets us forward the node to the consumer's ref shape
-  // (callback or RefObject) without changing the hook's contract.
-  const setRootRef = React.useCallback(
-    (node: HTMLDivElement | null) => {
-      outerRef.current = node;
-      if (typeof ref === "function") {
-        ref(node);
-      } else if (ref) {
-        (ref as React.RefObject<HTMLDivElement | null>).current = node;
-      }
-    },
-    [outerRef, ref],
-  );
-
-  // View registry. The ref holds DOM elements + focus contracts (read
-  // only inside effects, never during render). `orderedKeys` mirrors the
-  // registry's key order as state, so render-time logic (direction calc,
-  // dev warning) reads from state and not from the ref — keeping React
-  // Compiler / react-hooks lint rules happy and reactivity correct.
+  // View registry: the ref holds DOM elements + focus contracts (read only in
+  // effects), while `orderedKeys` mirrors key order as state so render-time
+  // logic (direction calc, dev warning) stays reactive and lint-clean.
   const viewsRef = React.useRef<Map<string, ViewEntry>>(new Map());
   const [orderedKeys, setOrderedKeys] = React.useState<string[]>([]);
 
-  // On each registration we re-derive ordering from DOM position. Map
-  // insertion order matches source order on the initial mount, but a view
-  // that unmounts (e.g. {isPro && <TransitionPanelView ...>} toggled off)
-  // and remounts later would otherwise reinsert at the end of the Map,
-  // breaking direction calc. Querying `[data-viewkey]` returns elements in
-  // document order, which is React's rendered source order regardless of
-  // HOC / fragment / Suspense wrapping in between.
+  // Re-derive ordering from DOM position on each registration. A view that
+  // unmounts and remounts would otherwise reinsert at the end of the Map and
+  // break direction calc; `[data-viewkey]` in document order is React's source
+  // order regardless of HOC / fragment / Suspense wrapping.
   const registerView = React.useCallback<
     TransitionPanelContextValue["registerView"]
   >((key, el, initialFocus) => {
@@ -249,9 +170,8 @@ function TransitionPanel({
       }
       viewsRef.current = next;
     } else {
-      // Layout effects run after the parent's DOM mutations (which set
-      // innerDivRef.current), so this branch shouldn't fire in practice.
-      // Fall back to plain insertion-order Map.set if it ever does.
+      // innerDivRef is set before view layout effects run, so this shouldn't
+      // fire in practice; fall back to insertion-order Map.set if it does.
       viewsRef.current.set(key, { el, initialFocus });
     }
     setOrderedKeys(Array.from(viewsRef.current.keys()));
@@ -261,37 +181,41 @@ function TransitionPanel({
     };
   }, []);
 
-  // Track the previous active key for direction calculation. Render-time
-  // conditional setter — React discards and retries the render when state
-  // is updated during rendering, so the values read after the `if` block
-  // reflect the new state in the committed render.
+  // Track the previous active key for direction calc. Render-time conditional
+  // setters below are safe: React discards and retries the render, so values
+  // read after the `if` reflect the committed state.
   const [previousKey, setPreviousKey] = React.useState(activeKey);
   const [renderedKey, setRenderedKey] = React.useState(activeKey);
+
+  // Gate the height transition to swaps only. The observer fires on *any*
+  // content size change, and animating height here would fight a tween the
+  // content is already running. Outside a swap, height writes apply instantly
+  // so the panel tracks self-animating content frame-for-frame. Set on swap,
+  // cleared by the root's own height `transitionend` (see `onTransitionEnd`) so
+  // it honors any `--tp-duration` override; a same-height swap leaves it set
+  // until the next height change, which is harmless.
+  const [isSwapping, setIsSwapping] = React.useState(false);
   if (activeKey !== renderedKey) {
     setPreviousKey(renderedKey);
     setRenderedKey(activeKey);
+    setIsSwapping(true);
   }
 
-  // Direction calculation from registry order (not from React.Children, so
-  // views can be wrapped / conditional / Suspense-gated). On the very first
-  // render `orderedKeys` is empty because view layout effects haven't run
-  // yet — both lookups miss and direction defaults to forward, but
-  // `mounted` is also false on the first render so no slide animation
-  // observes the placeholder value.
+  // Direction from registry order (not React.Children, so views can be wrapped
+  // / conditional / Suspense-gated). On first render `orderedKeys` is empty and
+  // direction defaults to forward, but `mounted` is also false then so no slide
+  // observes the placeholder.
   const currentIdx = orderedKeys.indexOf(activeKey);
   const previousIdx = orderedKeys.indexOf(previousKey);
   const direction = currentIdx >= previousIdx ? 1 : -1;
 
-  // True iff `activeKey` has differed from `previousKey` at least once.
-  // Equal only on the initial render (both initialized from activeKey);
-  // any subsequent transition (forward or back) flips this to true and
-  // it stays true. Used to gate `data-activation-direction` so consumers
-  // can distinguish "first paint, no animation yet" from a real swap.
+  // False only on initial render (both keys start equal); the first swap flips
+  // it permanently. Gates `data-activation-direction` so consumers can tell
+  // "first paint" from a real swap.
   const hasActivated = activeKey !== previousKey;
 
-  // Dev-only warning. Gated on `orderedKeys.length > 0` because the
-  // registry is populated by view layout effects, which run after this
-  // render's body on the initial mount.
+  // Dev warning, gated on a populated registry (view layout effects run after
+  // this render's body on the initial mount).
   if (process.env.NODE_ENV !== "production") {
     if (orderedKeys.length > 0 && !orderedKeys.includes(activeKey)) {
       console.warn(
@@ -302,31 +226,20 @@ function TransitionPanel({
     }
   }
 
-  // Skip `@starting-style` on first paint so the initially-active view
-  // doesn't run an entrance animation on mount. Deferred via
-  // `requestAnimationFrame` to guarantee the initial mounted-false render
-  // has painted before the starting: classes are added — without the rAF,
-  // mobile Chrome on Android appears to trigger `@starting-style` on the
-  // active view anyway, sliding the popover content in from the right on
-  // open.
+  // Skip `@starting-style` on first paint so the initial view doesn't animate
+  // in on mount. The `requestAnimationFrame` defer is required: without it,
+  // mobile Chrome still triggers `@starting-style` and slides the content in.
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => {
     const id = requestAnimationFrame(() => setMounted(true));
     return () => cancelAnimationFrame(id);
   }, []);
 
-  // Focus management for view swaps. Views stay mounted across swaps, so
-  // the standard "autoFocus on mount" approach can't fire when a view
-  // becomes active for the second time. We use `useLayoutEffect` (not
-  // `useEffect`) so the focus call runs synchronously after commit but
-  // before browser paint — keeping the gap between "outgoing view becomes
-  // inert" and "incoming view receives focus" within a single frame.
-  //
-  // The parent (popover / dialog / sheet) owns first-render focus via its
-  // own focus manager, so we skip the mount run via a one-shot flag. A
-  // key-comparison gate (skip when activeKey equals its initial value)
-  // would silently skip back-navigations to the initial view, breaking
-  // focus on Back-button-style flows.
+  // Focus management for swaps. Views stay mounted, so "autoFocus on mount"
+  // can't fire on re-activation. `useLayoutEffect` (not `useEffect`) runs the
+  // focus move before paint, keeping the inert-flip-to-refocus gap within a
+  // frame. The one-shot mount flag skips first render (the parent owns initial
+  // focus); a key-comparison gate would instead break back-navigation focus.
   const hasMountedRef = React.useRef(false);
   React.useLayoutEffect(() => {
     if (!hasMountedRef.current) {
@@ -339,109 +252,96 @@ function TransitionPanel({
       entry.initialFocus === true
         ? entry.el.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)
         : entry.initialFocus.current;
-    // `preventScroll: true` avoids the browser scrolling the focused
-    // element into view while the entrance animation is still translating
-    // it back from its starting-style offset. Without this, focus during
-    // the transition causes visible scroll-jank.
+    // `preventScroll` avoids scroll-jank from the browser chasing the focused
+    // element while the entrance animation is still translating it in.
     target?.focus({ preventScroll: true });
   }, [activeKey]);
 
-  // Direction-aware slide values, exposed via context to view children as
-  // CSS custom properties. Tailwind's JIT sees the literal class names in
-  // the view source (translate-*-(var(--tp-enter))); the var values change
-  // per render based on direction.
-  const distance = axis === "x" ? X_SLIDE : Y_SLIDE;
-  const enterFrom = direction === 1 ? distance : `-${distance}`;
-  const exitTo = direction === 1 ? `-${distance}` : distance;
+  // Direction-aware slide offsets, passed to views via context as CSS vars
+  // (the class names are literal in the view source; only the values change).
+  // Consumed in `slide` mode only.
+  const enterFrom = direction === 1 ? SLIDE_DISTANCE : `-${SLIDE_DISTANCE}`;
+  const exitTo = direction === 1 ? `-${SLIDE_DISTANCE}` : SLIDE_DISTANCE;
 
   const contextValue = React.useMemo<TransitionPanelContextValue>(
     () => ({
       activeKey,
-      axis,
+      transition,
       enterFrom,
       exitTo,
       mounted,
       registerView,
     }),
-    [activeKey, axis, enterFrom, exitTo, mounted, registerView],
+    [activeKey, transition, enterFrom, exitTo, mounted, registerView],
   );
 
-  // `data-activation-direction` matches Base UI's Tabs.Panel vocabulary
-  // verbatim: "left" | "right" | "up" | "down" | "none". The value encodes
-  // both axis and direction so consumers don't need to combine attrs in
-  // CSS. "none" before any activation has happened — same convention Base
-  // UI uses for the pre-interaction state.
-  const activationDirection: "left" | "right" | "up" | "down" | "none" =
-    !hasActivated
-      ? "none"
-      : axis === "x"
-        ? direction === 1
-          ? "right"
-          : "left"
-        : direction === 1
-          ? "down"
-          : "up";
+  // `data-activation-direction` matches Base UI's Tabs.Panel vocabulary:
+  // "left" | "right" | "none" (slide is horizontal-only; "none" pre-activation).
+  // Reported in `fade` mode too, for consumers driving their own directional
+  // styling even though the built-in fade is non-directional.
+  const activationDirection: "left" | "right" | "none" = !hasActivated
+    ? "none"
+    : direction === 1
+      ? "right"
+      : "left";
 
-  return (
-    <div
-      {...rest}
-      ref={setRootRef}
-      data-slot="transition-panel"
-      data-axis={axis}
-      data-activation-direction={activationDirection}
-      style={
-        {
-          // Default duration for both the height transition (on this
-          // element) and the slide/opacity transition (on view wrappers,
-          // which inherit the property). Consumer's inline style spreads
-          // after, so any `--tp-duration` they set wins.
-          "--tp-duration": "240ms",
-          // Bleed area for the overflow clip. Defaults to 0 because the
-          // recommended composition puts internal padding inside each
-          // view, so focus rings / shadows already render in safe
-          // territory. Bump (e.g. "8px") when the panel is nested inside
-          // a padded container where view content sits flush with the
-          // panel's clip edge.
-          "--tp-clip-margin": "0px",
-          ...style,
-        } as React.CSSProperties
+  const defaultProps = {
+    "data-slot": "transition-panel",
+    "data-transition": transition,
+    "data-activation-direction": activationDirection,
+    onTransitionEnd: (event: React.TransitionEvent<HTMLDivElement>) => {
+      // Clear the swap flag when the root's own height transition finishes.
+      // `target === currentTarget` ignores transitions bubbling up from views.
+      if (
+        event.target === event.currentTarget &&
+        event.propertyName === "height"
+      ) {
+        setIsSwapping(false);
       }
-      className={cn(
-        // `overflow-clip` (not `overflow-hidden`) so the browser doesn't
-        // treat this as a scrollable ancestor. `overflow: hidden` blocks
-        // visible scrollbars but still allows *programmatic* scrolling,
-        // which means `scrollIntoView` (fired when focus moves to a deep
-        // descendant via label click etc.) will scroll this container,
-        // shifting all content up and exposing any clipped bottom region.
-        // `overflow: clip` makes the element a true non-scroll container.
-        //
-        // `overflow-clip-margin` gives the clip box a bleed area so
-        // focus rings, drop shadows, and other decorations that extend
-        // just outside an element's box can still render. Defaults to
-        // 0 (see `--tp-clip-margin` above) because the recommended
-        // composition keeps decoration-bearing elements inside view
-        // padding, so they're already inside the clip box. Set it to a
-        // few pixels when the panel is nested inside a padded container
-        // where content sits flush with the clip edge.
-        //
-        // `contain-layout` scopes the height-driven layout work to this
-        // subtree so the browser can skip recalculating surrounding layouts.
-        // Side effect: this element becomes a containing block for `position:
-        // fixed` / `absolute` descendants. Unlikely to matter for typical
-        // panel content; flag if you put a viewport-positioned element here.
-        "overflow-clip contain-layout [overflow-clip-margin:var(--tp-clip-margin)]",
-        "transition-[height] duration-(--tp-duration) ease-[cubic-bezier(0.32,0.72,0,1)]",
-        "motion-reduce:transition-none",
-        className,
-      )}
-    >
+    },
+    // Defaults for the inherited CSS vars. Consumer `style` spreads after, so
+    // any override wins. `--tp-fade-duration` falls back to the observer-written
+    // `--fade-duration` (adaptive crossfade) until overridden to a fixed value;
+    // `--tp-clip-margin` is the overflow-clip bleed (0 by default — bump it when
+    // view content sits flush with a padded container's edge).
+    style: {
+      "--tp-duration": "240ms",
+      "--tp-fade-duration": "var(--fade-duration, var(--tp-duration))",
+      "--tp-ease": "cubic-bezier(0.32, 0.72, 0, 1)",
+      "--tp-fade-ease": "cubic-bezier(0.26, 0.08, 0.25, 1)",
+      "--tp-clip-margin": "0px",
+      ...style,
+    } as React.CSSProperties,
+    className: cn(
+      // `overflow-clip` (not `-hidden`): hidden still permits programmatic
+      // `scrollIntoView` (e.g. focusing a deep descendant), which would scroll
+      // this container and expose the clipped region; clip is a true non-scroll
+      // container. `overflow-clip-margin` adds a bleed for focus rings / shadows
+      // (see `--tp-clip-margin`). `contain-layout` scopes height-driven layout
+      // work here — side effect: it becomes a containing block for fixed /
+      // absolute descendants (flag if you position one inside).
+      "overflow-clip contain-layout [overflow-clip-margin:var(--tp-clip-margin)]",
+      // Only animate height while swapping (see `isSwapping` above).
+      isSwapping &&
+        "transition-[height] duration-(--tp-duration) ease-(--tp-ease)",
+      "motion-reduce:transition-none",
+      className,
+    ),
+    children: (
       <div ref={setInnerRef} className="grid grid-cols-[minmax(0,1fr)]">
         <TransitionPanelContext value={contextValue}>
           {children}
         </TransitionPanelContext>
       </div>
-    </div>
-  );
+    ),
+  };
+
+  return useRender({
+    defaultTagName: "div",
+    render,
+    ref: outerRef,
+    props: mergeProps<"div">(defaultProps, props),
+  });
 }
 
 TransitionPanel.displayName = "TransitionPanel";
@@ -449,11 +349,11 @@ TransitionPanel.displayName = "TransitionPanel";
 function TransitionPanelView({
   viewKey,
   initialFocus = true,
-  ref,
+  render,
   className,
   style,
   children,
-  ...rest
+  ...props
 }: TransitionPanelViewProps) {
   const ctx = React.use(TransitionPanelContext);
   if (!ctx) {
@@ -461,80 +361,74 @@ function TransitionPanelView({
       "TransitionPanelView must be rendered inside a TransitionPanel.",
     );
   }
-  const { activeKey, axis, enterFrom, exitTo, mounted, registerView } = ctx;
+  const { activeKey, transition, enterFrom, exitTo, mounted, registerView } =
+    ctx;
   const isActive = viewKey === activeKey;
+  const isFade = transition === "fade";
   const wrapperRef = React.useRef<HTMLDivElement | null>(null);
 
-  // Compose the consumer `ref` with the internal `wrapperRef` used by
-  // `registerView`. Mirrors the pattern on `TransitionPanel` so callers
-  // can attach observers or imperatively measure the view wrapper without
-  // breaking the panel's own DOM reads.
-  const setWrapperRef = React.useCallback(
-    (node: HTMLDivElement | null) => {
-      wrapperRef.current = node;
-      if (typeof ref === "function") {
-        ref(node);
-      } else if (ref) {
-        (ref as React.RefObject<HTMLDivElement | null>).current = node;
-      }
-    },
-    [ref],
-  );
-
-  // useLayoutEffect (not useEffect) so registration happens before the
-  // panel's own layout-effect-driven focus move. React runs layout effects
-  // child-to-parent, so a view that mounts in the same render as an
-  // activeKey change still gets registered in time for the focus lookup.
+  // useLayoutEffect (not useEffect), and child-to-parent ordering, ensures a
+  // view registers before the panel's focus move reads the registry — even
+  // when it mounts in the same render as the activeKey change.
   React.useLayoutEffect(() => {
     const el = wrapperRef.current;
     if (!el) return;
     return registerView(viewKey, el, initialFocus);
   }, [viewKey, initialFocus, registerView]);
 
-  return (
-    <div
-      {...rest}
-      ref={setWrapperRef}
-      aria-hidden={!isActive}
-      inert={!isActive}
-      data-slot="transition-panel-view"
-      data-active={isActive ? "" : undefined}
-      data-viewkey={viewKey}
-      style={
-        {
-          // Consumer style spreads first so they can add their own
-          // properties (padding, background, custom CSS vars). The
-          // direction-aware slide vars override after — these are
-          // panel-controlled and change every render, so a consumer
-          // setting them would just break the slide animation.
-          ...style,
-          "--tp-enter": enterFrom,
-          "--tp-exit": exitTo,
-        } as React.CSSProperties
-      }
-      className={cn(
-        "[grid-area:1/1]",
-        "transition-[opacity,translate,display] transition-discrete duration-(--tp-duration) ease-[cubic-bezier(0.32,0.72,0,1)]",
-        "motion-reduce:transition-none",
-        mounted && "starting:opacity-0",
-        mounted &&
-          (axis === "x"
-            ? "starting:translate-x-(--tp-enter)"
-            : "starting:translate-y-(--tp-enter)"),
-        isActive
-          ? "translate-x-0 translate-y-0 opacity-100"
-          : cn(
-              "pointer-events-none hidden opacity-0 contain-[size]",
-              axis === "x"
-                ? "translate-x-(--tp-exit)"
-                : "translate-y-(--tp-exit)",
-            ),
-        className,
-      )}
-    >
-      {children}
-    </div>
-  );
+  const defaultProps = {
+    "aria-hidden": !isActive,
+    inert: !isActive,
+    "data-slot": "transition-panel-view",
+    "data-active": isActive ? "" : undefined,
+    "data-viewkey": viewKey,
+    style: {
+      // Consumer style spreads first; the panel-controlled slide vars override
+      // after (they change every render — a consumer value would just break the
+      // slide). Unused in `fade` mode.
+      ...style,
+      "--tp-enter": enterFrom,
+      "--tp-exit": exitTo,
+    } as React.CSSProperties,
+    className: cn(
+      "[grid-area:1/1]",
+      // Per-mode transition: `slide` translates on --tp-duration/--tp-ease;
+      // `fade` scales + crossfades on --tp-fade-duration/--tp-fade-ease.
+      isFade
+        ? "transition-[opacity,scale,display] duration-(--tp-fade-duration) ease-(--tp-fade-ease)"
+        : "transition-[opacity,translate,display] duration-(--tp-duration) ease-(--tp-ease)",
+      "transition-discrete",
+      "motion-reduce:transition-none",
+      mounted && "starting:opacity-0",
+      // Slide sets the `translate` property *directly* rather than via Tailwind's
+      // `translate-x-*` (which routes through the `@property`-registered var
+      // `--tw-translate-x`). WebKit drops an `@starting-style` value on a
+      // registered custom property when it's a `var()` reference, falling back to
+      // the registered `initial-value: 0` — so `--tw-translate-x: var(--tp-enter)`
+      // collapses to 0 and the entering view jumps in with no slide (only the
+      // crossfade survives). Chrome resolves it fine. Setting `translate` directly
+      // bypasses the registered var. Fade's `scale-*` is a literal, so it's safe.
+      mounted &&
+        (isFade ? "starting:scale-[0.96]" : "starting:[translate:var(--tp-enter)_0]"),
+      isActive
+        ? isFade
+          ? "scale-100 opacity-100"
+          : "[translate:0_0] opacity-100"
+        : cn(
+            "pointer-events-none hidden opacity-0 contain-[size]",
+            isFade ? "scale-[0.96]" : "[translate:var(--tp-exit)_0]",
+          ),
+      className,
+    ),
+    children,
+  };
+
+  return useRender({
+    defaultTagName: "div",
+    render,
+    ref: wrapperRef,
+    props: mergeProps<"div">(defaultProps, props),
+  });
 }
 
 TransitionPanelView.displayName = "TransitionPanelView";

@@ -131,11 +131,9 @@ function AccordionTrigger({
   subtitle,
   ...props
 }: AccordionTriggerProps) {
-  // Determine if we have a start-positioned indicator
   const hasStartIndicator = showIndicator && indicatorPosition === "start";
   const hasEndIndicator = showIndicator && indicatorPosition === "end";
 
-  // Render the appropriate indicator icon
   const renderIndicator = () => {
     if (!showIndicator) return null;
 
@@ -167,7 +165,7 @@ function AccordionTrigger({
         data-slot="accordion-trigger"
         data-has-icon={hasStartIndicator ? "true" : undefined}
         className={cn(
-          "group/trigger flex w-full cursor-pointer items-center justify-between gap-3 p-3.5 text-left text-sm font-medium outline-none disabled:pointer-events-none disabled:opacity-50",
+          "group/trigger flex w-full cursor-pointer items-center justify-between gap-3 p-3.5 text-left text-sm font-medium outline-none disabled:pointer-events-none disabled:opacity-60",
           // Default variant styles
           "group-data-[variant=default]:px-0",
           // Split variant styles
@@ -183,17 +181,15 @@ function AccordionTrigger({
         )}
         {...props}
       >
-        {/* Start-positioned indicator (replaces icon prop) */}
         {hasStartIndicator && renderIndicator()}
 
-        {/* Legacy icon support (only shown when indicator is at end position) */}
+        {/* icon prop — only rendered when indicator is at end position */}
         {icon && !hasStartIndicator && (
           <span className="text-muted-foreground shrink-0" aria-hidden="true">
             {icon}
           </span>
         )}
 
-        {/* Content area */}
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="underline-offset-2 group-hover/trigger:underline">
             {children}
@@ -205,7 +201,6 @@ function AccordionTrigger({
           )}
         </div>
 
-        {/* End-positioned indicator */}
         {hasEndIndicator && renderIndicator()}
       </BaseAccordion.Trigger>
     </AccordionHeader>

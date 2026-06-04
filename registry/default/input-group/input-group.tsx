@@ -8,39 +8,59 @@ import { Button } from "@/registry/default/button/button";
 import { Input, type InputProps } from "@/registry/default/input/input";
 import { Textarea } from "@/registry/default/textarea/textarea";
 
-function InputGroup({ className, ...props }: React.ComponentProps<"div">) {
+const inputGroupVariants = cva(
+  [
+    "group/input-group relative flex w-full items-center rounded-lg border bg-clip-padding",
+    "min-w-0 has-[>textarea]:h-auto",
+
+    // Variants based on alignment.
+    "has-[>[data-align=inline-start]]:[&>input]:pl-2",
+    "has-[>[data-align=inline-end]]:[&>input]:pr-2",
+    "has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col has-[>[data-align=block-start]]:[&>input]:pb-3",
+    "has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-end]]:[&>input]:pt-3",
+
+    // Focus state.
+    "has-[[data-slot=input-group-control]:focus-visible]:outline-ring/50 has-[[data-slot=input-group-control]:focus-visible]:outline-2 has-[[data-slot=input-group-control]:focus-visible]:outline-offset-2 has-[[data-slot=input-group-control]:focus-visible]:outline-solid",
+
+    // Error state.
+    "has-[[data-slot][aria-invalid=true]]:outline-destructive/50 has-[[data-slot][aria-invalid=true]]:outline-2 has-[[data-slot][aria-invalid=true]]:outline-offset-2 has-[[data-slot][aria-invalid=true]]:outline-solid",
+
+    // Transition outline
+    "outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out",
+  ],
+  {
+    variants: {
+      variant: {
+        // Opaque "lifted" bg — use on the page or any non-elevated substrate.
+        default: "bg-input",
+        // Translucent overlay — use inside Cards, Dialogs, or any surface
+        // where the opaque default would collapse into its parent.
+        elevated: "bg-input-elevated",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  },
+);
+
+function InputGroup({
+  className,
+  variant,
+  ...props
+}: React.ComponentProps<"div"> & VariantProps<typeof inputGroupVariants>) {
   return (
     <div
       data-slot="input-group"
       role="group"
-      className={cn(
-        "group/input-group bg-input dark:bg-input/35 relative flex w-full items-center rounded-lg border bg-clip-padding shadow-xs",
-        "min-w-0 has-[>textarea]:h-auto",
-
-        // Variants based on alignment.
-        "has-[>[data-align=inline-start]]:[&>input]:pl-2",
-        "has-[>[data-align=inline-end]]:[&>input]:pr-2",
-        "has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col has-[>[data-align=block-start]]:[&>input]:pb-3",
-        "has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-end]]:[&>input]:pt-3",
-
-        // Focus state.
-        "has-[[data-slot=input-group-control]:focus-visible]:outline-ring/50 has-[[data-slot=input-group-control]:focus-visible]:outline-2 has-[[data-slot=input-group-control]:focus-visible]:outline-offset-2 has-[[data-slot=input-group-control]:focus-visible]:outline-solid",
-
-        // Error state.
-        "has-[[data-slot][aria-invalid=true]]:outline-destructive/50 has-[[data-slot][aria-invalid=true]]:outline-2 has-[[data-slot][aria-invalid=true]]:outline-offset-2 has-[[data-slot][aria-invalid=true]]:outline-solid",
-
-        // Transition outline
-        "outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out",
-
-        className,
-      )}
+      className={cn(inputGroupVariants({ variant }), className)}
       {...props}
     />
   );
 }
 
 const inputGroupAddonVariants = cva(
-  "text-muted-foreground flex h-auto cursor-text items-center justify-center gap-2 py-1.5 text-sm font-medium select-none [&>svg:not([class*='size-'])]:size-4 [&>kbd]:rounded-[calc(var(--radius)-5px)] group-data-[disabled=true]/input-group:opacity-50",
+  "text-muted-foreground flex h-auto cursor-text items-center justify-center gap-2 py-1.5 text-sm font-medium select-none [&>svg:not([class*='size-'])]:size-4 [&>kbd]:rounded-[calc(var(--radius)-5px)] group-data-[disabled=true]/input-group:opacity-60",
   {
     variants: {
       align: {
@@ -131,11 +151,7 @@ function InputGroupText({ className, ...props }: React.ComponentProps<"span">) {
 
 export type InputGroupInputProps = InputProps;
 
-function InputGroupInput({
-  className,
-  size,
-  ...props
-}: InputGroupInputProps) {
+function InputGroupInput({ className, size, ...props }: InputGroupInputProps) {
   return (
     <Input
       data-slot="input-group-control"

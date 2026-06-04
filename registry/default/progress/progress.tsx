@@ -6,7 +6,6 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
-// Context for sharing progress configuration
 interface ProgressContextValue {
   size?: "sm" | "md" | "lg";
   animated?: boolean;
@@ -18,7 +17,6 @@ interface ProgressContextValue {
 
 const ProgressContext = React.createContext<ProgressContextValue>({});
 
-// Root component with size variants and animation support
 const progressRootVariants = cva("w-full", {
   variants: {
     size: {
@@ -78,7 +76,6 @@ function ProgressRoot({
   );
 }
 
-// Track component with size variants and animation support
 const progressTrackVariants = cva(
   "relative w-full overflow-hidden rounded-full bg-primary/15 shadow-[inset_0_1px_2px_0_oklch(0.18_0_0_/_0.06)]",
   {
@@ -124,7 +121,6 @@ function ProgressTrack({
   );
 }
 
-// Indicator component with animation and indeterminate support
 function ProgressIndicator({
   className,
   ...props
@@ -145,7 +141,6 @@ function ProgressIndicator({
   );
 }
 
-// Label component with size variants
 const progressLabelVariants = cva("font-medium", {
   variants: {
     size: {
@@ -174,7 +169,6 @@ function ProgressLabel({
   );
 }
 
-// Value component with formatting support
 const progressValueVariants = cva("text-muted-foreground", {
   variants: {
     size: {
@@ -256,7 +250,6 @@ function Progress({ className, children, ...props }: ProgressRootProps) {
   );
 }
 
-// Named exports for subcomponents
 export {
   Progress,
   ProgressRoot,

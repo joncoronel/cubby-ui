@@ -2,6 +2,10 @@ import * as React from "react";
 import { NavigationMenu as NavigationMenuPrimitive } from "@base-ui/react/navigation-menu";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import {
+  solidSurface,
+  type SurfaceLevel,
+} from "@/registry/default/lib/elevated";
 
 interface NavigationMenuProps extends React.ComponentProps<
   typeof NavigationMenuPrimitive.Root
@@ -25,6 +29,10 @@ interface NavigationMenuProps extends React.ComponentProps<
     typeof NavigationMenuPrimitive.Positioner
   >["collisionBoundary"];
   arrow?: boolean;
+  /** Surface elevation level (1-8) for the bar. Defaults to 2 — subtle toolbar above the page. */
+  level?: SurfaceLevel;
+  /** Shadow weight (1-8) for the bar. Defaults to 2. */
+  shadowLevel?: SurfaceLevel;
 }
 
 function NavigationMenu({
@@ -37,13 +45,17 @@ function NavigationMenu({
   collisionPadding = { top: 5, bottom: 5, left: 20, right: 20 },
   collisionBoundary,
   arrow = false,
+  level = 2,
+  shadowLevel = 2,
   ...props
 }: NavigationMenuProps) {
   return (
     <NavigationMenuPrimitive.Root
       data-slot="navigation-menu"
+      data-level={level}
       className={cn(
-        "bg-card border-border/70 text-foreground min-w-max rounded-xl border p-1 shadow-[0_2px_6px_0_oklch(0.18_0_0_/_0.05)]",
+        "text-foreground min-w-max rounded-xl p-1",
+        solidSurface(level, shadowLevel),
         className,
       )}
       {...props}
@@ -89,7 +101,7 @@ function NavigationMenuItem({
 }
 
 const navigationMenuTriggerStyle = cva(
-  "box-border flex items-center justify-center gap-1.5 h-10 px-2.5 xs:px-3 m-0 rounded-md bg-card text-foreground font-medium text-[0.925rem] xs:text-base leading-6 select-none no-underline transition-colors duration-150 hover:duration-0 hover:bg-accent/50 hover:text-accent-foreground data-[popup-open]:bg-accent/50 data-[popup-open]:text-accent-foreground focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-ring focus-visible:relative",
+  "box-border flex items-center justify-center gap-1.5 h-10 px-2.5 xs:px-3 m-0 rounded-md text-foreground font-medium text-[0.925rem] xs:text-base leading-6 select-none no-underline transition-colors duration-150 hover:duration-0 hover:bg-(--surface-hover) hover:text-accent-foreground data-[popup-open]:bg-(--surface-hover) data-[popup-open]:text-accent-foreground focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-ring focus-visible:relative",
 );
 
 function NavigationMenuTrigger({
@@ -127,7 +139,7 @@ function NavigationMenuIcon({
 }
 
 const navigationMenuSubTriggerStyle = cva(
-  "w-full text-left relative block rounded-md p-2.5 xs:p-3 no-underline text-inherit transition-colors duration-150 hover:duration-0 hover:bg-accent/50 hover:text-accent-foreground focus-visible:relative focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-ring data-[popup-open]:bg-accent/50 data-[popup-open]:text-accent-foreground",
+  "w-full text-left relative block rounded-md p-2.5 xs:p-3 no-underline text-inherit transition-colors duration-150 hover:duration-0 hover:bg-(--surface-hover) hover:text-accent-foreground focus-visible:relative focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-ring data-[popup-open]:bg-(--surface-hover) data-[popup-open]:text-accent-foreground",
 );
 
 function NavigationMenuSubTrigger({
@@ -202,7 +214,7 @@ function NavigationMenuLink({
       className={cn(
         standalone
           ? navigationMenuTriggerStyle()
-          : "xs:p-3 hover:bg-accent/50 hover:text-accent-foreground focus-visible:outline-ring block rounded-md p-2.5 text-inherit no-underline transition-colors duration-150 hover:duration-0 focus-visible:relative focus-visible:outline-2 focus-visible:-outline-offset-1",
+          : "xs:p-3 hover:bg-(--surface-hover) hover:text-accent-foreground focus-visible:outline-ring block rounded-md p-2.5 text-inherit no-underline transition-colors duration-150 hover:duration-0 focus-visible:relative focus-visible:outline-2 focus-visible:-outline-offset-1",
         className,
       )}
       {...props}
@@ -299,7 +311,10 @@ function NavigationMenuViewport({
       >
         <NavigationMenuPrimitive.Popup
           data-slot="navigation-menu-content"
-          className="bg-popover text-popover-foreground relative h-(--popup-height) w-(--popup-width) origin-(--transform-origin) overflow-hidden rounded-xl border bg-clip-padding shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)] transition-[opacity,transform,width,height,scale,translate] duration-(--duration) ease-(--easing) data-ending-style:scale-90 data-ending-style:opacity-0 data-ending-style:duration-150 data-starting-style:scale-90 data-starting-style:opacity-0"
+          className={cn(
+            "text-popover-foreground relative h-(--popup-height) w-(--popup-width) origin-(--transform-origin) overflow-hidden rounded-xl transition-[opacity,transform,width,height,scale,translate] duration-(--duration) ease-(--easing) data-ending-style:scale-90 data-ending-style:opacity-0 data-ending-style:duration-150 data-starting-style:scale-90 data-starting-style:opacity-0",
+            solidSurface(3, 3),
+          )}
         >
           {arrow && <NavigationMenuArrow />}
           <NavigationMenuPrimitive.Viewport
@@ -367,7 +382,10 @@ function NavigationMenuSub({
         >
           <NavigationMenuPrimitive.Popup
             data-slot="navigation-menu-sub-content"
-            className="bg-popover text-popover-foreground relative h-(--popup-height) w-(--popup-width) origin-(--transform-origin) overflow-hidden rounded-xl border bg-clip-padding shadow-[0_8px_20px_0_oklch(0.18_0_0/0.10)] transition-[opacity,transform,width,height,scale,translate] duration-(--duration) ease-(--easing) data-ending-style:scale-90 data-ending-style:opacity-0 data-ending-style:duration-150 data-starting-style:scale-90 data-starting-style:opacity-0"
+            className={cn(
+              "text-popover-foreground relative h-(--popup-height) w-(--popup-width) origin-(--transform-origin) overflow-hidden rounded-xl transition-[opacity,transform,width,height,scale,translate] duration-(--duration) ease-(--easing) data-ending-style:scale-90 data-ending-style:opacity-0 data-ending-style:duration-150 data-starting-style:scale-90 data-starting-style:opacity-0",
+              solidSurface(5, 5),
+            )}
           >
             {arrow && <NavigationMenuArrow />}
             <NavigationMenuPrimitive.Viewport
@@ -402,7 +420,7 @@ function ArrowSvg(props: React.ComponentProps<"svg">) {
     <svg width="20" height="10" viewBox="0 0 20 10" fill="none" {...props}>
       <path
         d="M9.66437 2.60207L4.80758 6.97318C4.07308 7.63423 3.11989 8 2.13172 8H0V10H20V8H18.5349C17.5468 8 16.5936 7.63423 15.8591 6.97318L11.0023 2.60207C10.622 2.2598 10.0447 2.25979 9.66437 2.60207Z"
-        className="fill-popover"
+        className="fill-(--popup-surface,var(--popover))"
       />
       <path
         d="M8.99542 1.85876C9.75604 1.17425 10.9106 1.17422 11.6713 1.85878L16.5281 6.22989C17.0789 6.72568 17.7938 7.00001 18.5349 7.00001L15.89 7L11.0023 2.60207C10.622 2.2598 10.0447 2.2598 9.66436 2.60207L4.77734 7L2.13171 7.00001C2.87284 7.00001 3.58774 6.72568 4.13861 6.22989L8.99542 1.85876Z"

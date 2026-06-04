@@ -33,6 +33,7 @@ export default function DialogBasic() {
             </Label>
             <Input
               id="link"
+              variant="elevated"
               defaultValue="https://cubby.dev/p/abc123"
               readOnly
             />

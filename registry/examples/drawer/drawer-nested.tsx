@@ -33,11 +33,11 @@ export default function DrawerNested() {
         <DrawerBody className="space-y-4">
           <div className="grid gap-2">
             <Label htmlFor="display-name">Display Name</Label>
-            <Input id="display-name" defaultValue="Jane Cooper" />
+            <Input id="display-name" variant="elevated" defaultValue="Jane Cooper" />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" defaultValue="jane@example.com" />
+            <Input id="email" variant="elevated" type="email" defaultValue="jane@example.com" />
           </div>
         </DrawerBody>
         <DrawerFooter className="flex-row justify-between">
@@ -65,6 +65,7 @@ export default function DrawerNested() {
                   confirm.
                 </p>
                 <Input
+                  variant="elevated"
                   className="mt-2"
                   placeholder="Type 'delete' to confirm"
                 />

@@ -4,7 +4,10 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const kbdVariants = cva(
-  "inline-flex items-center justify-center rounded-sm border text-center font-medium tracking-tight shadow-[0_1px_3px_0_oklch(0.18_0_0_/_0.08)] transition-colors duration-200 font-mono",
+  // `bg-clip-padding` on `default` only: the translucent border needs the bg
+  // clipped to the padding box to composite correctly. Colored variants use
+  // opaque borders; ghost has no bg, so it would leave a 1px substrate halo.
+  "inline-flex items-center justify-center rounded-sm border text-center font-medium tracking-tight shadow-[0_1px_2px_0_oklch(0_0_0/0.06)] transition-colors duration-150 font-mono",
   {
     variants: {
       size: {
@@ -13,15 +16,15 @@ const kbdVariants = cva(
         lg: "h-7 min-w-7 px-2.5 text-sm",
       },
       variant: {
-        default: "bg-background border-border/60 text-foreground",
+        default: "bg-card bg-clip-padding text-foreground",
         primary: "bg-primary text-primary-foreground border-primary",
         secondary: "bg-secondary text-secondary-foreground border-secondary",
-        outline: "border-2 border-border/60 bg-transparent text-foreground",
+        outline: "bg-transparent text-foreground shadow-none",
         ghost: "border-transparent bg-muted text-muted-foreground shadow-none",
         danger: "bg-destructive text-destructive-foreground border-destructive",
       },
       pressed: {
-        true: "shadow-none translate-y-px bg-muted",
+        true: "translate-y-px bg-muted shadow-none",
         false: "",
       },
     },
@@ -74,19 +77,21 @@ function useClientPlatform(): "mac" | "windows" {
   const [platform, setPlatform] = React.useState<"mac" | "windows">("mac");
 
   React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      setPlatform(
-        navigator.platform.toLowerCase().includes("mac") ? "mac" : "windows",
-      );
-    }
+    if (typeof navigator === "undefined") return;
+    // `navigator.platform` is deprecated; prefer userAgentData.platform
+    // (Chromium) with userAgent string as the universal fallback.
+    const uaData = (
+      navigator as Navigator & { userAgentData?: { platform?: string } }
+    ).userAgentData;
+    const platformHint = uaData?.platform ?? navigator.userAgent;
+    setPlatform(/mac/i.test(platformHint) ? "mac" : "windows");
   }, []);
 
   return platform;
 }
 
 export interface KbdProps
-  extends React.ComponentProps<"kbd">,
-    VariantProps<typeof kbdVariants> {
+  extends React.ComponentProps<"kbd">, VariantProps<typeof kbdVariants> {
   keys?: string[];
   separator?: string;
   platform?: "mac" | "windows" | "auto";
@@ -138,7 +143,7 @@ function Kbd({
       data-slot="kbd"
       className={cn(
         kbdVariants({ size, variant, pressed }),
-        disabled && "cursor-not-allowed opacity-50",
+        disabled && "cursor-not-allowed opacity-60",
         className,
       )}
       aria-label={ariaLabel}

@@ -400,15 +400,23 @@ function TransitionPanelView({
       "transition-discrete",
       "motion-reduce:transition-none",
       mounted && "starting:opacity-0",
+      // Slide sets the `translate` property *directly* rather than via Tailwind's
+      // `translate-x-*` (which routes through the `@property`-registered var
+      // `--tw-translate-x`). WebKit drops an `@starting-style` value on a
+      // registered custom property when it's a `var()` reference, falling back to
+      // the registered `initial-value: 0` — so `--tw-translate-x: var(--tp-enter)`
+      // collapses to 0 and the entering view jumps in with no slide (only the
+      // crossfade survives). Chrome resolves it fine. Setting `translate` directly
+      // bypasses the registered var. Fade's `scale-*` is a literal, so it's safe.
       mounted &&
-        (isFade ? "starting:scale-[0.96]" : "starting:translate-x-(--tp-enter)"),
+        (isFade ? "starting:scale-[0.96]" : "starting:[translate:var(--tp-enter)_0]"),
       isActive
         ? isFade
           ? "scale-100 opacity-100"
-          : "translate-x-0 opacity-100"
+          : "[translate:0_0] opacity-100"
         : cn(
             "pointer-events-none hidden opacity-0 contain-[size]",
-            isFade ? "scale-[0.96]" : "translate-x-(--tp-exit)",
+            isFade ? "scale-[0.96]" : "[translate:var(--tp-exit)_0]",
           ),
       className,
     ),

@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
   "name": "cubby-ui",
-  "homepage": "https://cubby-money.vercel.app",
+  "homepage": "https://www.cubby-ui.dev",
   "items": [
     {
       "name": "accordion",

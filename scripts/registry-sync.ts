@@ -14,7 +14,7 @@ const DEFAULT_STYLE = "default";
 
 // Get registry URL from environment variable or use default
 const REGISTRY_URL =
-  process.env.REGISTRY_URL || "https://cubby-money.vercel.app";
+  process.env.REGISTRY_URL || "https://www.cubby-ui.dev";
 
 interface Example {
   title: string;

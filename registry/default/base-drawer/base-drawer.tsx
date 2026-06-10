@@ -10,10 +10,9 @@ import { useRender } from "@base-ui/react/use-render";
 import { cn } from "@/lib/utils";
 import { Button } from "@/registry/default/button/button";
 import {
-  innerEdgeRim,
   INNER_EDGE_FROM_ATTACH_SIDE,
   solidSurface,
-  surfaceClasses,
+  flushSurface,
   type SurfaceLevel,
 } from "@/registry/default/lib/elevated";
 import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
@@ -215,10 +214,7 @@ function BaseDrawerPopup({
             // line at the viewport boundary.
             variant === "floating"
               ? solidSurface(level, shadowLevel)
-              : cn(
-                  surfaceClasses(level, shadowLevel),
-                  innerEdgeRim(INNER_EDGE_FROM_ATTACH_SIDE[position]),
-                ),
+              : flushSurface(level, INNER_EDGE_FROM_ATTACH_SIDE[position]),
             // Transition
             "transition-[transform,box-shadow,height,background-color] duration-400 ease-[cubic-bezier(.32,.72,0,1)]",
             "touch-none",

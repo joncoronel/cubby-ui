@@ -6,10 +6,9 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { Button } from "@/registry/default/button/button";
 import {
-  innerEdgeRim,
   INNER_EDGE_FROM_ATTACH_SIDE,
   solidSurface,
-  surfaceClasses,
+  flushSurface,
   type SurfaceLevel,
 } from "@/registry/default/lib/elevated";
 import {
@@ -205,10 +204,7 @@ function SheetContent({
             // line at the viewport boundary.
             variant === "floating"
               ? solidSurface(level, shadowLevel)
-              : cn(
-                  surfaceClasses(level, shadowLevel),
-                  innerEdgeRim(INNER_EDGE_FROM_ATTACH_SIDE[side ?? "right"]),
-                ),
+              : flushSurface(level, INNER_EDGE_FROM_ATTACH_SIDE[side ?? "right"]),
             sheetContentVariants({ variant, side }),
             !isModal && "pointer-events-auto",
             className,

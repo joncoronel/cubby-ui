@@ -11,10 +11,9 @@ import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { Button } from "@/registry/default/button/button";
 import {
-  innerEdgeRim,
   INNER_EDGE_FROM_ATTACH_SIDE,
   solidSurface,
-  surfaceClasses,
+  flushSurface,
   type SurfaceLevel,
 } from "@/registry/default/lib/elevated";
 import {
@@ -1094,10 +1093,7 @@ function DrawerContentInner({
                 // inner-facing side only — other edges would show a 1px line at the viewport boundary.
                 variant === "floating"
                   ? solidSurface(level, shadowLevel)
-                  : cn(
-                      surfaceClasses(level, shadowLevel),
-                      innerEdgeRim(INNER_EDGE_FROM_ATTACH_SIDE[direction]),
-                    ),
+                  : flushSurface(level, INNER_EDGE_FROM_ATTACH_SIDE[direction]),
                 open && !isInitialized && "opacity-0",
                 isAnimating || isClosing
                   ? "pointer-events-none"

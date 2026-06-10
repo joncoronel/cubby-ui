@@ -163,7 +163,7 @@ The values are matched to fluid-functionalism: 6% black/white overlay for hover,
 
 ## Building your own elevated containers
 
-Three helpers live in `@/registry/default/lib/elevated`. Each returns Tailwind class strings — drop them on whatever element you want elevated.
+Four helpers live in `@/registry/default/lib/elevated`. Each returns Tailwind class strings — drop them on whatever element you want elevated.
 
 ### `solidSurface(level, shadowLevel?)`
 
@@ -202,21 +202,42 @@ Requires the host to be positioned (`relative` or otherwise) and have a border-r
 
 ### `surfaceClasses(level, shadowLevel?)`
 
-The primitive — just `bg-surface-N` + drops, no rim. Building block for specialized treatments. The viewport-flush Sheet and Drawer variants use this together with `innerEdgeRim(side)` to paint a rim only on the inner-facing edge (a full four-edge rim would render as a thin line along the screen edge).
+The primitive — just `bg-surface-N` + the downward drop shadow, no rim. It's the building block the other helpers compose from; reach for it directly when the surface defines its own edge another way (a real CSS border, a single-edge rim, etc.).
 
 ```tsx
-import { surfaceClasses, innerEdgeRim } from "@/registry/default/lib/elevated";
+import { surfaceClasses } from "@/registry/default/lib/elevated";
 
-// Right-flush sheet — rim on the left (inner-facing) edge only
+function PlainSurface({ children }) {
+  return <div className={surfaceClasses(3)}>{children}</div>;
+}
+```
+
+### `flushSurface(level, innerEdge)`
+
+For **viewport-flush** containers — the `default` Sheet and Drawer variants, which slide in pinned against a screen edge. Three of their four edges sit at the viewport boundary, so `solidSurface`'s always-downward shadow + four-edge rim point the wrong way (a top/left/bottom sheet would cast its shadow off-screen, and the rim would draw a thin line along the screen edge). `flushSurface` instead:
+
+- casts the **drop shadow directionally**, toward the inner content-facing edge rather than straight down, and
+- paints a **single-edge rim** on that same edge (via `--surface-rim-color`).
+
+The edge ring matches `solidSurface` exactly in both themes; only the drop is rotated to point at the content. Pass the content-facing edge — derive it from the attach side with `INNER_EDGE_FROM_ATTACH_SIDE` (`right → left`, `bottom → top`, etc.).
+
+```tsx
+import {
+  flushSurface,
+  INNER_EDGE_FROM_ATTACH_SIDE,
+} from "@/registry/default/lib/elevated";
+
+// Right-flush sheet — shadow + rim on the left (inner-facing) edge
 function RightSheet({ children }) {
   return (
-    <div
-      className={`fixed inset-y-0 right-0 ${surfaceClasses(5)} ${innerEdgeRim("left")}`}
-    >
+    <div className={`fixed inset-y-0 right-0 ${flushSurface(5, "left")}`}>
       {children}
     </div>
   );
 }
+
+// Or derive the edge from the attach side:
+// flushSurface(5, INNER_EDGE_FROM_ATTACH_SIDE[side])
 ```
 
 ## Tracking the level from descendants

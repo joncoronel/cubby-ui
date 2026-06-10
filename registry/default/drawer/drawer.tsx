@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/registry/default/button/button";
 import {
   INNER_EDGE_FROM_ATTACH_SIDE,
-  solidSurface,
+  elevatedSurface,
   flushSurface,
   type SurfaceLevel,
 } from "@/registry/default/lib/elevated";
@@ -1092,7 +1092,7 @@ function DrawerContentInner({
                 // Floating: full 4-edge rim. Flush (`default`): single-edge rim on the
                 // inner-facing side only — other edges would show a 1px line at the viewport boundary.
                 variant === "floating"
-                  ? solidSurface(level, shadowLevel)
+                  ? elevatedSurface(level, shadowLevel)
                   : flushSurface(level, INNER_EDGE_FROM_ATTACH_SIDE[direction]),
                 open && !isInitialized && "opacity-0",
                 isAnimating || isClosing

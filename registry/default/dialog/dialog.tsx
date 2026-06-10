@@ -5,7 +5,7 @@ import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import { cn } from "@/lib/utils";
 import { Button } from "@/registry/default/button/button";
 import {
-  solidSurface,
+  elevatedSurface,
   type SurfaceLevel,
 } from "@/registry/default/lib/elevated";
 import {
@@ -110,7 +110,7 @@ function DialogContent({
             "text-popover-foreground relative z-50 flex max-h-full min-h-0 w-full max-w-full min-w-0 flex-col overflow-hidden",
             "rounded-2xl sm:max-w-lg",
             // Surface elevation — bg + shadow + rim overlay (rim uses ::after at z-[2])
-            solidSurface(level, shadowLevel),
+            elevatedSurface(level, shadowLevel),
             // Mobile: bottom sheet style
             // "right-0 bottom-0 left-0 rounded-t-lg",
             // Desktop: centered modal

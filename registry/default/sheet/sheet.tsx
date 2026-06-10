@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/registry/default/button/button";
 import {
   INNER_EDGE_FROM_ATTACH_SIDE,
-  solidSurface,
+  elevatedSurface,
   flushSurface,
   type SurfaceLevel,
 } from "@/registry/default/lib/elevated";
@@ -203,7 +203,7 @@ function SheetContent({
             // on the inner-facing edge so the other edges don't show a 1px
             // line at the viewport boundary.
             variant === "floating"
-              ? solidSurface(level, shadowLevel)
+              ? elevatedSurface(level, shadowLevel)
               : flushSurface(level, INNER_EDGE_FROM_ATTACH_SIDE[side ?? "right"]),
             sheetContentVariants({ variant, side }),
             !isModal && "pointer-events-auto",

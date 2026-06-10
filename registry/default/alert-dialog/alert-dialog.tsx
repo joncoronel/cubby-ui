@@ -5,7 +5,7 @@ import { AlertDialog as BaseAlertDialog } from "@base-ui/react/alert-dialog";
 import { cn } from "@/lib/utils";
 import { Button } from "@/registry/default/button/button";
 import {
-  solidSurface,
+  elevatedSurface,
   type SurfaceLevel,
 } from "@/registry/default/lib/elevated";
 import {
@@ -93,7 +93,7 @@ function AlertDialogContent({
             "text-popover-foreground relative z-50 flex max-h-full min-h-0 w-full max-w-full min-w-0 flex-col overflow-hidden",
             "rounded-2xl sm:max-w-lg",
             // Surface elevation — bg + shadow + rim overlay (rim uses ::after at z-[2])
-            solidSurface(level, shadowLevel),
+            elevatedSurface(level, shadowLevel),
             // Nested dialog offset
             "-translate-y-[calc(1.25rem*var(--nested-dialogs))]",
             // Scale effect for nested dialogs

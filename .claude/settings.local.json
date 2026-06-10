@@ -148,7 +148,8 @@
       "Bash(grep -iE \"\\\\.tsx?$|\\\\.ts$\")",
       "Bash(awk '/^[A-Za-z]:\\\\\\\\|^\\\\//{f=$0} /error/{print f\"  ::  \"$0}')",
       "Bash(awk '/^C:\\\\\\\\/{f=$0; sub\\(/.*cubby-ui\\\\\\\\/,\"\",f\\)} / error/{print f\"  ::  \"$2\"  \"$0}')",
-      "Bash(npx playwright *)"
+      "Bash(npx playwright *)",
+      "PowerShell(npx eslint registry/default/drawer/drawer.tsx 2>&1)"
     ],
     "deny": []
   }

@@ -53,7 +53,7 @@ const drawerContentVariants = cva(
     "scale-[calc(1-0.05*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))]",
     // Disable transitions on parent while child is being dragged
     "data-[nested-dragging]:transition-none",
-    // Nested drawer support: overlay dim effect (using before: to avoid conflict with Safari ::after touch fix AND the elevation rim's ::after)
+    // Nested drawer support: overlay dim effect — uses ::before to stay clear of the elevation rim's ::after
     "before:pointer-events-none before:absolute before:inset-0 before:z-50 before:hidden before:rounded-[inherit] before:bg-black/15 before:opacity-0 before:transition-[opacity,display] before:transition-discrete before:duration-300",
     "data-nested-dialog-open:before:block data-nested-dialog-open:before:opacity-100",
     "starting:data-nested-dialog-open:before:opacity-0",
@@ -1100,19 +1100,34 @@ function DrawerContentInner({
                   : "pointer-events-auto",
                 immediateClose && "transition-none",
                 "data-nested-dialog-open:overflow-hidden",
-                // Safari iOS touch fix: 1px cross-axis overflow (WebKit bug #183870).
-                // Co-exists with the rim's ::after — Tailwind merges both onto the same pseudo-element.
+                // Safari iOS touch fix (WebKit bug #183870): the popup needs a sliver of
+                // cross-axis scroll so iOS engages its touch handler. The overflow itself
+                // is supplied by the shim <span> below, keeping the rim's ::after to itself.
                 modal !== true && [
                   "[@supports(-webkit-touch-callout:none)]:relative [@supports(-webkit-touch-callout:none)]:[scrollbar-width:none]",
                   isVertical
-                    ? "[@supports(-webkit-touch-callout:none)]:overflow-x-scroll [@supports(-webkit-touch-callout:none)]:overscroll-x-none [@supports(-webkit-touch-callout:none)]:after:pointer-events-none [@supports(-webkit-touch-callout:none)]:after:absolute [@supports(-webkit-touch-callout:none)]:after:inset-0 [@supports(-webkit-touch-callout:none)]:after:w-[calc(100%+0.5px)] [@supports(-webkit-touch-callout:none)]:after:content-['']"
-                    : "[@supports(-webkit-touch-callout:none)]:overflow-y-scroll [@supports(-webkit-touch-callout:none)]:overscroll-y-none [@supports(-webkit-touch-callout:none)]:after:pointer-events-none [@supports(-webkit-touch-callout:none)]:after:absolute [@supports(-webkit-touch-callout:none)]:after:inset-0 [@supports(-webkit-touch-callout:none)]:after:h-[calc(100%+1px)] [@supports(-webkit-touch-callout:none)]:after:content-['']",
+                    ? "[@supports(-webkit-touch-callout:none)]:overflow-x-scroll [@supports(-webkit-touch-callout:none)]:overscroll-x-none"
+                    : "[@supports(-webkit-touch-callout:none)]:overflow-y-scroll [@supports(-webkit-touch-callout:none)]:overscroll-y-none",
                 ],
                 className,
               )}
               style={popupStyle}
               {...props}
             >
+              {/* Safari shim: supplies the 1px cross-axis scroll overflow (see the WebKit
+                  fix above) as a child element so the elevation rim keeps the popup's
+                  ::after to itself. Inert (display:none) on every engine except iOS Safari. */}
+              {modal !== true && (
+                <span
+                  aria-hidden
+                  className={cn(
+                    "hidden [@supports(-webkit-touch-callout:none)]:pointer-events-none [@supports(-webkit-touch-callout:none)]:absolute [@supports(-webkit-touch-callout:none)]:inset-0 [@supports(-webkit-touch-callout:none)]:block",
+                    isVertical
+                      ? "[@supports(-webkit-touch-callout:none)]:w-[calc(100%+0.5px)]"
+                      : "[@supports(-webkit-touch-callout:none)]:h-[calc(100%+1px)]",
+                  )}
+                />
+              )}
               {children}
               {showCloseButton && (
                 <DrawerClose

@@ -183,7 +183,7 @@ Use this for any floating container that doesn't have sticky or opaque children 
 
 ### `elevatedSurface(level, shadowLevel?)`
 
-Same effect as `solidSurface`, but paints the rim on an `::after` pseudo-element at `z-[2]` instead of on the popup's own box-shadow. Use this when sticky or opaque children might cover the rim (Select's sticky group labels are the canonical case).
+Same effect as `solidSurface`, but paints the rim on an `::after` pseudo-element at `z-[2]` instead of on the popup's own box-shadow. Use this whenever sticky or opaque children sit near the surface's edges — with `solidSurface` the rim lives in the box-shadow, so any opaque child at an edge renders on top of it and hides it. Two common cases: **sticky group labels** (Select, Combobox, Autocomplete) and **opaque inset footers** (Dialog, Alert Dialog, Sheet, Drawer — the `inset` footer's `bg-muted` would otherwise cover the bottom rim).
 
 ```tsx
 import { elevatedSurface } from "@/registry/default/lib/elevated";

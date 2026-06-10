@@ -1676,6 +1676,26 @@ async function syncRegistry() {
   }
 }
 
+// Extract the inner body of a top-level CSS block (e.g. `:root { ... }`) by
+// brace counting. A non-greedy `\{([\s\S]*?)\}` regex stops at the FIRST `}`,
+// which silently truncates a block when an earlier comment contains a brace —
+// e.g. the `bg-surface-{1..8}` shorthand in the @theme inline block, which
+// otherwise drops every surface utility that follows it.
+function extractBlockBody(content: string, opener: RegExp): string | null {
+  const match = content.match(opener);
+  if (!match || match.index === undefined) return null;
+  const startPos = match.index + match[0].length;
+  let braceCount = 1;
+  let endPos = startPos;
+  while (endPos < content.length && braceCount > 0) {
+    if (content[endPos] === "{") braceCount++;
+    else if (content[endPos] === "}") braceCount--;
+    endPos++;
+  }
+  if (braceCount !== 0) return null;
+  return content.substring(startPos, endPos - 1);
+}
+
 // Extract CSS variables from registry/theme.css
 function extractCssContent(): {
   light: Record<string, string>;
@@ -1699,10 +1719,9 @@ function extractCssContent(): {
   const keyframes: Record<string, any> = {};
 
   // Extract :root variables (light mode)
-  const rootMatch = content.match(/:root\s*\{([\s\S]*?)\}/);
-  if (rootMatch) {
-    const rootContent = rootMatch[1];
-    const varMatches = rootContent.matchAll(/--([a-z-]+):\s*([^;]+);/g);
+  const rootContent = extractBlockBody(content, /:root\s*\{/);
+  if (rootContent) {
+    const varMatches = rootContent.matchAll(/--([a-z0-9-]+):\s*([^;]+);/g);
     for (const match of varMatches) {
       const varName = match[1];
       const varValue = match[2].trim();
@@ -1713,10 +1732,9 @@ function extractCssContent(): {
   }
 
   // Extract .dark variables (dark mode)
-  const darkMatch = content.match(/\.dark\s*\{([\s\S]*?)\}/);
-  if (darkMatch) {
-    const darkContent = darkMatch[1];
-    const varMatches = darkContent.matchAll(/--([a-z-]+):\s*([^;]+);/g);
+  const darkContent = extractBlockBody(content, /\.dark\s*\{/);
+  if (darkContent) {
+    const varMatches = darkContent.matchAll(/--([a-z0-9-]+):\s*([^;]+);/g);
     for (const match of varMatches) {
       const varName = match[1];
       const varValue = match[2].trim();
@@ -1727,12 +1745,9 @@ function extractCssContent(): {
   }
 
   // Extract @theme inline variables
-  const themeMatch = content.match(/@theme inline\s*\{([\s\S]*?)\}/);
-  if (themeMatch) {
-    const themeContent = themeMatch[1];
-    const varMatches = themeContent.matchAll(
-      /--([a-z0-9-]+(?:-[a-z0-9]+)*):\s*([^;]+);/g,
-    );
+  const themeContent = extractBlockBody(content, /@theme inline\s*\{/);
+  if (themeContent) {
+    const varMatches = themeContent.matchAll(/--([a-z0-9-]+):\s*([^;]+);/g);
     for (const match of varMatches) {
       const varName = match[1];
       const varValue = match[2].trim();

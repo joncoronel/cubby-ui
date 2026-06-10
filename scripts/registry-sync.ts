@@ -1545,29 +1545,24 @@ function validateComponentConsistency(
   return errors;
 }
 
-// Re-add the `--` prefix the extractor strips from variable names, so the keys
-// are written verbatim as CSS custom properties in the `css` field.
-function toCssDeclarations(
-  vars: Record<string, string>,
-): Record<string, string> {
-  const out: Record<string, string> = {};
-  for (const [name, value] of Object.entries(vars)) {
-    out[name.startsWith("--") ? name : `--${name}`] = value;
-  }
-  return out;
-}
-
-// Generate the init registry item.
+// Generate the style registry item (the theme).
 //
-// The theme is delivered through shadcn's raw `css` field (`:root`, `.dark`,
-// `@theme inline` written verbatim) rather than through `cssVars`. shadcn's
-// `cssVars` channel runs an "update-theme" pass that echoes EVERY variable into
-// `@theme inline` — color-valued ones as `--color-*` utilities, the rest as
-// self-references. That model assumes a flat palette of literal colors, which
-// Cubby's aliased surface ladder + multi-layer shadow recipe is not, so it
-// produced a wall of dead/self-referential declarations in the consumer's
-// globals.css. The `css` field is written as-authored and skips that pass, so
-// the install mirrors registry/theme.css exactly.
+// Theme variables are delivered through shadcn's `cssVars` channel (theme /
+// light / dark), NOT the raw `css` field. The `css` field's updater treats each
+// `key: value` inside an at-rule as `selector { body }` and runs
+// `postcss.parse(".temp{" + value + "}")` on it — so a flat `@theme inline`
+// declaration like `--color-background: var(--background)` crashes the install
+// with "Unknown word var". `cssVars` is the only supported channel for variable
+// declarations; shadcn writes light→:root, dark→.dark, theme→@theme inline.
+//
+// The trade-off: shadcn's "update-theme" pass echoes every light/dark variable
+// into @theme inline (color-valued ones as `--color-*`, the rest as
+// self-references), which adds some inert/duplicate lines to the consumer's
+// globals.css. That noise is harmless and is the unavoidable cost of a working
+// install — the `css`-field alternative does not work for theme variables.
+//
+// The `css` field is still used for `@layer base` / keyframes / utilities,
+// which ARE selector-based and parse correctly.
 function generateInitItem(cssContent: {
   light: Record<string, string>;
   dark: Record<string, string>;
@@ -1576,23 +1571,11 @@ function generateInitItem(cssContent: {
   layerBase: Record<string, any>;
   keyframes: Record<string, any>;
 }) {
-  const css: Record<string, any> = {};
-
-  if (Object.keys(cssContent.light).length > 0) {
-    css[":root"] = toCssDeclarations(cssContent.light);
-  }
-  if (Object.keys(cssContent.dark).length > 0) {
-    css[".dark"] = toCssDeclarations(cssContent.dark);
-  }
-  if (Object.keys(cssContent.theme).length > 0) {
-    css["@theme inline"] = toCssDeclarations(cssContent.theme);
-  }
-  Object.assign(
-    css,
-    cssContent.keyframes,
-    cssContent.utilities,
-    cssContent.layerBase,
-  );
+  const css = {
+    ...cssContent.keyframes,
+    ...cssContent.utilities,
+    ...cssContent.layerBase,
+  };
 
   return {
     name: "style",
@@ -1607,6 +1590,11 @@ function generateInitItem(cssContent: {
       "Initialize your project with Cubby UI's theme system including OKLCH colors and CSS variables.",
     author: "Cubby UI",
     files: [], // Required by schema
+    cssVars: {
+      theme: cssContent.theme,
+      light: cssContent.light,
+      dark: cssContent.dark,
+    },
     // Only include css if there's content
     ...(Object.keys(css).length > 0 && { css }),
   };

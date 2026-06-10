@@ -19,9 +19,15 @@ Our styling system builds upon [shadcn/ui's CSS variables approach](https://ui.s
 <TabsPanels>
 <TabsContent value="cli">
 
-<PackageManagerCommand command="shadcn@latest add @cubby-ui/init" />
+For an existing shadcn project, add the theme:
 
-This adds the theme CSS variables to your project.
+<PackageManagerCommand command="shadcn@latest add @cubby-ui/style" />
+
+Starting a new project? Scaffold shadcn and install the theme in one command:
+
+<PackageManagerCommand command="shadcn@latest init @cubby-ui/style" />
+
+This adds the theme CSS variables to your project. See [Installation](/docs/getting-started/installation) for the full setup.
 
 </TabsContent>
 

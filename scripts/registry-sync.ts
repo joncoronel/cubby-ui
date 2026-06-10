@@ -1545,7 +1545,29 @@ function validateComponentConsistency(
   return errors;
 }
 
-// Generate init registry item with CSS variables
+// Re-add the `--` prefix the extractor strips from variable names, so the keys
+// are written verbatim as CSS custom properties in the `css` field.
+function toCssDeclarations(
+  vars: Record<string, string>,
+): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [name, value] of Object.entries(vars)) {
+    out[name.startsWith("--") ? name : `--${name}`] = value;
+  }
+  return out;
+}
+
+// Generate the init registry item.
+//
+// The theme is delivered through shadcn's raw `css` field (`:root`, `.dark`,
+// `@theme inline` written verbatim) rather than through `cssVars`. shadcn's
+// `cssVars` channel runs an "update-theme" pass that echoes EVERY variable into
+// `@theme inline` — color-valued ones as `--color-*` utilities, the rest as
+// self-references. That model assumes a flat palette of literal colors, which
+// Cubby's aliased surface ladder + multi-layer shadow recipe is not, so it
+// produced a wall of dead/self-referential declarations in the consumer's
+// globals.css. The `css` field is written as-authored and skips that pass, so
+// the install mirrors registry/theme.css exactly.
 function generateInitItem(cssContent: {
   light: Record<string, string>;
   dark: Record<string, string>;
@@ -1554,25 +1576,37 @@ function generateInitItem(cssContent: {
   layerBase: Record<string, any>;
   keyframes: Record<string, any>;
 }) {
-  const css = {
-    ...cssContent.keyframes,
-    ...cssContent.utilities,
-    ...cssContent.layerBase,
-  };
+  const css: Record<string, any> = {};
+
+  if (Object.keys(cssContent.light).length > 0) {
+    css[":root"] = toCssDeclarations(cssContent.light);
+  }
+  if (Object.keys(cssContent.dark).length > 0) {
+    css[".dark"] = toCssDeclarations(cssContent.dark);
+  }
+  if (Object.keys(cssContent.theme).length > 0) {
+    css["@theme inline"] = toCssDeclarations(cssContent.theme);
+  }
+  Object.assign(
+    css,
+    cssContent.keyframes,
+    cssContent.utilities,
+    cssContent.layerBase,
+  );
 
   return {
-    name: "init",
+    name: "style",
     type: "registry:style",
+    // `extends: none` tells shadcn this is a complete, standalone base theme —
+    // don't seed its default style/tokens underneath ours. It is unrelated to
+    // components: this item ships theme only (no `files`, no
+    // `registryDependencies`); consumers add components separately.
+    extends: "none",
     title: "Cubby UI Theme",
     description:
       "Initialize your project with Cubby UI's theme system including OKLCH colors and CSS variables.",
     author: "Cubby UI",
     files: [], // Required by schema
-    cssVars: {
-      theme: cssContent.theme,
-      light: cssContent.light,
-      dark: cssContent.dark,
-    },
     // Only include css if there's content
     ...(Object.keys(css).length > 0 && { css }),
   };
@@ -1645,7 +1679,7 @@ async function syncRegistry() {
       REGISTRY_JSON_PATH,
       JSON.stringify(validated, null, 2) + "\n",
     );
-    console.log("✓ Updated registry.json with init item");
+    console.log("✓ Updated registry.json with style item");
 
     // 10. Collect example data for unified registry
     const exampleData = await collectExampleData();

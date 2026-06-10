@@ -15,24 +15,50 @@ Before installing components, ensure your project has:
 
 ## Quick Start
 
-### 1. Set up shadcn/ui
-
-If you haven't already, initialize shadcn/ui for your framework. Follow the official guide for your setup:
-
-- [Next.js](https://ui.shadcn.com/docs/installation/next)
-- [Vite](https://ui.shadcn.com/docs/installation/vite)
-- [TanStack Start](https://ui.shadcn.com/docs/installation/tanstack)
-- [Other frameworks](https://ui.shadcn.com/docs/installation)
-
-### 2. Install Base UI
+### 1. Install Base UI
 
 Cubby UI components are built on [Base UI](https://base-ui.com), a headless component library:
 
 <PackageManagerCommand command="@base-ui/react" type="add" />
 
+### 2. Add the theme
+
+Cubby UI ships its theme as a standalone style — `@cubby-ui/style` — covering colors, status colors, radius, easings, and the surface elevation system. Choose the path that matches your project:
+
+<Tabs defaultValue="new">
+
+<TabsList>
+  <TabsTrigger value="new">New project</TabsTrigger>
+  <TabsTrigger value="existing">Existing project</TabsTrigger>
+</TabsList>
+
+<TabsPanels>
+<TabsContent value="new">
+
+Scaffold shadcn and install Cubby UI's theme as your project's base in a single command:
+
+<PackageManagerCommand command="shadcn@latest init @cubby-ui/style" />
+
+This creates your `components.json` and writes the full theme into `globals.css`.
+
+</TabsContent>
+<TabsContent value="existing">
+
+Already have a shadcn project? Add the theme to it:
+
+<PackageManagerCommand command="shadcn@latest add @cubby-ui/style" />
+
+The `@cubby-ui/style` shorthand requires the Cubby UI registry in your `components.json` (see step 3). Haven't added it yet? Install straight from the URL instead:
+
+<PackageManagerCommand command="shadcn@latest add https://cubby-ui.dev/r/style.json" />
+
+</TabsContent>
+</TabsPanels>
+</Tabs>
+
 ### 3. Add the Cubby UI registry
 
-Add the Cubby UI registry to your `components.json`:
+To install components by name (e.g. `@cubby-ui/button`), add the registry to your `components.json`:
 
 ```json
 {
@@ -44,13 +70,9 @@ Add the Cubby UI registry to your `components.json`:
 
 Add the `registries` field to your existing configuration if it doesn't already exist.
 
-### 4. Initialize Cubby UI theme
+### 4. Add the root class
 
-Run the init command to add Cubby UI's theme system to your project:
-
-<PackageManagerCommand command="shadcn@latest add @cubby-ui/init" />
-
-Then add a `root` class to your application wrapper. This creates a stacking context required by Base UI's portal-based components:
+Add a `root` class to your application wrapper. This creates a stacking context required by Base UI's portal-based components:
 
 ```tsx title="app/layout.tsx"
 export default function RootLayout({
@@ -90,9 +112,9 @@ Or install all components at once:
 
 <PackageManagerCommand command="shadcn@latest add @cubby-ui/all" />
 
-## What's Included in Init
+## What's Included in the Theme
 
-The init command adds CSS variables for colors (including status colors), border radius variants, easing functions, and Base UI layout requirements. See [Theming](/docs/getting-started/theming) for full details.
+The `@cubby-ui/style` theme adds CSS variables for colors (including status colors), border radius variants, easing functions, the surface elevation system, and Base UI layout requirements. See [Theming](/docs/getting-started/theming) for full details.
 
 ## Project Structure
 

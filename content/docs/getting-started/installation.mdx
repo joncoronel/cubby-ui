@@ -15,6 +15,8 @@ Before installing components, ensure your project has:
 
 ## Quick Start
 
+Cubby UI is listed in the official [shadcn registry directory](https://ui.shadcn.com/docs/directory), so the `@cubby-ui` namespace resolves automatically — there's no need to add it to your `components.json`.
+
 ### 1. Install Base UI
 
 Cubby UI components are built on [Base UI](https://base-ui.com), a headless component library:
@@ -48,29 +50,11 @@ Already have a shadcn project? Add the theme to it:
 
 <PackageManagerCommand command="shadcn@latest add @cubby-ui/style" />
 
-The `@cubby-ui/style` shorthand requires the Cubby UI registry in your `components.json` (see step 3). Haven't added it yet? Install straight from the URL instead:
-
-<PackageManagerCommand command="shadcn@latest add https://cubby-ui.dev/r/style.json" />
-
 </TabsContent>
 </TabsPanels>
 </Tabs>
 
-### 3. Add the Cubby UI registry
-
-To install components by name (e.g. `@cubby-ui/button`), add the registry to your `components.json`:
-
-```json
-{
-  "registries": {
-    "@cubby-ui": "https://cubby-ui.dev/r/{name}.json"
-  }
-}
-```
-
-Add the `registries` field to your existing configuration if it doesn't already exist.
-
-### 4. Add the root class
+### 3. Add the root class
 
 Add a `root` class to your application wrapper. This creates a stacking context required by Base UI's portal-based components:
 
@@ -90,7 +74,7 @@ export default function RootLayout({
 }
 ```
 
-### 5. Add components
+### 4. Add components
 
 Now you can add any Cubby UI component:
 

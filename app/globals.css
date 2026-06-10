@@ -139,10 +139,11 @@ html {
   --surface-7: oklch(1 0 0);
   --surface-8: oklch(1 0 0);
 
-  /* State overlays — applied via `bg-(--surface-hover)` etc. These are
-     translucent overlays, so they raise the underlying surface by a fixed
-     perceptual delta no matter what level it's sitting on. Light mode uses
-     black-on-white, dark mode uses white-on-black. */
+  /* State overlays — applied via the `bg-surface-hover` / `bg-surface-selected`
+     utilities (mapped in @theme inline below). These are translucent overlays,
+     so they raise the underlying surface by a fixed perceptual delta no matter
+     what level it's sitting on. Light mode uses black-on-white, dark mode uses
+     white-on-black. */
   --surface-hover: oklch(0 0 0 / 0.06);
   --surface-selected: oklch(0 0 0 / 0.1);
 
@@ -458,6 +459,12 @@ html {
   --color-surface-6: var(--surface-6);
   --color-surface-7: var(--surface-7);
   --color-surface-8: var(--surface-8);
+
+  /* Interactive overlay utilities — generates bg-surface-hover /
+     bg-surface-selected. Translucent overlays that composite on whatever
+     surface level they sit on. */
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-selected: var(--surface-selected);
 
   --shadow-surface-1: var(--surface-shadow-1);
   --shadow-surface-2: var(--surface-shadow-2);

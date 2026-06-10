@@ -928,6 +928,8 @@
           "color-surface-6": "var(--surface-6)",
           "color-surface-7": "var(--surface-7)",
           "color-surface-8": "var(--surface-8)",
+          "color-surface-hover": "var(--surface-hover)",
+          "color-surface-selected": "var(--surface-selected)",
           "shadow-surface-1": "var(--surface-shadow-1)",
           "shadow-surface-2": "var(--surface-shadow-2)",
           "shadow-surface-3": "var(--surface-shadow-3)",

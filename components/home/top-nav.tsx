@@ -118,8 +118,8 @@ function NavLink({
         "inline-flex h-8 items-center rounded-md px-2.5 text-sm font-medium transition-colors duration-150 ease-out",
         "focus-visible:outline-ring/50 outline-none focus-visible:outline-2 focus-visible:outline-offset-2",
         active
-          ? "text-foreground bg-(--surface-selected)"
-          : "text-muted-foreground hover:text-foreground hover:bg-(--surface-hover)",
+          ? "text-foreground bg-surface-selected"
+          : "text-muted-foreground hover:text-foreground hover:bg-surface-hover",
       )}
     >
       {label}

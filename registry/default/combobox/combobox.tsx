@@ -122,7 +122,7 @@ function ComboboxTrigger({
       aria-label="Open popup"
       className={cn(
         "inline-flex size-4 cursor-pointer items-center justify-center rounded-md border-none bg-transparent p-0 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-60",
-        "outline-none focus-visible:ring-2 focus-visible:ring-ring/70",
+        "focus-visible:ring-ring/70 outline-none focus-visible:ring-2",
         className,
       )}
       {...props}
@@ -158,7 +158,7 @@ function ComboboxClear({ className, ...props }: BaseCombobox.Clear.Props) {
       aria-label="Clear selection"
       className={cn(
         "inline-flex h-4 w-4 cursor-pointer items-center justify-center rounded-sm opacity-70 transition-[opacity,scale,transform,translate] hover:opacity-100 disabled:pointer-events-none",
-        "focus-visible:ring-2 focus-visible:ring-ring/70 duration-100 outline-none",
+        "focus-visible:ring-ring/70 duration-100 outline-none focus-visible:ring-2",
         "data-ending-style:translate-x-1 data-ending-style:opacity-0 data-starting-style:translate-x-1 data-starting-style:opacity-0",
         className,
       )}
@@ -394,7 +394,7 @@ function ComboboxItem({
       ref={ref}
       data-slot="combobox-item"
       className={cn(
-        "data-highlighted:text-accent-foreground relative grid cursor-default grid-cols-[1fr_1rem] items-center gap-2 rounded-md px-2.5 py-2 pr-2 text-sm outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-highlighted:bg-(--surface-hover)",
+        "data-highlighted:text-accent-foreground data-highlighted:bg-surface-hover relative grid cursor-default grid-cols-[1fr_1rem] items-center gap-2 rounded-md px-2.5 py-2 pr-2 text-sm outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60",
         // Spacing from list edges
         "mx-1 first:mt-1 last:mb-1",
         className,
@@ -491,10 +491,10 @@ function ComboboxChip({ className, ...props }: BaseCombobox.Chip.Props) {
     <BaseCombobox.Chip
       data-slot="combobox-chip"
       className={cn(
-        "bg-(--surface-selected) text-accent-foreground flex items-center gap-1 rounded-sm px-2 py-1 text-sm font-medium break-all sm:text-xs",
+        "bg-surface-selected text-accent-foreground flex items-center gap-1 rounded-sm px-2 py-1 text-sm font-medium break-all sm:text-xs",
         // Ring (not outline) avoids clipping neighbors in the packed chip row;
         // outline-none suppresses the browser default (currentColor → white in dark mode).
-        "outline-none focus-visible:ring-2 focus-visible:ring-ring/70",
+        "focus-visible:ring-ring/70 outline-none focus-visible:ring-2",
         className,
       )}
       {...props}
@@ -511,7 +511,7 @@ function ComboboxChipRemove({
       data-slot="combobox-chip-remove"
       className={cn(
         "ml-1 inline-flex h-4 w-4 items-center justify-center rounded-sm opacity-70 transition-opacity hover:opacity-100 disabled:pointer-events-none",
-        "focus-visible:ring-2 focus-visible:ring-ring/70 cursor-pointer outline-none",
+        "focus-visible:ring-ring/70 cursor-pointer outline-none focus-visible:ring-2",
         className,
       )}
       {...props}

@@ -41,7 +41,7 @@ function Calendar({
           today: cn("bg-accent", classNames?.today),
           week: cn("flex justify-center py-0.5 last:pb-2", classNames?.week),
           day: cn(
-            "flex size-9 items-center justify-center rounded-md text-sm font-normal hover:[&:has(>button)]:bg-(--surface-hover) hover:[&:has(>button)]:text-accent-foreground",
+            "flex size-9 items-center justify-center rounded-md text-sm font-normal hover:[&:has(>button)]:bg-surface-hover hover:[&:has(>button)]:text-accent-foreground",
             classNames?.day,
           ),
           day_button: cn(
@@ -104,7 +104,11 @@ function Calendar({
                 classNames?.button_next,
               )}
             >
-              <HugeiconsIcon icon={ArrowRight01Icon} className="size-4"  strokeWidth={2} />
+              <HugeiconsIcon
+                icon={ArrowRight01Icon}
+                className="size-4"
+                strokeWidth={2}
+              />
             </button>
           ),
           PreviousMonthButton: (props) => (
@@ -116,7 +120,11 @@ function Calendar({
                 classNames?.button_previous,
               )}
             >
-              <HugeiconsIcon icon={ArrowLeft01Icon} className="size-4"  strokeWidth={2} />
+              <HugeiconsIcon
+                icon={ArrowLeft01Icon}
+                className="size-4"
+                strokeWidth={2}
+              />
             </button>
           ),
         }}

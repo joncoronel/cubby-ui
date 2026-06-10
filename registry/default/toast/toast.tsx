@@ -1040,7 +1040,7 @@ function StackedToastItem({
             {showCloseButton && (
               <Toast.Close
                 data-slot="toast-close"
-                className="text-muted-foreground hover:bg-(--surface-hover) hover:text-foreground -mt-1 -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md border-none bg-transparent transition-colors duration-200"
+                className="text-muted-foreground hover:bg-surface-hover hover:text-foreground -mt-1 -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md border-none bg-transparent transition-colors duration-200"
                 aria-label="Close"
               >
                 <HugeiconsIcon
@@ -1133,7 +1133,7 @@ function AnchoredToastItem({ toast }: { toast: ToastData }) {
         {showArrow && (
           <Toast.Arrow
             data-slot="toast-arrow"
-            className="fill-(--popup-surface,var(--card)) [&>path:first-child]:fill-(--popup-surface,var(--card)) [&>path:not(:first-child)]:stroke-border"
+            className="[&>path:not(:first-child)]:stroke-border fill-(--popup-surface,var(--card)) [&>path:first-child]:fill-(--popup-surface,var(--card))"
           />
         )}
         <Toast.Content data-slot="toast-content">
@@ -1423,7 +1423,7 @@ function GroupedSingleItemContent({
       {showCloseButton && (
         <Toast.Close
           data-slot="toast-close"
-          className="text-muted-foreground hover:bg-(--surface-hover) hover:text-foreground -mt-1 -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md border-none bg-transparent transition-colors duration-200"
+          className="text-muted-foreground hover:bg-surface-hover hover:text-foreground -mt-1 -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md border-none bg-transparent transition-colors duration-200"
           aria-label="Close"
         >
           <HugeiconsIcon
@@ -1748,7 +1748,7 @@ function CompletedItemRow({ item, showSeparator }: CompletedItemRowProps) {
         <div
           data-slot="completed-item-progress"
           className={cn(
-            "bg-(--popup-surface,var(--card)) absolute inset-0 origin-left",
+            "absolute inset-0 origin-left bg-(--popup-surface,var(--card))",
             "animate-[progress-fill_var(--dismiss-duration)_linear_forwards]",
             "[animation-delay:var(--animation-delay)]",
           )}

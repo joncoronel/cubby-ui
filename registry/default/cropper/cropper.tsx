@@ -37,30 +37,34 @@ type AspectRatioPreset = {
 const ASPECT_RATIO_PRESETS: AspectRatioPreset[] = [
   { label: "Free", value: 0 },
   { label: "Square", value: 1, icon: Square01Icon },
-  { label: "Portrait", value: 3/4, icon: SmartPhone01Icon },
-  { label: "Landscape", value: 4/3, icon: ComputerIcon },
-  { label: "Widescreen", value: 16/9, icon: ComputerIcon },
+  { label: "Portrait", value: 3 / 4, icon: SmartPhone01Icon },
+  { label: "Landscape", value: 4 / 3, icon: ComputerIcon },
+  { label: "Widescreen", value: 16 / 9, icon: ComputerIcon },
 ];
 
-const createCropCanvas = (image: HTMLImageElement, cropArea: Area, isCircular: boolean = false): HTMLCanvasElement => {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  
-  if (!ctx) throw new Error('Failed to get canvas context');
-  
+const createCropCanvas = (
+  image: HTMLImageElement,
+  cropArea: Area,
+  isCircular: boolean = false,
+): HTMLCanvasElement => {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) throw new Error("Failed to get canvas context");
+
   canvas.width = cropArea.width;
   canvas.height = cropArea.height;
-  
+
   if (isCircular) {
     const centerX = cropArea.width / 2;
     const centerY = cropArea.height / 2;
     const radius = Math.min(centerX, centerY);
-    
+
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
     ctx.clip();
   }
-  
+
   ctx.drawImage(
     image,
     cropArea.x,
@@ -70,14 +74,17 @@ const createCropCanvas = (image: HTMLImageElement, cropArea: Area, isCircular: b
     0,
     0,
     cropArea.width,
-    cropArea.height
+    cropArea.height,
   );
-  
+
   return canvas;
 };
 
-const downloadCroppedImage = (canvas: HTMLCanvasElement, filename: string = 'cropped-image.png') => {
-  const link = document.createElement('a');
+const downloadCroppedImage = (
+  canvas: HTMLCanvasElement,
+  filename: string = "cropped-image.png",
+) => {
+  const link = document.createElement("a");
   link.download = filename;
   link.href = canvas.toDataURL();
   link.click();
@@ -160,7 +167,7 @@ function CropperCropAreaCircular({
     <CropperPrimitive.CropArea
       data-slot="cropper-crop-area"
       className={cn(
-        "pointer-events-none absolute border-3 border-white rounded-full shadow-[0_0_0_9999px_rgba(0,0,0,0.3)] in-[[data-slot=cropper]:focus-visible]:ring-[3px] in-[[data-slot=cropper]:focus-visible]:ring-white/50",
+        "pointer-events-none absolute rounded-full border-3 border-white shadow-[0_0_0_9999px_rgba(0,0,0,0.3)] in-[[data-slot=cropper]:focus-visible]:ring-[3px] in-[[data-slot=cropper]:focus-visible]:ring-white/50",
         className,
       )}
       {...props}
@@ -175,8 +182,8 @@ const CropperControls = forwardRef<
   <div
     ref={ref}
     className={cn(
-      "flex flex-wrap items-center justify-center gap-2 rounded-lg border border-border/60 bg-background/95 p-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-[0_2px_8px_0_oklch(0.18_0_0_/_0.06)]",
-      className
+      "border-border/60 bg-background/95 supports-[backdrop-filter]:bg-background/60 flex flex-wrap items-center justify-center gap-2 rounded-lg border p-4 shadow-[0_2px_8px_0_oklch(0.18_0_0_/_0.06)] backdrop-blur",
+      className,
     )}
     {...props}
   >
@@ -195,67 +202,84 @@ const CropperZoomControls = forwardRef<
     onReset?: () => void;
     step?: number;
   }
->(({ 
-  className, 
-  zoom, 
-  minZoom = 1, 
-  maxZoom = 3, 
-  onZoomChange, 
-  onReset,
-  step = 0.1,
-  ...props 
-}, ref) => {
-  const handleZoomIn = () => {
-    onZoomChange(Math.min(maxZoom, zoom + step));
-  };
+>(
+  (
+    {
+      className,
+      zoom,
+      minZoom = 1,
+      maxZoom = 3,
+      onZoomChange,
+      onReset,
+      step = 0.1,
+      ...props
+    },
+    ref,
+  ) => {
+    const handleZoomIn = () => {
+      onZoomChange(Math.min(maxZoom, zoom + step));
+    };
 
-  const handleZoomOut = () => {
-    onZoomChange(Math.max(minZoom, zoom - step));
-  };
+    const handleZoomOut = () => {
+      onZoomChange(Math.max(minZoom, zoom - step));
+    };
 
-  return (
-    <div
-      ref={ref}
-      className={cn("flex items-center gap-1", className)}
-      {...props}
-    >
-      <button
-        type="button"
-        onClick={handleZoomOut}
-        disabled={zoom <= minZoom}
-        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-sm font-medium hover:bg-(--surface-hover) hover:text-accent-foreground focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-60"
-        aria-label="Zoom out"
+    return (
+      <div
+        ref={ref}
+        className={cn("flex items-center gap-1", className)}
+        {...props}
       >
-        <HugeiconsIcon icon={ZoomOutAreaIcon} className="h-4 w-4"  strokeWidth={2} />
-      </button>
-      
-      <span className="min-w-[3rem] text-center text-sm text-muted-foreground">
-        {Math.round(zoom * 100)}%
-      </span>
-      
-      <button
-        type="button"
-        onClick={handleZoomIn}
-        disabled={zoom >= maxZoom}
-        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-sm font-medium hover:bg-(--surface-hover) hover:text-accent-foreground focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-60"
-        aria-label="Zoom in"
-      >
-        <HugeiconsIcon icon={ZoomInAreaIcon} className="h-4 w-4"  strokeWidth={2} />
-      </button>
-      
-      {onReset && (
         <button
           type="button"
-          onClick={onReset}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-sm font-medium hover:bg-(--surface-hover) hover:text-accent-foreground focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2"
-          aria-label="Reset zoom"
+          onClick={handleZoomOut}
+          disabled={zoom <= minZoom}
+          className="border-border bg-background hover:bg-surface-hover hover:text-accent-foreground focus-visible:outline-ring/50 inline-flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-medium outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-60"
+          aria-label="Zoom out"
         >
-          <HugeiconsIcon icon={RotateLeft02Icon} className="h-4 w-4"  strokeWidth={2} />
+          <HugeiconsIcon
+            icon={ZoomOutAreaIcon}
+            className="h-4 w-4"
+            strokeWidth={2}
+          />
         </button>
-      )}
-    </div>
-  );
-});
+
+        <span className="text-muted-foreground min-w-[3rem] text-center text-sm">
+          {Math.round(zoom * 100)}%
+        </span>
+
+        <button
+          type="button"
+          onClick={handleZoomIn}
+          disabled={zoom >= maxZoom}
+          className="border-border bg-background hover:bg-surface-hover hover:text-accent-foreground focus-visible:outline-ring/50 inline-flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-medium outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-60"
+          aria-label="Zoom in"
+        >
+          <HugeiconsIcon
+            icon={ZoomInAreaIcon}
+            className="h-4 w-4"
+            strokeWidth={2}
+          />
+        </button>
+
+        {onReset && (
+          <button
+            type="button"
+            onClick={onReset}
+            className="border-border bg-background hover:bg-surface-hover hover:text-accent-foreground focus-visible:outline-ring/50 inline-flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-medium outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2"
+            aria-label="Reset zoom"
+          >
+            <HugeiconsIcon
+              icon={RotateLeft02Icon}
+              className="h-4 w-4"
+              strokeWidth={2}
+            />
+          </button>
+        )}
+      </div>
+    );
+  },
+);
 CropperZoomControls.displayName = "CropperZoomControls";
 
 const CropperAspectRatioControls = forwardRef<
@@ -265,47 +289,52 @@ const CropperAspectRatioControls = forwardRef<
     onAspectRatioChange: (ratio: number) => void;
     presets?: AspectRatioPreset[];
   }
->(({ 
-  className, 
-  aspectRatio, 
-  onAspectRatioChange, 
-  presets = ASPECT_RATIO_PRESETS,
-  ...props 
-}, ref) => (
-  <div
-    ref={ref}
-    className={cn("flex flex-wrap items-center gap-1", className)}
-    {...props}
-  >
-    {presets.map((preset) => {
-      const isActive = aspectRatio === preset.value;
-      
-      return (
-        <button
-          key={preset.label}
-          type="button"
-          onClick={() => onAspectRatioChange(preset.value)}
-          className={cn(
-            "inline-flex h-9 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
-            isActive
-              ? "border-primary bg-primary text-primary-foreground shadow-[0_1px_3px_0_oklch(0.18_0_0_/_0.08)]"
-              : "border-border bg-background hover:bg-(--surface-hover) hover:text-accent-foreground"
-          )}
-          aria-label={`Set aspect ratio to ${preset.label}`}
-        >
-          {preset.icon && (
-            <HugeiconsIcon
-              icon={preset.icon}
-              strokeWidth={2}
-              className="h-3 w-3"
-            />
-          )}
-          {preset.label}
-        </button>
-      );
-    })}
-  </div>
-));
+>(
+  (
+    {
+      className,
+      aspectRatio,
+      onAspectRatioChange,
+      presets = ASPECT_RATIO_PRESETS,
+      ...props
+    },
+    ref,
+  ) => (
+    <div
+      ref={ref}
+      className={cn("flex flex-wrap items-center gap-1", className)}
+      {...props}
+    >
+      {presets.map((preset) => {
+        const isActive = aspectRatio === preset.value;
+
+        return (
+          <button
+            key={preset.label}
+            type="button"
+            onClick={() => onAspectRatioChange(preset.value)}
+            className={cn(
+              "focus-visible:outline-ring/50 inline-flex h-9 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+              isActive
+                ? "border-primary bg-primary text-primary-foreground shadow-[0_1px_3px_0_oklch(0.18_0_0_/_0.08)]"
+                : "border-border bg-background hover:bg-surface-hover hover:text-accent-foreground",
+            )}
+            aria-label={`Set aspect ratio to ${preset.label}`}
+          >
+            {preset.icon && (
+              <HugeiconsIcon
+                icon={preset.icon}
+                strokeWidth={2}
+                className="h-3 w-3"
+              />
+            )}
+            {preset.label}
+          </button>
+        );
+      })}
+    </div>
+  ),
+);
 CropperAspectRatioControls.displayName = "CropperAspectRatioControls";
 
 const CropperInfo = forwardRef<
@@ -317,7 +346,7 @@ const CropperInfo = forwardRef<
 >(({ className, cropData, showDetails = false, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("space-y-1 text-xs text-muted-foreground", className)}
+    className={cn("text-muted-foreground space-y-1 text-xs", className)}
     {...props}
   >
     {cropData && (
@@ -330,11 +359,18 @@ const CropperInfo = forwardRef<
           <>
             <div className="flex items-center justify-between">
               <span>Aspect:</span>
-              <span>{cropData.aspectRatio === 0 ? "Free" : cropData.aspectRatio.toFixed(2)}</span>
+              <span>
+                {cropData.aspectRatio === 0
+                  ? "Free"
+                  : cropData.aspectRatio.toFixed(2)}
+              </span>
             </div>
             <div className="flex items-center justify-between">
               <span>Size:</span>
-              <span>{Math.round(cropData.cropArea.width)} × {Math.round(cropData.cropArea.height)}</span>
+              <span>
+                {Math.round(cropData.cropArea.width)} ×{" "}
+                {Math.round(cropData.cropArea.height)}
+              </span>
             </div>
           </>
         )}
@@ -352,41 +388,50 @@ const CropperActions = forwardRef<
     downloadLabel?: string;
     exportLabel?: string;
   }
->(({ 
-  className, 
-  onDownload, 
-  onExport, 
-  downloadLabel = "Download",
-  exportLabel = "Export",
-  ...props 
-}, ref) => (
-  <div
-    ref={ref}
-    className={cn("flex items-center gap-2", className)}
-    {...props}
-  >
-    {onDownload && (
-      <button
-        type="button"
-        onClick={onDownload}
-        className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-background px-3 text-xs font-medium hover:bg-(--surface-hover) hover:text-accent-foreground focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2"
-      >
-        <HugeiconsIcon icon={Download01Icon} className="h-3 w-3"  strokeWidth={2} />
-        {downloadLabel}
-      </button>
-    )}
-    {onExport && (
-      <button
-        type="button"
-        onClick={onExport}
-        className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-background px-3 text-xs font-medium hover:bg-(--surface-hover) hover:text-accent-foreground focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2"
-      >
-        <HugeiconsIcon icon={CropIcon} className="h-3 w-3"  strokeWidth={2} />
-        {exportLabel}
-      </button>
-    )}
-  </div>
-));
+>(
+  (
+    {
+      className,
+      onDownload,
+      onExport,
+      downloadLabel = "Download",
+      exportLabel = "Export",
+      ...props
+    },
+    ref,
+  ) => (
+    <div
+      ref={ref}
+      className={cn("flex items-center gap-2", className)}
+      {...props}
+    >
+      {onDownload && (
+        <button
+          type="button"
+          onClick={onDownload}
+          className="border-border bg-background hover:bg-surface-hover hover:text-accent-foreground focus-visible:outline-ring/50 inline-flex h-9 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2"
+        >
+          <HugeiconsIcon
+            icon={Download01Icon}
+            className="h-3 w-3"
+            strokeWidth={2}
+          />
+          {downloadLabel}
+        </button>
+      )}
+      {onExport && (
+        <button
+          type="button"
+          onClick={onExport}
+          className="border-border bg-background hover:bg-surface-hover hover:text-accent-foreground focus-visible:outline-ring/50 inline-flex h-9 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2"
+        >
+          <HugeiconsIcon icon={CropIcon} className="h-3 w-3" strokeWidth={2} />
+          {exportLabel}
+        </button>
+      )}
+    </div>
+  ),
+);
 CropperActions.displayName = "CropperActions";
 
 interface UseCropperOptions {
@@ -412,13 +457,16 @@ const useCropper = (options: UseCropperOptions = {}) => {
 
   const zoomRef = useRef(zoom);
   const aspectRatioRef = useRef(aspectRatio);
-  
+
   zoomRef.current = zoom;
   aspectRatioRef.current = aspectRatio;
 
-  const handleZoomChange = useCallback((newZoom: number) => {
-    setZoom(Math.max(minZoom, Math.min(maxZoom, newZoom)));
-  }, [minZoom, maxZoom]);
+  const handleZoomChange = useCallback(
+    (newZoom: number) => {
+      setZoom(Math.max(minZoom, Math.min(maxZoom, newZoom)));
+    },
+    [minZoom, maxZoom],
+  );
 
   const handleAspectRatioChange = useCallback((newRatio: number) => {
     setAspectRatio(newRatio);
@@ -439,21 +487,24 @@ const useCropper = (options: UseCropperOptions = {}) => {
     setAspectRatio(initialAspectRatio);
   }, [initialZoom, initialAspectRatio]);
 
-  const exportCrop = useCallback(async (imageElement: HTMLImageElement, filename?: string) => {
-    if (!cropData) return null;
-    
-    const canvas = createCropCanvas(imageElement, cropData.cropArea);
-    
-    if (filename) {
-      downloadCroppedImage(canvas, filename);
-    }
-    
-    return {
-      canvas,
-      blob: await getCroppedImageBlob(canvas),
-      dataUrl: canvas.toDataURL(),
-    };
-  }, [cropData]);
+  const exportCrop = useCallback(
+    async (imageElement: HTMLImageElement, filename?: string) => {
+      if (!cropData) return null;
+
+      const canvas = createCropCanvas(imageElement, cropData.cropArea);
+
+      if (filename) {
+        downloadCroppedImage(canvas, filename);
+      }
+
+      return {
+        canvas,
+        blob: await getCroppedImageBlob(canvas),
+        dataUrl: canvas.toDataURL(),
+      };
+    },
+    [cropData],
+  );
 
   return {
     zoom,
@@ -472,10 +523,10 @@ const useCropper = (options: UseCropperOptions = {}) => {
   };
 };
 
-export { 
-  Cropper, 
-  CropperDescription, 
-  CropperImage, 
+export {
+  Cropper,
+  CropperDescription,
+  CropperImage,
   CropperCropArea,
   CropperCropAreaCircular,
   CropperControls,

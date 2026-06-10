@@ -92,9 +92,17 @@ export default function DrawerMusicPlayer() {
                   onClick={() => setIsPlaying(!isPlaying)}
                 >
                   {isPlaying ? (
-                    <HugeiconsIcon icon={PauseIcon} className="size-5"  strokeWidth={2} />
+                    <HugeiconsIcon
+                      icon={PauseIcon}
+                      className="size-5"
+                      strokeWidth={2}
+                    />
                   ) : (
-                    <HugeiconsIcon icon={PlayIcon} className="size-5"  strokeWidth={2} />
+                    <HugeiconsIcon
+                      icon={PlayIcon}
+                      className="size-5"
+                      strokeWidth={2}
+                    />
                   )}
                 </Button>
               </div>
@@ -141,10 +149,18 @@ export default function DrawerMusicPlayer() {
               {/* Playback Controls */}
               <div className="flex shrink-0 items-center justify-center gap-4">
                 <Button size="icon" variant="ghost">
-                  <HugeiconsIcon icon={ShuffleIcon} className="size-5"  strokeWidth={2} />
+                  <HugeiconsIcon
+                    icon={ShuffleIcon}
+                    className="size-5"
+                    strokeWidth={2}
+                  />
                 </Button>
                 <Button size="icon" variant="ghost">
-                  <HugeiconsIcon icon={Backward01Icon} className="size-6"  strokeWidth={2} />
+                  <HugeiconsIcon
+                    icon={Backward01Icon}
+                    className="size-6"
+                    strokeWidth={2}
+                  />
                 </Button>
                 <Button
                   size="icon"
@@ -152,16 +168,32 @@ export default function DrawerMusicPlayer() {
                   onClick={() => setIsPlaying(!isPlaying)}
                 >
                   {isPlaying ? (
-                    <HugeiconsIcon icon={PauseIcon} className="size-7"  strokeWidth={2} />
+                    <HugeiconsIcon
+                      icon={PauseIcon}
+                      className="size-7"
+                      strokeWidth={2}
+                    />
                   ) : (
-                    <HugeiconsIcon icon={PlayIcon} className="ml-0.5 size-7"  strokeWidth={2} />
+                    <HugeiconsIcon
+                      icon={PlayIcon}
+                      className="ml-0.5 size-7"
+                      strokeWidth={2}
+                    />
                   )}
                 </Button>
                 <Button size="icon" variant="ghost">
-                  <HugeiconsIcon icon={Forward01Icon} className="size-6"  strokeWidth={2} />
+                  <HugeiconsIcon
+                    icon={Forward01Icon}
+                    className="size-6"
+                    strokeWidth={2}
+                  />
                 </Button>
                 <Button size="icon" variant="ghost">
-                  <HugeiconsIcon icon={RepeatIcon} className="size-5"  strokeWidth={2} />
+                  <HugeiconsIcon
+                    icon={RepeatIcon}
+                    className="size-5"
+                    strokeWidth={2}
+                  />
                 </Button>
               </div>
 
@@ -181,7 +213,7 @@ export default function DrawerMusicPlayer() {
                   {queue.map((track) => (
                     <button
                       key={track.id}
-                      className="hover:bg-(--surface-hover) flex shrink-0 items-center gap-3 rounded-lg p-2 text-left transition-colors"
+                      className="hover:bg-surface-hover flex shrink-0 items-center gap-3 rounded-lg p-2 text-left transition-colors"
                     >
                       <div className="size-10 shrink-0 rounded bg-gradient-to-br from-purple-600/50 to-pink-500/50" />
                       <div className="min-w-0 flex-1">

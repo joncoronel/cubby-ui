@@ -141,7 +141,7 @@ function TableBody({ className, render, ...props }: TableBodyProps) {
       "group-data-[row-dividers]/table:[&_tr:not(:last-child)]:border-b group-data-[row-dividers]/table:[&_tr]:border-border/60",
       "group-data-bordered/table:[&_tr:first-child_td]:border-t group-data-bordered/table:[&_tr:first-child_td]:border-border",
 
-      "group-data-hoverable/table:[&_tr:hover_td]:bg-(--surface-hover)",
+      "group-data-hoverable/table:[&_tr:hover_td]:bg-surface-hover",
       "group-data-striped/table:[&_tr:nth-child(even)_td]:bg-muted/50",
       className,
     ),
@@ -233,7 +233,7 @@ function TableCell({ className, render, ...props }: TableCellProps) {
       "group-data-bordered/table:border-b group-data-bordered/table:border-r group-data-bordered/table:first:border-l group-data-bordered/table:border-border",
       // ! to override the dark-mode TableBody base bg-surface-1 which would
       // otherwise win on specificity (.dark .body tr td vs. [data-state=selected] td).
-      "[[data-state=selected]_&]:bg-(--surface-selected) dark:[[data-state=selected]_&]:bg-(--surface-selected)",
+      "[[data-state=selected]_&]:bg-surface-selected dark:[[data-state=selected]_&]:bg-surface-selected",
       className,
     ),
   };

@@ -68,7 +68,7 @@ function AutocompleteTrigger({
       aria-label="Open popup"
       className={cn(
         "inline-flex size-4 cursor-pointer items-center justify-center rounded-md border-none bg-transparent p-0 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-60",
-        "outline-none focus-visible:ring-2 focus-visible:ring-ring/70",
+        "focus-visible:ring-ring/70 outline-none focus-visible:ring-2",
         className,
       )}
       {...props}
@@ -108,7 +108,7 @@ function AutocompleteClear({
       aria-label="Clear selection"
       className={cn(
         "inline-flex h-4 w-4 cursor-pointer items-center justify-center rounded-sm opacity-70 transition-[opacity,scale,transform,translate] hover:opacity-100 disabled:pointer-events-none",
-        "focus-visible:ring-2 focus-visible:ring-ring/70 duration-100 outline-none",
+        "focus-visible:ring-ring/70 duration-100 outline-none focus-visible:ring-2",
         "data-ending-style:translate-x-1 data-ending-style:opacity-0 data-starting-style:translate-x-1 data-starting-style:opacity-0",
         className,
       )}
@@ -366,7 +366,7 @@ function AutocompleteItem({
       ref={ref}
       data-slot="autocomplete-item"
       className={cn(
-        "data-highlighted:text-accent-foreground relative flex cursor-default items-center rounded-md px-2.5 py-2 text-sm outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-highlighted:bg-(--surface-hover)",
+        "data-highlighted:text-accent-foreground data-highlighted:bg-surface-hover relative flex cursor-default items-center rounded-md px-2.5 py-2 text-sm outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60",
         // Spacing from list edges
         "mx-1 first:mt-1 last:mb-1",
         className,

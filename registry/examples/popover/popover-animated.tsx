@@ -16,7 +16,11 @@ import {
   AvatarFallback,
 } from "@/registry/default/avatar/avatar";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Activity01Icon, Notification03Icon, UserIcon } from "@hugeicons/core-free-icons";
+import {
+  Activity01Icon,
+  Notification03Icon,
+  UserIcon,
+} from "@hugeicons/core-free-icons";
 const animatedPopover = createPopoverHandle<React.ComponentType>();
 
 function NotificationsPanel() {
@@ -48,7 +52,9 @@ function ActivityPanel() {
   return (
     <div className="w-56">
       <PopoverTitle>Activity</PopoverTitle>
-      <PopoverDescription>Recent activity in your workspace.</PopoverDescription>
+      <PopoverDescription>
+        Recent activity in your workspace.
+      </PopoverDescription>
       <div className="mt-3 space-y-2 text-sm">
         <div className="flex justify-between">
           <span>Documents edited</span>
@@ -86,13 +92,13 @@ function ProfilePanel() {
       <div className="border-border mt-3 flex flex-col gap-1 border-t pt-3">
         <a
           href="#"
-          className="hover:bg-(--surface-hover) rounded-md px-2 py-1.5 text-sm transition-colors"
+          className="hover:bg-surface-hover rounded-md px-2 py-1.5 text-sm transition-colors"
         >
           Profile settings
         </a>
         <a
           href="#"
-          className="hover:bg-(--surface-hover) rounded-md px-2 py-1.5 text-sm transition-colors"
+          className="hover:bg-surface-hover rounded-md px-2 py-1.5 text-sm transition-colors"
         >
           Log out
         </a>
@@ -109,7 +115,11 @@ export default function PopoverAnimated() {
         payload={NotificationsPanel}
         render={<Button variant="outline" size="icon" />}
       >
-        <HugeiconsIcon icon={Notification03Icon} className="size-4"  strokeWidth={2} />
+        <HugeiconsIcon
+          icon={Notification03Icon}
+          className="size-4"
+          strokeWidth={2}
+        />
         <span className="sr-only">Notifications</span>
       </PopoverTrigger>
 
@@ -118,7 +128,11 @@ export default function PopoverAnimated() {
         payload={ActivityPanel}
         render={<Button variant="outline" size="icon" />}
       >
-        <HugeiconsIcon icon={Activity01Icon} className="size-4"  strokeWidth={2} />
+        <HugeiconsIcon
+          icon={Activity01Icon}
+          className="size-4"
+          strokeWidth={2}
+        />
         <span className="sr-only">Activity</span>
       </PopoverTrigger>
 
@@ -127,7 +141,7 @@ export default function PopoverAnimated() {
         payload={ProfilePanel}
         render={<Button variant="outline" size="icon" />}
       >
-        <HugeiconsIcon icon={UserIcon} className="size-4"  strokeWidth={2} />
+        <HugeiconsIcon icon={UserIcon} className="size-4" strokeWidth={2} />
         <span className="sr-only">Profile</span>
       </PopoverTrigger>
 

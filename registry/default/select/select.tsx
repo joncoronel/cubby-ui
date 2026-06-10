@@ -72,7 +72,7 @@ const selectTriggerVariants = cva(
         default: "bg-input hover:bg-(--outline-hover)",
         // Translucent overlay for Cards, Dialogs, etc. --surface-hover (alpha
         // overlay) preserves translucency on any substrate depth.
-        elevated: "bg-input-elevated hover:bg-(--surface-hover)",
+        elevated: "bg-input-elevated hover:bg-surface-hover",
       },
       size: {
         default: "h-10 px-3 py-2 sm:h-9",
@@ -234,7 +234,7 @@ function SelectItem({ className, children, ...props }: BaseSelect.Item.Props) {
         "mx-1 first:mt-1 last:mb-1",
         // Hover and highlight states — uses --surface-hover overlay so the
         // delta is the same regardless of the popup's surface level.
-        "data-highlighted:text-accent-foreground data-highlighted:bg-(--surface-hover)",
+        "data-highlighted:text-accent-foreground data-highlighted:bg-surface-hover",
         // Icon and text styling
         "[&_svg:not([class*='text-'])]:text-muted-foreground",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",

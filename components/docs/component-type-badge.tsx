@@ -61,7 +61,7 @@ function BranchIcon() {
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="size-3 text-muted-foreground"
+      className="text-muted-foreground size-3"
       aria-hidden
     >
       <path d="M4 4v4.5a2 2 0 0 0 2 2h6" />
@@ -77,13 +77,13 @@ const TYPE_META: Record<
   primitive: {
     label: "Primitive",
     title: "Styled wrapper around a single Base UI primitive",
-    badge:
-      "bg-secondary text-secondary-foreground border-transparent",
+    badge: "bg-secondary text-secondary-foreground border-transparent",
     Icon: PrimitiveIcon,
   },
   composable: {
     label: "Composable",
-    title: "A higher-level pattern composed from primitives, or an original component",
+    title:
+      "A higher-level pattern composed from primitives, or an original component",
     badge: "bg-info text-info-foreground border-info-border",
     Icon: ComposableIcon,
   },
@@ -119,7 +119,7 @@ export function ComponentTypeBadge({
               href={`/docs/components/${slug}`}
               className={cn(
                 CHIP,
-                "text-foreground bg-background hover:bg-(--surface-hover) transition-colors duration-150",
+                "text-foreground bg-background hover:bg-surface-hover transition-colors duration-150",
               )}
             >
               <BranchIcon />

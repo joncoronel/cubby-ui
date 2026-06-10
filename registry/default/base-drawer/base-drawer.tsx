@@ -230,7 +230,7 @@ function BaseDrawerPopup({
             "[--shrink:calc(1-var(--scale))]",
             "[--stack-peek-offset:max(0px,calc((var(--nested-drawers)-var(--stack-progress))*var(--peek)))]",
             // Bleed pseudo (fills gap when dragged past edge) — uses ::before so ::after stays free for the rim overlay
-            "before:bg-(--popup-surface,var(--popover)) before:pointer-events-none before:absolute",
+            "before:pointer-events-none before:absolute before:bg-(--popup-surface,var(--popover))",
             // States
             "data-swiping:select-none",
             "data-nested-drawer-open:overflow-hidden",
@@ -327,7 +327,7 @@ function BaseDrawerPopup({
               className="absolute end-2 top-2"
               render={<Button size="icon_sm" variant="ghost" />}
             >
-              <HugeiconsIcon icon={Cancel01Icon}  strokeWidth={2} />
+              <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} />
             </DrawerPrimitive.Close>
           )}
           {showBar && <BaseDrawerBar />}
@@ -518,7 +518,7 @@ function BaseDrawerMenuItem({
 }) {
   const defaultProps = {
     className: cn(
-      "flex min-h-9 w-full cursor-default select-none items-center gap-2 rounded-sm px-2 py-1 text-base text-foreground outline-none hover:bg-(--surface-hover) hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-60 data-[variant=destructive]:text-destructive-foreground sm:min-h-8 sm:text-sm [&>svg:not([class*='opacity-'])]:opacity-80 [&>svg:not([class*='size-'])]:size-4.5 sm:[&>svg:not([class*='size-'])]:size-4 [&>svg]:pointer-events-none [&>svg]:-mx-0.5 [&>svg]:shrink-0",
+      "flex min-h-9 w-full cursor-default select-none items-center gap-2 rounded-sm px-2 py-1 text-base text-foreground outline-none hover:bg-surface-hover hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-60 data-[variant=destructive]:text-destructive-foreground sm:min-h-8 sm:text-sm [&>svg:not([class*='opacity-'])]:opacity-80 [&>svg:not([class*='size-'])]:size-4.5 sm:[&>svg:not([class*='size-'])]:size-4 [&>svg]:pointer-events-none [&>svg]:-mx-0.5 [&>svg]:shrink-0",
       className,
     ),
     "data-slot": "base-drawer-menu-item",
@@ -596,14 +596,18 @@ function BaseDrawerMenuTrigger({
   return (
     <BaseDrawerTrigger
       className={cn(
-        "text-foreground hover:bg-(--surface-hover) hover:text-accent-foreground flex min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none sm:min-h-8 sm:text-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
+        "text-foreground hover:bg-surface-hover hover:text-accent-foreground flex min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none sm:min-h-8 sm:text-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       data-slot="base-drawer-menu-trigger"
       {...props}
     >
       {children}
-      <HugeiconsIcon icon={ArrowRight01Icon} className="ms-auto -me-0.5 opacity-80"  strokeWidth={2} />
+      <HugeiconsIcon
+        icon={ArrowRight01Icon}
+        className="ms-auto -me-0.5 opacity-80"
+        strokeWidth={2}
+      />
     </BaseDrawerTrigger>
   );
 }
@@ -626,7 +630,7 @@ function BaseDrawerMenuCheckboxItem({
     <CheckboxPrimitive.Root
       checked={checked}
       className={cn(
-        "text-foreground hover:bg-(--surface-hover) hover:text-accent-foreground grid min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60 sm:min-h-8 sm:text-sm [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
+        "text-foreground hover:bg-surface-hover hover:text-accent-foreground grid min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60 sm:min-h-8 sm:text-sm [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
         variant === "switch"
           ? "grid-cols-[1fr_auto] gap-4 pe-1.5"
           : "grid-cols-[1rem_1fr] pe-4",
@@ -700,7 +704,7 @@ function BaseDrawerMenuRadioItem({
   return (
     <RadioPrimitive.Root
       className={cn(
-        "text-foreground hover:bg-(--surface-hover) hover:text-accent-foreground grid min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60 sm:min-h-8 sm:text-sm [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
+        "text-foreground hover:bg-surface-hover hover:text-accent-foreground grid min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60 sm:min-h-8 sm:text-sm [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
         "grid-cols-[1rem_1fr] items-center pe-4",
         className,
       )}

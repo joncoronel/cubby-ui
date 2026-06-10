@@ -29,7 +29,7 @@ export default function BaseDrawerSide() {
             {["Dashboard", "Projects", "Settings", "Help"].map((item) => (
               <button
                 key={item}
-                className="hover:bg-(--surface-hover) rounded-md px-3 py-2 text-left text-sm font-medium transition-colors"
+                className="hover:bg-surface-hover rounded-md px-3 py-2 text-left text-sm font-medium transition-colors"
               >
                 {item}
               </button>

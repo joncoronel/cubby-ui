@@ -3,7 +3,6 @@
  * Centralized configuration for SVG coordinates, dimensions, and styling
  */
 
-export const SVG_VIEWBOX_SIZE = 200;
 export const DEFAULT_STROKE_WIDTH = 16;
 
 export const SVG_CONFIG = {

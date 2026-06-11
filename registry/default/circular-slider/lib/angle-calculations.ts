@@ -211,26 +211,3 @@ export function roundToStep(value: number, step: number, min: number): number {
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
-
-/**
- * Check if angle is within a range (handles wraparound)
- */
-export function isAngleInRange(
-  angle: number,
-  startAngle: number,
-  endAngle: number,
-): boolean {
-  const normalizedAngle = normalizeAngle(angle);
-  const normalizedStart = normalizeAngle(startAngle);
-  const normalizedEnd = normalizeAngle(endAngle);
-
-  if (normalizedStart <= normalizedEnd) {
-    return (
-      normalizedAngle >= normalizedStart && normalizedAngle <= normalizedEnd
-    );
-  } else {
-    return (
-      normalizedAngle >= normalizedStart || normalizedAngle <= normalizedEnd
-    );
-  }
-}

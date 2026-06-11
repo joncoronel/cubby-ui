@@ -220,14 +220,63 @@ function TransitionPanel({
   // content is already running. Outside a swap, height writes apply instantly
   // so the panel tracks self-animating content frame-for-frame. Set on swap,
   // cleared by the root's own height `transitionend` (see `onTransitionEnd`) so
-  // it honors any `--tp-duration` override; a same-height swap leaves it set
-  // until the next height change, which is harmless.
+  // it honors any `--tp-duration` override. A same-height swap (or reduced
+  // motion) fires no `transitionend`, so the timeout fallback below bounds the
+  // flag instead of leaving it set until the next height change.
   const [isSwapping, setIsSwapping] = React.useState(false);
   if (activeKey !== renderedKey) {
     setPreviousKey(renderedKey);
     setRenderedKey(activeKey);
     setIsSwapping(true);
   }
+
+  // Fallback clear for swaps that never produce a height `transitionend`:
+  // same-height swaps (no height change → no transition) and reduced motion
+  // (`transition-none`). Armed on swap (keyed on `renderedKey` so rapid swaps
+  // restart it) and disarmed the moment a real height transition is created
+  // (`onTransitionRun` below), so it can never fire mid-flight and snap one —
+  // even under main-thread jank or a class-level duration override. An aborted
+  // transition re-arms it via `onTransitionCancel`, so the flag stays bounded
+  // on every path.
+  const swapFallbackTimer = React.useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+
+  const disarmSwapFallback = React.useCallback(() => {
+    if (swapFallbackTimer.current !== null) {
+      clearTimeout(swapFallbackTimer.current);
+      swapFallbackTimer.current = null;
+    }
+  }, []);
+
+  const armSwapFallback = React.useCallback(() => {
+    disarmSwapFallback();
+    const el = outerRef.current;
+    // Resolved `transition-duration` (not the `--tp-duration` var) so class
+    // overrides are honored too. "0.24s" / "240ms", comma-separated if multiple
+    // properties transition — take the longest.
+    const raw = el ? getComputedStyle(el).transitionDuration : "";
+    const parsed = raw
+      ? Math.max(
+          ...raw.split(",").map((part) => {
+            const trimmed = part.trim();
+            return parseFloat(trimmed) * (trimmed.endsWith("ms") ? 1 : 1000);
+          }),
+        )
+      : NaN;
+    const ms = Number.isFinite(parsed) ? parsed : 240;
+    swapFallbackTimer.current = setTimeout(() => {
+      swapFallbackTimer.current = null;
+      setIsSwapping(false);
+    }, ms + 80);
+    // `outerRef` is a stable RefObject; listed to satisfy exhaustive-deps.
+  }, [disarmSwapFallback, outerRef]);
+
+  React.useEffect(() => {
+    if (!isSwapping) return;
+    armSwapFallback();
+    return disarmSwapFallback;
+  }, [isSwapping, renderedKey, armSwapFallback, disarmSwapFallback]);
 
   // Direction from registry order (not React.Children, so views can be wrapped
   // / conditional / Suspense-gated). On first render `orderedKeys` is empty and
@@ -313,17 +362,36 @@ function TransitionPanel({
       ? "right"
       : "left";
 
+  // The root's own height transition — `target === currentTarget` ignores
+  // transitions bubbling up from views.
+  const isRootHeightTransition = (
+    event: React.TransitionEvent<HTMLDivElement>,
+  ) => event.target === event.currentTarget && event.propertyName === "height";
+
   const defaultProps = {
     "data-slot": "transition-panel",
     "data-transition": transition,
     "data-activation-direction": activationDirection,
+    // `transitionrun` fires at creation (before any delay): a real height
+    // transition exists, so its end/cancel events own the swap flag — the
+    // fallback timer must not race it.
+    onTransitionRun: (event: React.TransitionEvent<HTMLDivElement>) => {
+      if (isRootHeightTransition(event)) {
+        disarmSwapFallback();
+      }
+    },
+    // Died without `transitionend` (interrupted swap, display change). If a
+    // replacement transition spins up, its `transitionrun` disarms again;
+    // otherwise the timer clears the flag.
+    onTransitionCancel: (event: React.TransitionEvent<HTMLDivElement>) => {
+      if (isRootHeightTransition(event)) {
+        armSwapFallback();
+      }
+    },
+    // Clear the swap flag when the root's own height transition finishes.
     onTransitionEnd: (event: React.TransitionEvent<HTMLDivElement>) => {
-      // Clear the swap flag when the root's own height transition finishes.
-      // `target === currentTarget` ignores transitions bubbling up from views.
-      if (
-        event.target === event.currentTarget &&
-        event.propertyName === "height"
-      ) {
+      if (isRootHeightTransition(event)) {
+        disarmSwapFallback();
         setIsSwapping(false);
       }
     },
@@ -368,6 +436,10 @@ function TransitionPanel({
     defaultTagName: "div",
     render,
     ref: outerRef,
+    // Transition handlers close over the fallback-timer ref (via arm/disarm).
+    // mergeProps never invokes them or reads `.current` — the React Compiler
+    // false-positive is safe (same pattern as CircularSliderRoot).
+    // eslint-disable-next-line react-hooks/refs
     props: mergeProps<"div">(defaultProps, props),
   });
 }

@@ -7,7 +7,6 @@ import { useRender } from "@base-ui/react/use-render";
 import { cn } from "@/lib/utils";
 import {
   valueToAngle,
-  angleToValue,
   getThumbPosition,
   describeArc,
   roundToStep,
@@ -154,7 +153,6 @@ export interface CircularSliderRootProps
   step?: number;
   largeStep?: number;
   startAngle?: number;
-  endAngle?: number;
   direction?: "clockwise" | "counterclockwise";
   continuous?: boolean;
   disabled?: boolean;
@@ -184,7 +182,6 @@ export function CircularSliderRoot({
   step = 1,
   largeStep = 10,
   startAngle = 0,
-  endAngle,
   direction = "clockwise",
   continuous = true,
   disabled = false,
@@ -210,6 +207,11 @@ export function CircularSliderRoot({
   const [isFocused, setIsFocused] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const previousValue = React.useRef<number | null>(null);
+  // Focus modality: `:focus-visible` can't distinguish pointer-initiated
+  // programmatic focus on a range input (inputs that accept keyboard always
+  // match it), so track it ourselves. Set before the pointer-down focus call,
+  // consumed by the input's onFocus.
+  const focusFromPointer = React.useRef(false);
 
   const handleValueChange = React.useCallback(
     (newValue: number, reason: ChangeReason) => {
@@ -268,6 +270,14 @@ export function CircularSliderRoot({
 
       setIsDragging(true);
       (e.target as HTMLElement).setPointerCapture(e.pointerId);
+      // Move focus to the hidden input so arrow keys work right after a
+      // pointer interaction. `preventDefault` stops the compatibility
+      // mousedown's native focus action from undoing it a moment later;
+      // `focusFromPointer` keeps the focus ring hidden for this path (see the
+      // input's onFocus).
+      e.preventDefault();
+      focusFromPointer.current = true;
+      inputRef.current?.focus({ preventScroll: true });
 
       handleValueChange(newValue, "drag");
     },
@@ -318,7 +328,12 @@ export function CircularSliderRoot({
       if (!isDragging) return;
 
       setIsDragging(false);
-      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+      // Guarded: on the cancel/lost-capture paths capture may already be gone,
+      // and releasing an inactive pointer throws `NotFoundError`.
+      const target = e.target as HTMLElement;
+      if (target.hasPointerCapture(e.pointerId)) {
+        target.releasePointerCapture(e.pointerId);
+      }
       handleValueCommitted(value);
     },
     [isDragging, value, handleValueCommitted],
@@ -336,6 +351,10 @@ export function CircularSliderRoot({
   const handleInputKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (disabled) return;
+
+      // Keyboard use while focused = keyboard modality: show the ring even if
+      // focus originally arrived via pointer (mirrors :focus-visible).
+      setIsFocused(true);
 
       previousValue.current = value;
 
@@ -401,6 +420,12 @@ export function CircularSliderRoot({
     onPointerDown: handlePointerDown,
     onPointerMove: handlePointerMove,
     onPointerUp: handlePointerUp,
+    // Mirror pointer-up so an OS-cancelled gesture (touch interruption, context
+    // menu) or any lost capture still clears `isDragging` and commits — without
+    // these, `pointerup` never fires and the drag stays stuck. `handlePointerUp`'s
+    // `isDragging` guard makes the post-`pointerup` `lostpointercapture` a no-op.
+    onPointerCancel: handlePointerUp,
+    onLostPointerCapture: handlePointerUp,
   };
 
   const element = useRender({
@@ -427,7 +452,13 @@ export function CircularSliderRoot({
         value={value}
         onChange={handleInputChange}
         onKeyDown={handleInputKeyDown}
-        onFocus={() => setIsFocused(true)}
+        // Show the ring for keyboard focus (Tab) but not for the programmatic
+        // focus from a pointer interaction. (`:focus-visible` can't make this
+        // distinction — keyboard-accepting inputs always match it.)
+        onFocus={() => {
+          setIsFocused(!focusFromPointer.current);
+          focusFromPointer.current = false;
+        }}
         onBlur={() => {
           setIsFocused(false);
           handleValueCommitted(value);
@@ -751,7 +782,6 @@ export function CircularSliderValue({
 
 export interface CircularSliderMarkersProps extends useRender.ComponentProps<"svg"> {
   count?: number;
-  showLabels?: boolean;
   length?: number;
 }
 
@@ -759,7 +789,6 @@ export function CircularSliderMarkers({
   className,
   render,
   count = 12,
-  showLabels = false,
   length,
   ...props
 }: CircularSliderMarkersProps) {

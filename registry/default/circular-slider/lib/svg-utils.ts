@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 import {
-  SVG_VIEWBOX_SIZE,
   SVG_CONFIG,
   RADIUS_CONFIG,
   DEFAULT_STROKE_WIDTH,
@@ -13,7 +12,7 @@ export function pixelsToSvgUnits(
   pixels: number,
   containerSize: number,
 ): number {
-  return pixels * (SVG_VIEWBOX_SIZE / containerSize);
+  return pixels * (SVG_CONFIG.VIEWBOX_SIZE / containerSize);
 }
 
 /**

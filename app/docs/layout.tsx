@@ -5,7 +5,12 @@ import { source } from "@/lib/source";
 export default function Layout({ children }: LayoutProps<"/docs">) {
   const { nav, ...base } = baseOptions;
   return (
-    <DocsLayout {...base} nav={{ ...nav, mode: "top" }} tree={source.pageTree}>
+    <DocsLayout
+      {...base}
+      nav={{ ...nav, mode: "top" }}
+      sidebar={{ prefetch: false }}
+      tree={source.pageTree}
+    >
       {children}
     </DocsLayout>
   );

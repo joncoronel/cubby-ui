@@ -12,6 +12,19 @@ const config = {
     root: process.cwd(),
   },
   allowedDevOrigins: ['192.168.1.128'],
+  async headers() {
+    return [
+      {
+        source: "/r/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=0, s-maxage=86400, stale-while-revalidate=604800",
+          },
+        ],
+      },
+    ];
+  },
   async rewrites() {
     return [
       {

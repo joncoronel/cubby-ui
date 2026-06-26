@@ -48,6 +48,9 @@ importers:
       '@origin-space/image-cropper':
         specifier: ^0.1.9
         version: 0.1.9(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@shadcn/react':
+        specifier: ^0.1.0
+        version: 0.1.0(@types/react@19.2.7)(react@19.2.3)
       '@tanstack/react-form':
         specifier: ^1.29.0
         version: 1.29.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -1753,6 +1756,17 @@ packages:
 
   '@sec-ant/readable-stream@0.4.1':
     resolution: {integrity: sha512-831qok9r2t8AlxLko40y2ebgSDhenenCatLVeW/uBtnHPyhHOvG0C7TvfgecV+wHzIm5KUICgzmVpWS+IMEAeg==}
+
+  '@shadcn/react@0.1.0':
+    resolution: {integrity: sha512-6i67TEnqValsZY7e4exJ4rkHo2OdHXmDH152YulwSpuEUnTQYumHkXzFsaje7HB7GbMTWuI9x1Jn6sSduCYdeA==}
+    peerDependencies:
+      '@types/react': 19.2.7
+      react: '>=19'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      react:
+        optional: true
 
   '@shikijs/core@3.23.0':
     resolution: {integrity: sha512-NSWQz0riNb67xthdm5br6lAkvpDJRTgB36fxlo37ZzM2yq0PQFFzbd8psqC2XMPgCzo1fW6cVi18+ArJ44wqgA==}
@@ -6927,6 +6941,11 @@ snapshots:
   '@rtsao/scc@1.1.0': {}
 
   '@sec-ant/readable-stream@0.4.1': {}
+
+  '@shadcn/react@0.1.0(@types/react@19.2.7)(react@19.2.3)':
+    optionalDependencies:
+      '@types/react': 19.2.7
+      react: 19.2.3
 
   '@shikijs/core@3.23.0':
     dependencies:

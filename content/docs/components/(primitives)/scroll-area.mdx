@@ -26,6 +26,28 @@ Use the `fadeEdges` prop to add a subtle fade effect at the edges. The fade appe
 
 <ComponentPreview component="scroll-area" example="scroll-area-scroll-fade" />
 
+The fade depth defaults to `min(12%, 2.5rem)` — 12% of the container, capped at `2.5rem` so tall scrollers stay subtle. Tune it per instance by setting the `--scroll-fade-size` CSS variable on `viewportClassName`:
+
+```tsx
+<ScrollArea fadeEdges viewportClassName="[--scroll-fade-size:2rem]" />
+```
+
+With `nativeScroll`, the fade eases in and out over a fixed scroll distance (`6rem` by default, clamped to the scroll range so short scrollers still fully reveal). Adjust it with `--scroll-fade-reveal`:
+
+```tsx
+<ScrollArea fadeEdges nativeScroll viewportClassName="[--scroll-fade-reveal:4rem]" />
+```
+
+### Native Scroll Fade
+
+With `nativeScroll`, the fade is driven by CSS scroll-driven animations instead of Base UI's measured overflow. It eases in and out over a fixed scroll distance and falls back to a static fade where scroll-driven animations are unsupported.
+
+<ComponentPreview component="scroll-area" example="scroll-area-native-fade" />
+
+### Scroll Fade Without the Component
+
+For a scroll container you didn't render with `ScrollArea` — a code block, a table wrapper, a third-party list — the same edge fade is available as a standalone CSS utility you can drop on any element with `overflow`. See [Scroll Fade](/docs/utils/scroll-fade).
+
 ### Scrollbar Gutter
 
 Use the `scrollbarGutter` prop to reserve space for the scrollbar when content overflows. This prevents layout shift when the scrollbar appears.

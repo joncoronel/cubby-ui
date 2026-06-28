@@ -412,6 +412,12 @@
     ],
     "reference": []
   },
+  "scroll-fade": {
+    "title": "Scroll Fade",
+    "description": "A CSS utility that fades the edges of any scroll container as you scroll, with no component required.",
+    "dependencies": [],
+    "reference": []
+  },
   "select": {
     "title": "Select",
     "description": "A select component.",

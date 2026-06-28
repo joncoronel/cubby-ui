@@ -1192,6 +1192,30 @@ async function scanRegistry() {
     const componentPath = path.join(stylePath, componentName);
     const mainFile = path.join(componentPath, `${componentName}.tsx`);
 
+    // CSS-only registry item (e.g. a standalone utility): a directory with a
+    // {name}.css and no {name}.tsx. It ships the CSS file for the user to
+    // @import — used for utilities that can't go through shadcn's `css` field
+    // (e.g. anything relying on @property, which that channel can't carry).
+    const cssOnlyFile = path.join(componentPath, `${componentName}.css`);
+    if (!fsSync.existsSync(mainFile) && fsSync.existsSync(cssOnlyFile)) {
+      const metadata = getComponentMetadata(componentName);
+      items.push({
+        name: componentName,
+        type: "registry:component",
+        title: metadata.title,
+        description: metadata.description,
+        ...(metadata.author && { author: metadata.author }),
+        files: [
+          {
+            path: `registry/${DEFAULT_STYLE}/${componentName}/${componentName}.css`,
+            type: "registry:file",
+            target: `components/ui/cubby-ui/${componentName}.css`,
+          },
+        ],
+      });
+      continue;
+    }
+
     if (!fsSync.existsSync(mainFile)) {
       console.warn(`Warning: No main file found for ${componentName}`);
       continue;

@@ -23,6 +23,8 @@ function getLanguageFromPath(filePath: string): BundledLanguage {
       return "javascript";
     case ".jsx":
       return "jsx";
+    case ".css":
+      return "css";
     default:
       return "tsx";
   }

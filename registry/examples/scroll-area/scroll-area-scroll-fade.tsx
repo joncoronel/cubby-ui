@@ -20,8 +20,8 @@ export default function ScrollAreaScrollFade() {
             background color or pattern without needing to match colors.
           </p>
           <p>
-            The fade size is set to 1.5rem by default, providing a clean
-            transition that&apos;s visible but not distracting.
+            The fade depth defaults to 12% of the container, capped at 2.5rem,
+            so the transition stays visible but not distracting at any size.
           </p>
         </div>
       </ScrollArea>

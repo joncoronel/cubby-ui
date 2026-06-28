@@ -1,0 +1,70 @@
+---
+title: Scroll Fade
+description: A CSS utility that fades the edges of any scroll container as you scroll, with no component required.
+---
+
+`scroll-fade` adds a scroll-aware edge fade to any element that scrolls — a code block, a table wrapper, a third-party list — without wrapping it in a component. It masks the content itself, so the fade dissolves over any background. The effect is driven by [CSS scroll-driven animations](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_scroll-driven_animations) with no JavaScript, and falls back to a static fade where they aren't supported.
+
+It's the standalone version of the fade built into [ScrollArea](/docs/components/scroll-area)'s `nativeScroll` mode — same animation, same fallback.
+
+<ComponentPreview component="scroll-fade" example="scroll-fade-demo" previewClassName="h-auto" />
+
+## Installation
+
+The utility relies on `@property` to animate the mask, which can't be injected through the registry's CSS channel — so it ships as a CSS file. Add it, then import it once in your global CSS:
+
+<ComponentInstall component="scroll-fade" />
+
+```css title="app/globals.css"
+@import "tailwindcss";
+/* adjust the relative path to wherever the CLI placed the file */
+@import "../components/ui/cubby-ui/scroll-fade.css";
+```
+
+If you already installed the [ScrollArea](/docs/components/scroll-area) component, this same animation logic is bundled in its `scroll-area.css` — the utility just exposes it as standalone classes.
+
+## Usage
+
+Add `scroll-fade` to the element that has `overflow`. It's scroll-aware: at the top only the bottom edge fades; mid-scroll both edges soften; at the end the bottom sharpens.
+
+```tsx
+<div className="scroll-fade overflow-y-auto">{/* ... */}</div>
+<div className="flex scroll-fade-x overflow-x-auto">{/* ... */}</div>
+```
+
+If the content doesn't overflow, no fade is shown — so you can apply it to any list without checking whether it scrolls.
+
+## Classes
+
+| Class | Effect |
+| --- | --- |
+| `scroll-fade` / `scroll-fade-y` | Fade top and bottom edges |
+| `scroll-fade-x` | Fade left and right edges |
+| `scroll-fade-t` / `-b` / `-l` / `-r` | Fade a single edge |
+| `scroll-fade-none` | Disable — works in any order, e.g. `md:scroll-fade-none` |
+
+## Customization
+
+Two CSS variables control the look, the same ones the `ScrollArea` component uses:
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `--scroll-fade-size` | `min(12%, 2.5rem)` | Fade depth — 12% of the container, capped at `2.5rem`. |
+| `--scroll-fade-reveal` | `6rem` | Scroll distance the fade eases in/out over. Clamped to the scroll range so short scrollers still fully reveal. |
+
+Set them per instance with arbitrary properties:
+
+```tsx
+<div className="scroll-fade overflow-y-auto [--scroll-fade-size:2rem]">{/* ... */}</div>
+<div className="scroll-fade overflow-y-auto [--scroll-fade-reveal:4rem]">{/* ... */}</div>
+```
+
+## Fallback
+
+The scroll-aware behavior uses CSS scroll-driven animations, with no JavaScript and no scroll listeners. In browsers that don't support them, `scroll-fade` falls back to a static fade on both edges (and edge utilities to a static fade on the selected edge).
+
+Because the mask is applied to the scroll container itself, a visible scrollbar fades with the content at the edges. Hide it with `[scrollbar-width:none]` (or your preferred utility) if you want only the content to fade.
+
+## Used By
+
+- [ScrollArea](/docs/components/scroll-area) — the `nativeScroll` mode uses this fade internally.

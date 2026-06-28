@@ -1,0 +1,306 @@
+/* -------------------------------------------------------------------------------------------------
+ * Scroll Fade utility
+ *
+ * Standalone, component-free edge fade for any scroll container. Add
+ * `scroll-fade` (or an axis/edge variant) to the element that has `overflow`
+ * and the edges dissolve as you scroll — masking the content so it works over
+ * any background. Scroll-aware via CSS scroll-driven animations; falls back to
+ * a static fade where unsupported. No JS, no scroll listeners.
+ *
+ * Import this file once in your global CSS (after `@import "tailwindcss"`):
+ *   @import "./components/ui/cubby-ui/scroll-fade.css";
+ *
+ *   --scroll-fade-size:   fade depth (default min(12%, 2.5rem))
+ *   --scroll-fade-reveal: scroll distance the fade eases over (default 6rem),
+ *                         clamped to the scroll range so short scrollers still
+ *                         fully reveal.
+ *
+ * The @property + @keyframes here are byte-identical to the ScrollArea
+ * component's scroll-area.css so the two never conflict when both are present.
+ * -------------------------------------------------------------------------------------------------*/
+@property --scroll-fade-top {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --scroll-fade-bottom {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --scroll-fade-left {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --scroll-fade-right {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@keyframes scroll-fade-reveal-top {
+  from {
+    --scroll-fade-top: 0px;
+  }
+  to {
+    --scroll-fade-top: var(--scroll-fade-size);
+  }
+}
+@keyframes scroll-fade-reveal-bottom {
+  from {
+    --scroll-fade-bottom: var(--scroll-fade-size);
+  }
+  to {
+    --scroll-fade-bottom: 0px;
+  }
+}
+@keyframes scroll-fade-reveal-left {
+  from {
+    --scroll-fade-left: 0px;
+  }
+  to {
+    --scroll-fade-left: var(--scroll-fade-size);
+  }
+}
+@keyframes scroll-fade-reveal-right {
+  from {
+    --scroll-fade-right: var(--scroll-fade-size);
+  }
+  to {
+    --scroll-fade-right: 0px;
+  }
+}
+
+/* Vertical fade (default). `scroll-fade` and `scroll-fade-y` are aliases. */
+@utility scroll-fade {
+  --scroll-fade-size: min(12%, 2.5rem);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--scroll-fade-top, 0px),
+    #000 calc(100% - var(--scroll-fade-bottom, 0px)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--scroll-fade-top, 0px),
+    #000 calc(100% - var(--scroll-fade-bottom, 0px)),
+    transparent 100%
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+
+  @supports (animation-timeline: scroll()) {
+    animation:
+      scroll-fade-reveal-top 1ms ease-in-out,
+      scroll-fade-reveal-bottom 1ms ease-in-out;
+    animation-timeline: scroll(self y), scroll(self y);
+    animation-range:
+      0 min(var(--scroll-fade-reveal, 6rem), 100%),
+      calc(100% - min(var(--scroll-fade-reveal, 6rem), 100%)) 100%;
+    animation-fill-mode: both;
+  }
+
+  @supports not (animation-timeline: scroll()) {
+    --scroll-fade-top: var(--scroll-fade-size);
+    --scroll-fade-bottom: var(--scroll-fade-size);
+  }
+}
+
+@utility scroll-fade-y {
+  --scroll-fade-size: min(12%, 2.5rem);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--scroll-fade-top, 0px),
+    #000 calc(100% - var(--scroll-fade-bottom, 0px)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--scroll-fade-top, 0px),
+    #000 calc(100% - var(--scroll-fade-bottom, 0px)),
+    transparent 100%
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+
+  @supports (animation-timeline: scroll()) {
+    animation:
+      scroll-fade-reveal-top 1ms ease-in-out,
+      scroll-fade-reveal-bottom 1ms ease-in-out;
+    animation-timeline: scroll(self y), scroll(self y);
+    animation-range:
+      0 min(var(--scroll-fade-reveal, 6rem), 100%),
+      calc(100% - min(var(--scroll-fade-reveal, 6rem), 100%)) 100%;
+    animation-fill-mode: both;
+  }
+
+  @supports not (animation-timeline: scroll()) {
+    --scroll-fade-top: var(--scroll-fade-size);
+    --scroll-fade-bottom: var(--scroll-fade-size);
+  }
+}
+
+/* Horizontal fade. */
+@utility scroll-fade-x {
+  --scroll-fade-size: min(12%, 2.5rem);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--scroll-fade-left, 0px),
+    #000 calc(100% - var(--scroll-fade-right, 0px)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--scroll-fade-left, 0px),
+    #000 calc(100% - var(--scroll-fade-right, 0px)),
+    transparent 100%
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+
+  @supports (animation-timeline: scroll()) {
+    animation:
+      scroll-fade-reveal-left 1ms ease-in-out,
+      scroll-fade-reveal-right 1ms ease-in-out;
+    animation-timeline: scroll(self x), scroll(self x);
+    animation-range:
+      0 min(var(--scroll-fade-reveal, 6rem), 100%),
+      calc(100% - min(var(--scroll-fade-reveal, 6rem), 100%)) 100%;
+    animation-fill-mode: both;
+  }
+
+  @supports not (animation-timeline: scroll()) {
+    --scroll-fade-left: var(--scroll-fade-size);
+    --scroll-fade-right: var(--scroll-fade-size);
+  }
+}
+
+/* Single-edge fades. */
+@utility scroll-fade-t {
+  --scroll-fade-size: min(12%, 2.5rem);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--scroll-fade-top, 0px),
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--scroll-fade-top, 0px),
+    #000 100%
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+
+  @supports (animation-timeline: scroll()) {
+    animation: scroll-fade-reveal-top 1ms ease-in-out;
+    animation-timeline: scroll(self y);
+    animation-range: 0 min(var(--scroll-fade-reveal, 6rem), 100%);
+    animation-fill-mode: both;
+  }
+
+  @supports not (animation-timeline: scroll()) {
+    --scroll-fade-top: var(--scroll-fade-size);
+  }
+}
+
+@utility scroll-fade-b {
+  --scroll-fade-size: min(12%, 2.5rem);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 calc(100% - var(--scroll-fade-bottom, 0px)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 calc(100% - var(--scroll-fade-bottom, 0px)),
+    transparent 100%
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+
+  @supports (animation-timeline: scroll()) {
+    animation: scroll-fade-reveal-bottom 1ms ease-in-out;
+    animation-timeline: scroll(self y);
+    animation-range: calc(100% - min(var(--scroll-fade-reveal, 6rem), 100%)) 100%;
+    animation-fill-mode: both;
+  }
+
+  @supports not (animation-timeline: scroll()) {
+    --scroll-fade-bottom: var(--scroll-fade-size);
+  }
+}
+
+@utility scroll-fade-l {
+  --scroll-fade-size: min(12%, 2.5rem);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--scroll-fade-left, 0px),
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--scroll-fade-left, 0px),
+    #000 100%
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+
+  @supports (animation-timeline: scroll()) {
+    animation: scroll-fade-reveal-left 1ms ease-in-out;
+    animation-timeline: scroll(self x);
+    animation-range: 0 min(var(--scroll-fade-reveal, 6rem), 100%);
+    animation-fill-mode: both;
+  }
+
+  @supports not (animation-timeline: scroll()) {
+    --scroll-fade-left: var(--scroll-fade-size);
+  }
+}
+
+@utility scroll-fade-r {
+  --scroll-fade-size: min(12%, 2.5rem);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    #000 0,
+    #000 calc(100% - var(--scroll-fade-right, 0px)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    #000 0,
+    #000 calc(100% - var(--scroll-fade-right, 0px)),
+    transparent 100%
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+
+  @supports (animation-timeline: scroll()) {
+    animation: scroll-fade-reveal-right 1ms ease-in-out;
+    animation-timeline: scroll(self x);
+    animation-range: calc(100% - min(var(--scroll-fade-reveal, 6rem), 100%)) 100%;
+    animation-fill-mode: both;
+  }
+
+  @supports not (animation-timeline: scroll()) {
+    --scroll-fade-right: var(--scroll-fade-size);
+  }
+}
+
+/* Disable — works in any order, e.g. `md:scroll-fade-none`. */
+@utility scroll-fade-none {
+  -webkit-mask-image: none;
+  mask-image: none;
+}

@@ -58,6 +58,7 @@
     "@cubby-ui/radio-group",
     "@cubby-ui/resizable",
     "@cubby-ui/scroll-area",
+    "@cubby-ui/scroll-fade",
     "@cubby-ui/select",
     "@cubby-ui/separator",
     "@cubby-ui/sheet",

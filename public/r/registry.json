@@ -119,6 +119,7 @@
         "@cubby-ui/radio-group",
         "@cubby-ui/resizable",
         "@cubby-ui/scroll-area",
+        "@cubby-ui/scroll-fade",
         "@cubby-ui/select",
         "@cubby-ui/separator",
         "@cubby-ui/sheet",
@@ -1247,6 +1248,19 @@
           "path": "registry/default/scroll-area/scroll-area.css",
           "type": "registry:file",
           "target": "components/ui/cubby-ui/scroll-area/scroll-area.css"
+        }
+      ]
+    },
+    {
+      "name": "scroll-fade",
+      "type": "registry:component",
+      "title": "Scroll Fade",
+      "description": "A CSS utility that fades the edges of any scroll container as you scroll, with no component required.",
+      "files": [
+        {
+          "path": "registry/default/scroll-fade/scroll-fade.css",
+          "type": "registry:file",
+          "target": "components/ui/cubby-ui/scroll-fade.css"
         }
       ]
     },

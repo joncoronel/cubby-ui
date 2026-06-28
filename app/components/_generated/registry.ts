@@ -349,10 +349,12 @@ import resizable_resizable_vertical from "@/registry/examples/resizable/resizabl
 import resizable_resizable_with_handle from "@/registry/examples/resizable/resizable-with-handle";
 import scroll_area_scroll_area_both_scrollbars from "@/registry/examples/scroll-area/scroll-area-both-scrollbars";
 import scroll_area_scroll_area_horizontal_scroll from "@/registry/examples/scroll-area/scroll-area-horizontal-scroll";
+import scroll_area_scroll_area_native_fade from "@/registry/examples/scroll-area/scroll-area-native-fade";
 import scroll_area_scroll_area_persist_scrollbar from "@/registry/examples/scroll-area/scroll-area-persist-scrollbar";
 import scroll_area_scroll_area_scroll_fade from "@/registry/examples/scroll-area/scroll-area-scroll-fade";
 import scroll_area_scroll_area_scrollbar_gutter from "@/registry/examples/scroll-area/scroll-area-scrollbar-gutter";
 import scroll_area_scroll_area_vertical_scroll from "@/registry/examples/scroll-area/scroll-area-vertical-scroll";
+import scroll_fade_scroll_fade_demo from "@/registry/examples/scroll-fade/scroll-fade-demo";
 import select_select_basic from "@/registry/examples/select/select-basic";
 import select_select_align_item_with_trigger from "@/registry/examples/select/select-align-item-with-trigger";
 import select_select_controlled from "@/registry/examples/select/select-controlled";
@@ -1172,6 +1174,16 @@ export const componentMetadata = {
     "name": "scroll-area",
     "title": "Scroll-area",
     "description": "A scroll-area component.",
+    "category": "UI",
+    "registryDependencies": [],
+    "dependencies": [],
+    "examples": {},
+    "reference": []
+  },
+  "scroll-fade": {
+    "name": "scroll-fade",
+    "title": "Scroll Fade",
+    "description": "A CSS utility that fades the edges of any scroll container as you scroll, with no component required.",
     "category": "UI",
     "registryDependencies": [],
     "dependencies": [],
@@ -3304,6 +3316,11 @@ export const exampleRegistry = {
       "source": "import { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\n\nexport default function ScrollAreaHorizontalScroll() {\n  return (\n    <ScrollArea className=\"w-96 max-w-full whitespace-nowrap rounded-md border\">\n      <div className=\"flex w-max space-x-4 p-4\">\n        {Array.from({ length: 20 }).map((_, i) => (\n          <div\n            key={i}\n            className=\"flex h-20 w-32 items-center justify-center rounded-md bg-secondary\"\n          >\n            Item {i + 1}\n          </div>\n        ))}\n      </div>\n    </ScrollArea>\n  );\n}"
     },
     {
+      "title": "Native Fade",
+      "importPath": "scroll-area-native-fade",
+      "source": "import { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\n\nexport default function ScrollAreaNativeFade() {\n  return (\n    <div className=\"bg-muted/30 h-48 w-80 rounded-md border\">\n      <ScrollArea fadeEdges nativeScroll>\n        <div className=\"space-y-4 p-4 text-sm leading-relaxed\">\n          <p>\n            With <code>nativeScroll</code>, the fade is driven entirely by CSS\n            scroll-driven animations — no JavaScript scroll listeners. The\n            browser updates the mask as you scroll.\n          </p>\n          <p>\n            The fade eases in and out over a fixed scroll distance rather than a\n            percentage of the content, so the reveal feels the same whether the\n            list is short or long.\n          </p>\n          <p>\n            At the top, only the bottom edge fades to hint at more content. As\n            you scroll, the top edge fades in and both edges stay soft. At the\n            very end, the bottom edge sharpens again.\n          </p>\n          <p>\n            In browsers without scroll-driven animation support, this falls back\n            to a static fade on the configured edges.\n          </p>\n        </div>\n      </ScrollArea>\n    </div>\n  );\n}\n"
+    },
+    {
       "title": "Persist Scrollbar",
       "importPath": "scroll-area-persist-scrollbar",
       "source": "import { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\n\nexport default function ScrollAreaPersistScrollbar() {\n  return (\n    <ScrollArea\n      persistScrollbar\n      className=\"bg-muted/30 h-48 w-80 rounded-md border\"\n    >\n      <div className=\"space-y-4 p-4 text-sm leading-relaxed\">\n        <p>\n          The scrollbar is always visible, providing constant awareness of\n          scroll position and content length.\n        </p>\n        <p>\n          This is useful for interfaces where users need to quickly gauge how\n          much content exists or navigate large lists efficiently.\n        </p>\n        <p>\n          Unlike the default behavior where the scrollbar fades in on hover or\n          scroll, persistent scrollbars remain visible at all times.\n        </p>\n      </div>\n    </ScrollArea>\n  );\n}\n"
@@ -3311,7 +3328,7 @@ export const exampleRegistry = {
     {
       "title": "Scroll Fade",
       "importPath": "scroll-area-scroll-fade",
-      "source": "import { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\n\nexport default function ScrollAreaScrollFade() {\n  return (\n    <div className=\"bg-muted/30 h-48 w-80 rounded-md border\">\n      <ScrollArea fadeEdges>\n        <div className=\"space-y-4 p-4 text-sm leading-relaxed\">\n          <p>\n            The scroll fade effect uses CSS masks to create a subtle fade at the\n            edges of the scroll container. This provides a visual hint that more\n            content is available.\n          </p>\n          <p>\n            As you scroll, the fade appears and disappears based on your\n            position. When at the top, only the bottom fade shows. When at the\n            bottom, only the top fade shows.\n          </p>\n          <p>\n            This approach uses Tailwind&apos;s mask utilities and works over any\n            background color or pattern without needing to match colors.\n          </p>\n          <p>\n            The fade size is set to 1.5rem by default, providing a clean\n            transition that&apos;s visible but not distracting.\n          </p>\n        </div>\n      </ScrollArea>\n    </div>\n  );\n}\n"
+      "source": "import { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\n\nexport default function ScrollAreaScrollFade() {\n  return (\n    <div className=\"bg-muted/30 h-48 w-80 rounded-md border\">\n      <ScrollArea fadeEdges>\n        <div className=\"space-y-4 p-4 text-sm leading-relaxed\">\n          <p>\n            The scroll fade effect uses CSS masks to create a subtle fade at the\n            edges of the scroll container. This provides a visual hint that more\n            content is available.\n          </p>\n          <p>\n            As you scroll, the fade appears and disappears based on your\n            position. When at the top, only the bottom fade shows. When at the\n            bottom, only the top fade shows.\n          </p>\n          <p>\n            This approach uses Tailwind&apos;s mask utilities and works over any\n            background color or pattern without needing to match colors.\n          </p>\n          <p>\n            The fade depth defaults to 12% of the container, capped at 2.5rem,\n            so the transition stays visible but not distracting at any size.\n          </p>\n        </div>\n      </ScrollArea>\n    </div>\n  );\n}\n"
     },
     {
       "title": "Scrollbar Gutter",
@@ -3322,6 +3339,13 @@ export const exampleRegistry = {
       "title": "Vertical Scroll",
       "importPath": "scroll-area-vertical-scroll",
       "source": "import * as React from \"react\";\nimport { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\nimport { Separator } from \"@/components/ui/cubby-ui/separator\";\n\nexport default function ScrollAreaVerticalScroll() {\n  const tags = Array.from({ length: 50 }).map(\n    (_, i, a) => `v1.2.0-beta.${a.length - i}`\n  );\n\n  return (\n    <ScrollArea className=\"h-72 w-48 rounded-md border\">\n      <div className=\"p-4\">\n        <h4 className=\"mb-4 text-sm font-medium leading-none\">Tags</h4>\n        {tags.map((tag) => (\n          <React.Fragment key={tag}>\n            <div className=\"text-sm\">{tag}</div>\n            <Separator className=\"my-2\" />\n          </React.Fragment>\n        ))}\n      </div>\n    </ScrollArea>\n  );\n}"
+    }
+  ],
+  "scroll-fade": [
+    {
+      "title": "Demo",
+      "importPath": "scroll-fade-demo",
+      "source": "export default function ScrollFadeDemo() {\n  return (\n    <div className=\"bg-muted/30 h-48 w-80 rounded-md border\">\n      <div className=\"scroll-fade h-full overflow-y-auto\">\n        <div className=\"space-y-4 p-4 text-sm leading-relaxed\">\n          <p>\n            The <code>scroll-fade</code> utility works on any scroll container —\n            no component required. Add it to the element that has{\" \"}\n            <code>overflow-y-auto</code> and the edges dissolve as you scroll.\n          </p>\n          <p>\n            It is driven by CSS scroll-driven animations, so the fade tracks the\n            scroll position with no JavaScript. At the top only the bottom edge\n            fades; mid-scroll both edges soften; at the end the bottom sharpens.\n          </p>\n          <p>\n            Because it masks the content itself, it adapts to any background\n            without configuration. Use <code>scroll-fade-x</code> for horizontal\n            scrollers and <code>scroll-fade-none</code> to switch it off\n            responsively.\n          </p>\n          <p>\n            In browsers without scroll-driven animation support, it falls back\n            to a static fade on both edges.\n          </p>\n        </div>\n      </div>\n    </div>\n  );\n}\n"
     }
   ],
   "select": [
@@ -4199,10 +4223,12 @@ export const componentMap = {
   "resizable-with-handle": resizable_resizable_with_handle,
   "scroll-area-both-scrollbars": scroll_area_scroll_area_both_scrollbars,
   "scroll-area-horizontal-scroll": scroll_area_scroll_area_horizontal_scroll,
+  "scroll-area-native-fade": scroll_area_scroll_area_native_fade,
   "scroll-area-persist-scrollbar": scroll_area_scroll_area_persist_scrollbar,
   "scroll-area-scroll-fade": scroll_area_scroll_area_scroll_fade,
   "scroll-area-scrollbar-gutter": scroll_area_scroll_area_scrollbar_gutter,
   "scroll-area-vertical-scroll": scroll_area_scroll_area_vertical_scroll,
+  "scroll-fade-demo": scroll_fade_scroll_fade_demo,
   "select-basic": select_select_basic,
   "select-align-item-with-trigger": select_select_align_item_with_trigger,
   "select-controlled": select_select_controlled,

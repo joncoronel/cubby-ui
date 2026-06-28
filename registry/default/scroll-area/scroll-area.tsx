@@ -114,7 +114,7 @@ function ScrollArea({
         className={cn(
           "h-full rounded-[inherit]",
           "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
-          hasFade && "[--scroll-fade-size:1.5rem]",
+          hasFade && "[--scroll-fade-size:min(12%,2.5rem)]",
           fade.top &&
             "mask-t-from-[calc(100%-min(var(--scroll-fade-size),var(--scroll-area-overflow-y-start,0px)))]",
           fade.bottom &&
@@ -130,7 +130,9 @@ function ScrollArea({
           viewportClassName,
         )}
       >
-        {children}
+        <BaseScrollArea.Content data-slot="scroll-area-content">
+          {children}
+        </BaseScrollArea.Content>
       </BaseScrollArea.Viewport>
       {!hideScrollbar && (
         <>
@@ -199,24 +201,40 @@ function NativeScrollArea({
 }) {
   const fade = parseFadeEdges(fadeEdges);
   const hasFade = fade.top || fade.bottom || fade.left || fade.right;
-  const hasVerticalFade = fade.top || fade.bottom;
-  const hasHorizontalFade = fade.left || fade.right;
+
+  // Fixed reveal distance, clamped to the scroll range so short scrollers
+  // still reach a full fade instead of only partially revealing it.
+  const reveal = "min(var(--scroll-fade-reveal,6rem),100%)";
+  const fadeAnimations = [
+    fade.top && {
+      name: "scroll-fade-reveal-top",
+      timeline: "scroll(y self)",
+      range: `0 ${reveal}`,
+    },
+    fade.bottom && {
+      name: "scroll-fade-reveal-bottom",
+      timeline: "scroll(y self)",
+      range: `calc(100% - ${reveal}) 100%`,
+    },
+    fade.left && {
+      name: "scroll-fade-reveal-left",
+      timeline: "scroll(x self)",
+      range: `0 ${reveal}`,
+    },
+    fade.right && {
+      name: "scroll-fade-reveal-right",
+      timeline: "scroll(x self)",
+      range: `calc(100% - ${reveal}) 100%`,
+    },
+  ].filter(Boolean) as { name: string; timeline: string; range: string }[];
 
   const animationStyle: React.CSSProperties | undefined = hasFade
     ? {
-        animationName: [
-          hasVerticalFade && "scroll-fade-y",
-          hasHorizontalFade && "scroll-fade-x",
-        ]
-          .filter(Boolean)
-          .join(", "),
-        animationTimeline: [
-          hasVerticalFade && "scroll(y self)",
-          hasHorizontalFade && "scroll(x self)",
-        ]
-          .filter(Boolean)
-          .join(", "),
-        animationTimingFunction: "linear",
+        animationName: fadeAnimations.map((a) => a.name).join(", "),
+        animationTimeline: fadeAnimations.map((a) => a.timeline).join(", "),
+        animationRange: fadeAnimations.map((a) => a.range).join(", "),
+        animationTimingFunction: "ease-in-out",
+        animationDuration: "1ms",
         animationFillMode: "both",
       }
     : undefined;
@@ -229,17 +247,13 @@ function NativeScrollArea({
       className={cn(
         "size-full min-h-0 overflow-auto rounded-[inherit]",
         "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
-        hasFade && "[--scroll-fade-size:1.5rem]",
-        // Native scroll uses scroll-driven animation CSS variables
-        // Fallbacks: top/left hidden at start, bottom/right visible (more content below/right).
-        fade.top &&
-          "supports-[animation-timeline:scroll()]:mask-t-from-[calc(100%-var(--scroll-fade-top))]",
-        fade.bottom &&
-          "supports-[animation-timeline:scroll()]:mask-b-from-[calc(100%-var(--scroll-fade-bottom))]",
-        fade.left &&
-          "supports-[animation-timeline:scroll()]:mask-l-from-[calc(100%-var(--scroll-fade-left))]",
-        fade.right &&
-          "supports-[animation-timeline:scroll()]:mask-r-from-[calc(100%-var(--scroll-fade-right))]",
+        hasFade && "[--scroll-fade-size:min(12%,2.5rem)]",
+        // Mask amounts come from CSS variables driven by scroll-driven
+        // animations where supported, and from a static fallback otherwise.
+        fade.top && "mask-t-from-[calc(100%-var(--scroll-fade-top))]",
+        fade.bottom && "mask-b-from-[calc(100%-var(--scroll-fade-bottom))]",
+        fade.left && "mask-l-from-[calc(100%-var(--scroll-fade-left))]",
+        fade.right && "mask-r-from-[calc(100%-var(--scroll-fade-right))]",
         hideScrollbar ? "[scrollbar-width:none]" : "[scrollbar-width:thin]",
         scrollbarGutter && "[scrollbar-gutter:stable]",
         "[scrollbar-color:var(--color-scrollbar)_transparent]",

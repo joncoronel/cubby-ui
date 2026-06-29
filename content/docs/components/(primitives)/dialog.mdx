@@ -13,6 +13,8 @@ import {
   DialogTrigger,
 } from "@/registry/default/dialog/dialog";
 
+A dialog is a modal window that overlays the page and waits for the user to act. Use it for focused tasks like confirming a destructive action, editing a record, or completing a short form without leaving the current view.
+
 ## Preview
 
 <ComponentPreview component="dialog" example="dialog-basic" />
@@ -25,35 +27,51 @@ import {
 
 <ComponentUsage component="dialog" />
 
+## Composition
+
+```text
+Dialog
+├── DialogTrigger
+└── DialogContent
+    ├── DialogHeader
+    │   ├── DialogTitle
+    │   └── DialogDescription
+    ├── DialogBody
+    └── DialogFooter
+        └── DialogClose
+```
+
+`DialogContent` composes the portal, viewport, backdrop, and popup internally, so you wrap your content directly inside it.
+
 ## Examples
 
 ### Controlled
 
-Manage dialog open state programmatically.
+Use `open` and `onOpenChange` on `Dialog` to drive open state yourself.
 
 <ComponentPreview component="dialog" example="dialog-controlled" />
 
 ### With Form
 
-Include form elements within the dialog.
+Place form elements inside `DialogBody` and close on submit.
 
 <ComponentPreview component="dialog" example="dialog-form" />
 
 ### Scrollable Content
 
-Handle long content with scrolling.
+`DialogBody` scrolls its content while the header and footer stay pinned.
 
 <ComponentPreview component="dialog" example="dialog-scroll" />
 
 ### No Close Button
 
-Hide the default close button.
+Set `showCloseButton={false}` on `DialogContent` to hide the default close button.
 
 <ComponentPreview component="dialog" example="dialog-no-close-button" />
 
 ### Nested Dialogs
 
-Stack multiple dialogs on top of each other.
+Open a dialog from within another to stack them.
 
 <ComponentPreview component="dialog" example="dialog-nested" />
 
@@ -91,7 +109,7 @@ For the complete Base UI API, see the [Base UI Dialog documentation](https://bas
 
 #### createDialogHandle
 
-Creates a handle that connects a dialog to one or more external `DialogTrigger` components. Useful when the triggers need to live outside the `Dialog` — for example, when each row in a list has its own trigger but they all share one dialog.
+Creates a handle that connects a dialog to one or more external `DialogTrigger` components. Useful when the triggers need to live outside the `Dialog`, for example when each row in a list has its own trigger but they all share one dialog.
 
 ```tsx
 import { createDialogHandle } from "@/registry/default/dialog/dialog";
@@ -170,11 +188,11 @@ Dialog container with centered positioning. Composes `Dialog.Portal`, `Dialog.Vi
 </ApiProp>
 
 <ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="5">
-  Surface elevation level. See the [Surfaces](/docs/getting-started/surfaces) docs. Dialogs default to `5` — comfortably above popovers and dropdowns at level 3.
+  Surface elevation level. See the [Surfaces](/docs/getting-started/surfaces) docs. Dialogs default to `5`, comfortably above popovers and dropdowns at level 3.
 </ApiProp>
 
 <ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="5">
-  Shadow weight. Defaults to `5` for the typical dialog-sized element (~400–800px).
+  Shadow weight. Defaults to `5` for the typical dialog-sized element (~400 to 800px).
 </ApiProp>
 
 </ApiPropsList>

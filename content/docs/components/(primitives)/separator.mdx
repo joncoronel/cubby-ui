@@ -6,6 +6,8 @@ type: primitive
 
 import { Separator } from "@/registry/default/separator/separator";
 
+A separator is a thin rule that divides content into groups. Use it between list items, toolbar sections, or stacked cards. Set `orientation="vertical"` to divide items in a row.
+
 ## Preview
 
 <ComponentPreview component="separator" example="separator-basic" />
@@ -22,13 +24,19 @@ import { Separator } from "@/registry/default/separator/separator";
 
 ### Variants
 
-Choose from different separator styles.
+Use `variant` to set the line's thickness and style.
 
 <ComponentPreview component="separator" example="separator-variants" />
 
+| Variant   | Description                          |
+| --------- | ----------------------------------- |
+| `default` | A 1px solid rule.                   |
+| `thick`   | A heavier 2px solid rule.           |
+| `dashed`  | A dashed rule for a softer divide.  |
+
 ### Vertical
 
-Display vertical separators for horizontal layouts.
+Set `orientation="vertical"` to divide items laid out in a row.
 
 <ComponentPreview component="separator" example="separator-vertical" />
 

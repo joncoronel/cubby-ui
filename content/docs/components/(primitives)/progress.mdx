@@ -6,6 +6,8 @@ type: primitive
 
 import { Progress } from "@/registry/default/progress/progress";
 
+A progress bar shows how far along a task or operation is, from a starting value to completion. Use it for uploads, downloads, or any determinate loading; for a static reading within a fixed range, use [`Meter`](/docs/components/meter) instead.
+
 ## Preview
 
 <ComponentPreview component="progress" example="progress-basic" />
@@ -18,35 +20,51 @@ import { Progress } from "@/registry/default/progress/progress";
 
 <ComponentUsage component="progress" />
 
+## Composition
+
+```text
+ProgressRoot
+├── ProgressLabel
+├── ProgressValue
+└── ProgressTrack
+    └── ProgressIndicator
+```
+
 ## Examples
 
 ### Different Sizes
 
-Display progress bars in various sizes.
+Use `size` to set the track height and text size.
 
 <ComponentPreview component="progress" example="progress-different-sizes" />
 
+| Value | Description                       |
+| ----- | --------------------------------- |
+| `sm`  | Thin track with extra-small text. |
+| `md`  | The default track and text.       |
+| `lg`  | Thick track with larger text.     |
+
 ### Custom Colors
 
-Apply custom color schemes to progress bars.
+Pass a `className` to `ProgressIndicator` to recolor the filled bar.
 
 <ComponentPreview component="progress" example="progress-custom-colors" />
 
 ### With Label
 
-Add labels to show progress percentage or status.
+Add `ProgressLabel` and `ProgressValue` to caption the bar.
 
 <ComponentPreview component="progress" example="progress-with-label" />
 
 ### Dynamic Progress
 
-Animated progress that updates over time.
+Set `animated` on `ProgressRoot` to ease the indicator between values as they update.
 
 <ComponentPreview component="progress" example="progress-dynamic" />
 
 ### File Upload
 
-Progress indicator for file upload operations.
+Drive `value` from an upload's progress; the bar shows a completed state when it reaches `max`.
 
 <ComponentPreview component="progress" example="progress-file-upload" />
 

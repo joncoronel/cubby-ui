@@ -6,6 +6,8 @@ type: primitive
 
 import { Toggle } from "@/registry/default/toggle/toggle";
 
+A toggle is a two-state button that stays pressed when on. Use it for a single on/off control like bold, mute, or pin. For a set of mutually exclusive or multi-select toggles, use [`Toggle Group`](/docs/components/toggle-group); for a labeled settings switch, use [`Switch`](/docs/components/switch).
+
 ## Preview
 
 <ComponentPreview component="toggle" example="toggle-basic" />
@@ -20,35 +22,58 @@ import { Toggle } from "@/registry/default/toggle/toggle";
 
 ## Examples
 
-### Different Sizes
+### Sizes
 
-Display toggles in various sizes.
+Use `size` to set the toggle's height and padding.
 
 <ComponentPreview component="toggle" example="toggle-different-sizes" />
 
+| Size      | Description                       |
+| --------- | --------------------------------- |
+| `sm`      | Compact, for dense toolbars.      |
+| `default` | The standard height.              |
+| `lg`      | Taller, for prominent controls.   |
+
 ### With Text
 
-Include text labels within toggle buttons.
+Place a text label alongside the icon inside the toggle.
 
 <ComponentPreview component="toggle" example="toggle-with-text" />
 
 ### Outline Variant
 
-Use outline styling for toggles.
+Set `variant="outline"` to give the toggle a border and subtle shadow.
 
 <ComponentPreview component="toggle" example="toggle-outline-variant" />
 
+| Variant   | Description                              |
+| --------- | ---------------------------------------- |
+| `default` | Borderless, fills only when pressed.     |
+| `outline` | Bordered with a subtle shadow.           |
+
 ### Controlled
 
-Manage toggle state externally.
+Use `pressed` and `onPressedChange` to drive the toggle state yourself.
 
 <ComponentPreview component="toggle" example="toggle-controlled" />
 
 ### Disabled State
 
-Prevent interaction with disabled toggles.
+Use `disabled` to prevent interaction.
 
 <ComponentPreview component="toggle" example="toggle-disabled-state" />
+
+## Accessibility
+
+### Label icon-only toggles
+
+An icon-only toggle has no text for a screen reader to announce. Give it an `aria-label` describing the action it controls.
+
+```tsx showLineNumbers
+<Toggle aria-label="Toggle bold">
+  <BoldIcon />
+</Toggle>
+```
 
 ## API Reference
 

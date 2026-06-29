@@ -6,6 +6,8 @@ type: composable
 
 import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@/registry/default/input-otp/input-otp";
 
+The input OTP is a fixed-length code entry built from individual character slots backed by one hidden input. Use it for one-time passwords, verification codes, and PINs where each character gets its own box. It is built on the [`input-otp`](https://input-otp.rodz.dev) library; for a Base UI version with field labeling and validation, use [`OTPField`](/docs/components/otp-field) instead.
+
 ## Preview
 
 <ComponentPreview component="input-otp" example="input-otp-basic" />
@@ -18,37 +20,57 @@ import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@/regi
 
 <ComponentUsage component="input-otp" />
 
+## Composition
+
+```text
+InputOTP
+└── InputOTPGroup
+    ├── InputOTPSlot
+    └── InputOTPSeparator
+```
+
+Use multiple `InputOTPGroup` blocks with an `InputOTPSeparator` between them to split the code into visual chunks.
+
 ## Examples
 
 ### With Separator
 
-Add visual separators between digit groups.
+Place an `InputOTPSeparator` between two `InputOTPGroup` blocks to split the code.
 
 <ComponentPreview component="input-otp" example="input-otp-with-separator" />
 
 ### Custom Pattern
 
-Define custom input patterns and validation.
+Use `pattern` to restrict which characters each slot accepts.
 
 <ComponentPreview component="input-otp" example="input-otp-custom-pattern" />
 
 ### Custom Styling
 
-Apply custom styles to OTP slots.
+Pass `className` to `InputOTPSlot` to restyle the slots.
 
 <ComponentPreview component="input-otp" example="input-otp-custom-styling" />
 
 ### Disabled
 
-Prevent interaction with disabled OTP input.
+Set `disabled` on `InputOTP` to block interaction.
 
 <ComponentPreview component="input-otp" example="input-otp-disabled" />
 
 ### Elevated Variant
 
-On a Card, Dialog, or popover surface, the opaque `default` slots collapse into the parent. Use `variant="elevated"` on each `InputOTPSlot` for a translucent overlay that adapts to the substrate. See the [Surfaces](/docs/getting-started/surfaces) docs.
+Use `variant="elevated"` on each `InputOTPSlot` for translucent slots that adapt to a Card, Dialog, or popover surface. See the [Surfaces](/docs/getting-started/surfaces) docs.
 
 <ComponentPreview component="input-otp" example="input-otp-elevated" />
+
+| Value      | Description                                                  |
+| ---------- | ------------------------------------------------------------ |
+| `default`  | Opaque `bg-input` slots for standard backgrounds.            |
+| `elevated` | Translucent `bg-input-elevated` slots for layered surfaces.  |
+
+## Accessibility
+
+The slots render the visible boxes, but text entry happens in a single hidden input that spans the group, so the code stays selectable, pasteable, and reachable by autofill. Set `maxLength` to the code length, and pass `aria-invalid="true"` on `InputOTP` to flag a rejected code.
 
 ## API Reference
 

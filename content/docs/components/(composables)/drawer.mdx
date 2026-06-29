@@ -18,6 +18,8 @@ import {
   DrawerTrigger,
 } from "@/registry/default/drawer/drawer";
 
+The drawer is a swipeable panel that slides in from a screen edge and rests at configurable snap points. Use it for mobile-style bottom sheets, multi-height panels like a music player, or any surface a user drags between heights. For a plain slide-in panel without snap points or drag gestures, use [`Sheet`](/docs/components/sheet) instead.
+
 ## Preview
 
 <ComponentPreview component="drawer" example="drawer-basic" />
@@ -30,85 +32,119 @@ import {
 
 <ComponentUsage component="drawer" />
 
+## Composition
+
+```text
+Drawer
+├── DrawerTrigger
+└── DrawerContent
+    ├── DrawerHandle
+    ├── DrawerHeader
+    │   ├── DrawerTitle
+    │   └── DrawerDescription
+    ├── DrawerBody
+    └── DrawerFooter
+        └── DrawerClose
+```
+
+`DrawerContent` composes the portal, backdrop, viewport, and popup. Use `DrawerBody` for scrollable content that cooperates with swipe gestures.
+
 ## Examples
 
 ### Controlled
 
-Use the `open` and `onOpenChange` props to control the drawer's open state externally.
+Use `open` and `onOpenChange` to drive the drawer's open state externally.
 
 <ComponentPreview component="drawer" example="drawer-controlled" />
 
 ### Directions
 
-Open drawer from different screen edges.
+Use `direction` to choose which edge the drawer slides in from.
 
 <ComponentPreview component="drawer" example="drawer-directions" />
 
+| Value      | Description                          |
+| ---------- | ------------------------------------ |
+| `"bottom"` | Slides up from the bottom (default). |
+| `"top"`    | Slides down from the top.            |
+| `"left"`   | Slides in from the left.             |
+| `"right"`  | Slides in from the right.            |
+
 ### Snap Points
 
-Configure multiple snap points for the drawer to rest at different heights.
+Use `snapPoints` to let the drawer rest at multiple heights.
 
 <ComponentPreview component="drawer" example="drawer-snap-points" />
 
 ### Pixel-Based Snap Points
 
-Use pixel values for fixed snap heights that don't depend on content size.
+Pass pixel strings in `snapPoints` for fixed heights that ignore content size.
 
 <ComponentPreview component="drawer" example="drawer-pixel-snap-points" />
 
 ### Sequential Snap Points
 
-Enable `sequentialSnap` to prevent skipping snap points during fast swipes.
+Set `sequentialSnap` to stop at each snap point instead of skipping them on fast swipes.
 
 <ComponentPreview component="drawer" example="drawer-sequential-snap" />
 
 ### Floating Variant
 
-Use the floating variant for a more elevated, modal-like appearance with rounded corners and shadow.
+Use `variant="floating"` for an inset, modal-like panel with rounded corners and shadow.
 
 <ComponentPreview component="drawer" example="drawer-floating" />
 
 ### Music Player
 
-A music player demonstrating progressive disclosure with snap points: mini player, expanded controls, and full queue view.
+Combine snap points with `--drawer-snap-progress` for progressive disclosure: mini player, expanded controls, and full queue.
 
 <ComponentPreview component="drawer" example="drawer-music-player" />
 
 ### Scrollable Content
 
-Use `DrawerBody` for scrollable content that works seamlessly with swipe gestures.
+Use `DrawerBody` for scrollable content that cooperates with swipe gestures.
 
 <ComponentPreview component="drawer" example="drawer-with-scroll" />
 
 ### With Form
 
-Include form elements within the drawer.
+Place form fields inside `DrawerBody`, with actions in `DrawerFooter`.
 
 <ComponentPreview component="drawer" example="drawer-with-form" />
 
 ### Inset Footer
 
-Use the `footerVariant="inset"` prop on `DrawerContent` for a visually separated footer with a muted background and top border.
+Set `footerVariant="inset"` on `DrawerContent` for a separated footer with a muted background and top border.
 
 <ComponentPreview component="drawer" example="drawer-inset-footer" />
 
 ### Sticky Footer
 
-Add `className="sticky bottom-0"` to `DrawerFooter` to keep it fixed at the bottom of the viewport as you drag the drawer down.
+Add `className="sticky bottom-0"` to `DrawerFooter` to pin it as the drawer is dragged down.
 
 <ComponentPreview component="drawer" example="drawer-sticky-footer" />
 
 ### Nested
 
-Open a drawer from within another drawer. The parent drawer scales down and dims to reveal the nested drawer stacking on top.
+Open a drawer from inside another; the parent scales down and dims behind the nested drawer.
 
 <ComponentPreview component="drawer" example="drawer-nested" />
 
 ### Non-Modal
 
-Control modal behavior with the `modal` prop. `modal={false}` allows full page interaction with no focus trapping. `modal="trap-focus"` keeps focus within the drawer while still allowing page interaction.
+Use `modal` to control focus trapping and page interaction.
 
 <ComponentPreview component="drawer" example="drawer-non-modal" />
+
+| Value          | Description                                                          |
+| -------------- | ------------------------------------------------------------------- |
+| `true`         | Focus trapped, backdrop shown, body scroll locked (default).        |
+| `"trap-focus"` | Focus trapped, but the page stays interactive.                      |
+| `false`        | No focus trap, no backdrop; the page is fully interactive.          |
+
+## Accessibility
+
+Include a `DrawerTitle` (and ideally a `DrawerDescription`) inside every `DrawerContent` so the dialog is named for assistive technology. When the modal drawer opens, focus moves into it and is trapped until it closes; `modal="trap-focus"` keeps the trap while leaving the page interactive, and `modal={false}` removes the trap entirely. `DrawerHandle` is a real button labeled "Close drawer" by default; set `preventClose` to relabel it "Drawer handle" when it should not dismiss.
 
 ## API Reference
 

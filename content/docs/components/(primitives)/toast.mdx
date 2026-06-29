@@ -6,6 +6,8 @@ type: primitive
 
 import { ToastProvider, AnchoredToastProvider, toast } from "@/registry/default/toast/toast";
 
+A toast is a brief, self-dismissing message that confirms an action or reports a result without blocking the page. Call `toast()` from anywhere to show one. Use it for transient feedback like "Saved" or "Upload failed", not for content the user must act on (use [`Dialog`](/docs/components/dialog) or [`Alert Dialog`](/docs/components/alert-dialog) there).
+
 ## Preview
 
 <ComponentPreview component="toast" example="toast-basic" />
@@ -22,45 +24,63 @@ import { ToastProvider, AnchoredToastProvider, toast } from "@/registry/default/
 
 ### Types
 
-Toast variants for different feedback scenarios: success, error, warning, and info.
+Use `type` (or the `toast.success`, `toast.error`, and similar shorthands) to set the toast's color and icon.
 
 <ComponentPreview component="toast" example="toast-types" />
 
+| Type      | Description                                  |
+| --------- | -------------------------------------------- |
+| `default` | A neutral toast with no status color.        |
+| `success` | Confirms an action completed.                |
+| `error`   | Reports a failure.                           |
+| `warning` | Flags a risk or caution.                     |
+| `info`    | Conveys neutral, non-status information.     |
+
 ### Anchored Toast
 
-Toasts can be anchored to a specific element, useful for contextual feedback like "Copied" confirmations.
+Use `toast.anchored()` to pin a toast to a specific element for contextual feedback like a "Copied" confirmation.
 
 <ComponentPreview component="toast" example="toast-anchored" />
 
 ### With Action
 
-Add action buttons to toasts. Clicking the action dismisses the current toast and can trigger follow-up toasts.
+Use the `action` option to add a button; clicking it dismisses the current toast and can trigger a follow-up.
 
 <ComponentPreview component="toast" example="toast-action" />
 
 ### Deduplicated
 
-Prevent duplicate toasts by passing a fixed `id`. If a toast with the same ID is already visible, it updates in place with a pulse animation instead of creating a new one.
+Pass a fixed `id` to collapse repeats; a matching toast updates in place with a pulse instead of stacking a duplicate.
 
 <ComponentPreview component="toast" example="toast-deduplicated" />
 
 ### Promise
 
-Show loading, success, and error states based on promise resolution.
+Use `toast.promise()` to drive loading, success, and error states from a promise's resolution.
 
 <ComponentPreview component="toast" example="toast-promise" />
 
 ### Varying Heights
 
-Toasts automatically adjust their stacking when content has different heights.
+Toasts measure their own height and adjust the stack when content sizes differ.
 
 <ComponentPreview component="toast" example="toast-varying-heights" />
 
 ### Grouped Toasts
 
-Group multiple related toasts into a single summary toast with an expandable card. Ideal for long-running operations like deployments or file uploads.
+Use `toast.grouped()` to fold related toasts into one summary with an expandable card, for long-running work like deployments or uploads.
 
 <ComponentPreview component="toast" example="toast-grouped" />
+
+## Accessibility
+
+### Announcement urgency
+
+Use `priority` to control how a screen reader announces the toast. `"low"` (the default) announces politely without interrupting the user; reserve `"high"` for messages that must break through, such as a failed save.
+
+```tsx showLineNumbers
+toast.error({ title: "Couldn't save", priority: "high" });
+```
 
 ## API Reference
 

@@ -7,6 +7,10 @@ builtOn: ["calendar", "popover"]
 
 import { DatePicker } from "@/registry/default/date-picker/date-picker";
 
+The date picker is a trigger button that opens a calendar popover for choosing a single date. Use it for due dates, birthdays, and any form field that needs one date.
+
+To select a start and end date together, use [`DateRangePicker`](/docs/components/date-range-picker) instead.
+
 ## Preview
 
 <ComponentPreview component="date-picker" example="date-picker-basic" />
@@ -23,24 +27,28 @@ import { DatePicker } from "@/registry/default/date-picker/date-picker";
 
 ### Controlled
 
-Manage date picker state externally.
+Pass `value` and `onSelect` to manage the selected date externally.
 
 <ComponentPreview component="date-picker" example="date-picker-controlled" />
 
 ### Custom Placeholder and Format
 
-Customize placeholder text and date format.
+Use `placeholder` and `format` to set the empty-state text and the displayed date format.
 
 <ComponentPreview component="date-picker" example="date-picker-custom-placeholder-and-format" />
 
 ### Different Widths
 
-Display date picker with various widths.
+Set a width utility via `className` to size the trigger.
 
 <ComponentPreview component="date-picker" example="date-picker-different-widths" />
 
 ### Disabled State
 
-Prevent interaction with disabled date picker.
+Set `disabled` to prevent opening the picker.
 
 <ComponentPreview component="date-picker" example="date-picker-disabled-state" />
+
+## Accessibility
+
+The trigger opens a calendar popover that traps focus while open. Inside the calendar, use the arrow keys to move between days, `PageUp` and `PageDown` to change months, `Enter` or `Space` to select, and `Escape` to close.

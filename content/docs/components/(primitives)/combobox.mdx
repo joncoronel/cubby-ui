@@ -6,6 +6,8 @@ type: primitive
 
 import { Combobox } from "@/registry/default/combobox/combobox";
 
+The combobox is a text input paired with a filtered, keyboard-navigable list of options. Use it for searchable selects, tag pickers, async autocompletes, or any select-from-many flow with more options than a dropdown comfortably holds.
+
 ## Preview
 
 <ComponentPreview component="combobox" example="combobox-basic" />
@@ -18,23 +20,38 @@ import { Combobox } from "@/registry/default/combobox/combobox";
 
 <ComponentUsage component="combobox" />
 
+## Composition
+
+```text
+Combobox
+├── ComboboxLabel
+├── ComboboxInput
+└── ComboboxPopup
+    ├── ComboboxEmpty
+    └── ComboboxList
+        ├── ComboboxGroup
+        │   ├── ComboboxGroupLabel
+        │   └── ComboboxItem
+        └── ComboboxItem
+```
+
 ## Examples
 
 ### Creatable
 
-Allow users to create new options.
+Let users add an option that isn't in the list from their typed input.
 
 <ComponentPreview component="combobox" example="combobox-creatable" />
 
 ### Multiple Selection
 
-Select multiple options from the combobox.
+Pass `multiple` on `Combobox` to select more than one option.
 
 <ComponentPreview component="combobox" example="combobox-multiple" />
 
 ### Input Inside Popup
 
-Place the search input within the dropdown popup.
+Move `ComboboxInput` inside `ComboboxPopup` so the search field sits in the dropdown.
 
 <ComponentPreview component="combobox" example="combobox-input-inside-popup" />
 
@@ -46,19 +63,19 @@ Load options from a remote source by fetching on input changes. The `useAsyncCom
 
 ### Async Search (Multiple)
 
-Async search with multiple selection support. Selected items remain visible in the dropdown while searching for new matches.
+Combine async search with `multiple`; selected items stay visible in the dropdown while new matches load.
 
 <ComponentPreview component="combobox" example="combobox-async-multiple" />
 
 ### Grouped
 
-Organize options into logical groups with sticky headers.
+Wrap items in `ComboboxGroup` with a `ComboboxGroupLabel` for sticky section headers.
 
 <ComponentPreview component="combobox" example="combobox-grouped" />
 
 ### Virtualized
 
-Use virtualization for large lists (100+ items) to maintain smooth performance. Only renders items visible in the viewport, dramatically reducing DOM nodes.
+Use `ComboboxVirtualizedList` for large lists (100+ items); it only renders items in the viewport, dramatically reducing DOM nodes.
 
 <ComponentPreview component="combobox" example="combobox-virtualized" />
 
@@ -73,9 +90,14 @@ Use virtualization for large lists (100+ items) to maintain smooth performance. 
 
 ### Elevated Variant
 
-On a Card, Dialog, or popover surface, the opaque `default` input collapses into its parent. Use `variant="elevated"` on `ComboboxInput` for a translucent overlay that adapts to the substrate. See the [Surfaces](/docs/getting-started/surfaces) docs.
+Use `variant="elevated"` on `ComboboxInput` for a Card, Dialog, or popover surface, where the opaque `default` input would collapse into its parent. See the [Surfaces](/docs/getting-started/surfaces) docs.
 
 <ComponentPreview component="combobox" example="combobox-elevated" />
+
+| Value      | Description                                                       |
+| ---------- | ---------------------------------------------------------------- |
+| `default`  | Opaque `bg-input`, for standard page backgrounds.                |
+| `elevated` | Translucent `bg-input-elevated`, for Card, Dialog, or popovers.  |
 
 ### Form Integration
 
@@ -113,7 +135,7 @@ Text input with built-in trigger and clear buttons. Wraps Base UI's `Combobox.In
 
 #### ComboboxTriggerLabel
 
-Accessible label for the input-inside-popup pattern, where the trigger is the form control. Wraps Base UI's `Combobox.Label`. Renders a `<div>` — clicking it focuses the trigger without opening the popup.
+Accessible label for the input-inside-popup pattern, where the trigger is the form control. Wraps Base UI's `Combobox.Label`. Renders a `<div>`; clicking it focuses the trigger without opening the popup.
 
 For the standard combobox pattern (input outside popup), use `ComboboxLabel` which renders a native `<label>` associated with the input.
 

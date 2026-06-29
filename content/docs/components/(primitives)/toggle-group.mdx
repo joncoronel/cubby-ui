@@ -4,7 +4,9 @@ description: Group of toggle buttons for selecting one or multiple options
 type: primitive
 ---
 
-import { ToggleGroup, ToggleGroupItem } from "@/registry/default/toggle-group/toggle-group";
+import { ToggleGroup } from "@/registry/default/toggle-group/toggle-group";
+
+A toggle group joins a set of [`Toggle`](/docs/components/toggle) buttons into one segmented control with shared borders. Use it for related on/off choices that share a slot, like a text alignment or a view switcher, where one or several can be active at once.
 
 ## Preview
 
@@ -18,10 +20,19 @@ import { ToggleGroup, ToggleGroupItem } from "@/registry/default/toggle-group/to
 
 <ComponentUsage component="toggle-group" />
 
+## Composition
+
+```text
+ToggleGroup
+└── Toggle
+```
+
+`ToggleGroup` wraps a row of [`Toggle`](/docs/components/toggle) buttons and merges their adjacent borders into one segmented control. Each `Toggle` carries its own `value`.
+
 ## Examples
 
 ### With Icons
 
-Add icons to toggle group items.
+Use an icon as a `Toggle`'s content for a compact, label-free control.
 
 <ComponentPreview component="toggle-group" example="toggle-group-with-icons" />

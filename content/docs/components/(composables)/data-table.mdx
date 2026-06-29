@@ -7,6 +7,8 @@ builtOn: ["table"]
 
 import { DataTable } from "@/registry/default/data-table/data-table";
 
+The data table renders rows and columns with sorting, filtering, row selection, and pagination. Use it for dashboards, admin lists, and any tabular data that needs interaction. It is built on TanStack Table, so you define columns with `ColumnDef` and compose the table from parts.
+
 ## Preview
 
 <ComponentPreview component="data-table" example="data-table-basic" />
@@ -19,9 +21,22 @@ import { DataTable } from "@/registry/default/data-table/data-table";
 
 <ComponentUsage component="data-table" />
 
-## Architecture
+## Composition
 
-DataTable uses a **composition-based architecture**. The root `DataTable` component provides context to child components, allowing you to compose the exact table structure you need.
+`DataTable` builds the TanStack Table instance from `columns` and `data` and shares it through context. Compose the parts you need inside it.
+
+```text
+DataTable                       (columns + data)
+├── DataTableToolbar
+│   ├── DataTableSearch
+│   ├── DataTableColumnToggle
+│   └── DataTableToolbarSeparator
+├── DataTableContent
+│   ├── DataTableHeader
+│   ├── DataTableBody
+│   └── DataTableFooter
+└── DataTablePagination
+```
 
 ```tsx
 <DataTable columns={columns} data={data} enableSorting>
@@ -40,25 +55,25 @@ DataTable uses a **composition-based architecture**. The root `DataTable` compon
 
 ### Sorting
 
-Enable column sorting with the `enableSorting` prop on `DataTable`, then pass `enableSorting` to `DataTableHeader` to render sort controls. Columns with string headers automatically render clickable sort buttons with direction indicators.
+Set `enableSorting` on `DataTable` and pass it to `DataTableHeader`; columns with string headers get clickable sort controls.
 
 <ComponentPreview component="data-table" example="data-table-sorting" />
 
 ### Row Selection
 
-Enable row selection with the `enableRowSelection` prop. Checkboxes are automatically added as the first column. Control selection state with `rowSelection` and `onRowSelectionChange`.
+Set `enableRowSelection` to add a checkbox column, and control state with `rowSelection` and `onRowSelectionChange`.
 
 <ComponentPreview component="data-table" example="data-table-row-selection" />
 
 ### Toolbar
 
-Add a toolbar with search and column toggles by composing `DataTableToolbar` with `DataTableSearch` and `DataTableColumnToggle`. Enable `enableFiltering` on `DataTable` for search to work. This example also demonstrates sorting and row selection.
+Compose `DataTableToolbar` with `DataTableSearch` and `DataTableColumnToggle`, and set `enableFiltering` on `DataTable` so search works.
 
 <ComponentPreview component="data-table" example="data-table-toolbar" />
 
 ### Striped
 
-Use the `striped` prop on `DataTableContent` for alternating row backgrounds.
+Set `striped` on `DataTableContent` for alternating row backgrounds.
 
 <ComponentPreview component="data-table" example="data-table-striped" />
 
@@ -271,7 +286,7 @@ Root component that creates the TanStack Table instance and provides context to 
 
 </ApiPropsList>
 
-DataTable's outer wrapper uses the same `solidSurface(3, 1)` + `bg-muted` pattern as Card inset and Table — a flat outlined gray frame. The inner `DataTableContent` Table inside has its own bg-muted/inner-card visual (body cells `bg-surface-3 dark:bg-surface-1`), with its outer Table styling suppressed (`bg-transparent shadow-none ring-0`) so the elevation lives on the DataTable wrapper only. See the [Surfaces](/docs/getting-started/surfaces) docs.
+DataTable's outer wrapper uses the same `solidSurface(3, 1)` + `bg-muted` pattern as Card inset and Table, a flat outlined gray frame. The inner `DataTableContent` Table inside has its own bg-muted/inner-card visual (body cells `bg-surface-3 dark:bg-surface-1`), with its outer Table styling suppressed (`bg-transparent shadow-none ring-0`) so the elevation lives on the DataTable wrapper only. See the [Surfaces](/docs/getting-started/surfaces) docs.
 
 ### DataTableToolbar
 

@@ -6,6 +6,10 @@ type: primitive
 
 import { Alert, AlertDescription, AlertTitle } from "@/registry/default/alert/alert";
 
+An alert is a callout that surfaces a short, important message inline with the page content. Use it for form-level errors, status banners, or warnings that need to stay visible, not for transient toasts.
+
+For dismissible messages that auto-disappear, use [`Toast`](/docs/components/toast) instead.
+
 ## Preview
 
 <ComponentPreview component="alert" example="alert-demo" />
@@ -18,46 +22,67 @@ import { Alert, AlertDescription, AlertTitle } from "@/registry/default/alert/al
 
 <ComponentUsage component="alert" />
 
+## Composition
+
+```text
+Alert
+├── AlertTitle
+├── AlertDescription
+└── AlertAction
+```
+
 ## Examples
 
 ### Info
 
-Display informational messages to users.
+Use `variant="info"` for informational messages.
 
 <ComponentPreview component="alert" example="alert-info" />
 
 ### Success
 
-Show success messages for completed actions.
+Use `variant="success"` to confirm a completed action.
 
 <ComponentPreview component="alert" example="alert-success" />
 
 ### Warning
 
-Communicate warnings that require user attention.
+Use `variant="warning"` for messages that need attention.
 
 <ComponentPreview component="alert" example="alert-warning" />
 
 ### Danger
 
-Display critical error or danger messages.
+Use `variant="danger"` for errors and critical messages.
 
 <ComponentPreview component="alert" example="alert-danger" />
 
+| Variant   | Description                              |
+| --------- | ---------------------------------------- |
+| `default` | A neutral, low-emphasis message.         |
+| `info`    | An informational message.                |
+| `success` | A completed or successful action.        |
+| `warning` | A condition that needs attention.        |
+| `danger`  | An error or critical message.            |
+
 ### With Icon
 
-Add custom icons to enhance alert visibility.
+Place an SVG as the first child of `Alert` to show an icon beside the message.
 
 <ComponentPreview component="alert" example="alert-with-icon" />
 
 ### With Actions
 
-Include action buttons for user interaction.
+Use `AlertAction` to add buttons alongside the message.
 
 <ComponentPreview component="alert" example="alert-with-actions" />
 
 ### Without Title
 
-Display alerts with description only.
+Omit `AlertTitle` to render a description-only alert.
 
 <ComponentPreview component="alert" example="alert-without-title" />
+
+## Accessibility
+
+Each `Alert` has `role="alert"`, so screen readers announce its content when it appears. Because the variants signal severity through color, pair `danger` and `warning` alerts with an icon or explicit wording (such as "Error:") so the meaning carries without color.

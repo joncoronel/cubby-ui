@@ -6,6 +6,10 @@ type: primitive
 
 import { Autocomplete } from "@/registry/default/autocomplete/autocomplete";
 
+Autocomplete is a text input that suggests matching options as the user types, while still accepting free-form text. Use it for search fields, tag entry, or any input where suggestions speed things up but the value isn't restricted to the list.
+
+For selecting a single required value from a fixed list, use [`Combobox`](/docs/components/combobox) instead.
+
 ## Preview
 
 <ComponentPreview component="autocomplete" example="autocomplete-basic" />
@@ -18,17 +22,35 @@ import { Autocomplete } from "@/registry/default/autocomplete/autocomplete";
 
 <ComponentUsage component="autocomplete" />
 
+## Composition
+
+```text
+AutocompleteRoot
+├── AutocompleteInput
+│   ├── AutocompleteTrigger
+│   └── AutocompleteClear
+└── AutocompletePortal
+    └── AutocompletePositioner
+        └── AutocompletePopup
+            ├── AutocompleteEmpty
+            └── AutocompleteList
+                ├── AutocompleteGroup
+                │   ├── AutocompleteGroupLabel
+                │   └── AutocompleteItem
+                └── AutocompleteItem
+```
+
 ## Examples
 
 ### Async Loading
 
-Fetch suggestions asynchronously from an API.
+Fetch suggestions from an API as the query changes.
 
 <ComponentPreview component="autocomplete" example="autocomplete-async" />
 
 ### Auto Highlight
 
-Automatically highlight the first suggestion.
+Set `autoHighlight` on `AutocompleteRoot` to highlight the first suggestion automatically.
 
 <ComponentPreview
   component="autocomplete"
@@ -37,43 +59,43 @@ Automatically highlight the first suggestion.
 
 ### Clearable Input
 
-Add a clear button to reset the input value.
+Set `showClear` on `AutocompleteInput` to add a button that resets the value.
 
 <ComponentPreview component="autocomplete" example="autocomplete-clear" />
 
 ### Trigger and Clear
 
-Show both a trigger chevron and a clear button on the input. The trigger toggles the popup, the clear resets the value. Same anatomy as the [Combobox](/docs/components/combobox).
+Set `showTrigger` and `showClear` on `AutocompleteInput` to show a popup toggle and a clear button. Same anatomy as the [Combobox](/docs/components/combobox).
 
 <ComponentPreview component="autocomplete" example="autocomplete-trigger" />
 
 ### Fuzzy Search
 
-Enable fuzzy matching for more flexible searching.
+Pass a fuzzy matcher as the `filter` to match suggestions loosely.
 
 <ComponentPreview component="autocomplete" example="autocomplete-fuzzy" />
 
 ### Grouped Options
 
-Organize suggestions into categories.
+Wrap items in `AutocompleteGroup` with an `AutocompleteGroupLabel` to organize them into categories.
 
 <ComponentPreview component="autocomplete" example="autocomplete-grouped" />
 
 ### Inline Suggestions
 
-Display suggestions inline within the input.
+Set `mode="both"` on `AutocompleteRoot` to complete the input inline with the highlighted suggestion.
 
 <ComponentPreview component="autocomplete" example="autocomplete-inline" />
 
 ### Limited Results
 
-Limit the number of displayed suggestions.
+Use `limit` on `AutocompleteRoot` to cap the number of suggestions shown.
 
 <ComponentPreview component="autocomplete" example="autocomplete-limit" />
 
 ### Virtualized
 
-Use virtualization for large lists (100+ items) to maintain smooth performance. Only renders items visible in the viewport, dramatically reducing DOM nodes.
+Use virtualization for large lists (100+ items) so only the items in view are rendered, keeping the list smooth.
 
 <ComponentPreview component="autocomplete" example="autocomplete-virtualized" />
 
@@ -86,7 +108,7 @@ Use virtualization for large lists (100+ items) to maintain smooth performance. 
 5. **Use `useHighlightHandler`** - Pass a `virtualizerRef` to the child and use `useHighlightHandler(virtualizerRef)` on Root so keyboard navigation scrolls to the highlighted item.
 6. **Override item margins** - Pass `className="mt-0! mb-0!"` to `AutocompleteItem` since virtualized items are absolutely positioned and the virtualizer handles padding.
 
-> **Manual filtering still works** — If you need custom filter logic (fuzzy search, server-side filtering), you can still compute `filteredItems` externally, pass `filter={null}` to `Autocomplete.Root`, and spread `rootProps` from `useListVirtualizer`. See [useAutocompleteFilter](#useautocompletefilter).
+> **Manual filtering still works.** If you need custom filter logic (fuzzy search, server-side filtering), you can still compute `filteredItems` externally, pass `filter={null}` to `Autocomplete.Root`, and spread `rootProps` from `useListVirtualizer`. See [useAutocompleteFilter](#useautocompletefilter).
 
 ### Elevated Variant
 

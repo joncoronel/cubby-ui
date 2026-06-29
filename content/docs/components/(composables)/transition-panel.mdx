@@ -6,6 +6,8 @@ type: composable
 
 import { TransitionPanel, TransitionPanelView } from "@/registry/default/transition-panel/transition-panel";
 
+The transition panel animates the swap between named views and grows or shrinks its height to fit the active one. Use it for multi-step wizards, settings panels, and popover or dialog content that changes in place, where you want a direction-aware slide or an in-place crossfade between states.
+
 ## Preview
 
 <ComponentPreview component="transition-panel" example="transition-panel-basic" />
@@ -18,17 +20,31 @@ import { TransitionPanel, TransitionPanelView } from "@/registry/default/transit
 
 <ComponentUsage component="transition-panel" />
 
+## Composition
+
+```text
+TransitionPanel
+└── TransitionPanelView
+```
+
+Match each `TransitionPanelView`'s `viewKey` to the panel's `activeKey` to control which view is visible. Set `transition` on `TransitionPanel` to choose how views swap.
+
+| Value   | Description                                                       |
+| ------- | ---------------------------------------------------------------- |
+| `slide` | Direction-aware horizontal slide (forward right, back left). Default. |
+| `fade`  | Non-directional crossfade with a subtle `0.96` to `1` scale.     |
+
 ## Examples
 
 ### Crossfade
 
-Set `transition="fade"` to swap views with a non-directional crossfade (opacity plus a subtle `0.96 → 1` scale) instead of a slide. Good for in-place swaps like dialogs, popovers, or settings panels, where a directional slide feels out of place. Height still animates as the active view's content size changes, and the fade duration adapts to that change, so a short-to-short swap fades faster than a short-to-tall one.
+Set `transition="fade"` to swap views with a non-directional crossfade instead of a slide, for in-place swaps like dialogs, popovers, or settings panels.
 
 <ComponentPreview component="transition-panel" example="transition-panel-crossfade" />
 
 ### Multi-step dialog
 
-A multi-step authenticator-setup wizard inside a [Dialog](/docs/components/dialog). Each step (icon, title, and description included) lives in its own `TransitionPanelView`, so the whole surface crossfades and the dialog grows or shrinks to fit the active step. The verify step auto-focuses the [Input OTP](/docs/components/input-otp) field, since focus moves to the first tabbable element of the newly active view on each swap.
+Give each step its own `TransitionPanelView` so the surface crossfades and the [Dialog](/docs/components/dialog) resizes to fit the active step, with focus moving to the active view's first tabbable element on each swap.
 
 <ComponentPreview component="transition-panel" example="transition-panel-dialog" />
 

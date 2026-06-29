@@ -11,6 +11,8 @@ import InputGroupWithSuffix from "@/registry/examples/input-group/input-group-wi
 import InputGroupKeyboardShortcut from "@/registry/examples/input-group/input-group-keyboard-shortcut";
 import InputGroupValidation from "@/registry/examples/input-group/input-group-validation";
 
+The input group wraps an input or textarea together with icons, text, or buttons as a single bordered control. Use it for search fields with a leading icon, password fields with a visibility toggle, inputs with unit suffixes, or any field that needs inline addons.
+
 ## Preview
 
 <ComponentPreview component="input-group" example="input-group-demo" />
@@ -22,6 +24,18 @@ import InputGroupValidation from "@/registry/examples/input-group/input-group-va
 ## Usage
 
 <ComponentUsage component="input-group" />
+
+## Composition
+
+```text
+InputGroup
+├── InputGroupInput      (or InputGroupTextarea)
+└── InputGroupAddon
+    ├── InputGroupButton
+    └── InputGroupText
+```
+
+Place one or more `InputGroupAddon` blocks alongside the input and position each with its `align` prop.
 
 ## Examples
 
@@ -59,9 +73,14 @@ Use `aria-invalid="true"` on the input to show error styling on the group.
 
 ### Elevated Variant
 
-On a Card, Dialog, or popover surface, the opaque `default` group collapses into its parent. Use `variant="elevated"` on `InputGroup` — the inner Input is transparent, so the container's variant controls the entire group's appearance. See the [Surfaces](/docs/getting-started/surfaces) docs.
+Use `variant="elevated"` on `InputGroup` so the group reads correctly on a Card, Dialog, or popover surface. The inner input is transparent, so the container's variant controls the whole group. See the [Surfaces](/docs/getting-started/surfaces) docs.
 
 <ComponentPreview component="input-group" example="input-group-elevated" />
+
+| Value      | Description                                                       |
+| ---------- | ----------------------------------------------------------------- |
+| `default`  | Opaque `bg-input` container for standard backgrounds.             |
+| `elevated` | Translucent `bg-input-elevated` container for layered surfaces.   |
 
 ## API Reference
 

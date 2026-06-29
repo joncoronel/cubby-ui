@@ -5,6 +5,13 @@ type: composable
 builtOn: ["dialog"]
 ---
 
+The command menu is a searchable list of actions and links, driven from the
+keyboard. Use it for a ⌘K palette, a quick switcher, or any
+search-then-select flow.
+
+For a simple dropdown of options bound to a form field, use
+[`Select`](/docs/components/select) instead.
+
 ## Preview
 
 <ComponentPreview component="command" example="command-basic-command-menu" />
@@ -17,29 +24,47 @@ builtOn: ["dialog"]
 
 <ComponentUsage component="command" />
 
+## Composition
+
+```text
+Command
+└── CommandContent
+    ├── CommandInput
+    └── CommandList
+        └── CommandGroup
+            ├── CommandGroupLabel
+            ├── CommandSeparator
+            └── CommandCollection
+                └── CommandItem
+                    └── CommandShortcut
+```
+
+Wrap the whole menu in `CommandDialog` to open it as a modal, and add
+`CommandFooter` below `CommandContent` for navigation hints.
+
 ## Examples
 
 ### Command Dialog
 
-Display command menu in a modal dialog with keyboard shortcut support.
+Wrap the menu in `CommandDialog` to open it as a ⌘K modal.
 
 <ComponentPreview component="command" example="command-command-dialog" />
 
 ### With Footer
 
-Add footer content with keyboard navigation hints.
+Use `CommandFooter` to show keyboard navigation hints below the list.
 
 <ComponentPreview component="command" example="command-with-footer" />
 
 ### Fuzzy Search
 
-Enable fuzzy matching for more flexible searching across multiple fields.
+Use `useFuzzyFilter` to match across multiple fields and tolerate typos.
 
 <ComponentPreview component="command" example="command-fuzzy" />
 
 ### Virtualized
 
-Use virtualization for large lists (100+ items) to maintain smooth performance. Only renders items visible in the viewport, dramatically reducing DOM nodes.
+Use `CommandVirtualizedList` for large lists (100+ items); it only renders the items in view.
 
 <ComponentPreview component="command" example="command-virtualized" />
 
@@ -51,7 +76,25 @@ Use virtualization for large lists (100+ items) to maintain smooth performance. 
 4. **Pass `virtualized` and `items` on Command** - Enables virtualized mode with your full item list.
 5. **Use `useHighlightHandler`** - Pass a `virtualizerRef` to the child and use `useHighlightHandler(virtualizerRef)` on the parent so keyboard navigation scrolls to the highlighted item.
 
-> **Manual filtering still works** — If you need custom filter logic (fuzzy search, server-side filtering), you can still compute `filteredItems` externally, pass `filter={null}` to `Command`, and spread `rootProps` from `useListVirtualizer`. See [useCommandFilter](#usecommandfilter).
+> **Manual filtering still works.** If you need custom filter logic (fuzzy search, server-side filtering), you can still compute `filteredItems` externally, pass `filter={null}` to `Command`, and spread `rootProps` from `useListVirtualizer`. See [useCommandFilter](#usecommandfilter).
+
+## Accessibility
+
+### Keyboard navigation
+
+The menu is operable entirely from the keyboard: type to filter, `↑`/`↓` to move
+between items, and `Enter` to select. `autoHighlight="always"` keeps an item
+highlighted at all times so `Enter` always has a target.
+
+### Label the input
+
+`CommandInput` is the search field. Give it a `placeholder`, and when the menu
+opens outside a labeled `CommandDialog`, add an `aria-label` so its purpose is
+announced.
+
+```tsx showLineNumbers
+<CommandInput placeholder="Search commands…" aria-label="Search commands" />
+```
 
 ## API Reference
 
@@ -104,7 +147,7 @@ Root component that manages command menu state and keyboard navigation. Wraps Ba
 </ApiProp>
 
 <ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
-  Shadow weight for the outer frame. The bg is pinned to `bg-muted` (gray frame) — only the shadow + rim track this prop.
+  Shadow weight for the outer frame. The bg is pinned to `bg-muted` (gray frame); only the shadow + rim track this prop.
 </ApiProp>
 
 </ApiPropsList>

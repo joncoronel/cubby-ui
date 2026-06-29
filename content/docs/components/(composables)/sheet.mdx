@@ -7,6 +7,8 @@ builtOn: ["dialog"]
 
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/registry/default/sheet/sheet";
 
+The sheet is a panel that slides in from a screen edge for navigation, forms, or supplementary content. Use it for a mobile nav menu, a side filter panel, a detail pane, or an action sheet. For a panel the user drags between snap-point heights, use [`Drawer`](/docs/components/drawer) instead.
+
 ## Preview
 
 <ComponentPreview component="sheet" example="sheet-basic" />
@@ -19,49 +21,76 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 
 <ComponentUsage component="sheet" />
 
+## Composition
+
+```text
+Sheet
+├── SheetTrigger
+└── SheetContent
+    ├── SheetHeader
+    │   ├── SheetTitle
+    │   └── SheetDescription
+    ├── SheetBody
+    └── SheetFooter
+        └── SheetClose
+```
+
+`SheetContent` composes the portal, viewport, and popup, and renders a backdrop when the sheet is modal. Use `SheetBody` for scrollable content.
+
 ## Examples
 
 ### Positions
 
-Open sheet from different screen edges.
+Use `side` on `SheetContent` to choose which edge the sheet slides in from.
 
 <ComponentPreview component="sheet" example="sheet-positions" />
 
+| Value      | Description                       |
+| ---------- | --------------------------------- |
+| `"right"`  | Slides in from the right (default). |
+| `"left"`   | Slides in from the left.          |
+| `"top"`    | Slides down from the top.         |
+| `"bottom"` | Slides up from the bottom.        |
+
 ### Floating Variant
 
-Use `variant="floating"` for a card-like appearance with rounded corners and margins from screen edges. Great for action sheets and share menus.
+Use `variant="floating"` for a card-like sheet with rounded corners and margins from the screen edges.
 
 <ComponentPreview component="sheet" example="sheet-variants" />
 
 ### With Form
 
-Include form elements within the sheet.
+Place form fields inside `SheetBody`, with actions in `SheetFooter`.
 
 <ComponentPreview component="sheet" example="sheet-with-form" />
 
 ### Nested Sheets
 
-Sheets can be nested within each other. When a nested sheet opens, the parent sheet scales down slightly and shifts away from its edge, revealing a sliver of it behind the nested sheet.
+Open a sheet from inside another; the parent scales down and shifts toward its edge behind the nested sheet.
 
 <ComponentPreview component="sheet" example="sheet-nested" />
 
 ### Inset Footer
 
-Use `footerVariant="inset"` to give the footer a muted background with a top border, visually separating it from the content.
+Use `footerVariant="inset"` to give the footer a muted background with a top border.
 
 <ComponentPreview component="sheet" example="sheet-inset-footer" />
 
 ### Detached Trigger
 
-Place the trigger outside of the Sheet component using `createSheetHandle()`.
+Use `createSheetHandle()` to place the trigger outside the `Sheet`.
 
 <ComponentPreview component="sheet" example="sheet-detached-trigger" />
 
 ### Non-Modal
 
-Pass `modal={false}` for a floating sheet that keeps the page interactive. The backdrop is hidden, pointer events pass through the empty area around the popup, and outside clicks don't dismiss the sheet.
+Pass `modal={false}` to keep the page interactive: the backdrop is hidden, pointer events pass through the empty area, and outside clicks don't dismiss the sheet.
 
 <ComponentPreview component="sheet" example="sheet-non-modal" />
+
+## Accessibility
+
+Include a `SheetTitle` inside every `SheetContent` so the dialog is named for assistive technology; add a `SheetDescription` when extra context helps. When a modal sheet opens, focus moves into it and is trapped until it closes, and the built-in close button is labeled for screen readers. With `modal={false}`, the page stays interactive and focus is not trapped, so make sure the sheet can still be closed from the keyboard.
 
 ## API Reference
 
@@ -73,7 +102,7 @@ For the complete Base UI API, see the [Base UI Dialog documentation](https://bas
 
 #### createSheetHandle
 
-Creates a handle that connects a sheet to one or more external `SheetTrigger` components. Useful when the triggers need to live outside the `Sheet` — for example, when each row in a list has its own trigger but they all share one sheet.
+Creates a handle that connects a sheet to one or more external `SheetTrigger` components. Useful when the triggers need to live outside the `Sheet`, for example when each row in a list has its own trigger but they all share one sheet.
 
 ```tsx
 import { createSheetHandle } from "@/registry/default/sheet/sheet";

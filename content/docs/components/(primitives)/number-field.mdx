@@ -14,6 +14,8 @@ import {
   NumberFieldScrubAreaCursor,
 } from "@/registry/default/number-field/number-field";
 
+A number field is a numeric input with increment and decrement buttons and an optional scrub area for dragging the value. Use it for bounded, steppable quantities like counts, prices, or percentages, where the value should stay numeric.
+
 ## Preview
 
 <ComponentPreview component="number-field" example="number-field-demo" />
@@ -26,35 +28,47 @@ import {
 
 <ComponentUsage component="number-field" />
 
+## Composition
+
+```text
+NumberField
+└── NumberFieldGroup
+    ├── NumberFieldDecrement
+    ├── NumberFieldInput
+    ├── NumberFieldIncrement
+    └── NumberFieldScrubArea
+        └── NumberFieldScrubAreaCursor
+```
+
 ## Examples
 
 ### Controlled
 
-Manage number field state externally.
+Use `value` and `onValueChange` on `NumberField` to drive the value yourself.
 
 <ComponentPreview component="number-field" example="number-field-controlled" />
 
 ### Min / Max
 
-Constrain the value within a range.
+Set `min` and `max` on `NumberField` to constrain the value to a range.
 
 <ComponentPreview component="number-field" example="number-field-min-max" />
 
 ### Formatted Display
 
-Format the value as currency, percentage, or other number formats.
+Pass `format` (an `Intl.NumberFormat` options object) to display the value as currency, a percentage, or another number format.
 
 <ComponentPreview component="number-field" example="number-field-format" />
 
 ### Scrub Area
 
-Click and drag to change the value interactively.
+Wrap a label in `NumberFieldScrubArea` to let the user drag horizontally to change the value.
 
 <ComponentPreview component="number-field" example="number-field-scrub-area" />
 
 ### Disabled
 
-Prevent interaction with disabled number fields.
+Set `disabled` on `NumberField` to prevent interaction.
 
 <ComponentPreview component="number-field" example="number-field-disabled" />
 
@@ -63,6 +77,11 @@ Prevent interaction with disabled number fields.
 On a Card, Dialog, or popover surface, the opaque `default` group collapses into its parent. Use `variant="elevated"` on `NumberFieldGroup` for a translucent overlay that adapts to the substrate. See the [Surfaces](/docs/getting-started/surfaces) docs.
 
 <ComponentPreview component="number-field" example="number-field-elevated" />
+
+| Variant    | Description                                                  |
+| ---------- | ----------------------------------------------------------- |
+| `default`  | Opaque `bg-input` group for page-level surfaces.            |
+| `elevated` | Translucent group for use inside Card, Dialog, or popover.  |
 
 ### Form Integration
 
@@ -101,7 +120,7 @@ Groups the input with increment and decrement buttons. Renders a `<div>` element
 
 #### NumberFieldInput
 
-The numeric input control. Renders an `<input>` element. Inherits its surface from `NumberFieldGroup` — no `variant` prop of its own.
+The numeric input control. Renders an `<input>` element. Inherits its surface from `NumberFieldGroup`, with no `variant` prop of its own.
 
 #### NumberFieldIncrement
 

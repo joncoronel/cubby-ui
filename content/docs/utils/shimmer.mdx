@@ -3,7 +3,7 @@ title: Shimmer
 description: A CSS utility that sweeps an animated highlight across text for live status and streaming states, with no component required.
 ---
 
-`shimmer` paints text with an animated highlight that loops across it — the canonical "Generating response…" / "Thinking…" affordance for streaming or in-progress states. It's pure CSS: the text is rendered with `background-clip: text` and a gradient highlight sweeps over it in a seamless loop.
+`shimmer` paints text with an animated highlight that loops across it: the canonical "Generating response…" / "Thinking…" affordance for streaming or in-progress states. It's pure CSS: the text is rendered with `background-clip: text` and a gradient highlight sweeps over it in a seamless loop.
 
 The highlight is derived from the element's own `currentColor` via [relative color syntax](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_colors/Relative_colors), so it adapts to any text color with no configuration, and brightens automatically in dark mode.
 
@@ -11,7 +11,7 @@ _Directly inspired by shadcn's [`shimmer`](https://ui.shadcn.com/docs/utils/shim
 
 <ComponentPreview component="shimmer" example="shimmer-demo" previewClassName="h-auto" />
 
-> Because the highlight **brightens** the text, the effect reads best on dimmed text such as `text-muted-foreground` — there's little headroom to brighten text that's already near-white (e.g. `text-foreground` in dark mode). This matches the typical use: a muted status line.
+> Because the highlight **brightens** the text, the effect reads best on dimmed text such as `text-muted-foreground`. There's little headroom to brighten text that's already near-white (e.g. `text-foreground` in dark mode). This matches the typical use: a muted status line.
 
 ## Installation
 
@@ -33,7 +33,7 @@ Add `shimmer` to any text element. The highlight is built from the text color, s
 <p className="shimmer text-muted-foreground">Generating response&hellip;</p>
 ```
 
-It composes with any component that renders text — for example, a status label inside a button or badge while an action is in flight.
+It composes with any component that renders text, for example a status label inside a button or badge while an action is in flight.
 
 ## Classes
 
@@ -52,7 +52,7 @@ Every variant tab below has a **Code** tab with the exact markup. Reference for 
 
 ## Color
 
-The highlight defaults to a derivative of the text color. Use `shimmer-color-<color>` to set it explicitly — it accepts theme colors (with an optional `/<opacity>` modifier) or any arbitrary value like `shimmer-color-[#22c55e]`.
+The highlight defaults to a derivative of the text color. Use `shimmer-color-<color>` to set it explicitly. It accepts theme colors (with an optional `/<opacity>` modifier) or any arbitrary value like `shimmer-color-[#22c55e]`.
 
 <ComponentPreview component="shimmer" example="shimmer-color" previewClassName="h-auto" />
 
@@ -64,7 +64,7 @@ Use `shimmer-duration-<ms>` to set how long one sweep takes, in milliseconds. Th
 
 ## Spread
 
-Use `shimmer-spread-<n>` to set the width of the highlight band on the spacing scale, or an arbitrary length like `shimmer-spread-[3rem]`. The default is `calc(3ch + 40px)` — a fixed base plus a `3ch` term that scales with the font size.
+Use `shimmer-spread-<n>` to set the width of the highlight band on the spacing scale, or an arbitrary length like `shimmer-spread-[3rem]`. The default is `calc(3ch + 40px)`: a fixed base plus a `3ch` term that scales with the font size.
 
 <ComponentPreview component="shimmer" example="shimmer-spread" previewClassName="h-auto" />
 
@@ -76,13 +76,13 @@ Use `shimmer-angle-<deg>` to set the tilt of the highlight band in degrees. The 
 
 ## Play Once
 
-Use `shimmer-once` for a single sweep instead of a loop — useful as a reveal when streaming completes. Pair it with `shimmer-duration-<ms>` to control how long the reveal takes. (Press **Replay** to see it again.)
+Use `shimmer-once` for a single sweep instead of a loop, useful as a reveal when streaming completes. Pair it with `shimmer-duration-<ms>` to control how long the reveal takes. (Press **Replay** to see it again.)
 
 <ComponentPreview component="shimmer" example="shimmer-once" previewClassName="h-auto" />
 
 ## Disabling
 
-Use `shimmer-none` to render the text normally. It works in any class order, so the typical use is responsive or stateful — shimmer while loading, solid once resolved:
+Use `shimmer-none` to render the text normally. It works in any class order, so the typical use is responsive or stateful: shimmer while loading, solid once resolved.
 
 <ComponentPreview component="shimmer" example="shimmer-none" previewClassName="h-auto" />
 
@@ -100,7 +100,7 @@ Use `shimmer-reverse` to sweep the highlight in the opposite direction. In RTL l
 
 ## Fallback & reduced motion
 
-The shimmer uses modern color features (relative color syntax and `color-mix()`), available in all current browsers. In older browsers without support the highlight is dropped and the text may render transparent — apply it conditionally with a `supports-*` variant if you target those:
+The shimmer uses modern color features (relative color syntax and `color-mix()`), available in all current browsers. In older browsers without support the highlight is dropped and the text may render transparent, so apply it conditionally with a `supports-*` variant if you target those:
 
 ```tsx
 <p className="supports-[color:oklch(from_white_l_c_h)]:shimmer">
@@ -108,4 +108,4 @@ The shimmer uses modern color features (relative color syntax and `color-mix()`)
 </p>
 ```
 
-When the user prefers reduced motion, the animation is disabled automatically and the text renders normally — nothing to configure.
+When the user prefers reduced motion, the animation is disabled automatically and the text renders normally, with nothing to configure.

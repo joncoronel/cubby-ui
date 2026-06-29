@@ -6,6 +6,8 @@ type: primitive
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/registry/default/avatar/avatar";
 
+An avatar shows a user's profile image, falling back to initials or an icon when the image is missing or fails to load. Use it in comment threads, member lists, navbars, and anywhere you identify a person or account.
+
 ## Preview
 
 <ComponentPreview component="avatar" example="avatar-basic" />
@@ -18,31 +20,56 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/registry/default/avatar/a
 
 <ComponentUsage component="avatar" />
 
+## Composition
+
+```text
+Avatar
+├── AvatarImage
+└── AvatarFallback
+```
+
 ## Examples
 
 ### Sizes
 
-Display avatars in different sizes.
+Use `size` to set the avatar's dimensions.
 
 <ComponentPreview component="avatar" example="avatar-sizes" />
 
+| Size | Description            |
+| ---- | ---------------------- |
+| `sm` | A compact avatar.      |
+| `md` | The default avatar.    |
+| `lg` | A larger avatar.       |
+
 ### Fallback
 
-Show fallback content when image fails to load.
+`AvatarFallback` renders when the image is missing or fails to load.
 
 <ComponentPreview component="avatar" example="avatar-fallback" />
 
 ### Avatar Group
 
-Display multiple avatars in a group layout.
+Overlap avatars to show a group of users compactly.
 
 <ComponentPreview component="avatar" example="avatar-group" />
 
 ### With Status Indicator
 
-Add online/offline status indicators to avatars.
+Overlay a dot on the avatar to show online or offline state.
 
 <ComponentPreview component="avatar" example="avatar-with-status-indicator" />
+
+## Accessibility
+
+Give `AvatarImage` an `alt` describing who it represents (typically the person's name). Provide an `AvatarFallback` so the avatar still conveys identity when the image fails to load.
+
+```tsx showLineNumbers
+<Avatar>
+  <AvatarImage src="/users/ada.jpg" alt="Ada Lovelace" />
+  <AvatarFallback>AL</AvatarFallback>
+</Avatar>
+```
 
 ## API Reference
 

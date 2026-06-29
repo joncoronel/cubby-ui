@@ -6,6 +6,8 @@ type: primitive
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/registry/default/popover/popover";
 
+A popover floats rich, interactive content next to a trigger. Use it for notification panels, quick forms, or detail cards; for a plain hover label, use [`Tooltip`](/docs/components/tooltip), and for picking from a list bound to a form field, use [`Select`](/docs/components/select).
+
 ## Preview
 
 <ComponentPreview component="popover" example="popover-demo" />
@@ -18,17 +20,29 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/registry/default/popo
 
 <ComponentUsage component="popover" />
 
+## Composition
+
+```text
+Popover
+├── PopoverTrigger
+└── PopoverContent
+    ├── PopoverTitle
+    └── PopoverDescription
+```
+
+`PopoverContent` composes the portal, positioner, popup, viewport, and optional arrow internally, so you place your content directly inside it.
+
 ## Examples
 
 ### Hover Trigger
 
-Open popover on hover instead of click using the `openOnHover` prop.
+Set `openOnHover` on `Popover` to open on hover instead of click.
 
 <ComponentPreview component="popover" example="popover-hover" />
 
 ### With Backdrop
 
-Add a backdrop overlay when popover is open for a modal-like experience.
+Render `PopoverBackdrop` for a dimmed overlay behind the open popover.
 
 <ComponentPreview component="popover" example="popover-with-backdrop" />
 
@@ -60,7 +74,7 @@ For the complete Base UI API, see the [Base UI Popover documentation](https://ba
 
 #### createPopoverHandle
 
-Creates a handle that connects a popover to one or more external `PopoverTrigger` components. Useful when the triggers need to live outside the `Popover` — for example, when each row in a list has its own trigger but they all share one popover.
+Creates a handle that connects a popover to one or more external `PopoverTrigger` components. Useful when the triggers need to live outside the `Popover`, for example when each row in a list has its own trigger but they all share one popover.
 
 ```tsx
 import { createPopoverHandle } from "@/registry/default/popover/popover";

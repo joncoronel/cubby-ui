@@ -14,6 +14,8 @@ import {
 } from "@/registry/default/card/card";
 import { Button } from "@/registry/default/button/button";
 
+The card groups related content on a single surface with optional header, body, and footer regions. Use it for dashboard tiles, list rows, article previews, or any self-contained block that needs its own elevation.
+
 ## Preview
 
 <ComponentPreview component="card" example="card-demo" />
@@ -26,19 +28,36 @@ import { Button } from "@/registry/default/button/button";
 
 <ComponentUsage component="card" />
 
+## Composition
+
+```text
+Card
+├── CardHeader
+│   ├── CardTitle
+│   ├── CardDescription
+│   └── CardAction
+├── CardContent
+└── CardFooter
+```
+
 ## Examples
 
 ### With Footer and Action
 
-Cards can include footers with buttons and header actions.
+Use `CardFooter` for actions below the content and `CardAction` to place a control in the header.
 
 <ComponentPreview component="card" example="card-article" />
 
 ### Variants
 
-The Card component supports different visual variants.
+Use `variant` to change how the card is framed.
 
 <ComponentPreview component="card" example="card-variant" />
+
+| Value     | Description                                                  |
+| --------- | ----------------------------------------------------------- |
+| `default` | A single elevated surface, the standard card.               |
+| `inset`   | A gray-framed outer with a lifted inner card.               |
 
 ## API Reference
 
@@ -60,16 +79,16 @@ Container component for grouping related content with optional header, body, and
 >
   Visual style variant of the card.
 
-  - `"default"` — a single elevated surface (the standard card).
-  - `"inset"` — a gray-framed outer with a lifted inner card. Reads as "a Default Card wrapped in a tray."
+  - `"default"`: a single elevated surface (the standard card).
+  - `"inset"`: a gray-framed outer with a lifted inner card. Reads as "a Default Card wrapped in a tray."
 </ApiProp>
 
 <ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
-  Surface elevation level for the card. See the [Surfaces](/docs/getting-started/surfaces) docs. For the `inset` variant, only the outer frame's shadow/rim tracks this prop — the gray-frame bg and the inner card's level are pinned for the visual idiom to hold.
+  Surface elevation level for the card. See the [Surfaces](/docs/getting-started/surfaces) docs. For the `inset` variant, only the outer frame's shadow/rim tracks this prop; the gray-frame bg and the inner card's level are pinned for the visual idiom to hold.
 </ApiProp>
 
 <ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="1">
-  Shadow weight. Defaults to `1` — a flat outlined card (rim only, no drop shadow). Matches the rest of the flat-card family (Table, DataTable, code-block, ComponentPreview).
+  Shadow weight. Defaults to `1`, a flat outlined card (rim only, no drop shadow). Matches the rest of the flat-card family (Table, DataTable, code-block, ComponentPreview).
 </ApiProp>
 
 </ApiPropsList>

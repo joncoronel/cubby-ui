@@ -4,7 +4,9 @@ description: Group multiple checkboxes with shared state management and layout o
 type: primitive
 ---
 
-import { CheckboxGroup, CheckboxGroupItem } from "@/registry/default/checkbox-group/checkbox-group";
+import { CheckboxGroup } from "@/registry/default/checkbox-group/checkbox-group";
+
+The checkbox group manages the shared state of several related [`Checkbox`](/docs/components/checkbox) controls and wires up a parent checkbox for select-all behavior. Use it for multi-select preference lists, permission sets, or any group where selections combine into one value.
 
 ## Preview
 
@@ -22,37 +24,37 @@ import { CheckboxGroup, CheckboxGroupItem } from "@/registry/default/checkbox-gr
 
 ### With Descriptions
 
-Add descriptive text to each option.
+Add a description below each option's label for extra context.
 
 <ComponentPreview component="checkbox-group" example="checkbox-group-with-descriptions" />
 
 ### Card Style
 
-Display checkboxes as selectable cards.
+Wrap each option in a bordered card to make the whole row clickable.
 
 <ComponentPreview component="checkbox-group" example="checkbox-group-cards" />
 
 ### Controlled
 
-Manage group state externally.
+Pass `value` and `onValueChange` to manage the selected values yourself.
 
 <ComponentPreview component="checkbox-group" example="checkbox-group-controlled" />
 
 ### Disabled Options
 
-Disable specific options within the group.
+Set `disabled` on an individual `Checkbox` to lock that option.
 
 <ComponentPreview component="checkbox-group" example="checkbox-group-disabled-options" />
 
 ### Parent Checkbox
 
-Control all checkboxes with a parent checkbox.
+Use a parent checkbox to toggle every option at once, with an indeterminate state for partial selections.
 
 <ComponentPreview component="checkbox-group" example="checkbox-group-parent" />
 
 ### Nested Groups
 
-Create hierarchical checkbox structures.
+Nest groups to build hierarchical, tree-like selections.
 
 <ComponentPreview component="checkbox-group" example="checkbox-group-nested" />
 

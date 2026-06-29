@@ -6,6 +6,8 @@ type: primitive
 
 import { Badge } from "@/registry/default/badge/badge";
 
+A badge is a small label for status, counts, or metadata. Use it to tag an item's state (`Active`, `Beta`, `Failed`), show a count, or annotate a row in a list or table.
+
 ## Preview
 
 <ComponentPreview component="badge" example="badge-default" />
@@ -22,18 +24,29 @@ import { Badge } from "@/registry/default/badge/badge";
 
 ### Variants
 
-Choose from multiple visual styles.
+Use `variant` to set the badge's color and meaning.
 
 <ComponentPreview component="badge" example="badge-variants" />
 
+| Variant     | Description                                  |
+| ----------- | -------------------------------------------- |
+| `default`   | Solid primary badge, the highest emphasis.   |
+| `neutral`   | Solid neutral badge with no brand color.     |
+| `outline`   | Bordered badge on the page background.       |
+| `secondary` | Lower-emphasis tinted badge.                 |
+| `success`   | Positive state such as completed or online.  |
+| `warning`   | Cautionary state that needs attention.       |
+| `info`      | Informational, non-urgent state.             |
+| `danger`    | Error or failed state.                       |
+
 ### Sizes
 
-Display badges in different sizes.
+Apply utility classes to adjust the badge's text size and padding.
 
 <ComponentPreview component="badge" example="badge-sizes" />
 
 ### With Icons
 
-Add icons to badges for visual context.
+Place an icon inside the badge to reinforce its meaning.
 
 <ComponentPreview component="badge" example="badge-with-icons" />

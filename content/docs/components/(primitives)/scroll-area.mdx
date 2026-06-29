@@ -6,6 +6,8 @@ type: primitive
 
 import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 
+The scroll area is a container with custom-styled scrollbars and optional edge fades. Use it for any overflowing region, like a sidebar, a chat log, or a long form, where the native scrollbar would look out of place.
+
 ## Preview
 
 <ComponentPreview component="scroll-area" example="scroll-area-vertical-scroll" />
@@ -22,11 +24,11 @@ import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 
 ### Fade Edges
 
-Use the `fadeEdges` prop to add a subtle fade effect at the edges. The fade appears when content is scrollable in that direction and uses CSS masks, so it works over any background.
+Use `fadeEdges` to add a CSS-mask fade at the edges that appears only where content is scrollable.
 
 <ComponentPreview component="scroll-area" example="scroll-area-scroll-fade" />
 
-The fade depth defaults to `min(12%, 2.5rem)` — 12% of the container, capped at `2.5rem` so tall scrollers stay subtle. Tune it per instance by setting the `--scroll-fade-size` CSS variable on `viewportClassName`:
+The fade depth defaults to `min(12%, 2.5rem)`, 12% of the container capped at `2.5rem` so tall scrollers stay subtle. Tune it per instance by setting the `--scroll-fade-size` CSS variable on `viewportClassName`:
 
 ```tsx
 <ScrollArea fadeEdges viewportClassName="[--scroll-fade-size:2rem]" />
@@ -40,35 +42,35 @@ With `nativeScroll`, the fade eases in and out over a fixed scroll distance (`6r
 
 ### Native Scroll Fade
 
-With `nativeScroll`, the fade is driven by CSS scroll-driven animations instead of Base UI's measured overflow. It eases in and out over a fixed scroll distance and falls back to a static fade where scroll-driven animations are unsupported.
+Add `nativeScroll` to drive the fade with CSS scroll-driven animations instead of Base UI's measured overflow, falling back to a static fade where unsupported.
 
 <ComponentPreview component="scroll-area" example="scroll-area-native-fade" />
 
 ### Scroll Fade Without the Component
 
-For a scroll container you didn't render with `ScrollArea` — a code block, a table wrapper, a third-party list — the same edge fade is available as a standalone CSS utility you can drop on any element with `overflow`. See [Scroll Fade](/docs/utils/scroll-fade).
+The same edge fade ships as a standalone CSS utility you can drop on any element with `overflow`, for scroll containers you didn't render with `ScrollArea` such as a code block, a table wrapper, or a third-party list. See [Scroll Fade](/docs/utils/scroll-fade).
 
 ### Scrollbar Gutter
 
-Use the `scrollbarGutter` prop to reserve space for the scrollbar when content overflows. This prevents layout shift when the scrollbar appears.
+Use `scrollbarGutter` to reserve space for the scrollbar so it doesn't shift the layout when it appears.
 
 <ComponentPreview component="scroll-area" example="scroll-area-scrollbar-gutter" />
 
 ### Persistent Scrollbar
 
-Use the `persistScrollbar` prop to always show the scrollbar instead of fading it in on hover or scroll.
+Use `persistScrollbar` to always show the scrollbar instead of fading it in on hover or scroll.
 
 <ComponentPreview component="scroll-area" example="scroll-area-persist-scrollbar" />
 
 ### Horizontal Scroll
 
-Enable horizontal scrolling for wide content.
+Let wide content scroll sideways instead of wrapping.
 
 <ComponentPreview component="scroll-area" example="scroll-area-horizontal-scroll" />
 
 ### Both Scrollbars
 
-When content overflows in both directions, both scrollbars appear automatically. The corner prevents them from intersecting.
+When content overflows in both directions, both scrollbars appear automatically and the corner keeps them from intersecting.
 
 <ComponentPreview component="scroll-area" example="scroll-area-both-scrollbars" />
 

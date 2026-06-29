@@ -6,6 +6,8 @@ type: primitive
 
 import { AspectRatio } from "@/registry/default/aspect-ratio/aspect-ratio";
 
+Aspect Ratio constrains its content to a fixed width-to-height ratio as the container resizes. Use it to reserve space for images, video embeds, and media cards so the layout doesn't shift while they load.
+
 ## Preview
 
 <ComponentPreview component="aspect-ratio" example="aspect-ratio-16-9-string" />
@@ -22,24 +24,24 @@ import { AspectRatio } from "@/registry/default/aspect-ratio/aspect-ratio";
 
 ### Square Ratio
 
-Create square containers with 1:1 aspect ratio.
+Set `ratio="1/1"` for a square container.
 
 <ComponentPreview component="aspect-ratio" example="aspect-ratio-square" />
 
 ### Portrait Orientation
 
-Use portrait aspect ratios for vertical content.
+Use a `ratio` below `1` (such as `3/4`) for taller-than-wide content.
 
 <ComponentPreview component="aspect-ratio" example="aspect-ratio-portrait-orientation" />
 
 ### Multiple Ratios
 
-Display content with different aspect ratios.
+Pass different `ratio` values to compare common aspect ratios side by side.
 
 <ComponentPreview component="aspect-ratio" example="aspect-ratio-multiple-ratios" />
 
 ### Video Embed
 
-Embed responsive videos with proper aspect ratio.
+Wrap an iframe in `ratio="16/9"` for a responsive video embed.
 
 <ComponentPreview component="aspect-ratio" example="aspect-ratio-video-embed" />

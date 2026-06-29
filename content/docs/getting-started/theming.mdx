@@ -472,7 +472,7 @@ Three tokens at the top of `:root` control the warmth of the entire neutral pale
 - `--neutral-chroma`: chroma for mid-tone neutrals. The default `0.004` is barely tinted.
 - `--neutral-chroma-low`: chroma for near-extreme L (very light / very dark). Kept lower because high chroma at the extremes looks garish.
 
-Change these to retune the whole stack — every neutral surface, foreground, and sidebar color references them. Try `--neutral-hue: 220` for a cooler blue tilt or `30` for a warm tan tilt.
+Change these to retune the whole stack. Every neutral surface, foreground, and sidebar color references them. Try `--neutral-hue: 220` for a cooler blue tilt or `30` for a warm tan tilt.
 
 ## Surface elevation system
 
@@ -494,8 +494,8 @@ For the full elevation system docs, see [Surfaces](/docs/getting-started/surface
 
 Form fields (Input, Textarea, Checkbox, Radio, etc.) use three dedicated tokens:
 
-- `--input`: Default bg — aliased to `--surface-3` so it matches Card surfaces
-- `--input-elevated`: Translucent overlay for the `elevated` variant — adapts to any substrate (use inside Cards, Dialogs, popovers)
+- `--input`: Default bg, aliased to `--surface-3` so it matches Card surfaces
+- `--input-elevated`: Translucent overlay for the `elevated` variant, adapts to any substrate (use inside Cards, Dialogs, popovers)
 
 See the [Forms](/docs/getting-started/forms) guide for when to use which variant.
 

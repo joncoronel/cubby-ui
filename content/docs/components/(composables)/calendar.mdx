@@ -6,6 +6,8 @@ type: composable
 
 import { Calendar } from "@/registry/default/calendar/calendar";
 
+The calendar displays a month grid for picking a single date, a range, or several dates. Use it inline for date entry or inside a popover for a date-picker field. It is built on React DayPicker, so all of its props pass through.
+
 ## Preview
 
 <ComponentPreview component="calendar" example="calendar-basic" />
@@ -20,32 +22,40 @@ import { Calendar } from "@/registry/default/calendar/calendar";
 
 ## Examples
 
+The `mode` prop sets what a click selects.
+
+| Value      | Description                          |
+| ---------- | ------------------------------------ |
+| `single`   | One date at a time.                  |
+| `range`    | A start and end date.                |
+| `multiple` | Any number of individual dates.      |
+
 ### Single Date Selection
 
-Select a single date from the calendar.
+Use `mode="single"` to pick one date.
 
 <ComponentPreview component="calendar" example="calendar-single-date-selection" />
 
 ### Date Range Selection
 
-Choose a start and end date for date ranges.
+Use `mode="range"` to pick a start and end date.
 
 <ComponentPreview component="calendar" example="calendar-date-range-selection" />
 
 ### Multiple Dates Selection
 
-Select multiple individual dates.
+Use `mode="multiple"` to pick several individual dates.
 
 <ComponentPreview component="calendar" example="calendar-multiple-dates-selection" />
 
 ### Disabled Dates
 
-Prevent selection of specific dates.
+Use the `disabled` prop to block specific dates from selection.
 
 <ComponentPreview component="calendar" example="calendar-disabled-dates" />
 
 ### With Footer
 
-Add custom footer content to the calendar.
+Pass a `footer` to render content below the grid.
 
 <ComponentPreview component="calendar" example="calendar-with-footer" />

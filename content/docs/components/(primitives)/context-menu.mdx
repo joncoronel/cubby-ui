@@ -6,6 +6,8 @@ type: primitive
 
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@/registry/default/context-menu/context-menu";
 
+The context menu opens on right-click and lists actions scoped to the element under the cursor. Use it for row actions in a table, canvas or editor commands, or any desktop-style secondary menu; for a button-triggered menu, use [`Dropdown Menu`](/docs/components/dropdown-menu) instead.
+
 ## Preview
 
 <ComponentPreview component="context-menu" example="context-menu-basic" />
@@ -18,23 +20,45 @@ import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } 
 
 <ComponentUsage component="context-menu" />
 
+## Composition
+
+```text
+ContextMenu
+├── ContextMenuTrigger
+└── ContextMenuContent
+    ├── ContextMenuLabel
+    ├── ContextMenuItem
+    ├── ContextMenuLinkItem
+    ├── ContextMenuCheckboxItem
+    ├── ContextMenuRadioGroup
+    │   └── ContextMenuRadioItem
+    ├── ContextMenuGroup
+    │   ├── ContextMenuGroupLabel
+    │   └── ContextMenuItem
+    ├── ContextMenuSeparator
+    ├── ContextMenuShortcut
+    └── ContextMenuSub
+        ├── ContextMenuSubTrigger
+        └── ContextMenuSubContent
+```
+
 ## Examples
 
 ### With Submenus
 
-Create nested menu structures.
+Nest a `ContextMenuSub` to open a second menu from a trigger item.
 
 <ComponentPreview component="context-menu" example="context-menu-with-submenus" />
 
 ### With Separators and Shortcuts
 
-Add separators and keyboard shortcuts.
+Use `ContextMenuSeparator` to divide groups and `ContextMenuShortcut` to show key hints.
 
 <ComponentPreview component="context-menu" example="context-menu-with-separators-and-shortcuts" />
 
 ### With Checkboxes and Radio Groups
 
-Include checkbox and radio group menu items.
+Use `ContextMenuCheckboxItem` for toggles and `ContextMenuRadioGroup` for single-choice options.
 
 <ComponentPreview component="context-menu" example="context-menu-with-checkboxes-and-radio-groups" />
 
@@ -89,6 +113,11 @@ Include checkbox and radio group menu items.
 </ApiProp>
 
 </ApiPropsList>
+
+| Value         | Description                                       |
+| ------------- | ------------------------------------------------ |
+| `default`     | A standard menu action.                          |
+| `destructive` | A dangerous action such as delete or remove.     |
 
 ### ContextMenuLinkItem
 
@@ -166,7 +195,7 @@ Menu item that renders as an anchor (`<a>`) for navigation links. Wraps Base UI'
 </ApiProp>
 
 <ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
-  Shadow weight. Kept at `3` — submenus are still small popups.
+  Shadow weight. Kept at `3` since submenus are still small popups.
 </ApiProp>
 
 </ApiPropsList>

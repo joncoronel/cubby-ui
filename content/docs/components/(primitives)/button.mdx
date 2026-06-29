@@ -6,6 +6,10 @@ type: primitive
 
 import { Button } from "@/registry/default/button/button";
 
+Buttons trigger an action or event: submitting a form, opening a dialog, or
+confirming a choice. Use them for in-page actions, not for navigation between
+pages.
+
 ## Preview
 
 <ComponentPreview component="button" example="button-demo" />
@@ -22,27 +26,58 @@ import { Button } from "@/registry/default/button/button";
 
 ### Variants
 
-The Button supports multiple visual variants for different use cases.
+Use `variant` to change the button's visual weight and color.
 
 <ComponentPreview component="button" example="button-variants" />
 
+| Variant            | Description                                              |
+| ------------------ | ------------------------------------------------------- |
+| `primary`          | The default, highest-emphasis action.                   |
+| `primary-soft`     | A tinted primary for a lower-emphasis branded action.   |
+| `neutral`          | A solid neutral action with no brand color.             |
+| `secondary`        | The standard lower-emphasis action.                     |
+| `outline`          | A bordered action for secondary actions.                |
+| `ghost`            | A borderless action for toolbars and dense UI.          |
+| `link`             | Renders as inline text, like a link.                    |
+| `destructive`      | A destructive action such as delete.                    |
+| `destructive-soft` | A tinted destructive for a lower-emphasis warning.      |
+
 ### Sizes
 
-Choose from multiple sizes to fit your design.
+Use `size` to set the button's height and padding.
 
 <ComponentPreview component="button" example="button-sizes" />
 
 ### With Icons
 
-Add icons to provide visual context.
+Use `leftSection` and `rightSection` to place an icon beside the label.
 
 <ComponentPreview component="button" example="button-with-icons" />
 
 ### As Link
 
-Use the `render` prop to render as a Next.js Link and set `nativeButton` to `false`.
+Use the `render` prop to render as a Next.js Link, and set `nativeButton` to `false`.
 
 <ComponentPreview component="button" example="button-with-link" />
+
+## Accessibility
+
+### Label icon-only buttons
+
+An icon-only button has no text for a screen reader to announce. Give it an
+`aria-label` describing the action.
+
+```tsx showLineNumbers
+<Button size="icon" aria-label="Delete item">
+  <TrashIcon />
+</Button>
+```
+
+### Loading state
+
+The `loading` prop disables the button but keeps it focusable
+(`focusableWhenDisabled`), so keyboard users don't lose their place while an
+action is in flight.
 
 ## API Reference
 
@@ -64,7 +99,7 @@ Clickable element that triggers actions. Wraps Base UI's `Button`.
   simpleType="string"
   defaultValue='"primary"'
 >
-  Visual style variant of the button. The `-soft` variants are tinted-background versions of their solid counterparts — useful for less-prominent CTAs that still need to read as branded or destructive. Custom prop not available in Base UI.
+  Visual style variant of the button. The `-soft` variants are tinted-background versions of their solid counterparts, for less-prominent CTAs that still need to read as branded or destructive. Custom prop not available in Base UI.
 </ApiProp>
 
 <ApiProp

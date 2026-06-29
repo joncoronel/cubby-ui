@@ -6,6 +6,10 @@ type: primitive
 
 import { AlertDialog, AlertDialogClose, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/registry/default/alert-dialog/alert-dialog";
 
+An alert dialog is a modal that interrupts the user to confirm a consequential action. Use it for destructive or irreversible choices such as deleting an account, where the user must explicitly confirm or cancel.
+
+For non-blocking dialogs the user can dismiss freely, use [`Dialog`](/docs/components/dialog) instead.
+
 ## Preview
 
 <ComponentPreview component="alert-dialog" example="alert-dialog-basic" />
@@ -18,23 +22,37 @@ import { AlertDialog, AlertDialogClose, AlertDialogContent, AlertDialogDescripti
 
 <ComponentUsage component="alert-dialog" />
 
+## Composition
+
+```text
+AlertDialog
+├── AlertDialogTrigger
+└── AlertDialogContent
+    ├── AlertDialogHeader
+    │   ├── AlertDialogTitle
+    │   └── AlertDialogDescription
+    ├── AlertDialogBody
+    └── AlertDialogFooter
+        └── AlertDialogClose
+```
+
 ## Examples
 
 ### Controlled
 
-Control the alert dialog open state programmatically.
+Use the `open` and `onOpenChange` props on `AlertDialog` to control the open state.
 
 <ComponentPreview component="alert-dialog" example="alert-dialog-controlled" />
 
 ### Nested
 
-Use nested alert dialogs for multi-step confirmations.
+Nest alert dialogs to chain multi-step confirmations.
 
 <ComponentPreview component="alert-dialog" example="alert-dialog-nested" />
 
 ### Detached Trigger
 
-Place the trigger outside of the AlertDialog component using `createAlertDialogHandle()`.
+Use `createAlertDialogHandle()` to drive one dialog from triggers rendered outside it.
 
 <ComponentPreview component="alert-dialog" example="alert-dialog-detached-trigger" />
 
@@ -48,7 +66,7 @@ For the complete Base UI API, see the [Base UI AlertDialog documentation](https:
 
 #### createAlertDialogHandle
 
-Creates a handle that connects an alert dialog to one or more external `AlertDialogTrigger` components. Useful when the triggers need to live outside the `AlertDialog` — for example, when each row in a list has its own delete button but they all share one confirmation dialog.
+Creates a handle that connects an alert dialog to one or more external `AlertDialogTrigger` components. Useful when the triggers need to live outside the `AlertDialog`, for example when each row in a list has its own delete button but they all share one confirmation dialog.
 
 ```tsx
 import { createAlertDialogHandle } from "@/registry/default/alert-dialog/alert-dialog";

@@ -4,7 +4,9 @@ description: Adjustable panels with draggable handles for flexible layouts
 type: composable
 ---
 
-import { Resizable, ResizableHandle, ResizablePanel } from "@/registry/default/resizable/resizable";
+import { ResizablePanelGroup, ResizableHandle, ResizablePanel } from "@/registry/default/resizable/resizable";
+
+Resizable splits a layout into panels separated by draggable handles, so users can size regions to taste. Use it for split editors, sidebars beside content, or any pane layout the user should control. It is built on react-resizable-panels.
 
 ## Preview
 
@@ -18,34 +20,54 @@ import { Resizable, ResizableHandle, ResizablePanel } from "@/registry/default/r
 
 <ComponentUsage component="resizable" />
 
+## Composition
+
+```text
+ResizablePanelGroup
+├── ResizablePanel
+├── ResizableHandle
+└── ResizablePanel
+```
+
+Set `direction` on `ResizablePanelGroup` to lay panels out horizontally or vertically, and place a `ResizableHandle` between each pair.
+
+| Value          | Description                              |
+| -------------- | ---------------------------------------- |
+| `horizontal`   | Panels sit side by side, drag left/right.|
+| `vertical`     | Panels stack, drag up/down.              |
+
 ## Examples
 
 ### Vertical Layout
 
-Stack resizable panels vertically.
+Set `direction="vertical"` on `ResizablePanelGroup` to stack panels.
 
 <ComponentPreview component="resizable" example="resizable-vertical" />
 
 ### Three Panels
 
-Create layouts with three resizable sections.
+Add more `ResizablePanel` and `ResizableHandle` pairs for additional sections.
 
 <ComponentPreview component="resizable" example="resizable-three-panels" />
 
 ### Min and Max Size
 
-Set minimum and maximum panel sizes.
+Use `minSize` and `maxSize` on `ResizablePanel` to clamp how far it can resize.
 
 <ComponentPreview component="resizable" example="resizable-min-max-size" />
 
 ### Custom Handle
 
-Use custom styled resize handles.
+Pass `withHandle` to `ResizableHandle` to render a visible drag grip.
 
 <ComponentPreview component="resizable" example="resizable-with-handle" />
 
 ### Nested Panels
 
-Create complex layouts with nested resizable panels.
+Nest a `ResizablePanelGroup` inside a `ResizablePanel` for grid-like layouts.
 
 <ComponentPreview component="resizable" example="resizable-nested" />
+
+## Accessibility
+
+`ResizableHandle` is keyboard operable: focus it and use the arrow keys to resize, with a focus ring on `:focus-visible`. The underlying separators expose the appropriate `role` and value attributes from react-resizable-panels.

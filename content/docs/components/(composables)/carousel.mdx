@@ -6,6 +6,8 @@ type: composable
 
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/registry/default/carousel/carousel";
 
+The carousel cycles through a set of slides one screen at a time, with previous and next controls. Use it for image galleries, feature highlights, or any horizontally or vertically scrollable strip of cards. It is built on Embla Carousel.
+
 ## Preview
 
 <ComponentPreview component="carousel" example="carousel-basic" />
@@ -18,22 +20,43 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 
 <ComponentUsage component="carousel" />
 
+## Composition
+
+```text
+Carousel
+├── CarouselContent
+│   └── CarouselItem
+├── CarouselPrevious
+└── CarouselNext
+```
+
+Set `orientation` on `Carousel` to scroll horizontally or vertically.
+
+| Value          | Description                            |
+| -------------- | -------------------------------------- |
+| `horizontal`   | Slides scroll left and right. Default. |
+| `vertical`     | Slides scroll up and down.             |
+
 ## Examples
 
 ### Image Carousel
 
-Display images in a sliding carousel.
+Place an image inside each `CarouselItem` for a gallery.
 
 <ComponentPreview component="carousel" example="carousel-image" />
 
 ### Multiple Items
 
-Show multiple items per view.
+Set `basis` on `CarouselItem` (for example `basis-1/2`) to show several slides at once.
 
 <ComponentPreview component="carousel" example="carousel-multiple-items" />
 
 ### Responsive Sizes
 
-Adjust carousel size based on viewport.
+Use responsive `basis` utilities to change how many slides show per breakpoint.
 
 <ComponentPreview component="carousel" example="carousel-responsive-sizes" />
+
+## Accessibility
+
+`CarouselPrevious` and `CarouselNext` carry visually hidden labels and disable themselves at the ends of the list. The carousel region also handles `ArrowLeft` and `ArrowRight` to move between slides when focused.

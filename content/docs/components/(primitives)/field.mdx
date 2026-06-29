@@ -14,6 +14,8 @@ import {
   FieldValidity,
 } from "@/registry/default/field/field";
 
+Wraps a single form control to give it an associated label, a description, and validation messages, all wired together for accessibility automatically. Reach for it around any input, select, checkbox, switch, or radio group that needs a label or error display. To group several fields under one legend, use [Fieldset](/docs/components/fieldset); to wrap and submit the whole form, use [Form](/docs/components/form).
+
 ## Preview
 
 <ComponentPreview component="field" example="field-demo" />
@@ -25,6 +27,19 @@ import {
 ## Usage
 
 <ComponentUsage component="field" />
+
+## Composition
+
+```text
+Field
+├── FieldLabel
+├── FieldControl
+├── FieldDescription
+├── FieldError
+│   └── FieldErrorSlot   (optional wrapper)
+├── FieldItem            (per option in a checkbox/radio group)
+└── FieldValidity        (render prop, no DOM)
+```
 
 ## Examples
 
@@ -98,7 +113,7 @@ Disable the entire field, cascading to all child components.
 
 ### Animating Error Visibility
 
-Wrap `FieldError` in `FieldErrorSlot` to smoothly animate the error's height and opacity on mount/unmount. When empty, the slot collapses to zero space - so you get the animation without extra gap in the layout when no error is present.
+Wrap `FieldError` in `FieldErrorSlot` to smoothly animate the error's height and opacity on mount/unmount. When empty, the slot collapses to zero space, so there is no extra gap in the layout when no error is present.
 
 <ComponentPreview component="field" example="field-with-error-slot" />
 
@@ -107,7 +122,7 @@ Wrap `FieldError` in `FieldErrorSlot` to smoothly animate the error's height and
 </Callout>
 
 <Callout type="warn">
-  Keep the slot in normal **block** flow. `interpolate-size` animates the slot's height from `0` to `auto`, but flex and grid items have an automatic `min-height: auto` that clamps them to their content's height — so the moment the error mounts the slot jumps straight to full height instead of animating. Don't put `display: flex`/`grid` on the `Field`; if you need to center or lay out the field's contents, wrap the inner controls (e.g. an OTP field) in their own flex container. If the slot genuinely must be a flex/grid item, give it `min-h-0` (`min-height: 0`) to remove the clamp.
+  Keep the slot in normal **block** flow. `interpolate-size` animates the slot's height from `0` to `auto`, but flex and grid items have an automatic `min-height: auto` that clamps them to their content's height, so the moment the error mounts the slot jumps straight to full height instead of animating. Don't put `display: flex`/`grid` on the `Field`; if you need to center or lay out the field's contents, wrap the inner controls (e.g. an OTP field) in their own flex container. If the slot genuinely must be a flex/grid item, give it `min-h-0` (`min-height: 0`) to remove the clamp.
 </Callout>
 
 ## API Reference
@@ -174,7 +189,7 @@ An accessible label automatically associated with the field control. Renders a `
 
 The form control to label and validate. Renders an `<input>` element. You can omit this and use any Base UI input component directly inside Field instead.
 
-`FieldControl` inherits its visual styling from the [Input](/docs/components/input) component (`inputVariants`). Changes to Input's variant styles propagate to every `FieldControl` — keep that in mind when customizing either.
+`FieldControl` inherits its visual styling from the [Input](/docs/components/input) component (`inputVariants`). Changes to Input's variant styles propagate to every `FieldControl`, so keep that in mind when customizing either.
 
 #### FieldDescription
 
@@ -196,7 +211,7 @@ An error message displayed when the field fails validation. Renders a `<div>` el
 
 Optional wrapper for `FieldError` that animates the error's height (via `interpolate-size`) and opacity on mount/unmount. When empty, uses a negative top margin to collapse to zero space, so there's no layout difference versus not using a slot at all. When switching between multiple match-specific `FieldError` components, the switch is instant (no cross-fade). Renders a `<div>` element.
 
-Assumes the parent `Field` uses the default `space-y-2` spacing. If you customize the Field's spacing, override the slot's margin classes to match. Keep the slot in block flow — flex/grid items have an automatic `min-height: auto` that clamps the slot to its content height and breaks the `interpolate-size` height tween (the error jumps instead of animating). Don't put `display: flex`/`grid` on the `Field`; if the slot must be a flex/grid item, add `min-h-0` to it.
+Assumes the parent `Field` uses the default `space-y-2` spacing. If you customize the Field's spacing, override the slot's margin classes to match. Keep the slot in block flow: flex/grid items have an automatic `min-height: auto` that clamps the slot to its content height and breaks the `interpolate-size` height tween (the error jumps instead of animating). Don't put `display: flex`/`grid` on the `Field`; if the slot must be a flex/grid item, add `min-h-0` to it.
 
 #### FieldItem
 

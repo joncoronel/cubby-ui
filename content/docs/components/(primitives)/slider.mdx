@@ -6,6 +6,8 @@ type: primitive
 
 import { Slider } from "@/registry/default/slider/slider";
 
+The slider lets users pick a value, or a range, by dragging a thumb along a track. Use it for volume, brightness, price ranges, and other continuous settings where quick adjustment matters more than typing an exact number.
+
 ## Preview
 
 <ComponentPreview component="slider" example="slider-basic" />
@@ -18,9 +20,15 @@ import { Slider } from "@/registry/default/slider/slider";
 
 <ComponentUsage component="slider" />
 
-### Children Layout
+## Composition
 
-Children render **above** the track, not below. This enables the common pattern of a header row (`SliderLabel` + `SliderValue` side by side) sitting directly above the slider control:
+```text
+Slider
+├── SliderLabel
+└── SliderValue
+```
+
+`SliderLabel` and `SliderValue` are optional children that render **above** the track, so a header row (the label and value side by side) sits directly above the slider control:
 
 ```tsx
 <Slider defaultValue={[50]}>
@@ -31,63 +39,82 @@ Children render **above** the track, not below. This enables the common pattern 
 </Slider>
 ```
 
-If you want content *below* the track, render it as a sibling of the `Slider` instead of a child — for example, a `<FieldDescription>` inside the enclosing `<Field>`.
+For content *below* the track, render it as a sibling of `Slider` rather than a child (for example, a `<FieldDescription>` inside the enclosing `<Field>`).
 
 ## Examples
 
 ### Controlled
 
-Manage slider state externally.
+Use `value` and `onValueChange` to control the slider state.
 
 <ComponentPreview component="slider" example="slider-controlled" />
 
 ### Range Slider
 
-Select a range with two handles.
+Pass an array value to render two thumbs and select a range.
 
 <ComponentPreview component="slider" example="slider-range" />
 
 ### With Steps
 
-Snap to discrete step values.
+Use `step` to snap to discrete values, and `showSteps` to mark them on the track.
 
 <ComponentPreview component="slider" example="slider-with-steps" />
 
 ### With Value Display
 
-Show the current value alongside the slider.
+Add `SliderValue` to show the current value beside the slider.
 
 <ComponentPreview component="slider" example="slider-with-value" />
 
 ### Vertical Orientation
 
-Display slider vertically.
+Set `orientation="vertical"` to lay the slider out vertically.
 
 <ComponentPreview component="slider" example="slider-vertical" />
 
 ### Variants
 
-Apply different visual styles.
+Use `variant` to change the slider's visual style.
 
 <ComponentPreview component="slider" example="slider-variant" />
 
+| Variant       | Description                                          |
+| ------------- | --------------------------------------------------- |
+| `default`     | A round thumb centered on the track.                |
+| `contained`   | The thumb aligns to the track edges at min and max. |
+| `squareThumb` | A square thumb in place of the round default.       |
+
 ### With Reference Scale
 
-Render annotations (like a reference scale) as a sibling of `Slider` — content outside the `Slider` root doesn't need the slider's context, so it avoids the label/value composition rules. A `SliderLabel` child keeps the visible label above the track.
+Render annotations like a reference scale as a sibling of `Slider`. Content outside the `Slider` root doesn't need slider context, so it skips the label/value composition rules; a `SliderLabel` child still keeps the visible label above the track.
 
 <ComponentPreview component="slider" example="slider-with-scale" />
 
 ### Disabled State
 
-Prevent interaction with disabled slider.
+Set `disabled` to prevent interaction.
 
 <ComponentPreview component="slider" example="slider-disabled-state" />
 
 ### Form Integration
 
-Slider works with two submission flows. With Base UI's `onFormSubmit`, values come from registered [Field](/docs/components/field)s — wrap each slider in `<Field name="...">` (and compose with [Fieldset](/docs/components/fieldset) for multi-thumb groups so each thumb keeps its own `aria-label` under a shared legend). With a native `onSubmit`, Slider's hidden input makes `name` sufficient on its own. The example below shows both. See the [Forms guide](/docs/getting-started/forms) for more patterns.
+Slider works with two submission flows. With Base UI's `onFormSubmit`, values come from registered [Field](/docs/components/field)s, so wrap each slider in `<Field name="...">` (and compose with [Fieldset](/docs/components/fieldset) for multi-thumb groups so each thumb keeps its own `aria-label` under a shared legend). With a native `onSubmit`, Slider's hidden input makes `name` sufficient on its own. The example below shows both. See the [Forms guide](/docs/getting-started/forms) for more patterns.
 
 <ComponentPreview component="slider" example="slider-field" />
+
+## Accessibility
+
+The slider is operable from the keyboard: focus a thumb, then use the arrow keys to adjust by `step`, `Home`/`End` to jump to the min and max, and `PageUp`/`PageDown` for larger increments.
+
+Give the slider an accessible name when there is no visible `SliderLabel`. For a range slider, use `getAriaLabel` so each thumb gets its own label.
+
+```tsx showLineNumbers
+<Slider
+  defaultValue={[20, 60]}
+  getAriaLabel={(index) => (index === 0 ? "Minimum price" : "Maximum price")}
+/>
+```
 
 ## API Reference
 

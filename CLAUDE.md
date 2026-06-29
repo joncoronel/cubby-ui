@@ -196,6 +196,7 @@ For deeper context on specific areas, read these files:
 | `MDX_DOCUMENTATION.md`       | MDX components, server-side highlighting, search system                   |
 | `CODE_STANDARDS.md`          | Comprehensive code quality rules, async patterns, security, performance   |
 | `API_REFERENCE_GUIDE.md`     | Writing API reference sections in component docs                          |
+| `DOC_WRITING_GUIDE.md`       | Writing/structuring doc pages: voice, lede, conditional sections          |
 | `WEB_INTERFACE_STANDARDS.md` | UI/UX guidelines, animations, touch interactions, accessibility           |
 
 **Read `REGISTRY_SYSTEM.md` when:**
@@ -212,3 +213,7 @@ For deeper context on specific areas, read these files:
 
 - Adding/modifying MDX documentation components
 - Working with the search system
+
+**Read `DOC_WRITING_GUIDE.md` when:**
+
+- Writing or editing any `content/docs/**` MDX page (voice, lede, section order, conditional sections)

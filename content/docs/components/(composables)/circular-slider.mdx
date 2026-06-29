@@ -4,6 +4,8 @@ description: A radial slider component for selecting values along a circular pat
 type: composable
 ---
 
+The circular slider selects a numeric value by dragging a thumb around a ring. Use it for radial inputs like timers, volume or brightness knobs, temperature dials, and color or angle pickers.
+
 ## Preview
 
 <ComponentPreview component="circular-slider" example="circular-slider-basic" />
@@ -16,11 +18,22 @@ type: composable
 
 <ComponentUsage component="circular-slider" />
 
+## Composition
+
+```text
+CircularSliderRoot
+├── CircularSliderTrack
+├── CircularSliderIndicator
+├── CircularSliderThumb
+├── CircularSliderValue
+└── CircularSliderMarkers
+```
+
 ## Examples
 
 ### With Value Display
 
-Display the current value in the center of the slider.
+Add `CircularSliderValue` to render the current value in the center.
 
 <ComponentPreview
   component="circular-slider"
@@ -29,22 +42,27 @@ Display the current value in the center of the slider.
 
 ### Sizes
 
-Configure the slider size and independently control track, indicator, and thumb dimensions.
+Set `size` on the root and `strokeWidth` or thumb `size` on the parts to scale each dimension independently.
 
 <ComponentPreview component="circular-slider" example="circular-slider-sizes" />
 
 ### Variants
 
-Choose between a classic ring style or a filled circle with a radial indicator.
+Use `variant` to switch between a ring and a filled circle with a radial indicator.
 
 <ComponentPreview
   component="circular-slider"
   example="circular-slider-variants"
 />
 
+| Value     | Description                                          |
+| --------- | --------------------------------------------------- |
+| `default` | A ring track with a circular thumb. Default.        |
+| `filled`  | A filled circle with a radial indicator line.       |
+
 ### Format Value
 
-Customize the displayed value with custom formatting like units or symbols.
+Pass `formatValue` to `CircularSliderValue` to append units or symbols to the displayed value.
 
 <ComponentPreview
   component="circular-slider"
@@ -53,7 +71,7 @@ Customize the displayed value with custom formatting like units or symbols.
 
 ### With Markers
 
-Add visual markers around the circle for better value indication.
+Add `CircularSliderMarkers` to draw evenly-spaced tick marks around the circle.
 
 <ComponentPreview
   component="circular-slider"
@@ -62,16 +80,21 @@ Add visual markers around the circle for better value indication.
 
 ### Direction
 
-Control the direction of value progression around the circle.
+Use `direction` to set which way the value progresses around the circle.
 
 <ComponentPreview
   component="circular-slider"
   example="circular-slider-counterclockwise"
 />
 
+| Value              | Description                            |
+| ------------------ | -------------------------------------- |
+| `clockwise`        | Value increases clockwise. Default.    |
+| `counterclockwise` | Value increases counterclockwise.      |
+
 ### Non-Continuous Mode
 
-Disable continuous mode to show a visual gap and prevent wrapping from max to min.
+Set `continuous={false}` to show a gap at the bottom and stop the value from wrapping between max and min.
 
 <ComponentPreview
   component="circular-slider"
@@ -80,12 +103,28 @@ Disable continuous mode to show a visual gap and prevent wrapping from max to mi
 
 ### Custom Start Angle
 
-Configure where the slider starts on the circle.
+Use `startAngle` to set where the value scale begins on the circle.
 
 <ComponentPreview
   component="circular-slider"
   example="circular-slider-custom-start"
 />
+
+## Accessibility
+
+The slider renders a visually hidden native `<input type="range">` that owns focus, value semantics, and form integration, so screen readers announce it as a slider. Set `aria-label` (or `aria-labelledby`) on `CircularSliderRoot` to name it, and pass `aria-valuetext` to announce a formatted value instead of the raw number.
+
+### Keyboard
+
+When the slider is focused, the native range input handles arrow keys, `Home`, and `End`. `Page Up` and `Page Down` move by `largeStep`.
+
+| Key                   | Action                                  |
+| --------------------- | --------------------------------------- |
+| `↑` / `→`             | Increase by `step`.                     |
+| `↓` / `←`             | Decrease by `step`.                     |
+| `Page Up`             | Increase by `largeStep`.                |
+| `Page Down`           | Decrease by `largeStep`.                |
+| `Home` / `End`        | Jump to `min` / `max`.                  |
 
 ## API Reference
 

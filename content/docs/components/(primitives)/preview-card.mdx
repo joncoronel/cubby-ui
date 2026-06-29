@@ -6,6 +6,8 @@ type: primitive
 
 import { PreviewCard } from "@/registry/default/preview-card/preview-card";
 
+A preview card reveals a floating panel of supplementary content when the user hovers or focuses a trigger. Use it for link previews, profile cards, or any rich hover tooltip; for plain text on hover, use [`Tooltip`](/docs/components/tooltip) instead.
+
 ## Preview
 
 <ComponentPreview component="preview-card" example="preview-card-basic" />
@@ -18,29 +20,39 @@ import { PreviewCard } from "@/registry/default/preview-card/preview-card";
 
 <ComponentUsage component="preview-card" />
 
+## Composition
+
+```text
+PreviewCard
+├── PreviewCardTrigger
+└── PreviewCardContent
+```
+
+`PreviewCardContent` composes the portal, positioner, popup, and arrow internally. Set `arrow={false}` to hide the pointer.
+
 ## Examples
 
 ### Simple
 
-Minimal preview card with basic content.
+A minimal card with text content.
 
 <ComponentPreview component="preview-card" example="preview-card-simple" />
 
 ### Product Preview
 
-Display product information in preview card.
+Render rich content like an image and price inside `PreviewCardContent`.
 
 <ComponentPreview component="preview-card" example="preview-card-product" />
 
 ### Text Trigger
 
-Trigger preview from inline text.
+Wrap an inline `<span>` in `PreviewCardTrigger` to anchor the card to text.
 
 <ComponentPreview component="preview-card" example="preview-card-text-trigger" />
 
 ### Inline (wrapping text)
 
-When the trigger is a phrase inside a paragraph that wraps across lines, the card anchors to the specific line box under the pointer rather than the full multi-line bounding box. Hover near the start of the phrase and the card points there; hover where it wraps to the next line and the card follows. This works automatically with no extra props.
+When the trigger phrase wraps across lines, the card anchors to the line box under the pointer rather than the full bounding box, and it works with no extra props.
 
 <ComponentPreview component="preview-card" example="preview-card-inline" />
 

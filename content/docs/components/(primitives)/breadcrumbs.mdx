@@ -4,7 +4,9 @@ description: Navigation component that shows the current location within a hiera
 type: primitive
 ---
 
-import { Breadcrumbs, BreadcrumbsItem, BreadcrumbsSeparator } from "@/registry/default/breadcrumbs/breadcrumbs";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbSeparator } from "@/registry/default/breadcrumbs/breadcrumbs";
+
+Breadcrumbs show where the current page sits in a site's hierarchy and let users jump back to any ancestor. Use them on deep, nested routes such as docs sections, dashboards, or file paths.
 
 ## Preview
 
@@ -18,46 +20,68 @@ import { Breadcrumbs, BreadcrumbsItem, BreadcrumbsSeparator } from "@/registry/d
 
 <ComponentUsage component="breadcrumbs" />
 
+## Composition
+
+```text
+Breadcrumb
+└── BreadcrumbList
+    ├── BreadcrumbItem
+    │   ├── BreadcrumbLink
+    │   └── BreadcrumbPage
+    ├── BreadcrumbSeparator
+    └── BreadcrumbEllipsis
+```
+
 ## Examples
 
 ### Size Variants
 
-Display breadcrumbs in different sizes.
+Use `size` on `Breadcrumb` to scale the text and spacing.
 
 <ComponentPreview component="breadcrumbs" example="breadcrumbs-size-variants" />
 
+| Size | Description           |
+| ---- | --------------------- |
+| `sm` | A compact breadcrumb. |
+| `md` | The default size.     |
+| `lg` | A larger breadcrumb.  |
+
 ### Custom Separator
 
-Use custom separator elements between items.
+Pass children to `BreadcrumbSeparator` to replace the default chevron.
 
 <ComponentPreview component="breadcrumbs" example="breadcrumbs-custom-separator" />
 
 ### Custom Separator with Prop
 
-Set custom separator via component prop.
+Use the `separator` prop on `BreadcrumbSeparator` to set the divider element.
 
 <ComponentPreview component="breadcrumbs" example="breadcrumbs-custom-separator-with-prop" />
 
 ### With Icons
 
-Add icons to breadcrumb items for context.
+Place an icon inside `BreadcrumbLink` to add context to an item.
 
 <ComponentPreview component="breadcrumbs" example="breadcrumbs-with-icons" />
 
 ### With Ellipsis
 
-Collapse long paths with ellipsis.
+Use `BreadcrumbEllipsis` to collapse the middle of a long path.
 
 <ComponentPreview component="breadcrumbs" example="breadcrumbs-with-ellipsis-for-long-paths" />
 
 ### With Next.js Link
 
-Integrate with Next.js Link component.
+Use the `render` prop on `BreadcrumbLink` to render a Next.js `Link`.
 
 <ComponentPreview component="breadcrumbs" example="breadcrumbs-with-next-js-link" />
 
 ### With Accessibility Features
 
-Enhanced accessibility with ARIA attributes.
+Add `aria-label` to items and the nav to clarify the trail for assistive tech.
 
 <ComponentPreview component="breadcrumbs" example="breadcrumbs-with-accessibility-features" />
+
+## Accessibility
+
+The `Breadcrumb` nav defaults to `aria-label="breadcrumb"`, and `BreadcrumbPage` sets `aria-current="page"` to mark the active location. Separators are hidden from assistive tech with `aria-hidden`, and `BreadcrumbEllipsis` exposes a screen-reader label ("More pages" by default) for the collapsed items.

@@ -6,6 +6,8 @@ type: primitive
 
 import { Toolbar, ToolbarButton, ToolbarSeparator } from "@/registry/default/toolbar/toolbar";
 
+A toolbar groups related buttons, links, and inputs into a single horizontal or vertical strip with arrow-key navigation between its controls. Use it for a formatting bar, a media player's transport controls, or any cluster of actions that act on the same context.
+
 ## Preview
 
 <ComponentPreview component="toolbar" example="toolbar-basic" />
@@ -18,13 +20,42 @@ import { Toolbar, ToolbarButton, ToolbarSeparator } from "@/registry/default/too
 
 <ComponentUsage component="toolbar" />
 
+## Composition
+
+```text
+Toolbar
+├── ToolbarGroup
+│   └── ToolbarButton
+├── ToolbarSeparator
+├── ToolbarInput
+└── ToolbarLink
+```
+
+Wrap related buttons in `ToolbarGroup` to keep them visually clustered, and use `ToolbarSeparator` to divide groups. `ToolbarButton` defaults to the `ghost` button variant.
+
 ## Examples
 
 ### With Input
 
-Include input fields within the toolbar.
+Use `ToolbarInput` to place a text field inline with the toolbar's buttons.
 
 <ComponentPreview component="toolbar" example="toolbar-with-input" />
+
+## Accessibility
+
+### Keyboard navigation
+
+The toolbar manages a single tab stop with a roving tabindex: `Tab` moves focus into and out of the whole toolbar, and the arrow keys move between controls inside it. Match the arrow direction to the layout by setting `orientation` to `"horizontal"` or `"vertical"`.
+
+### Label icon-only buttons
+
+A `ToolbarButton` with only an icon has no text for a screen reader to announce. Give it an `aria-label` describing the action.
+
+```tsx showLineNumbers
+<ToolbarButton aria-label="Bold">
+  <BoldIcon />
+</ToolbarButton>
+```
 
 ## API Reference
 

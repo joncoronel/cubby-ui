@@ -6,6 +6,8 @@ type: primitive
 
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } from "@/registry/default/menubar/menubar";
 
+A horizontal bar of top-level menus, like the File / Edit / View bar in a desktop app. Use it for application-style command surfaces where several menus sit side by side and moving between them keeps the next menu open. For a single menu opened from one button, use [Dropdown Menu](/docs/components/dropdown-menu) instead.
+
 ## Preview
 
 <ComponentPreview component="menubar" example="menubar-basic" />
@@ -18,6 +20,27 @@ import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } fro
 
 <ComponentUsage component="menubar" />
 
+## Composition
+
+```text
+Menubar
+└── MenubarMenu          (one per top-level menu)
+    ├── MenubarTrigger
+    └── MenubarContent
+        ├── MenubarGroup
+        ├── MenubarLabel
+        ├── MenubarItem
+        ├── MenubarLinkItem
+        ├── MenubarCheckboxItem
+        ├── MenubarRadioGroup
+        │   └── MenubarRadioItem
+        ├── MenubarShortcut   (inside an item)
+        ├── MenubarSeparator
+        └── MenubarSub
+            ├── MenubarSubTrigger
+            └── MenubarSubContent
+```
+
 ## API Reference
 
 The Menubar component is built on top of [Base UI's Menubar](https://base-ui.com/react/components/menubar). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
@@ -28,12 +51,12 @@ For the complete Base UI API, see the [Base UI Menubar documentation](https://ba
 
 #### Menubar
 
-The bar element itself is a subtle inline toolbar — it sits visibly elevated above the page.
+The bar element itself is a subtle inline toolbar that sits visibly elevated above the page.
 
 <ApiPropsList>
 
 <ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="2">
-  Surface elevation level for the bar. Defaults to `2` — a subtle toolbar that lifts gently from the page. See the [Surfaces](/docs/getting-started/surfaces) docs.
+  Surface elevation level for the bar. Defaults to `2`, a subtle toolbar that lifts gently from the page. See the [Surfaces](/docs/getting-started/surfaces) docs.
 </ApiProp>
 
 <ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="2">
@@ -90,7 +113,7 @@ The bar element itself is a subtle inline toolbar — it sits visibly elevated a
 </ApiProp>
 
 <ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
-  Shadow weight. Kept at `3` — submenus are still small popups.
+  Shadow weight. Kept at `3`, since submenus are still small popups.
 </ApiProp>
 
 </ApiPropsList>

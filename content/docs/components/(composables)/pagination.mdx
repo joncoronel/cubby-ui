@@ -7,6 +7,8 @@ builtOn: ["button"]
 
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/registry/default/pagination/pagination";
 
+Pagination splits long content into numbered pages with previous and next controls. Use it for search results, tables, or any list too long for a single view. It renders links, so wire each `PaginationLink` to your own page state or route.
+
 ## Preview
 
 <ComponentPreview component="pagination" example="pagination-basic-pagination" />
@@ -19,22 +21,40 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 
 <ComponentUsage component="pagination" />
 
+## Composition
+
+```text
+Pagination
+└── PaginationContent
+    └── PaginationItem
+        ├── PaginationPrevious
+        ├── PaginationLink
+        ├── PaginationEllipsis
+        └── PaginationNext
+```
+
+Mark the current page with `isActive` on its `PaginationLink`, and use `isDisabled` to gray out unavailable controls.
+
 ## Examples
 
 ### Interactive
 
-Full-featured pagination with state management.
+Drive the active page from state and update it from each `PaginationLink`.
 
 <ComponentPreview component="pagination" example="pagination-interactive-pagination" />
 
 ### With Ellipsis
 
-Compact pagination for many pages using ellipsis.
+Use `PaginationEllipsis` to collapse skipped page ranges when there are many pages.
 
 <ComponentPreview component="pagination" example="pagination-with-ellipsis" />
 
 ### Minimal
 
-Simplified pagination with just prev/next controls.
+Drop the numbered links to leave only `PaginationPrevious` and `PaginationNext`.
 
 <ComponentPreview component="pagination" example="pagination-minimal-pagination" />
+
+## Accessibility
+
+The `Pagination` root is a labeled `nav` landmark. `PaginationLink` sets `aria-current="page"` when `isActive`, and `PaginationEllipsis` is hidden from assistive tech with a visually hidden "More pages" label.

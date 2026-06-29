@@ -6,6 +6,8 @@ type: composable
 
 import { MarchingBorder } from "@/registry/default/marching-border/marching-border";
 
+`MarchingBorder` is an animated dashed border overlay that conforms to its parent's corner radius. Use it to signal edit states, pending changes, or drag-over targets without shifting layout, since it sits outside the parent's box model.
+
 ## Preview
 
 <ComponentPreview component="marching-border" example="marching-border-basic" />
@@ -26,13 +28,13 @@ The stroke uses `currentColor`, so set the color the same way you'd set text col
 
 ### Variants
 
-`dash` and `gap` are percentages of the perimeter, so the pattern tiles evenly at any size. Adjust `dash`, `gap`, `strokeWidth`, and `duration` to taste.
+Adjust `dash`, `gap`, `strokeWidth`, and `duration` to tune the pattern; `dash` and `gap` are percentages of the perimeter, so it tiles evenly at any size.
 
 <ComponentPreview component="marching-border" example="marching-border-variants" />
 
 ### Overriding the radius
 
-The overlay uses `border-radius: inherit` by default, so it copies the parent's corners. It reads its own computed `border-radius`, so any way of setting one works: a utility class, an inline `style`, or plain CSS. Set a radius on the overlay itself when it should differ from the parent, or when the parent has none (a `<canvas>`, a square panel). Leave it alone and it matches the parent, square corners included.
+Set a `border-radius` on the overlay itself when it should differ from the parent, or when the parent has none (a `canvas`, a square panel); by default it inherits the parent's corners.
 
 <ComponentPreview component="marching-border" example="marching-border-explicit-radius" />
 

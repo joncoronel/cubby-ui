@@ -18,6 +18,8 @@ import {
   BaseDrawerTrigger,
 } from "@/registry/default/base-drawer/base-drawer";
 
+Base Drawer is a panel that slides in from a screen edge and responds to swipe gestures, with support for snap points, nested stacking, and an indent effect on the background. Use it for mobile-first navigation, filters, or detail panels where dragging to dismiss feels natural.
+
 ## Preview
 
 <ComponentPreview component="base-drawer" example="base-drawer-basic" />
@@ -30,47 +32,69 @@ import {
 
 <ComponentUsage component="base-drawer" />
 
+## Composition
+
+```text
+BaseDrawer
+├── BaseDrawerTrigger
+└── BaseDrawerPopup
+    ├── BaseDrawerBar
+    ├── BaseDrawerHeader
+    │   ├── BaseDrawerTitle
+    │   └── BaseDrawerDescription
+    ├── BaseDrawerPanel
+    └── BaseDrawerFooter
+        └── BaseDrawerClose
+```
+
 ## Examples
 
 ### Side Drawer
 
-Use `position="right"` to create a side drawer.
+Use `position="right"` to slide the drawer in from the side.
 
 <ComponentPreview component="base-drawer" example="base-drawer-side" />
 
 ### Directions
 
-Open drawers from any screen edge using the `position` prop.
+Use `position` to open the drawer from any screen edge.
 
 <ComponentPreview component="base-drawer" example="base-drawer-directions" />
 
+| Position | Description                          |
+| -------- | ------------------------------------ |
+| `bottom` | Slides up from the bottom (default). |
+| `top`    | Slides down from the top.            |
+| `left`   | Slides in from the left.             |
+| `right`  | Slides in from the right.            |
+
 ### Controlled
 
-Use the `open` and `onOpenChange` props to control the drawer's open state externally.
+Use the `open` and `onOpenChange` props on `BaseDrawer` to control the open state.
 
 <ComponentPreview component="base-drawer" example="base-drawer-controlled" />
 
 ### Snap Points
 
-Configure multiple snap points for the drawer to rest at different heights. Numbers between 0 and 1 represent fractions of the viewport height. String values support `px` and `rem` units.
+Use `snapPoints` on `BaseDrawer` to let the drawer rest at multiple heights. Numbers from 0 to 1 are viewport fractions, strings support `px` and `rem` units.
 
 <ComponentPreview component="base-drawer" example="base-drawer-snap-points" />
 
 ### Floating Variant
 
-Use `variant="floating"` for a card-like appearance with inset spacing and fully rounded corners on desktop.
+Use `variant="floating"` on `BaseDrawerPopup` for inset spacing and fully rounded corners on desktop.
 
 <ComponentPreview component="base-drawer" example="base-drawer-floating" />
 
 ### Inset Footer
 
-Use `variant="inset"` on `BaseDrawerFooter` for a visually separated footer with a border-top and muted background.
+Use `variant="inset"` on `BaseDrawerFooter` to separate the footer with a top border and muted background.
 
 <ComponentPreview component="base-drawer" example="base-drawer-inset-footer" />
 
 ### Nested Drawers
 
-Drawers can be nested. Each drawer remains independently focus managed while stacking visually with scale and translate animations.
+Nest drawers to stack them with scale and translate animations, each independently focus managed.
 
 <ComponentPreview component="base-drawer" example="base-drawer-nested" />
 
@@ -82,13 +106,13 @@ Use `BaseDrawerProvider`, `BaseDrawerIndentBackground`, and `BaseDrawerIndent` t
 
 ### With Form
 
-Include form elements within the drawer. `BaseDrawerPanel` wraps content in `Drawer.Content` by default, enabling text selection without triggering swipe gestures.
+Use `BaseDrawerPanel` to hold form elements; it wraps content in `Drawer.Content` so text selection works without triggering swipe gestures.
 
 <ComponentPreview component="base-drawer" example="base-drawer-with-form" />
 
 ### Scrollable Content
 
-Use `BaseDrawerPanel` for scrollable content that works seamlessly with swipe gestures.
+Use `BaseDrawerPanel` for scrollable content that coexists with swipe gestures.
 
 <ComponentPreview component="base-drawer" example="base-drawer-with-scroll" />
 

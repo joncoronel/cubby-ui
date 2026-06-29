@@ -6,6 +6,8 @@ type: primitive
 
 import { Fieldset, FieldsetLegend } from "@/registry/default/fieldset/fieldset";
 
+Groups related controls under a shared legend, the way a native `<fieldset>` does. Use it to label a set of radio buttons, checkboxes, or a cluster of inputs that belong together. To label and validate a single control, use [Field](/docs/components/field); to wrap the whole form, use [Form](/docs/components/form).
+
 ## Preview
 
 <ComponentPreview component="fieldset" example="fieldset-demo" />
@@ -18,17 +20,24 @@ import { Fieldset, FieldsetLegend } from "@/registry/default/fieldset/fieldset";
 
 <ComponentUsage component="fieldset" />
 
+## Composition
+
+```text
+Fieldset
+└── FieldsetLegend
+```
+
 ## Examples
 
 ### With Radio Group
 
-Compose Fieldset with RadioGroup using the `render` prop to merge elements.
+Use the `render` prop to merge `Fieldset` onto a `RadioGroup`.
 
 <ComponentPreview component="fieldset" example="fieldset-with-radio-group" />
 
 ### With Checkbox Group
 
-Compose Fieldset with CheckboxGroup using the `render` prop.
+Use the `render` prop to merge `Fieldset` onto a `CheckboxGroup`.
 
 <ComponentPreview component="fieldset" example="fieldset-with-checkbox-group" />
 

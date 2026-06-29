@@ -6,6 +6,8 @@ type: primitive
 
 import { Textarea } from "@/registry/default/textarea/textarea";
 
+A textarea collects multi-line text that grows with its content. Use it for comments, messages, or descriptions; for a single line such as a name or email, use [`Input`](/docs/components/input) instead.
+
 ## Preview
 
 <ComponentPreview component="textarea" example="textarea-basic" />
@@ -22,33 +24,38 @@ import { Textarea } from "@/registry/default/textarea/textarea";
 
 ### With Label
 
-Add descriptive labels to textarea fields.
+Pair the textarea with a `Label` for an accessible, clickable field name.
 
 <ComponentPreview component="textarea" example="textarea-with-label" />
 
 ### With Helper Text
 
-Include helper text for guidance or validation.
+Add helper text below the field for guidance or validation messages.
 
 <ComponentPreview component="textarea" example="textarea-with-helper-text" />
 
 ### Controlled
 
-Manage textarea value externally.
+Use `value` and `onChange` to drive the textarea's value yourself.
 
 <ComponentPreview component="textarea" example="textarea-controlled" />
 
 ### Disabled State
 
-Prevent interaction with disabled textareas.
+Set `disabled` to block input and dim the field.
 
 <ComponentPreview component="textarea" example="textarea-disabled-state" />
 
 ### Elevated Variant
 
-On a Card, Dialog, or popover surface, the opaque `default` textarea collapses into its parent. Use `variant="elevated"` for a translucent overlay that adapts to the substrate. See the [Surfaces](/docs/getting-started/surfaces) docs.
+Use `variant="elevated"` for a translucent overlay that adapts to the substrate, so the field reads clearly on a Card, Dialog, or popover instead of collapsing into it. See the [Surfaces](/docs/getting-started/surfaces) docs.
 
 <ComponentPreview component="textarea" example="textarea-elevated" />
+
+| Variant    | Description                                                  |
+| ---------- | ----------------------------------------------------------- |
+| `default`  | Opaque `bg-input`, for fields on the page background.       |
+| `elevated` | Translucent `bg-input-elevated`, for raised surfaces.       |
 
 ## API Reference
 

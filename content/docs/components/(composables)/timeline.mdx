@@ -4,7 +4,9 @@ description: Display events in chronological order with visual connection
 type: composable
 ---
 
-import { Timeline, TimelineItem, TimelineContent, TimelineConnector, TimelineIcon } from "@/registry/default/timeline/timeline";
+import { Timeline, TimelineItem, TimelineContent } from "@/registry/default/timeline/timeline";
+
+The timeline lays out a sequence of events along a connected line, with each event marked by an indicator. Use it for activity feeds, changelogs, and order or shipment history, or set `value` to drive it as a step progress indicator.
 
 ## Preview
 
@@ -18,17 +20,37 @@ import { Timeline, TimelineItem, TimelineContent, TimelineConnector, TimelineIco
 
 <ComponentUsage component="timeline" />
 
+## Composition
+
+```text
+Timeline
+└── TimelineItem
+    ├── TimelineIndicator
+    ├── TimelineSeparator
+    ├── TimelineHeader
+    │   ├── TimelineDate
+    │   └── TimelineTitle
+    └── TimelineContent
+```
+
+Set `orientation` on `Timeline` to lay items out vertically or horizontally.
+
+| Value        | Description                                  |
+| ------------ | -------------------------------------------- |
+| `vertical`   | Items stack top to bottom. Default.          |
+| `horizontal` | Items flow left to right.                    |
+
 ## Examples
 
 ### Horizontal
 
-Display timeline events horizontally.
+Set `orientation="horizontal"` to flow events left to right.
 
 <ComponentPreview component="timeline" example="timeline-horizontal" />
 
 ### Stepper
 
-Use timeline as a step progress indicator.
+Pass `value` and `onValueChange` to drive the timeline as a step progress indicator.
 
 <ComponentPreview component="timeline" example="timeline-stepper" />
 

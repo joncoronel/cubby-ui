@@ -11,6 +11,10 @@ import {
   CodeBlockCode,
 } from "@/registry/default/code-block/code-block";
 
+The code block renders syntax-highlighted code with optional headers, filenames, tabs, line numbers, diffs, and a copy button. Use it for documentation snippets, install commands, and any multi-line code sample.
+
+To copy a single string from an inline icon button, use [`CopyButton`](/docs/components/copy-button) instead.
+
 ## Preview
 
 <ComponentPreview component="code-block" example="code-block-basic" />
@@ -23,53 +27,62 @@ import {
 
 <ComponentUsage component="code-block" />
 
+## Composition
+
+```text
+CodeBlock
+├── CodeBlockHeader
+└── CodeBlockPre
+    └── CodeBlockCode
+```
+
 ## Examples
 
 ### Floating Copy Button
 
-Display code without a header using a floating copy button that appears on hover.
+Set `floatingCopy` on `CodeBlock` to show a copy button that appears on hover, without a header.
 
 <ComponentPreview component="code-block" example="code-block-floating-copy" />
 
 ### With Filename
 
-Display a filename in the header to provide context for the code snippet.
+Pass `filename` to `CodeBlockHeader` to label the snippet.
 
 <ComponentPreview component="code-block" example="code-block-with-filename" />
 
 ### With Tabs
 
-Show multiple code variants using tabs, commonly used for different package managers or language implementations.
+Pass `tabs` to `CodeBlockHeader` to switch between code variants such as package managers or languages.
 
 <ComponentPreview component="code-block" example="code-block-tabs" />
 
 ### With Line Numbers
 
-Add line numbers to help users reference specific lines of code.
+Set `lineNumbers` on `CodeBlockPre` to number each line.
 
 <ComponentPreview component="code-block" example="code-block-line-numbers" />
 
 ### Multiple Languages
 
-The component automatically detects and highlights syntax for different programming languages.
+Set `language` on `CodeBlock` to highlight any Shiki-supported language.
 
 <ComponentPreview component="code-block" example="code-block-languages" />
 
 ### Custom Icon
 
-Override the default language icon with a custom icon of your choice.
+Pass `customIcon` to `CodeBlockHeader` to replace the default language icon.
 
 <ComponentPreview component="code-block" example="code-block-custom-icon" />
 
 ### Custom Height
 
-Control the maximum height and scrolling behavior with custom classes.
+Set a `max-h-*` class on `CodeBlockPre` to cap the height and scroll overflow.
 
 <ComponentPreview component="code-block" example="code-block-height" />
 
 ### Server-Side Highlighting
 
-Pre-highlight code on the server using the `highlight` function for instant rendering with zero client-side delay.
+Pre-highlight on the server with the `highlight` function and pass the result as `initial` for instant rendering.
 
 <ComponentPreview
   component="code-block"
@@ -78,19 +91,19 @@ Pre-highlight code on the server using the `highlight` function for instant rend
 
 ### Highlighted Lines
 
-Emphasize specific lines with background highlighting and a left border accent.
+Pass `highlightLines` to `CodeBlock` to emphasize lines with a background and left border.
 
 <ComponentPreview component="code-block" example="code-block-highlight-lines" />
 
 ### Diffs
 
-Show code changes with added, removed, and modified line indicators. Diff markers are automatically stripped from the displayed code.
+Set `showDiff` to mark added, removed, and modified lines; the diff markers are stripped from the displayed code.
 
 <ComponentPreview component="code-block" example="code-block-diff" />
 
 ### Focus Mode
 
-Blur non-focused lines to draw attention to specific parts of the code.
+Pass `focusLines` to `CodeBlock` to blur every line except the ones you name.
 
 <ComponentPreview component="code-block" example="code-block-focus" />
 

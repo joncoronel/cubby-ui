@@ -17,6 +17,8 @@ import ButtonGroupDropdown from "@/registry/examples/button-group/button-group-d
 import ButtonGroupSelect from "@/registry/examples/button-group/button-group-select";
 import ButtonGroupPopover from "@/registry/examples/button-group/button-group-popover";
 
+The button group fuses related buttons into a single connected control with shared borders and rounded outer corners. Use it for toolbars, segmented actions, split buttons, and input add-ons like search bars.
+
 ## Preview
 
 <ComponentPreview component="button-group" example="button-group-demo">
@@ -31,11 +33,24 @@ import ButtonGroupPopover from "@/registry/examples/button-group/button-group-po
 
 <ComponentUsage component="button-group" />
 
+## Composition
+
+```text
+ButtonGroup
+├── ButtonGroupSeparator
+└── ButtonGroupText
+```
+
 ## Examples
 
 ### Orientation
 
-Use the `orientation` prop to change the layout direction of the button group.
+Use `orientation` to lay the buttons out in a row or a column.
+
+| Value          | Description                          |
+| -------------- | ------------------------------------ |
+| `"horizontal"` | Arranges buttons in a row (default). |
+| `"vertical"`   | Stacks buttons in a column.          |
 
 <ComponentPreview component="button-group" example="button-group-orientation">
   <ButtonGroupOrientation />
@@ -43,7 +58,7 @@ Use the `orientation` prop to change the layout direction of the button group.
 
 ### Size
 
-Button groups inherit the size of their child buttons. Use different button sizes to create compact or large button groups.
+Set the `size` on the child buttons; the group inherits it.
 
 <ComponentPreview component="button-group" example="button-group-size">
   <ButtonGroupSize />
@@ -51,7 +66,7 @@ Button groups inherit the size of their child buttons. Use different button size
 
 ### Nested
 
-Button groups can be nested to create more complex layouts like pagination controls.
+Nest button groups to build compound layouts such as pagination controls.
 
 <ComponentPreview component="button-group" example="button-group-nested">
   <ButtonGroupNested />
@@ -59,7 +74,7 @@ Button groups can be nested to create more complex layouts like pagination contr
 
 ### Separator
 
-Use `ButtonGroupSeparator` to visually divide buttons within a group. The separator is not necessary if using button variants that have a border already.
+Use `ButtonGroupSeparator` to divide buttons within a group; skip it when the button variant already has a border.
 
 <ComponentPreview
   component="button-group"
@@ -70,7 +85,7 @@ Use `ButtonGroupSeparator` to visually divide buttons within a group. The separa
 
 ### With Input
 
-Integrate input fields directly into button groups for search bars and similar patterns.
+Place an input directly inside the group for search bars and similar patterns.
 
 <ComponentPreview component="button-group" example="button-group-input">
   <ButtonGroupInput />
@@ -78,7 +93,7 @@ Integrate input fields directly into button groups for search bars and similar p
 
 ### Complex Input Group
 
-Create sophisticated input layouts with nested button groups, inputs, and toggleable features.
+Combine nested groups, inputs, and toggleable controls into a single input layout.
 
 <ComponentPreview component="button-group" example="button-group-input-group">
   <ButtonGroupInputGroup />
@@ -86,7 +101,7 @@ Create sophisticated input layouts with nested button groups, inputs, and toggle
 
 ### With Dropdown
 
-Combine buttons with dropdown menus for actions that need additional options.
+Pair a button with a dropdown menu for actions that need extra options.
 
 <ComponentPreview component="button-group" example="button-group-dropdown">
   <ButtonGroupDropdown />
@@ -94,7 +109,7 @@ Combine buttons with dropdown menus for actions that need additional options.
 
 ### With Select
 
-Integrate select components for dynamic forms and input combinations.
+Fuse a `Select` into the group for dynamic form and input combinations.
 
 <ComponentPreview component="button-group" example="button-group-select">
   <ButtonGroupSelect />
@@ -102,7 +117,7 @@ Integrate select components for dynamic forms and input combinations.
 
 ### With Popover
 
-Use popovers within button groups to provide contextual interfaces and assistants.
+Anchor a popover to a button in the group for contextual panels and assistants.
 
 <ComponentPreview component="button-group" example="button-group-popover">
   <ButtonGroupPopover />
@@ -110,7 +125,7 @@ Use popovers within button groups to provide contextual interfaces and assistant
 
 ### With Text
 
-Use `ButtonGroupText` to display a read-only label inline with the buttons — useful for pagination indicators, stepper values, or any context where you want a non-interactive segment fused into the group.
+Use `ButtonGroupText` to display a read-only label inline with the buttons, for pagination indicators, stepper values, or any non-interactive segment fused into the group.
 
 <ComponentPreview component="button-group" example="button-group-text" />
 

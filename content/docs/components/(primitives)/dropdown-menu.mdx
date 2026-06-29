@@ -6,6 +6,8 @@ type: primitive
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/registry/default/dropdown-menu/dropdown-menu";
 
+A menu of actions or links that opens from a trigger button. Use it for row actions, a "more options" overflow button, account menus, or any compact list of commands. For a horizontal bar of menus (File, Edit, View), use [Menubar](/docs/components/menubar) instead.
+
 ## Preview
 
 <ComponentPreview component="dropdown-menu" example="dropdown-menu-basic" />
@@ -18,35 +20,58 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 <ComponentUsage component="dropdown-menu" />
 
+## Composition
+
+```text
+DropdownMenu
+├── DropdownMenuTrigger
+└── DropdownMenuContent
+    ├── DropdownMenuGroup
+    │   ├── DropdownMenuGroupLabel
+    │   └── DropdownMenuItem
+    ├── DropdownMenuLinkItem
+    ├── DropdownMenuLabel
+    ├── DropdownMenuCheckboxItem
+    ├── DropdownMenuRadioGroup
+    │   └── DropdownMenuRadioItem
+    ├── DropdownMenuShortcut   (inside an item)
+    ├── DropdownMenuSeparator
+    └── DropdownMenuSub
+        ├── DropdownMenuSubTrigger
+        └── DropdownMenuSubContent
+```
+
+`DropdownMenuContent` composes the portal, positioner, and popup internally, so you place items directly inside it.
+
 ## Examples
 
 ### With Icons and Shortcuts
 
-Add icons and keyboard shortcuts to menu items.
+Place an icon beside the label and a `DropdownMenuShortcut` at the end of an item.
 
 <ComponentPreview component="dropdown-menu" example="dropdown-menu-with-icons-and-shortcuts" />
 
 ### With Checkboxes
 
-Include checkbox menu items for toggleable options.
+Use `DropdownMenuCheckboxItem` for toggleable options.
 
 <ComponentPreview component="dropdown-menu" example="dropdown-menu-with-checkboxes" />
 
 ### With Radio Group
 
-Use radio groups for mutually exclusive options.
+Use `DropdownMenuRadioGroup` with `DropdownMenuRadioItem` for mutually exclusive options.
 
 <ComponentPreview component="dropdown-menu" example="dropdown-menu-with-radio-group" />
 
 ### With Sub Menu
 
-Create nested submenus for hierarchical navigation.
+Nest a `DropdownMenuSub` to open a submenu on hover.
 
 <ComponentPreview component="dropdown-menu" example="dropdown-menu-with-sub-menu" />
 
 ### Animated (Detached Triggers)
 
-Multiple triggers share a single menu with animated content transitions. The menu smoothly moves between triggers and slides content in/out based on activation direction.
+Multiple triggers share one menu that moves between them and slides content in or out based on activation direction.
 
 <ComponentPreview component="dropdown-menu" example="dropdown-menu-animated" />
 
@@ -211,7 +236,7 @@ Submenu container with positioning. Composes `Menu.Portal`, `Menu.Positioner`, a
 </ApiProp>
 
 <ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
-  Shadow weight. Kept at `3` (same as parent dropdown) — submenus are still small popups.
+  Shadow weight. Kept at `3` (same as parent dropdown), since submenus are still small popups.
 </ApiProp>
 
 </ApiPropsList>

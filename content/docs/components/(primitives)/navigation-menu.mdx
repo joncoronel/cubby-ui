@@ -6,6 +6,8 @@ type: primitive
 
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuList, NavigationMenuTrigger } from "@/registry/default/navigation-menu/navigation-menu";
 
+A navigation menu is a horizontal bar of links and dropdown panels for site-level navigation, with support for nested submenus. Use it for a primary site header; for a single dropdown of actions tied to a button, use [`DropdownMenu`](/docs/components/dropdown-menu) instead.
+
 ## Preview
 
 <ComponentPreview component="navigation-menu" example="navigation-menu-basic" />
@@ -18,29 +20,46 @@ import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMe
 
 <ComponentUsage component="navigation-menu" />
 
+## Composition
+
+```text
+NavigationMenu
+└── NavigationMenuList
+    └── NavigationMenuItem
+        ├── NavigationMenuTrigger
+        │   └── NavigationMenuIcon
+        ├── NavigationMenuContent
+        │   └── NavigationMenuLink
+        └── NavigationMenuSub
+            ├── NavigationMenuSubTrigger
+            └── NavigationMenuContent
+```
+
+`NavigationMenu` composes the viewport internally. Use `NavigationMenuLink` with `standalone` for top-level links that have no dropdown.
+
 ## Examples
 
 ### With Direct Links
 
-Include direct navigation links alongside dropdowns.
+Set `standalone` on `NavigationMenuLink` to mix plain links in with the dropdowns.
 
 <ComponentPreview component="navigation-menu" example="navigation-menu-with-direct-links" />
 
 ### Nested Submenus
 
-Create multi-level navigation structures.
+Use `NavigationMenuSub` inside a `NavigationMenuContent` to build multi-level menus.
 
 <ComponentPreview component="navigation-menu" example="navigation-menu-nested-submenus" />
 
 ### Custom Styled Dropdown
 
-Apply custom styling to dropdown content.
+Pass a `className` to `NavigationMenuContent` to restyle a dropdown panel.
 
 <ComponentPreview component="navigation-menu" example="navigation-menu-custom-styled-dropdown" />
 
 ### With Next.js Link
 
-Integrate with Next.js Link for client-side navigation.
+Use the `render` prop on `NavigationMenuLink` to route through a Next.js Link.
 
 <ComponentPreview component="navigation-menu" example="navigation-menu-flexible-nextjs-link" />
 
@@ -87,7 +106,7 @@ Root navigation menu container. Composes `NavigationMenu.Root` with an internal 
 </ApiProp>
 
 <ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="2">
-  Surface elevation level for the bar itself. Defaults to `2` — a subtle toolbar that sits visibly above the page. The Viewport and Sub popups have their levels (3 and 5) baked in. See the [Surfaces](/docs/getting-started/surfaces) docs.
+  Surface elevation level for the bar itself. Defaults to `2`, a subtle toolbar that sits visibly above the page. The Viewport and Sub popups have their levels (3 and 5) baked in. See the [Surfaces](/docs/getting-started/surfaces) docs.
 </ApiProp>
 
 <ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="2">

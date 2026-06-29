@@ -6,6 +6,8 @@ type: primitive
 
 import { Form } from "@/registry/default/form/form";
 
+Wraps a native `<form>` and consolidates validation: it collects values from the [Field](/docs/components/field) components inside it, surfaces server-side errors through the `errors` prop, and hands you parsed values via `onFormSubmit`. Use it as the outermost element of any multi-field form. For a single labeled control, [Field](/docs/components/field) alone is enough.
+
 ## Preview
 
 <ComponentPreview component="form" example="form-demo" />
@@ -64,7 +66,7 @@ Integrate with TanStack Form using `useForm` and `form.Field` render props.
 
 ### Complete Form
 
-A comprehensive form combining multiple field types.
+Combine multiple field types in one validated form.
 
 <ComponentPreview component="form" example="form-complete" />
 

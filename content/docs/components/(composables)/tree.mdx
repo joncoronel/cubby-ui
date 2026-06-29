@@ -4,6 +4,8 @@ description: A hierarchical tree view component with support for selection, expa
 type: composable
 ---
 
+The tree displays nested data as an expandable hierarchy with selection, checkboxes, and keyboard navigation. Use it for file explorers, nav menus, category pickers, or any parent-child structure. It renders each node through a child function, so you control the markup of every row.
+
 ## Preview
 
 <ComponentPreview component="tree" example="tree-basic" />
@@ -16,55 +18,77 @@ type: composable
 
 <ComponentUsage component="tree" />
 
+## Composition
+
+```text
+Tree                      (data + render function)
+└── TreeItem
+    ├── TreeItemIcon
+    ├── TreeItemLabel
+    └── TreeItemBadge
+```
+
+`Tree` takes a `data` array and a child function that returns a `TreeItem` for each node. Compose the row from `TreeItemIcon`, `TreeItemLabel`, and `TreeItemBadge`.
+
 ## Examples
 
 ### Variants
 
-The Tree component supports three visual variants: `default` (minimal styling), `filled` (card-like with background), and `outline` (bordered card with shadow).
+Use `variant` to set the tree's surface treatment.
 
 <ComponentPreview component="tree" example="tree-variants" />
 
+| Value     | Description                          |
+| --------- | ------------------------------------ |
+| `default` | Minimal styling, no container.       |
+| `filled`  | Card-like with a background.         |
+| `outline` | Bordered card with a shadow.         |
+
 ### With Icons
 
-Add icons to tree items using the `icon` prop on TreeNode. Use `iconOpen` to show a different icon when the node is expanded (useful for folder states).
+Set `icon` on a node and `iconOpen` for a different icon while it is expanded.
 
 <ComponentPreview component="tree" example="tree-with-icons" />
 
 ### With Lines
 
-Enable visual connection lines between parent and child nodes using the `showLines` prop for better hierarchy visualization.
+Use `showLines` to draw connecting lines between parent and child nodes.
 
 <ComponentPreview component="tree" example="tree-with-lines" />
 
 ### With Badges
 
-Display additional information using badges. Use the `badge` prop on TreeNode and render with `TreeItemBadge`.
+Set `badge` on a node and render it with `TreeItemBadge`.
 
 <ComponentPreview component="tree" example="tree-with-badges" />
 
 ### With Checkboxes
 
-Enable bulk selection mode with `mode="multiple"`. Parent checkboxes automatically reflect child selection state.
+Use `mode="multiple"` to add checkboxes; parent state reflects child selection automatically.
 
 <ComponentPreview component="tree" example="tree-with-checkboxes" />
 
 ### Controlled State
 
-Control expansion and selection state externally using the `expanded`/`onExpandedChange` and `selectedNode`/`onNodeSelect` props.
+Use `expanded`/`onExpandedChange` and `selectedNode`/`onNodeSelect` to drive state externally.
 
 <ComponentPreview component="tree" example="tree-controlled" />
 
 ### Disabled & Loading States
 
-Disable interaction on specific nodes using the `disabled` prop. Loading states are shown automatically with a spinner icon when nodes are loading. Set `mode="none"` to create a read-only tree.
+Set `disabled` or `loading` on individual nodes, or `mode="none"` for a read-only tree.
 
 <ComponentPreview component="tree" example="tree-disabled-loading" />
 
 ### Async Loading
 
-Load tree children dynamically using the `onLoadChildren` callback. The Tree component automatically manages loading state and displays a spinner while fetching data. Children are cached after the first load.
+Use `onLoadChildren` on a node to fetch children on first expand; the tree shows a spinner and caches the result.
 
 <ComponentPreview component="tree" example="tree-async-loading" />
+
+## Accessibility
+
+The tree is operable from the keyboard: arrow keys move between and expand/collapse nodes, and `Enter` or `Space` selects. Selection and expansion state are reflected via `aria` attributes on each node, and disabled nodes are skipped during navigation.
 
 ## API Reference
 

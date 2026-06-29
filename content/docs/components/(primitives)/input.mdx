@@ -6,6 +6,8 @@ type: primitive
 
 import { Input } from "@/registry/default/input/input";
 
+A single-line text input for collecting short user data: names, emails, search queries, or any free-form value. For labeling, validation, and error messages, wrap it in [Field](/docs/components/field).
+
 ## Preview
 
 <ComponentPreview component="input" example="input-demo" />
@@ -22,13 +24,13 @@ import { Input } from "@/registry/default/input/input";
 
 ### With Label
 
-Add descriptive labels to input fields.
+Pair the input with a `<label>` to describe what it collects.
 
 <ComponentPreview component="input" example="input-with-label" />
 
 ### Disabled
 
-Prevent interaction with disabled inputs.
+Set `disabled` to prevent interaction and dim the input.
 
 <ComponentPreview component="input" example="input-disabled" />
 
@@ -69,7 +71,7 @@ For the complete Base UI API, see the [Base UI Input documentation](https://base
   simpleType="string"
   defaultValue='"default"'
 >
-  Surface appearance. `default` uses opaque `bg-input` (clean "lifted card" feel on the page). `elevated` uses translucent `bg-input-elevated` — use this when the input sits inside a Card, Dialog, popover, or any elevated surface where the opaque default would visually collapse into its parent. See the [Surfaces](/docs/getting-started/surfaces) docs.
+  Surface appearance. `default` uses opaque `bg-input` (clean "lifted card" feel on the page). `elevated` uses translucent `bg-input-elevated`; use this when the input sits inside a Card, Dialog, popover, or any elevated surface where the opaque default would visually collapse into its parent. See the [Surfaces](/docs/getting-started/surfaces) docs.
 </ApiProp>
 
 </ApiPropsList>

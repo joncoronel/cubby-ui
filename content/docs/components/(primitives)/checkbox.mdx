@@ -6,6 +6,8 @@ type: primitive
 
 import { Checkbox } from "@/registry/default/checkbox/checkbox";
 
+The checkbox toggles a single on/off value, with checked, unchecked, and indeterminate states. Use it for individual settings, consent agreements, or one item in a list; for a set of related options sharing one value, reach for [`CheckboxGroup`](/docs/components/checkbox-group).
+
 ## Preview
 
 <ComponentPreview component="checkbox" example="checkbox-basic" />
@@ -22,27 +24,32 @@ import { Checkbox } from "@/registry/default/checkbox/checkbox";
 
 ### With Label
 
-Add descriptive labels to checkboxes.
+Pair the checkbox with a [`Label`](/docs/components/label) so clicking the text toggles it.
 
 <ComponentPreview component="checkbox" example="checkbox-with-label" />
 
 ### Controlled
 
-Manage checkbox state externally.
+Pass `checked` and `onCheckedChange` to manage the state yourself.
 
 <ComponentPreview component="checkbox" example="checkbox-controlled" />
 
 ### Disabled State
 
-Prevent interaction with disabled checkboxes.
+Set `disabled` to prevent interaction.
 
 <ComponentPreview component="checkbox" example="checkbox-disabled-state" />
 
 ### Elevated Variant
 
-On a Card, Dialog, or popover surface, the opaque `default` checkbox collapses into its parent. Use `variant="elevated"` for a translucent overlay that adapts to the substrate. See the [Surfaces](/docs/getting-started/surfaces) docs.
+Use `variant="elevated"` on a Card, Dialog, or popover surface, where the opaque `default` checkbox would collapse into its parent. See the [Surfaces](/docs/getting-started/surfaces) docs.
 
 <ComponentPreview component="checkbox" example="checkbox-elevated" />
+
+| Value      | Description                                                          |
+| ---------- | ------------------------------------------------------------------- |
+| `default`  | Opaque `bg-input`, for standard page backgrounds.                   |
+| `elevated` | Translucent `bg-input-elevated`, for Card, Dialog, or popovers.     |
 
 ### Form Integration
 

@@ -6,6 +6,8 @@ type: primitive
 
 import { Meter } from "@/registry/default/meter/meter";
 
+A meter displays a scalar measurement within a known range, with optional thresholds that color the indicator by status. Use it for static readings like disk usage, battery level, or a score; for the changing completion of a task, use [`Progress`](/docs/components/progress) instead.
+
 ## Preview
 
 <ComponentPreview component="meter" example="meter-basic" />
@@ -18,41 +20,57 @@ import { Meter } from "@/registry/default/meter/meter";
 
 <ComponentUsage component="meter" />
 
+## Composition
+
+```text
+MeterRoot
+├── MeterLabel
+├── MeterValue
+└── MeterTrack
+    └── MeterIndicator
+```
+
 ## Examples
 
 ### Different Sizes
 
-Display meters in various sizes.
+Use `size` to set the track height and text size.
 
 <ComponentPreview component="meter" example="meter-different-sizes" />
 
+| Value | Description                       |
+| ----- | --------------------------------- |
+| `sm`  | Thin track with extra-small text. |
+| `md`  | The default track and text.       |
+| `lg`  | Thick track with larger text.     |
+
 ### With Labels
 
-Add descriptive labels to meters.
+Add `MeterLabel` and `MeterValue` to caption the meter.
 
 <ComponentPreview component="meter" example="meter-with-labels" />
 
 ### With Min and Max
 
-Define custom minimum and maximum values.
+Set `min` and `max` to scale the value to a custom range.
 
 <ComponentPreview component="meter" example="meter-with-min-max" />
 
 ### With Optimum Range
 
-Highlight the optimal value range.
+Set `optimumMin` and `optimumMax` to mark the ideal range with tick markers.
 
 <ComponentPreview component="meter" example="meter-with-optimum-range" />
 
 ### With Thresholds
 
-Set thresholds for different value ranges.
+Set `low` and `high` to color the indicator by status as the value crosses each threshold.
 
 <ComponentPreview component="meter" example="meter-with-thresholds" />
 
 ### With Segments
 
-Display segmented meter visualization.
+Set `segments` on `MeterTrack` to divide the track into discrete blocks.
 
 <ComponentPreview component="meter" example="meter-with-segments" />
 

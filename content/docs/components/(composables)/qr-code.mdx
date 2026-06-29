@@ -6,6 +6,8 @@ type: composable
 
 import { QRCode } from "@/registry/default/qr-code/qr-code";
 
+The QR code encodes a URL or string into a scannable symbol rendered as pure SVG. Use it for links, Wi-Fi credentials, payment codes, or any value a phone camera should read, with optional styled modules, custom finder eyes, and a center logo. It ships its own encoder, so it has no runtime dependencies.
+
 ## Preview
 
 <ComponentPreview component="qr-code" example="qr-code-branded" />
@@ -22,31 +24,47 @@ import { QRCode } from "@/registry/default/qr-code/qr-code";
 
 ### Dot styles
 
-`dotStyle` controls how data modules are drawn: `"square"` (default), `"circle"`, or `"rounded"`. The rounded style is neighbor-aware — runs of adjacent modules merge into continuous "snake" shapes while isolated modules become full dots.
+Use `dotStyle` to control how the data modules are drawn.
 
 <ComponentPreview component="qr-code" example="qr-code-dot-styles" />
 
+| Value       | Description                                                            |
+| ----------- | --------------------------------------------------------------------- |
+| `"square"`  | Solid square modules (default).                                       |
+| `"circle"`  | Each module as an isolated dot.                                       |
+| `"rounded"` | Neighbor-aware: adjacent runs merge into "snake" shapes, isolated modules become dots. |
+
 ### Custom finders
 
-The three finder patterns (the large corner "eyes") are styled independently from the data modules. Pass a single `finder` object to style all three, or a `[topLeft, topRight, bottomLeft]` tuple to style each. The outer ring and inner eye each take their own `style` and `color`.
+Use `finder` to style the three corner "eyes" independently from the data modules.
 
 <ComponentPreview component="qr-code" example="qr-code-custom-finders" />
 
+Pass a single object to style all three, or a `[topLeft, topRight, bottomLeft]` tuple to style each. The outer ring and inner eye each take their own `style` and `color`.
+
 ### With a logo
 
-Pass a `logo` to embed an image (or any React element) in the center. The modules behind it are cleared and a quiet area is knocked out so the symbol stays scannable. When a logo is present the error correction level is automatically raised to `"H"` (≈30% recovery) unless you explicitly request `"Q"` or `"H"` yourself.
+Use `logo` to embed an image or React element in the center; the modules behind it are cleared and a quiet area is knocked out to keep the symbol scannable.
 
 <ComponentPreview component="qr-code" example="qr-code-with-logo" />
 
+When a logo is present, the error correction level is automatically raised to `"H"` (about 30% recovery) unless you explicitly request `"Q"` or `"H"`.
+
 ### Export & download
 
-The component exposes an imperative handle via `ref` with `toSVGString()`, `toDataURL()`, and `getMatrix()`. `toDataURL()` renders PNG or JPEG through an offscreen canvas at export time (the display itself is always pure SVG), or returns a vector SVG data URL with `type: "svg"`.
+Use the imperative `ref` handle to export the code with `toSVGString()`, `toDataURL()`, or `getMatrix()`.
 
 <ComponentPreview component="qr-code" example="qr-code-download" />
 
+`toDataURL()` rasterizes PNG or JPEG through an offscreen canvas at export time (the display itself stays pure SVG), or returns a vector SVG data URL with `type: "svg"`.
+
+## Accessibility
+
+The symbol is decorative SVG with no inherent label. Give it an accessible name with `aria-label` (or `role="img"` plus `aria-label`) describing where the code leads, and provide the same destination as visible text or a fallback link so it is reachable without a camera.
+
 ## API Reference
 
-`QRCode` is an original composable — there is no underlying Base UI primitive. The QR encoder is implemented from scratch per ISO/IEC 18004, supporting Numeric, Alphanumeric, and Byte (UTF-8) modes across versions 1–40 and all four error correction levels, with automatic mode, version, and mask selection. The symbol is rendered entirely as SVG `<path>` elements, so it scales crisply at any size.
+`QRCode` is an original composable with no underlying Base UI primitive. The QR encoder is implemented from scratch per ISO/IEC 18004, supporting Numeric, Alphanumeric, and Byte (UTF-8) modes across versions 1–40 and all four error correction levels, with automatic mode, version, and mask selection. The symbol is rendered entirely as SVG `<path>` elements, so it scales crisply at any size.
 
 ### Props
 
@@ -57,7 +75,7 @@ Renders an `<svg>` element and accepts any native SVG prop (`className`, `style`
 <ApiPropsList>
 
 <ApiProp name="value" fullType="string" required>
-  The data to encode — a URL, text, or any string.
+  The data to encode: a URL, text, or any string.
 </ApiProp>
 
 <ApiProp
@@ -182,8 +200,8 @@ These named exports are framework-agnostic and tree-shakeable.
 
 ### Notes
 
-- **Pure SVG.** The display is rendered entirely as SVG paths — no canvas and no raster images — so it stays sharp at any resolution. A canvas is used only momentarily inside `toDataURL()` to produce PNG/JPEG bytes.
+- **Pure SVG.** The display is rendered entirely as SVG paths (no canvas, no raster images), so it stays sharp at any resolution. A canvas is used only momentarily inside `toDataURL()` to produce PNG/JPEG bytes.
 - **Logos and scannability.** Keep `logoSize` modest (≤ `0.3`) and prefer a light `background` behind the logo. The automatic `"H"` error correction compensates for the cleared center, but very large logos can still defeat a scanner.
 - **`toSVGString()` and React-element logos.** Image (`src`) logos are serialized into the string output; arbitrary React-element logos are not (only the knockout area is). Use an image logo when you need identical string/DOM output.
-- **Cross-origin logos and PNG/JPEG export.** Rasterizing a code whose logo points to another origin would taint the canvas. `toDataURL()` automatically fetches and inlines a cross-origin logo before rasterizing (this works only if the image host sends CORS headers); if it can't, it throws a clear error. Prefer same-origin or data-URI logos, or export with `type: "svg"`. For raster export, set explicit `foreground`/`background` colors — `currentColor` resolves to black during rasterization.
+- **Cross-origin logos and PNG/JPEG export.** Rasterizing a code whose logo points to another origin would taint the canvas. `toDataURL()` automatically fetches and inlines a cross-origin logo before rasterizing (this works only if the image host sends CORS headers); if it can't, it throws a clear error. Prefer same-origin or data-URI logos, or export with `type: "svg"`. For raster export, set explicit `foreground`/`background` colors, since `currentColor` resolves to black during rasterization.
 - **Styling hook.** The root carries `data-slot="qr-code"`; `foreground` defaults to `currentColor` so the code themes with surrounding text.

@@ -12,6 +12,8 @@ import {
   SelectValue,
 } from "@/registry/default/select/select";
 
+A select lets the user pick one option (or several) from a list bound to a form field. Use it for a known, finite set of choices; for a searchable list of actions or a command palette, use [`Command`](/docs/components/command) instead.
+
 ## Preview
 
 <ComponentPreview component="select" example="select-basic" />
@@ -24,41 +26,57 @@ import {
 
 <ComponentUsage component="select" />
 
+## Composition
+
+```text
+Select
+├── SelectLabel
+├── SelectTrigger
+│   └── SelectValue
+└── SelectContent
+    └── SelectGroup
+        ├── SelectGroupLabel
+        ├── SelectItem
+        └── SelectSeparator
+```
+
+`SelectContent` composes the portal, backdrop, positioner, and popup internally. Pass your options as `items` on `Select` and render `SelectItem` children inside `SelectContent`.
+
 ## Examples
 
 ### Controlled
 
-Manage select state externally.
+Use `value` and `onValueChange` on `Select` to drive the selection yourself.
 
 <ComponentPreview component="select" example="select-controlled" />
 
 ### With Groups
 
-Organize options into labeled groups.
+Wrap items in `SelectGroup` with a `SelectGroupLabel` to organize them.
 
 <ComponentPreview component="select" example="select-with-groups" />
 
 ### With Icons
 
-Add icons to select options for visual context.
+Render an icon alongside the label inside each `SelectItem`.
 
 <ComponentPreview component="select" example="select-with-icons" />
 
 ### Multiple Selection
 
-Select multiple options from the list.
+Set `multiple` on `Select` to let the user pick several options.
 
 <ComponentPreview component="select" example="select-multiple" />
 
 ### With Scroll
 
-Handle long lists with scrollable content.
+Long lists scroll inside `SelectContent` with fading scroll edges.
 
 <ComponentPreview component="select" example="select-with-scroll" />
 
 ### Align Item with Trigger
 
-Align selected item with trigger position.
+Set `alignItemWithTrigger` on `SelectContent` to overlay the selected item on the trigger.
 
 <ComponentPreview component="select" example="select-align-item-with-trigger" />
 
@@ -73,6 +91,11 @@ Use objects as values instead of primitives. The `itemToStringValue` prop conver
 On a Card, Dialog, or popover surface, the opaque `default` trigger collapses into its parent. Use `variant="elevated"` on `SelectTrigger` for a translucent overlay that adapts to the substrate. See the [Surfaces](/docs/getting-started/surfaces) docs.
 
 <ComponentPreview component="select" example="select-elevated" />
+
+| Variant    | Description                                                  |
+| ---------- | ----------------------------------------------------------- |
+| `default`  | Opaque `bg-input` trigger for page-level surfaces.          |
+| `elevated` | Translucent trigger for use inside Card, Dialog, or popover. |
 
 ### Form Integration
 
@@ -90,7 +113,7 @@ For the complete Base UI API, see the [Base UI Select documentation](https://bas
 
 #### SelectLabel
 
-Accessible label for the select trigger. Wraps Base UI's `Select.Label`. Renders a `<div>` — clicking it focuses the trigger without opening the popup.
+Accessible label for the select trigger. Wraps Base UI's `Select.Label`. Renders a `<div>`: clicking it focuses the trigger without opening the popup.
 
 #### SelectTrigger
 

@@ -10,6 +10,8 @@ import {
   TooltipTrigger,
 } from "@/registry/default/tooltip/tooltip";
 
+A tooltip shows a short, non-interactive label on hover or focus. Use it to name icon-only buttons or add a brief hint; for anything clickable or longer than a phrase, use [`Popover`](/docs/components/popover) instead.
+
 ## Preview
 
 <ComponentPreview component="tooltip" example="tooltip-basic" />
@@ -21,6 +23,16 @@ import {
 ## Usage
 
 <ComponentUsage component="tooltip" />
+
+## Composition
+
+```text
+Tooltip
+├── TooltipTrigger
+└── TooltipContent
+```
+
+`TooltipContent` composes the portal, positioner, popup, and optional arrow internally, so you pass your label directly inside it. Wrap your app in `TooltipProvider` to share open and close timing across tooltips.
 
 ## Examples
 
@@ -42,6 +54,20 @@ Animate the tooltip when switching between multiple triggers with different payl
 
 <ComponentPreview component="tooltip" example="tooltip-animated" />
 
+## Accessibility
+
+### Don't rely on the tooltip as the only label
+
+A tooltip only appears on hover or focus, so it can't be the sole accessible name for an icon-only control. Give the trigger its own text (a visually hidden span or `aria-label`) and use the tooltip for the same or supplementary hint.
+
+```tsx showLineNumbers
+<TooltipTrigger render={<Button variant="outline" size="icon" />}>
+  <PlusIcon />
+  <span className="sr-only">Add to library</span>
+</TooltipTrigger>
+<TooltipContent>Add to library</TooltipContent>
+```
+
 ## API Reference
 
 The Tooltip component is built on top of [Base UI's Tooltip](https://base-ui.com/react/components/tooltip). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
@@ -52,7 +78,7 @@ For the complete Base UI API, see the [Base UI Tooltip documentation](https://ba
 
 #### createTooltipHandle
 
-Creates a handle that connects a tooltip to one or more external `TooltipTrigger` components. Useful when the triggers need to live outside the `Tooltip` — for example, when each row in a list has its own trigger but they all share one tooltip.
+Creates a handle that connects a tooltip to one or more external `TooltipTrigger` components. Useful when the triggers need to live outside the `Tooltip`, for example when each row in a list has its own trigger but they all share one tooltip.
 
 ```tsx
 import { createTooltipHandle } from "@/registry/default/tooltip/tooltip";
@@ -163,7 +189,7 @@ Composed component for common tooltip layouts. Combines `Tooltip.Portal`, `Toolt
 </ApiProp>
 
 <ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="2">
-  Surface elevation level. Tooltip defaults to `2` (lightest tier) — quieter than popovers and dropdowns. See the [Surfaces](/docs/getting-started/surfaces) docs.
+  Surface elevation level. Tooltip defaults to `2` (lightest tier), quieter than popovers and dropdowns. See the [Surfaces](/docs/getting-started/surfaces) docs.
 </ApiProp>
 
 <ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="2">

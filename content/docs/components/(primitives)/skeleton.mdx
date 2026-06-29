@@ -6,6 +6,8 @@ type: primitive
 
 import { Skeleton } from "@/registry/default/skeleton/skeleton";
 
+A skeleton is a shimmering placeholder that holds an element's shape while its content loads. Use it for the initial load of cards, lists, tables, or text, in place of a spinner, to preview the layout that is about to appear.
+
 ## Preview
 
 <ComponentPreview component="skeleton" example="skeleton-basic" />
@@ -22,25 +24,25 @@ import { Skeleton } from "@/registry/default/skeleton/skeleton";
 
 ### Synchronized Sweep
 
-The shimmer is positioned relative to the viewport, so a single highlight passes across every skeleton on the page in unison. This makes grouped loading states feel coordinated rather than each element animating on its own.
+The shimmer is anchored to the viewport, so one highlight sweeps across every skeleton on the page in unison.
 
 <ComponentPreview component="skeleton" example="skeleton-sync" />
 
 ### Inverted
 
-Flips the shimmer highlight from light to dark. Useful when the skeleton sits on a light surface where a bright sheen is too loud, or on a dark surface in dark mode where a darker band reads more naturally.
+Use `inverted` to flip the shimmer highlight from light to dark on surfaces where the default sheen is too bright.
 
 <ComponentPreview component="skeleton" example="skeleton-inverted" />
 
 ### Multi-line Text
 
-Pass `multiline` to render the skeleton as an inline element that wraps with its parent text. Each line fragment picks up the shimmer as the same viewport-wide wave sweeps across.
+Use `multiline` to render the skeleton inline so it wraps across multiple lines with its parent text.
 
 <ComponentPreview component="skeleton" example="skeleton-multiline" />
 
 ### Wrapping Content
 
-Wrap existing elements to automatically match their dimensions. The skeleton inherits the size of its children while hiding them with a shimmer overlay.
+Pass children to inherit their dimensions, hiding them under the shimmer until they load.
 
 <ComponentPreview component="skeleton" example="skeleton-wrap" />
 

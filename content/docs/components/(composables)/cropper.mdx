@@ -6,6 +6,8 @@ type: composable
 
 import { Cropper } from "@/registry/default/cropper/cropper";
 
+The cropper lets users pan and zoom an image inside a fixed crop frame, then export the result. Use it for avatar uploads, cover images, and any flow that needs a constrained crop with optional aspect-ratio presets.
+
 ## Preview
 
 <ComponentPreview component="cropper" example="cropper-simple" />
@@ -18,28 +20,45 @@ import { Cropper } from "@/registry/default/cropper/cropper";
 
 <ComponentUsage component="cropper" />
 
+## Composition
+
+`Cropper` holds the image and crop frame. The control components render alongside it and drive state through the `useCropper` hook.
+
+```text
+Cropper
+├── CropperImage
+├── CropperCropArea | CropperCropAreaCircular
+└── CropperDescription
+
+CropperControls
+├── CropperZoomControls
+├── CropperAspectRatioControls
+├── CropperInfo
+└── CropperActions
+```
+
 ## Examples
 
 ### Aspect Ratios
 
-Constrain crops to specific aspect ratios.
+Pass `aspectRatio` to constrain the crop frame to a fixed ratio.
 
 <ComponentPreview component="cropper" example="cropper-aspect-ratios" />
 
 ### With Preview
 
-Show live preview of cropped image.
+Read `onCropChange` to render a live preview of the cropped result.
 
 <ComponentPreview component="cropper" example="cropper-with-preview" />
 
 ### Download Cropped Image
 
-Export and download the cropped result.
+Use `createCropCanvas` and `downloadCroppedImage` to export the crop as a file.
 
 <ComponentPreview component="cropper" example="cropper-download" />
 
 ### Pro Features
 
-Advanced cropping with all features enabled.
+Combine aspect-ratio presets, circular crops, and custom dimensions for a full editor.
 
 <ComponentPreview component="cropper" example="cropper-pro" />

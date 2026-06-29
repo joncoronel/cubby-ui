@@ -6,6 +6,8 @@ type: primitive
 
 import { Kbd } from "@/registry/default/kbd/kbd";
 
+Kbd renders a keyboard key or shortcut with key-cap styling. Use it in docs, tooltips, command menus, and shortcut lists to show combinations like `⌘ K` or `Ctrl + S`. Pass `keys` to render a combination, and it converts named keys to platform symbols automatically.
+
 ## Preview
 
 <ComponentPreview component="kbd" example="kbd-single-keys" />
@@ -22,60 +24,75 @@ import { Kbd } from "@/registry/default/kbd/kbd";
 
 ### Size Variants
 
-Display keyboard keys in different sizes.
+Use `size` to set the key's height and text size.
 
 <ComponentPreview component="kbd" example="kbd-size-variants" />
 
+| Size | Description                  |
+| ---- | ---------------------------- |
+| `sm` | Compact key for dense UI.    |
+| `md` | The default key size.        |
+| `lg` | Larger key for emphasis.     |
+
 ### Color Variants
 
-Apply different color schemes to keys.
+Use `variant` to set the key's color scheme.
 
 <ComponentPreview component="kbd" example="kbd-color-variants" />
 
+| Variant     | Description                              |
+| ----------- | ---------------------------------------- |
+| `default`   | Card-colored key with a subtle border.   |
+| `primary`   | Solid primary-colored key.               |
+| `secondary` | Solid secondary-colored key.             |
+| `outline`   | Borderless, transparent key.             |
+| `ghost`     | Muted key with no border or shadow.      |
+| `danger`    | Destructive-colored key.                 |
+
 ### Manual Key Combinations
 
-Create custom key combinations manually.
+Compose multiple `Kbd` elements to build a combination by hand.
 
 <ComponentPreview component="kbd" example="kbd-manual-key-combinations" />
 
 ### Key Combinations with Props
 
-Define key combinations via component props.
+Use `keys` to render a combination from an array, joined by `separator`.
 
 <ComponentPreview component="kbd" example="kbd-key-combinations-with-props" />
 
 ### Special Keys with Auto Conversion
 
-Automatically convert special key names to symbols.
+Named keys like `cmd` and `shift` convert to symbols automatically.
 
 <ComponentPreview component="kbd" example="kbd-special-keys-with-auto-conversion" />
 
 ### Platform Detection
 
-Detect and display platform-specific key symbols.
+Use `platform` to force `mac` or `windows` symbols, or leave it `auto` to detect the user's OS.
 
 <ComponentPreview component="kbd" example="kbd-platform-detection" />
 
 ### In Context
 
-Use keyboard shortcuts within documentation.
+Place `Kbd` inline within prose to reference a shortcut.
 
 <ComponentPreview component="kbd" example="kbd-in-context" />
 
 ### Keyboard Shortcuts List
 
-Display a complete list of available shortcuts.
+Pair labels with `Kbd` to document a set of shortcuts.
 
 <ComponentPreview component="kbd" example="kbd-keyboard-shortcuts-list" />
 
 ### Live Keyboard Input Detection
 
-Detect and display live keyboard input.
+Reflect the keys the user is pressing in real time.
 
 <ComponentPreview component="kbd" example="kbd-live-keyboard-input-detection" />
 
 ### States
 
-Show different states like active or disabled.
+Use `pressed` and `disabled` to show active or unavailable keys.
 
 <ComponentPreview component="kbd" example="kbd-states" />

@@ -6,6 +6,8 @@ type: primitive
 
 import { RadioGroup, RadioGroupItem } from "@/registry/default/radio-group/radio-group";
 
+A radio group lets the user pick exactly one option from a small, visible set. Use it when every choice should stay on screen, like a plan tier or a shipping speed. For more than a handful of options, or when the choices can stay collapsed, use [`Select`](/docs/components/select) instead.
+
 ## Preview
 
 <ComponentPreview component="radio-group" example="radio-group-basic" />
@@ -18,31 +20,45 @@ import { RadioGroup, RadioGroupItem } from "@/registry/default/radio-group/radio
 
 <ComponentUsage component="radio-group" />
 
+## Composition
+
+```text
+RadioGroup
+└── RadioGroupItem
+```
+
+`RadioGroup` owns the selected `value`; each `RadioGroupItem` carries its own `value` and renders the indicator.
+
 ## Examples
 
 ### Controlled
 
-Manage radio group state externally.
+Use `value` and `onValueChange` on `RadioGroup` to drive the selection yourself.
 
 <ComponentPreview component="radio-group" example="radio-group-controlled" />
 
 ### With Descriptions
 
-Add descriptive text to each radio option.
+Pair each item with a label and helper text for richer options.
 
 <ComponentPreview component="radio-group" example="radio-group-with-descriptions" />
 
 ### Disabled Options
 
-Disable specific radio options within the group.
+Set `disabled` on a `RadioGroupItem` to take a single option out of play.
 
 <ComponentPreview component="radio-group" example="radio-group-disabled-options" />
 
 ### Elevated Variant
 
-On a Card, Dialog, or popover surface, the opaque `default` radio collapses into its parent. Use `variant="elevated"` on `RadioGroupItem` for a translucent overlay that adapts to the substrate. See the [Surfaces](/docs/getting-started/surfaces) docs.
+Use `variant="elevated"` on `RadioGroupItem` for a translucent overlay that adapts to the substrate, so the control reads clearly on a Card, Dialog, or popover instead of collapsing into it. See the [Surfaces](/docs/getting-started/surfaces) docs.
 
 <ComponentPreview component="radio-group" example="radio-group-elevated" />
+
+| Variant    | Description                                                  |
+| ---------- | ----------------------------------------------------------- |
+| `default`  | Opaque `bg-input`, for radios on the page background.       |
+| `elevated` | Translucent `bg-input-elevated`, for raised surfaces.       |
 
 ### Form Integration
 

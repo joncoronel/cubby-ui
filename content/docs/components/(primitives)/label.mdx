@@ -4,6 +4,8 @@ description: Text label for form inputs and other interactive elements
 type: primitive
 ---
 
+A label is the text caption for a form control. Use it to name an input, select, checkbox, or switch, and associate it with `htmlFor` so clicking the label focuses the control.
+
 ## Preview
 
 <ComponentPreview component="label" example="label-demo" />
@@ -15,6 +17,15 @@ type: primitive
 ## Usage
 
 <ComponentUsage component="label" />
+
+## Accessibility
+
+Set `htmlFor` to the `id` of the control the label names. This lets assistive technology announce the label when the control is focused, and lets users click the label to focus the control.
+
+```tsx showLineNumbers
+<Label htmlFor="email">Email</Label>
+<input id="email" type="email" />
+```
 
 ## API Reference
 

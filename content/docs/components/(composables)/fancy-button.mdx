@@ -7,6 +7,8 @@ builtOn: ["button"]
 
 import { FancyButton } from "@/registry/default/fancy-button/fancy-button";
 
+The fancy button is a glossy, dark gradient button with built-in press and hover animation. Use it for a hero call to action or a single standout action where the plain [`Button`](/docs/components/button) would feel too flat. For most actions, reach for [`Button`](/docs/components/button) instead.
+
 ## Preview
 
 <ComponentPreview component="fancy-button" example="fancy-button-demo" />
@@ -23,19 +25,30 @@ import { FancyButton } from "@/registry/default/fancy-button/fancy-button";
 
 ### Sizes
 
-Choose from multiple button sizes.
+Use `size` to set the button's height and padding.
 
 <ComponentPreview component="fancy-button" example="fancy-button-sizes" />
 
+| Value     | Description                          |
+| --------- | ------------------------------------ |
+| `xs`      | Smallest height, compact padding.    |
+| `sm`      | Small height.                        |
+| `default` | Standard height and padding.         |
+| `lg`      | Largest height, roomier padding.     |
+| `icon`    | Square, for an icon-only button.     |
+| `icon_xs` | Square, extra-small icon button.     |
+| `icon_sm` | Square, small icon button.           |
+| `icon_lg` | Square, large icon button.           |
+
 ### With Icons
 
-Add icons for visual context.
+Use `leftSection` and `rightSection` to place icons beside the label.
 
 <ComponentPreview component="fancy-button" example="fancy-button-with-icons" />
 
 ### Custom Colors
 
-Apply custom color schemes.
+Use `color` to swap the dark gradient for a custom tint.
 
 <ComponentPreview
   component="fancy-button"
@@ -44,19 +57,19 @@ Apply custom color schemes.
 
 ### Loading State
 
-Display loading indicator during async actions.
+Pass `disabled` and your own spinner to show progress during async actions.
 
 <ComponentPreview component="fancy-button" example="fancy-button-loading" />
 
 ### Disabled State
 
-Show disabled state for unavailable actions.
+Set `disabled` to block interaction for unavailable actions.
 
 <ComponentPreview component="fancy-button" example="fancy-button-disabled" />
 
 ### As Link
 
-Render as a Next.js Link component.
+Use `render` to render the button as a Next.js `Link`.
 
 <ComponentPreview component="fancy-button" example="fancy-button-as-link" />
 

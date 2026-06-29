@@ -6,6 +6,8 @@ type: primitive
 
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/registry/default/table/table";
 
+A table presents rows and columns of structured data inside a scrollable, card-styled frame. Use it for records you compare across columns, like users, invoices, or transactions, where each row shares the same fields.
+
 ## Preview
 
 <ComponentPreview component="table" example="table-basic" />
@@ -18,35 +20,53 @@ import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, Tabl
 
 <ComponentUsage component="table" />
 
+## Composition
+
+```text
+Table
+├── TableCaption
+├── TableHeader
+│   └── TableRow
+│       └── TableHead
+├── TableBody
+│   └── TableRow
+│       └── TableCell
+└── TableFooter
+    └── TableRow
+        └── TableCell
+```
+
+`Table` reads its variant props (`bordered`, `striped`, and the rest) and passes them to the cells via data attributes, so the styling flags live on the root.
+
 ## Examples
 
 ### With Footer
 
-Add footer rows for totals or summaries.
+Use `TableFooter` to hold totals or summary rows below the body.
 
 <ComponentPreview component="table" example="table-with-footer" />
 
 ### Scrollable
 
-Constrain the table height with `className` to enable scrolling. The header stays sticky automatically.
+Constrain the table height with `className` to enable scrolling; the header stays sticky automatically.
 
 <ComponentPreview component="table" example="table-sticky-header" />
 
 ### Bordered
 
-Add borders to all cells for a grid appearance.
+Set `bordered` on `Table` to draw borders on every cell for a grid look.
 
 <ComponentPreview component="table" example="table-bordered" />
 
 ### Striped
 
-Alternate row backgrounds for better readability.
+Set `striped` on `Table` to alternate row backgrounds for easier scanning.
 
 <ComponentPreview component="table" example="table-striped" />
 
 ### Row Selection
 
-Select rows with visual feedback.
+Set `selected` on a `TableRow` to highlight it as the active selection.
 
 <ComponentPreview component="table" example="table-row-selection" />
 
@@ -137,7 +157,7 @@ Root container that wraps the table and provides variant context to children via
 </ApiProp>
 
 <ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="1">
-  Shadow weight for the outer frame. Defaults to `1` — flat outlined card (rim only, no drops), matching the rest of the flat-card family.
+  Shadow weight for the outer frame. Defaults to `1`, a flat outlined card (rim only, no drops), matching the rest of the flat-card family.
 </ApiProp>
 
 </ApiPropsList>

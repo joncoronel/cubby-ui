@@ -7,6 +7,10 @@ builtOn: ["button"]
 
 import { CopyButton } from "@/registry/default/copy-button/copy-button";
 
+The copy button copies a string to the clipboard and animates to a checkmark to confirm. Use it beside code snippets, API keys, share links, or any value a user needs to grab.
+
+For a full multi-line code sample with its own copy control, use [`CodeBlock`](/docs/components/code-block) instead.
+
 ## Preview
 
 <ComponentPreview component="copy-button" example="copy-button-demo" />
@@ -23,7 +27,7 @@ import { CopyButton } from "@/registry/default/copy-button/copy-button";
 
 ### Custom Icons
 
-Customize the copy and check icons by providing your own icon components.
+Pass `copyIcon` and `checkIcon` to replace the default copy and confirmation icons.
 
 <ComponentPreview component="copy-button"
   example="copy-button-custom-icons-demo"
@@ -31,9 +35,13 @@ Customize the copy and check icons by providing your own icon components.
 
 ### With Toast
 
-Set `toast` to show an anchored toast above the button on successful copy. Pass an options object to customize the description, side, duration, or any other anchored toast option.
+Set `toast` to show an anchored toast above the button on a successful copy. Pass an options object to customize the description, side, duration, or any other anchored toast option.
 
 <ComponentPreview component="copy-button" example="copy-button-with-toast" />
+
+## Accessibility
+
+The button is icon-only, so it ships with a built-in `aria-label` that switches from `"Copy to clipboard"` to `"Copied to clipboard"` when the copy succeeds. Do not pass children; if you need a different label, override `aria-label`.
 
 ## API Reference
 
@@ -75,7 +83,7 @@ Button that copies text to clipboard with visual feedback. Extends the Button co
 
 <ApiProp name="onCopied" fullType="(text: string) => void" simpleType="function">
   Fires after a successful copy with the copied text. Runs independently of
-  `toast` — use it for analytics or extra side effects.
+  `toast`; use it for analytics or extra side effects.
 </ApiProp>
 
 </ApiPropsList>

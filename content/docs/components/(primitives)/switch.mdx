@@ -6,6 +6,8 @@ type: primitive
 
 import { Switch } from "@/registry/default/switch/switch";
 
+A switch toggles a single setting on or off and applies the change immediately. Use it for instant preferences like notifications or dark mode, not for choices a user submits later with a form (reach for [`Checkbox`](/docs/components/checkbox) there).
+
 ## Preview
 
 <ComponentPreview component="switch" example="switch-basic" />
@@ -22,15 +24,20 @@ import { Switch } from "@/registry/default/switch/switch";
 
 ### Card
 
-Use a Label as a clickable card container.
+Wrap the switch in a `Label` to make a whole card row toggle the control.
 
 <ComponentPreview component="switch" example="switch-card" />
 
 ### Pill Shape
 
-Use the `shape="pill"` variant for a wider thumb.
+Use `shape` to set the thumb's aspect ratio and travel distance.
 
 <ComponentPreview component="switch" example="switch-pill" />
+
+| Shape    | Description                                  |
+| -------- | -------------------------------------------- |
+| `circle` | The default, a round thumb.                  |
+| `pill`   | A wider, rectangular thumb.                  |
 
 ### Form Integration
 
@@ -63,4 +70,4 @@ Toggle control for binary on/off states. Wraps Base UI's `Switch.Root` and `Swit
 
 </ApiPropsList>
 
-Switch does not expose a `variant` prop like the other form fields. The unchecked track always uses `bg-input-elevated` — a translucent overlay that adapts to whatever substrate it sits on. This contrasts with both the thumb (white in light, page-dark in dark) AND the parent surface, so a single behavior works everywhere. See the [Surfaces](/docs/getting-started/surfaces) docs.
+Switch does not expose a `variant` prop like the other form fields. The unchecked track always uses `bg-input-elevated`, a translucent overlay that adapts to whatever substrate it sits on. This contrasts with both the thumb (white in light, page-dark in dark) AND the parent surface, so a single behavior works everywhere. See the [Surfaces](/docs/getting-started/surfaces) docs.

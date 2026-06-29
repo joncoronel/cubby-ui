@@ -6,6 +6,8 @@ type: primitive
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/registry/default/accordion/accordion";
 
+The accordion stacks collapsible sections, each with a header that toggles its content. Use it for FAQs, settings groups, or any list where showing one section at a time keeps the page short.
+
 ## Preview
 
 <ComponentPreview component="accordion" example="accordion-demo" />
@@ -18,89 +20,90 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 <ComponentUsage component="accordion" />
 
+## Composition
+
+```text
+Accordion
+└── AccordionItem
+    ├── AccordionTrigger
+    └── AccordionContent
+```
+
+`AccordionTrigger` renders its own `AccordionHeader` internally, so you compose only these four parts.
+
 ## Examples
 
 ### Multiple Open Items
 
-Allow multiple accordion items to be open simultaneously.
+Set `multiple` on `Accordion` to keep more than one item open at once.
 
 <ComponentPreview component="accordion" example="accordion-multiple" />
 
 ### Default Expanded
 
-Set accordion items to be expanded by default.
+Pass `defaultValue` on `Accordion` to expand items on first render.
 
 <ComponentPreview component="accordion" example="accordion-default-expanded" />
 
 ### Disabled Items
 
-Disable specific accordion items to prevent interaction.
+Set `disabled` on an `AccordionItem` to prevent it from toggling.
 
 <ComponentPreview component="accordion" example="accordion-disabled" />
 
 ### Chevron Indicator
 
-Use chevron icons as expand/collapse indicators.
+Set `indicatorType="chevron"` on `AccordionTrigger` to use a chevron instead of the plus.
 
 <ComponentPreview component="accordion" example="accordion-chevron-indicator" />
 
 ### Indicator at Start
 
-Position the expand/collapse indicator at the start of the trigger.
+Set `indicatorPosition="start"` on `AccordionTrigger` to move the indicator before the label.
 
 <ComponentPreview component="accordion" example="accordion-indicator-start" />
 
 ### Without Indicator
 
-Hide the expand/collapse indicator for a minimal design.
+Set `showIndicator={false}` on `AccordionTrigger` to hide the indicator.
 
 <ComponentPreview component="accordion" example="accordion-without-indicator" />
 
 ### With Icon
 
-Add custom icons to accordion triggers.
+Use the `icon` prop on `AccordionTrigger` to render a custom icon before the label.
 
 <ComponentPreview component="accordion" example="accordion-with-icon" />
 
 ### With Subtitle
 
-Include descriptive subtitles in accordion triggers.
+Use the `subtitle` prop on `AccordionTrigger` to render secondary text below the label.
 
 <ComponentPreview component="accordion" example="accordion-with-subtitle" />
 
-### Outline Variant
+### Variants
 
-Display accordion with outline styling.
+Use `variant` on `Accordion` to change how items are framed and separated.
 
 <ComponentPreview component="accordion" example="accordion-outline-variant" />
 
-### Split Variant
-
-Use split styling for separated accordion items.
+| Variant                    | Description                                                       |
+| -------------------------- | ---------------------------------------------------------------- |
+| `default`                  | Borderless items divided by a bottom rule.                       |
+| `split`                    | Each item is its own bordered card.                              |
+| `outline`                  | Items grouped inside one bordered card.                          |
+| `nested`                   | Indented items inside a muted, rounded container.                |
+| `isolated-bordered`        | Bordered items that detach and round when opened.                |
+| `isolated-filled`          | Filled items that detach and round when opened.                  |
+| `isolated-filled-bordered` | Filled items with dividers that detach and round when opened.    |
 
 <ComponentPreview component="accordion" example="accordion-split-variant" />
 
-### Isolated Bordered Variant
-
-Apply bordered styling to isolated accordion items.
-
 <ComponentPreview component="accordion" example="accordion-isolated-bordered-variant" />
-
-### Isolated Filled Variant
-
-Use filled background styling for isolated items.
 
 <ComponentPreview component="accordion" example="accordion-isolated-filled-variant" />
 
-### Isolated Filled Bordered Variant
-
-Combine filled background with borders for isolated items.
-
 <ComponentPreview component="accordion" example="accordion-isolated-filled-bordered-variant" />
-
-### Nested Variant
-
-Create nested accordion structures with indentation.
 
 <ComponentPreview component="accordion" example="accordion-nested-varaint" />
 

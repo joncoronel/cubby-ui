@@ -6,6 +6,8 @@ type: primitive
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/registry/default/collapsible/collapsible";
 
+The collapsible shows or hides a single region of content behind a trigger, with a height animation. Use it for "show more" toggles, optional form sections, or sidebar groups; for a stacked set of toggling sections, use [`Accordion`](/docs/components/accordion) instead.
+
 ## Preview
 
 <ComponentPreview component="collapsible" example="collapsible-basic-usage" />
@@ -18,22 +20,30 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/registry/
 
 <ComponentUsage component="collapsible" />
 
+## Composition
+
+```text
+Collapsible
+├── CollapsibleTrigger
+└── CollapsibleContent
+```
+
 ## Examples
 
 ### Controlled
 
-Manage collapsible state programmatically.
+Pass `open` and `onOpenChange` to manage the open state yourself.
 
 <ComponentPreview component="collapsible" example="collapsible-controlled" />
 
 ### Custom Trigger
 
-Use custom trigger elements for expand/collapse.
+Use the `render` prop on `CollapsibleTrigger` to drive it from your own element.
 
 <ComponentPreview component="collapsible" example="collapsible-custom-trigger" />
 
 ### Custom Animation
 
-Apply custom animation styles to transitions.
+Override the transition on `CollapsibleContent` using the `--collapsible-panel-height` CSS variable.
 
 <ComponentPreview component="collapsible" example="collapsible-custom-animation" />

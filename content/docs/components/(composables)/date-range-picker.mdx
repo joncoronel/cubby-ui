@@ -7,6 +7,10 @@ builtOn: ["calendar", "popover"]
 
 import { DateRangePicker } from "@/registry/default/date-range-picker/date-range-picker";
 
+The date range picker is a trigger button that opens a calendar popover for selecting a start and end date with a live hover preview. Use it for report ranges, booking windows, and date filters.
+
+To select a single date, use [`DatePicker`](/docs/components/date-picker) instead.
+
 ## Preview
 
 <ComponentPreview component="date-range-picker" example="date-range-picker-basic" />
@@ -23,24 +27,28 @@ import { DateRangePicker } from "@/registry/default/date-range-picker/date-range
 
 ### Multiple Months
 
-Display multiple months for easier range selection.
+Set `numberOfMonths` to show several months side by side for easier range selection.
 
 <ComponentPreview component="date-range-picker" example="date-range-picker-multiple-months" />
 
 ### With Custom Format
 
-Customize the date range display format.
+Pass `format` to change how the selected range is displayed.
 
 <ComponentPreview component="date-range-picker" example="date-range-picker-with-format" />
 
 ### With Placeholder
 
-Add custom placeholder text.
+Set `placeholder` for the empty-state text on the trigger.
 
 <ComponentPreview component="date-range-picker" example="date-range-picker-with-placeholder" />
 
 ### Disabled State
 
-Prevent interaction with disabled state.
+Set `disabled` to prevent opening the picker.
 
 <ComponentPreview component="date-range-picker" example="date-range-picker-disabled-state" />
+
+## Accessibility
+
+The trigger opens a calendar popover that traps focus while open. Inside the calendar, use the arrow keys to move between days, `PageUp` and `PageDown` to change months, and `Enter` or `Space` to set the start then the end of the range. Press `Escape` to close.

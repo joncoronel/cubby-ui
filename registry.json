@@ -240,9 +240,6 @@
           "target": "components/ui/cubby-ui/breadcrumbs.tsx"
         }
       ],
-      "registryDependencies": [
-        "@cubby-ui/elevated"
-      ],
       "dependencies": [
         "@hugeicons/react",
         "@hugeicons/core-free-icons"

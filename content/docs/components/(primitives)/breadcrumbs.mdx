@@ -34,6 +34,17 @@ Breadcrumb
 
 ## Examples
 
+### Variants
+
+Use `variant` on `Breadcrumb` to switch between the plain default and a framed `surface` style.
+
+<ComponentPreview component="breadcrumbs" example="breadcrumbs-variants" />
+
+| Variant   | Description                                                      |
+| --------- | --------------------------------------------------------------- |
+| `default` | A plain inline trail. The simplest, most common style.          |
+| `surface` | A framed track with the current page lifted onto a raised pill. |
+
 ### Size Variants
 
 Use `size` on `Breadcrumb` to scale the text and spacing.
@@ -70,6 +81,12 @@ Use `BreadcrumbEllipsis` to collapse the middle of a long path.
 
 <ComponentPreview component="breadcrumbs" example="breadcrumbs-with-ellipsis-for-long-paths" />
 
+### Dropdown
+
+Compose a `BreadcrumbItem` with a [DropdownMenu](/docs/components/dropdown-menu) to collapse part of the path into a menu.
+
+<ComponentPreview component="breadcrumbs" example="breadcrumbs-dropdown" />
+
 ### With Next.js Link
 
 Use the `render` prop on `BreadcrumbLink` to render a Next.js `Link`.
@@ -88,7 +105,7 @@ The `Breadcrumb` nav defaults to `aria-label="breadcrumb"`, and `BreadcrumbPage`
 
 ## API Reference
 
-Breadcrumbs are custom styled components built on native HTML elements (`nav`, `ol`, `li`, `a`, `span`). All props are custom or standard attributes for those elements passed through.
+Breadcrumbs are custom styled components built on native HTML elements (`nav`, `ol`, `li`, `a`, `span`). `BreadcrumbLink` is polymorphic through Base UI's `render` prop; the other parts pass through standard attributes for their element.
 
 ### Props
 
@@ -97,6 +114,10 @@ Breadcrumbs are custom styled components built on native HTML elements (`nav`, `
 Navigation landmark that wraps the trail. Renders a `nav`.
 
 <ApiPropsList>
+
+<ApiProp name="variant" fullType='"default" | "surface"' simpleType="string" defaultValue='"default"'>
+  Visual style of the trail. `default` is a plain inline trail; `surface` frames it in a raised track with the current page lifted onto a pill. Applied through a `data-variant` attribute that descendants read.
+</ApiProp>
 
 <ApiProp name="size" fullType='"sm" | "md" | "lg"' simpleType="string" defaultValue='"md"'>
   Scale of the text and spacing for the whole trail, applied through a `data-size` attribute that descendants read.
@@ -114,8 +135,8 @@ Interactive ancestor link. Renders an `a` by default.
 
 <ApiPropsList>
 
-<ApiProp name="render" fullType="(props: { className: string }) => ReactNode" simpleType="function">
-  Render function for replacing the default `a`, for example to render a Next.js `Link`. Receives the merged `className` to apply.
+<ApiProp name="render" fullType="ReactElement | ((props, state) => ReactElement)" simpleType="element">
+  Render the link as a different element, such as a Next.js `Link`. Pass the element and its props are merged in, for example `render={<Link href="/" />}`.
 </ApiProp>
 
 </ApiPropsList>

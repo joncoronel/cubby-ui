@@ -68,7 +68,9 @@ import base_drawer_base_drawer_with_scroll from "@/registry/examples/base-drawer
 import breadcrumbs_breadcrumbs_basic from "@/registry/examples/breadcrumbs/breadcrumbs-basic";
 import breadcrumbs_breadcrumbs_custom_separator from "@/registry/examples/breadcrumbs/breadcrumbs-custom-separator";
 import breadcrumbs_breadcrumbs_custom_separator_with_prop from "@/registry/examples/breadcrumbs/breadcrumbs-custom-separator-with-prop";
+import breadcrumbs_breadcrumbs_dropdown from "@/registry/examples/breadcrumbs/breadcrumbs-dropdown";
 import breadcrumbs_breadcrumbs_size_variants from "@/registry/examples/breadcrumbs/breadcrumbs-size-variants";
+import breadcrumbs_breadcrumbs_variants from "@/registry/examples/breadcrumbs/breadcrumbs-variants";
 import breadcrumbs_breadcrumbs_with_accessibility_features from "@/registry/examples/breadcrumbs/breadcrumbs-with-accessibility-features";
 import breadcrumbs_breadcrumbs_with_ellipsis_for_long_paths from "@/registry/examples/breadcrumbs/breadcrumbs-with-ellipsis-for-long-paths";
 import breadcrumbs_breadcrumbs_with_icons from "@/registry/examples/breadcrumbs/breadcrumbs-with-icons";
@@ -576,9 +578,7 @@ export const componentMetadata = {
     "title": "Breadcrumbs",
     "description": "A breadcrumbs component.",
     "category": "UI",
-    "registryDependencies": [
-      "@cubby-ui/elevated"
-    ],
+    "registryDependencies": [],
     "dependencies": [
       "@hugeicons/react",
       "@hugeicons/core-free-icons"
@@ -1840,9 +1840,19 @@ export const exampleRegistry = {
       "source": "import {\n  Breadcrumb,\n  BreadcrumbItem,\n  BreadcrumbLink,\n  BreadcrumbList,\n  BreadcrumbPage,\n  BreadcrumbSeparator,\n} from \"@/components/ui/cubby-ui/breadcrumbs\";\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport { ArrowRight01Icon } from \"@hugeicons/core-free-icons\";\nexport default function BreadcrumbsCustomSeparatorWithProp() {\n  return (\n    <Breadcrumb>\n      <BreadcrumbList>\n        <BreadcrumbItem>\n          <BreadcrumbLink href=\"/\">Home</BreadcrumbLink>\n        </BreadcrumbItem>\n        <BreadcrumbSeparator separator={<HugeiconsIcon icon={ArrowRight01Icon} className=\"h-4 w-4\"  strokeWidth={2} />} />\n        <BreadcrumbItem>\n          <BreadcrumbLink href=\"/blog\">Blog</BreadcrumbLink>\n        </BreadcrumbItem>\n        <BreadcrumbSeparator separator={<HugeiconsIcon icon={ArrowRight01Icon} className=\"h-4 w-4\"  strokeWidth={2} />} />\n        <BreadcrumbItem>\n          <BreadcrumbPage>Article Title</BreadcrumbPage>\n        </BreadcrumbItem>\n      </BreadcrumbList>\n    </Breadcrumb>\n  );\n}\n"
     },
     {
+      "title": "Dropdown",
+      "importPath": "breadcrumbs-dropdown",
+      "source": "import {\n  Breadcrumb,\n  BreadcrumbEllipsis,\n  BreadcrumbItem,\n  BreadcrumbLink,\n  BreadcrumbList,\n  BreadcrumbPage,\n  BreadcrumbSeparator,\n} from \"@/components/ui/cubby-ui/breadcrumbs\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  DropdownMenu,\n  DropdownMenuContent,\n  DropdownMenuItem,\n  DropdownMenuTrigger,\n} from \"@/components/ui/cubby-ui/dropdown-menu\";\n\nexport default function BreadcrumbsDropdown() {\n  return (\n    <Breadcrumb>\n      <BreadcrumbList>\n        <BreadcrumbItem>\n          <BreadcrumbLink href=\"/\">Home</BreadcrumbLink>\n        </BreadcrumbItem>\n        <BreadcrumbSeparator />\n        <BreadcrumbItem>\n          <DropdownMenu>\n            <DropdownMenuTrigger\n              render={<Button variant=\"ghost\" size=\"icon_sm\" />}\n            >\n              <BreadcrumbEllipsis />\n              <span className=\"sr-only\">Toggle menu</span>\n            </DropdownMenuTrigger>\n            <DropdownMenuContent align=\"start\">\n              <DropdownMenuItem>Documentation</DropdownMenuItem>\n              <DropdownMenuItem>Themes</DropdownMenuItem>\n              <DropdownMenuItem>GitHub</DropdownMenuItem>\n            </DropdownMenuContent>\n          </DropdownMenu>\n        </BreadcrumbItem>\n        <BreadcrumbSeparator />\n        <BreadcrumbItem>\n          <BreadcrumbLink href=\"/components\">Components</BreadcrumbLink>\n        </BreadcrumbItem>\n        <BreadcrumbSeparator />\n        <BreadcrumbItem>\n          <BreadcrumbPage>Breadcrumbs</BreadcrumbPage>\n        </BreadcrumbItem>\n      </BreadcrumbList>\n    </Breadcrumb>\n  );\n}\n"
+    },
+    {
       "title": "Size Variants",
       "importPath": "breadcrumbs-size-variants",
       "source": "import {\n  Breadcrumb,\n  BreadcrumbItem,\n  BreadcrumbLink,\n  BreadcrumbList,\n  BreadcrumbPage,\n  BreadcrumbSeparator,\n} from \"@/components/ui/cubby-ui/breadcrumbs\";\n\nexport default function BreadcrumbsSizeVariants() {\n  return (\n    <div className=\"space-y-4\">\n      <Breadcrumb size=\"sm\">\n        <BreadcrumbList>\n          <BreadcrumbItem>\n            <BreadcrumbLink href=\"/\">Home</BreadcrumbLink>\n          </BreadcrumbItem>\n          <BreadcrumbSeparator />\n          <BreadcrumbItem>\n            <BreadcrumbPage>Small</BreadcrumbPage>\n          </BreadcrumbItem>\n        </BreadcrumbList>\n      </Breadcrumb>\n      \n      <Breadcrumb size=\"md\">\n        <BreadcrumbList>\n          <BreadcrumbItem>\n            <BreadcrumbLink href=\"/\">Home</BreadcrumbLink>\n          </BreadcrumbItem>\n          <BreadcrumbSeparator />\n          <BreadcrumbItem>\n            <BreadcrumbPage>Medium</BreadcrumbPage>\n          </BreadcrumbItem>\n        </BreadcrumbList>\n      </Breadcrumb>\n      \n      <Breadcrumb size=\"lg\">\n        <BreadcrumbList>\n          <BreadcrumbItem>\n            <BreadcrumbLink href=\"/\">Home</BreadcrumbLink>\n          </BreadcrumbItem>\n          <BreadcrumbSeparator />\n          <BreadcrumbItem>\n            <BreadcrumbPage>Large</BreadcrumbPage>\n          </BreadcrumbItem>\n        </BreadcrumbList>\n      </Breadcrumb>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Variants",
+      "importPath": "breadcrumbs-variants",
+      "source": "import {\n  Breadcrumb,\n  BreadcrumbItem,\n  BreadcrumbLink,\n  BreadcrumbList,\n  BreadcrumbPage,\n  BreadcrumbSeparator,\n} from \"@/components/ui/cubby-ui/breadcrumbs\";\n\nexport default function BreadcrumbsVariants() {\n  return (\n    <div className=\"flex flex-col items-start gap-6\">\n      <Breadcrumb variant=\"default\">\n        <BreadcrumbList>\n          <BreadcrumbItem>\n            <BreadcrumbLink href=\"/\">Home</BreadcrumbLink>\n          </BreadcrumbItem>\n          <BreadcrumbSeparator />\n          <BreadcrumbItem>\n            <BreadcrumbLink href=\"/components\">Components</BreadcrumbLink>\n          </BreadcrumbItem>\n          <BreadcrumbSeparator />\n          <BreadcrumbItem>\n            <BreadcrumbPage>Breadcrumbs</BreadcrumbPage>\n          </BreadcrumbItem>\n        </BreadcrumbList>\n      </Breadcrumb>\n\n      <Breadcrumb variant=\"surface\">\n        <BreadcrumbList>\n          <BreadcrumbItem>\n            <BreadcrumbLink href=\"/\">Home</BreadcrumbLink>\n          </BreadcrumbItem>\n          <BreadcrumbSeparator />\n          <BreadcrumbItem>\n            <BreadcrumbLink href=\"/components\">Components</BreadcrumbLink>\n          </BreadcrumbItem>\n          <BreadcrumbSeparator />\n          <BreadcrumbItem>\n            <BreadcrumbPage>Breadcrumbs</BreadcrumbPage>\n          </BreadcrumbItem>\n        </BreadcrumbList>\n      </Breadcrumb>\n    </div>\n  );\n}\n"
     },
     {
       "title": "With Accessibility Features",
@@ -1862,7 +1872,7 @@ export const exampleRegistry = {
     {
       "title": "With Next Js Link",
       "importPath": "breadcrumbs-with-next-js-link",
-      "source": "import {\n  Breadcrumb,\n  BreadcrumbItem,\n  BreadcrumbLink,\n  BreadcrumbList,\n  BreadcrumbPage,\n  BreadcrumbSeparator,\n} from \"@/components/ui/cubby-ui/breadcrumbs\";\nimport Link from \"next/link\";\n\nexport default function BreadcrumbsWithNextJsLink() {\n  return (\n    <Breadcrumb>\n      <BreadcrumbList>\n        <BreadcrumbItem>\n          <BreadcrumbLink\n            render={({ className }) => (\n              <Link href=\"/\" className={className}>\n                Home\n              </Link>\n            )}\n          />\n        </BreadcrumbItem>\n        <BreadcrumbSeparator />\n        <BreadcrumbItem>\n          <BreadcrumbLink\n            render={({ className }) => (\n              <Link href=\"/products\" className={className}>\n                Products\n              </Link>\n            )}\n          />\n        </BreadcrumbItem>\n        <BreadcrumbSeparator />\n        <BreadcrumbItem>\n          <BreadcrumbLink\n            render={({ className }) => (\n              <Link href=\"/products/electronics\" className={className}>\n                Electronics\n              </Link>\n            )}\n          />\n        </BreadcrumbItem>\n        <BreadcrumbSeparator />\n        <BreadcrumbItem>\n          <BreadcrumbPage>Laptop</BreadcrumbPage>\n        </BreadcrumbItem>\n      </BreadcrumbList>\n    </Breadcrumb>\n  );\n}\n"
+      "source": "import {\n  Breadcrumb,\n  BreadcrumbItem,\n  BreadcrumbLink,\n  BreadcrumbList,\n  BreadcrumbPage,\n  BreadcrumbSeparator,\n} from \"@/components/ui/cubby-ui/breadcrumbs\";\nimport Link from \"next/link\";\n\nexport default function BreadcrumbsWithNextJsLink() {\n  return (\n    <Breadcrumb>\n      <BreadcrumbList>\n        <BreadcrumbItem>\n          <BreadcrumbLink render={<Link href=\"/\" />}>Home</BreadcrumbLink>\n        </BreadcrumbItem>\n        <BreadcrumbSeparator />\n        <BreadcrumbItem>\n          <BreadcrumbLink render={<Link href=\"/products\" />}>\n            Products\n          </BreadcrumbLink>\n        </BreadcrumbItem>\n        <BreadcrumbSeparator />\n        <BreadcrumbItem>\n          <BreadcrumbLink render={<Link href=\"/products/electronics\" />}>\n            Electronics\n          </BreadcrumbLink>\n        </BreadcrumbItem>\n        <BreadcrumbSeparator />\n        <BreadcrumbItem>\n          <BreadcrumbPage>Laptop</BreadcrumbPage>\n        </BreadcrumbItem>\n      </BreadcrumbList>\n    </Breadcrumb>\n  );\n}\n"
     }
   ],
   "button": [
@@ -3996,7 +4006,9 @@ export const componentMap = {
   "breadcrumbs-basic": breadcrumbs_breadcrumbs_basic,
   "breadcrumbs-custom-separator": breadcrumbs_breadcrumbs_custom_separator,
   "breadcrumbs-custom-separator-with-prop": breadcrumbs_breadcrumbs_custom_separator_with_prop,
+  "breadcrumbs-dropdown": breadcrumbs_breadcrumbs_dropdown,
   "breadcrumbs-size-variants": breadcrumbs_breadcrumbs_size_variants,
+  "breadcrumbs-variants": breadcrumbs_breadcrumbs_variants,
   "breadcrumbs-with-accessibility-features": breadcrumbs_breadcrumbs_with_accessibility_features,
   "breadcrumbs-with-ellipsis-for-long-paths": breadcrumbs_breadcrumbs_with_ellipsis_for_long_paths,
   "breadcrumbs-with-icons": breadcrumbs_breadcrumbs_with_icons,

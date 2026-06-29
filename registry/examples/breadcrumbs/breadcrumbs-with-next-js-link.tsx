@@ -13,33 +13,19 @@ export default function BreadcrumbsWithNextJsLink() {
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink
-            render={({ className }) => (
-              <Link href="/" className={className}>
-                Home
-              </Link>
-            )}
-          />
+          <BreadcrumbLink render={<Link href="/" />}>Home</BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
-          <BreadcrumbLink
-            render={({ className }) => (
-              <Link href="/products" className={className}>
-                Products
-              </Link>
-            )}
-          />
+          <BreadcrumbLink render={<Link href="/products" />}>
+            Products
+          </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
-          <BreadcrumbLink
-            render={({ className }) => (
-              <Link href="/products/electronics" className={className}>
-                Electronics
-              </Link>
-            )}
-          />
+          <BreadcrumbLink render={<Link href="/products/electronics" />}>
+            Electronics
+          </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>

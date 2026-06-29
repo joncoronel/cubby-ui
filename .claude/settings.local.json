@@ -150,7 +150,8 @@
       "Bash(awk '/^C:\\\\\\\\/{f=$0; sub\\(/.*cubby-ui\\\\\\\\/,\"\",f\\)} / error/{print f\"  ::  \"$2\"  \"$0}')",
       "Bash(npx playwright *)",
       "PowerShell(npx eslint registry/default/drawer/drawer.tsx 2>&1)",
-      "mcp__shadcn__search_items_in_registries"
+      "mcp__shadcn__search_items_in_registries",
+      "Bash(node \"C:\\\\Users\\\\jonny\\\\.claude\\\\skills\\\\impeccable\\\\scripts\\\\context.mjs\" --target \"registry/default/breadcrumbs/breadcrumbs.tsx\")"
     ],
     "deny": []
   }

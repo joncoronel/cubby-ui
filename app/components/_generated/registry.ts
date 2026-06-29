@@ -376,6 +376,13 @@ import sheet_sheet_non_modal from "@/registry/examples/sheet/sheet-non-modal";
 import sheet_sheet_positions from "@/registry/examples/sheet/sheet-positions";
 import sheet_sheet_variants from "@/registry/examples/sheet/sheet-variants";
 import sheet_sheet_with_form from "@/registry/examples/sheet/sheet-with-form";
+import shimmer_shimmer_demo from "@/registry/examples/shimmer/shimmer-demo";
+import shimmer_shimmer_angle from "@/registry/examples/shimmer/shimmer-angle";
+import shimmer_shimmer_color from "@/registry/examples/shimmer/shimmer-color";
+import shimmer_shimmer_duration from "@/registry/examples/shimmer/shimmer-duration";
+import shimmer_shimmer_none from "@/registry/examples/shimmer/shimmer-none";
+import shimmer_shimmer_once from "@/registry/examples/shimmer/shimmer-once";
+import shimmer_shimmer_spread from "@/registry/examples/shimmer/shimmer-spread";
 import skeleton_skeleton_basic from "@/registry/examples/skeleton/skeleton-basic";
 import skeleton_skeleton_inverted from "@/registry/examples/skeleton/skeleton-inverted";
 import skeleton_skeleton_multiline from "@/registry/examples/skeleton/skeleton-multiline";
@@ -1234,6 +1241,16 @@ export const componentMetadata = {
       "@hugeicons/react",
       "@hugeicons/core-free-icons"
     ],
+    "examples": {},
+    "reference": []
+  },
+  "shimmer": {
+    "name": "shimmer",
+    "title": "Shimmer",
+    "description": "A CSS utility that sweeps an animated highlight across text for live status and streaming states, with no component required.",
+    "category": "UI",
+    "registryDependencies": [],
+    "dependencies": [],
     "examples": {},
     "reference": []
   },
@@ -3459,6 +3476,43 @@ export const exampleRegistry = {
       "source": "\"use client\";\n\nimport {\n  Sheet,\n  SheetBody,\n  SheetClose,\n  SheetContent,\n  SheetDescription,\n  SheetFooter,\n  SheetHeader,\n  SheetTitle,\n  SheetTrigger,\n} from \"@/components/ui/cubby-ui/sheet\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Input } from \"@/components/ui/cubby-ui/input\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function SheetWithForm() {\n  return (\n    <Sheet>\n      <SheetTrigger render={<Button />}>Edit Profile</SheetTrigger>\n      <SheetContent>\n        <SheetHeader>\n          <SheetTitle>Edit profile</SheetTitle>\n          <SheetDescription>\n            Update your profile information below.\n          </SheetDescription>\n        </SheetHeader>\n        <SheetBody className=\"grid gap-4\">\n          <div className=\"grid gap-2\">\n            <Label htmlFor=\"name\">Name</Label>\n            <Input id=\"name\" variant=\"elevated\" placeholder=\"Your name\" />\n          </div>\n          <div className=\"grid gap-2\">\n            <Label htmlFor=\"email\">Email</Label>\n            <Input id=\"email\" variant=\"elevated\" type=\"email\" placeholder=\"you@example.com\" />\n          </div>\n        </SheetBody>\n        <SheetFooter>\n          <SheetClose render={<Button type=\"submit\" />}>Save</SheetClose>\n          <SheetClose render={<Button variant=\"outline\" />}>Cancel</SheetClose>\n        </SheetFooter>\n      </SheetContent>\n    </Sheet>\n  );\n}\n"
     }
   ],
+  "shimmer": [
+    {
+      "title": "Demo",
+      "importPath": "shimmer-demo",
+      "source": "export default function ShimmerDemo() {\n  return (\n    <div className=\"flex h-32 w-full items-center justify-center\">\n      <p className=\"shimmer text-muted-foreground text-sm\">\n        Generating response&hellip;\n      </p>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Angle",
+      "importPath": "shimmer-angle",
+      "source": "export default function ShimmerAngle() {\n  return (\n    <div className=\"text-muted-foreground flex h-32 w-full flex-col items-center justify-center gap-3 text-sm\">\n      <p className=\"shimmer\">Default &middot; 20&deg;</p>\n      <p className=\"shimmer shimmer-angle-0\">Flat &middot; 0&deg;</p>\n      <p className=\"shimmer shimmer-angle-45\">Steeper &middot; 45&deg;</p>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Color",
+      "importPath": "shimmer-color",
+      "source": "export default function ShimmerColor() {\n  return (\n    <div className=\"text-muted-foreground flex h-32 w-full flex-col items-center justify-center gap-3 text-sm\">\n      <p className=\"shimmer\">Generating response&hellip;</p>\n      <p className=\"shimmer shimmer-color-primary\">Generating response&hellip;</p>\n      <p className=\"shimmer shimmer-color-[#22c55e]\">Generating response&hellip;</p>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Duration",
+      "importPath": "shimmer-duration",
+      "source": "export default function ShimmerDuration() {\n  return (\n    <div className=\"text-muted-foreground flex h-32 w-full flex-col items-center justify-center gap-3 text-sm\">\n      <p className=\"shimmer\">Default &middot; 2s</p>\n      <p className=\"shimmer shimmer-duration-1000\">Faster &middot; 1s</p>\n      <p className=\"shimmer shimmer-duration-3500\">Slower &middot; 3.5s</p>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "None",
+      "importPath": "shimmer-none",
+      "source": "export default function ShimmerNone() {\n  return (\n    <div className=\"text-muted-foreground flex h-32 w-full flex-col items-center justify-center gap-3 text-sm\">\n      <p className=\"shimmer\">Shimmer on</p>\n      <p className=\"shimmer shimmer-none\">Shimmer off</p>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Once",
+      "importPath": "shimmer-once",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nexport default function ShimmerOnce() {\n  const [runId, setRunId] = React.useState(0);\n\n  return (\n    <div className=\"flex h-32 w-full flex-col items-center justify-center gap-4 text-sm\">\n      <p\n        key={runId}\n        className=\"shimmer shimmer-once shimmer-duration-1100 text-muted-foreground\"\n      >\n        Response generated.\n      </p>\n      <Button\n        variant=\"outline\"\n        size=\"sm\"\n        onClick={() => setRunId((id) => id + 1)}\n      >\n        Replay\n      </Button>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Spread",
+      "importPath": "shimmer-spread",
+      "source": "export default function ShimmerSpread() {\n  return (\n    <div className=\"text-muted-foreground flex h-32 w-full flex-col items-center justify-center gap-3 text-sm\">\n      <p className=\"shimmer\">Default band</p>\n      <p className=\"shimmer shimmer-spread-24\">Wider band</p>\n      <p className=\"shimmer shimmer-spread-[3rem]\">Narrow band</p>\n    </div>\n  );\n}\n"
+    }
+  ],
   "skeleton": [
     {
       "title": "Basic",
@@ -4250,6 +4304,13 @@ export const componentMap = {
   "sheet-positions": sheet_sheet_positions,
   "sheet-variants": sheet_sheet_variants,
   "sheet-with-form": sheet_sheet_with_form,
+  "shimmer-demo": shimmer_shimmer_demo,
+  "shimmer-angle": shimmer_shimmer_angle,
+  "shimmer-color": shimmer_shimmer_color,
+  "shimmer-duration": shimmer_shimmer_duration,
+  "shimmer-none": shimmer_shimmer_none,
+  "shimmer-once": shimmer_shimmer_once,
+  "shimmer-spread": shimmer_shimmer_spread,
   "skeleton-basic": skeleton_skeleton_basic,
   "skeleton-inverted": skeleton_skeleton_inverted,
   "skeleton-multiline": skeleton_skeleton_multiline,

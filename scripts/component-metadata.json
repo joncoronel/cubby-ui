@@ -444,6 +444,12 @@
     ],
     "reference": []
   },
+  "shimmer": {
+    "title": "Shimmer",
+    "description": "A CSS utility that sweeps an animated highlight across text for live status and streaming states, with no component required.",
+    "dependencies": [],
+    "reference": []
+  },
   "skeleton": {
     "title": "Skeleton",
     "description": "A skeleton component.",

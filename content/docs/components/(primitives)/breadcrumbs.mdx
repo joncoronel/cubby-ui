@@ -101,7 +101,18 @@ Add `aria-label` to items and the nav to clarify the trail for assistive tech.
 
 ## Accessibility
 
-The `Breadcrumb` nav defaults to `aria-label="breadcrumb"`, and `BreadcrumbPage` sets `aria-current="page"` to mark the active location. Separators are hidden from assistive tech with `aria-hidden`, and `BreadcrumbEllipsis` exposes a screen-reader label ("More pages" by default) for the collapsed items.
+The `Breadcrumb` nav defaults to `aria-label="breadcrumb"`. `BreadcrumbPage` marks the current location with `role="link"`, `aria-disabled="true"`, and `aria-current="page"`, so assistive tech announces it as the current, non-actionable page. `BreadcrumbLink` shows a visible focus ring on keyboard focus. Separators are hidden with `aria-hidden`, and `BreadcrumbEllipsis` carries a screen-reader label ("More pages" by default) for the collapsed items.
+
+### Labeling a collapsed trigger
+
+When you collapse items into a [DropdownMenu](/docs/components/dropdown-menu), give the icon-only trigger an accessible name. `BreadcrumbEllipsis` is hidden from assistive tech, so the button has no name on its own.
+
+```tsx showLineNumbers
+<DropdownMenuTrigger render={<Button variant="ghost" size="icon_sm" />}>
+  <BreadcrumbEllipsis />
+  <span className="sr-only">Toggle menu</span>
+</DropdownMenuTrigger>
+```
 
 ## API Reference
 

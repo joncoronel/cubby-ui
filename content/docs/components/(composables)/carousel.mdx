@@ -60,3 +60,92 @@ Use responsive `basis` utilities to change how many slides show per breakpoint.
 ## Accessibility
 
 `CarouselPrevious` and `CarouselNext` carry visually hidden labels and disable themselves at the ends of the list. The carousel region also handles `ArrowLeft` and `ArrowRight` to move between slides when focused.
+
+## API Reference
+
+The Carousel is built on top of [Embla Carousel](https://www.embla-carousel.com). Slide behavior (loop, alignment, drag, snapping) is configured through the `opts` and `plugins` props, which are forwarded to Embla. The props below are specific to this implementation.
+
+For the full list of Embla options, see the [Embla Carousel options documentation](https://www.embla-carousel.com/api/options/).
+
+### Props
+
+#### Carousel
+
+Root container that creates the Embla instance and shares it through context. Renders a `div` with `role="region"`.
+
+<ApiPropsList>
+
+<ApiProp
+  name="orientation"
+  fullType='"horizontal" | "vertical"'
+  simpleType="string"
+  defaultValue='"horizontal"'
+>
+  Scroll direction. Sets Embla's `axis` to `"x"` or `"y"`.
+</ApiProp>
+
+<ApiProp name="opts" fullType="CarouselOptions" simpleType="object">
+  Embla options object, forwarded to `useEmblaCarousel` (for example `{ loop: true, align: "start" }`).
+</ApiProp>
+
+<ApiProp name="plugins" fullType="CarouselPlugin" simpleType="array">
+  Array of Embla plugins, forwarded to `useEmblaCarousel` (for example Autoplay).
+</ApiProp>
+
+<ApiProp name="setApi" fullType="(api: CarouselApi) => void" simpleType="function">
+  Callback receiving the Embla API instance for imperative control from outside the carousel.
+</ApiProp>
+
+</ApiPropsList>
+
+#### CarouselPrevious
+
+Button that scrolls to the previous slide and disables at the start. Wraps [`Button`](/docs/components/button).
+
+<ApiPropsList>
+
+<ApiProp
+  name="variant"
+  fullType='"primary" | "primary-soft" | "neutral" | "secondary" | "outline" | "ghost" | "link" | "destructive" | "destructive-soft"'
+  simpleType="string"
+  defaultValue='"ghost"'
+>
+  Button variant. Defaults to `"ghost"` instead of the `Button` default of `"primary"`.
+</ApiProp>
+
+<ApiProp
+  name="size"
+  fullType='"xs" | "sm" | "default" | "lg" | "icon" | "icon_xs" | "icon_sm" | "icon_lg"'
+  simpleType="string"
+  defaultValue='"icon"'
+>
+  Button size. Defaults to `"icon"` instead of the `Button` default of `"default"`.
+</ApiProp>
+
+</ApiPropsList>
+
+#### CarouselNext
+
+Button that scrolls to the next slide and disables at the end. Wraps [`Button`](/docs/components/button).
+
+<ApiPropsList>
+
+<ApiProp
+  name="variant"
+  fullType='"primary" | "primary-soft" | "neutral" | "secondary" | "outline" | "ghost" | "link" | "destructive" | "destructive-soft"'
+  simpleType="string"
+  defaultValue='"ghost"'
+>
+  Button variant. Defaults to `"ghost"` instead of the `Button` default of `"primary"`.
+</ApiProp>
+
+<ApiProp
+  name="size"
+  fullType='"xs" | "sm" | "default" | "lg" | "icon" | "icon_xs" | "icon_sm" | "icon_lg"'
+  simpleType="string"
+  defaultValue='"icon"'
+>
+  Button size. Defaults to `"icon"` instead of the `Button` default of `"default"`.
+</ApiProp>
+
+</ApiPropsList>

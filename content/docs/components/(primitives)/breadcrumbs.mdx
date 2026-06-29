@@ -85,3 +85,61 @@ Add `aria-label` to items and the nav to clarify the trail for assistive tech.
 ## Accessibility
 
 The `Breadcrumb` nav defaults to `aria-label="breadcrumb"`, and `BreadcrumbPage` sets `aria-current="page"` to mark the active location. Separators are hidden from assistive tech with `aria-hidden`, and `BreadcrumbEllipsis` exposes a screen-reader label ("More pages" by default) for the collapsed items.
+
+## API Reference
+
+Breadcrumbs are custom styled components built on native HTML elements (`nav`, `ol`, `li`, `a`, `span`). All props are custom or standard attributes for those elements passed through.
+
+### Props
+
+#### Breadcrumb
+
+Navigation landmark that wraps the trail. Renders a `nav`.
+
+<ApiPropsList>
+
+<ApiProp name="size" fullType='"sm" | "md" | "lg"' simpleType="string" defaultValue='"md"'>
+  Scale of the text and spacing for the whole trail, applied through a `data-size` attribute that descendants read.
+</ApiProp>
+
+<ApiProp name="aria-label" fullType="string" defaultValue='"breadcrumb"'>
+  Accessible label for the navigation landmark.
+</ApiProp>
+
+</ApiPropsList>
+
+#### BreadcrumbLink
+
+Interactive ancestor link. Renders an `a` by default.
+
+<ApiPropsList>
+
+<ApiProp name="render" fullType="(props: { className: string }) => ReactNode" simpleType="function">
+  Render function for replacing the default `a`, for example to render a Next.js `Link`. Receives the merged `className` to apply.
+</ApiProp>
+
+</ApiPropsList>
+
+#### BreadcrumbSeparator
+
+Divider between items. Renders an `li` marked `aria-hidden`, defaulting to a chevron icon.
+
+<ApiPropsList>
+
+<ApiProp name="separator" fullType="ReactNode" simpleType="node">
+  Custom divider element. Used when no `children` are provided, in place of the default chevron.
+</ApiProp>
+
+</ApiPropsList>
+
+#### BreadcrumbEllipsis
+
+Collapsed indicator for the middle of a long path. Renders a `span` marked `aria-hidden` with a screen-reader label.
+
+<ApiPropsList>
+
+<ApiProp name="aria-label" fullType="string" defaultValue='"More pages"'>
+  Screen-reader label announced for the collapsed items.
+</ApiProp>
+
+</ApiPropsList>

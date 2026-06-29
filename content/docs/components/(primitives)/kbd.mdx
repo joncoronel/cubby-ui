@@ -96,3 +96,54 @@ Reflect the keys the user is pressing in real time.
 Use `pressed` and `disabled` to show active or unavailable keys.
 
 <ComponentPreview component="kbd" example="kbd-states" />
+
+## API Reference
+
+Kbd is a custom styled `kbd` element. All props are custom or standard `kbd` attributes passed through.
+
+### Props
+
+#### Kbd
+
+Keyboard key or shortcut with key-cap styling.
+
+<ApiPropsList>
+
+<ApiProp name="size" fullType='"sm" | "md" | "lg"' simpleType="string" defaultValue='"md"'>
+  Height and text size of the key.
+</ApiProp>
+
+<ApiProp
+  name="variant"
+  fullType='"default" | "primary" | "secondary" | "outline" | "ghost" | "danger"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Color scheme of the key.
+</ApiProp>
+
+<ApiProp name="pressed" fullType="boolean" defaultValue="false">
+  Shows the key in a pressed-down state.
+</ApiProp>
+
+<ApiProp name="keys" fullType="string[]" simpleType="array">
+  Keys to render as a combination, joined by `separator`. When set, `children` is ignored. Named keys convert to platform symbols.
+</ApiProp>
+
+<ApiProp name="separator" fullType="string" defaultValue='"+"'>
+  Symbol placed between keys when rendering a `keys` combination.
+</ApiProp>
+
+<ApiProp name="platform" fullType='"mac" | "windows" | "auto"' simpleType="string" defaultValue='"auto"'>
+  Symbol set used for named keys. `"auto"` detects the user's OS.
+</ApiProp>
+
+<ApiProp name="disabled" fullType="boolean" defaultValue="false">
+  Dims the key and sets `aria-disabled` to mark it unavailable.
+</ApiProp>
+
+<ApiProp name="aria-label" fullType="string" simpleType="string">
+  Accessible label for the key, useful when the visible content is a symbol.
+</ApiProp>
+
+</ApiPropsList>

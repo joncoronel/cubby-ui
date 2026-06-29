@@ -86,3 +86,66 @@ Omit `AlertTitle` to render a description-only alert.
 ## Accessibility
 
 Each `Alert` has `role="alert"`, so screen readers announce its content when it appears. Because the variants signal severity through color, pair `danger` and `warning` alerts with an icon or explicit wording (such as "Error:") so the meaning carries without color.
+
+## API Reference
+
+The Alert is built on top of Base UI's [`useRender`](https://base-ui.com/react/utils/use-render), so every part accepts a `render` prop for polymorphic rendering. The documentation below covers the custom props specific to our implementation.
+
+### Props
+
+#### Alert
+
+Callout container that surfaces an inline message. Sets `role="alert"` and accepts a `render` prop.
+
+<ApiPropsList>
+
+<ApiProp
+  name="variant"
+  fullType='"default" | "info" | "success" | "warning" | "danger"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Severity style of the alert, applied to the accent bar and icon color.
+</ApiProp>
+
+<ApiProp name="render" fullType="ReactElement | ((props, state) => ReactElement)" simpleType="element">
+  Element or function used to render the alert in place of the default `div`.
+</ApiProp>
+
+</ApiPropsList>
+
+#### AlertTitle
+
+Heading line of the alert. Renders an `h4` by default and accepts a `render` prop.
+
+<ApiPropsList>
+
+<ApiProp name="render" fullType="ReactElement | ((props, state) => ReactElement)" simpleType="element">
+  Element or function used to render the title in place of the default `h4`.
+</ApiProp>
+
+</ApiPropsList>
+
+#### AlertDescription
+
+Body text of the alert. Renders a `div` by default and accepts a `render` prop.
+
+<ApiPropsList>
+
+<ApiProp name="render" fullType="ReactElement | ((props, state) => ReactElement)" simpleType="element">
+  Element or function used to render the description in place of the default `div`.
+</ApiProp>
+
+</ApiPropsList>
+
+#### AlertAction
+
+Container for buttons placed alongside the message. Renders a `div` by default and accepts a `render` prop.
+
+<ApiPropsList>
+
+<ApiProp name="render" fullType="ReactElement | ((props, state) => ReactElement)" simpleType="element">
+  Element or function used to render the action container in place of the default `div`.
+</ApiProp>
+
+</ApiPropsList>

@@ -45,3 +45,25 @@ Pass different `ratio` values to compare common aspect ratios side by side.
 Wrap an iframe in `ratio="16/9"` for a responsive video embed.
 
 <ComponentPreview component="aspect-ratio" example="aspect-ratio-video-embed" />
+
+## API Reference
+
+Aspect Ratio is a custom styled `div` wrapper. All props are custom or standard `div` attributes passed through.
+
+### Props
+
+#### AspectRatio
+
+Wraps its content in a `div` that holds a fixed width-to-height ratio.
+
+<ApiPropsList>
+
+<ApiProp
+  name="ratio"
+  fullType="number | `${number}/${number}`"
+  defaultValue="1"
+>
+  Width-to-height ratio of the container. Accepts a number (such as `1.7778`) or a string fraction (such as `"16/9"`), which is divided into a number.
+</ApiProp>
+
+</ApiPropsList>

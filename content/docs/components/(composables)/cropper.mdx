@@ -62,3 +62,260 @@ Use `createCropCanvas` and `downloadCroppedImage` to export the crop as a file.
 Combine aspect-ratio presets, circular crops, and custom dimensions for a full editor.
 
 <ComponentPreview component="cropper" example="cropper-pro" />
+
+## API Reference
+
+The image surface (`Cropper`, `CropperImage`, `CropperCropArea`, `CropperCropAreaCircular`, `CropperDescription`) is built on top of [@origin-space/image-cropper](https://github.com/origin-space/image-cropper). Its props pass through to that library. The control parts (`CropperControls`, `CropperZoomControls`, `CropperAspectRatioControls`, `CropperInfo`, `CropperActions`) are custom, and `useCropper` wires them together.
+
+### Props
+
+#### Cropper
+
+Pan-and-zoom image surface and crop frame. Wraps the cropper library's `Root`.
+
+<ApiPropsList>
+
+<ApiProp name="image" fullType="string" required>
+  URL or data URL of the image to crop.
+</ApiProp>
+
+<ApiProp name="aspectRatio" fullType="number">
+  Locks the crop frame to a fixed width-to-height ratio. Omit for a free-form crop.
+</ApiProp>
+
+<ApiProp name="zoom" fullType="number">
+  Controlled zoom level. Pair with `onZoomChange`.
+</ApiProp>
+
+<ApiProp name="minZoom" fullType="number" defaultValue="1">
+  Lowest zoom level allowed.
+</ApiProp>
+
+<ApiProp name="maxZoom" fullType="number" defaultValue="3">
+  Highest zoom level allowed.
+</ApiProp>
+
+<ApiProp name="cropPadding" fullType="number">
+  Space in pixels between the crop frame and the container edge.
+</ApiProp>
+
+<ApiProp name="zoomSensitivity" fullType="number">
+  Multiplier applied to wheel and pinch zoom input.
+</ApiProp>
+
+<ApiProp name="keyboardStep" fullType="number">
+  Pixels the crop position moves per arrow-key press.
+</ApiProp>
+
+<ApiProp
+  name="onCropChange"
+  fullType="(pixels: Area | null) => void"
+  simpleType="function"
+>
+  Callback fired with the cropped area in source-image pixels whenever the crop changes.
+</ApiProp>
+
+<ApiProp
+  name="onZoomChange"
+  fullType="(zoom: number) => void"
+  simpleType="function"
+>
+  Callback fired when the zoom level changes.
+</ApiProp>
+
+</ApiPropsList>
+
+#### CropperZoomControls
+
+Zoom out, zoom in, and optional reset buttons. Renders a custom toolbar.
+
+<ApiPropsList>
+
+<ApiProp name="zoom" fullType="number" required>
+  Current zoom level to display as a percentage.
+</ApiProp>
+
+<ApiProp
+  name="onZoomChange"
+  fullType="(zoom: number) => void"
+  simpleType="function"
+  required
+>
+  Callback fired when a zoom button is pressed, clamped to `minZoom` and `maxZoom`.
+</ApiProp>
+
+<ApiProp name="minZoom" fullType="number" defaultValue="1">
+  Lowest zoom the buttons allow.
+</ApiProp>
+
+<ApiProp name="maxZoom" fullType="number" defaultValue="3">
+  Highest zoom the buttons allow.
+</ApiProp>
+
+<ApiProp name="step" fullType="number" defaultValue="0.1">
+  Amount each button press changes the zoom.
+</ApiProp>
+
+<ApiProp name="onReset" fullType="() => void" simpleType="function">
+  Callback for the reset button. The button only renders when this is provided.
+</ApiProp>
+
+</ApiPropsList>
+
+#### CropperAspectRatioControls
+
+Row of preset buttons for switching the crop ratio.
+
+<ApiPropsList>
+
+<ApiProp name="aspectRatio" fullType="number" required>
+  Currently active ratio, used to highlight the matching preset.
+</ApiProp>
+
+<ApiProp
+  name="onAspectRatioChange"
+  fullType="(ratio: number) => void"
+  simpleType="function"
+  required
+>
+  Callback fired with the selected preset's value.
+</ApiProp>
+
+<ApiProp name="presets" fullType="AspectRatioPreset[]" defaultValue="ASPECT_RATIO_PRESETS">
+  Presets to render. Each is `{ label: string; value: number; icon?: IconSvgElement }`. Defaults to Free, Square, Portrait, Landscape, and Widescreen.
+</ApiProp>
+
+</ApiPropsList>
+
+#### CropperInfo
+
+Read-only summary of zoom, aspect, and crop size.
+
+<ApiPropsList>
+
+<ApiProp name="cropData" fullType="CropData" simpleType="object">
+  Crop metadata to display, `{ cropArea, zoom, aspectRatio }`. Renders nothing when absent.
+</ApiProp>
+
+<ApiProp name="showDetails" fullType="boolean" defaultValue="false">
+  Also shows the aspect ratio and pixel dimensions in addition to zoom.
+</ApiProp>
+
+</ApiPropsList>
+
+#### CropperActions
+
+Optional download and export buttons.
+
+<ApiPropsList>
+
+<ApiProp name="onDownload" fullType="() => void" simpleType="function">
+  Callback for the download button. The button only renders when provided.
+</ApiProp>
+
+<ApiProp name="onExport" fullType="() => void" simpleType="function">
+  Callback for the export button. The button only renders when provided.
+</ApiProp>
+
+<ApiProp name="downloadLabel" fullType="string" defaultValue='"Download"'>
+  Label for the download button.
+</ApiProp>
+
+<ApiProp name="exportLabel" fullType="string" defaultValue='"Export"'>
+  Label for the export button.
+</ApiProp>
+
+</ApiPropsList>
+
+### Hooks
+
+#### useCropper
+
+```ts
+function useCropper(options?: UseCropperOptions): {
+  zoom: number;
+  aspectRatio: number;
+  cropData: CropData | undefined;
+  setZoom: (zoom: number) => void;
+  setAspectRatio: (ratio: number) => void;
+  onCropChange: (cropArea: Area | null) => void;
+  reset: () => void;
+  exportCrop: (
+    image: HTMLImageElement,
+    filename?: string,
+  ) => Promise<{ canvas: HTMLCanvasElement; blob: Blob; dataUrl: string } | null>;
+  config: { minZoom: number; maxZoom: number; zoomStep: number };
+};
+```
+
+Manages zoom, aspect ratio, and crop state for a `Cropper`, and wires up the control parts. Pass `setZoom`/`zoom` to `CropperZoomControls`, `setAspectRatio`/`aspectRatio` to `CropperAspectRatioControls`, and `onCropChange` to `Cropper`.
+
+**Options**
+
+<ApiPropsList>
+
+<ApiProp name="initialZoom" fullType="number" defaultValue="1">
+  Starting zoom level.
+</ApiProp>
+
+<ApiProp name="initialAspectRatio" fullType="number" defaultValue="1">
+  Starting aspect ratio.
+</ApiProp>
+
+<ApiProp name="minZoom" fullType="number" defaultValue="1">
+  Lowest zoom `setZoom` clamps to.
+</ApiProp>
+
+<ApiProp name="maxZoom" fullType="number" defaultValue="3">
+  Highest zoom `setZoom` clamps to.
+</ApiProp>
+
+<ApiProp name="zoomStep" fullType="number" defaultValue="0.1">
+  Step exposed via `config` for zoom controls.
+</ApiProp>
+
+</ApiPropsList>
+
+**Returns**
+
+| Property         | Type                                                              | Description                                                       |
+| ---------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `zoom`           | `number`                                                         | Current zoom level.                                               |
+| `aspectRatio`    | `number`                                                         | Current aspect ratio.                                             |
+| `cropData`       | `CropData \| undefined`                                          | Latest crop metadata from `onCropChange`.                        |
+| `setZoom`        | `(zoom: number) => void`                                        | Sets zoom, clamped to `minZoom`/`maxZoom`.                       |
+| `setAspectRatio` | `(ratio: number) => void`                                      | Sets the aspect ratio.                                           |
+| `onCropChange`   | `(cropArea: Area \| null) => void`                             | Handler to pass to `Cropper`.                                    |
+| `reset`          | `() => void`                                                    | Resets zoom and aspect ratio to their initial values.            |
+| `exportCrop`     | `(image, filename?) => Promise<{ canvas; blob; dataUrl } \| null>` | Renders the current crop to a canvas, optionally downloading it. |
+| `config`         | `{ minZoom; maxZoom; zoomStep }`                               | Resolved zoom bounds and step.                                   |
+
+### Utilities
+
+#### createCropCanvas
+
+```ts
+function createCropCanvas(
+  image: HTMLImageElement,
+  cropArea: Area,
+  isCircular?: boolean,
+): HTMLCanvasElement;
+```
+
+Draws the cropped region of `image` to a canvas. Pass `isCircular` to clip the output to a circle.
+
+#### downloadCroppedImage
+
+```ts
+function downloadCroppedImage(canvas: HTMLCanvasElement, filename?: string): void;
+```
+
+Triggers a browser download of the canvas as a PNG. `filename` defaults to `"cropped-image.png"`.
+
+#### getCroppedImageBlob
+
+```ts
+function getCroppedImageBlob(canvas: HTMLCanvasElement): Promise<Blob>;
+```
+
+Resolves the canvas contents as a `Blob`, useful for uploading the crop.

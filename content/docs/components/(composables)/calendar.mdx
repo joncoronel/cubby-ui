@@ -59,3 +59,59 @@ Use the `disabled` prop to block specific dates from selection.
 Pass a `footer` to render content below the grid.
 
 <ComponentPreview component="calendar" example="calendar-with-footer" />
+
+## API Reference
+
+The Calendar is built on top of [react-day-picker's DayPicker](https://daypicker.dev/). All DayPicker props are supported and pass through. The documentation below covers the key props and the styling hooks specific to our implementation.
+
+For the complete API, see the [react-day-picker documentation](https://daypicker.dev/api/functions/DayPicker).
+
+### Props
+
+#### Calendar
+
+Month grid for selecting dates. Wraps DayPicker, forwarding all props to it.
+
+<ApiPropsList>
+
+<ApiProp
+  name="mode"
+  fullType='"single" | "multiple" | "range"'
+  simpleType="string"
+>
+  Selection behavior. `"single"` picks one date, `"range"` picks a start and end, `"multiple"` picks any number of individual dates. Pair with `selected` and `onSelect`.
+</ApiProp>
+
+<ApiProp name="selected" fullType="Date | Date[] | DateRange | undefined">
+  The currently selected date(s). Shape depends on `mode`.
+</ApiProp>
+
+<ApiProp
+  name="onSelect"
+  fullType="(selected, triggerDate, modifiers, e) => void"
+  simpleType="function"
+>
+  Callback fired when the selection changes.
+</ApiProp>
+
+<ApiProp name="disabled" fullType="Matcher | Matcher[]">
+  Dates to disable. Accepts a `Date`, an array, a range, a day-of-week matcher, or a predicate function.
+</ApiProp>
+
+<ApiProp name="footer" fullType="ReactNode" simpleType="node">
+  Content rendered below the month grid.
+</ApiProp>
+
+<ApiProp name="showOutsideDays" fullType="boolean" defaultValue="true">
+  Renders days from adjacent months to fill the grid. Set internally; DayPicker defaults to `false`.
+</ApiProp>
+
+<ApiProp
+  name="classNames"
+  fullType="Partial<Record<UI | DayFlag | SelectionState | Animation, string>>"
+  simpleType="object"
+>
+  Class overrides for individual DayPicker elements, merged with the default styling. Keys include `root`, `month_grid`, `day`, `day_button`, `selected`, `range_start`, and others.
+</ApiProp>
+
+</ApiPropsList>

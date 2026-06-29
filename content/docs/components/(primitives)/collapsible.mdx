@@ -47,3 +47,23 @@ Use the `render` prop on `CollapsibleTrigger` to drive it from your own element.
 Override the transition on `CollapsibleContent` using the `--collapsible-panel-height` CSS variable.
 
 <ComponentPreview component="collapsible" example="collapsible-custom-animation" />
+
+## API Reference
+
+The Collapsible component is built on top of [Base UI's Collapsible](https://base-ui.com/react/components/collapsible). All Base UI props are supported and passed through unchanged on every part. Our implementation only adds default styling and animation, so there are no custom props or modified defaults.
+
+For the complete Base UI API, including `open`, `defaultOpen`, and `onOpenChange` on the root, see the [Base UI Collapsible documentation](https://base-ui.com/react/components/collapsible).
+
+### Props
+
+#### Collapsible
+
+Root container that holds the open state. Wraps Base UI's `Collapsible.Root`.
+
+#### CollapsibleTrigger
+
+Button that toggles the panel open and closed. Wraps Base UI's `Collapsible.Trigger`.
+
+#### CollapsibleContent
+
+Animated panel whose height transitions on open and close. Wraps Base UI's `Collapsible.Panel`.

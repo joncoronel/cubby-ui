@@ -70,12 +70,18 @@ Drive `value` from an upload's progress; the bar shows a completed state when it
 
 ## API Reference
 
-### ProgressRoot
+The Progress component is built on top of [Base UI's Progress](https://base-ui.com/react/components/progress). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+
+For the complete Base UI API, see the [Base UI Progress documentation](https://base-ui.com/react/components/progress).
+
+### Props
+
+#### ProgressRoot
 
 <ApiPropsList>
 
 <ApiProp name="animated" fullType="boolean" defaultValue="false">
-  Enable animated progress transitions for smooth visual updates.
+  Ease the indicator between values as it updates.
 </ApiProp>
 
 <ApiProp
@@ -84,7 +90,7 @@ Drive `value` from an upload's progress; the bar shows a completed state when it
   simpleType="string"
   defaultValue='"md"'
 >
-  Size variant for the progress bar. Choose from small, medium, or large sizes.
+  Size of the progress bar.
 </ApiProp>
 
 <ApiProp name="min" fullType="number" defaultValue="0">
@@ -97,18 +103,17 @@ Drive `value` from an upload's progress; the bar shows a completed state when it
 
 </ApiPropsList>
 
-### ProgressTrack
+#### ProgressTrack
 
 <ApiPropsList>
 
 <ApiProp name="striped" fullType="boolean">
-  Add striped background pattern to the progress track for enhanced visual
-  feedback.
+  Add a striped pattern to the track.
 </ApiProp>
 
 </ApiPropsList>
 
-### ProgressValue
+#### ProgressValue
 
 <ApiPropsList>
 
@@ -117,12 +122,7 @@ Drive `value` from an upload's progress; the bar shows a completed state when it
   fullType="(value: number, max: number) => string"
   simpleType="function"
 >
-  Custom function to format the displayed progress value. Receives current value
-  and max value as parameters.
+  Format the displayed value. Receives the current value and max as arguments.
 </ApiProp>
 
 </ApiPropsList>
-
-### Additional Props
-
-Progress components inherit all props from [Base UI Progress](https://base-ui.com/react/components/progress#api-reference), including value, defaultValue, onChange, and accessibility props.

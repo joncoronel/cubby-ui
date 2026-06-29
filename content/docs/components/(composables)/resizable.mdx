@@ -71,3 +71,72 @@ Nest a `ResizablePanelGroup` inside a `ResizablePanel` for grid-like layouts.
 ## Accessibility
 
 `ResizableHandle` is keyboard operable: focus it and use the arrow keys to resize, with a focus ring on `:focus-visible`. The underlying separators expose the appropriate `role` and value attributes from react-resizable-panels.
+
+## API Reference
+
+Resizable is built on top of [react-resizable-panels](https://github.com/bvaughn/react-resizable-panels). All props pass through to the underlying `PanelGroup`, `Panel`, and `PanelResizeHandle`. The documentation below covers the key props and the custom prop on `ResizableHandle`.
+
+For the complete API, see the [react-resizable-panels documentation](https://github.com/bvaughn/react-resizable-panels#api).
+
+### Props
+
+#### ResizablePanelGroup
+
+Container that lays out panels and tracks their sizes. Wraps `PanelGroup`.
+
+<ApiPropsList>
+
+<ApiProp
+  name="direction"
+  fullType='"horizontal" | "vertical"'
+  simpleType="string"
+  required
+>
+  Axis the panels resize along. `"horizontal"` drags left and right, `"vertical"` drags up and down.
+</ApiProp>
+
+<ApiProp name="autoSaveId" fullType="string | null">
+  Persists panel sizes to storage under this id so the layout is restored on reload.
+</ApiProp>
+
+</ApiPropsList>
+
+#### ResizablePanel
+
+A single resizable region. Wraps `Panel`.
+
+<ApiPropsList>
+
+<ApiProp name="defaultSize" fullType="number">
+  Initial size as a percentage of the group (`0` to `100`).
+</ApiProp>
+
+<ApiProp name="minSize" fullType="number">
+  Smallest size the panel can shrink to, as a percentage.
+</ApiProp>
+
+<ApiProp name="maxSize" fullType="number">
+  Largest size the panel can grow to, as a percentage.
+</ApiProp>
+
+<ApiProp name="collapsible" fullType="boolean" defaultValue="false">
+  Allows the panel to collapse below `minSize` to `collapsedSize`.
+</ApiProp>
+
+<ApiProp name="collapsedSize" fullType="number" defaultValue="0">
+  Size the panel snaps to when collapsed. Requires `collapsible`.
+</ApiProp>
+
+</ApiPropsList>
+
+#### ResizableHandle
+
+Draggable divider between two panels. Wraps `PanelResizeHandle`.
+
+<ApiPropsList>
+
+<ApiProp name="withHandle" fullType="boolean" defaultValue="false">
+  Renders a visible grip in the center of the handle. Custom prop not available in react-resizable-panels.
+</ApiProp>
+
+</ApiPropsList>

@@ -52,3 +52,53 @@ Set `disabled` to prevent opening the picker.
 ## Accessibility
 
 The trigger opens a calendar popover that traps focus while open. Inside the calendar, use the arrow keys to move between days, `PageUp` and `PageDown` to change months, and `Enter` or `Space` to set the start then the end of the range. Press `Escape` to close.
+
+## API Reference
+
+The DateRangePicker composes [`Calendar`](/docs/components/calendar) in `range` mode inside a [`Popover`](/docs/components/popover), with a [`Button`](/docs/components/button) trigger. It exposes its own props rather than forwarding to the underlying parts.
+
+### Props
+
+#### DateRangePicker
+
+Trigger button that opens a range-selection calendar popover with hover preview.
+
+<ApiPropsList>
+
+<ApiProp name="value" fullType="DateRange" simpleType="object">
+  The selected range, a `{ from, to }` object. Pair with `onSelect` for controlled use.
+</ApiProp>
+
+<ApiProp
+  name="onSelect"
+  fullType="(range: DateRange | undefined) => void"
+  simpleType="function"
+>
+  Callback fired once both ends of the range are chosen.
+</ApiProp>
+
+<ApiProp name="placeholder" fullType="string" defaultValue='"Select date range"'>
+  Text shown on the trigger when no range is selected.
+</ApiProp>
+
+<ApiProp name="format" fullType="string" defaultValue='"DD MMM YYYY"'>
+  Day.js format string for each date in the displayed range.
+</ApiProp>
+
+<ApiProp name="numberOfMonths" fullType="number" defaultValue="1">
+  Number of months shown side by side in the popover.
+</ApiProp>
+
+<ApiProp name="fixedWeeks" fullType="boolean" defaultValue="false">
+  Always renders six weeks per month so the grid height stays constant.
+</ApiProp>
+
+<ApiProp name="disabled" fullType="boolean" defaultValue="false">
+  Prevents the popover from opening.
+</ApiProp>
+
+<ApiProp name="className" fullType="string">
+  Classes applied to the trigger button. Use a width utility to size it.
+</ApiProp>
+
+</ApiPropsList>

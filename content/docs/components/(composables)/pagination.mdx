@@ -58,3 +58,34 @@ Drop the numbered links to leave only `PaginationPrevious` and `PaginationNext`.
 ## Accessibility
 
 The `Pagination` root is a labeled `nav` landmark. `PaginationLink` sets `aria-current="page"` when `isActive`, and `PaginationEllipsis` is hidden from assistive tech with a visually hidden "More pages" label.
+
+## API Reference
+
+Pagination is a set of custom navigation parts built from plain HTML elements. `PaginationLink` styles itself with `buttonVariants` from [`Button`](/docs/components/button), so all props below are specific to this implementation. Each part also accepts the standard props for its underlying element (`nav`, `ul`, `li`, `a`, or `span`).
+
+### Props
+
+#### PaginationLink
+
+Single page link, rendered as an `a` styled with `buttonVariants`. `PaginationPrevious`, `PaginationNext`, and the numbered links all build on it.
+
+<ApiPropsList>
+
+<ApiProp name="isActive" fullType="boolean" defaultValue="false">
+  Marks the link as the current page. Switches the variant to `outline` and sets `aria-current="page"`.
+</ApiProp>
+
+<ApiProp name="isDisabled" fullType="boolean" defaultValue="false">
+  Disables the link. Removes pointer events, lowers opacity, and sets `aria-disabled`.
+</ApiProp>
+
+<ApiProp
+  name="size"
+  fullType='"xs" | "sm" | "default" | "lg" | "icon" | "icon_xs" | "icon_sm" | "icon_lg"'
+  simpleType="string"
+  defaultValue='"icon"'
+>
+  Size passed to `buttonVariants`. `PaginationPrevious` and `PaginationNext` override this to `"default"` to fit their label.
+</ApiProp>
+
+</ApiPropsList>

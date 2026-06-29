@@ -48,7 +48,7 @@ function BreadcrumbList({ className, ...props }: React.ComponentProps<"ol">) {
         "group-data-[size=sm]:gap-1 group-data-[size=sm]:text-xs group-data-[size=sm]:sm:gap-2",
         "group-data-[size=lg]:gap-2 group-data-[size=lg]:text-base group-data-[size=lg]:sm:gap-3",
         // surface variant — framed gray track lifted off the page.
-        "group-data-[variant=surface]:bg-muted group-data-[variant=surface]:rounded-lg group-data-[variant=surface]:p-1 group-data-[variant=surface]:shadow-[var(--surface-shadow-2),var(--surface-rim-2)]",
+        "group-data-[variant=surface]:bg-muted group-data-[variant=surface]:rounded-lg group-data-[variant=surface]:p-1 group-data-[variant=surface]:shadow-[var(--surface-shadow-1),var(--surface-rim-1)]",
         className,
       )}
       {...props}
@@ -106,7 +106,7 @@ function BreadcrumbPage({ className, ...props }: React.ComponentProps<"span">) {
       className={cn(
         "text-foreground font-normal",
         // surface variant — current-page pill lifted out of the muted track.
-        "group-data-[variant=surface]:bg-surface-4 group-data-[variant=surface]:rounded-sm group-data-[variant=surface]:px-2 group-data-[variant=surface]:py-1 group-data-[variant=surface]:shadow-[var(--surface-shadow-2),var(--surface-rim-2)]",
+        "group-data-[variant=surface]:bg-surface-4 group-data-[variant=surface]:rounded-sm group-data-[variant=surface]:px-2 group-data-[variant=surface]:py-1 group-data-[variant=surface]:shadow-[var(--surface-shadow-3),var(--surface-rim-3)]",
         className,
       )}
       {...props}
@@ -168,7 +168,7 @@ function BreadcrumbEllipsis({
     >
       <HugeiconsIcon
         icon={MoreHorizontalIcon}
-        className="size-4 group-data-[size=sm]:size-3 group-data-[size=lg]:size-5"
+        className="size-4 group-data-[size=lg]:size-5 group-data-[size=sm]:size-3"
         strokeWidth={2}
       />
       <span className="sr-only">{ariaLabel}</span>

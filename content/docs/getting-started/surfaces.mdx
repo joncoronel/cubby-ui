@@ -1,34 +1,50 @@
 ---
 title: Surfaces
-description: An eight-level elevation system for popovers, dropdowns, dialogs, sheets, and drawers, so floating UI stays visible at any nesting depth, in both light and dark mode.
+description: How Cubby keeps floating UI (popovers, dropdowns, dialogs, sheets) clearly lifted above whatever is behind it, at any nesting depth, in light and dark mode.
 ---
 
-## Overview
+Open a dropdown and it should read as floating above the page. Open a popover _inside_ a dialog and it should still read as floating above the dialog. Surfaces is the system that makes that happen automatically, at any depth. Most of the time you never touch it.
 
-Cubby UI's elevation system is an eight-step ladder of substrate colors and shadow recipes. Every floating component (Popover, Dropdown, Dialog, Sheet, Drawer, and so on) picks a level on this ladder. The system is designed so that a popover opened *inside* a dialog still clearly pops above the dialog, even three layers deep.
+## How elevation works
 
-Inspired by [fluidfunctionalism.com/elevated](https://www.fluidfunctionalism.com/elevated), adapted to a prop-based API instead of context, and with a few intentional divergences (see "Design decisions" below).
-
-### Why eight levels
-
-Most apps need three or four. The full eight-level ladder exists so a nested case never collapses. Wrap a panel and its substrate settles at the level it belongs to. The shadow stays the same, so a popover still reads as a popover three layers down.
+Every floating component (Popover, Dropdown, Dialog, Sheet, Drawer, and the rest) sits on a **level** from 1 to 8. The deeper something is nested, the higher its level. A card sits low, a dialog higher, a popover opened inside that dialog higher still. Each step up gets a lighter surface and a stronger shadow, so every layer reads as lifted above the one behind it.
 
 <SurfaceNestingDemo />
 
-In light mode, surfaces 3–8 are all pure white; shadows do the heavy lifting. In dark mode the substrate colors progress from `oklch(0.205)` to `oklch(0.402)` so each layer reads as visibly lifted.
+There are eight levels because a nested case can go surprisingly deep, and the ladder should never run out. Most apps only ever reach for three or four.
 
-## Quick start
+One thing is worth knowing up front, because light and dark behave differently:
 
-Every elevated component (Popover, Dropdown, Dialog, Sheet, etc.) accepts a `level` and `shadowLevel` prop. The defaults match most cases. You only override when nesting deeper than usual.
+- **Light mode** keeps levels 3 and up pure white. The shadow alone does the lifting.
+- **Dark mode** brightens the surface at each level, from `oklch(0.205)` at level 1 to `oklch(0.402)` at level 8, so each layer is visibly lighter than the one below.
+
+## The two knobs
+
+Every elevated component takes two props:
+
+- `level` picks the **surface color**: which rung of the 1 to 8 ladder it sits on.
+- `shadowLevel` picks the **shadow weight**: how heavily it casts.
+
+They move independently. A wide dialog can sit on a mid surface but throw a heavy shadow; a small popover can sit higher yet cast a lighter one. Drag both and watch what changes:
+
+<SurfacePlayground />
+
+In light mode the surface stops changing above level 3 (they are all white) while the shadow keeps growing. In dark mode the surface color climbs with every level. That split is the whole idea: light mode leans on shadow, dark mode leans on color. Toggle the site theme to compare.
+
+## Using it
+
+Here is the part that matters most: **you rarely set either prop.** The defaults are tuned for the common case. A popover already sits at the right level; a dialog already sits higher.
+
+The one time you reach for `level` is when you nest deeper than usual, like opening a popover from inside a dialog:
 
 ```tsx
-// Defaults — uses level=3, shadowLevel=3
+// Default popover: level and shadow are already set for you.
 <Popover>
   <PopoverTrigger>Open</PopoverTrigger>
   <PopoverContent>Default popover</PopoverContent>
 </Popover>
 
-// Inside a Dialog (substrate=5), bump the inner popover to level=7
+// Inside a Dialog (which sits at level 5), bump the inner popover up.
 <Dialog>
   <DialogContent>
     <Popover>
@@ -39,151 +55,155 @@ Every elevated component (Popover, Dropdown, Dialog, Sheet, etc.) accepts a `lev
 </Dialog>
 ```
 
-That's the whole API for consumers. `shadowLevel` is independent of `level`: it controls the drop-shadow weight, which is pinned per-component so a popover always reads visually like a popover regardless of depth.
+Bump `level` (not `shadowLevel`) when you nest. `shadowLevel` stays pinned per component, so a popover keeps reading like a popover no matter how deep it goes.
 
-## The ladder
+> **That is the whole API for most people.** Everything below is reference: the raw tokens, four helpers for building your own surfaces, and the knobs for retuning the system. Skip it until you need it.
 
-Eight bg/shadow pairs. Light mode flattens to pure white from level 3 up; the shadow recipe alone carries elevation. Dark mode keeps adding white-opacity to the substrate *and* progressing the shadow recipe.
+## Reference
+
+### The ladder
+
+Eight surface colors, drawn here in your current theme:
 
 <SurfaceTokensDemo />
 
-### Substrate colors
+| Level       | Light            | Dark               | Typical use                              |
+| ----------- | ---------------- | ------------------ | ---------------------------------------- |
+| `surface-1` | `oklch(0.97 0 0)` | `oklch(0.205 ◇ ◆)` | Page background                          |
+| `surface-2` | `oklch(0.985 0 0)` | `oklch(0.235 ◇ ◆)` | Inline toolbars, menubars                |
+| `surface-3` | `oklch(1 0 0)`    | `oklch(0.264 ◇ ◆)` | Cards, popovers, dropdowns, tooltips     |
+| `surface-4` | `oklch(1 0 0)`    | `oklch(0.293 ◇ ◆)` | Tabs indicator, transitional             |
+| `surface-5` | `oklch(1 0 0)`    | `oklch(0.321 ◇ ◆)` | Dialogs, sheets, drawers, sub-menus      |
+| `surface-6` | `oklch(1 0 0)`    | `oklch(0.348 ◇ ◆)` | Transitional                             |
+| `surface-7` | `oklch(1 0 0)`    | `oklch(0.375 ◇ ◆)` | Popovers nested inside dialogs           |
+| `surface-8` | `oklch(1 0 0)`    | `oklch(0.402 ◇ ◆)` | Maximum elevation (rare)                 |
 
-| Level | Light | Dark | Typical use |
-|---|---|---|---|
-| `surface-1` | `oklch(0.97 0 0)` | `oklch(0.205 ◇ ◆)` | Page background |
-| `surface-2` | `oklch(0.985 0 0)` | `oklch(0.235 ◇ ◆)` | Inline toolbars, menubars |
-| `surface-3` | `oklch(1 0 0)` | `oklch(0.264 ◇ ◆)` | Cards, popovers, dropdowns, tooltips |
-| `surface-4` | `oklch(1 0 0)` | `oklch(0.293 ◇ ◆)` | Tabs indicator, transitional |
-| `surface-5` | `oklch(1 0 0)` | `oklch(0.321 ◇ ◆)` | Dialogs, sheets, drawers, sub-menus |
-| `surface-6` | `oklch(1 0 0)` | `oklch(0.348 ◇ ◆)` | Transitional |
-| `surface-7` | `oklch(1 0 0)` | `oklch(0.375 ◇ ◆)` | Popovers nested inside dialogs |
-| `surface-8` | `oklch(1 0 0)` | `oklch(0.402 ◇ ◆)` | Maximum elevation (rare) |
+`◇` is `var(--neutral-chroma)` and `◆` is `var(--neutral-hue)`; both come from the [brand tint](#brand-tint).
 
-*`◇` is `var(--neutral-chroma)`, `◆` is `var(--neutral-hue)`; see "Brand tint" below.*
-
-The named tokens you've used elsewhere are aliased to the ladder:
+The named tokens you use elsewhere alias onto the ladder, so tuning the ladder updates all of them:
 
 ```css
 --background: var(--surface-1);
---card:       var(--surface-3);   /* Card and Popover share level 3 */
---popover:    var(--surface-3);
---sidebar:    var(--surface-1);
+--card: var(--surface-3); /* Card and Popover share level 3 */
+--popover: var(--surface-3);
+--sidebar: var(--surface-1);
 ```
 
-If you tune the ladder, `bg-background`, `bg-card`, `bg-popover`, and `bg-sidebar` all follow automatically.
+### Shadows
 
-### Shadow recipes
+`shadowLevel` tracks the visual weight of the element, not its surface level. Pick it by size:
 
-Shadows scale with the visual weight of the floating element, not its surface level:
+- Under ~400px wide: `3`
+- ~400 to 800px: `5`
+- Over ~800px or fullscreen: `7`
+- Never let `shadowLevel` exceed `level` by more than 2.
 
-| Shadow | Drop layers | Visual feel |
-|---|---|---|
-| `shadow-surface-1` | 0 (just a 1px ring) | Barely there |
-| `shadow-surface-2` | 1 | Tooltip / quiet |
-| `shadow-surface-3` | 2 | **Dropdown / popover / card** |
-| `shadow-surface-4` | 3 | Toast / floating elements unattached to a trigger |
-| `shadow-surface-5` | 4 | **Dialog / sheet** |
-| `shadow-surface-6` | 5 | Transitional |
-| `shadow-surface-7` | 6 | Dramatic (hero modals) |
-| `shadow-surface-8` | 7 | Maximum gravity (rare) |
+| Shadow             | Drop layers        | Feel                                        |
+| ------------------ | ------------------ | ------------------------------------------- |
+| `shadow-surface-1` | 0 (just a 1px ring) | Barely there                                |
+| `shadow-surface-2` | 1                  | Tooltip, quiet                              |
+| `shadow-surface-3` | 2                  | **Dropdown, popover, card**                 |
+| `shadow-surface-4` | 3                  | Toast, floating elements with no trigger    |
+| `shadow-surface-5` | 4                  | **Dialog, sheet**                           |
+| `shadow-surface-6` | 5                  | Transitional                                |
+| `shadow-surface-7` | 6                  | Dramatic (hero modals)                      |
+| `shadow-surface-8` | 7                  | Maximum gravity (rare)                      |
 
-The dark recipe additionally adds an inset highlight + inset ring that gives elevated surfaces a "lit from above" feel. In light mode, those insets are no-ops (light mode relies on the drop shadow alone).
+In dark mode the recipe also adds an inset highlight and ring, giving surfaces a lit-from-above edge. In light mode those insets are no-ops and the drop shadow does everything.
 
-### Size rule of thumb
+### Component defaults
 
-When picking `shadowLevel`:
+You do not need these day to day; they are what each component already uses. Reach in only to match a custom element to a built-in one.
 
-- Element width < ~400px → `3`
-- Element width ~400–800px → `5`
-- Element width > ~800px or fullscreen → `7`
-- Never let `shadowLevel` exceed `level` by more than 2
+<Accordion>
+  <AccordionItem value="defaults">
+    <AccordionTrigger indicatorType="chevron">
+      Default level and shadow for every component
+    </AccordionTrigger>
+    <AccordionContent>
 
-## Default levels per component
+| Component            | Default `level` | Default `shadowLevel`               |
+| -------------------- | --------------- | ----------------------------------- |
+| Tooltip              | `2`             | `2`                                 |
+| Card                 | `3`             | `1`                                 |
+| Table                | `3`             | `1`                                 |
+| DataTable            | `3`             | `1`                                 |
+| Code block           | `3`             | `1`                                 |
+| ComponentPreview     | `3`             | `1`                                 |
+| Popover              | `3`             | `3`                                 |
+| Dropdown menu        | `3`             | `3`                                 |
+| Dropdown sub-menu    | `5`             | `3`                                 |
+| Context menu         | `3`             | `3`                                 |
+| Context sub-menu     | `5`             | `3`                                 |
+| Menubar (the bar)    | `2`             | `2`                                 |
+| Menubar dropdown     | `3`             | `3`                                 |
+| Menubar sub-menu     | `5`             | `3`                                 |
+| NavigationMenu (bar) | `2`             | `2`                                 |
+| NavigationMenu popup | `3`             | `3`                                 |
+| NavigationMenu sub   | `5`             | `5`                                 |
+| Select               | `3`             | `3`                                 |
+| Toast                | `3`             | `4` (heavier, floats unattached)    |
+| Dialog               | `5`             | `5`                                 |
+| Alert dialog         | `5`             | `5`                                 |
+| Sheet                | `5`             | `5`                                 |
+| Drawer               | `5`             | `5`                                 |
+| Command              | `3`             | `3`                                 |
+| Combobox             | `3`             | `3`                                 |
+| Autocomplete         | `3`             | `3`                                 |
 
-You usually don't need to think about these; the defaults are tuned for the typical case.
+The flat-card family (Card, Table, DataTable, code block, ComponentPreview) all share `solidSurface(3, 1)`: a surface-3 background with a 1px rim and no drop shadow. They are embedded containers, not floating popups, so they read as lifted just enough to define an edge rather than casting a shadow over content.
 
-| Component | Default `level` | Default `shadowLevel` |
-|---|---|---|
-| Tooltip | `2` | `2` |
-| Card | `3` | `1` |
-| Table | `3` | `1` |
-| DataTable | `3` | `1` |
-| Code block | `3` | `1` |
-| ComponentPreview frame | `3` | `1` |
-| Popover | `3` | `3` |
-| Dropdown menu | `3` | `3` |
-| Dropdown sub-menu | `5` | `3` |
-| Context menu | `3` | `3` |
-| Context sub-menu | `5` | `3` |
-| Menubar (the bar) | `2` | `2` |
-| Menubar dropdown | `3` | `3` |
-| Menubar sub-menu | `5` | `3` |
-| NavigationMenu (bar) | `2` | `2` |
-| NavigationMenu popup | `3` | `3` |
-| NavigationMenu sub-popup | `5` | `5` |
-| Select | `3` | `3` |
-| Toast | `3` | `4` (heavier, floats unattached) |
-| Dialog | `5` | `5` |
-| Alert dialog | `5` | `5` |
-| Sheet | `5` | `5` |
-| Drawer | `5` | `5` |
-| Command | `3` | `3` |
-| Combobox | `3` | `3` |
-| Autocomplete | `3` | `3` |
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
 
-The **flat-card family** (Card, Table, DataTable, code-block, ComponentPreview) all share `solidSurface(3, 1)`, a surface-3 bg with a 1px rim only, no drop shadows. They're embedded containers, not floating popups, so they read as "lifted off the page just enough to define an edge" rather than "casting a shadow over content."
+### State overlays
 
-When in doubt: leave the defaults alone, bump `level` (not `shadowLevel`) when nesting.
-
-## State overlays
-
-Hover and selected backgrounds use translucent overlays so they always raise the underlying surface by a fixed perceptual delta, regardless of what level the surface sits at:
+Hover and selected backgrounds are translucent overlays, so they lift whatever surface they sit on by a fixed perceptual step, whatever its level:
 
 ```css
-/* :root (light) */
---surface-hover:    oklch(0 0 0 / 0.06);
+/* light */
+--surface-hover: oklch(0 0 0 / 0.06);
 --surface-selected: oklch(0 0 0 / 0.1);
 
-/* .dark */
---surface-hover:    oklch(1 0 0 / 0.06);
+/* dark */
+--surface-hover: oklch(1 0 0 / 0.06);
 --surface-selected: oklch(1 0 0 / 0.1);
 ```
-
-Apply them on interactive items:
 
 ```tsx
 <div className="bg-(--surface-hover)">Hovered row</div>
 <div className="bg-(--surface-selected)">Active row</div>
 ```
 
-Because they're overlays (not fixed colors), `bg-(--surface-hover)` on a `surface-3` row brightens by the same perceptual step as on a `surface-7` row. Hover always reads as hover, even deeply nested.
+Because they are overlays and not fixed colors, hover on a `surface-3` row brightens by the same amount as on a `surface-7` row. Hover always reads as hover, even deeply nested. The values (6% for hover, 10% for selected) are matched to fluid-functionalism.
 
-The values are matched to fluid-functionalism: 6% black/white overlay for hover, 10% for selected/active.
+## Building your own surface
 
-## Building your own elevated containers
+Making a custom floating container? Four helpers in `@/registry/default/lib/elevated` return Tailwind class strings. Drop them on any element you want elevated. Pick by situation:
 
-Four helpers live in `@/registry/default/lib/elevated`. Each returns Tailwind class strings; drop them on whatever element you want elevated.
+| Helper            | When                                                                 |
+| ----------------- | -------------------------------------------------------------------- |
+| `solidSurface`    | Most cases. The default choice.                                      |
+| `elevatedSurface` | Sticky or opaque children sit near the edges (labels, inset footers). |
+| `surfaceClasses`  | The surface already defines its own edge (a real CSS border).        |
+| `flushSurface`    | A sheet or drawer pinned against a screen edge.                      |
 
-### `solidSurface(level, shadowLevel?)`
+### solidSurface(level, shadowLevel?)
 
-**Default choice.** Returns `bg-surface-N`, the combined drop + rim shadow, and exposes `--popup-surface` for descendants.
+Returns `bg-surface-N`, the combined drop and rim shadow, and exposes `--popup-surface` for descendants. Use it for any floating container without sticky or opaque children near its edges.
 
 ```tsx
 import { solidSurface } from "@/registry/default/lib/elevated";
 
 function Card({ children }) {
-  return (
-    <div className={solidSurface(3)}>{children}</div>
-  );
+  return <div className={solidSurface(3)}>{children}</div>;
 }
 ```
 
-Use this for any floating container that doesn't have sticky or opaque children near its edges.
+### elevatedSurface(level, shadowLevel?)
 
-### `elevatedSurface(level, shadowLevel?)`
-
-Same effect as `solidSurface`, but paints the rim on an `::after` pseudo-element at `z-[2]` instead of on the popup's own box-shadow. Use this whenever sticky or opaque children sit near the surface's edges. With `solidSurface` the rim lives in the box-shadow, so any opaque child at an edge renders on top of it and hides it. Two common cases: **sticky group labels** (Select, Combobox, Autocomplete) and **opaque inset footers** (Dialog, Alert Dialog, Sheet, Drawer, where the `inset` footer's `bg-muted` would otherwise cover the bottom rim).
+Same look as `solidSurface`, but it paints the rim on an `::after` layer above the content instead of in the box-shadow. Reach for it when sticky or opaque children sit near the edges: with `solidSurface` the rim lives in the box-shadow, so an opaque child at an edge renders on top and hides it. The two common cases are sticky group labels (Select, Combobox, Autocomplete) and opaque inset footers (Dialog, Sheet, Drawer, where a `bg-muted` footer would cover the bottom rim).
 
 ```tsx
 import { elevatedSurface } from "@/registry/default/lib/elevated";
@@ -198,11 +218,11 @@ function MenuWithStickyHeader({ children }) {
 }
 ```
 
-Requires the host to be positioned (`relative` or otherwise) and have a border-radius for the rim to clip correctly.
+The host must be positioned and have a border-radius so the rim clips correctly.
 
-### `surfaceClasses(level, shadowLevel?)`
+### surfaceClasses(level, shadowLevel?)
 
-The primitive: just `bg-surface-N` + the downward drop shadow, no rim. It's the building block the other helpers compose from; reach for it directly when the surface defines its own edge another way (a real CSS border, a single-edge rim, etc.).
+The primitive the others build on: just `bg-surface-N` and the downward drop shadow, no rim. Reach for it directly when the surface defines its own edge some other way (a real CSS border, a single-edge rim).
 
 ```tsx
 import { surfaceClasses } from "@/registry/default/lib/elevated";
@@ -212,14 +232,9 @@ function PlainSurface({ children }) {
 }
 ```
 
-### `flushSurface(level, innerEdge)`
+### flushSurface(level, innerEdge)
 
-This is for **viewport-flush** containers: the `default` Sheet and Drawer variants, which slide in pinned against a screen edge. Three of their four edges sit at the viewport boundary, so `solidSurface`'s always-downward shadow + four-edge rim point the wrong way (a top/left/bottom sheet would cast its shadow off-screen, and the rim would draw a thin line along the screen edge). `flushSurface` instead:
-
-- casts the **drop shadow directionally**, toward the inner content-facing edge rather than straight down, and
-- paints a **single-edge rim** on that same edge (via `--surface-rim-color`).
-
-The edge ring matches `solidSurface` exactly in both themes; only the drop is rotated to point at the content. Pass the content-facing edge, or derive it from the attach side with `INNER_EDGE_FROM_ATTACH_SIDE` (`right → left`, `bottom → top`, etc.).
+For viewport-flush containers: the `default` Sheet and Drawer variants that slide in pinned against a screen edge. Three of their four edges sit at the viewport boundary, so `solidSurface`'s always-downward shadow and four-edge rim point the wrong way. `flushSurface` instead casts the drop shadow toward the inner, content-facing edge, and paints a single-edge rim on that same edge. Pass the content-facing edge directly, or derive it from the attach side with `INNER_EDGE_FROM_ATTACH_SIDE` (`right → left`, `bottom → top`, and so on).
 
 ```tsx
 import {
@@ -227,7 +242,7 @@ import {
   INNER_EDGE_FROM_ATTACH_SIDE,
 } from "@/registry/default/lib/elevated";
 
-// Right-flush sheet — shadow + rim on the left (inner-facing) edge
+// Right-flush sheet: shadow and rim on the left (inner) edge.
 function RightSheet({ children }) {
   return (
     <div className={`fixed inset-y-0 right-0 ${flushSurface(5, "left")}`}>
@@ -240,145 +255,155 @@ function RightSheet({ children }) {
 // flushSurface(5, INNER_EDGE_FROM_ATTACH_SIDE[side])
 ```
 
-## Tracking the level from descendants
+## Customizing the system
 
-When you set `level` on a popup, the helpers automatically expose `--popup-surface` as a CSS variable on that element. Children can match the popup's bg color without hardcoding a level:
+### Brand tint
+
+Two variables at the top of `:root` tint every neutral in the system, so you can retune the whole thing from one place:
+
+```css
+--neutral-hue: 275; /* hue angle 0–360. Cool purple-blue. */
+--neutral-chroma: 0.004; /* tint strength for mid-tone neutrals */
+--neutral-chroma-low: 0.002; /* tint strength near the lightness extremes */
+```
+
+Change `--neutral-hue` to rotate the entire palette without touching individual tokens:
+
+- `0 to 90`: warm (red, orange, amber, yellow). Try ~70 for amber.
+- `90 to 180`: green.
+- `180 to 270`: cool (cyan, blue). The primary lives at 250.
+- `270 to 330`: cool purple and violet. The neutral tint sits at 275.
+- `330 to 360`: pink and magenta, heading back toward warm.
+
+`--neutral-chroma` around `0.005 to 0.01` is the visibility floor; we sit just under at `0.004` for a quieter feel.
+
+### Tracking the level from descendants
+
+When you set `level`, the helpers expose `--popup-surface` on that element. Children can match the surface color without hardcoding a level:
 
 ```tsx
-// Arrow that matches whatever level the popup is at
+// Arrow that matches whatever level the popup is at.
 <svg className="fill-(--popup-surface,var(--popover))" />
 
-// Sticky label inside a Select that blends with the popup bg
+// Sticky label inside a Select that blends with the popup.
 <div className="sticky top-0 bg-(--popup-surface)">Group label</div>
 ```
 
-The fallback `var(--popover)` keeps things working if the var isn't set in some context.
-
-## Brand tint
-
-Two CSS variables at the top of `:root` control the entire neutral tint:
-
-```css
---neutral-hue:        275;     /* hue angle (0–360). Cool purple-blue. */
---neutral-chroma:     0.004;   /* tint strength for mid-tone neutrals */
---neutral-chroma-low: 0.002;   /* tint strength at extreme lightness (L > 0.97 or < 0.03) */
-```
-
-Every tinted neutral references these via `var()`: surface ladder dark values, foregrounds in both modes, `--muted`/`--secondary`/`--accent` dark values, sidebar dark values, scrollbar.
-
-**Change `--neutral-hue` to retune the whole system** without touching individual tokens. Suggested ranges:
-
-- `0–90`: warm (red, orange, amber, yellow). Try ~70 for amber.
-- `90–180`: green territory.
-- `180–270`: cool (cyan, blue). Current primary lives at 250.
-- `270–330`: cool purple/violet. Current neutral tint at 275 sits here.
-- `330–360`: pink/magenta back toward warm.
-
-`--neutral-chroma` between `0.005–0.01` is the visibility floor; below that the tint is sub-perceptual. We sit slightly below at `0.004` for a quieter feel.
+The `var(--popover)` fallback keeps things working if the variable is not set in some context.
 
 ## Design decisions
 
-A few places where the system deliberately differs from a strict "tint everything on the ladder" interpretation:
+Surfaces is inspired by [fluidfunctionalism.com/elevated](https://www.fluidfunctionalism.com/elevated), adapted to a prop-based API instead of a context, with a few deliberate divergences from a strict "tint everything on the ladder" reading.
 
-### Light surfaces are pure neutral
+<Accordion multiple>
+  <AccordionItem value="pure-neutral">
+    <AccordionTrigger indicatorType="chevron">
+      Light surfaces are pure neutral
+    </AccordionTrigger>
+    <AccordionContent>
 
-All light-mode backgrounds (surface ladder, `--muted`, `--secondary`, `--accent`, `--input`, sidebar surfaces) have **chroma 0**; they're literally neutral gray/white. The brand tint applies only to:
+Every light-mode background (the surface ladder, `--muted`, `--secondary`, `--accent`, `--input`, sidebar surfaces) has chroma 0: literally neutral gray and white. The brand tint applies only to text foregrounds in light mode and to every dark-mode surface and token.
 
-- Text foregrounds in light mode (subtle warmth in `--foreground`, `--muted-foreground`, etc.)
-- All dark-mode surfaces and tokens.
+Net effect: light mode reads as a clean canvas, dark mode carries the brand identity. It is a common pattern (Linear, Vercel, Stripe): tint on a near-white page reads as a wash rather than a signature, while in dark mode the same chroma has room to express.
 
-Net effect: light mode reads as "clean canvas," dark mode carries the brand identity. This is a common pattern (Linear, Vercel, Stripe): tint on a near-white page tends to read as a "wash" rather than a brand signature, while in dark mode the same chroma has room to express.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="muted">
+    <AccordionTrigger indicatorType="chevron">
+      `--muted` lives off the ladder
+    </AccordionTrigger>
+    <AccordionContent>
 
-### `--muted` lives off-ladder
+`--muted` is a standalone token (`oklch(0.94 0 0)` light, `oklch(0.24 ◇ ◆)` dark), not aliased to a surface level. The ladder represents _lifted_ surfaces (up from the page); `--muted` represents the _recessed_ category: inset wells, code blocks, command-palette wells, quiet differentiation strips.
 
-`--muted` is a standalone token (`oklch(0.94 0 0)` light / `oklch(0.24 ◇ ◆)` dark), not aliased to a surface level. The surface ladder represents *lifted* surfaces (up-only from page); `--muted` represents the **recessed** category: inset wells, code blocks, command palette wells, quiet differentiation strips.
+The reference aliases `--muted` to `surface-2` because its system has no recessed concept. Cubby does, so `--muted` stays separate.
 
-The reference (fluid-functionalism) aliases `--muted: var(--surface-2)` because their system doesn't have a recessed concept. We do, so `--muted` stays standalone.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="form-fields">
+    <AccordionTrigger indicatorType="chevron">
+      Form fields use `--input` and `--input-elevated`
+    </AccordionTrigger>
+    <AccordionContent>
 
-### Form-field bg: `--input` + `--input-elevated`
-
-Form fields come in two appearances, exposed as a `variant` prop on Input, Textarea, NumberField, InputGroup, OTP, Combobox, Autocomplete, Checkbox, and Radio (Switch is the exception, see below):
+Form fields come in two appearances, exposed as a `variant` prop on Input, Textarea, NumberField, InputGroup, OTP, Combobox, Autocomplete, Checkbox, and Radio:
 
 ```tsx
-// Default — opaque "clean lifted card" look. Use on the page.
+// Default: opaque "clean lifted card" look. Use on the page.
 <Input />
 
-// Elevated — translucent overlay that adapts to substrate. Use inside Card,
-// Dialog, popovers, or any surface where the opaque default would collapse
-// into its parent.
+// Elevated: translucent overlay that adapts to its substrate. Use inside a
+// Card, Dialog, or popover, where the opaque default would disappear.
 <Card>
   <Input variant="elevated" />
 </Card>
 ```
 
-The two tokens:
+`--input` resolves to `var(--surface-3)` in both modes (white in light, surface-3 in dark). `--input-elevated` is the same family as the state overlays but stronger, so it adapts to any substrate:
 
 ```css
-/* :root (light) */
---input:          var(--surface-3);          /* opaque, "clean lifted" */
---input-elevated: oklch(0 0 0 / 0.08);       /* 8% black overlay */
+/* light */
+--input: var(--surface-3); /* opaque, "clean lifted" */
+--input-elevated: oklch(0 0 0 / 0.08); /* 8% black overlay */
 
-/* .dark */
---input-elevated: oklch(1 0 0 / 0.09);       /* 9% white overlay */
+/* dark */
+--input-elevated: oklch(1 0 0 / 0.09); /* 9% white overlay */
 ```
 
-`--input` resolves to `var(--surface-3)` in both modes (pure white in light, surface-3 dark in dark). `--input-elevated` is the same family as `--surface-hover`/`--surface-selected` but stronger; it adapts to any substrate.
+One token cannot satisfy every context: an opaque white input feels right on the page, but disappears on a Card or inside a Dialog (also white in light mode), where the translucent overlay is needed instead. The `variant` prop lets the caller choose per context.
 
-Why two? A single token can't satisfy every context cleanly:
+Switch skips the variant. Its unchecked track has to contrast with both its thumb and the parent surface at once, and a single translucent `bg-input-elevated` overlay handles both: it adapts to whatever it sits on while staying a clear gray against the thumb. So Switch has no `variant` prop; it always uses `bg-input-elevated`.
 
-- On the page (`surface-1`), an opaque white input feels right: lifted, clean.
-- On a Card or inside a Dialog (also surface-3 / surface-5 = pure white in light), an opaque white input is invisible against its parent. The translucent overlay is needed instead.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="overlays">
+    <AccordionTrigger indicatorType="chevron">
+      Pure black and white overlays stay untinted
+    </AccordionTrigger>
+    <AccordionContent>
 
-The variant prop lets the caller choose per context. It's the same pattern HeroUI uses for its form fields. Trade-off: callers need to know which to reach for, but it avoids the "form field that disappears on a Card" failure mode.
+`--border`, `--surface-hover`, `--surface-selected`, the dark-mode shadow ring values, `--surface-shadow-*`, and the rest use literal `oklch(0 0 0)` or `oklch(1 0 0)` rather than tinted near-black or near-white. At translucent alpha they borrow their visible color from the tinted substrate beneath, so tinting the overlay itself contributes almost nothing while making the CSS harder to read.
 
-**Switch skips the variant.** Switch's unchecked track has to contrast with *both* its thumb (white in light, page-dark in dark) AND the parent surface. A single translucent `bg-input-elevated` overlay handles both constraints: it adapts to whatever substrate it sits on (page, Card, `bg-muted` toolbar) while always reading as a clear gray against the thumb. So Switch has no `variant` prop; it just uses `bg-input-elevated` always.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="asymmetric">
+    <AccordionTrigger indicatorType="chevron">
+      Inset patterns are mode-asymmetric
+    </AccordionTrigger>
+    <AccordionContent>
 
-### Pure-black / pure-white overlays stay untinted
+The Command well uses `bg-surface-3 dark:bg-surface-1`. In light mode that is a lifted white card inside a gray strip; in dark mode it is a cutout to the page color. Each mode gets strong contrast its own way. A symmetric version (one token for both modes) has a weak mode by construction.
 
-`--border`, `--surface-hover`, `--surface-selected`, the dark-mode shadow `oklch(0 0 0 / X)` ring values, `--surface-shadow-{near,mid,far,ambient}`, etc. all use literal `oklch(0 0 0)` or `oklch(1 0 0)` rather than tinted-near-black/white. At translucent alpha they borrow most of their visible color from the tinted substrate beneath; tinting the overlay itself contributes essentially nothing while making the CSS harder to read.
-
-### Inset patterns are mode-asymmetric
-
-The Command well's inner uses `bg-surface-3 dark:bg-surface-1`. In light mode that's "lifted white card inside a gray strip"; in dark mode it's "cutout to the page color." Each mode gets strong contrast in its own way; a symmetric version (single token both modes) has a weak mode by construction.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
 
 ## Token reference
 
-All tokens live on `:root` and are exposed as Tailwind utilities via `@theme inline`.
-
-### Substrate
+Every token lives on `:root` and is exposed as a Tailwind utility through `@theme inline`. Tune any of them in your `globals.css` to customize the system without touching the components.
 
 ```css
---surface-1 .. --surface-8       /* substrate colors */
---surface-shadow-1 .. -8         /* drop shadow recipes (Tailwind: shadow-surface-N) */
---surface-rim-1 .. -8            /* inset rim recipes (Tailwind: shadow-surface-rim-N) */
-```
+/* Substrate */
+--surface-1 .. --surface-8       /* surface colors */
+--surface-shadow-1 .. -8         /* drop-shadow recipes → shadow-surface-N */
+--surface-rim-1 .. -8            /* inset rim recipes → shadow-surface-rim-N */
 
-### State
-
-```css
+/* State */
 --surface-hover                  /* +6% perceived brightness overlay */
 --surface-selected               /* +10% perceived brightness overlay */
 --input                          /* opaque form-field bg = surface-3 */
---input-elevated                 /* +8% / +12% overlay for elevated form fields and Switch tracks */
+--input-elevated                 /* stronger overlay for elevated fields and Switch */
 --surface-rim-color              /* single-edge rim color (flush sheets) */
---popup-surface                  /* set by helpers, read by descendants */
-```
+--popup-surface                  /* set by the helpers, read by descendants */
 
-### Tint controls
-
-```css
+/* Tint controls */
 --neutral-hue                    /* one knob: rotates the whole tint */
 --neutral-chroma                 /* tint strength for mid-tone neutrals */
---neutral-chroma-low             /* tint strength near gamut extremes */
-```
+--neutral-chroma-low             /* tint strength near the gamut extremes */
 
-### Aliases
-
-```css
+/* Aliases */
 --background  →  var(--surface-1)
 --card        →  var(--surface-3)
 --popover     →  var(--surface-3)
 --sidebar     →  var(--surface-1)
 ```
-
-Tune any token in your `globals.css` to customize the system without changing the components.

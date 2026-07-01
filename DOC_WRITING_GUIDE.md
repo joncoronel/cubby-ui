@@ -124,6 +124,28 @@ the minimal code.
 **Skip** when Base UI handles accessibility and there is nothing specific to add.
 Never write a generic "this component is accessible" section. That's filler.
 
+## Concept and guide pages
+
+The section order above is for component pages. Getting-started and concept
+pages (Surfaces, Theming, Forms) are freeform, but three structural rules keep a
+reference-heavy page from reading as an overwhelming wall of text:
+
+- **Lead with the mental model, in plain language, before the jargon.** Open
+  with the problem the system solves and one visual that makes it click. Define
+  terms like "substrate" or "ladder" only after the reader knows why they'd
+  care.
+- **Tier by audience, and give the majority an exit.** Most readers need only
+  the common path; put it first, then a one-line signpost ("That's the whole API
+  for most people; everything below is reference") before the deep material, so
+  nobody feels obligated to read all of it.
+- **Progressive disclosure for heavy reference.** Exhaustive tables (per-
+  component defaults) and design rationale belong inside an `<Accordion>`,
+  collapsed by default. Still present and still searchable, just out of the way.
+
+Reach for a custom interactive component when it teaches faster than prose (a
+playground that lets the reader feel a system beats three paragraphs describing
+it). The voice rules below still apply on these pages.
+
 ## Voice rules
 
 ### Kill filler

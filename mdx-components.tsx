@@ -11,6 +11,7 @@ import { MdxPreServer } from "@/components/mdx/mdx-pre-server";
 import { ApiProp, ApiPropsList } from "@/components/mdx/api-prop";
 import { SurfaceNestingDemo } from "@/components/mdx/surface-nesting-demo";
 import { SurfaceTokensDemo } from "@/components/mdx/surface-tokens-demo";
+import { SurfacePlayground } from "@/components/mdx/surface-playground";
 import {
   Tabs,
   TabsList,
@@ -18,6 +19,12 @@ import {
   TabsPanels,
   TabsContent,
 } from "@/registry/default/tabs/tabs";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/registry/default/accordion/accordion";
 
 // Notes/callouts authored as Markdown blockquotes. Fumadocs' default renders
 // them with a left side-stripe, italic text, and auto curly-quote marks — we
@@ -58,5 +65,10 @@ export function getMDXComponents(
     ApiPropsList,
     SurfaceNestingDemo,
     SurfaceTokensDemo,
+    SurfacePlayground,
+    Accordion,
+    AccordionItem,
+    AccordionTrigger,
+    AccordionContent,
   };
 }

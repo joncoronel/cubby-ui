@@ -107,7 +107,11 @@ function AccordionHeader({ className, ...props }: BaseAccordion.Header.Props) {
   return (
     <BaseAccordion.Header
       data-slot="accordion-header"
-      className={cn("", className)}
+      // `not-prose` guards the trigger from document typography when the
+      // accordion is rendered inside a prose/markdown container (e.g. MDX docs),
+      // which would otherwise style this heading with large margins and an
+      // inflated line-height. Inert outside a prose context.
+      className={cn("not-prose", className)}
       {...props}
     />
   );

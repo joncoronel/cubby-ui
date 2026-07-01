@@ -261,6 +261,12 @@
     "dependencies": [],
     "reference": []
   },
+  "filters": {
+    "title": "Filters",
+    "description": "A filter bar of segmented pills with per-field operators and value controls.",
+    "dependencies": [],
+    "reference": []
+  },
   "form": {
     "title": "Form",
     "description": "A form component.",

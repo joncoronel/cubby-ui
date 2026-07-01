@@ -38,6 +38,7 @@
     "@cubby-ui/fancy-button",
     "@cubby-ui/field",
     "@cubby-ui/fieldset",
+    "@cubby-ui/filters",
     "@cubby-ui/form",
     "@cubby-ui/input",
     "@cubby-ui/input-group",

@@ -240,6 +240,13 @@ import field_field_with_switch from "@/registry/examples/field/field-with-switch
 import fieldset_fieldset_demo from "@/registry/examples/fieldset/fieldset-demo";
 import fieldset_fieldset_with_checkbox_group from "@/registry/examples/fieldset/fieldset-with-checkbox-group";
 import fieldset_fieldset_with_radio_group from "@/registry/examples/fieldset/fieldset-with-radio-group";
+import filters_filters_basic from "@/registry/examples/filters/filters-basic";
+import filters_filters_controlled from "@/registry/examples/filters/filters-controlled";
+import filters_filters_field_types from "@/registry/examples/filters/filters-field-types";
+import filters_filters_manual from "@/registry/examples/filters/filters-manual";
+import filters_filters_multiselect from "@/registry/examples/filters/filters-multiselect";
+import filters_filters_operators from "@/registry/examples/filters/filters-operators";
+import filters_filters_sizes from "@/registry/examples/filters/filters-sizes";
 import form_form_demo from "@/registry/examples/form/form-demo";
 import form_form_complete from "@/registry/examples/form/form-complete";
 import form_form_constraint_validation from "@/registry/examples/form/form-constraint-validation";
@@ -942,6 +949,27 @@ export const componentMetadata = {
     "category": "UI",
     "registryDependencies": [],
     "dependencies": [],
+    "examples": {},
+    "reference": []
+  },
+  "filters": {
+    "name": "filters",
+    "title": "Filters",
+    "description": "A filter bar of segmented pills with per-field operators and value controls.",
+    "category": "UI",
+    "registryDependencies": [
+      "@cubby-ui/badge",
+      "@cubby-ui/button",
+      "@cubby-ui/button-group",
+      "@cubby-ui/combobox",
+      "@cubby-ui/dropdown-menu",
+      "@cubby-ui/input"
+    ],
+    "dependencies": [
+      "@hugeicons/react",
+      "@hugeicons/core-free-icons",
+      "uuid"
+    ],
     "examples": {},
     "reference": []
   },
@@ -2748,6 +2776,43 @@ export const exampleRegistry = {
       "source": "import { Field, FieldItem, FieldLabel } from \"@/components/ui/cubby-ui/field\";\nimport { Fieldset, FieldsetLegend } from \"@/components/ui/cubby-ui/fieldset\";\nimport {\n  RadioGroup,\n  RadioGroupItem,\n} from \"@/components/ui/cubby-ui/radio-group\";\n\nexport default function FieldsetWithRadioGroup() {\n  return (\n    <Field name=\"notifications\">\n      <Fieldset render={<RadioGroup defaultValue=\"all\" />}>\n        <FieldsetLegend>Notification preferences</FieldsetLegend>\n        <FieldItem>\n          <FieldLabel>\n            <RadioGroupItem value=\"all\" />\n            All notifications\n          </FieldLabel>\n        </FieldItem>\n        <FieldItem>\n          <FieldLabel>\n            <RadioGroupItem value=\"mentions\" />\n            Mentions only\n          </FieldLabel>\n        </FieldItem>\n        <FieldItem>\n          <FieldLabel>\n            <RadioGroupItem value=\"none\" />\n            None\n          </FieldLabel>\n        </FieldItem>\n      </Fieldset>\n    </Field>\n  );\n}\n"
     }
   ],
+  "filters": [
+    {
+      "title": "Basic",
+      "importPath": "filters-basic",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  Filters,\n  createFilter,\n  type FilterField,\n  type FilterValue,\n} from \"@/components/ui/cubby-ui/filters\";\n\nconst fields: FilterField[] = [\n  {\n    id: \"status\",\n    label: \"Status\",\n    type: \"select\",\n    options: [\n      { value: \"todo\", label: \"Todo\" },\n      { value: \"in_progress\", label: \"In progress\" },\n      { value: \"done\", label: \"Done\" },\n      { value: \"canceled\", label: \"Canceled\" },\n    ],\n  },\n  {\n    id: \"priority\",\n    label: \"Priority\",\n    type: \"multiselect\",\n    options: [\n      { value: \"low\", label: \"Low\" },\n      { value: \"medium\", label: \"Medium\" },\n      { value: \"high\", label: \"High\" },\n      { value: \"urgent\", label: \"Urgent\" },\n    ],\n  },\n  { id: \"title\", label: \"Title\", type: \"text\" },\n  { id: \"estimate\", label: \"Estimate\", type: \"number\" },\n];\n\nexport default function FiltersBasic() {\n  const [value, setValue] = React.useState<FilterValue[]>(() => [\n    createFilter(fields[0], { id: \"seed-status\", value: \"in_progress\" }),\n  ]);\n\n  return <Filters fields={fields} value={value} onValueChange={setValue} />;\n}\n"
+    },
+    {
+      "title": "Controlled",
+      "importPath": "filters-controlled",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  Filters,\n  type FilterField,\n  type FilterValue,\n} from \"@/components/ui/cubby-ui/filters\";\n\nconst fields: FilterField[] = [\n  {\n    id: \"status\",\n    label: \"Status\",\n    type: \"select\",\n    options: [\n      { value: \"todo\", label: \"Todo\" },\n      { value: \"in_progress\", label: \"In progress\" },\n      { value: \"done\", label: \"Done\" },\n    ],\n  },\n  {\n    id: \"labels\",\n    label: \"Labels\",\n    type: \"multiselect\",\n    options: [\n      { value: \"bug\", label: \"Bug\" },\n      { value: \"feature\", label: \"Feature\" },\n      { value: \"docs\", label: \"Docs\" },\n    ],\n  },\n  { id: \"estimate\", label: \"Estimate\", type: \"number\" },\n];\n\nexport default function FiltersControlled() {\n  const [value, setValue] = React.useState<FilterValue[]>([]);\n\n  return (\n    <div className=\"flex w-full flex-col gap-4\">\n      <Filters\n        fields={fields}\n        value={value}\n        onValueChange={setValue}\n        showActiveCount\n      />\n      <pre className=\"bg-muted text-muted-foreground max-h-56 overflow-auto rounded-lg p-3 text-xs\">\n        {JSON.stringify(value, null, 2)}\n      </pre>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Field Types",
+      "importPath": "filters-field-types",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  Filters,\n  type FilterField,\n  type FilterValue,\n} from \"@/components/ui/cubby-ui/filters\";\n\nconst fields: FilterField[] = [\n  {\n    id: \"status\",\n    label: \"Status\",\n    type: \"select\",\n    options: [\n      { value: \"todo\", label: \"Todo\" },\n      { value: \"in_progress\", label: \"In progress\" },\n      { value: \"done\", label: \"Done\" },\n    ],\n  },\n  {\n    id: \"labels\",\n    label: \"Labels\",\n    type: \"multiselect\",\n    options: [\n      { value: \"bug\", label: \"Bug\" },\n      { value: \"feature\", label: \"Feature\" },\n      { value: \"docs\", label: \"Docs\" },\n      { value: \"design\", label: \"Design\" },\n    ],\n  },\n  { id: \"title\", label: \"Title\", type: \"text\" },\n  { id: \"estimate\", label: \"Estimate\", type: \"number\" },\n  {\n    // The custom escape hatch: a native date input driving the filter value.\n    id: \"due\",\n    label: \"Due date\",\n    type: \"custom\",\n    defaultValue: \"\",\n    renderValue: ({ value, onValueChange }) => (\n      <input\n        type=\"date\"\n        value={typeof value === \"string\" ? value : \"\"}\n        onChange={(event) => onValueChange(event.target.value)}\n        className=\"bg-card focus-visible:outline-ring/50 h-10 rounded-none border-l px-2.5 text-sm outline-none focus-visible:relative focus-visible:z-10 focus-visible:outline-2 focus-visible:-outline-offset-2 sm:h-9\"\n      />\n    ),\n  },\n];\n\nexport default function FiltersFieldTypes() {\n  const [value, setValue] = React.useState<FilterValue[]>([]);\n  return <Filters fields={fields} value={value} onValueChange={setValue} />;\n}\n"
+    },
+    {
+      "title": "Manual",
+      "importPath": "filters-manual",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  Filters,\n  FilterAddButton,\n  FilterChip,\n  FilterClearButton,\n  type FilterField,\n  type FilterValue,\n} from \"@/components/ui/cubby-ui/filters\";\n\nconst fields: FilterField[] = [\n  {\n    id: \"status\",\n    label: \"Status\",\n    type: \"select\",\n    options: [\n      { value: \"todo\", label: \"Todo\" },\n      { value: \"in_progress\", label: \"In progress\" },\n      { value: \"done\", label: \"Done\" },\n    ],\n  },\n  { id: \"title\", label: \"Title\", type: \"text\" },\n  { id: \"estimate\", label: \"Estimate\", type: \"number\" },\n];\n\nexport default function FiltersManual() {\n  const [value, setValue] = React.useState<FilterValue[]>([]);\n\n  return (\n    <Filters fields={fields} value={value} onValueChange={setValue}>\n      <FilterAddButton />\n      {value.map((filter) => {\n        const field = fields.find((item) => item.id === filter.field);\n        if (!field) return null;\n        return <FilterChip key={filter.id} filter={filter} field={field} />;\n      })}\n      {value.length > 0 && <FilterClearButton />}\n    </Filters>\n  );\n}\n"
+    },
+    {
+      "title": "Multiselect",
+      "importPath": "filters-multiselect",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  Filters,\n  createFilter,\n  type FilterField,\n  type FilterValue,\n} from \"@/components/ui/cubby-ui/filters\";\n\nconst fields: FilterField[] = [\n  {\n    id: \"labels\",\n    label: \"Labels\",\n    type: \"multiselect\",\n    options: [\n      { value: \"bug\", label: \"Bug\" },\n      { value: \"feature\", label: \"Feature\" },\n      { value: \"docs\", label: \"Documentation\" },\n      { value: \"design\", label: \"Design\" },\n      { value: \"infra\", label: \"Infrastructure\" },\n      { value: \"a11y\", label: \"Accessibility\" },\n      { value: \"perf\", label: \"Performance\" },\n      { value: \"security\", label: \"Security\" },\n    ],\n  },\n];\n\nexport default function FiltersMultiselect() {\n  const [value, setValue] = React.useState<FilterValue[]>(() => [\n    createFilter(fields[0], {\n      id: \"seed-labels\",\n      operator: \"is_any_of\",\n      value: [\"bug\", \"feature\", \"docs\"],\n    }),\n  ]);\n\n  return <Filters fields={fields} value={value} onValueChange={setValue} />;\n}\n"
+    },
+    {
+      "title": "Operators",
+      "importPath": "filters-operators",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  Filters,\n  createFilter,\n  type FilterField,\n  type FilterValue,\n} from \"@/components/ui/cubby-ui/filters\";\n\nconst fields: FilterField[] = [\n  {\n    id: \"status\",\n    label: \"Status\",\n    type: \"select\",\n    options: [\n      { value: \"todo\", label: \"Todo\" },\n      { value: \"in_progress\", label: \"In progress\" },\n      { value: \"done\", label: \"Done\" },\n    ],\n  },\n  {\n    // Restrict this field to two operators.\n    id: \"assignee\",\n    label: \"Assignee\",\n    type: \"select\",\n    disabledOperators: [\"is_empty\", \"is_not_empty\"],\n    options: [\n      { value: \"alex\", label: \"Alex\" },\n      { value: \"sam\", label: \"Sam\" },\n      { value: \"jordan\", label: \"Jordan\" },\n    ],\n  },\n  {\n    // Fully custom operator set.\n    id: \"title\",\n    label: \"Title\",\n    type: \"text\",\n    operators: [\n      { id: \"contains\", label: \"contains\" },\n      { id: \"is\", label: \"is exactly\" },\n      { id: \"is_empty\", label: \"is empty\", valueless: true },\n    ],\n  },\n];\n\nexport default function FiltersOperators() {\n  const [value, setValue] = React.useState<FilterValue[]>(() => [\n    createFilter(fields[0], {\n      id: \"seed-status\",\n      operator: \"is_not\",\n      value: \"done\",\n    }),\n    createFilter(fields[2], { id: \"seed-title\", operator: \"is_empty\" }),\n  ]);\n\n  return <Filters fields={fields} value={value} onValueChange={setValue} />;\n}\n"
+    },
+    {
+      "title": "Sizes",
+      "importPath": "filters-sizes",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  Filters,\n  createFilter,\n  type FilterField,\n  type FilterSize,\n  type FilterValue,\n} from \"@/components/ui/cubby-ui/filters\";\n\nconst fields: FilterField[] = [\n  {\n    id: \"status\",\n    label: \"Status\",\n    type: \"select\",\n    options: [\n      { value: \"todo\", label: \"Todo\" },\n      { value: \"in_progress\", label: \"In progress\" },\n      { value: \"done\", label: \"Done\" },\n    ],\n  },\n  { id: \"title\", label: \"Title\", type: \"text\" },\n];\n\nconst sizes: FilterSize[] = [\"sm\", \"default\", \"lg\"];\n\nexport default function FiltersSizes() {\n  const [value, setValue] = React.useState<FilterValue[]>(() => [\n    createFilter(fields[0], { id: \"seed-status\", value: \"in_progress\" }),\n  ]);\n\n  return (\n    <div className=\"flex w-full flex-col gap-4\">\n      {sizes.map((size) => (\n        <Filters\n          key={size}\n          fields={fields}\n          size={size}\n          value={value}\n          onValueChange={setValue}\n        />\n      ))}\n    </div>\n  );\n}\n"
+    }
+  ],
   "form": [
     {
       "title": "Demo",
@@ -4178,6 +4243,13 @@ export const componentMap = {
   "fieldset-demo": fieldset_fieldset_demo,
   "fieldset-with-checkbox-group": fieldset_fieldset_with_checkbox_group,
   "fieldset-with-radio-group": fieldset_fieldset_with_radio_group,
+  "filters-basic": filters_filters_basic,
+  "filters-controlled": filters_filters_controlled,
+  "filters-field-types": filters_filters_field_types,
+  "filters-manual": filters_filters_manual,
+  "filters-multiselect": filters_filters_multiselect,
+  "filters-operators": filters_filters_operators,
+  "filters-sizes": filters_filters_sizes,
   "form-demo": form_form_demo,
   "form-complete": form_form_complete,
   "form-constraint-validation": form_form_constraint_validation,
@@ -4534,6 +4606,10 @@ export const componentAnatomy = {
   "fieldset": {
     "imports": "import { Fieldset, FieldsetLegend } from \"@/components/ui/cubby-ui/fieldset\";",
     "anatomy": "<Fieldset>\n  <FieldsetLegend />\n</Fieldset>"
+  },
+  "filters": {
+    "imports": "import {\n  Filters,\n  createFilter,\n  type FilterField,\n  type FilterValue,\n} from \"@/components/ui/cubby-ui/filters\";",
+    "anatomy": "<Filters />"
   },
   "form": {
     "imports": "import { Form } from \"@/components/ui/cubby-ui/form\";",

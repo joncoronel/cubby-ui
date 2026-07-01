@@ -1,0 +1,243 @@
+---
+title: Filters
+description: A filter bar of segmented pills with per-field operators and value controls
+type: composable
+builtOn: ["button-group", "combobox", "dropdown-menu", "input"]
+---
+
+import { Filters } from "@/registry/default/filters/filters";
+import FiltersBasic from "@/registry/examples/filters/filters-basic";
+import FiltersControlled from "@/registry/examples/filters/filters-controlled";
+import FiltersFieldTypes from "@/registry/examples/filters/filters-field-types";
+import FiltersOperators from "@/registry/examples/filters/filters-operators";
+import FiltersMultiselect from "@/registry/examples/filters/filters-multiselect";
+import FiltersManual from "@/registry/examples/filters/filters-manual";
+import FiltersSizes from "@/registry/examples/filters/filters-sizes";
+
+The filter bar shows active filters as segmented pills, each pairing a field, an operator, and a value, plus an "Add filter" button that opens a searchable field picker. Use it for list and table views where users refine results by several conditions at once, the pattern you see in Linear, Notion, and Stripe.
+
+For a single dropdown of options tied to a form field, use [`Combobox`](/docs/components/combobox) instead.
+
+## Preview
+
+<ComponentPreview component="filters" example="filters-basic">
+  <FiltersBasic />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall component="filters" />
+
+## Usage
+
+<ComponentUsage component="filters" />
+
+## Composition
+
+```text
+Filters
+├── FilterChip
+│   ├── FilterChipField
+│   ├── FilterChipOperator
+│   ├── FilterChipValue
+│   └── FilterChipRemove
+├── FilterAddButton
+├── FilterActiveCount
+└── FilterClearButton
+```
+
+Drive the bar with a `fields` config and a `value` array of active filters. Each field's `type` picks the value control and its default operators; the pills, the add-filter picker, and the operator menus are wired up for you.
+
+```tsx
+const fields: FilterField[] = [
+  {
+    id: "status",
+    label: "Status",
+    type: "select",
+    options: [
+      { value: "todo", label: "Todo" },
+      { value: "done", label: "Done" },
+    ],
+  },
+  { id: "title", label: "Title", type: "text" },
+];
+
+const [value, setValue] = React.useState<FilterValue[]>([]);
+
+return <Filters fields={fields} value={value} onValueChange={setValue} />;
+```
+
+## Features
+
+- Per-type operators with sensible defaults (`is`, `contains`, `between`, `is empty`), overridable or hideable per field.
+- Valueless operators like `is empty` drop the value segment automatically.
+- Controlled and uncontrolled: pass `value` + `onValueChange`, or `defaultValue`.
+- The `custom` field type renders any control through `renderValue`, for dates, sliders, or bespoke inputs.
+- Searchable, keyboard-navigable field and value pickers, inherited from `Combobox`.
+
+## Examples
+
+### Controlled
+
+Pass `value` and `onValueChange` to own the state; the serialized filters update as you edit.
+
+<ComponentPreview component="filters" example="filters-controlled">
+  <FiltersControlled />
+</ComponentPreview>
+
+### Field types
+
+Use `type` to pick the value control. `select` and `multiselect` open a searchable list, `text` and `number` render inline inputs, and `custom` renders your own control through `renderValue`.
+
+| Type            | Value control                          | Value shape                     |
+| --------------- | -------------------------------------- | ------------------------------- |
+| `"select"`      | Searchable single-select list.         | `string \| null`                |
+| `"multiselect"` | Searchable multi-select list.          | `string[]`                      |
+| `"text"`        | Inline text input.                     | `string`                        |
+| `"number"`      | Inline number input, paired for `between`. | `number \| null \| NumberRange` |
+| `"custom"`      | Your control via `renderValue`.        | `unknown`                       |
+
+<ComponentPreview component="filters" example="filters-field-types">
+  <FiltersFieldTypes />
+</ComponentPreview>
+
+### Operators
+
+Use `operators` to replace the default set for a field, or `disabledOperators` to remove specific ones. Operators marked `valueless` hide the value segment.
+
+<ComponentPreview component="filters" example="filters-operators">
+  <FiltersOperators />
+</ComponentPreview>
+
+### Multiselect
+
+A `multiselect` field collapses its selection to the first label plus a count.
+
+<ComponentPreview component="filters" example="filters-multiselect">
+  <FiltersMultiselect />
+</ComponentPreview>
+
+### Manual layout
+
+Pass `children` to lay the bar out yourself with `FilterChip`, `FilterAddButton`, and `FilterClearButton`, which read the shared state from context.
+
+<ComponentPreview component="filters" example="filters-manual">
+  <FiltersManual />
+</ComponentPreview>
+
+### Sizes
+
+Use `size` to set the height of every pill in the bar.
+
+<ComponentPreview component="filters" example="filters-sizes">
+  <FiltersSizes />
+</ComponentPreview>
+
+## Accessibility
+
+The field picker and value lists are `Combobox` instances, so type-to-search, arrow-key navigation, and selection follow the ARIA combobox pattern. The operator menu is a `DropdownMenu` radio group. The remove control on each pill is an icon button with an `aria-label` of `"Remove filter"`.
+
+## API Reference
+
+Filters is a custom component composed from Cubby UI primitives. It has no Base UI root of its own; the value and field pickers are [`Combobox`](/docs/components/combobox) and the operator menu is [`DropdownMenu`](/docs/components/dropdown-menu).
+
+### Props
+
+#### Filters
+
+The bar. Owns filter state and renders a pill per active filter plus the add-filter control.
+
+<ApiPropsList>
+
+<ApiProp name="fields" fullType="FilterField[]">
+  Field definitions the bar can filter on. Each field's `type` determines its value control and default operators.
+</ApiProp>
+
+<ApiProp name="value" fullType="FilterValue[]">
+  Controlled list of active filters. Pair with `onValueChange`.
+</ApiProp>
+
+<ApiProp name="defaultValue" fullType="FilterValue[]" defaultValue="[]">
+  Initial filters in uncontrolled mode. Seed entries with `createFilter` so each has a stable id.
+</ApiProp>
+
+<ApiProp name="onValueChange" fullType="(value: FilterValue[]) => void">
+  Called whenever a filter is added, edited, or removed.
+</ApiProp>
+
+<ApiProp
+  name="size"
+  fullType='"sm" | "default" | "lg"'
+  defaultValue='"default"'
+>
+  Height of every pill and the add-filter button.
+</ApiProp>
+
+<ApiProp name="showClear" fullType="boolean" defaultValue="true">
+  Shows a "Clear all" button once at least one filter is active.
+</ApiProp>
+
+<ApiProp name="showActiveCount" fullType="boolean" defaultValue="false">
+  Shows a badge with the number of active filters.
+</ApiProp>
+
+<ApiProp name="allowDuplicateFields" fullType="boolean" defaultValue="false">
+  Allows the same field to be added more than once. When `false`, used fields are disabled in the picker.
+</ApiProp>
+
+<ApiProp name="addLabel" fullType="ReactNode" defaultValue='"Add filter"'>
+  Label for the add-filter button.
+</ApiProp>
+
+<ApiProp name="labels" fullType="Partial<FiltersLabels>">
+  Overrides for the bar's copy, such as the search placeholders and empty-state text.
+</ApiProp>
+
+</ApiPropsList>
+
+#### FilterChip
+
+A single pill. Renders the field, operator, value, and remove segments for one filter. Provide `filter` and `field`; other state comes from the `Filters` context.
+
+<ApiPropsList>
+
+<ApiProp name="filter" fullType="FilterValue">
+  The active filter this pill represents.
+</ApiProp>
+
+<ApiProp name="field" fullType="FilterField">
+  The field definition matching `filter.field`.
+</ApiProp>
+
+</ApiPropsList>
+
+### Types
+
+#### FilterField
+
+A discriminated union keyed on `type`. Every variant has `id`, `label`, and optional `icon`, `operators`, and `disabledOperators`. `select` and `multiselect` add `options`; `custom` adds `renderValue` and optional `defaultValue`.
+
+#### FilterValue
+
+```ts
+interface FilterValue {
+  id: string;
+  field: string;
+  operator: string;
+  value: unknown;
+}
+```
+
+### Helpers
+
+#### createFilter
+
+Creates a `FilterValue` with a stable id, the field's first operator, and a typed empty value. Pass a partial to override any of them.
+
+```ts
+createFilter(statusField, { value: "in_progress" });
+```
+
+#### resolveOperators
+
+Returns the operators available for a field, applying `operators` and `disabledOperators`.

@@ -3,6 +3,10 @@
 import * as React from "react";
 import {
   Filters,
+  FilterActiveCount,
+  FilterAddButton,
+  FilterChips,
+  FilterClearButton,
   type FilterField,
   type FilterValue,
 } from "@/registry/default/filters/filters";
@@ -64,12 +68,16 @@ export default function FiltersControlled() {
 
   return (
     <div className="flex w-full flex-col gap-4">
-      <Filters
-        fields={fields}
-        value={value}
-        onValueChange={setValue}
-        showActiveCount
-      />
+      <Filters fields={fields} value={value} onValueChange={setValue}>
+        <FilterChips />
+        <FilterAddButton />
+        {value.length > 0 && (
+          <>
+            <FilterActiveCount />
+            <FilterClearButton />
+          </>
+        )}
+      </Filters>
       <pre className="bg-muted text-muted-foreground max-h-56 overflow-auto rounded-lg p-3 text-xs">
         {JSON.stringify(value, null, 2)}
       </pre>

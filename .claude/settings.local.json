@@ -153,7 +153,9 @@
       "mcp__shadcn__search_items_in_registries",
       "Bash(node \"C:\\\\Users\\\\jonny\\\\.claude\\\\skills\\\\impeccable\\\\scripts\\\\context.mjs\" --target \"registry/default/breadcrumbs/breadcrumbs.tsx\")",
       "Bash(node .agents/skills/impeccable/scripts/context.mjs)",
-      "Bash(echo \"===EXIT: $?===\")"
+      "Bash(echo \"===EXIT: $?===\")",
+      "Bash(npx tsc *)",
+      "Bash(pnpm run *)"
     ],
     "deny": []
   }

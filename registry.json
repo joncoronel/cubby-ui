@@ -850,14 +850,14 @@
           "target": "components/ui/cubby-ui/filters/lib/filters-utils.ts"
         },
         {
-          "path": "registry/default/filters/hooks/use-controllable-state.ts",
-          "type": "registry:hook",
-          "target": "components/ui/cubby-ui/filters/hooks/use-controllable-state.ts"
-        },
-        {
           "path": "registry/default/filters/filters-context.tsx",
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/filters/filters-context.tsx"
+        },
+        {
+          "path": "registry/default/filters/filters-value-controls.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/filters/filters-value-controls.tsx"
         }
       ],
       "registryDependencies": [
@@ -866,13 +866,13 @@
         "@cubby-ui/button-group",
         "@cubby-ui/combobox",
         "@cubby-ui/dropdown-menu",
+        "@cubby-ui/kbd",
         "@cubby-ui/input",
-        "@cubby-ui/kbd"
+        "@cubby-ui/use-controllable-state"
       ],
       "dependencies": [
         "@hugeicons/react",
-        "@hugeicons/core-free-icons",
-        "uuid"
+        "@hugeicons/core-free-icons"
       ]
     },
     {
@@ -1918,6 +1918,19 @@
           "path": "registry/default/hooks/use-animated-height.ts",
           "type": "registry:hook",
           "target": "hooks/cubby-ui/use-animated-height.ts"
+        }
+      ]
+    },
+    {
+      "name": "use-controllable-state",
+      "type": "registry:hook",
+      "title": "useControllableState",
+      "description": "A custom React hook for controllable state.",
+      "files": [
+        {
+          "path": "registry/default/hooks/use-controllable-state.ts",
+          "type": "registry:hook",
+          "target": "hooks/cubby-ui/use-controllable-state.ts"
         }
       ]
     },

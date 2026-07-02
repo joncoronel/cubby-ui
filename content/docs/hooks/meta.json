@@ -1,4 +1,8 @@
 {
   "title": "Hooks",
-  "pages": ["use-list-virtualizer", "use-fuzzy-filter"]
+  "pages": [
+    "use-list-virtualizer",
+    "use-fuzzy-filter",
+    "use-controllable-state"
+  ]
 }

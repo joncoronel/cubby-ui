@@ -1,0 +1,70 @@
+---
+title: useControllableState
+description: Merge controlled and uncontrolled state into one value and setter
+---
+
+## Installation
+
+<ComponentInstall component="use-controllable-state" />
+
+## Overview
+
+`useControllableState` merges controlled and uncontrolled state into a single `[value, setValue]` tuple, the pattern Radix and Base UI use internally. Build components that accept `value` + `onValueChange` for controlled use, or `defaultValue` for uncontrolled use, without branching the component logic.
+
+Functional updates are safe in both modes: uncontrolled updates resolve through React's own `setState(prev => ...)` queue, so multiple updates in one event tick compose instead of clobbering each other.
+
+**Timing contract:** in controlled mode `onValueChange` fires synchronously during the event. In uncontrolled mode it fires after commit (from an effect), and if the component unmounts in the same tick as a final update, that last callback is skipped. Both are the cost of keeping the state updater pure; don't rely on the uncontrolled callback for teardown work.
+
+## Usage
+
+```tsx
+import { useControllableState } from "@/hooks/cubby-ui/use-controllable-state";
+
+function Stepper({
+  value,
+  defaultValue = 0,
+  onValueChange,
+}: {
+  value?: number;
+  defaultValue?: number;
+  onValueChange?: (value: number) => void;
+}) {
+  const [count, setCount] = useControllableState({
+    value,
+    defaultValue,
+    onValueChange,
+  });
+
+  return <button onClick={() => setCount((prev) => prev + 1)}>{count}</button>;
+}
+```
+
+## API Reference
+
+### Options
+
+<ApiPropsList>
+
+<ApiProp name="value" fullType="T">
+  Controlled value. When defined, the hook is in controlled mode and state
+  changes only flow through `onValueChange`.
+</ApiProp>
+
+<ApiProp name="defaultValue" fullType="T">
+  Initial value for uncontrolled mode.
+</ApiProp>
+
+<ApiProp name="onValueChange" fullType="(value: T) => void">
+  Called with the resolved value whenever it changes, in both modes.
+  Synchronous in controlled mode; fires after commit in uncontrolled mode (see
+  the timing contract above).
+</ApiProp>
+
+</ApiPropsList>
+
+### Returns
+
+| Property   | Type                                  | Description                                          |
+| ---------- | ------------------------------------- | ---------------------------------------------------- |
+| `value`    | `T`                                   | The current value (controlled prop or internal).     |
+| `setValue` | `(next: T \| ((prev: T) => T)) => void` | Updates the value; accepts functional updates.       |

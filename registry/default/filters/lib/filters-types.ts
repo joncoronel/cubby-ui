@@ -121,10 +121,15 @@ export interface FiltersLabels {
   noFields: string;
   noResults: string;
   selectValue: string;
+  enterValue: string;
+  value: string;
+  min: string;
+  max: string;
+  /** Builds the accessible label for a pill's remove button. */
+  removeFilter: (fieldLabel: string) => string;
 }
 
-export interface FiltersProps
-  extends Omit<React.ComponentProps<"div">, "onChange"> {
+export interface FiltersProviderProps {
   /** Field definitions the bar can filter on. */
   fields: FilterField[];
   /** Controlled list of active filters. */
@@ -133,24 +138,24 @@ export interface FiltersProps
   defaultValue?: FilterValue[];
   onValueChange?: (value: FilterValue[]) => void;
   size?: FilterSize;
-  addLabel?: React.ReactNode;
-  /** Show a "Clear all" button once filters exist. Defaults to `true`. */
-  showClear?: boolean;
-  /** Show a count badge of active filters. Defaults to `false`. */
-  showActiveCount?: boolean;
   /** Allow the same field to be added more than once. Defaults to `false`. */
   allowDuplicateFields?: boolean;
-  /** Open the add-filter menu from the keyboard. Defaults to `false`. */
-  enableShortcut?: boolean;
-  /** Key that opens the add-filter menu when `enableShortcut`. Defaults to `"f"`. */
-  shortcutKey?: string;
-  /** Hint shown on the add-filter button. Defaults to the uppercased `shortcutKey`. */
-  shortcutLabel?: string;
   labels?: Partial<FiltersLabels>;
+  children?: React.ReactNode;
 }
+
+export interface FiltersBarProps
+  extends Omit<React.ComponentProps<"div">, "onChange" | "defaultValue"> {
+  /** Key that opens the add-filter menu, forwarded to the default `FilterAddButton`. */
+  shortcut?: string;
+}
+
+export interface FiltersProps
+  extends Omit<FiltersProviderProps, "children">, FiltersBarProps {}
 
 export interface FilterChipProps
   extends Omit<React.ComponentProps<"div">, "onChange"> {
   filter: FilterValue;
-  field: FilterField;
+  /** Field definition. Resolved from the `Filters` context when omitted. */
+  field?: FilterField;
 }

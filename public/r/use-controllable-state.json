@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "use-controllable-state",
+  "title": "useControllableState",
+  "description": "A custom React hook for controllable state.",
+  "files": [
+    {
+      "path": "registry/default/hooks/use-controllable-state.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\ninterface UseControllableStateParams<T> {\n  /** Controlled value. When defined, the hook is in controlled mode. */\n  value?: T;\n  /** Initial value for uncontrolled mode. */\n  defaultValue: T;\n  onValueChange?: (value: T) => void;\n}\n\n/**\n * Merges controlled and uncontrolled state into a single `[value, setValue]`\n * tuple, mirroring the pattern Radix and Base UI use internally.\n *\n * Functional updates are safe in both modes: uncontrolled updates resolve\n * through React's own `setState(prev => ...)` queue (so multiple updates in\n * one event tick compose instead of clobbering each other), and controlled\n * updates resolve against the value from the current render.\n */\nexport function useControllableState<T>({\n  value,\n  defaultValue,\n  onValueChange,\n}: UseControllableStateParams<T>): [T, (next: T | ((prev: T) => T)) => void] {\n  const isControlled = value !== undefined;\n  const [uncontrolled, setUncontrolled] = React.useState<T>(defaultValue);\n  const current = isControlled ? (value as T) : uncontrolled;\n\n  const onChangeRef = React.useRef(onValueChange);\n  React.useEffect(() => {\n    onChangeRef.current = onValueChange;\n  });\n\n  // In uncontrolled mode, notify after commit whenever the state actually\n  // changed. This keeps `onValueChange` out of the setState updater (which\n  // must stay pure) while still composing batched functional updates.\n  const prevUncontrolledRef = React.useRef(uncontrolled);\n  React.useEffect(() => {\n    if (!Object.is(prevUncontrolledRef.current, uncontrolled)) {\n      prevUncontrolledRef.current = uncontrolled;\n      onChangeRef.current?.(uncontrolled);\n    }\n  }, [uncontrolled]);\n\n  const setValue = React.useCallback(\n    (next: T | ((prev: T) => T)) => {\n      if (isControlled) {\n        const resolved =\n          typeof next === \"function\"\n            ? (next as (prev: T) => T)(value as T)\n            : next;\n        if (!Object.is(resolved, value)) {\n          onChangeRef.current?.(resolved);\n        }\n      } else {\n        setUncontrolled(next);\n      }\n    },\n    [isControlled, value],\n  );\n\n  return [current, setValue];\n}\n",
+      "type": "registry:hook",
+      "target": "hooks/cubby-ui/use-controllable-state.ts"
+    }
+  ],
+  "type": "registry:hook"
+}

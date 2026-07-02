@@ -3,8 +3,9 @@
 import * as React from "react";
 import {
   Filters,
+  FilterActiveCount,
   FilterAddButton,
-  FilterChip,
+  FilterChips,
   FilterClearButton,
   type FilterField,
   type FilterValue,
@@ -56,15 +57,18 @@ const fields: FilterField[] = [
 export default function FiltersManual() {
   const [value, setValue] = React.useState<FilterValue[]>([]);
 
+  // Pass children to own the layout: the add button leads, the chip list
+  // follows, and the count + clear render only once filters exist.
   return (
     <Filters fields={fields} value={value} onValueChange={setValue}>
       <FilterAddButton />
-      {value.map((filter) => {
-        const field = fields.find((item) => item.id === filter.field);
-        if (!field) return null;
-        return <FilterChip key={filter.id} filter={filter} field={field} />;
-      })}
-      {value.length > 0 && <FilterClearButton />}
+      <FilterChips />
+      {value.length > 0 && (
+        <>
+          <FilterActiveCount />
+          <FilterClearButton />
+        </>
+      )}
     </Filters>
   );
 }

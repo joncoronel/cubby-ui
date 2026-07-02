@@ -44,8 +44,7 @@ export default function FiltersShortcut() {
         fields={fields}
         value={value}
         onValueChange={setValue}
-        enableShortcut
-        shortcutKey="f"
+        shortcut="f"
       />
     </div>
   );

@@ -9,33 +9,77 @@ import type {
   FiltersLabels,
 } from "./lib/filters-types";
 
-interface FiltersContextValue {
-  fields: FilterField[];
+/**
+ * Fast-changing state: `filters` gets a new identity on every edit (including
+ * each keystroke in a text or number filter). Subscribe only when you render
+ * the filters themselves.
+ */
+interface FiltersStateContextValue {
   filters: FilterValue[];
+}
+
+/**
+ * Configuration and actions. Referentially stable across value edits (it only
+ * changes when the field config changes or a filter is added/removed), so
+ * leaves like the add/clear buttons and memoized chips can subscribe without
+ * re-rendering per keystroke.
+ */
+interface FiltersActionsContextValue {
+  fields: FilterField[];
   size: FilterSize;
   labels: FiltersLabels;
   fieldsById: Map<string, FilterField>;
+  /** Field ids with at least one active filter. Stable across value edits. */
   usedFieldIds: Set<string>;
   allowDuplicateFields: boolean;
-  enableShortcut: boolean;
-  shortcutKey: string;
-  shortcutLabel: string | undefined;
   /** Id of the most recently added filter, used to auto-open its value control. */
   lastAddedId: string | null;
+  /** Clears `lastAddedId`; called by the freshly added chip once it mounts. */
+  clearAutoOpen: () => void;
   addFilter: (filter: FilterValue) => void;
   updateFilter: (id: string, patch: Partial<Omit<FilterValue, "id">>) => void;
   removeFilter: (id: string) => void;
   clearAll: () => void;
 }
 
-const FiltersContext = React.createContext<FiltersContextValue | null>(null);
+type FiltersContextValue = FiltersStateContextValue &
+  FiltersActionsContextValue;
 
-function useFilters(): FiltersContextValue {
-  const context = React.useContext(FiltersContext);
+const FiltersStateContext =
+  React.createContext<FiltersStateContextValue | null>(null);
+const FiltersActionsContext =
+  React.createContext<FiltersActionsContextValue | null>(null);
+
+/** The bar's fast-changing state (`filters`). Re-renders on every edit. */
+function useFiltersState(): FiltersStateContextValue {
+  const context = React.useContext(FiltersStateContext);
   if (!context) {
-    throw new Error("useFilters must be used within a Filters component.");
+    throw new Error(
+      "useFiltersState must be used within a FiltersProvider.",
+    );
   }
   return context;
+}
+
+/** The bar's config and actions. Stable while a filter value is being edited. */
+function useFiltersActions(): FiltersActionsContextValue {
+  const context = React.useContext(FiltersActionsContext);
+  if (!context) {
+    throw new Error(
+      "useFiltersActions must be used within a FiltersProvider.",
+    );
+  }
+  return context;
+}
+
+/**
+ * Everything from both contexts. Convenient, but re-renders on every filter
+ * edit; subscribe to `useFiltersActions` alone when that matters.
+ */
+function useFilters(): FiltersContextValue {
+  const state = useFiltersState();
+  const actions = useFiltersActions();
+  return React.useMemo(() => ({ ...state, ...actions }), [state, actions]);
 }
 
 interface FilterChipContextValue {
@@ -59,9 +103,17 @@ function useFilterChip(): FilterChipContextValue {
 }
 
 export {
-  FiltersContext,
+  FiltersStateContext,
+  FiltersActionsContext,
   useFilters,
+  useFiltersState,
+  useFiltersActions,
   FilterChipContext,
   useFilterChip,
 };
-export type { FiltersContextValue, FilterChipContextValue };
+export type {
+  FiltersContextValue,
+  FiltersStateContextValue,
+  FiltersActionsContextValue,
+  FilterChipContextValue,
+};

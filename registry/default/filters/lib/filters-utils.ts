@@ -1,12 +1,82 @@
-import { v4 as uuidv4 } from "uuid";
-
 import type {
   FilterField,
   FilterFieldType,
   FilterOperator,
+  FilterSize,
   FilterValue,
   NumberRange,
 } from "./filters-types";
+
+/**
+ * Per-size styling contract shared by every segment of a pill. Restyle here
+ * rather than in the individual components.
+ */
+export const FILTER_SIZES: Record<
+  FilterSize,
+  {
+    /** `Button` size for icon-only segments (the remove button). */
+    iconButton: "icon_sm" | "icon" | "icon_lg";
+    /** `Input` size for inline text inputs. */
+    input: "sm" | "default";
+    /** Height matching the `Button` size, for non-button segments. */
+    height: string;
+    /** Padding + text classes for the field-label segment. */
+    fieldLabel: string;
+  }
+> = {
+  sm: {
+    iconButton: "icon_sm",
+    input: "sm",
+    height: "h-9 sm:h-8",
+    fieldLabel: "px-2.5 text-xs",
+  },
+  default: {
+    iconButton: "icon",
+    input: "default",
+    height: "h-10 sm:h-9",
+    fieldLabel: "px-3",
+  },
+  lg: {
+    iconButton: "icon_lg",
+    input: "default",
+    height: "h-11 sm:h-10",
+    fieldLabel: "px-4",
+  },
+};
+
+// ----- Value coercers ---------------------------------------------------
+// `FilterValue.value` is `unknown` (it may arrive from URL state or other
+// untrusted sources, e.g. `JSON.parse`), so every read goes through a coercer
+// that rebuilds the expected shape instead of trusting a cast.
+
+/** Coerces an unknown filter value to a string (`""` when absent). */
+export function asString(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
+
+/** Coerces an unknown filter value to a string array. */
+export function asStringArray(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : [];
+}
+
+/** Coerces an unknown filter value to a finite number or `null`. */
+export function asNumberOrNull(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+/** Rebuilds a `NumberRange`, coercing each bound independently. */
+export function asNumberRange(value: unknown): NumberRange {
+  if (typeof value === "object" && value !== null) {
+    const candidate = value as Partial<Record<"min" | "max", unknown>>;
+    return {
+      min: asNumberOrNull(candidate.min),
+      max: asNumberOrNull(candidate.max),
+    };
+  }
+  return { min: null, max: null };
+}
 
 /** Default English labels for the built-in operators. */
 const OPERATOR_LABELS: Record<string, string> = {
@@ -116,10 +186,12 @@ export function valueShape(field: FilterField, operatorId: string): string {
 }
 
 function generateId(): string {
+  // Filter ids only need list-key uniqueness. `crypto.randomUUID` is absent
+  // in non-secure contexts (plain-HTTP LAN dev), hence the cheap fallback.
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
     return crypto.randomUUID();
   }
-  return uuidv4();
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
 /**
@@ -141,4 +213,82 @@ export function createFilter(
         ? partial.value
         : emptyValueFor(field, operator),
   };
+}
+
+/**
+ * Applies a patch to a filter. When only the operator changes and the new
+ * operator expects a different value shape (e.g. `eq` to `between`, or into a
+ * valueless operator), the value is reseeded to a typed empty.
+ */
+export function patchFilter(
+  field: FilterField | undefined,
+  filter: FilterValue,
+  patch: Partial<Omit<FilterValue, "id">>,
+): FilterValue {
+  const next: FilterValue = { ...filter, ...patch };
+  const operatorChanged =
+    patch.operator !== undefined && patch.operator !== filter.operator;
+  if (
+    operatorChanged &&
+    !("value" in patch) &&
+    field &&
+    valueShape(field, filter.operator) !== valueShape(field, next.operator)
+  ) {
+    next.value = emptyValueFor(field, next.operator);
+  }
+  return next;
+}
+
+/**
+ * Formats a filter's value as a human-readable string. Shared by the visible
+ * value controls and the aria summary so the two never diverge.
+ */
+export function formatFilterValue(
+  field: FilterField,
+  filter: FilterValue,
+): string {
+  if (isValuelessOperator(field, filter.operator)) return "";
+  switch (field.type) {
+    case "select":
+      return (
+        field.options.find((option) => option.value === filter.value)?.label ??
+        ""
+      );
+    case "multiselect": {
+      const values = asStringArray(filter.value);
+      return field.options
+        .filter((option) => values.includes(option.value))
+        .map((option) => option.label)
+        .join(", ");
+    }
+    case "text":
+      return asString(filter.value);
+    case "number": {
+      if (filter.operator === "between") {
+        const { min, max } = asNumberRange(filter.value);
+        if (min === null && max === null) return "";
+        if (min === null) return `up to ${max}`;
+        if (max === null) return `from ${min}`;
+        return `${min} to ${max}`;
+      }
+      const numeric = asNumberOrNull(filter.value);
+      return numeric === null ? "" : String(numeric);
+    }
+    default:
+      return "";
+  }
+}
+
+/** Builds a plain-language summary of a filter, e.g. for screen readers. */
+export function describeFilter(
+  field: FilterField,
+  filter: FilterValue,
+): string {
+  const operatorLabel =
+    resolveOperators(field).find((operator) => operator.id === filter.operator)
+      ?.label ?? filter.operator;
+  const summary = formatFilterValue(field, filter);
+  return summary
+    ? `${field.label} ${operatorLabel} ${summary}`
+    : `${field.label} ${operatorLabel}`;
 }

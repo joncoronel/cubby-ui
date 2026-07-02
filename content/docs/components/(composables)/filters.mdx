@@ -38,18 +38,20 @@ For a single dropdown of options tied to a form field, use [`Combobox`](/docs/co
 ## Composition
 
 ```text
-Filters
-├── FilterChip
-│   ├── FilterChipField
-│   ├── FilterChipOperator
-│   ├── FilterChipValue
-│   └── FilterChipRemove
-├── FilterAddButton
-├── FilterActiveCount
-└── FilterClearButton
+Filters                 (FiltersProvider + FiltersBar)
+└── FiltersBar
+    ├── FilterChips
+    │   └── FilterChip
+    │       ├── FilterChipField
+    │       ├── FilterChipOperator
+    │       ├── FilterChipValue
+    │       └── FilterChipRemove
+    ├── FilterAddButton
+    ├── FilterActiveCount
+    └── FilterClearButton
 ```
 
-Drive the bar with a `fields` config and a `value` array of active filters. Each field's `type` picks the value control and its default operators; the pills, the add-filter picker, and the operator menus are wired up for you.
+Drive the bar with a `fields` config and a `value` array of active filters. Each field's `type` picks the value control and its default operators. Without `children`, the bar renders `FilterChips`, `FilterAddButton`, and a `FilterClearButton` once filters exist; pass `children` to compose the same parts in any order.
 
 ```tsx
 const fields: FilterField[] = [
@@ -78,7 +80,7 @@ return <Filters fields={fields} value={value} onValueChange={setValue} />;
 - Colored dots or icons on options keep a dense bar scannable; fields accept an optional `icon` too.
 - `prefix` / `suffix` on text and number fields for currency, units, or symbols; `maxSelections` caps a multiselect.
 - Number fields are spinner-free (Base UI) with arrow-key stepping and wheel scrubbing (scroll to adjust while focused).
-- Optional keyboard shortcut (`enableShortcut`) opens the add-filter menu, with a `Kbd` hint on the button.
+- An optional `shortcut` key opens the add-filter menu, with a `Kbd` hint on the button.
 - Controlled and uncontrolled: pass `value` + `onValueChange`, or `defaultValue`. Because it is controlled, syncing to the URL (nuqs) is trivial.
 - The `custom` field type renders any control through `renderValue`, for dates, sliders, or bespoke inputs.
 - Searchable, keyboard-navigable field and value pickers, inherited from `Combobox`.
@@ -87,7 +89,7 @@ return <Filters fields={fields} value={value} onValueChange={setValue} />;
 
 ### Controlled
 
-Pass `value` and `onValueChange` to own the state; the serialized filters update as you edit.
+Pass `value` and `onValueChange` to own the state; the serialized filters update as you edit. This example also composes a `FilterActiveCount` badge into the bar.
 
 <ComponentPreview component="filters" example="filters-controlled">
   <FiltersControlled />
@@ -135,7 +137,7 @@ A `multiselect` field collapses its selection to the first label plus a count. S
 
 ### Manual layout
 
-Pass `children` to lay the bar out yourself with `FilterChip`, `FilterAddButton`, and `FilterClearButton`, which read the shared state from context.
+Pass `children` to lay the bar out yourself with `FilterChips`, `FilterAddButton`, `FilterActiveCount`, and `FilterClearButton`, which read the shared state from context.
 
 <ComponentPreview component="filters" example="filters-manual">
   <FiltersManual />
@@ -151,7 +153,7 @@ Use `size` to set the height of every pill in the bar.
 
 ### Keyboard shortcut
 
-Set `enableShortcut` to open the add-filter menu from the keyboard; `shortcutKey` sets the key (default `"f"`) and a `Kbd` hint appears on the button.
+Set `shortcut` to a key (here `"f"`) to open the add-filter menu from the keyboard; a `Kbd` hint appears on the button. The key is ignored while typing or while a popup is open.
 
 <ComponentPreview component="filters" example="filters-shortcut">
   <FiltersShortcut />
@@ -165,9 +167,23 @@ Because `Filters` is controlled, syncing to the query string is just wiring `val
   <FiltersNuqs />
 </ComponentPreview>
 
+### State outside the bar
+
+`Filters` is `FiltersProvider` + `FiltersBar` composed. Use them separately when UI outside the flex row (a results count, saved views, an apply button) should read or mutate the same state through `useFilters`.
+
+```tsx
+<FiltersProvider fields={fields} value={value} onValueChange={setValue}>
+  <PageHeader>
+    <FilterSummary />   {/* reads useFilters() */}
+  </PageHeader>
+  <FiltersBar />
+  <ResultsCount />
+</FiltersProvider>
+```
+
 ## Accessibility
 
-The field picker and value lists are `Combobox` instances, so type-to-search, arrow-key navigation, and selection follow the ARIA combobox pattern. The operator menu is a `DropdownMenu` radio group. Each pill is a group labeled with its full filter (for example, "Status is In progress"), and pressing `Backspace` or `Delete` while a pill is focused removes it. The remove control is an icon button with an `aria-label` of `"Remove filter"`.
+The field picker and value lists are `Combobox` instances, so type-to-search, arrow-key navigation, and selection follow the ARIA combobox pattern. The operator menu is a `DropdownMenu` radio group. Each pill is a group labeled with its full filter (for example, "Status is In progress"); value inputs carry field-specific `aria-label`s that include string affixes. Pressing `Backspace` or `Delete` on one of a pill's button segments removes the filter, and focus moves to the neighboring pill (or the add button) instead of dropping to the page. The remove control is labeled "Remove [field] filter".
 
 ## API Reference
 
@@ -177,7 +193,7 @@ Filters is a custom component composed from Cubby UI primitives. It has no Base 
 
 #### Filters
 
-The bar. Owns filter state and renders a pill per active filter plus the add-filter control.
+`FiltersProvider` + `FiltersBar` composed, for the common case. All props below except `shortcut` belong to the provider; `shortcut` and div props flow to the bar.
 
 <ApiPropsList>
 
@@ -205,43 +221,35 @@ The bar. Owns filter state and renders a pill per active filter plus the add-fil
   Height of every pill and the add-filter button.
 </ApiProp>
 
-<ApiProp name="showClear" fullType="boolean" defaultValue="true">
-  Shows a "Clear all" button once at least one filter is active.
-</ApiProp>
-
-<ApiProp name="showActiveCount" fullType="boolean" defaultValue="false">
-  Shows a badge with the number of active filters.
-</ApiProp>
-
 <ApiProp name="allowDuplicateFields" fullType="boolean" defaultValue="false">
   Allows the same field to be added more than once. When `false`, used fields are disabled in the picker.
 </ApiProp>
 
-<ApiProp name="enableShortcut" fullType="boolean" defaultValue="false">
-  Opens the add-filter menu when `shortcutKey` is pressed (ignored while typing in an input). Shows a `Kbd` hint on the button.
-</ApiProp>
-
-<ApiProp name="shortcutKey" fullType="string" defaultValue='"f"'>
-  Key that opens the add-filter menu when `enableShortcut` is set.
-</ApiProp>
-
-<ApiProp name="shortcutLabel" fullType="string" defaultValue="shortcutKey (uppercased)">
-  Text shown in the `Kbd` hint on the add-filter button.
-</ApiProp>
-
-<ApiProp name="addLabel" fullType="ReactNode" defaultValue='"Add filter"'>
-  Label for the add-filter button.
+<ApiProp name="shortcut" fullType="string">
+  Key that opens the add-filter menu, forwarded to the default `FilterAddButton`. Ignored while typing or while a popup is open; shows a `Kbd` hint on the button.
 </ApiProp>
 
 <ApiProp name="labels" fullType="Partial<FiltersLabels>">
-  Overrides for the bar's copy, such as the search placeholders and empty-state text.
+  Overrides for the bar's copy: `add`, `clear`, `searchFields`, `searchValues`, `noFields`, `noResults`, `selectValue`, `enterValue`, `value`, `min`, `max`, and `removeFilter` (a function building the remove button's accessible label).
 </ApiProp>
 
 </ApiPropsList>
 
+#### FiltersProvider
+
+Owns filter state and provides it via context without rendering layout. Takes the state props from `Filters` (`fields`, `value`, `defaultValue`, `onValueChange`, `size`, `allowDuplicateFields`, `labels`) plus `children`.
+
+#### FiltersBar
+
+The flex row. Renders the default layout (`FilterChips`, `FilterAddButton`, clear-when-active) unless `children` is passed. Takes `shortcut` and div props.
+
+#### FilterChips
+
+Renders a `FilterChip` for every active filter, in order. Use it in `children` mode to place the chip list among your own chrome.
+
 #### FilterChip
 
-A single pill. Renders the field, operator, value, and remove segments for one filter. Provide `filter` and `field`; other state comes from the `Filters` context.
+A single pill. Without `children` it renders the field, operator, value, and remove segments; pass `children` to compose the segments yourself.
 
 <ApiPropsList>
 
@@ -250,10 +258,28 @@ A single pill. Renders the field, operator, value, and remove segments for one f
 </ApiProp>
 
 <ApiProp name="field" fullType="FilterField">
-  The field definition matching `filter.field`.
+  The field definition. Resolved from the `Filters` context by `filter.field` when omitted.
 </ApiProp>
 
 </ApiPropsList>
+
+#### FilterAddButton
+
+The searchable field picker. Renders the dashed trigger and the popup.
+
+<ApiPropsList>
+
+<ApiProp name="shortcut" fullType="string">
+  Key that opens this menu from the keyboard (e.g. `"f"`). Adds a `Kbd` hint to the trigger.
+</ApiProp>
+
+</ApiPropsList>
+
+### Hooks
+
+`useFilters()` exposes the bar's state and actions (`filters`, `fieldsById`, `addFilter`, `updateFilter`, `removeFilter`, `clearAll`) to anything rendered inside a `FiltersProvider`. It re-renders on every filter edit; performance-sensitive leaves can subscribe to `useFiltersState()` (just `filters`) or `useFiltersActions()` (config and actions, stable while a value is being typed) instead. `useFilterChip()` exposes the current pill's `filter`, `field`, and `size` inside a `FilterChip`.
+
+State merging uses [useControllableState](/docs/hooks/use-controllable-state), installed as a shared hook.
 
 ### Types
 
@@ -281,6 +307,14 @@ Creates a `FilterValue` with a stable id, the field's first operator, and a type
 ```ts
 createFilter(statusField, { value: "in_progress" });
 ```
+
+#### patchFilter
+
+Applies a partial update to a filter, reseeding the value when an operator change alters the value shape (e.g. `eq` to `between`).
+
+#### formatFilterValue / describeFilter
+
+`formatFilterValue` renders a filter's value as a human-readable string; `describeFilter` prepends the field and operator ("Status is In progress"). The pill's `aria-label` uses `describeFilter`, so custom UIs can stay consistent with it.
 
 #### resolveOperators
 

@@ -79,10 +79,13 @@ function FiltersNuqsDemo() {
 
 export default function FiltersNuqs() {
   // Mount <NuqsAdapter> once at your app root; it lives here so the example is
-  // self-contained.
+  // self-contained. The Suspense boundary is required because `useQueryState`
+  // reads `useSearchParams()`, which bails out of static prerendering.
   return (
     <NuqsAdapter>
-      <FiltersNuqsDemo />
+      <React.Suspense fallback={null}>
+        <FiltersNuqsDemo />
+      </React.Suspense>
     </NuqsAdapter>
   );
 }

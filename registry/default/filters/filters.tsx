@@ -27,6 +27,7 @@ import {
 } from "@/registry/default/dropdown-menu/dropdown-menu";
 import { Input } from "@/registry/default/input/input";
 import { Kbd } from "@/registry/default/kbd/kbd";
+import { NumberField as BaseNumberField } from "@base-ui/react/number-field";
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
@@ -657,6 +658,14 @@ function TextValueControl({
   );
 }
 
+function fieldHeight(size: FilterSize): string {
+  return size === "sm"
+    ? "h-9 sm:h-8"
+    : size === "lg"
+      ? "h-11 sm:h-10"
+      : "h-10 sm:h-9";
+}
+
 function NumberValueField({
   value,
   size,
@@ -676,44 +685,28 @@ function NumberValueField({
   suffix?: React.ReactNode;
   onValueChange: (value: number | null) => void;
 }) {
-  const [text, setText] = React.useState(value === null ? "" : String(value));
-
-  React.useEffect(() => {
-    const parsed = text === "" ? null : Number(text);
-    if (parsed !== value) {
-      setText(value === null ? "" : String(value));
-    }
-    // Resync local text only when the external value diverges from what we hold.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
-
+  // Base UI's NumberField.Input is a text input with numeric semantics (no
+  // native spinner) and handles parsing, arrow-key stepping, and clamping.
   return withAddons(
-    <Input
-      data-slot="filter-chip-value"
-      type="number"
-      inputMode="decimal"
+    <BaseNumberField.Root
+      value={value}
       step={step}
-      autoFocus={autoFocus}
-      value={text}
-      placeholder={placeholder}
-      size={inputSize(size)}
-      className={cn(
-        "w-24 flex-none rounded-none border-0 bg-transparent shadow-none focus-visible:-outline-offset-2 dark:bg-transparent",
-        prefix && "pl-1",
-        suffix && "pr-1",
-        size === "lg" && "h-11 sm:h-10",
-      )}
-      onChange={(event) => {
-        const raw = event.target.value;
-        setText(raw);
-        if (raw === "") {
-          onValueChange(null);
-          return;
-        }
-        const parsed = Number(raw);
-        onValueChange(Number.isFinite(parsed) ? parsed : null);
-      }}
-    />,
+      onValueChange={(next) => onValueChange(next)}
+      className={cn("flex flex-none items-center", fieldHeight(size))}
+    >
+      <BaseNumberField.Input
+        data-slot="filter-chip-value"
+        autoFocus={autoFocus}
+        placeholder={placeholder}
+        className={cn(
+          "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground",
+          "h-full w-24 rounded-none border-0 bg-transparent px-2.5 text-base font-normal tabular-nums outline-none md:text-sm",
+          "focus-visible:outline-ring/50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid",
+          prefix && "pl-1",
+          suffix && "pr-1",
+        )}
+      />
+    </BaseNumberField.Root>,
     prefix,
     suffix,
   );

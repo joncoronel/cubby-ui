@@ -1071,7 +1071,9 @@
         }
       ],
       "dependencies": [
-        "class-variance-authority"
+        "class-variance-authority",
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {

@@ -10,6 +10,7 @@ import {
   NumberFieldInput,
   NumberFieldIncrement,
   NumberFieldDecrement,
+  NumberFieldStepper,
   NumberFieldScrubArea,
   NumberFieldScrubAreaCursor,
 } from "@/registry/default/number-field/number-field";
@@ -36,9 +37,12 @@ NumberField
     ├── NumberFieldDecrement
     ├── NumberFieldInput
     ├── NumberFieldIncrement
+    ├── NumberFieldStepper
     └── NumberFieldScrubArea
         └── NumberFieldScrubAreaCursor
 ```
+
+`NumberFieldStepper` is an alternative to the separate `NumberFieldDecrement` / `NumberFieldIncrement`, stacking both on the right edge.
 
 ## Examples
 
@@ -59,6 +63,12 @@ Set `min` and `max` on `NumberField` to constrain the value to a range.
 Pass `format` (an `Intl.NumberFormat` options object) to display the value as currency, a percentage, or another number format.
 
 <ComponentPreview component="number-field" example="number-field-format" />
+
+### Stacked steppers
+
+Use `NumberFieldStepper` for a vertically-stacked increment/decrement cluster on the right, the styled equivalent of a native number spinner. Cap the input's left edge with `className="rounded-l-lg border-l"`.
+
+<ComponentPreview component="number-field" example="number-field-stacked" />
 
 ### Scrub Area
 
@@ -129,6 +139,10 @@ Button that increases the value when clicked. Renders a `<button>` element.
 #### NumberFieldDecrement
 
 Button that decreases the value when clicked. Renders a `<button>` element.
+
+#### NumberFieldStepper
+
+A vertically-stacked increment (top) and decrement (bottom) cluster for the group's right edge, with built-in chevron icons. Renders a `<div>` wrapping Base UI's `Increment` and `Decrement`. Pair with `<NumberFieldInput className="rounded-l-lg border-l" />` to cap the left edge.
 
 #### NumberFieldScrubArea
 

@@ -11,7 +11,6 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Calendar01Icon,
   DashboardCircleIcon,
-  MoneyBag02Icon,
   Tag01Icon,
   TextFontIcon,
   Timer01Icon,
@@ -70,15 +69,6 @@ const fields: FilterField[] = [
     label: "Estimate",
     icon: <HugeiconsIcon icon={Timer01Icon} strokeWidth={2} />,
     type: "number",
-    suffix: "hrs",
-  },
-  {
-    // prefix / suffix wrap the inline input, e.g. a currency symbol.
-    id: "budget",
-    label: "Budget",
-    icon: <HugeiconsIcon icon={MoneyBag02Icon} strokeWidth={2} />,
-    type: "number",
-    prefix: "$",
   },
   {
     // The custom escape hatch: a native date input driving the filter value.

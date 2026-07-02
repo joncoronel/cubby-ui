@@ -74,7 +74,6 @@ const fields: FilterField[] = [
     label: "Estimate",
     icon: <HugeiconsIcon icon={Timer01Icon} strokeWidth={2} />,
     type: "number",
-    suffix: "hrs",
   },
 ];
 

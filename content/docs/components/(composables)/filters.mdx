@@ -13,6 +13,7 @@ import FiltersOperators from "@/registry/examples/filters/filters-operators";
 import FiltersMultiselect from "@/registry/examples/filters/filters-multiselect";
 import FiltersManual from "@/registry/examples/filters/filters-manual";
 import FiltersSizes from "@/registry/examples/filters/filters-sizes";
+import FiltersAffixes from "@/registry/examples/filters/filters-affixes";
 import FiltersShortcut from "@/registry/examples/filters/filters-shortcut";
 import FiltersNuqs from "@/registry/examples/filters/filters-nuqs";
 
@@ -103,10 +104,16 @@ Use `type` to pick the value control. `select` and `multiselect` open a searchab
 | `"number"`      | Inline number input, paired for `between`. | `number \| null \| NumberRange` |
 | `"custom"`      | Your control via `renderValue`.        | `unknown`                       |
 
-Text and number fields take a `prefix` / `suffix` (the `$` and `hrs` here) to flank the input.
-
 <ComponentPreview component="filters" example="filters-field-types">
   <FiltersFieldTypes />
+</ComponentPreview>
+
+### Prefix and suffix
+
+Add a `prefix` or `suffix` to text and number fields for currency, units, or symbols. The value input stays inline; the affix sits alongside it.
+
+<ComponentPreview component="filters" example="filters-affixes">
+  <FiltersAffixes />
 </ComponentPreview>
 
 ### Operators

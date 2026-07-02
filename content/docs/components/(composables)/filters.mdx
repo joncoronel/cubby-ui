@@ -71,6 +71,8 @@ return <Filters fields={fields} value={value} onValueChange={setValue} />;
 
 - Per-type operators with sensible defaults (`is`, `contains`, `between`, `is empty`), overridable or hideable per field.
 - Valueless operators like `is empty` drop the value segment automatically.
+- Adding a filter opens its value picker (or focuses its input) right away, so you pick in one gesture.
+- Colored dots or icons on options keep a dense bar scannable; fields accept an optional `icon` too.
 - Controlled and uncontrolled: pass `value` + `onValueChange`, or `defaultValue`.
 - The `custom` field type renders any control through `renderValue`, for dates, sliders, or bespoke inputs.
 - Searchable, keyboard-navigable field and value pickers, inherited from `Combobox`.
@@ -135,7 +137,7 @@ Use `size` to set the height of every pill in the bar.
 
 ## Accessibility
 
-The field picker and value lists are `Combobox` instances, so type-to-search, arrow-key navigation, and selection follow the ARIA combobox pattern. The operator menu is a `DropdownMenu` radio group. The remove control on each pill is an icon button with an `aria-label` of `"Remove filter"`.
+The field picker and value lists are `Combobox` instances, so type-to-search, arrow-key navigation, and selection follow the ARIA combobox pattern. The operator menu is a `DropdownMenu` radio group. Each pill is a group labeled with its full filter (for example, "Status is In progress"), and pressing `Backspace` or `Delete` while a pill is focused removes it. The remove control is an icon button with an `aria-label` of `"Remove filter"`.
 
 ## API Reference
 

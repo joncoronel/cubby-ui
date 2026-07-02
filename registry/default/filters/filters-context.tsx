@@ -17,6 +17,8 @@ interface FiltersContextValue {
   fieldsById: Map<string, FilterField>;
   usedFieldIds: Set<string>;
   allowDuplicateFields: boolean;
+  /** Id of the most recently added filter, used to auto-open its value control. */
+  lastAddedId: string | null;
   addFilter: (filter: FilterValue) => void;
   updateFilter: (id: string, patch: Partial<Omit<FilterValue, "id">>) => void;
   removeFilter: (id: string) => void;
@@ -37,6 +39,8 @@ interface FilterChipContextValue {
   filter: FilterValue;
   field: FilterField;
   size: FilterSize;
+  /** True when this chip was just added, so its value control opens itself. */
+  autoOpen: boolean;
 }
 
 const FilterChipContext = React.createContext<FilterChipContextValue | null>(

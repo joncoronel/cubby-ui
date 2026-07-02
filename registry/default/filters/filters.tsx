@@ -77,6 +77,49 @@ function isNumberRange(value: unknown): value is NumberRange {
   return typeof value === "object" && value !== null && "min" in value;
 }
 
+/** Builds a plain-language summary of a filter for screen readers. */
+function describeFilter(field: FilterField, filter: FilterValue): string {
+  const operatorLabel =
+    resolveOperators(field).find((operator) => operator.id === filter.operator)
+      ?.label ?? filter.operator;
+  if (isValuelessOperator(field, filter.operator)) {
+    return `${field.label} ${operatorLabel}`;
+  }
+
+  let summary = "";
+  switch (field.type) {
+    case "select":
+      summary =
+        field.options.find((option) => option.value === filter.value)?.label ??
+        "";
+      break;
+    case "multiselect": {
+      const values = Array.isArray(filter.value)
+        ? (filter.value as string[])
+        : [];
+      summary = field.options
+        .filter((option) => values.includes(option.value))
+        .map((option) => option.label)
+        .join(", ");
+      break;
+    }
+    case "text":
+      summary = typeof filter.value === "string" ? filter.value : "";
+      break;
+    case "number":
+      if (isNumberRange(filter.value)) {
+        summary = `${filter.value.min ?? ""} to ${filter.value.max ?? ""}`.trim();
+      } else if (typeof filter.value === "number") {
+        summary = String(filter.value);
+      }
+      break;
+  }
+
+  return summary
+    ? `${field.label} ${operatorLabel} ${summary}`
+    : `${field.label} ${operatorLabel}`;
+}
+
 function Filters({
   fields,
   value,
@@ -98,6 +141,14 @@ function Filters({
     onValueChange,
   });
 
+  // Tracks the freshly added filter so its value control can open on mount.
+  const [lastAddedId, setLastAddedId] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    if (!lastAddedId) return;
+    const timer = setTimeout(() => setLastAddedId(null), 500);
+    return () => clearTimeout(timer);
+  }, [lastAddedId]);
+
   const labels = React.useMemo(
     () => ({ ...DEFAULT_LABELS, ...labelsProp }),
     [labelsProp],
@@ -112,7 +163,10 @@ function Filters({
   );
 
   const addFilter = React.useCallback(
-    (filter: FilterValue) => setFilters((prev) => [...prev, filter]),
+    (filter: FilterValue) => {
+      setFilters((prev) => [...prev, filter]);
+      setLastAddedId(filter.id);
+    },
     [setFilters],
   );
   const removeFilter = React.useCallback(
@@ -154,6 +208,7 @@ function Filters({
       fieldsById,
       usedFieldIds,
       allowDuplicateFields,
+      lastAddedId,
       addFilter,
       updateFilter,
       removeFilter,
@@ -167,6 +222,7 @@ function Filters({
       fieldsById,
       usedFieldIds,
       allowDuplicateFields,
+      lastAddedId,
       addFilter,
       updateFilter,
       removeFilter,
@@ -201,22 +257,32 @@ function Filters({
 }
 
 function FilterChip({ filter, field, className, ...props }: FilterChipProps) {
-  const { size } = useFilters();
+  const { size, lastAddedId, removeFilter } = useFilters();
   const valueless = isValuelessOperator(field, filter.operator);
+  const autoOpen = filter.id === lastAddedId;
   const chipContext = React.useMemo(
-    () => ({ filter, field, size }),
-    [filter, field, size],
+    () => ({ filter, field, size, autoOpen }),
+    [filter, field, size, autoOpen],
   );
 
   return (
     <FilterChipContext.Provider value={chipContext}>
       <ButtonGroup
         data-slot="filter-chip"
+        aria-label={describeFilter(field, filter)}
         className={cn(
           "bg-card overflow-hidden rounded-lg border bg-clip-padding",
-          "ease-out-expo transition-[scale,opacity] duration-150 starting:scale-95 starting:opacity-0 motion-reduce:transition-none",
           className,
         )}
+        onKeyDown={(event) => {
+          if (
+            (event.key === "Backspace" || event.key === "Delete") &&
+            !(event.target instanceof HTMLInputElement)
+          ) {
+            event.preventDefault();
+            removeFilter(filter.id);
+          }
+        }}
         {...props}
       >
         <FilterChipField />
@@ -238,7 +304,11 @@ function FilterChipField() {
         size === "sm" ? "px-2.5 text-xs" : size === "lg" ? "px-4" : "px-3",
       )}
     >
-      {field.icon}
+      {field.icon ? (
+        <span className="text-muted-foreground flex shrink-0 items-center [&_svg]:size-3.5!">
+          {field.icon}
+        </span>
+      ) : null}
       {field.label}
     </ButtonGroupText>
   );
@@ -281,7 +351,7 @@ function FilterChipOperator() {
 }
 
 function FilterChipValue() {
-  const { field, filter, size } = useFilterChip();
+  const { field, filter, size, autoOpen } = useFilterChip();
   const { updateFilter } = useFilters();
   const onValueChange = React.useCallback(
     (nextValue: unknown) => updateFilter(filter.id, { value: nextValue }),
@@ -295,6 +365,7 @@ function FilterChipValue() {
           field={field}
           filter={filter}
           size={size}
+          autoOpen={autoOpen}
           onValueChange={onValueChange}
         />
       );
@@ -304,6 +375,7 @@ function FilterChipValue() {
           field={field}
           filter={filter}
           size={size}
+          autoOpen={autoOpen}
           onValueChange={onValueChange}
         />
       );
@@ -313,6 +385,7 @@ function FilterChipValue() {
           field={field}
           filter={filter}
           size={size}
+          autoOpen={autoOpen}
           onValueChange={onValueChange}
         />
       );
@@ -322,6 +395,7 @@ function FilterChipValue() {
           field={field}
           filter={filter}
           size={size}
+          autoOpen={autoOpen}
           onValueChange={onValueChange}
         />
       );
@@ -346,6 +420,7 @@ interface ValueControlProps<F extends FilterField> {
   field: F;
   filter: FilterValue;
   size: FilterSize;
+  autoOpen: boolean;
   onValueChange: (value: unknown) => void;
 }
 
@@ -378,9 +453,12 @@ function SelectValueControl({
   field,
   filter,
   size,
+  autoOpen,
   onValueChange,
 }: ValueControlProps<SelectFilterField>) {
   const { labels } = useFilters();
+  // Capture once at mount so the uncontrolled open state never changes.
+  const [initialOpen] = React.useState(autoOpen);
   const selected =
     field.options.find((option) => option.value === filter.value) ?? null;
 
@@ -388,6 +466,7 @@ function SelectValueControl({
     <Combobox<FilterOption, false>
       items={field.options}
       value={selected}
+      defaultOpen={initialOpen}
       onValueChange={(next) => onValueChange(next ? next.value : null)}
       itemToStringLabel={(option) => option.label}
     >
@@ -398,16 +477,18 @@ function SelectValueControl({
             data-slot="filter-chip-value"
             variant="ghost"
             size={size}
-            className="text-foreground data-popup-open:bg-surface-hover gap-1.5 rounded-none font-normal focus-visible:-outline-offset-2"
+            className="text-foreground data-popup-open:bg-surface-hover rounded-none font-normal focus-visible:-outline-offset-2"
           >
-            {selected?.icon}
-            {selected ? (
-              selected.label
-            ) : (
-              <span className="text-muted-foreground">
-                {field.placeholder ?? labels.selectValue}
-              </span>
-            )}
+            <span className="flex items-center gap-1.5">
+              {selected?.icon}
+              {selected ? (
+                <span className="max-w-40 truncate">{selected.label}</span>
+              ) : (
+                <span className="text-muted-foreground">
+                  {field.placeholder ?? labels.selectValue}
+                </span>
+              )}
+            </span>
           </Button>
         )}
       />
@@ -416,9 +497,11 @@ function SelectValueControl({
         noResults={labels.noResults}
       >
         {(option: FilterOption) => (
-          <ComboboxItem key={option.value} value={option} className="gap-2">
-            {option.icon}
-            <span className="truncate">{option.label}</span>
+          <ComboboxItem key={option.value} value={option}>
+            <span className="flex items-center gap-2">
+              {option.icon}
+              <span className="truncate">{option.label}</span>
+            </span>
           </ComboboxItem>
         )}
       </ValuePopup>
@@ -430,9 +513,12 @@ function MultiSelectValueControl({
   field,
   filter,
   size,
+  autoOpen,
   onValueChange,
 }: ValueControlProps<MultiSelectFilterField>) {
   const { labels } = useFilters();
+  // Capture once at mount so the uncontrolled open state never changes.
+  const [initialOpen] = React.useState(autoOpen);
   const values = Array.isArray(filter.value) ? (filter.value as string[]) : [];
   const selected = field.options.filter((option) =>
     values.includes(option.value),
@@ -449,6 +535,7 @@ function MultiSelectValueControl({
       items={field.options}
       multiple
       value={selected}
+      defaultOpen={initialOpen}
       onValueChange={(next) => onValueChange(next.map((option) => option.value))}
       itemToStringLabel={(option) => option.label}
     >
@@ -459,11 +546,18 @@ function MultiSelectValueControl({
             data-slot="filter-chip-value"
             variant="ghost"
             size={size}
-            className="text-foreground data-popup-open:bg-surface-hover gap-1.5 rounded-none font-normal focus-visible:-outline-offset-2"
+            className="text-foreground data-popup-open:bg-surface-hover rounded-none font-normal focus-visible:-outline-offset-2"
           >
-            {selected.length > 0 && selected[0].icon}
-            <span className={cn(selected.length === 0 && "text-muted-foreground")}>
-              {display}
+            <span className="flex items-center gap-1.5">
+              {selected.length > 0 && selected[0].icon}
+              <span
+                className={cn(
+                  "max-w-40 truncate",
+                  selected.length === 0 && "text-muted-foreground",
+                )}
+              >
+                {display}
+              </span>
             </span>
           </Button>
         )}
@@ -473,9 +567,11 @@ function MultiSelectValueControl({
         noResults={labels.noResults}
       >
         {(option: FilterOption) => (
-          <ComboboxItem key={option.value} value={option} className="gap-2">
-            {option.icon}
-            <span className="truncate">{option.label}</span>
+          <ComboboxItem key={option.value} value={option}>
+            <span className="flex items-center gap-2">
+              {option.icon}
+              <span className="truncate">{option.label}</span>
+            </span>
           </ComboboxItem>
         )}
       </ValuePopup>
@@ -491,13 +587,14 @@ function TextValueControl({
   field,
   filter,
   size,
+  autoOpen,
   onValueChange,
 }: ValueControlProps<TextFilterField>) {
   return (
     <Input
       data-slot="filter-chip-value"
       type="text"
-      autoFocus
+      autoFocus={autoOpen}
       value={typeof filter.value === "string" ? filter.value : ""}
       placeholder={field.placeholder ?? "Enter value"}
       size={inputSize(size)}
@@ -568,6 +665,7 @@ function NumberValueControl({
   field,
   filter,
   size,
+  autoOpen,
   onValueChange,
 }: ValueControlProps<NumberFilterField>) {
   if (filter.operator === "between") {
@@ -600,7 +698,7 @@ function NumberValueControl({
       size={size}
       step={field.step}
       placeholder={field.placeholder ?? "Value"}
-      autoFocus
+      autoFocus={autoOpen}
       onValueChange={onValueChange}
     />
   );
@@ -666,10 +764,15 @@ function FilterAddButton({ children }: { children?: React.ReactNode }) {
               key={field.id}
               value={field}
               disabled={!allowDuplicateFields && usedFieldIds.has(field.id)}
-              className="gap-2"
             >
-              {field.icon}
-              <span className="truncate">{field.label}</span>
+              <span className="flex items-center gap-2">
+                {field.icon ? (
+                  <span className="text-muted-foreground flex shrink-0 items-center [&_svg]:size-3.5!">
+                    {field.icon}
+                  </span>
+                ) : null}
+                <span className="truncate">{field.label}</span>
+              </span>
             </ComboboxItem>
           )}
         </ComboboxList>

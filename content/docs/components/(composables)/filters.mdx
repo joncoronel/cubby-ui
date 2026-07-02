@@ -77,6 +77,7 @@ return <Filters fields={fields} value={value} onValueChange={setValue} />;
 - Adding a filter opens its value picker (or focuses its input) right away, so you pick in one gesture.
 - Colored dots or icons on options keep a dense bar scannable; fields accept an optional `icon` too.
 - `prefix` / `suffix` on text and number fields for currency, units, or symbols; `maxSelections` caps a multiselect.
+- Number fields are spinner-free (Base UI) with arrow-key stepping and wheel scrubbing (scroll to adjust while focused).
 - Optional keyboard shortcut (`enableShortcut`) opens the add-filter menu, with a `Kbd` hint on the button.
 - Controlled and uncontrolled: pass `value` + `onValueChange`, or `defaultValue`. Because it is controlled, syncing to the URL (nuqs) is trivial.
 - The `custom` field type renders any control through `renderValue`, for dates, sliders, or bespoke inputs.

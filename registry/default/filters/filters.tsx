@@ -687,10 +687,13 @@ function NumberValueField({
 }) {
   // Base UI's NumberField.Input is a text input with numeric semantics (no
   // native spinner) and handles parsing, arrow-key stepping, and clamping.
+  // `allowWheelScrub` lets the wheel adjust the value while the input is
+  // focused and hovered (it won't hijack ordinary page scrolling).
   return withAddons(
     <BaseNumberField.Root
       value={value}
       step={step}
+      allowWheelScrub
       onValueChange={(next) => onValueChange(next)}
       className={cn("flex flex-none items-center", fieldHeight(size))}
     >

@@ -99,6 +99,7 @@
         "@cubby-ui/fancy-button",
         "@cubby-ui/field",
         "@cubby-ui/fieldset",
+        "@cubby-ui/filters",
         "@cubby-ui/form",
         "@cubby-ui/input",
         "@cubby-ui/input-group",
@@ -828,6 +829,53 @@
       ]
     },
     {
+      "name": "filters",
+      "type": "registry:ui",
+      "title": "Filters",
+      "description": "A filter bar of segmented pills with per-field operators and value controls.",
+      "files": [
+        {
+          "path": "registry/default/filters/filters.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/filters/filters.tsx"
+        },
+        {
+          "path": "registry/default/filters/lib/filters-types.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/filters/lib/filters-types.ts"
+        },
+        {
+          "path": "registry/default/filters/lib/filters-utils.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/filters/lib/filters-utils.ts"
+        },
+        {
+          "path": "registry/default/filters/hooks/use-controllable-state.ts",
+          "type": "registry:hook",
+          "target": "components/ui/cubby-ui/filters/hooks/use-controllable-state.ts"
+        },
+        {
+          "path": "registry/default/filters/filters-context.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/filters/filters-context.tsx"
+        }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/badge",
+        "@cubby-ui/button",
+        "@cubby-ui/button-group",
+        "@cubby-ui/combobox",
+        "@cubby-ui/dropdown-menu",
+        "@cubby-ui/input",
+        "@cubby-ui/kbd"
+      ],
+      "dependencies": [
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons",
+        "uuid"
+      ]
+    },
+    {
       "name": "form",
       "type": "registry:ui",
       "title": "Form",
@@ -1023,7 +1071,9 @@
         }
       ],
       "dependencies": [
-        "class-variance-authority"
+        "class-variance-authority",
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
       ]
     },
     {

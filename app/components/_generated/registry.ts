@@ -240,6 +240,16 @@ import field_field_with_switch from "@/registry/examples/field/field-with-switch
 import fieldset_fieldset_demo from "@/registry/examples/fieldset/fieldset-demo";
 import fieldset_fieldset_with_checkbox_group from "@/registry/examples/fieldset/fieldset-with-checkbox-group";
 import fieldset_fieldset_with_radio_group from "@/registry/examples/fieldset/fieldset-with-radio-group";
+import filters_filters_basic from "@/registry/examples/filters/filters-basic";
+import filters_filters_affixes from "@/registry/examples/filters/filters-affixes";
+import filters_filters_controlled from "@/registry/examples/filters/filters-controlled";
+import filters_filters_field_types from "@/registry/examples/filters/filters-field-types";
+import filters_filters_manual from "@/registry/examples/filters/filters-manual";
+import filters_filters_multiselect from "@/registry/examples/filters/filters-multiselect";
+import filters_filters_nuqs from "@/registry/examples/filters/filters-nuqs";
+import filters_filters_operators from "@/registry/examples/filters/filters-operators";
+import filters_filters_shortcut from "@/registry/examples/filters/filters-shortcut";
+import filters_filters_sizes from "@/registry/examples/filters/filters-sizes";
 import form_form_demo from "@/registry/examples/form/form-demo";
 import form_form_complete from "@/registry/examples/form/form-complete";
 import form_form_constraint_validation from "@/registry/examples/form/form-constraint-validation";
@@ -302,6 +312,7 @@ import number_field_number_field_field from "@/registry/examples/number-field/nu
 import number_field_number_field_format from "@/registry/examples/number-field/number-field-format";
 import number_field_number_field_min_max from "@/registry/examples/number-field/number-field-min-max";
 import number_field_number_field_scrub_area from "@/registry/examples/number-field/number-field-scrub-area";
+import number_field_number_field_stacked from "@/registry/examples/number-field/number-field-stacked";
 import otp_field_otp_field_basic from "@/registry/examples/otp-field/otp-field-basic";
 import otp_field_otp_field_alphanumeric from "@/registry/examples/otp-field/otp-field-alphanumeric";
 import otp_field_otp_field_custom_sanitization from "@/registry/examples/otp-field/otp-field-custom-sanitization";
@@ -945,6 +956,28 @@ export const componentMetadata = {
     "examples": {},
     "reference": []
   },
+  "filters": {
+    "name": "filters",
+    "title": "Filters",
+    "description": "A filter bar of segmented pills with per-field operators and value controls.",
+    "category": "UI",
+    "registryDependencies": [
+      "@cubby-ui/badge",
+      "@cubby-ui/button",
+      "@cubby-ui/button-group",
+      "@cubby-ui/combobox",
+      "@cubby-ui/dropdown-menu",
+      "@cubby-ui/input",
+      "@cubby-ui/kbd"
+    ],
+    "dependencies": [
+      "@hugeicons/react",
+      "@hugeicons/core-free-icons",
+      "uuid"
+    ],
+    "examples": {},
+    "reference": []
+  },
   "form": {
     "name": "form",
     "title": "Form",
@@ -1077,7 +1110,9 @@ export const componentMetadata = {
     "category": "UI",
     "registryDependencies": [],
     "dependencies": [
-      "class-variance-authority"
+      "class-variance-authority",
+      "@hugeicons/react",
+      "@hugeicons/core-free-icons"
     ],
     "examples": {},
     "reference": []
@@ -2748,6 +2783,58 @@ export const exampleRegistry = {
       "source": "import { Field, FieldItem, FieldLabel } from \"@/components/ui/cubby-ui/field\";\nimport { Fieldset, FieldsetLegend } from \"@/components/ui/cubby-ui/fieldset\";\nimport {\n  RadioGroup,\n  RadioGroupItem,\n} from \"@/components/ui/cubby-ui/radio-group\";\n\nexport default function FieldsetWithRadioGroup() {\n  return (\n    <Field name=\"notifications\">\n      <Fieldset render={<RadioGroup defaultValue=\"all\" />}>\n        <FieldsetLegend>Notification preferences</FieldsetLegend>\n        <FieldItem>\n          <FieldLabel>\n            <RadioGroupItem value=\"all\" />\n            All notifications\n          </FieldLabel>\n        </FieldItem>\n        <FieldItem>\n          <FieldLabel>\n            <RadioGroupItem value=\"mentions\" />\n            Mentions only\n          </FieldLabel>\n        </FieldItem>\n        <FieldItem>\n          <FieldLabel>\n            <RadioGroupItem value=\"none\" />\n            None\n          </FieldLabel>\n        </FieldItem>\n      </Fieldset>\n    </Field>\n  );\n}\n"
     }
   ],
+  "filters": [
+    {
+      "title": "Basic",
+      "importPath": "filters-basic",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  Filters,\n  createFilter,\n  type FilterField,\n  type FilterValue,\n} from \"@/components/ui/cubby-ui/filters\";\n\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport {\n  DashboardCircleIcon,\n  Flag02Icon,\n  TextFontIcon,\n  Timer01Icon,\n} from \"@hugeicons/core-free-icons\";\n\nfunction Dot({ className }: { className: string }) {\n  return (\n    <span aria-hidden className={`size-2 shrink-0 rounded-full ${className}`} />\n  );\n}\n\nconst fields: FilterField[] = [\n  {\n    id: \"status\",\n    label: \"Status\",\n    icon: <HugeiconsIcon icon={DashboardCircleIcon} strokeWidth={2} />,\n    type: \"select\",\n    options: [\n      { value: \"todo\", label: \"Todo\", icon: <Dot className=\"bg-[oklch(0.7_0_0)]\" /> },\n      {\n        value: \"in_progress\",\n        label: \"In progress\",\n        icon: <Dot className=\"bg-[oklch(0.75_0.15_75)]\" />,\n      },\n      { value: \"done\", label: \"Done\", icon: <Dot className=\"bg-[oklch(0.7_0.16_150)]\" /> },\n      {\n        value: \"canceled\",\n        label: \"Canceled\",\n        icon: <Dot className=\"bg-[oklch(0.62_0.2_25)]\" />,\n      },\n    ],\n  },\n  {\n    id: \"priority\",\n    label: \"Priority\",\n    icon: <HugeiconsIcon icon={Flag02Icon} strokeWidth={2} />,\n    type: \"multiselect\",\n    options: [\n      { value: \"low\", label: \"Low\", icon: <Dot className=\"bg-[oklch(0.7_0_0)]\" /> },\n      {\n        value: \"medium\",\n        label: \"Medium\",\n        icon: <Dot className=\"bg-[oklch(0.6_0.2_250)]\" />,\n      },\n      { value: \"high\", label: \"High\", icon: <Dot className=\"bg-[oklch(0.75_0.15_75)]\" /> },\n      {\n        value: \"urgent\",\n        label: \"Urgent\",\n        icon: <Dot className=\"bg-[oklch(0.62_0.2_25)]\" />,\n      },\n    ],\n  },\n  {\n    id: \"title\",\n    label: \"Title\",\n    icon: <HugeiconsIcon icon={TextFontIcon} strokeWidth={2} />,\n    type: \"text\",\n  },\n  {\n    id: \"estimate\",\n    label: \"Estimate\",\n    icon: <HugeiconsIcon icon={Timer01Icon} strokeWidth={2} />,\n    type: \"number\",\n  },\n];\n\nexport default function FiltersBasic() {\n  const [value, setValue] = React.useState<FilterValue[]>(() => [\n    createFilter(fields[0], { id: \"seed-status\", value: \"in_progress\" }),\n  ]);\n\n  return <Filters fields={fields} value={value} onValueChange={setValue} />;\n}\n"
+    },
+    {
+      "title": "Affixes",
+      "importPath": "filters-affixes",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  Filters,\n  createFilter,\n  type FilterField,\n  type FilterValue,\n} from \"@/components/ui/cubby-ui/filters\";\n\nconst fields: FilterField[] = [\n  {\n    id: \"budget\",\n    label: \"Budget\",\n    type: \"number\",\n    prefix: \"$\",\n  },\n  {\n    id: \"estimate\",\n    label: \"Estimate\",\n    type: \"number\",\n    suffix: \"hrs\",\n  },\n  {\n    id: \"progress\",\n    label: \"Progress\",\n    type: \"number\",\n    suffix: \"%\",\n  },\n  {\n    id: \"handle\",\n    label: \"Handle\",\n    type: \"text\",\n    prefix: \"@\",\n  },\n];\n\nexport default function FiltersAffixes() {\n  const [value, setValue] = React.useState<FilterValue[]>(() => [\n    createFilter(fields[0], { id: \"seed-budget\", operator: \"gt\", value: 1000 }),\n    createFilter(fields[1], { id: \"seed-estimate\", operator: \"lt\", value: 8 }),\n  ]);\n\n  return <Filters fields={fields} value={value} onValueChange={setValue} />;\n}\n"
+    },
+    {
+      "title": "Controlled",
+      "importPath": "filters-controlled",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  Filters,\n  type FilterField,\n  type FilterValue,\n} from \"@/components/ui/cubby-ui/filters\";\n\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport {\n  DashboardCircleIcon,\n  Tag01Icon,\n  Timer01Icon,\n} from \"@hugeicons/core-free-icons\";\n\nfunction Dot({ className }: { className: string }) {\n  return (\n    <span aria-hidden className={`size-2 shrink-0 rounded-full ${className}`} />\n  );\n}\n\nconst fields: FilterField[] = [\n  {\n    id: \"status\",\n    label: \"Status\",\n    icon: <HugeiconsIcon icon={DashboardCircleIcon} strokeWidth={2} />,\n    type: \"select\",\n    options: [\n      { value: \"todo\", label: \"Todo\", icon: <Dot className=\"bg-[oklch(0.7_0_0)]\" /> },\n      {\n        value: \"in_progress\",\n        label: \"In progress\",\n        icon: <Dot className=\"bg-[oklch(0.75_0.15_75)]\" />,\n      },\n      { value: \"done\", label: \"Done\", icon: <Dot className=\"bg-[oklch(0.7_0.16_150)]\" /> },\n    ],\n  },\n  {\n    id: \"labels\",\n    label: \"Labels\",\n    icon: <HugeiconsIcon icon={Tag01Icon} strokeWidth={2} />,\n    type: \"multiselect\",\n    options: [\n      { value: \"bug\", label: \"Bug\", icon: <Dot className=\"bg-[oklch(0.62_0.2_25)]\" /> },\n      {\n        value: \"feature\",\n        label: \"Feature\",\n        icon: <Dot className=\"bg-[oklch(0.7_0.16_150)]\" />,\n      },\n      { value: \"docs\", label: \"Docs\", icon: <Dot className=\"bg-[oklch(0.6_0.2_250)]\" /> },\n    ],\n  },\n  {\n    id: \"estimate\",\n    label: \"Estimate\",\n    icon: <HugeiconsIcon icon={Timer01Icon} strokeWidth={2} />,\n    type: \"number\",\n  },\n];\n\nexport default function FiltersControlled() {\n  const [value, setValue] = React.useState<FilterValue[]>([]);\n\n  return (\n    <div className=\"flex w-full flex-col gap-4\">\n      <Filters\n        fields={fields}\n        value={value}\n        onValueChange={setValue}\n        showActiveCount\n      />\n      <pre className=\"bg-muted text-muted-foreground max-h-56 overflow-auto rounded-lg p-3 text-xs\">\n        {JSON.stringify(value, null, 2)}\n      </pre>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Field Types",
+      "importPath": "filters-field-types",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  Filters,\n  type FilterField,\n  type FilterValue,\n} from \"@/components/ui/cubby-ui/filters\";\n\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport {\n  Calendar01Icon,\n  DashboardCircleIcon,\n  Tag01Icon,\n  TextFontIcon,\n  Timer01Icon,\n} from \"@hugeicons/core-free-icons\";\n\nfunction Dot({ className }: { className: string }) {\n  return (\n    <span aria-hidden className={`size-2 shrink-0 rounded-full ${className}`} />\n  );\n}\n\nconst fields: FilterField[] = [\n  {\n    id: \"status\",\n    label: \"Status\",\n    icon: <HugeiconsIcon icon={DashboardCircleIcon} strokeWidth={2} />,\n    type: \"select\",\n    options: [\n      { value: \"todo\", label: \"Todo\", icon: <Dot className=\"bg-[oklch(0.7_0_0)]\" /> },\n      {\n        value: \"in_progress\",\n        label: \"In progress\",\n        icon: <Dot className=\"bg-[oklch(0.75_0.15_75)]\" />,\n      },\n      { value: \"done\", label: \"Done\", icon: <Dot className=\"bg-[oklch(0.7_0.16_150)]\" /> },\n    ],\n  },\n  {\n    id: \"labels\",\n    label: \"Labels\",\n    icon: <HugeiconsIcon icon={Tag01Icon} strokeWidth={2} />,\n    type: \"multiselect\",\n    options: [\n      { value: \"bug\", label: \"Bug\", icon: <Dot className=\"bg-[oklch(0.62_0.2_25)]\" /> },\n      {\n        value: \"feature\",\n        label: \"Feature\",\n        icon: <Dot className=\"bg-[oklch(0.7_0.16_150)]\" />,\n      },\n      { value: \"docs\", label: \"Docs\", icon: <Dot className=\"bg-[oklch(0.6_0.2_250)]\" /> },\n      {\n        value: \"design\",\n        label: \"Design\",\n        icon: <Dot className=\"bg-[oklch(0.6_0.2_290)]\" />,\n      },\n    ],\n  },\n  {\n    id: \"title\",\n    label: \"Title\",\n    icon: <HugeiconsIcon icon={TextFontIcon} strokeWidth={2} />,\n    type: \"text\",\n  },\n  {\n    id: \"estimate\",\n    label: \"Estimate\",\n    icon: <HugeiconsIcon icon={Timer01Icon} strokeWidth={2} />,\n    type: \"number\",\n  },\n  {\n    // The custom escape hatch: a native date input driving the filter value.\n    id: \"due\",\n    label: \"Due date\",\n    icon: <HugeiconsIcon icon={Calendar01Icon} strokeWidth={2} />,\n    type: \"custom\",\n    defaultValue: \"\",\n    renderValue: ({ value, onValueChange }) => (\n      <input\n        type=\"date\"\n        value={typeof value === \"string\" ? value : \"\"}\n        onChange={(event) => onValueChange(event.target.value)}\n        className=\"focus-visible:outline-ring/50 h-10 rounded-none bg-transparent px-2.5 text-sm outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 sm:h-9\"\n      />\n    ),\n  },\n];\n\nexport default function FiltersFieldTypes() {\n  const [value, setValue] = React.useState<FilterValue[]>([]);\n  return <Filters fields={fields} value={value} onValueChange={setValue} />;\n}\n"
+    },
+    {
+      "title": "Manual",
+      "importPath": "filters-manual",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  Filters,\n  FilterAddButton,\n  FilterChip,\n  FilterClearButton,\n  type FilterField,\n  type FilterValue,\n} from \"@/components/ui/cubby-ui/filters\";\n\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport {\n  DashboardCircleIcon,\n  TextFontIcon,\n  Timer01Icon,\n} from \"@hugeicons/core-free-icons\";\n\nfunction Dot({ className }: { className: string }) {\n  return (\n    <span aria-hidden className={`size-2 shrink-0 rounded-full ${className}`} />\n  );\n}\n\nconst fields: FilterField[] = [\n  {\n    id: \"status\",\n    label: \"Status\",\n    icon: <HugeiconsIcon icon={DashboardCircleIcon} strokeWidth={2} />,\n    type: \"select\",\n    options: [\n      { value: \"todo\", label: \"Todo\", icon: <Dot className=\"bg-[oklch(0.7_0_0)]\" /> },\n      {\n        value: \"in_progress\",\n        label: \"In progress\",\n        icon: <Dot className=\"bg-[oklch(0.75_0.15_75)]\" />,\n      },\n      { value: \"done\", label: \"Done\", icon: <Dot className=\"bg-[oklch(0.7_0.16_150)]\" /> },\n    ],\n  },\n  {\n    id: \"title\",\n    label: \"Title\",\n    icon: <HugeiconsIcon icon={TextFontIcon} strokeWidth={2} />,\n    type: \"text\",\n  },\n  {\n    id: \"estimate\",\n    label: \"Estimate\",\n    icon: <HugeiconsIcon icon={Timer01Icon} strokeWidth={2} />,\n    type: \"number\",\n  },\n];\n\nexport default function FiltersManual() {\n  const [value, setValue] = React.useState<FilterValue[]>([]);\n\n  return (\n    <Filters fields={fields} value={value} onValueChange={setValue}>\n      <FilterAddButton />\n      {value.map((filter) => {\n        const field = fields.find((item) => item.id === filter.field);\n        if (!field) return null;\n        return <FilterChip key={filter.id} filter={filter} field={field} />;\n      })}\n      {value.length > 0 && <FilterClearButton />}\n    </Filters>\n  );\n}\n"
+    },
+    {
+      "title": "Multiselect",
+      "importPath": "filters-multiselect",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  Filters,\n  createFilter,\n  type FilterField,\n  type FilterValue,\n} from \"@/components/ui/cubby-ui/filters\";\n\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport { Tag01Icon } from \"@hugeicons/core-free-icons\";\n\nfunction Dot({ className }: { className: string }) {\n  return (\n    <span aria-hidden className={`size-2 shrink-0 rounded-full ${className}`} />\n  );\n}\n\nconst fields: FilterField[] = [\n  {\n    id: \"labels\",\n    label: \"Labels\",\n    icon: <HugeiconsIcon icon={Tag01Icon} strokeWidth={2} />,\n    type: \"multiselect\",\n    maxSelections: 4,\n    options: [\n      { value: \"bug\", label: \"Bug\", icon: <Dot className=\"bg-[oklch(0.62_0.2_25)]\" /> },\n      {\n        value: \"feature\",\n        label: \"Feature\",\n        icon: <Dot className=\"bg-[oklch(0.7_0.16_150)]\" />,\n      },\n      {\n        value: \"docs\",\n        label: \"Documentation\",\n        icon: <Dot className=\"bg-[oklch(0.6_0.2_250)]\" />,\n      },\n      {\n        value: \"design\",\n        label: \"Design\",\n        icon: <Dot className=\"bg-[oklch(0.6_0.2_290)]\" />,\n      },\n      {\n        value: \"infra\",\n        label: \"Infrastructure\",\n        icon: <Dot className=\"bg-[oklch(0.7_0_0)]\" />,\n      },\n      {\n        value: \"a11y\",\n        label: \"Accessibility\",\n        icon: <Dot className=\"bg-[oklch(0.75_0.15_75)]\" />,\n      },\n      {\n        value: \"perf\",\n        label: \"Performance\",\n        icon: <Dot className=\"bg-[oklch(0.6_0.2_290)]\" />,\n      },\n      {\n        value: \"security\",\n        label: \"Security\",\n        icon: <Dot className=\"bg-[oklch(0.62_0.2_25)]\" />,\n      },\n    ],\n  },\n];\n\nexport default function FiltersMultiselect() {\n  const [value, setValue] = React.useState<FilterValue[]>(() => [\n    createFilter(fields[0], {\n      id: \"seed-labels\",\n      operator: \"is_any_of\",\n      value: [\"bug\", \"feature\", \"docs\"],\n    }),\n  ]);\n\n  return <Filters fields={fields} value={value} onValueChange={setValue} />;\n}\n"
+    },
+    {
+      "title": "Nuqs",
+      "importPath": "filters-nuqs",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { NuqsAdapter } from \"nuqs/adapters/next/app\";\nimport { useQueryState } from \"nuqs\";\nimport {\n  Filters,\n  type FilterField,\n  type FilterValue,\n} from \"@/components/ui/cubby-ui/filters\";\n\nfunction Dot({ className }: { className: string }) {\n  return (\n    <span aria-hidden className={`size-2 shrink-0 rounded-full ${className}`} />\n  );\n}\n\nconst fields: FilterField[] = [\n  {\n    id: \"status\",\n    label: \"Status\",\n    type: \"select\",\n    options: [\n      { value: \"todo\", label: \"Todo\", icon: <Dot className=\"bg-[oklch(0.7_0_0)]\" /> },\n      {\n        value: \"in_progress\",\n        label: \"In progress\",\n        icon: <Dot className=\"bg-[oklch(0.75_0.15_75)]\" />,\n      },\n      { value: \"done\", label: \"Done\", icon: <Dot className=\"bg-[oklch(0.7_0.16_150)]\" /> },\n    ],\n  },\n  {\n    id: \"labels\",\n    label: \"Labels\",\n    type: \"multiselect\",\n    options: [\n      { value: \"bug\", label: \"Bug\", icon: <Dot className=\"bg-[oklch(0.62_0.2_25)]\" /> },\n      {\n        value: \"feature\",\n        label: \"Feature\",\n        icon: <Dot className=\"bg-[oklch(0.7_0.16_150)]\" />,\n      },\n      { value: \"docs\", label: \"Docs\", icon: <Dot className=\"bg-[oklch(0.6_0.2_250)]\" /> },\n    ],\n  },\n  { id: \"title\", label: \"Title\", type: \"text\" },\n];\n\nfunction FiltersNuqsDemo() {\n  // Persist the filters array in the `?filters=` query param as JSON. Because\n  // `Filters` is already controlled, wiring it to nuqs is just value + setter.\n  const [raw, setRaw] = useQueryState(\"filters\");\n  const value = React.useMemo<FilterValue[]>(() => {\n    if (!raw) return [];\n    try {\n      return JSON.parse(raw) as FilterValue[];\n    } catch {\n      return [];\n    }\n  }, [raw]);\n\n  return (\n    <div className=\"flex w-full flex-col gap-3\">\n      <Filters\n        fields={fields}\n        value={value}\n        onValueChange={(next) =>\n          setRaw(next.length ? JSON.stringify(next) : null)\n        }\n      />\n      <p className=\"text-muted-foreground text-sm\">\n        Filters persist in the URL as <code>?filters=</code>. Reload the page and\n        they stick.\n      </p>\n    </div>\n  );\n}\n\nexport default function FiltersNuqs() {\n  // Mount <NuqsAdapter> once at your app root; it lives here so the example is\n  // self-contained.\n  return (\n    <NuqsAdapter>\n      <FiltersNuqsDemo />\n    </NuqsAdapter>\n  );\n}\n"
+    },
+    {
+      "title": "Operators",
+      "importPath": "filters-operators",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  Filters,\n  createFilter,\n  type FilterField,\n  type FilterValue,\n} from \"@/components/ui/cubby-ui/filters\";\n\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport {\n  DashboardCircleIcon,\n  TextFontIcon,\n  UserCircleIcon,\n} from \"@hugeicons/core-free-icons\";\n\nfunction Dot({ className }: { className: string }) {\n  return (\n    <span aria-hidden className={`size-2 shrink-0 rounded-full ${className}`} />\n  );\n}\n\nconst fields: FilterField[] = [\n  {\n    id: \"status\",\n    label: \"Status\",\n    icon: <HugeiconsIcon icon={DashboardCircleIcon} strokeWidth={2} />,\n    type: \"select\",\n    options: [\n      { value: \"todo\", label: \"Todo\", icon: <Dot className=\"bg-[oklch(0.7_0_0)]\" /> },\n      {\n        value: \"in_progress\",\n        label: \"In progress\",\n        icon: <Dot className=\"bg-[oklch(0.75_0.15_75)]\" />,\n      },\n      { value: \"done\", label: \"Done\", icon: <Dot className=\"bg-[oklch(0.7_0.16_150)]\" /> },\n    ],\n  },\n  {\n    // Restrict this field to two operators.\n    id: \"assignee\",\n    label: \"Assignee\",\n    icon: <HugeiconsIcon icon={UserCircleIcon} strokeWidth={2} />,\n    type: \"select\",\n    disabledOperators: [\"is_empty\", \"is_not_empty\"],\n    options: [\n      { value: \"alex\", label: \"Alex\" },\n      { value: \"sam\", label: \"Sam\" },\n      { value: \"jordan\", label: \"Jordan\" },\n    ],\n  },\n  {\n    // Fully custom operator set.\n    id: \"title\",\n    label: \"Title\",\n    icon: <HugeiconsIcon icon={TextFontIcon} strokeWidth={2} />,\n    type: \"text\",\n    operators: [\n      { id: \"contains\", label: \"contains\" },\n      { id: \"is\", label: \"is exactly\" },\n      { id: \"is_empty\", label: \"is empty\", valueless: true },\n    ],\n  },\n];\n\nexport default function FiltersOperators() {\n  const [value, setValue] = React.useState<FilterValue[]>(() => [\n    createFilter(fields[0], {\n      id: \"seed-status\",\n      operator: \"is_not\",\n      value: \"done\",\n    }),\n    createFilter(fields[2], { id: \"seed-title\", operator: \"is_empty\" }),\n  ]);\n\n  return <Filters fields={fields} value={value} onValueChange={setValue} />;\n}\n"
+    },
+    {
+      "title": "Shortcut",
+      "importPath": "filters-shortcut",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  Filters,\n  type FilterField,\n  type FilterValue,\n} from \"@/components/ui/cubby-ui/filters\";\n\nfunction Dot({ className }: { className: string }) {\n  return (\n    <span aria-hidden className={`size-2 shrink-0 rounded-full ${className}`} />\n  );\n}\n\nconst fields: FilterField[] = [\n  {\n    id: \"status\",\n    label: \"Status\",\n    type: \"select\",\n    options: [\n      { value: \"todo\", label: \"Todo\", icon: <Dot className=\"bg-[oklch(0.7_0_0)]\" /> },\n      {\n        value: \"in_progress\",\n        label: \"In progress\",\n        icon: <Dot className=\"bg-[oklch(0.75_0.15_75)]\" />,\n      },\n      { value: \"done\", label: \"Done\", icon: <Dot className=\"bg-[oklch(0.7_0.16_150)]\" /> },\n    ],\n  },\n  { id: \"title\", label: \"Title\", type: \"text\" },\n];\n\nexport default function FiltersShortcut() {\n  const [value, setValue] = React.useState<FilterValue[]>([]);\n\n  return (\n    <div className=\"flex w-full flex-col gap-3\">\n      <p className=\"text-muted-foreground text-sm\">\n        Press <kbd className=\"text-foreground font-medium\">F</kbd> (while not\n        typing) to open the filter menu.\n      </p>\n      <Filters\n        fields={fields}\n        value={value}\n        onValueChange={setValue}\n        enableShortcut\n        shortcutKey=\"f\"\n      />\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Sizes",
+      "importPath": "filters-sizes",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  Filters,\n  createFilter,\n  type FilterField,\n  type FilterSize,\n  type FilterValue,\n} from \"@/components/ui/cubby-ui/filters\";\n\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport { DashboardCircleIcon, TextFontIcon } from \"@hugeicons/core-free-icons\";\n\nfunction Dot({ className }: { className: string }) {\n  return (\n    <span aria-hidden className={`size-2 shrink-0 rounded-full ${className}`} />\n  );\n}\n\nconst fields: FilterField[] = [\n  {\n    id: \"status\",\n    label: \"Status\",\n    icon: <HugeiconsIcon icon={DashboardCircleIcon} strokeWidth={2} />,\n    type: \"select\",\n    options: [\n      { value: \"todo\", label: \"Todo\", icon: <Dot className=\"bg-[oklch(0.7_0_0)]\" /> },\n      {\n        value: \"in_progress\",\n        label: \"In progress\",\n        icon: <Dot className=\"bg-[oklch(0.75_0.15_75)]\" />,\n      },\n      { value: \"done\", label: \"Done\", icon: <Dot className=\"bg-[oklch(0.7_0.16_150)]\" /> },\n    ],\n  },\n  {\n    id: \"title\",\n    label: \"Title\",\n    icon: <HugeiconsIcon icon={TextFontIcon} strokeWidth={2} />,\n    type: \"text\",\n  },\n];\n\nconst sizes: FilterSize[] = [\"sm\", \"default\", \"lg\"];\n\nexport default function FiltersSizes() {\n  const [value, setValue] = React.useState<FilterValue[]>(() => [\n    createFilter(fields[0], { id: \"seed-status\", value: \"in_progress\" }),\n  ]);\n\n  return (\n    <div className=\"flex w-full flex-col gap-4\">\n      {sizes.map((size) => (\n        <Filters\n          key={size}\n          fields={fields}\n          size={size}\n          value={value}\n          onValueChange={setValue}\n        />\n      ))}\n    </div>\n  );\n}\n"
+    }
+  ],
   "form": [
     {
       "title": "Demo",
@@ -3078,6 +3165,11 @@ export const exampleRegistry = {
       "title": "Scrub Area",
       "importPath": "number-field-scrub-area",
       "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  NumberField,\n  NumberFieldDecrement,\n  NumberFieldGroup,\n  NumberFieldIncrement,\n  NumberFieldInput,\n  NumberFieldScrubArea,\n  NumberFieldScrubAreaCursor,\n} from \"@/components/ui/cubby-ui/number-field\";\n\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport { MinusSignIcon, PlusSignIcon } from \"@hugeicons/core-free-icons\";\nfunction CursorGrowIcon(props: React.ComponentProps<\"svg\">) {\n  return (\n    <svg\n      width=\"26\"\n      height=\"14\"\n      viewBox=\"0 0 24 14\"\n      fill=\"black\"\n      stroke=\"white\"\n      xmlns=\"http://www.w3.org/2000/svg\"\n      {...props}\n    >\n      <path d=\"M19.5 5.5L6.49737 5.51844V2L1 6.9999L6.5 12L6.49737 8.5L19.5 8.5V12L25 6.9999L19.5 2V5.5Z\" />\n    </svg>\n  );\n}\n\nexport default function NumberFieldScrubAreaDemo() {\n  const id = React.useId();\n\n  return (\n    <NumberField id={id} defaultValue={100}>\n      <NumberFieldScrubArea>\n        <label\n          htmlFor={id}\n          className=\"cursor-ew-resize text-sm font-medium select-none\"\n        >\n          Amount\n        </label>\n        <NumberFieldScrubAreaCursor>\n          <CursorGrowIcon />\n        </NumberFieldScrubAreaCursor>\n      </NumberFieldScrubArea>\n      <NumberFieldGroup>\n        <NumberFieldDecrement>\n          <HugeiconsIcon icon={MinusSignIcon} className=\"size-4\"  strokeWidth={2} />\n        </NumberFieldDecrement>\n        <NumberFieldInput />\n        <NumberFieldIncrement>\n          <HugeiconsIcon icon={PlusSignIcon} className=\"size-4\"  strokeWidth={2} />\n        </NumberFieldIncrement>\n      </NumberFieldGroup>\n    </NumberField>\n  );\n}\n"
+    },
+    {
+      "title": "Stacked",
+      "importPath": "number-field-stacked",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\nimport {\n  NumberField,\n  NumberFieldGroup,\n  NumberFieldInput,\n  NumberFieldStepper,\n} from \"@/components/ui/cubby-ui/number-field\";\n\nexport default function NumberFieldStacked() {\n  const id = React.useId();\n\n  return (\n    <NumberField id={id} defaultValue={100}>\n      <Label htmlFor={id}>Amount</Label>\n      <NumberFieldGroup>\n        <NumberFieldInput className=\"rounded-l-lg border-l\" />\n        <NumberFieldStepper />\n      </NumberFieldGroup>\n    </NumberField>\n  );\n}\n"
     }
   ],
   "otp-field": [
@@ -4178,6 +4270,16 @@ export const componentMap = {
   "fieldset-demo": fieldset_fieldset_demo,
   "fieldset-with-checkbox-group": fieldset_fieldset_with_checkbox_group,
   "fieldset-with-radio-group": fieldset_fieldset_with_radio_group,
+  "filters-basic": filters_filters_basic,
+  "filters-affixes": filters_filters_affixes,
+  "filters-controlled": filters_filters_controlled,
+  "filters-field-types": filters_filters_field_types,
+  "filters-manual": filters_filters_manual,
+  "filters-multiselect": filters_filters_multiselect,
+  "filters-nuqs": filters_filters_nuqs,
+  "filters-operators": filters_filters_operators,
+  "filters-shortcut": filters_filters_shortcut,
+  "filters-sizes": filters_filters_sizes,
   "form-demo": form_form_demo,
   "form-complete": form_form_complete,
   "form-constraint-validation": form_form_constraint_validation,
@@ -4240,6 +4342,7 @@ export const componentMap = {
   "number-field-format": number_field_number_field_format,
   "number-field-min-max": number_field_number_field_min_max,
   "number-field-scrub-area": number_field_number_field_scrub_area,
+  "number-field-stacked": number_field_number_field_stacked,
   "otp-field-basic": otp_field_otp_field_basic,
   "otp-field-alphanumeric": otp_field_otp_field_alphanumeric,
   "otp-field-custom-sanitization": otp_field_otp_field_custom_sanitization,
@@ -4534,6 +4637,10 @@ export const componentAnatomy = {
   "fieldset": {
     "imports": "import { Fieldset, FieldsetLegend } from \"@/components/ui/cubby-ui/fieldset\";",
     "anatomy": "<Fieldset>\n  <FieldsetLegend />\n</Fieldset>"
+  },
+  "filters": {
+    "imports": "import {\n  Filters,\n  createFilter,\n  type FilterField,\n  type FilterValue,\n} from \"@/components/ui/cubby-ui/filters\";",
+    "anatomy": "<Filters />"
   },
   "form": {
     "imports": "import { Form } from \"@/components/ui/cubby-ui/form\";",

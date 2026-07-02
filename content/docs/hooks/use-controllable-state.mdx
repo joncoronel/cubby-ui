@@ -11,9 +11,7 @@ description: Merge controlled and uncontrolled state into one value and setter
 
 `useControllableState` merges controlled and uncontrolled state into a single `[value, setValue]` tuple, the pattern Radix and Base UI use internally. Build components that accept `value` + `onValueChange` for controlled use, or `defaultValue` for uncontrolled use, without branching the component logic.
 
-Functional updates are safe in both modes: uncontrolled updates resolve through React's own `setState(prev => ...)` queue, so multiple updates in one event tick compose instead of clobbering each other.
-
-**Timing contract:** in controlled mode `onValueChange` fires synchronously during the event. In uncontrolled mode it fires after commit (from an effect), and if the component unmounts in the same tick as a final update, that last callback is skipped. Both are the cost of keeping the state updater pure; don't rely on the uncontrolled callback for teardown work.
+`onValueChange` fires synchronously during the event in both modes, once per accepted update. Functional updates are safe in both modes: uncontrolled updates resolve against an eagerly-advanced internal ref, so multiple `setValue` calls in one event tick compose instead of clobbering each other; controlled updates resolve against the last-committed value, since the parent owns the state. `setValue` is referentially stable across renders, so it is safe in dependency arrays and memoized contexts.
 
 ## Usage
 
@@ -55,9 +53,8 @@ function Stepper({
 </ApiProp>
 
 <ApiProp name="onValueChange" fullType="(value: T) => void">
-  Called with the resolved value whenever it changes, in both modes.
-  Synchronous in controlled mode; fires after commit in uncontrolled mode (see
-  the timing contract above).
+  Called synchronously with the resolved value whenever it changes, in both
+  modes.
 </ApiProp>
 
 </ApiPropsList>

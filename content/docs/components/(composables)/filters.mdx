@@ -230,7 +230,7 @@ Filters is a custom component composed from Cubby UI primitives. It has no Base 
 </ApiProp>
 
 <ApiProp name="labels" fullType="Partial<FiltersLabels>">
-  Overrides for the bar's copy: `add`, `clear`, `searchFields`, `searchValues`, `noFields`, `noResults`, `selectValue`, `enterValue`, `value`, `min`, `max`, and `removeFilter` (a function building the remove button's accessible label). Hoist the object outside the component (or memoize it); an inline literal is recreated every render and defeats the bar's internal memoization.
+  Overrides for the bar's copy: `add`, `clear`, `searchFields`, `searchValues`, `noFields`, `noResults`, `selectValue`, `enterValue`, `value`, `min`, `max`, and `removeFilter` (a function building the remove button's accessible label). Inline objects with string labels are fine (the memo compares values, not identity); hoist the object only if you override `removeFilter`, since an inline arrow is a new function every render.
 </ApiProp>
 
 </ApiPropsList>

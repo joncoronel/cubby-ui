@@ -71,6 +71,8 @@ const DEFAULT_LABELS: FiltersLabels = {
   removeFilter: (fieldLabel) => `Remove ${fieldLabel} filter`,
 };
 
+const LABEL_KEYS = Object.keys(DEFAULT_LABELS) as (keyof FiltersLabels)[];
+
 /** Small muted wrapper that normalizes field icons to 14px. */
 function FieldIcon({ children }: { children?: React.ReactNode }) {
   if (!children) return null;
@@ -128,7 +130,10 @@ function FiltersProvider({
 
   const labels = React.useMemo(
     () => ({ ...DEFAULT_LABELS, ...labelsProp }),
-    [labelsProp],
+    // Value-level deps (constant length — FiltersLabels is a closed shape) so
+    // an inline `labels={{ ... }}` object doesn't churn the actions context.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    LABEL_KEYS.map((key) => labelsProp?.[key]),
   );
   const fieldsById = React.useMemo(
     () => new Map(fields.map((field) => [field.id, field])),

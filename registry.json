@@ -866,7 +866,8 @@
         "@cubby-ui/button-group",
         "@cubby-ui/combobox",
         "@cubby-ui/dropdown-menu",
-        "@cubby-ui/input"
+        "@cubby-ui/input",
+        "@cubby-ui/kbd"
       ],
       "dependencies": [
         "@hugeicons/react",

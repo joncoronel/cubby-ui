@@ -26,6 +26,7 @@ import {
   DropdownMenuTrigger,
 } from "@/registry/default/dropdown-menu/dropdown-menu";
 import { Input } from "@/registry/default/input/input";
+import { Kbd } from "@/registry/default/kbd/kbd";
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
@@ -130,6 +131,9 @@ function Filters({
   showClear = true,
   showActiveCount = false,
   allowDuplicateFields = false,
+  enableShortcut = false,
+  shortcutKey = "f",
+  shortcutLabel,
   labels: labelsProp,
   className,
   children,
@@ -208,6 +212,9 @@ function Filters({
       fieldsById,
       usedFieldIds,
       allowDuplicateFields,
+      enableShortcut,
+      shortcutKey,
+      shortcutLabel: shortcutLabel ?? shortcutKey.toUpperCase(),
       lastAddedId,
       addFilter,
       updateFilter,
@@ -222,6 +229,9 @@ function Filters({
       fieldsById,
       usedFieldIds,
       allowDuplicateFields,
+      enableShortcut,
+      shortcutKey,
+      shortcutLabel,
       lastAddedId,
       addFilter,
       updateFilter,
@@ -529,6 +539,8 @@ function MultiSelectValueControl({
       : selected.length === 1
         ? selected[0].label
         : `${selected[0].label} +${selected.length - 1}`;
+  const atMax =
+    field.maxSelections != null && values.length >= field.maxSelections;
 
   return (
     <Combobox<FilterOption, true>
@@ -536,7 +548,13 @@ function MultiSelectValueControl({
       multiple
       value={selected}
       defaultOpen={initialOpen}
-      onValueChange={(next) => onValueChange(next.map((option) => option.value))}
+      onValueChange={(next) => {
+        // Reject selections past the cap; controlled value snaps back.
+        if (field.maxSelections != null && next.length > field.maxSelections) {
+          return;
+        }
+        onValueChange(next.map((option) => option.value));
+      }}
       itemToStringLabel={(option) => option.label}
     >
       <ComboboxTrigger
@@ -567,7 +585,11 @@ function MultiSelectValueControl({
         noResults={labels.noResults}
       >
         {(option: FilterOption) => (
-          <ComboboxItem key={option.value} value={option}>
+          <ComboboxItem
+            key={option.value}
+            value={option}
+            disabled={atMax && !values.includes(option.value)}
+          >
             <span className="flex items-center gap-2">
               {option.icon}
               <span className="truncate">{option.label}</span>
@@ -583,6 +605,30 @@ function inputSize(size: FilterSize): "sm" | "default" {
   return size === "sm" ? "sm" : "default";
 }
 
+/** Flanks an inline value input with muted prefix/suffix text (e.g. `$`, `%`). */
+function withAddons(
+  input: React.ReactNode,
+  prefix?: React.ReactNode,
+  suffix?: React.ReactNode,
+): React.ReactNode {
+  if (!prefix && !suffix) return input;
+  return (
+    <div data-slot="filter-chip-value" className="flex items-center">
+      {prefix ? (
+        <span className="text-muted-foreground pl-2.5 text-sm select-none">
+          {prefix}
+        </span>
+      ) : null}
+      {input}
+      {suffix ? (
+        <span className="text-muted-foreground pr-2.5 text-sm select-none">
+          {suffix}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
 function TextValueControl({
   field,
   filter,
@@ -590,7 +636,7 @@ function TextValueControl({
   autoOpen,
   onValueChange,
 }: ValueControlProps<TextFilterField>) {
-  return (
+  return withAddons(
     <Input
       data-slot="filter-chip-value"
       type="text"
@@ -600,10 +646,14 @@ function TextValueControl({
       size={inputSize(size)}
       className={cn(
         "w-40 flex-none rounded-none border-0 bg-transparent shadow-none focus-visible:-outline-offset-2 dark:bg-transparent",
+        field.prefix && "pl-1",
+        field.suffix && "pr-1",
         size === "lg" && "h-11 sm:h-10",
       )}
       onChange={(event) => onValueChange(event.target.value)}
-    />
+    />,
+    field.prefix,
+    field.suffix,
   );
 }
 
@@ -613,6 +663,8 @@ function NumberValueField({
   step,
   placeholder,
   autoFocus,
+  prefix,
+  suffix,
   onValueChange,
 }: {
   value: number | null;
@@ -620,6 +672,8 @@ function NumberValueField({
   step?: number;
   placeholder?: string;
   autoFocus?: boolean;
+  prefix?: React.ReactNode;
+  suffix?: React.ReactNode;
   onValueChange: (value: number | null) => void;
 }) {
   const [text, setText] = React.useState(value === null ? "" : String(value));
@@ -633,7 +687,7 @@ function NumberValueField({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
-  return (
+  return withAddons(
     <Input
       data-slot="filter-chip-value"
       type="number"
@@ -645,6 +699,8 @@ function NumberValueField({
       size={inputSize(size)}
       className={cn(
         "w-24 flex-none rounded-none border-0 bg-transparent shadow-none focus-visible:-outline-offset-2 dark:bg-transparent",
+        prefix && "pl-1",
+        suffix && "pr-1",
         size === "lg" && "h-11 sm:h-10",
       )}
       onChange={(event) => {
@@ -657,7 +713,9 @@ function NumberValueField({
         const parsed = Number(raw);
         onValueChange(Number.isFinite(parsed) ? parsed : null);
       }}
-    />
+    />,
+    prefix,
+    suffix,
   );
 }
 
@@ -698,6 +756,8 @@ function NumberValueControl({
       size={size}
       step={field.step}
       placeholder={field.placeholder ?? "Value"}
+      prefix={field.prefix}
+      suffix={field.suffix}
       autoFocus={autoOpen}
       onValueChange={onValueChange}
     />
@@ -722,13 +782,48 @@ function FilterChipRemove() {
 }
 
 function FilterAddButton({ children }: { children?: React.ReactNode }) {
-  const { fields, usedFieldIds, allowDuplicateFields, addFilter, labels, size } =
-    useFilters();
+  const {
+    fields,
+    usedFieldIds,
+    allowDuplicateFields,
+    addFilter,
+    labels,
+    size,
+    enableShortcut,
+    shortcutKey,
+    shortcutLabel,
+  } = useFilters();
+  const [open, setOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!enableShortcut) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target;
+      const isTyping =
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        (target instanceof HTMLElement && target.isContentEditable);
+      if (
+        !isTyping &&
+        !event.metaKey &&
+        !event.ctrlKey &&
+        !event.altKey &&
+        event.key.toLowerCase() === shortcutKey.toLowerCase()
+      ) {
+        event.preventDefault();
+        setOpen(true);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [enableShortcut, shortcutKey]);
 
   return (
     <Combobox<FilterField, false>
       items={fields}
       value={null}
+      open={open}
+      onOpenChange={setOpen}
       onValueChange={(field) => {
         if (field) addFilter(createFilter(field));
       }}
@@ -743,6 +838,13 @@ function FilterAddButton({ children }: { children?: React.ReactNode }) {
             size={size}
             className="text-muted-foreground gap-1.5 border-dashed"
             leftSection={<HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />}
+            rightSection={
+              enableShortcut && shortcutLabel ? (
+                <Kbd size="sm" variant="ghost" className="ms-1">
+                  {shortcutLabel}
+                </Kbd>
+              ) : undefined
+            }
           >
             {children ?? labels.add}
           </Button>

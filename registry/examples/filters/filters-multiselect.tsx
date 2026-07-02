@@ -23,6 +23,7 @@ const fields: FilterField[] = [
     label: "Labels",
     icon: <HugeiconsIcon icon={Tag01Icon} strokeWidth={2} />,
     type: "multiselect",
+    maxSelections: 4,
     options: [
       { value: "bug", label: "Bug", icon: <Dot className="bg-[oklch(0.62_0.2_25)]" /> },
       {

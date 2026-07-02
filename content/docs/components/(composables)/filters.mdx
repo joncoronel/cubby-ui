@@ -13,6 +13,8 @@ import FiltersOperators from "@/registry/examples/filters/filters-operators";
 import FiltersMultiselect from "@/registry/examples/filters/filters-multiselect";
 import FiltersManual from "@/registry/examples/filters/filters-manual";
 import FiltersSizes from "@/registry/examples/filters/filters-sizes";
+import FiltersShortcut from "@/registry/examples/filters/filters-shortcut";
+import FiltersNuqs from "@/registry/examples/filters/filters-nuqs";
 
 The filter bar shows active filters as segmented pills, each pairing a field, an operator, and a value, plus an "Add filter" button that opens a searchable field picker. Use it for list and table views where users refine results by several conditions at once, the pattern you see in Linear, Notion, and Stripe.
 
@@ -73,7 +75,9 @@ return <Filters fields={fields} value={value} onValueChange={setValue} />;
 - Valueless operators like `is empty` drop the value segment automatically.
 - Adding a filter opens its value picker (or focuses its input) right away, so you pick in one gesture.
 - Colored dots or icons on options keep a dense bar scannable; fields accept an optional `icon` too.
-- Controlled and uncontrolled: pass `value` + `onValueChange`, or `defaultValue`.
+- `prefix` / `suffix` on text and number fields for currency, units, or symbols; `maxSelections` caps a multiselect.
+- Optional keyboard shortcut (`enableShortcut`) opens the add-filter menu, with a `Kbd` hint on the button.
+- Controlled and uncontrolled: pass `value` + `onValueChange`, or `defaultValue`. Because it is controlled, syncing to the URL (nuqs) is trivial.
 - The `custom` field type renders any control through `renderValue`, for dates, sliders, or bespoke inputs.
 - Searchable, keyboard-navigable field and value pickers, inherited from `Combobox`.
 
@@ -99,6 +103,8 @@ Use `type` to pick the value control. `select` and `multiselect` open a searchab
 | `"number"`      | Inline number input, paired for `between`. | `number \| null \| NumberRange` |
 | `"custom"`      | Your control via `renderValue`.        | `unknown`                       |
 
+Text and number fields take a `prefix` / `suffix` (the `$` and `hrs` here) to flank the input.
+
 <ComponentPreview component="filters" example="filters-field-types">
   <FiltersFieldTypes />
 </ComponentPreview>
@@ -113,7 +119,7 @@ Use `operators` to replace the default set for a field, or `disabledOperators` t
 
 ### Multiselect
 
-A `multiselect` field collapses its selection to the first label plus a count.
+A `multiselect` field collapses its selection to the first label plus a count. Set `maxSelections` to cap how many options can be picked; the rest disable once the cap is hit.
 
 <ComponentPreview component="filters" example="filters-multiselect">
   <FiltersMultiselect />
@@ -133,6 +139,22 @@ Use `size` to set the height of every pill in the bar.
 
 <ComponentPreview component="filters" example="filters-sizes">
   <FiltersSizes />
+</ComponentPreview>
+
+### Keyboard shortcut
+
+Set `enableShortcut` to open the add-filter menu from the keyboard; `shortcutKey` sets the key (default `"f"`) and a `Kbd` hint appears on the button.
+
+<ComponentPreview component="filters" example="filters-shortcut">
+  <FiltersShortcut />
+</ComponentPreview>
+
+### URL state with nuqs
+
+Because `Filters` is controlled, syncing to the query string is just wiring `value` / `onValueChange` to a state hook. This uses [`nuqs`](https://nuqs.dev) to persist the filters in `?filters=`. Mount `NuqsAdapter` once at your app root.
+
+<ComponentPreview component="filters" example="filters-nuqs">
+  <FiltersNuqs />
 </ComponentPreview>
 
 ## Accessibility
@@ -187,6 +209,18 @@ The bar. Owns filter state and renders a pill per active filter plus the add-fil
   Allows the same field to be added more than once. When `false`, used fields are disabled in the picker.
 </ApiProp>
 
+<ApiProp name="enableShortcut" fullType="boolean" defaultValue="false">
+  Opens the add-filter menu when `shortcutKey` is pressed (ignored while typing in an input). Shows a `Kbd` hint on the button.
+</ApiProp>
+
+<ApiProp name="shortcutKey" fullType="string" defaultValue='"f"'>
+  Key that opens the add-filter menu when `enableShortcut` is set.
+</ApiProp>
+
+<ApiProp name="shortcutLabel" fullType="string" defaultValue="shortcutKey (uppercased)">
+  Text shown in the `Kbd` hint on the add-filter button.
+</ApiProp>
+
 <ApiProp name="addLabel" fullType="ReactNode" defaultValue='"Add filter"'>
   Label for the add-filter button.
 </ApiProp>
@@ -217,7 +251,7 @@ A single pill. Renders the field, operator, value, and remove segments for one f
 
 #### FilterField
 
-A discriminated union keyed on `type`. Every variant has `id`, `label`, and optional `icon`, `operators`, and `disabledOperators`. `select` and `multiselect` add `options`; `custom` adds `renderValue` and optional `defaultValue`.
+A discriminated union keyed on `type`. Every variant has `id`, `label`, and optional `icon`, `operators`, and `disabledOperators`. `select` and `multiselect` add `options` (`multiselect` also takes `maxSelections`); `text` and `number` take `prefix` / `suffix`; `custom` adds `renderValue` and optional `defaultValue`.
 
 #### FilterValue
 

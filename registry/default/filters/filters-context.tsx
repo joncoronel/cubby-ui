@@ -17,6 +17,9 @@ interface FiltersContextValue {
   fieldsById: Map<string, FilterField>;
   usedFieldIds: Set<string>;
   allowDuplicateFields: boolean;
+  enableShortcut: boolean;
+  shortcutKey: string;
+  shortcutLabel: string | undefined;
   /** Id of the most recently added filter, used to auto-open its value control. */
   lastAddedId: string | null;
   addFilter: (filter: FilterValue) => void;

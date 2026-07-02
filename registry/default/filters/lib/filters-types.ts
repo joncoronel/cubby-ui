@@ -47,17 +47,27 @@ export interface MultiSelectFilterField extends FilterFieldBase {
   type: "multiselect";
   options: FilterOption[];
   placeholder?: string;
+  /** Maximum number of options that can be selected. */
+  maxSelections?: number;
 }
 
 export interface TextFilterField extends FilterFieldBase {
   type: "text";
   placeholder?: string;
+  /** Content shown before the input, e.g. `@` or an icon. */
+  prefix?: React.ReactNode;
+  /** Content shown after the input, e.g. a unit label. */
+  suffix?: React.ReactNode;
 }
 
 export interface NumberFilterField extends FilterFieldBase {
   type: "number";
   placeholder?: string;
   step?: number;
+  /** Content shown before the input, e.g. `$`. */
+  prefix?: React.ReactNode;
+  /** Content shown after the input, e.g. `%` or `hrs`. */
+  suffix?: React.ReactNode;
 }
 
 export interface CustomFilterField extends FilterFieldBase {
@@ -130,6 +140,12 @@ export interface FiltersProps
   showActiveCount?: boolean;
   /** Allow the same field to be added more than once. Defaults to `false`. */
   allowDuplicateFields?: boolean;
+  /** Open the add-filter menu from the keyboard. Defaults to `false`. */
+  enableShortcut?: boolean;
+  /** Key that opens the add-filter menu when `enableShortcut`. Defaults to `"f"`. */
+  shortcutKey?: string;
+  /** Hint shown on the add-filter button. Defaults to the uppercased `shortcutKey`. */
+  shortcutLabel?: string;
   labels?: Partial<FiltersLabels>;
 }
 

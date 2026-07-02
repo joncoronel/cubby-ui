@@ -29,8 +29,14 @@ export function useControllableState<T>({
   const current = isControlled ? (value as T) : uncontrolled;
 
   const onChangeRef = React.useRef(onValueChange);
+  // The controlled value lives in a ref (read only at event time) so that
+  // `setValue` keeps a stable identity across renders. Controlled resolution
+  // against the last-committed value is inherent to controlled mode; the ref
+  // does not change those semantics, only the setter's identity.
+  const valueRef = React.useRef(value);
   React.useEffect(() => {
     onChangeRef.current = onValueChange;
+    valueRef.current = value;
   });
 
   // In uncontrolled mode, notify after commit whenever the state actually
@@ -47,18 +53,17 @@ export function useControllableState<T>({
   const setValue = React.useCallback(
     (next: T | ((prev: T) => T)) => {
       if (isControlled) {
+        const prev = valueRef.current as T;
         const resolved =
-          typeof next === "function"
-            ? (next as (prev: T) => T)(value as T)
-            : next;
-        if (!Object.is(resolved, value)) {
+          typeof next === "function" ? (next as (prev: T) => T)(prev) : next;
+        if (!Object.is(resolved, prev)) {
           onChangeRef.current?.(resolved);
         }
       } else {
         setUncontrolled(next);
       }
     },
-    [isControlled, value],
+    [isControlled],
   );
 
   return [current, setValue];

@@ -11,11 +11,7 @@ import {
 } from "@/registry/default/button-group/button-group";
 import {
   Combobox,
-  ComboboxEmpty,
-  ComboboxInput,
   ComboboxItem,
-  ComboboxList,
-  ComboboxPopup,
   ComboboxTrigger,
 } from "@/registry/default/combobox/combobox";
 import {
@@ -34,12 +30,14 @@ import { Cancel01Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
 import {
   FilterChipContext,
   FiltersActionsContext,
+  FiltersAutoOpenContext,
   FiltersStateContext,
   useFilterChip,
   useFiltersActions,
+  useFiltersAutoOpen,
   useFiltersState,
 } from "./filters-context";
-import { FilterChipValue } from "./filters-value-controls";
+import { FilterChipValue, FilterSearchPopup } from "./filters-value-controls";
 import {
   createFilter,
   describeFilter,
@@ -72,6 +70,16 @@ const DEFAULT_LABELS: FiltersLabels = {
   max: "Max",
   removeFilter: (fieldLabel) => `Remove ${fieldLabel} filter`,
 };
+
+/** Small muted wrapper that normalizes field icons to 14px. */
+function FieldIcon({ children }: { children?: React.ReactNode }) {
+  if (!children) return null;
+  return (
+    <span className="text-muted-foreground flex shrink-0 items-center [&_svg]:size-3.5!">
+      {children}
+    </span>
+  );
+}
 
 /**
  * Moves focus to the adjacent chip's remove button (or the add-filter trigger)
@@ -162,9 +170,15 @@ function FiltersProvider({
     [setFilters, fieldsById],
   );
 
-  // Split contexts: `state` changes per keystroke, `actions` stays stable, so
-  // leaves subscribed via useFiltersActions don't re-render while typing.
+  // Split contexts: `state` changes per keystroke, `actions` stays stable
+  // (so leaves subscribed via useFiltersActions don't re-render while
+  // typing), and the transient auto-open signal is isolated so its set/consume
+  // cycle per add doesn't churn the actions context either.
   const stateContext = React.useMemo(() => ({ filters }), [filters]);
+  const autoOpenContext = React.useMemo(
+    () => ({ lastAddedId, clearAutoOpen }),
+    [lastAddedId, clearAutoOpen],
+  );
   const actionsContext = React.useMemo(
     () => ({
       fields,
@@ -173,8 +187,6 @@ function FiltersProvider({
       fieldsById,
       usedFieldIds,
       allowDuplicateFields,
-      lastAddedId,
-      clearAutoOpen,
       addFilter,
       updateFilter,
       removeFilter,
@@ -187,8 +199,6 @@ function FiltersProvider({
       fieldsById,
       usedFieldIds,
       allowDuplicateFields,
-      lastAddedId,
-      clearAutoOpen,
       addFilter,
       updateFilter,
       removeFilter,
@@ -199,7 +209,9 @@ function FiltersProvider({
   return (
     <FiltersStateContext.Provider value={stateContext}>
       <FiltersActionsContext.Provider value={actionsContext}>
-        {children}
+        <FiltersAutoOpenContext.Provider value={autoOpenContext}>
+          {children}
+        </FiltersAutoOpenContext.Provider>
       </FiltersActionsContext.Provider>
     </FiltersStateContext.Provider>
   );
@@ -276,8 +288,8 @@ const FilterChip = React.memo(function FilterChip({
   children,
   ...props
 }: FilterChipProps) {
-  const { size, lastAddedId, clearAutoOpen, removeFilter, fieldsById } =
-    useFiltersActions();
+  const { size, removeFilter, fieldsById } = useFiltersActions();
+  const { lastAddedId, clearAutoOpen } = useFiltersAutoOpen();
   const field = fieldProp ?? fieldsById.get(filter.field);
   const autoOpen = filter.id === lastAddedId;
 
@@ -354,11 +366,7 @@ function FilterChipField({
     >
       {children ?? (
         <>
-          {field.icon ? (
-            <span className="text-muted-foreground flex shrink-0 items-center [&_svg]:size-3.5!">
-              {field.icon}
-            </span>
-          ) : null}
+          <FieldIcon>{field.icon}</FieldIcon>
           {field.label}
         </>
       )}
@@ -519,35 +527,24 @@ function FilterAddButton({
           </Button>
         )}
       />
-      <ComboboxPopup className="flex min-w-56 flex-col p-0">
-        <div className="border-border border-b p-2">
-          <ComboboxInput
-            variant="elevated"
-            placeholder={labels.searchFields}
-            showTrigger={false}
-            showClear={false}
-          />
-        </div>
-        <ComboboxEmpty>{labels.noFields}</ComboboxEmpty>
-        <ComboboxList>
-          {(field: FilterField) => (
-            <ComboboxItem
-              key={field.id}
-              value={field}
-              disabled={!allowDuplicateFields && usedFieldIds.has(field.id)}
-            >
-              <span className="flex items-center gap-2">
-                {field.icon ? (
-                  <span className="text-muted-foreground flex shrink-0 items-center [&_svg]:size-3.5!">
-                    {field.icon}
-                  </span>
-                ) : null}
-                <span className="truncate">{field.label}</span>
-              </span>
-            </ComboboxItem>
-          )}
-        </ComboboxList>
-      </ComboboxPopup>
+      <FilterSearchPopup
+        className="min-w-56"
+        placeholder={labels.searchFields}
+        empty={labels.noFields}
+      >
+        {(field: FilterField) => (
+          <ComboboxItem
+            key={field.id}
+            value={field}
+            disabled={!allowDuplicateFields && usedFieldIds.has(field.id)}
+          >
+            <span className="flex items-center gap-2">
+              <FieldIcon>{field.icon}</FieldIcon>
+              <span className="truncate">{field.label}</span>
+            </span>
+          </ComboboxItem>
+        )}
+      </FilterSearchPopup>
     </Combobox>
   );
 }

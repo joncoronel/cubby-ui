@@ -14,6 +14,9 @@ const numberFieldGroupVariants = cva(
     "outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid",
     "has-[[data-slot=number-field-input]:focus-visible]:outline-ring/50 has-[[data-slot=number-field-input]:focus-visible]:outline-2 has-[[data-slot=number-field-input]:focus-visible]:outline-offset-2",
     "has-[[data-slot=number-field-input][aria-invalid=true]]:outline-destructive/50 has-[[data-slot=number-field-input][aria-invalid=true]]:outline-2 has-[[data-slot=number-field-input][aria-invalid=true]]:outline-offset-2",
+    // With a stacked stepper (no decrement capping the left edge), the input
+    // rounds and borders its own left side automatically.
+    "has-[[data-slot=number-field-stepper]]:[&>[data-slot=number-field-input]]:rounded-l-lg has-[[data-slot=number-field-stepper]]:[&>[data-slot=number-field-input]]:border-l",
   ],
   {
     variants: {
@@ -123,8 +126,7 @@ function NumberFieldDecrement({
 
 // Vertically-stacked increment (top) / decrement (bottom) cluster for the
 // right edge of the group — the styled equivalent of a native number spinner.
-// Pair with `<NumberFieldInput className="rounded-l-lg border-l" />` so the
-// input caps the left side of the cluster.
+// The group detects it and rounds/borders the input's left edge automatically.
 function NumberFieldStepper({
   className,
   ...props

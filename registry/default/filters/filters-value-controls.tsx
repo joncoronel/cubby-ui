@@ -97,7 +97,7 @@ function FilterChipValue() {
 
 /** Accessible name for a value input, folding in string affixes ("$", "hrs"). */
 function valueAriaLabel(
-  field: FilterField & { prefix?: React.ReactNode; suffix?: React.ReactNode },
+  field: TextFilterField | NumberFilterField,
   part: string,
 ): string {
   const affixes = [field.prefix, field.suffix].filter(
@@ -156,6 +156,37 @@ function OptionsTrigger({ size, icon, text, isPlaceholder }: OptionsTriggerProps
   );
 }
 
+/**
+ * The searchable popup shell shared by the value pickers and the add-filter
+ * menu: bordered search header, empty state, and the option list.
+ */
+function FilterSearchPopup({
+  placeholder,
+  empty,
+  className,
+  children,
+}: {
+  placeholder: string;
+  empty: React.ReactNode;
+  className?: string;
+  children: React.ComponentProps<typeof ComboboxList>["children"];
+}) {
+  return (
+    <ComboboxPopup className={cn("flex min-w-52 flex-col p-0", className)}>
+      <div className="border-border border-b p-2">
+        <ComboboxInput
+          variant="elevated"
+          placeholder={placeholder}
+          showTrigger={false}
+          showClear={false}
+        />
+      </div>
+      <ComboboxEmpty>{empty}</ComboboxEmpty>
+      <ComboboxList>{children}</ComboboxList>
+    </ComboboxPopup>
+  );
+}
+
 function OptionsPopup({
   children,
 }: {
@@ -163,18 +194,12 @@ function OptionsPopup({
 }) {
   const { labels } = useFiltersActions();
   return (
-    <ComboboxPopup className="flex min-w-52 flex-col p-0">
-      <div className="border-border border-b p-2">
-        <ComboboxInput
-          variant="elevated"
-          placeholder={labels.searchValues}
-          showTrigger={false}
-          showClear={false}
-        />
-      </div>
-      <ComboboxEmpty>{labels.noResults}</ComboboxEmpty>
-      <ComboboxList>{children}</ComboboxList>
-    </ComboboxPopup>
+    <FilterSearchPopup
+      placeholder={labels.searchValues}
+      empty={labels.noResults}
+    >
+      {children}
+    </FilterSearchPopup>
   );
 }
 
@@ -439,4 +464,4 @@ function NumberValueControl({
   );
 }
 
-export { FilterChipValue };
+export { FilterChipValue, FilterSearchPopup };

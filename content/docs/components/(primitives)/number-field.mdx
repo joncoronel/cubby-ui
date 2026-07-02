@@ -66,7 +66,7 @@ Pass `format` (an `Intl.NumberFormat` options object) to display the value as cu
 
 ### Stacked steppers
 
-Use `NumberFieldStepper` for a vertically-stacked increment/decrement cluster on the right, the styled equivalent of a native number spinner. Cap the input's left edge with `className="rounded-l-lg border-l"`.
+Use `NumberFieldStepper` for a vertically-stacked increment/decrement cluster on the right, the styled equivalent of a native number spinner. The group detects the stepper and caps the input's left edge automatically.
 
 <ComponentPreview component="number-field" example="number-field-stacked" />
 
@@ -142,7 +142,7 @@ Button that decreases the value when clicked. Renders a `<button>` element.
 
 #### NumberFieldStepper
 
-A vertically-stacked increment (top) and decrement (bottom) cluster for the group's right edge, with built-in chevron icons. Renders a `<div>` wrapping Base UI's `Increment` and `Decrement`. Pair with `<NumberFieldInput className="rounded-l-lg border-l" />` to cap the left edge.
+A vertically-stacked increment (top) and decrement (bottom) cluster for the group's right edge, with built-in chevron icons. Renders a `<div>` wrapping Base UI's `Increment` and `Decrement`. `NumberFieldGroup` detects it and rounds/borders the input's left edge automatically.
 
 #### NumberFieldScrubArea
 

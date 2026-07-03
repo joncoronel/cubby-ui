@@ -75,7 +75,7 @@ return <Filters fields={fields} value={value} onValueChange={setValue} />;
 ## Features
 
 - Per-type operators with sensible defaults (`is`, `contains`, `between`, `is empty`), overridable or hideable per field.
-- Valueless operators like `is empty` drop the value segment automatically.
+- Operators declare a value `shape` (`"none"` / `"scalar"` / `"range"`), so custom operators get the right control automatically; `is empty` drops the value segment, and any `"range"` operator gets paired min/max inputs.
 - Adding a filter opens its value picker (or focuses its input) right away, so you pick in one gesture.
 - Colored dots or icons on options keep a dense bar scannable; fields accept an optional `icon` too.
 - `prefix` / `suffix` on text and number fields for currency, units, or symbols; `maxSelections` caps a multiselect.
@@ -99,13 +99,13 @@ Pass `value` and `onValueChange` to own the state; the serialized filters update
 
 Use `type` to pick the value control. `select` and `multiselect` open a searchable list, `text` and `number` render inline inputs, and `custom` renders your own control through `renderValue`.
 
-| Type            | Value control                          | Value shape                     |
-| --------------- | -------------------------------------- | ------------------------------- |
-| `"select"`      | Searchable single-select list.         | `string \| null`                |
-| `"multiselect"` | Searchable multi-select list.          | `string[]`                      |
-| `"text"`        | Inline text input.                     | `string`                        |
+| Type            | Value control                              | Value shape                     |
+| --------------- | ------------------------------------------ | ------------------------------- |
+| `"select"`      | Searchable single-select list.             | `string \| null`                |
+| `"multiselect"` | Searchable multi-select list.              | `string[]`                      |
+| `"text"`        | Inline text input.                         | `string`                        |
 | `"number"`      | Inline number input, paired for `between`. | `number \| null \| NumberRange` |
-| `"custom"`      | Your control via `renderValue`.        | `unknown`                       |
+| `"custom"`      | Your control via `renderValue`.            | `unknown`                       |
 
 <ComponentPreview component="filters" example="filters-field-types">
   <FiltersFieldTypes />
@@ -121,7 +121,7 @@ Add a `prefix` or `suffix` to text and number fields for currency, units, or sym
 
 ### Operators
 
-Use `operators` to replace the default set for a field, or `disabledOperators` to remove specific ones. Operators marked `valueless` hide the value segment.
+Use `operators` to replace the default set for a field, or `disabledOperators` to remove specific ones. Each operator declares a `shape`: `"none"` hides the value segment (`valueless: true` is sugar for it), `"range"` renders paired min/max inputs on number fields, and `"scalar"` (the default) renders the field's normal control.
 
 <ComponentPreview component="filters" example="filters-operators">
   <FiltersOperators />
@@ -174,7 +174,7 @@ Because `Filters` is controlled, syncing to the query string is just wiring `val
 ```tsx
 <FiltersProvider fields={fields} value={value} onValueChange={setValue}>
   <PageHeader>
-    <FilterSummary />   {/* reads useFilters() */}
+    <FilterSummary /> {/* reads useFilters() */}
   </PageHeader>
   <FiltersBar />
   <ResultsCount />
@@ -183,7 +183,9 @@ Because `Filters` is controlled, syncing to the query string is just wiring `val
 
 ## Accessibility
 
-The field picker and value lists are `Combobox` instances, so type-to-search, arrow-key navigation, and selection follow the ARIA combobox pattern. The operator menu is a `DropdownMenu` radio group. Each pill is a group labeled with its full filter (for example, "Status is In progress"); value inputs carry field-specific `aria-label`s that include string affixes. Pressing `Backspace` or `Delete` on one of a pill's button segments removes the filter, and focus moves to the neighboring pill (or the add button) instead of dropping to the page. The remove control is labeled "Remove [field] filter".
+The field picker and value lists are `Combobox` instances, so type-to-search, arrow-key navigation, and selection follow the ARIA combobox pattern. The operator menu is a `DropdownMenu` radio group. Each pill is a group labeled with its full filter (for example, "Status is In progress"), and every segment is self-describing: the operator trigger is named "[field] operator: [operator]", value triggers and inputs are named "[field] value: ..." (including string affixes), and the remove control is "Remove [field] filter". Pressing `Backspace` or `Delete` on one of a pill's button segments removes the filter, and focus moves to the neighboring pill (or the add button) instead of dropping to the page.
+
+The Backspace removal and focus rescue rely on the `data-slot` attributes (`filter-chip`, `filter-chip-remove`, `filter-add`); custom chip children should preserve those slots to keep the keyboard behavior.
 
 ## API Reference
 
@@ -198,7 +200,8 @@ Filters is a custom component composed from Cubby UI primitives. It has no Base 
 <ApiPropsList>
 
 <ApiProp name="fields" fullType="FilterField[]">
-  Field definitions the bar can filter on. Each field's `type` determines its value control and default operators.
+  Field definitions the bar can filter on. Each field's `type` determines its
+  value control and default operators.
 </ApiProp>
 
 <ApiProp name="value" fullType="FilterValue[]">
@@ -206,7 +209,8 @@ Filters is a custom component composed from Cubby UI primitives. It has no Base 
 </ApiProp>
 
 <ApiProp name="defaultValue" fullType="FilterValue[]" defaultValue="[]">
-  Initial filters in uncontrolled mode. Seed entries with `createFilter` so each has a stable id.
+  Initial filters in uncontrolled mode. Seed entries with `createFilter` so each
+  has a stable id.
 </ApiProp>
 
 <ApiProp name="onValueChange" fullType="(value: FilterValue[]) => void">
@@ -222,15 +226,23 @@ Filters is a custom component composed from Cubby UI primitives. It has no Base 
 </ApiProp>
 
 <ApiProp name="allowDuplicateFields" fullType="boolean" defaultValue="false">
-  Allows the same field to be added more than once. When `false`, used fields are disabled in the picker.
+  Allows the same field to be added more than once. When `false`, used fields
+  are disabled in the picker.
 </ApiProp>
 
 <ApiProp name="shortcut" fullType="string">
-  Key that opens the add-filter menu, forwarded to the default `FilterAddButton`. Ignored while typing or while a popup is open; shows a `Kbd` hint on the button.
+  Key that opens the add-filter menu, forwarded to the default
+  `FilterAddButton`. Ignored while typing or while a popup is open; shows a
+  `Kbd` hint on the button.
 </ApiProp>
 
 <ApiProp name="labels" fullType="Partial<FiltersLabels>">
-  Overrides for the bar's copy: `add`, `clear`, `searchFields`, `searchValues`, `noFields`, `noResults`, `selectValue`, `enterValue`, `value`, `min`, `max`, and `removeFilter` (a function building the remove button's accessible label). Inline objects with string labels are fine (the memo compares values, not identity); hoist the object only if you override `removeFilter`, since an inline arrow is a new function every render.
+  Overrides for the bar's copy: `add`, `clear`, `searchFields`, `searchValues`,
+  `noFields`, `noResults`, `selectValue`, `enterValue`, `value`, `min`, `max`,
+  `operator`, and `removeFilter` (a function building the remove button's
+  accessible label). Inline objects with string labels are fine (the memo
+  compares values, not identity); hoist the object only if you override
+  `removeFilter`, since an inline arrow is a new function every render.
 </ApiProp>
 
 </ApiPropsList>
@@ -241,7 +253,11 @@ Owns filter state and provides it via context without rendering layout. Takes th
 
 #### FiltersBar
 
-The flex row. Renders the default layout (`FilterChips`, `FilterAddButton`, clear-when-active) unless `children` is passed. Takes `shortcut` and div props.
+The flex row. Renders the default layout (`FilterChips`, `FilterAddButton`, `FilterClearButton`) unless `children` is passed. Takes `shortcut` and div props.
+
+#### FilterClearButton
+
+Clears every filter. Renders nothing while no filters are active, so compositions don't need to wrap it in a conditional.
 
 #### FilterChips
 
@@ -258,7 +274,8 @@ A single pill. Without `children` it renders the field, operator, value, and rem
 </ApiProp>
 
 <ApiProp name="field" fullType="FilterField">
-  The field definition. Resolved from the `Filters` context by `filter.field` when omitted.
+  The field definition. Resolved from the `Filters` context by `filter.field`
+  when omitted.
 </ApiProp>
 
 </ApiPropsList>
@@ -270,7 +287,8 @@ The searchable field picker. Renders the dashed trigger and the popup.
 <ApiPropsList>
 
 <ApiProp name="shortcut" fullType="string">
-  Key that opens this menu from the keyboard (e.g. `"f"`). Adds a `Kbd` hint to the trigger.
+  Key that opens this menu from the keyboard (e.g. `"f"`). Adds a `Kbd` hint to
+  the trigger.
 </ApiProp>
 
 </ApiPropsList>
@@ -311,6 +329,10 @@ createFilter(statusField, { value: "in_progress" });
 #### patchFilter
 
 Applies a partial update to a filter, reseeding the value when an operator change alters the value shape (e.g. `eq` to `between`).
+
+#### asFilterValues
+
+Coerces unknown JSON (e.g. a parsed URL param) into a `FilterValue[]`, dropping entries with a malformed envelope. Pair it with the controlled API when restoring filters from untrusted sources; see the nuqs example.
 
 #### formatFilterValue / describeFilter
 

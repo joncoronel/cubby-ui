@@ -25,7 +25,11 @@ const fields: FilterField[] = [
     type: "multiselect",
     maxSelections: 4,
     options: [
-      { value: "bug", label: "Bug", icon: <Dot className="bg-[oklch(0.62_0.2_25)]" /> },
+      {
+        value: "bug",
+        label: "Bug",
+        icon: <Dot className="bg-[oklch(0.62_0.2_25)]" />,
+      },
       {
         value: "feature",
         label: "Feature",

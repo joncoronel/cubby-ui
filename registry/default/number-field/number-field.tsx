@@ -152,7 +152,11 @@ function NumberFieldStepper({
         className={cn(stepClassName, "border-b")}
         aria-label="Increase"
       >
-        <HugeiconsIcon icon={ArrowUp01Icon} className="size-3.5" strokeWidth={2} />
+        <HugeiconsIcon
+          icon={ArrowUp01Icon}
+          className="size-3.5"
+          strokeWidth={2}
+        />
       </BaseNumberField.Increment>
       <BaseNumberField.Decrement
         data-slot="number-field-decrement"

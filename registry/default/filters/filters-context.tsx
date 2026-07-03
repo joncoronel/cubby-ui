@@ -64,9 +64,7 @@ const FiltersAutoOpenContext =
 function useFiltersState(): FiltersStateContextValue {
   const context = React.useContext(FiltersStateContext);
   if (!context) {
-    throw new Error(
-      "useFiltersState must be used within a FiltersProvider.",
-    );
+    throw new Error("useFiltersState must be used within a FiltersProvider.");
   }
   return context;
 }
@@ -75,9 +73,7 @@ function useFiltersState(): FiltersStateContextValue {
 function useFiltersActions(): FiltersActionsContextValue {
   const context = React.useContext(FiltersActionsContext);
   if (!context) {
-    throw new Error(
-      "useFiltersActions must be used within a FiltersProvider.",
-    );
+    throw new Error("useFiltersActions must be used within a FiltersProvider.");
   }
   return context;
 }

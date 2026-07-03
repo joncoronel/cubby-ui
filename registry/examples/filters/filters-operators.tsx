@@ -28,13 +28,21 @@ const fields: FilterField[] = [
     icon: <HugeiconsIcon icon={DashboardCircleIcon} strokeWidth={2} />,
     type: "select",
     options: [
-      { value: "todo", label: "Todo", icon: <Dot className="bg-[oklch(0.7_0_0)]" /> },
+      {
+        value: "todo",
+        label: "Todo",
+        icon: <Dot className="bg-[oklch(0.7_0_0)]" />,
+      },
       {
         value: "in_progress",
         label: "In progress",
         icon: <Dot className="bg-[oklch(0.75_0.15_75)]" />,
       },
-      { value: "done", label: "Done", icon: <Dot className="bg-[oklch(0.7_0.16_150)]" /> },
+      {
+        value: "done",
+        label: "Done",
+        icon: <Dot className="bg-[oklch(0.7_0.16_150)]" />,
+      },
     ],
   },
   {
@@ -51,7 +59,7 @@ const fields: FilterField[] = [
     ],
   },
   {
-    // Fully custom operator set.
+    // Fully custom operator set. `valueless` hides the value segment.
     id: "title",
     label: "Title",
     icon: <HugeiconsIcon icon={TextFontIcon} strokeWidth={2} />,
@@ -60,6 +68,18 @@ const fields: FilterField[] = [
       { id: "contains", label: "contains" },
       { id: "is", label: "is exactly" },
       { id: "is_empty", label: "is empty", valueless: true },
+    ],
+  },
+  {
+    // A custom operator with `shape: "range"` gets the paired min/max inputs.
+    id: "estimate",
+    label: "Estimate",
+    type: "number",
+    suffix: "hrs",
+    operators: [
+      { id: "eq", label: "=" },
+      { id: "gt", label: ">" },
+      { id: "within", label: "within", shape: "range" },
     ],
   },
 ];
@@ -71,7 +91,7 @@ export default function FiltersOperators() {
       operator: "is_not",
       value: "done",
     }),
-    createFilter(fields[2], { id: "seed-title", operator: "is_empty" }),
+    createFilter(fields[3], { id: "seed-estimate", operator: "within" }),
   ]);
 
   return <Filters fields={fields} value={value} onValueChange={setValue} />;

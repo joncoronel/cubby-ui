@@ -18,11 +18,20 @@ export interface FilterOption {
   icon?: React.ReactNode;
 }
 
+/**
+ * The value shape an operator expects: `"none"` hides the value segment
+ * (`is empty`), `"range"` renders paired min/max inputs on number fields
+ * (`between`), and `"scalar"` renders the field's normal single control.
+ */
+export type FilterOperatorShape = "none" | "scalar" | "range";
+
 /** An operator shown in the middle segment of a pill (`is`, `contains`, ...). */
 export interface FilterOperator {
   id: string;
   label: string;
-  /** When true the value segment is hidden, e.g. `is empty` / `is not empty`. */
+  /** Value shape this operator expects. Defaults to `"scalar"`. */
+  shape?: FilterOperatorShape;
+  /** Sugar for `shape: "none"`, e.g. `is empty` / `is not empty`. */
   valueless?: boolean;
 }
 
@@ -125,6 +134,8 @@ export interface FiltersLabels {
   value: string;
   min: string;
   max: string;
+  /** Word used in the operator trigger's accessible name. */
+  operator: string;
   /** Builds the accessible label for a pill's remove button. */
   removeFilter: (fieldLabel: string) => string;
 }
@@ -144,8 +155,10 @@ export interface FiltersProviderProps {
   children?: React.ReactNode;
 }
 
-export interface FiltersBarProps
-  extends Omit<React.ComponentProps<"div">, "onChange" | "defaultValue"> {
+export interface FiltersBarProps extends Omit<
+  React.ComponentProps<"div">,
+  "onChange" | "defaultValue"
+> {
   /** Key that opens the add-filter menu, forwarded to the default `FilterAddButton`. */
   shortcut?: string;
 }
@@ -153,8 +166,10 @@ export interface FiltersBarProps
 export interface FiltersProps
   extends Omit<FiltersProviderProps, "children">, FiltersBarProps {}
 
-export interface FilterChipProps
-  extends Omit<React.ComponentProps<"div">, "onChange"> {
+export interface FilterChipProps extends Omit<
+  React.ComponentProps<"div">,
+  "onChange"
+> {
   filter: FilterValue;
   /** Field definition. Resolved from the `Filters` context when omitted. */
   field?: FilterField;

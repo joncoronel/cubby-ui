@@ -42,7 +42,6 @@ import {
   createFilter,
   describeFilter,
   FILTER_SIZES,
-  isValuelessOperator,
   patchFilter,
   resolveOperators,
 } from "./lib/filters-utils";
@@ -68,6 +67,7 @@ const DEFAULT_LABELS: FiltersLabels = {
   value: "Value",
   min: "Min",
   max: "Max",
+  operator: "operator",
   removeFilter: (fieldLabel) => `Remove ${fieldLabel} filter`,
 };
 
@@ -132,6 +132,8 @@ function FiltersProvider({
     () => ({ ...DEFAULT_LABELS, ...labelsProp }),
     // Value-level deps (constant length — FiltersLabels is a closed shape) so
     // an inline `labels={{ ... }}` object doesn't churn the actions context.
+    // Caveat: `removeFilter` is a function, so an inline arrow for it is a
+    // new identity every render and still churns; hoist it in that case.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     LABEL_KEYS.map((key) => labelsProp?.[key]),
   );
@@ -222,9 +224,17 @@ function FiltersProvider({
   );
 }
 
-/** The flex row. Renders the default layout unless `children` is passed. */
-function FiltersBar({ shortcut, className, children, ...props }: FiltersBarProps) {
-  const { filters } = useFiltersState();
+/**
+ * The flex row. Renders the default layout unless `children` is passed. Only
+ * the default leaves subscribe to filter state, so a bar with custom children
+ * doesn't re-render while a value is being typed.
+ */
+function FiltersBar({
+  shortcut,
+  className,
+  children,
+  ...props
+}: FiltersBarProps) {
   return (
     <div
       data-slot="filters"
@@ -235,7 +245,7 @@ function FiltersBar({ shortcut, className, children, ...props }: FiltersBarProps
         <>
           <FilterChips />
           <FilterAddButton shortcut={shortcut} />
-          {filters.length > 0 && <FilterClearButton />}
+          <FilterClearButton />
         </>
       )}
     </div>
@@ -310,7 +320,6 @@ const FilterChip = React.memo(function FilterChip({
   );
 
   if (!field || !chipContext) return null;
-  const valueless = isValuelessOperator(field, filter.operator);
 
   return (
     <FilterChipContext.Provider value={chipContext}>
@@ -344,7 +353,7 @@ const FilterChip = React.memo(function FilterChip({
           <>
             <FilterChipField />
             <FilterChipOperator />
-            {!valueless && <FilterChipValue />}
+            <FilterChipValue />
             <FilterChipRemove />
           </>
         )}
@@ -384,7 +393,7 @@ function FilterChipOperator({
   ...props
 }: React.ComponentProps<typeof Button>) {
   const { filter, field, size } = useFilterChip();
-  const { updateFilter } = useFiltersActions();
+  const { updateFilter, labels } = useFiltersActions();
   const operators = resolveOperators(field);
   const current = operators.find((operator) => operator.id === filter.operator);
 
@@ -394,6 +403,7 @@ function FilterChipOperator({
         render={
           <Button
             data-slot="filter-chip-operator"
+            aria-label={`${field.label} ${labels.operator}: ${current?.label ?? filter.operator}`}
             variant="ghost"
             size={size}
             className={cn(
@@ -460,8 +470,14 @@ function FilterAddButton({
   /** Key that opens this menu from the keyboard (e.g. `"f"`). */
   shortcut?: string;
 }) {
-  const { fields, usedFieldIds, allowDuplicateFields, addFilter, labels, size } =
-    useFiltersActions();
+  const {
+    fields,
+    usedFieldIds,
+    allowDuplicateFields,
+    addFilter,
+    labels,
+    size,
+  } = useFiltersActions();
   const [open, setOpen] = React.useState(false);
 
   React.useEffect(() => {
@@ -517,7 +533,10 @@ function FilterAddButton({
             data-slot="filter-add"
             variant="outline"
             size={size}
-            className={cn("text-muted-foreground gap-1.5 border-dashed", className)}
+            className={cn(
+              "text-muted-foreground gap-1.5 border-dashed",
+              className,
+            )}
             leftSection={<HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />}
             rightSection={
               shortcut ? (
@@ -554,12 +573,15 @@ function FilterAddButton({
   );
 }
 
+/** Clears every filter. Renders nothing while no filters are active. */
 function FilterClearButton({
   className,
   children,
   ...props
 }: React.ComponentProps<typeof Button>) {
   const { clearAll, labels, size } = useFiltersActions();
+  const { filters } = useFiltersState();
+  if (filters.length === 0) return null;
   return (
     <Button
       data-slot="filter-clear"
@@ -617,16 +639,20 @@ export {
   patchFilter,
   resolveOperators,
   defaultOperatorsFor,
+  operatorShape,
+  operatorShapeFor,
   isValuelessOperator,
   emptyValueFor,
   formatFilterValue,
   describeFilter,
+  asFilterValues,
 } from "./lib/filters-utils";
 export type {
   FilterField,
   FilterFieldType,
   FilterOption,
   FilterOperator,
+  FilterOperatorShape,
   FilterValue,
   FilterSize,
   FiltersLabels,

@@ -2,6 +2,7 @@ import type {
   FilterField,
   FilterFieldType,
   FilterOperator,
+  FilterOperatorShape,
   FilterSize,
   FilterValue,
   NumberRange,
@@ -78,6 +79,25 @@ export function asNumberRange(value: unknown): NumberRange {
   return { min: null, max: null };
 }
 
+function isFilterValue(item: unknown): item is FilterValue {
+  if (typeof item !== "object" || item === null) return false;
+  const candidate = item as Partial<Record<keyof FilterValue, unknown>>;
+  return (
+    typeof candidate.id === "string" &&
+    typeof candidate.field === "string" &&
+    typeof candidate.operator === "string"
+  );
+}
+
+/**
+ * Coerces unknown JSON (e.g. a parsed URL param) into a `FilterValue` array,
+ * dropping entries whose envelope (`id` / `field` / `operator`) is malformed.
+ * `value` stays `unknown`; the per-field coercers above handle it downstream.
+ */
+export function asFilterValues(value: unknown): FilterValue[] {
+  return Array.isArray(value) ? value.filter(isFilterValue) : [];
+}
+
 /** Default English labels for the built-in operators. */
 const OPERATOR_LABELS: Record<string, string> = {
   is: "is",
@@ -98,21 +118,26 @@ const OPERATOR_LABELS: Record<string, string> = {
   between: "between",
 };
 
-function op(id: string, valueless = false): FilterOperator {
-  return { id, label: OPERATOR_LABELS[id] ?? id, valueless };
+function op(id: string, shape: FilterOperatorShape = "scalar"): FilterOperator {
+  return { id, label: OPERATOR_LABELS[id] ?? id, shape };
 }
 
 /** The default operator set for a field type, in display order. */
 export function defaultOperatorsFor(type: FilterFieldType): FilterOperator[] {
   switch (type) {
     case "select":
-      return [op("is"), op("is_not"), op("is_empty", true), op("is_not_empty", true)];
+      return [
+        op("is"),
+        op("is_not"),
+        op("is_empty", "none"),
+        op("is_not_empty", "none"),
+      ];
     case "multiselect":
       return [
         op("is_any_of"),
         op("is_not_any_of"),
         op("includes_all"),
-        op("is_empty", true),
+        op("is_empty", "none"),
       ];
     case "text":
       return [
@@ -121,10 +146,10 @@ export function defaultOperatorsFor(type: FilterFieldType): FilterOperator[] {
         op("starts_with"),
         op("ends_with"),
         op("is"),
-        op("is_empty", true),
+        op("is_empty", "none"),
       ];
     case "number":
-      return [op("eq"), op("neq"), op("gt"), op("lt"), op("between")];
+      return [op("eq"), op("neq"), op("gt"), op("lt"), op("between", "range")];
     case "custom":
     default:
       return [op("is")];
@@ -139,32 +164,42 @@ export function resolveOperators(field: FilterField): FilterOperator[] {
   return base.filter((operator) => !disabled.has(operator.id));
 }
 
+/** The value shape an operator declares (`valueless` is sugar for `"none"`). */
+export function operatorShape(operator: FilterOperator): FilterOperatorShape {
+  return operator.shape ?? (operator.valueless ? "none" : "scalar");
+}
+
+/** Resolves the value shape for a field's operator by id. */
+export function operatorShapeFor(
+  field: FilterField,
+  operatorId: string,
+): FilterOperatorShape {
+  const operator = resolveOperators(field).find((o) => o.id === operatorId);
+  return operator ? operatorShape(operator) : "scalar";
+}
+
 /** Whether the given operator hides the value segment. */
 export function isValuelessOperator(
   field: FilterField,
   operatorId: string,
 ): boolean {
-  return (
-    resolveOperators(field).find((operator) => operator.id === operatorId)
-      ?.valueless ?? false
-  );
+  return operatorShapeFor(field, operatorId) === "none";
 }
 
 /** A typed empty value for a fresh filter of `field` with `operatorId`. */
-export function emptyValueFor(
-  field: FilterField,
-  operatorId: string,
-): unknown {
-  if (isValuelessOperator(field, operatorId)) return null;
+export function emptyValueFor(field: FilterField, operatorId: string): unknown {
+  const shape = operatorShapeFor(field, operatorId);
+  if (shape === "none") return null;
+  if (shape === "range") {
+    return { min: null, max: null } satisfies NumberRange;
+  }
   switch (field.type) {
     case "multiselect":
       return [] as string[];
     case "text":
       return "";
     case "number":
-      return operatorId === "between"
-        ? ({ min: null, max: null } satisfies NumberRange)
-        : null;
+      return null;
     case "custom":
       return field.defaultValue ?? null;
     case "select":
@@ -178,17 +213,19 @@ export function emptyValueFor(
  * `between`, or entering a valueless operator) can trigger a value reset.
  */
 export function valueShape(field: FilterField, operatorId: string): string {
-  if (isValuelessOperator(field, operatorId)) return "none";
-  if (field.type === "number") {
-    return operatorId === "between" ? "range" : "scalar";
-  }
+  const shape = operatorShapeFor(field, operatorId);
+  if (shape === "none") return "none";
+  if (shape === "range") return "range";
   return field.type;
 }
 
 function generateId(): string {
   // Filter ids only need list-key uniqueness. `crypto.randomUUID` is absent
   // in non-secure contexts (plain-HTTP LAN dev), hence the cheap fallback.
-  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+  if (
+    typeof crypto !== "undefined" &&
+    typeof crypto.randomUUID === "function"
+  ) {
     return crypto.randomUUID();
   }
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
@@ -247,7 +284,15 @@ export function formatFilterValue(
   field: FilterField,
   filter: FilterValue,
 ): string {
-  if (isValuelessOperator(field, filter.operator)) return "";
+  const shape = operatorShapeFor(field, filter.operator);
+  if (shape === "none") return "";
+  if (shape === "range") {
+    const { min, max } = asNumberRange(filter.value);
+    if (min === null && max === null) return "";
+    if (min === null) return `up to ${max}`;
+    if (max === null) return `from ${min}`;
+    return `${min} to ${max}`;
+  }
   switch (field.type) {
     case "select":
       return (
@@ -264,13 +309,6 @@ export function formatFilterValue(
     case "text":
       return asString(filter.value);
     case "number": {
-      if (filter.operator === "between") {
-        const { min, max } = asNumberRange(filter.value);
-        if (min === null && max === null) return "";
-        if (min === null) return `up to ${max}`;
-        if (max === null) return `from ${min}`;
-        return `${min} to ${max}`;
-      }
       const numeric = asNumberOrNull(filter.value);
       return numeric === null ? "" : String(numeric);
     }

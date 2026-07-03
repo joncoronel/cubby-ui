@@ -5,6 +5,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { useQueryState } from "nuqs";
 import {
   Filters,
+  asFilterValues,
   type FilterField,
   type FilterValue,
 } from "@/registry/default/filters/filters";
@@ -21,13 +22,21 @@ const fields: FilterField[] = [
     label: "Status",
     type: "select",
     options: [
-      { value: "todo", label: "Todo", icon: <Dot className="bg-[oklch(0.7_0_0)]" /> },
+      {
+        value: "todo",
+        label: "Todo",
+        icon: <Dot className="bg-[oklch(0.7_0_0)]" />,
+      },
       {
         value: "in_progress",
         label: "In progress",
         icon: <Dot className="bg-[oklch(0.75_0.15_75)]" />,
       },
-      { value: "done", label: "Done", icon: <Dot className="bg-[oklch(0.7_0.16_150)]" /> },
+      {
+        value: "done",
+        label: "Done",
+        icon: <Dot className="bg-[oklch(0.7_0.16_150)]" />,
+      },
     ],
   },
   {
@@ -35,13 +44,21 @@ const fields: FilterField[] = [
     label: "Labels",
     type: "multiselect",
     options: [
-      { value: "bug", label: "Bug", icon: <Dot className="bg-[oklch(0.62_0.2_25)]" /> },
+      {
+        value: "bug",
+        label: "Bug",
+        icon: <Dot className="bg-[oklch(0.62_0.2_25)]" />,
+      },
       {
         value: "feature",
         label: "Feature",
         icon: <Dot className="bg-[oklch(0.7_0.16_150)]" />,
       },
-      { value: "docs", label: "Docs", icon: <Dot className="bg-[oklch(0.6_0.2_250)]" /> },
+      {
+        value: "docs",
+        label: "Docs",
+        icon: <Dot className="bg-[oklch(0.6_0.2_250)]" />,
+      },
     ],
   },
   { id: "title", label: "Title", type: "text" },
@@ -54,7 +71,9 @@ function FiltersNuqsDemo() {
   const value = React.useMemo<FilterValue[]>(() => {
     if (!raw) return [];
     try {
-      return JSON.parse(raw) as FilterValue[];
+      // asFilterValues validates the envelope (id/field/operator) of the
+      // untrusted URL JSON; the value controls coerce `value` downstream.
+      return asFilterValues(JSON.parse(raw));
     } catch {
       return [];
     }
@@ -70,8 +89,8 @@ function FiltersNuqsDemo() {
         }
       />
       <p className="text-muted-foreground text-sm">
-        Filters persist in the URL as <code>?filters=</code>. Reload the page and
-        they stick.
+        Filters persist in the URL as <code>?filters=</code>. Reload the page
+        and they stick.
       </p>
     </div>
   );

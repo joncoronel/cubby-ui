@@ -31,13 +31,21 @@ const fields: FilterField[] = [
     icon: <HugeiconsIcon icon={DashboardCircleIcon} strokeWidth={2} />,
     type: "select",
     options: [
-      { value: "todo", label: "Todo", icon: <Dot className="bg-[oklch(0.7_0_0)]" /> },
+      {
+        value: "todo",
+        label: "Todo",
+        icon: <Dot className="bg-[oklch(0.7_0_0)]" />,
+      },
       {
         value: "in_progress",
         label: "In progress",
         icon: <Dot className="bg-[oklch(0.75_0.15_75)]" />,
       },
-      { value: "done", label: "Done", icon: <Dot className="bg-[oklch(0.7_0.16_150)]" /> },
+      {
+        value: "done",
+        label: "Done",
+        icon: <Dot className="bg-[oklch(0.7_0.16_150)]" />,
+      },
     ],
   },
   {
@@ -58,17 +66,13 @@ export default function FiltersManual() {
   const [value, setValue] = React.useState<FilterValue[]>([]);
 
   // Pass children to own the layout: the add button leads, the chip list
-  // follows, and the count + clear render only once filters exist.
+  // follows. The clear button hides itself while no filters are active.
   return (
     <Filters fields={fields} value={value} onValueChange={setValue}>
       <FilterAddButton />
       <FilterChips />
-      {value.length > 0 && (
-        <>
-          <FilterActiveCount />
-          <FilterClearButton />
-        </>
-      )}
+      {value.length > 0 && <FilterActiveCount />}
+      <FilterClearButton />
     </Filters>
   );
 }

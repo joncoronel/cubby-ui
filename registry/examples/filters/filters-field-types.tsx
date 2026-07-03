@@ -29,13 +29,21 @@ const fields: FilterField[] = [
     icon: <HugeiconsIcon icon={DashboardCircleIcon} strokeWidth={2} />,
     type: "select",
     options: [
-      { value: "todo", label: "Todo", icon: <Dot className="bg-[oklch(0.7_0_0)]" /> },
+      {
+        value: "todo",
+        label: "Todo",
+        icon: <Dot className="bg-[oklch(0.7_0_0)]" />,
+      },
       {
         value: "in_progress",
         label: "In progress",
         icon: <Dot className="bg-[oklch(0.75_0.15_75)]" />,
       },
-      { value: "done", label: "Done", icon: <Dot className="bg-[oklch(0.7_0.16_150)]" /> },
+      {
+        value: "done",
+        label: "Done",
+        icon: <Dot className="bg-[oklch(0.7_0.16_150)]" />,
+      },
     ],
   },
   {
@@ -44,13 +52,21 @@ const fields: FilterField[] = [
     icon: <HugeiconsIcon icon={Tag01Icon} strokeWidth={2} />,
     type: "multiselect",
     options: [
-      { value: "bug", label: "Bug", icon: <Dot className="bg-[oklch(0.62_0.2_25)]" /> },
+      {
+        value: "bug",
+        label: "Bug",
+        icon: <Dot className="bg-[oklch(0.62_0.2_25)]" />,
+      },
       {
         value: "feature",
         label: "Feature",
         icon: <Dot className="bg-[oklch(0.7_0.16_150)]" />,
       },
-      { value: "docs", label: "Docs", icon: <Dot className="bg-[oklch(0.6_0.2_250)]" /> },
+      {
+        value: "docs",
+        label: "Docs",
+        icon: <Dot className="bg-[oklch(0.6_0.2_250)]" />,
+      },
       {
         value: "design",
         label: "Design",

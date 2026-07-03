@@ -17,7 +17,14 @@ import { Input } from "@/registry/default/input/input";
 import { NumberField as BaseNumberField } from "@base-ui/react/number-field";
 
 import { useFilterChip, useFiltersActions } from "./filters-context";
-import { asNumberOrNull, asNumberRange, asString, asStringArray, FILTER_SIZES } from "./lib/filters-utils";
+import {
+  asNumberOrNull,
+  asNumberRange,
+  asString,
+  asStringArray,
+  FILTER_SIZES,
+  operatorShapeFor,
+} from "./lib/filters-utils";
 import type {
   FilterField,
   FilterOption,
@@ -37,7 +44,11 @@ interface ValueControlProps<F extends FilterField> {
   onValueChange: (value: unknown) => void;
 }
 
-/** The value segment of a pill. Renders the control matching the field type. */
+/**
+ * The value segment of a pill. Renders the control matching the field type,
+ * or nothing when the operator's shape is `"none"` (`is empty`), so custom
+ * chip compositions are correct without re-implementing that rule.
+ */
 function FilterChipValue() {
   const { field, filter, size, autoOpen } = useFilterChip();
   const { updateFilter } = useFiltersActions();
@@ -45,6 +56,8 @@ function FilterChipValue() {
     (nextValue: unknown) => updateFilter(filter.id, { value: nextValue }),
     [updateFilter, filter.id],
   );
+
+  if (operatorShapeFor(field, filter.operator) === "none") return null;
 
   switch (field.type) {
     case "select":
@@ -125,16 +138,25 @@ interface OptionsTriggerProps {
   icon?: React.ReactNode;
   text: string;
   isPlaceholder: boolean;
+  /** Accessible name with field context, e.g. "Status value: Done". */
+  "aria-label": string;
 }
 
 /** Shared ghost trigger for the single- and multi-select value popups. */
-function OptionsTrigger({ size, icon, text, isPlaceholder }: OptionsTriggerProps) {
+function OptionsTrigger({
+  size,
+  icon,
+  text,
+  isPlaceholder,
+  "aria-label": ariaLabel,
+}: OptionsTriggerProps) {
   return (
     <ComboboxTrigger
       render={(triggerProps) => (
         <Button
           {...triggerProps}
           data-slot="filter-chip-value"
+          aria-label={ariaLabel}
           variant="ghost"
           size={size}
           className={VALUE_TRIGGER_CLASSES}
@@ -238,7 +260,10 @@ function OptionsValueControl({
         defaultOpen={initialOpen}
         onValueChange={(next) => {
           // Reject selections past the cap; the controlled value snaps back.
-          if (field.maxSelections != null && next.length > field.maxSelections) {
+          if (
+            field.maxSelections != null &&
+            next.length > field.maxSelections
+          ) {
             return;
           }
           onValueChange(next.map((option) => option.value));
@@ -250,6 +275,7 @@ function OptionsValueControl({
           icon={selected[0]?.icon}
           text={display}
           isPlaceholder={selected.length === 0}
+          aria-label={`${field.label} ${labels.value.toLowerCase()}: ${display}`}
         />
         <OptionsPopup>
           {(option: FilterOption) => (
@@ -282,6 +308,7 @@ function OptionsValueControl({
         icon={selected?.icon}
         text={selected?.label ?? placeholder}
         isPlaceholder={!selected}
+        aria-label={`${field.label} ${labels.value.toLowerCase()}: ${selected?.label ?? placeholder}`}
       />
       <OptionsPopup>
         {(option: FilterOption) => (
@@ -420,7 +447,7 @@ function NumberValueControl({
 }: ValueControlProps<NumberFilterField>) {
   const { labels } = useFiltersActions();
 
-  if (filter.operator === "between") {
+  if (operatorShapeFor(field, filter.operator) === "range") {
     const range = asNumberRange(filter.value);
     return (
       <>

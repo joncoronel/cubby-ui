@@ -11,9 +11,13 @@ import {
   TextUnderlineIcon,
 } from "@hugeicons/core-free-icons"
 
-export default function ToggleGroupWithIcons() {
+export default function ToggleGroupMultiple() {
   return (
-    <ToggleGroup aria-label="Text formatting" defaultValue={["bold"]}>
+    <ToggleGroup
+      multiple
+      aria-label="Text formatting"
+      defaultValue={["bold", "underline"]}
+    >
       <ToggleGroupItem value="bold" aria-label="Bold">
         <HugeiconsIcon icon={TextBoldIcon} className="h-4 w-4" strokeWidth={2} />
       </ToggleGroupItem>

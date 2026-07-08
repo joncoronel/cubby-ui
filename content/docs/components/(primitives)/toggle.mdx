@@ -40,6 +40,12 @@ Place a text label alongside the icon inside the toggle.
 
 <ComponentPreview component="toggle" example="toggle-with-text" />
 
+### Solid Variant
+
+Set `variant="solid"` for a filled button: a muted plate when off that insets when on (the same treatment the detached toggle group gives its cells).
+
+<ComponentPreview component="toggle" example="toggle-solid-variant" />
+
 ### Outline Variant
 
 Set `variant="outline"` to give the toggle a border and subtle shadow.
@@ -48,7 +54,8 @@ Set `variant="outline"` to give the toggle a border and subtle shadow.
 
 | Variant   | Description                                          |
 | --------- | ---------------------------------------------------- |
-| `default` | Borderless ghost. Muted when off, filled when on.    |
+| `ghost`   | Borderless. Muted when off, filled when on. Default. |
+| `solid`   | Muted plate when off; insets to the selected overlay when on. |
 | `outline` | Framed with a subtle shadow. Fills when on.          |
 
 ### Controlled
@@ -87,9 +94,9 @@ For the complete Base UI API, see the [Base UI Toggle documentation](https://bas
 
 <ApiProp
   name="variant"
-  fullType='"default" | "outline"'
+  fullType='"ghost" | "solid" | "outline"'
   simpleType="string"
-  defaultValue='"default"'
+  defaultValue='"ghost"'
 >
   Visual style variant for the toggle button. Custom prop not available in Base UI.
 </ApiProp>

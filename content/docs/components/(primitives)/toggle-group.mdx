@@ -6,7 +6,7 @@ type: primitive
 
 import { ToggleGroup } from "@/registry/default/toggle-group/toggle-group";
 
-A toggle group joins a set of [`Toggle`](/docs/components/toggle) buttons into one segmented control with shared borders. Use it for related on/off choices that share a slot, like a text alignment or a view switcher, where one or several can be active at once.
+A toggle group joins a set of [`Toggle`](/docs/components/toggle) buttons into one connected segmented control: a shared track with hairline dividers, where each pressed toggle fills to mark the selection. Use it for related on/off choices that share a slot, like text alignment or a view switcher, where one or several can be active at once.
 
 ## Preview
 
@@ -24,21 +24,115 @@ A toggle group joins a set of [`Toggle`](/docs/components/toggle) buttons into o
 
 ```text
 ToggleGroup
-└── Toggle
+└── ToggleGroupItem
 ```
 
-`ToggleGroup` wraps a row of [`Toggle`](/docs/components/toggle) buttons and merges their adjacent borders into one segmented control. Each `Toggle` carries its own `value`.
+`ToggleGroup` wraps a row of `ToggleGroupItem`s into one connected track, dividing them with hairlines and filling each pressed one to mark the selection. Each `ToggleGroupItem` is a [`Toggle`](/docs/components/toggle) that inherits the group's `size` and `variant`, and carries its own `value`.
 
 ## Examples
 
 ### With Icons
 
-Use an icon as a `Toggle`'s content for a compact, label-free control.
+Use an icon as a `ToggleGroupItem`'s content for a compact control. Give each icon-only item an `aria-label`.
 
 <ComponentPreview component="toggle-group" example="toggle-group-with-icons" />
 
+### Multiple
+
+Add the `multiple` prop to let more than one toggle stay pressed at once. Each selected toggle fills independently.
+
+<ComponentPreview component="toggle-group" example="toggle-group-multiple" />
+
+### Variants
+
+Set `variant` to change the container chrome. Each pressed cell fills to mark the selection.
+
+<ComponentPreview component="toggle-group" example="toggle-group-variants" />
+
+| Variant   | Description                              |
+| --------- | ---------------------------------------- |
+| `solid`   | Filled track. The default.               |
+| `outline` | Bordered cells collapsed into one framed control. |
+| `ghost`   | No track chrome; just the buttons and dividers. |
+
+### Sizes
+
+Set `size` on the group to size every cell at once. Child `ToggleGroupItem`s inherit it unless they set their own.
+
+<ComponentPreview component="toggle-group" example="toggle-group-sizes" />
+
+| Size      | Description                  |
+| --------- | ---------------------------- |
+| `sm`      | Compact, for dense toolbars. |
+| `default` | The standard height.         |
+| `lg`      | Taller, for prominent rows.  |
+
+### Detached
+
+Set `detached` to split the buttons into standalone pills with gaps instead of one connected track.
+
+<ComponentPreview component="toggle-group" example="toggle-group-detached" />
+
+Detached cells leave the shared track, so each one takes on its `variant`'s own look: a filled plate for `solid`, a framed card for `outline`, or a bare button for `ghost`.
+
+<ComponentPreview component="toggle-group" example="toggle-group-detached-variants" />
+
+### Without Separators
+
+Set `separators={false}` to drop the hairline dividers between attached cells. (The `outline` variant divides cells with their collapsed borders instead, so it ignores this.)
+
+<ComponentPreview component="toggle-group" example="toggle-group-without-separator" />
+
+### Orientation
+
+Set `orientation="vertical"` to stack the buttons. Dividers and cell sizing follow the axis.
+
+<ComponentPreview component="toggle-group" example="toggle-group-orientation" />
+
+### Custom Selected Color
+
+The selected cell is neutral by design. There's no accent prop; override it with utility classes when you want color. Note that `--primary` is light enough that it fails contrast as text on a tint, so the accent look pairs the tint with `--info-foreground` (the accessible brand-hue ink).
+
+<ComponentPreview component="toggle-group" example="toggle-group-custom-color" />
+
+### Disabled
+
+Set `disabled` on the group to disable every cell at once, or on a single `ToggleGroupItem` to disable just that one.
+
+<ComponentPreview component="toggle-group" example="toggle-group-disabled" />
+
 ## API Reference
 
-The ToggleGroup component is built on top of [Base UI's ToggleGroup](https://base-ui.com/react/components/toggle-group). All Base UI props are supported and passed through unchanged. Our implementation only merges the adjacent `Toggle` borders into one segmented control, so there are no custom props or modified defaults.
+The ToggleGroup component is built on top of [Base UI's ToggleGroup](https://base-ui.com/react/components/toggle-group). All Base UI props are supported and passed through, including `value`, `defaultValue`, `onValueChange`, `multiple`, `orientation`, and `disabled` (see the [Base UI ToggleGroup documentation](https://base-ui.com/react/components/toggle-group)). The custom props below are specific to our implementation.
 
-For the complete Base UI API, including `value`, `defaultValue`, `onValueChange`, `toggleMultiple`, and `disabled`, see the [Base UI ToggleGroup documentation](https://base-ui.com/react/components/toggle-group).
+### Custom Props
+
+<ApiPropsList>
+
+<ApiProp
+  name="variant"
+  fullType='"solid" | "outline" | "ghost"'
+  simpleType="string"
+  defaultValue='"solid"'
+>
+  Container chrome: a filled track (`solid`), a bordered track (`outline`), or none (`ghost`).
+</ApiProp>
+
+<ApiProp
+  name="size"
+  fullType='"sm" | "default" | "lg"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Sizes every cell at once. Propagated to child `ToggleGroupItem`s that don't set their own `size`.
+</ApiProp>
+
+<ApiProp name="detached" fullType="boolean" simpleType="boolean" defaultValue="false">
+  Splits the buttons into standalone pills separated by gaps instead of one connected track.
+</ApiProp>
+
+<ApiProp name="separators" fullType="boolean" simpleType="boolean" defaultValue="true">
+  Hairline dividers between attached cells. Ignored when `detached` or `variant="outline"` (which divides cells with their collapsed borders).
+</ApiProp>
+
+</ApiPropsList>

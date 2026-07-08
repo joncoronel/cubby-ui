@@ -7,17 +7,29 @@ import { Toggle as BaseToggle } from "@base-ui/react/toggle";
 import { cn } from "@/lib/utils";
 
 const toggleVariants = cva(
-  // Off (resting): muted ghost so the on-state clearly stands apart.
-  // Hover (off): lift onto the surface overlay and go full-contrast.
-  // On (pressed): a filled secondary chip — the same "engaged" plate as the
-  // secondary Button, with its own hover feedback via --secondary-hover.
-  "inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg bg-transparent text-sm font-medium whitespace-nowrap text-muted-foreground select-none hover:not-data-pressed:bg-surface-hover hover:not-data-pressed:text-foreground data-pressed:bg-secondary data-pressed:text-secondary-foreground data-pressed:hover:bg-(--secondary-hover) active:scale-[0.97] data-disabled:pointer-events-none data-disabled:opacity-60 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 transition-[background-color,color,border-color,box-shadow,outline-width,outline-offset,outline-color,scale] duration-100 ease-out focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
+  // Label + icon stay full-contrast (text-foreground) in every state; the
+  // background carries the state, not the text — so resting toggles read as
+  // legible options, not dimmed ones. Off: transparent. Hover: surface overlay.
+  // On (pressed): a filled secondary chip. Selection is terminal — three states
+  // only (rest / hover / selected); hover does not alter a pressed toggle.
+  // Per-variant fills override the background below.
+  "inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg bg-transparent text-sm font-medium whitespace-nowrap text-foreground select-none hover:not-data-pressed:bg-surface-hover data-pressed:bg-secondary active:scale-[0.97] data-disabled:pointer-events-none data-disabled:opacity-60 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 transition-[background-color,color,border-color,box-shadow,outline-width,outline-offset,outline-color,scale] duration-100 ease-out focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
   {
     variants: {
       variant: {
-        default: "",
+        // Borderless ghost: transparent when off, secondary chip when on (base).
+        ghost: "",
+        // Filled: an opaque muted plate. Hover/selected are the shared surface-hover /
+        // surface-selected overlays composited on an ::after layer (the plate stays put
+        // underneath — the base's ghost bg rules are pinned back to bg-muted), so a
+        // standalone/detached solid cell matches the group track exactly.
+        solid:
+          "relative bg-muted hover:not-data-pressed:bg-muted data-pressed:bg-muted after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:content-[''] after:bg-surface-hover after:opacity-0 after:transition-opacity after:duration-100 after:ease-out hover:not-data-pressed:after:opacity-100 data-pressed:after:bg-surface-selected data-pressed:after:opacity-100",
+        // Framed card. Border stays through press (only the fill changes), so the
+        // frame never drops out — and in a group the collapsed outline stays
+        // continuous when a cell is selected.
         outline:
-          "border bg-card bg-clip-padding hover:not-data-pressed:bg-(--outline-hover) data-pressed:border-transparent",
+          "border bg-card bg-clip-padding hover:not-data-pressed:bg-(--outline-hover)",
       },
       size: {
         sm: "h-9 min-w-9 gap-1.5 px-2 sm:h-8 sm:min-w-8",
@@ -26,7 +38,7 @@ const toggleVariants = cva(
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "ghost",
       size: "default",
     },
   },

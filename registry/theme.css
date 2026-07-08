@@ -115,8 +115,8 @@
      utilities (mapped in @theme inline below). Translucent overlays that raise
      the underlying surface by a fixed perceptual delta no matter what level it's
      sitting on. Light mode uses black-on-white. */
-  --surface-hover: oklch(0 0 0 / 0.06);
-  --surface-selected: oklch(0 0 0 / 0.1);
+  --surface-hover: oklch(0 0 0 / 0.04);
+  --surface-selected: oklch(0 0 0 / 0.08);
   --surface-rim-color: oklch(0 0 0 / 0);
 
   /* Light shadow recipe — opacity decreases with blur radius to mimic
@@ -245,8 +245,8 @@
   --surface-8: oklch(0.402 var(--neutral-chroma) var(--neutral-hue));
 
   /* State overlays flip to white-on-black */
-  --surface-hover: oklch(1 0 0 / 0.06);
-  --surface-selected: oklch(1 0 0 / 0.1);
+  --surface-hover: oklch(1 0 0 / 0.04);
+  --surface-selected: oklch(1 0 0 / 0.08);
   --surface-rim-color: oklch(1 0 0 / 0.04);
 
   /* Dark-only tokens used by the rim recipe */

@@ -146,8 +146,8 @@ html {
      so they raise the underlying surface by a fixed perceptual delta no matter
      what level it's sitting on. Light mode uses black-on-white, dark mode uses
      white-on-black. */
-  --surface-hover: oklch(0 0 0 / 0.06);
-  --surface-selected: oklch(0 0 0 / 0.1);
+  --surface-hover: oklch(0 0 0 / 0.04);
+  --surface-selected: oklch(0 0 0 / 0.08);
 
   /* Single-edge rim color — used by viewport-flush elevated containers
      (Sheet/Drawer in `default` variant) to paint a 1px inset line ONLY on
@@ -243,7 +243,11 @@ html {
      Derived, so it tracks whatever --primary the consumer sets. */
   --primary-soft-foreground: color-mix(in oklch, var(--primary), white 30%);
   /* Same treatment for destructive-soft's label on its tinted plate. */
-  --destructive-soft-foreground: color-mix(in oklch, var(--destructive), white 30%);
+  --destructive-soft-foreground: color-mix(
+    in oklch,
+    var(--destructive),
+    white 30%
+  );
 
   /* Dark-mode hover colors — mix toward white instead of black so hovered
      buttons brighten against the dark substrate. */
@@ -286,8 +290,8 @@ html {
   --surface-8: oklch(0.402 var(--neutral-chroma) var(--neutral-hue));
 
   /* State overlays flip from black-on-white to white-on-black */
-  --surface-hover: oklch(1 0 0 / 0.06);
-  --surface-selected: oklch(1 0 0 / 0.1);
+  --surface-hover: oklch(1 0 0 / 0.04);
+  --surface-selected: oklch(1 0 0 / 0.08);
 
   /* Single-edge rim — visible in dark, transparent in light (above) */
   --surface-rim-color: oklch(1 0 0 / 0.04);

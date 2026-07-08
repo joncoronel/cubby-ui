@@ -453,9 +453,19 @@ import toggle_toggle_controlled from "@/registry/examples/toggle/toggle-controll
 import toggle_toggle_different_sizes from "@/registry/examples/toggle/toggle-different-sizes";
 import toggle_toggle_disabled_state from "@/registry/examples/toggle/toggle-disabled-state";
 import toggle_toggle_outline_variant from "@/registry/examples/toggle/toggle-outline-variant";
+import toggle_toggle_solid_variant from "@/registry/examples/toggle/toggle-solid-variant";
 import toggle_toggle_with_text from "@/registry/examples/toggle/toggle-with-text";
 import toggle_group_toggle_group_basic from "@/registry/examples/toggle-group/toggle-group-basic";
+import toggle_group_toggle_group_custom_color from "@/registry/examples/toggle-group/toggle-group-custom-color";
+import toggle_group_toggle_group_detached from "@/registry/examples/toggle-group/toggle-group-detached";
+import toggle_group_toggle_group_detached_variants from "@/registry/examples/toggle-group/toggle-group-detached-variants";
+import toggle_group_toggle_group_disabled from "@/registry/examples/toggle-group/toggle-group-disabled";
+import toggle_group_toggle_group_multiple from "@/registry/examples/toggle-group/toggle-group-multiple";
+import toggle_group_toggle_group_orientation from "@/registry/examples/toggle-group/toggle-group-orientation";
+import toggle_group_toggle_group_sizes from "@/registry/examples/toggle-group/toggle-group-sizes";
+import toggle_group_toggle_group_variants from "@/registry/examples/toggle-group/toggle-group-variants";
 import toggle_group_toggle_group_with_icons from "@/registry/examples/toggle-group/toggle-group-with-icons";
+import toggle_group_toggle_group_without_separator from "@/registry/examples/toggle-group/toggle-group-without-separator";
 import toolbar_toolbar_basic from "@/registry/examples/toolbar/toolbar-basic";
 import toolbar_toolbar_with_input from "@/registry/examples/toolbar/toolbar-with-input";
 import tooltip_tooltip_basic from "@/registry/examples/tooltip/tooltip-basic";
@@ -1411,7 +1421,9 @@ export const componentMetadata = {
     "title": "Toggle-group",
     "description": "A toggle-group component.",
     "category": "UI",
-    "registryDependencies": [],
+    "registryDependencies": [
+      "@cubby-ui/toggle"
+    ],
     "dependencies": [],
     "examples": {},
     "reference": []
@@ -3928,6 +3940,11 @@ export const exampleRegistry = {
       "source": "import { Toggle } from \"@/components/ui/cubby-ui/toggle\";\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport { TextUnderlineIcon } from \"@hugeicons/core-free-icons\";\nexport default function ToggleOutlineVariant() {\n  return (\n    <Toggle variant=\"outline\">\n      <HugeiconsIcon icon={TextUnderlineIcon} className=\"h-4 w-4\"  strokeWidth={2} />\n    </Toggle>\n  );\n}"
     },
     {
+      "title": "Solid Variant",
+      "importPath": "toggle-solid-variant",
+      "source": "\"use client\";\n\nimport { Toggle } from \"@/components/ui/cubby-ui/toggle\";\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport { TextBoldIcon } from \"@hugeicons/core-free-icons\";\n\nexport default function ToggleSolidVariant() {\n  return (\n    <Toggle variant=\"solid\" aria-label=\"Bold\">\n      <HugeiconsIcon icon={TextBoldIcon} className=\"h-4 w-4\" strokeWidth={2} />\n    </Toggle>\n  );\n}\n"
+    },
+    {
       "title": "With Text",
       "importPath": "toggle-with-text",
       "source": "import { Toggle } from \"@/components/ui/cubby-ui/toggle\";\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport { TextBoldIcon } from \"@hugeicons/core-free-icons\";\nexport default function ToggleWithText() {\n  return (\n    <Toggle>\n      <HugeiconsIcon icon={TextBoldIcon} className=\"h-4 w-4\" strokeWidth={2} />\n      Bold\n    </Toggle>\n  );\n}"
@@ -3937,12 +3954,57 @@ export const exampleRegistry = {
     {
       "title": "Basic",
       "importPath": "toggle-group-basic",
-      "source": "\"use client\"\n\nimport { ToggleGroup } from \"@/components/ui/cubby-ui/toggle-group\"\nimport { Toggle } from \"@/components/ui/cubby-ui/toggle\"\n\nexport default function ToggleGroupBasic() {\n  return (\n    <ToggleGroup>\n      <Toggle value=\"left\">Left</Toggle>\n      <Toggle value=\"center\">Center</Toggle>\n      <Toggle value=\"right\">Right</Toggle>\n    </ToggleGroup>\n  )\n}"
+      "source": "import {\n  ToggleGroup,\n  ToggleGroupItem,\n} from \"@/components/ui/cubby-ui/toggle-group\"\n\nexport default function ToggleGroupBasic() {\n  return (\n    <ToggleGroup aria-label=\"Text alignment\" defaultValue={[\"center\"]}>\n      <ToggleGroupItem value=\"left\">Left</ToggleGroupItem>\n      <ToggleGroupItem value=\"center\">Center</ToggleGroupItem>\n      <ToggleGroupItem value=\"right\">Right</ToggleGroupItem>\n    </ToggleGroup>\n  )\n}\n"
+    },
+    {
+      "title": "Custom Color",
+      "importPath": "toggle-group-custom-color",
+      "source": "\"use client\"\n\nimport {\n  ToggleGroup,\n  ToggleGroupItem,\n} from \"@/components/ui/cubby-ui/toggle-group\"\n\n// The selected cell is neutral by default. Override it with any Tailwind classes —\n// here, an accent look using the brand-hue tint + accessible brand-hue ink.\nexport default function ToggleGroupCustomColor() {\n  return (\n    <ToggleGroup\n      aria-label=\"Text alignment\"\n      defaultValue={[\"center\"]}\n      className=\"**:data-[slot=toggle]:data-pressed:bg-primary/10 **:data-[slot=toggle]:data-pressed:text-info-foreground **:data-[slot=toggle]:data-pressed:hover:bg-primary/15\"\n    >\n      <ToggleGroupItem value=\"left\">Left</ToggleGroupItem>\n      <ToggleGroupItem value=\"center\">Center</ToggleGroupItem>\n      <ToggleGroupItem value=\"right\">Right</ToggleGroupItem>\n    </ToggleGroup>\n  )\n}\n"
+    },
+    {
+      "title": "Detached",
+      "importPath": "toggle-group-detached",
+      "source": "\"use client\"\n\nimport {\n  ToggleGroup,\n  ToggleGroupItem,\n} from \"@/components/ui/cubby-ui/toggle-group\"\nimport { HugeiconsIcon } from \"@hugeicons/react\"\nimport {\n  TextBoldIcon,\n  TextItalicIcon,\n  TextUnderlineIcon,\n  TextStrikethroughIcon,\n} from \"@hugeicons/core-free-icons\"\n\nexport default function ToggleGroupDetached() {\n  return (\n    <ToggleGroup multiple detached aria-label=\"Text formatting\" defaultValue={[\"bold\"]}>\n      <ToggleGroupItem value=\"bold\" aria-label=\"Bold\">\n        <HugeiconsIcon icon={TextBoldIcon} className=\"h-4 w-4\" strokeWidth={2} />\n      </ToggleGroupItem>\n      <ToggleGroupItem value=\"italic\" aria-label=\"Italic\">\n        <HugeiconsIcon icon={TextItalicIcon} className=\"h-4 w-4\" strokeWidth={2} />\n      </ToggleGroupItem>\n      <ToggleGroupItem value=\"underline\" aria-label=\"Underline\">\n        <HugeiconsIcon icon={TextUnderlineIcon} className=\"h-4 w-4\" strokeWidth={2} />\n      </ToggleGroupItem>\n      <ToggleGroupItem value=\"strikethrough\" aria-label=\"Strikethrough\">\n        <HugeiconsIcon icon={TextStrikethroughIcon} className=\"h-4 w-4\" strokeWidth={2} />\n      </ToggleGroupItem>\n    </ToggleGroup>\n  )\n}\n"
+    },
+    {
+      "title": "Detached Variants",
+      "importPath": "toggle-group-detached-variants",
+      "source": "\"use client\"\n\nimport {\n  ToggleGroup,\n  ToggleGroupItem,\n} from \"@/components/ui/cubby-ui/toggle-group\"\n\nexport default function ToggleGroupDetachedVariants() {\n  return (\n    <div className=\"flex flex-col items-center gap-4\">\n      <ToggleGroup\n        detached\n        variant=\"solid\"\n        aria-label=\"Text alignment\"\n        defaultValue={[\"center\"]}\n      >\n        <ToggleGroupItem value=\"left\">Left</ToggleGroupItem>\n        <ToggleGroupItem value=\"center\">Center</ToggleGroupItem>\n        <ToggleGroupItem value=\"right\">Right</ToggleGroupItem>\n      </ToggleGroup>\n      <ToggleGroup\n        detached\n        variant=\"outline\"\n        aria-label=\"Text alignment\"\n        defaultValue={[\"center\"]}\n      >\n        <ToggleGroupItem value=\"left\">Left</ToggleGroupItem>\n        <ToggleGroupItem value=\"center\">Center</ToggleGroupItem>\n        <ToggleGroupItem value=\"right\">Right</ToggleGroupItem>\n      </ToggleGroup>\n      <ToggleGroup\n        detached\n        variant=\"ghost\"\n        aria-label=\"Text alignment\"\n        defaultValue={[\"center\"]}\n      >\n        <ToggleGroupItem value=\"left\">Left</ToggleGroupItem>\n        <ToggleGroupItem value=\"center\">Center</ToggleGroupItem>\n        <ToggleGroupItem value=\"right\">Right</ToggleGroupItem>\n      </ToggleGroup>\n    </div>\n  )\n}\n"
+    },
+    {
+      "title": "Disabled",
+      "importPath": "toggle-group-disabled",
+      "source": "\"use client\"\n\nimport {\n  ToggleGroup,\n  ToggleGroupItem,\n} from \"@/components/ui/cubby-ui/toggle-group\"\n\nexport default function ToggleGroupDisabled() {\n  return (\n    <div className=\"flex flex-col items-center gap-4\">\n      {/* Whole group disabled */}\n      <ToggleGroup disabled aria-label=\"Text alignment\" defaultValue={[\"center\"]}>\n        <ToggleGroupItem value=\"left\">Left</ToggleGroupItem>\n        <ToggleGroupItem value=\"center\">Center</ToggleGroupItem>\n        <ToggleGroupItem value=\"right\">Right</ToggleGroupItem>\n      </ToggleGroup>\n\n      {/* A single item disabled */}\n      <ToggleGroup aria-label=\"Text alignment\" defaultValue={[\"left\"]}>\n        <ToggleGroupItem value=\"left\">Left</ToggleGroupItem>\n        <ToggleGroupItem value=\"center\" disabled>\n          Center\n        </ToggleGroupItem>\n        <ToggleGroupItem value=\"right\">Right</ToggleGroupItem>\n      </ToggleGroup>\n    </div>\n  )\n}\n"
+    },
+    {
+      "title": "Multiple",
+      "importPath": "toggle-group-multiple",
+      "source": "\"use client\"\n\nimport {\n  ToggleGroup,\n  ToggleGroupItem,\n} from \"@/components/ui/cubby-ui/toggle-group\"\nimport { HugeiconsIcon } from \"@hugeicons/react\"\nimport {\n  TextBoldIcon,\n  TextItalicIcon,\n  TextUnderlineIcon,\n} from \"@hugeicons/core-free-icons\"\n\nexport default function ToggleGroupMultiple() {\n  return (\n    <ToggleGroup\n      multiple\n      aria-label=\"Text formatting\"\n      defaultValue={[\"bold\", \"underline\"]}\n    >\n      <ToggleGroupItem value=\"bold\" aria-label=\"Bold\">\n        <HugeiconsIcon icon={TextBoldIcon} className=\"h-4 w-4\" strokeWidth={2} />\n      </ToggleGroupItem>\n      <ToggleGroupItem value=\"italic\" aria-label=\"Italic\">\n        <HugeiconsIcon\n          icon={TextItalicIcon}\n          className=\"h-4 w-4\"\n          strokeWidth={2}\n        />\n      </ToggleGroupItem>\n      <ToggleGroupItem value=\"underline\" aria-label=\"Underline\">\n        <HugeiconsIcon\n          icon={TextUnderlineIcon}\n          className=\"h-4 w-4\"\n          strokeWidth={2}\n        />\n      </ToggleGroupItem>\n    </ToggleGroup>\n  )\n}\n"
+    },
+    {
+      "title": "Orientation",
+      "importPath": "toggle-group-orientation",
+      "source": "\"use client\"\n\nimport {\n  ToggleGroup,\n  ToggleGroupItem,\n} from \"@/components/ui/cubby-ui/toggle-group\"\nimport { HugeiconsIcon } from \"@hugeicons/react\"\nimport {\n  TextAlignLeftIcon,\n  TextAlignCenterIcon,\n  TextAlignRightIcon,\n} from \"@hugeicons/core-free-icons\"\n\nexport default function ToggleGroupOrientation() {\n  return (\n    <ToggleGroup\n      orientation=\"vertical\"\n      aria-label=\"Text alignment\"\n      defaultValue={[\"center\"]}\n    >\n      <ToggleGroupItem value=\"left\" aria-label=\"Align left\">\n        <HugeiconsIcon icon={TextAlignLeftIcon} className=\"h-4 w-4\" strokeWidth={2} />\n      </ToggleGroupItem>\n      <ToggleGroupItem value=\"center\" aria-label=\"Align center\">\n        <HugeiconsIcon icon={TextAlignCenterIcon} className=\"h-4 w-4\" strokeWidth={2} />\n      </ToggleGroupItem>\n      <ToggleGroupItem value=\"right\" aria-label=\"Align right\">\n        <HugeiconsIcon icon={TextAlignRightIcon} className=\"h-4 w-4\" strokeWidth={2} />\n      </ToggleGroupItem>\n    </ToggleGroup>\n  )\n}\n"
+    },
+    {
+      "title": "Sizes",
+      "importPath": "toggle-group-sizes",
+      "source": "\"use client\"\n\nimport {\n  ToggleGroup,\n  ToggleGroupItem,\n} from \"@/components/ui/cubby-ui/toggle-group\"\n\nexport default function ToggleGroupSizes() {\n  return (\n    <div className=\"flex flex-col items-center gap-4\">\n      <ToggleGroup size=\"sm\" aria-label=\"Text alignment\" defaultValue={[\"center\"]}>\n        <ToggleGroupItem value=\"left\">Left</ToggleGroupItem>\n        <ToggleGroupItem value=\"center\">Center</ToggleGroupItem>\n        <ToggleGroupItem value=\"right\">Right</ToggleGroupItem>\n      </ToggleGroup>\n      <ToggleGroup size=\"default\" aria-label=\"Text alignment\" defaultValue={[\"center\"]}>\n        <ToggleGroupItem value=\"left\">Left</ToggleGroupItem>\n        <ToggleGroupItem value=\"center\">Center</ToggleGroupItem>\n        <ToggleGroupItem value=\"right\">Right</ToggleGroupItem>\n      </ToggleGroup>\n      <ToggleGroup size=\"lg\" aria-label=\"Text alignment\" defaultValue={[\"center\"]}>\n        <ToggleGroupItem value=\"left\">Left</ToggleGroupItem>\n        <ToggleGroupItem value=\"center\">Center</ToggleGroupItem>\n        <ToggleGroupItem value=\"right\">Right</ToggleGroupItem>\n      </ToggleGroup>\n    </div>\n  )\n}\n"
+    },
+    {
+      "title": "Variants",
+      "importPath": "toggle-group-variants",
+      "source": "\"use client\"\n\nimport {\n  ToggleGroup,\n  ToggleGroupItem,\n} from \"@/components/ui/cubby-ui/toggle-group\"\n\nexport default function ToggleGroupVariants() {\n  return (\n    <div className=\"flex flex-col items-center gap-4\">\n      <ToggleGroup variant=\"solid\" aria-label=\"Text alignment\" defaultValue={[\"center\"]}>\n        <ToggleGroupItem value=\"left\">Left</ToggleGroupItem>\n        <ToggleGroupItem value=\"center\">Center</ToggleGroupItem>\n        <ToggleGroupItem value=\"right\">Right</ToggleGroupItem>\n      </ToggleGroup>\n      <ToggleGroup variant=\"outline\" aria-label=\"Text alignment\" defaultValue={[\"center\"]}>\n        <ToggleGroupItem value=\"left\">Left</ToggleGroupItem>\n        <ToggleGroupItem value=\"center\">Center</ToggleGroupItem>\n        <ToggleGroupItem value=\"right\">Right</ToggleGroupItem>\n      </ToggleGroup>\n      <ToggleGroup variant=\"ghost\" aria-label=\"Text alignment\" defaultValue={[\"center\"]}>\n        <ToggleGroupItem value=\"left\">Left</ToggleGroupItem>\n        <ToggleGroupItem value=\"center\">Center</ToggleGroupItem>\n        <ToggleGroupItem value=\"right\">Right</ToggleGroupItem>\n      </ToggleGroup>\n    </div>\n  )\n}\n"
     },
     {
       "title": "With Icons",
       "importPath": "toggle-group-with-icons",
-      "source": "\"use client\"\n\nimport { ToggleGroup } from \"@/components/ui/cubby-ui/toggle-group\"\nimport { Toggle } from \"@/components/ui/cubby-ui/toggle\"\n\nexport default function ToggleGroupWithIcons() {\n  return (\n    <ToggleGroup>\n      <Toggle value=\"bold\">\n        <svg\n          xmlns=\"http://www.w3.org/2000/svg\"\n          width=\"16\"\n          height=\"16\"\n          viewBox=\"0 0 24 24\"\n          fill=\"none\"\n          stroke=\"currentColor\"\n          strokeWidth=\"2\"\n          strokeLinecap=\"round\"\n          strokeLinejoin=\"round\"\n        >\n          <path d=\"M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z\"></path>\n          <path d=\"M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z\"></path>\n        </svg>\n      </Toggle>\n      <Toggle value=\"italic\">\n        <svg\n          xmlns=\"http://www.w3.org/2000/svg\"\n          width=\"16\"\n          height=\"16\"\n          viewBox=\"0 0 24 24\"\n          fill=\"none\"\n          stroke=\"currentColor\"\n          strokeWidth=\"2\"\n          strokeLinecap=\"round\"\n          strokeLinejoin=\"round\"\n        >\n          <line x1=\"19\" y1=\"4\" x2=\"10\" y2=\"4\"></line>\n          <line x1=\"14\" y1=\"20\" x2=\"5\" y2=\"20\"></line>\n          <line x1=\"15\" y1=\"4\" x2=\"9\" y2=\"20\"></line>\n        </svg>\n      </Toggle>\n      <Toggle value=\"underline\">\n        <svg\n          xmlns=\"http://www.w3.org/2000/svg\"\n          width=\"16\"\n          height=\"16\"\n          viewBox=\"0 0 24 24\"\n          fill=\"none\"\n          stroke=\"currentColor\"\n          strokeWidth=\"2\"\n          strokeLinecap=\"round\"\n          strokeLinejoin=\"round\"\n        >\n          <path d=\"M6 4v6a6 6 0 0 0 12 0V4\"></path>\n          <line x1=\"4\" y1=\"20\" x2=\"20\" y2=\"20\"></line>\n        </svg>\n      </Toggle>\n    </ToggleGroup>\n  )\n}"
+      "source": "\"use client\"\n\nimport {\n  ToggleGroup,\n  ToggleGroupItem,\n} from \"@/components/ui/cubby-ui/toggle-group\"\nimport { HugeiconsIcon } from \"@hugeicons/react\"\nimport {\n  TextBoldIcon,\n  TextItalicIcon,\n  TextUnderlineIcon,\n} from \"@hugeicons/core-free-icons\"\n\nexport default function ToggleGroupWithIcons() {\n  return (\n    <ToggleGroup aria-label=\"Text formatting\" defaultValue={[\"bold\"]}>\n      <ToggleGroupItem value=\"bold\" aria-label=\"Bold\">\n        <HugeiconsIcon icon={TextBoldIcon} className=\"h-4 w-4\" strokeWidth={2} />\n      </ToggleGroupItem>\n      <ToggleGroupItem value=\"italic\" aria-label=\"Italic\">\n        <HugeiconsIcon\n          icon={TextItalicIcon}\n          className=\"h-4 w-4\"\n          strokeWidth={2}\n        />\n      </ToggleGroupItem>\n      <ToggleGroupItem value=\"underline\" aria-label=\"Underline\">\n        <HugeiconsIcon\n          icon={TextUnderlineIcon}\n          className=\"h-4 w-4\"\n          strokeWidth={2}\n        />\n      </ToggleGroupItem>\n    </ToggleGroup>\n  )\n}\n"
+    },
+    {
+      "title": "Without Separator",
+      "importPath": "toggle-group-without-separator",
+      "source": "\"use client\"\n\nimport {\n  ToggleGroup,\n  ToggleGroupItem,\n} from \"@/components/ui/cubby-ui/toggle-group\"\n\nexport default function ToggleGroupWithoutSeparator() {\n  return (\n    <ToggleGroup\n      separators={false}\n      aria-label=\"Text alignment\"\n      defaultValue={[\"center\"]}\n    >\n      <ToggleGroupItem value=\"left\">Left</ToggleGroupItem>\n      <ToggleGroupItem value=\"center\">Center</ToggleGroupItem>\n      <ToggleGroupItem value=\"right\">Right</ToggleGroupItem>\n    </ToggleGroup>\n  )\n}\n"
     }
   ],
   "toolbar": [
@@ -4498,9 +4560,19 @@ export const componentMap = {
   "toggle-different-sizes": toggle_toggle_different_sizes,
   "toggle-disabled-state": toggle_toggle_disabled_state,
   "toggle-outline-variant": toggle_toggle_outline_variant,
+  "toggle-solid-variant": toggle_toggle_solid_variant,
   "toggle-with-text": toggle_toggle_with_text,
   "toggle-group-basic": toggle_group_toggle_group_basic,
+  "toggle-group-custom-color": toggle_group_toggle_group_custom_color,
+  "toggle-group-detached": toggle_group_toggle_group_detached,
+  "toggle-group-detached-variants": toggle_group_toggle_group_detached_variants,
+  "toggle-group-disabled": toggle_group_toggle_group_disabled,
+  "toggle-group-multiple": toggle_group_toggle_group_multiple,
+  "toggle-group-orientation": toggle_group_toggle_group_orientation,
+  "toggle-group-sizes": toggle_group_toggle_group_sizes,
+  "toggle-group-variants": toggle_group_toggle_group_variants,
   "toggle-group-with-icons": toggle_group_toggle_group_with_icons,
+  "toggle-group-without-separator": toggle_group_toggle_group_without_separator,
   "toolbar-basic": toolbar_toolbar_basic,
   "toolbar-with-input": toolbar_toolbar_with_input,
   "tooltip-basic": tooltip_tooltip_basic,
@@ -4787,8 +4859,8 @@ export const componentAnatomy = {
     "anatomy": "<Toggle />"
   },
   "toggle-group": {
-    "imports": "import { ToggleGroup } from \"@/components/ui/cubby-ui/toggle-group\"",
-    "anatomy": "<ToggleGroup />"
+    "imports": "import {\n  ToggleGroup,\n  ToggleGroupItem,\n} from \"@/components/ui/cubby-ui/toggle-group\"",
+    "anatomy": "<ToggleGroup>\n  <ToggleGroupItem />\n</ToggleGroup>"
   },
   "toolbar": {
     "imports": "import {\n  Toolbar,\n  ToolbarButton,\n  ToolbarSeparator,\n  ToolbarGroup,\n} from \"@/components/ui/cubby-ui/toolbar\"",

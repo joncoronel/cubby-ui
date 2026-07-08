@@ -157,7 +157,8 @@
       "Bash(npx tsc *)",
       "Bash(pnpm run *)",
       "Bash(find \"C:\\\\Users\\\\jonny\\\\.claude\\\\skills\\\\building-components\" -maxdepth 2 -name \"*.md\")",
-      "Bash(find . -path ./node_modules -prune -o -name \"globals.css\" -print)"
+      "Bash(find . -path ./node_modules -prune -o -name \"globals.css\" -print)",
+      "PowerShell($dir=\"C:\\\\Users\\\\jonny\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-jonny-Documents-Projects-cubby-ui\\\\898f3743-a0c2-4d10-a1e4-bcc5c3408298\\\\scratchpad\"; Add-Type -AssemblyName System.Drawing; $src=[System.Drawing.Image]::FromFile\\(\"$dir\\\\d-dark.png\"\\); $rect=New-Object System.Drawing.Rectangle\\(660,198,180,145\\); $out=New-Object System.Drawing.Bitmap\\(720,580\\); $g=[System.Drawing.Graphics]::FromImage\\($out\\); $g.InterpolationMode='NearestNeighbor'; $g.DrawImage\\($src,\\(New-Object System.Drawing.Rectangle\\(0,0,720,580\\)\\),$rect,[System.Drawing.GraphicsUnit]::Pixel\\); $out.Save\\(\"$dir\\\\d-dark-zoom.png\"\\); $g.Dispose\\(\\);$src.Dispose\\(\\);$out.Dispose\\(\\); \"ok\")"
     ],
     "deny": []
   }

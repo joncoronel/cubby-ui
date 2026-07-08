@@ -23,6 +23,8 @@ After all the token shifts (surface aliasing, OKLCH conversion, surface-1 darken
 - Pivot to warm (would clash with current cool neutrals — would need to rotate `--neutral-hue` too)
 - Something distinctive (sage, dusty plum)
 
+**Contrast note (accent-as-text):** `--primary` at L 0.6 is too light to serve as _colored text_ on a light tint — measured 2.92:1 for `text-primary` on `bg-primary/10` in light mode (needs 4.5:1). `ToggleGroup` now ships a **neutral** selected state (`bg-surface-selected` + `text-foreground`, no contrast issue), so this is no longer a shipped coupling — it only surfaces in the documented accent _override_ (`toggle-group-custom-color` example), which pairs the tint with `text-info-foreground` (the primary-hue text ramp: 5.5:1 light / ~5.9:1 dark) instead of `text-primary`. If a dedicated dark-primary text token is ever added (or primary is darkened here), that override — and any other "primary as colored text" usage — can switch to it.
+
 #### Light-mode shadow tuning (only if needed)
 
 `--surface-shadow-color: oklch(0 0 0 / 0.06)` matches the source design. With light surfaces all neutral and the page at `oklch(0.97)`, color contrast between popup and page is mostly carried by the shadow drops + 1px ring. If popovers/cards look under-shadowed in light mode during the visual sweep, increase the alpha here.

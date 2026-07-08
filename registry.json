@@ -1577,8 +1577,8 @@
           "surface-6": "oklch(1 0 0)",
           "surface-7": "oklch(1 0 0)",
           "surface-8": "oklch(1 0 0)",
-          "surface-hover": "oklch(0 0 0 / 0.06)",
-          "surface-selected": "oklch(0 0 0 / 0.1)",
+          "surface-hover": "oklch(0 0 0 / 0.04)",
+          "surface-selected": "oklch(0 0 0 / 0.08)",
           "surface-rim-color": "oklch(0 0 0 / 0)",
           "surface-shadow-ring": "oklch(0 0 0 / 0.06)",
           "surface-shadow-near": "oklch(0 0 0 / 0.06)",
@@ -1645,8 +1645,8 @@
           "surface-6": "oklch(0.348 var(--neutral-chroma) var(--neutral-hue))",
           "surface-7": "oklch(0.375 var(--neutral-chroma) var(--neutral-hue))",
           "surface-8": "oklch(0.402 var(--neutral-chroma) var(--neutral-hue))",
-          "surface-hover": "oklch(1 0 0 / 0.06)",
-          "surface-selected": "oklch(1 0 0 / 0.1)",
+          "surface-hover": "oklch(1 0 0 / 0.04)",
+          "surface-selected": "oklch(1 0 0 / 0.08)",
           "surface-rim-color": "oklch(1 0 0 / 0.04)",
           "surface-hi-base": "oklch(1 0 0 / 0.01)",
           "surface-hi-mid": "oklch(1 0 0 / 0.02)",
@@ -1828,6 +1828,9 @@
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/toggle-group.tsx"
         }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/toggle"
       ]
     },
     {

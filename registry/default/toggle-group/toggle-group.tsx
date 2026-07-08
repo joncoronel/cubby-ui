@@ -41,14 +41,6 @@ const CELL_RADIUS: Record<ToggleGroupSize, string> = {
   lg: "**:data-[slot=toggle]:rounded-xl",
 };
 
-// Attached cells read as one control: uniform neutral selection regardless of
-// variant (the app's standard selected-state overlay; text stays full-contrast
-// from the base). Detached cells opt out and keep their own Toggle variant's
-// pressed identity instead.
-// For an accent look, override via className, e.g.
-//   className="**:data-[slot=toggle]:data-pressed:bg-primary/10 **:data-[slot=toggle]:data-pressed:text-info-foreground"
-const SELECTED = "**:data-[slot=toggle]:data-pressed:bg-surface-selected";
-
 // Shared cell resets for the attached variants.
 const ATTACHED_CELL =
   "**:data-[slot=toggle]:relative **:data-[slot=toggle]:shadow-none **:data-[slot=toggle]:active:scale-100 **:data-[slot=toggle]:focus-visible:z-10";
@@ -62,6 +54,13 @@ function ToggleGroup({
   children,
   ...props
 }: ToggleGroupProps) {
+  // Cell styling lives here on the parent, via **:data-[slot=toggle]: descendant
+  // selectors, rather than on ToggleGroupItem — on purpose. The item owns cell
+  // *identity* (variant/size, fed through context); the group owns *adjacency*:
+  // border collapse, end-cap radius, dividers, and track chrome. Keeping it
+  // parent-side also makes the neutral-selection accent a single group-level
+  // override hook (see toggle-group-custom-color) and styles any descendant
+  // [data-slot=toggle] robustly, so it doesn't depend on the item wrapper.
   return (
     <BaseToggleGroup
       data-slot="toggle-group"
@@ -89,18 +88,20 @@ function ToggleGroup({
             : [
                 // Solid / ghost: one connected track; cells flatten and inherit the track's
                 // corner radius on the ends (size-agnostic), with floating ::before dividers.
-                SELECTED,
+                // Each cell's own pressed fill (ghost → surface-selected) provides the
+                // selected look — no group-level override needed, so no bg-transparent
+                // reset here that would out-specify it.
                 TRACK_RADIUS[size],
                 variant === "solid" && "bg-muted",
                 // ghost: no container chrome.
                 ATTACHED_CELL,
-                "**:data-[slot=toggle]:rounded-none **:data-[slot=toggle]:border-0 **:data-[slot=toggle]:bg-transparent",
+                "**:data-[slot=toggle]:rounded-none **:data-[slot=toggle]:border-0",
                 "**:data-[slot=toggle]:first:rounded-s-[inherit] **:data-[slot=toggle]:last:rounded-e-[inherit] data-[orientation=vertical]:**:data-[slot=toggle]:first:rounded-s-none data-[orientation=vertical]:**:data-[slot=toggle]:last:rounded-e-none data-[orientation=vertical]:**:data-[slot=toggle]:first:rounded-t-[inherit] data-[orientation=vertical]:**:data-[slot=toggle]:last:rounded-b-[inherit]",
                 separators && [
                   // Floating inset rule at 50% that tracks its cell's ink.
                   "**:data-[slot=toggle]:not-first:before:pointer-events-none **:data-[slot=toggle]:not-first:before:absolute **:data-[slot=toggle]:not-first:before:z-0 **:data-[slot=toggle]:not-first:before:content-[''] **:data-[slot=toggle]:not-first:before:rounded-full **:data-[slot=toggle]:not-first:before:bg-current **:data-[slot=toggle]:not-first:before:opacity-15",
-                  "**:data-[slot=toggle]:not-first:before:top-1/4 **:data-[slot=toggle]:not-first:before:left-0 **:data-[slot=toggle]:not-first:before:h-1/2 **:data-[slot=toggle]:not-first:before:w-px",
-                  "data-[orientation=vertical]:**:data-[slot=toggle]:not-first:before:top-0 data-[orientation=vertical]:**:data-[slot=toggle]:not-first:before:left-1/4 data-[orientation=vertical]:**:data-[slot=toggle]:not-first:before:h-px data-[orientation=vertical]:**:data-[slot=toggle]:not-first:before:w-1/2",
+                  "**:data-[slot=toggle]:not-first:before:top-1/4 **:data-[slot=toggle]:not-first:before:start-0 **:data-[slot=toggle]:not-first:before:h-1/2 **:data-[slot=toggle]:not-first:before:w-px",
+                  "data-[orientation=vertical]:**:data-[slot=toggle]:not-first:before:top-0 data-[orientation=vertical]:**:data-[slot=toggle]:not-first:before:inset-s-1/4 data-[orientation=vertical]:**:data-[slot=toggle]:not-first:before:h-px data-[orientation=vertical]:**:data-[slot=toggle]:not-first:before:w-1/2",
                 ],
               ],
         className,
@@ -116,6 +117,12 @@ function ToggleGroup({
 
 export type ToggleGroupItemProps = ToggleProps;
 
+/**
+ * A cell in a `ToggleGroup`. Accepts all `Toggle` props; `size` and `variant`
+ * are inherited from the group through context. A per-item `variant` only takes
+ * effect when the group is `detached` — attached cells are painted by the group
+ * and ignore it.
+ */
 function ToggleGroupItem({ variant, size, ...props }: ToggleGroupItemProps) {
   const group = React.useContext(ToggleGroupContext);
   const resolvedSize = size ?? group.size ?? "default";

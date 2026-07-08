@@ -12,7 +12,7 @@ export default function ToggleGroupCustomColor() {
     <ToggleGroup
       aria-label="Text alignment"
       defaultValue={["center"]}
-      className="**:data-[slot=toggle]:data-pressed:bg-primary/10 **:data-[slot=toggle]:data-pressed:text-info-foreground **:data-[slot=toggle]:data-pressed:hover:bg-primary/15"
+      className="**:data-[slot=toggle]:data-pressed:bg-primary/10 **:data-[slot=toggle]:data-pressed:text-info-foreground"
     >
       <ToggleGroupItem value="left">Left</ToggleGroupItem>
       <ToggleGroupItem value="center">Center</ToggleGroupItem>

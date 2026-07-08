@@ -3954,12 +3954,12 @@ export const exampleRegistry = {
     {
       "title": "Basic",
       "importPath": "toggle-group-basic",
-      "source": "import {\n  ToggleGroup,\n  ToggleGroupItem,\n} from \"@/components/ui/cubby-ui/toggle-group\"\n\nexport default function ToggleGroupBasic() {\n  return (\n    <ToggleGroup aria-label=\"Text alignment\" defaultValue={[\"center\"]}>\n      <ToggleGroupItem value=\"left\">Left</ToggleGroupItem>\n      <ToggleGroupItem value=\"center\">Center</ToggleGroupItem>\n      <ToggleGroupItem value=\"right\">Right</ToggleGroupItem>\n    </ToggleGroup>\n  )\n}\n"
+      "source": "\"use client\"\n\nimport {\n  ToggleGroup,\n  ToggleGroupItem,\n} from \"@/components/ui/cubby-ui/toggle-group\"\n\nexport default function ToggleGroupBasic() {\n  return (\n    <ToggleGroup aria-label=\"Text alignment\" defaultValue={[\"center\"]}>\n      <ToggleGroupItem value=\"left\">Left</ToggleGroupItem>\n      <ToggleGroupItem value=\"center\">Center</ToggleGroupItem>\n      <ToggleGroupItem value=\"right\">Right</ToggleGroupItem>\n    </ToggleGroup>\n  )\n}\n"
     },
     {
       "title": "Custom Color",
       "importPath": "toggle-group-custom-color",
-      "source": "\"use client\"\n\nimport {\n  ToggleGroup,\n  ToggleGroupItem,\n} from \"@/components/ui/cubby-ui/toggle-group\"\n\n// The selected cell is neutral by default. Override it with any Tailwind classes —\n// here, an accent look using the brand-hue tint + accessible brand-hue ink.\nexport default function ToggleGroupCustomColor() {\n  return (\n    <ToggleGroup\n      aria-label=\"Text alignment\"\n      defaultValue={[\"center\"]}\n      className=\"**:data-[slot=toggle]:data-pressed:bg-primary/10 **:data-[slot=toggle]:data-pressed:text-info-foreground **:data-[slot=toggle]:data-pressed:hover:bg-primary/15\"\n    >\n      <ToggleGroupItem value=\"left\">Left</ToggleGroupItem>\n      <ToggleGroupItem value=\"center\">Center</ToggleGroupItem>\n      <ToggleGroupItem value=\"right\">Right</ToggleGroupItem>\n    </ToggleGroup>\n  )\n}\n"
+      "source": "\"use client\"\n\nimport {\n  ToggleGroup,\n  ToggleGroupItem,\n} from \"@/components/ui/cubby-ui/toggle-group\"\n\n// The selected cell is neutral by default. Override it with any Tailwind classes —\n// here, an accent look using the brand-hue tint + accessible brand-hue ink.\nexport default function ToggleGroupCustomColor() {\n  return (\n    <ToggleGroup\n      aria-label=\"Text alignment\"\n      defaultValue={[\"center\"]}\n      className=\"**:data-[slot=toggle]:data-pressed:bg-primary/10 **:data-[slot=toggle]:data-pressed:text-info-foreground\"\n    >\n      <ToggleGroupItem value=\"left\">Left</ToggleGroupItem>\n      <ToggleGroupItem value=\"center\">Center</ToggleGroupItem>\n      <ToggleGroupItem value=\"right\">Right</ToggleGroupItem>\n    </ToggleGroup>\n  )\n}\n"
     },
     {
       "title": "Detached",

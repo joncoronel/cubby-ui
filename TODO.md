@@ -35,7 +35,7 @@ After all the token shifts (surface aliasing, OKLCH conversion, surface-1 darken
 
 Several standalone-button hovers still use `bg-accent/50` / `bg-accent/80` rather than `bg-(--surface-hover)`. This is deliberate — `--surface-hover` at 6% is too subtle for a single button needing visible hover feedback. Affected:
 
-- Button (`outline`, `ghost`), Toggle, Select trigger, NumberField increment buttons, Collapsible trigger, Autocomplete trigger, Cropper toolbar buttons, Resizable handle hover, Calendar nav buttons, Checkbox-card and switch-card examples.
+- Button (`outline`, `ghost`), Toggle, Select trigger, NumberField increment buttons, Collapsible trigger, Autocomplete trigger, Resizable handle hover, Calendar nav buttons, Checkbox-card and switch-card examples.
 
 If we ever repurpose `--accent` as a true brand-tinted accent (instead of pure gray), these hover effects will automatically pick up the brand color.
 

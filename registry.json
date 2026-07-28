@@ -89,7 +89,6 @@
         "@cubby-ui/command",
         "@cubby-ui/context-menu",
         "@cubby-ui/copy-button",
-        "@cubby-ui/cropper",
         "@cubby-ui/data-table",
         "@cubby-ui/date-picker",
         "@cubby-ui/date-range-picker",
@@ -103,7 +102,6 @@
         "@cubby-ui/form",
         "@cubby-ui/input",
         "@cubby-ui/input-group",
-        "@cubby-ui/input-otp",
         "@cubby-ui/kbd",
         "@cubby-ui/label",
         "@cubby-ui/marching-border",
@@ -569,24 +567,6 @@
       ]
     },
     {
-      "name": "cropper",
-      "type": "registry:ui",
-      "title": "Cropper",
-      "description": "A cropper component.",
-      "files": [
-        {
-          "path": "registry/default/cropper/cropper.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/cubby-ui/cropper.tsx"
-        }
-      ],
-      "dependencies": [
-        "@origin-space/image-cropper",
-        "@hugeicons/react",
-        "@hugeicons/core-free-icons"
-      ]
-    },
-    {
       "name": "data-table",
       "type": "registry:ui",
       "title": "Data Table",
@@ -936,24 +916,6 @@
       ],
       "dependencies": [
         "class-variance-authority"
-      ]
-    },
-    {
-      "name": "input-otp",
-      "type": "registry:ui",
-      "title": "Input-otp",
-      "description": "A input-otp component.",
-      "files": [
-        {
-          "path": "registry/default/input-otp/input-otp.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/cubby-ui/input-otp.tsx"
-        }
-      ],
-      "dependencies": [
-        "input-otp",
-        "@hugeicons/react",
-        "@hugeicons/core-free-icons"
       ]
     },
     {

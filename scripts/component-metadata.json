@@ -184,14 +184,6 @@
     "dependencies": [],
     "reference": []
   },
-  "cropper": {
-    "title": "Cropper",
-    "description": "A cropper component.",
-    "dependencies": [
-      "@origin-space/image-cropper"
-    ],
-    "reference": []
-  },
   "data-table": {
     "title": "Data Table",
     "description": "A data-table component.",
@@ -289,15 +281,6 @@
     "title": "Input Group",
     "description": "A input-group component.",
     "dependencies": [],
-    "reference": []
-  },
-  "input-otp": {
-    "title": "Input-otp",
-    "description": "A input-otp component.",
-    "dependencies": [
-      "input-otp",
-      "lucide-react"
-    ],
     "reference": []
   },
   "kbd": {

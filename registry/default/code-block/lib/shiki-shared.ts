@@ -25,6 +25,12 @@ const highlighter = createHighlighterCore({
 // Track loaded languages to avoid redundant imports
 const loadedLanguages = new Set<string>();
 
+// Shiki's built-in no-op grammars. These need no on-demand `shiki/langs/*`
+// import (there is no module for them) — `codeToHast` handles them directly.
+// Used for fenced blocks with no language (file trees, plain output) so they
+// still render in a real <pre> rather than collapsing into inline code.
+const PLAINTEXT_LANGS = new Set(["text", "txt", "plaintext", "plain", "ansi"]);
+
 const BASE_TRANSFORMERS: ShikiTransformer[] = [
   {
     name: "remove-background",
@@ -61,8 +67,9 @@ async function highlightWithLang(
   // Await the global highlighter promise (per Shiki Next.js docs)
   const instance = await highlighter;
 
-  // Load language dynamically if not already loaded (cached Set for performance)
-  if (!loadedLanguages.has(lang)) {
+  // Load language dynamically if not already loaded (cached Set for performance).
+  // Plaintext grammars are built in, so skip the import that would 404.
+  if (!PLAINTEXT_LANGS.has(lang) && !loadedLanguages.has(lang)) {
     // Dynamically import only the specific language module needed
     const langModule = await import(`shiki/langs/${lang}.mjs`);
     await instance.loadLanguage(langModule.default);

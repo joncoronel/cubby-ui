@@ -553,7 +553,10 @@ function CodeBlockCode({ className, render, ...props }: CodeBlockCodeProps) {
   const defaultProps = {
     "data-slot": "code-block-code",
     className: cn(
-      "block text-[.8125rem] leading-normal whitespace-pre w-fit min-w-full",
+      // font-mono on the wrapper plus the Shiki/fallback pre & code elements:
+      // the UA stylesheet sets `font-family: monospace` directly on pre/code,
+      // which beats inheritance, so Geist Mono must be applied to them too.
+      "block font-mono text-[.8125rem] leading-normal whitespace-pre w-fit min-w-full [&_pre]:font-mono [&_code]:font-mono",
       // Uniform padding: raw text (no `.line`) vs. Shiki `.line` spans.
       "[&:not(:has(.line))]:px-3 [&_.line]:!px-3 [&:not(:has(.line))]:pr-8 [&_.line]:!pr-8",
       // Full-width lines so bg highlights stretch edge-to-edge.

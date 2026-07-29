@@ -74,6 +74,27 @@ When content overflows in both directions, both scrollbars appear automatically 
 
 <ComponentPreview component="scroll-area" example="scroll-area-both-scrollbars" />
 
+### Fill Content Height
+
+The content wrapper is only as tall as its children, so a short flex column has no slack for `mt-auto` to work with and a pinned footer floats up under the nav. Set `contentHeight="fill"` to stretch the wrapper to at least the viewport height and give that footer somewhere to sit.
+
+<ComponentPreview component="scroll-area" example="scroll-area-fill-content" />
+
+Children of a filled wrapper claim the height with `flex-1`:
+
+```tsx
+<ScrollArea contentHeight="fill" className="h-56">
+  <div className="flex flex-1 flex-col">
+    <nav>{/* items */}</nav>
+    <div className="mt-auto">{/* pinned footer */}</div>
+  </div>
+</ScrollArea>
+```
+
+Use `flex-1` rather than `h-full`. A percentage height resolves against the wrapper's own height, which stays growable, so `h-full` collapses to nothing here.
+
+The wrapper only ever grows from the viewport height, never locks to it, so long content still scrolls normally and keeps its natural size. Leave `contentHeight` at `"auto"` for lists, menus, and dialog bodies, where nothing needs to be pushed to the bottom.
+
 ### Content Width
 
 `contentMinWidth` decides how wide the internal content wrapper may grow. It defaults to `"viewport"`, which keeps the wrapper at the visible width.
@@ -176,6 +197,18 @@ Container with styled scrollbars and optional fade effects. Wraps Base UI's `Scr
 
   Children that size themselves still scroll sideways under either value. Has no
   effect with `nativeScroll`, which renders no content wrapper.
+</ApiProp>
+
+<ApiProp name="contentHeight" fullType="'auto' | 'fill'" defaultValue="auto">
+  How tall the internal content wrapper may grow.
+
+  - `"auto"` - track the children, the usual case for lists and menus
+  - `"fill"` - stretch to at least the viewport height, so a flex child can push
+    a footer to the bottom with `mt-auto`
+
+  Under `"fill"` the wrapper becomes a flex column, so children claim the height
+  with `flex-1` rather than `h-full`. Long content still grows and scrolls
+  normally. Has no effect with `nativeScroll`, which renders no content wrapper.
 </ApiProp>
 
 </ApiPropsList>

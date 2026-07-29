@@ -351,6 +351,7 @@ import resizable_resizable_three_panels from "@/registry/examples/resizable/resi
 import resizable_resizable_vertical from "@/registry/examples/resizable/resizable-vertical";
 import resizable_resizable_with_handle from "@/registry/examples/resizable/resizable-with-handle";
 import scroll_area_scroll_area_both_scrollbars from "@/registry/examples/scroll-area/scroll-area-both-scrollbars";
+import scroll_area_scroll_area_fill_content from "@/registry/examples/scroll-area/scroll-area-fill-content";
 import scroll_area_scroll_area_horizontal_scroll from "@/registry/examples/scroll-area/scroll-area-horizontal-scroll";
 import scroll_area_scroll_area_native_fade from "@/registry/examples/scroll-area/scroll-area-native-fade";
 import scroll_area_scroll_area_persist_scrollbar from "@/registry/examples/scroll-area/scroll-area-persist-scrollbar";
@@ -3359,6 +3360,11 @@ export const exampleRegistry = {
       "source": "import { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\n\nexport default function ScrollAreaBothScrollbars() {\n  return (\n    <div className=\"bg-muted/30 h-72 w-72 overflow-clip rounded-md border\">\n      <ScrollArea>\n        <div className=\"grid w-max grid-cols-[repeat(8,5rem)] grid-rows-[repeat(8,5rem)] gap-2 p-3\">\n          {Array.from({ length: 64 }, (_, i) => (\n            <div\n              key={i}\n              className=\"bg-muted text-muted-foreground flex items-center justify-center rounded-md text-sm font-medium\"\n            >\n              {i + 1}\n            </div>\n          ))}\n        </div>\n      </ScrollArea>\n    </div>\n  );\n}\n"
     },
     {
+      "title": "Fill Content",
+      "importPath": "scroll-area-fill-content",
+      "source": "import { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\n\nconst items = [\"Overview\", \"Activity\", \"Members\", \"Settings\"];\n\nfunction Nav({ count }: { count: number }) {\n  return (\n    <nav className=\"space-y-1\">\n      {Array.from({ length: count }).map((_, i) => (\n        <div\n          key={i}\n          className=\"hover:bg-muted/50 rounded-md px-2 py-1.5 text-sm\"\n        >\n          {items[i % items.length]} {Math.floor(i / items.length) + 1}\n        </div>\n      ))}\n    </nav>\n  );\n}\n\nfunction Footer() {\n  return (\n    <div className=\"border-border mt-auto border-t pt-3\">\n      <div className=\"flex items-center gap-2 px-2\">\n        <div className=\"bg-primary/20 size-6 rounded-full\" />\n        <span className=\"text-muted-foreground text-xs\">Signed in</span>\n      </div>\n    </div>\n  );\n}\n\nexport default function ScrollAreaFillContent() {\n  return (\n    <div className=\"flex flex-wrap justify-center gap-4\">\n      <div className=\"space-y-2\">\n        <p className=\"text-muted-foreground text-xs\">auto</p>\n        <ScrollArea className=\"h-56 w-52 rounded-md border\">\n          <div className=\"flex flex-col p-2\">\n            <Nav count={3} />\n            <Footer />\n          </div>\n        </ScrollArea>\n      </div>\n      <div className=\"space-y-2\">\n        <p className=\"text-muted-foreground text-xs\">fill</p>\n        <ScrollArea\n          contentHeight=\"fill\"\n          className=\"h-56 w-52 rounded-md border\"\n        >\n          <div className=\"flex flex-1 flex-col p-2\">\n            <Nav count={3} />\n            <Footer />\n          </div>\n        </ScrollArea>\n      </div>\n      <div className=\"space-y-2\">\n        <p className=\"text-muted-foreground text-xs\">fill, overflowing</p>\n        <ScrollArea\n          contentHeight=\"fill\"\n          className=\"h-56 w-52 rounded-md border\"\n        >\n          <div className=\"flex flex-1 flex-col p-2\">\n            <Nav count={14} />\n            <Footer />\n          </div>\n        </ScrollArea>\n      </div>\n    </div>\n  );\n}\n"
+    },
+    {
       "title": "Horizontal Scroll",
       "importPath": "scroll-area-horizontal-scroll",
       "source": "import { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\n\nexport default function ScrollAreaHorizontalScroll() {\n  return (\n    <ScrollArea className=\"w-96 max-w-full whitespace-nowrap rounded-md border\">\n      <div className=\"flex w-max space-x-4 p-4\">\n        {Array.from({ length: 20 }).map((_, i) => (\n          <div\n            key={i}\n            className=\"flex h-20 w-32 items-center justify-center rounded-md bg-secondary\"\n          >\n            Item {i + 1}\n          </div>\n        ))}\n      </div>\n    </ScrollArea>\n  );\n}"
@@ -4360,6 +4366,7 @@ export const componentMap = {
   "resizable-vertical": resizable_resizable_vertical,
   "resizable-with-handle": resizable_resizable_with_handle,
   "scroll-area-both-scrollbars": scroll_area_scroll_area_both_scrollbars,
+  "scroll-area-fill-content": scroll_area_scroll_area_fill_content,
   "scroll-area-horizontal-scroll": scroll_area_scroll_area_horizontal_scroll,
   "scroll-area-native-fade": scroll_area_scroll_area_native_fade,
   "scroll-area-persist-scrollbar": scroll_area_scroll_area_persist_scrollbar,

@@ -4,7 +4,7 @@ export default function ScrollAreaBothScrollbars() {
   return (
     <div className="bg-muted/30 h-72 w-72 overflow-clip rounded-md border">
       <ScrollArea>
-        <div className="grid grid-cols-[repeat(8,5rem)] grid-rows-[repeat(8,5rem)] gap-2 p-3">
+        <div className="grid w-max grid-cols-[repeat(8,5rem)] grid-rows-[repeat(8,5rem)] gap-2 p-3">
           {Array.from({ length: 64 }, (_, i) => (
             <div
               key={i}

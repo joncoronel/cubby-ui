@@ -74,6 +74,38 @@ When content overflows in both directions, both scrollbars appear automatically 
 
 <ComponentPreview component="scroll-area" example="scroll-area-both-scrollbars" />
 
+### Content Width
+
+`contentMinWidth` decides how wide the internal content wrapper may grow. It defaults to `"viewport"`, which keeps the wrapper at the visible width.
+
+The alternative, `"fit-content"`, is Base UI's own default and lets the wrapper grow to its widest child. That sounds harmless but it switches on intrinsic sizing, and anything in the subtree that physically cannot shrink reports its full width upward. A `whitespace-pre` code block is the usual culprit. Nesting it in its own scroll area does not help, because a scroll container still passes its content's width up to whatever is measuring it.
+
+The result is a panel meant to scroll vertically that quietly grows a horizontal scrollbar, with the nested scroller stretched wide enough that it never overflows and so never scrolls on its own:
+
+```tsx
+<SheetBody>
+  <CodeBlock code={longUnwrappedLine} />
+</SheetBody>
+```
+
+Under `"viewport"` the wrapper stays put and the code block scrolls inside its own box, which is what you want.
+
+Sideways scrolling still works under `"viewport"`. Children that overflow keep extending the scroll range, so anything sizing itself with `w-max`, a fixed grid template, or a table's own width behaves exactly as it did before:
+
+```tsx
+<ScrollArea className="w-96">
+  <div className="flex w-max gap-4">{/* scrolls sideways */}</div>
+</ScrollArea>
+```
+
+What `"viewport"` gives up is the wrapper stretching across the whole scroll range. Padding on a child lands at the fold instead of the far end, so a horizontally scrolling child with its own padding loses that breathing room at the end of the scroll. Give the child an explicit width to get it back, or switch to `"fit-content"`:
+
+```tsx
+<ScrollArea contentMinWidth="fit-content">
+  <div className="p-3">{/* padding survives at the scroll end */}</div>
+</ScrollArea>
+```
+
 ## API Reference
 
 The ScrollArea component is built on top of [Base UI's ScrollArea](https://base-ui.com/react/components/scroll-area). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
@@ -133,6 +165,17 @@ Container with styled scrollbars and optional fade effects. Wraps Base UI's `Scr
   - `"auto"` - default browser behavior, scroll chains to parent containers
   - `"contain"` - prevents scroll chaining to parent containers
   - `"none"` - prevents scroll chaining and disables bounce/rubber-band effects
+</ApiProp>
+
+<ApiProp name="contentMinWidth" fullType="'viewport' | 'fit-content'" defaultValue="viewport">
+  How wide the internal content wrapper may grow.
+
+  - `"viewport"` - hold the wrapper at the visible width, so content that cannot
+    wrap does not give a vertical panel a horizontal scrollbar
+  - `"fit-content"` - Base UI's default, growing the wrapper to its widest child
+
+  Children that size themselves still scroll sideways under either value. Has no
+  effect with `nativeScroll`, which renders no content wrapper.
 </ApiProp>
 
 </ApiPropsList>

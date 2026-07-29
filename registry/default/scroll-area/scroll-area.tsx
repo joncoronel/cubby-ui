@@ -41,6 +41,8 @@ function parseFadeEdges(fadeEdges: FadeEdges): {
 
 type OverscrollBehavior = "auto" | "contain" | "none";
 
+type ContentMinWidth = "viewport" | "fit-content";
+
 type ScrollAreaProps = BaseScrollArea.Root.Props & {
   fadeEdges?: FadeEdges;
   scrollbarGutter?: boolean;
@@ -48,6 +50,12 @@ type ScrollAreaProps = BaseScrollArea.Root.Props & {
   hideScrollbar?: boolean;
   nativeScroll?: boolean;
   overscrollBehavior?: OverscrollBehavior;
+  /**
+   * How wide the content wrapper is allowed to get. `"viewport"` keeps it at
+   * the visible width; `"fit-content"` restores Base UI's default of growing
+   * to the widest child. See the note on the `Content` element below.
+   */
+  contentMinWidth?: ContentMinWidth;
   /** Ref callback for the scrollable viewport element. Useful for virtualization. */
   viewportRef?: (element: HTMLDivElement | null) => void;
   /** Additional className for the viewport element */
@@ -63,6 +71,7 @@ function ScrollArea({
   hideScrollbar = false,
   nativeScroll = false,
   overscrollBehavior = "contain",
+  contentMinWidth = "viewport",
   viewportRef,
   viewportClassName,
   ...props
@@ -130,7 +139,29 @@ function ScrollArea({
           viewportClassName,
         )}
       >
-        <BaseScrollArea.Content data-slot="scroll-area-content">
+        <BaseScrollArea.Content
+          data-slot="scroll-area-content"
+          // Base UI ships `min-width: fit-content` here. That turns on an
+          // intrinsic sizing pass, and anything un-shrinkable in the subtree
+          // (a `whitespace-pre` code block, a fixed-width table) reports its
+          // full width upward — even from inside a nested scroll container,
+          // which does not insulate its parent. The wrapper then outgrows the
+          // viewport, so a vertical panel sprouts a horizontal scrollbar and
+          // the nested scroller, stretched to that width, never reaches its
+          // own overflow and never scrolls itself.
+          //
+          // `"viewport"` skips that pass entirely: width stays `auto`, which
+          // is how this component behaved before the Content wrapper existed.
+          // Overflowing children still extend the scroll range, so sideways
+          // scrolling is intact wherever the child sizes itself. What it gives
+          // up is the wrapper spanning the scroll range, so trailing padding
+          // on a child lands at the fold rather than the far end. Opt back in
+          // with `"fit-content"` if you need that.
+          //
+          // Written through `style` because Base UI's own value is inline; a
+          // class would have to fight it with `!important`.
+          style={contentMinWidth === "viewport" ? { minWidth: 0 } : undefined}
+        >
           {children}
         </BaseScrollArea.Content>
       </BaseScrollArea.Viewport>
@@ -272,4 +303,10 @@ function NativeScrollArea({
 }
 
 export { ScrollArea };
-export type { ScrollAreaProps, FadeEdges, FadeEdge, OverscrollBehavior };
+export type {
+  ScrollAreaProps,
+  FadeEdges,
+  FadeEdge,
+  OverscrollBehavior,
+  ContentMinWidth,
+};

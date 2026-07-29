@@ -3356,7 +3356,7 @@ export const exampleRegistry = {
     {
       "title": "Both Scrollbars",
       "importPath": "scroll-area-both-scrollbars",
-      "source": "import { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\n\nexport default function ScrollAreaBothScrollbars() {\n  return (\n    <div className=\"bg-muted/30 h-72 w-72 overflow-clip rounded-md border\">\n      <ScrollArea>\n        <div className=\"grid grid-cols-[repeat(8,5rem)] grid-rows-[repeat(8,5rem)] gap-2 p-3\">\n          {Array.from({ length: 64 }, (_, i) => (\n            <div\n              key={i}\n              className=\"bg-muted text-muted-foreground flex items-center justify-center rounded-md text-sm font-medium\"\n            >\n              {i + 1}\n            </div>\n          ))}\n        </div>\n      </ScrollArea>\n    </div>\n  );\n}\n"
+      "source": "import { ScrollArea } from \"@/components/ui/cubby-ui/scroll-area\";\n\nexport default function ScrollAreaBothScrollbars() {\n  return (\n    <div className=\"bg-muted/30 h-72 w-72 overflow-clip rounded-md border\">\n      <ScrollArea>\n        <div className=\"grid w-max grid-cols-[repeat(8,5rem)] grid-rows-[repeat(8,5rem)] gap-2 p-3\">\n          {Array.from({ length: 64 }, (_, i) => (\n            <div\n              key={i}\n              className=\"bg-muted text-muted-foreground flex items-center justify-center rounded-md text-sm font-medium\"\n            >\n              {i + 1}\n            </div>\n          ))}\n        </div>\n      </ScrollArea>\n    </div>\n  );\n}\n"
     },
     {
       "title": "Horizontal Scroll",

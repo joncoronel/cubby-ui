@@ -204,7 +204,10 @@ function SheetContent({
             // line at the viewport boundary.
             variant === "floating"
               ? elevatedSurface(level, shadowLevel)
-              : flushSurface(level, INNER_EDGE_FROM_ATTACH_SIDE[side ?? "right"]),
+              : flushSurface(
+                  level,
+                  INNER_EDGE_FROM_ATTACH_SIDE[side ?? "right"],
+                ),
             sheetContentVariants({ variant, side }),
             !isModal && "pointer-events-auto",
             className,

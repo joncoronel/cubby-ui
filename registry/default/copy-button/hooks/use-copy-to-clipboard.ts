@@ -45,12 +45,13 @@ export function useCopyToClipboard({
   }, [isCopied, timeout]);
 
   const copyToClipboard = useCallback(
-    async (text: string) => {
+    async (text: string): Promise<boolean> => {
       const success = await writeToClipboard(text);
       if (success) {
         setIsCopied(true);
         onCopied?.(text);
       }
+      return success;
     },
     [onCopied],
   );

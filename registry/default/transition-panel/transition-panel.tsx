@@ -154,7 +154,40 @@ function TransitionPanel({
   children,
   ...props
 }: TransitionPanelProps) {
-  const { outerRef, innerRef } = useAnimatedHeight();
+  // Swap height animation state. Declared up here (ahead of the narrative
+  // order) because `handleContentResize` below has to exist before
+  // `useAnimatedHeight` is called, to be passed in as its resize callback.
+  const heightState = React.useRef<HeightAnimationState>({
+    animation: null,
+    target: null,
+  });
+
+  // Retarget a swap animation whose destination moved. The observer fires on
+  // every content resize; while a swap animation is in flight, one means the
+  // height we're heading toward is already stale (an image decoded, async data
+  // landed, a nested collapsible opened). Restart from the mid-flight height
+  // toward the new one — the same retarget a CSS transition on `height` would
+  // have done — instead of finishing at the old target and snapping.
+  //
+  // Outside a swap there's no running animation, so this no-ops and the
+  // observer's instant write stands. That's the whole point of the gate:
+  // content animating its own height still drives a single tween the panel
+  // tracks frame-for-frame, with no competing tween of ours.
+  const handleContentResize = React.useCallback(
+    (height: number, outer: HTMLElement) => {
+      const state = heightState.current;
+      if (state.animation?.playState !== "running") return;
+      // The swap's own settle lands here too (the observer fires right after
+      // the layout effect starts the animation); only a moved target retargets.
+      // Rounded/tolerant because the observer reports a fractional border-box
+      // size while the target came from integer `offsetHeight`.
+      if (state.target !== null && Math.abs(state.target - height) < 1) return;
+      animateHeight(outer, Math.round(height), state);
+    },
+    [],
+  );
+
+  const { outerRef, innerRef } = useAnimatedHeight(handleContentResize);
 
   // Shadow useAnimatedHeight's inner callback ref with a RefObject we can read
   // in `registerView` (for the DOM-order rebuild), still forwarding the node on.
@@ -214,69 +247,36 @@ function TransitionPanel({
   // read after the `if` reflect the committed state.
   const [previousKey, setPreviousKey] = React.useState(activeKey);
   const [renderedKey, setRenderedKey] = React.useState(activeKey);
-
-  // Gate the height transition to swaps only. The observer fires on *any*
-  // content size change, and animating height here would fight a tween the
-  // content is already running. Outside a swap, height writes apply instantly
-  // so the panel tracks self-animating content frame-for-frame. Set on swap,
-  // cleared by the root's own height `transitionend` (see `onTransitionEnd`) so
-  // it honors any `--tp-duration` override. A same-height swap (or reduced
-  // motion) fires no `transitionend`, so the timeout fallback below bounds the
-  // flag instead of leaving it set until the next height change.
-  const [isSwapping, setIsSwapping] = React.useState(false);
   if (activeKey !== renderedKey) {
     setPreviousKey(renderedKey);
     setRenderedKey(activeKey);
-    setIsSwapping(true);
   }
 
-  // Fallback clear for swaps that never produce a height `transitionend`:
-  // same-height swaps (no height change → no transition) and reduced motion
-  // (`transition-none`). Armed on swap (keyed on `renderedKey` so rapid swaps
-  // restart it) and disarmed the moment a real height transition is created
-  // (`onTransitionRun` below), so it can never fire mid-flight and snap one —
-  // even under main-thread jank or a class-level duration override. An aborted
-  // transition re-arms it via `onTransitionCancel`, so the flag stays bounded
-  // on every path.
-  const swapFallbackTimer = React.useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
-
-  const disarmSwapFallback = React.useCallback(() => {
-    if (swapFallbackTimer.current !== null) {
-      clearTimeout(swapFallbackTimer.current);
-      swapFallbackTimer.current = null;
+  // Height animation, swaps only. The observer (useAnimatedHeight) tracks
+  // content size with INSTANT writes — animating those would fight a tween the
+  // content is already running — so the swap's height change animates here
+  // instead: a one-shot WAAPI animation started at swap commit. Old and new
+  // heights are measured synchronously in the layout effect, so a same-height
+  // swap (or reduced motion) simply never starts one — no transition classes,
+  // no `transitionend` bookkeeping, no fallback timers. The observer's instant
+  // style write lands underneath the running animation (WAAPI overrides it)
+  // and is already correct when the animation finishes; if the incoming view
+  // resizes mid-flight, `handleContentResize` retargets so it stays that way.
+  // An interrupted swap cancels the old animation and retargets from the
+  // mid-flight height (offsetHeight reflects the animated value).
+  const hasSwappedRef = React.useRef(false);
+  React.useLayoutEffect(() => {
+    // First run is mount, not a swap — nothing to animate.
+    if (!hasSwappedRef.current) {
+      hasSwappedRef.current = true;
+      return;
     }
-  }, []);
-
-  const armSwapFallback = React.useCallback(() => {
-    disarmSwapFallback();
-    const el = outerRef.current;
-    // Resolved `transition-duration` (not the `--tp-duration` var) so class
-    // overrides are honored too. "0.24s" / "240ms", comma-separated if multiple
-    // properties transition — take the longest.
-    const raw = el ? getComputedStyle(el).transitionDuration : "";
-    const parsed = raw
-      ? Math.max(
-          ...raw.split(",").map((part) => {
-            const trimmed = part.trim();
-            return parseFloat(trimmed) * (trimmed.endsWith("ms") ? 1 : 1000);
-          }),
-        )
-      : NaN;
-    const ms = Number.isFinite(parsed) ? parsed : 240;
-    swapFallbackTimer.current = setTimeout(() => {
-      swapFallbackTimer.current = null;
-      setIsSwapping(false);
-    }, ms + 80);
+    const outer = outerRef.current;
+    const inner = innerDivRef.current;
+    if (!outer || !inner) return;
+    animateHeight(outer, inner.offsetHeight, heightState.current);
     // `outerRef` is a stable RefObject; listed to satisfy exhaustive-deps.
-  }, [disarmSwapFallback, outerRef]);
-
-  React.useEffect(() => {
-    if (!isSwapping) return;
-    armSwapFallback();
-    return disarmSwapFallback;
-  }, [isSwapping, renderedKey, armSwapFallback, disarmSwapFallback]);
+  }, [renderedKey, outerRef]);
 
   // Direction from registry order (not React.Children, so views can be wrapped
   // / conditional / Suspense-gated). On first render `orderedKeys` is empty and
@@ -362,39 +362,10 @@ function TransitionPanel({
       ? "right"
       : "left";
 
-  // The root's own height transition — `target === currentTarget` ignores
-  // transitions bubbling up from views.
-  const isRootHeightTransition = (
-    event: React.TransitionEvent<HTMLDivElement>,
-  ) => event.target === event.currentTarget && event.propertyName === "height";
-
   const defaultProps = {
     "data-slot": "transition-panel",
     "data-transition": transition,
     "data-activation-direction": activationDirection,
-    // `transitionrun` fires at creation (before any delay): a real height
-    // transition exists, so its end/cancel events own the swap flag — the
-    // fallback timer must not race it.
-    onTransitionRun: (event: React.TransitionEvent<HTMLDivElement>) => {
-      if (isRootHeightTransition(event)) {
-        disarmSwapFallback();
-      }
-    },
-    // Died without `transitionend` (interrupted swap, display change). If a
-    // replacement transition spins up, its `transitionrun` disarms again;
-    // otherwise the timer clears the flag.
-    onTransitionCancel: (event: React.TransitionEvent<HTMLDivElement>) => {
-      if (isRootHeightTransition(event)) {
-        armSwapFallback();
-      }
-    },
-    // Clear the swap flag when the root's own height transition finishes.
-    onTransitionEnd: (event: React.TransitionEvent<HTMLDivElement>) => {
-      if (isRootHeightTransition(event)) {
-        disarmSwapFallback();
-        setIsSwapping(false);
-      }
-    },
     // Defaults for the inherited CSS vars. Consumer `style` spreads after, so
     // any override wins. `--tp-fade-duration` falls back to the observer-written
     // `--fade-duration` (adaptive crossfade) until overridden to a fixed value;
@@ -417,9 +388,8 @@ function TransitionPanel({
       // layout work here. Side effect: it becomes a containing block for
       // fixed/absolute descendants (flag if you position one inside).
       "overflow-clip contain-layout [overflow-clip-margin:var(--tp-clip-margin)]",
-      // Only animate height while swapping (see `isSwapping` above).
-      isSwapping &&
-        "transition-[height] duration-(--tp-duration) ease-(--tp-ease)",
+      // Swap height changes animate via the WAAPI one-shot above, not a
+      // transition class — so untouched height writes stay instant.
       "motion-reduce:transition-none",
       className,
     ),
@@ -436,15 +406,63 @@ function TransitionPanel({
     defaultTagName: "div",
     render,
     ref: outerRef,
-    // Transition handlers close over the fallback-timer ref (via arm/disarm).
-    // mergeProps never invokes them or reads `.current` — the React Compiler
-    // false-positive is safe (same pattern as CircularSliderRoot).
-    // eslint-disable-next-line react-hooks/refs
     props: mergeProps<"div">(defaultProps, props),
   });
 }
 
 TransitionPanel.displayName = "TransitionPanel";
+
+type HeightAnimationState = {
+  animation: Animation | null;
+  /** Height the running animation is heading toward, for staleness checks. */
+  target: number | null;
+};
+
+/**
+ * Start (or restart) the root's one-shot height animation, reading duration and
+ * easing from `--tp-duration` / `--tp-ease` at call time so overrides apply.
+ * No-ops when the height isn't actually changing or under reduced motion, which
+ * is what keeps a same-height swap from needing any cleanup. `from` is read
+ * before cancelling any in-flight animation, so an interrupted or retargeted
+ * swap continues from the mid-flight height rather than snapping back.
+ */
+function animateHeight(
+  outer: HTMLElement,
+  to: number,
+  state: HeightAnimationState,
+): void {
+  const from = outer.offsetHeight;
+  if (from === to) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const styles = getComputedStyle(outer);
+  const duration =
+    parseCssTime(styles.getPropertyValue("--tp-duration")) ?? 240;
+  const easing =
+    styles.getPropertyValue("--tp-ease").trim() ||
+    "cubic-bezier(0.32, 0.72, 0, 1)";
+  state.animation?.cancel();
+  state.target = to;
+  state.animation = outer.animate(
+    { height: [`${from}px`, `${to}px`] },
+    { duration, easing },
+  );
+}
+
+/**
+ * Parse a CSS time ("240ms" / "0.24s") to milliseconds. A unitless value is
+ * invalid CSS for a time, but if a consumer writes one anyway, reading it as
+ * milliseconds (240 → 240ms) fails far less spectacularly than as seconds
+ * (240 → 4 minutes).
+ */
+function parseCssTime(value: string): number | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const parsed = parseFloat(trimmed);
+  if (!Number.isFinite(parsed)) return null;
+  if (trimmed.endsWith("ms")) return parsed;
+  if (trimmed.endsWith("s")) return parsed * 1000;
+  return parsed;
+}
 
 function TransitionPanelView({
   viewKey,
@@ -561,7 +579,9 @@ function TransitionPanelView({
       // crossfade survives). Chrome resolves it fine. Setting `translate` directly
       // bypasses the registered var. Fade's `scale-*` is a literal, so it's safe.
       mounted &&
-        (isFade ? "starting:scale-[0.96]" : "starting:[translate:var(--tp-enter)_0]"),
+        (isFade
+          ? "starting:scale-[0.96]"
+          : "starting:[translate:var(--tp-enter)_0]"),
       isActive
         ? isFade
           ? "scale-100 opacity-100"

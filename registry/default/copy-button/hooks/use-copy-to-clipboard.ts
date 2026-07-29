@@ -26,37 +26,47 @@ async function writeToClipboard(text: string): Promise<boolean> {
 }
 
 export interface UseCopyToClipboardOptions {
-  /** ms before `isCopied` auto-resets. Pass `null` to disable (e.g. when another mechanism owns the lifecycle). */
+  /** ms before `isCopied`/`isError` auto-resets. Pass `null` to disable (e.g. when another mechanism owns the lifecycle). */
   timeout?: number | null;
   onCopied?: (text: string) => void;
+  onCopyError?: (text: string) => void;
 }
 
 export function useCopyToClipboard({
   timeout = 2000,
   onCopied,
+  onCopyError,
 }: UseCopyToClipboardOptions = {}) {
-  const [isCopied, setIsCopied] = useState(false);
+  const [status, setStatus] = useState<"idle" | "copied" | "error">("idle");
 
   useEffect(() => {
-    if (isCopied && timeout != null) {
-      const timer = setTimeout(() => setIsCopied(false), timeout);
+    if (status !== "idle" && timeout != null) {
+      const timer = setTimeout(() => setStatus("idle"), timeout);
       return () => clearTimeout(timer);
     }
-  }, [isCopied, timeout]);
+  }, [status, timeout]);
 
   const copyToClipboard = useCallback(
     async (text: string): Promise<boolean> => {
       const success = await writeToClipboard(text);
       if (success) {
-        setIsCopied(true);
+        setStatus("copied");
         onCopied?.(text);
+      } else {
+        setStatus("error");
+        onCopyError?.(text);
       }
       return success;
     },
-    [onCopied],
+    [onCopied, onCopyError],
   );
 
-  const reset = useCallback(() => setIsCopied(false), []);
+  const reset = useCallback(() => setStatus("idle"), []);
 
-  return { isCopied, copyToClipboard, reset };
+  return {
+    isCopied: status === "copied",
+    isError: status === "error",
+    copyToClipboard,
+    reset,
+  };
 }

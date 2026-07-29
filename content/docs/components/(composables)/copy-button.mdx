@@ -7,7 +7,7 @@ builtOn: ["button"]
 
 import { CopyButton } from "@/registry/default/copy-button/copy-button";
 
-The copy button copies a string to the clipboard and animates to a checkmark to confirm. Use it beside code snippets, API keys, share links, or any value a user needs to grab.
+The copy button copies a string to the clipboard and animates to a checkmark to confirm. If the copy fails (for example, when clipboard permissions are blocked), it shows an error icon instead. Use it beside code snippets, API keys, share links, or any value a user needs to grab.
 
 For a full multi-line code sample with its own copy control, use [`CodeBlock`](/docs/components/code-block) instead.
 
@@ -41,7 +41,7 @@ Set `toast` to show an anchored toast above the button on a successful copy. Pas
 
 ## Accessibility
 
-The button is icon-only, so it ships with a built-in `aria-label` that switches from `"Copy to clipboard"` to `"Copied to clipboard"` when the copy succeeds. Do not pass children; if you need a different label, override `aria-label`.
+The button is icon-only, so it ships with a built-in `aria-label` that switches from `"Copy to clipboard"` to `"Copied to clipboard"` when the copy succeeds, or `"Copy failed"` when it does not. Do not pass children; if you need a different label, override `aria-label`.
 
 ## API Reference
 
@@ -74,16 +74,30 @@ Button that copies text to clipboard with visual feedback. Extends the Button co
   Check icon with green color.
 </ApiProp>
 
+<ApiProp name="errorIcon" fullType="React.ReactNode" simpleType="node">
+  Custom icon to display when the copy fails. Defaults to an X icon with red
+  color. The error state auto-resets after `timeout`, and the button stays
+  enabled so the user can retry.
+</ApiProp>
+
 <ApiProp name="toast" fullType="true | Omit<AnchoredToastOptions, 'anchor'>" simpleType="boolean | object">
   Show an anchored toast above the button on successful copy. Pass `true` to
   use the defaults (`"Copied to clipboard!"`, `side: "top"`, arrow, duration
   matches `timeout`), or an options object to override any anchored toast
-  option except `anchor` (which is always the button itself).
+  option except `anchor` (which is always the button itself). If the copy
+  fails, the toast reads `"Failed to copy to clipboard"` regardless of a
+  custom `description`.
 </ApiProp>
 
 <ApiProp name="onCopied" fullType="(text: string) => void" simpleType="function">
   Fires after a successful copy with the copied text. Runs independently of
   `toast`; use it for analytics or extra side effects.
+</ApiProp>
+
+<ApiProp name="onCopyError" fullType="(text: string) => void" simpleType="function">
+  Fires when the copy fails, with the text that could not be copied. When
+  `toast` is enabled, a "Failed to copy to clipboard" toast is shown
+  automatically; use this callback for logging or a custom fallback.
 </ApiProp>
 
 </ApiPropsList>

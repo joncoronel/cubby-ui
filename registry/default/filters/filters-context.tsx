@@ -62,7 +62,7 @@ const FiltersAutoOpenContext =
 
 /** The bar's fast-changing state (`filters`). Re-renders on every edit. */
 function useFiltersState(): FiltersStateContextValue {
-  const context = React.useContext(FiltersStateContext);
+  const context = React.use(FiltersStateContext);
   if (!context) {
     throw new Error("useFiltersState must be used within a FiltersProvider.");
   }
@@ -71,7 +71,7 @@ function useFiltersState(): FiltersStateContextValue {
 
 /** The bar's config and actions. Stable while a filter value is being edited. */
 function useFiltersActions(): FiltersActionsContextValue {
-  const context = React.useContext(FiltersActionsContext);
+  const context = React.use(FiltersActionsContext);
   if (!context) {
     throw new Error("useFiltersActions must be used within a FiltersProvider.");
   }
@@ -80,7 +80,7 @@ function useFiltersActions(): FiltersActionsContextValue {
 
 /** The auto-open signal for freshly added chips. */
 function useFiltersAutoOpen(): FiltersAutoOpenContextValue {
-  const context = React.useContext(FiltersAutoOpenContext);
+  const context = React.use(FiltersAutoOpenContext);
   if (!context) {
     throw new Error(
       "useFiltersAutoOpen must be used within a FiltersProvider.",
@@ -116,7 +116,7 @@ const FilterChipContext = React.createContext<FilterChipContextValue | null>(
 );
 
 function useFilterChip(): FilterChipContextValue {
-  const context = React.useContext(FilterChipContext);
+  const context = React.use(FilterChipContext);
   if (!context) {
     throw new Error("useFilterChip must be used within a FilterChip.");
   }

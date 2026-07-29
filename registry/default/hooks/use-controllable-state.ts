@@ -15,10 +15,9 @@ interface UseControllableStateParams<T> {
  * tuple, mirroring the pattern Radix and Base UI use internally.
  *
  * `onValueChange` fires synchronously in both modes. Functional updates are
- * safe in both modes: uncontrolled updates resolve against an eagerly-advanced
- * ref, so multiple `setValue` calls in one event tick compose; controlled
- * updates resolve against the last-committed value (the parent owns the
- * state). `setValue` is referentially stable across renders.
+ * safe in both modes: they resolve against an eagerly-advanced ref, so
+ * multiple `setValue` calls in one event tick compose. `setValue` is
+ * referentially stable across renders.
  */
 export function useControllableState<T>({
   value,
@@ -31,7 +30,7 @@ export function useControllableState<T>({
 
   const onChangeRef = React.useRef(onValueChange);
   // Mirrors `current`. Re-synced after every commit; eagerly advanced by
-  // uncontrolled updates so multiple setValue calls in one event tick compose.
+  // setValue so multiple calls in one event tick compose.
   const currentRef = React.useRef(current);
   React.useEffect(() => {
     onChangeRef.current = onValueChange;
@@ -45,8 +44,11 @@ export function useControllableState<T>({
         typeof next === "function" ? (next as (prev: T) => T)(prev) : next;
       if (Object.is(resolved, prev)) return;
       if (isControlled) {
-        // The parent owns the state; the ref re-syncs from the prop once the
-        // parent commits (or rejects) the change.
+        // The parent owns the state, but advance the ref eagerly so a second
+        // functional setValue in the same tick composes on this one instead of
+        // clobbering it. The ref re-syncs from the prop at the next commit,
+        // which also corrects it if the parent rejected the change.
+        currentRef.current = resolved;
         onChangeRef.current?.(resolved);
       } else {
         currentRef.current = resolved;

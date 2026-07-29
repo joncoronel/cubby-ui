@@ -79,23 +79,30 @@ export function asNumberRange(value: unknown): NumberRange {
   return { min: null, max: null };
 }
 
-function isFilterValue(item: unknown): item is FilterValue {
-  if (typeof item !== "object" || item === null) return false;
-  const candidate = item as Partial<Record<keyof FilterValue, unknown>>;
-  return (
-    typeof candidate.id === "string" &&
-    typeof candidate.field === "string" &&
-    typeof candidate.operator === "string"
-  );
-}
-
 /**
  * Coerces unknown JSON (e.g. a parsed URL param) into a `FilterValue` array,
  * dropping entries whose envelope (`id` / `field` / `operator`) is malformed.
  * `value` stays `unknown`; the per-field coercers above handle it downstream.
  */
 export function asFilterValues(value: unknown): FilterValue[] {
-  return Array.isArray(value) ? value.filter(isFilterValue) : [];
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter(
+      (item): item is Record<string, unknown> =>
+        typeof item === "object" && item !== null,
+    )
+    .filter(
+      (item) =>
+        typeof item.id === "string" &&
+        typeof item.field === "string" &&
+        typeof item.operator === "string",
+    )
+    .map((item) => ({
+      id: item.id as string,
+      field: item.field as string,
+      operator: item.operator as string,
+      value: item.value,
+    }));
 }
 
 /** Default English labels for the built-in operators. */

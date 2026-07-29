@@ -13,8 +13,9 @@ export interface UseAsyncComboboxOptions<T extends { id: string }> {
   debounceMs?: number;
 }
 
-export interface UseAsyncComboboxSingleOptions<T extends { id: string }>
-  extends UseAsyncComboboxOptions<T> {
+export interface UseAsyncComboboxSingleOptions<
+  T extends { id: string },
+> extends UseAsyncComboboxOptions<T> {
   /**
    * Whether multiple selection is enabled
    */
@@ -31,8 +32,9 @@ export interface UseAsyncComboboxSingleOptions<T extends { id: string }>
   onValueChange?: (value: T | null) => void;
 }
 
-export interface UseAsyncComboboxMultipleOptions<T extends { id: string }>
-  extends UseAsyncComboboxOptions<T> {
+export interface UseAsyncComboboxMultipleOptions<
+  T extends { id: string },
+> extends UseAsyncComboboxOptions<T> {
   /**
    * Whether multiple selection is enabled
    */
@@ -115,12 +117,15 @@ export function useAsyncCombobox<T extends { id: string }>(
 export function useAsyncCombobox<T extends { id: string }>(
   options: UseAsyncComboboxMultipleOptions<T>,
 ): UseAsyncComboboxReturn<T>;
+// `onValueChange` is accepted (it belongs on the options object alongside
+// `value` so callers configure selection in one place) but not destructured —
+// the caller passes it to <Combobox> directly; this hook only reads `value`
+// for the selected-items merge.
 export function useAsyncCombobox<T extends { id: string }>({
   searchFn,
   debounceMs = 0,
   multiple,
   value,
-  onValueChange,
 }:
   | UseAsyncComboboxSingleOptions<T>
   | UseAsyncComboboxMultipleOptions<T>): UseAsyncComboboxReturn<T> {

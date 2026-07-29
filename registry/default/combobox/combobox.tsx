@@ -43,8 +43,9 @@ function Combobox<Value, Multiple extends boolean | undefined = false>(
   props: BaseCombobox.Root.Props<Value, Multiple>,
 ): React.JSX.Element {
   const id = React.useId();
-  const [chipsElement, setChipsElement] =
-    React.useState<HTMLDivElement | null>(null);
+  const [chipsElement, setChipsElement] = React.useState<HTMLDivElement | null>(
+    null,
+  );
 
   const contextValue = React.useMemo(
     () => ({ id, chipsElement, setChipsElement }),
@@ -79,7 +80,7 @@ function ComboboxInput({
   /** Class applied to the inner `<input>`. `className` styles the field wrapper. */
   inputClassName?: string;
 }) {
-  const context = React.useContext(ComboboxContext);
+  const context = React.use(ComboboxContext);
   const id = idProp ?? context?.id;
 
   return (
@@ -94,12 +95,15 @@ function ComboboxInput({
         // Focus ring follows the input via focus-within (same pattern as ComboboxChips).
         "focus-within:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-within:outline-2 focus-within:outline-offset-2",
         // Disabled state (input or field-level) dims and locks the whole field.
-        "has-[input:disabled]:cursor-not-allowed has-[input:disabled]:pointer-events-none has-[input:disabled]:opacity-60",
+        "has-[input:disabled]:pointer-events-none has-[input:disabled]:cursor-not-allowed has-[input:disabled]:opacity-60",
         className,
       )}
     >
       {start != null && (
-        <div data-slot="combobox-input-start" className={comboboxAddonClassName}>
+        <div
+          data-slot="combobox-input-start"
+          className={comboboxAddonClassName}
+        >
           {start}
         </div>
       )}
@@ -133,7 +137,7 @@ function ComboboxChipInput({
   className,
   ...props
 }: BaseCombobox.Input.Props) {
-  const context = React.useContext(ComboboxContext);
+  const context = React.use(ComboboxContext);
   const id = idProp ?? context?.id;
 
   return (
@@ -240,7 +244,10 @@ function ComboboxPositioner({
     <BaseCombobox.Positioner
       data-slot="combobox-positioner"
       sideOffset={6}
-      className={cn("", className)}
+      // z-50 (matching Select's positioner) keeps the portaled popup above
+      // overlay surfaces it's opened from — e.g. the mobile Drawer, whose
+      // viewport is z-50. Without it the popup renders behind the drawer.
+      className={cn("z-50", className)}
       {...props}
     />
   );
@@ -507,7 +514,7 @@ function ComboboxChips({
   variant = "default",
   ...props
 }: BaseCombobox.Chips.Props & { variant?: "default" | "elevated" }) {
-  const context = React.useContext(ComboboxContext);
+  const context = React.use(ComboboxContext);
 
   return (
     <BaseCombobox.Chips
@@ -590,7 +597,7 @@ function ComboboxPopup({
   /** Shadow weight (1-8). Defaults to 3. */
   shadowLevel?: SurfaceLevel;
 }) {
-  const context = React.useContext(ComboboxContext);
+  const context = React.use(ComboboxContext);
 
   return (
     <ComboboxPortal>
@@ -630,7 +637,7 @@ function ComboboxLabel({
   className,
   ...props
 }: React.ComponentProps<typeof Label>) {
-  const context = React.useContext(ComboboxContext);
+  const context = React.use(ComboboxContext);
 
   return <Label htmlFor={context?.id} className={className} {...props} />;
 }

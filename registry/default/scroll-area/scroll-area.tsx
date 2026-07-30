@@ -70,6 +70,14 @@ type ScrollAreaProps = BaseScrollArea.Root.Props & {
   viewportRef?: (element: HTMLDivElement | null) => void;
   /** Additional className for the viewport element */
   viewportClassName?: string;
+  /**
+   * Additional className for the content wrapper element. Needed when a child
+   * relies on a percentage height against its parent (e.g. Base UI's Select
+   * list gets `max-height: 100%` with `alignItemWithTrigger`), which only
+   * resolves if the wrapper has a definite height like `h-full`. Ignored with
+   * `nativeScroll` (no content wrapper exists there).
+   */
+  contentClassName?: string;
 };
 
 function ScrollArea({
@@ -85,6 +93,7 @@ function ScrollArea({
   contentHeight = "auto",
   viewportRef,
   viewportClassName,
+  contentClassName,
   ...props
 }: ScrollAreaProps) {
   if (process.env.NODE_ENV !== "production") {
@@ -163,7 +172,10 @@ function ScrollArea({
           // content is long. The flex column here is what lets children claim
           // that height with `flex-1` (`h-full` resolves against an auto height
           // and does nothing).
-          className={cn(contentHeight === "fill" && "flex min-h-full flex-col")}
+          className={cn(
+            contentHeight === "fill" && "flex min-h-full flex-col",
+            contentClassName,
+          )}
           // Base UI ships `min-width: fit-content` here. That turns on an
           // intrinsic sizing pass, and anything un-shrinkable in the subtree
           // (a `whitespace-pre` code block, a fixed-width table) reports its

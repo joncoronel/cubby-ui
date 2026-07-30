@@ -203,6 +203,11 @@ function SelectContent({
             hideScrollbar={hideScrollbar}
             nativeScroll={nativeScroll}
             className={cn("max-h-80 in-data-[side=none]:max-h-full", className)}
+            // With alignItemWithTrigger (data-side="none") Base UI makes the
+            // List the scroller via an inline `max-height: 100%`, which only
+            // resolves against a definite parent height — pin the content
+            // wrapper to the viewport so the List clips and scrolls itself.
+            contentClassName="in-data-[side=none]:h-full"
           >
             <BaseSelect.List
               data-slot="select-list"

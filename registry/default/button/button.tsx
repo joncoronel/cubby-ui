@@ -197,15 +197,18 @@ function Button({
           ],
         )}
       />
+      {/* w-full + [justify-content:inherit] keep root-level justify overrides
+          (e.g. className="justify-between" on a full-width trigger) working:
+          the span fills the root and mirrors its justification. */}
       <span
         data-slot="button-content"
-        className="relative inline-flex items-center justify-center gap-[inherit]"
+        className="relative inline-flex w-full items-center [justify-content:inherit] gap-[inherit]"
       >
         {loading ? (
           <>
             {/* The real content stays laid out (invisible) so the button
                 keeps its size while loading. */}
-            <span className="inline-flex items-center justify-center gap-[inherit] opacity-0">
+            <span className="inline-flex w-full items-center [justify-content:inherit] gap-[inherit] opacity-0">
               {content}
             </span>
             <span className="absolute inset-0 flex items-center justify-center">

@@ -107,6 +107,11 @@ function ScrollArea({
         "ScrollArea: `persistScrollbar` is not supported with `nativeScroll`.",
       );
     }
+    if (nativeScroll && contentClassName) {
+      console.error(
+        "ScrollArea: `contentClassName` is ignored with `nativeScroll` (no content wrapper exists there).",
+      );
+    }
   }
 
   if (nativeScroll) {

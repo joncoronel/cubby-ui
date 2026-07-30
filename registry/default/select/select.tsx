@@ -82,8 +82,9 @@ const selectTriggerVariants = cva(
       },
       size: {
         default: "h-10 px-3 py-2 sm:h-9",
-        // px-2 matches the button's sm size so ghost triggers align optically
-        // with adjacent ghost buttons.
+        // Compact trigger. Note: tighter than the Button sm size (px-3), so
+        // ghost triggers in toolbars pair best with icon-size ghost buttons,
+        // which carry no horizontal padding.
         sm: "h-9 px-2 py-1.5 sm:h-8",
       },
     },

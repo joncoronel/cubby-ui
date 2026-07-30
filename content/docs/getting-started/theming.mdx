@@ -85,8 +85,15 @@ Copy and paste the following into your `globals.css` file:
   --secondary-hover: color-mix(in oklch, var(--secondary), black 5%);
   --outline-hover: color-mix(in oklch, var(--card), black 5%);
 
+  /* Pressed colors — one step past hover in the same direction */
+  --primary-active: color-mix(in oklch, var(--primary), black 8%);
+  --neutral-active: color-mix(in oklch, var(--neutral), white 14%);
+  --destructive-active: color-mix(in oklch, var(--destructive), black 8%);
+  --secondary-active: color-mix(in oklch, var(--secondary), black 8%);
+  --outline-active: color-mix(in oklch, var(--card), black 8%);
+
   /* Borders & form fields */
-  --border: oklch(0 0 0 / 10%);
+  --border: color-mix(in oklab, var(--foreground) 10%, transparent);
   --input: var(--surface-3);
   --input-elevated: oklch(0 0 0 / 8%);
   --ring: oklch(0.55 0.2 250);
@@ -131,8 +138,9 @@ Copy and paste the following into your `globals.css` file:
   --surface-8: oklch(1 0 0);
 
   /* State overlays */
-  --surface-hover: oklch(0 0 0 / 0.06);
-  --surface-selected: oklch(0 0 0 / 0.1);
+  --surface-hover: oklch(0 0 0 / 0.04);
+  --surface-active: oklch(0 0 0 / 0.06);
+  --surface-selected: oklch(0 0 0 / 0.08);
   --surface-rim-color: oklch(0 0 0 / 0);
 
   /* Light shadow recipe — opacity decreases with blur radius for
@@ -224,7 +232,17 @@ Copy and paste the following into your `globals.css` file:
   --secondary-hover: color-mix(in oklch, var(--secondary), white 5%);
   --outline-hover: color-mix(in oklch, var(--card), white 5%);
 
-  --border: oklch(1 0 0 / 10%);
+  /* Dark pressed colors — one step past hover. --destructive-active darkens
+     instead so white label text keeps WCAG AA contrast while pressed. */
+  --primary-active: color-mix(in oklch, var(--primary), white 14%);
+  --neutral-active: color-mix(in oklch, var(--neutral), black 14%);
+  --destructive-active: color-mix(in oklch, var(--destructive), black 8%);
+  --secondary-active: color-mix(in oklch, var(--secondary), white 8%);
+  --outline-active: color-mix(in oklch, var(--card), white 8%);
+
+  /* Re-declared so the mix resolves against dark's --foreground even when
+     .dark is scoped to a subtree */
+  --border: color-mix(in oklab, var(--foreground) 10%, transparent);
   --input-elevated: oklch(1 0 0 / 9%);
   --scrollbar: oklch(0.7 var(--neutral-chroma) var(--neutral-hue));
 
@@ -256,8 +274,9 @@ Copy and paste the following into your `globals.css` file:
   --surface-8: oklch(0.402 var(--neutral-chroma) var(--neutral-hue));
 
   /* State overlays flip to white-on-black */
-  --surface-hover: oklch(1 0 0 / 0.06);
-  --surface-selected: oklch(1 0 0 / 0.1);
+  --surface-hover: oklch(1 0 0 / 0.04);
+  --surface-active: oklch(1 0 0 / 0.06);
+  --surface-selected: oklch(1 0 0 / 0.08);
   --surface-rim-color: oklch(1 0 0 / 0.04);
 
   /* Dark-only tokens for the rim recipe */
@@ -485,6 +504,7 @@ Cubby UI ships with an 8-level surface elevation ladder used by Cards, Popovers,
 State overlays raise an underlying surface by a fixed perceptual delta:
 
 - `--surface-hover`: hover state overlay
+- `--surface-active`: pressed state overlay
 - `--surface-selected`: selected state overlay
 - `--surface-rim-color`: single-edge rim color (used by viewport-flush Sheet/Drawer)
 

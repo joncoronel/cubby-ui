@@ -19,7 +19,7 @@ export default function SelectGhost() {
   return (
     <div className="flex items-center gap-1">
       <Select items={fonts} defaultValue="geist">
-        <SelectTrigger variant="ghost" size="sm">
+        <SelectTrigger variant="ghost" size="sm" aria-label="Font">
           <SelectValue />
         </SelectTrigger>
         <SelectContent size="sm">

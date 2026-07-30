@@ -19,11 +19,11 @@ import { cn } from "@/lib/utils";
 // overriding the tokens (className="[--btn-bg:...]").
 const buttonBase = cn(
   "relative isolate inline-flex items-center cursor-pointer justify-center whitespace-nowrap rounded-lg font-medium data-disabled:pointer-events-none data-disabled:opacity-60 data-disabled:focus-visible:outline-ring [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,scale,opacity,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
-  // State machine: unset tokens fall through to transparent. Generated-CSS
-  // order is base < hover < active < data-popup-open (stamped by Base UI on
-  // triggers) — last on purpose, so an open trigger holds its hover paint
-  // even while pressed.
-  "[--btn-paint:var(--btn-bg,transparent)] hover:[--btn-paint:var(--btn-bg-hover,var(--btn-bg,transparent))] active:[--btn-paint:var(--btn-bg-active,var(--btn-bg-hover,var(--btn-bg,transparent)))] data-popup-open:[--btn-paint:var(--btn-bg-hover,var(--btn-bg,transparent))]",
+  // State machine: unset tokens fall through to transparent. The active rule
+  // excludes data-popup-open (stamped by Base UI on triggers) so an open
+  // trigger holds its hover paint even while pressed — encoded in the
+  // selector rather than relying on generated-CSS rule order.
+  "[--btn-paint:var(--btn-bg,transparent)] hover:[--btn-paint:var(--btn-bg-hover,var(--btn-bg,transparent))] active:not-data-popup-open:[--btn-paint:var(--btn-bg-active,var(--btn-bg-hover,var(--btn-bg,transparent)))] data-popup-open:[--btn-paint:var(--btn-bg-hover,var(--btn-bg,transparent))]",
 );
 
 // Shared by the background layer and the flat recipe: 1px border + fill from
@@ -71,13 +71,27 @@ const buttonSizeVariantClasses = {
   icon_lg: "size-11 sm:size-10 text-base [&_svg:not([class*='size-'])]:size-5",
 };
 
+// Sizes with no text slot. For these, children render bare (no text-box
+// wrapper) and leadingIcon/trailingIcon are ignored — a fixed square has no
+// room for an icon beside a label.
+const iconOnlySizes = new Set<keyof typeof buttonSizeVariantClasses>([
+  "icon",
+  "icon_xs",
+  "icon_sm",
+  "icon_lg",
+]);
+
 // Fills the root and mirrors its justification so root-level overrides like
 // justify-between keep working.
 const buttonContentLayout =
   "inline-flex w-full items-center [justify-content:inherit] gap-[inherit]";
 
 // Single-element recipe for styling plain elements as buttons (links,
-// calendar nav, ...): paints on the element itself, whole-element press scale.
+// calendar nav, ...): paints on the element itself, whole-element press
+// scale. The scale divergence from <Button> is deliberate: flat consumers
+// are elements that must keep their own semantics (anchors) or live inside
+// composite widgets (Toolbar's roving tabindex), where nesting <Button> is
+// riskier than the barely-perceptible label movement on these small controls.
 const buttonVariants = cva(
   cn(buttonBase, buttonPaint, "active:not-aria-[haspopup]:scale-[0.98]"),
   {
@@ -118,8 +132,10 @@ const buttonRootVariants = cva(buttonBase, {
   },
 });
 
+// Variant/size come from the root recipe the component actually evaluates
+// (minus its internal icon flags), so the two cvas can't silently drift.
 export type ButtonProps = BaseButton.Props &
-  VariantProps<typeof buttonVariants> & {
+  Omit<VariantProps<typeof buttonRootVariants>, "iconLeft" | "iconRight"> & {
     loading?: boolean;
     leadingIcon?: React.ReactNode;
     trailingIcon?: React.ReactNode;
@@ -132,22 +148,21 @@ function Button({
   loading,
   children,
   disabled,
+  focusableWhenDisabled,
   leadingIcon,
   trailingIcon,
   ...props
 }: ButtonProps) {
-  const isIconOnly = typeof size === "string" && size.startsWith("icon");
+  const isIconOnly = size != null && iconOnlySizes.has(size);
 
-  const content = (
+  const content = isIconOnly ? (
+    children
+  ) : (
     <>
       {leadingIcon}
-      {isIconOnly ? (
-        children
-      ) : (
-        // text-box trims ascent/descent whitespace for optical centering;
-        // unsupported browsers fall back to metrics centering.
-        <span className="[text-box:trim-both_cap_alphabetic]">{children}</span>
-      )}
+      {/* text-box trims ascent/descent whitespace for optical centering;
+          unsupported browsers fall back to metrics centering. */}
+      <span className="[text-box:trim-both_cap_alphabetic]">{children}</span>
       {trailingIcon}
     </>
   );
@@ -162,14 +177,15 @@ function Button({
         buttonRootVariants({
           variant,
           size,
-          iconLeft: !isIconOnly && !!leadingIcon,
-          iconRight: !isIconOnly && !!trailingIcon,
+          iconLeft: !!leadingIcon,
+          iconRight: !!trailingIcon,
         }),
         className,
       )}
       disabled={disabled || loading}
-      focusableWhenDisabled={loading}
+      aria-busy={loading || undefined}
       {...props}
+      focusableWhenDisabled={focusableWhenDisabled ?? loading}
     >
       <span
         aria-hidden
@@ -192,12 +208,18 @@ function Button({
             <span className={cn(buttonContentLayout, "opacity-0")}>
               {content}
             </span>
-            <span className="absolute inset-0 flex items-center justify-center">
+            <span
+              aria-hidden
+              className="absolute inset-0 flex items-center justify-center"
+            >
               <HugeiconsIcon
                 icon={Loading03Icon}
-                className="animate-spin"
+                className="animate-spin motion-reduce:animate-pulse"
                 strokeWidth={2}
               />
+            </span>
+            <span role="status" className="sr-only">
+              Loading
             </span>
           </>
         ) : (

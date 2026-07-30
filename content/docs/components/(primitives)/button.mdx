@@ -51,9 +51,10 @@ Use `size` to set the button's height and padding.
 
 ### With Icons
 
-Use `leadingIcon` and `trailingIcon` to place an icon beside the label. The
-button automatically tightens the padding on the icon side, since an icon is
-visually lighter than a text edge.
+Use `leadingIcon` and `trailingIcon` (renamed from `leftSection` and
+`rightSection`) to place an icon beside the label. The button automatically
+tightens the padding on the icon side, since an icon is visually lighter than
+a text edge.
 
 <ComponentPreview component="button" example="button-with-icons" />
 
@@ -77,8 +78,9 @@ The button paints its background from three CSS variables, one per interaction
 state: `--btn-bg` (rest), `--btn-bg-hover`, and `--btn-bg-active`. Each variant
 sets them and the button switches between them internally, so recoloring a
 button one-off is just overriding the variables, with no `hover:` or `active:`
-prefixes needed. Override the variables instead of `bg-*` classes (the fill
-renders on an internal layer, so root-level `bg-*` overrides have no effect):
+prefixes needed. Override the variables instead of `bg-*` classes: root-level
+`bg-*` paints behind the fill layer, so it is hidden by opaque variants and
+blended by transparent ones, which is rarely what you want:
 
 ```tsx showLineNumbers
 <Button className="[--btn-bg:var(--color-violet-600)] [--btn-bg-hover:var(--color-violet-700)] [--btn-bg-active:var(--color-violet-800)]">
@@ -90,6 +92,11 @@ Any variable you don't override keeps the variant's color for that state, so
 set all three for a full recolor. The border color is `--btn-border`; note that
 the `destructive` variant sets its dark-mode border with a `dark:` class, so
 overriding it there takes both `[--btn-border:...]` and `dark:[--btn-border:...]`.
+
+The same layering applies to border style and width: classes like
+`border-dashed` or `border-2` on the root style a border you cannot see.
+Target the layer instead, for example
+`*:data-[slot=button-background]:border-dashed`.
 
 ## Accessibility
 

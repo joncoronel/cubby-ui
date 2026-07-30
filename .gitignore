@@ -48,3 +48,6 @@ package-lock.json
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# Local panel-review output
+reviews/

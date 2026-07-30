@@ -211,4 +211,12 @@ Container with styled scrollbars and optional fade effects. Wraps Base UI's `Scr
   normally. Has no effect with `nativeScroll`, which renders no content wrapper.
 </ApiProp>
 
+<ApiProp name="contentClassName" fullType="string" simpleType="string">
+  Additional className for the internal content wrapper. Needed when a child
+  relies on a percentage height against its parent (for example, Base UI's
+  Select list gets `max-height: 100%` under `alignItemWithTrigger`), which only
+  resolves if the wrapper has a definite height like `h-full`. Ignored with
+  `nativeScroll`, which renders no content wrapper.
+</ApiProp>
+
 </ApiPropsList>

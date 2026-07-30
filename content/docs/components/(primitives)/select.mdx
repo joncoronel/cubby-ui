@@ -101,10 +101,10 @@ On a Card, Dialog, or popover surface, the opaque `default` trigger collapses in
 ### Ghost Variant
 
 Use `variant="ghost"` for a chromeless trigger in toolbars and dense UI. It
-mirrors the Button `ghost` variant, so it sits flush next to ghost buttons:
-transparent until hovered, with the same text color shift and held background
-while the popup is open. The `sm` size's padding is tuned to align optically
-with adjacent ghost buttons.
+mirrors the Button `ghost` variant: transparent until hovered, with the same
+text color shift and held background while the popup is open. Because a ghost
+trigger has no visible chrome or label, give it an explicit `aria-label` so
+screen readers announce what the control chooses, not just its current value.
 
 <ComponentPreview component="select" example="select-ghost" />
 

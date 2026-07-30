@@ -407,7 +407,7 @@ function FilterChipOperator({
             variant="ghost"
             size={size}
             className={cn(
-              "data-popup-open:bg-surface-hover data-popup-open:text-foreground rounded-none! font-normal focus-visible:-outline-offset-2",
+              "rounded-none! font-normal focus-visible:-outline-offset-2",
               className,
             )}
             {...props}
@@ -534,7 +534,9 @@ function FilterAddButton({
             variant="outline"
             size={size}
             className={cn(
-              "text-muted-foreground gap-1.5 border-dashed",
+              // The border renders on Button's background layer, so border
+              // style overrides must target it, not the root.
+              "text-muted-foreground gap-1.5 *:data-[slot=button-background]:border-dashed",
               className,
             )}
             leadingIcon={<HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />}

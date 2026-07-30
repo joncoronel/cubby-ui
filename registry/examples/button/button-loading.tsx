@@ -7,10 +7,13 @@ import { Download01Icon } from "@hugeicons/core-free-icons";
 
 export default function ButtonLoading() {
   const [loading, setLoading] = React.useState(false);
+  const timeoutRef = React.useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  React.useEffect(() => () => clearTimeout(timeoutRef.current), []);
 
   const simulateAction = () => {
     setLoading(true);
-    setTimeout(() => setLoading(false), 2500);
+    timeoutRef.current = setTimeout(() => setLoading(false), 2500);
   };
 
   return (

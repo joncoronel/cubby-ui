@@ -1,6 +1,6 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/registry/default/button/button";
+import { Button, buttonVariants } from "@/registry/default/button/button";
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft01Icon, ArrowRight01Icon, MoreHorizontalIcon } from "@hugeicons/core-free-icons";
@@ -36,42 +36,37 @@ function PaginationItem({ ...props }: React.ComponentProps<"li">) {
 type PaginationLinkProps = {
   isActive?: boolean;
   isDisabled?: boolean;
-} & Pick<
-  React.ComponentProps<typeof Button>,
-  "size" | "leadingIcon" | "trailingIcon"
-> &
+} & Pick<React.ComponentProps<typeof Button>, "size"> &
   React.ComponentProps<"a">;
 
+// Pagination links are real anchors styled with the flat `buttonVariants`
+// recipe on purpose: rendering them through <Button render={<a/>}> would
+// bolt button semantics (role="button", no Space navigation) onto elements
+// that must stay links for screen readers.
 function PaginationLink({
   className,
   isActive,
   isDisabled,
   size = "icon",
-  leadingIcon,
-  trailingIcon,
-  children,
   ...props
 }: PaginationLinkProps) {
   return (
-    <Button
-      variant={isActive ? "outline" : "ghost"}
-      size={size}
-      leadingIcon={leadingIcon}
-      trailingIcon={trailingIcon}
-      nativeButton={false}
-      disabled={isDisabled}
-      className={className}
-      render={
-        <a
-          aria-current={isActive ? "page" : undefined}
-          data-slot="pagination-link"
-          data-active={isActive}
-          {...props}
-        />
-      }
-    >
-      {children}
-    </Button>
+    <a
+      aria-current={isActive ? "page" : undefined}
+      aria-disabled={isDisabled}
+      data-slot="pagination-link"
+      data-active={isActive}
+      data-disabled={isDisabled}
+      className={cn(
+        buttonVariants({
+          variant: isActive ? "outline" : "ghost",
+          size,
+        }),
+        isDisabled && "pointer-events-none opacity-60",
+        className,
+      )}
+      {...props}
+    />
   );
 }
 
@@ -83,13 +78,13 @@ function PaginationPrevious({
     <PaginationLink
       aria-label="Go to previous page"
       size="default"
-      leadingIcon={
-        <HugeiconsIcon icon={ArrowLeft01Icon} size={16} strokeWidth={2} />
-      }
-      className={className}
+      // pl-2.5 mirrors the Button's leading-icon optical padding, which the
+      // flat recipe has no compound variants for.
+      className={cn("gap-1.5 pl-2.5", className)}
       {...props}
     >
-      Previous
+      <HugeiconsIcon icon={ArrowLeft01Icon} size={16} strokeWidth={2} />
+      <span>Previous</span>
     </PaginationLink>
   );
 }
@@ -102,13 +97,11 @@ function PaginationNext({
     <PaginationLink
       aria-label="Go to next page"
       size="default"
-      trailingIcon={
-        <HugeiconsIcon icon={ArrowRight01Icon} size={16} strokeWidth={2} />
-      }
-      className={className}
+      className={cn("gap-1.5 pr-2.5", className)}
       {...props}
     >
-      Next
+      <span>Next</span>
+      <HugeiconsIcon icon={ArrowRight01Icon} size={16} strokeWidth={2} />
     </PaginationLink>
   );
 }

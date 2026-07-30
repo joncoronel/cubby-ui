@@ -88,8 +88,9 @@ html {
   --secondary-active: color-mix(in oklch, var(--secondary), black 8%);
   --outline-active: color-mix(in oklch, var(--card), black 8%);
 
-  /* Mixed from --foreground so it tracks the theme automatically — no dark
-     override needed (the mix resolves against dark's --foreground there). */
+  /* Mixed from --foreground. Re-declared in .dark below: a custom property
+     resolves its var()s where it is DECLARED, so without the re-declaration
+     a .dark scoped to a subtree would inherit this light-resolved value. */
   --border: color-mix(in oklab, var(--foreground) 10%, transparent);
   /* Default form-field bg — opaque "clean lifted card" look. Aliased to
      surface-3 so it tracks the ladder. Used by the `default` variant of Input,
@@ -268,13 +269,17 @@ html {
   --secondary-hover: color-mix(in oklch, var(--secondary), white 5%);
   --outline-hover: color-mix(in oklch, var(--card), white 5%);
 
-  /* Dark pressed colors — one step past hover, mixing toward white. */
+  /* Dark pressed colors — one step past hover, mixing toward white.
+     --destructive-active darkens instead: brightening the saturated red
+     drops white-label contrast below WCAG AA (white 20% measures 4.30:1). */
   --primary-active: color-mix(in oklch, var(--primary), white 14%);
   --neutral-active: color-mix(in oklch, var(--neutral), black 14%);
-  --destructive-active: color-mix(in oklch, var(--destructive), white 20%);
+  --destructive-active: color-mix(in oklch, var(--destructive), black 8%);
   --secondary-active: color-mix(in oklch, var(--secondary), white 8%);
   --outline-active: color-mix(in oklch, var(--card), white 8%);
 
+  /* Re-resolved against dark's --foreground (see the :root note). */
+  --border: color-mix(in oklab, var(--foreground) 10%, transparent);
   --input-elevated: oklch(1 0 0 / 9%);
   --scrollbar: oklch(0.7 var(--neutral-chroma) var(--neutral-hue));
 
@@ -488,6 +493,7 @@ html {
      bg-surface-selected. Translucent overlays that composite on whatever
      surface level they sit on. */
   --color-surface-hover: var(--surface-hover);
+  --color-surface-active: var(--surface-active);
   --color-surface-selected: var(--surface-selected);
 
   --shadow-surface-1: var(--surface-shadow-1);

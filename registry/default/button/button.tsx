@@ -187,7 +187,11 @@ function Button({
         aria-hidden
         data-slot="button-background"
         className={cn(
-          "absolute inset-0 rounded-[inherit] transition-[background-color,scale] duration-100 ease-out group-active/button:scale-[0.98]",
+          // Press scale skips popup triggers (aria-haspopup, applied to the
+          // DOM by Base UI): a trigger is a toggle that holds state, not a
+          // momentary action — it gets the held data-popup-open background
+          // instead.
+          "absolute inset-0 rounded-[inherit] transition-[background-color,scale] duration-100 ease-out group-[:active:not([aria-haspopup])]/button:scale-[0.98]",
           buttonBackgroundVariantClasses[
             (variant ?? "primary") as ButtonVariant
           ],

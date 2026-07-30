@@ -1,6 +1,6 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { Button, buttonVariants } from "@/registry/default/button/button";
+import { Button } from "@/registry/default/button/button";
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft01Icon, ArrowRight01Icon, MoreHorizontalIcon } from "@hugeicons/core-free-icons";
@@ -36,7 +36,10 @@ function PaginationItem({ ...props }: React.ComponentProps<"li">) {
 type PaginationLinkProps = {
   isActive?: boolean;
   isDisabled?: boolean;
-} & Pick<React.ComponentProps<typeof Button>, "size"> &
+} & Pick<
+  React.ComponentProps<typeof Button>,
+  "size" | "leadingIcon" | "trailingIcon"
+> &
   React.ComponentProps<"a">;
 
 function PaginationLink({
@@ -44,25 +47,31 @@ function PaginationLink({
   isActive,
   isDisabled,
   size = "icon",
+  leadingIcon,
+  trailingIcon,
+  children,
   ...props
 }: PaginationLinkProps) {
   return (
-    <a
-      aria-current={isActive ? "page" : undefined}
-      aria-disabled={isDisabled}
-      data-slot="pagination-link"
-      data-active={isActive}
-      data-disabled={isDisabled}
-      className={cn(
-        buttonVariants({
-          variant: isActive ? "outline" : "ghost",
-          size,
-        }),
-        isDisabled && "pointer-events-none opacity-60",
-        className,
-      )}
-      {...props}
-    />
+    <Button
+      variant={isActive ? "outline" : "ghost"}
+      size={size}
+      leadingIcon={leadingIcon}
+      trailingIcon={trailingIcon}
+      nativeButton={false}
+      disabled={isDisabled}
+      className={className}
+      render={
+        <a
+          aria-current={isActive ? "page" : undefined}
+          data-slot="pagination-link"
+          data-active={isActive}
+          {...props}
+        />
+      }
+    >
+      {children}
+    </Button>
   );
 }
 
@@ -74,11 +83,13 @@ function PaginationPrevious({
     <PaginationLink
       aria-label="Go to previous page"
       size="default"
-      className={cn("gap-1.5 px-3 sm:pe-4", className)}
+      leadingIcon={
+        <HugeiconsIcon icon={ArrowLeft01Icon} size={16} strokeWidth={2} />
+      }
+      className={className}
       {...props}
     >
-      <HugeiconsIcon icon={ArrowLeft01Icon} size={16}  strokeWidth={2} />
-      <span>Previous</span>
+      Previous
     </PaginationLink>
   );
 }
@@ -91,11 +102,13 @@ function PaginationNext({
     <PaginationLink
       aria-label="Go to next page"
       size="default"
-      className={cn("gap-1.5 px-3 sm:ps-4", className)}
+      trailingIcon={
+        <HugeiconsIcon icon={ArrowRight01Icon} size={16} strokeWidth={2} />
+      }
+      className={className}
       {...props}
     >
-      <span>Next</span>
-      <HugeiconsIcon icon={ArrowRight01Icon} size={16}  strokeWidth={2} />
+      Next
     </PaginationLink>
   );
 }

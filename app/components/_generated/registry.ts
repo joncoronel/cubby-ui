@@ -365,6 +365,7 @@ import select_select_align_item_with_trigger from "@/registry/examples/select/se
 import select_select_controlled from "@/registry/examples/select/select-controlled";
 import select_select_elevated from "@/registry/examples/select/select-elevated";
 import select_select_field from "@/registry/examples/select/select-field";
+import select_select_ghost from "@/registry/examples/select/select-ghost";
 import select_select_multiple from "@/registry/examples/select/select-multiple";
 import select_select_object_values from "@/registry/examples/select/select-object-values";
 import select_select_with_groups from "@/registry/examples/select/select-with-groups";
@@ -3437,6 +3438,11 @@ export const exampleRegistry = {
       "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Field, FieldError } from \"@/components/ui/cubby-ui/field\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\nimport {\n  Select,\n  SelectContent,\n  SelectItem,\n  SelectLabel,\n  SelectTrigger,\n  SelectValue,\n} from \"@/components/ui/cubby-ui/select\";\n\nconst items = [\n  { label: \"United States\", value: \"us\" },\n  { label: \"Canada\", value: \"ca\" },\n  { label: \"United Kingdom\", value: \"uk\" },\n  { label: \"Germany\", value: \"de\" },\n  { label: \"Japan\", value: \"jp\" },\n];\n\nexport default function SelectField() {\n  return (\n    <Form\n      className=\"space-y-4\"\n      onFormSubmit={(values) => {\n        alert(JSON.stringify(values, null, 2));\n      }}\n    >\n      <Field name=\"country\">\n        <Select items={items} required>\n          <div className=\"flex flex-col gap-1\">\n            <SelectLabel>Country</SelectLabel>\n            <SelectTrigger className=\"w-[200px]\">\n              <SelectValue placeholder=\"Select a country\" />\n            </SelectTrigger>\n          </div>\n          <SelectContent>\n            {items.map((item) => (\n              <SelectItem key={item.value} value={item.value}>\n                {item.label}\n              </SelectItem>\n            ))}\n          </SelectContent>\n        </Select>\n        <FieldError />\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\">\n        Submit\n      </Button>\n    </Form>\n  );\n}\n"
     },
     {
+      "title": "Ghost",
+      "importPath": "select-ghost",
+      "source": "import { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Select,\n  SelectTrigger,\n  SelectContent,\n  SelectItem,\n  SelectValue,\n} from \"@/components/ui/cubby-ui/select\";\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport { TextBoldIcon, TextItalicIcon } from \"@hugeicons/core-free-icons\";\n\nconst fonts = [\n  { label: \"Geist\", value: \"geist\" },\n  { label: \"Georgia\", value: \"georgia\" },\n  { label: \"Menlo\", value: \"menlo\" },\n];\n\nexport default function SelectGhost() {\n  return (\n    <div className=\"flex items-center gap-1\">\n      <Select items={fonts} defaultValue=\"geist\">\n        <SelectTrigger variant=\"ghost\" size=\"sm\">\n          <SelectValue />\n        </SelectTrigger>\n        <SelectContent size=\"sm\">\n          {fonts.map((font) => (\n            <SelectItem key={font.value} value={font.value}>\n              {font.label}\n            </SelectItem>\n          ))}\n        </SelectContent>\n      </Select>\n      <Button variant=\"ghost\" size=\"icon_sm\" aria-label=\"Bold\">\n        <HugeiconsIcon icon={TextBoldIcon} strokeWidth={2} />\n      </Button>\n      <Button variant=\"ghost\" size=\"icon_sm\" aria-label=\"Italic\">\n        <HugeiconsIcon icon={TextItalicIcon} strokeWidth={2} />\n      </Button>\n    </div>\n  );\n}\n"
+    },
+    {
       "title": "Multiple",
       "importPath": "select-multiple",
       "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  Select,\n  SelectContent,\n  SelectItem,\n  SelectTrigger,\n  SelectValue,\n} from \"@/components/ui/cubby-ui/select\";\n\nconst fruits = {\n  apple: \"Apple\",\n  banana: \"Banana\",\n  orange: \"Orange\",\n  grape: \"Grape\",\n  strawberry: \"Strawberry\",\n  watermelon: \"Watermelon\",\n};\n\ntype Fruit = keyof typeof fruits;\n\nfunction renderValue(value: Fruit[]) {\n  if (value.length === 0) {\n    return \"Select fruits...\";\n  }\n  const firstFruit = fruits[value[0]];\n  const additional =\n    value.length > 1 ? ` (+${value.length - 1} more)` : \"\";\n  return firstFruit + additional;\n}\n\nexport default function SelectMultipleExample() {\n  return (\n    <Select defaultValue={[\"apple\", \"banana\"]} multiple>\n      <SelectTrigger className=\"w-[280px]\">\n        <SelectValue>{renderValue}</SelectValue>\n      </SelectTrigger>\n      <SelectContent>\n        {(Object.keys(fruits) as Fruit[]).map((fruit) => (\n          <SelectItem key={fruit} value={fruit}>\n            {fruits[fruit]}\n          </SelectItem>\n        ))}\n      </SelectContent>\n    </Select>\n  );\n}\n"
@@ -4388,6 +4394,7 @@ export const componentMap = {
   "select-controlled": select_select_controlled,
   "select-elevated": select_select_elevated,
   "select-field": select_select_field,
+  "select-ghost": select_select_ghost,
   "select-multiple": select_select_multiple,
   "select-object-values": select_select_object_values,
   "select-with-groups": select_select_with_groups,

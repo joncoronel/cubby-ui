@@ -96,6 +96,17 @@ On a Card, Dialog, or popover surface, the opaque `default` trigger collapses in
 | ---------- | ----------------------------------------------------------- |
 | `default`  | Opaque `bg-input` trigger for page-level surfaces.          |
 | `elevated` | Translucent trigger for use inside Card, Dialog, or popover. |
+| `ghost`    | Chromeless trigger that mirrors the Button `ghost` variant.  |
+
+### Ghost Variant
+
+Use `variant="ghost"` for a chromeless trigger in toolbars and dense UI. It
+mirrors the Button `ghost` variant, so it sits flush next to ghost buttons:
+transparent until hovered, with the same text color shift and held background
+while the popup is open. The `sm` size's padding is tuned to align optically
+with adjacent ghost buttons.
+
+<ComponentPreview component="select" example="select-ghost" />
 
 ### Form Integration
 
@@ -132,11 +143,11 @@ Button that opens the dropdown when clicked. Wraps Base UI's `Select.Trigger`.
 
 <ApiProp
   name="variant"
-  fullType="'default' | 'elevated'"
+  fullType="'default' | 'elevated' | 'ghost'"
   simpleType="string"
   defaultValue='"default"'
 >
-  Surface appearance. `default` uses opaque `bg-input` with a soft drop shadow in light mode. `elevated` uses translucent `bg-input-elevated` for use inside Card, Dialog, or popover surfaces. Matches the same prop on Input, Combobox, and Autocomplete. See the [Surfaces](/docs/getting-started/surfaces) docs.
+  Surface appearance. `default` uses opaque `bg-input` with a soft drop shadow in light mode. `elevated` uses translucent `bg-input-elevated` for use inside Card, Dialog, or popover surfaces. `ghost` is chromeless and mirrors the Button `ghost` variant for toolbars and dense UI. `default` and `elevated` match the same prop on Input, Combobox, and Autocomplete. See the [Surfaces](/docs/getting-started/surfaces) docs.
 </ApiProp>
 
 <ApiProp name="hideChevronRotation" fullType="boolean" defaultValue="false">

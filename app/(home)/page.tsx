@@ -41,7 +41,7 @@ export default function Home() {
               size="lg"
               render={<Link href="/docs/getting-started/introduction" />}
               nativeButton={false}
-              rightSection={
+              trailingIcon={
                 <HugeiconsIcon
                   icon={ArrowRight01Icon}
                   className="size-4"

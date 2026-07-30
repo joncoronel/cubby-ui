@@ -54,7 +54,7 @@ export function MobileNavSheet({ trigger }: MobileNavSheetProps) {
             <Button
               variant="outline"
               size="lg"
-              leftSection={
+              leadingIcon={
                 <HugeiconsIcon
                   icon={Search01Icon}
                   className="size-4"
@@ -71,7 +71,7 @@ export function MobileNavSheet({ trigger }: MobileNavSheetProps) {
             <Button
               variant="ghost"
               size="lg"
-              leftSection={
+              leadingIcon={
                 <HugeiconsIcon
                   icon={GithubIcon}
                   className="size-4"

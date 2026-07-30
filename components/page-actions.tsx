@@ -59,7 +59,13 @@ export function LLMCopyButton({
       size="xs"
       disabled={isLoading}
       onClick={handleCopy}
-      leftSection={checked ? <HugeiconsIcon icon={Tick02Icon}  strokeWidth={2} /> : <HugeiconsIcon icon={Copy01Icon}  strokeWidth={2} />}
+      leadingIcon={
+        checked ? (
+          <HugeiconsIcon icon={Tick02Icon} strokeWidth={2} />
+        ) : (
+          <HugeiconsIcon icon={Copy01Icon} strokeWidth={2} />
+        )
+      }
     >
       Copy Markdown
     </Button>
@@ -196,7 +202,7 @@ export function ViewOptions({
       {
         title: "Open in T3 Chat",
         href: `https://t3.chat/new?${new URLSearchParams({ q })}`,
-        icon: <HugeiconsIcon icon={ChatIcon}  strokeWidth={2} />,
+        icon: <HugeiconsIcon icon={ChatIcon} strokeWidth={2} />,
       },
     ];
   }, [githubUrl, markdownUrl]);
@@ -205,7 +211,13 @@ export function ViewOptions({
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
-          <Button variant="outline" size="xs" rightSection={<HugeiconsIcon icon={ArrowDown01Icon}  strokeWidth={2} />}>
+          <Button
+            variant="outline"
+            size="xs"
+            trailingIcon={
+              <HugeiconsIcon icon={ArrowDown01Icon} strokeWidth={2} />
+            }
+          >
             Open
           </Button>
         }
@@ -220,7 +232,11 @@ export function ViewOptions({
           >
             {item.icon}
             {item.title}
-            <HugeiconsIcon icon={LinkSquare02Icon} className="text-muted-foreground ms-auto size-3.5"  strokeWidth={2} />
+            <HugeiconsIcon
+              icon={LinkSquare02Icon}
+              className="text-muted-foreground ms-auto size-3.5"
+              strokeWidth={2}
+            />
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

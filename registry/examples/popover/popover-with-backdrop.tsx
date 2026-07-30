@@ -14,7 +14,7 @@ export default function PopoverWithBackdrop() {
     <Popover>
       <PopoverTrigger
         render={
-          <Button variant="outline" leftSection={<HugeiconsIcon icon={Layers01Icon} className="size-4"  strokeWidth={2} />} />
+          <Button variant="outline" leadingIcon={<HugeiconsIcon icon={Layers01Icon} className="size-4"  strokeWidth={2} />} />
         }
       >
         Open Modal Popover

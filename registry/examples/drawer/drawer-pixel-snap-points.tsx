@@ -45,7 +45,7 @@ export default function DrawerPixelSnapPoints() {
         render={
           <Button
             variant="outline"
-            leftSection={
+            leadingIcon={
               <HugeiconsIcon
                 icon={ShoppingCart01Icon}
                 strokeWidth={2}

@@ -50,9 +50,19 @@ Use `size` to set the button's height and padding.
 
 ### With Icons
 
-Use `leftSection` and `rightSection` to place an icon beside the label.
+Use `leadingIcon` and `trailingIcon` to place an icon beside the label. The
+button automatically tightens the padding on the icon side, since an icon is
+visually lighter than a text edge.
 
 <ComponentPreview component="button" example="button-with-icons" />
+
+### Loading
+
+Use `loading` to show a spinner while an action is in flight. The label stays
+mounted but invisible, so the button keeps its size and nothing shifts around
+it.
+
+<ComponentPreview component="button" example="button-loading" />
 
 ### As Link
 
@@ -116,12 +126,12 @@ Clickable element that triggers actions. Wraps Base UI's `Button`.
   Display loading state with spinner. Automatically disables the button and sets `focusableWhenDisabled` to `true` for keyboard accessibility.
 </ApiProp>
 
-<ApiProp name="leftSection" fullType="ReactNode" simpleType="node">
-  Content (typically icon) to display before the button text. Custom prop not available in Base UI.
+<ApiProp name="leadingIcon" fullType="ReactNode" simpleType="node">
+  Icon to display before the button text. Padding on the leading edge tightens automatically. Custom prop not available in Base UI.
 </ApiProp>
 
-<ApiProp name="rightSection" fullType="ReactNode" simpleType="node">
-  Content (typically icon) to display after the button text. Custom prop not available in Base UI.
+<ApiProp name="trailingIcon" fullType="ReactNode" simpleType="node">
+  Icon to display after the button text. Padding on the trailing edge tightens automatically. Custom prop not available in Base UI.
 </ApiProp>
 
 </ApiPropsList>

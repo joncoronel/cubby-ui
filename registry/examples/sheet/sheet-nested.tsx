@@ -23,7 +23,7 @@ export default function SheetNested() {
         render={
           <Button
             variant="outline"
-            leftSection={<HugeiconsIcon icon={Settings01Icon} className="size-4"  strokeWidth={2} />}
+            leadingIcon={<HugeiconsIcon icon={Settings01Icon} className="size-4"  strokeWidth={2} />}
           />
         }
       >

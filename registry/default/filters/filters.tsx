@@ -537,8 +537,8 @@ function FilterAddButton({
               "text-muted-foreground gap-1.5 border-dashed",
               className,
             )}
-            leftSection={<HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />}
-            rightSection={
+            leadingIcon={<HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />}
+            trailingIcon={
               shortcut ? (
                 <Kbd size="sm" variant="ghost" className="ms-1">
                   {shortcut.toUpperCase()}
@@ -589,7 +589,7 @@ function FilterClearButton({
       size={size}
       className={cn("text-muted-foreground gap-1.5", className)}
       onClick={clearAll}
-      leftSection={<HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} />}
+      leadingIcon={<HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} />}
       {...props}
     >
       {children ?? labels.clear}

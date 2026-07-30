@@ -24,11 +24,11 @@ export default function ButtonWithIcons() {
 
       {/* Text with icons (automatic padding) */}
       <div className="flex flex-wrap gap-2">
-        <Button leftSection={<HugeiconsIcon icon={Settings01Icon}  strokeWidth={2} />}>Settings</Button>
-        <Button leftSection={<HugeiconsIcon icon={Copy01Icon}  strokeWidth={2} />} variant="outline">
+        <Button leadingIcon={<HugeiconsIcon icon={Settings01Icon}  strokeWidth={2} />}>Settings</Button>
+        <Button leadingIcon={<HugeiconsIcon icon={Copy01Icon}  strokeWidth={2} />} variant="outline">
           Copy
         </Button>
-        <Button rightSection={<HugeiconsIcon icon={ArrowRight01Icon}  strokeWidth={2} />} variant="secondary">
+        <Button trailingIcon={<HugeiconsIcon icon={ArrowRight01Icon}  strokeWidth={2} />} variant="secondary">
           Download
         </Button>
       </div>

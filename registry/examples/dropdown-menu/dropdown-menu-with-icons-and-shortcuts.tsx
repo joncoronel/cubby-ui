@@ -11,7 +11,7 @@ import {
 export default function DropdownMenuWithIconsAndShortcuts() {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger render={<Button variant="outline" leftSection={<HugeiconsIcon icon={UserIcon}  strokeWidth={2} />} />}>
+      <DropdownMenuTrigger render={<Button variant="outline" leadingIcon={<HugeiconsIcon icon={UserIcon}  strokeWidth={2} />} />}>
         Account
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">

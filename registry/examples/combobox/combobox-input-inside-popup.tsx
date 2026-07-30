@@ -33,7 +33,7 @@ export default function ComboboxInputInsidePopup() {
               {...props}
               variant="outline"
               className="justify-between font-normal"
-              rightSection={<HugeiconsIcon icon={ArrowDown01Icon} className="h-4 w-4 opacity-50"  strokeWidth={2} />}
+              trailingIcon={<HugeiconsIcon icon={ArrowDown01Icon} className="h-4 w-4 opacity-50"  strokeWidth={2} />}
             >
               <ComboboxValue placeholder="Select country" />
             </Button>

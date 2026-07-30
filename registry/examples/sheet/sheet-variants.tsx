@@ -25,7 +25,7 @@ export default function SheetVariants() {
           render={
             <Button
               variant="outline"
-              leftSection={<HugeiconsIcon icon={ArrowUp01Icon} className="size-4"  strokeWidth={2} />}
+              leadingIcon={<HugeiconsIcon icon={ArrowUp01Icon} className="size-4"  strokeWidth={2} />}
             />
           }
         >
@@ -52,7 +52,7 @@ export default function SheetVariants() {
           render={
             <Button
               variant="outline"
-              leftSection={<HugeiconsIcon icon={ArrowRight01Icon} className="size-4"  strokeWidth={2} />}
+              leadingIcon={<HugeiconsIcon icon={ArrowRight01Icon} className="size-4"  strokeWidth={2} />}
             />
           }
         >
@@ -79,7 +79,7 @@ export default function SheetVariants() {
           render={
             <Button
               variant="outline"
-              leftSection={<HugeiconsIcon icon={ArrowDown01Icon} className="size-4"  strokeWidth={2} />}
+              leadingIcon={<HugeiconsIcon icon={ArrowDown01Icon} className="size-4"  strokeWidth={2} />}
             />
           }
         >
@@ -106,7 +106,7 @@ export default function SheetVariants() {
           render={
             <Button
               variant="outline"
-              leftSection={<HugeiconsIcon icon={ArrowLeft01Icon} className="size-4"  strokeWidth={2} />}
+              leadingIcon={<HugeiconsIcon icon={ArrowLeft01Icon} className="size-4"  strokeWidth={2} />}
             />
           }
         >

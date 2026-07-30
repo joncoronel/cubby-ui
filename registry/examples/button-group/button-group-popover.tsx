@@ -18,7 +18,7 @@ export default function ButtonGroupPopover() {
           render={
             <Button
               variant="outline"
-              leftSection={<HugeiconsIcon icon={SparklesIcon}  strokeWidth={2} />}
+              leadingIcon={<HugeiconsIcon icon={SparklesIcon}  strokeWidth={2} />}
               aria-label="Open Copilot assistant"
             />
           }

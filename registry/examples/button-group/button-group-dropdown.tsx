@@ -17,7 +17,7 @@ import {
 export default function ButtonGroupDropdown() {
   return (
     <ButtonGroup>
-      <Button leftSection={<HugeiconsIcon icon={UserAdd01Icon}  strokeWidth={2} />} variant="outline">
+      <Button leadingIcon={<HugeiconsIcon icon={UserAdd01Icon}  strokeWidth={2} />} variant="outline">
         Follow
       </Button>
       <DropdownMenu>

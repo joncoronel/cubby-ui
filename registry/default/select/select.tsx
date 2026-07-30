@@ -70,15 +70,15 @@ const selectTriggerVariants = cva(
         // Opaque bg for page-level or non-elevated substrates. --outline-hover
         // is a deliberate -5% darken of --card/--input for a sharp hover delta.
         default:
-          "bg-input hover:bg-(--outline-hover) data-popup-open:bg-(--outline-hover)",
+          "bg-input hover:bg-(--outline-hover) data-popup-open:bg-(--outline-active)",
         // Translucent overlay for Cards, Dialogs, etc. --surface-hover (alpha
         // overlay) preserves translucency on any substrate depth.
         elevated:
-          "bg-input-elevated hover:bg-surface-hover data-popup-open:bg-surface-hover",
+          "bg-input-elevated hover:bg-surface-hover data-popup-open:bg-surface-active",
         // Chromeless — mirrors the button's ghost variant for use in toolbars
         // and inline next to ghost buttons. Chevron follows the text on hover.
         ghost:
-          "border-transparent bg-transparent text-muted-foreground hover:bg-surface-hover hover:text-foreground data-popup-open:bg-surface-hover data-popup-open:text-foreground group-hover/select-trigger:[&_svg:not([class*='text-'])]:text-foreground",
+          "border-transparent bg-transparent text-muted-foreground hover:bg-surface-hover hover:text-foreground data-popup-open:bg-surface-active data-popup-open:text-foreground group-hover/select-trigger:[&_svg:not([class*='text-'])]:text-foreground",
       },
       size: {
         default: "h-10 px-3 py-2 sm:h-9",

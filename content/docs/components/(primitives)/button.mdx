@@ -71,6 +71,26 @@ Use the `render` prop to render as a Next.js Link, and set `nativeButton` to `fa
 
 <ComponentPreview component="button" example="button-with-link" />
 
+### Custom Colors
+
+The button paints its background from three CSS variables, one per interaction
+state: `--btn-bg` (rest), `--btn-bg-hover`, and `--btn-bg-active`. Each variant
+sets them and the button switches between them internally, so recoloring a
+button one-off is just overriding the variables, with no `hover:` or `active:`
+prefixes needed. Override the variables instead of `bg-*` classes (the fill
+renders on an internal layer, so root-level `bg-*` overrides have no effect):
+
+```tsx showLineNumbers
+<Button className="[--btn-bg:var(--color-violet-600)] [--btn-bg-hover:var(--color-violet-700)] [--btn-bg-active:var(--color-violet-800)]">
+  Custom
+</Button>
+```
+
+Any variable you don't override keeps the variant's color for that state, so
+set all three for a full recolor. The border color is `--btn-border`; note that
+the `destructive` variant sets its dark-mode border with a `dark:` class, so
+overriding it there takes both `[--btn-border:...]` and `dark:[--btn-border:...]`.
+
 ## Accessibility
 
 ### Label icon-only buttons

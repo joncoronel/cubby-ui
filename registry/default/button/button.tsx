@@ -25,6 +25,7 @@ const buttonRootVariantClasses = {
   destructive: "text-destructive-foreground",
   "destructive-soft": "text-(--destructive-soft-foreground)",
   outline: "",
+  "outline-ghost": "",
   secondary: "text-secondary-foreground",
   ghost:
     "text-muted-foreground hover:text-foreground data-popup-open:text-foreground",
@@ -51,6 +52,11 @@ const buttonBackgroundVariantClasses = {
     "bg-destructive/12 hover:bg-destructive/20 group-hover/button:bg-destructive/20 active:bg-destructive/25 group-active/button:bg-destructive/25 data-popup-open:bg-destructive/20 group-data-popup-open/button:bg-destructive/20",
   outline:
     "border bg-card bg-clip-padding hover:bg-(--outline-hover) group-hover/button:bg-(--outline-hover) active:bg-(--outline-active) group-active/button:bg-(--outline-active) data-popup-open:bg-(--outline-hover) group-data-popup-open/button:bg-(--outline-hover)",
+  // Bordered ghost — outline's border with ghost's transparent fill and alpha
+  // overlay states, so it adapts to elevated substrates (Cards, Dialogs)
+  // where outline's solid bg-card would read as a mismatched patch.
+  "outline-ghost":
+    "border hover:bg-surface-hover group-hover/button:bg-surface-hover active:bg-(--surface-active) group-active/button:bg-(--surface-active) data-popup-open:bg-surface-hover group-data-popup-open/button:bg-surface-hover",
   secondary:
     "border border-transparent bg-secondary hover:bg-(--secondary-hover) group-hover/button:bg-(--secondary-hover) active:bg-(--secondary-active) group-active/button:bg-(--secondary-active) data-popup-open:bg-(--secondary-hover) group-data-popup-open/button:bg-(--secondary-hover)",
   ghost:

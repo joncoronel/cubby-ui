@@ -1917,7 +1917,7 @@ export const exampleRegistry = {
     {
       "title": "Variants",
       "importPath": "button-variants",
-      "source": "import { Button } from \"@/components/ui/cubby-ui/button\";\n\nexport default function ButtonVariants() {\n  return (\n    <div className=\"flex flex-wrap gap-2\">\n      <Button>Primary</Button>\n      <Button variant=\"primary-soft\">Primary Soft</Button>\n      <Button variant=\"neutral\">Neutral</Button>\n      <Button variant=\"secondary\">Secondary</Button>\n      <Button variant=\"outline\">Outline</Button>\n      <Button variant=\"ghost\">Ghost</Button>\n      <Button variant=\"link\">Link</Button>\n      <Button variant=\"destructive\">Destructive</Button>\n      <Button variant=\"destructive-soft\">Destructive Soft</Button>\n    </div>\n  );\n}\n"
+      "source": "import { Button } from \"@/components/ui/cubby-ui/button\";\n\nexport default function ButtonVariants() {\n  return (\n    <div className=\"flex flex-wrap gap-2\">\n      <Button>Primary</Button>\n      <Button variant=\"primary-soft\">Primary Soft</Button>\n      <Button variant=\"neutral\">Neutral</Button>\n      <Button variant=\"secondary\">Secondary</Button>\n      <Button variant=\"outline\">Outline</Button>\n      <Button variant=\"outline-ghost\">Outline Ghost</Button>\n      <Button variant=\"ghost\">Ghost</Button>\n      <Button variant=\"link\">Link</Button>\n      <Button variant=\"destructive\">Destructive</Button>\n      <Button variant=\"destructive-soft\">Destructive Soft</Button>\n    </div>\n  );\n}\n"
     },
     {
       "title": "With Icons",

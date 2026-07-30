@@ -19,13 +19,11 @@ import { cn } from "@/lib/utils";
 // overriding the tokens (className="[--btn-bg:...]").
 const buttonBase = cn(
   "relative isolate inline-flex items-center cursor-pointer justify-center whitespace-nowrap rounded-lg font-medium data-disabled:pointer-events-none data-disabled:opacity-60 data-disabled:focus-visible:outline-ring [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,scale,opacity,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
-  // State machine: unset tokens fall through to transparent. An open trigger
-  // (data-popup-open, stamped by Base UI) holds the pressed paint — one step
-  // past hover — so opening a popup produces a visible change even though the
-  // cursor is already hovering. The active rule excludes data-popup-open so
-  // the two states can't fight over the property, independent of generated
-  // rule order.
-  "[--btn-paint:var(--btn-bg,transparent)] hover:[--btn-paint:var(--btn-bg-hover,var(--btn-bg,transparent))] active:not-data-popup-open:[--btn-paint:var(--btn-bg-active,var(--btn-bg-hover,var(--btn-bg,transparent)))] data-popup-open:[--btn-paint:var(--btn-bg-active,var(--btn-bg-hover,var(--btn-bg,transparent)))]",
+  // State machine: unset tokens fall through to transparent. Pressing shows
+  // the active paint — except on popup triggers (aria-haspopup), which skip
+  // pressed feedback entirely (mirroring the press-scale guard) and simply
+  // hold their hover paint while open (data-popup-open, stamped by Base UI).
+  "[--btn-paint:var(--btn-bg,transparent)] hover:[--btn-paint:var(--btn-bg-hover,var(--btn-bg,transparent))] active:not-aria-[haspopup]:[--btn-paint:var(--btn-bg-active,var(--btn-bg-hover,var(--btn-bg,transparent)))] data-popup-open:[--btn-paint:var(--btn-bg-hover,var(--btn-bg,transparent))]",
 );
 
 // Shared by the background layer and the flat recipe: 1px border + fill from

@@ -7,16 +7,20 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Loading03Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 
-// Two-part button: the root owns layout, text color, and the focus ring;
-// backgrounds and borders render on an inner layer that scales down on press
-// (the pill shrinks, the label stays put). ButtonGroup targets the layer via
-// [data-slot=button-background] when collapsing borders between segments.
+// The button's fill and border render on a ::before pseudo-element that
+// scales down on press (the pill shrinks, the label stays put). Because the
+// pseudo travels with the classes, every consumer of the recipe — <Button>
+// and flat elements styled via `buttonVariants` (pagination links, calendar
+// nav, toolbar buttons) — gets identical paint and press behavior with no
+// extra DOM. ButtonGroup collapses borders between segments with `before:`
+// rules, inert on children that don't carry the recipe.
 //
 // Paint: variants set per-state tokens (--btn-bg, --btn-bg-hover,
 // --btn-bg-active, --btn-border), the state machine below resolves them into
-// --btn-paint, and buttonPaint renders it — on the layer (vars inherit from
-// the root) or on the flat recipe's own element. Consumers recolor by
-// overriding the tokens (className="[--btn-bg:...]").
+// --btn-paint, and buttonPaint renders it on the pseudo (custom properties
+// inherit into pseudo-elements). Consumers recolor by overriding the tokens
+// (className="[--btn-bg:...]") and restyle the border via `before:` classes
+// (className="before:border-dashed").
 const buttonBase = cn(
   "relative isolate inline-flex items-center cursor-pointer justify-center whitespace-nowrap rounded-lg font-medium data-disabled:pointer-events-none data-disabled:opacity-60 data-disabled:focus-visible:outline-ring [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,scale,opacity,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
   // State machine: unset tokens fall through to transparent. Pressing shows
@@ -26,10 +30,13 @@ const buttonBase = cn(
   "[--btn-paint:var(--btn-bg,transparent)] hover:[--btn-paint:var(--btn-bg-hover,var(--btn-bg,transparent))] active:not-aria-[haspopup]:[--btn-paint:var(--btn-bg-active,var(--btn-bg-hover,var(--btn-bg,transparent)))] data-popup-open:[--btn-paint:var(--btn-bg-hover,var(--btn-bg,transparent))]",
 );
 
-// Shared by the background layer and the flat recipe: 1px border + fill from
-// the resolved vars, transparent when unset.
+// The paint pseudo-element: 1px border + fill from the resolved vars,
+// transparent when unset. -z-10 keeps it under the content (the root's
+// `isolate` contains it), and pressing scales only the pseudo — except on
+// popup triggers (aria-haspopup), which skip press feedback and hold their
+// hover paint while open instead.
 const buttonPaint =
-  "border border-[color:var(--btn-border,transparent)] bg-[var(--btn-paint,transparent)] bg-clip-padding";
+  "before:content-[''] before:absolute before:inset-0 before:-z-10 before:rounded-[inherit] before:border before:border-[color:var(--btn-border,transparent)] before:bg-[var(--btn-paint,transparent)] before:transition-[background-color,border-color,scale] before:duration-100 before:ease-out active:not-aria-[haspopup]:before:scale-[0.98]";
 
 // Text classes plus the paint tokens the state machine reads.
 const buttonVariantClasses = {
@@ -43,8 +50,11 @@ const buttonVariantClasses = {
     "text-destructive-foreground [--btn-border:rgb(0_0_0/0.05)] dark:[--btn-border:rgb(255_255_255/0.05)] [--btn-bg:var(--destructive)] [--btn-bg-hover:var(--destructive-hover)] [--btn-bg-active:var(--destructive-active)]",
   "destructive-soft":
     "text-(--destructive-soft-foreground) [--btn-bg:color-mix(in_oklab,var(--destructive)_12%,transparent)] [--btn-bg-hover:color-mix(in_oklab,var(--destructive)_20%,transparent)] [--btn-bg-active:color-mix(in_oklab,var(--destructive)_25%,transparent)]",
+  // bg-clip-padding keeps the card fill out from under the translucent
+  // border. Deliberately NOT in the shared paint: with the default
+  // transparent border it would inset every solid fill by 1px.
   outline:
-    "[--btn-border:var(--border)] [--btn-bg:var(--card)] [--btn-bg-hover:var(--outline-hover)] [--btn-bg-active:var(--outline-active)]",
+    "[--btn-border:var(--border)] [--btn-bg:var(--card)] [--btn-bg-hover:var(--outline-hover)] [--btn-bg-active:var(--outline-active)] before:bg-clip-padding",
   // Outline's border with ghost's transparent fill, for elevated substrates
   // (Cards, Dialogs) where outline's solid card fill would look mismatched.
   "outline-ghost":
@@ -86,30 +96,12 @@ const iconOnlySizes = new Set<keyof typeof buttonSizeVariantClasses>([
 const buttonContentLayout =
   "inline-flex w-full items-center [justify-content:inherit] gap-[inherit]";
 
-// Single-element recipe for styling plain elements as buttons (links,
-// calendar nav, ...): paints on the element itself, whole-element press
-// scale. The scale divergence from <Button> is deliberate: flat consumers
-// are elements that must keep their own semantics (anchors) or live inside
-// composite widgets (Toolbar's roving tabindex), where nesting <Button> is
-// riskier than the barely-perceptible label movement on these small controls.
-const buttonVariants = cva(
-  cn(buttonBase, buttonPaint, "active:not-aria-[haspopup]:scale-[0.98]"),
-  {
-    variants: {
-      variant: buttonVariantClasses,
-      size: buttonSizeVariantClasses,
-    },
-    defaultVariants: {
-      variant: "primary",
-      size: "default",
-    },
-  },
-);
-
-// <Button>'s root recipe: sets the tokens but leaves painting and press scale
-// to the layer. iconLeft/iconRight tighten padding on the icon side (an icon
-// is visually lighter than a text edge).
-const buttonRootVariants = cva(buttonBase, {
+// The one button recipe, used by <Button> and by flat elements (links,
+// calendar nav, toolbar buttons) alike — paint, states, and press behavior
+// are identical in both. iconLeft/iconRight tighten padding on the icon side
+// (an icon is visually lighter than a text edge); <Button> sets them from
+// its icon props, flat consumers can pass them explicitly.
+const buttonVariants = cva(cn(buttonBase, buttonPaint), {
   variants: {
     variant: buttonVariantClasses,
     size: buttonSizeVariantClasses,
@@ -132,10 +124,8 @@ const buttonRootVariants = cva(buttonBase, {
   },
 });
 
-// Variant/size come from the root recipe the component actually evaluates
-// (minus its internal icon flags), so the two cvas can't silently drift.
 export type ButtonProps = BaseButton.Props &
-  Omit<VariantProps<typeof buttonRootVariants>, "iconLeft" | "iconRight"> & {
+  Omit<VariantProps<typeof buttonVariants>, "iconLeft" | "iconRight"> & {
     loading?: boolean;
     leadingIcon?: React.ReactNode;
     trailingIcon?: React.ReactNode;
@@ -173,8 +163,7 @@ function Button({
       data-size={size}
       data-variant={variant}
       className={cn(
-        "group/button",
-        buttonRootVariants({
+        buttonVariants({
           variant,
           size,
           iconLeft: !!leadingIcon,
@@ -187,17 +176,6 @@ function Button({
       {...props}
       focusableWhenDisabled={focusableWhenDisabled ?? loading}
     >
-      <span
-        aria-hidden
-        data-slot="button-background"
-        className={cn(
-          // Colors arrive via the inherited vars. Press scale skips popup
-          // triggers (aria-haspopup): a trigger holds state, so it gets the
-          // held data-popup-open background instead.
-          "absolute inset-0 rounded-[inherit] transition-[background-color,border-color,scale] duration-100 ease-out group-[:active:not([aria-haspopup])]/button:scale-[0.98]",
-          buttonPaint,
-        )}
-      />
       <span
         data-slot="button-content"
         className={cn("relative", buttonContentLayout)}

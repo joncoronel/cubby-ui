@@ -93,10 +93,9 @@ set all three for a full recolor. The border color is `--btn-border`; note that
 the `destructive` variant sets its dark-mode border with a `dark:` class, so
 overriding it there takes both `[--btn-border:...]` and `dark:[--btn-border:...]`.
 
-The same layering applies to border style and width: classes like
-`border-dashed` or `border-2` on the root style a border you cannot see.
-Target the layer instead, for example
-`*:data-[slot=button-background]:border-dashed`.
+The same layering applies to border style and width: the border lives on the
+button's paint pseudo-element, so use `before:` classes to restyle it, for
+example `before:border-dashed` or `before:border-2`.
 
 ## Accessibility
 

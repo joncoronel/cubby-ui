@@ -9,14 +9,18 @@ const buttonGroupVariants = cva(
   {
     variants: {
       orientation: {
-        // Border rules target both the child root (flat elements styled with
-        // buttonVariants, inputs, selects) and its [data-slot=button-background]
-        // layer (<Button> renders its border/background there). Radius rules
-        // only need the root — the layer uses rounded-[inherit].
+        // Border rules come in pairs: a root rule for children with real
+        // borders (inputs, select triggers) and a `before:` twin for
+        // button-recipe children, whose border lives on their paint
+        // pseudo-element. The before: twins are scoped to button/a tags and
+        // exclude select triggers — Tailwind's before: variant generates a
+        // pseudo box on any matched element, which would otherwise add a
+        // phantom flex item (and gap) inside non-recipe children. Radius
+        // rules only need the root — the pseudo uses rounded-[inherit].
         horizontal:
-          "[&>*:not(:first-child)]:rounded-l-none [&>*:not(:first-child)]:border-l-0 [&>*:not(:first-child)>[data-slot=button-background]]:border-l-0 [&>*:not(:last-child)]:rounded-r-none [&>*:has(+[data-slot=button-group-separator])]:border-r-0 [&>*:has(+[data-slot=button-group-separator])>[data-slot=button-background]]:border-r-0 [&>button:first-of-type:not(:only-of-type)]:rounded-l-lg [&>button:first-of-type:not(:only-of-type):not(:has(>[data-slot=button-background]))]:border-l [&>button:first-of-type:not(:only-of-type)>[data-slot=button-background]]:border-l [&>a:first-of-type:not(:only-of-type)]:rounded-l-lg [&>a:first-of-type:not(:only-of-type):not(:has(>[data-slot=button-background]))]:border-l [&>a:first-of-type:not(:only-of-type)>[data-slot=button-background]]:border-l [&>button:last-of-type:not(:only-of-type)]:rounded-r-lg [&>a:last-of-type:not(:only-of-type)]:rounded-r-lg",
+          "[&>*:not(:first-child)]:rounded-l-none [&>*:not(:first-child)]:border-l-0 [&>button:not(:first-child):not([data-slot=select-trigger])]:before:border-l-0 [&>a:not(:first-child)]:before:border-l-0 [&>*:not(:last-child)]:rounded-r-none [&>*:has(+[data-slot=button-group-separator])]:border-r-0 [&>button:has(+[data-slot=button-group-separator]):not([data-slot=select-trigger])]:before:border-r-0 [&>a:has(+[data-slot=button-group-separator])]:before:border-r-0 [&>button:first-of-type:not(:only-of-type)]:rounded-l-lg [&>button:first-of-type:not(:only-of-type):not([data-slot=select-trigger])]:before:border-l [&>[data-slot=select-trigger]:first-of-type:not(:only-of-type)]:border-l [&>a:first-of-type:not(:only-of-type)]:rounded-l-lg [&>a:first-of-type:not(:only-of-type)]:before:border-l [&>button:last-of-type:not(:only-of-type)]:rounded-r-lg [&>a:last-of-type:not(:only-of-type)]:rounded-r-lg",
         vertical:
-          "flex-col [&>*:not(:first-child)]:rounded-t-none [&>*:not(:first-child)]:border-t-0 [&>*:not(:first-child)>[data-slot=button-background]]:border-t-0 [&>*:not(:last-child)]:rounded-b-none [&>*:has(+[data-slot=button-group-separator])]:border-b-0 [&>*:has(+[data-slot=button-group-separator])>[data-slot=button-background]]:border-b-0 [&>button:first-of-type:not(:only-of-type)]:rounded-t-lg [&>button:first-of-type:not(:only-of-type):not(:has(>[data-slot=button-background]))]:border-t [&>button:first-of-type:not(:only-of-type)>[data-slot=button-background]]:border-t [&>a:first-of-type:not(:only-of-type)]:rounded-t-lg [&>a:first-of-type:not(:only-of-type):not(:has(>[data-slot=button-background]))]:border-t [&>a:first-of-type:not(:only-of-type)>[data-slot=button-background]]:border-t [&>button:last-of-type:not(:only-of-type)]:rounded-b-lg [&>a:last-of-type:not(:only-of-type)]:rounded-b-lg",
+          "flex-col [&>*:not(:first-child)]:rounded-t-none [&>*:not(:first-child)]:border-t-0 [&>button:not(:first-child):not([data-slot=select-trigger])]:before:border-t-0 [&>a:not(:first-child)]:before:border-t-0 [&>*:not(:last-child)]:rounded-b-none [&>*:has(+[data-slot=button-group-separator])]:border-b-0 [&>button:has(+[data-slot=button-group-separator]):not([data-slot=select-trigger])]:before:border-b-0 [&>a:has(+[data-slot=button-group-separator])]:before:border-b-0 [&>button:first-of-type:not(:only-of-type)]:rounded-t-lg [&>button:first-of-type:not(:only-of-type):not([data-slot=select-trigger])]:before:border-t [&>[data-slot=select-trigger]:first-of-type:not(:only-of-type)]:border-t [&>a:first-of-type:not(:only-of-type)]:rounded-t-lg [&>a:first-of-type:not(:only-of-type)]:before:border-t [&>button:last-of-type:not(:only-of-type)]:rounded-b-lg [&>a:last-of-type:not(:only-of-type)]:rounded-b-lg",
       },
     },
     defaultVariants: {

@@ -534,9 +534,9 @@ function FilterAddButton({
             variant="outline"
             size={size}
             className={cn(
-              // The border renders on Button's background layer, so border
-              // style overrides must target it, not the root.
-              "text-muted-foreground gap-1.5 *:data-[slot=button-background]:border-dashed",
+              // The border renders on the button's paint pseudo-element, so
+              // border style overrides use before: classes.
+              "text-muted-foreground gap-1.5 before:border-dashed",
               className,
             )}
             leadingIcon={<HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />}

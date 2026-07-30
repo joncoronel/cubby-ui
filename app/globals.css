@@ -80,7 +80,17 @@ html {
   --secondary-hover: color-mix(in oklch, var(--secondary), black 5%);
   --outline-hover: color-mix(in oklch, var(--card), black 5%);
 
-  --border: oklch(0 0 0 / 10%);
+  /* Pressed colors — one step past hover in the same direction, so a held
+     press reads as deeper than hover. */
+  --primary-active: color-mix(in oklch, var(--primary), black 8%);
+  --neutral-active: color-mix(in oklch, var(--neutral), white 14%);
+  --destructive-active: color-mix(in oklch, var(--destructive), black 8%);
+  --secondary-active: color-mix(in oklch, var(--secondary), black 8%);
+  --outline-active: color-mix(in oklch, var(--card), black 8%);
+
+  /* Mixed from --foreground so it tracks the theme automatically — no dark
+     override needed (the mix resolves against dark's --foreground there). */
+  --border: color-mix(in oklab, var(--foreground) 10%, transparent);
   /* Default form-field bg — opaque "clean lifted card" look. Aliased to
      surface-3 so it tracks the ladder. Used by the `default` variant of Input,
      Textarea, Checkbox, Radio, Switch, etc. */
@@ -147,6 +157,7 @@ html {
      what level it's sitting on. Light mode uses black-on-white, dark mode uses
      white-on-black. */
   --surface-hover: oklch(0 0 0 / 0.04);
+  --surface-active: oklch(0 0 0 / 0.06);
   --surface-selected: oklch(0 0 0 / 0.08);
 
   /* Single-edge rim color — used by viewport-flush elevated containers
@@ -257,7 +268,13 @@ html {
   --secondary-hover: color-mix(in oklch, var(--secondary), white 5%);
   --outline-hover: color-mix(in oklch, var(--card), white 5%);
 
-  --border: oklch(1 0 0 / 10%);
+  /* Dark pressed colors — one step past hover, mixing toward white. */
+  --primary-active: color-mix(in oklch, var(--primary), white 14%);
+  --neutral-active: color-mix(in oklch, var(--neutral), black 14%);
+  --destructive-active: color-mix(in oklch, var(--destructive), white 20%);
+  --secondary-active: color-mix(in oklch, var(--secondary), white 8%);
+  --outline-active: color-mix(in oklch, var(--card), white 8%);
+
   --input-elevated: oklch(1 0 0 / 9%);
   --scrollbar: oklch(0.7 var(--neutral-chroma) var(--neutral-hue));
 
@@ -291,6 +308,7 @@ html {
 
   /* State overlays flip from black-on-white to white-on-black */
   --surface-hover: oklch(1 0 0 / 0.04);
+  --surface-active: oklch(1 0 0 / 0.06);
   --surface-selected: oklch(1 0 0 / 0.08);
 
   /* Single-edge rim — visible in dark, transparent in light (above) */

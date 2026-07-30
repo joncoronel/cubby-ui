@@ -24,36 +24,37 @@ const buttonRootVariantClasses = {
   neutral: "text-neutral-foreground",
   destructive: "text-destructive-foreground",
   "destructive-soft": "text-(--destructive-soft-foreground)",
-  outline:
-    "hover:text-accent-foreground data-popup-open:text-accent-foreground",
+  outline: "",
   secondary: "text-secondary-foreground",
-  ghost: "text-muted-foreground hover:text-foreground data-popup-open:text-foreground",
+  ghost:
+    "text-muted-foreground hover:text-foreground data-popup-open:text-foreground",
   link: "text-primary underline-offset-4 hover:underline",
 };
 
-// Background variant styles. The hover color carries three prefixes: `hover:`
-// (flat single-element usage via `buttonVariants`), `group-hover/button:`
-// (<Button>'s background layer, which isn't its own :hover target when the
-// cursor sits over the label), and `data-popup-open:`/its group twin — Base UI
-// stamps data-popup-open on trigger buttons, so a trigger holds its hover
-// color while the popover/dropdown it anchors is open.
+// Background variant styles. Each state color carries a plain prefix (flat
+// single-element usage via `buttonVariants`) and a `group-*/button:` twin
+// (<Button>'s background layer, which isn't its own :hover/:active target
+// when the cursor sits over the label). States: hover, active (pressed goes
+// one step past hover), and data-popup-open — Base UI stamps that attribute
+// on trigger buttons, so a trigger holds its hover color while the
+// popover/dropdown it anchors is open.
 const buttonBackgroundVariantClasses = {
   primary:
-    "bg-primary hover:bg-(--primary-hover) group-hover/button:bg-(--primary-hover) data-popup-open:bg-(--primary-hover) group-data-popup-open/button:bg-(--primary-hover)",
+    "bg-primary hover:bg-(--primary-hover) group-hover/button:bg-(--primary-hover) active:bg-(--primary-active) group-active/button:bg-(--primary-active) data-popup-open:bg-(--primary-hover) group-data-popup-open/button:bg-(--primary-hover)",
   "primary-soft":
-    "bg-secondary hover:bg-(--secondary-hover) group-hover/button:bg-(--secondary-hover) data-popup-open:bg-(--secondary-hover) group-data-popup-open/button:bg-(--secondary-hover)",
+    "bg-secondary hover:bg-(--secondary-hover) group-hover/button:bg-(--secondary-hover) active:bg-(--secondary-active) group-active/button:bg-(--secondary-active) data-popup-open:bg-(--secondary-hover) group-data-popup-open/button:bg-(--secondary-hover)",
   neutral:
-    "bg-neutral hover:bg-(--neutral-hover) group-hover/button:bg-(--neutral-hover) data-popup-open:bg-(--neutral-hover) group-data-popup-open/button:bg-(--neutral-hover)",
+    "bg-neutral hover:bg-(--neutral-hover) group-hover/button:bg-(--neutral-hover) active:bg-(--neutral-active) group-active/button:bg-(--neutral-active) data-popup-open:bg-(--neutral-hover) group-data-popup-open/button:bg-(--neutral-hover)",
   destructive:
-    "border border-black/5 dark:border-white/5 bg-destructive hover:bg-(--destructive-hover) group-hover/button:bg-(--destructive-hover) data-popup-open:bg-(--destructive-hover) group-data-popup-open/button:bg-(--destructive-hover)",
+    "border border-black/5 dark:border-white/5 bg-destructive hover:bg-(--destructive-hover) group-hover/button:bg-(--destructive-hover) active:bg-(--destructive-active) group-active/button:bg-(--destructive-active) data-popup-open:bg-(--destructive-hover) group-data-popup-open/button:bg-(--destructive-hover)",
   "destructive-soft":
-    "bg-destructive/12 hover:bg-destructive/20 group-hover/button:bg-destructive/20 data-popup-open:bg-destructive/20 group-data-popup-open/button:bg-destructive/20",
+    "bg-destructive/12 hover:bg-destructive/20 group-hover/button:bg-destructive/20 active:bg-destructive/25 group-active/button:bg-destructive/25 data-popup-open:bg-destructive/20 group-data-popup-open/button:bg-destructive/20",
   outline:
-    "border bg-card bg-clip-padding hover:bg-(--outline-hover) group-hover/button:bg-(--outline-hover) data-popup-open:bg-(--outline-hover) group-data-popup-open/button:bg-(--outline-hover)",
+    "border bg-card bg-clip-padding hover:bg-(--outline-hover) group-hover/button:bg-(--outline-hover) active:bg-(--outline-active) group-active/button:bg-(--outline-active) data-popup-open:bg-(--outline-hover) group-data-popup-open/button:bg-(--outline-hover)",
   secondary:
-    "border border-transparent bg-secondary hover:bg-(--secondary-hover) group-hover/button:bg-(--secondary-hover) data-popup-open:bg-(--secondary-hover) group-data-popup-open/button:bg-(--secondary-hover)",
+    "border border-transparent bg-secondary hover:bg-(--secondary-hover) group-hover/button:bg-(--secondary-hover) active:bg-(--secondary-active) group-active/button:bg-(--secondary-active) data-popup-open:bg-(--secondary-hover) group-data-popup-open/button:bg-(--secondary-hover)",
   ghost:
-    "border border-transparent hover:bg-surface-hover group-hover/button:bg-surface-hover data-popup-open:bg-surface-hover group-data-popup-open/button:bg-surface-hover",
+    "border border-transparent hover:bg-surface-hover group-hover/button:bg-surface-hover active:bg-(--surface-active) group-active/button:bg-(--surface-active) data-popup-open:bg-surface-hover group-data-popup-open/button:bg-surface-hover",
   link: "",
 };
 
@@ -64,14 +65,15 @@ type ButtonVariant = keyof typeof buttonRootVariantClasses;
 // fluid-functionalism. Below the sm breakpoint each size is one step taller
 // for comfortable touch targets.
 const buttonSizeVariantClasses = {
-  default: "h-10 sm:h-9 px-3 gap-1.5 text-sm",
+  default: "h-10 sm:h-9 px-3.5 gap-1.5 text-sm",
   xs: "h-8 sm:h-7 px-2.5 gap-1 text-xs rounded-md [&_svg:not([class*='size-'])]:size-3.5",
-  sm: "h-9 sm:h-8 px-3 gap-1.5 text-[13px]",
-  lg: "h-11 sm:h-10 px-3.5 gap-1.5 text-sm [&_svg:not([class*='size-'])]:size-5",
-  icon: "size-10 sm:size-9",
-  icon_xs: "size-8 sm:size-7 rounded-md [&_svg:not([class*='size-'])]:size-3.5",
-  icon_sm: "size-9 sm:size-8",
-  icon_lg: "size-11 sm:size-10 [&_svg:not([class*='size-'])]:size-5",
+  sm: "h-9 sm:h-8 px-3 gap-1.5 text-[13px] ",
+  lg: "h-11 sm:h-10 px-3.5 gap-1.5 text-base [&_svg:not([class*='size-'])]:size-5",
+  icon: "size-10 sm:size-9 text-sm",
+  icon_xs:
+    "size-8 sm:size-7 rounded-md text-xs [&_svg:not([class*='size-'])]:size-3.5",
+  icon_sm: "size-9 sm:size-8 text-[13px]",
+  icon_lg: "size-11 sm:size-10 text-base [&_svg:not([class*='size-'])]:size-5",
 };
 
 // Flat, single-element recipe for styling plain elements as buttons (links,
@@ -112,12 +114,12 @@ const buttonRootVariants = cva(buttonBase, {
     iconRight: { true: "" },
   },
   compoundVariants: [
-    { size: "default", iconLeft: true, className: "pl-2" },
-    { size: "default", iconRight: true, className: "pr-2" },
+    { size: "default", iconLeft: true, className: "pl-2.5" },
+    { size: "default", iconRight: true, className: "pr-2.5" },
     { size: "sm", iconLeft: true, className: "pl-2" },
     { size: "sm", iconRight: true, className: "pr-2" },
-    { size: "xs", iconLeft: true, className: "pl-1.5" },
-    { size: "xs", iconRight: true, className: "pr-1.5" },
+    { size: "xs", iconLeft: true, className: "pl-2" },
+    { size: "xs", iconRight: true, className: "pr-2" },
     { size: "lg", iconLeft: true, className: "pl-2.5" },
     { size: "lg", iconRight: true, className: "pr-2.5" },
   ],

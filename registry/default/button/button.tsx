@@ -8,25 +8,26 @@ import { Loading03Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 
 // The button's visuals are split across two elements: the root owns layout,
-// text color, borders, and the focus ring, while backgrounds render on a
+// text color, and the focus ring, while backgrounds and borders render on a
 // separate layer inside <Button> that scales down on press — the pill shrinks
-// but the label stays put. Borders stay on the root so ButtonGroup's
-// child-root selectors (border-l-0, rounded-l-none, ...) keep working.
+// but the label stays put. ButtonGroup targets the layer (via
+// [data-slot=button-background]) alongside child roots when collapsing
+// borders between segments.
 const buttonBase =
   "relative isolate inline-flex items-center cursor-pointer justify-center whitespace-nowrap rounded-lg font-medium data-disabled:pointer-events-none data-disabled:opacity-60 data-disabled:focus-visible:outline-ring [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,scale,opacity,shadow,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid";
 
-// Root-level variant styles: text color and borders.
+// Root-level variant styles: text color only. Borders live with the
+// backgrounds so the whole pill (border + fill) scales together on press.
 const buttonRootVariantClasses = {
   primary: "text-primary-foreground",
   "primary-soft": "text-(--primary-soft-foreground)",
   neutral: "text-neutral-foreground",
-  destructive:
-    "text-destructive-foreground border border-black/5 dark:border-white/5",
+  destructive: "text-destructive-foreground",
   "destructive-soft": "text-(--destructive-soft-foreground)",
   outline:
-    "border hover:text-accent-foreground data-popup-open:text-accent-foreground",
-  secondary: "text-secondary-foreground border border-transparent",
-  ghost: "text-muted-foreground hover:text-foreground data-popup-open:text-foreground border border-transparent",
+    "hover:text-accent-foreground data-popup-open:text-accent-foreground",
+  secondary: "text-secondary-foreground",
+  ghost: "text-muted-foreground hover:text-foreground data-popup-open:text-foreground",
   link: "text-primary underline-offset-4 hover:underline",
 };
 
@@ -44,15 +45,15 @@ const buttonBackgroundVariantClasses = {
   neutral:
     "bg-neutral hover:bg-(--neutral-hover) group-hover/button:bg-(--neutral-hover) data-popup-open:bg-(--neutral-hover) group-data-popup-open/button:bg-(--neutral-hover)",
   destructive:
-    "bg-destructive hover:bg-(--destructive-hover) group-hover/button:bg-(--destructive-hover) data-popup-open:bg-(--destructive-hover) group-data-popup-open/button:bg-(--destructive-hover)",
+    "border border-black/5 dark:border-white/5 bg-destructive hover:bg-(--destructive-hover) group-hover/button:bg-(--destructive-hover) data-popup-open:bg-(--destructive-hover) group-data-popup-open/button:bg-(--destructive-hover)",
   "destructive-soft":
     "bg-destructive/12 hover:bg-destructive/20 group-hover/button:bg-destructive/20 data-popup-open:bg-destructive/20 group-data-popup-open/button:bg-destructive/20",
   outline:
-    "bg-card bg-clip-padding hover:bg-(--outline-hover) group-hover/button:bg-(--outline-hover) data-popup-open:bg-(--outline-hover) group-data-popup-open/button:bg-(--outline-hover)",
+    "border bg-card bg-clip-padding hover:bg-(--outline-hover) group-hover/button:bg-(--outline-hover) data-popup-open:bg-(--outline-hover) group-data-popup-open/button:bg-(--outline-hover)",
   secondary:
-    "bg-secondary hover:bg-(--secondary-hover) group-hover/button:bg-(--secondary-hover) data-popup-open:bg-(--secondary-hover) group-data-popup-open/button:bg-(--secondary-hover)",
+    "border border-transparent bg-secondary hover:bg-(--secondary-hover) group-hover/button:bg-(--secondary-hover) data-popup-open:bg-(--secondary-hover) group-data-popup-open/button:bg-(--secondary-hover)",
   ghost:
-    "hover:bg-surface-hover group-hover/button:bg-surface-hover data-popup-open:bg-surface-hover group-data-popup-open/button:bg-surface-hover",
+    "border border-transparent hover:bg-surface-hover group-hover/button:bg-surface-hover data-popup-open:bg-surface-hover group-data-popup-open/button:bg-surface-hover",
   link: "",
 };
 

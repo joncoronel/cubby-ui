@@ -41,10 +41,14 @@ const switchVariants = cva(
     // outline-offset measures from the border box, which now sits 2px inside
     // the painted edge, so 4 keeps the focus ring the same 2px clear of it.
     "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-4",
-    // 24px pointer target (WCAG 2.5.8) without touching the visual or layout.
-    // Inert wherever the switch is a decorative indicator, since those set
-    // pointer-events-none on the root.
-    "before:absolute before:inset-x-0 before:top-1/2 before:h-6 before:-translate-y-1/2 before:content-['']",
+    // Pointer target. It has to reach the painted edge, which the ring puts 2px
+    // outside the border box — otherwise the visible rim is not clickable.
+    // On a mouse it stops exactly there, so hover never fires over blank space.
+    // Coarse pointers get the 24px minimum (WCAG 2.5.8) instead, where the
+    // extra reach matters and there is no hover to mismatch. Inert wherever the
+    // switch is a decorative indicator, since those set pointer-events-none.
+    "before:absolute before:-inset-0.5 before:content-['']",
+    "pointer-coarse:before:inset-y-[calc((100%-24px)/2)]",
     "data-disabled:cursor-not-allowed data-disabled:opacity-60",
   ],
   {

@@ -62,7 +62,7 @@ const switchThumbVariants = cva([
   // `translate` is set directly rather than through translate-x-(--thumb-travel):
   // that utility routes the value through the registered --tw-translate-x
   // @property, which misbehaves in Safari.
-  "transform-gpu will-change-transform [translate:var(--thumb-travel)]",
+  " [translate:var(--thumb-travel)]",
 ]);
 
 type SwitchProps = React.ComponentProps<typeof BaseSwitch.Root> &

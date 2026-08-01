@@ -99,4 +99,6 @@ Toggle control for binary on/off states. Wraps Base UI's `Switch.Root` and `Swit
 
 </ApiPropsList>
 
-Switch does not expose a `variant` prop like the other form fields. The unchecked track always uses `bg-input-elevated`, a translucent overlay that adapts to whatever substrate it sits on. This contrasts with both the thumb (white in light, page-dark in dark) AND the parent surface, so a single behavior works everywhere. See the [Surfaces](/docs/getting-started/surfaces) docs.
+Switch does not expose a `variant` prop like the other form fields. The unchecked track uses `--switch-track`, a translucent overlay that adapts to whatever substrate it sits on, so one track color works on a page, a Card, or a toolbar. It is a separate token from `--input-elevated` because a switch has no border: the fill *is* the control's boundary, so it carries more weight in dark mode than a field background would. The thumb is white in both themes, contrasting with the track and the parent surface alike. See the [Surfaces](/docs/getting-started/surfaces) docs.
+
+Hover moves the track one step further along that overlay, which darkens it in light mode and lightens it in dark from a single rule. A checked track darkens in both, since lightening the primary reads as disabled. Set `--switch-track` and `--switch-track-hover` to retune both.

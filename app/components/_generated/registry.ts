@@ -412,7 +412,7 @@ import slider_slider_with_value from "@/registry/examples/slider/slider-with-val
 import switch_switch_basic from "@/registry/examples/switch/switch-basic";
 import switch_switch_card from "@/registry/examples/switch/switch-card";
 import switch_switch_field from "@/registry/examples/switch/switch-field";
-import switch_switch_pill from "@/registry/examples/switch/switch-pill";
+import switch_switch_shapes from "@/registry/examples/switch/switch-shapes";
 import switch_switch_sizes from "@/registry/examples/switch/switch-sizes";
 import table_table_basic from "@/registry/examples/table/table-basic";
 import table_table_bordered from "@/registry/examples/table/table-bordered";
@@ -3695,9 +3695,9 @@ export const exampleRegistry = {
       "source": "import {\n  Field,\n  FieldDescription,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Switch } from \"@/components/ui/cubby-ui/switch\";\n\nexport default function SwitchField() {\n  return (\n    <Field name=\"notifications\">\n      <FieldLabel>\n        Email notifications\n        <Switch defaultChecked />\n      </FieldLabel>\n      <FieldDescription>\n        Receive email notifications when someone mentions you.\n      </FieldDescription>\n    </Field>\n  );\n}\n"
     },
     {
-      "title": "Pill",
-      "importPath": "switch-pill",
-      "source": "import { Switch } from \"@/components/ui/cubby-ui/switch\";\n\nexport default function SwitchPill() {\n  return <Switch shape=\"pill\" />;\n}\n"
+      "title": "Shapes",
+      "importPath": "switch-shapes",
+      "source": "import { Switch } from \"@/components/ui/cubby-ui/switch\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function SwitchShapes() {\n  return (\n    <div className=\"flex items-center gap-6\">\n      <Label className=\"flex-row items-center gap-2\" htmlFor=\"shape-circle\">\n        <Switch defaultChecked id=\"shape-circle\" />\n        circle\n      </Label>\n      <Label className=\"flex-row items-center gap-2\" htmlFor=\"shape-pill\">\n        <Switch defaultChecked id=\"shape-pill\" shape=\"pill\" />\n        pill\n      </Label>\n      <Label className=\"flex-row items-center gap-2\" htmlFor=\"shape-square\">\n        <Switch defaultChecked id=\"shape-square\" shape=\"square\" />\n        square\n      </Label>\n    </div>\n  );\n}\n"
     },
     {
       "title": "Sizes",
@@ -4481,7 +4481,7 @@ export const componentMap = {
   "switch-basic": switch_switch_basic,
   "switch-card": switch_switch_card,
   "switch-field": switch_switch_field,
-  "switch-pill": switch_switch_pill,
+  "switch-shapes": switch_switch_shapes,
   "switch-sizes": switch_switch_sizes,
   "table-basic": table_table_basic,
   "table-bordered": table_table_bordered,

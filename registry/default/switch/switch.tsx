@@ -6,7 +6,11 @@ import { cn } from "@/lib/utils";
 
 const switchVariants = cva(
   [
-    "peer relative inline-flex shrink-0 items-center rounded-full outline-none cursor-pointer",
+    "peer relative inline-flex shrink-0 items-center outline-none cursor-pointer",
+    // Radius comes from the shape variant and is inherited by the thumb, so the
+    // two silhouettes always agree. The fallback keeps the thumb styles usable
+    // on their own, where no track has set the variable.
+    "rounded-[var(--switch-radius,9999px)]",
     // The 2px inset around the thumb is a ring, not padding. A ring is one
     // shape expanded uniformly from the border box, so its thickness is
     // constant at any sub-pixel offset. As padding, the inset is instead the
@@ -53,11 +57,16 @@ const switchVariants = cva(
   ],
   {
     variants: {
-      // Shape sets the thumb's proportions, size sets its height. They're
-      // independent: every shape works at every size.
+      // Shape sets the thumb's silhouette — proportions and corner radius —
+      // size sets its height. They're independent: every shape works at every
+      // size, so the radius is a fraction of --thumb-size rather than a fixed
+      // px value that would read as too round at xs and too sharp at default.
       shape: {
-        circle: "[--thumb-aspect:1] [--travel-ratio:0.8]",
-        pill: "[--thumb-aspect:1.8] [--travel-ratio:0.45]",
+        circle:
+          "[--switch-radius:9999px] [--thumb-aspect:1] [--travel-ratio:0.8]",
+        pill: "[--switch-radius:9999px] [--thumb-aspect:1.8] [--travel-ratio:0.45]",
+        square:
+          "[--switch-radius:calc(var(--thumb-size)*0.3)] [--thumb-aspect:1] [--travel-ratio:0.8]",
       },
       size: {
         xs: "[--thumb-size:--spacing(3.5)]",
@@ -75,7 +84,7 @@ const switchVariants = cva(
 const switchThumbVariants = cva([
   // White in both themes. In dark mode the thumb is the lit element against a
   // recessed track, the same way physical switches read.
-  "pointer-events-none block rounded-full bg-white",
+  "pointer-events-none block rounded-[var(--switch-radius,9999px)] bg-white",
   "aspect-(--thumb-aspect) h-(--thumb-size)",
   // Only 2px of track shows around the thumb, so a heavier shadow darkens the
   // gap below it and the thumb reads as sitting low. Balanced against the

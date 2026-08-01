@@ -28,16 +28,19 @@ Wrap the switch in a `Label` to make a whole card row toggle the control.
 
 <ComponentPreview component="switch" example="switch-card" />
 
-### Pill Shape
+### Shapes
 
-Use `shape` to set the thumb's aspect ratio and travel distance.
+Use `shape` to set the thumb's silhouette. It controls the aspect ratio, the corner radius, and the travel distance together, and the track follows the thumb so the two always match.
 
-<ComponentPreview component="switch" example="switch-pill" />
+<ComponentPreview component="switch" example="switch-shapes" />
 
-| Shape    | Description                                  |
-| -------- | -------------------------------------------- |
-| `circle` | The default, a round thumb.                  |
-| `pill`   | A wider, rectangular thumb.                  |
+| Shape    | Description                                                          |
+| -------- | -------------------------------------------------------------------- |
+| `circle` | The default, a round thumb.                                          |
+| `pill`   | A wider, rectangular thumb.                                          |
+| `square` | A rounded square thumb, for a more mechanical look.                  |
+
+`square` sets its radius as a fraction of `--thumb-size` rather than a fixed pixel value, so the corners stay proportional across every size instead of reading too round at `xs` and too sharp at `default`.
 
 ### Sizes
 
@@ -81,11 +84,11 @@ Toggle control for binary on/off states. Wraps Base UI's `Switch.Root` and `Swit
 
 <ApiProp
   name="shape"
-  fullType='"circle" | "pill"'
+  fullType='"circle" | "pill" | "square"'
   simpleType="string"
   defaultValue='"circle"'
 >
-  Controls the aspect ratio and animation travel distance of the switch thumb. Use `"pill"` for a wider, more rectangular thumb.
+  Controls the aspect ratio, corner radius and animation travel distance of the switch thumb. Use `"pill"` for a wider, more rectangular thumb, or `"square"` for a rounded square one. The track picks up the same radius, so both stay in step.
 </ApiProp>
 
 <ApiProp

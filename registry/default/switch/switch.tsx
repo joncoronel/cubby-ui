@@ -7,10 +7,10 @@ import { cn } from "@/lib/utils";
 const switchVariants = cva(
   [
     "peer relative inline-flex shrink-0 items-center outline-none cursor-pointer",
-    // Radius comes from the shape variant and is inherited by the thumb, so the
-    // two silhouettes always agree. The fallback keeps the thumb styles usable
-    // on their own, where no track has set the variable.
-    "rounded-[var(--switch-radius,9999px)]",
+    // Radius and corner shape come from the shape variant and are inherited by
+    // the thumb, so the two silhouettes always agree. The fallbacks keep the
+    // thumb styles usable on their own, where no track has set the variables.
+    "rounded-[var(--switch-radius,9999px)] [corner-shape:var(--switch-corner-shape,round)]",
     // The 2px inset around the thumb is a ring, not padding. A ring is one
     // shape expanded uniformly from the border box, so its thickness is
     // constant at any sub-pixel offset. As padding, the inset is instead the
@@ -65,8 +65,16 @@ const switchVariants = cva(
         circle:
           "[--switch-radius:9999px] [--thumb-aspect:1] [--travel-ratio:0.8]",
         pill: "[--switch-radius:9999px] [--thumb-aspect:1.8] [--travel-ratio:0.45]",
-        square:
-          "[--switch-radius:calc(var(--thumb-size)*0.3)] [--thumb-aspect:1] [--travel-ratio:0.8]",
+        // A superellipse, not a rounded rect. corner-shape needs a radius near
+        // 50% to read as a squircle, but that same radius without corner-shape
+        // support is just a circle — so the plain-radius fallback is the
+        // smaller value, which degrades to a rounded square instead.
+        squircle: [
+          "[--switch-radius:calc(var(--thumb-size)*0.3)]",
+          "supports-[corner-shape:squircle]:[--switch-radius:calc(var(--thumb-size)*0.5)]",
+          "[--switch-corner-shape:squircle]",
+          "[--thumb-aspect:1] [--travel-ratio:0.8]",
+        ].join(" "),
       },
       size: {
         xs: "[--thumb-size:--spacing(3.5)]",
@@ -84,7 +92,8 @@ const switchVariants = cva(
 const switchThumbVariants = cva([
   // White in both themes. In dark mode the thumb is the lit element against a
   // recessed track, the same way physical switches read.
-  "pointer-events-none block rounded-[var(--switch-radius,9999px)] bg-white",
+  "pointer-events-none block bg-white",
+  "rounded-[var(--switch-radius,9999px)] [corner-shape:var(--switch-corner-shape,round)]",
   "aspect-(--thumb-aspect) h-(--thumb-size)",
   // Only 2px of track shows around the thumb, so a heavier shadow darkens the
   // gap below it and the thumb reads as sitting low. Balanced against the

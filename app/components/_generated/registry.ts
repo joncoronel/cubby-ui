@@ -3697,7 +3697,7 @@ export const exampleRegistry = {
     {
       "title": "Shapes",
       "importPath": "switch-shapes",
-      "source": "import { Switch } from \"@/components/ui/cubby-ui/switch\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function SwitchShapes() {\n  return (\n    <div className=\"flex items-center gap-6\">\n      <Label className=\"flex-row items-center gap-2\" htmlFor=\"shape-circle\">\n        <Switch defaultChecked id=\"shape-circle\" />\n        circle\n      </Label>\n      <Label className=\"flex-row items-center gap-2\" htmlFor=\"shape-pill\">\n        <Switch defaultChecked id=\"shape-pill\" shape=\"pill\" />\n        pill\n      </Label>\n      <Label className=\"flex-row items-center gap-2\" htmlFor=\"shape-square\">\n        <Switch defaultChecked id=\"shape-square\" shape=\"square\" />\n        square\n      </Label>\n    </div>\n  );\n}\n"
+      "source": "import { Switch } from \"@/components/ui/cubby-ui/switch\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function SwitchShapes() {\n  return (\n    <div className=\"flex items-center gap-6\">\n      <Label className=\"flex-row items-center gap-2\" htmlFor=\"shape-circle\">\n        <Switch defaultChecked id=\"shape-circle\" />\n        circle\n      </Label>\n      <Label className=\"flex-row items-center gap-2\" htmlFor=\"shape-pill\">\n        <Switch defaultChecked id=\"shape-pill\" shape=\"pill\" />\n        pill\n      </Label>\n      <Label className=\"flex-row items-center gap-2\" htmlFor=\"shape-squircle\">\n        <Switch defaultChecked id=\"shape-squircle\" shape=\"squircle\" />\n        squircle\n      </Label>\n    </div>\n  );\n}\n"
     },
     {
       "title": "Sizes",

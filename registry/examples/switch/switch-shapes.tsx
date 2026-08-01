@@ -12,9 +12,9 @@ export default function SwitchShapes() {
         <Switch defaultChecked id="shape-pill" shape="pill" />
         pill
       </Label>
-      <Label className="flex-row items-center gap-2" htmlFor="shape-square">
-        <Switch defaultChecked id="shape-square" shape="square" />
-        square
+      <Label className="flex-row items-center gap-2" htmlFor="shape-squircle">
+        <Switch defaultChecked id="shape-squircle" shape="squircle" />
+        squircle
       </Label>
     </div>
   );

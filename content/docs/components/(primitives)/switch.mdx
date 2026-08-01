@@ -34,13 +34,15 @@ Use `shape` to set the thumb's silhouette. It controls the aspect ratio, the cor
 
 <ComponentPreview component="switch" example="switch-shapes" />
 
-| Shape    | Description                                                          |
-| -------- | -------------------------------------------------------------------- |
-| `circle` | The default, a round thumb.                                          |
-| `pill`   | A wider, rectangular thumb.                                          |
-| `square` | A rounded square thumb, for a more mechanical look.                  |
+| Shape      | Description                                          |
+| ---------- | ---------------------------------------------------- |
+| `circle`   | The default, a round thumb.                          |
+| `pill`     | A wider, rectangular thumb.                          |
+| `squircle` | A squared-off thumb, for a more mechanical look.     |
 
-`square` sets its radius as a fraction of `--thumb-size` rather than a fixed pixel value, so the corners stay proportional across every size instead of reading too round at `xs` and too sharp at `default`.
+`squircle` uses the CSS `corner-shape` property, which draws a superellipse rather than a quarter-circle at each corner. Browsers without it fall back to a plain rounded square: the fallback deliberately uses a smaller radius, because the near-50% radius a squircle needs would render as a plain circle without `corner-shape` to reshape it.
+
+Every shape sets its radius as a fraction of `--thumb-size` rather than a fixed pixel value, so the corners stay proportional across sizes instead of reading too round at `xs` and too sharp at `default`.
 
 ### Sizes
 
@@ -84,11 +86,11 @@ Toggle control for binary on/off states. Wraps Base UI's `Switch.Root` and `Swit
 
 <ApiProp
   name="shape"
-  fullType='"circle" | "pill" | "square"'
+  fullType='"circle" | "pill" | "squircle"'
   simpleType="string"
   defaultValue='"circle"'
 >
-  Controls the aspect ratio, corner radius and animation travel distance of the switch thumb. Use `"pill"` for a wider, more rectangular thumb, or `"square"` for a rounded square one. The track picks up the same radius, so both stay in step.
+  Controls the aspect ratio, corner shape and animation travel distance of the switch thumb. Use `"pill"` for a wider, more rectangular thumb, or `"squircle"` for a squared-off one. The track picks up the same corner treatment, so both stay in step.
 </ApiProp>
 
 <ApiProp

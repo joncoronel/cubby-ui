@@ -64,6 +64,7 @@ import base_drawer_base_drawer_nested from "@/registry/examples/base-drawer/base
 import base_drawer_base_drawer_side from "@/registry/examples/base-drawer/base-drawer-side";
 import base_drawer_base_drawer_snap_points from "@/registry/examples/base-drawer/base-drawer-snap-points";
 import base_drawer_base_drawer_with_form from "@/registry/examples/base-drawer/base-drawer-with-form";
+import base_drawer_base_drawer_with_menu from "@/registry/examples/base-drawer/base-drawer-with-menu";
 import base_drawer_base_drawer_with_scroll from "@/registry/examples/base-drawer/base-drawer-with-scroll";
 import breadcrumbs_breadcrumbs_basic from "@/registry/examples/breadcrumbs/breadcrumbs-basic";
 import breadcrumbs_breadcrumbs_custom_separator from "@/registry/examples/breadcrumbs/breadcrumbs-custom-separator";
@@ -166,6 +167,7 @@ import context_menu_context_menu_basic from "@/registry/examples/context-menu/co
 import context_menu_context_menu_with_checkboxes_and_radio_groups from "@/registry/examples/context-menu/context-menu-with-checkboxes-and-radio-groups";
 import context_menu_context_menu_with_separators_and_shortcuts from "@/registry/examples/context-menu/context-menu-with-separators-and-shortcuts";
 import context_menu_context_menu_with_submenus from "@/registry/examples/context-menu/context-menu-with-submenus";
+import context_menu_context_menu_with_switch from "@/registry/examples/context-menu/context-menu-with-switch";
 import copy_button_copy_button_custom_icons_demo from "@/registry/examples/copy-button/copy-button-custom-icons-demo";
 import copy_button_copy_button_demo from "@/registry/examples/copy-button/copy-button-demo";
 import copy_button_copy_button_with_toast from "@/registry/examples/copy-button/copy-button-with-toast";
@@ -212,8 +214,10 @@ import dropdown_menu_dropdown_menu_basic from "@/registry/examples/dropdown-menu
 import dropdown_menu_dropdown_menu_animated from "@/registry/examples/dropdown-menu/dropdown-menu-animated";
 import dropdown_menu_dropdown_menu_with_checkboxes from "@/registry/examples/dropdown-menu/dropdown-menu-with-checkboxes";
 import dropdown_menu_dropdown_menu_with_icons_and_shortcuts from "@/registry/examples/dropdown-menu/dropdown-menu-with-icons-and-shortcuts";
+import dropdown_menu_dropdown_menu_with_inset from "@/registry/examples/dropdown-menu/dropdown-menu-with-inset";
 import dropdown_menu_dropdown_menu_with_radio_group from "@/registry/examples/dropdown-menu/dropdown-menu-with-radio-group";
 import dropdown_menu_dropdown_menu_with_sub_menu from "@/registry/examples/dropdown-menu/dropdown-menu-with-sub-menu";
+import dropdown_menu_dropdown_menu_with_switches from "@/registry/examples/dropdown-menu/dropdown-menu-with-switches";
 import fancy_button_fancy_button_demo from "@/registry/examples/fancy-button/fancy-button-demo";
 import fancy_button_fancy_button_as_link from "@/registry/examples/fancy-button/fancy-button-as-link";
 import fancy_button_fancy_button_custom_colors from "@/registry/examples/fancy-button/fancy-button-custom-colors";
@@ -283,6 +287,7 @@ import marching_border_marching_border_basic from "@/registry/examples/marching-
 import marching_border_marching_border_explicit_radius from "@/registry/examples/marching-border/marching-border-explicit-radius";
 import marching_border_marching_border_variants from "@/registry/examples/marching-border/marching-border-variants";
 import menubar_menubar_basic from "@/registry/examples/menubar/menubar-basic";
+import menubar_menubar_with_checkboxes_and_switches from "@/registry/examples/menubar/menubar-with-checkboxes-and-switches";
 import meter_meter_basic from "@/registry/examples/meter/meter-basic";
 import meter_meter_different_sizes from "@/registry/examples/meter/meter-different-sizes";
 import meter_meter_with_labels from "@/registry/examples/meter/meter-with-labels";
@@ -578,6 +583,7 @@ export const componentMetadata = {
     "registryDependencies": [
       "@cubby-ui/button",
       "@cubby-ui/scroll-area",
+      "@cubby-ui/switch",
       "@cubby-ui/elevated"
     ],
     "dependencies": [
@@ -779,6 +785,7 @@ export const componentMetadata = {
     "description": "A context-menu component.",
     "category": "UI",
     "registryDependencies": [
+      "@cubby-ui/switch",
       "@cubby-ui/elevated"
     ],
     "dependencies": [
@@ -904,6 +911,7 @@ export const componentMetadata = {
     "description": "A dropdown-menu component.",
     "category": "UI",
     "registryDependencies": [
+      "@cubby-ui/switch",
       "@cubby-ui/elevated"
     ],
     "dependencies": [
@@ -1045,6 +1053,7 @@ export const componentMetadata = {
     "description": "A menubar component.",
     "category": "UI",
     "registryDependencies": [
+      "@cubby-ui/switch",
       "@cubby-ui/elevated"
     ],
     "dependencies": [
@@ -1841,6 +1850,11 @@ export const exampleRegistry = {
       "source": "import {\n  BaseDrawer,\n  BaseDrawerClose,\n  BaseDrawerDescription,\n  BaseDrawerFooter,\n  BaseDrawerHeader,\n  BaseDrawerPanel,\n  BaseDrawerPopup,\n  BaseDrawerTitle,\n  BaseDrawerTrigger,\n} from \"@/components/ui/cubby-ui/base-drawer\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Input } from \"@/components/ui/cubby-ui/input\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function BaseDrawerWithForm() {\n  return (\n    <BaseDrawer>\n      <BaseDrawerTrigger render={<Button />}>Edit Profile</BaseDrawerTrigger>\n      <BaseDrawerPopup showBar>\n        <BaseDrawerHeader>\n          <BaseDrawerTitle>Edit profile</BaseDrawerTitle>\n          <BaseDrawerDescription>\n            Make changes to your profile here. Click save when you&apos;re done.\n          </BaseDrawerDescription>\n        </BaseDrawerHeader>\n        <BaseDrawerPanel>\n          <div className=\"space-y-4\">\n            <div className=\"space-y-2\">\n              <Label htmlFor=\"bd-name\">Name</Label>\n              <Input id=\"bd-name\" variant=\"elevated\" defaultValue=\"Pedro Duarte\" />\n            </div>\n            <div className=\"space-y-2\">\n              <Label htmlFor=\"bd-username\">Username</Label>\n              <Input id=\"bd-username\" variant=\"elevated\" defaultValue=\"@peduarte\" />\n            </div>\n          </div>\n        </BaseDrawerPanel>\n        <BaseDrawerFooter>\n          <Button>Save changes</Button>\n          <BaseDrawerClose render={<Button variant=\"outline\" />}>\n            Cancel\n          </BaseDrawerClose>\n        </BaseDrawerFooter>\n      </BaseDrawerPopup>\n    </BaseDrawer>\n  );\n}\n"
     },
     {
+      "title": "With Menu",
+      "importPath": "base-drawer-with-menu",
+      "source": "\"use client\";\n\nimport { useState } from \"react\";\n\nimport {\n  BaseDrawer,\n  BaseDrawerTrigger,\n  BaseDrawerPopup,\n  BaseDrawerHeader,\n  BaseDrawerTitle,\n  BaseDrawerDescription,\n  BaseDrawerPanel,\n  BaseDrawerMenu,\n  BaseDrawerMenuGroup,\n  BaseDrawerMenuGroupLabel,\n  BaseDrawerMenuCheckboxItem,\n  BaseDrawerMenuRadioGroup,\n  BaseDrawerMenuRadioItem,\n  BaseDrawerMenuSeparator,\n} from \"@/components/ui/cubby-ui/base-drawer\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nexport default function BaseDrawerWithMenu() {\n  const [wifi, setWifi] = useState(true);\n  const [bluetooth, setBluetooth] = useState(false);\n  const [airplane, setAirplane] = useState(false);\n  const [quality, setQuality] = useState(\"high\");\n\n  return (\n    <BaseDrawer>\n      <BaseDrawerTrigger render={<Button variant=\"outline\" />}>\n        Settings\n      </BaseDrawerTrigger>\n      <BaseDrawerPopup showBar>\n        <BaseDrawerHeader>\n          <BaseDrawerTitle>Settings</BaseDrawerTitle>\n          <BaseDrawerDescription>\n            Toggles use a switch, single-choice options use a checkmark.\n          </BaseDrawerDescription>\n        </BaseDrawerHeader>\n        <BaseDrawerPanel>\n          <BaseDrawerMenu>\n            <BaseDrawerMenuGroup>\n              <BaseDrawerMenuGroupLabel>Connections</BaseDrawerMenuGroupLabel>\n              <BaseDrawerMenuCheckboxItem\n                variant=\"switch\"\n                checked={wifi}\n                onCheckedChange={setWifi}\n              >\n                Wi-Fi\n              </BaseDrawerMenuCheckboxItem>\n              <BaseDrawerMenuCheckboxItem\n                variant=\"switch\"\n                checked={bluetooth}\n                onCheckedChange={setBluetooth}\n              >\n                Bluetooth\n              </BaseDrawerMenuCheckboxItem>\n              <BaseDrawerMenuCheckboxItem\n                checked={airplane}\n                onCheckedChange={setAirplane}\n              >\n                Airplane mode\n              </BaseDrawerMenuCheckboxItem>\n            </BaseDrawerMenuGroup>\n            <BaseDrawerMenuSeparator />\n            <BaseDrawerMenuGroup>\n              <BaseDrawerMenuGroupLabel>\n                Streaming quality\n              </BaseDrawerMenuGroupLabel>\n              <BaseDrawerMenuRadioGroup\n                value={quality}\n                onValueChange={(next) => setQuality(next as string)}\n              >\n                <BaseDrawerMenuRadioItem value=\"low\">\n                  Low\n                </BaseDrawerMenuRadioItem>\n                <BaseDrawerMenuRadioItem value=\"standard\">\n                  Standard\n                </BaseDrawerMenuRadioItem>\n                <BaseDrawerMenuRadioItem value=\"high\">\n                  High\n                </BaseDrawerMenuRadioItem>\n              </BaseDrawerMenuRadioGroup>\n            </BaseDrawerMenuGroup>\n          </BaseDrawerMenu>\n        </BaseDrawerPanel>\n      </BaseDrawerPopup>\n    </BaseDrawer>\n  );\n}\n"
+    },
+    {
       "title": "With Scroll",
       "importPath": "base-drawer-with-scroll",
       "source": "import {\n  BaseDrawer,\n  BaseDrawerClose,\n  BaseDrawerDescription,\n  BaseDrawerFooter,\n  BaseDrawerHeader,\n  BaseDrawerPanel,\n  BaseDrawerPopup,\n  BaseDrawerTitle,\n  BaseDrawerTrigger,\n} from \"@/components/ui/cubby-ui/base-drawer\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nconst items = Array.from({ length: 50 }, (_, i) => ({\n  id: i + 1,\n  title: `Item ${i + 1}`,\n  description: `This is the description for item ${i + 1}. It contains some sample text.`,\n}));\n\nexport default function BaseDrawerWithScroll() {\n  return (\n    <BaseDrawer>\n      <BaseDrawerTrigger render={<Button variant=\"outline\" />}>\n        Open Scrollable Drawer\n      </BaseDrawerTrigger>\n      <BaseDrawerPopup showBar>\n        <BaseDrawerHeader>\n          <BaseDrawerTitle>Scrollable Content</BaseDrawerTitle>\n          <BaseDrawerDescription>\n            Scroll within the drawer. Swipe down to dismiss when at the top.\n          </BaseDrawerDescription>\n        </BaseDrawerHeader>\n        <BaseDrawerPanel>\n          <div className=\"flex flex-col gap-3\">\n            {items.map((item) => (\n              <div key={item.id} className=\"bg-muted/50 rounded-lg border p-3\">\n                <h4 className=\"font-medium\">{item.title}</h4>\n                <p className=\"text-muted-foreground text-sm\">\n                  {item.description}\n                </p>\n              </div>\n            ))}\n          </div>\n        </BaseDrawerPanel>\n        <BaseDrawerFooter>\n          <BaseDrawerClose render={<Button className=\"w-full\" />}>\n            Done\n          </BaseDrawerClose>\n        </BaseDrawerFooter>\n      </BaseDrawerPopup>\n    </BaseDrawer>\n  );\n}\n"
@@ -2377,6 +2391,11 @@ export const exampleRegistry = {
       "title": "With Submenus",
       "importPath": "context-menu-with-submenus",
       "source": "import {\n  ContextMenu,\n  ContextMenuContent,\n  ContextMenuItem,\n  ContextMenuTrigger,\n  ContextMenuSeparator,\n  ContextMenuSub,\n  ContextMenuSubContent,\n  ContextMenuSubTrigger,\n} from \"@/components/ui/cubby-ui/context-menu\"\n\nexport default function ContextMenuWithSubmenus() {\n  return (\n    <ContextMenu>\n      <ContextMenuTrigger className=\"flex h-[150px] w-[300px] items-center justify-center rounded-md border border-dashed text-sm\">\n        Right click here\n      </ContextMenuTrigger>\n      <ContextMenuContent className=\"w-64\">\n        <ContextMenuSub>\n          <ContextMenuSubTrigger>More Tools</ContextMenuSubTrigger>\n          <ContextMenuSubContent>\n            <ContextMenuItem>Save Page As...</ContextMenuItem>\n            <ContextMenuItem>Create Shortcut...</ContextMenuItem>\n            <ContextMenuItem>Name Window...</ContextMenuItem>\n            <ContextMenuSeparator />\n            <ContextMenuItem>Developer Tools</ContextMenuItem>\n          </ContextMenuSubContent>\n        </ContextMenuSub>\n        <ContextMenuSeparator />\n        <ContextMenuItem>Show Bookmarks Bar</ContextMenuItem>\n        <ContextMenuItem>Show Full URLs</ContextMenuItem>\n      </ContextMenuContent>\n    </ContextMenu>\n  )\n}"
+    },
+    {
+      "title": "With Switch",
+      "importPath": "context-menu-with-switch",
+      "source": "\"use client\";\n\nimport { useState } from \"react\";\n\nimport {\n  ContextMenu,\n  ContextMenuTrigger,\n  ContextMenuContent,\n  ContextMenuLabel,\n  ContextMenuSeparator,\n  ContextMenuCheckboxItem,\n} from \"@/components/ui/cubby-ui/context-menu\";\n\nexport default function ContextMenuWithSwitch() {\n  const [gridLines, setGridLines] = useState(true);\n  const [snapToGrid, setSnapToGrid] = useState(false);\n  const [rulers, setRulers] = useState(false);\n\n  return (\n    <ContextMenu>\n      <ContextMenuTrigger className=\"flex h-[150px] w-[300px] items-center justify-center rounded-md border border-dashed text-sm\">\n        Right click here\n      </ContextMenuTrigger>\n      <ContextMenuContent className=\"w-64\">\n        <ContextMenuLabel>Canvas</ContextMenuLabel>\n        <ContextMenuSeparator />\n        <ContextMenuCheckboxItem\n          variant=\"switch\"\n          checked={gridLines}\n          onCheckedChange={setGridLines}\n        >\n          Grid lines\n        </ContextMenuCheckboxItem>\n        <ContextMenuCheckboxItem\n          variant=\"switch\"\n          checked={snapToGrid}\n          onCheckedChange={setSnapToGrid}\n        >\n          Snap to grid\n        </ContextMenuCheckboxItem>\n        <ContextMenuCheckboxItem\n          variant=\"switch\"\n          checked={rulers}\n          onCheckedChange={setRulers}\n          disabled\n        >\n          Rulers\n        </ContextMenuCheckboxItem>\n      </ContextMenuContent>\n    </ContextMenu>\n  );\n}\n"
     }
   ],
   "copy-button": [
@@ -2623,6 +2642,11 @@ export const exampleRegistry = {
       "source": "import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuGroup, DropdownMenuShortcut } from \"@/components/ui/cubby-ui/dropdown-menu\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport {\n  CreditCardIcon,\n  KeyboardIcon,\n  Logout01Icon,\n  Settings01Icon,\n  UserIcon,\n} from \"@hugeicons/core-free-icons\";\nexport default function DropdownMenuWithIconsAndShortcuts() {\n  return (\n    <DropdownMenu>\n      <DropdownMenuTrigger render={<Button variant=\"outline\" leadingIcon={<HugeiconsIcon icon={UserIcon}  strokeWidth={2} />} />}>\n        Account\n      </DropdownMenuTrigger>\n      <DropdownMenuContent className=\"w-56\">\n        <DropdownMenuLabel>My Account</DropdownMenuLabel>\n        <DropdownMenuSeparator />\n        <DropdownMenuGroup>\n          <DropdownMenuItem>\n            <HugeiconsIcon icon={UserIcon} className=\"mr-2 h-4 w-4\"  strokeWidth={2} />\n            <span>Profile</span>\n            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>\n          </DropdownMenuItem>\n          <DropdownMenuItem>\n            <HugeiconsIcon icon={CreditCardIcon} className=\"mr-2 h-4 w-4\"  strokeWidth={2} />\n            <span>Billing</span>\n            <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>\n          </DropdownMenuItem>\n          <DropdownMenuItem>\n            <HugeiconsIcon icon={Settings01Icon} className=\"mr-2 h-4 w-4\"  strokeWidth={2} />\n            <span>Settings</span>\n            <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>\n          </DropdownMenuItem>\n          <DropdownMenuItem>\n            <HugeiconsIcon icon={KeyboardIcon} className=\"mr-2 h-4 w-4\"  strokeWidth={2} />\n            <span>Keyboard shortcuts</span>\n            <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>\n          </DropdownMenuItem>\n        </DropdownMenuGroup>\n        <DropdownMenuSeparator />\n        <DropdownMenuItem>\n          <HugeiconsIcon icon={Logout01Icon} className=\"mr-2 h-4 w-4\"  strokeWidth={2} />\n          <span>Log out</span>\n          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>\n        </DropdownMenuItem>\n      </DropdownMenuContent>\n    </DropdownMenu>\n  );\n}"
     },
     {
+      "title": "With Inset",
+      "importPath": "dropdown-menu-with-inset",
+      "source": "\"use client\";\n\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport {\n  PencilEdit01Icon,\n  Copy01Icon,\n  Delete02Icon,\n} from \"@hugeicons/core-free-icons\";\n\nimport {\n  DropdownMenu,\n  DropdownMenuTrigger,\n  DropdownMenuContent,\n  DropdownMenuItem,\n  DropdownMenuSeparator,\n} from \"@/components/ui/cubby-ui/dropdown-menu\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nexport default function DropdownMenuWithInset() {\n  return (\n    <DropdownMenu>\n      <DropdownMenuTrigger render={<Button variant=\"outline\" />}>\n        Actions\n      </DropdownMenuTrigger>\n      <DropdownMenuContent className=\"w-56\">\n        <DropdownMenuItem>\n          <HugeiconsIcon icon={PencilEdit01Icon} strokeWidth={2} />\n          Edit\n        </DropdownMenuItem>\n        <DropdownMenuItem>\n          <HugeiconsIcon icon={Copy01Icon} strokeWidth={2} />\n          Duplicate\n        </DropdownMenuItem>\n        <DropdownMenuSeparator />\n        {/* No icon of their own, so `inset` lines their labels up with the\n            icon items above instead of hanging out to the left. */}\n        <DropdownMenuItem inset>Rename</DropdownMenuItem>\n        <DropdownMenuItem inset>Move to folder</DropdownMenuItem>\n        <DropdownMenuSeparator />\n        <DropdownMenuItem variant=\"destructive\">\n          <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />\n          Delete\n        </DropdownMenuItem>\n      </DropdownMenuContent>\n    </DropdownMenu>\n  );\n}\n"
+    },
+    {
       "title": "With Radio Group",
       "importPath": "dropdown-menu-with-radio-group",
       "source": "\"use client\";\n\nimport { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuRadioGroup, DropdownMenuRadioItem } from \"@/components/ui/cubby-ui/dropdown-menu\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { useState } from \"react\";\n\nexport default function DropdownMenuWithRadioGroup() {\n  const [position, setPosition] = useState(\"bottom\");\n\n  return (\n    <DropdownMenu>\n      <DropdownMenuTrigger render={<Button variant=\"outline\" />}>\n        Panel Position\n      </DropdownMenuTrigger>\n      <DropdownMenuContent className=\"w-56\">\n        <DropdownMenuLabel>Panel Position</DropdownMenuLabel>\n        <DropdownMenuSeparator />\n        <DropdownMenuRadioGroup value={position} onValueChange={setPosition}>\n          <DropdownMenuRadioItem value=\"top\">Top</DropdownMenuRadioItem>\n          <DropdownMenuRadioItem value=\"bottom\">Bottom</DropdownMenuRadioItem>\n          <DropdownMenuRadioItem value=\"right\">Right</DropdownMenuRadioItem>\n        </DropdownMenuRadioGroup>\n      </DropdownMenuContent>\n    </DropdownMenu>\n  );\n}"
@@ -2631,6 +2655,11 @@ export const exampleRegistry = {
       "title": "With Sub Menu",
       "importPath": "dropdown-menu-with-sub-menu",
       "source": "import {\n  DropdownMenu,\n  DropdownMenuTrigger,\n  DropdownMenuContent,\n  DropdownMenuItem,\n  DropdownMenuGroup,\n  DropdownMenuSub,\n  DropdownMenuSubTrigger,\n  DropdownMenuSubContent,\n  DropdownMenuSeparator,\n  DropdownMenuShortcut,\n} from \"@/components/ui/cubby-ui/dropdown-menu\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport {\n  BubbleChatIcon,\n  Mail01Icon,\n  PlusSignCircleIcon,\n  PlusSignIcon,\n  UserAdd01Icon,\n  UserMultipleIcon,\n} from \"@hugeicons/core-free-icons\";\nexport default function DropdownMenuWithSubMenu() {\n  return (\n    <DropdownMenu>\n      <DropdownMenuTrigger render={<Button variant=\"outline\" />}>\n        More Options\n      </DropdownMenuTrigger>\n      <DropdownMenuContent className=\"w-56\">\n        <DropdownMenuGroup>\n          <DropdownMenuItem>\n            <HugeiconsIcon icon={UserMultipleIcon} className=\"mr-2 h-4 w-4\"  strokeWidth={2} />\n            <span>Team</span>\n          </DropdownMenuItem>\n          <DropdownMenuSub>\n            <DropdownMenuSubTrigger>\n              <HugeiconsIcon icon={UserAdd01Icon} className=\"mr-2 h-4 w-4\"  strokeWidth={2} />\n              <span>Invite users</span>\n            </DropdownMenuSubTrigger>\n            <DropdownMenuSubContent>\n              <DropdownMenuItem>\n                <HugeiconsIcon icon={Mail01Icon} className=\"mr-2 h-4 w-4\"  strokeWidth={2} />\n                <span>Email</span>\n              </DropdownMenuItem>\n              <DropdownMenuItem>\n                <HugeiconsIcon icon={BubbleChatIcon} className=\"mr-2 h-4 w-4\"  strokeWidth={2} />\n                <span>Message</span>\n              </DropdownMenuItem>\n              <DropdownMenuSeparator />\n              <DropdownMenuItem>\n                <HugeiconsIcon icon={PlusSignCircleIcon} className=\"mr-2 h-4 w-4\"  strokeWidth={2} />\n                <span>More...</span>\n              </DropdownMenuItem>\n            </DropdownMenuSubContent>\n          </DropdownMenuSub>\n          <DropdownMenuItem>\n            <HugeiconsIcon icon={PlusSignIcon} className=\"mr-2 h-4 w-4\"  strokeWidth={2} />\n            <span>New Team</span>\n            <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>\n          </DropdownMenuItem>\n        </DropdownMenuGroup>\n      </DropdownMenuContent>\n    </DropdownMenu>\n  );\n}\n"
+    },
+    {
+      "title": "With Switches",
+      "importPath": "dropdown-menu-with-switches",
+      "source": "\"use client\";\n\nimport { useState } from \"react\";\n\nimport {\n  DropdownMenu,\n  DropdownMenuTrigger,\n  DropdownMenuContent,\n  DropdownMenuLabel,\n  DropdownMenuSeparator,\n  DropdownMenuCheckboxItem,\n} from \"@/components/ui/cubby-ui/dropdown-menu\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nexport default function DropdownMenuWithSwitches() {\n  const [autoSave, setAutoSave] = useState(true);\n  const [wordWrap, setWordWrap] = useState(false);\n  const [telemetry, setTelemetry] = useState(false);\n\n  return (\n    <DropdownMenu>\n      <DropdownMenuTrigger render={<Button variant=\"outline\" />}>\n        Preferences\n      </DropdownMenuTrigger>\n      <DropdownMenuContent className=\"w-60\">\n        <DropdownMenuLabel>Editor</DropdownMenuLabel>\n        <DropdownMenuSeparator />\n        <DropdownMenuCheckboxItem\n          variant=\"switch\"\n          checked={autoSave}\n          onCheckedChange={setAutoSave}\n        >\n          Auto save\n        </DropdownMenuCheckboxItem>\n        <DropdownMenuCheckboxItem\n          variant=\"switch\"\n          checked={wordWrap}\n          onCheckedChange={setWordWrap}\n        >\n          Word wrap\n        </DropdownMenuCheckboxItem>\n        <DropdownMenuCheckboxItem\n          variant=\"switch\"\n          checked={telemetry}\n          onCheckedChange={setTelemetry}\n          disabled\n        >\n          Share telemetry\n        </DropdownMenuCheckboxItem>\n      </DropdownMenuContent>\n    </DropdownMenu>\n  );\n}\n"
     }
   ],
   "fancy-button": [
@@ -2998,6 +3027,11 @@ export const exampleRegistry = {
       "title": "Basic",
       "importPath": "menubar-basic",
       "source": "import {\n  Menubar,\n  MenubarContent,\n  MenubarItem,\n  MenubarMenu,\n  MenubarSeparator,\n  MenubarShortcut,\n  MenubarSub,\n  MenubarSubContent,\n  MenubarSubTrigger,\n  MenubarTrigger,\n} from \"@/components/ui/cubby-ui/menubar\"\n\nexport default function MenubarBasic() {\n  return (\n    <Menubar>\n      <MenubarMenu>\n        <MenubarTrigger>File</MenubarTrigger>\n        <MenubarContent>\n          <MenubarItem>\n            New Tab <MenubarShortcut>⌘T</MenubarShortcut>\n          </MenubarItem>\n          <MenubarItem>\n            New Window <MenubarShortcut>⌘N</MenubarShortcut>\n          </MenubarItem>\n          <MenubarItem disabled>New Incognito Window</MenubarItem>\n          <MenubarSeparator />\n          <MenubarItem>Print... <MenubarShortcut>⌘P</MenubarShortcut>\n          </MenubarItem>\n        </MenubarContent>\n      </MenubarMenu>\n      <MenubarMenu>\n        <MenubarTrigger>Edit</MenubarTrigger>\n        <MenubarContent>\n          <MenubarItem>\n            Undo <MenubarShortcut>⌘Z</MenubarShortcut>\n          </MenubarItem>\n          <MenubarItem>\n            Redo <MenubarShortcut>⇧⌘Z</MenubarShortcut>\n          </MenubarItem>\n          <MenubarSeparator />\n          <MenubarItem>Cut</MenubarItem>\n          <MenubarItem>Copy</MenubarItem>\n          <MenubarItem>Paste</MenubarItem>\n        </MenubarContent>\n      </MenubarMenu>\n      <MenubarMenu>\n        <MenubarTrigger>View</MenubarTrigger>\n        <MenubarContent>\n          <MenubarItem>Always Show Bookmarks Bar</MenubarItem>\n          <MenubarItem>Always Show Full URLs</MenubarItem>\n          <MenubarSeparator />\n          <MenubarItem inset>Reload <MenubarShortcut>⌘R</MenubarShortcut>\n          </MenubarItem>\n          <MenubarItem disabled inset>\n            Force Reload <MenubarShortcut>⇧⌘R</MenubarShortcut>\n          </MenubarItem>\n          <MenubarSeparator />\n          <MenubarSub>\n            <MenubarSubTrigger inset>Zoom</MenubarSubTrigger>\n            <MenubarSubContent>\n              <MenubarItem>Zoom In <MenubarShortcut>⌘+</MenubarShortcut></MenubarItem>\n              <MenubarItem>Zoom Out <MenubarShortcut>⌘-</MenubarShortcut></MenubarItem>\n              <MenubarItem>Actual Size <MenubarShortcut>⌘0</MenubarShortcut></MenubarItem>\n              <MenubarSeparator />\n              <MenubarItem>Fit to Window</MenubarItem>\n            </MenubarSubContent>\n          </MenubarSub>\n          <MenubarItem inset>Toggle Fullscreen</MenubarItem>\n        </MenubarContent>\n      </MenubarMenu>\n    </Menubar>\n  )\n}"
+    },
+    {
+      "title": "With Checkboxes And Switches",
+      "importPath": "menubar-with-checkboxes-and-switches",
+      "source": "\"use client\";\n\nimport { useState } from \"react\";\n\nimport {\n  Menubar,\n  MenubarMenu,\n  MenubarTrigger,\n  MenubarContent,\n  MenubarGroup,\n  MenubarGroupLabel,\n  MenubarSeparator,\n  MenubarCheckboxItem,\n  MenubarRadioGroup,\n  MenubarRadioItem,\n} from \"@/components/ui/cubby-ui/menubar\";\n\nexport default function MenubarWithCheckboxesAndSwitches() {\n  const [bookmarks, setBookmarks] = useState(true);\n  const [fullUrls, setFullUrls] = useState(false);\n  const [autoSave, setAutoSave] = useState(true);\n  const [density, setDensity] = useState(\"comfortable\");\n\n  return (\n    <Menubar>\n      <MenubarMenu>\n        <MenubarTrigger>View</MenubarTrigger>\n        <MenubarContent>\n          <MenubarGroup>\n            <MenubarGroupLabel>Toolbars</MenubarGroupLabel>\n            <MenubarCheckboxItem\n              checked={bookmarks}\n              onCheckedChange={setBookmarks}\n            >\n              Bookmarks bar\n            </MenubarCheckboxItem>\n            <MenubarCheckboxItem\n              checked={fullUrls}\n              onCheckedChange={setFullUrls}\n            >\n              Full URLs\n            </MenubarCheckboxItem>\n          </MenubarGroup>\n          <MenubarSeparator />\n          <MenubarCheckboxItem\n            variant=\"switch\"\n            checked={autoSave}\n            onCheckedChange={setAutoSave}\n          >\n            Auto save\n          </MenubarCheckboxItem>\n        </MenubarContent>\n      </MenubarMenu>\n      <MenubarMenu>\n        <MenubarTrigger>Density</MenubarTrigger>\n        <MenubarContent>\n          <MenubarRadioGroup value={density} onValueChange={setDensity}>\n            <MenubarRadioItem value=\"compact\">Compact</MenubarRadioItem>\n            <MenubarRadioItem value=\"comfortable\">Comfortable</MenubarRadioItem>\n            <MenubarRadioItem value=\"spacious\">Spacious</MenubarRadioItem>\n          </MenubarRadioGroup>\n        </MenubarContent>\n      </MenubarMenu>\n    </Menubar>\n  );\n}\n"
     }
   ],
   "meter": [
@@ -4093,6 +4127,7 @@ export const componentMap = {
   "base-drawer-side": base_drawer_base_drawer_side,
   "base-drawer-snap-points": base_drawer_base_drawer_snap_points,
   "base-drawer-with-form": base_drawer_base_drawer_with_form,
+  "base-drawer-with-menu": base_drawer_base_drawer_with_menu,
   "base-drawer-with-scroll": base_drawer_base_drawer_with_scroll,
   "breadcrumbs-basic": breadcrumbs_breadcrumbs_basic,
   "breadcrumbs-custom-separator": breadcrumbs_breadcrumbs_custom_separator,
@@ -4195,6 +4230,7 @@ export const componentMap = {
   "context-menu-with-checkboxes-and-radio-groups": context_menu_context_menu_with_checkboxes_and_radio_groups,
   "context-menu-with-separators-and-shortcuts": context_menu_context_menu_with_separators_and_shortcuts,
   "context-menu-with-submenus": context_menu_context_menu_with_submenus,
+  "context-menu-with-switch": context_menu_context_menu_with_switch,
   "copy-button-custom-icons-demo": copy_button_copy_button_custom_icons_demo,
   "copy-button-demo": copy_button_copy_button_demo,
   "copy-button-with-toast": copy_button_copy_button_with_toast,
@@ -4241,8 +4277,10 @@ export const componentMap = {
   "dropdown-menu-animated": dropdown_menu_dropdown_menu_animated,
   "dropdown-menu-with-checkboxes": dropdown_menu_dropdown_menu_with_checkboxes,
   "dropdown-menu-with-icons-and-shortcuts": dropdown_menu_dropdown_menu_with_icons_and_shortcuts,
+  "dropdown-menu-with-inset": dropdown_menu_dropdown_menu_with_inset,
   "dropdown-menu-with-radio-group": dropdown_menu_dropdown_menu_with_radio_group,
   "dropdown-menu-with-sub-menu": dropdown_menu_dropdown_menu_with_sub_menu,
+  "dropdown-menu-with-switches": dropdown_menu_dropdown_menu_with_switches,
   "fancy-button-demo": fancy_button_fancy_button_demo,
   "fancy-button-as-link": fancy_button_fancy_button_as_link,
   "fancy-button-custom-colors": fancy_button_fancy_button_custom_colors,
@@ -4312,6 +4350,7 @@ export const componentMap = {
   "marching-border-explicit-radius": marching_border_marching_border_explicit_radius,
   "marching-border-variants": marching_border_marching_border_variants,
   "menubar-basic": menubar_menubar_basic,
+  "menubar-with-checkboxes-and-switches": menubar_menubar_with_checkboxes_and_switches,
   "meter-basic": meter_meter_basic,
   "meter-different-sizes": meter_meter_different_sizes,
   "meter-with-labels": meter_meter_with_labels,

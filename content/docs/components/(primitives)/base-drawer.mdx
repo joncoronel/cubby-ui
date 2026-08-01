@@ -116,6 +116,14 @@ Use `BaseDrawerPanel` for scrollable content that coexists with swipe gestures.
 
 <ComponentPreview component="base-drawer" example="base-drawer-with-scroll" />
 
+### Menu Items
+
+`BaseDrawerMenu` holds a list of touch-sized rows. Use `BaseDrawerMenuCheckboxItem` for toggles and `BaseDrawerMenuRadioGroup` for single-choice options. Both put their indicator in a reserved column on the right, matching [Dropdown Menu](/docs/components/dropdown-menu). Set `variant="switch"` on a checkbox item to swap its checkmark for a switch, which reads better for settings that apply immediately.
+
+Unlike the other menu components, these rows are real checkbox and radio controls rather than Base UI menu items, so each one is individually focusable.
+
+<ComponentPreview component="base-drawer" example="base-drawer-with-menu" />
+
 ## API Reference
 
 Built on [Base UI's Drawer](https://base-ui.com/react/components/drawer). All Base UI Drawer props are supported.
@@ -248,6 +256,45 @@ Scrollable content area. Wraps `ScrollArea` and `Drawer.Content` for text select
 
 <ApiProp name="allowSelection" fullType="boolean" defaultValue="true">
   When true, wraps in `Drawer.Content` for text selection support.
+</ApiProp>
+
+</ApiPropsList>
+
+#### BaseDrawerMenuCheckboxItem
+
+Toggleable drawer row. Wraps Base UI's `Checkbox.Root`, so it is a real focusable checkbox rather than a menu item. The indicator sits in a reserved column on the right.
+
+<ApiPropsList>
+
+<ApiProp
+  name="variant"
+  fullType='"default" | "switch"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Indicator style. `"switch"` renders a switch in place of the checkmark. Prefer
+  it for settings that apply the moment they are toggled.
+</ApiProp>
+
+<ApiProp name="render" fullType="ReactElement">
+  Replace the rendered element, following Base UI's render prop convention.
+</ApiProp>
+
+</ApiPropsList>
+
+#### BaseDrawerMenuRadioItem
+
+Single-choice drawer row. Wraps Base UI's `Radio.Root` and must sit inside a `BaseDrawerMenuRadioGroup`. Uses the same right-aligned checkmark as `BaseDrawerMenuCheckboxItem`.
+
+<ApiPropsList>
+
+<ApiProp name="value" fullType="string">
+  Value set on the surrounding `BaseDrawerMenuRadioGroup` when this row is
+  selected. Required.
+</ApiProp>
+
+<ApiProp name="render" fullType="ReactElement">
+  Replace the rendered element, following Base UI's render prop convention.
 </ApiProp>
 
 </ApiPropsList>

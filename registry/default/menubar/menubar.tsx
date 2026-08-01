@@ -7,11 +7,41 @@ import {
 } from "@/registry/default/lib/elevated";
 
 import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import {
-  ArrowRight01Icon,
-  CircleIcon,
-  Tick02Icon,
-} from "@hugeicons/core-free-icons";
+  switchVariants,
+  switchThumbVariants,
+} from "@/registry/default/switch/switch";
+
+// Shared shell for checkbox and radio items. Padding matches MenubarItem so
+// labels line up across every item type; the indicator lives in a reserved
+// right-hand column so toggling never shifts the label.
+const toggleItemClasses =
+  "data-highlighted:text-accent-foreground data-highlighted:bg-surface-hover grid cursor-default items-center rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
+
+// Path length ≈ 22 (from the path geometry)
+function CheckmarkIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path
+        d="M5 14L8.5 17.5L19 6.5"
+        style={{
+          strokeDasharray: 22,
+        }}
+        className="ease-out-expo transition-[stroke-dashoffset] duration-150 in-data-checked:[stroke-dashoffset:0] in-data-unchecked:[stroke-dashoffset:22] motion-reduce:transition-none"
+      />
+    </svg>
+  );
+}
+
 function Menubar({
   className,
   level = 2,
@@ -172,10 +202,10 @@ function MenubarItem({
   return (
     <BaseMenu.Item
       data-slot="menubar-item"
-      data-inset={inset}
+      data-inset={inset || undefined}
       data-variant={variant}
       className={cn(
-        "focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive-foreground data-[variant=destructive]:*:[svg]:!text-destructive focus:data-[variant=destructive]:*:[svg]:!text-destructive-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus:bg-surface-hover relative flex cursor-default items-center gap-2 rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-60 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:transition-all [&_svg:not([class*='size-'])]:size-4",
+        "data-highlighted:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:data-highlighted:bg-destructive/20 data-[variant=destructive]:data-highlighted:text-destructive-foreground data-[variant=destructive]:*:[svg]:text-destructive! data-highlighted:data-[variant=destructive]:*:[svg]:text-destructive-foreground! [&_svg:not([class*='text-'])]:text-muted-foreground data-highlighted:bg-surface-hover relative flex cursor-default items-center gap-2 rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
@@ -193,9 +223,9 @@ function MenubarLinkItem({
   return (
     <BaseMenu.LinkItem
       data-slot="menubar-link-item"
-      data-inset={inset}
+      data-inset={inset || undefined}
       className={cn(
-        "focus:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus:bg-surface-hover relative flex cursor-default items-center gap-2 rounded-md px-2.5 py-1.5 text-sm no-underline outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:transition-all [&_svg:not([class*='size-'])]:size-4",
+        "data-highlighted:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground data-highlighted:bg-surface-hover relative flex cursor-default items-center gap-2 rounded-md px-2.5 py-1.5 text-sm no-underline outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
@@ -207,24 +237,56 @@ function MenubarCheckboxItem({
   className,
   children,
   checked,
+  inset,
+  variant = "default",
   ...props
-}: React.ComponentProps<typeof BaseMenu.CheckboxItem>) {
+}: React.ComponentProps<typeof BaseMenu.CheckboxItem> & {
+  inset?: boolean;
+  /** Indicator style. `"switch"` is visual only — the item keeps the `menuitemcheckbox` role. */
+  variant?: "default" | "switch";
+}) {
   return (
     <BaseMenu.CheckboxItem
       data-slot="menubar-checkbox-item"
+      data-inset={inset || undefined}
+      data-variant={variant}
       className={cn(
-        "focus:text-accent-foreground focus:bg-surface-hover relative flex cursor-default items-center gap-2 rounded-md py-1.5 pr-2.5 pl-8 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-60 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        toggleItemClasses,
+        variant === "switch"
+          ? "grid-cols-[1fr_auto] gap-3"
+          : "grid-cols-[1fr_1rem] gap-2",
         className,
       )}
       checked={checked}
       {...props}
     >
-      <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
-        <BaseMenu.CheckboxItemIndicator>
-          <HugeiconsIcon icon={Tick02Icon} className="size-4" strokeWidth={2} />
-        </BaseMenu.CheckboxItemIndicator>
+      <span className="col-start-1 flex min-w-0 items-center gap-2">
+        {children}
       </span>
-      {children}
+      {variant === "switch" ? (
+        // The indicator is aria-hidden and non-interactive: the row itself
+        // carries the role and the click target, so nesting a real Switch here
+        // would put a focusable control inside a menuitemcheckbox.
+        <BaseMenu.CheckboxItemIndicator
+          keepMounted
+          className={cn(
+            switchVariants({ shape: "circle" }),
+            "col-start-2 cursor-default [--thumb-size:--spacing(3.5)]",
+            "pointer-events-none",
+            // The row already dims when disabled; don't compound the fade.
+            "data-disabled:opacity-100",
+          )}
+        >
+          <span className={switchThumbVariants()} />
+        </BaseMenu.CheckboxItemIndicator>
+      ) : (
+        <BaseMenu.CheckboxItemIndicator
+          keepMounted
+          className="col-start-2 flex items-center justify-center"
+        >
+          <CheckmarkIcon className="size-4" />
+        </BaseMenu.CheckboxItemIndicator>
+      )}
     </BaseMenu.CheckboxItem>
   );
 }
@@ -232,27 +294,27 @@ function MenubarCheckboxItem({
 function MenubarRadioItem({
   className,
   children,
+  inset,
   ...props
-}: React.ComponentProps<typeof BaseMenu.RadioItem>) {
+}: React.ComponentProps<typeof BaseMenu.RadioItem> & {
+  inset?: boolean;
+}) {
   return (
     <BaseMenu.RadioItem
       data-slot="menubar-radio-item"
-      className={cn(
-        "focus:text-accent-foreground focus:bg-surface-hover relative flex cursor-default items-center gap-2 rounded-md py-1.5 pr-2.5 pl-8 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-60 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        className,
-      )}
+      data-inset={inset || undefined}
+      className={cn(toggleItemClasses, "grid-cols-[1fr_1rem] gap-2", className)}
       {...props}
     >
-      <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
-        <BaseMenu.RadioItemIndicator>
-          <HugeiconsIcon
-            icon={CircleIcon}
-            className="size-2 fill-current"
-            strokeWidth={2}
-          />
-        </BaseMenu.RadioItemIndicator>
+      <span className="col-start-1 flex min-w-0 items-center gap-2">
+        {children}
       </span>
-      {children}
+      <BaseMenu.RadioItemIndicator
+        keepMounted
+        className="col-start-2 flex items-center justify-center"
+      >
+        <CheckmarkIcon className="size-4" />
+      </BaseMenu.RadioItemIndicator>
     </BaseMenu.RadioItem>
   );
 }
@@ -261,15 +323,35 @@ function MenubarLabel({
   className,
   inset,
   ...props
+}: React.ComponentProps<"div"> & {
+  inset?: boolean;
+}) {
+  return (
+    <div
+      data-slot="menubar-label"
+      data-inset={inset || undefined}
+      className={cn(
+        "px-2.5 py-1.5 text-xs font-medium data-inset:pl-8",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+function MenubarGroupLabel({
+  className,
+  inset,
+  ...props
 }: React.ComponentProps<typeof BaseMenu.GroupLabel> & {
   inset?: boolean;
 }) {
   return (
     <BaseMenu.GroupLabel
-      data-slot="menubar-label"
-      data-inset={inset}
+      data-slot="menubar-group-label"
+      data-inset={inset || undefined}
       className={cn(
-        "px-2.5 py-1.5 text-xs font-medium data-[inset]:pl-8",
+        "px-2.5 py-1.5 text-xs font-medium data-inset:pl-8",
         className,
       )}
       {...props}
@@ -323,9 +405,9 @@ function MenubarSubTrigger({
   return (
     <BaseMenu.SubmenuTrigger
       data-slot="menubar-sub-trigger"
-      data-inset={inset}
+      data-inset={inset || undefined}
       className={cn(
-        "focus:text-accent-foreground data-popup-open:text-accent-foreground focus:bg-surface-hover data-popup-open:bg-surface-hover flex cursor-default items-center rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-[inset]:pl-8",
+        "data-highlighted:text-accent-foreground data-popup-open:text-accent-foreground data-highlighted:bg-surface-hover data-popup-open:bg-surface-hover flex cursor-default items-center rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-inset:pl-8",
         className,
       )}
       {...props}
@@ -390,6 +472,7 @@ export {
   MenubarContent,
   MenubarGroup,
   MenubarSeparator,
+  MenubarGroupLabel,
   MenubarLabel,
   MenubarItem,
   MenubarLinkItem,

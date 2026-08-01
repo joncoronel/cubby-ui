@@ -55,6 +55,33 @@ Deferred / removed follow-ups pulled from the initial `filters` build (`registry
 - **Auto-remove a filter dismissed without a value.** Linear-style: if a freshly added select/multiselect filter is dismissed (popup closed) without choosing a value, drop the dangling `Select…` pill instead of leaving it. Would hook the value Combobox's `onOpenChange`/close with an "was anything picked" check. Left out to avoid surprising removals; consider behind an opt-in prop.
 - **Lower-priority PR-review leftovers** (blockers, structural pass, context split, and provider/bar split all landed): a ghost/unstyled variant on the `NumberField` primitive so the filter chip can compose it instead of raw Base UI (do it when a second consumer wants an inline borderless number input, or when the chip's copy visibly drifts from the primitive); cache `resolveOperators` per field if it ever shows in profiles.
 
+### Code hygiene
+
+#### Canonical Tailwind class sweep (repo-wide)
+
+Tailwind CSS IntelliSense flags non-canonical v4 class spellings (`suggestCanonicalClasses`). These are editor warnings only — ESLint does not catch them, so `pnpm run lint` stays green either way. Purely cosmetic; the compiled CSS is identical.
+
+Already swept: `dropdown-menu`, `context-menu`, `menubar`, `base-drawer`, `switch`. Those five are clean.
+
+What's left, and how safe each bucket is:
+
+| Pattern | Fix | Count | Files | Safe to sed? |
+| --- | --- | --- | --- | --- |
+| `data-[starting-style]:` etc. (bare attribute) | `data-starting-style:` | 39 | 11 | Yes |
+| `!text-foo` (leading important) | `text-foo!` | 4 | 3 | Yes |
+| `h-[var(--x)]` (single var) | `h-(--x)` | 9 | 6 | Yes |
+| `shadow-[var(--a),var(--b)]` (multi-var) | — | 17 | mostly `lib/elevated.tsx` | **No** |
+| `translate-y-[var(--drawer-offset)]` | `translate-y-(--x)` | 16 | `drawer/drawer.tsx` | **Careful** |
+
+Two things a blind find/replace gets wrong:
+
+- **Multi-var arbitrary values can't be converted.** The `(--x)` shorthand takes exactly one custom property, so `shadow-[var(--surface-shadow-3),var(--surface-rim-3)]` in `lib/elevated.tsx` has to stay bracketed. IntelliSense doesn't flag these, but a naive regex will eat them.
+- **`translate-*-[var(…)]` is the Safari @property trap.** The shorthand routes the value through the registered `--tw-translate-x`/`-y` `@property`, which misbehaves in Safari under `@starting-style` — the exact bug that made `switch.tsx` set `translate` directly via `[translate:var(--thumb-travel)]`. All 16 are in `drawer/drawer.tsx`, which animates with `data-starting-style`. Either leave them bracketed or convert and verify in real Safari, not just Chrome.
+
+Also note `data-[variant=destructive]:` and other `key=value` forms are already canonical — only bare attribute-presence variants shorten.
+
+Worth doing opportunistically when a file is already being touched rather than as one big diff, since it churns lines without changing behavior.
+
 ## Done — Elevation / surface system
 
 Condensed log of the completed surface/elevation work. Full detail is in git history and [surfaces.mdx](content/docs/getting-started/surfaces.mdx). Future areas add their own `## Done — <area>` as work lands.

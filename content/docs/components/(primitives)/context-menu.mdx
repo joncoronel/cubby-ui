@@ -58,9 +58,15 @@ Use `ContextMenuSeparator` to divide groups and `ContextMenuShortcut` to show ke
 
 ### With Checkboxes and Radio Groups
 
-Use `ContextMenuCheckboxItem` for toggles and `ContextMenuRadioGroup` for single-choice options.
+Use `ContextMenuCheckboxItem` for toggles and `ContextMenuRadioGroup` for single-choice options. Both put their indicator in a reserved column on the right, so labels stay put as items toggle.
 
 <ComponentPreview component="context-menu" example="context-menu-with-checkboxes-and-radio-groups" />
+
+### With Switch
+
+Set `variant="switch"` on `ContextMenuCheckboxItem` to swap the checkmark for a switch. This is a visual variant only. The item keeps its `menuitemcheckbox` role and the same props, the whole row stays the click target, and the menu stays open on toggle.
+
+<ComponentPreview component="context-menu" example="context-menu-with-switch" />
 
 ## API Reference
 
@@ -122,6 +128,43 @@ Use `ContextMenuCheckboxItem` for toggles and `ContextMenuRadioGroup` for single
 ### ContextMenuLinkItem
 
 Menu item that renders as an anchor (`<a>`) for navigation links. Wraps Base UI's `ContextMenu.LinkItem`.
+
+<ApiPropsList>
+
+<ApiProp name="inset" fullType="boolean">
+  Add left padding to align with items that have icons, creating consistent
+  visual alignment.
+</ApiProp>
+
+</ApiPropsList>
+
+### ContextMenuCheckboxItem
+
+Toggleable menu item. Wraps Base UI's `ContextMenu.CheckboxItem`. The indicator sits in a reserved column on the right.
+
+<ApiPropsList>
+
+<ApiProp
+  name="variant"
+  fullType='"default" | "switch"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Indicator style. `"switch"` renders a decorative switch in place of the
+  checkmark. It is purely visual: the item keeps the `menuitemcheckbox` role,
+  the same props, and the same behavior.
+</ApiProp>
+
+<ApiProp name="inset" fullType="boolean">
+  Add left padding to align with items that have icons, creating consistent
+  visual alignment.
+</ApiProp>
+
+</ApiPropsList>
+
+### ContextMenuRadioItem
+
+Mutually exclusive menu item. Wraps Base UI's `ContextMenu.RadioItem`. Uses the same right-aligned checkmark as `ContextMenuCheckboxItem`.
 
 <ApiPropsList>
 

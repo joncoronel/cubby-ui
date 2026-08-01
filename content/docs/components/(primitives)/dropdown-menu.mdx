@@ -53,15 +53,29 @@ Place an icon beside the label and a `DropdownMenuShortcut` at the end of an ite
 
 ### With Checkboxes
 
-Use `DropdownMenuCheckboxItem` for toggleable options.
+Use `DropdownMenuCheckboxItem` for toggleable options. The checkmark sits in a reserved column on the right, so labels stay put as items toggle.
 
 <ComponentPreview component="dropdown-menu" example="dropdown-menu-with-checkboxes" />
 
+### With Switch
+
+Set `variant="switch"` on `DropdownMenuCheckboxItem` to swap the checkmark for a switch. This is a visual variant only. The item keeps its `menuitemcheckbox` role and the same props, the whole row stays the click target, and the menu stays open on toggle.
+
+<ComponentPreview component="dropdown-menu" example="dropdown-menu-with-switches" />
+
 ### With Radio Group
 
-Use `DropdownMenuRadioGroup` with `DropdownMenuRadioItem` for mutually exclusive options.
+Use `DropdownMenuRadioGroup` with `DropdownMenuRadioItem` for mutually exclusive options. Radio items use the same right-aligned checkmark as checkbox items.
 
 <ComponentPreview component="dropdown-menu" example="dropdown-menu-with-radio-group" />
+
+### Aligning Items With and Without Icons
+
+Menu items lay their icon out inline, so an item with no icon starts its label further left than its neighbours. Add `inset` to the icon-less items to give them the same left padding an icon would have occupied, and every label lines up on one edge.
+
+`inset` is available on `DropdownMenuItem`, `DropdownMenuLinkItem`, `DropdownMenuCheckboxItem`, `DropdownMenuRadioItem`, `DropdownMenuLabel`, `DropdownMenuGroupLabel`, and `DropdownMenuSubTrigger`. Only reach for it in menus that actually mix the two kinds of item. In a menu where nothing has an icon, adding `inset` just indents everything for no reason.
+
+<ComponentPreview component="dropdown-menu" example="dropdown-menu-with-inset" />
 
 ### With Sub Menu
 
@@ -131,8 +145,9 @@ Individual menu item. Wraps Base UI's `Menu.Item`.
 <ApiPropsList>
 
 <ApiProp name="inset" fullType="boolean">
-  Add left padding to align with items that have icons, creating consistent
-  visual alignment.
+  Indent the label by the width an icon would occupy, so icon-less items line up
+  with icon items in the same menu. See [Aligning Items With and Without
+  Icons](#aligning-items-with-and-without-icons).
 </ApiProp>
 
 <ApiProp
@@ -154,8 +169,48 @@ Menu item that renders as an anchor (`<a>`) for navigation links. Wraps Base UI'
 <ApiPropsList>
 
 <ApiProp name="inset" fullType="boolean">
-  Add left padding to align with items that have icons, creating consistent
-  visual alignment.
+  Indent the label by the width an icon would occupy, so icon-less items line up
+  with icon items in the same menu. See [Aligning Items With and Without
+  Icons](#aligning-items-with-and-without-icons).
+</ApiProp>
+
+</ApiPropsList>
+
+#### DropdownMenuCheckboxItem
+
+Toggleable menu item. Wraps Base UI's `Menu.CheckboxItem`. The indicator sits in a reserved column on the right, matching [Select](/docs/components/select).
+
+<ApiPropsList>
+
+<ApiProp
+  name="variant"
+  fullType='"default" | "switch"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Indicator style. `"switch"` renders a decorative switch in place of the
+  checkmark. It is purely visual: the item keeps the `menuitemcheckbox` role,
+  the same props, and the same behavior.
+</ApiProp>
+
+<ApiProp name="inset" fullType="boolean">
+  Indent the label by the width an icon would occupy, so icon-less items line up
+  with icon items in the same menu. See [Aligning Items With and Without
+  Icons](#aligning-items-with-and-without-icons).
+</ApiProp>
+
+</ApiPropsList>
+
+#### DropdownMenuRadioItem
+
+Mutually exclusive menu item. Wraps Base UI's `Menu.RadioItem`. Uses the same right-aligned checkmark as `DropdownMenuCheckboxItem`.
+
+<ApiPropsList>
+
+<ApiProp name="inset" fullType="boolean">
+  Indent the label by the width an icon would occupy, so icon-less items line up
+  with icon items in the same menu. See [Aligning Items With and Without
+  Icons](#aligning-items-with-and-without-icons).
 </ApiProp>
 
 </ApiPropsList>
@@ -167,8 +222,9 @@ Non-interactive label for grouping items.
 <ApiPropsList>
 
 <ApiProp name="inset" fullType="boolean">
-  Add left padding to align with items that have icons, creating consistent
-  visual alignment.
+  Indent the label by the width an icon would occupy, so icon-less items line up
+  with icon items in the same menu. See [Aligning Items With and Without
+  Icons](#aligning-items-with-and-without-icons).
 </ApiProp>
 
 </ApiPropsList>
@@ -180,8 +236,9 @@ Label for a menu group. Wraps Base UI's `Menu.GroupLabel`.
 <ApiPropsList>
 
 <ApiProp name="inset" fullType="boolean">
-  Add left padding to align with items that have icons, creating consistent
-  visual alignment.
+  Indent the label by the width an icon would occupy, so icon-less items line up
+  with icon items in the same menu. See [Aligning Items With and Without
+  Icons](#aligning-items-with-and-without-icons).
 </ApiProp>
 
 </ApiPropsList>
@@ -193,8 +250,9 @@ Item that opens a submenu on hover. Wraps Base UI's `Menu.SubmenuTrigger`.
 <ApiPropsList>
 
 <ApiProp name="inset" fullType="boolean">
-  Add left padding to align with items that have icons, creating consistent
-  visual alignment.
+  Indent the label by the width an icon would occupy, so icon-less items line up
+  with icon items in the same menu. See [Aligning Items With and Without
+  Icons](#aligning-items-with-and-without-icons).
 </ApiProp>
 
 <ApiProp name="delay" fullType="number" defaultValue="0">

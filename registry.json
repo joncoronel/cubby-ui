@@ -220,6 +220,7 @@
       "registryDependencies": [
         "@cubby-ui/button",
         "@cubby-ui/scroll-area",
+        "@cubby-ui/switch",
         "@cubby-ui/elevated"
       ],
       "dependencies": [
@@ -535,6 +536,7 @@
         }
       ],
       "registryDependencies": [
+        "@cubby-ui/switch",
         "@cubby-ui/elevated"
       ],
       "dependencies": [
@@ -745,6 +747,7 @@
         }
       ],
       "registryDependencies": [
+        "@cubby-ui/switch",
         "@cubby-ui/elevated"
       ],
       "dependencies": [
@@ -980,6 +983,7 @@
         }
       ],
       "registryDependencies": [
+        "@cubby-ui/switch",
         "@cubby-ui/elevated"
       ],
       "dependencies": [

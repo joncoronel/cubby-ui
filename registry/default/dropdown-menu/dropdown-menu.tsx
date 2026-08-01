@@ -10,6 +10,16 @@ import {
   solidSurface,
   type SurfaceLevel,
 } from "@/registry/default/lib/elevated";
+import {
+  switchVariants,
+  switchThumbVariants,
+} from "@/registry/default/switch/switch";
+
+// Shared shell for checkbox and radio items. Padding matches DropdownMenuItem
+// so labels line up across every item type; the indicator lives in a reserved
+// right-hand column so toggling never shifts the label.
+const toggleItemClasses =
+  "data-highlighted:bg-surface-hover data-highlighted:text-accent-foreground grid cursor-default items-center rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
 
 // Path length ≈ 22 (from the path geometry)
 function CheckmarkIcon({ className }: { className?: string }) {
@@ -160,7 +170,7 @@ function DropdownMenuItem({
   return (
     <BaseMenu.Item
       data-slot="dropdown-menu-item"
-      data-inset={inset}
+      data-inset={inset || undefined}
       data-variant={variant}
       className={cn(
         "data-highlighted:bg-surface-hover data-highlighted:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:data-highlighted:bg-destructive/20 data-[variant=destructive]:data-highlighted:text-destructive-foreground data-[variant=destructive]:*:[svg]:text-destructive! data-highlighted:data-[variant=destructive]:*:[svg]:text-destructive-foreground! [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
@@ -210,9 +220,9 @@ function DropdownMenuLabel({
   return (
     <div
       data-slot="dropdown-menu-label"
-      data-inset={inset}
+      data-inset={inset || undefined}
       className={cn(
-        "px-2.5 py-1.5 text-xs font-medium data-[inset]:pl-8",
+        "px-2.5 py-1.5 text-xs font-medium data-inset:pl-8",
         className,
       )}
       {...props}
@@ -230,9 +240,9 @@ function DropdownMenuGroupLabel({
   return (
     <BaseMenu.GroupLabel
       data-slot="dropdown-menu-group-label"
-      data-inset={inset}
+      data-inset={inset || undefined}
       className={cn(
-        "px-2.5 py-1.5 text-xs font-medium data-[inset]:pl-8",
+        "px-2.5 py-1.5 text-xs font-medium data-inset:pl-8",
         className,
       )}
       {...props}
@@ -244,24 +254,56 @@ function DropdownMenuCheckboxItem({
   className,
   children,
   checked,
+  inset,
+  variant = "default",
   ...props
-}: React.ComponentProps<typeof BaseMenu.CheckboxItem>) {
+}: React.ComponentProps<typeof BaseMenu.CheckboxItem> & {
+  inset?: boolean;
+  /** Indicator style. `"switch"` is visual only — the item keeps the `menuitemcheckbox` role. */
+  variant?: "default" | "switch";
+}) {
   return (
     <BaseMenu.CheckboxItem
       data-slot="dropdown-menu-checkbox-item"
+      data-inset={inset || undefined}
+      data-variant={variant}
       className={cn(
-        "data-highlighted:bg-surface-hover data-highlighted:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-md py-1.5 pr-2.5 pl-8 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        toggleItemClasses,
+        variant === "switch"
+          ? "grid-cols-[1fr_auto] gap-3"
+          : "grid-cols-[1fr_1rem] gap-2",
         className,
       )}
       checked={checked}
       {...props}
     >
-      <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
-        <BaseMenu.CheckboxItemIndicator keepMounted>
+      <span className="col-start-1 flex min-w-0 items-center gap-2">
+        {children}
+      </span>
+      {variant === "switch" ? (
+        // The indicator is aria-hidden and non-interactive: the row itself
+        // carries the role and the click target, so nesting a real Switch here
+        // would put a focusable control inside a menuitemcheckbox.
+        <BaseMenu.CheckboxItemIndicator
+          keepMounted
+          className={cn(
+            switchVariants({ shape: "circle" }),
+            "col-start-2 cursor-default [--thumb-size:--spacing(3.5)]",
+            "pointer-events-none",
+            // The row already dims when disabled; don't compound the fade.
+            "data-disabled:opacity-100",
+          )}
+        >
+          <span className={switchThumbVariants()} />
+        </BaseMenu.CheckboxItemIndicator>
+      ) : (
+        <BaseMenu.CheckboxItemIndicator
+          keepMounted
+          className="col-start-2 flex items-center justify-center"
+        >
           <CheckmarkIcon className="size-4" />
         </BaseMenu.CheckboxItemIndicator>
-      </span>
-      {children}
+      )}
     </BaseMenu.CheckboxItem>
   );
 }
@@ -277,24 +319,27 @@ function DropdownMenuRadioGroup({
 function DropdownMenuRadioItem({
   className,
   children,
+  inset,
   ...props
-}: React.ComponentProps<typeof BaseMenu.RadioItem>) {
+}: React.ComponentProps<typeof BaseMenu.RadioItem> & {
+  inset?: boolean;
+}) {
   return (
     <BaseMenu.RadioItem
       data-slot="dropdown-menu-radio-item"
-      className={cn(
-        "data-highlighted:bg-surface-hover data-highlighted:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-md py-1.5 pr-2.5 pl-8 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        className,
-      )}
+      data-inset={inset || undefined}
+      className={cn(toggleItemClasses, "grid-cols-[1fr_1rem] gap-2", className)}
       {...props}
     >
-      <span className="bg-accent pointer-events-none absolute left-2 flex size-3.5 items-center justify-center overflow-clip rounded-full">
-        <BaseMenu.RadioItemIndicator
-          keepMounted
-          className="bg-primary before:bg-primary size-full rounded-full transition-[opacity,transform] duration-150 before:absolute before:inset-0 before:origin-center before:rounded-full before:bg-white before:transition-[scale] before:duration-250 before:content-[''] data-checked:before:scale-50 data-ending-style:opacity-0 data-starting-style:opacity-0 data-unchecked:opacity-0"
-        ></BaseMenu.RadioItemIndicator>
+      <span className="col-start-1 flex min-w-0 items-center gap-2">
+        {children}
       </span>
-      {children}
+      <BaseMenu.RadioItemIndicator
+        keepMounted
+        className="col-start-2 flex items-center justify-center"
+      >
+        <CheckmarkIcon className="size-4" />
+      </BaseMenu.RadioItemIndicator>
     </BaseMenu.RadioItem>
   );
 }
@@ -309,7 +354,7 @@ function DropdownMenuLinkItem({
   return (
     <BaseMenu.LinkItem
       data-slot="dropdown-menu-link-item"
-      data-inset={inset}
+      data-inset={inset || undefined}
       className={cn(
         "data-highlighted:bg-surface-hover data-highlighted:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-md px-2.5 py-1.5 text-sm no-underline outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
@@ -338,7 +383,7 @@ function DropdownMenuSubTrigger({
   return (
     <BaseMenu.SubmenuTrigger
       data-slot="dropdown-menu-sub-trigger"
-      data-inset={inset}
+      data-inset={inset || undefined}
       delay={delay}
       closeDelay={closeDelay}
       className={cn(
@@ -360,7 +405,10 @@ function DropdownMenuSubTrigger({
 function DropdownMenuSubContent({
   className,
   children,
-  sideOffset = 0,
+  // 8px, not 0: the positioner anchors to the sub-trigger, which sits 4px
+  // inside the parent popup because of its p-1. A 0 offset therefore overlaps
+  // the parent's edge by 4px; 8 leaves a 4px gap, matching Menubar.
+  sideOffset = 8,
   align = "start",
   alignOffset,
   level = 5,

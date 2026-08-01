@@ -28,6 +28,7 @@ Menubar
     ├── MenubarTrigger
     └── MenubarContent
         ├── MenubarGroup
+        │   └── MenubarGroupLabel
         ├── MenubarLabel
         ├── MenubarItem
         ├── MenubarLinkItem
@@ -40,6 +41,14 @@ Menubar
             ├── MenubarSubTrigger
             └── MenubarSubContent
 ```
+
+## Examples
+
+### With Checkboxes and Switches
+
+Use `MenubarCheckboxItem` for toggles and `MenubarRadioGroup` for single-choice options. Set `variant="switch"` on a checkbox item to swap its checkmark for a switch.
+
+<ComponentPreview component="menubar" example="menubar-with-checkboxes-and-switches" />
 
 ## API Reference
 
@@ -157,7 +166,66 @@ Menu item that renders as an anchor (`<a>`) for navigation links. Wraps Base UI'
 
 </ApiPropsList>
 
+#### MenubarCheckboxItem
+
+Toggleable menu item. Wraps Base UI's `Menu.CheckboxItem`. The indicator sits in a reserved column on the right.
+
+<ApiPropsList>
+
+<ApiProp
+  name="variant"
+  fullType='"default" | "switch"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Indicator style. `"switch"` renders a decorative switch in place of the checkmark. It is purely visual: the item keeps the `menuitemcheckbox` role, the same props, and the same behavior. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp
+  name="inset"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Add left padding to align with items that have icons. Custom prop not available in Base UI.
+</ApiProp>
+
+</ApiPropsList>
+
+#### MenubarRadioItem
+
+Mutually exclusive menu item. Wraps Base UI's `Menu.RadioItem`. Uses the same right-aligned checkmark as `MenubarCheckboxItem`.
+
+<ApiPropsList>
+
+<ApiProp
+  name="inset"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Add left padding to align with items that have icons. Custom prop not available in Base UI.
+</ApiProp>
+
+</ApiPropsList>
+
 #### MenubarLabel
+
+Standalone label. Renders a plain `div`, so it can sit anywhere inside `MenubarContent`.
+
+<ApiPropsList>
+
+<ApiProp
+  name="inset"
+  fullType="boolean"
+  defaultValue="false"
+>
+  Add left padding to align with items that have icons. Custom prop not available in Base UI.
+</ApiProp>
+
+</ApiPropsList>
+
+#### MenubarGroupLabel
+
+Label for a `MenubarGroup`. Wraps Base UI's `Menu.GroupLabel`, which names the group for assistive tech. It must have a `MenubarGroup` ancestor. Use `MenubarLabel` for a label that is not attached to a group.
 
 <ApiPropsList>
 

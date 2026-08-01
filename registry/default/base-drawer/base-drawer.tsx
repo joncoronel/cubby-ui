@@ -16,9 +16,36 @@ import {
   type SurfaceLevel,
 } from "@/registry/default/lib/elevated";
 import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
+import {
+  switchVariants,
+  switchThumbVariants,
+} from "@/registry/default/switch/switch";
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
+
+// Path length ≈ 22 (from the path geometry)
+function CheckmarkIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path
+        d="M5 14L8.5 17.5L19 6.5"
+        style={{
+          strokeDasharray: 22,
+        }}
+        className="ease-out-expo transition-[stroke-dashoffset] duration-150 in-data-checked:[stroke-dashoffset:0] in-data-unchecked:[stroke-dashoffset:22] motion-reduce:transition-none"
+      />
+    </svg>
+  );
+}
 type DrawerPosition = "right" | "left" | "top" | "bottom";
 
 const DrawerContext = React.createContext<{ position: DrawerPosition }>({
@@ -85,7 +112,7 @@ function BaseDrawerIndent({
       data-slot="base-drawer-indent"
       className={cn(
         "transition-[transform,border-radius] duration-400 ease-[cubic-bezier(.32,.72,0,1)]",
-        "data-[active]:scale-[0.94] data-[active]:overflow-hidden data-[active]:rounded-lg",
+        "data-active:scale-[0.94] data-active:overflow-hidden data-active:rounded-lg",
         className,
       )}
       {...props}
@@ -166,9 +193,9 @@ function BaseDrawerViewport({
         position === "top" && "grid grid-rows-[auto_1fr] pb-12",
         position === "left" && "flex justify-start",
         position === "right" && "flex justify-end",
-        variant === "floating" && "px-[var(--inset)] [--inset:1rem]",
-        variant === "floating" && position !== "bottom" && "pt-[var(--inset)]",
-        variant === "floating" && position !== "top" && "pb-[var(--inset)]",
+        variant === "floating" && "px-(--inset) [--inset:1rem]",
+        variant === "floating" && position !== "bottom" && "pt-(--inset)",
+        variant === "floating" && position !== "top" && "pb-(--inset)",
         className,
       )}
       data-slot="base-drawer-viewport"
@@ -252,9 +279,9 @@ function BaseDrawerPopup({
                 // Bar support
                 "has-data-[slot=base-drawer-bar]:pt-2",
                 // Nested stacking
-                "h-[var(--drawer-height,auto)]",
+                "h-(--drawer-height,auto)",
                 "[--height:max(0px,calc(var(--drawer-frontmost-height,var(--drawer-height))))]",
-                "data-nested-drawer-open:h-[var(--height)]",
+                "data-nested-drawer-open:h-(--height)",
                 "origin-[50%_calc(100%-var(--inset))]",
                 "data-nested-drawer-open:transform-[translateY(calc(var(--drawer-swipe-movement-y)-var(--stack-peek-offset)-(var(--shrink)*var(--height))))_scale(var(--scale))]",
               ),
@@ -267,9 +294,9 @@ function BaseDrawerPopup({
                 "before:inset-x-0 before:bottom-full before:h-(--bleed)",
                 "has-data-[slot=base-drawer-bar]:pb-2",
                 // Nested stacking
-                "h-[var(--drawer-height,auto)]",
+                "h-(--drawer-height,auto)",
                 "[--height:max(0px,calc(var(--drawer-frontmost-height,var(--drawer-height))))]",
-                "data-nested-drawer-open:h-[var(--height)]",
+                "data-nested-drawer-open:h-(--height)",
                 "origin-[50%_var(--inset)]",
                 "data-nested-drawer-open:transform-[translateY(calc(var(--drawer-swipe-movement-y)+var(--stack-peek-offset)+(var(--shrink)*var(--height))))_scale(var(--scale))]",
               ),
@@ -514,7 +541,7 @@ function BaseDrawerMenuItem({
 }) {
   const defaultProps = {
     className: cn(
-      "flex min-h-9 w-full cursor-default select-none items-center gap-2 rounded-sm px-2 py-1 text-base text-foreground outline-none hover:bg-surface-hover hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-60 data-[variant=destructive]:text-destructive-foreground sm:min-h-8 sm:text-sm [&>svg:not([class*='opacity-'])]:opacity-80 [&>svg:not([class*='size-'])]:size-4.5 sm:[&>svg:not([class*='size-'])]:size-4 [&>svg]:pointer-events-none [&>svg]:-mx-0.5 [&>svg]:shrink-0",
+      "flex min-h-9 w-full cursor-default select-none items-center gap-2 rounded-sm px-2 py-1 text-base text-foreground outline-none focus-visible:outline-ring/50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid hover:bg-surface-hover hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-60 data-[variant=destructive]:text-destructive-foreground sm:min-h-8 sm:text-sm [&>svg:not([class*='opacity-'])]:opacity-80 [&>svg:not([class*='size-'])]:size-4.5 sm:[&>svg:not([class*='size-'])]:size-4 [&>svg]:pointer-events-none [&>svg]:-mx-0.5 [&>svg]:shrink-0",
       className,
     ),
     "data-slot": "base-drawer-menu-item",
@@ -592,7 +619,7 @@ function BaseDrawerMenuTrigger({
   return (
     <BaseDrawerTrigger
       className={cn(
-        "text-foreground hover:bg-surface-hover hover:text-accent-foreground flex min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none sm:min-h-8 sm:text-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
+        "text-foreground hover:bg-surface-hover hover:text-accent-foreground focus-visible:outline-ring/50 flex min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid sm:min-h-8 sm:text-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       data-slot="base-drawer-menu-trigger"
@@ -626,10 +653,10 @@ function BaseDrawerMenuCheckboxItem({
     <CheckboxPrimitive.Root
       checked={checked}
       className={cn(
-        "text-foreground hover:bg-surface-hover hover:text-accent-foreground grid min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60 sm:min-h-8 sm:text-sm [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
+        "text-foreground hover:bg-surface-hover hover:text-accent-foreground focus-visible:outline-ring/50 grid min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid data-disabled:pointer-events-none data-disabled:opacity-60 sm:min-h-8 sm:text-sm [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
         variant === "switch"
           ? "grid-cols-[1fr_auto] gap-4 pe-1.5"
-          : "grid-cols-[1rem_1fr] pe-4",
+          : "grid-cols-[1fr_1.125rem] pe-2 sm:grid-cols-[1fr_1rem]",
         className,
       )}
       data-slot="base-drawer-menu-checkbox-item"
@@ -639,35 +666,31 @@ function BaseDrawerMenuCheckboxItem({
       render={render}
       {...props}
     >
+      <span className="col-start-1 flex min-w-0 items-center gap-2">
+        {children}
+      </span>
       {variant === "switch" ? (
-        <>
-          <span className="col-start-1">{children}</span>
-          <CheckboxPrimitive.Indicator
-            className="focus-visible:outline-ring/50 data-checked:bg-primary data-unchecked:bg-muted col-start-2 inline-flex h-[calc(var(--thumb-size)+2px)] w-[calc(var(--thumb-size)*2-2px)] shrink-0 items-center rounded-full p-px outline-0 outline-offset-0 outline-transparent transition-[background-color,box-shadow,outline-width,outline-offset,outline-color] duration-200 ease-out outline-solid [--thumb-size:1rem] focus-visible:outline-2 focus-visible:outline-offset-2 data-disabled:opacity-60 sm:[--thumb-size:0.75rem]"
-            keepMounted
-          >
-            <span className="bg-background pointer-events-none block aspect-square h-full origin-left rounded-[var(--thumb-size)] shadow-sm will-change-transform [transition:translate_.15s,border-radius_.15s,scale_.1s_.1s,transform-origin_.15s] in-[[data-slot=base-drawer-menu-checkbox-item]:active]:not-data-disabled:scale-x-110 in-[[data-slot=base-drawer-menu-checkbox-item][data-checked]]:origin-[var(--thumb-size)_50%] in-[[data-slot=base-drawer-menu-checkbox-item][data-checked]]:translate-x-[calc(var(--thumb-size)-4px)]" />
-          </CheckboxPrimitive.Indicator>
-        </>
+        <CheckboxPrimitive.Indicator
+          className={cn(
+            switchVariants({ shape: "circle" }),
+            // Touch-sized on mobile, matching the taller drawer rows; drops to
+            // the same 14px thumb the desktop menus use from `sm` up.
+            "col-start-2 cursor-default [--thumb-size:--spacing(4)] sm:[--thumb-size:--spacing(3.5)]",
+            "pointer-events-none",
+            // The row already dims when disabled; don't compound the fade.
+            "data-disabled:opacity-100",
+          )}
+          keepMounted
+        >
+          <span className={switchThumbVariants()} />
+        </CheckboxPrimitive.Indicator>
       ) : (
-        <>
-          <CheckboxPrimitive.Indicator className="col-start-1">
-            <svg
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M5.252 12.7 10.2 18.63 18.748 5.37" />
-            </svg>
-          </CheckboxPrimitive.Indicator>
-          <span className="col-start-2">{children}</span>
-        </>
+        <CheckboxPrimitive.Indicator
+          className="col-start-2 flex items-center justify-center"
+          keepMounted
+        >
+          <CheckmarkIcon className="size-4.5 sm:size-4" />
+        </CheckboxPrimitive.Indicator>
       )}
     </CheckboxPrimitive.Root>
   );
@@ -700,8 +723,8 @@ function BaseDrawerMenuRadioItem({
   return (
     <RadioPrimitive.Root
       className={cn(
-        "text-foreground hover:bg-surface-hover hover:text-accent-foreground grid min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60 sm:min-h-8 sm:text-sm [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
-        "grid-cols-[1rem_1fr] items-center pe-4",
+        "text-foreground hover:bg-surface-hover hover:text-accent-foreground focus-visible:outline-ring/50 grid min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid data-disabled:pointer-events-none data-disabled:opacity-60 sm:min-h-8 sm:text-sm [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
+        "grid-cols-[1fr_1.125rem] items-center pe-2 sm:grid-cols-[1fr_1rem]",
         className,
       )}
       data-slot="base-drawer-menu-radio-item"
@@ -710,22 +733,15 @@ function BaseDrawerMenuRadioItem({
       value={value}
       {...props}
     >
-      <RadioPrimitive.Indicator className="col-start-1">
-        <svg
-          fill="none"
-          height="24"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          viewBox="0 0 24 24"
-          width="24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M5.252 12.7 10.2 18.63 18.748 5.37" />
-        </svg>
+      <span className="col-start-1 flex min-w-0 items-center gap-2">
+        {children}
+      </span>
+      <RadioPrimitive.Indicator
+        className="col-start-2 flex items-center justify-center"
+        keepMounted
+      >
+        <CheckmarkIcon className="size-4.5 sm:size-4" />
       </RadioPrimitive.Indicator>
-      <span className="col-start-2">{children}</span>
     </RadioPrimitive.Root>
   );
 }

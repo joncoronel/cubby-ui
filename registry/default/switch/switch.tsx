@@ -22,14 +22,21 @@ const switchVariants = cva(
   ],
   {
     variants: {
+      // Shape sets the thumb's proportions, size sets its height. They're
+      // independent: every shape works at every size.
       shape: {
-        circle:
-          "[--thumb-size:--spacing(5)] [--thumb-aspect:1] [--travel-ratio:0.8]",
-        pill: "[--thumb-size:--spacing(5)] [--thumb-aspect:1.8] [--travel-ratio:0.45]",
+        circle: "[--thumb-aspect:1] [--travel-ratio:0.8]",
+        pill: "[--thumb-aspect:1.8] [--travel-ratio:0.45]",
+      },
+      size: {
+        xs: "[--thumb-size:--spacing(3.5)]",
+        sm: "[--thumb-size:--spacing(4)]",
+        default: "[--thumb-size:--spacing(5)]",
       },
     },
     defaultVariants: {
       shape: "circle",
+      size: "default",
     },
   },
 );
@@ -48,12 +55,13 @@ const switchThumbVariants = cva([
 type SwitchProps = React.ComponentProps<typeof BaseSwitch.Root> &
   VariantProps<typeof switchVariants>;
 
-function Switch({ className, shape, ...props }: SwitchProps) {
+function Switch({ className, shape, size, ...props }: SwitchProps) {
   return (
     <BaseSwitch.Root
       data-slot="switch"
       data-shape={shape}
-      className={cn(switchVariants({ shape }), className)}
+      data-size={size}
+      className={cn(switchVariants({ shape, size }), className)}
       {...props}
     >
       <BaseSwitch.Thumb

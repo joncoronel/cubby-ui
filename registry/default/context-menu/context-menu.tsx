@@ -218,8 +218,8 @@ function ContextMenuCheckboxItem({
         <BaseContextMenu.CheckboxItemIndicator
           keepMounted
           className={cn(
-            switchVariants({ shape: "circle" }),
-            "col-start-2 cursor-default [--thumb-size:--spacing(3.5)]",
+            switchVariants({ shape: "circle", size: "xs" }),
+            "col-start-2 cursor-default",
             "pointer-events-none",
             // The row already dims when disabled; don't compound the fade.
             "data-disabled:opacity-100",

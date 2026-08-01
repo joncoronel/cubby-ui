@@ -672,10 +672,11 @@ function BaseDrawerMenuCheckboxItem({
       {variant === "switch" ? (
         <CheckboxPrimitive.Indicator
           className={cn(
-            switchVariants({ shape: "circle" }),
+            switchVariants({ shape: "circle", size: "sm" }),
             // Touch-sized on mobile, matching the taller drawer rows; drops to
-            // the same 14px thumb the desktop menus use from `sm` up.
-            "col-start-2 cursor-default [--thumb-size:--spacing(4)] sm:[--thumb-size:--spacing(3.5)]",
+            // the same 14px thumb the desktop menus use (`size="xs"`) from
+            // `sm` up. Responsive sizing can't come from the cva variant.
+            "col-start-2 cursor-default sm:[--thumb-size:--spacing(3.5)]",
             "pointer-events-none",
             // The row already dims when disabled; don't compound the fade.
             "data-disabled:opacity-100",

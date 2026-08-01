@@ -13,7 +13,7 @@ export default function SwitchCard() {
           Receive notifications when someone mentions you.
         </span>
       </div>
-      <Switch className="[--thumb-size:--spacing(4)]" id="notifications" />
+      <Switch id="notifications" size="sm" />
     </Label>
   );
 }

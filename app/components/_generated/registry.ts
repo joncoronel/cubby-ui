@@ -413,6 +413,7 @@ import switch_switch_basic from "@/registry/examples/switch/switch-basic";
 import switch_switch_card from "@/registry/examples/switch/switch-card";
 import switch_switch_field from "@/registry/examples/switch/switch-field";
 import switch_switch_pill from "@/registry/examples/switch/switch-pill";
+import switch_switch_sizes from "@/registry/examples/switch/switch-sizes";
 import table_table_basic from "@/registry/examples/table/table-basic";
 import table_table_bordered from "@/registry/examples/table/table-bordered";
 import table_table_row_selection from "@/registry/examples/table/table-row-selection";
@@ -3686,7 +3687,7 @@ export const exampleRegistry = {
     {
       "title": "Card",
       "importPath": "switch-card",
-      "source": "import { Switch } from \"@/components/ui/cubby-ui/switch\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function SwitchCard() {\n  return (\n    <Label\n      htmlFor=\"notifications\"\n      className=\"flex-row items-start justify-between gap-4 rounded-lg border bg-card p-4 has-data-checked:border-primary/50 has-data-checked:bg-muted hover:bg-muted\"\n    >\n      <div className=\"flex flex-col gap-1\">\n        <span className=\"font-medium\">Push Notifications</span>\n        <span className=\"text-muted-foreground text-sm\">\n          Receive notifications when someone mentions you.\n        </span>\n      </div>\n      <Switch className=\"[--thumb-size:--spacing(4)]\" id=\"notifications\" />\n    </Label>\n  );\n}\n"
+      "source": "import { Switch } from \"@/components/ui/cubby-ui/switch\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function SwitchCard() {\n  return (\n    <Label\n      htmlFor=\"notifications\"\n      className=\"flex-row items-start justify-between gap-4 rounded-lg border bg-card p-4 has-data-checked:border-primary/50 has-data-checked:bg-muted hover:bg-muted\"\n    >\n      <div className=\"flex flex-col gap-1\">\n        <span className=\"font-medium\">Push Notifications</span>\n        <span className=\"text-muted-foreground text-sm\">\n          Receive notifications when someone mentions you.\n        </span>\n      </div>\n      <Switch id=\"notifications\" size=\"sm\" />\n    </Label>\n  );\n}\n"
     },
     {
       "title": "Field",
@@ -3697,6 +3698,11 @@ export const exampleRegistry = {
       "title": "Pill",
       "importPath": "switch-pill",
       "source": "import { Switch } from \"@/components/ui/cubby-ui/switch\";\n\nexport default function SwitchPill() {\n  return <Switch shape=\"pill\" />;\n}\n"
+    },
+    {
+      "title": "Sizes",
+      "importPath": "switch-sizes",
+      "source": "import { Switch } from \"@/components/ui/cubby-ui/switch\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function SwitchSizes() {\n  return (\n    <div className=\"flex items-center gap-6\">\n      <Label className=\"flex-row items-center gap-2\" htmlFor=\"size-xs\">\n        <Switch defaultChecked id=\"size-xs\" size=\"xs\" />\n        xs\n      </Label>\n      <Label className=\"flex-row items-center gap-2\" htmlFor=\"size-sm\">\n        <Switch defaultChecked id=\"size-sm\" size=\"sm\" />\n        sm\n      </Label>\n      <Label className=\"flex-row items-center gap-2\" htmlFor=\"size-default\">\n        <Switch defaultChecked id=\"size-default\" />\n        default\n      </Label>\n    </div>\n  );\n}\n"
     }
   ],
   "table": [
@@ -4476,6 +4482,7 @@ export const componentMap = {
   "switch-card": switch_switch_card,
   "switch-field": switch_switch_field,
   "switch-pill": switch_switch_pill,
+  "switch-sizes": switch_switch_sizes,
   "table-basic": table_table_basic,
   "table-bordered": table_table_bordered,
   "table-row-selection": table_table_row_selection,

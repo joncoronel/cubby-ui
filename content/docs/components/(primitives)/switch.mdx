@@ -39,6 +39,26 @@ Use `shape` to set the thumb's aspect ratio and travel distance.
 | `circle` | The default, a round thumb.                  |
 | `pill`   | A wider, rectangular thumb.                  |
 
+### Sizes
+
+Use `size` to set the thumb height. Shape and size are independent, so every shape works at every size.
+
+<ComponentPreview component="switch" example="switch-sizes" />
+
+| Size      | Thumb | Track height | Where it fits                                        |
+| --------- | ----- | ------------ | ---------------------------------------------------- |
+| `xs`      | 14px  | 18px         | Dense rows: menu items, toolbars.                    |
+| `sm`      | 16px  | 20px         | Compact settings rows and cards.                     |
+| `default` | 20px  | 24px         | Standalone form control.                             |
+
+The menu components use `size="xs"` for their `variant="switch"` items, so a switch inside a [Dropdown Menu](/docs/components/dropdown-menu), [Context Menu](/docs/components/context-menu), or [Menubar](/docs/components/menubar) already matches the surrounding text.
+
+For a size the scale does not cover, set `--thumb-size` directly. It also accepts responsive variants, which the preset cannot:
+
+```tsx
+<Switch className="sm:[--thumb-size:--spacing(3.5)]" size="sm" />
+```
+
 ### Form Integration
 
 Use [Field](/docs/components/field) for labeling and form participation. See the [Forms guide](/docs/getting-started/forms) for more patterns.
@@ -66,6 +86,15 @@ Toggle control for binary on/off states. Wraps Base UI's `Switch.Root` and `Swit
   defaultValue='"circle"'
 >
   Controls the aspect ratio and animation travel distance of the switch thumb. Use `"pill"` for a wider, more rectangular thumb.
+</ApiProp>
+
+<ApiProp
+  name="size"
+  fullType='"xs" | "sm" | "default"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Thumb height, which drives the track dimensions. `"xs"` (14px) suits dense rows like menu items, `"sm"` (16px) compact settings rows. Sets `--thumb-size`, so `className` can still override it for a one-off or responsive size.
 </ApiProp>
 
 </ApiPropsList>

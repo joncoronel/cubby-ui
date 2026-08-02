@@ -176,16 +176,19 @@ const switchThumbVariants = cva([
   // height and a single offset, so the 2px inset is one number rather than
   // whatever the layout has left after resolving both top and bottom — which
   // would hand each edge its own rounding at fractional device pixel ratios
-  // and read as an off-centre thumb. The squash moves height and margin-top
-  // together, both layout, so nothing cancels a snapped value against an
-  // unsnapped transform. That mismatch is what makes a thumb appear to shake.
+  // and read as an off-centre thumb.
+  //
+  // The re-centring offset rides on the transform below rather than on a
+  // margin. A margin is laid out, so it snaps to whole device pixels, and a
+  // squash that animates through fractional values then makes the top gap step
+  // while the bottom gap steps at different moments — measured at 1.2 device
+  // px of swing, which reads as the thumb shaking vertically. A transform
+  // offset is applied after layout and stays continuous, so both gaps glide.
   "w-auto h-[calc(var(--thumb-h)-var(--switch-press-total))]",
-  "mt-[calc(var(--switch-press-total)/2)]",
   // Whichever is larger: the press, or the stretch's own deformation. Only one
   // is ever non-zero, since --switch-split decides which motion is in play.
   "[--switch-press-total:max(var(--switch-press),calc(var(--switch-press-squash)*(var(--lead)-var(--trail))))]",
-  // Constant, so it never animates and never has to agree with a layout value.
-  "[transform:translateY(2px)]",
+  "[transform:translateY(calc(2px+var(--switch-press-total)/2))]",
   // Only 2px of track shows around the thumb, so a shadow much heavier than
   // this darkens the inset below it and the thumb reads as sitting low.
   "shadow-[0_1px_1px_0_oklch(0.18_0_0/0.1)]",

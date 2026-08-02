@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { OTPFieldPreview as BaseOTPField } from "@base-ui/react/otp-field";
+import { OTPField as BaseOTPField } from "@base-ui/react/otp-field";
 
 import { cn } from "@/lib/utils";
 
@@ -69,10 +69,7 @@ function OTPFieldSeparator({
   );
 }
 
-function OTPFieldGroup({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+function OTPFieldGroup({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="otp-field-group"

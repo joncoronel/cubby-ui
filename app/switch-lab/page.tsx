@@ -4,101 +4,105 @@ import * as React from "react";
 import { Switch as BaseSwitch } from "@base-ui/react/switch";
 
 import { cn } from "@/lib/utils";
-import { Switch } from "@/registry/default/switch/switch";
 
 /**
- * Scratch comparison page for the switch thumb-gap rendering options.
+ * Scratch comparison page for how the thumb's 2px inset is produced.
  * Not part of the registry or the docs — delete once a direction is picked.
  *
- * The complaint: at the smaller sizes the thumb does not look evenly inset on
- * all four sides. Cause is that the track width and the thumb travel are
- * derived by multiplying by 1.8 / 0.8 / 0.45, which only lands on whole pixels
- * for circle/default. Everything else puts the thumb's leading edge mid-pixel,
- * so the gap smears horizontally while the vertical gaps stay crisp.
+ * All four rows are geometrically identical: same painted size, same thumb,
+ * same 2px inset, same travel. The only variable is the mechanism, so anything
+ * visible on screen is down to how the browser rasterizes it.
+ *
+ *   1. ring      what ships today — thumb fills the box, inset is a box-shadow
+ *   2. padding   thumb inset by padding, centred by flex, moved by translate
+ *   3. absolute  Fluid Functionalism — absolutely positioned thumb, offset and
+ *                moved entirely by transform
+ *   4. margin    HeroUI — centred by flex, moved by margin-inline-start, so the
+ *                horizontal position is a layout value rather than a transform
  */
 
-type Shape = "circle" | "pill";
 type Size = "xs" | "sm" | "default";
 
-const SIZES: Size[] = ["xs", "sm", "default"];
-const THUMB_PX: Record<Size, number> = { xs: 14, sm: 16, default: 20 };
-const SHAPE_MATH: Record<Shape, { aspect: number; ratio: number }> = {
-  circle: { aspect: 1, ratio: 0.8 },
-  pill: { aspect: 1.8, ratio: 0.45 },
+const GEOMETRY: Record<Size, { thumb: number; travel: number }> = {
+  xs: { thumb: 14, travel: 11 },
+  sm: { thumb: 16, travel: 13 },
+  default: { thumb: 20, travel: 16 },
 };
 
-// Option A, hand-computed: every dimension rounded to a whole pixel.
-const INTEGER: Record<
-  Shape,
-  Record<Size, { h: number; w: number; travel: number }>
-> = {
-  circle: {
-    xs: { h: 14, w: 14, travel: 11 },
-    sm: { h: 16, w: 16, travel: 13 },
-    default: { h: 20, w: 20, travel: 16 },
-  },
-  pill: {
-    xs: { h: 14, w: 25, travel: 11 },
-    sm: { h: 16, w: 29, travel: 13 },
-    default: { h: 20, w: 36, travel: 16 },
-  },
-};
+const INSET = 2;
 
-// Kumo rings with a shade of the track itself, not a neutral over the page
-// (bg-blue-500/ring-blue-600 in light, bg-blue-600/ring-blue-500 in dark), so
-// the ring reads as the track's own edge rather than as a focus ring.
-const RING_CLASSES = cn(
-  "ring-2",
-  "data-unchecked:ring-switch-track",
-  "data-checked:ring-primary",
-  "dark:data-checked:ring-primary",
-);
+const radiusFor = (box: number, squircle: boolean) =>
+  squircle ? box * 0.5 : 9999;
 
-const trackBase =
-  "inline-flex shrink-0 items-center rounded-full outline-none cursor-pointer " +
-  "data-unchecked:bg-switch-track data-checked:bg-primary " +
-  "transition-colors duration-100 motion-reduce:transition-none " +
-  "focus-visible:outline-ring/50 focus-visible:outline-2 focus-visible:outline-offset-2";
+// corner-shape is newer than React's CSSProperties typings.
+const corner = (squircle: boolean) =>
+  ({ cornerShape: squircle ? "squircle" : "round" }) as React.CSSProperties;
 
-const thumbBase =
-  "pointer-events-none block rounded-full bg-white " +
-  "shadow-[0_1px_1px_0_oklch(0.18_0_0/0.1)] " +
-  "ease-out-expo transition-all duration-200 motion-reduce:transition-none ";
-
-type VariantProps = {
-  shape: Shape;
+type MechProps = {
   size: Size;
+  squircle: boolean;
   checked: boolean;
+  duration: number;
   onCheckedChange: (v: boolean) => void;
 };
 
-/** 1. What ships today. */
-function Current({ shape, size, checked, onCheckedChange }: VariantProps) {
-  return (
-    <Switch
-      checked={checked}
-      onCheckedChange={onCheckedChange}
-      shape={shape}
-      size={size}
-    />
-  );
-}
+/** Colour and motion shared by every mechanism, so only structure differs. */
+const trackStyle = (
+  checked: boolean,
+  duration: number,
+): React.CSSProperties => ({
+  background: checked ? "var(--primary)" : "var(--switch-track)",
+  transitionProperty: "background-color, box-shadow",
+  transitionDuration: `${duration}ms`,
+});
 
-/** 2. Option A via explicit whole-pixel values (cva compoundVariants shape). */
-function IntegerCva({ shape, size, checked, onCheckedChange }: VariantProps) {
-  const { h, w, travel } = INTEGER[shape][size];
+const thumbStyle = (
+  thumb: number,
+  squircle: boolean,
+  moveProp: string,
+): React.CSSProperties =>
+  ({
+    height: thumb,
+    width: thumb,
+    background: "#fff",
+    borderRadius: radiusFor(thumb, squircle),
+    ...corner(squircle),
+    boxShadow: "0 1px 1px 0 oklch(0.18 0 0 / 0.1)",
+    transitionProperty: moveProp,
+    transitionDuration: "200ms",
+    transitionTimingFunction: "cubic-bezier(0.19, 1, 0.22, 1)",
+  }) as React.CSSProperties;
+
+const rootClasses = "shrink-0 cursor-pointer outline-none";
+
+/** 1. Ring — the shipped approach. */
+function Ring({
+  size,
+  squircle,
+  checked,
+  duration,
+  onCheckedChange,
+}: MechProps) {
+  const { thumb, travel } = GEOMETRY[size];
+  const color = checked ? "var(--primary)" : "var(--switch-track)";
   return (
     <BaseSwitch.Root
       checked={checked}
+      className={cn(rootClasses, "inline-flex items-center")}
       onCheckedChange={onCheckedChange}
-      className={cn(trackBase, "p-0.5")}
-      style={{ height: h + 4, width: w + travel + 4 }}
+      style={{
+        ...trackStyle(checked, duration),
+        height: thumb,
+        width: thumb + travel,
+        margin: INSET,
+        borderRadius: radiusFor(thumb, squircle),
+        ...corner(squircle),
+        boxShadow: `0 0 0 ${INSET}px ${color}`,
+      }}
     >
       <BaseSwitch.Thumb
-        className={thumbBase}
         style={{
-          height: h,
-          width: w,
+          ...thumbStyle(thumb, squircle, "translate"),
           translate: checked ? `${travel}px` : "0px",
         }}
       />
@@ -106,83 +110,33 @@ function IntegerCva({ shape, size, checked, onCheckedChange }: VariantProps) {
   );
 }
 
-/** 3. Option A via CSS round() — keeps shape and size orthogonal. */
-function IntegerRound({ shape, size, checked, onCheckedChange }: VariantProps) {
-  const { aspect, ratio } = SHAPE_MATH[shape];
-  const vars = {
-    "--thumb-size": `${THUMB_PX[size]}px`,
-    "--thumb-aspect": aspect,
-    "--travel-ratio": ratio,
-    "--thumb-w": "round(calc(var(--thumb-size) * var(--thumb-aspect)), 1px)",
-    "--travel": "round(calc(var(--thumb-w) * var(--travel-ratio)), 1px)",
-  } as React.CSSProperties;
-
+/** 2. Padding — thumb inset by padding, centred by flex. */
+function Padding({
+  size,
+  squircle,
+  checked,
+  duration,
+  onCheckedChange,
+}: MechProps) {
+  const { thumb, travel } = GEOMETRY[size];
   return (
     <BaseSwitch.Root
       checked={checked}
+      className={cn(rootClasses, "inline-flex items-center")}
       onCheckedChange={onCheckedChange}
-      className={cn(
-        trackBase,
-        "p-0.5",
-        "h-[calc(var(--thumb-size)+4px)] w-[calc(var(--thumb-w)+var(--travel)+4px)]",
-      )}
-      style={vars}
+      style={{
+        ...trackStyle(checked, duration),
+        boxSizing: "border-box",
+        padding: INSET,
+        height: thumb + INSET * 2,
+        width: thumb + travel + INSET * 2,
+        borderRadius: radiusFor(thumb + INSET * 2, squircle),
+        ...corner(squircle),
+      }}
     >
       <BaseSwitch.Thumb
-        className={cn(thumbBase, "h-(--thumb-size) w-(--thumb-w)")}
-        style={{ translate: checked ? "var(--travel)" : "0px" }}
-      />
-    </BaseSwitch.Root>
-  );
-}
-
-/**
- * 4. Option B — Kumo-style: no gap, thumb fills the track, ring outside.
- * Thumb is the same size as every other row; the track is sized to the thumb
- * and the ring adds the outer 2px, so the painted footprint matches too.
- */
-function NoGap({ shape, size, checked, onCheckedChange }: VariantProps) {
-  const { h } = INTEGER[shape][size];
-  return (
-    <BaseSwitch.Root
-      checked={checked}
-      onCheckedChange={onCheckedChange}
-      className={cn(trackBase, "p-0", RING_CLASSES)}
-      style={{ height: h, width: h * 2 }}
-    >
-      <BaseSwitch.Thumb
-        className={thumbBase}
-        style={{ height: h, width: h, translate: checked ? `${h}px` : "0px" }}
-      />
-    </BaseSwitch.Root>
-  );
-}
-
-/**
- * 5. The border idea — thumb is the same size as rows 1-3 and flush against a
- * 2px border that supplies the ring. Same outer box as option A, and with the
- * border colored to match the track fill it is pixel-identical to rows 2-3;
- * the point of the border is that the ring can be colored independently.
- */
-function BorderedRing({ shape, size, checked, onCheckedChange }: VariantProps) {
-  const { h, w, travel } = INTEGER[shape][size];
-  return (
-    <BaseSwitch.Root
-      checked={checked}
-      onCheckedChange={onCheckedChange}
-      className={cn(
-        trackBase,
-        // Border sits over the track fill, so a translucent shade of the
-        // substrate reads as the same "one step darker" edge Kumo rings with.
-        "border-2 border-transparent p-0",
-      )}
-      style={{ height: h + 4, width: w + travel + 4 }}
-    >
-      <BaseSwitch.Thumb
-        className={thumbBase}
         style={{
-          height: h,
-          width: w,
+          ...thumbStyle(thumb, squircle, "translate"),
           translate: checked ? `${travel}px` : "0px",
         }}
       />
@@ -190,53 +144,105 @@ function BorderedRing({ shape, size, checked, onCheckedChange }: VariantProps) {
   );
 }
 
-const APPROACHES = [
-  { key: "current", label: "1. Current", Component: Current },
-  { key: "cva", label: "2. A — integer (cva)", Component: IntegerCva },
-  { key: "round", label: "3. A — integer (round())", Component: IntegerRound },
-  { key: "nogap", label: "4. B — no gap (Kumo)", Component: NoGap },
-  { key: "border", label: "5. Border as the ring", Component: BorderedRing },
+/** 3. Absolute + transform — the Fluid Functionalism structure. */
+function Absolute({
+  size,
+  squircle,
+  checked,
+  duration,
+  onCheckedChange,
+}: MechProps) {
+  const { thumb, travel } = GEOMETRY[size];
+  return (
+    <BaseSwitch.Root
+      checked={checked}
+      className={cn(rootClasses, "relative inline-block")}
+      onCheckedChange={onCheckedChange}
+      style={{
+        ...trackStyle(checked, duration),
+        height: thumb + INSET * 2,
+        width: thumb + travel + INSET * 2,
+        borderRadius: radiusFor(thumb + INSET * 2, squircle),
+        ...corner(squircle),
+      }}
+    >
+      <BaseSwitch.Thumb
+        style={{
+          ...thumbStyle(thumb, squircle, "transform"),
+          position: "absolute",
+          top: 0,
+          left: 0,
+          transform: `translate(${INSET + (checked ? travel : 0)}px, ${INSET}px)`,
+        }}
+      />
+    </BaseSwitch.Root>
+  );
+}
+
+/** 4. Margin — the HeroUI structure; horizontal position is a layout value. */
+function Margin({
+  size,
+  squircle,
+  checked,
+  duration,
+  onCheckedChange,
+}: MechProps) {
+  const { thumb, travel } = GEOMETRY[size];
+  return (
+    <BaseSwitch.Root
+      checked={checked}
+      className={cn(rootClasses, "inline-flex items-center overflow-hidden")}
+      onCheckedChange={onCheckedChange}
+      style={{
+        ...trackStyle(checked, duration),
+        boxSizing: "border-box",
+        height: thumb + INSET * 2,
+        width: thumb + travel + INSET * 2,
+        borderRadius: radiusFor(thumb + INSET * 2, squircle),
+        ...corner(squircle),
+      }}
+    >
+      <BaseSwitch.Thumb
+        style={{
+          ...thumbStyle(thumb, squircle, "margin"),
+          marginInlineStart: INSET + (checked ? travel : 0),
+        }}
+      />
+    </BaseSwitch.Root>
+  );
+}
+
+const MECHANISMS = [
+  { key: "ring", label: "1. ring (shipped)", Component: Ring },
+  { key: "padding", label: "2. padding + translate", Component: Padding },
+  {
+    key: "absolute",
+    label: "3. absolute + transform (FF)",
+    Component: Absolute,
+  },
+  { key: "margin", label: "4. margin (HeroUI)", Component: Margin },
 ] as const;
 
-/**
- * Reports the rendered box so fractional geometry is visible, not inferred.
- * Measured after the thumb transition settles — sampling immediately catches
- * the thumb mid-travel and reports the resting position instead.
- */
-function Measured({
-  checked,
-  shape,
-  children,
-}: {
-  checked: boolean;
-  shape: Shape;
-  children: React.ReactNode;
-}) {
+/** Confirms the four really are the same size, so the eye is the only judge. */
+function Painted({ children }: { children: React.ReactNode }) {
   const ref = React.useRef<HTMLDivElement>(null);
   const [text, setText] = React.useState("");
 
   React.useEffect(() => {
     const id = setTimeout(() => {
-      const root = ref.current?.querySelector<HTMLElement>("[role=switch]");
-      const thumb = root?.firstElementChild as HTMLElement | undefined;
-      if (!root || !thumb) return;
-      const r = root.getBoundingClientRect();
-      const t = thumb.getBoundingClientRect();
-      const travel = getComputedStyle(thumb).translate.split(" ")[0];
-      const whole = (n: number) => Number.isInteger(+n.toFixed(3));
-      const gapL = t.left - r.left;
-      const gapR = r.right - t.right;
-      const clean =
-        whole(r.width) && whole(r.height) && whole(gapL) && whole(gapR);
+      const el = ref.current?.querySelector<HTMLElement>("[role=switch]");
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const m = parseFloat(getComputedStyle(el).marginTop) || 0;
       setText(
-        `${+r.width.toFixed(2)}x${+r.height.toFixed(2)} · travel ${travel} · gap L ${+gapL.toFixed(2)} R ${+gapR.toFixed(2)} · ${clean ? "whole px" : "FRACTIONAL"}`,
+        `${+(r.width + m * 2).toFixed(2)} x ${+(r.height + m * 2).toFixed(2)}`,
       );
     }, 260);
     return () => clearTimeout(id);
-  }, [checked, shape]);
+  });
 
   return (
-    <div className="flex items-center gap-4" ref={ref}>
+    <div className="flex items-center gap-3" ref={ref}>
       {children}
       <code className="text-muted-foreground text-[11px] tabular-nums">
         {text}
@@ -247,40 +253,53 @@ function Measured({
 
 export default function SwitchLabPage() {
   const [checked, setChecked] = React.useState(false);
-  const [shape, setShape] = React.useState<Shape>("circle");
+  const [squircle, setSquircle] = React.useState(false);
+  const [duration, setDuration] = React.useState(100);
+
+  const btn =
+    "border-border hover:bg-surface-hover rounded-md border px-3 py-1.5 text-sm";
 
   return (
     <div className="min-h-screen p-10">
       <div className="mx-auto flex max-w-3xl flex-col gap-8">
-        <header className="flex flex-col gap-2">
-          <h1 className="text-xl font-semibold">Switch gap rendering</h1>
+        <header className="flex flex-col gap-3">
+          <h1 className="text-xl font-semibold">Switch inset mechanisms</h1>
           <p className="text-muted-foreground text-sm">
-            View at 100% browser zoom — zooming changes the device pixel ratio
-            and re-rasterizes everything, which hides the effect being compared.
-            Options 2 and 3 should be pixel-identical; if they are not, round()
-            is not producing the hand-computed values.
+            All four rows are geometrically identical — same painted size, same
+            thumb, same 2px inset, same travel. Only the mechanism differs, so
+            anything you can see is a rasterization difference. View at 100%
+            browser zoom: zooming changes the device pixel ratio and re-renders
+            everything, which hides the effect being compared.
           </p>
-          <div className="flex items-center gap-3 text-sm">
+          <div className="flex flex-wrap items-center gap-3">
             <button
-              className="border-border hover:bg-surface-hover rounded-md border px-3 py-1.5"
+              className={btn}
               onClick={() => setChecked((c) => !c)}
               type="button"
             >
               Toggle all ({checked ? "on" : "off"})
             </button>
             <button
-              className="border-border hover:bg-surface-hover rounded-md border px-3 py-1.5"
-              onClick={() =>
-                setShape((s) => (s === "circle" ? "pill" : "circle"))
-              }
+              className={btn}
+              onClick={() => setSquircle((s) => !s)}
               type="button"
             >
-              Shape: {shape}
+              Corners: {squircle ? "squircle" : "round"}
             </button>
+            {[100, 400, 1000, 3000].map((d) => (
+              <button
+                className={cn(btn, duration === d && "bg-surface-selected")}
+                key={d}
+                onClick={() => setDuration(d)}
+                type="button"
+              >
+                {d}ms
+              </button>
+            ))}
           </div>
         </header>
 
-        {SIZES.map((size) => (
+        {(Object.keys(GEOMETRY) as Size[]).map((size) => (
           <section
             className="border-border flex flex-col gap-4 rounded-lg border p-6"
             key={size}
@@ -288,26 +307,26 @@ export default function SwitchLabPage() {
             <h2 className="text-sm font-medium">
               size={size}{" "}
               <span className="text-muted-foreground font-normal">
-                (thumb {THUMB_PX[size]}px)
+                (thumb {GEOMETRY[size].thumb}px, travel {GEOMETRY[size].travel}
+                px)
               </span>
             </h2>
-            <div className="flex flex-col gap-4">
-              {APPROACHES.map(({ key, label, Component }) => (
-                <div className="flex items-center gap-4" key={key}>
-                  <span className="text-muted-foreground w-48 shrink-0 text-xs">
-                    {label}
-                  </span>
-                  <Measured checked={checked} shape={shape}>
-                    <Component
-                      checked={checked}
-                      onCheckedChange={setChecked}
-                      shape={shape}
-                      size={size}
-                    />
-                  </Measured>
-                </div>
-              ))}
-            </div>
+            {MECHANISMS.map(({ key, label, Component }) => (
+              <div className="flex items-center gap-4" key={key}>
+                <span className="text-muted-foreground w-52 shrink-0 text-xs">
+                  {label}
+                </span>
+                <Painted>
+                  <Component
+                    checked={checked}
+                    duration={duration}
+                    onCheckedChange={setChecked}
+                    size={size}
+                    squircle={squircle}
+                  />
+                </Painted>
+              </div>
+            ))}
           </section>
         ))}
       </div>

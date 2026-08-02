@@ -221,7 +221,11 @@
      Derived, so it tracks whatever --primary the consumer sets. */
   --primary-soft-foreground: color-mix(in oklch, var(--primary), white 30%);
   /* Same treatment for destructive-soft's label on its tinted plate. */
-  --destructive-soft-foreground: color-mix(in oklch, var(--destructive), white 30%);
+  --destructive-soft-foreground: color-mix(
+    in oklch,
+    var(--destructive),
+    white 30%
+  );
 
   /* Dark-mode hover colors — same per-token logic as :root above. Most
      tokens brighten (mix toward white), but --neutral is near-white in dark
@@ -472,6 +476,28 @@
   --shadow-surface-rim-6: var(--surface-rim-6);
   --shadow-surface-rim-7: var(--surface-rim-7);
   --shadow-surface-rim-8: var(--surface-rim-8);
+}
+
+/* Switch motion. A custom property only animates once it is registered — an
+   unregistered one has no type, so there is nothing to interpolate and it
+   steps. These three are the only animated quantities on a Switch: the thumb's
+   own declarations are plain calc() of them, which is what lets one mechanism
+   serve both the sliding and the stretching motion. They inherit so the thumb
+   can read what the root animates. */
+@property --switch-p {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@property --switch-ext {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+@property --switch-press {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
 }
 
 /* Base UI requirements */

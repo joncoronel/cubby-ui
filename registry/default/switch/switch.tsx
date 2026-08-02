@@ -72,10 +72,10 @@ const switchVariants = cva(
     "not-data-disabled:hover:data-checked:bg-[color-mix(in_oklab,var(--primary),var(--color-black)_8%)]",
     "not-data-disabled:group-hover:data-checked:bg-[color-mix(in_oklab,var(--primary),var(--color-black)_8%)]",
     "not-data-disabled:data-highlighted:data-checked:bg-[color-mix(in_oklab,var(--primary),var(--color-black)_8%)]",
-    // Three clocks, because they answer different questions: colour has to feel
-    // instant, gestures nearly so, and only the toggle itself is worth 200ms.
-    // The two gesture entries repeat because transition lists are positional,
-    // not because they are separately tuned.
+    // Two tiers: 80ms for anything that answers the pointer directly, and the
+    // toggle's own duration for the state change. The repeated 80ms entries
+    // are the same tier twice, not separate tuning — transition lists are
+    // positional, so each property needs its own slot.
     //
     // One curve for all of them, and it has to be a gentle one. Under
     // ease-out-expo the stretch reaches half its progress in the first tenth
@@ -83,7 +83,7 @@ const switchVariants = cva(
     // remaining nine — the two edges split a single timeline between them, so
     // whatever the curve front-loads is taken out of the trailing edge's share.
     "transition-[background-color,--switch-p,--switch-ext,--switch-press]",
-    "duration-[100ms,200ms,120ms,120ms]",
+    "duration-[80ms,var(--switch-duration),160ms,160ms]",
     "ease-out-cubic",
     "motion-reduce:transition-none motion-reduce:[--switch-hover-part:0px] motion-reduce:[--switch-press-part:0px] motion-reduce:[--switch-press:0px]",
     "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
@@ -136,14 +136,19 @@ const switchVariants = cva(
       // the track mid-toggle. One number, two very different motions.
       motion: {
         default: [
-          "[--switch-split:1]",
+          "[--switch-split:1] [--switch-duration:160ms]",
           "not-data-disabled:active:[--switch-press:var(--switch-press-squash)]",
           "not-data-disabled:group-active:[--switch-press:var(--switch-press-squash)]",
         ].join(" "),
         // No press squash here: the stretch derives its own from how far it
         // has spread, so pressing as well would spend the same deformation
         // twice within a tenth of a second.
-        stretch: "[--switch-split:0.5]",
+        //
+        // Longer, because this timeline is split between two edges and has to
+        // show the thumb spread and gather inside it. At the sliding duration
+        // the outward half lasts about two frames, which registers as a flicker
+        // rather than a stretch.
+        stretch: "[--switch-split:0.5] [--switch-duration:200ms]",
       },
     },
     defaultVariants: {

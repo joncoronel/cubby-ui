@@ -30,7 +30,7 @@ Wrap the switch in a `Label` to make a whole card row toggle the control.
 
 ### Shapes
 
-Use `shape` to set the thumb's silhouette. It controls the aspect ratio, the corner radius, and the travel distance together, and the track follows the thumb so the two always match.
+Use `shape` to set the thumb's silhouette, which the track follows.
 
 <ComponentPreview component="switch" example="switch-shapes" />
 
@@ -40,13 +40,11 @@ Use `shape` to set the thumb's silhouette. It controls the aspect ratio, the cor
 | `pill`     | A wider, rectangular thumb.                      |
 | `squircle` | A squared-off thumb, for a more mechanical look. |
 
-`squircle` uses the CSS `corner-shape` property, which draws a superellipse rather than a quarter-circle at each corner. Browsers without it fall back to a plain rounded square: the fallback deliberately uses a smaller radius, because the near-50% radius a squircle needs would render as a plain circle without `corner-shape` to reshape it.
-
-Every shape sets its radius as a fraction of `--thumb-size` rather than a fixed pixel value, so the corners stay proportional across sizes instead of reading too round at `xs` and too sharp at `default`.
+`squircle` uses CSS `corner-shape`. Browsers without it fall back to a rounded square.
 
 ### Sizes
 
-Use `size` to set the thumb height. Shape and size are independent, so every shape works at every size.
+Use `size` to set the thumb height, which drives the track dimensions.
 
 <ComponentPreview component="switch" example="switch-sizes" />
 
@@ -56,9 +54,9 @@ Use `size` to set the thumb height. Shape and size are independent, so every sha
 | `sm`      | 16px  | 20px         | Compact settings rows and cards.  |
 | `default` | 20px  | 24px         | Standalone form control.          |
 
-The menu components use `size="xs"` for their `variant="switch"` items, so a switch inside a [Dropdown Menu](/docs/components/dropdown-menu), [Context Menu](/docs/components/context-menu), or [Menubar](/docs/components/menubar) already matches the surrounding text.
+[Dropdown Menu](/docs/components/dropdown-menu), [Context Menu](/docs/components/context-menu) and [Menubar](/docs/components/menubar) use `xs` for their `variant="switch"` items, so a switch inside one already matches the surrounding text.
 
-For a size the scale does not cover, set `--thumb-size` directly. It also accepts responsive variants, which the preset cannot:
+For a size the scale does not cover, set `--thumb-size`. It also takes responsive variants, which the preset cannot:
 
 ```tsx
 <Switch className="sm:[--thumb-size:--spacing(3.5)]" size="sm" />
@@ -66,26 +64,22 @@ For a size the scale does not cover, set `--thumb-size` directly. It also accept
 
 ### Motion
 
-The thumb widens slightly on hover and widens further and flattens on press, always reaching into the empty half of the track rather than out of it. Use `motion` to change what the toggle itself does.
+Use `motion` to set what the thumb does while the switch toggles.
 
 <ComponentPreview component="switch" example="switch-motion" />
 
-| Motion    | Description                                                                                                                    |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `default` | The thumb slides across at a constant width.                                                                                   |
-| `stretch` | The leading edge crosses first and the trailing edge follows, so the thumb spans the track mid-toggle and flattens as it does. |
+| Motion    | Description                                                                |
+| --------- | -------------------------------------------------------------------------- |
+| `default` | The thumb slides across at a constant width.                               |
+| `stretch` | The leading edge crosses first, so the thumb spans the track and flattens. |
 
-Both keep the same resting geometry, and neither can overhang the track: at its widest the thumb reaches exactly from one inset to the other.
+Hover and press behave the same either way. The thumb widens on hover, widens further and flattens on press, and always reaches into the empty half of the track. Both respond to a `group` ancestor as well as to the switch itself, so `Label className="group"` makes a whole row drive the thumb; menu items already do this.
 
-`--switch-press-squash` is the single source for the flattening in both motions, so setting it to `0` removes it and leaves the widening behind:
+To retune, set `--switch-press-squash` (use `0` to drop the flattening), `--switch-hover-ext`, `--switch-press-ext`, or `--switch-duration`:
 
 ```tsx
 <Switch className="[--switch-press-squash:0px]" motion="stretch" />
 ```
-
-`--switch-hover-ext` and `--switch-press-ext` do the same for how far the thumb reaches on hover and on press.
-
-Hover and press respond to a `group` ancestor as well as to the switch itself, so wrapping a row in `Label className="group"` makes the whole row drive the thumb. Menu items already do this, which is why a switch inside a [Dropdown Menu](/docs/components/dropdown-menu) reacts to its row rather than to the small indicator.
 
 ### Form Integration
 
@@ -113,10 +107,8 @@ Toggle control for binary on/off states. Wraps Base UI's `Switch.Root` and `Swit
   simpleType="string"
   defaultValue='"circle"'
 >
-  Controls the aspect ratio, corner shape and animation travel distance of the
-  switch thumb. Use `"pill"` for a wider, more rectangular thumb, or
-  `"squircle"` for a squared-off one. The track picks up the same corner
-  treatment, so both stay in step.
+  Sets the thumb's aspect ratio, corner radius and travel distance together. The
+  track picks up the same corner treatment, so the two stay in step.
 </ApiProp>
 
 <ApiProp
@@ -125,10 +117,8 @@ Toggle control for binary on/off states. Wraps Base UI's `Switch.Root` and `Swit
   simpleType="string"
   defaultValue='"default"'
 >
-  Thumb height, which drives the track dimensions. `"xs"` (14px) suits dense
-  rows like menu items, `"sm"` (16px) compact settings rows. Sets
-  `--thumb-size`, so `className` can still override it for a one-off or
-  responsive size.
+  Thumb height, which drives the track dimensions. Sets `--thumb-size`, so
+  `className` can still override it for a one-off or responsive size.
 </ApiProp>
 
 <ApiProp
@@ -137,18 +127,13 @@ Toggle control for binary on/off states. Wraps Base UI's `Switch.Root` and `Swit
   simpleType="string"
   defaultValue='"default"'
 >
-  What the thumb does while the switch toggles. `"default"` slides it across at
-  a constant width; `"stretch"` sends the leading edge first so the thumb spans
-  the track mid-toggle and flattens as it goes. Hover and press behave the same
-  either way.
+  What the thumb does while the switch toggles. `"stretch"` sends the leading
+  edge first, so the thumb spans the track mid-toggle and flattens as it goes.
+  Hover and press are unaffected.
 </ApiProp>
 
 </ApiPropsList>
 
-Switch does not expose a `variant` prop like the other form fields. The unchecked track uses `--switch-track`, a translucent overlay that adapts to whatever substrate it sits on, so one track color works on a page, a Card, or a toolbar. It is a separate token from `--input-elevated` because a switch has no border: the fill _is_ the control's boundary, so it carries more weight in dark mode than a field background would. The thumb is white in both themes, contrasting with the track and the parent surface alike. See the [Surfaces](/docs/getting-started/surfaces) docs.
+Switch has no `variant` prop. The unchecked track uses `--switch-track`, a translucent overlay that adapts to whatever substrate it sits on, so one colour works on a page, a Card, or a toolbar. The thumb is white in both themes. Set `--switch-track` and `--switch-track-hover` to retune the track and its hover step. See the [Surfaces](/docs/getting-started/surfaces) docs.
 
-Hover moves the track one step further along that overlay, which darkens it in light mode and lightens it in dark from a single rule. A checked track darkens in both, since lightening the primary reads as disabled. Set `--switch-track` and `--switch-track-hover` to retune both.
-
-The thumb is pinned by `left` and `right` rather than sized and moved, which is what lets each of its edges travel on its own schedule and produce the `stretch` motion. Vertically it keeps an explicit height and a single 2px offset, so that inset is one number rather than whatever the layout has left after resolving both edges. That matters at fractional device pixel ratios, where dividing the space can round to a different number of device pixels at the top than the bottom and read as an off-centre thumb. For the same reason the track's width, the thumb's width and the travel distance are all snapped to whole pixels with CSS `round()`; browsers without it fall back to the unrounded values. A `p-*` class will not change the inset.
-
-All of the motion comes from three registered custom properties on the root, `--switch-p`, `--switch-ext` and `--switch-press`; every declaration on the thumb is plain `calc()` of them. That is what lets one mechanism serve both motions, and it means nothing on the thumb transitions directly. It does mean the animation needs `@property`: without it the thumb changes state without animating, the same as under `prefers-reduced-motion`.
+The 2px inset around the thumb is a fixed offset rather than space the layout divides, and the track width, thumb width and travel distance are snapped to whole pixels with CSS `round()`, so a `p-*` class will not change it. The motion runs off registered custom properties, which means it needs `@property`: without it the switch changes state without animating, the same as under `prefers-reduced-motion`.

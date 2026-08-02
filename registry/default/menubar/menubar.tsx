@@ -151,36 +151,23 @@ function MenubarContent({
           )}
           {...props}
         >
+          {/*
+            Kept for sizing, not for content transitions. Base UI runs the popup
+            auto-resize from inside the Viewport, and that is what writes
+            --positioner-width / --positioner-height (plus --popup-width /
+            --popup-height, which sit at `auto` between resizes). The positioner
+            above sizes off those, so dropping the Viewport leaves them unset
+            and its explicit box collapses.
+
+            Deliberately carries no morph styling. A menubar can't morph: each
+            MenubarMenu is its own Menu.Root, so moving from File to Edit mounts
+            a new popup rather than swapping content within one, and
+            data-current / data-previous / data-activation-direction never
+            appear. (Verified: two distinct popup elements across a switch.)
+          */}
           <BaseMenu.Viewport
             data-slot="menubar-viewport"
-            className={cn(
-              "relative size-full overflow-clip p-1 [--viewport-padding:0.25rem]",
-              "not-data-transitioning:overflow-y-auto",
-              // Content width
-              "**:data-current:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
-              "**:data-previous:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
-              // Content base state and transitions
-              "**:data-current:translate-x-0 **:data-current:opacity-100",
-              "**:data-previous:translate-x-0 **:data-previous:opacity-100",
-              "**:data-current:transition-[translate,opacity,filter] **:data-current:duration-[350ms,175ms,350ms] **:data-current:ease-[cubic-bezier(0.22,1,0.36,1)]",
-              "**:data-previous:transition-[translate,opacity,filter] **:data-previous:duration-[350ms,175ms,350ms] **:data-previous:ease-[cubic-bezier(0.22,1,0.36,1)]",
-              // Direction-aware slide animations for incoming content
-              "data-[activation-direction~=left]:**:data-current:data-starting-style:-translate-x-1/2",
-              "data-[activation-direction~=left]:**:data-current:data-starting-style:opacity-0",
-              "data-[activation-direction~=right]:**:data-current:data-starting-style:translate-x-1/2",
-              "data-[activation-direction~=right]:**:data-current:data-starting-style:opacity-0",
-              // Direction-aware slide animations for outgoing content
-              "data-[activation-direction~=left]:**:data-previous:data-ending-style:translate-x-1/2",
-              "data-[activation-direction~=left]:**:data-previous:data-ending-style:opacity-0",
-              "data-[activation-direction~=right]:**:data-previous:data-ending-style:-translate-x-1/2",
-              "data-[activation-direction~=right]:**:data-previous:data-ending-style:opacity-0",
-              // Blur effects during transitions
-              "**:data-current:data-starting-style:blur-[4px]",
-              "**:data-current:data-ending-style:blur-[4px]",
-              "**:data-previous:data-starting-style:blur-[4px]",
-              "**:data-previous:data-ending-style:blur-[4px]",
-              "motion-reduce:**:data-current:transition-none motion-reduce:**:data-previous:transition-none",
-            )}
+            className="relative size-full overflow-clip overflow-y-auto p-1"
           >
             {children}
           </BaseMenu.Viewport>

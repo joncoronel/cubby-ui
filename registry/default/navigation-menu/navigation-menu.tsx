@@ -171,8 +171,8 @@ function NavigationMenuContent({
       data-slot="navigation-menu-content"
       className={cn(
         "h-full w-[calc(100vw-2.5rem)] p-4 sm:w-max",
-        // Transitions for opacity/transform/filter
-        "transition-[opacity,transform,filter,scale,translate] duration-(--duration) ease-(--easing)",
+        // Transitions for opacity/transform/scale/translate
+        "transition-[opacity,transform,scale,translate] duration-(--duration) ease-(--easing)",
         // Starting/ending opacity
         "data-ending-style:opacity-0 data-starting-style:opacity-0",
         // Direction-aware slide (starting)
@@ -181,8 +181,6 @@ function NavigationMenuContent({
         // Direction-aware slide (ending)
         "data-ending-style:data-[activation-direction=left]:translate-x-1/2",
         "data-ending-style:data-[activation-direction=right]:-translate-x-1/2",
-        // Blur effect during transitions
-        "data-ending-style:blur-[4px] data-starting-style:blur-[4px]",
         // scale effect during transitions
         "data-ending-style:scale-97 data-starting-style:scale-97",
         // Motion reduce support

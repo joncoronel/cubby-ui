@@ -100,6 +100,10 @@ function DropdownMenuContent({
           data-slot="dropdown-menu-content"
           data-level={level}
           className={cn(
+            // Base UI derives --popup-width by measuring at `width:auto`, so two
+            // menus that both sit on this floor morph position and height but not
+            // width. That is the accepted trade: menus narrower than 12rem read
+            // as cramped, and width is the least visible of the three.
             "text-popover-foreground relative min-w-[12rem] overflow-hidden rounded-xl",
             solidSurface(level, shadowLevel),
             "h-(--popup-height,auto) w-(--popup-width,auto)",
@@ -123,8 +127,10 @@ function DropdownMenuContent({
               // Content base state and transitions
               "**:data-current:translate-x-0 **:data-current:opacity-100",
               "**:data-previous:translate-x-0 **:data-previous:opacity-100",
-              "**:data-current:transition-[translate,opacity,filter] **:data-current:duration-[350ms,175ms,350ms] **:data-current:ease-[cubic-bezier(0.22,1,0.36,1)]",
-              "**:data-previous:transition-[translate,opacity,filter] **:data-previous:duration-[350ms,175ms,350ms] **:data-previous:ease-[cubic-bezier(0.22,1,0.36,1)]",
+              // Opacity lands at half the slide's duration so the incoming
+              // content is readable well before it stops moving.
+              "**:data-current:transition-[translate,opacity] **:data-current:duration-[350ms,175ms] **:data-current:ease-[cubic-bezier(0.22,1,0.36,1)]",
+              "**:data-previous:transition-[translate,opacity] **:data-previous:duration-[350ms,175ms] **:data-previous:ease-[cubic-bezier(0.22,1,0.36,1)]",
               // Direction-aware slide animations for incoming content
               "data-[activation-direction~=left]:**:data-current:data-starting-style:-translate-x-1/2",
               "data-[activation-direction~=left]:**:data-current:data-starting-style:opacity-0",
@@ -135,12 +141,6 @@ function DropdownMenuContent({
               "data-[activation-direction~=left]:**:data-previous:data-ending-style:opacity-0",
               "data-[activation-direction~=right]:**:data-previous:data-ending-style:-translate-x-1/2",
               "data-[activation-direction~=right]:**:data-previous:data-ending-style:opacity-0",
-              // Blur effects during transitions
-              "**:data-current:data-starting-style:blur-[4px]",
-              "**:data-current:data-ending-style:blur-[4px]",
-              "**:data-previous:data-starting-style:blur-[4px]",
-              "**:data-previous:data-ending-style:blur-[4px]",
-
               "motion-reduce:**:data-current:transition-none motion-reduce:**:data-previous:transition-none",
             )}
           >
@@ -369,7 +369,7 @@ function DropdownMenuLinkItem({
 
 function DropdownMenuSub({
   ...props
-}: React.ComponentProps<typeof BaseMenu.Root>) {
+}: React.ComponentProps<typeof BaseMenu.SubmenuRoot>) {
   return <BaseMenu.SubmenuRoot data-slot="dropdown-menu-sub" {...props} />;
 }
 

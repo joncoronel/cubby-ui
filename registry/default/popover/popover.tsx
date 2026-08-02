@@ -198,8 +198,10 @@ function PopoverContent({
               // Content base state and transitions
               "**:data-current:translate-x-0 **:data-current:opacity-100",
               "**:data-previous:translate-x-0 **:data-previous:opacity-100",
-              "**:data-current:transition-[translate,opacity,filter] **:data-current:duration-[350ms,175ms,350ms] **:data-current:ease-[cubic-bezier(0.22,1,0.36,1)]",
-              "**:data-previous:transition-[translate,opacity,filter] **:data-previous:duration-[350ms,175ms,350ms] **:data-previous:ease-[cubic-bezier(0.22,1,0.36,1)]",
+              // Opacity lands at half the slide's duration so the incoming
+              // content is readable well before it stops moving.
+              "**:data-current:transition-[translate,opacity] **:data-current:duration-[350ms,175ms] **:data-current:ease-[cubic-bezier(0.22,1,0.36,1)]",
+              "**:data-previous:transition-[translate,opacity] **:data-previous:duration-[350ms,175ms] **:data-previous:ease-[cubic-bezier(0.22,1,0.36,1)]",
               // Direction-aware slide animations for incoming content
               "data-[activation-direction~=left]:**:data-current:data-starting-style:-translate-x-1/2",
               "data-[activation-direction~=left]:**:data-current:data-starting-style:opacity-0",
@@ -210,10 +212,6 @@ function PopoverContent({
               "data-[activation-direction~=left]:**:data-previous:data-ending-style:opacity-0",
               "data-[activation-direction~=right]:**:data-previous:data-ending-style:-translate-x-1/2",
               "data-[activation-direction~=right]:**:data-previous:data-ending-style:opacity-0",
-              "**:data-current:data-starting-style:blur-[4px]",
-              "**:data-current:data-ending-style:blur-[4px]",
-              "**:data-previous:data-starting-style:blur-[4px]",
-              "**:data-previous:data-ending-style:blur-[4px]",
               "data-instant:transition-none",
               "motion-reduce:**:data-current:transition-none motion-reduce:**:data-previous:transition-none",
             )}

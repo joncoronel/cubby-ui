@@ -54,7 +54,7 @@ Use `size` to set the thumb height, which drives the track dimensions.
 | `sm`      | 16px  | 20px         | Compact settings rows and cards.  |
 | `default` | 20px  | 24px         | Standalone form control.          |
 
-[Dropdown Menu](/docs/components/dropdown-menu), [Context Menu](/docs/components/context-menu) and [Menubar](/docs/components/menubar) use `xs` for their `variant="switch"` items, so a switch inside one already matches the surrounding text.
+[Dropdown Menu](/docs/components/dropdown-menu), [Context Menu](/docs/components/context-menu) and [Menubar](/docs/components/menubar) use `xs` for their `indicator="switch"` items, so a switch inside one already matches the surrounding text.
 
 For a size the scale does not cover, set `--thumb-size`. It also takes responsive variants, which the preset cannot:
 
@@ -73,7 +73,7 @@ Use `motion` to set what the thumb does while the switch toggles.
 | `default` | The thumb slides across at a constant width.                               |
 | `stretch` | The leading edge crosses first, so the thumb spans the track and flattens. |
 
-Hover and press behave the same either way. The thumb widens on hover, widens further and flattens on press, and always reaches into the empty half of the track. Both respond to a `group` ancestor as well as to the switch itself, so `Label className="group"` makes a whole row drive the thumb; menu items already do this.
+Hover and press behave the same either way. The thumb widens on hover, widens further and flattens on press, and always reaches into the empty half of the track. Both respond to a `group/switch` ancestor as well as to the switch itself, so `Label className="group/switch"` makes a whole row drive the thumb; menu items already do this. The group is named on purpose: a bare `group` would let any ancestor a consumer marks for an unrelated hover effect drive every switch inside it.
 
 To retune, set `--switch-press-squash` (use `0` to drop the flattening), `--switch-hover-ext`, `--switch-press-ext`, or `--switch-duration`:
 

@@ -102,7 +102,7 @@ function TooltipContent({
         sticky={sticky}
         positionMethod={positionMethod}
         arrowPadding={arrowPadding}
-        className="z-50 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none"
+        className="z-50 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none motion-reduce:transition-none"
       >
         <BaseTooltip.Popup
           data-slot="tooltip-content"
@@ -161,14 +161,18 @@ function TooltipContent({
               // Truncate outgoing content as popup shrinks.
               "**:data-previous:truncate",
               // Disable transitions when instant or motion-reduce
-              "[[data-instant]_&_[data-current]]:transition-none [[data-instant]_&_[data-previous]]:transition-none",
+              // Value-matched to the popup's own guard above, so one policy governs
+              // the whole subtree. Targets the content, not the viewport: the
+              // viewport has no transitions of its own and transition-property does
+              // not inherit, so a rule here would be a no-op.
+              "[[data-instant=delay]_&_[data-current]]:transition-none [[data-instant=delay]_&_[data-previous]]:transition-none",
               "motion-reduce:**:data-current:transition-none motion-reduce:**:data-previous:transition-none",
             )}
           >
             {children}
           </BaseTooltip.Viewport>
           {arrow && (
-            <TooltipArrow className="outline-0 transition-[left,right,top,bottom] duration-350 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none data-[side=bottom]:top-[-9px] data-[side=left]:right-[-13.5px] data-[side=left]:rotate-90 data-[side=right]:left-[-13.5px] data-[side=right]:-rotate-90 data-[side=top]:bottom-[-9px] data-[side=top]:rotate-180">
+            <TooltipArrow className="outline-0 transition-[left,right,top,bottom] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none data-[side=bottom]:top-[-9px] data-[side=left]:right-[-13.5px] data-[side=left]:rotate-90 data-[side=right]:left-[-13.5px] data-[side=right]:-rotate-90 data-[side=top]:bottom-[-9px] data-[side=top]:rotate-180 motion-reduce:transition-none">
               <svg width="20" height="10" viewBox="0 0 20 10" fill="none">
                 <path
                   d="M9.66437 2.60207L4.80758 6.97318C4.07308 7.63423 3.11989 8 2.13172 8H0V9H20V8H18.5349C17.5468 8 16.5936 7.63423 15.8591 6.97318L11.0023 2.60207C10.622 2.2598 10.0447 2.25979 9.66437 2.60207Z"

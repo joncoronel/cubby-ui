@@ -43,14 +43,14 @@ export default function BaseDrawerWithMenu() {
             <BaseDrawerMenuGroup>
               <BaseDrawerMenuGroupLabel>Connections</BaseDrawerMenuGroupLabel>
               <BaseDrawerMenuCheckboxItem
-                variant="switch"
+                indicator="switch"
                 checked={wifi}
                 onCheckedChange={setWifi}
               >
                 Wi-Fi
               </BaseDrawerMenuCheckboxItem>
               <BaseDrawerMenuCheckboxItem
-                variant="switch"
+                indicator="switch"
                 checked={bluetooth}
                 onCheckedChange={setBluetooth}
               >

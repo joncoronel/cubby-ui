@@ -118,7 +118,7 @@ Use `BaseDrawerPanel` for scrollable content that coexists with swipe gestures.
 
 ### Menu Items
 
-`BaseDrawerMenu` holds a list of touch-sized rows. Use `BaseDrawerMenuCheckboxItem` for toggles and `BaseDrawerMenuRadioGroup` for single-choice options. Both put their indicator in a reserved column on the right, matching [Dropdown Menu](/docs/components/dropdown-menu). Set `variant="switch"` on a checkbox item to swap its checkmark for a switch, which reads better for settings that apply immediately.
+`BaseDrawerMenu` holds a list of touch-sized rows. Use `BaseDrawerMenuCheckboxItem` for toggles and `BaseDrawerMenuRadioGroup` for single-choice options. Both put their indicator in a reserved column on the right, matching [Dropdown Menu](/docs/components/dropdown-menu). Set `indicator="switch"` on a checkbox item to swap its checkmark for a switch, which reads better for settings that apply immediately.
 
 Unlike the other menu components, these rows are real checkbox and radio controls rather than Base UI menu items, so each one is individually focusable.
 
@@ -145,11 +145,7 @@ Root component that manages drawer state. Wraps Base UI's `Drawer.Root`.
   Which edge of the screen the drawer slides in from.
 </ApiProp>
 
-<ApiProp
-  name="snapPoints"
-  fullType='(number | string)[]'
-  simpleType="array"
->
+<ApiProp name="snapPoints" fullType="(number | string)[]" simpleType="array">
   Snap points for the drawer. Numbers 0-1 are viewport fractions, strings
   support `px`/`rem` units.
 </ApiProp>
@@ -210,10 +206,16 @@ Convenience composite that renders Portal + Backdrop + Viewport + Popup. This is
 </ApiProp>
 
 <ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="5">
-  Surface elevation level. See the [Surfaces](/docs/getting-started/surfaces) docs. The default (viewport-flush) variant uses a single-edge rim on the inner-facing side.
+  Surface elevation level. See the [Surfaces](/docs/getting-started/surfaces)
+  docs. The default (viewport-flush) variant uses a single-edge rim on the
+  inner-facing side.
 </ApiProp>
 
-<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="5">
+<ApiProp
+  name="shadowLevel"
+  fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8"
+  defaultValue="5"
+>
   Shadow weight.
 </ApiProp>
 
@@ -267,13 +269,42 @@ Toggleable drawer row. Wraps Base UI's `Checkbox.Root`, so it is a real focusabl
 <ApiPropsList>
 
 <ApiProp
-  name="variant"
-  fullType='"default" | "switch"'
+  name="indicator"
+  fullType='"check" | "switch"'
   simpleType="string"
-  defaultValue='"default"'
+  defaultValue='"check"'
 >
   Indicator style. `"switch"` renders a switch in place of the checkmark. Prefer
   it for settings that apply the moment they are toggled.
+</ApiProp>
+
+<ApiProp
+  name="switchShape"
+  fullType='"circle" | "pill" | "squircle"'
+  simpleType="string"
+  defaultValue='"circle"'
+>
+  Thumb silhouette, when `indicator="switch"`. Forwarded to
+  [Switch](/docs/components/switch).
+</ApiProp>
+
+<ApiProp
+  name="switchSize"
+  fullType='"xs" | "sm" | "default"'
+  simpleType="string"
+  defaultValue='"sm"'
+>
+  Thumb size, when `indicator="switch"`. The default matches the row's text.
+</ApiProp>
+
+<ApiProp
+  name="switchMotion"
+  fullType='"default" | "stretch"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  What the thumb does while toggling, when `indicator="switch"`. `"stretch"`
+  sends the leading edge first, so the thumb spans the track mid-toggle.
 </ApiProp>
 
 <ApiProp name="render" fullType="ReactElement">
@@ -301,44 +332,44 @@ Single-choice drawer row. Wraps Base UI's `Radio.Root` and must sit inside a `Ba
 
 ### Components
 
-| Component                        | Description                                                       |
-| -------------------------------- | ----------------------------------------------------------------- |
-| `BaseDrawer`                     | Root component with position context                              |
-| `BaseDrawerTrigger`              | Button that opens the drawer                                      |
-| `BaseDrawerPopup`                | Convenience composite (Portal + Backdrop + Viewport + Popup)      |
-| `BaseDrawerBar`                  | Drag handle indicator (adapts orientation per position)            |
-| `BaseDrawerHeader`               | Container for title and description                               |
-| `BaseDrawerTitle`                | Accessible title element                                          |
-| `BaseDrawerDescription`          | Accessible description element                                    |
-| `BaseDrawerPanel`                | Scrollable content area with text selection support                |
-| `BaseDrawerFooter`               | Container for action buttons                                      |
-| `BaseDrawerClose`                | Button that closes the drawer                                     |
-| `BaseDrawerContent`              | Pass-through to `Drawer.Content` for text selection in custom layouts |
-| `BaseDrawerMenu`                 | Navigation menu container                                         |
-| `BaseDrawerMenuItem`             | Menu item button                                                  |
-| `BaseDrawerMenuTrigger`          | Menu item that opens a nested drawer                              |
-| `BaseDrawerMenuSeparator`        | Menu divider                                                      |
-| `BaseDrawerMenuGroup`            | Menu item group                                                   |
-| `BaseDrawerMenuGroupLabel`       | Group label                                                       |
-| `BaseDrawerMenuCheckboxItem`     | Checkbox menu item (default or switch variant)                    |
-| `BaseDrawerMenuRadioGroup`       | Radio group container                                             |
-| `BaseDrawerMenuRadioItem`        | Radio menu item                                                   |
-| `BaseDrawerProvider`             | Shared context for indent effect                                  |
-| `BaseDrawerIndent`               | App content wrapper for indent/scale effect                       |
-| `BaseDrawerIndentBackground`     | Background layer behind indent                                    |
-| `BaseDrawerSwipeArea`            | Invisible area for swipe-to-open gestures                         |
+| Component                    | Description                                                           |
+| ---------------------------- | --------------------------------------------------------------------- |
+| `BaseDrawer`                 | Root component with position context                                  |
+| `BaseDrawerTrigger`          | Button that opens the drawer                                          |
+| `BaseDrawerPopup`            | Convenience composite (Portal + Backdrop + Viewport + Popup)          |
+| `BaseDrawerBar`              | Drag handle indicator (adapts orientation per position)               |
+| `BaseDrawerHeader`           | Container for title and description                                   |
+| `BaseDrawerTitle`            | Accessible title element                                              |
+| `BaseDrawerDescription`      | Accessible description element                                        |
+| `BaseDrawerPanel`            | Scrollable content area with text selection support                   |
+| `BaseDrawerFooter`           | Container for action buttons                                          |
+| `BaseDrawerClose`            | Button that closes the drawer                                         |
+| `BaseDrawerContent`          | Pass-through to `Drawer.Content` for text selection in custom layouts |
+| `BaseDrawerMenu`             | Navigation menu container                                             |
+| `BaseDrawerMenuItem`         | Menu item button                                                      |
+| `BaseDrawerMenuTrigger`      | Menu item that opens a nested drawer                                  |
+| `BaseDrawerMenuSeparator`    | Menu divider                                                          |
+| `BaseDrawerMenuGroup`        | Menu item group                                                       |
+| `BaseDrawerMenuGroupLabel`   | Group label                                                           |
+| `BaseDrawerMenuCheckboxItem` | Checkbox menu item (default or switch variant)                        |
+| `BaseDrawerMenuRadioGroup`   | Radio group container                                                 |
+| `BaseDrawerMenuRadioItem`    | Radio menu item                                                       |
+| `BaseDrawerProvider`         | Shared context for indent effect                                      |
+| `BaseDrawerIndent`           | App content wrapper for indent/scale effect                           |
+| `BaseDrawerIndentBackground` | Background layer behind indent                                        |
+| `BaseDrawerSwipeArea`        | Invisible area for swipe-to-open gestures                             |
 
 ### CSS Variables
 
 Base UI's Drawer exposes CSS custom properties on the popup element:
 
-| Variable                        | Description                                                    |
-| ------------------------------- | -------------------------------------------------------------- |
-| `--drawer-swipe-progress`       | Progress toward dismissed (0 = open, 1 = dismissed)            |
-| `--drawer-swipe-movement-x`     | Horizontal swipe offset in pixels                              |
-| `--drawer-swipe-movement-y`     | Vertical swipe offset in pixels                                |
-| `--drawer-swipe-strength`       | Velocity-based strength (scales exit animation duration)        |
-| `--drawer-snap-point-offset`    | Vertical offset for snap point positioning                     |
-| `--drawer-height`               | Current drawer height                                          |
-| `--drawer-frontmost-height`     | Height of the frontmost drawer in a nested stack               |
-| `--nested-drawers`              | Number of nested drawers open                                  |
+| Variable                     | Description                                              |
+| ---------------------------- | -------------------------------------------------------- |
+| `--drawer-swipe-progress`    | Progress toward dismissed (0 = open, 1 = dismissed)      |
+| `--drawer-swipe-movement-x`  | Horizontal swipe offset in pixels                        |
+| `--drawer-swipe-movement-y`  | Vertical swipe offset in pixels                          |
+| `--drawer-swipe-strength`    | Velocity-based strength (scales exit animation duration) |
+| `--drawer-snap-point-offset` | Vertical offset for snap point positioning               |
+| `--drawer-height`            | Current drawer height                                    |
+| `--drawer-frontmost-height`  | Height of the frontmost drawer in a nested stack         |
+| `--nested-drawers`           | Number of nested drawers open                            |

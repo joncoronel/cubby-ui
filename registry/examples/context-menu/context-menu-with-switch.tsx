@@ -25,21 +25,21 @@ export default function ContextMenuWithSwitch() {
         <ContextMenuLabel>Canvas</ContextMenuLabel>
         <ContextMenuSeparator />
         <ContextMenuCheckboxItem
-          variant="switch"
+          indicator="switch"
           checked={gridLines}
           onCheckedChange={setGridLines}
         >
           Grid lines
         </ContextMenuCheckboxItem>
         <ContextMenuCheckboxItem
-          variant="switch"
+          indicator="switch"
           checked={snapToGrid}
           onCheckedChange={setSnapToGrid}
         >
           Snap to grid
         </ContextMenuCheckboxItem>
         <ContextMenuCheckboxItem
-          variant="switch"
+          indicator="switch"
           checked={rulers}
           onCheckedChange={setRulers}
           disabled

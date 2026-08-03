@@ -4,7 +4,12 @@ description: Right-click menu that displays contextual actions for specific elem
 type: primitive
 ---
 
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@/registry/default/context-menu/context-menu";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/registry/default/context-menu/context-menu";
 
 The context menu opens on right-click and lists actions scoped to the element under the cursor. Use it for row actions in a table, canvas or editor commands, or any desktop-style secondary menu; for a button-triggered menu, use [`Dropdown Menu`](/docs/components/dropdown-menu) instead.
 
@@ -48,23 +53,32 @@ ContextMenu
 
 Nest a `ContextMenuSub` to open a second menu from a trigger item.
 
-<ComponentPreview component="context-menu" example="context-menu-with-submenus" />
+<ComponentPreview
+  component="context-menu"
+  example="context-menu-with-submenus"
+/>
 
 ### With Separators and Shortcuts
 
 Use `ContextMenuSeparator` to divide groups and `ContextMenuShortcut` to show key hints.
 
-<ComponentPreview component="context-menu" example="context-menu-with-separators-and-shortcuts" />
+<ComponentPreview
+  component="context-menu"
+  example="context-menu-with-separators-and-shortcuts"
+/>
 
 ### With Checkboxes and Radio Groups
 
 Use `ContextMenuCheckboxItem` for toggles and `ContextMenuRadioGroup` for single-choice options. Both put their indicator in a reserved column on the right, so labels stay put as items toggle.
 
-<ComponentPreview component="context-menu" example="context-menu-with-checkboxes-and-radio-groups" />
+<ComponentPreview
+  component="context-menu"
+  example="context-menu-with-checkboxes-and-radio-groups"
+/>
 
 ### With Switch
 
-Set `variant="switch"` on `ContextMenuCheckboxItem` to swap the checkmark for a switch. This is a visual variant only. The item keeps its `menuitemcheckbox` role and the same props, the whole row stays the click target, and the menu stays open on toggle.
+Set `indicator="switch"` on `ContextMenuCheckboxItem` to swap the checkmark for a switch. This is visual only. The item keeps its `menuitemcheckbox` role and the same props, the whole row stays the click target, and the menu stays open on toggle.
 
 <ComponentPreview component="context-menu" example="context-menu-with-switch" />
 
@@ -80,8 +94,8 @@ Set `variant="switch"` on `ContextMenuCheckboxItem` to swap the checkmark for a 
   simpleType="string"
   defaultValue='"start"'
 >
-  How to align the menu. This prop is flattened from the Positioner component for
-  convenience.
+  How to align the menu. This prop is flattened from the Positioner component
+  for convenience.
 </ApiProp>
 
 <ApiProp name="sideOffset" fullType="number" defaultValue="4">
@@ -90,11 +104,17 @@ Set `variant="switch"` on `ContextMenuCheckboxItem` to swap the checkmark for a 
 </ApiProp>
 
 <ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
-  Surface elevation level. See the [Surfaces](/docs/getting-started/surfaces) docs.
+  Surface elevation level. See the [Surfaces](/docs/getting-started/surfaces)
+  docs.
 </ApiProp>
 
-<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
-  Shadow weight. Controls drop-shadow intensity independently of substrate color.
+<ApiProp
+  name="shadowLevel"
+  fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8"
+  defaultValue="3"
+>
+  Shadow weight. Controls drop-shadow intensity independently of substrate
+  color.
 </ApiProp>
 
 </ApiPropsList>
@@ -120,10 +140,10 @@ Set `variant="switch"` on `ContextMenuCheckboxItem` to swap the checkmark for a 
 
 </ApiPropsList>
 
-| Value         | Description                                       |
-| ------------- | ------------------------------------------------ |
-| `default`     | A standard menu action.                          |
-| `destructive` | A dangerous action such as delete or remove.     |
+| Value         | Description                                  |
+| ------------- | -------------------------------------------- |
+| `default`     | A standard menu action.                      |
+| `destructive` | A dangerous action such as delete or remove. |
 
 ### ContextMenuLinkItem
 
@@ -145,14 +165,43 @@ Toggleable menu item. Wraps Base UI's `ContextMenu.CheckboxItem`. The indicator 
 <ApiPropsList>
 
 <ApiProp
-  name="variant"
-  fullType='"default" | "switch"'
+  name="indicator"
+  fullType='"check" | "switch"'
   simpleType="string"
-  defaultValue='"default"'
+  defaultValue='"check"'
 >
   Indicator style. `"switch"` renders a decorative switch in place of the
   checkmark. It is purely visual: the item keeps the `menuitemcheckbox` role,
   the same props, and the same behavior.
+</ApiProp>
+
+<ApiProp
+  name="switchShape"
+  fullType='"circle" | "pill" | "squircle"'
+  simpleType="string"
+  defaultValue='"circle"'
+>
+  Thumb silhouette, when `indicator="switch"`. Forwarded to
+  [Switch](/docs/components/switch).
+</ApiProp>
+
+<ApiProp
+  name="switchSize"
+  fullType='"xs" | "sm" | "default"'
+  simpleType="string"
+  defaultValue='"xs"'
+>
+  Thumb size, when `indicator="switch"`. The default matches the row's text.
+</ApiProp>
+
+<ApiProp
+  name="switchMotion"
+  fullType='"default" | "stretch"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  What the thumb does while toggling, when `indicator="switch"`. `"stretch"`
+  sends the leading edge first, so the thumb spans the track mid-toggle.
 </ApiProp>
 
 <ApiProp name="inset" fullType="boolean">
@@ -221,7 +270,9 @@ Mutually exclusive menu item. Wraps Base UI's `ContextMenu.RadioItem`. Uses the 
 <ApiPropsList>
 
 <ApiProp name="sideOffset" fullType="number" defaultValue="8">
-  Distance in pixels for positioning the submenu relative to its trigger. Base UI defaults to `0`, which overlaps the parent popup's padding; `8` leaves a visible gap.
+  Distance in pixels for positioning the submenu relative to its trigger. Base
+  UI defaults to `0`, which overlaps the parent popup's padding; `8` leaves a
+  visible gap.
 </ApiProp>
 
 <ApiProp
@@ -234,10 +285,15 @@ Mutually exclusive menu item. Wraps Base UI's `ContextMenu.RadioItem`. Uses the 
 </ApiProp>
 
 <ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="5">
-  Surface elevation level. Submenus default to `5` so they pop above the parent menu at level 3.
+  Surface elevation level. Submenus default to `5` so they pop above the parent
+  menu at level 3.
 </ApiProp>
 
-<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
+<ApiProp
+  name="shadowLevel"
+  fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8"
+  defaultValue="3"
+>
   Shadow weight. Kept at `3` since submenus are still small popups.
 </ApiProp>
 

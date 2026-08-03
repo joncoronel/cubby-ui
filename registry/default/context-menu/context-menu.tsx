@@ -9,40 +9,23 @@ import {
 } from "@/registry/default/lib/elevated";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { ArrowRight01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 import {
-  switchVariants,
-  switchThumbVariants,
+  SwitchVisual,
+  type SwitchVisualProps,
 } from "@/registry/default/switch/switch";
 
-// Shared shell for checkbox and radio items. Padding matches ContextMenuItem
-// so labels line up across every item type; the indicator lives in a reserved
-// right-hand column so toggling never shifts the label.
+// Shared shell for checkbox and radio items. Padding matches the plain menu
+// item so labels line up across every item type; the indicator lives in a
+// reserved right-hand column so toggling never shifts the label.
 const toggleItemClasses =
-  "group data-highlighted:text-accent-foreground data-highlighted:bg-surface-hover grid cursor-default items-center rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
+  "group/switch data-highlighted:bg-surface-hover data-highlighted:text-accent-foreground grid cursor-default items-center rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
 
-// Path length ≈ 22 (from the path geometry)
-function CheckmarkIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path
-        d="M5 14L8.5 17.5L19 6.5"
-        style={{
-          strokeDasharray: 22,
-        }}
-        className="ease-out-expo transition-[stroke-dashoffset] duration-150 in-data-checked:[stroke-dashoffset:0] in-data-unchecked:[stroke-dashoffset:22] motion-reduce:transition-none"
-      />
-    </svg>
-  );
-}
+// The tick draws itself in on check. Tick02Icon is a single path of length
+// ~22, so dashoffset 22 hides it and 0 completes it; the classes reach the
+// path through the svg HugeiconsIcon renders.
+const checkmarkClasses =
+  "[&_path]:ease-out-expo [&_path]:transition-[stroke-dashoffset] [&_path]:duration-150 [&_path]:[stroke-dasharray:22] in-data-checked:[&_path]:[stroke-dashoffset:0] in-data-unchecked:[&_path]:[stroke-dashoffset:22] motion-reduce:[&_path]:transition-none";
 
 function ContextMenu({
   ...props
@@ -190,21 +173,30 @@ function ContextMenuCheckboxItem({
   children,
   checked,
   inset,
-  variant = "default",
+  indicator = "check",
+  switchShape = "circle",
+  switchSize = "xs",
+  switchMotion = "default",
   ...props
 }: React.ComponentProps<typeof BaseContextMenu.CheckboxItem> & {
   inset?: boolean;
-  /** Indicator style. `"switch"` is visual only — the item keeps the `menuitemcheckbox` role. */
-  variant?: "default" | "switch";
+  /** Which indicator sits in the right-hand column. `"switch"` is visual only — the item keeps the `menuitemcheckbox` role. */
+  indicator?: "check" | "switch";
+  /** Thumb silhouette, when `indicator="switch"`. */
+  switchShape?: SwitchVisualProps["shape"];
+  /** Thumb size, when `indicator="switch"`. Defaults to `xs`, which matches the row's text. */
+  switchSize?: SwitchVisualProps["size"];
+  /** How the thumb travels, when `indicator="switch"`. */
+  switchMotion?: SwitchVisualProps["motion"];
 }) {
   return (
     <BaseContextMenu.CheckboxItem
       data-slot="context-menu-checkbox-item"
       data-inset={inset || undefined}
-      data-variant={variant}
+      data-indicator={indicator}
       className={cn(
         toggleItemClasses,
-        variant === "switch"
+        indicator === "switch"
           ? "grid-cols-[1fr_auto] gap-3"
           : "grid-cols-[1fr_1rem] gap-2",
         className,
@@ -215,28 +207,28 @@ function ContextMenuCheckboxItem({
       <span className="col-start-1 flex min-w-0 items-center gap-2">
         {children}
       </span>
-      {variant === "switch" ? (
-        // The indicator is aria-hidden and non-interactive: the row itself
-        // carries the role and the click target, so nesting a real Switch here
-        // would put a focusable control inside a menuitemcheckbox.
-        <BaseContextMenu.CheckboxItemIndicator
-          keepMounted
-          className={cn(
-            switchVariants({ shape: "circle", size: "xs" }),
-            "col-start-2 cursor-default",
-            "pointer-events-none",
-            // The row already dims when disabled; don't compound the fade.
-            "data-disabled:opacity-100",
-          )}
-        >
-          <span className={switchThumbVariants()} />
-        </BaseContextMenu.CheckboxItemIndicator>
+      {indicator === "switch" ? (
+        // Visual only, and non-interactive: the row itself carries the role and
+        // the click target, so nesting a real Switch here would put a focusable
+        // control inside a menuitemcheckbox. Base UI's indicator supplies the
+        // aria-hidden.
+        <SwitchVisual
+          shape={switchShape}
+          size={switchSize}
+          motion={switchMotion}
+          className="col-start-2"
+          render={<BaseContextMenu.CheckboxItemIndicator keepMounted />}
+        />
       ) : (
         <BaseContextMenu.CheckboxItemIndicator
           keepMounted
           className="col-start-2 flex items-center justify-center"
         >
-          <CheckmarkIcon className="size-4" />
+          <HugeiconsIcon
+            icon={Tick02Icon}
+            strokeWidth={2.5}
+            className={cn("size-4", checkmarkClasses)}
+          />
         </BaseContextMenu.CheckboxItemIndicator>
       )}
     </BaseContextMenu.CheckboxItem>
@@ -265,7 +257,11 @@ function ContextMenuRadioItem({
         keepMounted
         className="col-start-2 flex items-center justify-center"
       >
-        <CheckmarkIcon className="size-4" />
+        <HugeiconsIcon
+          icon={Tick02Icon}
+          strokeWidth={2.5}
+          className={cn("size-4", checkmarkClasses)}
+        />
       </BaseContextMenu.RadioItemIndicator>
     </BaseContextMenu.RadioItem>
   );

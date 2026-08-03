@@ -1,6 +1,10 @@
+"use client";
+
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Switch as BaseSwitch } from "@base-ui/react/switch";
+import { mergeProps } from "@base-ui/react/merge-props";
+import { useRender } from "@base-ui/react/use-render";
 
 import { cn } from "@/lib/utils";
 
@@ -14,21 +18,22 @@ const switchVariants = cva(
     "touch-manipulation [-webkit-tap-highlight-color:transparent]",
     // Track and thumb need separate radii: the track is 4px larger in both
     // axes, so one shared value leaves its corners proportionally tighter.
-    "rounded-[var(--switch-track-radius,9999px)] [corner-shape:var(--switch-corner-shape,round)]",
+    // corner-shape is the one fallback that is load-bearing rather than a
+    // default restated — only `squircle` sets it.
+    "rounded-(--switch-track-radius) [corner-shape:var(--switch-corner-shape,round)]",
     // Geometry, all derived from --thumb-size so overriding that one value
-    // still works. Each variant-supplied variable is read with a fallback
-    // because cva drops its defaultVariants on an explicit null and
-    // VariantProps types null as valid, so `size={cond ? "sm" : null}` would
-    // otherwise invalidate these calc()s and the thumb would not render.
-    "[--thumb-h:var(--thumb-size,--spacing(5))]",
-    "[--thumb-w:calc(var(--thumb-size,--spacing(5))*var(--thumb-aspect,1))]",
-    "[--travel:calc(var(--thumb-w)*var(--travel-ratio,0.8))]",
+    // still works. Every variable read here is supplied by a variant, and the
+    // prop types below reject `null`, so cva can never drop a defaultVariant
+    // and leave one unset.
+    "[--thumb-h:var(--thumb-size)]",
+    "[--thumb-w:calc(var(--thumb-size)*var(--thumb-aspect))]",
+    "[--travel:calc(var(--thumb-w)*var(--travel-ratio))]",
     // Snapped to whole pixels, or the 2px inset lands mid-pixel and renders
     // thicker on one side than the other. The unrounded values above stand in
     // where round() is unsupported.
-    "supports-[width:round(1px,1px)]:[--thumb-h:round(var(--thumb-size,--spacing(5)),1px)]",
-    "supports-[width:round(1px,1px)]:[--thumb-w:round(calc(var(--thumb-size,--spacing(5))*var(--thumb-aspect,1)),1px)]",
-    "supports-[width:round(1px,1px)]:[--travel:round(calc(var(--thumb-w)*var(--travel-ratio,0.8)),1px)]",
+    "supports-[width:round(1px,1px)]:[--thumb-h:round(var(--thumb-size),1px)]",
+    "supports-[width:round(1px,1px)]:[--thumb-w:round(calc(var(--thumb-size)*var(--thumb-aspect)),1px)]",
+    "supports-[width:round(1px,1px)]:[--travel:round(calc(var(--thumb-w)*var(--travel-ratio)),1px)]",
     "h-[calc(var(--thumb-h)+4px)]",
     "w-[calc(var(--thumb-w)+var(--travel)+4px)]",
     // How far the thumb reaches into the empty half of the track, and how far
@@ -46,33 +51,49 @@ const switchVariants = cva(
     // once, and whichever Tailwind ordered last would win. Press has to.
     "[--switch-hover-part:0px] [--switch-press-part:0px] [--switch-press:0px]",
     "[--switch-ext:max(var(--switch-hover-part),var(--switch-press-part))]",
-    // Gestures read from the control and from any `group` ancestor, so a switch
-    // in a labelled row answers the row. Menu indicators are inert, so Base UI's
-    // data-highlighted stands in, which also covers arrow-key navigation.
-    "not-data-disabled:hover:[--switch-hover-part:var(--switch-hover-ext)]",
-    "not-data-disabled:group-hover:[--switch-hover-part:var(--switch-hover-ext)]",
-    "not-data-disabled:data-highlighted:[--switch-hover-part:var(--switch-hover-ext)]",
-    "not-data-disabled:active:[--switch-press-part:var(--switch-press-ext)]",
-    "not-data-disabled:group-active:[--switch-press-part:var(--switch-press-ext)]",
-    // --switch-track is translucent, so one colour works on any substrate.
-    // Hover steps further along that same overlay, which darkens in light mode
-    // and lightens in dark from a single rule. Checked darkens in both, since a
+    // Gestures read from the control and from a `group/switch` ancestor, so a
+    // switch in a labelled row answers the row. The group is named rather than
+    // bare: Tailwind compiles `group-hover:` to a descendant selector
+    // (`:where(.group):hover *`), so an unnamed one would let any `.group` a
+    // consumer happens to put on a card or list drive every switch inside it,
+    // which reads as the switch being hovered when it is not. Menu indicators
+    // are inert, so Base UI's data-highlighted stands in, which also covers
+    // arrow-key navigation.
+    // motion-safe rather than a motion-reduce reset further down: a reset would
+    // carry fewer selectors than the rule it means to undo and lose on
+    // specificity, leaving reduced motion with the same displacement as
+    // everyone else and none of the easing that makes it readable.
+    "motion-safe:not-data-disabled:hover:[--switch-hover-part:var(--switch-hover-ext)]",
+    "motion-safe:not-data-disabled:group-hover/switch:[--switch-hover-part:var(--switch-hover-ext)]",
+    "motion-safe:not-data-disabled:data-highlighted:[--switch-hover-part:var(--switch-hover-ext)]",
+    "motion-safe:not-data-disabled:active:[--switch-press-part:var(--switch-press-ext)]",
+    "motion-safe:not-data-disabled:group-active/switch:[--switch-press-part:var(--switch-press-ext)]",
+    // Track fill. The values sit here rather than in the theme so the component
+    // works the moment it is installed, with no token to add first; set
+    // --switch-track / --switch-track-hover on any ancestor to retune them.
+    // Both are translucent, so one colour works on any substrate, and hover
+    // steps further along that same overlay — which darkens in light and
+    // lightens in dark from a single rule. Checked darkens in both, since a
     // lighter primary reads as disabled.
-    "data-unchecked:bg-switch-track data-checked:bg-primary",
-    "not-data-disabled:hover:data-unchecked:bg-switch-track-hover",
-    "not-data-disabled:group-hover:data-unchecked:bg-switch-track-hover",
-    "not-data-disabled:data-highlighted:data-unchecked:bg-switch-track-hover",
+    "[--switch-track-bg:var(--switch-track,oklch(0_0_0/8%))]",
+    "[--switch-track-bg-hover:var(--switch-track-hover,oklch(0_0_0/12%))]",
+    "dark:[--switch-track-bg:var(--switch-track,oklch(1_0_0/20%))]",
+    "dark:[--switch-track-bg-hover:var(--switch-track-hover,oklch(1_0_0/24%))]",
+    "data-unchecked:bg-(--switch-track-bg) data-checked:bg-primary",
+    "not-data-disabled:hover:data-unchecked:bg-(--switch-track-bg-hover)",
+    "not-data-disabled:group-hover/switch:data-unchecked:bg-(--switch-track-bg-hover)",
+    "not-data-disabled:data-highlighted:data-unchecked:bg-(--switch-track-bg-hover)",
     "not-data-disabled:hover:data-checked:bg-[color-mix(in_oklab,var(--primary),var(--color-black)_8%)]",
-    "not-data-disabled:group-hover:data-checked:bg-[color-mix(in_oklab,var(--primary),var(--color-black)_8%)]",
+    "not-data-disabled:group-hover/switch:data-checked:bg-[color-mix(in_oklab,var(--primary),var(--color-black)_8%)]",
     "not-data-disabled:data-highlighted:data-checked:bg-[color-mix(in_oklab,var(--primary),var(--color-black)_8%)]",
     // Colour runs at half the speed of anything that moves, so on a toggle the
     // track reads as filling ahead of the thumb. One curve for all of it, and
     // it has to be gentle: the two edges split a single timeline, so whatever a
     // front-loaded curve spends on the leading edge is taken from the trailing.
     "transition-[background-color,--switch-p,--switch-ext,--switch-press]",
-    "duration-[80ms,var(--switch-duration,160ms),160ms,160ms]",
+    "duration-[80ms,var(--switch-duration),160ms,160ms]",
     "ease-out-cubic",
-    "motion-reduce:transition-none motion-reduce:[--switch-hover-part:0px] motion-reduce:[--switch-press-part:0px] motion-reduce:[--switch-press:0px]",
+    "motion-reduce:transition-none",
     "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
     // The border box is the painted box, so a mouse already has an exact target
     // and hover fires over the visual. Coarse pointers get 24px (WCAG 2.5.8),
@@ -119,8 +140,8 @@ const switchVariants = cva(
       motion: {
         default: [
           "[--switch-split:1] [--switch-duration:160ms]",
-          "not-data-disabled:active:[--switch-press:var(--switch-press-squash)]",
-          "not-data-disabled:group-active:[--switch-press:var(--switch-press-squash)]",
+          "motion-safe:not-data-disabled:active:[--switch-press:var(--switch-press-squash)]",
+          "motion-safe:not-data-disabled:group-active/switch:[--switch-press:var(--switch-press-squash)]",
         ].join(" "),
         // No press squash: the stretch derives its own from how far it has
         // spread. Longer than the slide because this timeline has to show the
@@ -137,24 +158,26 @@ const switchVariants = cva(
 );
 
 /**
- * Pair with an element carrying `switchVariants`: every declaration here reads
- * a custom property the root supplies.
+ * Thumb classes. Every declaration reads a custom property the root supplies,
+ * so this is only ever correct as a direct child of an element carrying
+ * `switchVariants`. Not exported for that reason: `Switch` and `SwitchVisual`
+ * are the two things that know how to pair them.
  *
  * Deliberately animates layout properties rather than transform and opacity
  * alone. Nothing else moves the thumb's two edges independently, which is what
  * the stretch motion is, and the cost stays on one absolutely positioned
  * element with no layout dependents.
  */
-const switchThumbVariants = cva([
+const switchThumbClasses = cn([
   // White in both themes: in dark mode the thumb is the lit element against a
   // recessed track, the way physical switches read.
   "pointer-events-none absolute top-0 block bg-white",
-  "rounded-[var(--switch-radius,9999px)] [corner-shape:var(--switch-corner-shape,round)]",
+  "rounded-(--switch-radius) [corner-shape:var(--switch-corner-shape,round)]",
   // Progress of each edge along its own half of the timeline. Reversing
   // --switch-p swaps which edge leads for free, so there is no per-direction
   // code.
-  "[--lead:min(1,var(--switch-p)/var(--switch-split,1))]",
-  "[--trail:max(0,(var(--switch-p)-(1-var(--switch-split,1)))/var(--switch-split,1))]",
+  "[--lead:min(1,var(--switch-p)/var(--switch-split))]",
+  "[--trail:max(0,(var(--switch-p)-(1-var(--switch-split)))/var(--switch-split))]",
   "left-[calc(2px+var(--travel)*var(--trail))]",
   "right-[calc(2px+var(--travel)*(1-var(--lead)))]",
   // Negative margins push one edge outward. Each carries its own edge's factor,
@@ -178,10 +201,28 @@ const switchThumbVariants = cva([
   "shadow-[0_1px_1px_0_oklch(0.18_0_0/0.1)]",
 ]);
 
-type SwitchProps = React.ComponentProps<typeof BaseSwitch.Root> &
-  VariantProps<typeof switchVariants>;
+/**
+ * cva types an explicit `null` as valid and drops its defaultVariants when it
+ * sees one, which would leave the geometry variables unset. Rejecting `null` at
+ * the type level is what lets every `var()` above read a bare variable instead
+ * of restating its default as a fallback.
+ */
+type SwitchVariants = {
+  [K in keyof VariantProps<typeof switchVariants>]?: NonNullable<
+    VariantProps<typeof switchVariants>[K]
+  >;
+};
 
-function Switch({ className, shape, size, motion, ...props }: SwitchProps) {
+type SwitchProps = React.ComponentProps<typeof BaseSwitch.Root> &
+  SwitchVariants;
+
+function Switch({
+  className,
+  shape = "circle",
+  size = "default",
+  motion = "default",
+  ...props
+}: SwitchProps) {
   return (
     <BaseSwitch.Root
       data-slot="switch"
@@ -193,10 +234,55 @@ function Switch({ className, shape, size, motion, ...props }: SwitchProps) {
     >
       <BaseSwitch.Thumb
         data-slot="switch-thumb"
-        className={switchThumbVariants()}
+        className={switchThumbClasses}
       />
     </BaseSwitch.Root>
   );
 }
 
-export { Switch, switchVariants, switchThumbVariants };
+/**
+ * The switch's look without the control, for rows that already own the role and
+ * the click target — a menu's checkbox item, say, where nesting a real Switch
+ * would put a focusable control inside a `menuitemcheckbox`. Pass the row's
+ * indicator as `render`:
+ *
+ * ```tsx
+ * <SwitchVisual render={<Menu.CheckboxItemIndicator keepMounted />} />
+ * ```
+ *
+ * Owning the thumb as well as the track is the point: the two only work as a
+ * pair, and every caller that hand-assembled them was one rename away from
+ * silently rendering a dead track.
+ */
+type SwitchVisualProps = useRender.ComponentProps<"span"> & SwitchVariants;
+
+function SwitchVisual({
+  className,
+  shape = "circle",
+  size = "xs",
+  motion = "default",
+  render,
+  ...props
+}: SwitchVisualProps) {
+  const defaultProps = {
+    "data-slot": "switch-visual",
+    className: cn(
+      switchVariants({ shape, size, motion }),
+      // The row carries the state and the hit area; this is decoration.
+      "pointer-events-none cursor-default",
+      // The row already dims when disabled; don't compound the fade.
+      "data-disabled:opacity-100",
+      className,
+    ),
+    children: <span className={switchThumbClasses} />,
+  };
+
+  return useRender({
+    defaultTagName: "span",
+    render,
+    props: mergeProps<"span">(defaultProps, props),
+  });
+}
+
+export { Switch, SwitchVisual, switchVariants };
+export type { SwitchProps, SwitchVisualProps };

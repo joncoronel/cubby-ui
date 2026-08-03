@@ -17,35 +17,23 @@ import {
 } from "@/registry/default/lib/elevated";
 import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 import {
-  switchVariants,
-  switchThumbVariants,
+  SwitchVisual,
+  type SwitchVisualProps,
 } from "@/registry/default/switch/switch";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowRight01Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
+import {
+  ArrowRight01Icon,
+  Cancel01Icon,
+  Tick02Icon,
+} from "@hugeicons/core-free-icons";
 
-// Path length ≈ 22 (from the path geometry)
-function CheckmarkIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path
-        d="M5 14L8.5 17.5L19 6.5"
-        style={{
-          strokeDasharray: 22,
-        }}
-        className="ease-out-expo transition-[stroke-dashoffset] duration-150 in-data-checked:[stroke-dashoffset:0] in-data-unchecked:[stroke-dashoffset:22] motion-reduce:transition-none"
-      />
-    </svg>
-  );
-}
+// The tick draws itself in on check. Tick02Icon is a single path of length
+// ~22, so dashoffset 22 hides it and 0 completes it; the classes reach the
+// path through the svg HugeiconsIcon renders.
+const checkmarkClasses =
+  "[&_path]:ease-out-expo [&_path]:transition-[stroke-dashoffset] [&_path]:duration-150 [&_path]:[stroke-dasharray:22] in-data-checked:[&_path]:[stroke-dashoffset:0] in-data-unchecked:[&_path]:[stroke-dashoffset:22] motion-reduce:[&_path]:transition-none";
+
 type DrawerPosition = "right" | "left" | "top" | "bottom";
 
 const DrawerContext = React.createContext<{ position: DrawerPosition }>({
@@ -641,12 +629,22 @@ function BaseDrawerMenuCheckboxItem({
   checked,
   defaultChecked,
   onCheckedChange,
-  variant = "default",
+  indicator = "check",
+  switchShape = "circle",
+  switchSize = "sm",
+  switchMotion = "default",
   disabled,
   render,
   ...props
 }: CheckboxPrimitive.Root.Props & {
-  variant?: "default" | "switch";
+  /** Which indicator sits in the right-hand column. `"switch"` is visual only. */
+  indicator?: "check" | "switch";
+  /** Thumb silhouette, when `indicator="switch"`. */
+  switchShape?: SwitchVisualProps["shape"];
+  /** Thumb size, when `indicator="switch"`. Defaults to `sm` for the drawer's taller touch rows. */
+  switchSize?: SwitchVisualProps["size"];
+  /** How the thumb travels, when `indicator="switch"`. */
+  switchMotion?: SwitchVisualProps["motion"];
   render?: React.ReactElement;
 }) {
   return (
@@ -654,10 +652,11 @@ function BaseDrawerMenuCheckboxItem({
       checked={checked}
       className={cn(
         "text-foreground hover:bg-surface-hover hover:text-accent-foreground focus-visible:outline-ring/50 grid min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid data-disabled:pointer-events-none data-disabled:opacity-60 sm:min-h-8 sm:text-sm [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
-        // `group` lets a switch indicator pick up the row's press state, so
-        // the whole row behaves as the control rather than just the switch.
-        "group",
-        variant === "switch"
+        // `group/switch` lets a switch indicator pick up the row's press
+        // state, so the whole row behaves as the control rather than just the
+        // switch. Named, so an unrelated `.group` on an ancestor cannot.
+        "group/switch",
+        indicator === "switch"
           ? "grid-cols-[1fr_auto] gap-4 pe-1.5"
           : "grid-cols-[1fr_1.125rem] pe-2 sm:grid-cols-[1fr_1rem]",
         className,
@@ -672,28 +671,33 @@ function BaseDrawerMenuCheckboxItem({
       <span className="col-start-1 flex min-w-0 items-center gap-2">
         {children}
       </span>
-      {variant === "switch" ? (
-        <CheckboxPrimitive.Indicator
-          className={cn(
-            switchVariants({ shape: "circle", size: "sm" }),
-            // Touch-sized on mobile, matching the taller drawer rows; drops to
-            // the same 14px thumb the desktop menus use (`size="xs"`) from
-            // `sm` up. Responsive sizing can't come from the cva variant.
-            "col-start-2 cursor-default sm:[--thumb-size:--spacing(3.5)]",
-            "pointer-events-none",
-            // The row already dims when disabled; don't compound the fade.
-            "data-disabled:opacity-100",
-          )}
-          keepMounted
-        >
-          <span className={switchThumbVariants()} />
-        </CheckboxPrimitive.Indicator>
+      {indicator === "switch" ? (
+        <SwitchVisual
+          shape={switchShape}
+          size={switchSize}
+          motion={switchMotion}
+          // Touch-sized on mobile, matching the taller drawer rows; drops to
+          // the same 14px thumb the desktop menus use (`size="xs"`) from `sm`
+          // up. Responsive sizing can't come from the cva variant.
+          className="col-start-2 sm:[--thumb-size:--spacing(3.5)]"
+          // Checkbox.Indicator does not inject aria-hidden the way the menu
+          // primitives do, and this span sits inside the row's accessible name.
+          aria-hidden
+          render={<CheckboxPrimitive.Indicator keepMounted />}
+        />
       ) : (
+        // Checkbox.Indicator does not inject aria-hidden the way the menu
+        // primitives do, and the glyph sits inside the row's accessible name.
         <CheckboxPrimitive.Indicator
           className="col-start-2 flex items-center justify-center"
+          aria-hidden
           keepMounted
         >
-          <CheckmarkIcon className="size-4.5 sm:size-4" />
+          <HugeiconsIcon
+            icon={Tick02Icon}
+            strokeWidth={2.5}
+            className={cn("size-4.5 sm:size-4", checkmarkClasses)}
+          />
         </CheckboxPrimitive.Indicator>
       )}
     </CheckboxPrimitive.Root>
@@ -740,11 +744,17 @@ function BaseDrawerMenuRadioItem({
       <span className="col-start-1 flex min-w-0 items-center gap-2">
         {children}
       </span>
+      {/* Radio.Indicator, like Checkbox.Indicator, leaves aria-hidden to us. */}
       <RadioPrimitive.Indicator
         className="col-start-2 flex items-center justify-center"
+        aria-hidden
         keepMounted
       >
-        <CheckmarkIcon className="size-4.5 sm:size-4" />
+        <HugeiconsIcon
+          icon={Tick02Icon}
+          strokeWidth={2.5}
+          className={cn("size-4.5 sm:size-4", checkmarkClasses)}
+        />
       </RadioPrimitive.Indicator>
     </RadioPrimitive.Root>
   );

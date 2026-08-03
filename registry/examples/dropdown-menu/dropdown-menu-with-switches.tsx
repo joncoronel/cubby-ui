@@ -26,21 +26,21 @@ export default function DropdownMenuWithSwitches() {
         <DropdownMenuLabel>Editor</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuCheckboxItem
-          variant="switch"
+          indicator="switch"
           checked={autoSave}
           onCheckedChange={setAutoSave}
         >
           Auto save
         </DropdownMenuCheckboxItem>
         <DropdownMenuCheckboxItem
-          variant="switch"
+          indicator="switch"
           checked={wordWrap}
           onCheckedChange={setWordWrap}
         >
           Word wrap
         </DropdownMenuCheckboxItem>
         <DropdownMenuCheckboxItem
-          variant="switch"
+          indicator="switch"
           checked={telemetry}
           onCheckedChange={setTelemetry}
           disabled

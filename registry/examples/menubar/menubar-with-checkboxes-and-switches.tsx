@@ -43,7 +43,7 @@ export default function MenubarWithCheckboxesAndSwitches() {
           </MenubarGroup>
           <MenubarSeparator />
           <MenubarCheckboxItem
-            variant="switch"
+            indicator="switch"
             checked={autoSave}
             onCheckedChange={setAutoSave}
           >

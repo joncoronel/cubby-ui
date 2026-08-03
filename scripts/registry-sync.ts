@@ -13,8 +13,7 @@ const THEME_CSS_PATH = path.join(process.cwd(), "registry", "theme.css");
 const DEFAULT_STYLE = "default";
 
 // Get registry URL from environment variable or use default
-const REGISTRY_URL =
-  process.env.REGISTRY_URL || "https://www.cubby-ui.dev";
+const REGISTRY_URL = process.env.REGISTRY_URL || "https://www.cubby-ui.dev";
 
 interface Example {
   title: string;
@@ -205,7 +204,7 @@ function extractAnatomyFromExample(
           imports = originalImport
             .replace(
               `@/registry/default/${componentName}/${componentName}`,
-              `@/components/ui/cubby-ui/${componentName}`,
+              installedImportPath(componentName),
             )
             .replace(/\r\n/g, "\n") // Normalize CRLF to LF
             .replace(/\r/g, "\n"); // Normalize CR to LF
@@ -265,9 +264,10 @@ function transformComponentImports(
 
   // Transform imports from other registry components
   // @/registry/default/button/button → @/components/ui/cubby-ui/button
+  // Multi-file components install into a directory and keep both segments.
   transformed = transformed.replace(
     /@\/registry\/default\/([^/]+)\/\1(?=["'])/g,
-    "@/components/ui/cubby-ui/$1",
+    (_match, component: string) => installedImportPath(component),
   );
 
   return transformed;
@@ -289,9 +289,11 @@ function transformExampleImports(content: string): string {
 
   // Transform main component imports
   // @/registry/default/button/button → @/components/ui/cubby-ui/button
+  // Multi-file components install into a directory, so they keep both segments:
+  // @/registry/default/switch/switch → @/components/ui/cubby-ui/switch/switch
   transformed = transformed.replace(
     /@\/registry\/default\/([^/]+)\/\1(?=["'])/g,
-    "@/components/ui/cubby-ui/$1",
+    (_match, component: string) => installedImportPath(component),
   );
 
   return transformed;
@@ -597,10 +599,11 @@ function extractComponentAnatomy(
   visit(sourceFile);
 
   // Generate imports string with user-facing path
+  const importPath = installedImportPath(componentName);
   const imports =
     exports.length > 1
-      ? `import {\n  ${exports.join(",\n  ")}\n} from "@/components/ui/cubby-ui/${componentName}"`
-      : `import { ${exports[0] || mainComponent} } from "@/components/ui/cubby-ui/${componentName}"`;
+      ? `import {\n  ${exports.join(",\n  ")}\n} from "${importPath}"`
+      : `import { ${exports[0] || mainComponent} } from "${importPath}"`;
 
   // Generate anatomy based on known patterns
   let anatomy = "";
@@ -997,6 +1000,35 @@ function getTargetPath(
   }
 }
 
+// A component that ships more than its main .tsx installs into a directory of
+// its own (see getTargetPath), so its user-facing import path gains a segment.
+// Memoised because the anatomy and example rewriters hit it once per import.
+const multiFileCache = new Map<string, boolean>();
+function isMultiFileComponent(componentName: string): boolean {
+  const cached = multiFileCache.get(componentName);
+  if (cached !== undefined) return cached;
+
+  const componentPath = path.join(
+    process.cwd(),
+    "registry",
+    DEFAULT_STYLE,
+    componentName,
+  );
+  const result =
+    fsSync.existsSync(componentPath) &&
+    scanComponentFiles(componentPath, componentName).length > 0;
+
+  multiFileCache.set(componentName, result);
+  return result;
+}
+
+// Installed import path for a component, matching what getTargetPath writes.
+function installedImportPath(componentName: string): string {
+  return isMultiFileComponent(componentName)
+    ? `@/components/ui/cubby-ui/${componentName}/${componentName}`
+    : `@/components/ui/cubby-ui/${componentName}`;
+}
+
 // Scan for additional files within a component directory
 function scanComponentFiles(
   componentPath: string,
@@ -1298,7 +1330,11 @@ async function scanRegistry() {
     const mainFileType = "registry:ui";
     // Multi-file components get a subdirectory structure for co-location
     const isMultiFile = additionalFiles.length > 0;
-    const mainFileTarget = getTargetPath(mainFilePath, mainFileType, isMultiFile);
+    const mainFileTarget = getTargetPath(
+      mainFilePath,
+      mainFileType,
+      isMultiFile,
+    );
 
     // Add target fields to all files and filter out empty targets
     const filesWithTargets = [
@@ -1753,7 +1789,14 @@ function extractCssContent(): {
 } {
   if (!fsSync.existsSync(THEME_CSS_PATH)) {
     console.warn(`⚠️  theme.css not found at ${THEME_CSS_PATH}`);
-    return { light: {}, dark: {}, theme: {}, utilities: {}, layerBase: {}, keyframes: {} };
+    return {
+      light: {},
+      dark: {},
+      theme: {},
+      utilities: {},
+      layerBase: {},
+      keyframes: {},
+    };
   }
 
   const content = fsSync.readFileSync(THEME_CSS_PATH, "utf-8");
@@ -1861,7 +1904,8 @@ function extractCssContent(): {
     if (!keyframesMatch || keyframesMatch.index === undefined) break;
 
     const keyframeName = keyframesMatch[1];
-    const startPos = keyframesPos + keyframesMatch.index + keyframesMatch[0].length;
+    const startPos =
+      keyframesPos + keyframesMatch.index + keyframesMatch[0].length;
     let braceCount = 1;
     let endPos = startPos;
 
@@ -1874,7 +1918,8 @@ function extractCssContent(): {
 
     if (braceCount === 0) {
       const keyframeContent = content.substring(startPos, endPos - 1).trim();
-      keyframes[`@keyframes ${keyframeName}`] = parseKeyframeRules(keyframeContent);
+      keyframes[`@keyframes ${keyframeName}`] =
+        parseKeyframeRules(keyframeContent);
     }
 
     keyframesPos = endPos;

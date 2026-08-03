@@ -102,13 +102,6 @@ html {
      Cards, Dialogs, popovers — contexts where the opaque white default would
      collapse into the surrounding surface. */
   --input-elevated: oklch(0 0 0 / 8%);
-  /* Switch track (unchecked). Same overlay family as --input-elevated, but a
-     switch is the one control whose fill *is* its boundary — there is no
-     border to carry the shape — so it needs more presence than a field bg.
-     Light matches --input-elevated; dark is stronger because a 9% white
-     overlay on a dark page only reaches 1.3:1 against it. */
-  --switch-track: oklch(0 0 0 / 8%);
-  --switch-track-hover: oklch(0 0 0 / 12%);
   --ring: oklch(0.55 0.2 250);
   --scrollbar: oklch(0.87 0 0);
 
@@ -288,10 +281,6 @@ html {
   /* Re-resolved against dark's --foreground (see the :root note). */
   --border: color-mix(in oklab, var(--foreground) 10%, transparent);
   --input-elevated: oklch(1 0 0 / 9%);
-  /* Hover moves in the overlay's own direction, so it darkens in light and
-     lightens in dark from the one rule. */
-  --switch-track: oklch(1 0 0 / 20%);
-  --switch-track-hover: oklch(1 0 0 / 24%);
   --scrollbar: oklch(0.7 var(--neutral-chroma) var(--neutral-hue));
 
   /* Sidebar — only --sidebar-border needs a dark value; the rest are aliases
@@ -425,8 +414,6 @@ html {
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-input-elevated: var(--input-elevated);
-  --color-switch-track: var(--switch-track);
-  --color-switch-track-hover: var(--switch-track-hover);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);

@@ -498,7 +498,7 @@
     ],
     "reference": [],
     "usage": {
-      "imports": "import { toast } from \"@/components/ui/cubby-ui/toast\"",
+      "imports": "import { toast } from \"@/components/ui/cubby-ui/toast/toast\"",
       "anatomy": "toast({\n  title: \"Event has been created\",\n  description: \"Friday, February 10, 2023 at 5:57 PM\"\n})"
     }
   },

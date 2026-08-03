@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Menu as BaseMenu } from "@base-ui/react/menu";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { ArrowRight01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 
 import { cn } from "@/lib/utils";
 import {
@@ -11,38 +11,21 @@ import {
   type SurfaceLevel,
 } from "@/registry/default/lib/elevated";
 import {
-  switchVariants,
-  switchThumbVariants,
+  SwitchVisual,
+  type SwitchVisualProps,
 } from "@/registry/default/switch/switch";
 
-// Shared shell for checkbox and radio items. Padding matches DropdownMenuItem
-// so labels line up across every item type; the indicator lives in a reserved
-// right-hand column so toggling never shifts the label.
+// Shared shell for checkbox and radio items. Padding matches the plain menu
+// item so labels line up across every item type; the indicator lives in a
+// reserved right-hand column so toggling never shifts the label.
 const toggleItemClasses =
-  "group data-highlighted:bg-surface-hover data-highlighted:text-accent-foreground grid cursor-default items-center rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
+  "group/switch data-highlighted:bg-surface-hover data-highlighted:text-accent-foreground grid cursor-default items-center rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
 
-// Path length ≈ 22 (from the path geometry)
-function CheckmarkIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path
-        d="M5 14L8.5 17.5L19 6.5"
-        style={{
-          strokeDasharray: 22,
-        }}
-        className="ease-out-expo transition-[stroke-dashoffset] duration-150 in-data-checked:[stroke-dashoffset:0] in-data-unchecked:[stroke-dashoffset:22] motion-reduce:transition-none"
-      />
-    </svg>
-  );
-}
+// The tick draws itself in on check. Tick02Icon is a single path of length
+// ~22, so dashoffset 22 hides it and 0 completes it; the classes reach the
+// path through the svg HugeiconsIcon renders.
+const checkmarkClasses =
+  "[&_path]:ease-out-expo [&_path]:transition-[stroke-dashoffset] [&_path]:duration-150 [&_path]:[stroke-dasharray:22] in-data-checked:[&_path]:[stroke-dashoffset:0] in-data-unchecked:[&_path]:[stroke-dashoffset:22] motion-reduce:[&_path]:transition-none";
 
 function DropdownMenu<Payload = unknown>({
   ...props
@@ -91,7 +74,7 @@ function DropdownMenuContent({
   return (
     <DropdownMenuPortal>
       <DropdownMenuPositioner
-        className="z-50 h-(--positioner-height) max-h-(--available-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none"
+        className="z-50 h-(--positioner-height) max-h-(--available-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none motion-reduce:transition-none"
         sideOffset={sideOffset}
         align={align}
         side={side}
@@ -151,10 +134,11 @@ function DropdownMenuContent({
               "**:data-previous:transition-[scale,opacity] **:data-previous:duration-150 **:data-previous:ease-[cubic-bezier(0.22,1,0.36,1)]",
               "**:data-current:data-starting-style:scale-[0.96] **:data-current:data-starting-style:opacity-0",
               "**:data-previous:data-ending-style:scale-[0.96] **:data-previous:data-ending-style:opacity-0",
-              // Targets the content, not the viewport: the viewport has no
-              // transitions of its own and transition-property does not
-              // inherit, so a `data-instant:` rule here would be a no-op.
-              "[[data-instant]_&_[data-current]]:transition-none [[data-instant]_&_[data-previous]]:transition-none",
+              // Value-matched to the popup's own guard above, so one policy governs
+              // the whole subtree. Targets the content, not the viewport: the
+              // viewport has no transitions of its own and transition-property does
+              // not inherit, so a rule here would be a no-op.
+              "[[data-instant=trigger-change]_&_[data-current]]:transition-none [[data-instant=trigger-change]_&_[data-previous]]:transition-none",
               "motion-reduce:**:data-current:transition-none motion-reduce:**:data-previous:transition-none",
             )}
           >
@@ -272,21 +256,30 @@ function DropdownMenuCheckboxItem({
   children,
   checked,
   inset,
-  variant = "default",
+  indicator = "check",
+  switchShape = "circle",
+  switchSize = "xs",
+  switchMotion = "default",
   ...props
 }: React.ComponentProps<typeof BaseMenu.CheckboxItem> & {
   inset?: boolean;
-  /** Indicator style. `"switch"` is visual only — the item keeps the `menuitemcheckbox` role. */
-  variant?: "default" | "switch";
+  /** Which indicator sits in the right-hand column. `"switch"` is visual only — the item keeps the `menuitemcheckbox` role. */
+  indicator?: "check" | "switch";
+  /** Thumb silhouette, when `indicator="switch"`. */
+  switchShape?: SwitchVisualProps["shape"];
+  /** Thumb size, when `indicator="switch"`. Defaults to `xs`, which matches the row's text. */
+  switchSize?: SwitchVisualProps["size"];
+  /** How the thumb travels, when `indicator="switch"`. */
+  switchMotion?: SwitchVisualProps["motion"];
 }) {
   return (
     <BaseMenu.CheckboxItem
       data-slot="dropdown-menu-checkbox-item"
       data-inset={inset || undefined}
-      data-variant={variant}
+      data-indicator={indicator}
       className={cn(
         toggleItemClasses,
-        variant === "switch"
+        indicator === "switch"
           ? "grid-cols-[1fr_auto] gap-3"
           : "grid-cols-[1fr_1rem] gap-2",
         className,
@@ -297,28 +290,28 @@ function DropdownMenuCheckboxItem({
       <span className="col-start-1 flex min-w-0 items-center gap-2">
         {children}
       </span>
-      {variant === "switch" ? (
-        // The indicator is aria-hidden and non-interactive: the row itself
-        // carries the role and the click target, so nesting a real Switch here
-        // would put a focusable control inside a menuitemcheckbox.
-        <BaseMenu.CheckboxItemIndicator
-          keepMounted
-          className={cn(
-            switchVariants({ shape: "circle", size: "xs" }),
-            "col-start-2 cursor-default",
-            "pointer-events-none",
-            // The row already dims when disabled; don't compound the fade.
-            "data-disabled:opacity-100",
-          )}
-        >
-          <span className={switchThumbVariants()} />
-        </BaseMenu.CheckboxItemIndicator>
+      {indicator === "switch" ? (
+        // Visual only, and non-interactive: the row itself carries the role and
+        // the click target, so nesting a real Switch here would put a focusable
+        // control inside a menuitemcheckbox. Base UI's indicator supplies the
+        // aria-hidden.
+        <SwitchVisual
+          shape={switchShape}
+          size={switchSize}
+          motion={switchMotion}
+          className="col-start-2"
+          render={<BaseMenu.CheckboxItemIndicator keepMounted />}
+        />
       ) : (
         <BaseMenu.CheckboxItemIndicator
           keepMounted
           className="col-start-2 flex items-center justify-center"
         >
-          <CheckmarkIcon className="size-4" />
+          <HugeiconsIcon
+            icon={Tick02Icon}
+            strokeWidth={2.5}
+            className={cn("size-4", checkmarkClasses)}
+          />
         </BaseMenu.CheckboxItemIndicator>
       )}
     </BaseMenu.CheckboxItem>
@@ -355,7 +348,11 @@ function DropdownMenuRadioItem({
         keepMounted
         className="col-start-2 flex items-center justify-center"
       >
-        <CheckmarkIcon className="size-4" />
+        <HugeiconsIcon
+          icon={Tick02Icon}
+          strokeWidth={2.5}
+          className={cn("size-4", checkmarkClasses)}
+        />
       </BaseMenu.RadioItemIndicator>
     </BaseMenu.RadioItem>
   );

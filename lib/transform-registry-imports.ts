@@ -1,3 +1,29 @@
+import registry from "@/registry.json";
+
+/**
+ * Components that ship more than their main .tsx install into a directory of
+ * their own, so their import path keeps both segments
+ * (`.../cubby-ui/switch/switch`, not `.../cubby-ui/switch`). Read off the
+ * targets the sync script already wrote rather than re-deriving the rule, so
+ * the two can't disagree — printing the flat path for a nested install gives
+ * the reader an import that resolves to nothing.
+ */
+const MULTI_FILE_COMPONENTS: ReadonlySet<string> = new Set(
+  (registry.items as Array<{ name: string; files?: { target?: string }[] }>)
+    .filter((item) =>
+      item.files?.some((file) =>
+        file.target?.startsWith(`components/ui/cubby-ui/${item.name}/`),
+      ),
+    )
+    .map((item) => item.name),
+);
+
+function installedImportPath(componentName: string): string {
+  return MULTI_FILE_COMPONENTS.has(componentName)
+    ? `@/components/ui/cubby-ui/${componentName}/${componentName}`
+    : `@/components/ui/cubby-ui/${componentName}`;
+}
+
 /**
  * Transform component source imports from internal registry paths to user-facing paths
  * Used for displaying code to users in documentation and installation instructions
@@ -39,7 +65,7 @@ export function transformComponentImports(
   // @/registry/default/button/button → @/components/ui/cubby-ui/button
   transformed = transformed.replace(
     /@\/registry\/default\/([^/]+)\/\1(?=["'])/g,
-    "@/components/ui/cubby-ui/$1",
+    (_match, component: string) => installedImportPath(component),
   );
 
   return transformed;

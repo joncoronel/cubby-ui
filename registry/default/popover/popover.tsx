@@ -150,7 +150,7 @@ function PopoverContent({
         sticky={sticky}
         positionMethod={positionMethod}
         arrowPadding={arrowPadding}
-        className="z-50 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none"
+        className="z-50 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none motion-reduce:transition-none"
       >
         <BasePopover.Popup
           data-slot="popover-content"
@@ -180,7 +180,7 @@ function PopoverContent({
           {...props}
         >
           {arrow && (
-            <PopoverArrow className="transition-[left,right,top,bottom] duration-350 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none data-[side=bottom]:top-[-8px] data-[side=left]:right-[-13px] data-[side=left]:rotate-90 data-[side=right]:left-[-13px] data-[side=right]:-rotate-90 data-[side=top]:bottom-[-8px] data-[side=top]:rotate-180">
+            <PopoverArrow className="transition-[left,right,top,bottom] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none data-[side=bottom]:top-[-8px] data-[side=left]:right-[-13px] data-[side=left]:rotate-90 data-[side=right]:left-[-13px] data-[side=right]:-rotate-90 data-[side=top]:bottom-[-8px] data-[side=top]:rotate-180 motion-reduce:transition-none">
               <svg width="20" height="10" viewBox="0 0 20 10" fill="none">
                 <path
                   d="M9.66437 2.60207L4.80758 6.97318C4.07308 7.63423 3.11989 8 2.13172 8H0V9H20V8H18.5349C17.5468 8 16.5936 7.63423 15.8591 6.97318L11.0023 2.60207C10.622 2.2598 10.0447 2.25979 9.66437 2.60207Z"
@@ -214,10 +214,11 @@ function PopoverContent({
               // whichever trigger you came from.
               "**:data-current:data-starting-style:scale-[0.96] **:data-current:data-starting-style:opacity-0",
               "**:data-previous:data-ending-style:scale-[0.96] **:data-previous:data-ending-style:opacity-0",
-              // Must target the content, not the viewport: the viewport has no
-              // transitions of its own and transition-property does not
-              // inherit, so `data-instant:transition-none` here was a no-op.
-              "[[data-instant]_&_[data-current]]:transition-none [[data-instant]_&_[data-previous]]:transition-none",
+              // Value-matched to the popup's own guard above, so one policy governs
+              // the whole subtree. Targets the content, not the viewport: the
+              // viewport has no transitions of its own and transition-property does
+              // not inherit, so a rule here would be a no-op.
+              "[[data-instant=trigger-change]_&_[data-current]]:transition-none [[data-instant=trigger-change]_&_[data-previous]]:transition-none",
               "motion-reduce:**:data-current:transition-none motion-reduce:**:data-previous:transition-none",
             )}
           >

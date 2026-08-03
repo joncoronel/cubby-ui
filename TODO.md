@@ -45,6 +45,31 @@ Card and code-block use the same `bg-muted` outer + `solidSurface(3)` inner patt
 
 Practical effect: when a Card inset is rendered inside a Dialog at level 5, the outer reads as recessed below the dialog (bg-muted is darker than the dialog substrate). Acceptable since inset variant is mostly for page-level use, but if we ever need contextual inset rendering, it would need a level-aware inner (8 sets of classes or refactor).
 
+### Menus
+
+#### Content-driven indicator column (`:has()`)
+
+`DropdownMenuCheckboxItem` and its Context Menu / Menubar / Base Drawer siblings pick the row's grid template from the `indicator` prop:
+
+```tsx
+indicator === "switch"
+  ? "grid-cols-[1fr_auto] gap-3"
+  : "grid-cols-[1fr_1rem] gap-2";
+```
+
+So the layout is welded to the flag rather than to the contents. `indicator="switch"` gets the built-in `SwitchVisual` and a template sized for it; anything else you place in the row is laid out for a 1rem checkmark.
+
+This does **not** block configuring the built-in switch — `switchShape`, `switchSize` and `switchMotion` all forward, and the switch branch's `auto` column absorbs every size those produce. The only gap is a _different_ indicator entirely: a spinner, a count badge, a coloured dot.
+
+The fix, when a use case shows up:
+
+```tsx
+"grid-cols-[1fr_1rem] gap-2",
+"has-[[data-slot=switch-visual]]:grid-cols-[1fr_auto] has-[[data-slot=switch-visual]]:gap-3",
+```
+
+Then the row adapts to whatever is inside it and `indicator="switch"` becomes shorthand rather than the only door. Costs four components plus an exported indicator primitive per menu so the composed form is writable. Purely additive to what shipped — nothing needs undoing first.
+
 ### Filters
 
 Deferred / removed follow-ups pulled from the initial `filters` build (`registry/default/filters/`) to keep v1 tight. None are blocking; revisit when demand shows up.
@@ -65,18 +90,17 @@ Already swept: `dropdown-menu`, `context-menu`, `menubar`, `base-drawer`, `switc
 
 What's left, and how safe each bucket is:
 
-| Pattern | Fix | Count | Files | Safe to sed? |
-| --- | --- | --- | --- | --- |
-| `data-[starting-style]:` etc. (bare attribute) | `data-starting-style:` | 39 | 11 | Yes |
-| `!text-foo` (leading important) | `text-foo!` | 4 | 3 | Yes |
-| `h-[var(--x)]` (single var) | `h-(--x)` | 9 | 6 | Yes |
-| `shadow-[var(--a),var(--b)]` (multi-var) | — | 17 | mostly `lib/elevated.tsx` | **No** |
-| `translate-y-[var(--drawer-offset)]` | `translate-y-(--x)` | 16 | `drawer/drawer.tsx` | **Careful** |
+| Pattern                                        | Fix                    | Count | Files                     | Safe to sed? |
+| ---------------------------------------------- | ---------------------- | ----- | ------------------------- | ------------ |
+| `data-[starting-style]:` etc. (bare attribute) | `data-starting-style:` | 39    | 11                        | Yes          |
+| `!text-foo` (leading important)                | `text-foo!`            | 4     | 3                         | Yes          |
+| `h-[var(--x)]` (single var)                    | `h-(--x)`              | 9     | 6                         | Yes          |
+| `shadow-[var(--a),var(--b)]` (multi-var)       | —                      | 17    | mostly `lib/elevated.tsx` | **No**       |
 
 Two things a blind find/replace gets wrong:
 
 - **Multi-var arbitrary values can't be converted.** The `(--x)` shorthand takes exactly one custom property, so `shadow-[var(--surface-shadow-3),var(--surface-rim-3)]` in `lib/elevated.tsx` has to stay bracketed. IntelliSense doesn't flag these, but a naive regex will eat them.
-- **`translate-*-[var(…)]` is the Safari @property trap.** The shorthand routes the value through the registered `--tw-translate-x`/`-y` `@property`, which misbehaves in Safari under `@starting-style` — the exact bug that made `switch.tsx` set `translate` directly via `[translate:var(--thumb-travel)]`. All 16 are in `drawer/drawer.tsx`, which animates with `data-starting-style`. Either leave them bracketed or convert and verify in real Safari, not just Chrome.
+- **Translate utilities are the Safari @property trap, and `drawer.tsx` is now converted.** Any Tailwind translate utility, bracketed (`translate-y-[var(--x)]`) or shorthand (`translate-y-(--x)`), compiles to `--tw-translate-y: <value>; translate: var(--tw-translate-x) var(--tw-translate-y)`. WebKit drops a registered custom property's `@starting-style` value when it is a `var()` reference and falls back to the registered `initial-value: 0`, so an enter animation starts from the wrong offset. An earlier version of this note claimed the bracketed form was the safe one; it is not, and the compiled CSS confirms both forms are identical. `drawer/drawer.tsx` had all 24 of them inside `data-starting-style` / `data-ending-style` variants and has been converted to direct `[translate:…]` arbitrary properties, which is what `transition-panel.tsx` already does and documents. Still worth a real Safari pass to confirm the original symptom is gone. Anything new that animates a translate off a `var()` under `@starting-style` should set `translate` directly rather than reach for the utility.
 
 Also note `data-[variant=destructive]:` and other `key=value` forms are already canonical — only bare attribute-presence variants shorten.
 

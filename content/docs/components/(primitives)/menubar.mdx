@@ -4,7 +4,13 @@ description: Horizontal menu bar for organizing navigation and actions
 type: primitive
 ---
 
-import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } from "@/registry/default/menubar/menubar";
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarTrigger,
+} from "@/registry/default/menubar/menubar";
 
 A horizontal bar of top-level menus, like the File / Edit / View bar in a desktop app. Use it for application-style command surfaces where several menus sit side by side and moving between them keeps the next menu open. For a single menu opened from one button, use [Dropdown Menu](/docs/components/dropdown-menu) instead.
 
@@ -46,9 +52,12 @@ Menubar
 
 ### With Checkboxes and Switches
 
-Use `MenubarCheckboxItem` for toggles and `MenubarRadioGroup` for single-choice options. Set `variant="switch"` on a checkbox item to swap its checkmark for a switch.
+Use `MenubarCheckboxItem` for toggles and `MenubarRadioGroup` for single-choice options. Set `indicator="switch"` on a checkbox item to swap its checkmark for a switch.
 
-<ComponentPreview component="menubar" example="menubar-with-checkboxes-and-switches" />
+<ComponentPreview
+  component="menubar"
+  example="menubar-with-checkboxes-and-switches"
+/>
 
 ## API Reference
 
@@ -65,10 +74,16 @@ The bar element itself is a subtle inline toolbar that sits visibly elevated abo
 <ApiPropsList>
 
 <ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="2">
-  Surface elevation level for the bar. Defaults to `2`, a subtle toolbar that lifts gently from the page. See the [Surfaces](/docs/getting-started/surfaces) docs.
+  Surface elevation level for the bar. Defaults to `2`, a subtle toolbar that
+  lifts gently from the page. See the [Surfaces](/docs/getting-started/surfaces)
+  docs.
 </ApiProp>
 
-<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="2">
+<ApiProp
+  name="shadowLevel"
+  fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8"
+  defaultValue="2"
+>
   Shadow weight for the bar.
 </ApiProp>
 
@@ -84,30 +99,28 @@ The bar element itself is a subtle inline toolbar that sits visibly elevated abo
   simpleType="string"
   defaultValue='"start"'
 >
-  How to align the menu. Flattened from Positioner. Base UI defaults to `'center'`.
+  How to align the menu. Flattened from Positioner. Base UI defaults to
+  `'center'`.
 </ApiProp>
 
-<ApiProp
-  name="alignOffset"
-  fullType="number"
-  defaultValue="-4"
->
+<ApiProp name="alignOffset" fullType="number" defaultValue="-4">
   Offset along alignment axis. Flattened from Positioner.
 </ApiProp>
 
-<ApiProp
-  name="sideOffset"
-  fullType="number"
-  defaultValue="8"
->
-  Distance in pixels for positioning. Flattened from Positioner. Base UI defaults to `0`.
+<ApiProp name="sideOffset" fullType="number" defaultValue="8">
+  Distance in pixels for positioning. Flattened from Positioner. Base UI
+  defaults to `0`.
 </ApiProp>
 
 <ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
   Surface elevation level for the dropdown popup.
 </ApiProp>
 
-<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
+<ApiProp
+  name="shadowLevel"
+  fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8"
+  defaultValue="3"
+>
   Shadow weight for the dropdown popup.
 </ApiProp>
 
@@ -118,10 +131,15 @@ The bar element itself is a subtle inline toolbar that sits visibly elevated abo
 <ApiPropsList>
 
 <ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="5">
-  Surface elevation level. Submenus default to `5` so they pop above the parent menu.
+  Surface elevation level. Submenus default to `5` so they pop above the parent
+  menu.
 </ApiProp>
 
-<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
+<ApiProp
+  name="shadowLevel"
+  fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8"
+  defaultValue="3"
+>
   Shadow weight. Kept at `3`, since submenus are still small popups.
 </ApiProp>
 
@@ -131,12 +149,9 @@ The bar element itself is a subtle inline toolbar that sits visibly elevated abo
 
 <ApiPropsList>
 
-<ApiProp
-  name="inset"
-  fullType="boolean"
-  defaultValue="false"
->
-  Add left padding to align with items that have icons. Custom prop not available in Base UI.
+<ApiProp name="inset" fullType="boolean">
+  Add left padding to align with items that have icons. Custom prop not
+  available in Base UI.
 </ApiProp>
 
 <ApiProp
@@ -145,7 +160,8 @@ The bar element itself is a subtle inline toolbar that sits visibly elevated abo
   simpleType="string"
   defaultValue='"default"'
 >
-  Visual style variant for dangerous actions. Custom prop not available in Base UI.
+  Visual style variant for dangerous actions. Custom prop not available in Base
+  UI.
 </ApiProp>
 
 </ApiPropsList>
@@ -156,12 +172,9 @@ Menu item that renders as an anchor (`<a>`) for navigation links. Wraps Base UI'
 
 <ApiPropsList>
 
-<ApiProp
-  name="inset"
-  fullType="boolean"
-  defaultValue="false"
->
-  Add left padding to align with items that have icons. Custom prop not available in Base UI.
+<ApiProp name="inset" fullType="boolean">
+  Add left padding to align with items that have icons. Custom prop not
+  available in Base UI.
 </ApiProp>
 
 </ApiPropsList>
@@ -173,20 +186,50 @@ Toggleable menu item. Wraps Base UI's `Menu.CheckboxItem`. The indicator sits in
 <ApiPropsList>
 
 <ApiProp
-  name="variant"
-  fullType='"default" | "switch"'
+  name="indicator"
+  fullType='"check" | "switch"'
   simpleType="string"
-  defaultValue='"default"'
+  defaultValue='"check"'
 >
-  Indicator style. `"switch"` renders a decorative switch in place of the checkmark. It is purely visual: the item keeps the `menuitemcheckbox` role, the same props, and the same behavior. Custom prop not available in Base UI.
+  Indicator style. `"switch"` renders a decorative switch in place of the
+  checkmark. It is purely visual: the item keeps the `menuitemcheckbox` role,
+  the same props, and the same behavior. Custom prop not available in Base UI.
 </ApiProp>
 
 <ApiProp
-  name="inset"
-  fullType="boolean"
-  defaultValue="false"
+  name="switchShape"
+  fullType='"circle" | "pill" | "squircle"'
+  simpleType="string"
+  defaultValue='"circle"'
 >
-  Add left padding to align with items that have icons. Custom prop not available in Base UI.
+  Thumb silhouette, when `indicator="switch"`. Forwarded to
+  [Switch](/docs/components/switch). Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp
+  name="switchSize"
+  fullType='"xs" | "sm" | "default"'
+  simpleType="string"
+  defaultValue='"xs"'
+>
+  Thumb size, when `indicator="switch"`. The default matches the row's text.
+  Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp
+  name="switchMotion"
+  fullType='"default" | "stretch"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  What the thumb does while toggling, when `indicator="switch"`. `"stretch"`
+  sends the leading edge first, so the thumb spans the track mid-toggle. Custom
+  prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="inset" fullType="boolean">
+  Add left padding to align with items that have icons. Custom prop not
+  available in Base UI.
 </ApiProp>
 
 </ApiPropsList>
@@ -197,12 +240,9 @@ Mutually exclusive menu item. Wraps Base UI's `Menu.RadioItem`. Uses the same ri
 
 <ApiPropsList>
 
-<ApiProp
-  name="inset"
-  fullType="boolean"
-  defaultValue="false"
->
-  Add left padding to align with items that have icons. Custom prop not available in Base UI.
+<ApiProp name="inset" fullType="boolean">
+  Add left padding to align with items that have icons. Custom prop not
+  available in Base UI.
 </ApiProp>
 
 </ApiPropsList>
@@ -213,12 +253,9 @@ Standalone label. Renders a plain `div`, so it can sit anywhere inside `MenubarC
 
 <ApiPropsList>
 
-<ApiProp
-  name="inset"
-  fullType="boolean"
-  defaultValue="false"
->
-  Add left padding to align with items that have icons. Custom prop not available in Base UI.
+<ApiProp name="inset" fullType="boolean">
+  Add left padding to align with items that have icons. Custom prop not
+  available in Base UI.
 </ApiProp>
 
 </ApiPropsList>
@@ -229,12 +266,9 @@ Label for a `MenubarGroup`. Wraps Base UI's `Menu.GroupLabel`, which names the g
 
 <ApiPropsList>
 
-<ApiProp
-  name="inset"
-  fullType="boolean"
-  defaultValue="false"
->
-  Add left padding to align with items that have icons. Custom prop not available in Base UI.
+<ApiProp name="inset" fullType="boolean">
+  Add left padding to align with items that have icons. Custom prop not
+  available in Base UI.
 </ApiProp>
 
 </ApiPropsList>
@@ -243,12 +277,9 @@ Label for a `MenubarGroup`. Wraps Base UI's `Menu.GroupLabel`, which names the g
 
 <ApiPropsList>
 
-<ApiProp
-  name="inset"
-  fullType="boolean"
-  defaultValue="false"
->
-  Add left padding to align with items that have icons. Custom prop not available in Base UI.
+<ApiProp name="inset" fullType="boolean">
+  Add left padding to align with items that have icons. Custom prop not
+  available in Base UI.
 </ApiProp>
 
 </ApiPropsList>

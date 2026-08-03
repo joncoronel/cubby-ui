@@ -70,6 +70,14 @@ The fix, when a use case shows up:
 
 Then the row adapts to whatever is inside it and `indicator="switch"` becomes shorthand rather than the only door. Costs four components plus an exported indicator primitive per menu so the composed form is writable. Purely additive to what shipped — nothing needs undoing first.
 
+#### Radio and checkbox items are visually identical
+
+Raised by the panel review and deliberately deferred. `DropdownMenuRadioItem` and a default `DropdownMenuCheckboxItem` render the same grid template and the same checkmark glyph in the same cell (dropdown-menu.tsx, and repeated in context-menu and menubar). The pre-branch radio indicator had its own filled-dot treatment, which this branch removed.
+
+In the common "View" menu shape — a `Show sidebar` toggle above a `Sort by` group — nothing signals that one group is multi-select and the other single-select, so there is no cue that picking a second radio silently clears the first.
+
+Options: give the radio indicator a distinct mark (a filled dot, or a lighter/smaller check), or document `indicator="switch"` as the expected choice for checkbox items in any menu that also holds a radio group.
+
 ### Filters
 
 Deferred / removed follow-ups pulled from the initial `filters` build (`registry/default/filters/`) to keep v1 tight. None are blocking; revisit when demand shows up.

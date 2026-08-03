@@ -87,7 +87,7 @@ function DropdownMenuContent({
             // menus that both sit on this floor morph position and height but not
             // width. That is the accepted trade: menus narrower than 12rem read
             // as cramped, and width is the least visible of the three.
-            "text-popover-foreground relative min-w-[12rem] overflow-hidden rounded-xl outline-none",
+            "text-popover-foreground relative max-h-(--available-height) min-w-[12rem] overflow-hidden rounded-xl outline-none",
             solidSurface(level, shadowLevel),
             "h-(--popup-height,auto) w-(--popup-width,auto)",
             "origin-(--transform-origin) transition-[width,height,scale,opacity] duration-[150ms,150ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
@@ -119,7 +119,15 @@ function DropdownMenuContent({
           <BaseMenu.Viewport
             data-slot="dropdown-menu-viewport"
             className={cn(
-              "relative size-full overflow-clip p-1 [--viewport-padding:0.25rem]",
+              // Bounded here rather than inherited from the popup: `h-full`
+              // is `height: 100%` against a parent whose specified height is
+              // `--popup-height`, the literal `auto` at rest, so the
+              // percentage stays indefinite and the viewport grows to its
+              // content. scrollHeight then always equals clientHeight and the
+              // overflow-y below can never engage. Capping the viewport gives
+              // it a definite bound and leaves the popup's height free to
+              // animate for the morph.
+              "relative max-h-(--available-height) w-full overflow-clip p-1 [--viewport-padding:0.25rem]",
               "not-data-transitioning:overflow-y-auto",
               // Content width
               "**:data-current:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
@@ -452,7 +460,7 @@ function DropdownMenuSubContent({
           data-slot="dropdown-menu-content"
           data-level={level}
           className={cn(
-            "text-popover-foreground relative min-w-[12rem] overflow-hidden rounded-xl outline-none",
+            "text-popover-foreground relative max-h-(--available-height) min-w-[12rem] overflow-hidden rounded-xl outline-none",
             solidSurface(level, shadowLevel),
             "ease-out-expo origin-(--transform-origin) transition-[transform,scale,opacity] duration-100",
             "data-starting-style:scale-95 data-starting-style:opacity-0",

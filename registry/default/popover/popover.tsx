@@ -196,8 +196,15 @@ function PopoverContent({
           <BasePopover.Viewport
             data-slot="popover-viewport"
             className={cn(
-              // Base viewport styles
-              "relative size-full overflow-clip px-3 py-3 [--viewport-padding:0.75rem]",
+              // Height is bounded here rather than inherited from the popup.
+              // `h-full` would be `height: 100%` against a parent whose
+              // specified height is `--popup-height` — the literal `auto` at
+              // rest — so the percentage stays indefinite and the viewport
+              // grows to its content instead. scrollHeight then always equals
+              // clientHeight and the overflow-y below can never engage. Capping
+              // the viewport itself gives it a definite bound while leaving the
+              // popup's height free to animate for the morph.
+              "relative max-h-(--available-height) w-full overflow-clip px-3 py-3 [--viewport-padding:0.75rem]",
               "not-data-transitioning:overflow-y-auto",
               // Content width calculation (edge-to-edge minus padding)
               "**:data-current:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",

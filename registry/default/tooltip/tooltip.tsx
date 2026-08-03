@@ -144,7 +144,15 @@ function TooltipContent({
             data-slot="tooltip-viewport"
             className={cn(
               // Base viewport styles
-              "relative size-full overflow-clip px-2 py-1.5 [--viewport-padding:0.5rem]",
+              // Bounded here rather than inherited from the popup: `h-full`
+              // is `height: 100%` against a parent whose specified height is
+              // `--popup-height`, the literal `auto` at rest, so the
+              // percentage stays indefinite and the viewport grows to its
+              // content. scrollHeight then always equals clientHeight and the
+              // overflow-y below can never engage. Capping the viewport gives
+              // it a definite bound and leaves the popup's height free to
+              // animate for the morph.
+              "relative max-h-(--available-height) w-full overflow-clip px-2 py-1.5 [--viewport-padding:0.5rem]",
               "not-data-transitioning:overflow-y-auto",
               // Content width and transitions
               "**:data-current:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",

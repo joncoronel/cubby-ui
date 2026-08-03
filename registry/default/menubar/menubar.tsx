@@ -134,7 +134,7 @@ function MenubarContent({
           data-slot="menubar-content"
           data-level={level}
           className={cn(
-            "text-popover-foreground relative min-w-[12rem] overflow-hidden rounded-xl outline-none",
+            "text-popover-foreground relative max-h-(--available-height) min-w-[12rem] overflow-hidden rounded-xl outline-none",
             solidSurface(level, shadowLevel),
             "h-(--popup-height,auto) w-(--popup-width,auto)",
             "origin-(--transform-origin) transition-[width,height,scale,opacity] duration-[150ms,150ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
@@ -181,7 +181,7 @@ function MenubarContent({
           */}
           <BaseMenu.Viewport
             data-slot="menubar-viewport"
-            className="relative size-full overflow-clip overflow-y-auto p-1"
+            className="relative max-h-(--available-height) w-full overflow-clip overflow-y-auto p-1"
           >
             {children}
           </BaseMenu.Viewport>
@@ -463,7 +463,7 @@ function MenubarSubContent({
           data-slot="menubar-sub-content"
           data-level={level}
           className={cn(
-            "text-popover-foreground relative min-w-[12rem] overflow-hidden rounded-xl outline-none",
+            "text-popover-foreground relative max-h-(--available-height) min-w-[12rem] overflow-hidden rounded-xl outline-none",
             solidSurface(level, shadowLevel),
             // Submenus open as their own popup (no Viewport content-swap) — scale + fade
             "ease-out-expo origin-(--transform-origin) transition-[transform,scale,opacity] duration-100",

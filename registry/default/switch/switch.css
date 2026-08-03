@@ -1,0 +1,32 @@
+/* -------------------------------------------------------------------------------------------------
+ * Switch motion.
+ *
+ * A custom property only animates once it is registered — an unregistered one
+ * has no type, so there is nothing to interpolate and it steps. These three are
+ * the only animated quantities on a Switch: the thumb's own declarations are
+ * plain calc() of them, which is what lets one mechanism serve both the sliding
+ * and the stretching motion. They inherit so the thumb can read what the root
+ * animates.
+ *
+ * Ships as a file rather than through the registry's `css` field, which cannot
+ * carry @property. Imported from switch.tsx, so anything that renders a Switch —
+ * including the menu components' SwitchItem, which borrow switchVariants —
+ * pulls it in without a separate install step.
+ * -------------------------------------------------------------------------------------------------*/
+@property --switch-p {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --switch-ext {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --switch-press {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}

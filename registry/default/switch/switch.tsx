@@ -4,6 +4,8 @@ import { Switch as BaseSwitch } from "@base-ui/react/switch";
 
 import { cn } from "@/lib/utils";
 
+import "./switch.css";
+
 const switchVariants = cva(
   [
     // Containing block for the thumb, which is pinned by left and right so its

@@ -1684,7 +1684,12 @@
         {
           "path": "registry/default/switch/switch.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/switch.tsx"
+          "target": "components/ui/cubby-ui/switch/switch.tsx"
+        },
+        {
+          "path": "registry/default/switch/switch.css",
+          "type": "registry:file",
+          "target": "components/ui/cubby-ui/switch/switch.css"
         }
       ],
       "dependencies": [

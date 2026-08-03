@@ -78,6 +78,16 @@ In the common "View" menu shape — a `Show sidebar` toggle above a `Sort by` gr
 
 Options: give the radio indicator a distinct mark (a filled dot, or a lighter/smaller check), or document `indicator="switch"` as the expected choice for checkbox items in any menu that also holds a radio group.
 
+#### Switch track contrast in light mode is an accepted trade
+
+The unchecked light track is `oklch(0 0 0 / 8%)` (`switch.tsx`), which composites on white to `#EBEBEB` — **1.20:1** against the surface. The thumb is `bg-white`, so it measures 1.20:1 against the track too, and thumb position is what conveys on/off. WCAG 1.4.11 asks 3:1 for the parts that identify a component and its state, so this is below the bar on both counts. `data-disabled:opacity-60` takes it to ~1.11:1, and the light hover step (8% → 12%) is a change of about 0.12 contrast points, i.e. not perceptible.
+
+Dark mode is fine at 20% white (≈1.88:1 against the dark page).
+
+Kept deliberately: the value looks right as shipped, and reaching 3:1 by fill alone needs roughly 42% black, which is a visually filled track rather than a subtle one. Recorded here rather than left implicit because the comment that used to carry the reasoning was removed when the tokens moved into the component, and an undocumented trade reads as an oversight to the next reviewer.
+
+If it is ever revisited, the cheaper route than darkening the fill is restoring a boundary: the pre-branch switch carried `inset-shadow-xs`, and a `--switch-track-ring` token at ≥3:1 against both the surface and the thumb would satisfy 1.4.11 without changing the track's weight.
+
 ### Filters
 
 Deferred / removed follow-ups pulled from the initial `filters` build (`registry/default/filters/`) to keep v1 tight. None are blocking; revisit when demand shows up.
@@ -108,7 +118,11 @@ What's left, and how safe each bucket is:
 Two things a blind find/replace gets wrong:
 
 - **Multi-var arbitrary values can't be converted.** The `(--x)` shorthand takes exactly one custom property, so `shadow-[var(--surface-shadow-3),var(--surface-rim-3)]` in `lib/elevated.tsx` has to stay bracketed. IntelliSense doesn't flag these, but a naive regex will eat them.
-- **Translate utilities are the Safari @property trap, and `drawer.tsx` is now converted.** Any Tailwind translate utility, bracketed (`translate-y-[var(--x)]`) or shorthand (`translate-y-(--x)`), compiles to `--tw-translate-y: <value>; translate: var(--tw-translate-x) var(--tw-translate-y)`. WebKit drops a registered custom property's `@starting-style` value when it is a `var()` reference and falls back to the registered `initial-value: 0`, so an enter animation starts from the wrong offset. An earlier version of this note claimed the bracketed form was the safe one; it is not, and the compiled CSS confirms both forms are identical. `drawer/drawer.tsx` had all 24 of them inside `data-starting-style` / `data-ending-style` variants and has been converted to direct `[translate:…]` arbitrary properties, which is what `transition-panel.tsx` already does and documents. Still worth a real Safari pass to confirm the original symptom is gone. Anything new that animates a translate off a `var()` under `@starting-style` should set `translate` directly rather than reach for the utility.
+- **Translate utilities are the Safari @property trap, and the obvious fix costs `cn()` overrides.** Any Tailwind translate utility, bracketed (`translate-y-[var(--x)]`) or shorthand (`translate-y-(--x)`), compiles to `--tw-translate-y: <value>; translate: var(--tw-translate-x) var(--tw-translate-y)`. WebKit drops a registered custom property's `@starting-style` value when it is a `var()` reference and falls back to the registered `initial-value: 0`, so an enter animation starts from the wrong offset. An earlier version of this note claimed the bracketed form was the safe one; it is not — both forms compile identically, confirmed against this repo's own compiler.
+
+  `drawer/drawer.tsx` has 24 of them inside `data-starting-style` / `data-ending-style` variants and is the only file affected. It was converted to direct `[translate:…]` arbitrary properties and then **reverted**, because that conversion is invisible to tailwind-merge: `twMerge("-translate-y-[calc(1.5rem)] translate-y-4")` resolves to `translate-y-4`, but `twMerge("[translate:0_calc(-1.5rem)] translate-y-4")` keeps both, and the arbitrary property wins on emission order. So `<DrawerContent className="translate-y-2">` would silently do nothing. Losing a documented `className` override is worse than a Safari-only enter-animation offset, so the utilities stay for now.
+
+  What a real fix needs: keep the value out of `--tw-translate-*` **and** stay mergeable. Most likely shape is a custom property the consumer sets (`--drawer-offset` already exists) with the component reading it, so `className` is not the override channel in the first place. `transition-panel.tsx` sets `translate` directly and documents it at the call site — it has no consumer-overridable offset, which is why the same trade does not bite there. Confirm the symptom in real Safari before spending more on it; it has never been reproduced here, only reasoned about.
 
 Also note `data-[variant=destructive]:` and other `key=value` forms are already canonical — only bare attribute-presence variants shorten.
 

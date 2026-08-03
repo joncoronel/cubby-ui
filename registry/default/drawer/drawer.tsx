@@ -78,50 +78,50 @@ const drawerContentVariants = cva(
         variant: "default",
         direction: "bottom",
         class:
-          "origin-bottom mx-auto max-h-[95dvh] w-full max-w-full rounded-t-2xl [translate:0_calc(-1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:[translate:0_var(--drawer-offset)] [&[data-ending-style]]:[translate:0_var(--drawer-offset)]",
+          "origin-bottom mx-auto max-h-[95dvh] w-full max-w-full rounded-t-2xl -translate-y-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-y-[var(--drawer-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-offset)]",
       },
       {
         variant: "default",
         direction: "top",
         class:
-          "origin-top mx-auto max-h-[95dvh] w-full max-w-full rounded-b-2xl [translate:0_calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:[translate:0_calc(var(--drawer-offset)*-1)] [&[data-ending-style]]:[translate:0_calc(var(--drawer-offset)*-1)]",
+          "origin-top mx-auto max-h-[95dvh] w-full max-w-full rounded-b-2xl translate-y-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-y-[var(--drawer-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-offset)]",
       },
       {
         variant: "default",
         direction: "right",
         class:
-          "origin-right max-w-screen w-screen sm:max-w-md [translate:calc(-1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:[translate:var(--drawer-offset)] [&[data-ending-style]]:[translate:var(--drawer-offset)]",
+          "origin-right max-w-screen w-screen sm:max-w-md -translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-x-[var(--drawer-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-offset)]",
       },
       {
         variant: "default",
         direction: "left",
         class:
-          "origin-left max-w-screen w-screen sm:max-w-md [translate:calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:[translate:calc(var(--drawer-offset)*-1)] [&[data-ending-style]]:[translate:calc(var(--drawer-offset)*-1)]",
+          "origin-left max-w-screen w-screen sm:max-w-md translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-x-[var(--drawer-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-offset)]",
       },
       // Floating variant - direction-specific sizing, transforms, and nesting origin/offset
       {
         variant: "floating",
         direction: "bottom",
         class:
-          "origin-bottom mx-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] [translate:0_calc(-1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:[translate:0_var(--drawer-offset)] [&[data-ending-style]]:[translate:0_var(--drawer-offset)]",
+          "origin-bottom mx-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] -translate-y-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-y-[var(--drawer-offset)] [&[data-ending-style]]:translate-y-[var(--drawer-offset)]",
       },
       {
         variant: "floating",
         direction: "top",
         class:
-          "origin-top mx-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] [translate:0_calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:[translate:0_calc(var(--drawer-offset)*-1)] [&[data-ending-style]]:[translate:0_calc(var(--drawer-offset)*-1)]",
+          "origin-top mx-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] translate-y-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-y-[var(--drawer-offset)] [&[data-ending-style]]:-translate-y-[var(--drawer-offset)]",
       },
       {
         variant: "floating",
         direction: "right",
         class:
-          "origin-right h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-md [translate:calc(-1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:[translate:var(--drawer-offset)] [&[data-ending-style]]:[translate:var(--drawer-offset)]",
+          "origin-right h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-md -translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:translate-x-[var(--drawer-offset)] [&[data-ending-style]]:translate-x-[var(--drawer-offset)]",
       },
       {
         variant: "floating",
         direction: "left",
         class:
-          "origin-left h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-md [translate:calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:[translate:calc(var(--drawer-offset)*-1)] [&[data-ending-style]]:[translate:calc(var(--drawer-offset)*-1)]",
+          "origin-left h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-md translate-x-[calc(1.5rem*max(0,var(--nested-dialogs,0)-var(--nested-drag-progress,0)))] [&[data-starting-style]]:-translate-x-[var(--drawer-offset)] [&[data-ending-style]]:-translate-x-[var(--drawer-offset)]",
       },
     ],
     defaultVariants: {

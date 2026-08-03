@@ -254,7 +254,12 @@ function Switch({
  * pair, and every caller that hand-assembled them was one rename away from
  * silently rendering a dead track.
  */
-type SwitchVisualProps = useRender.ComponentProps<"span"> & SwitchVariants;
+// `children` is omitted on purpose. mergeProps lets the rightmost object win
+// for anything that is not a handler, className or style, so a caller-passed
+// child would replace the thumb and leave a dead track — the exact failure
+// this component exists to make unrepresentable.
+type SwitchVisualProps = Omit<useRender.ComponentProps<"span">, "children"> &
+  SwitchVariants;
 
 function SwitchVisual({
   className,

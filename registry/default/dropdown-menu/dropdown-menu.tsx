@@ -21,11 +21,19 @@ import {
 const toggleItemClasses =
   "group/switch data-highlighted:bg-surface-hover data-highlighted:text-accent-foreground grid cursor-default items-center rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
 
-// The tick draws itself in on check. Tick02Icon is a single path of length
-// ~22, so dashoffset 22 hides it and 0 completes it; the classes reach the
-// path through the svg HugeiconsIcon renders.
+// The tick draws itself in on check. `pathLength` restates the path as 1 unit
+// long, so the dash values below are fractions of the stroke rather than a
+// hardcoded length — a future HugeIcons revision can reshape Tick02Icon
+// without stranding the number. HugeiconsIcon builds its paths from the icon
+// array, so this is the only way in; the classes then reach the rendered path
+// through the svg it returns.
+const tickIcon = Tick02Icon.map(([tag, attrs]) => [
+  tag,
+  { ...attrs, pathLength: 1 },
+]) as typeof Tick02Icon;
+
 const checkmarkClasses =
-  "[&_path]:ease-out-expo [&_path]:transition-[stroke-dashoffset] [&_path]:duration-150 [&_path]:[stroke-dasharray:22] in-data-checked:[&_path]:[stroke-dashoffset:0] in-data-unchecked:[&_path]:[stroke-dashoffset:22] motion-reduce:[&_path]:transition-none";
+  "[&_path]:ease-out-expo [&_path]:transition-[stroke-dashoffset] [&_path]:duration-150 [&_path]:[stroke-dasharray:1] in-data-checked:[&_path]:[stroke-dashoffset:0] in-data-unchecked:[&_path]:[stroke-dashoffset:1] motion-reduce:[&_path]:transition-none";
 
 function DropdownMenu<Payload = unknown>({
   ...props
@@ -316,7 +324,7 @@ function DropdownMenuCheckboxItem({
           className="col-start-2 flex items-center justify-center"
         >
           <HugeiconsIcon
-            icon={Tick02Icon}
+            icon={tickIcon}
             strokeWidth={2.5}
             className={cn("size-4", checkmarkClasses)}
           />
@@ -357,7 +365,7 @@ function DropdownMenuRadioItem({
         className="col-start-2 flex items-center justify-center"
       >
         <HugeiconsIcon
-          icon={Tick02Icon}
+          icon={tickIcon}
           strokeWidth={2.5}
           className={cn("size-4", checkmarkClasses)}
         />
@@ -470,7 +478,13 @@ function DropdownMenuSubContent({
           )}
           {...props}
         >
-          <div className="p-1">{children}</div>
+          {/* The popup above is capped at --available-height and clips, so the
+            scroll container has to live here or a tall submenu silently
+            truncates. The main popups get this from Menu.Viewport; a
+            submenu has none, so it is spelled out. */}
+          <div className="max-h-(--available-height) overflow-y-auto p-1">
+            {children}
+          </div>
         </BaseMenu.Popup>
       </DropdownMenuPositioner>
     </DropdownMenuPortal>

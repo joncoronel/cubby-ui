@@ -21,11 +21,19 @@ import {
 const toggleItemClasses =
   "group/switch data-highlighted:bg-surface-hover data-highlighted:text-accent-foreground grid cursor-default items-center rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
 
-// The tick draws itself in on check. Tick02Icon is a single path of length
-// ~22, so dashoffset 22 hides it and 0 completes it; the classes reach the
-// path through the svg HugeiconsIcon renders.
+// The tick draws itself in on check. `pathLength` restates the path as 1 unit
+// long, so the dash values below are fractions of the stroke rather than a
+// hardcoded length — a future HugeIcons revision can reshape Tick02Icon
+// without stranding the number. HugeiconsIcon builds its paths from the icon
+// array, so this is the only way in; the classes then reach the rendered path
+// through the svg it returns.
+const tickIcon = Tick02Icon.map(([tag, attrs]) => [
+  tag,
+  { ...attrs, pathLength: 1 },
+]) as typeof Tick02Icon;
+
 const checkmarkClasses =
-  "[&_path]:ease-out-expo [&_path]:transition-[stroke-dashoffset] [&_path]:duration-150 [&_path]:[stroke-dasharray:22] in-data-checked:[&_path]:[stroke-dashoffset:0] in-data-unchecked:[&_path]:[stroke-dashoffset:22] motion-reduce:[&_path]:transition-none";
+  "[&_path]:ease-out-expo [&_path]:transition-[stroke-dashoffset] [&_path]:duration-150 [&_path]:[stroke-dasharray:1] in-data-checked:[&_path]:[stroke-dashoffset:0] in-data-unchecked:[&_path]:[stroke-dashoffset:1] motion-reduce:[&_path]:transition-none";
 
 function ContextMenu({
   ...props
@@ -101,7 +109,11 @@ function ContextMenuContent({
           data-slot="context-menu-content"
           data-level={level}
           className={cn(
-            "text-popover-foreground relative z-50 min-w-[12rem] origin-(--transform-origin) overflow-hidden rounded-xl p-1 outline-none",
+            // No Menu.Viewport here (ContextMenu has no trigger-swap morph to run
+            // one for), so the popup is its own scroll container: capped at
+            // --available-height, clipping on x for the rounded corners and
+            // scrolling on y. Without the cap a tall menu runs off screen.
+            "text-popover-foreground relative z-50 max-h-(--available-height) min-w-[12rem] origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-xl p-1 outline-none",
             // Modern enter/exit — scale + fade from the transform origin, matching
             // popover/dropdown-menu (replaces the legacy animate-in/zoom/slide classes)
             "ease-out-expo transition-[scale,opacity] duration-100",
@@ -225,7 +237,7 @@ function ContextMenuCheckboxItem({
           className="col-start-2 flex items-center justify-center"
         >
           <HugeiconsIcon
-            icon={Tick02Icon}
+            icon={tickIcon}
             strokeWidth={2.5}
             className={cn("size-4", checkmarkClasses)}
           />
@@ -258,7 +270,7 @@ function ContextMenuRadioItem({
         className="col-start-2 flex items-center justify-center"
       >
         <HugeiconsIcon
-          icon={Tick02Icon}
+          icon={tickIcon}
           strokeWidth={2.5}
           className={cn("size-4", checkmarkClasses)}
         />
@@ -408,7 +420,11 @@ function ContextMenuSubContent({
           data-slot="context-menu-sub-content"
           data-level={level}
           className={cn(
-            "text-popover-foreground relative z-50 min-w-[12rem] origin-(--transform-origin) overflow-hidden rounded-xl p-1 outline-none",
+            // No Menu.Viewport here (ContextMenu has no trigger-swap morph to run
+            // one for), so the popup is its own scroll container: capped at
+            // --available-height, clipping on x for the rounded corners and
+            // scrolling on y. Without the cap a tall menu runs off screen.
+            "text-popover-foreground relative z-50 max-h-(--available-height) min-w-[12rem] origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-xl p-1 outline-none",
             // Modern enter/exit — scale + fade from the transform origin, matching
             // popover/dropdown-menu (replaces the legacy animate-in/zoom/slide classes)
             "ease-out-expo transition-[scale,opacity] duration-100",

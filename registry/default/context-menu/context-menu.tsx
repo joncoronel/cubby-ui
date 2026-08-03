@@ -118,15 +118,19 @@ function ContextMenuContent({
           data-slot="context-menu-content"
           data-level={level}
           className={cn(
-            "text-popover-foreground relative z-50 min-w-[12rem] origin-(--transform-origin) overflow-hidden rounded-xl p-1",
+            "text-popover-foreground relative z-50 min-w-[12rem] origin-(--transform-origin) overflow-hidden rounded-xl p-1 outline-none",
             // Modern enter/exit — scale + fade from the transform origin, matching
             // popover/dropdown-menu (replaces the legacy animate-in/zoom/slide classes)
             "ease-out-expo transition-[scale,opacity] duration-100",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
-            // Not suppressing on data-instant: Base UI marks every right-click open
-            // as instant="click" (contextmenu detail===0 looks like keyboard), which
-            // would kill the enter animation. Only honor reduced motion.
+            // No data-instant guard at all, deliberately. 'click' is inferred
+            // from `event.detail === 0`, which every right-click matches, so
+            // suppressing it would kill the enter animation on every open.
+            // 'dismiss' must animate, or Base UI has nothing to wait on and the
+            // popup unmounts with no exit. And 'group' / 'trigger-change'
+            // cannot fire here: the first needs a Menubar parent, the second
+            // needs detached triggers sharing one root.
             "motion-reduce:transition-none",
             solidSurface(level, shadowLevel),
             className,
@@ -408,13 +412,13 @@ function ContextMenuSubContent({
           data-slot="context-menu-sub-content"
           data-level={level}
           className={cn(
-            "text-popover-foreground relative z-50 min-w-[12rem] origin-(--transform-origin) overflow-hidden rounded-xl p-1",
+            "text-popover-foreground relative z-50 min-w-[12rem] origin-(--transform-origin) overflow-hidden rounded-xl p-1 outline-none",
             // Modern enter/exit — scale + fade from the transform origin, matching
             // popover/dropdown-menu (replaces the legacy animate-in/zoom/slide classes)
             "ease-out-expo transition-[scale,opacity] duration-100",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
-            // See ContextMenuContent: not suppressing on data-instant (right-click false positive).
+            // See ContextMenuContent for why there is no data-instant guard.
             "motion-reduce:transition-none",
             solidSurface(level, shadowLevel),
             className,

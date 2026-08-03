@@ -91,7 +91,7 @@ function DropdownMenuContent({
   return (
     <DropdownMenuPortal>
       <DropdownMenuPositioner
-        className="z-50 h-(--positioner-height) max-h-(--available-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-350 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none"
+        className="z-50 h-(--positioner-height) max-h-(--available-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none"
         sideOffset={sideOffset}
         align={align}
         side={side}
@@ -104,10 +104,10 @@ function DropdownMenuContent({
             // menus that both sit on this floor morph position and height but not
             // width. That is the accepted trade: menus narrower than 12rem read
             // as cramped, and width is the least visible of the three.
-            "text-popover-foreground relative min-w-[12rem] overflow-hidden rounded-xl",
+            "text-popover-foreground relative min-w-[12rem] overflow-hidden rounded-xl outline-none",
             solidSurface(level, shadowLevel),
             "h-(--popup-height,auto) w-(--popup-width,auto)",
-            "origin-(--transform-origin) transition-[width,height,scale,opacity] duration-[350ms,350ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
+            "origin-(--transform-origin) transition-[width,height,scale,opacity] duration-[150ms,150ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
             // Own compositor layer while mounted. The origin sits just above
@@ -120,7 +120,15 @@ function DropdownMenuContent({
             // irregular so there is no rhythm for the eye to lock onto.)
             "will-change-transform",
             "motion-reduce:transition-none motion-reduce:will-change-auto",
-            "data-instant:transition-none",
+            // 'trigger-change' fires once a detached-trigger swap has settled,
+            // so a later scroll or resize does not re-animate the whole
+            // journey. The other instants are deliberately left alone:
+            // 'dismiss' must still animate (Base UI waits on this transition
+            // before unmounting, so killing it means no exit at all), 'click'
+            // is inferred from `event.detail === 0` and so also matches
+            // right-clicks and programmatic .click(), and 'group' only ever
+            // fires for a menu parented to a Menubar.
+            "data-[instant=trigger-change]:transition-none",
             className,
           )}
           {...props}
@@ -133,23 +141,20 @@ function DropdownMenuContent({
               // Content width
               "**:data-current:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
               "**:data-previous:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
-              // Content base state and transitions
-              "**:data-current:translate-x-0 **:data-current:opacity-100",
-              "**:data-previous:translate-x-0 **:data-previous:opacity-100",
-              // Opacity lands at half the slide's duration so the incoming
-              // content is readable well before it stops moving.
-              "**:data-current:transition-[translate,opacity] **:data-current:duration-[350ms,175ms] **:data-current:ease-[cubic-bezier(0.22,1,0.36,1)]",
-              "**:data-previous:transition-[translate,opacity] **:data-previous:duration-[350ms,175ms] **:data-previous:ease-[cubic-bezier(0.22,1,0.36,1)]",
-              // Direction-aware slide animations for incoming content
-              "data-[activation-direction~=left]:**:data-current:data-starting-style:-translate-x-1/2",
-              "data-[activation-direction~=left]:**:data-current:data-starting-style:opacity-0",
-              "data-[activation-direction~=right]:**:data-current:data-starting-style:translate-x-1/2",
-              "data-[activation-direction~=right]:**:data-current:data-starting-style:opacity-0",
-              // Direction-aware slide animations for outgoing content
-              "data-[activation-direction~=left]:**:data-previous:data-ending-style:translate-x-1/2",
-              "data-[activation-direction~=left]:**:data-previous:data-ending-style:opacity-0",
-              "data-[activation-direction~=right]:**:data-previous:data-ending-style:-translate-x-1/2",
-              "data-[activation-direction~=right]:**:data-previous:data-ending-style:opacity-0",
+              // Non-directional crossfade, matching Popover: the two halves
+              // dissolve in place and both recede to 0.96, so the swap reads
+              // the same whichever trigger you came from and the popup's own
+              // width/height morph carries the movement.
+              "**:data-current:scale-100 **:data-current:opacity-100",
+              "**:data-previous:scale-100 **:data-previous:opacity-100",
+              "**:data-current:transition-[scale,opacity] **:data-current:duration-150 **:data-current:ease-[cubic-bezier(0.22,1,0.36,1)]",
+              "**:data-previous:transition-[scale,opacity] **:data-previous:duration-150 **:data-previous:ease-[cubic-bezier(0.22,1,0.36,1)]",
+              "**:data-current:data-starting-style:scale-[0.96] **:data-current:data-starting-style:opacity-0",
+              "**:data-previous:data-ending-style:scale-[0.96] **:data-previous:data-ending-style:opacity-0",
+              // Targets the content, not the viewport: the viewport has no
+              // transitions of its own and transition-property does not
+              // inherit, so a `data-instant:` rule here would be a no-op.
+              "[[data-instant]_&_[data-current]]:transition-none [[data-instant]_&_[data-previous]]:transition-none",
               "motion-reduce:**:data-current:transition-none motion-reduce:**:data-previous:transition-none",
             )}
           >
@@ -450,7 +455,7 @@ function DropdownMenuSubContent({
           data-slot="dropdown-menu-content"
           data-level={level}
           className={cn(
-            "text-popover-foreground relative min-w-[12rem] overflow-hidden rounded-xl",
+            "text-popover-foreground relative min-w-[12rem] overflow-hidden rounded-xl outline-none",
             solidSurface(level, shadowLevel),
             "ease-out-expo origin-(--transform-origin) transition-[transform,scale,opacity] duration-100",
             "data-starting-style:scale-95 data-starting-style:opacity-0",

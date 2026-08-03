@@ -101,7 +101,12 @@ function MenubarTrigger({
       delay={delay}
       closeDelay={closeDelay}
       className={cn(
-        "data-popup-open:text-accent-foreground hover:text-accent-foreground hover:bg-surface-hover data-popup-open:bg-surface-hover flex items-center rounded-sm px-2.5 py-1 text-sm font-medium outline-hidden select-none",
+        "data-popup-open:text-accent-foreground hover:text-accent-foreground hover:bg-surface-hover data-popup-open:bg-surface-hover flex items-center rounded-sm px-2.5 py-1 text-sm font-medium select-none",
+        // Menubar triggers are a real tab stop and arrowing between them moves
+        // DOM focus, so they need a visible indicator. `outline-offset-1`
+        // rather than the usual 2 because the triggers sit in a tight row and
+        // a wider ring would collide with its neighbours.
+        "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-1",
         className,
       )}
       {...props}
@@ -129,8 +134,15 @@ function MenubarContent({
 }) {
   return (
     <MenubarPortal>
+      {/*
+        No data-instant guard here, unlike DropdownMenu. There a single
+        positioner is shared by detached triggers and physically travels between
+        them, so a settled swap has a real journey worth suppressing. Each
+        MenubarMenu is its own Menu.Root, so every menu mounts its own
+        positioner with no previous position to animate from.
+      */}
       <BaseMenu.Positioner
-        className="z-50 h-(--positioner-height) max-h-(--available-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-350 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none"
+        className="z-50 h-(--positioner-height) max-h-(--available-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
         align={align}
         alignOffset={alignOffset}
         sideOffset={sideOffset}
@@ -139,10 +151,10 @@ function MenubarContent({
           data-slot="menubar-content"
           data-level={level}
           className={cn(
-            "text-popover-foreground relative min-w-[12rem] overflow-hidden rounded-xl",
+            "text-popover-foreground relative min-w-[12rem] overflow-hidden rounded-xl outline-none",
             solidSurface(level, shadowLevel),
             "h-(--popup-height,auto) w-(--popup-width,auto)",
-            "origin-(--transform-origin) transition-[width,height,scale,opacity] duration-[350ms,350ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
+            "origin-(--transform-origin) transition-[width,height,scale,opacity] duration-[150ms,150ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
             // Own compositor layer while mounted. Having width/height in the
@@ -153,7 +165,16 @@ function MenubarContent({
             // opacity alone and therefore gets composited for free.
             "will-change-transform",
             "motion-reduce:transition-none motion-reduce:will-change-auto",
-            "data-instant:transition-none",
+            // 'group' is the menubar case: moving from File to Edit, the menu
+            // is already open and only its content and position change, so it
+            // snaps rather than replaying the enter animation. The other
+            // instants are left alone: 'dismiss' must still animate (Base UI
+            // waits on this transition before unmounting, so killing it means
+            // no exit at all), 'click' is inferred from `event.detail === 0`
+            // and so also matches right-clicks and programmatic .click(), and
+            // 'trigger-change' cannot fire here because each MenubarMenu is its
+            // own Menu.Root with exactly one trigger.
+
             className,
           )}
           {...props}
@@ -443,7 +464,7 @@ function MenubarSubContent({
           data-slot="menubar-sub-content"
           data-level={level}
           className={cn(
-            "text-popover-foreground relative min-w-[12rem] overflow-hidden rounded-xl",
+            "text-popover-foreground relative min-w-[12rem] overflow-hidden rounded-xl outline-none",
             solidSurface(level, shadowLevel),
             // Submenus open as their own popup (no Viewport content-swap) — scale + fade
             "ease-out-expo origin-(--transform-origin) transition-[transform,scale,opacity] duration-100",

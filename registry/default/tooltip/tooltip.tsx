@@ -113,7 +113,7 @@ function TooltipContent({
             // mid-animation (a non-none scale creates one) and not at rest, so
             // an absolutely positioned arrow would change reference frame
             // partway through the open.
-            "text-popover-foreground relative h-(--popup-height,auto) w-(--popup-width,auto) origin-(--transform-origin) rounded-sm text-xs",
+            "text-popover-foreground relative h-(--popup-height,auto) w-(--popup-width,auto) origin-(--transform-origin) rounded-sm text-xs outline-none",
             solidSurface(level, shadowLevel),
             // No directional translate: the popup scales from
             // --transform-origin, which Base UI aims back at the trigger, so
@@ -129,14 +129,12 @@ function TooltipContent({
             "will-change-transform",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
-            // Tooltip's instant types are 'delay' | 'dismiss' | 'focus'. Only
-            // the first two should skip the animation: 'delay' is a swap inside
-            // a Provider group (or a sibling opening), 'focus' is keyboard
-            // driven. 'dismiss' is a click or Escape and must still animate out
-            // — suppressing it leaves Base UI nothing to wait on, so the popup
-            // unmounts with no exit at all.
+            // Suppress only the "already open, something changed" instants.
+            // 'delay' is a swap inside a Provider group (or a sibling opening).
+            // 'dismiss' and 'focus' are closes and opens: Base UI waits on this
+            // transition before unmounting, so killing it there means no exit
+            // animation at all.
             "data-[instant=delay]:transition-none",
-            "data-[instant=focus]:transition-none",
             "motion-reduce:transition-none motion-reduce:will-change-auto",
             className,
           )}

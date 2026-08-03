@@ -57,7 +57,7 @@ function PopoverPopup({
       data-slot="popover-popup"
       data-level={level}
       className={cn(
-        "text-popover-foreground relative max-h-(--available-height) max-w-(--available-width) origin-(--transform-origin) rounded-xl",
+        "text-popover-foreground relative max-h-(--available-height) max-w-(--available-width) origin-(--transform-origin) rounded-xl outline-none",
         solidSurface(level, shadowLevel),
         className,
       )}
@@ -157,7 +157,7 @@ function PopoverContent({
           data-level={level}
           className={cn(
             // Base styles
-            "text-popover-foreground relative",
+            "text-popover-foreground relative outline-none",
             "h-(--popup-height,auto) w-(--popup-width,auto)",
             "max-h-(--available-height) max-w-(--available-width)",
             "origin-(--transform-origin) overflow-hidden rounded-xl",
@@ -167,13 +167,12 @@ function PopoverContent({
             "transition-[width,height,scale,opacity] duration-[150ms,150ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
-            // Only the cases that should genuinely snap. Deliberately NOT
-            // `data-instant` broadly: Base UI also sets it to "focus" on
-            // focus-out, and clicking outside a focused popover fires that —
-            // killing the transition there leaves Base UI nothing to wait on,
-            // so the popup unmounts with no exit at all. "click" is keyboard
-            // activation (detail === 0), "trigger-change" is a settled swap.
-            "data-[instant=click]:transition-none",
+            // Suppress only the "already open, something changed" instants,
+            // never the open/close ones. Base UI waits on this transition
+            // before unmounting, so killing it on a close ('dismiss', or
+            // 'focus' from focus-out) means no exit animation at all. And
+            // 'click' is inferred from `event.detail === 0`, which is equally
+            // true of right-clicks and programmatic .click().
             "data-[instant=trigger-change]:transition-none",
             "motion-reduce:transition-none",
             className,

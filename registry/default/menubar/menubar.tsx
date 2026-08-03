@@ -145,7 +145,14 @@ function MenubarContent({
             "origin-(--transform-origin) transition-[width,height,scale,opacity] duration-[350ms,350ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
-            "motion-reduce:transition-none",
+            // Own compositor layer while mounted. Having width/height in the
+            // transition list above keeps Chrome from compositing the scale, so
+            // the rows re-raster every frame and the differential stretch (top
+            // edge ~0.2px, bottom ~7px) reads as a ripple down the list.
+            // ContextMenu escapes this only because it transitions scale and
+            // opacity alone and therefore gets composited for free.
+            "will-change-transform",
+            "motion-reduce:transition-none motion-reduce:will-change-auto",
             "data-instant:transition-none",
             className,
           )}
@@ -353,7 +360,10 @@ function MenubarSeparator({
   return (
     <BaseMenu.Separator
       data-slot="menubar-separator"
-      className={cn("bg-border -mx-1 my-1 h-px", className)}
+      // Inset to the item label, not the popup edge: mx-2.5 clears the
+      // viewport's p-1 plus the item's px-2.5, so the rule starts where the
+      // text does instead of running into the popup's rounded corners.
+      className={cn("bg-border mx-2.5 my-1 h-px", className)}
       {...props}
     />
   );

@@ -314,7 +314,10 @@ function ContextMenuSeparator({
   return (
     <BaseContextMenu.Separator
       data-slot="context-menu-separator"
-      className={cn("bg-border -mx-1 my-1 h-px", className)}
+      // Inset to the item label, not the popup edge: mx-2.5 clears the popup's
+      // p-1 plus the item's px-2.5, so the rule starts where the text does
+      // instead of running into the popup's rounded corners.
+      className={cn("bg-border mx-2.5 my-1 h-px", className)}
       {...props}
     />
   );

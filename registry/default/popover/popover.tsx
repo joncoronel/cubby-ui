@@ -150,7 +150,7 @@ function PopoverContent({
         sticky={sticky}
         positionMethod={positionMethod}
         arrowPadding={arrowPadding}
-        className="z-50 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-350 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none"
+        className="z-50 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none"
       >
         <BasePopover.Popup
           data-slot="popover-content"
@@ -164,9 +164,17 @@ function PopoverContent({
             // Surface elevation — bg tracks `level`, shadow weight tracks `shadowLevel`
             solidSurface(level, shadowLevel),
             // Size/opacity transitions
-            "transition-[width,height,scale,opacity] duration-[350ms,350ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
+            "transition-[width,height,scale,opacity] duration-[150ms,150ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
+            // Only the cases that should genuinely snap. Deliberately NOT
+            // `data-instant` broadly: Base UI also sets it to "focus" on
+            // focus-out, and clicking outside a focused popover fires that —
+            // killing the transition there leaves Base UI nothing to wait on,
+            // so the popup unmounts with no exit at all. "click" is keyboard
+            // activation (detail === 0), "trigger-change" is a settled swap.
+            "data-[instant=click]:transition-none",
+            "data-[instant=trigger-change]:transition-none",
             "motion-reduce:transition-none",
             className,
           )}
@@ -195,24 +203,22 @@ function PopoverContent({
               // Content width calculation (edge-to-edge minus padding)
               "**:data-current:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
               "**:data-previous:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
-              // Content base state and transitions
-              "**:data-current:translate-x-0 **:data-current:opacity-100",
-              "**:data-previous:translate-x-0 **:data-previous:opacity-100",
-              // Opacity lands at half the slide's duration so the incoming
-              // content is readable well before it stops moving.
-              "**:data-current:transition-[translate,opacity] **:data-current:duration-[350ms,175ms] **:data-current:ease-[cubic-bezier(0.22,1,0.36,1)]",
-              "**:data-previous:transition-[translate,opacity] **:data-previous:duration-[350ms,175ms] **:data-previous:ease-[cubic-bezier(0.22,1,0.36,1)]",
-              // Direction-aware slide animations for incoming content
-              "data-[activation-direction~=left]:**:data-current:data-starting-style:-translate-x-1/2",
-              "data-[activation-direction~=left]:**:data-current:data-starting-style:opacity-0",
-              "data-[activation-direction~=right]:**:data-current:data-starting-style:translate-x-1/2",
-              "data-[activation-direction~=right]:**:data-current:data-starting-style:opacity-0",
-              // Direction-aware slide animations for outgoing content
-              "data-[activation-direction~=left]:**:data-previous:data-ending-style:translate-x-1/2",
-              "data-[activation-direction~=left]:**:data-previous:data-ending-style:opacity-0",
-              "data-[activation-direction~=right]:**:data-previous:data-ending-style:-translate-x-1/2",
-              "data-[activation-direction~=right]:**:data-previous:data-ending-style:opacity-0",
-              "data-instant:transition-none",
+              // Non-directional crossfade, mirroring TransitionPanel's `fade`
+              // mode: the two halves dissolve in place rather than sliding past
+              // each other, so nothing implies travel and the popup's own
+              // width/height morph carries the movement on its own.
+              "**:data-current:scale-100 **:data-current:opacity-100",
+              "**:data-previous:scale-100 **:data-previous:opacity-100",
+              "**:data-current:transition-[scale,opacity] **:data-current:duration-150 **:data-current:ease-[cubic-bezier(0.22,1,0.36,1)]",
+              "**:data-previous:transition-[scale,opacity] **:data-previous:duration-150 **:data-previous:ease-[cubic-bezier(0.22,1,0.36,1)]",
+              // Both directions recede to 0.96, so the swap reads the same
+              // whichever trigger you came from.
+              "**:data-current:data-starting-style:scale-[0.96] **:data-current:data-starting-style:opacity-0",
+              "**:data-previous:data-ending-style:scale-[0.96] **:data-previous:data-ending-style:opacity-0",
+              // Must target the content, not the viewport: the viewport has no
+              // transitions of its own and transition-property does not
+              // inherit, so `data-instant:transition-none` here was a no-op.
+              "[[data-instant]_&_[data-current]]:transition-none [[data-instant]_&_[data-previous]]:transition-none",
               "motion-reduce:**:data-current:transition-none motion-reduce:**:data-previous:transition-none",
             )}
           >

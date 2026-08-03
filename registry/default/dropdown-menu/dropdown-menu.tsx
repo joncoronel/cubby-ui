@@ -110,7 +110,16 @@ function DropdownMenuContent({
             "origin-(--transform-origin) transition-[width,height,scale,opacity] duration-[350ms,350ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
-            "motion-reduce:transition-none",
+            // Own compositor layer while mounted. The origin sits just above
+            // the popup, so the 0.95 -> 1 scale stretches it downward: the top
+            // edge moves ~0.2px while the bottom moves ~7px. Every row lands on
+            // a different sub-pixel offset, and because menu rows are an evenly
+            // spaced stack of identical text, that differential reads as a
+            // ripple down the list. Promoted, the rows raster once and move
+            // together. (Popover shears more, ~7.6px, but its content is
+            // irregular so there is no rhythm for the eye to lock onto.)
+            "will-change-transform",
+            "motion-reduce:transition-none motion-reduce:will-change-auto",
             "data-instant:transition-none",
             className,
           )}

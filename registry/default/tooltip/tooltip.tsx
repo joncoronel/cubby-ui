@@ -90,20 +90,38 @@ function TooltipContent({
         sticky={sticky}
         positionMethod={positionMethod}
         arrowPadding={arrowPadding}
-        className="z-50 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-350 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none"
+        className="z-50 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none"
       >
         <BaseTooltip.Popup
           data-slot="tooltip-content"
           data-level={level}
           className={cn(
-            "text-popover-foreground h-(--popup-height,auto) w-(--popup-width,auto) origin-(--transform-origin) rounded-sm text-xs",
+            // `relative` matches Popover and pins the arrow's containing block.
+            // Without it the popup is a containing block only while `scale` is
+            // mid-animation (a non-none scale creates one) and not at rest, so
+            // an absolutely positioned arrow would change reference frame
+            // partway through the open.
+            "text-popover-foreground relative h-(--popup-height,auto) w-(--popup-width,auto) origin-(--transform-origin) rounded-sm text-xs",
             solidSurface(level, shadowLevel),
-            "transition-[width,height,scale,translate,opacity] duration-[350ms,350ms,100ms,175ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo),var(--ease-out-expo)]",
+            // No directional translate: the popup scales from
+            // --transform-origin, which Base UI aims back at the trigger, so
+            // the growth already reads as coming from the anchor. A per-side
+            // nudge on top of that is a second cue for the same thing.
+            "transition-[width,height,scale,opacity] duration-[150ms,150ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
+            // Own compositor layer while mounted. Without it the 0.95 -> 1
+            // scale re-lays-out and re-rasterises the label every frame, and at
+            // 12px the hinting snaps stems between pixels, which reads as the
+            // text crawling. Promoted, the glyphs raster once and the layer is
+            // scaled instead. Scoped to the popup, which only exists while the
+            // tooltip is shown, so nothing carries the hint at rest.
+            "will-change-transform",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
-            "data-starting-style:data-[side=bottom]:-translate-y-1 data-starting-style:data-[side=left]:translate-x-1 data-starting-style:data-[side=right]:-translate-x-1 data-starting-style:data-[side=top]:translate-y-1",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
-            "data-ending-style:data-[side=bottom]:-translate-y-1 data-ending-style:data-[side=left]:translate-x-1 data-ending-style:data-[side=right]:-translate-x-1 data-ending-style:data-[side=top]:translate-y-1",
-            "motion-reduce:transition-none",
+            // Base UI sets data-instant when a change should not animate —
+            // keyboard focus, dismiss. Without this the popup played its
+            // scale/fade anyway, even though the viewport below obeyed.
+            "data-instant:transition-none",
+            "motion-reduce:transition-none motion-reduce:will-change-auto",
             className,
           )}
           {...props}
@@ -117,12 +135,14 @@ function TooltipContent({
               // Content width and transitions
               "**:data-current:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
               "**:data-previous:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
+              // Straight crossfade, no scale: tooltip content is a line of
+              // text, and scaling it fights the popup's own scale rather than
+              // reading as a separate layer. The width/height morph carries
+              // the swap.
               "**:data-current:opacity-100 **:data-previous:opacity-100",
-              "**:data-current:transition-opacity **:data-current:duration-175 **:data-current:ease-[cubic-bezier(0.22,1,0.36,1)]",
-              "**:data-previous:transition-opacity **:data-previous:duration-175 **:data-previous:ease-[cubic-bezier(0.22,1,0.36,1)]",
-              // Fade in/out
+              "**:data-current:transition-opacity **:data-current:duration-150 **:data-current:ease-[cubic-bezier(0.22,1,0.36,1)]",
+              "**:data-previous:transition-opacity **:data-previous:duration-150 **:data-previous:ease-[cubic-bezier(0.22,1,0.36,1)]",
               "**:data-current:data-starting-style:opacity-0",
-              "**:data-current:data-ending-style:opacity-0",
               "**:data-previous:data-ending-style:opacity-0",
               // Truncate outgoing content as popup shrinks.
               "**:data-previous:truncate",

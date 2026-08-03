@@ -3991,7 +3991,7 @@ export const exampleRegistry = {
     {
       "title": "Basic",
       "importPath": "tooltip-basic",
-      "source": "import {\n  Tooltip,\n  TooltipContent,\n  TooltipTrigger,\n} from \"@/components/ui/cubby-ui/tooltip\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport { PlusSignIcon } from \"@hugeicons/core-free-icons\";\n\nexport default function TooltipBasic() {\n  return (\n    <Tooltip>\n      <TooltipTrigger render={<Button variant=\"outline\" size=\"icon\" />}>\n        <HugeiconsIcon icon={PlusSignIcon} size={16} strokeWidth={2} />\n        <span className=\"sr-only\">Add to library</span>\n      </TooltipTrigger>\n      <TooltipContent>\n        <p>Add to library</p>\n      </TooltipContent>\n    </Tooltip>\n  );\n}"
+      "source": "import {\n  Tooltip,\n  TooltipContent,\n  TooltipProvider,\n  TooltipTrigger,\n} from \"@/components/ui/cubby-ui/tooltip\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport { PlusSignIcon } from \"@hugeicons/core-free-icons\";\n\nexport default function TooltipBasic() {\n  return (\n    <TooltipProvider>\n      <Tooltip>\n        <TooltipTrigger render={<Button variant=\"outline\" size=\"icon\" />}>\n          <HugeiconsIcon icon={PlusSignIcon} size={16} strokeWidth={2} />\n          <span className=\"sr-only\">Add to library</span>\n        </TooltipTrigger>\n        <TooltipContent>\n          <p>Add to library</p>\n        </TooltipContent>\n      </Tooltip>\n    </TooltipProvider>\n  );\n}\n"
     },
     {
       "title": "Animated",
@@ -4006,7 +4006,7 @@ export const exampleRegistry = {
     {
       "title": "Detached Trigger",
       "importPath": "tooltip-detached-trigger",
-      "source": "\"use client\";\n\nimport {\n  Tooltip,\n  TooltipContent,\n  TooltipTrigger,\n  createTooltipHandle,\n} from \"@/components/ui/cubby-ui/tooltip\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport { InformationCircleIcon } from \"@hugeicons/core-free-icons\";\n\nconst infoTooltip = createTooltipHandle();\n\nexport default function TooltipDetachedTrigger() {\n  return (\n    <>\n      <TooltipTrigger\n        handle={infoTooltip}\n        render={<Button variant=\"outline\" size=\"icon\" />}\n      >\n        <HugeiconsIcon icon={InformationCircleIcon} size={16} strokeWidth={2} />\n        <span className=\"sr-only\">More information</span>\n      </TooltipTrigger>\n\n      <Tooltip handle={infoTooltip}>\n        <TooltipContent>\n          <p>This tooltip is connected via a handle</p>\n        </TooltipContent>\n      </Tooltip>\n    </>\n  );\n}\n"
+      "source": "\"use client\";\n\nimport {\n  Tooltip,\n  TooltipContent,\n  TooltipProvider,\n  TooltipTrigger,\n  createTooltipHandle,\n} from \"@/components/ui/cubby-ui/tooltip\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport { InformationCircleIcon } from \"@hugeicons/core-free-icons\";\n\nconst infoTooltip = createTooltipHandle();\n\nexport default function TooltipDetachedTrigger() {\n  return (\n    <TooltipProvider>\n      <TooltipTrigger\n        handle={infoTooltip}\n        render={<Button variant=\"outline\" size=\"icon\" />}\n      >\n        <HugeiconsIcon icon={InformationCircleIcon} size={16} strokeWidth={2} />\n        <span className=\"sr-only\">More information</span>\n      </TooltipTrigger>\n\n      <Tooltip handle={infoTooltip}>\n        <TooltipContent>\n          <p>This tooltip is connected via a handle</p>\n        </TooltipContent>\n      </Tooltip>\n    </TooltipProvider>\n  );\n}\n"
     }
   ],
   "transition-panel": [
@@ -4826,8 +4826,8 @@ export const componentAnatomy = {
     "anatomy": "<Toolbar>\n  <ToolbarGroup>\n    <ToolbarButton />\n  </ToolbarGroup>\n  <ToolbarSeparator />\n</Toolbar>"
   },
   "tooltip": {
-    "imports": "import {\n  Tooltip,\n  TooltipContent,\n  TooltipTrigger,\n} from \"@/components/ui/cubby-ui/tooltip\";",
-    "anatomy": "<Tooltip>\n  <TooltipTrigger />\n  <TooltipContent />\n</Tooltip>"
+    "imports": "import {\n  Tooltip,\n  TooltipContent,\n  TooltipProvider,\n  TooltipTrigger,\n} from \"@/components/ui/cubby-ui/tooltip\";",
+    "anatomy": "<TooltipProvider>\n  <Tooltip>\n    <TooltipTrigger />\n    <TooltipContent />\n  </Tooltip>\n</TooltipProvider>"
   },
   "transition-panel": {
     "imports": "import {\n  TransitionPanel,\n  TransitionPanelView,\n} from \"@/components/ui/cubby-ui/transition-panel\";",

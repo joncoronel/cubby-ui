@@ -34,6 +34,32 @@ Tooltip
 
 `TooltipContent` composes the portal, positioner, popup, and optional arrow internally, so you pass your label directly inside it. Wrap your app in `TooltipProvider` to share open and close timing across tooltips.
 
+## Timing
+
+Three props control when a tooltip appears and disappears.
+
+| Prop         | Where                               | Default | Description                                                        |
+| ------------ | ----------------------------------- | ------- | ------------------------------------------------------------------ |
+| `delay`      | `TooltipProvider`, `TooltipTrigger` | `200`   | Time the cursor must rest before opening.                          |
+| `closeDelay` | `TooltipProvider`, `TooltipTrigger` | `0`     | Time before closing once the cursor leaves.                        |
+| `timeout`    | `TooltipProvider`                   | `400`   | Window after one tooltip closes in which the next opens instantly. |
+
+`timeout` is what makes a row of icon buttons feel responsive: hover the first, then move along the row, and the rest appear with no wait. It only applies inside a `TooltipProvider`, which is why every example here is wrapped in one.
+
+```tsx
+<TooltipProvider delay={400} closeDelay={100} timeout={600}>
+  {/* every tooltip below shares this timing */}
+</TooltipProvider>
+```
+
+Set `delay` on an individual `TooltipTrigger` to override the provider for one tooltip. A trigger-level `delay` always wins, so leave it unset when you want the provider's value.
+
+```tsx
+<TooltipTrigger delay={0}>Opens immediately</TooltipTrigger>
+```
+
+Without a `TooltipProvider` there is no shared timing and no instant-reopen window, and Base UI's own `600` delay applies unless you set one per trigger.
+
 ## Examples
 
 ### Detached Trigger
@@ -104,9 +130,7 @@ users.map((user) => (
 
 // One shared tooltip that renders based on the active trigger:
 <Tooltip handle={handle}>
-  <TooltipContent>
-    {({ payload: user }) => <p>{user?.name}</p>}
-  </TooltipContent>
+  <TooltipContent>{({ payload: user }) => <p>{user?.name}</p>}</TooltipContent>
 </Tooltip>;
 ```
 
@@ -189,10 +213,16 @@ Composed component for common tooltip layouts. Combines `Tooltip.Portal`, `Toolt
 </ApiProp>
 
 <ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="2">
-  Surface elevation level. Tooltip defaults to `2` (lightest tier), quieter than popovers and dropdowns. See the [Surfaces](/docs/getting-started/surfaces) docs.
+  Surface elevation level. Tooltip defaults to `2` (lightest tier), quieter than
+  popovers and dropdowns. See the [Surfaces](/docs/getting-started/surfaces)
+  docs.
 </ApiProp>
 
-<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="2">
+<ApiProp
+  name="shadowLevel"
+  fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8"
+  defaultValue="2"
+>
   Shadow weight. Defaults to `2` to match the lightweight visual of tooltips.
 </ApiProp>
 
@@ -204,3 +234,4 @@ Our implementation changes the following Base UI prop defaults:
 
 - **TooltipContent**: `sideOffset` defaults to `8` (Base UI defaults to `0`)
 - **TooltipContent**: `collisionPadding` defaults to `10` (Base UI defaults to `5`)
+- **TooltipProvider**: `delay` defaults to `200` (Base UI falls back to `600`)

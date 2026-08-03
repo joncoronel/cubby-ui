@@ -3,6 +3,7 @@
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
   createTooltipHandle,
 } from "@/registry/default/tooltip/tooltip";
@@ -14,7 +15,7 @@ const infoTooltip = createTooltipHandle();
 
 export default function TooltipDetachedTrigger() {
   return (
-    <>
+    <TooltipProvider>
       <TooltipTrigger
         handle={infoTooltip}
         render={<Button variant="outline" size="icon" />}
@@ -28,6 +29,6 @@ export default function TooltipDetachedTrigger() {
           <p>This tooltip is connected via a handle</p>
         </TooltipContent>
       </Tooltip>
-    </>
+    </TooltipProvider>
   );
 }

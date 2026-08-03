@@ -8,9 +8,21 @@ import {
 } from "@/registry/default/lib/elevated";
 
 function TooltipProvider({
+  // Base UI's own default is 600ms, which reads as sluggish for a label that
+  // mostly confirms what an icon already implies. Set here rather than on
+  // TooltipTrigger because the trigger's `delay` *wins* over the provider's
+  // (`delay ?? providerDelay ?? 600`), so a default there would make
+  // `<TooltipProvider delay>` impossible to honour.
+  delay = 200,
   ...props
 }: React.ComponentProps<typeof BaseTooltip.Provider>) {
-  return <BaseTooltip.Provider data-slot="tooltip-provider" {...props} />;
+  return (
+    <BaseTooltip.Provider
+      data-slot="tooltip-provider"
+      delay={delay}
+      {...props}
+    />
+  );
 }
 
 function Tooltip<Payload = unknown>({
@@ -117,10 +129,14 @@ function TooltipContent({
             "will-change-transform",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
-            // Base UI sets data-instant when a change should not animate —
-            // keyboard focus, dismiss. Without this the popup played its
-            // scale/fade anyway, even though the viewport below obeyed.
-            "data-instant:transition-none",
+            // Tooltip's instant types are 'delay' | 'dismiss' | 'focus'. Only
+            // the first two should skip the animation: 'delay' is a swap inside
+            // a Provider group (or a sibling opening), 'focus' is keyboard
+            // driven. 'dismiss' is a click or Escape and must still animate out
+            // — suppressing it leaves Base UI nothing to wait on, so the popup
+            // unmounts with no exit at all.
+            "data-[instant=delay]:transition-none",
+            "data-[instant=focus]:transition-none",
             "motion-reduce:transition-none motion-reduce:will-change-auto",
             className,
           )}

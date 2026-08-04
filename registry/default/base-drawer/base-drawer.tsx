@@ -29,11 +29,8 @@ import {
 } from "@hugeicons/core-free-icons";
 
 // The tick draws itself in on check. `pathLength` restates the path as 1 unit
-// long, so the dash values below are fractions of the stroke rather than a
-// hardcoded length — a future HugeIcons revision can reshape Tick02Icon
-// without stranding the number. HugeiconsIcon builds its paths from the icon
-// array, so this is the only way in; the classes then reach the rendered path
-// through the svg it returns.
+// long, so the dash values are fractions of the stroke and survive a HugeIcons
+// reshape. Deriving the icon array is the only way to reach the path.
 const tickIcon = Tick02Icon.map(([tag, attrs]) => [
   tag,
   { ...attrs, pathLength: 1 },
@@ -698,8 +695,6 @@ function BaseDrawerMenuCheckboxItem({
           render={<CheckboxPrimitive.Indicator keepMounted />}
         />
       ) : (
-        // Checkbox.Indicator does not inject aria-hidden the way the menu
-        // primitives do, and the glyph sits inside the row's accessible name.
         <CheckboxPrimitive.Indicator
           className="col-start-2 flex items-center justify-center"
           aria-hidden

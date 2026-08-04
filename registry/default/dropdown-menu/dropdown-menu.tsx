@@ -22,11 +22,8 @@ const toggleItemClasses =
   "group/switch data-highlighted:bg-surface-hover data-highlighted:text-accent-foreground grid cursor-default items-center rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
 
 // The tick draws itself in on check. `pathLength` restates the path as 1 unit
-// long, so the dash values below are fractions of the stroke rather than a
-// hardcoded length — a future HugeIcons revision can reshape Tick02Icon
-// without stranding the number. HugeiconsIcon builds its paths from the icon
-// array, so this is the only way in; the classes then reach the rendered path
-// through the svg it returns.
+// long, so the dash values are fractions of the stroke and survive a HugeIcons
+// reshape. Deriving the icon array is the only way to reach the path.
 const tickIcon = Tick02Icon.map(([tag, attrs]) => [
   tag,
   { ...attrs, pathLength: 1 },
@@ -101,24 +98,18 @@ function DropdownMenuContent({
             "origin-(--transform-origin) transition-[width,height,scale,opacity] duration-[150ms,150ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
-            // Own compositor layer while mounted. The origin sits just above
-            // the popup, so the 0.95 -> 1 scale stretches it downward: the top
-            // edge moves ~0.2px while the bottom moves ~7px. Every row lands on
-            // a different sub-pixel offset, and because menu rows are an evenly
-            // spaced stack of identical text, that differential reads as a
-            // ripple down the list. Promoted, the rows raster once and move
-            // together. (Popover shears more, ~7.6px, but its content is
-            // irregular so there is no rhythm for the eye to lock onto.)
+            // Own compositor layer while mounted. The scale stretches the popup
+            // downward from an origin just above it, so the top edge moves
+            // ~0.2px and the bottom ~7px; every row lands on a different
+            // sub-pixel offset, which on an evenly spaced stack of identical
+            // text reads as a ripple. Promoted, the rows raster once.
             "will-change-transform",
             "motion-reduce:transition-none motion-reduce:will-change-auto",
-            // 'trigger-change' fires once a detached-trigger swap has settled,
-            // so a later scroll or resize does not re-animate the whole
-            // journey. The other instants are deliberately left alone:
-            // 'dismiss' must still animate (Base UI waits on this transition
-            // before unmounting, so killing it means no exit at all), 'click'
-            // is inferred from `event.detail === 0` and so also matches
-            // right-clicks and programmatic .click(), and 'group' only ever
-            // fires for a menu parented to a Menubar.
+            // Only 'trigger-change', which fires once a detached-trigger swap has
+            // settled. The others must animate: Base UI waits on this transition
+            // before unmounting, so suppressing 'dismiss' means no exit at all,
+            // and 'click' is inferred from `event.detail === 0`, which every
+            // right-click matches.
             "data-[instant=trigger-change]:transition-none",
             className,
           )}
@@ -127,17 +118,13 @@ function DropdownMenuContent({
           <BaseMenu.Viewport
             data-slot="dropdown-menu-viewport"
             className={cn(
-              // Bounded here rather than inherited from the popup: `h-full`
-              // is `height: 100%` against a parent whose specified height is
-              // `--popup-height`, the literal `auto` at rest, so the
-              // percentage stays indefinite and the viewport grows to its
-              // content. scrollHeight then always equals clientHeight and the
-              // overflow-y below can never engage. Capping the viewport gives
-              // it a definite bound and leaves the popup's height free to
-              // animate for the morph.
-              // `max-w` is deliberately absent: `w-full` resolves against the
-              // popup's already-capped content box, so the width bound is
-              // inherited for free. Only the height needs restating here.
+              // Bounded here, not inherited: `h-full` resolves against the popup's
+              // specified height, which is the literal `auto` at rest, so the
+              // percentage stays indefinite and the viewport grows to its content
+              // instead. scrollHeight would always equal clientHeight and the
+              // overflow-y below could never engage.
+              // No `max-w`: `w-full` resolves against the popup's already-capped
+              // content box, so the width bound is inherited for free.
               "relative max-h-(--available-height) w-full overflow-clip p-1 [--viewport-padding:0.25rem]",
               "not-data-transitioning:overflow-y-auto",
               // Content width
@@ -153,10 +140,9 @@ function DropdownMenuContent({
               "**:data-previous:transition-[scale,opacity] **:data-previous:duration-150 **:data-previous:ease-[cubic-bezier(0.22,1,0.36,1)]",
               "**:data-current:data-starting-style:scale-[0.96] **:data-current:data-starting-style:opacity-0",
               "**:data-previous:data-ending-style:scale-[0.96] **:data-previous:data-ending-style:opacity-0",
-              // Value-matched to the popup's own guard above, so one policy governs
-              // the whole subtree. Targets the content, not the viewport: the
-              // viewport has no transitions of its own and transition-property does
-              // not inherit, so a rule here would be a no-op.
+              // Value-matched to the popup's guard above so one policy governs the
+              // subtree. Targets the content: the viewport has no transitions of
+              // its own and transition-property does not inherit.
               "[[data-instant=trigger-change]_&_[data-current]]:transition-none [[data-instant=trigger-change]_&_[data-previous]]:transition-none",
               "motion-reduce:**:data-current:transition-none motion-reduce:**:data-previous:transition-none",
             )}
@@ -313,10 +299,9 @@ function DropdownMenuCheckboxItem({
         {children}
       </span>
       {indicator === "switch" ? (
-        // Visual only, and non-interactive: the row itself carries the role and
-        // the click target, so nesting a real Switch here would put a focusable
-        // control inside a menuitemcheckbox. Base UI's indicator supplies the
-        // aria-hidden.
+        // Visual only: the row carries the role and the click target, so a real
+        // Switch here would nest a focusable control inside a menuitemcheckbox.
+        // Base UI's indicator supplies the aria-hidden.
         <SwitchVisual
           color={switchColor}
           shape={switchShape}

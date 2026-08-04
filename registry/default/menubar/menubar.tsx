@@ -20,11 +20,8 @@ const toggleItemClasses =
   "group/switch data-highlighted:bg-surface-hover data-highlighted:text-accent-foreground grid cursor-default items-center rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
 
 // The tick draws itself in on check. `pathLength` restates the path as 1 unit
-// long, so the dash values below are fractions of the stroke rather than a
-// hardcoded length — a future HugeIcons revision can reshape Tick02Icon
-// without stranding the number. HugeiconsIcon builds its paths from the icon
-// array, so this is the only way in; the classes then reach the rendered path
-// through the svg it returns.
+// long, so the dash values are fractions of the stroke and survive a HugeIcons
+// reshape. Deriving the icon array is the only way to reach the path.
 const tickIcon = Tick02Icon.map(([tag, attrs]) => [
   tag,
   { ...attrs, pathLength: 1 },
@@ -125,13 +122,9 @@ function MenubarContent({
 }) {
   return (
     <MenubarPortal>
-      {/*
-        No data-instant guard here, unlike DropdownMenu. There a single
-        positioner is shared by detached triggers and physically travels between
-        them, so a settled swap has a real journey worth suppressing. Each
-        MenubarMenu is its own Menu.Root, so every menu mounts its own
-        positioner with no previous position to animate from.
-      */}
+      {/* No guard here, unlike DropdownMenu: there one positioner is shared by
+          detached triggers and physically travels between them. Each MenubarMenu
+          mounts its own, with no previous position to animate from. */}
       <BaseMenu.Positioner
         className="z-50 h-(--positioner-height) max-h-(--available-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
         align={align}
@@ -148,27 +141,19 @@ function MenubarContent({
             "origin-(--transform-origin) transition-[width,height,scale,opacity] duration-[150ms,150ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
-            // Own compositor layer while mounted. Having width/height in the
-            // transition list above keeps Chrome from compositing the scale, so
-            // the rows re-raster every frame and the differential stretch (top
-            // edge ~0.2px, bottom ~7px) reads as a ripple down the list.
-            // ContextMenu escapes this only because it transitions scale and
-            // opacity alone and therefore gets composited for free.
+            // Own compositor layer while mounted. width/height in the transition
+            // list stops Chrome compositing the scale, so rows re-raster every
+            // frame and the differential stretch reads as a ripple. ContextMenu
+            // escapes it by transitioning scale and opacity alone.
             "will-change-transform",
             "motion-reduce:transition-none motion-reduce:will-change-auto",
-            // No data-instant guard at all, deliberately. 'group' is the
-            // menubar case — moving from File to Edit — and suppressing it is
-            // the conventional choice. We let it animate instead. Each
-            // MenubarMenu is its own Menu.Root with its own popup, so the swap
-            // is a genuine unmount and mount rather than a morph of one
-            // element; a guard would snap the enter and exit of two separate
-            // popups, where letting them run reads as a crossfade between the
-            // two. The other instants were never candidates: 'dismiss' must
-            // animate or Base UI has nothing to wait on and the popup unmounts
-            // with no exit, 'click' is inferred from `event.detail === 0` and
-            // so also matches right-clicks and programmatic .click(), and
-            // 'trigger-change' cannot fire here because each MenubarMenu is its
-            // own Menu.Root with exactly one trigger.
+            // No data-instant guard, deliberately. 'group' is the menubar case,
+            // File to Edit, and suppressing it is the conventional choice. Each
+            // MenubarMenu owns its popup, so the swap is a real unmount and
+            // mount: a guard would snap two separate animations where letting
+            // them run reads as a crossfade. 'dismiss' must animate or there is
+            // no exit, and 'trigger-change' cannot fire with one trigger per
+            // root.
             className,
           )}
           {...props}
@@ -189,9 +174,8 @@ function MenubarContent({
           */}
           <BaseMenu.Viewport
             data-slot="menubar-viewport"
-            // `max-w` is deliberately absent: `w-full` resolves against the
-            // popup's already-capped content box, so the width bound is
-            // inherited for free. Only the height needs restating here.
+            // No `max-w`: `w-full` resolves against the popup's already-capped
+            // content box, so the width bound is inherited for free.
             className="relative max-h-(--available-height) w-full overflow-clip overflow-y-auto p-1"
           >
             {children}
@@ -288,10 +272,9 @@ function MenubarCheckboxItem({
         {children}
       </span>
       {indicator === "switch" ? (
-        // Visual only, and non-interactive: the row itself carries the role and
-        // the click target, so nesting a real Switch here would put a focusable
-        // control inside a menuitemcheckbox. Base UI's indicator supplies the
-        // aria-hidden.
+        // Visual only: the row carries the role and the click target, so a real
+        // Switch here would nest a focusable control inside a menuitemcheckbox.
+        // Base UI's indicator supplies the aria-hidden.
         <SwitchVisual
           color={switchColor}
           shape={switchShape}

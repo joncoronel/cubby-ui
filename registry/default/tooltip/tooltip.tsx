@@ -129,11 +129,9 @@ function TooltipContent({
             "will-change-transform",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
-            // Suppress only the "already open, something changed" instants.
-            // 'delay' is a swap inside a Provider group (or a sibling opening).
-            // 'dismiss' and 'focus' are closes and opens: Base UI waits on this
-            // transition before unmounting, so killing it there means no exit
-            // animation at all.
+            // Only 'delay', the swap inside a Provider group. 'dismiss' and 'focus'
+            // are closes: Base UI waits on this transition before unmounting, so
+            // suppressing them means no exit at all.
             "data-[instant=delay]:transition-none",
             "motion-reduce:transition-none motion-reduce:will-change-auto",
             className,
@@ -144,17 +142,13 @@ function TooltipContent({
             data-slot="tooltip-viewport"
             className={cn(
               // Base viewport styles
-              // Bounded here rather than inherited from the popup: `h-full`
-              // is `height: 100%` against a parent whose specified height is
-              // `--popup-height`, the literal `auto` at rest, so the
-              // percentage stays indefinite and the viewport grows to its
-              // content. scrollHeight then always equals clientHeight and the
-              // overflow-y below can never engage. Capping the viewport gives
-              // it a definite bound and leaves the popup's height free to
-              // animate for the morph.
-              // `max-w` is deliberately absent: `w-full` resolves against the
-              // popup's already-capped content box, so the width bound is
-              // inherited for free. Only the height needs restating here.
+              // Bounded here, not inherited: `h-full` resolves against the popup's
+              // specified height, which is the literal `auto` at rest, so the
+              // percentage stays indefinite and the viewport grows to its content
+              // instead. scrollHeight would always equal clientHeight and the
+              // overflow-y below could never engage.
+              // No `max-w`: `w-full` resolves against the popup's already-capped
+              // content box, so the width bound is inherited for free.
               "relative max-h-(--available-height) w-full overflow-clip px-2 py-1.5 [--viewport-padding:0.5rem]",
               "not-data-transitioning:overflow-y-auto",
               // Content width and transitions
@@ -172,10 +166,9 @@ function TooltipContent({
               // Truncate outgoing content as popup shrinks.
               "**:data-previous:truncate",
               // Disable transitions when instant or motion-reduce
-              // Value-matched to the popup's own guard above, so one policy governs
-              // the whole subtree. Targets the content, not the viewport: the
-              // viewport has no transitions of its own and transition-property does
-              // not inherit, so a rule here would be a no-op.
+              // Value-matched to the popup's guard above so one policy governs the
+              // subtree. Targets the content: the viewport has no transitions of
+              // its own and transition-property does not inherit.
               "[[data-instant=delay]_&_[data-current]]:transition-none [[data-instant=delay]_&_[data-previous]]:transition-none",
               "motion-reduce:**:data-current:transition-none motion-reduce:**:data-previous:transition-none",
             )}

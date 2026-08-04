@@ -45,7 +45,7 @@ For anything outside the scale, set `--switch-fill` on the switch or any ancesto
 <Switch className="[--switch-fill:var(--color-emerald-600)]" />
 ```
 
-Each preset pairs its fill with a matching thumb while checked, so `neutral` gets a dark thumb in dark mode where white would vanish. Unchecked, the thumb is white on every preset. A custom fill keeps the white thumb, which disappears against a light colour, so set `--switch-thumb` alongside it. Qualify it with `data-checked:` when the thumb you want is dark: unqualified it applies to both states, and the unchecked track is a translucent overlay that a dark thumb vanishes into. Like `--switch-fill`, it works from an ancestor too:
+Each preset also sets the thumb while checked, so `neutral` gets a dark thumb in dark mode where white would vanish. A custom fill keeps the white thumb, so set `--switch-thumb` when the fill is light. Qualify it with `data-checked:`, or the dark thumb also lands on the unchecked track and disappears into it:
 
 ```tsx
 <Switch className="[--switch-fill:var(--color-amber-300)] data-checked:[--switch-thumb:var(--color-amber-950)]" />
@@ -96,7 +96,7 @@ Use `motion` to set what the thumb does while the switch toggles.
 | `default` | The thumb slides across at a constant width.                               |
 | `stretch` | The leading edge crosses first, so the thumb spans the track and flattens. |
 
-Hover and press behave the same either way. The thumb widens on hover, widens further and flattens on press, and always reaches into the empty half of the track. Both respond to a `group/switch` ancestor as well as to the switch itself, so `Label className="group/switch"` makes a whole row drive the thumb; menu items already do this. The group is named on purpose: a bare `group` would let any ancestor a consumer marks for an unrelated hover effect drive every switch inside it.
+Hover and press behave the same either way: the thumb widens on hover, widens further and flattens on press. Both respond to a `group/switch` ancestor, so `Label className="group/switch"` makes a whole row drive the thumb. Menu items already do this.
 
 To retune, set `--switch-press-squash` (use `0` to drop the flattening), `--switch-hover-ext`, `--switch-press-ext`, or `--switch-duration`:
 
@@ -168,6 +168,6 @@ Toggle control for binary on/off states. Wraps Base UI's `Switch.Root` and `Swit
 
 </ApiPropsList>
 
-Switch has no `variant` prop: colour is its own `color` prop, which keeps `variant` free for a future treatment axis. The unchecked track uses `--switch-track`, a translucent overlay that adapts to whatever substrate it sits on, so one colour works on a page, a Card, or a toolbar. The thumb is white unchecked, and follows the `color` preset's foreground while checked. Set `--switch-track` and `--switch-track-hover` to retune the track and its hover step. See the [Surfaces](/docs/getting-started/surfaces) docs.
+Colour lives on `color` rather than a `variant` prop. The unchecked track uses `--switch-track`, a translucent overlay that adapts to whatever [surface](/docs/getting-started/surfaces) it sits on, so one colour works on a page, a Card, or a toolbar. Set `--switch-track` and `--switch-track-hover` to retune it.
 
-The 2px inset around the thumb is a fixed offset rather than space the layout divides, and the track width, thumb width and travel distance are snapped to whole pixels with CSS `round()`, so a `p-*` class will not change it. The checked track's hover step uses relative color syntax (`oklch(from ...)`), available in all current browsers; in older ones without support the hovered track renders transparent, so apply your own hover with a `supports-*` variant if you target those. The motion runs off registered custom properties, so it needs `@property`. Those registrations ship in `switch.css`, which the component imports itself: nothing to wire up, but drop that import and the switch changes state without animating, the same as under `prefers-reduced-motion`.
+The 2px inset and the track, thumb and travel dimensions are snapped to whole pixels with CSS `round()`, so a `p-*` class will not change them. The checked track's hover step uses relative color syntax (`oklch(from ...)`), which every current browser supports; older ones render the hovered track transparent, so add your own hover with a `supports-*` variant if you target them. The motion needs the `@property` registrations in `switch.css`, which the component imports itself: nothing to wire up, but drop that import and the switch toggles without animating.

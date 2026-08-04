@@ -167,12 +167,10 @@ function PopoverContent({
             "transition-[width,height,scale,opacity] duration-[150ms,150ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
-            // Suppress only the "already open, something changed" instants,
-            // never the open/close ones. Base UI waits on this transition
-            // before unmounting, so killing it on a close ('dismiss', or
-            // 'focus' from focus-out) means no exit animation at all. And
-            // 'click' is inferred from `event.detail === 0`, which is equally
-            // true of right-clicks and programmatic .click().
+            // Only the "already open, something changed" instant. Base UI waits on
+            // this transition before unmounting, so suppressing a close means no
+            // exit at all, and 'click' is inferred from `event.detail === 0`,
+            // which every right-click matches.
             "data-[instant=trigger-change]:transition-none",
             "motion-reduce:transition-none",
             className,
@@ -196,17 +194,13 @@ function PopoverContent({
           <BasePopover.Viewport
             data-slot="popover-viewport"
             className={cn(
-              // Height is bounded here rather than inherited from the popup.
-              // `h-full` would be `height: 100%` against a parent whose
-              // specified height is `--popup-height` — the literal `auto` at
-              // rest — so the percentage stays indefinite and the viewport
-              // grows to its content instead. scrollHeight then always equals
-              // clientHeight and the overflow-y below can never engage. Capping
-              // the viewport itself gives it a definite bound while leaving the
-              // popup's height free to animate for the morph.
-              // `max-w` is deliberately absent: `w-full` resolves against the
-              // popup's already-capped content box, so the width bound is
-              // inherited for free. Only the height needs restating here.
+              // Bounded here, not inherited: `h-full` resolves against the popup's
+              // specified height, which is the literal `auto` at rest, so the
+              // percentage stays indefinite and the viewport grows to its content
+              // instead. scrollHeight would always equal clientHeight and the
+              // overflow-y below could never engage.
+              // No `max-w`: `w-full` resolves against the popup's already-capped
+              // content box, so the width bound is inherited for free.
               "relative max-h-(--available-height) w-full overflow-clip px-3 py-3 [--viewport-padding:0.75rem]",
               "not-data-transitioning:overflow-y-auto",
               // Content width calculation (edge-to-edge minus padding)
@@ -224,10 +218,9 @@ function PopoverContent({
               // whichever trigger you came from.
               "**:data-current:data-starting-style:scale-[0.96] **:data-current:data-starting-style:opacity-0",
               "**:data-previous:data-ending-style:scale-[0.96] **:data-previous:data-ending-style:opacity-0",
-              // Value-matched to the popup's own guard above, so one policy governs
-              // the whole subtree. Targets the content, not the viewport: the
-              // viewport has no transitions of its own and transition-property does
-              // not inherit, so a rule here would be a no-op.
+              // Value-matched to the popup's guard above so one policy governs the
+              // subtree. Targets the content: the viewport has no transitions of
+              // its own and transition-property does not inherit.
               "[[data-instant=trigger-change]_&_[data-current]]:transition-none [[data-instant=trigger-change]_&_[data-previous]]:transition-none",
               "motion-reduce:**:data-current:transition-none motion-reduce:**:data-previous:transition-none",
             )}

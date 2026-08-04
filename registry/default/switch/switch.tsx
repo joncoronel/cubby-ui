@@ -18,19 +18,16 @@ const switchVariants = cva(
     "touch-manipulation [-webkit-tap-highlight-color:transparent]",
     // Track and thumb need separate radii: the track is 4px larger in both
     // axes, so one shared value leaves its corners proportionally tighter.
-    // corner-shape is the one fallback that is load-bearing rather than a
-    // default restated — only `squircle` sets it.
+    // Only `squircle` sets --switch-corner-shape, so that fallback is real.
     "rounded-(--switch-track-radius) [corner-shape:var(--switch-corner-shape,round)]",
-    // Geometry, all derived from --thumb-size so overriding that one value
-    // still works. Every variable read here is supplied by a variant, and the
-    // prop types below reject `null`, so cva can never drop a defaultVariant
-    // and leave one unset.
+    // All geometry derives from --thumb-size, so overriding that one value
+    // still works. No var() fallbacks here: the prop types reject `null`, so
+    // cva cannot drop a defaultVariant and leave one unset.
     "[--thumb-h:var(--thumb-size)]",
     "[--thumb-w:calc(var(--thumb-size)*var(--thumb-aspect))]",
     "[--travel:calc(var(--thumb-w)*var(--travel-ratio))]",
     // Snapped to whole pixels, or the 2px inset lands mid-pixel and renders
-    // thicker on one side than the other. The unrounded values above stand in
-    // where round() is unsupported.
+    // thicker on one side. The unrounded values above cover no round() support.
     "supports-[width:round(1px,1px)]:[--thumb-h:round(var(--thumb-size),1px)]",
     "supports-[width:round(1px,1px)]:[--thumb-w:round(calc(var(--thumb-size)*var(--thumb-aspect)),1px)]",
     "supports-[width:round(1px,1px)]:[--travel:round(calc(var(--thumb-w)*var(--travel-ratio)),1px)]",
@@ -38,8 +35,7 @@ const switchVariants = cva(
     "w-[calc(var(--thumb-w)+var(--travel)+4px)]",
     // How far the thumb reaches into the empty half of the track, and how far
     // it flattens under a press. Whole pixels because a pointer can rest in
-    // either state; the squash is flat and even because it gets halved to
-    // re-centre the thumb.
+    // either state.
     "[--switch-hover-ext:round(calc(var(--thumb-h)*0.125),1px)]",
     "[--switch-press-ext:round(calc(var(--thumb-h)*0.25),1px)]",
     "[--switch-press-squash:4px]",
@@ -52,59 +48,42 @@ const switchVariants = cva(
     "[--switch-hover-part:0px] [--switch-press-part:0px] [--switch-press:0px]",
     "[--switch-ext:max(var(--switch-hover-part),var(--switch-press-part))]",
     // Gestures read from the control and from a `group/switch` ancestor, so a
-    // switch in a labelled row answers the row. The group is named rather than
-    // bare: Tailwind compiles `group-hover:` to a descendant selector
-    // (`:where(.group):hover *`), so an unnamed one would let any `.group` a
-    // consumer happens to put on a card or list drive every switch inside it,
-    // which reads as the switch being hovered when it is not. Menu indicators
-    // are inert, so Base UI's data-highlighted stands in, which also covers
-    // arrow-key navigation.
-    // motion-safe rather than a motion-reduce reset further down: a reset would
-    // carry fewer selectors than the rule it means to undo and lose on
-    // specificity, leaving reduced motion with the same displacement as
-    // everyone else and none of the easing that makes it readable.
+    // switch in a labelled row answers the row. Named, not bare: `group-hover:`
+    // compiles to a descendant selector, so an unnamed group would let any
+    // `.group` a consumer puts on a card drive every switch inside it. Menu
+    // indicators are inert, so data-highlighted stands in for hover.
+    // motion-safe rather than a motion-reduce reset: a reset carries fewer
+    // selectors than the rule it undoes and loses on specificity.
     "motion-safe:not-data-disabled:hover:[--switch-hover-part:var(--switch-hover-ext)]",
     "motion-safe:not-data-disabled:group-hover/switch:[--switch-hover-part:var(--switch-hover-ext)]",
     "motion-safe:not-data-disabled:data-highlighted:[--switch-hover-part:var(--switch-hover-ext)]",
     "motion-safe:not-data-disabled:active:[--switch-press-part:var(--switch-press-ext)]",
     "motion-safe:not-data-disabled:group-active/switch:[--switch-press-part:var(--switch-press-ext)]",
-    // Track fill. The values sit here rather than in the theme so the component
-    // works the moment it is installed, with no token to add first; set
-    // --switch-track / --switch-track-hover on any ancestor to retune them.
-    // Both are translucent, so one colour works on any substrate, and hover
-    // steps further along that same overlay — which darkens in light and
-    // lightens in dark from a single rule. Checked darkens in both, since a
-    // lighter primary reads as disabled.
+    // Unchecked track. Values live here rather than in the theme so the
+    // component works the moment it is installed; set --switch-track /
+    // --switch-track-hover on any ancestor to retune. Translucent, so one
+    // colour works on any substrate and hover steps along the same overlay.
     "[--switch-track-bg:var(--switch-track,oklch(0_0_0/8%))]",
     "[--switch-track-bg-hover:var(--switch-track-hover,oklch(0_0_0/12%))]",
     "dark:[--switch-track-bg:var(--switch-track,oklch(1_0_0/20%))]",
     "dark:[--switch-track-bg-hover:var(--switch-track-hover,oklch(1_0_0/24%))]",
-    // Checked fill. Read through the same indirection as the track above, so
-    // both halves of the switch retune the same way: `color` supplies a preset,
-    // an ancestor or the element's own className can set --switch-fill, and
-    // that wins.
+    // Checked fill and thumb both read through an indirection: `color` supplies
+    // the preset, and --switch-fill / --switch-thumb from an ancestor or
+    // className win over it.
     "[--switch-fill-bg:var(--switch-fill,var(--switch-fill-preset))]",
-    // Thumb resolves the same way, and for the same reason a consumer needs
-    // it to: --switch-thumb from an ancestor or className wins in both
-    // states. Scoping the preset with `data-checked:` rather than the value
-    // keeps the override at one specificity — qualifying the declaration
-    // itself would raise it to (0,2,0) and quietly outrank the consumer.
+    // The data-checked: qualifier sits on --switch-thumb-bg, never on
+    // --switch-thumb: qualifying the consumer-facing variable would raise its
+    // specificity and silently outrank a className override.
     "[--switch-thumb-bg:var(--switch-thumb,var(--color-white))]",
     "data-checked:[--switch-thumb-bg:var(--switch-thumb,var(--switch-thumb-preset))]",
-    // Hover is derived from whatever the fill resolved to, so every colour —
-    // preset or custom — gets a step from one rule with no second value to
-    // supply. Subtracts a fixed amount of lightness rather than mixing in a
-    // percentage of black: a percentage is proportional, so 8% toward black
-    // moves --primary (L 0.6) by 0.048 but --neutral in light (L 0.22) by only
-    // 0.018, which is at the JND. An absolute step lands the same on both.
-    // It also touches only `l`, leaving `c` and `h` alone, so a saturated fill
-    // deepens on hover instead of washing out: mixing black pulls chroma
-    // toward zero too (--primary 0.200 to 0.184), which reads as the colour
-    // going flat rather than darker.
-    // Not the --primary-hover / --neutral-hover tokens, which shift *away*
-    // from their base lightness and so lighten in one theme or the other; a
-    // lighter checked track reads as disabled, and this darkens in both,
-    // matching the note on the unchecked track above.
+    // Hover derives from the resolved fill, so one rule covers every colour.
+    // An absolute lightness step, not a percentage of black: a percentage is
+    // proportional, so 8% moves --primary (L 0.6) by 0.048 but --neutral in
+    // light (L 0.22) by 0.018, at the JND. It also leaves `c` and `h` alone,
+    // where mixing black desaturates. Darkens in both themes deliberately, a
+    // lighter checked track reads as disabled, which is also why the
+    // --primary-hover / --neutral-hover tokens are unused: they lighten in one
+    // theme or the other.
     "[--switch-fill-hover:oklch(from_var(--switch-fill-bg)_calc(l-0.05)_c_h)]",
     "data-unchecked:bg-(--switch-track-bg) data-checked:bg-(--switch-fill-bg)",
     "not-data-disabled:hover:data-unchecked:bg-(--switch-track-bg-hover)",
@@ -113,36 +92,29 @@ const switchVariants = cva(
     "not-data-disabled:hover:data-checked:bg-(--switch-fill-hover)",
     "not-data-disabled:group-hover/switch:data-checked:bg-(--switch-fill-hover)",
     "not-data-disabled:data-highlighted:data-checked:bg-(--switch-fill-hover)",
-    // Colour runs at half the speed of anything that moves, so on a toggle the
-    // track reads as filling ahead of the thumb. One curve for all of it, and
-    // it has to be gentle: the two edges split a single timeline, so whatever a
-    // front-loaded curve spends on the leading edge is taken from the trailing.
+    // Colour runs at half the speed of anything that moves, so the track reads
+    // as filling ahead of the thumb. One gentle curve for all of it: the two
+    // edges split a single timeline, so a front-loaded curve would spend the
+    // trailing edge's budget on the leading one.
     "transition-[background-color,--switch-p,--switch-ext,--switch-press]",
     "duration-[80ms,var(--switch-duration),160ms,160ms]",
     "ease-out-cubic",
     "motion-reduce:transition-none",
     "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
-    // The border box is the painted box, so a mouse already has an exact target
-    // and hover fires over the visual. Coarse pointers get 24px (WCAG 2.5.8),
-    // where the reach matters and there is no hover to mismatch.
+    // The border box is the painted box, so a mouse already has an exact
+    // target. Coarse pointers get 24px (WCAG 2.5.8), where reach matters and
+    // there is no hover to mismatch.
     "pointer-coarse:before:absolute pointer-coarse:before:inset-x-0 pointer-coarse:before:content-['']",
     "pointer-coarse:before:inset-y-[calc((100%-24px)/2)]",
     "data-disabled:cursor-not-allowed data-disabled:opacity-60",
   ],
   {
     variants: {
-      // Each colour pairs a fill with the foreground that sits on it, the way
-      // Button pairs --btn-bg with text-*-foreground. Not decoration: --neutral
-      // is dark in light mode and *light* in dark, so a white thumb would
-      // vanish into the checked neutral track under dark.
-      //
-      // These are presets, not the value: the --switch-thumb-bg rules in the
-      // base array apply them only while checked. Deliberate — the unchecked
-      // track is a translucent overlay in both themes, so the thumb there
-      // wants white regardless of colour; repainting it would put a near-black
-      // thumb on a dark overlay and cost the off state its only positional
-      // cue.
-      //
+      // Each colour pairs a fill with the foreground that sits on it, as Button
+      // pairs --btn-bg with text-*-foreground. Not decoration: --neutral is
+      // light in dark mode, where a white thumb would vanish into it. The base
+      // array applies these while checked only, since the unchecked track is a
+      // translucent overlay that a dark thumb disappears into.
       color: {
         primary:
           "[--switch-fill-preset:var(--primary)] [--switch-thumb-preset:var(--primary-foreground)]",
@@ -205,21 +177,16 @@ const switchVariants = cva(
 
 /**
  * Thumb classes. Every declaration reads a custom property the root supplies,
- * so this is only ever correct as a direct child of an element carrying
- * `switchVariants`. Not exported for that reason: `Switch` and `SwitchVisual`
- * are the two things that know how to pair them.
+ * so this is only correct as a direct child of an element carrying
+ * `switchVariants`. Unexported for that reason.
  *
- * Deliberately animates layout properties rather than transform and opacity
- * alone. Nothing else moves the thumb's two edges independently, which is what
- * the stretch motion is, and the cost stays on one absolutely positioned
- * element with no layout dependents.
+ * Animates layout properties rather than transform alone, deliberately: nothing
+ * else moves the thumb's two edges independently, and the cost stays on one
+ * absolutely positioned element with no layout dependents.
  */
 const switchThumbClasses = cn([
   // White unchecked in both themes: the thumb is the lit element against a
-  // recessed track, the way physical switches read. Checked, it takes the
-  // `color` preset's foreground, because --neutral is light in dark mode and
-  // would swallow a white thumb. Both resolve through --switch-thumb-bg on the
-  // root, so a consumer's --switch-thumb wins in either state.
+  // recessed track, the way physical switches read.
   "pointer-events-none absolute top-0 block bg-(--switch-thumb-bg)",
   "rounded-(--switch-radius) [corner-shape:var(--switch-corner-shape,round)]",
   // Progress of each edge along its own half of the timeline. Reversing
@@ -234,21 +201,18 @@ const switchThumbClasses = cn([
   // what stops the thumb overhanging the track.
   "ml-[calc(-1*var(--switch-ext)*var(--trail))]",
   "mr-[calc(-1*var(--switch-ext)*(1-var(--lead)))]",
-  // Only the horizontal axis needs two edges. Vertically an explicit height and
-  // a single offset keep the inset one number, rather than whatever the layout
-  // has left after resolving both edges, which would hand each its own rounding
-  // at fractional device pixel ratios. That offset has to be a transform: as a
-  // margin it snaps independently of the height, and the two gaps step out of
-  // sync while the squash animates, which reads as the thumb shaking.
+  // Only the horizontal axis needs two edges. Vertically, an explicit height
+  // plus one offset keeps the inset a single number instead of two independent
+  // roundings at fractional DPRs. The offset must be a transform: as a margin
+  // it snaps separately from the height and the thumb reads as shaking.
   "w-auto h-[calc(var(--thumb-h)-var(--switch-press-total))]",
   // Whichever is larger; only one is ever non-zero, since --switch-split
   // decides which motion is in play.
   "[--switch-press-total:max(var(--switch-press),calc(var(--switch-press-squash)*(var(--lead)-var(--trail))))]",
   "[transform:translateY(calc(2px+var(--switch-press-total)/2))]",
-  // The thumb's colour is state-dependent, so it needs its own transition: the
-  // root's is on the root and transition-* does not inherit. Matched to the
-  // track's own 80ms colour step so the two cross together rather than the
-  // thumb snapping while the track eases.
+  // The thumb's colour is state-dependent and transition-* does not inherit,
+  // so it needs its own. Matched to the track's 80ms step so the two cross
+  // together rather than the thumb snapping.
   "transition-[background-color] duration-80 ease-out-cubic motion-reduce:transition-none",
   // Only 2px of track shows around the thumb, so anything heavier darkens the
   // inset below it and the thumb reads as sitting low.
@@ -306,16 +270,12 @@ function Switch({
  * <SwitchVisual render={<Menu.CheckboxItemIndicator keepMounted />} />
  * ```
  *
- * Pass that element childless. Owning the thumb as well as the track is the
- * point — the two only work as a pair — but the `render` element is one door
- * the type cannot close: Base UI merges its props *after* ours, so children on
- * it would replace the thumb and leave a dead track.
+ * Pass that element childless: track and thumb only work as a pair, and
+ * children on it would replace the thumb and leave a dead track.
  */
-// `children` is omitted from the props for the same reason, where a type can
-// reach: mergeProps lets the rightmost object win for anything that is not a
-// handler, className or style, so a caller-passed child would take the thumb's
-// place. That closes the direct-prop route; the `render` route above is a
-// convention, not an invariant.
+// mergeProps lets the rightmost object win, so a child reaches the thumb's slot
+// from either direction. Omitting `children` closes the direct-prop route; the
+// `render` route above is a convention the type cannot reach.
 type SwitchVisualProps = Omit<useRender.ComponentProps<"span">, "children"> &
   SwitchVariants;
 

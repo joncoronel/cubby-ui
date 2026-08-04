@@ -22,11 +22,8 @@ const toggleItemClasses =
   "group/switch data-highlighted:bg-surface-hover data-highlighted:text-accent-foreground grid cursor-default items-center rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
 
 // The tick draws itself in on check. `pathLength` restates the path as 1 unit
-// long, so the dash values below are fractions of the stroke rather than a
-// hardcoded length — a future HugeIcons revision can reshape Tick02Icon
-// without stranding the number. HugeiconsIcon builds its paths from the icon
-// array, so this is the only way in; the classes then reach the rendered path
-// through the svg it returns.
+// long, so the dash values are fractions of the stroke and survive a HugeIcons
+// reshape. Deriving the icon array is the only way to reach the path.
 const tickIcon = Tick02Icon.map(([tag, attrs]) => [
   tag,
   { ...attrs, pathLength: 1 },
@@ -119,13 +116,10 @@ function ContextMenuContent({
             "ease-out-expo transition-[scale,opacity] duration-100",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
-            // No data-instant guard at all, deliberately. 'click' is inferred
-            // from `event.detail === 0`, which every right-click matches, so
-            // suppressing it would kill the enter animation on every open.
-            // 'dismiss' must animate, or Base UI has nothing to wait on and the
-            // popup unmounts with no exit. And 'group' / 'trigger-change'
-            // cannot fire here: the first needs a Menubar parent, the second
-            // needs detached triggers sharing one root.
+            // No data-instant guard, deliberately: 'click' is inferred from
+            // `event.detail === 0`, which every right-click matches, so it would
+            // kill the enter animation on every open. 'dismiss' must animate or
+            // there is no exit, and 'group' / 'trigger-change' cannot fire here.
             "motion-reduce:transition-none",
             solidSurface(level, shadowLevel),
             className,
@@ -223,10 +217,9 @@ function ContextMenuCheckboxItem({
         {children}
       </span>
       {indicator === "switch" ? (
-        // Visual only, and non-interactive: the row itself carries the role and
-        // the click target, so nesting a real Switch here would put a focusable
-        // control inside a menuitemcheckbox. Base UI's indicator supplies the
-        // aria-hidden.
+        // Visual only: the row carries the role and the click target, so a real
+        // Switch here would nest a focusable control inside a menuitemcheckbox.
+        // Base UI's indicator supplies the aria-hidden.
         <SwitchVisual
           color={switchColor}
           shape={switchShape}
@@ -424,10 +417,7 @@ function ContextMenuSubContent({
           data-slot="context-menu-sub-content"
           data-level={level}
           className={cn(
-            // No Menu.Viewport here (ContextMenu has no trigger-swap morph to run
-            // one for), so the popup is its own scroll container: capped at
-            // --available-height, clipping on x for the rounded corners and
-            // scrolling on y. Without the cap a tall menu runs off screen.
+            // Its own scroll container, like ContextMenuContent above.
             "text-popover-foreground relative z-50 max-h-(--available-height) max-w-(--available-width) min-w-[12rem] origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-xl p-1 outline-none",
             // Modern enter/exit — scale + fade from the transform origin, matching
             // popover/dropdown-menu (replaces the legacy animate-in/zoom/slide classes)

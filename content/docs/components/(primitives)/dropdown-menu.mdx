@@ -70,7 +70,7 @@ Use `DropdownMenuCheckboxItem` for toggleable options. The checkmark sits in a r
 
 ### With Switch
 
-Set `indicator="switch"` on `DropdownMenuCheckboxItem` to swap the checkmark for a switch. This is visual only. The item keeps its `menuitemcheckbox` role and the same props, the whole row stays the click target, and the menu stays open on toggle.
+Set `indicator="switch"` on `DropdownMenuCheckboxItem` to swap the checkmark for a switch. Visual only: the item keeps its `menuitemcheckbox` role, the row stays the click target, and the menu stays open on toggle.
 
 <ComponentPreview
   component="dropdown-menu"
@@ -90,7 +90,7 @@ Use `DropdownMenuRadioGroup` with `DropdownMenuRadioItem` for mutually exclusive
 
 Menu items lay their icon out inline, so an item with no icon starts its label further left than its neighbours. Add `inset` to the icon-less items to give them the same left padding an icon would have occupied, and every label lines up on one edge.
 
-`inset` is available on `DropdownMenuItem`, `DropdownMenuLinkItem`, `DropdownMenuCheckboxItem`, `DropdownMenuRadioItem`, `DropdownMenuLabel`, `DropdownMenuGroupLabel`, and `DropdownMenuSubTrigger`. Only reach for it in menus that actually mix the two kinds of item. In a menu where nothing has an icon, adding `inset` just indents everything for no reason.
+`inset` is available on `DropdownMenuItem`, `DropdownMenuLinkItem`, `DropdownMenuCheckboxItem`, `DropdownMenuRadioItem`, `DropdownMenuLabel`, `DropdownMenuGroupLabel`, and `DropdownMenuSubTrigger`. Only reach for it in menus that actually mix the two kinds of item.
 
 <ComponentPreview
   component="dropdown-menu"
@@ -118,7 +118,7 @@ The DropdownMenu component is built on top of [Base UI's Menu](https://base-ui.c
 
 For the complete Base UI API, see the [Base UI Menu documentation](https://base-ui.com/react/components/menu).
 
-One exception to "all Base UI props are supported": `DropdownMenuSub` renders `Menu.SubmenuRoot`, whose props are narrower than `Menu.Root`'s. `modal`, `openOnHover`, `handle`, `triggerId` and `defaultTriggerId` are not accepted there. They belong on the root `DropdownMenu`.
+One exception: `DropdownMenuSub` renders `Menu.SubmenuRoot`, which does not accept `modal`, `openOnHover`, `handle`, `triggerId` or `defaultTriggerId`. Those belong on the root `DropdownMenu`.
 
 ### Props
 

@@ -142,14 +142,17 @@ function TooltipContent({
             data-slot="tooltip-viewport"
             className={cn(
               // Base viewport styles
-              // Bounded here, not inherited: `h-full` resolves against the popup's
-              // specified height, which is the literal `auto` at rest, so the
-              // percentage stays indefinite and the viewport grows to its content
-              // instead. scrollHeight would always equal clientHeight and the
-              // overflow-y below could never engage.
+              // `h-full` and the cap do different jobs; both are load-bearing. At
+              // rest --popup-height is `auto`, so the percentage is indefinite and
+              // only the cap bounds the viewport, which is what engages the
+              // overflow-y below. Mid-swap it is a definite px that transitions,
+              // and the percentage tracks it. Without that the viewport snaps to
+              // the incoming content's height on frame one, because Base UI takes
+              // the outgoing content out of flow with position:absolute, and
+              // overflow-clip cuts its extra rows instead of letting them fade.
               // No `max-w`: `w-full` resolves against the popup's already-capped
               // content box, so the width bound is inherited for free.
-              "relative max-h-(--available-height) w-full overflow-clip px-2 py-1.5 [--viewport-padding:0.5rem]",
+              "relative h-full max-h-(--available-height) w-full overflow-clip px-2 py-1.5 [--viewport-padding:0.5rem]",
               "not-data-transitioning:overflow-y-auto",
               // Content width and transitions
               "**:data-current:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",

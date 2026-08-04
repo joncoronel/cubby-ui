@@ -37,7 +37,14 @@ function PopoverViewport({ className, ...props }: BasePopover.Viewport.Props) {
   return (
     <BasePopover.Viewport
       data-slot="popover-viewport"
-      className={cn("relative h-full w-full overflow-clip", className)}
+      // Same height and overflow policy as the viewport inside PopoverContent,
+      // which see for why both the percentage and the cap are needed. Padding
+      // is left to the caller; hand-composed popups own their own spacing.
+      className={cn(
+        "relative h-full max-h-(--available-height) w-full overflow-clip",
+        "not-data-transitioning:overflow-y-auto",
+        className,
+      )}
       {...props}
     />
   );
@@ -194,14 +201,17 @@ function PopoverContent({
           <BasePopover.Viewport
             data-slot="popover-viewport"
             className={cn(
-              // Bounded here, not inherited: `h-full` resolves against the popup's
-              // specified height, which is the literal `auto` at rest, so the
-              // percentage stays indefinite and the viewport grows to its content
-              // instead. scrollHeight would always equal clientHeight and the
-              // overflow-y below could never engage.
+              // `h-full` and the cap do different jobs; both are load-bearing. At
+              // rest --popup-height is `auto`, so the percentage is indefinite and
+              // only the cap bounds the viewport, which is what engages the
+              // overflow-y below. Mid-swap it is a definite px that transitions,
+              // and the percentage tracks it. Without that the viewport snaps to
+              // the incoming content's height on frame one, because Base UI takes
+              // the outgoing content out of flow with position:absolute, and
+              // overflow-clip cuts its extra rows instead of letting them fade.
               // No `max-w`: `w-full` resolves against the popup's already-capped
               // content box, so the width bound is inherited for free.
-              "relative max-h-(--available-height) w-full overflow-clip px-3 py-3 [--viewport-padding:0.75rem]",
+              "relative h-full max-h-(--available-height) w-full overflow-clip px-3 py-3 [--viewport-padding:0.75rem]",
               "not-data-transitioning:overflow-y-auto",
               // Content width calculation (edge-to-edge minus padding)
               "**:data-current:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",

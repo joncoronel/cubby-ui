@@ -79,13 +79,20 @@ const switchVariants = cva(
     "[--switch-track-bg-hover:var(--switch-track-hover,oklch(0_0_0/12%))]",
     "dark:[--switch-track-bg:var(--switch-track,oklch(1_0_0/20%))]",
     "dark:[--switch-track-bg-hover:var(--switch-track-hover,oklch(1_0_0/24%))]",
-    "data-unchecked:bg-(--switch-track-bg) data-checked:bg-primary",
+    // Checked fill. `color` sets --switch-fill; the hover step is mixed from
+    // whatever that resolves to rather than from --primary, so a custom fill
+    // gets a matching hover for free and there is no per-colour value to keep
+    // in sync. Deliberately not the --primary-hover / --neutral-hover tokens:
+    // those lighten in dark mode, and a lighter checked track reads as
+    // disabled, so this darkens in both themes.
+    "[--switch-fill-hover:color-mix(in_oklab,var(--switch-fill),var(--color-black)_8%)]",
+    "data-unchecked:bg-(--switch-track-bg) data-checked:bg-(--switch-fill)",
     "not-data-disabled:hover:data-unchecked:bg-(--switch-track-bg-hover)",
     "not-data-disabled:group-hover/switch:data-unchecked:bg-(--switch-track-bg-hover)",
     "not-data-disabled:data-highlighted:data-unchecked:bg-(--switch-track-bg-hover)",
-    "not-data-disabled:hover:data-checked:bg-[color-mix(in_oklab,var(--primary),var(--color-black)_8%)]",
-    "not-data-disabled:group-hover/switch:data-checked:bg-[color-mix(in_oklab,var(--primary),var(--color-black)_8%)]",
-    "not-data-disabled:data-highlighted:data-checked:bg-[color-mix(in_oklab,var(--primary),var(--color-black)_8%)]",
+    "not-data-disabled:hover:data-checked:bg-(--switch-fill-hover)",
+    "not-data-disabled:group-hover/switch:data-checked:bg-(--switch-fill-hover)",
+    "not-data-disabled:data-highlighted:data-checked:bg-(--switch-fill-hover)",
     // Colour runs at half the speed of anything that moves, so on a toggle the
     // track reads as filling ahead of the thumb. One curve for all of it, and
     // it has to be gentle: the two edges split a single timeline, so whatever a
@@ -104,6 +111,19 @@ const switchVariants = cva(
   ],
   {
     variants: {
+      // Each colour pairs a fill with its foreground for the thumb, the way
+      // Button pairs --btn-bg with text-*-foreground. Not decoration: --neutral
+      // is dark in light mode and *light* in dark mode, so a hard-coded white
+      // thumb disappears into the neutral track under dark. The hover step is
+      // mixed from --switch-fill in the base, so a variant only names the rest
+      // colour, and `className="[--switch-fill:…]"` is a complete override
+      // rather than half of one.
+      color: {
+        primary:
+          "[--switch-fill:var(--primary)] [--switch-thumb:var(--primary-foreground)]",
+        neutral:
+          "[--switch-fill:var(--neutral)] [--switch-thumb:var(--neutral-foreground)]",
+      },
       // Shape sets the thumb's silhouette, size sets its height. They are
       // independent, so radii are fractions of --thumb-size rather than fixed
       // pixels that would read too round at xs and too sharp at default.
@@ -150,6 +170,7 @@ const switchVariants = cva(
       },
     },
     defaultVariants: {
+      color: "primary",
       shape: "circle",
       size: "default",
       motion: "default",
@@ -170,8 +191,10 @@ const switchVariants = cva(
  */
 const switchThumbClasses = cn([
   // White in both themes: in dark mode the thumb is the lit element against a
-  // recessed track, the way physical switches read.
-  "pointer-events-none absolute top-0 block bg-white",
+  // recessed track, the way physical switches read. Via a variable because a
+  // light custom --switch-fill would swallow a hard-coded white thumb, and the
+  // fix has to be reachable from the same className that set the fill.
+  "pointer-events-none absolute top-0 block bg-[var(--switch-thumb,var(--color-white))]",
   "rounded-(--switch-radius) [corner-shape:var(--switch-corner-shape,round)]",
   // Progress of each edge along its own half of the timeline. Reversing
   // --switch-p swaps which edge leads for free, so there is no per-direction
@@ -218,6 +241,7 @@ type SwitchProps = React.ComponentProps<typeof BaseSwitch.Root> &
 
 function Switch({
   className,
+  color = "primary",
   shape = "circle",
   size = "default",
   motion = "default",
@@ -226,10 +250,11 @@ function Switch({
   return (
     <BaseSwitch.Root
       data-slot="switch"
+      data-color={color}
       data-shape={shape}
       data-size={size}
       data-motion={motion}
-      className={cn(switchVariants({ shape, size, motion }), className)}
+      className={cn(switchVariants({ color, shape, size, motion }), className)}
       {...props}
     >
       <BaseSwitch.Thumb
@@ -265,6 +290,7 @@ type SwitchVisualProps = Omit<useRender.ComponentProps<"span">, "children"> &
 
 function SwitchVisual({
   className,
+  color = "primary",
   shape = "circle",
   size = "xs",
   motion = "default",
@@ -274,7 +300,7 @@ function SwitchVisual({
   const defaultProps = {
     "data-slot": "switch-visual",
     className: cn(
-      switchVariants({ shape, size, motion }),
+      switchVariants({ color, shape, size, motion }),
       // The row carries the state and the hit area; this is decoration.
       "pointer-events-none cursor-default",
       // The row already dims when disabled; don't compound the fade.

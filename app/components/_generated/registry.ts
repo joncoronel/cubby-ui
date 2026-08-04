@@ -411,6 +411,7 @@ import slider_slider_with_steps from "@/registry/examples/slider/slider-with-ste
 import slider_slider_with_value from "@/registry/examples/slider/slider-with-value";
 import switch_switch_basic from "@/registry/examples/switch/switch-basic";
 import switch_switch_card from "@/registry/examples/switch/switch-card";
+import switch_switch_color from "@/registry/examples/switch/switch-color";
 import switch_switch_field from "@/registry/examples/switch/switch-field";
 import switch_switch_motion from "@/registry/examples/switch/switch-motion";
 import switch_switch_shapes from "@/registry/examples/switch/switch-shapes";
@@ -3691,6 +3692,11 @@ export const exampleRegistry = {
       "source": "import { Switch } from \"@/components/ui/cubby-ui/switch/switch\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function SwitchCard() {\n  return (\n    <Label\n      htmlFor=\"notifications\"\n      className=\"flex-row items-start justify-between gap-4 rounded-lg border bg-card p-4 has-data-checked:border-primary/50 has-data-checked:bg-muted hover:bg-muted\"\n    >\n      <div className=\"flex flex-col gap-1\">\n        <span className=\"font-medium\">Push Notifications</span>\n        <span className=\"text-muted-foreground text-sm\">\n          Receive notifications when someone mentions you.\n        </span>\n      </div>\n      <Switch id=\"notifications\" size=\"sm\" />\n    </Label>\n  );\n}\n"
     },
     {
+      "title": "Color",
+      "importPath": "switch-color",
+      "source": "import { Switch } from \"@/components/ui/cubby-ui/switch/switch\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function SwitchColor() {\n  return (\n    <div className=\"flex items-center gap-6\">\n      <Label className=\"flex-row items-center gap-2\" htmlFor=\"color-primary\">\n        <Switch defaultChecked id=\"color-primary\" />\n        primary\n      </Label>\n      <Label className=\"flex-row items-center gap-2\" htmlFor=\"color-neutral\">\n        <Switch defaultChecked color=\"neutral\" id=\"color-neutral\" />\n        neutral\n      </Label>\n      <Label className=\"flex-row items-center gap-2\" htmlFor=\"color-custom\">\n        <Switch\n          className=\"[--switch-fill:var(--color-emerald-600)]\"\n          defaultChecked\n          id=\"color-custom\"\n        />\n        custom\n      </Label>\n    </div>\n  );\n}\n"
+    },
+    {
       "title": "Field",
       "importPath": "switch-field",
       "source": "import {\n  Field,\n  FieldDescription,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Switch } from \"@/components/ui/cubby-ui/switch/switch\";\n\nexport default function SwitchField() {\n  return (\n    <Field name=\"notifications\">\n      <FieldLabel>\n        Email notifications\n        <Switch defaultChecked />\n      </FieldLabel>\n      <FieldDescription>\n        Receive email notifications when someone mentions you.\n      </FieldDescription>\n    </Field>\n  );\n}\n"
@@ -4486,6 +4492,7 @@ export const componentMap = {
   "slider-with-value": slider_slider_with_value,
   "switch-basic": switch_switch_basic,
   "switch-card": switch_switch_card,
+  "switch-color": switch_switch_color,
   "switch-field": switch_switch_field,
   "switch-motion": switch_switch_motion,
   "switch-shapes": switch_switch_shapes,

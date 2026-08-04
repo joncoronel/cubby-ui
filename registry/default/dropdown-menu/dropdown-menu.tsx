@@ -135,6 +135,9 @@ function DropdownMenuContent({
               // overflow-y below can never engage. Capping the viewport gives
               // it a definite bound and leaves the popup's height free to
               // animate for the morph.
+              // `max-w` is deliberately absent: `w-full` resolves against the
+              // popup's already-capped content box, so the width bound is
+              // inherited for free. Only the height needs restating here.
               "relative max-h-(--available-height) w-full overflow-clip p-1 [--viewport-padding:0.25rem]",
               "not-data-transitioning:overflow-y-auto",
               // Content width

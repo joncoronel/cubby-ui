@@ -88,6 +88,18 @@ Kept deliberately: the value looks right as shipped, and reaching 3:1 by fill al
 
 If it is ever revisited, the cheaper route than darkening the fill is restoring a boundary: the pre-branch switch carried `inset-shadow-xs`, and a `--switch-track-ring` token at ≥3:1 against both the surface and the thumb would satisfy 1.4.11 without changing the track's weight.
 
+#### Popup size caps: two accepted residuals
+
+Every popup and positioner in the popup family (Dropdown Menu, Menubar, Context Menu, Popover, Tooltip) is capped at `max-h-(--available-height)` / `max-w-(--available-width)`, and each viewport carries its own `max-h` so `overflow-y: auto` has a definite bound to work against. Two things that cap deliberately does not solve:
+
+**`min-w-[12rem]` outranks the width cap.** Used width is `max(min-width, min(max-width, width))`, so `min-width` wins unconditionally. A menu opened where less than 192px of horizontal space remains still overflows the viewport edge. Pre-existing, unchanged by the cap, and only reachable on very narrow screens or hard against an edge.
+
+**A too-wide label is now clipped rather than run off-screen.** The popup caps at `--available-width` and clips, so an item wider than the available box is cut at the boundary with no ellipsis and no horizontal scroll. Previously it ran past the viewport edge instead. Both are unreadable; neither is worse, and Popover has shipped this exact pairing since before the caps were added elsewhere.
+
+The obvious fix — `truncate` on the row's label wrapper — does not work as written. That wrapper is `display: flex` (icon + label + trailing icon), so the label is an anonymous flex item, and `text-overflow` only applies to block containers. It would give a hard cut with no ellipsis, i.e. no change. A real fix has to wrap `{children}` in a block-level element inside the row, across four components, and that changes what arbitrary consumer children are nested in. Worth doing only if long menu labels turn out to be a real use case.
+
+Note also why `max-w` is **absent** from the viewports and submenu scroll wrappers, since it reads as an omission: `height: 100%` against a parent whose specified height is `auto` computes to `auto` (CSS 2.1 §10.5), which is why each viewport needs its own `max-h`; `width: 100%` resolves against the popup's already-capped content box, so the width bound is inherited for free and a `max-w` there would be inert. The same note is on each viewport at the call site.
+
 ### Filters
 
 Deferred / removed follow-ups pulled from the initial `filters` build (`registry/default/filters/`) to keep v1 tight. None are blocking; revisit when demand shows up.

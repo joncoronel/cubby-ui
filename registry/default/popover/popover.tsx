@@ -204,6 +204,9 @@ function PopoverContent({
               // clientHeight and the overflow-y below can never engage. Capping
               // the viewport itself gives it a definite bound while leaving the
               // popup's height free to animate for the morph.
+              // `max-w` is deliberately absent: `w-full` resolves against the
+              // popup's already-capped content box, so the width bound is
+              // inherited for free. Only the height needs restating here.
               "relative max-h-(--available-height) w-full overflow-clip px-3 py-3 [--viewport-padding:0.75rem]",
               "not-data-transitioning:overflow-y-auto",
               // Content width calculation (edge-to-edge minus padding)

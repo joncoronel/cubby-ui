@@ -189,6 +189,9 @@ function MenubarContent({
           */}
           <BaseMenu.Viewport
             data-slot="menubar-viewport"
+            // `max-w` is deliberately absent: `w-full` resolves against the
+            // popup's already-capped content box, so the width bound is
+            // inherited for free. Only the height needs restating here.
             className="relative max-h-(--available-height) w-full overflow-clip overflow-y-auto p-1"
           >
             {children}

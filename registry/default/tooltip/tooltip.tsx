@@ -102,7 +102,7 @@ function TooltipContent({
         sticky={sticky}
         positionMethod={positionMethod}
         arrowPadding={arrowPadding}
-        className="z-50 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none motion-reduce:transition-none"
+        className="z-50 h-(--positioner-height) max-h-(--available-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none motion-reduce:transition-none"
       >
         <BaseTooltip.Popup
           data-slot="tooltip-content"
@@ -113,7 +113,7 @@ function TooltipContent({
             // mid-animation (a non-none scale creates one) and not at rest, so
             // an absolutely positioned arrow would change reference frame
             // partway through the open.
-            "text-popover-foreground relative h-(--popup-height,auto) w-(--popup-width,auto) origin-(--transform-origin) rounded-sm text-xs outline-none",
+            "text-popover-foreground relative h-(--popup-height,auto) max-h-(--available-height) w-(--popup-width,auto) max-w-(--available-width) origin-(--transform-origin) rounded-sm text-xs outline-none",
             solidSurface(level, shadowLevel),
             // No directional translate: the popup scales from
             // --transform-origin, which Base UI aims back at the trigger, so

@@ -101,7 +101,7 @@ function ContextMenuContent({
   return (
     <ContextMenuPortal>
       <ContextMenuPositioner
-        className="max-h-(--available-height)"
+        className="max-h-(--available-height) max-w-(--available-width)"
         align={align}
         sideOffset={sideOffset}
       >
@@ -113,7 +113,7 @@ function ContextMenuContent({
             // one for), so the popup is its own scroll container: capped at
             // --available-height, clipping on x for the rounded corners and
             // scrolling on y. Without the cap a tall menu runs off screen.
-            "text-popover-foreground relative z-50 max-h-(--available-height) min-w-[12rem] origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-xl p-1 outline-none",
+            "text-popover-foreground relative z-50 max-h-(--available-height) max-w-(--available-width) min-w-[12rem] origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-xl p-1 outline-none",
             // Modern enter/exit — scale + fade from the transform origin, matching
             // popover/dropdown-menu (replaces the legacy animate-in/zoom/slide classes)
             "ease-out-expo transition-[scale,opacity] duration-100",
@@ -412,7 +412,7 @@ function ContextMenuSubContent({
   return (
     <ContextMenuPortal>
       <ContextMenuPositioner
-        className="max-h-(--available-height)"
+        className="max-h-(--available-height) max-w-(--available-width)"
         sideOffset={sideOffset}
         align={align}
       >
@@ -424,7 +424,7 @@ function ContextMenuSubContent({
             // one for), so the popup is its own scroll container: capped at
             // --available-height, clipping on x for the rounded corners and
             // scrolling on y. Without the cap a tall menu runs off screen.
-            "text-popover-foreground relative z-50 max-h-(--available-height) min-w-[12rem] origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-xl p-1 outline-none",
+            "text-popover-foreground relative z-50 max-h-(--available-height) max-w-(--available-width) min-w-[12rem] origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-xl p-1 outline-none",
             // Modern enter/exit — scale + fade from the transform origin, matching
             // popover/dropdown-menu (replaces the legacy animate-in/zoom/slide classes)
             "ease-out-expo transition-[scale,opacity] duration-100",

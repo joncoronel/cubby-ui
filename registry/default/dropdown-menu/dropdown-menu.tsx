@@ -95,7 +95,7 @@ function DropdownMenuContent({
             // menus that both sit on this floor morph position and height but not
             // width. That is the accepted trade: menus narrower than 12rem read
             // as cramped, and width is the least visible of the three.
-            "text-popover-foreground relative max-h-(--available-height) min-w-[12rem] overflow-hidden rounded-xl outline-none",
+            "text-popover-foreground relative max-h-(--available-height) max-w-(--available-width) min-w-[12rem] overflow-hidden rounded-xl outline-none",
             solidSurface(level, shadowLevel),
             "h-(--popup-height,auto) w-(--popup-width,auto)",
             "origin-(--transform-origin) transition-[width,height,scale,opacity] duration-[150ms,150ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
@@ -459,7 +459,7 @@ function DropdownMenuSubContent({
   return (
     <DropdownMenuPortal>
       <DropdownMenuPositioner
-        className="z-50 max-h-(--available-height)"
+        className="z-50 max-h-(--available-height) max-w-(--available-width)"
         sideOffset={sideOffset}
         align={align}
         alignOffset={alignOffset ?? defaultAlignOffset}
@@ -468,7 +468,7 @@ function DropdownMenuSubContent({
           data-slot="dropdown-menu-content"
           data-level={level}
           className={cn(
-            "text-popover-foreground relative max-h-(--available-height) min-w-[12rem] overflow-hidden rounded-xl outline-none",
+            "text-popover-foreground relative max-h-(--available-height) max-w-(--available-width) min-w-[12rem] overflow-hidden rounded-xl outline-none",
             solidSurface(level, shadowLevel),
             "ease-out-expo origin-(--transform-origin) transition-[transform,scale,opacity] duration-100",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
@@ -482,7 +482,7 @@ function DropdownMenuSubContent({
             scroll container has to live here or a tall submenu silently
             truncates. The main popups get this from Menu.Viewport; a
             submenu has none, so it is spelled out. */}
-          <div className="max-h-(--available-height) overflow-y-auto p-1">
+          <div className="max-h-(--available-height) overflow-x-hidden overflow-y-auto p-1">
             {children}
           </div>
         </BaseMenu.Popup>

@@ -250,14 +250,16 @@ function Switch({
  * <SwitchVisual render={<Menu.CheckboxItemIndicator keepMounted />} />
  * ```
  *
- * Owning the thumb as well as the track is the point: the two only work as a
- * pair, and every caller that hand-assembled them was one rename away from
- * silently rendering a dead track.
+ * Pass that element childless. Owning the thumb as well as the track is the
+ * point — the two only work as a pair — but the `render` element is one door
+ * the type cannot close: Base UI merges its props *after* ours, so children on
+ * it would replace the thumb and leave a dead track.
  */
-// `children` is omitted on purpose. mergeProps lets the rightmost object win
-// for anything that is not a handler, className or style, so a caller-passed
-// child would replace the thumb and leave a dead track — the exact failure
-// this component exists to make unrepresentable.
+// `children` is omitted from the props for the same reason, where a type can
+// reach: mergeProps lets the rightmost object win for anything that is not a
+// handler, className or style, so a caller-passed child would take the thumb's
+// place. That closes the direct-prop route; the `render` route above is a
+// convention, not an invariant.
 type SwitchVisualProps = Omit<useRender.ComponentProps<"span">, "children"> &
   SwitchVariants;
 

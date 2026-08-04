@@ -186,6 +186,7 @@ function ContextMenuCheckboxItem({
   checked,
   inset,
   indicator = "check",
+  switchColor = "primary",
   switchShape = "circle",
   switchSize = "xs",
   switchMotion = "default",
@@ -194,6 +195,8 @@ function ContextMenuCheckboxItem({
   inset?: boolean;
   /** Which indicator sits in the right-hand column. `"switch"` is visual only — the item keeps the `menuitemcheckbox` role. */
   indicator?: "check" | "switch";
+  /** Checked track colour, when `indicator="switch"`. */
+  switchColor?: SwitchVisualProps["color"];
   /** Thumb silhouette, when `indicator="switch"`. */
   switchShape?: SwitchVisualProps["shape"];
   /** Thumb size, when `indicator="switch"`. Defaults to `xs`, which matches the row's text. */
@@ -225,6 +228,7 @@ function ContextMenuCheckboxItem({
         // control inside a menuitemcheckbox. Base UI's indicator supplies the
         // aria-hidden.
         <SwitchVisual
+          color={switchColor}
           shape={switchShape}
           size={switchSize}
           motion={switchMotion}

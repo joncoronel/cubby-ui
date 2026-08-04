@@ -79,14 +79,30 @@ const switchVariants = cva(
     "[--switch-track-bg-hover:var(--switch-track-hover,oklch(0_0_0/12%))]",
     "dark:[--switch-track-bg:var(--switch-track,oklch(1_0_0/20%))]",
     "dark:[--switch-track-bg-hover:var(--switch-track-hover,oklch(1_0_0/24%))]",
-    // Checked fill. `color` sets --switch-fill; the hover step is mixed from
-    // whatever that resolves to rather than from --primary, so a custom fill
-    // gets a matching hover for free and there is no per-colour value to keep
-    // in sync. Deliberately not the --primary-hover / --neutral-hover tokens:
-    // those lighten in dark mode, and a lighter checked track reads as
-    // disabled, so this darkens in both themes.
-    "[--switch-fill-hover:color-mix(in_oklab,var(--switch-fill),var(--color-black)_8%)]",
-    "data-unchecked:bg-(--switch-track-bg) data-checked:bg-(--switch-fill)",
+    // Checked fill. Read through the same indirection as the track above, so
+    // both halves of the switch retune the same way: `color` supplies a preset,
+    // an ancestor or the element's own className can set --switch-fill, and
+    // that wins.
+    "[--switch-fill-bg:var(--switch-fill,var(--switch-fill-preset))]",
+    // Thumb resolves the same way, and for the same reason a consumer needs
+    // it to: --switch-thumb from an ancestor or className wins in both
+    // states. Scoping the preset with `data-checked:` rather than the value
+    // keeps the override at one specificity — qualifying the declaration
+    // itself would raise it to (0,2,0) and quietly outrank the consumer.
+    "[--switch-thumb-bg:var(--switch-thumb,var(--color-white))]",
+    "data-checked:[--switch-thumb-bg:var(--switch-thumb,var(--switch-thumb-preset))]",
+    // Hover is derived from whatever the fill resolved to, so every colour —
+    // preset or custom — gets a step from one rule with no second value to
+    // supply. Subtracts a fixed amount of lightness rather than mixing in a
+    // percentage of black: a percentage is proportional, so 8% toward black
+    // moves --primary (L 0.6) by 0.048 but --neutral in light (L 0.22) by only
+    // 0.018, which is at the JND. An absolute step lands the same on both.
+    // Not the --primary-hover / --neutral-hover tokens, which shift *away*
+    // from their base lightness and so lighten in one theme or the other; a
+    // lighter checked track reads as disabled, and this darkens in both,
+    // matching the note on the unchecked track above.
+    "[--switch-fill-hover:oklch(from_var(--switch-fill-bg)_calc(l-0.05)_c_h)]",
+    "data-unchecked:bg-(--switch-track-bg) data-checked:bg-(--switch-fill-bg)",
     "not-data-disabled:hover:data-unchecked:bg-(--switch-track-bg-hover)",
     "not-data-disabled:group-hover/switch:data-unchecked:bg-(--switch-track-bg-hover)",
     "not-data-disabled:data-highlighted:data-unchecked:bg-(--switch-track-bg-hover)",
@@ -111,18 +127,21 @@ const switchVariants = cva(
   ],
   {
     variants: {
-      // Each colour pairs a fill with its foreground for the thumb, the way
+      // Each colour pairs a fill with the foreground that sits on it, the way
       // Button pairs --btn-bg with text-*-foreground. Not decoration: --neutral
-      // is dark in light mode and *light* in dark mode, so a hard-coded white
-      // thumb disappears into the neutral track under dark. The hover step is
-      // mixed from --switch-fill in the base, so a variant only names the rest
-      // colour, and `className="[--switch-fill:…]"` is a complete override
-      // rather than half of one.
+      // is dark in light mode and *light* in dark, so a white thumb would
+      // vanish into the checked neutral track under dark.
+      //
+      // Scoped to data-checked on purpose. The unchecked track is a translucent
+      // overlay in both themes, so the thumb there wants white regardless of
+      // colour; repainting it would put a near-black thumb on a dark overlay
+      // and cost the off state its only positional cue.
+      //
       color: {
         primary:
-          "[--switch-fill:var(--primary)] [--switch-thumb:var(--primary-foreground)]",
+          "[--switch-fill-preset:var(--primary)] [--switch-thumb-preset:var(--primary-foreground)]",
         neutral:
-          "[--switch-fill:var(--neutral)] [--switch-thumb:var(--neutral-foreground)]",
+          "[--switch-fill-preset:var(--neutral)] [--switch-thumb-preset:var(--neutral-foreground)]",
       },
       // Shape sets the thumb's silhouette, size sets its height. They are
       // independent, so radii are fractions of --thumb-size rather than fixed
@@ -190,11 +209,15 @@ const switchVariants = cva(
  * element with no layout dependents.
  */
 const switchThumbClasses = cn([
-  // White in both themes: in dark mode the thumb is the lit element against a
-  // recessed track, the way physical switches read. Via a variable because a
-  // light custom --switch-fill would swallow a hard-coded white thumb, and the
-  // fix has to be reachable from the same className that set the fill.
-  "pointer-events-none absolute top-0 block bg-[var(--switch-thumb,var(--color-white))]",
+  // White unchecked in both themes: the thumb is the lit element against a
+  // recessed track, the way physical switches read. Checked, it takes the
+  // `color` preset's foreground, because --neutral is light in dark mode and
+  // would swallow a white thumb. Both resolve through --switch-thumb-bg on the
+  // root, so a consumer's --switch-thumb wins in either state.
+  // R4: colour is state-dependent now, so it needs its own transition — the
+  // root's is on the root and transition-* does not inherit. Matched to the
+  // track's 80ms so the two cross together instead of the thumb snapping.
+  "pointer-events-none absolute top-0 block bg-(--switch-thumb-bg)",
   "rounded-(--switch-radius) [corner-shape:var(--switch-corner-shape,round)]",
   // Progress of each edge along its own half of the timeline. Reversing
   // --switch-p swaps which edge leads for free, so there is no per-direction
@@ -221,6 +244,7 @@ const switchThumbClasses = cn([
   "[transform:translateY(calc(2px+var(--switch-press-total)/2))]",
   // Only 2px of track shows around the thumb, so anything heavier darkens the
   // inset below it and the thumb reads as sitting low.
+  "transition-[background-color] duration-80 ease-out-cubic motion-reduce:transition-none",
   "shadow-[0_1px_1px_0_oklch(0.18_0_0/0.1)]",
 ]);
 

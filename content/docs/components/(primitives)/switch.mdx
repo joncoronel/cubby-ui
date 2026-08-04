@@ -39,13 +39,13 @@ Use `color` to set the checked track. The unchecked track is a translucent overl
 | `primary` | The default, your brand colour.                                     |
 | `neutral` | A dark neutral, for switches that should not compete for attention. |
 
-For anything outside the scale, set `--switch-fill`. The hover step is mixed from it, so a custom colour gets a matching hover without a second value:
+For anything outside the scale, set `--switch-fill` on the switch or any ancestor. The hover step is derived from whatever it resolves to, so a custom colour gets a matching hover without a second value:
 
 ```tsx
 <Switch className="[--switch-fill:var(--color-emerald-600)]" />
 ```
 
-The thumb stays white on both presets. Against a light custom fill it would disappear, so retint it alongside:
+Each preset pairs its fill with a matching thumb while checked, so `neutral` gets a dark thumb in dark mode where white would vanish. Unchecked, the thumb is white on every preset. A custom fill keeps the white thumb, which disappears against a light colour, so set `--switch-thumb` alongside it. Like `--switch-fill`, it takes effect in both states and works from an ancestor too:
 
 ```tsx
 <Switch className="[--switch-fill:var(--color-amber-300)] [--switch-thumb:var(--color-amber-950)]" />
@@ -130,8 +130,9 @@ Toggle control for binary on/off states. Wraps Base UI's `Switch.Root` and `Swit
   simpleType="string"
   defaultValue='"primary"'
 >
-  Checked track colour. Sets `--switch-fill`, which `className` can override for
-  a colour outside the scale; the hover step is derived from it either way.
+  Checked track colour. `className` or an ancestor can set `--switch-fill` to
+  override it for a colour outside the scale; the hover step is derived from
+  whatever the fill resolves to either way.
 </ApiProp>
 
 <ApiProp
@@ -167,6 +168,6 @@ Toggle control for binary on/off states. Wraps Base UI's `Switch.Root` and `Swit
 
 </ApiPropsList>
 
-Switch has no `variant` prop: colour is its own `color` prop, which keeps `variant` free for a future treatment axis. The unchecked track uses `--switch-track`, a translucent overlay that adapts to whatever substrate it sits on, so one colour works on a page, a Card, or a toolbar. The thumb is white in both themes. Set `--switch-track` and `--switch-track-hover` to retune the track and its hover step. See the [Surfaces](/docs/getting-started/surfaces) docs.
+Switch has no `variant` prop: colour is its own `color` prop, which keeps `variant` free for a future treatment axis. The unchecked track uses `--switch-track`, a translucent overlay that adapts to whatever substrate it sits on, so one colour works on a page, a Card, or a toolbar. The thumb is white unchecked, and follows the `color` preset's foreground while checked. Set `--switch-track` and `--switch-track-hover` to retune the track and its hover step. See the [Surfaces](/docs/getting-started/surfaces) docs.
 
 The 2px inset around the thumb is a fixed offset rather than space the layout divides, and the track width, thumb width and travel distance are snapped to whole pixels with CSS `round()`, so a `p-*` class will not change it. The motion runs off registered custom properties, so it needs `@property`. Those registrations ship in `switch.css`, which the component imports itself: nothing to wire up, but drop that import and the switch changes state without animating, the same as under `prefers-reduced-motion`.

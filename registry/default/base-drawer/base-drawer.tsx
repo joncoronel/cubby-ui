@@ -638,6 +638,7 @@ function BaseDrawerMenuCheckboxItem({
   defaultChecked,
   onCheckedChange,
   indicator = "check",
+  switchColor = "primary",
   switchShape = "circle",
   switchSize = "sm",
   switchMotion = "default",
@@ -647,6 +648,8 @@ function BaseDrawerMenuCheckboxItem({
 }: CheckboxPrimitive.Root.Props & {
   /** Which indicator sits in the right-hand column. `"switch"` is visual only. */
   indicator?: "check" | "switch";
+  /** Checked track colour, when `indicator="switch"`. */
+  switchColor?: SwitchVisualProps["color"];
   /** Thumb silhouette, when `indicator="switch"`. */
   switchShape?: SwitchVisualProps["shape"];
   /** Thumb size, when `indicator="switch"`. Defaults to `sm` for the drawer's taller touch rows. */
@@ -681,6 +684,7 @@ function BaseDrawerMenuCheckboxItem({
       </span>
       {indicator === "switch" ? (
         <SwitchVisual
+          color={switchColor}
           shape={switchShape}
           size={switchSize}
           motion={switchMotion}

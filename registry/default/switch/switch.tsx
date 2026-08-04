@@ -97,6 +97,10 @@ const switchVariants = cva(
     // percentage of black: a percentage is proportional, so 8% toward black
     // moves --primary (L 0.6) by 0.048 but --neutral in light (L 0.22) by only
     // 0.018, which is at the JND. An absolute step lands the same on both.
+    // It also touches only `l`, leaving `c` and `h` alone, so a saturated fill
+    // deepens on hover instead of washing out: mixing black pulls chroma
+    // toward zero too (--primary 0.200 to 0.184), which reads as the colour
+    // going flat rather than darker.
     // Not the --primary-hover / --neutral-hover tokens, which shift *away*
     // from their base lightness and so lighten in one theme or the other; a
     // lighter checked track reads as disabled, and this darkens in both,
@@ -132,10 +136,12 @@ const switchVariants = cva(
       // is dark in light mode and *light* in dark, so a white thumb would
       // vanish into the checked neutral track under dark.
       //
-      // Scoped to data-checked on purpose. The unchecked track is a translucent
-      // overlay in both themes, so the thumb there wants white regardless of
-      // colour; repainting it would put a near-black thumb on a dark overlay
-      // and cost the off state its only positional cue.
+      // These are presets, not the value: the --switch-thumb-bg rules in the
+      // base array apply them only while checked. Deliberate — the unchecked
+      // track is a translucent overlay in both themes, so the thumb there
+      // wants white regardless of colour; repainting it would put a near-black
+      // thumb on a dark overlay and cost the off state its only positional
+      // cue.
       //
       color: {
         primary:
@@ -214,9 +220,6 @@ const switchThumbClasses = cn([
   // `color` preset's foreground, because --neutral is light in dark mode and
   // would swallow a white thumb. Both resolve through --switch-thumb-bg on the
   // root, so a consumer's --switch-thumb wins in either state.
-  // R4: colour is state-dependent now, so it needs its own transition — the
-  // root's is on the root and transition-* does not inherit. Matched to the
-  // track's 80ms so the two cross together instead of the thumb snapping.
   "pointer-events-none absolute top-0 block bg-(--switch-thumb-bg)",
   "rounded-(--switch-radius) [corner-shape:var(--switch-corner-shape,round)]",
   // Progress of each edge along its own half of the timeline. Reversing
@@ -242,9 +245,13 @@ const switchThumbClasses = cn([
   // decides which motion is in play.
   "[--switch-press-total:max(var(--switch-press),calc(var(--switch-press-squash)*(var(--lead)-var(--trail))))]",
   "[transform:translateY(calc(2px+var(--switch-press-total)/2))]",
+  // The thumb's colour is state-dependent, so it needs its own transition: the
+  // root's is on the root and transition-* does not inherit. Matched to the
+  // track's own 80ms colour step so the two cross together rather than the
+  // thumb snapping while the track eases.
+  "transition-[background-color] duration-80 ease-out-cubic motion-reduce:transition-none",
   // Only 2px of track shows around the thumb, so anything heavier darkens the
   // inset below it and the thumb reads as sitting low.
-  "transition-[background-color] duration-80 ease-out-cubic motion-reduce:transition-none",
   "shadow-[0_1px_1px_0_oklch(0.18_0_0/0.1)]",
 ]);
 

@@ -63,6 +63,12 @@ Place form elements inside `DialogBody` and close on submit.
 
 <ComponentPreview component="dialog" example="dialog-scroll" />
 
+### Outside Scroll
+
+Set `scroll="outside"` on `DialogContent` to let the popup grow past the viewport and scroll the area around it instead. The header and footer travel with the card rather than staying pinned, and `DialogBody` drops its inner scroller.
+
+<ComponentPreview component="dialog" example="dialog-outside-scroll" />
+
 ### No Close Button
 
 Set `showCloseButton={false}` on `DialogContent` to hide the default close button.
@@ -185,6 +191,14 @@ Dialog container with centered positioning. Composes `Dialog.Portal`, `Dialog.Vi
 <ApiProp name="variant" fullType='"default" | "inset"' defaultValue='"default"'>
   Visual variant of the dialog. The `inset` variant applies a muted background
   to the footer that extends to the dialog edges.
+</ApiProp>
+
+<ApiProp name="scroll" fullType='"inside" | "outside"' defaultValue='"inside"'>
+  Where overflow scrolls. `inside` caps the popup to the viewport and scrolls
+  `DialogBody`, keeping the header and footer pinned. `outside` lets the popup
+  grow past the viewport and scrolls the area around it, so the whole card
+  moves; `DialogBody` renders without its inner scroller and its ScrollArea
+  props have no effect. Custom prop not available in Base UI.
 </ApiProp>
 
 <ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="5">

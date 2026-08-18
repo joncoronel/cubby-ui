@@ -116,7 +116,7 @@ Base UI handles the dialog role, labelling, focus trapping, and Escape. One thin
 
 `scroll="outside"` moves initial focus to the popup itself rather than the first focusable child. Without it the browser scrolls whatever it focuses into view, so a tall dialog can open part-way down its own content. The popup's focus ring is suppressed in this mode because focus lands there on open rather than by user action. Pass `initialFocus` to choose a different target.
 
-The close button stays reachable while the card scrolls, so a dialog taller than the viewport can still be dismissed by pointer as well as by Escape.
+The close button sits at the top of the card, so under `scroll="outside"` it scrolls out of view on a tall dialog. Escape still closes it. Give a long dialog a footer close action, or set `showCloseButton={false}` and place your own.
 
 ## API Reference
 

@@ -191,13 +191,9 @@ function DialogContent({
       data-level={level}
       data-scroll={scroll}
       className={cn(
-        "text-popover-foreground relative z-50 flex w-full max-w-full min-w-0 flex-col",
+        "text-popover-foreground relative z-50 flex w-full max-w-full min-w-0 flex-col overflow-hidden",
         "rounded-2xl sm:max-w-lg",
-        // Outside scroll must not clip: `overflow-hidden` would make the
-        // popup the sticky close button's scrollport, pinning the button to
-        // the card instead of the viewport. Nothing needs clipping there,
-        // the inset footer rounds its own bottom corners.
-        scroll === "inside" && "max-h-full min-h-0 overflow-hidden",
+        scroll === "inside" && "max-h-full min-h-0",
         // Outside scroll parks initial focus on the popup itself, so suppress
         // the UA ring it would otherwise draw around the whole card.
         isOutsideScroll && "outline-none",
@@ -224,23 +220,11 @@ function DialogContent({
       )}
       {...props}
     >
-      {/* Outside scroll renders the close button first so `sticky top-2` has
-            somewhere to stick: as a last child it starts below the fold and
-            never reaches the top. The negative margin cancels the row it would
-            otherwise add, so it overlays the header like the absolute one. */}
-      {showCloseButton && isOutsideScroll && (
-        <DialogClose
-          aria-label="Close"
-          // The negative margin has to match the button's own box or it adds a
-          // row: `icon_sm` is `size-9`, `sm:size-8`, plus `mt-2`.
-          className="sticky top-2 z-4 me-2 mt-2 -mb-11 self-end sm:-mb-10"
-          render={<Button size="icon_sm" variant="ghost" />}
-        >
-          <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} />
-        </DialogClose>
-      )}
       {children}
-      {showCloseButton && !isOutsideScroll && (
+      {/* Pinned to the card, not the viewport, in both modes. Under outside
+          scroll a tall card carries it off screen; Escape and the footer
+          remain. Matches Base UI's own outside-scroll demo. */}
+      {showCloseButton && (
         <DialogClose
           aria-label="Close"
           className="absolute end-2 top-2"

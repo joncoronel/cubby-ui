@@ -5,11 +5,11 @@ import path from "path";
 // import { glob } from "glob"; // Using fs.readdir instead
 import ts from "typescript";
 import { z } from "zod";
+import { extractCssVars } from "./lib/css-vars";
 
 const REGISTRY_PATH = path.join(process.cwd(), "registry");
 const REGISTRY_JSON_PATH = path.join(process.cwd(), "registry.json");
 const EXAMPLES_PATH = path.join(REGISTRY_PATH, "examples");
-import { extractCssVars } from "./lib/css-vars";
 
 const THEME_CSS_PATH = path.join(process.cwd(), "registry", "theme.css");
 const DEFAULT_STYLE = "default";

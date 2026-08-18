@@ -4,6 +4,11 @@ import { cn } from "@/lib/utils";
 
 export type SurfaceLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
+/** Every `SurfaceLevel`, for exhaustive iteration. Keep in sync with the type. */
+export const SURFACE_LEVELS = [
+  1, 2, 3, 4, 5, 6, 7, 8,
+] as const satisfies readonly SurfaceLevel[];
+
 export const SURFACE_BG: Record<SurfaceLevel, string> = {
   1: "bg-surface-1",
   2: "bg-surface-2",
@@ -16,33 +21,40 @@ export const SURFACE_BG: Record<SurfaceLevel, string> = {
 };
 
 /**
- * Shadows are written as `shadow-(--shadow-surface-N)` rather than the theme-key
- * form `shadow-surface-N`. Both compile to the same rule, but tailwind-merge only
- * recognizes the variable form as the `shadow` group — with the theme-key form it
- * lands in `shadow-color`, so a caller's `className="shadow-none"` never overrides
- * it and the winner is decided by stylesheet order instead. Same reasoning for the
- * `after:` rim below. Don't "simplify" these back.
+ * Every shadow below uses the `shadow-(--var)` form, pointing at a single theme
+ * variable. Two reasons, and both break if you "simplify" it back:
+ *
+ * 1. tailwind-merge only treats this form as the `shadow` group. A theme-key
+ *    name and a square-bracket arbitrary value both land in `shadow-color`, so
+ *    a caller's `className="shadow-none"` never overrides them and stylesheet
+ *    order silently picks the winner. (Do not spell those two forms out here:
+ *    Tailwind scans comments, and a bracket example compiles to a real,
+ *    broken utility.)
+ * 2. The variable is a `--surface-*` source token, not a `@theme` alias. Source
+ *    tokens are re-declared in `.dark`, so they resolve per element. A `@theme`
+ *    alias is declared once on `:root`, which makes a `.dark` scoped to a
+ *    subtree inherit the light value (same trap as `--border`).
  */
 export const SURFACE_SHADOW: Record<SurfaceLevel, string> = {
-  1: "shadow-(--shadow-surface-1)",
-  2: "shadow-(--shadow-surface-2)",
-  3: "shadow-(--shadow-surface-3)",
-  4: "shadow-(--shadow-surface-4)",
-  5: "shadow-(--shadow-surface-5)",
-  6: "shadow-(--shadow-surface-6)",
-  7: "shadow-(--shadow-surface-7)",
-  8: "shadow-(--shadow-surface-8)",
+  1: "shadow-(--surface-shadow-1)",
+  2: "shadow-(--surface-shadow-2)",
+  3: "shadow-(--surface-shadow-3)",
+  4: "shadow-(--surface-shadow-4)",
+  5: "shadow-(--surface-shadow-5)",
+  6: "shadow-(--surface-shadow-6)",
+  7: "shadow-(--surface-shadow-7)",
+  8: "shadow-(--surface-shadow-8)",
 };
 
 export const SURFACE_RIM: Record<SurfaceLevel, string> = {
-  1: "after:shadow-(--shadow-surface-rim-1)",
-  2: "after:shadow-(--shadow-surface-rim-2)",
-  3: "after:shadow-(--shadow-surface-rim-3)",
-  4: "after:shadow-(--shadow-surface-rim-4)",
-  5: "after:shadow-(--shadow-surface-rim-5)",
-  6: "after:shadow-(--shadow-surface-rim-6)",
-  7: "after:shadow-(--shadow-surface-rim-7)",
-  8: "after:shadow-(--shadow-surface-rim-8)",
+  1: "after:shadow-(--surface-rim-1)",
+  2: "after:shadow-(--surface-rim-2)",
+  3: "after:shadow-(--surface-rim-3)",
+  4: "after:shadow-(--surface-rim-4)",
+  5: "after:shadow-(--surface-rim-5)",
+  6: "after:shadow-(--surface-rim-6)",
+  7: "after:shadow-(--surface-rim-7)",
+  8: "after:shadow-(--surface-rim-8)",
 };
 
 /**
@@ -66,14 +78,14 @@ export const SURFACE_VAR: Record<SurfaceLevel, string> = {
  * Literal Tailwind classes so the scanner picks them up.
  */
 export const SURFACE_SHADOW_COMBINED: Record<SurfaceLevel, string> = {
-  1: "shadow-[var(--surface-shadow-1),var(--surface-rim-1)]",
-  2: "shadow-[var(--surface-shadow-2),var(--surface-rim-2)]",
-  3: "shadow-[var(--surface-shadow-3),var(--surface-rim-3)]",
-  4: "shadow-[var(--surface-shadow-4),var(--surface-rim-4)]",
-  5: "shadow-[var(--surface-shadow-5),var(--surface-rim-5)]",
-  6: "shadow-[var(--surface-shadow-6),var(--surface-rim-6)]",
-  7: "shadow-[var(--surface-shadow-7),var(--surface-rim-7)]",
-  8: "shadow-[var(--surface-shadow-8),var(--surface-rim-8)]",
+  1: "shadow-(--surface-shadow-combined-1)",
+  2: "shadow-(--surface-shadow-combined-2)",
+  3: "shadow-(--surface-shadow-combined-3)",
+  4: "shadow-(--surface-shadow-combined-4)",
+  5: "shadow-(--surface-shadow-combined-5)",
+  6: "shadow-(--surface-shadow-combined-6)",
+  7: "shadow-(--surface-shadow-combined-7)",
+  8: "shadow-(--surface-shadow-combined-8)",
 };
 
 export function surfaceClasses(

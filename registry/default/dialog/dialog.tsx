@@ -79,24 +79,48 @@ function DialogBackdrop({ className, ...props }: BaseDialog.Backdrop.Props) {
 function DialogViewport({
   className,
   scroll = "inside",
+  children,
   ...props
 }: BaseDialog.Viewport.Props & { scroll?: DialogScroll }) {
+  const { modal } = React.useContext(DialogConfigContext);
   return (
     <BaseDialog.Viewport
       data-slot="dialog-viewport"
-      data-scroll={scroll}
       className={cn(
         "fixed inset-0",
         // Inside scroll: the viewport is the centering frame the popup is
-        // capped against. Outside scroll: it's only the scroll port — the
-        // centering and padding move onto the scrollable content instead, so
-        // the popup can grow past the bottom edge.
+        // capped against. Outside scroll: it's only the scroll port, and the
+        // ScrollArea below owns the centering and padding so the popup can
+        // grow past the bottom edge.
         scroll === "inside" &&
           "flex flex-col items-center justify-center overflow-hidden px-4 py-6",
         className,
       )}
       {...props}
-    />
+    >
+      <DialogScrollContext.Provider value={scroll}>
+        {scroll === "outside" ? (
+          <ScrollArea
+            // `min-h-full` (not `h-full`) keeps the centering box growable, so a
+            // short popup sits centered and a tall one extends the scroll range
+            // instead of having its top clipped out of reach.
+            contentClassName="flex min-h-full items-center justify-center px-4 py-6"
+            // A non-modal viewport is `pointer-events-none` so the page stays
+            // usable, which would otherwise leave the scrollbar thumb dead.
+            // Only the thumb opts back in; the gutter keeps passing wheel and
+            // clicks through to the page.
+            className={cn(
+              modal !== true &&
+                "[&_[data-slot=scroll-area-scrollbar]]:pointer-events-auto",
+            )}
+          >
+            {children}
+          </ScrollArea>
+        ) : (
+          children
+        )}
+      </DialogScrollContext.Provider>
+    </BaseDialog.Viewport>
   );
 }
 
@@ -114,7 +138,12 @@ function DialogContent({
 }: BaseDialog.Popup.Props & {
   showCloseButton?: boolean;
   variant?: "default" | "inset";
-  /** Whether the dialog body scrolls inside the popup (`"inside"`) or the area around the popup scrolls (`"outside"`). */
+  /**
+   * Whether the dialog body scrolls inside the popup (`"inside"`) or the area
+   * around the popup scrolls (`"outside"`). Treat as fixed for the dialog's
+   * lifetime: changing it while open swaps the element tree above the popup,
+   * which remounts it and replays the entry animation.
+   */
   scroll?: DialogScroll;
   /** Surface elevation level for the dialog bg (1-8). Defaults to 5 — the standard "dialog tier" above page/cards/popovers. Bump to 7 for a hero/critical modal. */
   level?: SurfaceLevel;
@@ -133,63 +162,94 @@ function DialogContent({
   const mergedRef = React.useCallback(
     (node: HTMLDivElement | null) => {
       popupRef.current = node;
-      if (typeof ref === "function") ref(node);
-      else if (ref) ref.current = node;
+      if (typeof ref !== "function") {
+        if (ref) ref.current = node;
+        return () => {
+          popupRef.current = null;
+          if (ref) ref.current = null;
+        };
+      }
+      // React 19 ref callbacks may return a cleanup. Returning one here makes
+      // React run it on detach instead of calling us back with `null`, so the
+      // caller's cleanup has to be forwarded rather than dropped.
+      const cleanup = ref(node);
+      return () => {
+        popupRef.current = null;
+        if (typeof cleanup === "function") cleanup();
+        else ref(null);
+      };
     },
     [ref],
   );
 
   const popup = (
-    <DialogScrollContext.Provider value={scroll}>
-      <BaseDialog.Popup
-        ref={mergedRef}
-        initialFocus={initialFocus ?? (isOutsideScroll ? popupRef : undefined)}
-        data-slot="dialog-content"
-        data-variant={variant}
-        data-level={level}
-        data-scroll={scroll}
-        className={cn(
-          "text-popover-foreground relative z-50 flex w-full max-w-full min-w-0 flex-col overflow-hidden",
-          "rounded-2xl sm:max-w-lg",
-          scroll === "inside" && "max-h-full min-h-0",
-          // Outside scroll parks initial focus on the popup itself, so suppress
-          // the UA ring it would otherwise draw around the whole card.
-          isOutsideScroll && "outline-none",
-          // Surface elevation — bg + shadow + rim overlay (rim uses ::after at z-[2])
-          elevatedSurface(level, shadowLevel),
-          // Mobile: bottom sheet style
-          // "right-0 bottom-0 left-0 rounded-t-lg",
-          // Desktop: centered modal
-          "-translate-y-[calc(1.25rem*var(--nested-dialogs))]",
+    <BaseDialog.Popup
+      ref={mergedRef}
+      initialFocus={initialFocus ?? (isOutsideScroll ? popupRef : undefined)}
+      data-slot="dialog-content"
+      data-variant={variant}
+      data-level={level}
+      data-scroll={scroll}
+      className={cn(
+        "text-popover-foreground relative z-50 flex w-full max-w-full min-w-0 flex-col",
+        "rounded-2xl sm:max-w-lg",
+        // Outside scroll must not clip: `overflow-hidden` would make the
+        // popup the sticky close button's scrollport, pinning the button to
+        // the card instead of the viewport. Nothing needs clipping there,
+        // the inset footer rounds its own bottom corners.
+        scroll === "inside" && "max-h-full min-h-0 overflow-hidden",
+        // Outside scroll parks initial focus on the popup itself, so suppress
+        // the UA ring it would otherwise draw around the whole card.
+        isOutsideScroll && "outline-none",
+        // Surface elevation — bg + shadow + rim overlay (rim uses ::after at z-[2])
+        elevatedSurface(level, shadowLevel),
+        // Mobile: bottom sheet style
+        // "right-0 bottom-0 left-0 rounded-t-lg",
+        // Desktop: centered modal
+        "-translate-y-[calc(1.25rem*var(--nested-dialogs))]",
 
-          // Scale effect for nested dialogs on desktop
-          "scale-[calc(1-0.1*var(--nested-dialogs))]",
-          // Animation duration
-          "ease-out-expo transition-all duration-200",
-          // Desktop animations: scale and fade
-          "data-starting-style:translate-y-[calc(1.25rem)] data-starting-style:scale-95 data-starting-style:opacity-0",
-          "data-ending-style:translate-y-[calc(1.25rem)] data-ending-style:scale-95 data-ending-style:opacity-0",
-          // Nested dialog overlay — uses ::before (not ::after, that's the rim) at z-[3] so it paints above content AND above the rim
-          "before:pointer-events-none before:absolute before:inset-0 before:z-3 before:hidden before:rounded-[inherit] before:bg-black/5 before:opacity-0 before:transition-[opacity,display] before:transition-discrete before:duration-200",
-          "data-nested-dialog-open:before:block data-nested-dialog-open:before:opacity-100",
-          "starting:data-nested-dialog-open:before:opacity-0",
-          !isModal && "pointer-events-auto",
-          className,
-        )}
-        {...props}
-      >
-        {children}
-        {showCloseButton && (
-          <DialogClose
-            aria-label="Close"
-            className="absolute end-2 top-2"
-            render={<Button size="icon_sm" variant="ghost" />}
-          >
-            <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} />
-          </DialogClose>
-        )}
-      </BaseDialog.Popup>
-    </DialogScrollContext.Provider>
+        // Scale effect for nested dialogs on desktop
+        "scale-[calc(1-0.1*var(--nested-dialogs))]",
+        // Animation duration
+        "ease-out-expo transition-all duration-200",
+        // Desktop animations: scale and fade
+        "data-starting-style:translate-y-[calc(1.25rem)] data-starting-style:scale-95 data-starting-style:opacity-0",
+        "data-ending-style:translate-y-[calc(1.25rem)] data-ending-style:scale-95 data-ending-style:opacity-0",
+        // Nested dialog overlay — uses ::before (not ::after, that's the rim) at z-[3] so it paints above content AND above the rim
+        "before:pointer-events-none before:absolute before:inset-0 before:z-3 before:hidden before:rounded-[inherit] before:bg-black/5 before:opacity-0 before:transition-[opacity,display] before:transition-discrete before:duration-200",
+        "data-nested-dialog-open:before:block data-nested-dialog-open:before:opacity-100",
+        "starting:data-nested-dialog-open:before:opacity-0",
+        !isModal && "pointer-events-auto",
+        className,
+      )}
+      {...props}
+    >
+      {/* Outside scroll renders the close button first so `sticky top-2` has
+            somewhere to stick: as a last child it starts below the fold and
+            never reaches the top. The negative margin cancels the row it would
+            otherwise add, so it overlays the header like the absolute one. */}
+      {showCloseButton && isOutsideScroll && (
+        <DialogClose
+          aria-label="Close"
+          // The negative margin has to match the button's own box or it adds a
+          // row: `icon_sm` is `size-9`, `sm:size-8`, plus `mt-2`.
+          className="sticky top-2 z-4 me-2 mt-2 -mb-11 self-end sm:-mb-10"
+          render={<Button size="icon_sm" variant="ghost" />}
+        >
+          <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} />
+        </DialogClose>
+      )}
+      {children}
+      {showCloseButton && !isOutsideScroll && (
+        <DialogClose
+          aria-label="Close"
+          className="absolute end-2 top-2"
+          render={<Button size="icon_sm" variant="ghost" />}
+        >
+          <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} />
+        </DialogClose>
+      )}
+    </BaseDialog.Popup>
   );
 
   return (
@@ -199,18 +259,7 @@ function DialogContent({
         scroll={scroll}
         className={cn(!isModal && "pointer-events-none")}
       >
-        {isOutsideScroll ? (
-          <ScrollArea
-            // `min-h-full` (not `h-full`) keeps the centering box growable, so a
-            // short popup sits centered and a tall one extends the scroll range
-            // instead of having its top clipped out of reach.
-            contentClassName="flex min-h-full items-center justify-center px-4 py-6"
-          >
-            {popup}
-          </ScrollArea>
-        ) : (
-          popup
-        )}
+        {popup}
       </DialogViewport>
     </DialogPortal>
   );
@@ -255,6 +304,21 @@ function DialogBody({
     "fadeEdges" | "scrollbarGutter" | "persistScrollbar" | "hideScrollbar"
   >) {
   const scroll = React.useContext(DialogScrollContext);
+
+  if (process.env.NODE_ENV !== "production") {
+    if (
+      scroll === "outside" &&
+      (nativeScroll ||
+        fadeEdges !== true ||
+        scrollbarGutter ||
+        persistScrollbar !== undefined ||
+        hideScrollbar !== undefined)
+    ) {
+      console.error(
+        'DialogBody: `fadeEdges`, `scrollbarGutter`, `persistScrollbar`, `hideScrollbar` and `nativeScroll` have no effect under `scroll="outside"` — the body renders no scroller of its own there.',
+      );
+    }
+  }
 
   const content = (
     <div className={cn("px-6 py-1", className)} {...props}>

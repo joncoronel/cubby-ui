@@ -9,6 +9,8 @@ import { z } from "zod";
 const REGISTRY_PATH = path.join(process.cwd(), "registry");
 const REGISTRY_JSON_PATH = path.join(process.cwd(), "registry.json");
 const EXAMPLES_PATH = path.join(REGISTRY_PATH, "examples");
+import { extractCssVars } from "./lib/css-vars";
+
 const THEME_CSS_PATH = path.join(process.cwd(), "registry", "theme.css");
 const DEFAULT_STYLE = "default";
 
@@ -1810,41 +1812,24 @@ function extractCssContent(): {
   // Extract :root variables (light mode)
   const rootContent = extractBlockBody(content, /:root\s*\{/);
   if (rootContent) {
-    const varMatches = rootContent.matchAll(/--([a-z0-9-]+):\s*([^;]+);/g);
-    for (const match of varMatches) {
-      const varName = match[1];
-      const varValue = match[2].trim();
-      if (!varValue.includes("/*")) {
-        lightVars[varName] = varValue;
-      }
-    }
+    Object.assign(lightVars, extractCssVars(rootContent));
   }
 
   // Extract .dark variables (dark mode)
   const darkContent = extractBlockBody(content, /\.dark\s*\{/);
   if (darkContent) {
-    const varMatches = darkContent.matchAll(/--([a-z0-9-]+):\s*([^;]+);/g);
-    for (const match of varMatches) {
-      const varName = match[1];
-      const varValue = match[2].trim();
-      if (!varValue.includes("/*")) {
-        darkVars[varName] = varValue;
-      }
-    }
+    Object.assign(darkVars, extractCssVars(darkContent));
   }
 
   // Extract @theme inline variables
   const themeContent = extractBlockBody(content, /@theme inline\s*\{/);
   if (themeContent) {
-    const varMatches = themeContent.matchAll(/--([a-z0-9-]+):\s*([^;]+);/g);
-    for (const match of varMatches) {
-      const varName = match[1];
-      const varValue = match[2].trim();
-      if (!varValue.includes("/*") && !varValue.includes("*/")) {
-        // Per shadcn docs, animation variables should keep the -- prefix
-        const key = varName.startsWith("animate-") ? `--${varName}` : varName;
-        themeVars[key] = varValue;
-      }
+    for (const [varName, value] of Object.entries(
+      extractCssVars(themeContent),
+    )) {
+      // Per shadcn docs, animation variables should keep the -- prefix
+      const key = varName.startsWith("animate-") ? `--${varName}` : varName;
+      themeVars[key] = value;
     }
   }
 

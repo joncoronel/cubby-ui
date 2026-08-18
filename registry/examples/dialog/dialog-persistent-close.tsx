@@ -99,7 +99,12 @@ export default function DialogPersistentClose() {
 
         <div
           className={cn(
-            "text-popover-foreground ease-out-expo pointer-events-auto relative w-full max-w-lg rounded-2xl transition-transform duration-200",
+            "text-popover-foreground ease-out-expo pointer-events-auto relative w-full max-w-full rounded-2xl transition-transform duration-200",
+            // Cap relative to the frame, not an absolute width. `100%-6rem`
+            // reserves 3rem of gutter each side, which is where the pinned
+            // button lives. Widen `32rem` freely; the gutter survives, because
+            // the card narrows itself before it can reach the button.
+            "sm:max-w-[min(32rem,calc(100%-6rem))]",
             "group-data-ending-style/popup:translate-y-[calc(1.25rem)] group-data-ending-style/popup:scale-95",
             "group-data-starting-style/popup:translate-y-[calc(1.25rem)] group-data-starting-style/popup:scale-95",
             solidSurface(5, 5),

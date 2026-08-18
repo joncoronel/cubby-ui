@@ -91,7 +91,12 @@ export default function DialogElementsOutside() {
             // `flex max-h-full min-h-0 flex-col` is what lets DialogBody
             // scroll: without a height cap on the card its `flex-1` has
             // nothing to resolve against and the card just grows instead.
-            "text-popover-foreground ease-out-expo pointer-events-auto flex max-h-full min-h-0 w-full max-w-full flex-col overflow-hidden rounded-2xl transition-transform duration-200 group-data-ending-style/popup:translate-y-[calc(1.25rem)] group-data-ending-style/popup:scale-95 group-data-starting-style/popup:translate-y-[calc(1.25rem)] group-data-starting-style/popup:scale-95 sm:max-w-lg",
+            "text-popover-foreground ease-out-expo pointer-events-auto flex max-h-full min-h-0 w-full max-w-full flex-col overflow-hidden rounded-2xl transition-transform duration-200 group-data-ending-style/popup:translate-y-[calc(1.25rem)] group-data-ending-style/popup:scale-95 group-data-starting-style/popup:translate-y-[calc(1.25rem)] group-data-starting-style/popup:scale-95",
+            // The width cap is relative to the frame, not absolute. `100%-6rem`
+            // reserves 3rem of gutter on each side for the close button, so the
+            // button can never land on the card no matter how wide the cap or
+            // the viewport gets. Change `32rem` freely; the gutter survives.
+            "sm:max-w-[min(32rem,calc(100%-6rem))]",
             solidSurface(5, 5),
           )}
         >

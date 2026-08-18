@@ -110,13 +110,21 @@ Place elements visually outside the popup card while keeping them inside the pop
 
 <ComponentPreview component="dialog" example="dialog-elements-outside" />
 
+### Persistent Close Button
+
+Combine `scroll="outside"` with the transparent frame above to keep the close button in the corner of the screen while the card scrolls past it.
+
+<ComponentPreview component="dialog" example="dialog-persistent-close" />
+
+The button stays inside `DialogContent` so it remains in the focus trap, which puts it inside the scroll area too. `sticky` is what pins it there; `fixed` would resolve against the popup, not the viewport, because the popup carries a transform for nested dialogs. It needs a gutter to sit in, so below `sm` it falls back into the card and scrolls away with the header.
+
 ## Accessibility
 
 Base UI handles the dialog role, labelling, focus trapping, and Escape. One thing is layered on top:
 
 `scroll="outside"` moves initial focus to the popup itself rather than the first focusable child. Without it the browser scrolls whatever it focuses into view, so a tall dialog can open part-way down its own content. The popup's focus ring is suppressed in this mode because focus lands there on open rather than by user action. Pass `initialFocus` to choose a different target.
 
-The close button sits at the top of the card, so under `scroll="outside"` it scrolls out of view on a tall dialog. Escape still closes it. Give a long dialog a footer close action, or set `showCloseButton={false}` and place your own.
+The close button sits at the top of the card, so under `scroll="outside"` it scrolls out of view on a tall dialog. Escape still closes it. Give a long dialog a footer close action, or see [Persistent Close Button](#persistent-close-button) for one that stays on screen.
 
 ## API Reference
 

@@ -41,9 +41,15 @@ const CELL_RADIUS: Record<ToggleGroupSize, string> = {
   lg: "**:data-[slot=toggle]:rounded-xl",
 };
 
-// Shared cell resets for the attached variants.
+// Shared cell resets for the attached variants. Press-scale is off inside a
+// track — the reset targets ::before, where the scale now lives (see the Toggle
+// recipe), not the cell itself. Deliberately no ::after twin: Tailwind's `after:`
+// variant also emits `content: ""`, so the reset alone would materialize an
+// in-flow pseudo on press, and the cell's `gap` would push it out to 8px of
+// phantom width. Nothing needs the twin anyway — only `solid` paints an ::after,
+// and attached cells always resolve to `ghost` or `outline`.
 const ATTACHED_CELL =
-  "**:data-[slot=toggle]:relative **:data-[slot=toggle]:shadow-none **:data-[slot=toggle]:active:scale-100 **:data-[slot=toggle]:focus-visible:z-10";
+  "**:data-[slot=toggle]:shadow-none **:data-[slot=toggle]:active:before:scale-100 **:data-[slot=toggle]:focus-visible:z-10";
 
 function ToggleGroup({
   className,
@@ -87,12 +93,12 @@ function ToggleGroup({
                 // rules merge into one that frames the control and divides the cells.
                 ATTACHED_CELL,
                 CELL_RADIUS[size],
-                "data-[orientation=horizontal]:**:data-[slot=toggle]:not-first:rounded-s-none data-[orientation=horizontal]:**:data-[slot=toggle]:not-first:border-s-0 data-[orientation=horizontal]:**:data-[slot=toggle]:not-last:rounded-e-none",
-                "data-[orientation=vertical]:**:data-[slot=toggle]:not-first:rounded-t-none data-[orientation=vertical]:**:data-[slot=toggle]:not-first:border-t-0 data-[orientation=vertical]:**:data-[slot=toggle]:not-last:rounded-b-none",
+                "data-[orientation=horizontal]:**:data-[slot=toggle]:not-first:rounded-s-none data-[orientation=horizontal]:**:data-[slot=toggle]:not-last:rounded-e-none data-[orientation=horizontal]:**:data-[slot=toggle]:not-first:before:border-s-0",
+                "data-[orientation=vertical]:**:data-[slot=toggle]:not-first:rounded-t-none data-[orientation=vertical]:**:data-[slot=toggle]:not-last:rounded-b-none data-[orientation=vertical]:**:data-[slot=toggle]:not-first:before:border-t-0",
               ]
             : [
                 // Solid / ghost: one connected track; cells flatten and inherit the track's
-                // corner radius on the ends (size-agnostic), with floating ::before dividers.
+                // corner radius on the ends (size-agnostic), with floating ::after dividers.
                 // Each cell's own pressed fill (ghost → surface-selected) provides the
                 // selected look — no group-level override needed, so no bg-transparent
                 // reset here that would out-specify it.
@@ -100,13 +106,16 @@ function ToggleGroup({
                 variant === "solid" && "bg-muted",
                 // ghost: no container chrome.
                 ATTACHED_CELL,
-                "**:data-[slot=toggle]:rounded-none **:data-[slot=toggle]:border-0",
+                "**:data-[slot=toggle]:rounded-none **:data-[slot=toggle]:before:border-0",
                 "**:data-[slot=toggle]:first:rounded-s-[inherit] **:data-[slot=toggle]:last:rounded-e-[inherit] data-[orientation=vertical]:**:data-[slot=toggle]:first:rounded-s-none data-[orientation=vertical]:**:data-[slot=toggle]:first:rounded-t-[inherit] data-[orientation=vertical]:**:data-[slot=toggle]:last:rounded-e-none data-[orientation=vertical]:**:data-[slot=toggle]:last:rounded-b-[inherit]",
                 separators && [
-                  // Floating inset rule at 50% that tracks its cell's ink.
-                  "**:data-[slot=toggle]:not-first:before:pointer-events-none **:data-[slot=toggle]:not-first:before:absolute **:data-[slot=toggle]:not-first:before:z-0 **:data-[slot=toggle]:not-first:before:rounded-full **:data-[slot=toggle]:not-first:before:bg-current **:data-[slot=toggle]:not-first:before:opacity-15 **:data-[slot=toggle]:not-first:before:content-['']",
-                  "**:data-[slot=toggle]:not-first:before:start-0 **:data-[slot=toggle]:not-first:before:top-1/4 **:data-[slot=toggle]:not-first:before:h-1/2 **:data-[slot=toggle]:not-first:before:w-px",
-                  "data-[orientation=vertical]:**:data-[slot=toggle]:not-first:before:inset-s-1/4 data-[orientation=vertical]:**:data-[slot=toggle]:not-first:before:top-0 data-[orientation=vertical]:**:data-[slot=toggle]:not-first:before:h-px data-[orientation=vertical]:**:data-[slot=toggle]:not-first:before:w-1/2",
+                  // Floating inset rule at 50% that tracks its cell's ink. It
+                  // rides ::after because ::before is the cell's paint layer
+                  // now; attached solid/ghost cells render as `ghost`, whose
+                  // ::after is otherwise unused (only `solid` paints one).
+                  "**:data-[slot=toggle]:not-first:after:pointer-events-none **:data-[slot=toggle]:not-first:after:absolute **:data-[slot=toggle]:not-first:after:z-0 **:data-[slot=toggle]:not-first:after:rounded-full **:data-[slot=toggle]:not-first:after:bg-current **:data-[slot=toggle]:not-first:after:opacity-15 **:data-[slot=toggle]:not-first:after:content-['']",
+                  "**:data-[slot=toggle]:not-first:after:start-0 **:data-[slot=toggle]:not-first:after:top-1/4 **:data-[slot=toggle]:not-first:after:h-1/2 **:data-[slot=toggle]:not-first:after:w-px",
+                  "data-[orientation=vertical]:**:data-[slot=toggle]:not-first:after:inset-s-1/4 data-[orientation=vertical]:**:data-[slot=toggle]:not-first:after:top-0 data-[orientation=vertical]:**:data-[slot=toggle]:not-first:after:h-px data-[orientation=vertical]:**:data-[slot=toggle]:not-first:after:w-1/2",
                 ],
               ],
         className,

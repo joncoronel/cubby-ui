@@ -58,6 +58,31 @@ Set `variant="outline"` to frame the toggle with a border.
 | `solid`   | Muted plate when off; insets to the selected overlay when on. |
 | `outline` | Framed with a border. Fills when on.                 |
 
+### Custom Colors
+
+The toggle paints its background from CSS variables, one per state: `--tgl-bg`
+(off), `--tgl-bg-hover`, and `--tgl-bg-selected` (on). Each variant sets them and
+the toggle switches between them internally, so recoloring a toggle one-off is
+just overriding the variables, with no `hover:` or `data-pressed:` prefixes
+needed. Override the variables instead of `bg-*` classes: root-level `bg-*`
+paints behind the fill layer, so it is hidden by opaque variants and blended by
+transparent ones, which is rarely what you want:
+
+```tsx showLineNumbers
+<Toggle className="[--tgl-bg-selected:var(--color-violet-600)] data-pressed:text-white">
+  <BoldIcon />
+</Toggle>
+```
+
+Any variable you don't override keeps the variant's color for that state. The
+`solid` variant is the exception: its plate is `--tgl-bg` and its hover and
+selected states composite a translucent overlay on top of that plate, so retint
+it through `--tgl-bg` rather than the per-state variables.
+
+The border color is `--tgl-border`. The border itself lives on the toggle's paint
+pseudo-element, so use `before:` classes to restyle it, for example
+`before:border-dashed` or `before:border-2`.
+
 ### Controlled
 
 Use `pressed` and `onPressedChange` to drive the toggle state yourself.

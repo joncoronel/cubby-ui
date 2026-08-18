@@ -251,11 +251,9 @@ function DataTableContent({
       rowDividers={rowDividers}
       className={cn(
         // Strips Table's own elevation; outer DataTable container owns it.
-        // `shadow-none!` needed because twMerge doesn't resolve custom shadow
-        // utilities, so without `!` the inner ring persists in light mode.
         // `after:hidden` removes the dark-mode rim ::after (would paint a
         // square-cornered rim over the DataTable's rounded one).
-        "rounded-none bg-transparent shadow-none! ring-0 after:hidden",
+        "rounded-none bg-transparent shadow-none ring-0 after:hidden",
         className,
       )}
       {...tableProps}

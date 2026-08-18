@@ -354,7 +354,7 @@ function CodeBlockTabs({
         <TabsList
           variant={variant}
           size="small"
-          className="w-max bg-transparent p-0 shadow-none! ring-0"
+          className="w-max bg-transparent p-0 shadow-none ring-0"
         >
           {tabs.map((tab) => (
             <TabsTrigger key={tab.value} value={tab.value}>

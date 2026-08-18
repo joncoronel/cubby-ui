@@ -15,26 +15,34 @@ export const SURFACE_BG: Record<SurfaceLevel, string> = {
   8: "bg-surface-8",
 };
 
+/**
+ * Shadows are written as `shadow-(--shadow-surface-N)` rather than the theme-key
+ * form `shadow-surface-N`. Both compile to the same rule, but tailwind-merge only
+ * recognizes the variable form as the `shadow` group — with the theme-key form it
+ * lands in `shadow-color`, so a caller's `className="shadow-none"` never overrides
+ * it and the winner is decided by stylesheet order instead. Same reasoning for the
+ * `after:` rim below. Don't "simplify" these back.
+ */
 export const SURFACE_SHADOW: Record<SurfaceLevel, string> = {
-  1: "shadow-surface-1",
-  2: "shadow-surface-2",
-  3: "shadow-surface-3",
-  4: "shadow-surface-4",
-  5: "shadow-surface-5",
-  6: "shadow-surface-6",
-  7: "shadow-surface-7",
-  8: "shadow-surface-8",
+  1: "shadow-(--shadow-surface-1)",
+  2: "shadow-(--shadow-surface-2)",
+  3: "shadow-(--shadow-surface-3)",
+  4: "shadow-(--shadow-surface-4)",
+  5: "shadow-(--shadow-surface-5)",
+  6: "shadow-(--shadow-surface-6)",
+  7: "shadow-(--shadow-surface-7)",
+  8: "shadow-(--shadow-surface-8)",
 };
 
 export const SURFACE_RIM: Record<SurfaceLevel, string> = {
-  1: "after:shadow-surface-rim-1",
-  2: "after:shadow-surface-rim-2",
-  3: "after:shadow-surface-rim-3",
-  4: "after:shadow-surface-rim-4",
-  5: "after:shadow-surface-rim-5",
-  6: "after:shadow-surface-rim-6",
-  7: "after:shadow-surface-rim-7",
-  8: "after:shadow-surface-rim-8",
+  1: "after:shadow-(--shadow-surface-rim-1)",
+  2: "after:shadow-(--shadow-surface-rim-2)",
+  3: "after:shadow-(--shadow-surface-rim-3)",
+  4: "after:shadow-(--shadow-surface-rim-4)",
+  5: "after:shadow-(--shadow-surface-rim-5)",
+  6: "after:shadow-(--shadow-surface-rim-6)",
+  7: "after:shadow-(--shadow-surface-rim-7)",
+  8: "after:shadow-(--shadow-surface-rim-8)",
 };
 
 /**
@@ -190,12 +198,7 @@ export interface ElevatedProps extends React.ComponentProps<"div"> {
   shadowLevel?: SurfaceLevel;
 }
 
-function Elevated({
-  level,
-  shadowLevel,
-  className,
-  ...props
-}: ElevatedProps) {
+function Elevated({ level, shadowLevel, className, ...props }: ElevatedProps) {
   return (
     <div
       data-slot="elevated"

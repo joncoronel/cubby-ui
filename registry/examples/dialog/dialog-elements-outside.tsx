@@ -23,7 +23,10 @@ export default function DialogElementsOutside() {
       <DialogTrigger render={<Button>View Image</Button>} />
 
       <DialogContent
-        className="group/popup pointer-events-none static flex h-full max-h-full w-full items-center justify-center overflow-visible bg-transparent shadow-none ring-0 data-ending-style:translate-y-0 data-ending-style:scale-100 data-starting-style:translate-y-0 data-starting-style:scale-100 sm:max-w-full"
+        // The popup is just a transparent layout frame; the card below carries
+        // the surface. `shadow-none` drops the frame's drop shadow and
+        // `after:hidden` removes the rim overlay `elevatedSurface()` adds.
+        className="group/popup pointer-events-none static flex h-full max-h-full w-full items-center justify-center overflow-visible bg-transparent shadow-none after:hidden data-ending-style:translate-y-0 data-ending-style:scale-100 data-starting-style:translate-y-0 data-starting-style:scale-100 sm:max-w-full"
         showCloseButton={false}
       >
         {/* Close button positioned OUTSIDE the card visually */}

@@ -1,1 +1,5 @@
-* text=auto
+# LF in the working tree on every platform, not just inside the repo. `shadcn
+# build` inlines component sources verbatim into public/r/*.json, so a CRLF
+# checkout ships carriage returns to consumers and flips those files for the
+# next contributor on another OS.
+* text=auto eol=lf

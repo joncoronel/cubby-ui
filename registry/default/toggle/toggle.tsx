@@ -12,11 +12,10 @@ import { cn } from "@/lib/utils";
 //
 // Paint: variants set per-state tokens (--tgl-bg, --tgl-bg-hover,
 // --tgl-bg-active, --tgl-bg-selected, --tgl-border), the state machine below
-// resolves them into
-// --tgl-paint, and togglePaint renders it on the pseudo (custom properties
-// inherit into pseudo-elements). Consumers recolor by overriding the tokens
-// (className="[--tgl-bg-selected:...]") and restyle the border via `before:`
-// classes (className="before:border-dashed").
+// resolves them into --tgl-paint, and togglePaint renders it on the pseudo
+// (custom properties inherit into pseudo-elements). Consumers recolor by
+// overriding the tokens (className="[--tgl-bg-selected:...]") and restyle the
+// border via `before:` classes (className="before:border-dashed").
 const toggleBase = cn(
   // Label + icon stay full-contrast (text-foreground) in every state; the
   // background carries the state, not the text — so resting toggles read as

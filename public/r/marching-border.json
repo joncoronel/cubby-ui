@@ -12,7 +12,7 @@
     },
     {
       "path": "registry/default/marching-border/marching-border.css",
-      "content": "/* -------------------------------------------------------------------------------------------------\r\n * MarchingBorder dash animation.\r\n *\r\n * One static keyframe shared across every instance. The end offset\r\n * (one full dash + gap cycle) comes from the `--march-offset` CSS\r\n * custom property set per-instance on the <path>, so any\r\n * (dash, gap) combination loops seamlessly without generating\r\n * per-instance keyframes.\r\n * -------------------------------------------------------------------------------------------------*/\r\n\r\n@keyframes dash-march {\r\n  to {\r\n    stroke-dashoffset: var(--march-offset);\r\n  }\r\n}\r\n",
+      "content": "/* -------------------------------------------------------------------------------------------------\n * MarchingBorder dash animation.\n *\n * One static keyframe shared across every instance. The end offset\n * (one full dash + gap cycle) comes from the `--march-offset` CSS\n * custom property set per-instance on the <path>, so any\n * (dash, gap) combination loops seamlessly without generating\n * per-instance keyframes.\n * -------------------------------------------------------------------------------------------------*/\n\n@keyframes dash-march {\n  to {\n    stroke-dashoffset: var(--march-offset);\n  }\n}\n",
       "type": "registry:file",
       "target": "components/ui/cubby-ui/marching-border/marching-border.css"
     }

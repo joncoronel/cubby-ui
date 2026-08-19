@@ -41,15 +41,16 @@ const CELL_RADIUS: Record<ToggleGroupSize, string> = {
   lg: "**:data-[slot=toggle]:rounded-xl",
 };
 
-// Shared cell resets for the attached variants. Press-scale is off inside a
-// track — the reset targets ::before, where the scale now lives (see the Toggle
-// recipe), not the cell itself. Deliberately no ::after twin: Tailwind's `after:`
-// variant also emits `content: ""`, so the reset alone would materialize an
-// in-flow pseudo on press, and the cell's `gap` would push it out to 8px of
-// phantom width. Nothing needs the twin anyway — only `solid` paints an ::after,
-// and attached cells always resolve to `ghost` or `outline`.
+// Shared cell resets for the attached variants. Press-scale is deliberately NOT
+// reset here: the Toggle recipe scales only its paint pseudo-element, so a cell
+// presses by shrinking its own fill inside the track while the label, the track,
+// and the dividers hold still — the same thing an attached Button does in a
+// ButtonGroup. Careful adding `after:` utilities to cells: Tailwind's `after:`
+// variant also emits `content: ""`, so a rule that only means to tweak a property
+// materializes an in-flow pseudo, which the cell's `gap` then pushes out to 8px
+// of phantom width. Only style ::after alongside `absolute` (as the dividers do).
 const ATTACHED_CELL =
-  "**:data-[slot=toggle]:shadow-none **:data-[slot=toggle]:active:before:scale-100 **:data-[slot=toggle]:focus-visible:z-10";
+  "**:data-[slot=toggle]:shadow-none **:data-[slot=toggle]:focus-visible:z-10";
 
 function ToggleGroup({
   className,

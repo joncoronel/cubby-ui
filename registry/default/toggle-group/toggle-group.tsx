@@ -71,8 +71,11 @@ function ToggleGroup({
   // *identity* (variant/size, fed through context); the group owns *adjacency*:
   // border collapse, end-cap radius, dividers, and track chrome. Keeping it
   // parent-side also makes the neutral-selection accent a single group-level
-  // override hook (see toggle-group-custom-color) and styles any descendant
-  // [data-slot=toggle] robustly, so it doesn't depend on the item wrapper.
+  // override hook (see toggle-group-custom-color). The selectors reach any
+  // descendant [data-slot=toggle] so they don't depend on the item wrapper, but
+  // they assume the variant ToggleGroupItem resolves: attached cells render as
+  // `ghost` or `outline`, never `solid`, which is what leaves ::after free for
+  // the dividers below.
   return (
     <BaseToggleGroup
       data-slot="toggle-group"
@@ -88,8 +91,9 @@ function ToggleGroup({
           : variant === "outline"
             ? [
                 // Outline: cells are Toggle `outline`s (see ToggleGroupItem), so they
-                // paint themselves — bg-card, an opaque same-family `--outline-hover`,
-                // and a border kept through press. That fixes the dark-mode darkening a
+                // paint themselves — a card fill and an opaque same-family
+                // `--outline-hover`, both on the cell's ::before, with the border a
+                // token that survives selection. That fixes the dark-mode darkening a
                 // neutral overlay caused. The group only collapses the borders: adjacent
                 // rules merge into one that frames the control and divides the cells.
                 ATTACHED_CELL,
@@ -100,9 +104,9 @@ function ToggleGroup({
             : [
                 // Solid / ghost: one connected track; cells flatten and inherit the track's
                 // corner radius on the ends (size-agnostic), with floating ::after dividers.
-                // Each cell's own pressed fill (ghost → surface-selected) provides the
-                // selected look — no group-level override needed, so no bg-transparent
-                // reset here that would out-specify it.
+                // Each cell's own paint tokens (ghost → surface-selected when on) provide
+                // the selected look, so the group sets no fill on the cells at all: the
+                // track chrome below is the group's own background, not the cells'.
                 TRACK_RADIUS[size],
                 variant === "solid" && "bg-muted",
                 // ghost: no container chrome.

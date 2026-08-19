@@ -91,7 +91,9 @@ Set `orientation="vertical"` to stack the buttons. Dividers and cell sizing foll
 
 ### Custom Selected Color
 
-The selected cell is neutral by design. There's no accent prop; recolor it by overriding the cell's selected-paint variable, `--tgl-bg-selected`, plus the ink with a text class. Note that `--primary` is light enough that it fails contrast as text on a tint, so the accent look pairs the tint with `--info-foreground` (the accessible brand-hue ink).
+The selected cell is neutral by design. There's no accent prop; recolor it by overriding the cell's selected-fill variable, `--tgl-bg-selected` (see [Toggle's custom colors](/docs/components/toggle#custom-colors) for the full set), plus the ink with a text class. Note that `--primary` is light enough that it fails contrast as text on a tint, so the accent look pairs the tint with `--info-foreground` (the accessible brand-hue ink).
+
+This applies to attached groups and to `detached` groups whose `variant` is `outline` or `ghost`. Detached `solid` cells paint selection with a translucent overlay composited on their plate, so retint those through `--tgl-bg` instead.
 
 <ComponentPreview component="toggle-group" example="toggle-group-custom-color" />
 

@@ -11,7 +11,8 @@ import { cn } from "@/lib/utils";
 // label and icon stay put.
 //
 // Paint: variants set per-state tokens (--tgl-bg, --tgl-bg-hover,
-// --tgl-bg-selected, --tgl-border), the state machine below resolves them into
+// --tgl-bg-active, --tgl-bg-selected, --tgl-border), the state machine below
+// resolves them into
 // --tgl-paint, and togglePaint renders it on the pseudo (custom properties
 // inherit into pseudo-elements). Consumers recolor by overriding the tokens
 // (className="[--tgl-bg-selected:...]") and restyle the border via `before:`
@@ -20,12 +21,14 @@ const toggleBase = cn(
   // Label + icon stay full-contrast (text-foreground) in every state; the
   // background carries the state, not the text — so resting toggles read as
   // legible options, not dimmed ones.
-  "relative isolate inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg text-sm font-medium whitespace-nowrap text-foreground select-none data-disabled:pointer-events-none data-disabled:opacity-60 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 transition-[outline-width,outline-offset,outline-color,scale,opacity,background-color,color] duration-100 ease-out focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
+  "relative isolate inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg text-sm font-medium whitespace-nowrap text-foreground select-none data-disabled:pointer-events-none data-disabled:opacity-60 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 transition-[outline-width,outline-offset,outline-color,opacity,color] duration-100 ease-out focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
   // State machine: unset tokens fall through to transparent. Selection is
-  // terminal — three states only (rest / hover / selected); hover does not
-  // alter a selected toggle, and there is no separate pressed-down fill (the
-  // press reads as the scale below).
-  "[--tgl-paint:var(--tgl-bg,transparent)] hover:not-data-pressed:[--tgl-paint:var(--tgl-bg-hover,var(--tgl-bg,transparent))] data-pressed:[--tgl-paint:var(--tgl-bg-selected,var(--tgl-bg,transparent))]",
+  // terminal, so neither hover nor press alters a selected toggle; both are
+  // scoped to the off state. The pressed-down step exists because the scale
+  // alone is invisible on a variant that paints nothing at rest (ghost), which
+  // is every attached group cell and every toggle on touch, where `hover:`
+  // never matches.
+  "[--tgl-paint:var(--tgl-bg,transparent)] hover:not-data-pressed:[--tgl-paint:var(--tgl-bg-hover,var(--tgl-bg,transparent))] active:not-data-pressed:[--tgl-paint:var(--tgl-bg-active,var(--tgl-bg-hover,var(--tgl-bg,transparent)))] data-pressed:[--tgl-paint:var(--tgl-bg-selected,var(--tgl-bg,transparent))]",
 );
 
 // The paint pseudo-element: 1px border + fill from the resolved vars,
@@ -39,7 +42,7 @@ const toggleVariants = cva(cn(toggleBase, togglePaint), {
     variant: {
       // Borderless: transparent when off, a neutral selected overlay when on.
       ghost:
-        "[--tgl-bg-hover:var(--surface-hover)] [--tgl-bg-selected:var(--surface-selected)]",
+        "[--tgl-bg-hover:var(--surface-hover)] [--tgl-bg-active:var(--surface-active)] [--tgl-bg-selected:var(--surface-selected)]",
       // Filled: an opaque muted plate that never changes color. Hover/selected
       // are the shared surface-hover / surface-selected overlays composited on
       // a second ::after layer that scales with the plate, so a
@@ -52,7 +55,7 @@ const toggleVariants = cva(cn(toggleBase, togglePaint), {
       // selected. bg-clip-padding keeps the card fill out from under the
       // translucent border.
       outline:
-        "[--tgl-border:var(--border)] [--tgl-bg:var(--card)] [--tgl-bg-hover:var(--outline-hover)] [--tgl-bg-selected:var(--secondary)] before:bg-clip-padding",
+        "[--tgl-border:var(--border)] [--tgl-bg:var(--card)] [--tgl-bg-hover:var(--outline-hover)] [--tgl-bg-active:var(--outline-active)] [--tgl-bg-selected:var(--secondary)] before:bg-clip-padding",
     },
     size: {
       sm: "h-9 min-w-9 gap-1.5 px-2 sm:h-8 sm:min-w-8",

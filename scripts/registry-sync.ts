@@ -1801,7 +1801,13 @@ function extractCssContent(): {
     };
   }
 
-  const content = fsSync.readFileSync(THEME_CSS_PATH, "utf-8");
+  // Normalize CRLF. theme.css is checked out with native line endings, so on
+  // Windows a multi-line token value would otherwise carry \r\n into the JSON
+  // string, churning the diff for every non-Windows contributor and shipping
+  // stray carriage returns into consumer CSS.
+  const content = fsSync
+    .readFileSync(THEME_CSS_PATH, "utf-8")
+    .replace(/\r\n/g, "\n");
   const lightVars: Record<string, string> = {};
   const darkVars: Record<string, string> = {};
   const themeVars: Record<string, string> = {};

@@ -60,16 +60,35 @@ Set `variant="outline"` to frame the toggle with a border.
 
 ### Custom Colors
 
-The toggle paints its background from CSS variables, one per state: `--tgl-bg`
-(off), `--tgl-bg-hover`, and `--tgl-bg-selected` (on). Each variant sets them and
-the toggle switches between them internally, so recoloring a toggle one-off is
-just overriding the variables, with no `hover:` or `data-pressed:` prefixes
-needed. Override the variables instead of `bg-*` classes: root-level `bg-*`
-paints behind the fill layer, so it is hidden by opaque variants and blended by
-transparent ones, which is rarely what you want:
+The toggle paints its fill from CSS variables, one per state:
+
+| Variable            | State                                   |
+| ------------------- | --------------------------------------- |
+| `--tgl-bg`          | Off.                                    |
+| `--tgl-bg-hover`    | Off and hovered.                        |
+| `--tgl-bg-active`   | Off and held down. Falls back to hover. |
+| `--tgl-bg-selected` | On.                                     |
+| `--tgl-border`      | Border color, in every state.           |
+
+Each variant sets them and the toggle switches between them internally, so
+recoloring the fill is just overriding the variables, with no `hover:` or
+`data-pressed:` prefixes needed. Override the variables instead of `bg-*`
+classes: root-level `bg-*` paints behind the fill layer, so it is hidden by
+opaque variants and blended by transparent ones, which is rarely what you want.
+The label color is not tokenized, so it stays a normal state-prefixed text
+class:
 
 ```tsx showLineNumbers
 <Toggle className="[--tgl-bg-selected:var(--color-violet-600)] data-pressed:text-white">
+  <BoldIcon />
+</Toggle>
+```
+
+Custom property values can't take Tailwind's `/10` opacity shorthand, so build a
+translucent tint with `color-mix` instead:
+
+```tsx showLineNumbers
+<Toggle className="[--tgl-bg-selected:color-mix(in_oklab,var(--primary)_10%,transparent)]">
   <BoldIcon />
 </Toggle>
 ```
@@ -79,9 +98,12 @@ Any variable you don't override keeps the variant's color for that state. The
 selected states composite a translucent overlay on top of that plate, so retint
 it through `--tgl-bg` rather than the per-state variables.
 
-The border color is `--tgl-border`. The border itself lives on the toggle's paint
-pseudo-element, so use `before:` classes to restyle it, for example
-`before:border-dashed` or `before:border-2`.
+The border lives on the toggle's paint pseudo-element, so `before:` classes
+restyle it, for example `before:border-dashed` or `before:border-2`. Only
+`outline` sets a visible `--tgl-border`, so on the other variants pair those
+classes with a color: `[--tgl-border:var(--border)] before:border-dashed`. Cells
+in an attached `solid` or `ghost` group are the exception, since the group
+strips their borders to keep the track seamless.
 
 ### Controlled
 

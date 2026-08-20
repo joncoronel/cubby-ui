@@ -67,16 +67,16 @@ Eight surface colors, drawn here in your current theme:
 
 <SurfaceTokensDemo />
 
-| Level       | Light            | Dark               | Typical use                              |
-| ----------- | ---------------- | ------------------ | ---------------------------------------- |
-| `surface-1` | `oklch(0.97 0 0)` | `oklch(0.205 ◇ ◆)` | Page background                          |
-| `surface-2` | `oklch(0.985 0 0)` | `oklch(0.235 ◇ ◆)` | Inline toolbars, menubars                |
-| `surface-3` | `oklch(1 0 0)`    | `oklch(0.264 ◇ ◆)` | Cards, popovers, dropdowns, tooltips     |
-| `surface-4` | `oklch(1 0 0)`    | `oklch(0.293 ◇ ◆)` | Tabs indicator, transitional             |
-| `surface-5` | `oklch(1 0 0)`    | `oklch(0.321 ◇ ◆)` | Dialogs, sheets, drawers, sub-menus      |
-| `surface-6` | `oklch(1 0 0)`    | `oklch(0.348 ◇ ◆)` | Transitional                             |
-| `surface-7` | `oklch(1 0 0)`    | `oklch(0.375 ◇ ◆)` | Popovers nested inside dialogs           |
-| `surface-8` | `oklch(1 0 0)`    | `oklch(0.402 ◇ ◆)` | Maximum elevation (rare)                 |
+| Level       | Light              | Dark               | Typical use                          |
+| ----------- | ------------------ | ------------------ | ------------------------------------ |
+| `surface-1` | `oklch(0.97 0 0)`  | `oklch(0.205 ◇ ◆)` | Page background                      |
+| `surface-2` | `oklch(0.985 0 0)` | `oklch(0.235 ◇ ◆)` | Inline toolbars, menubars            |
+| `surface-3` | `oklch(1 0 0)`     | `oklch(0.264 ◇ ◆)` | Cards, popovers, dropdowns, tooltips |
+| `surface-4` | `oklch(1 0 0)`     | `oklch(0.293 ◇ ◆)` | Tabs indicator, transitional         |
+| `surface-5` | `oklch(1 0 0)`     | `oklch(0.321 ◇ ◆)` | Dialogs, sheets, drawers, sub-menus  |
+| `surface-6` | `oklch(1 0 0)`     | `oklch(0.348 ◇ ◆)` | Transitional                         |
+| `surface-7` | `oklch(1 0 0)`     | `oklch(0.375 ◇ ◆)` | Popovers nested inside dialogs       |
+| `surface-8` | `oklch(1 0 0)`     | `oklch(0.402 ◇ ◆)` | Maximum elevation (rare)             |
 
 `◇` is `var(--neutral-chroma)` and `◆` is `var(--neutral-hue)`; both come from the [brand tint](#brand-tint).
 
@@ -98,18 +98,22 @@ The named tokens you use elsewhere alias onto the ladder, so tuning the ladder u
 - Over ~800px or fullscreen: `7`
 - Never let `shadowLevel` exceed `level` by more than 2.
 
-| Shadow             | Drop layers        | Feel                                        |
-| ------------------ | ------------------ | ------------------------------------------- |
-| `shadow-surface-1` | 0 (just a 1px ring) | Barely there                                |
-| `shadow-surface-2` | 1                  | Tooltip, quiet                              |
-| `shadow-surface-3` | 2                  | **Dropdown, popover, card**                 |
-| `shadow-surface-4` | 3                  | Toast, floating elements with no trigger    |
-| `shadow-surface-5` | 4                  | **Dialog, sheet**                           |
-| `shadow-surface-6` | 5                  | Transitional                                |
-| `shadow-surface-7` | 6                  | Dramatic (hero modals)                      |
-| `shadow-surface-8` | 7                  | Maximum gravity (rare)                      |
+| `shadowLevel` | Drop layers         | Feel                                     |
+| ------------- | ------------------- | ---------------------------------------- |
+| `1`           | 0 (just a 1px ring) | Barely there                             |
+| `2`           | 1                   | Tooltip, quiet                           |
+| `3`           | 2                   | **Dropdown, popover, card**              |
+| `4`           | 3                   | Toast, floating elements with no trigger |
+| `5`           | 4                   | **Dialog, sheet**                        |
+| `6`           | 5                   | Transitional                             |
+| `7`           | 6                   | Dramatic (hero modals)                   |
+| `8`           | 7                   | Maximum gravity (rare)                   |
 
 In dark mode the recipe also adds an inset highlight and ring, giving surfaces a lit-from-above edge. In light mode those insets are no-ops and the drop shadow does everything.
+
+Set the weight through the `shadowLevel` prop (`<PopoverContent shadowLevel={5} />`) or as the second argument to any helper below (`solidSurface(3, 5)` is a level-3 surface carrying a level-5 shadow), rather than reaching for a shadow utility class.
+
+That last part is not a style preference. A shadow applied by theme key or by a bracketed arbitrary value lands in tailwind-merge's `shadow-color` group rather than its `shadow` group, so a later `shadow-none` from a consumer never wins and stylesheet order silently decides. The helpers use the one form tailwind-merge treats as a shadow, which is why passing a level through them stays overridable.
 
 ### Component defaults
 
@@ -122,38 +126,39 @@ You do not need these day to day; they are what each component already uses. Rea
     </AccordionTrigger>
     <AccordionContent>
 
-| Component            | Default `level` | Default `shadowLevel`               |
-| -------------------- | --------------- | ----------------------------------- |
-| Tooltip              | `2`             | `2`                                 |
-| Card                 | `3`             | `1`                                 |
-| Table                | `3`             | `1`                                 |
-| DataTable            | `3`             | `1`                                 |
-| Code block           | `3`             | `1`                                 |
-| ComponentPreview     | `3`             | `1`                                 |
-| Popover              | `3`             | `3`                                 |
-| Dropdown menu        | `3`             | `3`                                 |
-| Dropdown sub-menu    | `5`             | `3`                                 |
-| Context menu         | `3`             | `3`                                 |
-| Context sub-menu     | `5`             | `3`                                 |
-| Menubar (the bar)    | `2`             | `2`                                 |
-| Menubar dropdown     | `3`             | `3`                                 |
-| Menubar sub-menu     | `5`             | `3`                                 |
-| NavigationMenu (bar) | `2`             | `2`                                 |
-| NavigationMenu popup | `3`             | `3`                                 |
-| NavigationMenu sub   | `5`             | `5`                                 |
-| Select               | `3`             | `3`                                 |
-| Toast                | `3`             | `4` (heavier, floats unattached)    |
-| Dialog               | `5`             | `5`                                 |
-| Alert dialog         | `5`             | `5`                                 |
-| Sheet                | `5`             | `5`                                 |
-| Drawer               | `5`             | `5`                                 |
-| Command              | `3`             | `3`                                 |
-| Combobox             | `3`             | `3`                                 |
-| Autocomplete         | `3`             | `3`                                 |
+| Component            | Default `level` | Default `shadowLevel`            |
+| -------------------- | --------------- | -------------------------------- |
+| Tooltip              | `2`             | `2`                              |
+| Card                 | `3`             | `1`                              |
+| Table                | `3`             | `1`                              |
+| DataTable            | `3`             | `1`                              |
+| Code block           | `3`             | `1`                              |
+| ComponentPreview     | `3`             | `1`                              |
+| Popover              | `3`             | `3`                              |
+| Dropdown menu        | `3`             | `3`                              |
+| Dropdown sub-menu    | `5`             | `3`                              |
+| Context menu         | `3`             | `3`                              |
+| Context sub-menu     | `5`             | `3`                              |
+| Menubar (the bar)    | `2`             | `2`                              |
+| Menubar dropdown     | `3`             | `3`                              |
+| Menubar sub-menu     | `5`             | `3`                              |
+| NavigationMenu (bar) | `2`             | `2`                              |
+| NavigationMenu popup | `3`             | `3`                              |
+| NavigationMenu sub   | `5`             | `5`                              |
+| Select               | `3`             | `3`                              |
+| Toast                | `3`             | `4` (heavier, floats unattached) |
+| Dialog               | `5`             | `5`                              |
+| Alert dialog         | `5`             | `5`                              |
+| Sheet                | `5`             | `5`                              |
+| Drawer               | `5`             | `5`                              |
+| Command              | `3`             | `3`                              |
+| Combobox             | `3`             | `3`                              |
+| Autocomplete         | `3`             | `3`                              |
 
 The flat-card family (Card, Table, DataTable, code block, ComponentPreview) all share `solidSurface(3, 1)`: a surface-3 background with a 1px rim and no drop shadow. They are embedded containers, not floating popups, so they read as lifted just enough to define an edge rather than casting a shadow over content.
 
     </AccordionContent>
+
   </AccordionItem>
 </Accordion>
 
@@ -182,12 +187,12 @@ Because they are overlays and not fixed colors, hover on a `surface-3` row brigh
 
 Making a custom floating container? Four helpers in `@/registry/default/lib/elevated` return Tailwind class strings. Drop them on any element you want elevated. Pick by situation:
 
-| Helper            | When                                                                 |
-| ----------------- | -------------------------------------------------------------------- |
-| `solidSurface`    | Most cases. The default choice.                                      |
+| Helper            | When                                                                  |
+| ----------------- | --------------------------------------------------------------------- |
+| `solidSurface`    | Most cases. The default choice.                                       |
 | `elevatedSurface` | Sticky or opaque children sit near the edges (labels, inset footers). |
-| `surfaceClasses`  | The surface already defines its own edge (a real CSS border).        |
-| `flushSurface`    | A sheet or drawer pinned against a screen edge.                      |
+| `surfaceClasses`  | The surface already defines its own edge (a real CSS border).         |
+| `flushSurface`    | A sheet or drawer pinned against a screen edge.                       |
 
 ### solidSurface(level, shadowLevel?)
 
@@ -255,6 +260,50 @@ function RightSheet({ children }) {
 // flushSurface(5, INNER_EDGE_FROM_ATTACH_SIDE[side])
 ```
 
+## The chrome surface
+
+One surface sits deliberately off the ladder. `--chrome` is a near-black fill in **both** themes, for persistent app chrome (a header bar, a command bar) and for floating labels that should read as instrument rather than page. `TooltipContent` exposes it as `variant="chrome"`.
+
+It is not an inverse surface. Inverting in dark would put a white slab at roughly 97 times the page's luminance into chrome you cannot scroll away from, so both themes stay dark. In light the fill borrows `--neutral`, the same black as a solid `neutral` Button. In dark it steps _below_ the page rather than above it, because up is where every card lives and a lifted near-black slab reads as one more card.
+
+Put `data-surface="chrome"` on the container and use ordinary page classes inside. That attribute re-points `--foreground`, `--muted-foreground`, `--border` and the hover and active washes for the whole subtree, so anything you drop in paints correctly with no per-control classes:
+
+```tsx
+import { CHROME_SURFACE } from "@/registry/default/lib/elevated";
+
+<div data-surface="chrome" className={`rounded-2xl ${CHROME_SURFACE}`}>
+  <span className="text-foreground">Primary label</span>
+  <span className="text-muted-foreground">Secondary label</span>
+  <Button variant="ghost">Ghost buttons work too</Button>
+</div>;
+```
+
+### The edge is opt-in
+
+`CHROME_SURFACE` paints the fill and nothing else, the same way `SURFACE_BG` does for a ladder rung. The edge is a separate utility you add when the surface needs one:
+
+```tsx
+<div
+  data-surface="chrome"
+  className={cn(CHROME_SURFACE, "shadow-(--chrome-shadow)")}
+/>
+```
+
+Add it for anything large: a header bar, a command bar, a chrome Select or dropdown. Leave it off for anything small, the way the chrome Tooltip does, because an edge on a two-line label is more boundary than there is object and a tooltip already carries its shape through its text and arrow.
+
+In dark, `--chrome-shadow` is not decoration. The chrome fill measures **1.08:1** against the dark page, so on a large surface that token is the only thing separating the two. In light the same pair measures **15.96:1**, the step alone is the boundary, and the token collapses to the ladder's ring-without-drop rung, which keeps the surface flush rather than raised.
+
+The edge keeps a chrome surface **flush**, not raised: there is no drop layer in it, so a header bar sits in the page rather than above it. A chrome surface that genuinely floats needs its own sibling token rather than a per-element override, because a custom property's `var()`s are substituted where the property is declared, not where it is used.
+
+`--primary` is left alone on purpose, so a primary Button keeps its brand fill anywhere. `bg-chrome` is the only chrome utility, for the fill itself. There is deliberately no `bg-chrome-hover` beside it: a second idiom for the same job is what the attribute exists to remove.
+
+Two things to know:
+
+- **Portalled content does not inherit it.** Menus, dialogs and tooltips render at the document body, so a floating component that wants this look has to carry the attribute itself. That is exactly what `TooltipContent variant="chrome"` does.
+- **The edge is not the ladder's.** `--surface-rim-*` and the ring baked into `--surface-shadow-*` both assume a fill lighter than the page. This fill is darker, so the ladder's ring lands lighter than the very fill it should define and the boundary blurs. `--chrome-hairline` (outer boundary) and `--chrome-rim` (top-edge specular) replace it. Both are box-shadow values, not colors: writing a bare color into either one voids the entire `box-shadow` it lands in, because a single invalid layer invalidates the whole declaration.
+
+Because chrome is off the ladder, `level` and `shadowLevel` do not apply to either helper.
+
 ## Customizing the system
 
 ### Brand tint
@@ -307,6 +356,7 @@ Every light-mode background (the surface ladder, `--muted`, `--secondary`, `--ac
 Net effect: light mode reads as a clean canvas, dark mode carries the brand identity. It is a common pattern (Linear, Vercel, Stripe): tint on a near-white page reads as a wash rather than a signature, while in dark mode the same chroma has room to express.
 
     </AccordionContent>
+
   </AccordionItem>
   <AccordionItem value="muted">
     <AccordionTrigger indicatorType="chevron">
@@ -319,6 +369,7 @@ Net effect: light mode reads as a clean canvas, dark mode carries the brand iden
 The reference aliases `--muted` to `surface-2` because its system has no recessed concept. Cubby does, so `--muted` stays separate.
 
     </AccordionContent>
+
   </AccordionItem>
   <AccordionItem value="form-fields">
     <AccordionTrigger indicatorType="chevron">
@@ -355,6 +406,7 @@ One token cannot satisfy every context: an opaque white input feels right on the
 Switch skips the variant. Its unchecked track has to contrast with both its thumb and the parent surface at once, and a single translucent `bg-input-elevated` overlay handles both: it adapts to whatever it sits on while staying a clear gray against the thumb. So Switch has no `variant` prop; it always uses `bg-input-elevated`.
 
     </AccordionContent>
+
   </AccordionItem>
   <AccordionItem value="overlays">
     <AccordionTrigger indicatorType="chevron">
@@ -365,6 +417,7 @@ Switch skips the variant. Its unchecked track has to contrast with both its thum
 `--border`, `--surface-hover`, `--surface-selected`, the dark-mode shadow ring values, `--surface-shadow-*`, and the rest use literal `oklch(0 0 0)` or `oklch(1 0 0)` rather than tinted near-black or near-white. At translucent alpha they borrow their visible color from the tinted substrate beneath, so tinting the overlay itself contributes almost nothing while making the CSS harder to read.
 
     </AccordionContent>
+
   </AccordionItem>
   <AccordionItem value="asymmetric">
     <AccordionTrigger indicatorType="chevron">
@@ -375,6 +428,7 @@ Switch skips the variant. Its unchecked track has to contrast with both its thum
 The Command well uses `bg-surface-3 dark:bg-surface-1`. In light mode that is a lifted white card inside a gray strip; in dark mode it is a cutout to the page color. Each mode gets strong contrast its own way. A symmetric version (one token for both modes) has a weak mode by construction.
 
     </AccordionContent>
+
   </AccordionItem>
 </Accordion>
 
@@ -385,8 +439,9 @@ Every token lives on `:root` and is exposed as a Tailwind utility through `@them
 ```css
 /* Substrate */
 --surface-1 .. --surface-8       /* surface colors */
---surface-shadow-1 .. -8         /* drop-shadow recipes → shadow-surface-N */
---surface-rim-1 .. -8            /* inset rim recipes → shadow-surface-rim-N */
+--surface-shadow-1 .. -8         /* drop-shadow recipes, read by the helpers */
+--surface-rim-1 .. -8            /* inset rim recipes, read by the helpers */
+--surface-shadow-combined-1 .. -8 /* drop + rim in one value, for solidSurface */
 
 /* State */
 --surface-hover                  /* hover overlay */
@@ -401,6 +456,14 @@ Every token lives on `:root` and is exposed as a Tailwind utility through `@them
 --neutral-hue                    /* one knob: rotates the whole tint */
 --neutral-chroma                 /* tint strength for mid-tone neutrals */
 --neutral-chroma-low             /* tint strength near the gamut extremes */
+
+/* Chrome surface (off the ladder) */
+--chrome                         /* near-black fill in both themes → bg-chrome */
+--chrome-foreground              /* label color on that fill */
+--chrome-muted-foreground        /* secondary label color */
+--chrome-hover                   /* the one wash: hover, active and fill */
+--chrome-border                  /* hairline between controls */
+--chrome-shadow                  /* the opt-in edge (a box-shadow value) */
 
 /* Aliases */
 --background  →  var(--surface-1)

@@ -3,6 +3,7 @@ import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip";
 
 import { cn } from "@/lib/utils";
 import {
+  CHROME_SURFACE,
   solidSurface,
   type SurfaceLevel,
 } from "@/registry/default/lib/elevated";
@@ -69,6 +70,7 @@ function TooltipContent({
   arrow = false,
   arrowPadding,
   container,
+  variant = "default",
   level = 2,
   shadowLevel = 2,
   ...props
@@ -84,11 +86,18 @@ function TooltipContent({
   arrow?: boolean;
   arrowPadding?: number;
   container?: HTMLElement | undefined;
+  /**
+   * Surface treatment. `chrome` is the near-black fill in both themes, for
+   * labels that read as instrument rather than page. It ignores `level` and
+   * `shadowLevel`, which describe a ladder it is deliberately off.
+   */
+  variant?: "default" | "chrome";
   /** Surface elevation level for the tooltip bg (1-8). Defaults to 2 — the lightest "lifted off the page" tier. */
   level?: SurfaceLevel;
   /** Shadow weight (1-8). Pinned to 2 by default so tooltips read as quiet/subtle. */
   shadowLevel?: SurfaceLevel;
 }) {
+  const isChrome = variant === "chrome";
   return (
     <TooltipPortal container={container}>
       <BaseTooltip.Positioner
@@ -106,15 +115,24 @@ function TooltipContent({
       >
         <BaseTooltip.Popup
           data-slot="tooltip-content"
-          data-level={level}
+          data-variant={variant}
+          // No level to report off the ladder. The popup carries the attribute
+          // itself because portalled content can't inherit the page's.
+          data-level={isChrome ? undefined : level}
+          data-surface={isChrome ? "chrome" : undefined}
           className={cn(
             // `relative` matches Popover and pins the arrow's containing block.
             // Without it the popup is a containing block only while `scale` is
             // mid-animation (a non-none scale creates one) and not at rest, so
             // an absolutely positioned arrow would change reference frame
             // partway through the open.
-            "text-popover-foreground relative h-(--popup-height,auto) max-h-(--available-height) w-(--popup-width,auto) max-w-(--available-width) origin-(--transform-origin) rounded-sm text-xs outline-none",
-            solidSurface(level, shadowLevel),
+            "relative h-(--popup-height,auto) max-h-(--available-height) w-(--popup-width,auto) max-w-(--available-width) origin-(--transform-origin) rounded-sm text-xs outline-none",
+            // The chrome rule re-points --foreground but deliberately leaves
+            // the popover/card pair alone, so chrome reads the former.
+            isChrome ? "text-foreground" : "text-popover-foreground",
+            // Fill only — `shadow-(--chrome-shadow)` is the opt-in edge, which a
+            // header bar needs and a two-line label does not.
+            isChrome ? CHROME_SURFACE : solidSurface(level, shadowLevel),
             // No directional translate: the popup scales from
             // --transform-origin, which Base UI aims back at the trigger, so
             // the growth already reads as coming from the anchor. A per-side

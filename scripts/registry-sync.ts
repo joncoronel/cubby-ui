@@ -12,6 +12,13 @@ const REGISTRY_JSON_PATH = path.join(process.cwd(), "registry.json");
 const EXAMPLES_PATH = path.join(REGISTRY_PATH, "examples");
 
 const THEME_CSS_PATH = path.join(process.cwd(), "registry", "theme.css");
+const THEMING_DOC_PATH = path.join(
+  process.cwd(),
+  "content",
+  "docs",
+  "getting-started",
+  "theming.mdx",
+);
 const DEFAULT_STYLE = "default";
 
 // Get registry URL from environment variable or use default
@@ -1702,6 +1709,11 @@ async function syncRegistry() {
       `✓ Extracted ${Object.keys(cssContent.light).length} light mode, ${Object.keys(cssContent.dark).length} dark mode CSS variables, ${Object.keys(cssContent.theme).length} theme variables, ${Object.keys(cssContent.utilities).length} utilities, ${Object.keys(cssContent.keyframes).length} keyframes, and ${Object.keys(cssContent.layerBase).length} layer base rules`,
     );
 
+    // 3b. Mirror theme.css into the theming doc
+    if (syncThemingDoc()) {
+      console.log("✓ Synced theme.css into the theming doc");
+    }
+
     // 4. Read existing registry.json
     const existingRegistry = JSON.parse(
       await fs.readFile(REGISTRY_JSON_PATH, "utf-8"),
@@ -1778,6 +1790,54 @@ function extractBlockBody(content: string, opener: RegExp): string | null {
   }
   if (braceCount !== 0) return null;
   return content.substring(startPos, endPos - 1);
+}
+
+// theme.css carries maintainer rationale that is noise in a block a consumer
+// pastes into their own globals.css, especially since the page explains the
+// system in prose underneath it. Multi-line comments go; one-liners are the
+// section dividers and stay.
+function stripMaintainerNotes(css: string): string {
+  return css
+    .replace(/[ \t]*\/\*[\s\S]*?\*\/[ \t]*\n?/g, (match) => {
+      const body = match.slice(0, match.indexOf("*/"));
+      return body.includes("\n") ? "" : match;
+    })
+    .replace(/\n{3,}/g, "\n\n");
+}
+
+// Rewrite the copy of theme.css embedded in the theming docs.
+//
+// Hand-maintained it drifted silently: before this existed the block was missing
+// --surface-shadow-combined-1..8 and three --color-surface-* state tokens, and
+// still listed --shadow-surface-* aliases that had been removed.
+function syncThemingDoc(): boolean {
+  if (!fsSync.existsSync(THEMING_DOC_PATH)) {
+    console.warn(`⚠️  theming doc not found at ${THEMING_DOC_PATH}`);
+    return false;
+  }
+  const theme = stripMaintainerNotes(
+    fsSync
+      .readFileSync(THEME_CSS_PATH, "utf-8")
+      .replace(/\r\n/g, "\n")
+      .replace(/\n+$/, ""),
+  );
+  const doc = fsSync.readFileSync(THEMING_DOC_PATH, "utf-8");
+  // The fence is spelled out so a stray code block elsewhere on the page can
+  // never be the one that gets rewritten.
+  const region =
+    /(\{\/\* THEME_CSS:START[\s\S]*?\*\/\}\n\n```css title="globals\.css"\n)[\s\S]*?(\n```)/;
+  if (!region.test(doc)) {
+    console.warn("⚠️  THEME_CSS markers not found in the theming doc");
+    return false;
+  }
+  // A function replacer, so `$&`-style sequences in the CSS stay literal.
+  const next = doc.replace(
+    region,
+    (_match, open: string, close: string) => open + theme + close,
+  );
+  if (next === doc) return false;
+  fsSync.writeFileSync(THEMING_DOC_PATH, next);
+  return true;
 }
 
 // Extract CSS variables from registry/theme.css
@@ -1980,32 +2040,36 @@ function parseUtilityRules(content: string): Record<string, any> {
 function parseLayerBaseRules(content: string): Record<string, any> {
   const rules: Record<string, any> = {};
 
+  // The scan below treats everything before a `{` as the selector, so a comment
+  // above a rule would be folded into it and shipped to consumers.
+  const body = content.replace(/\/\*[\s\S]*?\*\//g, "");
+
   // Parse content by finding selectors and their blocks
   let pos = 0;
-  while (pos < content.length) {
+  while (pos < body.length) {
     // Skip whitespace
-    while (pos < content.length && /\s/.test(content[pos])) pos++;
-    if (pos >= content.length) break;
+    while (pos < body.length && /\s/.test(body[pos])) pos++;
+    if (pos >= body.length) break;
 
     // Find selector (everything before {)
     const selectorStart = pos;
-    while (pos < content.length && content[pos] !== "{") pos++;
-    if (pos >= content.length) break;
+    while (pos < body.length && body[pos] !== "{") pos++;
+    if (pos >= body.length) break;
 
-    const selector = content.substring(selectorStart, pos).trim();
+    const selector = body.substring(selectorStart, pos).trim();
     pos++; // Skip {
 
     // Find matching closing brace
     let braceCount = 1;
     const propStart = pos;
-    while (pos < content.length && braceCount > 0) {
-      if (content[pos] === "{") braceCount++;
-      else if (content[pos] === "}") braceCount--;
+    while (pos < body.length && braceCount > 0) {
+      if (body[pos] === "{") braceCount++;
+      else if (body[pos] === "}") braceCount--;
       pos++;
     }
 
     if (braceCount === 0 && selector) {
-      const properties = content.substring(propStart, pos - 1).trim();
+      const properties = body.substring(propStart, pos - 1).trim();
       const parsedProperties: Record<string, string> = {};
 
       // Parse @apply directives

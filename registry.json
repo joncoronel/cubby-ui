@@ -1409,6 +1409,7 @@
           "color-primary-foreground": "var(--primary-foreground)",
           "color-neutral": "var(--neutral)",
           "color-neutral-foreground": "var(--neutral-foreground)",
+          "color-chrome": "var(--chrome)",
           "color-secondary": "var(--secondary)",
           "color-secondary-foreground": "var(--secondary-foreground)",
           "color-muted": "var(--muted)",
@@ -1466,23 +1467,7 @@
           "color-surface-8": "var(--surface-8)",
           "color-surface-hover": "var(--surface-hover)",
           "color-surface-active": "var(--surface-active)",
-          "color-surface-selected": "var(--surface-selected)",
-          "shadow-surface-1": "var(--surface-shadow-1)",
-          "shadow-surface-2": "var(--surface-shadow-2)",
-          "shadow-surface-3": "var(--surface-shadow-3)",
-          "shadow-surface-4": "var(--surface-shadow-4)",
-          "shadow-surface-5": "var(--surface-shadow-5)",
-          "shadow-surface-6": "var(--surface-shadow-6)",
-          "shadow-surface-7": "var(--surface-shadow-7)",
-          "shadow-surface-8": "var(--surface-shadow-8)",
-          "shadow-surface-rim-1": "var(--surface-rim-1)",
-          "shadow-surface-rim-2": "var(--surface-rim-2)",
-          "shadow-surface-rim-3": "var(--surface-rim-3)",
-          "shadow-surface-rim-4": "var(--surface-rim-4)",
-          "shadow-surface-rim-5": "var(--surface-rim-5)",
-          "shadow-surface-rim-6": "var(--surface-rim-6)",
-          "shadow-surface-rim-7": "var(--surface-rim-7)",
-          "shadow-surface-rim-8": "var(--surface-rim-8)"
+          "color-surface-selected": "var(--surface-selected)"
         },
         "light": {
           "radius": "0.75rem",
@@ -1498,7 +1483,7 @@
           "primary": "oklch(0.6 0.2 250)",
           "primary-foreground": "oklch(1 0 0)",
           "primary-soft-foreground": "var(--primary)",
-          "neutral": "oklch(0.22 0 0)",
+          "neutral": "oklch(0.21 var(--neutral-chroma) var(--neutral-hue))",
           "neutral-foreground": "oklch(\n    0.98 var(--neutral-chroma-low) var(--neutral-hue)\n  )",
           "secondary": "oklch(0.92 0 0)",
           "secondary-foreground": "oklch(0.32 var(--neutral-chroma) var(--neutral-hue))",
@@ -1509,6 +1494,11 @@
           "destructive": "oklch(0.53 0.19 25)",
           "destructive-foreground": "oklch(\n    0.98 var(--neutral-chroma-low) var(--neutral-hue)\n  )",
           "destructive-soft-foreground": "var(--destructive)",
+          "chrome": "var(--neutral)",
+          "chrome-foreground": "var(--neutral-foreground)",
+          "chrome-muted-foreground": "color-mix(\n    in oklab,\n    var(--chrome-foreground) 71%,\n    var(--chrome)\n  )",
+          "chrome-hover": "color-mix(\n    in oklab,\n    var(--chrome-foreground) 10%,\n    transparent\n  )",
+          "chrome-border": "color-mix(\n    in oklab,\n    var(--chrome-foreground) 12%,\n    transparent\n  )",
           "primary-hover": "color-mix(in oklch, var(--primary), black 5%)",
           "neutral-hover": "color-mix(in oklch, var(--neutral), white 10%)",
           "destructive-hover": "color-mix(in oklch, var(--destructive), black 5%)",
@@ -1584,7 +1574,8 @@
           "surface-shadow-combined-5": "var(--surface-shadow-5), var(--surface-rim-5)",
           "surface-shadow-combined-6": "var(--surface-shadow-6), var(--surface-rim-6)",
           "surface-shadow-combined-7": "var(--surface-shadow-7), var(--surface-rim-7)",
-          "surface-shadow-combined-8": "var(--surface-shadow-8), var(--surface-rim-8)"
+          "surface-shadow-combined-8": "var(--surface-shadow-8), var(--surface-rim-8)",
+          "chrome-shadow": "var(--surface-shadow-1)"
         },
         "dark": {
           "foreground": "oklch(0.94 var(--neutral-chroma) var(--neutral-hue))",
@@ -1600,6 +1591,11 @@
           "destructive-foreground": "oklch(1 0 0)",
           "primary-soft-foreground": "color-mix(in oklch, var(--primary), white 30%)",
           "destructive-soft-foreground": "color-mix(\n    in oklch,\n    var(--destructive),\n    white 30%\n  )",
+          "chrome": "oklch(0.159 var(--neutral-chroma) var(--neutral-hue))",
+          "chrome-foreground": "var(--foreground)",
+          "chrome-muted-foreground": "color-mix(\n    in oklab,\n    var(--chrome-foreground) 71%,\n    var(--chrome)\n  )",
+          "chrome-hover": "color-mix(\n    in oklab,\n    var(--chrome-foreground) 10%,\n    transparent\n  )",
+          "chrome-border": "color-mix(\n    in oklab,\n    var(--chrome-foreground) 12%,\n    transparent\n  )",
           "primary-hover": "color-mix(in oklch, var(--primary), white 10%)",
           "neutral-hover": "color-mix(in oklch, var(--neutral), black 10%)",
           "destructive-hover": "color-mix(in oklch, var(--destructive), white 15%)",
@@ -1672,7 +1668,8 @@
           "surface-shadow-combined-5": "var(--surface-shadow-5), var(--surface-rim-5)",
           "surface-shadow-combined-6": "var(--surface-shadow-6), var(--surface-rim-6)",
           "surface-shadow-combined-7": "var(--surface-shadow-7), var(--surface-rim-7)",
-          "surface-shadow-combined-8": "var(--surface-shadow-8), var(--surface-rim-8)"
+          "surface-shadow-combined-8": "var(--surface-shadow-8), var(--surface-rim-8)",
+          "chrome-shadow": "0 0 0 1px oklch(0 0 0 / 0.7), inset 0 1px 0 0 oklch(1 0 0 / 0.065)"
         }
       },
       "css": {
@@ -1682,6 +1679,15 @@
           },
           ".root": {
             "isolation": "isolate"
+          },
+          "[data-surface=\"chrome\"]": {
+            "--foreground": "var(--chrome-foreground)",
+            "--muted-foreground": "var(--chrome-muted-foreground)",
+            "--border": "var(--chrome-border)",
+            "--muted": "var(--chrome-hover)",
+            "--accent": "var(--chrome-hover)",
+            "--surface-hover": "var(--chrome-hover)",
+            "--surface-active": "var(--chrome-hover)"
           }
         }
       }

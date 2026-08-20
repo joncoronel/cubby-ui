@@ -472,6 +472,7 @@ import toolbar_toolbar_basic from "@/registry/examples/toolbar/toolbar-basic";
 import toolbar_toolbar_with_input from "@/registry/examples/toolbar/toolbar-with-input";
 import tooltip_tooltip_basic from "@/registry/examples/tooltip/tooltip-basic";
 import tooltip_tooltip_animated from "@/registry/examples/tooltip/tooltip-animated";
+import tooltip_tooltip_chrome from "@/registry/examples/tooltip/tooltip-chrome";
 import tooltip_tooltip_controlled from "@/registry/examples/tooltip/tooltip-controlled";
 import tooltip_tooltip_detached_trigger from "@/registry/examples/tooltip/tooltip-detached-trigger";
 import transition_panel_transition_panel_basic from "@/registry/examples/transition-panel/transition-panel-basic";
@@ -3991,7 +3992,7 @@ export const exampleRegistry = {
     {
       "title": "Without Separator",
       "importPath": "toggle-group-without-separator",
-      "source": "\"use client\"\n\nimport {\n  ToggleGroup,\n  ToggleGroupItem,\n} from \"@/components/ui/cubby-ui/toggle-group\"\n\nexport default function ToggleGroupWithoutSeparator() {\n  return (\n    <ToggleGroup\n      separators={false}\n      aria-label=\"Text alignment\"\n      defaultValue={[\"center\"]}\n    >\n      <ToggleGroupItem value=\"left\">Left</ToggleGroupItem>\n      <ToggleGroupItem value=\"center\">Center</ToggleGroupItem>\n      <ToggleGroupItem value=\"right\">Right</ToggleGroupItem>\n    </ToggleGroup>\n  )\n}\n"
+      "source": "\"use client\";\n\nimport {\n  ToggleGroup,\n  ToggleGroupItem,\n} from \"@/components/ui/cubby-ui/toggle-group\";\n\nexport default function ToggleGroupWithoutSeparator() {\n  return (\n    <ToggleGroup\n      separators={false}\n      aria-label=\"Text alignment\"\n      defaultValue={[\"center\"]}\n    >\n      <ToggleGroupItem value=\"left\">Left</ToggleGroupItem>\n      <ToggleGroupItem value=\"center\">Center</ToggleGroupItem>\n      <ToggleGroupItem value=\"right\">Right</ToggleGroupItem>\n    </ToggleGroup>\n  );\n}\n"
     }
   ],
   "toolbar": [
@@ -4016,6 +4017,11 @@ export const exampleRegistry = {
       "title": "Animated",
       "importPath": "tooltip-animated",
       "source": "\"use client\";\n\nimport {\n  Tooltip,\n  TooltipContent,\n  TooltipProvider,\n  TooltipTrigger,\n  createTooltipHandle,\n} from \"@/components/ui/cubby-ui/tooltip\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { ButtonGroup } from \"@/components/ui/cubby-ui/button-group\";\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport {\n  TextAlignLeftIcon,\n  TextAlignCenterIcon,\n  TextAlignRightIcon,\n} from \"@hugeicons/core-free-icons\";\n\ninterface TooltipPayload {\n  label: string;\n  shortcut: string;\n}\n\nconst alignmentTooltip = createTooltipHandle<TooltipPayload>();\n\nexport default function TooltipAnimated() {\n  return (\n    <TooltipProvider>\n      <ButtonGroup>\n        <TooltipTrigger\n          handle={alignmentTooltip}\n          payload={{ label: \"Align left\", shortcut: \"⌘⇧L\" }}\n          render={<Button variant=\"outline\" size=\"icon\" />}\n        >\n          <HugeiconsIcon icon={TextAlignLeftIcon} size={16} strokeWidth={2} />\n          <span className=\"sr-only\">Align left</span>\n        </TooltipTrigger>\n\n        <TooltipTrigger\n          handle={alignmentTooltip}\n          payload={{ label: \"Align center\", shortcut: \"⌘⇧E\" }}\n          render={<Button variant=\"outline\" size=\"icon\" />}\n        >\n          <HugeiconsIcon icon={TextAlignCenterIcon} size={16} strokeWidth={2} />\n          <span className=\"sr-only\">Align center</span>\n        </TooltipTrigger>\n\n        <TooltipTrigger\n          handle={alignmentTooltip}\n          payload={{ label: \"Align right\", shortcut: \"⌘⇧R\" }}\n          render={<Button variant=\"outline\" size=\"icon\" />}\n        >\n          <HugeiconsIcon icon={TextAlignRightIcon} size={16} strokeWidth={2} />\n          <span className=\"sr-only\">Align right</span>\n        </TooltipTrigger>\n      </ButtonGroup>\n      <Tooltip handle={alignmentTooltip}>\n        {({ payload }) => (\n          <TooltipContent arrow={false}>\n            {payload && (\n              <div className=\"flex items-center gap-2\">\n                <span>{payload.label}</span>\n                <kbd className=\"bg-muted text-muted-foreground rounded px-1.5 py-0.5 text-[10px] font-medium\">\n                  {payload.shortcut}\n                </kbd>\n              </div>\n            )}\n          </TooltipContent>\n        )}\n      </Tooltip>\n    </TooltipProvider>\n  );\n}\n"
+    },
+    {
+      "title": "Chrome",
+      "importPath": "tooltip-chrome",
+      "source": "import {\n  Tooltip,\n  TooltipContent,\n  TooltipProvider,\n  TooltipTrigger,\n} from \"@/components/ui/cubby-ui/tooltip\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport { Notification01Icon } from \"@hugeicons/core-free-icons\";\n\nexport default function TooltipChrome() {\n  return (\n    <TooltipProvider>\n      <Tooltip>\n        <TooltipTrigger render={<Button variant=\"outline\" size=\"icon\" />}>\n          <HugeiconsIcon icon={Notification01Icon} size={16} strokeWidth={2} />\n          <span className=\"sr-only\">Notifications</span>\n        </TooltipTrigger>\n        <TooltipContent variant=\"chrome\" arrow>\n          <p>Notifications</p>\n        </TooltipContent>\n      </Tooltip>\n    </TooltipProvider>\n  );\n}\n"
     },
     {
       "title": "Controlled",
@@ -4566,6 +4572,7 @@ export const componentMap = {
   "toolbar-with-input": toolbar_toolbar_with_input,
   "tooltip-basic": tooltip_tooltip_basic,
   "tooltip-animated": tooltip_tooltip_animated,
+  "tooltip-chrome": tooltip_tooltip_chrome,
   "tooltip-controlled": tooltip_tooltip_controlled,
   "tooltip-detached-trigger": tooltip_tooltip_detached_trigger,
   "transition-panel-basic": transition_panel_transition_panel_basic,

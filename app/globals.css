@@ -7,7 +7,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Theme color-scheme setup */
 html {
   background: var(--color-background);
 }
@@ -17,27 +16,17 @@ html {
   /* --fd-layout-width: 100vw; */
   /* --fd-page-width: 1232px; */
 
-  /* Neutral tint — applied to every neutral via oklch().
-     Change these two values to retune the entire surface/foreground stack:
-     --neutral-hue     : hue angle for the tint (0–360). Brand-direction.
-     --neutral-chroma  : chroma for mid-tone neutrals (L roughly 0.10–0.95).
-     --neutral-chroma-low : chroma for near-extreme L (> 0.95 or < 0.05),
-                            kept lower because high chroma at extremes looks
-                            garish (impeccable rule).
-     Pure-black / pure-white translucent overlays stay at chroma 0 — they
-     borrow their visible color from the tinted substrate via alpha. */
+  /* Neutral tint applied to every neutral via oklch(). Retune the whole
+     surface/foreground stack from these three: hue angle, chroma for mid-tone
+     neutrals, and a lower chroma near the lightness extremes where high chroma
+     turns garish. */
   --neutral-hue: 270;
   --neutral-chroma: 0.004;
   --neutral-chroma-low: 0.002;
 
-  /* Light-mode color values. Dark-mode overrides live in the
-     `.dark` block further down. Both themes use the same
-     :root + override pattern (no light-dark() — see surfaces docs for why). */
+  /* Light values; dark overrides live in `.dark` below (no light-dark(), see docs). */
 
-  /* Background colors — aliased to the surface ladder.
-     The page is surface-1; cards and floating popovers/dropdowns share
-     surface-3. Bump any of these by editing the surface ladder below;
-     the rest of the system follows. */
+  /* Background colors — the page is surface-1, cards and popovers surface-3. */
   --background: var(--surface-1);
   --foreground: oklch(0.18 var(--neutral-chroma) var(--neutral-hue));
 
@@ -47,12 +36,14 @@ html {
   --popover-foreground: var(--foreground);
   --primary: oklch(0.6 0.2 250);
   --primary-foreground: oklch(1 0 0);
-  /* Primary used AS TEXT on a neutral plate (e.g. the `primary-soft` button).
-     Derived from --primary so it tracks any brand color. In light the solid
-     primary reads fine; dark brightens it (see .dark) since --primary is too
-     dim as text on the darker secondary surface. */
+  /* Primary as text on a neutral plate (the `primary-soft` button), derived so
+     it tracks any brand colour. Dark brightens it; solid --primary is too dim
+     as text on the darker secondary surface. */
   --primary-soft-foreground: var(--primary);
-  --neutral: oklch(0.22 0 0);
+  /* Carries the tint, unlike the other light fills: a pure-neutral black beside
+     --foreground's faintly cool one reads as two blacks rather than one black at
+     two weights. Also the light --chrome fill. */
+  --neutral: oklch(0.21 var(--neutral-chroma) var(--neutral-hue));
   --neutral-foreground: oklch(
     0.98 var(--neutral-chroma-low) var(--neutral-hue)
   );
@@ -66,50 +57,68 @@ html {
   --destructive-foreground: oklch(
     0.98 var(--neutral-chroma-low) var(--neutral-hue)
   );
-  /* Destructive used AS TEXT on a destructive-tinted plate (the
-     `destructive-soft` button). Derived from --destructive so it tracks the
-     consumer's danger color; brightened in dark (see .dark) for readability. */
+  /* Same idea for `destructive-soft`'s label on its tinted plate. */
   --destructive-soft-foreground: var(--destructive);
 
-  /* Hover-state colors — light mode darkens (mix toward black), dark mode
-     brightens (mix toward white, see .dark below). Always shifts AWAY from
-     the substrate so the hover state reads as more emphasized, never less. */
+  /* ── Chrome surface ──────────────────────────────────────────────────────
+     Near-black in BOTH themes, deliberately OFF the elevation ladder. For
+     persistent app chrome (a header bar) and for floating labels that should
+     read as instrument rather than page. Not "inverse": a white slab in dark
+     would sit at ~97x the page's luminance, in chrome you can't scroll away.
+
+     Light borrows --neutral, so this fill and the solid `neutral` Button are
+     one black; retuning that token moves both.
+
+     Paint on it with `data-surface="chrome"` (rule in @layer base below), not
+     by hand. Every token is re-declared in .dark, derived ones included: a
+     custom property substitutes its var()s where DECLARED, so derived tokens
+     living only here resolve against LIGHT roots under a subtree .dark. */
+  --chrome: var(--neutral);
+  --chrome-foreground: var(--neutral-foreground);
+  --chrome-muted-foreground: color-mix(
+    in oklab,
+    var(--chrome-foreground) 71%,
+    var(--chrome)
+  );
+  --chrome-hover: color-mix(
+    in oklab,
+    var(--chrome-foreground) 10%,
+    transparent
+  );
+  --chrome-border: color-mix(
+    in oklab,
+    var(--chrome-foreground) 12%,
+    transparent
+  );
+
+  /* Hover colours shift AWAY from the token's own lightness so the change always
+     reads. Most light tokens darken, but --neutral is already dark and barely
+     moves when blacked, so it lightens instead. */
   --primary-hover: color-mix(in oklch, var(--primary), black 5%);
   --neutral-hover: color-mix(in oklch, var(--neutral), white 10%);
   --destructive-hover: color-mix(in oklch, var(--destructive), black 5%);
   --secondary-hover: color-mix(in oklch, var(--secondary), black 5%);
   --outline-hover: color-mix(in oklch, var(--card), black 5%);
 
-  /* Pressed colors — one step past hover in the same direction, so a held
-     press reads as deeper than hover. */
+  /* Pressed — one step past hover in the same direction. */
   --primary-active: color-mix(in oklch, var(--primary), black 8%);
   --neutral-active: color-mix(in oklch, var(--neutral), white 14%);
   --destructive-active: color-mix(in oklch, var(--destructive), black 8%);
   --secondary-active: color-mix(in oklch, var(--secondary), black 8%);
   --outline-active: color-mix(in oklch, var(--card), black 8%);
 
-  /* Mixed from --foreground. Re-declared in .dark below: a custom property
-     resolves its var()s where it is DECLARED, so without the re-declaration
-     a .dark scoped to a subtree would inherit this light-resolved value. */
+  /* Re-declared in .dark: a custom property resolves its var()s where DECLARED,
+     so without it a subtree-scoped .dark inherits this light-resolved value. */
   --border: color-mix(in oklab, var(--foreground) 10%, transparent);
-  /* Default form-field bg — opaque "clean lifted card" look. Aliased to
-     surface-3 so it tracks the ladder. Used by the `default` variant of Input,
-     Textarea, Checkbox, Radio, Switch, etc. */
+  /* Default form-field bg — opaque, aliased to surface-3 so it tracks the ladder. */
   --input: var(--surface-3);
-  /* Elevated form-field bg — translucent overlay that adapts to whatever
-     substrate it sits on (same family as --surface-hover/--surface-selected
-     but stronger). Used by the `elevated` variant for form fields inside
-     Cards, Dialogs, popovers — contexts where the opaque white default would
-     collapse into the surrounding surface. */
+  /* Elevated form-field bg — translucent, for fields inside Cards, Dialogs and
+     popovers where the opaque default collapses into its surround. */
   --input-elevated: oklch(0 0 0 / 8%);
   --ring: oklch(0.55 0.2 250);
   --scrollbar: oklch(0.87 0 0);
 
-  /* Sidebar colors — aliased to the core tokens so the sidebar palette tracks
-     the rest of the system. (The Sidebar component currently derives its
-     interactive states from --surface-hover/--surface-selected/--primary
-     directly, but these aliases keep the sidebar-* set on-system for anyone who
-     references them.) Because they're aliases, no `.dark` overrides are needed —
+  /* Sidebar — aliases onto the core tokens, so no .dark overrides are needed;
      the referenced tokens resolve per mode. */
   --sidebar: var(--surface-1);
   --sidebar-foreground: var(--foreground);
@@ -117,8 +126,7 @@ html {
   --sidebar-primary-foreground: var(--primary-foreground);
   --sidebar-accent: var(--accent);
   --sidebar-accent-foreground: var(--accent-foreground);
-  /* Opaque equivalent of --border pre-composited on the sidebar surface — used
-     as a solid bg on the resize rail, where a translucent border is too faint. */
+  /* Opaque --border, for the resize rail where a translucent line is too faint. */
   --sidebar-border: oklch(0.9 var(--neutral-chroma) var(--neutral-hue));
   --sidebar-ring: var(--ring);
 
@@ -136,13 +144,8 @@ html {
   --success-foreground: oklch(0.48 0.18 145);
   --success-border: oklch(0.9 0.1 145);
 
-  /* Surface elevation ladder (1-8).
-     Light mode: all surfaces stay neutral (no chroma) — light is the "clean
-       canvas" mode. surfaces 3-8 are pure white; 1-2 step down through pure
-       neutral grays. Shadow alone carries elevation here.
-     Dark mode (see `.dark`): progressive lightness step +
-       neutral-chroma tint + layered inset highlights and outer drops; the
-       brand tint expresses here. */
+  /* Surface elevation ladder. Light stays neutral and lets shadow alone carry
+     elevation; dark adds a lightness step plus the brand tint (see .dark). */
   --surface-1: oklch(0.97 0 0);
   --surface-2: oklch(0.985 0 0);
   --surface-3: oklch(1 0 0);
@@ -152,25 +155,18 @@ html {
   --surface-7: oklch(1 0 0);
   --surface-8: oklch(1 0 0);
 
-  /* State overlays — applied via the `bg-surface-hover` / `bg-surface-selected`
-     utilities (mapped in @theme inline below). These are translucent overlays,
-     so they raise the underlying surface by a fixed perceptual delta no matter
-     what level it's sitting on. Light mode uses black-on-white, dark mode uses
-     white-on-black. */
+  /* Translucent state overlays, so they raise whatever level they sit on by a
+     fixed perceptual delta. */
   --surface-hover: oklch(0 0 0 / 0.06);
   --surface-active: oklch(0 0 0 / 0.08);
   --surface-selected: oklch(0 0 0 / 0.1);
 
-  /* Single-edge rim color — used by viewport-flush elevated containers
-     (Sheet/Drawer in `default` variant) to paint a 1px inset line ONLY on
-     the inner-facing edge. The full 4-edge rim from --surface-rim-N doesn't
-     read correctly when 3 of 4 edges sit at the viewport boundary. */
+  /* Single-edge rim for viewport-flush containers, where the full 4-edge rim
+     doesn't read with 3 of 4 edges at the viewport boundary. */
   --surface-rim-color: oklch(0 0 0 / 0);
 
-  /* Light shadow recipe — opacity decreases with blur radius to mimic
-     natural light fall-off (closer to surface = denser, farther = softer
-     ambient). The crisp 1px ring stays at full opacity so elevated
-     containers keep a defined edge; drop layers soften progressively. */
+  /* Opacity falls as blur grows, mimicking light fall-off. The 1px ring stays
+     at full opacity so elevated containers keep a defined edge. */
   --surface-shadow-ring: oklch(0 0 0 / 0.06); /* crisp edge */
   --surface-shadow-near: oklch(0 0 0 / 0.06); /* 1px blur (contact) */
   --surface-shadow-mid: oklch(0 0 0 / 0.05); /* 3–6px blur */
@@ -220,10 +216,8 @@ html {
     0 48px 48px -24px var(--surface-shadow-ambient),
     0 96px 96px -48px var(--surface-shadow-ambient);
 
-  /* Rim overlay (inset parts of the shadow recipe).
-     Applied via a pseudo-element on elevated containers so the rim stays
-     visible above opaque children (sticky headers, group labels, etc).
-     Light mode uses outer rings only — no rim needed, so these are no-ops. */
+  /* Inset rim, painted via a pseudo-element so it stays above opaque children.
+     Light uses outer rings only, so these are no-ops. */
   --surface-rim-1: 0 0 transparent;
   --surface-rim-2: 0 0 transparent;
   --surface-rim-3: 0 0 transparent;
@@ -233,10 +227,9 @@ html {
   --surface-rim-7: 0 0 transparent;
   --surface-rim-8: 0 0 transparent;
 
-  /* Drop + rim in one value, for `solidSurface()`. A single custom property is
-     what lets the utility use the `shadow-(--var)` form that tailwind-merge can
-     override. Re-declared in .dark below for the same reason the border token
-     is: a custom property resolves its var()s where it is DECLARED. */
+  /* Drop + rim in one value for `solidSurface()`. One custom property is what
+     lets the utility use the `shadow-(--var)` form tailwind-merge can override,
+     and it is re-declared in .dark for the same reason --border is. */
   --surface-shadow-combined-1: var(--surface-shadow-1), var(--surface-rim-1);
   --surface-shadow-combined-2: var(--surface-shadow-2), var(--surface-rim-2);
   --surface-shadow-combined-3: var(--surface-shadow-3), var(--surface-rim-3);
@@ -245,13 +238,23 @@ html {
   --surface-shadow-combined-6: var(--surface-shadow-6), var(--surface-rim-6);
   --surface-shadow-combined-7: var(--surface-shadow-7), var(--surface-rim-7);
   --surface-shadow-combined-8: var(--surface-shadow-8), var(--surface-rim-8);
+
+  /* The chrome edge, applied with `shadow-(--chrome-shadow)`. A BOX-SHADOW
+     value, hence the name; re-declared in .dark for the same reason --border is.
+
+     Light needs no edge of its own — the fill lands 16:1 against the page — so
+     this is just the ladder's ring-without-drop rung, which keeps the surface
+     flush rather than raised. Dark is where it does the work.
+
+     Don't split it back into hairline/rim tokens: nothing recomposes them, and
+     a colour written into one silently voids the WHOLE box-shadow. Don't add an
+     inner --chrome-drop to swap the middle layer per element either — measured,
+     and it can't work, since this resolves on <html> (same trap as --border). */
+  --chrome-shadow: var(--surface-shadow-1);
 }
 
 .dark {
-  /* Dark-mode color overrides. Mirrors the :root color block above —
-     every token declared in :root that needs a different dark value gets
-     overridden here. Tokens that share light/dark values (like --primary,
-     --primary-foreground, --ring) are NOT redeclared. */
+  /* Dark-mode overrides. Tokens sharing a light value are not redeclared. */
   --foreground: oklch(0.94 var(--neutral-chroma) var(--neutral-hue));
   --neutral: oklch(0.95 var(--neutral-chroma) var(--neutral-hue));
   --neutral-foreground: oklch(0.13 var(--neutral-chroma) var(--neutral-hue));
@@ -263,9 +266,7 @@ html {
   --accent-foreground: oklch(0.95 var(--neutral-chroma) var(--neutral-hue));
   --destructive: oklch(0.5 0.22 25);
   --destructive-foreground: oklch(1 0 0);
-  /* Brighten --primary toward white so primary-soft's label stays readable on
-     the darker secondary plate (solid --primary is too dim as text in dark).
-     Derived, so it tracks whatever --primary the consumer sets. */
+  /* Brightened so primary-soft's label stays readable on the darker plate. */
   --primary-soft-foreground: color-mix(in oklch, var(--primary), white 30%);
   /* Same treatment for destructive-soft's label on its tinted plate. */
   --destructive-soft-foreground: color-mix(
@@ -274,30 +275,52 @@ html {
     white 30%
   );
 
-  /* Dark-mode hover colors — mix toward white instead of black so hovered
-     buttons brighten against the dark substrate. */
+  /* ── Chrome surface ──────────────────────────────────────────────────────
+     BELOW the page, the only direction dark leaves open: up is where every card
+     lives, so a lifted near-black slab read as one more card. --neutral inverts
+     to near-white here for the Button, so only chroma and hue carry over. */
+  --chrome: oklch(0.159 var(--neutral-chroma) var(--neutral-hue));
+  --chrome-foreground: var(--foreground);
+  /* Re-resolved against dark's roots. See the :root block for why the derived
+     tokens cannot be declared once. */
+  --chrome-muted-foreground: color-mix(
+    in oklab,
+    var(--chrome-foreground) 71%,
+    var(--chrome)
+  );
+  --chrome-hover: color-mix(
+    in oklab,
+    var(--chrome-foreground) 10%,
+    transparent
+  );
+  --chrome-border: color-mix(
+    in oklab,
+    var(--chrome-foreground) 12%,
+    transparent
+  );
+
+  /* Dark hover — mix toward white so hovered buttons brighten. */
   --primary-hover: color-mix(in oklch, var(--primary), white 10%);
   --neutral-hover: color-mix(in oklch, var(--neutral), black 10%);
   --destructive-hover: color-mix(in oklch, var(--destructive), white 15%);
   --secondary-hover: color-mix(in oklch, var(--secondary), white 5%);
   --outline-hover: color-mix(in oklch, var(--card), white 5%);
 
-  /* Dark pressed colors — one step past hover, mixing toward white.
-     --destructive-active darkens instead: brightening the saturated red
-     drops white-label contrast below WCAG AA (white 20% measures 4.30:1). */
+  /* Dark pressed. --destructive-active darkens instead: brightening the
+     saturated red drops white-label contrast below AA. */
   --primary-active: color-mix(in oklch, var(--primary), white 14%);
   --neutral-active: color-mix(in oklch, var(--neutral), black 14%);
   --destructive-active: color-mix(in oklch, var(--destructive), black 8%);
   --secondary-active: color-mix(in oklch, var(--secondary), white 8%);
   --outline-active: color-mix(in oklch, var(--card), white 8%);
 
-  /* Re-resolved against dark's --foreground (see the :root note). */
+  /* Re-declared rather than inherited: a custom property resolves its var()s
+     where DECLARED, so this must re-mix against dark's --foreground. */
   --border: color-mix(in oklab, var(--foreground) 10%, transparent);
   --input-elevated: oklch(1 0 0 / 9%);
   --scrollbar: oklch(0.7 var(--neutral-chroma) var(--neutral-hue));
 
-  /* Sidebar — only --sidebar-border needs a dark value; the rest are aliases
-     (set in :root) that resolve per mode automatically. */
+  /* Only --sidebar-border needs a dark value; the rest are aliases. */
   --sidebar-border: oklch(0.28 var(--neutral-chroma) var(--neutral-hue));
 
   /* Status */
@@ -340,12 +363,8 @@ html {
   --surface-ring-base: oklch(1 0 0 / 0.02);
   --surface-ring-mid: oklch(1 0 0 / 0.04);
   --surface-ring-high: oklch(1 0 0 / 0.06);
-  /* Same per-layer alpha tokens as light mode (--surface-shadow-near/mid/far/
-     ambient) — overridden here with darker values so the same recipe shape
-     works in both themes. Tighter range than light (0.18 → 0.12 vs
-     0.06 → 0.03) so the wider layers don't fade to invisibility against the
-     dark substrate. --surface-shadow-ring is not redefined: dark mode sets
-     the ring inline per level since it grows with elevation. */
+  /* Same alpha tokens as light, darker and in a tighter range so the wider
+     layers don't fade out against the dark substrate. */
   --surface-shadow-near: oklch(0 0 0 / 0.18); /* 1px blur (contact) */
   --surface-shadow-mid: oklch(0 0 0 / 0.16); /* 3–6px blur */
   --surface-shadow-far: oklch(0 0 0 / 0.14); /* 12–24px blur */
@@ -413,10 +432,8 @@ html {
     inset 0 1px 0 0 var(--surface-hi-peak),
     inset 0 0 0 1px var(--surface-ring-high);
 
-  /* Drop + rim in one value, for `solidSurface()`. A single custom property is
-     what lets the utility use the `shadow-(--var)` form that tailwind-merge can
-     override. Re-declared in .dark below for the same reason the border token
-     is: a custom property resolves its var()s where it is DECLARED. */
+  /* Re-declared rather than inherited, for the same var()-resolution reason
+     the light block gives. */
   --surface-shadow-combined-1: var(--surface-shadow-1), var(--surface-rim-1);
   --surface-shadow-combined-2: var(--surface-shadow-2), var(--surface-rim-2);
   --surface-shadow-combined-3: var(--surface-shadow-3), var(--surface-rim-3);
@@ -425,6 +442,23 @@ html {
   --surface-shadow-combined-6: var(--surface-shadow-6), var(--surface-rim-6);
   --surface-shadow-combined-7: var(--surface-shadow-7), var(--surface-rim-7);
   --surface-shadow-combined-8: var(--surface-shadow-8), var(--surface-rim-8);
+
+  /* Not polish in dark — this IS the surface: the fill lands rgb 12 against a
+     page at rgb 22, a ratio of 1.08:1. (Light gets 15.96:1, hence nothing there.)
+
+     Boundary first, then the top-edge specular — the ladder lights from above
+     (every --surface-rim-* is `inset 0 1px 0 0`) and without it this reads as a
+     hole punched in the page. Neither layer comes from the ladder: --surface-rim-*
+     and the ring inside --surface-shadow-* both assume a fill LIGHTER than the
+     page, so the ladder's ring lands lighter than the fill it should define.
+
+     A floating chrome surface is NOT this plus a ladder rung. Rungs 3-8 bake in
+     their own ring, which would sit under this hairline, and the composed form
+     can only be written as `shadow-[...]`, which tailwind-merge files under
+     shadow-COLOR so `shadow-none` stops overriding. Build one from
+     --surface-shadow-near/-mid/-far with no ladder ring. */
+  --chrome-shadow:
+    0 0 0 1px oklch(0 0 0 / 0.7), inset 0 1px 0 0 oklch(1 0 0 / 0.065);
 }
 
 @theme inline {
@@ -452,6 +486,9 @@ html {
   --color-primary: var(--primary);
   --color-neutral-foreground: var(--neutral-foreground);
   --color-neutral: var(--neutral);
+  /* Only the fill gets a utility; the rest of the palette reaches controls
+     through `[data-surface="chrome"]`, deliberately the one way to paint here. */
+  --color-chrome: var(--chrome);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -505,7 +542,10 @@ html {
   --shadow-inset: 0 1px 2px 0 oklch(0 0 0 / 0.08);
   --shadow-inset-highlight: 0 -1px oklch(1 0 0 / 0.04);
 
-  /* Surface elevation utilities — generates bg-surface-{1..8} and shadow-surface-{1..8}. */
+  /* Surface fills — generates bg-surface-{1..8}. The shadow and rim recipes
+     deliberately get NO @theme alias: a theme-key shadow class lands in
+     tailwind-merge's shadow-COLOR group, so `shadow-none` would never override
+     it. The helpers in lib/elevated point at the raw tokens instead. */
   --color-surface-1: var(--surface-1);
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
@@ -515,30 +555,10 @@ html {
   --color-surface-7: var(--surface-7);
   --color-surface-8: var(--surface-8);
 
-  /* Interactive overlay utilities — generates bg-surface-hover /
-     bg-surface-selected. Translucent overlays that composite on whatever
-     surface level they sit on. */
+  /* Generates bg-surface-hover / -active / -selected. */
   --color-surface-hover: var(--surface-hover);
   --color-surface-active: var(--surface-active);
   --color-surface-selected: var(--surface-selected);
-
-  --shadow-surface-1: var(--surface-shadow-1);
-  --shadow-surface-2: var(--surface-shadow-2);
-  --shadow-surface-3: var(--surface-shadow-3);
-  --shadow-surface-4: var(--surface-shadow-4);
-  --shadow-surface-5: var(--surface-shadow-5);
-  --shadow-surface-6: var(--surface-shadow-6);
-  --shadow-surface-7: var(--surface-shadow-7);
-  --shadow-surface-8: var(--surface-shadow-8);
-
-  --shadow-surface-rim-1: var(--surface-rim-1);
-  --shadow-surface-rim-2: var(--surface-rim-2);
-  --shadow-surface-rim-3: var(--surface-rim-3);
-  --shadow-surface-rim-4: var(--surface-rim-4);
-  --shadow-surface-rim-5: var(--surface-rim-5);
-  --shadow-surface-rim-6: var(--surface-rim-6);
-  --shadow-surface-rim-7: var(--surface-rim-7);
-  --shadow-surface-rim-8: var(--surface-rim-8);
 
   @keyframes fade-in-up {
     from {
@@ -566,6 +586,22 @@ html {
 
   .root {
     isolation: isolate;
+  }
+
+  /* Hands the chrome palette to the whole subtree, so controls keep using
+     ordinary page classes instead of being repainted one at a time. --primary
+     is left alone so a primary Button keeps its brand fill. Portalled content
+     renders at the body and correctly does NOT inherit this; a floating
+     component that wants the look carries the attribute itself, as
+     `Tooltip variant="chrome"` does. */
+  [data-surface="chrome"] {
+    --foreground: var(--chrome-foreground);
+    --muted-foreground: var(--chrome-muted-foreground);
+    --border: var(--chrome-border);
+    --muted: var(--chrome-hover);
+    --accent: var(--chrome-hover);
+    --surface-hover: var(--chrome-hover);
+    --surface-active: var(--chrome-hover);
   }
 
   h1,
@@ -601,7 +637,6 @@ html {
   /* background: #000; */
   position: absolute;
   overflow: hidden;
-  /* after */
   &::after {
     content: "";
     pointer-events: none;

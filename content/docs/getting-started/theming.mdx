@@ -45,7 +45,7 @@ Copy and paste the following into your `globals.css` file:
   --neutral-chroma: 0.004;
   --neutral-chroma-low: 0.002;
 
-  /* Background colors — the page is surface-1, cards and popovers surface-3. */
+  /* Background colors, the page is surface-1, cards and popovers surface-3. */
   --background: var(--surface-1);
   --foreground: oklch(0.18 var(--neutral-chroma) var(--neutral-hue));
 
@@ -99,7 +99,7 @@ Copy and paste the following into your `globals.css` file:
   --secondary-hover: color-mix(in oklch, var(--secondary), black 5%);
   --outline-hover: color-mix(in oklch, var(--card), black 5%);
 
-  /* Pressed — one step past hover in the same direction. */
+  /* Pressed, one step past hover in the same direction. */
   --primary-active: color-mix(in oklch, var(--primary), black 8%);
   --neutral-active: color-mix(in oklch, var(--neutral), white 14%);
   --destructive-active: color-mix(in oklch, var(--destructive), black 8%);
@@ -261,7 +261,7 @@ Copy and paste the following into your `globals.css` file:
     transparent
   );
 
-  /* Dark hover — mix toward white so hovered buttons brighten. */
+  /* Dark hover, mix toward white so hovered buttons brighten. */
   --primary-hover: color-mix(in oklch, var(--primary), white 10%);
   --neutral-hover: color-mix(in oklch, var(--neutral), black 10%);
   --destructive-hover: color-mix(in oklch, var(--destructive), white 15%);
@@ -295,7 +295,7 @@ Copy and paste the following into your `globals.css` file:
   --success-foreground: oklch(0.72 0.15 145);
   --success-border: oklch(0.36 0.11 145);
 
-  /* Surface ladder — progressive lightness with brand-hue tint */
+  /* Surface ladder, progressive lightness with brand-hue tint */
   --surface-1: oklch(0.205 var(--neutral-chroma) var(--neutral-hue));
   --surface-2: oklch(0.235 var(--neutral-chroma) var(--neutral-hue));
   --surface-3: oklch(0.264 var(--neutral-chroma) var(--neutral-hue));
@@ -492,15 +492,18 @@ Copy and paste the following into your `globals.css` file:
   .root {
     isolation: isolate;
   }
-  [data-surface="chrome"] {
-    --foreground: var(--chrome-foreground);
-    --muted-foreground: var(--chrome-muted-foreground);
-    --border: var(--chrome-border);
-    --muted: var(--chrome-hover);
-    --accent: var(--chrome-hover);
-    --surface-hover: var(--chrome-hover);
-    --surface-active: var(--chrome-hover);
-  }
+}
+
+[data-surface="chrome"] {
+  --foreground: var(--chrome-foreground);
+  --muted-foreground: var(--chrome-muted-foreground);
+  --border: var(--chrome-border);
+  --muted: var(--chrome-hover);
+  --accent: var(--chrome-hover);
+  --accent-foreground: var(--chrome-foreground);
+  --input: var(--chrome-hover);
+  --surface-hover: var(--chrome-hover);
+  --surface-active: var(--chrome-hover);
 }
 ```
 

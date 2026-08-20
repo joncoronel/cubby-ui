@@ -1796,11 +1796,16 @@ function extractBlockBody(content: string, opener: RegExp): string | null {
 // pastes into their own globals.css, especially since the page explains the
 // system in prose underneath it. Multi-line comments go; one-liners are the
 // section dividers and stay.
+//
+// The surviving one-liners land under content/docs/**, where DOC_WRITING_GUIDE
+// bans em-dashes. Reviewing the page can no longer catch them, since it is
+// machine-written, so normalize here instead.
 function stripMaintainerNotes(css: string): string {
   return css
     .replace(/[ \t]*\/\*[\s\S]*?\*\/[ \t]*\n?/g, (match) => {
       const body = match.slice(0, match.indexOf("*/"));
-      return body.includes("\n") ? "" : match;
+      if (body.includes("\n")) return "";
+      return match.replace(/\s*—\s*/g, ", ");
     })
     .replace(/\n{3,}/g, "\n\n");
 }
@@ -1821,6 +1826,13 @@ function syncThemingDoc(): boolean {
       .replace(/\r\n/g, "\n")
       .replace(/\n+$/, ""),
   );
+  // A backtick fence inside the CSS would close the block early. Everything
+  // after it would land outside the fence and be parsed as MDX, where `{` and
+  // `<` are JSX, breaking the build.
+  if (theme.includes("```")) {
+    console.warn("⚠️  theme.css contains a code fence; skipping doc sync");
+    return false;
+  }
   const doc = fsSync.readFileSync(THEMING_DOC_PATH, "utf-8");
   // The fence is spelled out so a stray code block elsewhere on the page can
   // never be the one that gets rewritten.
@@ -1836,6 +1848,12 @@ function syncThemingDoc(): boolean {
     (_match, open: string, close: string) => open + theme + close,
   );
   if (next === doc) return false;
+  // The end marker must still follow the closing fence, or the block was
+  // truncated and the rest of the page is now loose MDX.
+  if (!/\n```\n\n\{\/\* THEME_CSS:END \*\/\}/.test(next)) {
+    console.warn("⚠️  doc sync would truncate the block; leaving it untouched");
+    return false;
+  }
   fsSync.writeFileSync(THEMING_DOC_PATH, next);
   return true;
 }
@@ -1944,6 +1962,18 @@ function extractCssContent(): {
       const layerContent = content.substring(startPos, endPos - 1).trim();
       layerBase["@layer base"] = parseLayerBaseRules(layerContent);
     }
+  }
+
+  // Extract top-level [data-surface="..."] rules. These must stay UNLAYERED:
+  // `.dark` is unlayered, and unlayered declarations beat layered ones whatever
+  // the specificity, so from `@layer base` a surface rule loses to `.dark` on
+  // any element carrying both.
+  for (const match of content.matchAll(
+    /^\[data-surface="[a-z-]+"\]\s*\{([^}]*)\}/gm,
+  )) {
+    const selector = match[0].slice(0, match[0].indexOf("{")).trim();
+    const props = parseLayerBaseRules(`${selector} { ${match[1]} }`);
+    Object.assign(layerBase, props);
   }
 
   // Extract @keyframes blocks

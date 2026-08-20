@@ -1679,16 +1679,18 @@
           },
           ".root": {
             "isolation": "isolate"
-          },
-          "[data-surface=\"chrome\"]": {
-            "--foreground": "var(--chrome-foreground)",
-            "--muted-foreground": "var(--chrome-muted-foreground)",
-            "--border": "var(--chrome-border)",
-            "--muted": "var(--chrome-hover)",
-            "--accent": "var(--chrome-hover)",
-            "--surface-hover": "var(--chrome-hover)",
-            "--surface-active": "var(--chrome-hover)"
           }
+        },
+        "[data-surface=\"chrome\"]": {
+          "--foreground": "var(--chrome-foreground)",
+          "--muted-foreground": "var(--chrome-muted-foreground)",
+          "--border": "var(--chrome-border)",
+          "--muted": "var(--chrome-hover)",
+          "--accent": "var(--chrome-hover)",
+          "--accent-foreground": "var(--chrome-foreground)",
+          "--input": "var(--chrome-hover)",
+          "--surface-hover": "var(--chrome-hover)",
+          "--surface-active": "var(--chrome-hover)"
         }
       }
     },

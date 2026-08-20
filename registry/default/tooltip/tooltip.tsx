@@ -56,6 +56,23 @@ function TooltipArrow({
   return <BaseTooltip.Arrow data-slot="tooltip-arrow" {...props} />;
 }
 
+/**
+ * Surface treatment, as a union so the compiler rejects the impossible pair.
+ * `chrome` is the near-black fill in both themes, for labels that read as
+ * instrument rather than page. It sits off the elevation ladder, so `level` and
+ * `shadowLevel` would have nothing to select and are refused rather than
+ * silently dropped.
+ */
+type TooltipSurfaceProps =
+  | {
+      variant?: "default";
+      /** Surface elevation level for the tooltip bg (1-8). Defaults to 2, the lightest "lifted off the page" tier. */
+      level?: SurfaceLevel;
+      /** Shadow weight (1-8). Pinned to 2 by default so tooltips read as quiet/subtle. */
+      shadowLevel?: SurfaceLevel;
+    }
+  | { variant: "chrome"; level?: never; shadowLevel?: never };
+
 function TooltipContent({
   children,
   className,
@@ -86,17 +103,7 @@ function TooltipContent({
   arrow?: boolean;
   arrowPadding?: number;
   container?: HTMLElement | undefined;
-  /**
-   * Surface treatment. `chrome` is the near-black fill in both themes, for
-   * labels that read as instrument rather than page. It ignores `level` and
-   * `shadowLevel`, which describe a ladder it is deliberately off.
-   */
-  variant?: "default" | "chrome";
-  /** Surface elevation level for the tooltip bg (1-8). Defaults to 2 — the lightest "lifted off the page" tier. */
-  level?: SurfaceLevel;
-  /** Shadow weight (1-8). Pinned to 2 by default so tooltips read as quiet/subtle. */
-  shadowLevel?: SurfaceLevel;
-}) {
+} & TooltipSurfaceProps) {
   const isChrome = variant === "chrome";
   return (
     <TooltipPortal container={container}>

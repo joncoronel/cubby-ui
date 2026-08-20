@@ -73,7 +73,7 @@ of the page rather than part of the control.
 
 The chrome surface sits off the [elevation ladder](/docs/getting-started/surfaces), so `level` and `shadowLevel` have no effect on it. It also carries no edge: the chrome edge is an opt-in `shadow-(--chrome-shadow)` that larger containers add, and on a label two lines tall it is more boundary than there is object. A tooltip already carries its shape through its text and arrow.
 
-It brings its own palette with it: text, muted text, borders and hover washes inside the tooltip resolve against the dark fill, so ordinary classes like `text-muted-foreground` keep working.
+It brings its own palette with it: text, muted text, borders, form-field fills and hover washes inside the tooltip resolve against the dark fill, so ordinary classes like `text-muted-foreground` keep working.
 
 ```tsx
 <TooltipContent variant="chrome">

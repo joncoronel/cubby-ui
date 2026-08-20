@@ -49,12 +49,12 @@
      Near-black in BOTH themes, deliberately OFF the elevation ladder. For
      persistent app chrome (a header bar) and for floating labels that should
      read as instrument rather than page. Not "inverse": a white slab in dark
-     would sit at ~97x the page's luminance, in chrome you can't scroll away.
+     would sit at ~116x the page's luminance, in chrome you can't scroll away.
 
      Light borrows --neutral, so this fill and the solid `neutral` Button are
      one black; retuning that token moves both.
 
-     Paint on it with `data-surface="chrome"` (rule in @layer base below), not
+     Paint on it with `data-surface="chrome"` (the unlayered rule below), not
      by hand. Every token is re-declared in .dark, derived ones included: a
      custom property substitutes its var()s where DECLARED, so derived tokens
      living only here resolve against LIGHT roots under a subtree .dark. */
@@ -222,7 +222,7 @@
   /* The chrome edge, applied with `shadow-(--chrome-shadow)`. A BOX-SHADOW
      value, hence the name; re-declared in .dark for the same reason --border is.
 
-     Light needs no edge of its own — the fill lands 16:1 against the page — so
+     Light needs no edge of its own, the fill lands 16.3:1 against the page, so
      this is just the ladder's ring-without-drop rung, which keeps the surface
      flush rather than raised. Dark is where it does the work.
 
@@ -540,19 +540,30 @@
   .root {
     isolation: isolate;
   }
-  /* Hands the chrome palette to the whole subtree, so controls keep using
-     ordinary page classes instead of being repainted one at a time. --primary
-     is left alone so a primary Button keeps its brand fill. Portalled content
-     renders at the body and correctly does NOT inherit this; a floating
-     component that wants the look carries the attribute itself, as
-     `Tooltip variant="chrome"` does. */
-  [data-surface="chrome"] {
-    --foreground: var(--chrome-foreground);
-    --muted-foreground: var(--chrome-muted-foreground);
-    --border: var(--chrome-border);
-    --muted: var(--chrome-hover);
-    --accent: var(--chrome-hover);
-    --surface-hover: var(--chrome-hover);
-    --surface-active: var(--chrome-hover);
-  }
+}
+
+/* Hands the chrome palette to the whole subtree, so controls keep using ordinary
+   page classes instead of being repainted one at a time. --primary is left alone
+   so a primary Button keeps its brand fill. Portalled content renders at the body
+   and correctly does NOT inherit this; a floating component that wants the look
+   carries the attribute itself, as `Tooltip variant="chrome"` does.
+
+   Unlayered on purpose. `.dark` is unlayered, and unlayered declarations beat
+   layered ones regardless of specificity, so from `@layer base` this lost to
+   `.dark` on any element carrying both.
+
+   Each re-pointed fill needs its foreground beside it, or a control pairs a
+   chrome background with a page text colour. --input is here for the reverse
+   case: Input and Textarea set a background but inherit their colour, so
+   without it they paint --chrome-foreground on a white fill. */
+[data-surface="chrome"] {
+  --foreground: var(--chrome-foreground);
+  --muted-foreground: var(--chrome-muted-foreground);
+  --border: var(--chrome-border);
+  --muted: var(--chrome-hover);
+  --accent: var(--chrome-hover);
+  --accent-foreground: var(--chrome-foreground);
+  --input: var(--chrome-hover);
+  --surface-hover: var(--chrome-hover);
+  --surface-active: var(--chrome-hover);
 }

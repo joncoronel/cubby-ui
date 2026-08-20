@@ -101,7 +101,7 @@ export const SURFACE_SHADOW_COMBINED: Record<SurfaceLevel, string> = {
  * Fill only, like `SURFACE_BG` + `SURFACE_VAR`. Add the edge separately with
  * `shadow-(--chrome-shadow)` for anything LARGE: in dark it is not decoration,
  * since the fill measures 1.08:1 against the page and that token is the only
- * thing defining the surface (light is 15.96:1 and needs none). Leave it off
+ * thing defining the surface (light is 16.3:1 and needs none). Leave it off
  * for anything small, as the chrome `Tooltip` does.
  */
 export const CHROME_SURFACE = "bg-chrome [--popup-surface:var(--chrome)]";

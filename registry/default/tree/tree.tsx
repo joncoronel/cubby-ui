@@ -1033,6 +1033,5 @@ export {
 
 import * as TreeUtils from "./lib/tree-utils";
 import { HugeiconsIcon } from "@hugeicons/react";
-import ArrowRight01Icon from "@hugeicons/core-free-icons/ArrowRight01Icon";
-import Loading03Icon from "@hugeicons/core-free-icons/Loading03Icon";
+import { ArrowRight01Icon, Loading03Icon } from "@hugeicons/core-free-icons";
 export { TreeUtils };

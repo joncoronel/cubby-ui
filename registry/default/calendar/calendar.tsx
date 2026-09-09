@@ -8,8 +8,7 @@ import { buttonVariants } from "@/registry/default/button/button";
 import { cn } from "@/lib/utils";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import ArrowLeft01Icon from "@hugeicons/core-free-icons/ArrowLeft01Icon";
-import ArrowRight01Icon from "@hugeicons/core-free-icons/ArrowRight01Icon";
+import { ArrowLeft01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
 function Calendar({
   classNames,
   ...props

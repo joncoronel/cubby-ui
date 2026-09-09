@@ -22,17 +22,19 @@ import {
 } from "@/registry/default/switch/switch";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import ArrowRight01Icon from "@hugeicons/core-free-icons/ArrowRight01Icon";
-import Cancel01Icon from "@hugeicons/core-free-icons/Cancel01Icon";
-import Tick02Icon from "@hugeicons/core-free-icons/Tick02Icon";
+import {
+  ArrowRight01Icon,
+  Cancel01Icon,
+  CheckIcon,
+} from "@hugeicons/core-free-icons";
 
-// The tick draws itself in on check. `pathLength` restates the path as 1 unit
+// The check draws itself in. `pathLength` restates the path as 1 unit
 // long, so the dash values are fractions of the stroke and survive a HugeIcons
 // reshape. Deriving the icon array is the only way to reach the path.
-const tickIcon = Tick02Icon.map(([tag, attrs]) => [
+const checkIcon = CheckIcon.map(([tag, attrs]) => [
   tag,
   { ...attrs, pathLength: 1 },
-]) as typeof Tick02Icon;
+]) as typeof CheckIcon;
 
 const checkmarkClasses =
   "[&_path]:ease-out-expo [&_path]:transition-[stroke-dashoffset] [&_path]:duration-150 [&_path]:[stroke-dasharray:1] in-data-checked:[&_path]:[stroke-dashoffset:0] in-data-unchecked:[&_path]:[stroke-dashoffset:1] motion-reduce:[&_path]:transition-none";
@@ -699,7 +701,7 @@ function BaseDrawerMenuCheckboxItem({
           keepMounted
         >
           <HugeiconsIcon
-            icon={tickIcon}
+            icon={checkIcon}
             strokeWidth={2.5}
             className={cn("size-4.5 sm:size-4", checkmarkClasses)}
           />
@@ -756,7 +758,7 @@ function BaseDrawerMenuRadioItem({
         keepMounted
       >
         <HugeiconsIcon
-          icon={tickIcon}
+          icon={checkIcon}
           strokeWidth={2.5}
           className={cn("size-4.5 sm:size-4", checkmarkClasses)}
         />

@@ -6,11 +6,13 @@ import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useSearchContext } from "fumadocs-ui/contexts/search";
 import { HugeiconsIcon } from "@hugeicons/react";
-import GithubIcon from "@hugeicons/core-free-icons/GithubIcon";
-import Menu01Icon from "@hugeicons/core-free-icons/Menu01Icon";
-import Moon01Icon from "@hugeicons/core-free-icons/Moon01Icon";
-import Search01Icon from "@hugeicons/core-free-icons/Search01Icon";
-import Sun01Icon from "@hugeicons/core-free-icons/Sun01Icon";
+import {
+  GithubIcon,
+  Menu01Icon,
+  Moon01Icon,
+  Search01Icon,
+  Sun01Icon,
+} from "@hugeicons/core-free-icons";
 import { CubbyUILogo } from "@/components/cubbyui-logo";
 import { Button } from "@/registry/default/button/button";
 import { Kbd } from "@/registry/default/kbd/kbd";

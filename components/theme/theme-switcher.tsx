@@ -5,9 +5,11 @@ import { useEffect, useState } from "react";
 import { Button } from "@/registry/default/button/button";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import ComputerIcon from "@hugeicons/core-free-icons/ComputerIcon";
-import Moon02Icon from "@hugeicons/core-free-icons/Moon02Icon";
-import Sun01Icon from "@hugeicons/core-free-icons/Sun01Icon";
+import {
+  ComputerIcon,
+  Moon02Icon,
+  Sun01Icon,
+} from "@hugeicons/core-free-icons";
 export function ThemeSwitcher() {
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme, resolvedTheme } = useTheme();

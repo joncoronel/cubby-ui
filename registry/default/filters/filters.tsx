@@ -25,8 +25,7 @@ import { Kbd } from "@/registry/default/kbd/kbd";
 import { useControllableState } from "@/registry/default/hooks/use-controllable-state";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import Cancel01Icon from "@hugeicons/core-free-icons/Cancel01Icon";
-import PlusSignIcon from "@hugeicons/core-free-icons/PlusSignIcon";
+import { Cancel01Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
 
 import {
   FilterChipContext,

@@ -19,9 +19,11 @@ import {
   type Column,
 } from "@tanstack/react-table";
 import { HugeiconsIcon } from "@hugeicons/react";
-import SortByDown01Icon from "@hugeicons/core-free-icons/SortByDown01Icon";
-import SortByUp01Icon from "@hugeicons/core-free-icons/SortByUp01Icon";
-import ArrowUpDownIcon from "@hugeicons/core-free-icons/ArrowUpDownIcon";
+import {
+  ArrowUpDownIcon,
+  SortByDown01Icon,
+  SortByUp01Icon,
+} from "@hugeicons/core-free-icons";
 
 import { cn } from "@/lib/utils";
 import { elevatedSurface } from "@/registry/default/lib/elevated";

@@ -11,7 +11,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 // leaves the import alone. Tree shaking still keeps the unused icons out of the
 // bundle; the cost this avoids is parsing all 6 MB, which an installed copy of
 // this component would otherwise impose on the consumer's build too.
-import Loading03Icon from "@hugeicons/core-free-icons/Loading03Icon";
+import { Loading03Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 
 // The button's fill and border render on a ::before pseudo-element that

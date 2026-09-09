@@ -12,8 +12,7 @@ import { cn } from "@/lib/utils";
 import type { DateRange } from "react-day-picker";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import Calendar01Icon from "@hugeicons/core-free-icons/Calendar01Icon";
-import UnfoldMoreIcon from "@hugeicons/core-free-icons/UnfoldMoreIcon";
+import { Calendar01Icon, UnfoldMoreIcon } from "@hugeicons/core-free-icons";
 export interface DateRangePickerProps {
   value?: DateRange;
   onSelect?: (range: DateRange | undefined) => void;

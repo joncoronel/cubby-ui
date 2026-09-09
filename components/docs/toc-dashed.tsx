@@ -5,7 +5,7 @@ import { startTransition } from "react";
 import * as Primitive from "fumadocs-core/toc";
 import type { TOCItemType } from "fumadocs-core/toc";
 import { HugeiconsIcon } from "@hugeicons/react";
-import File01Icon from "@hugeicons/core-free-icons/File01Icon";
+import { File01Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 
 // Static empty state content (hoisted to avoid recreation)

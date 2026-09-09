@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import FilterHorizontalIcon from "@hugeicons/core-free-icons/FilterHorizontalIcon";
+import { FilterHorizontalIcon } from "@hugeicons/core-free-icons";
 
 import {
   DropdownMenu,

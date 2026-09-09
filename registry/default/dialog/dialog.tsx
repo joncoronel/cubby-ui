@@ -14,7 +14,7 @@ import {
 } from "@/registry/default/scroll-area/scroll-area";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import Cancel01Icon from "@hugeicons/core-free-icons/Cancel01Icon";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
 /**
  * `"inside"` caps the popup to the viewport and scrolls `DialogBody`.
  * `"outside"` lets the popup grow past the viewport and scrolls the area

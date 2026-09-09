@@ -9,9 +9,11 @@ import {
   type AnchoredToastOptions,
 } from "@/registry/default/toast/toast";
 import { HugeiconsIcon } from "@hugeicons/react";
-import Cancel01Icon from "@hugeicons/core-free-icons/Cancel01Icon";
-import Copy01Icon from "@hugeicons/core-free-icons/Copy01Icon";
-import Tick02Icon from "@hugeicons/core-free-icons/Tick02Icon";
+import {
+  Cancel01Icon,
+  CheckIcon,
+  Copy01Icon,
+} from "@hugeicons/core-free-icons";
 
 type CopyButtonToastConfig = Omit<AnchoredToastOptions, "anchor">;
 
@@ -20,7 +22,7 @@ const DEFAULT_COPY_ICON = (
 );
 const DEFAULT_CHECK_ICON = (
   <HugeiconsIcon
-    icon={Tick02Icon}
+    icon={CheckIcon}
     strokeWidth={2}
     className="size-4 text-green-500"
   />

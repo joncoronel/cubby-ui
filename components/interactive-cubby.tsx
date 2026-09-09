@@ -4,31 +4,33 @@ import * as m from "motion/react-m";
 import { useMotionValue, useTransform, useSpring } from "motion/react";
 import { useRef, useState, useEffect } from "react";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
-import ArrowDown01Icon from "@hugeicons/core-free-icons/ArrowDown01Icon";
-import ArrowRight01Icon from "@hugeicons/core-free-icons/ArrowRight01Icon";
-import BarChartIcon from "@hugeicons/core-free-icons/BarChartIcon";
-import BubbleChatIcon from "@hugeicons/core-free-icons/BubbleChatIcon";
-import Calendar01Icon from "@hugeicons/core-free-icons/Calendar01Icon";
-import CheckListIcon from "@hugeicons/core-free-icons/CheckListIcon";
-import CircleIcon from "@hugeicons/core-free-icons/CircleIcon";
-import ComputerTerminal01Icon from "@hugeicons/core-free-icons/ComputerTerminal01Icon";
-import Image02Icon from "@hugeicons/core-free-icons/Image02Icon";
-import InformationCircleIcon from "@hugeicons/core-free-icons/InformationCircleIcon";
-import Layers01Icon from "@hugeicons/core-free-icons/Layers01Icon";
-import Loading03Icon from "@hugeicons/core-free-icons/Loading03Icon";
-import Menu01Icon from "@hugeicons/core-free-icons/Menu01Icon";
-import MinusSignIcon from "@hugeicons/core-free-icons/MinusSignIcon";
-import Navigation03Icon from "@hugeicons/core-free-icons/Navigation03Icon";
-import Notification03Icon from "@hugeicons/core-free-icons/Notification03Icon";
-import Radio01Icon from "@hugeicons/core-free-icons/Radio01Icon";
-import RectangularIcon from "@hugeicons/core-free-icons/RectangularIcon";
-import SidebarLeft01Icon from "@hugeicons/core-free-icons/SidebarLeft01Icon";
-import SlidersHorizontalIcon from "@hugeicons/core-free-icons/SlidersHorizontalIcon";
-import Square01Icon from "@hugeicons/core-free-icons/Square01Icon";
-import Table01Icon from "@hugeicons/core-free-icons/Table01Icon";
-import TextFontIcon from "@hugeicons/core-free-icons/TextFontIcon";
-import ToggleOffIcon from "@hugeicons/core-free-icons/ToggleOffIcon";
-import UserIcon from "@hugeicons/core-free-icons/UserIcon";
+import {
+  ArrowDown01Icon,
+  ArrowRight01Icon,
+  BarChartIcon,
+  BubbleChatIcon,
+  Calendar01Icon,
+  CheckListIcon,
+  CircleIcon,
+  ComputerTerminal01Icon,
+  Image02Icon,
+  InformationCircleIcon,
+  Layers01Icon,
+  Loading03Icon,
+  Menu01Icon,
+  MinusSignIcon,
+  Navigation03Icon,
+  Notification03Icon,
+  Radio01Icon,
+  RectangularIcon,
+  SidebarLeft01Icon,
+  SlidersHorizontalIcon,
+  Square01Icon,
+  Table01Icon,
+  TextFontIcon,
+  ToggleOffIcon,
+  UserIcon,
+} from "@hugeicons/core-free-icons";
 interface Component {
   id: string;
   name: string;

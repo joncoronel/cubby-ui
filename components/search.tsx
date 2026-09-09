@@ -21,9 +21,11 @@ import { cn } from "@/lib/utils";
 import { create } from "@orama/orama";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import ArrowDown01Icon from "@hugeicons/core-free-icons/ArrowDown01Icon";
-import ArrowTurnBackwardIcon from "@hugeicons/core-free-icons/ArrowTurnBackwardIcon";
-import ArrowUp01Icon from "@hugeicons/core-free-icons/ArrowUp01Icon";
+import {
+  ArrowDown01Icon,
+  ArrowTurnBackwardIcon,
+  ArrowUp01Icon,
+} from "@hugeicons/core-free-icons";
 
 function HashtagIcon({ className }: { className?: string }) {
   return (

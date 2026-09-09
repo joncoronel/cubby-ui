@@ -3,8 +3,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { NumberField as BaseNumberField } from "@base-ui/react/number-field";
 import { HugeiconsIcon } from "@hugeicons/react";
-import ArrowDown01Icon from "@hugeicons/core-free-icons/ArrowDown01Icon";
-import ArrowUp01Icon from "@hugeicons/core-free-icons/ArrowUp01Icon";
+import { ArrowDown01Icon, ArrowUp01Icon } from "@hugeicons/core-free-icons";
 
 import { cn } from "@/lib/utils";
 

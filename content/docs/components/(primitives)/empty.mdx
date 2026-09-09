@@ -1,0 +1,200 @@
+---
+title: Empty
+description: Display an empty state with an icon, title, description, and action
+type: primitive
+---
+
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/registry/default/empty/empty";
+
+The empty state communicates that a collection has no items yet and guides the next action. Use it for first-run screens, zero search results, or any list that is intentionally blank. Pair a short title, a one-line explanation, and a clear call to action.
+
+## Preview
+
+<ComponentPreview component="empty" example="empty-demo" />
+
+## Installation
+
+<ComponentInstall component="empty" />
+
+## Usage
+
+<ComponentUsage component="empty" />
+
+## Composition
+
+```text
+Empty
+├── EmptyHeader
+│   ├── EmptyMedia
+│   ├── EmptyTitle
+│   └── EmptyDescription
+└── EmptyContent
+```
+
+## Examples
+
+### Outline
+
+Use `border` utilities on `Empty` to create an outlined dashed container.
+
+<ComponentPreview component="empty" example="empty-outline" />
+
+### Background
+
+Use `bg-*` utilities on `Empty` to add a tinted background. `bg-muted/30` reads as a soft inset well.
+
+<ComponentPreview component="empty" example="empty-background" />
+
+### Avatar
+
+Use `EmptyMedia` with `variant="default"` to render an avatar or any custom media instead of the icon plate.
+
+<ComponentPreview component="empty" example="empty-avatar" />
+
+### Avatar Group
+
+Compose multiple `Avatar` components inside `EmptyMedia` for team or collaborator empty states. Use `*:data-[slot=avatar]` selectors to size and overlap the avatars.
+
+<ComponentPreview component="empty" example="empty-avatar-group" />
+
+### Input Group
+
+Place an `InputGroup` inside `EmptyContent` for no-results and 404 states that invite a search. Add a `Kbd` hint with `InputGroupAddon`.
+
+<ComponentPreview component="empty" example="empty-input-group" />
+
+## API Reference
+
+The Empty components are custom layout primitives with no Base UI dependency. Every part renders a `div` and accepts all `div` props.
+
+### Empty
+
+Root container. Centers its children, balances text, and provides the dashed border and padding.
+
+<ComponentPreview component="empty" example="empty-demo" />
+
+<ApiPropsList>
+
+<ApiProp name="className" fullType="string" simpleType="string">
+  Additional Tailwind classes. Use `border`, `bg-muted`, or `bg-gradient-*` to change the frame and fill.
+</ApiProp>
+
+</ApiPropsList>
+
+```tsx
+<Empty>
+  <EmptyHeader />
+  <EmptyContent />
+</Empty>
+```
+
+### EmptyHeader
+
+Groups the visual, title, and description. Constrains width to `max-w-sm` and centers content.
+
+<ApiPropsList>
+
+<ApiProp name="className" fullType="string" simpleType="string">
+  Additional classes for the header wrapper.
+</ApiProp>
+
+</ApiPropsList>
+
+```tsx
+<EmptyHeader>
+  <EmptyMedia />
+  <EmptyTitle />
+  <EmptyDescription />
+</EmptyHeader>
+```
+
+### EmptyMedia
+
+Visual slot for the empty state. Use `variant="icon"` for the muted rounded plate with an icon, or `variant="default"` (transparent) for avatars, illustrations, or custom media.
+
+<ApiPropsList>
+
+<ApiProp name="variant" fullType='"default" | "icon"' simpleType="string" defaultValue='"default"'>
+  Visual style of the media container.
+
+  - `"default"`: transparent, for avatars, images, or custom elements.
+  - `"icon"`: 40px muted plate with rounded corners, centers a single icon at `size-6`.
+</ApiProp>
+
+<ApiProp name="className" fullType="string" simpleType="string">
+  Additional classes for the media wrapper.
+</ApiProp>
+
+</ApiPropsList>
+
+```tsx
+<EmptyMedia variant="icon">
+  <Icon />
+</EmptyMedia>
+```
+
+```tsx
+<EmptyMedia>
+  <Avatar>
+    <AvatarImage src="..." />
+    <AvatarFallback>CN</AvatarFallback>
+  </Avatar>
+</EmptyMedia>
+```
+
+### EmptyTitle
+
+Title line of the empty state.
+
+<ApiPropsList>
+
+<ApiProp name="className" fullType="string" simpleType="string">
+  Additional classes for the title.
+</ApiProp>
+
+</ApiPropsList>
+
+```tsx
+<EmptyTitle>No data</EmptyTitle>
+```
+
+### EmptyDescription
+
+Supporting text below the title. Link styles are built-in via `[&>a]` selectors.
+
+<ApiPropsList>
+
+<ApiProp name="className" fullType="string" simpleType="string">
+  Additional classes for the description.
+</ApiProp>
+
+</ApiPropsList>
+
+```tsx
+<EmptyDescription>You do not have any notifications.</EmptyDescription>
+```
+
+### EmptyContent
+
+Action area for buttons, inputs, or other controls. Centers content and limits width to `max-w-sm`.
+
+<ApiPropsList>
+
+<ApiProp name="className" fullType="string" simpleType="string">
+  Additional classes. Use `flex-row justify-center` for side-by-side buttons.
+</ApiProp>
+
+</ApiPropsList>
+
+```tsx
+<EmptyContent>
+  <Button>Add Project</Button>
+</EmptyContent>
+```

@@ -95,6 +95,7 @@
         "@cubby-ui/dialog",
         "@cubby-ui/drawer",
         "@cubby-ui/dropdown-menu",
+        "@cubby-ui/empty",
         "@cubby-ui/fancy-button",
         "@cubby-ui/field",
         "@cubby-ui/fieldset",
@@ -766,6 +767,22 @@
           "type": "registry:lib",
           "target": "lib/cubby-ui/elevated.tsx"
         }
+      ]
+    },
+    {
+      "name": "empty",
+      "type": "registry:ui",
+      "title": "Empty",
+      "description": "Display an empty state with an icon, title, description, and action.",
+      "files": [
+        {
+          "path": "registry/default/empty/empty.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/empty.tsx"
+        }
+      ],
+      "dependencies": [
+        "class-variance-authority"
       ]
     },
     {

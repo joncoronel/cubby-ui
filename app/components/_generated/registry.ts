@@ -220,6 +220,12 @@ import dropdown_menu_dropdown_menu_with_inset from "@/registry/examples/dropdown
 import dropdown_menu_dropdown_menu_with_radio_group from "@/registry/examples/dropdown-menu/dropdown-menu-with-radio-group";
 import dropdown_menu_dropdown_menu_with_sub_menu from "@/registry/examples/dropdown-menu/dropdown-menu-with-sub-menu";
 import dropdown_menu_dropdown_menu_with_switches from "@/registry/examples/dropdown-menu/dropdown-menu-with-switches";
+import empty_empty_demo from "@/registry/examples/empty/empty-demo";
+import empty_empty_avatar from "@/registry/examples/empty/empty-avatar";
+import empty_empty_avatar_group from "@/registry/examples/empty/empty-avatar-group";
+import empty_empty_background from "@/registry/examples/empty/empty-background";
+import empty_empty_input_group from "@/registry/examples/empty/empty-input-group";
+import empty_empty_outline from "@/registry/examples/empty/empty-outline";
 import fancy_button_fancy_button_demo from "@/registry/examples/fancy-button/fancy-button-demo";
 import fancy_button_fancy_button_as_link from "@/registry/examples/fancy-button/fancy-button-as-link";
 import fancy_button_fancy_button_custom_colors from "@/registry/examples/fancy-button/fancy-button-custom-colors";
@@ -923,6 +929,18 @@ export const componentMetadata = {
     "dependencies": [
       "@hugeicons/react",
       "@hugeicons/core-free-icons"
+    ],
+    "examples": {},
+    "reference": []
+  },
+  "empty": {
+    "name": "empty",
+    "title": "Empty",
+    "description": "Display an empty state with an icon, title, description, and action.",
+    "category": "UI",
+    "registryDependencies": [],
+    "dependencies": [
+      "class-variance-authority"
     ],
     "examples": {},
     "reference": []
@@ -2679,6 +2697,38 @@ export const exampleRegistry = {
       "source": "\"use client\";\n\nimport { useState } from \"react\";\n\nimport {\n  DropdownMenu,\n  DropdownMenuTrigger,\n  DropdownMenuContent,\n  DropdownMenuLabel,\n  DropdownMenuSeparator,\n  DropdownMenuCheckboxItem,\n} from \"@/components/ui/cubby-ui/dropdown-menu\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nexport default function DropdownMenuWithSwitches() {\n  const [autoSave, setAutoSave] = useState(true);\n  const [wordWrap, setWordWrap] = useState(false);\n  const [telemetry, setTelemetry] = useState(false);\n\n  return (\n    <DropdownMenu>\n      <DropdownMenuTrigger render={<Button variant=\"outline\" />}>\n        Preferences\n      </DropdownMenuTrigger>\n      <DropdownMenuContent className=\"w-60\">\n        <DropdownMenuLabel>Editor</DropdownMenuLabel>\n        <DropdownMenuSeparator />\n        <DropdownMenuCheckboxItem\n          indicator=\"switch\"\n          checked={autoSave}\n          onCheckedChange={setAutoSave}\n        >\n          Auto save\n        </DropdownMenuCheckboxItem>\n        <DropdownMenuCheckboxItem\n          indicator=\"switch\"\n          checked={wordWrap}\n          onCheckedChange={setWordWrap}\n        >\n          Word wrap\n        </DropdownMenuCheckboxItem>\n        <DropdownMenuCheckboxItem\n          indicator=\"switch\"\n          checked={telemetry}\n          onCheckedChange={setTelemetry}\n          disabled\n        >\n          Share telemetry\n        </DropdownMenuCheckboxItem>\n      </DropdownMenuContent>\n    </DropdownMenu>\n  );\n}\n"
     }
   ],
+  "empty": [
+    {
+      "title": "Demo",
+      "importPath": "empty-demo",
+      "source": "import { HugeiconsIcon } from \"@hugeicons/react\";\nimport ArrowUpRight01Icon from \"@hugeicons/core-free-icons/ArrowUpRight01Icon\";\nimport FolderCodeIcon from \"@hugeicons/core-free-icons/FolderCodeIcon\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Empty,\n  EmptyContent,\n  EmptyDescription,\n  EmptyHeader,\n  EmptyMedia,\n  EmptyTitle,\n} from \"@/components/ui/cubby-ui/empty\";\n\nexport default function EmptyDemo() {\n  return (\n    <Empty>\n      <EmptyHeader>\n        <EmptyMedia variant=\"icon\">\n          <HugeiconsIcon icon={FolderCodeIcon} strokeWidth={2} />\n        </EmptyMedia>\n        <EmptyTitle>No Projects Yet</EmptyTitle>\n        <EmptyDescription>\n          You haven&apos;t created any projects yet. Get started by creating\n          your first project.\n        </EmptyDescription>\n      </EmptyHeader>\n      <EmptyContent className=\"flex-row justify-center gap-2\">\n        <Button>Create Project</Button>\n        <Button variant=\"outline\">Import Project</Button>\n      </EmptyContent>\n      <Button\n        variant=\"link\"\n        size=\"sm\"\n        className=\"text-muted-foreground\"\n        render={<a href=\"#\" />}\n        nativeButton={false}\n        trailingIcon={\n          <HugeiconsIcon icon={ArrowUpRight01Icon} strokeWidth={2} />\n        }\n      >\n        Learn More\n      </Button>\n    </Empty>\n  );\n}\n"
+    },
+    {
+      "title": "Avatar",
+      "importPath": "empty-avatar",
+      "source": "import {\n  Avatar,\n  AvatarFallback,\n  AvatarImage,\n} from \"@/components/ui/cubby-ui/avatar\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Empty,\n  EmptyContent,\n  EmptyDescription,\n  EmptyHeader,\n  EmptyMedia,\n  EmptyTitle,\n} from \"@/components/ui/cubby-ui/empty\";\n\nexport default function EmptyAvatar() {\n  return (\n    <Empty>\n      <EmptyHeader>\n        <EmptyMedia variant=\"default\">\n          <Avatar className=\"size-12\">\n            <AvatarImage\n              src=\"https://github.com/shadcn.png\"\n              className=\"grayscale\"\n              alt=\"@shadcn\"\n            />\n            <AvatarFallback>CN</AvatarFallback>\n          </Avatar>\n        </EmptyMedia>\n        <EmptyTitle>User Offline</EmptyTitle>\n        <EmptyDescription>\n          This user is currently offline. You can leave a message to notify them\n          or try again later.\n        </EmptyDescription>\n      </EmptyHeader>\n      <EmptyContent>\n        <Button size=\"sm\">Leave Message</Button>\n      </EmptyContent>\n    </Empty>\n  );\n}\n"
+    },
+    {
+      "title": "Avatar Group",
+      "importPath": "empty-avatar-group",
+      "source": "import { HugeiconsIcon } from \"@hugeicons/react\";\nimport PlusSignIcon from \"@hugeicons/core-free-icons/PlusSignIcon\";\n\nimport {\n  Avatar,\n  AvatarFallback,\n  AvatarImage,\n} from \"@/components/ui/cubby-ui/avatar\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Empty,\n  EmptyContent,\n  EmptyDescription,\n  EmptyHeader,\n  EmptyMedia,\n  EmptyTitle,\n} from \"@/components/ui/cubby-ui/empty\";\n\nexport default function EmptyAvatarGroup() {\n  return (\n    <Empty>\n      <EmptyHeader>\n        <EmptyMedia>\n          <div className=\"*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:size-12 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale\">\n            <Avatar>\n              <AvatarImage src=\"https://github.com/shadcn.png\" alt=\"@shadcn\" />\n              <AvatarFallback>CN</AvatarFallback>\n            </Avatar>\n            <Avatar>\n              <AvatarImage\n                src=\"https://github.com/maxleiter.png\"\n                alt=\"@maxleiter\"\n              />\n              <AvatarFallback>ML</AvatarFallback>\n            </Avatar>\n            <Avatar>\n              <AvatarImage\n                src=\"https://github.com/evilrabbit.png\"\n                alt=\"@evilrabbit\"\n              />\n              <AvatarFallback>ER</AvatarFallback>\n            </Avatar>\n          </div>\n        </EmptyMedia>\n        <EmptyTitle>No Team Members</EmptyTitle>\n        <EmptyDescription>\n          Invite your team to collaborate on this project.\n        </EmptyDescription>\n      </EmptyHeader>\n      <EmptyContent>\n        <Button\n          size=\"sm\"\n          leadingIcon={<HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />}\n        >\n          Invite Members\n        </Button>\n      </EmptyContent>\n    </Empty>\n  );\n}\n"
+    },
+    {
+      "title": "Background",
+      "importPath": "empty-background",
+      "source": "import { HugeiconsIcon } from \"@hugeicons/react\";\nimport Notification01Icon from \"@hugeicons/core-free-icons/Notification01Icon\";\nimport Refresh01Icon from \"@hugeicons/core-free-icons/Refresh01Icon\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Empty,\n  EmptyContent,\n  EmptyDescription,\n  EmptyHeader,\n  EmptyMedia,\n  EmptyTitle,\n} from \"@/components/ui/cubby-ui/empty\";\n\nexport default function EmptyBackground() {\n  return (\n    <Empty className=\"bg-muted/30\">\n      <EmptyHeader>\n        <EmptyMedia variant=\"icon\">\n          <HugeiconsIcon icon={Notification01Icon} strokeWidth={2} />\n        </EmptyMedia>\n        <EmptyTitle>No Notifications</EmptyTitle>\n        <EmptyDescription className=\"max-w-xs text-pretty\">\n          You&apos;re all caught up. New notifications will appear here.\n        </EmptyDescription>\n      </EmptyHeader>\n      <EmptyContent>\n        <Button\n          variant=\"outline\"\n          leadingIcon={<HugeiconsIcon icon={Refresh01Icon} strokeWidth={2} />}\n        >\n          Refresh\n        </Button>\n      </EmptyContent>\n    </Empty>\n  );\n}\n"
+    },
+    {
+      "title": "Input Group",
+      "importPath": "empty-input-group",
+      "source": "import { HugeiconsIcon } from \"@hugeicons/react\";\nimport Search01Icon from \"@hugeicons/core-free-icons/Search01Icon\";\n\nimport {\n  Empty,\n  EmptyContent,\n  EmptyDescription,\n  EmptyHeader,\n  EmptyTitle,\n} from \"@/components/ui/cubby-ui/empty\";\nimport {\n  InputGroup,\n  InputGroupAddon,\n  InputGroupInput,\n} from \"@/components/ui/cubby-ui/input-group\";\nimport { Kbd } from \"@/components/ui/cubby-ui/kbd\";\n\nexport default function EmptyInputGroup() {\n  return (\n    <Empty>\n      <EmptyHeader>\n        <EmptyTitle>404 - Not Found</EmptyTitle>\n        <EmptyDescription>\n          The page you&apos;re looking for doesn&apos;t exist. Try searching for\n          what you need below.\n        </EmptyDescription>\n      </EmptyHeader>\n      <EmptyContent>\n        <InputGroup className=\"sm:w-3/4\">\n          <InputGroupInput placeholder=\"Try searching for pages...\" />\n          <InputGroupAddon>\n            <HugeiconsIcon icon={Search01Icon} strokeWidth={2} />\n          </InputGroupAddon>\n          <InputGroupAddon align=\"inline-end\">\n            <Kbd>/</Kbd>\n          </InputGroupAddon>\n        </InputGroup>\n        <EmptyDescription>\n          Need help? <a href=\"#\">Contact support</a>\n        </EmptyDescription>\n      </EmptyContent>\n    </Empty>\n  );\n}\n"
+    },
+    {
+      "title": "Outline",
+      "importPath": "empty-outline",
+      "source": "import { HugeiconsIcon } from \"@hugeicons/react\";\nimport CloudIcon from \"@hugeicons/core-free-icons/CloudIcon\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Empty,\n  EmptyContent,\n  EmptyDescription,\n  EmptyHeader,\n  EmptyMedia,\n  EmptyTitle,\n} from \"@/components/ui/cubby-ui/empty\";\n\nexport default function EmptyOutline() {\n  return (\n    <Empty className=\"border border-dashed\">\n      <EmptyHeader>\n        <EmptyMedia variant=\"icon\">\n          <HugeiconsIcon icon={CloudIcon} strokeWidth={2} />\n        </EmptyMedia>\n        <EmptyTitle>Cloud Storage Empty</EmptyTitle>\n        <EmptyDescription>\n          Upload files to your cloud storage to access them anywhere.\n        </EmptyDescription>\n      </EmptyHeader>\n      <EmptyContent>\n        <Button variant=\"outline\" size=\"sm\">\n          Upload Files\n        </Button>\n      </EmptyContent>\n    </Empty>\n  );\n}\n"
+    }
+  ],
   "fancy-button": [
     {
       "title": "Demo",
@@ -4320,6 +4370,12 @@ export const componentMap = {
   "dropdown-menu-with-radio-group": dropdown_menu_dropdown_menu_with_radio_group,
   "dropdown-menu-with-sub-menu": dropdown_menu_dropdown_menu_with_sub_menu,
   "dropdown-menu-with-switches": dropdown_menu_dropdown_menu_with_switches,
+  "empty-demo": empty_empty_demo,
+  "empty-avatar": empty_empty_avatar,
+  "empty-avatar-group": empty_empty_avatar_group,
+  "empty-background": empty_empty_background,
+  "empty-input-group": empty_empty_input_group,
+  "empty-outline": empty_empty_outline,
   "fancy-button-demo": fancy_button_fancy_button_demo,
   "fancy-button-as-link": fancy_button_fancy_button_as_link,
   "fancy-button-custom-colors": fancy_button_fancy_button_custom_colors,
@@ -4705,6 +4761,10 @@ export const componentAnatomy = {
   "dropdown-menu": {
     "imports": "import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from \"@/components/ui/cubby-ui/dropdown-menu\";",
     "anatomy": "<DropdownMenu>\n  <DropdownMenuTrigger />\n  <DropdownMenuContent>\n    <DropdownMenuItem />\n  </DropdownMenuContent>\n</DropdownMenu>"
+  },
+  "empty": {
+    "imports": "import {\n  Empty,\n  EmptyContent,\n  EmptyDescription,\n  EmptyHeader,\n  EmptyMedia,\n  EmptyTitle,\n} from \"@/components/ui/cubby-ui/empty\";",
+    "anatomy": "<Empty>\n  <EmptyHeader>\n    <EmptyMedia />\n    <EmptyTitle />\n    <EmptyDescription />\n  </EmptyHeader>\n  <EmptyContent />\n</Empty>"
   },
   "fancy-button": {
     "imports": "import { FancyButton } from \"@/components/ui/cubby-ui/fancy-button\";",

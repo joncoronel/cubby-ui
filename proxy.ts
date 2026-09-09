@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isMarkdownPreferred, rewritePath } from "fumadocs-core/negotiation";
-import { opServer } from "@/lib/openpanel";
 
 const { rewrite: rewriteLLM } = rewritePath(
   "/docs{/*path}",
@@ -13,7 +12,6 @@ const { rewrite: rewriteMd } = rewritePath(
 
 export const config = {
   matcher: [
-    "/r/:path*.json", // Registry component installs
     "/docs/:path*.md", // Direct .md URLs (any Accept header)
     {
       source: "/docs/:path*",
@@ -22,31 +20,8 @@ export const config = {
   ],
 };
 
-export default function proxy(
-  request: NextRequest,
-  event: { waitUntil: (promise: Promise<unknown>) => void },
-) {
+export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
-  // Track registry component installs (non-blocking)
-  if (pathname.startsWith("/r/") && pathname.endsWith(".json")) {
-    const componentName = pathname.replace("/r/", "").replace(".json", "");
-
-    // Filter out placeholder/template requests and meta files
-    const isPlaceholder =
-      componentName === "{name}" ||
-      componentName === "registry" ||
-      componentName === "%7Bname%7D";
-
-    if (!isPlaceholder) {
-      event.waitUntil(
-        opServer.track("component_install", {
-          component: componentName,
-          userAgent: request.headers.get("user-agent") || "unknown",
-        }),
-      );
-    }
-  }
 
   // Strip .md extension and rewrite to the LLM route (handles all clients).
   // Must run before the Accept-based rewrite so the .md suffix doesn't leak
@@ -67,12 +42,3 @@ export default function proxy(
 
   return NextResponse.next();
 }
-
-// Pseudo-code
-// const dedupeKey = `install:${ip}:${componentName}`;
-// const exists = await kv.get(dedupeKey);
-
-// if (!exists) {
-//   await kv.set(dedupeKey, "1", { ex: 30 }); // 30 second TTL
-//   event.waitUntil(opServer.track("component_install", {...}));
-// }

@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Menu as BaseMenu } from "@base-ui/react/menu";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowRight01Icon, CheckIcon } from "@hugeicons/core-free-icons";
+import { CheckIcon, ChevronRightIcon } from "@hugeicons/core-free-icons";
 
 import { cn } from "@/lib/utils";
 import {
@@ -419,7 +419,7 @@ function DropdownMenuSubTrigger({
     >
       {children}
       <HugeiconsIcon
-        icon={ArrowRight01Icon}
+        icon={ChevronRightIcon}
         className="ml-auto size-4"
         strokeWidth={2}
       />

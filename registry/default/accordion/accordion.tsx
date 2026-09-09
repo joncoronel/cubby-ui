@@ -3,7 +3,7 @@ import { Accordion as BaseAccordion } from "@base-ui/react/accordion";
 import { cn } from "@/lib/utils";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
+import { ChevronDownIcon } from "@hugeicons/core-free-icons";
 type AccordionVariant =
   | "default"
   | "split"
@@ -144,7 +144,7 @@ function AccordionTrigger({
     const indicatorIcon =
       indicatorType === "chevron" ? (
         <HugeiconsIcon
-          icon={ArrowDown01Icon}
+          icon={ChevronDownIcon}
           data-slot="accordion-indicator"
           className="text-muted-foreground ease-out-expo size-4 shrink-0 transition-transform duration-200"
           strokeWidth={2}

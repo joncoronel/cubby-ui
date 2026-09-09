@@ -5,12 +5,12 @@ import { useMotionValue, useTransform, useSpring } from "motion/react";
 import { useRef, useState, useEffect } from "react";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import {
-  ArrowDown01Icon,
-  ArrowRight01Icon,
   BarChartIcon,
   BubbleChatIcon,
   Calendar01Icon,
   CheckListIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
   CircleIcon,
   ComputerTerminal01Icon,
   Image02Icon,
@@ -44,7 +44,7 @@ const allComponents: Component[] = [
   { id: "badge", name: "Badge", icon: CircleIcon },
   { id: "switch", name: "Switch", icon: ToggleOffIcon },
   { id: "checkbox", name: "Checkbox", icon: CheckListIcon },
-  { id: "select", name: "Select", icon: ArrowDown01Icon },
+  { id: "select", name: "Select", icon: ChevronDownIcon },
   { id: "dialog", name: "Dialog", icon: BubbleChatIcon },
   { id: "tooltip", name: "Tooltip", icon: InformationCircleIcon },
   { id: "popover", name: "Popover", icon: BubbleChatIcon },
@@ -58,7 +58,7 @@ const allComponents: Component[] = [
   { id: "slider", name: "Slider", icon: SlidersHorizontalIcon },
   { id: "table", name: "Table", icon: Table01Icon },
   { id: "calendar", name: "Calendar", icon: Calendar01Icon },
-  { id: "breadcrumb", name: "Breadcrumb", icon: ArrowRight01Icon },
+  { id: "breadcrumb", name: "Breadcrumb", icon: ChevronRightIcon },
   { id: "carousel", name: "Carousel", icon: Image02Icon },
   { id: "command", name: "Command", icon: ComputerTerminal01Icon },
   { id: "drawer", name: "Drawer", icon: SidebarLeft01Icon },

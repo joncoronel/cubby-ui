@@ -5,9 +5,9 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Select as BaseSelect } from "@base-ui/react/select";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  ArrowDown01Icon,
-  ArrowUp01Icon,
   CheckIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
   UnfoldMoreIcon,
 } from "@hugeicons/core-free-icons";
 
@@ -193,7 +193,7 @@ function SelectContent({
               <HugeiconsIcon
                 className="size-4"
                 strokeWidth={2}
-                icon={ArrowUp01Icon}
+                icon={ChevronUpIcon}
               />
             </BaseSelect.ScrollUpArrow>
           )}
@@ -229,7 +229,7 @@ function SelectContent({
               <HugeiconsIcon
                 className="size-4"
                 strokeWidth={2}
-                icon={ArrowDown01Icon}
+                icon={ChevronDownIcon}
               />
             </BaseSelect.ScrollDownArrow>
           )}

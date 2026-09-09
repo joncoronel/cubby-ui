@@ -11,9 +11,9 @@ import {
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  ArrowDown01Icon,
   ChatIcon,
   CheckIcon,
+  ChevronDownIcon,
   Copy01Icon,
   LinkSquare02Icon,
 } from "@hugeicons/core-free-icons";
@@ -215,7 +215,7 @@ export function ViewOptions({
             variant="outline"
             size="xs"
             trailingIcon={
-              <HugeiconsIcon icon={ArrowDown01Icon} strokeWidth={2} />
+              <HugeiconsIcon icon={ChevronDownIcon} strokeWidth={2} />
             }
           >
             Open

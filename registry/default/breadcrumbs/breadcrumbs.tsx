@@ -5,7 +5,7 @@ import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  ArrowRight01Icon,
+  ChevronRightIcon,
   MoreHorizontalIcon,
 } from "@hugeicons/core-free-icons";
 
@@ -136,7 +136,7 @@ function BreadcrumbSeparator({
       {...props}
     >
       {children ?? separator ?? (
-        <HugeiconsIcon icon={ArrowRight01Icon} strokeWidth={2} />
+        <HugeiconsIcon icon={ChevronRightIcon} strokeWidth={2} />
       )}
     </li>
   );

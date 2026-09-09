@@ -20,8 +20,8 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArchiveIcon,
-  ArrowLeft01Icon,
   CalendarAdd01Icon,
+  ChevronLeftIcon,
   Clock01Icon,
   Delete02Icon,
   FilterIcon,
@@ -36,7 +36,7 @@ export default function ButtonGroupDemo() {
     <ButtonGroup>
       <ButtonGroup className="hidden sm:flex">
         <Button variant="outline" size="icon" aria-label="Go Back">
-          <HugeiconsIcon icon={ArrowLeft01Icon}  strokeWidth={2} />
+          <HugeiconsIcon icon={ChevronLeftIcon} strokeWidth={2} />
         </Button>
       </ButtonGroup>
       <ButtonGroup>
@@ -49,38 +49,38 @@ export default function ButtonGroupDemo() {
           <DropdownMenuTrigger
             render={
               <Button variant="outline" size="icon" aria-label="More Options">
-                <HugeiconsIcon icon={MoreHorizontalIcon}  strokeWidth={2} />
+                <HugeiconsIcon icon={MoreHorizontalIcon} strokeWidth={2} />
               </Button>
             }
           />
           <DropdownMenuContent align="end" className="w-52">
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <HugeiconsIcon icon={MailValidation01Icon}  strokeWidth={2} />
+                <HugeiconsIcon icon={MailValidation01Icon} strokeWidth={2} />
                 Mark as Read
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <HugeiconsIcon icon={ArchiveIcon}  strokeWidth={2} />
+                <HugeiconsIcon icon={ArchiveIcon} strokeWidth={2} />
                 Archive
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <HugeiconsIcon icon={Clock01Icon}  strokeWidth={2} />
+                <HugeiconsIcon icon={Clock01Icon} strokeWidth={2} />
                 Snooze
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <HugeiconsIcon icon={CalendarAdd01Icon}  strokeWidth={2} />
+                <HugeiconsIcon icon={CalendarAdd01Icon} strokeWidth={2} />
                 Add to Calendar
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <HugeiconsIcon icon={FilterIcon}  strokeWidth={2} />
+                <HugeiconsIcon icon={FilterIcon} strokeWidth={2} />
                 Add to List
               </DropdownMenuItem>
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
-                  <HugeiconsIcon icon={Tag01Icon}  strokeWidth={2} />
+                  <HugeiconsIcon icon={Tag01Icon} strokeWidth={2} />
                   Label As...
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
@@ -104,7 +104,7 @@ export default function ButtonGroupDemo() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem variant="destructive">
-                <HugeiconsIcon icon={Delete02Icon}  strokeWidth={2} />
+                <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />
                 Trash
               </DropdownMenuItem>
             </DropdownMenuGroup>

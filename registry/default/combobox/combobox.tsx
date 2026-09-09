@@ -15,9 +15,9 @@ import { Combobox as BaseCombobox } from "@base-ui/react/combobox";
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  ArrowDown01Icon,
   Cancel01Icon,
   CheckIcon,
+  ChevronDownIcon,
 } from "@hugeicons/core-free-icons";
 const useComboboxFilter = BaseCombobox.useFilter;
 const useComboboxFilteredItems = BaseCombobox.useFilteredItems;
@@ -172,7 +172,7 @@ function ComboboxTrigger({
     >
       {children ?? (
         <HugeiconsIcon
-          icon={ArrowDown01Icon}
+          icon={ChevronDownIcon}
           className="h-4 w-4"
           strokeWidth={2}
         />

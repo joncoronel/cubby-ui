@@ -23,9 +23,9 @@ import {
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  ArrowRight01Icon,
   Cancel01Icon,
   CheckIcon,
+  ChevronRightIcon,
 } from "@hugeicons/core-free-icons";
 
 // The check draws itself in. `pathLength` restates the path as 1 unit
@@ -620,7 +620,7 @@ function BaseDrawerMenuTrigger({
     >
       {children}
       <HugeiconsIcon
-        icon={ArrowRight01Icon}
+        icon={ChevronRightIcon}
         className="ms-auto -me-0.5 opacity-80"
         strokeWidth={2}
       />

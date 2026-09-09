@@ -11,7 +11,7 @@ import {
 } from "@/registry/default/scroll-area/scroll-area";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowDown01Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
+import { Cancel01Icon, ChevronDownIcon } from "@hugeicons/core-free-icons";
 const AutocompleteRoot = BaseAutocomplete.Root;
 
 function AutocompleteInput({
@@ -75,7 +75,7 @@ function AutocompleteTrigger({
     >
       {children ?? (
         <HugeiconsIcon
-          icon={ArrowDown01Icon}
+          icon={ChevronDownIcon}
           className="h-4 w-4"
           strokeWidth={2}
         />

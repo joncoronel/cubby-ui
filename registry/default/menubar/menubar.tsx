@@ -7,7 +7,7 @@ import {
 } from "@/registry/default/lib/elevated";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowRight01Icon, CheckIcon } from "@hugeicons/core-free-icons";
+import { CheckIcon, ChevronRightIcon } from "@hugeicons/core-free-icons";
 import {
   SwitchVisual,
   type SwitchVisualProps,
@@ -429,7 +429,7 @@ function MenubarSubTrigger({
     >
       {children}
       <HugeiconsIcon
-        icon={ArrowRight01Icon}
+        icon={ChevronRightIcon}
         className="ml-auto h-4 w-4"
         strokeWidth={2}
       />

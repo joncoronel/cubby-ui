@@ -5,8 +5,8 @@ import { buttonVariants } from "@/registry/default/button/button";
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  ArrowLeft01Icon,
-  ArrowRight01Icon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
   MoreHorizontalIcon,
 } from "@hugeicons/core-free-icons";
 function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
@@ -96,7 +96,7 @@ function PaginationPrevious({
       className={cn("gap-1.5", className)}
       {...props}
     >
-      <HugeiconsIcon icon={ArrowLeft01Icon} size={16} strokeWidth={2} />
+      <HugeiconsIcon icon={ChevronLeftIcon} size={16} strokeWidth={2} />
       <span>Previous</span>
     </PaginationLink>
   );
@@ -115,7 +115,7 @@ function PaginationNext({
       {...props}
     >
       <span>Next</span>
-      <HugeiconsIcon icon={ArrowRight01Icon} size={16} strokeWidth={2} />
+      <HugeiconsIcon icon={ChevronRightIcon} size={16} strokeWidth={2} />
     </PaginationLink>
   );
 }

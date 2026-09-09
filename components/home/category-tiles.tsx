@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { ChevronRightIcon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 
 /* Abstract, non-interactive illustrations. Deliberately NOT real components:
@@ -120,7 +120,7 @@ export function CategoryTiles() {
                 </span>
               </div>
               <HugeiconsIcon
-                icon={ArrowRight01Icon}
+                icon={ChevronRightIcon}
                 strokeWidth={2}
                 className="text-muted-foreground size-4 shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-0.5"
               />

@@ -3,7 +3,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ChevronRightIcon,
   Download01Icon,
-  FavouriteIcon,
+  HeartIcon,
   PlusSignIcon,
   Settings01Icon,
 } from "@hugeicons/core-free-icons";
@@ -30,7 +30,7 @@ export default function FancyButtonWithIcons() {
         </FancyButton>
 
         <FancyButton
-          leftSection={<HugeiconsIcon icon={FavouriteIcon} strokeWidth={2} />}
+          leftSection={<HugeiconsIcon icon={HeartIcon} strokeWidth={2} />}
           color="#ef4444"
         >
           Favorite

@@ -8,12 +8,12 @@ import { AnimatePresence } from "motion/react";
 import { motion } from "motion/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  Alert02Icon,
   AlertCircleIcon,
   Cancel01Icon,
   CheckmarkCircle02Icon,
   InformationCircleIcon,
   Loading03Icon,
+  TriangleAlertIcon,
 } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 import { Button } from "@/registry/default/button/button";
@@ -33,7 +33,7 @@ const groupDataMap = new Map<string, GroupedToastData>();
 const TOAST_ICONS = {
   success: CheckmarkCircle02Icon,
   error: AlertCircleIcon,
-  warning: Alert02Icon,
+  warning: TriangleAlertIcon,
   info: InformationCircleIcon,
   loading: Loading03Icon,
 } as const;

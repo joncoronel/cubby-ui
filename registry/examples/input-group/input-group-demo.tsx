@@ -21,8 +21,8 @@ import {
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
+  ArrowUp02Icon,
   CheckIcon,
-  ChevronUpIcon,
   InformationCircleIcon,
   PlusSignIcon,
   Search01Icon,
@@ -86,7 +86,7 @@ export default function InputGroupDemo() {
             size="icon_xs"
             disabled
           >
-            <HugeiconsIcon icon={ChevronUpIcon} strokeWidth={2} />
+            <HugeiconsIcon icon={ArrowUp02Icon} strokeWidth={2} />
             <span className="sr-only">Send</span>
           </InputGroupButton>
         </InputGroupAddon>

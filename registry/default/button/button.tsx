@@ -4,13 +4,12 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Button as BaseButton } from "@base-ui/react/button";
 import { HugeiconsIcon } from "@hugeicons/react";
-// Subpath, not the package root, here and in every other component that draws
-// an icon. `@hugeicons/core-free-icons`'s ESM index is a single 6 MB file of
-// inline declarations closed by one `export {}`, not a re-export barrel, so the
-// `optimizePackageImports` entry in next.config.mjs has nothing to trace and
-// leaves the import alone. Tree shaking still keeps the unused icons out of the
-// bundle; the cost this avoids is parsing all 6 MB, which an installed copy of
-// this component would otherwise impose on the consumer's build too.
+// Package root, not a subpath. Since 4.3 the root is a barrel of per-icon
+// re-exports that the `optimizePackageImports` entry in next.config.mjs rewrites
+// to direct imports, so only the icons in use get parsed. It is also the only
+// entry point that ships types; the per-icon subpaths have no .d.ts. Next does
+// not optimize this package by default, so an app installing this component
+// should add "@hugeicons/core-free-icons" to its own `optimizePackageImports`.
 import { Loading03Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 

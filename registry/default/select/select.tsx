@@ -4,10 +4,12 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Select as BaseSelect } from "@base-ui/react/select";
 import { HugeiconsIcon } from "@hugeicons/react";
-import UnfoldMoreIcon from "@hugeicons/core-free-icons/UnfoldMoreIcon";
-import Tick02Icon from "@hugeicons/core-free-icons/Tick02Icon";
-import ArrowDown01Icon from "@hugeicons/core-free-icons/ArrowDown01Icon";
-import ArrowUp01Icon from "@hugeicons/core-free-icons/ArrowUp01Icon";
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  UnfoldMoreIcon,
+} from "@hugeicons/core-free-icons";
 
 import { cn } from "@/lib/utils";
 import {
@@ -191,7 +193,7 @@ function SelectContent({
               <HugeiconsIcon
                 className="size-4"
                 strokeWidth={2}
-                icon={ArrowUp01Icon}
+                icon={ChevronUpIcon}
               />
             </BaseSelect.ScrollUpArrow>
           )}
@@ -227,7 +229,7 @@ function SelectContent({
               <HugeiconsIcon
                 className="size-4"
                 strokeWidth={2}
-                icon={ArrowDown01Icon}
+                icon={ChevronDownIcon}
               />
             </BaseSelect.ScrollDownArrow>
           )}
@@ -264,7 +266,7 @@ function SelectItem({ className, children, ...props }: BaseSelect.Item.Props) {
         {children}
       </BaseSelect.ItemText>
       <BaseSelect.ItemIndicator>
-        <HugeiconsIcon strokeWidth={2} icon={Tick02Icon} />
+        <HugeiconsIcon strokeWidth={2} icon={CheckIcon} />
       </BaseSelect.ItemIndicator>
     </BaseSelect.Item>
   );

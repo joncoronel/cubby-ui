@@ -5,7 +5,7 @@ import * as ResizablePrimitive from "react-resizable-panels";
 import { cn } from "@/lib/utils";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import DragDropVerticalIcon from "@hugeicons/core-free-icons/DragDropVerticalIcon";
+import { DragDropVerticalIcon } from "@hugeicons/core-free-icons";
 function ResizablePanelGroup({
   className,
   ...props

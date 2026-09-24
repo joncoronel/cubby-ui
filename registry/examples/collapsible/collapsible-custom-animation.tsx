@@ -4,13 +4,17 @@ import {
   CollapsibleContent,
 } from "@/registry/default/collapsible/collapsible";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { ChevronRightIcon } from "@hugeicons/core-free-icons";
 export default function CollapsibleWithContent() {
   return (
     <Collapsible className="w-full max-w-md">
       <CollapsibleTrigger>
         What are the system requirements?
-        <HugeiconsIcon icon={ArrowRight01Icon} className="size-4 transition-transform duration-200 ease-out group-data-[panel-open]:rotate-90"  strokeWidth={2} />
+        <HugeiconsIcon
+          icon={ChevronRightIcon}
+          className="size-4 transition-transform duration-200 ease-out group-data-[panel-open]:rotate-90"
+          strokeWidth={2}
+        />
       </CollapsibleTrigger>
       <CollapsibleContent className="duration-200 ease-out data-[ending-style]:-translate-y-4 data-[ending-style]:scale-98 data-[ending-style]:blur-sm data-[starting-style]:-translate-y-4 data-[starting-style]:scale-98 data-[starting-style]:blur-sm">
         <div className="border-border bg-card mt-2 space-y-4 rounded-md border px-4 py-3">

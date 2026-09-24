@@ -14,9 +14,11 @@ import {
 import { Combobox as BaseCombobox } from "@base-ui/react/combobox";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import ArrowDown01Icon from "@hugeicons/core-free-icons/ArrowDown01Icon";
-import Cancel01Icon from "@hugeicons/core-free-icons/Cancel01Icon";
-import Tick02Icon from "@hugeicons/core-free-icons/Tick02Icon";
+import {
+  Cancel01Icon,
+  CheckIcon,
+  ChevronDownIcon,
+} from "@hugeicons/core-free-icons";
 const useComboboxFilter = BaseCombobox.useFilter;
 const useComboboxFilteredItems = BaseCombobox.useFilteredItems;
 
@@ -170,7 +172,7 @@ function ComboboxTrigger({
     >
       {children ?? (
         <HugeiconsIcon
-          icon={ArrowDown01Icon}
+          icon={ChevronDownIcon}
           className="h-4 w-4"
           strokeWidth={2}
         />
@@ -448,7 +450,7 @@ function ComboboxItem({
       <div className="break-all">{children}</div>
       <BaseCombobox.ItemIndicator
         render={
-          <HugeiconsIcon icon={Tick02Icon} className="size-4" strokeWidth={2} />
+          <HugeiconsIcon icon={CheckIcon} className="size-4" strokeWidth={2} />
         }
       />
     </BaseCombobox.Item>

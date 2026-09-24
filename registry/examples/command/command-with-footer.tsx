@@ -23,9 +23,9 @@ import { useState, useEffect } from "react";
 
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import {
-  ArrowDown01Icon,
   ArrowTurnBackwardIcon,
-  ArrowUp01Icon,
+  ChevronDownIcon,
+  ChevronUpIcon,
   File01Icon,
   Folder01Icon,
   Home01Icon,
@@ -63,7 +63,12 @@ const commandGroups: CommandGroupData[] = [
         type: "Folder",
       },
       { value: "readme", label: "README.md", icon: File01Icon, type: "File" },
-      { value: "package", label: "package.json", icon: File01Icon, type: "File" },
+      {
+        value: "package",
+        label: "package.json",
+        icon: File01Icon,
+        type: "File",
+      },
       { value: "config", label: "config.json", icon: File01Icon, type: "File" },
       {
         value: "settings",
@@ -148,16 +153,28 @@ export default function CommandWithFooter() {
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1.5">
                   <Kbd size="sm" className="px-1">
-                    <HugeiconsIcon icon={ArrowTurnBackwardIcon} className="size-3"  strokeWidth={2} />
+                    <HugeiconsIcon
+                      icon={ArrowTurnBackwardIcon}
+                      className="size-3"
+                      strokeWidth={2}
+                    />
                   </Kbd>
                   <span>to select</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Kbd size="sm" className="px-1">
-                    <HugeiconsIcon icon={ArrowUp01Icon} className="size-3"  strokeWidth={2} />
+                    <HugeiconsIcon
+                      icon={ChevronUpIcon}
+                      className="size-3"
+                      strokeWidth={2}
+                    />
                   </Kbd>
                   <Kbd size="sm" className="px-1">
-                    <HugeiconsIcon icon={ArrowDown01Icon} className="size-3"  strokeWidth={2} />
+                    <HugeiconsIcon
+                      icon={ChevronDownIcon}
+                      className="size-3"
+                      strokeWidth={2}
+                    />
                   </Kbd>
                   <span>to navigate</span>
                 </div>

@@ -3,8 +3,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { NumberField as BaseNumberField } from "@base-ui/react/number-field";
 import { HugeiconsIcon } from "@hugeicons/react";
-import ArrowDown01Icon from "@hugeicons/core-free-icons/ArrowDown01Icon";
-import ArrowUp01Icon from "@hugeicons/core-free-icons/ArrowUp01Icon";
+import { ChevronDownIcon, ChevronUpIcon } from "@hugeicons/core-free-icons";
 
 import { cn } from "@/lib/utils";
 
@@ -154,7 +153,7 @@ function NumberFieldStepper({
         aria-label="Increase"
       >
         <HugeiconsIcon
-          icon={ArrowUp01Icon}
+          icon={ChevronUpIcon}
           className="size-3.5"
           strokeWidth={2}
         />
@@ -165,7 +164,7 @@ function NumberFieldStepper({
         aria-label="Decrease"
       >
         <HugeiconsIcon
-          icon={ArrowDown01Icon}
+          icon={ChevronDownIcon}
           className="size-3.5"
           strokeWidth={2}
         />

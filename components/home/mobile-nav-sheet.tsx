@@ -3,8 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
-import GithubIcon from "@hugeicons/core-free-icons/GithubIcon";
-import Search01Icon from "@hugeicons/core-free-icons/Search01Icon";
+import { GithubIcon, Search01Icon } from "@hugeicons/core-free-icons";
 import { useSearchContext } from "fumadocs-ui/contexts/search";
 import {
   Sheet,

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
-import ArrowRight01Icon from "@hugeicons/core-free-icons/ArrowRight01Icon";
+import { ChevronRightIcon } from "@hugeicons/core-free-icons";
 import { Button } from "@/registry/default/button/button";
 import { CategoryTiles } from "@/components/home/category-tiles";
 
@@ -41,7 +41,7 @@ export default function Home() {
               nativeButton={false}
               trailingIcon={
                 <HugeiconsIcon
-                  icon={ArrowRight01Icon}
+                  icon={ChevronRightIcon}
                   className="size-4"
                   strokeWidth={2}
                 />

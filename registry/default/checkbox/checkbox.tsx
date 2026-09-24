@@ -2,74 +2,50 @@
 
 import * as React from "react";
 import { Checkbox as BaseCheckbox } from "@base-ui/react/checkbox";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { CheckIcon, MinusSignIcon } from "@hugeicons/core-free-icons";
 
 import { cn } from "@/lib/utils";
 
-// strokeDasharray 22 matches this path's computed length (~20px, rounded up for a clean draw-on).
-function CheckmarkIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={cn(
-        // Crossfade: visible when checked (not indeterminate), hidden when indeterminate
-        "not-in-data-indeterminate:scale-100 not-in-data-indeterminate:opacity-100",
-        "scale-90 opacity-0",
-        "ease-out-expo transition-[opacity,filter,transform,scale] duration-200 motion-reduce:transition-none",
-        // Start hidden on mount for enter animation
-        "in-data-starting-style:scale-90 in-data-starting-style:opacity-0",
-        // Subtle blur during indeterminate crossfade
-        "in-data-indeterminate:blur-[2px]",
-        className,
-      )}
-    >
-      <path
-        d="M5 14L8.5 17.5L19 6.5"
-        style={{
-          strokeDasharray: 22,
-        }}
-        className="ease-out-expo transition-[stroke-dashoffset] duration-200 not-in-data-indeterminate:delay-15 not-in-data-indeterminate:[stroke-dashoffset:0] in-data-indeterminate:[stroke-dashoffset:22] in-data-starting-style:[stroke-dashoffset:22] motion-reduce:transition-none"
-      />
-    </svg>
-  );
-}
+// Both marks draw themselves in. `pathLength` restates each path as 1 unit
+// long, so the dash values are fractions of the stroke and survive a HugeIcons
+// reshape. Deriving the icon array is the only way to reach the path.
+const checkIcon = CheckIcon.map(([tag, attrs]) => [
+  tag,
+  { ...attrs, pathLength: 1 },
+]) as typeof CheckIcon;
 
-// strokeDasharray 16 = exact length of the M20,12 L4,12 segment.
-function MinusIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={cn(
-        // Crossfade: visible when indeterminate, hidden when checked
-        "in-data-indeterminate:scale-100 in-data-indeterminate:opacity-100",
-        "scale-90 opacity-0",
-        "ease-out-expo transition-[opacity,filter,transform,scale] duration-200 motion-reduce:transition-none",
-        // Start hidden on mount for enter animation
-        "in-data-starting-style:scale-90 in-data-starting-style:opacity-0",
-        // Subtle blur when transitioning away from indeterminate
-        "not-in-data-indeterminate:blur-[2px]",
-        className,
-      )}
-    >
-      <path
-        d="M20 12L4 12"
-        style={{
-          strokeDasharray: 16,
-        }}
-        className="ease-out-expo transition-[stroke-dashoffset] duration-200 not-in-data-indeterminate:[stroke-dashoffset:16] in-data-indeterminate:delay-15 in-data-indeterminate:[stroke-dashoffset:0] in-data-starting-style:[stroke-dashoffset:16] motion-reduce:transition-none"
-      />
-    </svg>
-  );
-}
+const minusIcon = MinusSignIcon.map(([tag, attrs]) => [
+  tag,
+  { ...attrs, pathLength: 1 },
+]) as typeof MinusSignIcon;
+
+// Shared crossfade: the two marks stack in one grid cell, so each scales and
+// blurs past the other instead of popping. `base` holds the hidden resting
+// state; the active state is restored by the per-mark variant.
+const markBase =
+  "scale-90 opacity-0 ease-out-expo transition-[opacity,filter,transform,scale] duration-200 in-data-starting-style:scale-90 in-data-starting-style:opacity-0 motion-reduce:transition-none";
+
+// Draw-on: dasharray 1 is the whole stroke (see `pathLength` above), so
+// offset 1 -> 0 sweeps the mark in. The delay lets the outgoing mark clear
+// first during an indeterminate swap.
+const checkClasses = cn(
+  markBase,
+  "not-in-data-indeterminate:scale-100 not-in-data-indeterminate:opacity-100 in-data-indeterminate:blur-[2px]",
+  "[&_path]:ease-out-expo [&_path]:transition-[stroke-dashoffset] [&_path]:duration-200 [&_path]:[stroke-dasharray:1]",
+  "not-in-data-indeterminate:[&_path]:delay-15 not-in-data-indeterminate:[&_path]:[stroke-dashoffset:0]",
+  "in-data-indeterminate:[&_path]:[stroke-dashoffset:1] in-data-starting-style:[&_path]:[stroke-dashoffset:1]",
+  "motion-reduce:[&_path]:transition-none",
+);
+
+const minusClasses = cn(
+  markBase,
+  "in-data-indeterminate:scale-100 in-data-indeterminate:opacity-100 not-in-data-indeterminate:blur-[2px]",
+  "[&_path]:ease-out-expo [&_path]:transition-[stroke-dashoffset] [&_path]:duration-200 [&_path]:[stroke-dasharray:1]",
+  "not-in-data-indeterminate:[&_path]:[stroke-dashoffset:1] in-data-starting-style:[&_path]:[stroke-dashoffset:1]",
+  "in-data-indeterminate:[&_path]:delay-15 in-data-indeterminate:[&_path]:[stroke-dashoffset:0]",
+  "motion-reduce:[&_path]:transition-none",
+);
 
 function Checkbox({
   className,
@@ -101,8 +77,16 @@ function Checkbox({
         data-slot="checkbox-indicator"
         className="ease-out-expo grid place-items-center transition-opacity duration-200 *:col-start-1 *:row-start-1 data-ending-style:opacity-0 data-starting-style:opacity-0 motion-reduce:transition-none"
       >
-        <CheckmarkIcon className="size-3.5 sm:size-3" />
-        <MinusIcon className="size-3.5 sm:size-3" />
+        <HugeiconsIcon
+          icon={checkIcon}
+          strokeWidth={2.5}
+          className={cn("size-3.5", checkClasses)}
+        />
+        <HugeiconsIcon
+          icon={minusIcon}
+          strokeWidth={2.5}
+          className={cn("size-3.5", minusClasses)}
+        />
       </BaseCheckbox.Indicator>
     </BaseCheckbox.Root>
   );

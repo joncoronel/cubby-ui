@@ -12,12 +12,12 @@ import { Slider } from "@/registry/default/slider/slider";
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  Backward01Icon,
-  Forward01Icon,
   PauseIcon,
   PlayIcon,
   RepeatIcon,
   ShuffleIcon,
+  StepBackIcon,
+  StepForwardIcon,
 } from "@hugeicons/core-free-icons";
 const currentTrack = {
   title: "Bohemian Rhapsody",
@@ -157,7 +157,7 @@ export default function DrawerMusicPlayer() {
                 </Button>
                 <Button size="icon" variant="ghost">
                   <HugeiconsIcon
-                    icon={Backward01Icon}
+                    icon={StepBackIcon}
                     className="size-6"
                     strokeWidth={2}
                   />
@@ -183,7 +183,7 @@ export default function DrawerMusicPlayer() {
                 </Button>
                 <Button size="icon" variant="ghost">
                   <HugeiconsIcon
-                    icon={Forward01Icon}
+                    icon={StepForwardIcon}
                     className="size-6"
                     strokeWidth={2}
                   />

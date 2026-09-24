@@ -792,7 +792,7 @@ function TreeItemInternal<
                     />
                   </span>
                   <HugeiconsIcon
-                    icon={ArrowRight01Icon}
+                    icon={ChevronRightIcon}
                     aria-hidden="true"
                     className={cn(
                       "text-muted-foreground ease-out-expo size-4 shrink-0 transition-transform duration-[325ms]",
@@ -830,7 +830,7 @@ function TreeItemInternal<
                   tabIndex={isDisabled ? -1 : isTabbable ? 0 : -1}
                 >
                   <HugeiconsIcon
-                    icon={ArrowRight01Icon}
+                    icon={ChevronRightIcon}
                     aria-hidden="true"
                     className={cn(
                       "text-muted-foreground ease-out-expo size-4 shrink-0 transition-transform duration-[325ms]",
@@ -1033,6 +1033,5 @@ export {
 
 import * as TreeUtils from "./lib/tree-utils";
 import { HugeiconsIcon } from "@hugeicons/react";
-import ArrowRight01Icon from "@hugeicons/core-free-icons/ArrowRight01Icon";
-import Loading03Icon from "@hugeicons/core-free-icons/Loading03Icon";
+import { ChevronRightIcon, Loading03Icon } from "@hugeicons/core-free-icons";
 export { TreeUtils };

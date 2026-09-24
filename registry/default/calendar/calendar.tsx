@@ -8,8 +8,7 @@ import { buttonVariants } from "@/registry/default/button/button";
 import { cn } from "@/lib/utils";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import ArrowLeft01Icon from "@hugeicons/core-free-icons/ArrowLeft01Icon";
-import ArrowRight01Icon from "@hugeicons/core-free-icons/ArrowRight01Icon";
+import { ChevronLeftIcon, ChevronRightIcon } from "@hugeicons/core-free-icons";
 function Calendar({
   classNames,
   ...props
@@ -106,7 +105,7 @@ function Calendar({
               )}
             >
               <HugeiconsIcon
-                icon={ArrowRight01Icon}
+                icon={ChevronRightIcon}
                 className="size-4"
                 strokeWidth={2}
               />
@@ -122,7 +121,7 @@ function Calendar({
               )}
             >
               <HugeiconsIcon
-                icon={ArrowLeft01Icon}
+                icon={ChevronLeftIcon}
                 className="size-4"
                 strokeWidth={2}
               />

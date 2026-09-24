@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Toolbar } from "@base-ui/react/toolbar";
 import { HugeiconsIcon } from "@hugeicons/react";
-import Search01Icon from "@hugeicons/core-free-icons/Search01Icon";
+import { Search01Icon } from "@hugeicons/core-free-icons";
 
 import { cn } from "@/lib/utils";
 import { useDataTable } from "@/registry/default/data-table/data-table-context";

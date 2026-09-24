@@ -22,12 +22,12 @@ import { Button } from "@/registry/default/button/button";
 import { Kbd } from "@/registry/default/kbd/kbd";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import {
-  ArrowDown01Icon,
   ArrowTurnBackwardIcon,
-  ArrowUp01Icon,
   BubbleChatIcon,
   CalculatorIcon,
   Calendar01Icon,
+  ChevronDownIcon,
+  ChevronUpIcon,
   CreditCardIcon,
   File02Icon,
   Mail01Icon,
@@ -172,7 +172,7 @@ export default function CommandFuzzy() {
                                 className="mt-0.5 size-4 shrink-0"
                               />
                               <div className="flex flex-col gap-0.5">
-                                <span className="font-medium leading-5">
+                                <span className="leading-5 font-medium">
                                   {highlightText(item.label, query)}
                                 </span>
                                 <span className="text-muted-foreground text-xs leading-4">
@@ -192,16 +192,28 @@ export default function CommandFuzzy() {
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1.5">
                   <Kbd size="sm" className="px-1">
-                    <HugeiconsIcon icon={ArrowTurnBackwardIcon} className="size-3"  strokeWidth={2} />
+                    <HugeiconsIcon
+                      icon={ArrowTurnBackwardIcon}
+                      className="size-3"
+                      strokeWidth={2}
+                    />
                   </Kbd>
                   <span>to select</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Kbd size="sm" className="px-1">
-                    <HugeiconsIcon icon={ArrowUp01Icon} className="size-3"  strokeWidth={2} />
+                    <HugeiconsIcon
+                      icon={ChevronUpIcon}
+                      className="size-3"
+                      strokeWidth={2}
+                    />
                   </Kbd>
                   <Kbd size="sm" className="px-1">
-                    <HugeiconsIcon icon={ArrowDown01Icon} className="size-3"  strokeWidth={2} />
+                    <HugeiconsIcon
+                      icon={ChevronDownIcon}
+                      className="size-3"
+                      strokeWidth={2}
+                    />
                   </Kbd>
                   <span>to navigate</span>
                 </div>

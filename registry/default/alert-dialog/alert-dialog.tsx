@@ -14,7 +14,7 @@ import {
 } from "@/registry/default/scroll-area/scroll-area";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import Cancel01Icon from "@hugeicons/core-free-icons/Cancel01Icon";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
 const AlertDialog = BaseAlertDialog.Root;
 
 const createAlertDialogHandle = BaseAlertDialog.createHandle;

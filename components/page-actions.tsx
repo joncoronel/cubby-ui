@@ -10,11 +10,13 @@ import {
 } from "@/registry/default/dropdown-menu/dropdown-menu";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import ArrowDown01Icon from "@hugeicons/core-free-icons/ArrowDown01Icon";
-import ChatIcon from "@hugeicons/core-free-icons/ChatIcon";
-import Copy01Icon from "@hugeicons/core-free-icons/Copy01Icon";
-import LinkSquare02Icon from "@hugeicons/core-free-icons/LinkSquare02Icon";
-import Tick02Icon from "@hugeicons/core-free-icons/Tick02Icon";
+import {
+  ChatIcon,
+  CheckIcon,
+  ChevronDownIcon,
+  Copy01Icon,
+  LinkSquare02Icon,
+} from "@hugeicons/core-free-icons";
 const cache = new Map<string, string>();
 
 export function LLMCopyButton({
@@ -59,7 +61,7 @@ export function LLMCopyButton({
       onClick={handleCopy}
       leadingIcon={
         checked ? (
-          <HugeiconsIcon icon={Tick02Icon} strokeWidth={2} />
+          <HugeiconsIcon icon={CheckIcon} strokeWidth={2} />
         ) : (
           <HugeiconsIcon icon={Copy01Icon} strokeWidth={2} />
         )
@@ -213,7 +215,7 @@ export function ViewOptions({
             variant="outline"
             size="xs"
             trailingIcon={
-              <HugeiconsIcon icon={ArrowDown01Icon} strokeWidth={2} />
+              <HugeiconsIcon icon={ChevronDownIcon} strokeWidth={2} />
             }
           >
             Open

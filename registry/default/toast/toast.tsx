@@ -7,12 +7,14 @@ import { Toast } from "@base-ui/react/toast";
 import { AnimatePresence } from "motion/react";
 import { motion } from "motion/react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import AlertCircleIcon from "@hugeicons/core-free-icons/AlertCircleIcon";
-import Alert02Icon from "@hugeicons/core-free-icons/Alert02Icon";
-import CheckmarkCircle02Icon from "@hugeicons/core-free-icons/CheckmarkCircle02Icon";
-import InformationCircleIcon from "@hugeicons/core-free-icons/InformationCircleIcon";
-import Loading03Icon from "@hugeicons/core-free-icons/Loading03Icon";
-import Cancel01Icon from "@hugeicons/core-free-icons/Cancel01Icon";
+import {
+  AlertCircleIcon,
+  Cancel01Icon,
+  CheckmarkCircle02Icon,
+  InformationCircleIcon,
+  Loading03Icon,
+  TriangleAlertIcon,
+} from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 import { Button } from "@/registry/default/button/button";
 import { solidSurface } from "@/registry/default/lib/elevated";
@@ -31,7 +33,7 @@ const groupDataMap = new Map<string, GroupedToastData>();
 const TOAST_ICONS = {
   success: CheckmarkCircle02Icon,
   error: AlertCircleIcon,
-  warning: Alert02Icon,
+  warning: TriangleAlertIcon,
   info: InformationCircleIcon,
   loading: Loading03Icon,
 } as const;

@@ -28,7 +28,7 @@ import {
 } from "@/registry/default/scroll-area/scroll-area";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import ComputerTerminal01Icon from "@hugeicons/core-free-icons/ComputerTerminal01Icon";
+import { ComputerTerminal01Icon } from "@hugeicons/core-free-icons";
 
 interface CodeBlockContextValue {
   code: string;

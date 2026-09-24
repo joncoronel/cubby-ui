@@ -9,7 +9,7 @@ import {
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  ArrowDown01Icon,
+  ChevronDownIcon,
   NotificationOff03Icon,
   UserAdd01Icon,
   ViewOffIcon,
@@ -17,7 +17,10 @@ import {
 export default function ButtonGroupDropdown() {
   return (
     <ButtonGroup>
-      <Button leadingIcon={<HugeiconsIcon icon={UserAdd01Icon}  strokeWidth={2} />} variant="outline">
+      <Button
+        leadingIcon={<HugeiconsIcon icon={UserAdd01Icon} strokeWidth={2} />}
+        variant="outline"
+      >
         Follow
       </Button>
       <DropdownMenu>
@@ -26,15 +29,15 @@ export default function ButtonGroupDropdown() {
             <Button size="icon" aria-label="More options" variant="outline" />
           }
         >
-          <HugeiconsIcon icon={ArrowDown01Icon}  strokeWidth={2} />
+          <HugeiconsIcon icon={ChevronDownIcon} strokeWidth={2} />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem>
-            <HugeiconsIcon icon={NotificationOff03Icon}  strokeWidth={2} />
+            <HugeiconsIcon icon={NotificationOff03Icon} strokeWidth={2} />
             Mute conversation
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <HugeiconsIcon icon={ViewOffIcon}  strokeWidth={2} />
+            <HugeiconsIcon icon={ViewOffIcon} strokeWidth={2} />
             Hide conversation
           </DropdownMenuItem>
         </DropdownMenuContent>

@@ -15,7 +15,7 @@ import {
 import { Button } from "@/registry/default/button/button";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
+import { ChevronDownIcon } from "@hugeicons/core-free-icons";
 export default function ComboboxInputInsidePopup() {
   const [value, setValue] = React.useState<Country | null>(null);
 
@@ -33,7 +33,13 @@ export default function ComboboxInputInsidePopup() {
               {...props}
               variant="outline"
               className="justify-between font-normal"
-              trailingIcon={<HugeiconsIcon icon={ArrowDown01Icon} className="h-4 w-4 opacity-50"  strokeWidth={2} />}
+              trailingIcon={
+                <HugeiconsIcon
+                  icon={ChevronDownIcon}
+                  className="h-4 w-4 opacity-50"
+                  strokeWidth={2}
+                />
+              }
             >
               <ComboboxValue placeholder="Select country" />
             </Button>

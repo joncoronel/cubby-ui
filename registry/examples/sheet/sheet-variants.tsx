@@ -12,10 +12,10 @@ import {
 import { Button } from "@/registry/default/button/button";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  ArrowDown01Icon,
-  ArrowLeft01Icon,
-  ArrowRight01Icon,
-  ArrowUp01Icon,
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronUpIcon,
 } from "@hugeicons/core-free-icons";
 export default function SheetVariants() {
   return (
@@ -25,7 +25,13 @@ export default function SheetVariants() {
           render={
             <Button
               variant="outline"
-              leadingIcon={<HugeiconsIcon icon={ArrowUp01Icon} className="size-4"  strokeWidth={2} />}
+              leadingIcon={
+                <HugeiconsIcon
+                  icon={ChevronUpIcon}
+                  className="size-4"
+                  strokeWidth={2}
+                />
+              }
             />
           }
         >
@@ -52,7 +58,13 @@ export default function SheetVariants() {
           render={
             <Button
               variant="outline"
-              leadingIcon={<HugeiconsIcon icon={ArrowRight01Icon} className="size-4"  strokeWidth={2} />}
+              leadingIcon={
+                <HugeiconsIcon
+                  icon={ChevronRightIcon}
+                  className="size-4"
+                  strokeWidth={2}
+                />
+              }
             />
           }
         >
@@ -79,7 +91,13 @@ export default function SheetVariants() {
           render={
             <Button
               variant="outline"
-              leadingIcon={<HugeiconsIcon icon={ArrowDown01Icon} className="size-4"  strokeWidth={2} />}
+              leadingIcon={
+                <HugeiconsIcon
+                  icon={ChevronDownIcon}
+                  className="size-4"
+                  strokeWidth={2}
+                />
+              }
             />
           }
         >
@@ -106,7 +124,13 @@ export default function SheetVariants() {
           render={
             <Button
               variant="outline"
-              leadingIcon={<HugeiconsIcon icon={ArrowLeft01Icon} className="size-4"  strokeWidth={2} />}
+              leadingIcon={
+                <HugeiconsIcon
+                  icon={ChevronLeftIcon}
+                  className="size-4"
+                  strokeWidth={2}
+                />
+              }
             />
           }
         >

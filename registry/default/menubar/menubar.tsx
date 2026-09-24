@@ -7,8 +7,7 @@ import {
 } from "@/registry/default/lib/elevated";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import ArrowRight01Icon from "@hugeicons/core-free-icons/ArrowRight01Icon";
-import Tick02Icon from "@hugeicons/core-free-icons/Tick02Icon";
+import { CheckIcon, ChevronRightIcon } from "@hugeicons/core-free-icons";
 import {
   SwitchVisual,
   type SwitchVisualProps,
@@ -20,13 +19,13 @@ import {
 const toggleItemClasses =
   "group/switch data-highlighted:bg-surface-hover data-highlighted:text-accent-foreground grid cursor-default items-center rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
 
-// The tick draws itself in on check. `pathLength` restates the path as 1 unit
+// The check draws itself in. `pathLength` restates the path as 1 unit
 // long, so the dash values are fractions of the stroke and survive a HugeIcons
 // reshape. Deriving the icon array is the only way to reach the path.
-const tickIcon = Tick02Icon.map(([tag, attrs]) => [
+const checkIcon = CheckIcon.map(([tag, attrs]) => [
   tag,
   { ...attrs, pathLength: 1 },
-]) as typeof Tick02Icon;
+]) as typeof CheckIcon;
 
 const checkmarkClasses =
   "[&_path]:ease-out-expo [&_path]:transition-[stroke-dashoffset] [&_path]:duration-150 [&_path]:[stroke-dasharray:1] in-data-checked:[&_path]:[stroke-dashoffset:0] in-data-unchecked:[&_path]:[stroke-dashoffset:1] motion-reduce:[&_path]:transition-none";
@@ -290,7 +289,7 @@ function MenubarCheckboxItem({
           className="col-start-2 flex items-center justify-center"
         >
           <HugeiconsIcon
-            icon={tickIcon}
+            icon={checkIcon}
             strokeWidth={2.5}
             className={cn("size-4", checkmarkClasses)}
           />
@@ -323,7 +322,7 @@ function MenubarRadioItem({
         className="col-start-2 flex items-center justify-center"
       >
         <HugeiconsIcon
-          icon={tickIcon}
+          icon={checkIcon}
           strokeWidth={2.5}
           className={cn("size-4", checkmarkClasses)}
         />
@@ -430,7 +429,7 @@ function MenubarSubTrigger({
     >
       {children}
       <HugeiconsIcon
-        icon={ArrowRight01Icon}
+        icon={ChevronRightIcon}
         className="ml-auto h-4 w-4"
         strokeWidth={2}
       />

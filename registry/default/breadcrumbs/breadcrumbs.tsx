@@ -4,8 +4,10 @@ import * as React from "react";
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import { HugeiconsIcon } from "@hugeicons/react";
-import ArrowRight01Icon from "@hugeicons/core-free-icons/ArrowRight01Icon";
-import MoreHorizontalIcon from "@hugeicons/core-free-icons/MoreHorizontalIcon";
+import {
+  ChevronRightIcon,
+  MoreHorizontalIcon,
+} from "@hugeicons/core-free-icons";
 
 import { cn } from "@/lib/utils";
 
@@ -134,7 +136,7 @@ function BreadcrumbSeparator({
       {...props}
     >
       {children ?? separator ?? (
-        <HugeiconsIcon icon={ArrowRight01Icon} strokeWidth={2} />
+        <HugeiconsIcon icon={ChevronRightIcon} strokeWidth={2} />
       )}
     </li>
   );

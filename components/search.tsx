@@ -21,9 +21,11 @@ import { cn } from "@/lib/utils";
 import { create } from "@orama/orama";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import ArrowDown01Icon from "@hugeicons/core-free-icons/ArrowDown01Icon";
-import ArrowTurnBackwardIcon from "@hugeicons/core-free-icons/ArrowTurnBackwardIcon";
-import ArrowUp01Icon from "@hugeicons/core-free-icons/ArrowUp01Icon";
+import {
+  ArrowTurnBackwardIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+} from "@hugeicons/core-free-icons";
 
 function HashtagIcon({ className }: { className?: string }) {
   return (
@@ -178,14 +180,14 @@ export default function CustomSearchDialog({
               <div className="flex items-center gap-1.5">
                 <Kbd size="sm" className="px-1">
                   <HugeiconsIcon
-                    icon={ArrowUp01Icon}
+                    icon={ChevronUpIcon}
                     className="size-3"
                     strokeWidth={2}
                   />
                 </Kbd>
                 <Kbd size="sm" className="px-1">
                   <HugeiconsIcon
-                    icon={ArrowDown01Icon}
+                    icon={ChevronDownIcon}
                     className="size-3"
                     strokeWidth={2}
                   />

@@ -20,7 +20,7 @@ import {
 } from "@/registry/default/lib/elevated";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import Search01Icon from "@hugeicons/core-free-icons/Search01Icon";
+import { Search01Icon } from "@hugeicons/core-free-icons";
 const useCommandFilter = AutocompleteBase.useFilter;
 const useCommandFilteredItems = AutocompleteBase.useFilteredItems;
 

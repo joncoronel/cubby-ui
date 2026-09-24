@@ -58,7 +58,9 @@ function Command<ItemValue>({
       )}
     >
       <AutocompleteRoot
-        items={items}
+        // Root is overloaded (flat vs grouped items), so a forwarded union
+        // matches neither signature; both shapes are handled at runtime.
+        items={items as readonly ItemValue[]}
         autoHighlight={autoHighlight}
         keepHighlight={keepHighlight}
         open={open}

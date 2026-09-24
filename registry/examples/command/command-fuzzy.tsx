@@ -41,10 +41,10 @@ interface CommandItemData {
   icon: IconSvgElement;
 }
 
-interface CommandGroupData {
+type CommandGroupData = {
   label: string;
   items: CommandItemData[];
-}
+};
 
 const commandGroups: CommandGroupData[] = [
   {

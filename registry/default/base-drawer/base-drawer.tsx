@@ -220,7 +220,7 @@ function BaseDrawerPopup({
   const { position: contextPosition } = React.useContext(DrawerContext);
   const position = positionProp ?? contextPosition;
 
-  return (
+  const portal = (
     <BaseDrawerPortal>
       <BaseDrawerBackdrop />
       <BaseDrawerViewport position={position} variant={variant}>
@@ -350,6 +350,16 @@ function BaseDrawerPopup({
         </DrawerPrimitive.Popup>
       </BaseDrawerViewport>
     </BaseDrawerPortal>
+  );
+
+  // Bottom sheets scroll focused fields clear of the software keyboard and
+  // expose --drawer-keyboard-inset while it's open.
+  if (position !== "bottom") return portal;
+
+  return (
+    <DrawerPrimitive.VirtualKeyboardProvider>
+      {portal}
+    </DrawerPrimitive.VirtualKeyboardProvider>
   );
 }
 

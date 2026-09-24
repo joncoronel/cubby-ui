@@ -48,7 +48,10 @@ function FieldDescription({
   return (
     <BaseField.Description
       data-slot="field-description"
-      className={cn("text-muted-foreground text-sm", className)}
+      className={cn(
+        "text-muted-foreground text-sm data-disabled:opacity-60",
+        className,
+      )}
       {...props}
     />
   );

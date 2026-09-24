@@ -60,6 +60,7 @@ import base_drawer_base_drawer_directions from "@/registry/examples/base-drawer/
 import base_drawer_base_drawer_floating from "@/registry/examples/base-drawer/base-drawer-floating";
 import base_drawer_base_drawer_indent from "@/registry/examples/base-drawer/base-drawer-indent";
 import base_drawer_base_drawer_inset_footer from "@/registry/examples/base-drawer/base-drawer-inset-footer";
+import base_drawer_base_drawer_keyboard_aware from "@/registry/examples/base-drawer/base-drawer-keyboard-aware";
 import base_drawer_base_drawer_nested from "@/registry/examples/base-drawer/base-drawer-nested";
 import base_drawer_base_drawer_side from "@/registry/examples/base-drawer/base-drawer-side";
 import base_drawer_base_drawer_snap_points from "@/registry/examples/base-drawer/base-drawer-snap-points";
@@ -1838,6 +1839,11 @@ export const exampleRegistry = {
       "title": "Inset Footer",
       "importPath": "base-drawer-inset-footer",
       "source": "import {\n  BaseDrawer,\n  BaseDrawerClose,\n  BaseDrawerDescription,\n  BaseDrawerFooter,\n  BaseDrawerHeader,\n  BaseDrawerPanel,\n  BaseDrawerPopup,\n  BaseDrawerTitle,\n  BaseDrawerTrigger,\n} from \"@/components/ui/cubby-ui/base-drawer\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nexport default function BaseDrawerInsetFooter() {\n  return (\n    <BaseDrawer>\n      <BaseDrawerTrigger render={<Button variant=\"outline\" />}>\n        Inset Footer\n      </BaseDrawerTrigger>\n      <BaseDrawerPopup showBar>\n        <BaseDrawerHeader>\n          <BaseDrawerTitle>Confirm Action</BaseDrawerTitle>\n          <BaseDrawerDescription>\n            The inset footer variant adds a border-top and muted background for\n            visual separation.\n          </BaseDrawerDescription>\n        </BaseDrawerHeader>\n        <BaseDrawerPanel>\n          <p className=\"text-muted-foreground text-sm\">\n            This is useful when the footer contains important actions that should\n            be visually distinct from the content above.\n          </p>\n        </BaseDrawerPanel>\n        <BaseDrawerFooter variant=\"inset\">\n          <Button>Confirm</Button>\n          <BaseDrawerClose render={<Button variant=\"outline\" />}>\n            Cancel\n          </BaseDrawerClose>\n        </BaseDrawerFooter>\n      </BaseDrawerPopup>\n    </BaseDrawer>\n  );\n}\n"
+    },
+    {
+      "title": "Keyboard Aware",
+      "importPath": "base-drawer-keyboard-aware",
+      "source": "import {\n  BaseDrawer,\n  BaseDrawerDescription,\n  BaseDrawerFooter,\n  BaseDrawerHeader,\n  BaseDrawerPanel,\n  BaseDrawerPopup,\n  BaseDrawerTitle,\n  BaseDrawerTrigger,\n} from \"@/components/ui/cubby-ui/base-drawer\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Input } from \"@/components/ui/cubby-ui/input\";\n\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport { ArrowUp02Icon } from \"@hugeicons/core-free-icons\";\n\nconst comments = [\n  { id: 1, author: \"Maya\", text: \"Can we push the launch to Thursday?\" },\n  { id: 2, author: \"Theo\", text: \"Thursday works. QA needs one more pass.\" },\n  { id: 3, author: \"Maya\", text: \"I'll update the release notes tonight.\" },\n  { id: 4, author: \"Ines\", text: \"Screenshots for the changelog are ready.\" },\n  { id: 5, author: \"Theo\", text: \"Nice. Dropping them in the shared folder?\" },\n  { id: 6, author: \"Ines\", text: \"Already there, under /launch/assets.\" },\n];\n\nexport default function BaseDrawerKeyboardAware() {\n  return (\n    <BaseDrawer>\n      <BaseDrawerTrigger render={<Button variant=\"outline\" />}>\n        Open Comments\n      </BaseDrawerTrigger>\n      <BaseDrawerPopup showBar>\n        <BaseDrawerHeader>\n          <BaseDrawerTitle>Comments</BaseDrawerTitle>\n          <BaseDrawerDescription>\n            The reply field stays above the on-screen keyboard.\n          </BaseDrawerDescription>\n        </BaseDrawerHeader>\n        <BaseDrawerPanel>\n          <ul className=\"flex flex-col gap-3\">\n            {comments.map((comment) => (\n              <li key={comment.id} className=\"bg-muted/50 rounded-lg border p-3\">\n                <p className=\"text-sm font-medium\">{comment.author}</p>\n                <p className=\"text-muted-foreground text-sm\">{comment.text}</p>\n              </li>\n            ))}\n          </ul>\n        </BaseDrawerPanel>\n        <BaseDrawerFooter\n          variant=\"inset\"\n          keyboardAware\n          className=\"flex-row items-center\"\n        >\n          <Input\n            aria-label=\"Reply\"\n            placeholder=\"Write a reply…\"\n            variant=\"elevated\"\n            className=\"flex-1\"\n          />\n          <Button size=\"icon\" aria-label=\"Send reply\">\n            <HugeiconsIcon icon={ArrowUp02Icon} strokeWidth={2} />\n          </Button>\n        </BaseDrawerFooter>\n      </BaseDrawerPopup>\n    </BaseDrawer>\n  );\n}\n"
     },
     {
       "title": "Nested",
@@ -4163,6 +4169,7 @@ export const componentMap = {
   "base-drawer-floating": base_drawer_base_drawer_floating,
   "base-drawer-indent": base_drawer_base_drawer_indent,
   "base-drawer-inset-footer": base_drawer_base_drawer_inset_footer,
+  "base-drawer-keyboard-aware": base_drawer_base_drawer_keyboard_aware,
   "base-drawer-nested": base_drawer_base_drawer_nested,
   "base-drawer-side": base_drawer_base_drawer_side,
   "base-drawer-snap-points": base_drawer_base_drawer_snap_points,

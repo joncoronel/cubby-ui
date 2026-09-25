@@ -46,11 +46,7 @@ export default function BaseDrawerKeyboardAware() {
             ))}
           </ul>
         </BaseDrawerPanel>
-        <BaseDrawerFooter
-          variant="inset"
-          keyboardAware
-          className="flex-row items-center"
-        >
+        <BaseDrawerFooter variant="inset" className="flex-row items-center">
           <Input
             aria-label="Reply"
             placeholder="Write a reply…"

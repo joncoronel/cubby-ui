@@ -401,6 +401,27 @@ function createTypedToast(type: NonNullable<ToastOptions["type"]>) {
   };
 }
 
+/** The fields `toast.update()` applies; other ToastOptions are set at creation only. */
+export type ToastUpdateOptions = Pick<
+  ToastOptions,
+  "title" | "description" | "type" | "data"
+>;
+
+function toUpdateOptions(
+  next: ToastUpdateOptions,
+  prevToast: Toast.Root.ToastObject,
+): Record<string, unknown> {
+  const updateOptions: Record<string, unknown> = {};
+  if (next.title !== undefined) updateOptions.title = next.title;
+  if (next.description !== undefined)
+    updateOptions.description = next.description;
+  if (next.type !== undefined) updateOptions.type = next.type;
+  // Base UI replaces `data` wholesale; merge so internal keys (showCloseButton, customJSX) survive.
+  if (next.data !== undefined)
+    updateOptions.data = { ...prevToast.data, ...next.data };
+  return updateOptions;
+}
+
 export const toast = Object.assign(baseToast, {
   success: createTypedToast("success"),
   error: createTypedToast("error"),
@@ -414,21 +435,14 @@ export const toast = Object.assign(baseToast, {
   update: (
     toastId: string,
     options:
-      | Partial<ToastOptions>
-      | ((prevToast: Toast.Root.ToastObject) => Partial<ToastOptions>),
+      | ToastUpdateOptions
+      | ((prevToast: Toast.Root.ToastObject) => ToastUpdateOptions),
   ) => {
-    const pickUpdate = (next: Partial<ToastOptions>) => {
-      const updateOptions: Record<string, unknown> = {};
-      if (next.title !== undefined) updateOptions.title = next.title;
-      if (next.description !== undefined)
-        updateOptions.description = next.description;
-      if (next.type !== undefined) updateOptions.type = next.type;
-      if (next.data !== undefined) updateOptions.data = next.data;
-      return updateOptions;
-    };
-
     return toastManager.update(toastId, (prevToast) =>
-      pickUpdate(typeof options === "function" ? options(prevToast) : options),
+      toUpdateOptions(
+        typeof options === "function" ? options(prevToast) : options,
+        prevToast,
+      ),
     );
   },
   /** Show an anchored toast near an element */

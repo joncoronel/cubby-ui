@@ -395,33 +395,27 @@ function BaseDrawerFooter({
   className,
   variant = "default",
   allowSelection = true,
-  keyboardAware = false,
   render,
   ...props
 }: useRender.ComponentProps<"div"> & {
   variant?: "default" | "inset";
   allowSelection?: boolean;
-  /** Lifts the footer above the software keyboard while a field inside it is focused (bottom drawers only). */
-  keyboardAware?: boolean;
 }) {
   const defaultProps = {
     className: cn(
-      "mt-auto flex flex-col-reverse gap-2 px-6 pb-[var(--safe-bottom)] sm:flex-row sm:justify-end",
+      "mt-auto flex flex-col-reverse gap-2 px-6 sm:flex-row sm:justify-end",
+      // Bottom inset under the footer content. While a field in the footer has
+      // the software keyboard open, it becomes the keyboard inset: the
+      // (auto-height) popup grows so the footer sits above the keyboard, and
+      // the panel scrolls once the popup hits max height.
+      "[--footer-bottom:var(--safe-bottom,0px)]",
+      "focus-within:[--footer-bottom:max(var(--safe-bottom,0px),var(--drawer-keyboard-inset,0px))]",
+      "transition-[padding] duration-260 ease-[cubic-bezier(.32,.72,0,1)] motion-reduce:transition-none",
       !allowSelection && "cursor-default",
       variant === "default" &&
-        "in-[[data-slot=base-drawer-popup]:has([data-slot=base-drawer-panel])]:pt-3 pt-4 pb-[calc(var(--safe-bottom)+1.5rem)]",
+        "in-[[data-slot=base-drawer-popup]:has([data-slot=base-drawer-panel])]:pt-3 pt-4 pb-[calc(var(--footer-bottom)+1.5rem)]",
       variant === "inset" &&
-        "border-t bg-muted pt-4 pb-[calc(var(--safe-bottom)+1rem)]",
-      // Grows the (auto-height) popup by the keyboard inset so the footer
-      // sits above it; the panel scrolls once the popup hits max height.
-      keyboardAware &&
-        "transition-[padding] duration-260 ease-[cubic-bezier(.32,.72,0,1)] motion-reduce:transition-none",
-      keyboardAware &&
-        variant === "default" &&
-        "focus-within:pb-[calc(max(var(--safe-bottom),var(--drawer-keyboard-inset,0px))+1.5rem)]",
-      keyboardAware &&
-        variant === "inset" &&
-        "focus-within:pb-[calc(max(var(--safe-bottom),var(--drawer-keyboard-inset,0px))+1rem)]",
+        "border-t bg-muted pt-4 pb-[calc(var(--footer-bottom)+1rem)]",
       className,
     ),
     "data-slot": "base-drawer-footer",

@@ -368,16 +368,19 @@ function VirtualizedListContent() {
 #### createComboboxItems
 
 ```ts
-function createComboboxItems<Item, Value>(
+function createComboboxItems<
+  Item,
+  Value extends string | number | bigint | boolean,
+>(
   data: readonly Item[] | readonly { items: readonly Item[] }[] | undefined,
   options: {
     getValue: (item: Item) => Value;
     getLabel: (item: Item) => string;
   },
-): ComboboxItemCollection;
+): ComboboxItemCollection<Item, Value>;
 ```
 
-Builds a collection for the `items` prop from flat or grouped data. Each item's selection value comes from `getValue` and its display and filter label from `getLabel`. Items can't have their own `items` array field, since that marks a group.
+Builds a collection for the `items` prop from flat or grouped data. Each item's selection value comes from `getValue`, which must return a primitive (usually a stable ID), and its display and filter label from `getLabel`. Items can't have their own `items` array field, since that marks a group.
 
 Create static collections at module scope. For data that loads or changes at runtime, wrap the call in `React.useMemo()` keyed on the data.
 

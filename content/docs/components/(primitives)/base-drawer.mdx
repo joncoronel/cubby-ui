@@ -112,7 +112,7 @@ Use `BaseDrawerPanel` to hold form elements; it wraps content in `Drawer.Content
 
 ### Keyboard Aware Footer
 
-Bottom drawers scroll a focused field clear of the on-screen keyboard automatically. If the footer holds its own input, like a reply box, set `keyboardAware` on `BaseDrawerFooter` so it moves above the keyboard while that input has focus.
+Bottom drawers keep focused fields clear of the on-screen keyboard. Fields in `BaseDrawerPanel` scroll into view, and a field in `BaseDrawerFooter`, like a reply box, lifts the footer above the keyboard while it has focus. No props needed.
 
 <ComponentPreview component="base-drawer" example="base-drawer-keyboard-aware" />
 
@@ -265,12 +265,6 @@ Scrollable content area. Wraps `ScrollArea` and `Drawer.Content` for text select
 <ApiProp name="allowSelection" fullType="boolean" defaultValue="true">
   When true, wraps in `Drawer.Content` for text selection support.
 </ApiProp>
-
-<ApiProp name="keyboardAware" fullType="boolean" defaultValue="false">
-  When true, moves the footer above the on-screen keyboard while a field inside
-  it has focus. Only affects bottom drawers.
-</ApiProp>
-
 </ApiPropsList>
 
 #### BaseDrawerMenuCheckboxItem

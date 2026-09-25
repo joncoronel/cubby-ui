@@ -401,6 +401,27 @@ function createTypedToast(type: NonNullable<ToastOptions["type"]>) {
   };
 }
 
+/** The fields `toast.update()` applies; other ToastOptions are set at creation only. */
+export type ToastUpdateOptions = Pick<
+  ToastOptions,
+  "title" | "description" | "type" | "data"
+>;
+
+function toUpdateOptions(
+  next: ToastUpdateOptions,
+  prevToast: Toast.Root.ToastObject,
+): Record<string, unknown> {
+  const updateOptions: Record<string, unknown> = {};
+  if (next.title !== undefined) updateOptions.title = next.title;
+  if (next.description !== undefined)
+    updateOptions.description = next.description;
+  if (next.type !== undefined) updateOptions.type = next.type;
+  // Base UI replaces `data` wholesale; merge so internal keys (showCloseButton, customJSX) survive.
+  if (next.data !== undefined)
+    updateOptions.data = { ...prevToast.data, ...next.data };
+  return updateOptions;
+}
+
 export const toast = Object.assign(baseToast, {
   success: createTypedToast("success"),
   error: createTypedToast("error"),
@@ -410,15 +431,19 @@ export const toast = Object.assign(baseToast, {
   dismiss: (toastId: string) => {
     return toastManager.close(toastId);
   },
-  update: (toastId: string, options: Partial<ToastOptions>) => {
-    const updateOptions: Record<string, unknown> = {};
-    if (options.title !== undefined) updateOptions.title = options.title;
-    if (options.description !== undefined)
-      updateOptions.description = options.description;
-    if (options.type !== undefined) updateOptions.type = options.type;
-    if (options.data !== undefined) updateOptions.data = options.data;
-
-    return toastManager.update(toastId, updateOptions);
+  /** Pass a function to derive the update from the current toast (e.g. incrementing a count in `data`). */
+  update: (
+    toastId: string,
+    options:
+      | ToastUpdateOptions
+      | ((prevToast: Toast.Root.ToastObject) => ToastUpdateOptions),
+  ) => {
+    return toastManager.update(toastId, (prevToast) =>
+      toUpdateOptions(
+        typeof options === "function" ? options(prevToast) : options,
+        prevToast,
+      ),
+    );
   },
   /** Show an anchored toast near an element */
   anchored: <TData extends object = object>(

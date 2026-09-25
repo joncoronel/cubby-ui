@@ -60,6 +60,24 @@ Overlay a dot on the avatar to show online or offline state.
 
 <ComponentPreview component="avatar" example="avatar-with-status-indicator" />
 
+### Lazy and Optimized Images
+
+By default, `AvatarImage` preloads `src` in the background and shows the image once it has loaded. Add `keepMounted` to render the image element right away and let it load in place instead. This lets `loading="lazy"` defer offscreen avatars, and works with image optimizers like `next/image`, which request a different URL than the raw `src`. The fallback shows until the image loads, and stays if it fails.
+
+<ComponentPreview component="avatar" example="avatar-lazy" />
+
+```tsx showLineNumbers
+import Image from "next/image";
+
+<Avatar>
+  <AvatarImage
+    keepMounted
+    render={<Image src="/users/ada.jpg" width={40} height={40} alt="Ada Lovelace" />}
+  />
+  <AvatarFallback>AL</AvatarFallback>
+</Avatar>
+```
+
 ## Accessibility
 
 Give `AvatarImage` an `alt` describing who it represents (typically the person's name). Provide an `AvatarFallback` so the avatar still conveys identity when the image fails to load.

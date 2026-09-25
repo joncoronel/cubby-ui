@@ -159,7 +159,7 @@ function BaseDrawerBackdrop({
   return (
     <DrawerPrimitive.Backdrop
       className={cn(
-        "fixed inset-0 z-50 bg-black/40 opacity-[calc(1-var(--drawer-swipe-progress))] backdrop-blur-sm transition-opacity duration-300 data-ending-style:opacity-0 data-ending-style:duration-[calc(var(--drawer-swipe-strength)*300ms)] data-starting-style:opacity-0 data-swiping:duration-0 supports-[-webkit-touch-callout:none]:absolute",
+        "fixed inset-0 z-50 min-h-dvh bg-black/40 opacity-[calc(1-var(--drawer-swipe-progress))] backdrop-blur-sm transition-opacity duration-300 data-ending-style:opacity-0 data-ending-style:duration-[calc(var(--drawer-swipe-strength)*300ms)] data-starting-style:opacity-0 data-swiping:duration-0 supports-[-webkit-touch-callout:none]:absolute",
         className,
       )}
       data-slot="base-drawer-backdrop"
@@ -181,6 +181,10 @@ function BaseDrawerViewport({
     <DrawerPrimitive.Viewport
       className={cn(
         "fixed inset-0 z-50 [--bleed:3rem] [--inset:0px]",
+        // Android Chrome: env(safe-area-inset-bottom) on a fixed element brings
+        // back its gesture-bar chin, and removing it leaves the layout viewport
+        // stuck at the URL-bar-shown height. Only read the inset on iOS.
+        "[--safe-bottom:0px] supports-[-webkit-touch-callout:none]:[--safe-bottom:env(safe-area-inset-bottom,0px)]",
         "touch-none",
         position === "bottom" && "grid grid-rows-[1fr_auto] pt-12",
         position === "top" && "grid grid-rows-[auto_1fr] pb-12",
@@ -220,7 +224,7 @@ function BaseDrawerPopup({
   const { position: contextPosition } = React.useContext(DrawerContext);
   const position = positionProp ?? contextPosition;
 
-  return (
+  const portal = (
     <BaseDrawerPortal>
       <BaseDrawerBackdrop />
       <BaseDrawerViewport position={position} variant={variant}>
@@ -258,11 +262,11 @@ function BaseDrawerPopup({
                 "row-start-2",
                 // Transform
                 "transform-[translateY(calc(var(--drawer-snap-point-offset)+var(--drawer-swipe-movement-y)))]",
-                "data-starting-style:transform-[translateY(calc(100%+env(safe-area-inset-bottom,0px)+var(--inset)))]",
-                "data-ending-style:transform-[translateY(calc(100%+env(safe-area-inset-bottom,0px)+var(--inset)))]",
+                "data-starting-style:transform-[translateY(calc(100%+var(--safe-bottom)+var(--inset)))]",
+                "data-ending-style:transform-[translateY(calc(100%+var(--safe-bottom)+var(--inset)))]",
                 // Dynamic bleed: adjusts for snap points automatically
                 "-mb-[max(0px,calc(var(--drawer-snap-point-offset,0px)+clamp(0,1,var(--drawer-snap-point-offset,0px)/1px)*var(--drawer-swipe-movement-y,0px)))]",
-                "pb-[max(0px,calc(env(safe-area-inset-bottom,0px)+var(--drawer-snap-point-offset,0px)+clamp(0,1,var(--drawer-snap-point-offset,0px)/1px)*var(--drawer-swipe-movement-y,0px)))]",
+                "pb-[max(0px,calc(var(--safe-bottom)+var(--drawer-snap-point-offset,0px)+clamp(0,1,var(--drawer-snap-point-offset,0px)/1px)*var(--drawer-swipe-movement-y,0px)))]",
                 "data-ending-style:mb-0 data-starting-style:mb-0",
                 "data-ending-style:pb-0 data-starting-style:pb-0",
                 // Transition includes margin/padding for snap changes but not enter/exit
@@ -351,6 +355,16 @@ function BaseDrawerPopup({
       </BaseDrawerViewport>
     </BaseDrawerPortal>
   );
+
+  // Bottom sheets scroll focused fields clear of the software keyboard and
+  // expose --drawer-keyboard-inset while it's open.
+  if (position !== "bottom") return portal;
+
+  return (
+    <DrawerPrimitive.VirtualKeyboardProvider>
+      {portal}
+    </DrawerPrimitive.VirtualKeyboardProvider>
+  );
 }
 
 function BaseDrawerHeader({
@@ -389,12 +403,19 @@ function BaseDrawerFooter({
 }) {
   const defaultProps = {
     className: cn(
-      "mt-auto flex flex-col-reverse gap-2 px-6 pb-[env(safe-area-inset-bottom,0px)] sm:flex-row sm:justify-end",
+      "mt-auto flex flex-col-reverse gap-2 px-6 sm:flex-row sm:justify-end",
+      // Bottom inset under the footer content. While a field in the footer has
+      // the software keyboard open, it becomes the keyboard inset: the
+      // (auto-height) popup grows so the footer sits above the keyboard, and
+      // the panel scrolls once the popup hits max height.
+      "[--footer-bottom:var(--safe-bottom,0px)]",
+      "focus-within:[--footer-bottom:max(var(--safe-bottom,0px),var(--drawer-keyboard-inset,0px))]",
+      "transition-[padding] duration-260 ease-[cubic-bezier(.32,.72,0,1)] motion-reduce:transition-none",
       !allowSelection && "cursor-default",
       variant === "default" &&
-        "in-[[data-slot=base-drawer-popup]:has([data-slot=base-drawer-panel])]:pt-3 pt-4 pb-[calc(env(safe-area-inset-bottom,0px)+1.5rem)]",
+        "in-[[data-slot=base-drawer-popup]:has([data-slot=base-drawer-panel])]:pt-3 pt-4 pb-[calc(var(--footer-bottom)+1.5rem)]",
       variant === "inset" &&
-        "border-t bg-muted pt-4 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)]",
+        "border-t bg-muted pt-4 pb-[calc(var(--footer-bottom)+1rem)]",
       className,
     ),
     "data-slot": "base-drawer-footer",

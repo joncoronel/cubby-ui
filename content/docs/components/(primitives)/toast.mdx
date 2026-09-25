@@ -179,6 +179,8 @@ toast.promise(fetchData(), {
 // All toast methods return an ID that can be used for updates or dismissal
 const toastId = toast({ title: "Processing..." });
 toast.update(toastId, { title: "Done!", type: "success" });
+// Or derive the update from the current toast
+toast.update(toastId, (prev) => ({ title: `${prev.title} (retried)` }));
 toast.dismiss(toastId);
 ```
 

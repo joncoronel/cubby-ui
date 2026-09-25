@@ -493,8 +493,7 @@
     "title": "Toast",
     "description": "A toast component.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx"
+      "@base-ui/react"
     ],
     "reference": [],
     "usage": {

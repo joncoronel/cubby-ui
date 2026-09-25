@@ -59,6 +59,11 @@ type TuneToolbarProps = {
   file: string;
   /** The page's emitted override CSS; empty when every dial is at default. */
   css: string;
+  /**
+   * Dial-driven props that left the component default, keyed by component
+   * name: `{ PopoverContent: { sideOffset: 12 } }`. Copied as new defaults.
+   */
+  props?: Record<string, Record<string, unknown>>;
   onReplay: () => void;
   /** Show the keep-open toggle (popups only). */
   keepOpen?: boolean;
@@ -71,6 +76,7 @@ export function TuneToolbar({
   panelId,
   file,
   css,
+  props = {},
   onReplay,
   keepOpen = false,
   scrubMax = 1000,
@@ -82,9 +88,24 @@ export function TuneToolbar({
     setState((current) => ({ ...current, [key]: value }));
   }
 
+  const propLines = Object.entries(props).flatMap(([component, values]) => {
+    const entries = Object.entries(values);
+    if (entries.length === 0) return [];
+    return [
+      `/* ${component} prop defaults */`,
+      ...entries.map(([key, value]) => `${key}: ${JSON.stringify(value)}`),
+    ];
+  });
+  const hasChanges = Boolean(css) || propLines.length > 0;
+
   async function copy(): Promise<void> {
+    const sections = [
+      `/* Tuned changes for ${file}. Apply CSS as Tailwind classes and props as new defaults. */`,
+      css,
+      propLines.join("\n"),
+    ];
     await navigator.clipboard.writeText(
-      `/* Tuned overrides for ${file}. Apply as Tailwind classes. */\n${css}\n`,
+      `${sections.filter(Boolean).join("\n\n")}\n`,
     );
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1500);
@@ -202,7 +223,7 @@ export function TuneToolbar({
         <Button size="xs" variant="ghost" onClick={reset}>
           Reset
         </Button>
-        <Button size="xs" disabled={!css} onClick={copy}>
+        <Button size="xs" disabled={!hasChanges} onClick={copy}>
           {copied ? "Copied" : "Copy changes"}
         </Button>
       </ToolbarGroup>

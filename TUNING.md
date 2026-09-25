@@ -23,11 +23,14 @@ const [tune, setTune] = useTuneState(); // { original, keepOpen, rate, freeze, p
   setState={setTune}
   panelId="popover" // reset also calls DialStore.resetValues(panelId)
   file="registry/default/popover/popover.tsx" // named in the copied text
-  css={css} // the emitted overrides; Copy is disabled when empty
+  css={css} // the emitted overrides
+  props={{ PopoverContent: changedProps }} // prop dials that left the default
   onReplay={replay}
   keepOpen // popups only
 />;
 ```
+
+Prop dials follow the same rule as CSS: build a `changedProps` object holding only props whose dial left the default, spread it onto the component (skip it when `tune.original`), and pass it to the toolbar. Copy is disabled when both `css` and `props` are empty.
 
 Pick a small, useful set of dials. Group with nested objects (folders). Wire `tune.original` (drop the `<style>` and dial-driven props), `tune.rate` (`useSlowMotion`), and `tune.freeze`/`phase`/`time` (`useCssScrub`).
 
@@ -90,21 +93,25 @@ The toolbar's Freeze toggle reveals the phase and time controls; `scrubMax` sets
 
 ## Applying tuned values
 
-The user clicks **Copy changes** in the toolbar and pastes the result: a CSS block headed with the source file, holding only the rules whose dials moved, e.g.
+The user clicks **Copy changes** in the toolbar and pastes the result: the source file, then only the CSS rules and props whose dials moved, e.g.
 
-```css
-/* Tuned overrides for registry/default/popover/popover.tsx. Apply as Tailwind classes. */
-[data-slot="popover-content"] {
-  border-radius: 16px;
-}
+```
+/* Tuned changes for registry/default/popover/popover.tsx. Apply CSS as Tailwind classes and props as new defaults. */
+
+[data-slot="popover-content"] { border-radius: 16px; }
+
+/* PopoverContent prop defaults */
+sideOffset: 12
+level: 5
 ```
 
 (DialKit's own **Copy** gives raw dial values instead; prefer the toolbar's, since it's already resolved to CSS, springs included.) Then:
 
-1. Translate each rule into the component's Tailwind classes in `registry/default/<component>/` (e.g. `radius: 14` → `rounded-[14px]` or the nearest token; easing → `ease-[cubic-bezier(...)]` or an existing `--ease-*` token if it matches).
-2. If a value belongs in a design token, update **both** `registry/theme.css` and `app/globals.css`.
-3. Update the tune page's defaults to the new values so it keeps matching production.
-4. `pnpm run registry:sync`, lint, and check the examples in the dev server.
+1. Change each listed prop's default in the component's function signature (e.g. `sideOffset = 8` → `sideOffset = 12`), and update any doc/API reference that states the default.
+2. Translate each CSS rule into the component's Tailwind classes in `registry/default/<component>/` (e.g. `radius: 14` → `rounded-[14px]` or the nearest token; easing → `ease-[cubic-bezier(...)]` or an existing `--ease-*` token if it matches).
+3. If a value belongs in a design token, update **both** `registry/theme.css` and `app/globals.css`.
+4. Update the tune page's defaults to the new values so it keeps matching production.
+5. `pnpm run registry:sync`, lint, and check the examples in the dev server.
 
 ## Why not Leva or Tweakpane
 

@@ -23,6 +23,12 @@ import { useCssScrub } from "../_lib/use-css-scrub";
 import { useSlowMotion } from "../_lib/use-slow-motion";
 
 type Side = "bottom" | "top" | "left" | "right";
+type PopoverContentProps = {
+  side?: Side;
+  sideOffset?: number;
+  level?: SurfaceLevel;
+  shadowLevel?: SurfaceLevel;
+};
 
 const SELECTOR = '[data-slot="popover-content"]';
 // The positioner wraps the popup and moves on its own during a trigger switch,
@@ -33,6 +39,8 @@ const POSITIONER = '[data-slot="popover-positioner"]';
 // once its dial leaves the default, so untouched dials show the real component.
 const RADIUS = 12;
 const PADDING = 12;
+const SIDE = "bottom";
+const SIDE_OFFSET = 8;
 const LEVEL = 3;
 const START_SCALE = 0.95;
 const FADE_DEFAULT: EasingConfig = {
@@ -59,8 +67,8 @@ const handle = createPopoverHandle<Content>();
 // Component values only. Playback controls live in the TuneToolbar so they
 // stay out of DialKit's Copy output and saved versions.
 const CONFIG = {
-  side: { type: "select", options: ["bottom", "top", "left", "right"] },
-  sideOffset: [8, 0, 24, 1],
+  side: { type: "select", options: [SIDE, "top", "left", "right"] },
+  sideOffset: [SIDE_OFFSET, 0, 24, 1],
   surface: {
     radius: [RADIUS, 0, 32, 1],
     padding: [PADDING, 0, 32, 1],
@@ -170,6 +178,19 @@ export default function PopoverTune(): React.ReactElement {
     .filter(Boolean)
     .join("\n");
 
+  // Same rule as the CSS: only props whose dial left the default. Spread onto
+  // the component and copied by the toolbar as new defaults.
+  const changedProps: PopoverContentProps = {
+    ...(v.side !== SIDE && { side: v.side as Side }),
+    ...(v.sideOffset !== SIDE_OFFSET && { sideOffset: v.sideOffset }),
+    ...(v.surface.level !== LEVEL && {
+      level: v.surface.level as SurfaceLevel,
+    }),
+    ...(v.surface.shadowLevel !== LEVEL && {
+      shadowLevel: v.surface.shadowLevel as SurfaceLevel,
+    }),
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center p-8">
       {!tune.original && css && <style>{css}</style>}
@@ -201,18 +222,7 @@ export default function PopoverTune(): React.ReactElement {
         }}
       >
         {({ payload }) => (
-          <PopoverContent
-            side={tune.original ? undefined : (v.side as Side)}
-            sideOffset={tune.original ? undefined : v.sideOffset}
-            level={
-              tune.original ? undefined : (v.surface.level as SurfaceLevel)
-            }
-            shadowLevel={
-              tune.original
-                ? undefined
-                : (v.surface.shadowLevel as SurfaceLevel)
-            }
-          >
+          <PopoverContent {...(!tune.original && changedProps)}>
             <PopoverBody content={payload ?? "short"} />
           </PopoverContent>
         )}
@@ -224,6 +234,7 @@ export default function PopoverTune(): React.ReactElement {
         panelId="popover"
         file="registry/default/popover/popover.tsx"
         css={css}
+        props={{ PopoverContent: changedProps }}
         onReplay={replay}
         keepOpen
       />

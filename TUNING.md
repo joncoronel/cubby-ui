@@ -7,6 +7,9 @@ Live-tuning components with [DialKit](https://github.com/joshpuckett/dialkit): d
 - **DialKit never goes in `registry/`.** Registry files ship to users via the shadcn CLI. Tune pages live in `app/tune/` only.
 - **Don't edit the component to make it tunable.** Override it from the tune page (see "Binding values" below). The component stays the source of truth.
 - **Dial defaults must equal the component's current values**, so the page opens looking exactly like production.
+- **Only emit an override once its dial leaves the default.** Untouched dials must inject nothing, so the page shows the real component even if the defaults drift. Keep defaults as named constants and compare against them (see the popover page's `css` array).
+- **Every page gets an `original: false` toggle** that drops all overrides and default-valued props, for A/B against the shipped component.
+- **Every page gets a `reset: { type: "action", label: "Reset to component" }`** handled with `DialStore.resetValues("<panel id>")`. Values persist across reloads (`persist: true`) and DialKit's panel has no reset button of its own. Saved versions survive a reset.
 - `app/tune/layout.tsx` mounts the single `<DialRoot />`, loads `dialkit/styles.css`, and `notFound()`s in production. Don't mount another root.
 
 ## Adding a tune page
@@ -40,6 +43,24 @@ Cubby components are styled with Tailwind utilities in `@layer utilities`. An **
 **Multi-value transitions:** if the component transitions several properties with a comma list (e.g. `transition-[width,height,scale,opacity]`), keep the list length and only replace the entries you're tuning, or you'll silently retime the others.
 
 **Types:** `spring`/`easing` values come back typed as the `TransitionConfig` union. Narrow with `as EasingConfig` / `as SpringConfig` (both exported from `dialkit`).
+
+## Scrubbing CSS transitions
+
+`app/tune/_lib/use-css-scrub.ts` freezes a component's CSS transitions and seeks them from a dial. Every CSS transition is a `CSSTransition` in the Web Animations API, so the hook listens for `transitionrun`, pauses the animations under `selector`, and sets `currentTime` from the dial (one shared playhead in ms, so offsets between properties stay real).
+
+```tsx
+scrub: {
+  freeze: false,
+  phase: { type: "select", options: ["enter", "exit"] },
+  time: [0, 0, 400, 1],
+},
+
+useCssScrub({ selector: '[data-slot="popover-content"]', enabled: v.scrub.freeze, phase, time: v.scrub.time });
+```
+
+- `phase: "exit"` only freezes transitions under `[data-ending-style]`. Base UI waits for exit transitions to finish, so a frozen exit keeps the popup mounted until freeze is turned off.
+- Freezing only catches transitions that start after it's on. Make `replay` phase-aware: close then reopen for `enter`, open then close for `exit`.
+- For quick inspection without a page, Chrome DevTools' Animations panel (Ctrl+Shift+P, "Show Animations") also scrubs and slows CSS transitions.
 
 ## Timeline
 

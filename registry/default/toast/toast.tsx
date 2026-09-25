@@ -410,15 +410,26 @@ export const toast = Object.assign(baseToast, {
   dismiss: (toastId: string) => {
     return toastManager.close(toastId);
   },
-  update: (toastId: string, options: Partial<ToastOptions>) => {
-    const updateOptions: Record<string, unknown> = {};
-    if (options.title !== undefined) updateOptions.title = options.title;
-    if (options.description !== undefined)
-      updateOptions.description = options.description;
-    if (options.type !== undefined) updateOptions.type = options.type;
-    if (options.data !== undefined) updateOptions.data = options.data;
+  /** Pass a function to derive the update from the current toast (e.g. incrementing a count in `data`). */
+  update: (
+    toastId: string,
+    options:
+      | Partial<ToastOptions>
+      | ((prevToast: Toast.Root.ToastObject) => Partial<ToastOptions>),
+  ) => {
+    const pickUpdate = (next: Partial<ToastOptions>) => {
+      const updateOptions: Record<string, unknown> = {};
+      if (next.title !== undefined) updateOptions.title = next.title;
+      if (next.description !== undefined)
+        updateOptions.description = next.description;
+      if (next.type !== undefined) updateOptions.type = next.type;
+      if (next.data !== undefined) updateOptions.data = next.data;
+      return updateOptions;
+    };
 
-    return toastManager.update(toastId, updateOptions);
+    return toastManager.update(toastId, (prevToast) =>
+      pickUpdate(typeof options === "function" ? options(prevToast) : options),
+    );
   },
   /** Show an anchored toast near an element */
   anchored: <TData extends object = object>(

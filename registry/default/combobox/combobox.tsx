@@ -21,6 +21,7 @@ import {
 } from "@hugeicons/core-free-icons";
 const useComboboxFilter = BaseCombobox.useFilter;
 const useComboboxFilteredItems = BaseCombobox.useFilteredItems;
+const createComboboxItems = BaseCombobox.createItems;
 
 // Shared styling for the start/end addon containers. `pointer-events-none` lets
 // clicks on decorative content (icons, spinners) fall through to the InputGroup,
@@ -39,9 +40,13 @@ const ComboboxContext = React.createContext<{
   setChipsElement: (element: HTMLDivElement | null) => void;
 } | null>(null);
 
-function Combobox<Value, Multiple extends boolean | undefined = false>(
-  props: BaseCombobox.Root.Props<Value, Multiple>,
-): React.JSX.Element {
+// `Item` lets `items` accept a `createComboboxItems()` collection, whose
+// rendered item type differs from its selection value.
+function Combobox<
+  Value,
+  Multiple extends boolean | undefined = false,
+  Item = Value,
+>(props: BaseCombobox.Root.Props<Value, Multiple, Item>): React.JSX.Element {
   const id = React.useId();
   const [chipsElement, setChipsElement] = React.useState<HTMLDivElement | null>(
     null,
@@ -690,4 +695,5 @@ export {
   ComboboxTriggerLabel,
   useComboboxFilter,
   useComboboxFilteredItems,
+  createComboboxItems,
 };

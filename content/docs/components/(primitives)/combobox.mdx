@@ -79,6 +79,12 @@ Wrap items in `ComboboxGroup` with a `ComboboxGroupLabel` for sticky section hea
 
 <ComponentPreview component="combobox" example="combobox-grouped" />
 
+### Selecting by ID
+
+When your app stores IDs rather than item objects, build the list with `createComboboxItems`. `getValue` sets each item's selection value and `getLabel` sets the text used in the input and for filtering. The list still renders your full objects, but `value` and `onValueChange` work with the IDs, so pass the ID to `ComboboxItem`'s `value`.
+
+<ComponentPreview component="combobox" example="combobox-item-ids" />
+
 ### Virtualized
 
 Use `ComboboxVirtualizedList` for large lists (100+ items); it only renders items in the viewport, dramatically reducing DOM nodes.
@@ -357,4 +363,31 @@ function VirtualizedListContent() {
   });
   // ...
 }
+```
+
+#### createComboboxItems
+
+```ts
+function createComboboxItems<Item, Value>(
+  data: readonly Item[] | readonly { items: readonly Item[] }[] | undefined,
+  options: {
+    getValue: (item: Item) => Value;
+    getLabel: (item: Item) => string;
+  },
+): ComboboxItemCollection;
+```
+
+Builds a collection for the `items` prop from flat or grouped data. Each item's selection value comes from `getValue` and its display and filter label from `getLabel`. Items can't have their own `items` array field, since that marks a group.
+
+Create static collections at module scope. For data that loads or changes at runtime, wrap the call in `React.useMemo()` keyed on the data.
+
+```tsx
+const items = React.useMemo(
+  () =>
+    createComboboxItems(users, {
+      getValue: (user) => user.id,
+      getLabel: (user) => user.name,
+    }),
+  [users],
+);
 ```

@@ -15,6 +15,7 @@ import {
   PopoverTrigger,
 } from "@/registry/default/popover/popover";
 import { Button } from "@/registry/default/button/button";
+import { transitionToCss } from "../_lib/transition-css";
 import { useCssScrub, type ScrubPhase } from "../_lib/use-css-scrub";
 
 type Side = "bottom" | "top" | "left" | "right";
@@ -44,7 +45,7 @@ const CONFIG = {
   scrub: {
     freeze: false,
     phase: { type: "select", options: ["enter", "exit"] },
-    time: [0, 0, 400, 1],
+    time: [0, 0, 1000, 1],
   },
   replay: { type: "action" },
   reset: { type: "action", label: "Reset to component" },
@@ -52,7 +53,8 @@ const CONFIG = {
 
 export default function PopoverTune(): React.ReactElement {
   const [open, setOpen] = React.useState(false);
-  const phaseRef = React.useRef<ScrubPhase>("enter");
+  // Read by onAction, which DialKit may hold from an earlier render.
+  const replayRef = React.useRef({ phase: "enter" as ScrubPhase, ms: 400 });
 
   const v = useDialKit("Popover", CONFIG, {
     id: "popover",
@@ -62,17 +64,15 @@ export default function PopoverTune(): React.ReactElement {
       if (path === "reset") return DialStore.resetValues("popover");
       if (path !== "replay") return;
       // Exit scrubbing needs an open popup to close; enter needs a closed one.
-      const exit = phaseRef.current === "exit";
+      // Wait out the current transition so the next one starts from rest.
+      const { phase, ms } = replayRef.current;
+      const exit = phase === "exit";
       setOpen(exit);
-      window.setTimeout(() => setOpen(!exit), 400);
+      window.setTimeout(() => setOpen(!exit), ms);
     },
   });
 
   const phase = v.scrub.phase as ScrubPhase;
-  React.useEffect(() => {
-    phaseRef.current = phase;
-  }, [phase]);
-
   useCssScrub({
     selector: '[data-slot="popover-content"]',
     enabled: v.scrub.freeze,
@@ -80,10 +80,22 @@ export default function PopoverTune(): React.ReactElement {
     time: v.scrub.time,
   });
 
-  const enter = v.motion.enter as EasingConfig;
-  const ease = `cubic-bezier(${enter.ease.join(",")})`;
+  // Easing tab gives a bezier; Time and Physics tabs give a spring.
+  const enter = v.motion.enter;
+  const timing = transitionToCss(enter);
   const timingChanged =
-    enter.duration !== DURATION || enter.ease.some((n, i) => n !== EASE[i]);
+    enter.type !== "easing" ||
+    enter.duration !== DURATION ||
+    enter.ease.some((n, i) => n !== EASE[i]);
+
+  const replayMs = Math.max(
+    400,
+    parseFloat(timing.duration) * (timing.duration.endsWith("ms") ? 1 : 1000) +
+      100,
+  );
+  React.useEffect(() => {
+    replayRef.current = { phase, ms: replayMs };
+  }, [phase, replayMs]);
 
   // Keeps the width/height entries of the component's 4-value transition list.
   const css = [
@@ -91,8 +103,8 @@ export default function PopoverTune(): React.ReactElement {
       `[data-slot="popover-content"] { border-radius: ${v.surface.radius}px; }`,
     timingChanged &&
       `[data-slot="popover-content"] {
-        transition-duration: 150ms, 150ms, ${enter.duration}s, ${enter.duration}s;
-        transition-timing-function: ${SIZE_EASE}, ${SIZE_EASE}, ${ease}, ${ease};
+        transition-duration: 150ms, 150ms, ${timing.duration}, ${timing.duration};
+        transition-timing-function: ${SIZE_EASE}, ${SIZE_EASE}, ${timing.easing}, ${timing.easing};
       }`,
     v.motion.startScale !== START_SCALE &&
       `[data-slot="popover-content"]:is([data-starting-style], [data-ending-style]) { scale: ${v.motion.startScale}; }`,

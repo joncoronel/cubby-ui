@@ -31,18 +31,17 @@ Cubby components are styled with Tailwind utilities in `@layer utilities`. An **
 `}</style>
 ```
 
-| What                                  | How                                                                                                                                         |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Spacing, radius, size, color, opacity | CSS property in the `<style>` rule, or set a CSS variable the component already reads                                                       |
-| Enter/exit states (Base UI)           | `[data-starting-style]` / `[data-ending-style]` selectors                                                                                   |
-| Props (side, offset, variant, size)   | Pass `v.x` straight to the component prop; use `select` controls for enums                                                                  |
-| CSS transition with easing curve      | `easing` control → `transition-duration: ${d}s; transition-timing-function: cubic-bezier(${ease.join(",")})`                                |
-| CSS transition with a spring          | `spring` control → `String(spring(visualDuration, bounce))` from `motion` gives `"550ms linear(...)"`, usable as duration + timing function |
-| Motion (`motion/react`) animations    | Pass the `spring`/`easing` value directly as the `transition` prop                                                                          |
+| What                                  | How                                                                                                                                             |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Spacing, radius, size, color, opacity | CSS property in the `<style>` rule, or set a CSS variable the component already reads                                                           |
+| Enter/exit states (Base UI)           | `[data-starting-style]` / `[data-ending-style]` selectors                                                                                       |
+| Props (side, offset, variant, size)   | Pass `v.x` straight to the component prop; use `select` controls for enums                                                                      |
+| CSS transition (easing or spring)     | `transitionToCss(v.x)` from `app/tune/_lib/transition-css.ts` returns `{ duration, easing }`. Handles all three tabs of the transition control. |
+| Motion (`motion/react`) animations    | Pass the `spring`/`easing` value directly as the `transition` prop                                                                              |
 
 **Multi-value transitions:** if the component transitions several properties with a comma list (e.g. `transition-[width,height,scale,opacity]`), keep the list length and only replace the entries you're tuning, or you'll silently retime the others.
 
-**Types:** `spring`/`easing` values come back typed as the `TransitionConfig` union. Narrow with `as EasingConfig` / `as SpringConfig` (both exported from `dialkit`).
+**Never assume a transition control returns a bezier.** Its Time and Physics tabs switch the value to `{ type: "spring", ... }` (`visualDuration`/`bounce` or `stiffness`/`damping`/`mass`). Always go through `transitionToCss`, which samples springs into `linear()` via Motion's `spring()`. Springs usually outlast beziers, so size the scrub `time` range and replay delay to fit.
 
 ## Scrubbing CSS transitions
 

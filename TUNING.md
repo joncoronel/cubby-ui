@@ -20,6 +20,13 @@ Pick a small, useful set of dials (5 to 10). Group with nested objects (folders)
 
 For overlays (popover, select, menu, tooltip): control `open` and ignore `details.reason === "outside-press"` while a `keepOpen` toggle is on, otherwise clicking the dial panel closes the popup.
 
+Standard extras for every page:
+
+- **Content variants that exercise the component**, not just the one-line demo: short, long, and overflowing. For components that morph between contents (popover, menu, tooltip), render one trigger per variant sharing a `createXHandle()` with `payload`; switching triggers while open is what runs the morph. A morph is several transitions on different elements (popover: popup width/height, positioner + arrow position, content crossfade); give each its own dial in a `morph` folder. Tuning only one of them desyncs it from the rest.
+- **Theme toggle action** via `next-themes`' `setTheme`. It flips the site theme (the same one the docs toggle uses).
+- **Real props as dials** (`level`, `shadowLevel`, `size`, `variant`): pass them through, `undefined` when `original` is on.
+- `/tune` lists every `app/tune/<name>/` folder automatically. Folders starting with `_` are skipped.
+
 ## Binding values
 
 Cubby components are styled with Tailwind utilities in `@layer utilities`. An **unlayered** `<style>` rule beats any layered rule regardless of specificity, so target the component's `data-slot` hooks:
@@ -61,6 +68,7 @@ useCssScrub({ selector: '[data-slot="popover-content"]', enabled: v.scrub.freeze
 
 - `phase: "exit"` only freezes transitions under `[data-ending-style]`. Base UI waits for exit transitions to finish, so a frozen exit keeps the popup mounted until freeze is turned off.
 - Freezing only catches transitions that start after it's on. Make `replay` phase-aware: close then reopen for `enter`, open then close for `exit`.
+- **Slow motion:** pass the component's **outermost animated element** (for popups, the positioner, not the popup). Anything outside the selector keeps playing at 1x and drifts out of sync. `useSlowMotion(selector, rate)` (`app/tune/_lib/use-slow-motion.ts`) sets `playbackRate` on every browser-run animation under `selector`: CSS transitions/keyframes and Motion's hardware-accelerated animations (opacity, transform, filter, clip-path). Motion's JS-driven animations (layout, other-property springs, motion values) aren't affected. Divide replay delays by the rate.
 - For quick inspection without a page, Chrome DevTools' Animations panel (Ctrl+Shift+P, "Show Animations") also scrubs and slows CSS transitions.
 
 ## Timeline

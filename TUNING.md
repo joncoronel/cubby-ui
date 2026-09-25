@@ -41,6 +41,8 @@ Cubby components are styled with Tailwind utilities in `@layer utilities`. An **
 
 **Multi-value transitions:** if the component transitions several properties with a comma list (e.g. `transition-[width,height,scale,opacity]`), keep the list length and only replace the entries you're tuning, or you'll silently retime the others.
 
+**Never put a spring on opacity or color.** A spring overshoots and swings back. Transforms show that as bounce, but opacity is capped at 1, so it only shows the swing back as a visible flicker. Give transform and opacity separate transition dials; the opacity one uses its bezier only and falls back to the default if a spring tab is picked (see the popover page's `motion.scale` / `motion.fade`).
+
 **Never assume a transition control returns a bezier.** Its Time and Physics tabs switch the value to `{ type: "spring", ... }` (`visualDuration`/`bounce` or `stiffness`/`damping`/`mass`). Always go through `transitionToCss`, which samples springs into `linear()` via Motion's `spring()`. Springs usually outlast beziers, so size the scrub `time` range and replay delay to fit.
 
 ## Scrubbing CSS transitions

@@ -6,6 +6,7 @@ import {
   useDialKit,
   type DialConfig,
   type EasingConfig,
+  type TransitionConfig,
 } from "dialkit";
 import {
   Popover,
@@ -15,7 +16,7 @@ import {
   PopoverTrigger,
 } from "@/registry/default/popover/popover";
 import { Button } from "@/registry/default/button/button";
-import { transitionToCss } from "../_lib/transition-css";
+import { transitionToCss, type CssTiming } from "../_lib/transition-css";
 import { useCssScrub, type ScrubPhase } from "../_lib/use-css-scrub";
 
 type Side = "bottom" | "top" | "left" | "right";
@@ -28,6 +29,23 @@ const DURATION = 0.1;
 const EASE: EasingConfig["ease"] = [0.19, 1, 0.22, 1]; // --ease-out-expo
 const START_SCALE = 0.95;
 const SIZE_EASE = "cubic-bezier(0.22,1,0.36,1)";
+const DEFAULT_TIMING: EasingConfig = {
+  type: "easing",
+  duration: DURATION,
+  ease: EASE,
+};
+
+function isChanged(transition: TransitionConfig): boolean {
+  return (
+    transition.type !== "easing" ||
+    transition.duration !== DURATION ||
+    transition.ease.some((n, i) => n !== EASE[i])
+  );
+}
+
+function toMs({ duration }: CssTiming): number {
+  return parseFloat(duration) * (duration.endsWith("ms") ? 1 : 1000);
+}
 
 const CONFIG = {
   original: false,
@@ -39,7 +57,11 @@ const CONFIG = {
     padding: [PADDING, 0, 32, 1],
   },
   motion: {
-    enter: { type: "easing", duration: DURATION, ease: EASE },
+    // Springs overshoot and swing back. Scale shows that as bounce; opacity
+    // is capped at 1, so it only shows the swing-back as a flicker. Hence two
+    // dials, and the fade one ignores springs.
+    scale: { type: "easing", duration: DURATION, ease: EASE },
+    fade: { type: "easing", duration: DURATION, ease: EASE }, // easing only
     startScale: [START_SCALE, 0.8, 1, 0.01],
   },
   scrub: {
@@ -81,18 +103,13 @@ export default function PopoverTune(): React.ReactElement {
   });
 
   // Easing tab gives a bezier; Time and Physics tabs give a spring.
-  const enter = v.motion.enter;
-  const timing = transitionToCss(enter);
-  const timingChanged =
-    enter.type !== "easing" ||
-    enter.duration !== DURATION ||
-    enter.ease.some((n, i) => n !== EASE[i]);
+  const { scale, fade } = v.motion;
+  const fadeEasing = fade.type === "easing" ? fade : DEFAULT_TIMING;
+  const scaleTiming = transitionToCss(scale);
+  const fadeTiming = transitionToCss(fadeEasing);
+  const timingChanged = isChanged(scale) || isChanged(fadeEasing);
 
-  const replayMs = Math.max(
-    400,
-    parseFloat(timing.duration) * (timing.duration.endsWith("ms") ? 1 : 1000) +
-      100,
-  );
+  const replayMs = Math.max(400, toMs(scaleTiming), toMs(fadeTiming)) + 100;
   React.useEffect(() => {
     replayRef.current = { phase, ms: replayMs };
   }, [phase, replayMs]);
@@ -103,8 +120,8 @@ export default function PopoverTune(): React.ReactElement {
       `[data-slot="popover-content"] { border-radius: ${v.surface.radius}px; }`,
     timingChanged &&
       `[data-slot="popover-content"] {
-        transition-duration: 150ms, 150ms, ${timing.duration}, ${timing.duration};
-        transition-timing-function: ${SIZE_EASE}, ${SIZE_EASE}, ${timing.easing}, ${timing.easing};
+        transition-duration: 150ms, 150ms, ${scaleTiming.duration}, ${fadeTiming.duration};
+        transition-timing-function: ${SIZE_EASE}, ${SIZE_EASE}, ${scaleTiming.easing}, ${fadeTiming.easing};
       }`,
     v.motion.startScale !== START_SCALE &&
       `[data-slot="popover-content"]:is([data-starting-style], [data-ending-style]) { scale: ${v.motion.startScale}; }`,

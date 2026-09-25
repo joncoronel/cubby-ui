@@ -88,6 +88,10 @@ export function TuneToolbar({
   const copyTimer = React.useRef<number | undefined>(undefined);
   React.useEffect(() => () => window.clearTimeout(copyTimer.current), []);
 
+  // scrubMax shrinks when a spring gets shorter; keep the thumb and label in
+  // range. useCssScrub already caps each animation at its own end.
+  const scrubTime = Math.min(state.time, scrubMax);
+
   function set<K extends keyof TuneState>(key: K, value: TuneState[K]): void {
     setState((current) => ({ ...current, [key]: value }));
   }
@@ -185,13 +189,13 @@ export function TuneToolbar({
               className="w-32"
               min={0}
               max={scrubMax}
-              value={state.time}
+              value={scrubTime}
               onValueChange={(value) =>
                 set("time", Array.isArray(value) ? (value[0] ?? 0) : value)
               }
             />
             <span className="text-muted-foreground w-12 text-right text-xs tabular-nums">
-              {state.time}ms
+              {scrubTime}ms
             </span>
           </>
         )}

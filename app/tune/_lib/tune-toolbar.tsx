@@ -66,7 +66,7 @@ type TuneToolbarProps = {
   props?: Record<string, Record<string, unknown>>;
   onReplay: () => void;
   /** Show the keep-open toggle (popups only). */
-  keepOpen?: boolean;
+  showKeepOpen?: boolean;
   scrubMax?: number;
 };
 
@@ -78,11 +78,15 @@ export function TuneToolbar({
   css,
   props = {},
   onReplay,
-  keepOpen = false,
+  showKeepOpen = false,
   scrubMax = 1000,
 }: TuneToolbarProps): React.ReactElement {
   const { resolvedTheme, setTheme } = useTheme();
-  const [copied, setCopied] = React.useState(false);
+  const [copyStatus, setCopyStatus] = React.useState<
+    "idle" | "copied" | "failed"
+  >("idle");
+  const copyTimer = React.useRef<number | undefined>(undefined);
+  React.useEffect(() => () => window.clearTimeout(copyTimer.current), []);
 
   function set<K extends keyof TuneState>(key: K, value: TuneState[K]): void {
     setState((current) => ({ ...current, [key]: value }));
@@ -104,11 +108,17 @@ export function TuneToolbar({
       css,
       propLines.join("\n"),
     ];
-    await navigator.clipboard.writeText(
-      `${sections.filter(Boolean).join("\n\n")}\n`,
-    );
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1500);
+    try {
+      // Undefined over plain-http LAN IPs; rejects without focus/permission.
+      await navigator.clipboard.writeText(
+        `${sections.filter(Boolean).join("\n\n")}\n`,
+      );
+      setCopyStatus("copied");
+    } catch {
+      setCopyStatus("failed");
+    }
+    window.clearTimeout(copyTimer.current);
+    copyTimer.current = window.setTimeout(() => setCopyStatus("idle"), 1500);
   }
 
   function reset(): void {
@@ -198,7 +208,7 @@ export function TuneToolbar({
         >
           Original
         </Toggle>
-        {keepOpen && (
+        {showKeepOpen && (
           <Toggle
             size="sm"
             className="text-xs"
@@ -213,7 +223,10 @@ export function TuneToolbar({
           variant="ghost"
           onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
         >
-          {resolvedTheme === "dark" ? "Light" : "Dark"}
+          {/* The theme is unknown during SSR; swap labels on the .dark class
+              so server and client render the same markup. */}
+          <span className="dark:hidden">Dark</span>
+          <span className="hidden dark:inline">Light</span>
         </Button>
       </ToolbarGroup>
 
@@ -224,7 +237,11 @@ export function TuneToolbar({
           Reset
         </Button>
         <Button size="xs" disabled={!hasChanges} onClick={copy}>
-          {copied ? "Copied" : "Copy changes"}
+          {copyStatus === "copied"
+            ? "Copied"
+            : copyStatus === "failed"
+              ? "Copy failed"
+              : "Copy changes"}
         </Button>
       </ToolbarGroup>
     </Toolbar>

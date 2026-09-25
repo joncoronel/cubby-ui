@@ -26,7 +26,7 @@ const [tune, setTune] = useTuneState(); // { original, keepOpen, rate, freeze, p
   css={css} // the emitted overrides
   props={{ PopoverContent: changedProps }} // prop dials that left the default
   onReplay={replay}
-  keepOpen // popups only
+  showKeepOpen // popups only
 />;
 ```
 
@@ -34,12 +34,12 @@ Prop dials follow the same rule as CSS: build a `changedProps` object holding on
 
 Pick a small, useful set of dials. Group with nested objects (folders). Wire `tune.original` (drop the `<style>` and dial-driven props), `tune.rate` (`useSlowMotion`), and `tune.freeze`/`phase`/`time` (`useCssScrub`).
 
-For overlays (popover, select, menu, tooltip): control `open` and ignore `details.reason === "outside-press"` while `tune.keepOpen` is on, otherwise clicking the dial panel or toolbar closes the popup.
+For overlays (popover, select, menu, tooltip): control `open` and ignore closes with `details.reason` of `"outside-press"` or `"focus-out"` while `tune.keepOpen` is on, otherwise clicking or tabbing into the dial panel or toolbar closes the popup.
 
 Standard extras for every page:
 
 - **Content variants that exercise the component**, not just the one-line demo: short, long, and overflowing. For components that morph between contents (popover, menu, tooltip), render one trigger per variant sharing a `createXHandle()` with `payload`; switching triggers while open is what runs the morph. A morph is several transitions on different elements (popover: popup width/height, positioner + arrow position, content crossfade); give each its own dial in a `morph` folder. Tuning only one of them desyncs it from the rest.
-- **Real props as dials** (`level`, `shadowLevel`, `size`, `variant`): pass them through, `undefined` when `original` is on.
+- **Real props as dials** (`level`, `shadowLevel`, `size`, `variant`): use the `changedProps` pattern above, never pass `v.x` straight through.
 - `/tune` lists every `app/tune/<name>/` folder automatically. Folders starting with `_` are skipped.
 
 ## Binding values
@@ -53,13 +53,13 @@ Cubby components are styled with Tailwind utilities in `@layer utilities`. An **
 `}</style>
 ```
 
-| What                                  | How                                                                                                                                             |
-| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| Spacing, radius, size, color, opacity | CSS property in the `<style>` rule, or set a CSS variable the component already reads                                                           |
-| Enter/exit states (Base UI)           | `[data-starting-style]` / `[data-ending-style]` selectors                                                                                       |
-| Props (side, offset, variant, size)   | Pass `v.x` straight to the component prop; use `select` controls for enums                                                                      |
-| CSS transition (easing or spring)     | `transitionToCss(v.x)` from `app/tune/_lib/transition-css.ts` returns `{ duration, easing }`. Handles all three tabs of the transition control. |
-| Motion (`motion/react`) animations    | Pass the `spring`/`easing` value directly as the `transition` prop                                                                              |
+| What                                  | How                                                                                                                                                                                                                         |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Spacing, radius, size, color, opacity | CSS property in the `<style>` rule, or set a CSS variable the component already reads                                                                                                                                       |
+| Enter/exit states (Base UI)           | `[data-starting-style]` / `[data-ending-style]` selectors                                                                                                                                                                   |
+| Props (side, offset, variant, size)   | Add to `changedProps` only when it differs from the default; use `select` controls for enums                                                                                                                                |
+| CSS transition (easing or spring)     | `transitionToCss(v.x)` from `app/tune/_lib/transition-css.ts` returns `{ duration, easing }`. Handles all three tabs of the transition control. Same file: `isChanged`, `bezierOnly`, `toMs`; import them, don't copy them. |
+| Motion (`motion/react`) animations    | Pass the `spring`/`easing` value directly as the `transition` prop                                                                                                                                                          |
 
 **Multi-value transitions:** if the component transitions several properties with a comma list (e.g. `transition-[width,height,scale,opacity]`), keep the list length and only replace the entries you're tuning, or you'll silently retime the others.
 

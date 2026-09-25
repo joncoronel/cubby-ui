@@ -1,12 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  useDialKit,
-  type DialConfig,
-  type EasingConfig,
-  type TransitionConfig,
-} from "dialkit";
+import { useDialKit, type DialConfig, type EasingConfig } from "dialkit";
 import {
   Popover,
   PopoverContent,
@@ -17,7 +12,12 @@ import {
 } from "@/registry/default/popover/popover";
 import { Button } from "@/registry/default/button/button";
 import type { SurfaceLevel } from "@/registry/default/lib/elevated";
-import { transitionToCss, type CssTiming } from "../_lib/transition-css";
+import {
+  bezierOnly,
+  isChanged,
+  toMs,
+  transitionToCss,
+} from "../_lib/transition-css";
 import { TuneToolbar, useTuneState } from "../_lib/tune-toolbar";
 import { useCssScrub } from "../_lib/use-css-scrub";
 import { useSlowMotion } from "../_lib/use-slow-motion";
@@ -30,6 +30,7 @@ type PopoverContentProps = {
   shadowLevel?: SurfaceLevel;
 };
 
+const PANEL_ID = "popover";
 const SELECTOR = '[data-slot="popover-content"]';
 // The positioner wraps the popup and moves on its own during a trigger switch,
 // so slow motion has to reach it too.
@@ -43,11 +44,14 @@ const SIDE = "bottom";
 const SIDE_OFFSET = 8;
 const LEVEL = 3;
 const START_SCALE = 0.95;
-const FADE_DEFAULT: EasingConfig = {
+// Scale and opacity are separate entries in the component's transition list,
+// so each gets its own baseline even though they match today.
+const SCALE_DEFAULT: EasingConfig = {
   type: "easing",
   duration: 0.1,
   ease: [0.19, 1, 0.22, 1], // --ease-out-expo
 };
+const FADE_DEFAULT: EasingConfig = { ...SCALE_DEFAULT };
 // A trigger switch runs three transitions together: the popup resizes, the
 // positioner (and arrow) re-centers, and the old/new content crossfades.
 const SIZE_DEFAULT: EasingConfig = {
@@ -79,7 +83,7 @@ const CONFIG = {
     // Springs overshoot and swing back. Scale shows that as bounce; opacity
     // is capped at 1, so it only shows the swing-back as a flicker. Hence
     // separate dials, and fade ignores springs.
-    scale: { ...FADE_DEFAULT },
+    scale: { ...SCALE_DEFAULT },
     fade: { ...FADE_DEFAULT }, // easing only
     startScale: [START_SCALE, 0.8, 1, 0.01],
   },
@@ -92,30 +96,13 @@ const CONFIG = {
   },
 } satisfies DialConfig;
 
-function isChanged(transition: TransitionConfig, base: EasingConfig): boolean {
-  return (
-    transition.type !== "easing" ||
-    transition.duration !== base.duration ||
-    transition.ease.some((n, i) => n !== base.ease[i])
-  );
-}
-
-function bezierOnly(
-  transition: TransitionConfig,
-  base: EasingConfig,
-): EasingConfig {
-  return transition.type === "easing" ? transition : base;
-}
-
-function toMs({ duration }: CssTiming): number {
-  return parseFloat(duration) * (duration.endsWith("ms") ? 1 : 1000);
-}
-
 export default function PopoverTune(): React.ReactElement {
   const [open, setOpen] = React.useState(false);
   const [triggerId, setTriggerId] = React.useState<string | null>("tune-short");
   const [tune, setTune] = useTuneState();
-  const v = useDialKit("Popover", CONFIG, { id: "popover", persist: true });
+  const replayTimer = React.useRef<number | undefined>(undefined);
+  React.useEffect(() => () => window.clearTimeout(replayTimer.current), []);
+  const v = useDialKit("Popover", CONFIG, { id: PANEL_ID, persist: true });
 
   useCssScrub({
     selector: SELECTOR,
@@ -137,18 +124,20 @@ export default function PopoverTune(): React.ReactElement {
   const fadeTiming = transitionToCss(fade);
   const sizeTiming = transitionToCss(size);
   const timingChanged =
-    isChanged(scale, FADE_DEFAULT) ||
+    isChanged(scale, SCALE_DEFAULT) ||
     isChanged(fade, FADE_DEFAULT) ||
     isChanged(size, SIZE_DEFAULT);
+
+  const longestMs = Math.max(toMs(scaleTiming), toMs(fadeTiming));
 
   function replay(): void {
     // Exit scrubbing needs an open popup to close; enter needs a closed one.
     // Wait out the current transition so the next starts from rest.
-    const ms =
-      Math.max(400, toMs(scaleTiming), toMs(fadeTiming)) / tune.rate + 100;
+    const ms = Math.max(400, longestMs) / tune.rate + 100;
     const exit = tune.phase === "exit";
+    window.clearTimeout(replayTimer.current);
     setOpen(exit);
-    window.setTimeout(() => setOpen(!exit), ms);
+    replayTimer.current = window.setTimeout(() => setOpen(!exit), ms);
   }
 
   // Order matches the component's transition-[width,height,scale,opacity].
@@ -214,9 +203,12 @@ export default function PopoverTune(): React.ReactElement {
         open={open}
         triggerId={triggerId}
         onOpenChange={(next, details) => {
-          // Clicking the dial panel or toolbar counts as an outside press.
-          if (!next && tune.keepOpen && details.reason === "outside-press")
-            return;
+          // Clicking or tabbing into the dial panel or toolbar counts as
+          // leaving the popup.
+          const leaving =
+            details.reason === "outside-press" ||
+            details.reason === "focus-out";
+          if (!next && tune.keepOpen && leaving) return;
           if (next && details.trigger) setTriggerId(details.trigger.id);
           setOpen(next);
         }}
@@ -231,12 +223,14 @@ export default function PopoverTune(): React.ReactElement {
       <TuneToolbar
         state={tune}
         setState={setTune}
-        panelId="popover"
+        panelId={PANEL_ID}
         file="registry/default/popover/popover.tsx"
         css={css}
         props={{ PopoverContent: changedProps }}
         onReplay={replay}
-        keepOpen
+        showKeepOpen
+        // Springs can settle past 1s; round up so the slider reaches the end.
+        scrubMax={Math.max(1000, Math.ceil(longestMs / 100) * 100)}
       />
     </div>
   );

@@ -1,5 +1,5 @@
 import { spring } from "motion";
-import type { TransitionConfig } from "dialkit";
+import type { EasingConfig, TransitionConfig } from "dialkit";
 
 export type CssTiming = { duration: string; easing: string };
 
@@ -20,4 +20,28 @@ export function transitionToCss(transition: TransitionConfig): CssTiming {
   const css = String(spring({ keyframes: [0, 1], ...transition }));
   const split = css.indexOf(" ");
   return { duration: css.slice(0, split), easing: css.slice(split + 1) };
+}
+
+/** True once a dial has left its default curve (any spring counts). */
+export function isChanged(
+  transition: TransitionConfig,
+  base: EasingConfig,
+): boolean {
+  return (
+    transition.type !== "easing" ||
+    transition.duration !== base.duration ||
+    transition.ease.some((n, i) => n !== base.ease[i])
+  );
+}
+
+/** For properties that must not overshoot (opacity, size): drop springs. */
+export function bezierOnly(
+  transition: TransitionConfig,
+  base: EasingConfig,
+): EasingConfig {
+  return transition.type === "easing" ? transition : base;
+}
+
+export function toMs({ duration }: CssTiming): number {
+  return parseFloat(duration) * (duration.endsWith("ms") ? 1 : 1000);
 }

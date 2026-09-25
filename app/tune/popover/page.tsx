@@ -2,13 +2,11 @@
 
 import * as React from "react";
 import {
-  DialStore,
   useDialKit,
   type DialConfig,
   type EasingConfig,
   type TransitionConfig,
 } from "dialkit";
-import { useTheme } from "next-themes";
 import {
   Popover,
   PopoverContent,
@@ -20,7 +18,8 @@ import {
 import { Button } from "@/registry/default/button/button";
 import type { SurfaceLevel } from "@/registry/default/lib/elevated";
 import { transitionToCss, type CssTiming } from "../_lib/transition-css";
-import { useCssScrub, type ScrubPhase } from "../_lib/use-css-scrub";
+import { TuneToolbar, useTuneState } from "../_lib/tune-toolbar";
+import { useCssScrub } from "../_lib/use-css-scrub";
 import { useSlowMotion } from "../_lib/use-slow-motion";
 
 type Side = "bottom" | "top" | "left" | "right";
@@ -57,12 +56,9 @@ type Content = (typeof CONTENTS)[number];
 // Switching triggers while open is what runs the width/height morph.
 const handle = createPopoverHandle<Content>();
 
-const SPEEDS: Record<string, number> = { "1x": 1, "0.25x": 0.25, "0.1x": 0.1 };
-
+// Component values only. Playback controls live in the TuneToolbar so they
+// stay out of DialKit's Copy output and saved versions.
 const CONFIG = {
-  original: false,
-  keepOpen: true,
-  speed: { type: "select", options: Object.keys(SPEEDS) },
   side: { type: "select", options: ["bottom", "top", "left", "right"] },
   sideOffset: [8, 0, 24, 1],
   surface: {
@@ -86,14 +82,6 @@ const CONFIG = {
     position: { ...POSITION_DEFAULT },
     crossfade: { ...CROSSFADE_DEFAULT },
   },
-  scrub: {
-    freeze: false,
-    phase: { type: "select", options: ["enter", "exit"] },
-    time: [0, 0, 1000, 1],
-  },
-  replay: { type: "action" },
-  theme: { type: "action", label: "Toggle light/dark" },
-  reset: { type: "action", label: "Reset to component" },
 } satisfies DialConfig;
 
 function isChanged(transition: TransitionConfig, base: EasingConfig): boolean {
@@ -118,43 +106,16 @@ function toMs({ duration }: CssTiming): number {
 export default function PopoverTune(): React.ReactElement {
   const [open, setOpen] = React.useState(false);
   const [triggerId, setTriggerId] = React.useState<string | null>("tune-short");
-  const { resolvedTheme, setTheme } = useTheme();
-  // Read by onAction, which DialKit may hold from an earlier render.
-  const actionRef = React.useRef({
-    phase: "enter" as ScrubPhase,
-    ms: 400,
-    theme: resolvedTheme,
-  });
+  const [tune, setTune] = useTuneState();
+  const v = useDialKit("Popover", CONFIG, { id: "popover", persist: true });
 
-  const v = useDialKit("Popover", CONFIG, {
-    id: "popover",
-    persist: true,
-    onAction: (path) => {
-      const { phase, ms, theme } = actionRef.current;
-      if (path === "reset") {
-        // Back to the component's values; saved versions are kept.
-        DialStore.resetValues("popover");
-      } else if (path === "theme") {
-        setTheme(theme === "dark" ? "light" : "dark");
-      } else if (path === "replay") {
-        // Exit scrubbing needs an open popup to close; enter needs a closed
-        // one. Wait out the current transition so the next starts from rest.
-        const exit = phase === "exit";
-        setOpen(exit);
-        window.setTimeout(() => setOpen(!exit), ms);
-      }
-    },
-  });
-
-  const phase = v.scrub.phase as ScrubPhase;
-  const rate = SPEEDS[v.speed] ?? 1;
   useCssScrub({
     selector: SELECTOR,
-    enabled: v.scrub.freeze,
-    phase,
-    time: v.scrub.time,
+    enabled: tune.freeze,
+    phase: tune.phase,
+    time: tune.time,
   });
-  useSlowMotion(POSITIONER, rate);
+  useSlowMotion(POSITIONER, tune.rate);
 
   // Easing tab gives a bezier; Time and Physics tabs give a spring.
   const { scale } = v.motion;
@@ -172,11 +133,15 @@ export default function PopoverTune(): React.ReactElement {
     isChanged(fade, FADE_DEFAULT) ||
     isChanged(size, SIZE_DEFAULT);
 
-  const replayMs =
-    Math.max(400, toMs(scaleTiming), toMs(fadeTiming)) / rate + 100;
-  React.useEffect(() => {
-    actionRef.current = { phase, ms: replayMs, theme: resolvedTheme };
-  }, [phase, replayMs, resolvedTheme]);
+  function replay(): void {
+    // Exit scrubbing needs an open popup to close; enter needs a closed one.
+    // Wait out the current transition so the next starts from rest.
+    const ms =
+      Math.max(400, toMs(scaleTiming), toMs(fadeTiming)) / tune.rate + 100;
+    const exit = tune.phase === "exit";
+    setOpen(exit);
+    window.setTimeout(() => setOpen(!exit), ms);
+  }
 
   // Order matches the component's transition-[width,height,scale,opacity].
   const css = [
@@ -207,7 +172,7 @@ export default function PopoverTune(): React.ReactElement {
 
   return (
     <div className="flex min-h-screen items-center justify-center p-8">
-      {!v.original && css && <style>{css}</style>}
+      {!tune.original && css && <style>{css}</style>}
 
       <div className="flex gap-2">
         {CONTENTS.map((content) => (
@@ -228,25 +193,40 @@ export default function PopoverTune(): React.ReactElement {
         open={open}
         triggerId={triggerId}
         onOpenChange={(next, details) => {
-          // Clicking the dial panel counts as an outside press.
-          if (!next && v.keepOpen && details.reason === "outside-press") return;
+          // Clicking the dial panel or toolbar counts as an outside press.
+          if (!next && tune.keepOpen && details.reason === "outside-press")
+            return;
           if (next && details.trigger) setTriggerId(details.trigger.id);
           setOpen(next);
         }}
       >
         {({ payload }) => (
           <PopoverContent
-            side={v.original ? undefined : (v.side as Side)}
-            sideOffset={v.original ? undefined : v.sideOffset}
-            level={v.original ? undefined : (v.surface.level as SurfaceLevel)}
+            side={tune.original ? undefined : (v.side as Side)}
+            sideOffset={tune.original ? undefined : v.sideOffset}
+            level={
+              tune.original ? undefined : (v.surface.level as SurfaceLevel)
+            }
             shadowLevel={
-              v.original ? undefined : (v.surface.shadowLevel as SurfaceLevel)
+              tune.original
+                ? undefined
+                : (v.surface.shadowLevel as SurfaceLevel)
             }
           >
             <PopoverBody content={payload ?? "short"} />
           </PopoverContent>
         )}
       </Popover>
+
+      <TuneToolbar
+        state={tune}
+        setState={setTune}
+        panelId="popover"
+        file="registry/default/popover/popover.tsx"
+        css={css}
+        onReplay={replay}
+        keepOpen
+      />
     </div>
   );
 }

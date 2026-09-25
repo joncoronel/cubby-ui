@@ -8,22 +8,34 @@ Live-tuning components with [DialKit](https://github.com/joshpuckett/dialkit): d
 - **Don't edit the component to make it tunable.** Override it from the tune page (see "Binding values" below). The component stays the source of truth.
 - **Dial defaults must equal the component's current values**, so the page opens looking exactly like production.
 - **Only emit an override once its dial leaves the default.** Untouched dials must inject nothing, so the page shows the real component even if the defaults drift. Keep defaults as named constants and compare against them (see the popover page's `css` array).
-- **Every page gets an `original: false` toggle** that drops all overrides and default-valued props, for A/B against the shipped component.
-- **Every page gets a `reset: { type: "action", label: "Reset to component" }`** handled with `DialStore.resetValues("<panel id>")`. Values persist across reloads (`persist: true`) and DialKit's panel has no reset button of its own. Saved versions survive a reset.
+- **DialKit holds component values only.** Playback and page controls (replay, speed, freeze/scrub, original, keep open, theme, reset, copy) live in the shared `<TuneToolbar>` (`app/tune/_lib/tune-toolbar.tsx`), so DialKit's Copy output and saved versions never contain them. DialKit can't host custom buttons in its sticky header, which is why they're not there.
 - `app/tune/layout.tsx` mounts the single `<DialRoot />`, loads `dialkit/styles.css`, and `notFound()`s in production. Don't mount another root.
 
 ## Adding a tune page
 
-One page per component: `app/tune/<component>/page.tsx` (client component). Copy `app/tune/popover/page.tsx` as the template. It renders the real registry component, calls `useDialKit("<Name>", config, { id, persist: true, onAction })`, and injects overrides.
+One page per component: `app/tune/<component>/page.tsx` (client component). Copy `app/tune/popover/page.tsx` as the template. It renders the real registry component, calls `useDialKit("<Name>", config, { id, persist: true })`, builds the override `css`, and renders the toolbar:
 
-Pick a small, useful set of dials (5 to 10). Group with nested objects (folders). Add a `replay: { type: "action" }` whenever there's an enter/exit animation to re-trigger.
+```tsx
+const [tune, setTune] = useTuneState(); // { original, keepOpen, rate, freeze, phase, time }
 
-For overlays (popover, select, menu, tooltip): control `open` and ignore `details.reason === "outside-press"` while a `keepOpen` toggle is on, otherwise clicking the dial panel closes the popup.
+<TuneToolbar
+  state={tune}
+  setState={setTune}
+  panelId="popover" // reset also calls DialStore.resetValues(panelId)
+  file="registry/default/popover/popover.tsx" // named in the copied text
+  css={css} // the emitted overrides; Copy is disabled when empty
+  onReplay={replay}
+  keepOpen // popups only
+/>;
+```
+
+Pick a small, useful set of dials. Group with nested objects (folders). Wire `tune.original` (drop the `<style>` and dial-driven props), `tune.rate` (`useSlowMotion`), and `tune.freeze`/`phase`/`time` (`useCssScrub`).
+
+For overlays (popover, select, menu, tooltip): control `open` and ignore `details.reason === "outside-press"` while `tune.keepOpen` is on, otherwise clicking the dial panel or toolbar closes the popup.
 
 Standard extras for every page:
 
 - **Content variants that exercise the component**, not just the one-line demo: short, long, and overflowing. For components that morph between contents (popover, menu, tooltip), render one trigger per variant sharing a `createXHandle()` with `payload`; switching triggers while open is what runs the morph. A morph is several transitions on different elements (popover: popup width/height, positioner + arrow position, content crossfade); give each its own dial in a `morph` folder. Tuning only one of them desyncs it from the rest.
-- **Theme toggle action** via `next-themes`' `setTheme`. It flips the site theme (the same one the docs toggle uses).
 - **Real props as dials** (`level`, `shadowLevel`, `size`, `variant`): pass them through, `undefined` when `original` is on.
 - `/tune` lists every `app/tune/<name>/` folder automatically. Folders starting with `_` are skipped.
 
@@ -57,14 +69,15 @@ Cubby components are styled with Tailwind utilities in `@layer utilities`. An **
 `app/tune/_lib/use-css-scrub.ts` freezes a component's CSS transitions and seeks them from a dial. Every CSS transition is a `CSSTransition` in the Web Animations API, so the hook listens for `transitionrun`, pauses the animations under `selector`, and sets `currentTime` from the dial (one shared playhead in ms, so offsets between properties stay real).
 
 ```tsx
-scrub: {
-  freeze: false,
-  phase: { type: "select", options: ["enter", "exit"] },
-  time: [0, 0, 400, 1],
-},
-
-useCssScrub({ selector: '[data-slot="popover-content"]', enabled: v.scrub.freeze, phase, time: v.scrub.time });
+useCssScrub({
+  selector: '[data-slot="popover-content"]',
+  enabled: tune.freeze,
+  phase: tune.phase,
+  time: tune.time,
+});
 ```
+
+The toolbar's Freeze toggle reveals the phase and time controls; `scrubMax` sets the time range (default 1000ms).
 
 - `phase: "exit"` only freezes transitions under `[data-ending-style]`. Base UI waits for exit transitions to finish, so a frozen exit keeps the popup mounted until freeze is turned off.
 - Freezing only catches transitions that start after it's on. Make `replay` phase-aware: close then reopen for `enter`, open then close for `exit`.
@@ -77,9 +90,18 @@ useCssScrub({ selector: '[data-slot="popover-content"]', enabled: v.scrub.freeze
 
 ## Applying tuned values
 
-The user clicks **Copy** in the panel and pastes the result. Then:
+The user clicks **Copy changes** in the toolbar and pastes the result: a CSS block headed with the source file, holding only the rules whose dials moved, e.g.
 
-1. Translate each value into the component's Tailwind classes in `registry/default/<component>/` (e.g. `radius: 14` → `rounded-[14px]` or the nearest token; easing → `ease-[cubic-bezier(...)]` or an existing `--ease-*` token if it matches).
+```css
+/* Tuned overrides for registry/default/popover/popover.tsx. Apply as Tailwind classes. */
+[data-slot="popover-content"] {
+  border-radius: 16px;
+}
+```
+
+(DialKit's own **Copy** gives raw dial values instead; prefer the toolbar's, since it's already resolved to CSS, springs included.) Then:
+
+1. Translate each rule into the component's Tailwind classes in `registry/default/<component>/` (e.g. `radius: 14` → `rounded-[14px]` or the nearest token; easing → `ease-[cubic-bezier(...)]` or an existing `--ease-*` token if it matches).
 2. If a value belongs in a design token, update **both** `registry/theme.css` and `app/globals.css`.
 3. Update the tune page's defaults to the new values so it keeps matching production.
 4. `pnpm run registry:sync`, lint, and check the examples in the dev server.

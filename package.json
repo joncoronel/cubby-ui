@@ -71,6 +71,7 @@
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "^5.2.0",
+    "dialkit": "^2.0.2",
     "eslint": "^9.39.4",
     "eslint-config-next": "16.1.0",
     "jsdom": "^27.4.0",

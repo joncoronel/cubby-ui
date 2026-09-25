@@ -198,6 +198,7 @@ For deeper context on specific areas, read these files:
 | `API_REFERENCE_GUIDE.md`     | Writing API reference sections in component docs                          |
 | `WEB_INTERFACE_STANDARDS.md` | UI/UX guidelines, animations, touch interactions, accessibility           |
 | `TESTING.md`                 | Testing conventions, Vitest setup, React Testing Library patterns         |
+| `TUNING.md`                  | Live-tuning components with DialKit dials in `app/tune/` (dev only)       |
 
 **Read `REGISTRY_SYSTEM.md` when:**
 
@@ -218,3 +219,8 @@ For deeper context on specific areas, read these files:
 
 - Adding or modifying tests
 - Understanding test conventions and patterns
+
+**Read `TUNING.md` when:**
+
+- The user wants dials/sliders/live controls to adjust a component
+- Applying values the user copied from the DialKit panel

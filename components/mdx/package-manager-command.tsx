@@ -1,15 +1,17 @@
 "use client";
 
 import type { ReactElement } from "react";
-import { useState } from "react";
 import {
   CodeBlock,
   CodeBlockHeader,
   CodeBlockPre,
   CodeBlockCode,
 } from "@/registry/default/code-block/code-block";
-
-type PackageManager = "npm" | "pnpm" | "yarn" | "bun";
+import {
+  PACKAGE_MANAGERS,
+  usePackageManager,
+  type PackageManager,
+} from "./use-package-manager";
 
 interface PackageManagerCommandProps {
   /** Pre-converted commands for each package manager */
@@ -22,22 +24,17 @@ export function PackageManagerCommand({
   commands,
   highlighted,
 }: PackageManagerCommandProps) {
-  const [packageManager, setPackageManager] = useState<PackageManager>("npm");
+  const [packageManager, setPackageManager] = usePackageManager();
 
   return (
-    <div className="not-prose my-4">
+    <div className="not-prose my-6">
       <CodeBlock
         code={commands[packageManager]}
         language="bash"
         initial={highlighted[packageManager]}
       >
         <CodeBlockHeader
-          tabs={[
-            { value: "npm", label: "npm" },
-            { value: "pnpm", label: "pnpm" },
-            { value: "yarn", label: "yarn" },
-            { value: "bun", label: "bun" },
-          ]}
+          tabs={PACKAGE_MANAGERS.map((pm) => ({ value: pm, label: pm }))}
           activeTab={packageManager}
           onTabChange={(value) => setPackageManager(value as PackageManager)}
         />

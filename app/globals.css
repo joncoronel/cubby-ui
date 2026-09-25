@@ -466,6 +466,7 @@ html {
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
   --font-rubik: var(--font-rubik);
+  --font-display: var(--font-display);
 
   /* Colors */
   --color-background: var(--background);
@@ -594,7 +595,7 @@ html {
   h4,
   h5,
   h6 {
-    font-family: var(--font-rubik);
+    font-family: var(--font-display);
   }
 
   code,

@@ -12,6 +12,7 @@ import { ApiProp, ApiPropsList } from "@/components/mdx/api-prop";
 import { SurfaceNestingDemo } from "@/components/mdx/surface-nesting-demo";
 import { SurfaceTokensDemo } from "@/components/mdx/surface-tokens-demo";
 import { SurfacePlayground } from "@/components/mdx/surface-playground";
+import { DocHeading } from "@/components/docs/doc-heading";
 import {
   Tabs,
   TabsList,
@@ -26,20 +27,17 @@ import {
   AccordionContent,
 } from "@/registry/default/accordion/accordion";
 
-// Notes/callouts authored as Markdown blockquotes. Fumadocs' default renders
-// them with a left side-stripe, italic text, and auto curly-quote marks — we
-// render a contained, upright callout instead. Fumadocs' prose rules use
-// zero-specificity `:where()`, so plain utility classes override them cleanly.
+// Notes authored as Markdown blockquotes render as a quiet, upright note.
 function Blockquote({ className, ...props }: ComponentProps<"blockquote">) {
+  return <blockquote className={cn("docs-note", className)} {...props} />;
+}
+
+// Tables scroll sideways on narrow screens instead of squeezing their columns.
+function Table(props: ComponentProps<"table">) {
   return (
-    <blockquote
-      className={cn(
-        "border-border bg-muted/60 text-foreground my-5 rounded-lg border px-4 py-3 text-sm leading-relaxed font-normal not-italic [quotes:none]",
-        "*:first:mt-0 *:last:mb-0",
-        className,
-      )}
-      {...props}
-    />
+    <div className="docs-table">
+      <table {...props} />
+    </div>
   );
 }
 
@@ -49,6 +47,12 @@ export function getMDXComponents(
   return {
     ...defaultComponents,
     ...components,
+    h2: (props: ComponentProps<"h2">) => <DocHeading as="h2" {...props} />,
+    h3: (props: ComponentProps<"h3">) => <DocHeading as="h3" {...props} />,
+    h4: (props: ComponentProps<"h4">) => <DocHeading as="h4" {...props} />,
+    h5: (props: ComponentProps<"h5">) => <DocHeading as="h5" {...props} />,
+    h6: (props: ComponentProps<"h6">) => <DocHeading as="h6" {...props} />,
+    table: Table,
     blockquote: Blockquote,
     pre: MdxPreServer as unknown as NonNullable<MDXComponents["pre"]>,
     Tabs,

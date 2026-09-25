@@ -1,17 +1,16 @@
-import { DocsLayout } from "fumadocs-ui/layouts/notebook";
-import { baseOptions } from "@/lib/layout.shared";
-import { source } from "@/lib/source";
+import { DocsHeader } from "@/components/docs/docs-header";
+import { getShelfGroups } from "@/lib/docs-nav";
+import "./docs.css";
 
 export default function Layout({ children }: LayoutProps<"/docs">) {
-  const { nav, ...base } = baseOptions;
+  const groups = getShelfGroups();
+
   return (
-    <DocsLayout
-      {...base}
-      nav={{ ...nav, mode: "top" }}
-      sidebar={{ prefetch: false }}
-      tree={source.pageTree}
-    >
-      {children}
-    </DocsLayout>
+    <div className="docs-root relative flex min-h-dvh flex-col">
+      <DocsHeader groups={groups} />
+      <main id="docs-main" className="relative flex-1">
+        {children}
+      </main>
+    </div>
   );
 }

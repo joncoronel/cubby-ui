@@ -26,7 +26,7 @@ export const NAV_ITEMS = [
 
 export const GITHUB_URL = "https://github.com/joncoronel/cubby-ui";
 
-function ThemeToggle() {
+export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
 
@@ -52,7 +52,7 @@ function ThemeToggle() {
   );
 }
 
-function SearchTrigger() {
+export function SearchTrigger() {
   const { setOpenSearch } = useSearchContext();
 
   return (
@@ -77,7 +77,7 @@ function SearchTrigger() {
   );
 }
 
-function GithubLink() {
+export function GithubLink() {
   return (
     <Button
       variant="ghost"

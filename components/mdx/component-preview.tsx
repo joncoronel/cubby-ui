@@ -1,19 +1,16 @@
 "use client";
+
+import * as React from "react";
 import type { ReactElement } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { SourceCodeIcon } from "@hugeicons/core-free-icons";
 import { componentMap } from "@/app/components/_generated/registry";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsPanels,
-  TabsContent,
-} from "@/registry/default/tabs/tabs";
 import {
   CodeBlock,
   CodeBlockPre,
   CodeBlockCode,
 } from "@/registry/default/code-block/code-block";
-import { solidSurface } from "@/registry/default/lib/elevated";
+import { MorphText } from "@/components/docs/morph-text";
 import { cn } from "@/lib/utils";
 
 interface ComponentPreviewProps {
@@ -25,71 +22,76 @@ interface ComponentPreviewProps {
   serverRenderedExample?: ReactElement;
 }
 
+// overflow-hidden: the button is pinned right, so it grows leftward while
+// torph lays the new label out rightward; clipping turns that brief overhang
+// into a reveal instead of letters spilling past the edge.
+const TOOL =
+  "docs-stage-tool overflow-hidden text-muted-foreground hover:text-foreground hover:bg-surface-hover focus-visible:outline-ring/50 flex h-7 items-center gap-1.5 rounded-md px-2 text-xs font-medium outline-none focus-visible:outline-2";
+
 export function ComponentPreview({
   code,
   language = "tsx",
-  className = "",
+  className,
   example,
   initialHighlighted,
   serverRenderedExample,
 }: ComponentPreviewProps) {
-  // Look up the example component from componentMap on the client
-  // (unless a server-rendered example is already provided)
+  const codeId = React.useId();
+  const [showCode, setShowCode] = React.useState(false);
+
+  // Look up the example on the client, unless the server already rendered it
+  // (async server-component examples).
   const ExampleComponent = example
     ? componentMap[example as keyof typeof componentMap]
     : null;
-
-  // Render the appropriate example:
-  // - serverRenderedExample: Already a ReactElement from server (for async components)
-  // - ExampleComponent: Client component function to instantiate
   const exampleNode =
     serverRenderedExample || (ExampleComponent && <ExampleComponent />);
 
-  // If no code is provided, just show the preview
-  if (!code) {
-    return (
-      <div className={`not-prose my-6 w-full max-w-full min-w-0 ${className}`}>
-        <div className={cn("rounded-md p-1", solidSurface(3, 1), "bg-muted")}>
-          <div className="bg-background flex min-h-[300px] items-center justify-center rounded-sm border p-8">
-            {exampleNode}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Show preview/code tabs using our custom Tabs component
   return (
-    <div className={`not-prose my-6 w-full max-w-full min-w-0 ${className}`}>
-      <Tabs defaultValue="preview">
-        <TabsList>
-          <TabsTrigger value="preview">Preview</TabsTrigger>
-          <TabsTrigger value="code">Code</TabsTrigger>
-        </TabsList>
-        <TabsPanels className="">
-          <TabsContent value="preview">
-            <div
-              className={cn("rounded-2xl p-1", solidSurface(3, 1), "bg-muted")}
+    <figure
+      data-slot="preview"
+      className={cn("docs-stage-wrap not-prose", className)}
+    >
+      <div className="docs-stage">
+        <div className="docs-stage-tools">
+          {code && (
+            <button
+              type="button"
+              className={TOOL}
+              aria-expanded={showCode}
+              aria-controls={codeId}
+              onClick={() => setShowCode((s) => !s)}
             >
-              <div className="bg-background flex min-h-[300px] items-center justify-center rounded-lg border p-8">
-                {exampleNode}
-              </div>
-            </div>
-          </TabsContent>
-          <TabsContent value="code">
-            <CodeBlock
-              code={code}
-              language={language}
-              floatingCopy
-              initial={initialHighlighted}
-            >
-              <CodeBlockPre>
-                <CodeBlockCode />
-              </CodeBlockPre>
-            </CodeBlock>
-          </TabsContent>
-        </TabsPanels>
-      </Tabs>
-    </div>
+              <HugeiconsIcon
+                icon={SourceCodeIcon}
+                strokeWidth={2}
+                className="size-3.5"
+              />
+              <MorphText feedback>{showCode ? "Hide code" : "Code"}</MorphText>
+            </button>
+          )}
+        </div>
+
+        <div className="docs-stage-canvas">{exampleNode}</div>
+      </div>
+
+      {/* Code appears in place, no height animation: revealing a long block
+          by animating layout is slow on heavy pages. */}
+      {code && (
+        <div id={codeId} hidden={!showCode} className="docs-code-reveal">
+          <CodeBlock
+            code={code}
+            language={language}
+            floatingCopy
+            initial={initialHighlighted}
+            className="mt-2"
+          >
+            <CodeBlockPre>
+              <CodeBlockCode />
+            </CodeBlockPre>
+          </CodeBlock>
+        </div>
+      )}
+    </figure>
   );
 }

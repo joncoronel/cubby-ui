@@ -10,6 +10,7 @@ import {
 } from "@/registry/default/dropdown-menu/dropdown-menu";
 
 import { HugeiconsIcon } from "@hugeicons/react";
+import { MorphText } from "@/components/docs/morph-text";
 import {
   ChatIcon,
   CheckIcon,
@@ -19,6 +20,67 @@ import {
 } from "@hugeicons/core-free-icons";
 const cache = new Map<string, string>();
 
+async function fetchMarkdown(url: string): Promise<string> {
+  const cached = cache.get(url);
+  if (cached) return cached;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Couldn't load ${url} (${res.status})`);
+  const content = await res.text();
+  cache.set(url, content);
+  return content;
+}
+
+/** Legacy copy path for browsers or webviews that deny the async clipboard. */
+function execCopy(text: string): boolean {
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    return document.execCommand("copy");
+  } finally {
+    textarea.remove();
+  }
+}
+
+async function copyText(text: string): Promise<void> {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    if (!execCopy(text)) throw new Error("Clipboard unavailable");
+  }
+}
+
+/**
+ * Copies text that is still loading. Safari (iOS included) only allows a
+ * clipboard write that starts synchronously inside the tap, so the write is
+ * started immediately with a promised ClipboardItem; other browsers resolve
+ * the text first and write it.
+ */
+async function copyPending(text: Promise<string>): Promise<void> {
+  if (typeof ClipboardItem !== "undefined" && navigator.clipboard?.write) {
+    try {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "text/plain": text.then(
+            (value) => new Blob([value], { type: "text/plain" }),
+          ),
+        }),
+      ]);
+      return;
+    } catch {
+      // Some Chromium versions reject promised ClipboardItems; fall back. If
+      // the fetch itself failed, the fallback rethrows it.
+    }
+  }
+  await copyText(await text);
+}
+
+type CopyState = "idle" | "loading" | "copied" | "failed";
+
 export function LLMCopyButton({
   markdownUrl,
 }: {
@@ -27,47 +89,65 @@ export function LLMCopyButton({
    */
   markdownUrl: string;
 }) {
-  const [isLoading, setLoading] = React.useState(false);
-  const [checked, setChecked] = React.useState(false);
+  const [state, setState] = React.useState<CopyState>("idle");
+  const resetRef = React.useRef<number | undefined>(undefined);
 
-  const handleCopy = async () => {
+  React.useEffect(() => () => window.clearTimeout(resetRef.current), []);
+
+  // Load the page's markdown while the browser is idle, so a tap can copy it
+  // synchronously: the most reliable path on mobile browsers and webviews.
+  React.useEffect(() => {
+    const load = () => void fetchMarkdown(markdownUrl).catch(() => {});
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(load, { timeout: 3000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(load, 1500);
+    return () => window.clearTimeout(id);
+  }, [markdownUrl]);
+
+  const settle = (next: CopyState) => {
+    setState(next);
+    window.clearTimeout(resetRef.current);
+    resetRef.current = window.setTimeout(() => setState("idle"), 2000);
+  };
+
+  // Not async: the clipboard write must begin inside the click itself.
+  const handleCopy = () => {
+    // One copy at a time: ignore taps while it's copying or showing the result.
+    if (state !== "idle") return;
     const cached = cache.get(markdownUrl);
-    if (cached) {
-      await navigator.clipboard.writeText(cached);
-      setChecked(true);
-      setTimeout(() => setChecked(false), 2000);
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const res = await fetch(markdownUrl);
-      const content = await res.text();
-      cache.set(markdownUrl, content);
-      await navigator.clipboard.writeText(content);
-      setChecked(true);
-      setTimeout(() => setChecked(false), 2000);
-    } finally {
-      setLoading(false);
-    }
+    setState("loading");
+    (cached ? copyText(cached) : copyPending(fetchMarkdown(markdownUrl))).then(
+      () => settle("copied"),
+      () => settle("failed"),
+    );
   };
 
   return (
     <Button
-      variant="outline"
+      variant="secondary"
       size="xs"
-      disabled={isLoading}
+      // Clip the label's brief overhang while it morphs (see MorphText).
+      className="overflow-hidden"
       onClick={handleCopy}
       leadingIcon={
-        checked ? (
+        state === "copied" ? (
           <HugeiconsIcon icon={CheckIcon} strokeWidth={2} />
         ) : (
           <HugeiconsIcon icon={Copy01Icon} strokeWidth={2} />
         )
       }
     >
-      Copy Markdown
+      <span aria-live="polite">
+        <MorphText feedback>
+          {state === "copied"
+            ? "Copied"
+            : state === "failed"
+              ? "Copy failed"
+              : "Copy page"}
+        </MorphText>
+      </span>
     </Button>
   );
 }
@@ -212,17 +292,17 @@ export function ViewOptions({
       <DropdownMenuTrigger
         render={
           <Button
-            variant="outline"
+            variant="secondary"
             size="xs"
             trailingIcon={
               <HugeiconsIcon icon={ChevronDownIcon} strokeWidth={2} />
             }
           >
-            Open
+            Open in
           </Button>
         }
       />
-      <DropdownMenuContent align="start">
+      <DropdownMenuContent align="end">
         {items.map((item) => (
           <DropdownMenuItem
             key={item.href}

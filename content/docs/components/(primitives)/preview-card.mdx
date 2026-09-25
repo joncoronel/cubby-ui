@@ -72,12 +72,24 @@ For the complete Base UI API, see the [Base UI PreviewCard documentation](https:
   Show or hide the arrow pointing to the trigger. Custom prop not available in Base UI.
 </ApiProp>
 
+<ApiProp name="side" fullType='"top" | "bottom" | "left" | "right" | "inline-start" | "inline-end"' simpleType="string" defaultValue='"bottom"'>
+  Which side of the trigger to place the preview card on. Flattened from Positioner for convenience.
+</ApiProp>
+
 <ApiProp name="align" fullType='"start" | "center" | "end"' simpleType="string">
   How to align the preview card. Flattened from Positioner for convenience.
 </ApiProp>
 
 <ApiProp name="sideOffset" fullType="number" simpleType="number">
   Distance in pixels for positioning. Flattened from Positioner for convenience.
+</ApiProp>
+
+<ApiProp name="alignOffset" fullType="number" simpleType="number" defaultValue="0">
+  Additional offset in pixels along the alignment axis. Flattened from Positioner for convenience.
+</ApiProp>
+
+<ApiProp name="positionMethod" fullType='"absolute" | "fixed"' simpleType="string" defaultValue='"absolute"'>
+  CSS position strategy for the card. Use `"fixed"` when the trigger is itself fixed (a floating rail or toolbar), so the card stays put while the page scrolls. Flattened from Positioner for convenience.
 </ApiProp>
 
 </ApiPropsList>

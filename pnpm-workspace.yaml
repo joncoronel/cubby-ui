@@ -1,6 +1,8 @@
 overrides:
   "@types/react": 19.2.7
   "@types/react-dom": 19.2.3
+  # One copy, so shiki's hast types and hast-util-to-jsx-runtime's agree.
+  "@types/hast": 3.0.5
 
 # pnpm 11 replaced onlyBuiltDependencies / ignoredBuiltDependencies with allowBuilds.
 # true  = allow the package to run install/build scripts

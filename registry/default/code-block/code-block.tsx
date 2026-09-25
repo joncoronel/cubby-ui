@@ -182,8 +182,9 @@ function CodeBlock({
       // bg-muted follows solidSurface to override its bg-surface-3.
       solidSurface(3, 1),
       "bg-muted",
-      // Restore top padding when there's no header.
-      "has-[[data-slot='code-block-pre']:first-child]:pt-1",
+      // No header: the tray has nothing to hold, so drop it and let the code
+      // card stand on its own.
+      "has-[[data-slot='code-block-pre']:first-child]:bg-transparent has-[[data-slot='code-block-pre']:first-child]:p-0 has-[[data-slot='code-block-pre']:first-child]:shadow-none",
       className,
     ),
     children: content,

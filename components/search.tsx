@@ -1,6 +1,8 @@
 "use client";
 
+import * as React from "react";
 import { useDocsSearch } from "fumadocs-core/search/client";
+import { staticClient } from "fumadocs-core/search/client/orama-static";
 import type { SortedResult } from "fumadocs-core/search";
 import { useI18n } from "fumadocs-ui/contexts/i18n";
 import { SharedProps } from "fumadocs-ui/contexts/search";
@@ -18,7 +20,6 @@ import {
 
 import { Kbd } from "@/registry/default/kbd/kbd";
 import { cn } from "@/lib/utils";
-import { create } from "@orama/orama";
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -68,22 +69,14 @@ function renderHighlightedContent(content: string): React.ReactNode {
   });
 }
 
-function initOrama() {
-  return create({
-    schema: { _: "string" },
-    language: "english",
-  });
-}
-
 export default function CustomSearchDialog({
   open,
   onOpenChange,
 }: SharedProps) {
   const { locale } = useI18n();
+  const client = React.useMemo(() => staticClient({ locale }), [locale]);
   const { search, setSearch, query } = useDocsSearch({
-    type: "static",
-    initOrama,
-    locale,
+    client,
     delayMs: 100,
   });
 

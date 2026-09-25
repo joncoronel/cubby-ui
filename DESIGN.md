@@ -1,0 +1,308 @@
+---
+name: Cubby UI
+description: Styled primitives, your code. A component library site built on a tinted OKLCH surface ladder, one blue accent, and Bricolage headings.
+colors:
+  primary: "oklch(0.6 0.2 250)"
+  primary-foreground: "oklch(1 0 0)"
+  ring: "oklch(0.55 0.2 250)"
+  foreground: "oklch(0.18 0.004 270)"
+  muted-foreground: "oklch(0.5 0.004 270)"
+  surface-1: "oklch(0.97 0 0)"
+  surface-2: "oklch(0.985 0 0)"
+  surface-3: "oklch(1 0 0)"
+  secondary: "oklch(0.92 0 0)"
+  secondary-foreground: "oklch(0.32 0.004 270)"
+  neutral: "oklch(0.21 0.004 270)"
+  neutral-foreground: "oklch(0.98 0.002 270)"
+  border: "color-mix(in oklab, oklch(0.18 0.004 270) 10%, transparent)"
+  destructive: "oklch(0.53 0.19 25)"
+  danger-foreground: "oklch(0.55 0.18 25)"
+  warning-foreground: "oklch(0.58 0.14 85)"
+  info-foreground: "oklch(0.45 0.2 250)"
+  success-foreground: "oklch(0.48 0.18 145)"
+  dark-surface-1: "oklch(0.205 0.004 270)"
+  dark-surface-3: "oklch(0.264 0.004 270)"
+  dark-foreground: "oklch(0.94 0.004 270)"
+  dark-muted-foreground: "oklch(0.73 0.004 270)"
+  dark-chrome: "oklch(0.159 0.004 270)"
+typography:
+  display:
+    fontFamily: "Bricolage Grotesque, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "2.75rem"
+    fontWeight: 600
+    lineHeight: 1.05
+    letterSpacing: "-0.03em"
+    fontVariation: "'opsz' auto"
+  headline:
+    fontFamily: "Bricolage Grotesque, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1.625rem"
+    fontWeight: 600
+    lineHeight: 1.2
+    letterSpacing: "-0.02em"
+  title:
+    fontFamily: "Bricolage Grotesque, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1.1875rem"
+    fontWeight: 600
+    lineHeight: 1.3
+    letterSpacing: "-0.01em"
+  lead:
+    fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1.125rem"
+    fontWeight: 400
+    lineHeight: 1.625
+  body:
+    fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1rem"
+    fontWeight: 400
+    lineHeight: 1.75
+  label:
+    fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "0.8125rem"
+    fontWeight: 500
+    lineHeight: 1.4
+  mono:
+    fontFamily: "Geist Mono, ui-monospace, monospace"
+    fontSize: "0.8125rem"
+    fontWeight: 400
+    lineHeight: 1.55
+rounded:
+  xs: "6px"
+  sm: "8px"
+  md: "10px"
+  lg: "12px"
+  xl: "14px"
+  2xl: "16px"
+  stage: "18px"
+  full: "999px"
+spacing:
+  flow: "1.25rem"
+  block: "2rem"
+  headline-above: "4rem"
+  title-above: "3rem"
+  heading-below: "0.875rem"
+  header-height: "3.5rem"
+  content: "48rem"
+  chrome-max: "76rem"
+components:
+  button-primary:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.primary-foreground}"
+    rounded: "{rounded.lg}"
+    padding: "0 14px"
+    height: "36px"
+  button-outline:
+    backgroundColor: "{colors.surface-3}"
+    textColor: "{colors.foreground}"
+    rounded: "{rounded.lg}"
+    padding: "0 14px"
+    height: "36px"
+  button-ghost:
+    textColor: "{colors.muted-foreground}"
+    rounded: "{rounded.lg}"
+    padding: "0 14px"
+    height: "36px"
+  button-neutral:
+    backgroundColor: "{colors.neutral}"
+    textColor: "{colors.neutral-foreground}"
+    rounded: "{rounded.lg}"
+    padding: "0 14px"
+    height: "36px"
+  shelf-link:
+    textColor: "{colors.muted-foreground}"
+    typography: "{typography.label}"
+    rounded: "{rounded.sm}"
+    padding: "0 8px"
+    height: "32px"
+  shelf-link-current:
+    textColor: "{colors.foreground}"
+    typography: "{typography.label}"
+    rounded: "{rounded.sm}"
+    padding: "0 8px"
+    height: "32px"
+  preview-stage:
+    backgroundColor: "{colors.surface-1}"
+    rounded: "{rounded.stage}"
+    padding: "52px 24px 40px"
+  docs-note:
+    textColor: "{colors.foreground}"
+    rounded: "{rounded.xl}"
+    padding: "14px 18px"
+---
+
+# Design System: Cubby UI
+
+## Overview
+
+**Creative North Star: "The Cubby Shelf"**
+
+A well-made wooden shelf of labeled cubbies: everything has a place, the place is marked with a hairline and a name, and nothing is shouting. The system is quiet on purpose. Tinted near-neutrals carry the page, one blue carries meaning, and the display type carries the voice. Depth comes from a measured surface ladder rather than from decoration, and structure is ruled with hairlines rather than boxed with cards.
+
+Density is calm and reading-first. Pages sit in one centered column with generous vertical rhythm; controls stay small, muted until touched, and brighten to full foreground on hover. Motion is a single settle curve (ease-out-expo) that opens slowly and closes quickly, and every motion collapses to a plain opacity change under reduced motion.
+
+Light and dark are both designed. Light keeps fills neutral and lets layered shadow carry elevation; dark steps lightness up a tinted ladder and adds a lit top rim. The home page adds one ornament, the cubby mark printed as a feathered dot-matrix field behind the hero; the docs surface carries the same mark as a four-cell glyph in its shelf trigger.
+
+**Key Characteristics:**
+- Neutrals tinted toward hue 270 at very low chroma (0.004, 0.002 near the extremes), tuned from three root variables.
+- One chromatic accent, the primary blue; status hues appear only on status plates.
+- Bricolage Grotesque (optical-size axis) for h1 to h3 and the wordmark; Geist for body and UI; Geist Mono for code.
+- An 8-rung surface ladder with matching shadow and rim recipes; state overlays are translucent deltas.
+- Hairline structure at 10% foreground; lighter 7% lines inside rows.
+- A near-black chrome surface, off the ladder, in both themes.
+
+## Colors
+
+A cool, faintly violet-tinted neutral stack with a single saturated blue, expressed entirely in OKLCH and color-mix so the whole palette retunes from a few roots.
+
+### Primary
+- **Cubby Blue** (`{colors.primary}`): primary buttons, focus ring (via `{colors.ring}` at 50 to 55% opacity), text selection (24% mix), caret, link-underline hover, the current-page mark in the shelf, and the first cell of the cubby glyph. In dark mode the soft variant label brightens it by mixing 30% white.
+
+### Neutral
+- **Ink** (`{colors.foreground}` / dark `{colors.dark-foreground}`): headings, active labels, current-page marks. Docs prose runs at 88% ink mixed into the page background, so body text sits one step below headings.
+- **Quiet Ink** (`{colors.muted-foreground}` / dark `{colors.dark-muted-foreground}`): descriptions, meta lines, idle controls, table headers, minimap labels.
+- **Page** (`{colors.surface-1}` / dark `{colors.dark-surface-1}`): the page background and every docs surface that should read as the page itself (header when scrolled, shelf panel, stage).
+- **Raised Paper** (`{colors.surface-2}`, `{colors.surface-3}` / dark `{colors.dark-surface-3}`): cards, popovers, default inputs, outline buttons. Light rungs 3 to 8 share one white and differ only in shadow; dark rungs climb in lightness from 0.205 to 0.402.
+- **Plate Gray** (`{colors.secondary}`, text `{colors.secondary-foreground}`): secondary and primary-soft button plates.
+- **Hairline** (`{colors.border}`): the default 1px rule, re-derived in dark from dark ink.
+- **Chrome Black** (`{colors.neutral}` light, `{colors.dark-chrome}` dark): persistent instrument chrome and the solid neutral button in light. Its foreground is `{colors.neutral-foreground}`; its muted text, hover, and border are 71%, 10%, and 12% mixes of that foreground.
+
+### Status
+- **Destructive** (`{colors.destructive}`): destructive button fills only.
+- **Danger / Warning / Info / Success** (`{colors.danger-foreground}`, `{colors.warning-foreground}`, `{colors.info-foreground}`, `{colors.success-foreground}`): text on their own pale plates (lightness 0.97 to 0.98, chroma 0.04 to 0.06) with a 0.9 to 0.92 border; dark inverts to 0.26 to 0.28 plates with 0.72 to 0.78 text. The docs "required" prop flag uses danger text with no plate.
+
+### Named Rules
+**The One Blue Rule.** Blue is the only chromatic accent outside status plates, and it means action, focus, or relation. The current location is marked in ink, never in blue; blue is reserved for what a thing is built on or what you can press.
+
+**The Mix-Not-Pick Rule.** New tints are derived, not picked: color-mix of ink or blue into transparent at the established steps (2.5%, 3.5%, 4%, 7%, 9%, 10%, 16%, 24%, 35%, 40%). A new hard-coded gray is a defect.
+
+**The Chrome Is Below Rule.** The chrome surface is near-black in both themes and sits off the ladder: in dark it goes below the page (0.159 against 0.205), because up is where cards live. Paint on it only through `data-surface="chrome"`, which re-points ink, muted, border, input, and hover tokens for the whole subtree.
+
+## Typography
+
+**Display Font:** Bricolage Grotesque, variable, with the `opsz` axis (with ui-sans-serif, system-ui)
+**Body Font:** Geist (with ui-sans-serif, system-ui)
+**Label/Mono Font:** Geist Mono for code, prop names, and types
+
+**Character:** Bricolage brings the warmth and a slightly wonky, printed confidence at large sizes, and optical sizing tightens it automatically as it grows. Geist keeps the reading and the controls neutral and precise underneath.
+
+### Hierarchy
+- **Display** (600, `{typography.display}`: 2.75rem desktop, 2.25rem mobile, line-height 1.05, -0.03em, balanced): page titles. The home hero uses the same cut at 2.5rem, 3rem, and 3.75rem across breakpoints, capped at 18ch.
+- **Headline** (600, 1.625rem, 1.2, -0.02em): docs h2 and section anchors.
+- **Title** (600, 1.1875rem, 1.3, -0.01em): docs h3. The footer's next/previous names use Bricolage at 1.25rem.
+- **Lead** (400, 1.125rem, 1.625, Quiet Ink): the description under a title, capped at 52ch on docs and 58ch on home.
+- **Body** (400, 1rem, 1.75): docs prose, column-capped at 48rem, `text-wrap: pretty`. h4 to h6 stay in Geist at 1rem, 600.
+- **Label** (500, 0.8125rem to 0.875rem): shelf links (0.875rem), minimap labels and table headers (0.8125rem), group labels and tool buttons (0.75rem, 500). Numbers are tabular.
+- **Mono** (Geist Mono, 0.8125rem; inline code at 0.84em on a 7% ink plate with a 0.35rem radius).
+
+### Named Rules
+**The Bricolage Rule.** The display face sets h1 to h3 and the wordmark, nothing smaller than about 1.05rem, and always in weight 600 with negative tracking. Body, labels, h4 and below are Geist.
+
+**The Two-Step Ink Rule.** Headings and strong text are full ink; running prose is 88% ink. The step is small and deliberate: it lets headings lead without enlarging them.
+
+## Layout
+
+One centered column. Everything, previews included, sits in one `{spacing.content}` (48rem) column; nothing breaks out wider, so every block shares both edges. Header and shelf content share a `{spacing.chrome-max}` (76rem) container with 1.25rem to 2rem side padding. The sticky header is `{spacing.header-height}` (56px) and scroll padding is 5rem.
+
+Vertical rhythm is set by the container, not the blocks: siblings flow at `{spacing.flow}`; any component block (preview, table, note) takes `{spacing.block}` above and below; h2 takes `{spacing.headline-above}` above, h3 `{spacing.title-above}`, h4 to h6 2.25rem; the gap after h2 and h3 is `{spacing.heading-below}`, after h4 0.5rem. The page footer sits 6rem below content. Lists indent 1.25rem with 0.375rem between items.
+
+The table of contents is a fixed tick minimap in the right margin at the xl breakpoint (hovering it opens the headings in a PreviewCard to its left); below that it lives in the header's section crumb. The shelf is a contents page: from lg up, a 10rem guides column, Primitives flowing down three text columns and Composables down two; below lg the groups stack, each flowing in two or three columns. Heading anchor glyphs hide below 40rem.
+
+The home page is a 64rem (max-w-5xl) viewport-height composition: centered hero stack with 1.5rem internal gaps, 3 to 3.5rem to the category tiles, a slim footer pinned to the bottom.
+
+## Elevation & Depth
+
+A hybrid: light mode keeps fills neutral and communicates elevation with layered shadow; dark mode steps lightness up the tinted ladder, adds an inset top-edge highlight and ring, and uses darker, tighter shadow alphas so wide layers stay visible. Every rung is one shadow token plus one rim token, combined as `--surface-shadow-combined-N`. State overlays (`--surface-hover` 6%, `--surface-active` 8%, `--surface-selected` 10%, black in light, white in dark) raise whatever they sit on by a fixed perceptual delta.
+
+### Shadow Vocabulary
+- **Hairline ring** (`box-shadow: 0 0 0 1px oklch(0 0 0 / 0.06)`, rung 1): flush containers that need an edge without lift; also the light chrome edge.
+- **Resting card** (rung 3: `0 0 0 1px oklch(0 0 0 / 0.06), 0 1px 1px -0.5px oklch(0 0 0 / 0.06), 0 3px 3px -1.5px oklch(0 0 0 / 0.05)`): cards and inputs at rest.
+- **Floating** (rungs 5 to 8, adding 12px, 24px, 48px, and 96px layers at 0.04 to 0.03 alpha): popovers, dialogs, menus.
+- **Docs float** (`0 0 0 1px var(--border), 0 16px 40px -12px oklch(0 0 0 / 0.14)`, dark 0.5): menus and the minimap's PreviewCard use the component's own surface. The shelf panel uses `0 1px 0 var(--border), 0 24px 48px -16px oklch(0 0 0 / 0.16)` (dark 0.5), dropping from the header edge.
+- **Dark chrome edge** (`0 0 0 1px oklch(0 0 0 / 0.7), inset 0 1px 0 0 oklch(1 0 0 / 0.065)`): defines the chrome fill against a dark page.
+- **Stage outline** (`0 0 0 1px var(--border)`): previews are drawn, not lifted.
+
+### Named Rules
+**The Ladder Rule.** Elevation is chosen from the ladder, never hand-written. A floating chrome surface is built from the near, mid, and far shadow alphas with no ladder ring, because rungs 3 to 8 carry their own ring.
+
+**The Drawn-Not-Lifted Rule.** Reading surfaces on docs (stage, note, tables, API rows, shelf index) sit flat on the page, defined by hairlines or a faint ink wash. Shadow appears only on things that float over content: the open shelf, the minimap card, menus.
+
+## Shapes
+
+Softly rounded, from a single root radius of 12px (`{rounded.lg}`) with 2px steps either side: 6, 8, 10, 12, 14, 16px. Buttons use 12px; shelf links 8px; compact buttons and menu rows 8 to 10px; notes 14px; the preview stage 18px, the largest radius, because it is the page's main object. Pills (999px) are reserved for the shelf trigger and step numbers. Small marks are nearly square: the current-page mark is a 6px square at 2px radius, minimap ticks are 2px bars.
+
+Structure is typographic: groups are set apart by space and a small label, not by boxes or rules. Disclosure is clipped, not scaled: the shelf opens with `clip-path: inset()` and revealed code simply appears in place with a 180ms fade; nothing animates layout height.
+
+## Components
+
+### Buttons
+Tactile and small. Paint lives on a `::before` layer so press can scale it without moving the label.
+- **Shape:** gently rounded (`{rounded.lg}`); xs and icon_xs sizes drop to 10px.
+- **Sizes:** default 36px tall desktop, 40px below sm (touch step); sm 32px, lg 40px, xs 28px; 14px inline padding.
+- **Primary:** `{colors.primary}` fill, white label. Hover mixes 5% black (light) or 10% white (dark); pressed goes one step further (8% / 14%).
+- **Outline:** card fill with a hairline border; **Ghost:** Quiet Ink label brightening to ink on a surface-hover wash; **Neutral:** the chrome-black fill that lightens on hover; **Primary-soft / Destructive-soft:** accent-colored label on the Plate Gray plate.
+- **Hover / Focus:** 100ms ease-out on color and fill; press scales the paint to 0.98; focus draws a 2px ring at 50% ring color, offset 2px.
+
+### Inputs / Fields
+- **Style:** opaque surface-3 fill tracking the ladder; inside cards and dialogs, a translucent elevated fill (black 8% light, white 9% dark).
+- **Focus:** the shared 2px half-strength ring; the caret is blue on docs.
+
+### Navigation
+- **Docs header:** 56px, transparent at rest; once scrolled, 84% page color with a 14px blur and a hairline underneath (300ms ease-out). While the shelf is open, header and panel become one opaque sheet.
+- **Shelf trigger:** a pill reading "Group / Page" with the four-cell cubby glyph (first cell blue, others at 32% ink) and a chevron that turns 180 degrees. Open state uses surface-selected; the glyph cells spread 0.75px apart.
+- **Section crumb:** a slash and the active section title, which morphs letter by letter when the section changes; it opens a menu of the page's headings.
+- **Home top nav:** the shared search trigger, theme toggle, and GitHub link, reused by the docs header.
+
+### The Cubby Shelf (signature)
+Every docs page, laid out like a contents page, dropping from the header. No boxes, no filter, no connecting lines: it is an index, read at a glance.
+- **Link:** 32px tall, 8px inline padding, 0.875rem Quiet Ink label. Hover: ink label on a surface-hover wash (8px radius). Focus: a 2px ring inset.
+- **Current page:** 500-weight ink label with a 6px blue mark that grows in and pushes the name over (300ms ease-out-expo).
+- **Keyboard:** opens with focus on the current page; up and down arrows walk the links in reading order; Escape closes and returns focus to the trigger.
+- **Motion:** the panel clip-reveals in 550ms ease-out-expo and closes in 260ms ease-in-cubic; the groups arrive as beats (guides, Primitives, Composables) rising 0.25rem, 80ms + 50ms apart. A scrim at 10% ink (45% black in dark) covers the page, which becomes inert.
+
+### Preview Stage
+- **Container:** page fill, 18px radius, 1px hairline ring, 16rem minimum height (12rem on mobile for the first stage), content centered with 52px top, 24px sides, 40px bottom padding.
+- **Tools:** a single Code toggle sits top-right as a 28px ghost button at 0.75rem. The code block appears directly below the stage with a 180ms fade and a 4px drop; closing is instant.
+
+### Install
+One code block with package-manager tabs; the choice is shared across the site and remembered. Manual steps appear the same way (instant, short fade) under a small chevron disclosure; steps are numbered 24px pills at 7% ink joined by a hairline.
+
+### API Props
+Quiet hairline rows on a subgrid: mono name in ink (0.8125rem, 500), type and default in Quiet Ink mono, a chevron that turns 90 degrees. Rows are separated by a 70% hairline; hover washes the row at 2.5% ink. The panel height-animates 300ms ease-out-expo and shows description, full type, and default.
+
+### Minimap (on this page)
+A column of 2px ticks in the right margin at xl: 24px for h2, 16px and 8px (indented) for deeper levels, at 16% ink; visible sections go to 40%, the active one to full ink. Hovering opens the headings in a PreviewCard to its left, vertically centered on the ticks and fixed-positioned so it never drifts on scroll; the ticks fade out while it is open. Clicking a heading scrolls smoothly (instant under reduced motion) and updates the URL. The active section is computed from scroll position once per frame (`HeadingsProvider` in `components/docs/use-headings.tsx`): the last heading above a reading line 25% down the viewport, or the last heading on screen at the very bottom. That keeps the minimap, header crumb and mobile pill in step even on fast scrolls, which an IntersectionObserver can skip.
+
+### Text Morph
+Any label that swaps in place morphs letter by letter with torph (`MorphText` in `components/docs/morph-text.tsx`, on torph's defaults: 400ms on `cubic-bezier(0.19, 1, 0.22, 1)`, which is our ease-out-expo; off under reduced motion). Labels that answer a click ("Copied", "Hide code") use `feedback`, which runs at 250ms; labels that change on their own stay at 400ms. Used for the shelf trigger's group and page name, the header section crumb, the mobile pill's section, "Copy page" to "Copied", and "Code" to "Hide code". Headings are flattened to plain text first. Responsive visibility classes go on a wrapper, because torph sets its root's display. Never put `truncate` on the morph itself: torph animates its width between the old and new text, so an ellipsis flashes mid-morph. Use `MorphText truncate`, which clips on a wrapper and fades the right edge only when the settled text doesn't fit. A button whose right edge is pinned (the stage's Code toggle, Copy page) clips with `overflow: hidden`: it grows leftward while torph lays the new label out rightward, so the brief overhang reads as a reveal instead of spilling past the edge.
+
+### Scrolling lists
+Popup lists that can outgrow the viewport (the minimap card, the mobile TOC list) scroll inside `ScrollArea` with `fadeEdges="y"` and contained overscroll, the max height set on its viewport.
+
+### Mobile TOC Pill
+Below md, the table of contents is a pill floating 1rem above the bottom edge (plus the iOS safe area; Android keeps 0 to avoid the fixed-overlay viewport bug). It appears once the title scrolls away (rises 1.5rem and fades, 350ms ease-out-expo) and hides while the shelf is open. It shows a 16px ring filling in Cubby Blue with reading progress, the current section name (morphs on change), and a chevron that turns when open. The pill takes its fill and shadow from the surface ladder (`solidSurface(3, 5)`: level-3 fill, level-5 shadow), like other floating controls; it presses to 97%. Tapping opens a Popover above it listing every heading (40px rows, current one on surface-selected), scrolled to the current section; choosing one scrolls there and closes.
+
+### Code Blocks
+A block with a header (package-manager or file tabs) sits in the muted tray; a block without one drops the tray entirely and shows only its code card.
+
+### Cards / Notes / Tables
+- **Note:** 14px radius, 4% ink wash, 14px by 18px padding, 0.9375rem at 1.65 line height, no border.
+- **Table:** 0.875rem tabular numerals; Quiet Ink 0.8125rem headers over a full hairline; rows split by 7% ink lines.
+- **Home category tiles** rest at ladder rung 3 (shadow plus rim) and lift on hover to rung 6 with a 4px rise.
+
+## Do's and Don'ts
+
+### Do:
+- **Do** retune neutrals through `--neutral-hue` (270), `--neutral-chroma` (0.004), and `--neutral-chroma-low` (0.002) rather than editing individual grays.
+- **Do** take elevation from the surface ladder (`--surface-N`, `--surface-shadow-combined-N`) and state from the translucent overlays (6%, 8%, 10%).
+- **Do** keep blue for action, focus, and relation; mark the current location in ink.
+- **Do** set h1 to h3 in Bricolage Grotesque at 600 with negative tracking, and everything else in Geist.
+- **Do** open with ease-out-expo (`cubic-bezier(0.19, 1, 0.22, 1)`) and close faster with ease-in-cubic (`cubic-bezier(0.55, 0.055, 0.675, 0.19)`); keep hovers at 150ms ease-out.
+- **Do** collapse every transform, clip, blur, and draw to opacity or nothing under `prefers-reduced-motion`.
+- **Do** design dark explicitly: re-declare derived tokens in `.dark` so they resolve against dark roots.
+
+### Don't:
+- **Don't** raise the chrome surface with a ladder rung or paint chrome controls by hand; use `data-surface="chrome"`.
+- **Don't** add a second accent hue outside status plates.
+- **Don't** use elastic or bouncy easing on controls.
+- **Don't** use neon glows, gradient meshes, or cool-AI dark-mode effects; the only gradients are the stage's 3.5% light and the feathered mask on the home dot field.
+- **Don't** use the reflex fonts PRODUCT.md bans (Inter, DM Sans, Plus Jakarta, Space Grotesk, Fraunces, Playfair, Cormorant, Instrument Serif, Crimson).
+- **Don't** box reading content in shadowed cards on docs; rule it with hairlines or a faint wash.

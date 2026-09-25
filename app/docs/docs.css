@@ -1,0 +1,741 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   Docs surface. Everything here is scoped under `.docs-*` class names so it
+   never reaches the homepage or the registry components.
+
+   Unlayered on purpose: it sits above Tailwind's utility layer, which lets the
+   prose rhythm below own the vertical spacing of MDX blocks (components ship
+   their own `my-*` classes, and in a grid those would otherwise stack).
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root:has(.docs-root) {
+  scrollbar-gutter: stable;
+  scroll-padding-top: 5rem;
+}
+
+.docs-root {
+  --docs-content: 48rem;
+  --docs-ease: cubic-bezier(0.19, 1, 0.22, 1);
+  --docs-ease-in: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  --docs-text: color-mix(in oklab, var(--foreground) 88%, var(--background));
+  --docs-tick: color-mix(in oklab, var(--foreground) 16%, transparent);
+}
+
+.docs-root ::selection {
+  background: color-mix(in oklab, var(--primary) 24%, transparent);
+}
+
+.docs-root input {
+  caret-color: var(--primary);
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+
+.docs-header {
+  background-color: transparent;
+  box-shadow: 0 1px 0 transparent;
+  transition:
+    background-color 0.3s ease-out,
+    box-shadow 0.3s ease-out,
+    backdrop-filter 0.3s ease-out;
+}
+
+.docs-header[data-scrolled] {
+  background-color: color-mix(in oklab, var(--background) 84%, transparent);
+  backdrop-filter: blur(14px) saturate(1.4);
+  box-shadow: 0 1px 0 var(--border);
+}
+
+/* While the shelf is open, header and panel read as one sheet. */
+:root[data-shelf-open] .docs-header {
+  background-color: var(--background);
+  backdrop-filter: none;
+  box-shadow: 0 1px 0 transparent;
+}
+
+.docs-shelf-trigger {
+  transition:
+    background-color 0.15s ease-out,
+    box-shadow 0.15s ease-out;
+}
+.docs-shelf-trigger:hover {
+  background-color: var(--surface-hover);
+}
+.docs-shelf-trigger[data-open] {
+  background-color: var(--surface-selected);
+}
+
+.docs-shelf-chevron {
+  transition: rotate 0.4s var(--docs-ease);
+}
+.docs-shelf-trigger[data-open] .docs-shelf-chevron {
+  rotate: 180deg;
+}
+
+/* The glyph's four cubbies spread apart as the shelf opens. */
+.docs-cubby-glyph rect {
+  fill: currentColor;
+  opacity: 0.32;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    translate 0.45s var(--docs-ease),
+    opacity 0.3s ease-out;
+}
+.docs-cubby-glyph rect:first-child {
+  fill: var(--primary);
+  opacity: 1;
+}
+.docs-shelf-trigger:hover .docs-cubby-glyph rect:not(:first-child) {
+  opacity: 0.5;
+}
+.docs-shelf-trigger[data-open] .docs-cubby-glyph rect:nth-child(1) {
+  translate: -0.75px -0.75px;
+}
+.docs-shelf-trigger[data-open] .docs-cubby-glyph rect:nth-child(2) {
+  translate: 0.75px -0.75px;
+}
+.docs-shelf-trigger[data-open] .docs-cubby-glyph rect:nth-child(3) {
+  translate: -0.75px 0.75px;
+}
+.docs-shelf-trigger[data-open] .docs-cubby-glyph rect:nth-child(4) {
+  translate: 0.75px 0.75px;
+}
+
+/* ── Shelf ──────────────────────────────────────────────────────────────── */
+
+.docs-shelf {
+  visibility: hidden;
+  pointer-events: none;
+  transition: visibility 0s linear 0.3s;
+}
+.docs-shelf[data-open] {
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+
+.docs-shelf-scrim {
+  background: color-mix(in oklab, var(--foreground) 10%, transparent);
+  opacity: 0;
+  transition: opacity 0.25s ease-out;
+}
+.dark .docs-shelf-scrim {
+  background: oklch(0 0 0 / 0.45);
+}
+.docs-shelf[data-open] .docs-shelf-scrim {
+  opacity: 1;
+  transition-duration: 0.4s;
+}
+
+.docs-shelf-panel {
+  max-height: 100%;
+  clip-path: inset(0 0 100% 0);
+  box-shadow:
+    0 1px 0 var(--border),
+    0 24px 48px -16px oklch(0 0 0 / 0.16);
+  transition: clip-path 0.26s var(--docs-ease-in);
+}
+.dark .docs-shelf-panel {
+  box-shadow:
+    0 1px 0 var(--border),
+    0 24px 48px -16px oklch(0 0 0 / 0.5);
+}
+.docs-shelf[data-open] .docs-shelf-panel {
+  /* Negative bottom inset lets the drop shadow show below the panel. */
+  clip-path: inset(0 0 -4rem 0);
+  transition: clip-path 0.55s var(--docs-ease);
+}
+
+/* Groups arrive as three quiet beats rather than one cell at a time. */
+.docs-shelf-group {
+  opacity: 0;
+  translate: 0 -0.25rem;
+  transition:
+    opacity 0.15s ease-out,
+    translate 0.15s ease-out;
+}
+.docs-shelf[data-open] .docs-shelf-group {
+  opacity: 1;
+  translate: 0 0;
+  transition:
+    opacity 0.4s ease-out,
+    translate 0.5s var(--docs-ease);
+  transition-delay: calc(80ms + var(--g, 0) * 50ms);
+}
+
+.docs-shelf-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 2rem;
+  margin-inline: -0.5rem;
+  padding-inline: 0.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  outline: none;
+  transition:
+    color 0.15s ease-out,
+    background-color 0.15s ease-out;
+}
+.docs-shelf-link:hover {
+  color: var(--foreground);
+  background-color: var(--surface-hover);
+}
+.docs-shelf-link:focus-visible {
+  color: var(--foreground);
+  outline: 2px solid color-mix(in oklab, var(--ring) 55%, transparent);
+  outline-offset: -2px;
+}
+.docs-shelf-link[aria-current="page"] {
+  color: var(--foreground);
+  font-weight: 500;
+}
+
+/* The current page gets a small cubby mark that pushes its name over. */
+.docs-shelf-mark {
+  flex-shrink: 0;
+  width: 0;
+  height: 0.375rem;
+  margin-right: 0;
+  border-radius: 2px;
+  background: var(--primary);
+  scale: 0;
+  transition:
+    width 0.3s var(--docs-ease),
+    margin 0.3s var(--docs-ease),
+    scale 0.3s var(--docs-ease);
+}
+.docs-shelf-link[aria-current="page"] .docs-shelf-mark {
+  width: 0.375rem;
+  margin-right: 0.5rem;
+  scale: 1;
+}
+
+/* ── Small motion vocabulary ────────────────────────────────────────────── */
+
+@keyframes docs-enter {
+  from {
+    opacity: 0;
+    translate: 0 0.5rem;
+    filter: blur(3px);
+  }
+}
+.docs-enter {
+  animation: docs-enter 0.6s var(--docs-ease) both;
+  animation-delay: var(--enter-delay, 0ms);
+}
+
+@keyframes docs-fade-in {
+  from {
+    opacity: 0;
+    translate: 0 -0.25rem;
+  }
+}
+
+/* ── Page column ────────────────────────────────────────────────────────── */
+
+.docs-col {
+  width: min(var(--docs-content), 100%);
+  margin-inline: auto;
+}
+
+.docs-prose {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  max-width: var(--docs-content);
+  margin-inline: auto;
+  color: var(--docs-text);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.docs-prose > * {
+  margin-block: 0;
+  min-width: 0;
+}
+
+/* Vertical rhythm: prose flows at 1.25rem, blocks breathe at 2rem, headings
+   take more space above than below. */
+.docs-prose > * + * {
+  margin-top: 1.25rem;
+}
+/* :where() keeps these at the same weight as the flow rule, so the heading
+   rules below still win when a heading follows a block. */
+.docs-prose > :where(.not-prose, .docs-table, .docs-note) + *,
+.docs-prose > * + :where(.not-prose, .docs-table, .docs-note) {
+  margin-top: 2rem;
+}
+.docs-prose > h2 {
+  margin-top: 4rem;
+}
+.docs-prose > h3 {
+  margin-top: 3rem;
+}
+.docs-prose > :is(h4, h5, h6) {
+  margin-top: 2.25rem;
+}
+.docs-prose > :first-child {
+  margin-top: 0;
+}
+.docs-prose > h2 + *,
+.docs-prose > h3 + * {
+  margin-top: 0.875rem;
+}
+.docs-prose > :is(h4, h5, h6) + * {
+  margin-top: 0.5rem;
+}
+.docs-prose > :is(h2, h3, h4) + .not-prose {
+  margin-top: 1.25rem;
+}
+
+/* The first preview is the page's stage: its heading is announced but not
+   shown, and the stage gets more room. */
+.docs-prose > h2#preview {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.docs-prose > h2#preview + * {
+  margin-top: 0;
+}
+.docs-prose > h2#preview + .docs-stage-wrap {
+  margin-top: 2rem;
+}
+.docs-prose > h2#preview:first-child + .docs-stage-wrap {
+  margin-top: 0.5rem;
+}
+
+/* ── Type ───────────────────────────────────────────────────────────────── */
+
+.docs-prose > :is(h2, h3, h4, h5, h6) {
+  color: var(--foreground);
+  text-wrap: balance;
+}
+.docs-prose > h2 {
+  font-family: var(--font-display);
+  font-size: 1.625rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.docs-prose > h3 {
+  font-family: var(--font-display);
+  font-size: 1.1875rem;
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.docs-prose > :is(h4, h5, h6) {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.docs-heading {
+  scroll-margin-top: 5rem;
+}
+.docs-heading-link {
+  position: relative;
+  color: inherit;
+  text-decoration: none;
+}
+.docs-heading-hash {
+  position: absolute;
+  top: 0;
+  right: 100%;
+  padding-right: 0.4em;
+  color: var(--muted-foreground);
+  font-weight: 400;
+  opacity: 0;
+  translate: 0.2em 0;
+  transition:
+    opacity 0.2s ease-out,
+    translate 0.3s var(--docs-ease);
+}
+.docs-heading-link:hover .docs-heading-hash,
+.docs-heading-link:focus-visible .docs-heading-hash {
+  opacity: 1;
+  translate: 0 0;
+}
+@media (max-width: 40rem) {
+  .docs-heading-hash {
+    display: none;
+  }
+}
+
+.docs-prose > p,
+.docs-prose li {
+  text-wrap: pretty;
+}
+
+.docs-prose strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+/* Prose-only rules skip anything inside a component (`.not-prose`). */
+.docs-prose :is(p, li, td, .docs-note) a:not(.not-prose *) {
+  color: var(--foreground);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, var(--foreground) 25%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
+  transition: text-decoration-color 0.15s ease-out;
+}
+.docs-prose :is(p, li, td, .docs-note) a:not(.not-prose *):hover {
+  text-decoration-color: var(--primary);
+}
+
+.docs-prose :is(p, li, td, th, h2, h3, h4, .docs-note) code:not(.not-prose *) {
+  font-family: var(--font-mono);
+  font-size: 0.84em;
+  padding: 0.12em 0.36em;
+  border-radius: 0.35rem;
+  background: color-mix(in oklab, var(--foreground) 7%, transparent);
+  color: var(--foreground);
+  overflow-wrap: anywhere;
+}
+
+.docs-prose > :is(ul, ol) {
+  padding-left: 1.25rem;
+}
+.docs-prose > ul {
+  list-style: disc;
+}
+.docs-prose > ol {
+  list-style: decimal;
+}
+.docs-prose > :is(ul, ol) li::marker {
+  color: color-mix(in oklab, var(--foreground) 35%, transparent);
+}
+.docs-prose > :is(ul, ol) li + li {
+  margin-top: 0.375rem;
+}
+.docs-prose li > :is(ul, ol) {
+  margin-top: 0.375rem;
+  padding-left: 1.25rem;
+  list-style: circle;
+}
+
+.docs-prose > hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin-block: 3rem;
+}
+
+.docs-note {
+  padding: 0.875rem 1.125rem;
+  border-radius: 0.875rem;
+  background: color-mix(in oklab, var(--foreground) 4%, transparent);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  font-style: normal;
+  quotes: none;
+}
+.docs-note > * + * {
+  margin-top: 0.625rem;
+}
+
+.docs-table {
+  overflow-x: auto;
+}
+.docs-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+}
+.docs-table th {
+  text-align: left;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+  padding: 0 1rem 0.625rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.docs-table td {
+  padding: 0.625rem 1rem 0.625rem 0;
+  border-bottom: 1px solid color-mix(in oklab, var(--foreground) 7%, transparent);
+  vertical-align: top;
+}
+.docs-table td:first-child {
+  white-space: nowrap;
+}
+
+/* ── Stage (live previews) ──────────────────────────────────────────────── */
+
+.docs-stage {
+  position: relative;
+  display: flex;
+  min-height: 16rem;
+  border-radius: 1.125rem;
+  background-color: var(--background);
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+/* Examples are authored at fixed widths, but the stage is narrower than
+   some of them (always, on phones). The example shrinks to fit when it can;
+   when it can't, `safe` centering starts it at the left edge and the stage
+   scrolls sideways instead of spilling past both edges. */
+.docs-stage-canvas {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  justify-content: safe center;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  padding: 3.25rem 1rem 2.5rem;
+}
+.docs-stage-canvas > * {
+  max-width: 100%;
+}
+@media (min-width: 40rem) {
+  .docs-stage-canvas {
+    padding-inline: 1.5rem;
+  }
+}
+
+/* The page's first stage is a little taller on wide screens. */
+.docs-prose > h2#preview + .docs-stage-wrap .docs-stage {
+  min-height: 12rem;
+}
+@media (min-width: 40rem) {
+  .docs-prose > h2#preview + .docs-stage-wrap .docs-stage {
+    min-height: 16rem;
+  }
+}
+
+/* Install follows the first stage closely: they are one "grab it" unit. */
+.docs-prose > h2#preview + .docs-stage-wrap + h2 {
+  margin-top: 2.5rem;
+}
+
+.docs-stage-tools {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 2;
+  display: flex;
+  gap: 0.125rem;
+}
+
+.docs-stage-tool {
+  transition:
+    color 0.15s ease-out,
+    background-color 0.15s ease-out;
+}
+.docs-stage-tool[aria-expanded="true"] {
+  color: var(--foreground);
+  background-color: var(--surface-selected);
+}
+
+/* Revealed code appears in place with a short fade: no layout animation. */
+.docs-code-reveal:not([hidden]) {
+  animation: docs-fade-in 0.18s ease-out;
+}
+
+.docs-disclosure-chevron {
+  transition: rotate 0.4s var(--docs-ease);
+}
+.docs-disclosure[aria-expanded="true"] .docs-disclosure-chevron {
+  rotate: 90deg;
+}
+
+/* Numbered manual-install steps. The number sits on a hairline that runs
+   down to the next step. */
+.docs-steps {
+  counter-reset: docs-step;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.docs-steps > li {
+  counter-increment: docs-step;
+  position: relative;
+  padding-left: 2.25rem;
+}
+.docs-steps > li::before {
+  content: counter(docs-step);
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--foreground) 7%, transparent);
+  color: var(--foreground);
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.docs-steps > li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 2rem;
+  bottom: -1rem;
+  left: 0.75rem;
+  width: 1px;
+  background: var(--border);
+}
+.docs-step-title {
+  margin-bottom: 0.625rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.5rem;
+  color: var(--foreground);
+}
+
+.docs-prop-trigger {
+  transition: background-color 0.15s ease-out;
+}
+.docs-prop-trigger:hover {
+  background-color: color-mix(in oklab, var(--foreground) 2.5%, transparent);
+}
+
+/* ── Minimap (on this page) ───────────────────────────────────────────── */
+
+.docs-minimap {
+  transition: opacity 0.2s ease-out;
+}
+.docs-minimap[data-popup-open] {
+  opacity: 0;
+}
+
+.docs-minimap-tick {
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 2px;
+  border-radius: 1px;
+  background-color: var(--docs-tick);
+  /* No transition: the ticks track the scroll position, and any fade makes
+     them trail behind a fast scroll. */
+}
+.docs-minimap-tick[data-depth="3"] {
+  width: 1rem;
+  margin-left: 0.5rem;
+}
+.docs-minimap-tick[data-depth="4"] {
+  width: 0.5rem;
+  margin-left: 1rem;
+}
+.docs-minimap-tick[data-visible] {
+  background-color: color-mix(in oklab, var(--foreground) 40%, transparent);
+}
+.docs-minimap-tick[data-active] {
+  background-color: var(--foreground);
+}
+
+/* ── Text morph clipping ─────────────────────────────────────────────── */
+
+/* Clips a morphing label without an ellipsis (see MorphText); fades the edge
+   only when the settled text is too long to fit. */
+.docs-morph-clip {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.docs-morph-clip[data-overflowing] {
+  mask-image: linear-gradient(to right, #000 calc(100% - 1.5rem), transparent);
+}
+
+/* ── Mobile TOC pill ─────────────────────────────────────────────────── */
+
+/* iOS only: Android Chrome desyncs the layout viewport when env() is used on
+   a fixed overlay, so the safe-area inset stays 0 everywhere else. */
+.docs-toc-pill-wrap {
+  --safe-bottom: 0px;
+  bottom: calc(1rem + var(--safe-bottom));
+  opacity: 0;
+  translate: 0 1.5rem;
+  pointer-events: none;
+  transition:
+    opacity 0.2s ease-out,
+    translate 0.35s var(--docs-ease);
+}
+@supports (-webkit-touch-callout: none) {
+  .docs-toc-pill-wrap {
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+.docs-toc-pill-wrap[data-visible] {
+  opacity: 1;
+  translate: 0 0;
+}
+.docs-toc-pill-wrap[data-visible] > * {
+  pointer-events: auto;
+}
+:root[data-shelf-open] .docs-toc-pill-wrap {
+  opacity: 0;
+  translate: 0 1.5rem;
+}
+
+/* Fill and shadow come from the surface ladder (solidSurface 3, shadow 5). */
+.docs-toc-pill {
+  transition: scale 0.15s ease-out;
+}
+.docs-toc-pill:active {
+  scale: 0.97;
+}
+
+.docs-toc-pill-chevron {
+  transition: rotate 0.35s var(--docs-ease);
+}
+.docs-toc-pill[data-popup-open] .docs-toc-pill-chevron {
+  rotate: 180deg;
+}
+
+.docs-ring-track,
+.docs-ring-fill {
+  fill: none;
+  stroke-width: 2;
+}
+.docs-ring-track {
+  stroke: color-mix(in oklab, var(--foreground) 14%, transparent);
+}
+.docs-ring-fill {
+  stroke: var(--primary);
+  stroke-linecap: round;
+}
+
+/* ── Reduced motion ─────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .docs-enter,
+  .docs-code-reveal:not([hidden]) {
+    animation: none;
+  }
+  .docs-shelf-panel,
+  .docs-shelf[data-open] .docs-shelf-panel {
+    clip-path: none;
+    transition: none;
+  }
+  .docs-shelf-group,
+  .docs-shelf[data-open] .docs-shelf-group {
+    translate: none;
+    transition: opacity 0.15s ease-out;
+    transition-delay: 0s;
+  }
+  .docs-toc-pill-wrap {
+    translate: none;
+  }
+  .docs-toc-pill,
+  .docs-toc-pill-chevron,
+  .docs-minimap,
+  .docs-shelf-mark,
+  .docs-cubby-glyph rect,
+  .docs-shelf-chevron,
+  .docs-disclosure-chevron {
+    transition-duration: 0s;
+  }
+}

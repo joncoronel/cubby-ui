@@ -515,7 +515,8 @@ function* morphTo(
   // wraps keeps its lines as they fall. An empty value has no line box at
   // all; it counts as one line.
   // `box` below means that: the label's space eases as one box.
-  const box = !reduced && linesBefore <= 1 && root.getClientRects().length <= 1;
+  const oneLine = root.getClientRects().length <= 1;
+  const box = !reduced && linesBefore <= 1 && oneLine;
   // And the rest of the final layout, with the start margin the author set.
   const rootAfter = root.getBoundingClientRect();
   const startAfter = parseFloat(getComputedStyle(root).marginInlineStart) || 0;
@@ -637,7 +638,9 @@ function* morphTo(
   yield;
 
   // 7. Read: where the label begins there, which the stage rides against.
-  const rootAt0 = resizes ? root.getBoundingClientRect() : rootAfter;
+  // Read even when it doesn't resize: a neighbour changing in the same
+  // update may be easing its own space, which moves this label too.
+  const rootAt0 = oneLine ? root.getBoundingClientRect() : rootAfter;
   yield;
 
   // 8. Write: everything else, attributes and styles only. Nothing below
@@ -687,14 +690,18 @@ function* morphTo(
       if (root.dataset.sizing === sizing) delete root.dataset.sizing;
     };
     ease.finished.then(release, release);
+  }
 
-    // The label's start moves while its space eases (its own margin, and a
-    // centred or pinned container around it); ride the other way on the
-    // same curve, so the glyphs hold their final place.
-    const ride = rootAfter.left - rootAt0.left;
-    if (Math.abs(ride) > 0.5) {
-      run(stage, [{ left: `${ride}px` }, { left: "0px" }], resize);
-    }
+  // The label's start moves while space eases (its own margin, a centred or
+  // pinned container around it, or a neighbour changing in the same update
+  // easing its space); ride the other way on the width's curve, so the
+  // glyphs and ghosts hold the final places they were measured at.
+  const ride = rootAfter.left - rootAt0.left;
+  if (Math.abs(ride) > 0.5) {
+    run(stage, [{ left: `${ride}px` }, { left: "0px" }], {
+      duration: o.width.duration,
+      easing: o.width.easing,
+    });
   }
 
   const motion = { duration: o.motion.duration, easing: o.motion.easing };

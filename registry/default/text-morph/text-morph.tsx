@@ -49,7 +49,10 @@ import "./text-morph.css";
  * travel to their new places across them.
  *
  * Leaving glyphs (ghosts) sit in a layer measured and sized each change,
- * each in a slot at its own line that fades it out above and below.
+ * each in a slot at its own line that fades it out above and below. A new
+ * glyph landing where its own text is still leaving takes that ghost back.
+ * The slots fade only while a change plays (`data-playing`); at rest they're
+ * inert wrappers.
  */
 
 /** Escapes text for use as element content (never in an attribute). */
@@ -91,10 +94,11 @@ const spaceNode = (node: HTMLElement): boolean =>
 
 /**
  * Lay glyphs out as words, the same structure the server renders, each
- * glyph in a slot: room above and below its line that fades it out, taking
- * no space of its own. A glyph that travels turns its slot's fade off
- * (`data-travel`) only when it moves to another line; one that slides along
- * its line keeps the fade and gets room beside it for the slide (`--reach`).
+ * glyph in a slot: room above and below its line that fades it out while a
+ * change plays, taking no space of its own. A glyph that travels turns its
+ * slot's fade off (`data-travel`) only when it moves to another line; one
+ * that slides along its line keeps the fade and gets room beside it for the
+ * slide (`--reach`).
  */
 function layOut(layer: HTMLElement, nodes: HTMLElement[]): void {
   const parts: HTMLElement[] = [];
@@ -351,6 +355,9 @@ type MorphJob = {
 
 const queue: MorphJob[] = [];
 
+/** A leaving glyph's animations, so a change that brings it back can stop them. */
+const ghostAnimations = new WeakMap<HTMLElement, Animation[]>();
+
 /** Tags a label's current resize, so an older one can't release it. */
 let sizings = 0;
 
@@ -420,11 +427,12 @@ function* morphTo(
       return false;
     },
   );
-  const ghostRects = slots.flatMap((slot) =>
-    slot.firstElementChild
-      ? [slot.firstElementChild.getBoundingClientRect()]
-      : [],
-  );
+  const ghosts = slots.flatMap((slot) => {
+    const node = slot.firstElementChild;
+    return node instanceof HTMLElement
+      ? [{ slot, node, drawn: visualState(node) }]
+      : [];
+  });
 
   // 2. New glyph list.
   const match = matchText(
@@ -480,6 +488,8 @@ function* morphTo(
   // Free to wrap again, so step 5 sees how the new value falls.
   delete root.dataset.sizing;
   for (const slot of gone) slot.remove();
+  // The slots fade from step 8 on, while this change plays.
+  delete glyphLayer.dataset.playing;
   if (play === "none") {
     // Swapped without a change to watch: an earlier change's ghosts and
     // edge fade go too (their animations were stopped in step 2).
@@ -536,6 +546,34 @@ function* morphTo(
   const letter = nodes.findIndex((node) => !spaceNode(node));
   const line = letter === -1 ? em * 1.2 : after[letter].height;
 
+  // A new glyph whose text is still leaving from where it lands (a quick
+  // 5 -> 6 -> 5) takes that ghost back rather than crossing it: the ghost
+  // turns around from wherever it's drawn, like a kept glyph. Where a ghost
+  // sat in the layout is its slot's place, which holds still on screen.
+  const reclaimed: { index: number; slot: HTMLElement; node: HTMLElement }[] =
+    [];
+  const claimed = new Set<HTMLElement>();
+  nodes.forEach((node, i) => {
+    if (kept[i] || spaceNode(node)) return;
+    const target = after[i];
+    const ghost = ghosts.find(
+      (g) =>
+        !claimed.has(g.slot) &&
+        g.node.textContent === next[i] &&
+        Math.abs(originBefore.left + px(g.slot, "--x") - target.left) <
+          target.width / 2 &&
+        Math.abs(originBefore.top + px(g.slot, "--y") - target.top) <
+          SLOT_PAD_Y * em,
+    );
+    if (!ghost) return;
+    claimed.add(ghost.slot);
+    reclaimed.push({ index: i, slot: ghost.slot, node: ghost.node });
+    before.set(ghost.node, ghost.drawn);
+    const slide = Math.abs(centreDelta(ghost.drawn.rect, target)[0]);
+    if (slide > 0.5) reach.push([ghost.node, Math.ceil(slide)]);
+  });
+  const staying = ghosts.filter((g) => !claimed.has(g.slot));
+
   // Ghost coordinates start at the layer's place in the flow, which holds
   // still on screen for the whole change, so earlier ghosts shift by however
   // far it moved, and hold theirs (placed in step 8).
@@ -549,7 +587,7 @@ function* morphTo(
   const finalStart = rootAfter.left - origin.left;
   const finalEnd = rootAfter.right - origin.left;
   const inkRects = [
-    ...ghostRects,
+    ...staying.map((g) => g.drawn.rect),
     ...leaving.flatMap(({ node }) => {
       const rect = before.get(node)?.rect;
       return rect ? [rect] : [];
@@ -605,7 +643,18 @@ function* morphTo(
   // 8. Write: everything else, attributes and styles only. Nothing below
   // reads layout or changes the DOM's structure.
   root.style.marginInlineStart = authorStart;
-  for (const slot of slots) {
+  glyphLayer.dataset.playing = "";
+  // Reclaimed ghosts take their new glyph's place, which measured the same.
+  for (const { index, slot, node } of reclaimed) {
+    for (const animation of ghostAnimations.get(node) ?? []) {
+      animation.cancel();
+    }
+    nodes[index].replaceWith(node);
+    nodes[index] = node;
+    kept[index] = node;
+    slot.remove();
+  }
+  for (const { slot } of staying) {
     placeSlot(slot, px(slot, "--x") + shiftX, px(slot, "--y") + shiftY);
   }
   for (const node of changesLine) {
@@ -732,7 +781,10 @@ function* morphTo(
 
   // Size the layer around every slot (a mask cuts whatever falls outside
   // its element) and, when the edge fade is armed, the band's reach.
-  const allSlots = [...slots, ...newSlots.map((s) => s.slot)];
+  const allSlots = [
+    ...staying.map((g) => g.slot),
+    ...newSlots.map((s) => s.slot),
+  ];
   if (allSlots.length === 0) {
     resetLayer(ghostLayer);
     return started;
@@ -825,6 +877,7 @@ function* morphTo(
         fill: "both",
       },
     );
+    ghostAnimations.set(node, [move, out]);
     // A ghost that has left stays in place, invisible, until the last one
     // has: removing them together is one change to the DOM's structure (one
     // restyle) instead of one per ghost.
@@ -1019,6 +1072,7 @@ export function TextMorph({
       done: (started) => {
         if (over || !mounted.current) return;
         if (started.length === 0) {
+          delete glyphs.dataset.playing;
           over = true;
           if (inFlight.current === cancel) inFlight.current = null;
           latest.current.onAnimationComplete?.();
@@ -1029,6 +1083,7 @@ export function TextMorph({
           if (over || !mounted.current) return;
           over = true;
           if (inFlight.current === cancel) inFlight.current = null;
+          delete glyphs.dataset.playing;
           latest.current.onAnimationComplete?.();
         });
       },

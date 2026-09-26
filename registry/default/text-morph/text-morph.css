@@ -44,19 +44,21 @@
   position: relative;
 }
 
-/* Each glyph sits in a slot with room above and below its line, faded at
-   the edges, and room beside it for tilt, scale and blur, plus the length
-   of any slide along the line (--reach). Negative margins hand the room
-   back, so the slot takes no space. A mask cuts whatever falls outside its
-   element, so a glyph moving to another line turns it off. */
+/* Each glyph sits in a slot with room above and below its line and room
+   beside it for tilt, scale and blur, plus the length of any slide along
+   the line (--reach). Negative margins hand the room back, so the slot
+   takes no space. While a change plays (data-playing) the slot fades its
+   glyph out above and below; at rest it doesn't, so no masks stay on the
+   page. Toggling an attribute costs a scoped restyle, where adding or
+   removing the slots restyles the page. A mask cuts whatever falls outside
+   its element, so a glyph moving to another line turns it off. */
 .text-morph-slot {
   display: inline-block;
   padding: 0.3em calc(0.5em + var(--reach, 0px));
   margin: -0.3em calc(-0.5em - var(--reach, 0px));
-  mask-image: var(--text-morph-fade-y);
 }
-.text-morph-slot[data-travel] {
-  mask-image: none;
+.text-morph-glyphs[data-playing] .text-morph-slot:not([data-travel]) {
+  mask-image: var(--text-morph-fade-y);
 }
 
 /* A word never breaks; lines break at the spaces between words. */

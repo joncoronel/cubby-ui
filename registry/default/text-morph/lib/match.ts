@@ -43,9 +43,51 @@ export type MatchOptions = {
 
 type NumberToken = { start: number; end: number };
 
+const graphemeSegmenter =
+  typeof Intl !== "undefined" && "Segmenter" in Intl
+    ? new Intl.Segmenter(undefined, { granularity: "grapheme" })
+    : null;
+const wordSegmenter =
+  typeof Intl !== "undefined" && "Segmenter" in Intl
+    ? new Intl.Segmenter(undefined, { granularity: "word" })
+    : null;
+
+function graphemes(text: string): string[] {
+  return graphemeSegmenter
+    ? Array.from(graphemeSegmenter.segment(text), (s) => s.segment)
+    : Array.from(text);
+}
+
+/**
+ * A letter or mark from a script whose letters join (Arabic and the scripts
+ * written with it, Syriac, N'Ko, Mongolian, ...). Their digits don't join,
+ * so they're left out.
+ */
+const JOINING =
+  /(?=[\p{L}\p{M}])[\p{Script=Arabic}\p{Script=Syriac}\p{Script=Nko}\p{Script=Mongolian}\p{Script=Mandaic}\p{Script=Adlam}\p{Script=Hanifi_Rohingya}\p{Script=Thaana}]/u;
+
+/**
+ * The units a value animates in: one per grapheme, except that a word
+ * written in a joining script stays whole. Its letters take their joined
+ * forms only when drawn together, so splitting it would render each in its
+ * isolated form. Everything else, digits included, is still per grapheme.
+ */
+export function textUnits(text: string): string[] {
+  if (!JOINING.test(text)) return graphemes(text);
+  const words = wordSegmenter
+    ? Array.from(wordSegmenter.segment(text), (s) => s.segment)
+    : text.split(/(\s+)/).filter(Boolean);
+  return words.flatMap((word) =>
+    JOINING.test(word) ? [word] : graphemes(word),
+  );
+}
+
 const SIGN = "+-−";
-const GROUP = ".,'   ";
-const DIGIT = /^\d$/;
+const GROUP = ".,'   \u066C\u066B";
+/** Any script's decimal digits (0-9, ٠-٩, ۰-۹, ...). */
+const DIGIT = /^\p{Nd}$/u;
+/** Percent signs a number can end with, Latin and Arabic. */
+const PERCENT = "%\u066A";
 const CURRENCY = /^\p{Sc}$/u;
 
 const isDigit = (g: string): boolean => DIGIT.test(g);
@@ -75,7 +117,7 @@ export function findNumbers(glyphs: string[]): NumberToken[] {
         end += 2;
       else break;
     }
-    if (glyphs[end] === "%") end++;
+    if (end < glyphs.length && PERCENT.includes(glyphs[end])) end++;
     tokens.push({ start, end });
     i = end;
   }
@@ -120,10 +162,21 @@ export function placeKeys(glyphs: string[], decimal: string): string[] {
 }
 
 /** The numeric value of a number token, or NaN. */
+/**
+ * A decimal digit's value, in any script: digits run in blocks of ten from
+ * zero, so it's the distance from the start of its run.
+ */
+export function digitValue(digit: string): number {
+  const code = digit.codePointAt(0) ?? 0;
+  let start = code;
+  while (DIGIT.test(String.fromCodePoint(start - 1))) start--;
+  return (code - start) % 10;
+}
+
 export function parseNumber(glyphs: string[], decimal: string): number {
   let text = "";
   for (const g of glyphs) {
-    if (isDigit(g)) text += g;
+    if (isDigit(g)) text += digitValue(g);
     else if (g === decimal) text += ".";
     else if (g === "-" || g === "−") text = `-${text}`;
   }

@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
   decimalFor,
+  digitValue,
   findNumbers,
   matchText,
   parseNumber,
   placeKeys,
+  textUnits,
   type MatchOptions,
 } from "@/registry/default/text-morph/lib/match";
 
@@ -190,6 +192,68 @@ describe("matchText with a caret", () => {
     );
     expect(nextKinds).toEqual(["number", "number", "number"]);
     expect(trend).toBe(1);
+  });
+});
+
+describe("textUnits", () => {
+  it("splits text without joining scripts into graphemes, as before", () => {
+    expect(textUnits("Copy page")).toEqual(Array.from("Copy page"));
+    expect(textUnits("$1,204.50")).toEqual(Array.from("$1,204.50"));
+    // Hebrew is right-to-left but its letters don't join.
+    expect(textUnits("שלום")).toEqual(Array.from("שלום"));
+  });
+
+  it("keeps a word in a joining script whole", () => {
+    expect(textUnits("التجربة النهائية")).toEqual(["التجربة", " ", "النهائية"]);
+  });
+
+  it("still splits the other words and numbers in mixed text", () => {
+    expect(textUnits("Order ١٢ طلب")).toEqual([
+      "O",
+      "r",
+      "d",
+      "e",
+      "r",
+      " ",
+      "١",
+      "٢",
+      " ",
+      "طلب",
+    ]);
+  });
+
+  it("keeps Arabic-Indic digits as separate units", () => {
+    expect(textUnits("١٬٢٠٤")).toEqual(["١", "٬", "٢", "٠", "٤"]);
+  });
+});
+
+describe("numbers in other scripts", () => {
+  it("reads the value of any script's digits", () => {
+    expect(digitValue("٧")).toBe(7);
+    expect(digitValue("۴")).toBe(4);
+    expect(digitValue("9")).toBe(9);
+    expect(parseNumber(chars("١٬٢٠٤٫٥"), "٫")).toBe(1204.5);
+  });
+
+  it("matches Arabic-Indic numbers by place value", () => {
+    const arabic = { ...OPTIONS, decimal: "٫" };
+    // ١٬٢٠٤ -> ١٬٣١٨: the thousands and the separator stay.
+    expect(keptView("morph", "١٬٢٠٤", "١٬٣١٨", arabic)).toBe("١٬___");
+    expect(findNumbers(chars("٪١٢ خصم"))).toHaveLength(1);
+  });
+
+  it("reads the trend from Arabic-Indic numbers", () => {
+    const arabic = { ...OPTIONS, decimal: "٫" };
+    expect(matchText("roll", chars("٩"), chars("١٠"), arabic).trend).toBe(1);
+    expect(matchText("roll", chars("١٬٣١٨"), chars("٩٨٧"), arabic).trend).toBe(
+      -1,
+    );
+  });
+
+  it("counts the Arabic percent sign as part of a number", () => {
+    const text = chars("خصم ١٢٪");
+    const [token] = findNumbers(text);
+    expect(text.slice(token.start, token.end).join("")).toBe("١٢٪");
   });
 });
 

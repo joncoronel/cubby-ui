@@ -210,4 +210,5 @@ Screen readers get the value as plain text; the animated glyphs are hidden from 
 - **Defaults.** `morph` uses [torph](https://github.com/lochie/torph)'s timing and scale; `roll` uses [Scritto](https://github.com/JaceThings/Scritto)'s spring, travel, tilt and blur.
 - **Off screen.** A change to a label that isn't on screen at that moment swaps instantly.
 - **Width.** A change that stays on one line eases the box to its new width, so text after an inline `TextMorph` slides instead of jumping. A change that wraps keeps the lines as they fall, without the width animation or the edge fade.
+- **Languages.** Right-to-left text works, and a label reads in its own direction inside text of the other. A word in a script whose letters join (Arabic, Persian, Urdu and others) animates as a whole word so it stays correctly joined; other text animates letter by letter. Numbers in any script's digits match by place value.
 - **No spaces, no wrapping.** A value without spaces (a long number, a URL) can't break, so it runs past a narrow container, like any unbroken word.

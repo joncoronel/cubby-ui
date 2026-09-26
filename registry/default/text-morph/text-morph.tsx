@@ -4,7 +4,7 @@ import * as React from "react";
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import { cn } from "@/lib/utils";
-import { decimalFor, matchText, type GlyphKind } from "./lib/match";
+import { decimalFor, matchText, textUnits, type GlyphKind } from "./lib/match";
 import { resolveOptions, type TextMorphOptions } from "./lib/options";
 import "./text-morph.css";
 
@@ -42,17 +42,6 @@ import "./text-morph.css";
  * each in a slot at its own line that fades it out above and below.
  */
 
-const segmenter =
-  typeof Intl !== "undefined" && "Segmenter" in Intl
-    ? new Intl.Segmenter(undefined, { granularity: "grapheme" })
-    : null;
-
-function graphemes(text: string): string[] {
-  return segmenter
-    ? Array.from(segmenter.segment(text), (s) => s.segment)
-    : Array.from(text);
-}
-
 function escapeHtml(text: string): string {
   return text
     .replace(/&/g, "&amp;")
@@ -69,7 +58,7 @@ const isSpace = (glyph: string): boolean =>
 function glyphsHtml(text: string): string {
   let html = "";
   let word = "";
-  for (const glyph of graphemes(text)) {
+  for (const glyph of textUnits(text)) {
     if (isSpace(glyph)) {
       if (word) html += `<span data-word>${word}</span>`;
       word = "";
@@ -385,7 +374,7 @@ function* morphTo(
   const old = Array.from(
     glyphLayer.querySelectorAll<HTMLElement>("[data-glyph]"),
   );
-  const next = graphemes(value);
+  const next = textUnits(value);
 
   // 1. Read: where everything is on screen right now.
   const moving = animate();

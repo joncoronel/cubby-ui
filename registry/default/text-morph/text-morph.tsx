@@ -23,17 +23,18 @@ import "./text-morph.css";
  *      ones, and move the removed ones to a ghost layer to animate out.
  *   3. Measure the final layout, then animate each glyph from its snapshot.
  *
- * At rest the label flows inline like the text around it, grouped into
- * words so lines only break between them. A change that stays on one line
- * turns the label into a box for its duration: the width eases from
- * wherever it visibly is, and when a pinned or centred container moves the
- * box's left edge, the stage rides the opposite way on the same curve, so
- * the glyphs never drift with it. Both run on the main thread from one
- * clock (width, and `left` rather than a transform): a transform would run
- * on the compositor and keep going while a busy main thread held the width
- * still, sliding the text out of its box. A
- * change that wraps keeps the lines as the layout, and glyphs travel to
- * their new places across them.
+ * The label flows inline like the text around it, grouped into words so
+ * lines only break between them, and it never changes display: switching
+ * an element between inline and inline-block repaints its text snapped
+ * differently, a visible shimmer as it settles. A change that stays on one
+ * line eases the space it takes with its end margin, so the text after it
+ * slides rather than jumps; when a pinned or centred container moves the
+ * label's start, the stage rides the opposite way (`left`, which inline
+ * boxes honour) on the same curve, so the glyphs never drift with it. Both
+ * run on the main thread from one clock: a transform would run on the
+ * compositor and keep going while a busy main thread held the layout
+ * still. A change that wraps keeps the lines as the layout, and glyphs
+ * travel to their new places across them.
  *
  * Leaving glyphs (ghosts) sit in a layer measured and sized each change,
  * each in a slot at its own line that fades it out above and below.
@@ -221,9 +222,6 @@ function isOnScreen(el: HTMLElement): boolean {
   );
 }
 
-/** Pending "drop the explicit width" timers, per root. */
-const settleTimers = new WeakMap<HTMLElement, number>();
-
 /** The edge fade's ramp, and how far past the box edge it ends (em). */
 const EDGE_RAMP = 0.3;
 const EDGE_SLACK = 0.4;
@@ -331,6 +329,9 @@ type MorphJob = {
 
 const queue: MorphJob[] = [];
 
+/** Tags a label's current resize, so an older one can't release it. */
+let sizings = 0;
+
 function flushMorphs(): void {
   let active = queue.splice(0);
   while (active.length > 0) {
@@ -381,6 +382,7 @@ function* morphTo(
   // 1. Read: where everything is on screen right now.
   const moving = animate();
   const rootBefore = root.getBoundingClientRect();
+  const endBefore = parseFloat(getComputedStyle(root).marginInlineEnd) || 0;
   const linesBefore = root.getClientRects().length;
   const originBefore = layerOrigin(ghostLayer);
   const before = new Map(old.map((node) => [node, visualState(node)]));
@@ -430,7 +432,6 @@ function* morphTo(
   for (const el of running) {
     for (const animation of el.getAnimations()) animation.cancel();
   }
-  window.clearTimeout(settleTimers.get(root));
   yield;
 
   // 3. Read: where leaving glyphs sit in the layout, with nothing moving
@@ -443,9 +444,9 @@ function* morphTo(
   // 4. Write: the new glyphs, back to flowing inline, the resting layout.
   // Every structural change happens here, so the batch restyles once.
   layOut(glyphLayer, nodes);
+  // Free to wrap again, so step 5 sees how the new value falls.
+  delete root.dataset.sizing;
   for (const slot of gone) slot.remove();
-  delete root.dataset.box;
-  root.style.width = "";
   if (!moving) return started;
   // Leaving glyphs move into slots in the ghost layer (placed in step 8).
   const newSlots = leaving.flatMap(({ node, kind }) => {
@@ -464,19 +465,16 @@ function* morphTo(
   // 5. Read: a change that stays on one line is animated as a box; one that
   // wraps keeps its lines as they fall. An empty value has no line box at
   // all; it counts as one line.
+  // `box` below means that: the label's space eases as one box.
   const box = linesBefore <= 1 && root.getClientRects().length <= 1;
-  const width = root.getBoundingClientRect().width;
   yield;
 
-  // 6. Write: the box at its new width.
-  if (box) {
-    root.dataset.box = "";
-    root.style.width = `${width}px`;
-  }
+  // 6. (Nothing to write: the final layout is already in place.)
   yield;
 
-  // 7. Read: the final layout.
+  // 7. Read: the final layout, and the end margin the author set.
   const rootAfter = root.getBoundingClientRect();
+  const endAfter = parseFloat(getComputedStyle(root).marginInlineEnd) || 0;
   const origin = layerOrigin(ghostLayer);
   const after = nodes.map((node) => node.getBoundingClientRect());
   const em = parseFloat(getComputedStyle(root).fontSize) || 16;
@@ -558,41 +556,33 @@ function* morphTo(
   const away = match.trend === 1 ? -1 : 1;
 
   if (box) {
-    // Width: from where it visibly was to the new width.
+    // The space it takes: from what it visibly took (its box plus any end
+    // margin still easing) to its new width, through the end margin, so
+    // the display never changes.
     const resize = { duration: o.width.duration, easing: o.width.easing };
-    run(root, [{ width: `${rootBefore.width}px` }, { width: `${width}px` }], {
-      ...resize,
-      fill: "both",
-    });
-    settleTimers.set(
-      root,
-      window.setTimeout(() => {
-        const from = layerOrigin(ghostLayer);
-        for (const animation of root.getAnimations()) animation.cancel();
-        delete root.dataset.box;
-        root.style.width = "";
-        // Back to flowing inline, the layer's place in the flow can move;
-        // ghosts still leaving (and the layer's box) hold where they are.
-        if (ghostLayer.childElementCount === 0) return;
-        const to = layerOrigin(ghostLayer);
-        const dx = from.left - to.left;
-        const dy = from.top - to.top;
-        if (Math.abs(dx) < 0.01 && Math.abs(dy) < 0.01) return;
-        for (const slot of Array.from(ghostLayer.children) as HTMLElement[]) {
-          placeSlot(slot, px(slot, "--x") + dx, px(slot, "--y") + dy);
-        }
-        ghostLayer.style.setProperty(
-          "--ox",
-          `${px(ghostLayer, "--ox") + dx}px`,
-        );
-        ghostLayer.style.setProperty(
-          "--oy",
-          `${px(ghostLayer, "--oy") + dy}px`,
-        );
-      }, o.width.duration + 50),
-    );
+    const from = rootBefore.width + (endBefore - endAfter) - rootAfter.width;
+    if (Math.abs(from) > 0.5) {
+      // While its space eases open, the value must not wrap in the space it
+      // hasn't reached yet (a shrink-to-fit parent would wrap it and grow a
+      // line taller). No-wrap changes line breaking, not display, and the
+      // value sits on one line either way.
+      const sizing = String(++sizings);
+      root.dataset.sizing = sizing;
+      const ease = run(
+        root,
+        [
+          { marginInlineEnd: `${endAfter + from}px` },
+          { marginInlineEnd: `${endAfter}px` },
+        ],
+        resize,
+      );
+      const release = (): void => {
+        if (root.dataset.sizing === sizing) delete root.dataset.sizing;
+      };
+      ease.finished.then(release, release);
+    }
 
-    // The box's left edge moves while it resizes (a centred pill, a
+    // The label's start moves while its space eases (a centred pill, a
     // right-pinned button); ride the other way on the same curve.
     const ride = rootAfter.left - rootBefore.left;
     if (Math.abs(ride) > 0.5) {

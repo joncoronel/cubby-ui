@@ -11,44 +11,37 @@
     transparent
   );
   position: relative;
-  /* At rest it flows like the text around it, wrapping between words where
-     the context lets text wrap. */
+  /* It flows like the text around it, wrapping between words where the
+     context lets text wrap, and never changes display: switching between
+     inline and inline-block repaints the text snapped differently. */
   display: inline;
   vertical-align: baseline;
 }
 
-/* While a one-line change animates, the label is a box whose width eases,
-   and the stage rides against its moving edge. */
-.text-morph[data-box] {
-  display: inline-block;
+/* While a one-line change eases the label's space, it stays on one line.
+   text-wrap-mode leaves spaces alone; nowrap (the fallback) would drop a
+   leading one. */
+.text-morph[data-sizing] {
   white-space: nowrap;
-  /* The stage sits at the box's start and rides from there. Inherited
-     centring (a button's) would shift it by half the width still to go. */
-  text-align: start;
 }
-/* No wrapping, without collapsing spaces the context keeps (nowrap would
-   drop a leading space inside the box, in a code block for instance). */
 @supports (text-wrap-mode: nowrap) {
-  .text-morph[data-box] {
+  .text-morph[data-sizing] {
     white-space: inherit;
     text-wrap-mode: nowrap;
   }
 }
 
-/* The plain value for screen readers and copying, exactly as written:
-   sr-only's nowrap would drop a leading space. */
+/* The plain value for screen readers, exactly as written (sr-only's
+   nowrap would drop a leading space). The visible glyphs are what gets
+   selected and copied, so this copy isn't, or a copied selection would
+   paste the value twice (torph does the same). */
 .text-morph > .sr-only {
   white-space: pre;
+  user-select: none;
 }
 
 .text-morph-stage {
   position: relative;
-  /* Selecting and copying picks up the plain value (the screen-reader
-     copy), not the glyphs as well. */
-  user-select: none;
-}
-.text-morph[data-box] > .text-morph-stage {
-  display: inline-block;
 }
 
 /* Each glyph sits in a slot with room above and below its line, faded at
@@ -86,6 +79,8 @@
    neighbour. */
 .text-morph-ghosts {
   position: absolute;
+  /* Glyphs on their way out aren't part of the value. */
+  user-select: none;
   /* Inline, so its static position is where the value starts on its line. */
   display: inline;
   width: 0;

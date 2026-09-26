@@ -158,6 +158,41 @@ describe("matchText", () => {
   });
 });
 
+describe("matchText with a caret", () => {
+  const at = (caret: number): MatchOptions => ({ ...OPTIONS, caret });
+
+  it("inserts at the caret instead of renumbering places", () => {
+    // Typed 1 between 2 and 0: by place value only the 0 would stay.
+    expect(keptView("morph", "20", "210")).toBe("__0");
+    expect(keptView("morph", "20", "210", at(2))).toBe("2_0");
+  });
+
+  it("keeps everything after a deletion, shifted back", () => {
+    // Deleted the 2 of 1,204; the field reformats to 104.
+    expect(keptView("morph", "1,204", "104", at(1))).toBe("104");
+  });
+
+  it("pairs group separators from the end as the field reformats", () => {
+    expect(keptView("morph", "999", "9,999", at(1))).toBe("__999");
+    expect(keptView("morph", "1,999", "11,999", at(1))).toBe("_1,999");
+  });
+
+  it("keeps matching glyphs in place when typing over a selection", () => {
+    expect(keptView("roll", "cat", "cut", at(2))).toBe("c_t");
+  });
+
+  it("still marks numbers and reads the trend", () => {
+    const { nextKinds, trend } = matchText(
+      "morph",
+      chars("20"),
+      chars("210"),
+      at(2),
+    );
+    expect(nextKinds).toEqual(["number", "number", "number"]);
+    expect(trend).toBe(1);
+  });
+});
+
 describe("decimalFor", () => {
   it("returns the locale's decimal separator", () => {
     expect(decimalFor("en")).toBe(".");

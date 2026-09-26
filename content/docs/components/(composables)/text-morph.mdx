@@ -29,6 +29,7 @@ Pass the current text as `value` and change it; `TextMorph` works out what moved
 - **Interruptible.** A change that lands mid-animation starts every glyph from where it is on screen, so rapid updates never jump.
 - **Edge fade.** When the box shrinks, old glyphs fade at the moving edge instead of running over the next word or out of a pill.
 - **Stable anchoring.** Centered and right-aligned labels hold still while the box resizes.
+- **Wraps like text.** A long value flows over lines, breaking only between words, wherever the surrounding text is allowed to wrap.
 
 ## Examples
 
@@ -54,6 +55,18 @@ Pass a number as `value` and set `decimals` (and `locale`) to format it; only th
 Place `TextMorph` inline with other text; when the value shrinks, the old ink fades at the edge instead of overlapping the words after it.
 
 <ComponentPreview component="text-morph" example="text-morph-inline" />
+
+### Wrapping
+
+Give `TextMorph` a value longer than its line and it wraps between words; glyphs travel to their new places across lines.
+
+<ComponentPreview component="text-morph" example="text-morph-wrapping" />
+
+### Editable field
+
+Pass the input's caret as `cursorIndex` to mirror a field someone is typing in, so a typed digit is inserted instead of renumbering the ones after it.
+
+<ComponentPreview component="text-morph" example="text-morph-editable" />
 
 ## Accessibility
 
@@ -93,6 +106,13 @@ Screen readers get the value as plain text; the animated glyphs are hidden from 
 
 <ApiProp name="respectReducedMotion" fullType="boolean" defaultValue="true">
   Swap without animating when the reader prefers reduced motion.
+</ApiProp>
+
+<ApiProp name="cursorIndex" fullType="number">
+  For a field someone is typing in: where the caret sits in `value` after the
+  edit. Glyphs are matched around it, so typing 1 in front of 20 inserts a digit
+  instead of renumbering the column. Leave it unset for values that change on
+  their own.
 </ApiProp>
 
 <ApiProp name="onAnimationStart" fullType="() => void">
@@ -189,4 +209,5 @@ Screen readers get the value as plain text; the animated glyphs are hidden from 
 
 - **Defaults.** `morph` uses [torph](https://github.com/lochie/torph)'s timing and scale; `roll` uses [Scritto](https://github.com/JaceThings/Scritto)'s spring, travel, tilt and blur.
 - **Off screen.** A change to a label that isn't on screen at that moment swaps instantly.
-- **Width.** The box eases to its new width, so text after an inline `TextMorph` slides instead of jumping.
+- **Width.** A change that stays on one line eases the box to its new width, so text after an inline `TextMorph` slides instead of jumping. A change that wraps keeps the lines as they fall, without the width animation or the edge fade.
+- **No spaces, no wrapping.** A value without spaces (a long number, a URL) can't break, so it runs past a narrow container, like any unbroken word.

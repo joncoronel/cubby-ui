@@ -436,9 +436,11 @@ import tabs_tabs_vertical from "@/registry/examples/tabs/tabs-vertical";
 import tabs_tabs_vertical_underline from "@/registry/examples/tabs/tabs-vertical-underline";
 import tabs_tabs_vertical_underline_with_sides from "@/registry/examples/tabs/tabs-vertical-underline-with-sides";
 import text_morph_text_morph_basic from "@/registry/examples/text-morph/text-morph-basic";
+import text_morph_text_morph_editable from "@/registry/examples/text-morph/text-morph-editable";
 import text_morph_text_morph_inline from "@/registry/examples/text-morph/text-morph-inline";
 import text_morph_text_morph_modes from "@/registry/examples/text-morph/text-morph-modes";
 import text_morph_text_morph_numbers from "@/registry/examples/text-morph/text-morph-numbers";
+import text_morph_text_morph_wrapping from "@/registry/examples/text-morph/text-morph-wrapping";
 import textarea_textarea_basic from "@/registry/examples/textarea/textarea-basic";
 import textarea_textarea_controlled from "@/registry/examples/textarea/textarea-controlled";
 import textarea_textarea_disabled_state from "@/registry/examples/textarea/textarea-disabled-state";
@@ -3847,6 +3849,11 @@ export const exampleRegistry = {
       "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { TextMorph } from \"@/components/ui/cubby-ui/text-morph/text-morph\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nconst WORDS = [\"Design\", \"Develop\", \"Deploy\", \"Delight\"];\n\nexport default function TextMorphBasic() {\n  const [index, setIndex] = React.useState(0);\n\n  return (\n    <div className=\"flex flex-col items-center gap-6\">\n      <TextMorph\n        value={WORDS[index]}\n        className=\"font-display text-4xl font-semibold tracking-tight\"\n      />\n      <Button\n        size=\"sm\"\n        variant=\"outline\"\n        onClick={() => setIndex((i) => (i + 1) % WORDS.length)}\n      >\n        Next word\n      </Button>\n    </div>\n  );\n}\n"
     },
     {
+      "title": "Editable",
+      "importPath": "text-morph-editable",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { TextMorph } from \"@/components/ui/cubby-ui/text-morph/text-morph\";\nimport { Input } from \"@/components/ui/cubby-ui/input\";\n\nexport default function TextMorphEditable() {\n  const [value, setValue] = React.useState(\"1200\");\n  const [caret, setCaret] = React.useState<number>();\n\n  return (\n    <div className=\"flex w-64 flex-col gap-4\">\n      <Input\n        aria-label=\"Amount\"\n        inputMode=\"numeric\"\n        value={value}\n        onChange={(event) => {\n          setCaret(event.target.selectionStart ?? undefined);\n          setValue(event.target.value);\n        }}\n      />\n      <p className=\"font-display text-3xl font-semibold tabular-nums\">\n        $<TextMorph value={value || \"0\"} cursorIndex={caret} />\n      </p>\n    </div>\n  );\n}\n"
+    },
+    {
       "title": "Inline",
       "importPath": "text-morph-inline",
       "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { TextMorph } from \"@/components/ui/cubby-ui/text-morph/text-morph\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nconst TARGETS = [\"production-eu\", \"staging\", \"preview-4821\", \"dev\"];\n\nexport default function TextMorphInline() {\n  const [index, setIndex] = React.useState(0);\n\n  return (\n    <div className=\"flex flex-col items-center gap-6\">\n      <p className=\"text-base\">\n        Deploying to{\" \"}\n        <TextMorph\n          value={TARGETS[index]}\n          className=\"font-mono text-sm font-medium\"\n        />{\" \"}\n        in the next window.\n      </p>\n      <Button\n        size=\"sm\"\n        variant=\"outline\"\n        onClick={() => setIndex((i) => (i + 1) % TARGETS.length)}\n      >\n        Change target\n      </Button>\n    </div>\n  );\n}\n"
@@ -3860,6 +3867,11 @@ export const exampleRegistry = {
       "title": "Numbers",
       "importPath": "text-morph-numbers",
       "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { TextMorph } from \"@/components/ui/cubby-ui/text-morph/text-morph\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nexport default function TextMorphNumbers() {\n  const [balance, setBalance] = React.useState(1204.5);\n\n  return (\n    <div className=\"flex flex-col items-center gap-6\">\n      <div className=\"font-display flex items-baseline gap-1 text-4xl font-semibold tabular-nums\">\n        <span className=\"text-muted-foreground text-2xl\">$</span>\n        <TextMorph value={balance} decimals={2} />\n      </div>\n      <div className=\"flex gap-2\">\n        <Button\n          size=\"sm\"\n          variant=\"outline\"\n          onClick={() => setBalance((b) => Math.max(0, b - 95.25))}\n        >\n          Spend $95.25\n        </Button>\n        <Button\n          size=\"sm\"\n          variant=\"outline\"\n          onClick={() => setBalance((b) => b + 1000)}\n        >\n          Add $1,000\n        </Button>\n      </div>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Wrapping",
+      "importPath": "text-morph-wrapping",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { TextMorph } from \"@/components/ui/cubby-ui/text-morph/text-morph\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nconst UPDATES = [\n  \"Your order has shipped and is on its way to the sorting center.\",\n  \"Your order left the sorting center and is out for delivery today.\",\n  \"Delivered to the front door at 2:14 pm. Thanks for shopping with us.\",\n];\n\nexport default function TextMorphWrapping() {\n  const [index, setIndex] = React.useState(0);\n\n  return (\n    <div className=\"flex flex-col items-center gap-6\">\n      <p className=\"max-w-64 text-sm leading-6\">\n        <TextMorph value={UPDATES[index]} />\n      </p>\n      <Button\n        size=\"sm\"\n        variant=\"outline\"\n        onClick={() => setIndex((i) => (i + 1) % UPDATES.length)}\n      >\n        Next update\n      </Button>\n    </div>\n  );\n}\n"
     }
   ],
   "textarea": [
@@ -4593,9 +4605,11 @@ export const componentMap = {
   "tabs-vertical-underline": tabs_tabs_vertical_underline,
   "tabs-vertical-underline-with-sides": tabs_tabs_vertical_underline_with_sides,
   "text-morph-basic": text_morph_text_morph_basic,
+  "text-morph-editable": text_morph_text_morph_editable,
   "text-morph-inline": text_morph_text_morph_inline,
   "text-morph-modes": text_morph_text_morph_modes,
   "text-morph-numbers": text_morph_text_morph_numbers,
+  "text-morph-wrapping": text_morph_text_morph_wrapping,
   "textarea-basic": textarea_textarea_basic,
   "textarea-controlled": textarea_textarea_controlled,
   "textarea-disabled-state": textarea_textarea_disabled_state,

@@ -18,6 +18,7 @@ import {
   type Timing,
 } from "@/registry/default/text-morph/lib/options";
 import { Button } from "@/registry/default/button/button";
+import { Input } from "@/registry/default/input/input";
 import { Toggle } from "@/registry/default/toggle/toggle";
 import {
   ToggleGroup,
@@ -186,6 +187,11 @@ const PRICES = ["$1,204", "$1,318", "$987", "$12,450", "$12,455", "$9"];
 const COUNTS = [8, 9, 10, 11, 12, 99, 100, 101, 100, 99, 42, 41];
 const PERCENTS = [2.4, 2.45, 3.1, -0.6, -1.25, 0.8];
 const TARGETS = ["production-eu", "staging", "preview-4821", "dev"];
+const UPDATES = [
+  "Your order has shipped and is on its way to the sorting center.",
+  "Your order left the sorting center and is out for delivery today.",
+  "Delivered to the front door at 2:14 pm. Thanks for shopping with us.",
+];
 const STATUSES = [
   "Draft saved.",
   "Changes saved!",
@@ -232,6 +238,8 @@ export default function TextMorphTune(): React.ReactElement {
   const [tune, setTune] = useTuneState();
   const [step, setStep] = React.useState(0);
   const [auto, setAuto] = React.useState(false);
+  const [typed, setTyped] = React.useState("1200");
+  const [caret, setCaret] = React.useState<number>();
   const [events, setEvents] = React.useState({
     start: 0,
     complete: 0,
@@ -318,6 +326,7 @@ export default function TextMorphTune(): React.ReactElement {
   const percent = PERCENTS[step % PERCENTS.length];
   const status = STATUSES[step % STATUSES.length];
   const target = TARGETS[step % TARGETS.length];
+  const update = UPDATES[step % UPDATES.length];
   const flip = step % 2 === 1;
   const longestMs =
     Math.max(
@@ -351,6 +360,35 @@ export default function TextMorphTune(): React.ReactElement {
           <span className="font-display text-3xl font-semibold tabular-nums">
             <TextMorph value={price} options={ambient} />
           </span>
+        </Demo>
+
+        <Demo label="Wrapping (a long value flows over lines; glyphs travel across them)">
+          <p className="max-w-64 text-sm leading-6">
+            <TextMorph value={update} options={ambient} />
+          </p>
+        </Demo>
+
+        <Demo label="Editable field (cursorIndex: typing 1 between 2 and 0 inserts it)">
+          <div className="flex items-center gap-4">
+            <Input
+              aria-label="Amount"
+              inputMode="numeric"
+              value={typed}
+              onChange={(event) => {
+                setCaret(event.target.selectionStart ?? undefined);
+                setTyped(event.target.value);
+              }}
+              className="w-40"
+            />
+            <span className="font-display text-2xl font-semibold tabular-nums">
+              $
+              <TextMorph
+                value={typed || "0"}
+                cursorIndex={caret}
+                options={ambient}
+              />
+            </span>
+          </div>
         </Demo>
 
         <Demo label="In a sentence (old ink fades at the edge instead of running over the next word)">

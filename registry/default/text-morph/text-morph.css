@@ -1,4 +1,4 @@
-/* TextMorph (components/docs/text-morph). The server renders one span per
+/* TextMorph (registry/default/text-morph). The server renders one span per
    glyph, the same markup the browser keeps, so these styles apply from first
    paint and nothing shifts on hydration. */
 
@@ -11,56 +11,68 @@
     transparent
   );
   position: relative;
-  display: inline-block;
-  max-width: none;
-  white-space: nowrap;
-  /* Its baseline is its text's, so it lines up with the words around it
-     at any font size. */
+  /* At rest it flows like the text around it, wrapping between words where
+     the context lets text wrap. */
+  display: inline;
   vertical-align: baseline;
+}
+
+/* While a one-line change animates, the label is a box whose width eases,
+   and the stage rides against its moving edge. */
+.text-morph[data-box] {
+  display: inline-block;
+  white-space: nowrap;
 }
 
 .text-morph-stage {
   position: relative;
+}
+.text-morph[data-box] > .text-morph-stage {
   display: inline-block;
 }
 
-/* Room above and below for glyphs travelling in and out, faded at the
-   edges, without changing the line the label sits on. The mask sits on the
-   layers, not the box: a mask cuts whatever falls outside its element, and
-   ghosts reach past the box while it shrinks. */
+/* Room above and below every line for glyphs travelling in and out, faded
+   at the edges. Padding on an inline box doesn't change the line it sits
+   on. The mask sits on the layers, not the label: a mask cuts whatever
+   falls outside its element, and ghosts reach past the label. */
 .text-morph-glyphs {
-  display: inline-block;
-  white-space: pre;
   padding-block: 0.3em;
-  margin-block: -0.3em;
   mask-image: var(--text-morph-fade-y);
 }
 
-.text-morph [data-glyph] {
-  display: inline-block;
-  white-space: pre;
+/* A word never breaks; lines break at the spaces between words. */
+.text-morph [data-word] {
+  white-space: nowrap;
 }
 
-/* Ghosts sit at --x/--y in stage coordinates. The layer reaches
-   --text-morph-room past the stage on both sides so nothing is cut, and
-   wears the edge fade (--text-morph-edge, set per change) only while a
-   shrinking box would leave ink over a neighbour. */
+.text-morph [data-glyph]:not([data-space]) {
+  display: inline-block;
+}
+
+/* Ghosts sit at --x/--y from the layer's place in the flow (its static
+   position, at the start of the value). The layer is offset and sized each
+   change to take in every ghost, and wears the edge fade
+   (--text-morph-edge) only while a shrinking box would leave ink over a
+   neighbour. */
 .text-morph-ghosts {
   position: absolute;
-  inset-block: -0.3em;
-  inset-inline: calc(-1 * var(--text-morph-room, 0px));
+  /* Inline, so its static position is where the value starts on its line. */
+  display: inline;
+  width: 0;
+  height: 0;
+  translate: var(--ox, 0px) var(--oy, 0px);
   pointer-events: none;
-  mask-image:
-    var(--text-morph-fade-y),
-    var(--text-morph-edge, linear-gradient(#000, #000));
-  mask-size:
-    100% 100%,
-    100% 100%;
+  mask-image: var(--text-morph-edge, none);
   mask-repeat: no-repeat;
-  mask-composite: intersect;
 }
-.text-morph-ghosts > [data-glyph] {
+
+/* Each ghost gets a slot at its own line, faded above and below like the
+   live glyphs, with room beside it for tilt, scale and blur. */
+.text-morph-ghost {
   position: absolute;
-  left: calc(var(--x, 0px) + var(--text-morph-room, 0px));
-  top: calc(var(--y, 0px) + 0.3em);
+  left: calc(var(--x) - var(--ox, 0px) - 0.5em);
+  top: calc(var(--y) - var(--oy, 0px) - 0.3em);
+  padding: 0.3em 0.5em;
+  white-space: nowrap;
+  mask-image: var(--text-morph-fade-y);
 }

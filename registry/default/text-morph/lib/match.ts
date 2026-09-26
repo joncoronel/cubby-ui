@@ -8,6 +8,11 @@ import type { TextMorphMode } from "./options";
  * decimal point, so 1,204 → 1,318 keeps the thousands and the comma, and a
  * digit that changes rolls in place. Everything else is matched by the
  * mode's text rule.
+ *
+ * A field someone is typing in knows where the edit happened, so with a
+ * caret the whole value is matched around it instead (torph's cursorIndex):
+ * typing 1 in front of 20 inserts a digit rather than renumbering the
+ * column.
  */
 
 /** `number`: part of a number matched by place value. */
@@ -29,6 +34,11 @@ export type MatchOptions = {
   decimal: string;
   /** 1 up, -1 down, 0 read it off the numbers. */
   trend: -1 | 0 | 1;
+  /**
+   * Where the caret sits in the new value after an edit. Matches around it
+   * instead of by place value and the mode's text rule.
+   */
+  caret?: number;
 };
 
 type NumberToken = { start: number; end: number };
@@ -205,6 +215,59 @@ function matchAnywhere(old: string[], next: string[]): [number, number][] {
   return pairs;
 }
 
+/**
+ * Match around the caret of an edit. Group separators are set aside first,
+ * since a field that formats as you type moves them around: the rest is
+ * shared before the edit and shifted by its length after it, and the
+ * separators pair up from the end.
+ */
+export function matchCaret(
+  old: string[],
+  next: string[],
+  caret: number,
+  decimal: string,
+): [number, number][] {
+  const isSeparator = (g: string): boolean =>
+    g !== decimal && GROUP.includes(g);
+  const oldRest = old.flatMap((g, i) => (isSeparator(g) ? [] : [i]));
+  const nextRest = next.flatMap((g, i) => (isSeparator(g) ? [] : [i]));
+  const pairs: [number, number][] = [];
+  const pair = (to: number, from: number): void => {
+    if (old[oldRest[from]] === next[nextRest[to]]) {
+      pairs.push([nextRest[to], oldRest[from]]);
+    }
+  };
+
+  // The caret, counted in non-separator glyphs.
+  const at = nextRest.filter((i) => i < caret).length;
+  const grew = nextRest.length - oldRest.length;
+  if (grew > 0) {
+    // Typed `grew` glyphs, ending at the caret.
+    for (let k = 0; k < at - grew; k++) pair(k, k);
+    for (let k = at; k < nextRest.length; k++) pair(k, k - grew);
+  } else if (grew < 0) {
+    // Deleted glyphs, starting at the caret.
+    for (let k = 0; k < at; k++) pair(k, k);
+    for (let k = at; k < nextRest.length; k++) pair(k, k - grew);
+  } else {
+    // Typed over a selection: keep what still matches in place.
+    for (let k = 0; k < nextRest.length; k++) pair(k, k);
+  }
+
+  const oldSeparators = old.flatMap((g, i) => (isSeparator(g) ? [i] : []));
+  const nextSeparators = next.flatMap((g, i) => (isSeparator(g) ? [i] : []));
+  for (
+    let k = 1;
+    k <= oldSeparators.length && k <= nextSeparators.length;
+    k++
+  ) {
+    const from = oldSeparators[oldSeparators.length - k];
+    const to = nextSeparators[nextSeparators.length - k];
+    if (old[from] === next[to]) pairs.push([to, from]);
+  }
+  return pairs;
+}
+
 export function matchText(
   mode: TextMorphMode,
   old: string[],
@@ -218,6 +281,8 @@ export function matchText(
   const nextNumbers = options.numbers ? findNumbers(next) : [];
   const paired = Math.min(oldNumbers.length, nextNumbers.length);
 
+  const caret = options.caret;
+
   // Numbers, paired in order, matched by place.
   let trend: 1 | -1 | 0 = options.trend;
   for (let n = 0; n < paired; n++) {
@@ -225,16 +290,18 @@ export function matchText(
     const b = nextNumbers[n];
     const aGlyphs = old.slice(a.start, a.end);
     const bGlyphs = next.slice(b.start, b.end);
-    const byKey = new Map<string, number>();
-    placeKeys(aGlyphs, options.decimal).forEach((key, i) =>
-      byKey.set(key, a.start + i),
-    );
-    placeKeys(bGlyphs, options.decimal).forEach((key, i) => {
-      const from = byKey.get(key);
-      if (from !== undefined && old[from] === next[b.start + i]) {
-        kept[b.start + i] = from;
-      }
-    });
+    if (caret === undefined) {
+      const byKey = new Map<string, number>();
+      placeKeys(aGlyphs, options.decimal).forEach((key, i) =>
+        byKey.set(key, a.start + i),
+      );
+      placeKeys(bGlyphs, options.decimal).forEach((key, i) => {
+        const from = byKey.get(key);
+        if (from !== undefined && old[from] === next[b.start + i]) {
+          kept[b.start + i] = from;
+        }
+      });
+    }
     for (let i = a.start; i < a.end; i++) oldKinds[i] = "number";
     for (let i = b.start; i < b.end; i++) nextKinds[i] = "number";
 
@@ -243,6 +310,14 @@ export function matchText(
       const after = parseNumber(bGlyphs, options.decimal);
       if (after !== before) trend = after > before ? 1 : -1;
     }
+  }
+
+  // An edit at a caret: everything is matched around it.
+  if (caret !== undefined) {
+    for (const [to, from] of matchCaret(old, next, caret, options.decimal)) {
+      kept[to] = from;
+    }
+    return { kept, nextKinds, oldKinds, trend: trend === -1 ? -1 : 1 };
   }
 
   // Everything else, by the mode's text rule.

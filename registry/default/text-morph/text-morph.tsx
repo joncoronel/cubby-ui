@@ -23,10 +23,17 @@ import "./text-morph.css";
  *      ones, and move the removed ones to a ghost layer to animate out.
  *   3. Measure the final layout, then animate each glyph from its snapshot.
  *
- * The box width eases with a CSS transition, which always retargets from its
- * current value. When the box resizes, a pinned or centred container moves
- * its left edge; the stage rides the opposite way on the same curve, so the
- * glyphs never drift with it.
+ * At rest the label flows inline like the text around it, grouped into
+ * words so lines only break between them. A change that stays on one line
+ * turns the label into a box for its duration: the width eases with a CSS
+ * transition, which always retargets from its current value, and when a
+ * pinned or centred container moves the box's left edge, the stage rides
+ * the opposite way on the same curve, so the glyphs never drift with it. A
+ * change that wraps keeps the lines as the layout, and glyphs travel to
+ * their new places across them.
+ *
+ * Leaving glyphs (ghosts) sit in a layer measured and sized each change,
+ * each in a slot at its own line that fades it out above and below.
  */
 
 const segmenter =
@@ -48,17 +55,56 @@ function escapeHtml(text: string): string {
     .replace(/"/g, "&quot;");
 }
 
+/** Spaces are where lines may break; everything else sits in a word. */
+const isSpace = (glyph: string): boolean =>
+  glyph === " " || glyph === "\t" || glyph === "\n";
+
+/** Server markup: words of glyphs, with spaces between them. */
 function glyphsHtml(text: string): string {
-  return graphemes(text)
-    .map((g) => `<span data-glyph>${escapeHtml(g)}</span>`)
-    .join("");
+  let html = "";
+  let word = "";
+  for (const glyph of graphemes(text)) {
+    if (isSpace(glyph)) {
+      if (word) html += `<span data-word>${word}</span>`;
+      word = "";
+      html += `<span data-glyph data-space>${escapeHtml(glyph)}</span>`;
+    } else {
+      word += `<span data-glyph>${escapeHtml(glyph)}</span>`;
+    }
+  }
+  if (word) html += `<span data-word>${word}</span>`;
+  return html;
 }
 
 function createGlyph(text: string): HTMLSpanElement {
   const span = document.createElement("span");
   span.setAttribute("data-glyph", "");
+  if (isSpace(text)) span.setAttribute("data-space", "");
   span.textContent = text;
   return span;
+}
+
+const spaceNode = (node: HTMLElement): boolean =>
+  node.hasAttribute("data-space");
+
+/** Lay glyphs out as words, the same structure the server renders. */
+function layOut(layer: HTMLElement, nodes: HTMLElement[]): void {
+  const parts: HTMLElement[] = [];
+  let word: HTMLElement | null = null;
+  for (const node of nodes) {
+    if (spaceNode(node)) {
+      word = null;
+      parts.push(node);
+      continue;
+    }
+    if (!word) {
+      word = document.createElement("span");
+      word.setAttribute("data-word", "");
+      parts.push(word);
+    }
+    word.append(node);
+  }
+  layer.replaceChildren(...parts);
 }
 
 type VisualState = {
@@ -172,6 +218,10 @@ const EDGE_RAMP = 0.3;
 const EDGE_SLACK = 0.4;
 /** Room around a ghost for its blur, tilt and scale (em). */
 const INK_MARGIN = 0.3;
+/** A ghost slot's room beside its glyph (em), for tilt, scale and blur. */
+const SLOT_PAD_X = 0.5;
+/** Its room above and below, which it fades across (em). */
+const SLOT_PAD_Y = 0.3;
 
 type Side = "start" | "end";
 
@@ -216,23 +266,39 @@ function inkEscapes(root: HTMLElement, side: Side, inkEdge: number): boolean {
   return false;
 }
 
-/** A ghost's place in stage coordinates, kept in custom properties. */
-function ghostPlace(node: HTMLElement): { x: number; y: number } {
+const px = (el: HTMLElement, name: string): number =>
+  parseFloat(el.style.getPropertyValue(name)) || 0;
+
+/**
+ * Where the ghost layer's coordinates start on screen: its place in the
+ * flow, before the offset that sizes it around its ghosts.
+ */
+function layerOrigin(layer: HTMLElement): { left: number; top: number } {
+  const rect = layer.getBoundingClientRect();
   return {
-    x: parseFloat(node.style.getPropertyValue("--x")) || 0,
-    y: parseFloat(node.style.getPropertyValue("--y")) || 0,
+    left: rect.left - px(layer, "--ox"),
+    top: rect.top - px(layer, "--oy"),
   };
 }
-function placeGhost(node: HTMLElement, x: number, y: number): void {
-  node.style.setProperty("--x", `${x}px`);
-  node.style.setProperty("--y", `${y}px`);
+
+/** A ghost slot at x/y (its glyph's box, layer coordinates). */
+function placeSlot(slot: HTMLElement, x: number, y: number): void {
+  slot.style.setProperty("--x", `${x}px`);
+  slot.style.setProperty("--y", `${y}px`);
 }
 
-/** Lift the edge fade once the last ghost has left. */
+/** Lift the edge fade. */
 function disarm(ghostLayer: HTMLElement): void {
   for (const animation of ghostLayer.getAnimations()) animation.cancel();
   ghostLayer.style.removeProperty("--text-morph-edge");
   delete ghostLayer.dataset.armed;
+}
+
+/** Once the last ghost has left, the layer folds away. */
+function clearLayer(ghostLayer: HTMLElement): void {
+  disarm(ghostLayer);
+  ghostLayer.style.width = "";
+  ghostLayer.style.height = "";
 }
 
 function morphTo(
@@ -242,7 +308,7 @@ function morphTo(
   ghostLayer: HTMLElement,
   value: string,
   o: TextMorphOptions,
-  decimal: string,
+  place: { decimal: string; caret: number | undefined },
   animate: boolean,
 ): Animation[] {
   // Everything this change starts, so the caller can tell when it's over.
@@ -256,98 +322,120 @@ function morphTo(
     started.push(animation);
     return animation;
   };
-  const old = Array.from(glyphLayer.children) as HTMLElement[];
+  const old = Array.from(
+    glyphLayer.querySelectorAll<HTMLElement>("[data-glyph]"),
+  );
   const next = graphemes(value);
 
   // 1. Where everything is on screen right now.
   const rootBefore = root.getBoundingClientRect();
-  const stageBefore = stage.getBoundingClientRect();
+  const linesBefore = root.getClientRects().length;
+  const originBefore = layerOrigin(ghostLayer);
   const before = new Map(old.map((node) => [node, visualState(node)]));
-  const ghosts = Array.from(ghostLayer.children) as HTMLElement[];
-  const ghostRects = ghosts.map((node) => node.getBoundingClientRect());
+  const slots = Array.from(ghostLayer.children) as HTMLElement[];
+  const ghostRects = slots.flatMap((slot) =>
+    slot.firstElementChild
+      ? [slot.firstElementChild.getBoundingClientRect()]
+      : [],
+  );
 
   // 2. New glyph list.
   const match = matchText(
     o.mode,
     old.map((node) => node.textContent ?? ""),
     next,
-    { numbers: o.numbers, decimal, trend: o.trend },
+    {
+      numbers: o.numbers,
+      decimal: place.decimal,
+      trend: o.trend,
+      caret: place.caret,
+    },
   );
   const used = new Set(match.kept);
   const kept = match.kept.map((from) => (from === -1 ? null : old[from]));
-  const removed = old.filter((_, i) => !used.has(i));
-  const removedKinds = old.flatMap((_, i) =>
-    used.has(i) ? [] : [match.oldKinds[i]],
+  const leaving = old.flatMap((node, i) =>
+    used.has(i) || spaceNode(node) ? [] : [{ node, kind: match.oldKinds[i] }],
   );
   const nodes = next.map((glyph, i) => kept[i] ?? createGlyph(glyph));
-  for (const node of [...nodes, ...removed, stage]) {
+  for (const node of [...nodes, ...leaving.map((l) => l.node), stage]) {
     for (const animation of node.getAnimations()) animation.cancel();
   }
-  glyphLayer.replaceChildren(...nodes);
+  // Where leaving glyphs sit in the layout, with nothing moving them.
+  const homes = new Map(
+    leaving.map(({ node }) => [node, node.getBoundingClientRect()]),
+  );
+  layOut(glyphLayer, nodes);
 
+  // Back to flowing inline, the resting layout.
   window.clearTimeout(settleTimers.get(root));
-  if (!animate) {
-    root.style.transition = "";
-    root.style.width = "";
-    return started;
-  }
-
-  // 3. The final layout: the box at its new width, no ride.
-  root.style.transition = "none";
+  delete root.dataset.box;
+  root.style.transition = "";
   root.style.width = "";
-  const width = glyphLayer.getBoundingClientRect().width;
-  root.style.width = `${width}px`;
-  const rootAfter = root.getBoundingClientRect();
-  const stageAfter = stage.getBoundingClientRect();
-  const after = nodes.map((node) => node.getBoundingClientRect());
-  const line = glyphLayer.getBoundingClientRect().height;
-  const em = parseFloat(getComputedStyle(root).fontSize) || 16;
+  if (!animate) return started;
 
-  // Ghosts live in stage coordinates; the stage holds still on screen at
-  // its final place for the whole change, so earlier ghosts shift by
-  // however far it moved, and hold theirs.
-  const shiftX = stageBefore.left - stageAfter.left;
-  const shiftY = stageBefore.top - stageAfter.top;
-  for (const node of ghosts) {
-    const { x, y } = ghostPlace(node);
-    placeGhost(node, x + shiftX, y + shiftY);
+  // 3. The final layout. A change that stays on one line is animated as a
+  // box; one that wraps keeps its lines as they fall.
+  const box = linesBefore === 1 && root.getClientRects().length === 1;
+  const width = root.getBoundingClientRect().width;
+  if (box) {
+    root.dataset.box = "";
+    root.style.transition = "none";
+    root.style.width = `${width}px`;
+  }
+  const rootAfter = root.getBoundingClientRect();
+  const origin = layerOrigin(ghostLayer);
+  const after = nodes.map((node) => node.getBoundingClientRect());
+  const em = parseFloat(getComputedStyle(root).fontSize) || 16;
+  const letter = nodes.findIndex((node) => !spaceNode(node));
+  const line = letter === -1 ? em * 1.2 : after[letter].height;
+
+  // Ghost coordinates start at the layer's place in the flow, which holds
+  // still on screen for the whole change, so earlier ghosts shift by however
+  // far it moved, and hold theirs.
+  const shiftX = originBefore.left - origin.left;
+  const shiftY = originBefore.top - origin.top;
+  for (const slot of slots) {
+    placeSlot(slot, px(slot, "--x") + shiftX, px(slot, "--y") + shiftY);
   }
 
-  // Edge fade: the box (stage coordinates) before and after, and how far
-  // old ink reaches past it.
-  const boxStart = rootBefore.left - stageAfter.left;
-  const boxEnd = rootBefore.right - stageAfter.left;
+  // Edge fade (boxes only): the box before and after, and how far old ink
+  // reaches past it, in layer coordinates.
+  const boxStart = rootBefore.left - origin.left;
+  const boxEnd = rootBefore.right - origin.left;
+  const finalStart = rootAfter.left - origin.left;
+  const finalEnd = rootAfter.right - origin.left;
   const inkRects = [
     ...ghostRects,
-    ...removed
-      .map((node) => before.get(node)?.rect)
-      .filter((r) => r !== undefined),
+    ...leaving.flatMap(({ node }) => {
+      const rect = before.get(node)?.rect;
+      return rect ? [rect] : [];
+    }),
   ];
   // The glyph boxes decide whether ink sticks out; the room also covers
   // their blur and tilt.
   const glyphStart =
-    Math.min(Infinity, ...inkRects.map((r) => r.left)) - stageAfter.left;
+    Math.min(Infinity, ...inkRects.map((r) => r.left)) - origin.left;
   const glyphEnd =
-    Math.max(-Infinity, ...inkRects.map((r) => r.right)) - stageAfter.left;
-  const inkStart = glyphStart - INK_MARGIN * em;
-  const inkEnd = glyphEnd + INK_MARGIN * em;
+    Math.max(-Infinity, ...inkRects.map((r) => r.right)) - origin.left;
   const wasArmed = ghostLayer.dataset.armed ?? "";
   const armed = (side: Side): boolean => {
-    if (o.edgeFade === "never" || inkRects.length === 0) return false;
+    if (!box || o.edgeFade === "never" || inkRects.length === 0) return false;
     if (wasArmed.includes(side)) return true;
     const travels =
       side === "start"
-        ? Math.abs(boxStart) > 0.5
-        : Math.abs(boxEnd - width) > 0.5;
+        ? Math.abs(boxStart - finalStart) > 0.5
+        : Math.abs(boxEnd - finalEnd) > 0.5;
     const overhangs =
-      side === "start" ? glyphStart < -0.5 : glyphEnd > width + 0.5;
+      side === "start"
+        ? glyphStart < finalStart - 0.5
+        : glyphEnd > finalEnd + 0.5;
     if (!travels || !overhangs) return false;
     return (
       o.edgeFade === "always" ||
       inkEscapes(
         root,
         side,
-        stageAfter.left + (side === "start" ? glyphStart : glyphEnd),
+        origin.left + (side === "start" ? glyphStart : glyphEnd),
       )
     );
   };
@@ -356,39 +444,44 @@ function morphTo(
 
   // A rise brings new glyphs up from below and sends old ones up and away.
   const arrive = match.trend;
-  const leave = match.trend === 1 ? -1 : 1;
+  const away = match.trend === 1 ? -1 : 1;
 
-  // Width: back to where it visibly was, then ease to the new width.
-  root.style.width = `${rootBefore.width}px`;
-  void root.offsetWidth;
-  root.style.transition = `width ${o.width.duration}ms ${o.width.easing}`;
-  root.style.width = `${width}px`;
-  started.push(...root.getAnimations());
-  settleTimers.set(
-    root,
-    window.setTimeout(() => {
-      root.style.transition = "";
-      root.style.width = "";
-    }, o.width.duration + 50),
-  );
+  if (box) {
+    // Width: back to where it visibly was, then ease to the new width.
+    root.style.width = `${rootBefore.width}px`;
+    void root.offsetWidth;
+    root.style.transition = `width ${o.width.duration}ms ${o.width.easing}`;
+    root.style.width = `${width}px`;
+    started.push(...root.getAnimations());
+    settleTimers.set(
+      root,
+      window.setTimeout(() => {
+        delete root.dataset.box;
+        root.style.transition = "";
+        root.style.width = "";
+      }, o.width.duration + 50),
+    );
 
-  // The box's left edge moves while it resizes (a centred pill, a
-  // right-pinned button); ride the other way on the same curve.
-  const ride = rootAfter.left - rootBefore.left;
-  if (Math.abs(ride) > 0.5) {
-    run(stage, [{ translate: `${ride}px 0` }, { translate: "0 0" }], {
-      duration: o.width.duration,
-      easing: o.width.easing,
-    });
+    // The box's left edge moves while it resizes (a centred pill, a
+    // right-pinned button); ride the other way on the same curve.
+    const ride = rootAfter.left - rootBefore.left;
+    if (Math.abs(ride) > 0.5) {
+      run(stage, [{ translate: `${ride}px 0` }, { translate: "0 0" }], {
+        duration: o.width.duration,
+        easing: o.width.easing,
+      });
+    }
   }
 
   const motion = { duration: o.motion.duration, easing: o.motion.easing };
   const blur = `blur(${o.blur}em)`;
   const delays = staggerDelays(
     o,
-    nodes.flatMap((_, i) => (kept[i] ? [] : [after[i].left - rootAfter.left])),
-    removed.map(
-      (node) =>
+    nodes.flatMap((node, i) =>
+      kept[i] || spaceNode(node) ? [] : [after[i].left - rootAfter.left],
+    ),
+    leaving.map(
+      ({ node }) =>
         (before.get(node)?.rect.left ?? rootBefore.left) - rootBefore.left,
     ),
   );
@@ -396,6 +489,7 @@ function morphTo(
   // Shared glyphs slide from wherever they were, including mid-animation.
   let entering = 0;
   nodes.forEach((node, i) => {
+    if (spaceNode(node)) return;
     const was = kept[i] ? before.get(node) : undefined;
     const kind = match.nextKinds[i];
     const { fadeIn } = fadesFor(o, kind);
@@ -421,8 +515,11 @@ function morphTo(
       );
       return;
     }
-    const dx = was.rect.left - after[i].left;
-    const dy = was.rect.top - after[i].top;
+    // Centres, since scale and tilt pivot on them.
+    const dx =
+      was.rect.left + was.rect.width / 2 - (after[i].left + after[i].width / 2);
+    const dy =
+      was.rect.top + was.rect.height / 2 - (after[i].top + after[i].height / 2);
     if (
       Math.abs(dx) > 0.5 ||
       Math.abs(dy) > 0.5 ||
@@ -454,30 +551,65 @@ function morphTo(
     }
   });
 
-  // The ghost layer reaches past all the ink (a mask cuts whatever falls
-  // outside its element), and wears a band on each armed edge that follows
-  // the box edge on the width's curve, ending a little past it.
+  // Leaving glyphs move into slots at the place they sat in the layout,
+  // and start from wherever they were drawn.
+  const newSlots = leaving.flatMap(({ node, kind }) => {
+    const home = homes.get(node);
+    if (!home) return [];
+    const slot = document.createElement("span");
+    slot.className = "text-morph-ghost";
+    slot.style.setProperty("--w", `${home.width}px`);
+    slot.style.setProperty("--h", `${home.height}px`);
+    placeSlot(slot, home.left - origin.left, home.top - origin.top);
+    slot.append(node);
+    return [{ slot, node, kind, home }];
+  });
+
+  // Size the layer around every slot (a mask cuts whatever falls outside
+  // its element) and, when the edge fade is armed, the band's reach.
+  const allSlots = [...slots, ...newSlots.map((s) => s.slot)];
+  if (allSlots.length === 0) {
+    clearLayer(ghostLayer);
+    return started;
+  }
   const slack = EDGE_SLACK * em;
-  const room = Math.ceil(
-    Math.max(
-      0,
-      -inkStart,
-      inkEnd - width,
-      -(boxStart - slack),
-      boxEnd + slack - width,
-    ) + 1,
-  );
-  ghostLayer.style.setProperty("--text-morph-room", `${room}px`);
+  const padX = SLOT_PAD_X * em;
+  const padY = SLOT_PAD_Y * em;
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const slot of allSlots) {
+    const x = px(slot, "--x");
+    const y = px(slot, "--y");
+    minX = Math.min(minX, x - padX - INK_MARGIN * em);
+    maxX = Math.max(maxX, x + px(slot, "--w") + padX + INK_MARGIN * em);
+    minY = Math.min(minY, y - padY);
+    maxY = Math.max(maxY, y + px(slot, "--h") + padY);
+  }
+  if (armStart || armEnd) {
+    minX = Math.min(minX, boxStart - slack, finalStart - slack);
+    maxX = Math.max(maxX, boxEnd + slack, finalEnd + slack);
+  }
+  const ox = Math.floor(minX) - 1;
+  const oy = Math.floor(minY) - 1;
+  const layerWidth = Math.ceil(maxX) + 1 - ox;
+  ghostLayer.style.setProperty("--ox", `${ox}px`);
+  ghostLayer.style.setProperty("--oy", `${oy}px`);
+  ghostLayer.style.width = `${layerWidth}px`;
+  ghostLayer.style.height = `${Math.ceil(maxY) + 1 - oy}px`;
+
+  // The edge fade: a band on each armed edge that follows the box edge on
+  // the width's curve, ending a little past it.
   for (const animation of ghostLayer.getAnimations()) animation.cancel();
   if (armStart || armEnd) {
     const ramp = EDGE_RAMP * em;
-    const span = width + 2 * room;
     const window = (start: number, end: number) => {
-      const left = armStart ? room + start - slack : 0;
-      const right = armEnd ? room + end + slack : span;
+      const left = armStart ? start - slack - ox : 0;
+      const right = armEnd ? end + slack - ox : layerWidth;
       return {
-        maskPosition: `0 0, ${left}px 0`,
-        maskSize: `100% 100%, ${right - left}px 100%`,
+        maskPosition: `${left}px 0`,
+        maskSize: `${right - left}px 100%`,
       };
     };
     ghostLayer.dataset.armed = `${armStart ? "start " : ""}${armEnd ? "end" : ""}`;
@@ -487,7 +619,7 @@ function morphTo(
         armEnd ? `#000 calc(100% - ${ramp}px), transparent` : "#000"
       })`,
     );
-    run(ghostLayer, [window(boxStart, boxEnd), window(0, width)], {
+    run(ghostLayer, [window(boxStart, boxEnd), window(finalStart, finalEnd)], {
       duration: o.width.duration,
       easing: o.width.easing,
       fill: "forwards",
@@ -496,24 +628,22 @@ function morphTo(
     disarm(ghostLayer);
   }
 
-  // Removed glyphs leave from where they were, in the ghost layer.
-  removed.forEach((node, i) => {
+  newSlots.forEach(({ slot, node, kind, home }, i) => {
+    ghostLayer.append(slot);
     const was = before.get(node);
     if (!was) return;
-    placeGhost(
-      node,
-      was.rect.left - stageAfter.left,
-      was.rect.top - stageAfter.top,
-    );
-    ghostLayer.append(node);
-    const kind = removedKinds[i];
     const { fadeOut } = fadesFor(o, kind);
     const delay = delays.leaving[i];
+    // Drawn where it was: the offset its animation had it at.
+    const dx =
+      was.rect.left + was.rect.width / 2 - (home.left + home.width / 2);
+    const dy =
+      was.rect.top + was.rect.height / 2 - (home.top + home.height / 2);
     const move = run(
       node,
       [
-        { translate: "0 0", scale: was.scale, rotate: was.rotate },
-        awayState(o, kind, leave, line),
+        { translate: `${dx}px ${dy}px`, scale: was.scale, rotate: was.rotate },
+        awayState(o, kind, away, line),
       ],
       { ...motion, delay, fill: "forwards" },
     );
@@ -531,8 +661,8 @@ function morphTo(
       },
     );
     const finish = (): void => {
-      if (node.parentNode === ghostLayer) node.remove();
-      if (ghostLayer.childElementCount === 0) disarm(ghostLayer);
+      if (slot.parentNode === ghostLayer) slot.remove();
+      if (ghostLayer.childElementCount === 0) clearLayer(ghostLayer);
     };
     // Cancelled by a later change, which already moved on without it.
     Promise.all([move.finished, out.finished]).then(finish, finish);
@@ -569,6 +699,13 @@ export type TextMorphProps = Omit<
   onAnimationComplete?: () => void;
   /** A change was interrupted by the next one. */
   onAnimationCancel?: () => void;
+  /**
+   * For a field someone is typing in: where the caret sits in `value` after
+   * the edit. Glyphs are matched around it, so typing 1 in front of 20
+   * inserts a digit instead of renumbering the column. Leave it unset for
+   * values that change on their own.
+   */
+  cursorIndex?: number;
 };
 
 function formatValue(
@@ -595,6 +732,7 @@ export function TextMorph({
   onAnimationStart,
   onAnimationComplete,
   onAnimationCancel,
+  cursorIndex,
   className,
   render,
   ...props
@@ -615,6 +753,7 @@ export function TextMorph({
     onAnimationStart,
     onAnimationComplete,
     onAnimationCancel,
+    cursorIndex,
   });
   React.useLayoutEffect(() => {
     optionsRef.current = resolved;
@@ -624,6 +763,7 @@ export function TextMorph({
       onAnimationStart,
       onAnimationComplete,
       onAnimationCancel,
+      cursorIndex,
     };
   });
 
@@ -652,7 +792,7 @@ export function TextMorph({
       ghosts,
       value,
       optionsRef.current,
-      decimalFor(locale),
+      { decimal: decimalFor(locale), caret: current.cursorIndex },
       !current.disabled && !reduce && isOnScreen(root),
     );
     if (started.length === 0) {

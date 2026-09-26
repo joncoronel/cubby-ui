@@ -13,8 +13,8 @@ type HeadingsState = {
 const EMPTY: HeadingsState = { active: null, visible: [] };
 const HeadingsContext = React.createContext<HeadingsState>(EMPTY);
 
-/** The sticky header covers the top of the viewport. */
-const HEADER = 56;
+/** The header plus the frame's top edge cover the top of the viewport. */
+const HEADER = 64;
 /** A heading becomes active once it rises past this share of the viewport. */
 const READING_LINE = 0.25;
 

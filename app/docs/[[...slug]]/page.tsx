@@ -31,7 +31,7 @@ export default async function Page(props: PageProps) {
     <>
       <PageNavigation
         toc={page.data.toc}
-        className="fixed top-1/2 right-6 z-30 -translate-y-1/2"
+        className="fixed top-1/2 right-8 z-30 -translate-y-1/2"
       />
 
       <article className="docs-article px-5 pt-10 pb-28 sm:px-8 sm:pt-12 md:pb-16">
@@ -64,7 +64,7 @@ export default async function Page(props: PageProps) {
         </header>
 
         <div
-          className="docs-enter docs-prose mt-8"
+          className="docs-enter-fade docs-prose mt-8"
           style={{ ["--enter-delay" as string]: "70ms" }}
         >
           <MDX

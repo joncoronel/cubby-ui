@@ -10,6 +10,28 @@
 :root:has(.docs-root) {
   scrollbar-gutter: stable;
   scroll-padding-top: 5rem;
+
+  /* The frame the page card sits in: a step darker than the card, the way a
+     code block's tray sits under its code. The card keeps the page color, so
+     every component still sits on the background it was designed for. */
+  --docs-frame: oklch(0.925 var(--neutral-chroma-low) var(--neutral-hue));
+  --frame-top: 3.5rem;
+  --frame-gap: 0.5rem;
+  --frame-radius: 1rem;
+  background-color: var(--docs-frame);
+}
+:root.dark:has(.docs-root) {
+  --docs-frame: var(--chrome);
+}
+@media (min-width: 40rem) {
+  :root:has(.docs-root) {
+    --frame-gap: 0.75rem;
+    --frame-radius: 1.25rem;
+  }
+}
+:root:has(.docs-root) body,
+:root:has(.docs-root) .root {
+  background-color: var(--docs-frame);
 }
 
 .docs-root {
@@ -18,6 +40,103 @@
   --docs-ease-in: cubic-bezier(0.55, 0.055, 0.675, 0.19);
   --docs-text: color-mix(in oklab, var(--foreground) 88%, var(--background));
   --docs-tick: color-mix(in oklab, var(--foreground) 16%, transparent);
+}
+
+/* ── Frame and card ─────────────────────────────────────────────────────── */
+
+/* Three layers draw the card; content scrolls between them and none of them
+   take pointer events.
+
+   Nothing here is sized from both the top and the bottom edge: Chrome on
+   Android resolves such an element against a different viewport height while
+   the URL bar slides, and only fixes it when the gesture ends, so the card
+   gapped or overflowed mid-scroll. Instead the fill and the frame's top and
+   sides are pinned to the top and made taller than the largest viewport
+   (they never resize), and the bottom edge is its own layer pinned to the
+   bottom, which Chrome moves with the URL bar. */
+.docs-card-fill,
+.docs-frame,
+.docs-frame-bottom {
+  position: fixed;
+  pointer-events: none;
+}
+
+/* The card's fill, behind the content. */
+.docs-card-fill {
+  z-index: -1;
+  top: var(--frame-top);
+  left: var(--frame-gap);
+  right: var(--frame-gap);
+  height: 100lvh;
+  border-radius: var(--frame-radius) var(--frame-radius) 0 0;
+  background-color: var(--background);
+}
+
+/* Top and side edges: a huge spread shadow in the frame color paints
+   everything outside the rounded rectangle. Its own bottom corners hang below
+   the largest viewport, out of sight. */
+.docs-frame {
+  z-index: 40;
+  top: var(--frame-top);
+  left: var(--frame-gap);
+  right: var(--frame-gap);
+  height: calc(100lvh + 2 * var(--frame-radius));
+  border-radius: var(--frame-radius);
+  box-shadow: var(--docs-frame-edge);
+}
+
+/* Bottom edge: a strip pinned to the bottom, showing only the lower half of
+   the same rounded rectangle (its rounded corners and bottom hairline). */
+.docs-frame-bottom {
+  z-index: 40;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--frame-gap) + var(--frame-radius));
+  overflow: hidden;
+}
+.docs-frame-bottom::before {
+  content: "";
+  z-index: 1;
+  position: absolute;
+  left: var(--frame-gap);
+  right: var(--frame-gap);
+  bottom: var(--frame-gap);
+  height: calc(2 * var(--frame-radius));
+  border-radius: var(--frame-radius);
+  box-shadow: var(--docs-frame-edge);
+}
+
+/* The top layer's side hairlines run on down into this strip, where they'd
+   overlap the curved hairline (stacking two translucent lines) and poke a few
+   pixels past where the corner starts to curve. Paint that 1px column in the
+   card's own color underneath the curve; content never reaches the card's
+   outer pixel, so it only hides the stray line. */
+.docs-frame-bottom::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--frame-gap);
+  right: var(--frame-gap);
+  box-shadow:
+    inset 1px 0 0 var(--background),
+    inset -1px 0 0 var(--background);
+}
+
+.docs-root {
+  --docs-frame-edge:
+    0 0 0 100vmax var(--docs-frame), inset 0 0 0 1px var(--border);
+}
+.dark .docs-root {
+  --docs-frame-edge:
+    0 0 0 100vmax var(--docs-frame), inset 0 0 0 1px oklch(1 0 0 / 0.07),
+    inset 0 1px 0 0 oklch(1 0 0 / 0.06);
+}
+
+.docs-main {
+  padding-top: var(--frame-top);
+  padding-bottom: var(--frame-gap);
 }
 
 .docs-root ::selection {
@@ -30,26 +149,27 @@
 
 /* ── Header ─────────────────────────────────────────────────────────────── */
 
+/* The header sits on the frame, above the card, so it never changes as the
+   page scrolls. */
 .docs-header {
   background-color: transparent;
-  box-shadow: 0 1px 0 transparent;
-  transition:
-    background-color 0.3s ease-out,
-    box-shadow 0.3s ease-out,
-    backdrop-filter 0.3s ease-out;
 }
 
-.docs-header[data-scrolled] {
-  background-color: color-mix(in oklab, var(--background) 84%, transparent);
-  backdrop-filter: blur(14px) saturate(1.4);
-  box-shadow: 0 1px 0 var(--border);
+/* The logo arrives as one composited fade and settle: the drawn-stroke
+   version animates SVG paint on the main thread, which freezes while the
+   page hydrates. */
+.docs-header .cubby-logo {
+  animation: docs-logo-in 0.6s var(--docs-ease) both;
 }
-
-/* While the shelf is open, header and panel read as one sheet. */
-:root[data-shelf-open] .docs-header {
-  background-color: var(--background);
-  backdrop-filter: none;
-  box-shadow: 0 1px 0 transparent;
+.docs-header .cubby-logo path {
+  animation: none;
+  fill-opacity: 1;
+}
+@keyframes docs-logo-in {
+  from {
+    opacity: 0;
+    scale: 0.9;
+  }
 }
 
 .docs-shelf-trigger {
@@ -103,7 +223,13 @@
 
 /* ── Shelf ──────────────────────────────────────────────────────────────── */
 
+/* The shelf opens inside the card, clipped to its rounded rectangle. */
 .docs-shelf {
+  position: fixed;
+  inset: var(--frame-top) var(--frame-gap) var(--frame-gap);
+  z-index: 45;
+  overflow: hidden;
+  border-radius: var(--frame-radius);
   visibility: hidden;
   pointer-events: none;
   transition: visibility 0s linear 0.3s;
@@ -132,7 +258,7 @@
   clip-path: inset(0 0 100% 0);
   box-shadow:
     0 1px 0 var(--border),
-    0 24px 48px -16px oklch(0 0 0 / 0.16);
+    0 24px 48px -16px oklch(0 0 0 / 0.12);
   transition: clip-path 0.26s var(--docs-ease-in);
 }
 .dark .docs-shelf-panel {
@@ -214,15 +340,25 @@
 
 /* ── Small motion vocabulary ────────────────────────────────────────────── */
 
+/* Entrances stay on the compositor (opacity and transform only), so they
+   keep running smoothly while the page hydrates. */
 @keyframes docs-enter {
   from {
     opacity: 0;
     translate: 0 0.5rem;
-    filter: blur(3px);
   }
 }
 .docs-enter {
   animation: docs-enter 0.6s var(--docs-ease) both;
+  animation-delay: var(--enter-delay, 0ms);
+}
+@keyframes docs-fade {
+  from {
+    opacity: 0;
+  }
+}
+.docs-enter-fade {
+  animation: docs-fade 0.5s ease-out both;
   animation-delay: var(--enter-delay, 0ms);
 }
 
@@ -655,7 +791,7 @@
    a fixed overlay, so the safe-area inset stays 0 everywhere else. */
 .docs-toc-pill-wrap {
   --safe-bottom: 0px;
-  bottom: calc(1rem + var(--safe-bottom));
+  bottom: calc(1rem + var(--frame-gap) + var(--safe-bottom));
   opacity: 0;
   translate: 0 1.5rem;
   pointer-events: none;
@@ -712,6 +848,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .docs-enter,
+  .docs-enter-fade,
+  .docs-header .cubby-logo,
   .docs-code-reveal:not([hidden]) {
     animation: none;
   }

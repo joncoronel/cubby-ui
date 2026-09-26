@@ -139,7 +139,7 @@ export function Shelf({ id, groups, open, currentUrl, onClose }: ShelfProps) {
       id={id}
       data-open={open ? "" : undefined}
       inert={!open}
-      className="docs-shelf fixed inset-x-0 top-14 bottom-0 z-40"
+      className="docs-shelf"
     >
       <div
         aria-hidden="true"

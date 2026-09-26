@@ -98,7 +98,7 @@ export function LLMCopyButton({
   // synchronously: the most reliable path on mobile browsers and webviews.
   React.useEffect(() => {
     const load = () => void fetchMarkdown(markdownUrl).catch(() => {});
-    if ("requestIdleCallback" in window) {
+    if (typeof window.requestIdleCallback === "function") {
       const id = window.requestIdleCallback(load, { timeout: 3000 });
       return () => window.cancelIdleCallback(id);
     }

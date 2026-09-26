@@ -79,6 +79,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Before first paint: mark the platform so shortcut hints (Cmd vs
+            Ctrl) render correctly without waiting for hydration. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var p=(navigator.userAgentData&&navigator.userAgentData.platform)||navigator.userAgent;document.documentElement.dataset.platform=/mac|iphone|ipad/i.test(p)?"mac":"windows"}catch(e){}`,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${rubik.variable} ${display.variable} font-sans antialiased`}
       >

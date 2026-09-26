@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { TextMorph } from "torph/react";
+import { useTextMorph } from "torph/react";
 import { cn } from "@/lib/utils";
 
 /** Flattens a heading's React title (which may hold inline code) to text. */
@@ -15,11 +15,80 @@ export function toPlainText(node: React.ReactNode): string {
   return "";
 }
 
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+/**
+ * torph, mounted on `from` and immediately updated to `to`, so the first
+ * change still morphs. torph owns this element's children from here on,
+ * which is why they're set once through innerHTML rather than by React.
+ */
+function LiveMorph({
+  from,
+  to,
+  className,
+  duration,
+  onAnimationComplete,
+}: {
+  from: string;
+  to: string;
+  className?: string;
+  duration?: number;
+  onAnimationComplete?: () => void;
+}) {
+  const { ref, update } = useTextMorph({
+    ...(duration ? { duration } : null),
+    onAnimationComplete,
+  });
+  // Set once: after mount torph owns the children.
+  const [initialHtml] = React.useState(() => ({ __html: escapeHtml(from) }));
+  const started = React.useRef(false);
+  const settled = React.useRef(false);
+
+  React.useEffect(() => {
+    // First, settle torph on the old text; morph to the new one a frame
+    // later (both in the same tick skips the transition). The frame is
+    // rescheduled if an effect re-run cancels it before it fires.
+    if (!started.current) {
+      started.current = true;
+      update(from);
+    }
+    if (settled.current) {
+      update(to);
+      return;
+    }
+    const frame = requestAnimationFrame(() => {
+      settled.current = true;
+      update(to);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [from, to, update]);
+
+  return (
+    <span
+      ref={ref as React.RefObject<HTMLSpanElement>}
+      className={className}
+      dangerouslySetInnerHTML={initialHtml}
+    />
+  );
+}
+
 /**
  * Text that morphs letter by letter when it changes: the site's one way of
- * animating a label swap. torph's own defaults (400ms on the expo curve, which
- * is also our --ease-out-expo) and it steps straight to the new text under
+ * animating a label swap, on torph's defaults (400ms on the expo curve, which
+ * is also our --ease-out-expo), stepping straight to the new text under
  * reduced motion.
+ *
+ * torph is mounted lazily. On first render (and so during hydration) this is
+ * plain text; torph only attaches the first time the text changes. Attaching
+ * splits the label into one span per letter and measures each of them, and
+ * with a dozen labels on a page doing that at load forced dozens of
+ * whole-page style recalculations while the page hydrated.
  *
  * `feedback` is for labels that change because the reader clicked (Copied,
  * Hide code): those answer the click, so they run at 250ms instead of 400.
@@ -43,6 +112,14 @@ export function MorphText({
   const clipRef = React.useRef<HTMLSpanElement>(null);
   const [overflowing, setOverflowing] = React.useState(false);
 
+  // The text torph starts from, set the first time the label changes.
+  const [from, setFrom] = React.useState<string | null>(null);
+  const [prev, setPrev] = React.useState(children);
+  if (children !== prev) {
+    setPrev(children);
+    if (from === null) setFrom(prev);
+  }
+
   const measure = React.useCallback(() => {
     const el = clipRef.current;
     if (el) setOverflowing(el.scrollWidth > el.clientWidth + 1);
@@ -57,17 +134,21 @@ export function MorphText({
     return () => observer.disconnect();
   }, [truncate, measure]);
 
-  const morph = (
-    <TextMorph
-      {...(feedback ? { duration: 250 } : null)}
-      className={truncate ? undefined : className}
-      onAnimationComplete={truncate ? measure : undefined}
-    >
-      {children}
-    </TextMorph>
-  );
+  const textClassName = truncate ? undefined : className;
+  const text =
+    from === null ? (
+      <span className={textClassName}>{children}</span>
+    ) : (
+      <LiveMorph
+        from={from}
+        to={children}
+        className={textClassName}
+        duration={feedback ? 250 : undefined}
+        onAnimationComplete={truncate ? measure : undefined}
+      />
+    );
 
-  if (!truncate) return morph;
+  if (!truncate) return text;
 
   return (
     <span
@@ -75,7 +156,7 @@ export function MorphText({
       data-overflowing={overflowing ? "" : undefined}
       className={cn("docs-morph-clip", className)}
     >
-      {morph}
+      {text}
     </span>
   );
 }

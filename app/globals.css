@@ -632,6 +632,14 @@ html {
   --surface-active: var(--chrome-hover);
 }
 
+/* Platform-specific hints: <html data-platform> is set by an inline script in
+   the root layout, so the right variant shows from first paint. Before the
+   flag exists (no JS), the Windows hint shows. */
+:root[data-platform="mac"] [data-platform-only="windows"],
+:root:not([data-platform="mac"]) [data-platform-only="mac"] {
+  display: none;
+}
+
 .dither-test {
   --dither-gray: 1;
   --dither-contrast: 120;

@@ -36,8 +36,8 @@ function PageTracker({ toc }: { toc: TOCItemType[] }) {
     if (!title) return;
     const observer = new IntersectionObserver(
       ([entry]) => setDocsPageState({ pastTitle: !entry.isIntersecting }),
-      // The sticky header covers the top 56px.
-      { rootMargin: "-56px 0px 0px 0px" },
+      // The header and the frame's top edge cover the top ~64px.
+      { rootMargin: "-64px 0px 0px 0px" },
     );
     observer.observe(title);
     return () => observer.disconnect();

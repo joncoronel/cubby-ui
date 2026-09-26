@@ -28,24 +28,24 @@ export const GITHUB_URL = "https://github.com/joncoronel/cubby-ui";
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = React.useState(false);
 
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const isDark = mounted && resolvedTheme === "dark";
-
+  // Both icons render; the `.dark` class next-themes sets before first paint
+  // picks one, so the right icon shows without waiting for hydration.
   return (
     <Button
       variant="ghost"
       size="icon_sm"
       aria-label="Toggle theme"
-      onClick={() => setTheme(isDark ? "light" : "dark")}
+      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
     >
       <HugeiconsIcon
-        icon={isDark ? Sun01Icon : Moon01Icon}
-        className="size-4"
+        icon={Moon01Icon}
+        className="size-4 dark:hidden"
+        strokeWidth={2}
+      />
+      <HugeiconsIcon
+        icon={Sun01Icon}
+        className="hidden size-4 dark:block"
         strokeWidth={2}
       />
     </Button>
@@ -67,12 +67,24 @@ export function SearchTrigger() {
     >
       <HugeiconsIcon icon={Search01Icon} className="size-4" strokeWidth={2} />
       <span>Search</span>
-      <Kbd
-        size="sm"
-        variant="outline"
-        keys={["cmd", "k"]}
-        className="ml-1 hidden lg:inline-flex"
-      />
+      {/* Both variants render on the server; the platform flag set in the
+          document head picks one before first paint (see globals.css). */}
+      <span className="ml-1 hidden lg:inline-flex">
+        <Kbd
+          size="sm"
+          variant="outline"
+          platform="mac"
+          keys={["cmd", "k"]}
+          data-platform-only="mac"
+        />
+        <Kbd
+          size="sm"
+          variant="outline"
+          platform="windows"
+          keys={["cmd", "k"]}
+          data-platform-only="windows"
+        />
+      </span>
     </button>
   );
 }

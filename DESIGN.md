@@ -200,7 +200,7 @@ A cool, faintly violet-tinted neutral stack with a single saturated blue, expres
 
 ## Layout
 
-One centered column. Everything, previews included, sits in one `{spacing.content}` (48rem) column; nothing breaks out wider, so every block shares both edges. Header and shelf content share a `{spacing.chrome-max}` (76rem) container with 1.25rem to 2rem side padding. The sticky header is `{spacing.header-height}` (56px) and scroll padding is 5rem.
+The docs page is a card set in a frame. The frame (`--docs-frame`: oklch 0.925 in light, the chrome near-black in dark) holds the header; the card keeps the page color (`--background`), so components sit on the background they were designed for. The card is inset 8px (12px from sm up) on the sides and bottom, starts under the 56px header, and has a 16px (20px) radius with a 1px hairline edge. The document still scrolls natively: two fixed layers draw the card fill behind the content and the frame in front of it (a rounded rectangle with a 100vmax spread shadow in the frame color), so content reads as scrolling inside the card while scroll restoration, anchors, and the mobile URL bar keep working. No layer is sized from both its top and bottom edge: Chrome on Android resolves those against a different viewport height while the URL bar slides, so the fill and the frame's top and sides are pinned to the top at `100lvh` (they never resize) and the bottom edge is its own bottom-pinned strip, which moves with the URL bar. The shelf opens inside the card's rounded rectangle. One centered column. Everything, previews included, sits in one `{spacing.content}` (48rem) column; nothing breaks out wider, so every block shares both edges. Header and shelf content share a `{spacing.chrome-max}` (76rem) container with 1.25rem to 2rem side padding. The sticky header is `{spacing.header-height}` (56px) and scroll padding is 5rem.
 
 Vertical rhythm is set by the container, not the blocks: siblings flow at `{spacing.flow}`; any component block (preview, table, note) takes `{spacing.block}` above and below; h2 takes `{spacing.headline-above}` above, h3 `{spacing.title-above}`, h4 to h6 2.25rem; the gap after h2 and h3 is `{spacing.heading-below}`, after h4 0.5rem. The page footer sits 6rem below content. Lists indent 1.25rem with 0.375rem between items.
 
@@ -246,7 +246,7 @@ Tactile and small. Paint lives on a `::before` layer so press can scale it witho
 - **Focus:** the shared 2px half-strength ring; the caret is blue on docs.
 
 ### Navigation
-- **Docs header:** 56px, transparent at rest; once scrolled, 84% page color with a 14px blur and a hairline underneath (300ms ease-out). While the shelf is open, header and panel become one opaque sheet.
+- **Docs header:** 56px, fixed, sitting on the frame above the card; it never changes as the page scrolls. The logo enters as one composited fade and settle (opacity and scale, 600ms), not the home page's drawn stroke, which freezes while the page hydrates.
 - **Shelf trigger:** a pill reading "Group / Page" with the four-cell cubby glyph (first cell blue, others at 32% ink) and a chevron that turns 180 degrees. Open state uses surface-selected; the glyph cells spread 0.75px apart.
 - **Section crumb:** a slash and the active section title, which morphs letter by letter when the section changes; it opens a menu of the page's headings.
 - **Home top nav:** the shared search trigger, theme toggle, and GitHub link, reused by the docs header.
@@ -276,6 +276,9 @@ Any label that swaps in place morphs letter by letter with torph (`MorphText` in
 
 ### Scrolling lists
 Popup lists that can outgrow the viewport (the minimap card, the mobile TOC list) scroll inside `ScrollArea` with `fadeEdges="y"` and contained overscroll, the max height set on its viewport.
+
+### Hydration-safe chrome
+Anything visible on first paint must not change when React hydrates. Platform shortcut hints render both variants and CSS picks one from `<html data-platform>`, set by an inline script in the head; the theme toggle renders both icons and `.dark` picks one; `MorphText` renders plain text until its label first changes and only then mounts torph, so nothing splits or measures text during hydration (a dozen labels doing so at load forced dozens of whole-page style recalcs, because the page carries ~150 `:has()` selectors that make any DOM insertion invalidate broadly). Styles for portaled popups use literal values, not `--docs-*` tokens, which only exist inside `.docs-root`.
 
 ### Mobile TOC Pill
 Below md, the table of contents is a pill floating 1rem above the bottom edge (plus the iOS safe area; Android keeps 0 to avoid the fixed-overlay viewport bug). It appears once the title scrolls away (rises 1.5rem and fades, 350ms ease-out-expo) and hides while the shelf is open. It shows a 16px ring filling in Cubby Blue with reading progress, the current section name (morphs on change), and a chevron that turns when open. The pill takes its fill and shadow from the surface ladder (`solidSurface(3, 5)`: level-3 fill, level-5 shadow), like other floating controls; it presses to 97%. Tapping opens a Popover above it listing every heading (40px rows, current one on surface-selected), scrolled to the current section; choosing one scrolls there and closes.

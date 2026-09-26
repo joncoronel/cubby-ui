@@ -112,7 +112,6 @@ function findCurrent(groups: ShelfGroup[], pathname: string) {
 export function DocsHeader({ groups }: { groups: ShelfGroup[] }) {
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
-  const [scrolled, setScrolled] = React.useState(false);
   const triggerRef = React.useRef<HTMLButtonElement>(null);
 
   const current = findCurrent(groups, pathname);
@@ -123,13 +122,6 @@ export function DocsHeader({ groups }: { groups: ShelfGroup[] }) {
     setPrevPath(pathname);
     setOpen(false);
   }
-
-  React.useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 4);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   // While the shelf is open the page behind it is scrim, not content.
   React.useEffect(() => {
@@ -151,10 +143,7 @@ export function DocsHeader({ groups }: { groups: ShelfGroup[] }) {
 
   return (
     <>
-      <header
-        data-scrolled={scrolled || open ? "" : undefined}
-        className="docs-header sticky top-0 z-50 h-14 w-full"
-      >
+      <header className="docs-header fixed inset-x-0 top-0 z-50 h-14">
         <div className="mx-auto flex h-full max-w-[76rem] items-center gap-2 px-3 sm:gap-3 sm:px-8">
           <Link
             href="/"

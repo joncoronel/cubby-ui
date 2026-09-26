@@ -43,19 +43,13 @@ export type MatchOptions = {
 
 type NumberToken = { start: number; end: number };
 
-const graphemeSegmenter =
-  typeof Intl !== "undefined" && "Segmenter" in Intl
-    ? new Intl.Segmenter(undefined, { granularity: "grapheme" })
-    : null;
-const wordSegmenter =
-  typeof Intl !== "undefined" && "Segmenter" in Intl
-    ? new Intl.Segmenter(undefined, { granularity: "word" })
-    : null;
+const graphemeSegmenter = new Intl.Segmenter(undefined, {
+  granularity: "grapheme",
+});
+const wordSegmenter = new Intl.Segmenter(undefined, { granularity: "word" });
 
 function graphemes(text: string): string[] {
-  return graphemeSegmenter
-    ? Array.from(graphemeSegmenter.segment(text), (s) => s.segment)
-    : Array.from(text);
+  return Array.from(graphemeSegmenter.segment(text), (s) => s.segment);
 }
 
 /**
@@ -74,12 +68,27 @@ const JOINING =
  */
 export function textUnits(text: string): string[] {
   if (!JOINING.test(text)) return graphemes(text);
-  const words = wordSegmenter
-    ? Array.from(wordSegmenter.segment(text), (s) => s.segment)
-    : text.split(/(\s+)/).filter(Boolean);
+  const words = Array.from(wordSegmenter.segment(text), (s) => s.segment);
   return words.flatMap((word) =>
     JOINING.test(word) ? [word] : graphemes(word),
   );
+}
+
+/**
+ * A caret given as a string index (an input's `selectionStart`, in UTF-16
+ * code units) as a count of the units before it, which matching works in:
+ * an emoji, an accented letter or a whole Arabic word before the caret is
+ * several code units but one unit.
+ */
+export function caretUnits(units: string[], caret: number): number {
+  let length = 0;
+  let count = 0;
+  for (const unit of units) {
+    length += unit.length;
+    if (length > caret) break;
+    count++;
+  }
+  return count;
 }
 
 const SIGN = "+-−";
@@ -161,7 +170,6 @@ export function placeKeys(glyphs: string[], decimal: string): string[] {
   return keys;
 }
 
-/** The numeric value of a number token, or NaN. */
 /**
  * A decimal digit's value, in any script: digits run in blocks of ten from
  * zero, so it's the distance from the start of its run.
@@ -173,6 +181,7 @@ export function digitValue(digit: string): number {
   return (code - start) % 10;
 }
 
+/** The numeric value of a number token, or NaN. */
 export function parseNumber(glyphs: string[], decimal: string): number {
   let text = "";
   for (const g of glyphs) {
@@ -226,7 +235,7 @@ const MIN_RUN = 2;
 const RUN_SLACK = 2;
 
 /** The longest shared run within its travel cap; the shorter trip on ties. */
-export function floatingRun(
+function floatingRun(
   old: string[],
   next: string[],
 ): { from: number; to: number; length: number } | null {
@@ -274,7 +283,7 @@ function matchAnywhere(old: string[], next: string[]): [number, number][] {
  * shared before the edit and shifted by its length after it, and the
  * separators pair up from the end.
  */
-export function matchCaret(
+function matchCaret(
   old: string[],
   next: string[],
   caret: number,
@@ -293,19 +302,13 @@ export function matchCaret(
 
   // The caret, counted in non-separator glyphs.
   const at = nextRest.filter((i) => i < caret).length;
+  // Glyphs before the edit stay where they were; after it, they shift by
+  // its length. Typing `grew` glyphs ends at the caret, deleting starts
+  // there, and typing over a selection (grew 0) keeps everything in place.
   const grew = nextRest.length - oldRest.length;
-  if (grew > 0) {
-    // Typed `grew` glyphs, ending at the caret.
-    for (let k = 0; k < at - grew; k++) pair(k, k);
-    for (let k = at; k < nextRest.length; k++) pair(k, k - grew);
-  } else if (grew < 0) {
-    // Deleted glyphs, starting at the caret.
-    for (let k = 0; k < at; k++) pair(k, k);
-    for (let k = at; k < nextRest.length; k++) pair(k, k - grew);
-  } else {
-    // Typed over a selection: keep what still matches in place.
-    for (let k = 0; k < nextRest.length; k++) pair(k, k);
-  }
+  const before = grew > 0 ? at - grew : at;
+  for (let k = 0; k < before; k++) pair(k, k);
+  for (let k = at; k < nextRest.length; k++) pair(k, k - grew);
 
   const oldSeparators = old.flatMap((g, i) => (isSeparator(g) ? [i] : []));
   const nextSeparators = next.flatMap((g, i) => (isSeparator(g) ? [i] : []));
@@ -388,17 +391,11 @@ export function matchText(
   return { kept, nextKinds, oldKinds, trend: trend === -1 ? -1 : 1 };
 }
 
-const decimals = new Map<string, string>();
-
 /** The decimal separator for a locale. */
 export function decimalFor(locale: string): string {
-  let decimal = decimals.get(locale);
-  if (decimal === undefined) {
-    decimal =
-      new Intl.NumberFormat(locale)
-        .formatToParts(1.1)
-        .find((part) => part.type === "decimal")?.value ?? ".";
-    decimals.set(locale, decimal);
-  }
-  return decimal;
+  return (
+    new Intl.NumberFormat(locale)
+      .formatToParts(1.1)
+      .find((part) => part.type === "decimal")?.value ?? "."
+  );
 }

@@ -477,7 +477,7 @@
   },
   "text-morph": {
     "title": "Text Morph",
-    "description": "A text-morph component.",
+    "description": "Animates a label from one value to the next, glyph by glyph.",
     "dependencies": [],
     "reference": []
   },

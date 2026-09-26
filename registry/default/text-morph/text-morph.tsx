@@ -4,8 +4,18 @@ import * as React from "react";
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import { cn } from "@/lib/utils";
-import { decimalFor, matchText, textUnits, type GlyphKind } from "./lib/match";
-import { resolveOptions, type TextMorphOptions } from "./lib/options";
+import {
+  caretUnits,
+  decimalFor,
+  matchText,
+  textUnits,
+  type GlyphKind,
+} from "./lib/match";
+import {
+  resolveOptions,
+  type TextMorphOptions,
+  type TextMorphOverrides,
+} from "./lib/options";
 import "./text-morph.css";
 
 /*
@@ -42,12 +52,9 @@ import "./text-morph.css";
  * each in a slot at its own line that fades it out above and below.
  */
 
+/** Escapes text for use as element content (never in an attribute). */
 function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;");
 }
 
 /** Spaces are where lines may break; everything else sits in a word. */
@@ -135,7 +142,8 @@ function visualState(node: HTMLElement): VisualState {
  * `ms` later. `spread` (Scritto's sweep): delay from where the glyph sits,
  * across `ms` over the changed stretch only, so a one-digit change in a long
  * number isn't left waiting, and a glyph leaving and its replacement in the
- * same spot cross over together. `left` is measured from the box's start.
+ * same spot cross over together. Positions count from the start of the
+ * line in reading order.
  */
 function staggerDelays(
   o: TextMorphOptions,
@@ -201,6 +209,32 @@ function fadesFor(
   return { fadeIn: o.fadeIn, fadeOut: o.fadeOut };
 }
 const HOME: Keyframe = { translate: "0 0", scale: "1", rotate: "0deg" };
+
+/**
+ * How a change plays: in full, as a crossfade only (the reader prefers
+ * reduced motion: remove the movement, keep the change visible), or not at
+ * all (disabled, or nobody can see it).
+ */
+type Playback = "full" | "reduced" | "none";
+
+/** The options with nothing that moves, scales, tilts or blurs. */
+function stillOptions(o: TextMorphOptions): TextMorphOptions {
+  return {
+    ...o,
+    stagger: { ...o.stagger, ms: 0 },
+    roll: { distance: 0, scale: 1, rotate: 0 },
+    morph: { ...o.morph, scale: 1, digits: { ...o.morph.digits, distance: 0 } },
+    blur: 0,
+  };
+}
+
+/** How far `a`'s centre sits from `b`'s (scale and tilt pivot on centres). */
+function centreDelta(a: DOMRect, b: DOMRect): [number, number] {
+  return [
+    a.left + a.width / 2 - (b.left + b.width / 2),
+    a.top + a.height / 2 - (b.top + b.height / 2),
+  ];
+}
 
 /** Whether a change here would be seen: rendered, and in the viewport. */
 function isOnScreen(el: HTMLElement): boolean {
@@ -276,16 +310,6 @@ function inkEscapes(root: HTMLElement, side: Side, inkEdge: number): boolean {
 const px = (el: HTMLElement, name: string): number =>
   parseFloat(el.style.getPropertyValue(name)) || 0;
 
-/**
- * Where ghost coordinates start on screen: the ghost anchor's place in the
- * flow. The anchor never changes size, so that place doesn't depend on
- * which edge a line anchors it by (right-to-left lines anchor the right).
- */
-function layerOrigin(anchor: HTMLElement): { left: number; top: number } {
-  const rect = anchor.getBoundingClientRect();
-  return { left: rect.left, top: rect.top };
-}
-
 /** A ghost slot at x/y (its glyph's box, layer coordinates). */
 function placeSlot(slot: HTMLElement, x: number, y: number): void {
   slot.style.setProperty("--x", `${x}px`);
@@ -298,9 +322,11 @@ function disarm(ghostLayer: HTMLElement): void {
   delete ghostLayer.dataset.armed;
 }
 
-/** Once the last ghost has left, the layer folds away. */
-function clearLayer(ghostLayer: HTMLElement): void {
-  for (const animation of ghostLayer.getAnimations()) animation.cancel();
+/**
+ * Fold the ghost layer away, its animations already cancelled. (Asking for
+ * them would flush style, which a change avoids after moving nodes.)
+ */
+function resetLayer(ghostLayer: HTMLElement): void {
   disarm(ghostLayer);
   ghostLayer.style.width = "";
   ghostLayer.style.height = "";
@@ -355,9 +381,9 @@ function* morphTo(
   ghostAnchor: HTMLElement,
   ghostLayer: HTMLElement,
   value: string,
-  o: TextMorphOptions,
+  options: TextMorphOptions,
   place: { decimal: string; caret: number | undefined },
-  animate: () => boolean,
+  playback: () => Playback,
 ): MorphSteps {
   // Everything this change starts, so the caller can tell when it's over.
   const started: Animation[] = [];
@@ -377,11 +403,13 @@ function* morphTo(
   const next = textUnits(value);
 
   // 1. Read: where everything is on screen right now.
-  const moving = animate();
+  const play = playback();
+  const reduced = play === "reduced";
+  const o = reduced ? stillOptions(options) : options;
   const rootBefore = root.getBoundingClientRect();
   const startBefore = parseFloat(getComputedStyle(root).marginInlineStart) || 0;
   const linesBefore = root.getClientRects().length;
-  const originBefore = layerOrigin(ghostAnchor);
+  const originBefore = ghostAnchor.getBoundingClientRect();
   const before = new Map(old.map((node) => [node, visualState(node)]));
   // Ghosts still leaving; ones already gone are cleared in step 4.
   const gone: HTMLElement[] = [];
@@ -407,7 +435,8 @@ function* morphTo(
       numbers: o.numbers,
       decimal: place.decimal,
       trend: o.trend,
-      caret: place.caret,
+      caret:
+        place.caret === undefined ? undefined : caretUnits(next, place.caret),
     },
   );
   const used = new Set(match.kept);
@@ -451,7 +480,13 @@ function* morphTo(
   // Free to wrap again, so step 5 sees how the new value falls.
   delete root.dataset.sizing;
   for (const slot of gone) slot.remove();
-  if (!moving) return started;
+  if (play === "none") {
+    // Swapped without a change to watch: an earlier change's ghosts and
+    // edge fade go too (their animations were stopped in step 2).
+    ghostLayer.replaceChildren();
+    resetLayer(ghostLayer);
+    return started;
+  }
   // Leaving glyphs move into slots in the ghost layer (placed in step 8).
   const newSlots = leaving.flatMap(({ node, kind }) => {
     const home = homes.get(node);
@@ -470,11 +505,13 @@ function* morphTo(
   // wraps keeps its lines as they fall. An empty value has no line box at
   // all; it counts as one line.
   // `box` below means that: the label's space eases as one box.
-  const box = linesBefore <= 1 && root.getClientRects().length <= 1;
+  const box = !reduced && linesBefore <= 1 && root.getClientRects().length <= 1;
   // And the rest of the final layout, with the start margin the author set.
   const rootAfter = root.getBoundingClientRect();
   const startAfter = parseFloat(getComputedStyle(root).marginInlineStart) || 0;
-  const origin = layerOrigin(ghostAnchor);
+  const origin = ghostAnchor.getBoundingClientRect();
+  // Reading direction, for the stagger's sweep.
+  const rtl = getComputedStyle(glyphLayer).direction === "rtl";
   const after = nodes.map((node) => node.getBoundingClientRect());
   const em = parseFloat(getComputedStyle(root).fontSize) || 16;
 
@@ -493,9 +530,7 @@ function* morphTo(
       changesLine.push(node);
       return;
     }
-    const slide = Math.abs(
-      was.rect.left + was.rect.width / 2 - (after[i].left + after[i].width / 2),
-    );
+    const slide = Math.abs(centreDelta(was.rect, after[i])[0]);
     if (slide > 0.5) reach.push([node, Math.ceil(slide)]);
   });
   const letter = nodes.findIndex((node) => !spaceNode(node));
@@ -614,16 +649,25 @@ function* morphTo(
   }
 
   const motion = { duration: o.motion.duration, easing: o.motion.easing };
-  const blur = `blur(${o.blur}em)`;
+  // A filter animates only when there's blur to show: morph's default has
+  // none, and a filter animation per glyph costs even when it changes
+  // nothing.
+  const blur = o.blur > 0 ? `blur(${o.blur}em)` : null;
+  const fade = (opacity: number, filter: string | null): Keyframe =>
+    filter === null ? { opacity } : { opacity, filter };
+  const sharp = (filter: string | null): string | null =>
+    filter === null ? null : "blur(0px)";
+  const lineStart = (rect: DOMRect, box: DOMRect): number =>
+    rtl ? box.right - rect.right : rect.left - box.left;
   const delays = staggerDelays(
     o,
     nodes.flatMap((node, i) =>
-      kept[i] || spaceNode(node) ? [] : [after[i].left - rootAfter.left],
+      kept[i] || spaceNode(node) ? [] : [lineStart(after[i], rootAfter)],
     ),
-    leaving.map(
-      ({ node }) =>
-        (before.get(node)?.rect.left ?? rootBefore.left) - rootBefore.left,
-    ),
+    leaving.map(({ node }) => {
+      const rect = before.get(node)?.rect;
+      return rect ? lineStart(rect, rootBefore) : 0;
+    }),
   );
 
   // Shared glyphs slide from wherever they were, including mid-animation.
@@ -640,31 +684,22 @@ function* morphTo(
         delay,
         fill: "backwards",
       });
-      run(
-        node,
-        [
-          { opacity: 0, filter: blur },
-          { opacity: 1, filter: "blur(0px)" },
-        ],
-        {
-          duration: fadeIn.duration,
-          easing: fadeIn.easing,
-          delay: delay + fadeIn.delay,
-          fill: "backwards",
-        },
-      );
+      run(node, [fade(0, blur), fade(1, sharp(blur))], {
+        duration: fadeIn.duration,
+        easing: fadeIn.easing,
+        delay: delay + fadeIn.delay,
+        fill: "backwards",
+      });
       return;
     }
-    // Centres, since scale and tilt pivot on them.
-    const dx =
-      was.rect.left + was.rect.width / 2 - (after[i].left + after[i].width / 2);
-    const dy =
-      was.rect.top + was.rect.height / 2 - (after[i].top + after[i].height / 2);
+    // Under reduced motion a kept glyph takes its new place directly.
+    const [dx, dy] = centreDelta(was.rect, after[i]);
     if (
-      Math.abs(dx) > 0.5 ||
-      Math.abs(dy) > 0.5 ||
-      was.scale !== "1" ||
-      was.rotate !== "0deg"
+      !reduced &&
+      (Math.abs(dx) > 0.5 ||
+        Math.abs(dy) > 0.5 ||
+        was.scale !== "1" ||
+        was.rotate !== "0deg")
     ) {
       run(
         node,
@@ -679,15 +714,13 @@ function* morphTo(
         motion,
       );
     }
-    if (was.opacity < 0.999 || was.filter !== "blur(0px)") {
-      run(
-        node,
-        [
-          { opacity: was.opacity, filter: was.filter },
-          { opacity: 1, filter: "blur(0px)" },
-        ],
-        { duration: fadeIn.duration, easing: fadeIn.easing },
-      );
+    // Mid-fade (or mid-blur, from an earlier change) it finishes coming in.
+    const blurred = was.filter !== "blur(0px)" ? was.filter : null;
+    if (was.opacity < 0.999 || blurred !== null) {
+      run(node, [fade(was.opacity, blurred), fade(1, sharp(blurred))], {
+        duration: fadeIn.duration,
+        easing: fadeIn.easing,
+      });
     }
   });
 
@@ -701,9 +734,7 @@ function* morphTo(
   // its element) and, when the edge fade is armed, the band's reach.
   const allSlots = [...slots, ...newSlots.map((s) => s.slot)];
   if (allSlots.length === 0) {
-    disarm(ghostLayer);
-    ghostLayer.style.width = "";
-    ghostLayer.style.height = "";
+    resetLayer(ghostLayer);
     return started;
   }
   const slack = EDGE_SLACK * em;
@@ -766,25 +797,26 @@ function* morphTo(
     if (!was) return;
     const { fadeOut } = fadesFor(o, kind);
     const delay = delays.leaving[i];
-    // Drawn where it was: the offset its animation had it at.
-    const dx =
-      was.rect.left + was.rect.width / 2 - (home.left + home.width / 2);
-    const dy =
-      was.rect.top + was.rect.height / 2 - (home.top + home.height / 2);
+    // Drawn where it was: the offset its animation had it at. Under
+    // reduced motion it fades out there.
+    const [dx, dy] = centreDelta(was.rect, home);
+    const drawn: Keyframe = {
+      translate: `${dx}px ${dy}px`,
+      scale: was.scale,
+      rotate: was.rotate,
+    };
     const move = run(
       node,
-      [
-        { translate: `${dx}px ${dy}px`, scale: was.scale, rotate: was.rotate },
-        awayState(o, kind, away, line),
-      ],
+      [drawn, reduced ? drawn : awayState(o, kind, away, line)],
       // Both: its starting place holds through the stagger delay too.
       { ...motion, delay, fill: "both" },
     );
+    const blurred = was.filter !== "blur(0px)" ? was.filter : null;
     const out = run(
       node,
       [
-        { opacity: was.opacity, filter: was.filter },
-        { opacity: 0, filter: blur },
+        fade(was.opacity, blurred ?? (blur && "blur(0px)")),
+        fade(0, blur ?? (blurred && "blur(0px)")),
       ],
       {
         duration: fadeOut.duration,
@@ -801,8 +833,9 @@ function* morphTo(
       slot.dataset.gone = "";
       const slots = Array.from(ghostLayer.children) as HTMLElement[];
       if (slots.every((ghost) => ghost.dataset.gone !== undefined)) {
+        for (const animation of ghostLayer.getAnimations()) animation.cancel();
         ghostLayer.replaceChildren();
-        clearLayer(ghostLayer);
+        resetLayer(ghostLayer);
       }
     };
     // Cancelled by a later change, which already moved on without it.
@@ -817,7 +850,11 @@ export type TextMorphProps = Omit<
 > & {
   /** The text. A number is formatted with `locale` and `decimals`. */
   value: string | number;
-  options?: Partial<TextMorphOptions>;
+  /**
+   * How changes animate. `mode` picks the defaults for everything else; any
+   * field set here, nested ones included, overrides that mode's value.
+   */
+  options?: TextMorphOverrides;
   /**
    * Formats a number `value` and names the decimal separator numbers are
    * aligned on. Fixed rather than the browser's, so the server and the
@@ -828,23 +865,31 @@ export type TextMorphProps = Omit<
   decimals?: number;
   /** Swap the text without animating. */
   disabled?: boolean;
-  /** Swap without animating when the reader prefers reduced motion. */
+  /**
+   * When the reader prefers reduced motion, crossfade in place: nothing
+   * travels, scales, tilts, blurs or resizes.
+   */
   respectReducedMotion?: boolean;
-  /** A change started animating. */
+  /**
+   * A change started animating. (These three are TextMorph's own events, not
+   * the DOM's CSS animation events.)
+   */
   onAnimationStart?: () => void;
   /**
    * A change finished, every glyph and the box settled. Fires right away
-   * for a change that didn't animate (disabled, reduced motion, off screen).
-   * Each change ends in exactly one of this and `onAnimationCancel`.
+   * for a change that didn't animate (disabled, off screen). Each change
+   * ends in exactly one of this and `onAnimationCancel`, unless the label
+   * unmounts first.
    */
   onAnimationComplete?: () => void;
   /** A change was interrupted by the next one. */
   onAnimationCancel?: () => void;
   /**
    * For a field someone is typing in: where the caret sits in `value` after
-   * the edit. Glyphs are matched around it, so typing 1 in front of 20
-   * inserts a digit instead of renumbering the column. Leave it unset for
-   * values that change on their own.
+   * the edit, as a string index (an input's `selectionStart`). Glyphs are
+   * matched around it, so typing 1 in front of 20 inserts a digit instead of
+   * renumbering the column. Leave it unset for values that change on their
+   * own.
    */
   cursorIndex?: number;
 };
@@ -888,8 +933,8 @@ export function TextMorph({
   const [initialHtml] = React.useState(() => ({ __html: glyphsHtml(value) }));
   const shown = React.useRef(value);
   const resolved = resolveOptions(options);
-  const optionsRef = React.useRef(resolved);
   const latest = React.useRef({
+    options: resolved,
     disabled,
     respectReducedMotion,
     onAnimationStart,
@@ -898,8 +943,8 @@ export function TextMorph({
     cursorIndex,
   });
   React.useLayoutEffect(() => {
-    optionsRef.current = resolved;
     latest.current = {
+      options: resolved,
       disabled,
       respectReducedMotion,
       onAnimationStart,
@@ -911,6 +956,16 @@ export function TextMorph({
 
   // The change in flight, so the next one can cancel it.
   const inFlight = React.useRef<(() => void) | null>(null);
+
+  // Unmounted, a change in flight ends without calling back.
+  const mounted = React.useRef(false);
+  React.useLayoutEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      inFlight.current = null;
+    };
+  }, []);
 
   React.useLayoutEffect(() => {
     const root = rootRef.current;
@@ -937,7 +992,7 @@ export function TextMorph({
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let over = false;
     const cancel = (): void => {
-      if (over) return;
+      if (over || !mounted.current) return;
       over = true;
       latest.current.onAnimationCancel?.();
     };
@@ -951,13 +1006,18 @@ export function TextMorph({
         ghosts,
         sheet,
         value,
-        optionsRef.current,
+        current.options,
         { decimal: decimalFor(locale), caret: current.cursorIndex },
         // Read in the batch's first read phase, with the others.
-        () => !current.disabled && !reduce && isOnScreen(root),
+        () =>
+          current.disabled || !isOnScreen(root)
+            ? "none"
+            : reduce
+              ? "reduced"
+              : "full",
       ),
       done: (started) => {
-        if (over) return;
+        if (over || !mounted.current) return;
         if (started.length === 0) {
           over = true;
           if (inFlight.current === cancel) inFlight.current = null;
@@ -966,7 +1026,7 @@ export function TextMorph({
         }
         latest.current.onAnimationStart?.();
         void Promise.allSettled(started.map((a) => a.finished)).then(() => {
-          if (over) return;
+          if (over || !mounted.current) return;
           over = true;
           if (inFlight.current === cancel) inFlight.current = null;
           latest.current.onAnimationComplete?.();
@@ -982,7 +1042,12 @@ export function TextMorph({
     children: (
       <>
         <span className="sr-only">{value}</span>
-        <span ref={stageRef} aria-hidden="true" className="text-morph-stage">
+        <span
+          ref={stageRef}
+          aria-hidden="true"
+          translate="no"
+          className="text-morph-stage"
+        >
           {/* Each glyph is its own box, which bidi treats as direction-
               neutral: without its own direction, a Latin value in a
               right-to-left paragraph would be laid out backwards. auto
@@ -1009,4 +1074,10 @@ export function TextMorph({
   });
 }
 
-export type { TextMorphMode, TextMorphOptions } from "./lib/options";
+export { faster, MODE_DEFAULTS } from "./lib/options";
+export type {
+  TextMorphMode,
+  TextMorphOptions,
+  TextMorphOverrides,
+  Timing,
+} from "./lib/options";

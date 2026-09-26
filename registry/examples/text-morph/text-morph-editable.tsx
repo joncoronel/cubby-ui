@@ -1,8 +1,16 @@
 "use client";
 
 import * as React from "react";
-import { TextMorph } from "@/registry/default/text-morph/text-morph";
+import {
+  MODE_DEFAULTS,
+  TextMorph,
+  faster,
+} from "@/registry/default/text-morph/text-morph";
 import { Input } from "@/registry/default/input/input";
+
+// Keystrokes come faster than the default timing, so the same look runs on
+// half the clock.
+const TYPING = faster(MODE_DEFAULTS.morph, 0.5);
 
 export default function TextMorphEditable() {
   const [value, setValue] = React.useState("1200");
@@ -12,6 +20,8 @@ export default function TextMorphEditable() {
     <div className="flex w-64 flex-col gap-4">
       <Input
         aria-label="Amount"
+        name="amount"
+        autoComplete="off"
         inputMode="numeric"
         value={value}
         onChange={(event) => {
@@ -20,7 +30,8 @@ export default function TextMorphEditable() {
         }}
       />
       <p className="font-display text-3xl font-semibold tabular-nums">
-        $<TextMorph value={value || "0"} cursorIndex={caret} />
+        $
+        <TextMorph value={value || "0"} cursorIndex={caret} options={TYPING} />
       </p>
     </div>
   );

@@ -44,9 +44,11 @@ Use `options.mode` to pick how glyphs move, `morph` (the default) or `roll`; eac
 | `morph` | Matches letters anywhere; shared ones slide, the rest scale and fade in place. Digits roll a full line.       |
 | `roll`  | Keeps the shared start, end and a shared word in the middle; everything between rolls vertically on a spring. |
 
+`roll` runs about 700ms from the first glyph to the last, which suits headlines and values that change now and then. For buttons, tabs and values that update often, use `morph`, or run either mode on a shorter clock with [`faster`](#faster).
+
 ### Numbers
 
-Pass a number as `value` and set `decimals` (and `locale`) to format it; only the digits that change roll.
+Pass a number as `value` and set `decimals` (and `locale`) to format it; only the digits that change roll. Set `tabular-nums` on numbers, or digits of different widths shift their neighbours on every change.
 
 <ComponentPreview component="text-morph" example="text-morph-numbers" />
 
@@ -64,13 +66,13 @@ Give `TextMorph` a value longer than its line and it wraps between words; glyphs
 
 ### Editable field
 
-Pass the input's caret as `cursorIndex` to mirror a field someone is typing in, so a typed digit is inserted instead of renumbering the ones after it.
+Pass the input's caret as `cursorIndex` to mirror a field someone is typing in, so a typed digit is inserted instead of renumbering the ones after it; keystrokes come quickly, so run it on a shorter clock with [`faster`](#faster).
 
 <ComponentPreview component="text-morph" example="text-morph-editable" />
 
 ## Accessibility
 
-Screen readers get the value as plain text; the animated glyphs are hidden from the accessibility tree. Changes swap instantly, without animating, under `prefers-reduced-motion: reduce` unless `respectReducedMotion` is `false`. `TextMorph` doesn't announce changes on its own; wrap it in an element with `aria-live="polite"` when a change needs to be read out.
+Screen readers get the value as plain text; the animated glyphs are hidden from the accessibility tree. Under `prefers-reduced-motion: reduce`, changes crossfade in place: nothing travels, scales, tilts, blurs or resizes (unless `respectReducedMotion` is `false`). `TextMorph` doesn't announce changes on its own; wrap it in an element with `aria-live="polite"` when a change needs to be read out.
 
 ## API Reference
 
@@ -85,9 +87,11 @@ Screen readers get the value as plain text; the animated glyphs are hidden from 
   with `locale` and `decimals`.
 </ApiProp>
 
-<ApiProp name="options" fullType="Partial<TextMorphOptions>">
+<ApiProp name="options" fullType="TextMorphOverrides">
   How the change animates. `mode` picks the defaults for everything else; any
-  field you set overrides that mode's value. See [Options](#options).
+  field you set, nested ones included, overrides that mode's value, so
+  `{ motion: { duration: 200 } }` keeps the mode's easing. See
+  [Options](#options).
 </ApiProp>
 
 <ApiProp name="locale" fullType="string" defaultValue='"en"'>
@@ -105,18 +109,20 @@ Screen readers get the value as plain text; the animated glyphs are hidden from 
 </ApiProp>
 
 <ApiProp name="respectReducedMotion" fullType="boolean" defaultValue="true">
-  Swap without animating when the reader prefers reduced motion.
+  When the reader prefers reduced motion, crossfade in place: nothing travels,
+  scales, tilts, blurs or resizes.
 </ApiProp>
 
 <ApiProp name="cursorIndex" fullType="number">
   For a field someone is typing in: where the caret sits in `value` after the
-  edit. Glyphs are matched around it, so typing 1 in front of 20 inserts a digit
-  instead of renumbering the column. Leave it unset for values that change on
-  their own.
+  edit, as a string index (an input's `selectionStart`). Glyphs are matched
+  around it, so typing 1 in front of 20 inserts a digit instead of renumbering
+  the column. Leave it unset for values that change on their own.
 </ApiProp>
 
 <ApiProp name="onAnimationStart" fullType="() => void">
-  A change started animating.
+  A change started animating. These three are TextMorph's own events, not the
+  DOM's CSS animation events.
 </ApiProp>
 
 <ApiProp name="onAnimationComplete" fullType="() => void">
@@ -204,6 +210,22 @@ Screen readers get the value as plain text; the animated glyphs are hidden from 
 </ApiProp>
 
 </ApiPropsList>
+
+### faster
+
+`faster(options, factor)` returns the same look on a shorter clock: every duration, delay and stagger scaled by `factor`. Use it for labels that answer a click or mirror typing, where a mode's full timing lags behind the input.
+
+```tsx
+import {
+  MODE_DEFAULTS,
+  TextMorph,
+  faster,
+} from "@/components/ui/cubby-ui/text-morph";
+
+const feedback = faster(MODE_DEFAULTS.morph, 0.5); // 200ms of motion
+
+<TextMorph value={copied ? "Copied" : "Copy"} options={feedback} />;
+```
 
 ### Notes
 

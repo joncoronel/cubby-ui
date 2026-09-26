@@ -64,9 +64,9 @@ const TORPH_DIGITS: TextMorphOptions["morph"]["digits"] = {
 };
 
 /** The curve the box width eases on: fast out, no overshoot. */
-export const WIDTH_EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
+const WIDTH_EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
 /** Ease-out expo: torph's movement, width and everything. */
-export const EXPO_EASING = "cubic-bezier(0.19, 1, 0.22, 1)";
+const EXPO_EASING = "cubic-bezier(0.19, 1, 0.22, 1)";
 
 /**
  * Scritto 0.1.0's defaults, from its source: a 550ms hand-tuned spring (1.5%
@@ -76,7 +76,7 @@ export const EXPO_EASING = "cubic-bezier(0.19, 1, 0.22, 1)";
  */
 const SCRITTO_SPRING =
   "linear(0,.1052,.3155,.532,.7112,.8414,.9265,.9765,1.0023,1.013,1.0151,1.0133,1.01,1.0068,1.0041,1.0022,1.001,1)";
-export const SCRITTO_OPTIONS: TextMorphOptions = {
+const SCRITTO_OPTIONS: TextMorphOptions = {
   mode: "roll",
   motion: { duration: 550, easing: SCRITTO_SPRING },
   fadeIn: { duration: 550, easing: SCRITTO_SPRING, delay: 0 },
@@ -97,7 +97,7 @@ export const SCRITTO_OPTIONS: TextMorphOptions = {
  * leaving over the first quarter of the duration and arriving over half of it
  * from a quarter in; no blur, no stagger.
  */
-export const TORPH_OPTIONS: TextMorphOptions = {
+const TORPH_OPTIONS: TextMorphOptions = {
   mode: "morph",
   motion: { duration: 400, easing: EXPO_EASING },
   fadeIn: { duration: 200, easing: "linear", delay: 100 },
@@ -121,17 +121,49 @@ export const MODE_DEFAULTS: Record<TextMorphMode, TextMorphOptions> = {
 /** Production: morph. */
 export const DEFAULT_OPTIONS: TextMorphOptions = MODE_DEFAULTS.morph;
 
-/** Options for `overrides`, filled in from the chosen mode's defaults. */
-export function resolveOptions(
-  overrides: Partial<TextMorphOptions> = {},
-): TextMorphOptions {
-  return {
-    ...MODE_DEFAULTS[overrides.mode ?? DEFAULT_OPTIONS.mode],
-    ...overrides,
-  };
+type Overrides<T> = {
+  [K in keyof T]?: T[K] extends object ? Overrides<T[K]> : T[K];
+};
+
+/**
+ * Any subset of the options, nested fields included: `{ motion: { duration:
+ * 200 } }` keeps the mode's easing, `{ stagger: { ms: 50 } }` its stagger
+ * mode.
+ */
+export type TextMorphOverrides = Overrides<TextMorphOptions>;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-/** The same look on a shorter clock (every duration, delay and stagger). */
+function merge<T>(base: T, overrides: Overrides<T> | undefined): T {
+  if (!overrides) return base;
+  const out: Record<string, unknown> = { ...(base as Record<string, unknown>) };
+  for (const [key, value] of Object.entries(overrides)) {
+    if (value === undefined) continue;
+    out[key] =
+      isRecord(value) && isRecord(out[key])
+        ? merge(out[key], value as Overrides<unknown>)
+        : value;
+  }
+  return out as T;
+}
+
+/** Options for `overrides`, filled in from the chosen mode's defaults. */
+export function resolveOptions(
+  overrides: TextMorphOverrides = {},
+): TextMorphOptions {
+  return merge(
+    MODE_DEFAULTS[overrides.mode ?? DEFAULT_OPTIONS.mode],
+    overrides,
+  );
+}
+
+/**
+ * The same look on a shorter clock: every duration, delay and stagger scaled
+ * by `factor`. For labels that answer a click (the docs use 209ms of motion)
+ * or mirror typing, where the mode's full timing would lag behind the input.
+ */
 export function faster(o: TextMorphOptions, factor: number): TextMorphOptions {
   const t = (timing: Timing): Timing => ({
     ...timing,

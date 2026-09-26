@@ -1761,7 +1761,7 @@
       "name": "text-morph",
       "type": "registry:ui",
       "title": "Text Morph",
-      "description": "A text-morph component.",
+      "description": "Animates a label from one value to the next, glyph by glyph.",
       "files": [
         {
           "path": "registry/default/text-morph/text-morph.tsx",

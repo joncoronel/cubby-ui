@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  caretUnits,
   decimalFor,
   digitValue,
   findNumbers,
@@ -254,6 +255,37 @@ describe("numbers in other scripts", () => {
     const text = chars("خصم ١٢٪");
     const [token] = findNumbers(text);
     expect(text.slice(token.start, token.end).join("")).toBe("١٢٪");
+  });
+});
+
+describe("caretUnits", () => {
+  it("counts plain text one unit per character", () => {
+    expect(caretUnits(textUnits("1200"), 3)).toBe(3);
+  });
+
+  it("counts an emoji or accented letter before the caret as one unit", () => {
+    // "👍" is two code units, "é" typed as e + a combining accent two more.
+    const units = textUnits("👍é 12");
+    expect(units).toEqual(["👍", "é", " ", "1", "2"]);
+    expect(caretUnits(units, "👍é 1".length)).toBe(4);
+  });
+
+  it("counts a whole Arabic word as one unit", () => {
+    const value = "طلب 12";
+    expect(caretUnits(textUnits(value), value.length)).toBe(4);
+  });
+
+  it("matches around the right place with an emoji before the caret", () => {
+    // Typed 5 between 2 and 0, after an emoji.
+    const old = textUnits("👍 120");
+    const next = textUnits("👍 1250");
+    const { kept } = matchText("morph", old, next, {
+      ...OPTIONS,
+      caret: caretUnits(next, "👍 125".length),
+    });
+    expect(next.map((g, i) => (kept[i] === -1 ? "_" : g)).join("")).toBe(
+      "👍 12_0",
+    );
   });
 });
 

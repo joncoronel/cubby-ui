@@ -1359,7 +1359,7 @@ export const componentMetadata = {
   "text-morph": {
     "name": "text-morph",
     "title": "Text Morph",
-    "description": "A text-morph component.",
+    "description": "Animates a label from one value to the next, glyph by glyph.",
     "category": "UI",
     "registryDependencies": [],
     "dependencies": [],
@@ -3851,7 +3851,7 @@ export const exampleRegistry = {
     {
       "title": "Editable",
       "importPath": "text-morph-editable",
-      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { TextMorph } from \"@/components/ui/cubby-ui/text-morph/text-morph\";\nimport { Input } from \"@/components/ui/cubby-ui/input\";\n\nexport default function TextMorphEditable() {\n  const [value, setValue] = React.useState(\"1200\");\n  const [caret, setCaret] = React.useState<number>();\n\n  return (\n    <div className=\"flex w-64 flex-col gap-4\">\n      <Input\n        aria-label=\"Amount\"\n        inputMode=\"numeric\"\n        value={value}\n        onChange={(event) => {\n          setCaret(event.target.selectionStart ?? undefined);\n          setValue(event.target.value);\n        }}\n      />\n      <p className=\"font-display text-3xl font-semibold tabular-nums\">\n        $<TextMorph value={value || \"0\"} cursorIndex={caret} />\n      </p>\n    </div>\n  );\n}\n"
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  MODE_DEFAULTS,\n  TextMorph,\n  faster,\n} from \"@/components/ui/cubby-ui/text-morph/text-morph\";\nimport { Input } from \"@/components/ui/cubby-ui/input\";\n\n// Keystrokes come faster than the default timing, so the same look runs on\n// half the clock.\nconst TYPING = faster(MODE_DEFAULTS.morph, 0.5);\n\nexport default function TextMorphEditable() {\n  const [value, setValue] = React.useState(\"1200\");\n  const [caret, setCaret] = React.useState<number>();\n\n  return (\n    <div className=\"flex w-64 flex-col gap-4\">\n      <Input\n        aria-label=\"Amount\"\n        name=\"amount\"\n        autoComplete=\"off\"\n        inputMode=\"numeric\"\n        value={value}\n        onChange={(event) => {\n          setCaret(event.target.selectionStart ?? undefined);\n          setValue(event.target.value);\n        }}\n      />\n      <p className=\"font-display text-3xl font-semibold tabular-nums\">\n        $\n        <TextMorph value={value || \"0\"} cursorIndex={caret} options={TYPING} />\n      </p>\n    </div>\n  );\n}\n"
     },
     {
       "title": "Inline",

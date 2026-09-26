@@ -6,8 +6,9 @@ export type Timing = { duration: number; easing: string };
 export type TextMorphOptions = {
   /**
    * `roll` keeps the old and new text's shared start and end, and rolls the
-   * glyphs between vertically, on Scritto's defaults. `morph` matches letters
-   * anywhere: shared ones slide to their new place, the rest scale and fade
+   * glyphs between vertically, on Scritto's defaults. `morph` matches whole
+   * words, then letters within similar words (anywhere, in a one-word
+   * value): shared ones slide to their new place, the rest scale and fade
    * in place, on torph's defaults. Each mode brings its own defaults.
    */
   mode: TextMorphMode;

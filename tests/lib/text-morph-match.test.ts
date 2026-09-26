@@ -14,7 +14,11 @@ import {
 const chars = (text: string): string[] => Array.from(text);
 const OPTIONS: MatchOptions = { numbers: true, decimal: ".", trend: 0 };
 
-/** The new text with every kept glyph shown and every new one as `_`. */
+/**
+ * The new text with every kept glyph shown and every new one as `_`.
+ * Spaces and line breaks show as themselves: they never animate, so
+ * whether one is kept doesn't matter.
+ */
 function keptView(
   mode: "roll" | "morph",
   from: string,
@@ -23,7 +27,9 @@ function keptView(
 ): string {
   const { kept } = matchText(mode, chars(from), chars(to), options);
   return chars(to)
-    .map((glyph, i) => (kept[i] === -1 ? "_" : glyph))
+    .map((glyph, i) =>
+      glyph === " " || glyph === "\n" || kept[i] !== -1 ? glyph : "_",
+    )
     .join("");
 }
 
@@ -135,10 +141,9 @@ describe("matchText", () => {
     expect(keptView("roll", "Xab..Y", "Z---abW")).toBe("____ab_");
   });
 
-  it("matches letters anywhere in morph mode", () => {
-    // The e comes from "page"; roll would only keep the shared "Cop".
-    expect(keptView("morph", "Copy page", "Copied")).toBe("Cop_e_");
-    expect(keptView("roll", "Copy page", "Copied")).toBe("Cop___");
+  it("matches letters anywhere in a one-word value in morph mode", () => {
+    expect(keptView("morph", "listen", "silent")).toBe("silent");
+    expect(keptView("roll", "listen", "silent")).toBe("___en_");
   });
 
   it("reads the trend off the first number that changed", () => {
@@ -293,5 +298,56 @@ describe("decimalFor", () => {
   it("returns the locale's decimal separator", () => {
     expect(decimalFor("en")).toBe(".");
     expect(decimalFor("de-DE")).toBe(",");
+  });
+});
+
+// torph's playground cases (packages/test-cases/src/cases.ts).
+describe("matchText by words in morph mode", () => {
+  const morph = (from: string, to: string): string =>
+    keptView("morph", from, to);
+
+  it("keeps a word whole as it moves", () => {
+    expect(morph("Transaction Safe", "Processing Transaction")).toBe(
+      "__________ Transaction",
+    );
+    expect(morph("Processing Transaction", "Transaction Safe")).toBe(
+      "Transaction ____",
+    );
+  });
+
+  it("swaps reordered words whole", () => {
+    expect(morph("hello world", "world hello")).toBe("world hello");
+  });
+
+  it("adds and removes whole words", () => {
+    expect(morph("hello", "hello world")).toBe("hello _____");
+    expect(morph("hello world", "hello")).toBe("hello");
+  });
+
+  it("replaces dissimilar words whole", () => {
+    expect(morph("cat and dog", "fish and bird")).toBe("____ and ____");
+  });
+
+  it("morphs a similar word letter by letter", () => {
+    expect(morph("npm i torph", "pnpm i torph")).toBe("_npm i torph");
+    expect(morph("npm i torph", "pnpm add torph")).toBe("_npm ___ torph");
+    expect(morph("Hello World", "hello world")).toBe("_ello _orld");
+  });
+
+  it("keeps a copied letter from another word", () => {
+    // Its only similar word sits on the other side of a surviving one.
+    expect(morph("Copy Address", "Address Copied")).toBe("Address ______");
+    // The e of "page" no longer joins "Copied".
+    expect(morph("Copy page", "Copied")).toBe("Cop___");
+  });
+
+  it("leaves numbers to place value and never pairs one with a word", () => {
+    expect(morph("2 of 10 done", "2 of 15 done")).toBe("2 of 1_ done");
+    expect(morph("5 items", "five items")).toBe("____ items");
+  });
+
+  it("works across lines and graphemes", () => {
+    expect(morph("hello\nworld", "hello\nuniverse")).toBe("hello\n________");
+    expect(morph("Hello 👋", "Goodbye 👋")).toBe("_______ 👋");
   });
 });

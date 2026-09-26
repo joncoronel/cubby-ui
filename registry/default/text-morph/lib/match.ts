@@ -7,7 +7,9 @@ import type { TextMorphMode } from "./options";
  * Numbers are matched by place value (torph): the digits line up on the
  * decimal point, so 1,204 → 1,318 keeps the thousands and the comma, and a
  * digit that changes rolls in place. Everything else is matched by the
- * mode's text rule.
+ * mode's text rule: roll keeps the shared ends and one run between them
+ * (Scritto); morph matches whole words first, then letters within the
+ * words it pairs, and letters anywhere only in a one-word value (torph).
  *
  * A field someone is typing in knows where the edit happened, so with a
  * caret the whole value is matched around it instead (torph's cursorIndex):
@@ -277,6 +279,159 @@ function matchAnywhere(old: string[], next: string[]): [number, number][] {
   return pairs;
 }
 
+/** Longest common subsequence of two lists, as [bIndex, aIndex] pairs. */
+function lcs(a: string[], b: string[]): [number, number][] {
+  // lengths[i][j]: the LCS of a[i..] and b[j..].
+  const lengths = Array.from({ length: a.length + 1 }, () =>
+    new Array<number>(b.length + 1).fill(0),
+  );
+  for (let i = a.length - 1; i >= 0; i--) {
+    for (let j = b.length - 1; j >= 0; j--) {
+      lengths[i][j] =
+        a[i] === b[j]
+          ? lengths[i + 1][j + 1] + 1
+          : Math.max(lengths[i + 1][j], lengths[i][j + 1]);
+    }
+  }
+  const pairs: [number, number][] = [];
+  let i = 0;
+  let j = 0;
+  while (i < a.length && j < b.length) {
+    if (a[i] === b[j]) {
+      pairs.push([j, i]);
+      i++;
+      j++;
+    } else if (lengths[i + 1][j] >= lengths[i][j + 1]) {
+      i++;
+    } else {
+      j++;
+    }
+  }
+  return pairs;
+}
+
+/** Stands in for a whole number when comparing words: numbers pair by place. */
+const NUMBER_KEY = "\u0000#";
+
+type Word = {
+  /** Its glyphs' indices in the value. */
+  glyphs: number[];
+  /** What it's compared by: its text, with each number as one token. */
+  key: string[];
+};
+
+/** Words: runs of glyphs between spaces. */
+function wordsOf(glyphs: string[], kinds: GlyphKind[]): Word[] {
+  const words: Word[] = [];
+  let word: Word | null = null;
+  glyphs.forEach((glyph, i) => {
+    if (glyph === " " || glyph === "\t" || glyph === "\n") {
+      word = null;
+      return;
+    }
+    if (!word) {
+      word = { glyphs: [], key: [] };
+      words.push(word);
+    }
+    // A number counts once, however many glyphs it has.
+    if (kinds[i] === "text") word.key.push(glyph);
+    else if (word.glyphs.length === 0 || kinds[i - 1] !== "number") {
+      word.key.push(NUMBER_KEY);
+    }
+    word.glyphs.push(i);
+  });
+  return words;
+}
+
+/** Shared letters over the longer word's length; 1 for numbers alone. */
+function similarity(a: string[], b: string[]): number {
+  if (a.length === 0 || b.length === 0) return 0;
+  return lcs(a, b).length / Math.max(a.length, b.length);
+}
+
+/** Below this a new word enters whole rather than morphing from an old one. */
+const MIN_SIMILARITY = 0.4;
+
+/** How many surviving words sit before each word: the gap it's in. */
+function gaps(count: number, survivors: Set<number>): number[] {
+  const out: number[] = [];
+  let before = 0;
+  for (let i = 0; i < count; i++) {
+    out.push(before);
+    if (survivors.has(i)) before++;
+  }
+  return out;
+}
+
+/**
+ * Match by words (torph): words that survive in order keep every glyph, and
+ * so do words that only moved (`hello world` → `world hello` swaps them
+ * whole); a new word takes the letters it shares with the most similar old
+ * word in the same gap between survivors, when they share enough; anything
+ * else enters or leaves as a whole word. Only text glyphs pair here;
+ * numbers were paired by place.
+ */
+function matchWords(
+  old: string[],
+  next: string[],
+  oldKinds: GlyphKind[],
+  nextKinds: GlyphKind[],
+): [number, number][] {
+  const oldWords = wordsOf(old, oldKinds);
+  const nextWords = wordsOf(next, nextKinds);
+  const keyOf = (word: Word): string => word.key.join("\u0001");
+  const pairsOf = new Map<number, number>();
+
+  const inOrder = lcs(oldWords.map(keyOf), nextWords.map(keyOf));
+  for (const [to, from] of inOrder) pairsOf.set(to, from);
+  const oldGaps = gaps(oldWords.length, new Set(inOrder.map(([, f]) => f)));
+  const nextGaps = gaps(nextWords.length, new Set(inOrder.map(([t]) => t)));
+  const taken = new Set(inOrder.map(([, from]) => from));
+
+  // Words that moved: the same word, anywhere.
+  nextWords.forEach((word, to) => {
+    if (pairsOf.has(to)) return;
+    const from = oldWords.findIndex(
+      (old, i) => !taken.has(i) && keyOf(old) === keyOf(word),
+    );
+    if (from === -1) return;
+    pairsOf.set(to, from);
+    taken.add(from);
+  });
+
+  // Words that changed: the most similar old word in the same gap.
+  nextWords.forEach((word, to) => {
+    if (pairsOf.has(to)) return;
+    let best = -1;
+    let bestSimilarity = MIN_SIMILARITY;
+    oldWords.forEach((old, from) => {
+      if (taken.has(from) || oldGaps[from] !== nextGaps[to]) return;
+      const shared = similarity(old.key, word.key);
+      if (shared > bestSimilarity) {
+        best = from;
+        bestSimilarity = shared;
+      }
+    });
+    if (best === -1) return;
+    pairsOf.set(to, best);
+    taken.add(best);
+  });
+
+  // Within each pair, the letters they share, in order.
+  const pairs: [number, number][] = [];
+  for (const [to, from] of pairsOf) {
+    const a = oldWords[from].glyphs.filter((i) => oldKinds[i] === "text");
+    const b = nextWords[to].glyphs.filter((i) => nextKinds[i] === "text");
+    for (const [j, i] of lcs(
+      a.map((k) => old[k]),
+      b.map((k) => next[k]),
+    )) {
+      pairs.push([b[j], a[i]]);
+    }
+  }
+  return pairs;
+}
+
 /**
  * Match around the caret of an edit. Group separators are set aside first,
  * since a field that formats as you type moves them around: the rest is
@@ -376,7 +531,18 @@ export function matchText(
     return { kept, nextKinds, oldKinds, trend: trend === -1 ? -1 : 1 };
   }
 
-  // Everything else, by the mode's text rule.
+  // Everything else, by the mode's text rule. Morph works by words once a
+  // value has more than one.
+  const isSpace = (g: string): boolean => g === " " || g === "\t" || g === "\n";
+  if (
+    mode === "morph" &&
+    (next.some(isSpace) || wordsOf(old, oldKinds).length > 1)
+  ) {
+    for (const [to, from] of matchWords(old, next, oldKinds, nextKinds)) {
+      kept[to] = from;
+    }
+    return { kept, nextKinds, oldKinds, trend: trend === -1 ? -1 : 1 };
+  }
   const oldText = old.flatMap((_, i) => (oldKinds[i] === "text" ? [i] : []));
   const nextText = next.flatMap((_, i) => (nextKinds[i] === "text" ? [i] : []));
   const match = mode === "roll" ? matchEnds : matchAnywhere;

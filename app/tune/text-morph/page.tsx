@@ -184,6 +184,9 @@ const SECTIONS = [
   "Label icon-only buttons",
   "API Reference",
 ];
+// torph's playground cases (packages/test-cases/src/cases.ts), to compare.
+const REORDER = ["Transaction Safe", "Processing Transaction"];
+const SWAP = ["hello world", "world hello"];
 const PRICES = ["$1,204", "$1,318", "$987", "$12,450", "$12,455", "$9"];
 const COUNTS = [8, 9, 10, 11, 12, 99, 100, 101, 100, 99, 42, 41];
 const PERCENTS = [2.4, 2.45, 3.1, -0.6, -1.25, 0.8];
@@ -423,6 +426,24 @@ export default function TextMorphTune(): React.ReactElement {
         >
           <span className="text-sm">
             <TextMorph value={pick(STATUSES, "status")} options={ambient} />
+          </span>
+        </Demo>
+
+        <Demo
+          label="Word reorder + exit (torph: Transaction moves to its new place, Safe leaves, Processing arrives)"
+          onAdvance={bump("reorder")}
+        >
+          <span className="text-2xl font-medium">
+            <TextMorph value={pick(REORDER, "reorder")} options={ambient} />
+          </span>
+        </Demo>
+
+        <Demo
+          label="Same words, reversed order (torph: hello and world swap places, nothing enters or leaves)"
+          onAdvance={bump("swap")}
+        >
+          <span className="text-2xl font-medium">
+            <TextMorph value={pick(SWAP, "swap")} options={ambient} />
           </span>
         </Demo>
 

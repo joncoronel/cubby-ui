@@ -39,10 +39,10 @@ Use `options.mode` to pick how glyphs move, `morph` (the default) or `roll`; eac
 
 <ComponentPreview component="text-morph" example="text-morph-modes" />
 
-| Mode    | Description                                                                                                   |
-| ------- | ------------------------------------------------------------------------------------------------------------- |
-| `morph` | Matches letters anywhere; shared ones slide, the rest scale and fade in place. Digits roll a full line.       |
-| `roll`  | Keeps the shared start, end and a shared word in the middle; everything between rolls vertically on a spring. |
+| Mode    | Description                                                                                                                                                                           |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `morph` | Matches whole words, so a word that moves slides over intact, then letters within words that changed. Shared glyphs slide, the rest scale and fade in place. Digits roll a full line. |
+| `roll`  | Keeps the shared start, end and a shared word in the middle; everything between rolls vertically on a spring.                                                                         |
 
 `roll` runs about 700ms from the first glyph to the last, which suits headlines and values that change now and then. For buttons, tabs and values that update often, use `morph`, or run either mode on a shorter clock with [`faster`](#faster).
 
@@ -142,8 +142,9 @@ Screen readers get the value as plain text; the animated glyphs are hidden from 
 <ApiPropsList>
 
 <ApiProp name="mode" fullType='"morph" | "roll"' defaultValue='"morph"'>
-  `morph` matches letters anywhere and scales the rest in place. `roll` keeps
-  the shared start, end and middle and rolls the glyphs between.
+  `morph` matches whole words, then letters within the words that changed, and
+  scales the rest in place. `roll` keeps the shared start, end and middle and
+  rolls the glyphs between.
 </ApiProp>
 
 <ApiProp name="numbers" fullType="boolean" defaultValue="true">

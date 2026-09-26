@@ -1,0 +1,192 @@
+---
+title: Text Morph
+description: Animates a label from one value to the next, glyph by glyph
+type: composable
+---
+
+import { TextMorph } from "@/registry/default/text-morph/text-morph";
+
+`TextMorph` animates text that changes in place: letters the old and new value share slide to their new spots, and the rest animate out and in. Use it for labels that swap (Copy to Copied, a section title in a header), live numbers such as prices and counters, and status text.
+
+## Preview
+
+<ComponentPreview component="text-morph" example="text-morph-basic" />
+
+## Installation
+
+<ComponentInstall component="text-morph" />
+
+## Usage
+
+<ComponentUsage component="text-morph" />
+
+Pass the current text as `value` and change it; `TextMorph` works out what moved. The server renders the label already split into glyphs, the same markup the browser keeps, so hydration adds no work and nothing is measured until the value first changes.
+
+## Features
+
+- **Numbers by place value.** Digits line up on the decimal point, so `1,204` to `1,318` keeps the `1,` still and rolls only the digits that changed.
+- **Direction.** Glyphs roll up when a number grows and down when it shrinks.
+- **Interruptible.** A change that lands mid-animation starts every glyph from where it is on screen, so rapid updates never jump.
+- **Edge fade.** When the box shrinks, old glyphs fade at the moving edge instead of running over the next word or out of a pill.
+- **Stable anchoring.** Centered and right-aligned labels hold still while the box resizes.
+
+## Examples
+
+### Modes
+
+Use `options.mode` to pick how glyphs move: `morph` (the default) or `roll`.
+
+<ComponentPreview component="text-morph" example="text-morph-modes" />
+
+| Mode    | Description                                                                                                   |
+| ------- | ------------------------------------------------------------------------------------------------------------- |
+| `morph` | Matches letters anywhere; shared ones slide, the rest scale and fade in place. Digits roll a full line.       |
+| `roll`  | Keeps the shared start, end and a shared word in the middle; everything between rolls vertically on a spring. |
+
+### Numbers
+
+Pass a number as `value` and set `decimals` (and `locale`) to format it; only the digits that change roll.
+
+<ComponentPreview component="text-morph" example="text-morph-numbers" />
+
+### In a sentence
+
+Place `TextMorph` inline with other text; when the value shrinks, the old ink fades at the edge instead of overlapping the words after it.
+
+<ComponentPreview component="text-morph" example="text-morph-inline" />
+
+## Accessibility
+
+Screen readers get the value as plain text; the animated glyphs are hidden from the accessibility tree. Changes swap instantly, without animating, under `prefers-reduced-motion: reduce` unless `respectReducedMotion` is `false`. `TextMorph` doesn't announce changes on its own; wrap it in an element with `aria-live="polite"` when a change needs to be read out.
+
+## API Reference
+
+`TextMorph` renders a `<span>` through Base UI's [`useRender`](https://base-ui.com/react/utils/use-render), so it accepts a `render` prop and any native `<span>` prop in addition to those documented below.
+
+### Props
+
+<ApiPropsList>
+
+<ApiProp name="value" fullType="string | number" required>
+  The text to show. Changing it animates to the new value. A number is formatted
+  with `locale` and `decimals`.
+</ApiProp>
+
+<ApiProp name="options" fullType="Partial<TextMorphOptions>">
+  How the change animates. `mode` picks the defaults for everything else; any
+  field you set overrides that mode's value. See [Options](#options).
+</ApiProp>
+
+<ApiProp name="locale" fullType="string" defaultValue='"en"'>
+  Formats a number `value` and names the decimal separator digits align on.
+  Fixed rather than read from the browser, so the server and the browser render
+  the same text.
+</ApiProp>
+
+<ApiProp name="decimals" fullType="number">
+  Fraction digits for a number `value`.
+</ApiProp>
+
+<ApiProp name="disabled" fullType="boolean" defaultValue="false">
+  Swap the text without animating.
+</ApiProp>
+
+<ApiProp name="respectReducedMotion" fullType="boolean" defaultValue="true">
+  Swap without animating when the reader prefers reduced motion.
+</ApiProp>
+
+<ApiProp name="onAnimationStart" fullType="() => void">
+  A change started animating.
+</ApiProp>
+
+<ApiProp name="onAnimationComplete" fullType="() => void">
+  A change finished and every glyph settled. Fires right away for a change that
+  didn't animate (disabled, reduced motion, or off screen). Each change ends in
+  exactly one of this and `onAnimationCancel`.
+</ApiProp>
+
+<ApiProp name="onAnimationCancel" fullType="() => void">
+  A change was interrupted by the next one.
+</ApiProp>
+
+</ApiPropsList>
+
+### Options
+
+<ApiPropsList>
+
+<ApiProp name="mode" fullType='"morph" | "roll"' defaultValue='"morph"'>
+  `morph` matches letters anywhere and scales the rest in place. `roll` keeps
+  the shared start, end and middle and rolls the glyphs between.
+</ApiProp>
+
+<ApiProp name="numbers" fullType="boolean" defaultValue="true">
+  Match numbers by place value, so only the digits that changed animate.
+</ApiProp>
+
+<ApiProp name="trend" fullType="-1 | 0 | 1" defaultValue="0">
+  Which way glyphs roll: `1` up, `-1` down, `0` read it off the value (a number
+  that grew rolls up).
+</ApiProp>
+
+<ApiProp
+  name="edgeFade"
+  fullType='"auto" | "always" | "never"'
+  defaultValue='"auto"'
+>
+  Fade old ink at an edge the box is shrinking away from. `auto` only fades
+  where the ink would land on something: a neighbouring word, or the edge of the
+  pill, card or clipping element holding the value.
+</ApiProp>
+
+<ApiProp name="motion" fullType="{ duration: number; easing: string }">
+  Timing of glyph movement. `morph`: 400ms ease-out expo. `roll`: 550ms spring.
+</ApiProp>
+
+<ApiProp
+  name="fadeIn"
+  fullType="{ duration: number; easing: string; delay: number }"
+>
+  Opacity and blur of arriving glyphs.
+</ApiProp>
+
+<ApiProp name="fadeOut" fullType="{ duration: number; easing: string }">
+  Opacity and blur of leaving glyphs.
+</ApiProp>
+
+<ApiProp name="width" fullType="{ duration: number; easing: string }">
+  Timing of the box's width as it resizes.
+</ApiProp>
+
+<ApiProp name="stagger" fullType='{ mode: "each" | "spread"; ms: number }'>
+  `each` starts every changed glyph `ms` after the last. `spread` sweeps left to
+  right across `ms` over the changed stretch only.
+</ApiProp>
+
+<ApiProp
+  name="roll"
+  fullType="{ distance: number; scale: number; rotate: number }"
+>
+  Roll mode: how far glyphs travel (em), and the scale and tilt (deg) they
+  arrive and leave with.
+</ApiProp>
+
+<ApiProp
+  name="morph"
+  fullType="{ scale: number; digits: { distance: number; fadeIn: Timing; fadeOut: Timing } }"
+>
+  Morph mode: the scale letters grow from and shrink to, and how far digits roll
+  (in line heights) with their own fades.
+</ApiProp>
+
+<ApiProp name="blur" fullType="number">
+  Blur on arriving and leaving glyphs, in em.
+</ApiProp>
+
+</ApiPropsList>
+
+### Notes
+
+- **Defaults.** `morph` uses [torph](https://github.com/lochie/torph)'s timing and scale; `roll` uses [Scritto](https://github.com/JaceThings/Scritto)'s spring, travel, tilt and blur.
+- **Off screen.** A change to a label that isn't on screen at that moment swaps instantly.
+- **Width.** The box eases to its new width, so text after an inline `TextMorph` slides instead of jumping.

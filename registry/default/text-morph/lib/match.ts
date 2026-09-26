@@ -1,0 +1,276 @@
+import type { TextMorphMode } from "./options";
+
+/*
+ * Which glyphs of the old text survive into the new one. Pure: works on
+ * grapheme strings, so it can be tested without a DOM.
+ *
+ * Numbers are matched by place value (torph): the digits line up on the
+ * decimal point, so 1,204 → 1,318 keeps the thousands and the comma, and a
+ * digit that changes rolls in place. Everything else is matched by the
+ * mode's text rule.
+ */
+
+/** `number`: part of a number matched by place value. */
+export type GlyphKind = "text" | "number";
+
+export type MatchResult = {
+  /** For each new glyph, the index of the old glyph it keeps, or -1. */
+  kept: number[];
+  nextKinds: GlyphKind[];
+  oldKinds: GlyphKind[];
+  /** 1: the value went up (new glyphs arrive from below), -1: down. */
+  trend: 1 | -1;
+};
+
+export type MatchOptions = {
+  /** Match numbers by place value. */
+  numbers: boolean;
+  /** The locale's decimal separator. */
+  decimal: string;
+  /** 1 up, -1 down, 0 read it off the numbers. */
+  trend: -1 | 0 | 1;
+};
+
+type NumberToken = { start: number; end: number };
+
+const SIGN = "+-−";
+const GROUP = ".,'   ";
+const DIGIT = /^\d$/;
+const CURRENCY = /^\p{Sc}$/u;
+
+const isDigit = (g: string): boolean => DIGIT.test(g);
+
+/**
+ * Numbers in a grapheme list: an optional sign and currency symbol, digits
+ * with group or decimal separators between them, and an optional `%`.
+ */
+export function findNumbers(glyphs: string[]): NumberToken[] {
+  const tokens: NumberToken[] = [];
+  let i = 0;
+  while (i < glyphs.length) {
+    if (!isDigit(glyphs[i])) {
+      i++;
+      continue;
+    }
+    let start = i;
+    // Leading currency symbol, then sign, either order.
+    for (let k = 0; k < 2; k++) {
+      const before = glyphs[start - 1];
+      if (before && (CURRENCY.test(before) || SIGN.includes(before))) start--;
+    }
+    let end = i + 1;
+    while (end < glyphs.length) {
+      if (isDigit(glyphs[end])) end++;
+      else if (GROUP.includes(glyphs[end]) && isDigit(glyphs[end + 1] ?? ""))
+        end += 2;
+      else break;
+    }
+    if (glyphs[end] === "%") end++;
+    tokens.push({ start, end });
+    i = end;
+  }
+  return tokens;
+}
+
+/**
+ * A key per glyph of one number, naming its place: `i2` is the hundreds,
+ * `g3` the separator left of them, `f0` the first decimal, `d` the point.
+ * Glyphs with the same key and character are the same glyph.
+ */
+export function placeKeys(glyphs: string[], decimal: string): string[] {
+  const first = glyphs.findIndex(isDigit);
+  let last = glyphs.length - 1;
+  while (last > first && !isDigit(glyphs[last])) last--;
+  let point = -1;
+  for (let i = last; i > first; i--) {
+    if (glyphs[i] === decimal) {
+      point = i;
+      break;
+    }
+  }
+  const intEnd = point === -1 ? last + 1 : point;
+
+  const keys: string[] = new Array(glyphs.length);
+  for (let i = 0; i < first; i++) keys[i] = `p${first - i}`;
+  for (let i = last + 1; i < glyphs.length; i++) keys[i] = `s${i - last}`;
+  let place = 0;
+  for (let i = intEnd - 1; i >= first; i--) {
+    if (isDigit(glyphs[i])) keys[i] = `i${place++}`;
+    else keys[i] = `g${place}`;
+  }
+  if (point !== -1) {
+    keys[point] = "d";
+    let decimals = 0;
+    for (let i = point + 1; i <= last; i++) {
+      if (isDigit(glyphs[i])) keys[i] = `f${decimals++}`;
+      else keys[i] = `h${decimals}`;
+    }
+  }
+  return keys;
+}
+
+/** The numeric value of a number token, or NaN. */
+export function parseNumber(glyphs: string[], decimal: string): number {
+  let text = "";
+  for (const g of glyphs) {
+    if (isDigit(g)) text += g;
+    else if (g === decimal) text += ".";
+    else if (g === "-" || g === "−") text = `-${text}`;
+  }
+  return Number(text);
+}
+
+/** Keep the shared start and end. Returns [newIndex, oldIndex] pairs. */
+function matchEnds(old: string[], next: string[]): [number, number][] {
+  const pairs: [number, number][] = [];
+  let start = 0;
+  while (
+    start < old.length &&
+    start < next.length &&
+    old[start] === next[start]
+  ) {
+    pairs.push([start, start]);
+    start++;
+  }
+  let end = 0;
+  while (
+    end < old.length - start &&
+    end < next.length - start &&
+    old[old.length - 1 - end] === next[next.length - 1 - end]
+  ) {
+    pairs.push([next.length - 1 - end, old.length - 1 - end]);
+    end++;
+  }
+
+  // Between them, one shared run flush with neither end (Scritto's
+  // floating run): xxlightxx → yylightyy keeps "light". It must be at
+  // least two glyphs (one shared letter is a coincidence) and may travel at
+  // most its own length plus two slots, so a word never swims across the
+  // value while everything around it dissolves.
+  const run = floatingRun(
+    old.slice(start, old.length - end),
+    next.slice(start, next.length - end),
+  );
+  if (run) {
+    for (let k = 0; k < run.length; k++) {
+      pairs.push([start + run.to + k, start + run.from + k]);
+    }
+  }
+  return pairs;
+}
+
+const MIN_RUN = 2;
+const RUN_SLACK = 2;
+
+/** The longest shared run within its travel cap; the shorter trip on ties. */
+export function floatingRun(
+  old: string[],
+  next: string[],
+): { from: number; to: number; length: number } | null {
+  let best: { from: number; to: number; length: number } | null = null;
+  // lengths[j]: the shared run ending at old[i - 1] and next[j - 1].
+  let previous = new Array<number>(next.length + 1).fill(0);
+  for (let i = 1; i <= old.length; i++) {
+    const lengths = new Array<number>(next.length + 1).fill(0);
+    for (let j = 1; j <= next.length; j++) {
+      if (old[i - 1] !== next[j - 1]) continue;
+      const length = previous[j - 1] + 1;
+      lengths[j] = length;
+      const from = i - length;
+      const to = j - length;
+      const travel = Math.abs(to - from);
+      if (length < MIN_RUN || travel > length + RUN_SLACK) continue;
+      if (
+        !best ||
+        length > best.length ||
+        (length === best.length && travel < Math.abs(best.to - best.from))
+      ) {
+        best = { from, to, length };
+      }
+    }
+    previous = lengths;
+  }
+  return best;
+}
+
+/** Match each glyph to the first unused old copy of it, in order. */
+function matchAnywhere(old: string[], next: string[]): [number, number][] {
+  const pool = new Map<string, number[]>();
+  old.forEach((glyph, i) => pool.set(glyph, [...(pool.get(glyph) ?? []), i]));
+  const pairs: [number, number][] = [];
+  next.forEach((glyph, i) => {
+    const from = pool.get(glyph)?.shift();
+    if (from !== undefined) pairs.push([i, from]);
+  });
+  return pairs;
+}
+
+export function matchText(
+  mode: TextMorphMode,
+  old: string[],
+  next: string[],
+  options: MatchOptions,
+): MatchResult {
+  const kept = next.map(() => -1);
+  const oldKinds: GlyphKind[] = old.map(() => "text");
+  const nextKinds: GlyphKind[] = next.map(() => "text");
+  const oldNumbers = options.numbers ? findNumbers(old) : [];
+  const nextNumbers = options.numbers ? findNumbers(next) : [];
+  const paired = Math.min(oldNumbers.length, nextNumbers.length);
+
+  // Numbers, paired in order, matched by place.
+  let trend: 1 | -1 | 0 = options.trend;
+  for (let n = 0; n < paired; n++) {
+    const a = oldNumbers[n];
+    const b = nextNumbers[n];
+    const aGlyphs = old.slice(a.start, a.end);
+    const bGlyphs = next.slice(b.start, b.end);
+    const byKey = new Map<string, number>();
+    placeKeys(aGlyphs, options.decimal).forEach((key, i) =>
+      byKey.set(key, a.start + i),
+    );
+    placeKeys(bGlyphs, options.decimal).forEach((key, i) => {
+      const from = byKey.get(key);
+      if (from !== undefined && old[from] === next[b.start + i]) {
+        kept[b.start + i] = from;
+      }
+    });
+    for (let i = a.start; i < a.end; i++) oldKinds[i] = "number";
+    for (let i = b.start; i < b.end; i++) nextKinds[i] = "number";
+
+    if (trend === 0) {
+      const before = parseNumber(aGlyphs, options.decimal);
+      const after = parseNumber(bGlyphs, options.decimal);
+      if (after !== before) trend = after > before ? 1 : -1;
+    }
+  }
+
+  // Everything else, by the mode's text rule.
+  const oldText = old.flatMap((_, i) => (oldKinds[i] === "text" ? [i] : []));
+  const nextText = next.flatMap((_, i) => (nextKinds[i] === "text" ? [i] : []));
+  const match = mode === "roll" ? matchEnds : matchAnywhere;
+  for (const [to, from] of match(
+    oldText.map((i) => old[i]),
+    nextText.map((i) => next[i]),
+  )) {
+    kept[nextText[to]] = oldText[from];
+  }
+
+  // A value that gains or loses a number, or changes none, reads as a rise.
+  return { kept, nextKinds, oldKinds, trend: trend === -1 ? -1 : 1 };
+}
+
+const decimals = new Map<string, string>();
+
+/** The decimal separator for a locale. */
+export function decimalFor(locale: string): string {
+  let decimal = decimals.get(locale);
+  if (decimal === undefined) {
+    decimal =
+      new Intl.NumberFormat(locale)
+        .formatToParts(1.1)
+        .find((part) => part.type === "decimal")?.value ?? ".";
+    decimals.set(locale, decimal);
+  }
+  return decimal;
+}

@@ -128,6 +128,7 @@
         "@cubby-ui/switch",
         "@cubby-ui/table",
         "@cubby-ui/tabs",
+        "@cubby-ui/text-morph",
         "@cubby-ui/textarea",
         "@cubby-ui/timeline",
         "@cubby-ui/toast",
@@ -1754,6 +1755,34 @@
       ],
       "dependencies": [
         "class-variance-authority"
+      ]
+    },
+    {
+      "name": "text-morph",
+      "type": "registry:ui",
+      "title": "Text Morph",
+      "description": "A text-morph component.",
+      "files": [
+        {
+          "path": "registry/default/text-morph/text-morph.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/text-morph/text-morph.tsx"
+        },
+        {
+          "path": "registry/default/text-morph/lib/match.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/text-morph/lib/match.ts"
+        },
+        {
+          "path": "registry/default/text-morph/lib/options.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/text-morph/lib/options.ts"
+        },
+        {
+          "path": "registry/default/text-morph/text-morph.css",
+          "type": "registry:file",
+          "target": "components/ui/cubby-ui/text-morph/text-morph.css"
+        }
       ]
     },
     {

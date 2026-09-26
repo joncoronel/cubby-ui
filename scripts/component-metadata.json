@@ -475,6 +475,12 @@
     ],
     "reference": []
   },
+  "text-morph": {
+    "title": "Text Morph",
+    "description": "A text-morph component.",
+    "dependencies": [],
+    "reference": []
+  },
   "textarea": {
     "title": "Textarea",
     "description": "A textarea component.",

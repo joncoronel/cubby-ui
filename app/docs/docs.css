@@ -776,35 +776,11 @@
 /* Clips a morphing label without an ellipsis (see MorphText); fades the edge
    only when the settled text is too long to fit. */
 .docs-morph-clip {
-  position: relative;
   display: block;
   min-width: 0;
   max-width: 100%;
   overflow: hidden;
   white-space: nowrap;
-  /* Scritto's own box-width curve (no overshoot, so neighbours never do). */
-  transition: width var(--morph-duration, 400ms) cubic-bezier(0.22, 1, 0.36, 1);
-}
-/* The label always keeps its full one-line width, and the wrapper clips it.
-   Scritto switches the text to wrapping whenever its box is narrower than
-   the value (with !important inside its shadow root), which is every time
-   the wrapper is still catching up to a longer label. */
-.docs-morph-clip > scritto-text {
-  display: inline-block;
-  min-width: max-content;
-  vertical-align: top;
-}
-/* Measures the label's settled width. Kerning and ligatures are off to match
-   Scritto's per-glyph layout. */
-.docs-morph-sizer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  visibility: hidden;
-  pointer-events: none;
-  white-space: nowrap;
-  font-kerning: none;
-  font-variant-ligatures: none;
 }
 .docs-morph-clip[data-overflowing] {
   mask-image: linear-gradient(to right, #000 calc(100% - 1.5rem), transparent);
@@ -893,7 +869,6 @@
     translate: none;
   }
   .docs-toc-pill,
-  .docs-morph-clip,
   .docs-toc-pill-chevron,
   .docs-minimap,
   .docs-shelf-mark,

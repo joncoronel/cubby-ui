@@ -1,0 +1,66 @@
+/* TextMorph (components/docs/text-morph). The server renders one span per
+   glyph, the same markup the browser keeps, so these styles apply from first
+   paint and nothing shifts on hydration. */
+
+.text-morph {
+  --text-morph-fade-y: linear-gradient(
+    to bottom,
+    transparent,
+    #000 0.3em,
+    #000 calc(100% - 0.3em),
+    transparent
+  );
+  position: relative;
+  display: inline-block;
+  max-width: none;
+  white-space: nowrap;
+  /* Its baseline is its text's, so it lines up with the words around it
+     at any font size. */
+  vertical-align: baseline;
+}
+
+.text-morph-stage {
+  position: relative;
+  display: inline-block;
+}
+
+/* Room above and below for glyphs travelling in and out, faded at the
+   edges, without changing the line the label sits on. The mask sits on the
+   layers, not the box: a mask cuts whatever falls outside its element, and
+   ghosts reach past the box while it shrinks. */
+.text-morph-glyphs {
+  display: inline-block;
+  white-space: pre;
+  padding-block: 0.3em;
+  margin-block: -0.3em;
+  mask-image: var(--text-morph-fade-y);
+}
+
+.text-morph [data-glyph] {
+  display: inline-block;
+  white-space: pre;
+}
+
+/* Ghosts sit at --x/--y in stage coordinates. The layer reaches
+   --text-morph-room past the stage on both sides so nothing is cut, and
+   wears the edge fade (--text-morph-edge, set per change) only while a
+   shrinking box would leave ink over a neighbour. */
+.text-morph-ghosts {
+  position: absolute;
+  inset-block: -0.3em;
+  inset-inline: calc(-1 * var(--text-morph-room, 0px));
+  pointer-events: none;
+  mask-image:
+    var(--text-morph-fade-y),
+    var(--text-morph-edge, linear-gradient(#000, #000));
+  mask-size:
+    100% 100%,
+    100% 100%;
+  mask-repeat: no-repeat;
+  mask-composite: intersect;
+}
+.text-morph-ghosts > [data-glyph] {
+  position: absolute;
+  left: calc(var(--x, 0px) + var(--text-morph-room, 0px));
+  top: calc(var(--y, 0px) + 0.3em);
+}

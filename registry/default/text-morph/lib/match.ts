@@ -27,6 +27,8 @@ export type MatchResult = {
   oldKinds: GlyphKind[];
   /** 1: the value went up (new glyphs arrive from below), -1: down. */
   trend: 1 | -1;
+  /** Morph matched by words (the value has more than one). */
+  byWords: boolean;
 };
 
 export type MatchOptions = {
@@ -103,34 +105,48 @@ const CURRENCY = /^\p{Sc}$/u;
 
 const isDigit = (g: string): boolean => DIGIT.test(g);
 
+/** Marks a number may open with, besides a currency symbol. */
+const PREFIX = SIGN + "(#" + PERCENT;
+/** Marks a number may close with, besides a currency symbol. */
+const SUFFIX = PERCENT + ".,!?:;)\"'\u201D\u2019";
+
+const isBreak = (g: string): boolean => g === " " || g === "\t" || g === "\n";
+
 /**
- * Numbers in a grapheme list: an optional sign and currency symbol, digits
- * with group or decimal separators between them, and an optional `%`.
+ * Numbers in a grapheme list. A number is a whole word (torph's rule):
+ * digits with group or decimal separators between them, opened only by a
+ * sign, currency symbol, `(` or `#` and closed only by punctuation, so
+ * `v1.2.3`, `2024-01-01` and `COVID-19` stay text. The number itself takes
+ * in a sign and currency symbol before it and a `%` after it.
  */
 export function findNumbers(glyphs: string[]): NumberToken[] {
   const tokens: NumberToken[] = [];
-  let i = 0;
-  while (i < glyphs.length) {
-    if (!isDigit(glyphs[i])) {
-      i++;
+  const isAffix = (g: string, marks: string): boolean =>
+    marks.includes(g) || CURRENCY.test(g);
+  let wordStart = 0;
+  for (let i = 0; i <= glyphs.length; i++) {
+    if (i < glyphs.length && !isBreak(glyphs[i])) continue;
+    const wordFrom = wordStart;
+    const wordEnd = i;
+    let first = wordFrom;
+    let last = wordEnd;
+    wordStart = i + 1;
+    while (first < last && isAffix(glyphs[first], PREFIX)) first++;
+    while (last > first && isAffix(glyphs[last - 1], SUFFIX)) last--;
+    if (first >= last || !isDigit(glyphs[first]) || !isDigit(glyphs[last - 1]))
       continue;
-    }
-    let start = i;
+    const core = glyphs.slice(first, last);
+    if (!core.every((g) => isDigit(g) || GROUP.includes(g))) continue;
+    let start = first;
     // Leading currency symbol, then sign, either order.
     for (let k = 0; k < 2; k++) {
       const before = glyphs[start - 1];
-      if (before && (CURRENCY.test(before) || SIGN.includes(before))) start--;
+      if (start > wordFrom && (CURRENCY.test(before) || SIGN.includes(before)))
+        start--;
     }
-    let end = i + 1;
-    while (end < glyphs.length) {
-      if (isDigit(glyphs[end])) end++;
-      else if (GROUP.includes(glyphs[end]) && isDigit(glyphs[end + 1] ?? ""))
-        end += 2;
-      else break;
-    }
-    if (end < glyphs.length && PERCENT.includes(glyphs[end])) end++;
+    let end = last;
+    if (end < wordEnd && PERCENT.includes(glyphs[end])) end++;
     tokens.push({ start, end });
-    i = end;
   }
   return tokens;
 }
@@ -493,6 +509,10 @@ export function matchText(
   const paired = Math.min(oldNumbers.length, nextNumbers.length);
 
   const caret = options.caret;
+  const byWords =
+    caret === undefined &&
+    mode === "morph" &&
+    (next.some(isBreak) || wordsOf(old, oldKinds).length > 1);
 
   // Numbers, paired in order, matched by place.
   let trend: 1 | -1 | 0 = options.trend;
@@ -528,20 +548,28 @@ export function matchText(
     for (const [to, from] of matchCaret(old, next, caret, options.decimal)) {
       kept[to] = from;
     }
-    return { kept, nextKinds, oldKinds, trend: trend === -1 ? -1 : 1 };
+    return {
+      kept,
+      nextKinds,
+      oldKinds,
+      trend: trend === -1 ? -1 : 1,
+      byWords,
+    };
   }
 
   // Everything else, by the mode's text rule. Morph works by words once a
   // value has more than one.
-  const isSpace = (g: string): boolean => g === " " || g === "\t" || g === "\n";
-  if (
-    mode === "morph" &&
-    (next.some(isSpace) || wordsOf(old, oldKinds).length > 1)
-  ) {
+  if (byWords) {
     for (const [to, from] of matchWords(old, next, oldKinds, nextKinds)) {
       kept[to] = from;
     }
-    return { kept, nextKinds, oldKinds, trend: trend === -1 ? -1 : 1 };
+    return {
+      kept,
+      nextKinds,
+      oldKinds,
+      trend: trend === -1 ? -1 : 1,
+      byWords,
+    };
   }
   const oldText = old.flatMap((_, i) => (oldKinds[i] === "text" ? [i] : []));
   const nextText = next.flatMap((_, i) => (nextKinds[i] === "text" ? [i] : []));
@@ -554,7 +582,13 @@ export function matchText(
   }
 
   // A value that gains or loses a number, or changes none, reads as a rise.
-  return { kept, nextKinds, oldKinds, trend: trend === -1 ? -1 : 1 };
+  return {
+    kept,
+    nextKinds,
+    oldKinds,
+    trend: trend === -1 ? -1 : 1,
+    byWords,
+  };
 }
 
 /** The decimal separator for a locale. */

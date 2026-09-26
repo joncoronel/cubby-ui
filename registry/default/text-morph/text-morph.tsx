@@ -72,7 +72,8 @@ function glyphsHtml(text: string): string {
     if (isSpace(glyph)) {
       if (word) html += `<span data-word>${word}</span>`;
       word = "";
-      html += `<span data-glyph data-space>${escapeHtml(glyph)}</span>`;
+      const kind = glyph === "\n" ? "data-space data-break" : "data-space";
+      html += `<span data-glyph ${kind}>${escapeHtml(glyph)}</span>`;
     } else {
       word += `<span data-glyph>${escapeHtml(glyph)}</span>`;
     }
@@ -85,6 +86,7 @@ function createGlyph(text: string): HTMLSpanElement {
   const span = document.createElement("span");
   span.setAttribute("data-glyph", "");
   if (isSpace(text)) span.setAttribute("data-space", "");
+  if (text === "\n") span.setAttribute("data-break", "");
   span.textContent = text;
   return span;
 }
@@ -194,6 +196,75 @@ function awayState(
     };
   }
   return { translate: "0 0", scale: String(o.morph.scale), rotate: "0deg" };
+}
+
+/**
+ * Morph mode, one-word values (torph): a run of this many replaced glyphs,
+ * with no survivor inside, is swapped as one shape rather than glyph by
+ * glyph. It recedes further, to GROUP_SCALE about its own centre, and its
+ * fades take these shares of the movement's duration.
+ */
+const GROUP_MIN = 6;
+const GROUP_SCALE = 0.8;
+const GROUP_FADE_IN = 0.35;
+const GROUP_FADE_OUT = 0.45;
+
+/** Its scale's pivot, written only when it changes. */
+function setOrigin(node: HTMLElement, origin: string): void {
+  if (node.style.transformOrigin !== origin) {
+    node.style.transformOrigin = origin;
+  }
+}
+
+/** How a glyph arriving or leaving as part of a shape scales. */
+type Shape = { origin: string; group: boolean };
+
+/** Scale each member about the centre of the whole run. */
+function shapeRun(
+  shapes: Map<HTMLElement, Shape>,
+  members: { node: HTMLElement; rect: DOMRect }[],
+  group: boolean,
+): void {
+  const left = Math.min(...members.map((m) => m.rect.left));
+  const right = Math.max(...members.map((m) => m.rect.right));
+  const top = Math.min(...members.map((m) => m.rect.top));
+  const bottom = Math.max(...members.map((m) => m.rect.bottom));
+  for (const { node, rect } of members) {
+    shapes.set(node, {
+      origin: `${(left + right) / 2 - rect.left}px ${(top + bottom) / 2 - rect.top}px`,
+      group,
+    });
+  }
+}
+
+/**
+ * The runs a value's glyphs fall into for shaping: whole words where the
+ * change matched by words, else runs of at least GROUP_MIN between
+ * survivors. `changed` says which glyphs arrive (or leave).
+ */
+function shapeRuns(
+  nodes: HTMLElement[],
+  changed: (i: number) => boolean,
+  byWords: boolean,
+): { runs: number[][]; group: boolean } {
+  const runs: number[][] = [];
+  let run: number[] = [];
+  let whole = true;
+  const flush = (): void => {
+    if (byWords ? whole && run.length > 0 : run.length >= GROUP_MIN) {
+      runs.push(run);
+    }
+    run = [];
+    whole = true;
+  };
+  nodes.forEach((node, i) => {
+    if (spaceNode(node)) return flush();
+    if (changed(i)) run.push(i);
+    else if (byWords) whole = false;
+    else flush();
+  });
+  flush();
+  return { runs, group: !byWords };
 }
 
 /** Fade timings for a glyph of this kind. */
@@ -450,15 +521,23 @@ function* morphTo(
   const used = new Set(match.kept);
   const kept = match.kept.map((from) => (from === -1 ? null : old[from]));
   const leaving = old.flatMap((node, i) =>
-    used.has(i) || spaceNode(node) ? [] : [{ node, kind: match.oldKinds[i] }],
+    used.has(i) || spaceNode(node)
+      ? []
+      : [{ node, kind: match.oldKinds[i], index: i }],
   );
   const nodes = next.map((glyph, i) => kept[i] ?? createGlyph(glyph));
   yield;
 
   // 2. Write: stop what's running (a style change, not a structural one).
+  const slotOf = (node: HTMLElement): HTMLElement[] => {
+    const slot = node.parentElement;
+    return slot?.classList.contains("text-morph-slot") ? [slot] : [];
+  };
   const running = [
     ...nodes,
     ...leaving.map((l) => l.node),
+    ...nodes.flatMap(slotOf),
+    ...leaving.flatMap((l) => slotOf(l.node)),
     stage,
     root,
     ghostLayer,
@@ -498,7 +577,7 @@ function* morphTo(
     return started;
   }
   // Leaving glyphs move into slots in the ghost layer (placed in step 8).
-  const newSlots = leaving.flatMap(({ node, kind }) => {
+  const newSlots = leaving.flatMap(({ node, kind, index }) => {
     const home = homes.get(node);
     if (!home) return [];
     const slot = document.createElement("span");
@@ -507,7 +586,7 @@ function* morphTo(
     slot.style.setProperty("--h", `${home.height}px`);
     slot.append(node);
     ghostLayer.append(slot);
-    return [{ slot, node, kind, home }];
+    return [{ slot, node, kind, home, index }];
   });
   yield;
 
@@ -574,6 +653,115 @@ function* morphTo(
     if (slide > 0.5) reach.push([ghost.node, Math.ceil(slide)]);
   });
   const staying = ghosts.filter((g) => !claimed.has(g.slot));
+  const reclaimedAt = new Map(reclaimed.map((r) => [r.index, r.node]));
+
+  // What arrives or leaves travels with its nearest surviving neighbour
+  // (torph's anchoring), looking before it first when arriving and after it
+  // first when leaving. Its slot takes the trip and the glyph its own
+  // entrance inside it (torph's slot and mover), so a digit rolls within a
+  // number that moves line, where adding the two up cancelled them (a
+  // morph digit rolls exactly one line). Morph anchors everything; roll
+  // only digits, to the rest of their own number, so its glyphs still roll
+  // in place and a number that moves takes its digits with it.
+  //
+  // Morph also scales a whole word arriving or leaving about its own
+  // centre, as one shape; in a one-word value, only a run of GROUP_MIN or
+  // more replaced glyphs, further and faster.
+  const shaping = o.mode === "morph" && !reduced;
+  // Where each survivor starts, from its final place.
+  const startsAt = new Map<number, [number, number]>();
+  nodes.forEach((node, i) => {
+    const survivor = reclaimedAt.get(i) ?? kept[i];
+    const was = survivor && !spaceNode(node) ? before.get(survivor) : null;
+    if (was) startsAt.set(i, centreDelta(was.rect, after[i]));
+  });
+  /** Where a glyph may find its neighbour: anywhere, or its own number. */
+  const scope = (kinds: GlyphKind[], i: number): [number, number] | null => {
+    if (reduced) return null;
+    if (o.mode === "morph") return [0, kinds.length - 1];
+    if (kinds[i] !== "number") return null;
+    let first = i;
+    let last = i;
+    while (first > 0 && kinds[first - 1] === "number") first--;
+    while (last < kinds.length - 1 && kinds[last + 1] === "number") last++;
+    return [first, last];
+  };
+  const nearest = (
+    index: number,
+    [first, last]: [number, number],
+    offsetAt: (i: number) => [number, number] | undefined,
+    forwardFirst: boolean,
+  ): [number, number] | undefined => {
+    const scan = (step: 1 | -1): [number, number] | undefined => {
+      for (let j = index + step; j >= first && j <= last; j += step) {
+        const offset = offsetAt(j);
+        if (offset) return offset;
+      }
+      return undefined;
+    };
+    const [one, two]: [1 | -1, 1 | -1] = forwardFirst ? [1, -1] : [-1, 1];
+    return scan(one) ?? scan(two);
+  };
+  const isArriving = (i: number): boolean =>
+    !kept[i] && !reclaimedAt.has(i) && !spaceNode(nodes[i]);
+  const shapes = new Map<HTMLElement, Shape>();
+  if (shaping) {
+    const text = (kinds: GlyphKind[], i: number): boolean =>
+      kinds[i] === "text";
+    const arriving = shapeRuns(
+      nodes,
+      (i) => isArriving(i) && text(match.nextKinds, i),
+      match.byWords,
+    );
+    for (const run of arriving.runs) {
+      shapeRun(
+        shapes,
+        run.map((i) => ({ node: nodes[i], rect: after[i] })),
+        arriving.group,
+      );
+    }
+    const leavingAt = new Set(leaving.map((l) => l.index));
+    const departing = shapeRuns(
+      old,
+      (i) => leavingAt.has(i) && text(match.oldKinds, i),
+      match.byWords,
+    );
+    for (const run of departing.runs) {
+      const members = run.flatMap((i) => {
+        const rect = homes.get(old[i]);
+        return rect ? [{ node: old[i], rect }] : [];
+      });
+      if (members.length > 0) shapeRun(shapes, members, departing.group);
+    }
+  }
+  // An arriving glyph starts where its neighbour starts; a shape swapped
+  // as one doesn't travel.
+  const arrivals = new Map<number, [number, number]>();
+  nodes.forEach((node, i) => {
+    const range = scope(match.nextKinds, i);
+    if (!range || !isArriving(i) || shapes.get(node)?.group) return;
+    const shift = nearest(i, range, (j) => startsAt.get(j), false);
+    if (shift) arrivals.set(i, shift);
+  });
+  // A leaving glyph goes where its neighbour goes.
+  const newIndexOf = new Map(
+    match.kept.flatMap((from, to) => (from === -1 ? [] : [[from, to]])),
+  );
+  const departures = new Map<HTMLElement, [number, number]>();
+  for (const { node, index } of newSlots) {
+    const range = scope(match.oldKinds, index);
+    if (!range || shapes.get(node)?.group) continue;
+    const start = nearest(
+      index,
+      range,
+      (j) => {
+        const to = newIndexOf.get(j);
+        return to === undefined ? undefined : startsAt.get(to);
+      },
+      true,
+    );
+    if (start) departures.set(node, [-start[0], -start[1]]);
+  }
 
   // Ghost coordinates start at the layer's place in the flow, which holds
   // still on screen for the whole change, so earlier ghosts shift by however
@@ -663,6 +851,11 @@ function* morphTo(
   for (const node of changesLine) {
     node.parentElement?.setAttribute("data-travel", "");
   }
+  for (const { slot, node } of newSlots) {
+    const [dx, dy] = departures.get(node) ?? [0, 0];
+    slot.style.setProperty("--trip-x", `${Math.ceil(Math.abs(dx))}px`);
+    slot.style.setProperty("--trip-y", `${Math.ceil(Math.abs(dy))}px`);
+  }
   for (const [node, px] of reach) {
     node.parentElement?.style.setProperty("--reach", `${px}px`);
   }
@@ -670,6 +863,14 @@ function* morphTo(
   // A rise brings new glyphs up from below and sends old ones up and away.
   const arrive = match.trend;
   const away = match.trend === 1 ? -1 : 1;
+  // A glyph travelling to another line rolls the way it travels instead,
+  // so a number that moves up scrolls up as it changes: rolling against
+  // its trip, it would hold still on screen while its slot slid past.
+  const rollWith = (
+    trip: [number, number] | undefined,
+    otherwise: 1 | -1,
+  ): 1 | -1 =>
+    trip && Math.abs(trip[1]) > line / 2 ? (trip[1] > 0 ? 1 : -1) : otherwise;
 
   if (resizes) {
     const resize = { duration: o.width.duration, easing: o.width.easing };
@@ -733,17 +934,41 @@ function* morphTo(
     const was = kept[i] ? before.get(node) : undefined;
     const kind = match.nextKinds[i];
     const { fadeIn } = fadesFor(o, kind);
+    // Scale pivots on the glyph's own centre unless it arrives in a shape.
+    const shape = shapes.get(node);
+    setOrigin(node, shape?.origin ?? "");
     if (!was) {
       const delay = delays.entering[entering++];
-      run(node, [awayState(o, kind, arrive, line), HOME], {
+      const awayFrame = shape?.group
+        ? { translate: "0 0", scale: String(GROUP_SCALE), rotate: "0deg" }
+        : awayState(o, kind, rollWith(arrivals.get(i), arrive), line);
+      run(node, [awayFrame, HOME], {
         ...motion,
         delay,
         fill: "backwards",
       });
+      const shift = arrivals.get(i);
+      const slot = node.parentElement;
+      if (shift && slot) {
+        run(
+          slot,
+          [{ translate: `${shift[0]}px ${shift[1]}px` }, { translate: "0 0" }],
+          { ...motion, delay, fill: "backwards" },
+        );
+      }
+      const fadeTiming = shape?.group
+        ? {
+            duration: o.motion.duration * GROUP_FADE_IN,
+            easing: "linear",
+            delay,
+          }
+        : {
+            duration: fadeIn.duration,
+            easing: fadeIn.easing,
+            delay: delay + fadeIn.delay,
+          };
       run(node, [fade(0, blur), fade(1, sharp(blur))], {
-        duration: fadeIn.duration,
-        easing: fadeIn.easing,
-        delay: delay + fadeIn.delay,
+        ...fadeTiming,
         fill: "backwards",
       });
       return;
@@ -806,10 +1031,12 @@ function* morphTo(
   for (const slot of allSlots) {
     const x = px(slot, "--x");
     const y = px(slot, "--y");
-    minX = Math.min(minX, x - padX - INK_MARGIN * em);
-    maxX = Math.max(maxX, x + px(slot, "--w") + padX + INK_MARGIN * em);
-    minY = Math.min(minY, y - padY);
-    maxY = Math.max(maxY, y + px(slot, "--h") + padY);
+    const room = padX + px(slot, "--trip-x") + INK_MARGIN * em;
+    const roomY = padY + px(slot, "--trip-y");
+    minX = Math.min(minX, x - room);
+    maxX = Math.max(maxX, x + px(slot, "--w") + room);
+    minY = Math.min(minY, y - roomY);
+    maxY = Math.max(maxY, y + px(slot, "--h") + roomY);
   }
   if (armStart || armEnd) {
     minX = Math.min(minX, boxStart - slack, finalStart - slack);
@@ -864,12 +1091,34 @@ function* morphTo(
       scale: was.scale,
       rotate: was.rotate,
     };
+    // A shape's pivot applies only to a glyph at rest, or its first frame
+    // would jump.
+    const atRest = was.scale === "1" && was.rotate === "0deg";
+    const shape = atRest ? shapes.get(node) : undefined;
+    setOrigin(node, shape?.origin ?? "");
+    const awayFrame = shape?.group
+      ? { translate: "0 0", scale: String(GROUP_SCALE), rotate: "0deg" }
+      : awayState(
+          o,
+          kind,
+          // It leaves the way its trip goes.
+          rollWith(departures.get(node), away),
+          line,
+        );
     const move = run(
       node,
-      [drawn, reduced ? drawn : awayState(o, kind, away, line)],
+      [drawn, reduced ? drawn : awayFrame],
       // Both: its starting place holds through the stagger delay too.
       { ...motion, delay, fill: "both" },
     );
+    const trip = departures.get(node);
+    if (trip) {
+      run(
+        slot,
+        [{ translate: "0 0" }, { translate: `${trip[0]}px ${trip[1]}px` }],
+        { ...motion, delay, fill: "both" },
+      );
+    }
     const blurred = was.filter !== "blur(0px)" ? was.filter : null;
     const out = run(
       node,
@@ -878,8 +1127,9 @@ function* morphTo(
         fade(0, blur ?? (blurred && "blur(0px)")),
       ],
       {
-        duration: fadeOut.duration,
-        easing: fadeOut.easing,
+        ...(shape?.group
+          ? { duration: o.motion.duration * GROUP_FADE_OUT, easing: "linear" }
+          : { duration: fadeOut.duration, easing: fadeOut.easing }),
         delay,
         fill: "both",
       },

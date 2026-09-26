@@ -187,6 +187,8 @@ const SECTIONS = [
 // torph's playground cases (packages/test-cases/src/cases.ts), to compare.
 const REORDER = ["Transaction Safe", "Processing Transaction"];
 const SWAP = ["hello world", "world hello"];
+const LINES = ["1,234", "Total\n1,234", "Total\n5,678"];
+const EMPTY = ["hello world", ""];
 const PRICES = ["$1,204", "$1,318", "$987", "$12,450", "$12,455", "$9"];
 const COUNTS = [8, 9, 10, 11, 12, 99, 100, 101, 100, 99, 42, 41];
 const PERCENTS = [2.4, 2.45, 3.1, -0.6, -1.25, 0.8];
@@ -445,6 +447,24 @@ export default function TextMorphTune(): React.ReactElement {
           <span className="text-2xl font-medium">
             <TextMorph value={pick(SWAP, "swap")} options={ambient} />
           </span>
+        </Demo>
+
+        <Demo
+          label="Line break (torph: a new line arrives above the number, which holds its place value)"
+          onAdvance={bump("lines")}
+        >
+          <span className="text-2xl font-medium tabular-nums">
+            <TextMorph value={pick(LINES, "lines")} options={ambient} />
+          </span>
+        </Demo>
+
+        <Demo
+          label="Empty and back (torph: the line keeps its height while the text leaves)"
+          onAdvance={bump("empty")}
+        >
+          <p className="text-2xl font-medium">
+            <TextMorph value={pick(EMPTY, "empty")} options={ambient} />
+          </p>
         </Demo>
 
         <Demo

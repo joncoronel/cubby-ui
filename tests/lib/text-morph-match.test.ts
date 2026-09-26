@@ -351,3 +351,31 @@ describe("matchText by words in morph mode", () => {
     expect(morph("Hello 👋", "Goodbye 👋")).toBe("_______ 👋");
   });
 });
+
+// torph's rule: a number is a whole word, opened and closed only by marks.
+describe("findNumbers keeps words that aren't quantities as text", () => {
+  const found = (text: string): string[] => {
+    const glyphs = chars(text);
+    return findNumbers(glyphs).map(({ start, end }) =>
+      glyphs.slice(start, end).join(""),
+    );
+  };
+
+  it("leaves versions, dates and names with digits alone", () => {
+    expect(found("v1.2.3")).toEqual([]);
+    expect(found("2024-01-01")).toEqual([]);
+    expect(found("COVID-19")).toEqual([]);
+  });
+
+  it("still finds numbers wrapped in marks", () => {
+    expect(found("(1,234)")).toEqual(["1,234"]);
+    expect(found("#1 of 12!")).toEqual(["1", "12"]);
+    expect(found("Total: -$5.")).toEqual(["-$5"]);
+  });
+
+  it("reads no trend from a name with digits", () => {
+    const up = matchText("roll", chars("COVID-19"), chars("COVID-20"), OPTIONS);
+    expect(up.trend).toBe(1);
+    expect(up.nextKinds.every((kind) => kind === "text")).toBe(true);
+  });
+});

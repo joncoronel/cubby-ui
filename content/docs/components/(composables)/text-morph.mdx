@@ -39,16 +39,16 @@ Use `options.mode` to pick how glyphs move, `morph` (the default) or `roll`; eac
 
 <ComponentPreview component="text-morph" example="text-morph-modes" />
 
-| Mode    | Description                                                                                                                                                                           |
-| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `morph` | Matches whole words, so a word that moves slides over intact, then letters within words that changed. Shared glyphs slide, the rest scale and fade in place. Digits roll a full line. |
-| `roll`  | Keeps the shared start, end and a shared word in the middle; everything between rolls vertically on a spring.                                                                         |
+| Mode    | Description                                                                                                                                                                                                               |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `morph` | Matches whole words, so a word that moves slides over intact, then letters within words that changed. Shared glyphs slide; the rest scale and fade, travelling with the nearest word that stays. Digits roll a full line. |
+| `roll`  | Keeps the shared start, end and a shared word in the middle; everything between rolls vertically on a spring.                                                                                                             |
 
 `roll` runs about 700ms from the first glyph to the last, which suits headlines and values that change now and then. For buttons, tabs and values that update often, use `morph`, or run either mode on a shorter clock with [`faster`](#faster).
 
 ### Numbers
 
-Pass a number as `value` and set `decimals` (and `locale`) to format it; only the digits that change roll. Set `tabular-nums` on numbers, or digits of different widths shift their neighbours on every change.
+Pass a number as `value` and set `decimals` (and `locale`) to format it; only the digits that change roll. A number is a whole word, so a version (`v1.2.3`), a date (`2024-01-01`) or a name with digits (`COVID-19`) animates as text. Set `tabular-nums` on numbers, or digits of different widths shift their neighbours on every change.
 
 <ComponentPreview component="text-morph" example="text-morph-numbers" />
 
@@ -234,4 +234,6 @@ const feedback = faster(MODE_DEFAULTS.morph, 0.5); // 200ms of motion
 - **Off screen.** A change to a label that isn't on screen at that moment swaps instantly.
 - **Width.** A change that stays on one line eases the box to its new width, so text after an inline `TextMorph` slides instead of jumping. A change that wraps keeps the lines as they fall, without the width animation or the edge fade.
 - **Languages.** Right-to-left text works, and a label reads in its own direction inside text of the other. A word in a script whose letters join (Arabic, Persian, Urdu and others) animates as a whole word so it stays correctly joined; other text animates letter by letter. Numbers in any script's digits match by place value.
+- **Line breaks.** A `\n` in the value starts a new line.
+- **Empty values.** An empty value keeps its line's height, so the text around it doesn't jump.
 - **No spaces, no wrapping.** A value without spaces (a long number, a URL) can't break, so it runs past a narrow container, like any unbroken word.

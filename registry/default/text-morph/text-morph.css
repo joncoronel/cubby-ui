@@ -61,6 +61,17 @@
   mask-image: var(--text-morph-fade-y);
 }
 
+/* An empty value still holds its line (torph does the same): with nothing
+   in it, the line would collapse and the text around it jump. */
+.text-morph-glyphs:empty::before {
+  content: "\200B";
+}
+
+/* A line break in the value breaks the line. */
+.text-morph [data-break] {
+  white-space: pre;
+}
+
 /* A word never breaks; lines break at the spaces between words. */
 .text-morph [data-word] {
   white-space: nowrap;
@@ -102,7 +113,9 @@
 }
 
 /* Each ghost gets a slot at its own line, faded above and below like the
-   live glyphs, with room beside it for tilt, scale and blur. */
+   live glyphs, with room beside it for tilt, scale and blur. A ghost
+   travelling with a neighbour moves its slot, fade and all (translate),
+   and leaves inside it. */
 .text-morph-ghost {
   position: absolute;
   left: calc(var(--x) - var(--ox, 0px) - 0.5em);

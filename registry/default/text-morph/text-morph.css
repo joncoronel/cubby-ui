@@ -51,16 +51,18 @@
   display: inline-block;
 }
 
-/* A glyph animating in place sits in a slot with room above and below its
-   line, faded at the edges, and room beside it for tilt, scale and blur.
-   Negative margins hand the room back, so the slot takes no space. A mask
-   cuts whatever falls outside its element, so glyphs that travel go without
-   a slot. */
+/* Each glyph sits in a slot with room above and below its line, faded at
+   the edges, and room beside it for tilt, scale and blur. Negative margins
+   hand the room back, so the slot takes no space. A mask cuts whatever
+   falls outside its element, so a glyph that travels turns it off. */
 .text-morph-slot {
   display: inline-block;
   padding: 0.3em 0.5em;
   margin: -0.3em -0.5em;
   mask-image: var(--text-morph-fade-y);
+}
+.text-morph-slot[data-travel] {
+  mask-image: none;
 }
 
 /* A word never breaks; lines break at the spaces between words. */

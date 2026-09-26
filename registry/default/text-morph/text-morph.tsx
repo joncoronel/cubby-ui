@@ -91,20 +91,11 @@ const spaceNode = (node: HTMLElement): boolean =>
   node.hasAttribute("data-space");
 
 /**
- * A glyph that animates in place (arriving, or rolling where it stands)
- * sits in a slot that fades it out above and below its line, taking no
- * room of its own. Glyphs that travel go without one, so nothing cuts them
- * off on the way.
+ * Lay glyphs out as words, the same structure the server renders, each
+ * glyph in a slot: room above and below its line that fades it out, taking
+ * no space of its own. A glyph that travels turns its slot's fade off
+ * (`data-travel`), so nothing cuts it off on the way.
  */
-function slotted(node: HTMLElement): HTMLElement {
-  const slot = document.createElement("span");
-  slot.className = "text-morph-slot";
-  node.replaceWith(slot);
-  slot.append(node);
-  return slot;
-}
-
-/** Lay glyphs out as words, the same structure the server renders. */
 function layOut(layer: HTMLElement, nodes: HTMLElement[]): void {
   const parts: HTMLElement[] = [];
   let word: HTMLElement | null = null;
@@ -119,7 +110,10 @@ function layOut(layer: HTMLElement, nodes: HTMLElement[]): void {
       word.setAttribute("data-word", "");
       parts.push(word);
     }
-    word.append(node);
+    const slot = document.createElement("span");
+    slot.className = "text-morph-slot";
+    slot.append(node);
+    word.append(slot);
   }
   layer.replaceChildren(...parts);
 }
@@ -304,21 +298,60 @@ function placeSlot(slot: HTMLElement, x: number, y: number): void {
   slot.style.setProperty("--y", `${y}px`);
 }
 
-/** Lift the edge fade. */
+/** Lift the edge fade (its band animation already cancelled). */
 function disarm(ghostLayer: HTMLElement): void {
-  for (const animation of ghostLayer.getAnimations()) animation.cancel();
   ghostLayer.style.removeProperty("--text-morph-edge");
   delete ghostLayer.dataset.armed;
 }
 
 /** Once the last ghost has left, the layer folds away. */
 function clearLayer(ghostLayer: HTMLElement): void {
+  for (const animation of ghostLayer.getAnimations()) animation.cancel();
   disarm(ghostLayer);
   ghostLayer.style.width = "";
   ghostLayer.style.height = "";
 }
 
-function morphTo(
+/**
+ * A change runs in phases, yielding between them: reads, then writes, then
+ * reads again. Every label that changes in the same update is stepped
+ * through the phases together, so all of them read before any of them
+ * writes. Reading after the DOM changes forces the browser to restyle, and
+ * on a page with complex `:has()` selectors each such restyle can cover the
+ * whole document; batched, a set of changes costs one instead of several
+ * per label.
+ */
+type MorphSteps = Generator<void, Animation[], void>;
+
+type MorphJob = {
+  root: HTMLElement;
+  steps: MorphSteps;
+  done: (started: Animation[]) => void;
+};
+
+const queue: MorphJob[] = [];
+
+function flushMorphs(): void {
+  let active = queue.splice(0);
+  while (active.length > 0) {
+    active = active.filter((job) => {
+      const step = job.steps.next();
+      if (!step.done) return true;
+      job.done(step.value);
+      return false;
+    });
+  }
+}
+
+/** Run a change with the others from this update, before the next paint. */
+function scheduleMorph(job: MorphJob): void {
+  // A second change to the same label before the batch runs goes after it.
+  if (queue.some((queued) => queued.root === job.root)) flushMorphs();
+  queue.push(job);
+  if (queue.length === 1) queueMicrotask(flushMorphs);
+}
+
+function* morphTo(
   root: HTMLElement,
   stage: HTMLElement,
   glyphLayer: HTMLElement,
@@ -326,8 +359,8 @@ function morphTo(
   value: string,
   o: TextMorphOptions,
   place: { decimal: string; caret: number | undefined },
-  animate: boolean,
-): Animation[] {
+  animate: () => boolean,
+): MorphSteps {
   // Everything this change starts, so the caller can tell when it's over.
   const started: Animation[] = [];
   const run = (
@@ -339,17 +372,27 @@ function morphTo(
     started.push(animation);
     return animation;
   };
+  if (!root.isConnected) return started;
   const old = Array.from(
     glyphLayer.querySelectorAll<HTMLElement>("[data-glyph]"),
   );
   const next = graphemes(value);
 
-  // 1. Where everything is on screen right now.
+  // 1. Read: where everything is on screen right now.
+  const moving = animate();
   const rootBefore = root.getBoundingClientRect();
   const linesBefore = root.getClientRects().length;
   const originBefore = layerOrigin(ghostLayer);
   const before = new Map(old.map((node) => [node, visualState(node)]));
-  const slots = Array.from(ghostLayer.children) as HTMLElement[];
+  // Ghosts still leaving; ones already gone are cleared in step 4.
+  const gone: HTMLElement[] = [];
+  const slots = (Array.from(ghostLayer.children) as HTMLElement[]).filter(
+    (slot) => {
+      if (slot.dataset.gone === undefined) return true;
+      gone.push(slot);
+      return false;
+    },
+  );
   const ghostRects = slots.flatMap((slot) =>
     slot.firstElementChild
       ? [slot.firstElementChild.getBoundingClientRect()]
@@ -374,46 +417,79 @@ function morphTo(
     used.has(i) || spaceNode(node) ? [] : [{ node, kind: match.oldKinds[i] }],
   );
   const nodes = next.map((glyph, i) => kept[i] ?? createGlyph(glyph));
-  for (const node of [...nodes, ...leaving.map((l) => l.node), stage]) {
-    for (const animation of node.getAnimations()) animation.cancel();
+  yield;
+
+  // 2. Write: stop what's running (a style change, not a structural one).
+  const running = [
+    ...nodes,
+    ...leaving.map((l) => l.node),
+    stage,
+    root,
+    ghostLayer,
+  ];
+  for (const el of running) {
+    for (const animation of el.getAnimations()) animation.cancel();
   }
-  // Where leaving glyphs sit in the layout, with nothing moving them.
+  window.clearTimeout(settleTimers.get(root));
+  yield;
+
+  // 3. Read: where leaving glyphs sit in the layout, with nothing moving
+  // them.
   const homes = new Map(
     leaving.map(({ node }) => [node, node.getBoundingClientRect()]),
   );
-  layOut(glyphLayer, nodes);
+  yield;
 
-  // Back to flowing inline, the resting layout.
-  window.clearTimeout(settleTimers.get(root));
-  for (const animation of root.getAnimations()) animation.cancel();
+  // 4. Write: the new glyphs, back to flowing inline, the resting layout.
+  // Every structural change happens here, so the batch restyles once.
+  layOut(glyphLayer, nodes);
+  for (const slot of gone) slot.remove();
   delete root.dataset.box;
   root.style.width = "";
-  if (!animate) return started;
+  if (!moving) return started;
+  // Leaving glyphs move into slots in the ghost layer (placed in step 8).
+  const newSlots = leaving.flatMap(({ node, kind }) => {
+    const home = homes.get(node);
+    if (!home) return [];
+    const slot = document.createElement("span");
+    slot.className = "text-morph-ghost";
+    slot.style.setProperty("--w", `${home.width}px`);
+    slot.style.setProperty("--h", `${home.height}px`);
+    slot.append(node);
+    ghostLayer.append(slot);
+    return [{ slot, node, kind, home }];
+  });
+  yield;
 
-  // 3. The final layout. A change that stays on one line is animated as a
-  // box; one that wraps keeps its lines as they fall.
-  // An empty value has no line box at all; it counts as one line.
+  // 5. Read: a change that stays on one line is animated as a box; one that
+  // wraps keeps its lines as they fall. An empty value has no line box at
+  // all; it counts as one line.
   const box = linesBefore <= 1 && root.getClientRects().length <= 1;
   const width = root.getBoundingClientRect().width;
+  yield;
+
+  // 6. Write: the box at its new width.
   if (box) {
     root.dataset.box = "";
     root.style.width = `${width}px`;
   }
+  yield;
+
+  // 7. Read: the final layout.
   const rootAfter = root.getBoundingClientRect();
   const origin = layerOrigin(ghostLayer);
   const after = nodes.map((node) => node.getBoundingClientRect());
   const em = parseFloat(getComputedStyle(root).fontSize) || 16;
 
-  // Slots take no room, so wrapping glyphs in them leaves this layout as
-  // measured.
-  nodes.forEach((node, i) => {
-    if (spaceNode(node)) return;
+  // Glyphs that travel further than their slot's room go unmasked.
+  const travelling = nodes.filter((node, i) => {
     const was = kept[i] ? before.get(node) : undefined;
-    const travels =
+    return (
       was !== undefined &&
+      !spaceNode(node) &&
       (Math.abs(was.rect.left - after[i].left) > SLOT_PAD_X * em ||
-        Math.abs(was.rect.top - after[i].top) > SLOT_PAD_Y * em);
-    if (!travels) slotted(node);
+        Math.abs(was.rect.top - after[i].top) > SLOT_PAD_Y * em)
+    );
   });
   const letter = nodes.findIndex((node) => !spaceNode(node));
   const line = letter === -1 ? em * 1.2 : after[letter].height;
@@ -470,6 +546,12 @@ function morphTo(
   };
   const armStart = armed("start");
   const armEnd = armed("end");
+  yield;
+
+  // 8. Write: everything else, attributes and styles only. Nothing below
+  // reads layout or changes the DOM's structure.
+  for (const node of travelling)
+    node.parentElement?.setAttribute("data-travel", "");
 
   // A rise brings new glyphs up from below and sends old ones up and away.
   const arrive = match.trend;
@@ -596,25 +678,19 @@ function morphTo(
     }
   });
 
-  // Leaving glyphs move into slots at the place they sat in the layout,
-  // and start from wherever they were drawn.
-  const newSlots = leaving.flatMap(({ node, kind }) => {
-    const home = homes.get(node);
-    if (!home) return [];
-    const slot = document.createElement("span");
-    slot.className = "text-morph-ghost";
-    slot.style.setProperty("--w", `${home.width}px`);
-    slot.style.setProperty("--h", `${home.height}px`);
+  // Leaving glyphs sit at the place they had in the layout, and start from
+  // wherever they were drawn.
+  for (const { slot, home } of newSlots) {
     placeSlot(slot, home.left - origin.left, home.top - origin.top);
-    slot.append(node);
-    return [{ slot, node, kind, home }];
-  });
+  }
 
   // Size the layer around every slot (a mask cuts whatever falls outside
   // its element) and, when the edge fade is armed, the band's reach.
   const allSlots = [...slots, ...newSlots.map((s) => s.slot)];
   if (allSlots.length === 0) {
-    clearLayer(ghostLayer);
+    disarm(ghostLayer);
+    ghostLayer.style.width = "";
+    ghostLayer.style.height = "";
     return started;
   }
   const slack = EDGE_SLACK * em;
@@ -646,7 +722,6 @@ function morphTo(
 
   // The edge fade: a band on each armed edge that follows the box edge on
   // the width's curve, ending a little past it.
-  for (const animation of ghostLayer.getAnimations()) animation.cancel();
   if (armStart || armEnd) {
     const ramp = EDGE_RAMP * em;
     const window = (start: number, end: number) => {
@@ -674,7 +749,6 @@ function morphTo(
   }
 
   newSlots.forEach(({ slot, node, kind, home }, i) => {
-    ghostLayer.append(slot);
     const was = before.get(node);
     if (!was) return;
     const { fadeOut } = fadesFor(o, kind);
@@ -706,9 +780,17 @@ function morphTo(
         fill: "both",
       },
     );
+    // A ghost that has left stays in place, invisible, until the last one
+    // has: removing them together is one change to the DOM's structure (one
+    // restyle) instead of one per ghost.
     const finish = (): void => {
-      if (slot.parentNode === ghostLayer) slot.remove();
-      if (ghostLayer.childElementCount === 0) clearLayer(ghostLayer);
+      if (slot.parentNode !== ghostLayer) return;
+      slot.dataset.gone = "";
+      const slots = Array.from(ghostLayer.children) as HTMLElement[];
+      if (slots.every((ghost) => ghost.dataset.gone !== undefined)) {
+        ghostLayer.replaceChildren();
+        clearLayer(ghostLayer);
+      }
     };
     // Cancelled by a later change, which already moved on without it.
     Promise.all([move.finished, out.finished]).then(finish, finish);
@@ -831,22 +913,6 @@ export function TextMorph({
     const reduce =
       current.respectReducedMotion &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const started = morphTo(
-      root,
-      stage,
-      glyphs,
-      ghosts,
-      value,
-      optionsRef.current,
-      { decimal: decimalFor(locale), caret: current.cursorIndex },
-      !current.disabled && !reduce && isOnScreen(root),
-    );
-    if (started.length === 0) {
-      current.onAnimationComplete?.();
-      return;
-    }
-
-    current.onAnimationStart?.();
     let over = false;
     const cancel = (): void => {
       if (over) return;
@@ -854,11 +920,35 @@ export function TextMorph({
       latest.current.onAnimationCancel?.();
     };
     inFlight.current = cancel;
-    void Promise.allSettled(started.map((a) => a.finished)).then(() => {
-      if (over) return;
-      over = true;
-      if (inFlight.current === cancel) inFlight.current = null;
-      latest.current.onAnimationComplete?.();
+    scheduleMorph({
+      root,
+      steps: morphTo(
+        root,
+        stage,
+        glyphs,
+        ghosts,
+        value,
+        optionsRef.current,
+        { decimal: decimalFor(locale), caret: current.cursorIndex },
+        // Read in the batch's first read phase, with the others.
+        () => !current.disabled && !reduce && isOnScreen(root),
+      ),
+      done: (started) => {
+        if (over) return;
+        if (started.length === 0) {
+          over = true;
+          if (inFlight.current === cancel) inFlight.current = null;
+          latest.current.onAnimationComplete?.();
+          return;
+        }
+        latest.current.onAnimationStart?.();
+        void Promise.allSettled(started.map((a) => a.finished)).then(() => {
+          if (over) return;
+          over = true;
+          if (inFlight.current === cancel) inFlight.current = null;
+          latest.current.onAnimationComplete?.();
+        });
+      },
     });
   }, [value, locale]);
 

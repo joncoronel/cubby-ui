@@ -10,6 +10,7 @@ import {
   type TransitionConfig,
 } from "dialkit";
 import { feedbackOf } from "@/components/docs/morph-text";
+import { cn } from "@/lib/utils";
 import { TextMorph } from "@/registry/default/text-morph/text-morph";
 import {
   MODE_DEFAULTS,
@@ -237,6 +238,12 @@ function useFreeze(enabled: boolean, time: number): void {
 export default function TextMorphTune(): React.ReactElement {
   const [tune, setTune] = useTuneState();
   const [step, setStep] = React.useState(0);
+  // Clicking an example steps just that one, on top of the shared step.
+  const [bumps, setBumps] = React.useState<Record<string, number>>({});
+  const bump = (key: string) => (): void =>
+    setBumps((b) => ({ ...b, [key]: (b[key] ?? 0) + 1 }));
+  const pick = <T,>(list: readonly T[], key: string): T =>
+    list[(step + (bumps[key] ?? 0)) % list.length];
   const [auto, setAuto] = React.useState(false);
   const [typed, setTyped] = React.useState("1200");
   const [caret, setCaret] = React.useState<number>();
@@ -320,14 +327,9 @@ export default function TextMorphTune(): React.ReactElement {
   const ambient = tune.original ? exact : resolved;
   const feedback = feedbackOf(ambient);
 
-  const section = SECTIONS[step % SECTIONS.length];
-  const price = PRICES[step % PRICES.length];
-  const count = COUNTS[step % COUNTS.length];
-  const percent = PERCENTS[step % PERCENTS.length];
-  const status = STATUSES[step % STATUSES.length];
-  const target = TARGETS[step % TARGETS.length];
-  const update = UPDATES[step % UPDATES.length];
-  const flip = step % 2 === 1;
+  const count = pick(COUNTS, "counter");
+  const percent = pick(PERCENTS, "counter");
+  const flip = pick([false, true], "feedback");
   const longestMs =
     Math.max(
       ambient.motion.duration,
@@ -341,30 +343,39 @@ export default function TextMorphTune(): React.ReactElement {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 p-8 pb-32">
       <div data-tune-scope className="flex w-full max-w-xl flex-col gap-8">
-        <Demo label="Header crumb (scroll-driven)">
+        <Demo label="Header crumb (scroll-driven)" onAdvance={bump("crumb")}>
           <span className="text-muted-foreground flex items-center gap-1.5 text-sm">
             <span className="text-border">/</span>
-            <TextMorph value={section} options={ambient} />
+            <TextMorph value={pick(SECTIONS, "crumb")} options={ambient} />
           </span>
         </Demo>
 
-        <Demo label="Mobile pill (centred, resizes both ways)">
+        <Demo
+          label="Mobile pill (centred, resizes both ways)"
+          onAdvance={bump("pill")}
+        >
           <div className="flex justify-center">
             <span className="bg-card flex h-10 items-center rounded-full px-4 text-sm font-medium shadow-(--surface-shadow-combined-5)">
-              <TextMorph value={section} options={ambient} />
+              <TextMorph value={pick(SECTIONS, "pill")} options={ambient} />
             </span>
           </div>
         </Demo>
 
-        <Demo label="Price (digits line up by place; only changed ones roll)">
+        <Demo
+          label="Price (digits line up by place; only changed ones roll)"
+          onAdvance={bump("price")}
+        >
           <span className="font-display text-3xl font-semibold tabular-nums">
-            <TextMorph value={price} options={ambient} />
+            <TextMorph value={pick(PRICES, "price")} options={ambient} />
           </span>
         </Demo>
 
-        <Demo label="Wrapping (a long value flows over lines; glyphs travel across them)">
+        <Demo
+          label="Wrapping (a long value flows over lines; glyphs travel across them)"
+          onAdvance={bump("wrapping")}
+        >
           <p className="max-w-64 text-sm leading-6">
-            <TextMorph value={update} options={ambient} />
+            <TextMorph value={pick(UPDATES, "wrapping")} options={ambient} />
           </p>
         </Demo>
 
@@ -391,11 +402,14 @@ export default function TextMorphTune(): React.ReactElement {
           </div>
         </Demo>
 
-        <Demo label="In a sentence (old ink fades at the edge instead of running over the next word)">
+        <Demo
+          label="In a sentence (old ink fades at the edge instead of running over the next word)"
+          onAdvance={bump("sentence")}
+        >
           <p className="text-sm">
             Deploying to{" "}
             <TextMorph
-              value={target}
+              value={pick(TARGETS, "sentence")}
               options={ambient}
               className="font-mono font-medium"
             />{" "}
@@ -403,13 +417,19 @@ export default function TextMorphTune(): React.ReactElement {
           </p>
         </Demo>
 
-        <Demo label="Status (roll: the shared word in the middle stays put)">
+        <Demo
+          label="Status (roll: the shared word in the middle stays put)"
+          onAdvance={bump("status")}
+        >
           <span className="text-sm">
-            <TextMorph value={status} options={ambient} />
+            <TextMorph value={pick(STATUSES, "status")} options={ambient} />
           </span>
         </Demo>
 
-        <Demo label="Counter (a number value; rolls up when it grows, down when it shrinks)">
+        <Demo
+          label="Counter (a number value; rolls up when it grows, down when it shrinks)"
+          onAdvance={bump("counter")}
+        >
           <span className="flex items-baseline gap-3 text-sm">
             <span className="font-display text-3xl font-semibold tabular-nums">
               <TextMorph value={count} options={ambient} />
@@ -426,10 +446,13 @@ export default function TextMorphTune(): React.ReactElement {
           </span>
         </Demo>
 
-        <Demo label="Events (each change ends in exactly one of complete or cancel; try every 120ms)">
+        <Demo
+          label="Events (each change ends in exactly one of complete or cancel; try every 120ms)"
+          onAdvance={bump("events")}
+        >
           <div className="flex items-baseline justify-between gap-4 text-sm">
             <TextMorph
-              value={price}
+              value={pick(PRICES, "events")}
               options={ambient}
               onAnimationStart={tally("start")}
               onAnimationComplete={tally("complete")}
@@ -445,13 +468,15 @@ export default function TextMorphTune(): React.ReactElement {
 
         <Demo label="Click feedback (right-pinned buttons, the same look in 209ms)">
           <div className="flex justify-end gap-2">
-            <Button variant="ghost" size="xs">
+            {/* The buttons step this one; the card around them doesn't, so
+                there are no buttons inside a button. */}
+            <Button variant="ghost" size="xs" onClick={bump("feedback")}>
               <TextMorph
                 value={flip ? "Hide code" : "Code"}
                 options={feedback}
               />
             </Button>
-            <Button variant="secondary" size="xs">
+            <Button variant="secondary" size="xs" onClick={bump("feedback")}>
               <TextMorph
                 value={flip ? "Copied" : "Copy page"}
                 options={feedback}
@@ -522,19 +547,42 @@ export default function TextMorphTune(): React.ReactElement {
 
 function Demo({
   label,
+  onAdvance,
   children,
 }: {
   label: string;
+  /** Clicking the example (or Enter/Space on it) steps just this one. */
+  onAdvance?: () => void;
   children: React.ReactNode;
 }): React.ReactElement {
+  const card = "border-border/70 rounded-xl border px-5 py-6";
   return (
     <section className="flex flex-col gap-3">
       <h2 className="text-muted-foreground font-sans text-xs font-medium">
         {label}
       </h2>
-      <div className="border-border/70 rounded-xl border px-5 py-6">
-        {children}
-      </div>
+      {onAdvance ? (
+        // A div, not a button: some examples hold block content.
+        <div
+          role="button"
+          tabIndex={0}
+          aria-label={`Next: ${label}`}
+          onClick={onAdvance}
+          onKeyDown={(event) => {
+            if (event.key !== "Enter" && event.key !== " ") return;
+            event.preventDefault();
+            onAdvance();
+          }}
+          className={cn(
+            card,
+            "hover:bg-muted/40 focus-visible:ring-ring/50 cursor-pointer transition-colors outline-none select-none focus-visible:ring-2",
+          )}
+        >
+          {children}
+        </div>
+      ) : (
+        <div className={card}>{children}</div>
+      )}
     </section>
   );
 }

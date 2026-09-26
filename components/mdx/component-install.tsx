@@ -10,7 +10,12 @@ import {
   CodeBlockPre,
   CodeBlockCode,
 } from "@/registry/default/code-block/code-block";
-import { PACKAGE_MANAGERS, usePackageManager } from "./use-package-manager";
+import { CommandMorph, commandParts } from "./command-morph";
+import {
+  PACKAGE_MANAGERS,
+  usePackageManager,
+  type PackageManager,
+} from "./use-package-manager";
 
 interface ComponentInstallProps {
   component: string;
@@ -43,6 +48,15 @@ function getCliCommand(pm: string, component: string): string {
   }
 }
 
+/** A command for every package manager. */
+function perManager(
+  build: (pm: PackageManager) => string,
+): Record<PackageManager, string> {
+  return Object.fromEntries(
+    PACKAGE_MANAGERS.map((pm) => [pm, build(pm)]),
+  ) as Record<PackageManager, string>;
+}
+
 function getInstallCommand(pm: string, deps: string[]): string {
   const list = deps.join(" ");
   switch (pm) {
@@ -66,6 +80,13 @@ export function ComponentInstall({
 }: ComponentInstallProps) {
   const manualId = React.useId();
   const [pm, setPm] = usePackageManager();
+  // Commands morph only once the reader picks a tab; restoring their saved
+  // choice after load swaps in place.
+  const [picked, setPicked] = React.useState(false);
+  const pick = (value: string): void => {
+    setPicked(true);
+    setPm(value as typeof pm);
+  };
   const [manualOpen, setManualOpen] = React.useState(false);
   const [activeFile, setActiveFile] = React.useState(
     componentFiles?.[0]?.relativePath ?? "",
@@ -84,13 +105,17 @@ export function ComponentInstall({
         language="bash"
         initial={highlightedCliCommands?.[pm]}
       >
-        <CodeBlockHeader
-          tabs={PM_TABS}
-          activeTab={pm}
-          onTabChange={(value) => setPm(value as typeof pm)}
-        />
+        <CodeBlockHeader tabs={PM_TABS} activeTab={pm} onTabChange={pick} />
         <CodeBlockPre>
-          <CodeBlockCode />
+          <CodeBlockCode>
+            <CommandMorph
+              parts={commandParts(
+                perManager((m) => getCliCommand(m, component)),
+                pm,
+              )}
+              animate={picked}
+            />
+          </CodeBlockCode>
         </CodeBlockPre>
       </CodeBlock>
 
@@ -125,10 +150,20 @@ export function ComponentInstall({
                       <CodeBlockHeader
                         tabs={PM_TABS}
                         activeTab={pm}
-                        onTabChange={(value) => setPm(value as typeof pm)}
+                        onTabChange={pick}
                       />
                       <CodeBlockPre>
-                        <CodeBlockCode />
+                        <CodeBlockCode>
+                          <CommandMorph
+                            parts={commandParts(
+                              perManager((m) =>
+                                getInstallCommand(m, allDependencies),
+                              ),
+                              pm,
+                            )}
+                            animate={picked}
+                          />
+                        </CodeBlockCode>
                       </CodeBlockPre>
                     </CodeBlock>
                   </li>

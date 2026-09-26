@@ -25,10 +25,13 @@ import "./text-morph.css";
  *
  * At rest the label flows inline like the text around it, grouped into
  * words so lines only break between them. A change that stays on one line
- * turns the label into a box for its duration: the width eases with a CSS
- * transition, which always retargets from its current value, and when a
- * pinned or centred container moves the box's left edge, the stage rides
- * the opposite way on the same curve, so the glyphs never drift with it. A
+ * turns the label into a box for its duration: the width eases from
+ * wherever it visibly is, and when a pinned or centred container moves the
+ * box's left edge, the stage rides the opposite way on the same curve, so
+ * the glyphs never drift with it. Both run on the main thread from one
+ * clock (width, and `left` rather than a transform): a transform would run
+ * on the compositor and keep going while a busy main thread held the width
+ * still, sliding the text out of its box. A
  * change that wraps keeps the lines as the layout, and glyphs travel to
  * their new places across them.
  *
@@ -86,6 +89,20 @@ function createGlyph(text: string): HTMLSpanElement {
 
 const spaceNode = (node: HTMLElement): boolean =>
   node.hasAttribute("data-space");
+
+/**
+ * A glyph that animates in place (arriving, or rolling where it stands)
+ * sits in a slot that fades it out above and below its line, taking no
+ * room of its own. Glyphs that travel go without one, so nothing cuts them
+ * off on the way.
+ */
+function slotted(node: HTMLElement): HTMLElement {
+  const slot = document.createElement("span");
+  slot.className = "text-morph-slot";
+  node.replaceWith(slot);
+  slot.append(node);
+  return slot;
+}
 
 /** Lay glyphs out as words, the same structure the server renders. */
 function layOut(layer: HTMLElement, nodes: HTMLElement[]): void {
@@ -368,24 +385,36 @@ function morphTo(
 
   // Back to flowing inline, the resting layout.
   window.clearTimeout(settleTimers.get(root));
+  for (const animation of root.getAnimations()) animation.cancel();
   delete root.dataset.box;
-  root.style.transition = "";
   root.style.width = "";
   if (!animate) return started;
 
   // 3. The final layout. A change that stays on one line is animated as a
   // box; one that wraps keeps its lines as they fall.
-  const box = linesBefore === 1 && root.getClientRects().length === 1;
+  // An empty value has no line box at all; it counts as one line.
+  const box = linesBefore <= 1 && root.getClientRects().length <= 1;
   const width = root.getBoundingClientRect().width;
   if (box) {
     root.dataset.box = "";
-    root.style.transition = "none";
     root.style.width = `${width}px`;
   }
   const rootAfter = root.getBoundingClientRect();
   const origin = layerOrigin(ghostLayer);
   const after = nodes.map((node) => node.getBoundingClientRect());
   const em = parseFloat(getComputedStyle(root).fontSize) || 16;
+
+  // Slots take no room, so wrapping glyphs in them leaves this layout as
+  // measured.
+  nodes.forEach((node, i) => {
+    if (spaceNode(node)) return;
+    const was = kept[i] ? before.get(node) : undefined;
+    const travels =
+      was !== undefined &&
+      (Math.abs(was.rect.left - after[i].left) > SLOT_PAD_X * em ||
+        Math.abs(was.rect.top - after[i].top) > SLOT_PAD_Y * em);
+    if (!travels) slotted(node);
+  });
   const letter = nodes.findIndex((node) => !spaceNode(node));
   const line = letter === -1 ? em * 1.2 : after[letter].height;
 
@@ -447,18 +476,37 @@ function morphTo(
   const away = match.trend === 1 ? -1 : 1;
 
   if (box) {
-    // Width: back to where it visibly was, then ease to the new width.
-    root.style.width = `${rootBefore.width}px`;
-    void root.offsetWidth;
-    root.style.transition = `width ${o.width.duration}ms ${o.width.easing}`;
-    root.style.width = `${width}px`;
-    started.push(...root.getAnimations());
+    // Width: from where it visibly was to the new width.
+    const resize = { duration: o.width.duration, easing: o.width.easing };
+    run(root, [{ width: `${rootBefore.width}px` }, { width: `${width}px` }], {
+      ...resize,
+      fill: "both",
+    });
     settleTimers.set(
       root,
       window.setTimeout(() => {
+        const from = layerOrigin(ghostLayer);
+        for (const animation of root.getAnimations()) animation.cancel();
         delete root.dataset.box;
-        root.style.transition = "";
         root.style.width = "";
+        // Back to flowing inline, the layer's place in the flow can move;
+        // ghosts still leaving (and the layer's box) hold where they are.
+        if (ghostLayer.childElementCount === 0) return;
+        const to = layerOrigin(ghostLayer);
+        const dx = from.left - to.left;
+        const dy = from.top - to.top;
+        if (Math.abs(dx) < 0.01 && Math.abs(dy) < 0.01) return;
+        for (const slot of Array.from(ghostLayer.children) as HTMLElement[]) {
+          placeSlot(slot, px(slot, "--x") + dx, px(slot, "--y") + dy);
+        }
+        ghostLayer.style.setProperty(
+          "--ox",
+          `${px(ghostLayer, "--ox") + dx}px`,
+        );
+        ghostLayer.style.setProperty(
+          "--oy",
+          `${px(ghostLayer, "--oy") + dy}px`,
+        );
       }, o.width.duration + 50),
     );
 
@@ -466,10 +514,7 @@ function morphTo(
     // right-pinned button); ride the other way on the same curve.
     const ride = rootAfter.left - rootBefore.left;
     if (Math.abs(ride) > 0.5) {
-      run(stage, [{ translate: `${ride}px 0` }, { translate: "0 0" }], {
-        duration: o.width.duration,
-        easing: o.width.easing,
-      });
+      run(stage, [{ left: `${ride}px` }, { left: "0px" }], resize);
     }
   }
 
@@ -645,7 +690,8 @@ function morphTo(
         { translate: `${dx}px ${dy}px`, scale: was.scale, rotate: was.rotate },
         awayState(o, kind, away, line),
       ],
-      { ...motion, delay, fill: "forwards" },
+      // Both: its starting place holds through the stagger delay too.
+      { ...motion, delay, fill: "both" },
     );
     const out = run(
       node,
@@ -657,7 +703,7 @@ function morphTo(
         duration: fadeOut.duration,
         easing: fadeOut.easing,
         delay,
-        fill: "forwards",
+        fill: "both",
       },
     );
     const finish = (): void => {

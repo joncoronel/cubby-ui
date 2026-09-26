@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import type { ReactElement } from "react";
 import {
   CodeBlock,
@@ -12,6 +13,7 @@ import {
   usePackageManager,
   type PackageManager,
 } from "./use-package-manager";
+import { CommandMorph, commandParts } from "./command-morph";
 
 interface PackageManagerCommandProps {
   /** Pre-converted commands for each package manager */
@@ -25,6 +27,9 @@ export function PackageManagerCommand({
   highlighted,
 }: PackageManagerCommandProps) {
   const [packageManager, setPackageManager] = usePackageManager();
+  // Morph only once the reader picks a tab; restoring their saved choice
+  // after load swaps in place.
+  const [picked, setPicked] = React.useState(false);
 
   return (
     <div className="not-prose my-6">
@@ -36,10 +41,18 @@ export function PackageManagerCommand({
         <CodeBlockHeader
           tabs={PACKAGE_MANAGERS.map((pm) => ({ value: pm, label: pm }))}
           activeTab={packageManager}
-          onTabChange={(value) => setPackageManager(value as PackageManager)}
+          onTabChange={(value) => {
+            setPicked(true);
+            setPackageManager(value as PackageManager);
+          }}
         />
         <CodeBlockPre>
-          <CodeBlockCode />
+          <CodeBlockCode>
+            <CommandMorph
+              parts={commandParts(commands, packageManager)}
+              animate={picked}
+            />
+          </CodeBlockCode>
         </CodeBlockPre>
       </CodeBlock>
     </div>

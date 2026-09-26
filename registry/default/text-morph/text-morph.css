@@ -22,21 +22,44 @@
 .text-morph[data-box] {
   display: inline-block;
   white-space: nowrap;
+  /* The stage sits at the box's start and rides from there. Inherited
+     centring (a button's) would shift it by half the width still to go. */
+  text-align: start;
+}
+/* No wrapping, without collapsing spaces the context keeps (nowrap would
+   drop a leading space inside the box, in a code block for instance). */
+@supports (text-wrap-mode: nowrap) {
+  .text-morph[data-box] {
+    white-space: inherit;
+    text-wrap-mode: nowrap;
+  }
+}
+
+/* The plain value for screen readers and copying, exactly as written:
+   sr-only's nowrap would drop a leading space. */
+.text-morph > .sr-only {
+  white-space: pre;
 }
 
 .text-morph-stage {
   position: relative;
+  /* Selecting and copying picks up the plain value (the screen-reader
+     copy), not the glyphs as well. */
+  user-select: none;
 }
 .text-morph[data-box] > .text-morph-stage {
   display: inline-block;
 }
 
-/* Room above and below every line for glyphs travelling in and out, faded
-   at the edges. Padding on an inline box doesn't change the line it sits
-   on. The mask sits on the layers, not the label: a mask cuts whatever
-   falls outside its element, and ghosts reach past the label. */
-.text-morph-glyphs {
-  padding-block: 0.3em;
+/* A glyph animating in place sits in a slot with room above and below its
+   line, faded at the edges, and room beside it for tilt, scale and blur.
+   Negative margins hand the room back, so the slot takes no space. A mask
+   cuts whatever falls outside its element, so glyphs that travel go without
+   a slot. */
+.text-morph-slot {
+  display: inline-block;
+  padding: 0.3em 0.5em;
+  margin: -0.3em -0.5em;
   mask-image: var(--text-morph-fade-y);
 }
 
@@ -45,8 +68,13 @@
   white-space: nowrap;
 }
 
+/* Glyphs keep their own compositing layer, animating or not. A glyph that
+   drops back into ordinary painting when its animation ends is redrawn
+   snapped to the pixel grid, often with different anti-aliasing: a visible
+   twitch just as it settles (torph does the same). */
 .text-morph [data-glyph]:not([data-space]) {
   display: inline-block;
+  will-change: transform, opacity;
 }
 
 /* Ghosts sit at --x/--y from the layer's place in the flow (its static

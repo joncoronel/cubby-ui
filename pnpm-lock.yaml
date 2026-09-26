@@ -46,6 +46,12 @@ importers:
       '@orama/orama':
         specifier: ^3.1.18
         version: 3.1.18
+      '@scritto/core':
+        specifier: 0.1.0
+        version: 0.1.0
+      '@scritto/react':
+        specifier: ^0.1.0
+        version: 0.1.0(react@19.2.8)
       '@shadcn/react':
         specifier: ^0.1.0
         version: 0.1.0(@types/react@19.2.7)(react@19.2.8)
@@ -1924,6 +1930,14 @@ packages:
 
   '@rtsao/scc@1.1.0':
     resolution: {integrity: sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==}
+
+  '@scritto/core@0.1.0':
+    resolution: {integrity: sha512-8itfD3jc+DvoDcMYAcWJHyLXZvBNaorlL091Fp/4Toe4trGErbQOtyptO9Qexyb/qvGO0S1WRWDrGO/2KURnxg==}
+
+  '@scritto/react@0.1.0':
+    resolution: {integrity: sha512-fNeX/ZjXUBtNMo/aQ03t1AG9+5vbitfEDfrLbO5qVCAcus7xq8kWhuv1LNuGGcBLA6pngo5otymCCkZDNRY84Q==}
+    peerDependencies:
+      react: ^18 || ^19
 
   '@sec-ant/readable-stream@0.4.1':
     resolution: {integrity: sha512-831qok9r2t8AlxLko40y2ebgSDhenenCatLVeW/uBtnHPyhHOvG0C7TvfgecV+wHzIm5KUICgzmVpWS+IMEAeg==}
@@ -7348,6 +7362,13 @@ snapshots:
   '@rrweb/utils@2.0.0-alpha.20': {}
 
   '@rtsao/scc@1.1.0': {}
+
+  '@scritto/core@0.1.0': {}
+
+  '@scritto/react@0.1.0(react@19.2.8)':
+    dependencies:
+      '@scritto/core': 0.1.0
+      react: 19.2.8
 
   '@sec-ant/readable-stream@0.4.1': {}
 

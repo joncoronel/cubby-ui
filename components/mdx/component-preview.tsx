@@ -22,11 +22,8 @@ interface ComponentPreviewProps {
   serverRenderedExample?: ReactElement;
 }
 
-// overflow-hidden: the button is pinned right, so it grows leftward while
-// torph lays the new label out rightward; clipping turns that brief overhang
-// into a reveal instead of letters spilling past the edge.
 const TOOL =
-  "docs-stage-tool overflow-hidden text-muted-foreground hover:text-foreground hover:bg-surface-hover focus-visible:outline-ring/50 flex h-7 items-center gap-1.5 rounded-md px-2 text-xs font-medium outline-none focus-visible:outline-2";
+  "docs-stage-tool text-muted-foreground hover:text-foreground hover:bg-surface-hover focus-visible:outline-ring/50 flex h-7 items-center gap-1.5 rounded-md px-2 text-xs font-medium outline-none focus-visible:outline-2";
 
 export function ComponentPreview({
   code,

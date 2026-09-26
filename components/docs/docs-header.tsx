@@ -170,7 +170,7 @@ export function DocsHeader({ groups }: { groups: ShelfGroup[] }) {
               <span className="flex min-w-0 items-baseline gap-1.5">
                 {current ? (
                   <>
-                    {/* torph sets its root's display, so the responsive
+                    {/* The text-roll element sets its own display, so the responsive
                         visibility lives on a wrapper. */}
                     <span className="text-muted-foreground hidden shrink-0 sm:inline">
                       <MorphText>{current.group.label}</MorphText>

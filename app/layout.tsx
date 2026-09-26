@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Geist, Geist_Mono, Rubik } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 import { RootProvider } from "fumadocs-ui/provider/next";
@@ -82,11 +83,9 @@ export default function RootLayout({
       <head>
         {/* Before first paint: mark the platform so shortcut hints (Cmd vs
             Ctrl) render correctly without waiting for hydration. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `try{var p=(navigator.userAgentData&&navigator.userAgentData.platform)||navigator.userAgent;document.documentElement.dataset.platform=/mac|iphone|ipad/i.test(p)?"mac":"windows"}catch(e){}`,
-          }}
-        />
+        <Script id="platform" strategy="beforeInteractive">
+          {`try{var p=(navigator.userAgentData&&navigator.userAgentData.platform)||navigator.userAgent;document.documentElement.dataset.platform=/mac|iphone|ipad/i.test(p)?"mac":"windows"}catch(e){}`}
+        </Script>
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${rubik.variable} ${display.variable} font-sans antialiased`}

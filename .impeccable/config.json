@@ -2,6 +2,16 @@
   "detector": {
     "ignoreRules": [],
     "ignoreFiles": [],
-    "ignoreValues": []
+    "ignoreValues": [
+      {
+        "rule": "layout-transition",
+        "value": "*",
+        "files": [
+          "app/docs/docs.css"
+        ],
+        "createdAt": "2026-09-26T03:52:51.714Z",
+        "reason": "agent decision: .docs-morph-clip width transition is intentional (Scritto doesn't retarget its own in-flight box-width animation, so scroll-driven labels size themselves); it reflows only a small inline label in the pill/header"
+      }
+    ]
   }
 }

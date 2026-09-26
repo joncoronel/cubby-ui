@@ -128,8 +128,6 @@ export function LLMCopyButton({
     <Button
       variant="secondary"
       size="xs"
-      // Clip the label's brief overhang while it morphs (see MorphText).
-      className="overflow-hidden"
       onClick={handleCopy}
       leadingIcon={
         state === "copied" ? (

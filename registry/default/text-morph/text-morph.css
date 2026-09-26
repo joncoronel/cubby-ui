@@ -45,13 +45,14 @@
 }
 
 /* Each glyph sits in a slot with room above and below its line, faded at
-   the edges, and room beside it for tilt, scale and blur. Negative margins
-   hand the room back, so the slot takes no space. A mask cuts whatever
-   falls outside its element, so a glyph that travels turns it off. */
+   the edges, and room beside it for tilt, scale and blur, plus the length
+   of any slide along the line (--reach). Negative margins hand the room
+   back, so the slot takes no space. A mask cuts whatever falls outside its
+   element, so a glyph moving to another line turns it off. */
 .text-morph-slot {
   display: inline-block;
-  padding: 0.3em 0.5em;
-  margin: -0.3em -0.5em;
+  padding: 0.3em calc(0.5em + var(--reach, 0px));
+  margin: -0.3em calc(-0.5em - var(--reach, 0px));
   mask-image: var(--text-morph-fade-y);
 }
 .text-morph-slot[data-travel] {
@@ -72,21 +73,28 @@
   will-change: transform, opacity;
 }
 
-/* Ghosts sit at --x/--y from the layer's place in the flow (its static
-   position, at the start of the value). The layer is offset and sized each
-   change to take in every ghost, and wears the edge fade
-   (--text-morph-edge) only while a shrinking box would leave ink over a
-   neighbour. */
+/* Ghosts sit at --x/--y from the anchor's place in the flow (its static
+   position, where the value is on its line). The anchor never changes size;
+   the sheet inside it is offset and sized each change to take in every
+   ghost, and wears the edge fade (--text-morph-edge) only while a shrinking
+   box would leave ink over a neighbour. */
 .text-morph-ghosts {
   position: absolute;
-  /* Glyphs on their way out aren't part of the value. */
-  user-select: none;
-  /* Inline, so its static position is where the value starts on its line. */
+  /* Inline, so its static position is where the value sits on its line. */
   display: inline;
   width: 0;
   height: 0;
-  translate: var(--ox, 0px) var(--oy, 0px);
   pointer-events: none;
+  /* Glyphs on their way out aren't part of the value. */
+  user-select: none;
+}
+.text-morph-ghost-sheet {
+  position: absolute;
+  left: var(--ox, 0px);
+  top: var(--oy, 0px);
+  width: 0;
+  height: 0;
+  direction: ltr;
   mask-image: var(--text-morph-edge, none);
   mask-repeat: no-repeat;
 }

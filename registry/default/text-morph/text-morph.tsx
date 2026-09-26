@@ -27,10 +27,12 @@ import "./text-morph.css";
  * lines only break between them, and it never changes display: switching
  * an element between inline and inline-block repaints its text snapped
  * differently, a visible shimmer as it settles. A change that stays on one
- * line eases the space it takes with its end margin, so the text after it
- * slides rather than jumps; when a pinned or centred container moves the
- * label's start, the stage rides the opposite way (`left`, which inline
- * boxes honour) on the same curve, so the glyphs never drift with it. Both
+ * line eases the space it takes with its start margin, so the text after
+ * it slides rather than jumps. A start margin rather than an end one: line
+ * breaking counts it before the glyphs, so a growing value never overruns
+ * the space it had and breaks away from the text before it. The stage rides
+ * against the label's moving start (`left`, which inline boxes honour) on
+ * the same curve, so the glyphs never drift with it. Both
  * run on the main thread from one clock: a transform would run on the
  * compositor and keep going while a busy main thread held the layout
  * still. A change that wraps keeps the lines as the layout, and glyphs
@@ -95,7 +97,8 @@ const spaceNode = (node: HTMLElement): boolean =>
  * Lay glyphs out as words, the same structure the server renders, each
  * glyph in a slot: room above and below its line that fades it out, taking
  * no space of its own. A glyph that travels turns its slot's fade off
- * (`data-travel`), so nothing cuts it off on the way.
+ * (`data-travel`) only when it moves to another line; one that slides along
+ * its line keeps the fade and gets room beside it for the slide (`--reach`).
  */
 function layOut(layer: HTMLElement, nodes: HTMLElement[]): void {
   const parts: HTMLElement[] = [];
@@ -243,14 +246,20 @@ type Side = "start" | "end";
 function inkEscapes(root: HTMLElement, side: Side, inkEdge: number): boolean {
   let el: Element = root;
   for (let depth = 0; depth < 8; depth++) {
-    let sibling = side === "end" ? el.nextSibling : el.previousSibling;
+    // `side` is physical (start: left, end: right); in right-to-left text
+    // the next sibling sits to the left.
+    const rtl =
+      el.parentElement !== null &&
+      getComputedStyle(el.parentElement).direction === "rtl";
+    const toRight = (side === "end") !== rtl;
+    let sibling = toRight ? el.nextSibling : el.previousSibling;
     while (sibling) {
       const visible =
         sibling instanceof Element
           ? sibling.getBoundingClientRect().width >= 1
           : Boolean(sibling.textContent?.trim());
       if (visible) return true;
-      sibling = side === "end" ? sibling.nextSibling : sibling.previousSibling;
+      sibling = toRight ? sibling.nextSibling : sibling.previousSibling;
     }
     const parent = el.parentElement;
     if (!parent) return false;
@@ -279,15 +288,13 @@ const px = (el: HTMLElement, name: string): number =>
   parseFloat(el.style.getPropertyValue(name)) || 0;
 
 /**
- * Where the ghost layer's coordinates start on screen: its place in the
- * flow, before the offset that sizes it around its ghosts.
+ * Where ghost coordinates start on screen: the ghost anchor's place in the
+ * flow. The anchor never changes size, so that place doesn't depend on
+ * which edge a line anchors it by (right-to-left lines anchor the right).
  */
-function layerOrigin(layer: HTMLElement): { left: number; top: number } {
-  const rect = layer.getBoundingClientRect();
-  return {
-    left: rect.left - px(layer, "--ox"),
-    top: rect.top - px(layer, "--oy"),
-  };
+function layerOrigin(anchor: HTMLElement): { left: number; top: number } {
+  const rect = anchor.getBoundingClientRect();
+  return { left: rect.left, top: rect.top };
 }
 
 /** A ghost slot at x/y (its glyph's box, layer coordinates). */
@@ -356,6 +363,7 @@ function* morphTo(
   root: HTMLElement,
   stage: HTMLElement,
   glyphLayer: HTMLElement,
+  ghostAnchor: HTMLElement,
   ghostLayer: HTMLElement,
   value: string,
   o: TextMorphOptions,
@@ -382,9 +390,9 @@ function* morphTo(
   // 1. Read: where everything is on screen right now.
   const moving = animate();
   const rootBefore = root.getBoundingClientRect();
-  const endBefore = parseFloat(getComputedStyle(root).marginInlineEnd) || 0;
+  const startBefore = parseFloat(getComputedStyle(root).marginInlineStart) || 0;
   const linesBefore = root.getClientRects().length;
-  const originBefore = layerOrigin(ghostLayer);
+  const originBefore = layerOrigin(ghostAnchor);
   const before = new Map(old.map((node) => [node, visualState(node)]));
   // Ghosts still leaving; ones already gone are cleared in step 4.
   const gone: HTMLElement[] = [];
@@ -439,6 +447,13 @@ function* morphTo(
   const homes = new Map(
     leaving.map(({ node }) => [node, node.getBoundingClientRect()]),
   );
+  // And which line each kept glyph sits on, whatever a roll in progress is
+  // drawing it at.
+  const keptHomes = new Map(
+    nodes.flatMap((node, i) =>
+      kept[i] && !spaceNode(node) ? [[node, node.getBoundingClientRect()]] : [],
+    ),
+  );
   yield;
 
   // 4. Write: the new glyphs, back to flowing inline, the resting layout.
@@ -467,39 +482,41 @@ function* morphTo(
   // all; it counts as one line.
   // `box` below means that: the label's space eases as one box.
   const box = linesBefore <= 1 && root.getClientRects().length <= 1;
-  yield;
-
-  // 6. (Nothing to write: the final layout is already in place.)
-  yield;
-
-  // 7. Read: the final layout, and the end margin the author set.
+  // And the rest of the final layout, with the start margin the author set.
   const rootAfter = root.getBoundingClientRect();
-  const endAfter = parseFloat(getComputedStyle(root).marginInlineEnd) || 0;
-  const origin = layerOrigin(ghostLayer);
+  const startAfter = parseFloat(getComputedStyle(root).marginInlineStart) || 0;
+  const origin = layerOrigin(ghostAnchor);
   const after = nodes.map((node) => node.getBoundingClientRect());
   const em = parseFloat(getComputedStyle(root).fontSize) || 16;
 
   // Glyphs that travel further than their slot's room go unmasked.
-  const travelling = nodes.filter((node, i) => {
+  // A kept glyph moving to another line (wrapped text) goes unmasked, or
+  // its slot would hide it on the way. One sliding along its line keeps the
+  // fade, since it may be mid-roll and meant to fade back in, and its slot
+  // gets room beside it for the slide.
+  const changesLine: HTMLElement[] = [];
+  const reach: [HTMLElement, number][] = [];
+  nodes.forEach((node, i) => {
     const was = kept[i] ? before.get(node) : undefined;
-    return (
-      was !== undefined &&
-      !spaceNode(node) &&
-      (Math.abs(was.rect.left - after[i].left) > SLOT_PAD_X * em ||
-        Math.abs(was.rect.top - after[i].top) > SLOT_PAD_Y * em)
+    const home = keptHomes.get(node);
+    if (!was || !home) return;
+    if (Math.abs(home.top - after[i].top) > SLOT_PAD_Y * em) {
+      changesLine.push(node);
+      return;
+    }
+    const slide = Math.abs(
+      was.rect.left + was.rect.width / 2 - (after[i].left + after[i].width / 2),
     );
+    if (slide > 0.5) reach.push([node, Math.ceil(slide)]);
   });
   const letter = nodes.findIndex((node) => !spaceNode(node));
   const line = letter === -1 ? em * 1.2 : after[letter].height;
 
   // Ghost coordinates start at the layer's place in the flow, which holds
   // still on screen for the whole change, so earlier ghosts shift by however
-  // far it moved, and hold theirs.
+  // far it moved, and hold theirs (placed in step 8).
   const shiftX = originBefore.left - origin.left;
   const shiftY = originBefore.top - origin.top;
-  for (const slot of slots) {
-    placeSlot(slot, px(slot, "--x") + shiftX, px(slot, "--y") + shiftY);
-  }
 
   // Edge fade (boxes only): the box before and after, and how far old ink
   // reaches past it, in layer coordinates.
@@ -544,47 +561,64 @@ function* morphTo(
   };
   const armStart = armed("start");
   const armEnd = armed("end");
+  // The space it takes eases from what it visibly took (its box plus any
+  // start margin still easing) to its new width.
+  const from = box
+    ? rootBefore.width + (startBefore - startAfter) - rootAfter.width
+    : 0;
+  const resizes = Math.abs(from) > 0.5;
+  yield;
+
+  // 6. Write: the label at the start of its resize.
+  const authorStart = root.style.marginInlineStart;
+  if (resizes) root.style.marginInlineStart = `${startAfter + from}px`;
+  yield;
+
+  // 7. Read: where the label begins there, which the stage rides against.
+  const rootAt0 = resizes ? root.getBoundingClientRect() : rootAfter;
   yield;
 
   // 8. Write: everything else, attributes and styles only. Nothing below
   // reads layout or changes the DOM's structure.
-  for (const node of travelling)
+  root.style.marginInlineStart = authorStart;
+  for (const slot of slots) {
+    placeSlot(slot, px(slot, "--x") + shiftX, px(slot, "--y") + shiftY);
+  }
+  for (const node of changesLine) {
     node.parentElement?.setAttribute("data-travel", "");
+  }
+  for (const [node, px] of reach) {
+    node.parentElement?.style.setProperty("--reach", `${px}px`);
+  }
 
   // A rise brings new glyphs up from below and sends old ones up and away.
   const arrive = match.trend;
   const away = match.trend === 1 ? -1 : 1;
 
-  if (box) {
-    // The space it takes: from what it visibly took (its box plus any end
-    // margin still easing) to its new width, through the end margin, so
-    // the display never changes.
+  if (resizes) {
     const resize = { duration: o.width.duration, easing: o.width.easing };
-    const from = rootBefore.width + (endBefore - endAfter) - rootAfter.width;
-    if (Math.abs(from) > 0.5) {
-      // While its space eases open, the value must not wrap in the space it
-      // hasn't reached yet (a shrink-to-fit parent would wrap it and grow a
-      // line taller). No-wrap changes line breaking, not display, and the
-      // value sits on one line either way.
-      const sizing = String(++sizings);
-      root.dataset.sizing = sizing;
-      const ease = run(
-        root,
-        [
-          { marginInlineEnd: `${endAfter + from}px` },
-          { marginInlineEnd: `${endAfter}px` },
-        ],
-        resize,
-      );
-      const release = (): void => {
-        if (root.dataset.sizing === sizing) delete root.dataset.sizing;
-      };
-      ease.finished.then(release, release);
-    }
+    // While its space eases open, the value stays on one line. No-wrap
+    // changes line breaking, not display, and the value sits on one line
+    // either way.
+    const sizing = String(++sizings);
+    root.dataset.sizing = sizing;
+    const ease = run(
+      root,
+      [
+        { marginInlineStart: `${startAfter + from}px` },
+        { marginInlineStart: `${startAfter}px` },
+      ],
+      resize,
+    );
+    const release = (): void => {
+      if (root.dataset.sizing === sizing) delete root.dataset.sizing;
+    };
+    ease.finished.then(release, release);
 
-    // The label's start moves while its space eases (a centred pill, a
-    // right-pinned button); ride the other way on the same curve.
-    const ride = rootAfter.left - rootBefore.left;
+    // The label's start moves while its space eases (its own margin, and a
+    // centred or pinned container around it); ride the other way on the
+    // same curve, so the glyphs hold their final place.
+    const ride = rootAfter.left - rootAt0.left;
     if (Math.abs(ride) > 0.5) {
       run(stage, [{ left: `${ride}px` }, { left: "0px" }], resize);
     }
@@ -860,6 +894,7 @@ export function TextMorph({
   const stageRef = React.useRef<HTMLSpanElement>(null);
   const glyphsRef = React.useRef<HTMLSpanElement>(null);
   const ghostsRef = React.useRef<HTMLSpanElement>(null);
+  const sheetRef = React.useRef<HTMLSpanElement>(null);
   // Set once: after that this component owns the glyph markup.
   const [initialHtml] = React.useState(() => ({ __html: glyphsHtml(value) }));
   const shown = React.useRef(value);
@@ -893,7 +928,15 @@ export function TextMorph({
     const stage = stageRef.current;
     const glyphs = glyphsRef.current;
     const ghosts = ghostsRef.current;
-    if (!root || !stage || !glyphs || !ghosts || value === shown.current)
+    const sheet = sheetRef.current;
+    if (
+      !root ||
+      !stage ||
+      !glyphs ||
+      !ghosts ||
+      !sheet ||
+      value === shown.current
+    )
       return;
     shown.current = value;
     inFlight.current?.();
@@ -917,6 +960,7 @@ export function TextMorph({
         stage,
         glyphs,
         ghosts,
+        sheet,
         value,
         optionsRef.current,
         { decimal: decimalFor(locale), caret: current.cursorIndex },
@@ -950,12 +994,19 @@ export function TextMorph({
       <>
         <span className="sr-only">{value}</span>
         <span ref={stageRef} aria-hidden="true" className="text-morph-stage">
+          {/* Each glyph is its own box, which bidi treats as direction-
+              neutral: without its own direction, a Latin value in a
+              right-to-left paragraph would be laid out backwards. auto
+              reads it off the value's first strong character. */}
           <span
             ref={glyphsRef}
+            dir="auto"
             className="text-morph-glyphs"
             dangerouslySetInnerHTML={initialHtml}
           />
-          <span ref={ghostsRef} className="text-morph-ghosts" />
+          <span ref={ghostsRef} className="text-morph-ghosts">
+            <span ref={sheetRef} className="text-morph-ghost-sheet" />
+          </span>
         </span>
       </>
     ),

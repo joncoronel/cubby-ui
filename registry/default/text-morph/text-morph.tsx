@@ -29,6 +29,7 @@ import {
   GROUP_FADE_IN,
   GROUP_FADE_OUT,
   GROUP_SCALE,
+  planGathers,
   planShapes,
   type Shape,
 } from "./lib/shapes";
@@ -691,7 +692,8 @@ function* morphTo(
   // Morph also scales a whole word arriving or leaving about its own
   // centre, as one shape; in a one-word value, only a run of GROUP_MIN or
   // more replaced glyphs, further and faster.
-  const shaping = o.mode === "morph" && !reduced;
+  // Settle plans too: each changed run of letters gathers about its centre.
+  const shaping = (o.mode === "morph" || o.mode === "settle") && !reduced;
   // How far each survivor moved in the layout, from its old place to its
   // final one. The layout, not where it's drawn (torph measures with
   // transforms taken out): a digit still falling in is drawn above its
@@ -712,14 +714,25 @@ function* morphTo(
       kinds: GlyphKind[],
       boxOf: (i: number) => DOMRect | undefined,
     ): void => {
-      const planned = planShapes({
-        count: glyphs.length,
-        isSpace: (i) => spaceNode(glyphs[i]),
-        changed,
-        kinds,
-        byWords: match.byWords,
-        boxOf,
-      });
+      const isSpace = (i: number): boolean => spaceNode(glyphs[i]);
+      // Settle: each changed run of letters, whole word or not (digits
+      // drift instead). Morph: whole words and long runs, as torph.
+      const planned =
+        o.mode === "settle"
+          ? planGathers({
+              count: glyphs.length,
+              isSpace,
+              changed: (i) => changed(i) && kinds[i] === "text",
+              boxOf,
+            })
+          : planShapes({
+              count: glyphs.length,
+              isSpace,
+              changed,
+              kinds,
+              byWords: match.byWords,
+              boxOf,
+            });
       for (const [i, shape] of planned) shapes.set(glyphs[i], shape);
     };
     plan(nodes, isArriving, match.nextKinds, (i) => after[i]);
@@ -1014,7 +1027,10 @@ function* morphTo(
     // A shape's glyph slides toward the shape's centre as it scales, out of
     // its slot, whose fade would cut it off; it doesn't roll, so it needs
     // no fade.
-    if (shape?.group) node.parentElement?.setAttribute("data-travel", "");
+    const gathers = o.mode === "settle" && shape !== undefined;
+    if (shape?.group || gathers) {
+      node.parentElement?.setAttribute("data-travel", "");
+    }
     if (!was) {
       const delay = delays.entering[entering++];
       const awayFrame = shape?.group
@@ -1024,6 +1040,7 @@ function* morphTo(
             kind,
             rollWith(arrivals.get(i), arriveFor(next[i]), line),
             line,
+            shape?.toCentre,
           );
       // Under reduced motion it only fades in, where it lands.
       if (!reduced) {
@@ -1039,7 +1056,10 @@ function* morphTo(
         run(
           slot,
           [{ translate: `${shift[0]}px ${shift[1]}px` }, { translate: "0 0" }],
-          { ...motion, delay, fill: "backwards" },
+          // With its neighbour from the start: the stagger delays its own
+          // entrance, not the trip, or it lagged behind the neighbour it
+          // travels with (a swept `!` ran over the `d` before it).
+          { ...motion, fill: "backwards" },
         );
       }
       const fadeTiming = shape?.group
@@ -1215,7 +1235,9 @@ function* morphTo(
     const atRest = was.scale === "1" && was.rotate === "0deg";
     const shape = atRest ? shapes.get(node) : undefined;
     setOrigin(node, shape?.origin ?? "");
-    if (shape?.group) slot.setAttribute("data-travel", "");
+    if (shape?.group || (o.mode === "settle" && shape)) {
+      slot.setAttribute("data-travel", "");
+    }
     const awayFrame = shape?.group
       ? { translate: "0 0", scale: String(GROUP_SCALE), rotate: "0deg" }
       : awayState(
@@ -1224,6 +1246,7 @@ function* morphTo(
           // It leaves the way its trip goes.
           rollWith(departures.get(node), away, line),
           line,
+          shape?.toCentre,
         );
     const move = run(
       node,
@@ -1236,7 +1259,8 @@ function* morphTo(
       run(
         slot,
         [{ translate: "0 0" }, { translate: `${trip[0]}px ${trip[1]}px` }],
-        { ...motion, delay, fill: "both" },
+        // With its neighbour from the start, whatever its own delay.
+        { ...motion, fill: "both" },
       );
     }
     const blurred = was.filter !== "blur(0px)" ? was.filter : null;

@@ -130,6 +130,8 @@ const DIGIT = /^\p{Nd}$/u;
 /** Percent signs a number can end with, Latin and Arabic. */
 const PERCENT = "%\u066A";
 const CURRENCY = /^\p{Sc}$/u;
+/** A punctuation mark, in any script. */
+const PUNCTUATION = /^\p{P}$/u;
 
 /** A decimal digit, in any script. */
 export const isDigit = (g: string): boolean => DIGIT.test(g);
@@ -501,22 +503,77 @@ function gaps(count: number, survivors: Set<number>): number[] {
 }
 
 /**
+ * The glyphs two runs share at their start and end, as [next, old] pairs,
+ * and, when what's between is the same length on both sides (a clock, a
+ * date, a version), any glyph that's the same in the same place there:
+ * `09:59` → `10:00` keeps its colon, `v1.3.0` → `v2.0.0` its dots.
+ * Nothing moves to another place, as a reused letter would.
+ */
+function sharedEnds(old: string[], next: string[]): [number, number][] {
+  let start = 0;
+  while (
+    start < old.length &&
+    start < next.length &&
+    old[start] === next[start]
+  ) {
+    start++;
+  }
+  let end = 0;
+  while (
+    end < old.length - start &&
+    end < next.length - start &&
+    old[old.length - 1 - end] === next[next.length - 1 - end]
+  ) {
+    end++;
+  }
+  const pairs: [number, number][] = [];
+  for (let k = 0; k < start; k++) pairs.push([k, k]);
+  for (let k = 1; k <= end; k++) {
+    pairs.push([next.length - k, old.length - k]);
+  }
+  if (old.length === next.length) {
+    for (let k = start; k < old.length - end; k++) {
+      if (old[k] === next[k]) pairs.push([k, k]);
+    }
+  }
+  return pairs;
+}
+
+/**
  * Match by words (torph): words that survive in order keep every glyph, and
  * so do words that only moved (`hello world` → `world hello` swaps them
  * whole); a new word takes the letters it shares with the most similar old
  * word in the same gap between survivors, when they share enough; anything
- * else enters or leaves as a whole word. Only text glyphs pair here;
- * numbers were paired by place.
+ * else enters or leaves as a whole word. Only text glyphs pair here; numbers
+ * were paired by place.
+ *
+ * `within` is what a changed word keeps of the old word it pairs with:
+ * `letters` (morph), the letters they share anywhere, in order; `ends`
+ * (settle), only what they share at the start and end, so the change is one
+ * run in the middle: `2024-01-01` → `2024-01-02` changes the last digit,
+ * where letters reused from anywhere in a word read as busy.
  */
 function matchWords(
   old: string[],
   next: string[],
   oldKinds: GlyphKind[],
   nextKinds: GlyphKind[],
+  within: "letters" | "ends",
 ): [number, number][] {
   const oldWords = wordsOf(old, oldKinds);
   const nextWords = wordsOf(next, nextKinds);
-  const keyOf = (word: Word): string => word.key.join("\u0001");
+  // Keeping only ends (settle), a word is the same word whatever
+  // punctuation it ends or starts with: `saved.` → `saved!` keeps `saved`
+  // and swaps the mark. A word of punctuation alone is itself.
+  const core = (key: string[]): string[] => {
+    let start = 0;
+    let end = key.length;
+    while (start < end && PUNCTUATION.test(key[start])) start++;
+    while (end > start && PUNCTUATION.test(key[end - 1])) end--;
+    return start === end ? key : key.slice(start, end);
+  };
+  const keyOf = (word: Word): string =>
+    (within === "letters" ? word.key : core(word.key)).join("\u0001");
   const pairsOf = new Map<number, number>();
 
   const inOrder = lcs(oldWords.map(keyOf), nextWords.map(keyOf));
@@ -536,13 +593,32 @@ function matchWords(
     taken.add(from);
   });
 
-  // Words that changed: the most similar old word in the same gap.
+  // Words that changed: the most similar old word in the same gap. Keeping
+  // ends (settle), a gap holding one changed word on each side pairs them
+  // however little they share, since only their shared ends are kept: a
+  // one-word value like `1.2K` → `12.4M` keeps its `1` rather than
+  // replaying whole for falling short of the similarity bar.
+  const changed = new Set<number>();
+  const free =
+    (words: Word[], gapsOf: number[], used: (i: number) => boolean) =>
+    (gap: number): number =>
+      words.filter((_, i) => gapsOf[i] === gap && !used(i)).length;
+  const oldFree = free(oldWords, oldGaps, (i) => taken.has(i));
+  const nextFree = free(nextWords, nextGaps, (i) => pairsOf.has(i));
   nextWords.forEach((word, to) => {
     if (pairsOf.has(to)) return;
     let best = -1;
     let bestSimilarity = MIN_SIMILARITY;
+    const alone =
+      within === "ends" &&
+      oldFree(nextGaps[to]) === 1 &&
+      nextFree(nextGaps[to]) === 1;
     oldWords.forEach((old, from) => {
       if (taken.has(from) || oldGaps[from] !== nextGaps[to]) return;
+      if (alone) {
+        best = from;
+        return;
+      }
       const shared = similarity(old.key, word.key);
       if (shared > bestSimilarity) {
         best = from;
@@ -552,19 +628,26 @@ function matchWords(
     if (best === -1) return;
     pairsOf.set(to, best);
     taken.add(best);
+    changed.add(to);
   });
 
-  // Within each pair, the letters they share, in order.
+  // Within each pair, the letters they share: in order, or at the ends of a
+  // changed word.
   const pairs: [number, number][] = [];
   for (const [to, from] of pairsOf) {
     const a = oldWords[from].glyphs.filter((i) => oldKinds[i] === "text");
     const b = nextWords[to].glyphs.filter((i) => nextKinds[i] === "text");
-    for (const [j, i] of lcs(
-      a.map((k) => old[k]),
-      b.map((k) => next[k]),
-    )) {
-      pairs.push([b[j], a[i]]);
-    }
+    const shared =
+      within === "ends" && changed.has(to)
+        ? sharedEnds(
+            a.map((k) => old[k]),
+            b.map((k) => next[k]),
+          )
+        : lcs(
+            a.map((k) => old[k]),
+            b.map((k) => next[k]),
+          );
+    for (const [j, i] of shared) pairs.push([b[j], a[i]]);
   }
   return pairs;
 }
@@ -630,10 +713,12 @@ export function matchText(
   const paired = Math.min(oldNumbers.length, nextNumbers.length);
 
   const caret = options.caret;
+  // Settle always works by words; morph once a value has more than one.
   const byWords =
     caret === undefined &&
-    mode === "morph" &&
-    (next.some(isBreak) || wordsOf(old, oldKinds).length > 1);
+    (mode === "settle" ||
+      (mode === "morph" &&
+        (next.some(isBreak) || wordsOf(old, oldKinds).length > 1)));
 
   // Numbers, paired in order, matched by place.
   let trend: 1 | -1 | 0 = options.trend;
@@ -688,10 +773,16 @@ export function matchText(
     return result();
   }
 
-  // Everything else, by the mode's text rule. Morph works by words once a
-  // value has more than one.
+  // Everything else, by the mode's text rule.
   if (byWords) {
-    for (const [to, from] of matchWords(old, next, oldKinds, nextKinds)) {
+    const within = mode === "morph" ? "letters" : "ends";
+    for (const [to, from] of matchWords(
+      old,
+      next,
+      oldKinds,
+      nextKinds,
+      within,
+    )) {
       kept[to] = from;
     }
     return result();

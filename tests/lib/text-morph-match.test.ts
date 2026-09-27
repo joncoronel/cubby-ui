@@ -10,6 +10,7 @@ import {
   textUnits,
   type MatchOptions,
 } from "@/registry/default/text-morph/lib/match";
+import type { TextMorphMode } from "@/registry/default/text-morph/lib/options";
 
 const chars = (text: string): string[] => Array.from(text);
 const OPTIONS: MatchOptions = { numbers: true, decimal: ".", trend: 0 };
@@ -20,7 +21,7 @@ const OPTIONS: MatchOptions = { numbers: true, decimal: ".", trend: 0 };
  * whether one is kept doesn't matter.
  */
 function keptView(
-  mode: "roll" | "morph",
+  mode: TextMorphMode,
   from: string,
   to: string,
   options: MatchOptions = OPTIONS,
@@ -470,5 +471,79 @@ describe("a roll run in centred or end-pinned text", () => {
 
   it("travels half as far in centred text, and is kept", () => {
     expect(view(0.5)).toBe("______ok_");
+  });
+});
+
+describe("settle", () => {
+  it("keeps the words that stay and swaps changed ones whole", () => {
+    expect(keptView("settle", "hello world", "hello there")).toBe(
+      "hello _____",
+    );
+    // Unrelated words swap whole.
+    expect(keptView("settle", "Draft", "Changes")).toBe("_______");
+  });
+
+  it("keeps words that moved, and numbers by place", () => {
+    expect(keptView("settle", "hello world", "world hello")).toBe(
+      "world hello",
+    );
+    expect(keptView("settle", "Total $1,204", "Total $1,318")).toBe(
+      "Total $1,___",
+    );
+  });
+});
+
+describe("settle punctuation", () => {
+  it("keeps a word whose punctuation changed, swapping only the mark", () => {
+    expect(keptView("settle", "Draft saved.", "Changes saved!")).toBe(
+      "_______ saved_",
+    );
+    expect(keptView("settle", "(beta)", "beta")).toBe("beta");
+  });
+
+  it("matches a word of punctuation alone only to itself", () => {
+    expect(keptView("settle", "a — b", "a ? b")).toBe("a _ b");
+  });
+});
+
+describe("settle similar words", () => {
+  it("keeps only what a similar word shares at its ends", () => {
+    expect(keptView("settle", "2024-01-01", "2024-01-02")).toBe("2024-01-0_");
+    expect(keptView("settle", "v1.2.3", "v1.2.4")).toBe("v1.2._");
+    expect(keptView("settle", "Copy", "Copied")).toBe("Cop___");
+  });
+
+  it("doesn't reuse letters from the middle, as morph does", () => {
+    // Morph keeps the r, e and d it shares anywhere; settle only the ends.
+    expect(keptView("morph", "ordered", "rendered")).not.toBe(
+      keptView("settle", "ordered", "rendered"),
+    );
+    expect(keptView("settle", "ordered", "rendered")).toBe("___dered");
+  });
+});
+
+describe("settle one-word values", () => {
+  it("keeps the shared ends however little the words share", () => {
+    expect(keptView("settle", "999K", "1.2K")).toBe("___K");
+    expect(keptView("settle", "1.2K", "12.4M")).toBe("1____");
+    expect(keptView("settle", "12.4M", "1.1B")).toBe("1___");
+    expect(keptView("settle", "cat", "hat")).toBe("_at");
+  });
+
+  it("still swaps a word whole when nothing is shared", () => {
+    expect(keptView("settle", "1.1B", "999K")).toBe("____");
+  });
+});
+
+describe("settle fixed formats", () => {
+  it("keeps what stays in place between the ends", () => {
+    expect(keptView("settle", "09:59", "10:00")).toBe("__:__");
+    expect(keptView("settle", "v1.3.0", "v2.0.0")).toBe("v_._.0");
+    expect(keptView("settle", "v1.2.3", "v1.3.0")).toBe("v1._._");
+  });
+
+  it("never moves a glyph to another place, as morph does", () => {
+    // Morph slides the 0 over from the hour's tens; settle replaces it.
+    expect(keptView("morph", "09:59", "10:00")).toBe("_0:__");
   });
 });

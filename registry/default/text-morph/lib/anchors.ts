@@ -13,6 +13,16 @@ export function crossesLines([, dy]: Trip, line: number): boolean {
 }
 
 /**
+ * Whether every arriving and leaving glyph travels with its neighbours, on
+ * its line too. Morph and settle: new text appears where it ends up while
+ * the words that stay slide into place, so without it they ran into each
+ * other mid-change (`Draft saved.` → `Changes saved!` drew `Changesaved`).
+ * Roll's glyphs roll in place on their line.
+ */
+const anchorsAll = (mode: TextMorphMode): boolean =>
+  mode === "morph" || mode === "settle";
+
+/**
  * Which way a glyph rolls (1 up from below, -1 down from above): with its
  * trip when that crosses lines, so a number that moves up scrolls up as it
  * changes (rolling against its trip, it would hold still on screen while its
@@ -28,8 +38,8 @@ export function rollWith(
 
 /**
  * Where a glyph at `i` may find a neighbour to travel with, as an index
- * range: anywhere in the value in morph mode; in roll mode only a digit, and
- * only within its own number. None under reduced motion.
+ * range: anywhere in the value in morph and settle; in roll mode only a
+ * digit, and only within its own number. None under reduced motion.
  */
 export function neighbourScope(
   mode: TextMorphMode,
@@ -38,7 +48,7 @@ export function neighbourScope(
   i: number,
 ): [number, number] | null {
   if (reduced) return null;
-  if (mode === "morph") return [0, kinds.length - 1];
+  if (anchorsAll(mode)) return [0, kinds.length - 1];
   if (kinds[i] !== "number") return null;
   let first = i;
   let last = i;
@@ -118,7 +128,7 @@ export function planTrips({
   const sameLine = (a: number | undefined, b: number | undefined): boolean =>
     a !== undefined && b !== undefined && Math.abs(a - b) < line / 2;
   const travels = (trip: Trip): boolean =>
-    mode === "morph" || crossesLines(trip, line);
+    anchorsAll(mode) || crossesLines(trip, line);
 
   const arrivals = new Map<number, Trip>();
   for (let i = 0; i < nextKinds.length; i++) {

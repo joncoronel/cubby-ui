@@ -76,11 +76,32 @@ type DialPositions = {
   rollRotate: number;
   morphScale: number;
   digitDistance: number;
+  settleDistance: number;
+  settleSpread: number;
   blur: number;
   trend: TextMorphOptions["trend"];
 };
 
 const DIAL_MODES: Record<TextMorphMode, DialPositions> = {
+  settle: {
+    mode: "settle",
+    motion: easing(0.24, WIDTH_CURVE),
+    fadeIn: easing(0.24, WIDTH_CURVE),
+    fadeInDelay: 0,
+    fadeOut: easing(0.15, WIDTH_CURVE),
+    width: easing(0.24, WIDTH_CURVE),
+    staggerMode: "spread",
+    staggerMs: 40,
+    rollDistance: 0.35,
+    rollScale: 1,
+    rollRotate: 0,
+    morphScale: 1,
+    digitDistance: 1,
+    settleDistance: 0.15,
+    settleSpread: 0.15,
+    blur: 0.04,
+    trend: "auto",
+  },
   roll: {
     mode: "roll",
     motion: { type: "spring", visualDuration: 0.35, bounce: 0.1 },
@@ -95,6 +116,8 @@ const DIAL_MODES: Record<TextMorphMode, DialPositions> = {
     rollRotate: 2,
     morphScale: 0.6,
     digitDistance: 1,
+    settleDistance: 0.15,
+    settleSpread: 0.15,
     blur: 0.1,
     trend: "auto",
   },
@@ -112,6 +135,8 @@ const DIAL_MODES: Record<TextMorphMode, DialPositions> = {
     rollRotate: 0,
     morphScale: 0.95,
     digitDistance: 1,
+    settleDistance: 0.15,
+    settleSpread: 0.15,
     blur: 0,
     trend: "down",
   },
@@ -122,7 +147,11 @@ const base = DIAL_MODES.morph;
 // Component values only; playback lives in the page controls. Defaults are
 // morph's (production). Picking a mode moves every dial to that mode's values.
 const CONFIG = {
-  mode: { type: "select", options: ["roll", "morph"], default: base.mode },
+  mode: {
+    type: "select",
+    options: ["settle", "roll", "morph"],
+    default: base.mode,
+  },
   motion: easing(0.4, EXPO),
   fade: {
     in: { ...base.fadeIn },
@@ -146,6 +175,10 @@ const CONFIG = {
   morph: {
     scale: [base.morphScale, 0.2, 1, 0.05],
     digitDistance: [base.digitDistance, 0, 2, 0.05],
+  },
+  settle: {
+    spread: [base.settleSpread, 0, 1, 0.01],
+    distance: [base.settleDistance, 0, 1, 0.01],
   },
   blur: [base.blur, 0, 0.4, 0.01],
   numbers: true,
@@ -177,6 +210,8 @@ function dialUpdates(p: DialPositions): Record<string, DialValue> {
     "roll.rotate": p.rollRotate,
     "morph.scale": p.morphScale,
     "morph.digitDistance": p.digitDistance,
+    "settle.distance": p.settleDistance,
+    "settle.spread": p.settleSpread,
     blur: p.blur,
     trend: p.trend,
   };
@@ -224,6 +259,7 @@ const STATUSES = [
 ];
 const INTERVALS = [120, 250, 700] as const;
 const MODE_LABELS: Record<TextMorphMode, string> = {
+  settle: "Settle (Cubby)",
   roll: "Roll (Scritto)",
   morph: "Morph (torph)",
 };
@@ -379,6 +415,7 @@ export default function TextMorphTune(): React.ReactElement {
       scale: v.morph.scale,
       digits: { ...exact.morph.digits, distance: v.morph.digitDistance },
     },
+    settle: { distance: v.settle.distance, spread: v.settle.spread },
     blur: v.blur,
     numbers: v.numbers,
     trend: v.trend as TextMorphOptions["trend"],
@@ -391,7 +428,11 @@ export default function TextMorphTune(): React.ReactElement {
       .filter((key) => !same(resolved[key], exact[key]))
       .map((key) => [key, resolved[key]]),
   );
-  const copiedName = mode === "roll" ? "SCRITTO_OPTIONS" : "TORPH_OPTIONS";
+  const copiedName = {
+    settle: "SETTLE_OPTIONS",
+    roll: "SCRITTO_OPTIONS",
+    morph: "TORPH_OPTIONS",
+  }[mode];
 
   const ambient = tune.original ? exact : resolved;
   const feedback = feedbackOf(ambient);

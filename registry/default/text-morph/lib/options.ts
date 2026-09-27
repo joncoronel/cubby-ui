@@ -1,15 +1,19 @@
-export type TextMorphMode = "roll" | "morph";
+export type TextMorphMode = "settle" | "roll" | "morph";
 
 /** One CSS timing: a duration in ms and any CSS easing, `linear()` included. */
 export type Timing = { duration: number; easing: string };
 
 export type TextMorphOptions = {
   /**
-   * `roll` keeps the old and new text's shared start and end, and rolls the
-   * glyphs between vertically, on Scritto's defaults. `morph` matches whole
-   * words, then letters within similar words (anywhere, in a one-word
-   * value): shared ones slide to their new place, the rest scale and fade,
-   * travelling with the nearest glyph that stays, on torph's defaults. Each mode brings its own defaults.
+   * `settle` keeps the words the old and new text share and swaps the rest
+   * whole, drifting them a little as they crossfade: calm enough for
+   * anything. `roll` keeps the old and new text's shared start and end, and
+   * rolls the glyphs between vertically, on Scritto's defaults. `morph`
+   * matches whole words, then letters within similar words (anywhere, in a
+   * one-word value): shared ones slide to their new place, the rest scale and
+   * fade, travelling with the nearest glyph that stays, on torph's defaults.
+   * In every mode numbers change digit by digit. Each mode brings its own
+   * defaults.
    */
   mode: TextMorphMode;
   /** Glyph movement: roll travel, enter/exit scale, shared glyphs sliding. */
@@ -36,6 +40,13 @@ export type TextMorphOptions = {
     scale: number;
     digits: { distance: number; fadeIn: Timing; fadeOut: Timing };
   };
+  /**
+   * Settle: a changed word's letters gather into it as it arrives and drift
+   * apart as it leaves, each `spread` of its distance from the word's centre
+   * (0.15 starts them 15% further out); digits drift `distance` (em) the way
+   * the value went.
+   */
+  settle: { distance: number; spread: number };
   /** Blur on arriving and leaving glyphs, in em. */
   blur: number;
   /**
@@ -90,6 +101,7 @@ const SCRITTO_OPTIONS: TextMorphOptions = {
   stagger: { mode: "spread", ms: 165 },
   roll: { distance: 0.35, scale: 0.6, rotate: 2 },
   morph: { scale: 0.6, digits: TORPH_DIGITS },
+  settle: { distance: 0.15, spread: 0.15 },
   blur: 0.1,
   numbers: true,
   trend: "auto",
@@ -111,14 +123,44 @@ const TORPH_OPTIONS: TextMorphOptions = {
   stagger: { mode: "each", ms: 0 },
   roll: { distance: 0.35, scale: 0.95, rotate: 0 },
   morph: { scale: 0.95, digits: TORPH_DIGITS },
+  settle: { distance: 0.15, spread: 0.15 },
   blur: 0,
   numbers: true,
   trend: "down",
   edgeFade: "auto",
 };
 
-/** Each mode brings its own defaults: roll is Scritto's, morph is torph's. */
+/**
+ * Cubby's own. A changed word gathers: its letters start a little apart and
+ * draw together into the word as it fades in, and the word it replaces
+ * drifts apart as it fades out. Letter spacing is what text is made of, so
+ * the change stays typographic rather than borrowing a slide or a roll.
+ * Digits drift 0.15em the way the value went. A faint sweep (40ms across the
+ * changed stretch) gives it a direction; a whisper of blur blends old and
+ * new. New text enters over 240ms and old leaves over 150ms, and everything,
+ * the box's width and the words that stay sliding to their places included,
+ * runs on one strong ease-out. No scale, tilt or travel.
+ */
+const SETTLE_EASING = WIDTH_EASING;
+const SETTLE_OPTIONS: TextMorphOptions = {
+  mode: "settle",
+  motion: { duration: 240, easing: SETTLE_EASING },
+  fadeIn: { duration: 240, easing: SETTLE_EASING, delay: 0 },
+  fadeOut: { duration: 150, easing: SETTLE_EASING },
+  width: { duration: 240, easing: SETTLE_EASING },
+  stagger: { mode: "spread", ms: 40 },
+  roll: { distance: 0.35, scale: 1, rotate: 0 },
+  morph: { scale: 1, digits: TORPH_DIGITS },
+  settle: { distance: 0.15, spread: 0.15 },
+  blur: 0.04,
+  numbers: true,
+  trend: "auto",
+  edgeFade: "auto",
+};
+
+/** Each mode brings its own defaults: settle is Cubby's, roll Scritto's, morph torph's. */
 export const MODE_DEFAULTS: Record<TextMorphMode, TextMorphOptions> = {
+  settle: SETTLE_OPTIONS,
   roll: SCRITTO_OPTIONS,
   morph: TORPH_OPTIONS,
 };

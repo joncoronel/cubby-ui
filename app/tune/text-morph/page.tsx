@@ -9,7 +9,14 @@ import {
   type EasingConfig,
   type TransitionConfig,
 } from "dialkit";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  CheckIcon,
+  Copy01Icon,
+  SourceCodeIcon,
+} from "@hugeicons/core-free-icons";
 import { feedbackOf } from "@/components/docs/morph-text";
+import { SwapIcon } from "@/components/docs/swap-icon";
 import { cn } from "@/lib/utils";
 import { TextMorph } from "@/registry/default/text-morph/text-morph";
 import {
@@ -650,13 +657,33 @@ export default function TextMorphTune(): React.ReactElement {
             <div className="flex justify-end gap-2">
               {/* The buttons step this one; the card around them doesn't, so
                 there are no buttons inside a button. */}
-              <Button variant="ghost" size="xs" onClick={bump("feedback")}>
+              {/* Built as the docs' Code and Copy page buttons are, icons
+                  included, so the two feel alike. */}
+              <Button
+                variant="ghost"
+                size="xs"
+                onClick={bump("feedback")}
+                leadingIcon={
+                  <HugeiconsIcon icon={SourceCodeIcon} strokeWidth={2} />
+                }
+              >
                 <TextMorph
                   value={flip ? "Hide code" : "Code"}
                   options={feedback}
                 />
               </Button>
-              <Button variant="secondary" size="xs" onClick={bump("feedback")}>
+              <Button
+                variant="secondary"
+                size="xs"
+                onClick={bump("feedback")}
+                leadingIcon={
+                  <SwapIcon
+                    swapped={flip}
+                    from={<HugeiconsIcon icon={Copy01Icon} strokeWidth={2} />}
+                    to={<HugeiconsIcon icon={CheckIcon} strokeWidth={2} />}
+                  />
+                }
+              >
                 <TextMorph
                   value={flip ? "Copied" : "Copy page"}
                   options={feedback}

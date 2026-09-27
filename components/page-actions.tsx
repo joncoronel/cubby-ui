@@ -11,6 +11,7 @@ import {
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import { MorphText } from "@/components/docs/morph-text";
+import { SwapIcon } from "@/components/docs/swap-icon";
 import {
   ChatIcon,
   CheckIcon,
@@ -130,11 +131,11 @@ export function LLMCopyButton({
       size="xs"
       onClick={handleCopy}
       leadingIcon={
-        state === "copied" ? (
-          <HugeiconsIcon icon={CheckIcon} strokeWidth={2} />
-        ) : (
-          <HugeiconsIcon icon={Copy01Icon} strokeWidth={2} />
-        )
+        <SwapIcon
+          swapped={state === "copied"}
+          from={<HugeiconsIcon icon={Copy01Icon} strokeWidth={2} />}
+          to={<HugeiconsIcon icon={CheckIcon} strokeWidth={2} />}
+        />
       }
     >
       <span aria-live="polite">

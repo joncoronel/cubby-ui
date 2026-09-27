@@ -643,7 +643,12 @@ function* morphTo(
         Math.abs(originBefore.left + px(g.slot, "--x") - target.left) <
           target.width / 2 &&
         Math.abs(originBefore.top + px(g.slot, "--y") - target.top) <
-          SLOT_PAD_Y * em,
+          SLOT_PAD_Y * em &&
+        // Still drawn within the label: one carried out past its edge (with
+        // a neighbour, toward a pinned edge) keeps leaving under the edge
+        // fade, since the live glyphs have none to hide it on its way back.
+        g.drawn.rect.left >= rootAfter.left - 0.5 &&
+        g.drawn.rect.right <= rootAfter.right + 0.5,
     );
     if (!ghost) return;
     claimed.add(ghost.slot);
@@ -789,12 +794,30 @@ function* morphTo(
   const boxEnd = rootBefore.right - origin.left;
   const finalStart = rootAfter.left - origin.left;
   const finalEnd = rootAfter.right - origin.left;
+  // And where leaving ink ends up when it travels with a neighbour: past an
+  // edge that doesn't move (a right-pinned button's), carried out by the
+  // survivor sliding toward it.
+  const carried = leaving.flatMap(({ node }) => {
+    const rect = before.get(node)?.rect;
+    const trip = departures.get(node);
+    return rect && trip
+      ? [
+          new DOMRect(
+            rect.x + trip[0],
+            rect.y + trip[1],
+            rect.width,
+            rect.height,
+          ),
+        ]
+      : [];
+  });
   const inkRects = [
     ...staying.map((g) => g.drawn.rect),
     ...leaving.flatMap(({ node }) => {
       const rect = before.get(node)?.rect;
       return rect ? [rect] : [];
     }),
+    ...carried,
   ];
   // The glyph boxes decide whether ink sticks out; the room also covers
   // their blur and tilt.
@@ -814,7 +837,12 @@ function* morphTo(
       side === "start"
         ? glyphStart < finalStart - 0.5
         : glyphEnd > finalEnd + 0.5;
-    if (!travels || !overhangs) return false;
+    const carriedOut = carried.some((rect) =>
+      side === "start"
+        ? rect.left - origin.left < finalStart - 0.5
+        : rect.right - origin.left > finalEnd + 0.5,
+    );
+    if (!(travels && overhangs) && !carriedOut) return false;
     return (
       o.edgeFade === "always" ||
       inkEscapes(

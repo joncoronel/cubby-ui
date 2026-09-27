@@ -1769,6 +1769,11 @@
           "target": "components/ui/cubby-ui/text-morph/text-morph.tsx"
         },
         {
+          "path": "registry/default/text-morph/lib/anchors.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/text-morph/lib/anchors.ts"
+        },
+        {
           "path": "registry/default/text-morph/lib/match.ts",
           "type": "registry:lib",
           "target": "components/ui/cubby-ui/text-morph/lib/match.ts"

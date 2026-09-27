@@ -32,6 +32,7 @@ import {
   planShapes,
   type Shape,
 } from "./lib/shapes";
+import { planTrips, rollWith, type Trip } from "./lib/anchors";
 import "./text-morph.css";
 
 /*
@@ -702,39 +703,6 @@ function* morphTo(
     const home = kept[i] && !spaceNode(node) ? keptHomes.get(node) : null;
     if (home) startsAt.set(i, centreDelta(home, after[i]));
   });
-  /** Where a glyph may find its neighbour: anywhere, or its own number. */
-  const scope = (kinds: GlyphKind[], i: number): [number, number] | null => {
-    if (reduced) return null;
-    if (o.mode === "morph") return [0, kinds.length - 1];
-    if (kinds[i] !== "number") return null;
-    let first = i;
-    let last = i;
-    while (first > 0 && kinds[first - 1] === "number") first--;
-    while (last < kinds.length - 1 && kinds[last + 1] === "number") last++;
-    return [first, last];
-  };
-  const nearest = (
-    index: number,
-    [first, last]: [number, number],
-    offsetAt: (i: number) => [number, number] | undefined,
-    forwardFirst: boolean,
-  ): [number, number] | undefined => {
-    const scan = (step: 1 | -1): [number, number] | undefined => {
-      for (let j = index + step; j >= first && j <= last; j += step) {
-        const offset = offsetAt(j);
-        if (offset) return offset;
-      }
-      return undefined;
-    };
-    const [one, two]: [1 | -1, 1 | -1] = forwardFirst ? [1, -1] : [-1, 1];
-    return scan(one) ?? scan(two);
-  };
-  // A trip to another line, not a centred value recentring by half a line
-  // as its line count changes.
-  const crossesLines = ([, dy]: [number, number]): boolean =>
-    Math.abs(dy) > line * 0.75;
-  const travels = (trip: [number, number]): boolean =>
-    o.mode === "morph" || crossesLines(trip);
   const isArriving = (i: number): boolean => !kept[i] && !spaceNode(nodes[i]);
   const shapes = new Map<HTMLElement, Shape>();
   if (shaping) {
@@ -764,46 +732,28 @@ function* morphTo(
       (i) => homes.get(old[i]),
     );
   }
-  // A neighbour is one on the same line: in wrapped text the glyph before
-  // a line's first is at the end of the line above, and travelling with it
-  // would carry the glyph off the start of its own line (torph never wraps).
-  const sameLine = (a: DOMRect | undefined, b: DOMRect | undefined): boolean =>
-    a !== undefined && b !== undefined && Math.abs(a.top - b.top) < line / 2;
-  // An arriving glyph starts where its neighbour starts; a shape swapped
-  // as one doesn't travel.
-  const arrivals = new Map<number, [number, number]>();
-  nodes.forEach((node, i) => {
-    const range = scope(match.nextKinds, i);
-    if (!range || !isArriving(i) || shapes.get(node)?.group) return;
-    const shift = nearest(
-      i,
-      range,
-      (j) => (sameLine(after[j], after[i]) ? startsAt.get(j) : undefined),
-      false,
-    );
-    if (shift && travels(shift)) arrivals.set(i, shift);
+  // Arriving and leaving glyphs travel with their neighbours (lib/anchors),
+  // planned by index, then leaving ones kept by node.
+  const trips = planTrips({
+    mode: o.mode,
+    reduced,
+    line,
+    kept: match.kept,
+    nextKinds: match.nextKinds,
+    oldKinds: match.oldKinds,
+    moves: startsAt,
+    nextTop: (i) => after[i]?.top,
+    keptTop: (i) => keptHomes.get(old[i])?.top,
+    arriving: isArriving,
+    leaving: newSlots.map(({ index, home }) => ({ index, top: home.top })),
+    grouped: (side, i) =>
+      shapes.get(side === "next" ? nodes[i] : old[i])?.group ?? false,
   });
-  // A leaving glyph goes where its neighbour goes.
-  const newIndexOf = new Map(
-    match.kept.flatMap((from, to) => (from === -1 ? [] : [[from, to]])),
-  );
-  const departures = new Map<HTMLElement, [number, number]>();
+  const arrivals = trips.arrivals;
+  const departures = new Map<HTMLElement, Trip>();
   for (const { node, index } of newSlots) {
-    const range = scope(match.oldKinds, index);
-    if (!range || shapes.get(node)?.group) continue;
-    const start = nearest(
-      index,
-      range,
-      (j) => {
-        const to = newIndexOf.get(j);
-        if (to === undefined) return undefined;
-        return sameLine(keptHomes.get(old[j]), homes.get(node))
-          ? startsAt.get(to)
-          : undefined;
-      },
-      true,
-    );
-    if (start && travels(start)) departures.set(node, [-start[0], -start[1]]);
+    const trip = trips.departures.get(index);
+    if (trip) departures.set(node, trip);
   }
 
   // Ghost coordinates start at the layer's place in the flow, which holds
@@ -956,15 +906,6 @@ function* morphTo(
     node.parentElement?.style.setProperty("--reach", `${px}px`);
   }
 
-  // A glyph travelling to another line rolls the way it travels instead,
-  // so a number that moves up scrolls up as it changes: rolling against
-  // its trip, it would hold still on screen while its slot slid past.
-  const rollWith = (
-    trip: [number, number] | undefined,
-    otherwise: 1 | -1,
-  ): 1 | -1 =>
-    trip && crossesLines(trip) ? (trip[1] > 0 ? 1 : -1) : otherwise;
-
   if (resizes) {
     const resize = { duration: o.width.duration, easing: o.width.easing };
     // While its space eases open, the value stays on one line. No-wrap
@@ -1080,7 +1021,7 @@ function* morphTo(
         : awayState(
             o,
             kind,
-            rollWith(arrivals.get(i), arriveFor(next[i])),
+            rollWith(arrivals.get(i), arriveFor(next[i]), line),
             line,
           );
       // Under reduced motion it only fades in, where it lands.
@@ -1279,7 +1220,7 @@ function* morphTo(
           o,
           kind,
           // It leaves the way its trip goes.
-          rollWith(departures.get(node), away),
+          rollWith(departures.get(node), away, line),
           line,
         );
     const move = run(

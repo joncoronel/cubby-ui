@@ -16,6 +16,15 @@
   --text-morph-slot-y: 0em;
   --text-morph-fade: 0.15em;
 }
+/* In a tight line height the ink reaches past the line box (a comma's tail
+   below it), and a fade inside the box faded it until the change settled,
+   then popped it. So the slot is at least 1.4em tall, reaching past the box
+   only as far as that takes: at torph's 1.6 it doesn't. */
+@supports (height: 1lh) {
+  .text-morph[data-mode="morph"] {
+    --text-morph-slot-y: max(0em, (1.4em - 1lh) / 2);
+  }
+}
 .text-morph {
   --text-morph-fade-y: linear-gradient(
     to bottom,

@@ -487,7 +487,9 @@ function InputDemo(props: DemoProps): React.ReactElement {
           // The field's own value, drawn large; reading it back doubles it.
           aria-hidden="true"
           className={cn(
-            "text-5xl font-medium tabular-nums transition-opacity",
+            // torph's line height (1.6): text-5xl's own (1) put a comma's
+            // tail in the slot's fade.
+            "text-5xl leading-[1.6] font-medium tabular-nums transition-opacity",
             query === undefined && "opacity-50",
           )}
         >

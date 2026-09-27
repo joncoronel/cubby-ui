@@ -1779,6 +1779,11 @@
           "target": "components/ui/cubby-ui/text-morph/lib/options.ts"
         },
         {
+          "path": "registry/default/text-morph/lib/shapes.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/text-morph/lib/shapes.ts"
+        },
+        {
           "path": "registry/default/text-morph/lib/timing.ts",
           "type": "registry:lib",
           "target": "components/ui/cubby-ui/text-morph/lib/timing.ts"

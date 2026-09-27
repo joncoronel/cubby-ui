@@ -25,6 +25,13 @@ import {
   staggerDelays,
   stillOptions,
 } from "./lib/timing";
+import {
+  GROUP_FADE_IN,
+  GROUP_FADE_OUT,
+  GROUP_SCALE,
+  planShapes,
+  type Shape,
+} from "./lib/shapes";
 import "./text-morph.css";
 
 /*
@@ -146,72 +153,11 @@ function visualState(node: HTMLElement): VisualState {
   };
 }
 
-/**
- * Morph mode, one-word values (torph): a run of this many replaced glyphs,
- * with no survivor inside, is swapped as one shape rather than glyph by
- * glyph. It recedes further, to GROUP_SCALE about its own centre, and its
- * fades take these shares of the movement's duration.
- */
-const GROUP_MIN = 6;
-const GROUP_SCALE = 0.8;
-const GROUP_FADE_IN = 0.35;
-const GROUP_FADE_OUT = 0.45;
-
 /** Its scale's pivot, written only when it changes. */
 function setOrigin(node: HTMLElement, origin: string): void {
   if (node.style.transformOrigin !== origin) {
     node.style.transformOrigin = origin;
   }
-}
-
-/** How a glyph arriving or leaving as part of a shape scales. */
-type Shape = { origin: string; group: boolean };
-
-/** Scale each member about the centre of the whole run. */
-function shapeRun(
-  shapes: Map<HTMLElement, Shape>,
-  members: { node: HTMLElement; rect: DOMRect }[],
-  group: boolean,
-): void {
-  const left = Math.min(...members.map((m) => m.rect.left));
-  const right = Math.max(...members.map((m) => m.rect.right));
-  const top = Math.min(...members.map((m) => m.rect.top));
-  const bottom = Math.max(...members.map((m) => m.rect.bottom));
-  for (const { node, rect } of members) {
-    shapes.set(node, {
-      origin: `${(left + right) / 2 - rect.left}px ${(top + bottom) / 2 - rect.top}px`,
-      group,
-    });
-  }
-}
-
-/**
- * The runs of changed glyphs (arriving, or leaving) to shape: whole words,
- * or runs of at least GROUP_MIN between survivors.
- */
-function shapeRuns(
-  nodes: HTMLElement[],
-  changed: (i: number) => boolean,
-  byWords: boolean,
-): number[][] {
-  const runs: number[][] = [];
-  let run: number[] = [];
-  let whole = true;
-  const flush = (): void => {
-    if (byWords ? whole && run.length > 0 : run.length >= GROUP_MIN) {
-      runs.push(run);
-    }
-    run = [];
-    whole = true;
-  };
-  nodes.forEach((node, i) => {
-    if (spaceNode(node)) return flush();
-    if (changed(i)) run.push(i);
-    else if (byWords) whole = false;
-    else flush();
-  });
-  flush();
-  return runs;
 }
 
 /** Share of its fade a glyph interrupted mid-fade takes to finish. */
@@ -792,34 +738,26 @@ function* morphTo(
   const isArriving = (i: number): boolean => !kept[i] && !spaceNode(nodes[i]);
   const shapes = new Map<HTMLElement, Shape>();
   if (shaping) {
-    // Whole words of letters (by words), and runs of GROUP_MIN or more
-    // replaced glyphs, digits included: torph splits numbers glyph by glyph
-    // either way, so `$12,345,678` → `$99` shrinks its old digits in place
-    // rather than sending them after the `$`.
-    const shapeAll = (
+    // Planned by index (lib/shapes), then kept by node.
+    const plan = (
       glyphs: HTMLElement[],
       changed: (i: number) => boolean,
       kinds: GlyphKind[],
-      rectOf: (i: number) => DOMRect | undefined,
+      boxOf: (i: number) => DOMRect | undefined,
     ): void => {
-      const add = (runs: number[][], group: boolean): void => {
-        for (const run of runs) {
-          const members = run.flatMap((i) => {
-            const rect = rectOf(i);
-            return rect ? [{ node: glyphs[i], rect }] : [];
-          });
-          if (members.length > 0) shapeRun(shapes, members, group);
-        }
-      };
-      if (!match.byWords) return add(shapeRuns(glyphs, changed, false), true);
-      const of = (kind: GlyphKind) => (i: number) =>
-        changed(i) && kinds[i] === kind;
-      add(shapeRuns(glyphs, of("text"), true), false);
-      add(shapeRuns(glyphs, of("number"), false), true);
+      const planned = planShapes({
+        count: glyphs.length,
+        isSpace: (i) => spaceNode(glyphs[i]),
+        changed,
+        kinds,
+        byWords: match.byWords,
+        boxOf,
+      });
+      for (const [i, shape] of planned) shapes.set(glyphs[i], shape);
     };
-    shapeAll(nodes, isArriving, match.nextKinds, (i) => after[i]);
+    plan(nodes, isArriving, match.nextKinds, (i) => after[i]);
     const leavingAt = new Set(leaving.map((l) => l.index));
-    shapeAll(
+    plan(
       old,
       (i) => leavingAt.has(i),
       match.oldKinds,

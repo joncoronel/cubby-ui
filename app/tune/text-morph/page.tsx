@@ -77,7 +77,7 @@ type DialPositions = {
   morphScale: number;
   digitDistance: number;
   settleDistance: number;
-  settleSpread: number;
+  settleScale: number;
   blur: number;
   trend: TextMorphOptions["trend"];
 };
@@ -90,16 +90,16 @@ const DIAL_MODES: Record<TextMorphMode, DialPositions> = {
     fadeInDelay: 0,
     fadeOut: easing(0.15, WIDTH_CURVE),
     width: easing(0.24, WIDTH_CURVE),
-    staggerMode: "spread",
-    staggerMs: 40,
+    staggerMode: "each",
+    staggerMs: 0,
     rollDistance: 0.35,
     rollScale: 1,
     rollRotate: 0,
     morphScale: 1,
     digitDistance: 1,
     settleDistance: 0.15,
-    settleSpread: 0.15,
-    blur: 0.04,
+    settleScale: 0.94,
+    blur: 0.1,
     trend: "auto",
   },
   roll: {
@@ -117,7 +117,7 @@ const DIAL_MODES: Record<TextMorphMode, DialPositions> = {
     morphScale: 0.6,
     digitDistance: 1,
     settleDistance: 0.15,
-    settleSpread: 0.15,
+    settleScale: 1,
     blur: 0.1,
     trend: "auto",
   },
@@ -136,7 +136,7 @@ const DIAL_MODES: Record<TextMorphMode, DialPositions> = {
     morphScale: 0.95,
     digitDistance: 1,
     settleDistance: 0.15,
-    settleSpread: 0.15,
+    settleScale: 1,
     blur: 0,
     trend: "down",
   },
@@ -177,7 +177,7 @@ const CONFIG = {
     digitDistance: [base.digitDistance, 0, 2, 0.05],
   },
   settle: {
-    spread: [base.settleSpread, 0, 1, 0.01],
+    scale: [base.settleScale, 0.8, 1, 0.01],
     distance: [base.settleDistance, 0, 1, 0.01],
   },
   blur: [base.blur, 0, 0.4, 0.01],
@@ -211,7 +211,7 @@ function dialUpdates(p: DialPositions): Record<string, DialValue> {
     "morph.scale": p.morphScale,
     "morph.digitDistance": p.digitDistance,
     "settle.distance": p.settleDistance,
-    "settle.spread": p.settleSpread,
+    "settle.scale": p.settleScale,
     blur: p.blur,
     trend: p.trend,
   };
@@ -415,7 +415,10 @@ export default function TextMorphTune(): React.ReactElement {
       scale: v.morph.scale,
       digits: { ...exact.morph.digits, distance: v.morph.digitDistance },
     },
-    settle: { distance: v.settle.distance, spread: v.settle.spread },
+    settle: {
+      distance: v.settle.distance,
+      scale: v.settle.scale,
+    },
     blur: v.blur,
     numbers: v.numbers,
     trend: v.trend as TextMorphOptions["trend"],

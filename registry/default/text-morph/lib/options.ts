@@ -5,9 +5,9 @@ export type Timing = { duration: number; easing: string };
 
 export type TextMorphOptions = {
   /**
-   * `settle` keeps the words the old and new text share and swaps the rest
-   * whole, drifting them a little as they crossfade: calm enough for
-   * anything. `roll` keeps the old and new text's shared start and end, and
+   * `settle` changes only what changed (a similar word keeps what it shares
+   * at its ends), crossfading each changed run as one unit, a touch smaller
+   * and blurred: calm enough for anything. `roll` keeps the old and new text's shared start and end, and
    * rolls the glyphs between vertically, on Scritto's defaults. `morph`
    * matches whole words, then letters within similar words (anywhere, in a
    * one-word value): shared ones slide to their new place, the rest scale and
@@ -41,12 +41,11 @@ export type TextMorphOptions = {
     digits: { distance: number; fadeIn: Timing; fadeOut: Timing };
   };
   /**
-   * Settle: a changed word's letters gather into it as it arrives and drift
-   * apart as it leaves, each `spread` of its distance from the word's centre
-   * (0.15 starts them 15% further out); digits drift `distance` (em) the way
-   * the value went.
+   * Settle: a changed run grows into place from `scale` about its own
+   * centre, as one unit, and digits drift `distance` (em) the way the value
+   * went.
    */
-  settle: { distance: number; spread: number };
+  settle: { distance: number; scale: number };
   /** Blur on arriving and leaving glyphs, in em. */
   blur: number;
   /**
@@ -101,7 +100,7 @@ const SCRITTO_OPTIONS: TextMorphOptions = {
   stagger: { mode: "spread", ms: 165 },
   roll: { distance: 0.35, scale: 0.6, rotate: 2 },
   morph: { scale: 0.6, digits: TORPH_DIGITS },
-  settle: { distance: 0.15, spread: 0.15 },
+  settle: { distance: 0.15, scale: 1 },
   blur: 0.1,
   numbers: true,
   trend: "auto",
@@ -123,7 +122,7 @@ const TORPH_OPTIONS: TextMorphOptions = {
   stagger: { mode: "each", ms: 0 },
   roll: { distance: 0.35, scale: 0.95, rotate: 0 },
   morph: { scale: 0.95, digits: TORPH_DIGITS },
-  settle: { distance: 0.15, spread: 0.15 },
+  settle: { distance: 0.15, scale: 1 },
   blur: 0,
   numbers: true,
   trend: "down",
@@ -131,15 +130,13 @@ const TORPH_OPTIONS: TextMorphOptions = {
 };
 
 /**
- * Cubby's own. A changed word gathers: its letters start a little apart and
- * draw together into the word as it fades in, and the word it replaces
- * drifts apart as it fades out. Letter spacing is what text is made of, so
- * the change stays typographic rather than borrowing a slide or a roll.
- * Digits drift 0.15em the way the value went. A faint sweep (40ms across the
- * changed stretch) gives it a direction; a whisper of blur blends old and
- * new. New text enters over 240ms and old leaves over 150ms, and everything,
- * the box's width and the words that stay sliding to their places included,
- * runs on one strong ease-out. No scale, tilt or travel.
+ * Cubby's own: a soft crossfade. Only what changed moves: each changed run
+ * comes in as one unit, a touch smaller (0.94, about its own centre) and
+ * blurred (0.1em), and settles into focus as the old text blurs away under
+ * it, all at once. Digits drift 0.15em the way the value went instead, so a
+ * number still shows its direction. New text enters over 240ms and old
+ * leaves over 150ms, and everything, the box's width and the words that
+ * stay sliding to their places included, runs on one strong ease-out.
  */
 const SETTLE_EASING = WIDTH_EASING;
 const SETTLE_OPTIONS: TextMorphOptions = {
@@ -148,11 +145,11 @@ const SETTLE_OPTIONS: TextMorphOptions = {
   fadeIn: { duration: 240, easing: SETTLE_EASING, delay: 0 },
   fadeOut: { duration: 150, easing: SETTLE_EASING },
   width: { duration: 240, easing: SETTLE_EASING },
-  stagger: { mode: "spread", ms: 40 },
+  stagger: { mode: "each", ms: 0 },
   roll: { distance: 0.35, scale: 1, rotate: 0 },
   morph: { scale: 1, digits: TORPH_DIGITS },
-  settle: { distance: 0.15, spread: 0.15 },
-  blur: 0.04,
+  settle: { distance: 0.15, scale: 0.94 },
+  blur: 0.1,
   numbers: true,
   trend: "auto",
   edgeFade: "auto",

@@ -117,26 +117,26 @@ describe("stillOptions", () => {
 describe("settle", () => {
   const settle = MODE_DEFAULTS.settle;
 
-  it("gathers a word's letters from around its centre, sideways only", () => {
-    // A letter 10px left of its word's centre starts 15% further out.
-    expect(awayState(settle, "text", 1, 36, [10, 0])).toEqual({
-      translate: "-1.5px 0px",
+  it("crossfades a changed run as one unit, a touch smaller", () => {
+    expect(awayState(settle, "text", 1, 36)).toEqual({
+      translate: "0 0",
+      scale: "0.94",
+      rotate: "0deg",
+    });
+    expect(settle.stagger.ms).toBe(0);
+    expect(settle.blur).toBe(0.1);
+  });
+
+  it("drifts digits the way the value went, unscaled", () => {
+    expect(awayState(settle, "number", 1, 36)).toEqual({
+      translate: "0 0.15em",
       scale: "1",
       rotate: "0deg",
     });
-    expect(awayState(settle, "text", 1, 36, [-20, 4]).translate).toBe(
-      "3px 0px",
-    );
-    // Not part of a whole word (a swapped mark): it only fades.
-    expect(awayState(settle, "text", 1, 36).translate).toBe("0px 0px");
-  });
-
-  it("drifts digits the way the value went", () => {
-    expect(awayState(settle, "number", 1, 36).translate).toBe("0 0.15em");
     expect(awayState(settle, "number", -1, 36).translate).toBe("0 -0.15em");
   });
 
-  it("runs on one curve, sweeps faintly, and leaves faster than it enters", () => {
+  it("runs on one curve and leaves faster than it enters", () => {
     const curves = [
       settle.motion.easing,
       settle.fadeIn.easing,
@@ -145,12 +145,11 @@ describe("settle", () => {
     ];
     expect(new Set(curves).size).toBe(1);
     expect(settle.fadeOut.duration).toBeLessThan(settle.fadeIn.duration);
-    expect(settle.stagger).toEqual({ mode: "spread", ms: 40 });
   });
 
   it("holds still under reduced motion", () => {
     const still = stillOptions(settle);
-    expect(awayState(still, "text", 1, 36, [10, 0]).translate).toBe("0px 0px");
+    expect(awayState(still, "text", 1, 36).scale).toBe("1");
     expect(awayState(still, "number", 1, 36).translate).toBe("0 0em");
   });
 });

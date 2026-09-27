@@ -29,7 +29,7 @@ import {
   GROUP_FADE_IN,
   GROUP_FADE_OUT,
   GROUP_SCALE,
-  planGathers,
+  planRuns,
   planShapes,
   type Shape,
 } from "./lib/shapes";
@@ -692,7 +692,7 @@ function* morphTo(
   // Morph also scales a whole word arriving or leaving about its own
   // centre, as one shape; in a one-word value, only a run of GROUP_MIN or
   // more replaced glyphs, further and faster.
-  // Settle plans too: each changed run of letters gathers about its centre.
+  // Settle plans too: each changed run of letters scales about its centre.
   const shaping = (o.mode === "morph" || o.mode === "settle") && !reduced;
   // How far each survivor moved in the layout, from its old place to its
   // final one. The layout, not where it's drawn (torph measures with
@@ -719,7 +719,7 @@ function* morphTo(
       // drift instead). Morph: whole words and long runs, as torph.
       const planned =
         o.mode === "settle"
-          ? planGathers({
+          ? planRuns({
               count: glyphs.length,
               isSpace,
               changed: (i) => changed(i) && kinds[i] === "text",
@@ -1027,8 +1027,9 @@ function* morphTo(
     // A shape's glyph slides toward the shape's centre as it scales, out of
     // its slot, whose fade would cut it off; it doesn't roll, so it needs
     // no fade.
-    const gathers = o.mode === "settle" && shape !== undefined;
-    if (shape?.group || gathers) {
+    // So does a settle run's, scaling about the run's centre.
+    const inRun = o.mode === "settle" && shape !== undefined;
+    if (shape?.group || inRun) {
       node.parentElement?.setAttribute("data-travel", "");
     }
     if (!was) {
@@ -1040,7 +1041,6 @@ function* morphTo(
             kind,
             rollWith(arrivals.get(i), arriveFor(next[i]), line),
             line,
-            shape?.toCentre,
           );
       // Under reduced motion it only fades in, where it lands.
       if (!reduced) {
@@ -1246,7 +1246,6 @@ function* morphTo(
           // It leaves the way its trip goes.
           rollWith(departures.get(node), away, line),
           line,
-          shape?.toCentre,
         );
     const move = run(
       node,

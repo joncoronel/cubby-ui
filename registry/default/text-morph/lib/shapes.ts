@@ -17,8 +17,6 @@ export type Shape = {
   origin: string;
   /** A run swapped as one shape (further, faster), not a word. */
   group: boolean;
-  /** How far the shape's centre sits from the glyph's own, [x, y] in px. */
-  toCentre: [number, number];
 };
 
 /** Where a glyph sits: any rect (a DOMRect will do). */
@@ -65,26 +63,21 @@ function origins(
   const right = Math.max(...members.map((m) => m.box.right));
   const top = Math.min(...members.map((m) => m.box.top));
   const bottom = Math.max(...members.map((m) => m.box.bottom));
-  const cx = (left + right) / 2;
-  const cy = (top + bottom) / 2;
   for (const { index, box } of members) {
     into.set(index, {
-      origin: `${cx - box.left}px ${cy - box.top}px`,
+      origin: `${(left + right) / 2 - box.left}px ${(top + bottom) / 2 - box.top}px`,
       group,
-      toCentre: [
-        cx - (box.left + box.right) / 2,
-        cy - (box.top + box.bottom) / 2,
-      ],
     });
   }
 }
 
 /**
  * Settle: every run of changed glyphs, a whole word or the changed middle
- * of one (`Copy` → `Copied` changes `ied`), gathers about its own centre.
- * Runs end at a survivor or a space. Pivots only; none is a group.
+ * of one (`Copy` → `Copied` changes `ied`), scales about its own centre,
+ * as one unit. Runs end at a survivor or a space. Pivots only; none is a
+ * group.
  */
-export function planGathers({
+export function planRuns({
   count,
   isSpace,
   changed,

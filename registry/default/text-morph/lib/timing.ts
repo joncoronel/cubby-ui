@@ -41,24 +41,25 @@ export const HOME: Keyframe = { translate: "0 0", scale: "1", rotate: "0deg" };
 
 /**
  * Transform keyframe for a glyph away from home: `offset` is 1 below the
- * line, -1 above. Settle spreads a word's letters out from its centre
- * (`toCentre`, px, from the glyph to its word's centre) and drifts digits;
- * morph letters scale in place; morph digits roll whole lines (`line` is
- * the line height in px).
+ * line, -1 above. Settle drifts digits and scales letters about their
+ * run's centre (the glyph's transform origin), so a changed run grows in as
+ * one unit. Morph letters scale in place; morph digits roll whole lines
+ * (`line` is the line height in px).
  */
 export function awayState(
   o: TextMorphOptions,
   kind: GlyphKind,
   offset: 1 | -1,
   line: number,
-  toCentre?: [number, number],
 ): Keyframe {
   if (o.mode === "settle") {
-    const translate =
-      kind === "number"
-        ? `0 ${offset * o.settle.distance}em`
-        : `${toCentre ? -toCentre[0] * o.settle.spread : 0}px 0px`;
-    return { translate, scale: "1", rotate: "0deg" };
+    return kind === "number"
+      ? {
+          translate: `0 ${offset * o.settle.distance}em`,
+          scale: "1",
+          rotate: "0deg",
+        }
+      : { translate: "0 0", scale: String(o.settle.scale), rotate: "0deg" };
   }
   if (o.mode === "roll") {
     return {
@@ -107,7 +108,7 @@ export function stillOptions(o: TextMorphOptions): TextMorphOptions {
     stagger: { ...o.stagger, ms: 0 },
     roll: { distance: 0, scale: 1, rotate: 0 },
     morph: { ...o.morph, scale: 1, digits: { ...o.morph.digits, distance: 0 } },
-    settle: { distance: 0, spread: 0 },
+    settle: { distance: 0, scale: 1 },
     blur: 0,
   };
 }

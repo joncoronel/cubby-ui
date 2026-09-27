@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { GlyphKind } from "@/registry/default/text-morph/lib/match";
 import {
   GROUP_MIN,
-  planGathers,
+  planRuns,
   planShapes,
   shapeRuns,
   type Box,
@@ -79,17 +79,14 @@ describe("planShapes", () => {
     expect(shapes.get(0)).toEqual({
       origin: "15px 10px",
       group: false,
-      toCentre: [10, 0],
     });
     expect(shapes.get(1)).toEqual({
       origin: "5px 10px",
       group: false,
-      toCentre: [0, 0],
     });
     expect(shapes.get(2)).toEqual({
       origin: "-5px 10px",
       group: false,
-      toCentre: [-10, 0],
     });
   });
 
@@ -145,14 +142,15 @@ describe("planShapes", () => {
   });
 });
 
-describe("planGathers", () => {
-  it("gathers each changed run, whole word or not, about its own centre", () => {
+describe("planRuns", () => {
+  it("pivots each changed run, whole word or not, on its own centre", () => {
     // "Cop___": the changed `ied` gathers alone.
     const { count, isSpace, changed } = parse("Cop___ ___");
-    const shapes = planGathers({ count, isSpace, changed, boxOf: box });
+    const shapes = planRuns({ count, isSpace, changed, boxOf: box });
     expect([...shapes.keys()]).toEqual([3, 4, 5, 7, 8, 9]);
-    expect(shapes.get(3)?.toCentre).toEqual([10, 0]);
-    expect(shapes.get(4)?.toCentre).toEqual([0, 0]);
+    // `ied` spans 30..60: its centre is 45, 15px into the `i`.
+    expect(shapes.get(3)?.origin).toBe("15px 10px");
+    expect(shapes.get(4)?.origin).toBe("5px 10px");
     expect([...shapes.values()].every((s) => !s.group)).toBe(true);
   });
 });

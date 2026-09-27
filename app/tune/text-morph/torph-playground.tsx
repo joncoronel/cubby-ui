@@ -172,17 +172,18 @@ export function CaseStage({
           event.preventDefault();
           onAdvance();
         }}
-        className="border-border/70 hover:bg-muted/40 focus-visible:ring-ring/50 cursor-pointer rounded-xl border px-8 py-16 transition-colors outline-none select-none focus-visible:ring-2"
+        // Centred in room for the case's lines, as torph's stage is: a value
+        // with fewer lines sits in the middle, and the label grows and
+        // shrinks about it.
+        className="border-border/70 hover:bg-muted/40 focus-visible:ring-ring/50 flex cursor-pointer items-center rounded-xl border px-8 py-16 text-4xl leading-tight font-medium transition-colors outline-none select-none focus-visible:ring-2"
+        style={{ minHeight: `calc(${(c.minLines ?? 1) * 1.25}em + 8rem)` }}
       >
         <div
           className={cn(
-            "text-4xl leading-tight font-medium",
+            "w-full",
             ALIGN_CLASS[align],
             tabular && "tabular-nums",
           )}
-          style={{
-            minHeight: `${(c.minLines ?? 1) * 1.25}em`,
-          }}
         >
           <TextMorph
             // A new case starts fresh rather than morphing from the last.

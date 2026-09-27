@@ -704,8 +704,12 @@ function* morphTo(
     const [one, two]: [1 | -1, 1 | -1] = forwardFirst ? [1, -1] : [-1, 1];
     return scan(one) ?? scan(two);
   };
-  const travels = ([, dy]: [number, number]): boolean =>
-    o.mode === "morph" || Math.abs(dy) > line / 2;
+  // A trip to another line, not a centred value recentring by half a line
+  // as its line count changes.
+  const crossesLines = ([, dy]: [number, number]): boolean =>
+    Math.abs(dy) > line * 0.75;
+  const travels = (trip: [number, number]): boolean =>
+    o.mode === "morph" || crossesLines(trip);
   const isArriving = (i: number): boolean =>
     !kept[i] && !reclaimedAt.has(i) && !spaceNode(nodes[i]);
   const shapes = new Map<HTMLElement, Shape>();
@@ -886,7 +890,7 @@ function* morphTo(
     trip: [number, number] | undefined,
     otherwise: 1 | -1,
   ): 1 | -1 =>
-    trip && Math.abs(trip[1]) > line / 2 ? (trip[1] > 0 ? 1 : -1) : otherwise;
+    trip && crossesLines(trip) ? (trip[1] > 0 ? 1 : -1) : otherwise;
 
   if (resizes) {
     const resize = { duration: o.width.duration, easing: o.width.easing };

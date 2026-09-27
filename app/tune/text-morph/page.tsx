@@ -264,11 +264,13 @@ export default function TextMorphTune(): React.ReactElement {
   const [view, setView] = React.useState<View>("site");
   const [caseStep, setCaseStep] = React.useState(0);
   const [align, setAlign] = React.useState<Align | null>(null);
+  const [tabular, setTabular] = React.useState<boolean | null>(null);
   const shownCase = caseOf(view);
   const select = (next: View): void => {
     setView(next);
     setCaseStep(0);
     setAlign(null);
+    setTabular(null);
     try {
       localStorage.setItem(VIEW_KEY, next);
     } catch {
@@ -409,6 +411,8 @@ export default function TextMorphTune(): React.ReactElement {
             step={caseStep}
             align={align ?? shownCase.align ?? "left"}
             onAlign={setAlign}
+            tabular={tabular ?? shownCase.tabular ?? false}
+            onTabular={setTabular}
             options={ambient}
             onAdvance={advance}
           />
@@ -535,7 +539,7 @@ export default function TextMorphTune(): React.ReactElement {
           </Demo>
 
           <Demo
-            label="Counter (a number value; rolls up when it grows, down when it shrinks)"
+            label="Counter (a number value; roll rolls up when it grows and down when it shrinks, morph drops digits in from above)"
             onAdvance={bump("counter")}
           >
             <span className="flex items-baseline gap-3 text-sm">

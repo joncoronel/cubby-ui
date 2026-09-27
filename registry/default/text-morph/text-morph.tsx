@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import {
   caretUnits,
   decimalFor,
+  isDigit,
   matchText,
   textUnits,
   type GlyphKind,
@@ -869,9 +870,15 @@ function* morphTo(
     node.parentElement?.style.setProperty("--reach", `${px}px`);
   }
 
-  // A rise brings new glyphs up from below and sends old ones up and away.
-  const arrive = match.trend;
-  const away = match.trend === 1 ? -1 : 1;
+  // Which way glyphs roll. Roll (Scritto) reads it off the value: a rise
+  // brings new glyphs up from below and sends old ones up and away. Morph
+  // (torph) doesn't: digits fall in from above and leave downward, and a
+  // number's other marks arrive from below, so each reads as its own event.
+  // A trend set in the options applies in either mode.
+  const byValue = o.mode === "roll" || o.trend !== 0;
+  const arriveFor = (glyph: string): 1 | -1 =>
+    byValue ? match.trend : isDigit(glyph) ? -1 : 1;
+  const away = byValue && match.trend === 1 ? -1 : 1;
   // A glyph travelling to another line rolls the way it travels instead,
   // so a number that moves up scrolls up as it changes: rolling against
   // its trip, it would hold still on screen while its slot slid past.
@@ -950,7 +957,12 @@ function* morphTo(
       const delay = delays.entering[entering++];
       const awayFrame = shape?.group
         ? { translate: "0 0", scale: String(GROUP_SCALE), rotate: "0deg" }
-        : awayState(o, kind, rollWith(arrivals.get(i), arrive), line);
+        : awayState(
+            o,
+            kind,
+            rollWith(arrivals.get(i), arriveFor(next[i])),
+            line,
+          );
       run(node, [awayFrame, HOME], {
         ...motion,
         delay,

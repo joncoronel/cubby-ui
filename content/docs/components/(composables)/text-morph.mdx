@@ -152,8 +152,9 @@ Screen readers get the value as plain text; the animated glyphs are hidden from 
 </ApiProp>
 
 <ApiProp name="trend" fullType="-1 | 0 | 1" defaultValue="0">
-  Which way glyphs roll: `1` up, `-1` down, `0` read it off the value (a number
-  that grew rolls up).
+  Which way glyphs roll: `1` up, `-1` down, `0` the mode's way. `roll` reads it
+  off the value, so a number that grew rolls up; `morph` drops digits in from
+  above and out below, as torph does.
 </ApiProp>
 
 <ApiProp

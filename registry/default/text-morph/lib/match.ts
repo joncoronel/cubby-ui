@@ -103,7 +103,8 @@ const DIGIT = /^\p{Nd}$/u;
 const PERCENT = "%\u066A";
 const CURRENCY = /^\p{Sc}$/u;
 
-const isDigit = (g: string): boolean => DIGIT.test(g);
+/** A decimal digit, in any script. */
+export const isDigit = (g: string): boolean => DIGIT.test(g);
 
 /** Marks a number may open with, besides a currency symbol. */
 const PREFIX = SIGN + "(#" + PERCENT;

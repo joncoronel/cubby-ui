@@ -4,6 +4,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { TextMorph } from "@/registry/default/text-morph/text-morph";
 import type { TextMorphOptions } from "@/registry/default/text-morph/lib/options";
+import { Toggle } from "@/registry/default/toggle/toggle";
 import {
   ToggleGroup,
   ToggleGroupItem,
@@ -124,6 +125,8 @@ export function CaseStage({
   step,
   align,
   onAlign,
+  tabular,
+  onTabular,
   options,
   onAdvance,
 }: {
@@ -131,6 +134,9 @@ export function CaseStage({
   step: number;
   align: Align;
   onAlign: (align: Align) => void;
+  /** Equal-width digits, to rule out a font's digit widths when text shifts. */
+  tabular: boolean;
+  onTabular: (tabular: boolean) => void;
   options: TextMorphOptions;
   onAdvance: () => void;
 }): React.ReactElement {
@@ -172,7 +178,7 @@ export function CaseStage({
           className={cn(
             "text-4xl leading-tight font-medium",
             ALIGN_CLASS[align],
-            c.tabular && "tabular-nums",
+            tabular && "tabular-nums",
           )}
           style={{
             minHeight: `${(c.minLines ?? 1) * 1.25}em`,
@@ -203,18 +209,23 @@ export function CaseStage({
           )}
           {c.locale && <span>{c.locale}</span>}
         </div>
-        <ToggleGroup
-          size="sm"
-          value={[align]}
-          onValueChange={(next) => {
-            if (next[0]) onAlign(next[0] as Align);
-          }}
-          aria-label="Alignment"
-        >
-          <ToggleGroupItem value="left">L</ToggleGroupItem>
-          <ToggleGroupItem value="center">C</ToggleGroupItem>
-          <ToggleGroupItem value="right">R</ToggleGroupItem>
-        </ToggleGroup>
+        <div className="flex items-center gap-2">
+          <Toggle size="sm" pressed={tabular} onPressedChange={onTabular}>
+            Tabular
+          </Toggle>
+          <ToggleGroup
+            size="sm"
+            value={[align]}
+            onValueChange={(next) => {
+              if (next[0]) onAlign(next[0] as Align);
+            }}
+            aria-label="Alignment"
+          >
+            <ToggleGroupItem value="left">L</ToggleGroupItem>
+            <ToggleGroupItem value="center">C</ToggleGroupItem>
+            <ToggleGroupItem value="right">R</ToggleGroupItem>
+          </ToggleGroup>
+        </div>
       </footer>
     </section>
   );

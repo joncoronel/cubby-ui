@@ -45,7 +45,8 @@ export type TextMorphOptions = {
   numbers: boolean;
   /**
    * Which way glyphs roll: 1 up (new ones arrive from below), -1 down, 0
-   * read it off the value (a number that grew rolls up).
+   * the mode's way: roll reads it off the value (a number that grew rolls
+   * up); morph drops digits in from above and out below, as torph does.
    */
   trend: -1 | 0 | 1;
   /**

@@ -148,7 +148,8 @@ function visualState(node: HTMLElement): VisualState {
  * across `ms` over the changed stretch only, so a one-digit change in a long
  * number isn't left waiting, and a glyph leaving and its replacement in the
  * same spot cross over together. Positions count from the start of the
- * line in reading order.
+ * line in reading order. The sweep spans `ms` less one glyph's step, as
+ * Scritto's ladder does, so two glyphs are half of it apart, not all of it.
  */
 function staggerDelays(
   o: TextMorphOptions,
@@ -164,9 +165,15 @@ function staggerDelays(
   const all = [...entering, ...leaving];
   const min = Math.min(...all);
   const span = Math.max(...all) - min;
-  const at = (left: number): number =>
-    span > 0 ? (o.stagger.ms * (left - min)) / span : 0;
-  return { entering: entering.map(at), leaving: leaving.map(at) };
+  const sweep = (count: number) => (left: number) =>
+    span > 0
+      ? (((o.stagger.ms * Math.max(count - 1, 0)) / count) * (left - min)) /
+        span
+      : 0;
+  return {
+    entering: entering.map(sweep(entering.length)),
+    leaving: leaving.map(sweep(leaving.length)),
+  };
 }
 
 /**
@@ -309,15 +316,37 @@ function centreDelta(a: DOMRect, b: DOMRect): [number, number] {
   ];
 }
 
-/** Whether a change here would be seen: rendered, and in the viewport. */
+const CLIPS = /auto|scroll|hidden|clip/;
+
+/** Whether an element cuts off what overflows it (a scroller, a clip). */
+const clips = (style: CSSStyleDeclaration): boolean =>
+  CLIPS.test(style.overflowX) || CLIPS.test(style.overflowY);
+
+/**
+ * Whether a change here would be seen: rendered, and within the viewport
+ * and every ancestor that clips it (Scritto's), so a label scrolled out of
+ * view inside a scrolling panel swaps without animating.
+ */
 function isOnScreen(el: HTMLElement): boolean {
   if (el.checkVisibility && !el.checkVisibility()) return false;
+  let top = 0;
+  let left = 0;
+  let bottom = window.innerHeight;
+  let right = window.innerWidth;
+  for (let node = el.parentElement; node; node = node.parentElement) {
+    if (!clips(getComputedStyle(node))) continue;
+    const box = node.getBoundingClientRect();
+    top = Math.max(top, box.top);
+    left = Math.max(left, box.left);
+    bottom = Math.min(bottom, box.bottom);
+    right = Math.min(right, box.right);
+  }
   const rect = el.getBoundingClientRect();
   return (
-    rect.bottom > 0 &&
-    rect.right > 0 &&
-    rect.top < window.innerHeight &&
-    rect.left < window.innerWidth
+    rect.bottom > top &&
+    rect.right > left &&
+    rect.top < bottom &&
+    rect.left < right
   );
 }
 
@@ -334,9 +363,61 @@ const SLOT_PAD_Y = 0.3;
 type Side = "start" | "end";
 
 /**
+ * Whether a box shows an edge: a background, a side border, a shadow (a
+ * ring, a shadow-drawn outline) or a frosted backdrop.
+ */
+function showsEdge(style: CSSStyleDeclaration): boolean {
+  return (
+    style.backgroundImage !== "none" ||
+    (style.backgroundColor !== "rgba(0, 0, 0, 0)" &&
+      style.backgroundColor !== "transparent") ||
+    parseFloat(style.borderLeftWidth) > 0 ||
+    parseFloat(style.borderRightWidth) > 0 ||
+    style.boxShadow !== "none" ||
+    (style.backdropFilter !== "" && style.backdropFilter !== "none")
+  );
+}
+
+/** Whether a pseudo-element draws a surface for its box (a button's fill). */
+function pseudoShowsEdge(
+  node: Element,
+  which: "::before" | "::after",
+): boolean {
+  const style = getComputedStyle(node, which);
+  return (
+    style.content !== "none" && style.content !== "normal" && showsEdge(style)
+  );
+}
+
+/**
+ * The inner edges of what a reader sees as holding the value (Scritto's
+ * bounds): the nearest ancestor that shows an edge, itself or through a
+ * pseudo-element (our Button paints its fill on `::before`), or clips; else
+ * the viewport. A plain block around it has no edge to see.
+ */
+function visibleBounds(el: HTMLElement): { left: number; right: number } {
+  for (let node = el.parentElement; node; node = node.parentElement) {
+    const style = getComputedStyle(node);
+    if (
+      showsEdge(style) ||
+      clips(style) ||
+      pseudoShowsEdge(node, "::before") ||
+      pseudoShowsEdge(node, "::after")
+    ) {
+      const box = node.getBoundingClientRect();
+      return {
+        left: box.left + parseFloat(style.borderLeftWidth),
+        right: box.right - parseFloat(style.borderRightWidth),
+      };
+    }
+  }
+  return { left: 0, right: window.innerWidth };
+}
+
+/**
  * Whether old ink escaping the box on this side would land on something:
- * a neighbour on the line, or the edge of the box that holds the value (a
- * pill, a card, a clipping wrapper). With room around it, ink is left to
+ * a neighbour on the line, or past the edge a reader sees holding the value
+ * (a pill, a card, a clipping wrapper). With room around it, ink is left to
  * dissolve on its own opacity. Reads the final layout.
  */
 function inkEscapes(root: HTMLElement, side: Side, inkEdge: number): boolean {
@@ -357,27 +438,17 @@ function inkEscapes(root: HTMLElement, side: Side, inkEdge: number): boolean {
       if (visible) return true;
       sibling = toRight ? sibling.nextSibling : sibling.previousSibling;
     }
+    // Neighbours share the line up to the first block around it.
     const parent = el.parentElement;
-    if (!parent) return false;
-    const style = getComputedStyle(parent);
-    if (!style.display.startsWith("inline") && style.display !== "contents") {
-      const box = parent.getBoundingClientRect();
-      if (side === "end") {
-        const edge =
-          box.right -
-          parseFloat(style.borderRightWidth) -
-          parseFloat(style.paddingRight);
-        return inkEdge > edge + 0.5;
-      }
-      const edge =
-        box.left +
-        parseFloat(style.borderLeftWidth) +
-        parseFloat(style.paddingLeft);
-      return inkEdge < edge - 0.5;
-    }
+    if (!parent) break;
+    const { display } = getComputedStyle(parent);
+    if (!display.startsWith("inline") && display !== "contents") break;
     el = parent;
   }
-  return false;
+  const bounds = visibleBounds(root);
+  return side === "end"
+    ? inkEdge > bounds.right + 0.5
+    : inkEdge < bounds.left - 0.5;
 }
 
 /**
@@ -448,6 +519,30 @@ type MorphJob = {
 };
 
 const queue: MorphJob[] = [];
+
+/**
+ * Where each label was last seen pinned as it resized (0 start, 1 end, 0.5
+ * centred), from how far each edge travelled: what a roll run's travel is
+ * measured against (Scritto's anchor).
+ */
+const anchors = new WeakMap<HTMLElement, number>();
+
+/** Until a label has resized, a guess from its alignment. */
+function anchorHint(style: CSSStyleDeclaration): number {
+  const rtl = style.direction === "rtl";
+  switch (style.textAlign) {
+    case "center":
+      return 0.5;
+    case "end":
+      return 1;
+    case "right":
+      return rtl ? 0 : 1;
+    case "left":
+      return rtl ? 1 : 0;
+    default:
+      return 0;
+  }
+}
 
 /** A leaving glyph's animations, so a change that brings it back can stop them. */
 const ghostAnimations = new WeakMap<HTMLElement, Animation[]>();
@@ -543,6 +638,7 @@ function* morphTo(
       numbers: o.numbers,
       decimal: place.decimal,
       trend: o.trend === "up" ? 1 : o.trend === "down" ? -1 : 0,
+      anchor: anchors.get(root) ?? anchorHint(styleBefore),
       caret:
         place.caret === undefined ? undefined : caretUnits(next, place.caret),
     },
@@ -920,6 +1016,15 @@ function* morphTo(
   // update may be easing its own space, which moves this label too.
   const rootAt0 =
     oneLine || reheights ? root.getBoundingClientRect() : rootAfter;
+  // Which edge the label is pinned by, for the next change's run.
+  if (resizes) {
+    const leftTravel = Math.abs(rootAfter.left - rootAt0.left);
+    const rightTravel = Math.abs(rootAfter.right - rootAt0.right);
+    const rtl = styleAfter.direction === "rtl";
+    const startTravel = rtl ? rightTravel : leftTravel;
+    const travel = leftTravel + rightTravel;
+    if (travel > 0.5) anchors.set(root, startTravel / travel);
+  }
   yield;
 
   // 8. Write: everything else, attributes and styles only. Nothing below
@@ -1110,7 +1215,11 @@ function* morphTo(
           },
           HOME,
         ],
-        motion,
+        // Roll (Scritto): on the box's curve, not the roll's spring, or a
+        // kept run outruns the box resizing around it.
+        o.mode === "roll"
+          ? { duration: o.width.duration, easing: o.width.easing }
+          : motion,
       );
     }
     // Mid-fade (or mid-blur, from an earlier change) it finishes coming in.

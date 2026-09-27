@@ -168,8 +168,9 @@ Screen readers get the value as plain text; the animated glyphs are hidden from 
   defaultValue='"auto"'
 >
   Fade old ink at an edge the box is shrinking away from. `auto` only fades
-  where the ink would land on something: a neighbouring word, or the edge of the
-  pill, card or clipping element holding the value.
+  where the ink would land on something: a neighbouring word, or an edge you can
+  see around the value (a background, a border or a clipping element). In open
+  space it fades on its own.
 </ApiProp>
 
 <ApiProp name="motion" fullType="{ duration: number; easing: string }">

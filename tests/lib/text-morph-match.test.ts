@@ -435,3 +435,23 @@ describe("a number without a partner", () => {
     expect(refilled.nextKinds).toEqual(["number", "number"]);
   });
 });
+
+// Scritto's anchor: a run's travel is measured on screen, against where the
+// value is pinned as it grows.
+describe("a roll run in centred or end-pinned text", () => {
+  // "ok" shifts 5 slots along the text as the value grows by 5.
+  const view = (anchor: number): string =>
+    keptView("roll", "Xok#", "ZZZZZZok%", { ...OPTIONS, anchor });
+
+  it("travels too far in start-pinned text, and leaves", () => {
+    expect(view(0)).toBe("_________");
+  });
+
+  it("holds still in end-pinned text, and is kept", () => {
+    expect(view(1)).toBe("______ok_");
+  });
+
+  it("travels half as far in centred text, and is kept", () => {
+    expect(view(0.5)).toBe("______ok_");
+  });
+});

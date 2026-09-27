@@ -43,6 +43,12 @@ export type MatchOptions = {
    * instead of by place value and the mode's text rule.
    */
   caret?: number;
+  /**
+   * Where the value is pinned as its length changes: 0 its start, 1 its end,
+   * 0.5 its middle (centred). A roll run's travel is measured on screen,
+   * against that, not along the text (Scritto's anchor).
+   */
+  anchor?: number;
 };
 
 type NumberToken = { start: number; end: number };
@@ -284,7 +290,11 @@ export function parseNumber(glyphs: string[], decimal: string): number {
 }
 
 /** Keep the shared start and end. Returns [newIndex, oldIndex] pairs. */
-function matchEnds(old: string[], next: string[]): [number, number][] {
+function matchEnds(
+  old: string[],
+  next: string[],
+  anchor: number,
+): [number, number][] {
   const pairs: [number, number][] = [];
   let start = 0;
   while (
@@ -313,6 +323,7 @@ function matchEnds(old: string[], next: string[]): [number, number][] {
   const run = floatingRun(
     old.slice(start, old.length - end),
     next.slice(start, next.length - end),
+    anchor,
   );
   if (run) {
     for (let k = 0; k < run.length; k++) {
@@ -325,11 +336,20 @@ function matchEnds(old: string[], next: string[]): [number, number][] {
 const MIN_RUN = 2;
 const RUN_SLACK = 2;
 
-/** The longest shared run within its travel cap; the shorter trip on ties. */
+/**
+ * The longest shared run within its travel cap; the shorter trip on ties.
+ * Travel is how far it moves on screen: in centred or end-pinned text the
+ * value grows or shrinks about that point, so a run shifted along the text
+ * by the change in length (or half of it) holds still.
+ */
 function floatingRun(
   old: string[],
   next: string[],
+  anchor: number,
 ): { from: number; to: number; length: number } | null {
+  const grown = next.length - old.length;
+  const travelOf = (from: number, to: number): number =>
+    Math.abs(to - from - anchor * grown);
   let best: { from: number; to: number; length: number } | null = null;
   // lengths[j]: the shared run ending at old[i - 1] and next[j - 1].
   let previous = new Array<number>(next.length + 1).fill(0);
@@ -341,12 +361,12 @@ function floatingRun(
       lengths[j] = length;
       const from = i - length;
       const to = j - length;
-      const travel = Math.abs(to - from);
+      const travel = travelOf(from, to);
       if (length < MIN_RUN || travel > length + RUN_SLACK) continue;
       if (
         !best ||
         length > best.length ||
-        (length === best.length && travel < Math.abs(best.to - best.from))
+        (length === best.length && travel < travelOf(best.from, best.to))
       ) {
         best = { from, to, length };
       }
@@ -649,11 +669,15 @@ export function matchText(
   // version) keeps its letters in order, as torph does: a digit reused from
   // another column would read as the time running backwards.
   const hasDigits = options.numbers && [...old, ...next].some(isDigit);
-  const match = mode === "roll" ? matchEnds : hasDigits ? lcs : matchAnywhere;
-  for (const [to, from] of match(
-    oldText.map((i) => old[i]),
-    nextText.map((i) => next[i]),
-  )) {
+  const oldTexts = oldText.map((i) => old[i]);
+  const nextTexts = nextText.map((i) => next[i]);
+  const pairs =
+    mode === "roll"
+      ? matchEnds(oldTexts, nextTexts, options.anchor ?? 0)
+      : hasDigits
+        ? lcs(oldTexts, nextTexts)
+        : matchAnywhere(oldTexts, nextTexts);
+  for (const [to, from] of pairs) {
     kept[nextText[to]] = oldText[from];
   }
 

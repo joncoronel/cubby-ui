@@ -239,7 +239,8 @@ const feedback = faster(MODE_DEFAULTS.morph, 0.5); // 200ms of motion
 - **Defaults.** `morph` uses [torph](https://github.com/lochie/torph)'s timing and scale; `roll` uses [Scritto](https://github.com/JaceThings/Scritto)'s spring, travel, tilt and blur.
 - **Off screen.** A change to a label that isn't on screen at that moment swaps instantly.
 - **Width.** A change that stays on one line eases the box to its new width, so text after an inline `TextMorph` slides instead of jumping. A change that wraps keeps the lines as they fall, without the width animation or the edge fade.
+- **Height.** Inline, the label's height is its lines', so gaining or losing a line changes it at once. Give it `className="block"` (it's a box already inside a flex or grid container) and a change of line count eases its height too, so the card or paragraph around it grows and shrinks smoothly. For `inline-block`, add `align-top`: aligned on its last line's baseline, an inline-block stretches its line to the new height at once as it grows.
 - **Languages.** Right-to-left text works, and a label reads in its own direction inside text of the other. A word in a script whose letters join (Arabic, Persian, Urdu and others) animates as a whole word so it stays correctly joined; other text animates letter by letter. Numbers in any script's digits match by place value.
-- **Line breaks.** A `\n` in the value starts a new line.
+- **Spaces.** Spaces show as typed: a run of them isn't collapsed to one, and a `\n` in the value starts a new line.
 - **Empty values.** An empty value keeps its line's height, so the text around it doesn't jump.
 - **No spaces, no wrapping.** A value without spaces (a long number, a URL) can't break, so it runs past a narrow container, like any unbroken word.

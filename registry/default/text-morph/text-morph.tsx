@@ -73,8 +73,7 @@ function glyphsHtml(text: string): string {
     if (isSpace(glyph)) {
       if (word) html += `<span data-word>${word}</span>`;
       word = "";
-      const kind = glyph === "\n" ? "data-space data-break" : "data-space";
-      html += `<span data-glyph ${kind}>${escapeHtml(glyph)}</span>`;
+      html += `<span data-glyph data-space>${escapeHtml(glyph)}</span>`;
     } else {
       word += `<span data-glyph>${escapeHtml(glyph)}</span>`;
     }
@@ -87,7 +86,6 @@ function createGlyph(text: string): HTMLSpanElement {
   const span = document.createElement("span");
   span.setAttribute("data-glyph", "");
   if (isSpace(text)) span.setAttribute("data-space", "");
-  if (text === "\n") span.setAttribute("data-break", "");
   span.textContent = text;
   return span;
 }
@@ -382,6 +380,31 @@ function inkEscapes(root: HTMLElement, side: Side, inkEdge: number): boolean {
   return false;
 }
 
+/**
+ * How many lines an inline element's text runs over: rows, not the
+ * fragments `getClientRects` reports (a line can come back in pieces, split
+ * around a space or a line break).
+ */
+function lineCount(el: HTMLElement): number {
+  const tops: number[] = [];
+  for (const rect of el.getClientRects()) {
+    if (!tops.some((top) => Math.abs(top - rect.top) < 1)) tops.push(rect.top);
+  }
+  return tops.length;
+}
+
+/** The height to set to make an element this tall, by its box-sizing. */
+function heightOf(style: CSSStyleDeclaration, rect: DOMRect): number {
+  if (style.boxSizing === "border-box") return rect.height;
+  return (
+    rect.height -
+    parseFloat(style.paddingTop) -
+    parseFloat(style.paddingBottom) -
+    parseFloat(style.borderTopWidth) -
+    parseFloat(style.borderBottomWidth)
+  );
+}
+
 const px = (el: HTMLElement, name: string): number =>
   parseFloat(el.style.getPropertyValue(name)) || 0;
 
@@ -485,8 +508,14 @@ function* morphTo(
   const reduced = play === "reduced";
   const o = reduced ? stillOptions(options) : options;
   const rootBefore = root.getBoundingClientRect();
-  const startBefore = parseFloat(getComputedStyle(root).marginInlineStart) || 0;
-  const linesBefore = root.getClientRects().length;
+  const styleBefore = getComputedStyle(root);
+  const startBefore = parseFloat(styleBefore.marginInlineStart) || 0;
+  const linesBefore = lineCount(glyphLayer);
+  // A label laid out as a box (a block, an inline-block, a flex item) can
+  // take a height, so a change that adds or removes a line eases it, as
+  // torph's inline-block root does. An inline label's height is its lines'.
+  const boxed = styleBefore.display !== "inline";
+  const heightBefore = heightOf(styleBefore, rootBefore);
   const originBefore = ghostAnchor.getBoundingClientRect();
   const before = new Map(old.map((node) => [node, visualState(node)]));
   // Ghosts still leaving; ones already gone are cleared in step 4.
@@ -594,11 +623,15 @@ function* morphTo(
   // wraps keeps its lines as they fall. An empty value has no line box at
   // all; it counts as one line.
   // `box` below means that: the label's space eases as one box.
-  const oneLine = root.getClientRects().length <= 1;
+  const oneLine = lineCount(glyphLayer) <= 1;
   const box = !reduced && linesBefore <= 1 && oneLine;
   // And the rest of the final layout, with the start margin the author set.
   const rootAfter = root.getBoundingClientRect();
-  const startAfter = parseFloat(getComputedStyle(root).marginInlineStart) || 0;
+  const styleAfter = getComputedStyle(root);
+  const startAfter = parseFloat(styleAfter.marginInlineStart) || 0;
+  const heightAfter = heightOf(styleAfter, rootAfter);
+  const reheights =
+    boxed && !reduced && Math.abs(heightAfter - heightBefore) > 0.5;
   const origin = ghostAnchor.getBoundingClientRect();
   // Reading direction, for the stagger's sweep.
   const rtl = getComputedStyle(glyphLayer).direction === "rtl";
@@ -877,18 +910,22 @@ function* morphTo(
 
   // 6. Write: the label at the start of its resize.
   const authorStart = root.style.marginInlineStart;
+  const authorHeight = root.style.height;
   if (resizes) root.style.marginInlineStart = `${startAfter + from}px`;
+  if (reheights) root.style.height = `${heightBefore}px`;
   yield;
 
   // 7. Read: where the label begins there, which the stage rides against.
   // Read even when it doesn't resize: a neighbour changing in the same
   // update may be easing its own space, which moves this label too.
-  const rootAt0 = oneLine ? root.getBoundingClientRect() : rootAfter;
+  const rootAt0 =
+    oneLine || reheights ? root.getBoundingClientRect() : rootAfter;
   yield;
 
   // 8. Write: everything else, attributes and styles only. Nothing below
   // reads layout or changes the DOM's structure.
   root.style.marginInlineStart = authorStart;
+  root.style.height = authorHeight;
   glyphLayer.dataset.playing = "";
   // Reclaimed ghosts take their new glyph's place, which measured the same.
   for (const { index, slot, node } of reclaimed) {
@@ -954,16 +991,31 @@ function* morphTo(
     ease.finished.then(release, release);
   }
 
-  // The label's start moves while space eases (its own margin, a centred or
-  // pinned container around it, or a neighbour changing in the same update
-  // easing its space); ride the other way on the width's curve, so the
-  // glyphs and ghosts hold the final places they were measured at.
-  const ride = rootAfter.left - rootAt0.left;
-  if (Math.abs(ride) > 0.5) {
-    run(stage, [{ left: `${ride}px` }, { left: "0px" }], {
-      duration: o.width.duration,
-      easing: o.width.easing,
-    });
+  // A box's height eases the same way, from what it was to what its new
+  // lines take; the value's lines are laid out as they end up throughout.
+  if (reheights) {
+    run(
+      root,
+      [{ height: `${heightBefore}px` }, { height: `${heightAfter}px` }],
+      { duration: o.width.duration, easing: o.width.easing },
+    );
+  }
+
+  // The label moves while space eases (its own margin or height, a centred
+  // or pinned container around it, or a neighbour changing in the same
+  // update easing its space); ride the other way on the width's curve, so
+  // the glyphs and ghosts hold the final places they were measured at.
+  const rideX = rootAfter.left - rootAt0.left;
+  const rideY = rootAfter.top - rootAt0.top;
+  if (Math.abs(rideX) > 0.5 || Math.abs(rideY) > 0.5) {
+    run(
+      stage,
+      [
+        { left: `${rideX}px`, top: `${rideY}px` },
+        { left: "0px", top: "0px" },
+      ],
+      { duration: o.width.duration, easing: o.width.easing },
+    );
   }
 
   const motion = { duration: o.motion.duration, easing: o.motion.easing };

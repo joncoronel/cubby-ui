@@ -172,11 +172,13 @@ export function CaseStage({
           event.preventDefault();
           onAdvance();
         }}
-        // Centred in room for the case's lines, as torph's stage is: a value
-        // with fewer lines sits in the middle, and the label grows and
-        // shrinks about it.
-        className="border-border/70 hover:bg-muted/40 focus-visible:ring-ring/50 flex cursor-pointer items-center rounded-xl border px-8 py-16 text-4xl leading-tight font-medium transition-colors outline-none select-none focus-visible:ring-2"
-        style={{ minHeight: `calc(${(c.minLines ?? 1) * 1.25}em + 8rem)` }}
+        // Centred in room for two lines, as torph's stage is (176px): one
+        // or two lines hold the card's size, and a third grows it, easing as
+        // the label's height does.
+        className="border-border/70 hover:bg-muted/40 focus-visible:ring-ring/50 flex cursor-pointer items-center rounded-xl border px-8 py-10 text-4xl leading-tight font-medium transition-colors outline-none select-none focus-visible:ring-2"
+        style={{
+          minHeight: "calc(2 * 1.25em + 5rem)",
+        }}
       >
         <div
           className={cn(
@@ -188,6 +190,11 @@ export function CaseStage({
           <TextMorph
             // A new case starts fresh rather than morphing from the last.
             key={c.label}
+            // A box, as torph's root is, so a change of line count eases its
+            // height rather than jumping; top-aligned (torph's too), or an
+            // inline-block's last-line baseline would stretch its line to
+            // the new height at once while it grows.
+            className="inline-block align-top"
             value={value}
             options={options}
             locale={c.locale}

@@ -11,11 +11,19 @@
     transparent
   );
   position: relative;
-  /* It flows like the text around it, wrapping between words where the
-     context lets text wrap, and never changes display: switching between
-     inline and inline-block repaints the text snapped differently. */
-  display: inline;
-  vertical-align: baseline;
+}
+
+/* It flows like the text around it, wrapping between words where the
+   context lets text wrap, and never changes display: switching between
+   inline and inline-block repaints the text snapped differently. In a
+   layer, so a class can make it a box instead (`block`, `inline-block`),
+   which eases its height when its line count changes; the rest stays
+   unlayered, so page styles for spans can't reach the glyphs. */
+@layer components {
+  .text-morph {
+    display: inline;
+    vertical-align: baseline;
+  }
 }
 
 /* While a one-line change eases the label's space, it stays on one line.
@@ -67,9 +75,18 @@
   content: "\200B";
 }
 
-/* A line break in the value breaks the line. */
-.text-morph [data-break] {
-  white-space: pre;
+/* Spaces show as typed (torph does the same): a run of them isn't
+   collapsed to one, and a line break in the value breaks the line. Only
+   collapsing changes; wrapping is inherited, so a label easing its width
+   still holds one line. */
+.text-morph [data-space] {
+  white-space: pre-wrap;
+}
+@supports (white-space-collapse: preserve) {
+  .text-morph [data-space] {
+    white-space: inherit;
+    white-space-collapse: preserve;
+  }
 }
 
 /* A word never breaks; lines break at the spaces between words. */

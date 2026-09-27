@@ -33,9 +33,11 @@ import {
   ExampleNav,
   VIEWS,
   caseOf,
+  isDemo,
   type Align,
   type View,
 } from "./torph-playground";
+import { TorphDemo } from "./torph-demos";
 
 const PANEL_ID = "text-morph";
 /** Remembers the example shown, per browser (a convenience only). */
@@ -410,7 +412,22 @@ export default function TextMorphTune(): React.ReactElement {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 p-8 pb-32 lg:pr-80 lg:pl-72">
       <ExampleNav view={view} onSelect={select} />
-      {shownCase ? (
+      {isDemo(view) ? (
+        <div data-tune-scope className="w-full max-w-3xl">
+          <TorphDemo
+            // Each demo starts from its own first state.
+            key={view}
+            view={view}
+            options={ambient}
+            align={align ?? "left"}
+            onAlign={setAlign}
+            tabular={tabular ?? false}
+            onTabular={setTabular}
+            tick={caseStep}
+            duration={longestMs}
+          />
+        </div>
+      ) : shownCase ? (
         <div data-tune-scope className="w-full max-w-3xl">
           <CaseStage
             c={shownCase}

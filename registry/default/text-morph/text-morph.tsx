@@ -755,13 +755,36 @@ function* morphTo(
   const letter = nodes.findIndex((node) => !spaceNode(node));
   const line = letter === -1 ? em * 1.2 : after[letter].height;
 
+  // Which way glyphs roll (`trend`, read off the value when `auto`): a rise
+  // brings new glyphs up from below and sends old ones up and away. Morph's
+  // `down` is torph's: digits fall in from above and leave downward while a
+  // number's other marks arrive from below, so each reads as its own event.
+  const rise = match.trend === 1;
+  const marksRise = o.mode === "morph" && o.trend === "down";
+  const arriveFor = (glyph: string): 1 | -1 =>
+    rise || (marksRise && !isDigit(glyph)) ? 1 : -1;
+  const away = rise ? -1 : 1;
+
   // A new glyph whose text is still leaving from where it lands (a quick
   // 5 -> 6 -> 5) takes that ghost back rather than crossing it: the ghost
   // turns around from wherever it's drawn, like a kept glyph. Where a ghost
   // sat in the layout is its slot's place, which holds still on screen.
+  // Only a ghost on the side new glyphs arrive from turns around: in roll,
+  // 5 -> 6 -> 5 sent the old 5 up and brings the new one down from above,
+  // so it comes back the way arrivals do; in morph, digits always fall, and
+  // bringing a falling ghost back up ran against the flow (sweeping a chart
+  // reversed 19 digits mid-fall, torph none).
   const reclaimed: { index: number; slot: HTMLElement; node: HTMLElement }[] =
     [];
   const claimed = new Set<HTMLElement>();
+  const comesBackWithArrivals = (
+    drawn: DOMRect,
+    target: DOMRect,
+    glyph: string,
+  ): boolean => {
+    const dy = centreDelta(drawn, target)[1];
+    return Math.abs(dy) <= 1 || Math.sign(dy) === arriveFor(glyph);
+  };
   nodes.forEach((node, i) => {
     if (kept[i] || spaceNode(node)) return;
     const target = after[i];
@@ -777,7 +800,8 @@ function* morphTo(
         // a neighbour, toward a pinned edge) keeps leaving under the edge
         // fade, since the live glyphs have none to hide it on its way back.
         g.drawn.rect.left >= rootAfter.left - 0.5 &&
-        g.drawn.rect.right <= rootAfter.right + 0.5,
+        g.drawn.rect.right <= rootAfter.right + 0.5 &&
+        comesBackWithArrivals(g.drawn.rect, target, next[i]),
     );
     if (!ghost) return;
     claimed.add(ghost.slot);
@@ -1057,15 +1081,6 @@ function* morphTo(
     node.parentElement?.style.setProperty("--reach", `${px}px`);
   }
 
-  // Which way glyphs roll (`trend`, read off the value when `auto`): a rise
-  // brings new glyphs up from below and sends old ones up and away. Morph's
-  // `down` is torph's: digits fall in from above and leave downward while a
-  // number's other marks arrive from below, so each reads as its own event.
-  const rise = match.trend === 1;
-  const marksRise = o.mode === "morph" && o.trend === "down";
-  const arriveFor = (glyph: string): 1 | -1 =>
-    rise || (marksRise && !isDigit(glyph)) ? 1 : -1;
-  const away = rise ? -1 : 1;
   // A glyph travelling to another line rolls the way it travels instead,
   // so a number that moves up scrolls up as it changes: rolling against
   // its trip, it would hold still on screen while its slot slid past.
@@ -1222,11 +1237,16 @@ function* morphTo(
           : motion,
       );
     }
-    // Mid-fade (or mid-blur, from an earlier change) it finishes coming in.
+    // Mid-fade (or mid-blur, from an earlier change) it finishes coming in,
+    // at the pace it was going: over what's left of the fade, not a fresh
+    // one. Restarting the whole fade on every change left a run of quick
+    // ones (a held key) playing only its opening sliver, so letters crawled
+    // in over most of a second (torph snaps them to full instead).
     const blurred = was.filter !== "blur(0px)" ? was.filter : null;
     if (was.opacity < 0.999 || blurred !== null) {
+      const left = Math.max(1 - was.opacity, blurred !== null ? 0.25 : 0);
       run(node, [fade(was.opacity, blurred), fade(1, sharp(blurred))], {
-        duration: fadeIn.duration,
+        duration: fadeIn.duration * left,
         easing: fadeIn.easing,
       });
     }

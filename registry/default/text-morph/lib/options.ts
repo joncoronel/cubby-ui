@@ -168,8 +168,13 @@ export function resolveOptions(
  * The same look on a shorter clock: every duration, delay and stagger scaled
  * by `factor`. For labels that answer a click (the docs use 209ms of motion)
  * or mirror typing, where the mode's full timing would lag behind the input.
+ * Takes full options or any overrides (`faster({ mode: "roll" }, 0.5)`).
  */
-export function faster(o: TextMorphOptions, factor: number): TextMorphOptions {
+export function faster(
+  options: TextMorphOverrides,
+  factor: number,
+): TextMorphOptions {
+  const o = resolveOptions(options);
   const t = (timing: Timing): Timing => ({
     ...timing,
     duration: Math.round(timing.duration * factor),

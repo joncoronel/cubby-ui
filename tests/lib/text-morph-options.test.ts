@@ -67,4 +67,14 @@ describe("faster", () => {
       delay: 50,
     });
   });
+
+  it("takes overrides, filled in from their mode", () => {
+    expect(faster({ mode: "roll" }, 0.5)).toEqual(
+      faster(MODE_DEFAULTS.roll, 0.5),
+    );
+    expect(faster({ stagger: { ms: 100 } }, 0.5).stagger).toEqual({
+      mode: MODE_DEFAULTS.morph.stagger.mode,
+      ms: 50,
+    });
+  });
 });

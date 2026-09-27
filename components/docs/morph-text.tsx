@@ -45,14 +45,14 @@ export function MorphText({
   className,
   truncate = false,
   feedback = false,
-  disabled = false,
+  disableAnimation = false,
 }: {
   children: string;
   className?: string;
   truncate?: boolean;
   feedback?: boolean;
   /** Swap without animating (a change the reader didn't cause). */
-  disabled?: boolean;
+  disableAnimation?: boolean;
 }) {
   const clipRef = React.useRef<HTMLSpanElement>(null);
   const [overflowing, setOverflowing] = React.useState(false);
@@ -81,7 +81,7 @@ export function MorphText({
     <TextMorph
       value={children}
       options={options}
-      disabled={disabled}
+      disableAnimation={disableAnimation}
       className={truncate ? undefined : className}
     />
   );

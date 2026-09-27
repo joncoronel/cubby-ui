@@ -75,7 +75,7 @@ export function CommandMorph({
         {parts.map((part, i) => (
           <span key={i} style={{ color: TONES[part.tone] }}>
             {part.morph ? (
-              <MorphText feedback disabled={!animate}>
+              <MorphText feedback disableAnimation={!animate}>
                 {part.text}
               </MorphText>
             ) : (

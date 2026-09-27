@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import {
   caretUnits,
   decimalFor,
+  isBreak,
   isDigit,
   matchText,
   textUnits,
@@ -61,16 +62,12 @@ function escapeHtml(text: string): string {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;");
 }
 
-/** Spaces are where lines may break; everything else sits in a word. */
-const isSpace = (glyph: string): boolean =>
-  glyph === " " || glyph === "\t" || glyph === "\n";
-
 /** Server markup: words of glyphs, with spaces between them. */
 function glyphsHtml(text: string): string {
   let html = "";
   let word = "";
   for (const glyph of textUnits(text)) {
-    if (isSpace(glyph)) {
+    if (isBreak(glyph)) {
       if (word) html += `<span data-word>${word}</span>`;
       word = "";
       html += `<span data-glyph data-space>${escapeHtml(glyph)}</span>`;
@@ -85,7 +82,7 @@ function glyphsHtml(text: string): string {
 function createGlyph(text: string): HTMLSpanElement {
   const span = document.createElement("span");
   span.setAttribute("data-glyph", "");
-  if (isSpace(text)) span.setAttribute("data-space", "");
+  if (isBreak(text)) span.setAttribute("data-space", "");
   span.textContent = text;
   return span;
 }
@@ -295,14 +292,20 @@ const HOME: Keyframe = { translate: "0 0", scale: "1", rotate: "0deg" };
 /**
  * How a change plays: in full, as a crossfade only (the reader prefers
  * reduced motion: remove the movement, keep the change visible), or not at
- * all (disabled, or nobody can see it).
+ * all (disableAnimation, or nobody can see it).
  */
 type Playback = "full" | "reduced" | "none";
 
-/** The options with nothing that moves, scales, tilts or blurs. */
+/**
+ * The options with nothing that moves, scales, tilts or blurs. New glyphs
+ * fade in straight away: morph's delay leaves a gap after the old ones have
+ * gone that its travel covers, and standing still in place it read as a
+ * blink rather than a crossfade.
+ */
 function stillOptions(o: TextMorphOptions): TextMorphOptions {
   return {
     ...o,
+    fadeIn: { ...o.fadeIn, delay: 0 },
     stagger: { ...o.stagger, ms: 0 },
     roll: { distance: 0, scale: 1, rotate: 0 },
     morph: { ...o.morph, scale: 1, digits: { ...o.morph.digits, distance: 0 } },
@@ -330,6 +333,9 @@ const clips = (style: CSSStyleDeclaration): boolean =>
  * view inside a scrolling panel swaps without animating.
  */
 function isOnScreen(el: HTMLElement): boolean {
+  // A background tab: animations there don't finish until it's shown, so
+  // every change would leave its ghosts piling up in the meantime.
+  if (document.visibilityState === "hidden") return false;
   if (el.checkVisibility && !el.checkVisibility()) return false;
   let top = 0;
   let left = 0;
@@ -359,8 +365,14 @@ const EDGE_SLACK = 0.4;
 const INK_MARGIN = 0.3;
 /** A ghost slot's room beside its glyph (em), for tilt, scale and blur. */
 const SLOT_PAD_X = 0.5;
-/** Its room above and below, which it fades across (em). */
+/**
+ * Its room above and below (em): roll's, and at least what morph's minimum
+ * slot height (1.4em, in the CSS) adds in a tight line height.
+ */
 const SLOT_PAD_Y = 0.3;
+const SLOT_MIN_HEIGHT = 1.4;
+/** A kept glyph whose top moves further than this (em) changes line. */
+const LINE_CHANGE = 0.3;
 
 type Side = "start" | "end";
 
@@ -472,28 +484,28 @@ function lineCount(el: HTMLElement): number {
   return tops.length;
 }
 
-/** The height to set to make an element this tall, by its box-sizing. */
-function heightOf(style: CSSStyleDeclaration, rect: DOMRect): number {
-  if (style.boxSizing === "border-box") return rect.height;
-  return (
-    rect.height -
-    parseFloat(style.paddingTop) -
-    parseFloat(style.paddingBottom) -
-    parseFloat(style.borderTopWidth) -
-    parseFloat(style.borderBottomWidth)
-  );
+type Axis = "width" | "height";
+
+/** A box's content width or height, from its rect: less padding and borders. */
+function contentSize(
+  style: CSSStyleDeclaration,
+  rect: DOMRect,
+  axis: Axis,
+): number {
+  const sides = axis === "width" ? ["left", "right"] : ["top", "bottom"];
+  let size = rect[axis];
+  for (const side of sides) {
+    size -= parseFloat(style.getPropertyValue(`padding-${side}`)) || 0;
+    size -= parseFloat(style.getPropertyValue(`border-${side}-width`)) || 0;
+  }
+  return size;
 }
 
-/** A box's width as its `width` property counts it, from its rect. */
-function widthOf(style: CSSStyleDeclaration, rect: DOMRect): number {
-  if (style.boxSizing === "border-box") return rect.width;
-  return (
-    rect.width -
-    parseFloat(style.paddingLeft) -
-    parseFloat(style.paddingRight) -
-    parseFloat(style.borderLeftWidth) -
-    parseFloat(style.borderRightWidth)
-  );
+/** The width or height to set to make a box this big, by its box-sizing. */
+function sizeOf(style: CSSStyleDeclaration, rect: DOMRect, axis: Axis): number {
+  return style.boxSizing === "border-box"
+    ? rect[axis]
+    : contentSize(style, rect, axis);
 }
 
 const px = (el: HTMLElement, name: string): number =>
@@ -627,7 +639,7 @@ function* morphTo(
   // take a height, so a change that adds or removes a line eases it, as
   // torph's inline-block root does. An inline label's height is its lines'.
   const boxed = styleBefore.display !== "inline";
-  const heightBefore = heightOf(styleBefore, rootBefore);
+  const heightBefore = sizeOf(styleBefore, rootBefore, "height");
   const originBefore = ghostAnchor.getBoundingClientRect();
   const before = new Map(old.map((node) => [node, visualState(node)]));
   // Ghosts still leaving; ones already gone are cleared in step 4.
@@ -768,7 +780,7 @@ function* morphTo(
   const glyphsAfter = glyphLayer.getBoundingClientRect();
   const styleAfter = getComputedStyle(root);
   const startAfter = parseFloat(styleAfter.marginInlineStart) || 0;
-  const heightAfter = heightOf(styleAfter, rootAfter);
+  const heightAfter = sizeOf(styleAfter, rootAfter, "height");
   const reheights =
     boxed && !reduced && Math.abs(heightAfter - heightBefore) > 0.5;
   const origin = ghostAnchor.getBoundingClientRect();
@@ -788,7 +800,7 @@ function* morphTo(
     const was = kept[i] ? before.get(node) : undefined;
     const home = keptHomes.get(node);
     if (!was || !home) return;
-    if (Math.abs(home.top - after[i].top) > SLOT_PAD_Y * em) {
+    if (Math.abs(home.top - after[i].top) > LINE_CHANGE * em) {
       changesLine.push(node);
       return;
     }
@@ -1027,19 +1039,13 @@ function* morphTo(
     ? rootBefore.width + (startBefore - startAfter) - rootAfter.width
     : 0;
   const resizes = Math.abs(from) > 0.5;
-  // A box eases its width, as torph's root does: its alignment inside holds
-  // the glyphs where they end up, so nothing has to ride against it. An
-  // inline label can't take a width, so it eases its start margin, and the
-  // stage rides against the move; in centred text those two, each rounded
-  // to layout units (1/64px) on its own, stepped the glyphs back and forth.
-  const widthAfter = widthOf(styleAfter, rootAfter);
+  // A box eases its width, as torph's root does, and the stage rides by a
+  // share of it in CSS (step 8). An inline label can't take a width, so it
+  // eases its start margin, and the stage rides against the move by the
+  // margin's exact value.
+  const widthAfter = sizeOf(styleAfter, rootAfter, "width");
   // What the stage's percentages count: the label's content box.
-  const contentAfter =
-    rootAfter.width -
-    parseFloat(styleAfter.paddingLeft) -
-    parseFloat(styleAfter.paddingRight) -
-    parseFloat(styleAfter.borderLeftWidth) -
-    parseFloat(styleAfter.borderRightWidth);
+  const contentAfter = contentSize(styleAfter, rootAfter, "width");
   const sizeFrom = boxed
     ? { width: `${widthAfter + from}px` }
     : { marginInlineStart: `${startAfter + from}px` };
@@ -1228,11 +1234,14 @@ function* morphTo(
             rollWith(arrivals.get(i), arriveFor(next[i])),
             line,
           );
-      run(node, [awayFrame, HOME], {
-        ...motion,
-        delay,
-        fill: "backwards",
-      });
+      // Under reduced motion it only fades in, where it lands.
+      if (!reduced) {
+        run(node, [awayFrame, HOME], {
+          ...motion,
+          delay,
+          fill: "backwards",
+        });
+      }
       const shift = arrivals.get(i);
       const slot = node.parentElement;
       if (shift && slot) {
@@ -1328,7 +1337,7 @@ function* morphTo(
   }
   const slack = EDGE_SLACK * em;
   const padX = SLOT_PAD_X * em;
-  const padY = SLOT_PAD_Y * em;
+  const padY = Math.max(SLOT_PAD_Y * em, (SLOT_MIN_HEIGHT * em - line) / 2);
   let minX = Infinity;
   let minY = Infinity;
   let maxX = -Infinity;
@@ -1496,7 +1505,7 @@ export type TextMorphProps = Omit<
   /** Fraction digits for a number `value`. */
   decimals?: number;
   /** Swap the text without animating. */
-  disabled?: boolean;
+  disableAnimation?: boolean;
   /**
    * When the reader prefers reduced motion, crossfade in place: nothing
    * travels, scales, tilts, blurs or resizes.
@@ -1509,7 +1518,7 @@ export type TextMorphProps = Omit<
   onAnimationStart?: () => void;
   /**
    * A change finished, every glyph and the box settled. Fires right away
-   * for a change that didn't animate (disabled, off screen). Each change
+   * for a change that didn't animate (`disableAnimation`, off screen). Each change
    * ends in exactly one of this and `onAnimationCancel`, unless the label
    * unmounts first.
    */
@@ -1526,26 +1535,35 @@ export type TextMorphProps = Omit<
   cursorIndex?: number;
 };
 
+/** One formatter per locale and decimals: making one is Intl's slow part. */
+const formatters = new Map<string, Intl.NumberFormat>();
+
 function formatValue(
   value: string | number,
   locale: string,
   decimals: number | undefined,
 ): string {
   if (typeof value === "string") return value;
-  return new Intl.NumberFormat(
-    locale,
-    decimals === undefined
-      ? undefined
-      : { minimumFractionDigits: decimals, maximumFractionDigits: decimals },
-  ).format(value);
+  const key = `${locale}|${decimals ?? ""}`;
+  let formatter = formatters.get(key);
+  if (!formatter) {
+    formatter = new Intl.NumberFormat(
+      locale,
+      decimals === undefined
+        ? undefined
+        : { minimumFractionDigits: decimals, maximumFractionDigits: decimals },
+    );
+    formatters.set(key, formatter);
+  }
+  return formatter.format(value);
 }
 
-export function TextMorph({
+function TextMorph({
   value: rawValue,
   options,
   locale = "en",
   decimals,
-  disabled = false,
+  disableAnimation = false,
   respectReducedMotion = true,
   onAnimationStart,
   onAnimationComplete,
@@ -1567,7 +1585,7 @@ export function TextMorph({
   const resolved = resolveOptions(options);
   const latest = React.useRef({
     options: resolved,
-    disabled,
+    disableAnimation,
     respectReducedMotion,
     onAnimationStart,
     onAnimationComplete,
@@ -1577,7 +1595,7 @@ export function TextMorph({
   React.useLayoutEffect(() => {
     latest.current = {
       options: resolved,
-      disabled,
+      disableAnimation,
       respectReducedMotion,
       onAnimationStart,
       onAnimationComplete,
@@ -1586,18 +1604,21 @@ export function TextMorph({
     };
   });
 
-  // The change in flight, so the next one can cancel it.
-  const inFlight = React.useRef<(() => void) | null>(null);
-
-  // Unmounted, a change in flight ends without calling back.
-  const mounted = React.useRef(false);
-  React.useLayoutEffect(() => {
-    mounted.current = true;
-    return () => {
-      mounted.current = false;
+  // The change in flight: the next one cancels it. Unmounting, or an
+  // Activity or Suspense boundary hiding the label, silences it: it still
+  // settles, but calls nothing back (dropping it instead let a label shown
+  // again report it complete).
+  const inFlight = React.useRef<{
+    cancel: () => void;
+    silence: () => void;
+  } | null>(null);
+  React.useLayoutEffect(
+    () => () => {
+      inFlight.current?.silence();
       inFlight.current = null;
-    };
-  }, []);
+    },
+    [],
+  );
 
   React.useLayoutEffect(() => {
     const root = rootRef.current;
@@ -1615,7 +1636,7 @@ export function TextMorph({
     )
       return;
     shown.current = value;
-    inFlight.current?.();
+    inFlight.current?.cancel();
     inFlight.current = null;
 
     const current = latest.current;
@@ -1623,12 +1644,25 @@ export function TextMorph({
       current.respectReducedMotion &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let over = false;
-    const cancel = (): void => {
-      if (over || !mounted.current) return;
-      over = true;
-      latest.current.onAnimationCancel?.();
+    let silent = false;
+    const handle = {
+      cancel: (): void => {
+        if (over) return;
+        over = true;
+        if (!silent) latest.current.onAnimationCancel?.();
+      },
+      silence: (): void => {
+        silent = true;
+      },
     };
-    inFlight.current = cancel;
+    inFlight.current = handle;
+    const settle = (): void => {
+      if (over) return;
+      over = true;
+      if (inFlight.current === handle) inFlight.current = null;
+      delete glyphs.dataset.playing;
+      if (!silent) latest.current.onAnimationComplete?.();
+    };
     scheduleMorph({
       root,
       steps: morphTo(
@@ -1642,29 +1676,20 @@ export function TextMorph({
         { decimal: decimalFor(locale), caret: current.cursorIndex },
         // Read in the batch's first read phase, with the others.
         () =>
-          current.disabled || !isOnScreen(root)
+          current.disableAnimation || !isOnScreen(root)
             ? "none"
             : reduce
               ? "reduced"
               : "full",
       ),
       done: (started) => {
-        if (over || !mounted.current) return;
+        if (over) return;
         if (started.length === 0) {
-          delete glyphs.dataset.playing;
-          over = true;
-          if (inFlight.current === cancel) inFlight.current = null;
-          latest.current.onAnimationComplete?.();
+          settle();
           return;
         }
-        latest.current.onAnimationStart?.();
-        void Promise.allSettled(started.map((a) => a.finished)).then(() => {
-          if (over || !mounted.current) return;
-          over = true;
-          if (inFlight.current === cancel) inFlight.current = null;
-          delete glyphs.dataset.playing;
-          latest.current.onAnimationComplete?.();
-        });
+        if (!silent) latest.current.onAnimationStart?.();
+        void Promise.allSettled(started.map((a) => a.finished)).then(settle);
       },
     });
   }, [value, locale]);
@@ -1708,6 +1733,7 @@ export function TextMorph({
   });
 }
 
+export { TextMorph };
 export { faster, MODE_DEFAULTS } from "./lib/options";
 export type {
   TextMorphMode,

@@ -53,32 +53,54 @@ export type MatchOptions = {
 
 type NumberToken = { start: number; end: number };
 
-const graphemeSegmenter = new Intl.Segmenter(undefined, {
-  granularity: "grapheme",
-});
-const wordSegmenter = new Intl.Segmenter(undefined, { granularity: "word" });
-
-function graphemes(text: string): string[] {
-  return Array.from(graphemeSegmenter.segment(text), (s) => s.segment);
-}
+type Granularity = "grapheme" | "word";
 
 /**
- * A letter or mark from a script whose letters join (Arabic and the scripts
- * written with it, Syriac, N'Ko, Mongolian, ...). Their digits don't join,
- * so they're left out.
+ * Made on first use, and without Intl.Segmenter (Firefox before 125) left
+ * out: made when the module loaded, it threw there, taking down the whole
+ * bundle that imported it.
+ */
+const segmenters = new Map<Granularity, Intl.Segmenter | null>();
+
+/** Split into graphemes or words; by code point without Intl.Segmenter. */
+function segment(text: string, granularity: Granularity): string[] {
+  if (!segmenters.has(granularity)) {
+    segmenters.set(
+      granularity,
+      typeof Intl.Segmenter === "function"
+        ? new Intl.Segmenter(undefined, { granularity })
+        : null,
+    );
+  }
+  const segmenter = segmenters.get(granularity);
+  if (!segmenter) return Array.from(text);
+  return Array.from(segmenter.segment(text), (s) => s.segment);
+}
+
+const graphemes = (text: string): string[] => segment(text, "grapheme");
+
+/**
+ * A letter or mark from a script whose letters shape together: ones that
+ * join (Arabic and the scripts written with it, Syriac, N'Ko, Mongolian,
+ * ...) and ones that stack or fuse consonants into conjuncts (Devanagari and
+ * the other Indic scripts, Sinhala, Tibetan, Thai, Lao, Khmer, Myanmar).
+ * Each glyph is its own box, shaped alone, so a conjunct split across two
+ * showed a loose virama or subscript. Their digits don't shape together, so
+ * they're left out.
  */
 const JOINING =
-  /(?=[\p{L}\p{M}])[\p{Script=Arabic}\p{Script=Syriac}\p{Script=Nko}\p{Script=Mongolian}\p{Script=Mandaic}\p{Script=Adlam}\p{Script=Hanifi_Rohingya}\p{Script=Thaana}]/u;
+  /(?=[\p{L}\p{M}])[\p{Script=Arabic}\p{Script=Syriac}\p{Script=Nko}\p{Script=Mongolian}\p{Script=Mandaic}\p{Script=Adlam}\p{Script=Hanifi_Rohingya}\p{Script=Thaana}\p{Script=Devanagari}\p{Script=Bengali}\p{Script=Gurmukhi}\p{Script=Gujarati}\p{Script=Oriya}\p{Script=Tamil}\p{Script=Telugu}\p{Script=Kannada}\p{Script=Malayalam}\p{Script=Sinhala}\p{Script=Tibetan}\p{Script=Thai}\p{Script=Lao}\p{Script=Khmer}\p{Script=Myanmar}]/u;
 
 /**
  * The units a value animates in: one per grapheme, except that a word
- * written in a joining script stays whole. Its letters take their joined
- * forms only when drawn together, so splitting it would render each in its
- * isolated form. Everything else, digits included, is still per grapheme.
+ * written in a script whose letters shape together stays whole. Its letters
+ * take their joined or stacked forms only when drawn together, so splitting
+ * it would render each alone. Everything else, digits included, is still
+ * per grapheme.
  */
 export function textUnits(text: string): string[] {
   if (!JOINING.test(text)) return graphemes(text);
-  const words = Array.from(wordSegmenter.segment(text), (s) => s.segment);
+  const words = segment(text, "word");
   return words.flatMap((word) =>
     JOINING.test(word) ? [word] : graphemes(word),
   );
@@ -117,7 +139,9 @@ const PREFIX = SIGN + "(#" + PERCENT;
 /** Marks a number may close with, besides a currency symbol. */
 const SUFFIX = PERCENT + ".,!?:;)\"'\u201D\u2019";
 
-const isBreak = (g: string): boolean => g === " " || g === "\t" || g === "\n";
+/** A space, tab or line break: where words and lines may break. */
+export const isBreak = (g: string): boolean =>
+  g === " " || g === "\t" || g === "\n";
 
 /**
  * Numbers in a grapheme list. A number is a whole word (torph's rule):
@@ -379,7 +403,11 @@ function floatingRun(
 /** Match each glyph to the first unused old copy of it, in order. */
 function matchAnywhere(old: string[], next: string[]): [number, number][] {
   const pool = new Map<string, number[]>();
-  old.forEach((glyph, i) => pool.set(glyph, [...(pool.get(glyph) ?? []), i]));
+  old.forEach((glyph, i) => {
+    const at = pool.get(glyph);
+    if (at) at.push(i);
+    else pool.set(glyph, [i]);
+  });
   const pairs: [number, number][] = [];
   next.forEach((glyph, i) => {
     const from = pool.get(glyph)?.shift();
@@ -434,7 +462,7 @@ function wordsOf(glyphs: string[], kinds: GlyphKind[]): Word[] {
   const words: Word[] = [];
   let word: Word | null = null;
   glyphs.forEach((glyph, i) => {
-    if (glyph === " " || glyph === "\t" || glyph === "\n") {
+    if (isBreak(glyph)) {
       word = null;
       return;
     }
@@ -643,7 +671,12 @@ export function matchText(
     if (trend === 0) {
       const before = parseNumber(aGlyphs, options.decimal);
       const after = parseNumber(bGlyphs, options.decimal);
-      if (after !== before) trend = after > before ? 1 : -1;
+      // Not a number it can read (`1.2.3`, `192.168.0.1`) has no direction:
+      // NaN compares unequal to itself and never greater, so it read as a
+      // fall and held there.
+      if (!Number.isNaN(before) && !Number.isNaN(after) && after !== before) {
+        trend = after > before ? 1 : -1;
+      }
     }
   }
 

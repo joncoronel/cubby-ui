@@ -200,6 +200,16 @@ describe("matchText", () => {
     const forced = { ...OPTIONS, trend: -1 as const };
     expect(matchText("roll", chars("1"), chars("2"), forced).trend).toBe(-1);
   });
+
+  it("reads no direction off a number it can't parse", () => {
+    const trend = (a: string, b: string): number =>
+      matchText("roll", chars(a), chars(b), OPTIONS).trend;
+    // Unparseable: no direction, so it rolls up like text.
+    expect(trend("Build 1.2.3", "Build 1.2.4")).toBe(1);
+    // A real number after it still decides, either way.
+    expect(trend("192.168.0.1 of 5", "192.168.0.2 of 9")).toBe(1);
+    expect(trend("192.168.0.1 of 9", "192.168.0.2 of 5")).toBe(-1);
+  });
 });
 
 describe("matchText with a caret", () => {
@@ -274,6 +284,13 @@ describe("textUnits", () => {
 
   it("keeps Arabic-Indic digits as separate units", () => {
     expect(textUnits("١٬٢٠٤")).toEqual(["١", "٬", "٢", "٠", "٤"]);
+  });
+
+  it("keeps words whole in scripts that form conjuncts", () => {
+    // A split conjunct shows a loose virama or subscript.
+    expect(textUnits("क्षमा करें")).toEqual(["क्षमा", " ", "करें"]);
+    expect(textUnits("ស្រី")).toEqual(["ស្រី"]);
+    expect(textUnits("สวัสดี 12")).toEqual(["สวัสดี", " ", "1", "2"]);
   });
 });
 

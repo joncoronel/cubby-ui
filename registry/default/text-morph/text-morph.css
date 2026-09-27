@@ -138,7 +138,9 @@
 /* Glyphs keep their own compositing layer, animating or not. A glyph that
    drops back into ordinary painting when its animation ends is redrawn
    snapped to the pixel grid, often with different anti-aliasing: a visible
-   twitch just as it settles (torph does the same). */
+   twitch just as it settles (torph does the same). From first paint, not
+   from a glyph's first animation: outside a layer text draws with subpixel
+   anti-aliasing and inside one in greyscale, so a label mixed the two. */
 .text-morph [data-glyph]:not([data-space]) {
   display: inline-block;
   will-change: transform, opacity;

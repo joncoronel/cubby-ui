@@ -753,13 +753,23 @@ function* morphTo(
       (i) => homes.get(old[i]),
     );
   }
+  // A neighbour is one on the same line: in wrapped text the glyph before
+  // a line's first is at the end of the line above, and travelling with it
+  // would carry the glyph off the start of its own line (torph never wraps).
+  const sameLine = (a: DOMRect | undefined, b: DOMRect | undefined): boolean =>
+    a !== undefined && b !== undefined && Math.abs(a.top - b.top) < line / 2;
   // An arriving glyph starts where its neighbour starts; a shape swapped
   // as one doesn't travel.
   const arrivals = new Map<number, [number, number]>();
   nodes.forEach((node, i) => {
     const range = scope(match.nextKinds, i);
     if (!range || !isArriving(i) || shapes.get(node)?.group) return;
-    const shift = nearest(i, range, (j) => startsAt.get(j), false);
+    const shift = nearest(
+      i,
+      range,
+      (j) => (sameLine(after[j], after[i]) ? startsAt.get(j) : undefined),
+      false,
+    );
     if (shift && travels(shift)) arrivals.set(i, shift);
   });
   // A leaving glyph goes where its neighbour goes.
@@ -775,7 +785,10 @@ function* morphTo(
       range,
       (j) => {
         const to = newIndexOf.get(j);
-        return to === undefined ? undefined : startsAt.get(to);
+        if (to === undefined) return undefined;
+        return sameLine(keptHomes.get(old[j]), homes.get(node))
+          ? startsAt.get(to)
+          : undefined;
       },
       true,
     );

@@ -75,6 +75,7 @@ type DialPositions = {
   morphScale: number;
   digitDistance: number;
   blur: number;
+  trend: TextMorphOptions["trend"];
 };
 
 const DIAL_MODES: Record<TextMorphMode, DialPositions> = {
@@ -93,6 +94,7 @@ const DIAL_MODES: Record<TextMorphMode, DialPositions> = {
     morphScale: 0.6,
     digitDistance: 1,
     blur: 0.1,
+    trend: "auto",
   },
   morph: {
     mode: "morph",
@@ -109,6 +111,7 @@ const DIAL_MODES: Record<TextMorphMode, DialPositions> = {
     morphScale: 0.95,
     digitDistance: 1,
     blur: 0,
+    trend: "down",
   },
 };
 
@@ -144,15 +147,17 @@ const CONFIG = {
   },
   blur: [base.blur, 0, 0.4, 0.01],
   numbers: true,
-  trend: { type: "select", options: ["auto", "up", "down"], default: "auto" },
+  trend: {
+    type: "select",
+    options: ["auto", "up", "down"],
+    default: base.trend,
+  },
   edgeFade: {
     type: "select",
     options: ["auto", "always", "never"],
     default: "auto",
   },
 } satisfies DialConfig;
-
-const TRENDS = { auto: 0, up: 1, down: -1 } as const;
 
 /** Dial paths for DialStore.updateValues. */
 function dialUpdates(p: DialPositions): Record<string, DialValue> {
@@ -171,6 +176,7 @@ function dialUpdates(p: DialPositions): Record<string, DialValue> {
     "morph.scale": p.morphScale,
     "morph.digitDistance": p.digitDistance,
     blur: p.blur,
+    trend: p.trend,
   };
 }
 
@@ -373,7 +379,7 @@ export default function TextMorphTune(): React.ReactElement {
     },
     blur: v.blur,
     numbers: v.numbers,
-    trend: TRENDS[v.trend as keyof typeof TRENDS],
+    trend: v.trend as TextMorphOptions["trend"],
     edgeFade: v.edgeFade as TextMorphOptions["edgeFade"],
   };
 

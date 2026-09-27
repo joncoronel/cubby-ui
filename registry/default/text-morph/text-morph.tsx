@@ -513,7 +513,7 @@ function* morphTo(
     {
       numbers: o.numbers,
       decimal: place.decimal,
-      trend: o.trend,
+      trend: o.trend === "up" ? 1 : o.trend === "down" ? -1 : 0,
       caret:
         place.caret === undefined ? undefined : caretUnits(next, place.caret),
     },
@@ -870,15 +870,15 @@ function* morphTo(
     node.parentElement?.style.setProperty("--reach", `${px}px`);
   }
 
-  // Which way glyphs roll. Roll (Scritto) reads it off the value: a rise
-  // brings new glyphs up from below and sends old ones up and away. Morph
-  // (torph) doesn't: digits fall in from above and leave downward, and a
+  // Which way glyphs roll (`trend`, read off the value when `auto`): a rise
+  // brings new glyphs up from below and sends old ones up and away. Morph's
+  // `down` is torph's: digits fall in from above and leave downward while a
   // number's other marks arrive from below, so each reads as its own event.
-  // A trend set in the options applies in either mode.
-  const byValue = o.mode === "roll" || o.trend !== 0;
+  const rise = match.trend === 1;
+  const marksRise = o.mode === "morph" && o.trend === "down";
   const arriveFor = (glyph: string): 1 | -1 =>
-    byValue ? match.trend : isDigit(glyph) ? -1 : 1;
-  const away = byValue && match.trend === 1 ? -1 : 1;
+    rise || (marksRise && !isDigit(glyph)) ? 1 : -1;
+  const away = rise ? -1 : 1;
   // A glyph travelling to another line rolls the way it travels instead,
   // so a number that moves up scrolls up as it changes: rolling against
   // its trip, it would hold still on screen while its slot slid past.

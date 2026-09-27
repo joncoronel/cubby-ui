@@ -44,11 +44,14 @@ export type TextMorphOptions = {
    */
   numbers: boolean;
   /**
-   * Which way glyphs roll: 1 up (new ones arrive from below), -1 down, 0
-   * the mode's way: roll reads it off the value (a number that grew rolls
-   * up); morph drops digits in from above and out below, as torph does.
+   * Which way glyphs roll (Scritto's trend). `auto` reads it off the value:
+   * a number that grew brings new glyphs up from below, one that shrank
+   * brings them down, and anything else rolls up. `up` and `down` hold one
+   * way. Roll defaults to `auto`; morph to `down`, which is torph's: digits
+   * fall in from above and leave downward, and a number's other marks
+   * (separators, currency) arrive from below.
    */
-  trend: -1 | 0 | 1;
+  trend: "auto" | "up" | "down";
   /**
    * Fade old ink at an edge the box is shrinking away from. `auto` only
    * where it would land on something: a neighbour on the line, or the edge
@@ -89,7 +92,7 @@ const SCRITTO_OPTIONS: TextMorphOptions = {
   morph: { scale: 0.6, digits: TORPH_DIGITS },
   blur: 0.1,
   numbers: true,
-  trend: 0,
+  trend: "auto",
   edgeFade: "auto",
 };
 
@@ -110,7 +113,7 @@ const TORPH_OPTIONS: TextMorphOptions = {
   morph: { scale: 0.95, digits: TORPH_DIGITS },
   blur: 0,
   numbers: true,
-  trend: 0,
+  trend: "down",
   edgeFade: "auto",
 };
 

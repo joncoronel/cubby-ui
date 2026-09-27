@@ -43,6 +43,14 @@ describe("resolveOptions", () => {
   });
 });
 
+describe("trend", () => {
+  it("defaults to each library's own: auto for roll, down for morph", () => {
+    expect(resolveOptions({ mode: "roll" }).trend).toBe("auto");
+    expect(resolveOptions({ mode: "morph" }).trend).toBe("down");
+    expect(resolveOptions({ mode: "morph", trend: "auto" }).trend).toBe("auto");
+  });
+});
+
 describe("faster", () => {
   it("scales every duration, delay and stagger, keeping the look", () => {
     const o = faster(MODE_DEFAULTS.roll, 0.5);

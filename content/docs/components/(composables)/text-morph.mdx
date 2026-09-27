@@ -151,10 +151,15 @@ Screen readers get the value as plain text; the animated glyphs are hidden from 
   Match numbers by place value, so only the digits that changed animate.
 </ApiProp>
 
-<ApiProp name="trend" fullType="-1 | 0 | 1" defaultValue="0">
-  Which way glyphs roll: `1` up, `-1` down, `0` the mode's way. `roll` reads it
-  off the value, so a number that grew rolls up; `morph` drops digits in from
-  above and out below, as torph does.
+<ApiProp
+  name="trend"
+  fullType='"auto" | "up" | "down"'
+  defaultValue='"auto" (roll), "down" (morph)'
+>
+  Which way glyphs roll. `auto` reads it off the value, so a number that grew
+  rolls up and one that shrank rolls down; `up` and `down` hold one way. In
+  `morph`, `down` is torph's: digits fall in from above and out below, while
+  commas and currency symbols arrive from below.
 </ApiProp>
 
 <ApiProp

@@ -630,9 +630,8 @@ function* morphTo(
   // 5. Read: a change that stays on one line is animated as a box; one that
   // wraps keeps its lines as they fall. An empty value has no line box at
   // all; it counts as one line.
-  // `box` below means that: the label's space eases as one box.
   const oneLine = lineCount(glyphLayer) <= 1;
-  const box = !reduced && linesBefore <= 1 && oneLine;
+  const easesAsBox = !reduced && linesBefore <= 1 && oneLine;
   // And the rest of the final layout, with the start margin the author set.
   const rootAfter = root.getBoundingClientRect();
   const glyphsAfter = glyphLayer.getBoundingClientRect();
@@ -805,7 +804,9 @@ function* morphTo(
   // there only ink crossing it needs fading, and a band following the box
   // swept across letters still well inside (clearing a long value).
   const armed = (side: Side): false | "box" | number => {
-    if (!box || o.edgeFade === "never" || inkRects.length === 0) return false;
+    if (!easesAsBox || o.edgeFade === "never" || inkRects.length === 0) {
+      return false;
+    }
     if (wasArmed.includes(side)) return "box";
     const travels =
       side === "start"
@@ -834,7 +835,7 @@ function* morphTo(
   const armEnd = armed("end");
   // The space it takes eases from what it visibly took (its box plus any
   // start margin still easing) to its new width.
-  const from = box
+  const from = easesAsBox
     ? rootBefore.width + (startBefore - startAfter) - rootAfter.width
     : 0;
   const resizes = Math.abs(from) > 0.5;
@@ -878,8 +879,8 @@ function* morphTo(
   if (resizes) {
     const leftTravel = Math.abs(rootAfter.left - rootAt0.left);
     const rightTravel = Math.abs(rootAfter.right - rootAt0.right);
-    const rtl = styleAfter.direction === "rtl";
-    const startTravel = rtl ? rightTravel : leftTravel;
+    const rootRtl = styleAfter.direction === "rtl";
+    const startTravel = rootRtl ? rightTravel : leftTravel;
     const travel = leftTravel + rightTravel;
     if (travel > 0.5) anchors.set(root, startTravel / travel);
   }
@@ -902,8 +903,8 @@ function* morphTo(
     slot.style.setProperty("--trip-x", `${Math.ceil(Math.abs(dx))}px`);
     slot.style.setProperty("--trip-y", `${Math.ceil(Math.abs(dy))}px`);
   }
-  for (const [node, px] of reach) {
-    node.parentElement?.style.setProperty("--reach", `${px}px`);
+  for (const [node, room] of reach) {
+    node.parentElement?.style.setProperty("--reach", `${room}px`);
   }
 
   if (resizes) {
@@ -987,8 +988,8 @@ function* morphTo(
     filter === null ? { opacity } : { opacity, filter };
   const sharp = (filter: string | null): string | null =>
     filter === null ? null : "blur(0px)";
-  const lineStart = (rect: DOMRect, box: DOMRect): number =>
-    rtl ? box.right - rect.right : rect.left - box.left;
+  const lineStart = (rect: DOMRect, bounds: DOMRect): number =>
+    rtl ? bounds.right - rect.right : rect.left - bounds.left;
   const delays = staggerDelays(
     o,
     nodes.flatMap((node, i) =>
@@ -1161,7 +1162,8 @@ function* morphTo(
   // the width's curve, ending a little past it, or holds at the container's.
   if (fades) {
     const ramp = EDGE_RAMP * em;
-    const window = (start: number, end: number) => {
+    // The mask's band for a box spanning start..end (layer coordinates).
+    const maskAt = (start: number, end: number): Keyframe => {
       const left =
         armStart === false
           ? 0
@@ -1186,7 +1188,7 @@ function* morphTo(
         armEnd !== false ? `#000 calc(100% - ${ramp}px), transparent` : "#000"
       })`,
     );
-    run(ghostLayer, [window(boxStart, boxEnd), window(finalStart, finalEnd)], {
+    run(ghostLayer, [maskAt(boxStart, boxEnd), maskAt(finalStart, finalEnd)], {
       duration: o.width.duration,
       easing: o.width.easing,
       fill: "forwards",

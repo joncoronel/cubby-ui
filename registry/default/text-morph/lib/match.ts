@@ -589,6 +589,24 @@ export function matchText(
 
   // Numbers, paired in order, matched by place.
   let trend: 1 | -1 | 0 = options.trend;
+  // Matching treats a number without a partner as text (a `$` left behind
+  // by `$4` → `$` still matches), but its glyphs animate as a number's:
+  // the 4 rolls out rather than fading like a letter, as torph's does.
+  // A value that gains or loses a number, or changes none, reads as a rise.
+  const result = (): MatchResult => {
+    const asNumbers = (kinds: GlyphKind[], tokens: NumberToken[]) => {
+      const shown = [...kinds];
+      for (const { start, end } of tokens) shown.fill("number", start, end);
+      return shown;
+    };
+    return {
+      kept,
+      nextKinds: asNumbers(nextKinds, nextNumbers),
+      oldKinds: asNumbers(oldKinds, oldNumbers),
+      trend: trend === -1 ? -1 : 1,
+      byWords,
+    };
+  };
   for (let n = 0; n < paired; n++) {
     const a = oldNumbers[n];
     const b = nextNumbers[n];
@@ -614,13 +632,7 @@ export function matchText(
     for (const [to, from] of matchCaret(old, next, caret, options.decimal)) {
       kept[to] = from;
     }
-    return {
-      kept,
-      nextKinds,
-      oldKinds,
-      trend: trend === -1 ? -1 : 1,
-      byWords,
-    };
+    return result();
   }
 
   // Everything else, by the mode's text rule. Morph works by words once a
@@ -629,13 +641,7 @@ export function matchText(
     for (const [to, from] of matchWords(old, next, oldKinds, nextKinds)) {
       kept[to] = from;
     }
-    return {
-      kept,
-      nextKinds,
-      oldKinds,
-      trend: trend === -1 ? -1 : 1,
-      byWords,
-    };
+    return result();
   }
   const oldText = old.flatMap((_, i) => (oldKinds[i] === "text" ? [i] : []));
   const nextText = next.flatMap((_, i) => (nextKinds[i] === "text" ? [i] : []));
@@ -651,14 +657,7 @@ export function matchText(
     kept[nextText[to]] = oldText[from];
   }
 
-  // A value that gains or loses a number, or changes none, reads as a rise.
-  return {
-    kept,
-    nextKinds,
-    oldKinds,
-    trend: trend === -1 ? -1 : 1,
-    byWords,
-  };
+  return result();
 }
 
 /** The decimal separator for a locale. */

@@ -423,3 +423,15 @@ describe("findNumbers keeps words that aren't quantities as text", () => {
     expect(up.nextKinds.every((kind) => kind === "text")).toBe(true);
   });
 });
+
+describe("a number without a partner", () => {
+  it("still animates as a number, while its affix matches as text", () => {
+    // torph's "Emptying a number to its affix": $4 → $ → $4.
+    const emptied = matchText("morph", chars("$4"), chars("$"), OPTIONS);
+    expect(emptied.kept).toEqual([0]);
+    expect(emptied.oldKinds).toEqual(["number", "number"]);
+    const refilled = matchText("morph", chars("$"), chars("$4"), OPTIONS);
+    expect(refilled.kept).toEqual([0, -1]);
+    expect(refilled.nextKinds).toEqual(["number", "number"]);
+  });
+});

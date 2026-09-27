@@ -191,10 +191,11 @@ export function StageHeader({
 }
 
 /**
- * The card a value morphs in. Centred in room for two lines, as torph's
- * stage is (176px): one or two lines hold the card's size, and a third
- * grows it, easing as the label's height does. With `onAdvance` it's a
- * button that steps the screen.
+ * The card a value morphs in, sized and set as torph's playground stage
+ * is: 24px text on 36px lines, 176px tall (one or two lines hold its size, a
+ * third grows it, easing as the label's height does), and clipped at its
+ * sides (`overflow-x: clip`) while rolls stay free above and below. With
+ * `onAdvance` it's a button that steps the screen.
  */
 export function Stage({
   align,
@@ -208,7 +209,7 @@ export function Stage({
   children: React.ReactNode;
 }): React.ReactElement {
   const card =
-    "border-border/70 flex items-center rounded-xl border px-8 py-10 text-4xl leading-tight font-medium";
+    "border-border/70 flex min-h-44 items-center overflow-x-clip rounded-2xl border px-6 py-10 text-2xl leading-9 font-medium";
   const inner = (
     <div
       className={cn("w-full", ALIGN_CLASS[align], tabular && "tabular-nums")}
@@ -216,13 +217,9 @@ export function Stage({
       {children}
     </div>
   );
-  const style = { minHeight: "calc(2 * 1.25em + 5rem)" };
+
   if (!onAdvance) {
-    return (
-      <div className={card} style={style}>
-        {inner}
-      </div>
-    );
+    return <div className={card}>{inner}</div>;
   }
   return (
     <div
@@ -239,7 +236,6 @@ export function Stage({
         card,
         "hover:bg-muted/40 focus-visible:ring-ring/50 cursor-pointer transition-colors outline-none select-none focus-visible:ring-2",
       )}
-      style={style}
     >
       {inner}
     </div>

@@ -2,15 +2,28 @@
    glyph, the same markup the browser keeps, so these styles apply from first
    paint and nothing shifts on hydration. */
 
+/* A glyph's slot: how far it reaches above and below the glyph's box, and
+   how far it fades across. Roll (Scritto) fades across 0.3em of room past
+   the box, for its blur and tilt; morph (torph) fades 0.15em inside the
+   box itself, so a digit rolling in shows nothing until it enters its line
+   (with room past it, it showed faintly, whole, above the line). */
+.text-morph {
+  --text-morph-slot-y: 0.3em;
+  --text-morph-fade: 0.3em;
+  position: relative;
+}
+.text-morph[data-mode="morph"] {
+  --text-morph-slot-y: 0em;
+  --text-morph-fade: 0.15em;
+}
 .text-morph {
   --text-morph-fade-y: linear-gradient(
     to bottom,
     transparent,
-    #000 0.3em,
-    #000 calc(100% - 0.3em),
+    #000 var(--text-morph-fade),
+    #000 calc(100% - var(--text-morph-fade)),
     transparent
   );
-  position: relative;
 }
 
 /* It flows like the text around it, wrapping between words where the
@@ -28,9 +41,12 @@
 
 /* While a one-line change eases the label's space, it stays on one line.
    text-wrap-mode leaves spaces alone; nowrap (the fallback) would drop a
-   leading one. */
+   leading one. A box's text sits at its start meanwhile: the stage rides it
+   to where its alignment puts it, from the width as layout rounds it (both
+   rounded on their own, the text stepped back and forth). */
 .text-morph[data-sizing] {
   white-space: nowrap;
+  text-align: start;
 }
 @supports (text-wrap-mode: nowrap) {
   .text-morph[data-sizing] {
@@ -62,11 +78,27 @@
    its element, so a glyph moving to another line turns it off. */
 .text-morph-slot {
   display: inline-block;
-  padding: 0.3em calc(0.5em + var(--reach, 0px));
-  margin: -0.3em calc(-0.5em - var(--reach, 0px));
+  padding: var(--text-morph-slot-y) calc(0.5em + var(--reach, 0px));
+  margin: calc(-1 * var(--text-morph-slot-y)) calc(-0.5em - var(--reach, 0px));
 }
 .text-morph-glyphs[data-playing] .text-morph-slot:not([data-travel]) {
   mask-image: var(--text-morph-fade-y);
+}
+
+/* Where the browser can, the fade reaches sideways without end (torph's
+   slots do the same): it only ever cuts above and below, so a glyph sliding
+   or shrinking sideways out of its slot is never sliced. Elsewhere the slot's
+   room (--reach) and unmasking a shape's glyphs cover it. no-clip lifts
+   the cut above and below as well, showing a glyph rolling in whole and
+   unfaded past its slot, so a clip puts that edge back, reaching sideways
+   without end. */
+@supports (mask-clip: no-clip) {
+  .text-morph-glyphs[data-playing] .text-morph-slot:not([data-travel]),
+  .text-morph-ghost:not([data-travel]) {
+    mask-repeat: repeat-x;
+    mask-clip: no-clip;
+    clip-path: inset(0 -100vw);
+  }
 }
 
 /* An empty value still holds its line (torph does the same): with nothing
@@ -136,8 +168,13 @@
 .text-morph-ghost {
   position: absolute;
   left: calc(var(--x) - var(--ox, 0px) - 0.5em);
-  top: calc(var(--y) - var(--oy, 0px) - 0.3em);
-  padding: 0.3em 0.5em;
+  top: calc(var(--y) - var(--oy, 0px) - var(--text-morph-slot-y));
+  padding: var(--text-morph-slot-y) 0.5em;
   white-space: nowrap;
   mask-image: var(--text-morph-fade-y);
+}
+/* A ghost swapped as part of a shape slides toward the shape's centre as
+   it shrinks, out of its slot; it doesn't roll, so it goes unmasked. */
+.text-morph-ghost[data-travel] {
+  mask-image: none;
 }

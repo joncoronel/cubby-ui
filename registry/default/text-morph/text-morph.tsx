@@ -288,6 +288,8 @@ function fadesFor(
   }
   return { fadeIn: o.fadeIn, fadeOut: o.fadeOut };
 }
+/** Share of its fade a glyph interrupted mid-fade takes to finish. */
+const CATCH_UP = 0.25;
 const HOME: Keyframe = { translate: "0 0", scale: "1", rotate: "0deg" };
 
 /**
@@ -417,10 +419,15 @@ function visibleBounds(el: HTMLElement): { left: number; right: number } {
 /**
  * Whether old ink escaping the box on this side would land on something:
  * a neighbour on the line, or past the edge a reader sees holding the value
- * (a pill, a card, a clipping wrapper). With room around it, ink is left to
- * dissolve on its own opacity. Reads the final layout.
+ * (a pill, a card, a clipping wrapper), whose position it returns. With room
+ * around it, ink is left to dissolve on its own opacity. Reads the final
+ * layout.
  */
-function inkEscapes(root: HTMLElement, side: Side, inkEdge: number): boolean {
+function inkEscapes(
+  root: HTMLElement,
+  side: Side,
+  inkEdge: number,
+): false | "neighbour" | number {
   let el: Element = root;
   for (let depth = 0; depth < 8; depth++) {
     // `side` is physical (start: left, end: right); in right-to-left text
@@ -435,7 +442,7 @@ function inkEscapes(root: HTMLElement, side: Side, inkEdge: number): boolean {
         sibling instanceof Element
           ? sibling.getBoundingClientRect().width >= 1
           : Boolean(sibling.textContent?.trim());
-      if (visible) return true;
+      if (visible) return "neighbour";
       sibling = toRight ? sibling.nextSibling : sibling.previousSibling;
     }
     // Neighbours share the line up to the first block around it.
@@ -445,10 +452,11 @@ function inkEscapes(root: HTMLElement, side: Side, inkEdge: number): boolean {
     if (!display.startsWith("inline") && display !== "contents") break;
     el = parent;
   }
+  // Past the container's edge: the edge itself, where the fade belongs.
   const bounds = visibleBounds(root);
-  return side === "end"
-    ? inkEdge > bounds.right + 0.5
-    : inkEdge < bounds.left - 0.5;
+  if (side === "end")
+    return inkEdge > bounds.right + 0.5 ? bounds.right : false;
+  return inkEdge < bounds.left - 0.5 ? bounds.left : false;
 }
 
 /**
@@ -473,6 +481,18 @@ function heightOf(style: CSSStyleDeclaration, rect: DOMRect): number {
     parseFloat(style.paddingBottom) -
     parseFloat(style.borderTopWidth) -
     parseFloat(style.borderBottomWidth)
+  );
+}
+
+/** A box's width as its `width` property counts it, from its rect. */
+function widthOf(style: CSSStyleDeclaration, rect: DOMRect): number {
+  if (style.boxSizing === "border-box") return rect.width;
+  return (
+    rect.width -
+    parseFloat(style.paddingLeft) -
+    parseFloat(style.paddingRight) -
+    parseFloat(style.borderLeftWidth) -
+    parseFloat(style.borderRightWidth)
   );
 }
 
@@ -658,6 +678,30 @@ function* morphTo(
     const slot = node.parentElement;
     return slot?.classList.contains("text-morph-slot") ? [slot] : [];
   };
+  // A kept glyph's roll in progress, kept to carry on (step 8) if its place
+  // doesn't change: restarted from where it's drawn, a held key sent every
+  // digit still settling off again on a fresh curve each press, lurching
+  // forward, and one within half a pixel of home snapped there.
+  const rolling = new Map<
+    HTMLElement,
+    { keyframes: Keyframe[]; timing: EffectTiming; time: CSSNumberish | null }[]
+  >();
+  nodes.forEach((node, i) => {
+    if (!kept[i]) return;
+    const rolls = node.getAnimations().flatMap((animation) => {
+      const effect = animation.effect as KeyframeEffect | null;
+      const keyframes = effect?.getKeyframes() ?? [];
+      if (!effect || !keyframes.some((k) => "translate" in k)) return [];
+      return [
+        {
+          keyframes,
+          timing: effect.getTiming(),
+          time: animation.currentTime,
+        },
+      ];
+    });
+    if (rolls.length > 0) rolling.set(node, rolls);
+  });
   const running = [
     ...nodes,
     ...leaving.map((l) => l.node),
@@ -691,6 +735,7 @@ function* morphTo(
   layOut(glyphLayer, nodes);
   // Free to wrap again, so step 5 sees how the new value falls.
   delete root.dataset.sizing;
+  stage.style.left = "";
   for (const slot of gone) slot.remove();
   // The slots fade from step 8 on, while this change plays.
   delete glyphLayer.dataset.playing;
@@ -723,6 +768,7 @@ function* morphTo(
   const box = !reduced && linesBefore <= 1 && oneLine;
   // And the rest of the final layout, with the start margin the author set.
   const rootAfter = root.getBoundingClientRect();
+  const glyphsAfter = glyphLayer.getBoundingClientRect();
   const styleAfter = getComputedStyle(root);
   const startAfter = parseFloat(styleAfter.marginInlineStart) || 0;
   const heightAfter = heightOf(styleAfter, rootAfter);
@@ -995,9 +1041,13 @@ function* morphTo(
   const glyphEnd =
     Math.max(-Infinity, ...inkRects.map((r) => r.right)) - origin.left;
   const wasArmed = ghostLayer.dataset.armed ?? "";
-  const armed = (side: Side): boolean => {
+  // How each edge fades: not at all, following the box's edge (a neighbour
+  // moves with it), or held at the container's edge (layer coordinates):
+  // there only ink crossing it needs fading, and a band following the box
+  // swept across letters still well inside (clearing a long value).
+  const armed = (side: Side): false | "box" | number => {
     if (!box || o.edgeFade === "never" || inkRects.length === 0) return false;
-    if (wasArmed.includes(side)) return true;
+    if (wasArmed.includes(side)) return "box";
     const travels =
       side === "start"
         ? Math.abs(boxStart - finalStart) > 0.5
@@ -1012,14 +1062,14 @@ function* morphTo(
         : rect.right - origin.left > finalEnd + 0.5,
     );
     if (!(travels && overhangs) && !carriedOut) return false;
-    return (
-      o.edgeFade === "always" ||
-      inkEscapes(
-        root,
-        side,
-        origin.left + (side === "start" ? glyphStart : glyphEnd),
-      )
+    if (o.edgeFade === "always") return "box";
+    const escapes = inkEscapes(
+      root,
+      side,
+      origin.left + (side === "start" ? glyphStart : glyphEnd),
     );
+    if (escapes === false) return false;
+    return escapes === "neighbour" ? "box" : escapes - origin.left;
   };
   const armStart = armed("start");
   const armEnd = armed("end");
@@ -1029,12 +1079,39 @@ function* morphTo(
     ? rootBefore.width + (startBefore - startAfter) - rootAfter.width
     : 0;
   const resizes = Math.abs(from) > 0.5;
+  // A box eases its width, as torph's root does: its alignment inside holds
+  // the glyphs where they end up, so nothing has to ride against it. An
+  // inline label can't take a width, so it eases its start margin, and the
+  // stage rides against the move; in centred text those two, each rounded
+  // to layout units (1/64px) on its own, stepped the glyphs back and forth.
+  const widthAfter = widthOf(styleAfter, rootAfter);
+  // What the stage's percentages count: the label's content box.
+  const contentAfter =
+    rootAfter.width -
+    parseFloat(styleAfter.paddingLeft) -
+    parseFloat(styleAfter.paddingRight) -
+    parseFloat(styleAfter.borderLeftWidth) -
+    parseFloat(styleAfter.borderRightWidth);
+  const sizeFrom = boxed
+    ? { width: `${widthAfter + from}px` }
+    : { marginInlineStart: `${startAfter + from}px` };
+  const sizeTo = boxed
+    ? { width: `${widthAfter}px` }
+    : { marginInlineStart: `${startAfter}px` };
   yield;
 
   // 6. Write: the label at the start of its resize.
   const authorStart = root.style.marginInlineStart;
+  const authorWidth = root.style.width;
   const authorHeight = root.style.height;
-  if (resizes) root.style.marginInlineStart = `${startAfter + from}px`;
+  if (resizes && boxed) {
+    root.style.width = sizeFrom.width ?? "";
+    // Its text sits at its start while it resizes (text-align in the CSS),
+    // so the stage's ride alone places it, whichever way the width goes.
+    root.dataset.sizing = "";
+  }
+  else if (resizes)
+    root.style.marginInlineStart = sizeFrom.marginInlineStart ?? "";
   if (reheights) root.style.height = `${heightBefore}px`;
   yield;
 
@@ -1043,6 +1120,8 @@ function* morphTo(
   // update may be easing its own space, which moves this label too.
   const rootAt0 =
     oneLine || reheights ? root.getBoundingClientRect() : rootAfter;
+  const glyphsAt0 =
+    oneLine || reheights ? glyphLayer.getBoundingClientRect() : glyphsAfter;
   // Which edge the label is pinned by, for the next change's run.
   if (resizes) {
     const leftTravel = Math.abs(rootAfter.left - rootAt0.left);
@@ -1057,6 +1136,7 @@ function* morphTo(
   // 8. Write: everything else, attributes and styles only. Nothing below
   // reads layout or changes the DOM's structure.
   root.style.marginInlineStart = authorStart;
+  root.style.width = authorWidth;
   root.style.height = authorHeight;
   glyphLayer.dataset.playing = "";
   // Reclaimed ghosts take their new glyph's place, which measured the same.
@@ -1100,16 +1180,11 @@ function* morphTo(
     // either way.
     const sizing = String(++sizings);
     root.dataset.sizing = sizing;
-    const ease = run(
-      root,
-      [
-        { marginInlineStart: `${startAfter + from}px` },
-        { marginInlineStart: `${startAfter}px` },
-      ],
-      resize,
-    );
+    const ease = run(root, [sizeFrom, sizeTo], resize);
     const release = (): void => {
-      if (root.dataset.sizing === sizing) delete root.dataset.sizing;
+      if (root.dataset.sizing !== sizing) return;
+      delete root.dataset.sizing;
+      stage.style.left = "";
     };
     ease.finished.then(release, release);
   }
@@ -1128,8 +1203,37 @@ function* morphTo(
   // or pinned container around it, or a neighbour changing in the same
   // update easing its space); ride the other way on the width's curve, so
   // the glyphs and ghosts hold the final places they were measured at.
-  const rideX = rootAfter.left - rootAt0.left;
-  const rideY = rootAfter.top - rootAt0.top;
+  // A move that is just the label's own margin (all of it pinned at the
+  // start or end, half of it centred) rides by the margin's exact value:
+  // the measured one is rounded to layout units (1/64px), and the two
+  // easing from values that far apart round apart frame to frame, so the
+  // glyphs flickered a device pixel side to side (116 flips in one change
+  // at 125% scaling).
+  // A box rides by how far its glyphs moved (its alignment inside mostly
+  // holds them); an inline label by how far it moved.
+  const measuredX = boxed
+    ? glyphsAfter.left - glyphsAt0.left
+    : rootAfter.left - rootAt0.left;
+  const ownX =
+    resizes && !boxed
+      ? [from, -from, from / 2, -from / 2].find(
+          (x) => Math.abs(x - measuredX) < 0.05,
+        )
+      : undefined;
+  // A box whose glyphs move with its width (all of the change pinned at the
+  // end, half centred) rides by that share of its width as it eases, in
+  // CSS: layout rounds the ride and the width it follows from the same
+  // number each frame, where a ride animated beside the width rounded on
+  // its own and stepped the glyphs back and forth.
+  const share = boxed && resizes ? -measuredX / from : NaN;
+  const follows = [-1, -0.5, 0.5, 1].find((f) => Math.abs(f - share) < 0.01);
+  if (follows !== undefined) {
+    stage.style.left = `calc(${follows} * (${contentAfter}px - 100%))`;
+  }
+  const rideX = follows !== undefined ? 0 : (ownX ?? measuredX);
+  const rideY = boxed
+    ? glyphsAfter.top - glyphsAt0.top
+    : rootAfter.top - rootAt0.top;
   if (Math.abs(rideX) > 0.5 || Math.abs(rideY) > 0.5) {
     run(
       stage,
@@ -1173,6 +1277,10 @@ function* morphTo(
     // Scale pivots on the glyph's own centre unless it arrives in a shape.
     const shape = shapes.get(node);
     setOrigin(node, shape?.origin ?? "");
+    // A shape's glyph slides toward the shape's centre as it scales, out of
+    // its slot, whose fade would cut it off; it doesn't roll, so it needs
+    // no fade.
+    if (shape?.group) node.parentElement?.setAttribute("data-travel", "");
     if (!was) {
       const delay = delays.entering[entering++];
       const awayFrame = shape?.group
@@ -1216,7 +1324,17 @@ function* morphTo(
     }
     // Under reduced motion a kept glyph takes its new place directly.
     const [dx, dy] = centreDelta(was.rect, after[i]);
-    if (
+    const home = keptHomes.get(node);
+    const rolls = rolling.get(node);
+    const stays =
+      home !== undefined &&
+      centreDelta(home, after[i]).every((d) => Math.abs(d) < 0.01);
+    if (!reduced && rolls && stays) {
+      // Its place holds: the roll it was on carries on where it was.
+      for (const { keyframes, timing, time } of rolls) {
+        run(node, keyframes, timing).currentTime = time;
+      }
+    } else if (
       !reduced &&
       (Math.abs(dx) > 0.5 ||
         Math.abs(dy) > 0.5 ||
@@ -1240,16 +1358,16 @@ function* morphTo(
           : motion,
       );
     }
-    // Mid-fade (or mid-blur, from an earlier change) it finishes coming in,
-    // at the pace it was going: over what's left of the fade, not a fresh
-    // one. Restarting the whole fade on every change left a run of quick
-    // ones (a held key) playing only its opening sliver, so letters crawled
-    // in over most of a second (torph snaps them to full instead).
+    // Mid-fade (or mid-blur, from an earlier change) it catches up: the next
+    // change means a newer value is what to read, so it finishes over a
+    // quarter of its fade at most (50ms in morph) rather than hanging
+    // half-faded. Restarting the whole fade left a run of quick changes (a
+    // held key) crawling in; torph snaps it to full in one frame instead.
     const blurred = was.filter !== "blur(0px)" ? was.filter : null;
     if (was.opacity < 0.999 || blurred !== null) {
       const left = Math.max(1 - was.opacity, blurred !== null ? 0.25 : 0);
       run(node, [fade(was.opacity, blurred), fade(1, sharp(blurred))], {
-        duration: fadeIn.duration * left,
+        duration: fadeIn.duration * Math.min(left, CATCH_UP),
         easing: fadeIn.easing,
       });
     }
@@ -1288,9 +1406,12 @@ function* morphTo(
     minY = Math.min(minY, y - roomY);
     maxY = Math.max(maxY, y + px(slot, "--h") + roomY);
   }
-  if (armStart || armEnd) {
+  const fades = armStart !== false || armEnd !== false;
+  if (fades) {
     minX = Math.min(minX, boxStart - slack, finalStart - slack);
     maxX = Math.max(maxX, boxEnd + slack, finalEnd + slack);
+    if (typeof armStart === "number") minX = Math.min(minX, armStart);
+    if (typeof armEnd === "number") maxX = Math.max(maxX, armEnd);
   }
   const ox = Math.floor(minX) - 1;
   const oy = Math.floor(minY) - 1;
@@ -1301,22 +1422,32 @@ function* morphTo(
   ghostLayer.style.height = `${Math.ceil(maxY) + 1 - oy}px`;
 
   // The edge fade: a band on each armed edge that follows the box edge on
-  // the width's curve, ending a little past it.
-  if (armStart || armEnd) {
+  // the width's curve, ending a little past it, or holds at the container's.
+  if (fades) {
     const ramp = EDGE_RAMP * em;
     const window = (start: number, end: number) => {
-      const left = armStart ? start - slack - ox : 0;
-      const right = armEnd ? end + slack - ox : layerWidth;
+      const left =
+        armStart === false
+          ? 0
+          : typeof armStart === "number"
+            ? armStart - ox
+            : start - slack - ox;
+      const right =
+        armEnd === false
+          ? layerWidth
+          : typeof armEnd === "number"
+            ? armEnd - ox
+            : end + slack - ox;
       return {
         maskPosition: `${left}px 0`,
         maskSize: `${right - left}px 100%`,
       };
     };
-    ghostLayer.dataset.armed = `${armStart ? "start " : ""}${armEnd ? "end" : ""}`;
+    ghostLayer.dataset.armed = `${armStart !== false ? "start " : ""}${armEnd !== false ? "end" : ""}`;
     ghostLayer.style.setProperty(
       "--text-morph-edge",
-      `linear-gradient(to right, ${armStart ? `transparent, #000 ${ramp}px` : "#000"}, ${
-        armEnd ? `#000 calc(100% - ${ramp}px), transparent` : "#000"
+      `linear-gradient(to right, ${armStart !== false ? `transparent, #000 ${ramp}px` : "#000"}, ${
+        armEnd !== false ? `#000 calc(100% - ${ramp}px), transparent` : "#000"
       })`,
     );
     run(ghostLayer, [window(boxStart, boxEnd), window(finalStart, finalEnd)], {
@@ -1346,6 +1477,7 @@ function* morphTo(
     const atRest = was.scale === "1" && was.rotate === "0deg";
     const shape = atRest ? shapes.get(node) : undefined;
     setOrigin(node, shape?.origin ?? "");
+    if (shape?.group) slot.setAttribute("data-travel", "");
     const awayFrame = shape?.group
       ? { translate: "0 0", scale: String(GROUP_SCALE), rotate: "0deg" }
       : awayState(

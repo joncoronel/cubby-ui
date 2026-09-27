@@ -51,8 +51,8 @@ import "./text-morph.css";
  *
  * Leaving glyphs (ghosts) sit in a layer measured and sized each change,
  * each in a slot at its own line that fades it out above and below. A new
- * glyph landing where its own text is still leaving takes that ghost back.
- * The slots fade only while a change plays (`data-playing`); at rest they're
+ * glyph always arrives fresh, even where its own text is still leaving
+ * (torph's way), so quick changes look like slow ones. The slots fade only while a change plays (`data-playing`); at rest they're
  * inert wrappers.
  */
 
@@ -564,9 +564,6 @@ function anchorHint(style: CSSStyleDeclaration): number {
   }
 }
 
-/** A leaving glyph's animations, so a change that brings it back can stop them. */
-const ghostAnimations = new WeakMap<HTMLElement, Animation[]>();
-
 /** Tags a label's current resize, so an older one can't release it. */
 let sizings = 0;
 
@@ -811,54 +808,6 @@ function* morphTo(
     rise || (marksRise && !isDigit(glyph)) ? 1 : -1;
   const away = rise ? -1 : 1;
 
-  // A new glyph whose text is still leaving from where it lands (a quick
-  // 5 -> 6 -> 5) takes that ghost back rather than crossing it: the ghost
-  // turns around from wherever it's drawn, like a kept glyph. Where a ghost
-  // sat in the layout is its slot's place, which holds still on screen.
-  // Only a ghost on the side new glyphs arrive from turns around: in roll,
-  // 5 -> 6 -> 5 sent the old 5 up and brings the new one down from above,
-  // so it comes back the way arrivals do; in morph, digits always fall, and
-  // bringing a falling ghost back up ran against the flow (sweeping a chart
-  // reversed 19 digits mid-fall, torph none).
-  const reclaimed: { index: number; slot: HTMLElement; node: HTMLElement }[] =
-    [];
-  const claimed = new Set<HTMLElement>();
-  const comesBackWithArrivals = (
-    drawn: DOMRect,
-    target: DOMRect,
-    glyph: string,
-  ): boolean => {
-    const dy = centreDelta(drawn, target)[1];
-    return Math.abs(dy) <= 1 || Math.sign(dy) === arriveFor(glyph);
-  };
-  nodes.forEach((node, i) => {
-    if (kept[i] || spaceNode(node)) return;
-    const target = after[i];
-    const ghost = ghosts.find(
-      (g) =>
-        !claimed.has(g.slot) &&
-        g.node.textContent === next[i] &&
-        Math.abs(originBefore.left + px(g.slot, "--x") - target.left) <
-          target.width / 2 &&
-        Math.abs(originBefore.top + px(g.slot, "--y") - target.top) <
-          SLOT_PAD_Y * em &&
-        // Still drawn within the label: one carried out past its edge (with
-        // a neighbour, toward a pinned edge) keeps leaving under the edge
-        // fade, since the live glyphs have none to hide it on its way back.
-        g.drawn.rect.left >= rootAfter.left - 0.5 &&
-        g.drawn.rect.right <= rootAfter.right + 0.5 &&
-        comesBackWithArrivals(g.drawn.rect, target, next[i]),
-    );
-    if (!ghost) return;
-    claimed.add(ghost.slot);
-    reclaimed.push({ index: i, slot: ghost.slot, node: ghost.node });
-    before.set(ghost.node, ghost.drawn);
-    const slide = Math.abs(centreDelta(ghost.drawn.rect, target)[0]);
-    if (slide > 0.5) reach.push([ghost.node, Math.ceil(slide)]);
-  });
-  const staying = ghosts.filter((g) => !claimed.has(g.slot));
-  const reclaimedAt = new Map(reclaimed.map((r) => [r.index, r.node]));
-
   // What arrives or leaves travels with its nearest surviving neighbour
   // (torph's anchoring), looking before it first when arriving and after it
   // first when leaving. Its slot takes the trip and the glyph its own
@@ -917,8 +866,7 @@ function* morphTo(
     Math.abs(dy) > line * 0.75;
   const travels = (trip: [number, number]): boolean =>
     o.mode === "morph" || crossesLines(trip);
-  const isArriving = (i: number): boolean =>
-    !kept[i] && !reclaimedAt.has(i) && !spaceNode(nodes[i]);
+  const isArriving = (i: number): boolean => !kept[i] && !spaceNode(nodes[i]);
   const shapes = new Map<HTMLElement, Shape>();
   if (shaping) {
     // Whole words of letters (by words), and runs of GROUP_MIN or more
@@ -1027,7 +975,7 @@ function* morphTo(
       : [];
   });
   const inkRects = [
-    ...staying.map((g) => g.drawn.rect),
+    ...ghosts.map((g) => g.drawn.rect),
     ...leaving.flatMap(({ node }) => {
       const rect = before.get(node)?.rect;
       return rect ? [rect] : [];
@@ -1109,8 +1057,7 @@ function* morphTo(
     // Its text sits at its start while it resizes (text-align in the CSS),
     // so the stage's ride alone places it, whichever way the width goes.
     root.dataset.sizing = "";
-  }
-  else if (resizes)
+  } else if (resizes)
     root.style.marginInlineStart = sizeFrom.marginInlineStart ?? "";
   if (reheights) root.style.height = `${heightBefore}px`;
   yield;
@@ -1139,17 +1086,7 @@ function* morphTo(
   root.style.width = authorWidth;
   root.style.height = authorHeight;
   glyphLayer.dataset.playing = "";
-  // Reclaimed ghosts take their new glyph's place, which measured the same.
-  for (const { index, slot, node } of reclaimed) {
-    for (const animation of ghostAnimations.get(node) ?? []) {
-      animation.cancel();
-    }
-    nodes[index].replaceWith(node);
-    nodes[index] = node;
-    kept[index] = node;
-    slot.remove();
-  }
-  for (const { slot } of staying) {
+  for (const { slot } of ghosts) {
     placeSlot(slot, px(slot, "--x") + shiftX, px(slot, "--y") + shiftY);
   }
   for (const node of changesLine) {
@@ -1382,7 +1319,7 @@ function* morphTo(
   // Size the layer around every slot (a mask cuts whatever falls outside
   // its element) and, when the edge fade is armed, the band's reach.
   const allSlots = [
-    ...staying.map((g) => g.slot),
+    ...ghosts.map((g) => g.slot),
     ...newSlots.map((s) => s.slot),
   ];
   if (allSlots.length === 0) {
@@ -1502,10 +1439,14 @@ function* morphTo(
       );
     }
     const blurred = was.filter !== "blur(0px)" ? was.filter : null;
+    // One caught before it showed (still in its fade-in delay) leaves from
+    // full, as torph's do: leaving from nothing, a run of quick changes (spam
+    // clicking) showed nothing fading out at all.
+    const shown = was.opacity === 0 ? 1 : was.opacity;
     const out = run(
       node,
       [
-        fade(was.opacity, blurred ?? (blur && "blur(0px)")),
+        fade(shown, blurred ?? (blur && "blur(0px)")),
         fade(0, blur ?? (blurred && "blur(0px)")),
       ],
       {
@@ -1516,7 +1457,6 @@ function* morphTo(
         fill: "both",
       },
     );
-    ghostAnimations.set(node, [move, out]);
     // A ghost that has left stays in place, invisible, until the last one
     // has: removing them together is one change to the DOM's structure (one
     // restyle) instead of one per ghost.

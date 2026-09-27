@@ -246,4 +246,5 @@ const feedback = faster(MODE_DEFAULTS.morph, 0.5); // 200ms of motion
 - **Spaces.** Spaces show as typed: a run of them isn't collapsed to one, and a `\n` in the value starts a new line.
 - **Empty values.** An empty value keeps its line's height, so the text around it doesn't jump.
 - **Keep `render` on one element type.** Switching it to a different element or component while mounted remounts the label with its first value's glyphs.
+- **Built for labels and numbers.** Each glyph keeps its own compositing layer so it doesn't shift as an animation ends, and each layer takes a little GPU memory. A few labels on a page cost nothing noticeable; hundreds of changing values or long passages add up, most on low-end phones.
 - **No spaces, no wrapping.** A value without spaces (a long number, a URL) can't break, so it runs past a narrow container, like any unbroken word.

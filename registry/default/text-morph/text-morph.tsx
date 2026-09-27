@@ -18,6 +18,13 @@ import {
   type TextMorphOptions,
   type TextMorphOverrides,
 } from "./lib/options";
+import {
+  HOME,
+  awayState,
+  fadesFor,
+  staggerDelays,
+  stillOptions,
+} from "./lib/timing";
 import "./text-morph.css";
 
 /*
@@ -140,68 +147,6 @@ function visualState(node: HTMLElement): VisualState {
 }
 
 /**
- * Stagger delays for the glyphs that change. `each`: every successive glyph
- * `ms` later. `spread` (Scritto's sweep): delay from where the glyph sits,
- * across `ms` over the changed stretch only, so a one-digit change in a long
- * number isn't left waiting, and a glyph leaving and its replacement in the
- * same spot cross over together. Positions count from the start of the
- * line in reading order. The sweep spans `ms` less one glyph's step, as
- * Scritto's ladder does, so two glyphs are half of it apart, not all of it.
- */
-function staggerDelays(
-  o: TextMorphOptions,
-  entering: number[],
-  leaving: number[],
-): { entering: number[]; leaving: number[] } {
-  if (o.stagger.mode === "each") {
-    return {
-      entering: entering.map((_, k) => k * o.stagger.ms),
-      leaving: leaving.map((_, k) => k * o.stagger.ms),
-    };
-  }
-  const all = [...entering, ...leaving];
-  const min = Math.min(...all);
-  const span = Math.max(...all) - min;
-  const sweep = (count: number) => (left: number) =>
-    span > 0
-      ? (((o.stagger.ms * Math.max(count - 1, 0)) / count) * (left - min)) /
-        span
-      : 0;
-  return {
-    entering: entering.map(sweep(entering.length)),
-    leaving: leaving.map(sweep(leaving.length)),
-  };
-}
-
-/**
- * Transform keyframe for a glyph away from home: `offset` is 1 below the
- * line, -1 above. Morph letters scale in place; morph digits roll whole
- * lines (`line` is the line height in px).
- */
-function awayState(
-  o: TextMorphOptions,
-  kind: GlyphKind,
-  offset: 1 | -1,
-  line: number,
-): Keyframe {
-  if (o.mode === "roll") {
-    return {
-      translate: `0 ${offset * o.roll.distance}em`,
-      scale: String(o.roll.scale),
-      rotate: `${o.roll.rotate}deg`,
-    };
-  }
-  if (kind === "number") {
-    return {
-      translate: `0 ${offset * o.morph.digits.distance * line}px`,
-      scale: "1",
-      rotate: "0deg",
-    };
-  }
-  return { translate: "0 0", scale: String(o.morph.scale), rotate: "0deg" };
-}
-
-/**
  * Morph mode, one-word values (torph): a run of this many replaced glyphs,
  * with no survivor inside, is swapped as one shape rather than glyph by
  * glyph. It recedes further, to GROUP_SCALE about its own centre, and its
@@ -269,25 +214,8 @@ function shapeRuns(
   return runs;
 }
 
-/** Fade timings for a glyph of this kind. */
-function fadesFor(
-  o: TextMorphOptions,
-  kind: GlyphKind,
-): {
-  fadeIn: TextMorphOptions["fadeIn"];
-  fadeOut: TextMorphOptions["fadeOut"];
-} {
-  if (o.mode === "morph" && kind === "number") {
-    return {
-      fadeIn: { ...o.morph.digits.fadeIn, delay: 0 },
-      fadeOut: o.morph.digits.fadeOut,
-    };
-  }
-  return { fadeIn: o.fadeIn, fadeOut: o.fadeOut };
-}
 /** Share of its fade a glyph interrupted mid-fade takes to finish. */
 const CATCH_UP = 0.25;
-const HOME: Keyframe = { translate: "0 0", scale: "1", rotate: "0deg" };
 
 /**
  * How a change plays: in full, as a crossfade only (the reader prefers
@@ -295,23 +223,6 @@ const HOME: Keyframe = { translate: "0 0", scale: "1", rotate: "0deg" };
  * all (disableAnimation, or nobody can see it).
  */
 type Playback = "full" | "reduced" | "none";
-
-/**
- * The options with nothing that moves, scales, tilts or blurs. New glyphs
- * fade in straight away: morph's delay leaves a gap after the old ones have
- * gone that its travel covers, and standing still in place it read as a
- * blink rather than a crossfade.
- */
-function stillOptions(o: TextMorphOptions): TextMorphOptions {
-  return {
-    ...o,
-    fadeIn: { ...o.fadeIn, delay: 0 },
-    stagger: { ...o.stagger, ms: 0 },
-    roll: { distance: 0, scale: 1, rotate: 0 },
-    morph: { ...o.morph, scale: 1, digits: { ...o.morph.digits, distance: 0 } },
-    blur: 0,
-  };
-}
 
 /** How far `a`'s centre sits from `b`'s (scale and tilt pivot on centres). */
 function centreDelta(a: DOMRect, b: DOMRect): [number, number] {

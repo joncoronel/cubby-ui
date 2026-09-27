@@ -110,6 +110,33 @@ Deferred / removed follow-ups pulled from the initial `filters` build (`registry
 - **Auto-remove a filter dismissed without a value.** Linear-style: if a freshly added select/multiselect filter is dismissed (popup closed) without choosing a value, drop the dangling `Select…` pill instead of leaving it. Would hook the value Combobox's `onOpenChange`/close with an "was anything picked" check. Left out to avoid surprising removals; consider behind an opt-in prop.
 - **Lower-priority PR-review leftovers** (blockers, structural pass, context split, and provider/bar split all landed): a ghost/unstyled variant on the `NumberField` primitive so the filter chip can compose it instead of raw Base UI (do it when a second consumer wants an inline borderless number input, or when the chip's copy visibly drifts from the primitive); cache `resolveOperators` per field if it ever shows in profiles.
 
+### Text Morph
+
+Deferred after reading Scritto's source (`packages/core/src` in JaceThings/Scritto) against ours. Both are real but small today; build them when a page needs them. A third idea, making the box track arriving letters (Scritto's `_inkEnvelope`), was dropped: arriving ink overlapped the next word by 6.5px for one 40ms frame in morph and 0.7px in roll ("In a sentence", `dev` → `production-eu`), not worth an intricate sampled width curve.
+
+#### Per-line wipe for wrapped text (edge fade on more than one line)
+
+The edge fade (`edgeFade`) only arms on a one-line label (`box` in `morphTo`). In wrapped text, old ink can fade on top of words that reflowed into its place. Measured on the torph playground's long wrapped cases on `/tune/text-morph`: in roll, 1 to 3 leaving glyphs sit over kept, reflowed words for about 200ms; in morph, 0 to 1 for a single 50ms sample (its leaving glyphs fade in ~100ms). So it's a roll-only blemish in practice.
+
+Scritto's fix (`_armWipes` and `wipeRules` in `index.ts` / `const.ts`): group each line's leaving glyphs, give each group its own mask band, and sweep it across that line (a registered custom property, `--scritto-exit-wipe`, animated from 0 to the line's leftover ink width on the width's curve) while the ghosts fade. For us: group ghost slots by line in the ghost sheet, put a band per group, animate a registered `@property` length. Roughly 100 to 150 lines in `text-morph.tsx` plus CSS. Revisit if roll is used for multi-line labels (a status paragraph that changes often).
+
+#### `TextMorphFlow`: animate a paragraph reflowing around a label
+
+A new component, not a fix. When a label inside flowing prose changes width, the paragraph reflows: today text after it on the same line slides (the start-margin ease), but words that move to another line jump. Scritto's `scritto-flow` (`flow.ts`, ~475 lines) animates them:
+
+1. Wrap the paragraph. Split its text into word elements.
+2. On a change, measure the visible words before any label writes, let the paragraph reflow to its final layout once, measure again (only words in view, found by binary search).
+3. Words that stayed on their line slide from old to new position (a transform) on the resize curve.
+4. Words that changed line relay: a copy fades out sliding along the old line (gone by halfway), a copy fades in sliding into the new line (from 45%), the real word hidden meanwhile.
+
+Design notes for ours:
+
+- Ship it as a sibling file in the text-morph registry item (`text-morph-flow.tsx`, exporting `TextMorphFlow`), since it hooks the engine's internal batch scheduler.
+- React owns the paragraph's text, so split into words while rendering (recursing through inline children like links and bold), never by editing the DOM behind React as Scritto's web component does.
+- Two engine touch points, both inert without a flow: the batch calls flows before its first write and after layout settles; a label inside a flow (known via React context) skips its own start-margin width ease, because that reflows the paragraph every frame, and lets the flow move the words instead.
+- Verify no change for labels outside a flow with the usual sweeps (all torph playground cases in both modes, counter row, install tabs, docs pages).
+- Estimated 350 to 500 lines plus docs and a demo. Build it around a real use (a live stat or status inside a paragraph) so the API fits one.
+
 ### Performance
 
 #### `:has()` variants make any element insertion restyle the whole docs page

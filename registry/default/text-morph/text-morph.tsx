@@ -828,12 +828,15 @@ function* morphTo(
   // centre, as one shape; in a one-word value, only a run of GROUP_MIN or
   // more replaced glyphs, further and faster.
   const shaping = o.mode === "morph" && !reduced;
-  // Where each survivor starts, from its final place.
+  // How far each survivor moved in the layout, from its old place to its
+  // final one. The layout, not where it's drawn (torph measures with
+  // transforms taken out): a digit still falling in is drawn above its
+  // place, and anchoring the next one to that stacked each fall on the
+  // last, so typing fast brought digits in from ever higher.
   const startsAt = new Map<number, [number, number]>();
   nodes.forEach((node, i) => {
-    const survivor = reclaimedAt.get(i) ?? kept[i];
-    const was = survivor && !spaceNode(node) ? before.get(survivor) : null;
-    if (was) startsAt.set(i, centreDelta(was.rect, after[i]));
+    const home = kept[i] && !spaceNode(node) ? keptHomes.get(node) : null;
+    if (home) startsAt.set(i, centreDelta(home, after[i]));
   });
   /** Where a glyph may find its neighbour: anywhere, or its own number. */
   const scope = (kinds: GlyphKind[], i: number): [number, number] | null => {

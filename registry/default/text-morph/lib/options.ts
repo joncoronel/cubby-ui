@@ -41,9 +41,9 @@ export type TextMorphOptions = {
     digits: { distance: number; fadeIn: Timing; fadeOut: Timing };
   };
   /**
-   * Settle: a changed run grows into place from `scale` about its own
-   * centre, as one unit, and digits drift `distance` (em) the way the value
-   * went.
+   * Settle: a changed run, letters or digits, grows into place from `scale`
+   * about its own centre, as one unit; changed digits also drift
+   * `distance` (em) the way the value went.
    */
   settle: { distance: number; scale: number };
   /** Blur on arriving and leaving glyphs, in em. */
@@ -131,12 +131,13 @@ const TORPH_OPTIONS: TextMorphOptions = {
 
 /**
  * Cubby's own: a soft crossfade. Only what changed moves: each changed run
- * comes in as one unit, a touch smaller (0.94, about its own centre) and
- * blurred (0.1em), and settles into focus as the old text blurs away under
- * it, all at once. Digits drift 0.15em the way the value went instead, so a
- * number still shows its direction. New text enters over 240ms and old
- * leaves over 150ms, and everything, the box's width and the words that
- * stay sliding to their places included, runs on one strong ease-out.
+ * comes in as one unit, smaller (0.9, about its own centre) and blurred
+ * (0.1em), and settles into focus as the old text blurs away under it, all
+ * at once. Changed digits crossfade the same way and also drift 0.08em the
+ * way the value went, so a number keeps a hint of direction. New text
+ * enters over 240ms and old leaves over 150ms, and everything, the box's
+ * width and the words that stay sliding to their places included, runs on
+ * one strong ease-out.
  */
 const SETTLE_EASING = WIDTH_EASING;
 const SETTLE_OPTIONS: TextMorphOptions = {
@@ -148,7 +149,7 @@ const SETTLE_OPTIONS: TextMorphOptions = {
   stagger: { mode: "each", ms: 0 },
   roll: { distance: 0.35, scale: 1, rotate: 0 },
   morph: { scale: 1, digits: TORPH_DIGITS },
-  settle: { distance: 0.15, scale: 0.94 },
+  settle: { distance: 0.08, scale: 0.9 },
   blur: 0.1,
   numbers: true,
   trend: "auto",

@@ -506,8 +506,11 @@ function gaps(count: number, survivors: Set<number>): number[] {
  * The glyphs two runs share at their start and end, as [next, old] pairs,
  * and, when what's between is the same length on both sides (a clock, a
  * date, a version), any glyph that's the same in the same place there:
- * `09:59` → `10:00` keeps its colon, `v1.3.0` → `v2.0.0` its dots.
- * Nothing moves to another place, as a reused letter would.
+ * `09:59` → `10:00` keeps its colon, `v1.3.0` → `v2.0.0` its dots. A
+ * letter or digit never moves to another place, as a reused one would; a
+ * punctuation mark found once in what's between on each side does, since
+ * it's structure: `12.4M` → `1.1B` slides its decimal point over, as the
+ * number reshapes (torph does too).
  */
 function sharedEnds(old: string[], next: string[]): [number, number][] {
   let start = 0;
@@ -536,6 +539,27 @@ function sharedEnds(old: string[], next: string[]): [number, number][] {
       if (old[k] === next[k]) pairs.push([k, k]);
     }
   }
+  const taken = new Set(pairs.map(([, from]) => from));
+  const placed = new Set(pairs.map(([to]) => to));
+  const oldMiddle = old.slice(start, old.length - end);
+  const nextMiddle = next.slice(start, next.length - end);
+  const once = (run: string[], g: string): boolean =>
+    run.indexOf(g) === run.lastIndexOf(g);
+  nextMiddle.forEach((g, k) => {
+    const to = start + k;
+    const from = start + oldMiddle.indexOf(g);
+    if (
+      !PUNCTUATION.test(g) ||
+      placed.has(to) ||
+      from < start ||
+      taken.has(from) ||
+      !once(oldMiddle, g) ||
+      !once(nextMiddle, g)
+    ) {
+      return;
+    }
+    pairs.push([to, from]);
+  });
   return pairs;
 }
 

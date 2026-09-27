@@ -715,14 +715,14 @@ function* morphTo(
       boxOf: (i: number) => DOMRect | undefined,
     ): void => {
       const isSpace = (i: number): boolean => spaceNode(glyphs[i]);
-      // Settle: each changed run of letters, whole word or not (digits
-      // drift instead). Morph: whole words and long runs, as torph.
+      // Settle: each changed run, letters or digits, whole word or not.
+      // Morph: whole words and long runs, as torph.
       const planned =
         o.mode === "settle"
           ? planRuns({
               count: glyphs.length,
               isSpace,
-              changed: (i) => changed(i) && kinds[i] === "text",
+              changed,
               boxOf,
             })
           : planShapes({

@@ -120,20 +120,20 @@ describe("settle", () => {
   it("crossfades a changed run as one unit, a touch smaller", () => {
     expect(awayState(settle, "text", 1, 36)).toEqual({
       translate: "0 0",
-      scale: "0.94",
+      scale: "0.9",
       rotate: "0deg",
     });
     expect(settle.stagger.ms).toBe(0);
     expect(settle.blur).toBe(0.1);
   });
 
-  it("drifts digits the way the value went, unscaled", () => {
+  it("crossfades digits the same way, with a hint of direction", () => {
     expect(awayState(settle, "number", 1, 36)).toEqual({
-      translate: "0 0.15em",
-      scale: "1",
+      translate: "0 0.08em",
+      scale: "0.9",
       rotate: "0deg",
     });
-    expect(awayState(settle, "number", -1, 36).translate).toBe("0 -0.15em");
+    expect(awayState(settle, "number", -1, 36).translate).toBe("0 -0.08em");
   });
 
   it("runs on one curve and leaves faster than it enters", () => {
@@ -150,6 +150,10 @@ describe("settle", () => {
   it("holds still under reduced motion", () => {
     const still = stillOptions(settle);
     expect(awayState(still, "text", 1, 36).scale).toBe("1");
-    expect(awayState(still, "number", 1, 36).translate).toBe("0 0em");
+    expect(awayState(still, "number", 1, 36)).toEqual({
+      translate: "0 0",
+      scale: "1",
+      rotate: "0deg",
+    });
   });
 });

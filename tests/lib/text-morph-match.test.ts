@@ -525,8 +525,8 @@ describe("settle similar words", () => {
 describe("settle one-word values", () => {
   it("keeps the shared ends however little the words share", () => {
     expect(keptView("settle", "999K", "1.2K")).toBe("___K");
-    expect(keptView("settle", "1.2K", "12.4M")).toBe("1____");
-    expect(keptView("settle", "12.4M", "1.1B")).toBe("1___");
+    expect(keptView("settle", "1.2K", "12.4M")).toBe("1_.__");
+    expect(keptView("settle", "12.4M", "1.1B")).toBe("1.__");
     expect(keptView("settle", "cat", "hat")).toBe("_at");
   });
 
@@ -545,5 +545,23 @@ describe("settle fixed formats", () => {
   it("never moves a glyph to another place, as morph does", () => {
     // Morph slides the 0 over from the hour's tens; settle replaces it.
     expect(keptView("morph", "09:59", "10:00")).toBe("_0:__");
+  });
+});
+
+describe("settle punctuation that moves", () => {
+  it("slides a decimal point to its new place as the number reshapes", () => {
+    // 12.4M → 1.1B: `1` stays, the `.` slides left from the old decimal.
+    const { kept } = matchText(
+      "settle",
+      chars("12.4M"),
+      chars("1.1B"),
+      OPTIONS,
+    );
+    expect(kept).toEqual([0, 2, -1, -1]);
+    expect(keptView("settle", "1.2K", "12.4M")).toBe("1_.__");
+  });
+
+  it("never moves a letter or digit, or a repeated mark", () => {
+    expect(keptView("settle", "1.2.3x", "9.8.7")).toBe("_____");
   });
 });

@@ -28,8 +28,18 @@ import {
 import { bezierOnly, toMs, transitionToCss } from "../_lib/transition-css";
 import { TuneToolbar, useTuneState } from "../_lib/tune-toolbar";
 import { useSlowMotion } from "../_lib/use-slow-motion";
+import {
+  CaseStage,
+  ExampleNav,
+  VIEWS,
+  caseOf,
+  type Align,
+  type View,
+} from "./torph-playground";
 
 const PANEL_ID = "text-morph";
+/** Remembers the example shown, per browser (a convenience only). */
+const VIEW_KEY = "tune-text-morph-view";
 const SCOPE = "[data-tune-scope]";
 
 const EXPO: EasingConfig["ease"] = [0.19, 1, 0.22, 1];
@@ -249,6 +259,53 @@ export default function TextMorphTune(): React.ReactElement {
     setBumps((b) => ({ ...b, [key]: (b[key] ?? 0) + 1 }));
   const pick = <T,>(list: readonly T[], key: string): T =>
     list[(step + (bumps[key] ?? 0)) % list.length];
+  // Which example: the site's own, or one of torph's playground cases,
+  // each starting from its first value.
+  const [view, setView] = React.useState<View>("site");
+  const [caseStep, setCaseStep] = React.useState(0);
+  const [align, setAlign] = React.useState<Align | null>(null);
+  const shownCase = caseOf(view);
+  const select = (next: View): void => {
+    setView(next);
+    setCaseStep(0);
+    setAlign(null);
+    try {
+      localStorage.setItem(VIEW_KEY, next);
+    } catch {
+      // Storage unavailable: the choice just isn't remembered.
+    }
+  };
+  React.useEffect(() => {
+    try {
+      const saved = localStorage.getItem(VIEW_KEY) as View | null;
+      if (saved && VIEWS.includes(saved)) setView(saved);
+    } catch {
+      // Storage unavailable: start on the site examples.
+    }
+  }, []);
+  // Next, Auto and Replay step whatever is shown.
+  const advance = React.useCallback((): void => {
+    if (view === "site") setStep((s) => s + 1);
+    else setCaseStep((s) => s + 1);
+  }, [view]);
+  // Space steps a torph case, as in its playground.
+  React.useEffect(() => {
+    if (view === "site") return;
+    const onKey = (event: KeyboardEvent): void => {
+      if (event.key !== " " || event.defaultPrevented || event.repeat) return;
+      // Typing and controls keep their own Space.
+      const { target } = event;
+      if (
+        target instanceof Element &&
+        target.closest("input, textarea, select, button, [contenteditable]")
+      )
+        return;
+      event.preventDefault();
+      advance();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [view, advance]);
   const [auto, setAuto] = React.useState(false);
   const [typed, setTyped] = React.useState("1200");
   const [caret, setCaret] = React.useState<number>();
@@ -267,12 +324,9 @@ export default function TextMorphTune(): React.ReactElement {
 
   React.useEffect(() => {
     if (!auto) return;
-    const id = window.setInterval(
-      () => setStep((s) => s + 1),
-      interval / tune.rate,
-    );
+    const id = window.setInterval(advance, interval / tune.rate);
     return () => window.clearInterval(id);
-  }, [auto, interval, tune.rate]);
+  }, [auto, interval, tune.rate, advance]);
 
   // A new mode (from the panel or the page) brings its own values.
   const mode = v.mode as TextMorphMode;
@@ -346,186 +400,200 @@ export default function TextMorphTune(): React.ReactElement {
       : ambient.stagger.ms);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-10 p-8 pb-32">
-      <div data-tune-scope className="flex w-full max-w-xl flex-col gap-8">
-        <Demo label="Header crumb (scroll-driven)" onAdvance={bump("crumb")}>
-          <span className="text-muted-foreground flex items-center gap-1.5 text-sm">
-            <span className="text-border">/</span>
-            <TextMorph value={pick(SECTIONS, "crumb")} options={ambient} />
-          </span>
-        </Demo>
-
-        <Demo
-          label="Mobile pill (centred, resizes both ways)"
-          onAdvance={bump("pill")}
-        >
-          <div className="flex justify-center">
-            <span className="bg-card flex h-10 items-center rounded-full px-4 text-sm font-medium shadow-(--surface-shadow-combined-5)">
-              <TextMorph value={pick(SECTIONS, "pill")} options={ambient} />
+    <div className="flex min-h-screen flex-col items-center justify-center gap-10 p-8 pb-32 lg:pr-80 lg:pl-72">
+      <ExampleNav view={view} onSelect={select} />
+      {shownCase ? (
+        <div data-tune-scope className="w-full max-w-3xl">
+          <CaseStage
+            c={shownCase}
+            step={caseStep}
+            align={align ?? shownCase.align ?? "left"}
+            onAlign={setAlign}
+            options={ambient}
+            onAdvance={advance}
+          />
+        </div>
+      ) : (
+        <div data-tune-scope className="flex w-full max-w-xl flex-col gap-8">
+          <Demo label="Header crumb (scroll-driven)" onAdvance={bump("crumb")}>
+            <span className="text-muted-foreground flex items-center gap-1.5 text-sm">
+              <span className="text-border">/</span>
+              <TextMorph value={pick(SECTIONS, "crumb")} options={ambient} />
             </span>
-          </div>
-        </Demo>
+          </Demo>
 
-        <Demo
-          label="Price (digits line up by place; only changed ones roll)"
-          onAdvance={bump("price")}
-        >
-          <span className="font-display text-3xl font-semibold tabular-nums">
-            <TextMorph value={pick(PRICES, "price")} options={ambient} />
-          </span>
-        </Demo>
+          <Demo
+            label="Mobile pill (centred, resizes both ways)"
+            onAdvance={bump("pill")}
+          >
+            <div className="flex justify-center">
+              <span className="bg-card flex h-10 items-center rounded-full px-4 text-sm font-medium shadow-(--surface-shadow-combined-5)">
+                <TextMorph value={pick(SECTIONS, "pill")} options={ambient} />
+              </span>
+            </div>
+          </Demo>
 
-        <Demo
-          label="Wrapping (a long value flows over lines; glyphs travel across them)"
-          onAdvance={bump("wrapping")}
-        >
-          <p className="max-w-64 text-sm leading-6">
-            <TextMorph value={pick(UPDATES, "wrapping")} options={ambient} />
-          </p>
-        </Demo>
-
-        <Demo label="Editable field (cursorIndex: typing 1 between 2 and 0 inserts it)">
-          <div className="flex items-center gap-4">
-            <Input
-              aria-label="Amount"
-              inputMode="numeric"
-              value={typed}
-              onChange={(event) => {
-                setCaret(event.target.selectionStart ?? undefined);
-                setTyped(event.target.value);
-              }}
-              className="w-40"
-            />
-            <span className="font-display text-2xl font-semibold tabular-nums">
-              $
-              <TextMorph
-                value={typed || "0"}
-                cursorIndex={caret}
-                options={ambient}
-              />
-            </span>
-          </div>
-        </Demo>
-
-        <Demo
-          label="In a sentence (old ink fades at the edge instead of running over the next word)"
-          onAdvance={bump("sentence")}
-        >
-          <p className="text-sm">
-            Deploying to{" "}
-            <TextMorph
-              value={pick(TARGETS, "sentence")}
-              options={ambient}
-              className="font-mono font-medium"
-            />{" "}
-            now
-          </p>
-        </Demo>
-
-        <Demo
-          label="Status (roll: the shared word in the middle stays put)"
-          onAdvance={bump("status")}
-        >
-          <span className="text-sm">
-            <TextMorph value={pick(STATUSES, "status")} options={ambient} />
-          </span>
-        </Demo>
-
-        <Demo
-          label="Word reorder + exit (torph: Transaction moves to its new place, Safe leaves, Processing arrives)"
-          onAdvance={bump("reorder")}
-        >
-          <span className="text-2xl font-medium">
-            <TextMorph value={pick(REORDER, "reorder")} options={ambient} />
-          </span>
-        </Demo>
-
-        <Demo
-          label="Same words, reversed order (torph: hello and world swap places, nothing enters or leaves)"
-          onAdvance={bump("swap")}
-        >
-          <span className="text-2xl font-medium">
-            <TextMorph value={pick(SWAP, "swap")} options={ambient} />
-          </span>
-        </Demo>
-
-        <Demo
-          label="Line break (torph: a new line arrives above the number, which holds its place value)"
-          onAdvance={bump("lines")}
-        >
-          <span className="text-2xl font-medium tabular-nums">
-            <TextMorph value={pick(LINES, "lines")} options={ambient} />
-          </span>
-        </Demo>
-
-        <Demo
-          label="Empty and back (torph: the line keeps its height while the text leaves)"
-          onAdvance={bump("empty")}
-        >
-          <p className="text-2xl font-medium">
-            <TextMorph value={pick(EMPTY, "empty")} options={ambient} />
-          </p>
-        </Demo>
-
-        <Demo
-          label="Counter (a number value; rolls up when it grows, down when it shrinks)"
-          onAdvance={bump("counter")}
-        >
-          <span className="flex items-baseline gap-3 text-sm">
+          <Demo
+            label="Price (digits line up by place; only changed ones roll)"
+            onAdvance={bump("price")}
+          >
             <span className="font-display text-3xl font-semibold tabular-nums">
-              <TextMorph value={count} options={ambient} />
+              <TextMorph value={pick(PRICES, "price")} options={ambient} />
             </span>
-            <span className="text-muted-foreground tabular-nums">
-              <TextMorph value={`${count} unread`} options={ambient} />
-            </span>
-            <span className="text-muted-foreground tabular-nums">
+          </Demo>
+
+          <Demo
+            label="Wrapping (a long value flows over lines; glyphs travel across them)"
+            onAdvance={bump("wrapping")}
+          >
+            <p className="max-w-64 text-sm leading-6">
+              <TextMorph value={pick(UPDATES, "wrapping")} options={ambient} />
+            </p>
+          </Demo>
+
+          <Demo label="Editable field (cursorIndex: typing 1 between 2 and 0 inserts it)">
+            <div className="flex items-center gap-4">
+              <Input
+                aria-label="Amount"
+                inputMode="numeric"
+                value={typed}
+                onChange={(event) => {
+                  setCaret(event.target.selectionStart ?? undefined);
+                  setTyped(event.target.value);
+                }}
+                className="w-40"
+              />
+              <span className="font-display text-2xl font-semibold tabular-nums">
+                $
+                <TextMorph
+                  value={typed || "0"}
+                  cursorIndex={caret}
+                  options={ambient}
+                />
+              </span>
+            </div>
+          </Demo>
+
+          <Demo
+            label="In a sentence (old ink fades at the edge instead of running over the next word)"
+            onAdvance={bump("sentence")}
+          >
+            <p className="text-sm">
+              Deploying to{" "}
               <TextMorph
-                value={`${percent > 0 ? "+" : ""}${percent.toFixed(2)}%`}
+                value={pick(TARGETS, "sentence")}
                 options={ambient}
+                className="font-mono font-medium"
+              />{" "}
+              now
+            </p>
+          </Demo>
+
+          <Demo
+            label="Status (roll: the shared word in the middle stays put)"
+            onAdvance={bump("status")}
+          >
+            <span className="text-sm">
+              <TextMorph value={pick(STATUSES, "status")} options={ambient} />
+            </span>
+          </Demo>
+
+          <Demo
+            label="Word reorder + exit (torph: Transaction moves to its new place, Safe leaves, Processing arrives)"
+            onAdvance={bump("reorder")}
+          >
+            <span className="text-2xl font-medium">
+              <TextMorph value={pick(REORDER, "reorder")} options={ambient} />
+            </span>
+          </Demo>
+
+          <Demo
+            label="Same words, reversed order (torph: hello and world swap places, nothing enters or leaves)"
+            onAdvance={bump("swap")}
+          >
+            <span className="text-2xl font-medium">
+              <TextMorph value={pick(SWAP, "swap")} options={ambient} />
+            </span>
+          </Demo>
+
+          <Demo
+            label="Line break (torph: a new line arrives above the number, which holds its place value)"
+            onAdvance={bump("lines")}
+          >
+            <span className="text-2xl font-medium tabular-nums">
+              <TextMorph value={pick(LINES, "lines")} options={ambient} />
+            </span>
+          </Demo>
+
+          <Demo
+            label="Empty and back (torph: the line keeps its height while the text leaves)"
+            onAdvance={bump("empty")}
+          >
+            <p className="text-2xl font-medium">
+              <TextMorph value={pick(EMPTY, "empty")} options={ambient} />
+            </p>
+          </Demo>
+
+          <Demo
+            label="Counter (a number value; rolls up when it grows, down when it shrinks)"
+            onAdvance={bump("counter")}
+          >
+            <span className="flex items-baseline gap-3 text-sm">
+              <span className="font-display text-3xl font-semibold tabular-nums">
+                <TextMorph value={count} options={ambient} />
+              </span>
+              <span className="text-muted-foreground tabular-nums">
+                <TextMorph value={`${count} unread`} options={ambient} />
+              </span>
+              <span className="text-muted-foreground tabular-nums">
+                <TextMorph
+                  value={`${percent > 0 ? "+" : ""}${percent.toFixed(2)}%`}
+                  options={ambient}
+                />
+              </span>
+            </span>
+          </Demo>
+
+          <Demo
+            label="Events (each change ends in exactly one of complete or cancel; try every 120ms)"
+            onAdvance={bump("events")}
+          >
+            <div className="flex items-baseline justify-between gap-4 text-sm">
+              <TextMorph
+                value={pick(PRICES, "events")}
+                options={ambient}
+                onAnimationStart={tally("start")}
+                onAnimationComplete={tally("complete")}
+                onAnimationCancel={tally("cancel")}
+                className="font-medium tabular-nums"
               />
-            </span>
-          </span>
-        </Demo>
+              <span className="text-muted-foreground tabular-nums">
+                start {events.start} · complete {events.complete} · cancel{" "}
+                {events.cancel}
+              </span>
+            </div>
+          </Demo>
 
-        <Demo
-          label="Events (each change ends in exactly one of complete or cancel; try every 120ms)"
-          onAdvance={bump("events")}
-        >
-          <div className="flex items-baseline justify-between gap-4 text-sm">
-            <TextMorph
-              value={pick(PRICES, "events")}
-              options={ambient}
-              onAnimationStart={tally("start")}
-              onAnimationComplete={tally("complete")}
-              onAnimationCancel={tally("cancel")}
-              className="font-medium tabular-nums"
-            />
-            <span className="text-muted-foreground tabular-nums">
-              start {events.start} · complete {events.complete} · cancel{" "}
-              {events.cancel}
-            </span>
-          </div>
-        </Demo>
-
-        <Demo label="Click feedback (right-pinned buttons, the same look in 209ms)">
-          <div className="flex justify-end gap-2">
-            {/* The buttons step this one; the card around them doesn't, so
+          <Demo label="Click feedback (right-pinned buttons, the same look in 209ms)">
+            <div className="flex justify-end gap-2">
+              {/* The buttons step this one; the card around them doesn't, so
                 there are no buttons inside a button. */}
-            <Button variant="ghost" size="xs" onClick={bump("feedback")}>
-              <TextMorph
-                value={flip ? "Hide code" : "Code"}
-                options={feedback}
-              />
-            </Button>
-            <Button variant="secondary" size="xs" onClick={bump("feedback")}>
-              <TextMorph
-                value={flip ? "Copied" : "Copy page"}
-                options={feedback}
-              />
-            </Button>
-          </div>
-        </Demo>
-      </div>
+              <Button variant="ghost" size="xs" onClick={bump("feedback")}>
+                <TextMorph
+                  value={flip ? "Hide code" : "Code"}
+                  options={feedback}
+                />
+              </Button>
+              <Button variant="secondary" size="xs" onClick={bump("feedback")}>
+                <TextMorph
+                  value={flip ? "Copied" : "Copy page"}
+                  options={feedback}
+                />
+              </Button>
+            </div>
+          </Demo>
+        </div>
+      )}
 
       <div className="flex flex-col items-center gap-3">
         <div className="flex items-center gap-2">
@@ -546,11 +614,7 @@ export default function TextMorphTune(): React.ReactElement {
           </ToggleGroup>
         </div>
         <div className="flex flex-wrap items-center justify-center gap-2">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => setStep((s) => s + 1)}
-          >
+          <Button size="sm" variant="outline" onClick={advance}>
             Next
           </Button>
           <Toggle size="sm" pressed={auto} onPressedChange={setAuto}>
@@ -579,7 +643,7 @@ export default function TextMorphTune(): React.ReactElement {
         file="registry/default/text-morph/lib/options.ts"
         css=""
         props={Object.keys(copied).length ? { [copiedName]: copied } : {}}
-        onReplay={() => setStep((s) => s + 1)}
+        onReplay={advance}
         scrubMax={Math.max(1000, Math.ceil(longestMs / 100) * 100)}
       />
     </div>

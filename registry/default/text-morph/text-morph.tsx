@@ -238,15 +238,14 @@ function shapeRun(
 }
 
 /**
- * The runs a value's glyphs fall into for shaping: whole words where the
- * change matched by words, else runs of at least GROUP_MIN between
- * survivors. `changed` says which glyphs arrive (or leave).
+ * The runs of changed glyphs (arriving, or leaving) to shape: whole words,
+ * or runs of at least GROUP_MIN between survivors.
  */
 function shapeRuns(
   nodes: HTMLElement[],
   changed: (i: number) => boolean,
   byWords: boolean,
-): { runs: number[][]; group: boolean } {
+): number[][] {
   const runs: number[][] = [];
   let run: number[] = [];
   let whole = true;
@@ -264,7 +263,7 @@ function shapeRuns(
     else flush();
   });
   flush();
-  return { runs, group: !byWords };
+  return runs;
 }
 
 /** Fade timings for a glyph of this kind. */
@@ -661,8 +660,10 @@ function* morphTo(
   // entrance inside it (torph's slot and mover), so a digit rolls within a
   // number that moves line, where adding the two up cancelled them (a
   // morph digit rolls exactly one line). Morph anchors everything; roll
-  // only digits, to the rest of their own number, so its glyphs still roll
-  // in place and a number that moves takes its digits with it.
+  // only digits, to the rest of their own number, and only across lines:
+  // its glyphs still roll in place on their line (a number that resizes
+  // doesn't drag them after its `$`), and a number that moves to another
+  // line takes its digits with it.
   //
   // Morph also scales a whole word arriving or leaving about its own
   // centre, as one shape; in a one-word value, only a run of GROUP_MIN or
@@ -702,37 +703,45 @@ function* morphTo(
     const [one, two]: [1 | -1, 1 | -1] = forwardFirst ? [1, -1] : [-1, 1];
     return scan(one) ?? scan(two);
   };
+  const travels = ([, dy]: [number, number]): boolean =>
+    o.mode === "morph" || Math.abs(dy) > line / 2;
   const isArriving = (i: number): boolean =>
     !kept[i] && !reclaimedAt.has(i) && !spaceNode(nodes[i]);
   const shapes = new Map<HTMLElement, Shape>();
   if (shaping) {
-    const text = (kinds: GlyphKind[], i: number): boolean =>
-      kinds[i] === "text";
-    const arriving = shapeRuns(
-      nodes,
-      (i) => isArriving(i) && text(match.nextKinds, i),
-      match.byWords,
-    );
-    for (const run of arriving.runs) {
-      shapeRun(
-        shapes,
-        run.map((i) => ({ node: nodes[i], rect: after[i] })),
-        arriving.group,
-      );
-    }
+    // Whole words of letters (by words), and runs of GROUP_MIN or more
+    // replaced glyphs, digits included: torph splits numbers glyph by glyph
+    // either way, so `$12,345,678` → `$99` shrinks its old digits in place
+    // rather than sending them after the `$`.
+    const shapeAll = (
+      glyphs: HTMLElement[],
+      changed: (i: number) => boolean,
+      kinds: GlyphKind[],
+      rectOf: (i: number) => DOMRect | undefined,
+    ): void => {
+      const add = (runs: number[][], group: boolean): void => {
+        for (const run of runs) {
+          const members = run.flatMap((i) => {
+            const rect = rectOf(i);
+            return rect ? [{ node: glyphs[i], rect }] : [];
+          });
+          if (members.length > 0) shapeRun(shapes, members, group);
+        }
+      };
+      if (!match.byWords) return add(shapeRuns(glyphs, changed, false), true);
+      const of = (kind: GlyphKind) => (i: number) =>
+        changed(i) && kinds[i] === kind;
+      add(shapeRuns(glyphs, of("text"), true), false);
+      add(shapeRuns(glyphs, of("number"), false), true);
+    };
+    shapeAll(nodes, isArriving, match.nextKinds, (i) => after[i]);
     const leavingAt = new Set(leaving.map((l) => l.index));
-    const departing = shapeRuns(
+    shapeAll(
       old,
-      (i) => leavingAt.has(i) && text(match.oldKinds, i),
-      match.byWords,
+      (i) => leavingAt.has(i),
+      match.oldKinds,
+      (i) => homes.get(old[i]),
     );
-    for (const run of departing.runs) {
-      const members = run.flatMap((i) => {
-        const rect = homes.get(old[i]);
-        return rect ? [{ node: old[i], rect }] : [];
-      });
-      if (members.length > 0) shapeRun(shapes, members, departing.group);
-    }
   }
   // An arriving glyph starts where its neighbour starts; a shape swapped
   // as one doesn't travel.
@@ -741,7 +750,7 @@ function* morphTo(
     const range = scope(match.nextKinds, i);
     if (!range || !isArriving(i) || shapes.get(node)?.group) return;
     const shift = nearest(i, range, (j) => startsAt.get(j), false);
-    if (shift) arrivals.set(i, shift);
+    if (shift && travels(shift)) arrivals.set(i, shift);
   });
   // A leaving glyph goes where its neighbour goes.
   const newIndexOf = new Map(
@@ -760,7 +769,7 @@ function* morphTo(
       },
       true,
     );
-    if (start) departures.set(node, [-start[0], -start[1]]);
+    if (start && travels(start)) departures.set(node, [-start[0], -start[1]]);
   }
 
   // Ghost coordinates start at the layer's place in the flow, which holds

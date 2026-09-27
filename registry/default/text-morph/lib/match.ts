@@ -151,41 +151,113 @@ export function findNumbers(glyphs: string[]): NumberToken[] {
   return tokens;
 }
 
-/**
- * A key per glyph of one number, naming its place: `i2` is the hundreds,
- * `g3` the separator left of them, `f0` the first decimal, `d` the point.
- * Glyphs with the same key and character are the same glyph.
- */
-export function placeKeys(glyphs: string[], decimal: string): string[] {
-  const first = glyphs.findIndex(isDigit);
-  let last = glyphs.length - 1;
-  while (last > first && !isDigit(glyphs[last])) last--;
-  let point = -1;
-  for (let i = last; i > first; i--) {
-    if (glyphs[i] === decimal) {
-      point = i;
-      break;
-    }
-  }
-  const intEnd = point === -1 ? last + 1 : point;
+/** Past this many digits gained or lost, a number is replaced, not moved. */
+const MAGNITUDE_JUMP = 3;
 
-  const keys: string[] = new Array(glyphs.length);
-  for (let i = 0; i < first; i++) keys[i] = `p${first - i}`;
-  for (let i = last + 1; i < glyphs.length; i++) keys[i] = `s${i - last}`;
-  let place = 0;
-  for (let i = intEnd - 1; i >= first; i--) {
-    if (isDigit(glyphs[i])) keys[i] = `i${place++}`;
-    else keys[i] = `g${place}`;
+/**
+ * Pair two numbers' glyphs by place (torph's placeMatch), as [new, old]
+ * index pairs. The shared prefix and suffix (a currency symbol, a `%`)
+ * hold. Digits pair on the decimal point: by column while the count stays
+ * the same, and as the longest run carried from the units column when it
+ * changes, so `12,345` → `1,234` keeps 1234 sliding over. A separator holds
+ * its distance from the point (sliding the comma one group along on
+ * `999,999` → `1,000,000`) unless digits carried a reshape, when it would
+ * have to cross them and leaves instead. Gaining or losing three digits or
+ * more replaces the number: the two no longer read as one figure moving.
+ */
+export function matchPlaces(
+  old: string[],
+  next: string[],
+  decimal: string,
+): [number, number][] {
+  const pairs = new Map<number, number>();
+  let start = 0;
+  while (
+    start < old.length &&
+    start < next.length &&
+    old[start] === next[start] &&
+    !isDigit(old[start])
+  ) {
+    pairs.set(start, start);
+    start++;
   }
-  if (point !== -1) {
-    keys[point] = "d";
-    let decimals = 0;
-    for (let i = point + 1; i <= last; i++) {
-      if (isDigit(glyphs[i])) keys[i] = `f${decimals++}`;
-      else keys[i] = `h${decimals}`;
+  let oldEnd = old.length;
+  let nextEnd = next.length;
+  while (
+    oldEnd > start &&
+    nextEnd > start &&
+    old[oldEnd - 1] === next[nextEnd - 1] &&
+    !isDigit(old[oldEnd - 1])
+  ) {
+    pairs.set(nextEnd - 1, oldEnd - 1);
+    oldEnd--;
+    nextEnd--;
+  }
+
+  // The decimal point, or the end where there is none.
+  const pivotOf = (glyphs: string[], end: number): number => {
+    for (let i = end - 1; i >= start; i--) if (glyphs[i] === decimal) return i;
+    return end;
+  };
+  const digitsIn = (glyphs: string[], from: number, to: number): number[] => {
+    const out: number[] = [];
+    for (let i = from; i < to; i++) if (isDigit(glyphs[i])) out.push(i);
+    return out;
+  };
+  const oldPivot = pivotOf(old, oldEnd);
+  const nextPivot = pivotOf(next, nextEnd);
+  const oldInt = digitsIn(old, start, oldPivot);
+  const nextInt = digitsIn(next, start, nextPivot);
+  // A side with no digits is a field being typed into or emptied.
+  if (
+    oldInt.length > 0 &&
+    nextInt.length > 0 &&
+    Math.abs(oldInt.length - nextInt.length) >= MAGNITUDE_JUMP
+  ) {
+    return [...pairs];
+  }
+
+  // Returns whether digits survived a change in their count.
+  const pairDigits = (a: number[], b: number[], reshapes: boolean): boolean => {
+    if (a.length === b.length || !reshapes) {
+      for (let k = 0; k < Math.min(a.length, b.length); k++) {
+        if (old[a[k]] === next[b[k]]) pairs.set(b[k], a[k]);
+      }
+      return false;
+    }
+    // From the units column, so ties on repeated digits resolve there.
+    const carried = lcs(
+      a.map((i) => old[i]).reverse(),
+      b.map((i) => next[i]).reverse(),
+    );
+    for (const [to, from] of carried) {
+      pairs.set(b[b.length - 1 - to], a[a.length - 1 - from]);
+    }
+    return carried.length > 0;
+  };
+  const separator = (from: number, to: number): void => {
+    if (!isDigit(old[from]) && old[from] === next[to]) pairs.set(to, from);
+  };
+
+  if (!pairDigits(oldInt, nextInt, true)) {
+    for (let k = 1; oldPivot - k >= start && nextPivot - k >= start; k++) {
+      separator(oldPivot - k, nextPivot - k);
     }
   }
-  return keys;
+  // A fraction's columns are fixed by the point: 1.5 → 1.25 gains a
+  // hundredths rather than sliding the 5.
+  if (oldPivot < oldEnd && nextPivot < nextEnd) {
+    pairs.set(nextPivot, oldPivot);
+    for (let k = 1; oldPivot + k < oldEnd && nextPivot + k < nextEnd; k++) {
+      separator(oldPivot + k, nextPivot + k);
+    }
+    pairDigits(
+      digitsIn(old, oldPivot + 1, oldEnd),
+      digitsIn(next, nextPivot + 1, nextEnd),
+      false,
+    );
+  }
+  return [...pairs];
 }
 
 /**
@@ -522,16 +594,9 @@ export function matchText(
     const aGlyphs = old.slice(a.start, a.end);
     const bGlyphs = next.slice(b.start, b.end);
     if (caret === undefined) {
-      const byKey = new Map<string, number>();
-      placeKeys(aGlyphs, options.decimal).forEach((key, i) =>
-        byKey.set(key, a.start + i),
-      );
-      placeKeys(bGlyphs, options.decimal).forEach((key, i) => {
-        const from = byKey.get(key);
-        if (from !== undefined && old[from] === next[b.start + i]) {
-          kept[b.start + i] = from;
-        }
-      });
+      for (const [to, from] of matchPlaces(aGlyphs, bGlyphs, options.decimal)) {
+        kept[b.start + to] = a.start + from;
+      }
     }
     for (let i = a.start; i < a.end; i++) oldKinds[i] = "number";
     for (let i = b.start; i < b.end; i++) nextKinds[i] = "number";
@@ -573,7 +638,11 @@ export function matchText(
   }
   const oldText = old.flatMap((_, i) => (oldKinds[i] === "text" ? [i] : []));
   const nextText = next.flatMap((_, i) => (nextKinds[i] === "text" ? [i] : []));
-  const match = mode === "roll" ? matchEnds : matchAnywhere;
+  // A one-word value with digits in it that isn't a number (a clock, a
+  // version) keeps its letters in order, as torph does: a digit reused from
+  // another column would read as the time running backwards.
+  const hasDigits = options.numbers && [...old, ...next].some(isDigit);
+  const match = mode === "roll" ? matchEnds : hasDigits ? lcs : matchAnywhere;
   for (const [to, from] of match(
     oldText.map((i) => old[i]),
     nextText.map((i) => next[i]),

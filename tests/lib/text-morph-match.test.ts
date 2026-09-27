@@ -6,7 +6,7 @@ import {
   findNumbers,
   matchText,
   parseNumber,
-  placeKeys,
+  matchPlaces,
   textUnits,
   type MatchOptions,
 } from "@/registry/default/text-morph/lib/match";
@@ -53,30 +53,66 @@ describe("findNumbers", () => {
   });
 });
 
-describe("placeKeys", () => {
-  it("names places from the decimal point outward", () => {
-    expect(placeKeys(chars("$1,204.5"), ".")).toEqual([
-      "p1",
-      "i3",
-      "g3",
-      "i2",
-      "i1",
-      "i0",
-      "d",
-      "f0",
+// torph's number cases (packages/test-cases/src/number-cases.ts): for each
+// new glyph, the old glyph it keeps, or null.
+describe("matchPlaces", () => {
+  const places = (
+    from: string,
+    to: string,
+    decimal = ".",
+  ): (number | null)[] => {
+    const pairs = new Map(matchPlaces(chars(from), chars(to), decimal));
+    return chars(to).map((_, i) => pairs.get(i) ?? null);
+  };
+
+  it("keeps digits in their columns", () => {
+    expect(places("100", "101")).toEqual([0, 1, null]);
+    expect(places("1,234", "1,834")).toEqual([0, 1, null, 3, 4]);
+  });
+
+  it("grows new places on the left", () => {
+    expect(places("99", "199")).toEqual([null, 0, 1]);
+  });
+
+  it("slides the comma a group along as the number grows", () => {
+    expect(places("999,999", "1,000,000")).toEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
+      3,
+      null,
+      null,
+      null,
     ]);
   });
 
-  it("uses the locale's decimal separator", () => {
-    expect(placeKeys(chars("1.204,5"), ",")).toEqual([
-      "i3",
-      "g3",
-      "i2",
-      "i1",
-      "i0",
-      "d",
-      "f0",
+  it("slides carried digits over when the count changes, and drops the comma", () => {
+    expect(places("12,345", "1,234")).toEqual([0, null, 1, 3, 4]);
+    expect(places("1.234,56", "12.345,67", ",")).toEqual([
+      0,
+      2,
+      null,
+      3,
+      4,
+      null,
+      5,
+      null,
+      null,
     ]);
+  });
+
+  it("replaces a number three or more digits bigger, keeping only its affixes", () => {
+    expect(places("$999.50", "$1,000,000.00")).toEqual([
+      0,
+      ...new Array<null>(12).fill(null),
+    ]);
+    expect(places("$12,345,678", "$99")).toEqual([0, null, null]);
+  });
+
+  it("keeps a fraction's columns", () => {
+    expect(places("1.5", "1.55")).toEqual([0, 1, 2, null]);
   });
 });
 
@@ -169,10 +205,18 @@ describe("matchText", () => {
 describe("matchText with a caret", () => {
   const at = (caret: number): MatchOptions => ({ ...OPTIONS, caret });
 
-  it("inserts at the caret instead of renumbering places", () => {
-    // Typed 1 between 2 and 0: by place value only the 0 would stay.
-    expect(keptView("morph", "20", "210")).toBe("__0");
-    expect(keptView("morph", "20", "210", at(2))).toBe("2_0");
+  it("puts a typed digit at the caret, not wherever the digits carry", () => {
+    // Typing 1 at index 1 of 1,111: by place, the new 1 would be the first.
+    const byPlace = matchText(
+      "morph",
+      chars("1,111"),
+      chars("11,111"),
+      OPTIONS,
+    );
+    const atCaret = matchText("morph", chars("1,111"), chars("11,111"), at(2));
+    expect(byPlace.kept[0]).toBe(-1);
+    expect(atCaret.kept[0]).toBe(0);
+    expect(atCaret.kept[1]).toBe(-1);
   });
 
   it("keeps everything after a deletion, shifted back", () => {

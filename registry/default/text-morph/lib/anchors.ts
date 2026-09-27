@@ -14,13 +14,13 @@ export function crossesLines([, dy]: Trip, line: number): boolean {
 
 /**
  * Whether every arriving and leaving glyph travels with its neighbours, on
- * its line too. Morph and settle: new text appears where it ends up while
+ * its line too. Morph and blend: new text appears where it ends up while
  * the words that stay slide into place, so without it they ran into each
  * other mid-change (`Draft saved.` → `Changes saved!` drew `Changesaved`).
  * Roll's glyphs roll in place on their line.
  */
 const anchorsAll = (mode: TextMorphMode): boolean =>
-  mode === "morph" || mode === "settle";
+  mode === "morph" || mode === "blend";
 
 /**
  * Which way a glyph rolls (1 up from below, -1 down from above): with its
@@ -38,7 +38,7 @@ export function rollWith(
 
 /**
  * Where a glyph at `i` may find a neighbour to travel with, as an index
- * range: anywhere in the value in morph and settle; in roll mode only a
+ * range: anywhere in the value in morph and blend; in roll mode only a
  * digit, and only within its own number. None under reduced motion.
  */
 export function neighbourScope(

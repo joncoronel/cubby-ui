@@ -573,7 +573,7 @@ function sharedEnds(old: string[], next: string[]): [number, number][] {
  *
  * `within` is what a changed word keeps of the old word it pairs with:
  * `letters` (morph), the letters they share anywhere, in order; `ends`
- * (settle), only what they share at the start and end, so the change is one
+ * (blend), only what they share at the start and end, so the change is one
  * run in the middle: `2024-01-01` → `2024-01-02` changes the last digit,
  * where letters reused from anywhere in a word read as busy.
  */
@@ -586,7 +586,7 @@ function matchWords(
 ): [number, number][] {
   const oldWords = wordsOf(old, oldKinds);
   const nextWords = wordsOf(next, nextKinds);
-  // Keeping only ends (settle), a word is the same word whatever
+  // Keeping only ends (blend), a word is the same word whatever
   // punctuation it ends or starts with: `saved.` → `saved!` keeps `saved`
   // and swaps the mark. A word of punctuation alone is itself.
   const core = (key: string[]): string[] => {
@@ -618,7 +618,7 @@ function matchWords(
   });
 
   // Words that changed: the most similar old word in the same gap. Keeping
-  // ends (settle), a gap holding one changed word on each side pairs them
+  // ends (blend), a gap holding one changed word on each side pairs them
   // however little they share, since only their shared ends are kept: a
   // one-word value like `1.2K` → `12.4M` keeps its `1` rather than
   // replaying whole for falling short of the similarity bar.
@@ -737,10 +737,10 @@ export function matchText(
   const paired = Math.min(oldNumbers.length, nextNumbers.length);
 
   const caret = options.caret;
-  // Settle always works by words; morph once a value has more than one.
+  // Blend always works by words; morph once a value has more than one.
   const byWords =
     caret === undefined &&
-    (mode === "settle" ||
+    (mode === "blend" ||
       (mode === "morph" &&
         (next.some(isBreak) || wordsOf(old, oldKinds).length > 1)));
 

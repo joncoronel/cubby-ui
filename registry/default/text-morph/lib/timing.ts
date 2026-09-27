@@ -41,7 +41,7 @@ export const HOME: Keyframe = { translate: "0 0", scale: "1", rotate: "0deg" };
 
 /**
  * Transform keyframe for a glyph away from home: `offset` is 1 below the
- * line, -1 above. Settle scales a glyph about its run's centre (its
+ * line, -1 above. Blend scales a glyph about its run's centre (its
  * transform origin), so a changed run grows in as one unit, and drifts
  * digits a little the way the value went. Morph letters scale in place; morph digits roll whole lines
  * (`line` is the line height in px).
@@ -52,11 +52,11 @@ export function awayState(
   offset: 1 | -1,
   line: number,
 ): Keyframe {
-  if (o.mode === "settle") {
-    const drift = kind === "number" ? offset * o.settle.distance : 0;
+  if (o.mode === "blend") {
+    const drift = kind === "number" ? offset * o.blend.distance : 0;
     return {
       translate: drift === 0 ? "0 0" : `0 ${drift}em`,
-      scale: String(o.settle.scale),
+      scale: String(o.blend.scale),
       rotate: "0deg",
     };
   }
@@ -107,7 +107,7 @@ export function stillOptions(o: TextMorphOptions): TextMorphOptions {
     stagger: { ...o.stagger, ms: 0 },
     roll: { distance: 0, scale: 1, rotate: 0 },
     morph: { ...o.morph, scale: 1, digits: { ...o.morph.digits, distance: 0 } },
-    settle: { distance: 0, scale: 1 },
+    blend: { distance: 0, scale: 1 },
     blur: 0,
   };
 }

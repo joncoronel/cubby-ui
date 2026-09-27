@@ -189,3 +189,10 @@
 .text-morph-ghost[data-travel] {
   mask-image: none;
 }
+
+/* Blend: arriving text carried in from past a pinned edge a reader sees (a
+   button's) stays hidden past it while the change plays (the engine sets
+   the inset and lifts it when the change ends). */
+.text-morph[data-edge-clip] {
+  clip-path: var(--text-morph-clip);
+}

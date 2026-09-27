@@ -1,11 +1,11 @@
-export type TextMorphMode = "settle" | "roll" | "morph";
+export type TextMorphMode = "blend" | "roll" | "morph";
 
 /** One CSS timing: a duration in ms and any CSS easing, `linear()` included. */
 export type Timing = { duration: number; easing: string };
 
 export type TextMorphOptions = {
   /**
-   * `settle` changes only what changed (a similar word keeps what it shares
+   * `blend` changes only what changed (a similar word keeps what it shares
    * at its ends), crossfading each changed run as one unit, a touch smaller
    * and blurred: calm enough for anything. `roll` keeps the old and new text's shared start and end, and
    * rolls the glyphs between vertically, on Scritto's defaults. `morph`
@@ -41,11 +41,11 @@ export type TextMorphOptions = {
     digits: { distance: number; fadeIn: Timing; fadeOut: Timing };
   };
   /**
-   * Settle: a changed run, letters or digits, grows into place from `scale`
+   * Blend: a changed run, letters or digits, grows into place from `scale`
    * about its own centre, as one unit; changed digits also drift
    * `distance` (em) the way the value went.
    */
-  settle: { distance: number; scale: number };
+  blend: { distance: number; scale: number };
   /** Blur on arriving and leaving glyphs, in em. */
   blur: number;
   /**
@@ -100,7 +100,7 @@ const SCRITTO_OPTIONS: TextMorphOptions = {
   stagger: { mode: "spread", ms: 165 },
   roll: { distance: 0.35, scale: 0.6, rotate: 2 },
   morph: { scale: 0.6, digits: TORPH_DIGITS },
-  settle: { distance: 0.15, scale: 1 },
+  blend: { distance: 0.15, scale: 1 },
   blur: 0.1,
   numbers: true,
   trend: "auto",
@@ -122,7 +122,7 @@ const TORPH_OPTIONS: TextMorphOptions = {
   stagger: { mode: "each", ms: 0 },
   roll: { distance: 0.35, scale: 0.95, rotate: 0 },
   morph: { scale: 0.95, digits: TORPH_DIGITS },
-  settle: { distance: 0.15, scale: 1 },
+  blend: { distance: 0.15, scale: 1 },
   blur: 0,
   numbers: true,
   trend: "down",
@@ -139,32 +139,32 @@ const TORPH_OPTIONS: TextMorphOptions = {
  * width and the words that stay sliding to their places included, runs on
  * one strong ease-out.
  */
-const SETTLE_EASING = WIDTH_EASING;
-const SETTLE_OPTIONS: TextMorphOptions = {
-  mode: "settle",
-  motion: { duration: 240, easing: SETTLE_EASING },
-  fadeIn: { duration: 240, easing: SETTLE_EASING, delay: 0 },
-  fadeOut: { duration: 150, easing: SETTLE_EASING },
-  width: { duration: 240, easing: SETTLE_EASING },
+const BLEND_EASING = WIDTH_EASING;
+const BLEND_OPTIONS: TextMorphOptions = {
+  mode: "blend",
+  motion: { duration: 240, easing: BLEND_EASING },
+  fadeIn: { duration: 240, easing: BLEND_EASING, delay: 0 },
+  fadeOut: { duration: 150, easing: BLEND_EASING },
+  width: { duration: 240, easing: BLEND_EASING },
   stagger: { mode: "each", ms: 0 },
   roll: { distance: 0.35, scale: 1, rotate: 0 },
   morph: { scale: 1, digits: TORPH_DIGITS },
-  settle: { distance: 0.08, scale: 0.9 },
+  blend: { distance: 0.08, scale: 0.9 },
   blur: 0.1,
   numbers: true,
   trend: "auto",
   edgeFade: "auto",
 };
 
-/** Each mode brings its own defaults: settle is Cubby's, roll Scritto's, morph torph's. */
+/** Each mode brings its own defaults: blend is Cubby's, roll Scritto's, morph torph's. */
 export const MODE_DEFAULTS: Record<TextMorphMode, TextMorphOptions> = {
-  settle: SETTLE_OPTIONS,
+  blend: BLEND_OPTIONS,
   roll: SCRITTO_OPTIONS,
   morph: TORPH_OPTIONS,
 };
 
-/** Production: morph. */
-export const DEFAULT_OPTIONS: TextMorphOptions = MODE_DEFAULTS.morph;
+/** The default: blend, calm enough for anything. */
+export const DEFAULT_OPTIONS: TextMorphOptions = MODE_DEFAULTS.blend;
 
 type Overrides<T> = {
   [K in keyof T]?: T[K] extends object ? Overrides<T[K]> : T[K];

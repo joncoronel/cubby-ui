@@ -474,94 +474,85 @@ describe("a roll run in centred or end-pinned text", () => {
   });
 });
 
-describe("settle", () => {
+describe("blend", () => {
   it("keeps the words that stay and swaps changed ones whole", () => {
-    expect(keptView("settle", "hello world", "hello there")).toBe(
-      "hello _____",
-    );
+    expect(keptView("blend", "hello world", "hello there")).toBe("hello _____");
     // Unrelated words swap whole.
-    expect(keptView("settle", "Draft", "Changes")).toBe("_______");
+    expect(keptView("blend", "Draft", "Changes")).toBe("_______");
   });
 
   it("keeps words that moved, and numbers by place", () => {
-    expect(keptView("settle", "hello world", "world hello")).toBe(
-      "world hello",
-    );
-    expect(keptView("settle", "Total $1,204", "Total $1,318")).toBe(
+    expect(keptView("blend", "hello world", "world hello")).toBe("world hello");
+    expect(keptView("blend", "Total $1,204", "Total $1,318")).toBe(
       "Total $1,___",
     );
   });
 });
 
-describe("settle punctuation", () => {
+describe("blend punctuation", () => {
   it("keeps a word whose punctuation changed, swapping only the mark", () => {
-    expect(keptView("settle", "Draft saved.", "Changes saved!")).toBe(
+    expect(keptView("blend", "Draft saved.", "Changes saved!")).toBe(
       "_______ saved_",
     );
-    expect(keptView("settle", "(beta)", "beta")).toBe("beta");
+    expect(keptView("blend", "(beta)", "beta")).toBe("beta");
   });
 
   it("matches a word of punctuation alone only to itself", () => {
-    expect(keptView("settle", "a — b", "a ? b")).toBe("a _ b");
+    expect(keptView("blend", "a — b", "a ? b")).toBe("a _ b");
   });
 });
 
-describe("settle similar words", () => {
+describe("blend similar words", () => {
   it("keeps only what a similar word shares at its ends", () => {
-    expect(keptView("settle", "2024-01-01", "2024-01-02")).toBe("2024-01-0_");
-    expect(keptView("settle", "v1.2.3", "v1.2.4")).toBe("v1.2._");
-    expect(keptView("settle", "Copy", "Copied")).toBe("Cop___");
+    expect(keptView("blend", "2024-01-01", "2024-01-02")).toBe("2024-01-0_");
+    expect(keptView("blend", "v1.2.3", "v1.2.4")).toBe("v1.2._");
+    expect(keptView("blend", "Copy", "Copied")).toBe("Cop___");
   });
 
   it("doesn't reuse letters from the middle, as morph does", () => {
-    // Morph keeps the r, e and d it shares anywhere; settle only the ends.
+    // Morph keeps the r, e and d it shares anywhere; blend only the ends.
     expect(keptView("morph", "ordered", "rendered")).not.toBe(
-      keptView("settle", "ordered", "rendered"),
+      keptView("blend", "ordered", "rendered"),
     );
-    expect(keptView("settle", "ordered", "rendered")).toBe("___dered");
+    expect(keptView("blend", "ordered", "rendered")).toBe("___dered");
   });
 });
 
-describe("settle one-word values", () => {
+describe("blend one-word values", () => {
   it("keeps the shared ends however little the words share", () => {
-    expect(keptView("settle", "999K", "1.2K")).toBe("___K");
-    expect(keptView("settle", "1.2K", "12.4M")).toBe("1_.__");
-    expect(keptView("settle", "12.4M", "1.1B")).toBe("1.__");
-    expect(keptView("settle", "cat", "hat")).toBe("_at");
+    expect(keptView("blend", "999K", "1.2K")).toBe("___K");
+    expect(keptView("blend", "1.2K", "12.4M")).toBe("1_.__");
+    expect(keptView("blend", "12.4M", "1.1B")).toBe("1.__");
+    expect(keptView("blend", "cat", "hat")).toBe("_at");
   });
 
   it("still swaps a word whole when nothing is shared", () => {
-    expect(keptView("settle", "1.1B", "999K")).toBe("____");
+    expect(keptView("blend", "1.1B", "999K")).toBe("____");
   });
 });
 
-describe("settle fixed formats", () => {
+describe("blend fixed formats", () => {
   it("keeps what stays in place between the ends", () => {
-    expect(keptView("settle", "09:59", "10:00")).toBe("__:__");
-    expect(keptView("settle", "v1.3.0", "v2.0.0")).toBe("v_._.0");
-    expect(keptView("settle", "v1.2.3", "v1.3.0")).toBe("v1._._");
+    expect(keptView("blend", "09:59", "10:00")).toBe("__:__");
+    expect(keptView("blend", "v1.3.0", "v2.0.0")).toBe("v_._.0");
+    expect(keptView("blend", "v1.2.3", "v1.3.0")).toBe("v1._._");
   });
 
   it("never moves a glyph to another place, as morph does", () => {
-    // Morph slides the 0 over from the hour's tens; settle replaces it.
+    // Morph slides the 0 over from the hour's tens; blend replaces it.
     expect(keptView("morph", "09:59", "10:00")).toBe("_0:__");
   });
 });
 
-describe("settle punctuation that moves", () => {
+describe("blend punctuation that moves", () => {
   it("slides a decimal point to its new place as the number reshapes", () => {
     // 12.4M → 1.1B: `1` stays, the `.` slides left from the old decimal.
-    const { kept } = matchText(
-      "settle",
-      chars("12.4M"),
-      chars("1.1B"),
-      OPTIONS,
-    );
+    const { kept } = matchText("blend", chars("12.4M"), chars("1.1B"), OPTIONS);
     expect(kept).toEqual([0, 2, -1, -1]);
-    expect(keptView("settle", "1.2K", "12.4M")).toBe("1_.__");
+    expect(keptView("blend", "1.2K", "12.4M")).toBe("1_.__");
   });
 
   it("never moves a letter or digit, or a repeated mark", () => {
-    expect(keptView("settle", "1.2.3x", "9.8.7")).toBe("_____");
+    expect(keptView("blend", "1.2.3x", "9.8.7")).toBe("_____");
   });
 });

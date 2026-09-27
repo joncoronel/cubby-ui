@@ -437,6 +437,8 @@ function anchorHint(style: CSSStyleDeclaration): number {
 
 /** Tags a label's current resize, so an older one can't release it. */
 let sizings = 0;
+/** Tags a label's current edge clip, so an older change can't lift it. */
+let edgeClips = 0;
 
 function flushMorphs(): void {
   let active = queue.splice(0);
@@ -604,6 +606,7 @@ function* morphTo(
   // Free to wrap again, so step 5 sees how the new value falls.
   delete root.dataset.sizing;
   stage.style.left = "";
+  delete root.dataset.edgeClip;
   for (const slot of gone) slot.remove();
   // The slots fade from step 8 on, while this change plays.
   delete glyphLayer.dataset.playing;
@@ -692,8 +695,8 @@ function* morphTo(
   // Morph also scales a whole word arriving or leaving about its own
   // centre, as one shape; in a one-word value, only a run of GROUP_MIN or
   // more replaced glyphs, further and faster.
-  // Settle plans too: each changed run of letters scales about its centre.
-  const shaping = (o.mode === "morph" || o.mode === "settle") && !reduced;
+  // Blend plans too: each changed run of letters scales about its centre.
+  const shaping = (o.mode === "morph" || o.mode === "blend") && !reduced;
   // How far each survivor moved in the layout, from its old place to its
   // final one. The layout, not where it's drawn (torph measures with
   // transforms taken out): a digit still falling in is drawn above its
@@ -715,10 +718,10 @@ function* morphTo(
       boxOf: (i: number) => DOMRect | undefined,
     ): void => {
       const isSpace = (i: number): boolean => spaceNode(glyphs[i]);
-      // Settle: each changed run, letters or digits, whole word or not.
+      // Blend: each changed run, letters or digits, whole word or not.
       // Morph: whole words and long runs, as torph.
       const planned =
-        o.mode === "settle"
+        o.mode === "blend"
           ? planRuns({
               count: glyphs.length,
               isSpace,
@@ -762,6 +765,41 @@ function* morphTo(
       shapes.get(side === "next" ? nodes[i] : old[i])?.group ?? false,
   });
   const arrivals = trips.arrivals;
+  // Arriving text carried in from past the edge a reader sees around the
+  // value (a right-pinned button's: `Copied` → `Copy page` brings `page`
+  // in from past its right edge) stays hidden past that edge while the
+  // change plays, the way leaving text carried out dissolves there under the
+  // edge fade. Blend needs it: its new text shows from its first frame,
+  // where morph's waits 100ms, by when it has come most of the way in.
+  // Clipped, since a mask can't hide what's outside its element, and only
+  // on an edge the label holds still (the one it's pinned by), so the clip
+  // holds still with it.
+  let edgeClip: string | null = null;
+  if (
+    o.mode === "blend" &&
+    easesAsBox &&
+    o.edgeFade !== "never" &&
+    arrivals.size > 0
+  ) {
+    const bounds = visibleBounds(root);
+    let pastStart = false;
+    let pastEnd = false;
+    for (const [i, [dx]] of arrivals) {
+      if (after[i].left + dx < bounds.left - 0.5) pastStart = true;
+      if (after[i].right + dx > bounds.right + 0.5) pastEnd = true;
+    }
+    const clipLeft =
+      pastStart && Math.abs(rootBefore.left - rootAfter.left) < 0.5;
+    const clipRight =
+      pastEnd && Math.abs(rootBefore.right - rootAfter.right) < 0.5;
+    if (clipLeft || clipRight) {
+      const right = clipRight
+        ? `${rootAfter.right - bounds.right}px`
+        : "-100vw";
+      const left = clipLeft ? `${bounds.left - rootAfter.left}px` : "-100vw";
+      edgeClip = `inset(-100vh ${right} -100vh ${left})`;
+    }
+  }
   const departures = new Map<HTMLElement, Trip>();
   for (const { node, index } of newSlots) {
     const trip = trips.departures.get(index);
@@ -905,6 +943,11 @@ function* morphTo(
   root.style.width = authorWidth;
   root.style.height = authorHeight;
   glyphLayer.dataset.playing = "";
+  const clip = edgeClip === null ? null : String(++edgeClips);
+  if (clip !== null && edgeClip !== null) {
+    root.dataset.edgeClip = clip;
+    root.style.setProperty("--text-morph-clip", edgeClip);
+  }
   for (const { slot } of ghosts) {
     placeSlot(slot, px(slot, "--x") + shiftX, px(slot, "--y") + shiftY);
   }
@@ -1027,8 +1070,8 @@ function* morphTo(
     // A shape's glyph slides toward the shape's centre as it scales, out of
     // its slot, whose fade would cut it off; it doesn't roll, so it needs
     // no fade.
-    // So does a settle run's, scaling about the run's centre.
-    const inRun = o.mode === "settle" && shape !== undefined;
+    // So does a blend run's, scaling about the run's centre.
+    const inRun = o.mode === "blend" && shape !== undefined;
     if (shape?.group || inRun) {
       node.parentElement?.setAttribute("data-travel", "");
     }
@@ -1235,7 +1278,7 @@ function* morphTo(
     const atRest = was.scale === "1" && was.rotate === "0deg";
     const shape = atRest ? shapes.get(node) : undefined;
     setOrigin(node, shape?.origin ?? "");
-    if (shape?.group || (o.mode === "settle" && shape)) {
+    if (shape?.group || (o.mode === "blend" && shape)) {
       slot.setAttribute("data-travel", "");
     }
     const awayFrame = shape?.group
@@ -1297,6 +1340,12 @@ function* morphTo(
     // Cancelled by a later change, which already moved on without it.
     Promise.all([move.finished, out.finished]).then(finish, finish);
   });
+  if (clip !== null) {
+    const lift = (): void => {
+      if (root.dataset.edgeClip === clip) delete root.dataset.edgeClip;
+    };
+    void Promise.allSettled(started.map((a) => a.finished)).then(lift);
+  }
   return started;
 }
 

@@ -16,18 +16,16 @@ describe("resolveOptions", () => {
     const o = resolveOptions({ motion: { duration: 200 } });
     expect(o.motion).toEqual({
       duration: 200,
-      easing: MODE_DEFAULTS.morph.motion.easing,
+      easing: DEFAULT_OPTIONS.motion.easing,
     });
-    expect(o.fadeIn).toEqual(MODE_DEFAULTS.morph.fadeIn);
+    expect(o.fadeIn).toEqual(DEFAULT_OPTIONS.fadeIn);
   });
 
   it("merges two levels down", () => {
     const o = resolveOptions({ morph: { digits: { distance: 0.5 } } });
-    expect(o.morph.scale).toBe(MODE_DEFAULTS.morph.morph.scale);
+    expect(o.morph.scale).toBe(DEFAULT_OPTIONS.morph.scale);
     expect(o.morph.digits.distance).toBe(0.5);
-    expect(o.morph.digits.fadeIn).toEqual(
-      MODE_DEFAULTS.morph.morph.digits.fadeIn,
-    );
+    expect(o.morph.digits.fadeIn).toEqual(DEFAULT_OPTIONS.morph.digits.fadeIn);
   });
 
   it("takes the chosen mode's defaults under the overrides", () => {

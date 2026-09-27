@@ -114,41 +114,41 @@ describe("stillOptions", () => {
   });
 });
 
-describe("settle", () => {
-  const settle = MODE_DEFAULTS.settle;
+describe("blend", () => {
+  const blend = MODE_DEFAULTS.blend;
 
   it("crossfades a changed run as one unit, a touch smaller", () => {
-    expect(awayState(settle, "text", 1, 36)).toEqual({
+    expect(awayState(blend, "text", 1, 36)).toEqual({
       translate: "0 0",
       scale: "0.9",
       rotate: "0deg",
     });
-    expect(settle.stagger.ms).toBe(0);
-    expect(settle.blur).toBe(0.1);
+    expect(blend.stagger.ms).toBe(0);
+    expect(blend.blur).toBe(0.1);
   });
 
   it("crossfades digits the same way, with a hint of direction", () => {
-    expect(awayState(settle, "number", 1, 36)).toEqual({
+    expect(awayState(blend, "number", 1, 36)).toEqual({
       translate: "0 0.08em",
       scale: "0.9",
       rotate: "0deg",
     });
-    expect(awayState(settle, "number", -1, 36).translate).toBe("0 -0.08em");
+    expect(awayState(blend, "number", -1, 36).translate).toBe("0 -0.08em");
   });
 
   it("runs on one curve and leaves faster than it enters", () => {
     const curves = [
-      settle.motion.easing,
-      settle.fadeIn.easing,
-      settle.fadeOut.easing,
-      settle.width.easing,
+      blend.motion.easing,
+      blend.fadeIn.easing,
+      blend.fadeOut.easing,
+      blend.width.easing,
     ];
     expect(new Set(curves).size).toBe(1);
-    expect(settle.fadeOut.duration).toBeLessThan(settle.fadeIn.duration);
+    expect(blend.fadeOut.duration).toBeLessThan(blend.fadeIn.duration);
   });
 
   it("holds still under reduced motion", () => {
-    const still = stillOptions(settle);
+    const still = stillOptions(blend);
     expect(awayState(still, "text", 1, 36).scale).toBe("1");
     expect(awayState(still, "number", 1, 36)).toEqual({
       translate: "0 0",

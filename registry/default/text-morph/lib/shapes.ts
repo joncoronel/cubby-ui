@@ -72,7 +72,7 @@ function origins(
 }
 
 /**
- * Settle: every run of changed glyphs, a whole word or the changed middle
+ * Blend: every run of changed glyphs, a whole word or the changed middle
  * of one (`Copy` → `Copied` changes `ied`), scales about its own centre,
  * as one unit. Runs end at a survivor or a space. Pivots only; none is a
  * group.

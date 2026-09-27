@@ -25,7 +25,7 @@ Pass the current text as `value` and change it; `TextMorph` works out what moved
 ## Features
 
 - **Numbers by place value.** Digits line up on the decimal point, so `1,204` to `1,318` keeps the `1,` still and rolls only the digits that changed.
-- **Direction.** Glyphs roll up when a number grows and down when it shrinks.
+- **Direction.** Numbers show which way they went: up when they grow, down when they shrink.
 - **Interruptible.** A change that lands mid-animation starts every glyph from where it is on screen, so rapid updates never jump.
 - **Edge fade.** When the box shrinks, old glyphs fade at the moving edge instead of running over the next word or out of a pill.
 - **Stable anchoring.** Centered and right-aligned labels hold still while the box resizes.
@@ -35,16 +35,17 @@ Pass the current text as `value` and change it; `TextMorph` works out what moved
 
 ### Modes
 
-Use `options.mode` to pick how glyphs move, `morph` (the default) or `roll`; each button here plays the next change in its mode.
+Use `options.mode` to pick how glyphs move: `blend` (the default), `morph` or `roll`. Each button here plays the next change in its mode.
 
 <ComponentPreview component="text-morph" example="text-morph-modes" />
 
-| Mode    | Description                                                                                                                                                                                                               |
-| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `morph` | Matches whole words, so a word that moves slides over intact, then letters within words that changed. Shared glyphs slide; the rest scale and fade, travelling with the nearest word that stays. Digits roll a full line. |
-| `roll`  | Keeps the shared start, end and a shared word in the middle; everything between rolls vertically on a spring.                                                                                                             |
+| Mode    | Description                                                                                                                                                                                                                                                                   |
+| ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `blend` | Changes only what changed. Words that stay slide into place, a similar word keeps what it shares at its start and end, and each changed run crossfades in as one unit, slightly smaller and blurred. Digits drift a little the way the number went. Calm enough for anything. |
+| `morph` | Matches whole words, so a word that moves slides over intact, then letters within words that changed. Shared glyphs slide; the rest scale and fade, travelling with the nearest word that stays. Digits roll a full line.                                                     |
+| `roll`  | Keeps the shared start, end and a shared word in the middle; everything between rolls vertically on a spring.                                                                                                                                                                 |
 
-`roll` runs about 700ms from the first glyph to the last, which suits headlines and values that change now and then. For buttons, tabs and values that update often, use `morph`, or run either mode on a shorter clock with [`faster`](#faster).
+`blend` is quick and quiet, a good fit for buttons, tabs, status labels and live values. `morph` is more expressive, and `roll` runs about 700ms from the first glyph to the last, which suits headlines and values that change now and then. Run any mode on a shorter clock with [`faster`](#faster).
 
 ### Numbers
 
@@ -142,10 +143,15 @@ Screen readers get the value as plain text; the animated glyphs are hidden from 
 
 <ApiPropsList>
 
-<ApiProp name="mode" fullType='"morph" | "roll"' defaultValue='"morph"'>
-  `morph` matches whole words, then letters within the words that changed, and
-  scales the rest in place. `roll` keeps the shared start, end and middle and
-  rolls the glyphs between.
+<ApiProp
+  name="mode"
+  fullType='"blend" | "morph" | "roll"'
+  defaultValue='"blend"'
+>
+  `blend` changes only what changed and crossfades each changed run in as one
+  unit, slightly smaller and blurred. `morph` matches whole words, then letters
+  within the words that changed, and scales the rest in place. `roll` keeps the
+  shared start, end and middle and rolls the glyphs between.
 </ApiProp>
 
 <ApiProp name="numbers" fullType="boolean" defaultValue="true">
@@ -155,7 +161,7 @@ Screen readers get the value as plain text; the animated glyphs are hidden from 
 <ApiProp
   name="trend"
   fullType='"auto" | "up" | "down"'
-  defaultValue='"auto" (roll), "down" (morph)'
+  defaultValue='"auto" (blend, roll), "down" (morph)'
 >
   Which way glyphs roll. `auto` reads it off the value, so a number that grew
   rolls up and one that shrank rolls down; `up` and `down` hold one way. In
@@ -175,7 +181,8 @@ Screen readers get the value as plain text; the animated glyphs are hidden from 
 </ApiProp>
 
 <ApiProp name="motion" fullType="{ duration: number; easing: string }">
-  Timing of glyph movement. `morph`: 400ms ease-out expo. `roll`: 550ms spring.
+  Timing of glyph movement. `blend`: 240ms ease-out. `morph`: 400ms ease-out
+  expo. `roll`: 550ms spring.
 </ApiProp>
 
 <ApiProp
@@ -196,6 +203,11 @@ Screen readers get the value as plain text; the animated glyphs are hidden from 
 <ApiProp name="stagger" fullType='{ mode: "each" | "spread"; ms: number }'>
   `each` starts every changed glyph `ms` after the last. `spread` sweeps left to
   right across `ms` over the changed stretch only.
+</ApiProp>
+
+<ApiProp name="blend" fullType="{ scale: number; distance: number }">
+  Blend mode: the scale a changed run grows in from (0.9), and how far changed
+  digits drift the way the number went (em, 0.08).
 </ApiProp>
 
 <ApiProp
@@ -231,14 +243,14 @@ import {
   faster,
 } from "@/components/ui/cubby-ui/text-morph/text-morph";
 
-const feedback = faster(MODE_DEFAULTS.morph, 0.5); // 200ms of motion
+const feedback = faster(MODE_DEFAULTS.blend, 0.5); // 120ms of motion
 
 <TextMorph value={copied ? "Copied" : "Copy"} options={feedback} />;
 ```
 
 ### Notes
 
-- **Defaults.** `morph` uses [torph](https://github.com/lochie/torph)'s timing and scale; `roll` uses [Scritto](https://github.com/JaceThings/Scritto)'s spring, travel, tilt and blur.
+- **Defaults.** `blend` is Cubby's own; `morph` uses [torph](https://github.com/lochie/torph)'s timing and scale; `roll` uses [Scritto](https://github.com/JaceThings/Scritto)'s spring, travel, tilt and blur.
 - **Off screen.** A change to a label that isn't on screen at that moment, or in a background tab, swaps instantly.
 - **Width.** A change that stays on one line eases the box to its new width, so text after an inline `TextMorph` slides instead of jumping. A change that wraps keeps the lines as they fall, without the width animation or the edge fade.
 - **Height.** Inline, the label's height is its lines', so gaining or losing a line changes it at once. Give it `className="block"` (it's a box already inside a flex or grid container) and a change of line count eases its height too, so the card or paragraph around it grows and shrinks smoothly. For `inline-block`, add `align-top`: aligned on its last line's baseline, an inline-block stretches its line to the new height at once as it grows.

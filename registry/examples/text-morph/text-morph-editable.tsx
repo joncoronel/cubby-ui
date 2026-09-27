@@ -1,16 +1,12 @@
 "use client";
 
 import * as React from "react";
-import {
-  MODE_DEFAULTS,
-  TextMorph,
-  faster,
-} from "@/registry/default/text-morph/text-morph";
+import { TextMorph, faster } from "@/registry/default/text-morph/text-morph";
 import { Input } from "@/registry/default/input/input";
 
 // Keystrokes come faster than the default timing, so the same look runs on
 // half the clock.
-const TYPING = faster(MODE_DEFAULTS.morph, 0.5);
+const TYPING = faster({}, 0.5);
 
 export default function TextMorphEditable() {
   const [value, setValue] = React.useState("1200");

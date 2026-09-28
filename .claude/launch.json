@@ -6,6 +6,11 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["run", "dev"],
       "port": 3000
+    },
+    {
+      "name": "dev (running)",
+      "url": "http://localhost:3000",
+      "port": 3000
     }
   ]
 }

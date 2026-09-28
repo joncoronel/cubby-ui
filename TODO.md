@@ -141,18 +141,9 @@ Design notes for ours:
 
 #### `:has()` variants make any element insertion restyle the whole docs page
 
-Found while profiling the TextMorph install tabs. On a docs page, inserting or removing a single element anywhere and then reading layout costs **~9–14ms**: Chrome restyles ~2,600 elements, nearly the whole document. Attribute and inline-style changes cost ~0.5ms. Switching off every `:has()` rule on the page drops an insertion to **0.8ms**, so the site's `:has()` rules are the cause.
+**Worst of it fixed.** On a docs page, inserting one element anywhere cost ~8ms of restyling (~3,150 elements), so typing into the TextMorph editable example lagged. Eight rules did it, each alone ~7–10ms: Tailwind's group-has and has-…-star-star variants, which compile to `:has()` inside `:is(… *)`, from Alert (title/description row span), InputGroup (addon padding beside an input, opacity while disabled) and Autocomplete (input padding for the clear and trigger buttons). Each is now written on the component's root with a direct child as the target (`[&:has(>…)>[data-slot=…]]:…`), which measured no extra cost: an insertion is down to ~1.5ms. Note that Tailwind v4 scans every file that isn't gitignored, markdown included, so a class spelled out in a note like this one gets compiled into the site; describe such classes rather than writing them out.
 
-The expensive ones (each alone brings back ~13–17ms) are Tailwind variants compiled from registry components into the site's global CSS, where `:has()` sits inside `:is(… *)` and Chrome can't target the invalidation:
-
-- `group-has-[…]` → `:is(:where(.group):has(…) *)`: Alert (`group-has-[*[data-slot=alert-title]]`, `…alert-description`), InputGroup (`group-has-[>input]/input-group`, `…[data-slot=input-group-control]:disabled`).
-- `has-data-[slot=…]:**:…` → `:is(.x:has(…) *)`: Autocomplete (`autocomplete-clear`, `autocomplete-trigger`).
-
-Dozens of other `:has()` rules add ~3ms each (e.g. `:root:has(.docs-root)`, `html:has([data-slot=drawer-viewport]…)`, code-block's `[&:not(:has(.line))]`, button-group separators, field-error).
-
-TextMorph now batches its DOM work so a change forces one such restyle instead of ~8 (see DESIGN.md → Text Morph), but anything else that inserts elements on these pages (menus, popovers, toasts, the code panel reveal) pays the same cost.
-
-To fix: rewrite the worst variants so `:has()` is the rule's subject, not inside `:is(… *)` — e.g. put a data attribute on the group from the component (`data-has-title`) and style descendants with `group-data-[has-title]:…`, which Chrome invalidates cheaply. Then scope the page-level ones (`:root:has(.docs-root)`) to a class set on `<html>` by the docs layout. Measure before and after with the insertion probe: append a `<span>` inside any docs element, then time `getBoundingClientRect()`.
+Still open: the remaining `:has()` rules add ~1ms together at most (e.g. `:root:has(.docs-root)`, `html:has([data-slot=drawer-viewport]…)`, code-block's `[&:not(:has(.line))]`, button-group separators, field-error). Scope the page-level ones to a class set on `<html>` by the docs layout if they ever matter. Measure with the insertion probe: append a `<span>` inside any docs element, then time `getBoundingClientRect()`.
 
 ### Code hygiene
 

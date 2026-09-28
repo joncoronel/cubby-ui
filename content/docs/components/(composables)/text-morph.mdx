@@ -67,7 +67,7 @@ Give `TextMorph` a value longer than its line and it wraps between words; glyphs
 
 ### Editable field
 
-Pass the input's caret as `cursorIndex` to mirror a field someone is typing in, so a typed digit is inserted instead of renumbering the ones after it; keystrokes come quickly, so run it on a shorter clock with [`faster`](#faster).
+Pass the input's caret as `cursorIndex` to mirror a field someone is typing in, so a typed digit is inserted instead of renumbering the ones after it. `blend` keeps up with typing as it is; with `morph` or `roll`, run it on a shorter clock with [`faster`](#faster).
 
 <ComponentPreview component="text-morph" example="text-morph-editable" />
 

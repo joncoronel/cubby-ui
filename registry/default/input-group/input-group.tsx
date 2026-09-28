@@ -13,6 +13,14 @@ const inputGroupVariants = cva(
     "group/input-group relative flex w-full items-center rounded-lg border bg-clip-padding",
     "min-w-0 has-[>textarea]:h-auto",
 
+    // Addons follow the control: dimmed while it's disabled, and a block
+    // addon tucked closer to an input. Here on the group, with a direct
+    // child as the target, rather than as group-has variants on the addon:
+    // those compile to `:has()` inside `:is(… *)`, which makes Chrome
+    // restyle the whole page on any DOM insertion (~8ms on a docs page).
+    "[&:has([data-slot=input-group-control]:disabled)>[data-slot=input-group-addon]]:opacity-60",
+    "[&:has(>input)>[data-align=block-start]]:pt-2.5 [&:has(>input)>[data-align=block-end]]:pb-2.5",
+
     // Variants based on alignment.
     "has-[>[data-align=inline-start]]:[&>input]:pl-2",
     "has-[>[data-align=inline-end]]:[&>input]:pr-2",
@@ -60,7 +68,7 @@ function InputGroup({
 }
 
 const inputGroupAddonVariants = cva(
-  "text-muted-foreground flex h-auto cursor-text items-center justify-center gap-2 py-1.5 text-sm font-medium select-none [&>svg:not([class*='size-'])]:size-4 [&>kbd]:rounded-[calc(var(--radius)-5px)] group-has-[[data-slot=input-group-control]:disabled]/input-group:opacity-60",
+  "text-muted-foreground flex h-auto cursor-text items-center justify-center gap-2 py-1.5 text-sm font-medium select-none [&>svg:not([class*='size-'])]:size-4 [&>kbd]:rounded-[calc(var(--radius)-5px)]",
   {
     variants: {
       align: {
@@ -69,9 +77,9 @@ const inputGroupAddonVariants = cva(
         "inline-end":
           "order-last pr-3 has-[>button]:mr-[-0.45rem] has-[>kbd]:mr-[-0.35rem]",
         "block-start":
-          "order-first w-full justify-start px-3 pt-3 [.border-b]:pb-3 group-has-[>input]/input-group:pt-2.5",
+          "order-first w-full justify-start px-3 pt-3 [.border-b]:pb-3",
         "block-end":
-          "order-last w-full justify-start px-3 pb-3 [.border-t]:pt-3 group-has-[>input]/input-group:pb-2.5",
+          "order-last w-full justify-start px-3 pb-3 [.border-t]:pt-3",
       },
     },
     defaultVariants: {

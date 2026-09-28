@@ -773,16 +773,17 @@
 
 /* ── Text morph clipping ─────────────────────────────────────────────── */
 
-/* Clips a morphing label without an ellipsis (see MorphText); fades the edge
-   only when the settled text is too long to fit. */
+/* Clips a morphing label without an ellipsis (see MorphText), and fades the
+   edge, only when the settled text is too long to fit. Clipping always cut
+   the label at its easing width, so new text was wiped in as it grew. */
 .docs-morph-clip {
   display: block;
   min-width: 0;
   max-width: 100%;
-  overflow: hidden;
   white-space: nowrap;
 }
 .docs-morph-clip[data-overflowing] {
+  overflow: hidden;
   mask-image: linear-gradient(to right, #000 calc(100% - 1.5rem), transparent);
 }
 

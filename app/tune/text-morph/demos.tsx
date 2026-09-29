@@ -19,11 +19,10 @@ import {
   StageValue,
   type Align,
   type DemoView,
-} from "./torph-playground";
+} from "./playground";
 
 /*
- * torph's playground demos (site/src/surfaces/playground in lochie/torph):
- * free-form screens beside the cases, where nothing is asserted.
+ * Playground demos: free-form screens beside the cases, where nothing is asserted.
  */
 
 type DemoProps = {
@@ -143,7 +142,7 @@ type Decomposed = {
   fractionDigits: number;
 };
 
-/** A typed value's fixed affixes and the quantity between them (torph's). */
+/** A typed value's fixed affixes and the quantity between them. */
 function decompose(value: string, decimal: string): Decomposed | null {
   const first = value.search(/\d/);
   if (first === -1) return null;
@@ -487,7 +486,7 @@ function InputDemo(props: DemoProps): React.ReactElement {
           // The field's own value, drawn large; reading it back doubles it.
           aria-hidden="true"
           className={cn(
-            // torph's line height (1.6): text-5xl's own (1) put a comma's
+            // A 1.6 line height: text-5xl's own (1) put a comma's
             // tail in the slot's fade.
             "text-5xl leading-[1.6] font-medium tabular-nums transition-opacity",
             query === undefined && "opacity-50",
@@ -527,7 +526,7 @@ const DEMOS: Record<DemoView, (props: DemoProps) => React.ReactElement> = {
   input: InputDemo,
 };
 
-export function TorphDemo({
+export function PlaygroundDemo({
   view,
   ...props
 }: DemoProps & { view: DemoView }): React.ReactElement {

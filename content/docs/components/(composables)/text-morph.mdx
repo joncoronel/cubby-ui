@@ -8,6 +8,8 @@ import { TextMorph } from "@/registry/default/text-morph/text-morph";
 
 `TextMorph` animates text that changes in place: letters the old and new value share slide to their new spots, and the rest animate out and in. Use it for labels that swap (Copy to Copied, a section title in a header), live numbers such as prices and counters, and status text.
 
+The default mode, `blend`, is Cubby's own. The two secondary modes are adapted from other libraries: `morph` from [torph](https://github.com/lochie/torph) and `roll` from [Scritto](https://github.com/JaceThings/Scritto), rebuilt on the same engine with improvements of their own.
+
 ## Preview
 
 <ComponentPreview component="text-morph" example="text-morph-basic" />
@@ -165,7 +167,7 @@ Screen readers get the value as plain text; the animated glyphs are hidden from 
 >
   Which way glyphs roll. `auto` reads it off the value, so a number that grew
   rolls up and one that shrank rolls down; `up` and `down` hold one way. In
-  `morph`, `down` is torph's: digits fall in from above and out below, while
+  `morph`, `down` brings digits in from above and out below, while
   commas and currency symbols arrive from below.
 </ApiProp>
 
@@ -250,7 +252,6 @@ const feedback = faster(MODE_DEFAULTS.blend, 0.5); // 120ms of motion
 
 ### Notes
 
-- **Defaults.** `blend` is Cubby's own; `morph` uses [torph](https://github.com/lochie/torph)'s timing and scale; `roll` uses [Scritto](https://github.com/JaceThings/Scritto)'s spring, travel, tilt and blur.
 - **Off screen.** A change to a label that isn't on screen at that moment, or in a background tab, swaps instantly.
 - **Width.** A change that stays on one line eases the box to its new width, so text after an inline `TextMorph` slides instead of jumping. A change that wraps keeps the lines as they fall, without the width animation or the edge fade.
 - **Height.** Inline, the label's height is its lines', so gaining or losing a line changes it at once. Give it `className="block"` (it's a box already inside a flex or grid container) and a change of line count eases its height too, so the card or paragraph around it grows and shrinks smoothly. For `inline-block`, add `align-top`: aligned on its last line's baseline, an inline-block stretches its line to the new height at once as it grows.

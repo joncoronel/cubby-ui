@@ -80,7 +80,7 @@ export function nearestTrip(
 
 /**
  * What arrives or leaves travels with its nearest surviving neighbour on its
- * line (torph's anchoring): arriving glyphs look before them first and start
+ * line: arriving glyphs look before them first and start
  * where that neighbour started; leaving glyphs look after them first and go
  * where it goes. Morph anchors everything; roll only digits, and only across
  * lines. A glyph in a shape swapped as one doesn't travel.

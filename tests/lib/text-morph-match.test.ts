@@ -54,7 +54,7 @@ describe("findNumbers", () => {
   });
 });
 
-// torph's number cases (packages/test-cases/src/number-cases.ts): for each
+// Number cases: for each
 // new glyph, the old glyph it keeps, or null.
 describe("matchPlaces", () => {
   const places = (
@@ -363,7 +363,6 @@ describe("decimalFor", () => {
   });
 });
 
-// torph's playground cases (packages/test-cases/src/cases.ts).
 describe("matchText by words in morph mode", () => {
   const morph = (from: string, to: string): string =>
     keptView("morph", from, to);
@@ -391,8 +390,8 @@ describe("matchText by words in morph mode", () => {
   });
 
   it("morphs a similar word letter by letter", () => {
-    expect(morph("npm i torph", "pnpm i torph")).toBe("_npm i torph");
-    expect(morph("npm i torph", "pnpm add torph")).toBe("_npm ___ torph");
+    expect(morph("npm i react", "pnpm i react")).toBe("_npm i react");
+    expect(morph("npm i react", "pnpm add react")).toBe("_npm ___ react");
     expect(morph("Hello World", "hello world")).toBe("_ello _orld");
   });
 
@@ -414,7 +413,7 @@ describe("matchText by words in morph mode", () => {
   });
 });
 
-// torph's rule: a number is a whole word, opened and closed only by marks.
+// A number is a whole word, opened and closed only by marks.
 describe("findNumbers keeps words that aren't quantities as text", () => {
   const found = (text: string): string[] => {
     const glyphs = chars(text);
@@ -444,7 +443,7 @@ describe("findNumbers keeps words that aren't quantities as text", () => {
 
 describe("a number without a partner", () => {
   it("still animates as a number, while its affix matches as text", () => {
-    // torph's "Emptying a number to its affix": $4 → $ → $4.
+    // Emptying a number to its affix: $4 → $ → $4.
     const emptied = matchText("morph", chars("$4"), chars("$"), OPTIONS);
     expect(emptied.kept).toEqual([0]);
     expect(emptied.oldKinds).toEqual(["number", "number"]);
@@ -454,7 +453,7 @@ describe("a number without a partner", () => {
   });
 });
 
-// Scritto's anchor: a run's travel is measured on screen, against where the
+// Anchoring: a run's travel is measured on screen, against where the
 // value is pinned as it grows.
 describe("a roll run in centred or end-pinned text", () => {
   // "ok" shifts 5 slots along the text as the value grows by 5.

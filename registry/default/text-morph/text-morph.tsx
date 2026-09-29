@@ -69,7 +69,7 @@ import "./text-morph.css";
  * Leaving glyphs (ghosts) sit in a layer measured and sized each change,
  * each in a slot at its own line that fades it out above and below. A new
  * glyph always arrives fresh, even where its own text is still leaving
- * (torph's way), so quick changes look like slow ones. The slots fade only while a change plays (`data-playing`); at rest they're
+ * so quick changes look like slow ones. The slots fade only while a change plays (`data-playing`); at rest they're
  * inert wrappers.
  */
 
@@ -188,7 +188,7 @@ const clips = (style: CSSStyleDeclaration): boolean =>
 
 /**
  * Whether a change here would be seen: rendered, and within the viewport
- * and every ancestor that clips it (Scritto's), so a label scrolled out of
+ * and every ancestor that clips it, so a label scrolled out of
  * view inside a scrolling panel swaps without animating.
  */
 function isOnScreen(el: HTMLElement): boolean {
@@ -263,8 +263,7 @@ function pseudoShowsEdge(
 }
 
 /**
- * The inner edges of what a reader sees as holding the value (Scritto's
- * bounds): the nearest ancestor that shows an edge, itself or through a
+ * The inner edges of what a reader sees as holding the value: the nearest ancestor that shows an edge, itself or through a
  * pseudo-element (our Button paints its fill on `::before`), or clips; else
  * the viewport. A plain block around it has no edge to see.
  */
@@ -414,7 +413,7 @@ const queue: MorphJob[] = [];
 /**
  * Where each label was last seen pinned as it resized (0 start, 1 end, 0.5
  * centred), from how far each edge travelled: what a roll run's travel is
- * measured against (Scritto's anchor).
+ * measured against.
  */
 const anchors = new WeakMap<HTMLElement, number>();
 
@@ -497,8 +496,7 @@ function* morphTo(
   const startBefore = parseFloat(styleBefore.marginInlineStart) || 0;
   const linesBefore = lineCount(glyphLayer);
   // A label laid out as a box (a block, an inline-block, a flex item) can
-  // take a height, so a change that adds or removes a line eases it, as
-  // torph's inline-block root does. An inline label's height is its lines'.
+  // take a height, so a change that adds or removes a line eases it. An inline label's height is its lines'.
   const boxed = styleBefore.display !== "inline";
   const heightBefore = sizeOf(styleBefore, rootBefore, "height");
   const originBefore = ghostAnchor.getBoundingClientRect();
@@ -673,7 +671,7 @@ function* morphTo(
 
   // Which way glyphs roll (`trend`, read off the value when `auto`): a rise
   // brings new glyphs up from below and sends old ones up and away. Morph's
-  // `down` is torph's: digits fall in from above and leave downward while a
+  // `down`: digits fall in from above and leave downward while a
   // number's other marks arrive from below, so each reads as its own event.
   const rise = match.trend === 1;
   const marksRise = o.mode === "morph" && o.trend === "down";
@@ -682,9 +680,9 @@ function* morphTo(
   const away = rise ? -1 : 1;
 
   // What arrives or leaves travels with its nearest surviving neighbour
-  // (torph's anchoring), looking before it first when arriving and after it
+  // on its line, looking before it first when arriving and after it
   // first when leaving. Its slot takes the trip and the glyph its own
-  // entrance inside it (torph's slot and mover), so a digit rolls within a
+  // entrance inside it, so a digit rolls within a
   // number that moves line, where adding the two up cancelled them (a
   // morph digit rolls exactly one line). Morph anchors everything; roll
   // only digits, to the rest of their own number, and only across lines:
@@ -698,8 +696,7 @@ function* morphTo(
   // Blend plans too: each changed run of letters scales about its centre.
   const shaping = (o.mode === "morph" || o.mode === "blend") && !reduced;
   // How far each survivor moved in the layout, from its old place to its
-  // final one. The layout, not where it's drawn (torph measures with
-  // transforms taken out): a digit still falling in is drawn above its
+  // final one. The layout, not where it's drawn: a digit still falling in is drawn above its
   // place, and anchoring the next one to that stacked each fall on the
   // last, so typing fast brought digits in from ever higher.
   const startsAt = new Map<number, [number, number]>();
@@ -719,7 +716,7 @@ function* morphTo(
     ): void => {
       const isSpace = (i: number): boolean => spaceNode(glyphs[i]);
       // Blend: each changed run, letters or digits, whole word or not.
-      // Morph: whole words and long runs, as torph.
+      // Morph: whole words and long runs.
       const planned =
         o.mode === "blend"
           ? planRuns({
@@ -890,7 +887,7 @@ function* morphTo(
     ? rootBefore.width + (startBefore - startAfter) - rootAfter.width
     : 0;
   const resizes = Math.abs(from) > 0.5;
-  // A box eases its width, as torph's root does, and the stage rides by a
+  // A box eases its width, and the stage rides by a
   // share of it in CSS (step 8). An inline label can't take a width, so it
   // eases its start margin, and the stage rides against the move by the
   // margin's exact value.
@@ -1151,7 +1148,7 @@ function* morphTo(
           },
           HOME,
         ],
-        // Roll (Scritto): on the box's curve, not the roll's spring, or a
+        // Roll: on the box's curve, not the roll's spring, or a
         // kept run outruns the box resizing around it.
         o.mode === "roll"
           ? { duration: o.width.duration, easing: o.width.easing }
@@ -1162,7 +1159,7 @@ function* morphTo(
     // change means a newer value is what to read, so it finishes over a
     // quarter of its fade at most (50ms in morph) rather than hanging
     // half-faded. Restarting the whole fade left a run of quick changes (a
-    // held key) crawling in; torph snaps it to full in one frame instead.
+    // held key) crawling in, so it snaps to full in one frame instead.
     const blurred = was.filter !== "blur(0px)" ? was.filter : null;
     if (was.opacity < 0.999 || blurred !== null) {
       const left = Math.max(1 - was.opacity, blurred !== null ? 0.25 : 0);
@@ -1307,7 +1304,7 @@ function* morphTo(
     }
     const blurred = was.filter !== "blur(0px)" ? was.filter : null;
     // One caught before it showed (still in its fade-in delay) leaves from
-    // full, as torph's do: leaving from nothing, a run of quick changes (spam
+    // full: leaving from nothing, a run of quick changes (spam
     // clicking) showed nothing fading out at all.
     const shown = was.opacity === 0 ? 1 : was.opacity;
     const out = run(

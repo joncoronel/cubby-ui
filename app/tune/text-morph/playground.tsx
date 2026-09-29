@@ -9,13 +9,9 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from "@/registry/default/toggle-group/toggle-group";
-import {
-  TORPH_NUMBER_CASES,
-  TORPH_TEXT_CASES,
-  type TorphCase,
-} from "./torph-cases";
+import { NUMBER_CASES, TEXT_CASES, type MorphCase } from "./cases";
 
-/** torph's playground demos: free-form screens, not cases (nothing asserted). */
+/** Playground demos: free-form screens, not cases (nothing asserted). */
 export type DemoView =
   | "text-sandbox"
   | "number-sandbox"
@@ -23,7 +19,7 @@ export type DemoView =
   | "chart"
   | "input";
 
-/** What the page shows: its own examples, a torph demo or a torph case. */
+/** What the page shows: its own examples, a demo or a case. */
 export type View = "site" | DemoView | `text-${number}` | `number-${number}`;
 
 export type Align = "left" | "center" | "right";
@@ -32,16 +28,16 @@ const GROUPS: {
   title: string;
   prefix: "text" | "number";
   demos: { id: DemoView; label: string }[];
-  cases: TorphCase[];
+  cases: MorphCase[];
 }[] = [
   {
-    title: "torph · text",
+    title: "Cases · text",
     prefix: "text",
     demos: [{ id: "text-sandbox", label: "Sandbox" }],
-    cases: TORPH_TEXT_CASES,
+    cases: TEXT_CASES,
   },
   {
-    title: "torph · numbers",
+    title: "Cases · numbers",
     prefix: "number",
     demos: [
       { id: "number-sandbox", label: "Sandbox" },
@@ -49,7 +45,7 @@ const GROUPS: {
       { id: "chart", label: "Chart" },
       { id: "input", label: "Input" },
     ],
-    cases: TORPH_NUMBER_CASES,
+    cases: NUMBER_CASES,
   },
 ];
 
@@ -59,11 +55,11 @@ export function isDemo(view: View): view is DemoView {
   return (DEMO_VIEWS as View[]).includes(view);
 }
 
-/** The torph case a view shows, if it shows one. */
-export function caseOf(view: View): TorphCase | null {
+/** The case a view shows, if it shows one. */
+export function caseOf(view: View): MorphCase | null {
   if (view === "site" || isDemo(view)) return null;
   const [prefix, index] = view.split("-");
-  const cases = prefix === "text" ? TORPH_TEXT_CASES : TORPH_NUMBER_CASES;
+  const cases = prefix === "text" ? TEXT_CASES : NUMBER_CASES;
   return cases[Number(index)] ?? null;
 }
 
@@ -158,7 +154,7 @@ const ALIGN_CLASS: Record<Align, string> = {
   right: "text-right",
 };
 
-/** A screen's title, tags and description, as torph's playground heads it. */
+/** A screen's title, tags and description. */
 export function StageHeader({
   title,
   tags,
@@ -191,8 +187,7 @@ export function StageHeader({
 }
 
 /**
- * The card a value morphs in, sized and set as torph's playground stage
- * is: 24px text on 36px lines, 176px tall (one or two lines hold its size, a
+ * The card a value morphs in: 24px text on 36px lines, 176px tall (one or two lines hold its size, a
  * third grows it, easing as the label's height does), and clipped at its
  * sides (`overflow-x: clip`) while rolls stay free above and below. With
  * `onAdvance` it's a button that steps the screen.
@@ -242,13 +237,13 @@ export function Stage({
   );
 }
 
-/** A value on the stage: a box, as torph's root is. */
+/** A value on the stage: a box. */
 export function StageValue(
   props: React.ComponentProps<typeof TextMorph>,
 ): React.ReactElement {
   return (
     <TextMorph
-      // Top-aligned too (torph's is), or an inline-block's last-line
+      // Top-aligned, or an inline-block's last-line
       // baseline stretches its line to the new height at once as it grows.
       className="inline-block align-top"
       {...props}
@@ -298,7 +293,7 @@ export function StageTools({
   );
 }
 
-/** One torph case, as its playground shows it: click or Space for the next value. */
+/** One case: click or Space for the next value. */
 export function CaseStage({
   c,
   step,
@@ -309,7 +304,7 @@ export function CaseStage({
   options,
   onAdvance,
 }: {
-  c: TorphCase;
+  c: MorphCase;
   step: number;
   align: Align;
   onAlign: (align: Align) => void;

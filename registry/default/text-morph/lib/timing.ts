@@ -4,11 +4,11 @@ import type { TextMorphOptions } from "./options";
 /**
  * Stagger delays for the glyphs that change, from where each sits (its
  * distance from the start of the line, in reading order). `each`: every
- * successive glyph `ms` later. `spread` (Scritto's sweep): delay from where
+ * successive glyph `ms` later. `spread` (a sweep): delay from where
  * the glyph sits, across `ms` over the changed stretch only, so a one-digit
  * change in a long number isn't left waiting, and a glyph leaving and its
  * replacement in the same spot cross over together. The sweep spans `ms`
- * less one glyph's step, as Scritto's ladder does, so two glyphs are half of
+ * less one glyph's step, so two glyphs are half of
  * it apart, not all of it.
  */
 export function staggerDelays(

@@ -7,11 +7,12 @@ export type TextMorphOptions = {
   /**
    * `blend` changes only what changed (a similar word keeps what it shares
    * at its ends), crossfading each changed run as one unit, a touch smaller
-   * and blurred: calm enough for anything. `roll` keeps the old and new text's shared start and end, and
-   * rolls the glyphs between vertically, on Scritto's defaults. `morph`
+   * and blurred: calm enough for anything. `roll` keeps the old and new
+   * text's shared start and end, and rolls the glyphs between vertically, on
+   * a spring. `morph`
    * matches whole words, then letters within similar words (anywhere, in a
    * one-word value): shared ones slide to their new place, the rest scale and
-   * fade, travelling with the nearest glyph that stays, on torph's defaults.
+   * fade, travelling with the nearest glyph that stays.
    * In every mode numbers change digit by digit. Each mode brings its own
    * defaults.
    */
@@ -54,10 +55,10 @@ export type TextMorphOptions = {
    */
   numbers: boolean;
   /**
-   * Which way glyphs roll (Scritto's trend). `auto` reads it off the value:
+   * Which way glyphs roll. `auto` reads it off the value:
    * a number that grew brings new glyphs up from below, one that shrank
    * brings them down, and anything else rolls up. `up` and `down` hold one
-   * way. Roll defaults to `auto`; morph to `down`, which is torph's: digits
+   * way. Roll defaults to `auto`; morph to `down`: digits
    * fall in from above and leave downward, and a number's other marks
    * (separators, currency) arrive from below.
    */
@@ -70,9 +71,9 @@ export type TextMorphOptions = {
   edgeFade: "auto" | "always" | "never";
 };
 
-/** torph's digits: a full line of travel, fading out over 45% of the
+/** Morph's digits: a full line of travel, fading out over 45% of the
  * duration and in over the first 25%. */
-const TORPH_DIGITS: TextMorphOptions["morph"]["digits"] = {
+const MORPH_DIGITS: TextMorphOptions["morph"]["digits"] = {
   distance: 1,
   fadeIn: { duration: 100, easing: "linear" },
   fadeOut: { duration: 180, easing: "linear" },
@@ -80,26 +81,26 @@ const TORPH_DIGITS: TextMorphOptions["morph"]["digits"] = {
 
 /** The curve the box width eases on: fast out, no overshoot. */
 const WIDTH_EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
-/** Ease-out expo: torph's movement, width and everything. */
+/** Ease-out expo: morph's movement, width and everything. */
 const EXPO_EASING = "cubic-bezier(0.19, 1, 0.22, 1)";
 
 /**
- * Scritto 0.1.0's defaults, from its source: a 550ms hand-tuned spring (1.5%
+ * Roll's defaults: a 550ms hand-tuned spring (1.5%
  * overshoot) on transform, opacity and blur alike; glyphs travel 0.35em while
  * scaling to 0.6 and tilting 2deg, blurred 0.1em; delays fan out over 30% of
  * the duration; the box eases on its own non-overshooting curve.
  */
-const SCRITTO_SPRING =
+const ROLL_SPRING =
   "linear(0,.1052,.3155,.532,.7112,.8414,.9265,.9765,1.0023,1.013,1.0151,1.0133,1.01,1.0068,1.0041,1.0022,1.001,1)";
-const SCRITTO_OPTIONS: TextMorphOptions = {
+const ROLL_OPTIONS: TextMorphOptions = {
   mode: "roll",
-  motion: { duration: 550, easing: SCRITTO_SPRING },
-  fadeIn: { duration: 550, easing: SCRITTO_SPRING, delay: 0 },
-  fadeOut: { duration: 550, easing: SCRITTO_SPRING },
+  motion: { duration: 550, easing: ROLL_SPRING },
+  fadeIn: { duration: 550, easing: ROLL_SPRING, delay: 0 },
+  fadeOut: { duration: 550, easing: ROLL_SPRING },
   width: { duration: 550, easing: WIDTH_EASING },
   stagger: { mode: "spread", ms: 165 },
   roll: { distance: 0.35, scale: 0.6, rotate: 2 },
-  morph: { scale: 0.6, digits: TORPH_DIGITS },
+  morph: { scale: 0.6, digits: MORPH_DIGITS },
   blend: { distance: 0.15, scale: 1 },
   blur: 0.1,
   numbers: true,
@@ -108,12 +109,12 @@ const SCRITTO_OPTIONS: TextMorphOptions = {
 };
 
 /**
- * torph 0.1.3's defaults, from its source: 400ms ease-out expo for movement
+ * Morph's defaults: 400ms ease-out expo for movement
  * and width; arriving and leaving glyphs scale by 0.95; opacity is linear,
  * leaving over the first quarter of the duration and arriving over half of it
  * from a quarter in; no blur, no stagger.
  */
-const TORPH_OPTIONS: TextMorphOptions = {
+const MORPH_OPTIONS: TextMorphOptions = {
   mode: "morph",
   motion: { duration: 400, easing: EXPO_EASING },
   fadeIn: { duration: 200, easing: "linear", delay: 100 },
@@ -121,7 +122,7 @@ const TORPH_OPTIONS: TextMorphOptions = {
   width: { duration: 400, easing: EXPO_EASING },
   stagger: { mode: "each", ms: 0 },
   roll: { distance: 0.35, scale: 0.95, rotate: 0 },
-  morph: { scale: 0.95, digits: TORPH_DIGITS },
+  morph: { scale: 0.95, digits: MORPH_DIGITS },
   blend: { distance: 0.15, scale: 1 },
   blur: 0,
   numbers: true,
@@ -148,7 +149,7 @@ const BLEND_OPTIONS: TextMorphOptions = {
   width: { duration: 240, easing: BLEND_EASING },
   stagger: { mode: "each", ms: 0 },
   roll: { distance: 0.35, scale: 1, rotate: 0 },
-  morph: { scale: 1, digits: TORPH_DIGITS },
+  morph: { scale: 1, digits: MORPH_DIGITS },
   blend: { distance: 0.08, scale: 0.9 },
   blur: 0.1,
   numbers: true,
@@ -156,11 +157,11 @@ const BLEND_OPTIONS: TextMorphOptions = {
   edgeFade: "auto",
 };
 
-/** Each mode brings its own defaults: blend is Cubby's, roll Scritto's, morph torph's. */
+/** Each mode brings its own defaults. */
 export const MODE_DEFAULTS: Record<TextMorphMode, TextMorphOptions> = {
   blend: BLEND_OPTIONS,
-  roll: SCRITTO_OPTIONS,
-  morph: TORPH_OPTIONS,
+  roll: ROLL_OPTIONS,
+  morph: MORPH_OPTIONS,
 };
 
 /** The default: blend, calm enough for anything. */

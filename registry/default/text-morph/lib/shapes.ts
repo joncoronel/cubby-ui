@@ -1,7 +1,7 @@
 import type { GlyphKind } from "./match";
 
 /**
- * Morph mode, one-word values (torph): a run of this many replaced glyphs,
+ * Morph mode, one-word values: a run of this many replaced glyphs,
  * with no survivor inside, is swapped as one shape rather than glyph by
  * glyph. It recedes further, to GROUP_SCALE about its own centre, and its
  * fades take these shares of the movement's duration.
@@ -108,7 +108,7 @@ export function planRuns({
  * or the leaving ones) scale as, by index. By words (a value of several
  * words): whole words of letters, as words, and runs of GROUP_MIN or more
  * changed digits, as groups. Otherwise (one word): runs of GROUP_MIN or more
- * changed glyphs, digits included, as groups, since torph splits numbers
+ * changed glyphs, digits included, as groups, since morph splits numbers
  * glyph by glyph either way (`$12,345,678` → `$99` shrinks its old digits in
  * place rather than sending them after the `$`). A glyph without a box is
  * left out of its run.

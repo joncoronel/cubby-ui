@@ -4,15 +4,15 @@ import type { TextMorphMode } from "./options";
  * Which glyphs of the old text survive into the new one. Pure: works on
  * grapheme strings, so it can be tested without a DOM.
  *
- * Numbers are matched by place value (torph): the digits line up on the
+ * Numbers are matched by place value: the digits line up on the
  * decimal point, so 1,204 → 1,318 keeps the thousands and the comma, and a
  * digit that changes rolls in place. Everything else is matched by the
  * mode's text rule: roll keeps the shared ends and one run between them
- * (Scritto); morph matches whole words first, then letters within the
- * words it pairs, and letters anywhere only in a one-word value (torph).
+ * morph matches whole words first, then letters within the
+ * words it pairs, and letters anywhere only in a one-word value.
  *
  * A field someone is typing in knows where the edit happened, so with a
- * caret the whole value is matched around it instead (torph's cursorIndex):
+ * caret the whole value is matched around it instead:
  * typing 1 in front of 20 inserts a digit rather than renumbering the
  * column.
  */
@@ -46,7 +46,7 @@ export type MatchOptions = {
   /**
    * Where the value is pinned as its length changes: 0 its start, 1 its end,
    * 0.5 its middle (centred). A roll run's travel is measured on screen,
-   * against that, not along the text (Scritto's anchor).
+   * against that, not along the text.
    */
   anchor?: number;
 };
@@ -146,7 +146,7 @@ export const isBreak = (g: string): boolean =>
   g === " " || g === "\t" || g === "\n";
 
 /**
- * Numbers in a grapheme list. A number is a whole word (torph's rule):
+ * Numbers in a grapheme list. A number is a whole word:
  * digits with group or decimal separators between them, opened only by a
  * sign, currency symbol, `(` or `#` and closed only by punctuation, so
  * `v1.2.3`, `2024-01-01` and `COVID-19` stay text. The number itself takes
@@ -188,7 +188,7 @@ export function findNumbers(glyphs: string[]): NumberToken[] {
 const MAGNITUDE_JUMP = 3;
 
 /**
- * Pair two numbers' glyphs by place (torph's placeMatch), as [new, old]
+ * Pair two numbers' glyphs by place, as [new, old]
  * index pairs. The shared prefix and suffix (a currency symbol, a `%`)
  * hold. Digits pair on the decimal point: by column while the count stays
  * the same, and as the longest run carried from the units column when it
@@ -341,8 +341,8 @@ function matchEnds(
     end++;
   }
 
-  // Between them, one shared run flush with neither end (Scritto's
-  // floating run): xxlightxx → yylightyy keeps "light". It must be at
+  // Between them, one shared run flush with neither end (a floating
+  // run): xxlightxx → yylightyy keeps "light". It must be at
   // least two glyphs (one shared letter is a coincidence) and may travel at
   // most its own length plus two slots, so a word never swims across the
   // value while everything around it dissolves.
@@ -510,7 +510,7 @@ function gaps(count: number, survivors: Set<number>): number[] {
  * letter or digit never moves to another place, as a reused one would; a
  * punctuation mark found once in what's between on each side does, since
  * it's structure: `12.4M` → `1.1B` slides its decimal point over, as the
- * number reshapes (torph does too).
+ * number reshapes.
  */
 function sharedEnds(old: string[], next: string[]): [number, number][] {
   let start = 0;
@@ -564,7 +564,7 @@ function sharedEnds(old: string[], next: string[]): [number, number][] {
 }
 
 /**
- * Match by words (torph): words that survive in order keep every glyph, and
+ * Match by words: words that survive in order keep every glyph, and
  * so do words that only moved (`hello world` → `world hello` swaps them
  * whole); a new word takes the letters it shares with the most similar old
  * word in the same gap between survivors, when they share enough; anything
@@ -748,7 +748,7 @@ export function matchText(
   let trend: 1 | -1 | 0 = options.trend;
   // Matching treats a number without a partner as text (a `$` left behind
   // by `$4` → `$` still matches), but its glyphs animate as a number's:
-  // the 4 rolls out rather than fading like a letter, as torph's does.
+  // the 4 rolls out rather than fading like a letter.
   // A value that gains or loses a number, or changes none, reads as a rise.
   const result = (): MatchResult => {
     const asNumbers = (kinds: GlyphKind[], tokens: NumberToken[]) => {
@@ -814,7 +814,7 @@ export function matchText(
   const oldText = old.flatMap((_, i) => (oldKinds[i] === "text" ? [i] : []));
   const nextText = next.flatMap((_, i) => (nextKinds[i] === "text" ? [i] : []));
   // A one-word value with digits in it that isn't a number (a clock, a
-  // version) keeps its letters in order, as torph does: a digit reused from
+  // version) keeps its letters in order: a digit reused from
   // another column would read as the time running backwards.
   const hasDigits = options.numbers && [...old, ...next].some(isDigit);
   const oldTexts = oldText.map((i) => old[i]);

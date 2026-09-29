@@ -43,8 +43,8 @@ import {
   isDemo,
   type Align,
   type View,
-} from "./torph-playground";
-import { TorphDemo } from "./torph-demos";
+} from "./playground";
+import { PlaygroundDemo } from "./demos";
 
 const PANEL_ID = "text-morph";
 /** Remembers the example shown, per browser (a convenience only). */
@@ -65,7 +65,7 @@ const easing = (
 
 /**
  * Each mode's defaults as dial values. A mode runs its exact options until a
- * dial moves; these only position the dials. Two of roll's (Scritto's) can't
+ * dial moves; these only position the dials. Two of roll's can't
  * be shown exactly (its hand-tuned spring, and that same spring on opacity),
  * so its motion and fade dials start on the nearest match.
  */
@@ -245,7 +245,7 @@ const SECTIONS = [
   "Label icon-only buttons",
   "API Reference",
 ];
-// torph's playground cases (packages/test-cases/src/cases.ts), to compare.
+// Reference cases, to compare.
 const REORDER = ["Transaction Safe", "Processing Transaction"];
 const SWAP = ["hello world", "world hello"];
 const LINES = ["1,234", "Total\n1,234", "Total\n5,678"];
@@ -268,8 +268,8 @@ const STATUSES = [
 const INTERVALS = [120, 250, 700] as const;
 const MODE_LABELS: Record<TextMorphMode, string> = {
   blend: "Blend (Cubby)",
-  roll: "Roll (Scritto)",
-  morph: "Morph (torph)",
+  roll: "Roll",
+  morph: "Morph",
 };
 
 /**
@@ -311,7 +311,7 @@ export default function TextMorphTune(): React.ReactElement {
     setBumps((b) => ({ ...b, [key]: (b[key] ?? 0) + 1 }));
   const pick = <T,>(list: readonly T[], key: string): T =>
     list[(step + (bumps[key] ?? 0)) % list.length];
-  // Which example: the site's own, or one of torph's playground cases,
+  // Which example: the site's own, or one of the reference cases,
   // each starting from its first value.
   const [view, setView] = React.useState<View>("site");
   const [caseStep, setCaseStep] = React.useState(0);
@@ -342,7 +342,7 @@ export default function TextMorphTune(): React.ReactElement {
     if (view === "site") setStep((s) => s + 1);
     else setCaseStep((s) => s + 1);
   }, [view]);
-  // Space steps a torph case, as in its playground.
+  // Space steps a case.
   React.useEffect(() => {
     if (view === "site") return;
     const onKey = (event: KeyboardEvent): void => {
@@ -441,8 +441,8 @@ export default function TextMorphTune(): React.ReactElement {
   );
   const copiedName = {
     blend: "BLEND_OPTIONS",
-    roll: "SCRITTO_OPTIONS",
-    morph: "TORPH_OPTIONS",
+    roll: "ROLL_OPTIONS",
+    morph: "MORPH_OPTIONS",
   }[mode];
 
   const ambient = tune.original ? exact : resolved;
@@ -466,7 +466,7 @@ export default function TextMorphTune(): React.ReactElement {
       <ExampleNav view={view} onSelect={select} />
       {isDemo(view) ? (
         <div data-tune-scope className="w-full max-w-3xl">
-          <TorphDemo
+          <PlaygroundDemo
             // Each demo starts from its own first state.
             key={view}
             view={view}
@@ -578,7 +578,7 @@ export default function TextMorphTune(): React.ReactElement {
           </Demo>
 
           <Demo
-            label="Word reorder + exit (torph: Transaction moves to its new place, Safe leaves, Processing arrives)"
+            label="Word reorder + exit (Transaction moves to its new place, Safe leaves, Processing arrives)"
             onAdvance={bump("reorder")}
           >
             <span className="text-2xl font-medium">
@@ -587,7 +587,7 @@ export default function TextMorphTune(): React.ReactElement {
           </Demo>
 
           <Demo
-            label="Same words, reversed order (torph: hello and world swap places, nothing enters or leaves)"
+            label="Same words, reversed order (hello and world swap places, nothing enters or leaves)"
             onAdvance={bump("swap")}
           >
             <span className="text-2xl font-medium">
@@ -596,7 +596,7 @@ export default function TextMorphTune(): React.ReactElement {
           </Demo>
 
           <Demo
-            label="Line break (torph: a new line arrives above the number, which holds its place value)"
+            label="Line break (a new line arrives above the number, which holds its place value)"
             onAdvance={bump("lines")}
           >
             <span className="text-2xl font-medium tabular-nums">
@@ -605,7 +605,7 @@ export default function TextMorphTune(): React.ReactElement {
           </Demo>
 
           <Demo
-            label="Empty and back (torph: the line keeps its height while the text leaves)"
+            label="Empty and back (the line keeps its height while the text leaves)"
             onAdvance={bump("empty")}
           >
             <p className="text-2xl font-medium">

@@ -3,8 +3,8 @@
    paint and nothing shifts on hydration. */
 
 /* A glyph's slot: how far it reaches above and below the glyph's box, and
-   how far it fades across. Roll (Scritto) fades across 0.3em of room past
-   the box, for its blur and tilt; morph (torph) fades 0.15em inside the
+   how far it fades across. Roll fades across 0.3em of room past
+   the box, for its blur and tilt; morph fades 0.15em inside the
    box itself, so a digit rolling in shows nothing until it enters its line
    (with room past it, it showed faintly, whole, above the line). */
 .text-morph {
@@ -19,7 +19,7 @@
 /* In a tight line height the ink reaches past the line box (a comma's tail
    below it), and a fade inside the box faded it until the change settled,
    then popped it. So the slot is at least 1.4em tall, reaching past the box
-   only as far as that takes: at torph's 1.6 it doesn't. */
+   only as far as that takes: at a 1.6 line height it doesn't. */
 @supports (height: 1lh) {
   .text-morph[data-mode="morph"] {
     --text-morph-slot-y: max(0em, (1.4em - 1lh) / 2);
@@ -67,7 +67,7 @@
 /* The plain value for screen readers, exactly as written (sr-only's
    nowrap would drop a leading space). The visible glyphs are what gets
    selected and copied, so this copy isn't, or a copied selection would
-   paste the value twice (torph does the same). */
+   paste the value twice. */
 .text-morph > .sr-only {
   white-space: pre;
   user-select: none;
@@ -94,8 +94,7 @@
   mask-image: var(--text-morph-fade-y);
 }
 
-/* Where the browser can, the fade reaches sideways without end (torph's
-   slots do the same): it only ever cuts above and below, so a glyph sliding
+/* Where the browser can, the fade reaches sideways without end: it only ever cuts above and below, so a glyph sliding
    or shrinking sideways out of its slot is never sliced. Elsewhere the slot's
    room (--reach) and unmasking a shape's glyphs cover it. no-clip lifts
    the cut above and below as well, showing a glyph rolling in whole and
@@ -110,13 +109,13 @@
   }
 }
 
-/* An empty value still holds its line (torph does the same): with nothing
+/* An empty value still holds its line: with nothing
    in it, the line would collapse and the text around it jump. */
 .text-morph-glyphs:empty::before {
   content: "\200B";
 }
 
-/* Spaces show as typed (torph does the same): a run of them isn't
+/* Spaces show as typed: a run of them isn't
    collapsed to one, and a line break in the value breaks the line. Only
    collapsing changes; wrapping is inherited, so a label easing its width
    still holds one line. */
@@ -138,7 +137,7 @@
 /* Glyphs keep their own compositing layer, animating or not. A glyph that
    drops back into ordinary painting when its animation ends is redrawn
    snapped to the pixel grid, often with different anti-aliasing: a visible
-   twitch just as it settles (torph does the same). From first paint, not
+   twitch just as it settles. From first paint, not
    from a glyph's first animation: outside a layer text draws with subpixel
    anti-aliasing and inside one in greyscale, so a label mixed the two. */
 .text-morph [data-glyph]:not([data-space]) {

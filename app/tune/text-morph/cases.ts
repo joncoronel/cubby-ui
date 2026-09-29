@@ -1,9 +1,7 @@
-// torph's playground cases (https://torph.lochie.me/playground), from
-// packages/test-cases/src/cases.ts and number-cases.ts in lochie/torph, so
-// the tune page can run every one of them. Rendering fields only: their
-// verify functions check torph's own segment IDs.
+// Reference cases for text and numbers, so the tune page can run every one
+// of them. Rendering fields only: nothing here is asserted.
 
-export type TorphCase = {
+export type MorphCase = {
   label: string;
   description: string;
   tags: string[];
@@ -18,7 +16,7 @@ export type TorphCase = {
   tabular?: boolean;
 };
 
-export const TORPH_TEXT_CASES: TorphCase[] = [
+export const TEXT_CASES: MorphCase[] = [
   {
     label: "Word reorder + exit",
     description:
@@ -80,23 +78,23 @@ export const TORPH_TEXT_CASES: TorphCase[] = [
   {
     label: "Character morph (add prefix)",
     description:
-      '"p" enters while "n", "p", "m" persist and FLIP. "i" and "torph" stay unchanged.',
+      '"p" enters while "n", "p", "m" persist and FLIP. "i" and "react" stay unchanged.',
     tags: ["char morph", "split"],
-    values: ["npm i torph", "pnpm i torph"],
+    values: ["npm i react", "pnpm i react"],
   },
   {
     label: "Character morph + word swap",
     description:
-      '"npm" morphs to "pnpm" at char level. "i" exits, "add" enters. "torph" persists.',
+      '"npm" morphs to "pnpm" at char level. "i" exits, "add" enters. "react" persists.',
     tags: ["char morph", "enter", "exit"],
-    values: ["npm i torph", "pnpm add torph"],
+    values: ["npm i react", "pnpm add react"],
   },
   {
     label: "Reverse character morph",
     description:
       '"pnpm" splits into chars. "n", "p", "m" persist into "npm", the leading "p" exits.',
     tags: ["char morph", "reverse"],
-    values: ["pnpm i torph", "npm i torph"],
+    values: ["pnpm i react", "npm i react"],
   },
   {
     label: "Single character change",
@@ -387,7 +385,7 @@ export const TORPH_TEXT_CASES: TorphCase[] = [
   },
 ];
 
-export const TORPH_NUMBER_CASES: TorphCase[] = [
+export const NUMBER_CASES: MorphCase[] = [
   {
     label: "Counter tick",
     description:

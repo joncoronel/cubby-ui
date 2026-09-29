@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { flushSync } from "react-dom";
 import type { ReactElement } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -186,7 +187,14 @@ export function SourceFiles({
     const root = rootRef.current;
     if (!root) return;
     const observer = new ResizeObserver(([entry]) => {
-      setWide(entry.contentRect.width >= TREE_MIN_WIDTH);
+      // Hidden (the closed install-by-hand section) it measures 0: keep the
+      // last layout, or opening it showed the narrow one for a frame.
+      if (entry.contentRect.width === 0) return;
+      // Applied before the paint the observer runs ahead of, so the right
+      // layout is the first one seen (a plain update landed a frame late,
+      // flashing the other layout as the section opened).
+      const next = entry.contentRect.width >= TREE_MIN_WIDTH;
+      flushSync(() => setWide(next));
     });
     observer.observe(root);
     return () => observer.disconnect();

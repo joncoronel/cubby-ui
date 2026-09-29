@@ -1774,14 +1774,34 @@
           "target": "components/ui/cubby-ui/text-morph/lib/anchors.ts"
         },
         {
+          "path": "registry/default/text-morph/lib/edges.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/text-morph/lib/edges.ts"
+        },
+        {
           "path": "registry/default/text-morph/lib/match.ts",
           "type": "registry:lib",
           "target": "components/ui/cubby-ui/text-morph/lib/match.ts"
         },
         {
+          "path": "registry/default/text-morph/lib/measure.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/text-morph/lib/measure.ts"
+        },
+        {
           "path": "registry/default/text-morph/lib/options.ts",
           "type": "registry:lib",
           "target": "components/ui/cubby-ui/text-morph/lib/options.ts"
+        },
+        {
+          "path": "registry/default/text-morph/lib/ride.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/text-morph/lib/ride.ts"
+        },
+        {
+          "path": "registry/default/text-morph/lib/scheduler.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/text-morph/lib/scheduler.ts"
         },
         {
           "path": "registry/default/text-morph/lib/shapes.ts",

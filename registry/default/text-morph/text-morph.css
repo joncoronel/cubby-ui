@@ -3,9 +3,9 @@
    paint and nothing shifts on hydration. */
 
 /* A glyph's slot: how far it reaches above and below the glyph's box, and
-   how far it fades across. Roll fades across 0.3em of room past
-   the box, for its blur and tilt; morph fades 0.15em inside the
-   box itself, so a digit rolling in shows nothing until it enters its line
+   how far it fades across. Blend and roll fade across 0.3em of room past
+   the box, for their blur and tilt; morph fades 0.15em inside the box
+   itself, so a digit rolling in shows nothing until it enters its line
    (with room past it, it showed faintly, whole, above the line). */
 .text-morph {
   --text-morph-slot-y: 0.3em;
@@ -176,7 +176,8 @@
 }
 
 /* Each ghost gets a slot at its own line, faded above and below like the
-   live glyphs, with room beside it for tilt, scale and blur. A ghost
+   live glyphs, with room beside it for tilt, scale and blur (0.5em, the
+   engine's SLOT_PAD_X, which sizes the ghost layer around it). A ghost
    travelling with a neighbour moves its slot, fade and all (translate),
    and leaves inside it. */
 .text-morph-ghost {

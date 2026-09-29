@@ -555,3 +555,18 @@ describe("blend punctuation that moves", () => {
     expect(keptView("blend", "1.2.3x", "9.8.7")).toBe("_____");
   });
 });
+
+describe("edge cases", () => {
+  it("keeps a one-word value letter-matched whatever its trailing space", () => {
+    const words = (from: string, to: string): boolean =>
+      matchText("morph", chars(from), chars(to), OPTIONS).byWords;
+    expect(words("abc", "abd ")).toBe(false);
+    expect(words("abc ", "abd")).toBe(false);
+    expect(words("abc", "ab cd")).toBe(true);
+  });
+
+  it("keeps the affixes of a number typed into an empty field", () => {
+    expect(matchPlaces(chars("$"), chars("$5"), ".")).toEqual([[0, 0]]);
+    expect(matchPlaces(chars("$5"), chars("$"), ".")).toEqual([[0, 0]]);
+  });
+});

@@ -25,19 +25,20 @@ export type Box = { left: number; right: number; top: number; bottom: number };
 /**
  * The runs of changed glyphs (arriving, or leaving) to shape: whole words,
  * a word being a run between spaces with every glyph changed, or runs of at
- * least GROUP_MIN changed glyphs between survivors.
+ * least `min` changed glyphs between survivors.
  */
 export function shapeRuns(
   count: number,
   isSpace: (i: number) => boolean,
   changed: (i: number) => boolean,
   byWords: boolean,
+  min = GROUP_MIN,
 ): number[][] {
   const runs: number[][] = [];
   let run: number[] = [];
   let whole = true;
   const flush = (): void => {
-    if (byWords ? whole && run.length > 0 : run.length >= GROUP_MIN) {
+    if (byWords ? whole && run.length > 0 : run.length >= min) {
       runs.push(run);
     }
     run = [];
@@ -51,6 +52,25 @@ export function shapeRuns(
   }
   flush();
   return runs;
+}
+
+/**
+ * Each run's pivots, into `shapes`: the centre of the whole run, from each
+ * member's own box. A glyph without a box is left out of its run.
+ */
+function addRuns(
+  runs: number[][],
+  boxOf: (i: number) => Box | undefined,
+  group: boolean,
+  shapes: Map<number, Shape>,
+): void {
+  for (const run of runs) {
+    const members = run.flatMap((index) => {
+      const box = boxOf(index);
+      return box ? [{ index, box }] : [];
+    });
+    if (members.length > 0) origins(members, group, shapes);
+  }
 }
 
 /** Each member's pivot: the centre of the whole run, from its own box. */
@@ -89,17 +109,7 @@ export function planRuns({
   boxOf: (i: number) => Box | undefined;
 }): Map<number, Shape> {
   const shapes = new Map<number, Shape>();
-  let run: { index: number; box: Box }[] = [];
-  const flush = (): void => {
-    if (run.length > 0) origins(run, false, shapes);
-    run = [];
-  };
-  for (let i = 0; i < count; i++) {
-    const box = !isSpace(i) && changed(i) ? boxOf(i) : undefined;
-    if (box) run.push({ index: i, box });
-    else flush();
-  }
-  flush();
+  addRuns(shapeRuns(count, isSpace, changed, false, 1), boxOf, false, shapes);
   return shapes;
 }
 
@@ -110,8 +120,7 @@ export function planRuns({
  * changed digits, as groups. Otherwise (one word): runs of GROUP_MIN or more
  * changed glyphs, digits included, as groups, since morph splits numbers
  * glyph by glyph either way (`$12,345,678` → `$99` shrinks its old digits in
- * place rather than sending them after the `$`). A glyph without a box is
- * left out of its run.
+ * place rather than sending them after the `$`).
  */
 export function planShapes({
   count,
@@ -129,15 +138,8 @@ export function planShapes({
   boxOf: (i: number) => Box | undefined;
 }): Map<number, Shape> {
   const shapes = new Map<number, Shape>();
-  const add = (runs: number[][], group: boolean): void => {
-    for (const run of runs) {
-      const members = run.flatMap((index) => {
-        const box = boxOf(index);
-        return box ? [{ index, box }] : [];
-      });
-      if (members.length > 0) origins(members, group, shapes);
-    }
-  };
+  const add = (runs: number[][], group: boolean): void =>
+    addRuns(runs, boxOf, group, shapes);
   if (!byWords) {
     add(shapeRuns(count, isSpace, changed, false), true);
     return shapes;

@@ -34,6 +34,22 @@ import {
   type Shape,
 } from "./lib/shapes";
 import { planTrips, rollWith, type Trip } from "./lib/anchors";
+import {
+  anchorHint,
+  centreDelta,
+  contentSize,
+  inkEscapes,
+  isOnScreen,
+  lineCount,
+  sizeOf,
+  visibleBounds,
+  visualState,
+  type Bounds,
+  type Side,
+} from "./lib/measure";
+import { scheduleMorph, type MorphSteps } from "./lib/scheduler";
+import { armMark, arrivalClip, edgeBand, readArm, type Arm } from "./lib/edges";
+import { followShare, ownShift } from "./lib/ride";
 import "./text-morph.css";
 
 /*
@@ -68,9 +84,9 @@ import "./text-morph.css";
  *
  * Leaving glyphs (ghosts) sit in a layer measured and sized each change,
  * each in a slot at its own line that fades it out above and below. A new
- * glyph always arrives fresh, even where its own text is still leaving
- * so quick changes look like slow ones. The slots fade only while a change plays (`data-playing`); at rest they're
- * inert wrappers.
+ * glyph always arrives fresh, even where its own text is still leaving, so
+ * quick changes look like slow ones. The slots fade only while a change
+ * plays (`data-playing`); at rest they're inert wrappers.
  */
 
 /** Escapes text for use as element content (never in an attribute). */
@@ -137,25 +153,6 @@ function layOut(layer: HTMLElement, nodes: HTMLElement[]): void {
   layer.replaceChildren(...parts);
 }
 
-type VisualState = {
-  rect: DOMRect;
-  opacity: number;
-  scale: string;
-  rotate: string;
-  filter: string;
-};
-
-function visualState(node: HTMLElement): VisualState {
-  const style = getComputedStyle(node);
-  return {
-    rect: node.getBoundingClientRect(),
-    opacity: Number(style.opacity),
-    scale: style.scale === "none" ? "1" : style.scale,
-    rotate: style.rotate === "none" ? "0deg" : style.rotate,
-    filter: style.filter === "none" ? "blur(0px)" : style.filter,
-  };
-}
-
 /** Its scale's pivot, written only when it changes. */
 function setOrigin(node: HTMLElement, origin: string): void {
   if (node.style.transformOrigin !== origin) {
@@ -173,57 +170,15 @@ const CATCH_UP = 0.25;
  */
 type Playback = "full" | "reduced" | "none";
 
-/** How far `a`'s centre sits from `b`'s (scale and tilt pivot on centres). */
-function centreDelta(a: DOMRect, b: DOMRect): [number, number] {
-  return [
-    a.left + a.width / 2 - (b.left + b.width / 2),
-    a.top + a.height / 2 - (b.top + b.height / 2),
-  ];
-}
-
-const CLIPS = /auto|scroll|hidden|clip/;
-
-/** Whether an element cuts off what overflows it (a scroller, a clip). */
-const clips = (style: CSSStyleDeclaration): boolean =>
-  CLIPS.test(style.overflowX) || CLIPS.test(style.overflowY);
-
-/**
- * Whether a change here would be seen: rendered, and within the viewport
- * and every ancestor that clips it, so a label scrolled out of
- * view inside a scrolling panel swaps without animating.
- */
-function isOnScreen(el: HTMLElement): boolean {
-  // A background tab: animations there don't finish until it's shown, so
-  // every change would leave its ghosts piling up in the meantime.
-  if (document.visibilityState === "hidden") return false;
-  if (el.checkVisibility && !el.checkVisibility()) return false;
-  let top = 0;
-  let left = 0;
-  let bottom = window.innerHeight;
-  let right = window.innerWidth;
-  for (let node = el.parentElement; node; node = node.parentElement) {
-    if (!clips(getComputedStyle(node))) continue;
-    const box = node.getBoundingClientRect();
-    top = Math.max(top, box.top);
-    left = Math.max(left, box.left);
-    bottom = Math.min(bottom, box.bottom);
-    right = Math.min(right, box.right);
-  }
-  const rect = el.getBoundingClientRect();
-  return (
-    rect.bottom > top &&
-    rect.right > left &&
-    rect.top < bottom &&
-    rect.left < right
-  );
-}
-
 /** The edge fade's ramp, and how far past the box edge it ends (em). */
 const EDGE_RAMP = 0.3;
 const EDGE_SLACK = 0.4;
 /** Room around a ghost for its blur, tilt and scale (em). */
 const INK_MARGIN = 0.3;
-/** A ghost slot's room beside its glyph (em), for tilt, scale and blur. */
+/**
+ * A ghost slot's room beside its glyph (em), for tilt, scale and blur: the
+ * CSS gives `.text-morph-ghost` the same padding.
+ */
 const SLOT_PAD_X = 0.5;
 /**
  * Its room above and below (em): roll's, and at least what morph's minimum
@@ -234,147 +189,29 @@ const SLOT_MIN_HEIGHT = 1.4;
 /** A kept glyph whose top moves further than this (em) changes line. */
 const LINE_CHANGE = 0.3;
 
-type Side = "start" | "end";
-
 /**
- * Whether a box shows an edge: a background, a side border, a shadow (a
- * ring, a shadow-drawn outline) or a frosted backdrop.
+ * A ghost slot's glyph box and trip (layer coordinates), for sizing the layer
+ * around every ghost. Only --x/--y reach the CSS.
  */
-function showsEdge(style: CSSStyleDeclaration): boolean {
-  return (
-    style.backgroundImage !== "none" ||
-    (style.backgroundColor !== "rgba(0, 0, 0, 0)" &&
-      style.backgroundColor !== "transparent") ||
-    parseFloat(style.borderLeftWidth) > 0 ||
-    parseFloat(style.borderRightWidth) > 0 ||
-    style.boxShadow !== "none" ||
-    (style.backdropFilter !== "" && style.backdropFilter !== "none")
-  );
-}
-
-/** Whether a pseudo-element draws a surface for its box (a button's fill). */
-function pseudoShowsEdge(
-  node: Element,
-  which: "::before" | "::after",
-): boolean {
-  const style = getComputedStyle(node, which);
-  return (
-    style.content !== "none" && style.content !== "normal" && showsEdge(style)
-  );
-}
-
-/**
- * The inner edges of what a reader sees as holding the value: the nearest ancestor that shows an edge, itself or through a
- * pseudo-element (our Button paints its fill on `::before`), or clips; else
- * the viewport. A plain block around it has no edge to see.
- */
-type Bounds = { left: number; right: number };
-
-function visibleBounds(el: HTMLElement): Bounds {
-  for (let node = el.parentElement; node; node = node.parentElement) {
-    const style = getComputedStyle(node);
-    if (
-      showsEdge(style) ||
-      clips(style) ||
-      pseudoShowsEdge(node, "::before") ||
-      pseudoShowsEdge(node, "::after")
-    ) {
-      const box = node.getBoundingClientRect();
-      return {
-        left: box.left + parseFloat(style.borderLeftWidth),
-        right: box.right - parseFloat(style.borderRightWidth),
-      };
-    }
-  }
-  return { left: 0, right: window.innerWidth };
-}
-
-/**
- * Whether old ink escaping the box on this side would land on something:
- * a neighbour on the line, or past the edge a reader sees holding the value
- * (a pill, a card, a clipping wrapper), whose position it returns. With room
- * around it, ink is left to dissolve on its own opacity. Reads the final
- * layout.
- */
-function inkEscapes(
-  root: HTMLElement,
-  side: Side,
-  inkEdge: number,
-  visible: () => Bounds,
-): false | "neighbour" | number {
-  let el: Element = root;
-  for (let depth = 0; depth < 8; depth++) {
-    // `side` is physical (start: left, end: right); in right-to-left text
-    // the next sibling sits to the left.
-    const rtl =
-      el.parentElement !== null &&
-      getComputedStyle(el.parentElement).direction === "rtl";
-    const toRight = (side === "end") !== rtl;
-    let sibling = toRight ? el.nextSibling : el.previousSibling;
-    while (sibling) {
-      const visible =
-        sibling instanceof Element
-          ? sibling.getBoundingClientRect().width >= 1
-          : Boolean(sibling.textContent?.trim());
-      if (visible) return "neighbour";
-      sibling = toRight ? sibling.nextSibling : sibling.previousSibling;
-    }
-    // Neighbours share the line up to the first block around it.
-    const parent = el.parentElement;
-    if (!parent) break;
-    const { display } = getComputedStyle(parent);
-    if (!display.startsWith("inline") && display !== "contents") break;
-    el = parent;
-  }
-  // Past the container's edge: the edge itself, where the fade belongs.
-  const bounds = visible();
-  if (side === "end")
-    return inkEdge > bounds.right + 0.5 ? bounds.right : false;
-  return inkEdge < bounds.left - 0.5 ? bounds.left : false;
-}
-
-/**
- * How many lines an inline element's text runs over: rows, not the
- * fragments `getClientRects` reports (a line can come back in pieces, split
- * around a space or a line break).
- */
-function lineCount(el: HTMLElement): number {
-  const tops: number[] = [];
-  for (const rect of el.getClientRects()) {
-    if (!tops.some((top) => Math.abs(top - rect.top) < 1)) tops.push(rect.top);
-  }
-  return tops.length;
-}
-
-type Axis = "width" | "height";
-
-/** A box's content width or height, from its rect: less padding and borders. */
-function contentSize(
-  style: CSSStyleDeclaration,
-  rect: DOMRect,
-  axis: Axis,
-): number {
-  const sides = axis === "width" ? ["left", "right"] : ["top", "bottom"];
-  let size = rect[axis];
-  for (const side of sides) {
-    size -= parseFloat(style.getPropertyValue(`padding-${side}`)) || 0;
-    size -= parseFloat(style.getPropertyValue(`border-${side}-width`)) || 0;
-  }
-  return size;
-}
-
-/** The width or height to set to make a box this big, by its box-sizing. */
-function sizeOf(style: CSSStyleDeclaration, rect: DOMRect, axis: Axis): number {
-  return style.boxSizing === "border-box"
-    ? rect[axis]
-    : contentSize(style, rect, axis);
-}
-
-const px = (el: HTMLElement, name: string): number =>
-  parseFloat(el.style.getPropertyValue(name)) || 0;
+type GhostBox = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  tripX: number;
+  tripY: number;
+};
+const ghostBoxes = new WeakMap<HTMLElement, GhostBox>();
 
 /** A ghost slot at x/y (its glyph's box, layer coordinates). */
-function placeSlot(slot: HTMLElement, x: number, y: number): void {
+function placeSlot(
+  slot: HTMLElement,
+  box: GhostBox,
+  x: number,
+  y: number,
+): void {
+  box.x = x;
+  box.y = y;
   slot.style.setProperty("--x", `${x}px`);
   slot.style.setProperty("--y", `${y}px`);
 }
@@ -397,87 +234,29 @@ function resetLayer(ghostLayer: HTMLElement): void {
 }
 
 /**
- * A change runs in phases, yielding between them: reads, then writes, then
- * reads again. Every label that changes in the same update is stepped
- * through the phases together, so all of them read before any of them
- * writes. Reading after the DOM changes forces the browser to restyle, and
- * on a page with complex `:has()` selectors each such restyle can cover the
- * whole document; batched, a set of changes costs one instead of several
- * per label.
- */
-type MorphSteps = Generator<void, Animation[], void>;
-
-type MorphJob = {
-  root: HTMLElement;
-  steps: MorphSteps;
-  done: (started: Animation[]) => void;
-};
-
-const queue: MorphJob[] = [];
-
-/**
  * Where each label was last seen pinned as it resized (0 start, 1 end, 0.5
  * centred), from how far each edge travelled: what a roll run's travel is
  * measured against.
  */
 const anchors = new WeakMap<HTMLElement, number>();
 
-/** Until a label has resized, a guess from its alignment. */
-function anchorHint(style: CSSStyleDeclaration): number {
-  const rtl = style.direction === "rtl";
-  switch (style.textAlign) {
-    case "center":
-      return 0.5;
-    case "end":
-      return 1;
-    case "right":
-      return rtl ? 0 : 1;
-    case "left":
-      return rtl ? 1 : 0;
-    default:
-      return 0;
-  }
-}
-
 /** Tags a label's current resize, so an older one can't release it. */
 let sizings = 0;
 /** Tags a label's current edge clip, so an older change can't lift it. */
 let edgeClips = 0;
 
-function flushMorphs(): void {
-  let active = queue.splice(0);
-  while (active.length > 0) {
-    active = active.filter((job) => {
-      let step: IteratorResult<void, Animation[]>;
-      try {
-        step = job.steps.next();
-      } catch (error) {
-        // One label failing mustn't strand the rest of its batch mid-change.
-        reportError(error);
-        job.done([]);
-        return false;
-      }
-      if (!step.done) return true;
-      job.done(step.value);
-      return false;
-    });
-  }
-}
-
-/** Run a change with the others from this update, before the next paint. */
-function scheduleMorph(job: MorphJob): void {
-  // A second change to the same label before the batch runs goes after it.
-  if (queue.some((queued) => queued.root === job.root)) flushMorphs();
-  queue.push(job);
-  if (queue.length === 1) queueMicrotask(flushMorphs);
-}
+/** A label's parts: the root, the stage that rides, and its two layers. */
+type MorphElements = {
+  root: HTMLElement;
+  stage: HTMLElement;
+  glyphLayer: HTMLElement;
+  /** Holds still where the value starts; ghost coordinates count from it. */
+  ghostAnchor: HTMLElement;
+  ghostLayer: HTMLElement;
+};
 
 function* morphTo(
-  root: HTMLElement,
-  stage: HTMLElement,
-  glyphLayer: HTMLElement,
-  ghostAnchor: HTMLElement,
-  ghostLayer: HTMLElement,
+  { root, stage, glyphLayer, ghostAnchor, ghostLayer }: MorphElements,
   value: string,
   options: TextMorphOptions,
   place: { decimal: string; caret: number | undefined },
@@ -529,7 +308,7 @@ function* morphTo(
   const boxed = styleBefore.display !== "inline";
   const heightBefore = sizeOf(styleBefore, rootBefore, "height");
   const originBefore = ghostAnchor.getBoundingClientRect();
-  const before = new Map(old.map((node) => [node, visualState(node)]));
+  const before = old.map(visualState);
   // Ghosts still leaving; ones already gone are cleared in step 4.
   const gone: HTMLElement[] = [];
   const slots = (Array.from(ghostLayer.children) as HTMLElement[]).filter(
@@ -541,8 +320,9 @@ function* morphTo(
   );
   const ghosts = slots.flatMap((slot) => {
     const node = slot.firstElementChild;
-    return node instanceof HTMLElement
-      ? [{ slot, node, drawn: visualState(node) }]
+    const box = ghostBoxes.get(slot);
+    return node instanceof HTMLElement && box
+      ? [{ slot, node, box, drawn: visualState(node) }]
       : [];
   });
 
@@ -565,7 +345,7 @@ function* morphTo(
   const leaving = old.flatMap((node, i) =>
     used.has(i) || spaceNode(node)
       ? []
-      : [{ node, kind: match.oldKinds[i], index: i }],
+      : [{ node, kind: match.oldKinds[i], index: i, was: before[i] }],
   );
   const nodes = next.map((glyph, i) => kept[i] ?? createGlyph(glyph));
 
@@ -620,9 +400,7 @@ function* morphTo(
 
   // 3. Read: where leaving glyphs sit in the layout, with nothing moving
   // them.
-  const homes = new Map(
-    leaving.map(({ node }) => [node, node.getBoundingClientRect()]),
-  );
+  const homes = leaving.map(({ node }) => node.getBoundingClientRect());
   // And which line each kept glyph sits on, whatever a roll in progress is
   // drawing it at.
   const keptHomes = new Map(
@@ -643,16 +421,22 @@ function* morphTo(
   // The slots fade from step 8 on, while this change plays.
   delete glyphLayer.dataset.playing;
   // Leaving glyphs move into slots in the ghost layer (placed in step 8).
-  const newSlots = leaving.flatMap(({ node, kind, index }) => {
-    const home = homes.get(node);
-    if (!home) return [];
+  const newSlots = leaving.map((glyph, k) => {
+    const home = homes[k];
     const slot = document.createElement("span");
     slot.className = "text-morph-ghost";
-    slot.style.setProperty("--w", `${home.width}px`);
-    slot.style.setProperty("--h", `${home.height}px`);
-    slot.append(node);
+    slot.append(glyph.node);
     ghostLayer.append(slot);
-    return [{ slot, node, kind, home, index }];
+    const box: GhostBox = {
+      x: 0,
+      y: 0,
+      width: home.width,
+      height: home.height,
+      tripX: 0,
+      tripY: 0,
+    };
+    ghostBoxes.set(slot, box);
+    return { ...glyph, slot, box, home };
   });
   yield;
 
@@ -683,7 +467,7 @@ function* morphTo(
   const changesLine: HTMLElement[] = [];
   const reach: [HTMLElement, number][] = [];
   nodes.forEach((node, i) => {
-    const was = kept[i] ? before.get(node) : undefined;
+    const was = kept[i] ? before[match.kept[i]] : undefined;
     const home = keptHomes.get(node);
     if (!was || !home) return;
     if (Math.abs(home.top - after[i].top) > LINE_CHANGE * em) {
@@ -711,7 +495,7 @@ function* morphTo(
   // first when leaving. Its slot takes the trip and the glyph its own
   // entrance inside it, so a digit rolls within a
   // number that moves line, where adding the two up cancelled them (a
-  // morph digit rolls exactly one line). Morph anchors everything; roll
+  // morph digit rolls exactly one line). Morph and blend anchor everything; roll
   // only digits, to the rest of their own number, and only across lines:
   // its glyphs still roll in place on their line (a number that resizes
   // doesn't drag them after its `$`), and a number that moves to another
@@ -763,12 +547,12 @@ function* morphTo(
       for (const [i, shape] of planned) shapes.set(glyphs[i], shape);
     };
     plan(nodes, isArriving, match.nextKinds, (i) => after[i]);
-    const leavingAt = new Set(leaving.map((l) => l.index));
+    const homeAt = new Map(newSlots.map(({ index, home }) => [index, home]));
     plan(
       old,
-      (i) => leavingAt.has(i),
+      (i) => homeAt.has(i),
       match.oldKinds,
-      (i) => homes.get(old[i]),
+      (i) => homeAt.get(i),
     );
   }
   // Arriving and leaving glyphs travel with their neighbours (lib/anchors),
@@ -789,45 +573,32 @@ function* morphTo(
       shapes.get(side === "next" ? nodes[i] : old[i])?.group ?? false,
   });
   const arrivals = trips.arrivals;
+  // What holds the value, read at most once per change: it walks every
+  // ancestor, pseudo-elements too.
+  let seenBounds: Bounds | undefined;
+  const visible = (): Bounds => (seenBounds ??= visibleBounds(root));
   // Arriving text carried in from past the edge a reader sees around the
   // value (a right-pinned button's: `Copied` → `Copy page` brings `page`
   // in from past its right edge) stays hidden past that edge while the
   // change plays, the way leaving text carried out dissolves there under the
   // edge fade. Blend needs it: its new text shows from its first frame,
   // where morph's waits 100ms, by when it has come most of the way in.
-  // Clipped, since a mask can't hide what's outside its element, and only
-  // on an edge the label holds still (the one it's pinned by), so the clip
-  // holds still with it.
-  let edgeClip: string | null = null;
-  // What holds the value, read at most once per change: it walks every
-  // ancestor, pseudo-elements too.
-  let seenBounds: Bounds | undefined;
-  const visible = (): Bounds => (seenBounds ??= visibleBounds(root));
-  if (
+  // Clipped, since a mask can't hide what's outside its element.
+  const edgeClip =
     o.mode === "blend" &&
     easesAsBox &&
     o.edgeFade !== "never" &&
     arrivals.size > 0
-  ) {
-    const bounds = visible();
-    let pastStart = false;
-    let pastEnd = false;
-    for (const [i, [dx]] of arrivals) {
-      if (after[i].left + dx < bounds.left - 0.5) pastStart = true;
-      if (after[i].right + dx > bounds.right + 0.5) pastEnd = true;
-    }
-    const clipLeft =
-      pastStart && Math.abs(rootBefore.left - rootAfter.left) < 0.5;
-    const clipRight =
-      pastEnd && Math.abs(rootBefore.right - rootAfter.right) < 0.5;
-    if (clipLeft || clipRight) {
-      const right = clipRight
-        ? `${rootAfter.right - bounds.right}px`
-        : "-100vw";
-      const left = clipLeft ? `${bounds.left - rootAfter.left}px` : "-100vw";
-      edgeClip = `inset(-100vh ${right} -100vh ${left})`;
-    }
-  }
+      ? arrivalClip(
+          [...arrivals].map(([i, [dx]]) => ({
+            left: after[i].left + dx,
+            right: after[i].right + dx,
+          })),
+          visible(),
+          rootBefore,
+          rootAfter,
+        )
+      : null;
   const departures = new Map<HTMLElement, Trip>();
   for (const { node, index } of newSlots) {
     const trip = trips.departures.get(index);
@@ -849,26 +620,14 @@ function* morphTo(
   // And where leaving ink ends up when it travels with a neighbour: past an
   // edge that doesn't move (a right-pinned button's), carried out by the
   // survivor sliding toward it.
-  const carried = leaving.flatMap(({ node }) => {
-    const rect = before.get(node)?.rect;
+  const carried = leaving.flatMap(({ node, was }) => {
     const trip = departures.get(node);
-    return rect && trip
-      ? [
-          new DOMRect(
-            rect.x + trip[0],
-            rect.y + trip[1],
-            rect.width,
-            rect.height,
-          ),
-        ]
-      : [];
+    const { x, y, width, height } = was.rect;
+    return trip ? [new DOMRect(x + trip[0], y + trip[1], width, height)] : [];
   });
   const inkRects = [
     ...ghosts.map((g) => g.drawn.rect),
-    ...leaving.flatMap(({ node }) => {
-      const rect = before.get(node)?.rect;
-      return rect ? [rect] : [];
-    }),
+    ...leaving.map((l) => l.was.rect),
     ...carried,
   ];
   // The glyph boxes decide whether ink sticks out; the room also covers
@@ -880,19 +639,18 @@ function* morphTo(
   // How the last change armed each edge, for its ghosts still leaving: a
   // band held at the container's edge stays there (kept on screen, since
   // layer coordinates move) and one following the box keeps following it.
-  const wasArmed = (side: Side): false | "box" | number => {
-    const was =
+  const wasArmed = (side: Side): Arm =>
+    readArm(
       side === "start"
         ? ghostLayer.dataset.armedStart
-        : ghostLayer.dataset.armedEnd;
-    if (was === undefined) return false;
-    return was === "box" ? "box" : parseFloat(was) - origin.left;
-  };
+        : ghostLayer.dataset.armedEnd,
+      origin.left,
+    );
   // How each edge fades: not at all, following the box's edge (a neighbour
   // moves with it), or held at the container's edge (layer coordinates):
   // there only ink crossing it needs fading, and a band following the box
   // swept across letters still well inside (clearing a long value).
-  const armed = (side: Side): false | "box" | number => {
+  const armed = (side: Side): Arm => {
     if (!easesAsBox || o.edgeFade === "never" || inkRects.length === 0) {
       return false;
     }
@@ -937,25 +695,17 @@ function* morphTo(
   const widthAfter = sizeOf(styleAfter, rootAfter, "width");
   // What the stage's percentages count: the label's content box.
   const contentAfter = contentSize(styleAfter, rootAfter, "width");
-  const sizeFrom = boxed
-    ? { width: `${widthAfter + from}px` }
-    : { marginInlineStart: `${startAfter + from}px` };
-  const sizeTo = boxed
-    ? { width: `${widthAfter}px` }
-    : { marginInlineStart: `${startAfter}px` };
+  const sizeProp = boxed ? "width" : "marginInlineStart";
+  const sizeTo = boxed ? widthAfter : startAfter;
   yield;
 
   // 6. Write: the label at the start of its resize.
-  const authorStart = root.style.marginInlineStart;
-  const authorWidth = root.style.width;
+  const authorSize = root.style[sizeProp];
   const authorHeight = root.style.height;
-  if (resizes && boxed) {
-    root.style.width = sizeFrom.width ?? "";
-    // Its text sits at its start while it resizes (text-align in the CSS),
-    // so the stage's ride alone places it, whichever way the width goes.
-    root.dataset.sizing = "";
-  } else if (resizes)
-    root.style.marginInlineStart = sizeFrom.marginInlineStart ?? "";
+  if (resizes) root.style[sizeProp] = `${sizeTo + from}px`;
+  // Its text sits at its start while it resizes (text-align in the CSS), so
+  // the stage's ride alone places it, whichever way the width goes.
+  if (resizes && boxed) root.dataset.sizing = "";
   if (reheights) root.style.height = `${heightBefore}px`;
   yield;
 
@@ -979,8 +729,7 @@ function* morphTo(
 
   // 8. Write: everything else, attributes and styles only. Nothing below
   // reads layout or changes the DOM's structure.
-  root.style.marginInlineStart = authorStart;
-  root.style.width = authorWidth;
+  root.style[sizeProp] = authorSize;
   root.style.height = authorHeight;
   glyphLayer.dataset.playing = "";
   const clip = edgeClip === null ? null : String(++edgeClips);
@@ -988,16 +737,16 @@ function* morphTo(
     root.dataset.edgeClip = clip;
     root.style.setProperty("--text-morph-clip", edgeClip);
   }
-  for (const { slot } of ghosts) {
-    placeSlot(slot, px(slot, "--x") + shiftX, px(slot, "--y") + shiftY);
+  for (const { slot, box } of ghosts) {
+    placeSlot(slot, box, box.x + shiftX, box.y + shiftY);
   }
   for (const node of changesLine) {
     node.parentElement?.setAttribute("data-travel", "");
   }
-  for (const { slot, node } of newSlots) {
+  for (const { node, box } of newSlots) {
     const [dx, dy] = departures.get(node) ?? [0, 0];
-    slot.style.setProperty("--trip-x", `${Math.ceil(Math.abs(dx))}px`);
-    slot.style.setProperty("--trip-y", `${Math.ceil(Math.abs(dy))}px`);
+    box.tripX = Math.ceil(Math.abs(dx));
+    box.tripY = Math.ceil(Math.abs(dy));
   }
   for (const [node, room] of reach) {
     node.parentElement?.style.setProperty("--reach", `${room}px`);
@@ -1010,7 +759,11 @@ function* morphTo(
     // either way.
     const sizing = String(++sizings);
     root.dataset.sizing = sizing;
-    const ease = run(root, [sizeFrom, sizeTo], resize);
+    const ease = run(
+      root,
+      [{ [sizeProp]: `${sizeTo + from}px` }, { [sizeProp]: `${sizeTo}px` }],
+      resize,
+    );
     const release = (): void => {
       if (root.dataset.sizing !== sizing) return;
       delete root.dataset.sizing;
@@ -1044,19 +797,10 @@ function* morphTo(
   const measuredX = boxed
     ? glyphsAfter.left - glyphsAt0.left
     : rootAfter.left - rootAt0.left;
-  const ownX =
-    resizes && !boxed
-      ? [from, -from, from / 2, -from / 2].find(
-          (x) => Math.abs(x - measuredX) < 0.05,
-        )
-      : undefined;
-  // A box whose glyphs move with its width (all of the change pinned at the
-  // end, half centred) rides by that share of its width as it eases, in
-  // CSS: layout rounds the ride and the width it follows from the same
-  // number each frame, where a ride animated beside the width rounded on
-  // its own and stepped the glyphs back and forth.
-  const share = boxed && resizes ? -measuredX / from : NaN;
-  const follows = [-1, -0.5, 0.5, 1].find((f) => Math.abs(f - share) < 0.01);
+  const ownX = resizes && !boxed ? ownShift(from, measuredX) : undefined;
+  // A box whose glyphs move with its width rides by that share of its width
+  // as it eases, in CSS.
+  const follows = boxed && resizes ? followShare(from, measuredX) : undefined;
   if (follows !== undefined) {
     stage.style.left = `calc(${follows} * (${contentAfter}px - 100%))`;
   }
@@ -1076,6 +820,23 @@ function* morphTo(
   }
 
   const motion = { duration: o.motion.duration, easing: o.motion.easing };
+  // A glyph in a shape slides toward its centre as it scales, out of its
+  // slot, whose fade would cut it off; it doesn't roll, so it goes unmasked.
+  // So does one in a blend run, scaling about the run's centre.
+  const unmaskedBy = (shape: Shape | undefined): boolean =>
+    shape !== undefined && (shape.group || o.mode === "blend");
+  // Where an arriving glyph starts, or a leaving one ends: a group recedes
+  // about its centre; anything else takes its mode's entrance, rolling
+  // with its trip.
+  const awayFor = (
+    shape: Shape | undefined,
+    kind: GlyphKind,
+    trip: Trip | undefined,
+    direction: 1 | -1,
+  ): Keyframe =>
+    shape?.group
+      ? { translate: "0 0", scale: String(GROUP_SCALE), rotate: "0deg" }
+      : awayState(o, kind, rollWith(trip, direction, line), line);
   // A filter animates only when there's blur to show: morph's default has
   // none, and a filter animation per glyph costs even when it changes
   // nothing.
@@ -1091,28 +852,20 @@ function* morphTo(
     nodes.flatMap((node, i) =>
       kept[i] || spaceNode(node) ? [] : [lineStart(after[i], rootAfter)],
     ),
-    leaving.map(({ node }) => {
-      const rect = before.get(node)?.rect;
-      return rect ? lineStart(rect, rootBefore) : 0;
-    }),
+    leaving.map(({ was }) => lineStart(was.rect, rootBefore)),
   );
 
   // Shared glyphs slide from wherever they were, including mid-animation.
   let entering = 0;
   nodes.forEach((node, i) => {
     if (spaceNode(node)) return;
-    const was = kept[i] ? before.get(node) : undefined;
+    const was = kept[i] ? before[match.kept[i]] : undefined;
     const kind = match.nextKinds[i];
     const { fadeIn } = fadesFor(o, kind);
     // Scale pivots on the glyph's own centre unless it arrives in a shape.
     const shape = shapes.get(node);
     setOrigin(node, shape?.origin ?? "");
-    // A shape's glyph slides toward the shape's centre as it scales, out of
-    // its slot, whose fade would cut it off; it doesn't roll, so it needs
-    // no fade.
-    // So does a blend run's, scaling about the run's centre.
-    const inRun = o.mode === "blend" && shape !== undefined;
-    const unmasked = shape?.group || inRun;
+    const unmasked = unmaskedBy(shape);
     if (unmasked) node.parentElement?.setAttribute("data-travel", "");
     // Only what rolls, or is drawn off its line, fades in its slot.
     const fadesInSlot = (): void => {
@@ -1121,14 +874,12 @@ function* morphTo(
     if (!was) {
       fadesInSlot();
       const delay = delays.entering[entering++];
-      const awayFrame = shape?.group
-        ? { translate: "0 0", scale: String(GROUP_SCALE), rotate: "0deg" }
-        : awayState(
-            o,
-            kind,
-            rollWith(arrivals.get(i), arriveFor(next[i]), line),
-            line,
-          );
+      const awayFrame = awayFor(
+        shape,
+        kind,
+        arrivals.get(i),
+        arriveFor(next[i]),
+      );
       // Under reduced motion it only fades in, where it lands.
       if (!reduced) {
         run(node, [awayFrame, HOME], {
@@ -1215,7 +966,7 @@ function* morphTo(
     // held key) crawling in, so it snaps to full in one frame instead.
     const blurred = was.filter !== "blur(0px)" ? was.filter : null;
     if (was.opacity < 0.999 || blurred !== null) {
-      const left = Math.max(1 - was.opacity, blurred !== null ? 0.25 : 0);
+      const left = Math.max(1 - was.opacity, blurred !== null ? CATCH_UP : 0);
       run(node, [fade(was.opacity, blurred), fade(1, sharp(blurred))], {
         duration: fadeIn.duration * Math.min(left, CATCH_UP),
         easing: fadeIn.easing,
@@ -1225,17 +976,14 @@ function* morphTo(
 
   // Leaving glyphs sit at the place they had in the layout, and start from
   // wherever they were drawn.
-  for (const { slot, home } of newSlots) {
-    placeSlot(slot, home.left - origin.left, home.top - origin.top);
+  for (const { slot, box, home } of newSlots) {
+    placeSlot(slot, box, home.left - origin.left, home.top - origin.top);
   }
 
   // Size the layer around every slot (a mask cuts whatever falls outside
   // its element) and, when the edge fade is armed, the band's reach.
-  const allSlots = [
-    ...ghosts.map((g) => g.slot),
-    ...newSlots.map((s) => s.slot),
-  ];
-  if (allSlots.length === 0) {
+  const boxes = [...ghosts, ...newSlots].map((g) => g.box);
+  if (boxes.length === 0) {
     resetLayer(ghostLayer);
     return started;
   }
@@ -1246,15 +994,13 @@ function* morphTo(
   let minY = Infinity;
   let maxX = -Infinity;
   let maxY = -Infinity;
-  for (const slot of allSlots) {
-    const x = px(slot, "--x");
-    const y = px(slot, "--y");
-    const room = padX + px(slot, "--trip-x") + INK_MARGIN * em;
-    const roomY = padY + px(slot, "--trip-y");
+  for (const { x, y, width, height, tripX, tripY } of boxes) {
+    const room = padX + tripX + INK_MARGIN * em;
+    const roomY = padY + tripY;
     minX = Math.min(minX, x - room);
-    maxX = Math.max(maxX, x + px(slot, "--w") + room);
+    maxX = Math.max(maxX, x + width + room);
     minY = Math.min(minY, y - roomY);
-    maxY = Math.max(maxY, y + px(slot, "--h") + roomY);
+    maxY = Math.max(maxY, y + height + roomY);
   }
   const fades = armStart !== false || armEnd !== false;
   if (fades) {
@@ -1277,31 +1023,20 @@ function* morphTo(
     const ramp = EDGE_RAMP * em;
     // The mask's band for a box spanning start..end (layer coordinates).
     const maskAt = (start: number, end: number): Keyframe => {
-      const left =
-        armStart === false
-          ? 0
-          : typeof armStart === "number"
-            ? armStart - ox
-            : start - slack - ox;
-      const right =
-        armEnd === false
-          ? layerWidth
-          : typeof armEnd === "number"
-            ? armEnd - ox
-            : end + slack - ox;
+      const { left, right } = edgeBand(
+        start,
+        end,
+        { start: armStart, end: armEnd },
+        { left: ox, width: layerWidth },
+        slack,
+      );
       return {
         maskPosition: `${left}px 0`,
         maskSize: `${right - left}px 100%`,
       };
     };
-    const mark = (arm: false | "box" | number): string | undefined =>
-      arm === false
-        ? undefined
-        : arm === "box"
-          ? "box"
-          : String(arm + origin.left);
-    const markStart = mark(armStart);
-    const markEnd = mark(armEnd);
+    const markStart = armMark(armStart, origin.left);
+    const markEnd = armMark(armEnd, origin.left);
     if (markStart === undefined) delete ghostLayer.dataset.armedStart;
     else ghostLayer.dataset.armedStart = markStart;
     if (markEnd === undefined) delete ghostLayer.dataset.armedEnd;
@@ -1321,9 +1056,7 @@ function* morphTo(
     disarm(ghostLayer);
   }
 
-  newSlots.forEach(({ slot, node, kind, home }, i) => {
-    const was = before.get(node);
-    if (!was) return;
+  newSlots.forEach(({ slot, node, kind, home, was }, i) => {
     const { fadeOut } = fadesFor(o, kind);
     const delay = delays.leaving[i];
     // Drawn where it was: the offset its animation had it at. Under
@@ -1339,18 +1072,9 @@ function* morphTo(
     const atRest = was.scale === "1" && was.rotate === "0deg";
     const shape = atRest ? shapes.get(node) : undefined;
     setOrigin(node, shape?.origin ?? "");
-    if (shape?.group || (o.mode === "blend" && shape)) {
-      slot.setAttribute("data-travel", "");
-    }
-    const awayFrame = shape?.group
-      ? { translate: "0 0", scale: String(GROUP_SCALE), rotate: "0deg" }
-      : awayState(
-          o,
-          kind,
-          // It leaves the way its trip goes.
-          rollWith(departures.get(node), away, line),
-          line,
-        );
+    if (unmaskedBy(shape)) slot.setAttribute("data-travel", "");
+    // It leaves the way its trip goes.
+    const awayFrame = awayFor(shape, kind, departures.get(node), away);
     const move = run(
       node,
       [drawn, reduced ? drawn : awayFrame],
@@ -1502,8 +1226,8 @@ function TextMorph({
   const rootRef = React.useRef<HTMLSpanElement>(null);
   const stageRef = React.useRef<HTMLSpanElement>(null);
   const glyphsRef = React.useRef<HTMLSpanElement>(null);
-  const ghostsRef = React.useRef<HTMLSpanElement>(null);
-  const sheetRef = React.useRef<HTMLSpanElement>(null);
+  const ghostAnchorRef = React.useRef<HTMLSpanElement>(null);
+  const ghostLayerRef = React.useRef<HTMLSpanElement>(null);
   // Set once: after that this component owns the glyph markup.
   const [initialHtml] = React.useState(() => ({ __html: glyphsHtml(value) }));
   const shown = React.useRef(value);
@@ -1548,15 +1272,15 @@ function TextMorph({
   React.useLayoutEffect(() => {
     const root = rootRef.current;
     const stage = stageRef.current;
-    const glyphs = glyphsRef.current;
-    const ghosts = ghostsRef.current;
-    const sheet = sheetRef.current;
+    const glyphLayer = glyphsRef.current;
+    const ghostAnchor = ghostAnchorRef.current;
+    const ghostLayer = ghostLayerRef.current;
     if (
       !root ||
       !stage ||
-      !glyphs ||
-      !ghosts ||
-      !sheet ||
+      !glyphLayer ||
+      !ghostAnchor ||
+      !ghostLayer ||
       value === shown.current
     )
       return;
@@ -1585,17 +1309,13 @@ function TextMorph({
       if (over) return;
       over = true;
       if (inFlight.current === handle) inFlight.current = null;
-      delete glyphs.dataset.playing;
+      delete glyphLayer.dataset.playing;
       if (!silent) latest.current.onAnimationComplete?.();
     };
     scheduleMorph({
       root,
       steps: morphTo(
-        root,
-        stage,
-        glyphs,
-        ghosts,
-        sheet,
+        { root, stage, glyphLayer, ghostAnchor, ghostLayer },
         value,
         current.options,
         { decimal: decimalFor(locale), caret: current.cursorIndex },
@@ -1647,8 +1367,8 @@ function TextMorph({
             className="text-morph-glyphs"
             dangerouslySetInnerHTML={initialHtml}
           />
-          <span ref={ghostsRef} className="text-morph-ghosts">
-            <span ref={sheetRef} className="text-morph-ghost-sheet" />
+          <span ref={ghostAnchorRef} className="text-morph-ghosts">
+            <span ref={ghostLayerRef} className="text-morph-ghost-sheet" />
           </span>
         </span>
       </>

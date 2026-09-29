@@ -33,6 +33,10 @@ describe("neighbourScope", () => {
     expect(neighbourScope("morph", false, kinds, 0)).toEqual([0, 4]);
   });
 
+  it("blend: the whole value too", () => {
+    expect(neighbourScope("blend", false, kinds, 3)).toEqual([0, 4]);
+  });
+
   it("roll: a digit within its own number, nothing for letters", () => {
     expect(neighbourScope("roll", false, kinds, 2)).toEqual([1, 2]);
     expect(neighbourScope("roll", false, kinds, 4)).toEqual([4, 4]);

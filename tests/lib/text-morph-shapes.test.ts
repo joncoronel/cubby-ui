@@ -154,3 +154,15 @@ describe("planRuns", () => {
     expect([...shapes.values()].every((s) => !s.group)).toBe(true);
   });
 });
+
+describe("shapeRuns with a minimum", () => {
+  it("counts runs of at least `min` changed glyphs, ended by a space", () => {
+    const { count, isSpace, changed } = parse("__ _a___");
+    expect(shapeRuns(count, isSpace, changed, false, 1)).toEqual([
+      [0, 1],
+      [3],
+      [5, 6, 7],
+    ]);
+    expect(shapeRuns(count, isSpace, changed, false, 3)).toEqual([[5, 6, 7]]);
+  });
+});

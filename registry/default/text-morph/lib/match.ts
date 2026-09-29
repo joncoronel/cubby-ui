@@ -27,7 +27,7 @@ export type MatchResult = {
   oldKinds: GlyphKind[];
   /** 1: the value went up (new glyphs arrive from below), -1: down. */
   trend: 1 | -1;
-  /** Morph matched by words (the value has more than one). */
+  /** Matched by words: always in blend, in morph once a value has several. */
   byWords: boolean;
 };
 
@@ -188,6 +188,36 @@ export function findNumbers(glyphs: string[]): NumberToken[] {
 const MAGNITUDE_JUMP = 3;
 
 /**
+ * How many glyphs two lists share at their start, then at their end without
+ * overlapping it. `keeps` can end either run early at a glyph.
+ */
+function commonEnds(
+  old: string[],
+  next: string[],
+  keeps: (glyph: string) => boolean = () => true,
+): [start: number, end: number] {
+  let start = 0;
+  while (
+    start < old.length &&
+    start < next.length &&
+    old[start] === next[start] &&
+    keeps(old[start])
+  ) {
+    start++;
+  }
+  let end = 0;
+  while (
+    end < old.length - start &&
+    end < next.length - start &&
+    old[old.length - 1 - end] === next[next.length - 1 - end] &&
+    keeps(old[old.length - 1 - end])
+  ) {
+    end++;
+  }
+  return [start, end];
+}
+
+/**
  * Pair two numbers' glyphs by place, as [new, old]
  * index pairs. The shared prefix and suffix (a currency symbol, a `%`)
  * hold. Digits pair on the decimal point: by column while the count stays
@@ -204,28 +234,12 @@ export function matchPlaces(
   decimal: string,
 ): [number, number][] {
   const pairs = new Map<number, number>();
-  let start = 0;
-  while (
-    start < old.length &&
-    start < next.length &&
-    old[start] === next[start] &&
-    !isDigit(old[start])
-  ) {
-    pairs.set(start, start);
-    start++;
-  }
-  let oldEnd = old.length;
-  let nextEnd = next.length;
-  while (
-    oldEnd > start &&
-    nextEnd > start &&
-    old[oldEnd - 1] === next[nextEnd - 1] &&
-    !isDigit(old[oldEnd - 1])
-  ) {
-    pairs.set(nextEnd - 1, oldEnd - 1);
-    oldEnd--;
-    nextEnd--;
-  }
+  // Affixes hold (a currency symbol, a `%`); digits never count as one.
+  const [start, end] = commonEnds(old, next, (g) => !isDigit(g));
+  for (let k = 0; k < start; k++) pairs.set(k, k);
+  for (let k = 1; k <= end; k++) pairs.set(next.length - k, old.length - k);
+  const oldEnd = old.length - end;
+  const nextEnd = next.length - end;
 
   // The decimal point, or the end where there is none.
   const pivotOf = (glyphs: string[], end: number): number => {
@@ -322,23 +336,10 @@ function matchEnds(
   anchor: number,
 ): [number, number][] {
   const pairs: [number, number][] = [];
-  let start = 0;
-  while (
-    start < old.length &&
-    start < next.length &&
-    old[start] === next[start]
-  ) {
-    pairs.push([start, start]);
-    start++;
-  }
-  let end = 0;
-  while (
-    end < old.length - start &&
-    end < next.length - start &&
-    old[old.length - 1 - end] === next[next.length - 1 - end]
-  ) {
-    pairs.push([next.length - 1 - end, old.length - 1 - end]);
-    end++;
+  const [start, end] = commonEnds(old, next);
+  for (let k = 0; k < start; k++) pairs.push([k, k]);
+  for (let k = 0; k < end; k++) {
+    pairs.push([next.length - 1 - k, old.length - 1 - k]);
   }
 
   // Between them, one shared run flush with neither end (a floating
@@ -513,22 +514,7 @@ function gaps(count: number, survivors: Set<number>): number[] {
  * number reshapes.
  */
 function sharedEnds(old: string[], next: string[]): [number, number][] {
-  let start = 0;
-  while (
-    start < old.length &&
-    start < next.length &&
-    old[start] === next[start]
-  ) {
-    start++;
-  }
-  let end = 0;
-  while (
-    end < old.length - start &&
-    end < next.length - start &&
-    old[old.length - 1 - end] === next[next.length - 1 - end]
-  ) {
-    end++;
-  }
+  const [start, end] = commonEnds(old, next);
   const pairs: [number, number][] = [];
   for (let k = 0; k < start; k++) pairs.push([k, k]);
   for (let k = 1; k <= end; k++) {
@@ -754,7 +740,9 @@ export function matchText(
   const result = (): MatchResult => {
     const asNumbers = (kinds: GlyphKind[], tokens: NumberToken[]) => {
       const shown = [...kinds];
-      for (const { start, end } of tokens) shown.fill("number", start, end);
+      for (const { start, end } of tokens.slice(paired)) {
+        shown.fill("number", start, end);
+      }
       return shown;
     };
     return {

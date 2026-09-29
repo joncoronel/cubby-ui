@@ -2,6 +2,7 @@ import type { ReactElement } from "react";
 import { ComponentInstall } from "./component-install";
 import { highlight } from "@/registry/default/code-block/lib/shiki-shared";
 import { transformComponentImports } from "@/lib/transform-registry-imports";
+import type { RegistryItemJson } from "@/lib/registry-json";
 import fs from "fs/promises";
 import fsSync from "fs";
 import path from "path";
@@ -32,7 +33,7 @@ function getLanguageFromPath(filePath: string): BundledLanguage {
 
 // Helper to process files from a registry JSON
 async function processRegistryFiles(
-  registryJson: any,
+  registryJson: RegistryItemJson,
   component: string,
 ): Promise<
   Array<{
@@ -49,7 +50,7 @@ async function processRegistryFiles(
   }
 
   return Promise.all(
-    registryJson.files.map(async (file: any) => {
+    registryJson.files.map(async (file) => {
       const fullPath = path.join(process.cwd(), file.path);
       const rawContent = await fs.readFile(fullPath, "utf-8");
       // Without the closing newline, which rendered as an empty last line.
@@ -83,7 +84,7 @@ async function processRegistryFiles(
 }
 
 // Helper to read a registry item JSON
-function readRegistryJson(itemName: string): any | null {
+function readRegistryJson(itemName: string): RegistryItemJson | null {
   try {
     const registryJsonPath = path.join(
       process.cwd(),

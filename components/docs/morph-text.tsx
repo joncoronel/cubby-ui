@@ -49,8 +49,13 @@ export function MorphText({
 
   // Whether the settled text fits: the glyphs' layout width, since leaving
   // glyphs and transforms (which scrollWidth counts) take no space in it.
+  // Not mid-change: the box is still easing to its new width, so the text
+  // read as overflowing, and the clip and edge fade cut in (wiping a longer
+  // label in, dimming its last letter) until it settled.
   const checkFit = React.useCallback((): void => {
     const clip = clipRef.current;
+    const label = clip?.querySelector("[data-slot=text-morph]");
+    if (label?.hasAttribute("data-animating")) return;
     const glyphs = clip?.querySelector<HTMLElement>(".text-morph-glyphs");
     if (clip && glyphs) {
       setOverflowing(glyphs.offsetWidth > clip.clientWidth + 1);

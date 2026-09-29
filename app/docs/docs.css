@@ -726,6 +726,17 @@
 }
 
 /* Revealed code appears in place with a short fade: no layout animation. */
+/* A tray groups code that belongs together (Usage: the import and the
+   markup, copied apart), in the code block's own fill and edge around the
+   cards. One snippet goes without: around a single card it only narrowed
+   it. The cards' corners are concentric (16px less the 4px padding). */
+.docs-code-tray {
+  border-radius: 1rem;
+  padding: 0.25rem;
+  background-color: var(--muted);
+  box-shadow: var(--surface-shadow-combined-1);
+}
+
 .docs-code-reveal:not([hidden]) {
   animation: docs-fade-in 0.18s ease-out;
 }

@@ -12,7 +12,6 @@ import {
 } from "@/registry/default/code-block/code-block";
 import { CopyButton } from "@/registry/default/copy-button/copy-button";
 import { solidSurface } from "@/registry/default/lib/elevated";
-import { MorphText } from "@/components/docs/morph-text";
 import { cn } from "@/lib/utils";
 
 interface ComponentPreviewProps {
@@ -45,6 +44,18 @@ export function ComponentPreview({
   const codeId = React.useId();
   const figureRef = React.useRef<HTMLElement>(null);
   const [expanded, setExpanded] = React.useState(false);
+  const expandRef = React.useRef<HTMLButtonElement>(null);
+  const collapseRef = React.useRef<HTMLButtonElement>(null);
+  // The two toggles are different buttons, so focus follows from one to the
+  // other when a keyboard (or anything) opened or closed the code from it.
+  const moveFocus = React.useRef(false);
+  React.useEffect(() => {
+    if (!moveFocus.current) return;
+    moveFocus.current = false;
+    (expanded ? collapseRef : expandRef).current?.focus({
+      preventScroll: true,
+    });
+  }, [expanded]);
 
   // Look up the example on the client, unless the server already rendered it
   // (async server-component examples).
@@ -60,6 +71,9 @@ export function ComponentPreview({
 
   const toggle = (): void => {
     const collapsing = expanded;
+    moveFocus.current =
+      document.activeElement === expandRef.current ||
+      document.activeElement === collapseRef.current;
     setExpanded(!expanded);
     // Collapsing a long block pulls the page up under the reader; bring the
     // example back into view if it went off the top.
@@ -110,28 +124,47 @@ export function ComponentPreview({
                 <CodeBlockCode />
               </CodeBlockPre>
             </CodeBlock>
-            {/* The faded peek itself opens the code too: a large target
-                where the eye already is. Hidden from assistive tech, which
-                has the labelled toggle below. */}
+            {/* Closed, the toggle floats over the faded peek, so the peek
+                needs no bar under it; the whole peek opens the code too, a
+                large target where the eye already is (hidden from assistive
+                tech, which has the labelled button). */}
             {collapsed && (
-              <button
-                type="button"
-                tabIndex={-1}
-                aria-hidden="true"
-                onClick={toggle}
-                className="docs-example-peek"
-              />
+              <>
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  aria-hidden="true"
+                  onClick={toggle}
+                  className="docs-example-peek"
+                />
+                <button
+                  ref={expandRef}
+                  type="button"
+                  aria-expanded={false}
+                  aria-controls={codeId}
+                  onClick={toggle}
+                  className={cn("docs-example-expand", solidSurface(3, 2))}
+                >
+                  <HugeiconsIcon
+                    icon={ArrowDown01Icon}
+                    strokeWidth={2}
+                    className="size-3.5"
+                  />
+                  Show all {lineCount} lines
+                </button>
+              </>
             )}
           </div>
 
           {/* In the code's corner, outside its scroller, so it stays put
               while the code scrolls. */}
           <CopyButton content={code} className="docs-example-copy" />
-          {peeks && (
+          {peeks && expanded && (
             <div className="docs-example-bar">
               <button
+                ref={collapseRef}
                 type="button"
-                aria-expanded={expanded}
+                aria-expanded
                 aria-controls={codeId}
                 onClick={toggle}
                 className="docs-example-toggle"
@@ -139,11 +172,9 @@ export function ComponentPreview({
                 <HugeiconsIcon
                   icon={ArrowDown01Icon}
                   strokeWidth={2}
-                  className="docs-example-chevron size-3.5"
+                  className="size-3.5 rotate-180"
                 />
-                <MorphText feedback>
-                  {expanded ? "Collapse" : `Show all ${lineCount} lines`}
-                </MorphText>
+                Collapse
               </button>
             </div>
           )}

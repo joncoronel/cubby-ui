@@ -760,12 +760,24 @@
   background-color: var(--muted);
 }
 
-/* Long code opens as a peek: its first four lines, fading out. It expands
+/* Long code opens as a peek: its first four lines, fading out, with no bar
+   under it (the toggle floats over it). It expands
    in place without animating height, which is slow on a heavy page. */
+/* It runs over the tray's bottom padding, so the fade ends at the tray's
+   edge instead of a clipped line and an empty band above it. */
 .docs-example-body[data-collapsed] {
-  max-height: 6.25rem;
+  --peek: 6.5rem;
+  max-height: var(--peek);
+  margin-bottom: -0.25rem;
   overflow: hidden;
-  mask-image: linear-gradient(to bottom, #000 35%, transparent);
+}
+/* The fade is on the code alone, so the pill floating over it stays solid.
+   It is sized to the peek, not the code, which runs on below it hidden: a
+   gradient stretched over the whole code left the visible part opaque. */
+.docs-example-body[data-collapsed] > [data-slot="code-block"] {
+  mask-image: linear-gradient(to bottom, #000 30%, transparent 92%);
+  mask-size: 100% var(--peek);
+  mask-repeat: no-repeat;
 }
 .docs-example-peek {
   position: absolute;
@@ -800,11 +812,36 @@
 .docs-example-toggle:focus-visible {
   outline: 2px solid color-mix(in oklab, var(--ring) 55%, transparent);
 }
-.docs-example-chevron {
-  transition: rotate 0.2s var(--docs-ease);
+/* Closed, the toggle is a pill floating over the peek's faded foot. */
+.docs-example-expand {
+  position: absolute;
+  left: 50%;
+  bottom: 0.5rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  height: 1.75rem;
+  padding-inline: 0.625rem 0.75rem;
+  border-radius: 999px;
+  translate: -50% 0;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  outline: none;
+  transition:
+    color 0.15s ease-out,
+    scale 0.15s ease-out;
 }
-.docs-example-toggle[aria-expanded="true"] .docs-example-chevron {
-  rotate: 180deg;
+.docs-example-expand:hover {
+  color: var(--foreground);
+}
+.docs-example-expand:active {
+  scale: 0.97;
+}
+.docs-example-expand:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--ring) 55%, transparent);
+  outline-offset: 2px;
 }
 
 .docs-disclosure-chevron {
@@ -998,7 +1035,7 @@
   .docs-shelf-mark,
   .docs-cubby-glyph rect,
   .docs-shelf-chevron,
-  .docs-example-chevron,
+  .docs-example-expand,
   .docs-disclosure-chevron {
     transition-duration: 0s;
   }

@@ -257,7 +257,7 @@ Every docs page in one window that grows out of the header's trigger. Below md i
 - **Link:** 32px tall, 8px inline padding, 0.875rem Quiet Ink label. Hover: ink label on a surface-hover wash (8px radius), instant both ways (no transition). Focus: a 2px ring inset.
 - **Current page:** 500-weight ink label with a 6px blue mark that grows in and pushes the name over (300ms ease-out-expo). The list opens scrolled to it.
 - **Keyboard:** the window takes focus on open; the first arrow key lands on the current page, then up and down walk the links in reading order; Escape closes and returns focus to the trigger.
-- **Motion:** the window opens from 97% scale and 6px up, from an origin under the trigger: opacity 120ms ease-out, scale and position 220ms ease-out-expo, on its own layer. It closes in 150ms ease-out. A scrim at 10% ink (45% black in dark) covers the card, which becomes inert. Under reduced motion it only fades.
+- **Motion:** the window opens from 98% scale and 4px up, from an origin under the trigger: opacity 100ms ease-out, scale and position 180ms ease-out-expo, on its own layer. The scrim (150ms), chevron and glyph (200ms) finish on the same short clock. It closes the same way back in 120ms ease-out, the scrim with it. A scrim at 10% ink (45% black in dark) covers the card, which becomes inert. Under reduced motion it only fades.
 
 ### Preview Stage
 - **Container:** page fill, 18px radius, 1px hairline ring, 16rem minimum height (12rem on mobile for the first stage), content centered with 52px top, 24px sides, 40px bottom padding.

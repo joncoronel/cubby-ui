@@ -87,44 +87,39 @@ export function Shelf({ id, groups, open, currentUrl, onClose }: ShelfProps) {
   const guides = groups.filter((group) => group.kind === "list");
   const components = groups.filter((group) => group.kind === "grid");
 
-  // The window grows out of the trigger, so its scale origin sits under it.
+  // Everything it needs to open is set before the first paint, in one
+  // layout pass, so no frame of the animation waits on it: the scale
+  // origin under the trigger (the window grows out of it), the list
+  // scrolled to centre the page you're in, and focus on the window rather
+  // than the link, which would show its ring on a click (the first arrow
+  // key moves to the current page).
   React.useLayoutEffect(() => {
     if (!open) return;
     const nav = navRef.current;
+    const scroller = scrollRef.current;
     const trigger = document.querySelector(`[aria-controls="${id}"]`);
-    if (!nav || !trigger) return;
-    const t = trigger.getBoundingClientRect();
-    const n = nav.getBoundingClientRect();
-    nav.style.setProperty(
-      "--shelf-origin-x",
-      `${Math.round(t.left + t.width / 2 - n.left)}px`,
-    );
-  }, [open, id]);
-
-  // Opens on the page you're in, centred in the list. The window takes
-  // focus rather than the link, which would show its ring on a click; the
-  // first arrow key moves to the current page.
-  React.useEffect(() => {
-    if (!open) return;
-    const frame = requestAnimationFrame(() => {
-      const scroller = scrollRef.current;
-      const current = navRef.current?.querySelector<HTMLElement>(
-        '[aria-current="page"]',
+    if (!nav) return;
+    if (trigger) {
+      const t = trigger.getBoundingClientRect();
+      const n = nav.getBoundingClientRect();
+      nav.style.setProperty(
+        "--shelf-origin-x",
+        `${Math.round(t.left + t.width / 2 - n.left)}px`,
       );
-      if (scroller && current) {
-        const box = scroller.getBoundingClientRect();
-        const item = current.getBoundingClientRect();
-        scroller.scrollTop = Math.round(
-          scroller.scrollTop +
-            item.top -
-            box.top -
-            (box.height - item.height) / 2,
-        );
-      }
-      navRef.current?.focus({ preventScroll: true });
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [open]);
+    }
+    const current = nav.querySelector<HTMLElement>('[aria-current="page"]');
+    if (scroller && current) {
+      const box = scroller.getBoundingClientRect();
+      const item = current.getBoundingClientRect();
+      scroller.scrollTop = Math.round(
+        scroller.scrollTop +
+          item.top -
+          box.top -
+          (box.height - item.height) / 2,
+      );
+    }
+    nav.focus({ preventScroll: true });
+  }, [open, id]);
 
   React.useEffect(() => {
     if (!open) return;
@@ -146,8 +141,7 @@ export function Shelf({ id, groups, open, currentUrl, onClose }: ShelfProps) {
     const index = links.indexOf(document.activeElement as HTMLElement);
     const next =
       index === -1
-        ? (nav?.querySelector<HTMLElement>('[aria-current="page"]') ??
-          links[0])
+        ? (nav?.querySelector<HTMLElement>('[aria-current="page"]') ?? links[0])
         : links[
             event.key === "ArrowDown"
               ? Math.min(index + 1, links.length - 1)

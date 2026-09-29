@@ -159,8 +159,10 @@ export function DocsHeader({ groups }: { groups: ShelfGroup[] }) {
     setOpen(false);
   }
 
-  // While the shelf is open the page behind it is scrim, not content.
-  React.useEffect(() => {
+  // While the shelf is open the page behind it is scrim, not content. Before
+  // paint, so the whole-page restyle this causes lands in the same frame as
+  // the shelf opening rather than a frame into its animation.
+  React.useLayoutEffect(() => {
     const root = document.documentElement;
     const main = document.getElementById("docs-main");
     if (open) {

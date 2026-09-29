@@ -10,6 +10,7 @@ import {
   CodeBlockPre,
   CodeBlockCode,
 } from "@/registry/default/code-block/code-block";
+import { Button } from "@/registry/default/button/button";
 import { CopyButton } from "@/registry/default/copy-button/copy-button";
 import { solidSurface } from "@/registry/default/lib/elevated";
 import { cn } from "@/lib/utils";
@@ -44,18 +45,6 @@ export function ComponentPreview({
   const codeId = React.useId();
   const figureRef = React.useRef<HTMLElement>(null);
   const [expanded, setExpanded] = React.useState(false);
-  const expandRef = React.useRef<HTMLButtonElement>(null);
-  const collapseRef = React.useRef<HTMLButtonElement>(null);
-  // The two toggles are different buttons, so focus follows from one to the
-  // other when a keyboard (or anything) opened or closed the code from it.
-  const moveFocus = React.useRef(false);
-  React.useEffect(() => {
-    if (!moveFocus.current) return;
-    moveFocus.current = false;
-    (expanded ? collapseRef : expandRef).current?.focus({
-      preventScroll: true,
-    });
-  }, [expanded]);
 
   // Look up the example on the client, unless the server already rendered it
   // (async server-component examples).
@@ -71,9 +60,6 @@ export function ComponentPreview({
 
   const toggle = (): void => {
     const collapsing = expanded;
-    moveFocus.current =
-      document.activeElement === expandRef.current ||
-      document.activeElement === collapseRef.current;
     setExpanded(!expanded);
     // Collapsing a long block pulls the page up under the reader; bring the
     // example back into view if it went off the top.
@@ -106,6 +92,7 @@ export function ComponentPreview({
           <div
             id={codeId}
             data-collapsed={collapsed ? "" : undefined}
+            data-expanded={peeks && expanded ? "" : undefined}
             className="docs-example-body"
           >
             <CodeBlock
@@ -124,60 +111,45 @@ export function ComponentPreview({
                 <CodeBlockCode />
               </CodeBlockPre>
             </CodeBlock>
-            {/* Closed, the toggle floats over the faded peek, so the peek
-                needs no bar under it; the whole peek opens the code too, a
-                large target where the eye already is (hidden from assistive
-                tech, which has the labelled button). */}
+            {/* The whole closed peek opens the code too, a large target where
+                the eye already is (hidden from assistive tech, which has the
+                labelled button). */}
             {collapsed && (
-              <>
-                <button
-                  type="button"
-                  tabIndex={-1}
-                  aria-hidden="true"
-                  onClick={toggle}
-                  className="docs-example-peek"
-                />
-                <button
-                  ref={expandRef}
-                  type="button"
-                  aria-expanded={false}
-                  aria-controls={codeId}
-                  onClick={toggle}
-                  className={cn("docs-example-expand", solidSurface(3, 2))}
-                >
+              <button
+                type="button"
+                tabIndex={-1}
+                aria-hidden="true"
+                onClick={toggle}
+                className="docs-example-peek"
+              />
+            )}
+            {/* One toggle floating at the foot of the code, open or closed:
+                it never moves out from under the pointer or loses focus, and
+                the open code is capped, so it is always in view. */}
+            {peeks && (
+              <Button
+                variant="outline"
+                size="xs"
+                aria-expanded={expanded}
+                aria-controls={codeId}
+                onClick={toggle}
+                className="docs-example-expand rounded-full"
+                leadingIcon={
                   <HugeiconsIcon
                     icon={ArrowDown01Icon}
                     strokeWidth={2}
-                    className="size-3.5"
+                    className="docs-example-chevron"
                   />
-                  Show all {lineCount} lines
-                </button>
-              </>
+                }
+              >
+                {expanded ? "Collapse" : `Show all ${lineCount} lines`}
+              </Button>
             )}
           </div>
 
           {/* In the code's corner, outside its scroller, so it stays put
               while the code scrolls. */}
           <CopyButton content={code} className="docs-example-copy" />
-          {peeks && expanded && (
-            <div className="docs-example-bar">
-              <button
-                ref={collapseRef}
-                type="button"
-                aria-expanded
-                aria-controls={codeId}
-                onClick={toggle}
-                className="docs-example-toggle"
-              >
-                <HugeiconsIcon
-                  icon={ArrowDown01Icon}
-                  strokeWidth={2}
-                  className="size-3.5 rotate-180"
-                />
-                Collapse
-              </button>
-            </div>
-          )}
         </div>
       )}
     </figure>

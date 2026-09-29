@@ -2,16 +2,7 @@
 
 import * as React from "react";
 import type { TOCItemType } from "fumadocs-core/toc";
-
-type HeadingsState = {
-  /** Id of the section being read, or null above the first heading. */
-  active: string | null;
-  /** Ids of every section that overlaps the viewport. */
-  visible: string[];
-};
-
-const EMPTY: HeadingsState = { active: null, visible: [] };
-const HeadingsContext = React.createContext<HeadingsState>(EMPTY);
+import { resetDocsPageState, setDocsPageState } from "./docs-page-store";
 
 /** The header plus the frame's top edge cover the top of the viewport. */
 const HEADER = 64;
@@ -23,23 +14,23 @@ function sameIds(a: string[], b: string[]): boolean {
 }
 
 /**
- * Tracks the reader's section from scroll position, measured once per frame.
- * An IntersectionObserver only reports headings as they cross a threshold,
- * so a fast scroll can skip past them and leave the TOC a section behind;
- * reading positions directly keeps it in step at any speed.
+ * Tracks the reader's place and publishes it to the docs page store: the
+ * section from scroll position, measured once per frame, and whether the
+ * title has scrolled away. An IntersectionObserver only reports headings as
+ * they cross a threshold, so a fast scroll can skip past them and leave the
+ * TOC a section behind; reading positions directly keeps it in step at any
+ * speed.
  */
-export function HeadingsProvider({
-  toc,
-  children,
-}: {
-  toc: TOCItemType[];
-  children: React.ReactNode;
-}) {
-  const [state, setState] = React.useState<HeadingsState>(EMPTY);
+export function useTrackHeadings(toc: TOCItemType[]): void {
+  React.useEffect(() => {
+    setDocsPageState({ toc });
+    return () => resetDocsPageState();
+  }, [toc]);
 
   React.useEffect(() => {
     const ids = toc.map((item) => item.url.slice(1));
     let frame = 0;
+    let lastVisible: string[] = [];
 
     const compute = () => {
       frame = 0;
@@ -70,13 +61,14 @@ export function HeadingsProvider({
         const bottom = next ?? Number.POSITIVE_INFINITY;
         if (bottom > HEADER && top < viewport) visible.push(ids[i]);
       });
+      // Keep the same array while the ids match, so readers of `visible`
+      // only re-render when it really changes.
+      if (!sameIds(lastVisible, visible)) lastVisible = visible;
 
-      const nextActive = active === -1 ? null : ids[active];
-      setState((prev) =>
-        prev.active === nextActive && sameIds(prev.visible, visible)
-          ? prev
-          : { active: nextActive, visible },
-      );
+      setDocsPageState({
+        activeId: active === -1 ? null : ids[active],
+        visible: lastVisible,
+      });
     };
 
     const schedule = () => {
@@ -98,15 +90,15 @@ export function HeadingsProvider({
     };
   }, [toc]);
 
-  return (
-    <HeadingsContext.Provider value={state}>{children}</HeadingsContext.Provider>
-  );
-}
-
-export function useActiveHeading(): string | null {
-  return React.useContext(HeadingsContext).active;
-}
-
-export function useVisibleHeadings(): string[] {
-  return React.useContext(HeadingsContext).visible;
+  React.useEffect(() => {
+    const title = document.getElementById("docs-title");
+    if (!title) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setDocsPageState({ pastTitle: !entry.isIntersecting }),
+      // The header and the frame's top edge cover the top ~64px.
+      { rootMargin: "-64px 0px 0px 0px" },
+    );
+    observer.observe(title);
+    return () => observer.disconnect();
+  }, []);
 }

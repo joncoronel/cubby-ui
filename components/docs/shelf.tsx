@@ -165,7 +165,7 @@ export function Shelf({ id, groups, open, currentUrl, onClose }: ShelfProps) {
       <div
         aria-hidden="true"
         className="docs-shelf-scrim absolute inset-0"
-        onClick={() => onClose(false)}
+        onClick={() => onClose(true)}
       />
 
       <div className="docs-shelf-anchor">

@@ -9,50 +9,18 @@ import {
 } from "@/registry/default/preview-card/preview-card";
 import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 import { cn } from "@/lib/utils";
-import { resetDocsPageState, setDocsPageState } from "./docs-page-store";
+import { useDocsPage } from "./docs-page-store";
 import { MobileToc } from "./mobile-toc";
-import {
-  HeadingsProvider,
-  useActiveHeading,
-  useVisibleHeadings,
-} from "./use-headings";
+import { useTrackHeadings } from "./use-headings";
 import { scrollToHeading } from "./scroll-to-heading";
-
-/** Publishes the reader's position for the header's section crumb. */
-function PageTracker({ toc }: { toc: TOCItemType[] }) {
-  const active = useActiveHeading();
-
-  React.useEffect(() => {
-    setDocsPageState({ toc });
-    return () => resetDocsPageState();
-  }, [toc]);
-
-  React.useEffect(() => {
-    setDocsPageState({ activeId: active ?? null });
-  }, [active]);
-
-  React.useEffect(() => {
-    const title = document.getElementById("docs-title");
-    if (!title) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setDocsPageState({ pastTitle: !entry.isIntersecting }),
-      // The header and the frame's top edge cover the top ~64px.
-      { rootMargin: "-64px 0px 0px 0px" },
-    );
-    observer.observe(title);
-    return () => observer.disconnect();
-  }, []);
-
-  return null;
-}
 
 /**
  * A minimap of the page's headings. The ticks sit quietly in the margin;
  * hovering them opens the same list as readable titles in a preview card.
  */
 function Minimap({ toc }: { toc: TOCItemType[] }) {
-  const visible = useVisibleHeadings();
-  const active = useActiveHeading();
+  const visible = useDocsPage("visible");
+  const active = useDocsPage("activeId");
 
   return (
     <PreviewCard>
@@ -130,17 +98,15 @@ export function PageNavigation({
   toc: TOCItemType[];
   className?: string;
 }) {
+  useTrackHeadings(toc);
+
+  if (toc.length < 2) return null;
   return (
-    <HeadingsProvider toc={toc}>
-      <PageTracker toc={toc} />
-      {toc.length > 1 && (
-        <>
-          <div className={cn("hidden xl:block", className)}>
-            <Minimap toc={toc} />
-          </div>
-          <MobileToc toc={toc} />
-        </>
-      )}
-    </HeadingsProvider>
+    <>
+      <div className={cn("hidden xl:block", className)}>
+        <Minimap toc={toc} />
+      </div>
+      <MobileToc toc={toc} />
+    </>
   );
 }

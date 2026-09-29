@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import { ComponentInstall } from "./component-install";
+import { packageManagerCommands } from "./package-manager-commands";
 import { highlight } from "@/registry/default/code-block/lib/shiki-shared";
 import { transformComponentImports } from "@/lib/transform-registry-imports";
 import type { RegistryItemJson } from "@/lib/registry-json";
@@ -164,35 +165,20 @@ export async function ComponentInstallServer({
     console.warn(`Could not read registry files for ${component}:`, error);
   }
 
-  // Pre-highlight all CLI commands
-  const registryUrl = `@cubby-ui/${component}`;
-  const highlightedCliCommands = {
-    npm: await highlight(`npx shadcn@latest add ${registryUrl}`, "bash"),
-    pnpm: await highlight(`pnpm dlx shadcn@latest add ${registryUrl}`, "bash"),
-    yarn: await highlight(`yarn dlx shadcn@latest add ${registryUrl}`, "bash"),
-    bun: await highlight(`bunx --bun shadcn@latest add ${registryUrl}`, "bash"),
-  };
-
-  // Pre-highlight install commands if there are dependencies
-  let highlightedInstallCommands: Record<string, ReactElement> | undefined;
   const depsArray = Array.from(allDependencies);
-  if (depsArray.length > 0) {
-    const deps = depsArray.join(" ");
-    highlightedInstallCommands = {
-      npm: await highlight(`npm install ${deps}`, "bash"),
-      pnpm: await highlight(`pnpm add ${deps}`, "bash"),
-      yarn: await highlight(`yarn add ${deps}`, "bash"),
-      bun: await highlight(`bun add ${deps}`, "bash"),
-    };
-  }
 
   return (
     <ComponentInstall
-      component={component}
       componentFiles={componentFiles}
-      highlightedCliCommands={highlightedCliCommands}
-      highlightedInstallCommands={highlightedInstallCommands}
-      allDependencies={depsArray}
+      cliCommands={packageManagerCommands(
+        `shadcn@latest add @cubby-ui/${component}`,
+        "run",
+      )}
+      installCommands={
+        depsArray.length > 0
+          ? packageManagerCommands(depsArray.join(" "), "add")
+          : undefined
+      }
     />
   );
 }

@@ -155,8 +155,10 @@
     background-color 0.15s ease-out,
     box-shadow 0.15s ease-out;
 }
-.docs-shelf-trigger:hover {
-  background-color: var(--surface-hover);
+@media (hover: hover) {
+  .docs-shelf-trigger:hover {
+    background-color: var(--surface-hover);
+  }
 }
 .docs-shelf-trigger[data-open] {
   background-color: var(--surface-selected);
@@ -183,8 +185,10 @@
   fill: var(--primary);
   opacity: 1;
 }
-.docs-shelf-trigger:hover .docs-cubby-glyph rect:not(:first-child) {
-  opacity: 0.5;
+@media (hover: hover) {
+  .docs-shelf-trigger:hover .docs-cubby-glyph rect:not(:first-child) {
+    opacity: 0.5;
+  }
 }
 .docs-shelf-trigger[data-open] .docs-cubby-glyph rect:nth-child(1) {
   translate: -0.75px -0.75px;
@@ -375,9 +379,11 @@
 }
 /* Hover is instant both ways: any easing made the list feel like it lagged
    behind the pointer. */
-.docs-shelf-link:hover {
-  color: var(--foreground);
-  background-color: var(--surface-hover);
+@media (hover: hover) {
+  .docs-shelf-link:hover {
+    color: var(--foreground);
+    background-color: var(--surface-hover);
+  }
 }
 .docs-shelf-link:focus-visible {
   color: var(--foreground);
@@ -564,10 +570,15 @@
     opacity 0.2s ease-out,
     translate 0.3s var(--docs-ease);
 }
-.docs-heading-link:hover .docs-heading-hash,
 .docs-heading-link:focus-visible .docs-heading-hash {
   opacity: 1;
   translate: 0 0;
+}
+@media (hover: hover) {
+  .docs-heading-link:hover .docs-heading-hash {
+    opacity: 1;
+    translate: 0 0;
+  }
 }
 @media (max-width: 40rem) {
   .docs-heading-hash {
@@ -589,13 +600,19 @@
 .docs-prose :is(p, li, td, .docs-note) a:not(.not-prose *) {
   color: var(--foreground);
   text-decoration: underline;
-  text-decoration-color: color-mix(in oklab, var(--foreground) 25%, transparent);
+  text-decoration-color: color-mix(
+    in oklab,
+    var(--foreground) 25%,
+    transparent
+  );
   text-decoration-thickness: 1px;
   text-underline-offset: 0.25em;
   transition: text-decoration-color 0.15s ease-out;
 }
-.docs-prose :is(p, li, td, .docs-note) a:not(.not-prose *):hover {
-  text-decoration-color: var(--primary);
+@media (hover: hover) {
+  .docs-prose :is(p, li, td, .docs-note) a:not(.not-prose *):hover {
+    text-decoration-color: var(--primary);
+  }
 }
 
 .docs-prose :is(p, li, td, th, h2, h3, h4, .docs-note) code:not(.not-prose *) {
@@ -668,7 +685,8 @@
 }
 .docs-table td {
   padding: 0.625rem 1rem 0.625rem 0;
-  border-bottom: 1px solid color-mix(in oklab, var(--foreground) 7%, transparent);
+  border-bottom: 1px solid
+    color-mix(in oklab, var(--foreground) 7%, transparent);
   vertical-align: top;
 }
 .docs-table td:first-child {
@@ -991,8 +1009,10 @@
   cursor: pointer;
   outline: none;
 }
-.docs-prop-trigger:hover {
-  background-color: color-mix(in oklab, var(--foreground) 3%, transparent);
+@media (hover: hover) {
+  .docs-prop-trigger:hover {
+    background-color: color-mix(in oklab, var(--foreground) 3%, transparent);
+  }
 }
 .docs-prop-trigger:focus-visible {
   outline: 2px solid color-mix(in oklab, var(--ring) 55%, transparent);
@@ -1097,7 +1117,11 @@
 .docs-prop-desc a {
   color: var(--foreground);
   text-decoration: underline;
-  text-decoration-color: color-mix(in oklab, var(--foreground) 25%, transparent);
+  text-decoration-color: color-mix(
+    in oklab,
+    var(--foreground) 25%,
+    transparent
+  );
   text-underline-offset: 0.25em;
 }
 .docs-prop-desc > :is(p, ul, ol) + :is(p, ul, ol) {

@@ -1,6 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Geist, Geist_Mono, Rubik } from "next/font/google";
-import Script from "next/script";
+import {
+  Bricolage_Grotesque,
+  Geist,
+  Geist_Mono,
+  Rubik,
+} from "next/font/google";
 import "./globals.css";
 
 import { RootProvider } from "fumadocs-ui/provider/next";
@@ -82,10 +86,14 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         {/* Before first paint: mark the platform so shortcut hints (Cmd vs
-            Ctrl) render correctly without waiting for hydration. */}
-        <Script id="platform" strategy="beforeInteractive">
-          {`try{var p=(navigator.userAgentData&&navigator.userAgentData.platform)||navigator.userAgent;document.documentElement.dataset.platform=/mac|iphone|ipad/i.test(p)?"mac":"windows"}catch(e){}`}
-        </Script>
+            Ctrl) render correctly without waiting for hydration. A plain
+            script runs as the HTML parses; next/script's beforeInteractive
+            would wait for Next's own chunks. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var p=(navigator.userAgentData&&navigator.userAgentData.platform)||navigator.userAgent;document.documentElement.dataset.platform=/mac|iphone|ipad/i.test(p)?"mac":"windows"}catch(e){}`,
+          }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${rubik.variable} ${display.variable} font-sans antialiased`}

@@ -7,20 +7,13 @@ import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import {
   CodeBlock,
   CodeBlockHeader,
-  CodeBlockPre,
-  CodeBlockCode,
 } from "@/registry/default/code-block/code-block";
 import { CodePeek } from "./code-peek";
 import { SourceFiles } from "./source-files";
-import { CommandMorph, commandParts } from "./command-morph";
-import {
-  PACKAGE_MANAGERS,
-  usePackageManager,
-  type PackageManager,
-} from "./use-package-manager";
+import { PackageManagerCommand } from "./package-manager-command";
+import type { PackageManager } from "./package-manager-commands";
 
 interface ComponentInstallProps {
-  component: string;
   componentFiles?: Array<{
     path: string;
     type: string;
@@ -29,25 +22,9 @@ interface ComponentInstallProps {
     content: string;
     highlighted: ReactElement;
   }>;
-  highlightedCliCommands?: Record<string, ReactElement>;
-  highlightedInstallCommands?: Record<string, ReactElement>;
-  allDependencies?: string[];
-}
-
-const PM_TABS = PACKAGE_MANAGERS.map((pm) => ({ value: pm, label: pm }));
-
-function getCliCommand(pm: string, component: string): string {
-  const item = `@cubby-ui/${component}`;
-  switch (pm) {
-    case "pnpm":
-      return `pnpm dlx shadcn@latest add ${item}`;
-    case "yarn":
-      return `yarn dlx shadcn@latest add ${item}`;
-    case "bun":
-      return `bunx --bun shadcn@latest add ${item}`;
-    default:
-      return `npx shadcn@latest add ${item}`;
-  }
+  cliCommands: Record<PackageManager, string>;
+  /** Only when the source needs packages installed. */
+  installCommands?: Record<PackageManager, string>;
 }
 
 /** Past this many files a row of tabs overflows; they get a file browser. */
@@ -63,45 +40,12 @@ function fileLabel(path: string, all: string[]): string {
   return clash ? path : name;
 }
 
-/** A command for every package manager. */
-function perManager(
-  build: (pm: PackageManager) => string,
-): Record<PackageManager, string> {
-  return Object.fromEntries(
-    PACKAGE_MANAGERS.map((pm) => [pm, build(pm)]),
-  ) as Record<PackageManager, string>;
-}
-
-function getInstallCommand(pm: string, deps: string[]): string {
-  const list = deps.join(" ");
-  switch (pm) {
-    case "pnpm":
-      return `pnpm add ${list}`;
-    case "yarn":
-      return `yarn add ${list}`;
-    case "bun":
-      return `bun add ${list}`;
-    default:
-      return `npm install ${list}`;
-  }
-}
-
 export function ComponentInstall({
-  component,
   componentFiles,
-  highlightedCliCommands,
-  highlightedInstallCommands,
-  allDependencies = [],
+  cliCommands,
+  installCommands,
 }: ComponentInstallProps) {
   const manualId = React.useId();
-  const [pm, setPm] = usePackageManager();
-  // Commands morph only once the reader picks a tab; restoring their saved
-  // choice after load swaps in place.
-  const [picked, setPicked] = React.useState(false);
-  const pick = (value: string): void => {
-    setPicked(true);
-    setPm(value as typeof pm);
-  };
   const [manualOpen, setManualOpen] = React.useState(false);
   const [activeFile, setActiveFile] = React.useState(
     componentFiles?.[0]?.relativePath ?? "",
@@ -110,29 +54,10 @@ export function ComponentInstall({
   const file =
     componentFiles?.find((f) => f.relativePath === activeFile) ??
     componentFiles?.[0];
-  const hasDependencies =
-    allDependencies.length > 0 && Boolean(highlightedInstallCommands);
 
   return (
     <div className="not-prose my-6 flex w-full max-w-full min-w-0 flex-col gap-3">
-      <CodeBlock
-        code={getCliCommand(pm, component)}
-        language="bash"
-        initial={highlightedCliCommands?.[pm]}
-      >
-        <CodeBlockHeader tabs={PM_TABS} activeTab={pm} onTabChange={pick} />
-        <CodeBlockPre>
-          <CodeBlockCode>
-            <CommandMorph
-              parts={commandParts(
-                perManager((m) => getCliCommand(m, component)),
-                pm,
-              )}
-              animate={picked}
-            />
-          </CodeBlockCode>
-        </CodeBlockPre>
-      </CodeBlock>
+      <PackageManagerCommand commands={cliCommands} className="my-0" />
 
       {file && (
         <>
@@ -154,33 +79,13 @@ export function ComponentInstall({
           <div id={manualId} hidden={!manualOpen} className="docs-code-reveal">
             <div>
               <ol className="docs-steps pt-2">
-                {hasDependencies && (
+                {installCommands && (
                   <li>
                     <p className="docs-step-title">Add the dependencies</p>
-                    <CodeBlock
-                      code={getInstallCommand(pm, allDependencies)}
-                      language="bash"
-                      initial={highlightedInstallCommands?.[pm]}
-                    >
-                      <CodeBlockHeader
-                        tabs={PM_TABS}
-                        activeTab={pm}
-                        onTabChange={pick}
-                      />
-                      <CodeBlockPre>
-                        <CodeBlockCode>
-                          <CommandMorph
-                            parts={commandParts(
-                              perManager((m) =>
-                                getInstallCommand(m, allDependencies),
-                              ),
-                              pm,
-                            )}
-                            animate={picked}
-                          />
-                        </CodeBlockCode>
-                      </CodeBlockPre>
-                    </CodeBlock>
+                    <PackageManagerCommand
+                      commands={installCommands}
+                      className="my-0"
+                    />
                   </li>
                 )}
                 <li>

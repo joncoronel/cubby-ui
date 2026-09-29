@@ -22,7 +22,7 @@ import {
 import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 import { cn } from "@/lib/utils";
 import type { ShelfGroup } from "@/lib/docs-nav";
-import { useDocsPageState } from "./docs-page-store";
+import { useDocsPage } from "./docs-page-store";
 import { MorphText, toPlainText } from "./morph-text";
 import { Shelf } from "./shelf";
 
@@ -45,7 +45,9 @@ function CubbyGlyph() {
 }
 
 function SectionCrumb() {
-  const { toc, activeId, pastTitle } = useDocsPageState();
+  const toc = useDocsPage("toc");
+  const activeId = useDocsPage("activeId");
+  const pastTitle = useDocsPage("pastTitle");
   const active = toc.find((item) => item.url === `#${activeId}`);
 
   // Opening a long list lands on the section you're in. Set on the list

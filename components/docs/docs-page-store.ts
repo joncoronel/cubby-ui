@@ -4,33 +4,36 @@ import * as React from "react";
 import type { TOCItemType } from "fumadocs-core/toc";
 
 /**
- * Bridges the page (which owns the TOC and scroll position) and the header
- * (which lives in the layout and never remounts). The page publishes; the
- * header's section crumb subscribes.
+ * The reader's place on the page, in one store: the page's tracker writes
+ * it; the header's section crumb, the minimap and the phone TOC each read
+ * just the fields they draw, so a change to one doesn't re-render the rest.
  */
 export type DocsPageState = {
   toc: TOCItemType[];
   /** Hash-less id of the heading the reader is in, if any. */
   activeId: string | null;
+  /** Hash-less ids of every section that overlaps the viewport. */
+  visible: string[];
   /** True once the page title has scrolled under the header. */
   pastTitle: boolean;
 };
 
-const INITIAL: DocsPageState = { toc: [], activeId: null, pastTitle: false };
+const INITIAL: DocsPageState = {
+  toc: [],
+  activeId: null,
+  visible: [],
+  pastTitle: false,
+};
 
 let state = INITIAL;
 const listeners = new Set<() => void>();
 
 export function setDocsPageState(next: Partial<DocsPageState>): void {
-  const merged = { ...state, ...next };
-  if (
-    merged.toc === state.toc &&
-    merged.activeId === state.activeId &&
-    merged.pastTitle === state.pastTitle
-  ) {
-    return;
-  }
-  state = merged;
+  const changed = (Object.keys(next) as (keyof DocsPageState)[]).some(
+    (key) => next[key] !== state[key],
+  );
+  if (!changed) return;
+  state = { ...state, ...next };
   listeners.forEach((listener) => listener());
 }
 
@@ -43,10 +46,13 @@ function subscribe(listener: () => void): () => void {
   return () => listeners.delete(listener);
 }
 
-export function useDocsPageState(): DocsPageState {
+/** One field of the page state; re-renders only when that field changes. */
+export function useDocsPage<K extends keyof DocsPageState>(
+  key: K,
+): DocsPageState[K] {
   return React.useSyncExternalStore(
     subscribe,
-    () => state,
-    () => INITIAL,
+    () => state[key],
+    () => INITIAL[key],
   );
 }

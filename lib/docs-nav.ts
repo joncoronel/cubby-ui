@@ -4,10 +4,7 @@ import { source } from "@/lib/source";
 export type ShelfItem = {
   name: string;
   url: string;
-  description?: string;
   type?: "primitive" | "composable";
-  /** URLs of the components this one is built on. */
-  builtOn?: string[];
 };
 
 export type ShelfGroup = {
@@ -36,9 +33,7 @@ export function getShelfGroups(): ShelfGroup[] {
     return {
       name: nodeName(node.name),
       url: node.url,
-      description: data?.description,
       type: data?.type,
-      builtOn: data?.builtOn?.map((slug) => `/docs/components/${slug}`),
     };
   };
 
@@ -71,7 +66,11 @@ export function getShelfGroups(): ShelfGroup[] {
         // grid; any other folder folds into the group it sits under.
         const isComponents = pages.some((p) => p.type);
         if (isComponents) {
-          groups.push({ label: nodeName(node.name), kind: "grid", items: pages });
+          groups.push({
+            label: nodeName(node.name),
+            kind: "grid",
+            items: pages,
+          });
         } else if (node.children.some((c) => c.type === "folder")) {
           walk(node.children);
         } else {

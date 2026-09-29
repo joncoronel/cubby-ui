@@ -1,9 +1,12 @@
 "use client";
 
 import * as React from "react";
+import {
+  PACKAGE_MANAGERS,
+  type PackageManager,
+} from "./package-manager-commands";
 
-export const PACKAGE_MANAGERS = ["npm", "pnpm", "yarn", "bun"] as const;
-export type PackageManager = (typeof PACKAGE_MANAGERS)[number];
+export { PACKAGE_MANAGERS, type PackageManager };
 
 const STORAGE_KEY = "cubby-ui:package-manager";
 const listeners = new Set<() => void>();

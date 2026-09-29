@@ -12,10 +12,9 @@ import {
 import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 import { solidSurface } from "@/registry/default/lib/elevated";
 import { cn } from "@/lib/utils";
-import { useDocsPageState } from "./docs-page-store";
+import { useDocsPage } from "./docs-page-store";
 import { MorphText, toPlainText } from "./morph-text";
 import { scrollToHeading } from "./scroll-to-heading";
-import { useActiveHeading } from "./use-headings";
 
 const RING = 2 * Math.PI * 6.25;
 
@@ -76,8 +75,8 @@ function ProgressRing() {
  * section you're in. Tap it for the full list, which opens upward from it.
  */
 export function MobileToc({ toc }: { toc: TOCItemType[] }) {
-  const active = useActiveHeading();
-  const { pastTitle } = useDocsPageState();
+  const active = useDocsPage("activeId");
+  const pastTitle = useDocsPage("pastTitle");
   const [open, setOpen] = React.useState(false);
   const listRef = React.useRef<HTMLUListElement>(null);
 

@@ -438,8 +438,6 @@ const INDENT_SIZE = { default: 14 + 8, sm: 14 + 6 } as const;
 const INDENT_SIZE_WITH_CHECKBOX = 12;
 /** A row's inline padding and half its 14px chevron: the guide line's x. */
 const LINE_OFFSET = { default: 8 + 7, sm: 6 + 7 } as const;
-/** A folder's 14px chevron and the gap after it, per row size. */
-const CHEVRON_ROOM = { default: 14 + 8, sm: 14 + 6 } as const;
 const BADGE_TEXT_SIZE = "text-[10px]";
 
 /**
@@ -670,6 +668,10 @@ function TreeItemInternal<
       context,
     });
 
+  // The children's group sits beside the row rather than inside it, so the
+  // row names it as its own.
+  const groupId = React.useId();
+
   const setFocusable = (el: HTMLElement | null): void => {
     if (el) {
       context.focusableNodes.current.set(node.id, el);
@@ -713,7 +715,7 @@ function TreeItemInternal<
   // it only in bulk mode, where the checkboxes lead and must line up too.
   const leafRoom =
     !hasChildren && context.hasParents && !context.enableBulkActions
-      ? CHEVRON_ROOM[context.size]
+      ? INDENT_SIZE[context.size]
       : 0;
   const chevronSlot = hasChildren ? (
     <HugeiconsIcon
@@ -785,6 +787,7 @@ function TreeItemInternal<
                 ref={setFocusable}
                 {...itemAria}
                 aria-expanded={isExpanded}
+                aria-owns={isExpanded ? groupId : undefined}
                 tabIndex={tabIndex}
                 className={rowClassName}
                 onClick={() => {
@@ -817,6 +820,7 @@ function TreeItemInternal<
               <BaseCollapsible.Trigger
                 ref={setFocusable}
                 {...itemAria}
+                aria-owns={isExpanded ? groupId : undefined}
                 className={rowClassName}
                 onClick={(e) => {
                   if (!isDisabled && !context.disableSelection) {
@@ -844,7 +848,7 @@ function TreeItemInternal<
             )}
           >
             {node.children && node.children.length > 0 && (
-              <div role="group" className="relative pt-0.5">
+              <div id={groupId} role="group" className="relative pt-0.5">
                 {/* One guide line per group, under the parent's chevron. */}
                 {context.showLines && (
                   <div

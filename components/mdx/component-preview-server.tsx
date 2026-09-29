@@ -28,7 +28,9 @@ export async function ComponentPreviewServer({
     const examples = exampleRegistry[component as keyof typeof exampleRegistry];
     const exampleData = examples?.find((e) => e.importPath === example);
     if (exampleData) {
-      sourceCode = exampleData.source;
+      // Without its closing newline: rendered, it was an empty last line
+      // under the code.
+      sourceCode = exampleData.source.trimEnd();
     }
   }
 

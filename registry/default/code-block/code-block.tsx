@@ -259,7 +259,9 @@ function CodeBlockHeader({
   const defaultProps = {
     "data-slot": "code-block-header",
     className: cn(
-      "flex items-center justify-between bg-transparent px-3 py-1",
+      // min-h-9: a header with only a filename (no 28px tab pills) was
+      // 28px tall, crowding the name against the code card.
+      "flex min-h-9 items-center justify-between bg-transparent px-3 py-1",
       className,
     ),
     children: content,

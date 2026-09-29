@@ -52,12 +52,13 @@ async function processRegistryFiles(
     registryJson.files.map(async (file: any) => {
       const fullPath = path.join(process.cwd(), file.path);
       const rawContent = await fs.readFile(fullPath, "utf-8");
+      // Without the closing newline, which rendered as an empty last line.
       const transformedContent = transformComponentImports(
         rawContent,
         component,
         file.path,
         file.type,
-      );
+      ).trimEnd();
       const language = getLanguageFromPath(file.path);
       const highlighted = await highlight(transformedContent, language);
 

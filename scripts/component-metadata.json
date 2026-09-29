@@ -235,6 +235,12 @@
     ],
     "reference": []
   },
+  "empty": {
+    "title": "Empty",
+    "description": "Display an empty state with an icon, title, description, and action.",
+    "dependencies": [],
+    "reference": []
+  },
   "fancy-button": {
     "title": "Fancy Button",
     "description": "A fancy-button component.",

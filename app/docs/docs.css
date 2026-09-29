@@ -963,11 +963,161 @@
   overflow-wrap: anywhere;
 }
 
+/* ── API props ── Rows that open, between hairlines. One line carries what
+   you scan for: name, required, the type and the default (on a phone too;
+   the old columns dropped the type there, leaving bare names). It
+   opens to what the prop does. Hover lands at once; the row's wash and
+   focus ring run a little past the text, which stays on the page's edge. */
+.docs-props {
+  margin-block: 1.25rem 2rem;
+  border-top: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent);
+}
+.docs-prop {
+  border-bottom: 1px solid
+    color-mix(in oklab, var(--foreground) 8%, transparent);
+}
 .docs-prop-trigger {
-  transition: background-color 0.15s ease-out;
+  display: block;
+  width: calc(100% + 1rem);
+  margin-inline: -0.5rem;
+  padding: 0.75rem 0.5rem;
+  border-radius: 0.5rem;
+  text-align: start;
+  cursor: pointer;
+  outline: none;
 }
 .docs-prop-trigger:hover {
-  background-color: color-mix(in oklab, var(--foreground) 2.5%, transparent);
+  background-color: color-mix(in oklab, var(--foreground) 3%, transparent);
+}
+.docs-prop-trigger:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--ring) 55%, transparent);
+  outline-offset: -2px;
+}
+.docs-prop-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.625rem;
+  min-width: 0;
+}
+.docs-prop-name {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+/* Required is a fact about the prop, not an error: a quiet tag, not red. */
+.docs-prop-required {
+  flex-shrink: 0;
+  padding: 0.0625rem 0.375rem;
+  border-radius: 0.3125rem;
+  background: color-mix(in oklab, var(--foreground) 7%, transparent);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+.docs-prop-default {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.375rem;
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+.docs-prop-default code {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--foreground);
+}
+.docs-prop-chevron {
+  flex-shrink: 0;
+  align-self: center;
+  width: 0.875rem;
+  height: 0.875rem;
+  color: var(--muted-foreground);
+  transition: rotate 0.2s var(--docs-ease);
+}
+.docs-prop-trigger[data-panel-open] .docs-prop-chevron {
+  rotate: 90deg;
+}
+/* On the name's line, taking the room up to the default: a long type is
+   cut short here and shown whole when the row opens. */
+.docs-prop-type {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+}
+
+.docs-prop-panel {
+  height: var(--collapsible-panel-height);
+  overflow: hidden;
+  transition:
+    height 0.25s var(--docs-ease),
+    opacity 0.2s ease-out;
+}
+.docs-prop-panel[data-starting-style],
+.docs-prop-panel[data-ending-style] {
+  height: 0;
+  opacity: 0;
+}
+.docs-prop-body {
+  padding: 0.125rem 0 1rem;
+}
+.docs-prop-desc {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--docs-text);
+  text-wrap: pretty;
+}
+.docs-prop-desc code,
+.docs-prop-full code {
+  font-family: var(--font-mono);
+  font-size: 0.84em;
+  overflow-wrap: anywhere;
+}
+.docs-prop-desc code {
+  padding: 0.12em 0.36em;
+  border-radius: 0.35rem;
+  background: color-mix(in oklab, var(--foreground) 7%, transparent);
+  color: var(--foreground);
+}
+.docs-prop-desc a {
+  color: var(--foreground);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, var(--foreground) 25%, transparent);
+  text-underline-offset: 0.25em;
+}
+.docs-prop-desc > :is(p, ul, ol) + :is(p, ul, ol) {
+  margin-top: 0.5rem;
+}
+.docs-prop-full {
+  display: none;
+}
+.docs-prop-full[data-long] {
+  display: flex;
+}
+@media (max-width: 40rem) {
+  .docs-prop-full {
+    display: flex;
+  }
+}
+.docs-prop-full {
+  gap: 0.75rem;
+  margin-top: 0.625rem;
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+}
+.docs-prop-full code {
+  font-size: 0.8125rem;
+  color: var(--foreground);
 }
 
 /* ── Minimap (on this page) ───────────────────────────────────────────── */
@@ -1101,6 +1251,8 @@
   .docs-shelf-mark,
   .docs-cubby-glyph rect,
   .docs-shelf-chevron,
+  .docs-prop-chevron,
+  .docs-prop-panel,
   .docs-peek-chevron,
   .docs-disclosure-chevron {
     transition-duration: 0s;

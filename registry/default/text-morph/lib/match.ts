@@ -32,8 +32,6 @@ export type MatchResult = {
 };
 
 export type MatchOptions = {
-  /** Match numbers by place value. */
-  numbers: boolean;
   /** The locale's decimal separator. */
   decimal: string;
   /** 1 up, -1 down, 0 read it off the numbers. */
@@ -718,8 +716,8 @@ export function matchText(
   const kept = next.map(() => -1);
   const oldKinds: GlyphKind[] = old.map(() => "text");
   const nextKinds: GlyphKind[] = next.map(() => "text");
-  const oldNumbers = options.numbers ? findNumbers(old) : [];
-  const nextNumbers = options.numbers ? findNumbers(next) : [];
+  const oldNumbers = findNumbers(old);
+  const nextNumbers = findNumbers(next);
   const paired = Math.min(oldNumbers.length, nextNumbers.length);
 
   const caret = options.caret;
@@ -805,7 +803,7 @@ export function matchText(
   // A one-word value with digits in it that isn't a number (a clock, a
   // version) keeps its letters in order: a digit reused from
   // another column would read as the time running backwards.
-  const hasDigits = options.numbers && [...old, ...next].some(isDigit);
+  const hasDigits = [...old, ...next].some(isDigit);
   const oldTexts = oldText.map((i) => old[i]);
   const nextTexts = nextText.map((i) => next[i]);
   const pairs =

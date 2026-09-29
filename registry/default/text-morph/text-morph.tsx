@@ -333,7 +333,6 @@ function* morphTo(
     old.map((node) => node.textContent ?? ""),
     next,
     {
-      numbers: o.numbers,
       decimal: place.decimal,
       trend: o.trend === "up" ? 1 : o.trend === "down" ? -1 : 0,
       anchor: anchors.get(root) ?? anchorHint(styleBefore),

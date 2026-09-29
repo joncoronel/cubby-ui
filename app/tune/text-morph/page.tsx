@@ -190,7 +190,6 @@ const CONFIG = {
     distance: [base.blendDistance, 0, 1, 0.01],
   },
   blur: [base.blur, 0, 0.4, 0.01],
-  numbers: true,
   trend: {
     type: "select",
     options: ["auto", "up", "down"],
@@ -428,7 +427,6 @@ export default function TextMorphTune(): React.ReactElement {
       scale: v.blend.scale,
     },
     blur: v.blur,
-    numbers: v.numbers,
     trend: v.trend as TextMorphOptions["trend"],
     edgeFade: v.edgeFade as TextMorphOptions["edgeFade"],
   };

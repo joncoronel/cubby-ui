@@ -13,7 +13,7 @@ import {
 import type { TextMorphMode } from "@/registry/default/text-morph/lib/options";
 
 const chars = (text: string): string[] => Array.from(text);
-const OPTIONS: MatchOptions = { numbers: true, decimal: ".", trend: 0 };
+const OPTIONS: MatchOptions = { decimal: ".", trend: 0 };
 
 /**
  * The new text with every kept glyph shown and every new one as `_`.
@@ -149,10 +149,9 @@ describe("matchText", () => {
     expect(nextKinds).toEqual(["number", "text", "text", "text", "text"]);
   });
 
-  it("falls back to the mode's text rule when numbers are off", () => {
-    const off = { ...OPTIONS, numbers: false };
-    // Morph matches letters anywhere, so the 1 and 0 of 10 are reused.
-    expect(keptView("morph", "10", "01", off)).toBe("01");
+  it("keeps a version's or a clock's digits in order in morph", () => {
+    // Reused from another column, a digit would read as time running back.
+    expect(keptView("morph", "v1.2.3", "v1.3.0")).toBe("v1.3__");
     expect(keptView("morph", "10", "01")).toBe("__");
   });
 

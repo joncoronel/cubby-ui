@@ -53,11 +53,6 @@ export type TextMorphOptions = {
   /** Blur on arriving and leaving glyphs, in em. */
   blur: number;
   /**
-   * Match numbers by place value: digits line up on the decimal point, so
-   * only the ones that changed roll.
-   */
-  numbers: boolean;
-  /**
    * Which way glyphs roll. `auto` reads it off the value:
    * a number that grew brings new glyphs up from below, one that shrank
    * brings them down, and anything else rolls up. `up` and `down` hold one
@@ -105,7 +100,6 @@ const ROLL_OPTIONS: TextMorphOptions = {
   morph: { scale: 0.6, digits: MORPH_DIGITS },
   blend: { distance: 0.15, scale: 1 },
   blur: 0.1,
-  numbers: true,
   trend: "auto",
   edgeFade: "auto",
 };
@@ -126,7 +120,6 @@ const MORPH_OPTIONS: TextMorphOptions = {
   morph: { scale: 0.95, digits: MORPH_DIGITS },
   blend: { distance: 0.15, scale: 1 },
   blur: 0,
-  numbers: true,
   trend: "down",
   edgeFade: "auto",
 };
@@ -152,7 +145,6 @@ const BLEND_OPTIONS: TextMorphOptions = {
   morph: { scale: 1, digits: MORPH_DIGITS },
   blend: { distance: 0.08, scale: 0.9 },
   blur: 0.1,
-  numbers: true,
   trend: "auto",
   edgeFade: "auto",
 };

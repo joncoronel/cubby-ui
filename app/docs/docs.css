@@ -701,8 +701,13 @@
   scrollbar-width: thin;
   padding: 3.25rem 1rem 2.5rem;
 }
-.docs-stage-canvas > * {
-  max-width: 100%;
+/* In the components layer, under Tailwind's utilities: unlayered, this beat
+   an example's own cap (`w-full max-w-xs`), so 78 examples stretched across
+   the stage. Uncapped examples still shrink to fit it. */
+@layer components {
+  .docs-stage-canvas > * {
+    max-width: 100%;
+  }
 }
 @media (min-width: 40rem) {
   .docs-stage-canvas {

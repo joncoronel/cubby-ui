@@ -669,8 +669,10 @@ function TreeItemInternal<
     });
 
   // The children's group sits beside the row rather than inside it, so the
-  // row names it as its own.
+  // row names it as its own, once the group is rendered (children that are
+  // still loading have none yet).
   const groupId = React.useId();
+  const ownsGroup = isExpanded && Boolean(node.children?.length);
 
   const setFocusable = (el: HTMLElement | null): void => {
     if (el) {
@@ -787,7 +789,7 @@ function TreeItemInternal<
                 ref={setFocusable}
                 {...itemAria}
                 aria-expanded={isExpanded}
-                aria-owns={isExpanded ? groupId : undefined}
+                aria-owns={ownsGroup ? groupId : undefined}
                 tabIndex={tabIndex}
                 className={rowClassName}
                 onClick={() => {
@@ -820,7 +822,7 @@ function TreeItemInternal<
               <BaseCollapsible.Trigger
                 ref={setFocusable}
                 {...itemAria}
-                aria-owns={isExpanded ? groupId : undefined}
+                aria-owns={ownsGroup ? groupId : undefined}
                 className={rowClassName}
                 onClick={(e) => {
                   if (!isDisabled && !context.disableSelection) {

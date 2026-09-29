@@ -86,7 +86,7 @@
 }
 
 /* Bottom edge: a strip pinned to the bottom, showing only the lower half of
-   the same rounded rectangle (its rounded corners and bottom hairline). */
+   the same rounded rectangle (its rounded corners). */
 .docs-frame-bottom {
   z-index: 40;
   left: 0;
@@ -107,31 +107,10 @@
   box-shadow: var(--docs-frame-edge);
 }
 
-/* The top layer's side hairlines run on down into this strip, where they'd
-   overlap the curved hairline (stacking two translucent lines) and poke a few
-   pixels past where the corner starts to curve. Paint that 1px column in the
-   card's own color underneath the curve; content never reaches the card's
-   outer pixel, so it only hides the stray line. */
-.docs-frame-bottom::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: var(--frame-gap);
-  right: var(--frame-gap);
-  box-shadow:
-    inset 1px 0 0 var(--background),
-    inset -1px 0 0 var(--background);
-}
-
+/* The card has no edge line of its own: the frame's color around it draws
+   its shape. */
 .docs-root {
-  --docs-frame-edge:
-    0 0 0 100vmax var(--docs-frame), inset 0 0 0 1px var(--border);
-}
-.dark .docs-root {
-  --docs-frame-edge:
-    0 0 0 100vmax var(--docs-frame), inset 0 0 0 1px oklch(1 0 0 / 0.07),
-    inset 0 1px 0 0 oklch(1 0 0 / 0.06);
+  --docs-frame-edge: 0 0 0 100vmax var(--docs-frame);
 }
 
 .docs-main {

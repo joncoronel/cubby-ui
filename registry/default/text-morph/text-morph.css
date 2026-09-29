@@ -80,9 +80,10 @@
 /* Each glyph sits in a slot with room above and below its line and room
    beside it for tilt, scale and blur, plus the length of any slide along
    the line (--reach). Negative margins hand the room back, so the slot
-   takes no space. While a change plays (data-playing) the slot fades its
-   glyph out above and below; at rest it doesn't, so no masks stay on the
-   page. Toggling an attribute costs a scoped restyle, where adding or
+   takes no space. While a change plays (data-playing), the slot of a glyph
+   that rolls or is drawn off its line (data-fade) fades it out above and
+   below; glyphs that hold still or only slide carry no mask, and at rest
+   none do. Toggling an attribute costs a scoped restyle, where adding or
    removing the slots restyles the page. A mask cuts whatever falls outside
    its element, so a glyph moving to another line turns it off. */
 .text-morph-slot {
@@ -90,18 +91,21 @@
   padding: var(--text-morph-slot-y) calc(0.5em + var(--reach, 0px));
   margin: calc(-1 * var(--text-morph-slot-y)) calc(-0.5em - var(--reach, 0px));
 }
-.text-morph-glyphs[data-playing] .text-morph-slot:not([data-travel]) {
+.text-morph-glyphs[data-playing]
+  .text-morph-slot[data-fade]:not([data-travel]) {
   mask-image: var(--text-morph-fade-y);
 }
 
-/* Where the browser can, the fade reaches sideways without end: it only ever cuts above and below, so a glyph sliding
+/* Where the browser can, the fade reaches sideways without end: it only
+   ever cuts above and below, so a glyph sliding
    or shrinking sideways out of its slot is never sliced. Elsewhere the slot's
    room (--reach) and unmasking a shape's glyphs cover it. no-clip lifts
    the cut above and below as well, showing a glyph rolling in whole and
    unfaded past its slot, so a clip puts that edge back, reaching sideways
    without end. */
 @supports (mask-clip: no-clip) {
-  .text-morph-glyphs[data-playing] .text-morph-slot:not([data-travel]),
+  .text-morph-glyphs[data-playing]
+    .text-morph-slot[data-fade]:not([data-travel]),
   .text-morph-ghost:not([data-travel]) {
     mask-repeat: repeat-x;
     mask-clip: no-clip;

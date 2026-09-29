@@ -742,7 +742,8 @@ export function matchText(
     caret === undefined &&
     (mode === "blend" ||
       (mode === "morph" &&
-        (next.some(isBreak) || wordsOf(old, oldKinds).length > 1)));
+        (wordsOf(next, nextKinds).length > 1 ||
+          wordsOf(old, oldKinds).length > 1)));
 
   // Numbers, paired in order, matched by place.
   let trend: 1 | -1 | 0 = options.trend;

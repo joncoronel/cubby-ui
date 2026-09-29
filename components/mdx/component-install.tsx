@@ -10,6 +10,7 @@ import {
   CodeBlockPre,
   CodeBlockCode,
 } from "@/registry/default/code-block/code-block";
+import { CodePeek } from "./code-peek";
 import { CommandMorph, commandParts } from "./command-morph";
 import {
   PACKAGE_MANAGERS,
@@ -46,6 +47,16 @@ function getCliCommand(pm: string, component: string): string {
     default:
       return `npx shadcn@latest add ${item}`;
   }
+}
+
+/**
+ * A file's tab label: its name alone, or its path when another file shares
+ * the name. The full path is shown under the code instead.
+ */
+function fileLabel(path: string, all: string[]): string {
+  const name = path.split("/").pop() ?? path;
+  const clash = all.some((p) => p !== path && p.split("/").pop() === name);
+  return clash ? path : name;
 }
 
 /** A command for every package manager. */
@@ -172,26 +183,58 @@ export function ComponentInstall({
                   <p className="docs-step-title">
                     Copy the source into your project
                   </p>
+                  {/* The tray's header names the file (tabs when there are
+                      several); the code peeks, like an example's, rather
+                      than scrolling in a tall box. */}
                   <CodeBlock
                     code={file.content}
                     language="tsx"
                     initial={file.highlighted}
-                    floatingCopy={componentFiles!.length === 1}
                   >
-                    {componentFiles!.length > 1 && (
-                      <CodeBlockHeader
-                        tabs={componentFiles!.map((f) => ({
-                          value: f.relativePath,
-                          label: f.relativePath,
-                        }))}
-                        activeTab={file.relativePath}
-                        onTabChange={(value) => setActiveFile(value as string)}
-                      />
-                    )}
-                    <CodeBlockPre>
-                      <CodeBlockCode />
-                    </CodeBlockPre>
+                    <CodeBlockHeader
+                      showCopy={false}
+                      filename={
+                        componentFiles!.length === 1
+                          ? fileLabel(file.relativePath, [])
+                          : undefined
+                      }
+                      tabs={
+                        componentFiles!.length > 1
+                          ? componentFiles!.map((f) => ({
+                              value: f.relativePath,
+                              label: fileLabel(
+                                f.relativePath,
+                                componentFiles!.map((g) => g.relativePath),
+                              ),
+                            }))
+                          : undefined
+                      }
+                      activeTab={file.relativePath}
+                      onTabChange={(value) => setActiveFile(value as string)}
+                    />
+                    <CodePeek
+                      variant="card"
+                      code={file.content}
+                      initial={file.highlighted}
+                    />
                   </CodeBlock>
+                  <p className="docs-step-note">
+                    Save it as <code>{file.relativePath}</code>
+                  </p>
+                </li>
+                <li>
+                  <p className="docs-step-title">Update the import paths</p>
+                  <p className="docs-step-body">
+                    {"The source imports through the "}
+                    <code>@/</code>
+                    {" alias ("}
+                    <code>@/lib/utils</code>
+                    {", "}
+                    <code>@/components/ui/cubby-ui</code>
+                    {
+                      "). If your project uses another alias or folder, change them to match."
+                    }
+                  </p>
                 </li>
               </ol>
             </div>

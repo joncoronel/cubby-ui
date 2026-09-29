@@ -746,12 +746,17 @@
   box-shadow: none;
 }
 
-.docs-example-code,
-.docs-example-body {
+/* ── Code peek ── Code that opens as a peek when it's long (CodePeek), in
+   an example's tray (`flat`: straight on the tray) or an install step's
+   (`card`: on the code block's own card). */
+.docs-peek,
+.docs-peek-body {
   position: relative;
 }
-/* The tray's fill behind it, so code scrolling sideways passes beneath. */
-.docs-example-copy {
+
+/* Floats in the code's corner on the fill behind it, so code scrolling
+   sideways passes beneath. */
+.docs-peek-copy {
   position: absolute;
   top: 0.375rem;
   right: 0.25rem;
@@ -759,53 +764,72 @@
   border-radius: 0.5rem;
   background-color: var(--muted);
 }
+.docs-peek[data-variant="card"] .docs-peek-copy {
+  right: 0.375rem;
+  background-color: var(--surface-3);
+}
 
-/* Long code opens as a peek: its first four lines, fading out, with no bar
-   under it (the toggle floats over it). It expands
-   in place without animating height, which is slow on a heavy page. */
-/* It runs over the tray's bottom padding, so the fade ends at the tray's
-   edge instead of a clipped line and an empty band above it. */
-.docs-example-body[data-collapsed] {
+/* Long code opens as a peek: its first four lines, fading out, with the
+   toggle floating over it rather than a bar under it. It expands in place
+   without animating height, which is slow on a heavy page. */
+.docs-peek-body[data-collapsed] {
   --peek: 6.5rem;
   max-height: var(--peek);
-  margin-bottom: -0.25rem;
   overflow: hidden;
 }
-/* The fade is on the code alone, so the pill floating over it stays solid.
-   It is sized to the peek, not the code, which runs on below it hidden: a
+/* Flat, it runs over the tray's bottom padding, so the fade ends at the
+   tray's edge instead of a clipped line and an empty band above it. */
+.docs-peek[data-variant="flat"] .docs-peek-body[data-collapsed] {
+  margin-bottom: -0.25rem;
+}
+/* On a card, the clip keeps the card's corners. */
+.docs-peek[data-variant="card"] .docs-peek-body[data-collapsed] {
+  border-radius: var(--radius-lg, 0.75rem);
+}
+/* The fade is on the code text alone, so the card behind it and the button
+   floating over it stay solid. It is sized to the peek (less the scroller's
+   0.75rem top padding), not the code, which runs on below it hidden: a
    gradient stretched over the whole code left the visible part opaque. */
-.docs-example-body[data-collapsed] > [data-slot="code-block"] {
+.docs-peek-body[data-collapsed] [data-slot="code-block-code"] {
   mask-image: linear-gradient(to bottom, #000 30%, transparent 92%);
-  mask-size: 100% var(--peek);
+  mask-size: 100% calc(var(--peek) - 0.75rem);
   mask-repeat: no-repeat;
 }
-.docs-example-peek {
+/* Lines a closed peek never shows aren't rendered: a docs page carries
+   every example's full source, and a theme change restyled all of it (on
+   the combobox page, 11,000 of 13,000 elements, ~95ms a switch; ~40ms
+   without). Their newlines stay, below the clip. */
+.docs-peek-body[data-collapsed] .line:nth-child(n + 6) {
+  display: none;
+}
+.docs-peek-overlay {
   position: absolute;
   inset: 0;
+  z-index: 1;
   cursor: pointer;
 }
 
 /* Open, the code keeps just enough room at its foot for the floating
    toggle (its 1.75rem and 0.5rem offset, less the viewport's own 0.75rem
    padding), so its last line scrolls to sit right above it. */
-.docs-example-body[data-expanded] [data-slot="code-block-code"] {
+.docs-peek-body[data-expanded] [data-slot="code-block-code"] {
   padding-bottom: 1.625rem;
 }
 
 /* The toggle is an outline button floating at the code's foot, over the
    peek's fade when closed; its look and states are the Button's own, only
    placed here. */
-.docs-example-expand {
+.docs-peek-toggle {
   position: absolute;
   left: 50%;
   bottom: 0.5rem;
   z-index: 2;
   translate: -50% 0;
 }
-.docs-example-chevron {
+.docs-peek-chevron {
   transition: rotate 0.2s var(--docs-ease);
 }
-[aria-expanded="true"] .docs-example-chevron {
+[aria-expanded="true"] .docs-peek-chevron {
   rotate: 180deg;
 }
 
@@ -860,6 +884,29 @@
   font-weight: 500;
   line-height: 1.5rem;
   color: var(--foreground);
+}
+.docs-step-body {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--docs-text);
+  text-wrap: pretty;
+}
+/* Where the file goes, under its code. */
+.docs-step-note {
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+}
+/* The install block sits outside the prose (not-prose), so its inline code
+   takes the prose treatment here. */
+:is(.docs-step-body, .docs-step-note) code {
+  font-family: var(--font-mono);
+  font-size: 0.84em;
+  padding: 0.12em 0.36em;
+  border-radius: 0.35rem;
+  background: color-mix(in oklab, var(--foreground) 7%, transparent);
+  color: var(--foreground);
+  overflow-wrap: anywhere;
 }
 
 .docs-prop-trigger {
@@ -1000,7 +1047,7 @@
   .docs-shelf-mark,
   .docs-cubby-glyph rect,
   .docs-shelf-chevron,
-  .docs-example-chevron,
+  .docs-peek-chevron,
   .docs-disclosure-chevron {
     transition-duration: 0s;
   }

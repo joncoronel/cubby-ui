@@ -27,6 +27,11 @@ interface CodePeekProps {
    * header above it).
    */
   variant?: "flat" | "card";
+  /**
+   * Fill the height it's given and scroll, with no peek or toggle: the code
+   * pane of a window whose height something else sets (a file tree).
+   */
+  fill?: boolean;
   className?: string;
 }
 
@@ -41,6 +46,7 @@ export function CodePeek({
   language = "tsx",
   initial,
   variant = "flat",
+  fill = false,
   className,
 }: CodePeekProps) {
   const codeId = React.useId();
@@ -48,7 +54,7 @@ export function CodePeek({
   const [expanded, setExpanded] = React.useState(false);
 
   const lineCount = code.trimEnd().split("\n").length;
-  const peeks = lineCount > PEEK_LINES;
+  const peeks = !fill && lineCount > PEEK_LINES;
   const collapsed = peeks && !expanded;
 
   // New code (another file's tab) starts closed again.
@@ -79,6 +85,7 @@ export function CodePeek({
     <div
       ref={rootRef}
       data-variant={variant}
+      data-fill={fill ? "" : undefined}
       className={cn("docs-peek", className)}
     >
       <div
@@ -94,10 +101,14 @@ export function CodePeek({
           className="rounded-none bg-transparent p-0 shadow-none"
         >
           <CodeBlockPre
-            fadeEdges={expanded ? "y" : false}
+            fadeEdges={fill || expanded ? "y" : false}
             className={cn(
               variant === "flat" && "rounded-none bg-transparent shadow-none",
-              expanded ? "max-h-[min(30rem,65dvh)]" : "max-h-none",
+              fill
+                ? "h-full max-h-none"
+                : expanded
+                  ? "max-h-[min(30rem,65dvh)]"
+                  : "max-h-none",
             )}
           >
             <CodeBlockCode />

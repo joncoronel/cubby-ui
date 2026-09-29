@@ -11,6 +11,7 @@ import {
   CodeBlockCode,
 } from "@/registry/default/code-block/code-block";
 import { CodePeek } from "./code-peek";
+import { SourceFiles } from "./source-files";
 import { CommandMorph, commandParts } from "./command-morph";
 import {
   PACKAGE_MANAGERS,
@@ -48,6 +49,9 @@ function getCliCommand(pm: string, component: string): string {
       return `npx shadcn@latest add ${item}`;
   }
 }
+
+/** Past this many files a row of tabs overflows; they get a file browser. */
+const MAX_FILE_TABS = 3;
 
 /**
  * A file's tab label: its name alone, or its path when another file shares
@@ -184,40 +188,48 @@ export function ComponentInstall({
                     Copy the source into your project
                   </p>
                   {/* The tray's header names the file (tabs when there are
-                      several); the code peeks, like an example's, rather
-                      than scrolling in a tall box. */}
-                  <CodeBlock
-                    code={file.content}
-                    language="tsx"
-                    initial={file.highlighted}
-                  >
-                    <CodeBlockHeader
-                      showCopy={false}
-                      filename={
-                        componentFiles!.length === 1
-                          ? fileLabel(file.relativePath, [])
-                          : undefined
-                      }
-                      tabs={
-                        componentFiles!.length > 1
-                          ? componentFiles!.map((f) => ({
-                              value: f.relativePath,
-                              label: fileLabel(
-                                f.relativePath,
-                                componentFiles!.map((g) => g.relativePath),
-                              ),
-                            }))
-                          : undefined
-                      }
-                      activeTab={file.relativePath}
-                      onTabChange={(value) => setActiveFile(value as string)}
+                      a few, a file browser past that); the code peeks, like
+                      an example's, rather than scrolling in a tall box. */}
+                  {componentFiles!.length > MAX_FILE_TABS ? (
+                    <SourceFiles
+                      files={componentFiles!}
+                      active={file.relativePath}
+                      onActiveChange={setActiveFile}
                     />
-                    <CodePeek
-                      variant="card"
+                  ) : (
+                    <CodeBlock
                       code={file.content}
+                      language="tsx"
                       initial={file.highlighted}
-                    />
-                  </CodeBlock>
+                    >
+                      <CodeBlockHeader
+                        showCopy={false}
+                        filename={
+                          componentFiles!.length === 1
+                            ? fileLabel(file.relativePath, [])
+                            : undefined
+                        }
+                        tabs={
+                          componentFiles!.length > 1
+                            ? componentFiles!.map((f) => ({
+                                value: f.relativePath,
+                                label: fileLabel(
+                                  f.relativePath,
+                                  componentFiles!.map((g) => g.relativePath),
+                                ),
+                              }))
+                            : undefined
+                        }
+                        activeTab={file.relativePath}
+                        onTabChange={(value) => setActiveFile(value as string)}
+                      />
+                      <CodePeek
+                        variant="card"
+                        code={file.content}
+                        initial={file.highlighted}
+                      />
+                    </CodeBlock>
+                  )}
                   <p className="docs-step-note">
                     Save it as <code>{file.relativePath}</code>
                   </p>

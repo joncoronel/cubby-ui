@@ -11,7 +11,10 @@ export default function TextMorphNumbers() {
     <div className="flex flex-col items-center gap-6">
       <div className="font-display flex items-baseline gap-1 text-4xl font-semibold tabular-nums">
         <span className="text-muted-foreground text-2xl">$</span>
-        <TextMorph value={balance} decimals={2} />
+        <TextMorph
+          value={balance}
+          format={{ minimumFractionDigits: 2, maximumFractionDigits: 2 }}
+        />
       </div>
       <div className="flex gap-2">
         <Button

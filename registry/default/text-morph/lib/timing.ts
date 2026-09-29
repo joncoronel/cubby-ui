@@ -1,5 +1,5 @@
 import type { GlyphKind } from "./match";
-import type { TextMorphOptions } from "./options";
+import type { ResolvedOptions } from "./options";
 
 /**
  * Stagger delays for the glyphs that change, from where each sits (its
@@ -12,7 +12,7 @@ import type { TextMorphOptions } from "./options";
  * it apart, not all of it.
  */
 export function staggerDelays(
-  o: TextMorphOptions,
+  o: ResolvedOptions,
   entering: number[],
   leaving: number[],
 ): { entering: number[]; leaving: number[] } {
@@ -47,7 +47,7 @@ export const HOME: Keyframe = { translate: "0 0", scale: "1", rotate: "0deg" };
  * (`line` is the line height in px).
  */
 export function awayState(
-  o: TextMorphOptions,
+  o: ResolvedOptions,
   kind: GlyphKind,
   offset: 1 | -1,
   line: number,
@@ -79,11 +79,11 @@ export function awayState(
 
 /** Fade timings for a glyph of this kind: morph's digits have their own. */
 export function fadesFor(
-  o: TextMorphOptions,
+  o: ResolvedOptions,
   kind: GlyphKind,
 ): {
-  fadeIn: TextMorphOptions["fadeIn"];
-  fadeOut: TextMorphOptions["fadeOut"];
+  fadeIn: ResolvedOptions["fadeIn"];
+  fadeOut: ResolvedOptions["fadeOut"];
 } {
   if (o.mode === "morph" && kind === "number") {
     return {
@@ -100,7 +100,7 @@ export function fadesFor(
  * the old ones have gone that its travel covers, and standing still in place
  * it read as a blink rather than a crossfade.
  */
-export function stillOptions(o: TextMorphOptions): TextMorphOptions {
+export function stillOptions(o: ResolvedOptions): ResolvedOptions {
   return {
     ...o,
     fadeIn: { ...o.fadeIn, delay: 0 },

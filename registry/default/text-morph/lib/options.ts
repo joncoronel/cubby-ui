@@ -1,30 +1,29 @@
+/**
+ * How changes animate. `blend` (the default) changes only what changed (a
+ * similar word keeps what it shares at its ends), crossfading each changed
+ * run as one unit, a touch smaller and blurred: calm enough for anything.
+ * `morph` matches whole words, then letters within similar words (anywhere,
+ * in a one-word value): shared ones slide to their new place, the rest scale
+ * and fade, travelling with the nearest glyph that stays. `roll` keeps the
+ * old and new text's shared start and end, and rolls the glyphs between
+ * vertically, on a spring. In every mode numbers change digit by digit, and
+ * each mode brings its own defaults for every option.
+ */
 export type TextMorphMode = "blend" | "roll" | "morph";
 
 /** One CSS timing: a duration in ms and any CSS easing, `linear()` included. */
-export type Timing = { duration: number; easing: string };
+export type TextMorphTiming = { duration: number; easing: string };
 
+/** Everything a mode tunes. Each mode sets all of it (`MODE_DEFAULTS`). */
 export type TextMorphOptions = {
-  /**
-   * `blend` changes only what changed (a similar word keeps what it shares
-   * at its ends), crossfading each changed run as one unit, a touch smaller
-   * and blurred: calm enough for anything. `roll` keeps the old and new
-   * text's shared start and end, and rolls the glyphs between vertically, on
-   * a spring. `morph`
-   * matches whole words, then letters within similar words (anywhere, in a
-   * one-word value): shared ones slide to their new place, the rest scale and
-   * fade, travelling with the nearest glyph that stays.
-   * In every mode numbers change digit by digit. Each mode brings its own
-   * defaults.
-   */
-  mode: TextMorphMode;
   /** Glyph movement: roll travel, enter/exit scale, shared glyphs sliding. */
-  motion: Timing;
+  motion: TextMorphTiming;
   /** Opacity and blur of arriving glyphs, optionally starting late. */
-  fadeIn: Timing & { delay: number };
+  fadeIn: TextMorphTiming & { delay: number };
   /** Opacity and blur of leaving glyphs. */
-  fadeOut: Timing;
+  fadeOut: TextMorphTiming;
   /** The box's width. */
-  width: Timing;
+  width: TextMorphTiming;
   /**
    * `each`: every successive entering or leaving glyph starts `ms` later.
    * `spread`: a sweep from left to right across `ms` in total, by where
@@ -39,7 +38,11 @@ export type TextMorphOptions = {
    */
   morph: {
     scale: number;
-    digits: { distance: number; fadeIn: Timing; fadeOut: Timing };
+    digits: {
+      distance: number;
+      fadeIn: TextMorphTiming;
+      fadeOut: TextMorphTiming;
+    };
   };
   /**
    * Blend: a changed run, letters or digits, grows into place from `scale`
@@ -93,7 +96,6 @@ const EXPO_EASING = "cubic-bezier(0.19, 1, 0.22, 1)";
 const ROLL_SPRING =
   "linear(0,.1052,.3155,.532,.7112,.8414,.9265,.9765,1.0023,1.013,1.0151,1.0133,1.01,1.0068,1.0041,1.0022,1.001,1)";
 const ROLL_OPTIONS: TextMorphOptions = {
-  mode: "roll",
   motion: { duration: 550, easing: ROLL_SPRING },
   fadeIn: { duration: 550, easing: ROLL_SPRING, delay: 0 },
   fadeOut: { duration: 550, easing: ROLL_SPRING },
@@ -115,7 +117,6 @@ const ROLL_OPTIONS: TextMorphOptions = {
  * from a quarter in; no blur, no stagger.
  */
 const MORPH_OPTIONS: TextMorphOptions = {
-  mode: "morph",
   motion: { duration: 400, easing: EXPO_EASING },
   fadeIn: { duration: 200, easing: "linear", delay: 100 },
   fadeOut: { duration: 100, easing: "linear" },
@@ -142,7 +143,6 @@ const MORPH_OPTIONS: TextMorphOptions = {
  */
 const BLEND_EASING = WIDTH_EASING;
 const BLEND_OPTIONS: TextMorphOptions = {
-  mode: "blend",
   motion: { duration: 240, easing: BLEND_EASING },
   fadeIn: { duration: 240, easing: BLEND_EASING, delay: 0 },
   fadeOut: { duration: 150, easing: BLEND_EASING },
@@ -157,15 +157,25 @@ const BLEND_OPTIONS: TextMorphOptions = {
   edgeFade: "auto",
 };
 
-/** Each mode brings its own defaults. */
-export const MODE_DEFAULTS: Record<TextMorphMode, TextMorphOptions> = {
+type DeepReadonly<T> = {
+  readonly [K in keyof T]: T[K] extends object ? DeepReadonly<T[K]> : T[K];
+};
+
+function deepFreeze<T extends object>(value: T): DeepReadonly<T> {
+  for (const field of Object.values(value)) {
+    if (typeof field === "object" && field !== null) deepFreeze(field);
+  }
+  return Object.freeze(value) as DeepReadonly<T>;
+}
+
+/** Each mode's defaults for every option. Read-only: shared by every label. */
+export const MODE_DEFAULTS: {
+  readonly [M in TextMorphMode]: DeepReadonly<TextMorphOptions>;
+} = deepFreeze({
   blend: BLEND_OPTIONS,
   roll: ROLL_OPTIONS,
   morph: MORPH_OPTIONS,
-};
-
-/** The default: blend, calm enough for anything. */
-export const DEFAULT_OPTIONS: TextMorphOptions = MODE_DEFAULTS.blend;
+});
 
 type Overrides<T> = {
   [K in keyof T]?: T[K] extends object ? Overrides<T[K]> : T[K];
@@ -177,6 +187,9 @@ type Overrides<T> = {
  * mode.
  */
 export type TextMorphOverrides = Overrides<TextMorphOptions>;
+
+/** A mode with every option filled in: what a change runs on. */
+export type ResolvedOptions = TextMorphOptions & { mode: TextMorphMode };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -195,28 +208,31 @@ function merge<T>(base: T, overrides: Overrides<T> | undefined): T {
   return out as T;
 }
 
-/** Options for `overrides`, filled in from the chosen mode's defaults. */
+/**
+ * A mode's options with `overrides` applied, and, with `duration`, the
+ * whole clock scaled so movement takes that long: every other duration,
+ * delay and stagger in proportion, so the look holds on a shorter or longer
+ * clock.
+ */
 export function resolveOptions(
-  overrides: TextMorphOverrides = {},
-): TextMorphOptions {
-  return merge(
-    MODE_DEFAULTS[overrides.mode ?? DEFAULT_OPTIONS.mode],
-    overrides,
-  );
+  mode: TextMorphMode = "blend",
+  overrides?: TextMorphOverrides,
+  duration?: number,
+): ResolvedOptions {
+  const merged = merge(MODE_DEFAULTS[mode] as TextMorphOptions, overrides);
+  const timed =
+    duration === undefined
+      ? merged
+      : scaleTiming(merged, duration / merged.motion.duration);
+  return { ...timed, mode };
 }
 
-/**
- * The same look on a shorter clock: every duration, delay and stagger scaled
- * by `factor`. For labels that answer a click (the docs use 209ms of motion)
- * or mirror typing, where the mode's full timing would lag behind the input.
- * Takes full options or any overrides (`faster({ mode: "roll" }, 0.5)`).
- */
-export function faster(
-  options: TextMorphOverrides,
+/** Every duration, delay and stagger scaled by `factor`. */
+export function scaleTiming(
+  o: TextMorphOptions,
   factor: number,
 ): TextMorphOptions {
-  const o = resolveOptions(options);
-  const t = (timing: Timing): Timing => ({
+  const t = (timing: TextMorphTiming): TextMorphTiming => ({
     ...timing,
     duration: Math.round(timing.duration * factor),
   });

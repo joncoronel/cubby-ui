@@ -3,18 +3,9 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { TextMorph } from "@/registry/default/text-morph/text-morph";
-import {
-  DEFAULT_OPTIONS,
-  faster,
-  type TextMorphOptions,
-} from "@/registry/default/text-morph/lib/options";
 
 /** Labels that answer a click (Copied, Hide code) move in 209ms. */
-const FEEDBACK_MS = 209;
-export function feedbackOf(o: TextMorphOptions): TextMorphOptions {
-  return faster(o, FEEDBACK_MS / o.motion.duration);
-}
-const FEEDBACK_OPTIONS = feedbackOf(DEFAULT_OPTIONS);
+export const FEEDBACK_MS = 209;
 
 /** Flattens a heading's React title (which may hold inline code) to text. */
 export function toPlainText(node: React.ReactNode): string {
@@ -29,9 +20,8 @@ export function toPlainText(node: React.ReactNode): string {
 
 /**
  * A label that animates when its text changes: the site's one way of
- * animating a label swap, on the registry `TextMorph` (registry/default/text-morph).
- * Defaults live in `text-morph/options.ts`, which the /tune/text-morph page
- * reads too.
+ * animating a label swap, on the registry `TextMorph` (registry/default/text-morph),
+ * in its default mode.
  *
  * `feedback` is for labels that change because the reader clicked (Copied,
  * Hide code): the same look, moving in 209ms.
@@ -56,32 +46,32 @@ export function MorphText({
 }) {
   const clipRef = React.useRef<HTMLSpanElement>(null);
   const [overflowing, setOverflowing] = React.useState(false);
-  const options = feedback ? FEEDBACK_OPTIONS : DEFAULT_OPTIONS;
 
-  // Check the fit once the label has settled at its new width.
+  // Whether the settled text fits: the glyphs' layout width, since leaving
+  // glyphs and transforms (which scrollWidth counts) take no space in it.
+  const checkFit = React.useCallback((): void => {
+    const clip = clipRef.current;
+    const glyphs = clip?.querySelector<HTMLElement>(".text-morph-glyphs");
+    if (clip && glyphs) {
+      setOverflowing(glyphs.offsetWidth > clip.clientWidth + 1);
+    }
+  }, []);
+
+  // Checked when the space it has changes, and when a change settles.
   React.useEffect(() => {
     const clip = clipRef.current;
     if (!truncate || !clip) return;
-    const check = () => {
-      // The glyphs' layout width: leaving glyphs and transforms (which
-      // scrollWidth counts) don't take up space in the settled text.
-      const glyphs = clip.querySelector<HTMLElement>(".text-morph-glyphs");
-      if (glyphs) setOverflowing(glyphs.offsetWidth > clip.clientWidth + 1);
-    };
-    const timer = window.setTimeout(check, options.width.duration + 80);
-    const observer = new ResizeObserver(check);
+    const observer = new ResizeObserver(checkFit);
     observer.observe(clip);
-    return () => {
-      window.clearTimeout(timer);
-      observer.disconnect();
-    };
-  }, [truncate, children, options.width.duration]);
+    return () => observer.disconnect();
+  }, [truncate, checkFit]);
 
   const text = (
     <TextMorph
       value={children}
-      options={options}
+      duration={feedback ? FEEDBACK_MS : undefined}
       disableAnimation={disableAnimation}
+      onMorphComplete={truncate ? checkFit : undefined}
       className={truncate ? undefined : className}
     />
   );

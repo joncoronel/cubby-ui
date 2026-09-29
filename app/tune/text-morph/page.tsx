@@ -15,7 +15,7 @@ import {
   Copy01Icon,
   SourceCodeIcon,
 } from "@hugeicons/core-free-icons";
-import { feedbackOf } from "@/components/docs/morph-text";
+import { FEEDBACK_MS } from "@/components/docs/morph-text";
 import { SwapIcon } from "@/components/docs/swap-icon";
 import { cn } from "@/lib/utils";
 import { TextMorph } from "@/registry/default/text-morph/text-morph";
@@ -23,7 +23,7 @@ import {
   MODE_DEFAULTS,
   type TextMorphMode,
   type TextMorphOptions,
-  type Timing,
+  type TextMorphTiming,
 } from "@/registry/default/text-morph/lib/options";
 import { Button } from "@/registry/default/button/button";
 import { Input } from "@/registry/default/input/input";
@@ -42,6 +42,7 @@ import {
   caseOf,
   isDemo,
   type Align,
+  type MorphProps,
   type View,
 } from "./playground";
 import { PlaygroundDemo } from "./demos";
@@ -228,7 +229,7 @@ function dialUpdates(p: DialPositions): Record<string, DialValue> {
 const same = (a: unknown, b: unknown): boolean =>
   JSON.stringify(a) === JSON.stringify(b);
 
-function timingOf(transition: TransitionConfig): Timing {
+function timingOf(transition: TransitionConfig): TextMorphTiming {
   const css = transitionToCss(transition);
   return { duration: toMs(css), easing: css.easing };
 }
@@ -399,7 +400,6 @@ export default function TextMorphTune(): React.ReactElement {
   const fadeOut = bezierOnly(v.fade.out, p.fadeOut);
   const width = bezierOnly(v.width, p.width);
   const resolved: TextMorphOptions = {
-    mode,
     motion: same(v.motion, p.motion) ? exact.motion : timingOf(v.motion),
     fadeIn:
       same(fadeIn, p.fadeIn) && v.fade.inDelay === p.fadeInDelay
@@ -446,7 +446,8 @@ export default function TextMorphTune(): React.ReactElement {
   }[mode];
 
   const ambient = tune.original ? exact : resolved;
-  const feedback = feedbackOf(ambient);
+  const morph: MorphProps = { mode, options: ambient };
+  const feedback: MorphProps = { ...morph, duration: FEEDBACK_MS };
 
   const count = pick(COUNTS, "counter");
   const percent = pick(PERCENTS, "counter");
@@ -470,7 +471,7 @@ export default function TextMorphTune(): React.ReactElement {
             // Each demo starts from its own first state.
             key={view}
             view={view}
-            options={ambient}
+            morph={morph}
             align={align ?? "left"}
             onAlign={setAlign}
             tabular={tabular ?? false}
@@ -488,7 +489,7 @@ export default function TextMorphTune(): React.ReactElement {
             onAlign={setAlign}
             tabular={tabular ?? shownCase.tabular ?? false}
             onTabular={setTabular}
-            options={ambient}
+            morph={morph}
             onAdvance={advance}
           />
         </div>
@@ -497,7 +498,7 @@ export default function TextMorphTune(): React.ReactElement {
           <Demo label="Header crumb (scroll-driven)" onAdvance={bump("crumb")}>
             <span className="text-muted-foreground flex items-center gap-1.5 text-sm">
               <span className="text-border">/</span>
-              <TextMorph value={pick(SECTIONS, "crumb")} options={ambient} />
+              <TextMorph value={pick(SECTIONS, "crumb")} {...morph} />
             </span>
           </Demo>
 
@@ -507,7 +508,7 @@ export default function TextMorphTune(): React.ReactElement {
           >
             <div className="flex justify-center">
               <span className="bg-card flex h-10 items-center rounded-full px-4 text-sm font-medium shadow-(--surface-shadow-combined-5)">
-                <TextMorph value={pick(SECTIONS, "pill")} options={ambient} />
+                <TextMorph value={pick(SECTIONS, "pill")} {...morph} />
               </span>
             </div>
           </Demo>
@@ -517,7 +518,7 @@ export default function TextMorphTune(): React.ReactElement {
             onAdvance={bump("price")}
           >
             <span className="font-display text-3xl font-semibold tabular-nums">
-              <TextMorph value={pick(PRICES, "price")} options={ambient} />
+              <TextMorph value={pick(PRICES, "price")} {...morph} />
             </span>
           </Demo>
 
@@ -526,7 +527,7 @@ export default function TextMorphTune(): React.ReactElement {
             onAdvance={bump("wrapping")}
           >
             <p className="max-w-64 text-sm leading-6">
-              <TextMorph value={pick(UPDATES, "wrapping")} options={ambient} />
+              <TextMorph value={pick(UPDATES, "wrapping")} {...morph} />
             </p>
           </Demo>
 
@@ -547,7 +548,7 @@ export default function TextMorphTune(): React.ReactElement {
                 <TextMorph
                   value={typed || "0"}
                   cursorIndex={caret}
-                  options={ambient}
+                  {...morph}
                 />
               </span>
             </div>
@@ -561,7 +562,7 @@ export default function TextMorphTune(): React.ReactElement {
               Deploying to{" "}
               <TextMorph
                 value={pick(TARGETS, "sentence")}
-                options={ambient}
+                {...morph}
                 className="font-mono font-medium"
               />{" "}
               now
@@ -573,7 +574,7 @@ export default function TextMorphTune(): React.ReactElement {
             onAdvance={bump("status")}
           >
             <span className="text-sm">
-              <TextMorph value={pick(STATUSES, "status")} options={ambient} />
+              <TextMorph value={pick(STATUSES, "status")} {...morph} />
             </span>
           </Demo>
 
@@ -582,7 +583,7 @@ export default function TextMorphTune(): React.ReactElement {
             onAdvance={bump("reorder")}
           >
             <span className="text-2xl font-medium">
-              <TextMorph value={pick(REORDER, "reorder")} options={ambient} />
+              <TextMorph value={pick(REORDER, "reorder")} {...morph} />
             </span>
           </Demo>
 
@@ -591,7 +592,7 @@ export default function TextMorphTune(): React.ReactElement {
             onAdvance={bump("swap")}
           >
             <span className="text-2xl font-medium">
-              <TextMorph value={pick(SWAP, "swap")} options={ambient} />
+              <TextMorph value={pick(SWAP, "swap")} {...morph} />
             </span>
           </Demo>
 
@@ -600,7 +601,7 @@ export default function TextMorphTune(): React.ReactElement {
             onAdvance={bump("lines")}
           >
             <span className="text-2xl font-medium tabular-nums">
-              <TextMorph value={pick(LINES, "lines")} options={ambient} />
+              <TextMorph value={pick(LINES, "lines")} {...morph} />
             </span>
           </Demo>
 
@@ -609,7 +610,7 @@ export default function TextMorphTune(): React.ReactElement {
             onAdvance={bump("empty")}
           >
             <p className="text-2xl font-medium">
-              <TextMorph value={pick(EMPTY, "empty")} options={ambient} />
+              <TextMorph value={pick(EMPTY, "empty")} {...morph} />
             </p>
           </Demo>
 
@@ -619,15 +620,15 @@ export default function TextMorphTune(): React.ReactElement {
           >
             <span className="flex items-baseline gap-3 text-sm">
               <span className="font-display text-3xl font-semibold tabular-nums">
-                <TextMorph value={count} options={ambient} />
+                <TextMorph value={count} {...morph} />
               </span>
               <span className="text-muted-foreground tabular-nums">
-                <TextMorph value={`${count} unread`} options={ambient} />
+                <TextMorph value={`${count} unread`} {...morph} />
               </span>
               <span className="text-muted-foreground tabular-nums">
                 <TextMorph
                   value={`${percent > 0 ? "+" : ""}${percent.toFixed(2)}%`}
-                  options={ambient}
+                  {...morph}
                 />
               </span>
             </span>
@@ -640,10 +641,10 @@ export default function TextMorphTune(): React.ReactElement {
             <div className="flex items-baseline justify-between gap-4 text-sm">
               <TextMorph
                 value={pick(PRICES, "events")}
-                options={ambient}
-                onAnimationStart={tally("start")}
-                onAnimationComplete={tally("complete")}
-                onAnimationCancel={tally("cancel")}
+                {...morph}
+                onMorphStart={tally("start")}
+                onMorphComplete={tally("complete")}
+                onMorphCancel={tally("cancel")}
                 className="font-medium tabular-nums"
               />
               <span className="text-muted-foreground tabular-nums">
@@ -667,10 +668,7 @@ export default function TextMorphTune(): React.ReactElement {
                   <HugeiconsIcon icon={SourceCodeIcon} strokeWidth={2} />
                 }
               >
-                <TextMorph
-                  value={flip ? "Hide code" : "Code"}
-                  options={feedback}
-                />
+                <TextMorph value={flip ? "Hide code" : "Code"} {...feedback} />
               </Button>
               <Button
                 variant="secondary"
@@ -686,7 +684,7 @@ export default function TextMorphTune(): React.ReactElement {
               >
                 <TextMorph
                   value={flip ? "Copied" : "Copy page"}
-                  options={feedback}
+                  {...feedback}
                 />
               </Button>
             </div>

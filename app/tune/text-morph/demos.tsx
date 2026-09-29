@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import type { TextMorphOptions } from "@/registry/default/text-morph/lib/options";
 import { TextMorph } from "@/registry/default/text-morph/text-morph";
 import { Button } from "@/registry/default/button/button";
 import { Input } from "@/registry/default/input/input";
@@ -19,6 +18,7 @@ import {
   StageValue,
   type Align,
   type DemoView,
+  type MorphProps,
 } from "./playground";
 
 /*
@@ -26,7 +26,7 @@ import {
  */
 
 type DemoProps = {
-  options: TextMorphOptions;
+  morph: MorphProps;
   align: Align;
   onAlign: (align: Align) => void;
   tabular: boolean;
@@ -124,7 +124,7 @@ function TextSandbox(props: DemoProps): React.ReactElement {
         </Field>
       </div>
       <Stage align={props.align} tabular={props.tabular} onAdvance={toggle}>
-        <StageValue value={current} options={props.options} />
+        <StageValue value={current} {...props.morph} />
       </Stage>
       <StageTools {...props}>
         <Button size="sm" onClick={toggle}>
@@ -239,7 +239,7 @@ function NumberSandbox(props: DemoProps): React.ReactElement {
       <Stage align={props.align} tabular={props.tabular}>
         <StageValue
           value={value}
-          options={props.options}
+          {...props.morph}
           locale={locale}
           cursorIndex={useCaret ? caret : undefined}
         />
@@ -357,7 +357,7 @@ function Ticker(props: DemoProps): React.ReactElement {
       <Stage align={props.align} tabular={props.tabular}>
         <StageValue
           value={formatTick(value, kind, locale)}
-          options={props.options}
+          {...props.morph}
           locale={locale}
         />
       </Stage>
@@ -433,7 +433,7 @@ function Chart(props: DemoProps): React.ReactElement {
         <div className="text-4xl font-semibold tabular-nums">
           <TextMorph
             value={`$${value.toLocaleString("en-US")}`}
-            options={props.options}
+            {...props.morph}
           />
         </div>
         <p className="text-muted-foreground text-sm">
@@ -492,11 +492,7 @@ function InputDemo(props: DemoProps): React.ReactElement {
             query === undefined && "opacity-50",
           )}
         >
-          <TextMorph
-            value={query ?? 0}
-            options={props.options}
-            cursorIndex={caret}
-          />
+          <TextMorph value={query ?? 0} {...props.morph} cursorIndex={caret} />
         </div>
         <Input
           aria-label="Number to morph"

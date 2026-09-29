@@ -15,7 +15,8 @@ import {
 } from "./lib/match";
 import {
   resolveOptions,
-  type TextMorphOptions,
+  type ResolvedOptions,
+  type TextMorphMode,
   type TextMorphOverrides,
 } from "./lib/options";
 import {
@@ -258,7 +259,7 @@ type MorphElements = {
 function* morphTo(
   { root, stage, glyphLayer, ghostAnchor, ghostLayer }: MorphElements,
   value: string,
-  options: TextMorphOptions,
+  options: ResolvedOptions,
   place: { decimal: string; caret: number | undefined },
   playback: () => Playback,
 ): MorphSteps {
@@ -1136,44 +1137,50 @@ function* morphTo(
 
 export type TextMorphProps = Omit<
   useRender.ComponentProps<"span">,
-  "children" | "onAnimationStart" | "onAnimationEnd"
+  "children"
 > & {
-  /** The text. A number is formatted with `locale` and `decimals`. */
+  /** The text. A number is formatted with `locale` and `format`. */
   value: string | number;
+  /** How changes animate; each mode brings its own defaults. */
+  mode?: TextMorphMode;
   /**
-   * How changes animate. `mode` picks the defaults for everything else; any
-   * field set here, nested ones included, overrides that mode's value.
+   * How long movement takes, in ms: the mode's whole clock (fades, width,
+   * stagger) scales with it, so the look holds. Shorter for labels that
+   * answer a click or mirror typing.
+   */
+  duration?: number;
+  /**
+   * Fine tuning: any option, nested fields included, over the mode's
+   * defaults (`MODE_DEFAULTS`).
    */
   options?: TextMorphOverrides;
   /**
-   * Formats a number `value` and names the decimal separator numbers are
-   * aligned on. Fixed rather than the browser's, so the server and the
-   * browser render the same text.
+   * The locale a number `value` is formatted in, and whose decimal
+   * separator numbers in a string `value` are aligned on. Fixed rather than
+   * the browser's, so the server and the browser render the same text.
    */
   locale?: string;
-  /** Fraction digits for a number `value`. */
-  decimals?: number;
+  /** How a number `value` is formatted (`Intl.NumberFormat` options). */
+  format?: Intl.NumberFormatOptions;
   /** Swap the text without animating. */
   disableAnimation?: boolean;
   /**
-   * When the reader prefers reduced motion, crossfade in place: nothing
-   * travels, scales, tilts, blurs or resizes.
+   * When changes crossfade in place instead (nothing travels, scales,
+   * tilts, blurs or resizes): `user` when the reader prefers reduced
+   * motion, `always`, or `never`.
    */
-  respectReducedMotion?: boolean;
-  /**
-   * A change started animating. (These three are TextMorph's own events, not
-   * the DOM's CSS animation events.)
-   */
-  onAnimationStart?: () => void;
+  reducedMotion?: "user" | "always" | "never";
+  /** A change started animating. */
+  onMorphStart?: () => void;
   /**
    * A change finished, every glyph and the box settled. Fires right away
-   * for a change that didn't animate (`disableAnimation`, off screen). Each change
-   * ends in exactly one of this and `onAnimationCancel`, unless the label
-   * unmounts first.
+   * for a change that didn't animate (`disableAnimation`, off screen). Each
+   * change ends in exactly one of this and `onMorphCancel`, unless the label
+   * unmounts or is hidden first.
    */
-  onAnimationComplete?: () => void;
+  onMorphComplete?: () => void;
   /** A change was interrupted by the next one. */
-  onAnimationCancel?: () => void;
+  onMorphCancel?: () => void;
   /**
    * For a field someone is typing in: where the caret sits in `value` after
    * the edit, as a string index (an input's `selectionStart`). Glyphs are
@@ -1184,24 +1191,19 @@ export type TextMorphProps = Omit<
   cursorIndex?: number;
 };
 
-/** One formatter per locale and decimals: making one is Intl's slow part. */
+/** One formatter per locale and format: making one is Intl's slow part. */
 const formatters = new Map<string, Intl.NumberFormat>();
 
 function formatValue(
   value: string | number,
   locale: string,
-  decimals: number | undefined,
+  format: Intl.NumberFormatOptions | undefined,
 ): string {
   if (typeof value === "string") return value;
-  const key = `${locale}|${decimals ?? ""}`;
+  const key = `${locale}|${format ? JSON.stringify(format) : ""}`;
   let formatter = formatters.get(key);
   if (!formatter) {
-    formatter = new Intl.NumberFormat(
-      locale,
-      decimals === undefined
-        ? undefined
-        : { minimumFractionDigits: decimals, maximumFractionDigits: decimals },
-    );
+    formatter = new Intl.NumberFormat(locale, format);
     formatters.set(key, formatter);
   }
   return formatter.format(value);
@@ -1209,20 +1211,22 @@ function formatValue(
 
 function TextMorph({
   value: rawValue,
+  mode = "blend",
+  duration,
   options,
   locale = "en",
-  decimals,
+  format,
   disableAnimation = false,
-  respectReducedMotion = true,
-  onAnimationStart,
-  onAnimationComplete,
-  onAnimationCancel,
+  reducedMotion = "user",
+  onMorphStart,
+  onMorphComplete,
+  onMorphCancel,
   cursorIndex,
   className,
   render,
   ...props
 }: TextMorphProps): React.ReactElement {
-  const value = formatValue(rawValue, locale, decimals);
+  const value = formatValue(rawValue, locale, format);
   const rootRef = React.useRef<HTMLSpanElement>(null);
   const stageRef = React.useRef<HTMLSpanElement>(null);
   const glyphsRef = React.useRef<HTMLSpanElement>(null);
@@ -1231,24 +1235,24 @@ function TextMorph({
   // Set once: after that this component owns the glyph markup.
   const [initialHtml] = React.useState(() => ({ __html: glyphsHtml(value) }));
   const shown = React.useRef(value);
-  const resolved = resolveOptions(options);
+  const resolved = resolveOptions(mode, options, duration);
   const latest = React.useRef({
     options: resolved,
     disableAnimation,
-    respectReducedMotion,
-    onAnimationStart,
-    onAnimationComplete,
-    onAnimationCancel,
+    reducedMotion,
+    onMorphStart,
+    onMorphComplete,
+    onMorphCancel,
     cursorIndex,
   });
   React.useLayoutEffect(() => {
     latest.current = {
       options: resolved,
       disableAnimation,
-      respectReducedMotion,
-      onAnimationStart,
-      onAnimationComplete,
-      onAnimationCancel,
+      reducedMotion,
+      onMorphStart,
+      onMorphComplete,
+      onMorphCancel,
       cursorIndex,
     };
   });
@@ -1290,15 +1294,16 @@ function TextMorph({
 
     const current = latest.current;
     const reduce =
-      current.respectReducedMotion &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      current.reducedMotion === "always" ||
+      (current.reducedMotion === "user" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     let over = false;
     let silent = false;
     const handle = {
       cancel: (): void => {
         if (over) return;
         over = true;
-        if (!silent) latest.current.onAnimationCancel?.();
+        if (!silent) latest.current.onMorphCancel?.();
       },
       silence: (): void => {
         silent = true;
@@ -1310,7 +1315,8 @@ function TextMorph({
       over = true;
       if (inFlight.current === handle) inFlight.current = null;
       delete glyphLayer.dataset.playing;
-      if (!silent) latest.current.onAnimationComplete?.();
+      delete root.dataset.animating;
+      if (!silent) latest.current.onMorphComplete?.();
     };
     scheduleMorph({
       root,
@@ -1333,7 +1339,8 @@ function TextMorph({
           settle();
           return;
         }
-        if (!silent) latest.current.onAnimationStart?.();
+        root.dataset.animating = "";
+        if (!silent) latest.current.onMorphStart?.();
         void Promise.allSettled(started.map((a) => a.finished)).then(settle);
       },
     });
@@ -1341,7 +1348,7 @@ function TextMorph({
 
   const defaultProps = {
     "data-slot": "text-morph",
-    "data-mode": resolved.mode,
+    "data-mode": mode,
     className: cn("text-morph", className),
     children: (
       <>
@@ -1384,10 +1391,10 @@ function TextMorph({
 }
 
 export { TextMorph };
-export { faster, MODE_DEFAULTS } from "./lib/options";
+export { MODE_DEFAULTS } from "./lib/options";
 export type {
   TextMorphMode,
   TextMorphOptions,
   TextMorphOverrides,
-  Timing,
+  TextMorphTiming,
 } from "./lib/options";

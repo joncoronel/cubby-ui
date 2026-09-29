@@ -3,13 +3,23 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { TextMorph } from "@/registry/default/text-morph/text-morph";
-import type { TextMorphOptions } from "@/registry/default/text-morph/lib/options";
+import type {
+  TextMorphMode,
+  TextMorphOverrides,
+} from "@/registry/default/text-morph/lib/options";
 import { Toggle } from "@/registry/default/toggle/toggle";
 import {
   ToggleGroup,
   ToggleGroupItem,
 } from "@/registry/default/toggle-group/toggle-group";
 import { NUMBER_CASES, TEXT_CASES, type MorphCase } from "./cases";
+
+/** How the page's labels morph: the tuned mode and options, spread on each. */
+export type MorphProps = {
+  mode: TextMorphMode;
+  options: TextMorphOverrides;
+  duration?: number;
+};
 
 /** Playground demos: free-form screens, not cases (nothing asserted). */
 export type DemoView =
@@ -301,7 +311,7 @@ export function CaseStage({
   onAlign,
   tabular,
   onTabular,
-  options,
+  morph,
   onAdvance,
 }: {
   c: MorphCase;
@@ -310,7 +320,7 @@ export function CaseStage({
   onAlign: (align: Align) => void;
   tabular: boolean;
   onTabular: (tabular: boolean) => void;
-  options: TextMorphOptions;
+  morph: MorphProps;
   onAdvance: () => void;
 }): React.ReactElement {
   const index = step % c.values.length;
@@ -324,9 +334,16 @@ export function CaseStage({
           // A new case starts fresh rather than morphing from the last.
           key={c.label}
           value={value}
-          options={options}
+          {...morph}
           locale={c.locale}
-          decimals={c.decimals}
+          format={
+            c.decimals === undefined
+              ? undefined
+              : {
+                  minimumFractionDigits: c.decimals,
+                  maximumFractionDigits: c.decimals,
+                }
+          }
           cursorIndex={c.cursors?.[index]}
         />
       </Stage>

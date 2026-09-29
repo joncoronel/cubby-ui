@@ -22,7 +22,7 @@ export default function TextMorphModes() {
 
   return (
     <div className="flex flex-col items-center gap-6">
-      <TextMorph value={LABELS[index]} options={{ mode }} className="text-lg" />
+      <TextMorph value={LABELS[index]} mode={mode} className="text-lg" />
       <div className="flex gap-2">
         <Button size="sm" variant="outline" onClick={() => next("blend")}>
           Blend

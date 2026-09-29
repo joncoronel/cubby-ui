@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MODE_DEFAULTS } from "@/registry/default/text-morph/lib/options";
+import { resolveOptions } from "@/registry/default/text-morph/lib/options";
 import {
   HOME,
   awayState,
@@ -8,8 +8,8 @@ import {
   stillOptions,
 } from "@/registry/default/text-morph/lib/timing";
 
-const roll = MODE_DEFAULTS.roll;
-const morph = MODE_DEFAULTS.morph;
+const roll = resolveOptions("roll");
+const morph = resolveOptions("morph");
 
 describe("staggerDelays", () => {
   it("each: every successive glyph ms later, entering and leaving apart", () => {
@@ -115,7 +115,7 @@ describe("stillOptions", () => {
 });
 
 describe("blend", () => {
-  const blend = MODE_DEFAULTS.blend;
+  const blend = resolveOptions("blend");
 
   it("crossfades a changed run as one unit, a touch smaller", () => {
     expect(awayState(blend, "text", 1, 36)).toEqual({

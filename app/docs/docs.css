@@ -725,28 +725,86 @@
   margin-top: 2.5rem;
 }
 
-.docs-stage-tools {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  z-index: 2;
-  display: flex;
-  gap: 0.125rem;
-}
-
-.docs-stage-tool {
-  transition:
-    color 0.15s ease-out,
-    background-color 0.15s ease-out;
-}
-.docs-stage-tool[aria-expanded="true"] {
-  color: var(--foreground);
-  background-color: var(--surface-selected);
-}
-
 /* Revealed code appears in place with a short fade: no layout animation. */
 .docs-code-reveal:not([hidden]) {
   animation: docs-fade-in 0.18s ease-out;
+}
+
+/* ── Example tray ── An example with code is one object: a tray (the code
+   block's own fill and edge) holding the live example on a card at the top,
+   and the code on the tray beneath it. The card is set apart by its fill
+   alone, no ring or shadow (in dark the page fill sits below the tray's, and
+   a lit rim on it read as a raised card that was also sunk). Its corners
+   are concentric with the tray's (20px less its 4px padding). */
+.docs-example {
+  border-radius: 1.25rem;
+  padding: 0.25rem;
+}
+.docs-example .docs-stage {
+  min-height: 13rem;
+  border-radius: 1rem;
+  box-shadow: none;
+}
+
+.docs-example-code,
+.docs-example-body {
+  position: relative;
+}
+/* The tray's fill behind it, so code scrolling sideways passes beneath. */
+.docs-example-copy {
+  position: absolute;
+  top: 0.375rem;
+  right: 0.25rem;
+  z-index: 3;
+  border-radius: 0.5rem;
+  background-color: var(--muted);
+}
+
+/* Long code opens as a peek: its first four lines, fading out. It expands
+   in place without animating height, which is slow on a heavy page. */
+.docs-example-body[data-collapsed] {
+  max-height: 6.25rem;
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, #000 35%, transparent);
+}
+.docs-example-peek {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+}
+
+.docs-example-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 2.25rem;
+  padding: 0 0.125rem 0.125rem 0.25rem;
+}
+
+.docs-example-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  height: 1.75rem;
+  padding-inline: 0.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  outline: none;
+}
+.docs-example-toggle:hover {
+  color: var(--foreground);
+  background-color: color-mix(in oklab, var(--foreground) 6%, transparent);
+}
+.docs-example-toggle:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--ring) 55%, transparent);
+}
+.docs-example-chevron {
+  transition: rotate 0.2s var(--docs-ease);
+}
+.docs-example-toggle[aria-expanded="true"] .docs-example-chevron {
+  rotate: 180deg;
 }
 
 .docs-disclosure-chevron {
@@ -940,6 +998,7 @@
   .docs-shelf-mark,
   .docs-cubby-glyph rect,
   .docs-shelf-chevron,
+  .docs-example-chevron,
   .docs-disclosure-chevron {
     transition-duration: 0s;
   }

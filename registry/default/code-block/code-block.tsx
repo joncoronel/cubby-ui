@@ -463,10 +463,14 @@ function CodeBlockPre({
     children: (
       <>
         {floatingCopy && <CodeBlockFloatingCopy />}
+        {/* Scroll chains to the page: code is in-flow content, and containing
+            it trapped the page's vertical scroll over any block whose long
+            lines only scroll sideways (wheel and touch alike). */}
         <ScrollArea
           fadeEdges={fadeEdges}
           hideScrollbar={hideScrollbar}
           nativeScroll={nativeScroll}
+          overscrollBehavior="auto"
           viewportClassName="py-3"
           className="min-h-0 flex-1"
         >

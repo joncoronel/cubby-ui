@@ -223,11 +223,11 @@ A hybrid: light mode keeps fills neutral and communicates elevation with layered
 ### Named Rules
 **The Ladder Rule.** Elevation is chosen from the ladder, never hand-written. A floating chrome surface is built from the near, mid, and far shadow alphas with no ladder ring, because rungs 3 to 8 carry their own ring.
 
-**The Drawn-Not-Lifted Rule.** Reading surfaces on docs (stage, note, tables, API rows, shelf index) sit flat on the page, defined by hairlines or a faint ink wash. Shadow appears only on things that float over content: the open shelf, the minimap card, menus.
+**The Drawn-Not-Lifted Rule.** Reading surfaces on docs (note, tables, API rows) sit flat on the page, defined by hairlines or a faint ink wash. Shadow appears only on things that float over content: the open shelf, the minimap card, menus.
 
 ## Shapes
 
-Softly rounded, from a single root radius of 12px (`{rounded.lg}`) with 2px steps either side: 6, 8, 10, 12, 14, 16px. Buttons use 12px; shelf links 8px; compact buttons and menu rows 8 to 10px; notes 14px; the preview stage 18px, the largest radius, because it is the page's main object. Pills (999px) are reserved for the shelf trigger and step numbers. Small marks are nearly square: the current-page mark is a 6px square at 2px radius, minimap ticks are 2px bars.
+Softly rounded, from a single root radius of 12px (`{rounded.lg}`) with 2px steps either side: 6, 8, 10, 12, 14, 16px. Buttons use 12px; shelf links 8px; compact buttons and menu rows 8 to 10px; notes 14px; the example tray 20px (its card 16px), the largest radius, because it is the page's main object. Pills (999px) are reserved for the shelf trigger and step numbers. Small marks are nearly square: the current-page mark is a 6px square at 2px radius, minimap ticks are 2px bars.
 
 Structure is typographic: groups are set apart by space and a small label, not by boxes or rules. Revealed code simply appears in place with a 180ms fade; nothing animates layout height.
 
@@ -260,8 +260,9 @@ Every docs page in one window that grows out of the header's trigger. Below md i
 - **Motion:** the window opens from 98% scale and 4px up, from an origin under the trigger: opacity 100ms ease-out, scale and position 180ms ease-out-expo, on its own layer. The scrim (150ms), chevron and glyph (200ms) finish on the same short clock. It closes the same way back in 120ms ease-out, the scrim with it. A scrim at 10% ink (45% black in dark) covers the card, which becomes inert. Under reduced motion it only fades.
 
 ### Preview Stage
-- **Container:** page fill, 18px radius, 1px hairline ring, 16rem minimum height (12rem on mobile for the first stage), content centered with 52px top, 24px sides, 40px bottom padding.
-- **Tools:** a single Code toggle sits top-right as a 28px ghost button at 0.75rem. The code block appears directly below the stage with a 180ms fade and a 4px drop; closing is instant.
+- **Example tray:** an example with code is one object. A tray in the code block's own fill and edge (`bg-muted`, `solidSurface(3, 1)`), 20px radius and 4px padding, holds the live example on a card at the top (page fill, 16px radius so the corners stay concentric, no ring or shadow: its fill alone sets it apart) and the code on the tray beneath it. An example without code is the card alone with a 1px hairline ring.
+- **Card:** 13rem minimum height in a tray (the first stage 16rem, 12rem on mobile), content centered with 52px top, 24px sides, 40px bottom padding.
+- **Code:** Shiki colors straight on the tray, no card of its own, with a copy button floating in its top-right corner (outside the scroller, on the tray fill) so it never scrolls away. Up to 6 lines show in full. Longer code opens as a peek, its first four lines fading out; the peek itself and a "Show all N lines" toggle (0.75rem, chevron turning 180 degrees) expand it in place with no height animation, to at most min(30rem, 65dvh), past which it scrolls with faded edges, so copy and Collapse stay in reach. Scroll chains through to the page (code blocks never contain overscroll, which trapped the page over sideways-scrolling code). Collapsing brings the example back into view if it went off the top.
 
 ### Install
 One code block with package-manager tabs; the choice is shared across the site and remembered. Manual steps appear the same way (instant, short fade) under a small chevron disclosure; steps are numbered 24px pills at 7% ink joined by a hairline.

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { solidSurface } from "@/registry/default/lib/elevated";
 import { cn } from "@/lib/utils";
 import type { ShelfGroup, ShelfItem } from "@/lib/docs-nav";
 
@@ -42,21 +43,19 @@ function ShelfSection({
   onNavigate,
   className,
   listClassName,
-  style,
 }: {
   group: ShelfGroup;
   currentUrl: string;
   onNavigate: () => void;
   className?: string;
   listClassName?: string;
-  style?: React.CSSProperties;
 }) {
   return (
-    <section className={cn("min-w-0", className)} style={style}>
-      <h2 className="text-muted-foreground mb-2 flex items-baseline gap-2 font-sans text-xs font-medium">
+    <section className={cn("min-w-0", className)}>
+      <h2 className="font-display text-foreground mb-2 flex items-baseline gap-2 text-sm font-semibold tracking-tight">
         {group.label}
         {group.kind === "grid" && (
-          <span className="text-muted-foreground/70 tabular-nums">
+          <span className="text-muted-foreground font-sans text-xs font-normal tabular-nums">
             {group.items.length}
           </span>
         )}
@@ -77,26 +76,52 @@ function ShelfSection({
 }
 
 /**
- * Every docs page, laid out like a contents page: guides in a narrow first
- * column, then the component groups flowing down their own columns.
+ * Every docs page in one window: guides down a side rail, the component
+ * groups in columns beside it. It is for browsing; finding a page by name is
+ * the search dialog's job, one button over in the header.
  */
 export function Shelf({ id, groups, open, currentUrl, onClose }: ShelfProps) {
   const navRef = React.useRef<HTMLElement>(null);
+  const scrollRef = React.useRef<HTMLDivElement>(null);
 
   const guides = groups.filter((group) => group.kind === "list");
   const components = groups.filter((group) => group.kind === "grid");
-  const [primary, ...rest] = components;
 
-  // Open with focus on the current page (or the first link), so arrow keys
-  // pick up from where the reader is.
+  // The window grows out of the trigger, so its scale origin sits under it.
+  React.useLayoutEffect(() => {
+    if (!open) return;
+    const nav = navRef.current;
+    const trigger = document.querySelector(`[aria-controls="${id}"]`);
+    if (!nav || !trigger) return;
+    const t = trigger.getBoundingClientRect();
+    const n = nav.getBoundingClientRect();
+    nav.style.setProperty(
+      "--shelf-origin-x",
+      `${Math.round(t.left + t.width / 2 - n.left)}px`,
+    );
+  }, [open, id]);
+
+  // Opens on the page you're in, centred in the list. The window takes
+  // focus rather than the link, which would show its ring on a click; the
+  // first arrow key moves to the current page.
   React.useEffect(() => {
     if (!open) return;
     const frame = requestAnimationFrame(() => {
-      const nav = navRef.current;
-      const target =
-        nav?.querySelector<HTMLElement>('[aria-current="page"]') ??
-        nav?.querySelector<HTMLElement>("a");
-      target?.focus({ preventScroll: true });
+      const scroller = scrollRef.current;
+      const current = navRef.current?.querySelector<HTMLElement>(
+        '[aria-current="page"]',
+      );
+      if (scroller && current) {
+        const box = scroller.getBoundingClientRect();
+        const item = current.getBoundingClientRect();
+        scroller.scrollTop = Math.round(
+          scroller.scrollTop +
+            item.top -
+            box.top -
+            (box.height - item.height) / 2,
+        );
+      }
+      navRef.current?.focus({ preventScroll: true });
     });
     return () => cancelAnimationFrame(frame);
   }, [open]);
@@ -104,28 +129,30 @@ export function Shelf({ id, groups, open, currentUrl, onClose }: ShelfProps) {
   React.useEffect(() => {
     if (!open) return;
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        onClose(true);
-      }
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      onClose(true);
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [open, onClose]);
 
-  // Up/down walk the links in reading order.
+  // Up and down walk the links in reading order, starting from the current
+  // page.
   const onNavKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
     if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
-    const links = Array.from(
-      navRef.current?.querySelectorAll<HTMLElement>("a") ?? [],
-    );
+    const nav = navRef.current;
+    const links = Array.from(nav?.querySelectorAll<HTMLElement>("a") ?? []);
     const index = links.indexOf(document.activeElement as HTMLElement);
     const next =
-      links[
-        event.key === "ArrowDown"
-          ? Math.min(index + 1, links.length - 1)
-          : Math.max(index - 1, 0)
-      ];
+      index === -1
+        ? (nav?.querySelector<HTMLElement>('[aria-current="page"]') ??
+          links[0])
+        : links[
+            event.key === "ArrowDown"
+              ? Math.min(index + 1, links.length - 1)
+              : Math.max(index - 1, 0)
+          ];
     if (next) {
       event.preventDefault();
       next.focus();
@@ -147,51 +174,44 @@ export function Shelf({ id, groups, open, currentUrl, onClose }: ShelfProps) {
         onClick={() => onClose(false)}
       />
 
-      <nav
-        ref={navRef}
-        aria-label="All documentation pages"
-        onKeyDown={onNavKeyDown}
-        className="docs-shelf-panel bg-background relative max-h-full overflow-y-auto overscroll-contain"
-      >
-        <div className="mx-auto grid w-full max-w-[76rem] gap-x-12 gap-y-8 px-5 pt-6 pb-8 sm:px-8 lg:grid-cols-[10rem_minmax(0,3fr)_minmax(0,2fr)] lg:pt-8 lg:pb-10">
-          <div
-            className="docs-shelf-group grid grid-cols-2 content-start gap-x-6 gap-y-6 sm:grid-cols-3 lg:grid-cols-1"
-            style={{ ["--g" as string]: 0 }}
-          >
-            {guides.map((group) => (
-              <ShelfSection
-                key={group.label}
-                group={group}
-                currentUrl={currentUrl}
-                onNavigate={navigate}
-              />
-            ))}
+      <div className="docs-shelf-anchor">
+        <nav
+          ref={navRef}
+          aria-label="All documentation pages"
+          tabIndex={-1}
+          onKeyDown={onNavKeyDown}
+          className={cn("docs-shelf-panel outline-none", solidSurface(3, 5))}
+        >
+          <div ref={scrollRef} className="docs-shelf-scroll">
+            <div className="docs-shelf-grid">
+              <div className="docs-shelf-rail">
+                {guides.map((group) => (
+                  <ShelfSection
+                    key={group.label}
+                    group={group}
+                    currentUrl={currentUrl}
+                    onNavigate={navigate}
+                  />
+                ))}
+              </div>
+              <div className="docs-shelf-components">
+                {components.map((group, i) => (
+                  <ShelfSection
+                    key={group.label}
+                    group={group}
+                    currentUrl={currentUrl}
+                    onNavigate={navigate}
+                    listClassName={cn(
+                      "columns-2 gap-x-6 sm:columns-3",
+                      i > 0 && "lg:columns-2",
+                    )}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
-
-          {primary && (
-            <ShelfSection
-              group={primary}
-              currentUrl={currentUrl}
-              onNavigate={navigate}
-              listClassName="columns-2 gap-x-6 sm:columns-3"
-              className="docs-shelf-group"
-              style={{ ["--g" as string]: 1 }}
-            />
-          )}
-
-          {rest.map((group, i) => (
-            <ShelfSection
-              key={group.label}
-              group={group}
-              currentUrl={currentUrl}
-              onNavigate={navigate}
-              listClassName="columns-2 gap-x-6 sm:columns-3 lg:columns-2"
-              className="docs-shelf-group"
-              style={{ ["--g" as string]: i + 2 }}
-            />
-          ))}
-        </div>
-      </nav>
+        </nav>
+      </div>
     </div>
   );
 }

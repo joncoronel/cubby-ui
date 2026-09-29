@@ -159,7 +159,7 @@ A cool, faintly violet-tinted neutral stack with a single saturated blue, expres
 ### Neutral
 - **Ink** (`{colors.foreground}` / dark `{colors.dark-foreground}`): headings, active labels, current-page marks. Docs prose runs at 88% ink mixed into the page background, so body text sits one step below headings.
 - **Quiet Ink** (`{colors.muted-foreground}` / dark `{colors.dark-muted-foreground}`): descriptions, meta lines, idle controls, table headers, minimap labels.
-- **Page** (`{colors.surface-1}` / dark `{colors.dark-surface-1}`): the page background and every docs surface that should read as the page itself (header when scrolled, shelf panel, stage).
+- **Page** (`{colors.surface-1}` / dark `{colors.dark-surface-1}`): the page background and every docs surface that should read as the page itself (header when scrolled, stage).
 - **Raised Paper** (`{colors.surface-2}`, `{colors.surface-3}` / dark `{colors.dark-surface-3}`): cards, popovers, default inputs, outline buttons. Light rungs 3 to 8 share one white and differ only in shadow; dark rungs climb in lightness from 0.205 to 0.402.
 - **Plate Gray** (`{colors.secondary}`, text `{colors.secondary-foreground}`): secondary and primary-soft button plates.
 - **Hairline** (`{colors.border}`): the default 1px rule, re-derived in dark from dark ink.
@@ -200,11 +200,11 @@ A cool, faintly violet-tinted neutral stack with a single saturated blue, expres
 
 ## Layout
 
-The docs page is a card set in a frame. The frame (`--docs-frame`: oklch 0.925 in light, the chrome near-black in dark) holds the header; the card keeps the page color (`--background`), so components sit on the background they were designed for. The card is inset 8px (12px from sm up) on the sides and bottom, starts under the 56px header, and has a 16px (20px) radius and no edge line: the frame's color around it draws its shape. The document still scrolls natively: two fixed layers draw the card fill behind the content and the frame in front of it (a rounded rectangle with a 100vmax spread shadow in the frame color), so content reads as scrolling inside the card while scroll restoration, anchors, and the mobile URL bar keep working. No layer is sized from both its top and bottom edge: Chrome on Android resolves those against a different viewport height while the URL bar slides, so the fill and the frame's top and sides are pinned to the top at `100lvh` (they never resize) and the bottom edge is its own bottom-pinned strip, which moves with the URL bar. The shelf opens inside the card's rounded rectangle. One centered column. Everything, previews included, sits in one `{spacing.content}` (48rem) column; nothing breaks out wider, so every block shares both edges. Header and shelf content share a `{spacing.chrome-max}` (76rem) container with 1.25rem to 2rem side padding. The sticky header is `{spacing.header-height}` (56px) and scroll padding is 5rem.
+The docs page is a card set in a frame. The frame (`--docs-frame`: oklch 0.925 in light, the chrome near-black in dark) holds the header; the card keeps the page color (`--background`), so components sit on the background they were designed for. The card is inset 8px (12px from sm up) on the sides and bottom, starts under the 56px header, and has a 16px (20px) radius and no edge line: the frame's color around it draws its shape. The document still scrolls natively: two fixed layers draw the card fill behind the content and the frame in front of it (a rounded rectangle with a 100vmax spread shadow in the frame color), so content reads as scrolling inside the card while scroll restoration, anchors, and the mobile URL bar keep working. No layer is sized from both its top and bottom edge: Chrome on Android resolves those against a different viewport height while the URL bar slides, so the fill and the frame's top and sides are pinned to the top at `100lvh` (they never resize) and the bottom edge is its own bottom-pinned strip, which moves with the URL bar. The shelf opens over the card: a sheet across its top below md, a floating window inset 0.5rem from md up. One centered column. Everything, previews included, sits in one `{spacing.content}` (48rem) column; nothing breaks out wider, so every block shares both edges. Header and shelf content share a `{spacing.chrome-max}` (76rem) container with 1.25rem to 2rem side padding. The sticky header is `{spacing.header-height}` (56px) and scroll padding is 5rem.
 
 Vertical rhythm is set by the container, not the blocks: siblings flow at `{spacing.flow}`; any component block (preview, table, note) takes `{spacing.block}` above and below; h2 takes `{spacing.headline-above}` above, h3 `{spacing.title-above}`, h4 to h6 2.25rem; the gap after h2 and h3 is `{spacing.heading-below}`, after h4 0.5rem. The page footer sits 6rem below content. Lists indent 1.25rem with 0.375rem between items.
 
-The table of contents is a fixed tick minimap in the right margin at the xl breakpoint (hovering it opens the headings in a PreviewCard to its left); below that it lives in the header's section crumb. The shelf is a contents page: from lg up, a 10rem guides column, Primitives flowing down three text columns and Composables down two; below lg the groups stack, each flowing in two or three columns. Heading anchor glyphs hide below 40rem.
+The table of contents is a fixed tick minimap in the right margin at the xl breakpoint (hovering it opens the headings in a PreviewCard to its left); below that it lives in the header's section crumb. The shelf is a window for browsing (finding a page by name is the search dialog's job): from lg up, an inset 11.5rem guides rail, Primitives flowing down three text columns and Composables down two; below lg the guides sit in a row above the groups, each flowing in two or three columns. Heading anchor glyphs hide below 40rem.
 
 The home page is a 64rem (max-w-5xl) viewport-height composition: centered hero stack with 1.5rem internal gaps, 3 to 3.5rem to the category tiles, a slim footer pinned to the bottom.
 
@@ -216,7 +216,7 @@ A hybrid: light mode keeps fills neutral and communicates elevation with layered
 - **Hairline ring** (`box-shadow: 0 0 0 1px oklch(0 0 0 / 0.06)`, rung 1): flush containers that need an edge without lift; also the light chrome edge.
 - **Resting card** (rung 3: `0 0 0 1px oklch(0 0 0 / 0.06), 0 1px 1px -0.5px oklch(0 0 0 / 0.06), 0 3px 3px -1.5px oklch(0 0 0 / 0.05)`): cards and inputs at rest.
 - **Floating** (rungs 5 to 8, adding 12px, 24px, 48px, and 96px layers at 0.04 to 0.03 alpha): popovers, dialogs, menus.
-- **Docs float** (`0 0 0 1px var(--border), 0 16px 40px -12px oklch(0 0 0 / 0.14)`, dark 0.5): menus and the minimap's PreviewCard use the component's own surface. The shelf panel uses `0 1px 0 var(--border), 0 24px 48px -16px oklch(0 0 0 / 0.16)` (dark 0.5), dropping from the header edge.
+- **Docs float** (`0 0 0 1px var(--border), 0 16px 40px -12px oklch(0 0 0 / 0.14)`, dark 0.5): menus and the minimap's PreviewCard use the component's own surface. The shelf window takes its fill and shadow from the surface ladder (`solidSurface(3, 5)`), like the other floating controls.
 - **Dark chrome edge** (`0 0 0 1px oklch(0 0 0 / 0.7), inset 0 1px 0 0 oklch(1 0 0 / 0.065)`): defines the chrome fill against a dark page.
 - **Stage outline** (`0 0 0 1px var(--border)`): previews are drawn, not lifted.
 
@@ -229,7 +229,7 @@ A hybrid: light mode keeps fills neutral and communicates elevation with layered
 
 Softly rounded, from a single root radius of 12px (`{rounded.lg}`) with 2px steps either side: 6, 8, 10, 12, 14, 16px. Buttons use 12px; shelf links 8px; compact buttons and menu rows 8 to 10px; notes 14px; the preview stage 18px, the largest radius, because it is the page's main object. Pills (999px) are reserved for the shelf trigger and step numbers. Small marks are nearly square: the current-page mark is a 6px square at 2px radius, minimap ticks are 2px bars.
 
-Structure is typographic: groups are set apart by space and a small label, not by boxes or rules. Disclosure is clipped, not scaled: the shelf opens with `clip-path: inset()` and revealed code simply appears in place with a 180ms fade; nothing animates layout height.
+Structure is typographic: groups are set apart by space and a small label, not by boxes or rules. Revealed code simply appears in place with a 180ms fade; nothing animates layout height.
 
 ## Components
 
@@ -252,11 +252,12 @@ Tactile and small. Paint lives on a `::before` layer so press can scale it witho
 - **Home top nav:** the shared search trigger, theme toggle, and GitHub link, reused by the docs header.
 
 ### The Cubby Shelf (signature)
-Every docs page, laid out like a contents page, dropping from the header. No boxes, no filter, no connecting lines: it is an index, read at a glance.
-- **Link:** 32px tall, 8px inline padding, 0.875rem Quiet Ink label. Hover: ink label on a surface-hover wash (8px radius). Focus: a 2px ring inset.
-- **Current page:** 500-weight ink label with a 6px blue mark that grows in and pushes the name over (300ms ease-out-expo).
-- **Keyboard:** opens with focus on the current page; up and down arrows walk the links in reading order; Escape closes and returns focus to the trigger.
-- **Motion:** the panel clip-reveals in 550ms ease-out-expo and closes in 260ms ease-in-cubic; the groups arrive as beats (guides, Primitives, Composables) rising 0.25rem, 80ms + 50ms apart. A scrim at 10% ink (45% black in dark) covers the page, which becomes inert.
+Every docs page in one window that grows out of the header's trigger. Below md it is a sheet across the top of the card, scrolling inside it, with rounded bottom corners. From md up it floats: inset 0.5rem from the card, its left edge on the header row's, up to 66rem wide, with a 16px radius (the card's less 4px).
+- **Layout:** from lg up the guides sit in an 11.5rem rail: a 3.5% ink panel inset 0.5rem from the window's edges, set apart by its fill rather than a rule, with an 8px radius (concentric with the window's 16px); Primitives (three columns) and Composables (two) sit beside it. Every group name is Bricolage 0.875rem semibold in ink; component groups add a tabular count. Below md the sheet is flush with the card, so it drops the ring and rim and keeps only the shadow below it.
+- **Link:** 32px tall, 8px inline padding, 0.875rem Quiet Ink label. Hover: ink label on a surface-hover wash (8px radius), instant both ways (no transition). Focus: a 2px ring inset.
+- **Current page:** 500-weight ink label with a 6px blue mark that grows in and pushes the name over (300ms ease-out-expo). The list opens scrolled to it.
+- **Keyboard:** the window takes focus on open; the first arrow key lands on the current page, then up and down walk the links in reading order; Escape closes and returns focus to the trigger.
+- **Motion:** the window opens from 97% scale and 6px up, from an origin under the trigger: opacity 120ms ease-out, scale and position 220ms ease-out-expo, on its own layer. It closes in 150ms ease-out. A scrim at 10% ink (45% black in dark) covers the card, which becomes inert. Under reduced motion it only fades.
 
 ### Preview Stage
 - **Container:** page fill, 18px radius, 1px hairline ring, 16rem minimum height (12rem on mobile for the first stage), content centered with 52px top, 24px sides, 40px bottom padding.

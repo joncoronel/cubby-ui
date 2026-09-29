@@ -19,6 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/registry/default/dropdown-menu/dropdown-menu";
+import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 import { cn } from "@/lib/utils";
 import type { ShelfGroup } from "@/lib/docs-nav";
 import { useDocsPageState } from "./docs-page-store";
@@ -47,6 +48,31 @@ function SectionCrumb() {
   const { toc, activeId, pastTitle } = useDocsPageState();
   const active = toc.find((item) => item.url === `#${activeId}`);
 
+  // Opening a long list lands on the section you're in. Set on the list
+  // itself: scrollIntoView scrolled the page behind the menu instead. The
+  // menu focuses its first item as it opens, which scrolls the list back to
+  // the top, so it centres once more after that.
+  const landOnActive = React.useCallback((viewport: HTMLDivElement | null) => {
+    if (!viewport) return;
+    const centre = (): void => {
+      const item = viewport.querySelector('[aria-current="location"]');
+      if (!item) return;
+      const itemBox = item.getBoundingClientRect();
+      const box = viewport.getBoundingClientRect();
+      // Whole pixels: a fractional offset (at 175% scaling, say) gets
+      // rounded by the next write to it, the first hover, so the list
+      // jumped half a pixel.
+      viewport.scrollTop = Math.round(
+        viewport.scrollTop +
+          itemBox.top -
+          box.top -
+          (box.height - itemBox.height) / 2,
+      );
+    };
+    viewport.addEventListener("focusin", centre, { once: true });
+    requestAnimationFrame(centre);
+  }, []);
+
   if (!pastTitle || !active || toc.length === 0) return null;
 
   return (
@@ -65,23 +91,33 @@ function SectionCrumb() {
         <span className="sr-only">Jump to section, current: </span>
         <MorphText truncate>{toPlainText(active.title)}</MorphText>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="start"
-        className="max-h-[min(24rem,var(--available-height))] min-w-56"
-      >
-        {toc.map((item) => (
-          <DropdownMenuItem
-            key={item.url}
-            render={<a href={item.url} />}
-            className={cn(
-              item.depth > 2 && "pl-6",
-              item.depth > 3 && "pl-9",
-              item.url === `#${activeId}` && "text-foreground font-medium",
-            )}
-          >
-            {item.title}
-          </DropdownMenuItem>
-        ))}
+      <DropdownMenuContent align="start" className="min-w-56">
+        {/* The list scrolls itself: a height cap on the menu only clipped it,
+            since the menu's own scroller sits inside the cap. */}
+        <ScrollArea
+          viewportRef={landOnActive}
+          fadeEdges="y"
+          overscrollBehavior="contain"
+          viewportClassName="max-h-[min(24rem,calc(var(--available-height)-0.5rem))]"
+        >
+          {toc.map((item) => {
+            const isActive = item.url === `#${activeId}`;
+            return (
+              <DropdownMenuItem
+                key={item.url}
+                render={<a href={item.url} />}
+                aria-current={isActive ? "location" : undefined}
+                className={cn(
+                  item.depth > 2 && "pl-6",
+                  item.depth > 3 && "pl-9",
+                  isActive && "text-foreground font-medium",
+                )}
+              >
+                {item.title}
+              </DropdownMenuItem>
+            );
+          })}
+        </ScrollArea>
       </DropdownMenuContent>
     </DropdownMenu>
   );

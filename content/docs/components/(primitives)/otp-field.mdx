@@ -58,7 +58,10 @@ Set `placeholder` on each `OTPFieldInput` to show a hint that hides when the slo
 
 Restrict input to specific characters, with shake feedback on invalid input via the bundled `useInvalidFeedback` hook.
 
-<ComponentPreview component="otp-field" example="otp-field-custom-sanitization" />
+<ComponentPreview
+  component="otp-field"
+  example="otp-field-custom-sanitization"
+/>
 
 ### Masked Entry
 
@@ -72,7 +75,7 @@ On a Card, Dialog, or popover surface, the opaque `default` slots collapse into 
 
 <ComponentPreview component="otp-field" example="otp-field-elevated" />
 
-| Variant    | Description                                                 |
+| Variant    | Description                                                |
 | ---------- | ---------------------------------------------------------- |
 | `default`  | Opaque `bg-input` slots for page-level surfaces.           |
 | `elevated` | Translucent slots for use inside Card, Dialog, or popover. |
@@ -93,13 +96,13 @@ For the complete Base UI API, see the [Base UI OTP Field documentation](https://
 
 #### OTPField
 
-Groups all OTP field parts and manages their state. Wraps Base UI's `OTPField.Root`. Renders a `<div>`.
+Groups all OTP field parts and manages their state. Wraps Base UI's `OTPField.Root`. Renders a `<div>`, plus a single focus ring that slides to whichever slot has focus.
 
 No custom props. All Base UI Root props are passed through, including `length`, `value`, `onValueChange`, `validationType`, `mask`, `normalizeValue`, and `onValueInvalid`.
 
 #### OTPFieldInput
 
-Individual character input slot. Wraps Base UI's `OTPField.Input`. Renders an `<input>`.
+Individual character input slot. Wraps Base UI's `OTPField.Input`. Renders an `<input>` inside a slot `<span>`; `className` and `style` go to the slot. The input's own text and caret are hidden, and each character rolls in through [Text Morph](/docs/components/text-morph). The `render` prop isn't supported.
 
 <ApiPropsList>
 
@@ -109,7 +112,9 @@ Individual character input slot. Wraps Base UI's `OTPField.Input`. Renders an `<
   simpleType="string"
   defaultValue='"default"'
 >
-  Surface appearance of the slot. `default` uses opaque `bg-input`. `elevated` uses translucent `bg-input-elevated` for use inside Card, Dialog, or popover surfaces. See the [Surfaces](/docs/getting-started/surfaces) docs.
+  Surface appearance of the slot. `default` uses opaque `bg-input`. `elevated`
+  uses translucent `bg-input-elevated` for use inside Card, Dialog, or popover
+  surfaces. See the [Surfaces](/docs/getting-started/surfaces) docs.
 </ApiProp>
 
 </ApiPropsList>
@@ -121,7 +126,8 @@ Visual separator between input groups. Wraps Base UI's `Separator`. Renders a `<
 <ApiPropsList>
 
 <ApiProp name="children" fullType="ReactNode" simpleType="node">
-  Content to render inside the separator. Defaults to a horizontal dash icon when no children are provided.
+  Content to render inside the separator. Defaults to a horizontal dash icon
+  when no children are provided.
 </ApiProp>
 
 </ApiPropsList>
@@ -135,7 +141,9 @@ Layout wrapper for grouping inputs together. Not a Base UI component; renders a 
 #### useInvalidFeedback
 
 ```ts
-function useInvalidFeedback(options?: UseInvalidFeedbackOptions): UseInvalidFeedbackReturn;
+function useInvalidFeedback(
+  options?: UseInvalidFeedbackOptions,
+): UseInvalidFeedbackReturn;
 ```
 
 Manages shake animation and screen reader feedback for invalid OTP input. Bundled with the component, installed automatically when you install `otp-field`.
@@ -179,10 +187,10 @@ const invalidFeedback = useInvalidFeedback();
 
 ##### Returns
 
-| Property | Type | Description |
-| --- | --- | --- |
-| `handleValueChange` | `() => void` | Clears invalid feedback. Wire to `OTPField`'s `onValueChange`. |
-| `handleValueInvalid` | `(value: string) => void` | Triggers shake animation and status message. Wire to `OTPField`'s `onValueInvalid`. |
-| `getInvalidClassName` | `(index: number) => string \| undefined` | Returns the shake animation className for the active invalid slot, or `undefined`. |
-| `setFocusedIndex` | `(index: number) => void` | Tracks which slot is focused. Wire to each input's `onFocus`. |
-| `statusMessage` | `string` | Screen reader announcement. Render inside an `aria-live="polite"` region. |
+| Property              | Type                                     | Description                                                                         |
+| --------------------- | ---------------------------------------- | ----------------------------------------------------------------------------------- |
+| `handleValueChange`   | `() => void`                             | Clears invalid feedback. Wire to `OTPField`'s `onValueChange`.                      |
+| `handleValueInvalid`  | `(value: string) => void`                | Triggers shake animation and status message. Wire to `OTPField`'s `onValueInvalid`. |
+| `getInvalidClassName` | `(index: number) => string \| undefined` | Returns the shake animation className for the active invalid slot, or `undefined`.  |
+| `setFocusedIndex`     | `(index: number) => void`                | Tracks which slot is focused. Wire to each input's `onFocus`.                       |
+| `statusMessage`       | `string`                                 | Screen reader announcement. Render inside an `aria-live="polite"` region.           |

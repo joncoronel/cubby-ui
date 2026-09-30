@@ -67,8 +67,9 @@ export interface UseInvalidFeedbackReturn {
   statusMessage: string;
 }
 
-const SHAKE_CLASS_A = "otp-field-shake-a focus:outline-destructive/80";
-const SHAKE_CLASS_B = "otp-field-shake-b focus:outline-destructive/80";
+// The field's focus ring shakes and tints red along with the slot.
+const SHAKE_CLASS_A = "otp-field-shake-a";
+const SHAKE_CLASS_B = "otp-field-shake-b";
 
 /**
  * Hook that manages shake animation and screen reader feedback

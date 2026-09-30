@@ -1126,7 +1126,9 @@ export const componentMetadata = {
     "title": "Otp Field",
     "description": "A otp-field component.",
     "category": "UI",
-    "registryDependencies": [],
+    "registryDependencies": [
+      "@cubby-ui/text-morph"
+    ],
     "dependencies": [],
     "examples": {},
     "reference": []

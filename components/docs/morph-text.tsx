@@ -2,7 +2,10 @@
 
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { TextMorph } from "@/registry/default/text-morph/text-morph";
+import {
+  TextMorph,
+  type TextMorphSplit,
+} from "@/registry/default/text-morph/text-morph";
 
 /** Labels that answer a click (Copied, Hide code) move in 209ms. */
 export const FEEDBACK_MS = 209;
@@ -29,6 +32,9 @@ export function toPlainText(node: React.ReactNode): string {
  * `truncate` is for labels that can outgrow their space (the header crumb,
  * the mobile pill): it clips, and fades the right edge only while the
  * settled text doesn't fit.
+ *
+ * `split="word"` is for names (page and section titles): each word is one
+ * kerned box, where letters split one per box read loosely spaced.
  */
 export function MorphText({
   children,
@@ -36,6 +42,7 @@ export function MorphText({
   truncate = false,
   feedback = false,
   disableAnimation = false,
+  split,
 }: {
   children: string;
   className?: string;
@@ -43,6 +50,7 @@ export function MorphText({
   feedback?: boolean;
   /** Swap without animating (a change the reader didn't cause). */
   disableAnimation?: boolean;
+  split?: TextMorphSplit;
 }) {
   const clipRef = React.useRef<HTMLSpanElement>(null);
   const [overflowing, setOverflowing] = React.useState(false);
@@ -76,6 +84,7 @@ export function MorphText({
       value={children}
       duration={feedback ? FEEDBACK_MS : undefined}
       disableAnimation={disableAnimation}
+      split={split}
       onMorphComplete={truncate ? checkFit : undefined}
       className={truncate ? undefined : className}
     />

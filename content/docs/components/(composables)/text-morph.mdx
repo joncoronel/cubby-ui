@@ -106,6 +106,22 @@ Animates its `value` from one text to the next, glyph by glyph.
   between. Each mode brings its own defaults for every [option](#options).
 </ApiProp>
 
+<ApiProp
+  name="split"
+  fullType='"glyph" | "word" | "auto"'
+  defaultValue='"glyph"'
+>
+  What the text is split into. `glyph` gives every letter its own box, so
+  letters can move on their own (Copy to Copied keeps "Cop"). The font can't
+  kern across boxes, so a proportional font reads slightly loose. `word` keeps
+  each word whole and spaced like plain text, and changes word by word. `auto`
+  splits by word once the value has a space, tab or line break, and by letter
+  otherwise, so a change across that line (Copied to Copied link) crossfades.
+  Numbers change digit by digit in all three. A new `split` takes effect from
+  the next change of value. Use `word` for names such as page titles, where
+  letter-level motion adds little.
+</ApiProp>
+
 <ApiProp name="duration" fullType="number">
   How long movement takes, in ms. The mode's whole clock scales with it (fades,
   width and stagger), so the look holds. Use a shorter one for labels that
@@ -266,7 +282,7 @@ Other `data-*` attributes inside the label are internal and may change. The comp
 - **Off screen.** A change to a label that isn't on screen at that moment, or in a background tab, swaps instantly.
 - **Width.** A change that stays on one line eases the box to its new width, so text after an inline `TextMorph` slides instead of jumping. A change that wraps keeps the lines as they fall, without the width animation or the edge fade.
 - **Height.** Inline, the label's height is its lines', so gaining or losing a line changes it at once. Give it `className="block"` (it's a box already inside a flex or grid container) and a change of line count eases its height too, so the card or paragraph around it grows and shrinks smoothly. For `inline-block`, add `align-top`: aligned on its last line's baseline, an inline-block stretches its line to the new height at once as it grows.
-- **Languages.** Right-to-left text works, and a label reads in its own direction inside text of the other. A word in a script whose letters join or stack (Arabic, Persian, Urdu, Hindi and the other Indic scripts, Thai, Khmer and others) animates as a whole word so it stays correctly shaped; other text animates letter by letter. Numbers in any script's digits match by place value.
+- **Languages.** Right-to-left text works, and a label reads in its own direction inside text of the other. A word in a script whose letters join or stack (Arabic, Persian, Urdu, Hindi and the other Indic scripts, Thai, Khmer and others) animates as a whole word so it stays correctly shaped; other text animates letter by letter, or word by word with `split`. Numbers in any script's digits match by place value.
 - **Spaces.** Spaces show as typed: a run of them isn't collapsed to one, and a `\n` in the value starts a new line.
 - **Empty values.** An empty value keeps its line's height, so the text around it doesn't jump.
 - **Keep `render` on one element type.** Switching it to a different element or component while mounted remounts the label with its first value's glyphs.

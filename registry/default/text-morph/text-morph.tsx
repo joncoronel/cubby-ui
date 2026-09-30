@@ -12,6 +12,7 @@ import {
   matchText,
   textUnits,
   type GlyphKind,
+  type TextMorphSplit,
 } from "./lib/match";
 import {
   resolveOptions,
@@ -96,10 +97,10 @@ function escapeHtml(text: string): string {
 }
 
 /** Server markup: words of glyphs, with spaces between them. */
-function glyphsHtml(text: string): string {
+function glyphsHtml(text: string, split: TextMorphSplit): string {
   let html = "";
   let word = "";
-  for (const glyph of textUnits(text)) {
+  for (const glyph of textUnits(text, split)) {
     if (isBreak(glyph)) {
       if (word) html += `<span data-word>${word}</span>`;
       word = "";
@@ -258,7 +259,7 @@ type MorphElements = {
 
 function* morphTo(
   { root, stage, glyphLayer, ghostAnchor, ghostLayer }: MorphElements,
-  value: string,
+  next: string[],
   options: ResolvedOptions,
   place: { decimal: string; caret: number | undefined },
   playback: () => Playback,
@@ -278,7 +279,6 @@ function* morphTo(
   const old = Array.from(
     glyphLayer.querySelectorAll<HTMLElement>("[data-glyph]"),
   );
-  const next = textUnits(value);
 
   // 1. Read: where everything is on screen right now, and what's running.
   const play = playback();
@@ -1142,6 +1142,8 @@ export type TextMorphProps = Omit<
   value: string | number;
   /** How changes animate; each mode brings its own defaults. */
   mode?: TextMorphMode;
+  /** Letters (`glyph`, the default), words, or `auto`: see `TextMorphSplit`. */
+  split?: TextMorphSplit;
   /**
    * How long movement takes, in ms: the mode's whole clock (fades, width,
    * stagger) scales with it, so the look holds. Shorter for labels that
@@ -1211,6 +1213,7 @@ function formatValue(
 function TextMorph({
   value: rawValue,
   mode = "blend",
+  split = "glyph",
   duration,
   options,
   locale = "en",
@@ -1232,7 +1235,9 @@ function TextMorph({
   const ghostAnchorRef = React.useRef<HTMLSpanElement>(null);
   const ghostLayerRef = React.useRef<HTMLSpanElement>(null);
   // Set once: after that this component owns the glyph markup.
-  const [initialHtml] = React.useState(() => ({ __html: glyphsHtml(value) }));
+  const [initialHtml] = React.useState(() => ({
+    __html: glyphsHtml(value, split),
+  }));
   const shown = React.useRef(value);
   const resolved = resolveOptions(mode, options, duration);
   const latest = React.useRef({
@@ -1243,6 +1248,7 @@ function TextMorph({
     onMorphComplete,
     onMorphCancel,
     cursorIndex,
+    split,
   });
   React.useLayoutEffect(() => {
     latest.current = {
@@ -1253,6 +1259,7 @@ function TextMorph({
       onMorphComplete,
       onMorphCancel,
       cursorIndex,
+      split,
     };
   });
 
@@ -1321,7 +1328,7 @@ function TextMorph({
       root,
       steps: morphTo(
         { root, stage, glyphLayer, ghostAnchor, ghostLayer },
-        value,
+        textUnits(value, current.split),
         current.options,
         { decimal: decimalFor(locale), caret: current.cursorIndex },
         // Read in the batch's first read phase, with the others.
@@ -1391,6 +1398,7 @@ function TextMorph({
 
 export { TextMorph };
 export { MODE_DEFAULTS } from "./lib/options";
+export type { TextMorphSplit } from "./lib/match";
 export type {
   TextMorphMode,
   TextMorphOptions,

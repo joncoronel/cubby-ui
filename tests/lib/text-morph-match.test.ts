@@ -263,6 +263,30 @@ describe("textUnits", () => {
     expect(textUnits("שלום")).toEqual(Array.from("שלום"));
   });
 
+  it("keeps words whole by word, and numbers and punctuation per grapheme", () => {
+    expect(textUnits("Text Morph", "word")).toEqual(["Text", " ", "Morph"]);
+    expect(textUnits("Button", "word")).toEqual(["Button"]);
+    expect(textUnits("Save $1,204, now!", "word")).toEqual([
+      "Save",
+      " ",
+      ...Array.from("$1,204,"),
+      " ",
+      "now",
+      "!",
+    ]);
+  });
+
+  it("keeps a word holding a digit whole by word, joining or not", () => {
+    expect(textUnits("OAuth2 setup", "word")).toEqual(["OAuth2", " ", "setup"]);
+    expect(textUnits("قسم1", "word")).toEqual(textUnits("قسم1"));
+    expect(textUnits("قسم1", "word")).toHaveLength(1);
+  });
+
+  it("splits by word only once a value has a space, on auto", () => {
+    expect(textUnits("Copied", "auto")).toEqual(Array.from("Copied"));
+    expect(textUnits("Copied link", "auto")).toEqual(["Copied", " ", "link"]);
+  });
+
   it("keeps a word in a joining script whole", () => {
     expect(textUnits("التجربة النهائية")).toEqual(["التجربة", " ", "النهائية"]);
   });

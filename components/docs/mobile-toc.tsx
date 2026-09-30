@@ -114,7 +114,11 @@ export function MobileToc({ toc }: { toc: TOCItemType[] }) {
         >
           <ProgressRing />
           <span className="sr-only">On this page, current section: </span>
-          <MorphText truncate className="text-foreground font-medium">
+          <MorphText
+            truncate
+            split="word"
+            className="text-foreground font-medium"
+          >
             {toPlainText(current?.title)}
           </MorphText>
           <HugeiconsIcon

@@ -91,7 +91,9 @@ function SectionCrumb() {
           /
         </span>
         <span className="sr-only">Jump to section, current: </span>
-        <MorphText truncate>{toPlainText(active.title)}</MorphText>
+        <MorphText truncate split="word">
+          {toPlainText(active.title)}
+        </MorphText>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="min-w-56">
         {/* The list scrolls itself: a height cap on the menu only clipped it,
@@ -213,7 +215,7 @@ export function DocsHeader({ groups }: { groups: ShelfGroup[] }) {
                     {/* The text-roll element sets its own display, so the responsive
                         visibility lives on a wrapper. */}
                     <span className="text-muted-foreground hidden shrink-0 sm:inline">
-                      <MorphText>{current.group.label}</MorphText>
+                      <MorphText split="word">{current.group.label}</MorphText>
                     </span>
                     <span
                       aria-hidden="true"
@@ -221,7 +223,11 @@ export function DocsHeader({ groups }: { groups: ShelfGroup[] }) {
                     >
                       /
                     </span>
-                    <MorphText truncate className="text-foreground font-medium">
+                    <MorphText
+                      truncate
+                      split="word"
+                      className="text-foreground font-medium"
+                    >
                       {current.item.name}
                     </MorphText>
                   </>

@@ -90,18 +90,38 @@ const JOINING =
   /(?=[\p{L}\p{M}])[\p{Script=Arabic}\p{Script=Syriac}\p{Script=Nko}\p{Script=Mongolian}\p{Script=Mandaic}\p{Script=Adlam}\p{Script=Hanifi_Rohingya}\p{Script=Thaana}\p{Script=Devanagari}\p{Script=Bengali}\p{Script=Gurmukhi}\p{Script=Gujarati}\p{Script=Oriya}\p{Script=Tamil}\p{Script=Telugu}\p{Script=Kannada}\p{Script=Malayalam}\p{Script=Sinhala}\p{Script=Tibetan}\p{Script=Thai}\p{Script=Lao}\p{Script=Khmer}\p{Script=Myanmar}]/u;
 
 /**
+ * What a value is split into. `glyph`: a box per letter, so letters can
+ * move on their own (Copy → Copied keeps Cop), at the cost of kerning, which
+ * a font applies only within one box. `word`: a box per word, kerned as
+ * plain text, changing word by word. `auto`: words once the value has a
+ * space, tab or line break, letters otherwise; a change across that line
+ * (Copied → Copied link) shares no box, so it crossfades. Numbers go digit
+ * by digit in all three. It takes effect from the next change of value.
+ */
+export type TextMorphSplit = "glyph" | "word" | "auto";
+
+const LETTER = /\p{L}/u;
+const HAS_BREAK = /[ \t\n]/;
+
+/**
  * The units a value animates in: one per grapheme, except that a word
  * written in a script whose letters shape together stays whole. Its letters
  * take their joined or stacked forms only when drawn together, so splitting
- * it would render each alone. Everything else, digits included, is still
- * per grapheme.
+ * it would render each alone. By word, every word with a letter stays
+ * whole (v2 and OAuth2 included); spaces, punctuation, emoji and numbers are
+ * still per grapheme, so numbers match by place value as before.
  */
-export function textUnits(text: string): string[] {
-  if (!JOINING.test(text)) return graphemes(text);
+export function textUnits(
+  text: string,
+  split: TextMorphSplit = "glyph",
+): string[] {
+  const byWord = split === "word" || (split === "auto" && HAS_BREAK.test(text));
+  if (!byWord && !JOINING.test(text)) return graphemes(text);
   const words = segment(text, "word");
-  return words.flatMap((word) =>
-    JOINING.test(word) ? [word] : graphemes(word),
-  );
+  return words.flatMap((word) => {
+    const whole = JOINING.test(word) || (byWord && LETTER.test(word));
+    return whole ? [word] : graphemes(word);
+  });
 }
 
 /**

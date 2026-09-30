@@ -17,6 +17,8 @@ interface ApiPropProps {
 
 /** A type this long can't fit the row on one line, so it's cut short there. */
 const LONG_TYPE = 48;
+/** A default this long may be cut short on a phone, so the open row shows it. */
+const LONG_DEFAULT = 16;
 
 /**
  * One prop as a row that opens: one line carries what you scan for (name,
@@ -72,6 +74,12 @@ export function ApiProp({
             <span>Type</span>
             <code>{fullType}</code>
           </p>
+          {defaultValue !== undefined && defaultValue.length > LONG_DEFAULT && (
+            <p className="docs-prop-full" data-long="">
+              <span>Default</span>
+              <code>{defaultValue}</code>
+            </p>
+          )}
         </div>
       </Collapsible.Panel>
     </Collapsible.Root>

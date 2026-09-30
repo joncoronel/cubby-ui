@@ -10,7 +10,8 @@ const LEVELS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
 export function SurfaceTokensDemo() {
   return (
     <div className="not-prose bg-background flex flex-col gap-6 rounded-xl border px-4 py-8">
-      <div className="flex items-end justify-between gap-2">
+      {/* Two rows of four on a phone: eight in one row ran past the page. */}
+      <div className="grid grid-cols-4 justify-items-center gap-x-2 gap-y-6 sm:flex sm:items-end sm:justify-between">
         {LEVELS.map((level) => (
           <div key={level} className="flex flex-col items-center gap-3">
             <div

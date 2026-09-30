@@ -1035,12 +1035,16 @@
   display: inline-flex;
   align-items: baseline;
   gap: 0.375rem;
-  flex-shrink: 0;
+  /* Shrinks only once the type has given up its room: a long default is
+     cut short here (and shown whole when the row opens) rather than pushing
+     the row, and a phone's page, wider than the screen. */
+  min-width: 0;
   font-size: 0.75rem;
   color: var(--muted-foreground);
   white-space: nowrap;
 }
 .docs-prop-default code {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   font-family: var(--font-mono);

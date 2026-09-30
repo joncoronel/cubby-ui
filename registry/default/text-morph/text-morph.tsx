@@ -1348,7 +1348,7 @@ function TextMorph({
   const defaultProps = {
     "data-slot": "text-morph",
     "data-mode": mode,
-    className: cn("text-morph", className),
+    className: cn(className),
     children: (
       <>
         {/* Keyed by the value: a page machine-translated in place swaps

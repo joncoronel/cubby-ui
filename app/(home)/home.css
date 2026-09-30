@@ -1,29 +1,85 @@
-/* Homepage-scoped motion. Class-prefixed with `home-` so nothing here can leak
-   into /docs or the component registry. Pure load animations (not JS-gated
-   transitions), so they still resolve to their final state in headless renders. */
+/* The landing page's own look, scoped to `.landing` (and `.land-vars` for
+   the phone menu, which renders outside it) so none of it reaches /docs or
+   the registry. A drenched ultramarine slab holds the nav, hero and close;
+   the page between them keeps the app's background. */
 
-@keyframes home-rise {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.landing,
+.land-vars {
+  --land-field: oklch(0.47 0.2 264);
+  --land-on-field: oklch(0.985 0.008 264);
+  --land-on-field-muted: oklch(0.87 0.05 264);
+  --land-field-line: oklch(1 0 0 / 0.16);
+  /* The install command's component name: Cubby Blue, deepened (light) or
+     lifted (dark) so small mono text clears 4.5:1 on the muted bar. */
+  --land-slug: oklch(0.5 0.2 258);
 }
 
-.home-reveal {
-  opacity: 0;
-  /* ease-out-expo, matching the design system's snappy-settle curve */
-  animation: home-rise 0.8s cubic-bezier(0.19, 1, 0.22, 1) both;
-  animation-delay: var(--reveal-delay, 0ms);
+/* The page between the slabs is the app's own background, the same as the
+   docs, so only the slab carries the landing's colour. */
+.landing {
+  background-color: var(--background);
+}
+
+.dark .landing,
+.dark .land-vars {
+  --land-field: oklch(0.37 0.16 264);
+  --land-on-field-muted: oklch(0.84 0.05 264);
+  --land-field-line: oklch(1 0 0 / 0.12);
+  --land-slug: oklch(0.76 0.13 255);
+}
+
+/* The slab: inset from the page edge like the docs' card, so the two
+   surfaces share a shape while looking nothing alike. */
+.land-slab {
+  background-color: var(--land-field);
+  color: var(--land-on-field);
+  border-radius: 1.75rem;
+}
+.landing ::selection {
+  background: color-mix(in oklab, var(--land-field) 24%, transparent);
+}
+.landing {
+  caret-color: var(--land-field);
+}
+.land-slab ::selection {
+  background: oklch(1 0 0 / 0.28);
+}
+/* The showcase stage is a white card on the slab: back to the page's
+   selection, or selected text there went white on white. */
+.land-slab .land-stage ::selection {
+  background: color-mix(in oklab, var(--land-field) 24%, transparent);
+}
+
+/* The active showcase tab fills over its dwell, so the swap reads as
+   the page moving on, not a glitch. */
+@keyframes land-dwell {
+  from {
+    transform: scaleX(0);
+  }
+}
+.land-dwell {
+  transform-origin: left;
+  animation: land-dwell var(--dwell) linear both;
+}
+
+/* The hero's first paint: one rise, headline to stage. */
+@keyframes land-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+.land-rise {
+  animation: land-rise 0.8s cubic-bezier(0.19, 1, 0.22, 1) both;
+  animation-delay: var(--rise-delay, 0ms);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .home-reveal {
-    opacity: 1;
-    transform: none;
+  .land-rise {
     animation: none;
+  }
+  /* Nothing advances on its own under reduced motion, so no dwell line. */
+  .land-dwell {
+    display: none;
   }
 }

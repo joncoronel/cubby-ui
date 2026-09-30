@@ -25,6 +25,15 @@ colors:
   dark-foreground: "oklch(0.94 0.004 270)"
   dark-muted-foreground: "oklch(0.73 0.004 270)"
   dark-chrome: "oklch(0.159 0.004 270)"
+  landing-field: "oklch(0.47 0.2 264)"
+  landing-on-field: "oklch(0.985 0.008 264)"
+  landing-on-field-muted: "oklch(0.87 0.05 264)"
+  landing-field-line: "oklch(1 0 0 / 0.16)"
+  landing-slug: "oklch(0.5 0.2 258)"
+  dark-landing-field: "oklch(0.37 0.16 264)"
+  dark-landing-slug: "oklch(0.76 0.13 255)"
+  dark-landing-on-field-muted: "oklch(0.84 0.05 264)"
+  dark-landing-field-line: "oklch(1 0 0 / 0.12)"
 typography:
   display:
     fontFamily: "Bricolage Grotesque, ui-sans-serif, system-ui, sans-serif"
@@ -45,6 +54,18 @@ typography:
     fontWeight: 600
     lineHeight: 1.3
     letterSpacing: "-0.01em"
+  landing-display:
+    fontFamily: "Bricolage Grotesque, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "4.5rem"
+    fontWeight: 600
+    lineHeight: 0.98
+    letterSpacing: "-0.04em"
+  landing-section:
+    fontFamily: "Bricolage Grotesque, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "3rem"
+    fontWeight: 600
+    lineHeight: 1.05
+    letterSpacing: "-0.03em"
   lead:
     fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
     fontSize: "1.125rem"
@@ -73,6 +94,8 @@ rounded:
   xl: "14px"
   2xl: "16px"
   stage: "18px"
+  landing-card: "20px"
+  landing-slab: "28px"
   full: "999px"
 spacing:
   flow: "1.25rem"
@@ -83,6 +106,8 @@ spacing:
   header-height: "3.5rem"
   content: "48rem"
   chrome-max: "76rem"
+  landing-max: "80rem"
+  landing-section-above: "8rem"
 components:
   button-primary:
     backgroundColor: "{colors.primary}"
@@ -127,6 +152,40 @@ components:
     textColor: "{colors.foreground}"
     rounded: "{rounded.xl}"
     padding: "14px 18px"
+  landing-slab:
+    backgroundColor: "{colors.landing-field}"
+    textColor: "{colors.landing-on-field}"
+    rounded: "{rounded.landing-slab}"
+  landing-button-primary:
+    backgroundColor: "{colors.landing-on-field}"
+    textColor: "{colors.landing-field}"
+    rounded: "{rounded.full}"
+    padding: "0 16px 0 20px"
+    height: "44px"
+  landing-button-secondary:
+    textColor: "{colors.landing-on-field}"
+    rounded: "{rounded.full}"
+    padding: "0 20px"
+    height: "44px"
+  landing-tab-current:
+    backgroundColor: "{colors.landing-on-field}"
+    textColor: "{colors.landing-field}"
+    rounded: "{rounded.full}"
+    padding: "0 12px"
+    height: "32px"
+  landing-command-bar:
+    textColor: "{colors.foreground}"
+    typography: "{typography.mono}"
+    padding: "10px 8px 10px 16px"
+  landing-gallery-card:
+    textColor: "{colors.foreground}"
+    rounded: "{rounded.landing-card}"
+    padding: "4px"
+  landing-phone-menu:
+    backgroundColor: "{colors.landing-field}"
+    textColor: "{colors.landing-on-field}"
+    rounded: "{rounded.landing-slab}"
+    padding: "8px"
 ---
 
 # Design System: Cubby UI
@@ -139,7 +198,9 @@ A well-made wooden shelf of labeled cubbies: everything has a place, the place i
 
 Density is calm and reading-first. Pages sit in one centered column with generous vertical rhythm; controls stay small, muted until touched, and brighten to full foreground on hover. Motion is a single settle curve (ease-out-expo) that opens slowly and closes quickly, and every motion collapses to a plain opacity change under reduced motion.
 
-Light and dark are both designed. Light keeps fills neutral and lets layered shadow carry elevation; dark steps lightness up a tinted ladder and adds a lit top rim. The home page adds one ornament, the cubby mark printed as a feathered dot-matrix field behind the hero; the docs surface carries the same mark as a four-cell glyph in its shelf trigger.
+Light and dark are both designed. Light keeps fills neutral and lets layered shadow carry elevation; dark steps lightness up a tinted ladder and adds a lit top rim. The docs surface carries the cubby mark as a four-cell glyph in its shelf trigger.
+
+This system is the docs world. The landing page (`app/(home)`) is deliberately its own world, scoped under `.landing`: it keeps the fonts, the page background, the ladder and the registry components, and adds only an ultramarine slab. Everything below applies to the docs; where the landing departs, the **Landing page** section at the end is normative inside `.landing` and nowhere else.
 
 **Key Characteristics:**
 - Neutrals tinted toward hue 270 at very low chroma (0.004, 0.002 near the extremes), tuned from three root variables.
@@ -185,10 +246,10 @@ A cool, faintly violet-tinted neutral stack with a single saturated blue, expres
 **Character:** Bricolage brings the warmth and a slightly wonky, printed confidence at large sizes, and optical sizing tightens it automatically as it grows. Geist keeps the reading and the controls neutral and precise underneath.
 
 ### Hierarchy
-- **Display** (600, `{typography.display}`: 2.75rem desktop, 2.25rem mobile, line-height 1.05, -0.03em, balanced): page titles. The home hero uses the same cut at 2.5rem, 3rem, and 3.75rem across breakpoints, capped at 18ch.
+- **Display** (600, `{typography.display}`: 2.75rem desktop, 2.25rem mobile, line-height 1.05, -0.03em, balanced): page titles. The landing's display sizes live in the Landing page section.
 - **Headline** (600, 1.625rem, 1.2, -0.02em): docs h2 and section anchors.
 - **Title** (600, 1.1875rem, 1.3, -0.01em): docs h3. The footer's next/previous names use Bricolage at 1.25rem.
-- **Lead** (400, 1.125rem, 1.625, Quiet Ink): the description under a title, capped at 52ch on docs and 58ch on home.
+- **Lead** (400, 1.125rem, 1.625, Quiet Ink): the description under a title, capped at 52ch.
 - **Body** (400, 1rem, 1.75): docs prose, column-capped at 48rem, `text-wrap: pretty`. h4 to h6 stay in Geist at 1rem, 600.
 - **Label** (500, 0.8125rem to 0.875rem): shelf links (0.875rem), minimap labels and table headers (0.8125rem), group labels and tool buttons (0.75rem, 500). Numbers are tabular.
 - **Mono** (Geist Mono, 0.8125rem; inline code at 0.84em on a 7% ink plate with a 0.35rem radius).
@@ -205,8 +266,6 @@ The docs page is a card set in a frame. The frame (`--docs-frame`: oklch 0.925 i
 Vertical rhythm is set by the container, not the blocks: siblings flow at `{spacing.flow}`; any component block (preview, table, note) takes `{spacing.block}` above and below; h2 takes `{spacing.headline-above}` above, h3 `{spacing.title-above}`, h4 to h6 2.25rem; the gap after h2 and h3 is `{spacing.heading-below}`, after h4 0.5rem. The page footer sits 6rem below content. Lists indent 1.25rem with 0.375rem between items.
 
 The table of contents is a fixed tick minimap in the right margin at the xl breakpoint (hovering it opens the headings in a PreviewCard to its left); below that it lives in the header's section crumb. The shelf is a window for browsing (finding a page by name is the search dialog's job): from lg up, an inset 11.5rem guides rail, Primitives flowing down three text columns and Composables down two; below lg the guides sit in a row above the groups, each flowing in two or three columns. Heading anchor glyphs hide below 40rem.
-
-The home page is a 64rem (max-w-5xl) viewport-height composition: centered hero stack with 1.5rem internal gaps, 3 to 3.5rem to the category tiles, a slim footer pinned to the bottom.
 
 ## Elevation & Depth
 
@@ -246,10 +305,10 @@ Tactile and small. Paint lives on a `::before` layer so press can scale it witho
 - **Focus:** the shared 2px half-strength ring; the caret is blue on docs.
 
 ### Navigation
-- **Docs header:** 56px, fixed, sitting on the frame above the card; it never changes as the page scrolls. The logo enters as one composited fade and settle (opacity and scale, 600ms), not the home page's drawn stroke, which freezes while the page hydrates.
+- **Docs header:** 56px, fixed, sitting on the frame above the card; it never changes as the page scrolls. The logo enters as one composited fade and settle (opacity and scale, 600ms), not the landing's drawn stroke, which freezes while the page hydrates.
 - **Shelf trigger:** a pill reading "Group / Page" with the four-cell cubby glyph (first cell blue, others at 32% ink) and a chevron that turns 180 degrees. Open state uses surface-selected; the glyph cells spread 0.75px apart.
 - **Section crumb:** a slash and the active section title, which morphs letter by letter when the section changes; it opens a menu of the page's headings.
-- **Home top nav:** the shared search trigger, theme toggle, and GitHub link, reused by the docs header.
+- **Shared controls:** the search trigger, theme toggle and GitHub link (and the nav items) are shared exports the docs header uses; the landing paints its own versions for the slab (see Landing page).
 
 ### The Cubby Shelf (signature)
 Every docs page in one window that grows out of the header's trigger. Below md it is a sheet across the top of the card, scrolling inside it, with rounded bottom corners. From md up it floats: inset 0.5rem from the card, its left edge on the header row's, up to 66rem wide, with a 16px radius (the card's less 4px).
@@ -323,7 +382,6 @@ A block with a header (package-manager or file tabs) sits in the muted tray; a b
 ### Cards / Notes / Tables
 - **Note:** 14px radius, 4% ink wash, 14px by 18px padding, 0.9375rem at 1.65 line height, no border.
 - **Table:** 0.875rem tabular numerals; Quiet Ink 0.8125rem headers over a full hairline; rows split by 7% ink lines.
-- **Home category tiles** rest at ladder rung 3 (shadow plus rim) and lift on hover to rung 6 with a 4px rise.
 
 ## Do's and Don'ts
 
@@ -340,6 +398,56 @@ A block with a header (package-manager or file tabs) sits in the muted tray; a b
 - **Don't** raise the chrome surface with a ladder rung or paint chrome controls by hand; use `data-surface="chrome"`.
 - **Don't** add a second accent hue outside status plates.
 - **Don't** use elastic or bouncy easing on controls.
-- **Don't** use neon glows, gradient meshes, or cool-AI dark-mode effects; the only gradients are the stage's 3.5% light and the feathered mask on the home dot field.
+- **Don't** use neon glows, gradient meshes, or cool-AI dark-mode effects; the only gradients are the stage's 3.5% light and the edge-fade masks on scrolling rows.
 - **Don't** use the reflex fonts PRODUCT.md bans (Inter, DM Sans, Plus Jakarta, Space Grotesk, Fraunces, Playfair, Cormorant, Instrument Serif, Crimson).
 - **Don't** box reading content in shadowed cards on docs; rule it with hairlines or a faint wash.
+
+## Landing page
+
+The landing page (`app/(home)`, styles in `app/(home)/home.css`) is its own world, separate from the docs on purpose. Its tokens are declared on `.landing` (the layout's wrapper) and on `.land-vars`, which carries them to the phone menu, portalled outside `.landing`; none of it reaches `/docs` or the registry. It keeps the docs' fonts, the app's own page background (`.landing` paints `--background`, the same as the docs), the surface ladder (`solidSurface`), the hairline and the registry components; what it adds is a drenched ultramarine slab with near-white ink. Inside `.landing` the slab's tokens override the docs' where they conflict: the slab is painted at hue 264, off Cubby Blue's 250, and is the landing's field, not an accent. Everything off the slab follows the docs, and blue keeps its docs meaning: registry components use Cubby Blue for their own actions and focus, and the command's component name is a contrast-tuned Cubby Blue.
+
+### Colors
+- **Ultramarine Field** (`{colors.landing-field}` / dark `{colors.dark-landing-field}`): the slab, the phone menu, the gallery's closing "browse all" card, text selection (24% mix) and the caret everywhere on the landing.
+- **On Field** (`{colors.landing-on-field}`, the same in both themes): headline, wordmark, the light primary pill and the current tab's fill; also the 2px focus outline on the slab.
+- **On Field Muted** (`{colors.landing-on-field-muted}` / dark `{colors.dark-landing-on-field-muted}`): the headline's second sentence, leads on the slab, idle nav controls and idle tabs.
+- **Field Line** (`{colors.landing-field-line}` / dark `{colors.dark-landing-field-line}`): white at 16% (12% in dark); the secondary pill's inset ring and the hover wash of every control on the field. Selection on the slab is white at 28%.
+- **Slug Blue** (`{colors.landing-slug}` / dark `{colors.dark-landing-slug}`): the component name in the install command, and nothing else. It is Cubby Blue deepened in light and lifted in dark so small mono text clears 4.5:1 on the muted command bar.
+
+**The Paint-On-Field Rule.** Anything set on the ultramarine field paints with the on-field tokens (ink, muted, line) and focuses with a 2px on-field outline; docs tokens (foreground, border, ring) never appear on the slab.
+
+### Typography
+- **Hero** (`{typography.landing-display}`, Bricolage 600, leading 0.98, -0.04em, balanced): 2.625rem base, 3.5rem from sm, 3.75rem from lg, 4.5rem from xl. Two stacked sentences, the second in On Field Muted. The direction contract allowed up to 5.5rem; the build tops out at 4.5rem.
+- **Section title** (`{typography.landing-section}`, Bricolage 600, leading 1.05, -0.03em, balanced): 2.25rem base, 3rem from sm, in ink on the page background.
+- **Close title** (Bricolage 600, leading 1.02, -0.035em): 2.5rem base, 3.75rem from sm, capped at 18ch.
+- **Card titles:** gallery card names in Bricolage 1.1875rem, 600, -0.01em; the browse-all card's line in Bricolage 1.75rem, leading 1.1, -0.02em.
+- **Leads:** hero lead 1.125rem (1.25rem from sm), relaxed leading, On Field Muted, up to 60ch; section leads 1.125rem, relaxed, Quiet Ink; close lead 1.125rem, 42ch.
+- **Command:** Geist Mono 0.8125rem; the slug in weight 500.
+- **Wordmark:** one `Wordmark` component (mark plus name, Bricolage 600, tight tracking, 1.1rem) shared by the nav, the phone menu and the footer.
+
+### Layout
+Two slabs frame the page. The first slab holds the nav and hero; it is inset 8px (12px from sm) from the top and sides, like the docs card, so the two surfaces share a shape while looking nothing alike. Content sits in an 80rem (`{spacing.landing-max}`) container with 20px (40px from sm) side padding. The hero is one column until lg, then copy on the left and a 32rem showcase on the right (gaps 48px, 64px from lg, 80px from xl), vertically centred; hero padding is 40px top and 48px bottom (64px and 80px from lg). Headline to lead 24px, lead to actions 32px, actions 12px apart.
+
+Below the slab, sections open 6rem (8rem from sm, `{spacing.landing-section-above}`) apart, each headed by a title and lead capped at 42rem, then content 48px below. The gallery is a bento: one column, six columns from md with 16px gaps, spanning 4+2, 2+4, 3+3, 3+3. The ownership section is one column, then 5fr to 7fr from lg (gaps 40px, 64px). The close is a second slab, inset the same way, 6rem (8rem) below the last section, centred, with 64px (96px from sm) vertical padding. The footer sits in the same container: 64px top, 48px bottom, wordmark and blurb (20rem) then three link columns (two below sm).
+
+### Elevation & Depth
+The slab is flat colour with no shadow; its edge is the page around it. The hero stage is the one lifted card: rung 3 fill with rung 6 shadow (`solidSurface(3, 6)`), floating on the slab. Gallery cards are the docs' example tray instead: the code block's muted fill with the rung 1 hairline ring (`solidSurface(3, 1)` over `bg-muted`), holding the live component on the page background. Nothing lifts on hover.
+
+**The Components-Keep-Their-Surface Rule.** Live components sit on a card, never straight on the field: the page background inside a tray on the page, a ladder card on the slab, so they show on the surface they were designed for.
+
+### Shapes
+The slab and the phone menu are 28px (`{rounded.landing-slab}`, 1.75rem); the hero stage and the gallery trays are 20px (`{rounded.landing-card}`), the tray's inner card 16px so the corners stay concentric. Every control on the landing is a pill: the 48px menu actions, 44px slab actions, 40px menu close, 36px nav controls and Get started, 32px tabs, and the 36px round docs arrow under each gallery card.
+
+### Components
+- **Landing nav:** 64px, set on the slab rather than above it: logo and wordmark left, the nav items absolutely centred from md, then search, theme, GitHub (from sm) and a 36px Get started pill (from md); below md a menu button opens the phone menu. Controls are 36px pills in On Field Muted, going to On Field on a Field Line wash on hover.
+- **Slab actions:** a 44px light pill (On Field fill, field label, 0.9375rem 500, trailing chevron; hover drops to 90% opacity) and a ringed ghost pill (1px inset Field Line ring, Field Line wash on hover). Both press to 0.97 and focus with a 2px On Field outline offset 2px. Hero: Get started and Browse components; close: Get started and Star on GitHub.
+- **Showcase (signature):** the hero's proof, an install command joined to the component it installs. A row of 32px tab pills (current: field label over one On Field pill that slides to it, transform and width over 400ms ease-out-expo, and scrolls it into view; idle: muted, washed on hover) scrolls sideways without a scrollbar, fading only an edge with more to scroll (`scroll-fade-x`). Under it, a 20px stage card, 16rem tall with 16px padding (20px from sm), stacks every demo in one grid cell: all stay laid out, each panel scrolling on its own when a demo outgrows it (an opened Tree) with the `scroll-fade` edge fade and safe centring, which centres content that fits and starts taller content at the top, and the swap is a directional handoff (Web Animations, cancelled and restarted on a quick second click): the old demo leaves in 160ms (`cubic-bezier(0.25, 1, 0.5, 1)`), fading, drifting 12px the way the tabs moved and blurring to 3px; the new one enters 70ms behind it from 16px the other side, blur 4px to 0, over 380ms ease-out-expo, so the two barely overlap. Moving right sends content left; an earlier tab reverses it; the auto-advance wrap counts as forward. The rest stay `inert` and hidden from assistive tech. Demos are shown at their own size. Joined beneath the stage, inside the same card, the command bar is neutral: the muted fill under a top hairline, ink text, 10px by 16px padding (8px at the right), and the plain registry copy button. The command is plain inline text: `$ ` in Quiet Ink, the package-manager head (following the site's shared choice), `@cubby-ui/` and the slug, which morphs in Slug Blue through `TextMorph` in its default mode. When it doesn't fit (a phone), it scrolls sideways with no scrollbar and the `scroll-fade-x` edge fade, starting at the beginning; nothing scrolls it for the reader. Why it is built this way: a flex row shifted the morph's leaving glyphs as the baseline moved, a hidden demo measured zero so its own morph grew from nothing on return, and a scaled parent skews TextMorph's measurements. It advances every 5.2s. While it runs, a 1px hairline at 40% field, inset 12px, fills the current tab from the left over the dwell (linear). Pointer and focus pause it separately (either one holds it), it holds while the hero is off screen, and it stops once a tab is picked or the round pause button beside the tabs is pressed (the same button resumes it; it only appears when auto-advance can run). The tabs follow the tab keyboard model: one Tab stop, arrow keys with wrap, Home and End, each tab linked to its panel. Under reduced motion it never advances and shows no hairline.
+- **Gallery card:** the docs example tray. A 20px tray (the muted fill with the rung 1 hairline ring, 4px padding) holds the real component on a 16px card in the page background, centred in at least 16rem with 24px by 40px padding and no rule of its own. On the tray beneath it (16px sides, 14px top, 12px bottom) sit the name, the component's docs description in Quiet Ink 0.875rem (clamped to three lines, two from md) and a 36px round arrow linking to its docs (muted to ink on the surface-hover wash; focus is the half-strength ring). The bento closes with a field-coloured card, not a component: a Bricolage line and a "Browse all components" link whose arrow nudges 2px on hover (150ms ease-out).
+- **Phone menu:** below md, a small slab dropping from the top: the registry Sheet's floating variant, inset 8px, 28px radius, field fill with On Field ink and 8px padding, carrying `land-vars`. A 48px header row holds the logo and wordmark and a 40px round close (muted, washed on hover). The nav items follow in Bricolage 2.25rem, 600, -0.03em, each with a trailing arrow in On Field Muted. Below them, two full-width 48px pills: "Search the docs" in the light primary fill and "GitHub" as the ringed ghost; both press to 0.98.
+- **Ownership:** a title and lead, three title and body pairs (ink 500 titles, Quiet Ink 0.9375rem bodies, 20px apart, no icons), and beside them the registry `CodeBlock` with a filename header showing the first 40 lines of a component as it lands in a project, capped at 26rem.
+- **Footer:** wordmark, a one-line blurb in Quiet Ink 0.875rem, and Docs, Components and Project columns (ink 500 heads, Quiet Ink links brightening to ink on hover).
+
+### Motion
+- **Rise:** the hero enters once, headline, lead, actions, then the showcase, each rising from 14px below and zero opacity over 800ms ease-out-expo, 60ms apart (0, 60, 120, 180ms). Under reduced motion it doesn't animate.
+- **Dwell:** the tab hairline scales from 0 to full width over the dwell, linearly, from the left; under reduced motion it is hidden, since nothing advances on its own.
+- **Stage swap:** a directional handoff: exit 160ms (fade, 12px drift, 3px blur), enter 70ms later over 380ms ease-out-expo (from 16px, 4px blur); the tab pill slides on the same curve over 400ms. Under reduced motion: opacity only, 120ms out and 180ms in, no slide.
+- **Slug:** the command's slug changes through `TextMorph` in its default mode; nothing scrolls the command for the reader.

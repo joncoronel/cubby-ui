@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-25T00:00:00Z",
+  "generatedAt": "2026-09-30T00:00:00Z",
   "title": "Design System: Cubby UI",
   "extensions": {
     "colorMeta": {
@@ -158,12 +158,67 @@
         "role": "neutral",
         "displayName": "Dark Chrome",
         "canonical": "oklch(0.159 0.004 270)"
+      },
+      "landing-field": {
+        "role": "primary",
+        "displayName": "Ultramarine Field",
+        "canonical": "oklch(0.47 0.2 264)",
+        "tonalRamp": [
+          "oklch(0.15 0.06 264)",
+          "oklch(0.26 0.11 264)",
+          "oklch(0.37 0.16 264)",
+          "oklch(0.47 0.2 264)",
+          "oklch(0.6 0.16 264)",
+          "oklch(0.72 0.11 264)",
+          "oklch(0.85 0.06 264)",
+          "oklch(0.95 0.02 264)"
+        ]
+      },
+      "landing-on-field": {
+        "role": "neutral",
+        "displayName": "On Field",
+        "canonical": "oklch(0.985 0.008 264)"
+      },
+      "landing-on-field-muted": {
+        "role": "neutral",
+        "displayName": "On Field Muted",
+        "canonical": "oklch(0.87 0.05 264)"
+      },
+      "landing-field-line": {
+        "role": "neutral",
+        "displayName": "Field Line",
+        "canonical": "oklch(1 0 0 / 0.16)"
+      },
+      "dark-landing-field": {
+        "role": "primary",
+        "displayName": "Ultramarine Field (dark)",
+        "canonical": "oklch(0.37 0.16 264)"
+      },
+      "dark-landing-on-field-muted": {
+        "role": "neutral",
+        "displayName": "On Field Muted (dark)",
+        "canonical": "oklch(0.84 0.05 264)"
+      },
+      "dark-landing-field-line": {
+        "role": "neutral",
+        "displayName": "Field Line (dark)",
+        "canonical": "oklch(1 0 0 / 0.12)"
+      },
+      "landing-slug": {
+        "role": "primary",
+        "displayName": "Slug Blue",
+        "canonical": "oklch(0.5 0.2 258)"
+      },
+      "dark-landing-slug": {
+        "role": "primary",
+        "displayName": "Slug Blue (dark)",
+        "canonical": "oklch(0.76 0.13 255)"
       }
     },
     "typographyMeta": {
       "display": {
         "displayName": "Display",
-        "purpose": "Page titles (2.25rem mobile, 2.75rem desktop) and the home hero (2.5rem to 3.75rem). Bricolage Grotesque with optical sizing."
+        "purpose": "Docs page titles (2.25rem mobile, 2.75rem desktop). Bricolage Grotesque with optical sizing."
       },
       "headline": {
         "displayName": "Headline",
@@ -175,7 +230,7 @@
       },
       "lead": {
         "displayName": "Lead",
-        "purpose": "Description under a title, Quiet Ink, capped 52ch to 58ch."
+        "purpose": "Description under a docs title, Quiet Ink, capped 52ch."
       },
       "body": {
         "displayName": "Body",
@@ -188,23 +243,31 @@
       "mono": {
         "displayName": "Mono",
         "purpose": "Code, prop names, types. Inline code at 0.84em on a 7% ink plate."
+      },
+      "landing-display": {
+        "displayName": "Landing Hero",
+        "purpose": "Landing hero only: 2.625rem, 3.5rem sm, 3.75rem lg, 4.5rem xl; leading 0.98, -0.04em; two stacked sentences, the second On Field Muted."
+      },
+      "landing-section": {
+        "displayName": "Landing Section Title",
+        "purpose": "Landing section titles on the page background: 2.25rem, 3rem from sm, leading 1.05, -0.03em."
       }
     },
     "shadows": [
       {
         "name": "surface-shadow-1",
         "value": "0 0 0 1px oklch(0 0 0 / 0.06)",
-        "purpose": "Hairline ring; flush containers and the light chrome edge."
+        "purpose": "Hairline ring; flush containers, the light chrome edge, landing gallery trays."
       },
       {
         "name": "surface-shadow-3",
         "value": "0 0 0 1px oklch(0 0 0 / 0.06), 0 1px 1px -0.5px oklch(0 0 0 / 0.06), 0 3px 3px -1.5px oklch(0 0 0 / 0.05)",
-        "purpose": "Resting cards, inputs, home category tiles."
+        "purpose": "Resting cards, inputs."
       },
       {
         "name": "surface-shadow-6",
         "value": "0 0 0 1px oklch(0 0 0 / 0.06), 0 1px 1px -0.5px oklch(0 0 0 / 0.06), 0 3px 3px -1.5px oklch(0 0 0 / 0.05), 0 6px 6px -3px oklch(0 0 0 / 0.05), 0 12px 12px -6px oklch(0 0 0 / 0.04), 0 24px 24px -12px oklch(0 0 0 / 0.04)",
-        "purpose": "Hovered tiles, popovers, menus."
+        "purpose": "Popovers, menus, the landing hero stage (rung 3 fill, rung 6 shadow)."
       },
       {
         "name": "surface-shadow-8",
@@ -241,7 +304,7 @@
       {
         "name": "ease-out-expo",
         "value": "cubic-bezier(0.19, 1, 0.22, 1)",
-        "purpose": "The settle curve for everything that opens or enters (docs --docs-ease, home reveal, prop panels)."
+        "purpose": "The settle curve for everything that opens or enters (docs --docs-ease, landing rise, prop panels)."
       },
       {
         "name": "ease-in-cubic",
@@ -294,9 +357,24 @@
         "purpose": "Header section crumb and shelf status text changing."
       },
       {
-        "name": "home-reveal",
-        "value": "800ms ease-out-expo, from translateY 16px, 80ms stagger",
-        "purpose": "Home hero load sequence."
+        "name": "land-rise",
+        "value": "800ms ease-out-expo, from opacity 0 and translateY 14px, delays 0/60/120/180ms",
+        "purpose": "Landing hero first paint: headline, lead, actions, showcase. Off under reduced motion."
+      },
+      {
+        "name": "land-dwell",
+        "value": "5200ms linear, scaleX 0 to 1 from the left",
+        "purpose": "Showcase tab hairline filling over each auto-advance dwell; hidden under reduced motion."
+      },
+      {
+        "name": "showcase-advance",
+        "value": "5200ms per item",
+        "purpose": "Landing showcase auto-advance; pauses on hover or focus within, stops once a tab is clicked, off under reduced motion."
+      },
+      {
+        "name": "showcase-crossfade",
+        "value": "exit 160ms cubic-bezier(0.25, 1, 0.5, 1): fade, 12px drift, 3px blur; enter 70ms later, 380ms cubic-bezier(0.19, 1, 0.22, 1): from 16px, 4px blur; tab pill slides 400ms ease-out-expo",
+        "purpose": "Landing showcase demos swapping in one stacked grid cell."
       },
       {
         "name": "reduced-motion",
@@ -397,11 +475,35 @@
       "description": "Callout drawn with a 4% ink wash, no border or shadow.",
       "html": "<aside class=\"ds-note\"><p>Components are copied into your project. You own the source.</p></aside>",
       "css": ".ds-note { padding: 14px 18px; border-radius: 14px; background: color-mix(in oklab, oklch(0.18 0.004 270) 4%, transparent); color: color-mix(in oklab, oklch(0.18 0.004 270) 88%, oklch(0.97 0 0)); font: 400 15px/1.65 Geist, ui-sans-serif, system-ui, sans-serif; } .ds-note p { margin: 0; }"
+    },
+    {
+      "name": "Landing Slab Actions",
+      "kind": "button",
+      "refersTo": "landing-button-primary",
+      "description": "The landing's two pills on the ultramarine slab: light primary and ringed ghost.",
+      "html": "<div class=\"ds-land-slab ds-land-actions\"><a class=\"ds-land-pill ds-land-pill-primary\" href=\"#\">Get started <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9 6l6 6-6 6\"/></svg></a><a class=\"ds-land-pill ds-land-pill-ghost\" href=\"#\">Browse components</a></div>",
+      "css": ".ds-land-slab { background: oklch(0.47 0.2 264); color: oklch(0.985 0.008 264); border-radius: 28px; padding: 32px; } .ds-land-actions { display: flex; flex-wrap: wrap; gap: 12px; } .ds-land-pill { display: inline-flex; align-items: center; gap: 6px; height: 44px; border-radius: 999px; font: 500 15px/1 Geist, ui-sans-serif, system-ui, sans-serif; text-decoration: none; outline: 0 solid transparent; outline-offset: 2px; transition: opacity 150ms ease-out, background-color 150ms ease-out, scale 100ms ease-out; } .ds-land-pill:focus-visible { outline: 2px solid oklch(0.985 0.008 264); } .ds-land-pill:active { scale: 0.97; } .ds-land-pill-primary { background: oklch(0.985 0.008 264); color: oklch(0.47 0.2 264); padding: 0 16px 0 20px; } .ds-land-pill-primary:hover { opacity: 0.9; } .ds-land-pill-ghost { color: oklch(0.985 0.008 264); padding: 0 20px; box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.16); } .ds-land-pill-ghost:hover { background: oklch(1 0 0 / 0.16); }"
+    },
+    {
+      "name": "Landing Showcase",
+      "kind": "custom",
+      "refersTo": "landing-command-bar",
+      "description": "Hero signature: tab pills, a stage card of live demos, and a neutral install command joined beneath with the component name in Slug Blue.",
+      "html": "<div class=\"ds-sc\"><div class=\"ds-sc-tabs\"><button class=\"ds-sc-tab ds-sc-tab-on\">Text Morph<span class=\"ds-sc-dwell\"></span></button><button class=\"ds-sc-tab\">Circular Slider</button><button class=\"ds-sc-tab\">Tree</button><button class=\"ds-sc-tab\">QR Code</button></div><div class=\"ds-sc-card\"><div class=\"ds-sc-stage\">$1,234.56</div><div class=\"ds-sc-cmd\"><code><span class=\"ds-sc-dollar\">$ </span>pnpm dlx shadcn@latest add @cubby-ui/<span class=\"ds-sc-slug\">text-morph</span></code></div></div></div>",
+      "css": ".ds-sc { background: oklch(0.47 0.2 264); border-radius: 28px; padding: 24px; display: flex; flex-direction: column; gap: 12px; font-family: Geist, ui-sans-serif, system-ui, sans-serif; } .ds-sc-tabs { display: flex; gap: 4px; } .ds-sc-tab { position: relative; overflow: hidden; height: 32px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; color: oklch(0.87 0.05 264); font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; outline: 0 solid transparent; outline-offset: 2px; } .ds-sc-tab:hover { background: oklch(1 0 0 / 0.16); color: oklch(0.985 0.008 264); } .ds-sc-tab:focus-visible { outline: 2px solid oklch(0.985 0.008 264); } .ds-sc-tab-on, .ds-sc-tab-on:hover { background: oklch(0.985 0.008 264); color: oklch(0.47 0.2 264); } .ds-sc-dwell { position: absolute; left: 12px; right: 12px; bottom: 4px; height: 1px; background: color-mix(in oklab, oklch(0.47 0.2 264) 40%, transparent); transform-origin: left; animation: ds-dwell 5.2s linear infinite; } @keyframes ds-dwell { from { transform: scaleX(0); } } @media (prefers-reduced-motion: reduce) { .ds-sc-dwell { animation: none; } } .ds-sc-card { overflow: hidden; border-radius: 20px; background: oklch(1 0 0); box-shadow: 0 0 0 1px oklch(0 0 0 / 0.06), 0 3px 3px -1.5px oklch(0 0 0 / 0.05), 0 12px 12px -6px oklch(0 0 0 / 0.04), 0 24px 24px -12px oklch(0 0 0 / 0.04); } .ds-sc-stage { height: 15rem; padding: 20px; display: flex; align-items: center; justify-content: center; font: 600 40px/1 Geist, ui-sans-serif, system-ui, sans-serif; color: oklch(0.18 0.004 270); } .ds-sc-cmd { background: var(--muted, oklch(0.955 0 0)); color: oklch(0.18 0.004 270); border-top: 1px solid color-mix(in oklab, oklch(0.18 0.004 270) 10%, transparent); padding: 10px 8px 10px 16px; font: 13px/1.4 'Geist Mono', ui-monospace, monospace; white-space: nowrap; overflow-x: auto; scrollbar-width: none; } .ds-sc-dollar { color: oklch(0.5 0.004 270); } .ds-sc-slug { color: oklch(0.5 0.2 258); font-weight: 500; }"
+    },
+    {
+      "name": "Landing Gallery Card",
+      "kind": "card",
+      "refersTo": "landing-gallery-card",
+      "description": "The docs example tray: a live component on a page-background card inside a muted 20px tray, name, description and a round docs arrow on the tray below.",
+      "html": "<article class=\"ds-gc\"><div class=\"ds-gc-demo\"><button class=\"ds-gc-sample\">Live component</button></div><div class=\"ds-gc-foot\"><div><h3 class=\"ds-gc-name\">Circular Slider</h3><p class=\"ds-gc-desc\">A round slider for values on a dial.</p></div><a class=\"ds-gc-arrow\" href=\"#\" aria-label=\"Circular Slider docs\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9 6l6 6-6 6\"/></svg></a></div></article>",
+      "css": ".ds-gc { display: flex; flex-direction: column; max-width: 360px; padding: 4px; border-radius: 20px; background: var(--muted, oklch(0.955 0 0)); color: oklch(0.18 0.004 270); box-shadow: 0 0 0 1px oklch(0 0 0 / 0.06); font-family: Geist, ui-sans-serif, system-ui, sans-serif; } .ds-gc-demo { min-height: 16rem; display: flex; align-items: center; justify-content: center; padding: 40px 24px; border-radius: 16px; background: var(--background, oklch(0.97 0 0)); } .ds-gc-sample { height: 36px; padding: 0 14px; border: 0; border-radius: 12px; background: oklch(0.6 0.2 250); color: white; font-family: inherit; font-size: 14px; font-weight: 500; } .ds-gc-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; padding: 14px 16px 12px; } .ds-gc-name { margin: 0; font: 600 19px/1.25 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.01em; } .ds-gc-desc { margin: 4px 0 0; font-size: 14px; color: oklch(0.5 0.004 270); } .ds-gc-arrow { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 999px; color: oklch(0.5 0.004 270); outline: 0 solid transparent; outline-offset: 2px; } .ds-gc-arrow:hover { color: oklch(0.18 0.004 270); background: oklch(0 0 0 / 0.06); } .ds-gc-arrow:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.55 0.2 250) 50%, transparent); }"
     }
   ],
   "narrative": {
     "northStar": "The Cubby Shelf",
-    "overview": "A well-made wooden shelf of labeled cubbies: everything has a place, the place is marked with a hairline and a name, and nothing is shouting. The system is quiet on purpose. Tinted near-neutrals carry the page, one blue carries meaning, and the display type carries the voice. Depth comes from a measured surface ladder rather than from decoration, and structure is ruled with hairlines rather than boxed with cards.\n\nDensity is calm and reading-first. Pages sit in one centered column with generous vertical rhythm; controls stay small, muted until touched, and brighten to full foreground on hover. Motion is a single settle curve (ease-out-expo) that opens slowly and closes quickly, and every motion collapses to a plain opacity change under reduced motion.\n\nLight and dark are both designed. Light keeps fills neutral and lets layered shadow carry elevation; dark steps lightness up a tinted ladder and adds a lit top rim. The home page adds one ornament, the cubby mark printed as a feathered dot-matrix field behind the hero; the docs surface carries the same mark as a four-cell glyph in its shelf trigger.",
+    "overview": "A well-made wooden shelf of labeled cubbies: everything has a place, the place is marked with a hairline and a name, and nothing is shouting. The system is quiet on purpose. Tinted near-neutrals carry the page, one blue carries meaning, and the display type carries the voice. Depth comes from a measured surface ladder rather than from decoration, and structure is ruled with hairlines rather than boxed with cards.\n\nDensity is calm and reading-first. Pages sit in one centered column with generous vertical rhythm; controls stay small, muted until touched, and brighten to full foreground on hover. Motion is a single settle curve (ease-out-expo) that opens slowly and closes quickly, and every motion collapses to a plain opacity change under reduced motion.\n\nLight and dark are both designed. Light keeps fills neutral and lets layered shadow carry elevation; dark steps lightness up a tinted ladder and adds a lit top rim. The docs surface carries the cubby mark as a four-cell glyph in its shelf trigger.\n\nThis system is the docs world. The landing page (`app/(home)`) is deliberately its own world, scoped under `.landing`: it keeps the fonts, the page background, the ladder and the registry components, and adds only an ultramarine slab. Everything below applies to the docs; where the landing departs, the **Landing page** section at the end is normative inside `.landing` and nowhere else.",
     "keyCharacteristics": [
       "Neutrals tinted toward hue 270 at very low chroma (0.004, 0.002 near the extremes), tuned from three root variables.",
       "One chromatic accent, the primary blue; status hues appear only on status plates.",
@@ -445,6 +547,16 @@
         "name": "The Drawn-Not-Lifted Rule",
         "body": "Reading surfaces on docs (stage, note, tables, API rows, shelf grid) sit flat on the page, defined by hairlines or a faint ink wash. Shadow appears only on things that float over content: the open shelf, the expanded rail, menus.",
         "section": "elevation"
+      },
+      {
+        "name": "The Paint-On-Field Rule",
+        "body": "Anything set on the ultramarine field paints with the on-field tokens (ink, muted, line) and focuses with a 2px on-field outline; docs tokens (foreground, border, ring) never appear on the slab.",
+        "section": "colors"
+      },
+      {
+        "name": "The Components-Keep-Their-Surface Rule",
+        "body": "Live components sit on a card, never straight on the field: the page background inside a tray on the page, a ladder card on the slab, so they show on the surface they were designed for.",
+        "section": "elevation"
       }
     ],
     "dos": [
@@ -460,7 +572,7 @@
       "**Don't** raise the chrome surface with a ladder rung or paint chrome controls by hand; use `data-surface=\"chrome\"`.",
       "**Don't** add a second accent hue outside status plates.",
       "**Don't** use elastic or bouncy easing on controls.",
-      "**Don't** use neon glows, gradient meshes, or cool-AI dark-mode effects; the only gradients are the stage's 3.5% light and the feathered mask on the home dot field.",
+      "**Don't** use neon glows, gradient meshes, or cool-AI dark-mode effects; the only gradients are the stage's 3.5% light and the edge-fade masks on scrolling rows.",
       "**Don't** use the reflex fonts PRODUCT.md bans (Inter, DM Sans, Plus Jakarta, Space Grotesk, Fraunces, Playfair, Cormorant, Instrument Serif, Crimson).",
       "**Don't** box reading content in shadowed cards on docs; rule it with hairlines or a faint wash."
     ]

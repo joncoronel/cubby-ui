@@ -98,11 +98,11 @@ For the complete Base UI API, see the [Base UI OTP Field documentation](https://
 
 Groups all OTP field parts and manages their state. Wraps Base UI's `OTPField.Root`. Renders a `<div>`, plus a single focus ring that slides to whichever slot has focus.
 
-No custom props. All Base UI Root props are passed through, including `length`, `value`, `onValueChange`, `validationType`, `mask`, `normalizeValue`, and `onValueInvalid`.
+No custom props. To change the slot and ring rounding together, set `--otp-field-radius` on it (e.g. `className="[--otp-field-radius:9999px]"`). All Base UI Root props are passed through, including `length`, `value`, `onValueChange`, `validationType`, `mask`, `normalizeValue`, and `onValueInvalid`.
 
 #### OTPFieldInput
 
-Individual character input slot. Wraps Base UI's `OTPField.Input`. Renders an `<input>` inside a slot `<span>`; `className` and `style` go to the slot. The input's own text and caret are hidden, and each character rolls in through [Text Morph](/docs/components/text-morph). The `render` prop isn't supported.
+Individual character input slot. Wraps Base UI's `OTPField.Input`. Renders an `<input>` inside a slot `<span>`; `className` (a string, not Base UI's state function) and `style` go to the slot. The input's own text is hidden and each character rolls in through [Text Morph](/docs/components/text-morph); the caret shows in an empty slot and hides once it's filled. The `render` prop isn't supported.
 
 <ApiPropsList>
 
@@ -148,7 +148,7 @@ function useInvalidFeedback(
 
 Manages shake animation and screen reader feedback for invalid OTP input. Bundled with the component, installed automatically when you install `otp-field`.
 
-Wire its handlers to `OTPField` and its className getter to each `OTPFieldInput`:
+Wire its handlers and `className` to `OTPField`. The focused slot and the focus ring shake together:
 
 ```tsx
 import { useInvalidFeedback } from "@/components/ui/cubby-ui/otp-field/hooks/use-invalid-feedback";
@@ -159,15 +159,12 @@ const invalidFeedback = useInvalidFeedback();
   length={6}
   validationType="none"
   normalizeValue={myCustomNormalizer}
+  className={invalidFeedback.className}
   onValueChange={invalidFeedback.handleValueChange}
   onValueInvalid={invalidFeedback.handleValueInvalid}
 >
   {Array.from({ length: 6 }, (_, index) => (
-    <OTPFieldInput
-      key={index}
-      className={invalidFeedback.getInvalidClassName(index)}
-      onFocus={() => invalidFeedback.setFocusedIndex(index)}
-    />
+    <OTPFieldInput key={index} />
   ))}
 </OTPField>
 <span aria-live="polite" className="sr-only">
@@ -187,10 +184,9 @@ const invalidFeedback = useInvalidFeedback();
 
 ##### Returns
 
-| Property              | Type                                     | Description                                                                         |
-| --------------------- | ---------------------------------------- | ----------------------------------------------------------------------------------- |
-| `handleValueChange`   | `() => void`                             | Clears invalid feedback. Wire to `OTPField`'s `onValueChange`.                      |
-| `handleValueInvalid`  | `(value: string) => void`                | Triggers shake animation and status message. Wire to `OTPField`'s `onValueInvalid`. |
-| `getInvalidClassName` | `(index: number) => string \| undefined` | Returns the shake animation className for the active invalid slot, or `undefined`.  |
-| `setFocusedIndex`     | `(index: number) => void`                | Tracks which slot is focused. Wire to each input's `onFocus`.                       |
-| `statusMessage`       | `string`                                 | Screen reader announcement. Render inside an `aria-live="polite"` region.           |
+| Property             | Type                      | Description                                                                         |
+| -------------------- | ------------------------- | ----------------------------------------------------------------------------------- |
+| `handleValueChange`  | `() => void`              | Clears invalid feedback. Wire to `OTPField`'s `onValueChange`.                      |
+| `handleValueInvalid` | `(value: string) => void` | Triggers shake animation and status message. Wire to `OTPField`'s `onValueInvalid`. |
+| `className`          | `string \| undefined`     | Shake className while feedback is active, or `undefined`. Pass to `OTPField`.       |
+| `statusMessage`      | `string`                  | Screen reader announcement. Render inside an `aria-live="polite"` region.           |

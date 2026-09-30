@@ -29,6 +29,7 @@ export default function OtpFieldCustomSanitization() {
         validationType="none"
         inputMode="numeric"
         normalizeValue={normalizeTierCode}
+        className={invalidFeedback.className}
         onValueChange={invalidFeedback.handleValueChange}
         onValueInvalid={invalidFeedback.handleValueInvalid}
         aria-describedby={descriptionId}
@@ -36,9 +37,7 @@ export default function OtpFieldCustomSanitization() {
         {Array.from({ length: CODE_LENGTH }, (_, index) => (
           <OTPFieldInput
             key={index}
-            className={invalidFeedback.getInvalidClassName(index)}
             aria-label={`Character ${index + 1} of ${CODE_LENGTH}`}
-            onFocus={() => invalidFeedback.setFocusedIndex(index)}
           />
         ))}
       </OTPField>

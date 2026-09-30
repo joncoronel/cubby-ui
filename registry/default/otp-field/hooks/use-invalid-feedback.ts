@@ -12,25 +12,16 @@ export interface UseInvalidFeedbackOptions {
 
 export interface UseInvalidFeedbackReturn {
   /**
-   * Returns the invalid animation className for a given input index,
-   * or `undefined` when no feedback is active. Merge with `cn()`.
+   * The shake className for the field, or `undefined` when no feedback is
+   * active. Pass it to `OTPField`: the focused slot and the focus ring shake
+   * together.
    *
    * @example
    * ```tsx
-   * <OTPFieldInput className={invalidFeedback.getInvalidClassName(index)} />
+   * <OTPField className={invalidFeedback.className} />
    * ```
    */
-  getInvalidClassName: (index: number) => string | undefined;
-
-  /**
-   * Call in each input's `onFocus` to track which slot is active.
-   *
-   * @example
-   * ```tsx
-   * <OTPFieldInput onFocus={() => invalidFeedback.setFocusedIndex(index)} />
-   * ```
-   */
-  setFocusedIndex: (index: number) => void;
+  className: string | undefined;
 
   /**
    * Clears invalid feedback when the value changes.
@@ -67,7 +58,7 @@ export interface UseInvalidFeedbackReturn {
   statusMessage: string;
 }
 
-// The field's focus ring shakes and tints red along with the slot.
+// Alternated so a repeat invalid entry restarts the animation.
 const SHAKE_CLASS_A = "otp-field-shake-a";
 const SHAKE_CLASS_B = "otp-field-shake-b";
 
@@ -83,15 +74,12 @@ const SHAKE_CLASS_B = "otp-field-shake-b";
  *   length={6}
  *   validationType="none"
  *   normalizeValue={normalizeTierCode}
+ *   className={invalidFeedback.className}
  *   onValueChange={invalidFeedback.handleValueChange}
  *   onValueInvalid={invalidFeedback.handleValueInvalid}
  * >
  *   {Array.from({ length: 6 }, (_, index) => (
- *     <OTPFieldInput
- *       key={index}
- *       className={invalidFeedback.getInvalidClassName(index)}
- *       onFocus={() => invalidFeedback.setFocusedIndex(index)}
- *     />
+ *     <OTPFieldInput key={index} />
  *   ))}
  * </OTPField>
  * <span aria-live="polite" className="sr-only">
@@ -104,7 +92,6 @@ export function useInvalidFeedback(
 ): UseInvalidFeedbackReturn {
   const { duration = 400 } = options;
 
-  const [focusedIndex, setFocusedIndex] = React.useState(0);
   const [invalidPulse, setInvalidPulse] = React.useState(0);
   const [statusMessage, setStatusMessage] = React.useState("");
   const invalidTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(
@@ -149,23 +136,15 @@ export function useInvalidFeedback(
     }, duration);
   }
 
-  const activeInvalidIndex = invalidPulse > 0 ? focusedIndex : -1;
-  const invalidClassName =
+  const className =
     invalidPulse === 0
       ? undefined
       : invalidPulse % 2 === 0
         ? SHAKE_CLASS_B
         : SHAKE_CLASS_A;
 
-  const getInvalidClassName = React.useCallback(
-    (index: number) =>
-      activeInvalidIndex === index ? invalidClassName : undefined,
-    [activeInvalidIndex, invalidClassName],
-  );
-
   return {
-    getInvalidClassName,
-    setFocusedIndex,
+    className,
     handleValueChange,
     handleValueInvalid,
     statusMessage,

@@ -100,7 +100,7 @@ function OTPFieldInput({
                   "otp-field-glyph",
                   masked && "text-[1.5em] leading-none",
                 )}
-                mode="roll"
+                mode="morph"
                 duration={380}
                 options={{ trend: "up", roll: { rotate: 0 } }}
               />

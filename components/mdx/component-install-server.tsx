@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import { ComponentInstall } from "./component-install";
 import { packageManagerCommands } from "./package-manager-commands";
+import { highlightPeek } from "./code-peek-lines";
 import { highlight } from "@/registry/default/code-block/lib/shiki-shared";
 import { transformComponentImports } from "@/lib/transform-registry-imports";
 import type { RegistryItemJson } from "@/lib/registry-json";
@@ -43,7 +44,9 @@ async function processRegistryFiles(
     name: string;
     relativePath: string;
     content: string;
+    language: string;
     highlighted: ReactElement;
+    peekHighlighted?: ReactElement;
   }>
 > {
   if (!registryJson.files || !Array.isArray(registryJson.files)) {
@@ -63,6 +66,7 @@ async function processRegistryFiles(
       ).trimEnd();
       const language = getLanguageFromPath(file.path);
       const highlighted = await highlight(transformedContent, language);
+      const peekHighlighted = await highlightPeek(transformedContent, language);
 
       // Use target path for display if available, otherwise compute from source path
       // target is the actual install location (e.g., "hooks/cubby-ui/use-fuzzy-filter.ts")
@@ -78,6 +82,8 @@ async function processRegistryFiles(
         name: path.basename(file.path),
         relativePath,
         content: transformedContent,
+        language,
+        peekHighlighted,
         highlighted,
       };
     }),
@@ -108,7 +114,9 @@ export async function ComponentInstallServer({
     name: string;
     relativePath: string;
     content: string;
+    language: string;
     highlighted: ReactElement;
+    peekHighlighted?: ReactElement;
   }> = [];
 
   // Collect all dependencies (including from registry dependencies)

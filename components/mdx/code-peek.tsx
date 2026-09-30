@@ -12,15 +12,18 @@ import {
 import { Button } from "@/registry/default/button/button";
 import { CopyButton } from "@/registry/default/copy-button/copy-button";
 import { cn } from "@/lib/utils";
-
-/** Code this long or shorter shows in full; longer code opens as a peek. */
-const PEEK_LINES = 6;
+import { PEEK_LINES } from "./code-peek-lines";
 
 interface CodePeekProps {
   code: string;
   language?: string;
   /** Server-highlighted nodes, shown before the client highlighter runs. */
   initial?: ReactElement;
+  /**
+   * The first lines alone, highlighted (see `highlightPeek`): what a closed
+   * peek renders, so the rest isn't built until it opens.
+   */
+  peekInitial?: ReactElement;
   /**
    * `flat` sets the code straight on the tray it sits in (an example's
    * code); `card` keeps the code block's own card (source in a tray with a
@@ -45,6 +48,7 @@ export function CodePeek({
   code,
   language = "tsx",
   initial,
+  peekInitial,
   variant = "flat",
   fill = false,
   className,
@@ -97,7 +101,7 @@ export function CodePeek({
         <CodeBlock
           code={code}
           language={language}
-          initial={initial}
+          initial={collapsed && peekInitial ? peekInitial : initial}
           className="rounded-none bg-transparent p-0 shadow-none"
         >
           <CodeBlockPre

@@ -20,7 +20,9 @@ interface ComponentInstallProps {
     name: string;
     relativePath: string;
     content: string;
+    language: string;
     highlighted: ReactElement;
+    peekHighlighted?: ReactElement;
   }>;
   cliCommands: Record<PackageManager, string>;
   /** Only when the source needs packages installed. */
@@ -47,6 +49,9 @@ export function ComponentInstall({
 }: ComponentInstallProps) {
   const manualId = React.useId();
   const [manualOpen, setManualOpen] = React.useState(false);
+  // The source is built on first open, then kept: closed, it was thousands
+  // of highlighted lines nobody sees, rendered on every page switch.
+  const [manualShown, setManualShown] = React.useState(false);
   const [activeFile, setActiveFile] = React.useState(
     componentFiles?.[0]?.relativePath ?? "",
   );
@@ -65,7 +70,10 @@ export function ComponentInstall({
             type="button"
             aria-expanded={manualOpen}
             aria-controls={manualId}
-            onClick={() => setManualOpen((o) => !o)}
+            onClick={() => {
+              setManualShown(true);
+              setManualOpen((o) => !o);
+            }}
             className="docs-disclosure text-muted-foreground hover:text-foreground focus-visible:outline-ring/50 -ml-1 flex w-fit items-center gap-1 rounded-md px-1 py-0.5 text-sm outline-none focus-visible:outline-2"
           >
             <HugeiconsIcon
@@ -77,84 +85,90 @@ export function ComponentInstall({
           </button>
 
           <div id={manualId} hidden={!manualOpen} className="docs-code-reveal">
-            <div>
-              <ol className="docs-steps pt-2">
-                {installCommands && (
+            {manualShown && (
+              <div>
+                <ol className="docs-steps pt-2">
+                  {installCommands && (
+                    <li>
+                      <p className="docs-step-title">Add the dependencies</p>
+                      <PackageManagerCommand
+                        commands={installCommands}
+                        className="my-0"
+                      />
+                    </li>
+                  )}
                   <li>
-                    <p className="docs-step-title">Add the dependencies</p>
-                    <PackageManagerCommand
-                      commands={installCommands}
-                      className="my-0"
-                    />
-                  </li>
-                )}
-                <li>
-                  <p className="docs-step-title">
-                    Copy the source into your project
-                  </p>
-                  {/* The tray's header names the file (tabs when there are
+                    <p className="docs-step-title">
+                      Copy the source into your project
+                    </p>
+                    {/* The tray's header names the file (tabs when there are
                       a few, a file browser past that); the code peeks, like
                       an example's, rather than scrolling in a tall box. */}
-                  {componentFiles!.length > MAX_FILE_TABS ? (
-                    <SourceFiles
-                      files={componentFiles!}
-                      active={file.relativePath}
-                      onActiveChange={setActiveFile}
-                    />
-                  ) : (
-                    <CodeBlock
-                      code={file.content}
-                      language="tsx"
-                      initial={file.highlighted}
-                    >
-                      <CodeBlockHeader
-                        showCopy={false}
-                        filename={
-                          componentFiles!.length === 1
-                            ? fileLabel(file.relativePath, [])
-                            : undefined
-                        }
-                        tabs={
-                          componentFiles!.length > 1
-                            ? componentFiles!.map((f) => ({
-                                value: f.relativePath,
-                                label: fileLabel(
-                                  f.relativePath,
-                                  componentFiles!.map((g) => g.relativePath),
-                                ),
-                              }))
-                            : undefined
-                        }
-                        activeTab={file.relativePath}
-                        onTabChange={(value) => setActiveFile(value as string)}
+                    {componentFiles!.length > MAX_FILE_TABS ? (
+                      <SourceFiles
+                        files={componentFiles!}
+                        active={file.relativePath}
+                        onActiveChange={setActiveFile}
                       />
-                      <CodePeek
-                        variant="card"
+                    ) : (
+                      <CodeBlock
                         code={file.content}
+                        language={file.language}
                         initial={file.highlighted}
-                      />
-                    </CodeBlock>
-                  )}
-                  <p className="docs-step-note">
-                    Save it as <code>{file.relativePath}</code>
-                  </p>
-                </li>
-                <li>
-                  <p className="docs-step-title">Update the import paths</p>
-                  <p className="docs-step-body">
-                    {"The source imports through the "}
-                    <code>@/</code>
-                    {" alias ("}
-                    <code>@/lib/utils</code>
-                    {", "}
-                    <code>@/components/ui/cubby-ui</code>
-                    {
-                      "). If your project uses another alias or folder, change them to match."
-                    }
-                  </p>
-                </li>
-              </ol>
-            </div>
+                      >
+                        <CodeBlockHeader
+                          showCopy={false}
+                          filename={
+                            componentFiles!.length === 1
+                              ? fileLabel(file.relativePath, [])
+                              : undefined
+                          }
+                          tabs={
+                            componentFiles!.length > 1
+                              ? componentFiles!.map((f) => ({
+                                  value: f.relativePath,
+                                  label: fileLabel(
+                                    f.relativePath,
+                                    componentFiles!.map((g) => g.relativePath),
+                                  ),
+                                }))
+                              : undefined
+                          }
+                          activeTab={file.relativePath}
+                          onTabChange={(value) =>
+                            setActiveFile(value as string)
+                          }
+                        />
+                        <CodePeek
+                          variant="card"
+                          code={file.content}
+                          language={file.language}
+                          initial={file.highlighted}
+                          peekInitial={file.peekHighlighted}
+                        />
+                      </CodeBlock>
+                    )}
+                    <p className="docs-step-note">
+                      Save it as <code>{file.relativePath}</code>
+                    </p>
+                  </li>
+                  <li>
+                    <p className="docs-step-title">Update the import paths</p>
+                    <p className="docs-step-body">
+                      {"The source imports through the "}
+                      <code>@/</code>
+                      {" alias ("}
+                      <code>@/lib/utils</code>
+                      {", "}
+                      <code>@/components/ui/cubby-ui</code>
+                      {
+                        "). If your project uses another alias or folder, change them to match."
+                      }
+                    </p>
+                  </li>
+                </ol>
+              </div>
+            )}
           </div>
         </>
       )}

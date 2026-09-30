@@ -12,6 +12,7 @@ interface ComponentPreviewProps {
   className?: string;
   example?: string;
   initialHighlighted?: ReactElement;
+  peekHighlighted?: ReactElement;
   serverRenderedExample?: ReactElement;
 }
 
@@ -26,6 +27,7 @@ export function ComponentPreview({
   className,
   example,
   initialHighlighted,
+  peekHighlighted,
   serverRenderedExample,
 }: ComponentPreviewProps) {
   // Look up the example on the client, unless the server already rendered it
@@ -54,6 +56,7 @@ export function ComponentPreview({
           code={code}
           language={language}
           initial={initialHighlighted}
+          peekInitial={peekHighlighted}
         />
       )}
     </figure>

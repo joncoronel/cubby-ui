@@ -91,7 +91,7 @@ export default function RootLayout({
             would wait for Next's own chunks. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{var p=(navigator.userAgentData&&navigator.userAgentData.platform)||navigator.userAgent;document.documentElement.dataset.platform=/mac|iphone|ipad/i.test(p)?"mac":"windows"}catch(e){}`,
+            __html: `try{const p=(navigator.userAgentData&&navigator.userAgentData.platform)||navigator.userAgent;document.documentElement.dataset.platform=/mac|iphone|ipad/i.test(p)?"mac":"windows"}catch(e){}`,
           }}
         />
       </head>

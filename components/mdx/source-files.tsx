@@ -35,7 +35,9 @@ import { CodePeek } from "./code-peek";
 export interface SourceFile {
   relativePath: string;
   content: string;
+  language: string;
   highlighted: ReactElement;
+  peekHighlighted?: ReactElement;
 }
 
 interface SourceFilesProps {
@@ -258,7 +260,9 @@ export function SourceFiles({
             fill
             variant="card"
             code={file.content}
+            language={file.language}
             initial={file.highlighted}
+            peekInitial={file.peekHighlighted}
           />
         </>
       ) : (
@@ -320,7 +324,9 @@ export function SourceFiles({
           <CodePeek
             variant="card"
             code={file.content}
+            language={file.language}
             initial={file.highlighted}
+            peekInitial={file.peekHighlighted}
           />
         </>
       )}

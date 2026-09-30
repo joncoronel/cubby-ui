@@ -438,6 +438,11 @@
   animation: docs-fade 0.5s ease-out both;
   animation-delay: var(--enter-delay, 0ms);
 }
+/* After the first page, switching pages is frequent: a short fade only. */
+:root[data-docs-navigated] :is(.docs-enter, .docs-enter-fade) {
+  animation: docs-fade 0.15s ease-out both;
+  animation-delay: 0ms;
+}
 
 @keyframes docs-fade-in {
   from {

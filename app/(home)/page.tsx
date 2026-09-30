@@ -1,5 +1,3 @@
-import fs from "fs/promises";
-import path from "path";
 import Link from "next/link";
 import type { ReactElement, ReactNode } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -14,13 +12,22 @@ import { highlight } from "@/registry/default/code-block/lib/shiki-shared";
 import { solidSurface } from "@/registry/default/lib/elevated";
 import { source } from "@/lib/source";
 import type { RegistryItemJson } from "@/lib/registry-json";
+import marchingBorderItem from "@/public/r/marching-border.json";
 import { cn } from "@/lib/utils";
-import { LandingNav } from "@/components/home/landing-nav";
 import { Showcase } from "@/components/home/showcase";
 import { QrDemo } from "@/components/home/qr-demo";
 import { QrLogoDemo } from "@/components/home/qr-logo-demo";
 import { TreeDemo } from "@/components/home/tree-demo";
-import { CubbyUILogo } from "@/components/cubbyui-logo";
+import {
+  BROWSE_HREF,
+  GET_STARTED_HREF,
+  GITHUB_URL,
+} from "@/components/home/links";
+import {
+  SLAB_PILL_LG,
+  SLAB_PRIMARY,
+  SLAB_SECONDARY,
+} from "@/components/home/slab-styles";
 import TextMorphNumbers from "@/registry/examples/text-morph/text-morph-numbers";
 import TextMorphModes from "@/registry/examples/text-morph/text-morph-modes";
 import CircularSliderWithValue from "@/registry/examples/circular-slider/circular-slider-with-value";
@@ -30,37 +37,27 @@ import FiltersBasic from "@/registry/examples/filters/filters-basic";
 import TransitionPanelBasic from "@/registry/examples/transition-panel/transition-panel-basic";
 import MarchingBorderBasic from "@/registry/examples/marching-border/marching-border-basic";
 
-const GET_STARTED = "/docs/getting-started/introduction";
-const BROWSE = "/docs/components/text-morph";
-const GITHUB = "https://github.com/joncoronel/cubby-ui";
-
-/** Primary action on the slab: the light pill. */
-const SLAB_PRIMARY =
-  "inline-flex h-11 items-center gap-1.5 rounded-full bg-(--land-on-field) pr-4 pl-5 text-[0.9375rem] font-medium text-(--land-field) outline-0 outline-offset-2 outline-transparent outline-solid hover:opacity-90 focus-visible:outline-2 focus-visible:outline-(--land-on-field) active:scale-[0.97]";
-/** Secondary action on the slab: a ringed ghost pill. */
-const SLAB_SECONDARY =
-  "inline-flex h-11 items-center rounded-full px-5 text-[0.9375rem] font-medium text-(--land-on-field) ring-1 ring-(--land-field-line) ring-inset outline-0 outline-offset-2 outline-transparent outline-solid hover:bg-(--land-field-line) focus-visible:outline-2 focus-visible:outline-(--land-on-field) active:scale-[0.97]";
-
 const SECTION_TITLE =
   "text-foreground font-(family-name:--font-display) text-[2.25rem] leading-[1.05] font-semibold tracking-[-0.03em] text-balance sm:text-5xl";
 
 /** A component's one-line description, from its docs page. */
 function describe(slug: string): string {
-  return source.getPage(["components", slug])?.data.description ?? "";
+  const description = source.getPage(["components", slug])?.data.description;
+  if (!description) {
+    throw new Error(`No docs description for "${slug}" (landing gallery).`);
+  }
+  return description;
 }
 
-/** The first lines of a component as it lands in your project. */
+/** The first lines of a component's main file, as it lands in a project. */
 async function installedSource(
-  slug: string,
+  item: RegistryItemJson,
   lines: number,
 ): Promise<{ target: string; code: string; highlighted: ReactElement }> {
-  const json = JSON.parse(
-    await fs.readFile(
-      path.join(process.cwd(), "public/r", `${slug}.json`),
-      "utf-8",
-    ),
-  ) as RegistryItemJson;
-  const file = json.files![0];
+  const file = item.files?.find((f) => f.type === "registry:ui");
+  if (!file) {
+    throw new Error(`No registry:ui file in "${item.name}" (landing source).`);
+  }
   const code = file.content.split("\n").slice(0, lines).join("\n").trimEnd();
   return {
     target: file.target ?? file.path,
@@ -70,14 +67,12 @@ async function installedSource(
 }
 
 export default async function Home() {
-  const owned = await installedSource("marching-border", 40);
+  const owned = await installedSource(marchingBorderItem, 40);
 
   return (
     <>
-      {/* Nav and hero share the slab. */}
-      <section className="land-slab relative mx-2 mt-2 overflow-hidden sm:mx-3 sm:mt-3">
-        <LandingNav />
-
+      {/* The hero's slab; the nav (in the layout) is drawn over its top. */}
+      <div className="land-slab relative mx-2 mt-2 overflow-hidden pt-16 sm:mx-3 sm:mt-3">
         <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)] items-center gap-12 px-5 pt-10 pb-12 sm:px-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,32rem)] lg:gap-16 lg:pt-16 lg:pb-20 xl:gap-20">
           <div className="flex flex-col items-start">
             <h1 className="land-rise font-(family-name:--font-display) text-[2.625rem] leading-[0.98] font-semibold tracking-[-0.04em] text-balance sm:text-[3.5rem] lg:text-[3.75rem] xl:text-[4.5rem]">
@@ -96,7 +91,10 @@ export default async function Home() {
               className="land-rise mt-8 flex flex-wrap items-center gap-3"
               style={{ ["--rise-delay" as string]: "120ms" }}
             >
-              <Link href={GET_STARTED} className={SLAB_PRIMARY}>
+              <Link
+                href={GET_STARTED_HREF}
+                className={cn(SLAB_PRIMARY, SLAB_PILL_LG, "gap-1.5 pr-4")}
+              >
                 Get started
                 <HugeiconsIcon
                   icon={ChevronRightIcon}
@@ -104,7 +102,10 @@ export default async function Home() {
                   className="size-4"
                 />
               </Link>
-              <Link href={BROWSE} className={SLAB_SECONDARY}>
+              <Link
+                href={BROWSE_HREF}
+                className={cn(SLAB_SECONDARY, SLAB_PILL_LG)}
+              >
                 Browse components
               </Link>
             </div>
@@ -132,9 +133,9 @@ export default async function Home() {
             />
           </div>
         </div>
-      </section>
+      </div>
 
-      <main className="mx-auto max-w-7xl px-5 sm:px-10">
+      <div className="mx-auto max-w-7xl px-5 sm:px-10">
         {/* The gallery: every card is the real component. */}
         <section aria-labelledby="gallery" className="pt-24 sm:pt-32">
           <div className="max-w-2xl">
@@ -192,7 +193,7 @@ export default async function Home() {
               <MarchingBorderBasic />
             </GalleryCard>
             <Link
-              href={BROWSE}
+              href={BROWSE_HREF}
               className="group flex min-h-[12rem] flex-col justify-between rounded-[1.25rem] bg-(--land-field) p-6 text-(--land-on-field) outline-0 outline-offset-2 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-(--land-field) md:col-span-3"
             >
               <p className="font-(family-name:--font-display) text-[1.75rem] leading-[1.1] font-semibold tracking-[-0.02em] text-balance">
@@ -262,7 +263,7 @@ export default async function Home() {
             </CodeBlockPre>
           </CodeBlock>
         </section>
-      </main>
+      </div>
 
       {/* The close shares the hero's slab. */}
       <section className="land-slab mx-2 mt-24 px-5 py-16 text-center sm:mx-3 sm:mt-32 sm:px-10 sm:py-24">
@@ -273,7 +274,10 @@ export default async function Home() {
           Pick the piece you need today. The rest will be here when you do.
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Link href={GET_STARTED} className={SLAB_PRIMARY}>
+          <Link
+            href={GET_STARTED_HREF}
+            className={cn(SLAB_PRIMARY, SLAB_PILL_LG, "gap-1.5 pr-4")}
+          >
             Get started
             <HugeiconsIcon
               icon={ChevronRightIcon}
@@ -282,58 +286,15 @@ export default async function Home() {
             />
           </Link>
           <a
-            href={GITHUB}
+            href={GITHUB_URL}
             target="_blank"
             rel="noreferrer noopener"
-            className={SLAB_SECONDARY}
+            className={cn(SLAB_SECONDARY, SLAB_PILL_LG)}
           >
             Star on GitHub
           </a>
         </div>
       </section>
-
-      <footer className="mx-auto flex max-w-7xl flex-col gap-10 px-5 pt-16 pb-12 sm:flex-row sm:justify-between sm:px-10">
-        <div className="max-w-xs">
-          <Link
-            href="/"
-            className="text-foreground flex items-center gap-2.5"
-            aria-label="Cubby UI home"
-          >
-            <CubbyUILogo className="h-5 w-auto" />
-            <span className="font-(family-name:--font-display) text-[1.05rem] leading-none font-semibold tracking-tight">
-              Cubby UI
-            </span>
-          </Link>
-          <p className="text-muted-foreground mt-4 text-sm leading-relaxed">
-            React components with the details done. MIT licensed.
-          </p>
-        </div>
-        <div className="grid grid-cols-2 gap-10 text-sm sm:grid-cols-3">
-          <FooterColumn
-            title="Docs"
-            links={[
-              ["Introduction", GET_STARTED],
-              ["Installation", "/docs/getting-started/installation"],
-              ["Hooks", "/docs/hooks/use-fuzzy-filter"],
-            ]}
-          />
-          <FooterColumn
-            title="Components"
-            links={[
-              ["Text Morph", "/docs/components/text-morph"],
-              ["Circular Slider", "/docs/components/circular-slider"],
-              ["Tree", "/docs/components/tree"],
-            ]}
-          />
-          <FooterColumn
-            title="Project"
-            links={[
-              ["GitHub", GITHUB],
-              ["License", `${GITHUB}/blob/main/LICENSE`],
-            ]}
-          />
-        </div>
-      </footer>
     </>
   );
 }
@@ -385,42 +346,5 @@ function GalleryCard({
         </Link>
       </div>
     </article>
-  );
-}
-
-function FooterColumn({
-  title,
-  links,
-}: {
-  title: string;
-  links: [string, string][];
-}) {
-  return (
-    <div>
-      <p className="text-foreground font-medium">{title}</p>
-      <ul className="mt-3 flex flex-col gap-2">
-        {links.map(([label, href]) => (
-          <li key={label}>
-            {href.startsWith("http") ? (
-              <a
-                href={href}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="text-muted-foreground hover:text-foreground"
-              >
-                {label}
-              </a>
-            ) : (
-              <Link
-                href={href}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                {label}
-              </Link>
-            )}
-          </li>
-        ))}
-      </ul>
-    </div>
   );
 }

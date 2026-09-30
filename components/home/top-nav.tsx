@@ -13,13 +13,14 @@ import {
 import { Button } from "@/registry/default/button/button";
 import { Kbd } from "@/registry/default/kbd/kbd";
 import { cn } from "@/lib/utils";
+import { GITHUB_URL } from "./links";
 
 export const NAV_ITEMS = [
   { label: "Components", href: "/docs/components/button" },
   { label: "Docs", href: "/docs/getting-started/introduction" },
 ] as const;
 
-export const GITHUB_URL = "https://github.com/joncoronel/cubby-ui";
+export { GITHUB_URL };
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();

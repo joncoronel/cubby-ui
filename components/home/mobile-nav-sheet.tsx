@@ -17,12 +17,13 @@ import {
   SheetTrigger,
   SheetClose,
 } from "@/registry/default/sheet/sheet";
-import { CubbyUILogo } from "@/components/cubbyui-logo";
 import { cn } from "@/lib/utils";
-import { NAV_ITEMS, GITHUB_URL } from "./top-nav";
+import { NAV_ITEMS } from "./top-nav";
+import { GITHUB_URL } from "./links";
+import { Wordmark } from "./wordmark";
 
 interface MobileNavSheetProps {
-  trigger: React.ReactNode;
+  trigger: React.ReactElement;
 }
 
 const PILL =
@@ -39,7 +40,7 @@ export function MobileNavSheet({ trigger }: MobileNavSheetProps) {
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger render={trigger as React.ReactElement} />
+      <SheetTrigger render={trigger} />
       <SheetContent
         side="top"
         variant="floating"
@@ -49,12 +50,7 @@ export function MobileNavSheet({ trigger }: MobileNavSheetProps) {
         <SheetTitle className="sr-only">Navigation</SheetTitle>
 
         <div className="flex h-12 items-center justify-between pr-1 pl-3">
-          <span className="flex items-center gap-2.5">
-            <CubbyUILogo className="h-5 w-auto" />
-            <span className="font-(family-name:--font-display) text-[1.1rem] leading-none font-semibold tracking-tight">
-              Cubby UI
-            </span>
-          </span>
+          <Wordmark />
           <SheetClose
             aria-label="Close menu"
             className="inline-flex size-10 items-center justify-center rounded-full text-(--land-on-field-muted) outline-0 outline-offset-2 outline-transparent outline-solid hover:bg-(--land-field-line) hover:text-(--land-on-field) focus-visible:outline-2 focus-visible:outline-(--land-on-field)"

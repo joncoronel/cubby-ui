@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { PauseIcon, PlayIcon } from "@hugeicons/core-free-icons";
 import { TextMorph } from "@/registry/default/text-morph/text-morph";
 import { CopyButton } from "@/registry/default/copy-button/copy-button";
 import { solidSurface } from "@/registry/default/lib/elevated";
@@ -22,21 +24,36 @@ const EASE_OUT_EXPO = "cubic-bezier(0.19, 1, 0.22, 1)";
 /** A quick, decisive exit: most of the move in the first few frames. */
 const EASE_EXIT = "cubic-bezier(0.25, 1, 0.5, 1)";
 
+function prefersReducedMotion(): boolean {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 /**
  * The hero's proof: one install command joined to the component it
  * installs. The command's component name changes letter by letter and the
- * component above it swaps in, live. It moves on by itself until the reader
- * picks one, points at it, or focuses inside it.
+ * component above it swaps in, live. It moves on by itself while it's on
+ * screen, until the reader picks one, pauses it, points at it, or focuses
+ * inside it.
  */
 export function Showcase({ items }: { items: ShowcaseItem[] }) {
   const [index, setIndex] = React.useState(0);
   // Which way the swap travels: forward (1) sends the old demo left and
   // brings the new one in from the right, like moving along the tabs.
   const [direction, setDirection] = React.useState<1 | -1>(1);
-  const [held, setHeld] = React.useState(false);
-  const [chosen, setChosen] = React.useState(false);
+  // Pointer and focus pause it separately: sharing one flag, moving the
+  // pointer away resumed it with focus still inside, and the next swap made
+  // the focused panel inert.
+  const [hovered, setHovered] = React.useState(false);
+  const [focused, setFocused] = React.useState(false);
+  // A tab picked or the pause button pressed: stays put until resumed.
+  const [stopped, setStopped] = React.useState(false);
+  const [onScreen, setOnScreen] = React.useState(true);
+  // Auto-advance, and its dwell line, start only after mount, together, and
+  // never under reduced motion.
+  const [canAdvance, setCanAdvance] = React.useState(false);
   const [pm] = usePackageManager();
-  const tablistId = React.useId();
+  const baseId = React.useId();
+  const rootRef = React.useRef<HTMLDivElement>(null);
   const tablistRef = React.useRef<HTMLDivElement>(null);
   const tabRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
   const panelRefs = React.useRef<(HTMLDivElement | null)[]>([]);
@@ -44,14 +61,50 @@ export function Showcase({ items }: { items: ShowcaseItem[] }) {
   const [pill, setPill] = React.useState<{ x: number; w: number } | null>(null);
   const [pillReady, setPillReady] = React.useState(false);
 
-  const go = (next: number, forward?: boolean): void => {
+  React.useEffect(() => {
+    setCanAdvance(!prefersReducedMotion());
+    const root = rootRef.current;
+    if (!root) return;
+    const observer = new IntersectionObserver(([entry]) =>
+      setOnScreen(entry.isIntersecting),
+    );
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, []);
+
+  const go = (next: number): void => {
     if (next === index) return;
-    setDirection((forward ?? next > index) ? 1 : -1);
+    setDirection(next > index ? 1 : -1);
     setIndex(next);
   };
 
+  // Arrow keys, Home and End move between tabs (one Tab stop for the row).
+  const onTabKeyDown = (event: React.KeyboardEvent): void => {
+    const last = items.length - 1;
+    const next =
+      event.key === "ArrowRight"
+        ? index === last
+          ? 0
+          : index + 1
+        : event.key === "ArrowLeft"
+          ? index === 0
+            ? last
+            : index - 1
+          : event.key === "Home"
+            ? 0
+            : event.key === "End"
+              ? last
+              : null;
+    if (next === null) return;
+    event.preventDefault();
+    setStopped(true);
+    go(next);
+    tabRefs.current[next]?.focus();
+  };
+
   // The highlight slides to the current tab, measured from the tab itself so
-  // it fits any label; the tab row scrolls it into view on a narrow screen.
+  // it fits any label (re-measured when the row or any tab resizes, say a
+  // font swapping in); the tab row scrolls it into view on a narrow screen.
   React.useLayoutEffect(() => {
     const list = tablistRef.current;
     const measure = (): void => {
@@ -70,6 +123,7 @@ export function Showcase({ items }: { items: ShowcaseItem[] }) {
     if (!list) return;
     const observer = new ResizeObserver(measure);
     observer.observe(list);
+    tabRefs.current.forEach((el) => el && observer.observe(el));
     return () => observer.disconnect();
   }, [index]);
   // Placed once without motion, so it doesn't slide in from the edge.
@@ -95,10 +149,7 @@ export function Showcase({ items }: { items: ShowcaseItem[] }) {
         .filter((a) => !(a instanceof CSSAnimation))
         .forEach((a) => a.cancel());
     }
-    const reduce = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    if (reduce) {
+    if (prefersReducedMotion()) {
       leaving?.animate([{ opacity: 1 }, { opacity: 0 }], {
         duration: 120,
         easing: "ease-out",
@@ -133,93 +184,109 @@ export function Showcase({ items }: { items: ShowcaseItem[] }) {
     );
   }, [index, direction]);
 
+  const auto = canAdvance && onScreen && !stopped && !hovered && !focused;
+
   React.useEffect(() => {
-    if (held || chosen) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!auto) return;
     const id = window.setTimeout(() => {
       // Moving on is always forward, the wrap back to the first included.
       setDirection(1);
       setIndex((i) => (i + 1) % items.length);
     }, DWELL_MS);
     return () => window.clearTimeout(id);
-  }, [index, held, chosen, items.length]);
+  }, [index, auto, items.length]);
 
   const item = items[index];
-  const command = packageManagerCommands(
-    `shadcn@latest add @cubby-ui/${item.slug}`,
-    "run",
-  )[pm];
-  const scope = "@cubby-ui/";
-  const head = command.slice(
-    0,
-    command.length - item.slug.length - scope.length,
-  );
-  const auto = !held && !chosen;
+  const head = packageManagerCommands("shadcn@latest add @cubby-ui/", "run")[
+    pm
+  ];
+  const command = head + item.slug;
 
   return (
     <div
+      ref={rootRef}
       className="flex w-full flex-col gap-3"
-      onPointerEnter={() => setHeld(true)}
-      onPointerLeave={() => setHeld(false)}
-      onFocus={() => setHeld(true)}
+      onPointerEnter={() => setHovered(true)}
+      onPointerLeave={() => setHovered(false)}
+      onFocus={() => setFocused(true)}
       onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget)) setHeld(false);
+        if (!e.currentTarget.contains(e.relatedTarget)) setFocused(false);
       }}
     >
-      <div
-        role="tablist"
-        aria-label="Showcased components"
-        id={tablistId}
-        ref={tablistRef}
-        className="scroll-fade-x relative -mx-1 flex gap-1 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        {pill && (
-          <span
-            aria-hidden="true"
-            style={{
-              transform: `translateX(${pill.x}px)`,
-              width: pill.w,
-              transitionTimingFunction: EASE_OUT_EXPO,
-            }}
-            className={cn(
-              "pointer-events-none absolute top-0 left-0 h-8 rounded-full bg-(--land-on-field) motion-reduce:transition-none",
-              pillReady && "transition-[transform,width] duration-[400ms]",
-            )}
-          />
-        )}
-        {items.map((it, i) => (
+      <div className="flex items-center gap-2">
+        <div
+          role="tablist"
+          aria-label="Showcased components"
+          ref={tablistRef}
+          onKeyDown={onTabKeyDown}
+          className="scroll-fade-x relative -mx-1 flex min-w-0 flex-1 gap-1 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {pill && (
+            <span
+              aria-hidden="true"
+              style={{
+                transform: `translateX(${pill.x}px)`,
+                width: pill.w,
+                transitionTimingFunction: EASE_OUT_EXPO,
+              }}
+              className={cn(
+                "pointer-events-none absolute top-0 left-0 h-8 rounded-full bg-(--land-on-field) motion-reduce:transition-none",
+                pillReady && "transition-[transform,width] duration-[400ms]",
+              )}
+            />
+          )}
+          {items.map((it, i) => (
+            <button
+              key={it.slug}
+              ref={(el) => {
+                tabRefs.current[i] = el;
+              }}
+              type="button"
+              role="tab"
+              id={`${baseId}-tab-${i}`}
+              aria-selected={i === index}
+              aria-controls={`${baseId}-panel-${i}`}
+              tabIndex={i === index ? 0 : -1}
+              onClick={() => {
+                setStopped(true);
+                go(i);
+              }}
+              className={cn(
+                // The label changes colour with the highlight arriving under
+                // it (the pill itself is the element above); before the pill
+                // is measured, the current tab paints its own fill.
+                "relative h-8 shrink-0 overflow-hidden rounded-full px-3 text-sm font-medium outline-0 outline-offset-2 outline-transparent transition-colors duration-200 outline-solid focus-visible:outline-2 focus-visible:outline-(--land-on-field)",
+                i === index
+                  ? cn("text-(--land-field)", !pill && "bg-(--land-on-field)")
+                  : "text-(--land-on-field-muted) hover:bg-(--land-field-line) hover:text-(--land-on-field)",
+              )}
+            >
+              {i === index && auto && (
+                <span
+                  key={index}
+                  aria-hidden="true"
+                  style={{ ["--dwell" as string]: `${DWELL_MS}ms` }}
+                  className="land-dwell absolute inset-x-3 bottom-1 h-px bg-(--land-field)/40"
+                />
+              )}
+              {it.name}
+            </button>
+          ))}
+        </div>
+        {canAdvance && (
           <button
-            key={it.slug}
-            ref={(el) => {
-              tabRefs.current[i] = el;
-            }}
             type="button"
-            role="tab"
-            aria-selected={i === index}
-            onClick={() => {
-              setChosen(true);
-              go(i);
-            }}
-            className={cn(
-              // The label changes colour with the highlight arriving under
-              // it (the pill itself is the element above).
-              "relative h-8 shrink-0 overflow-hidden rounded-full px-3 text-sm font-medium outline-0 outline-offset-2 outline-transparent transition-colors duration-200 outline-solid focus-visible:outline-2 focus-visible:outline-(--land-on-field)",
-              i === index
-                ? "text-(--land-field)"
-                : "text-(--land-on-field-muted) hover:bg-(--land-field-line) hover:text-(--land-on-field)",
-            )}
+            onClick={() => setStopped((s) => !s)}
+            aria-label={stopped ? "Resume the showcase" : "Pause the showcase"}
+            className="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-(--land-on-field-muted) outline-0 outline-offset-2 outline-transparent outline-solid hover:bg-(--land-field-line) hover:text-(--land-on-field) focus-visible:outline-2 focus-visible:outline-(--land-on-field)"
           >
-            {i === index && auto && (
-              <span
-                key={index}
-                aria-hidden="true"
-                style={{ ["--dwell" as string]: `${DWELL_MS}ms` }}
-                className="land-dwell absolute inset-x-3 bottom-1 h-px bg-(--land-field)/40"
-              />
-            )}
-            {it.name}
+            <HugeiconsIcon
+              icon={stopped ? PlayIcon : PauseIcon}
+              strokeWidth={2}
+              className="size-4"
+            />
           </button>
-        ))}
+        )}
       </div>
 
       <div
@@ -239,7 +306,8 @@ export function Showcase({ items }: { items: ShowcaseItem[] }) {
                 panelRefs.current[i] = el;
               }}
               role="tabpanel"
-              aria-label={it.name}
+              id={`${baseId}-panel-${i}`}
+              aria-labelledby={`${baseId}-tab-${i}`}
               inert={i !== index}
               aria-hidden={i !== index}
               className={cn(
@@ -262,7 +330,6 @@ export function Showcase({ items }: { items: ShowcaseItem[] }) {
           <code className="scroll-fade-x block min-w-0 flex-1 overflow-x-auto overflow-y-hidden font-mono text-[0.8125rem] whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <span className="text-muted-foreground">$ </span>
             {head}
-            {scope}
             <TextMorph
               value={item.slug}
               className="font-medium text-(--land-slug)"

@@ -13,9 +13,11 @@ import {
   Search01Icon,
   Sun01Icon,
 } from "@hugeicons/core-free-icons";
-import { CubbyUILogo } from "@/components/cubbyui-logo";
 import { cn } from "@/lib/utils";
-import { GITHUB_URL, NAV_ITEMS } from "./top-nav";
+import { NAV_ITEMS } from "./top-nav";
+import { GET_STARTED_HREF, GITHUB_URL } from "./links";
+import { SLAB_PRIMARY } from "./slab-styles";
+import { Wordmark } from "./wordmark";
 import { MobileNavSheet } from "./mobile-nav-sheet";
 
 /** A quiet control painted for the ultramarine slab. */
@@ -35,17 +37,14 @@ export function LandingNav() {
   return (
     <header
       style={{ ["--fd-nav-height" as string]: "4rem" }}
-      className="relative z-10 flex h-16 items-center justify-between gap-4 px-4 sm:px-6"
+      className="absolute inset-x-2 top-2 z-20 flex h-16 items-center justify-between gap-4 px-4 sm:inset-x-3 sm:top-3 sm:px-6"
     >
       <Link
         href="/"
         aria-label="Cubby UI home"
         className="flex items-center gap-2.5 rounded-lg text-(--land-on-field) outline-0 outline-offset-4 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-(--land-on-field)"
       >
-        <CubbyUILogo className="h-5 w-auto" />
-        <span className="font-(family-name:--font-display) text-[1.1rem] leading-none font-semibold tracking-tight">
-          Cubby UI
-        </span>
+        <Wordmark />
       </Link>
 
       <nav
@@ -103,8 +102,11 @@ export function LandingNav() {
           <HugeiconsIcon icon={GithubIcon} strokeWidth={2} className="size-4" />
         </a>
         <Link
-          href="/docs/getting-started/introduction"
-          className="ml-2 hidden h-9 items-center gap-1 rounded-full bg-(--land-on-field) pr-3 pl-4 text-sm font-medium text-(--land-field) outline-0 outline-offset-2 outline-transparent outline-solid hover:opacity-90 focus-visible:outline-2 focus-visible:outline-(--land-on-field) active:scale-[0.97] md:inline-flex"
+          href={GET_STARTED_HREF}
+          className={cn(
+            SLAB_PRIMARY,
+            "ml-2 hidden h-9 gap-1 pr-3 pl-4 text-sm md:inline-flex",
+          )}
         >
           Get started
           <HugeiconsIcon

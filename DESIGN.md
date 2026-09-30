@@ -450,4 +450,4 @@ The slab and the phone menu are 28px (`{rounded.landing-slab}`, 1.75rem); the he
 - **Rise:** the hero enters once, headline, lead, actions, then the showcase, each rising from 14px below and zero opacity over 800ms ease-out-expo, 60ms apart (0, 60, 120, 180ms). Under reduced motion it doesn't animate.
 - **Dwell:** the tab hairline scales from 0 to full width over the dwell, linearly, from the left; under reduced motion it is hidden, since nothing advances on its own.
 - **Stage swap:** a directional handoff: exit 160ms (fade, 12px drift, 3px blur), enter 70ms later over 380ms ease-out-expo (from 16px, 4px blur); the tab pill slides on the same curve over 400ms. Under reduced motion: opacity only, 120ms out and 180ms in, no slide.
-- **Slug:** the command's slug changes through `TextMorph` in its default mode, then the command scrolls back to its end if it overflows.
+- **Slug:** the command's slug changes through `TextMorph` in its default mode; nothing scrolls the command for the reader.

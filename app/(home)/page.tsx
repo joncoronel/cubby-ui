@@ -1,5 +1,5 @@
-import Link from "next/link";
 import type { ReactElement, ReactNode } from "react";
+import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon, ChevronRightIcon } from "@hugeicons/core-free-icons";
 import {

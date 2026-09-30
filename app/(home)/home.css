@@ -44,6 +44,11 @@
 .land-slab ::selection {
   background: oklch(1 0 0 / 0.28);
 }
+/* The showcase stage is a white card on the slab: back to the page's
+   selection, or selected text there went white on white. */
+.land-slab .land-stage ::selection {
+  background: color-mix(in oklab, var(--land-field) 24%, transparent);
+}
 
 /* The active showcase tab fills over its dwell, so the swap reads as
    the page moving on, not a glitch. */

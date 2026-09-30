@@ -18,6 +18,9 @@ export function QrDemo() {
       <Input
         aria-label="Text to encode"
         value={value}
+        // Well inside what a QR code can hold: past its capacity the encoder
+        // throws, which took the page down.
+        maxLength={200}
         onChange={(e) => setValue(e.target.value)}
         className="text-center"
       />

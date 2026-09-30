@@ -291,7 +291,7 @@ export function Showcase({ items }: { items: ShowcaseItem[] }) {
 
       <div
         className={cn(
-          "text-foreground overflow-hidden rounded-[1.25rem]",
+          "land-stage text-foreground overflow-hidden rounded-[1.25rem]",
           solidSurface(3, 6),
         )}
       >

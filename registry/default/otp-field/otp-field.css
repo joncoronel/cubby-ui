@@ -1,17 +1,146 @@
 /* -------------------------------------------------------------------------------------------------
- * OTP field invalid-input shake animation.
+ * Sliding focus ring, in CSS anchor positioning.
+ *
+ * The focused slot takes the anchor name and the ring is placed on it, so
+ * moving focus moves the anchor and the ring's inset transitions to the new
+ * slot. `anchor-scope` keeps each field's name to itself. The ring is
+ * display: none while the field has no focus, so it has no earlier position
+ * to slide from: it appears on the slot and settles in (@starting-style).
+ * Without anchor positioning, each slot draws its own ring instead.
+ * -------------------------------------------------------------------------------------------------*/
+
+[data-slot="otp-field"] {
+  anchor-scope: --otp-field-slot;
+}
+
+[data-slot="otp-field-slot"]:focus-within {
+  anchor-name: --otp-field-slot;
+}
+
+.otp-field-indicator {
+  display: none;
+  position: absolute;
+  position-anchor: --otp-field-slot;
+  top: anchor(top);
+  left: anchor(left);
+  width: anchor-size(width);
+  height: anchor-size(height);
+  z-index: 1;
+  border-radius: var(--otp-field-radius, var(--radius-lg));
+  pointer-events: none;
+  transition:
+    top 280ms cubic-bezier(0.19, 1, 0.22, 1),
+    left 280ms cubic-bezier(0.19, 1, 0.22, 1),
+    width 280ms cubic-bezier(0.19, 1, 0.22, 1),
+    height 280ms cubic-bezier(0.19, 1, 0.22, 1),
+    scale 240ms cubic-bezier(0.19, 1, 0.22, 1),
+    opacity 150ms ease-out,
+    outline-color 150ms ease-out;
+}
+
+[data-slot="otp-field"]:focus-within > .otp-field-indicator {
+  display: block;
+
+  @starting-style {
+    opacity: 0;
+    scale: 1.12;
+  }
+}
+
+/* Every anchor feature the ring uses, or none: a partial implementation
+ * would leave it unsized or tied to another field. */
+@supports not (
+  (anchor-name: --otp-field-slot) and (anchor-scope: --otp-field-slot) and
+    (width: anchor-size(width))
+) {
+  .otp-field-indicator {
+    display: none !important;
+  }
+
+  [data-slot="otp-field-slot"]:focus-within {
+    outline: 2px solid
+      color-mix(in oklab, var(--color-ring, Highlight) 50%, transparent);
+    outline-offset: 2px;
+  }
+
+  .otp-field-shake-a [data-slot="otp-field-slot"]:focus-within,
+  .otp-field-shake-b [data-slot="otp-field-slot"]:focus-within {
+    outline-color: color-mix(
+      in oklab,
+      var(--color-destructive, red) 80%,
+      transparent
+    );
+  }
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * The input's own text is hidden (the character is drawn above it by
+ * TextMorph). Its native caret stays in an empty slot, where it sits centred,
+ * and hides in a filled one, where it would sit beside the invisible
+ * character rather than the drawn one. Unlayered and specific, so a page's
+ * global `input { caret-color }` can't override it.
+ * -------------------------------------------------------------------------------------------------*/
+
+[data-slot="otp-field-slot"] > input[data-slot="otp-field-input"] {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  caret-color: var(--color-primary, CanvasText);
+}
+
+[data-slot="otp-field-slot"][data-filled] > input[data-slot="otp-field-input"] {
+  caret-color: transparent;
+}
+
+/* Forced colors would repaint the input's own text over the drawn one. */
+@media (forced-colors: active) {
+  [data-slot="otp-field-slot"] > input[data-slot="otp-field-input"] {
+    forced-color-adjust: none;
+  }
+}
+
+/* A filled slot selects its character on focus (typing replaces it): the
+ * drawn character carries the selection, since the input's is invisible. */
+.otp-field-glyph {
+  border-radius: 3px;
+  padding-inline: 1px;
+  transition:
+    background-color 100ms ease-out,
+    color 100ms ease-out;
+}
+
+[data-slot="otp-field-slot"][data-filled]:focus-within .otp-field-glyph {
+  background-color: var(--color-primary, Highlight);
+  color: var(--color-primary-foreground, HighlightText);
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Invalid-input shake.
  *
  * Paired identical keyframes. CSS animations don't restart when re-applied to
  * the same element with the same animation-name, so on each invalid OTP entry
  * we alternate between the two classes to force the browser to treat it as a
- * new animation and replay the shake. Keep both bodies in sync.
+ * new animation and replay the shake. Keep both bodies in sync. The class
+ * sits on the field (useInvalidFeedback); the focused slot and the ring shake
+ * together with `transform`, which leaves the anchor where it is (moving the
+ * slot's layout box would start the ring's slide transition instead).
  * -------------------------------------------------------------------------------------------------*/
 
-.otp-field-shake-a {
+.otp-field-shake-a > .otp-field-indicator,
+.otp-field-shake-b > .otp-field-indicator {
+  outline-color: color-mix(
+    in oklab,
+    var(--color-destructive, red) 80%,
+    transparent
+  );
+}
+
+.otp-field-shake-a > .otp-field-indicator,
+.otp-field-shake-a [data-slot="otp-field-slot"]:focus-within {
   animation: otp-field-shake-a 180ms ease-in-out;
 }
 
-.otp-field-shake-b {
+.otp-field-shake-b > .otp-field-indicator,
+.otp-field-shake-b [data-slot="otp-field-slot"]:focus-within {
   animation: otp-field-shake-b 180ms ease-in-out;
 }
 
@@ -42,8 +171,21 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .otp-field-shake-a,
-  .otp-field-shake-b {
-    animation: none;
+  .otp-field-indicator {
+    transition:
+      opacity 150ms ease-out,
+      outline-color 150ms ease-out;
+  }
+
+  [data-slot="otp-field"]:focus-within > .otp-field-indicator {
+    @starting-style {
+      scale: 1;
+    }
+  }
+
+  /* The ring still turns red. */
+  [data-slot="otp-field"] > .otp-field-indicator,
+  [data-slot="otp-field-slot"] {
+    animation: none !important;
   }
 }

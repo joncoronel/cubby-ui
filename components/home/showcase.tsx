@@ -29,6 +29,15 @@ export function Showcase({ items }: { items: ShowcaseItem[] }) {
   const [chosen, setChosen] = React.useState(false);
   const [pm] = usePackageManager();
   const tablistId = React.useId();
+  const commandRef = React.useRef<HTMLElement>(null);
+
+  // On a screen too narrow for the whole command, keep its end, the
+  // component's name, in view; the fade on the left says there's more.
+  const showName = React.useCallback((): void => {
+    const el = commandRef.current;
+    if (el) el.scrollLeft = el.scrollWidth;
+  }, []);
+  React.useLayoutEffect(showName, [showName, pm]);
 
   React.useEffect(() => {
     if (held || chosen) return;
@@ -129,30 +138,23 @@ export function Showcase({ items }: { items: ShowcaseItem[] }) {
         </div>
 
         {/* The command that installs what's above it. */}
-        <div className="flex items-center gap-2 bg-(--land-field-deep) py-3 pr-2.5 pl-4 text-(--land-on-field)">
-          {/* Plain inline text, like the docs' command: a flex row here
-              shifted the morph's leaving glyphs as the line's baseline moved.
-              Right-to-left overflow clips the start of the command on a
-              narrow screen, so the component's name always shows; the text
-              itself stays left-to-right. */}
+        <div className="bg-muted text-foreground border-border flex items-center gap-2 border-t py-2.5 pr-2 pl-4">
+          {/* Scrolls sideways when it doesn't fit, whole and readable, with
+              the edge fade showing which way there's more. */}
           <code
-            dir="rtl"
-            className="block min-w-0 flex-1 overflow-hidden text-left font-mono text-[0.875rem] text-ellipsis whitespace-nowrap sm:text-[0.9375rem]"
+            ref={commandRef}
+            className="scroll-fade-x block min-w-0 flex-1 overflow-x-auto font-mono text-[0.8125rem] whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
-            <span dir="ltr">
-              <span className="opacity-60">$ </span>
-              {head}
-              {scope}
-              <TextMorph
-                value={item.slug}
-                className="font-medium text-(--land-spark)"
-              />
-            </span>
+            <span className="text-muted-foreground">$ </span>
+            {head}
+            {scope}
+            <TextMorph
+              value={item.slug}
+              onMorphComplete={showName}
+              className="font-medium text-(--land-slug)"
+            />
           </code>
-          <CopyButton
-            content={command}
-            className="text-(--land-on-field-muted) hover:bg-(--land-field-line) hover:text-(--land-on-field)"
-          />
+          <CopyButton content={command} />
         </div>
       </div>
     </div>

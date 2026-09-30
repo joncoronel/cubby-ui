@@ -1,17 +1,17 @@
 /* The landing page's own look, scoped to `.landing` (and `.land-vars` for
    the phone menu, which renders outside it) so none of it reaches /docs or
    the registry. A drenched ultramarine slab holds the nav, hero and close;
-   the page between them keeps the app's background. One marigold spark
-   marks the live component name. */
+   the page between them keeps the app's background. */
 
 .landing,
 .land-vars {
   --land-field: oklch(0.47 0.2 264);
-  --land-field-deep: oklch(0.39 0.18 264);
   --land-on-field: oklch(0.985 0.008 264);
   --land-on-field-muted: oklch(0.87 0.05 264);
   --land-field-line: oklch(1 0 0 / 0.16);
-  --land-spark: oklch(0.85 0.15 82);
+  /* The install command's component name: Cubby Blue, deepened (light) or
+     lifted (dark) so small mono text clears 4.5:1 on the muted bar. */
+  --land-slug: oklch(0.5 0.2 258);
 }
 
 /* The page between the slabs is the app's own background, the same as the
@@ -23,10 +23,9 @@
 .dark .landing,
 .dark .land-vars {
   --land-field: oklch(0.37 0.16 264);
-  --land-field-deep: oklch(0.29 0.13 264);
   --land-on-field-muted: oklch(0.84 0.05 264);
   --land-field-line: oklch(1 0 0 / 0.12);
-  --land-spark: oklch(0.83 0.14 82);
+  --land-slug: oklch(0.76 0.13 255);
 }
 
 /* The slab: inset from the page edge like the docs' card, so the two

@@ -6,8 +6,12 @@ import { useRender } from "@base-ui/react/use-render";
 
 import { cn } from "@/lib/utils";
 
+// A title and description share the row only when both are there: set here
+// on the root, with a direct child as the target, rather than as group-has
+// variants on each, which compile to `:has()` inside `:is(… *)` and make
+// Chrome restyle the whole page on any DOM insertion (~8ms on a docs page).
 const alertVariants = cva(
-  "relative w-full rounded-lg border border-border/70 px-4 py-3 pl-6 text-sm grid has-[>svg]:grid-cols-[auto_1fr] grid-cols-[0_1fr] has-[>svg]:gap-x-3 gap-y-0.5 items-start [&>svg]:row-span-2 [&>svg]:text-current shadow-sm has-[*[data-slot=alert-action]]:grid-cols-[0_1fr] has-[>svg]:has-[*[data-slot=alert-action]]:grid-cols-[auto_1fr] sm:has-[*[data-slot=alert-action]]:grid-cols-[0_1fr_auto] sm:has-[>svg]:has-[*[data-slot=alert-action]]:grid-cols-[auto_1fr_auto] [&>svg]:size-5 group before:absolute before:left-2 before:top-2 before:bottom-2 before:w-1 before:rounded-full bg-card dark:bg-muted",
+  "relative w-full rounded-lg border border-border/70 px-4 py-3 pl-6 text-sm grid has-[>svg]:grid-cols-[auto_1fr] grid-cols-[0_1fr] has-[>svg]:gap-x-3 gap-y-0.5 items-start [&>svg]:row-span-2 [&>svg]:text-current shadow-sm has-[*[data-slot=alert-action]]:grid-cols-[0_1fr] has-[>svg]:has-[*[data-slot=alert-action]]:grid-cols-[auto_1fr] sm:has-[*[data-slot=alert-action]]:grid-cols-[0_1fr_auto] sm:has-[>svg]:has-[*[data-slot=alert-action]]:grid-cols-[auto_1fr_auto] [&>svg]:size-5 [&:has(>[data-slot=alert-description])>[data-slot=alert-title]]:row-span-1 [&:has(>[data-slot=alert-title])>[data-slot=alert-description]]:row-span-1 group before:absolute before:left-2 before:top-2 before:bottom-2 before:w-1 before:rounded-full bg-card dark:bg-muted",
   {
     variants: {
       variant: {
@@ -51,7 +55,7 @@ function AlertTitle({ className, render, ...props }: AlertTitleProps) {
   const defaultProps = {
     "data-slot": "alert-title",
     className: cn(
-      "col-start-2 min-h-4 font-medium tracking-tight row-span-2 self-center group-has-[*[data-slot=alert-description]]:row-span-1 text-card-foreground",
+      "col-start-2 min-h-4 font-medium tracking-tight row-span-2 self-center text-card-foreground",
       className,
     ),
   };
@@ -75,7 +79,7 @@ function AlertDescription({
   const defaultProps = {
     "data-slot": "alert-description",
     className: cn(
-      "col-start-2 grid justify-items-start gap-1 text-sm [&_p]:leading-relaxed row-span-2 self-center group-has-[*[data-slot=alert-title]]:row-span-1 text-muted-foreground",
+      "col-start-2 grid justify-items-start gap-1 text-sm [&_p]:leading-relaxed row-span-2 self-center text-muted-foreground",
       className,
     ),
   };

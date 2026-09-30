@@ -67,6 +67,7 @@
     "@cubby-ui/switch",
     "@cubby-ui/table",
     "@cubby-ui/tabs",
+    "@cubby-ui/text-morph",
     "@cubby-ui/textarea",
     "@cubby-ui/timeline",
     "@cubby-ui/toast",

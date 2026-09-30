@@ -1,0 +1,468 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-25T00:00:00Z",
+  "title": "Design System: Cubby UI",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Cubby Blue",
+        "canonical": "oklch(0.6 0.2 250)",
+        "tonalRamp": [
+          "oklch(0.15 0.06 250)",
+          "oklch(0.26 0.1 250)",
+          "oklch(0.37 0.14 250)",
+          "oklch(0.48 0.18 250)",
+          "oklch(0.6 0.2 250)",
+          "oklch(0.72 0.15 250)",
+          "oklch(0.84 0.09 250)",
+          "oklch(0.95 0.03 250)"
+        ]
+      },
+      "primary-foreground": {
+        "role": "primary",
+        "displayName": "On Blue",
+        "canonical": "oklch(1 0 0)"
+      },
+      "ring": {
+        "role": "primary",
+        "displayName": "Focus Blue",
+        "canonical": "oklch(0.55 0.2 250)"
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "oklch(0.18 0.004 270)",
+        "tonalRamp": [
+          "oklch(0.15 0.004 270)",
+          "oklch(0.18 0.004 270)",
+          "oklch(0.32 0.004 270)",
+          "oklch(0.5 0.004 270)",
+          "oklch(0.73 0.004 270)",
+          "oklch(0.87 0.004 270)",
+          "oklch(0.94 0.004 270)",
+          "oklch(0.98 0.002 270)"
+        ]
+      },
+      "muted-foreground": {
+        "role": "neutral",
+        "displayName": "Quiet Ink",
+        "canonical": "oklch(0.5 0.004 270)"
+      },
+      "surface-1": {
+        "role": "neutral",
+        "displayName": "Page",
+        "canonical": "oklch(0.97 0 0)",
+        "tonalRamp": [
+          "oklch(0.97 0 0)",
+          "oklch(0.985 0 0)",
+          "oklch(1 0 0)",
+          "oklch(1 0 0)",
+          "oklch(1 0 0)",
+          "oklch(1 0 0)",
+          "oklch(1 0 0)",
+          "oklch(1 0 0)"
+        ]
+      },
+      "surface-2": {
+        "role": "neutral",
+        "displayName": "Raised Paper Low",
+        "canonical": "oklch(0.985 0 0)"
+      },
+      "surface-3": {
+        "role": "neutral",
+        "displayName": "Raised Paper",
+        "canonical": "oklch(1 0 0)"
+      },
+      "secondary": {
+        "role": "neutral",
+        "displayName": "Plate Gray",
+        "canonical": "oklch(0.92 0 0)"
+      },
+      "secondary-foreground": {
+        "role": "neutral",
+        "displayName": "Plate Ink",
+        "canonical": "oklch(0.32 0.004 270)"
+      },
+      "neutral": {
+        "role": "neutral",
+        "displayName": "Chrome Black",
+        "canonical": "oklch(0.21 0.004 270)"
+      },
+      "neutral-foreground": {
+        "role": "neutral",
+        "displayName": "On Chrome",
+        "canonical": "oklch(0.98 0.002 270)"
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "color-mix(in oklab, var(--foreground) 10%, transparent)"
+      },
+      "destructive": {
+        "role": "status",
+        "displayName": "Destructive Red",
+        "canonical": "oklch(0.53 0.19 25)"
+      },
+      "danger-foreground": {
+        "role": "status",
+        "displayName": "Danger",
+        "canonical": "oklch(0.55 0.18 25)"
+      },
+      "warning-foreground": {
+        "role": "status",
+        "displayName": "Warning",
+        "canonical": "oklch(0.58 0.14 85)"
+      },
+      "info-foreground": {
+        "role": "status",
+        "displayName": "Info",
+        "canonical": "oklch(0.45 0.2 250)"
+      },
+      "success-foreground": {
+        "role": "status",
+        "displayName": "Success",
+        "canonical": "oklch(0.48 0.18 145)"
+      },
+      "dark-surface-1": {
+        "role": "neutral",
+        "displayName": "Dark Page",
+        "canonical": "oklch(0.205 0.004 270)",
+        "tonalRamp": [
+          "oklch(0.205 0.004 270)",
+          "oklch(0.235 0.004 270)",
+          "oklch(0.264 0.004 270)",
+          "oklch(0.293 0.004 270)",
+          "oklch(0.321 0.004 270)",
+          "oklch(0.348 0.004 270)",
+          "oklch(0.375 0.004 270)",
+          "oklch(0.402 0.004 270)"
+        ]
+      },
+      "dark-surface-3": {
+        "role": "neutral",
+        "displayName": "Dark Raised Paper",
+        "canonical": "oklch(0.264 0.004 270)"
+      },
+      "dark-foreground": {
+        "role": "neutral",
+        "displayName": "Dark Ink",
+        "canonical": "oklch(0.94 0.004 270)"
+      },
+      "dark-muted-foreground": {
+        "role": "neutral",
+        "displayName": "Dark Quiet Ink",
+        "canonical": "oklch(0.73 0.004 270)"
+      },
+      "dark-chrome": {
+        "role": "neutral",
+        "displayName": "Dark Chrome",
+        "canonical": "oklch(0.159 0.004 270)"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Page titles (2.25rem mobile, 2.75rem desktop) and the home hero (2.5rem to 3.75rem). Bricolage Grotesque with optical sizing."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Docs h2."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Docs h3; footer next/previous names at 1.25rem."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "Description under a title, Quiet Ink, capped 52ch to 58ch."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Docs prose at 88% ink, 44rem column."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Shelf cells, rail labels, table headers, tool buttons."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Code, prop names, types. Inline code at 0.84em on a 7% ink plate."
+      }
+    },
+    "shadows": [
+      {
+        "name": "surface-shadow-1",
+        "value": "0 0 0 1px oklch(0 0 0 / 0.06)",
+        "purpose": "Hairline ring; flush containers and the light chrome edge."
+      },
+      {
+        "name": "surface-shadow-3",
+        "value": "0 0 0 1px oklch(0 0 0 / 0.06), 0 1px 1px -0.5px oklch(0 0 0 / 0.06), 0 3px 3px -1.5px oklch(0 0 0 / 0.05)",
+        "purpose": "Resting cards, inputs, home category tiles."
+      },
+      {
+        "name": "surface-shadow-6",
+        "value": "0 0 0 1px oklch(0 0 0 / 0.06), 0 1px 1px -0.5px oklch(0 0 0 / 0.06), 0 3px 3px -1.5px oklch(0 0 0 / 0.05), 0 6px 6px -3px oklch(0 0 0 / 0.05), 0 12px 12px -6px oklch(0 0 0 / 0.04), 0 24px 24px -12px oklch(0 0 0 / 0.04)",
+        "purpose": "Hovered tiles, popovers, menus."
+      },
+      {
+        "name": "surface-shadow-8",
+        "value": "0 0 0 1px oklch(0 0 0 / 0.06), 0 1px 1px -0.5px oklch(0 0 0 / 0.06), 0 3px 3px -1.5px oklch(0 0 0 / 0.05), 0 6px 6px -3px oklch(0 0 0 / 0.05), 0 12px 12px -6px oklch(0 0 0 / 0.04), 0 24px 24px -12px oklch(0 0 0 / 0.04), 0 48px 48px -24px oklch(0 0 0 / 0.03), 0 96px 96px -48px oklch(0 0 0 / 0.03)",
+        "purpose": "Top of the ladder: dialogs and the highest floats."
+      },
+      {
+        "name": "dark-rim-3",
+        "value": "inset 0 1px 0 0 oklch(1 0 0 / 0.02), inset 0 0 0 1px oklch(1 0 0 / 0.02)",
+        "purpose": "Dark-mode lit top edge and ring, painted on a pseudo-element above children."
+      },
+      {
+        "name": "dark-chrome-shadow",
+        "value": "0 0 0 1px oklch(0 0 0 / 0.7), inset 0 1px 0 0 oklch(1 0 0 / 0.065)",
+        "purpose": "Defines the dark chrome fill against the dark page."
+      },
+      {
+        "name": "docs-shelf-panel",
+        "value": "0 1px 0 var(--border), 0 24px 48px -16px oklch(0 0 0 / 0.16)",
+        "purpose": "The open shelf dropping from the header (dark: 0.5 alpha)."
+      },
+      {
+        "name": "docs-rail-float",
+        "value": "0 0 0 1px var(--border), 0 16px 40px -12px oklch(0 0 0 / 0.14)",
+        "purpose": "Tick rail expanded on hover or focus (dark: 0.5 alpha)."
+      },
+      {
+        "name": "docs-stage-outline",
+        "value": "0 0 0 1px var(--border)",
+        "purpose": "Preview stage: drawn, not lifted."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out-expo",
+        "value": "cubic-bezier(0.19, 1, 0.22, 1)",
+        "purpose": "The settle curve for everything that opens or enters (docs --docs-ease, home reveal, prop panels)."
+      },
+      {
+        "name": "ease-in-cubic",
+        "value": "cubic-bezier(0.55, 0.055, 0.675, 0.19)",
+        "purpose": "Closing clips (docs --docs-ease-in)."
+      },
+      {
+        "name": "ease-out-cubic",
+        "value": "cubic-bezier(0.215, 0.61, 0.355, 1)",
+        "purpose": "Theme token available for general easing."
+      },
+      {
+        "name": "ease-in-out-cubic",
+        "value": "cubic-bezier(0.645, 0.045, 0.355, 1)",
+        "purpose": "Theme token available for symmetric moves."
+      },
+      {
+        "name": "hover",
+        "value": "150ms ease-out",
+        "purpose": "Color and wash changes on links, cells, tools."
+      },
+      {
+        "name": "button-press",
+        "value": "100ms ease-out, paint scale 0.98",
+        "purpose": "Button fill and press feedback."
+      },
+      {
+        "name": "open",
+        "value": "550ms ease-out-expo",
+        "purpose": "Shelf clip reveal."
+      },
+      {
+        "name": "close",
+        "value": "260 to 300ms ease-in-cubic",
+        "purpose": "Shelf close; closing is faster than opening."
+      },
+      {
+        "name": "shelf-stagger",
+        "value": "delay calc(60ms + min(i, 48) * 5ms); 500ms translate, 350ms opacity",
+        "purpose": "Cells rising into the shelf."
+      },
+      {
+        "name": "enter",
+        "value": "600ms ease-out-expo, from translate 0.5rem, blur 3px, opacity 0",
+        "purpose": "Page header and prose settling in on navigation (prose delayed 70ms)."
+      },
+      {
+        "name": "roll-in",
+        "value": "400ms ease-out-expo, from translate 55%, blur 2px",
+        "purpose": "Header section crumb and shelf status text changing."
+      },
+      {
+        "name": "home-reveal",
+        "value": "800ms ease-out-expo, from translateY 16px, 80ms stagger",
+        "purpose": "Home hero load sequence."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "transforms, clips, blurs and draws removed; opacity 150ms only",
+        "purpose": "prefers-reduced-motion: reduce."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "prose-narrow",
+        "value": "40rem"
+      },
+      {
+        "name": "sm",
+        "value": "40rem"
+      },
+      {
+        "name": "md",
+        "value": "48rem"
+      },
+      {
+        "name": "lg",
+        "value": "64rem"
+      },
+      {
+        "name": "xl",
+        "value": "80rem"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one blue action; paint on a pseudo-layer that scales on press.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">Get started</button>",
+      "css": ".ds-btn { position: relative; isolation: isolate; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px; padding: 0 14px; border: 0; border-radius: 12px; font: 500 14px/1 Geist, ui-sans-serif, system-ui, sans-serif; cursor: pointer; background: transparent; outline: 0 solid transparent; outline-offset: 0; transition: outline-width 100ms ease-out, outline-offset 100ms ease-out, color 100ms ease-out; } .ds-btn::before { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: var(--ds-paint, transparent); border: 1px solid var(--ds-border, transparent); transition: background-color 100ms ease-out, scale 100ms ease-out; } .ds-btn:active::before { scale: 0.98; } .ds-btn:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.55 0.2 250) 50%, transparent); outline-offset: 2px; } .ds-btn-primary { color: oklch(1 0 0); --ds-paint: oklch(0.6 0.2 250); } .ds-btn-primary:hover { --ds-paint: color-mix(in oklch, oklch(0.6 0.2 250), black 5%); } .ds-btn-primary:active { --ds-paint: color-mix(in oklch, oklch(0.6 0.2 250), black 8%); }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Secondary action on the page: card fill with a hairline.",
+      "html": "<button class=\"ds-btn-o\">Browse components</button>",
+      "css": ".ds-btn-o { position: relative; display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 12px; border: 1px solid color-mix(in oklab, oklch(0.18 0.004 270) 10%, transparent); background: oklch(1 0 0); color: oklch(0.18 0.004 270); font: 500 14px/1 Geist, ui-sans-serif, system-ui, sans-serif; cursor: pointer; transition: background-color 100ms ease-out, scale 100ms ease-out; } .ds-btn-o:hover { background: color-mix(in oklch, oklch(1 0 0), black 5%); } .ds-btn-o:active { background: color-mix(in oklch, oklch(1 0 0), black 8%); scale: 0.98; } .ds-btn-o:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.55 0.2 250) 50%, transparent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Quiet tool: Quiet Ink label that brightens to ink on a 6% wash.",
+      "html": "<button class=\"ds-btn-g\">Copy page</button>",
+      "css": ".ds-btn-g { display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border: 0; border-radius: 12px; background: transparent; color: oklch(0.5 0.004 270); font: 500 14px/1 Geist, ui-sans-serif, system-ui, sans-serif; cursor: pointer; transition: background-color 100ms ease-out, color 100ms ease-out; } .ds-btn-g:hover { color: oklch(0.18 0.004 270); background: oklch(0 0 0 / 0.06); } .ds-btn-g:active { background: oklch(0 0 0 / 0.08); } .ds-btn-g:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.55 0.2 250) 50%, transparent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Shelf Trigger",
+      "kind": "nav",
+      "refersTo": "shelf-trigger",
+      "description": "Header pill naming the current page, with the four-cell cubby glyph.",
+      "html": "<button class=\"ds-trigger\" aria-expanded=\"false\"><svg class=\"ds-glyph\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\"><rect x=\"1.5\" y=\"1.5\" width=\"5.5\" height=\"5.5\" rx=\"1.6\"/><rect x=\"9\" y=\"1.5\" width=\"5.5\" height=\"5.5\" rx=\"1.6\"/><rect x=\"1.5\" y=\"9\" width=\"5.5\" height=\"5.5\" rx=\"1.6\"/><rect x=\"9\" y=\"9\" width=\"5.5\" height=\"5.5\" rx=\"1.6\"/></svg><span class=\"ds-trigger-group\">Components</span><span class=\"ds-trigger-sep\">/</span><span class=\"ds-trigger-page\">Button</span><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"ds-chev\" aria-hidden=\"true\"><path d=\"M18 9l-6 6-6-6\"/></svg></button>",
+      "css": ".ds-trigger { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 10px; border: 0; border-radius: 999px; background: transparent; font: 400 14px/1 Geist, ui-sans-serif, system-ui, sans-serif; cursor: pointer; transition: background-color 150ms ease-out; } .ds-trigger:hover { background: oklch(0 0 0 / 0.06); } .ds-trigger[aria-expanded='true'] { background: oklch(0 0 0 / 0.1); } .ds-trigger:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.55 0.2 250) 50%, transparent); } .ds-glyph rect { fill: currentColor; opacity: 0.32; } .ds-glyph rect:first-child { fill: oklch(0.6 0.2 250); opacity: 1; } .ds-trigger-group { color: oklch(0.5 0.004 270); } .ds-trigger-sep { color: color-mix(in oklab, oklch(0.18 0.004 270) 10%, transparent); } .ds-trigger-page { color: oklch(0.18 0.004 270); font-weight: 500; } .ds-chev { color: oklch(0.5 0.004 270); transition: rotate 400ms cubic-bezier(0.19, 1, 0.22, 1); } .ds-trigger[aria-expanded='true'] .ds-chev { rotate: 180deg; }"
+    },
+    {
+      "name": "Cubby Shelf Index",
+      "kind": "custom",
+      "refersTo": "shelf-link",
+      "description": "A contents page: plain links flowing down columns; the current page takes a small blue mark.",
+      "html": "<ul class=\"ds-index\"><li><a class=\"ds-link\" href=\"#\"><span class=\"ds-mark\"></span>Accordion</a></li><li><a class=\"ds-link\" href=\"#\"><span class=\"ds-mark\"></span>Alert</a></li><li><a class=\"ds-link\" aria-current=\"page\" href=\"#\"><span class=\"ds-mark\"></span>Button</a></li><li><a class=\"ds-link\" href=\"#\"><span class=\"ds-mark\"></span>Card</a></li><li><a class=\"ds-link\" href=\"#\"><span class=\"ds-mark\"></span>Dialog</a></li><li><a class=\"ds-link\" href=\"#\"><span class=\"ds-mark\"></span>Popover</a></li></ul>",
+      "css": ".ds-index { columns: 2; column-gap: 24px; list-style: none; margin: 0; padding: 0; } .ds-index > li { break-inside: avoid; } .ds-link { display: flex; align-items: center; height: 32px; margin: 0 -8px; padding: 0 8px; border-radius: 8px; font: 400 14px/1 Geist, ui-sans-serif, system-ui, sans-serif; color: oklch(0.5 0.004 270); text-decoration: none; transition: color 150ms ease-out, background-color 150ms ease-out; } .ds-link:hover { color: oklch(0.18 0.004 270); background: oklch(0 0 0 / 0.06); } .ds-link:focus-visible { color: oklch(0.18 0.004 270); outline: 2px solid color-mix(in oklab, oklch(0.55 0.2 250) 55%, transparent); outline-offset: -2px; } .ds-link[aria-current='page'] { color: oklch(0.18 0.004 270); font-weight: 500; } .ds-mark { flex-shrink: 0; width: 0; height: 6px; margin-right: 0; border-radius: 2px; background: oklch(0.6 0.2 250); scale: 0; transition: width 300ms cubic-bezier(0.19, 1, 0.22, 1), margin 300ms cubic-bezier(0.19, 1, 0.22, 1), scale 300ms cubic-bezier(0.19, 1, 0.22, 1); } .ds-link[aria-current='page'] .ds-mark { width: 6px; margin-right: 8px; scale: 1; }"
+    },
+    {
+      "name": "Preview Stage",
+      "kind": "card",
+      "refersTo": "preview-stage",
+      "description": "The live component's stage: drawn with a hairline, faint light from above, tools top-right.",
+      "html": "<figure class=\"ds-stage\"><div class=\"ds-tools\"><button class=\"ds-tool\" aria-expanded=\"false\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M8 7l-5 5 5 5\"/><path d=\"M16 7l5 5-5 5\"/></svg>Code</button></div><div class=\"ds-canvas\"><button class=\"ds-demo\">Button</button></div></figure>",
+      "css": ".ds-stage { position: relative; display: flex; min-height: 16rem; margin: 0; border-radius: 18px; background-color: oklch(0.97 0 0); background-image: radial-gradient(120% 90% at 50% 0%, color-mix(in oklab, oklch(0.18 0.004 270) 3.5%, transparent), transparent 70%); box-shadow: 0 0 0 1px color-mix(in oklab, oklch(0.18 0.004 270) 10%, transparent); } .ds-tools { position: absolute; top: 8px; right: 8px; display: flex; gap: 2px; } .ds-tool { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 8px; border: 0; border-radius: 8px; background: transparent; color: oklch(0.5 0.004 270); font: 500 12px/1 Geist, ui-sans-serif, system-ui, sans-serif; cursor: pointer; transition: color 150ms ease-out, background-color 150ms ease-out; } .ds-tool:hover { color: oklch(0.18 0.004 270); background: oklch(0 0 0 / 0.06); } .ds-tool[aria-expanded='true'] { color: oklch(0.18 0.004 270); background: oklch(0 0 0 / 0.1); } .ds-tool:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.55 0.2 250) 50%, transparent); } .ds-canvas { display: flex; flex: 1; align-items: center; justify-content: center; padding: 52px 24px 40px; } .ds-demo { height: 36px; padding: 0 14px; border: 0; border-radius: 12px; background: oklch(0.6 0.2 250); color: oklch(1 0 0); font: 500 14px/1 Geist, ui-sans-serif, system-ui, sans-serif; }"
+    },
+    {
+      "name": "Tick Rail",
+      "kind": "nav",
+      "description": "Table of contents as ticks; expands into a floating panel with labels on hover or focus.",
+      "html": "<nav class=\"ds-rail\"><a class=\"ds-rl\" href=\"#\"><span class=\"ds-rl-label\">Installation</span><span class=\"ds-tick\"></span></a><a class=\"ds-rl\" data-active href=\"#\"><span class=\"ds-rl-label\">Usage</span><span class=\"ds-tick\"></span></a><a class=\"ds-rl ds-deep\" href=\"#\"><span class=\"ds-rl-label\">Variants</span><span class=\"ds-tick\"></span></a><a class=\"ds-rl\" href=\"#\"><span class=\"ds-rl-label\">API reference</span><span class=\"ds-tick\"></span></a></nav>",
+      "css": ".ds-rail { display: inline-flex; flex-direction: column; padding: 8px; border-radius: 16px; background: transparent; box-shadow: 0 0 0 1px transparent; transition: background-color 250ms ease-out, box-shadow 250ms ease-out; } .ds-rail:hover, .ds-rail:focus-within { background: oklch(0.97 0 0); box-shadow: 0 0 0 1px color-mix(in oklab, oklch(0.18 0.004 270) 10%, transparent), 0 16px 40px -12px oklch(0 0 0 / 0.14); } .ds-rl { display: flex; align-items: center; height: 10px; border-radius: 6px; text-decoration: none; transition: height 350ms cubic-bezier(0.19, 1, 0.22, 1); } .ds-rail:hover .ds-rl, .ds-rail:focus-within .ds-rl { height: 26px; } .ds-rl-label { flex: 1; max-width: 0; overflow: hidden; white-space: nowrap; font: 400 13px/1 Geist, ui-sans-serif, system-ui, sans-serif; color: oklch(0.5 0.004 270); opacity: 0; transition: max-width 350ms cubic-bezier(0.19, 1, 0.22, 1), opacity 200ms ease-out, color 150ms ease-out; } .ds-rail:hover .ds-rl-label, .ds-rail:focus-within .ds-rl-label { max-width: 15rem; margin-right: 14px; opacity: 1; } .ds-deep .ds-rl-label { padding-left: 12px; } .ds-rl:hover .ds-rl-label, .ds-rl[data-active] .ds-rl-label { color: oklch(0.18 0.004 270); } .ds-tick { flex-shrink: 0; margin-left: auto; width: 12px; height: 2px; border-radius: 1px; background: color-mix(in oklab, oklch(0.18 0.004 270) 16%, transparent); transition: width 350ms cubic-bezier(0.19, 1, 0.22, 1), background-color 200ms ease-out; } .ds-deep .ds-tick { width: 7px; } .ds-rl[data-active] .ds-tick { width: 20px; background: oklch(0.18 0.004 270); } .ds-rl:hover .ds-tick { background: oklch(0.18 0.004 270); } .ds-rl:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.55 0.2 250) 55%, transparent); outline-offset: 1px; }"
+    },
+    {
+      "name": "API Prop Row",
+      "kind": "custom",
+      "description": "Quiet hairline row: mono name, type, default, and a turning chevron.",
+      "html": "<button class=\"ds-prop\"><code class=\"ds-prop-name\">variant</code><code class=\"ds-prop-meta\">\"primary\" | \"outline\" | \"ghost\"</code><code class=\"ds-prop-meta\">\"primary\"</code><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"ds-prop-chev\" aria-hidden=\"true\"><path d=\"M9 6l6 6-6 6\"/></svg></button>",
+      "css": ".ds-prop { display: grid; grid-template-columns: auto minmax(0, 1fr) auto min-content; align-items: center; width: 100%; padding: 0; border: 0; border-bottom: 1px solid color-mix(in oklab, color-mix(in oklab, oklch(0.18 0.004 270) 10%, transparent) 70%, transparent); border-radius: 0; background: transparent; text-align: left; cursor: pointer; transition: background-color 150ms ease-out; } .ds-prop:hover { background: color-mix(in oklab, oklch(0.18 0.004 270) 2.5%, transparent); } .ds-prop:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.55 0.2 250) 50%, transparent); border-radius: 10px; } .ds-prop > * { padding: 12px 16px 12px 0; } .ds-prop-name { font: 500 13px/1.4 'Geist Mono', ui-monospace, monospace; color: oklch(0.18 0.004 270); } .ds-prop-meta { font: 400 13px/1.4 'Geist Mono', ui-monospace, monospace; color: oklch(0.5 0.004 270); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-prop-chev { color: oklch(0.5 0.004 270); padding: 0; transition: rotate 300ms cubic-bezier(0.19, 1, 0.22, 1); } .ds-prop[aria-expanded='true'] .ds-prop-chev { rotate: 90deg; }"
+    },
+    {
+      "name": "Docs Note",
+      "kind": "card",
+      "refersTo": "docs-note",
+      "description": "Callout drawn with a 4% ink wash, no border or shadow.",
+      "html": "<aside class=\"ds-note\"><p>Components are copied into your project. You own the source.</p></aside>",
+      "css": ".ds-note { padding: 14px 18px; border-radius: 14px; background: color-mix(in oklab, oklch(0.18 0.004 270) 4%, transparent); color: color-mix(in oklab, oklch(0.18 0.004 270) 88%, oklch(0.97 0 0)); font: 400 15px/1.65 Geist, ui-sans-serif, system-ui, sans-serif; } .ds-note p { margin: 0; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Cubby Shelf",
+    "overview": "A well-made wooden shelf of labeled cubbies: everything has a place, the place is marked with a hairline and a name, and nothing is shouting. The system is quiet on purpose. Tinted near-neutrals carry the page, one blue carries meaning, and the display type carries the voice. Depth comes from a measured surface ladder rather than from decoration, and structure is ruled with hairlines rather than boxed with cards.\n\nDensity is calm and reading-first. Pages sit in one centered column with generous vertical rhythm; controls stay small, muted until touched, and brighten to full foreground on hover. Motion is a single settle curve (ease-out-expo) that opens slowly and closes quickly, and every motion collapses to a plain opacity change under reduced motion.\n\nLight and dark are both designed. Light keeps fills neutral and lets layered shadow carry elevation; dark steps lightness up a tinted ladder and adds a lit top rim. The home page adds one ornament, the cubby mark printed as a feathered dot-matrix field behind the hero; the docs surface carries the same mark as a four-cell glyph in its shelf trigger.",
+    "keyCharacteristics": [
+      "Neutrals tinted toward hue 270 at very low chroma (0.004, 0.002 near the extremes), tuned from three root variables.",
+      "One chromatic accent, the primary blue; status hues appear only on status plates.",
+      "Bricolage Grotesque (optical-size axis) for h1 to h3 and the wordmark; Geist for body and UI; Geist Mono for code.",
+      "An 8-rung surface ladder with matching shadow and rim recipes; state overlays are translucent deltas.",
+      "Hairline structure at 10% foreground; lighter 7% lines inside rows.",
+      "A near-black chrome surface, off the ladder, in both themes."
+    ],
+    "rules": [
+      {
+        "name": "The One Blue Rule",
+        "body": "Blue is the only chromatic accent outside status plates, and it means action, focus, or relation. The current location is marked in ink, never in blue; blue is reserved for what a thing is built on or what you can press.",
+        "section": "colors"
+      },
+      {
+        "name": "The Mix-Not-Pick Rule",
+        "body": "New tints are derived, not picked: color-mix of ink or blue into transparent at the established steps (2.5%, 3.5%, 4%, 7%, 9%, 10%, 16%, 24%, 35%, 40%). A new hard-coded gray is a defect.",
+        "section": "colors"
+      },
+      {
+        "name": "The Chrome Is Below Rule",
+        "body": "The chrome surface is near-black in both themes and sits off the ladder: in dark it goes below the page (0.159 against 0.205), because up is where cards live. Paint on it only through `data-surface=\"chrome\"`, which re-points ink, muted, border, input, and hover tokens for the whole subtree.",
+        "section": "colors"
+      },
+      {
+        "name": "The Bricolage Rule",
+        "body": "The display face sets h1 to h3 and the wordmark, nothing smaller than about 1.05rem, and always in weight 600 with negative tracking. Body, labels, h4 and below are Geist.",
+        "section": "typography"
+      },
+      {
+        "name": "The Two-Step Ink Rule",
+        "body": "Headings and strong text are full ink; running prose is 88% ink. The step is small and deliberate: it lets headings lead without enlarging them.",
+        "section": "typography"
+      },
+      {
+        "name": "The Ladder Rule",
+        "body": "Elevation is chosen from the ladder, never hand-written. A floating chrome surface is built from the near, mid, and far shadow alphas with no ladder ring, because rungs 3 to 8 carry their own ring.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Drawn-Not-Lifted Rule",
+        "body": "Reading surfaces on docs (stage, note, tables, API rows, shelf grid) sit flat on the page, defined by hairlines or a faint ink wash. Shadow appears only on things that float over content: the open shelf, the expanded rail, menus.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** retune neutrals through `--neutral-hue` (270), `--neutral-chroma` (0.004), and `--neutral-chroma-low` (0.002) rather than editing individual grays.",
+      "**Do** take elevation from the surface ladder (`--surface-N`, `--surface-shadow-combined-N`) and state from the translucent overlays (6%, 8%, 10%).",
+      "**Do** keep blue for action, focus, and relation; mark the current location in ink.",
+      "**Do** set h1 to h3 in Bricolage Grotesque at 600 with negative tracking, and everything else in Geist.",
+      "**Do** open with ease-out-expo (`cubic-bezier(0.19, 1, 0.22, 1)`) and close faster with ease-in-cubic (`cubic-bezier(0.55, 0.055, 0.675, 0.19)`); keep hovers at 150ms ease-out.",
+      "**Do** collapse every transform, clip, blur, and draw to opacity or nothing under `prefers-reduced-motion`.",
+      "**Do** design dark explicitly: re-declare derived tokens in `.dark` so they resolve against dark roots."
+    ],
+    "donts": [
+      "**Don't** raise the chrome surface with a ladder rung or paint chrome controls by hand; use `data-surface=\"chrome\"`.",
+      "**Don't** add a second accent hue outside status plates.",
+      "**Don't** use elastic or bouncy easing on controls.",
+      "**Don't** use neon glows, gradient meshes, or cool-AI dark-mode effects; the only gradients are the stage's 3.5% light and the feathered mask on the home dot field.",
+      "**Don't** use the reflex fonts PRODUCT.md bans (Inter, DM Sans, Plus Jakarta, Space Grotesk, Fraunces, Playfair, Cormorant, Instrument Serif, Crimson).",
+      "**Don't** box reading content in shadowed cards on docs; rule it with hairlines or a faint wash."
+    ]
+  }
+}

@@ -1,5 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Rubik } from "next/font/google";
+import {
+  Bricolage_Grotesque,
+  Geist,
+  Geist_Mono,
+  Rubik,
+} from "next/font/google";
 import "./globals.css";
 
 import { RootProvider } from "fumadocs-ui/provider/next";
@@ -58,6 +63,15 @@ export const metadata: Metadata = {
 //   ],
 // };
 
+// Display face for headings across the whole site (home and docs).
+const display = Bricolage_Grotesque({
+  variable: "--font-display",
+  subsets: ["latin"],
+  // Optical sizing: big headings get the tighter display cut automatically.
+  axes: ["opsz"],
+  display: "swap",
+});
+
 const rubik = Rubik({
   variable: "--font-rubik",
   subsets: ["latin"],
@@ -70,8 +84,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Before first paint: mark the platform so shortcut hints (Cmd vs
+            Ctrl) render correctly without waiting for hydration. A plain
+            script runs as the HTML parses; next/script's beforeInteractive
+            would wait for Next's own chunks. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{const p=(navigator.userAgentData&&navigator.userAgentData.platform)||navigator.userAgent;document.documentElement.dataset.platform=/mac|iphone|ipad/i.test(p)?"mac":"windows"}catch(e){}`,
+          }}
+        />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${rubik.variable} font-sans antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${rubik.variable} ${display.variable} font-sans antialiased`}
       >
         <Providers>
           <RootProvider search={{ SearchDialog: CustomSearchDialog }}>

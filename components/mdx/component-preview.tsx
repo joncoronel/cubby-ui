@@ -1,20 +1,10 @@
 "use client";
+
 import type { ReactElement } from "react";
 import { componentMap } from "@/app/components/_generated/registry";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsPanels,
-  TabsContent,
-} from "@/registry/default/tabs/tabs";
-import {
-  CodeBlock,
-  CodeBlockPre,
-  CodeBlockCode,
-} from "@/registry/default/code-block/code-block";
 import { solidSurface } from "@/registry/default/lib/elevated";
 import { cn } from "@/lib/utils";
+import { CodePeek } from "./code-peek";
 
 interface ComponentPreviewProps {
   code?: string;
@@ -22,74 +12,53 @@ interface ComponentPreviewProps {
   className?: string;
   example?: string;
   initialHighlighted?: ReactElement;
+  peekHighlighted?: ReactElement;
   serverRenderedExample?: ReactElement;
 }
 
+/**
+ * An example and its code as one object: a tray holding the live example
+ * on a card at the top, and the code beneath it on the tray itself (a peek
+ * when it's long, see `CodePeek`).
+ */
 export function ComponentPreview({
   code,
   language = "tsx",
-  className = "",
+  className,
   example,
   initialHighlighted,
+  peekHighlighted,
   serverRenderedExample,
 }: ComponentPreviewProps) {
-  // Look up the example component from componentMap on the client
-  // (unless a server-rendered example is already provided)
+  // Look up the example on the client, unless the server already rendered it
+  // (async server-component examples).
   const ExampleComponent = example
     ? componentMap[example as keyof typeof componentMap]
     : null;
-
-  // Render the appropriate example:
-  // - serverRenderedExample: Already a ReactElement from server (for async components)
-  // - ExampleComponent: Client component function to instantiate
   const exampleNode =
     serverRenderedExample || (ExampleComponent && <ExampleComponent />);
 
-  // If no code is provided, just show the preview
-  if (!code) {
-    return (
-      <div className={`not-prose my-6 w-full max-w-full min-w-0 ${className}`}>
-        <div className={cn("rounded-md p-1", solidSurface(3, 1), "bg-muted")}>
-          <div className="bg-background flex min-h-[300px] items-center justify-center rounded-sm border p-8">
-            {exampleNode}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Show preview/code tabs using our custom Tabs component
   return (
-    <div className={`not-prose my-6 w-full max-w-full min-w-0 ${className}`}>
-      <Tabs defaultValue="preview">
-        <TabsList>
-          <TabsTrigger value="preview">Preview</TabsTrigger>
-          <TabsTrigger value="code">Code</TabsTrigger>
-        </TabsList>
-        <TabsPanels className="">
-          <TabsContent value="preview">
-            <div
-              className={cn("rounded-2xl p-1", solidSurface(3, 1), "bg-muted")}
-            >
-              <div className="bg-background flex min-h-[300px] items-center justify-center rounded-lg border p-8">
-                {exampleNode}
-              </div>
-            </div>
-          </TabsContent>
-          <TabsContent value="code">
-            <CodeBlock
-              code={code}
-              language={language}
-              floatingCopy
-              initial={initialHighlighted}
-            >
-              <CodeBlockPre>
-                <CodeBlockCode />
-              </CodeBlockPre>
-            </CodeBlock>
-          </TabsContent>
-        </TabsPanels>
-      </Tabs>
-    </div>
+    <figure
+      data-slot="preview"
+      className={cn(
+        "docs-stage-wrap not-prose",
+        code && ["docs-example", solidSurface(3, 1), "bg-muted"],
+        className,
+      )}
+    >
+      <div className="docs-stage">
+        <div className="docs-stage-canvas">{exampleNode}</div>
+      </div>
+
+      {code && (
+        <CodePeek
+          code={code}
+          language={language}
+          initial={initialHighlighted}
+          peekInitial={peekHighlighted}
+        />
+      )}
+    </figure>
   );
 }

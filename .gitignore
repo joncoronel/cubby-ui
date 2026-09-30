@@ -51,3 +51,10 @@ package-lock.json
 
 # Local panel-review output
 reviews/
+
+# Impeccable working files (screenshots, decision rounds): local only
+.impeccable/review/
+.impeccable/questions/
+.impeccable/mocks/
+.impeccable/decision-*.json
+.impeccable/config.local.json

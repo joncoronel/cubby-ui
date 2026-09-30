@@ -1,0 +1,1278 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   Docs surface. Everything here is scoped under `.docs-*` class names so it
+   never reaches the homepage or the registry components.
+
+   Unlayered on purpose: it sits above Tailwind's utility layer, which lets the
+   prose rhythm below own the vertical spacing of MDX blocks (components ship
+   their own `my-*` classes, and in a grid those would otherwise stack).
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root:has(.docs-root) {
+  scrollbar-gutter: stable;
+  scroll-padding-top: 5rem;
+
+  /* The frame the page card sits in: a step darker than the card, the way a
+     code block's tray sits under its code. The card keeps the page color, so
+     every component still sits on the background it was designed for. */
+  --docs-frame: oklch(0.925 var(--neutral-chroma-low) var(--neutral-hue));
+  --frame-top: 3.5rem;
+  --frame-gap: 0.5rem;
+  --frame-radius: 1rem;
+  background-color: var(--docs-frame);
+}
+:root.dark:has(.docs-root) {
+  --docs-frame: var(--chrome);
+}
+@media (min-width: 40rem) {
+  :root:has(.docs-root) {
+    --frame-gap: 0.75rem;
+    --frame-radius: 1.25rem;
+  }
+}
+:root:has(.docs-root) body,
+:root:has(.docs-root) .root {
+  background-color: var(--docs-frame);
+}
+
+.docs-root {
+  --docs-content: 48rem;
+  --docs-ease: cubic-bezier(0.19, 1, 0.22, 1);
+  --docs-text: color-mix(in oklab, var(--foreground) 88%, var(--background));
+  --docs-tick: color-mix(in oklab, var(--foreground) 16%, transparent);
+}
+
+/* ── Frame and card ─────────────────────────────────────────────────────── */
+
+/* Three layers draw the card; content scrolls between them and none of them
+   take pointer events.
+
+   Nothing here is sized from both the top and the bottom edge: Chrome on
+   Android resolves such an element against a different viewport height while
+   the URL bar slides, and only fixes it when the gesture ends, so the card
+   gapped or overflowed mid-scroll. Instead the fill and the frame's top and
+   sides are pinned to the top and made taller than the largest viewport
+   (they never resize), and the bottom edge is its own layer pinned to the
+   bottom, which Chrome moves with the URL bar. */
+.docs-card-fill,
+.docs-frame,
+.docs-frame-bottom {
+  position: fixed;
+  pointer-events: none;
+}
+
+/* The card's fill, behind the content. */
+.docs-card-fill {
+  z-index: -1;
+  top: var(--frame-top);
+  left: var(--frame-gap);
+  right: var(--frame-gap);
+  height: 100lvh;
+  border-radius: var(--frame-radius) var(--frame-radius) 0 0;
+  background-color: var(--background);
+}
+
+/* Top and side edges: a huge spread shadow in the frame color paints
+   everything outside the rounded rectangle. Its own bottom corners hang below
+   the largest viewport, out of sight. */
+.docs-frame {
+  z-index: 40;
+  top: var(--frame-top);
+  left: var(--frame-gap);
+  right: var(--frame-gap);
+  height: calc(100lvh + 2 * var(--frame-radius));
+  border-radius: var(--frame-radius);
+  box-shadow: var(--docs-frame-edge);
+}
+
+/* Bottom edge: a strip pinned to the bottom, showing only the lower half of
+   the same rounded rectangle (its rounded corners). */
+.docs-frame-bottom {
+  z-index: 40;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--frame-gap) + var(--frame-radius));
+  overflow: hidden;
+}
+.docs-frame-bottom::before {
+  content: "";
+  z-index: 1;
+  position: absolute;
+  left: var(--frame-gap);
+  right: var(--frame-gap);
+  bottom: var(--frame-gap);
+  height: calc(2 * var(--frame-radius));
+  border-radius: var(--frame-radius);
+  box-shadow: var(--docs-frame-edge);
+}
+
+/* The card has no edge line of its own: the frame's color around it draws
+   its shape. */
+.docs-root {
+  --docs-frame-edge: 0 0 0 100vmax var(--docs-frame);
+}
+
+.docs-main {
+  padding-top: var(--frame-top);
+  padding-bottom: var(--frame-gap);
+}
+
+.docs-root ::selection {
+  background: color-mix(in oklab, var(--primary) 24%, transparent);
+}
+
+.docs-root input {
+  caret-color: var(--primary);
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+
+/* The header sits on the frame, above the card, so it never changes as the
+   page scrolls. */
+.docs-header {
+  background-color: transparent;
+}
+
+/* The logo arrives as one composited fade and settle: the drawn-stroke
+   version animates SVG paint on the main thread, which freezes while the
+   page hydrates. */
+.docs-header .cubby-logo {
+  animation: docs-logo-in 0.6s var(--docs-ease) both;
+}
+.docs-header .cubby-logo path {
+  animation: none;
+  fill-opacity: 1;
+}
+@keyframes docs-logo-in {
+  from {
+    opacity: 0;
+    scale: 0.9;
+  }
+}
+
+.docs-shelf-trigger {
+  transition:
+    background-color 0.15s ease-out,
+    box-shadow 0.15s ease-out;
+}
+@media (hover: hover) {
+  .docs-shelf-trigger:hover {
+    background-color: var(--surface-hover);
+  }
+}
+.docs-shelf-trigger[data-open] {
+  background-color: var(--surface-selected);
+}
+
+.docs-shelf-chevron {
+  transition: rotate 0.2s var(--docs-ease);
+}
+.docs-shelf-trigger[data-open] .docs-shelf-chevron {
+  rotate: 180deg;
+}
+
+/* The glyph's four cubbies spread apart as the shelf opens. */
+.docs-cubby-glyph rect {
+  fill: currentColor;
+  opacity: 0.32;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    translate 0.2s var(--docs-ease),
+    opacity 0.15s ease-out;
+}
+.docs-cubby-glyph rect:first-child {
+  fill: var(--primary);
+  opacity: 1;
+}
+@media (hover: hover) {
+  .docs-shelf-trigger:hover .docs-cubby-glyph rect:not(:first-child) {
+    opacity: 0.5;
+  }
+}
+.docs-shelf-trigger[data-open] .docs-cubby-glyph rect:nth-child(1) {
+  translate: -0.75px -0.75px;
+}
+.docs-shelf-trigger[data-open] .docs-cubby-glyph rect:nth-child(2) {
+  translate: 0.75px -0.75px;
+}
+.docs-shelf-trigger[data-open] .docs-cubby-glyph rect:nth-child(3) {
+  translate: -0.75px 0.75px;
+}
+.docs-shelf-trigger[data-open] .docs-cubby-glyph rect:nth-child(4) {
+  translate: 0.75px 0.75px;
+}
+
+/* ── Shelf ──────────────────────────────────────────────────────────────── */
+
+/* The shelf covers the card, clipped to its rounded rectangle: a scrim over
+   the page, and the window on top of it. */
+.docs-shelf {
+  position: fixed;
+  inset: var(--frame-top) var(--frame-gap) var(--frame-gap);
+  z-index: 45;
+  overflow: hidden;
+  border-radius: var(--frame-radius);
+  visibility: hidden;
+  pointer-events: none;
+  transition: visibility 0s linear 0.12s;
+}
+.docs-shelf[data-open] {
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+
+.docs-shelf-scrim {
+  background: color-mix(in oklab, var(--foreground) 10%, transparent);
+  opacity: 0;
+  transition: opacity 0.12s ease-out;
+}
+.dark .docs-shelf-scrim {
+  background: oklch(0 0 0 / 0.45);
+}
+.docs-shelf[data-open] .docs-shelf-scrim {
+  opacity: 1;
+  transition-duration: 0.15s;
+}
+
+/* On a phone the window is a sheet across the top of the card, scrolling
+   inside it. */
+.docs-shelf-anchor {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+
+.docs-shelf-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+  border-radius: 0 0 var(--frame-radius) var(--frame-radius);
+  pointer-events: auto;
+
+  /* It grows out of the trigger: a short settle down and in, no wipe. A
+     large window starts close to full size (98%, 4px up) so it has little
+     ground to cover. Everything that opens with it (scrim, chevron, glyph)
+     finishes on the same short clock, or the slowest part set the pace.
+     The exit is the same way back, a little quicker, with the scrim on the
+     same 120ms so the two leave together. Its own layer while it moves, so
+     the rows raster once instead of shimmering on a different sub-pixel
+     offset every frame. */
+  opacity: 0;
+  scale: 0.98;
+  translate: 0 -0.25rem;
+  transform-origin: var(--shelf-origin-x, 50%) 0;
+  will-change: transform;
+  transition:
+    opacity 0.12s ease-out,
+    scale 0.12s ease-out,
+    translate 0.12s ease-out;
+}
+.docs-shelf[data-open] .docs-shelf-panel {
+  opacity: 1;
+  scale: 1;
+  translate: 0 0;
+  transition:
+    opacity 0.1s ease-out,
+    scale 0.18s var(--docs-ease),
+    translate 0.18s var(--docs-ease);
+}
+
+/* Flush with the card on a phone, so no ring or rim, which drew a lighter
+   line around all four edges: only the drop below it. */
+@media (max-width: 47.99rem) {
+  .docs-shelf-panel {
+    box-shadow:
+      0 1px 1px -0.5px var(--surface-shadow-near),
+      0 3px 3px -1.5px var(--surface-shadow-mid),
+      0 6px 6px -3px var(--surface-shadow-mid),
+      0 12px 12px -6px var(--surface-shadow-far);
+  }
+}
+
+/* From tablets up it floats: a window inset from the card, its left edge on
+   the header's (same width and padding as the header row, less the frame
+   gap the shelf already sits in). */
+@media (min-width: 48rem) {
+  .docs-shelf-anchor {
+    left: 50%;
+    right: auto;
+    width: min(100%, calc(76rem - 2 * var(--frame-gap)));
+    translate: -50% 0;
+    padding: 0.5rem calc(2rem - var(--frame-gap));
+  }
+  .docs-shelf-panel {
+    width: min(100%, 66rem);
+    border-radius: calc(var(--frame-radius) - 0.25rem);
+  }
+}
+
+.docs-shelf-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--foreground) 18%, transparent)
+    transparent;
+}
+
+.docs-shelf-grid {
+  display: grid;
+}
+.docs-shelf-rail {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
+  gap: 1.25rem 1.5rem;
+  padding: 1.25rem 1.25rem 0;
+}
+.docs-shelf-components {
+  display: grid;
+  align-content: start;
+  gap: 1.75rem 2.5rem;
+  padding: 1.5rem 1.25rem 1.5rem;
+}
+@media (min-width: 40rem) {
+  .docs-shelf-rail {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* On a wide window the guides get a side rail: a tinted panel inset from
+   the window's edges, set apart by its fill rather than a rule, its corners
+   concentric with the window's (its radius less the 0.5rem gap). The
+   component groups sit side by side beside it. */
+@media (min-width: 64rem) {
+  .docs-shelf-grid {
+    grid-template-columns: 11.5rem minmax(0, 1fr);
+  }
+  .docs-shelf-rail {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+    margin: 0.5rem 0 0.5rem 0.5rem;
+    padding: 0.75rem 0.75rem 1rem;
+    border-radius: calc(var(--frame-radius) - 0.75rem);
+    background: color-mix(in oklab, var(--foreground) 3.5%, transparent);
+  }
+  .docs-shelf-components {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    padding: 1.25rem 1.5rem 1.5rem;
+  }
+}
+
+.docs-shelf-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 2rem;
+  margin-inline: -0.5rem;
+  padding-inline: 0.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  outline: none;
+}
+/* Hover is instant both ways: any easing made the list feel like it lagged
+   behind the pointer. */
+@media (hover: hover) {
+  .docs-shelf-link:hover {
+    color: var(--foreground);
+    background-color: var(--surface-hover);
+  }
+}
+.docs-shelf-link:focus-visible {
+  color: var(--foreground);
+  outline: 2px solid color-mix(in oklab, var(--ring) 55%, transparent);
+  outline-offset: -2px;
+}
+.docs-shelf-link[aria-current="page"] {
+  color: var(--foreground);
+  font-weight: 500;
+}
+
+/* The current page gets a small cubby mark that pushes its name over. */
+.docs-shelf-mark {
+  flex-shrink: 0;
+  width: 0;
+  height: 0.375rem;
+  margin-right: 0;
+  border-radius: 2px;
+  background: var(--primary);
+  scale: 0;
+  transition:
+    width 0.3s var(--docs-ease),
+    margin 0.3s var(--docs-ease),
+    scale 0.3s var(--docs-ease);
+}
+.docs-shelf-link[aria-current="page"] .docs-shelf-mark {
+  width: 0.375rem;
+  margin-right: 0.5rem;
+  scale: 1;
+}
+
+/* ── Small motion vocabulary ────────────────────────────────────────────── */
+
+/* A page arrives with a short fade, opacity only so it stays on the
+   compositor while the page hydrates. Switching pages is frequent, so it is
+   kept brief: a longer rise and fade read as slow navigation. */
+@keyframes docs-fade {
+  from {
+    opacity: 0;
+  }
+}
+.docs-enter {
+  animation: docs-fade 0.15s ease-out both;
+}
+
+@keyframes docs-fade-in {
+  from {
+    opacity: 0;
+    translate: 0 -0.25rem;
+  }
+}
+
+/* ── Page column ────────────────────────────────────────────────────────── */
+
+.docs-col {
+  width: min(var(--docs-content), 100%);
+  margin-inline: auto;
+}
+
+.docs-prose {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  max-width: var(--docs-content);
+  margin-inline: auto;
+  color: var(--docs-text);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.docs-prose > * {
+  margin-block: 0;
+  min-width: 0;
+}
+
+/* Vertical rhythm: prose flows at 1.25rem, blocks breathe at 2rem, headings
+   take more space above than below. */
+.docs-prose > * + * {
+  margin-top: 1.25rem;
+}
+/* :where() keeps these at the same weight as the flow rule, so the heading
+   rules below still win when a heading follows a block. */
+.docs-prose > :where(.not-prose, .docs-table, .docs-note) + *,
+.docs-prose > * + :where(.not-prose, .docs-table, .docs-note) {
+  margin-top: 2rem;
+}
+.docs-prose > h2 {
+  margin-top: 4rem;
+}
+.docs-prose > h3 {
+  margin-top: 3rem;
+}
+.docs-prose > :is(h4, h5, h6) {
+  margin-top: 2.25rem;
+}
+.docs-prose > :first-child {
+  margin-top: 0;
+}
+.docs-prose > h2 + *,
+.docs-prose > h3 + * {
+  margin-top: 0.875rem;
+}
+.docs-prose > :is(h4, h5, h6) + * {
+  margin-top: 0.5rem;
+}
+.docs-prose > :is(h2, h3, h4) + .not-prose {
+  margin-top: 1.25rem;
+}
+
+/* The first preview is the page's stage: its heading is announced but not
+   shown, and the stage gets more room. */
+.docs-prose > h2#preview {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.docs-prose > h2#preview + * {
+  margin-top: 0;
+}
+.docs-prose > h2#preview + .docs-stage-wrap {
+  margin-top: 2rem;
+}
+.docs-prose > h2#preview:first-child + .docs-stage-wrap {
+  margin-top: 0.5rem;
+}
+
+/* ── Type ───────────────────────────────────────────────────────────────── */
+
+.docs-prose > :is(h2, h3, h4, h5, h6) {
+  color: var(--foreground);
+  text-wrap: balance;
+}
+.docs-prose > h2 {
+  font-family: var(--font-display);
+  font-size: 1.625rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.docs-prose > h3 {
+  font-family: var(--font-display);
+  font-size: 1.1875rem;
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.docs-prose > :is(h4, h5, h6) {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.docs-heading {
+  scroll-margin-top: 5rem;
+}
+.docs-heading-link {
+  position: relative;
+  color: inherit;
+  text-decoration: none;
+}
+.docs-heading-hash {
+  position: absolute;
+  top: 0;
+  right: 100%;
+  padding-right: 0.4em;
+  color: var(--muted-foreground);
+  font-weight: 400;
+  opacity: 0;
+  translate: 0.2em 0;
+  transition:
+    opacity 0.2s ease-out,
+    translate 0.3s var(--docs-ease);
+}
+.docs-heading-link:focus-visible .docs-heading-hash {
+  opacity: 1;
+  translate: 0 0;
+}
+@media (hover: hover) {
+  .docs-heading-link:hover .docs-heading-hash {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@media (max-width: 40rem) {
+  .docs-heading-hash {
+    display: none;
+  }
+}
+
+.docs-prose > p,
+.docs-prose li {
+  text-wrap: pretty;
+}
+
+.docs-prose strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+/* Prose-only rules skip anything inside a component (`.not-prose`). */
+.docs-prose :is(p, li, td, .docs-note) a:not(.not-prose *) {
+  color: var(--foreground);
+  text-decoration: underline;
+  text-decoration-color: color-mix(
+    in oklab,
+    var(--foreground) 25%,
+    transparent
+  );
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
+  transition: text-decoration-color 0.15s ease-out;
+}
+@media (hover: hover) {
+  .docs-prose :is(p, li, td, .docs-note) a:not(.not-prose *):hover {
+    text-decoration-color: var(--primary);
+  }
+}
+
+.docs-prose :is(p, li, td, th, h2, h3, h4, .docs-note) code:not(.not-prose *) {
+  font-family: var(--font-mono);
+  font-size: 0.84em;
+  padding: 0.12em 0.36em;
+  border-radius: 0.35rem;
+  background: color-mix(in oklab, var(--foreground) 7%, transparent);
+  color: var(--foreground);
+  overflow-wrap: anywhere;
+}
+
+.docs-prose > :is(ul, ol) {
+  padding-left: 1.25rem;
+}
+.docs-prose > ul {
+  list-style: disc;
+}
+.docs-prose > ol {
+  list-style: decimal;
+}
+.docs-prose > :is(ul, ol) li::marker {
+  color: color-mix(in oklab, var(--foreground) 35%, transparent);
+}
+.docs-prose > :is(ul, ol) li + li {
+  margin-top: 0.375rem;
+}
+.docs-prose li:not(.not-prose *) > :is(ul, ol) {
+  margin-top: 0.375rem;
+  padding-left: 1.25rem;
+  list-style: circle;
+}
+
+.docs-prose > hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin-block: 3rem;
+}
+
+.docs-note {
+  padding: 0.875rem 1.125rem;
+  border-radius: 0.875rem;
+  background: color-mix(in oklab, var(--foreground) 4%, transparent);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  font-style: normal;
+  quotes: none;
+}
+.docs-note > * + * {
+  margin-top: 0.625rem;
+}
+
+.docs-table {
+  overflow-x: auto;
+}
+.docs-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+}
+.docs-table th {
+  text-align: left;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+  padding: 0 1rem 0.625rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.docs-table td {
+  padding: 0.625rem 1rem 0.625rem 0;
+  border-bottom: 1px solid
+    color-mix(in oklab, var(--foreground) 7%, transparent);
+  vertical-align: top;
+}
+.docs-table td:first-child {
+  white-space: nowrap;
+}
+
+/* ── Stage (live previews) ──────────────────────────────────────────────── */
+
+.docs-stage {
+  position: relative;
+  display: flex;
+  min-height: 16rem;
+  border-radius: 1.125rem;
+  background-color: var(--background);
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+/* Examples are authored at fixed widths, but the stage is narrower than
+   some of them (always, on phones). The example shrinks to fit when it can;
+   when it can't, `safe` centering starts it at the left edge and the stage
+   scrolls sideways instead of spilling past both edges. */
+.docs-stage-canvas {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  justify-content: safe center;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  padding: 3.25rem 1rem 2.5rem;
+}
+/* In the components layer, under Tailwind's utilities: unlayered, this beat
+   an example's own cap (`w-full max-w-xs`), so 78 examples stretched across
+   the stage. Uncapped examples still shrink to fit it. */
+@layer components {
+  .docs-stage-canvas > * {
+    max-width: 100%;
+  }
+}
+@media (min-width: 40rem) {
+  .docs-stage-canvas {
+    padding-inline: 1.5rem;
+  }
+}
+
+/* The page's first stage is a little taller on wide screens. */
+.docs-prose > h2#preview + .docs-stage-wrap .docs-stage {
+  min-height: 12rem;
+}
+@media (min-width: 40rem) {
+  .docs-prose > h2#preview + .docs-stage-wrap .docs-stage {
+    min-height: 16rem;
+  }
+}
+
+/* Install follows the first stage closely: they are one "grab it" unit. */
+.docs-prose > h2#preview + .docs-stage-wrap + h2 {
+  margin-top: 2.5rem;
+}
+
+/* Revealed code appears in place with a short fade: no layout animation. */
+/* A tray groups code that belongs together (Usage: the import and the
+   markup, copied apart), in the code block's own fill and edge around the
+   cards. One snippet goes without: around a single card it only narrowed
+   it. The cards' corners are concentric (16px less the 4px padding). */
+.docs-code-tray {
+  border-radius: 1rem;
+  padding: 0.25rem;
+  background-color: var(--muted);
+  box-shadow: var(--surface-shadow-combined-1);
+}
+
+.docs-code-reveal:not([hidden]) {
+  animation: docs-fade-in 0.18s ease-out;
+}
+
+/* ── Example tray ── An example with code is one object: a tray (the code
+   block's own fill and edge) holding the live example on a card at the top,
+   and the code on the tray beneath it. The card is set apart by its fill
+   alone, no ring or shadow (in dark the page fill sits below the tray's, and
+   a lit rim on it read as a raised card that was also sunk). Its corners
+   are concentric with the tray's (20px less its 4px padding). */
+.docs-example {
+  border-radius: 1.25rem;
+  padding: 0.25rem;
+}
+.docs-example .docs-stage {
+  min-height: 13rem;
+  border-radius: 1rem;
+  box-shadow: none;
+}
+
+/* ── Code peek ── Code that opens as a peek when it's long (CodePeek), in
+   an example's tray (`flat`: straight on the tray) or an install step's
+   (`card`: on the code block's own card). */
+.docs-peek,
+.docs-peek-body {
+  position: relative;
+}
+
+/* Floats in the code's corner on the fill behind it, so code scrolling
+   sideways passes beneath. */
+.docs-peek-copy {
+  position: absolute;
+  top: 0.375rem;
+  right: 0.25rem;
+  z-index: 3;
+  border-radius: 0.5rem;
+  background-color: var(--muted);
+}
+.docs-peek[data-variant="card"] .docs-peek-copy {
+  right: 0.375rem;
+  background-color: var(--surface-3);
+}
+
+/* Long code opens as a peek: its first four lines, fading out, with the
+   toggle floating over it rather than a bar under it. It expands in place
+   without animating height, which is slow on a heavy page. */
+.docs-peek-body[data-collapsed] {
+  --peek: 6.5rem;
+  max-height: var(--peek);
+  overflow: hidden;
+}
+/* Flat, it runs over the tray's bottom padding, so the fade ends at the
+   tray's edge instead of a clipped line and an empty band above it. */
+.docs-peek[data-variant="flat"] .docs-peek-body[data-collapsed] {
+  margin-bottom: -0.25rem;
+}
+/* On a card, the clip keeps the card's corners. */
+.docs-peek[data-variant="card"] .docs-peek-body[data-collapsed] {
+  border-radius: var(--radius-lg, 0.75rem);
+}
+/* The fade is on the code text alone, so the card behind it and the button
+   floating over it stay solid. It is sized to the peek (less the scroller's
+   0.75rem top padding), not the code, which runs on below it hidden: a
+   gradient stretched over the whole code left the visible part opaque. */
+.docs-peek-body[data-collapsed] [data-slot="code-block-code"] {
+  mask-image: linear-gradient(to bottom, #000 30%, transparent 92%);
+  mask-size: 100% calc(var(--peek) - 0.75rem);
+  mask-repeat: no-repeat;
+}
+/* Lines a closed peek never shows aren't rendered: a docs page carries
+   every example's full source, and a theme change restyled all of it (on
+   the combobox page, 11,000 of 13,000 elements, ~95ms a switch; ~40ms
+   without). Their newlines stay, below the clip. */
+.docs-peek-body[data-collapsed] .line:nth-child(n + 6) {
+  display: none;
+}
+.docs-peek-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  cursor: pointer;
+}
+
+/* Open, the code keeps just enough room at its foot for the floating
+   toggle (its 1.75rem and 0.5rem offset, less the viewport's own 0.75rem
+   padding), so its last line scrolls to sit right above it. */
+.docs-peek-body[data-expanded] [data-slot="code-block-code"] {
+  padding-bottom: 1.625rem;
+}
+
+/* The toggle is an outline button floating at the code's foot, over the
+   peek's fade when closed; its look and states are the Button's own, only
+   placed here. */
+.docs-peek-toggle {
+  position: absolute;
+  left: 50%;
+  bottom: 0.5rem;
+  z-index: 2;
+  translate: -50% 0;
+}
+.docs-peek-chevron {
+  transition: rotate 0.2s var(--docs-ease);
+}
+[aria-expanded="true"] .docs-peek-chevron {
+  rotate: 180deg;
+}
+
+/* A peek that fills the height it's given (a window's code pane). */
+.docs-peek[data-fill],
+.docs-peek[data-fill] > .docs-peek-body,
+.docs-peek[data-fill] [data-slot="code-block"] {
+  height: 100%;
+}
+
+/* ── Source files ── A component with more files than fit as tabs
+   (SourceFiles). A code block tray, holding an editor-like window on a
+   wide tray, the registry Tree beside the code at one fixed height, each
+   scrolling on its own; or, on a narrow one, a bar with a file menu,
+   position and previous/next above the code as a peek. */
+.docs-files {
+  border-radius: 1rem;
+  padding: 0.25rem;
+}
+.docs-files[data-layout="tree"] {
+  display: grid;
+  grid-template-columns: 13rem minmax(0, 1fr);
+  gap: 0.25rem;
+  height: 25rem;
+}
+.docs-files[data-layout="tree"] > .docs-peek {
+  min-height: 0;
+}
+
+.docs-files-tree {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.25rem 0.125rem 0.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--foreground) 18%, transparent)
+    transparent;
+}
+
+.docs-files-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2.25rem;
+  padding: 0 0.125rem 0.25rem 0.125rem;
+}
+
+.docs-disclosure-chevron {
+  transition: rotate 0.4s var(--docs-ease);
+}
+.docs-disclosure[aria-expanded="true"] .docs-disclosure-chevron {
+  rotate: 90deg;
+}
+
+/* Numbered manual-install steps. The number sits on a hairline that runs
+   down to the next step. */
+.docs-steps {
+  counter-reset: docs-step;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.docs-steps > li {
+  counter-increment: docs-step;
+  position: relative;
+  padding-left: 2.25rem;
+}
+.docs-steps > li::before {
+  content: counter(docs-step);
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--foreground) 7%, transparent);
+  color: var(--foreground);
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.docs-steps > li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 2rem;
+  bottom: -1rem;
+  left: 0.75rem;
+  width: 1px;
+  background: var(--border);
+}
+.docs-step-title {
+  margin-bottom: 0.625rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.5rem;
+  color: var(--foreground);
+}
+.docs-step-body {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--docs-text);
+  text-wrap: pretty;
+}
+/* Where the file goes, under its code. */
+.docs-step-note {
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+}
+/* The install block sits outside the prose (not-prose), so its inline code
+   takes the prose treatment here. */
+:is(.docs-step-body, .docs-step-note) code {
+  font-family: var(--font-mono);
+  font-size: 0.84em;
+  padding: 0.12em 0.36em;
+  border-radius: 0.35rem;
+  background: color-mix(in oklab, var(--foreground) 7%, transparent);
+  color: var(--foreground);
+  overflow-wrap: anywhere;
+}
+
+/* ── API props ── Rows that open, between hairlines. One line carries what
+   you scan for: name, required, the type and the default (on a phone too;
+   the old columns dropped the type there, leaving bare names). It
+   opens to what the prop does. Hover lands at once; the row's wash and
+   focus ring run a little past the text, which stays on the page's edge. */
+.docs-props {
+  margin-block: 1.25rem 2rem;
+  border-top: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent);
+}
+.docs-prop {
+  border-bottom: 1px solid
+    color-mix(in oklab, var(--foreground) 8%, transparent);
+}
+.docs-prop-trigger {
+  display: block;
+  width: calc(100% + 1rem);
+  margin-inline: -0.5rem;
+  padding: 0.75rem 0.5rem;
+  border-radius: 0.5rem;
+  text-align: start;
+  cursor: pointer;
+  outline: none;
+}
+@media (hover: hover) {
+  .docs-prop-trigger:hover {
+    background-color: color-mix(in oklab, var(--foreground) 3%, transparent);
+  }
+}
+.docs-prop-trigger:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--ring) 55%, transparent);
+  outline-offset: -2px;
+}
+.docs-prop-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.625rem;
+  min-width: 0;
+}
+.docs-prop-name {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+/* Required is a fact about the prop, not an error: a quiet tag, not red. */
+.docs-prop-required {
+  flex-shrink: 0;
+  padding: 0.0625rem 0.375rem;
+  border-radius: 0.3125rem;
+  background: color-mix(in oklab, var(--foreground) 7%, transparent);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+.docs-prop-default {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.375rem;
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+.docs-prop-default code {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--foreground);
+}
+.docs-prop-chevron {
+  flex-shrink: 0;
+  align-self: center;
+  width: 0.875rem;
+  height: 0.875rem;
+  color: var(--muted-foreground);
+  transition: rotate 0.2s var(--docs-ease);
+}
+.docs-prop-trigger[data-panel-open] .docs-prop-chevron {
+  rotate: 90deg;
+}
+/* On the name's line, taking the room up to the default: a long type is
+   cut short here and shown whole when the row opens. */
+.docs-prop-type {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+}
+
+.docs-prop-panel {
+  height: var(--collapsible-panel-height);
+  overflow: hidden;
+  transition:
+    height 0.25s var(--docs-ease),
+    opacity 0.2s ease-out;
+}
+.docs-prop-panel[data-starting-style],
+.docs-prop-panel[data-ending-style] {
+  height: 0;
+  opacity: 0;
+}
+.docs-prop-body {
+  padding: 0.125rem 0 1rem;
+}
+.docs-prop-desc {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--docs-text);
+  text-wrap: pretty;
+}
+.docs-prop-desc code,
+.docs-prop-full code {
+  font-family: var(--font-mono);
+  font-size: 0.84em;
+  overflow-wrap: anywhere;
+}
+.docs-prop-desc code {
+  padding: 0.12em 0.36em;
+  border-radius: 0.35rem;
+  background: color-mix(in oklab, var(--foreground) 7%, transparent);
+  color: var(--foreground);
+}
+.docs-prop-desc a {
+  color: var(--foreground);
+  text-decoration: underline;
+  text-decoration-color: color-mix(
+    in oklab,
+    var(--foreground) 25%,
+    transparent
+  );
+  text-underline-offset: 0.25em;
+}
+.docs-prop-desc > :is(p, ul, ol) + :is(p, ul, ol) {
+  margin-top: 0.5rem;
+}
+.docs-prop-full {
+  display: none;
+}
+.docs-prop-full[data-long] {
+  display: flex;
+}
+@media (max-width: 40rem) {
+  .docs-prop-full {
+    display: flex;
+  }
+}
+.docs-prop-full {
+  gap: 0.75rem;
+  margin-top: 0.625rem;
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+}
+.docs-prop-full code {
+  font-size: 0.8125rem;
+  color: var(--foreground);
+}
+
+/* ── Minimap (on this page) ───────────────────────────────────────────── */
+
+.docs-minimap {
+  transition: opacity 0.2s ease-out;
+}
+.docs-minimap[data-popup-open] {
+  opacity: 0;
+}
+
+.docs-minimap-tick {
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 2px;
+  border-radius: 1px;
+  background-color: var(--docs-tick);
+  /* No transition: the ticks track the scroll position, and any fade makes
+     them trail behind a fast scroll. */
+}
+.docs-minimap-tick[data-depth="3"] {
+  width: 1rem;
+  margin-left: 0.5rem;
+}
+.docs-minimap-tick[data-depth="4"] {
+  width: 0.5rem;
+  margin-left: 1rem;
+}
+.docs-minimap-tick[data-visible] {
+  background-color: color-mix(in oklab, var(--foreground) 40%, transparent);
+}
+.docs-minimap-tick[data-active] {
+  background-color: var(--foreground);
+}
+
+/* ── Text morph clipping ─────────────────────────────────────────────── */
+
+/* Clips a morphing label without an ellipsis (see MorphText), and fades the
+   edge, only when the settled text is too long to fit. Clipping always cut
+   the label at its easing width, so new text was wiped in as it grew. */
+.docs-morph-clip {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  white-space: nowrap;
+}
+.docs-morph-clip[data-overflowing] {
+  overflow: hidden;
+  mask-image: linear-gradient(to right, #000 calc(100% - 1.5rem), transparent);
+}
+
+/* ── Mobile TOC pill ─────────────────────────────────────────────────── */
+
+/* iOS only: Android Chrome desyncs the layout viewport when env() is used on
+   a fixed overlay, so the safe-area inset stays 0 everywhere else. */
+.docs-toc-pill-wrap {
+  --safe-bottom: 0px;
+  bottom: calc(1rem + var(--frame-gap) + var(--safe-bottom));
+  opacity: 0;
+  translate: 0 1.5rem;
+  pointer-events: none;
+  transition:
+    opacity 0.2s ease-out,
+    translate 0.35s var(--docs-ease);
+}
+@supports (-webkit-touch-callout: none) {
+  .docs-toc-pill-wrap {
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+.docs-toc-pill-wrap[data-visible] {
+  opacity: 1;
+  translate: 0 0;
+}
+.docs-toc-pill-wrap[data-visible] > * {
+  pointer-events: auto;
+}
+:root[data-shelf-open] .docs-toc-pill-wrap {
+  opacity: 0;
+  translate: 0 1.5rem;
+}
+
+/* Fill and shadow come from the surface ladder (solidSurface 3, shadow 5). */
+.docs-toc-pill {
+  transition: scale 0.15s ease-out;
+}
+.docs-toc-pill:active {
+  scale: 0.97;
+}
+
+.docs-toc-pill-chevron {
+  transition: rotate 0.35s var(--docs-ease);
+}
+.docs-toc-pill[data-popup-open] .docs-toc-pill-chevron {
+  rotate: 180deg;
+}
+
+.docs-ring-track,
+.docs-ring-fill {
+  fill: none;
+  stroke-width: 2;
+}
+.docs-ring-track {
+  stroke: color-mix(in oklab, var(--foreground) 14%, transparent);
+}
+.docs-ring-fill {
+  stroke: var(--primary);
+  stroke-linecap: round;
+}
+
+/* ── Reduced motion ─────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .docs-enter,
+  .docs-header .cubby-logo,
+  .docs-code-reveal:not([hidden]) {
+    animation: none;
+  }
+  .docs-shelf-panel,
+  .docs-shelf[data-open] .docs-shelf-panel {
+    scale: none;
+    translate: none;
+  }
+  .docs-toc-pill-wrap {
+    translate: none;
+  }
+  .docs-toc-pill,
+  .docs-toc-pill-chevron,
+  .docs-minimap,
+  .docs-shelf-mark,
+  .docs-cubby-glyph rect,
+  .docs-shelf-chevron,
+  .docs-prop-chevron,
+  .docs-prop-panel,
+  .docs-peek-chevron,
+  .docs-disclosure-chevron {
+    transition-duration: 0s;
+  }
+}

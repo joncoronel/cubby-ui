@@ -128,6 +128,7 @@
         "@cubby-ui/switch",
         "@cubby-ui/table",
         "@cubby-ui/tabs",
+        "@cubby-ui/text-morph",
         "@cubby-ui/textarea",
         "@cubby-ui/timeline",
         "@cubby-ui/toast",
@@ -1754,6 +1755,69 @@
       ],
       "dependencies": [
         "class-variance-authority"
+      ]
+    },
+    {
+      "name": "text-morph",
+      "type": "registry:ui",
+      "title": "Text Morph",
+      "description": "Animates a label from one value to the next, glyph by glyph.",
+      "files": [
+        {
+          "path": "registry/default/text-morph/text-morph.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/text-morph/text-morph.tsx"
+        },
+        {
+          "path": "registry/default/text-morph/lib/anchors.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/text-morph/lib/anchors.ts"
+        },
+        {
+          "path": "registry/default/text-morph/lib/edges.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/text-morph/lib/edges.ts"
+        },
+        {
+          "path": "registry/default/text-morph/lib/match.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/text-morph/lib/match.ts"
+        },
+        {
+          "path": "registry/default/text-morph/lib/measure.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/text-morph/lib/measure.ts"
+        },
+        {
+          "path": "registry/default/text-morph/lib/options.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/text-morph/lib/options.ts"
+        },
+        {
+          "path": "registry/default/text-morph/lib/ride.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/text-morph/lib/ride.ts"
+        },
+        {
+          "path": "registry/default/text-morph/lib/scheduler.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/text-morph/lib/scheduler.ts"
+        },
+        {
+          "path": "registry/default/text-morph/lib/shapes.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/text-morph/lib/shapes.ts"
+        },
+        {
+          "path": "registry/default/text-morph/lib/timing.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/text-morph/lib/timing.ts"
+        },
+        {
+          "path": "registry/default/text-morph/text-morph.css",
+          "type": "registry:file",
+          "target": "components/ui/cubby-ui/text-morph/text-morph.css"
+        }
       ]
     },
     {

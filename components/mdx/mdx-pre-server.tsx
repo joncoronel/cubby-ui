@@ -53,13 +53,20 @@ export async function MdxPreServer({
   // Server-side highlight
   const highlighted = await highlight(code, language as BundledLanguage);
 
+  // A plain-text block drawn with box characters is a parts diagram (the
+  // Composition sections), not code to paste, so it has no copy button.
+  const isDiagram = language === "text" && /[├└]──/.test(code);
+
+  // One snippet is its card alone, copy floating in its corner: a header
+  // would hold only a language icon, and a tray around a single card only
+  // narrowed it.
   return (
     <div className="not-prose my-4">
       <CodeBlock
         code={code}
         language={language}
         initial={highlighted}
-        floatingCopy
+        floatingCopy={!isDiagram}
       >
         <CodeBlockPre>
           <CodeBlockCode />

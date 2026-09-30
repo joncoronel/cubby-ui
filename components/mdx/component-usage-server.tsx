@@ -1,4 +1,3 @@
-import type { ReactElement } from "react";
 import { ComponentUsage } from "./component-usage";
 import { componentAnatomy } from "@/app/components/_generated/registry";
 import { highlight } from "@/registry/default/code-block/lib/shiki-shared";
@@ -16,12 +15,11 @@ export async function ComponentUsageServer({
     return <ComponentUsage component={component} />;
   }
 
-  const importsCode = anatomy.imports;
-  const anatomyCode = anatomy.anatomy;
-
-  // Pre-highlight both code blocks separately
-  const highlightedImports = await highlight(importsCode, "tsx");
-  const highlightedAnatomy = await highlight(anatomyCode, "tsx");
+  // Highlighted apart: they render as two cards, copied separately.
+  const [highlightedImports, highlightedAnatomy] = await Promise.all([
+    highlight(anatomy.imports.trimEnd(), "tsx"),
+    highlight(anatomy.anatomy.trimEnd(), "tsx"),
+  ]);
 
   return (
     <ComponentUsage

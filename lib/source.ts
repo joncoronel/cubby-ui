@@ -6,6 +6,7 @@ import {
   componentAnatomy,
 } from "@/app/components/_generated/registry";
 import { transformComponentImports } from "@/lib/transform-registry-imports";
+import type { RegistryItemJson } from "@/lib/registry-json";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
@@ -147,7 +148,7 @@ ${exampleData.source}
         "\n```\n";
 
       // Helper to read a registry JSON file
-      const readRegistryJson = (itemName: string): any | null => {
+      const readRegistryJson = (itemName: string): RegistryItemJson | null => {
         try {
           const jsonPath = path.join(
             process.cwd(),

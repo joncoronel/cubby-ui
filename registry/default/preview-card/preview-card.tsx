@@ -56,22 +56,34 @@ function PreviewCardArrow({
 function PreviewCardContent({
   className,
   children,
+  side,
   align = "center",
   sideOffset = 8,
+  alignOffset,
+  positionMethod,
   arrow = true,
   level = 3,
   shadowLevel = 3,
   ...props
 }: React.ComponentProps<typeof BasePreviewCard.Popup> & {
+  side?: BasePreviewCard.Positioner.Props["side"];
   align?: BasePreviewCard.Positioner.Props["align"];
   sideOffset?: BasePreviewCard.Positioner.Props["sideOffset"];
+  alignOffset?: BasePreviewCard.Positioner.Props["alignOffset"];
+  positionMethod?: BasePreviewCard.Positioner.Props["positionMethod"];
   arrow?: boolean;
   level?: SurfaceLevel;
   shadowLevel?: SurfaceLevel;
 }) {
   return (
     <PreviewCardPortal>
-      <PreviewCardPositioner sideOffset={sideOffset} align={align}>
+      <PreviewCardPositioner
+        side={side}
+        sideOffset={sideOffset}
+        align={align}
+        alignOffset={alignOffset}
+        positionMethod={positionMethod}
+      >
         <BasePreviewCard.Popup
           data-slot="preview-card-content"
           data-level={level}

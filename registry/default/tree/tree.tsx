@@ -6,6 +6,8 @@ import { CheckboxGroup } from "@base-ui/react/checkbox-group";
 import { Checkbox } from "@/registry/default/checkbox/checkbox";
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ChevronRightIcon, Loading03Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 import { solidSurface } from "@/registry/default/lib/elevated";
 import {
@@ -15,6 +17,7 @@ import {
   collectVisibleIds,
   handleTreeKeyboardNavigation,
 } from "./lib/tree-utils";
+import * as TreeUtils from "./lib/tree-utils";
 
 export interface TreeNodeBase<
   TData extends Record<string, unknown> = Record<string, unknown>,
@@ -60,6 +63,7 @@ export interface TreeExpandEvent {
 }
 
 type TreeVariant = "default" | "filled" | "outline";
+type TreeSize = "default" | "sm";
 type TreeMode = "single" | "multiple" | "none";
 
 interface TreeContextValue<
@@ -74,6 +78,9 @@ interface TreeContextValue<
   onCheckedNodesChange?: (checked: string[]) => void;
   renderItem: (item: TreeNode<TData>) => React.ReactElement;
   variant: TreeVariant;
+  size: TreeSize;
+  /** Some node has children, so leaves keep the chevron's room. */
+  hasParents: boolean;
   showLines: boolean;
   enableBulkActions: boolean;
   disableSelection: boolean;
@@ -144,6 +151,8 @@ export interface TreeProps<
   checkedNodes?: string[];
   onCheckedNodesChange?: (checked: string[]) => void;
   variant?: TreeVariant;
+  /** Row density: `sm` for compact trees such as a file explorer. */
+  size?: TreeSize;
   showLines?: boolean;
   mode?: TreeMode;
 }
@@ -159,6 +168,7 @@ function Tree<TData extends Record<string, unknown> = Record<string, unknown>>({
   checkedNodes,
   onCheckedNodesChange,
   variant = "default",
+  size = "default",
   showLines = false,
   mode = "single",
   className,
@@ -301,6 +311,18 @@ function Tree<TData extends Record<string, unknown> = Record<string, unknown>>({
     [mergedData, expandedNodes],
   );
 
+  // Leaves at any level sit beside folders or under one, so one parent
+  // anywhere means a top-level one.
+  const hasParents = React.useMemo(
+    () =>
+      mergedData.some(
+        (node) =>
+          (node.children && node.children.length > 0) ||
+          ("onLoadChildren" in node && Boolean(node.onLoadChildren)),
+      ),
+    [mergedData],
+  );
+
   const loadingNodesMap = React.useMemo(() => {
     const map = new Map<string, boolean>();
     loadingNodes.forEach((id) => map.set(id, true));
@@ -333,6 +355,8 @@ function Tree<TData extends Record<string, unknown> = Record<string, unknown>>({
         item: TreeNode<Record<string, unknown>>,
       ) => React.ReactElement,
       variant,
+      size,
+      hasParents,
       showLines,
       enableBulkActions,
       disableSelection,
@@ -353,6 +377,8 @@ function Tree<TData extends Record<string, unknown> = Record<string, unknown>>({
       checkedNodesSet,
       onCheckedNodesChange,
       variant,
+      size,
+      hasParents,
       showLines,
       enableBulkActions,
       disableSelection,
@@ -402,10 +428,16 @@ function Tree<TData extends Record<string, unknown> = Record<string, unknown>>({
   return element;
 }
 
-const INDENT_SIZE = 20;
+/**
+ * Each level indents by exactly the chevron and its gap, so a child's
+ * chevron sits under its parent's icon: the alignment that makes nesting
+ * read at a glance. (A shorter step, tried for compact trees, left a child
+ * folder looking like its parent's sibling.)
+ */
+const INDENT_SIZE = { default: 14 + 8, sm: 14 + 6 } as const;
 const INDENT_SIZE_WITH_CHECKBOX = 12;
-const VERTICAL_LINE_OFFSET = 4.5;
-const CHILD_VERTICAL_LINE_OFFSET = 15.5;
+/** A row's inline padding and half its 14px chevron: the guide line's x. */
+const LINE_OFFSET = { default: 8 + 7, sm: 6 + 7 } as const;
 const BADGE_TEXT_SIZE = "text-[10px]";
 
 /**
@@ -623,9 +655,11 @@ function TreeItemInternal<
     ],
   );
 
-  const paddingLeft =
+  const indent =
     depth *
-    (context.enableBulkActions ? INDENT_SIZE_WITH_CHECKBOX : INDENT_SIZE);
+    (context.enableBulkActions
+      ? INDENT_SIZE_WITH_CHECKBOX
+      : INDENT_SIZE[context.size]);
 
   const { allDescendantIds, localChildValues, handleLocalCheckboxChange } =
     useTreeCheckboxState({
@@ -634,79 +668,106 @@ function TreeItemInternal<
       context,
     });
 
+  // The children's group sits beside the row rather than inside it, so the
+  // row names it as its own, once the group is rendered (children that are
+  // still loading have none yet).
+  const groupId = React.useId();
+  const ownsGroup = isExpanded && Boolean(node.children?.length);
+
+  const setFocusable = (el: HTMLElement | null): void => {
+    if (el) {
+      context.focusableNodes.current.set(node.id, el);
+    } else {
+      context.focusableNodes.current.delete(node.id);
+    }
+  };
+
+  const tabIndex = isDisabled ? -1 : isTabbable ? 0 : -1;
+
+  // One element per row: it is the tree item, takes focus and carries hover
+  // and selection (two nested ones, pulled together with negative margins,
+  // used to split the job). Hover lands at once; the focus ring sits inside
+  // the row rather than over its neighbours.
+  const rowClassName = cn(
+    "flex min-w-0 flex-1 items-center rounded-md border-0 bg-transparent text-left select-none",
+    context.size === "sm"
+      ? "h-7 gap-1.5 px-1.5 text-[0.8125rem]"
+      : "h-8 gap-2 px-2 text-sm",
+    "hover:bg-surface-hover",
+    "focus-visible:outline-ring/50 outline-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:-outline-offset-2",
+    isSelected &&
+      !context.disableSelection &&
+      "bg-surface-selected text-foreground",
+    isDisabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
+  );
+
+  const itemAria = {
+    role: "treeitem",
+    "aria-level": depth + 1,
+    "aria-setsize": setSize,
+    "aria-posinset": positionInSet,
+    "aria-selected": context.enableBulkActions ? undefined : isSelected,
+    "aria-checked": context.enableBulkActions ? isChecked : undefined,
+    "aria-disabled": isDisabled,
+  } as const;
+
+  // Leaves keep the chevron's room, so every label at a level lines up
+  // (they used to start where a folder's chevron does). Outside the row, so
+  // a leaf's highlight starts at its content, not at an empty strip; inside
+  // it only in bulk mode, where the checkboxes lead and must line up too.
+  const leafRoom =
+    !hasChildren && context.hasParents && !context.enableBulkActions
+      ? INDENT_SIZE[context.size]
+      : 0;
+  const chevronSlot = hasChildren ? (
+    <HugeiconsIcon
+      icon={ChevronRightIcon}
+      aria-hidden="true"
+      strokeWidth={2}
+      className={cn(
+        "text-muted-foreground ease-out-expo size-3.5 shrink-0 transition-[rotate] duration-200",
+        isExpanded && "rotate-90",
+      )}
+    />
+  ) : context.hasParents && context.enableBulkActions ? (
+    <span aria-hidden="true" className="size-3.5 shrink-0" />
+  ) : null;
+
   if (!hasChildren) {
     return (
       <TreeContext.Provider value={mergedContextValue as TreeContextValue}>
-        <div className={cn("mt-0.5 first:mt-0")}>
+        <div
+          role="none"
+          className="mt-0.5 flex first:mt-0"
+          style={{ paddingLeft: indent + leafRoom }}
+        >
           <div
-            className="group relative flex select-none"
-            style={{ paddingLeft }}
+            ref={setFocusable}
+            {...itemAria}
+            tabIndex={tabIndex}
+            className={rowClassName}
+            onClick={handleClick}
+            onKeyDown={(e) => {
+              if (e.key === " " || e.key === "Enter") {
+                e.stopPropagation();
+              }
+              handleKeyDown(e);
+            }}
+            onFocus={() => {
+              context.setLastFocusedNodeId(node.id);
+            }}
           >
-            {context.showLines && depth > 0 && (
-              <div
-                className="absolute top-0 bottom-0 left-0"
-                style={{ left: paddingLeft - VERTICAL_LINE_OFFSET }}
-              >
-                <div className="bg-border h-full w-px" />
-              </div>
+            {context.enableBulkActions && (
+              <Checkbox
+                value={node.id}
+                checked={isChecked}
+                disabled={isDisabled}
+                tabIndex={-1}
+                className="pointer-events-none"
+              />
             )}
-            <div
-              className={cn(
-                "flex flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors",
-                "hover:bg-surface-hover",
-                isSelected &&
-                  !context.disableSelection &&
-                  "bg-surface-selected text-accent-foreground",
-                isDisabled && "cursor-not-allowed opacity-60",
-              )}
-            >
-              <div
-                ref={(el) => {
-                  if (el) {
-                    context.focusableNodes.current.set(node.id, el);
-                  } else {
-                    context.focusableNodes.current.delete(node.id);
-                  }
-                }}
-                className={cn(
-                  "-my-1.5 flex flex-1 items-center gap-2 rounded-md px-2 py-1.5 transition-colors outline-none select-none",
-                  "-mx-2",
-                  "focus-visible:bg-surface-hover focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
-                  !isDisabled && "cursor-pointer",
-                )}
-                onClick={handleClick}
-                onKeyDown={(e) => {
-                  if (e.key === " " || e.key === "Enter") {
-                    e.stopPropagation();
-                  }
-                  handleKeyDown(e);
-                }}
-                onFocus={() => {
-                  context.setLastFocusedNodeId(node.id);
-                }}
-                role="treeitem"
-                aria-level={depth + 1}
-                aria-setsize={setSize}
-                aria-posinset={positionInSet}
-                aria-selected={
-                  context.enableBulkActions ? undefined : isSelected
-                }
-                aria-checked={context.enableBulkActions ? isChecked : undefined}
-                aria-disabled={isDisabled}
-                tabIndex={isDisabled ? -1 : isTabbable ? 0 : -1}
-              >
-                {context.enableBulkActions && (
-                  <Checkbox
-                    value={node.id}
-                    checked={isChecked}
-                    disabled={isDisabled}
-                    tabIndex={-1}
-                    className="pointer-events-none"
-                  />
-                )}
-                {context.renderItem(node)}
-              </div>
-            </div>
+            {chevronSlot}
+            {context.renderItem(node)}
           </div>
         </div>
       </TreeContext.Provider>
@@ -715,154 +776,87 @@ function TreeItemInternal<
 
   const parentContent = (
     <TreeContext.Provider value={mergedContextValue as TreeContextValue}>
-      <div
-        role="treeitem"
-        aria-expanded={isExpanded}
-        aria-level={depth + 1}
-        aria-setsize={setSize}
-        aria-posinset={positionInSet}
-        aria-selected={context.enableBulkActions ? undefined : isSelected}
-        aria-checked={context.enableBulkActions ? isChecked : undefined}
-        aria-disabled={isDisabled}
-        className={cn("mt-0.5 first:mt-0")}
-      >
+      <div role="none" className="mt-0.5 first:mt-0">
         <BaseCollapsible.Root
           open={isExpanded}
           onOpenChange={() => !isDisabled && context.onToggleNode(node.id)}
         >
-          <div
-            className="group relative flex select-none"
-            style={{ paddingLeft }}
-          >
-            {context.showLines && depth > 0 && (
+          <div role="none" className="flex" style={{ paddingLeft: indent }}>
+            {context.enableBulkActions ? (
+              // Plain div in bulk-actions mode: avoids Collapsible.Trigger's
+              // built-in keyboard handling.
               <div
-                className="absolute top-0 bottom-0 left-0"
-                style={{ left: paddingLeft - VERTICAL_LINE_OFFSET }}
+                ref={setFocusable}
+                {...itemAria}
+                aria-expanded={isExpanded}
+                aria-owns={ownsGroup ? groupId : undefined}
+                tabIndex={tabIndex}
+                className={rowClassName}
+                onClick={() => {
+                  if (!isDisabled) {
+                    context.onToggleNode(node.id);
+                  }
+                }}
+                onKeyDown={handleKeyDown}
+                onFocus={() => {
+                  context.setLastFocusedNodeId(node.id);
+                }}
               >
-                <div className="bg-border h-full w-px" />
+                <span
+                  onClick={(e: React.MouseEvent) => {
+                    e.stopPropagation();
+                    handleToggleChecked();
+                  }}
+                >
+                  <Checkbox
+                    parent
+                    disabled={isDisabled}
+                    tabIndex={-1}
+                    className="pointer-events-auto cursor-pointer"
+                  />
+                </span>
+                {chevronSlot}
+                {context.renderItem(node)}
               </div>
+            ) : (
+              <BaseCollapsible.Trigger
+                ref={setFocusable}
+                {...itemAria}
+                aria-owns={ownsGroup ? groupId : undefined}
+                className={rowClassName}
+                onClick={(e) => {
+                  if (!isDisabled && !context.disableSelection) {
+                    handleClick(e);
+                  }
+                }}
+                onKeyDown={handleKeyDown}
+                onFocus={() => {
+                  context.setLastFocusedNodeId(node.id);
+                }}
+                disabled={isDisabled}
+                tabIndex={tabIndex}
+              >
+                {chevronSlot}
+                {context.renderItem(node)}
+              </BaseCollapsible.Trigger>
             )}
-            <div
-              className={cn(
-                "flex flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors",
-                "hover:bg-surface-hover",
-                isSelected &&
-                  !context.disableSelection &&
-                  "bg-surface-selected text-accent-foreground",
-                isDisabled && "cursor-not-allowed opacity-60",
-              )}
-            >
-              {context.enableBulkActions ? (
-                // Plain div in bulk-actions mode: avoids Collapsible.Trigger's built-in keyboard handling.
-                <div
-                  ref={(el) => {
-                    if (el) {
-                      context.focusableNodes.current.set(node.id, el);
-                    } else {
-                      context.focusableNodes.current.delete(node.id);
-                    }
-                  }}
-                  className={cn(
-                    "group/trigger -mx-2 -my-1.5 flex flex-1 items-center gap-2 rounded-md border-0 bg-transparent px-2 py-1.5 text-left transition-colors outline-none select-none",
-                    "focus-visible:bg-surface-hover focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
-                    !isDisabled && "cursor-pointer",
-                  )}
-                  onClick={() => {
-                    if (!isDisabled) {
-                      context.onToggleNode(node.id);
-                    }
-                  }}
-                  onKeyDown={handleKeyDown}
-                  onFocus={() => {
-                    context.setLastFocusedNodeId(node.id);
-                  }}
-                  tabIndex={isDisabled ? -1 : isTabbable ? 0 : -1}
-                >
-                  <span
-                    onClick={(e: React.MouseEvent) => {
-                      e.stopPropagation();
-                      handleToggleChecked();
-                    }}
-                  >
-                    <Checkbox
-                      parent
-                      disabled={isDisabled}
-                      tabIndex={-1}
-                      className="pointer-events-auto cursor-pointer"
-                    />
-                  </span>
-                  <HugeiconsIcon
-                    icon={ChevronRightIcon}
-                    aria-hidden="true"
-                    className={cn(
-                      "text-muted-foreground ease-out-expo size-4 shrink-0 transition-transform duration-[325ms]",
-                      isExpanded && "rotate-90",
-                      isDisabled && "opacity-60",
-                    )}
-                    strokeWidth={2}
-                  />
-                  {context.renderItem(node)}
-                </div>
-              ) : (
-                <BaseCollapsible.Trigger
-                  ref={(el) => {
-                    if (el) {
-                      context.focusableNodes.current.set(node.id, el);
-                    } else {
-                      context.focusableNodes.current.delete(node.id);
-                    }
-                  }}
-                  className={cn(
-                    "group/trigger -mx-2 -my-1.5 flex flex-1 items-center gap-2 rounded-md border-0 bg-transparent px-2 py-1.5 text-left transition-colors outline-none select-none",
-                    "focus-visible:bg-surface-hover focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
-                    !isDisabled && "cursor-pointer",
-                  )}
-                  onClick={(e) => {
-                    if (!isDisabled && !context.disableSelection) {
-                      handleClick(e);
-                    }
-                  }}
-                  onKeyDown={handleKeyDown}
-                  onFocus={() => {
-                    context.setLastFocusedNodeId(node.id);
-                  }}
-                  disabled={isDisabled}
-                  tabIndex={isDisabled ? -1 : isTabbable ? 0 : -1}
-                >
-                  <HugeiconsIcon
-                    icon={ChevronRightIcon}
-                    aria-hidden="true"
-                    className={cn(
-                      "text-muted-foreground ease-out-expo size-4 shrink-0 transition-transform duration-[325ms]",
-                      isExpanded && "rotate-90",
-                      isDisabled && "opacity-60",
-                    )}
-                    strokeWidth={2}
-                  />
-                  {context.renderItem(node)}
-                </BaseCollapsible.Trigger>
-              )}
-            </div>
           </div>
 
           <BaseCollapsible.Panel
             className={cn(
-              "ease-out-expo h-[var(--collapsible-panel-height)] overflow-y-clip transition-all duration-[325ms]",
-              "data-[ending-style]:h-0 data-[ending-style]:opacity-0",
-              "data-[starting-style]:h-0 data-[starting-style]:opacity-0",
+              "ease-out-expo h-(--collapsible-panel-height) overflow-y-clip transition-[height,opacity] duration-250",
+              "data-ending-style:h-0 data-ending-style:opacity-0",
+              "data-starting-style:h-0 data-starting-style:opacity-0",
             )}
           >
             {node.children && node.children.length > 0 && (
-              <div
-                className={cn(
-                  context.showLines && "relative",
-                  "pt-0.5 pb-0.5 pl-0",
-                )}
-              >
+              <div id={groupId} role="group" className="relative pt-0.5">
+                {/* One guide line per group, under the parent's chevron. */}
                 {context.showLines && (
                   <div
-                    className="bg-border absolute top-0 bottom-0 w-px"
-                    style={{ left: paddingLeft + CHILD_VERTICAL_LINE_OFFSET }}
+                    aria-hidden="true"
+                    className="bg-border absolute top-0.5 bottom-0 w-px"
+                    style={{ left: indent + LINE_OFFSET[context.size] }}
                   />
                 )}
                 {node.children.map((child, index) => (
@@ -904,7 +898,8 @@ export interface TreeItemProps extends useRender.ComponentProps<"div"> {
 function TreeItem({ className, children, render, ...props }: TreeItemProps) {
   const defaultProps = {
     "data-slot": "tree-item",
-    className: cn("flex flex-1 items-center gap-2", className),
+    // min-w-0, or a long label can't shrink below its text to truncate.
+    className: cn("flex min-w-0 flex-1 items-center gap-2", className),
     children,
   };
 
@@ -1028,10 +1023,8 @@ export {
   TreeItemLabel,
   TreeItemBadge,
   type TreeVariant,
+  type TreeSize,
   type TreeMode,
 };
 
-import * as TreeUtils from "./lib/tree-utils";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { ChevronRightIcon, Loading03Icon } from "@hugeicons/core-free-icons";
 export { TreeUtils };

@@ -110,6 +110,41 @@ Deferred / removed follow-ups pulled from the initial `filters` build (`registry
 - **Auto-remove a filter dismissed without a value.** Linear-style: if a freshly added select/multiselect filter is dismissed (popup closed) without choosing a value, drop the dangling `Select…` pill instead of leaving it. Would hook the value Combobox's `onOpenChange`/close with an "was anything picked" check. Left out to avoid surprising removals; consider behind an opt-in prop.
 - **Lower-priority PR-review leftovers** (blockers, structural pass, context split, and provider/bar split all landed): a ghost/unstyled variant on the `NumberField` primitive so the filter chip can compose it instead of raw Base UI (do it when a second consumer wants an inline borderless number input, or when the chip's copy visibly drifts from the primitive); cache `resolveOperators` per field if it ever shows in profiles.
 
+### Text Morph
+
+Two deferred ideas. Both are real but small today; build them when a page needs them. A third idea, making the box track arriving letters, was dropped: arriving ink overlapped the next word by 6.5px for one 40ms frame in morph and 0.7px in roll ("In a sentence", `dev` → `production-eu`), not worth an intricate sampled width curve.
+
+#### Per-line wipe for wrapped text (edge fade on more than one line)
+
+The edge fade (`edgeFade`) only arms on a one-line label (`box` in `morphTo`). In wrapped text, old ink can fade on top of words that reflowed into its place. Measured on the long wrapped reference cases on `/tune/text-morph`: in roll, 1 to 3 leaving glyphs sit over kept, reflowed words for about 200ms; in morph, 0 to 1 for a single 50ms sample (its leaving glyphs fade in ~100ms). So it's a roll-only blemish in practice.
+
+The fix: group each line's leaving glyphs, give each group its own mask band, and sweep it across that line (a registered custom property animated from 0 to the line's leftover ink width on the width's curve) while the ghosts fade. For us: group ghost slots by line in the ghost sheet, put a band per group, animate a registered `@property` length. Roughly 100 to 150 lines in `text-morph.tsx` plus CSS. Revisit if roll is used for multi-line labels (a status paragraph that changes often).
+
+#### `TextMorphFlow`: animate a paragraph reflowing around a label
+
+A new component, not a fix. When a label inside flowing prose changes width, the paragraph reflows: today text after it on the same line slides (the start-margin ease), but words that move to another line jump. A flow wrapper (~475 lines) would animate them:
+
+1. Wrap the paragraph. Split its text into word elements.
+2. On a change, measure the visible words before any label writes, let the paragraph reflow to its final layout once, measure again (only words in view, found by binary search).
+3. Words that stayed on their line slide from old to new position (a transform) on the resize curve.
+4. Words that changed line relay: a copy fades out sliding along the old line (gone by halfway), a copy fades in sliding into the new line (from 45%), the real word hidden meanwhile.
+
+Design notes for ours:
+
+- Ship it as a sibling file in the text-morph registry item (`text-morph-flow.tsx`, exporting `TextMorphFlow`), since it hooks the engine's internal batch scheduler.
+- React owns the paragraph's text, so split into words while rendering (recursing through inline children like links and bold), never by editing the DOM behind React.
+- Two engine touch points, both inert without a flow: the batch calls flows before its first write and after layout settles; a label inside a flow (known via React context) skips its own start-margin width ease, because that reflows the paragraph every frame, and lets the flow move the words instead.
+- Verify no change for labels outside a flow with the usual sweeps (all reference cases in every mode, counter row, install tabs, docs pages).
+- Estimated 350 to 500 lines plus docs and a demo. Build it around a real use (a live stat or status inside a paragraph) so the API fits one.
+
+### Performance
+
+#### `:has()` variants make any element insertion restyle the whole docs page
+
+**Worst of it fixed.** On a docs page, inserting one element anywhere cost ~8ms of restyling (~3,150 elements), so typing into the TextMorph editable example lagged. Eight rules did it, each alone ~7–10ms: Tailwind's group-has and has-…-star-star variants, which compile to `:has()` inside `:is(… *)`, from Alert (title/description row span), InputGroup (addon padding beside an input, opacity while disabled) and Autocomplete (input padding for the clear and trigger buttons). Each is now written on the component's root with a direct child as the target (`[&:has(>…)>[data-slot=…]]:…`), which measured no extra cost: an insertion is down to ~1.5ms. Note that Tailwind v4 scans every file that isn't gitignored, markdown included, so a class spelled out in a note like this one gets compiled into the site; describe such classes rather than writing them out.
+
+Still open: the remaining `:has()` rules add ~1ms together at most (e.g. `:root:has(.docs-root)`, `html:has([data-slot=drawer-viewport]…)`, code-block's `[&:not(:has(.line))]`, button-group separators, field-error). Scope the page-level ones to a class set on `<html>` by the docs layout if they ever matter. Measure with the insertion probe: append a `<span>` inside any docs element, then time `getBoundingClientRect()`.
+
 ### Code hygiene
 
 #### Canonical Tailwind class sweep (repo-wide)

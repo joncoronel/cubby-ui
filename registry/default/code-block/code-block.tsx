@@ -182,8 +182,11 @@ function CodeBlock({
       // bg-muted follows solidSurface to override its bg-surface-3.
       solidSurface(3, 1),
       "bg-muted",
-      // Restore top padding when there's no header.
-      "has-[[data-slot='code-block-pre']:first-child]:pt-1",
+      // No header: the tray has nothing to hold, so drop it and let the code
+      // card stand on its own.
+      // Its own child only: a code block nested inside (a card holding a
+      // peek) also opens with a pre, and stripped the tray around it.
+      "has-[>[data-slot='code-block-pre']:first-child]:bg-transparent has-[>[data-slot='code-block-pre']:first-child]:p-0 has-[>[data-slot='code-block-pre']:first-child]:shadow-none",
       className,
     ),
     children: content,
@@ -256,7 +259,9 @@ function CodeBlockHeader({
   const defaultProps = {
     "data-slot": "code-block-header",
     className: cn(
-      "flex items-center justify-between bg-transparent px-3 py-1",
+      // min-h-9: a header with only a filename (no 28px tab pills) was
+      // 28px tall, crowding the name against the code card.
+      "flex min-h-9 items-center justify-between bg-transparent px-3 py-1",
       className,
     ),
     children: content,
@@ -350,7 +355,15 @@ function CodeBlockTabs({
 }: CodeBlockTabsProps) {
   const tabsElement = (
     <Tabs value={activeTab} onValueChange={onTabChange} className="gap-1">
-      <div className="scrollbar-hide flex max-w-full items-center overflow-x-auto">
+      {/* Tabs that overflow scroll sideways without a scrollbar: the
+          project has no `scrollbar-hide` utility, so the native bar showed.
+          A scroller clips both axes, so it keeps 4px on every side (taken
+          back with negative margins) for the active tab's ring, first and
+          last tabs included, and scrolls a picked tab into view with the
+          same 4px (scroll padding), or it lands flush and the ring is cut. Its
+          width cap grows by the 8px its margins take back, or the right one
+          did nothing and the last tab ran 4px past the clip. */}
+      <div className="-m-1 flex max-w-[calc(100%+0.5rem)] scroll-px-1 items-center overflow-x-auto p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <TabsList
           variant={variant}
           size="small"
@@ -368,7 +381,9 @@ function CodeBlockTabs({
 
   const defaultProps = {
     "data-slot": "code-block-tabs",
-    className: cn("ml-2 min-w-0 overflow-hidden", className),
+    // The same 4px room inside this clip, so the scroller's fits (its 8px
+    // left margin split into 4px margin and 4px padding).
+    className: cn("-my-1 -mr-1 ml-1 min-w-0 overflow-hidden p-1", className),
     children: tabsElement,
   };
 
@@ -462,10 +477,14 @@ function CodeBlockPre({
     children: (
       <>
         {floatingCopy && <CodeBlockFloatingCopy />}
+        {/* Scroll chains to the page: code is in-flow content, and containing
+            it trapped the page's vertical scroll over any block whose long
+            lines only scroll sideways (wheel and touch alike). */}
         <ScrollArea
           fadeEdges={fadeEdges}
           hideScrollbar={hideScrollbar}
           nativeScroll={nativeScroll}
+          overscrollBehavior="auto"
           viewportClassName="py-3"
           className="min-h-0 flex-1"
         >

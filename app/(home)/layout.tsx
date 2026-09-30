@@ -1,24 +1,13 @@
 import type { ReactNode } from "react";
-import { Bricolage_Grotesque } from "next/font/google";
 import { TopNav } from "@/components/home/top-nav";
 import { CubbyUILogoDots } from "@/components/cubbyui-logo";
 import { cn } from "@/lib/utils";
 import "./home.css";
 
-// Display face for the marketing surface only. Scoped to the home tree via the
-// `--font-display` variable on the wrapper below — it never reaches /docs or the
-// component source, so the rest of the site keeps Rubik headings untouched.
-const display = Bricolage_Grotesque({
-  variable: "--font-display",
-  subsets: ["latin"],
-  display: "swap",
-});
-
 export default function Layout({ children }: { children: ReactNode }) {
   return (
     <div
       className={cn(
-        display.variable,
         "relative flex min-h-dvh flex-col overflow-x-clip",
       )}
     >

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { ComponentPreview } from "./component-preview";
 import { highlight } from "@/registry/default/code-block/lib/shiki-shared";
+import { highlightPeek } from "./code-peek-lines";
 import type { BundledLanguage } from "shiki/langs";
 import { exampleRegistry } from "@/app/components/_generated/registry";
 
@@ -28,7 +29,9 @@ export async function ComponentPreviewServer({
     const examples = exampleRegistry[component as keyof typeof exampleRegistry];
     const exampleData = examples?.find((e) => e.importPath === example);
     if (exampleData) {
-      sourceCode = exampleData.source;
+      // Without its closing newline: rendered, it was an empty last line
+      // under the code.
+      sourceCode = exampleData.source.trimEnd();
     }
   }
 
@@ -36,13 +39,14 @@ export async function ComponentPreviewServer({
   // These need to be rendered on the server, not in the client component
   if (example === "code-block-server-highlight") {
     const ServerExample = (
-      await import(
-        "@/registry/examples/code-block/code-block-server-highlight"
-      )
+      await import("@/registry/examples/code-block/code-block-server-highlight")
     ).default;
 
     const highlightedCode = sourceCode
       ? await highlight(sourceCode, language as BundledLanguage)
+      : undefined;
+    const peekCode = sourceCode
+      ? await highlightPeek(sourceCode, language as BundledLanguage)
       : undefined;
 
     return (
@@ -51,6 +55,7 @@ export async function ComponentPreviewServer({
         language={language}
         className={className}
         initialHighlighted={highlightedCode}
+        peekHighlighted={peekCode}
         serverRenderedExample={<ServerExample />}
       />
     );
@@ -62,6 +67,10 @@ export async function ComponentPreviewServer({
       sourceCode,
       language as BundledLanguage,
     );
+    const peekCode = await highlightPeek(
+      sourceCode,
+      language as BundledLanguage,
+    );
 
     return (
       <ComponentPreview
@@ -69,6 +78,7 @@ export async function ComponentPreviewServer({
         language={language}
         className={className}
         initialHighlighted={highlightedCode}
+        peekHighlighted={peekCode}
         example={example}
       />
     );

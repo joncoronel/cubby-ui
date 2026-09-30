@@ -8,8 +8,8 @@ import {
 
 export default function CardVariant() {
   return (
-    <div className="flex gap-4">
-      <Card className="w-[350px]">
+    <div className="flex flex-wrap justify-center gap-4">
+      <Card className="w-[350px] max-w-full">
         <CardHeader>
           <CardTitle>Default Card</CardTitle>
           <CardDescription>Clean and simple design.</CardDescription>
@@ -21,7 +21,7 @@ export default function CardVariant() {
         </CardContent>
       </Card>
 
-      <Card variant="inset" className="w-[350px]">
+      <Card variant="inset" className="w-[350px] max-w-full">
         <CardHeader>
           <CardTitle>Inset Card</CardTitle>
           <CardDescription>Nested border effect.</CardDescription>

@@ -1,0 +1,202 @@
+/* TextMorph (registry/default/text-morph). The server renders one span per
+   glyph, the same markup the browser keeps, so these styles apply from first
+   paint and nothing shifts on hydration. */
+
+/* A glyph's slot: how far it reaches above and below the glyph's box, and
+   how far it fades across. Blend and roll fade across 0.3em of room past
+   the box, for their blur and tilt; morph fades 0.15em inside the box
+   itself, so a digit rolling in shows nothing until it enters its line
+   (with room past it, it showed faintly, whole, above the line). */
+.text-morph {
+  --text-morph-slot-y: 0.3em;
+  --text-morph-fade: 0.3em;
+  position: relative;
+}
+.text-morph[data-mode="morph"] {
+  --text-morph-slot-y: 0em;
+  --text-morph-fade: 0.15em;
+}
+/* In a tight line height the ink reaches past the line box (a comma's tail
+   below it), and a fade inside the box faded it until the change settled,
+   then popped it. So the slot is at least 1.4em tall, reaching past the box
+   only as far as that takes: at a 1.6 line height it doesn't. */
+@supports (height: 1lh) {
+  .text-morph[data-mode="morph"] {
+    --text-morph-slot-y: max(0em, (1.4em - 1lh) / 2);
+  }
+}
+.text-morph {
+  --text-morph-fade-y: linear-gradient(
+    to bottom,
+    transparent,
+    #000 var(--text-morph-fade),
+    #000 calc(100% - var(--text-morph-fade)),
+    transparent
+  );
+}
+
+/* It flows like the text around it, wrapping between words where the
+   context lets text wrap, and never changes display: switching between
+   inline and inline-block repaints the text snapped differently. In a
+   layer, so a class can make it a box instead (`block`, `inline-block`),
+   which eases its height when its line count changes; the rest stays
+   unlayered, so page styles for spans can't reach the glyphs. */
+@layer components {
+  .text-morph {
+    display: inline;
+    vertical-align: baseline;
+  }
+}
+
+/* While a one-line change eases the label's space, it stays on one line.
+   text-wrap-mode leaves spaces alone; nowrap (the fallback) would drop a
+   leading one. A box's text sits at its start meanwhile: the stage rides it
+   to where its alignment puts it, from the width as layout rounds it (both
+   rounded on their own, the text stepped back and forth). */
+.text-morph[data-sizing] {
+  white-space: nowrap;
+  text-align: start;
+}
+@supports (text-wrap-mode: nowrap) {
+  .text-morph[data-sizing] {
+    white-space: inherit;
+    text-wrap-mode: nowrap;
+  }
+}
+
+/* The plain value for screen readers, exactly as written (sr-only's
+   nowrap would drop a leading space). The visible glyphs are what gets
+   selected and copied, so this copy isn't, or a copied selection would
+   paste the value twice. */
+.text-morph > .sr-only {
+  white-space: pre;
+  user-select: none;
+}
+
+.text-morph-stage {
+  position: relative;
+}
+
+/* Each glyph sits in a slot with room above and below its line and room
+   beside it for tilt, scale and blur, plus the length of any slide along
+   the line (--reach). Negative margins hand the room back, so the slot
+   takes no space. While a change plays (data-playing), the slot of a glyph
+   that rolls or is drawn off its line (data-fade) fades it out above and
+   below; glyphs that hold still or only slide carry no mask, and at rest
+   none do. Toggling an attribute costs a scoped restyle, where adding or
+   removing the slots restyles the page. A mask cuts whatever falls outside
+   its element, so a glyph moving to another line turns it off. */
+.text-morph-slot {
+  display: inline-block;
+  padding: var(--text-morph-slot-y) calc(0.5em + var(--reach, 0px));
+  margin: calc(-1 * var(--text-morph-slot-y)) calc(-0.5em - var(--reach, 0px));
+}
+.text-morph-glyphs[data-playing]
+  .text-morph-slot[data-fade]:not([data-travel]) {
+  mask-image: var(--text-morph-fade-y);
+}
+
+/* Where the browser can, the fade reaches sideways without end: it only
+   ever cuts above and below, so a glyph sliding
+   or shrinking sideways out of its slot is never sliced. Elsewhere the slot's
+   room (--reach) and unmasking a shape's glyphs cover it. no-clip lifts
+   the cut above and below as well, showing a glyph rolling in whole and
+   unfaded past its slot, so a clip puts that edge back, reaching sideways
+   without end. */
+@supports (mask-clip: no-clip) {
+  .text-morph-glyphs[data-playing]
+    .text-morph-slot[data-fade]:not([data-travel]),
+  .text-morph-ghost:not([data-travel]) {
+    mask-repeat: repeat-x;
+    mask-clip: no-clip;
+    clip-path: inset(0 -100vw);
+  }
+}
+
+/* An empty value still holds its line: with nothing
+   in it, the line would collapse and the text around it jump. */
+.text-morph-glyphs:empty::before {
+  content: "\200B";
+}
+
+/* Spaces show as typed: a run of them isn't
+   collapsed to one, and a line break in the value breaks the line. Only
+   collapsing changes; wrapping is inherited, so a label easing its width
+   still holds one line. */
+.text-morph [data-space] {
+  white-space: pre-wrap;
+}
+@supports (white-space-collapse: preserve) {
+  .text-morph [data-space] {
+    white-space: inherit;
+    white-space-collapse: preserve;
+  }
+}
+
+/* A word never breaks; lines break at the spaces between words. */
+.text-morph [data-word] {
+  white-space: nowrap;
+}
+
+/* Glyphs keep their own compositing layer, animating or not. A glyph that
+   drops back into ordinary painting when its animation ends is redrawn
+   snapped to the pixel grid, often with different anti-aliasing: a visible
+   twitch just as it settles. From first paint, not
+   from a glyph's first animation: outside a layer text draws with subpixel
+   anti-aliasing and inside one in greyscale, so a label mixed the two. */
+.text-morph [data-glyph]:not([data-space]) {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+/* Ghosts sit at --x/--y from the anchor's place in the flow (its static
+   position, where the value is on its line). The anchor never changes size;
+   the sheet inside it is offset and sized each change to take in every
+   ghost, and wears the edge fade (--text-morph-edge) only while a shrinking
+   box would leave ink over a neighbour. */
+.text-morph-ghosts {
+  position: absolute;
+  /* Inline, so its static position is where the value sits on its line. */
+  display: inline;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  /* Glyphs on their way out aren't part of the value. */
+  user-select: none;
+}
+.text-morph-ghost-sheet {
+  position: absolute;
+  left: var(--ox, 0px);
+  top: var(--oy, 0px);
+  width: 0;
+  height: 0;
+  direction: ltr;
+  mask-image: var(--text-morph-edge, none);
+  mask-repeat: no-repeat;
+}
+
+/* Each ghost gets a slot at its own line, faded above and below like the
+   live glyphs, with room beside it for tilt, scale and blur (0.5em, the
+   engine's SLOT_PAD_X, which sizes the ghost layer around it). A ghost
+   travelling with a neighbour moves its slot, fade and all (translate),
+   and leaves inside it. */
+.text-morph-ghost {
+  position: absolute;
+  left: calc(var(--x) - var(--ox, 0px) - 0.5em);
+  top: calc(var(--y) - var(--oy, 0px) - var(--text-morph-slot-y));
+  padding: var(--text-morph-slot-y) 0.5em;
+  white-space: nowrap;
+  mask-image: var(--text-morph-fade-y);
+}
+/* A ghost swapped as part of a shape slides toward the shape's centre as
+   it shrinks, out of its slot; it doesn't roll, so it goes unmasked. */
+.text-morph-ghost[data-travel] {
+  mask-image: none;
+}
+
+/* Blend: arriving text carried in from past a pinned edge a reader sees (a
+   button's) stays hidden past it while the change plays (the engine sets
+   the inset and lifts it when the change ends). */
+.text-morph[data-edge-clip] {
+  clip-path: var(--text-morph-clip);
+}

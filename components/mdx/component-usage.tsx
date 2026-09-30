@@ -14,6 +14,11 @@ interface ComponentUsageProps {
   highlightedAnatomy?: ReactElement;
 }
 
+/**
+ * A component's imports and anatomy: two cards, since they're copied apart
+ * (the import to the top of a file, the markup where it's used), in one
+ * tray that holds them together as one usage.
+ */
 export function ComponentUsage({
   component,
   highlightedImports,
@@ -31,13 +36,10 @@ export function ComponentUsage({
     );
   }
 
-  const importsCode = anatomy.imports;
-  const anatomyCode = anatomy.anatomy;
-
   return (
-    <div className="not-prose my-6 w-full max-w-full min-w-0 space-y-4">
+    <div className="docs-code-tray not-prose my-6 flex w-full max-w-full min-w-0 flex-col gap-1">
       <CodeBlock
-        code={importsCode}
+        code={anatomy.imports.trimEnd()}
         language="tsx"
         initial={highlightedImports}
         floatingCopy
@@ -46,9 +48,8 @@ export function ComponentUsage({
           <CodeBlockCode />
         </CodeBlockPre>
       </CodeBlock>
-
       <CodeBlock
-        code={anatomyCode}
+        code={anatomy.anatomy.trimEnd()}
         language="tsx"
         initial={highlightedAnatomy}
         floatingCopy

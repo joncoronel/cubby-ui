@@ -26,16 +26,14 @@ colors:
   dark-muted-foreground: "oklch(0.73 0.004 270)"
   dark-chrome: "oklch(0.159 0.004 270)"
   landing-field: "oklch(0.47 0.2 264)"
-  landing-field-deep: "oklch(0.39 0.18 264)"
   landing-on-field: "oklch(0.985 0.008 264)"
   landing-on-field-muted: "oklch(0.87 0.05 264)"
   landing-field-line: "oklch(1 0 0 / 0.16)"
-  landing-spark: "oklch(0.85 0.15 82)"
+  landing-slug: "oklch(0.5 0.2 258)"
   dark-landing-field: "oklch(0.37 0.16 264)"
-  dark-landing-field-deep: "oklch(0.29 0.13 264)"
+  dark-landing-slug: "oklch(0.76 0.13 255)"
   dark-landing-on-field-muted: "oklch(0.84 0.05 264)"
   dark-landing-field-line: "oklch(1 0 0 / 0.12)"
-  dark-landing-spark: "oklch(0.83 0.14 82)"
 typography:
   display:
     fontFamily: "Bricolage Grotesque, ui-sans-serif, system-ui, sans-serif"
@@ -176,10 +174,9 @@ components:
     padding: "0 12px"
     height: "32px"
   landing-command-bar:
-    backgroundColor: "{colors.landing-field-deep}"
-    textColor: "{colors.landing-on-field}"
+    textColor: "{colors.foreground}"
     typography: "{typography.mono}"
-    padding: "12px 10px 12px 16px"
+    padding: "10px 8px 10px 16px"
   landing-gallery-card:
     textColor: "{colors.foreground}"
     rounded: "{rounded.landing-card}"
@@ -203,7 +200,7 @@ Density is calm and reading-first. Pages sit in one centered column with generou
 
 Light and dark are both designed. Light keeps fills neutral and lets layered shadow carry elevation; dark steps lightness up a tinted ladder and adds a lit top rim. The docs surface carries the cubby mark as a four-cell glyph in its shelf trigger.
 
-This system is the docs world. The landing page (`app/(home)`) is deliberately its own world, scoped under `.landing`: it keeps the fonts, the page background, the ladder and the registry components, and adds an ultramarine slab and a marigold spark. Everything below applies to the docs; where the landing departs, the **Landing page** section at the end is normative inside `.landing` and nowhere else.
+This system is the docs world. The landing page (`app/(home)`) is deliberately its own world, scoped under `.landing`: it keeps the fonts, the page background, the ladder and the registry components, and adds only an ultramarine slab. Everything below applies to the docs; where the landing departs, the **Landing page** section at the end is normative inside `.landing` and nowhere else.
 
 **Key Characteristics:**
 - Neutrals tinted toward hue 270 at very low chroma (0.004, 0.002 near the extremes), tuned from three root variables.
@@ -399,7 +396,7 @@ A block with a header (package-manager or file tabs) sits in the muted tray; a b
 
 ### Don't:
 - **Don't** raise the chrome surface with a ladder rung or paint chrome controls by hand; use `data-surface="chrome"`.
-- **Don't** add a second accent hue outside status plates (on docs; the landing's marigold spark is scoped to `.landing`).
+- **Don't** add a second accent hue outside status plates.
 - **Don't** use elastic or bouncy easing on controls.
 - **Don't** use neon glows, gradient meshes, or cool-AI dark-mode effects; the only gradients are the stage's 3.5% light and the edge-fade masks on scrolling rows.
 - **Don't** use the reflex fonts PRODUCT.md bans (Inter, DM Sans, Plus Jakarta, Space Grotesk, Fraunces, Playfair, Cormorant, Instrument Serif, Crimson).
@@ -407,17 +404,14 @@ A block with a header (package-manager or file tabs) sits in the muted tray; a b
 
 ## Landing page
 
-The landing page (`app/(home)`, styles in `app/(home)/home.css`) is its own world, separate from the docs on purpose. Its tokens are declared on `.landing` (the layout's wrapper) and on `.land-vars`, which carries them to the phone menu, portalled outside `.landing`; none of it reaches `/docs` or the registry. It keeps the docs' fonts, the app's own page background (`.landing` paints `--background`, the same as the docs), the surface ladder (`solidSurface`), the hairline and the registry components; what it adds is a drenched ultramarine slab with near-white ink and one marigold mark. Inside `.landing` these rules override the docs' where they conflict: the One Blue Rule governs the docs, while the landing paints its slab at hue 264 and carries a second hue (the spark). Registry components inside it still use Cubby Blue for their own actions and focus.
+The landing page (`app/(home)`, styles in `app/(home)/home.css`) is its own world, separate from the docs on purpose. Its tokens are declared on `.landing` (the layout's wrapper) and on `.land-vars`, which carries them to the phone menu, portalled outside `.landing`; none of it reaches `/docs` or the registry. It keeps the docs' fonts, the app's own page background (`.landing` paints `--background`, the same as the docs), the surface ladder (`solidSurface`), the hairline and the registry components; what it adds is a drenched ultramarine slab with near-white ink. Inside `.landing` the slab's tokens override the docs' where they conflict: the slab is painted at hue 264, off Cubby Blue's 250, and is the landing's field, not an accent. Everything off the slab follows the docs, and blue keeps its docs meaning: registry components use Cubby Blue for their own actions and focus, and the command's component name is a contrast-tuned Cubby Blue.
 
 ### Colors
 - **Ultramarine Field** (`{colors.landing-field}` / dark `{colors.dark-landing-field}`): the slab, the phone menu, the gallery's closing "browse all" card, text selection (24% mix) and the caret everywhere on the landing.
-- **Field Deep** (`{colors.landing-field-deep}` / dark `{colors.dark-landing-field-deep}`): the command bar joined under the hero stage.
 - **On Field** (`{colors.landing-on-field}`, the same in both themes): headline, wordmark, the light primary pill and the current tab's fill; also the 2px focus outline on the slab.
 - **On Field Muted** (`{colors.landing-on-field-muted}` / dark `{colors.dark-landing-on-field-muted}`): the headline's second sentence, leads on the slab, idle nav controls and idle tabs.
 - **Field Line** (`{colors.landing-field-line}` / dark `{colors.dark-landing-field-line}`): white at 16% (12% in dark); the secondary pill's inset ring and the hover wash of every control on the field. Selection on the slab is white at 28%.
-- **Marigold Spark** (`{colors.landing-spark}` / dark `{colors.dark-landing-spark}`): the live component name in the install command, and nothing else.
-
-**The One Spark Rule.** Marigold marks the live component name in the command bar and nothing else. A second spark anywhere on the landing dilutes the one thing it points at.
+- **Slug Blue** (`{colors.landing-slug}` / dark `{colors.dark-landing-slug}`): the component name in the install command, and nothing else. It is Cubby Blue deepened in light and lifted in dark so small mono text clears 4.5:1 on the muted command bar.
 
 **The Paint-On-Field Rule.** Anything set on the ultramarine field paints with the on-field tokens (ink, muted, line) and focuses with a 2px on-field outline; docs tokens (foreground, border, ring) never appear on the slab.
 
@@ -427,7 +421,7 @@ The landing page (`app/(home)`, styles in `app/(home)/home.css`) is its own worl
 - **Close title** (Bricolage 600, leading 1.02, -0.035em): 2.5rem base, 3.75rem from sm, capped at 18ch.
 - **Card titles:** gallery card names in Bricolage 1.1875rem, 600, -0.01em; the browse-all card's line in Bricolage 1.75rem, leading 1.1, -0.02em.
 - **Leads:** hero lead 1.125rem (1.25rem from sm), relaxed leading, On Field Muted, up to 60ch; section leads 1.125rem, relaxed, Quiet Ink; close lead 1.125rem, 42ch.
-- **Command:** Geist Mono 0.875rem (0.9375rem from sm); the slug in weight 500.
+- **Command:** Geist Mono 0.8125rem; the slug in weight 500.
 - **Wordmark:** Bricolage 600, tight tracking, 1.1rem in the nav and 1.05rem in the footer.
 
 ### Layout
@@ -446,7 +440,7 @@ The slab and the phone menu are 28px (`{rounded.landing-slab}`, 1.75rem); the he
 ### Components
 - **Landing nav:** 64px, set on the slab rather than above it: logo and wordmark left, the nav items absolutely centred from md, then search, theme, GitHub (from sm) and a 36px Get started pill (from md); below md a menu button opens the phone menu. Controls are 36px pills in On Field Muted, going to On Field on a Field Line wash on hover.
 - **Slab actions:** a 44px light pill (On Field fill, field label, 0.9375rem 500, trailing chevron; hover drops to 90% opacity) and a ringed ghost pill (1px inset Field Line ring, Field Line wash on hover). Both press to 0.97 and focus with a 2px On Field outline offset 2px. Hero: Get started and Browse components; close: Get started and Star on GitHub.
-- **Showcase (signature):** the hero's proof, an install command joined to the component it installs. A row of 32px tab pills (current: On Field fill, field label; idle: muted, washed on hover) scrolls sideways without a scrollbar, fading only an edge with more to scroll (`scroll-fade-x`). Under it, a 20px stage card, 15rem tall (16rem from sm) with 20px padding, stacks every demo in one grid cell: all stay laid out, and the current one crossfades in with opacity and a 3px blur over 300ms ease-out while the rest are `inert` and hidden from assistive tech. Demos are shown at their own size. Joined beneath the stage, the command bar on Field Deep is plain inline text: `$ ` at 60%, the package-manager head (following the site's shared choice), `@cubby-ui/` and the slug, which morphs in marigold through `TextMorph` in its default mode; a copy button sits at its right in On Field Muted. The command overflows right to left (`dir="rtl"` on a block `code`, the text inside `dir="ltr"`), so a narrow screen clips the start with an ellipsis and the `@cubby-ui/` name always shows. Why it is built this way: a flex row shifted the morph's leaving glyphs as the baseline moved, a hidden demo measured zero so its own morph grew from nothing on return, and a scaled parent skews TextMorph's measurements. It advances every 5.2s. While it runs, a 1px hairline at 40% field, inset 12px, fills the current tab from the left over the dwell (linear). It pauses while the pointer is over it or focus is inside it, stops for good once a tab is clicked, and under reduced motion never advances and shows no hairline.
+- **Showcase (signature):** the hero's proof, an install command joined to the component it installs. A row of 32px tab pills (current: field label over one On Field pill that slides to it, transform and width over 400ms ease-out-expo, and scrolls it into view; idle: muted, washed on hover) scrolls sideways without a scrollbar, fading only an edge with more to scroll (`scroll-fade-x`). Under it, a 20px stage card, 16rem tall with 16px padding (20px from sm), stacks every demo in one grid cell: all stay laid out, each panel scrolling on its own when a demo outgrows it (an opened Tree) with the `scroll-fade` edge fade and safe centring, which centres content that fits and starts taller content at the top, and the swap is a directional handoff (Web Animations, cancelled and restarted on a quick second click): the old demo leaves in 160ms (`cubic-bezier(0.25, 1, 0.5, 1)`), fading, drifting 12px the way the tabs moved and blurring to 3px; the new one enters 70ms behind it from 16px the other side, blur 4px to 0, over 380ms ease-out-expo, so the two barely overlap. Moving right sends content left; an earlier tab reverses it; the auto-advance wrap counts as forward. The rest stay `inert` and hidden from assistive tech. Demos are shown at their own size. Joined beneath the stage, inside the same card, the command bar is neutral: the muted fill under a top hairline, ink text, 10px by 16px padding (8px at the right), and the plain registry copy button. The command is plain inline text: `$ ` in Quiet Ink, the package-manager head (following the site's shared choice), `@cubby-ui/` and the slug, which morphs in Slug Blue through `TextMorph` in its default mode. When it doesn't fit (a phone), it scrolls sideways with no scrollbar and the `scroll-fade-x` edge fade, starting at the beginning; nothing scrolls it for the reader. Why it is built this way: a flex row shifted the morph's leaving glyphs as the baseline moved, a hidden demo measured zero so its own morph grew from nothing on return, and a scaled parent skews TextMorph's measurements. It advances every 5.2s. While it runs, a 1px hairline at 40% field, inset 12px, fills the current tab from the left over the dwell (linear). It pauses while the pointer is over it or focus is inside it, stops for good once a tab is clicked, and under reduced motion never advances and shows no hairline.
 - **Gallery card:** the docs example tray. A 20px tray (the muted fill with the rung 1 hairline ring, 4px padding) holds the real component on a 16px card in the page background, centred in at least 16rem with 24px by 40px padding and no rule of its own. On the tray beneath it (16px sides, 14px top, 12px bottom) sit the name, the component's docs description in Quiet Ink 0.875rem (clamped to three lines, two from md) and a 36px round arrow linking to its docs (muted to ink on the surface-hover wash; focus is the half-strength ring). The bento closes with a field-coloured card, not a component: a Bricolage line and a "Browse all components" link whose arrow nudges 2px on hover (150ms ease-out).
 - **Phone menu:** below md, a small slab dropping from the top: the registry Sheet's floating variant, inset 8px, 28px radius, field fill with On Field ink and 8px padding, carrying `land-vars`. A 48px header row holds the logo and wordmark and a 40px round close (muted, washed on hover). The nav items follow in Bricolage 2.25rem, 600, -0.03em, each with a trailing arrow in On Field Muted. Below them, two full-width 48px pills: "Search the docs" in the light primary fill and "GitHub" as the ringed ghost; both press to 0.98.
 - **Ownership:** a title and lead, three title and body pairs (ink 500 titles, Quiet Ink 0.9375rem bodies, 20px apart, no icons), and beside them the registry `CodeBlock` with a filename header showing the first 40 lines of a component as it lands in a project, capped at 26rem.
@@ -455,5 +449,5 @@ The slab and the phone menu are 28px (`{rounded.landing-slab}`, 1.75rem); the he
 ### Motion
 - **Rise:** the hero enters once, headline, lead, actions, then the showcase, each rising from 14px below and zero opacity over 800ms ease-out-expo, 60ms apart (0, 60, 120, 180ms). Under reduced motion it doesn't animate.
 - **Dwell:** the tab hairline scales from 0 to full width over the dwell, linearly, from the left; under reduced motion it is hidden, since nothing advances on its own.
-- **Stage swap:** demos crossfade with opacity and a 3px blur over 300ms ease-out.
-- **Slug:** the command's slug changes through `TextMorph` (blend mode by default); the stage swaps with the panel's fade.
+- **Stage swap:** a directional handoff: exit 160ms (fade, 12px drift, 3px blur), enter 70ms later over 380ms ease-out-expo (from 16px, 4px blur); the tab pill slides on the same curve over 400ms. Under reduced motion: opacity only, 120ms out and 180ms in, no slide.
+- **Slug:** the command's slug changes through `TextMorph` in its default mode, then the command scrolls back to its end if it overflows.

@@ -18,13 +18,13 @@ import { cn } from "@/lib/utils";
 import { LandingNav } from "@/components/home/landing-nav";
 import { Showcase } from "@/components/home/showcase";
 import { QrDemo } from "@/components/home/qr-demo";
+import { QrLogoDemo } from "@/components/home/qr-logo-demo";
+import { TreeDemo } from "@/components/home/tree-demo";
 import { CubbyUILogo } from "@/components/cubbyui-logo";
 import TextMorphNumbers from "@/registry/examples/text-morph/text-morph-numbers";
 import TextMorphModes from "@/registry/examples/text-morph/text-morph-modes";
 import CircularSliderWithValue from "@/registry/examples/circular-slider/circular-slider-with-value";
 import CircularSliderWithMarkers from "@/registry/examples/circular-slider/circular-slider-with-markers";
-import TreeBasic from "@/registry/examples/tree/tree-basic";
-import QrCodeBranded from "@/registry/examples/qr-code/qr-code-branded";
 import CodeBlockWithFilename from "@/registry/examples/code-block/code-block-with-filename";
 import FiltersBasic from "@/registry/examples/filters/filters-basic";
 import TransitionPanelBasic from "@/registry/examples/transition-panel/transition-panel-basic";
@@ -126,7 +126,7 @@ export default async function Home() {
                   name: "Circular Slider",
                   demo: <CircularSliderWithValue />,
                 },
-                { slug: "tree", name: "Tree", demo: <TreeBasic /> },
+                { slug: "tree", name: "Tree", demo: <TreeDemo /> },
                 { slug: "qr-code", name: "QR Code", demo: <QrDemo /> },
               ]}
             />
@@ -163,7 +163,7 @@ export default async function Home() {
               <CircularSliderWithMarkers />
             </GalleryCard>
             <GalleryCard slug="qr-code" name="QR Code" span="md:col-span-2">
-              <QrCodeBranded />
+              <QrLogoDemo />
             </GalleryCard>
             <GalleryCard
               slug="transition-panel"

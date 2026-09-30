@@ -63,10 +63,7 @@ export default async function Page(props: PageProps) {
           </div>
         </header>
 
-        <div
-          className="docs-enter-fade docs-prose mt-8"
-          style={{ ["--enter-delay" as string]: "70ms" }}
-        >
+        <div className="docs-enter docs-prose mt-8">
           <MDX
             components={getMDXComponents({
               a: createRelativeLink(source, page),

@@ -47,7 +47,12 @@
   }
 }
 
-@supports not (anchor-name: --otp-field-slot) {
+/* Every anchor feature the ring uses, or none: a partial implementation
+ * would leave it unsized or tied to another field. */
+@supports not (
+  (anchor-name: --otp-field-slot) and (anchor-scope: --otp-field-slot) and
+    (width: anchor-size(width))
+) {
   .otp-field-indicator {
     display: none !important;
   }
@@ -56,6 +61,15 @@
     outline: 2px solid
       color-mix(in oklab, var(--color-ring, Highlight) 50%, transparent);
     outline-offset: 2px;
+  }
+
+  .otp-field-shake-a [data-slot="otp-field-slot"]:focus-within,
+  .otp-field-shake-b [data-slot="otp-field-slot"]:focus-within {
+    outline-color: color-mix(
+      in oklab,
+      var(--color-destructive, red) 80%,
+      transparent
+    );
   }
 }
 

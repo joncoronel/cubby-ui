@@ -102,7 +102,7 @@ function OTPFieldInput({
                 )}
                 mode="morph"
                 duration={380}
-                options={{ trend: "up", roll: { rotate: 0 } }}
+                options={{ trend: "auto" }}
               />
             </span>
           </span>

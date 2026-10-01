@@ -593,13 +593,17 @@ function InputStep({
       {/* Mounted only once there's something to submit, so it never takes
           room from the placeholder. */}
       {valid && (
-        <Kbd
-          size="sm"
-          aria-hidden
-          className="shrink-0 transition-[opacity,scale] duration-150 ease-out motion-reduce:transition-none starting:scale-90 starting:opacity-0"
+        // The Enter hint doubles as the way to add with a pointer.
+        <button
+          type="button"
+          aria-label={labels.addTooltip}
+          onClick={submit}
+          className="hover:bg-surface-hover focus-visible:outline-ring/50 -me-1.5 flex shrink-0 cursor-pointer items-center rounded-md p-0.5 outline-0 transition-[background-color,opacity,scale] duration-150 ease-out outline-solid focus-visible:outline-2 motion-reduce:transition-none starting:scale-90 starting:opacity-0"
         >
-          Enter
-        </Kbd>
+          <Kbd size="sm" aria-hidden>
+            Enter
+          </Kbd>
+        </button>
       )}
     </div>
   );
@@ -656,14 +660,23 @@ function FilterAddButton({
   // pick just added animates in. Its contents are rebuilt as it opens
   // instead (a fresh panel, back on an empty field list). A fresh panel also
   // skips its own entrance, which a hidden one shown again would replay.
+  // Closing hands focus back to the button, and a tooltip opening on that
+  // restored focus would answer a question nobody asked. Until focus moves
+  // off the button, the tooltip turns down opens that come from focus;
+  // hovers (a deliberate ask) still open it.
+  const [quietTooltip, setQuietTooltip] = React.useState(false);
+  const [tooltipOpen, setTooltipOpen] = React.useState(false);
   const changeOpen = React.useCallback((nextOpen: boolean) => {
     if (nextOpen) {
       setStep("fields");
       setFieldId(null);
       setSession((count) => count + 1);
+    } else {
+      setQuietTooltip(true);
     }
     setOpen(nextOpen);
   }, []);
+  const wakeTooltip = React.useCallback(() => setQuietTooltip(false), []);
 
   React.useEffect(() => {
     if (!shortcut) return;
@@ -701,10 +714,15 @@ function FilterAddButton({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [shortcut, changeOpen]);
 
-  const onDone = React.useCallback((focusFilterId?: string) => {
-    focusFilterIdRef.current = focusFilterId ?? null;
-    setOpen(false);
-  }, []);
+  const onDone = React.useCallback(
+    (focusFilterId?: string) => {
+      focusFilterIdRef.current = focusFilterId ?? null;
+      // Through changeOpen, like every other close, so the tooltip stays
+      // quiet on the focus the close hands back.
+      changeOpen(false);
+    },
+    [changeOpen],
+  );
   const onDrill = React.useCallback((id: string) => {
     setFieldId(id);
     setStep("value");
@@ -716,7 +734,16 @@ function FilterAddButton({
       {/* Folded to "+", the button says what it does in a tooltip (with
           the shortcut, whose hint folds away with the label). Off while
           the label shows or the menu is open. */}
-      <Tooltip disabled={!compact || open}>
+      <Tooltip
+        disabled={!compact || open}
+        open={tooltipOpen}
+        onOpenChange={(nextOpen, details) => {
+          if (nextOpen && quietTooltip && details.reason === "trigger-focus") {
+            return;
+          }
+          setTooltipOpen(nextOpen);
+        }}
+      >
         <TooltipTrigger
           render={
             <PopoverTrigger
@@ -726,6 +753,7 @@ function FilterAddButton({
                     type="button"
                     data-slot="filter-add"
                     data-compact={compact ? "" : undefined}
+                    onBlur={wakeTooltip}
                     className={cn(
                       FILTER_SEGMENT,
                       FILTER_SEGMENT_INTERACTIVE,
@@ -740,6 +768,7 @@ function FilterAddButton({
                   <Button
                     data-slot="filter-add"
                     data-compact={compact ? "" : undefined}
+                    onBlur={wakeTooltip}
                     variant="outline"
                     size={size}
                     className={cn(

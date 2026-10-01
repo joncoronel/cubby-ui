@@ -15,10 +15,7 @@ import {
 import { TextMorph } from "@/registry/default/text-morph/text-morph";
 import { NumberField as BaseNumberField } from "@base-ui/react/number-field";
 
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Search01Icon } from "@hugeicons/core-free-icons";
-
-import { OptionContent } from "./filters-add-menu";
+import { OptionContent, SearchIcon, STEP_ROW } from "./filters-add-menu";
 import { useFilterChip, useFiltersActions } from "./filters-context";
 import {
   asNumberOrNull,
@@ -34,6 +31,7 @@ import type {
   FilterField,
   FilterOption,
   FilterValue,
+  FilterValueControlProps,
   MultiSelectFilterField,
   NumberFilterField,
   SelectFilterField,
@@ -93,18 +91,27 @@ function FilterChipValue() {
           data-slot="filter-chip-value"
           className="flex h-full items-stretch"
         >
-          {field.renderValue({
-            value: filter.value,
-            operator: filter.operator,
-            onValueChange,
-            size,
-            field,
-          })}
+          <CustomValue
+            value={filter.value}
+            operator={filter.operator}
+            onValueChange={onValueChange}
+            size={size}
+            field={field}
+          />
         </div>
       );
     default:
       return null;
   }
+}
+
+/**
+ * A custom field's `renderValue`, rendered as a component of its own so it
+ * can use hooks: called inline, its hooks would belong to the chip and break
+ * the moment a valueless operator stopped calling it.
+ */
+function CustomValue(props: FilterValueControlProps) {
+  return props.field.renderValue(props);
 }
 
 /** Accessible name for a value input, folding in string affixes ("$", "hrs"). */
@@ -171,14 +178,8 @@ function FilterSearchPopup({
         showTrigger={false}
         showClear={false}
         placeholder={placeholder}
-        start={
-          <HugeiconsIcon
-            icon={Search01Icon}
-            strokeWidth={2}
-            className="text-muted-foreground size-4"
-          />
-        }
-        className="h-11 gap-2 rounded-none border-0 border-b bg-transparent px-3 outline-0 focus-within:outline-0 focus-within:outline-offset-0 sm:h-11 dark:bg-transparent"
+        start={<SearchIcon />}
+        className={STEP_ROW}
       />
       <ComboboxEmpty>{empty}</ComboboxEmpty>
       <ComboboxList className="max-h-72 py-1">{children}</ComboboxList>
@@ -406,7 +407,7 @@ function NumberValueField({
         value={value}
         step={step}
         allowWheelScrub
-        onValueChange={(next) => onValueChange(next)}
+        onValueChange={onValueChange}
         className="flex h-full items-center"
       >
         <BaseNumberField.Input
@@ -475,4 +476,4 @@ function NumberValueControl({
   );
 }
 
-export { FilterChipValue, FilterSearchPopup };
+export { FilterChipValue };

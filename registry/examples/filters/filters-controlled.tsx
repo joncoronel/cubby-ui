@@ -85,7 +85,7 @@ export default function FiltersControlled() {
     <div className="flex w-full flex-col gap-4">
       <Filters fields={fields} value={value} onValueChange={setValue}>
         <FilterChips />
-        {value.length > 0 && <FilterActiveCount />}
+        <FilterActiveCount />
         <FilterActions />
       </Filters>
       <pre className="bg-muted text-muted-foreground max-h-56 overflow-auto rounded-lg p-3 text-xs">

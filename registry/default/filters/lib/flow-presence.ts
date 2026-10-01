@@ -48,11 +48,10 @@ function widthOf(el: HTMLElement): number {
 function pinWidth(el: HTMLElement): () => void {
   const previous = el.style.maxWidth;
   el.style.maxWidth = `${widthOf(el)}px`;
-  // Read back rather than kept: the style normalizes a fractional length
-  // ("248.3123px" reads "248.312px"), and the check below has to match.
-  const pinned = el.style.maxWidth;
+  // Unconditional: whoever replaces a running entrance releases its pin
+  // first (`entrancePins`), so a stale undo never runs over a newer pin.
   return () => {
-    if (el.style.maxWidth === pinned) el.style.maxWidth = previous;
+    el.style.maxWidth = previous;
   };
 }
 
@@ -60,7 +59,7 @@ function pinWidth(el: HTMLElement): () => void {
 function isLiveFlowItem(node: Element): node is HTMLElement {
   return (
     node instanceof HTMLElement &&
-    !node.dataset.slot?.endsWith("-ghost") &&
+    !node.hasAttribute("data-flow-ghost") &&
     !["absolute", "fixed"].includes(getComputedStyle(node).position)
   );
 }
@@ -76,9 +75,7 @@ function columnGap(el: Element | null): number {
  * keeps a cleared row from closing one gap more than it had).
  */
 function flowSpan(el: HTMLElement): number {
-  const parent = el.parentElement;
-  if (!parent) return widthOf(el);
-  return widthOf(el) + (isAlone(el) ? 0 : columnGap(parent));
+  return widthOf(el) + (isAlone(el) ? 0 : columnGap(el.parentElement));
 }
 
 function isAlone(el: HTMLElement): boolean {
@@ -91,12 +88,16 @@ function isAlone(el: HTMLElement): boolean {
   );
 }
 
+/** The row itself when it scrolls sideways. */
+function asScroller(row: HTMLElement | null): HTMLElement | null {
+  if (!row) return null;
+  const { overflowX } = getComputedStyle(row);
+  return overflowX === "auto" || overflowX === "scroll" ? row : null;
+}
+
 /** The element's parent when that parent scrolls sideways. */
 function inlineScroller(el: HTMLElement): HTMLElement | null {
-  const parent = el.parentElement;
-  if (!parent) return null;
-  const { overflowX } = getComputedStyle(parent);
-  return overflowX === "auto" || overflowX === "scroll" ? parent : null;
+  return asScroller(el.parentElement);
 }
 
 function overflows(scroller: HTMLElement): boolean {
@@ -360,11 +361,10 @@ function exitInFlow(el: HTMLElement): void {
   // A distinct slot so nothing that looks up live chips finds the copy.
   ghost.setAttribute("data-slot", `${el.dataset.slot ?? "flow"}-ghost`);
   ghost.setAttribute("data-flow-ghost", "");
-  ghost.setAttribute("aria-hidden", "true");
+  // Out of the accessibility tree and unclickable.
   ghost.inert = true;
   // Fixed at the size it left at, for the reason `pinWidth` gives.
   Object.assign(ghost.style, {
-    pointerEvents: "none",
     width: `${widthOf(el)}px`,
     maxWidth: "none",
   });
@@ -374,7 +374,7 @@ function exitInFlow(el: HTMLElement): void {
     const created = {
       exits: [] as Exit[],
       width: widthOf(parent),
-      overflowed: parent.scrollWidth > parent.clientWidth + 1,
+      overflowed: overflows(parent),
     };
     exitBatches.set(parent, created);
     queueMicrotask(() => {
@@ -424,9 +424,7 @@ function playExits(
   });
   if (exits.length === 0) return;
 
-  const { overflowX } = getComputedStyle(parent);
-  const scroller =
-    overflowX === "auto" || overflowX === "scroll" ? parent : null;
+  const scroller = asScroller(parent);
   const emptying =
     scroller !== null && !Array.from(parent.children).some(isLiveFlowItem);
 

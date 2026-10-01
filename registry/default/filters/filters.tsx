@@ -24,9 +24,12 @@ import { useControllableState } from "@/registry/default/hooks/use-controllable-
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon, FilterRemoveIcon } from "@hugeicons/core-free-icons";
 
-import { FieldIcon, FilterAddButton } from "./filters-add-menu";
 import {
-  FilterActionsContext,
+  FieldIcon,
+  FilterActionsAdd,
+  FilterAddButton,
+} from "./filters-add-menu";
+import {
   FilterChipContext,
   FiltersActionsContext,
   FiltersAnnouncementContext,
@@ -39,11 +42,11 @@ import { FilterChipValue } from "./filters-value-controls";
 import {
   CLICK_MORPH_MS,
   describeFilter,
+  isFilterComplete,
+  operatorLabel,
   FILTER_SEGMENT,
   FILTER_SEGMENT_INTERACTIVE,
   FILTER_SIZES,
-  formatFilterValue,
-  operatorShapeFor,
   patchFilter,
   resolveOperators,
 } from "./lib/filters-utils";
@@ -79,6 +82,7 @@ const DEFAULT_LABELS: FiltersLabels = {
   invalidNumber: "Enter a number",
   filtersCleared: "Cleared all filters",
   operator: "operator",
+  operators: {},
   activeCount: (count) => `${count} active`,
   selectedCount: (count) => `${count} selected`,
   removeFilter: (fieldLabel) => `Remove ${fieldLabel} filter`,
@@ -87,6 +91,18 @@ const DEFAULT_LABELS: FiltersLabels = {
 };
 
 const LABEL_KEYS = Object.keys(DEFAULT_LABELS) as (keyof FiltersLabels)[];
+
+/**
+ * Clears every filter, first moving focus to the bar's add button: the
+ * chips (and the clear control itself) are about to go.
+ */
+function clearFromBar(from: HTMLElement, clearAll: () => void) {
+  from
+    .closest('[data-slot="filters"]')
+    ?.querySelector<HTMLElement>('[data-slot="filter-add"]')
+    ?.focus();
+  clearAll();
+}
 
 /**
  * Moves focus to the adjacent chip's remove button (or the add-filter trigger)
@@ -172,9 +188,11 @@ function FiltersProvider({
   const describe = React.useCallback(
     (filter: FilterValue | undefined) => {
       const field = filter && fieldsById.get(filter.field);
-      return field && filter ? describeFilter(field, filter) : "";
+      return field && filter
+        ? describeFilter(field, filter, labels.operators)
+        : "";
     },
-    [fieldsById],
+    [fieldsById, labels],
   );
 
   const addFilter = React.useCallback(
@@ -192,6 +210,7 @@ function FiltersProvider({
     },
     [setFilters, announce, labels, describe],
   );
+  const getFilters = React.useCallback(() => filtersRef.current, []);
   const clearAll = React.useCallback(() => {
     setFilters([]);
     announce(labels.filtersCleared);
@@ -224,6 +243,7 @@ function FiltersProvider({
       updateFilter,
       removeFilter,
       clearAll,
+      getFilters,
     }),
     [
       fields,
@@ -236,6 +256,7 @@ function FiltersProvider({
       updateFilter,
       removeFilter,
       clearAll,
+      getFilters,
     ],
   );
 
@@ -415,7 +436,7 @@ const FilterChip = React.memo(function FilterChip({
   onKeyDown,
   ...props
 }: FilterChipProps) {
-  const { size, removeFilter, fieldsById } = useFiltersActions();
+  const { size, removeFilter, fieldsById, labels } = useFiltersActions();
   const presenceRef = useFlowPresence(ref);
   const field = fieldProp ?? fieldsById.get(filter.field);
 
@@ -428,9 +449,7 @@ const FilterChip = React.memo(function FilterChip({
 
   // A chip still waiting on its value narrows nothing yet; its dashed edge
   // says so without an extra word.
-  const incomplete =
-    operatorShapeFor(field, filter.operator) !== "none" &&
-    formatFilterValue(field, filter) === "";
+  const incomplete = !isFilterComplete(field, filter);
 
   return (
     <FilterChipContext.Provider value={chipContext}>
@@ -440,7 +459,7 @@ const FilterChip = React.memo(function FilterChip({
         data-slot="filter-chip"
         data-filter-id={filter.id}
         data-incomplete={incomplete ? "" : undefined}
-        aria-label={describeFilter(field, filter)}
+        aria-label={describeFilter(field, filter, labels.operators)}
         className={cn(
           "bg-card text-foreground inline-flex max-w-full shrink-0 items-center gap-0.5 rounded-lg border bg-clip-padding p-0.5",
           "transition-[border-color] duration-150 data-incomplete:border-dashed",
@@ -513,7 +532,9 @@ function FilterChipOperator({
   const { updateFilter, labels } = useFiltersActions();
   const operators = resolveOperators(field);
   const current = operators.find((operator) => operator.id === filter.operator);
-  const label = current?.label ?? filter.operator;
+  const label = current
+    ? operatorLabel(current, labels.operators)
+    : filter.operator;
 
   return (
     <DropdownMenu>
@@ -542,7 +563,7 @@ function FilterChipOperator({
         >
           {operators.map((operator) => (
             <DropdownMenuRadioItem key={operator.id} value={operator.id}>
-              {operator.label}
+              {operatorLabel(operator, labels.operators)}
             </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>
@@ -606,12 +627,7 @@ function FilterClearButton({
       onClick={(event) => {
         onClick?.(event);
         if (event.defaultPrevented) return;
-        // The chips are about to go; keep focus on the bar.
-        event.currentTarget
-          .closest('[data-slot="filters"]')
-          ?.querySelector<HTMLElement>('[data-slot="filter-add"]')
-          ?.focus();
-        clearAll();
+        clearFromBar(event.currentTarget, clearAll);
       }}
       {...props}
     >
@@ -629,6 +645,7 @@ function FilterClearButton({
 function FilterActions({
   shortcut,
   className,
+  children,
   ...props
 }: React.ComponentProps<"div"> & {
   /** Key that opens the add menu from the keyboard (e.g. `"f"`). */
@@ -636,7 +653,7 @@ function FilterActions({
 }) {
   const { size } = useFiltersActions();
   return (
-    <FilterActionsContext value={true}>
+    <>
       <div
         role="group"
         data-slot="filter-actions"
@@ -649,19 +666,24 @@ function FilterActions({
         )}
         {...props}
       >
-        <FilterAddButton shortcut={shortcut} />
-        <FilterClearSegment />
+        {children ?? (
+          <>
+            <FilterActionsAdd shortcut={shortcut} />
+            <FilterActionsClear />
+          </>
+        )}
       </div>
-    </FilterActionsContext>
+    </>
   );
 }
 
 /**
- * The capsule's clear segment. Always rendered, folded through a grid column
+ * The capsule's clear segment, for composing your own `FilterActions`.
+ * Always rendered, folded through a grid column
  * (and inert) while no filters exist, so it opens and closes with the same
  * CSS-only motion as the add button's label.
  */
-function FilterClearSegment() {
+function FilterActionsClear() {
   const { clearAll, labels, usedFieldIds } = useFiltersActions();
   const active = usedFieldIds.size > 0;
   return (
@@ -689,14 +711,7 @@ function FilterClearSegment() {
                   FILTER_SEGMENT_INTERACTIVE,
                   "text-muted-foreground hover:text-foreground aspect-square justify-center px-0 [&_svg]:size-4",
                 )}
-                onClick={(event) => {
-                  // The chips are about to go; keep focus on the bar.
-                  event.currentTarget
-                    .closest('[data-slot="filter-actions"]')
-                    ?.querySelector<HTMLElement>('[data-slot="filter-add"]')
-                    ?.focus();
-                  clearAll();
-                }}
+                onClick={(event) => clearFromBar(event.currentTarget, clearAll)}
               />
             }
           >
@@ -712,7 +727,8 @@ function FilterClearSegment() {
 /**
  * The number of active filters as plain muted text ("3 active"), with the
  * number morphing as it changes. Status rather than an object, so it doesn't
- * read as one more chip in the row.
+ * read as one more chip in the row. Counts complete filters only, and
+ * renders nothing at zero.
  */
 function FilterActiveCount({
   className,
@@ -720,8 +736,16 @@ function FilterActiveCount({
   ...props
 }: React.ComponentProps<"span">) {
   const { filters } = useFiltersState();
-  const { labels } = useFiltersActions();
+  const { labels, fieldsById } = useFiltersActions();
   const presenceRef = useFlowPresence(ref);
+  // Filters that narrow anything: a chip still waiting on its value doesn't
+  // count, nor one whose field is gone (a stale URL, say).
+  const count = filters.filter((filter) => {
+    const field = fieldsById.get(filter.field);
+    return field !== undefined && isFilterComplete(field, filter);
+  }).length;
+  // Like the clear button, nothing to say at zero.
+  if (count === 0) return null;
   return (
     <span
       ref={presenceRef}
@@ -732,10 +756,7 @@ function FilterActiveCount({
       )}
       {...props}
     >
-      <TextMorph
-        value={labels.activeCount(filters.length)}
-        duration={CLICK_MORPH_MS}
-      />
+      <TextMorph value={labels.activeCount(count)} duration={CLICK_MORPH_MS} />
     </span>
   );
 }
@@ -752,6 +773,8 @@ export {
   FilterChipRemove,
   FilterAddButton,
   FilterActions,
+  FilterActionsAdd,
+  FilterActionsClear,
   FilterClearButton,
   FilterActiveCount,
 };
@@ -770,11 +793,14 @@ export {
   defaultOperatorsFor,
   operatorShape,
   operatorShapeFor,
-  isValuelessOperator,
   emptyValueFor,
   formatFilterValue,
   describeFilter,
+  isFilterComplete,
+  operatorLabel,
   asFilterValues,
+  FILTER_SEGMENT,
+  FILTER_SEGMENT_INTERACTIVE,
 } from "./lib/filters-utils";
 export type {
   FilterField,

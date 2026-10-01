@@ -40,15 +40,12 @@ import {
   Search01Icon,
 } from "@hugeicons/core-free-icons";
 
-import {
-  FilterActionsContext,
-  useFiltersActions,
-  useFiltersState,
-} from "./filters-context";
+import { useFiltersActions, useFiltersState } from "./filters-context";
 import { revealInScroller } from "./lib/flow-presence";
 import {
   asStringArray,
   createFilter,
+  operatorLabel,
   FILTER_SEGMENT,
   FILTER_SEGMENT_INTERACTIVE,
   operatorShapeFor,
@@ -117,11 +114,6 @@ function hasValueStep(field: FilterField): boolean {
 // floating on a card.
 const STEP_ROW =
   "h-11 gap-2 rounded-none border-0 border-b sm:h-11 bg-transparent px-3 outline-0 focus-within:outline-0 focus-within:outline-offset-0 dark:bg-transparent";
-
-// A flex column, as inside a Combobox popup: it is what lets the list's
-// scroll area resolve its height, so the step measures (and animates to)
-// exactly its rows.
-const STEP_COLUMN = "flex flex-col";
 
 // Lists give up height before the rows around them do, so a menu squeezed
 // against the viewport edge keeps its search row and footer in view.
@@ -200,8 +192,10 @@ function FieldStep({
     allowDuplicateFields,
     addFilter,
     updateFilter,
+    getFilters,
   } = useFiltersActions();
-  const { filters } = useFiltersState();
+  // Read on demand, not subscribed: the menu stays mounted while closed,
+  // and a subscription would re-render it on every keystroke in any chip.
   const [query, setQuery] = React.useState("");
 
   const fieldItems = React.useMemo<AddMenuItem[]>(
@@ -255,7 +249,7 @@ function FieldStep({
     // that's already there instead of being refused.
     const existing = allowDuplicateFields
       ? undefined
-      : filters.find((filter) => filter.field === field.id);
+      : getFilters().find((filter) => filter.field === field.id);
     if (existing) {
       const valueless = operatorShapeFor(field, existing.operator) === "none";
       updateFilter(existing.id, {
@@ -303,7 +297,10 @@ function FieldStep({
       }
       isItemEqualToValue={(a, b) => a.key === b.key}
     >
-      <div className={STEP_COLUMN}>
+      {/* A flex column, as inside a Combobox popup: it lets the list's
+          scroll area resolve its height, so the step measures exactly its
+          rows. */}
+      <div className="flex flex-col">
         <ComboboxInput
           ref={inputRef}
           showTrigger={false}
@@ -401,7 +398,7 @@ function SelectStep({
       }}
       itemToStringLabel={(option) => option.label}
     >
-      <div className={STEP_COLUMN}>
+      <div className="flex flex-col">
         <ComboboxInput
           ref={inputRef}
           showTrigger={false}
@@ -481,7 +478,7 @@ function MultiSelectStep({
       }}
       itemToStringLabel={(option) => option.label}
     >
-      <div className={STEP_COLUMN}>
+      <div className="flex flex-col">
         <ComboboxInput
           ref={inputRef}
           showTrigger={false}
@@ -558,7 +555,9 @@ function InputStep({
     >
       <ScopeToken field={field} onBack={onBack} />
       {operator && (
-        <span className="text-muted-foreground shrink-0">{operator.label}</span>
+        <span className="text-muted-foreground shrink-0">
+          {operatorLabel(operator, labels.operators)}
+        </span>
       )}
       {typeof field.prefix === "string" && (
         // The row's 8px gap less 4px: the same affix spacing as the chip.
@@ -570,7 +569,7 @@ function InputStep({
         ref={inputRef}
         type="text"
         inputMode={isNumber ? "decimal" : undefined}
-        aria-label={`${field.label} ${operator?.label ?? ""}`.trim()}
+        aria-label={`${field.label} ${operator ? operatorLabel(operator, labels.operators) : ""}`.trim()}
         aria-invalid={invalid || undefined}
         aria-describedby={invalid ? hintId : undefined}
         placeholder={field.placeholder ?? labels.enterValue}
@@ -641,19 +640,26 @@ function ValueStep(props: ValueStepProps<FilterField>) {
 const CHIP_FOCUS_TARGET =
   '[data-slot="filter-chip-value"]:is(button, input), [data-slot="filter-chip-value"] :is(button, input, select, textarea, [tabindex]:not([tabindex="-1"]))';
 
-function FilterAddButton({
+type AddMenuProps = React.ComponentProps<typeof Button> & {
+  /** Key that opens this menu from the keyboard (e.g. `"f"`). */
+  shortcut?: string;
+};
+
+/**
+ * The add button and its menu. `kind="segment"` renders the trigger as a segment of
+ * the `FilterActions` capsule; `button` as a standalone outline button.
+ */
+function AddMenu({
   children,
   shortcut,
   className,
   onBlur,
+  kind,
   ...props
-}: React.ComponentProps<typeof Button> & {
-  /** Key that opens this menu from the keyboard (e.g. `"f"`). */
-  shortcut?: string;
-}) {
+}: AddMenuProps & { kind: "button" | "segment" }) {
   const { fieldsById, labels, size, usedFieldIds } = useFiltersActions();
   const compact = usedFieldIds.size > 0;
-  const inActions = React.use(FilterActionsContext);
+  const inActions = kind === "segment";
   const [open, setOpen] = React.useState(false);
   const [step, setStep] = React.useState<"fields" | "value">("fields");
   // Kept after stepping back so the value view still has content while it
@@ -926,4 +932,23 @@ function FilterAddButton({
   );
 }
 
-export { FilterAddButton, FieldIcon, OptionContent };
+/** The add-filter button with its menu, standalone (an outline button). */
+function FilterAddButton(props: AddMenuProps) {
+  return <AddMenu {...props} kind="button" />;
+}
+
+/** The add segment of a `FilterActions` capsule, for composing your own. */
+function FilterActionsAdd(
+  props: Pick<AddMenuProps, "shortcut" | "className" | "children">,
+) {
+  return <AddMenu {...props} kind="segment" />;
+}
+
+export {
+  FilterAddButton,
+  FilterActionsAdd,
+  FieldIcon,
+  OptionContent,
+  SearchIcon,
+  STEP_ROW,
+};

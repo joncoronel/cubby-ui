@@ -181,14 +181,6 @@ export function operatorShapeFor(
   return operator ? operatorShape(operator) : "scalar";
 }
 
-/** Whether the given operator hides the value segment. */
-export function isValuelessOperator(
-  field: FilterField,
-  operatorId: string,
-): boolean {
-  return operatorShapeFor(field, operatorId) === "none";
-}
-
 /** A typed empty value for a fresh filter of `field` with `operatorId`. */
 export function emptyValueFor(field: FilterField, operatorId: string): unknown {
   const shape = operatorShapeFor(field, operatorId);
@@ -196,30 +188,10 @@ export function emptyValueFor(field: FilterField, operatorId: string): unknown {
   if (shape === "range") {
     return { min: null, max: null } satisfies NumberRange;
   }
-  switch (field.type) {
-    case "multiselect":
-      return [] as string[];
-    case "text":
-      return "";
-    case "number":
-      return null;
-    case "custom":
-      return field.defaultValue ?? null;
-    case "select":
-    default:
-      return null;
-  }
-}
-
-/**
- * Classifies the value shape for an operator so a shape change (e.g. `eq` to
- * `between`, or entering a valueless operator) can trigger a value reset.
- */
-export function valueShape(field: FilterField, operatorId: string): string {
-  const shape = operatorShapeFor(field, operatorId);
-  if (shape === "none") return "none";
-  if (shape === "range") return "range";
-  return field.type;
+  if (field.type === "multiselect") return [] as string[];
+  if (field.type === "text") return "";
+  if (field.type === "custom") return field.defaultValue ?? null;
+  return null;
 }
 
 function generateId(): string {
@@ -272,7 +244,8 @@ export function patchFilter(
     operatorChanged &&
     !("value" in patch) &&
     field &&
-    valueShape(field, filter.operator) !== valueShape(field, next.operator)
+    operatorShapeFor(field, filter.operator) !==
+      operatorShapeFor(field, next.operator)
   ) {
     next.value = emptyValueFor(field, next.operator);
   }
@@ -362,16 +335,50 @@ export function withOption(
   return [...values, optionValue];
 }
 
-/** Builds a plain-language summary of a filter, e.g. for screen readers. */
+/**
+ * An operator's display name: the translated one from `labels.operators`
+ * when given, else its own `label`.
+ */
+export function operatorLabel(
+  operator: FilterOperator,
+  names?: Partial<Record<string, string>>,
+): string {
+  return names?.[operator.id] ?? operator.label;
+}
+
+/**
+ * Whether a filter narrows anything yet: its operator takes no value, or it
+ * has one. A chip still waiting on its value (an empty text input, a select
+ * with nothing picked) is incomplete. Useful for sending only real filters
+ * to a server.
+ */
+export function isFilterComplete(
+  field: FilterField,
+  filter: FilterValue,
+): boolean {
+  return (
+    operatorShapeFor(field, filter.operator) === "none" ||
+    formatFilterValue(field, filter) !== ""
+  );
+}
+
+/**
+ * Builds a plain-language summary of a filter, e.g. for screen readers.
+ * `operatorNames` is `labels.operators`, for translated operator names.
+ */
 export function describeFilter(
   field: FilterField,
   filter: FilterValue,
+  operatorNames?: Partial<Record<string, string>>,
 ): string {
-  const operatorLabel =
-    resolveOperators(field).find((operator) => operator.id === filter.operator)
-      ?.label ?? filter.operator;
+  const operator = resolveOperators(field).find(
+    (candidate) => candidate.id === filter.operator,
+  );
+  const operatorText = operator
+    ? operatorLabel(operator, operatorNames)
+    : filter.operator;
   const summary = formatFilterValue(field, filter);
   return summary
-    ? `${field.label} ${operatorLabel} ${summary}`
-    : `${field.label} ${operatorLabel}`;
+    ? `${field.label} ${operatorText} ${summary}`
+    : `${field.label} ${operatorText}`;
 }

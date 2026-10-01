@@ -36,6 +36,11 @@ interface FiltersActionsContextValue {
   updateFilter: (id: string, patch: Partial<Omit<FilterValue, "id">>) => void;
   removeFilter: (id: string) => void;
   clearAll: () => void;
+  /**
+   * The filters as of the last render, read on demand. For event handlers
+   * that need the current filters without subscribing to every edit.
+   */
+  getFilters: () => FilterValue[];
 }
 
 type FiltersContextValue = FiltersStateContextValue &
@@ -92,9 +97,6 @@ interface FiltersAnnouncementValue {
 const FiltersAnnouncementContext =
   React.createContext<FiltersAnnouncementValue>({ text: "", count: 0 });
 
-/** True inside `FilterActions`, whose add button renders as a segment. */
-const FilterActionsContext = React.createContext(false);
-
 const FilterChipContext = React.createContext<FilterChipContextValue | null>(
   null,
 );
@@ -114,7 +116,6 @@ export {
   useFiltersState,
   useFiltersActions,
   FilterChipContext,
-  FilterActionsContext,
   FiltersAnnouncementContext,
   useFilterChip,
 };

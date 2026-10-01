@@ -71,7 +71,7 @@ export default function FiltersManual() {
     <Filters fields={fields} value={value} onValueChange={setValue}>
       <FilterAddButton />
       <FilterChips />
-      {value.length > 0 && <FilterActiveCount />}
+      <FilterActiveCount />
       <FilterClearButton />
     </Filters>
   );

@@ -107,7 +107,7 @@ export interface FilterValueControlProps {
   operator: string;
   onValueChange: (value: unknown) => void;
   size: FilterSize;
-  field: FilterField;
+  field: CustomFilterField;
 }
 
 /** Value shape for a `number` field when the operator is `between`. */
@@ -159,6 +159,12 @@ export interface FiltersLabels {
   filtersCleared: string;
   /** Word used in the operator trigger's accessible name. */
   operator: string;
+  /**
+   * Operator names by id, over each operator's own `label` (e.g.
+   * `{ is_not: "n'est pas" }`), so the built-in operators translate without
+   * redefining every field's `operators`.
+   */
+  operators: Partial<Record<string, string>>;
   /** The active-filter count, e.g. "3 active". */
   activeCount: (count: number) => string;
   /** Summary for a multiselect value with two or more options picked. */

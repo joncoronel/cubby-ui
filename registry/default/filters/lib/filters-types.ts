@@ -173,7 +173,17 @@ export interface FiltersBarProps extends Omit<
 > {
   /** Key that opens the add-filter menu, forwarded to the default `FilterAddButton`. */
   shortcut?: string;
+  /**
+   * What chips do when they outgrow the row. `"scroll"` (the default) keeps
+   * one row: the chips scroll sideways behind edge fades while the add and
+   * clear buttons stay put. `"wrap"` flows them onto new rows, for narrow
+   * panels where a tall bar is fine.
+   */
+  overflow?: FiltersOverflow;
 }
+
+/** How a bar handles more chips than fit on one row. */
+export type FiltersOverflow = "scroll" | "wrap";
 
 export interface FiltersProps
   extends Omit<FiltersProviderProps, "children">, FiltersBarProps {}

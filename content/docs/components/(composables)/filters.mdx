@@ -3,7 +3,14 @@ title: Filters
 description: A filter bar of sentence-like chips with per-field operators and a two-step add menu
 type: composable
 builtOn:
-  ["combobox", "dropdown-menu", "popover", "transition-panel", "text-morph"]
+  [
+    "combobox",
+    "dropdown-menu",
+    "popover",
+    "scroll-area",
+    "transition-panel",
+    "text-morph",
+  ]
 ---
 
 import { Filters } from "@/registry/default/filters/filters";
@@ -14,6 +21,7 @@ import FiltersOperators from "@/registry/examples/filters/filters-operators";
 import FiltersMultiselect from "@/registry/examples/filters/filters-multiselect";
 import FiltersManual from "@/registry/examples/filters/filters-manual";
 import FiltersSizes from "@/registry/examples/filters/filters-sizes";
+import FiltersOverflow from "@/registry/examples/filters/filters-overflow";
 import FiltersAffixes from "@/registry/examples/filters/filters-affixes";
 import FiltersShortcut from "@/registry/examples/filters/filters-shortcut";
 import FiltersNuqs from "@/registry/examples/filters/filters-nuqs";
@@ -85,6 +93,7 @@ return <Filters fields={fields} value={value} onValueChange={setValue} />;
 - `prefix` / `suffix` on text and number fields for currency, units, or symbols; `maxSelections` caps a multiselect.
 - Number fields are spinner-free (Base UI) with arrow-key stepping and wheel scrubbing (scroll to adjust while focused).
 - An optional `shortcut` key opens the add-filter menu, with a `Kbd` hint on the button.
+- Once a filter exists, the Filter button folds down to its "+" icon, since the chips beside it already say what it adds; it keeps its name for screen readers.
 - Controlled and uncontrolled: pass `value` + `onValueChange`, or `defaultValue`. Because it is controlled, syncing to the URL (nuqs) is trivial.
 - The `custom` field type renders any control through `renderValue`, for dates, sliders, or bespoke inputs.
 - Searchable, keyboard-navigable field and value pickers, inherited from `Combobox`.
@@ -146,6 +155,14 @@ Pass `children` to lay the bar out yourself with `FilterChips`, `FilterAddButton
 
 <ComponentPreview component="filters" example="filters-manual">
   <FiltersManual />
+</ComponentPreview>
+
+### Overflow
+
+When the chips outgrow the row, they scroll sideways behind edge fades, while the Filter and Clear buttons stay in view. Trackpads, touch, and a plain mouse wheel all scroll the strip, and a chip you add or change scrolls into view. The strip isn't a tab stop of its own, since every chip in it is, and the browser scrolls a focused chip into view. Set `overflow="wrap"` to flow chips onto new rows instead, for narrow panels where a taller bar is fine.
+
+<ComponentPreview component="filters" example="filters-overflow">
+  <FiltersOverflow />
 </ComponentPreview>
 
 ### Sizes
@@ -241,6 +258,12 @@ Filters is a custom component composed from Cubby UI primitives. It has no Base 
   `Kbd` hint on the button.
 </ApiProp>
 
+<ApiProp name="overflow" fullType='"scroll" | "wrap"' defaultValue='"scroll"'>
+  What chips do when they outgrow the row. `"scroll"` keeps one row: the chips
+  scroll sideways behind edge fades and the add and clear buttons stay put.
+  `"wrap"` flows them onto new rows.
+</ApiProp>
+
 <ApiProp name="labels" fullType="Partial<FiltersLabels>">
   Overrides for the bar's copy: `add`, `clear`, `searchFields`, `searchValues`,
   `noFields`, `noResults`, `selectValue`, `enterValue`, `value`, `min`, `max`,
@@ -260,7 +283,7 @@ Owns filter state and provides it via context without rendering layout. Takes th
 
 #### FiltersBar
 
-The flex row. Renders the default layout (`FilterChips`, `FilterAddButton`, `FilterClearButton`) unless `children` is passed. Takes `shortcut` and div props.
+The flex row. Renders the default layout (`FilterChips`, `FilterAddButton`, `FilterClearButton`) unless `children` is passed. Takes `shortcut`, `overflow`, and div props.
 
 #### FilterClearButton
 
@@ -268,7 +291,7 @@ Clears every filter. Renders nothing while no filters are active, so composition
 
 #### FilterChips
 
-Renders a `FilterChip` for every active filter, in order. Use it in `children` mode to place the chip list among your own chrome.
+Renders a `FilterChip` for every active filter, in order. Use it in `children` mode to place the chip list among your own chrome. In a scrolling bar it wraps the chips in their own sideways-scrolling strip, so whatever you place beside it stays in view.
 
 #### FilterChip
 

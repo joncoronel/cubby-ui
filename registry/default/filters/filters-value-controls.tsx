@@ -235,6 +235,7 @@ function OptionsValueControl({
           <StackedIcons options={selected} />
           <TextMorph
             value={text}
+            split="word"
             duration={CLICK_MORPH_MS}
             className="max-w-48 overflow-hidden"
           />

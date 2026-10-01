@@ -864,6 +864,7 @@
         "@cubby-ui/badge",
         "@cubby-ui/button",
         "@cubby-ui/dropdown-menu",
+        "@cubby-ui/scroll-area",
         "@cubby-ui/text-morph",
         "@cubby-ui/combobox",
         "@cubby-ui/kbd",

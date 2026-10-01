@@ -12,6 +12,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/registry/default/dropdown-menu/dropdown-menu";
+import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 import { TextMorph } from "@/registry/default/text-morph/text-morph";
 import { useControllableState } from "@/registry/default/hooks/use-controllable-state";
 
@@ -44,6 +45,7 @@ import type {
   FilterChipProps,
   FiltersBarProps,
   FiltersLabels,
+  FiltersOverflow,
   FiltersProps,
   FiltersProviderProps,
   FilterValue,
@@ -207,6 +209,7 @@ function FiltersProvider({
  */
 function FiltersBar({
   shortcut,
+  overflow = "scroll",
   className,
   children,
   ref,
@@ -214,20 +217,27 @@ function FiltersBar({
 }: FiltersBarProps) {
   const rowRef = useFlowRow(ref);
   return (
-    <div
-      ref={rowRef}
-      data-slot="filters"
-      className={cn("flex flex-wrap items-center gap-2", className)}
-      {...props}
-    >
-      {children ?? (
-        <>
-          <FilterChips />
-          <FilterAddButton shortcut={shortcut} />
-          <FilterClearButton />
-        </>
-      )}
-    </div>
+    <FiltersOverflowContext value={overflow}>
+      <div
+        ref={rowRef}
+        data-slot="filters"
+        data-overflow={overflow}
+        className={cn(
+          "flex max-w-full items-center gap-2",
+          overflow === "wrap" && "flex-wrap",
+          className,
+        )}
+        {...props}
+      >
+        {children ?? (
+          <>
+            <FilterChips />
+            <FilterAddButton shortcut={shortcut} />
+            <FilterClearButton />
+          </>
+        )}
+      </div>
+    </FiltersOverflowContext>
   );
 }
 
@@ -257,18 +267,70 @@ function Filters({
   );
 }
 
-/** Renders a `FilterChip` for every active filter. */
+/** The enclosing bar's overflow mode; chips outside a bar just lay out flat. */
+const FiltersOverflowContext = React.createContext<FiltersOverflow>("wrap");
+
+/**
+ * Lets a plain mouse wheel scroll the strip sideways. Only while the strip
+ * has somewhere to go in that direction, so at either end (or when nothing
+ * overflows) the wheel scrolls the page as usual.
+ */
+function scrollSidewaysOnWheel(node: HTMLDivElement | null) {
+  if (!node) return;
+  const handleWheel = (event: WheelEvent) => {
+    if (event.ctrlKey || Math.abs(event.deltaX) >= Math.abs(event.deltaY)) {
+      return;
+    }
+    const range = node.scrollWidth - node.clientWidth;
+    if (range <= 1) return;
+    // RTL scrolls from 0 towards negative values.
+    const direction = getComputedStyle(node).direction === "rtl" ? -1 : 1;
+    const position = node.scrollLeft * direction;
+    const delta = event.deltaY * (event.deltaMode === 1 ? 16 : 1);
+    if ((delta < 0 && position <= 0) || (delta > 0 && position >= range - 1)) {
+      return;
+    }
+    event.preventDefault();
+    node.scrollLeft += delta * direction;
+  };
+  node.addEventListener("wheel", handleWheel, { passive: false });
+  return () => node.removeEventListener("wheel", handleWheel);
+}
+
+/**
+ * Renders a `FilterChip` for every active filter. Inside a scrolling bar the
+ * chips sit in their own strip that scrolls sideways behind edge fades, so
+ * the buttons after it stay in view; the strip hides itself when empty, so
+ * it adds no gap to the bar.
+ */
 function FilterChips() {
   const { filters } = useFiltersState();
   const { fieldsById } = useFiltersActions();
+  const overflow = React.use(FiltersOverflowContext);
+  const chips = filters.map((filter) => {
+    const field = fieldsById.get(filter.field);
+    if (!field) return null;
+    return <FilterChip key={filter.id} filter={filter} field={field} />;
+  });
+
+  if (overflow === "wrap") return <>{chips}</>;
+
   return (
-    <>
-      {filters.map((filter) => {
-        const field = fieldsById.get(filter.field);
-        if (!field) return null;
-        return <FilterChip key={filter.id} filter={filter} field={field} />;
-      })}
-    </>
+    <ScrollArea
+      nativeScroll
+      hideScrollbar
+      fadeEdges="x"
+      viewportRef={scrollSidewaysOnWheel}
+      // Not a tab stop of its own: every chip in it is, and the browser
+      // scrolls a focused chip into view.
+      tabIndex={-1}
+      // The 2px inset keeps chip edges off the strip's clip line, where a
+      // fractional pixel ratio would shave their border; the matching
+      // negative margin keeps the bar's layout unchanged.
+      className="-m-0.5 flex size-auto min-w-0 items-center gap-2 overflow-y-hidden rounded-none p-0.5 *:max-w-none empty:not-data-flow-busy:hidden"
+    >
+      {chips}
+    </ScrollArea>
   );
 }
 
@@ -404,7 +466,7 @@ function FilterChipOperator({
           />
         }
       >
-        <TextMorph value={label} duration={CLICK_MORPH_MS} />
+        <TextMorph value={label} split="word" duration={CLICK_MORPH_MS} />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="min-w-40">
         <DropdownMenuRadioGroup
@@ -552,6 +614,7 @@ export type {
   FilterValue,
   FilterSize,
   FiltersLabels,
+  FiltersOverflow,
   FiltersProps,
   FiltersProviderProps,
   FiltersBarProps,

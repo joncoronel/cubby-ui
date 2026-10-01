@@ -36,6 +36,7 @@ import {
 } from "@hugeicons/core-free-icons";
 
 import { useFiltersActions, useFiltersState } from "./filters-context";
+import { revealInScroller } from "./lib/flow-presence";
 import {
   asStringArray,
   createFilter,
@@ -253,6 +254,13 @@ function FieldStep({
           valueless ? null : existing.value,
           option.value,
         ),
+      });
+      // It may be scrolled out of a crowded bar; bring it back into view.
+      requestAnimationFrame(() => {
+        const chip = document.querySelector<HTMLElement>(
+          `[data-slot="filter-chip"][data-filter-id="${CSS.escape(existing.id)}"]`,
+        );
+        if (chip) revealInScroller(chip);
       });
     } else {
       addFilter(
@@ -616,7 +624,8 @@ function FilterAddButton({
   /** Key that opens this menu from the keyboard (e.g. `"f"`). */
   shortcut?: string;
 }) {
-  const { fieldsById, labels, size } = useFiltersActions();
+  const { fieldsById, labels, size, usedFieldIds } = useFiltersActions();
+  const compact = usedFieldIds.size > 0;
   const [open, setOpen] = React.useState(false);
   const [step, setStep] = React.useState<"fields" | "value">("fields");
   // Kept after stepping back so the value view still has content while it
@@ -688,25 +697,38 @@ function FilterAddButton({
         render={
           <Button
             data-slot="filter-add"
+            data-compact={compact ? "" : undefined}
             variant="outline"
             size={size}
             className={cn(
-              "text-muted-foreground hover:text-foreground data-popup-open:text-foreground",
+              "text-muted-foreground hover:text-foreground data-popup-open:text-foreground gap-0",
+              // Even with the icon's side; the label adds the rest when shown.
+              size === "sm" ? "pe-2" : "pe-2.5",
               className,
             )}
             leadingIcon={<HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />}
-            trailingIcon={
-              shortcut ? (
-                <Kbd size="sm" variant="ghost" className="ms-0.5">
-                  {shortcut.toUpperCase()}
-                </Kbd>
-              ) : undefined
-            }
             {...props}
           />
         }
       >
-        {children ?? labels.add}
+        {/* The label (and shortcut hint) collapse through a grid column
+            once filters exist, leaving a square "+": the chips beside it
+            already say what it adds. A column animates in every browser,
+            where an auto width doesn't, and the text stays readable to
+            screen readers at zero width. */}
+        <span
+          data-slot="filter-add-label"
+          className="grid grid-cols-[minmax(0,1fr)] overflow-hidden transition-[grid-template-columns,opacity] duration-220 ease-[cubic-bezier(0.22,1,0.36,1)] in-data-compact:grid-cols-[minmax(0,0fr)] in-data-compact:opacity-0 motion-reduce:transition-none"
+        >
+          <span className="flex min-w-0 items-center gap-1.5 overflow-hidden ps-1.5 pe-1">
+            {children ?? labels.add}
+            {shortcut && (
+              <Kbd size="sm" variant="ghost">
+                {shortcut.toUpperCase()}
+              </Kbd>
+            )}
+          </span>
+        </span>
       </PopoverTrigger>
       <PopoverPortal>
         <PopoverPositioner

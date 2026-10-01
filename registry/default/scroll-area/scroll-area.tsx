@@ -80,6 +80,17 @@ type ScrollAreaProps = BaseScrollArea.Root.Props & {
   contentClassName?: string;
 };
 
+// Root props with no plain-div meaning, dropped on the `nativeScroll` path.
+const NATIVE_DROPPED_PROPS = [
+  "render",
+  "overflowEdgeThreshold",
+  "style",
+  "onScroll",
+  "onScrollCapture",
+  "onWheel",
+  "onWheelCapture",
+] as const;
+
 function ScrollArea({
   className,
   children,
@@ -118,9 +129,17 @@ function ScrollArea({
     // Base UI className can be a function; NativeScrollArea only accepts string.
     const nativeClassName =
       typeof className === "string" ? className : undefined;
+    // Everything else is a plain div prop and passes through (data attributes,
+    // aria, `tabIndex`, handlers), except the Base UI-only ones: `render`,
+    // `overflowEdgeThreshold`, a state-function `style`, and the scroll/wheel
+    // handlers NativeScrollArea doesn't take.
+    const divProps: Record<string, unknown> = { ...props };
+    for (const key of NATIVE_DROPPED_PROPS) delete divProps[key];
     return (
       <NativeScrollArea
+        {...(divProps as React.ComponentProps<typeof NativeScrollArea>)}
         ref={viewportRef}
+        style={typeof props.style === "function" ? undefined : props.style}
         className={nativeClassName}
         viewportClassName={viewportClassName}
         fadeEdges={fadeEdges}

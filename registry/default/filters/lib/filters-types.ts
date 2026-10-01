@@ -1,6 +1,6 @@
 import type * as React from "react";
 
-/** Size of the filter bar and its pills. */
+/** Size of the filter bar and its chips. */
 export type FilterSize = "sm" | "default" | "lg";
 
 /** Built-in field types. `custom` renders its own value control. */
@@ -18,11 +18,7 @@ export interface FilterOption {
   icon?: React.ReactNode;
 }
 
-/**
- * The value shape an operator expects: `"none"` hides the value segment
- * (`is empty`), `"range"` renders paired min/max inputs on number fields
- * (`between`), and `"scalar"` renders the field's normal single control.
- */
+/** Value shape an operator expects: `"none"` (no value), `"scalar"` (one control), `"range"` (number min/max). */
 export type FilterOperatorShape = "none" | "scalar" | "range";
 
 /** An operator shown in the middle segment of a pill (`is`, `contains`, ...). */
@@ -85,6 +81,11 @@ export interface CustomFilterField extends FilterFieldBase {
   renderValue: (props: FilterValueControlProps) => React.ReactNode;
   /** Seed value for a fresh filter of this field. */
   defaultValue?: unknown;
+  /**
+   * Value as text, for the accessible name and completeness (`""` = no value).
+   * Defaults handle only strings, numbers and booleans; required for objects.
+   */
+  formatValue?: (value: unknown) => string;
 }
 
 export type FilterField =
@@ -100,7 +101,7 @@ export interface FilterValueControlProps {
   operator: string;
   onValueChange: (value: unknown) => void;
   size: FilterSize;
-  field: FilterField;
+  field: CustomFilterField;
 }
 
 /** Value shape for a `number` field when the operator is `between`. */
@@ -110,8 +111,8 @@ export interface NumberRange {
 }
 
 /**
- * A single active filter. `value` is typed by the field:
- * `select → string | null`, `multiselect → string[]`, `text → string`,
+ * A single active filter. `value` by field type: `select → string | null`,
+ * `multiselect → string[]`, `text → string`,
  * `number → number | null | NumberRange`, `custom → unknown`.
  */
 export interface FilterValue {
@@ -124,6 +125,8 @@ export interface FilterValue {
 /** Copy overrides for the bar's chrome. */
 export interface FiltersLabels {
   add: string;
+  /** Tooltip on the add button once it has folded down to its icon. */
+  addTooltip: string;
   clear: string;
   searchFields: string;
   searchValues: string;
@@ -134,10 +137,34 @@ export interface FiltersLabels {
   value: string;
   min: string;
   max: string;
+  /** Joins the two bounds of a range, as in "between 2 and 8". */
+  and: string;
+  /** Group heading for fields in the add menu while searching. */
+  fields: string;
+  /** Group heading for matching values in the add menu while searching. */
+  values: string;
+  /** Accessible name of the add menu's back button. */
+  back: string;
+  /** Closes the add menu after picking several values of a multiselect. */
+  done: string;
+  /** Hint under a number the add menu can't read, e.g. "12a". */
+  invalidNumber: string;
+  /** Announced to screen readers when every filter is cleared. */
+  filtersCleared: string;
   /** Word used in the operator trigger's accessible name. */
   operator: string;
+  /** Operator label overrides by id, e.g. `{ is_not: "n'est pas" }`. */
+  operators: Partial<Record<string, string>>;
+  /** The active-filter count, e.g. "3 active". */
+  activeCount: (count: number) => string;
+  /** Summary for a multiselect value with two or more options picked. */
+  selectedCount: (count: number, field: FilterField) => string;
   /** Builds the accessible label for a pill's remove button. */
   removeFilter: (fieldLabel: string) => string;
+  /** Announced when a filter is added; gets e.g. "Status is Done". */
+  filterAdded: (description: string) => string;
+  /** Announced when a filter is removed; gets e.g. "Status is Done". */
+  filterRemoved: (description: string) => string;
 }
 
 export interface FiltersProviderProps {
@@ -161,7 +188,12 @@ export interface FiltersBarProps extends Omit<
 > {
   /** Key that opens the add-filter menu, forwarded to the default `FilterAddButton`. */
   shortcut?: string;
+  /** Chip overflow: `"scroll"` (default) scrolls one row behind edge fades; `"wrap"` adds rows. */
+  overflow?: FiltersOverflow;
 }
+
+/** How a bar handles more chips than fit on one row. */
+export type FiltersOverflow = "scroll" | "wrap";
 
 export interface FiltersProps
   extends Omit<FiltersProviderProps, "children">, FiltersBarProps {}

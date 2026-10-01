@@ -255,7 +255,7 @@
   },
   "filters": {
     "title": "Filters",
-    "description": "A filter bar of segmented pills with per-field operators and value controls.",
+    "description": "A filter bar of sentence-like chips with per-field operators and a two-step add menu.",
     "dependencies": [],
     "reference": []
   },

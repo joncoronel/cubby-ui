@@ -3,17 +3,7 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
-import { Badge } from "@/registry/default/badge/badge";
 import { Button } from "@/registry/default/button/button";
-import {
-  ButtonGroup,
-  ButtonGroupText,
-} from "@/registry/default/button-group/button-group";
-import {
-  Combobox,
-  ComboboxItem,
-  ComboboxTrigger,
-} from "@/registry/default/combobox/combobox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,72 +11,97 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/registry/default/dropdown-menu/dropdown-menu";
-import { Kbd } from "@/registry/default/kbd/kbd";
+import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
+import { TextMorph } from "@/registry/default/text-morph/text-morph";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/registry/default/tooltip/tooltip";
 import { useControllableState } from "@/registry/default/hooks/use-controllable-state";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Cancel01Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
+import { Cancel01Icon, FilterRemoveIcon } from "@hugeicons/core-free-icons";
 
+import {
+  FieldIcon,
+  FilterActionsAdd,
+  FilterAddButton,
+} from "./filters-add-menu";
 import {
   FilterChipContext,
   FiltersActionsContext,
-  FiltersAutoOpenContext,
+  FiltersAnnouncementContext,
   FiltersStateContext,
   useFilterChip,
   useFiltersActions,
-  useFiltersAutoOpen,
   useFiltersState,
 } from "./filters-context";
-import { FilterChipValue, FilterSearchPopup } from "./filters-value-controls";
+import { FilterChipValue } from "./filters-value-controls";
 import {
-  createFilter,
+  CLICK_MORPH_MS,
   describeFilter,
+  isFilterComplete,
+  operatorLabel,
+  FILTER_SEGMENT,
+  FILTER_SEGMENT_INTERACTIVE,
   FILTER_SIZES,
   patchFilter,
   resolveOperators,
 } from "./lib/filters-utils";
+import { useFlowPresence, useFlowRow } from "./lib/flow-presence";
 import type {
   FilterChipProps,
-  FilterField,
   FiltersBarProps,
   FiltersLabels,
+  FiltersOverflow,
   FiltersProps,
   FiltersProviderProps,
   FilterValue,
 } from "./lib/filters-types";
 
 const DEFAULT_LABELS: FiltersLabels = {
-  add: "Add filter",
-  clear: "Clear",
-  searchFields: "Filter...",
+  add: "Filter",
+  addTooltip: "Add filter",
+  clear: "Clear filters",
+  searchFields: "Filter by...",
   searchValues: "Search...",
-  noFields: "No filters found.",
+  noFields: "No matches.",
   noResults: "No results found.",
   selectValue: "Select...",
   enterValue: "Enter value",
   value: "Value",
   min: "Min",
   max: "Max",
+  and: "and",
+  fields: "Fields",
+  values: "Values",
+  back: "Back to fields",
+  done: "Done",
+  invalidNumber: "Enter a number",
+  filtersCleared: "Cleared all filters",
   operator: "operator",
+  operators: {},
+  activeCount: (count) => `${count} active`,
+  selectedCount: (count) => `${count} selected`,
   removeFilter: (fieldLabel) => `Remove ${fieldLabel} filter`,
+  filterAdded: (description) => `Added ${description}`,
+  filterRemoved: (description) => `Removed ${description}`,
 };
 
 const LABEL_KEYS = Object.keys(DEFAULT_LABELS) as (keyof FiltersLabels)[];
 
-/** Small muted wrapper that normalizes field icons to 14px. */
-function FieldIcon({ children }: { children?: React.ReactNode }) {
-  if (!children) return null;
-  return (
-    <span className="text-muted-foreground flex shrink-0 items-center [&_svg]:size-3.5!">
-      {children}
-    </span>
-  );
+/** Moves focus to the add button first: the chips and clear control are about to unmount. */
+function clearFromBar(from: HTMLElement, clearAll: () => void) {
+  from
+    .closest('[data-slot="filters"]')
+    ?.querySelector<HTMLElement>('[data-slot="filter-add"]')
+    ?.focus();
+  clearAll();
 }
 
-/**
- * Moves focus to the adjacent chip's remove button (or the add-filter trigger)
- * before a chip is removed, so focus never falls to `<body>`.
- */
+/** Refocuses a neighbouring chip (or the add button) before removal so focus never falls to `<body>`. */
 function focusAdjacentChip(chip: HTMLElement | null) {
   const bar = chip?.closest<HTMLElement>('[data-slot="filters"]');
   if (!chip || !bar) return;
@@ -101,11 +116,7 @@ function focusAdjacentChip(chip: HTMLElement | null) {
   target?.focus();
 }
 
-/**
- * Owns filter state and provides it via context, without rendering any layout.
- * Wrap it around a `FiltersBar` plus any external UI (a results count, saved
- * views, an apply button) that should share the state through `useFilters`.
- */
+/** Owns filter state with no layout; wrap a `FiltersBar` plus any external UI that reads `useFilters`. */
 function FiltersProvider({
   fields,
   value,
@@ -122,18 +133,10 @@ function FiltersProvider({
     onValueChange,
   });
 
-  // Tracks the freshly added filter so its value control opens on mount. The
-  // chip consumes (clears) the flag once mounted, so later remounts of the
-  // value control don't spuriously re-open it.
-  const [lastAddedId, setLastAddedId] = React.useState<string | null>(null);
-  const clearAutoOpen = React.useCallback(() => setLastAddedId(null), []);
-
   const labels = React.useMemo(
     () => ({ ...DEFAULT_LABELS, ...labelsProp }),
-    // Value-level deps (constant length — FiltersLabels is a closed shape) so
-    // an inline `labels={{ ... }}` object doesn't churn the actions context.
-    // Caveat: `removeFilter` is a function, so an inline arrow for it is a
-    // new identity every render and still churns; hoist it in that case.
+    // Value-level deps so an inline `labels` object doesn't churn the actions
+    // context. Inline function labels still churn; hoist those.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     LABEL_KEYS.map((key) => labelsProp?.[key]),
   );
@@ -152,18 +155,52 @@ function FiltersProvider({
     [usedFieldsKey],
   );
 
+  // Adds/removes/clears are announced because focus lands elsewhere; edits
+  // aren't, since their own controls already say what changed.
+  const [announcement, setAnnouncement] = React.useState({
+    text: "",
+    count: 0,
+  });
+  const announce = React.useCallback(
+    (text: string) =>
+      setAnnouncement((previous) => ({ text, count: previous.count + 1 })),
+    [],
+  );
+  // The filters as of the last commit, for describing the one removed.
+  const filtersRef = React.useRef(filters);
+  React.useLayoutEffect(() => {
+    filtersRef.current = filters;
+  }, [filters]);
+  const describe = React.useCallback(
+    (filter: FilterValue | undefined) => {
+      const field = filter && fieldsById.get(filter.field);
+      return field && filter
+        ? describeFilter(field, filter, labels.operators)
+        : "";
+    },
+    [fieldsById, labels],
+  );
+
   const addFilter = React.useCallback(
     (filter: FilterValue) => {
       setFilters((prev) => [...prev, filter]);
-      setLastAddedId(filter.id);
+      announce(labels.filterAdded(describe(filter)));
     },
-    [setFilters],
+    [setFilters, announce, labels, describe],
   );
   const removeFilter = React.useCallback(
-    (id: string) => setFilters((prev) => prev.filter((f) => f.id !== id)),
-    [setFilters],
+    (id: string) => {
+      const removed = filtersRef.current.find((filter) => filter.id === id);
+      setFilters((prev) => prev.filter((f) => f.id !== id));
+      if (removed) announce(labels.filterRemoved(describe(removed)));
+    },
+    [setFilters, announce, labels, describe],
   );
-  const clearAll = React.useCallback(() => setFilters([]), [setFilters]);
+  const getFilters = React.useCallback(() => filtersRef.current, []);
+  const clearAll = React.useCallback(() => {
+    setFilters([]);
+    announce(labels.filtersCleared);
+  }, [setFilters, announce, labels]);
   const updateFilter = React.useCallback(
     (id: string, patch: Partial<Omit<FilterValue, "id">>) => {
       setFilters((prev) =>
@@ -177,15 +214,8 @@ function FiltersProvider({
     [setFilters, fieldsById],
   );
 
-  // Split contexts: `state` changes per keystroke, `actions` stays stable
-  // (so leaves subscribed via useFiltersActions don't re-render while
-  // typing), and the transient auto-open signal is isolated so its set/consume
-  // cycle per add doesn't churn the actions context either.
+  // Split so useFiltersActions leaves don't re-render per keystroke.
   const stateContext = React.useMemo(() => ({ filters }), [filters]);
-  const autoOpenContext = React.useMemo(
-    () => ({ lastAddedId, clearAutoOpen }),
-    [lastAddedId, clearAutoOpen],
-  );
   const actionsContext = React.useMemo(
     () => ({
       fields,
@@ -198,6 +228,7 @@ function FiltersProvider({
       updateFilter,
       removeFilter,
       clearAll,
+      getFilters,
     }),
     [
       fields,
@@ -210,45 +241,68 @@ function FiltersProvider({
       updateFilter,
       removeFilter,
       clearAll,
+      getFilters,
     ],
   );
 
   return (
     <FiltersStateContext.Provider value={stateContext}>
       <FiltersActionsContext.Provider value={actionsContext}>
-        <FiltersAutoOpenContext.Provider value={autoOpenContext}>
+        <FiltersAnnouncementContext value={announcement}>
           {children}
-        </FiltersAutoOpenContext.Provider>
+        </FiltersAnnouncementContext>
       </FiltersActionsContext.Provider>
     </FiltersStateContext.Provider>
   );
 }
 
-/**
- * The flex row. Renders the default layout unless `children` is passed. Only
- * the default leaves subscribe to filter state, so a bar with custom children
- * doesn't re-render while a value is being typed.
- */
+/** The flex row; renders the default chips + actions unless `children` is passed. */
 function FiltersBar({
   shortcut,
+  overflow = "scroll",
   className,
   children,
+  ref,
   ...props
 }: FiltersBarProps) {
+  const rowRef = useFlowRow(ref);
   return (
-    <div
-      data-slot="filters"
-      className={cn("flex flex-wrap items-center gap-2", className)}
-      {...props}
-    >
-      {children ?? (
-        <>
-          <FilterChips />
-          <FilterAddButton shortcut={shortcut} />
-          <FilterClearButton />
-        </>
-      )}
-    </div>
+    <FiltersOverflowContext value={overflow}>
+      {/* Shared so moving between the add and clear tooltips skips the delay. */}
+      <TooltipProvider>
+        <div
+          ref={rowRef}
+          data-slot="filters"
+          data-overflow={overflow}
+          className={cn(
+            "flex max-w-full items-center gap-2",
+            overflow === "wrap" && "flex-wrap",
+            className,
+          )}
+          {...props}
+        >
+          {children ?? (
+            <>
+              <FilterChips />
+              <FilterActions shortcut={shortcut} />
+            </>
+          )}
+          <FiltersAnnouncer />
+        </div>
+      </TooltipProvider>
+    </FiltersOverflowContext>
+  );
+}
+
+// Always mounted so screen readers are listening before the first change; the
+// alternating nbsp makes a repeated message still count as a change.
+function FiltersAnnouncer() {
+  const { text, count } = React.use(FiltersAnnouncementContext);
+  return (
+    <span role="status" className="sr-only">
+      {text}
+      {count % 2 === 1 ? "\u00a0" : ""}
+    </span>
   );
 }
 
@@ -278,71 +332,123 @@ function Filters({
   );
 }
 
-/** Renders a `FilterChip` for every active filter. */
-function FilterChips() {
+/** The enclosing bar's overflow mode; chips outside a bar just lay out flat. */
+const FiltersOverflowContext = React.createContext<FiltersOverflow>("wrap");
+
+// Vertical wheel scrolls the strip sideways, but only while it can move that
+// way, so at either end the page scrolls as usual.
+function scrollSidewaysOnWheel(node: HTMLDivElement | null) {
+  if (!node) return;
+  const handleWheel = (event: WheelEvent) => {
+    if (event.ctrlKey || Math.abs(event.deltaX) >= Math.abs(event.deltaY)) {
+      return;
+    }
+    const range = node.scrollWidth - node.clientWidth;
+    if (range <= 1) return;
+    // RTL scrolls from 0 towards negative values.
+    const direction = getComputedStyle(node).direction === "rtl" ? -1 : 1;
+    const position = node.scrollLeft * direction;
+    const delta = event.deltaY * (event.deltaMode === 1 ? 16 : 1);
+    if ((delta < 0 && position <= 0) || (delta > 0 && position >= range - 1)) {
+      return;
+    }
+    event.preventDefault();
+    node.scrollLeft += delta * direction;
+  };
+  node.addEventListener("wheel", handleWheel, { passive: false });
+  return () => node.removeEventListener("wheel", handleWheel);
+}
+
+/** A `FilterChip` per active filter; in a scrolling bar, inside a sideways-scrolling strip. */
+function FilterChips({
+  className,
+}: {
+  /** Merged into the scroll strip (a scrolling bar only). */
+  className?: string;
+}) {
   const { filters } = useFiltersState();
   const { fieldsById } = useFiltersActions();
+  const overflow = React.use(FiltersOverflowContext);
+  const chips = filters.map((filter) => {
+    const field = fieldsById.get(filter.field);
+    if (!field) return null;
+    return <FilterChip key={filter.id} filter={filter} field={field} />;
+  });
+
+  if (overflow === "wrap") return <>{chips}</>;
+
   return (
-    <>
-      {filters.map((filter) => {
-        const field = fieldsById.get(filter.field);
-        if (!field) return null;
-        return <FilterChip key={filter.id} filter={filter} field={field} />;
-      })}
-    </>
+    <ScrollArea
+      nativeScroll
+      hideScrollbar
+      fadeEdges="x"
+      viewportRef={scrollSidewaysOnWheel}
+      // Chips are tab stops and get scrolled into view, so the strip isn't one.
+      tabIndex={-1}
+      // 2px inset keeps chip borders off the clip line (fractional DPR shaves
+      // them); the negative margin cancels it. `empty:` hides the strip's gap.
+      className={cn(
+        "-m-0.5 flex size-auto min-w-0 items-center gap-2 overflow-y-hidden rounded-none p-0.5 *:max-w-none empty:not-data-flow-busy:hidden",
+        className,
+      )}
+    >
+      {chips}
+    </ScrollArea>
   );
 }
 
-// Memoized: chips subscribe only to the stable actions context and untouched
-// `filter` objects keep their identity across edits, so typing in one chip's
-// value doesn't re-render the others.
+// Memoized so typing in one chip doesn't re-render the others (untouched
+// `filter` objects keep their identity; only the stable actions context is read).
 const FilterChip = React.memo(function FilterChip({
   filter,
   field: fieldProp,
   className,
   children,
+  ref,
+  onKeyDown,
   ...props
 }: FilterChipProps) {
-  const { size, removeFilter, fieldsById } = useFiltersActions();
-  const { lastAddedId, clearAutoOpen } = useFiltersAutoOpen();
+  const { size, removeFilter, fieldsById, labels } = useFiltersActions();
+  const presenceRef = useFlowPresence(ref);
   const field = fieldProp ?? fieldsById.get(filter.field);
-  const autoOpen = filter.id === lastAddedId;
-
-  // Consume the auto-open flag once this chip has mounted, so later remounts
-  // of the value control (e.g. an operator shape change) don't re-open it.
-  React.useEffect(() => {
-    if (autoOpen) clearAutoOpen();
-  }, [autoOpen, clearAutoOpen]);
 
   const chipContext = React.useMemo(
-    () => (field ? { filter, field, size, autoOpen } : null),
-    [filter, field, size, autoOpen],
+    () => (field ? { filter, field, size } : null),
+    [filter, field, size],
   );
 
   if (!field || !chipContext) return null;
 
+  const incomplete = !isFilterComplete(field, filter);
+
   return (
     <FilterChipContext.Provider value={chipContext}>
-      <ButtonGroup
+      <div
+        ref={presenceRef}
+        role="group"
         data-slot="filter-chip"
-        aria-label={describeFilter(field, filter)}
+        data-size={size}
+        data-filter-id={filter.id}
+        data-incomplete={incomplete ? "" : undefined}
+        aria-label={describeFilter(field, filter, labels.operators)}
         className={cn(
-          "bg-card overflow-hidden rounded-lg border bg-clip-padding",
+          "bg-card text-foreground inline-flex max-w-full shrink-0 items-center gap-0.5 rounded-lg border bg-clip-padding p-0.5",
+          "transition-[border-color] duration-150 data-incomplete:border-dashed",
+          FILTER_SIZES[size],
           className,
         )}
         onKeyDown={(event) => {
+          onKeyDown?.(event);
+          if (event.defaultPrevented) return;
           if (event.key !== "Backspace" && event.key !== "Delete") return;
-          // Only remove when focus is on one of the chip's own button
-          // segments; inputs and custom controls keep their editing keys.
           const target = event.target;
-          const isChipButton =
-            target instanceof HTMLElement &&
-            target.tagName === "BUTTON" &&
-            (target.dataset.slot === "filter-chip-value" ||
-              target.closest(
-                '[data-slot="filter-chip-remove"], [data-slot="filter-chip-operator"]',
-              ) !== null);
-          if (!isChipButton) return;
+          // Remove button only: elsewhere the key means editing that part.
+          if (
+            !(target instanceof HTMLButtonElement) ||
+            target.dataset.slot !== "filter-chip-remove"
+          ) {
+            return;
+          }
           event.preventDefault();
           focusAdjacentChip(event.currentTarget);
           removeFilter(filter.id);
@@ -357,7 +463,7 @@ const FilterChip = React.memo(function FilterChip({
             <FilterChipRemove />
           </>
         )}
-      </ButtonGroup>
+      </div>
     </FilterChipContext.Provider>
   );
 });
@@ -366,14 +472,13 @@ function FilterChipField({
   className,
   children,
   ...props
-}: React.ComponentProps<"div">) {
-  const { field, size } = useFilterChip();
+}: React.ComponentProps<"span">) {
+  const { field } = useFilterChip();
   return (
-    <ButtonGroupText
+    <span
       data-slot="filter-chip-field"
       className={cn(
-        "text-foreground gap-1.5 rounded-none border-0 border-r font-medium",
-        FILTER_SIZES[size].fieldLabel,
+        "text-muted-foreground inline-flex h-full shrink-0 items-center gap-1.5 ps-(--seg-x) pe-1 whitespace-nowrap",
         className,
       )}
       {...props}
@@ -384,37 +489,41 @@ function FilterChipField({
           {field.label}
         </>
       )}
-    </ButtonGroupText>
+    </span>
   );
 }
 
 function FilterChipOperator({
   className,
   ...props
-}: React.ComponentProps<typeof Button>) {
-  const { filter, field, size } = useFilterChip();
+}: React.ComponentProps<"button">) {
+  const { filter, field } = useFilterChip();
   const { updateFilter, labels } = useFiltersActions();
   const operators = resolveOperators(field);
   const current = operators.find((operator) => operator.id === filter.operator);
+  const label = current
+    ? operatorLabel(current, labels.operators)
+    : filter.operator;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
-          <Button
+          <button
+            type="button"
             data-slot="filter-chip-operator"
-            aria-label={`${field.label} ${labels.operator}: ${current?.label ?? filter.operator}`}
-            variant="ghost"
-            size={size}
+            aria-label={`${field.label} ${labels.operator}: ${label}`}
             className={cn(
-              "rounded-none! font-normal focus-visible:-outline-offset-2",
+              FILTER_SEGMENT,
+              FILTER_SEGMENT_INTERACTIVE,
+              "text-muted-foreground hover:text-foreground data-popup-open:text-foreground px-[calc(var(--seg-x)*0.6)]",
               className,
             )}
             {...props}
           />
         }
       >
-        {current?.label ?? filter.operator}
+        <TextMorph value={label} split="word" duration={CLICK_MORPH_MS} />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="min-w-40">
         <DropdownMenuRadioGroup
@@ -423,7 +532,7 @@ function FilterChipOperator({
         >
           {operators.map((operator) => (
             <DropdownMenuRadioItem key={operator.id} value={operator.id}>
-              {operator.label}
+              {operatorLabel(operator, labels.operators)}
             </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>
@@ -434,21 +543,25 @@ function FilterChipOperator({
 
 function FilterChipRemove({
   className,
+  onClick,
   ...props
-}: React.ComponentProps<typeof Button>) {
+}: React.ComponentProps<"button">) {
   const { filter, field } = useFilterChip();
-  const { removeFilter, size, labels } = useFiltersActions();
+  const { removeFilter, labels } = useFiltersActions();
   return (
-    <Button
+    <button
+      type="button"
       data-slot="filter-chip-remove"
       aria-label={labels.removeFilter(field.label)}
-      variant="ghost"
-      size={FILTER_SIZES[size].iconButton}
       className={cn(
-        "text-muted-foreground hover:text-foreground rounded-none focus-visible:-outline-offset-2",
+        FILTER_SEGMENT,
+        FILTER_SEGMENT_INTERACTIVE,
+        "text-muted-foreground hover:text-foreground aspect-square justify-center px-0 [&_svg]:size-3.5",
         className,
       )}
       onClick={(event) => {
+        onClick?.(event);
+        if (event.defaultPrevented) return;
         focusAdjacentChip(
           event.currentTarget.closest<HTMLElement>('[data-slot="filter-chip"]'),
         );
@@ -457,121 +570,7 @@ function FilterChipRemove({
       {...props}
     >
       <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} />
-    </Button>
-  );
-}
-
-function FilterAddButton({
-  children,
-  shortcut,
-  className,
-  ...props
-}: React.ComponentProps<typeof Button> & {
-  /** Key that opens this menu from the keyboard (e.g. `"f"`). */
-  shortcut?: string;
-}) {
-  const {
-    fields,
-    usedFieldIds,
-    allowDuplicateFields,
-    addFilter,
-    labels,
-    size,
-  } = useFiltersActions();
-  const [open, setOpen] = React.useState(false);
-
-  React.useEffect(() => {
-    if (!shortcut) return;
-    const handleKeyDown = (event: KeyboardEvent) => {
-      // `defaultPrevented` also dedupes multiple Filters instances: the first
-      // listener to accept the key prevents it for the rest.
-      if (event.defaultPrevented) return;
-      if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) {
-        return;
-      }
-      if (event.key.toLowerCase() !== shortcut.toLowerCase()) return;
-      const target = event.target;
-      if (target instanceof HTMLElement) {
-        if (
-          target instanceof HTMLInputElement ||
-          target instanceof HTMLTextAreaElement ||
-          target.isContentEditable
-        ) {
-          return;
-        }
-        // Don't steal the key from open popups (menu typeahead, dialogs).
-        if (
-          target.closest(
-            '[role="menu"], [role="listbox"], [role="dialog"], [role="alertdialog"]',
-          )
-        ) {
-          return;
-        }
-      }
-      event.preventDefault();
-      setOpen(true);
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [shortcut]);
-
-  return (
-    <Combobox<FilterField, false>
-      items={fields}
-      value={null}
-      open={open}
-      onOpenChange={setOpen}
-      onValueChange={(field) => {
-        if (field) addFilter(createFilter(field));
-      }}
-      itemToStringLabel={(field) => field.label}
-    >
-      <ComboboxTrigger
-        render={(triggerProps) => (
-          <Button
-            {...triggerProps}
-            data-slot="filter-add"
-            variant="outline"
-            size={size}
-            className={cn(
-              // The border renders on the button's paint pseudo-element, so
-              // border style overrides use before: classes.
-              "text-muted-foreground gap-1.5 before:border-dashed",
-              className,
-            )}
-            leadingIcon={<HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />}
-            trailingIcon={
-              shortcut ? (
-                <Kbd size="sm" variant="ghost" className="ms-1">
-                  {shortcut.toUpperCase()}
-                </Kbd>
-              ) : undefined
-            }
-            {...props}
-          >
-            {children ?? labels.add}
-          </Button>
-        )}
-      />
-      <FilterSearchPopup
-        className="min-w-56"
-        placeholder={labels.searchFields}
-        empty={labels.noFields}
-      >
-        {(field: FilterField) => (
-          <ComboboxItem
-            key={field.id}
-            value={field}
-            disabled={!allowDuplicateFields && usedFieldIds.has(field.id)}
-          >
-            <span className="flex items-center gap-2">
-              <FieldIcon>{field.icon}</FieldIcon>
-              <span className="truncate">{field.label}</span>
-            </span>
-          </ComboboxItem>
-        )}
-      </FilterSearchPopup>
-    </Combobox>
+    </button>
   );
 }
 
@@ -579,19 +578,26 @@ function FilterAddButton({
 function FilterClearButton({
   className,
   children,
+  ref,
+  onClick,
   ...props
 }: React.ComponentProps<typeof Button>) {
   const { clearAll, labels, size } = useFiltersActions();
   const { filters } = useFiltersState();
+  const presenceRef = useFlowPresence(ref);
   if (filters.length === 0) return null;
   return (
     <Button
+      ref={presenceRef}
       data-slot="filter-clear"
       variant="ghost"
       size={size}
-      className={cn("text-muted-foreground gap-1.5", className)}
-      onClick={clearAll}
-      leadingIcon={<HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} />}
+      className={cn("text-muted-foreground", className)}
+      onClick={(event) => {
+        onClick?.(event);
+        if (event.defaultPrevented) return;
+        clearFromBar(event.currentTarget, clearAll);
+      }}
       {...props}
     >
       {children ?? labels.clear}
@@ -599,20 +605,121 @@ function FilterClearButton({
   );
 }
 
-function FilterActiveCount({
+/** The add and clear actions as one chip-like capsule. */
+function FilterActions({
+  shortcut,
   className,
+  children,
   ...props
-}: React.ComponentProps<typeof Badge>) {
-  const { filters } = useFiltersState();
+}: React.ComponentProps<"div"> & {
+  /** Key that opens the add menu from the keyboard (e.g. `"f"`). */
+  shortcut?: string;
+}) {
+  const { size } = useFiltersActions();
   return (
-    <Badge
-      data-slot="filter-active-count"
-      variant="neutral"
-      className={className}
+    <div
+      role="group"
+      data-slot="filter-actions"
+      data-size={size}
+      className={cn(
+        // No gap: a folded clear segment would still get one; it brings its own.
+        "bg-card text-foreground inline-flex shrink-0 items-center rounded-lg border bg-clip-padding p-0.5",
+        FILTER_SIZES[size],
+        className,
+      )}
       {...props}
     >
-      {filters.length}
-    </Badge>
+      {children ?? (
+        <>
+          <FilterActionsAdd shortcut={shortcut} />
+          <FilterActionsClear />
+        </>
+      )}
+    </div>
+  );
+}
+
+/** The capsule's clear segment; stays mounted, folded and inert while no filters exist. */
+function FilterActionsClear({
+  className,
+  children,
+  onClick,
+  ...props
+}: React.ComponentProps<"button">) {
+  const { clearAll, labels, usedFieldIds } = useFiltersActions();
+  const active = usedFieldIds.size > 0;
+  return (
+    <div
+      data-slot="filter-clear-segment"
+      data-active={active ? "" : undefined}
+      inert={!active}
+      className="grid h-full grid-cols-[minmax(0,0fr)] overflow-hidden opacity-0 transition-[grid-template-columns,opacity] duration-220 ease-[cubic-bezier(0.22,1,0.36,1)] data-active:grid-cols-[minmax(0,1fr)] data-active:opacity-100 motion-reduce:transition-none"
+    >
+      <div className="flex h-full min-w-0 items-center gap-0.5 ps-0.5">
+        <span
+          aria-hidden
+          className="bg-border my-1.5 w-px shrink-0 self-stretch"
+        />
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              <button
+                type="button"
+                data-slot="filter-clear"
+                aria-label={labels.clear}
+                className={cn(
+                  FILTER_SEGMENT,
+                  FILTER_SEGMENT_INTERACTIVE,
+                  "text-muted-foreground hover:text-foreground aspect-square justify-center px-0 [&_svg]:size-4",
+                  className,
+                )}
+                {...props}
+                onClick={(event) => {
+                  onClick?.(event);
+                  if (event.defaultPrevented) return;
+                  clearFromBar(event.currentTarget, clearAll);
+                }}
+              />
+            }
+          >
+            {children ?? (
+              <HugeiconsIcon icon={FilterRemoveIcon} strokeWidth={2} />
+            )}
+          </TooltipTrigger>
+          <TooltipContent>{labels.clear}</TooltipContent>
+        </Tooltip>
+      </div>
+    </div>
+  );
+}
+
+/** Muted "3 active" text counting complete filters only; renders nothing at zero. */
+function FilterActiveCount({
+  className,
+  ref,
+  ...props
+}: React.ComponentProps<"span">) {
+  const { filters } = useFiltersState();
+  const { labels, fieldsById } = useFiltersActions();
+  const presenceRef = useFlowPresence(ref);
+  // Skips filters whose field is gone (a stale URL, say).
+  const count = filters.filter((filter) => {
+    const field = fieldsById.get(filter.field);
+    return field !== undefined && isFilterComplete(field, filter);
+  }).length;
+  if (count === 0) return null;
+  return (
+    <span
+      ref={presenceRef}
+      data-slot="filter-active-count"
+      className={cn(
+        "text-muted-foreground shrink-0 text-sm whitespace-nowrap tabular-nums",
+        className,
+      )}
+      {...props}
+    >
+      <TextMorph value={labels.activeCount(count)} duration={CLICK_MORPH_MS} />
+    </span>
   );
 }
 
@@ -627,6 +734,9 @@ export {
   FilterChipValue,
   FilterChipRemove,
   FilterAddButton,
+  FilterActions,
+  FilterActionsAdd,
+  FilterActionsClear,
   FilterClearButton,
   FilterActiveCount,
 };
@@ -640,14 +750,19 @@ export {
   createFilter,
   patchFilter,
   resolveOperators,
+  scalarOperatorFor,
+  withOption,
   defaultOperatorsFor,
   operatorShape,
   operatorShapeFor,
-  isValuelessOperator,
   emptyValueFor,
   formatFilterValue,
   describeFilter,
+  isFilterComplete,
+  operatorLabel,
   asFilterValues,
+  FILTER_SEGMENT,
+  FILTER_SEGMENT_INTERACTIVE,
 } from "./lib/filters-utils";
 export type {
   FilterField,
@@ -658,6 +773,7 @@ export type {
   FilterValue,
   FilterSize,
   FiltersLabels,
+  FiltersOverflow,
   FiltersProps,
   FiltersProviderProps,
   FiltersBarProps,

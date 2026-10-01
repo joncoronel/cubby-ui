@@ -632,10 +632,26 @@ function FilterAddButton({
   // slides out; cleared once the menu has closed.
   const [fieldId, setFieldId] = React.useState<string | null>(null);
   const field = fieldId ? fieldsById.get(fieldId) : undefined;
+  // Bumped on each open, which remounts the menu's panel.
+  const [session, setSession] = React.useState(0);
 
   const fieldsInputRef = React.useRef<HTMLInputElement | null>(null);
   const valueInputRef = React.useRef<HTMLInputElement | null>(null);
   const focusFilterIdRef = React.useRef<string | null>(null);
+
+  // The menu stays mounted while closed (`keepMounted`), so closing it is
+  // only its fade: no teardown lands on the main thread while a chip the
+  // pick just added animates in. Its contents are rebuilt as it opens
+  // instead (a fresh panel, back on an empty field list). A fresh panel also
+  // skips its own entrance, which a hidden one shown again would replay.
+  const changeOpen = React.useCallback((nextOpen: boolean) => {
+    if (nextOpen) {
+      setStep("fields");
+      setFieldId(null);
+      setSession((count) => count + 1);
+    }
+    setOpen(nextOpen);
+  }, []);
 
   React.useEffect(() => {
     if (!shortcut) return;
@@ -667,11 +683,11 @@ function FilterAddButton({
         }
       }
       event.preventDefault();
-      setOpen(true);
+      changeOpen(true);
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [shortcut]);
+  }, [shortcut, changeOpen]);
 
   const onDone = React.useCallback((focusFilterId?: string) => {
     focusFilterIdRef.current = focusFilterId ?? null;
@@ -684,15 +700,7 @@ function FilterAddButton({
   const onBack = React.useCallback(() => setStep("fields"), []);
 
   return (
-    <Popover
-      open={open}
-      onOpenChange={setOpen}
-      onOpenChangeComplete={(nextOpen) => {
-        if (nextOpen) return;
-        setStep("fields");
-        setFieldId(null);
-      }}
-    >
+    <Popover open={open} onOpenChange={changeOpen}>
       <PopoverTrigger
         render={
           <Button
@@ -730,7 +738,7 @@ function FilterAddButton({
           </span>
         </span>
       </PopoverTrigger>
-      <PopoverPortal>
+      <PopoverPortal keepMounted>
         <PopoverPositioner
           side="bottom"
           align="start"
@@ -763,6 +771,7 @@ function FilterAddButton({
             )}
           >
             <TransitionPanel
+              key={session}
               activeKey={step}
               // Quicker than the 240ms default, in step with the chips.
               style={{ "--tp-duration": "200ms" } as React.CSSProperties}

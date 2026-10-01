@@ -10,6 +10,7 @@ builtOn:
     "scroll-area",
     "transition-panel",
     "text-morph",
+    "tooltip",
   ]
 ---
 
@@ -55,12 +56,14 @@ Filters                 (FiltersProvider + FiltersBar)
     │       ├── FilterChipOperator
     │       ├── FilterChipValue
     │       └── FilterChipRemove
-    ├── FilterAddButton
     ├── FilterActiveCount
+    ├── FilterActions
+    │   └── FilterAddButton (plus a built-in clear segment)
+    ├── FilterAddButton
     └── FilterClearButton
 ```
 
-Drive the bar with a `fields` config and a `value` array of active filters. Each field's `type` picks the value control and its default operators. Without `children`, the bar renders `FilterChips`, `FilterAddButton`, and a `FilterClearButton` once filters exist; pass `children` to compose the same parts in any order.
+Drive the bar with a `fields` config and a `value` array of active filters. Each field's `type` picks the value control and its default operators. Without `children`, the bar renders `FilterChips` and `FilterActions`, a capsule holding the add button and, once filters exist, a clear segment; pass `children` to compose the parts in any order.
 
 ```tsx
 const fields: FilterField[] = [
@@ -103,7 +106,7 @@ return <Filters fields={fields} value={value} onValueChange={setValue} />;
 
 ### Controlled
 
-Pass `value` and `onValueChange` to own the state; the serialized filters update as you edit. This example also composes a `FilterActiveCount` badge into the bar.
+Pass `value` and `onValueChange` to own the state; the serialized filters update as you edit. This example also composes `FilterActiveCount` into the bar, a quiet "3 active" status beside the actions.
 
 <ComponentPreview component="filters" example="filters-controlled">
   <FiltersControlled />
@@ -151,7 +154,7 @@ A `multiselect` chip shows the picked option when there is one, and stacks up to
 
 ### Manual layout
 
-Pass `children` to lay the bar out yourself with `FilterChips`, `FilterAddButton`, `FilterActiveCount`, and `FilterClearButton`, which read the shared state from context.
+Pass `children` to lay the bar out yourself with `FilterChips`, `FilterActions`, `FilterActiveCount`, or the standalone `FilterAddButton` and `FilterClearButton`, which read the shared state from context.
 
 <ComponentPreview component="filters" example="filters-manual">
   <FiltersManual />
@@ -265,14 +268,15 @@ Filters is a custom component composed from Cubby UI primitives. It has no Base 
 </ApiProp>
 
 <ApiProp name="labels" fullType="Partial<FiltersLabels>">
-  Overrides for the bar's copy: `add`, `clear`, `searchFields`, `searchValues`,
-  `noFields`, `noResults`, `selectValue`, `enterValue`, `value`, `min`, `max`,
-  `and` (joins a range), `fields` and `values` (add menu group headings),
-  `back`, `done`, `operator`, plus two functions: `selectedCount` (the
-  multiselect summary) and `removeFilter` (the remove button's accessible
-  label). Inline objects with string labels are fine (the memo compares values,
-  not identity); hoist the object if you override either function, since an
-  inline arrow is a new function every render.
+  Overrides for the bar's copy: `add`, `addTooltip` (the folded "+" button's
+  tooltip), `clear`, `searchFields`, `searchValues`, `noFields`, `noResults`,
+  `selectValue`, `enterValue`, `value`, `min`, `max`, `and` (joins a range),
+  `fields` and `values` (add menu group headings), `back`, `done`, `operator`,
+  plus three functions: `activeCount` (the `FilterActiveCount` text),
+  `selectedCount` (the multiselect summary), and `removeFilter` (the remove
+  button's accessible label). Inline objects with string labels are fine (the
+  memo compares values, not identity); hoist the object if you override either
+  function, since an inline arrow is a new function every render.
 </ApiProp>
 
 </ApiPropsList>
@@ -283,11 +287,19 @@ Owns filter state and provides it via context without rendering layout. Takes th
 
 #### FiltersBar
 
-The flex row. Renders the default layout (`FilterChips`, `FilterAddButton`, `FilterClearButton`) unless `children` is passed. Takes `shortcut`, `overflow`, and div props.
+The flex row. Renders the default layout (`FilterChips`, `FilterActions`) unless `children` is passed. Takes `shortcut`, `overflow`, and div props.
+
+#### FilterActions
+
+The add and clear actions as one capsule, built like a chip. The add button sits inside as a segment and folds to "+" once filters exist (then showing an "Add filter" tooltip, with the shortcut key if set), while a clear segment (a filter-remove icon with a "Clear filters" tooltip, set apart by a hairline) opens in the same beat. Takes `shortcut` and div props.
+
+#### FilterActiveCount
+
+The number of active filters as plain muted text ("3 active", from `labels.activeCount`), with the number morphing as it changes. Takes span props.
 
 #### FilterClearButton
 
-Clears every filter. Renders nothing while no filters are active, so compositions don't need to wrap it in a conditional.
+A standalone text button that clears every filter, for layouts that keep the actions apart. Renders nothing while no filters are active, so compositions don't need to wrap it in a conditional. `FilterActions` has its own clear segment, so use one or the other.
 
 #### FilterChips
 

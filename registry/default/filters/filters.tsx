@@ -3,7 +3,6 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
-import { Badge } from "@/registry/default/badge/badge";
 import { Button } from "@/registry/default/button/button";
 import {
   DropdownMenu,
@@ -14,13 +13,20 @@ import {
 } from "@/registry/default/dropdown-menu/dropdown-menu";
 import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 import { TextMorph } from "@/registry/default/text-morph/text-morph";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/registry/default/tooltip/tooltip";
 import { useControllableState } from "@/registry/default/hooks/use-controllable-state";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Cancel01Icon } from "@hugeicons/core-free-icons";
+import { Cancel01Icon, FilterRemoveIcon } from "@hugeicons/core-free-icons";
 
 import { FieldIcon, FilterAddButton } from "./filters-add-menu";
 import {
+  FilterActionsContext,
   FilterChipContext,
   FiltersActionsContext,
   FiltersStateContext,
@@ -53,7 +59,8 @@ import type {
 
 const DEFAULT_LABELS: FiltersLabels = {
   add: "Filter",
-  clear: "Clear",
+  addTooltip: "Add filter",
+  clear: "Clear filters",
   searchFields: "Filter by...",
   searchValues: "Search...",
   noFields: "No matches.",
@@ -69,6 +76,7 @@ const DEFAULT_LABELS: FiltersLabels = {
   back: "Back to fields",
   done: "Done",
   operator: "operator",
+  activeCount: (count) => `${count} active`,
   selectedCount: (count) => `${count} selected`,
   removeFilter: (fieldLabel) => `Remove ${fieldLabel} filter`,
 };
@@ -218,25 +226,29 @@ function FiltersBar({
   const rowRef = useFlowRow(ref);
   return (
     <FiltersOverflowContext value={overflow}>
-      <div
-        ref={rowRef}
-        data-slot="filters"
-        data-overflow={overflow}
-        className={cn(
-          "flex max-w-full items-center gap-2",
-          overflow === "wrap" && "flex-wrap",
-          className,
-        )}
-        {...props}
-      >
-        {children ?? (
-          <>
-            <FilterChips />
-            <FilterAddButton shortcut={shortcut} />
-            <FilterClearButton />
-          </>
-        )}
-      </div>
+      {/* One provider for the bar's tooltips: the registry's snappier delay,
+          and moving between neighbours (the add and clear segments) shows
+          the next at once. */}
+      <TooltipProvider>
+        <div
+          ref={rowRef}
+          data-slot="filters"
+          data-overflow={overflow}
+          className={cn(
+            "flex max-w-full items-center gap-2",
+            overflow === "wrap" && "flex-wrap",
+            className,
+          )}
+          {...props}
+        >
+          {children ?? (
+            <>
+              <FilterChips />
+              <FilterActions shortcut={shortcut} />
+            </>
+          )}
+        </div>
+      </TooltipProvider>
     </FiltersOverflowContext>
   );
 }
@@ -550,23 +562,123 @@ function FilterClearButton({
   );
 }
 
+/**
+ * The add and clear actions as one capsule, built like a chip: the add
+ * button as a segment, then, while filters exist, a hairline and a clear
+ * segment. The clear segment opens in the same beat as the add button's
+ * label folds away.
+ */
+function FilterActions({
+  shortcut,
+  className,
+  ...props
+}: React.ComponentProps<"div"> & {
+  /** Key that opens the add menu from the keyboard (e.g. `"f"`). */
+  shortcut?: string;
+}) {
+  const { size } = useFiltersActions();
+  return (
+    <FilterActionsContext value={true}>
+      <div
+        role="group"
+        data-slot="filter-actions"
+        className={cn(
+          // No gap: a folded clear segment would still get one, leaving the
+          // add segment off-centre. The clear segment brings its own.
+          "bg-card text-foreground inline-flex shrink-0 items-center rounded-lg border bg-clip-padding p-0.5",
+          FILTER_SIZES[size],
+          className,
+        )}
+        {...props}
+      >
+        <FilterAddButton shortcut={shortcut} />
+        <FilterClearSegment />
+      </div>
+    </FilterActionsContext>
+  );
+}
+
+/**
+ * The capsule's clear segment. Always rendered, folded through a grid column
+ * (and inert) while no filters exist, so it opens and closes with the same
+ * CSS-only motion as the add button's label.
+ */
+function FilterClearSegment() {
+  const { clearAll, labels, usedFieldIds } = useFiltersActions();
+  const active = usedFieldIds.size > 0;
+  return (
+    <div
+      data-slot="filter-clear-segment"
+      data-active={active ? "" : undefined}
+      inert={!active}
+      className="grid h-full grid-cols-[minmax(0,0fr)] overflow-hidden opacity-0 transition-[grid-template-columns,opacity] duration-220 ease-[cubic-bezier(0.22,1,0.36,1)] data-active:grid-cols-[minmax(0,1fr)] data-active:opacity-100 motion-reduce:transition-none"
+    >
+      <div className="flex h-full min-w-0 items-center gap-0.5 ps-0.5">
+        {/* Sets clear-all apart from add, its neighbour in the capsule. */}
+        <span
+          aria-hidden
+          className="bg-border my-1.5 w-px shrink-0 self-stretch"
+        />
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              <button
+                type="button"
+                data-slot="filter-clear"
+                aria-label={labels.clear}
+                className={cn(
+                  FILTER_SEGMENT,
+                  FILTER_SEGMENT_INTERACTIVE,
+                  "text-muted-foreground hover:text-foreground aspect-square justify-center px-0 [&_svg]:size-4",
+                )}
+                onClick={(event) => {
+                  // The chips are about to go; keep focus on the bar.
+                  event.currentTarget
+                    .closest('[data-slot="filter-actions"]')
+                    ?.querySelector<HTMLElement>('[data-slot="filter-add"]')
+                    ?.focus();
+                  clearAll();
+                }}
+              />
+            }
+          >
+            <HugeiconsIcon icon={FilterRemoveIcon} strokeWidth={2} />
+          </TooltipTrigger>
+          <TooltipContent>{labels.clear}</TooltipContent>
+        </Tooltip>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The number of active filters as plain muted text ("3 active"), with the
+ * number morphing as it changes. Status rather than an object, so it doesn't
+ * read as one more chip in the row.
+ */
 function FilterActiveCount({
   className,
   ref,
   ...props
-}: React.ComponentProps<typeof Badge>) {
+}: React.ComponentProps<"span">) {
   const { filters } = useFiltersState();
+  const { labels } = useFiltersActions();
   const presenceRef = useFlowPresence(ref);
   return (
-    <Badge
+    <span
       ref={presenceRef}
       data-slot="filter-active-count"
-      variant="neutral"
-      className={cn("tabular-nums", className)}
+      className={cn(
+        "text-muted-foreground shrink-0 text-sm whitespace-nowrap tabular-nums",
+        className,
+      )}
       {...props}
     >
-      <TextMorph value={filters.length} duration={CLICK_MORPH_MS} />
-    </Badge>
+      <TextMorph
+        value={labels.activeCount(filters.length)}
+        duration={CLICK_MORPH_MS}
+      />
+    </span>
   );
 }
 
@@ -581,6 +693,7 @@ export {
   FilterChipValue,
   FilterChipRemove,
   FilterAddButton,
+  FilterActions,
   FilterClearButton,
   FilterActiveCount,
 };

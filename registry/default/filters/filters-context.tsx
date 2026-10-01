@@ -80,6 +80,9 @@ interface FilterChipContextValue {
   size: FilterSize;
 }
 
+/** True inside `FilterActions`, whose add button renders as a segment. */
+const FilterActionsContext = React.createContext(false);
+
 const FilterChipContext = React.createContext<FilterChipContextValue | null>(
   null,
 );
@@ -99,6 +102,7 @@ export {
   useFiltersState,
   useFiltersActions,
   FilterChipContext,
+  FilterActionsContext,
   useFilterChip,
 };
 export type {

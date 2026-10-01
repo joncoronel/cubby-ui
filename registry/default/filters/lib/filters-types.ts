@@ -124,6 +124,8 @@ export interface FilterValue {
 /** Copy overrides for the bar's chrome. */
 export interface FiltersLabels {
   add: string;
+  /** Tooltip on the add button once it has folded down to its icon. */
+  addTooltip: string;
   clear: string;
   searchFields: string;
   searchValues: string;
@@ -146,6 +148,8 @@ export interface FiltersLabels {
   done: string;
   /** Word used in the operator trigger's accessible name. */
   operator: string;
+  /** The active-filter count, e.g. "3 active". */
+  activeCount: (count: number) => string;
   /** Summary for a multiselect value with two or more options picked. */
   selectedCount: (count: number, field: FilterField) => string;
   /** Builds the accessible label for a pill's remove button. */

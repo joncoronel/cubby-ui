@@ -23,6 +23,11 @@ import {
   PopoverTrigger,
 } from "@/registry/default/popover/popover";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/registry/default/tooltip/tooltip";
+import {
   TransitionPanel,
   TransitionPanelView,
 } from "@/registry/default/transition-panel/transition-panel";
@@ -35,11 +40,17 @@ import {
   Search01Icon,
 } from "@hugeicons/core-free-icons";
 
-import { useFiltersActions, useFiltersState } from "./filters-context";
+import {
+  FilterActionsContext,
+  useFiltersActions,
+  useFiltersState,
+} from "./filters-context";
 import { revealInScroller } from "./lib/flow-presence";
 import {
   asStringArray,
   createFilter,
+  FILTER_SEGMENT,
+  FILTER_SEGMENT_INTERACTIVE,
   operatorShapeFor,
   scalarOperatorFor,
   withOption,
@@ -626,6 +637,7 @@ function FilterAddButton({
 }) {
   const { fieldsById, labels, size, usedFieldIds } = useFiltersActions();
   const compact = usedFieldIds.size > 0;
+  const inActions = React.use(FilterActionsContext);
   const [open, setOpen] = React.useState(false);
   const [step, setStep] = React.useState<"fields" | "value">("fields");
   // Kept after stepping back so the value view still has content while it
@@ -701,43 +713,92 @@ function FilterAddButton({
 
   return (
     <Popover open={open} onOpenChange={changeOpen}>
-      <PopoverTrigger
-        render={
-          <Button
-            data-slot="filter-add"
-            data-compact={compact ? "" : undefined}
-            variant="outline"
-            size={size}
-            className={cn(
-              "text-muted-foreground hover:text-foreground data-popup-open:text-foreground gap-0",
-              // Even with the icon's side; the label adds the rest when shown.
-              size === "sm" ? "pe-2" : "pe-2.5",
-              className,
-            )}
-            leadingIcon={<HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />}
-            {...props}
-          />
-        }
-      >
-        {/* The label (and shortcut hint) collapse through a grid column
-            once filters exist, leaving a square "+": the chips beside it
-            already say what it adds. A column animates in every browser,
-            where an auto width doesn't, and the text stays readable to
-            screen readers at zero width. */}
-        <span
-          data-slot="filter-add-label"
-          className="grid grid-cols-[minmax(0,1fr)] overflow-hidden transition-[grid-template-columns,opacity] duration-220 ease-[cubic-bezier(0.22,1,0.36,1)] in-data-compact:grid-cols-[minmax(0,0fr)] in-data-compact:opacity-0 motion-reduce:transition-none"
-        >
-          <span className="flex min-w-0 items-center gap-1.5 overflow-hidden ps-1.5 pe-1">
-            {children ?? labels.add}
-            {shortcut && (
-              <Kbd size="sm" variant="ghost">
-                {shortcut.toUpperCase()}
-              </Kbd>
-            )}
-          </span>
-        </span>
-      </PopoverTrigger>
+      {/* Folded to "+", the button says what it does in a tooltip (with
+          the shortcut, whose hint folds away with the label). Off while
+          the label shows or the menu is open. */}
+      <Tooltip disabled={!compact || open}>
+        <TooltipTrigger
+          render={
+            <PopoverTrigger
+              render={
+                inActions ? (
+                  <button
+                    type="button"
+                    data-slot="filter-add"
+                    data-compact={compact ? "" : undefined}
+                    className={cn(
+                      FILTER_SEGMENT,
+                      FILTER_SEGMENT_INTERACTIVE,
+                      // Padded evenly by the square-icon inset, so folded down to
+                      // the icon the segment is square.
+                      "text-muted-foreground hover:text-foreground data-popup-open:text-foreground gap-0 px-(--seg-icon-x)",
+                      className,
+                    )}
+                    {...(props as React.ComponentProps<"button">)}
+                  />
+                ) : (
+                  <Button
+                    data-slot="filter-add"
+                    data-compact={compact ? "" : undefined}
+                    variant="outline"
+                    size={size}
+                    className={cn(
+                      "text-muted-foreground hover:text-foreground data-popup-open:text-foreground gap-0",
+                      // Even with the icon's side; the label adds the rest when shown.
+                      size === "sm" ? "pe-2" : "pe-2.5",
+                      className,
+                    )}
+                    leadingIcon={
+                      <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />
+                    }
+                    {...props}
+                  />
+                )
+              }
+            >
+              {inActions && (
+                <HugeiconsIcon
+                  icon={PlusSignIcon}
+                  strokeWidth={2}
+                  className="size-4 shrink-0"
+                />
+              )}
+              {/* The label (and shortcut hint) collapse through a grid column
+                  once filters exist, leaving a square "+": the chips beside it
+                  already say what it adds. A column animates in every browser,
+                  where an auto width doesn't, and the text stays readable to
+                  screen readers at zero width. */}
+              <span
+                data-slot="filter-add-label"
+                className="grid grid-cols-[minmax(0,1fr)] overflow-hidden transition-[grid-template-columns,opacity] duration-220 ease-[cubic-bezier(0.22,1,0.36,1)] in-data-compact:grid-cols-[minmax(0,0fr)] in-data-compact:opacity-0 motion-reduce:transition-none"
+              >
+                <span
+                  // 6px from the icon, and 2px more on the text side than the
+                  // icon side: the "+" has ~2.7px of empty space inside its
+                  // box, so this evens the two sides by ink, not by box. Both
+                  // fold away with the label.
+                  className="flex min-w-0 items-center gap-1.5 overflow-hidden ps-1.5 pe-0.5"
+                >
+                  {children ?? labels.add}
+                  {shortcut && (
+                    <Kbd size="sm" variant="ghost">
+                      {shortcut.toUpperCase()}
+                    </Kbd>
+                  )}
+                </span>
+              </span>
+            </PopoverTrigger>
+          }
+        />
+        <TooltipContent className="flex items-center gap-2">
+          {labels.addTooltip}
+          {shortcut && (
+            <Kbd size="sm" variant="ghost">
+              {shortcut.toUpperCase()}
+            </Kbd>
+          )}
+        </TooltipContent>
+      </Tooltip>
       <PopoverPortal keepMounted>
         <PopoverPositioner
           side="bottom"

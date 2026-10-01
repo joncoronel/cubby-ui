@@ -27,16 +27,18 @@ export const FILTER_SEGMENT_INTERACTIVE =
   "cursor-pointer hover:bg-surface-hover active:bg-surface-active data-popup-open:bg-surface-hover";
 
 /**
- * Per-size chip classes. Heights match the `Button` ramp so chips line up with
+ * Per-size chip classes. `--seg-icon-x` is the side padding that makes an
+ * icon-only segment square: (inner height - 16px icon) / 2, where the inner
+ * height is the chip's less its 1px border and 2px inset on each side. Heights match the `Button` ramp so chips line up with
  * the add and clear buttons. Segments read `--seg-x` for their side padding;
  * their radius is the chip's minus its 1px border and 2px inset, so the hover
  * plates stay concentric with the chip. Restyle here rather than per segment.
  */
 export const FILTER_SIZES: Record<FilterSize, string> = {
-  sm: "h-9 sm:h-8 text-sm [--seg-x:0.5rem] [&_[data-slot=filter-chip-field]_svg]:size-3.5",
+  sm: "h-9 sm:h-8 [--seg-icon-x:7px] sm:[--seg-icon-x:5px] text-sm [--seg-x:0.5rem] [&_[data-slot=filter-chip-field]_svg]:size-3.5",
   default:
-    "h-10 sm:h-9 text-sm [--seg-x:0.625rem] [&_[data-slot=filter-chip-field]_svg]:size-3.5",
-  lg: "h-11 sm:h-10 text-base [--seg-x:0.75rem] [&_[data-slot=filter-chip-field]_svg]:size-4",
+    "h-10 sm:h-9 [--seg-icon-x:9px] sm:[--seg-icon-x:7px] text-sm [--seg-x:0.625rem] [&_[data-slot=filter-chip-field]_svg]:size-3.5",
+  lg: "h-11 sm:h-10 [--seg-icon-x:11px] sm:[--seg-icon-x:9px] text-base [--seg-x:0.75rem] [&_[data-slot=filter-chip-field]_svg]:size-4",
 };
 
 // ----- Value coercers ---------------------------------------------------

@@ -85,6 +85,13 @@ export interface CustomFilterField extends FilterFieldBase {
   renderValue: (props: FilterValueControlProps) => React.ReactNode;
   /** Seed value for a fresh filter of this field. */
   defaultValue?: unknown;
+  /**
+   * The value as text, for the chip's accessible name and to tell whether
+   * the filter is complete (an empty string reads as "no value yet"). By
+   * default strings, numbers and booleans read as themselves and anything
+   * else as empty, so give one for object values.
+   */
+  formatValue?: (value: unknown) => string;
 }
 
 export type FilterField =
@@ -146,6 +153,10 @@ export interface FiltersLabels {
   back: string;
   /** Closes the add menu after picking several values of a multiselect. */
   done: string;
+  /** Hint under a number the add menu can't read, e.g. "12a". */
+  invalidNumber: string;
+  /** Announced to screen readers when every filter is cleared. */
+  filtersCleared: string;
   /** Word used in the operator trigger's accessible name. */
   operator: string;
   /** The active-filter count, e.g. "3 active". */
@@ -154,6 +165,10 @@ export interface FiltersLabels {
   selectedCount: (count: number, field: FilterField) => string;
   /** Builds the accessible label for a pill's remove button. */
   removeFilter: (fieldLabel: string) => string;
+  /** Announced when a filter is added; gets e.g. "Status is Done". */
+  filterAdded: (description: string) => string;
+  /** Announced when a filter is removed; gets e.g. "Status is Done". */
+  filterRemoved: (description: string) => string;
 }
 
 export interface FiltersProviderProps {

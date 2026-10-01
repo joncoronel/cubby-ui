@@ -208,7 +208,9 @@ Because `Filters` is controlled, syncing to the query string is just wiring `val
 
 ## Accessibility
 
-The add menu is a `Popover` holding inline `Combobox` lists, and the value lists on chips are `Combobox` popups, so type-to-search, arrow-key navigation, and selection follow the ARIA combobox pattern. The operator menu is a `DropdownMenu` radio group. Each chip is a group labeled with its full filter (for example, "Status is In progress"), and every segment is self-describing: the operator trigger is named "[field] operator: [operator]", value triggers and inputs are named "[field] value: ..." (including string affixes), and the remove control is "Remove [field] filter". Pressing `Backspace` or `Delete` on one of a chip's button segments removes the filter, and focus moves to the neighboring chip (or the add button) instead of dropping to the page.
+The add menu is a `Popover` holding inline `Combobox` lists, and the value lists on chips are `Combobox` popups, so type-to-search, arrow-key navigation, and selection follow the ARIA combobox pattern. The operator menu is a `DropdownMenu` radio group. Each chip is a group labeled with its full filter (for example, "Status is In progress"), and every segment is self-describing: the operator trigger is named "[field] operator: [operator]", value triggers and inputs are named "[field] value: ..." (including string affixes), and the remove control is "Remove [field] filter". Pressing `Backspace` or `Delete` on a chip's remove button removes the filter (on the operator or value it's left alone, since there it reads as editing that part), and focus moves to the neighboring chip (or the add button) instead of dropping to the page.
+
+Adding, removing, and clearing filters are announced through a visually hidden status region in the bar ("Added Status is Done", "Removed Status is Done", "Cleared all filters"), so screen reader users hear the change even though focus lands elsewhere. A number the add menu can't read shows an "Enter a number" hint tied to the input. The shortcut key is exposed as `aria-keyshortcuts` rather than read as part of the button's name.
 
 The Backspace removal and focus rescue rely on the `data-slot` attributes (`filter-chip`, `filter-chip-remove`, `filter-add`); custom chip children should preserve those slots to keep the keyboard behavior.
 
@@ -271,12 +273,14 @@ Filters is a custom component composed from Cubby UI primitives. It has no Base 
   Overrides for the bar's copy: `add`, `addTooltip` (the folded "+" button's
   tooltip), `clear`, `searchFields`, `searchValues`, `noFields`, `noResults`,
   `selectValue`, `enterValue`, `value`, `min`, `max`, `and` (joins a range),
-  `fields` and `values` (add menu group headings), `back`, `done`, `operator`,
-  plus three functions: `activeCount` (the `FilterActiveCount` text),
-  `selectedCount` (the multiselect summary), and `removeFilter` (the remove
-  button's accessible label). Inline objects with string labels are fine (the
-  memo compares values, not identity); hoist the object if you override either
-  function, since an inline arrow is a new function every render.
+  `fields` and `values` (add menu group headings), `back`, `done`,
+  `invalidNumber`, `filtersCleared`, `operator`, plus five functions:
+  `activeCount` (the `FilterActiveCount` text), `selectedCount` (the multiselect
+  summary), `removeFilter` (the remove button's accessible label), and
+  `filterAdded` / `filterRemoved` (the screen reader announcements, given the
+  filter's description). Inline objects with string labels are fine (the memo
+  compares values, not identity); hoist the object if you override any of the
+  functions, since an inline arrow is a new function every render.
 </ApiProp>
 
 </ApiPropsList>

@@ -315,6 +315,15 @@ export function formatFilterValue(
       const numeric = asNumberOrNull(filter.value);
       return numeric === null ? "" : String(numeric);
     }
+    case "custom": {
+      if (field.formatValue) return field.formatValue(filter.value);
+      const value = filter.value;
+      return typeof value === "string" ||
+        typeof value === "number" ||
+        typeof value === "boolean"
+        ? String(value)
+        : "";
+    }
     default:
       return "";
   }

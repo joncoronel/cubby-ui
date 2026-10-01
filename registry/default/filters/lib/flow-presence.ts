@@ -196,6 +196,9 @@ function enterInFlow(el: HTMLElement): void {
   // The first chip into an empty strip also brings the strip's gap in the
   // bar with it (the strip is hidden while empty); ease that in alongside.
   if (scroller) {
+    // A chip back before an emptying strip finished narrowing (undoing a
+    // clear, say) takes the strip as it is now, not where it was heading.
+    cancelAnimations(scroller, SCROLLER_WIDTH_ID);
     holdFade(scroller);
     if (isAlone(el)) animateOuterGap(scroller, "open");
   }
@@ -287,17 +290,27 @@ function animateOuterGap(scroller: HTMLElement, direction: "open" | "close") {
   ).id = SCROLLER_GAP_ID;
 }
 
+function cancelAnimations(el: HTMLElement, id: string) {
+  for (const animation of el.getAnimations()) {
+    if (animation.id === id) animation.cancel();
+  }
+}
+
+/**
+ * Exit batches still settling in each strip. A strip's held animations and
+ * busy flag go only when the last of them ends: one batch's cleanup running
+ * while a later batch still plays would cut that batch's motion short.
+ */
+const scrollerExits = new WeakMap<HTMLElement, number>();
+
 /** Drops a strip's held exit animations once nothing is left leaving it. */
 function settleScroller(scroller: HTMLElement) {
-  if (scroller.querySelector(":scope > [data-flow-ghost]")) return;
-  for (const animation of scroller.getAnimations()) {
-    if (
-      animation.id === SCROLLER_GAP_ID ||
-      animation.id === SCROLLER_WIDTH_ID
-    ) {
-      animation.cancel();
-    }
-  }
+  const left = (scrollerExits.get(scroller) ?? 1) - 1;
+  scrollerExits.set(scroller, left);
+  if (left > 0) return;
+  scroller.removeAttribute(BUSY_ATTR);
+  cancelAnimations(scroller, SCROLLER_GAP_ID);
+  cancelAnimations(scroller, SCROLLER_WIDTH_ID);
 }
 
 interface Exit {
@@ -305,6 +318,9 @@ interface Exit {
   ghost: HTMLElement;
   span: number;
   crosses: boolean;
+  /** Where the element's own entrance had got to, if it was still running. */
+  opacity: number;
+  margin: number;
 }
 
 /** Exits from one row in the same commit, played together. */
@@ -321,6 +337,21 @@ const exitBatches = new Map<
 function exitInFlow(el: HTMLElement): void {
   const parent = el.parentElement;
   if (!parent || prefersReducedMotion()) return;
+  // Leaving mid-entrance, the exit picks up from where the entrance got to
+  // (a copy has none of its animations, so it would start fully open and
+  // opaque, then snap). Read that, then stop the entrance so everything
+  // measured below is the element's own layout.
+  const current = getComputedStyle(el);
+  const opacity = parseFloat(current.opacity);
+  const margin = parseFloat(current.marginInlineEnd) || 0;
+  for (const animation of el.getAnimations()) {
+    if (animation.id !== ANIMATION_ID) continue;
+    animation.onfinish = null;
+    animation.oncancel = null;
+    animation.cancel();
+  }
+  entrancePins.get(el)?.();
+  entrancePins.delete(el);
   const span = flowSpan(el);
   const crosses = crossesRows(el, span);
   const ghost = el.cloneNode(true) as HTMLElement;
@@ -354,7 +385,7 @@ function exitInFlow(el: HTMLElement): void {
   }
   el.before(ghost);
   pendingGhosts.set(el, ghost);
-  batch.exits.push({ el, ghost, span, crosses });
+  batch.exits.push({ el, ghost, span, crosses, opacity, margin });
 }
 
 /** Takes a copy out of the row, over the spot it holds. */
@@ -368,10 +399,10 @@ function liftOut(ghost: HTMLElement) {
   });
 }
 
-function fadeOut({ ghost }: Exit): Animation {
+function fadeOut({ ghost, opacity }: Exit): Animation {
   return ghost.animate(
     {
-      opacity: [1, 0],
+      opacity: [opacity, 0],
     },
     { duration: EXIT_FADE_MS, easing: EASE, fill: "forwards" },
   );
@@ -399,12 +430,21 @@ function playExits(
   const emptying =
     scroller !== null && !Array.from(parent.children).some(isLiveFlowItem);
 
-  // How wide the strip ends up once the copies are gone.
+  // How wide the strip ends up once the copies are gone. An earlier
+  // batch's width motion is stopped first (its current width was taken as
+  // this batch's start), or it would be measured as the destination.
   let settledWidth = width;
   if (scroller) {
-    for (const { ghost } of exits) ghost.style.display = "none";
+    cancelAnimations(scroller, SCROLLER_WIDTH_ID);
+    scrollerExits.set(scroller, (scrollerExits.get(scroller) ?? 0) + 1);
+    // Every copy still in the strip is set aside, an earlier batch's too:
+    // one still collapsing in place would be measured as staying.
+    const ghosts = Array.from(
+      scroller.querySelectorAll<HTMLElement>(":scope > [data-flow-ghost]"),
+    );
+    for (const ghost of ghosts) ghost.style.display = "none";
     settledWidth = emptying ? 0 : widthOf(scroller);
-    for (const { ghost } of exits) ghost.style.display = "";
+    for (const ghost of ghosts) ghost.style.display = "";
   }
 
   if (scroller && overflowed && settledWidth !== width) {
@@ -453,10 +493,7 @@ function playExits(
   // hides when empty doesn't vanish mid-animation.
   setTimeout(() => {
     for (const { ghost } of exits) ghost.remove();
-    if (scroller) {
-      scroller.removeAttribute(BUSY_ATTR);
-      settleScroller(scroller);
-    }
+    if (scroller) settleScroller(scroller);
   }, FLOW_MS);
 }
 
@@ -467,7 +504,7 @@ function playExits(
  * scroller's range: the edge fade would stay on, then the range would snap
  * once the copy went.
  */
-function collapse({ ghost, span }: Exit) {
+function collapse({ ghost, span, margin }: Exit) {
   const styles = getComputedStyle(ghost);
   const box = widthOf(ghost);
   const gap = span - box;
@@ -484,6 +521,8 @@ function collapse({ ghost, span }: Exit) {
         "0px",
       ],
       marginInlineStart: ["0px", `${-Math.max(0, gap)}px`],
+      // Still partly closed if it left mid-entrance; that closes too.
+      marginInlineEnd: [`${margin}px`, "0px"],
     },
     { duration: FLOW_MS, easing: EASE, fill: "forwards" },
   );
@@ -499,23 +538,34 @@ function assignRef<T>(ref: React.Ref<T> | undefined, value: T | null): void {
  * elements that mount after the row's first paint animate in, so a bar that
  * renders with filters already set appears settled. `forwardedRef` is kept in
  * sync, so the element can still take a caller's ref.
+ *
+ * The callback itself never changes: a caller's inline ref (a new function
+ * every render) would otherwise detach and reattach it on every render,
+ * playing the exit and the entrance each time.
  */
 function useFlowPresence<T extends HTMLElement>(
   forwardedRef?: React.Ref<T>,
 ): React.RefCallback<T> {
-  return React.useCallback(
-    (node: T | null) => {
-      assignRef(forwardedRef, node);
-      if (!node) return;
-      const row = node.closest(`[${READY_ATTR}]`);
-      if (row) enterInFlow(node);
-      return () => {
-        assignRef(forwardedRef, null);
-        exitInFlow(node);
-      };
-    },
-    [forwardedRef],
-  );
+  const nodeRef = React.useRef<T | null>(null);
+  const forwarded = React.useRef(forwardedRef);
+  React.useLayoutEffect(() => {
+    if (forwarded.current === forwardedRef) return;
+    assignRef(forwarded.current, null);
+    forwarded.current = forwardedRef;
+    assignRef(forwardedRef, nodeRef.current);
+  });
+  return React.useCallback((node: T | null) => {
+    nodeRef.current = node;
+    assignRef(forwarded.current, node);
+    if (!node) return;
+    const row = node.closest(`[${READY_ATTR}]`);
+    if (row) enterInFlow(node);
+    return () => {
+      nodeRef.current = null;
+      assignRef(forwarded.current, null);
+      exitInFlow(node);
+    };
+  }, []);
 }
 
 /**

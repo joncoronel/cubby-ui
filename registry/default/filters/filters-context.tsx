@@ -80,6 +80,18 @@ interface FilterChipContextValue {
   size: FilterSize;
 }
 
+/**
+ * The latest change to announce to screen readers. `count` changes with
+ * every announcement, so the same words announced twice still register.
+ */
+interface FiltersAnnouncementValue {
+  text: string;
+  count: number;
+}
+
+const FiltersAnnouncementContext =
+  React.createContext<FiltersAnnouncementValue>({ text: "", count: 0 });
+
 /** True inside `FilterActions`, whose add button renders as a segment. */
 const FilterActionsContext = React.createContext(false);
 
@@ -103,6 +115,7 @@ export {
   useFiltersActions,
   FilterChipContext,
   FilterActionsContext,
+  FiltersAnnouncementContext,
   useFilterChip,
 };
 export type {

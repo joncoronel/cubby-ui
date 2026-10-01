@@ -224,7 +224,13 @@ function OptionsValueControl({
           {...triggerProps}
           type="button"
           data-slot="filter-chip-value"
-          aria-label={`${field.label} ${labels.value.toLowerCase()}: ${selected.map((option) => option.label).join(", ") || placeholder}`}
+          // Starts with what it shows ("2 selected"), so voice control can
+          // name it, then says which.
+          aria-label={`${field.label} ${labels.value.toLowerCase()}: ${
+            selected.length > 1
+              ? `${text} (${selected.map((option) => option.label).join(", ")})`
+              : text
+          }`}
           className={cn(
             FILTER_SEGMENT,
             FILTER_SEGMENT_INTERACTIVE,
@@ -311,6 +317,8 @@ const INPUT_SEGMENT = cn(
   "hover:bg-surface-hover focus-visible:bg-surface-hover cursor-text bg-transparent font-medium",
   "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground placeholder:font-normal",
   "field-sizing-content max-w-48 min-w-[1ch] not-supports-[field-sizing:content]:w-28",
+  // 16px on small screens, below which iOS zooms in on a focused input.
+  "max-md:text-base",
 );
 
 /**

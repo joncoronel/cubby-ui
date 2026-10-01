@@ -535,6 +535,8 @@ function InputStep({
   const isNumber = field.type === "number";
   const parsed = isNumber ? Number(text.trim().replace(",", ".")) : NaN;
   const valid = text.trim() !== "" && (!isNumber || Number.isFinite(parsed));
+  const invalid = text.trim() !== "" && !valid;
+  const hintId = React.useId();
 
   const submit = () => {
     if (!valid || !operator) return;
@@ -569,7 +571,8 @@ function InputStep({
         type="text"
         inputMode={isNumber ? "decimal" : undefined}
         aria-label={`${field.label} ${operator?.label ?? ""}`.trim()}
-        aria-invalid={text.trim() !== "" && !valid ? true : undefined}
+        aria-invalid={invalid || undefined}
+        aria-describedby={invalid ? hintId : undefined}
         placeholder={field.placeholder ?? labels.enterValue}
         value={text}
         onChange={(event) => setText(event.target.value)}
@@ -592,6 +595,14 @@ function InputStep({
       )}
       {/* Mounted only once there's something to submit, so it never takes
           room from the placeholder. */}
+      {invalid && (
+        <span
+          id={hintId}
+          className="text-danger-foreground shrink-0 text-xs whitespace-nowrap"
+        >
+          {labels.invalidNumber}
+        </span>
+      )}
       {valid && (
         // The Enter hint doubles as the way to add with a pointer.
         <button
@@ -634,6 +645,7 @@ function FilterAddButton({
   children,
   shortcut,
   className,
+  onBlur,
   ...props
 }: React.ComponentProps<typeof Button> & {
   /** Key that opens this menu from the keyboard (e.g. `"f"`). */
@@ -687,6 +699,9 @@ function FilterAddButton({
       if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) {
         return;
       }
+      // Mid-composition (IME) and held-down repeats aren't presses; and some
+      // synthetic keydowns (autofill) carry no key at all.
+      if (event.isComposing || event.repeat || !event.key) return;
       if (event.key.toLowerCase() !== shortcut.toLowerCase()) return;
       const target = event.target;
       if (target instanceof HTMLElement) {
@@ -752,8 +767,16 @@ function FilterAddButton({
                   <button
                     type="button"
                     data-slot="filter-add"
+                    aria-keyshortcuts={shortcut?.toUpperCase()}
                     data-compact={compact ? "" : undefined}
-                    onBlur={wakeTooltip}
+                    onBlur={(event: React.FocusEvent<HTMLButtonElement>) => {
+                      // Base UI types its button events with extra fields the raw
+                      // segment button's event doesn't carry.
+                      onBlur?.(
+                        event as Parameters<NonNullable<typeof onBlur>>[0],
+                      );
+                      wakeTooltip();
+                    }}
                     className={cn(
                       FILTER_SEGMENT,
                       FILTER_SEGMENT_INTERACTIVE,
@@ -767,8 +790,16 @@ function FilterAddButton({
                 ) : (
                   <Button
                     data-slot="filter-add"
+                    aria-keyshortcuts={shortcut?.toUpperCase()}
                     data-compact={compact ? "" : undefined}
-                    onBlur={wakeTooltip}
+                    onBlur={(event: React.FocusEvent<HTMLButtonElement>) => {
+                      // Base UI types its button events with extra fields the raw
+                      // segment button's event doesn't carry.
+                      onBlur?.(
+                        event as Parameters<NonNullable<typeof onBlur>>[0],
+                      );
+                      wakeTooltip();
+                    }}
                     variant="outline"
                     size={size}
                     className={cn(
@@ -810,7 +841,7 @@ function FilterAddButton({
                 >
                   {children ?? labels.add}
                   {shortcut && (
-                    <Kbd size="sm" variant="ghost">
+                    <Kbd size="sm" variant="ghost" aria-hidden>
                       {shortcut.toUpperCase()}
                     </Kbd>
                   )}

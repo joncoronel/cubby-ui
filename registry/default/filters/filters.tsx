@@ -29,6 +29,7 @@ import {
   FilterActionsContext,
   FilterChipContext,
   FiltersActionsContext,
+  FiltersAnnouncementContext,
   FiltersStateContext,
   useFilterChip,
   useFiltersActions,
@@ -75,10 +76,14 @@ const DEFAULT_LABELS: FiltersLabels = {
   values: "Values",
   back: "Back to fields",
   done: "Done",
+  invalidNumber: "Enter a number",
+  filtersCleared: "Cleared all filters",
   operator: "operator",
   activeCount: (count) => `${count} active`,
   selectedCount: (count) => `${count} selected`,
   removeFilter: (fieldLabel) => `Remove ${fieldLabel} filter`,
+  filterAdded: (description) => `Added ${description}`,
+  filterRemoved: (description) => `Removed ${description}`,
 };
 
 const LABEL_KEYS = Object.keys(DEFAULT_LABELS) as (keyof FiltersLabels)[];
@@ -126,8 +131,8 @@ function FiltersProvider({
     () => ({ ...DEFAULT_LABELS, ...labelsProp }),
     // Value-level deps (constant length — FiltersLabels is a closed shape) so
     // an inline `labels={{ ... }}` object doesn't churn the actions context.
-    // Caveat: `removeFilter` and `selectedCount` are functions, so an inline
-    // arrow for either is a new identity every render and still churns;
+    // Caveat: the function labels (`removeFilter`, `selectedCount`, ...) are
+    // a new identity every render when written inline, which still churns;
     // hoist them in that case.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     LABEL_KEYS.map((key) => labelsProp?.[key]),
@@ -147,17 +152,50 @@ function FiltersProvider({
     [usedFieldsKey],
   );
 
+  // Adds, removes and clears are announced, so a screen reader hears what
+  // happened when focus lands somewhere else (a neighbouring chip, the add
+  // button). Edits aren't: their own controls already say what changed.
+  const [announcement, setAnnouncement] = React.useState({
+    text: "",
+    count: 0,
+  });
+  const announce = React.useCallback(
+    (text: string) =>
+      setAnnouncement((previous) => ({ text, count: previous.count + 1 })),
+    [],
+  );
+  // The filters as of the last commit, for describing the one removed.
+  const filtersRef = React.useRef(filters);
+  React.useLayoutEffect(() => {
+    filtersRef.current = filters;
+  }, [filters]);
+  const describe = React.useCallback(
+    (filter: FilterValue | undefined) => {
+      const field = filter && fieldsById.get(filter.field);
+      return field && filter ? describeFilter(field, filter) : "";
+    },
+    [fieldsById],
+  );
+
   const addFilter = React.useCallback(
     (filter: FilterValue) => {
       setFilters((prev) => [...prev, filter]);
+      announce(labels.filterAdded(describe(filter)));
     },
-    [setFilters],
+    [setFilters, announce, labels, describe],
   );
   const removeFilter = React.useCallback(
-    (id: string) => setFilters((prev) => prev.filter((f) => f.id !== id)),
-    [setFilters],
+    (id: string) => {
+      const removed = filtersRef.current.find((filter) => filter.id === id);
+      setFilters((prev) => prev.filter((f) => f.id !== id));
+      if (removed) announce(labels.filterRemoved(describe(removed)));
+    },
+    [setFilters, announce, labels, describe],
   );
-  const clearAll = React.useCallback(() => setFilters([]), [setFilters]);
+  const clearAll = React.useCallback(() => {
+    setFilters([]);
+    announce(labels.filtersCleared);
+  }, [setFilters, announce, labels]);
   const updateFilter = React.useCallback(
     (id: string, patch: Partial<Omit<FilterValue, "id">>) => {
       setFilters((prev) =>
@@ -204,7 +242,9 @@ function FiltersProvider({
   return (
     <FiltersStateContext.Provider value={stateContext}>
       <FiltersActionsContext.Provider value={actionsContext}>
-        {children}
+        <FiltersAnnouncementContext value={announcement}>
+          {children}
+        </FiltersAnnouncementContext>
       </FiltersActionsContext.Provider>
     </FiltersStateContext.Provider>
   );
@@ -247,9 +287,26 @@ function FiltersBar({
               <FilterActions shortcut={shortcut} />
             </>
           )}
+          <FiltersAnnouncer />
         </div>
       </TooltipProvider>
     </FiltersOverflowContext>
+  );
+}
+
+/**
+ * A visually hidden status region for the bar's announcements. Always
+ * rendered, empty to start, so screen readers are already listening when
+ * the first change lands; a non-breaking space alternates on so a repeat of
+ * the same words still counts as a change.
+ */
+function FiltersAnnouncer() {
+  const { text, count } = React.use(FiltersAnnouncementContext);
+  return (
+    <span role="status" className="sr-only">
+      {text}
+      {count % 2 === 1 ? "\u00a0" : ""}
+    </span>
   );
 }
 
@@ -346,14 +403,6 @@ function FilterChips() {
   );
 }
 
-// Chip segments that are buttons, where Backspace and Delete remove the chip.
-// Inputs and custom controls keep those keys for editing.
-const REMOVABLE_FROM = new Set([
-  "filter-chip-operator",
-  "filter-chip-value",
-  "filter-chip-remove",
-]);
-
 // Memoized: chips subscribe only to the stable actions context and untouched
 // `filter` objects keep their identity across edits, so typing in one chip's
 // value doesn't re-render the others.
@@ -363,6 +412,7 @@ const FilterChip = React.memo(function FilterChip({
   className,
   children,
   ref,
+  onKeyDown,
   ...props
 }: FilterChipProps) {
   const { size, removeFilter, fieldsById } = useFiltersActions();
@@ -398,11 +448,16 @@ const FilterChip = React.memo(function FilterChip({
           className,
         )}
         onKeyDown={(event) => {
+          onKeyDown?.(event);
+          if (event.defaultPrevented) return;
           if (event.key !== "Backspace" && event.key !== "Delete") return;
           const target = event.target;
+          // Only from the remove button. On the operator or a value
+          // (a multiselect's, say) the key reads as editing that part, not
+          // as dropping the whole filter; inputs keep it for typing.
           if (
             !(target instanceof HTMLButtonElement) ||
-            !REMOVABLE_FROM.has(target.dataset.slot ?? "")
+            target.dataset.slot !== "filter-chip-remove"
           ) {
             return;
           }
@@ -534,6 +589,7 @@ function FilterClearButton({
   className,
   children,
   ref,
+  onClick,
   ...props
 }: React.ComponentProps<typeof Button>) {
   const { clearAll, labels, size } = useFiltersActions();
@@ -548,6 +604,8 @@ function FilterClearButton({
       size={size}
       className={cn("text-muted-foreground", className)}
       onClick={(event) => {
+        onClick?.(event);
+        if (event.defaultPrevented) return;
         // The chips are about to go; keep focus on the bar.
         event.currentTarget
           .closest('[data-slot="filters"]')

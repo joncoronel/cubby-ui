@@ -42,6 +42,7 @@ interface ValueControlProps<F extends FilterField> {
   field: F;
   filter: FilterValue;
   onValueChange: (value: unknown) => void;
+  className?: string;
 }
 
 /**
@@ -49,7 +50,15 @@ interface ValueControlProps<F extends FilterField> {
  * or nothing when the operator's shape is `"none"` (`is empty`), so custom
  * chip compositions are correct without re-implementing that rule.
  */
-function FilterChipValue() {
+function FilterChipValue({
+  className,
+}: {
+  /**
+   * Merged into the value segment (each of a range's two segments, for a
+   * `between` operator).
+   */
+  className?: string;
+}) {
   const { field, filter, size } = useFilterChip();
   const { updateFilter } = useFiltersActions();
   const onValueChange = React.useCallback(
@@ -67,6 +76,7 @@ function FilterChipValue() {
           field={field}
           filter={filter}
           onValueChange={onValueChange}
+          className={className}
         />
       );
     case "text":
@@ -75,6 +85,7 @@ function FilterChipValue() {
           field={field}
           filter={filter}
           onValueChange={onValueChange}
+          className={className}
         />
       );
     case "number":
@@ -83,13 +94,14 @@ function FilterChipValue() {
           field={field}
           filter={filter}
           onValueChange={onValueChange}
+          className={className}
         />
       );
     case "custom":
       return (
         <div
           data-slot="filter-chip-value"
-          className="flex h-full items-stretch"
+          className={cn("flex h-full items-stretch", className)}
         >
           <CustomValue
             value={filter.value}
@@ -192,6 +204,7 @@ function OptionsValueControl({
   field,
   filter,
   onValueChange,
+  className,
 }: ValueControlProps<SelectFilterField | MultiSelectFilterField>) {
   const { labels } = useFiltersActions();
   const placeholder = field.placeholder ?? labels.selectValue;
@@ -237,6 +250,7 @@ function OptionsValueControl({
             FILTER_SEGMENT_INTERACTIVE,
             "font-medium",
             selected.length === 0 && "text-muted-foreground font-normal",
+            className,
           )}
         >
           <StackedIcons options={selected} />
@@ -329,10 +343,12 @@ const INPUT_SEGMENT = cn(
 function ValueSegment({
   prefix,
   suffix,
+  className,
   children,
 }: {
   prefix?: React.ReactNode;
   suffix?: React.ReactNode;
+  className?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -342,6 +358,7 @@ function ValueSegment({
         "flex h-full items-center",
         prefix != null && "[&_input]:ps-1",
         suffix != null && "[&_input]:pe-1",
+        className,
       )}
     >
       {prefix != null && (
@@ -363,10 +380,15 @@ function TextValueControl({
   field,
   filter,
   onValueChange,
+  className,
 }: ValueControlProps<TextFilterField>) {
   const { labels } = useFiltersActions();
   return (
-    <ValueSegment prefix={field.prefix} suffix={field.suffix}>
+    <ValueSegment
+      prefix={field.prefix}
+      suffix={field.suffix}
+      className={className}
+    >
       <input
         data-slot="filter-chip-value-input"
         type="text"
@@ -382,6 +404,7 @@ function TextValueControl({
 
 function NumberValueField({
   value,
+  className,
   step,
   placeholder,
   prefix,
@@ -390,6 +413,7 @@ function NumberValueField({
   onValueChange,
 }: {
   value: number | null;
+  className?: string;
   step?: number;
   placeholder?: string;
   prefix?: React.ReactNode;
@@ -402,7 +426,7 @@ function NumberValueField({
   // `allowWheelScrub` lets the wheel adjust the value while the input is
   // focused and hovered (it won't hijack ordinary page scrolling).
   return (
-    <ValueSegment prefix={prefix} suffix={suffix}>
+    <ValueSegment prefix={prefix} suffix={suffix} className={className}>
       <BaseNumberField.Root
         value={value}
         step={step}
@@ -428,6 +452,7 @@ function NumberValueControl({
   field,
   filter,
   onValueChange,
+  className,
 }: ValueControlProps<NumberFilterField>) {
   const { labels } = useFiltersActions();
 
@@ -436,6 +461,7 @@ function NumberValueControl({
     return (
       <>
         <NumberValueField
+          className={className}
           value={range.min}
           step={field.step}
           placeholder={labels.min}
@@ -451,6 +477,7 @@ function NumberValueControl({
           {labels.and}
         </span>
         <NumberValueField
+          className={className}
           value={range.max}
           step={field.step}
           placeholder={labels.max}
@@ -465,6 +492,7 @@ function NumberValueControl({
 
   return (
     <NumberValueField
+      className={className}
       value={asNumberOrNull(filter.value)}
       step={field.step}
       placeholder={field.placeholder ?? labels.value}

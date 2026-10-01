@@ -393,7 +393,12 @@ function scrollSidewaysOnWheel(node: HTMLDivElement | null) {
  * the buttons after it stay in view; the strip hides itself when empty, so
  * it adds no gap to the bar.
  */
-function FilterChips() {
+function FilterChips({
+  className,
+}: {
+  /** Merged into the scroll strip (a scrolling bar only). */
+  className?: string;
+}) {
   const { filters } = useFiltersState();
   const { fieldsById } = useFiltersActions();
   const overflow = React.use(FiltersOverflowContext);
@@ -417,7 +422,10 @@ function FilterChips() {
       // The 2px inset keeps chip edges off the strip's clip line, where a
       // fractional pixel ratio would shave their border; the matching
       // negative margin keeps the bar's layout unchanged.
-      className="-m-0.5 flex size-auto min-w-0 items-center gap-2 overflow-y-hidden rounded-none p-0.5 *:max-w-none empty:not-data-flow-busy:hidden"
+      className={cn(
+        "-m-0.5 flex size-auto min-w-0 items-center gap-2 overflow-y-hidden rounded-none p-0.5 *:max-w-none empty:not-data-flow-busy:hidden",
+        className,
+      )}
     >
       {chips}
     </ScrollArea>
@@ -457,6 +465,7 @@ const FilterChip = React.memo(function FilterChip({
         ref={presenceRef}
         role="group"
         data-slot="filter-chip"
+        data-size={size}
         data-filter-id={filter.id}
         data-incomplete={incomplete ? "" : undefined}
         aria-label={describeFilter(field, filter, labels.operators)}
@@ -653,27 +662,26 @@ function FilterActions({
 }) {
   const { size } = useFiltersActions();
   return (
-    <>
-      <div
-        role="group"
-        data-slot="filter-actions"
-        className={cn(
-          // No gap: a folded clear segment would still get one, leaving the
-          // add segment off-centre. The clear segment brings its own.
-          "bg-card text-foreground inline-flex shrink-0 items-center rounded-lg border bg-clip-padding p-0.5",
-          FILTER_SIZES[size],
-          className,
-        )}
-        {...props}
-      >
-        {children ?? (
-          <>
-            <FilterActionsAdd shortcut={shortcut} />
-            <FilterActionsClear />
-          </>
-        )}
-      </div>
-    </>
+    <div
+      role="group"
+      data-slot="filter-actions"
+      data-size={size}
+      className={cn(
+        // No gap: a folded clear segment would still get one, leaving the
+        // add segment off-centre. The clear segment brings its own.
+        "bg-card text-foreground inline-flex shrink-0 items-center rounded-lg border bg-clip-padding p-0.5",
+        FILTER_SIZES[size],
+        className,
+      )}
+      {...props}
+    >
+      {children ?? (
+        <>
+          <FilterActionsAdd shortcut={shortcut} />
+          <FilterActionsClear />
+        </>
+      )}
+    </div>
   );
 }
 
@@ -683,7 +691,12 @@ function FilterActions({
  * (and inert) while no filters exist, so it opens and closes with the same
  * CSS-only motion as the add button's label.
  */
-function FilterActionsClear() {
+function FilterActionsClear({
+  className,
+  children,
+  onClick,
+  ...props
+}: React.ComponentProps<"button">) {
   const { clearAll, labels, usedFieldIds } = useFiltersActions();
   const active = usedFieldIds.size > 0;
   return (
@@ -710,12 +723,20 @@ function FilterActionsClear() {
                   FILTER_SEGMENT,
                   FILTER_SEGMENT_INTERACTIVE,
                   "text-muted-foreground hover:text-foreground aspect-square justify-center px-0 [&_svg]:size-4",
+                  className,
                 )}
-                onClick={(event) => clearFromBar(event.currentTarget, clearAll)}
+                {...props}
+                onClick={(event) => {
+                  onClick?.(event);
+                  if (event.defaultPrevented) return;
+                  clearFromBar(event.currentTarget, clearAll);
+                }}
               />
             }
           >
-            <HugeiconsIcon icon={FilterRemoveIcon} strokeWidth={2} />
+            {children ?? (
+              <HugeiconsIcon icon={FilterRemoveIcon} strokeWidth={2} />
+            )}
           </TooltipTrigger>
           <TooltipContent>{labels.clear}</TooltipContent>
         </Tooltip>

@@ -15,6 +15,7 @@ import {
   ComboboxList,
 } from "@/registry/default/combobox/combobox";
 import { Kbd } from "@/registry/default/kbd/kbd";
+import { useControllableState } from "@/registry/default/hooks/use-controllable-state";
 import {
   Popover,
   PopoverPopup,
@@ -640,10 +641,17 @@ function ValueStep(props: ValueStepProps<FilterField>) {
 const CHIP_FOCUS_TARGET =
   '[data-slot="filter-chip-value"]:is(button, input), [data-slot="filter-chip-value"] :is(button, input, select, textarea, [tabindex]:not([tabindex="-1"]))';
 
-type AddMenuProps = React.ComponentProps<typeof Button> & {
+interface AddMenuOptions {
   /** Key that opens this menu from the keyboard (e.g. `"f"`). */
   shortcut?: string;
-};
+  /** Whether the menu is open (controlled). */
+  open?: boolean;
+  /** Whether the menu starts open (uncontrolled). */
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+type AddMenuProps = React.ComponentProps<typeof Button> & AddMenuOptions;
 
 /**
  * The add button and its menu. `kind="segment"` renders the trigger as a segment of
@@ -655,12 +663,19 @@ function AddMenu({
   className,
   onBlur,
   kind,
+  open: openProp,
+  defaultOpen = false,
+  onOpenChange,
   ...props
 }: AddMenuProps & { kind: "button" | "segment" }) {
   const { fieldsById, labels, size, usedFieldIds } = useFiltersActions();
   const compact = usedFieldIds.size > 0;
   const inActions = kind === "segment";
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useControllableState({
+    value: openProp,
+    defaultValue: defaultOpen,
+    onValueChange: onOpenChange,
+  });
   const [step, setStep] = React.useState<"fields" | "value">("fields");
   // Kept after stepping back so the value view still has content while it
   // slides out; cleared once the menu has closed.
@@ -684,16 +699,24 @@ function AddMenu({
   // hovers (a deliberate ask) still open it.
   const [quietTooltip, setQuietTooltip] = React.useState(false);
   const [tooltipOpen, setTooltipOpen] = React.useState(false);
-  const changeOpen = React.useCallback((nextOpen: boolean) => {
-    if (nextOpen) {
+  // Work on each open and close runs off the open state itself, so it
+  // happens however the change came: a click, the shortcut, a pick, or a
+  // controlled `open` from outside.
+  const [shownOpen, setShownOpen] = React.useState(open);
+  if (open !== shownOpen) {
+    setShownOpen(open);
+    if (open) {
       setStep("fields");
       setFieldId(null);
       setSession((count) => count + 1);
     } else {
       setQuietTooltip(true);
     }
-    setOpen(nextOpen);
-  }, []);
+  }
+  const changeOpen = React.useCallback(
+    (nextOpen: boolean) => setOpen(nextOpen),
+    [setOpen],
+  );
   const wakeTooltip = React.useCallback(() => setQuietTooltip(false), []);
 
   React.useEffect(() => {
@@ -939,9 +962,10 @@ function FilterAddButton(props: AddMenuProps) {
 
 /** The add segment of a `FilterActions` capsule, for composing your own. */
 function FilterActionsAdd(
-  props: Pick<AddMenuProps, "shortcut" | "className" | "children">,
+  props: React.ComponentProps<"button"> & AddMenuOptions,
 ) {
-  return <AddMenu {...props} kind="segment" />;
+  // The segment renders a plain button; its props pass straight through.
+  return <AddMenu {...(props as AddMenuProps)} kind="segment" />;
 }
 
 export {

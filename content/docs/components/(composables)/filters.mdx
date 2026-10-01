@@ -365,11 +365,55 @@ The add menu: a trigger and a popup that steps from the field list to the chosen
   the trigger.
 </ApiProp>
 
+<ApiProp name="open" fullType="boolean">
+  Whether the menu is open, for controlling it. Pair with `onOpenChange`.
+</ApiProp>
+
+<ApiProp name="defaultOpen" fullType="boolean" defaultValue="false">
+  Whether the menu starts open, uncontrolled.
+</ApiProp>
+
+<ApiProp name="onOpenChange" fullType="(open: boolean) => void">
+  Called when the menu opens or closes, including from a pick, the shortcut, or
+  Escape.
+</ApiProp>
+
 </ApiPropsList>
+
+Controlling the menu opens it from anywhere, for example an empty state's call to action. `FilterActionsAdd` takes the same props:
+
+```tsx
+const [adding, setAdding] = React.useState(false);
+
+<FiltersProvider fields={fields} value={value} onValueChange={setValue}>
+  <FiltersBar>
+    <FilterChips />
+    <FilterActions>
+      <FilterActionsAdd open={adding} onOpenChange={setAdding} />
+      <FilterActionsClear />
+    </FilterActions>
+  </FiltersBar>
+  {value.length === 0 && (
+    <Button onClick={() => setAdding(true)}>Add your first filter</Button>
+  )}
+</FiltersProvider>;
+```
+
+#### FilterActionsAdd / FilterActionsClear
+
+The two segments of the `FilterActions` capsule, for composing it yourself. `FilterActionsAdd` takes the same props as `FilterAddButton` (`shortcut`, `open`, `defaultOpen`, `onOpenChange`) plus button props. `FilterActionsClear` takes button props; its `onClick` runs first and can call `preventDefault()` to keep the filters, and `children` replaces its icon.
+
+#### FilterChipField / FilterChipOperator / FilterChipValue / FilterChipRemove
+
+The segments of a chip, for composing `FilterChip` children. Each takes `className`; the field, operator, and remove segments also take their element's props.
+
+- `FilterChipOperator` opens the operator menu and names itself "[field] operator: [operator]".
+- `FilterChipValue` renders the control for the field's type, and nothing for a valueless operator (`is empty`). Its `className` goes on the value segment (on each of a range's two).
+- `FilterChipRemove` removes the filter and moves focus to a neighbouring chip; its `onClick` runs first and can call `preventDefault()` to keep it.
 
 ### Hooks
 
-`useFilters()` exposes the bar's state and actions (`filters`, `fieldsById`, `addFilter`, `updateFilter`, `removeFilter`, `clearAll`) to anything rendered inside a `FiltersProvider`. It re-renders on every filter edit; performance-sensitive leaves can subscribe to `useFiltersState()` (just `filters`) or `useFiltersActions()` (config and actions, stable while a value is being typed) instead. `useFilterChip()` exposes the current chip's `filter`, `field`, and `size` inside a `FilterChip`.
+`useFilters()` exposes the bar's state and actions (`filters`, `fieldsById`, `addFilter`, `updateFilter`, `removeFilter`, `clearAll`) to anything rendered inside a `FiltersProvider`. It re-renders on every filter edit; performance-sensitive leaves can subscribe to `useFiltersState()` (just `filters`) or `useFiltersActions()` instead. The latter holds the config and actions, stable while a value is being typed: `fields`, `fieldsById`, `labels`, `size`, `usedFieldIds`, `allowDuplicateFields`, `addFilter`, `updateFilter`, `removeFilter`, `clearAll`, and `getFilters()` (the current filters, read on demand from event handlers without subscribing). `useFilterChip()` exposes the current chip's `filter`, `field`, and `size` inside a `FilterChip`.
 
 State merging uses [useControllableState](/docs/hooks/use-controllable-state), installed as a shared hook.
 

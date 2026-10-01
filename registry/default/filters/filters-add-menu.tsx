@@ -174,7 +174,11 @@ function FieldStep({
   inputRef,
   onDone,
   onDrill,
-}: StepProps & { onDrill: (fieldId: string) => void }) {
+  findChip,
+}: StepProps & {
+  onDrill: (fieldId: string) => void;
+  findChip: (filterId: string) => HTMLElement | null;
+}) {
   const {
     fields,
     labels,
@@ -249,9 +253,7 @@ function FieldStep({
         ),
       });
       requestAnimationFrame(() => {
-        const chip = document.querySelector<HTMLElement>(
-          `[data-slot="filter-chip"][data-filter-id="${CSS.escape(existing.id)}"]`,
-        );
+        const chip = findChip(existing.id);
         if (chip) revealInScroller(chip);
       });
     } else {
@@ -496,6 +498,8 @@ function MultiSelectStep({
   );
 }
 
+const DECIMAL = /^[+-]?(\d+\.?\d*|\.\d+)$/;
+
 function InputStep({
   field,
   inputRef,
@@ -506,7 +510,9 @@ function InputStep({
   const [text, setText] = React.useState("");
   const operator = scalarOperatorFor(field);
   const isNumber = field.type === "number";
-  const parsed = isNumber ? Number(text.trim().replace(",", ".")) : NaN;
+  const decimal = text.trim().replace(",", ".");
+  // Plain decimals only: `Number` would also take "0x10" or "1e3".
+  const parsed = DECIMAL.test(decimal) ? Number(decimal) : NaN;
   const valid = text.trim() !== "" && (!isNumber || Number.isFinite(parsed));
   const invalid = text.trim() !== "" && !valid;
   const hintId = React.useId();
@@ -653,6 +659,15 @@ function AddMenu({
   const fieldsInputRef = React.useRef<HTMLInputElement | null>(null);
   const valueInputRef = React.useRef<HTMLInputElement | null>(null);
   const focusFilterIdRef = React.useRef<string | null>(null);
+  const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+  // Scoped to this bar: two bars can show the same filters.
+  const findChip = React.useCallback((filterId: string) => {
+    const scope =
+      triggerRef.current?.closest('[data-slot="filters"]') ?? document;
+    return scope.querySelector<HTMLElement>(
+      `[data-slot="filter-chip"][data-filter-id="${CSS.escape(filterId)}"]`,
+    );
+  }, []);
 
   // `keepMounted` keeps teardown off the main thread while a new chip animates
   // in; the panel is remounted on open instead (a reshown hidden panel would
@@ -745,6 +760,7 @@ function AddMenu({
         <TooltipTrigger
           render={
             <PopoverTrigger
+              ref={triggerRef}
               render={
                 inActions ? (
                   <button
@@ -851,11 +867,9 @@ function AddMenu({
               const id = focusFilterIdRef.current;
               focusFilterIdRef.current = null;
               if (!id) return true;
-              const chip = document.querySelector(
-                `[data-slot="filter-chip"][data-filter-id="${CSS.escape(id)}"]`,
-              );
               return (
-                chip?.querySelector<HTMLElement>(CHIP_FOCUS_TARGET) ?? true
+                findChip(id)?.querySelector<HTMLElement>(CHIP_FOCUS_TARGET) ??
+                true
               );
             }}
             className={cn(
@@ -880,6 +894,7 @@ function AddMenu({
                   inputRef={fieldsInputRef}
                   onDone={onDone}
                   onDrill={onDrill}
+                  findChip={findChip}
                 />
               </TransitionPanelView>
               <TransitionPanelView viewKey="value" initialFocus={valueInputRef}>

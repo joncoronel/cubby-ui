@@ -178,6 +178,8 @@ Wire `value` and `onValueChange` to [`nuqs`](https://nuqs.dev) to keep the filte
 `onValueChange` fires on every keystroke, so send only complete filters and let typing settle before you fetch.
 
 ```tsx
+import { isFilterComplete } from "@/components/ui/cubby-ui/filters/filters";
+
 const query = React.useDeferredValue(
   value.filter((filter) => {
     const field = fields.find((f) => f.id === filter.field);

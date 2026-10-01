@@ -7,8 +7,11 @@ import * as React from "react";
 // wraps, retargets and stays correct with any number of siblings, with no
 // measuring of the siblings themselves.
 
-const ENTER_MS = 220;
-const EXIT_MS = 150;
+// Space opens and closes on the same clock, so a chip's neighbours move at
+// one pace both ways. Only the chip's own fade on the way out is quicker,
+// which keeps removal feeling immediate.
+const FLOW_MS = 220;
+const EXIT_FADE_MS = 130;
 const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
 const ANIMATION_ID = "filters-flow";
 
@@ -17,6 +20,28 @@ const READY_ATTR = "data-flow-ready";
 
 function prefersReducedMotion(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+/**
+ * Copies made by `exitInFlow` whose element might still come back: Strict
+ * Mode rehearses an unmount and remount in one go, and the copy has to be
+ * gone before the remount measures the row.
+ */
+const pendingGhosts = new WeakMap<HTMLElement, HTMLElement>();
+
+/**
+ * Holds the element at its current width. Chips cap themselves at the row's
+ * width (`max-w-full`), and a row that sizes to its content (centred in a
+ * preview, say) narrows as space closes, which would shrink the chip in turn
+ * and throw off a margin measured from its full width. Returns the undo.
+ */
+function pinWidth(el: HTMLElement): () => void {
+  const previous = el.style.maxWidth;
+  const pinned = `${el.offsetWidth}px`;
+  el.style.maxWidth = pinned;
+  return () => {
+    if (el.style.maxWidth === pinned) el.style.maxWidth = previous;
+  };
 }
 
 /** The width the element takes in the row, its trailing gap included. */
@@ -50,10 +75,12 @@ function trailingFlow(el: HTMLElement): HTMLElement[] {
 function crossesRows(el: HTMLElement, span: number): boolean {
   const nodes = trailingFlow(el);
   const rows = nodes.map((node) => node.offsetTop);
+  const unpin = pinWidth(el);
   const previous = el.style.marginInlineEnd;
   el.style.marginInlineEnd = `${-span}px`;
   const moved = nodes.some((node, index) => node.offsetTop !== rows[index]);
   el.style.marginInlineEnd = previous;
+  unpin();
   return moved;
 }
 
@@ -61,10 +88,25 @@ function startOrigin(el: HTMLElement): string {
   return getComputedStyle(el).direction === "rtl" ? "100% 50%" : "0% 50%";
 }
 
+/**
+ * The undo for an entrance's width pin. Released synchronously when a new
+ * entrance replaces a running one: an animation's cancel event fires later,
+ * after the replacement has pinned the same width, and would take that pin
+ * off with it.
+ */
+const entrancePins = new WeakMap<HTMLElement, () => void>();
+
 function enterInFlow(el: HTMLElement): void {
+  pendingGhosts.get(el)?.remove();
+  pendingGhosts.delete(el);
   for (const animation of el.getAnimations()) {
-    if (animation.id === ANIMATION_ID) animation.cancel();
+    if (animation.id !== ANIMATION_ID) continue;
+    animation.onfinish = null;
+    animation.oncancel = null;
+    animation.cancel();
   }
+  entrancePins.get(el)?.();
+  entrancePins.delete(el);
   if (prefersReducedMotion()) {
     const fade = el.animate({ opacity: [0, 1] }, { duration: 150 });
     fade.id = ANIMATION_ID;
@@ -72,6 +114,8 @@ function enterInFlow(el: HTMLElement): void {
   }
   const fullSpan = flowSpan(el);
   const span = crossesRows(el, fullSpan) ? 0 : fullSpan;
+  const unpin = pinWidth(el);
+  entrancePins.set(el, unpin);
   const animation = el.animate(
     [
       {
@@ -94,9 +138,13 @@ function enterInFlow(el: HTMLElement): void {
         transformOrigin: startOrigin(el),
       },
     ],
-    { duration: ENTER_MS, easing: EASE },
+    { duration: FLOW_MS, easing: EASE },
   );
   animation.id = ANIMATION_ID;
+  animation.onfinish = animation.oncancel = () => {
+    unpin();
+    if (entrancePins.get(el) === unpin) entrancePins.delete(el);
+  };
 }
 
 /**
@@ -119,45 +167,48 @@ function exitInFlow(el: HTMLElement): void {
   ghost.setAttribute("data-slot", `${el.dataset.slot ?? "flow"}-ghost`);
   ghost.setAttribute("aria-hidden", "true");
   ghost.inert = true;
-  ghost.style.pointerEvents = "none";
+  // Fixed at the size it left at, for the reason `pinWidth` gives.
+  Object.assign(ghost.style, {
+    pointerEvents: "none",
+    width: `${offsetWidth}px`,
+    maxWidth: "none",
+  });
   if (!inFlow) {
     // Out of the row, over the spot it held, while the rows reflow at once.
     Object.assign(ghost.style, {
       position: "absolute",
       left: `${offsetLeft}px`,
       top: `${offsetTop}px`,
-      width: `${offsetWidth}px`,
       margin: "0px",
     });
   }
   el.before(ghost);
+  pendingGhosts.set(el, ghost);
 
   queueMicrotask(() => {
+    if (pendingGhosts.get(el) === ghost) pendingGhosts.delete(el);
     if (el.isConnected || !parent.isConnected) {
       ghost.remove();
       return;
     }
-    const animation = ghost.animate(
-      [
-        {
-          marginInlineEnd: "0px",
-          opacity: 1,
-          scale: 1,
-          filter: "blur(0px)",
-          transformOrigin: origin,
-        },
-        {
-          marginInlineEnd: inFlow ? `${-span}px` : "0px",
-          opacity: 0,
-          scale: 0.96,
-          filter: "blur(2px)",
-          transformOrigin: origin,
-        },
-      ],
-      { duration: EXIT_MS, easing: EASE, fill: "forwards" },
+    if (inFlow) {
+      ghost.animate(
+        { marginInlineEnd: ["0px", `${-span}px`] },
+        { duration: FLOW_MS, easing: EASE, fill: "forwards" },
+      );
+    }
+    ghost.animate(
+      {
+        opacity: [1, 0],
+        scale: [1, 0.96],
+        filter: ["blur(0px)", "blur(2px)"],
+        transformOrigin: [origin, origin],
+      },
+      { duration: EXIT_FADE_MS, easing: EASE, fill: "forwards" },
     );
-    animation.onfinish = () => ghost.remove();
-    animation.oncancel = () => ghost.remove();
+    Promise.all(ghost.getAnimations().map((animation) => animation.finished))
+      .catch(() => undefined)
+      .then(() => ghost.remove());
   });
 }
 

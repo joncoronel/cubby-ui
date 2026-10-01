@@ -74,7 +74,6 @@ interface AddMenuGroup {
   items: AddMenuItem[];
 }
 
-/** Small muted wrapper that sizes field icons to the surrounding text. */
 function FieldIcon({
   className,
   children,
@@ -105,20 +104,15 @@ function OptionContent({ option }: { option: FilterOption }) {
   );
 }
 
-/** Whether picking this field opens a value step rather than adding at once. */
 function hasValueStep(field: FilterField): boolean {
   return field.type !== "custom" && scalarOperatorFor(field) !== undefined;
 }
 
-// The search row that heads every step: borderless, ruled off from the list
-// by a hairline, so the popup reads as one surface rather than a field
-// floating on a card.
 const STEP_ROW =
   "h-11 gap-2 rounded-none border-0 border-b sm:h-11 bg-transparent px-3 outline-0 focus-within:outline-0 focus-within:outline-offset-0 dark:bg-transparent";
 
-// Lists give up height before the rows around them do, so a menu squeezed
-// against the viewport edge keeps its search row and footer in view.
-// `--available-height` comes from the positioner.
+// Lists shrink first, so a menu squeezed against the viewport edge keeps its
+// search row and footer visible. `--available-height` comes from the positioner.
 const LIST_HEIGHT = "max-h-[min(18rem,calc(var(--available-height)-2.75rem))]";
 const LIST_WITH_FOOTER_HEIGHT =
   "max-h-[min(16rem,calc(var(--available-height)-5.25rem))]";
@@ -133,10 +127,7 @@ function SearchIcon() {
   );
 }
 
-/**
- * The drilled-in field, pinned to the start of the step's input. It doubles
- * as the way back, and Backspace in the empty input goes back too.
- */
+/** The drilled-in field at the start of the step's input; clicking it goes back. */
 function ScopeToken({
   field,
   onBack,
@@ -179,8 +170,6 @@ interface StepProps {
   onDone: (focusFilterId?: string) => void;
 }
 
-// ----- Step 1: fields (and, while searching, values) ---------------------
-
 function FieldStep({
   inputRef,
   onDone,
@@ -195,8 +184,8 @@ function FieldStep({
     updateFilter,
     getFilters,
   } = useFiltersActions();
-  // Read on demand, not subscribed: the menu stays mounted while closed,
-  // and a subscription would re-render it on every keystroke in any chip.
+  // Filters are read via `getFilters`, not subscribed: the menu stays mounted
+  // while closed and would otherwise re-render on every chip keystroke.
   const [query, setQuery] = React.useState("");
 
   const fieldItems = React.useMemo<AddMenuItem[]>(
@@ -219,8 +208,7 @@ function FieldStep({
       ),
     [fields],
   );
-  // Values join the list only once there's a query: browsing shows fields,
-  // searching reaches straight through to the value you meant.
+  // Values join the list only while searching.
   const searching = query.trim() !== "";
   const groups = React.useMemo<AddMenuGroup[]>(
     () =>
@@ -246,8 +234,7 @@ function FieldStep({
   const pickOption = (field: OptionsField, option: FilterOption) => {
     const scalar = scalarOperatorFor(field);
     if (!scalar) return;
-    // With one filter per field, a value found by search joins the filter
-    // that's already there instead of being refused.
+    // Without duplicates, a searched value joins the field's existing filter.
     const existing = allowDuplicateFields
       ? undefined
       : getFilters().find((filter) => filter.field === field.id);
@@ -261,7 +248,6 @@ function FieldStep({
           option.value,
         ),
       });
-      // It may be scrolled out of a crowded bar; bring it back into view.
       requestAnimationFrame(() => {
         const chip = document.querySelector<HTMLElement>(
           `[data-slot="filter-chip"][data-filter-id="${CSS.escape(existing.id)}"]`,
@@ -298,9 +284,7 @@ function FieldStep({
       }
       isItemEqualToValue={(a, b) => a.key === b.key}
     >
-      {/* A flex column, as inside a Combobox popup: it lets the list's
-          scroll area resolve its height, so the step measures exactly its
-          rows. */}
+      {/* Flex column so the list's scroll area can resolve its height. */}
       <div className="flex flex-col">
         <ComboboxInput
           ref={inputRef}
@@ -368,8 +352,6 @@ function FieldStep({
   );
 }
 
-// ----- Step 2: the drilled-in field's value ------------------------------
-
 interface ValueStepProps<F extends FilterField> extends StepProps {
   field: F;
   onBack: () => void;
@@ -422,11 +404,8 @@ function SelectStep({
   );
 }
 
-/**
- * Multiselect values toggle in place. The first pick adds the filter and
- * later picks edit it, so the chip grows in the bar behind the menu as you
- * choose; clearing every pick takes the chip back out.
- */
+// The first pick adds the filter and later picks edit it live; clearing every
+// pick removes it again.
 function MultiSelectStep({
   field,
   inputRef,
@@ -517,10 +496,6 @@ function MultiSelectStep({
   );
 }
 
-/**
- * Text and number fields take their value in the step's own row: the field,
- * its operator, then the input, read left to right as the chip will.
- */
 function InputStep({
   field,
   inputRef,
@@ -550,8 +525,7 @@ function InputStep({
   return (
     <div
       data-slot="filter-add-input"
-      // The whole step is this one row, so it drops the divider that rules
-      // the other steps' search off from their lists.
+      // A single row, so no divider under it.
       className={cn("flex w-full items-center text-sm", STEP_ROW, "border-b-0")}
     >
       <ScopeToken field={field} onBack={onBack} />
@@ -561,7 +535,7 @@ function InputStep({
         </span>
       )}
       {typeof field.prefix === "string" && (
-        // The row's 8px gap less 4px: the same affix spacing as the chip.
+        // Pulls in 4px to match the chip's affix spacing.
         <span className="text-muted-foreground -me-1 shrink-0">
           {field.prefix}
         </span>
@@ -593,8 +567,6 @@ function InputStep({
       {typeof field.suffix === "string" && (
         <span className="text-muted-foreground shrink-0">{field.suffix}</span>
       )}
-      {/* Mounted only once there's something to submit, so it never takes
-          room from the placeholder. */}
       {invalid && (
         <span
           id={hintId}
@@ -604,7 +576,7 @@ function InputStep({
         </span>
       )}
       {valid && (
-        // The Enter hint doubles as the way to add with a pointer.
+        // The Enter hint doubles as the pointer submit.
         <button
           type="button"
           aria-label={labels.addTooltip}
@@ -635,9 +607,7 @@ function ValueStep(props: ValueStepProps<FilterField>) {
   }
 }
 
-// ----- The button and its menu -------------------------------------------
-
-/** Matches the ready-made value control of a chip, for handing focus to it. */
+// A chip's value control, focused after the menu adds that filter.
 const CHIP_FOCUS_TARGET =
   '[data-slot="filter-chip-value"]:is(button, input), [data-slot="filter-chip-value"] :is(button, input, select, textarea, [tabindex]:not([tabindex="-1"]))';
 
@@ -653,10 +623,7 @@ interface AddMenuOptions {
 
 type AddMenuProps = React.ComponentProps<typeof Button> & AddMenuOptions;
 
-/**
- * The add button and its menu. `kind="segment"` renders the trigger as a segment of
- * the `FilterActions` capsule; `button` as a standalone outline button.
- */
+/** `kind="segment"` renders inside the `FilterActions` capsule; `button` standalone. */
 function AddMenu({
   children,
   shortcut,
@@ -677,31 +644,24 @@ function AddMenu({
     onValueChange: onOpenChange,
   });
   const [step, setStep] = React.useState<"fields" | "value">("fields");
-  // Kept after stepping back so the value view still has content while it
-  // slides out; cleared once the menu has closed.
+  // Kept after stepping back so the value view has content while sliding out.
   const [fieldId, setFieldId] = React.useState<string | null>(null);
   const field = fieldId ? fieldsById.get(fieldId) : undefined;
-  // Bumped on each open, which remounts the menu's panel.
+  // Bumped on each open to remount the panel.
   const [session, setSession] = React.useState(0);
 
   const fieldsInputRef = React.useRef<HTMLInputElement | null>(null);
   const valueInputRef = React.useRef<HTMLInputElement | null>(null);
   const focusFilterIdRef = React.useRef<string | null>(null);
 
-  // The menu stays mounted while closed (`keepMounted`), so closing it is
-  // only its fade: no teardown lands on the main thread while a chip the
-  // pick just added animates in. Its contents are rebuilt as it opens
-  // instead (a fresh panel, back on an empty field list). A fresh panel also
-  // skips its own entrance, which a hidden one shown again would replay.
-  // Closing hands focus back to the button, and a tooltip opening on that
-  // restored focus would answer a question nobody asked. Until focus moves
-  // off the button, the tooltip turns down opens that come from focus;
-  // hovers (a deliberate ask) still open it.
+  // `keepMounted` keeps teardown off the main thread while a new chip animates
+  // in; the panel is remounted on open instead (a reshown hidden panel would
+  // replay its @starting-style entrance).
+  // Closing restores focus to the button; until focus leaves it, focus-driven
+  // tooltip opens are refused (hover still opens it).
   const [quietTooltip, setQuietTooltip] = React.useState(false);
   const [tooltipOpen, setTooltipOpen] = React.useState(false);
-  // Work on each open and close runs off the open state itself, so it
-  // happens however the change came: a click, the shortcut, a pick, or a
-  // controlled `open` from outside.
+  // Derived from `open` itself so it also runs for a controlled `open`.
   const [shownOpen, setShownOpen] = React.useState(open);
   if (open !== shownOpen) {
     setShownOpen(open);
@@ -722,14 +682,12 @@ function AddMenu({
   React.useEffect(() => {
     if (!shortcut) return;
     const handleKeyDown = (event: KeyboardEvent) => {
-      // `defaultPrevented` also dedupes multiple Filters instances: the first
-      // listener to accept the key prevents it for the rest.
+      // Also dedupes multiple Filters instances: the first to accept prevents it.
       if (event.defaultPrevented) return;
       if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) {
         return;
       }
-      // Mid-composition (IME) and held-down repeats aren't presses; and some
-      // synthetic keydowns (autofill) carry no key at all.
+      // Skip IME composition, key repeat, and keyless synthetic keydowns (autofill).
       if (event.isComposing || event.repeat || !event.key) return;
       if (event.key.toLowerCase() !== shortcut.toLowerCase()) return;
       const target = event.target;
@@ -761,8 +719,6 @@ function AddMenu({
   const onDone = React.useCallback(
     (focusFilterId?: string) => {
       focusFilterIdRef.current = focusFilterId ?? null;
-      // Through changeOpen, like every other close, so the tooltip stays
-      // quiet on the focus the close hands back.
       changeOpen(false);
     },
     [changeOpen],
@@ -775,9 +731,7 @@ function AddMenu({
 
   return (
     <Popover open={open} onOpenChange={changeOpen}>
-      {/* Folded to "+", the button says what it does in a tooltip (with
-          the shortcut, whose hint folds away with the label). Off while
-          the label shows or the menu is open. */}
+      {/* Only once folded to "+" (the label is hidden) and while closed. */}
       <Tooltip
         disabled={!compact || open}
         open={tooltipOpen}
@@ -799,8 +753,7 @@ function AddMenu({
                     aria-keyshortcuts={shortcut?.toUpperCase()}
                     data-compact={compact ? "" : undefined}
                     onBlur={(event: React.FocusEvent<HTMLButtonElement>) => {
-                      // Base UI types its button events with extra fields the raw
-                      // segment button's event doesn't carry.
+                      // Base UI's event type has extra fields; cast through.
                       onBlur?.(
                         event as Parameters<NonNullable<typeof onBlur>>[0],
                       );
@@ -809,8 +762,7 @@ function AddMenu({
                     className={cn(
                       FILTER_SEGMENT,
                       FILTER_SEGMENT_INTERACTIVE,
-                      // Padded evenly by the square-icon inset, so folded down to
-                      // the icon the segment is square.
+                      // Even icon inset, so the folded segment is square.
                       "text-muted-foreground hover:text-foreground data-popup-open:text-foreground gap-0 px-(--seg-icon-x)",
                       className,
                     )}
@@ -822,8 +774,7 @@ function AddMenu({
                     aria-keyshortcuts={shortcut?.toUpperCase()}
                     data-compact={compact ? "" : undefined}
                     onBlur={(event: React.FocusEvent<HTMLButtonElement>) => {
-                      // Base UI types its button events with extra fields the raw
-                      // segment button's event doesn't carry.
+                      // Base UI's event type has extra fields; cast through.
                       onBlur?.(
                         event as Parameters<NonNullable<typeof onBlur>>[0],
                       );
@@ -833,7 +784,7 @@ function AddMenu({
                     size={size}
                     className={cn(
                       "text-muted-foreground hover:text-foreground data-popup-open:text-foreground gap-0",
-                      // Even with the icon's side; the label adds the rest when shown.
+                      // Matches the icon side; the label adds the rest when shown.
                       size === "sm" ? "pe-2" : "pe-2.5",
                       className,
                     )}
@@ -852,20 +803,15 @@ function AddMenu({
                   className="size-4 shrink-0"
                 />
               )}
-              {/* The label (and shortcut hint) collapse through a grid column
-                  once filters exist, leaving a square "+": the chips beside it
-                  already say what it adds. A column animates in every browser,
-                  where an auto width doesn't, and the text stays readable to
-                  screen readers at zero width. */}
+              {/* Folds via a grid column once filters exist: animates in every
+                  browser (auto width doesn't) and stays readable to screen readers. */}
               <span
                 data-slot="filter-add-label"
                 className="grid grid-cols-[minmax(0,1fr)] overflow-hidden transition-[grid-template-columns,opacity] duration-220 ease-[cubic-bezier(0.22,1,0.36,1)] in-data-compact:grid-cols-[minmax(0,0fr)] in-data-compact:opacity-0 motion-reduce:transition-none"
               >
                 <span
-                  // 6px from the icon, and 2px more on the text side than the
-                  // icon side: the "+" has ~2.7px of empty space inside its
-                  // box, so this evens the two sides by ink, not by box. Both
-                  // fold away with the label.
+                  // Text side gets 2px more than the icon side: the "+" glyph has
+                  // ~2.7px of internal space, so this balances by ink.
                   className="flex min-w-0 items-center gap-1.5 overflow-hidden ps-1.5 pe-0.5"
                 >
                   {children ?? labels.add}
@@ -894,7 +840,7 @@ function AddMenu({
           align="start"
           sideOffset={6}
           collisionPadding={8}
-          // Glides with the button as chips enter and leave beside it.
+          // Glides with the button as chips enter and leave.
           className="z-50 transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none motion-reduce:transition-none"
         >
           <PopoverPopup
@@ -923,7 +869,7 @@ function AddMenu({
             <TransitionPanel
               key={session}
               activeKey={step}
-              // Quicker than the 240ms default, in step with the chips.
+              // In step with the chips (default is 240ms).
               style={{ "--tp-duration": "200ms" } as React.CSSProperties}
             >
               <TransitionPanelView
@@ -955,7 +901,7 @@ function AddMenu({
   );
 }
 
-/** The add-filter button with its menu, standalone (an outline button). */
+/** Standalone add-filter outline button with its menu. */
 function FilterAddButton(props: AddMenuProps) {
   return <AddMenu {...props} kind="button" />;
 }
@@ -964,7 +910,6 @@ function FilterAddButton(props: AddMenuProps) {
 function FilterActionsAdd(
   props: React.ComponentProps<"button"> & AddMenuOptions,
 ) {
-  // The segment renders a plain button; its props pass straight through.
   return <AddMenu {...(props as AddMenuProps)} kind="segment" />;
 }
 

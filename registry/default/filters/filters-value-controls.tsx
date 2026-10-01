@@ -45,18 +45,11 @@ interface ValueControlProps<F extends FilterField> {
   className?: string;
 }
 
-/**
- * The value segment of a chip. Renders the control matching the field type,
- * or nothing when the operator's shape is `"none"` (`is empty`), so custom
- * chip compositions are correct without re-implementing that rule.
- */
+/** A chip's value control for its field type; renders nothing for valueless operators (`is empty`). */
 function FilterChipValue({
   className,
 }: {
-  /**
-   * Merged into the value segment (each of a range's two segments, for a
-   * `between` operator).
-   */
+  /** Merged into the value segment (both segments of a `between` range). */
   className?: string;
 }) {
   const { field, filter, size } = useFilterChip();
@@ -117,11 +110,8 @@ function FilterChipValue({
   }
 }
 
-/**
- * A custom field's `renderValue`, rendered as a component of its own so it
- * can use hooks: called inline, its hooks would belong to the chip and break
- * the moment a valueless operator stopped calling it.
- */
+// Its own component so `renderValue` can use hooks: called inline they'd belong
+// to the chip and break once a valueless operator stopped calling it.
 function CustomValue(props: FilterValueControlProps) {
   return props.field.renderValue(props);
 }
@@ -137,13 +127,7 @@ function valueAriaLabel(
   return [`${field.label} ${part}`, ...affixes].join(" ");
 }
 
-// ----- Select / multiselect ----------------------------------------------
-
-/**
- * Up to three option icons, overlapped like a hand of cards and ringed in the
- * chip's own fill so each reads against the one beneath. Icons join and
- * leave with a small scale so a pick registers on the chip itself.
- */
+/** Up to three overlapping option icons, ringed in the chip fill to separate them. */
 function StackedIcons({ options }: { options: FilterOption[] }) {
   const withIcons = options.filter((option) => option.icon).slice(0, 3);
   if (withIcons.length === 0) return null;
@@ -166,10 +150,6 @@ function StackedIcons({ options }: { options: FilterOption[] }) {
   );
 }
 
-/**
- * The searchable popup shell for editing a chip's options: the same ruled
- * search row as the add menu, then the list.
- */
 function FilterSearchPopup({
   placeholder,
   empty,
@@ -199,7 +179,6 @@ function FilterSearchPopup({
   );
 }
 
-/** Value control for `select` and `multiselect` fields. */
 function OptionsValueControl({
   field,
   filter,
@@ -230,16 +209,15 @@ function OptionsValueControl({
         : labels.selectedCount(selected.length, field);
 
   const trigger = (
-    // Render function, so the segment's classes replace the stock trigger's
-    // rather than merging with them.
+    // Render function so the segment's classes replace the stock trigger's
+    // rather than merging.
     <ComboboxTrigger
       render={(triggerProps) => (
         <button
           {...triggerProps}
           type="button"
           data-slot="filter-chip-value"
-          // Starts with what it shows ("2 selected"), so voice control can
-          // name it, then says which.
+          // Leads with the visible text so voice control can target it.
           aria-label={`${field.label} ${labels.value.toLowerCase()}: ${
             selected.length > 1
               ? `${text} (${selected.map((option) => option.label).join(", ")})`
@@ -322,11 +300,6 @@ function OptionsValueControl({
   );
 }
 
-// ----- Text / number ------------------------------------------------------
-
-// Inputs are segments too: no chrome of their own, the chip's hover plate on
-// hover, and a width that follows what's typed (`field-sizing`, with a fixed
-// width where it's unsupported).
 const INPUT_SEGMENT = cn(
   FILTER_SEGMENT,
   "hover:bg-surface-hover focus-visible:bg-surface-hover cursor-text bg-transparent font-medium",
@@ -336,10 +309,6 @@ const INPUT_SEGMENT = cn(
   "max-md:text-base",
 );
 
-/**
- * The value segment wrapper for inline inputs. Owns the `filter-chip-value`
- * slot and flanks the input with muted prefix/suffix text (e.g. `$`, `%`).
- */
 function ValueSegment({
   prefix,
   suffix,
@@ -421,10 +390,7 @@ function NumberValueField({
   "aria-label": string;
   onValueChange: (value: number | null) => void;
 }) {
-  // Base UI's NumberField.Input is a text input with numeric semantics (no
-  // native spinner) and handles parsing, arrow-key stepping, and clamping.
-  // `allowWheelScrub` lets the wheel adjust the value while the input is
-  // focused and hovered (it won't hijack ordinary page scrolling).
+  // `allowWheelScrub` only acts while focused and hovered, so page scroll is safe.
   return (
     <ValueSegment prefix={prefix} suffix={suffix} className={className}>
       <BaseNumberField.Root

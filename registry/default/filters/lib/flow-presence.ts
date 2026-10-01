@@ -1,15 +1,11 @@
 import * as React from "react";
 
-// Chips arrive and leave by opening and closing their own space in the flex
-// row, so the neighbours slide instead of jumping. The space is a negative
-// `margin-inline-end` equal to the element's width plus the row gap, eased to
-// zero on the way in and out to it on the way out. It is real layout, so it
-// wraps, retargets and stays correct with any number of siblings, with no
-// measuring of the siblings themselves.
+// Chips enter and leave by easing a negative `margin-inline-end` (their width
+// plus the row gap) so neighbours slide instead of jumping. It is real layout,
+// so it wraps and retargets without measuring the siblings.
 
-// Space opens and closes on the same clock, so a chip's neighbours move at
-// one pace both ways. Only the chip's own fade on the way out is quicker,
-// which keeps removal feeling immediate.
+// One clock for opening and closing; only the exit fade is quicker, so
+// removal feels immediate.
 const FLOW_MS = 220;
 const EXIT_FADE_MS = 130;
 const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
@@ -22,40 +18,28 @@ function prefersReducedMotion(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-/**
- * Copies made by `exitInFlow` whose element might still come back: Strict
- * Mode rehearses an unmount and remount in one go, and the copy has to be
- * gone before the remount measures the row.
- */
+/** Exit copies to drop if their element remounts (Strict Mode), before it measures the row. */
 const pendingGhosts = new WeakMap<HTMLElement, HTMLElement>();
 
-/**
- * The element's exact width. `offsetWidth` rounds to whole pixels, and a
- * rounded figure here leaves a fraction of a pixel to snap when the motion
- * ends. Elements are measured at rest (nothing here scales them), so the
- * box width is the layout width.
- */
+/** Fractional width: a rounded `offsetWidth` leaves a sub-pixel snap when motion ends. */
 function widthOf(el: HTMLElement): number {
   return el.getBoundingClientRect().width;
 }
 
 /**
- * Holds the element at its current width. Chips cap themselves at the row's
- * width (`max-w-full`), and a row that sizes to its content (centred in a
- * preview, say) narrows as space closes, which would shrink the chip in turn
- * and throw off a margin measured from its full width. Returns the undo.
+ * Holds the element at its current width and returns the undo. Chips are
+ * `max-w-full`, so a shrink-to-fit row narrowing as space closes would shrink
+ * the chip and break a margin measured from its full width.
  */
 function pinWidth(el: HTMLElement): () => void {
   const previous = el.style.maxWidth;
   el.style.maxWidth = `${widthOf(el)}px`;
-  // Unconditional: whoever replaces a running entrance releases its pin
-  // first (`entrancePins`), so a stale undo never runs over a newer pin.
+  // Safe unconditionally: a replacing entrance releases the old pin first.
   return () => {
     el.style.maxWidth = previous;
   };
 }
 
-/** Whether a node takes part in the row's layout and isn't a leaving copy. */
 function isLiveFlowItem(node: Element): node is HTMLElement {
   return (
     node instanceof HTMLElement &&
@@ -69,10 +53,8 @@ function columnGap(el: Element | null): number {
 }
 
 /**
- * The width the element takes in its row, plus the gap that comes and goes
- * with it: none when it's the row's only live item, since a lone item sits
- * between no gaps (the last of several leaving at once lands here too, which
- * keeps a cleared row from closing one gap more than it had).
+ * Width plus the gap that goes with it. A lone item has no gap, which also
+ * keeps a cleared row from closing one gap more than it had.
  */
 function flowSpan(el: HTMLElement): number {
   return widthOf(el) + (isAlone(el) ? 0 : columnGap(el.parentElement));
@@ -88,14 +70,12 @@ function isAlone(el: HTMLElement): boolean {
   );
 }
 
-/** The row itself when it scrolls sideways. */
 function asScroller(row: HTMLElement | null): HTMLElement | null {
   if (!row) return null;
   const { overflowX } = getComputedStyle(row);
   return overflowX === "auto" || overflowX === "scroll" ? row : null;
 }
 
-/** The element's parent when that parent scrolls sideways. */
 function inlineScroller(el: HTMLElement): HTMLElement | null {
   return asScroller(el.parentElement);
 }
@@ -104,11 +84,7 @@ function overflows(scroller: HTMLElement): boolean {
   return scroller.scrollWidth > scroller.clientWidth + 1;
 }
 
-/**
- * Scrolls the element's sideways-scrolling parent until the element sits
- * clear of the parent's edge fades. Does nothing outside a scroller or when
- * the element is already in view.
- */
+/** Scrolls the element's sideways-scrolling parent until it clears the edge fades. */
 function revealInScroller(el: HTMLElement): void {
   const scroller = inlineScroller(el);
   if (!scroller || !overflows(scroller)) return;
@@ -129,7 +105,6 @@ function revealInScroller(el: HTMLElement): void {
   });
 }
 
-/** The element and the siblings after it that take part in the row. */
 function trailingFlow(el: HTMLElement): HTMLElement[] {
   const nodes = [el];
   for (let node = el.nextElementSibling; node; node = node.nextElementSibling) {
@@ -139,10 +114,8 @@ function trailingFlow(el: HTMLElement): HTMLElement[] {
 }
 
 /**
- * Whether opening or closing `span` of space at `el` would move anything to
- * another row. Space eased across a wrap makes the neighbours hop between
- * lines mid-animation, so those changes fade in place instead. Measured by
- * applying the collapsed margin for one synchronous layout, then restoring.
+ * Whether `span` of space at `el` would move anything to another row. Easing
+ * across a wrap makes neighbours hop lines mid-motion, so those fade instead.
  */
 function crossesRows(el: HTMLElement, span: number): boolean {
   const nodes = trailingFlow(el);
@@ -157,10 +130,8 @@ function crossesRows(el: HTMLElement, span: number): boolean {
 }
 
 /**
- * The undo for an entrance's width pin. Released synchronously when a new
- * entrance replaces a running one: an animation's cancel event fires later,
- * after the replacement has pinned the same width, and would take that pin
- * off with it.
+ * Entrance pin undos, released synchronously on replacement: the async cancel
+ * event would otherwise fire after the new pin and remove it.
  */
 const entrancePins = new WeakMap<HTMLElement, () => void>();
 
@@ -180,8 +151,7 @@ function enterInFlow(el: HTMLElement): void {
     fade.id = ANIMATION_ID;
     return;
   }
-  // In a scroller that already overflows, opening space moves nothing in
-  // view, so the chip just appears and the scroller brings it into view.
+  // An overflowing scroller has nothing in view to slide; fade and reveal.
   const scroller = inlineScroller(el);
   if (scroller && overflows(scroller)) {
     const animation = el.animate(
@@ -194,11 +164,9 @@ function enterInFlow(el: HTMLElement): void {
     revealInScroller(el);
     return;
   }
-  // The first chip into an empty strip also brings the strip's gap in the
-  // bar with it (the strip is hidden while empty); ease that in alongside.
+  // The first chip into a hidden empty strip also brings back its outer gap.
   if (scroller) {
-    // A chip back before an emptying strip finished narrowing (undoing a
-    // clear, say) takes the strip as it is now, not where it was heading.
+    // Start from the strip as it is now if it was still narrowing (undo a clear).
     cancelAnimations(scroller, SCROLLER_WIDTH_ID);
     holdFade(scroller);
     if (isAlone(el)) animateOuterGap(scroller, "open");
@@ -212,9 +180,7 @@ function enterInFlow(el: HTMLElement): void {
     { duration: FLOW_MS, easing: EASE },
   );
   animation.id = ANIMATION_ID;
-  // The chip fades in place at full width, on a gentler curve than its
-  // space: the space is mostly open while the chip is still faint, so
-  // little of it shows over its neighbour.
+  // Gentler curve than the space, so little of the chip shows over its neighbour.
   el.animate(
     { opacity: [0, 1] },
     { duration: FLOW_MS, easing: "ease-out" },
@@ -222,7 +188,6 @@ function enterInFlow(el: HTMLElement): void {
   animation.onfinish = () => {
     unpin();
     if (entrancePins.get(el) === unpin) entrancePins.delete(el);
-    // Space that just opened may have pushed it past a scroller's edge.
     revealInScroller(el);
   };
   animation.oncancel = () => {
@@ -231,16 +196,12 @@ function enterInFlow(el: HTMLElement): void {
   };
 }
 
-/** How many motions currently hold each strip's edge fade off. */
 const fadeHolds = new WeakMap<HTMLElement, number>();
 
 /**
- * Switches a strip's edge fade off while space opens or closes inside it.
- * The moving chip's full width counts toward the strip's scroll width
- * before the strip itself has caught up, so for the length of the motion a
- * strip that fits reads as overflowing and would fade its edge. The fade
- * comes back once every hold has run out, so a strip that does end up
- * overflowing shows it from then on.
+ * Turns a strip's edge fade off during motion: the moving chip's full width
+ * counts toward scroll width early, so a fitting strip reads as overflowing.
+ * Restored once every hold has run out.
  */
 function holdFade(scroller: HTMLElement) {
   const holds = fadeHolds.get(scroller) ?? 0;
@@ -261,21 +222,18 @@ function holdFade(scroller: HTMLElement) {
 /** Keeps an emptied strip shown while its exit is still settling. */
 const BUSY_ATTR = "data-flow-busy";
 
-/** The strip's own animations: its outer gap, and its width. */
 const SCROLLER_GAP_ID = "filters-flow-gap";
 const SCROLLER_WIDTH_ID = "filters-flow-width";
 
 /**
- * Eases the gap between a strip and the rest of the bar, which appears and
- * disappears with the strip's first and last chip, through a negative
- * margin on the strip. Closing holds at its end until the strip's last copy
- * leaves and the strip hides; `settleScroller` lets it go then.
+ * Eases the strip's outer gap (present only while it has chips) via a negative
+ * margin. Closing holds its end state until `settleScroller` releases it.
  */
 function animateOuterGap(scroller: HTMLElement, direction: "open" | "close") {
   for (const animation of scroller.getAnimations()) {
     if (animation.id === SCROLLER_GAP_ID) animation.cancel();
   }
-  // From the strip's own resting margin, which isn't necessarily zero.
+  // The resting margin isn't necessarily zero.
   const rest = parseFloat(getComputedStyle(scroller).marginInlineEnd) || 0;
   const open = `${rest}px`;
   const closed = `${rest - columnGap(scroller.parentElement)}px`;
@@ -298,13 +256,11 @@ function cancelAnimations(el: HTMLElement, id: string) {
 }
 
 /**
- * Exit batches still settling in each strip. A strip's held animations and
- * busy flag go only when the last of them ends: one batch's cleanup running
- * while a later batch still plays would cut that batch's motion short.
+ * In-flight exit batches per strip. Cleanup waits for the last, or an earlier
+ * batch's cleanup would cut a later batch's motion short.
  */
 const scrollerExits = new WeakMap<HTMLElement, number>();
 
-/** Drops a strip's held exit animations once nothing is left leaving it. */
 function settleScroller(scroller: HTMLElement) {
   const left = (scrollerExits.get(scroller) ?? 1) - 1;
   scrollerExits.set(scroller, left);
@@ -319,7 +275,7 @@ interface Exit {
   ghost: HTMLElement;
   span: number;
   crosses: boolean;
-  /** Where the element's own entrance had got to, if it was still running. */
+  /** Progress of an interrupted entrance. */
   opacity: number;
   margin: number;
 }
@@ -331,17 +287,14 @@ const exitBatches = new Map<
 >();
 
 /**
- * Leaves a non-interactive copy of `el` in its place, then closes the space
- * it took. Runs while `el` is still in the document, just before React
- * removes it; the copies from one commit play together a microtask later.
+ * Leaves an inert copy of `el` in its place (just before React removes it)
+ * and closes its space. One commit's copies play together a microtask later.
  */
 function exitInFlow(el: HTMLElement): void {
   const parent = el.parentElement;
   if (!parent || prefersReducedMotion()) return;
-  // Leaving mid-entrance, the exit picks up from where the entrance got to
-  // (a copy has none of its animations, so it would start fully open and
-  // opaque, then snap). Read that, then stop the entrance so everything
-  // measured below is the element's own layout.
+  // Copies carry no animations, so capture an interrupted entrance's progress
+  // (or the exit snaps), then cancel it so measurements see resting layout.
   const current = getComputedStyle(el);
   const opacity = parseFloat(current.opacity);
   const margin = parseFloat(current.marginInlineEnd) || 0;
@@ -358,12 +311,11 @@ function exitInFlow(el: HTMLElement): void {
   const ghost = el.cloneNode(true) as HTMLElement;
   ghost.removeAttribute("id");
   for (const node of ghost.querySelectorAll("[id]")) node.removeAttribute("id");
-  // A distinct slot so nothing that looks up live chips finds the copy.
+  // A distinct slot so lookups for live chips skip the copy.
   ghost.setAttribute("data-slot", `${el.dataset.slot ?? "flow"}-ghost`);
   ghost.setAttribute("data-flow-ghost", "");
-  // Out of the accessibility tree and unclickable.
   ghost.inert = true;
-  // Fixed at the size it left at, for the reason `pinWidth` gives.
+  // Fixed width, for the reason `pinWidth` gives.
   Object.assign(ghost.style, {
     width: `${widthOf(el)}px`,
     maxWidth: "none",
@@ -388,7 +340,6 @@ function exitInFlow(el: HTMLElement): void {
   batch.exits.push({ el, ghost, span, crosses, opacity, margin });
 }
 
-/** Takes a copy out of the row, over the spot it holds. */
 function liftOut(ghost: HTMLElement) {
   const { offsetLeft, offsetTop } = ghost;
   Object.assign(ghost.style, {
@@ -428,15 +379,13 @@ function playExits(
   const emptying =
     scroller !== null && !Array.from(parent.children).some(isLiveFlowItem);
 
-  // How wide the strip ends up once the copies are gone. An earlier
-  // batch's width motion is stopped first (its current width was taken as
-  // this batch's start), or it would be measured as the destination.
+  // The strip's final width. Stop an earlier batch's width motion first, or
+  // it would be measured as the destination.
   let settledWidth = width;
   if (scroller) {
     cancelAnimations(scroller, SCROLLER_WIDTH_ID);
     scrollerExits.set(scroller, (scrollerExits.get(scroller) ?? 0) + 1);
-    // Every copy still in the strip is set aside, an earlier batch's too:
-    // one still collapsing in place would be measured as staying.
+    // Hide every copy, earlier batches' too, or one still collapsing counts.
     const ghosts = Array.from(
       scroller.querySelectorAll<HTMLElement>(":scope > [data-flow-ghost]"),
     );
@@ -446,10 +395,8 @@ function playExits(
   }
 
   if (scroller && overflowed && settledWidth !== width) {
-    // An overflowing strip changes width. Space closing inside it would
-    // mostly happen out of view, so the bar would sit still and then jump.
-    // Instead the copies fade where they stand and the strip eases to its
-    // new width, moving the rest of the bar in one motion.
+    // Closing space inside an overflowing strip happens mostly out of view,
+    // then the bar jumps. Fade copies in place and ease the strip's width.
     scroller.style.position ||= "relative";
     for (const exit of exits) liftOut(exit.ghost);
     scroller.animate(
@@ -457,13 +404,10 @@ function playExits(
       { duration: FLOW_MS, easing: EASE },
     ).id = SCROLLER_WIDTH_ID;
     if (emptying) animateOuterGap(scroller, "close");
-    // Out of the row, a copy still widens the strip's scroll range, which
-    // would keep its edge fade on after the copy has gone. So each goes as
-    // soon as it has faded, and the strip is flagged busy so it doesn't
-    // hide (it does once empty) before its own width has settled.
+    // A lifted copy still widens the scroll range (keeping the edge fade on),
+    // so each goes once faded; busy keeps an emptied strip shown meanwhile.
     scroller.setAttribute(BUSY_ATTR, "");
-    // The strip only narrows here because it ends up fitting, so its edge
-    // fade goes now, with the removal, rather than popping off mid-motion.
+    // It ends up fitting, so drop the fade now rather than mid-motion.
     holdFade(scroller);
     for (const exit of exits) {
       fadeOut(exit).finished.then(
@@ -472,13 +416,11 @@ function playExits(
       );
     }
   } else {
-    // A strip that fit before the change only looks like it overflows
-    // while the space closes.
+    // A fitting strip only looks overflowing while space closes.
     if (scroller && !overflowed) holdFade(scroller);
     if (emptying && scroller) animateOuterGap(scroller, "close");
     for (const exit of exits) {
       if (exit.crosses) {
-        // Out of the row, over the spot it held, while the rows reflow.
         liftOut(exit.ghost);
       } else {
         collapse(exit);
@@ -487,8 +429,7 @@ function playExits(
     }
   }
 
-  // Copies stay (invisible) until the space has closed, so a strip that
-  // hides when empty doesn't vanish mid-animation.
+  // Copies stay until the space closes, so an emptied strip doesn't hide mid-motion.
   setTimeout(() => {
     for (const { ghost } of exits) ghost.remove();
     if (scroller) settleScroller(scroller);
@@ -496,11 +437,9 @@ function playExits(
 }
 
 /**
- * Closes a copy's space by shrinking its box to nothing (content clipped as
- * it goes) and drawing it back over the gap before it. A negative margin
- * alone would leave the copy's own box standing, still counted in a
- * scroller's range: the edge fade would stay on, then the range would snap
- * once the copy went.
+ * Shrinks a copy's box to nothing and pulls it over the preceding gap. A
+ * negative margin alone leaves the box in the scroll range, so the edge fade
+ * would linger and the range snap on removal.
  */
 function collapse({ ghost, span, margin }: Exit) {
   const styles = getComputedStyle(ghost);
@@ -519,7 +458,7 @@ function collapse({ ghost, span, margin }: Exit) {
         "0px",
       ],
       marginInlineStart: ["0px", `${-Math.max(0, gap)}px`],
-      // Still partly closed if it left mid-entrance; that closes too.
+      // Non-zero if it left mid-entrance.
       marginInlineEnd: [`${margin}px`, "0px"],
     },
     { duration: FLOW_MS, easing: EASE, fill: "forwards" },
@@ -532,14 +471,10 @@ function assignRef<T>(ref: React.Ref<T> | undefined, value: T | null): void {
 }
 
 /**
- * Callback ref that animates the element into and out of its flex row. Only
- * elements that mount after the row's first paint animate in, so a bar that
- * renders with filters already set appears settled. `forwardedRef` is kept in
- * sync, so the element can still take a caller's ref.
- *
- * The callback itself never changes: a caller's inline ref (a new function
- * every render) would otherwise detach and reattach it on every render,
- * playing the exit and the entrance each time.
+ * Callback ref that animates the element into and out of its flex row; only
+ * mounts after the row's first paint animate in. Kept stable (forwarded ref
+ * synced separately), or an inline caller ref would replay exit and entrance
+ * every render.
  */
 function useFlowPresence<T extends HTMLElement>(
   forwardedRef?: React.Ref<T>,
@@ -566,10 +501,7 @@ function useFlowPresence<T extends HTMLElement>(
   }, []);
 }
 
-/**
- * Callback ref for the row itself: marks it ready after its first paint, so
- * children mounted from then on animate in.
- */
+/** Callback ref for the row: marks it ready after first paint so later children animate in. */
 function useFlowRow<T extends HTMLElement>(
   forwardedRef?: React.Ref<T>,
 ): React.RefCallback<T> {

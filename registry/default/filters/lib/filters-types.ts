@@ -18,11 +18,7 @@ export interface FilterOption {
   icon?: React.ReactNode;
 }
 
-/**
- * The value shape an operator expects: `"none"` hides the value segment
- * (`is empty`), `"range"` renders paired min/max inputs on number fields
- * (`between`), and `"scalar"` renders the field's normal single control.
- */
+/** Value shape an operator expects: `"none"` (no value), `"scalar"` (one control), `"range"` (number min/max). */
 export type FilterOperatorShape = "none" | "scalar" | "range";
 
 /** An operator shown in the middle segment of a pill (`is`, `contains`, ...). */
@@ -86,10 +82,8 @@ export interface CustomFilterField extends FilterFieldBase {
   /** Seed value for a fresh filter of this field. */
   defaultValue?: unknown;
   /**
-   * The value as text, for the chip's accessible name and to tell whether
-   * the filter is complete (an empty string reads as "no value yet"). By
-   * default strings, numbers and booleans read as themselves and anything
-   * else as empty, so give one for object values.
+   * Value as text, for the accessible name and completeness (`""` = no value).
+   * Defaults handle only strings, numbers and booleans; required for objects.
    */
   formatValue?: (value: unknown) => string;
 }
@@ -117,8 +111,8 @@ export interface NumberRange {
 }
 
 /**
- * A single active filter. `value` is typed by the field:
- * `select → string | null`, `multiselect → string[]`, `text → string`,
+ * A single active filter. `value` by field type: `select → string | null`,
+ * `multiselect → string[]`, `text → string`,
  * `number → number | null | NumberRange`, `custom → unknown`.
  */
 export interface FilterValue {
@@ -159,11 +153,7 @@ export interface FiltersLabels {
   filtersCleared: string;
   /** Word used in the operator trigger's accessible name. */
   operator: string;
-  /**
-   * Operator names by id, over each operator's own `label` (e.g.
-   * `{ is_not: "n'est pas" }`), so the built-in operators translate without
-   * redefining every field's `operators`.
-   */
+  /** Operator label overrides by id, e.g. `{ is_not: "n'est pas" }`. */
   operators: Partial<Record<string, string>>;
   /** The active-filter count, e.g. "3 active". */
   activeCount: (count: number) => string;
@@ -198,12 +188,7 @@ export interface FiltersBarProps extends Omit<
 > {
   /** Key that opens the add-filter menu, forwarded to the default `FilterAddButton`. */
   shortcut?: string;
-  /**
-   * What chips do when they outgrow the row. `"scroll"` (the default) keeps
-   * one row: the chips scroll sideways behind edge fades while the add and
-   * clear buttons stay put. `"wrap"` flows them onto new rows, for narrow
-   * panels where a tall bar is fine.
-   */
+  /** Chip overflow: `"scroll"` (default) scrolls one row behind edge fades; `"wrap"` adds rows. */
   overflow?: FiltersOverflow;
 }
 

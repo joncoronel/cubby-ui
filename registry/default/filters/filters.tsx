@@ -92,10 +92,7 @@ const DEFAULT_LABELS: FiltersLabels = {
 
 const LABEL_KEYS = Object.keys(DEFAULT_LABELS) as (keyof FiltersLabels)[];
 
-/**
- * Clears every filter, first moving focus to the bar's add button: the
- * chips (and the clear control itself) are about to go.
- */
+/** Moves focus to the add button first: the chips and clear control are about to unmount. */
 function clearFromBar(from: HTMLElement, clearAll: () => void) {
   from
     .closest('[data-slot="filters"]')
@@ -104,10 +101,7 @@ function clearFromBar(from: HTMLElement, clearAll: () => void) {
   clearAll();
 }
 
-/**
- * Moves focus to the adjacent chip's remove button (or the add-filter trigger)
- * before a chip is removed, so focus never falls to `<body>`.
- */
+/** Refocuses a neighbouring chip (or the add button) before removal so focus never falls to `<body>`. */
 function focusAdjacentChip(chip: HTMLElement | null) {
   const bar = chip?.closest<HTMLElement>('[data-slot="filters"]');
   if (!chip || !bar) return;
@@ -122,11 +116,7 @@ function focusAdjacentChip(chip: HTMLElement | null) {
   target?.focus();
 }
 
-/**
- * Owns filter state and provides it via context, without rendering any layout.
- * Wrap it around a `FiltersBar` plus any external UI (a results count, saved
- * views, an apply button) that should share the state through `useFilters`.
- */
+/** Owns filter state with no layout; wrap a `FiltersBar` plus any external UI that reads `useFilters`. */
 function FiltersProvider({
   fields,
   value,
@@ -145,11 +135,8 @@ function FiltersProvider({
 
   const labels = React.useMemo(
     () => ({ ...DEFAULT_LABELS, ...labelsProp }),
-    // Value-level deps (constant length — FiltersLabels is a closed shape) so
-    // an inline `labels={{ ... }}` object doesn't churn the actions context.
-    // Caveat: the function labels (`removeFilter`, `selectedCount`, ...) are
-    // a new identity every render when written inline, which still churns;
-    // hoist them in that case.
+    // Value-level deps so an inline `labels` object doesn't churn the actions
+    // context. Inline function labels still churn; hoist those.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     LABEL_KEYS.map((key) => labelsProp?.[key]),
   );
@@ -168,9 +155,8 @@ function FiltersProvider({
     [usedFieldsKey],
   );
 
-  // Adds, removes and clears are announced, so a screen reader hears what
-  // happened when focus lands somewhere else (a neighbouring chip, the add
-  // button). Edits aren't: their own controls already say what changed.
+  // Adds/removes/clears are announced because focus lands elsewhere; edits
+  // aren't, since their own controls already say what changed.
   const [announcement, setAnnouncement] = React.useState({
     text: "",
     count: 0,
@@ -228,8 +214,7 @@ function FiltersProvider({
     [setFilters, fieldsById],
   );
 
-  // Split contexts: `state` changes per keystroke, `actions` stays stable, so
-  // leaves subscribed via useFiltersActions don't re-render while typing.
+  // Split so useFiltersActions leaves don't re-render per keystroke.
   const stateContext = React.useMemo(() => ({ filters }), [filters]);
   const actionsContext = React.useMemo(
     () => ({
@@ -271,11 +256,7 @@ function FiltersProvider({
   );
 }
 
-/**
- * The flex row. Renders the default layout unless `children` is passed. Only
- * the default leaves subscribe to filter state, so a bar with custom children
- * doesn't re-render while a value is being typed.
- */
+/** The flex row; renders the default chips + actions unless `children` is passed. */
 function FiltersBar({
   shortcut,
   overflow = "scroll",
@@ -287,9 +268,7 @@ function FiltersBar({
   const rowRef = useFlowRow(ref);
   return (
     <FiltersOverflowContext value={overflow}>
-      {/* One provider for the bar's tooltips: the registry's snappier delay,
-          and moving between neighbours (the add and clear segments) shows
-          the next at once. */}
+      {/* Shared so moving between the add and clear tooltips skips the delay. */}
       <TooltipProvider>
         <div
           ref={rowRef}
@@ -315,12 +294,8 @@ function FiltersBar({
   );
 }
 
-/**
- * A visually hidden status region for the bar's announcements. Always
- * rendered, empty to start, so screen readers are already listening when
- * the first change lands; a non-breaking space alternates on so a repeat of
- * the same words still counts as a change.
- */
+// Always mounted so screen readers are listening before the first change; the
+// alternating nbsp makes a repeated message still count as a change.
 function FiltersAnnouncer() {
   const { text, count } = React.use(FiltersAnnouncementContext);
   return (
@@ -360,11 +335,8 @@ function Filters({
 /** The enclosing bar's overflow mode; chips outside a bar just lay out flat. */
 const FiltersOverflowContext = React.createContext<FiltersOverflow>("wrap");
 
-/**
- * Lets a plain mouse wheel scroll the strip sideways. Only while the strip
- * has somewhere to go in that direction, so at either end (or when nothing
- * overflows) the wheel scrolls the page as usual.
- */
+// Vertical wheel scrolls the strip sideways, but only while it can move that
+// way, so at either end the page scrolls as usual.
 function scrollSidewaysOnWheel(node: HTMLDivElement | null) {
   if (!node) return;
   const handleWheel = (event: WheelEvent) => {
@@ -387,12 +359,7 @@ function scrollSidewaysOnWheel(node: HTMLDivElement | null) {
   return () => node.removeEventListener("wheel", handleWheel);
 }
 
-/**
- * Renders a `FilterChip` for every active filter. Inside a scrolling bar the
- * chips sit in their own strip that scrolls sideways behind edge fades, so
- * the buttons after it stay in view; the strip hides itself when empty, so
- * it adds no gap to the bar.
- */
+/** A `FilterChip` per active filter; in a scrolling bar, inside a sideways-scrolling strip. */
 function FilterChips({
   className,
 }: {
@@ -416,12 +383,10 @@ function FilterChips({
       hideScrollbar
       fadeEdges="x"
       viewportRef={scrollSidewaysOnWheel}
-      // Not a tab stop of its own: every chip in it is, and the browser
-      // scrolls a focused chip into view.
+      // Chips are tab stops and get scrolled into view, so the strip isn't one.
       tabIndex={-1}
-      // The 2px inset keeps chip edges off the strip's clip line, where a
-      // fractional pixel ratio would shave their border; the matching
-      // negative margin keeps the bar's layout unchanged.
+      // 2px inset keeps chip borders off the clip line (fractional DPR shaves
+      // them); the negative margin cancels it. `empty:` hides the strip's gap.
       className={cn(
         "-m-0.5 flex size-auto min-w-0 items-center gap-2 overflow-y-hidden rounded-none p-0.5 *:max-w-none empty:not-data-flow-busy:hidden",
         className,
@@ -432,9 +397,8 @@ function FilterChips({
   );
 }
 
-// Memoized: chips subscribe only to the stable actions context and untouched
-// `filter` objects keep their identity across edits, so typing in one chip's
-// value doesn't re-render the others.
+// Memoized so typing in one chip doesn't re-render the others (untouched
+// `filter` objects keep their identity; only the stable actions context is read).
 const FilterChip = React.memo(function FilterChip({
   filter,
   field: fieldProp,
@@ -455,8 +419,6 @@ const FilterChip = React.memo(function FilterChip({
 
   if (!field || !chipContext) return null;
 
-  // A chip still waiting on its value narrows nothing yet; its dashed edge
-  // says so without an extra word.
   const incomplete = !isFilterComplete(field, filter);
 
   return (
@@ -480,9 +442,7 @@ const FilterChip = React.memo(function FilterChip({
           if (event.defaultPrevented) return;
           if (event.key !== "Backspace" && event.key !== "Delete") return;
           const target = event.target;
-          // Only from the remove button. On the operator or a value
-          // (a multiselect's, say) the key reads as editing that part, not
-          // as dropping the whole filter; inputs keep it for typing.
+          // Remove button only: elsewhere the key means editing that part.
           if (
             !(target instanceof HTMLButtonElement) ||
             target.dataset.slot !== "filter-chip-remove"
@@ -645,12 +605,7 @@ function FilterClearButton({
   );
 }
 
-/**
- * The add and clear actions as one capsule, built like a chip: the add
- * button as a segment, then, while filters exist, a hairline and a clear
- * segment. The clear segment opens in the same beat as the add button's
- * label folds away.
- */
+/** The add and clear actions as one chip-like capsule. */
 function FilterActions({
   shortcut,
   className,
@@ -667,8 +622,7 @@ function FilterActions({
       data-slot="filter-actions"
       data-size={size}
       className={cn(
-        // No gap: a folded clear segment would still get one, leaving the
-        // add segment off-centre. The clear segment brings its own.
+        // No gap: a folded clear segment would still get one; it brings its own.
         "bg-card text-foreground inline-flex shrink-0 items-center rounded-lg border bg-clip-padding p-0.5",
         FILTER_SIZES[size],
         className,
@@ -685,12 +639,7 @@ function FilterActions({
   );
 }
 
-/**
- * The capsule's clear segment, for composing your own `FilterActions`.
- * Always rendered, folded through a grid column
- * (and inert) while no filters exist, so it opens and closes with the same
- * CSS-only motion as the add button's label.
- */
+/** The capsule's clear segment; stays mounted, folded and inert while no filters exist. */
 function FilterActionsClear({
   className,
   children,
@@ -707,7 +656,6 @@ function FilterActionsClear({
       className="grid h-full grid-cols-[minmax(0,0fr)] overflow-hidden opacity-0 transition-[grid-template-columns,opacity] duration-220 ease-[cubic-bezier(0.22,1,0.36,1)] data-active:grid-cols-[minmax(0,1fr)] data-active:opacity-100 motion-reduce:transition-none"
     >
       <div className="flex h-full min-w-0 items-center gap-0.5 ps-0.5">
-        {/* Sets clear-all apart from add, its neighbour in the capsule. */}
         <span
           aria-hidden
           className="bg-border my-1.5 w-px shrink-0 self-stretch"
@@ -745,12 +693,7 @@ function FilterActionsClear({
   );
 }
 
-/**
- * The number of active filters as plain muted text ("3 active"), with the
- * number morphing as it changes. Status rather than an object, so it doesn't
- * read as one more chip in the row. Counts complete filters only, and
- * renders nothing at zero.
- */
+/** Muted "3 active" text counting complete filters only; renders nothing at zero. */
 function FilterActiveCount({
   className,
   ref,
@@ -759,13 +702,11 @@ function FilterActiveCount({
   const { filters } = useFiltersState();
   const { labels, fieldsById } = useFiltersActions();
   const presenceRef = useFlowPresence(ref);
-  // Filters that narrow anything: a chip still waiting on its value doesn't
-  // count, nor one whose field is gone (a stale URL, say).
+  // Skips filters whose field is gone (a stale URL, say).
   const count = filters.filter((filter) => {
     const field = fieldsById.get(filter.field);
     return field !== undefined && isFilterComplete(field, filter);
   }).length;
-  // Like the clear button, nothing to say at zero.
   if (count === 0) return null;
   return (
     <span

@@ -9,21 +9,12 @@ import type {
   FiltersLabels,
 } from "./lib/filters-types";
 
-/**
- * Fast-changing state: `filters` gets a new identity on every edit (including
- * each keystroke in a text or number filter). Subscribe only when you render
- * the filters themselves.
- */
+/** Fast-changing: `filters` gets a new identity on every edit, including keystrokes. */
 interface FiltersStateContextValue {
   filters: FilterValue[];
 }
 
-/**
- * Configuration and actions. Referentially stable across value edits (it only
- * changes when the field config changes or a filter is added/removed), so
- * leaves like the add/clear buttons and memoized chips can subscribe without
- * re-rendering per keystroke.
- */
+/** Config and actions; stable across value edits, so leaves don't re-render per keystroke. */
 interface FiltersActionsContextValue {
   fields: FilterField[];
   size: FilterSize;
@@ -36,10 +27,7 @@ interface FiltersActionsContextValue {
   updateFilter: (id: string, patch: Partial<Omit<FilterValue, "id">>) => void;
   removeFilter: (id: string) => void;
   clearAll: () => void;
-  /**
-   * The filters as of the last render, read on demand. For event handlers
-   * that need the current filters without subscribing to every edit.
-   */
+  /** The filters as of the last render, for handlers that shouldn't subscribe. */
   getFilters: () => FilterValue[];
 }
 
@@ -69,10 +57,7 @@ function useFiltersActions(): FiltersActionsContextValue {
   return context;
 }
 
-/**
- * Everything from both contexts. Convenient, but re-renders on every filter
- * edit; subscribe to `useFiltersActions` alone when that matters.
- */
+/** Both contexts merged; re-renders on every edit (prefer `useFiltersActions` when that matters). */
 function useFilters(): FiltersContextValue {
   const state = useFiltersState();
   const actions = useFiltersActions();
@@ -85,10 +70,7 @@ interface FilterChipContextValue {
   size: FilterSize;
 }
 
-/**
- * The latest change to announce to screen readers. `count` changes with
- * every announcement, so the same words announced twice still register.
- */
+/** `count` bumps per announcement so a repeated message still registers. */
 interface FiltersAnnouncementValue {
   text: string;
   count: number;

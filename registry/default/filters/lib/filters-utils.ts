@@ -8,31 +8,20 @@ import type {
   NumberRange,
 } from "./filters-types";
 
-/**
- * TextMorph clock for labels that answer a click (operator, value, count):
- * the docs' click-feedback duration, shorter than the mode's own 240ms.
- */
+/** TextMorph duration for click-driven labels; snappier than the default 240ms. */
 export const CLICK_MORPH_MS = 209;
 
-/**
- * Classes shared by every segment of a chip. The radius is the chip's
- * (`rounded-lg`) minus its 1px border and 2px inset, so hover plates sit
- * concentric with the chip's edge.
- */
+/** Shared segment classes. Radius is the chip's minus 1px border and 2px inset, for concentric hover plates. */
 export const FILTER_SEGMENT =
   "inline-flex h-full shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[calc(var(--radius-lg)-3px)] px-(--seg-x) outline-0 outline-transparent outline-solid transition-[background-color,color,outline-color] duration-100 ease-out focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring/50";
 
-/** Hover, press and open paint for the clickable segments. */
 export const FILTER_SEGMENT_INTERACTIVE =
   "cursor-pointer hover:bg-surface-hover active:bg-surface-active data-popup-open:bg-surface-hover";
 
 /**
- * Per-size chip classes. `--seg-icon-x` is the side padding that makes an
- * icon-only segment square: (inner height - 16px icon) / 2, where the inner
- * height is the chip's less its 1px border and 2px inset on each side. Heights match the `Button` ramp so chips line up with
- * the add and clear buttons. Segments read `--seg-x` for their side padding;
- * their radius is the chip's minus its 1px border and 2px inset, so the hover
- * plates stay concentric with the chip. Restyle here rather than per segment.
+ * Per-size chip classes; heights match the `Button` ramp. `--seg-x` is segment
+ * side padding; `--seg-icon-x` squares an icon-only segment:
+ * (height - 2*(1px border + 2px inset) - 16px icon) / 2.
  */
 export const FILTER_SIZES: Record<FilterSize, string> = {
   sm: "h-9 sm:h-8 [--seg-icon-x:7px] sm:[--seg-icon-x:5px] text-sm [--seg-x:0.5rem] [&_[data-slot=filter-chip-field]_svg]:size-3.5",
@@ -41,29 +30,23 @@ export const FILTER_SIZES: Record<FilterSize, string> = {
   lg: "h-11 sm:h-10 [--seg-icon-x:11px] sm:[--seg-icon-x:9px] text-base [--seg-x:0.75rem] [&_[data-slot=filter-chip-field]_svg]:size-4",
 };
 
-// ----- Value coercers ---------------------------------------------------
-// `FilterValue.value` is `unknown` (it may arrive from URL state or other
-// untrusted sources, e.g. `JSON.parse`), so every read goes through a coercer
-// that rebuilds the expected shape instead of trusting a cast.
+// `FilterValue.value` is `unknown` and may come from untrusted input (URL
+// state, `JSON.parse`), so reads go through these coercers, never a cast.
 
-/** Coerces an unknown filter value to a string (`""` when absent). */
 export function asString(value: unknown): string {
   return typeof value === "string" ? value : "";
 }
 
-/** Coerces an unknown filter value to a string array. */
 export function asStringArray(value: unknown): string[] {
   return Array.isArray(value)
     ? value.filter((item): item is string => typeof item === "string")
     : [];
 }
 
-/** Coerces an unknown filter value to a finite number or `null`. */
 export function asNumberOrNull(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
-/** Rebuilds a `NumberRange`, coercing each bound independently. */
 export function asNumberRange(value: unknown): NumberRange {
   if (typeof value === "object" && value !== null) {
     const candidate = value as Partial<Record<"min" | "max", unknown>>;
@@ -75,11 +58,7 @@ export function asNumberRange(value: unknown): NumberRange {
   return { min: null, max: null };
 }
 
-/**
- * Coerces unknown JSON (e.g. a parsed URL param) into a `FilterValue` array,
- * dropping entries whose envelope (`id` / `field` / `operator`) is malformed.
- * `value` stays `unknown`; the per-field coercers above handle it downstream.
- */
+/** Coerces unknown JSON into `FilterValue[]`, dropping entries without string `id`/`field`/`operator`. */
 export function asFilterValues(value: unknown): FilterValue[] {
   if (!Array.isArray(value)) return [];
   return value
@@ -101,7 +80,6 @@ export function asFilterValues(value: unknown): FilterValue[] {
     }));
 }
 
-/** Default English labels for the built-in operators. */
 const OPERATOR_LABELS: Record<string, string> = {
   is: "is",
   is_not: "is not",
@@ -195,8 +173,8 @@ export function emptyValueFor(field: FilterField, operatorId: string): unknown {
 }
 
 function generateId(): string {
-  // Filter ids only need list-key uniqueness. `crypto.randomUUID` is absent
-  // in non-secure contexts (plain-HTTP LAN dev), hence the cheap fallback.
+  // `crypto.randomUUID` is absent in non-secure contexts (plain-HTTP LAN dev);
+  // ids only need list-key uniqueness.
   if (
     typeof crypto !== "undefined" &&
     typeof crypto.randomUUID === "function"
@@ -206,10 +184,7 @@ function generateId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
-/**
- * Creates a `FilterValue` with a stable id. The operator defaults to the
- * field's first resolved operator and the value to a typed empty seed.
- */
+/** Creates a `FilterValue`, defaulting to the field's first operator and a typed empty value. */
 export function createFilter(
   field: FilterField,
   partial?: Partial<Omit<FilterValue, "field">>,
@@ -227,11 +202,7 @@ export function createFilter(
   };
 }
 
-/**
- * Applies a patch to a filter. When only the operator changes and the new
- * operator expects a different value shape (e.g. `eq` to `between`, or into a
- * valueless operator), the value is reseeded to a typed empty.
- */
+/** Applies a patch; an operator change to a different value shape reseeds the value. */
 export function patchFilter(
   field: FilterField | undefined,
   filter: FilterValue,
@@ -252,10 +223,7 @@ export function patchFilter(
   return next;
 }
 
-/**
- * Formats a filter's value as a human-readable string. Shared by the visible
- * value controls and the aria summary so the two never diverge.
- */
+/** Human-readable value, shared by the visible controls and the aria summary so they match. */
 export function formatFilterValue(
   field: FilterField,
   filter: FilterValue,
@@ -302,12 +270,7 @@ export function formatFilterValue(
   }
 }
 
-/**
- * The operator a filter added from the menu starts on: the field's first
- * operator that takes a single value, so a picked or typed value always has
- * somewhere to go. `undefined` when the field has none (the menu then adds
- * the filter straight away with its defaults).
- */
+/** The field's first single-value operator, so a value picked in the add menu has somewhere to go. */
 export function scalarOperatorFor(
   field: FilterField,
 ): FilterOperator | undefined {
@@ -316,11 +279,7 @@ export function scalarOperatorFor(
   );
 }
 
-/**
- * Folds a picked option into the field's value: a multiselect gains it (once),
- * anything else is replaced by it. Used when a value is chosen straight from
- * the add menu's search for a field that already has a filter.
- */
+/** Folds a picked option into the value: appended (once) for multiselect, else replaces it. */
 export function withOption(
   field: FilterField,
   current: unknown,
@@ -335,10 +294,7 @@ export function withOption(
   return [...values, optionValue];
 }
 
-/**
- * An operator's display name: the translated one from `labels.operators`
- * when given, else its own `label`.
- */
+/** Display name: the `labels.operators` translation, else the operator's own `label`. */
 export function operatorLabel(
   operator: FilterOperator,
   names?: Partial<Record<string, string>>,
@@ -346,12 +302,7 @@ export function operatorLabel(
   return names?.[operator.id] ?? operator.label;
 }
 
-/**
- * Whether a filter narrows anything yet: its operator takes no value, or it
- * has one. A chip still waiting on its value (an empty text input, a select
- * with nothing picked) is incomplete. Useful for sending only real filters
- * to a server.
- */
+/** Whether a filter narrows anything yet (valueless operator, or a value set). */
 export function isFilterComplete(
   field: FilterField,
   filter: FilterValue,
@@ -362,10 +313,7 @@ export function isFilterComplete(
   );
 }
 
-/**
- * Builds a plain-language summary of a filter, e.g. for screen readers.
- * `operatorNames` is `labels.operators`, for translated operator names.
- */
+/** Plain-language summary for screen readers; `operatorNames` is `labels.operators`. */
 export function describeFilter(
   field: FilterField,
   filter: FilterValue,

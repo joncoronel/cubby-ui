@@ -22,6 +22,7 @@ import FiltersFieldTypes from "@/registry/examples/filters/filters-field-types";
 import FiltersOperators from "@/registry/examples/filters/filters-operators";
 import FiltersMultiselect from "@/registry/examples/filters/filters-multiselect";
 import FiltersManual from "@/registry/examples/filters/filters-manual";
+import FiltersEmptyState from "@/registry/examples/filters/filters-empty-state";
 import FiltersSizes from "@/registry/examples/filters/filters-sizes";
 import FiltersOverflow from "@/registry/examples/filters/filters-overflow";
 import FiltersAffixes from "@/registry/examples/filters/filters-affixes";
@@ -167,6 +168,14 @@ When the chips outgrow the row, they scroll sideways behind edge fades, while th
 
 <ComponentPreview component="filters" example="filters-overflow">
   <FiltersOverflow />
+</ComponentPreview>
+
+### Empty state
+
+The add menu takes `open` and `onOpenChange`, so anything can open it. Here an empty state's call to action opens the same menu as the "+" button, composed from `FilterActionsAdd` and `FilterActionsClear`.
+
+<ComponentPreview component="filters" example="filters-empty-state">
+  <FiltersEmptyState />
 </ComponentPreview>
 
 ### Sizes
@@ -380,24 +389,7 @@ The add menu: a trigger and a popup that steps from the field list to the chosen
 
 </ApiPropsList>
 
-Controlling the menu opens it from anywhere, for example an empty state's call to action. `FilterActionsAdd` takes the same props:
-
-```tsx
-const [adding, setAdding] = React.useState(false);
-
-<FiltersProvider fields={fields} value={value} onValueChange={setValue}>
-  <FiltersBar>
-    <FilterChips />
-    <FilterActions>
-      <FilterActionsAdd open={adding} onOpenChange={setAdding} />
-      <FilterActionsClear />
-    </FilterActions>
-  </FiltersBar>
-  {value.length === 0 && (
-    <Button onClick={() => setAdding(true)}>Add your first filter</Button>
-  )}
-</FiltersProvider>;
-```
+Controlling the menu opens it from anywhere, for example an empty state's call to action; see the [Empty state](#empty-state) example. `FilterActionsAdd` takes the same props.
 
 #### FilterActionsAdd / FilterActionsClear
 

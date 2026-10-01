@@ -1,8 +1,9 @@
 ---
 title: Filters
-description: A filter bar of segmented pills with per-field operators and value controls
+description: A filter bar of sentence-like chips with per-field operators and a two-step add menu
 type: composable
-builtOn: ["button-group", "combobox", "dropdown-menu", "input"]
+builtOn:
+  ["combobox", "dropdown-menu", "popover", "transition-panel", "text-morph"]
 ---
 
 import { Filters } from "@/registry/default/filters/filters";
@@ -17,7 +18,7 @@ import FiltersAffixes from "@/registry/examples/filters/filters-affixes";
 import FiltersShortcut from "@/registry/examples/filters/filters-shortcut";
 import FiltersNuqs from "@/registry/examples/filters/filters-nuqs";
 
-The filter bar shows active filters as segmented pills, each pairing a field, an operator, and a value, plus an "Add filter" button that opens a searchable field picker. Use it for list and table views where users refine results by several conditions at once, the pattern you see in Linear, Notion, and Stripe.
+The filter bar shows active filters as chips that read as a sentence ("Status is In progress"), plus a "Filter" button whose menu takes you from a field to its value in one popup. Use it for list and table views where users refine results by several conditions at once, the pattern you see in Linear, Notion, and Stripe.
 
 For a single dropdown of options tied to a form field, use [`Combobox`](/docs/components/combobox) instead.
 
@@ -76,7 +77,10 @@ return <Filters fields={fields} value={value} onValueChange={setValue} />;
 
 - Per-type operators with sensible defaults (`is`, `contains`, `between`, `is empty`), overridable or hideable per field.
 - Operators declare a value `shape` (`"none"` / `"scalar"` / `"range"`), so custom operators get the right control automatically; `is empty` drops the value segment, and any `"range"` operator gets paired min/max inputs.
-- Adding a filter opens its value picker (or focuses its input) right away, so you pick in one gesture.
+- A two-step add menu: pick a field and the same popup slides to its values (or an input for text and number fields), so a chip only appears once it has a value. `Backspace` in the empty search, or the field token, goes back.
+- Searching the add menu also finds values across fields ("Done" in Status), so the common case takes one step. A value found for a field that already has a filter joins that filter.
+- Chips open their own space as they arrive and close it as they leave, so neighbors slide instead of jumping; operator and value labels morph in place with [`TextMorph`](/docs/components/text-morph).
+- Multiselect chips stack the picked options' icons beside a count, and multiselect values toggle live in the add menu while the chip grows behind it.
 - Colored dots or icons on options keep a dense bar scannable; fields accept an optional `icon` too.
 - `prefix` / `suffix` on text and number fields for currency, units, or symbols; `maxSelections` caps a multiselect.
 - Number fields are spinner-free (Base UI) with arrow-key stepping and wheel scrubbing (scroll to adjust while focused).
@@ -84,6 +88,7 @@ return <Filters fields={fields} value={value} onValueChange={setValue} />;
 - Controlled and uncontrolled: pass `value` + `onValueChange`, or `defaultValue`. Because it is controlled, syncing to the URL (nuqs) is trivial.
 - The `custom` field type renders any control through `renderValue`, for dates, sliders, or bespoke inputs.
 - Searchable, keyboard-navigable field and value pickers, inherited from `Combobox`.
+- A chip still waiting on its value (an empty text input, say) shows a dashed edge, since it narrows nothing yet.
 
 ## Examples
 
@@ -97,7 +102,7 @@ Pass `value` and `onValueChange` to own the state; the serialized filters update
 
 ### Field types
 
-Use `type` to pick the value control. `select` and `multiselect` open a searchable list, `text` and `number` render inline inputs, and `custom` renders your own control through `renderValue`.
+Use `type` to pick the value control. `select` and `multiselect` open a searchable list, `text` and `number` render inline inputs that grow with what you type, and `custom` renders your own control through `renderValue`. A `custom` field skips the value step: the chip is added straight away and focus moves into your control.
 
 | Type            | Value control                              | Value shape                     |
 | --------------- | ------------------------------------------ | ------------------------------- |
@@ -129,7 +134,7 @@ Use `operators` to replace the default set for a field, or `disabledOperators` t
 
 ### Multiselect
 
-A `multiselect` field collapses its selection to the first label plus a count. Set `maxSelections` to cap how many options can be picked; the rest disable once the cap is hit.
+A `multiselect` chip shows the picked option when there is one, and stacks up to three option icons beside a count ("3 selected") when there are more. Override `labels.selectedCount` for wording like "3 labels". Set `maxSelections` to cap how many options can be picked; the rest disable once the cap is hit.
 
 <ComponentPreview component="filters" example="filters-multiselect">
   <FiltersMultiselect />
@@ -145,7 +150,7 @@ Pass `children` to lay the bar out yourself with `FilterChips`, `FilterAddButton
 
 ### Sizes
 
-Use `size` to set the height of every pill in the bar.
+Use `size` to set the height of every chip in the bar.
 
 <ComponentPreview component="filters" example="filters-sizes">
   <FiltersSizes />
@@ -183,7 +188,7 @@ Because `Filters` is controlled, syncing to the query string is just wiring `val
 
 ## Accessibility
 
-The field picker and value lists are `Combobox` instances, so type-to-search, arrow-key navigation, and selection follow the ARIA combobox pattern. The operator menu is a `DropdownMenu` radio group. Each pill is a group labeled with its full filter (for example, "Status is In progress"), and every segment is self-describing: the operator trigger is named "[field] operator: [operator]", value triggers and inputs are named "[field] value: ..." (including string affixes), and the remove control is "Remove [field] filter". Pressing `Backspace` or `Delete` on one of a pill's button segments removes the filter, and focus moves to the neighboring pill (or the add button) instead of dropping to the page.
+The add menu is a `Popover` holding inline `Combobox` lists, and the value lists on chips are `Combobox` popups, so type-to-search, arrow-key navigation, and selection follow the ARIA combobox pattern. The operator menu is a `DropdownMenu` radio group. Each chip is a group labeled with its full filter (for example, "Status is In progress"), and every segment is self-describing: the operator trigger is named "[field] operator: [operator]", value triggers and inputs are named "[field] value: ..." (including string affixes), and the remove control is "Remove [field] filter". Pressing `Backspace` or `Delete` on one of a chip's button segments removes the filter, and focus moves to the neighboring chip (or the add button) instead of dropping to the page.
 
 The Backspace removal and focus rescue rely on the `data-slot` attributes (`filter-chip`, `filter-chip-remove`, `filter-add`); custom chip children should preserve those slots to keep the keyboard behavior.
 
@@ -222,7 +227,7 @@ Filters is a custom component composed from Cubby UI primitives. It has no Base 
   fullType='"sm" | "default" | "lg"'
   defaultValue='"default"'
 >
-  Height of every pill and the add-filter button.
+  Height of every chip and the add-filter button.
 </ApiProp>
 
 <ApiProp name="allowDuplicateFields" fullType="boolean" defaultValue="false">
@@ -239,10 +244,12 @@ Filters is a custom component composed from Cubby UI primitives. It has no Base 
 <ApiProp name="labels" fullType="Partial<FiltersLabels>">
   Overrides for the bar's copy: `add`, `clear`, `searchFields`, `searchValues`,
   `noFields`, `noResults`, `selectValue`, `enterValue`, `value`, `min`, `max`,
-  `operator`, and `removeFilter` (a function building the remove button's
-  accessible label). Inline objects with string labels are fine (the memo
-  compares values, not identity); hoist the object only if you override
-  `removeFilter`, since an inline arrow is a new function every render.
+  `and` (joins a range), `fields` and `values` (add menu group headings),
+  `back`, `done`, `operator`, plus two functions: `selectedCount` (the
+  multiselect summary) and `removeFilter` (the remove button's accessible
+  label). Inline objects with string labels are fine (the memo compares values,
+  not identity); hoist the object if you override either function, since an
+  inline arrow is a new function every render.
 </ApiProp>
 
 </ApiPropsList>
@@ -265,12 +272,12 @@ Renders a `FilterChip` for every active filter, in order. Use it in `children` m
 
 #### FilterChip
 
-A single pill. Without `children` it renders the field, operator, value, and remove segments; pass `children` to compose the segments yourself.
+A single chip. Without `children` it renders the field, operator, value, and remove segments; pass `children` to compose the segments yourself.
 
 <ApiPropsList>
 
 <ApiProp name="filter" fullType="FilterValue">
-  The active filter this pill represents.
+  The active filter this chip represents.
 </ApiProp>
 
 <ApiProp name="field" fullType="FilterField">
@@ -282,7 +289,7 @@ A single pill. Without `children` it renders the field, operator, value, and rem
 
 #### FilterAddButton
 
-The searchable field picker. Renders the dashed trigger and the popup.
+The add menu: a trigger and a popup that steps from the field list to the chosen field's value. Picking a value adds the filter and closes the menu; multiselect values toggle in place until you press Done or close it.
 
 <ApiPropsList>
 
@@ -295,7 +302,7 @@ The searchable field picker. Renders the dashed trigger and the popup.
 
 ### Hooks
 
-`useFilters()` exposes the bar's state and actions (`filters`, `fieldsById`, `addFilter`, `updateFilter`, `removeFilter`, `clearAll`) to anything rendered inside a `FiltersProvider`. It re-renders on every filter edit; performance-sensitive leaves can subscribe to `useFiltersState()` (just `filters`) or `useFiltersActions()` (config and actions, stable while a value is being typed) instead. `useFilterChip()` exposes the current pill's `filter`, `field`, and `size` inside a `FilterChip`.
+`useFilters()` exposes the bar's state and actions (`filters`, `fieldsById`, `addFilter`, `updateFilter`, `removeFilter`, `clearAll`) to anything rendered inside a `FiltersProvider`. It re-renders on every filter edit; performance-sensitive leaves can subscribe to `useFiltersState()` (just `filters`) or `useFiltersActions()` (config and actions, stable while a value is being typed) instead. `useFilterChip()` exposes the current chip's `filter`, `field`, and `size` inside a `FilterChip`.
 
 State merging uses [useControllableState](/docs/hooks/use-controllable-state), installed as a shared hook.
 
@@ -336,7 +343,11 @@ Coerces unknown JSON (e.g. a parsed URL param) into a `FilterValue[]`, dropping 
 
 #### formatFilterValue / describeFilter
 
-`formatFilterValue` renders a filter's value as a human-readable string; `describeFilter` prepends the field and operator ("Status is In progress"). The pill's `aria-label` uses `describeFilter`, so custom UIs can stay consistent with it.
+`formatFilterValue` renders a filter's value as a human-readable string; `describeFilter` prepends the field and operator ("Status is In progress"). The chip's `aria-label` uses `describeFilter`, so custom UIs can stay consistent with it.
+
+#### scalarOperatorFor / withOption
+
+`scalarOperatorFor` returns the field's first operator that takes a single value, which is the one filters added from the menu start on. `withOption` folds a picked option into a value: a multiselect gains it (respecting `maxSelections`), any other field is replaced by it.
 
 #### resolveOperators
 

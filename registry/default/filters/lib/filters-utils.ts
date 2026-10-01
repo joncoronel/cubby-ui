@@ -9,40 +9,34 @@ import type {
 } from "./filters-types";
 
 /**
- * Per-size styling contract shared by every segment of a pill. Restyle here
- * rather than in the individual components.
+ * TextMorph clock for labels that answer a click (operator, value, count):
+ * the docs' click-feedback duration, shorter than the mode's own 240ms.
  */
-export const FILTER_SIZES: Record<
-  FilterSize,
-  {
-    /** `Button` size for icon-only segments (the remove button). */
-    iconButton: "icon_sm" | "icon" | "icon_lg";
-    /** `Input` size for inline text inputs. */
-    input: "sm" | "default";
-    /** Height matching the `Button` size, for non-button segments. */
-    height: string;
-    /** Padding + text classes for the field-label segment. */
-    fieldLabel: string;
-  }
-> = {
-  sm: {
-    iconButton: "icon_sm",
-    input: "sm",
-    height: "h-9 sm:h-8",
-    fieldLabel: "px-2.5 text-xs",
-  },
-  default: {
-    iconButton: "icon",
-    input: "default",
-    height: "h-10 sm:h-9",
-    fieldLabel: "px-3",
-  },
-  lg: {
-    iconButton: "icon_lg",
-    input: "default",
-    height: "h-11 sm:h-10",
-    fieldLabel: "px-4",
-  },
+export const CLICK_MORPH_MS = 209;
+
+/**
+ * Classes shared by every segment of a chip. The radius is the chip's
+ * (`rounded-lg`) minus its 1px border and 2px inset, so hover plates sit
+ * concentric with the chip's edge.
+ */
+export const FILTER_SEGMENT =
+  "inline-flex h-full shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[calc(var(--radius-lg)-3px)] px-(--seg-x) outline-0 outline-transparent outline-solid transition-[background-color,color,outline-color] duration-100 ease-out focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring/50";
+
+/** Hover, press and open paint for the clickable segments. */
+export const FILTER_SEGMENT_INTERACTIVE =
+  "cursor-pointer hover:bg-surface-hover active:bg-surface-active data-popup-open:bg-surface-hover";
+
+/**
+ * Per-size chip classes. Heights match the `Button` ramp so chips line up with
+ * the add and clear buttons. Segments read `--seg-x` for their side padding;
+ * their radius is the chip's minus its 1px border and 2px inset, so the hover
+ * plates stay concentric with the chip. Restyle here rather than per segment.
+ */
+export const FILTER_SIZES: Record<FilterSize, string> = {
+  sm: "h-9 sm:h-8 text-sm [--seg-x:0.5rem] [&_[data-slot=filter-chip-field]_svg]:size-3.5",
+  default:
+    "h-10 sm:h-9 text-sm [--seg-x:0.625rem] [&_[data-slot=filter-chip-field]_svg]:size-3.5",
+  lg: "h-11 sm:h-10 text-base [--seg-x:0.75rem] [&_[data-slot=filter-chip-field]_svg]:size-4",
 };
 
 // ----- Value coercers ---------------------------------------------------
@@ -322,6 +316,39 @@ export function formatFilterValue(
     default:
       return "";
   }
+}
+
+/**
+ * The operator a filter added from the menu starts on: the field's first
+ * operator that takes a single value, so a picked or typed value always has
+ * somewhere to go. `undefined` when the field has none (the menu then adds
+ * the filter straight away with its defaults).
+ */
+export function scalarOperatorFor(
+  field: FilterField,
+): FilterOperator | undefined {
+  return resolveOperators(field).find(
+    (operator) => operatorShape(operator) === "scalar",
+  );
+}
+
+/**
+ * Folds a picked option into the field's value: a multiselect gains it (once),
+ * anything else is replaced by it. Used when a value is chosen straight from
+ * the add menu's search for a field that already has a filter.
+ */
+export function withOption(
+  field: FilterField,
+  current: unknown,
+  optionValue: string,
+): unknown {
+  if (field.type !== "multiselect") return optionValue;
+  const values = asStringArray(current);
+  if (values.includes(optionValue)) return values;
+  if (field.maxSelections != null && values.length >= field.maxSelections) {
+    return values;
+  }
+  return [...values, optionValue];
 }
 
 /** Builds a plain-language summary of a filter, e.g. for screen readers. */

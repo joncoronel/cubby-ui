@@ -840,6 +840,16 @@
           "target": "components/ui/cubby-ui/filters/lib/filters-utils.ts"
         },
         {
+          "path": "registry/default/filters/lib/flow-presence.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/filters/lib/flow-presence.ts"
+        },
+        {
+          "path": "registry/default/filters/filters-add-menu.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/filters/filters-add-menu.tsx"
+        },
+        {
           "path": "registry/default/filters/filters-context.tsx",
           "type": "registry:ui",
           "target": "components/ui/cubby-ui/filters/filters-context.tsx"
@@ -853,11 +863,12 @@
       "registryDependencies": [
         "@cubby-ui/badge",
         "@cubby-ui/button",
-        "@cubby-ui/button-group",
-        "@cubby-ui/combobox",
         "@cubby-ui/dropdown-menu",
+        "@cubby-ui/text-morph",
+        "@cubby-ui/combobox",
         "@cubby-ui/kbd",
-        "@cubby-ui/input",
+        "@cubby-ui/popover",
+        "@cubby-ui/transition-panel",
         "@cubby-ui/use-controllable-state"
       ],
       "dependencies": [

@@ -1,6 +1,6 @@
 import type * as React from "react";
 
-/** Size of the filter bar and its pills. */
+/** Size of the filter bar and its chips. */
 export type FilterSize = "sm" | "default" | "lg";
 
 /** Built-in field types. `custom` renders its own value control. */
@@ -134,8 +134,20 @@ export interface FiltersLabels {
   value: string;
   min: string;
   max: string;
+  /** Joins the two bounds of a range, as in "between 2 and 8". */
+  and: string;
+  /** Group heading for fields in the add menu while searching. */
+  fields: string;
+  /** Group heading for matching values in the add menu while searching. */
+  values: string;
+  /** Accessible name of the add menu's back button. */
+  back: string;
+  /** Closes the add menu after picking several values of a multiselect. */
+  done: string;
   /** Word used in the operator trigger's accessible name. */
   operator: string;
+  /** Summary for a multiselect value with two or more options picked. */
+  selectedCount: (count: number, field: FilterField) => string;
   /** Builds the accessible label for a pill's remove button. */
   removeFilter: (fieldLabel: string) => string;
 }

@@ -98,7 +98,7 @@ const fields: FilterField[] = [
         type="date"
         value={typeof value === "string" ? value : ""}
         onChange={(event) => onValueChange(event.target.value)}
-        className="focus-visible:outline-ring/50 h-10 rounded-none bg-transparent px-2.5 text-sm outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 sm:h-9"
+        className="hover:bg-surface-hover focus-visible:outline-ring/50 h-full rounded-[calc(var(--radius-lg)-3px)] bg-transparent px-(--seg-x) text-sm font-medium outline-none focus-visible:outline-2 focus-visible:-outline-offset-2"
       />
     ),
   },

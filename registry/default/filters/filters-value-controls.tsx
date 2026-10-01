@@ -3,7 +3,6 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/registry/default/button/button";
 import {
   Combobox,
   ComboboxEmpty,
@@ -13,22 +12,27 @@ import {
   ComboboxPopup,
   ComboboxTrigger,
 } from "@/registry/default/combobox/combobox";
-import { Input } from "@/registry/default/input/input";
+import { TextMorph } from "@/registry/default/text-morph/text-morph";
 import { NumberField as BaseNumberField } from "@base-ui/react/number-field";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Search01Icon } from "@hugeicons/core-free-icons";
+
+import { OptionContent } from "./filters-add-menu";
 import { useFilterChip, useFiltersActions } from "./filters-context";
 import {
   asNumberOrNull,
   asNumberRange,
   asString,
   asStringArray,
-  FILTER_SIZES,
+  CLICK_MORPH_MS,
+  FILTER_SEGMENT,
+  FILTER_SEGMENT_INTERACTIVE,
   operatorShapeFor,
 } from "./lib/filters-utils";
 import type {
   FilterField,
   FilterOption,
-  FilterSize,
   FilterValue,
   MultiSelectFilterField,
   NumberFilterField,
@@ -39,18 +43,16 @@ import type {
 interface ValueControlProps<F extends FilterField> {
   field: F;
   filter: FilterValue;
-  size: FilterSize;
-  autoOpen: boolean;
   onValueChange: (value: unknown) => void;
 }
 
 /**
- * The value segment of a pill. Renders the control matching the field type,
+ * The value segment of a chip. Renders the control matching the field type,
  * or nothing when the operator's shape is `"none"` (`is empty`), so custom
  * chip compositions are correct without re-implementing that rule.
  */
 function FilterChipValue() {
-  const { field, filter, size, autoOpen } = useFilterChip();
+  const { field, filter, size } = useFilterChip();
   const { updateFilter } = useFiltersActions();
   const onValueChange = React.useCallback(
     (nextValue: unknown) => updateFilter(filter.id, { value: nextValue }),
@@ -66,8 +68,6 @@ function FilterChipValue() {
         <OptionsValueControl
           field={field}
           filter={filter}
-          size={size}
-          autoOpen={autoOpen}
           onValueChange={onValueChange}
         />
       );
@@ -76,8 +76,6 @@ function FilterChipValue() {
         <TextValueControl
           field={field}
           filter={filter}
-          size={size}
-          autoOpen={autoOpen}
           onValueChange={onValueChange}
         />
       );
@@ -86,14 +84,15 @@ function FilterChipValue() {
         <NumberValueControl
           field={field}
           filter={filter}
-          size={size}
-          autoOpen={autoOpen}
           onValueChange={onValueChange}
         />
       );
     case "custom":
       return (
-        <div data-slot="filter-chip-value" className="flex items-stretch">
+        <div
+          data-slot="filter-chip-value"
+          className="flex h-full items-stretch"
+        >
           {field.renderValue({
             value: filter.value,
             operator: filter.operator,
@@ -121,66 +120,36 @@ function valueAriaLabel(
 
 // ----- Select / multiselect ----------------------------------------------
 
-const VALUE_TRIGGER_CLASSES =
-  "text-foreground data-popup-open:bg-surface-hover rounded-none font-normal focus-visible:-outline-offset-2";
-
-function OptionContent({ option }: { option: FilterOption }) {
+/**
+ * Up to three option icons, overlapped like a hand of cards and ringed in the
+ * chip's own fill so each reads against the one beneath. Icons join and
+ * leave with a small scale so a pick registers on the chip itself.
+ */
+function StackedIcons({ options }: { options: FilterOption[] }) {
+  const withIcons = options.filter((option) => option.icon).slice(0, 3);
+  if (withIcons.length === 0) return null;
   return (
-    <span className="flex items-center gap-2">
-      {option.icon}
-      <span className="truncate">{option.label}</span>
+    <span aria-hidden className="flex shrink-0 items-center">
+      {withIcons.map((option, index) => (
+        <span
+          key={option.value}
+          style={{ zIndex: withIcons.length - index }}
+          className={cn(
+            "bg-card ring-card relative flex items-center justify-center rounded-full ring-[1.5px]",
+            index > 0 && "-ms-0.5",
+            "transition-[scale,opacity] duration-150 ease-out motion-reduce:transition-none starting:scale-50 starting:opacity-0",
+          )}
+        >
+          {option.icon}
+        </span>
+      ))}
     </span>
   );
 }
 
-interface OptionsTriggerProps {
-  size: FilterSize;
-  icon?: React.ReactNode;
-  text: string;
-  isPlaceholder: boolean;
-  /** Accessible name with field context, e.g. "Status value: Done". */
-  "aria-label": string;
-}
-
-/** Shared ghost trigger for the single- and multi-select value popups. */
-function OptionsTrigger({
-  size,
-  icon,
-  text,
-  isPlaceholder,
-  "aria-label": ariaLabel,
-}: OptionsTriggerProps) {
-  return (
-    <ComboboxTrigger
-      render={(triggerProps) => (
-        <Button
-          {...triggerProps}
-          data-slot="filter-chip-value"
-          aria-label={ariaLabel}
-          variant="ghost"
-          size={size}
-          className={VALUE_TRIGGER_CLASSES}
-        >
-          <span className="flex items-center gap-1.5">
-            {icon}
-            <span
-              className={cn(
-                "max-w-40 truncate",
-                isPlaceholder && "text-muted-foreground",
-              )}
-            >
-              {text}
-            </span>
-          </span>
-        </Button>
-      )}
-    />
-  );
-}
-
 /**
- * The searchable popup shell shared by the value pickers and the add-filter
- * menu: bordered search header, empty state, and the option list.
+ * The searchable popup shell for editing a chip's options: the same ruled
+ * search row as the add menu, then the list.
  */
 function FilterSearchPopup({
   placeholder,
@@ -194,34 +163,26 @@ function FilterSearchPopup({
   children: React.ComponentProps<typeof ComboboxList>["children"];
 }) {
   return (
-    <ComboboxPopup className={cn("flex min-w-52 flex-col p-0", className)}>
-      <div className="border-border border-b p-2">
-        <ComboboxInput
-          variant="elevated"
-          placeholder={placeholder}
-          showTrigger={false}
-          showClear={false}
-        />
-      </div>
-      <ComboboxEmpty>{empty}</ComboboxEmpty>
-      <ComboboxList>{children}</ComboboxList>
-    </ComboboxPopup>
-  );
-}
-
-function OptionsPopup({
-  children,
-}: {
-  children: React.ComponentProps<typeof ComboboxList>["children"];
-}) {
-  const { labels } = useFiltersActions();
-  return (
-    <FilterSearchPopup
-      placeholder={labels.searchValues}
-      empty={labels.noResults}
+    <ComboboxPopup
+      align="start"
+      className={cn("flex w-64 flex-col p-0", className)}
     >
-      {children}
-    </FilterSearchPopup>
+      <ComboboxInput
+        showTrigger={false}
+        showClear={false}
+        placeholder={placeholder}
+        start={
+          <HugeiconsIcon
+            icon={Search01Icon}
+            strokeWidth={2}
+            className="text-muted-foreground size-4"
+          />
+        }
+        className="h-11 gap-2 rounded-none border-0 border-b bg-transparent px-3 outline-0 focus-within:outline-0 focus-within:outline-offset-0 sm:h-11 dark:bg-transparent"
+      />
+      <ComboboxEmpty>{empty}</ComboboxEmpty>
+      <ComboboxList className="max-h-72 py-1">{children}</ComboboxList>
+    </ComboboxPopup>
   );
 }
 
@@ -229,35 +190,84 @@ function OptionsPopup({
 function OptionsValueControl({
   field,
   filter,
-  size,
-  autoOpen,
   onValueChange,
 }: ValueControlProps<SelectFilterField | MultiSelectFilterField>) {
   const { labels } = useFiltersActions();
-  // Capture once at mount so the uncontrolled open state never changes.
-  const [initialOpen] = React.useState(autoOpen);
   const placeholder = field.placeholder ?? labels.selectValue;
+  const multiple = field.type === "multiselect";
 
-  if (field.type === "multiselect") {
-    const values = asStringArray(filter.value);
-    const selected = field.options.filter((option) =>
-      values.includes(option.value),
-    );
-    const atMax =
-      field.maxSelections != null && values.length >= field.maxSelections;
-    const display =
-      selected.length === 0
-        ? placeholder
-        : selected.length === 1
-          ? selected[0].label
-          : `${selected[0].label} +${selected.length - 1}`;
+  const values = multiple
+    ? asStringArray(filter.value)
+    : typeof filter.value === "string"
+      ? [filter.value]
+      : [];
+  const selected = field.options.filter((option) =>
+    values.includes(option.value),
+  );
+  const atMax =
+    multiple &&
+    field.maxSelections != null &&
+    values.length >= field.maxSelections;
+  const text =
+    selected.length === 0
+      ? placeholder
+      : selected.length === 1
+        ? selected[0].label
+        : labels.selectedCount(selected.length, field);
 
+  const trigger = (
+    // Render function, so the segment's classes replace the stock trigger's
+    // rather than merging with them.
+    <ComboboxTrigger
+      render={(triggerProps) => (
+        <button
+          {...triggerProps}
+          type="button"
+          data-slot="filter-chip-value"
+          aria-label={`${field.label} ${labels.value.toLowerCase()}: ${selected.map((option) => option.label).join(", ") || placeholder}`}
+          className={cn(
+            FILTER_SEGMENT,
+            FILTER_SEGMENT_INTERACTIVE,
+            "font-medium",
+            selected.length === 0 && "text-muted-foreground font-normal",
+          )}
+        >
+          <StackedIcons options={selected} />
+          <TextMorph
+            value={text}
+            duration={CLICK_MORPH_MS}
+            className="max-w-48 overflow-hidden"
+          />
+        </button>
+      )}
+    />
+  );
+
+  const popup = (
+    <FilterSearchPopup
+      placeholder={labels.searchValues}
+      empty={labels.noResults}
+    >
+      {(option: FilterOption) => (
+        <ComboboxItem
+          key={option.value}
+          value={option}
+          disabled={atMax && !values.includes(option.value)}
+          className="my-0!"
+        >
+          <OptionContent option={option} />
+        </ComboboxItem>
+      )}
+    </FilterSearchPopup>
+  );
+
+  if (multiple) {
     return (
       <Combobox<FilterOption, true>
         items={field.options}
         multiple
+        autoHighlight
         value={selected}
-        defaultOpen={initialOpen}
         onValueChange={(next) => {
           // Reject selections past the cap; the controlled value snaps back.
           if (
@@ -270,58 +280,37 @@ function OptionsValueControl({
         }}
         itemToStringLabel={(option) => option.label}
       >
-        <OptionsTrigger
-          size={size}
-          icon={selected[0]?.icon}
-          text={display}
-          isPlaceholder={selected.length === 0}
-          aria-label={`${field.label} ${labels.value.toLowerCase()}: ${display}`}
-        />
-        <OptionsPopup>
-          {(option: FilterOption) => (
-            <ComboboxItem
-              key={option.value}
-              value={option}
-              disabled={atMax && !values.includes(option.value)}
-            >
-              <OptionContent option={option} />
-            </ComboboxItem>
-          )}
-        </OptionsPopup>
+        {trigger}
+        {popup}
       </Combobox>
     );
   }
 
-  const selected =
-    field.options.find((option) => option.value === filter.value) ?? null;
-
   return (
     <Combobox<FilterOption, false>
       items={field.options}
-      value={selected}
-      defaultOpen={initialOpen}
+      autoHighlight
+      value={selected[0] ?? null}
       onValueChange={(next) => onValueChange(next ? next.value : null)}
       itemToStringLabel={(option) => option.label}
     >
-      <OptionsTrigger
-        size={size}
-        icon={selected?.icon}
-        text={selected?.label ?? placeholder}
-        isPlaceholder={!selected}
-        aria-label={`${field.label} ${labels.value.toLowerCase()}: ${selected?.label ?? placeholder}`}
-      />
-      <OptionsPopup>
-        {(option: FilterOption) => (
-          <ComboboxItem key={option.value} value={option}>
-            <OptionContent option={option} />
-          </ComboboxItem>
-        )}
-      </OptionsPopup>
+      {trigger}
+      {popup}
     </Combobox>
   );
 }
 
 // ----- Text / number ------------------------------------------------------
+
+// Inputs are segments too: no chrome of their own, the chip's hover plate on
+// hover, and a width that follows what's typed (`field-sizing`, with a fixed
+// width where it's unsupported).
+const INPUT_SEGMENT = cn(
+  FILTER_SEGMENT,
+  "hover:bg-surface-hover focus-visible:bg-surface-hover cursor-text bg-transparent font-medium",
+  "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground placeholder:font-normal",
+  "field-sizing-content max-w-48 min-w-[1ch] not-supports-[field-sizing:content]:w-28",
+);
 
 /**
  * The value segment wrapper for inline inputs. Owns the `filter-chip-value`
@@ -340,22 +329,22 @@ function ValueSegment({
     <div
       data-slot="filter-chip-value"
       className={cn(
-        "flex items-center",
-        prefix && "[&_input]:pl-1",
-        suffix && "[&_input]:pr-1",
+        "flex h-full items-center",
+        prefix != null && "[&_input]:ps-1",
+        suffix != null && "[&_input]:pe-1",
       )}
     >
-      {prefix ? (
-        <span className="text-muted-foreground pl-2.5 text-sm select-none">
+      {prefix != null && (
+        <span className="text-muted-foreground ps-(--seg-x) select-none">
           {prefix}
         </span>
-      ) : null}
+      )}
       {children}
-      {suffix ? (
-        <span className="text-muted-foreground pr-2.5 text-sm select-none">
+      {suffix != null && (
+        <span className="text-muted-foreground pe-(--seg-x) select-none">
           {suffix}
         </span>
-      ) : null}
+      )}
     </div>
   );
 }
@@ -363,25 +352,18 @@ function ValueSegment({
 function TextValueControl({
   field,
   filter,
-  size,
-  autoOpen,
   onValueChange,
 }: ValueControlProps<TextFilterField>) {
   const { labels } = useFiltersActions();
   return (
     <ValueSegment prefix={field.prefix} suffix={field.suffix}>
-      <Input
+      <input
         data-slot="filter-chip-value-input"
         type="text"
-        autoFocus={autoOpen}
         aria-label={valueAriaLabel(field, labels.value.toLowerCase())}
         value={asString(filter.value)}
         placeholder={field.placeholder ?? labels.enterValue}
-        size={FILTER_SIZES[size].input}
-        className={cn(
-          "w-40 flex-none rounded-none border-0 bg-transparent shadow-none focus-visible:-outline-offset-2 dark:bg-transparent",
-          FILTER_SIZES[size].height,
-        )}
+        className={INPUT_SEGMENT}
         onChange={(event) => onValueChange(event.target.value)}
       />
     </ValueSegment>
@@ -390,20 +372,16 @@ function TextValueControl({
 
 function NumberValueField({
   value,
-  size,
   step,
   placeholder,
-  autoFocus,
   prefix,
   suffix,
   "aria-label": ariaLabel,
   onValueChange,
 }: {
   value: number | null;
-  size: FilterSize;
   step?: number;
   placeholder?: string;
-  autoFocus?: boolean;
   prefix?: React.ReactNode;
   suffix?: React.ReactNode;
   "aria-label": string;
@@ -420,17 +398,15 @@ function NumberValueField({
         step={step}
         allowWheelScrub
         onValueChange={(next) => onValueChange(next)}
-        className={cn("flex flex-none items-center", FILTER_SIZES[size].height)}
+        className="flex h-full items-center"
       >
         <BaseNumberField.Input
           data-slot="filter-chip-value-input"
-          autoFocus={autoFocus}
           aria-label={ariaLabel}
           placeholder={placeholder}
           className={cn(
-            "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground",
-            "h-full w-24 rounded-none border-0 bg-transparent px-2.5 text-base font-normal tabular-nums outline-none md:text-sm",
-            "focus-visible:outline-ring/50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid",
+            INPUT_SEGMENT,
+            "tabular-nums not-supports-[field-sizing:content]:w-16",
           )}
         />
       </BaseNumberField.Root>
@@ -441,8 +417,6 @@ function NumberValueField({
 function NumberValueControl({
   field,
   filter,
-  size,
-  autoOpen,
   onValueChange,
 }: ValueControlProps<NumberFilterField>) {
   const { labels } = useFiltersActions();
@@ -453,18 +427,21 @@ function NumberValueControl({
       <>
         <NumberValueField
           value={range.min}
-          size={size}
           step={field.step}
           placeholder={labels.min}
           prefix={field.prefix}
           suffix={field.suffix}
           aria-label={valueAriaLabel(field, labels.min.toLowerCase())}
-          autoFocus={autoOpen}
           onValueChange={(min) => onValueChange({ ...range, min })}
         />
+        <span
+          aria-hidden
+          className="text-muted-foreground shrink-0 px-0.5 select-none"
+        >
+          {labels.and}
+        </span>
         <NumberValueField
           value={range.max}
-          size={size}
           step={field.step}
           placeholder={labels.max}
           prefix={field.prefix}
@@ -479,13 +456,11 @@ function NumberValueControl({
   return (
     <NumberValueField
       value={asNumberOrNull(filter.value)}
-      size={size}
       step={field.step}
       placeholder={field.placeholder ?? labels.value}
       prefix={field.prefix}
       suffix={field.suffix}
       aria-label={valueAriaLabel(field, labels.value.toLowerCase())}
-      autoFocus={autoOpen}
       onValueChange={onValueChange}
     />
   );

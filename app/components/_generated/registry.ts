@@ -978,7 +978,7 @@ export const componentMetadata = {
   "filters": {
     "name": "filters",
     "title": "Filters",
-    "description": "A filter bar of segmented pills with per-field operators and value controls.",
+    "description": "A filter bar of sentence-like chips with per-field operators and a two-step add menu.",
     "category": "UI",
     "registryDependencies": [
       "@cubby-ui/button",

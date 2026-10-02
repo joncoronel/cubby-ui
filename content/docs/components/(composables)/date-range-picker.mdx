@@ -63,7 +63,7 @@ The picker shows two months from the `sm` breakpoint up and one below it. Set `n
 
 <ComponentPreview
   component="date-range-picker"
-  example="date-range-picker-multiple-months"
+  example="date-range-picker-one-month"
 />
 
 ### With Custom Format
@@ -96,6 +96,10 @@ Set `disabled` to prevent opening the picker.
 ## Accessibility
 
 The trigger is a button that opens the calendar in a popover and moves focus into it. Use the arrow keys to move between days and `Enter` or `Space` to set the start and then the end; the preview band follows keyboard focus as well as the pointer. The status line under the calendar is a polite live region, so each step ("pick an end date", then the finished range and its length) is announced. `Escape` closes the popover without a change.
+
+## Migrating
+
+This version replaces the earlier API. `onSelect` is now `onValueChange`, it fires only once both ends are picked, and an empty value is `null`. `format` takes a function, `({ from, to }) => string`, instead of a Day.js format string. `fixedWeeks` and other calendar options now go through `calendarProps`.
 
 ## API Reference
 
@@ -135,6 +139,10 @@ The DateRangePicker composes [`Calendar`](/docs/components/calendar) in `range` 
 
 <ApiProp name="open" fullType="boolean">
   Whether the popover is open. Pair with `onOpenChange`, or use `defaultOpen`.
+</ApiProp>
+
+<ApiProp name="defaultOpen" fullType="boolean" defaultValue="false">
+  Whether the popover starts open when uncontrolled.
 </ApiProp>
 
 <ApiProp

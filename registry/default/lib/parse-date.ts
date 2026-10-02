@@ -5,6 +5,8 @@
  * day/month order. Everything resolves to local midnight.
  */
 
+import { startOfDay } from "./date-utils";
+
 export interface ParseDateOptions {
   /** The "today" that relative input resolves against. Defaults to now. */
   referenceDate?: Date;
@@ -59,15 +61,35 @@ const KEYWORDS: Record<string, number> = {
   yday: -1,
 };
 
+/** Own entries only, so names like "constructor" aren't found on Object. */
+function unitOf(name: string): Unit | undefined {
+  return Object.hasOwn(UNITS, name) ? UNITS[name] : undefined;
+}
+
+function keywordOf(name: string): number | undefined {
+  return Object.hasOwn(KEYWORDS, name) ? KEYWORDS[name] : undefined;
+}
+
+/** Earliest and latest years a parsed date may land in. */
+const MIN_YEAR = 1;
+const MAX_YEAR = 9999;
+
+/**
+ * The date if it's real and in range, else null. Huge years ("march 999999")
+ * or amounts ("in 99999999 years") overflow into Invalid Date, which throws
+ * when formatted.
+ */
+function valid(date: Date | null): Date | null {
+  if (!date || Number.isNaN(date.getTime())) return null;
+  const year = date.getFullYear();
+  return year >= MIN_YEAR && year <= MAX_YEAR ? date : null;
+}
+
 const RANGE_SEPARATOR = /\s+(?:-|to|until|till|through|thru)\s+|\s*[–—]\s*/;
 
 /* -------------------------------------------------------------------------------------------------
  * Date arithmetic
  * -------------------------------------------------------------------------------------------------*/
-
-function startOfDay(date: Date): Date {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-}
 
 function daysInMonth(year: number, month: number): number {
   return new Date(year, month + 1, 0).getDate();
@@ -177,26 +199,28 @@ function expandYear(year: number, reference: Date): number {
  * -------------------------------------------------------------------------------------------------*/
 
 function parseRelative(text: string, reference: Date): Date | null {
-  if (text in KEYWORDS) return add(reference, KEYWORDS[text], "day");
+  const keyword = keywordOf(text);
+  if (keyword !== undefined) return add(reference, keyword, "day");
 
   // "in 3 days", "+2w", "3 weeks"
   const ahead = text.match(/^(?:in\s+|\+)?(\d+)\s*([a-z]+)$/);
-  if (ahead && UNITS[ahead[2]]) {
-    return add(reference, Number(ahead[1]), UNITS[ahead[2]]);
-  }
+  const aheadUnit = ahead && unitOf(ahead[2]);
+  if (ahead && aheadUnit) return add(reference, Number(ahead[1]), aheadUnit);
 
   // "-2w", "3 days ago"
   const behind =
     text.match(/^-(\d+)\s*([a-z]+)$/) ?? text.match(/^(\d+)\s*([a-z]+)\s+ago$/);
-  if (behind && UNITS[behind[2]]) {
-    return add(reference, -Number(behind[1]), UNITS[behind[2]]);
+  const behindUnit = behind && unitOf(behind[2]);
+  if (behind && behindUnit) {
+    return add(reference, -Number(behind[1]), behindUnit);
   }
 
   // "next week", "last month", "this year"
   const step = text.match(/^(next|last|this)\s+([a-z]+)$/);
-  if (step && UNITS[step[2]]) {
+  const stepUnit = step && unitOf(step[2]);
+  if (step && stepUnit) {
     const direction = { next: 1, last: -1, this: 0 }[step[1] as "next"];
-    return add(reference, direction, UNITS[step[2]]);
+    return add(reference, direction, stepUnit);
   }
 
   return null;
@@ -264,15 +288,18 @@ function parseWords(
   for (const raw of text.split(" ")) {
     const token = normalizeName(raw);
     if (!token || token === "of" || token === "the") continue;
-    // A weekday alongside a full date ("Thu, Oct 1") is redundant.
-    if (weekdays.has(token)) continue;
 
+    // Months first: in some locales a weekday and a month share a short name
+    // ("mar" is Tuesday and March in Spanish and Italian).
     const month = months.get(token);
     if (month !== undefined) {
       if (parts.month !== undefined) return null;
       parts.month = month;
       continue;
     }
+
+    // A weekday alongside a full date ("Thu, Oct 1") is redundant.
+    if (weekdays.has(token)) continue;
 
     const number = token.match(/^'?(\d+)(?:st|nd|rd|th)?$/);
     if (!number) return null;
@@ -319,6 +346,7 @@ function resolve(parts: DateParts, reference: Date): Date | null {
   // A month on its own ("march 2027") means its first day.
   const day =
     parts.day ?? (parts.month !== undefined ? 1 : reference.getDate());
+  if (year < MIN_YEAR || year > MAX_YEAR) return null;
   if (month < 0 || month > 11 || day < 1 || day > daysInMonth(year, month)) {
     return null;
   }
@@ -336,11 +364,19 @@ export function parseDate(
   const reference = startOfDay(options.referenceDate ?? new Date());
   const parsed = parseOne(input, reference, options.locale);
   if (!parsed) return null;
-  return "date" in parsed ? parsed.date : resolve(parsed.parts, reference);
+  return valid(
+    "date" in parsed ? parsed.date : resolve(parsed.parts, reference),
+  );
 }
 
 function dateOf(parsed: Parsed): Date | null {
   return "date" in parsed ? parsed.date : null;
+}
+
+function checkedRange(range: ParsedDateRange): ParsedDateRange | null {
+  const from = valid(range.from);
+  const to = valid(range.to);
+  return from && to ? { from, to } : null;
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -353,10 +389,10 @@ function parseRelativeRange(
 ): ParsedDateRange | null {
   // "last 7 days", "past 2 weeks", "next 30 days"
   const match = text.match(/^(last|past|next)\s+(\d+)\s*([a-z]+)$/);
-  if (!match || !UNITS[match[3]]) return null;
+  const unit = match && unitOf(match[3]);
+  if (!match || !unit) return null;
   const amount = Number(match[2]);
   if (amount < 1) return null;
-  const unit = UNITS[match[3]];
   if (match[1] === "next") {
     return {
       from: reference,
@@ -383,7 +419,7 @@ export function parseDateRange(
   if (!text) return null;
 
   const relative = parseRelativeRange(text, reference);
-  if (relative) return relative;
+  if (relative) return checkedRange(relative);
 
   const sides = text.split(RANGE_SEPARATOR);
   if (sides.length === 1) {
@@ -429,5 +465,5 @@ export function parseDateRange(
     }
     if (!from || !to) return null;
   }
-  return to < from ? { from: to, to: from } : { from, to };
+  return checkedRange(to < from ? { from: to, to: from } : { from, to });
 }

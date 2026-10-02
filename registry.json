@@ -295,6 +295,11 @@
           "target": "components/ui/cubby-ui/calendar/calendar.tsx"
         },
         {
+          "path": "registry/default/calendar/calendar-picker.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/calendar/calendar-picker.tsx"
+        },
+        {
           "path": "registry/default/calendar/calendar.css",
           "type": "registry:file",
           "target": "components/ui/cubby-ui/calendar/calendar.css"
@@ -305,6 +310,7 @@
         "@cubby-ui/scroll-area",
         "@cubby-ui/text-morph",
         "@cubby-ui/use-controllable-state",
+        "@cubby-ui/date-utils",
         "@cubby-ui/elevated"
       ],
       "dependencies": [
@@ -640,15 +646,21 @@
         {
           "path": "registry/default/date-picker/date-picker.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/date-picker.tsx"
+          "target": "components/ui/cubby-ui/date-picker/date-picker.tsx"
+        },
+        {
+          "path": "registry/default/date-picker/date-picker-parts.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/date-picker/date-picker-parts.tsx"
         }
       ],
       "registryDependencies": [
         "@cubby-ui/calendar",
         "@cubby-ui/input",
-        "@cubby-ui/input-group",
         "@cubby-ui/popover",
+        "@cubby-ui/input-group",
         "@cubby-ui/use-controllable-state",
+        "@cubby-ui/date-utils",
         "@cubby-ui/parse-date"
       ],
       "dependencies": [
@@ -676,13 +688,25 @@
         "@cubby-ui/input",
         "@cubby-ui/popover",
         "@cubby-ui/use-controllable-state",
+        "@cubby-ui/date-utils",
         "@cubby-ui/parse-date"
       ],
       "dependencies": [
         "react-day-picker",
-        "class-variance-authority",
-        "@hugeicons/react",
-        "@hugeicons/core-free-icons"
+        "class-variance-authority"
+      ]
+    },
+    {
+      "name": "date-utils",
+      "type": "registry:lib",
+      "title": "dateUtils",
+      "description": "A utility function for date utils.",
+      "files": [
+        {
+          "path": "registry/default/lib/date-utils.ts",
+          "type": "registry:lib",
+          "target": "lib/cubby-ui/date-utils.ts"
+        }
       ]
     },
     {

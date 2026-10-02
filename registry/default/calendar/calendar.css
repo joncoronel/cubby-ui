@@ -301,7 +301,8 @@
 
   /* Appearing on a click, it settles in. Arriving with a new month, it
    * takes the weeks' entrance instead (data-enter is the direction), so it
-   * moves as part of the incoming page. */
+   * moves as part of the incoming page; when the days don't animate
+   * (data-enter="instant"), neither does it. */
   .calendar-selection:not([data-enter]) {
     @starting-style {
       opacity: 0;
@@ -309,7 +310,7 @@
     }
   }
 
-  .calendar-selection[data-enter] {
+  .calendar-selection:is([data-enter="start"], [data-enter="end"]) {
     animation: calendar-enter var(--calendar-enter-duration)
       var(--calendar-ease) var(--calendar-enter-delay) both;
   }

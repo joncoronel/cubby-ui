@@ -105,9 +105,34 @@ describe("parseDate", () => {
       ymd(parseDate("14 mars 2027", { referenceDate, locale: "fr" })),
     ).toBe("2027-03-14");
   });
+
+  it("prefers a month over a weekday sharing its short name", () => {
+    // "mar" is Tuesday and March in Spanish.
+    expect(ymd(parseDate("mar 14", { referenceDate, locale: "es" }))).toBe(
+      "2026-03-14",
+    );
+  });
+
+  it.each([
+    "constructor",
+    "in 3 constructor",
+    "toString",
+    "march 999999",
+    "in 99999999 years",
+    "99999 years ago",
+  ])("rejects %j instead of returning an invalid date", (input) => {
+    expect(parseDate(input, us)).toBeNull();
+  });
 });
 
 describe("parseDateRange", () => {
+  it.each(["constructor - friday", "last 99999999 years"])(
+    "rejects %j instead of returning an invalid range",
+    (input) => {
+      expect(parseDateRange(input, us)).toBeNull();
+    },
+  );
+
   it("reads two full dates", () => {
     expect(range("Oct 3, 2026 - Oct 12, 2026")).toEqual([
       "2026-10-03",

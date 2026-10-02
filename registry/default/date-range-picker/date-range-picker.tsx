@@ -8,27 +8,32 @@ import {
   type PropsBase,
 } from "react-day-picker";
 import type { VariantProps } from "class-variance-authority";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Calendar01Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
 
 import { cn } from "@/lib/utils";
 import {
   Calendar,
   CalendarPreset,
-  CalendarPresets,
+  type CalendarLabelsProp,
 } from "@/registry/default/calendar/calendar";
 import {
+  DatePickerClear,
+  DatePickerContent,
   DatePickerField,
+  DatePickerTrigger,
+  toDisabledMatchers,
   type DateFieldReading,
-} from "@/registry/default/date-picker/date-picker";
+  type PickerControlProps,
+} from "@/registry/default/date-picker/date-picker-parts";
 import { useControllableState } from "@/registry/default/hooks/use-controllable-state";
-import { inputVariants } from "@/registry/default/input/input";
-import { parseDateRange } from "@/registry/default/lib/parse-date";
+import type { inputVariants } from "@/registry/default/input/input";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/registry/default/popover/popover";
+  daysBetween,
+  isSameDay,
+  startOfDay,
+  toISODate,
+} from "@/registry/default/lib/date-utils";
+import { parseDateRange } from "@/registry/default/lib/parse-date";
+import { Popover } from "@/registry/default/popover/popover";
 
 export type { DateRange };
 
@@ -84,10 +89,7 @@ const DEFAULT_LABELS: DateRangePickerLabels = {
   tooLong: (nights) => `At most ${nights} ${nights === 1 ? "night" : "nights"}`,
 };
 
-export type DateRangePickerProps = Omit<
-  React.ComponentProps<"button">,
-  "value" | "defaultValue" | "onChange" | "onSelect" | "children"
-> &
+export type DateRangePickerProps = PickerControlProps &
   VariantProps<typeof inputVariants> & {
     /** The selected range. `null` means nothing is selected. */
     value?: DateRangeValue | null;
@@ -107,6 +109,7 @@ export type DateRangePickerProps = Omit<
      * "last 30 days", and the calendar opens from the button beside it.
      */
     editable?: boolean;
+    disabled?: boolean;
     /** Earliest selectable date. Also stops navigation before its month. */
     minDate?: Date;
     /** Latest selectable date. Also stops navigation after its month. */
@@ -123,41 +126,41 @@ export type DateRangePickerProps = Omit<
     presets?: DateRangePreset[];
     /** Submits the ends as `YYYY-MM-DD` under `${name}From` and `${name}To`. */
     name?: string;
-    /** Passed through to the calendar (locale, week start, and so on). */
-    calendarProps?: Partial<PropsBase>;
+    /**
+     * Passed through to the calendar (locale, week start, and so on). Its
+     * `labels` take DayPicker's and the calendar's own screen-reader text.
+     */
+    calendarProps?: Omit<Partial<PropsBase>, "labels"> & {
+      labels?: CalendarLabelsProp;
+    };
     /** Copy overrides for the picker's own text, merged over the defaults. */
     labels?: Partial<DateRangePickerLabels>;
   };
 
-const DAY_MS = 24 * 60 * 60 * 1000;
-
-function startOfDay(date: Date): Date {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-}
-
-function isSameDay(a: Date, b: Date): boolean {
-  return startOfDay(a).getTime() === startOfDay(b).getTime();
-}
-
-function toISODate(date: Date): string {
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-}
-
-/** Days in a range, counting both ends. Rounded to absorb DST shifts. */
+/** Days in a range, counting both ends. */
 function countDays(range: DateRangeValue): number {
-  return (
-    Math.round(
-      (startOfDay(range.to).getTime() - startOfDay(range.from).getTime()) /
-        DAY_MS,
-    ) + 1
-  );
+  return daysBetween(range.from, range.to) + 1;
 }
 
 function resolvePreset(preset: DateRangePreset): DateRangeValue {
   const range =
     typeof preset.value === "function" ? preset.value() : preset.value;
   return { from: startOfDay(range.from), to: startOfDay(range.to) };
+}
+
+/**
+ * A range written out with one formatter: a single day on its own, or the
+ * locale's compact range. ICU versions disagree on thin vs regular spaces
+ * around the dash, which breaks hydration between Node and the browser, so
+ * those are normalised.
+ */
+function formatSpan(
+  formatter: Intl.DateTimeFormat,
+  range: DateRangeValue,
+): string {
+  return isSameDay(range.from, range.to)
+    ? formatter.format(range.from)
+    : formatter.formatRange(range.from, range.to).replace(/[  ]/g, " ");
 }
 
 function useMediaQuery(query: string): boolean {
@@ -183,6 +186,7 @@ function DateRangePicker({
   format,
   clearable = false,
   editable = false,
+  disabled,
   minDate,
   maxDate,
   disabledDates,
@@ -196,7 +200,6 @@ function DateRangePicker({
   variant,
   size,
   className,
-  disabled,
   ...props
 }: DateRangePickerProps) {
   const [value, setValue] = useControllableState<DateRangeValue | null>({
@@ -210,7 +213,6 @@ function DateRangePicker({
     onValueChange: onOpenChange,
   });
   const triggerRef = React.useRef<HTMLButtonElement>(null);
-  const panelRef = React.useRef<HTMLDivElement>(null);
   const groupRef = React.useRef<HTMLDivElement>(null);
   const wide = useMediaQuery("(min-width: 640px)");
 
@@ -233,22 +235,39 @@ function DateRangePicker({
     year: "numeric",
   });
   const formatRange = (range: DateRangeValue) =>
-    format?.(range) ??
-    (isSameDay(range.from, range.to)
-      ? dayFormat.format(range.from)
-      : // ICU versions disagree on thin vs regular spaces around the dash,
-        // which breaks hydration between Node and the browser.
-        dayFormat.formatRange(range.from, range.to).replace(/[  ]/g, " "));
+    format?.(range) ?? formatSpan(dayFormat, range);
 
-  const disabledMatchers: Matcher[] = [
-    ...(minDate ? [{ before: startOfDay(minDate) }] : []),
-    ...(maxDate ? [{ after: startOfDay(maxDate) }] : []),
-    ...(disabledDates
-      ? Array.isArray(disabledDates)
-        ? disabledDates
-        : [disabledDates]
-      : []),
-  ];
+  // The typing hint drops the year when the whole range is in this year.
+  const formatHint = (range: DateRangeValue) => {
+    const thisYear = new Date().getFullYear();
+    return range.from.getFullYear() === thisYear &&
+      range.to.getFullYear() === thisYear
+      ? formatSpan(
+          new Intl.DateTimeFormat(locale, { month: "short", day: "numeric" }),
+          range,
+        )
+      : formatRange(range);
+  };
+
+  const disabledMatchers = toDisabledMatchers(minDate, maxDate, disabledDates);
+
+  /** Why a range can't be picked, or undefined when it can. */
+  const rangeError = (range: DateRangeValue): string | undefined => {
+    const nights = countDays(range) - 1;
+    if (
+      disabledMatchers.length > 0 &&
+      rangeContainsModifiers(range, disabledMatchers)
+    ) {
+      return copy.unavailable;
+    }
+    if (minNights !== undefined && nights < minNights) {
+      return copy.tooShort(minNights);
+    }
+    if (maxNights !== undefined && nights > maxNights) {
+      return copy.tooLong(maxNights);
+    }
+    return undefined;
+  };
 
   const commit = (range: DateRangeValue | null) => {
     setValue(range);
@@ -265,56 +284,22 @@ function DateRangePicker({
 
   const status = (() => {
     if (!draft?.from) return copy.pickStart;
-    if (!draft.to) {
-      return copy.pickEnd(dayFormat.format(draft.from));
-    }
+    if (!draft.to) return copy.pickEnd(dayFormat.format(draft.from));
     const range = { from: draft.from, to: draft.to };
-    const days = countDays(range);
-    return `${formatRange(range)} · ${copy.duration(days)}`;
+    return `${formatRange(range)} · ${copy.duration(countDays(range))}`;
   })();
-
-  const showClear = clearable && value !== null && !disabled;
-
-  // The hint drops the year when the whole range is in this year.
-  const formatHint = (range: DateRangeValue) => {
-    const thisYear = new Date().getFullYear();
-    if (
-      range.from.getFullYear() !== thisYear ||
-      range.to.getFullYear() !== thisYear
-    ) {
-      return formatRange(range);
-    }
-    const short = new Intl.DateTimeFormat(locale, {
-      month: "short",
-      day: "numeric",
-    });
-    return isSameDay(range.from, range.to)
-      ? short.format(range.from)
-      : short.formatRange(range.from, range.to).replace(/[\u2009\u202f]/g, " ");
-  };
 
   const readText = (text: string): DateFieldReading<DateRangeValue> | null => {
     const range = parseDateRange(text, { locale });
     if (!range) return null;
-    const days = countDays(range);
-    const nights = days - 1;
-    let error: string | undefined;
-    if (
-      disabledMatchers.length > 0 &&
-      rangeContainsModifiers(range, disabledMatchers)
-    ) {
-      error = copy.unavailable;
-    } else if (minNights !== undefined && nights < minNights) {
-      error = copy.tooShort(minNights);
-    } else if (maxNights !== undefined && nights > maxNights) {
-      error = copy.tooLong(maxNights);
-    }
     return {
       value: range,
-      hint: `${formatHint(range)} · ${copy.duration(days)}`,
-      error,
+      hint: `${formatHint(range)} · ${copy.duration(countDays(range))}`,
+      error: rangeError(range),
     };
   };
+
+  const showClear = clearable && value !== null && !disabled;
 
   return (
     <div
@@ -337,136 +322,86 @@ function DateRangePicker({
             disabled={disabled}
             variant={variant}
             size={size}
-            {...(props as Omit<React.ComponentProps<"input">, "size">)}
+            {...props}
           />
         ) : (
-          <PopoverTrigger
+          <DatePickerTrigger
             ref={triggerRef}
             disabled={disabled}
-            data-placeholder={value === null || undefined}
-            className={cn(
-              inputVariants({ variant, size }),
-              "cursor-pointer items-center gap-2 text-start",
-              variant === "elevated"
-                ? "hover:bg-surface-hover data-popup-open:bg-surface-hover"
-                : "hover:bg-(--outline-hover) data-popup-open:bg-(--outline-hover)",
-              "data-placeholder:text-muted-foreground",
-              showClear && "pe-9",
-            )}
+            empty={value === null}
+            showClear={showClear}
+            variant={variant}
+            size={size}
             {...props}
           >
-            <HugeiconsIcon
-              icon={Calendar01Icon}
-              strokeWidth={2}
-              className="text-muted-foreground size-4 shrink-0"
-            />
-            <span className="min-w-0 flex-1 truncate tabular-nums">
-              {value ? formatRange(value) : placeholder}
-            </span>
-          </PopoverTrigger>
+            {value ? formatRange(value) : placeholder}
+          </DatePickerTrigger>
         )}
-        <PopoverContent
-          align="start"
-          // The popover is the calendar's surface (its own frame is turned
-          // off below); 16px corners over 4px padding keep the header strip
-          // concentric with it.
-          className="w-auto rounded-2xl"
-          viewportClassName="p-1 [--viewport-padding:0.25rem]"
+        <DatePickerContent
           anchor={editable ? groupRef : undefined}
-          // Land on the selected day (or today), not the month arrows.
-          initialFocus={() =>
-            panelRef.current?.querySelector<HTMLElement>(
-              '[data-slot="calendar-day"] button[tabindex="0"]',
-            ) ?? true
-          }
-        >
-          <div ref={panelRef} className="flex flex-col gap-1 sm:flex-row">
-            {presets && presets.length > 0 && (
-              <CalendarPresets
-                aria-label={copy.presets}
-                className="border-border/60 border-b px-1 pt-1 pb-1.5 sm:w-32 sm:border-e sm:border-b-0 sm:p-1 sm:pe-2"
+          presetsLabel={copy.presets}
+          presets={presets?.map((preset) => {
+            const range = resolvePreset(preset);
+            return (
+              <CalendarPreset
+                key={preset.label}
+                active={Boolean(
+                  draft?.from &&
+                  draft.to &&
+                  isSameDay(draft.from, range.from) &&
+                  isSameDay(draft.to, range.to),
+                )}
+                disabled={rangeError(range) !== undefined}
+                onClick={() => commit(range)}
               >
-                {presets.map((preset) => {
-                  const range = resolvePreset(preset);
-                  const presetDisabled = Boolean(
-                    (minDate && range.from < startOfDay(minDate)) ||
-                    (maxDate && range.to > startOfDay(maxDate)),
-                  );
-                  return (
-                    <CalendarPreset
-                      key={preset.label}
-                      active={Boolean(
-                        draft?.from &&
-                        draft.to &&
-                        isSameDay(draft.from, range.from) &&
-                        isSameDay(draft.to, range.to),
-                      )}
-                      disabled={presetDisabled}
-                      onClick={() => commit(range)}
-                    >
-                      {preset.label}
-                    </CalendarPreset>
-                  );
-                })}
-              </CalendarPresets>
-            )}
-            <div className="flex flex-col">
-              <Calendar
-                {...calendarProps}
-                framed={false}
-                mode="range"
-                numberOfMonths={numberOfMonths ?? (wide ? 2 : 1)}
-                selected={draft}
-                onSelect={handleSelect}
-                min={minNights}
-                max={maxNights}
-                excludeDisabled={disabledDates !== undefined}
-                disabled={
-                  disabledMatchers.length > 0 ? disabledMatchers : undefined
-                }
-                startMonth={calendarProps?.startMonth ?? minDate}
-                endMonth={calendarProps?.endMonth ?? maxDate}
-              />
-              <div className="flex min-h-9 items-center px-2 pt-1">
-                <p
-                  role="status"
-                  aria-live="polite"
-                  className={cn(
-                    "truncate text-sm tabular-nums",
-                    draft?.to ? "text-foreground" : "text-muted-foreground",
-                  )}
-                >
-                  {status}
-                </p>
-              </div>
+                {preset.label}
+              </CalendarPreset>
+            );
+          })}
+        >
+          <div className="flex flex-col">
+            <Calendar
+              {...calendarProps}
+              framed={false}
+              mode="range"
+              numberOfMonths={numberOfMonths ?? (wide ? 2 : 1)}
+              selected={draft}
+              onSelect={handleSelect}
+              min={minNights}
+              max={maxNights}
+              excludeDisabled={disabledDates !== undefined}
+              disabled={
+                disabledMatchers.length > 0 ? disabledMatchers : undefined
+              }
+              startMonth={calendarProps?.startMonth ?? minDate}
+              endMonth={calendarProps?.endMonth ?? maxDate}
+            />
+            <div className="flex min-h-9 items-center px-2 pt-1">
+              {/* Wraps rather than truncates: a cross-year range or a longer
+                  locale can run past one month's width. */}
+              <p
+                role="status"
+                aria-live="polite"
+                className={cn(
+                  "text-sm text-pretty tabular-nums",
+                  draft?.to ? "text-foreground" : "text-muted-foreground",
+                )}
+              >
+                {status}
+              </p>
             </div>
           </div>
-        </PopoverContent>
+        </DatePickerContent>
       </Popover>
 
       {showClear && !editable && (
-        <button
-          type="button"
-          data-slot="date-range-picker-clear"
-          aria-label={copy.clear}
-          onClick={() => {
+        <DatePickerClear
+          label={copy.clear}
+          onClear={() => {
             setValue(null);
             triggerRef.current?.focus();
           }}
-          className={cn(
-            "text-muted-foreground hover:text-foreground hover:bg-surface-hover absolute end-1.5 top-1/2 flex size-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md",
-            // Grow the hit area without growing the button.
-            "before:absolute before:-inset-1.5",
-            "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-1",
-            "transition-[background-color,color,outline-color,outline-offset] duration-150 ease-out",
-          )}
-        >
-          <HugeiconsIcon
-            icon={Cancel01Icon}
-            strokeWidth={2}
-            className="size-3.5"
-          />
-        </button>
+        />
       )}
 
       {name && (

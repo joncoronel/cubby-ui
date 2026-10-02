@@ -88,6 +88,10 @@ The trigger is a button that opens the calendar in a popover and moves focus int
 
 With `editable`, the field is a text input (label it with `id` and a `<label>`, or `aria-label`), and the calendar opens from a "Choose date" button beside it or with `ArrowDown` in the input. The hint is a polite live region, so how the text was read ("Fri, Oct 9, 2026", "Unavailable") is announced, and text that can't be read marks the input `aria-invalid` when committed.
 
+## Migrating
+
+This version replaces the earlier API. `onSelect` is now `onValueChange`, and an empty value is `null` rather than `undefined`. `format` takes a function, `(date) => string`, instead of a Day.js format string. Other calendar options, such as `fixedWeeks`, now go through `calendarProps`.
+
 ## API Reference
 
 The DatePicker composes [`Calendar`](/docs/components/calendar) inside a [`Popover`](/docs/components/popover), with a trigger styled like an [`Input`](/docs/components/input). Props not listed below (`id`, `aria-*`, event handlers) go to the trigger button.
@@ -122,6 +126,10 @@ The DatePicker composes [`Calendar`](/docs/components/calendar) inside a [`Popov
 
 <ApiProp name="open" fullType="boolean">
   Whether the popover is open. Pair with `onOpenChange`, or use `defaultOpen`.
+</ApiProp>
+
+<ApiProp name="defaultOpen" fullType="boolean" defaultValue="false">
+  Whether the popover starts open when uncontrolled.
 </ApiProp>
 
 <ApiProp

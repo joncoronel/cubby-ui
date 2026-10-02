@@ -180,6 +180,17 @@ Month grid for selecting dates. Wraps DayPicker, forwarding all props to it.
   adjusting the old one.
 </ApiProp>
 
+<ApiProp
+  name="labels"
+  fullType="Partial<Labels> & Partial<CalendarLabels>"
+  simpleType="object"
+>
+  Screen-reader text. Takes DayPicker's own labels, plus the calendar's:
+  `labelCaptionTrigger(caption)` for the caption button, `labelMonthYearPicker`
+  for the picker panel, and `labelYears` for its year column. In the date
+  pickers, pass these through `calendarProps.labels`.
+</ApiProp>
+
 <ApiProp name="footer" fullType="ReactNode" simpleType="node">
   Content rendered below the month grid, in a polite live region.
 </ApiProp>
@@ -197,7 +208,7 @@ Month grid for selecting dates. Wraps DayPicker, forwarding all props to it.
 
 #### CalendarPresets
 
-A rail of one-click shortcuts to place beside a calendar. Vertical from the `sm` breakpoint up, a scrolling row below it. Renders a `div` with `role="group"`.
+A rail of one-click shortcuts to place beside a calendar. Vertical from the `sm` breakpoint up, a scrolling row below it that fades toward whichever end has more. It renders a scroll area around a `div` with `role="group"`: `className` goes on the scroll area, and other props (such as `aria-label`) on the group.
 
 #### CalendarPreset
 

@@ -8,6 +8,7 @@ import {
   type DayEventHandler,
   type DayPickerProps,
   type DayProps,
+  type Labels,
   type Matcher,
   type MonthCaptionProps,
   type MonthGridProps,
@@ -22,11 +23,39 @@ import {
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/registry/default/button/button";
 import { useControllableState } from "@/registry/default/hooks/use-controllable-state";
+import { daysBetween, isSameDay } from "@/registry/default/lib/date-utils";
 import { solidSurface } from "@/registry/default/lib/elevated";
 import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 import { TextMorph } from "@/registry/default/text-morph/text-morph";
 
+import {
+  CalendarPicker,
+  cellButtonClassName,
+  focusRing,
+} from "./calendar-picker";
 import "./calendar.css";
+
+/**
+ * Screen-reader text for what the calendar adds on top of DayPicker, in
+ * DayPicker's `label*` naming. Passed in `labels` beside DayPicker's own.
+ */
+export interface CalendarLabels {
+  /** The caption button; `caption` is the formatted month and year. */
+  labelCaptionTrigger: (caption: string) => string;
+  /** The month and year picker panel. */
+  labelMonthYearPicker: string;
+  /** The picker's year column. */
+  labelYears: string;
+}
+
+const DEFAULT_LABELS: CalendarLabels = {
+  labelCaptionTrigger: (caption) => `${caption}, choose month and year`,
+  labelMonthYearPicker: "Choose month and year",
+  labelYears: "Year",
+};
+
+/** DayPicker's own labels plus the calendar's (`CalendarLabels`). */
+export type CalendarLabelsProp = Partial<Labels> & Partial<CalendarLabels>;
 
 export type CalendarProps = DayPickerProps & {
   /**
@@ -34,20 +63,13 @@ export type CalendarProps = DayPickerProps & {
    * already is one, as the pickers' popover is.
    */
   framed?: boolean;
+  labels?: CalendarLabelsProp;
 };
 
 /** A range that just completed: where it was started, and the day that ended it. */
 interface RangeLanding {
   anchor: Date;
   target: Date;
-}
-
-/** Days between two dates, ignoring the time of day (and DST shifts). */
-function daysBetween(a: Date, b: Date): number {
-  return Math.round(
-    (new Date(b).setHours(0, 0, 0, 0) - new Date(a).setHours(0, 0, 0, 0)) /
-      DAY_MS,
-  );
 }
 
 /**
@@ -78,11 +100,10 @@ interface CalendarContextValue {
   pickerOpen: boolean;
   pickerId: string;
   togglePicker: (displayIndex: number) => void;
+  labelCaptionTrigger: CalendarLabels["labelCaptionTrigger"];
 }
 
 const CalendarContext = React.createContext<CalendarContextValue | null>(null);
-
-const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** Caption text morph, timed to the days' enter (calendar.css). */
 const CAPTION_MORPH_MS = 280;
@@ -111,14 +132,6 @@ function addMonths(date: Date, amount: number): Date {
 /** Months since year 0, so two months compare with plain arithmetic. */
 function monthIndex(date: Date): number {
   return date.getFullYear() * 12 + date.getMonth();
-}
-
-function isSameDay(a: Date, b: Date): boolean {
-  return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
-  );
 }
 
 /**
@@ -158,29 +171,11 @@ function firstSelectedDate(props: DayPickerProps): Date | undefined {
  * Classes
  * -------------------------------------------------------------------------------------------------*/
 
-const focusRing =
-  "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2";
-
 // Corners concentric with the frame: 16px frame radius minus its 4px padding.
 const navButtonClassName = cn(
   buttonVariants({ variant: "ghost", size: "icon_sm" }),
   "text-muted-foreground hover:text-foreground rounded-xl rtl:[&_svg]:-scale-x-100",
   "aria-disabled:pointer-events-none aria-disabled:opacity-40",
-);
-
-const cellButtonClassName = cn(
-  // Layout
-  "relative z-1 flex size-full items-center justify-center rounded-lg text-sm tabular-nums",
-  // Focus
-  focusRing,
-  "focus-visible:z-2",
-  // Interaction
-  // Hover and selection colours change instantly: days are crossed dozens of
-  // times a pass, and a fade would trail the pointer.
-  "cursor-pointer transition-[scale,outline-color,outline-offset] duration-150 ease-out active:scale-[0.96] motion-reduce:active:scale-100",
-  "hover:bg-surface-hover",
-  // Today: a dot under the number, re-coloured when the day is filled
-  "after:pointer-events-none after:absolute after:inset-x-0 after:bottom-1 after:mx-auto after:size-1 after:rounded-full after:bg-primary after:opacity-0",
 );
 
 const DEFAULT_CLASS_NAMES: NonNullable<DayPickerProps["classNames"]> = {
@@ -355,7 +350,7 @@ function CalendarMonthCaption({
       <button
         type="button"
         data-slot="calendar-caption-trigger"
-        aria-label={`${caption}, choose month and year`}
+        aria-label={context.labelCaptionTrigger(caption)}
         aria-expanded={context.pickerOpen}
         aria-controls={context.pickerOpen ? context.pickerId : undefined}
         onClick={() => context.togglePicker(displayIndex)}
@@ -420,239 +415,89 @@ function CalendarNextMonthButton({
 }
 
 /* -------------------------------------------------------------------------------------------------
- * Month and year picker
+ * Motion state
  * -------------------------------------------------------------------------------------------------*/
 
-/** Arrow-key movement across a grid of buttons, reading columns from layout. */
-function moveInGrid(event: React.KeyboardEvent<HTMLElement>): void {
-  const cells = Array.from(
-    event.currentTarget.querySelectorAll<HTMLButtonElement>(
-      "button:not(:disabled)",
-    ),
-  );
-  const index = cells.indexOf(document.activeElement as HTMLButtonElement);
-  if (index === -1) return;
+/**
+ * A range "lands" when a second click completes it. Tracked while rendering,
+ * so the frame that first shows the full range already carries the landing;
+ * from an effect it would paint once, then restart. Cleared once the wipe
+ * (at most 300ms) and the cap settle (320ms) are done.
+ */
+function useRangeLanding(range: DateRange | undefined | null) {
+  const rangeKey = range
+    ? `${range.from?.getTime() ?? ""}:${range.to?.getTime() ?? ""}`
+    : "";
+  const [previous, setPrevious] = React.useState({
+    key: rangeKey,
+    from: range?.from,
+    to: range?.to,
+  });
+  const [landing, setLanding] = React.useState<RangeLanding | null>(null);
+  if (previous.key !== rangeKey) {
+    const wasPicking = Boolean(previous.from && !previous.to);
+    setPrevious({ key: rangeKey, from: range?.from, to: range?.to });
+    if (
+      wasPicking &&
+      previous.from &&
+      range?.from &&
+      range.to &&
+      !isSameDay(range.from, range.to)
+    ) {
+      const anchor = previous.from;
+      setLanding({
+        anchor,
+        target: isSameDay(range.from, anchor) ? range.to : range.from,
+      });
+    } else {
+      setLanding(null);
+    }
+  }
 
-  const top = cells[0].offsetTop;
-  const columns = Math.max(
-    1,
-    cells.filter((cell) => cell.offsetTop === top).length,
-  );
-  const rtl = getComputedStyle(event.currentTarget).direction === "rtl";
-  const step = rtl ? -1 : 1;
+  React.useEffect(() => {
+    if (!landing) return;
+    const timeout = setTimeout(() => setLanding(null), 400);
+    return () => clearTimeout(timeout);
+  }, [landing]);
 
-  const moves: Record<string, number> = {
-    ArrowLeft: -step,
-    ArrowRight: step,
-    ArrowUp: -columns,
-    ArrowDown: columns,
-    Home: -index,
-    End: cells.length - 1 - index,
-  };
-  const move = moves[event.key];
-  if (move === undefined) return;
-
-  event.preventDefault();
-  cells[Math.min(Math.max(index + move, 0), cells.length - 1)].focus();
-}
-
-interface CalendarPickerProps {
-  id: string;
-  open: boolean;
-  year: number;
-  onYearChange: (year: number) => void;
-  minYear: number;
-  maxYear: number;
-  /** The displayed month the picker was opened from. */
-  activeMonth: Date;
-  today: Date;
-  locale: string | undefined;
-  isMonthDisabled: (year: number, month: number) => boolean;
-  onSelectMonth: (month: number) => void;
-  onClose: () => void;
+  return landing;
 }
 
 /**
- * One panel over the days: a scrolling year column beside the year's twelve
- * months. Picking a year only changes which months are shown; picking a month
- * goes there and closes. The caption above stays visible as the way back.
+ * How the selection fill enters when it remounts for a new month: with the
+ * incoming days ("start"/"end", the direction they travel), or "instant" when
+ * DayPicker skips its animation (a keyboard-focused day, a jump from the
+ * month picker). `null` until the month changes: a fresh selection settles in.
  */
-function CalendarPicker({
-  id,
-  open,
-  year,
-  onYearChange,
-  minYear,
-  maxYear,
-  activeMonth,
-  today,
-  locale,
-  isMonthDisabled,
-  onSelectMonth,
-  onClose,
-}: CalendarPickerProps) {
-  const yearsRef = React.useRef<HTMLDivElement>(null);
-  const focusYearRef = React.useRef(false);
-
-  // Centre the chosen year in its column whenever the picker opens.
-  React.useLayoutEffect(() => {
-    if (!open) return;
-    const list = yearsRef.current;
-    const active = list?.querySelector<HTMLElement>("[data-active]");
-    if (!list || !active) return;
-    list.scrollTop =
-      active.offsetTop - list.clientHeight / 2 + active.offsetHeight / 2;
-  }, [open]);
-
-  // Keyboard moves in the year column select as they go; follow with focus.
-  React.useEffect(() => {
-    if (!focusYearRef.current) return;
-    focusYearRef.current = false;
-    const active =
-      yearsRef.current?.querySelector<HTMLElement>("[data-active]");
-    active?.focus();
-    active?.scrollIntoView({ block: "nearest" });
-  }, [year]);
-
-  const stepYear = (next: number) => {
-    const clamped = Math.min(Math.max(next, minYear), maxYear);
-    if (clamped === year) return;
-    focusYearRef.current = true;
-    onYearChange(clamped);
-  };
-
-  const monthFormat = new Intl.DateTimeFormat(locale, { month: "short" });
-  const monthLongFormat = new Intl.DateTimeFormat(locale, {
-    month: "long",
-    year: "numeric",
+function useFillEntrance(
+  month: number,
+  selected: number | undefined,
+  pickerKey: number,
+  dayFocused: boolean,
+) {
+  const [previous, setPrevious] = React.useState({
+    month,
+    selected,
+    pickerKey,
   });
-  const years = Array.from(
-    { length: maxYear - minYear + 1 },
-    (_, index) => minYear + index,
-  );
-  const activeInYear = activeMonth.getFullYear() === year;
-
-  return (
-    <div
-      id={id}
-      role="group"
-      aria-label="Choose month and year"
-      data-slot="calendar-picker"
-      data-state={open ? "open" : "closed"}
-      inert={!open}
-      className={cn(
-        "absolute inset-x-0 top-(--calendar-header) bottom-0 z-3 flex overflow-hidden",
-        "rounded-xl bg-(--calendar-surface)",
-      )}
-      onKeyDown={(event) => {
-        if (event.key !== "Escape") return;
-        event.preventDefault();
-        event.stopPropagation();
-        onClose();
-      }}
-    >
-      <ScrollArea
-        fadeEdges="y"
-        hideScrollbar
-        viewportRef={(element) => {
-          yearsRef.current = element;
-        }}
-        className="border-border/60 h-auto w-17 shrink-0 border-e"
-      >
-        <div
-          role="group"
-          aria-label="Year"
-          data-slot="calendar-picker-years"
-          className="flex flex-col gap-0.5 p-1"
-          onKeyDown={(event) => {
-            const moves: Record<string, number> = {
-              ArrowUp: year - 1,
-              ArrowDown: year + 1,
-              PageUp: year - 10,
-              PageDown: year + 10,
-              Home: minYear,
-              End: maxYear,
-            };
-            if (!(event.key in moves)) return;
-            event.preventDefault();
-            stepYear(moves[event.key]);
-          }}
-        >
-          {years.map((option) => {
-            const active = option === year;
-            return (
-              <button
-                key={option}
-                type="button"
-                data-active={active || undefined}
-                data-today={option === today.getFullYear() || undefined}
-                aria-pressed={active}
-                tabIndex={active ? 0 : -1}
-                onClick={() => onYearChange(option)}
-                className={cn(
-                  cellButtonClassName,
-                  "text-muted-foreground h-8 w-full shrink-0",
-                  "data-today:after:opacity-100",
-                  "data-active:text-foreground data-active:bg-surface-hover data-active:font-semibold",
-                )}
-              >
-                {option}
-              </button>
-            );
-          })}
-        </div>
-      </ScrollArea>
-      <div
-        role="group"
-        aria-label={String(year)}
-        data-slot="calendar-picker-months"
-        className="grid flex-1 auto-rows-fr grid-cols-3 gap-x-1 p-1"
-        onKeyDown={(event) => {
-          if (event.key === "PageUp" || event.key === "PageDown") {
-            event.preventDefault();
-            onYearChange(
-              Math.min(
-                Math.max(year + (event.key === "PageUp" ? -1 : 1), minYear),
-                maxYear,
-              ),
-            );
-            return;
-          }
-          moveInGrid(event);
-        }}
-      >
-        {Array.from({ length: 12 }, (_, monthOfYear) => {
-          const date = new Date(year, monthOfYear, 1);
-          const active = activeInYear && monthOfYear === activeMonth.getMonth();
-          const isCurrent =
-            year === today.getFullYear() && monthOfYear === today.getMonth();
-          return (
-            <button
-              key={monthOfYear}
-              type="button"
-              data-active={active || undefined}
-              data-today={isCurrent || undefined}
-              aria-label={monthLongFormat.format(date)}
-              aria-current={active || undefined}
-              // In another year, January takes the tab stop.
-              tabIndex={active || (!activeInYear && monthOfYear === 0) ? 0 : -1}
-              disabled={isMonthDisabled(year, monthOfYear)}
-              onClick={() => onSelectMonth(monthOfYear)}
-              className={cn(
-                cellButtonClassName,
-                "h-9 w-full self-center font-medium sm:h-8",
-                "data-today:after:opacity-100",
-                "data-active:bg-primary data-active:text-primary-foreground data-active:after:bg-primary-foreground data-active:hover:bg-(--primary-hover)",
-                "disabled:pointer-events-none disabled:opacity-40",
-              )}
-            >
-              {monthFormat.format(date)}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
+  const [entrance, setEntrance] = React.useState<
+    "start" | "end" | "instant" | null
+  >(null);
+  if (
+    previous.month !== month ||
+    previous.selected !== selected ||
+    previous.pickerKey !== pickerKey
+  ) {
+    setPrevious({ month, selected, pickerKey });
+    if (previous.month === month) {
+      setEntrance(null);
+    } else if (previous.pickerKey !== pickerKey || dayFocused) {
+      setEntrance("instant");
+    } else {
+      setEntrance(month > previous.month ? "end" : "start");
+    }
+  }
+  return entrance;
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -684,8 +529,15 @@ function Calendar({
   onDayMouseEnter,
   onDayFocus,
   onDayBlur,
+  labels,
   ...props
 }: CalendarProps) {
+  const {
+    labelCaptionTrigger = DEFAULT_LABELS.labelCaptionTrigger,
+    labelMonthYearPicker = DEFAULT_LABELS.labelMonthYearPicker,
+    labelYears = DEFAULT_LABELS.labelYears,
+    ...dayPickerLabels
+  } = labels ?? {};
   const today = props.today ?? new Date();
   const locale = props.locale?.code;
   const numberOfMonths = props.numberOfMonths ?? 1;
@@ -723,43 +575,7 @@ function Calendar({
     props.mode === "range" ? (props.selected as DateRange | undefined) : null;
   const pickingEnd = Boolean(range?.from && !range.to);
 
-  // A range "lands" when a second click completes it. Tracked while
-  // rendering, so the frame that first shows the full range already carries
-  // the landing; from an effect it would paint once, then restart.
-  const rangeKey = range
-    ? `${range.from?.getTime() ?? ""}:${range.to?.getTime() ?? ""}`
-    : "";
-  const [previousRange, setPreviousRange] = React.useState({
-    key: rangeKey,
-    from: range?.from,
-    to: range?.to,
-  });
-  const [landing, setLanding] = React.useState<RangeLanding | null>(null);
-  if (previousRange.key !== rangeKey) {
-    const wasPicking = Boolean(previousRange.from && !previousRange.to);
-    setPreviousRange({ key: rangeKey, from: range?.from, to: range?.to });
-    if (
-      wasPicking &&
-      previousRange.from &&
-      range?.from &&
-      range.to &&
-      !isSameDay(range.from, range.to)
-    ) {
-      const anchor = previousRange.from;
-      setLanding({
-        anchor,
-        target: isSameDay(range.from, anchor) ? range.to : range.from,
-      });
-    } else {
-      setLanding(null);
-    }
-  }
-
-  React.useEffect(() => {
-    if (!landing) return;
-    const timeout = setTimeout(() => setLanding(null), 900);
-    return () => clearTimeout(timeout);
-  }, [landing]);
+  const landing = useRangeLanding(range);
 
   let previewModifiers: Record<string, Matcher | Matcher[] | undefined> = {};
   if (pickingEnd && range?.from && hovered && !isSameDay(hovered, range.from)) {
@@ -800,34 +616,14 @@ function Calendar({
           fixedWeeks,
         })));
 
-  // When the month changes, the fill arrives with the incoming days: it is
-  // remounted (so it doesn't slide over from the old month's spot) and runs
-  // the weeks' own entrance (calendar.css), travelling the same way. Not when
-  // DayPicker skips its animation: a keyboard-focused day, or a jump from the
-  // month picker. Picking another day afterwards slides it as usual.
-  const selectedTime = selectedDay?.getTime();
-  const [previousFill, setPreviousFill] = React.useState({
-    month: firstShown,
-    selected: selectedTime,
+  // When the month changes, the fill is remounted (so it doesn't slide over
+  // from the old month's spot) and enters with the incoming days.
+  const fillEnter = useFillEntrance(
+    firstShown,
+    selectedDay?.getTime(),
     pickerKey,
-  });
-  const [fillEnter, setFillEnter] = React.useState<"start" | "end" | null>(
-    null,
+    dayFocused,
   );
-  if (
-    previousFill.month !== firstShown ||
-    previousFill.selected !== selectedTime ||
-    previousFill.pickerKey !== pickerKey
-  ) {
-    setPreviousFill({ month: firstShown, selected: selectedTime, pickerKey });
-    const animated =
-      previousFill.month !== firstShown &&
-      previousFill.pickerKey === pickerKey &&
-      !dayFocused;
-    setFillEnter(
-      animated ? (firstShown > previousFill.month ? "end" : "start") : null,
-    );
-  }
 
   const startBound = props.startMonth ? monthIndex(props.startMonth) : null;
   const endBound = props.endMonth ? monthIndex(props.endMonth) : null;
@@ -893,6 +689,7 @@ function Calendar({
     pickerOpen,
     pickerId,
     togglePicker,
+    labelCaptionTrigger,
   };
 
   const handleDayMouseEnter: DayEventHandler<React.MouseEvent> = (
@@ -966,6 +763,7 @@ function Calendar({
             captionLayout={pickerEnabled ? "label" : captionLayout}
             {...(props.mode === "range" ? { resetOnSelect: true } : null)}
             {...props}
+            labels={dayPickerLabels}
             month={month}
             onMonthChange={setMonth}
             modifiers={{ ...previewModifiers, ...modifiers }}
@@ -1005,6 +803,8 @@ function Calendar({
               isMonthDisabled={isMonthDisabled}
               onSelectMonth={selectMonth}
               onClose={closePicker}
+              label={labelMonthYearPicker}
+              yearsLabel={labelYears}
             />
           )}
         </div>

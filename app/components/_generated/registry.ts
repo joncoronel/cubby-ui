@@ -193,7 +193,7 @@ import date_range_picker_date_range_picker_basic from "@/registry/examples/date-
 import date_range_picker_date_range_picker_disabled_state from "@/registry/examples/date-range-picker/date-range-picker-disabled-state";
 import date_range_picker_date_range_picker_editable from "@/registry/examples/date-range-picker/date-range-picker-editable";
 import date_range_picker_date_range_picker_min_max_nights from "@/registry/examples/date-range-picker/date-range-picker-min-max-nights";
-import date_range_picker_date_range_picker_multiple_months from "@/registry/examples/date-range-picker/date-range-picker-multiple-months";
+import date_range_picker_date_range_picker_one_month from "@/registry/examples/date-range-picker/date-range-picker-one-month";
 import date_range_picker_date_range_picker_presets from "@/registry/examples/date-range-picker/date-range-picker-presets";
 import date_range_picker_date_range_picker_with_format from "@/registry/examples/date-range-picker/date-range-picker-with-format";
 import date_range_picker_date_range_picker_with_placeholder from "@/registry/examples/date-range-picker/date-range-picker-with-placeholder";
@@ -671,6 +671,7 @@ export const componentMetadata = {
       "@cubby-ui/scroll-area",
       "@cubby-ui/text-morph",
       "@cubby-ui/use-controllable-state",
+      "@cubby-ui/date-utils",
       "@cubby-ui/elevated"
     ],
     "dependencies": [
@@ -873,9 +874,10 @@ export const componentMetadata = {
     "registryDependencies": [
       "@cubby-ui/calendar",
       "@cubby-ui/input",
-      "@cubby-ui/input-group",
       "@cubby-ui/popover",
+      "@cubby-ui/input-group",
       "@cubby-ui/use-controllable-state",
+      "@cubby-ui/date-utils",
       "@cubby-ui/parse-date"
     ],
     "dependencies": [
@@ -898,13 +900,12 @@ export const componentMetadata = {
       "@cubby-ui/input",
       "@cubby-ui/popover",
       "@cubby-ui/use-controllable-state",
+      "@cubby-ui/date-utils",
       "@cubby-ui/parse-date"
     ],
     "dependencies": [
       "react-day-picker",
-      "class-variance-authority",
-      "@hugeicons/react",
-      "@hugeicons/core-free-icons"
+      "class-variance-authority"
     ],
     "examples": {},
     "reference": []
@@ -1550,6 +1551,15 @@ export const componentMetadata = {
     "dependencies": [
       "@tanstack/react-virtual"
     ],
+    "examples": {}
+  },
+  "date-utils": {
+    "name": "date-utils",
+    "title": "dateUtils",
+    "description": "A utility function for date utils.",
+    "category": "UI",
+    "registryDependencies": [],
+    "dependencies": [],
     "examples": {}
   },
   "elevated": {
@@ -2529,47 +2539,47 @@ export const exampleRegistry = {
     {
       "title": "Basic",
       "importPath": "date-picker-basic",
-      "source": "import { DatePicker } from \"@/components/ui/cubby-ui/date-picker\";\n\nexport default function DatePickerBasic() {\n  return <DatePicker />;\n}\n"
+      "source": "import { DatePicker } from \"@/components/ui/cubby-ui/date-picker/date-picker\";\n\nexport default function DatePickerBasic() {\n  return <DatePicker />;\n}\n"
     },
     {
       "title": "Controlled",
       "importPath": "date-picker-controlled",
-      "source": "\"use client\";\n\nimport { useState } from \"react\";\nimport { DatePicker } from \"@/components/ui/cubby-ui/date-picker\";\n\nexport default function DatePickerControlled() {\n  const [date, setDate] = useState<Date | null>(new Date());\n\n  return (\n    <div className=\"flex flex-col items-start gap-2\">\n      <DatePicker value={date} onValueChange={setDate} clearable />\n      <p className=\"text-muted-foreground text-sm tabular-nums\">\n        {date ? date.toDateString() : \"No date\"}\n      </p>\n    </div>\n  );\n}\n"
+      "source": "\"use client\";\n\nimport { useState } from \"react\";\nimport { DatePicker } from \"@/components/ui/cubby-ui/date-picker/date-picker\";\n\nexport default function DatePickerControlled() {\n  const [date, setDate] = useState<Date | null>(new Date());\n\n  return (\n    <div className=\"flex flex-col items-start gap-2\">\n      <DatePicker value={date} onValueChange={setDate} clearable />\n      <p className=\"text-muted-foreground text-sm tabular-nums\">\n        {date ? date.toDateString() : \"No date\"}\n      </p>\n    </div>\n  );\n}\n"
     },
     {
       "title": "Custom Placeholder And Format",
       "importPath": "date-picker-custom-placeholder-and-format",
-      "source": "import { DatePicker } from \"@/components/ui/cubby-ui/date-picker\";\n\nconst longDate = new Intl.DateTimeFormat(undefined, {\n  weekday: \"short\",\n  month: \"long\",\n  day: \"numeric\",\n});\n\nexport default function DatePickerCustomPlaceholderAndFormat() {\n  return (\n    <DatePicker\n      placeholder=\"When's the launch?\"\n      format={(date) => longDate.format(date)}\n    />\n  );\n}\n"
+      "source": "import { DatePicker } from \"@/components/ui/cubby-ui/date-picker/date-picker\";\n\nconst longDate = new Intl.DateTimeFormat(undefined, {\n  weekday: \"short\",\n  month: \"long\",\n  day: \"numeric\",\n});\n\nexport default function DatePickerCustomPlaceholderAndFormat() {\n  return (\n    <DatePicker\n      placeholder=\"When's the launch?\"\n      format={(date) => longDate.format(date)}\n    />\n  );\n}\n"
     },
     {
       "title": "Different Widths",
       "importPath": "date-picker-different-widths",
-      "source": "import { DatePicker } from \"@/components/ui/cubby-ui/date-picker\";\n\nexport default function DatePickerDifferentWidths() {\n  return (\n    <div className=\"flex w-full max-w-sm flex-col gap-3\">\n      <DatePicker className=\"w-48\" placeholder=\"Narrow\" />\n      <DatePicker placeholder=\"Default\" />\n      <DatePicker className=\"w-full\" placeholder=\"Full width\" />\n    </div>\n  );\n}\n"
+      "source": "import { DatePicker } from \"@/components/ui/cubby-ui/date-picker/date-picker\";\n\nexport default function DatePickerDifferentWidths() {\n  return (\n    <div className=\"flex w-full max-w-sm flex-col gap-3\">\n      <DatePicker className=\"w-48\" placeholder=\"Narrow\" />\n      <DatePicker placeholder=\"Default\" />\n      <DatePicker className=\"w-full\" placeholder=\"Full width\" />\n    </div>\n  );\n}\n"
     },
     {
       "title": "Disabled State",
       "importPath": "date-picker-disabled-state",
-      "source": "import { DatePicker } from \"@/components/ui/cubby-ui/date-picker\";\n\nexport default function DatePickerDisabledState() {\n  return <DatePicker disabled defaultValue={new Date()} />;\n}\n"
+      "source": "import { DatePicker } from \"@/components/ui/cubby-ui/date-picker/date-picker\";\n\nexport default function DatePickerDisabledState() {\n  return <DatePicker disabled defaultValue={new Date()} />;\n}\n"
     },
     {
       "title": "Editable",
       "importPath": "date-picker-editable",
-      "source": "\"use client\";\n\nimport { useState } from \"react\";\nimport { DatePicker } from \"@/components/ui/cubby-ui/date-picker\";\n\nexport default function DatePickerEditable() {\n  const [date, setDate] = useState<Date | null>(null);\n\n  return (\n    <div className=\"flex flex-col items-start gap-2\">\n      <DatePicker\n        editable\n        clearable\n        value={date}\n        onValueChange={setDate}\n        placeholder=\"Try “next fri” or “mar 14”\"\n        className=\"w-72\"\n      />\n      <p className=\"text-muted-foreground text-sm tabular-nums\">\n        {date ? date.toDateString() : \"No date\"}\n      </p>\n    </div>\n  );\n}\n"
+      "source": "\"use client\";\n\nimport { useState } from \"react\";\nimport { DatePicker } from \"@/components/ui/cubby-ui/date-picker/date-picker\";\n\nexport default function DatePickerEditable() {\n  const [date, setDate] = useState<Date | null>(null);\n\n  return (\n    <div className=\"flex flex-col items-start gap-2\">\n      <DatePicker\n        editable\n        clearable\n        value={date}\n        onValueChange={setDate}\n        placeholder=\"Try “next fri” or “mar 14”\"\n        className=\"w-72\"\n      />\n      <p className=\"text-muted-foreground text-sm tabular-nums\">\n        {date ? date.toDateString() : \"No date\"}\n      </p>\n    </div>\n  );\n}\n"
     },
     {
       "title": "Form",
       "importPath": "date-picker-form",
-      "source": "\"use client\";\n\nimport { useState } from \"react\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { DatePicker } from \"@/components/ui/cubby-ui/date-picker\";\n\nexport default function DatePickerForm() {\n  const [submitted, setSubmitted] = useState<string | null>(null);\n\n  return (\n    <form\n      className=\"flex flex-col items-start gap-3\"\n      onSubmit={(event) => {\n        event.preventDefault();\n        const data = new FormData(event.currentTarget);\n        setSubmitted(String(data.get(\"birthday\") || \"(empty)\"));\n      }}\n    >\n      <label htmlFor=\"birthday\" className=\"text-sm font-medium\">\n        Birthday\n      </label>\n      <DatePicker id=\"birthday\" name=\"birthday\" />\n      <Button type=\"submit\" size=\"sm\">\n        Submit\n      </Button>\n      {submitted && (\n        <p className=\"text-muted-foreground font-mono text-sm\">\n          birthday={submitted}\n        </p>\n      )}\n    </form>\n  );\n}\n"
+      "source": "\"use client\";\n\nimport { useState } from \"react\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { DatePicker } from \"@/components/ui/cubby-ui/date-picker/date-picker\";\n\nexport default function DatePickerForm() {\n  const [submitted, setSubmitted] = useState<string | null>(null);\n\n  return (\n    <form\n      className=\"flex flex-col items-start gap-3\"\n      onSubmit={(event) => {\n        event.preventDefault();\n        const data = new FormData(event.currentTarget);\n        setSubmitted(String(data.get(\"birthday\") || \"(empty)\"));\n      }}\n    >\n      <label htmlFor=\"birthday\" className=\"text-sm font-medium\">\n        Birthday\n      </label>\n      <DatePicker id=\"birthday\" name=\"birthday\" />\n      <Button type=\"submit\" size=\"sm\">\n        Submit\n      </Button>\n      {submitted && (\n        <p className=\"text-muted-foreground font-mono text-sm\">\n          birthday={submitted}\n        </p>\n      )}\n    </form>\n  );\n}\n"
     },
     {
       "title": "Min Max",
       "importPath": "date-picker-min-max",
-      "source": "import { DatePicker } from \"@/components/ui/cubby-ui/date-picker\";\n\nconst today = new Date();\nconst inSixtyDays = new Date(\n  today.getFullYear(),\n  today.getMonth(),\n  today.getDate() + 60,\n);\n\nexport default function DatePickerMinMax() {\n  return (\n    <DatePicker\n      placeholder=\"Delivery date\"\n      minDate={today}\n      maxDate={inSixtyDays}\n      // Weekends are blocked too.\n      disabledDates={{ dayOfWeek: [0, 6] }}\n    />\n  );\n}\n"
+      "source": "import { DatePicker } from \"@/components/ui/cubby-ui/date-picker/date-picker\";\n\nconst today = new Date();\nconst inSixtyDays = new Date(\n  today.getFullYear(),\n  today.getMonth(),\n  today.getDate() + 60,\n);\n\nexport default function DatePickerMinMax() {\n  return (\n    <DatePicker\n      placeholder=\"Delivery date\"\n      minDate={today}\n      maxDate={inSixtyDays}\n      // Weekends are blocked too.\n      disabledDates={{ dayOfWeek: [0, 6] }}\n    />\n  );\n}\n"
     },
     {
       "title": "Presets",
       "importPath": "date-picker-presets",
-      "source": "import {\n  DatePicker,\n  type DatePickerPreset,\n} from \"@/components/ui/cubby-ui/date-picker\";\n\nfunction addDays(days: number): Date {\n  const date = new Date();\n  date.setDate(date.getDate() + days);\n  return date;\n}\n\n/** The next given weekday (0 = Sunday), never today. */\nfunction next(weekday: number): Date {\n  const date = new Date();\n  date.setDate(date.getDate() + (((weekday - date.getDay() + 6) % 7) + 1));\n  return date;\n}\n\nconst presets: DatePickerPreset[] = [\n  { label: \"Today\", value: () => new Date() },\n  { label: \"Tomorrow\", value: () => addDays(1) },\n  { label: \"Next Monday\", value: () => next(1) },\n  { label: \"In a week\", value: () => addDays(7) },\n  { label: \"In a month\", value: () => addDays(30) },\n];\n\nexport default function DatePickerPresets() {\n  return <DatePicker presets={presets} placeholder=\"Due date\" clearable />;\n}\n"
+      "source": "import {\n  DatePicker,\n  type DatePickerPreset,\n} from \"@/components/ui/cubby-ui/date-picker/date-picker\";\n\nfunction addDays(days: number): Date {\n  const date = new Date();\n  date.setDate(date.getDate() + days);\n  return date;\n}\n\n/** The next given weekday (0 = Sunday), never today. */\nfunction next(weekday: number): Date {\n  const date = new Date();\n  date.setDate(date.getDate() + (((weekday - date.getDay() + 6) % 7) + 1));\n  return date;\n}\n\nconst presets: DatePickerPreset[] = [\n  { label: \"Today\", value: () => new Date() },\n  { label: \"Tomorrow\", value: () => addDays(1) },\n  { label: \"Next Monday\", value: () => next(1) },\n  { label: \"In a week\", value: () => addDays(7) },\n  { label: \"In a month\", value: () => addDays(30) },\n];\n\nexport default function DatePickerPresets() {\n  return <DatePicker presets={presets} placeholder=\"Due date\" clearable />;\n}\n"
     }
   ],
   "date-range-picker": [
@@ -2594,9 +2604,9 @@ export const exampleRegistry = {
       "source": "import { DateRangePicker } from \"@/components/ui/cubby-ui/date-range-picker\";\n\nexport default function DateRangePickerMinMaxNights() {\n  return (\n    <DateRangePicker\n      placeholder=\"Book a stay\"\n      minDate={new Date()}\n      minNights={2}\n      maxNights={14}\n      // A stay is counted in nights, one fewer than the days it spans.\n      labels={{\n        duration: (days) => `${days - 1} ${days === 2 ? \"night\" : \"nights\"}`,\n      }}\n    />\n  );\n}\n"
     },
     {
-      "title": "Multiple Months",
-      "importPath": "date-range-picker-multiple-months",
-      "source": "import { DateRangePicker } from \"@/components/ui/cubby-ui/date-range-picker\";\n\nexport default function DateRangePickerMultipleMonths() {\n  return (\n    <DateRangePicker numberOfMonths={1} placeholder=\"One month at a time\" />\n  );\n}\n"
+      "title": "One Month",
+      "importPath": "date-range-picker-one-month",
+      "source": "import { DateRangePicker } from \"@/components/ui/cubby-ui/date-range-picker\";\n\nexport default function DateRangePickerOneMonth() {\n  return (\n    <DateRangePicker numberOfMonths={1} placeholder=\"One month at a time\" />\n  );\n}\n"
     },
     {
       "title": "Presets",
@@ -4446,7 +4456,7 @@ export const componentMap = {
   "date-range-picker-disabled-state": date_range_picker_date_range_picker_disabled_state,
   "date-range-picker-editable": date_range_picker_date_range_picker_editable,
   "date-range-picker-min-max-nights": date_range_picker_date_range_picker_min_max_nights,
-  "date-range-picker-multiple-months": date_range_picker_date_range_picker_multiple_months,
+  "date-range-picker-one-month": date_range_picker_date_range_picker_one_month,
   "date-range-picker-presets": date_range_picker_date_range_picker_presets,
   "date-range-picker-with-format": date_range_picker_date_range_picker_with_format,
   "date-range-picker-with-placeholder": date_range_picker_date_range_picker_with_placeholder,
@@ -4859,7 +4869,7 @@ export const componentAnatomy = {
     "anatomy": "<DataTable>\n  <DataTableContent>\n    <DataTableHeader />\n    <DataTableBody />\n  </DataTableContent>\n</DataTable>"
   },
   "date-picker": {
-    "imports": "import { DatePicker } from \"@/components/ui/cubby-ui/date-picker\";",
+    "imports": "import { DatePicker } from \"@/components/ui/cubby-ui/date-picker/date-picker\";",
     "anatomy": "<DatePicker />"
   },
   "date-range-picker": {

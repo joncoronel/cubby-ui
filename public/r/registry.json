@@ -292,11 +292,26 @@
         {
           "path": "registry/default/calendar/calendar.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/calendar.tsx"
+          "target": "components/ui/cubby-ui/calendar/calendar.tsx"
+        },
+        {
+          "path": "registry/default/calendar/calendar-picker.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/calendar/calendar-picker.tsx"
+        },
+        {
+          "path": "registry/default/calendar/calendar.css",
+          "type": "registry:file",
+          "target": "components/ui/cubby-ui/calendar/calendar.css"
         }
       ],
       "registryDependencies": [
-        "@cubby-ui/button"
+        "@cubby-ui/button",
+        "@cubby-ui/scroll-area",
+        "@cubby-ui/text-morph",
+        "@cubby-ui/use-controllable-state",
+        "@cubby-ui/date-utils",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "react-day-picker",
@@ -631,16 +646,26 @@
         {
           "path": "registry/default/date-picker/date-picker.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/date-picker.tsx"
+          "target": "components/ui/cubby-ui/date-picker/date-picker.tsx"
+        },
+        {
+          "path": "registry/default/date-picker/date-picker-parts.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/cubby-ui/date-picker/date-picker-parts.tsx"
         }
       ],
       "registryDependencies": [
-        "@cubby-ui/button",
         "@cubby-ui/calendar",
-        "@cubby-ui/popover"
+        "@cubby-ui/input",
+        "@cubby-ui/popover",
+        "@cubby-ui/input-group",
+        "@cubby-ui/use-controllable-state",
+        "@cubby-ui/date-utils",
+        "@cubby-ui/parse-date"
       ],
       "dependencies": [
-        "dayjs",
+        "react-day-picker",
+        "class-variance-authority",
         "@hugeicons/react",
         "@hugeicons/core-free-icons"
       ]
@@ -658,15 +683,30 @@
         }
       ],
       "registryDependencies": [
-        "@cubby-ui/button",
         "@cubby-ui/calendar",
-        "@cubby-ui/popover"
+        "@cubby-ui/date-picker",
+        "@cubby-ui/input",
+        "@cubby-ui/popover",
+        "@cubby-ui/use-controllable-state",
+        "@cubby-ui/date-utils",
+        "@cubby-ui/parse-date"
       ],
       "dependencies": [
-        "dayjs",
         "react-day-picker",
-        "@hugeicons/react",
-        "@hugeicons/core-free-icons"
+        "class-variance-authority"
+      ]
+    },
+    {
+      "name": "date-utils",
+      "type": "registry:lib",
+      "title": "dateUtils",
+      "description": "A utility function for date utils.",
+      "files": [
+        {
+          "path": "registry/default/lib/date-utils.ts",
+          "type": "registry:lib",
+          "target": "lib/cubby-ui/date-utils.ts"
+        }
       ]
     },
     {
@@ -1106,6 +1146,22 @@
         "class-variance-authority",
         "@hugeicons/react",
         "@hugeicons/core-free-icons"
+      ]
+    },
+    {
+      "name": "parse-date",
+      "type": "registry:lib",
+      "title": "parseDate",
+      "description": "A utility function for parse date.",
+      "files": [
+        {
+          "path": "registry/default/lib/parse-date.ts",
+          "type": "registry:lib",
+          "target": "lib/cubby-ui/parse-date.ts"
+        }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/date-utils"
       ]
     },
     {

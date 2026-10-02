@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "date-utils",
+  "title": "dateUtils",
+  "description": "A utility function for date utils.",
+  "files": [
+    {
+      "path": "registry/default/lib/date-utils.ts",
+      "content": "/**\n * Small local-time date helpers shared by the calendar, the date pickers, and\n * parse-date. Every date here is a local calendar day; times are dropped.\n */\n\nexport const DAY_MS = 24 * 60 * 60 * 1000;\n\n/** The same calendar day at local midnight. */\nexport function startOfDay(date: Date): Date {\n  return new Date(date.getFullYear(), date.getMonth(), date.getDate());\n}\n\n/** Whether two dates fall on the same calendar day, ignoring the time. */\nexport function isSameDay(a: Date, b: Date): boolean {\n  return (\n    a.getFullYear() === b.getFullYear() &&\n    a.getMonth() === b.getMonth() &&\n    a.getDate() === b.getDate()\n  );\n}\n\n/**\n * Calendar days from `a` to `b` (negative when `b` is earlier), ignoring the\n * time of day. Rounded, so a DST change inside the span doesn't skew it.\n */\nexport function daysBetween(a: Date, b: Date): number {\n  return Math.round(\n    (startOfDay(b).getTime() - startOfDay(a).getTime()) / DAY_MS,\n  );\n}\n\n/** `YYYY-MM-DD` in local time, the form `<input type=\"date\">` submits. */\nexport function toISODate(date: Date): string {\n  const pad = (n: number) => String(n).padStart(2, \"0\");\n  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;\n}\n",
+      "type": "registry:lib",
+      "target": "lib/cubby-ui/date-utils.ts"
+    }
+  ],
+  "type": "registry:lib"
+}

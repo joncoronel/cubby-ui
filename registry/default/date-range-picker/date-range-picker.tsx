@@ -169,7 +169,6 @@ function DateRangePicker({
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const panelRef = React.useRef<HTMLDivElement>(null);
   const groupRef = React.useRef<HTMLDivElement>(null);
-  const closeTimeoutRef = React.useRef<number | undefined>(undefined);
   const wide = useMediaQuery("(min-width: 640px)");
 
   // The range being picked. It only reaches `value` once both ends are set,
@@ -213,19 +212,12 @@ function DateRangePicker({
   };
 
   const handleSelect = (range: DateRange | undefined) => {
-    setDraft(range);
-    if (!range?.from || !range.to) return;
-    setValue({ from: range.from, to: range.to });
-    // Close a beat later so the range is seen landing (the calendar's band
-    // sweep), unless motion is reduced and there's nothing to see.
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setOpen(false);
-    } else {
-      closeTimeoutRef.current = window.setTimeout(() => setOpen(false), 350);
+    if (range?.from && range.to) {
+      commit({ from: range.from, to: range.to });
+      return;
     }
+    setDraft(range);
   };
-
-  React.useEffect(() => () => window.clearTimeout(closeTimeoutRef.current), []);
 
   const status = (() => {
     if (!draft?.from) return "Pick a start date";
@@ -345,7 +337,7 @@ function DateRangePicker({
         >
           <div ref={panelRef} className="flex flex-col gap-1 sm:flex-row">
             {presets && presets.length > 0 && (
-              <CalendarPresets className="border-border/60 border-b px-1 pt-1 pb-1.5 sm:w-32 sm:border-e sm:border-b-0 sm:p-1 sm:pe-2">
+              <CalendarPresets className="border-border/60 border-b px-1 pt-1 pb-1.5 max-sm:w-0 max-sm:min-w-full sm:w-32 sm:border-e sm:border-b-0 sm:p-1 sm:pe-2">
                 {presets.map((preset) => {
                   const range = resolvePreset(preset);
                   const presetDisabled = Boolean(

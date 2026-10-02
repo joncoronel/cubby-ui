@@ -181,6 +181,13 @@ function PopoverContent({
             "transition-[width,height,scale,opacity] duration-[150ms,150ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
+            // Own compositor layer while mounted, as in DropdownMenu and
+            // Menubar. width/height in the transition list stops Chrome
+            // compositing the scale, so the content re-rasters every frame and
+            // its text settles onto the pixel grid with a visible shift as the
+            // entrance ends. Promoted, it rasters once.
+            "will-change-transform",
+            "motion-reduce:will-change-auto",
             // Only the "already open, something changed" instant. Base UI waits on
             // this transition before unmounting, so suppressing a close means no
             // exit at all, and 'click' is inferred from `event.detail === 0`,

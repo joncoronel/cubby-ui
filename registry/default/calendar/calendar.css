@@ -290,11 +290,29 @@
       left var(--calendar-duration) var(--calendar-ease),
       opacity 150ms ease-out,
       scale var(--calendar-duration) var(--calendar-ease);
+  }
 
+  /* Appearing on a click, it settles in. Arriving with a new month, it
+   * takes the weeks' entrance instead (data-enter is the direction), so it
+   * moves as part of the incoming page. */
+  .calendar-selection:not([data-enter]) {
     @starting-style {
       opacity: 0;
       scale: 0.9;
     }
+  }
+
+  .calendar-selection[data-enter] {
+    animation: calendar-enter var(--calendar-enter-duration)
+      var(--calendar-ease) var(--calendar-enter-delay) both;
+  }
+
+  .calendar-selection[data-enter="end"] {
+    --calendar-from: var(--calendar-shift);
+  }
+
+  .calendar-selection[data-enter="start"] {
+    --calendar-from: calc(var(--calendar-shift) * -1);
   }
 
   @media (prefers-reduced-motion: reduce) {

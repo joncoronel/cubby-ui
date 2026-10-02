@@ -683,6 +683,7 @@ function Calendar({
   onMonthChange,
   onDayMouseEnter,
   onDayFocus,
+  onDayBlur,
   ...props
 }: CalendarProps) {
   const today = props.today ?? new Date();
@@ -707,6 +708,9 @@ function Calendar({
   // Remounting DayPicker after a pick skips its slide animation, which would
   // otherwise run underneath the picker fading away.
   const [pickerKey, setPickerKey] = React.useState(0);
+  // Whether a day has keyboard focus: DayPicker skips its month animation
+  // then, and the selection fill follows suit.
+  const [dayFocused, setDayFocused] = React.useState(false);
   const rootRef = React.useRef<HTMLDivElement>(null);
   const pendingFocusRef = React.useRef<"picker" | "days" | "caption" | null>(
     null,
@@ -796,6 +800,35 @@ function Calendar({
           fixedWeeks,
         })));
 
+  // When the month changes, the fill arrives with the incoming days: it is
+  // remounted (so it doesn't slide over from the old month's spot) and runs
+  // the weeks' own entrance (calendar.css), travelling the same way. Not when
+  // DayPicker skips its animation: a keyboard-focused day, or a jump from the
+  // month picker. Picking another day afterwards slides it as usual.
+  const selectedTime = selectedDay?.getTime();
+  const [previousFill, setPreviousFill] = React.useState({
+    month: firstShown,
+    selected: selectedTime,
+    pickerKey,
+  });
+  const [fillEnter, setFillEnter] = React.useState<"start" | "end" | null>(
+    null,
+  );
+  if (
+    previousFill.month !== firstShown ||
+    previousFill.selected !== selectedTime ||
+    previousFill.pickerKey !== pickerKey
+  ) {
+    setPreviousFill({ month: firstShown, selected: selectedTime, pickerKey });
+    const animated =
+      previousFill.month !== firstShown &&
+      previousFill.pickerKey === pickerKey &&
+      !dayFocused;
+    setFillEnter(
+      animated ? (firstShown > previousFill.month ? "end" : "start") : null,
+    );
+  }
+
   const startBound = props.startMonth ? monthIndex(props.startMonth) : null;
   const endBound = props.endMonth ? monthIndex(props.endMonth) : null;
   const isMonthDisabled = (year: number, monthOfYear: number) => {
@@ -876,8 +909,18 @@ function Calendar({
     dayModifiers,
     event,
   ) => {
+    setDayFocused(true);
     if (pickingEnd) setHovered(date);
     onDayFocus?.(date, dayModifiers, event);
+  };
+
+  const handleDayBlur: DayEventHandler<React.FocusEvent> = (
+    date,
+    dayModifiers,
+    event,
+  ) => {
+    setDayFocused(false);
+    onDayBlur?.(date, dayModifiers, event);
   };
 
   return (
@@ -928,6 +971,7 @@ function Calendar({
             modifiers={{ ...previewModifiers, ...modifiers }}
             onDayMouseEnter={handleDayMouseEnter}
             onDayFocus={handleDayFocus}
+            onDayBlur={handleDayBlur}
             classNames={mergeClassNames(classNames)}
             components={{
               Day: CalendarDay,
@@ -940,8 +984,10 @@ function Calendar({
           />
           {showIndicator && (
             <span
+              key={firstShown}
               aria-hidden
               data-slot="calendar-selection"
+              data-enter={fillEnter ?? undefined}
               className="calendar-selection"
             />
           )}

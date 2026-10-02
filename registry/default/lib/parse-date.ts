@@ -89,8 +89,15 @@ const RANGE_SEPARATOR = /\s+(?:-|to|until|till|through|thru)\s+|\s*[–—]\s*/;
  * Date arithmetic
  * -------------------------------------------------------------------------------------------------*/
 
+/** `new Date(y, m, d)`, except years 0–99 stay literal instead of meaning 1900–1999. */
+function makeDate(year: number, month: number, day: number): Date {
+  const date = new Date(2000, month, day);
+  date.setFullYear(year, month, day);
+  return date;
+}
+
 function daysInMonth(year: number, month: number): number {
-  return new Date(year, month + 1, 0).getDate();
+  return makeDate(year, month + 1, 0).getDate();
 }
 
 /** Adds whole units. Months and years clamp to the end of a shorter month. */
@@ -348,7 +355,7 @@ function resolve(parts: DateParts, reference: Date): Date | null {
   if (month < 0 || month > 11 || day < 1 || day > daysInMonth(year, month)) {
     return null;
   }
-  return new Date(year, month, day);
+  return makeDate(year, month, day);
 }
 
 /**

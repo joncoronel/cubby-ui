@@ -124,6 +124,9 @@ function CalendarPicker({
 }: CalendarPickerProps) {
   const yearsRef = React.useRef<HTMLDivElement>(null);
   const focusYearRef = React.useRef(false);
+  const monthsRef = React.useRef<HTMLDivElement>(null);
+  // The month focused when PageUp/PageDown changed the year, to refocus after.
+  const focusMonthRef = React.useRef<number | null>(null);
 
   React.useLayoutEffect(() => {
     if (!open) return;
@@ -142,6 +145,21 @@ function CalendarPicker({
       yearsRef.current?.querySelector<HTMLElement>("[data-active]");
     active?.focus();
     active?.scrollIntoView({ block: "nearest" });
+  }, [year]);
+
+  // Keep focus on the same month in the new year, or on the first one that
+  // isn't out of bounds there.
+  React.useEffect(() => {
+    const index = focusMonthRef.current;
+    if (index === null) return;
+    focusMonthRef.current = null;
+    const cells =
+      monthsRef.current?.querySelectorAll<HTMLButtonElement>("button");
+    if (!cells) return;
+    const target = cells[index]?.disabled
+      ? Array.from(cells).find((cell) => !cell.disabled)
+      : cells[index];
+    target?.focus();
   }, [year]);
 
   const stepYear = (next: number) => {
@@ -240,17 +258,21 @@ function CalendarPicker({
       <div
         role="group"
         aria-label={String(year)}
+        ref={monthsRef}
         data-slot="calendar-picker-months"
         className="grid flex-1 auto-rows-fr grid-cols-3 gap-x-1 p-1"
         onKeyDown={(event) => {
           if (event.key === "PageUp" || event.key === "PageDown") {
             event.preventDefault();
-            onYearChange(
-              Math.min(
-                Math.max(year + (event.key === "PageUp" ? -1 : 1), minYear),
-                maxYear,
-              ),
+            const next = Math.min(
+              Math.max(year + (event.key === "PageUp" ? -1 : 1), minYear),
+              maxYear,
             );
+            if (next === year) return;
+            focusMonthRef.current = Array.from(
+              event.currentTarget.querySelectorAll("button"),
+            ).indexOf(document.activeElement as HTMLButtonElement);
+            onYearChange(next);
             return;
           }
           moveInGrid(event);

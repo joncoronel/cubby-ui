@@ -123,6 +123,13 @@ describe("parseDate", () => {
   ])("rejects %j instead of returning an invalid date", (input) => {
     expect(parseDate(input, us)).toBeNull();
   });
+
+  it("keeps years 1 to 99 literal instead of mapping them to 19xx", () => {
+    const date = parseDate("0001-03-14", us);
+    expect([date?.getFullYear(), date?.getMonth(), date?.getDate()]).toEqual([
+      1, 2, 14,
+    ]);
+  });
 });
 
 describe("parseDateRange", () => {

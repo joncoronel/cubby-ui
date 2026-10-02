@@ -221,9 +221,13 @@ function DateRangePicker({
   const [draft, setDraft] = React.useState<DateRange | undefined>(
     value ?? undefined,
   );
+  // Reset the draft on open, and whenever the value changes from outside.
   const [wasOpen, setWasOpen] = React.useState(open);
-  if (open !== wasOpen) {
+  const valueKey = value ? `${value.from.getTime()}:${value.to.getTime()}` : "";
+  const [lastValueKey, setLastValueKey] = React.useState(valueKey);
+  if (open !== wasOpen || valueKey !== lastValueKey) {
     setWasOpen(open);
+    setLastValueKey(valueKey);
     if (open) setDraft(value ?? undefined);
   }
 

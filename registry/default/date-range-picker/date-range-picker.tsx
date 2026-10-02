@@ -160,7 +160,9 @@ function formatSpan(
 ): string {
   return isSameDay(range.from, range.to)
     ? formatter.format(range.from)
-    : formatter.formatRange(range.from, range.to).replace(/[  ]/g, " ");
+    : formatter
+        .formatRange(range.from, range.to)
+        .replace(/[\u2009\u202f]/g, " ");
 }
 
 function useMediaQuery(query: string): boolean {

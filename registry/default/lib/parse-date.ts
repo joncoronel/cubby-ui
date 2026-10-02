@@ -5,7 +5,7 @@
  * day/month order. Everything resolves to local midnight.
  */
 
-import { startOfDay } from "./date-utils";
+import { startOfDay } from "@/registry/default/lib/date-utils";
 
 export interface ParseDateOptions {
   /** The "today" that relative input resolves against. Defaults to now. */

@@ -1129,6 +1129,7 @@ function scanSharedDirectories(): Array<{
   description: string;
   files: Array<{ path: string; type: string; target?: string }>;
   dependencies?: string[];
+  registryDependencies?: string[];
 }> {
   const sharedItems: Array<{
     name: string;
@@ -1137,6 +1138,7 @@ function scanSharedDirectories(): Array<{
     description: string;
     files: Array<{ path: string; type: string; target?: string }>;
     dependencies?: string[];
+    registryDependencies?: string[];
   }> = [];
 
   // Scan both hooks and lib directories
@@ -1187,6 +1189,10 @@ function scanSharedDirectories(): Array<{
       const dependencies = imports.dependencies.filter(
         (dep) => dep !== "react" && dep !== "@base-ui/react",
       );
+      // Other shared hooks/utils this one imports, installed alongside it
+      const registryDependencies = imports.sharedLibFiles.map(
+        (dep) => `@cubby-ui/${dep}`,
+      );
 
       sharedItems.push({
         name,
@@ -1201,6 +1207,7 @@ function scanSharedDirectories(): Array<{
           },
         ],
         ...(dependencies.length > 0 && { dependencies }),
+        ...(registryDependencies.length > 0 && { registryDependencies }),
       });
     }
   }

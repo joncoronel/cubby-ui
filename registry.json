@@ -1159,6 +1159,9 @@
           "type": "registry:lib",
           "target": "lib/cubby-ui/parse-date.ts"
         }
+      ],
+      "registryDependencies": [
+        "@cubby-ui/date-utils"
       ]
     },
     {

@@ -1585,7 +1585,9 @@ export const componentMetadata = {
     "title": "parseDate",
     "description": "A utility function for parse date.",
     "category": "UI",
-    "registryDependencies": [],
+    "registryDependencies": [
+      "@cubby-ui/date-utils"
+    ],
     "dependencies": [],
     "examples": {}
   }

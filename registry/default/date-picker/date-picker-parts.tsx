@@ -233,6 +233,14 @@ function DatePickerField<T>({
   const [draft, setDraft] = React.useState<string | null>(null);
   // A commit was refused (Enter or blur); the draft stays, marked invalid.
   const [rejected, setRejected] = React.useState(false);
+  // A new value from elsewhere (the calendar, a preset, the parent) replaces
+  // any leftover draft, refused or not.
+  const [shownText, setShownText] = React.useState(text);
+  if (shownText !== text) {
+    setShownText(text);
+    setDraft(null);
+    setRejected(false);
+  }
   const inputRef = React.useRef<HTMLInputElement>(null);
   const hintId = React.useId();
 

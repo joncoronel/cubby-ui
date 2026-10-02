@@ -69,8 +69,10 @@
  * Range band
  *
  * Drawn on the cells, not the buttons, so it runs unbroken across a week. The
- * two ends fill only their inward half, and the band rounds off where a week
- * wraps. `td:first-of-type` skips the week-number header cell when shown.
+ * two ends fill only their inward half, and the band rounds off wherever it
+ * runs out of days: where a week wraps, and where a month ends mid-week with
+ * the next month's days hidden (side by side, a range crossing months stops
+ * at the hidden cells). `td:first-of-type` skips the week-number header.
  *
  * Each cell names its band shape in --calendar-paint (and the same shape in
  * the preview tint in --calendar-paint-preview), painted as a background
@@ -135,25 +137,30 @@
 }
 
 [data-slot="calendar-day"]:is([data-in-range], [data-preview-middle]):is(
-    td:first-of-type
+    td:first-of-type,
+    td[data-hidden] + td
   ) {
   border-start-start-radius: var(--calendar-radius);
   border-end-start-radius: var(--calendar-radius);
 }
 
 [data-slot="calendar-day"]:is([data-in-range], [data-preview-middle]):is(
-    td:last-of-type
+    td:last-of-type,
+    td:has(+ td[data-hidden])
   ) {
   border-start-end-radius: var(--calendar-radius);
   border-end-end-radius: var(--calendar-radius);
 }
 
-/* An end that sits on the week's edge has no inward neighbour to reach. */
+/* An end with no visible inward neighbour, at the week's edge or beside a
+ * hidden day of the next month, has nothing to reach toward. */
 [data-slot="calendar-day"]:is([data-range-start], [data-preview-start]):is(
-    td:last-of-type
+    td:last-of-type,
+    td:has(+ td[data-hidden])
   ),
 [data-slot="calendar-day"]:is([data-range-end], [data-preview-end]):is(
-    td:first-of-type
+    td:first-of-type,
+    td[data-hidden] + td
   ) {
   --calendar-paint: none;
   --calendar-paint-preview: none;

@@ -1029,21 +1029,34 @@ function Calendar({
 
 /**
  * A rail of one-click shortcuts that sits beside a calendar ("Today", "Last 7
- * days"). Vertical from `sm` up, a scrolling row of chips below it.
+ * days"). Vertical from `sm` up, a scrolling row of chips below it. Classes
+ * go on the outer scroll area; other props on the group inside.
  */
 function CalendarPresets({ className, ...props }: React.ComponentProps<"div">) {
+  // A ScrollArea so the scrolling row of chips fades toward whichever end
+  // has more past it. The vertical rail never overflows, so it never fades.
   return (
-    <div
-      role="group"
-      aria-label="Presets"
-      data-slot="calendar-presets"
+    <ScrollArea
+      fadeEdges="x"
+      hideScrollbar
+      contentMinWidth="fit-content"
+      // h-auto lets the rail stretch to the calendar beside it (ScrollArea's
+      // own full height resolves to nothing there). Below sm, w-0/min-w-full
+      // keeps the chip row from widening its container: it takes the
+      // container's width and scrolls within it.
       className={cn(
-        "flex shrink-0 gap-1 overflow-x-auto [scrollbar-width:none]",
-        "sm:w-36 sm:flex-col sm:overflow-visible",
+        "h-auto shrink-0 max-sm:w-0 max-sm:min-w-full sm:w-36",
         className,
       )}
-      {...props}
-    />
+    >
+      <div
+        role="group"
+        aria-label="Presets"
+        data-slot="calendar-presets"
+        className="flex gap-1 sm:flex-col"
+        {...props}
+      />
+    </ScrollArea>
   );
 }
 

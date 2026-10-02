@@ -337,7 +337,7 @@ function DateRangePicker({
         >
           <div ref={panelRef} className="flex flex-col gap-1 sm:flex-row">
             {presets && presets.length > 0 && (
-              <CalendarPresets className="border-border/60 border-b px-1 pt-1 pb-1.5 max-sm:w-0 max-sm:min-w-full sm:w-32 sm:border-e sm:border-b-0 sm:p-1 sm:pe-2">
+              <CalendarPresets className="border-border/60 border-b px-1 pt-1 pb-1.5 sm:w-32 sm:border-e sm:border-b-0 sm:p-1 sm:pe-2">
                 {presets.map((preset) => {
                   const range = resolvePreset(preset);
                   const presetDisabled = Boolean(

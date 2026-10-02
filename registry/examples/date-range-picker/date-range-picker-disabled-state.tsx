@@ -1,21 +1,19 @@
-"use client";
-
 import { DateRangePicker } from "@/registry/default/date-range-picker/date-range-picker";
-import { useState } from "react";
-import { DateRange } from "react-day-picker";
-import dayjs from "dayjs";
+
+const today = new Date();
 
 export default function DateRangePickerDisabledState() {
-  const [date, setDate] = useState<DateRange | undefined>({
-    from: new Date(),
-    to: dayjs().add(7, 'day').toDate(),
-  });
-
   return (
     <DateRangePicker
-      value={date}
-      onSelect={() => {}}
       disabled
+      defaultValue={{
+        from: today,
+        to: new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          today.getDate() + 7,
+        ),
+      }}
     />
   );
 }

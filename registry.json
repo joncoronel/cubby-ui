@@ -292,11 +292,17 @@
         {
           "path": "registry/default/calendar/calendar.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/calendar.tsx"
+          "target": "components/ui/cubby-ui/calendar/calendar.tsx"
+        },
+        {
+          "path": "registry/default/calendar/calendar.css",
+          "type": "registry:file",
+          "target": "components/ui/cubby-ui/calendar/calendar.css"
         }
       ],
       "registryDependencies": [
-        "@cubby-ui/button"
+        "@cubby-ui/button",
+        "@cubby-ui/use-controllable-state"
       ],
       "dependencies": [
         "react-day-picker",
@@ -635,12 +641,16 @@
         }
       ],
       "registryDependencies": [
-        "@cubby-ui/button",
         "@cubby-ui/calendar",
-        "@cubby-ui/popover"
+        "@cubby-ui/input",
+        "@cubby-ui/input-group",
+        "@cubby-ui/popover",
+        "@cubby-ui/use-controllable-state",
+        "@cubby-ui/parse-date"
       ],
       "dependencies": [
-        "dayjs",
+        "react-day-picker",
+        "class-variance-authority",
         "@hugeicons/react",
         "@hugeicons/core-free-icons"
       ]
@@ -658,13 +668,16 @@
         }
       ],
       "registryDependencies": [
-        "@cubby-ui/button",
         "@cubby-ui/calendar",
-        "@cubby-ui/popover"
+        "@cubby-ui/date-picker",
+        "@cubby-ui/input",
+        "@cubby-ui/popover",
+        "@cubby-ui/use-controllable-state",
+        "@cubby-ui/parse-date"
       ],
       "dependencies": [
-        "dayjs",
         "react-day-picker",
+        "class-variance-authority",
         "@hugeicons/react",
         "@hugeicons/core-free-icons"
       ]
@@ -1106,6 +1119,19 @@
         "class-variance-authority",
         "@hugeicons/react",
         "@hugeicons/core-free-icons"
+      ]
+    },
+    {
+      "name": "parse-date",
+      "type": "registry:lib",
+      "title": "parseDate",
+      "description": "A utility function for parse date.",
+      "files": [
+        {
+          "path": "registry/default/lib/parse-date.ts",
+          "type": "registry:lib",
+          "target": "lib/cubby-ui/parse-date.ts"
+        }
       ]
     },
     {

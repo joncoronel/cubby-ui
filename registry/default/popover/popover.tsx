@@ -121,6 +121,7 @@ function PopoverContent({
   collisionPadding = 10,
   sticky = false,
   positionMethod = "absolute",
+  anchor,
   arrow = false,
   arrowPadding,
   container,
@@ -136,6 +137,8 @@ function PopoverContent({
   collisionPadding?: BasePopover.Positioner.Props["collisionPadding"];
   sticky?: BasePopover.Positioner.Props["sticky"];
   positionMethod?: BasePopover.Positioner.Props["positionMethod"];
+  /** Positions against this element instead of the trigger. */
+  anchor?: BasePopover.Positioner.Props["anchor"];
   arrow?: boolean;
   arrowPadding?: number;
   container?: HTMLElement | undefined;
@@ -156,6 +159,7 @@ function PopoverContent({
         collisionPadding={collisionPadding}
         sticky={sticky}
         positionMethod={positionMethod}
+        anchor={anchor}
         arrowPadding={arrowPadding}
         className="z-50 h-(--positioner-height) max-h-(--available-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none motion-reduce:transition-none"
       >

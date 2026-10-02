@@ -98,6 +98,7 @@ import button_group_button_group_text from "@/registry/examples/button-group/but
 import calendar_calendar_basic from "@/registry/examples/calendar/calendar-basic";
 import calendar_calendar_date_range_selection from "@/registry/examples/calendar/calendar-date-range-selection";
 import calendar_calendar_disabled_dates from "@/registry/examples/calendar/calendar-disabled-dates";
+import calendar_calendar_month_and_year from "@/registry/examples/calendar/calendar-month-and-year";
 import calendar_calendar_multiple_dates_selection from "@/registry/examples/calendar/calendar-multiple-dates-selection";
 import calendar_calendar_single_date_selection from "@/registry/examples/calendar/calendar-single-date-selection";
 import calendar_calendar_with_footer from "@/registry/examples/calendar/calendar-with-footer";
@@ -184,9 +185,16 @@ import date_picker_date_picker_controlled from "@/registry/examples/date-picker/
 import date_picker_date_picker_custom_placeholder_and_format from "@/registry/examples/date-picker/date-picker-custom-placeholder-and-format";
 import date_picker_date_picker_different_widths from "@/registry/examples/date-picker/date-picker-different-widths";
 import date_picker_date_picker_disabled_state from "@/registry/examples/date-picker/date-picker-disabled-state";
+import date_picker_date_picker_editable from "@/registry/examples/date-picker/date-picker-editable";
+import date_picker_date_picker_form from "@/registry/examples/date-picker/date-picker-form";
+import date_picker_date_picker_min_max from "@/registry/examples/date-picker/date-picker-min-max";
+import date_picker_date_picker_presets from "@/registry/examples/date-picker/date-picker-presets";
 import date_range_picker_date_range_picker_basic from "@/registry/examples/date-range-picker/date-range-picker-basic";
 import date_range_picker_date_range_picker_disabled_state from "@/registry/examples/date-range-picker/date-range-picker-disabled-state";
+import date_range_picker_date_range_picker_editable from "@/registry/examples/date-range-picker/date-range-picker-editable";
+import date_range_picker_date_range_picker_min_max_nights from "@/registry/examples/date-range-picker/date-range-picker-min-max-nights";
 import date_range_picker_date_range_picker_multiple_months from "@/registry/examples/date-range-picker/date-range-picker-multiple-months";
+import date_range_picker_date_range_picker_presets from "@/registry/examples/date-range-picker/date-range-picker-presets";
 import date_range_picker_date_range_picker_with_format from "@/registry/examples/date-range-picker/date-range-picker-with-format";
 import date_range_picker_date_range_picker_with_placeholder from "@/registry/examples/date-range-picker/date-range-picker-with-placeholder";
 import dialog_dialog_basic from "@/registry/examples/dialog/dialog-basic";
@@ -659,7 +667,8 @@ export const componentMetadata = {
     "description": "A calendar component.",
     "category": "UI",
     "registryDependencies": [
-      "@cubby-ui/button"
+      "@cubby-ui/button",
+      "@cubby-ui/use-controllable-state"
     ],
     "dependencies": [
       "react-day-picker",
@@ -859,12 +868,16 @@ export const componentMetadata = {
     "description": "A date-picker component.",
     "category": "UI",
     "registryDependencies": [
-      "@cubby-ui/button",
       "@cubby-ui/calendar",
-      "@cubby-ui/popover"
+      "@cubby-ui/input",
+      "@cubby-ui/input-group",
+      "@cubby-ui/popover",
+      "@cubby-ui/use-controllable-state",
+      "@cubby-ui/parse-date"
     ],
     "dependencies": [
-      "dayjs",
+      "react-day-picker",
+      "class-variance-authority",
       "@hugeicons/react",
       "@hugeicons/core-free-icons"
     ],
@@ -877,13 +890,16 @@ export const componentMetadata = {
     "description": "A date-range-picker component.",
     "category": "UI",
     "registryDependencies": [
-      "@cubby-ui/button",
       "@cubby-ui/calendar",
-      "@cubby-ui/popover"
+      "@cubby-ui/date-picker",
+      "@cubby-ui/input",
+      "@cubby-ui/popover",
+      "@cubby-ui/use-controllable-state",
+      "@cubby-ui/parse-date"
     ],
     "dependencies": [
-      "dayjs",
       "react-day-picker",
+      "class-variance-authority",
       "@hugeicons/react",
       "@hugeicons/core-free-icons"
     ],
@@ -1550,6 +1566,15 @@ export const componentMetadata = {
     "registryDependencies": [],
     "dependencies": [],
     "examples": {}
+  },
+  "parse-date": {
+    "name": "parse-date",
+    "title": "parseDate",
+    "description": "A utility function for parse date.",
+    "category": "UI",
+    "registryDependencies": [],
+    "dependencies": [],
+    "examples": {}
   }
 } as const;
 
@@ -2050,32 +2075,37 @@ export const exampleRegistry = {
     {
       "title": "Basic",
       "importPath": "calendar-basic",
-      "source": "import { Calendar } from \"@/components/ui/cubby-ui/calendar\";\n\nexport default function CalendarBasic() {\n  return <Calendar />;\n}"
+      "source": "\"use client\";\n\nimport { useState } from \"react\";\nimport { Calendar } from \"@/components/ui/cubby-ui/calendar/calendar\";\n\nexport default function CalendarBasic() {\n  const [date, setDate] = useState<Date | undefined>(new Date());\n\n  return <Calendar mode=\"single\" selected={date} onSelect={setDate} />;\n}\n"
     },
     {
       "title": "Date Range Selection",
       "importPath": "calendar-date-range-selection",
-      "source": "\"use client\";\n\nimport { Calendar } from \"@/components/ui/cubby-ui/calendar\";\nimport { useState } from \"react\";\nimport { DateRange } from \"react-day-picker\";\n\nexport default function CalendarDateRangeSelection() {\n  const [dateRange, setDateRange] = useState<DateRange | undefined>({\n    from: new Date(2024, 0, 20),\n    to: new Date(2024, 0, 25),\n  });\n\n  return (\n    <div className=\"space-y-3\">\n      <Calendar\n        mode=\"range\"\n        selected={dateRange}\n        onSelect={setDateRange}\n        numberOfMonths={2}\n        fixedWeeks\n      />\n      <p className=\"text-muted-foreground text-center text-sm\">\n        {dateRange?.from ? (\n          dateRange.to ? (\n            <>\n              {dateRange.from.toDateString()} - {dateRange.to.toDateString()}\n            </>\n          ) : (\n            dateRange.from.toDateString()\n          )\n        ) : (\n          \"Pick a date range\"\n        )}\n      </p>\n    </div>\n  );\n}\n"
+      "source": "\"use client\";\n\nimport { useState } from \"react\";\nimport type { DateRange } from \"react-day-picker\";\nimport { Calendar } from \"@/components/ui/cubby-ui/calendar/calendar\";\n\nfunction addDays(date: Date, days: number): Date {\n  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);\n}\n\nexport default function CalendarDateRangeSelection() {\n  const [range, setRange] = useState<DateRange | undefined>(() => {\n    const today = new Date();\n    return { from: addDays(today, 2), to: addDays(today, 9) };\n  });\n\n  return (\n    <Calendar\n      mode=\"range\"\n      numberOfMonths={2}\n      selected={range}\n      onSelect={setRange}\n    />\n  );\n}\n"
     },
     {
       "title": "Disabled Dates",
       "importPath": "calendar-disabled-dates",
-      "source": "\"use client\";\n\nimport { Calendar } from \"@/components/ui/cubby-ui/calendar\";\nimport { useState } from \"react\";\n\nexport default function CalendarDisabledDates() {\n  const [date, setDate] = useState<Date | undefined>(new Date());\n\n  return (\n    <Calendar\n      mode=\"single\"\n      selected={date}\n      onSelect={setDate}\n      disabled={(date) =>\n        date > new Date() || date < new Date(\"1900-01-01\")\n      }\n      initialFocus\n    />\n  );\n}"
+      "source": "\"use client\";\n\nimport { useState } from \"react\";\nimport { Calendar } from \"@/components/ui/cubby-ui/calendar/calendar\";\n\nexport default function CalendarDisabledDates() {\n  const [date, setDate] = useState<Date | undefined>();\n  const today = new Date();\n  today.setHours(0, 0, 0, 0);\n\n  return (\n    <Calendar\n      mode=\"single\"\n      selected={date}\n      onSelect={setDate}\n      // No weekends, nothing in the past.\n      disabled={[{ dayOfWeek: [0, 6] }, { before: today }]}\n    />\n  );\n}\n"
+    },
+    {
+      "title": "Month And Year",
+      "importPath": "calendar-month-and-year",
+      "source": "\"use client\";\n\nimport { useState } from \"react\";\nimport { Calendar } from \"@/components/ui/cubby-ui/calendar/calendar\";\n\nexport default function CalendarMonthAndYear() {\n  const [date, setDate] = useState<Date | undefined>(new Date(1994, 4, 21));\n\n  return (\n    <Calendar\n      mode=\"single\"\n      selected={date}\n      onSelect={setDate}\n      // Bounds the month and year grids as well as the arrows.\n      startMonth={new Date(1920, 0)}\n      endMonth={new Date()}\n    />\n  );\n}\n"
     },
     {
       "title": "Multiple Dates Selection",
       "importPath": "calendar-multiple-dates-selection",
-      "source": "\"use client\";\n\nimport { Calendar } from \"@/components/ui/cubby-ui/calendar\";\nimport { useState } from \"react\";\n\nexport default function CalendarMultipleDatesSelection() {\n  const [dates, setDates] = useState<Date[] | undefined>([]);\n\n  return (\n    <div className=\"space-y-3\">\n      <Calendar mode=\"multiple\" selected={dates} onSelect={setDates} />\n      <div className=\"text-muted-foreground text-center text-sm\">\n        <p>Selected dates: {dates?.length || 0}</p>\n        {dates && dates.length > 0 && (\n          <p className=\"mt-1 text-xs\">\n            {dates.map((d) => d.toLocaleDateString()).join(\", \")}\n          </p>\n        )}\n      </div>\n    </div>\n  );\n}\n"
+      "source": "\"use client\";\n\nimport { useState } from \"react\";\nimport { Calendar } from \"@/components/ui/cubby-ui/calendar/calendar\";\n\nexport default function CalendarMultipleDatesSelection() {\n  const [dates, setDates] = useState<Date[] | undefined>([]);\n\n  return (\n    <Calendar\n      mode=\"multiple\"\n      selected={dates}\n      onSelect={setDates}\n      footer={`${dates?.length ?? 0} ${dates?.length === 1 ? \"day\" : \"days\"} selected`}\n    />\n  );\n}\n"
     },
     {
       "title": "Single Date Selection",
       "importPath": "calendar-single-date-selection",
-      "source": "\"use client\";\n\nimport { Calendar } from \"@/components/ui/cubby-ui/calendar\";\nimport { useState } from \"react\";\n\nexport default function CalendarSingleDateSelection() {\n  const [date, setDate] = useState<Date | undefined>(new Date());\n\n  return (\n    <div className=\"space-y-3\">\n      <Calendar mode=\"single\" selected={date} onSelect={setDate} />\n      <p className=\"text-muted-foreground text-center text-sm\">\n        Selected date: {date?.toDateString()}\n      </p>\n    </div>\n  );\n}\n"
+      "source": "\"use client\";\n\nimport { useState } from \"react\";\nimport { Calendar } from \"@/components/ui/cubby-ui/calendar/calendar\";\n\nexport default function CalendarSingleDateSelection() {\n  const [date, setDate] = useState<Date | undefined>();\n\n  return (\n    <Calendar\n      mode=\"single\"\n      selected={date}\n      onSelect={setDate}\n      footer={\n        date\n          ? `Selected ${date.toLocaleDateString(undefined, { dateStyle: \"long\" })}`\n          : \"Pick a day.\"\n      }\n    />\n  );\n}\n"
     },
     {
       "title": "With Footer",
       "importPath": "calendar-with-footer",
-      "source": "\"use client\";\n\nimport { Calendar } from \"@/components/ui/cubby-ui/calendar\";\nimport { useState } from \"react\";\n\nexport default function CalendarWithFooter() {\n  const [date, setDate] = useState<Date | undefined>(new Date());\n\n  return (\n    <Calendar\n      mode=\"single\"\n      selected={date}\n      onSelect={setDate}\n      footer={\n        <p className=\"text-muted-foreground mt-1 text-center text-sm\">\n          Pick a date for your appointment\n        </p>\n      }\n    />\n  );\n}\n"
+      "source": "\"use client\";\n\nimport { useState } from \"react\";\nimport { Calendar } from \"@/components/ui/cubby-ui/calendar/calendar\";\n\nexport default function CalendarWithFooter() {\n  const [date, setDate] = useState<Date | undefined>();\n\n  return (\n    <Calendar\n      mode=\"single\"\n      selected={date}\n      onSelect={setDate}\n      footer={\n        date\n          ? `Appointment on ${date.toLocaleDateString(undefined, { weekday: \"long\", month: \"long\", day: \"numeric\" })}`\n          : \"Pick a day for your appointment.\"\n      }\n    />\n  );\n}\n"
     }
   ],
   "card": [
@@ -2496,54 +2526,89 @@ export const exampleRegistry = {
     {
       "title": "Basic",
       "importPath": "date-picker-basic",
-      "source": "import { DatePicker } from \"@/components/ui/cubby-ui/date-picker\";\n\nexport default function DatePickerBasic() {\n  return <DatePicker />;\n}"
+      "source": "import { DatePicker } from \"@/components/ui/cubby-ui/date-picker\";\n\nexport default function DatePickerBasic() {\n  return <DatePicker />;\n}\n"
     },
     {
       "title": "Controlled",
       "importPath": "date-picker-controlled",
-      "source": "\"use client\";\n\nimport { DatePicker } from \"@/components/ui/cubby-ui/date-picker\";\nimport { useState } from \"react\";\n\nexport default function DatePickerControlled() {\n  const [date, setDate] = useState<Date | undefined>(undefined);\n\n  return (\n    <div className=\"space-y-2\">\n      <DatePicker value={date} onSelect={setDate} />\n      <p className=\"text-sm text-muted-foreground\">\n        Selected date: {date ? date.toDateString() : \"None\"}\n      </p>\n    </div>\n  );\n}"
+      "source": "\"use client\";\n\nimport { useState } from \"react\";\nimport { DatePicker } from \"@/components/ui/cubby-ui/date-picker\";\n\nexport default function DatePickerControlled() {\n  const [date, setDate] = useState<Date | null>(new Date());\n\n  return (\n    <div className=\"flex flex-col items-start gap-2\">\n      <DatePicker value={date} onValueChange={setDate} clearable />\n      <p className=\"text-muted-foreground text-sm tabular-nums\">\n        {date ? date.toDateString() : \"No date\"}\n      </p>\n    </div>\n  );\n}\n"
     },
     {
       "title": "Custom Placeholder And Format",
       "importPath": "date-picker-custom-placeholder-and-format",
-      "source": "\"use client\";\n\nimport { DatePicker } from \"@/components/ui/cubby-ui/date-picker\";\nimport { useState } from \"react\";\n\nexport default function DatePickerCustomPlaceholderAndFormat() {\n  const [birthDate, setBirthDate] = useState<Date | undefined>(undefined);\n\n  return (\n    <DatePicker\n      placeholder=\"Pick your birth date\"\n      format=\"MMM DD, YYYY\"\n      value={birthDate}\n      onSelect={setBirthDate}\n    />\n  );\n}"
+      "source": "import { DatePicker } from \"@/components/ui/cubby-ui/date-picker\";\n\nconst longDate = new Intl.DateTimeFormat(undefined, {\n  weekday: \"short\",\n  month: \"long\",\n  day: \"numeric\",\n});\n\nexport default function DatePickerCustomPlaceholderAndFormat() {\n  return (\n    <DatePicker\n      placeholder=\"When's the launch?\"\n      format={(date) => longDate.format(date)}\n    />\n  );\n}\n"
     },
     {
       "title": "Different Widths",
       "importPath": "date-picker-different-widths",
-      "source": "import { DatePicker } from \"@/components/ui/cubby-ui/date-picker\";\n\nexport default function DatePickerDifferentWidths() {\n  return (\n    <div className=\"space-y-3\">\n      <DatePicker className=\"w-[200px]\" placeholder=\"Narrow\" />\n      <DatePicker className=\"w-[300px]\" placeholder=\"Default\" />\n      <DatePicker className=\"w-[400px]\" placeholder=\"Wide\" />\n    </div>\n  );\n}"
+      "source": "import { DatePicker } from \"@/components/ui/cubby-ui/date-picker\";\n\nexport default function DatePickerDifferentWidths() {\n  return (\n    <div className=\"flex w-full max-w-sm flex-col gap-3\">\n      <DatePicker className=\"w-48\" placeholder=\"Narrow\" />\n      <DatePicker placeholder=\"Default\" />\n      <DatePicker className=\"w-full\" placeholder=\"Full width\" />\n    </div>\n  );\n}\n"
     },
     {
       "title": "Disabled State",
       "importPath": "date-picker-disabled-state",
-      "source": "import { DatePicker } from \"@/components/ui/cubby-ui/date-picker\";\n\nexport default function DatePickerDisabledState() {\n  return (\n    <div className=\"space-y-3\">\n      <DatePicker disabled placeholder=\"Disabled date picker\" />\n      <DatePicker\n        value={new Date()}\n        disabled\n        placeholder=\"Disabled with value\"\n      />\n    </div>\n  );\n}"
+      "source": "import { DatePicker } from \"@/components/ui/cubby-ui/date-picker\";\n\nexport default function DatePickerDisabledState() {\n  return <DatePicker disabled defaultValue={new Date()} />;\n}\n"
+    },
+    {
+      "title": "Editable",
+      "importPath": "date-picker-editable",
+      "source": "\"use client\";\n\nimport { useState } from \"react\";\nimport { DatePicker } from \"@/components/ui/cubby-ui/date-picker\";\n\nexport default function DatePickerEditable() {\n  const [date, setDate] = useState<Date | null>(null);\n\n  return (\n    <div className=\"flex flex-col items-start gap-2\">\n      <DatePicker\n        editable\n        clearable\n        value={date}\n        onValueChange={setDate}\n        placeholder=\"Try “next fri” or “mar 14”\"\n        className=\"w-72\"\n      />\n      <p className=\"text-muted-foreground text-sm tabular-nums\">\n        {date ? date.toDateString() : \"No date\"}\n      </p>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Form",
+      "importPath": "date-picker-form",
+      "source": "\"use client\";\n\nimport { useState } from \"react\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { DatePicker } from \"@/components/ui/cubby-ui/date-picker\";\n\nexport default function DatePickerForm() {\n  const [submitted, setSubmitted] = useState<string | null>(null);\n\n  return (\n    <form\n      className=\"flex flex-col items-start gap-3\"\n      onSubmit={(event) => {\n        event.preventDefault();\n        const data = new FormData(event.currentTarget);\n        setSubmitted(String(data.get(\"birthday\") || \"(empty)\"));\n      }}\n    >\n      <label htmlFor=\"birthday\" className=\"text-sm font-medium\">\n        Birthday\n      </label>\n      <DatePicker id=\"birthday\" name=\"birthday\" />\n      <Button type=\"submit\" size=\"sm\">\n        Submit\n      </Button>\n      {submitted && (\n        <p className=\"text-muted-foreground font-mono text-sm\">\n          birthday={submitted}\n        </p>\n      )}\n    </form>\n  );\n}\n"
+    },
+    {
+      "title": "Min Max",
+      "importPath": "date-picker-min-max",
+      "source": "import { DatePicker } from \"@/components/ui/cubby-ui/date-picker\";\n\nconst today = new Date();\nconst inSixtyDays = new Date(\n  today.getFullYear(),\n  today.getMonth(),\n  today.getDate() + 60,\n);\n\nexport default function DatePickerMinMax() {\n  return (\n    <DatePicker\n      placeholder=\"Delivery date\"\n      minDate={today}\n      maxDate={inSixtyDays}\n      // Weekends are blocked too.\n      disabledDates={{ dayOfWeek: [0, 6] }}\n    />\n  );\n}\n"
+    },
+    {
+      "title": "Presets",
+      "importPath": "date-picker-presets",
+      "source": "import {\n  DatePicker,\n  type DatePickerPreset,\n} from \"@/components/ui/cubby-ui/date-picker\";\n\nfunction addDays(days: number): Date {\n  const date = new Date();\n  date.setDate(date.getDate() + days);\n  return date;\n}\n\n/** The next given weekday (0 = Sunday), never today. */\nfunction next(weekday: number): Date {\n  const date = new Date();\n  date.setDate(date.getDate() + (((weekday - date.getDay() + 6) % 7) + 1));\n  return date;\n}\n\nconst presets: DatePickerPreset[] = [\n  { label: \"Today\", value: () => new Date() },\n  { label: \"Tomorrow\", value: () => addDays(1) },\n  { label: \"Next Monday\", value: () => next(1) },\n  { label: \"In a week\", value: () => addDays(7) },\n  { label: \"In a month\", value: () => addDays(30) },\n];\n\nexport default function DatePickerPresets() {\n  return <DatePicker presets={presets} placeholder=\"Due date\" clearable />;\n}\n"
     }
   ],
   "date-range-picker": [
     {
       "title": "Basic",
       "importPath": "date-range-picker-basic",
-      "source": "\"use client\";\n\nimport { DateRangePicker } from \"@/components/ui/cubby-ui/date-range-picker\";\nimport { useState } from \"react\";\nimport { DateRange } from \"react-day-picker\";\nimport dayjs from \"dayjs\";\n\nexport default function DateRangePickerBasic() {\n  const [date, setDate] = useState<DateRange | undefined>({\n    from: new Date(),\n    to: dayjs().add(7, 'day').toDate(),\n  });\n\n  return (\n    <DateRangePicker\n      value={date}\n      onSelect={setDate}\n    />\n  );\n}"
+      "source": "\"use client\";\n\nimport { useState } from \"react\";\nimport {\n  DateRangePicker,\n  type DateRangeValue,\n} from \"@/components/ui/cubby-ui/date-range-picker\";\n\nfunction addDays(date: Date, days: number): Date {\n  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);\n}\n\nexport default function DateRangePickerBasic() {\n  const [range, setRange] = useState<DateRangeValue | null>(() => {\n    const today = new Date();\n    return { from: today, to: addDays(today, 7) };\n  });\n\n  return <DateRangePicker value={range} onValueChange={setRange} clearable />;\n}\n"
     },
     {
       "title": "Disabled State",
       "importPath": "date-range-picker-disabled-state",
-      "source": "\"use client\";\n\nimport { DateRangePicker } from \"@/components/ui/cubby-ui/date-range-picker\";\nimport { useState } from \"react\";\nimport { DateRange } from \"react-day-picker\";\nimport dayjs from \"dayjs\";\n\nexport default function DateRangePickerDisabledState() {\n  const [date, setDate] = useState<DateRange | undefined>({\n    from: new Date(),\n    to: dayjs().add(7, 'day').toDate(),\n  });\n\n  return (\n    <DateRangePicker\n      value={date}\n      onSelect={() => {}}\n      disabled\n    />\n  );\n}"
+      "source": "import { DateRangePicker } from \"@/components/ui/cubby-ui/date-range-picker\";\n\nconst today = new Date();\n\nexport default function DateRangePickerDisabledState() {\n  return (\n    <DateRangePicker\n      disabled\n      defaultValue={{\n        from: today,\n        to: new Date(\n          today.getFullYear(),\n          today.getMonth(),\n          today.getDate() + 7,\n        ),\n      }}\n    />\n  );\n}\n"
+    },
+    {
+      "title": "Editable",
+      "importPath": "date-range-picker-editable",
+      "source": "\"use client\";\n\nimport { useState } from \"react\";\nimport {\n  DateRangePicker,\n  type DateRangeValue,\n} from \"@/components/ui/cubby-ui/date-range-picker\";\n\nexport default function DateRangePickerEditable() {\n  const [range, setRange] = useState<DateRangeValue | null>(null);\n\n  return (\n    <DateRangePicker\n      editable\n      clearable\n      value={range}\n      onValueChange={setRange}\n      placeholder=\"Try “last 30 days” or “mar 3 – 12”\"\n      className=\"w-80\"\n    />\n  );\n}\n"
+    },
+    {
+      "title": "Min Max Nights",
+      "importPath": "date-range-picker-min-max-nights",
+      "source": "import { DateRangePicker } from \"@/components/ui/cubby-ui/date-range-picker\";\n\nexport default function DateRangePickerMinMaxNights() {\n  return (\n    <DateRangePicker\n      placeholder=\"Book a stay\"\n      minDate={new Date()}\n      minNights={2}\n      maxNights={14}\n    />\n  );\n}\n"
     },
     {
       "title": "Multiple Months",
       "importPath": "date-range-picker-multiple-months",
-      "source": "\"use client\";\n\nimport { DateRangePicker } from \"@/components/ui/cubby-ui/date-range-picker\";\nimport { useState } from \"react\";\nimport { DateRange } from \"react-day-picker\";\nimport dayjs from \"dayjs\";\n\nexport default function DateRangePickerMultipleMonths() {\n  const [date, setDate] = useState<DateRange | undefined>({\n    from: new Date(),\n    to: dayjs().add(7, \"day\").toDate(),\n  });\n\n  return (\n    <DateRangePicker\n      value={date}\n      onSelect={setDate}\n      numberOfMonths={2}\n      fixedWeeks={true}\n    />\n  );\n}\n"
+      "source": "import { DateRangePicker } from \"@/components/ui/cubby-ui/date-range-picker\";\n\nexport default function DateRangePickerMultipleMonths() {\n  return (\n    <DateRangePicker numberOfMonths={1} placeholder=\"One month at a time\" />\n  );\n}\n"
+    },
+    {
+      "title": "Presets",
+      "importPath": "date-range-picker-presets",
+      "source": "\"use client\";\n\nimport { useState } from \"react\";\nimport {\n  DateRangePicker,\n  type DateRangePreset,\n  type DateRangeValue,\n} from \"@/components/ui/cubby-ui/date-range-picker\";\n\nfunction daysAgo(days: number): Date {\n  const date = new Date();\n  date.setDate(date.getDate() - days);\n  return date;\n}\n\nconst presets: DateRangePreset[] = [\n  { label: \"Today\", value: () => ({ from: new Date(), to: new Date() }) },\n  { label: \"Last 7 days\", value: () => ({ from: daysAgo(6), to: new Date() }) },\n  {\n    label: \"Last 30 days\",\n    value: () => ({ from: daysAgo(29), to: new Date() }),\n  },\n  {\n    label: \"This month\",\n    value: () => {\n      const today = new Date();\n      return {\n        from: new Date(today.getFullYear(), today.getMonth(), 1),\n        to: today,\n      };\n    },\n  },\n  {\n    label: \"Last month\",\n    value: () => {\n      const today = new Date();\n      return {\n        from: new Date(today.getFullYear(), today.getMonth() - 1, 1),\n        to: new Date(today.getFullYear(), today.getMonth(), 0),\n      };\n    },\n  },\n  {\n    label: \"Year to date\",\n    value: () => ({\n      from: new Date(new Date().getFullYear(), 0, 1),\n      to: new Date(),\n    }),\n  },\n];\n\nexport default function DateRangePickerPresets() {\n  const [range, setRange] = useState<DateRangeValue | null>(null);\n\n  return (\n    <DateRangePicker\n      value={range}\n      onValueChange={setRange}\n      presets={presets}\n      maxDate={new Date()}\n    />\n  );\n}\n"
     },
     {
       "title": "With Format",
       "importPath": "date-range-picker-with-format",
-      "source": "\"use client\";\n\nimport { DateRangePicker } from \"@/components/ui/cubby-ui/date-range-picker\";\nimport { useState } from \"react\";\nimport { DateRange } from \"react-day-picker\";\n\nexport default function DateRangePickerWithFormat() {\n  const [datePreset, setDatePreset] = useState<DateRange | undefined>();\n\n  return (\n    <DateRangePicker\n      value={datePreset}\n      onSelect={setDatePreset}\n      format=\"MMM DD, YYYY\"\n    />\n  );\n}"
+      "source": "import { DateRangePicker } from \"@/components/ui/cubby-ui/date-range-picker\";\n\nconst numeric = new Intl.DateTimeFormat(undefined, {\n  day: \"2-digit\",\n  month: \"2-digit\",\n  year: \"numeric\",\n});\n\nexport default function DateRangePickerWithFormat() {\n  return (\n    <DateRangePicker\n      format={({ from, to }) =>\n        `${numeric.format(from)} → ${numeric.format(to)}`\n      }\n    />\n  );\n}\n"
     },
     {
       "title": "With Placeholder",
       "importPath": "date-range-picker-with-placeholder",
-      "source": "\"use client\";\n\nimport { DateRangePicker } from \"@/components/ui/cubby-ui/date-range-picker\";\nimport { useState } from \"react\";\nimport { DateRange } from \"react-day-picker\";\n\nexport default function DateRangePickerWithPlaceholder() {\n  const [date, setDate] = useState<DateRange | undefined>();\n\n  return (\n    <DateRangePicker\n      value={date}\n      onSelect={setDate}\n      placeholder=\"Custom date range placeholder\"\n    />\n  );\n}\n"
+      "source": "import { DateRangePicker } from \"@/components/ui/cubby-ui/date-range-picker\";\n\nexport default function DateRangePickerWithPlaceholder() {\n  return <DateRangePicker placeholder=\"Check-in – Check-out\" />;\n}\n"
     }
   ],
   "dialog": [
@@ -4283,6 +4348,7 @@ export const componentMap = {
   "calendar-basic": calendar_calendar_basic,
   "calendar-date-range-selection": calendar_calendar_date_range_selection,
   "calendar-disabled-dates": calendar_calendar_disabled_dates,
+  "calendar-month-and-year": calendar_calendar_month_and_year,
   "calendar-multiple-dates-selection": calendar_calendar_multiple_dates_selection,
   "calendar-single-date-selection": calendar_calendar_single_date_selection,
   "calendar-with-footer": calendar_calendar_with_footer,
@@ -4369,9 +4435,16 @@ export const componentMap = {
   "date-picker-custom-placeholder-and-format": date_picker_date_picker_custom_placeholder_and_format,
   "date-picker-different-widths": date_picker_date_picker_different_widths,
   "date-picker-disabled-state": date_picker_date_picker_disabled_state,
+  "date-picker-editable": date_picker_date_picker_editable,
+  "date-picker-form": date_picker_date_picker_form,
+  "date-picker-min-max": date_picker_date_picker_min_max,
+  "date-picker-presets": date_picker_date_picker_presets,
   "date-range-picker-basic": date_range_picker_date_range_picker_basic,
   "date-range-picker-disabled-state": date_range_picker_date_range_picker_disabled_state,
+  "date-range-picker-editable": date_range_picker_date_range_picker_editable,
+  "date-range-picker-min-max-nights": date_range_picker_date_range_picker_min_max_nights,
   "date-range-picker-multiple-months": date_range_picker_date_range_picker_multiple_months,
+  "date-range-picker-presets": date_range_picker_date_range_picker_presets,
   "date-range-picker-with-format": date_range_picker_date_range_picker_with_format,
   "date-range-picker-with-placeholder": date_range_picker_date_range_picker_with_placeholder,
   "dialog-basic": dialog_dialog_basic,
@@ -4731,7 +4804,7 @@ export const componentAnatomy = {
     "anatomy": "<ButtonGroup>\n  <ButtonGroup />\n</ButtonGroup>"
   },
   "calendar": {
-    "imports": "import { Calendar } from \"@/components/ui/cubby-ui/calendar\";",
+    "imports": "import { Calendar } from \"@/components/ui/cubby-ui/calendar/calendar\";",
     "anatomy": "<Calendar />"
   },
   "card": {
@@ -4787,7 +4860,7 @@ export const componentAnatomy = {
     "anatomy": "<DatePicker />"
   },
   "date-range-picker": {
-    "imports": "import { DateRangePicker } from \"@/components/ui/cubby-ui/date-range-picker\";",
+    "imports": "import {\n  DateRangePicker,\n  type DateRangeValue,\n} from \"@/components/ui/cubby-ui/date-range-picker\";",
     "anatomy": "<DateRangePicker />"
   },
   "dialog": {

@@ -368,6 +368,13 @@
   inset: 0;
 }
 
+/* Stacked (below sm), each month draws its own header strip. The clone's
+ * would sit over the live header and hide what the caption text doesn't
+ * cover, like the chevron; the live month's strip is already there. */
+[data-slot="calendar"] [data-animated-month][aria-hidden="true"]::before {
+  content: none;
+}
+
 [data-slot="calendar"]
   [data-animated-month][aria-hidden="true"]
   [data-slot="calendar-grid"] {

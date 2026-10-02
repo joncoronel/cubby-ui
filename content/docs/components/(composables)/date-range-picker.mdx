@@ -50,7 +50,7 @@ Pass `presets` for one-click ranges beside the calendar. Give each a function so
 
 ### Minimum and Maximum Length
 
-`minNights` and `maxNights` limit the length of the range, counted as nights between the two ends. `minDate` and `maxDate` limit where it can fall.
+`minNights` and `maxNights` limit the length of the range, counted as nights between the two ends. `minDate` and `maxDate` limit where it can fall. For stays, `labels.duration` can count nights instead of days in the status line.
 
 <ComponentPreview
   component="date-range-picker"
@@ -230,6 +230,18 @@ The DateRangePicker composes [`Calendar`](/docs/components/calendar) in `range` 
 <ApiProp name="calendarProps" fullType="Partial<PropsBase>" simpleType="object">
   Passed to the calendar: `locale`, `weekStartsOn`, `showWeekNumber`, and other
   DayPicker props.
+</ApiProp>
+
+<ApiProp
+  name="labels"
+  fullType="Partial<DateRangePickerLabels>"
+  simpleType="object"
+>
+  Copy overrides for the picker's own text, merged over English defaults.
+  Strings: `chooseDates`, `clear`, `presets`, `pickStart`, `invalid`,
+  `unavailable`. Functions: `pickEnd(start)`, `duration(days)`,
+  `tooShort(minNights)`, `tooLong(maxNights)`. `duration` counts both ends;
+  return `days - 1` nights for stays.
 </ApiProp>
 
 <ApiProp name="className" fullType="string">

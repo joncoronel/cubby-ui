@@ -37,6 +37,27 @@ export interface DatePickerPreset {
   value: Date | (() => Date);
 }
 
+/** Copy overrides for the picker's own text, for wording and translation. */
+export interface DatePickerLabels {
+  /** The calendar button beside an `editable` field. */
+  chooseDate: string;
+  clear: string;
+  /** The group of presets, for screen readers. */
+  presets: string;
+  /** Typed text that can't be read as a date (`editable`). */
+  invalid: string;
+  /** A typed date that's blocked by min, max, or `disabledDates`. */
+  unavailable: string;
+}
+
+const DEFAULT_LABELS: DatePickerLabels = {
+  chooseDate: "Choose date",
+  clear: "Clear date",
+  presets: "Presets",
+  invalid: "Not a date",
+  unavailable: "Unavailable",
+};
+
 export type DatePickerProps = Omit<
   React.ComponentProps<"button">,
   "value" | "defaultValue" | "onChange" | "onSelect" | "children"
@@ -71,6 +92,8 @@ export type DatePickerProps = Omit<
     name?: string;
     /** Passed through to the calendar (locale, week start, and so on). */
     calendarProps?: Partial<PropsBase>;
+    /** Copy overrides for the picker's own text, merged over the defaults. */
+    labels?: Partial<DatePickerLabels>;
   };
 
 function startOfDay(date: Date): Date {
@@ -121,6 +144,8 @@ export type DatePickerFieldProps<T> = Omit<
     onOpenRequest: () => void;
     triggerLabel: string;
     clearLabel: string;
+    /** Shown when Enter is pressed on text that can't be read. */
+    invalidLabel: string;
     showClear: boolean;
   };
 
@@ -132,6 +157,7 @@ function DatePickerField<T>({
   onOpenRequest,
   triggerLabel,
   clearLabel,
+  invalidLabel,
   showClear,
   variant,
   size,
@@ -153,7 +179,7 @@ function DatePickerField<T>({
 
   let hint = "";
   if (editing && reading) hint = reading.error ?? reading.hint;
-  else if (editing && rejected) hint = "Not a date";
+  else if (editing && rejected) hint = invalidLabel;
   const invalid = editing && (reading?.error !== undefined || rejected);
 
   /** Applies the draft. False when it can't be read or isn't allowed. */
@@ -284,6 +310,7 @@ function DatePicker({
   presets,
   name,
   calendarProps,
+  labels,
   variant,
   size,
   className,
@@ -304,6 +331,7 @@ function DatePicker({
   const panelRef = React.useRef<HTMLDivElement>(null);
   const groupRef = React.useRef<HTMLDivElement>(null);
 
+  const copy = { ...DEFAULT_LABELS, ...labels };
   const locale = calendarProps?.locale?.code;
   const label = value
     ? (format?.(value) ??
@@ -342,7 +370,7 @@ function DatePicker({
     return {
       value: date,
       hint: hintFormat(date),
-      error: blocked ? "Unavailable" : undefined,
+      error: blocked ? copy.unavailable : undefined,
     };
   };
 
@@ -361,8 +389,9 @@ function DatePicker({
             read={readText}
             onCommit={setValue}
             onOpenRequest={() => setOpen(true)}
-            triggerLabel="Choose date"
-            clearLabel="Clear date"
+            triggerLabel={copy.chooseDate}
+            clearLabel={copy.clear}
+            invalidLabel={copy.invalid}
             showClear={showClear}
             placeholder={placeholder}
             disabled={disabled}
@@ -413,7 +442,10 @@ function DatePicker({
         >
           <div ref={panelRef} className="flex flex-col gap-1 sm:flex-row">
             {presets && presets.length > 0 && (
-              <CalendarPresets className="border-border/60 border-b px-1 pt-1 pb-1.5 sm:w-32 sm:border-e sm:border-b-0 sm:p-1 sm:pe-2">
+              <CalendarPresets
+                aria-label={copy.presets}
+                className="border-border/60 border-b px-1 pt-1 pb-1.5 sm:w-32 sm:border-e sm:border-b-0 sm:p-1 sm:pe-2"
+              >
                 {presets.map((preset) => {
                   const date = resolvePreset(preset);
                   const presetDisabled = Boolean(
@@ -454,7 +486,7 @@ function DatePicker({
         <button
           type="button"
           data-slot="date-picker-clear"
-          aria-label="Clear date"
+          aria-label={copy.clear}
           onClick={() => {
             setValue(null);
             triggerRef.current?.focus();

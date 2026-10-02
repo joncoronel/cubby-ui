@@ -1079,7 +1079,8 @@ function CalendarPreset({
         "hover:bg-surface-hover hover:text-foreground",
         "data-active:bg-surface-hover data-active:text-foreground data-active:font-medium",
         focusRing,
-        "transition-[background-color,color,outline-color,outline-offset] duration-150 ease-out",
+        // Hover changes colour instantly, like the days.
+        "transition-[outline-color,outline-offset] duration-150 ease-out",
         className,
       )}
       {...props}

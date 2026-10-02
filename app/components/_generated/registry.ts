@@ -2591,7 +2591,7 @@ export const exampleRegistry = {
     {
       "title": "Min Max Nights",
       "importPath": "date-range-picker-min-max-nights",
-      "source": "import { DateRangePicker } from \"@/components/ui/cubby-ui/date-range-picker\";\n\nexport default function DateRangePickerMinMaxNights() {\n  return (\n    <DateRangePicker\n      placeholder=\"Book a stay\"\n      minDate={new Date()}\n      minNights={2}\n      maxNights={14}\n    />\n  );\n}\n"
+      "source": "import { DateRangePicker } from \"@/components/ui/cubby-ui/date-range-picker\";\n\nexport default function DateRangePickerMinMaxNights() {\n  return (\n    <DateRangePicker\n      placeholder=\"Book a stay\"\n      minDate={new Date()}\n      minNights={2}\n      maxNights={14}\n      // A stay is counted in nights, one fewer than the days it spans.\n      labels={{\n        duration: (days) => `${days - 1} ${days === 2 ? \"night\" : \"nights\"}`,\n      }}\n    />\n  );\n}\n"
     },
     {
       "title": "Multiple Months",

@@ -44,6 +44,46 @@ export interface DateRangePreset {
   value: DateRangeValue | (() => DateRangeValue);
 }
 
+/** Copy overrides for the picker's own text, for wording and translation. */
+export interface DateRangePickerLabels {
+  /** The calendar button beside an `editable` field. */
+  chooseDates: string;
+  clear: string;
+  /** The group of presets, for screen readers. */
+  presets: string;
+  /** Status line before anything is picked. */
+  pickStart: string;
+  /** Status line once the start is picked; `start` is already formatted. */
+  pickEnd: (start: string) => string;
+  /**
+   * A range's length, after the dates in the status line and the typing
+   * hint. Counts both ends; return nights (`days - 1`) for stays.
+   */
+  duration: (days: number) => string;
+  /** Typed text that can't be read as a range (`editable`). */
+  invalid: string;
+  /** A typed range that crosses a blocked date or the min/max bounds. */
+  unavailable: string;
+  /** A typed range shorter than `minNights`. */
+  tooShort: (minNights: number) => string;
+  /** A typed range longer than `maxNights`. */
+  tooLong: (maxNights: number) => string;
+}
+
+const DEFAULT_LABELS: DateRangePickerLabels = {
+  chooseDates: "Choose dates",
+  clear: "Clear date range",
+  presets: "Presets",
+  pickStart: "Pick a start date",
+  pickEnd: (start) => `${start} – pick an end date`,
+  duration: (days) => `${days} ${days === 1 ? "day" : "days"}`,
+  invalid: "Not a date range",
+  unavailable: "Unavailable",
+  tooShort: (nights) =>
+    `At least ${nights} ${nights === 1 ? "night" : "nights"}`,
+  tooLong: (nights) => `At most ${nights} ${nights === 1 ? "night" : "nights"}`,
+};
+
 export type DateRangePickerProps = Omit<
   React.ComponentProps<"button">,
   "value" | "defaultValue" | "onChange" | "onSelect" | "children"
@@ -85,6 +125,8 @@ export type DateRangePickerProps = Omit<
     name?: string;
     /** Passed through to the calendar (locale, week start, and so on). */
     calendarProps?: Partial<PropsBase>;
+    /** Copy overrides for the picker's own text, merged over the defaults. */
+    labels?: Partial<DateRangePickerLabels>;
   };
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -150,6 +192,7 @@ function DateRangePicker({
   presets,
   name,
   calendarProps,
+  labels,
   variant,
   size,
   className,
@@ -182,6 +225,7 @@ function DateRangePicker({
     if (open) setDraft(value ?? undefined);
   }
 
+  const copy = { ...DEFAULT_LABELS, ...labels };
   const locale = calendarProps?.locale?.code;
   const dayFormat = new Intl.DateTimeFormat(locale, {
     month: "short",
@@ -220,13 +264,13 @@ function DateRangePicker({
   };
 
   const status = (() => {
-    if (!draft?.from) return "Pick a start date";
+    if (!draft?.from) return copy.pickStart;
     if (!draft.to) {
-      return `${dayFormat.format(draft.from)} – pick an end date`;
+      return copy.pickEnd(dayFormat.format(draft.from));
     }
     const range = { from: draft.from, to: draft.to };
     const days = countDays(range);
-    return `${formatRange(range)} · ${days} ${days === 1 ? "day" : "days"}`;
+    return `${formatRange(range)} · ${copy.duration(days)}`;
   })();
 
   const showClear = clearable && value !== null && !disabled;
@@ -259,15 +303,15 @@ function DateRangePicker({
       disabledMatchers.length > 0 &&
       rangeContainsModifiers(range, disabledMatchers)
     ) {
-      error = "Unavailable";
+      error = copy.unavailable;
     } else if (minNights !== undefined && nights < minNights) {
-      error = `At least ${minNights} ${minNights === 1 ? "night" : "nights"}`;
+      error = copy.tooShort(minNights);
     } else if (maxNights !== undefined && nights > maxNights) {
-      error = `At most ${maxNights} ${maxNights === 1 ? "night" : "nights"}`;
+      error = copy.tooLong(maxNights);
     }
     return {
       value: range,
-      hint: `${formatHint(range)} · ${days} ${days === 1 ? "day" : "days"}`,
+      hint: `${formatHint(range)} · ${copy.duration(days)}`,
       error,
     };
   };
@@ -285,8 +329,9 @@ function DateRangePicker({
             read={readText}
             onCommit={setValue}
             onOpenRequest={() => setOpen(true)}
-            triggerLabel="Choose dates"
-            clearLabel="Clear date range"
+            triggerLabel={copy.chooseDates}
+            clearLabel={copy.clear}
+            invalidLabel={copy.invalid}
             showClear={showClear}
             placeholder={placeholder}
             disabled={disabled}
@@ -337,7 +382,10 @@ function DateRangePicker({
         >
           <div ref={panelRef} className="flex flex-col gap-1 sm:flex-row">
             {presets && presets.length > 0 && (
-              <CalendarPresets className="border-border/60 border-b px-1 pt-1 pb-1.5 sm:w-32 sm:border-e sm:border-b-0 sm:p-1 sm:pe-2">
+              <CalendarPresets
+                aria-label={copy.presets}
+                className="border-border/60 border-b px-1 pt-1 pb-1.5 sm:w-32 sm:border-e sm:border-b-0 sm:p-1 sm:pe-2"
+              >
                 {presets.map((preset) => {
                   const range = resolvePreset(preset);
                   const presetDisabled = Boolean(
@@ -400,7 +448,7 @@ function DateRangePicker({
         <button
           type="button"
           data-slot="date-range-picker-clear"
-          aria-label="Clear date range"
+          aria-label={copy.clear}
           onClick={() => {
             setValue(null);
             triggerRef.current?.focus();

@@ -460,9 +460,10 @@ function Calendar({
     };
   }
 
-  // The single-mode selection is one fill that slides between days
-  // (calendar.css). It shows only while the selected day sits inside a
-  // displayed month; elsewhere the day draws its own fill.
+  // The single-mode selection is one fill, anchored to the selected day in
+  // CSS, that slides between days (calendar.css). It renders only while the
+  // selected day sits inside a displayed month, so it has no stale anchor to
+  // slide from when that month comes back into view.
   const selectedDay =
     props.mode === "single" ? (props.selected as Date | undefined) : undefined;
   const firstShown = monthIndex(month);
@@ -470,59 +471,6 @@ function Calendar({
     selectedDay !== undefined &&
     monthIndex(selectedDay) >= firstShown &&
     monthIndex(selectedDay) < firstShown + numberOfMonths;
-
-  const daysRef = React.useRef<HTMLDivElement>(null);
-  const indicatorRef = React.useRef<HTMLSpanElement>(null);
-  const placedRef = React.useRef<HTMLSpanElement | null>(null);
-
-  // Offsets rather than bounding rects: they ignore transforms, so a popover's
-  // open scale or the drill-down zoom can't skew the measurement.
-  const placeIndicator = React.useCallback(() => {
-    const layer = daysRef.current;
-    const indicator = indicatorRef.current;
-    if (!layer || !indicator) return;
-    // Skip the outgoing month DayPicker keeps on screen while animating.
-    const day = Array.from(
-      layer.querySelectorAll<HTMLElement>(
-        '[data-slot="calendar-day"][data-filled]:not([data-outside]) > button',
-      ),
-    ).find((button) => !button.closest('[aria-hidden="true"]'));
-    if (!day) return;
-
-    let x = 0;
-    let y = 0;
-    for (
-      let node: HTMLElement | null = day;
-      node && node !== layer;
-      node = node.offsetParent as HTMLElement | null
-    ) {
-      x += node.offsetLeft;
-      y += node.offsetTop;
-    }
-
-    // A fresh fill is placed without sliding in from the corner; it settles
-    // in with its @starting-style instead.
-    const fresh = placedRef.current !== indicator;
-    placedRef.current = indicator;
-    if (fresh) indicator.style.transitionProperty = "opacity, scale";
-    indicator.style.translate = `${x}px ${y}px`;
-    indicator.style.width = `${day.offsetWidth}px`;
-    indicator.style.height = `${day.offsetHeight}px`;
-    if (fresh) {
-      void indicator.offsetWidth;
-      indicator.style.transitionProperty = "";
-    }
-  }, []);
-
-  React.useLayoutEffect(placeIndicator);
-
-  React.useEffect(() => {
-    const layer = daysRef.current;
-    if (!layer) return;
-    const observer = new ResizeObserver(placeIndicator);
-    observer.observe(layer);
-    return () => observer.disconnect();
-  }, [placeIndicator]);
 
   const startBound = props.startMonth ? monthIndex(props.startMonth) : null;
   const endBound = props.endMonth ? monthIndex(props.endMonth) : null;
@@ -630,7 +578,6 @@ function Calendar({
         data-slot="calendar"
         data-mode={props.mode}
         data-view={view}
-        data-sliding={showIndicator || undefined}
         className={cn("relative w-fit p-3", className)}
         onMouseLeave={() => setHovered(undefined)}
         onBlur={(event) => {
@@ -641,7 +588,6 @@ function Calendar({
       >
         <div className="relative">
           <div
-            ref={daysRef}
             data-calendar-layer=""
             data-state={view === "days" ? "active" : "inner"}
             inert={view !== "days"}
@@ -673,7 +619,6 @@ function Calendar({
             />
             {showIndicator && (
               <span
-                ref={indicatorRef}
                 aria-hidden
                 data-slot="calendar-selection"
                 className="calendar-selection"

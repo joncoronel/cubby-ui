@@ -154,44 +154,67 @@
 }
 
 /* -------------------------------------------------------------------------------------------------
- * Sliding selection (single mode)
+ * Sliding selection (single mode), in CSS anchor positioning.
  *
- * One shared fill sits under the selected day, so picking another day slides
- * it across instead of swapping two fills. The calendar measures the day and
- * sets `translate` and size inline; it renders the fill only while the
- * selected day is in a displayed month, and `data-sliding` hands the day's
- * own fill over to it. Outside days keep their own fill (they can appear
- * twice across two months).
+ * The selected day takes the anchor name and one shared fill is placed on it,
+ * so picking another day moves the anchor and the fill's inset transitions
+ * across. `anchor-scope` keeps each calendar's name to itself. The calendar
+ * renders the fill only while the selected day is in a displayed month.
+ * Outside days keep their own fill (they can appear twice across two
+ * months), and so does the outgoing month DayPicker keeps on screen while
+ * animating (it's aria-hidden). Without anchor positioning, each day draws
+ * its own fill instead.
  * -------------------------------------------------------------------------------------------------*/
 
-[data-slot="calendar"][data-sliding]
-  [data-slot="calendar-day"][data-filled]:not([data-outside])
-  > button {
-  background-color: transparent;
-}
-
 .calendar-selection {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 0;
-  border-radius: var(--calendar-radius);
-  background: var(--color-primary);
-  pointer-events: none;
-  transition:
-    translate var(--calendar-duration) var(--calendar-ease),
-    opacity 150ms ease-out,
-    scale var(--calendar-duration) var(--calendar-ease);
-
-  @starting-style {
-    opacity: 0;
-    scale: 0.9;
-  }
+  display: none;
 }
 
-@media (prefers-reduced-motion: reduce) {
+/* Every anchor feature the fill uses, or none: a partial implementation
+ * would leave it unsized or tied to another calendar. */
+@supports (anchor-name: --calendar-selection) and
+  (anchor-scope: --calendar-selection) and (width: anchor-size(width)) {
+  [data-slot="calendar"] {
+    anchor-scope: --calendar-selection;
+  }
+
+  [data-slot="calendar"][data-mode="single"]
+    [data-slot="calendar-day"][data-filled]:not([data-outside]):not(
+      [aria-hidden="true"] *
+    )
+    > button {
+    anchor-name: --calendar-selection;
+    background-color: transparent;
+  }
+
   .calendar-selection {
-    transition: opacity 150ms ease-out;
+    display: block;
+    position: absolute;
+    position-anchor: --calendar-selection;
+    top: anchor(top);
+    left: anchor(left);
+    width: anchor-size(width);
+    height: anchor-size(height);
+    z-index: 0;
+    border-radius: var(--calendar-radius);
+    background: var(--color-primary);
+    pointer-events: none;
+    transition:
+      top var(--calendar-duration) var(--calendar-ease),
+      left var(--calendar-duration) var(--calendar-ease),
+      opacity 150ms ease-out,
+      scale var(--calendar-duration) var(--calendar-ease);
+
+    @starting-style {
+      opacity: 0;
+      scale: 0.9;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .calendar-selection {
+      transition: opacity 150ms ease-out;
+    }
   }
 }
 

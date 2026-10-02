@@ -24,6 +24,7 @@ import { buttonVariants } from "@/registry/default/button/button";
 import { useControllableState } from "@/registry/default/hooks/use-controllable-state";
 import { solidSurface } from "@/registry/default/lib/elevated";
 import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
+import { TextMorph } from "@/registry/default/text-morph/text-morph";
 
 import "./calendar.css";
 
@@ -83,6 +84,9 @@ const CalendarContext = React.createContext<CalendarContextValue | null>(null);
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+/** Caption text morph, timed to the days' enter (calendar.css). */
+const CAPTION_MORPH_MS = 280;
+
 /** The landing wipe's length: grows with the range, within these bounds. */
 const WIPE_MIN_MS = 180;
 const WIPE_MAX_MS = 300;
@@ -115,6 +119,31 @@ function isSameDay(a: Date, b: Date): boolean {
     a.getMonth() === b.getMonth() &&
     a.getDate() === b.getDate()
   );
+}
+
+/**
+ * Whether a day appears in a single month's grid, counting the neighbouring
+ * months' days that fill out its first and last weeks (and, with fixed weeks,
+ * the extra rows that make six).
+ */
+function isInGrid(
+  day: Date,
+  month: Date,
+  { weekStartsOn, fixedWeeks }: { weekStartsOn: number; fixedWeeks: boolean },
+): boolean {
+  const first = startOfMonth(month);
+  const start = new Date(first);
+  start.setDate(1 - ((first.getDay() - weekStartsOn + 7) % 7));
+  const end = new Date(start);
+  if (fixedWeeks) {
+    end.setDate(start.getDate() + 41);
+  } else {
+    const last = new Date(first.getFullYear(), first.getMonth() + 1, 0);
+    end.setFullYear(last.getFullYear(), last.getMonth(), last.getDate());
+    end.setDate(end.getDate() + ((weekStartsOn + 6 - last.getDay()) % 7));
+  }
+  const time = new Date(day).setHours(0, 0, 0, 0);
+  return time >= start.getTime() && time <= end.getTime();
 }
 
 function firstSelectedDate(props: DayPickerProps): Date | undefined {
@@ -163,8 +192,10 @@ const DEFAULT_CLASS_NAMES: NonNullable<DayPickerProps["classNames"]> = {
   months: "relative flex flex-col gap-1 sm:flex-row",
   // Header row on the tray (arrow, caption, arrow), then the card. Fixed side
   // columns keep the caption centred even on a month without arrows.
+  // The card row stretches, so months shown side by side end level even when
+  // one needs a week more than the other.
   month:
-    "grid grid-cols-[2.25rem_1fr_2.25rem] gap-y-1 sm:grid-cols-[2rem_1fr_2rem]",
+    "grid grid-cols-[2.25rem_1fr_2.25rem] grid-rows-[auto_1fr] gap-y-1 sm:grid-cols-[2rem_1fr_2rem]",
   month_caption:
     "col-start-2 row-start-1 flex h-9 min-w-0 items-center justify-center sm:h-8",
   button_previous: "col-start-1 row-start-1 self-center justify-self-start",
@@ -173,10 +204,7 @@ const DEFAULT_CLASS_NAMES: NonNullable<DayPickerProps["classNames"]> = {
   dropdowns: "flex items-center gap-2 text-sm font-medium",
   dropdown_root: "relative inline-flex items-center",
   dropdown: "absolute inset-0 cursor-pointer opacity-0",
-  month_grid: cn(
-    "col-span-3 row-start-2 border-separate border-spacing-x-0 border-spacing-y-0.5 p-1",
-    cardClassName,
-  ),
+  month_grid: "w-full border-separate border-spacing-x-0 border-spacing-y-0.5",
   weekdays: "",
   weekday: "text-muted-foreground h-8 w-10 p-0 text-xs font-medium sm:w-9",
   week_number_header: "h-8 w-10 p-0 sm:w-9",
@@ -205,10 +233,13 @@ const DEFAULT_CLASS_NAMES: NonNullable<DayPickerProps["classNames"]> = {
   weeks_before_exit: "calendar-exit-to-start",
   weeks_after_enter: "calendar-enter-from-end",
   weeks_after_exit: "calendar-exit-to-end",
-  caption_before_enter: "calendar-caption-enter-from-start",
-  caption_before_exit: "calendar-caption-exit-to-start",
-  caption_after_enter: "calendar-caption-enter-from-end",
-  caption_after_exit: "calendar-caption-exit-to-end",
+  // The caption morphs its text instead of moving (see calendar.css for why
+  // the outgoing one still needs an animation). Never empty: DayPicker adds
+  // these with classList.add, which throws on an empty string.
+  caption_before_enter: "calendar-caption-still",
+  caption_before_exit: "calendar-caption-hold",
+  caption_after_enter: "calendar-caption-still",
+  caption_after_exit: "calendar-caption-hold",
 };
 
 function mergeClassNames(
@@ -279,17 +310,23 @@ function CalendarDay({ day, modifiers, style, ...props }: DayProps) {
   );
 }
 
-/** The days card. Covered (and inert) while the month picker is open. */
+/**
+ * The days card, wrapping DayPicker's table so the card can stretch to the
+ * month beside it while the table keeps its natural height. Covered (and
+ * inert) while the month picker is open.
+ */
 function CalendarMonthGrid(props: MonthGridProps) {
   const context = React.useContext(CalendarContext);
   const covered = Boolean(context?.pickerOpen);
   return (
-    <table
-      {...props}
+    <div
       data-slot="calendar-grid"
       data-covered={covered || undefined}
       inert={covered}
-    />
+      className={cn("col-span-3 row-start-2 p-1", cardClassName)}
+    >
+      <table {...props} />
+    </div>
   );
 }
 
@@ -304,19 +341,17 @@ function CalendarMonthCaption({
 
   if (!context?.pickerEnabled) return <div {...props}>{children}</div>;
 
-  const locale = dayPickerProps.locale?.code;
-  const date = calendarMonth.date;
-  const month = new Intl.DateTimeFormat(locale, { month: "long" }).format(date);
-  const year = new Intl.DateTimeFormat(locale, { year: "numeric" }).format(
-    date,
-  );
+  const caption = new Intl.DateTimeFormat(dayPickerProps.locale?.code, {
+    month: "long",
+    year: "numeric",
+  }).format(calendarMonth.date);
 
   return (
     <div {...props}>
       <button
         type="button"
         data-slot="calendar-caption-trigger"
-        aria-label={`${month} ${year}, choose month and year`}
+        aria-label={`${caption}, choose month and year`}
         aria-expanded={context.pickerOpen}
         aria-controls={context.pickerOpen ? context.pickerId : undefined}
         onClick={() => context.togglePicker(displayIndex)}
@@ -326,8 +361,14 @@ function CalendarMonthCaption({
           focusRing,
         )}
       >
-        <span className="font-medium">{month}</span>
-        <span className="text-muted-foreground tabular-nums">{year}</span>
+        {/* One label, so TextMorph handles the caption's change of width
+            itself: only the letters that differ move, and the box eases
+            without the shimmer two side-by-side labels caused. */}
+        <TextMorph
+          value={caption}
+          duration={CAPTION_MORPH_MS}
+          className="font-medium"
+        />
         <HugeiconsIcon
           icon={ArrowDown01Icon}
           strokeWidth={2}
@@ -630,7 +671,7 @@ function Calendar({
   footer,
   tray = true,
   showOutsideDays,
-  fixedWeeks = true,
+  fixedWeeks: fixedWeeksProp,
   animate = true,
   captionLayout,
   month: monthProp,
@@ -726,15 +767,30 @@ function Calendar({
 
   // The single-mode selection is one fill, anchored to the selected day in
   // CSS, that slides between days (calendar.css). It renders only while the
-  // selected day sits inside a displayed month, so it has no stale anchor to
-  // slide from when that month comes back into view.
+  // selected day is on screen, so it has no stale anchor to slide from when
+  // that day comes back into view. With one month shown, that includes the
+  // neighbouring months' days filling out its first and last weeks.
+  // One month keeps six weeks, so its height (and a popover around it) holds
+  // still from month to month; the extra rows fill with the next month's
+  // days. Side by side those days are hidden, so fixed weeks would only add
+  // blank rows.
+  const showOutside = showOutsideDays ?? numberOfMonths === 1;
+  const fixedWeeks = fixedWeeksProp ?? numberOfMonths === 1;
   const selectedDay =
     props.mode === "single" ? (props.selected as Date | undefined) : undefined;
   const firstShown = monthIndex(month);
   const showIndicator =
     selectedDay !== undefined &&
-    monthIndex(selectedDay) >= firstShown &&
-    monthIndex(selectedDay) < firstShown + numberOfMonths;
+    ((monthIndex(selectedDay) >= firstShown &&
+      monthIndex(selectedDay) < firstShown + numberOfMonths) ||
+      (numberOfMonths === 1 &&
+        showOutside &&
+        isInGrid(selectedDay, month, {
+          weekStartsOn: props.ISOWeek
+            ? 1
+            : (props.weekStartsOn ?? props.locale?.options?.weekStartsOn ?? 0),
+          fixedWeeks,
+        })));
 
   const startBound = props.startMonth ? monthIndex(props.startMonth) : null;
   const endBound = props.endMonth ? monthIndex(props.endMonth) : null;
@@ -854,7 +910,7 @@ function Calendar({
             key={pickerKey}
             // Side by side, outside days would repeat the neighbouring
             // month's days (and any range drawn across them).
-            showOutsideDays={showOutsideDays ?? numberOfMonths === 1}
+            showOutsideDays={showOutside}
             fixedWeeks={fixedWeeks}
             animate={animate}
             navLayout="around"

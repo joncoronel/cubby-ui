@@ -669,6 +669,7 @@ export const componentMetadata = {
     "registryDependencies": [
       "@cubby-ui/button",
       "@cubby-ui/scroll-area",
+      "@cubby-ui/text-morph",
       "@cubby-ui/use-controllable-state",
       "@cubby-ui/elevated"
     ],

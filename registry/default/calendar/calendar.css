@@ -29,7 +29,7 @@
   --calendar-duration: 260ms;
   /* Motion amounts, zeroed under reduced motion so every transition below
    * becomes a plain crossfade. */
-  --calendar-shift: 1rem;
+  --calendar-shift: 1.25rem;
   --calendar-blur: 2px;
   --calendar-zoom: 0.06;
   /* Which way "later" runs, for the half bands at a range's ends. */
@@ -51,7 +51,7 @@
 }
 
 [data-slot="calendar"]:dir(rtl) {
-  --calendar-shift: -1rem;
+  --calendar-shift: -1.25rem;
   --calendar-toward-end: to left;
   --calendar-toward-start: to right;
 }
@@ -243,9 +243,10 @@
  * The selected day takes the anchor name and one shared fill is placed on it,
  * so picking another day moves the anchor and the fill's inset transitions
  * across. `anchor-scope` keeps each calendar's name to itself. The calendar
- * renders the fill only while the selected day is in a displayed month.
- * Outside days keep their own fill (they can appear twice across two
- * months), and so does the outgoing month DayPicker keeps on screen while
+ * renders the fill only while the selected day is on screen, the muted days
+ * of neighbouring months included. With several months shown, those muted
+ * days keep their own fill instead, since the same date can then appear
+ * twice; so does the outgoing month DayPicker keeps on screen while
  * animating (it's aria-hidden). Without anchor positioning, each day draws
  * its own fill instead.
  * -------------------------------------------------------------------------------------------------*/
@@ -263,7 +264,8 @@
   }
 
   [data-slot="calendar"][data-mode="single"]
-    [data-slot="calendar-day"][data-filled]:not([data-outside]):not(
+    [data-slot="calendar-day"][data-filled]:not(
+      [data-multiple-months] [data-outside],
       [aria-hidden="true"] *
     )
     > button {
@@ -305,23 +307,40 @@
 /* -------------------------------------------------------------------------------------------------
  * Month changes
  *
- * DayPicker keeps the outgoing month on screen and tags both with these
- * classes. The weeks slide a short way and soften rather than travelling the
- * full width: the two grids are nearly identical, so a hint of direction is
- * enough. Exits must last as long as enters, because DayPicker strips the
- * enter classes when the outgoing caption's animation ends.
+ * DayPicker keeps the outgoing month on screen as a clone over the incoming
+ * one and tags both with these classes. The two are sequenced rather than
+ * crossfaded: the outgoing weeks clear quickly, and the incoming ones start a
+ * beat later and settle in, both travelling the same way. Overlapping them
+ * evenly put two half-transparent sets of numbers on screen at once.
  *
- * The outgoing month is a clone laid over the incoming one, card and all, and
- * DayPicker clips the month to its box while animating. Two fixes keep the
- * days card whole: the clone's card goes transparent so it can't cover the
- * incoming weekday row (DayPicker blanks the clone's own), and the month
- * stays unclipped so the card's shadow and rim aren't cut off. The sliding
- * weeks are transparent at the far end of their travel, so nothing visibly
- * spills past the card.
+ * The caption doesn't move with them: its text morphs in place (TextMorph in
+ * calendar.tsx). DayPicker only finishes the transition when the outgoing
+ * caption's animation ends, so that caption runs an invisible hold lasting
+ * as long as the incoming weeks take, and the incoming caption a no-op.
+ *
+ * Three fixes keep the days card whole while the clone is up: its card goes
+ * transparent so it can't cover the incoming weekday row (DayPicker blanks
+ * the clone's own), the live month stays unclipped so the card's shadow and
+ * rim aren't cut off, and the clone is clipped to the live month's box so a
+ * taller outgoing month can't spill below a calendar that just shrank.
  * -------------------------------------------------------------------------------------------------*/
 
-[data-slot="calendar"] [data-animated-month] {
+[data-slot="calendar"] {
+  --calendar-exit-duration: 150ms;
+  --calendar-enter-delay: 40ms;
+  --calendar-enter-duration: 280ms;
+}
+
+[data-slot="calendar"] [data-animated-month]:not([aria-hidden="true"]) {
   overflow: visible !important;
+}
+
+/* The outgoing clone, sized to the incoming month rather than its own
+ * content, so when it had a week more its last row is clipped at the card's
+ * edge instead of hanging below a calendar that has already shrunk. DayPicker
+ * sets it to overflow: hidden; this gives that a box to clip to. */
+[data-slot="calendar"] [data-animated-month][aria-hidden="true"] {
+  inset: 0;
 }
 
 [data-slot="calendar"]
@@ -332,51 +351,43 @@
 }
 
 .calendar-enter-from-start,
-.calendar-enter-from-end,
-.calendar-exit-to-start,
-.calendar-exit-to-end,
-.calendar-caption-enter-from-start,
-.calendar-caption-enter-from-end,
-.calendar-caption-exit-to-start,
-.calendar-caption-exit-to-end {
-  animation-duration: var(--calendar-duration);
-  animation-timing-function: var(--calendar-ease);
-  animation-fill-mode: both;
+.calendar-enter-from-end {
+  animation: calendar-enter var(--calendar-enter-duration) var(--calendar-ease)
+    var(--calendar-enter-delay) both;
 }
 
-.calendar-enter-from-start,
-.calendar-caption-enter-from-start {
+.calendar-exit-to-start,
+.calendar-exit-to-end {
+  animation: calendar-exit var(--calendar-exit-duration) ease-out both;
+}
+
+.calendar-enter-from-start {
   --calendar-from: calc(var(--calendar-shift) * -1);
-  animation-name: calendar-enter;
 }
 
-.calendar-enter-from-end,
-.calendar-caption-enter-from-end {
+.calendar-enter-from-end {
   --calendar-from: var(--calendar-shift);
-  animation-name: calendar-enter;
 }
 
-.calendar-exit-to-start,
-.calendar-caption-exit-to-start {
+.calendar-exit-to-start {
   --calendar-to: calc(var(--calendar-shift) * -1);
-  animation-name: calendar-exit;
 }
 
-.calendar-exit-to-end,
-.calendar-caption-exit-to-end {
+.calendar-exit-to-end {
   --calendar-to: var(--calendar-shift);
-  animation-name: calendar-exit;
 }
 
-/* Captions travel half as far as the weeks under them. */
-[class*="calendar-caption-"] {
-  --calendar-shift-scale: 0.5;
+.calendar-caption-hold {
+  visibility: hidden;
+  animation: calendar-hold
+    calc(var(--calendar-enter-delay) + var(--calendar-enter-duration)) linear
+    both;
 }
 
 @keyframes calendar-enter {
   from {
     opacity: 0;
-    translate: calc(var(--calendar-from) * var(--calendar-shift-scale, 1)) 0;
+    translate: var(--calendar-from) 0;
     filter: blur(var(--calendar-blur));
   }
 }
@@ -384,8 +395,14 @@
 @keyframes calendar-exit {
   to {
     opacity: 0;
-    translate: calc(var(--calendar-to) * var(--calendar-shift-scale, 1)) 0;
+    translate: var(--calendar-to) 0;
     filter: blur(var(--calendar-blur));
+  }
+}
+
+@keyframes calendar-hold {
+  to {
+    opacity: 0;
   }
 }
 

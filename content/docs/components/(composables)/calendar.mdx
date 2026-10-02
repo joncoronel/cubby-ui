@@ -164,9 +164,10 @@ Month grid for selecting dates. Wraps DayPicker, forwarding all props to it.
   month and `false` for several, where they would repeat the neighboring month.
 </ApiProp>
 
-<ApiProp name="fixedWeeks" fullType="boolean" defaultValue="true">
+<ApiProp name="fixedWeeks" fullType="boolean">
   Always renders six weeks, so the calendar keeps its height (and a popover
-  keeps its position) as you change months.
+  keeps its position) as you change months. Defaults to `true` for one month and
+  `false` for several, where the hidden outside days would leave blank rows.
 </ApiProp>
 
 <ApiProp name="animate" fullType="boolean" defaultValue="true">

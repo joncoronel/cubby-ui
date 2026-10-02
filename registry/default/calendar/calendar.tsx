@@ -30,10 +30,10 @@ import "./calendar.css";
 
 export type CalendarProps = DayPickerProps & {
   /**
-   * Draws the muted tray around the calendar. Turn it off when the container
+   * Draws the card the calendar sits on. Turn it off when the container
    * already is one, as the pickers' popover is.
    */
-  tray?: boolean;
+  framed?: boolean;
 };
 
 /** A range that just completed: where it was started, and the day that ended it. */
@@ -161,7 +161,7 @@ function firstSelectedDate(props: DayPickerProps): Date | undefined {
 const focusRing =
   "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2";
 
-// Corners concentric with the tray: 16px tray radius minus its 4px padding.
+// Corners concentric with the frame: 16px frame radius minus its 4px padding.
 const navButtonClassName = cn(
   buttonVariants({ variant: "ghost", size: "icon_sm" }),
   "text-muted-foreground hover:text-foreground rounded-xl rtl:[&_svg]:-scale-x-100",
@@ -183,19 +183,23 @@ const cellButtonClassName = cn(
   "after:pointer-events-none after:absolute after:inset-x-0 after:bottom-1 after:mx-auto after:size-1 after:rounded-full after:bg-primary after:opacity-0",
 );
 
-/** The raised card the days (and the picker) sit in, inside the tray. */
-const cardClassName =
-  "rounded-xl bg-surface-3 shadow-[var(--surface-shadow-3),var(--surface-rim-3)]";
-
 const DEFAULT_CLASS_NAMES: NonNullable<DayPickerProps["classNames"]> = {
   root: "relative w-fit",
-  months: "relative flex flex-col gap-1 sm:flex-row",
-  // Header row on the tray (arrow, caption, arrow), then the card. Fixed side
-  // columns keep the caption centred even on a month without arrows.
-  // The card row stretches, so months shown side by side end level even when
-  // one needs a week more than the other.
-  month:
+  // The muted strip behind the header row (arrows and captions), painted
+  // behind it (-z-1 in an isolated stack). Side by side, months share one
+  // strip drawn on the months row; stacked, each month draws its own. Spelled
+  // out in full for each breakpoint: Tailwind only generates literal classes.
+  months: cn(
+    "relative isolate flex flex-col gap-1 sm:flex-row sm:gap-x-4",
+    "sm:before:absolute sm:before:inset-x-0 sm:before:top-0 sm:before:-z-1 sm:before:h-[calc(var(--calendar-header)-0.25rem)] sm:before:rounded-xl sm:before:bg-muted",
+  ),
+  // Header row on the strip (arrow, caption, arrow), then the days. Fixed
+  // side columns keep the caption centred even on a month without arrows.
+  month: cn(
     "grid grid-cols-[2.25rem_1fr_2.25rem] grid-rows-[auto_1fr] gap-y-1 sm:grid-cols-[2rem_1fr_2rem]",
+    "max-sm:relative max-sm:isolate",
+    "max-sm:before:absolute max-sm:before:inset-x-0 max-sm:before:top-0 max-sm:before:-z-1 max-sm:before:h-[calc(var(--calendar-header)-0.25rem)] max-sm:before:rounded-xl max-sm:before:bg-muted",
+  ),
   month_caption:
     "col-start-2 row-start-1 flex h-9 min-w-0 items-center justify-center sm:h-8",
   button_previous: "col-start-1 row-start-1 self-center justify-self-start",
@@ -323,7 +327,7 @@ function CalendarMonthGrid(props: MonthGridProps) {
       data-slot="calendar-grid"
       data-covered={covered || undefined}
       inert={covered}
-      className={cn("col-span-3 row-start-2 p-1", cardClassName)}
+      className="col-span-3 row-start-2 p-1"
     >
       <table {...props} />
     </div>
@@ -538,7 +542,7 @@ function CalendarPicker({
       inert={!open}
       className={cn(
         "absolute inset-x-0 top-(--calendar-header) bottom-0 z-3 flex overflow-hidden",
-        cardClassName,
+        "rounded-xl bg-(--calendar-surface)",
       )}
       onKeyDown={(event) => {
         if (event.key !== "Escape") return;
@@ -669,7 +673,7 @@ function Calendar({
   components,
   modifiers,
   footer,
-  tray = true,
+  framed = true,
   showOutsideDays,
   fixedWeeks: fixedWeeksProp,
   animate = true,
@@ -882,7 +886,7 @@ function Calendar({
         ref={rootRef}
         data-slot="calendar"
         data-mode={props.mode}
-        data-tray={tray || undefined}
+        data-framed={framed || undefined}
         data-picker-open={pickerOpen || undefined}
         data-range-landing={
           landing
@@ -893,9 +897,8 @@ function Calendar({
         }
         className={cn(
           "relative w-fit [--calendar-header:2.5rem] sm:[--calendar-header:2.25rem]",
-          // Same frame as Card's inset variant: the muted outer keeps the
-          // surface's shadow, rim, and --popup-surface.
-          tray && cn("rounded-2xl p-1", solidSurface(3, 1), "bg-muted"),
+          // A surface card with the header in a muted strip inside it.
+          framed && cn("rounded-2xl p-1", solidSurface(3, 1)),
           className,
         )}
         onMouseLeave={() => setHovered(undefined)}
@@ -905,7 +908,10 @@ function Calendar({
           }
         }}
       >
-        <div className="relative">
+        {/* Its own stack, so the selection fill (z -1) can sit under the
+            days, which share the months row's isolated stack with the header
+            strip, without dropping behind the card. */}
+        <div className="relative isolate">
           <DayPicker
             key={pickerKey}
             // Side by side, outside days would repeat the neighbouring

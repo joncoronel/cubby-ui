@@ -281,7 +281,7 @@
     left: anchor(left);
     width: anchor-size(width);
     height: anchor-size(height);
-    z-index: 0;
+    z-index: -1;
     border-radius: var(--calendar-radius);
     background: var(--color-primary);
     pointer-events: none;

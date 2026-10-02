@@ -330,9 +330,10 @@ function DateRangePicker({
         )}
         <PopoverContent
           align="start"
-          // The popover is the calendar's tray: muted, with the days card
-          // inside it (the calendar's own tray is turned off below).
-          className="bg-muted w-auto rounded-2xl"
+          // The popover is the calendar's surface (its own frame is turned
+          // off below); 16px corners over 4px padding keep the header strip
+          // concentric with it.
+          className="w-auto rounded-2xl"
           viewportClassName="p-1 [--viewport-padding:0.25rem]"
           anchor={editable ? groupRef : undefined}
           // Land on the selected day (or today), not the month arrows.
@@ -344,7 +345,7 @@ function DateRangePicker({
         >
           <div ref={panelRef} className="flex flex-col gap-1 sm:flex-row">
             {presets && presets.length > 0 && (
-              <CalendarPresets className="px-1 pt-1 sm:w-32 sm:p-1">
+              <CalendarPresets className="border-border/60 border-b px-1 pt-1 pb-1.5 sm:w-32 sm:border-e sm:border-b-0 sm:p-1 sm:pe-2">
                 {presets.map((preset) => {
                   const range = resolvePreset(preset);
                   const presetDisabled = Boolean(
@@ -372,7 +373,7 @@ function DateRangePicker({
             <div className="flex flex-col">
               <Calendar
                 {...calendarProps}
-                tray={false}
+                framed={false}
                 mode="range"
                 numberOfMonths={numberOfMonths ?? (wide ? 2 : 1)}
                 selected={draft}

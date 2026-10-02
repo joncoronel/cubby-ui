@@ -8,7 +8,7 @@ import { Calendar } from "@/registry/default/calendar/calendar";
 
 The calendar displays a month grid for picking a single date, a range, or several dates. Use it inline for date entry or inside a popover for a date field. It is built on React DayPicker, so all of its props pass through.
 
-It sits in a tray, with the month header on a muted frame and the days in a raised card. On top of DayPicker it adds a few things: the caption opens a month and year picker for jumping far away, a range shows a live preview while you pick its end, a single selection slides from day to day, and changing months animates in the direction you travel.
+It sits on a card, with the month header grouped in a muted strip across the top. On top of DayPicker it adds a few things: the caption opens a month and year picker for jumping far away, a range shows a live preview while you pick its end, a single selection slides from day to day, and changing months animates in the direction you travel.
 
 ## Preview
 
@@ -122,9 +122,9 @@ Month grid for selecting dates. Wraps DayPicker, forwarding all props to it.
   Callback fired when the selection changes.
 </ApiProp>
 
-<ApiProp name="tray" fullType="boolean" defaultValue="true">
-  Draws the muted tray around the calendar. Turn it off when the container
-  already is one; the date pickers do this, so their popover is the tray.
+<ApiProp name="framed" fullType="boolean" defaultValue="true">
+  Draws the card the calendar sits on. Turn it off when the container already is
+  one; the date pickers do this, so their popover is the card.
 </ApiProp>
 
 <ApiProp name="month" fullType="Date">

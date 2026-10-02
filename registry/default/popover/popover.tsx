@@ -122,6 +122,7 @@ function PopoverContent({
   sticky = false,
   positionMethod = "absolute",
   anchor,
+  viewportClassName,
   arrow = false,
   arrowPadding,
   container,
@@ -139,6 +140,8 @@ function PopoverContent({
   positionMethod?: BasePopover.Positioner.Props["positionMethod"];
   /** Positions against this element instead of the trigger. */
   anchor?: BasePopover.Positioner.Props["anchor"];
+  /** Classes for the inner viewport, e.g. to change its padding. */
+  viewportClassName?: string;
   arrow?: boolean;
   arrowPadding?: number;
   container?: HTMLElement | undefined;
@@ -237,6 +240,7 @@ function PopoverContent({
               // its own and transition-property does not inherit.
               "[[data-instant=trigger-change]_&_[data-current]]:transition-none [[data-instant=trigger-change]_&_[data-previous]]:transition-none",
               "motion-reduce:**:data-current:transition-none motion-reduce:**:data-previous:transition-none",
+              viewportClassName,
             )}
           >
             {children}

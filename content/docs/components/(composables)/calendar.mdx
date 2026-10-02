@@ -8,7 +8,7 @@ import { Calendar } from "@/registry/default/calendar/calendar";
 
 The calendar displays a month grid for picking a single date, a range, or several dates. Use it inline for date entry or inside a popover for a date field. It is built on React DayPicker, so all of its props pass through.
 
-On top of DayPicker it adds a few things: the caption opens month and year grids for jumping far away, a range shows a live preview while you pick its end, a single selection slides from day to day, and changing months animates in the direction you travel.
+It sits in a tray, with the month header on a muted frame and the days in a raised card. On top of DayPicker it adds a few things: the caption opens a month and year picker for jumping far away, a range shows a live preview while you pick its end, a single selection slides from day to day, and changing months animates in the direction you travel.
 
 ## Preview
 
@@ -43,7 +43,7 @@ Use `mode="single"` to pick one date. The `footer` renders below the grid and is
 
 ### Date Range Selection
 
-Use `mode="range"` to pick a start and end date. After the first click, the band follows the pointer (or keyboard focus) until you pick the end. Clicking again once a range is complete starts a new one.
+Use `mode="range"` to pick a start and end date. After the first click, the band follows the pointer (or keyboard focus) until you pick the end. When the second click lands, the band draws in from the first day toward that one. Clicking again once a range is complete starts a new one.
 
 <ComponentPreview
   component="calendar"
@@ -61,7 +61,7 @@ Use `mode="multiple"` to pick several individual dates.
 
 ### Month and Year
 
-Click the caption to zoom out to a month grid, then click the year for a year grid. `startMonth` and `endMonth` bound the grids as well as the arrows, which makes far-off dates like birthdays quick to reach.
+Click the caption to open the month and year picker over the days: a scrolling year column beside the year's months. Picking a year changes which months show; picking a month goes there and closes the picker. Click the caption again (or press `Escape`) to close it without a change. `startMonth` and `endMonth` bound the picker as well as the arrows, which makes far-off dates like birthdays quick to reach.
 
 <ComponentPreview component="calendar" example="calendar-month-and-year" />
 
@@ -81,7 +81,7 @@ Pass a `footer` to render content below the grid.
 
 The grid follows DayPicker's keyboard model: arrow keys move between days, `PageUp` and `PageDown` change months (add `Shift` for years), `Home` and `End` jump to the start or end of the week, and `Enter` or `Space` selects.
 
-In the month and year grids, arrow keys move between cells, `PageUp` and `PageDown` change the year (or the twelve years shown), and `Escape` steps back out one level without closing a surrounding popover. Focus moves into each grid as it opens and back to the days when you pick a month.
+The caption is a toggle (`aria-expanded`) for the month and year picker. Opening it moves focus to the current month; `Shift+Tab` reaches the year column, where the arrow keys, `PageUp`/`PageDown` (ten years), `Home`, and `End` change the year as they move. In the months, arrow keys move between cells and `PageUp`/`PageDown` change the year. `Escape` closes the picker and returns focus to the caption without closing a surrounding popover; picking a month moves focus back to the days.
 
 Today is marked with a dot as well as a heavier weight, and disabled days are struck through, so neither relies on color alone. Under `prefers-reduced-motion`, every transition becomes a plain crossfade.
 
@@ -122,6 +122,11 @@ Month grid for selecting dates. Wraps DayPicker, forwarding all props to it.
   Callback fired when the selection changes.
 </ApiProp>
 
+<ApiProp name="tray" fullType="boolean" defaultValue="true">
+  Draws the muted tray around the calendar. Turn it off when the container
+  already is one; the date pickers do this, so their popover is the tray.
+</ApiProp>
+
 <ApiProp name="month" fullType="Date">
   The displayed month, for controlling navigation. Pair with `onMonthChange`, or
   use `defaultMonth` to only set the starting month.
@@ -133,11 +138,11 @@ Month grid for selecting dates. Wraps DayPicker, forwarding all props to it.
 </ApiProp>
 
 <ApiProp name="startMonth" fullType="Date">
-  The earliest month that can be shown. Also bounds the month and year grids.
+  The earliest month that can be shown. Also bounds the month and year picker.
 </ApiProp>
 
 <ApiProp name="endMonth" fullType="Date">
-  The latest month that can be shown. Also bounds the month and year grids.
+  The latest month that can be shown. Also bounds the month and year picker.
 </ApiProp>
 
 <ApiProp name="numberOfMonths" fullType="number" defaultValue="1">
@@ -149,7 +154,7 @@ Month grid for selecting dates. Wraps DayPicker, forwarding all props to it.
   fullType='"label" | "dropdown" | "dropdown-months" | "dropdown-years"'
   simpleType="string"
 >
-  Leave unset for the clickable caption that opens the month and year grids.
+  Leave unset for the clickable caption that opens the month and year picker.
   `"label"` shows a static caption; the dropdown values use DayPicker's native
   selects.
 </ApiProp>

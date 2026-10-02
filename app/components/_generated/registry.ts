@@ -668,7 +668,9 @@ export const componentMetadata = {
     "category": "UI",
     "registryDependencies": [
       "@cubby-ui/button",
-      "@cubby-ui/use-controllable-state"
+      "@cubby-ui/scroll-area",
+      "@cubby-ui/use-controllable-state",
+      "@cubby-ui/elevated"
     ],
     "dependencies": [
       "react-day-picker",

@@ -10,6 +10,7 @@ import {
   type DayProps,
   type Matcher,
   type MonthCaptionProps,
+  type MonthGridProps,
 } from "react-day-picker";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -21,25 +22,75 @@ import {
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/registry/default/button/button";
 import { useControllableState } from "@/registry/default/hooks/use-controllable-state";
+import { solidSurface } from "@/registry/default/lib/elevated";
+import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 
 import "./calendar.css";
 
-export type CalendarProps = DayPickerProps;
+export type CalendarProps = DayPickerProps & {
+  /**
+   * Draws the muted tray around the calendar. Turn it off when the container
+   * already is one, as the pickers' popover is.
+   */
+  tray?: boolean;
+};
 
-type CalendarView = "days" | "months" | "years";
+/** A range that just completed: where it was started, and the day that ended it. */
+interface RangeLanding {
+  anchor: Date;
+  target: Date;
+}
 
-type LayerState = "active" | "inner" | "outer";
+/** Days between two dates, ignoring the time of day (and DST shifts). */
+function daysBetween(a: Date, b: Date): number {
+  return Math.round(
+    (new Date(b).setHours(0, 0, 0, 0) - new Date(a).setHours(0, 0, 0, 0)) /
+      DAY_MS,
+  );
+}
+
+/**
+ * One cell's slice of the landing wipe. The wipe's head follows an ease-out
+ * cubic over the whole range, so each cell gets the time the curve spends
+ * crossing it: short slices near the start, longer ones settling into the
+ * end. Longer ranges take a little longer overall, within a fixed window.
+ */
+function wipeTiming(
+  step: number,
+  span: number,
+): { delay: number; duration: number } {
+  const total = Math.min(
+    Math.max(140 + span * WIPE_MS_PER_DAY, WIPE_MIN_MS),
+    WIPE_MAX_MS,
+  );
+  const cells = span + 1;
+  // Time at which an ease-out cubic, 1 - (1 - t)^3, reaches position p.
+  const at = (position: number) => total * (1 - Math.cbrt(1 - position));
+  const delay = at(step / cells);
+  return { delay, duration: Math.max(at((step + 1) / cells) - delay, 1) };
+}
 
 interface CalendarContextValue {
-  /** True when the caption opens the month and year grids. */
-  drilldown: boolean;
-  view: CalendarView;
-  openMonths: (displayIndex: number) => void;
+  landing: RangeLanding | null;
+  /** True when the caption opens the month and year picker. */
+  pickerEnabled: boolean;
+  pickerOpen: boolean;
+  pickerId: string;
+  togglePicker: (displayIndex: number) => void;
 }
 
 const CalendarContext = React.createContext<CalendarContextValue | null>(null);
 
-const YEARS_PER_PAGE = 12;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** The landing wipe's length: grows with the range, within these bounds. */
+const WIPE_MIN_MS = 180;
+const WIPE_MAX_MS = 300;
+const WIPE_MS_PER_DAY = 12;
+
+/** How far the year list reaches when `startMonth`/`endMonth` aren't set. */
+const YEARS_BEFORE = 100;
+const YEARS_AFTER = 25;
 
 /* -------------------------------------------------------------------------------------------------
  * Date helpers
@@ -78,9 +129,13 @@ function firstSelectedDate(props: DayPickerProps): Date | undefined {
  * Classes
  * -------------------------------------------------------------------------------------------------*/
 
+const focusRing =
+  "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2";
+
+// Corners concentric with the tray: 16px tray radius minus its 4px padding.
 const navButtonClassName = cn(
   buttonVariants({ variant: "ghost", size: "icon_sm" }),
-  "text-muted-foreground hover:text-foreground rtl:[&_svg]:-scale-x-100",
+  "text-muted-foreground hover:text-foreground rounded-xl rtl:[&_svg]:-scale-x-100",
   "aria-disabled:pointer-events-none aria-disabled:opacity-40",
 );
 
@@ -88,29 +143,43 @@ const cellButtonClassName = cn(
   // Layout
   "relative z-1 flex size-full items-center justify-center rounded-lg text-sm tabular-nums",
   // Focus
-  "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:z-2 focus-visible:outline-2 focus-visible:outline-offset-2",
+  focusRing,
+  "focus-visible:z-2",
   // Interaction
-  "cursor-pointer transition-[background-color,color,box-shadow,scale,outline-color,outline-offset] duration-150 ease-out active:scale-[0.96] motion-reduce:active:scale-100",
+  // Hover and selection colours change instantly: days are crossed dozens of
+  // times a pass, and a fade would trail the pointer.
+  "cursor-pointer transition-[scale,outline-color,outline-offset] duration-150 ease-out active:scale-[0.96] motion-reduce:active:scale-100",
   "hover:bg-surface-hover",
   // Today: a dot under the number, re-coloured when the day is filled
   "after:pointer-events-none after:absolute after:inset-x-0 after:bottom-1 after:mx-auto after:size-1 after:rounded-full after:bg-primary after:opacity-0",
 );
 
+/** The raised card the days (and the picker) sit in, inside the tray. */
+const cardClassName =
+  "rounded-xl bg-surface-3 shadow-[var(--surface-shadow-3),var(--surface-rim-3)]";
+
 const DEFAULT_CLASS_NAMES: NonNullable<DayPickerProps["classNames"]> = {
   root: "relative w-fit",
-  months: "relative flex flex-col gap-x-6 gap-y-4 sm:flex-row",
-  month: "flex flex-col",
-  month_caption: "mb-2 flex h-8 items-center pe-18",
+  months: "relative flex flex-col gap-1 sm:flex-row",
+  // Header row on the tray (arrow, caption, arrow), then the card. Fixed side
+  // columns keep the caption centred even on a month without arrows.
+  month:
+    "grid grid-cols-[2.25rem_1fr_2.25rem] gap-y-1 sm:grid-cols-[2rem_1fr_2rem]",
+  month_caption:
+    "col-start-2 row-start-1 flex h-9 min-w-0 items-center justify-center sm:h-8",
+  button_previous: "col-start-1 row-start-1 self-center justify-self-start",
+  button_next: "col-start-3 row-start-1 self-center justify-self-end",
   caption_label: "text-sm font-medium",
   dropdowns: "flex items-center gap-2 text-sm font-medium",
   dropdown_root: "relative inline-flex items-center",
   dropdown: "absolute inset-0 cursor-pointer opacity-0",
-  nav: "absolute end-0 top-0 z-2 flex h-8 items-center gap-0.5",
-  month_grid: "border-separate border-spacing-x-0 border-spacing-y-0.5",
+  month_grid: cn(
+    "col-span-3 row-start-2 border-separate border-spacing-x-0 border-spacing-y-0.5 p-1",
+    cardClassName,
+  ),
   weekdays: "",
-  weekday:
-    "text-muted-foreground size-10 p-0 pb-1 text-xs font-medium sm:size-9",
-  week_number_header: "size-10 p-0 pb-1 sm:size-9",
+  weekday: "text-muted-foreground h-8 w-10 p-0 text-xs font-medium sm:w-9",
+  week_number_header: "h-8 w-10 p-0 sm:w-9",
   week_number:
     "text-muted-foreground/70 size-10 p-0 text-xs tabular-nums sm:size-9",
   weeks: "",
@@ -126,11 +195,10 @@ const DEFAULT_CLASS_NAMES: NonNullable<DayPickerProps["classNames"]> = {
     // Today
     "group-data-today/day:font-semibold group-data-today/day:after:opacity-100",
     // Selected (and the two ends of a range)
-    "group-data-filled/day:bg-primary group-data-filled/day:text-primary-foreground group-data-filled/day:hover:bg-primary-hover group-data-filled/day:font-medium group-data-filled/day:after:bg-primary-foreground",
+    "group-data-filled/day:bg-primary group-data-filled/day:text-primary-foreground group-data-filled/day:hover:bg-(--primary-hover) group-data-filled/day:font-medium group-data-filled/day:after:bg-primary-foreground",
     // Disabled: struck through so it doesn't rely on colour alone
     "group-data-disabled/day:text-muted-foreground group-data-disabled/day:decoration-muted-foreground/60 group-data-disabled/day:line-through group-data-disabled/day:opacity-60",
   ),
-  footer: "text-muted-foreground mt-3 text-sm",
   hidden: "invisible",
   // Month transitions, see calendar.css
   weeks_before_enter: "calendar-enter-from-start",
@@ -163,14 +231,41 @@ function mergeClassNames(
  * styles off these (`group-data-*`), and calendar.css draws the range band on
  * the cell itself so it runs unbroken beneath the buttons.
  */
-function CalendarDay({ day, modifiers, ...props }: DayProps) {
+function CalendarDay({ day, modifiers, style, ...props }: DayProps) {
+  const context = React.useContext(CalendarContext);
   const inRange = Boolean(modifiers.range_middle);
   const filled = Boolean(modifiers.selected) && !inRange;
+
+  // While a range lands, each of its days takes its slice of one wipe from
+  // where the range was started toward the day that completed it.
+  const landing = context?.landing;
+  const banded =
+    inRange || Boolean(modifiers.range_start || modifiers.range_end);
+  const wipe =
+    landing && banded
+      ? wipeTiming(
+          Math.abs(daysBetween(landing.anchor, day.date)),
+          Math.abs(daysBetween(landing.anchor, landing.target)),
+        )
+      : null;
 
   return (
     <td
       {...props}
+      style={
+        wipe
+          ? ({
+              ...style,
+              "--calendar-wipe-delay": `${wipe.delay}ms`,
+              "--calendar-wipe-duration": `${wipe.duration}ms`,
+            } as React.CSSProperties)
+          : style
+      }
+      data-sweep={wipe ? "" : undefined}
       data-slot="calendar-day"
+      data-landing-target={
+        (landing && isSameDay(day.date, landing.target)) || undefined
+      }
       data-filled={filled || undefined}
       data-in-range={inRange || undefined}
       data-muted={(day.outside && !filled && !inRange) || undefined}
@@ -184,6 +279,20 @@ function CalendarDay({ day, modifiers, ...props }: DayProps) {
   );
 }
 
+/** The days card. Covered (and inert) while the month picker is open. */
+function CalendarMonthGrid(props: MonthGridProps) {
+  const context = React.useContext(CalendarContext);
+  const covered = Boolean(context?.pickerOpen);
+  return (
+    <table
+      {...props}
+      data-slot="calendar-grid"
+      data-covered={covered || undefined}
+      inert={covered}
+    />
+  );
+}
+
 function CalendarMonthCaption({
   calendarMonth,
   displayIndex,
@@ -193,7 +302,7 @@ function CalendarMonthCaption({
   const context = React.useContext(CalendarContext);
   const { dayPickerProps } = useDayPicker();
 
-  if (!context?.drilldown) return <div {...props}>{children}</div>;
+  if (!context?.pickerEnabled) return <div {...props}>{children}</div>;
 
   const locale = dayPickerProps.locale?.code;
   const date = calendarMonth.date;
@@ -208,12 +317,13 @@ function CalendarMonthCaption({
         type="button"
         data-slot="calendar-caption-trigger"
         aria-label={`${month} ${year}, choose month and year`}
-        aria-expanded={context.view !== "days"}
-        onClick={() => context.openMonths(displayIndex)}
+        aria-expanded={context.pickerOpen}
+        aria-controls={context.pickerOpen ? context.pickerId : undefined}
+        onClick={() => context.togglePicker(displayIndex)}
         className={cn(
-          "-ms-2 inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg ps-2 pe-1.5 text-sm",
-          "hover:bg-surface-hover transition-[background-color,outline-color,outline-offset] duration-150 ease-out",
-          "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+          "inline-flex h-full cursor-pointer items-center gap-1.5 rounded-xl ps-2.5 pe-2 text-sm",
+          "hover:bg-surface-hover aria-expanded:bg-surface-hover transition-[background-color,outline-color,outline-offset] duration-150 ease-out",
+          focusRing,
         )}
       >
         <span className="font-medium">{month}</span>
@@ -221,7 +331,10 @@ function CalendarMonthCaption({
         <HugeiconsIcon
           icon={ArrowDown01Icon}
           strokeWidth={2}
-          className="text-muted-foreground size-3.5"
+          className={cn(
+            "text-muted-foreground size-3.5 transition-[rotate] duration-200 ease-out motion-reduce:transition-none",
+            context.pickerOpen && "rotate-180",
+          )}
         />
       </button>
       {/* DayPicker's caption label is a polite live region; keep it for
@@ -236,7 +349,11 @@ function CalendarPreviousMonthButton({
   ...props
 }: React.ComponentProps<"button">) {
   return (
-    <button {...props} className={cn(navButtonClassName, className)}>
+    <button
+      {...props}
+      data-slot="calendar-nav"
+      className={cn(navButtonClassName, className)}
+    >
       <HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} />
     </button>
   );
@@ -247,37 +364,25 @@ function CalendarNextMonthButton({
   ...props
 }: React.ComponentProps<"button">) {
   return (
-    <button {...props} className={cn(navButtonClassName, className)}>
+    <button
+      {...props}
+      data-slot="calendar-nav"
+      className={cn(navButtonClassName, className)}
+    >
       <HugeiconsIcon icon={ArrowRight01Icon} strokeWidth={2} />
     </button>
   );
 }
 
 /* -------------------------------------------------------------------------------------------------
- * Month and year grids
+ * Month and year picker
  * -------------------------------------------------------------------------------------------------*/
 
 /** Arrow-key movement across a grid of buttons, reading columns from layout. */
-function handleGridKeyDown(
-  event: React.KeyboardEvent<HTMLElement>,
-  handlers: { onPrevious: () => void; onNext: () => void; onBack: () => void },
-) {
-  if (event.key === "Escape") {
-    event.preventDefault();
-    event.stopPropagation();
-    handlers.onBack();
-    return;
-  }
-  if (event.key === "PageUp" || event.key === "PageDown") {
-    event.preventDefault();
-    if (event.key === "PageUp") handlers.onPrevious();
-    else handlers.onNext();
-    return;
-  }
-
+function moveInGrid(event: React.KeyboardEvent<HTMLElement>): void {
   const cells = Array.from(
     event.currentTarget.querySelectorAll<HTMLButtonElement>(
-      "button[data-cell]:not(:disabled)",
+      "button:not(:disabled)",
     ),
   );
   const index = cells.indexOf(document.activeElement as HTMLButtonElement);
@@ -303,86 +408,203 @@ function handleGridKeyDown(
   if (move === undefined) return;
 
   event.preventDefault();
-  const next = cells[Math.min(Math.max(index + move, 0), cells.length - 1)];
-  next.focus();
+  cells[Math.min(Math.max(index + move, 0), cells.length - 1)].focus();
 }
 
-const gridCellClassName = cn(
-  cellButtonClassName,
-  "h-10 w-full self-center font-medium sm:h-9",
-  "data-today:after:opacity-100",
-  "data-active:bg-primary data-active:text-primary-foreground data-active:hover:bg-primary-hover data-active:after:bg-primary-foreground",
-  "disabled:pointer-events-none disabled:opacity-40",
-);
-
-interface CalendarLayerProps {
-  state: LayerState;
-  label: string;
-  title: React.ReactNode;
-  previousLabel: string;
-  nextLabel: string;
-  previousDisabled: boolean;
-  nextDisabled: boolean;
-  onPrevious: () => void;
-  onNext: () => void;
-  onBack: () => void;
-  children: React.ReactNode;
+interface CalendarPickerProps {
+  id: string;
+  open: boolean;
+  year: number;
+  onYearChange: (year: number) => void;
+  minYear: number;
+  maxYear: number;
+  /** The displayed month the picker was opened from. */
+  activeMonth: Date;
+  today: Date;
+  locale: string | undefined;
+  isMonthDisabled: (year: number, month: number) => boolean;
+  onSelectMonth: (month: number) => void;
+  onClose: () => void;
 }
 
-function CalendarLayer({
-  state,
-  label,
-  title,
-  previousLabel,
-  nextLabel,
-  previousDisabled,
-  nextDisabled,
-  onPrevious,
-  onNext,
-  onBack,
-  children,
-}: CalendarLayerProps) {
+/**
+ * One panel over the days: a scrolling year column beside the year's twelve
+ * months. Picking a year only changes which months are shown; picking a month
+ * goes there and closes. The caption above stays visible as the way back.
+ */
+function CalendarPicker({
+  id,
+  open,
+  year,
+  onYearChange,
+  minYear,
+  maxYear,
+  activeMonth,
+  today,
+  locale,
+  isMonthDisabled,
+  onSelectMonth,
+  onClose,
+}: CalendarPickerProps) {
+  const yearsRef = React.useRef<HTMLDivElement>(null);
+  const focusYearRef = React.useRef(false);
+
+  // Centre the chosen year in its column whenever the picker opens.
+  React.useLayoutEffect(() => {
+    if (!open) return;
+    const list = yearsRef.current;
+    const active = list?.querySelector<HTMLElement>("[data-active]");
+    if (!list || !active) return;
+    list.scrollTop =
+      active.offsetTop - list.clientHeight / 2 + active.offsetHeight / 2;
+  }, [open]);
+
+  // Keyboard moves in the year column select as they go; follow with focus.
+  React.useEffect(() => {
+    if (!focusYearRef.current) return;
+    focusYearRef.current = false;
+    const active =
+      yearsRef.current?.querySelector<HTMLElement>("[data-active]");
+    active?.focus();
+    active?.scrollIntoView({ block: "nearest" });
+  }, [year]);
+
+  const stepYear = (next: number) => {
+    const clamped = Math.min(Math.max(next, minYear), maxYear);
+    if (clamped === year) return;
+    focusYearRef.current = true;
+    onYearChange(clamped);
+  };
+
+  const monthFormat = new Intl.DateTimeFormat(locale, { month: "short" });
+  const monthLongFormat = new Intl.DateTimeFormat(locale, {
+    month: "long",
+    year: "numeric",
+  });
+  const years = Array.from(
+    { length: maxYear - minYear + 1 },
+    (_, index) => minYear + index,
+  );
+  const activeInYear = activeMonth.getFullYear() === year;
+
   return (
     <div
+      id={id}
       role="group"
-      aria-label={label}
-      data-calendar-layer=""
-      data-state={state}
-      inert={state !== "active"}
-      className="@container absolute inset-0 flex flex-col"
-      onKeyDown={(event) =>
-        handleGridKeyDown(event, {
-          onPrevious: previousDisabled ? () => {} : onPrevious,
-          onNext: nextDisabled ? () => {} : onNext,
-          onBack,
-        })
-      }
+      aria-label="Choose month and year"
+      data-slot="calendar-picker"
+      data-state={open ? "open" : "closed"}
+      inert={!open}
+      className={cn(
+        "absolute inset-x-0 top-(--calendar-header) bottom-0 z-3 flex overflow-hidden",
+        cardClassName,
+      )}
+      onKeyDown={(event) => {
+        if (event.key !== "Escape") return;
+        event.preventDefault();
+        event.stopPropagation();
+        onClose();
+      }}
     >
-      <div className="relative mb-2 flex h-8 shrink-0 items-center justify-between">
-        {title}
-        <div className="flex items-center gap-0.5">
-          <button
-            type="button"
-            className={navButtonClassName}
-            aria-label={previousLabel}
-            aria-disabled={previousDisabled || undefined}
-            onClick={previousDisabled ? undefined : onPrevious}
-          >
-            <HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} />
-          </button>
-          <button
-            type="button"
-            className={navButtonClassName}
-            aria-label={nextLabel}
-            aria-disabled={nextDisabled || undefined}
-            onClick={nextDisabled ? undefined : onNext}
-          >
-            <HugeiconsIcon icon={ArrowRight01Icon} strokeWidth={2} />
-          </button>
+      <ScrollArea
+        fadeEdges="y"
+        hideScrollbar
+        viewportRef={(element) => {
+          yearsRef.current = element;
+        }}
+        className="border-border/60 h-auto w-17 shrink-0 border-e"
+      >
+        <div
+          role="group"
+          aria-label="Year"
+          data-slot="calendar-picker-years"
+          className="flex flex-col gap-0.5 p-1"
+          onKeyDown={(event) => {
+            const moves: Record<string, number> = {
+              ArrowUp: year - 1,
+              ArrowDown: year + 1,
+              PageUp: year - 10,
+              PageDown: year + 10,
+              Home: minYear,
+              End: maxYear,
+            };
+            if (!(event.key in moves)) return;
+            event.preventDefault();
+            stepYear(moves[event.key]);
+          }}
+        >
+          {years.map((option) => {
+            const active = option === year;
+            return (
+              <button
+                key={option}
+                type="button"
+                data-active={active || undefined}
+                data-today={option === today.getFullYear() || undefined}
+                aria-pressed={active}
+                tabIndex={active ? 0 : -1}
+                onClick={() => onYearChange(option)}
+                className={cn(
+                  cellButtonClassName,
+                  "text-muted-foreground h-8 w-full shrink-0",
+                  "data-today:after:opacity-100",
+                  "data-active:text-foreground data-active:bg-surface-hover data-active:font-semibold",
+                )}
+              >
+                {option}
+              </button>
+            );
+          })}
         </div>
-      </div>
-      <div className="grid flex-1 auto-rows-fr grid-cols-3 gap-x-1 @md:grid-cols-4">
-        {children}
+      </ScrollArea>
+      <div
+        role="group"
+        aria-label={String(year)}
+        data-slot="calendar-picker-months"
+        className="grid flex-1 auto-rows-fr grid-cols-3 gap-x-1 p-1"
+        onKeyDown={(event) => {
+          if (event.key === "PageUp" || event.key === "PageDown") {
+            event.preventDefault();
+            onYearChange(
+              Math.min(
+                Math.max(year + (event.key === "PageUp" ? -1 : 1), minYear),
+                maxYear,
+              ),
+            );
+            return;
+          }
+          moveInGrid(event);
+        }}
+      >
+        {Array.from({ length: 12 }, (_, monthOfYear) => {
+          const date = new Date(year, monthOfYear, 1);
+          const active = activeInYear && monthOfYear === activeMonth.getMonth();
+          const isCurrent =
+            year === today.getFullYear() && monthOfYear === today.getMonth();
+          return (
+            <button
+              key={monthOfYear}
+              type="button"
+              data-active={active || undefined}
+              data-today={isCurrent || undefined}
+              aria-label={monthLongFormat.format(date)}
+              aria-current={active || undefined}
+              // In another year, January takes the tab stop.
+              tabIndex={active || (!activeInYear && monthOfYear === 0) ? 0 : -1}
+              disabled={isMonthDisabled(year, monthOfYear)}
+              onClick={() => onSelectMonth(monthOfYear)}
+              className={cn(
+                cellButtonClassName,
+                "h-9 w-full self-center font-medium sm:h-8",
+                "data-today:after:opacity-100",
+                "data-active:bg-primary data-active:text-primary-foreground data-active:after:bg-primary-foreground data-active:hover:bg-(--primary-hover)",
+                "disabled:pointer-events-none disabled:opacity-40",
+              )}
+            >
+              {monthFormat.format(date)}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -396,15 +618,17 @@ function CalendarLayer({
  * A month grid for picking a date, several dates, or a range. Built on React
  * DayPicker, so every DayPicker prop passes through.
  *
- * On top of DayPicker it adds: a caption that drills out to month and year
- * grids, a live preview while picking the end of a range, a selection that
- * slides between days, and animated month changes.
+ * On top of DayPicker it adds: a caption that opens a month and year picker,
+ * a live preview while picking the end of a range, a selection that slides
+ * between days, and animated month changes.
  */
 function Calendar({
   className,
   classNames,
   components,
   modifiers,
+  footer,
+  tray = true,
   showOutsideDays,
   fixedWeeks = true,
   animate = true,
@@ -419,7 +643,8 @@ function Calendar({
   const today = props.today ?? new Date();
   const locale = props.locale?.code;
   const numberOfMonths = props.numberOfMonths ?? 1;
-  const drilldown = captionLayout === undefined;
+  const pickerEnabled = captionLayout === undefined;
+  const pickerId = React.useId();
 
   const [month, setMonth] = useControllableState<Date>({
     value: monthProp,
@@ -429,17 +654,18 @@ function Calendar({
     onValueChange: onMonthChange,
   });
 
-  // Drill-down state. `drillIndex` is the displayed month whose caption opened
-  // the grids, so picking a month puts it back in the same position.
-  const [view, setView] = React.useState<CalendarView>("days");
-  const [drillIndex, setDrillIndex] = React.useState(0);
-  const [panelYear, setPanelYear] = React.useState(() => month.getFullYear());
-  const [yearsStart, setYearsStart] = React.useState(0);
-  // Remounting DayPicker after a grid pick skips its slide animation, which
-  // would otherwise run underneath the zoom back into the days.
+  // Month and year picker. `pickerIndex` is the displayed month whose caption
+  // opened it, so picking a month puts it back in the same position.
+  const [pickerOpen, setPickerOpen] = React.useState(false);
+  const [pickerIndex, setPickerIndex] = React.useState(0);
+  const [pickerYear, setPickerYear] = React.useState(() => month.getFullYear());
+  // Remounting DayPicker after a pick skips its slide animation, which would
+  // otherwise run underneath the picker fading away.
   const [pickerKey, setPickerKey] = React.useState(0);
   const rootRef = React.useRef<HTMLDivElement>(null);
-  const pendingFocusRef = React.useRef(false);
+  const pendingFocusRef = React.useRef<"picker" | "days" | "caption" | null>(
+    null,
+  );
 
   // Range preview: the hovered (or keyboard-focused) day while only the start
   // of a range is picked.
@@ -447,6 +673,44 @@ function Calendar({
   const range =
     props.mode === "range" ? (props.selected as DateRange | undefined) : null;
   const pickingEnd = Boolean(range?.from && !range.to);
+
+  // A range "lands" when a second click completes it. Tracked while
+  // rendering, so the frame that first shows the full range already carries
+  // the landing; from an effect it would paint once, then restart.
+  const rangeKey = range
+    ? `${range.from?.getTime() ?? ""}:${range.to?.getTime() ?? ""}`
+    : "";
+  const [previousRange, setPreviousRange] = React.useState({
+    key: rangeKey,
+    from: range?.from,
+    to: range?.to,
+  });
+  const [landing, setLanding] = React.useState<RangeLanding | null>(null);
+  if (previousRange.key !== rangeKey) {
+    const wasPicking = Boolean(previousRange.from && !previousRange.to);
+    setPreviousRange({ key: rangeKey, from: range?.from, to: range?.to });
+    if (
+      wasPicking &&
+      previousRange.from &&
+      range?.from &&
+      range.to &&
+      !isSameDay(range.from, range.to)
+    ) {
+      const anchor = previousRange.from;
+      setLanding({
+        anchor,
+        target: isSameDay(range.from, anchor) ? range.to : range.from,
+      });
+    } else {
+      setLanding(null);
+    }
+  }
+
+  React.useEffect(() => {
+    if (!landing) return;
+    const timeout = setTimeout(() => setLanding(null), 900);
+    return () => clearTimeout(timeout);
+  }, [landing]);
 
   let previewModifiers: Record<string, Matcher | Matcher[] | undefined> = {};
   if (pickingEnd && range?.from && hovered && !isSameDay(hovered, range.from)) {
@@ -481,66 +745,62 @@ function Calendar({
       (endBound !== null && index > endBound)
     );
   };
-  const isYearDisabled = (year: number) =>
-    (startBound !== null && (year + 1) * 12 - 1 < startBound) ||
-    (endBound !== null && year * 12 > endBound);
+  const minYear =
+    props.startMonth?.getFullYear() ?? today.getFullYear() - YEARS_BEFORE;
+  const maxYear =
+    props.endMonth?.getFullYear() ?? today.getFullYear() + YEARS_AFTER;
 
-  const openMonths = React.useCallback(
-    (displayIndex: number) => {
-      setDrillIndex(displayIndex);
-      setPanelYear(addMonths(month, displayIndex).getFullYear());
-      pendingFocusRef.current = true;
-      setView("months");
-    },
-    [month],
-  );
+  const togglePicker = (displayIndex: number) => {
+    if (pickerOpen) {
+      setPickerOpen(false);
+      return;
+    }
+    setPickerIndex(displayIndex);
+    setPickerYear(addMonths(month, displayIndex).getFullYear());
+    pendingFocusRef.current = "picker";
+    setPickerOpen(true);
+  };
 
-  const openYears = () => {
-    setYearsStart(Math.floor(panelYear / YEARS_PER_PAGE) * YEARS_PER_PAGE);
-    pendingFocusRef.current = true;
-    setView("years");
+  const closePicker = () => {
+    pendingFocusRef.current = "caption";
+    setPickerOpen(false);
   };
 
   const selectMonth = (monthOfYear: number) => {
-    setMonth(new Date(panelYear, monthOfYear - drillIndex, 1));
+    setMonth(new Date(pickerYear, monthOfYear - pickerIndex, 1));
     setPickerKey((key) => key + 1);
-    pendingFocusRef.current = true;
-    setView("days");
+    pendingFocusRef.current = "days";
+    setPickerOpen(false);
   };
 
-  const selectYear = (year: number) => {
-    setPanelYear(year);
-    pendingFocusRef.current = true;
-    setView("months");
-  };
-
-  const goBack = () => {
-    pendingFocusRef.current = true;
-    setView(view === "years" ? "months" : "days");
-  };
-
-  // Move focus into whichever view just became active. Inactive views are
-  // inert, so without this focus would fall back to the body.
+  // Move focus to where the user now is. The covered days are inert, so
+  // without this focus would fall back to the body.
   React.useEffect(() => {
-    if (!pendingFocusRef.current) return;
-    pendingFocusRef.current = false;
+    const target = pendingFocusRef.current;
+    pendingFocusRef.current = null;
     const root = rootRef.current;
-    if (!root) return;
-    const target =
-      view === "days"
-        ? root.querySelector<HTMLElement>(
-            '[data-calendar-layer][data-state="active"] [data-slot="calendar-day"] button[tabindex="0"]',
-          )
-        : root.querySelector<HTMLElement>(
-            `[data-calendar-layer][data-state="active"] button[data-cell][tabindex="0"]`,
-          );
-    target?.focus();
-  }, [view, pickerKey]);
+    if (!target || !root) return;
+    const selectors = {
+      picker:
+        '[data-slot="calendar-picker-months"] button[tabindex="0"]:not(:disabled)',
+      days: '[data-slot="calendar-day"] button[tabindex="0"]',
+      caption: '[data-slot="calendar-caption-trigger"]',
+    };
+    const candidates = root.querySelectorAll<HTMLElement>(selectors[target]);
+    const element =
+      target === "caption"
+        ? (candidates[pickerIndex] ?? candidates[0])
+        : candidates[0];
+    element?.focus();
+  }, [pickerOpen, pickerKey, pickerIndex]);
 
-  const context = React.useMemo<CalendarContextValue>(
-    () => ({ drilldown, view, openMonths }),
-    [drilldown, view, openMonths],
-  );
+  const context: CalendarContextValue = {
+    landing,
+    pickerEnabled,
+    pickerOpen,
+    pickerId,
+    togglePicker,
+  };
 
   const handleDayMouseEnter: DayEventHandler<React.MouseEvent> = (
     date,
@@ -560,25 +820,28 @@ function Calendar({
     onDayFocus?.(date, dayModifiers, event);
   };
 
-  const monthFormat = new Intl.DateTimeFormat(locale, { month: "short" });
-  const monthLongFormat = new Intl.DateTimeFormat(locale, {
-    month: "long",
-    year: "numeric",
-  });
-  const activeMonth = addMonths(month, drillIndex);
-  const yearsEnd = yearsStart + YEARS_PER_PAGE - 1;
-
-  const monthsState: LayerState =
-    view === "months" ? "active" : view === "days" ? "outer" : "inner";
-
   return (
     <CalendarContext.Provider value={context}>
       <div
         ref={rootRef}
         data-slot="calendar"
         data-mode={props.mode}
-        data-view={view}
-        className={cn("relative w-fit p-3", className)}
+        data-tray={tray || undefined}
+        data-picker-open={pickerOpen || undefined}
+        data-range-landing={
+          landing
+            ? landing.target > landing.anchor
+              ? "forward"
+              : "backward"
+            : undefined
+        }
+        className={cn(
+          "relative w-fit [--calendar-header:2.5rem] sm:[--calendar-header:2.25rem]",
+          // Same frame as Card's inset variant: the muted outer keeps the
+          // surface's shadow, rim, and --popup-surface.
+          tray && cn("rounded-2xl p-1", solidSurface(3, 1), "bg-muted"),
+          className,
+        )}
         onMouseLeave={() => setHovered(undefined)}
         onBlur={(event) => {
           if (!event.currentTarget.contains(event.relatedTarget)) {
@@ -587,162 +850,66 @@ function Calendar({
         }}
       >
         <div className="relative">
-          <div
-            data-calendar-layer=""
-            data-state={view === "days" ? "active" : "inner"}
-            inert={view !== "days"}
-            className="relative"
-          >
-            <DayPicker
-              key={pickerKey}
-              // Side by side, outside days would repeat the neighbouring
-              // month's days (and any range drawn across them).
-              showOutsideDays={showOutsideDays ?? numberOfMonths === 1}
-              fixedWeeks={fixedWeeks}
-              animate={animate}
-              captionLayout={drilldown ? "label" : captionLayout}
-              {...(props.mode === "range" ? { resetOnSelect: true } : null)}
-              {...props}
-              month={month}
-              onMonthChange={setMonth}
-              modifiers={{ ...previewModifiers, ...modifiers }}
-              onDayMouseEnter={handleDayMouseEnter}
-              onDayFocus={handleDayFocus}
-              classNames={mergeClassNames(classNames)}
-              components={{
-                Day: CalendarDay,
-                MonthCaption: CalendarMonthCaption,
-                PreviousMonthButton: CalendarPreviousMonthButton,
-                NextMonthButton: CalendarNextMonthButton,
-                ...components,
-              }}
+          <DayPicker
+            key={pickerKey}
+            // Side by side, outside days would repeat the neighbouring
+            // month's days (and any range drawn across them).
+            showOutsideDays={showOutsideDays ?? numberOfMonths === 1}
+            fixedWeeks={fixedWeeks}
+            animate={animate}
+            navLayout="around"
+            captionLayout={pickerEnabled ? "label" : captionLayout}
+            {...(props.mode === "range" ? { resetOnSelect: true } : null)}
+            {...props}
+            month={month}
+            onMonthChange={setMonth}
+            modifiers={{ ...previewModifiers, ...modifiers }}
+            onDayMouseEnter={handleDayMouseEnter}
+            onDayFocus={handleDayFocus}
+            classNames={mergeClassNames(classNames)}
+            components={{
+              Day: CalendarDay,
+              MonthGrid: CalendarMonthGrid,
+              MonthCaption: CalendarMonthCaption,
+              PreviousMonthButton: CalendarPreviousMonthButton,
+              NextMonthButton: CalendarNextMonthButton,
+              ...components,
+            }}
+          />
+          {showIndicator && (
+            <span
+              aria-hidden
+              data-slot="calendar-selection"
+              className="calendar-selection"
             />
-            {showIndicator && (
-              <span
-                aria-hidden
-                data-slot="calendar-selection"
-                className="calendar-selection"
-              />
-            )}
-          </div>
-
-          {drilldown && (
-            <>
-              <CalendarLayer
-                state={monthsState}
-                label="Choose a month"
-                title={
-                  <button
-                    type="button"
-                    aria-label={`${panelYear}, choose a year`}
-                    onClick={openYears}
-                    className={cn(
-                      "-ms-2 inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg ps-2 pe-1.5 text-sm font-medium tabular-nums",
-                      "hover:bg-surface-hover transition-[background-color,outline-color,outline-offset] duration-150 ease-out",
-                      "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
-                    )}
-                  >
-                    {panelYear}
-                    <HugeiconsIcon
-                      icon={ArrowDown01Icon}
-                      strokeWidth={2}
-                      className="text-muted-foreground size-3.5"
-                    />
-                  </button>
-                }
-                previousLabel="Previous year"
-                nextLabel="Next year"
-                previousDisabled={isYearDisabled(panelYear - 1)}
-                nextDisabled={isYearDisabled(panelYear + 1)}
-                onPrevious={() => setPanelYear((year) => year - 1)}
-                onNext={() => setPanelYear((year) => year + 1)}
-                onBack={goBack}
-              >
-                {Array.from({ length: 12 }, (_, monthOfYear) => {
-                  const date = new Date(panelYear, monthOfYear, 1);
-                  const active =
-                    panelYear === activeMonth.getFullYear() &&
-                    monthOfYear === activeMonth.getMonth();
-                  const isCurrent =
-                    panelYear === today.getFullYear() &&
-                    monthOfYear === today.getMonth();
-                  return (
-                    <button
-                      key={monthOfYear}
-                      type="button"
-                      data-cell=""
-                      data-active={active || undefined}
-                      data-today={isCurrent || undefined}
-                      aria-label={monthLongFormat.format(date)}
-                      aria-current={active || undefined}
-                      // In another year, January takes the tab stop.
-                      tabIndex={
-                        active ||
-                        (panelYear !== activeMonth.getFullYear() &&
-                          monthOfYear === 0)
-                          ? 0
-                          : -1
-                      }
-                      disabled={isMonthDisabled(panelYear, monthOfYear)}
-                      onClick={() => selectMonth(monthOfYear)}
-                      className={gridCellClassName}
-                    >
-                      {monthFormat.format(date)}
-                    </button>
-                  );
-                })}
-              </CalendarLayer>
-
-              <CalendarLayer
-                state={view === "years" ? "active" : "outer"}
-                label="Choose a year"
-                title={
-                  <span className="text-sm font-medium tabular-nums">
-                    {yearsStart}
-                    <span className="text-muted-foreground"> – </span>
-                    {yearsEnd}
-                  </span>
-                }
-                previousLabel="Previous years"
-                nextLabel="Next years"
-                previousDisabled={isYearDisabled(yearsStart - 1)}
-                nextDisabled={isYearDisabled(yearsEnd + 1)}
-                onPrevious={() =>
-                  setYearsStart((year) => year - YEARS_PER_PAGE)
-                }
-                onNext={() => setYearsStart((year) => year + YEARS_PER_PAGE)}
-                onBack={goBack}
-              >
-                {Array.from({ length: YEARS_PER_PAGE }, (_, offset) => {
-                  const year = yearsStart + offset;
-                  const active = year === panelYear;
-                  // With the active year paged out of view, the first year
-                  // takes the tab stop instead.
-                  const tabStop =
-                    active ||
-                    ((panelYear < yearsStart || panelYear > yearsEnd) &&
-                      offset === 0);
-                  return (
-                    <button
-                      key={year}
-                      type="button"
-                      data-cell=""
-                      data-active={active || undefined}
-                      data-today={year === today.getFullYear() || undefined}
-                      aria-current={active || undefined}
-                      tabIndex={tabStop ? 0 : -1}
-                      disabled={isYearDisabled(year)}
-                      onClick={() => selectYear(year)}
-                      className={gridCellClassName}
-                    >
-                      {year}
-                    </button>
-                  );
-                })}
-              </CalendarLayer>
-            </>
+          )}
+          {pickerEnabled && (
+            <CalendarPicker
+              id={pickerId}
+              open={pickerOpen}
+              year={pickerYear}
+              onYearChange={setPickerYear}
+              minYear={minYear}
+              maxYear={maxYear}
+              activeMonth={addMonths(month, pickerIndex)}
+              today={today}
+              locale={locale}
+              isMonthDisabled={isMonthDisabled}
+              onSelectMonth={selectMonth}
+              onClose={closePicker}
+            />
           )}
         </div>
+        {footer && (
+          <div
+            role="status"
+            aria-live="polite"
+            data-slot="calendar-footer"
+            className="text-muted-foreground px-2 pt-2 pb-1 text-sm"
+          >
+            {footer}
+          </div>
+        )}
       </div>
     </CalendarContext.Provider>
   );
@@ -790,7 +957,7 @@ function CalendarPreset({
         "text-muted-foreground flex h-8 shrink-0 cursor-pointer items-center rounded-lg px-2.5 text-start text-sm whitespace-nowrap",
         "hover:bg-surface-hover hover:text-foreground",
         "data-active:bg-surface-hover data-active:text-foreground data-active:font-medium",
-        "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+        focusRing,
         "transition-[background-color,color,outline-color,outline-offset] duration-150 ease-out",
         className,
       )}

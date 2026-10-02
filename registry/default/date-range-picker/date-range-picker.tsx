@@ -169,6 +169,7 @@ function DateRangePicker({
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const panelRef = React.useRef<HTMLDivElement>(null);
   const groupRef = React.useRef<HTMLDivElement>(null);
+  const closeTimeoutRef = React.useRef<number | undefined>(undefined);
   const wide = useMediaQuery("(min-width: 640px)");
 
   // The range being picked. It only reaches `value` once both ends are set,
@@ -212,12 +213,19 @@ function DateRangePicker({
   };
 
   const handleSelect = (range: DateRange | undefined) => {
-    if (range?.from && range.to) {
-      commit({ from: range.from, to: range.to });
-      return;
-    }
     setDraft(range);
+    if (!range?.from || !range.to) return;
+    setValue({ from: range.from, to: range.to });
+    // Close a beat later so the range is seen landing (the calendar's band
+    // sweep), unless motion is reduced and there's nothing to see.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setOpen(false);
+    } else {
+      closeTimeoutRef.current = window.setTimeout(() => setOpen(false), 350);
+    }
   };
+
+  React.useEffect(() => () => window.clearTimeout(closeTimeoutRef.current), []);
 
   const status = (() => {
     if (!draft?.from) return "Pick a start date";
@@ -322,7 +330,10 @@ function DateRangePicker({
         )}
         <PopoverContent
           align="start"
-          className="w-auto"
+          // The popover is the calendar's tray: muted, with the days card
+          // inside it (the calendar's own tray is turned off below).
+          className="bg-muted w-auto rounded-2xl"
+          viewportClassName="p-1 [--viewport-padding:0.25rem]"
           anchor={editable ? groupRef : undefined}
           // Land on the selected day (or today), not the month arrows.
           initialFocus={() =>
@@ -331,9 +342,9 @@ function DateRangePicker({
             ) ?? true
           }
         >
-          <div ref={panelRef} className="flex flex-col gap-3 sm:flex-row">
+          <div ref={panelRef} className="flex flex-col gap-1 sm:flex-row">
             {presets && presets.length > 0 && (
-              <CalendarPresets className="sm:border-border/60 -mx-3 px-3 sm:mx-0 sm:border-e sm:ps-0 sm:pe-3">
+              <CalendarPresets className="px-1 pt-1 sm:w-32 sm:p-1">
                 {presets.map((preset) => {
                   const range = resolvePreset(preset);
                   const presetDisabled = Boolean(
@@ -361,7 +372,7 @@ function DateRangePicker({
             <div className="flex flex-col">
               <Calendar
                 {...calendarProps}
-                className="p-0"
+                tray={false}
                 mode="range"
                 numberOfMonths={numberOfMonths ?? (wide ? 2 : 1)}
                 selected={draft}
@@ -375,7 +386,7 @@ function DateRangePicker({
                 startMonth={calendarProps?.startMonth ?? minDate}
                 endMonth={calendarProps?.endMonth ?? maxDate}
               />
-              <div className="border-border/60 -mx-3 mt-3 flex min-h-9 items-center justify-between gap-3 border-t px-3 pt-3">
+              <div className="flex min-h-9 items-center px-2 pt-1">
                 <p
                   role="status"
                   aria-live="polite"

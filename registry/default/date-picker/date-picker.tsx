@@ -398,7 +398,10 @@ function DatePicker({
         )}
         <PopoverContent
           align="start"
-          className="w-auto"
+          // The popover is the calendar's tray: muted, with the days card
+          // inside it (the calendar's own tray is turned off below).
+          className="bg-muted w-auto rounded-2xl"
+          viewportClassName="p-1 [--viewport-padding:0.25rem]"
           anchor={editable ? groupRef : undefined}
           // Land on the selected day (or today), not the month arrows.
           initialFocus={() =>
@@ -407,9 +410,9 @@ function DatePicker({
             ) ?? true
           }
         >
-          <div ref={panelRef} className="flex flex-col gap-3 sm:flex-row">
+          <div ref={panelRef} className="flex flex-col gap-1 sm:flex-row">
             {presets && presets.length > 0 && (
-              <CalendarPresets className="sm:border-border/60 -mx-3 px-3 sm:mx-0 sm:border-e sm:ps-0 sm:pe-3">
+              <CalendarPresets className="px-1 pt-1 sm:w-32 sm:p-1">
                 {presets.map((preset) => {
                   const date = resolvePreset(preset);
                   const presetDisabled = Boolean(
@@ -431,7 +434,7 @@ function DatePicker({
             )}
             <Calendar
               {...calendarProps}
-              className="p-0"
+              tray={false}
               mode="single"
               required
               selected={value ?? undefined}

@@ -1,17 +1,16 @@
-"use client";
-
 import { DatePicker } from "@/registry/default/date-picker/date-picker";
-import { useState } from "react";
+
+const longDate = new Intl.DateTimeFormat(undefined, {
+  weekday: "short",
+  month: "long",
+  day: "numeric",
+});
 
 export default function DatePickerCustomPlaceholderAndFormat() {
-  const [birthDate, setBirthDate] = useState<Date | undefined>(undefined);
-
   return (
     <DatePicker
-      placeholder="Pick your birth date"
-      format="MMM DD, YYYY"
-      value={birthDate}
-      onSelect={setBirthDate}
+      placeholder="When's the launch?"
+      format={(date) => longDate.format(date)}
     />
   );
 }

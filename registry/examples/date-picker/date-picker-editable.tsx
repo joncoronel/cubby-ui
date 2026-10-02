@@ -3,12 +3,19 @@
 import { useState } from "react";
 import { DatePicker } from "@/registry/default/date-picker/date-picker";
 
-export default function DatePickerControlled() {
-  const [date, setDate] = useState<Date | null>(new Date());
+export default function DatePickerEditable() {
+  const [date, setDate] = useState<Date | null>(null);
 
   return (
     <div className="flex flex-col items-start gap-2">
-      <DatePicker value={date} onValueChange={setDate} clearable />
+      <DatePicker
+        editable
+        clearable
+        value={date}
+        onValueChange={setDate}
+        placeholder="Try “next fri” or “mar 14”"
+        className="w-72"
+      />
       <p className="text-muted-foreground text-sm tabular-nums">
         {date ? date.toDateString() : "No date"}
       </p>

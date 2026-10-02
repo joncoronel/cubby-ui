@@ -1,17 +1,17 @@
-"use client";
-
 import { DateRangePicker } from "@/registry/default/date-range-picker/date-range-picker";
-import { useState } from "react";
-import { DateRange } from "react-day-picker";
+
+const numeric = new Intl.DateTimeFormat(undefined, {
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+});
 
 export default function DateRangePickerWithFormat() {
-  const [datePreset, setDatePreset] = useState<DateRange | undefined>();
-
   return (
     <DateRangePicker
-      value={datePreset}
-      onSelect={setDatePreset}
-      format="MMM DD, YYYY"
+      format={({ from, to }) =>
+        `${numeric.format(from)} → ${numeric.format(to)}`
+      }
     />
   );
 }

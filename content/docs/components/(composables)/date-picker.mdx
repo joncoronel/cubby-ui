@@ -1,13 +1,13 @@
 ---
 title: Date Picker
-description: Input field with calendar popup for selecting dates
+description: A date field that opens a calendar for picking one date
 type: composable
 builtOn: ["calendar", "popover"]
 ---
 
 import { DatePicker } from "@/registry/default/date-picker/date-picker";
 
-The date picker is a trigger button that opens a calendar popover for choosing a single date. Use it for due dates, birthdays, and any form field that needs one date.
+The date picker is a field that opens a calendar popover for choosing one date. Use it for due dates, birthdays, and other single-date form fields.
 
 To select a start and end date together, use [`DateRangePicker`](/docs/components/date-range-picker) instead.
 
@@ -27,70 +27,187 @@ To select a start and end date together, use [`DateRangePicker`](/docs/component
 
 ### Controlled
 
-Pass `value` and `onSelect` to manage the selected date externally.
+Use `value` and `onValueChange` to control the date. An empty field is `null`; add `clearable` for a button that empties it.
 
 <ComponentPreview component="date-picker" example="date-picker-controlled" />
 
+### Typing a Date
+
+Use `editable` to make the field a text input, with the calendar on a button beside it. It reads input such as "today", "tomorrow", "next fri", "in 2 weeks", "mar 14", "14 March 2027", "3/14" (in the locale's day and month order), or "2026-03-14". A hint on the right shows how the picker reads the text before the value changes. `Enter` or leaving the field commits; `Escape` undoes the edit.
+
+<ComponentPreview component="date-picker" example="date-picker-editable" />
+
+### Presets
+
+Use `presets` to add one-click shortcuts beside the calendar. Give each a function instead of a fixed date so relative presets like "Tomorrow" resolve when the picker opens.
+
+<ComponentPreview component="date-picker" example="date-picker-presets" />
+
+### Min and Max
+
+Use `minDate` and `maxDate` to block days outside a window and stop navigation past it. Use `disabledDates` for other blocks, such as weekends.
+
+<ComponentPreview component="date-picker" example="date-picker-min-max" />
+
+### In a Form
+
+Use `name` to submit the date as `YYYY-MM-DD` through a hidden input. An `id` goes on the trigger, so a `<label htmlFor>` can name it.
+
+<ComponentPreview component="date-picker" example="date-picker-form" />
+
 ### Custom Placeholder and Format
 
-Use `placeholder` and `format` to set the empty-state text and the displayed date format.
+Use `placeholder` to set the empty text and `format` to control how the date is written. `format` takes the `Date` and returns a string.
 
-<ComponentPreview component="date-picker" example="date-picker-custom-placeholder-and-format" />
+<ComponentPreview
+  component="date-picker"
+  example="date-picker-custom-placeholder-and-format"
+/>
 
 ### Different Widths
 
-Set a width utility via `className` to size the trigger.
+Use a width utility in `className` to size the field. The default is `w-60`.
 
-<ComponentPreview component="date-picker" example="date-picker-different-widths" />
+<ComponentPreview
+  component="date-picker"
+  example="date-picker-different-widths"
+/>
 
 ### Disabled State
 
-Set `disabled` to prevent opening the picker.
+Use `disabled` to stop the picker from opening.
 
-<ComponentPreview component="date-picker" example="date-picker-disabled-state" />
+<ComponentPreview
+  component="date-picker"
+  example="date-picker-disabled-state"
+/>
 
 ## Accessibility
 
-The trigger opens a calendar popover that traps focus while open. Inside the calendar, use the arrow keys to move between days, `PageUp` and `PageDown` to change months, `Enter` or `Space` to select, and `Escape` to close.
+The trigger is a button that opens the calendar in a popover and moves focus into it. Inside, use the arrow keys to move between days, `PageUp` and `PageDown` to change months, and `Enter` or `Space` to pick. Picking a date closes the popover and returns focus to the trigger; `Escape` closes it without a change. The clear button is a separate control after the trigger, labelled "Clear date".
+
+With `editable`, the field is a text input (label it with `id` and a `<label>`, or `aria-label`), and the calendar opens from a "Choose date" button beside it or with `ArrowDown` in the input. The hint is a polite live region, so screen readers announce how the text was read ("Fri, Oct 9, 2026", "Unavailable"). Committing text the picker can't read sets `aria-invalid` on the input.
 
 ## API Reference
 
-The DatePicker composes [`Calendar`](/docs/components/calendar) inside a [`Popover`](/docs/components/popover), with a [`Button`](/docs/components/button) trigger. It exposes its own props rather than forwarding to the underlying parts.
+DatePicker composes [`Calendar`](/docs/components/calendar) inside a [`Popover`](/docs/components/popover), with a trigger styled like an [`Input`](/docs/components/input). Props not listed below (`id`, `aria-*`, event handlers) go to the trigger button.
 
 ### Props
 
 #### DatePicker
 
-Trigger button that opens a single-date calendar popover.
-
 <ApiPropsList>
 
-<ApiProp name="value" fullType="Date" simpleType="object">
-  The selected date. Pair with `onSelect` for controlled use.
+<ApiProp name="value" fullType="Date | null" simpleType="object">
+  The selected date, or `null` for none. Pair with `onValueChange` for
+  controlled use.
 </ApiProp>
 
 <ApiProp
-  name="onSelect"
-  fullType="(date: Date | undefined) => void"
-  simpleType="function"
+  name="defaultValue"
+  fullType="Date | null"
+  defaultValue="null"
+  simpleType="object"
 >
-  Callback fired when a date is picked.
+  The starting date when uncontrolled.
 </ApiProp>
 
-<ApiProp name="placeholder" fullType="string" defaultValue='"Select a date"'>
+<ApiProp
+  name="onValueChange"
+  fullType="(value: Date | null) => void"
+  simpleType="function"
+>
+  Fires when a date is picked or cleared.
+</ApiProp>
+
+<ApiProp name="open" fullType="boolean">
+  Whether the popover is open. Pair with `onOpenChange`, or use `defaultOpen`.
+</ApiProp>
+
+<ApiProp name="defaultOpen" fullType="boolean" defaultValue="false">
+  Whether the popover starts open when uncontrolled.
+</ApiProp>
+
+<ApiProp
+  name="onOpenChange"
+  fullType="(open: boolean) => void"
+  simpleType="function"
+>
+  Fires when the popover opens or closes.
+</ApiProp>
+
+<ApiProp name="placeholder" fullType="string" defaultValue='"Pick a date"'>
   Text shown on the trigger when no date is selected.
 </ApiProp>
 
-<ApiProp name="format" fullType="string" defaultValue='"DD MMMM YYYY"'>
-  Day.js format string for the displayed date.
+<ApiProp name="format" fullType="(date: Date) => string" simpleType="function">
+  Writes the date on the trigger. Defaults to the locale's medium date, such as
+  "Oct 1, 2026".
+</ApiProp>
+
+<ApiProp name="editable" fullType="boolean" defaultValue="false">
+  Makes the field a text input that reads typed dates, with the calendar on a
+  button beside it. Rest props go to the input instead of the trigger.
+</ApiProp>
+
+<ApiProp name="clearable" fullType="boolean" defaultValue="false">
+  Shows a button that clears the date.
+</ApiProp>
+
+<ApiProp name="minDate" fullType="Date">
+  Earliest selectable date. Also stops navigation before its month.
+</ApiProp>
+
+<ApiProp name="maxDate" fullType="Date">
+  Latest selectable date. Also stops navigation after its month.
+</ApiProp>
+
+<ApiProp name="disabledDates" fullType="Matcher | Matcher[]">
+  Extra dates to block, as DayPicker matchers.
+</ApiProp>
+
+<ApiProp
+  name="presets"
+  fullType="{ label: string; value: Date | (() => Date) }[]"
+  simpleType="array"
+>
+  One-click shortcuts shown beside the calendar. Picking one commits it and
+  closes the popover.
+</ApiProp>
+
+<ApiProp name="name" fullType="string">
+  Submits the date as `YYYY-MM-DD` under this name in a form.
+</ApiProp>
+
+<ApiProp
+  name="variant"
+  fullType='"default" | "elevated"'
+  defaultValue='"default"'
+>
+  Trigger background. Use `elevated` inside cards and dialogs, matching `Input`.
+</ApiProp>
+
+<ApiProp name="size" fullType='"default" | "sm"' defaultValue='"default"'>
+  Trigger height, matching `Input`.
 </ApiProp>
 
 <ApiProp name="disabled" fullType="boolean" defaultValue="false">
   Prevents the popover from opening.
 </ApiProp>
 
+<ApiProp name="calendarProps" fullType="Partial<PropsBase>" simpleType="object">
+  Passed to the calendar: `locale`, `weekStartsOn`, `showWeekNumber`, and other
+  DayPicker props.
+</ApiProp>
+
+<ApiProp name="labels" fullType="Partial<DatePickerLabels>" simpleType="object">
+  Overrides for the picker's own text, merged over English defaults:
+  `chooseDate`, `clear`, `presets`, `invalid`, and `unavailable`. Use it to
+  reword or translate.
+</ApiProp>
+
 <ApiProp name="className" fullType="string">
-  Classes applied to the trigger button. Use a width utility to size it.
+  Classes for the root element. Use a width utility to size the field.
 </ApiProp>
 
 </ApiPropsList>

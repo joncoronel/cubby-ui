@@ -4,7 +4,11 @@ description: Floating content that appears relative to a trigger element
 type: primitive
 ---
 
-import { Popover, PopoverContent, PopoverTrigger } from "@/registry/default/popover/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/registry/default/popover/popover";
 
 A popover floats rich, interactive content next to a trigger. Use it for notification panels, quick forms, or detail cards; for a plain hover label, use [`Tooltip`](/docs/components/tooltip), and for picking from a list bound to a form field, use [`Select`](/docs/components/select).
 
@@ -100,9 +104,7 @@ users.map((user) => (
 
 // One shared popover that renders based on the active trigger:
 <Popover handle={handle}>
-  <PopoverContent>
-    {({ payload: user }) => <p>{user?.name}</p>}
-  </PopoverContent>
+  <PopoverContent>{({ payload: user }) => <p>{user?.name}</p>}</PopoverContent>
 </Popover>;
 ```
 
@@ -116,12 +118,31 @@ Composed component for common popover layouts. Combines `Popover.Portal`, `Popov
 
 <ApiPropsList>
 
+<ApiProp name="arrow" fullType="boolean" defaultValue="false">
+  Show or hide the popover arrow pointing to the trigger. Custom prop not
+  available in Base UI.
+</ApiProp>
+
 <ApiProp
-  name="arrow"
-  fullType="boolean"
-  defaultValue="false"
+  name="anchor"
+  fullType="Element | RefObject<Element | null> | VirtualElement | (() => Element | VirtualElement | null) | null"
+  simpleType="element"
 >
-  Show or hide the popover arrow pointing to the trigger. Custom prop not available in Base UI.
+  Positions the popover against this element instead of the trigger, such as a
+  whole field whose trigger is a button inside it. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp name="viewportClassName" fullType="string">
+  Classes for the inner viewport, which holds the content's padding (`px-3 py-3`
+  by default). Use it to change that padding, such as when the content has its
+  own frame. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="followContentWidth" fullType="boolean" defaultValue="false">
+  Keeps the popover placed when its content changes width while open, such as a
+  calendar dropping from two months to one as the window narrows. The popup
+  sizes to its content instead of filling the positioner. Custom prop not
+  available in Base UI.
 </ApiProp>
 
 <ApiProp
@@ -140,19 +161,12 @@ Composed component for common popover layouts. Combines `Popover.Portal`, `Popov
   How to align the popover relative to the trigger. Flattened from Positioner.
 </ApiProp>
 
-<ApiProp
-  name="sideOffset"
-  fullType="number"
-  defaultValue="8"
->
-  Distance in pixels between trigger and popover. Flattened from Positioner. Base UI defaults to `0`.
+<ApiProp name="sideOffset" fullType="number" defaultValue="8">
+  Distance in pixels between trigger and popover. Flattened from Positioner.
+  Base UI defaults to `0`.
 </ApiProp>
 
-<ApiProp
-  name="alignOffset"
-  fullType="number"
-  defaultValue="0"
->
+<ApiProp name="alignOffset" fullType="number" defaultValue="0">
   Offset along the alignment axis. Flattened from Positioner.
 </ApiProp>
 
@@ -168,15 +182,13 @@ Composed component for common popover layouts. Combines `Popover.Portal`, `Popov
   fullType="number | Partial<Record<Side, number>>"
   defaultValue="10"
 >
-  Padding from collision boundary. Flattened from Positioner. Base UI defaults to `5`.
+  Padding from collision boundary. Flattened from Positioner. Base UI defaults
+  to `5`.
 </ApiProp>
 
-<ApiProp
-  name="sticky"
-  fullType="boolean"
-  defaultValue="false"
->
-  Whether to keep the popover visible in the viewport after the trigger has scrolled out of view. Flattened from Positioner.
+<ApiProp name="sticky" fullType="boolean" defaultValue="false">
+  Whether to keep the popover visible in the viewport after the trigger has
+  scrolled out of view. Flattened from Positioner.
 </ApiProp>
 
 <ApiProp
@@ -187,26 +199,19 @@ Composed component for common popover layouts. Combines `Popover.Portal`, `Popov
   CSS position method. Flattened from Positioner.
 </ApiProp>
 
-<ApiProp
-  name="arrowPadding"
-  fullType="number"
->
-  Minimum padding between arrow and popover edges. Flattened from Positioner. Base UI defaults to `5`.
+<ApiProp name="arrowPadding" fullType="number">
+  Minimum padding between arrow and popover edges. Flattened from Positioner.
+  Base UI defaults to `5`.
 </ApiProp>
 
-<ApiProp
-  name="container"
-  fullType="HTMLElement | undefined"
->
+<ApiProp name="container" fullType="HTMLElement | undefined">
   Portal container element. Flattened from Portal.
 </ApiProp>
 
-<ApiProp
-  name="level"
-  fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8"
-  defaultValue="3"
->
-  Surface elevation level. See the [Surfaces](/docs/getting-started/surfaces) docs. Bump higher when this popover lives inside an already-elevated parent (e.g., `level={7}` when nested inside a Dialog).
+<ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
+  Surface elevation level. See the [Surfaces](/docs/getting-started/surfaces)
+  docs. Bump higher when this popover lives inside an already-elevated parent
+  (e.g., `level={7}` when nested inside a Dialog).
 </ApiProp>
 
 <ApiProp
@@ -214,7 +219,8 @@ Composed component for common popover layouts. Combines `Popover.Portal`, `Popov
   fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8"
   defaultValue="3"
 >
-  Shadow weight. Controls drop-shadow intensity independently of substrate color.
+  Shadow weight. Controls drop-shadow intensity independently of substrate
+  color.
 </ApiProp>
 
 </ApiPropsList>

@@ -1,0 +1,447 @@
+/* -------------------------------------------------------------------------------------------------
+ * Tokens
+ *
+ * Bands are mixed into the card colour rather than made translucent, so a fill
+ * over a band covers it instead of stacking darker. Keep --calendar-surface in
+ * step with the card's background in calendar.tsx.
+ * -------------------------------------------------------------------------------------------------*/
+
+[data-slot="calendar"] {
+  --calendar-surface: var(--surface-3);
+  --calendar-band: color-mix(
+    in oklab,
+    var(--color-primary) 18%,
+    var(--calendar-surface)
+  );
+  --calendar-band-preview: color-mix(
+    in oklab,
+    var(--color-primary) 7%,
+    var(--calendar-surface)
+  );
+  --calendar-radius: var(--radius-lg, 0.625rem);
+  --calendar-ease: cubic-bezier(0.19, 1, 0.22, 1);
+  --calendar-duration: 260ms;
+  --calendar-picker-duration: 200ms;
+  /* Zeroed under reduced motion, leaving plain crossfades. */
+  --calendar-shift: 1.25rem;
+  --calendar-blur: 2px;
+  --calendar-zoom: 0.06;
+  /* Which way "later" runs, for the half bands at a range's ends. */
+  --calendar-toward-end: to right;
+  --calendar-toward-start: to left;
+}
+
+.dark [data-slot="calendar"] {
+  --calendar-band: color-mix(
+    in oklab,
+    var(--color-primary) 28%,
+    var(--calendar-surface)
+  );
+  --calendar-band-preview: color-mix(
+    in oklab,
+    var(--color-primary) 11%,
+    var(--calendar-surface)
+  );
+}
+
+[data-slot="calendar"]:dir(rtl) {
+  --calendar-shift: -1.25rem;
+  --calendar-toward-end: to left;
+  --calendar-toward-start: to right;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-slot="calendar"],
+  [data-slot="calendar"]:dir(rtl) {
+    --calendar-shift: 0px;
+    --calendar-blur: 0px;
+    --calendar-zoom: 0;
+  }
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Range band
+ *
+ * Drawn on the cells so it runs unbroken across a week, as a background image
+ * so a landing range can wipe it in by animating its size. `td:first-of-type`
+ * skips the week-number header.
+ * -------------------------------------------------------------------------------------------------*/
+
+[data-slot="calendar-day"] {
+  background-image: var(--calendar-paint, none);
+  background-repeat: no-repeat;
+}
+
+[data-slot="calendar-day"][data-in-range] {
+  --calendar-paint: linear-gradient(var(--calendar-band), var(--calendar-band));
+  --calendar-paint-preview: linear-gradient(
+    var(--calendar-band-preview),
+    var(--calendar-band-preview)
+  );
+}
+
+[data-slot="calendar-day"][data-range-start]:not([data-range-end]),
+[data-slot="calendar-day"][data-preview-start] {
+  --calendar-paint: linear-gradient(
+    var(--calendar-toward-end),
+    transparent 50%,
+    var(--calendar-band) 50%
+  );
+  --calendar-paint-preview: linear-gradient(
+    var(--calendar-toward-end),
+    transparent 50%,
+    var(--calendar-band-preview) 50%
+  );
+}
+
+[data-slot="calendar-day"][data-range-end]:not([data-range-start]),
+[data-slot="calendar-day"][data-preview-end] {
+  --calendar-paint: linear-gradient(
+    var(--calendar-toward-start),
+    transparent 50%,
+    var(--calendar-band) 50%
+  );
+  --calendar-paint-preview: linear-gradient(
+    var(--calendar-toward-start),
+    transparent 50%,
+    var(--calendar-band-preview) 50%
+  );
+}
+
+/* While previewing, the shape is the same but only the light tint shows. */
+[data-slot="calendar-day"]:is(
+  [data-preview-start],
+  [data-preview-middle],
+  [data-preview-end]
+) {
+  background-image: var(--calendar-paint-preview, none);
+}
+
+[data-slot="calendar-day"][data-preview-middle] {
+  --calendar-paint-preview: linear-gradient(
+    var(--calendar-band-preview),
+    var(--calendar-band-preview)
+  );
+}
+
+[data-slot="calendar-day"]:is([data-in-range], [data-preview-middle]):is(
+    td:first-of-type,
+    td[data-hidden] + td
+  ) {
+  border-start-start-radius: var(--calendar-radius);
+  border-end-start-radius: var(--calendar-radius);
+}
+
+[data-slot="calendar-day"]:is([data-in-range], [data-preview-middle]):is(
+    td:last-of-type,
+    td:has(+ td[data-hidden])
+  ) {
+  border-start-end-radius: var(--calendar-radius);
+  border-end-end-radius: var(--calendar-radius);
+}
+
+/* An end with no visible inward neighbour has nothing to reach toward. */
+[data-slot="calendar-day"]:is([data-range-start], [data-preview-start]):is(
+    td:last-of-type,
+    td:has(+ td[data-hidden])
+  ),
+[data-slot="calendar-day"]:is([data-range-end], [data-preview-end]):is(
+    td:first-of-type,
+    td[data-hidden] + td
+  ) {
+  --calendar-paint: none;
+  --calendar-paint-preview: none;
+}
+
+/* The preview's far end. Its fill covers the half band, which would otherwise
+ * split the day into two tones inside the ring. */
+[data-slot="calendar-day"][data-preview-target] > button {
+  background-color: var(--calendar-band-preview);
+  box-shadow: inset 0 0 0 1.5px
+    color-mix(in oklab, var(--color-primary) 60%, transparent);
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Landing a range
+ *
+ * One wipe from the start day toward the clicked end. Each cell gets its own
+ * delay and duration from calendar.tsx so the wipe's head follows a single
+ * ease-out curve across cells.
+ * -------------------------------------------------------------------------------------------------*/
+
+[data-slot="calendar"][data-range-landing]
+  [data-slot="calendar-day"][data-sweep] {
+  background-image:
+    var(--calendar-paint, none), var(--calendar-paint-preview, none);
+  background-position: var(--calendar-wipe-from, left) center;
+  animation: calendar-band-wipe var(--calendar-wipe-duration) linear
+    var(--calendar-wipe-delay) backwards;
+}
+
+[data-slot="calendar"][data-range-landing="forward"] {
+  --calendar-wipe-from: left;
+}
+
+[data-slot="calendar"][data-range-landing="backward"],
+[data-slot="calendar"][data-range-landing="forward"]:dir(rtl) {
+  --calendar-wipe-from: right;
+}
+
+[data-slot="calendar"][data-range-landing="backward"]:dir(rtl) {
+  --calendar-wipe-from: left;
+}
+
+[data-slot="calendar"][data-range-landing]
+  [data-slot="calendar-day"][data-landing-target]
+  > button {
+  animation: calendar-cap-land 320ms var(--calendar-ease);
+}
+
+@keyframes calendar-band-wipe {
+  from {
+    background-size:
+      0% 100%,
+      100% 100%;
+  }
+  to {
+    background-size:
+      100% 100%,
+      100% 100%;
+  }
+}
+
+@keyframes calendar-cap-land {
+  from {
+    scale: 0.82;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-slot="calendar"][data-range-landing] [data-slot="calendar-day"],
+  [data-slot="calendar"][data-range-landing]
+    [data-slot="calendar-day"]
+    > button {
+    animation: none;
+  }
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Sliding selection (single mode), in CSS anchor positioning.
+ *
+ * One shared fill is anchored to the selected day so it slides between days.
+ * Outside days with several months shown, and the aria-hidden outgoing month,
+ * keep their own fill since the same date can appear twice. Without anchor
+ * positioning, each day draws its own fill.
+ * -------------------------------------------------------------------------------------------------*/
+
+.calendar-selection {
+  display: none;
+}
+
+/* All anchor features or none: a partial implementation would leave the fill
+ * unsized or tied to another calendar. */
+@supports (anchor-name: --calendar-selection) and
+  (anchor-scope: --calendar-selection) and (width: anchor-size(width)) {
+  [data-slot="calendar"] {
+    anchor-scope: --calendar-selection;
+  }
+
+  [data-slot="calendar"][data-mode="single"]
+    [data-slot="calendar-day"][data-filled]:not(
+      [data-multiple-months] [data-outside],
+      [aria-hidden="true"] *
+    )
+    > button {
+    anchor-name: --calendar-selection;
+    background-color: transparent;
+  }
+
+  .calendar-selection {
+    display: block;
+    position: absolute;
+    position-anchor: --calendar-selection;
+    top: anchor(top);
+    left: anchor(left);
+    width: anchor-size(width);
+    height: anchor-size(height);
+    z-index: -1;
+    border-radius: var(--calendar-radius);
+    background: var(--color-primary);
+    pointer-events: none;
+    transition:
+      top var(--calendar-duration) var(--calendar-ease),
+      left var(--calendar-duration) var(--calendar-ease),
+      opacity 150ms ease-out,
+      scale var(--calendar-duration) var(--calendar-ease);
+  }
+
+  /* On a click it settles in; arriving with a new month it takes the weeks'
+   * entrance instead (data-enter is the direction, or "instant"). */
+  .calendar-selection:not([data-enter]) {
+    @starting-style {
+      opacity: 0;
+      scale: 0.9;
+    }
+  }
+
+  .calendar-selection:is([data-enter="start"], [data-enter="end"]) {
+    animation: calendar-enter var(--calendar-enter-duration)
+      var(--calendar-ease) var(--calendar-enter-delay) both;
+  }
+
+  .calendar-selection[data-enter="end"] {
+    --calendar-from: var(--calendar-shift);
+  }
+
+  .calendar-selection[data-enter="start"] {
+    --calendar-from: calc(var(--calendar-shift) * -1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .calendar-selection {
+      transition: opacity 150ms ease-out;
+    }
+  }
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Month changes
+ *
+ * Outgoing and incoming weeks are sequenced, not crossfaded, so two
+ * half-transparent sets of numbers never overlap. DayPicker only finishes the
+ * transition when the outgoing caption's animation ends, so that caption runs
+ * an invisible hold as long as the incoming weeks take.
+ * -------------------------------------------------------------------------------------------------*/
+
+[data-slot="calendar"] {
+  --calendar-exit-duration: 150ms;
+  --calendar-enter-delay: 40ms;
+  --calendar-enter-duration: 280ms;
+}
+
+/* Unclipped so the card's shadow and rim aren't cut off. */
+[data-slot="calendar"] [data-animated-month]:not([aria-hidden="true"]) {
+  overflow: visible !important;
+}
+
+/* Sizes the outgoing clone to the live month, so DayPicker's overflow: hidden
+ * clips an extra week instead of letting it hang below a shrunk calendar. */
+[data-slot="calendar"] [data-animated-month][aria-hidden="true"] {
+  inset: 0;
+}
+
+/* Stacked (below sm), the clone's header strip would cover the live chevron. */
+[data-slot="calendar"] [data-animated-month][aria-hidden="true"]::before {
+  content: none;
+}
+
+/* So the clone's card can't cover the incoming weekday row. */
+[data-slot="calendar"]
+  [data-animated-month][aria-hidden="true"]
+  [data-slot="calendar-grid"] {
+  background: none;
+  box-shadow: none;
+}
+
+.calendar-enter-from-start,
+.calendar-enter-from-end {
+  animation: calendar-enter var(--calendar-enter-duration) var(--calendar-ease)
+    var(--calendar-enter-delay) both;
+}
+
+.calendar-exit-to-start,
+.calendar-exit-to-end {
+  animation: calendar-exit var(--calendar-exit-duration) ease-out both;
+}
+
+.calendar-enter-from-start {
+  --calendar-from: calc(var(--calendar-shift) * -1);
+}
+
+.calendar-enter-from-end {
+  --calendar-from: var(--calendar-shift);
+}
+
+.calendar-exit-to-start {
+  --calendar-to: calc(var(--calendar-shift) * -1);
+}
+
+.calendar-exit-to-end {
+  --calendar-to: var(--calendar-shift);
+}
+
+.calendar-caption-hold {
+  visibility: hidden;
+  animation: calendar-hold
+    calc(var(--calendar-enter-delay) + var(--calendar-enter-duration)) linear
+    both;
+}
+
+@keyframes calendar-enter {
+  from {
+    opacity: 0;
+    translate: var(--calendar-from) 0;
+    filter: blur(var(--calendar-blur));
+  }
+}
+
+@keyframes calendar-exit {
+  to {
+    opacity: 0;
+    translate: var(--calendar-to) 0;
+    filter: blur(var(--calendar-blur));
+  }
+}
+
+@keyframes calendar-hold {
+  to {
+    opacity: 0;
+  }
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Month and year picker
+ *
+ * Transitions rather than animations, so a quick double click on the caption
+ * reverses mid-flight instead of restarting.
+ * -------------------------------------------------------------------------------------------------*/
+
+[data-slot="calendar-grid"],
+[data-slot="calendar-nav"] {
+  transition-property: opacity, scale, filter, visibility;
+  transition-duration: 150ms, var(--calendar-picker-duration), 150ms, 0s;
+  transition-timing-function: ease-out, var(--calendar-ease), ease-out, linear;
+}
+
+[data-slot="calendar-grid"][data-covered] {
+  opacity: 0;
+  scale: calc(1 - var(--calendar-zoom) / 3);
+  filter: blur(var(--calendar-blur));
+}
+
+[data-slot="calendar"][data-picker-open] [data-slot="calendar-nav"] {
+  opacity: 0;
+  visibility: hidden;
+  transition-delay: 0s, 0s, 0s, 150ms;
+}
+
+[data-slot="calendar"][data-picker-open] .calendar-selection {
+  opacity: 0;
+}
+
+[data-slot="calendar-picker"] {
+  transition:
+    opacity 150ms ease-out,
+    scale var(--calendar-picker-duration) var(--calendar-ease),
+    filter 150ms ease-out,
+    visibility 0s linear 0s;
+}
+
+[data-slot="calendar-picker"][data-state="closed"] {
+  opacity: 0;
+  scale: calc(1 - var(--calendar-zoom) / 3);
+  filter: blur(var(--calendar-blur));
+  visibility: hidden;
+  pointer-events: none;
+  transition-delay: 0s, 0s, 0s, var(--calendar-picker-duration);
+}

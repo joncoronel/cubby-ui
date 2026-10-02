@@ -1,10 +1,10 @@
 "use client";
 
-import { Calendar } from "@/registry/default/calendar/calendar";
 import { useState } from "react";
+import { Calendar } from "@/registry/default/calendar/calendar";
 
 export default function CalendarWithFooter() {
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date | undefined>();
 
   return (
     <Calendar
@@ -12,9 +12,9 @@ export default function CalendarWithFooter() {
       selected={date}
       onSelect={setDate}
       footer={
-        <p className="text-muted-foreground mt-1 text-center text-sm">
-          Pick a date for your appointment
-        </p>
+        date
+          ? `Appointment on ${date.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}`
+          : "Pick a day for your appointment."
       }
     />
   );

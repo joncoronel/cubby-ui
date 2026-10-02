@@ -1,17 +1,21 @@
 "use client";
 
-import { Calendar } from "@/registry/default/calendar/calendar";
 import { useState } from "react";
+import { Calendar } from "@/registry/default/calendar/calendar";
 
 export default function CalendarSingleDateSelection() {
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date | undefined>();
 
   return (
-    <div className="space-y-3">
-      <Calendar mode="single" selected={date} onSelect={setDate} />
-      <p className="text-muted-foreground text-center text-sm">
-        Selected date: {date?.toDateString()}
-      </p>
-    </div>
+    <Calendar
+      mode="single"
+      selected={date}
+      onSelect={setDate}
+      footer={
+        date
+          ? `Selected ${date.toLocaleDateString(undefined, { dateStyle: "long" })}`
+          : "Pick a day."
+      }
+    />
   );
 }

@@ -1,12 +1,14 @@
 ---
 title: Calendar
-description: Interactive date picker with support for single dates, ranges, and multiple selections
+description: A month grid for picking one date, several dates, or a range
 type: composable
 ---
 
 import { Calendar } from "@/registry/default/calendar/calendar";
 
-The calendar displays a month grid for picking a single date, a range, or several dates. Use it inline for date entry or inside a popover for a date-picker field. It is built on React DayPicker, so all of its props pass through.
+The calendar is a month grid for picking one date, a range, or several dates. Use it inline, or build it into your own popover; for a ready-made field, use [`DatePicker`](/docs/components/date-picker) or [`DateRangePicker`](/docs/components/date-range-picker).
+
+It wraps React DayPicker and passes all of its props through. On top of DayPicker, the caption opens a month and year picker, a range previews while you pick its end, a single selection slides between days, and month changes animate in the direction you travel.
 
 ## Preview
 
@@ -22,47 +24,70 @@ The calendar displays a month grid for picking a single date, a range, or severa
 
 ## Examples
 
-The `mode` prop sets what a click selects.
+Use `mode` to set what a click selects.
 
-| Value      | Description                          |
-| ---------- | ------------------------------------ |
-| `single`   | One date at a time.                  |
-| `range`    | A start and end date.                |
-| `multiple` | Any number of individual dates.      |
+| Value      | Description                     |
+| ---------- | ------------------------------- |
+| `single`   | One date at a time.             |
+| `range`    | A start and end date.           |
+| `multiple` | Any number of individual dates. |
 
 ### Single Date Selection
 
-Use `mode="single"` to pick one date.
+Use `mode="single"` to pick one date. Screen readers announce the `footer` when it changes.
 
-<ComponentPreview component="calendar" example="calendar-single-date-selection" />
+<ComponentPreview
+  component="calendar"
+  example="calendar-single-date-selection"
+/>
 
 ### Date Range Selection
 
-Use `mode="range"` to pick a start and end date.
+Use `mode="range"` to pick a start and end date. After the first click, the band follows the pointer or keyboard focus until you pick the end, then draws in from the start. Clicking after a complete range starts a new one.
 
-<ComponentPreview component="calendar" example="calendar-date-range-selection" />
+<ComponentPreview
+  component="calendar"
+  example="calendar-date-range-selection"
+/>
 
 ### Multiple Dates Selection
 
 Use `mode="multiple"` to pick several individual dates.
 
-<ComponentPreview component="calendar" example="calendar-multiple-dates-selection" />
+<ComponentPreview
+  component="calendar"
+  example="calendar-multiple-dates-selection"
+/>
+
+### Month and Year
+
+Click the caption to jump to a far-off month, such as a birthday decades back. The picker covers the days with a scrolling year column beside that year's months. Picking a year changes the months shown; picking a month navigates there and closes the picker. Click the caption again or press `Escape` to close it without a change. `startMonth` and `endMonth` bound the picker as well as the arrows.
+
+<ComponentPreview component="calendar" example="calendar-month-and-year" />
 
 ### Disabled Dates
 
-Use the `disabled` prop to block specific dates from selection.
+Use `disabled` to block dates. It takes any DayPicker matcher: a date, an array, a `{ before }` or `{ after }` bound, a `{ dayOfWeek }` list, or a function. Disabled days are struck through.
 
 <ComponentPreview component="calendar" example="calendar-disabled-dates" />
 
 ### With Footer
 
-Pass a `footer` to render content below the grid.
+Use `footer` to render content below the grid.
 
 <ComponentPreview component="calendar" example="calendar-with-footer" />
 
+## Accessibility
+
+The grid follows DayPicker's keyboard model: arrow keys move between days, `PageUp` and `PageDown` change months (add `Shift` for years), `Home` and `End` jump to the start or end of the week, and `Enter` or `Space` selects.
+
+The caption is a toggle (`aria-expanded`) for the month and year picker. Opening it moves focus to the current month; `Shift+Tab` reaches the year column, where the arrow keys, `PageUp`/`PageDown` (ten years), `Home`, and `End` change the year as they move. In the months, arrow keys move between cells and `PageUp`/`PageDown` change the year. `Escape` closes the picker and returns focus to the caption without closing a surrounding popover; picking a month moves focus back to the days.
+
+Today is marked with a dot as well as a heavier weight, and disabled days are struck through, so neither relies on color alone. Under `prefers-reduced-motion`, the transitions become plain crossfades.
+
 ## API Reference
 
-The Calendar is built on top of [react-day-picker's DayPicker](https://daypicker.dev/). All DayPicker props are supported and pass through. The documentation below covers the key props and the styling hooks specific to our implementation.
+Calendar wraps [react-day-picker's DayPicker](https://daypicker.dev/) and passes every DayPicker prop through. This section covers the key props and the defaults this implementation changes.
 
 For the complete API, see the [react-day-picker documentation](https://daypicker.dev/api/functions/DayPicker).
 
@@ -70,7 +95,7 @@ For the complete API, see the [react-day-picker documentation](https://daypicker
 
 #### Calendar
 
-Month grid for selecting dates. Wraps DayPicker, forwarding all props to it.
+Month grid for selecting dates.
 
 <ApiPropsList>
 
@@ -79,11 +104,14 @@ Month grid for selecting dates. Wraps DayPicker, forwarding all props to it.
   fullType='"single" | "multiple" | "range"'
   simpleType="string"
 >
-  Selection behavior. `"single"` picks one date, `"range"` picks a start and end, `"multiple"` picks any number of individual dates. Pair with `selected` and `onSelect`.
+  Selection behavior. `"single"` picks one date, `"range"` picks a start and
+  end, `"multiple"` picks any number of individual dates. Pair with `selected`
+  and `onSelect`.
 </ApiProp>
 
 <ApiProp name="selected" fullType="Date | Date[] | DateRange | undefined">
-  The currently selected date(s). Shape depends on `mode`.
+  The currently selected date(s). Shape depends on `mode`. The calendar opens on
+  the month of the first selected date.
 </ApiProp>
 
 <ApiProp
@@ -91,19 +119,83 @@ Month grid for selecting dates. Wraps DayPicker, forwarding all props to it.
   fullType="(selected, triggerDate, modifiers, e) => void"
   simpleType="function"
 >
-  Callback fired when the selection changes.
+  Fires when the selection changes.
+</ApiProp>
+
+<ApiProp name="framed" fullType="boolean" defaultValue="true">
+  Draws the card behind the calendar. Turn it off inside a container that is
+  already a card; the date pickers do this so their popover is the card.
+</ApiProp>
+
+<ApiProp name="month" fullType="Date">
+  The displayed month, for controlled navigation. Pair with `onMonthChange`, or
+  use `defaultMonth` to set only the starting month.
 </ApiProp>
 
 <ApiProp name="disabled" fullType="Matcher | Matcher[]">
-  Dates to disable. Accepts a `Date`, an array, a range, a day-of-week matcher, or a predicate function.
+  Dates to disable. Accepts a `Date`, an array, a range, a day-of-week matcher,
+  or a predicate function.
+</ApiProp>
+
+<ApiProp name="startMonth" fullType="Date">
+  The earliest month that can be shown. Also bounds the month and year picker.
+  Days before it that fill out that month's first week show as unavailable.
+</ApiProp>
+
+<ApiProp name="endMonth" fullType="Date">
+  The latest month that can be shown. Also bounds the month and year picker.
+  Days after it that fill out that month's last week show as unavailable.
+</ApiProp>
+
+<ApiProp name="numberOfMonths" fullType="number" defaultValue="1">
+  Months shown side by side. They stack below the `sm` breakpoint.
+</ApiProp>
+
+<ApiProp
+  name="captionLayout"
+  fullType='"label" | "dropdown" | "dropdown-months" | "dropdown-years"'
+  simpleType="string"
+>
+  Leave unset for the clickable caption that opens the month and year picker.
+  `"label"` shows a static caption; the dropdown values use DayPicker's native
+  selects.
+</ApiProp>
+
+<ApiProp name="showOutsideDays" fullType="boolean">
+  Renders days from adjacent months to fill the grid. Defaults to `true` for one
+  month and `false` for several, where they would repeat the neighboring month.
+</ApiProp>
+
+<ApiProp name="fixedWeeks" fullType="boolean">
+  Renders six weeks in every month, so the calendar keeps its height (and a
+  popover keeps its position) as you change months. Defaults to `true` for one
+  month and `false` for several, where the hidden outside days would leave blank
+  rows.
+</ApiProp>
+
+<ApiProp name="animate" fullType="boolean" defaultValue="true">
+  Animates month changes. Skipped while a day has keyboard focus, so arrowing
+  across months stays instant.
+</ApiProp>
+
+<ApiProp name="resetOnSelect" fullType="boolean" defaultValue="true">
+  Range mode only. Clicking after a complete range starts a new one instead of
+  adjusting the old one.
+</ApiProp>
+
+<ApiProp
+  name="labels"
+  fullType="Partial<Labels> & Partial<CalendarLabels>"
+  simpleType="object"
+>
+  Screen-reader text. Takes DayPicker's own labels, plus the calendar's:
+  `labelCaptionTrigger(caption)` for the caption button, `labelMonthYearPicker`
+  for the picker panel, and `labelYears` for its year column. In the date
+  pickers, pass these through `calendarProps.labels`.
 </ApiProp>
 
 <ApiProp name="footer" fullType="ReactNode" simpleType="node">
-  Content rendered below the month grid.
-</ApiProp>
-
-<ApiProp name="showOutsideDays" fullType="boolean" defaultValue="true">
-  Renders days from adjacent months to fill the grid. Set internally; DayPicker defaults to `false`.
+  Content rendered below the month grid, in a polite live region.
 </ApiProp>
 
 <ApiProp
@@ -111,7 +203,39 @@ Month grid for selecting dates. Wraps DayPicker, forwarding all props to it.
   fullType="Partial<Record<UI | DayFlag | SelectionState | Animation, string>>"
   simpleType="object"
 >
-  Class overrides for individual DayPicker elements, merged with the default styling. Keys include `root`, `month_grid`, `day`, `day_button`, `selected`, `range_start`, and others.
+  Class overrides for individual DayPicker elements, merged with the default
+  styling. Keys include `root`, `month_grid`, `day`, `day_button`, and others.
 </ApiProp>
 
 </ApiPropsList>
+
+#### CalendarPresets
+
+A rail of one-click shortcuts beside a calendar. It stacks vertically from the `sm` breakpoint up; below it, it becomes a scrolling row that fades at whichever end has more to scroll. It renders a scroll area around a `div` with `role="group"`: `className` goes on the scroll area, and other props such as `aria-label` go on the group.
+
+#### CalendarPreset
+
+One shortcut button inside `CalendarPresets`.
+
+<ApiPropsList>
+
+<ApiProp name="active" fullType="boolean" defaultValue="false">
+  Marks the preset that matches the current selection. Sets `aria-pressed` and
+  `data-active`.
+</ApiProp>
+
+</ApiPropsList>
+
+### Styling
+
+Each day cell exposes its state as data attributes you can target in style overrides.
+
+| Attribute                                     | Set on                                       |
+| --------------------------------------------- | -------------------------------------------- |
+| `data-filled`                                 | A selected day, or either end of a range.    |
+| `data-in-range`                               | Days strictly inside a range.                |
+| `data-range-start`, `data-range-end`          | The two ends of a range.                     |
+| `data-preview-*`                              | The provisional range while picking its end. |
+| `data-today`, `data-outside`, `data-disabled` | DayPicker's own day flags.                   |
+
+The range band colors come from `--calendar-band` and `--calendar-band-preview`, set on `[data-slot="calendar"]` in `calendar.css`.

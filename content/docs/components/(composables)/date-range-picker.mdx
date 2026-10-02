@@ -1,19 +1,22 @@
 ---
 title: Date Range Picker
-description: Select start and end dates with an interactive calendar popup
+description: A date field that opens a calendar for picking a start and end date
 type: composable
 builtOn: ["calendar", "popover"]
 ---
 
 import { DateRangePicker } from "@/registry/default/date-range-picker/date-range-picker";
 
-The date range picker is a trigger button that opens a calendar popover for selecting a start and end date with a live hover preview. Use it for report ranges, booking windows, and date filters.
+The date range picker is a field that opens a calendar popover for choosing a start and end date. Use it for report ranges, booking windows, and date filters.
 
 To select a single date, use [`DatePicker`](/docs/components/date-picker) instead.
 
 ## Preview
 
-<ComponentPreview component="date-range-picker" example="date-range-picker-basic" />
+<ComponentPreview
+  component="date-range-picker"
+  example="date-range-picker-basic"
+/>
 
 ## Installation
 
@@ -25,80 +28,228 @@ To select a single date, use [`DatePicker`](/docs/components/date-picker) instea
 
 ## Examples
 
-### Multiple Months
+The value changes only after you pick both ends; closing the popover halfway keeps the previous range. A status line under the calendar shows the range and its length.
 
-Set `numberOfMonths` to show several months side by side for easier range selection.
+### Typing a Range
 
-<ComponentPreview component="date-range-picker" example="date-range-picker-multiple-months" />
+Use `editable` to make the field a text input. It reads two dates joined by a dash, "to", or "until" ("mar 3 – 12", "today to fri", "Dec 28 – Jan 4"), relative spans like "last 30 days" or "next 2 weeks", and a single date as a one-day range. A second date missing its month or year takes them from the first, so the field also parses its own output, "Oct 1 – 8, 2026". Before you commit, the hint shows the range and its length, or why it breaks `minNights`, `maxNights`, or a blocked date.
+
+<ComponentPreview
+  component="date-range-picker"
+  example="date-range-picker-editable"
+/>
+
+### Presets
+
+Use `presets` to add one-click ranges beside the calendar. Give each a function so ranges like "Last 7 days" resolve when the picker opens; the preset matching the current range is marked.
+
+<ComponentPreview
+  component="date-range-picker"
+  example="date-range-picker-presets"
+/>
+
+### Minimum and Maximum Length
+
+Use `minNights` and `maxNights` to limit the range's length, counted in nights between the ends, and `minDate` and `maxDate` to limit where it falls. For stays, set `labels.duration` to count nights instead of days in the status line.
+
+<ComponentPreview
+  component="date-range-picker"
+  example="date-range-picker-min-max-nights"
+/>
+
+### One Month
+
+Use `numberOfMonths` to fix the month count. By default the picker shows two months from the `sm` breakpoint up and one below it.
+
+<ComponentPreview
+  component="date-range-picker"
+  example="date-range-picker-one-month"
+/>
 
 ### With Custom Format
 
-Pass `format` to change how the selected range is displayed.
+Use `format` to control how the range is written. It takes `{ from, to }` and returns a string; the default is the locale's compact range, such as "Oct 3 – 12, 2026".
 
-<ComponentPreview component="date-range-picker" example="date-range-picker-with-format" />
+<ComponentPreview
+  component="date-range-picker"
+  example="date-range-picker-with-format"
+/>
 
 ### With Placeholder
 
-Set `placeholder` for the empty-state text on the trigger.
+Use `placeholder` to set the trigger's empty-state text.
 
-<ComponentPreview component="date-range-picker" example="date-range-picker-with-placeholder" />
+<ComponentPreview
+  component="date-range-picker"
+  example="date-range-picker-with-placeholder"
+/>
 
 ### Disabled State
 
-Set `disabled` to prevent opening the picker.
+Use `disabled` to stop the picker from opening.
 
-<ComponentPreview component="date-range-picker" example="date-range-picker-disabled-state" />
+<ComponentPreview
+  component="date-range-picker"
+  example="date-range-picker-disabled-state"
+/>
 
 ## Accessibility
 
-The trigger opens a calendar popover that traps focus while open. Inside the calendar, use the arrow keys to move between days, `PageUp` and `PageDown` to change months, and `Enter` or `Space` to set the start then the end of the range. Press `Escape` to close.
+The trigger is a button that opens the calendar in a popover and moves focus into it. Use the arrow keys to move between days and `Enter` or `Space` to set the start and then the end; the preview band follows keyboard focus as well as the pointer. The status line under the calendar is a polite live region, so screen readers announce each step ("pick an end date", then the finished range and its length). `Escape` closes the popover without a change.
 
 ## API Reference
 
-The DateRangePicker composes [`Calendar`](/docs/components/calendar) in `range` mode inside a [`Popover`](/docs/components/popover), with a [`Button`](/docs/components/button) trigger. It exposes its own props rather than forwarding to the underlying parts.
+DateRangePicker composes [`Calendar`](/docs/components/calendar) in `range` mode inside a [`Popover`](/docs/components/popover), with a trigger styled like an [`Input`](/docs/components/input). Props not listed below (`id`, `aria-*`, event handlers) go to the trigger button.
 
 ### Props
 
 #### DateRangePicker
 
-Trigger button that opens a range-selection calendar popover with hover preview.
-
 <ApiPropsList>
 
-<ApiProp name="value" fullType="DateRange" simpleType="object">
-  The selected range, a `{ from, to }` object. Pair with `onSelect` for controlled use.
+<ApiProp
+  name="value"
+  fullType="{ from: Date; to: Date } | null"
+  simpleType="object"
+>
+  The selected range, or `null` for none. Pair with `onValueChange` for
+  controlled use.
 </ApiProp>
 
 <ApiProp
-  name="onSelect"
-  fullType="(range: DateRange | undefined) => void"
-  simpleType="function"
+  name="defaultValue"
+  fullType="{ from: Date; to: Date } | null"
+  defaultValue="null"
+  simpleType="object"
 >
-  Callback fired once both ends of the range are chosen.
+  The starting range when uncontrolled.
 </ApiProp>
 
-<ApiProp name="placeholder" fullType="string" defaultValue='"Select date range"'>
+<ApiProp
+  name="onValueChange"
+  fullType="(value: { from: Date; to: Date } | null) => void"
+  simpleType="function"
+>
+  Fires once both ends are picked, or with `null` when cleared.
+</ApiProp>
+
+<ApiProp name="open" fullType="boolean">
+  Whether the popover is open. Pair with `onOpenChange`, or use `defaultOpen`.
+</ApiProp>
+
+<ApiProp name="defaultOpen" fullType="boolean" defaultValue="false">
+  Whether the popover starts open when uncontrolled.
+</ApiProp>
+
+<ApiProp
+  name="onOpenChange"
+  fullType="(open: boolean) => void"
+  simpleType="function"
+>
+  Fires when the popover opens or closes.
+</ApiProp>
+
+<ApiProp
+  name="placeholder"
+  fullType="string"
+  defaultValue='"Pick a date range"'
+>
   Text shown on the trigger when no range is selected.
 </ApiProp>
 
-<ApiProp name="format" fullType="string" defaultValue='"DD MMM YYYY"'>
-  Day.js format string for each date in the displayed range.
+<ApiProp
+  name="format"
+  fullType="(range: { from: Date; to: Date }) => string"
+  simpleType="function"
+>
+  Writes the range on the trigger and in the status line. Defaults to the
+  locale's compact range.
 </ApiProp>
 
-<ApiProp name="numberOfMonths" fullType="number" defaultValue="1">
-  Number of months shown side by side in the popover.
+<ApiProp name="editable" fullType="boolean" defaultValue="false">
+  Makes the field a text input that reads typed ranges, with the calendar on a
+  button beside it. Rest props go to the input instead of the trigger.
 </ApiProp>
 
-<ApiProp name="fixedWeeks" fullType="boolean" defaultValue="false">
-  Always renders six weeks per month so the grid height stays constant.
+<ApiProp name="clearable" fullType="boolean" defaultValue="false">
+  Shows a button that clears the range.
+</ApiProp>
+
+<ApiProp name="minDate" fullType="Date">
+  Earliest selectable date. Also stops navigation before its month.
+</ApiProp>
+
+<ApiProp name="maxDate" fullType="Date">
+  Latest selectable date. Also stops navigation after its month.
+</ApiProp>
+
+<ApiProp name="disabledDates" fullType="Matcher | Matcher[]">
+  Extra dates to block, as DayPicker matchers. A range can't span a blocked
+  date; picking across one restarts the range.
+</ApiProp>
+
+<ApiProp name="minNights" fullType="number">
+  Shortest allowed range, in nights between the ends.
+</ApiProp>
+
+<ApiProp name="maxNights" fullType="number">
+  Longest allowed range, in nights between the ends.
+</ApiProp>
+
+<ApiProp name="numberOfMonths" fullType="number">
+  Months shown side by side. Defaults to 2 from the `sm` breakpoint up, 1 below
+  it.
+</ApiProp>
+
+<ApiProp
+  name="presets"
+  fullType="{ label: string; value: DateRangeValue | (() => DateRangeValue) }[]"
+  simpleType="array"
+>
+  One-click ranges shown beside the calendar. Picking one commits it and closes
+  the popover.
+</ApiProp>
+
+<ApiProp name="name" fullType="string">
+  Submits the ends as `YYYY-MM-DD` under `${name}From` and `${name}To` in a
+  form.
+</ApiProp>
+
+<ApiProp
+  name="variant"
+  fullType='"default" | "elevated"'
+  defaultValue='"default"'
+>
+  Trigger background. Use `elevated` inside cards and dialogs, matching `Input`.
+</ApiProp>
+
+<ApiProp name="size" fullType='"default" | "sm"' defaultValue='"default"'>
+  Trigger height, matching `Input`.
 </ApiProp>
 
 <ApiProp name="disabled" fullType="boolean" defaultValue="false">
   Prevents the popover from opening.
 </ApiProp>
 
+<ApiProp name="calendarProps" fullType="Partial<PropsBase>" simpleType="object">
+  Passed to the calendar: `locale`, `weekStartsOn`, `showWeekNumber`, and other
+  DayPicker props.
+</ApiProp>
+
+<ApiProp
+  name="labels"
+  fullType="Partial<DateRangePickerLabels>"
+  simpleType="object"
+>
+  Overrides for the picker's own text, merged over English defaults. Strings:
+  `chooseDates`, `clear`, `presets`, `pickStart`, `invalid`, `unavailable`.
+  Functions: `pickEnd(start)`, `duration(days)`, `tooShort(minNights)`,
+  `tooLong(maxNights)`. `duration` counts both ends; return `days - 1` nights
+  for stays.
+</ApiProp>
+
 <ApiProp name="className" fullType="string">
-  Classes applied to the trigger button. Use a width utility to size it.
+  Classes for the root element. Use a width utility to size the field.
 </ApiProp>
 
 </ApiPropsList>

@@ -110,6 +110,27 @@ function PopoverDescription({
   );
 }
 
+/**
+ * Base UI sizes the positioner only on open or trigger change. Copying the
+ * popup's width onto it lets Floating UI re-place it. Height stays pinned:
+ * following it makes a popover near the bottom edge flip back and forth.
+ */
+function followPopupWidth(positioner: HTMLElement | null): (() => void) | void {
+  // The popup sits between Base UI's focus guards, so find it by slot.
+  const popup = positioner?.querySelector(
+    ':scope > [data-slot="popover-content"]',
+  );
+  if (!positioner || !(popup instanceof HTMLElement)) return;
+  const observer = new ResizeObserver(() => {
+    positioner.style.setProperty(
+      "--positioner-width",
+      `${popup.offsetWidth}px`,
+    );
+  });
+  observer.observe(popup);
+  return () => observer.disconnect();
+}
+
 function PopoverContent({
   children,
   className,
@@ -121,6 +142,9 @@ function PopoverContent({
   collisionPadding = 10,
   sticky = false,
   positionMethod = "absolute",
+  anchor,
+  viewportClassName,
+  followContentWidth = false,
   arrow = false,
   arrowPadding,
   container,
@@ -136,6 +160,12 @@ function PopoverContent({
   collisionPadding?: BasePopover.Positioner.Props["collisionPadding"];
   sticky?: BasePopover.Positioner.Props["sticky"];
   positionMethod?: BasePopover.Positioner.Props["positionMethod"];
+  /** Positions against this element instead of the trigger. */
+  anchor?: BasePopover.Positioner.Props["anchor"];
+  /** Classes for the inner viewport, e.g. to change its padding. */
+  viewportClassName?: string;
+  /** Re-places the popover when its content changes width; sizes to content. */
+  followContentWidth?: boolean;
   arrow?: boolean;
   arrowPadding?: number;
   container?: HTMLElement | undefined;
@@ -156,7 +186,9 @@ function PopoverContent({
         collisionPadding={collisionPadding}
         sticky={sticky}
         positionMethod={positionMethod}
+        anchor={anchor}
         arrowPadding={arrowPadding}
+        ref={followContentWidth ? followPopupWidth : undefined}
         className="z-50 h-(--positioner-height) max-h-(--available-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none motion-reduce:transition-none"
       >
         <BasePopover.Popup
@@ -174,12 +206,18 @@ function PopoverContent({
             "transition-[width,height,scale,opacity] duration-[150ms,150ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
+            // Chrome won't composite the scale while width/height transition,
+            // so text re-rasters and shifts as the entrance ends. Promoting
+            // the layer rasters it once.
+            "will-change-transform",
+            "motion-reduce:will-change-auto",
             // Only the "already open, something changed" instant. Base UI waits on
             // this transition before unmounting, so suppressing a close means no
             // exit at all, and 'click' is inferred from `event.detail === 0`,
             // which every right-click matches.
             "data-[instant=trigger-change]:transition-none",
             "motion-reduce:transition-none",
+            followContentWidth && "w-max",
             className,
           )}
           {...props}
@@ -233,6 +271,7 @@ function PopoverContent({
               // its own and transition-property does not inherit.
               "[[data-instant=trigger-change]_&_[data-current]]:transition-none [[data-instant=trigger-change]_&_[data-previous]]:transition-none",
               "motion-reduce:**:data-current:transition-none motion-reduce:**:data-previous:transition-none",
+              viewportClassName,
             )}
           >
             {children}

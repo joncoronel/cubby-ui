@@ -150,7 +150,10 @@ function DatePickerContent({
       align="start"
       // The popover is the calendar's surface (its own frame is turned off);
       // 16px corners over 4px padding keep the header strip concentric.
-      className="w-auto rounded-2xl"
+      className="rounded-2xl"
+      // The calendar goes from two months to one (or back) as the window
+      // narrows or widens while open.
+      followContentWidth
       viewportClassName="p-1 [--viewport-padding:0.25rem]"
       anchor={anchor}
       // Land on the selected day (or today), not the month arrows.
@@ -360,11 +363,9 @@ function DatePickerField<T>({
               aria-label={clearLabel}
               onClick={() => {
                 onCommit(null);
+                // Focusing starts an edit from the old text; the cleared value
+                // replaces that draft when it renders.
                 inputRef.current?.focus();
-                // Focusing starts an edit from the old text (the cleared
-                // value hasn't rendered yet); start it empty instead, or
-                // leaving the field would commit the old date back.
-                setDraft("");
               }}
             >
               <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} />

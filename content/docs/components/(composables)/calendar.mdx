@@ -139,10 +139,12 @@ Month grid for selecting dates. Wraps DayPicker, forwarding all props to it.
 
 <ApiProp name="startMonth" fullType="Date">
   The earliest month that can be shown. Also bounds the month and year picker.
+  Days before it that fill out that month's first week show as unavailable.
 </ApiProp>
 
 <ApiProp name="endMonth" fullType="Date">
   The latest month that can be shown. Also bounds the month and year picker.
+  Days after it that fill out that month's last week show as unavailable.
 </ApiProp>
 
 <ApiProp name="numberOfMonths" fullType="number" defaultValue="1">

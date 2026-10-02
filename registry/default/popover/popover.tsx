@@ -110,6 +110,30 @@ function PopoverDescription({
   );
 }
 
+/**
+ * Base UI pins the positioner to the popup's size on open and re-measures only
+ * when the trigger changes. This copies the popup's width onto the positioner
+ * whenever it changes, and Floating UI, which watches the positioner, places
+ * it again. The height stays pinned: following it would let a popover near the
+ * bottom edge flip, shrink to the space above, fit below again, and flip back
+ * in a loop.
+ */
+function followPopupWidth(positioner: HTMLElement | null): (() => void) | void {
+  // The popup sits between Base UI's focus guards, so find it by slot.
+  const popup = positioner?.querySelector(
+    ':scope > [data-slot="popover-content"]',
+  );
+  if (!positioner || !(popup instanceof HTMLElement)) return;
+  const observer = new ResizeObserver(() => {
+    positioner.style.setProperty(
+      "--positioner-width",
+      `${popup.offsetWidth}px`,
+    );
+  });
+  observer.observe(popup);
+  return () => observer.disconnect();
+}
+
 function PopoverContent({
   children,
   className,
@@ -123,6 +147,7 @@ function PopoverContent({
   positionMethod = "absolute",
   anchor,
   viewportClassName,
+  followContentWidth = false,
   arrow = false,
   arrowPadding,
   container,
@@ -142,6 +167,11 @@ function PopoverContent({
   anchor?: BasePopover.Positioner.Props["anchor"];
   /** Classes for the inner viewport, e.g. to change its padding. */
   viewportClassName?: string;
+  /**
+   * Keeps the popover placed when its content changes width while open.
+   * The popup sizes to its content instead of filling the positioner.
+   */
+  followContentWidth?: boolean;
   arrow?: boolean;
   arrowPadding?: number;
   container?: HTMLElement | undefined;
@@ -164,6 +194,7 @@ function PopoverContent({
         positionMethod={positionMethod}
         anchor={anchor}
         arrowPadding={arrowPadding}
+        ref={followContentWidth ? followPopupWidth : undefined}
         className="z-50 h-(--positioner-height) max-h-(--available-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none motion-reduce:transition-none"
       >
         <BasePopover.Popup
@@ -194,6 +225,7 @@ function PopoverContent({
             // which every right-click matches.
             "data-[instant=trigger-change]:transition-none",
             "motion-reduce:transition-none",
+            followContentWidth && "w-max",
             className,
           )}
           {...props}

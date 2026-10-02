@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import {
+  dateMatchModifiers,
   DayPicker,
   useDayPicker,
   type DateRange,
@@ -263,6 +264,35 @@ function mergeClassNames(
  */
 function CalendarDay({ day, modifiers, style, ...props }: DayProps) {
   const context = React.useContext(CalendarContext);
+  const { formatters, classNames, dayPickerProps } = useDayPicker();
+  const { hidden, showOutsideDays } = dayPickerProps;
+
+  // DayPicker hides days past `startMonth`/`endMonth`. Where they only fill
+  // out the first or last week, show them as unavailable instead, so a month
+  // at the bound doesn't open with blank cells or end on an empty row.
+  if (
+    modifiers.hidden &&
+    day.outside &&
+    showOutsideDays &&
+    !(hidden && dateMatchModifiers(day.date, hidden, day.dateLib))
+  ) {
+    return (
+      <td
+        {...props}
+        className={cn(props.className, "visible")}
+        style={style}
+        aria-hidden
+        data-hidden={undefined}
+        data-disabled=""
+        data-slot="calendar-day"
+        data-muted=""
+      >
+        <span className={classNames.day_button}>
+          {formatters.formatDay(day.date, day.dateLib.options, day.dateLib)}
+        </span>
+      </td>
+    );
+  }
   const inRange = Boolean(modifiers.range_middle);
   const filled = Boolean(modifiers.selected) && !inRange;
 
@@ -422,22 +452,25 @@ function CalendarNextMonthButton({
  * A range "lands" when a second click completes it. Tracked while rendering,
  * so the frame that first shows the full range already carries the landing;
  * from an effect it would paint once, then restart. Cleared once the wipe
- * (at most 300ms) and the cap settle (320ms) are done.
+ * (at most 300ms) and the cap settle (320ms) are done, or as soon as the
+ * month changes, so the incoming days don't replay it.
  */
-function useRangeLanding(range: DateRange | undefined | null) {
+function useRangeLanding(range: DateRange | undefined | null, month: number) {
   const rangeKey = range
     ? `${range.from?.getTime() ?? ""}:${range.to?.getTime() ?? ""}`
     : "";
   const [previous, setPrevious] = React.useState({
     key: rangeKey,
+    month,
     from: range?.from,
     to: range?.to,
   });
   const [landing, setLanding] = React.useState<RangeLanding | null>(null);
-  if (previous.key !== rangeKey) {
+  if (previous.key !== rangeKey || previous.month !== month) {
     const wasPicking = Boolean(previous.from && !previous.to);
-    setPrevious({ key: rangeKey, from: range?.from, to: range?.to });
+    setPrevious({ key: rangeKey, month, from: range?.from, to: range?.to });
     if (
+      previous.month === month &&
       wasPicking &&
       previous.from &&
       range?.from &&
@@ -575,8 +608,6 @@ function Calendar({
     props.mode === "range" ? (props.selected as DateRange | undefined) : null;
   const pickingEnd = Boolean(range?.from && !range.to);
 
-  const landing = useRangeLanding(range);
-
   let previewModifiers: Record<string, Matcher | Matcher[] | undefined> = {};
   if (pickingEnd && range?.from && hovered && !isSameDay(hovered, range.from)) {
     const [start, end] =
@@ -603,6 +634,7 @@ function Calendar({
   const selectedDay =
     props.mode === "single" ? (props.selected as Date | undefined) : undefined;
   const firstShown = monthIndex(month);
+  const landing = useRangeLanding(range, firstShown);
   const showIndicator =
     selectedDay !== undefined &&
     ((monthIndex(selectedDay) >= firstShown &&

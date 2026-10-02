@@ -67,17 +67,14 @@ export type CalendarProps = DayPickerProps & {
   labels?: CalendarLabelsProp;
 };
 
-/** A range that just completed: where it was started, and the day that ended it. */
 interface RangeLanding {
   anchor: Date;
   target: Date;
 }
 
 /**
- * One cell's slice of the landing wipe. The wipe's head follows an ease-out
- * cubic over the whole range, so each cell gets the time the curve spends
- * crossing it: short slices near the start, longer ones settling into the
- * end. Longer ranges take a little longer overall, within a fixed window.
+ * One cell's slice of the landing wipe, so the wipe's head follows a single
+ * ease-out cubic across the whole range.
  */
 function wipeTiming(
   step: number,
@@ -96,7 +93,6 @@ function wipeTiming(
 
 interface CalendarContextValue {
   landing: RangeLanding | null;
-  /** True when the caption opens the month and year picker. */
   pickerEnabled: boolean;
   pickerOpen: boolean;
   pickerId: string;
@@ -106,10 +102,9 @@ interface CalendarContextValue {
 
 const CalendarContext = React.createContext<CalendarContextValue | null>(null);
 
-/** Caption text morph, timed to the days' enter (calendar.css). */
+/** Matches --calendar-enter-duration in calendar.css. */
 const CAPTION_MORPH_MS = 280;
 
-/** The landing wipe's length: grows with the range, within these bounds. */
 const WIPE_MIN_MS = 180;
 const WIPE_MAX_MS = 300;
 const WIPE_MS_PER_DAY = 12;
@@ -136,9 +131,8 @@ function monthIndex(date: Date): number {
 }
 
 /**
- * Whether a day appears in a single month's grid, counting the neighbouring
- * months' days that fill out its first and last weeks (and, with fixed weeks,
- * the extra rows that make six).
+ * Whether a day appears in a month's grid, including the neighbouring months'
+ * days that fill its first and last weeks (and fixed weeks' extra rows).
  */
 function isInGrid(
   day: Date,
@@ -181,16 +175,14 @@ const navButtonClassName = cn(
 
 const DEFAULT_CLASS_NAMES: NonNullable<DayPickerProps["classNames"]> = {
   root: "relative w-fit",
-  // The muted strip behind the header row (arrows and captions), painted
-  // behind it (-z-1 in an isolated stack). Side by side, months share one
-  // strip drawn on the months row; stacked, each month draws its own. Spelled
-  // out in full for each breakpoint: Tailwind only generates literal classes.
+  // The muted header strip. Side by side, months share one on the months row;
+  // stacked, each month draws its own (classes repeated in full, since Tailwind
+  // only generates literal classes).
   months: cn(
     "relative isolate flex flex-col gap-1 sm:flex-row sm:gap-x-4",
     "sm:before:absolute sm:before:inset-x-0 sm:before:top-0 sm:before:-z-1 sm:before:h-[calc(var(--calendar-header)-0.25rem)] sm:before:rounded-xl sm:before:bg-muted",
   ),
-  // Header row on the strip (arrow, caption, arrow), then the days. Fixed
-  // side columns keep the caption centred even on a month without arrows.
+  // Fixed side columns keep the caption centred on a month without arrows.
   month: cn(
     "grid grid-cols-[2.25rem_1fr_2.25rem] grid-rows-[auto_1fr] gap-y-1 sm:grid-cols-[2rem_1fr_2rem]",
     "max-sm:relative max-sm:isolate",
@@ -233,9 +225,8 @@ const DEFAULT_CLASS_NAMES: NonNullable<DayPickerProps["classNames"]> = {
   weeks_before_exit: "calendar-exit-to-start",
   weeks_after_enter: "calendar-enter-from-end",
   weeks_after_exit: "calendar-exit-to-end",
-  // The caption morphs its text instead of moving (see calendar.css for why
-  // the outgoing one still needs an animation). Never empty: DayPicker adds
-  // these with classList.add, which throws on an empty string.
+  // Never empty: DayPicker adds these with classList.add, which throws on an
+  // empty string.
   caption_before_enter: "calendar-caption-still",
   caption_before_exit: "calendar-caption-hold",
   caption_after_enter: "calendar-caption-still",
@@ -258,9 +249,8 @@ function mergeClassNames(
  * -------------------------------------------------------------------------------------------------*/
 
 /**
- * Each cell carries its selection state as data attributes. The day button
- * styles off these (`group-data-*`), and calendar.css draws the range band on
- * the cell itself so it runs unbroken beneath the buttons.
+ * Selection state goes on the cell as data attributes, so calendar.css can draw
+ * the range band on the cell, unbroken beneath the buttons.
  */
 function CalendarDay({ day, modifiers, style, ...props }: DayProps) {
   const context = React.useContext(CalendarContext);
@@ -268,8 +258,7 @@ function CalendarDay({ day, modifiers, style, ...props }: DayProps) {
   const { hidden, showOutsideDays } = dayPickerProps;
 
   // DayPicker hides days past `startMonth`/`endMonth`. Where they only fill
-  // out the first or last week, show them as unavailable instead, so a month
-  // at the bound doesn't open with blank cells or end on an empty row.
+  // out an edge week, show them as unavailable so the month has no blank cells.
   if (
     modifiers.hidden &&
     day.outside &&
@@ -296,8 +285,6 @@ function CalendarDay({ day, modifiers, style, ...props }: DayProps) {
   const inRange = Boolean(modifiers.range_middle);
   const filled = Boolean(modifiers.selected) && !inRange;
 
-  // While a range lands, each of its days takes its slice of one wipe from
-  // where the range was started toward the day that completed it.
   const landing = context?.landing;
   const banded =
     inRange || Boolean(modifiers.range_start || modifiers.range_end);
@@ -340,9 +327,8 @@ function CalendarDay({ day, modifiers, style, ...props }: DayProps) {
 }
 
 /**
- * The days card, wrapping DayPicker's table so the card can stretch to the
- * month beside it while the table keeps its natural height. Covered (and
- * inert) while the month picker is open.
+ * Wraps DayPicker's table so the days card can stretch to the month beside it
+ * while the table keeps its natural height.
  */
 function CalendarMonthGrid(props: MonthGridProps) {
   const context = React.useContext(CalendarContext);
@@ -390,9 +376,8 @@ function CalendarMonthCaption({
           focusRing,
         )}
       >
-        {/* One label, so TextMorph handles the caption's change of width
-            itself: only the letters that differ move, and the box eases
-            without the shimmer two side-by-side labels caused. */}
+        {/* One label, so TextMorph eases the width change itself; two
+            side-by-side labels shimmered. */}
         <TextMorph
           value={caption}
           duration={CAPTION_MORPH_MS}
@@ -407,8 +392,8 @@ function CalendarMonthCaption({
           )}
         />
       </button>
-      {/* DayPicker's caption label is a polite live region; keep it for
-          screen readers so month changes are still announced. */}
+      {/* DayPicker's caption label is a polite live region; kept so month
+          changes are still announced. */}
       <span className="sr-only">{children}</span>
     </div>
   );
@@ -449,11 +434,10 @@ function CalendarNextMonthButton({
  * -------------------------------------------------------------------------------------------------*/
 
 /**
- * A range "lands" when a second click completes it. Tracked while rendering,
- * so the frame that first shows the full range already carries the landing;
- * from an effect it would paint once, then restart. Cleared once the wipe
- * (at most 300ms) and the cap settle (320ms) are done, or as soon as the
- * month changes, so the incoming days don't replay it.
+ * A range "lands" when a second click completes it. Tracked during render so
+ * the first frame showing the full range already carries it; from an effect it
+ * would paint once, then restart. Cleared after the wipe and cap settle, or
+ * when the month changes so the incoming days don't replay it.
  */
 function useRangeLanding(range: DateRange | undefined | null, month: number) {
   const rangeKey = range
@@ -498,9 +482,8 @@ function useRangeLanding(range: DateRange | undefined | null, month: number) {
 
 /**
  * How the selection fill enters when it remounts for a new month: with the
- * incoming days ("start"/"end", the direction they travel), or "instant" when
- * DayPicker skips its animation (a keyboard-focused day, a jump from the
- * month picker). `null` until the month changes: a fresh selection settles in.
+ * incoming days ("start"/"end"), or "instant" when DayPicker skips its
+ * animation. `null` means a fresh selection, which settles in.
  */
 function useFillEntrance(
   month: number,
@@ -585,24 +568,24 @@ function Calendar({
     onValueChange: onMonthChange,
   });
 
-  // Month and year picker. `pickerIndex` is the displayed month whose caption
-  // opened it, so picking a month puts it back in the same position.
+  // `pickerIndex` is the displayed month whose caption opened the picker, so a
+  // picked month lands back in the same position.
   const [pickerOpen, setPickerOpen] = React.useState(false);
   const [pickerIndex, setPickerIndex] = React.useState(0);
   const [pickerYear, setPickerYear] = React.useState(() => month.getFullYear());
   // Remounting DayPicker after a pick skips its slide animation, which would
   // otherwise run underneath the picker fading away.
   const [pickerKey, setPickerKey] = React.useState(0);
-  // Whether a day has keyboard focus: DayPicker skips its month animation
-  // then, and the selection fill follows suit.
+  // DayPicker skips its month animation while a day has keyboard focus, and
+  // the selection fill follows suit.
   const [dayFocused, setDayFocused] = React.useState(false);
   const rootRef = React.useRef<HTMLDivElement>(null);
   const pendingFocusRef = React.useRef<"picker" | "days" | "caption" | null>(
     null,
   );
 
-  // Range preview: the hovered (or keyboard-focused) day while only the start
-  // of a range is picked.
+  // Range preview: the hovered (or keyboard-focused) day while picking a
+  // range's end.
   const [hovered, setHovered] = React.useState<Date>();
   const range =
     props.mode === "range" ? (props.selected as DateRange | undefined) : null;
@@ -620,15 +603,10 @@ function Calendar({
     };
   }
 
-  // The single-mode selection is one fill, anchored to the selected day in
-  // CSS, that slides between days (calendar.css). It renders only while the
-  // selected day is on screen, so it has no stale anchor to slide from when
-  // that day comes back into view. With one month shown, that includes the
-  // neighbouring months' days filling out its first and last weeks.
-  // One month keeps six weeks, so its height (and a popover around it) holds
-  // still from month to month; the extra rows fill with the next month's
-  // days. Side by side those days are hidden, so fixed weeks would only add
-  // blank rows.
+  // One month keeps six weeks so its height (and a popover around it) holds
+  // still. Side by side, outside days are hidden, so fixed weeks would only
+  // add blank rows. The sliding fill renders only while its day is on screen,
+  // so it never slides in from a stale anchor.
   const showOutside = showOutsideDays ?? numberOfMonths === 1;
   const fixedWeeks = fixedWeeksProp ?? numberOfMonths === 1;
   const selectedDay =
@@ -648,8 +626,7 @@ function Calendar({
           fixedWeeks,
         })));
 
-  // When the month changes, the fill is remounted (so it doesn't slide over
-  // from the old month's spot) and enters with the incoming days.
+  // The fill remounts per month so it doesn't slide from the old month's spot.
   const fillEnter = useFillEntrance(
     firstShown,
     selectedDay?.getTime(),
@@ -694,8 +671,8 @@ function Calendar({
     setPickerOpen(false);
   };
 
-  // Move focus to where the user now is. The covered days are inert, so
-  // without this focus would fall back to the body.
+  // The covered days are inert, so without this focus would fall back to the
+  // body.
   React.useEffect(() => {
     const target = pendingFocusRef.current;
     pendingFocusRef.current = null;
@@ -769,7 +746,6 @@ function Calendar({
         }
         className={cn(
           "relative w-fit [--calendar-header:2.5rem] sm:[--calendar-header:2.25rem]",
-          // A surface card with the header in a muted strip inside it.
           framed && cn("rounded-2xl p-1", solidSurface(3, 1)),
           className,
         )}
@@ -780,9 +756,8 @@ function Calendar({
           }
         }}
       >
-        {/* Its own stack, so the selection fill (z -1) can sit under the
-            days, which share the months row's isolated stack with the header
-            strip, without dropping behind the card. */}
+        {/* Own stack, so the selection fill (z -1) sits under the days
+            without dropping behind the card. */}
         <div className="relative isolate">
           <DayPicker
             key={pickerKey}
@@ -865,17 +840,14 @@ function Calendar({
  * go on the outer scroll area; other props on the group inside.
  */
 function CalendarPresets({ className, ...props }: React.ComponentProps<"div">) {
-  // A ScrollArea so the scrolling row of chips fades toward whichever end
-  // has more past it. The vertical rail never overflows, so it never fades.
   return (
     <ScrollArea
       fadeEdges="x"
       hideScrollbar
       contentMinWidth="fit-content"
-      // h-auto lets the rail stretch to the calendar beside it (ScrollArea's
-      // own full height resolves to nothing there). Below sm, w-0/min-w-full
-      // keeps the chip row from widening its container: it takes the
-      // container's width and scrolls within it.
+      // h-auto lets the rail stretch to the calendar (ScrollArea's full height
+      // resolves to nothing there). w-0/min-w-full keeps the chip row from
+      // widening its container.
       className={cn(
         "h-auto shrink-0 max-sm:w-0 max-sm:min-w-full sm:w-36",
         className,

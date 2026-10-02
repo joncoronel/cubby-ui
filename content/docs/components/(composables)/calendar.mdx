@@ -6,9 +6,9 @@ type: composable
 
 import { Calendar } from "@/registry/default/calendar/calendar";
 
-The calendar displays a month grid for picking a single date, a range, or several dates. Use it inline for date entry or inside a popover for a date field. It is built on React DayPicker, so all of its props pass through.
+The calendar is a month grid for picking one date, a range, or several dates. Use it inline, or build it into your own popover; for a ready-made field, use [`DatePicker`](/docs/components/date-picker) or [`DateRangePicker`](/docs/components/date-range-picker).
 
-It sits on a card, with the month header grouped in a muted strip across the top. On top of DayPicker it adds a few things: the caption opens a month and year picker for jumping far away, a range shows a live preview while you pick its end, a single selection slides from day to day, and changing months animates in the direction you travel.
+It wraps React DayPicker and passes all of its props through. On top of DayPicker, the caption opens a month and year picker, a range previews while you pick its end, a single selection slides between days, and month changes animate in the direction you travel.
 
 ## Preview
 
@@ -24,7 +24,7 @@ It sits on a card, with the month header grouped in a muted strip across the top
 
 ## Examples
 
-The `mode` prop sets what a click selects.
+Use `mode` to set what a click selects.
 
 | Value      | Description                     |
 | ---------- | ------------------------------- |
@@ -34,7 +34,7 @@ The `mode` prop sets what a click selects.
 
 ### Single Date Selection
 
-Use `mode="single"` to pick one date. The `footer` renders below the grid and is announced to screen readers when it changes.
+Use `mode="single"` to pick one date. Screen readers announce the `footer` when it changes.
 
 <ComponentPreview
   component="calendar"
@@ -43,7 +43,7 @@ Use `mode="single"` to pick one date. The `footer` renders below the grid and is
 
 ### Date Range Selection
 
-Use `mode="range"` to pick a start and end date. After the first click, the band follows the pointer (or keyboard focus) until you pick the end. When the second click lands, the band draws in from the first day toward that one. Clicking again once a range is complete starts a new one.
+Use `mode="range"` to pick a start and end date. After the first click, the band follows the pointer or keyboard focus until you pick the end, then draws in from the start. Clicking after a complete range starts a new one.
 
 <ComponentPreview
   component="calendar"
@@ -61,19 +61,19 @@ Use `mode="multiple"` to pick several individual dates.
 
 ### Month and Year
 
-Click the caption to open the month and year picker over the days: a scrolling year column beside the year's months. Picking a year changes which months show; picking a month goes there and closes the picker. Click the caption again (or press `Escape`) to close it without a change. `startMonth` and `endMonth` bound the picker as well as the arrows, which makes far-off dates like birthdays quick to reach.
+Click the caption to jump to a far-off month, such as a birthday decades back. The picker covers the days with a scrolling year column beside that year's months. Picking a year changes the months shown; picking a month navigates there and closes the picker. Click the caption again or press `Escape` to close it without a change. `startMonth` and `endMonth` bound the picker as well as the arrows.
 
 <ComponentPreview component="calendar" example="calendar-month-and-year" />
 
 ### Disabled Dates
 
-Use the `disabled` prop to block dates. It takes any DayPicker matcher: a date, an array, a `{ before }` or `{ after }` bound, a `{ dayOfWeek }` list, or a function. Disabled days are struck through.
+Use `disabled` to block dates. It takes any DayPicker matcher: a date, an array, a `{ before }` or `{ after }` bound, a `{ dayOfWeek }` list, or a function. Disabled days are struck through.
 
 <ComponentPreview component="calendar" example="calendar-disabled-dates" />
 
 ### With Footer
 
-Pass a `footer` to render content below the grid.
+Use `footer` to render content below the grid.
 
 <ComponentPreview component="calendar" example="calendar-with-footer" />
 
@@ -83,11 +83,11 @@ The grid follows DayPicker's keyboard model: arrow keys move between days, `Page
 
 The caption is a toggle (`aria-expanded`) for the month and year picker. Opening it moves focus to the current month; `Shift+Tab` reaches the year column, where the arrow keys, `PageUp`/`PageDown` (ten years), `Home`, and `End` change the year as they move. In the months, arrow keys move between cells and `PageUp`/`PageDown` change the year. `Escape` closes the picker and returns focus to the caption without closing a surrounding popover; picking a month moves focus back to the days.
 
-Today is marked with a dot as well as a heavier weight, and disabled days are struck through, so neither relies on color alone. Under `prefers-reduced-motion`, every transition becomes a plain crossfade.
+Today is marked with a dot as well as a heavier weight, and disabled days are struck through, so neither relies on color alone. Under `prefers-reduced-motion`, the transitions become plain crossfades.
 
 ## API Reference
 
-The Calendar is built on top of [react-day-picker's DayPicker](https://daypicker.dev/). All DayPicker props are supported and pass through. The documentation below covers the key props and the defaults specific to this implementation.
+Calendar wraps [react-day-picker's DayPicker](https://daypicker.dev/) and passes every DayPicker prop through. This section covers the key props and the defaults this implementation changes.
 
 For the complete API, see the [react-day-picker documentation](https://daypicker.dev/api/functions/DayPicker).
 
@@ -95,7 +95,7 @@ For the complete API, see the [react-day-picker documentation](https://daypicker
 
 #### Calendar
 
-Month grid for selecting dates. Wraps DayPicker, forwarding all props to it.
+Month grid for selecting dates.
 
 <ApiPropsList>
 
@@ -119,17 +119,17 @@ Month grid for selecting dates. Wraps DayPicker, forwarding all props to it.
   fullType="(selected, triggerDate, modifiers, e) => void"
   simpleType="function"
 >
-  Callback fired when the selection changes.
+  Fires when the selection changes.
 </ApiProp>
 
 <ApiProp name="framed" fullType="boolean" defaultValue="true">
-  Draws the card the calendar sits on. Turn it off when the container already is
-  one; the date pickers do this, so their popover is the card.
+  Draws the card behind the calendar. Turn it off inside a container that is
+  already a card; the date pickers do this so their popover is the card.
 </ApiProp>
 
 <ApiProp name="month" fullType="Date">
-  The displayed month, for controlling navigation. Pair with `onMonthChange`, or
-  use `defaultMonth` to only set the starting month.
+  The displayed month, for controlled navigation. Pair with `onMonthChange`, or
+  use `defaultMonth` to set only the starting month.
 </ApiProp>
 
 <ApiProp name="disabled" fullType="Matcher | Matcher[]">
@@ -167,9 +167,10 @@ Month grid for selecting dates. Wraps DayPicker, forwarding all props to it.
 </ApiProp>
 
 <ApiProp name="fixedWeeks" fullType="boolean">
-  Always renders six weeks, so the calendar keeps its height (and a popover
-  keeps its position) as you change months. Defaults to `true` for one month and
-  `false` for several, where the hidden outside days would leave blank rows.
+  Renders six weeks in every month, so the calendar keeps its height (and a
+  popover keeps its position) as you change months. Defaults to `true` for one
+  month and `false` for several, where the hidden outside days would leave blank
+  rows.
 </ApiProp>
 
 <ApiProp name="animate" fullType="boolean" defaultValue="true">
@@ -210,7 +211,7 @@ Month grid for selecting dates. Wraps DayPicker, forwarding all props to it.
 
 #### CalendarPresets
 
-A rail of one-click shortcuts to place beside a calendar. Vertical from the `sm` breakpoint up, a scrolling row below it that fades toward whichever end has more. It renders a scroll area around a `div` with `role="group"`: `className` goes on the scroll area, and other props (such as `aria-label`) on the group.
+A rail of one-click shortcuts beside a calendar. It stacks vertically from the `sm` breakpoint up; below it, it becomes a scrolling row that fades at whichever end has more to scroll. It renders a scroll area around a `div` with `role="group"`: `className` goes on the scroll area, and other props such as `aria-label` go on the group.
 
 #### CalendarPreset
 
@@ -227,7 +228,7 @@ One shortcut button inside `CalendarPresets`.
 
 ### Styling
 
-Each day cell carries its state as data attributes, so overrides can target them directly.
+Each day cell exposes its state as data attributes you can target in style overrides.
 
 | Attribute                                     | Set on                                       |
 | --------------------------------------------- | -------------------------------------------- |

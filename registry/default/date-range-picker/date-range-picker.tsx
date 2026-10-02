@@ -149,10 +149,8 @@ function resolvePreset(preset: DateRangePreset): DateRangeValue {
 }
 
 /**
- * A range written out with one formatter: a single day on its own, or the
- * locale's compact range. ICU versions disagree on thin vs regular spaces
- * around the dash, which breaks hydration between Node and the browser, so
- * those are normalised.
+ * ICU versions disagree on thin vs regular spaces around the range dash, which
+ * breaks hydration between Node and the browser, so those are normalised.
  */
 function formatSpan(
   formatter: Intl.DateTimeFormat,
@@ -239,7 +237,6 @@ function DateRangePicker({
   const formatRange = (range: DateRangeValue) =>
     format?.(range) ?? formatSpan(dayFormat, range);
 
-  // The typing hint drops the year when the whole range is in this year.
   const formatHint = (range: DateRangeValue) => {
     const thisYear = new Date().getFullYear();
     return range.from.getFullYear() === thisYear &&

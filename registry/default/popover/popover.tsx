@@ -111,12 +111,9 @@ function PopoverDescription({
 }
 
 /**
- * Base UI pins the positioner to the popup's size on open and re-measures only
- * when the trigger changes. This copies the popup's width onto the positioner
- * whenever it changes, and Floating UI, which watches the positioner, places
- * it again. The height stays pinned: following it would let a popover near the
- * bottom edge flip, shrink to the space above, fit below again, and flip back
- * in a loop.
+ * Base UI sizes the positioner only on open or trigger change. Copying the
+ * popup's width onto it lets Floating UI re-place it. Height stays pinned:
+ * following it makes a popover near the bottom edge flip back and forth.
  */
 function followPopupWidth(positioner: HTMLElement | null): (() => void) | void {
   // The popup sits between Base UI's focus guards, so find it by slot.
@@ -167,10 +164,7 @@ function PopoverContent({
   anchor?: BasePopover.Positioner.Props["anchor"];
   /** Classes for the inner viewport, e.g. to change its padding. */
   viewportClassName?: string;
-  /**
-   * Keeps the popover placed when its content changes width while open.
-   * The popup sizes to its content instead of filling the positioner.
-   */
+  /** Re-places the popover when its content changes width; sizes to content. */
   followContentWidth?: boolean;
   arrow?: boolean;
   arrowPadding?: number;
@@ -212,11 +206,9 @@ function PopoverContent({
             "transition-[width,height,scale,opacity] duration-[150ms,150ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
             "data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-ending-style:scale-95 data-ending-style:opacity-0",
-            // Own compositor layer while mounted, as in DropdownMenu and
-            // Menubar. width/height in the transition list stops Chrome
-            // compositing the scale, so the content re-rasters every frame and
-            // its text settles onto the pixel grid with a visible shift as the
-            // entrance ends. Promoted, it rasters once.
+            // Chrome won't composite the scale while width/height transition,
+            // so text re-rasters and shifts as the entrance ends. Promoting
+            // the layer rasters it once.
             "will-change-transform",
             "motion-reduce:will-change-auto",
             // Only the "already open, something changed" instant. Base UI waits on

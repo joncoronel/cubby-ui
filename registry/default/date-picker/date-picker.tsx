@@ -161,7 +161,6 @@ function DatePicker({
     setOpen(false);
   };
 
-  // The hint names the weekday and drops the year when it's this year.
   const hintFormat = (date: Date) =>
     new Intl.DateTimeFormat(locale, {
       weekday: "short",

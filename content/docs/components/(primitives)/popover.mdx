@@ -128,21 +128,20 @@ Composed component for common popover layouts. Combines `Popover.Portal`, `Popov
   fullType="Element | RefObject<Element | null> | VirtualElement | (() => Element | VirtualElement | null) | null"
   simpleType="element"
 >
-  Positions the popover against this element instead of the trigger, for example
-  a whole field when the trigger is a button inside it. Flattened from
-  Positioner.
+  Positions the popover against this element instead of the trigger, such as a
+  whole field whose trigger is a button inside it. Flattened from Positioner.
 </ApiProp>
 
 <ApiProp name="viewportClassName" fullType="string">
-  Classes for the inner viewport, which carries the content's padding (`px-3
-  py-3` by default). Use it to change that padding, for example when the content
-  brings its own frame. Custom prop not available in Base UI.
+  Classes for the inner viewport, which holds the content's padding (`px-3 py-3`
+  by default). Use it to change that padding, such as when the content has its
+  own frame. Custom prop not available in Base UI.
 </ApiProp>
 
 <ApiProp name="followContentWidth" fullType="boolean" defaultValue="false">
-  Keeps the popover placed when its content changes width while open, for
-  example a calendar going from two months to one as the window narrows. The
-  popup sizes to its content instead of filling the positioner. Custom prop not
+  Keeps the popover placed when its content changes width while open, such as a
+  calendar dropping from two months to one as the window narrows. The popup
+  sizes to its content instead of filling the positioner. Custom prop not
   available in Base UI.
 </ApiProp>
 

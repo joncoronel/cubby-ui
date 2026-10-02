@@ -70,14 +70,12 @@ function keywordOf(name: string): number | undefined {
   return Object.hasOwn(KEYWORDS, name) ? KEYWORDS[name] : undefined;
 }
 
-/** Earliest and latest years a parsed date may land in. */
 const MIN_YEAR = 1;
 const MAX_YEAR = 9999;
 
 /**
- * The date if it's real and in range, else null. Huge years ("march 999999")
- * or amounts ("in 99999999 years") overflow into Invalid Date, which throws
- * when formatted.
+ * Null for out-of-range years and Invalid Date, which huge input like
+ * "in 99999999 years" produces and which throws when formatted.
  */
 function valid(date: Date | null): Date | null {
   if (!date || Number.isNaN(date.getTime())) return null;

@@ -21,15 +21,11 @@ import {
   PopoverTrigger,
 } from "@/registry/default/popover/popover";
 
-/*
- * The pieces DatePicker and DateRangePicker share: the trigger, the clear
- * button, the popover around the calendar, and the editable field.
- */
+/* Pieces shared by DatePicker and DateRangePicker. */
 
 /**
- * Props that reach the picker's control, whichever element it is: the
- * trigger button, or the text input when `editable`. Kept to what both
- * accept (id, aria-*, data-*, handlers).
+ * Props forwarded to the trigger button, or the text input when `editable`.
+ * Limited to what both accept (id, aria-*, data-*, handlers).
  */
 export type PickerControlProps = Omit<
   React.HTMLAttributes<HTMLElement>,
@@ -181,10 +177,8 @@ function DatePickerContent({
 /* -------------------------------------------------------------------------------------------------
  * Editable field
  *
- * Used when `editable` is set: a text input that reads what's typed, with the
- * calendar trigger beside it. While editing, a hint on the right shows how
- * the text will be read, so "next fri" is confirmed as a date before it's
- * committed (on Enter or blur).
+ * While typing, a hint shows how the text will be read, so "next fri" is
+ * confirmed as a date before it commits on Enter or blur.
  * -------------------------------------------------------------------------------------------------*/
 
 export interface DateFieldReading<T> {
@@ -267,7 +261,6 @@ function DatePickerField<T>({
     return true;
   };
 
-  /** Commits, or keeps the text and marks it invalid when it can't. */
   const settle = () => {
     if (commit()) {
       setDraft(null);
@@ -337,9 +330,8 @@ function DatePickerField<T>({
           }
         }}
       />
-      {/* Announces a refused commit only. The visible hint below changes on
-          nearly every keystroke, so it's linked by aria-describedby instead
-          of being a live region. */}
+      {/* Announces refused commits only. The visible hint changes on most
+          keystrokes, so it's linked by aria-describedby, not a live region. */}
       <span aria-live="polite" className="sr-only">
         {rejected && editing ? hint : ""}
       </span>

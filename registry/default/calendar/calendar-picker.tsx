@@ -18,9 +18,8 @@ export const cellButtonClassName = cn(
   // Focus
   focusRing,
   "focus-visible:z-2",
-  // Interaction
-  // Hover and selection colours change instantly: days are crossed dozens of
-  // times a pass, and a fade would trail the pointer.
+  // Interaction: colours change instantly, since a fade would trail the
+  // pointer across the days.
   "cursor-pointer transition-[scale,outline-color,outline-offset] duration-150 ease-out active:scale-[0.96] motion-reduce:active:scale-100",
   "hover:bg-surface-hover",
   // Today: a dot under the number, re-coloured when the day is filled
@@ -32,9 +31,8 @@ export const cellButtonClassName = cn(
  * -------------------------------------------------------------------------------------------------*/
 
 /**
- * Arrow-key movement across a grid of buttons. Columns are read from layout
- * over every cell, disabled ones included, so rows stay true when some
- * months are out of bounds; moves step over disabled cells.
+ * Arrow-key movement across a grid of buttons. Columns are counted from layout
+ * with disabled cells included, so rows stay true when some are out of bounds.
  */
 function moveInGrid(event: React.KeyboardEvent<HTMLElement>): void {
   const cells = Array.from(
@@ -100,16 +98,13 @@ interface CalendarPickerProps {
   isMonthDisabled: (year: number, month: number) => boolean;
   onSelectMonth: (month: number) => void;
   onClose: () => void;
-  /** The picker panel's name, for screen readers. */
   label: string;
-  /** The year column's name, for screen readers. */
   yearsLabel: string;
 }
 
 /**
- * One panel over the days: a scrolling year column beside the year's twelve
- * months. Picking a year only changes which months are shown; picking a month
- * goes there and closes. The caption above stays visible as the way back.
+ * A scrolling year column beside the year's twelve months. Picking a year only
+ * changes which months show; picking a month goes there and closes.
  */
 function CalendarPicker({
   id,
@@ -130,7 +125,6 @@ function CalendarPicker({
   const yearsRef = React.useRef<HTMLDivElement>(null);
   const focusYearRef = React.useRef(false);
 
-  // Centre the chosen year in its column whenever the picker opens.
   React.useLayoutEffect(() => {
     if (!open) return;
     const list = yearsRef.current;
@@ -140,7 +134,7 @@ function CalendarPicker({
       active.offsetTop - list.clientHeight / 2 + active.offsetHeight / 2;
   }, [open]);
 
-  // Keyboard moves in the year column select as they go; follow with focus.
+  // Keyboard moves in the year column select as they go, so focus follows.
   React.useEffect(() => {
     if (!focusYearRef.current) return;
     focusYearRef.current = false;
@@ -168,8 +162,6 @@ function CalendarPicker({
   );
   const months = Array.from({ length: 12 }, (_, monthOfYear) => monthOfYear);
   const activeInYear = activeMonth.getFullYear() === year;
-  // The month that takes the tab stop: the active one, or the first that
-  // isn't out of bounds in this year.
   const tabStop =
     activeInYear && !isMonthDisabled(year, activeMonth.getMonth())
       ? activeMonth.getMonth()

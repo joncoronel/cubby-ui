@@ -7,7 +7,7 @@ builtOn: ["calendar", "popover"]
 
 import { DateRangePicker } from "@/registry/default/date-range-picker/date-range-picker";
 
-The date range picker is a field that opens a calendar popover for choosing a start and end date. Use it for report ranges, booking windows, and date filters. Two months sit side by side on wider screens, the band previews the range as you move toward its end, and a status line under the calendar reads back the range and its length.
+The date range picker is a field that opens a calendar popover for choosing a start and end date. Use it for report ranges, booking windows, and date filters.
 
 To select a single date, use [`DatePicker`](/docs/components/date-picker) instead.
 
@@ -28,11 +28,11 @@ To select a single date, use [`DatePicker`](/docs/components/date-picker) instea
 
 ## Examples
 
-The value only changes once both ends are picked. Closing the popover halfway through leaves the previous range in place.
+The value changes only after you pick both ends; closing the popover halfway keeps the previous range. A status line under the calendar shows the range and its length.
 
 ### Typing a Range
 
-Set `editable` to make the field a text input. It reads two dates joined by a dash, "to", or "until" ("mar 3 – 12", "today to fri", "Dec 28 – Jan 4"), relative spans like "last 30 days" or "next 2 weeks", and a single date as a one-day range. The second date borrows a missing month or year from the first, so the field also reads back its own "Oct 1 – 8, 2026". The hint shows the range and its length before it's committed, and explains a range that breaks `minNights`, `maxNights`, or a blocked date.
+Use `editable` to make the field a text input. It reads two dates joined by a dash, "to", or "until" ("mar 3 – 12", "today to fri", "Dec 28 – Jan 4"), relative spans like "last 30 days" or "next 2 weeks", and a single date as a one-day range. A second date missing its month or year takes them from the first, so the field also parses its own output, "Oct 1 – 8, 2026". Before you commit, the hint shows the range and its length, or why it breaks `minNights`, `maxNights`, or a blocked date.
 
 <ComponentPreview
   component="date-range-picker"
@@ -41,7 +41,7 @@ Set `editable` to make the field a text input. It reads two dates joined by a da
 
 ### Presets
 
-Pass `presets` for one-click ranges beside the calendar. Give each a function so ranges like "Last 7 days" are worked out when the picker opens. The preset that matches the current range is marked.
+Use `presets` to add one-click ranges beside the calendar. Give each a function so ranges like "Last 7 days" resolve when the picker opens; the preset matching the current range is marked.
 
 <ComponentPreview
   component="date-range-picker"
@@ -50,7 +50,7 @@ Pass `presets` for one-click ranges beside the calendar. Give each a function so
 
 ### Minimum and Maximum Length
 
-`minNights` and `maxNights` limit the length of the range, counted as nights between the two ends. `minDate` and `maxDate` limit where it can fall. For stays, `labels.duration` can count nights instead of days in the status line.
+Use `minNights` and `maxNights` to limit the range's length, counted in nights between the ends, and `minDate` and `maxDate` to limit where it falls. For stays, set `labels.duration` to count nights instead of days in the status line.
 
 <ComponentPreview
   component="date-range-picker"
@@ -59,7 +59,7 @@ Pass `presets` for one-click ranges beside the calendar. Give each a function so
 
 ### One Month
 
-The picker shows two months from the `sm` breakpoint up and one below it. Set `numberOfMonths` to fix the count.
+Use `numberOfMonths` to fix the month count. By default the picker shows two months from the `sm` breakpoint up and one below it.
 
 <ComponentPreview
   component="date-range-picker"
@@ -68,7 +68,7 @@ The picker shows two months from the `sm` breakpoint up and one below it. Set `n
 
 ### With Custom Format
 
-Pass `format` to control how the range is written. It receives `{ from, to }` and returns a string. By default the locale's compact range is used, such as "Oct 3 – 12, 2026".
+Use `format` to control how the range is written. It takes `{ from, to }` and returns a string; the default is the locale's compact range, such as "Oct 3 – 12, 2026".
 
 <ComponentPreview
   component="date-range-picker"
@@ -77,7 +77,7 @@ Pass `format` to control how the range is written. It receives `{ from, to }` an
 
 ### With Placeholder
 
-Set `placeholder` for the empty-state text on the trigger.
+Use `placeholder` to set the trigger's empty-state text.
 
 <ComponentPreview
   component="date-range-picker"
@@ -86,7 +86,7 @@ Set `placeholder` for the empty-state text on the trigger.
 
 ### Disabled State
 
-Set `disabled` to prevent opening the picker.
+Use `disabled` to stop the picker from opening.
 
 <ComponentPreview
   component="date-range-picker"
@@ -95,15 +95,11 @@ Set `disabled` to prevent opening the picker.
 
 ## Accessibility
 
-The trigger is a button that opens the calendar in a popover and moves focus into it. Use the arrow keys to move between days and `Enter` or `Space` to set the start and then the end; the preview band follows keyboard focus as well as the pointer. The status line under the calendar is a polite live region, so each step ("pick an end date", then the finished range and its length) is announced. `Escape` closes the popover without a change.
-
-## Migrating
-
-This version replaces the earlier API. `onSelect` is now `onValueChange`, it fires only once both ends are picked, and an empty value is `null`. `format` takes a function, `({ from, to }) => string`, instead of a Day.js format string. `fixedWeeks` and other calendar options now go through `calendarProps`.
+The trigger is a button that opens the calendar in a popover and moves focus into it. Use the arrow keys to move between days and `Enter` or `Space` to set the start and then the end; the preview band follows keyboard focus as well as the pointer. The status line under the calendar is a polite live region, so screen readers announce each step ("pick an end date", then the finished range and its length). `Escape` closes the popover without a change.
 
 ## API Reference
 
-The DateRangePicker composes [`Calendar`](/docs/components/calendar) in `range` mode inside a [`Popover`](/docs/components/popover), with a trigger styled like an [`Input`](/docs/components/input). Props not listed below (`id`, `aria-*`, event handlers) go to the trigger button.
+DateRangePicker composes [`Calendar`](/docs/components/calendar) in `range` mode inside a [`Popover`](/docs/components/popover), with a trigger styled like an [`Input`](/docs/components/input). Props not listed below (`id`, `aria-*`, event handlers) go to the trigger button.
 
 ### Props
 
@@ -245,11 +241,11 @@ The DateRangePicker composes [`Calendar`](/docs/components/calendar) in `range` 
   fullType="Partial<DateRangePickerLabels>"
   simpleType="object"
 >
-  Copy overrides for the picker's own text, merged over English defaults.
-  Strings: `chooseDates`, `clear`, `presets`, `pickStart`, `invalid`,
-  `unavailable`. Functions: `pickEnd(start)`, `duration(days)`,
-  `tooShort(minNights)`, `tooLong(maxNights)`. `duration` counts both ends;
-  return `days - 1` nights for stays.
+  Overrides for the picker's own text, merged over English defaults. Strings:
+  `chooseDates`, `clear`, `presets`, `pickStart`, `invalid`, `unavailable`.
+  Functions: `pickEnd(start)`, `duration(days)`, `tooShort(minNights)`,
+  `tooLong(maxNights)`. `duration` counts both ends; return `days - 1` nights
+  for stays.
 </ApiProp>
 
 <ApiProp name="className" fullType="string">

@@ -33,6 +33,7 @@ import {
   CalendarPicker,
   cellButtonClassName,
   focusRing,
+  pressPaint,
 } from "./calendar-picker";
 import "./calendar.css";
 
@@ -215,7 +216,7 @@ const DEFAULT_CLASS_NAMES: NonNullable<DayPickerProps["classNames"]> = {
     // Today
     "group-data-today/day:font-semibold group-data-today/day:after:opacity-100",
     // Selected (and the two ends of a range)
-    "group-data-filled/day:bg-primary group-data-filled/day:text-primary-foreground group-data-filled/day:hover:bg-(--primary-hover) group-data-filled/day:font-medium group-data-filled/day:after:bg-primary-foreground",
+    "group-data-filled/day:text-primary-foreground group-data-filled/day:font-medium group-data-filled/day:after:bg-primary-foreground group-data-filled/day:[--cell-paint:var(--primary)] group-data-filled/day:hover:[--cell-paint:var(--primary-hover)]",
     // Disabled: struck through so it doesn't rely on colour alone
     "group-data-disabled/day:text-muted-foreground group-data-disabled/day:decoration-muted-foreground/60 group-data-disabled/day:line-through group-data-disabled/day:opacity-60",
   ),
@@ -880,8 +881,11 @@ function CalendarPreset({
       aria-pressed={active}
       className={cn(
         "text-muted-foreground flex h-8 shrink-0 cursor-pointer items-center rounded-lg px-2.5 text-start text-sm whitespace-nowrap",
-        "hover:bg-surface-hover hover:text-foreground",
-        "data-active:bg-surface-hover data-active:text-foreground data-active:font-medium",
+        "hover:text-foreground hover:[--cell-paint:var(--surface-hover)]",
+        "data-active:text-foreground data-active:font-medium data-active:[--cell-paint:var(--surface-hover)]",
+        // Isolated so the paint sits behind the label, not the rail.
+        "relative isolate",
+        pressPaint,
         focusRing,
         // Hover changes colour instantly, like the days.
         "transition-[outline-color,outline-offset] duration-150 ease-out",

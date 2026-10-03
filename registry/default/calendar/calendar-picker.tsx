@@ -12,6 +12,13 @@ import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 export const focusRing =
   "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2";
 
+/**
+ * A background in `::before`, painted from `--cell-paint`, that shrinks on
+ * press while the label holds still, as Button's does.
+ */
+export const pressPaint =
+  "before:pointer-events-none before:absolute before:inset-0 before:-z-1 before:rounded-[inherit] before:bg-(--cell-paint,transparent) before:transition-[scale] before:duration-100 before:ease-out active:before:scale-[0.96]";
+
 export const cellButtonClassName = cn(
   // Layout
   "relative z-1 flex size-full items-center justify-center rounded-lg text-sm tabular-nums",
@@ -20,8 +27,9 @@ export const cellButtonClassName = cn(
   "focus-visible:z-2",
   // Interaction: colours change instantly, since a fade would trail the
   // pointer across the days.
-  "cursor-pointer transition-[scale,outline-color,outline-offset] duration-150 ease-out active:scale-[0.96] motion-reduce:active:scale-100",
-  "hover:bg-surface-hover",
+  "cursor-pointer transition-[outline-color,outline-offset] duration-150 ease-out",
+  pressPaint,
+  "hover:[--cell-paint:var(--surface-hover)]",
   // Today: a dot under the number, re-coloured when the day is filled
   "after:pointer-events-none after:absolute after:inset-x-0 after:bottom-1 after:mx-auto after:size-1 after:rounded-full after:bg-primary after:opacity-0",
 );
@@ -246,7 +254,7 @@ function CalendarPicker({
                   cellButtonClassName,
                   "text-muted-foreground h-8 w-full shrink-0",
                   "data-today:after:opacity-100",
-                  "data-active:text-foreground data-active:bg-surface-hover data-active:font-semibold",
+                  "data-active:text-foreground data-active:font-semibold data-active:[--cell-paint:var(--surface-hover)]",
                 )}
               >
                 {option}
@@ -298,7 +306,7 @@ function CalendarPicker({
                 cellButtonClassName,
                 "h-9 w-full self-center font-medium sm:h-8",
                 "data-today:after:opacity-100",
-                "data-active:bg-primary data-active:text-primary-foreground data-active:after:bg-primary-foreground data-active:hover:bg-(--primary-hover)",
+                "data-active:text-primary-foreground data-active:after:bg-primary-foreground data-active:[--cell-paint:var(--primary)] data-active:hover:[--cell-paint:var(--primary-hover)]",
                 "disabled:pointer-events-none disabled:opacity-40",
               )}
             >

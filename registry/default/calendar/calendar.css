@@ -235,31 +235,27 @@
  * mode, a two-day range's ends. Logical corners, so it holds in RTL.
  * -------------------------------------------------------------------------------------------------*/
 
-[data-slot="calendar"]:is([data-mode="multiple"], [data-mode="range"])
-  [data-slot="calendar-day"]
-  > button::before {
-  transition-property: scale, border-radius;
-  transition-duration: 100ms, 150ms;
-  transition-timing-function: ease-out;
-}
-
 [data-slot="calendar"][data-mode="multiple"]
-  [data-slot="calendar-day"][data-filled]:has(+ [data-filled])
+  [data-slot="calendar-day"][data-filled]:not([data-hidden]):has(
+    + [data-filled]:not([data-hidden])
+  )
   > button::before,
 [data-slot="calendar"][data-mode="range"]
-  [data-slot="calendar-day"][data-range-start]:has(+ [data-range-end])
+  [data-slot="calendar-day"][data-range-start]:not([data-hidden]):has(
+    + [data-range-end]:not([data-hidden])
+  )
   > button::before {
   border-start-end-radius: 0;
   border-end-end-radius: 0;
 }
 
 [data-slot="calendar"][data-mode="multiple"]
-  [data-slot="calendar-day"][data-filled]
-  + [data-filled]
+  [data-slot="calendar-day"][data-filled]:not([data-hidden])
+  + [data-filled]:not([data-hidden])
   > button::before,
 [data-slot="calendar"][data-mode="range"]
-  [data-slot="calendar-day"][data-range-start]
-  + [data-range-end]
+  [data-slot="calendar-day"][data-range-start]:not([data-hidden])
+  + [data-range-end]:not([data-hidden])
   > button::before {
   border-start-start-radius: 0;
   border-end-start-radius: 0;
@@ -302,14 +298,12 @@
   [data-slot="calendar"][data-mode="single"]
     [data-slot="calendar-day"]
     > button {
-    transition-property: outline-color, outline-offset, color;
-    transition-duration: 150ms, 150ms, 120ms;
-    transition-timing-function: ease-out;
+    --cell-text-duration: 120ms;
   }
   [data-slot="calendar"][data-mode="single"]
     [data-slot="calendar-day"][data-filled]
     > button {
-    transition-delay: 0s, 0s, 70ms;
+    --cell-text-delay: 70ms;
   }
 
   .calendar-selection {
@@ -356,6 +350,17 @@
   @media (prefers-reduced-motion: reduce) {
     .calendar-selection {
       transition: opacity 150ms ease-out;
+    }
+
+    /* The fill fades in place instead of sliding, so the text keeps pace. */
+    [data-slot="calendar"][data-mode="single"]
+      [data-slot="calendar-day"]
+      > button,
+    [data-slot="calendar"][data-mode="single"]
+      [data-slot="calendar-day"][data-filled]
+      > button {
+      --cell-text-duration: 150ms;
+      --cell-text-delay: 0s;
     }
   }
 }

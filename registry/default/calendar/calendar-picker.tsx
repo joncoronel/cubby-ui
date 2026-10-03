@@ -13,11 +13,13 @@ export const focusRing =
   "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2";
 
 /**
- * A background in `::before`, painted from `--cell-paint`, that shrinks on
- * press while the label holds still, as Button's does.
+ * A background in `::before` that shrinks on press while the label holds
+ * still, as Button's does. It paints `--cell-paint`, or the press colour
+ * when the cell has none, so a touch press shows without hover. Isolated so
+ * the paint sits behind the label, not the surface around it.
  */
 export const pressPaint =
-  "before:pointer-events-none before:absolute before:inset-0 before:-z-1 before:rounded-[inherit] before:bg-(--cell-paint,transparent) before:transition-[scale] before:duration-100 before:ease-out active:before:scale-[0.96]";
+  "relative isolate before:pointer-events-none before:absolute before:inset-0 before:-z-1 before:rounded-[inherit] before:bg-[var(--cell-paint,var(--cell-press,transparent))] before:transition-[scale,border-radius] before:duration-[100ms,150ms] before:ease-out active:[--cell-press:var(--surface-active)] active:before:scale-[0.96]";
 
 export const cellButtonClassName = cn(
   // Layout
@@ -26,8 +28,10 @@ export const cellButtonClassName = cn(
   focusRing,
   "focus-visible:z-2",
   // Interaction: colours change instantly, since a fade would trail the
-  // pointer across the days.
-  "cursor-pointer transition-[outline-color,outline-offset] duration-150 ease-out",
+  // pointer across the days. A mode can time the text colour (and the today
+  // dot with it) through --cell-text-duration and --cell-text-delay.
+  "cursor-pointer transition-[outline-color,outline-offset,color] duration-[150ms,150ms,var(--cell-text-duration,0s)] delay-[0s,0s,var(--cell-text-delay,0s)] ease-out",
+  "after:transition-[background-color] after:duration-[var(--cell-text-duration,0s)] after:delay-[var(--cell-text-delay,0s)] after:ease-out",
   pressPaint,
   "hover:[--cell-paint:var(--surface-hover)]",
   // Today: a dot under the number, re-coloured when the day is filled

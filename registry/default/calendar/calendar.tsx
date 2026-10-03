@@ -883,8 +883,6 @@ function CalendarPreset({
         "text-muted-foreground flex h-8 shrink-0 cursor-pointer items-center rounded-lg px-2.5 text-start text-sm whitespace-nowrap",
         "hover:text-foreground hover:[--cell-paint:var(--surface-hover)]",
         "data-active:text-foreground data-active:font-medium data-active:[--cell-paint:var(--surface-hover)]",
-        // Isolated so the paint sits behind the label, not the rail.
-        "relative isolate",
         pressPaint,
         focusRing,
         // Hover changes colour instantly, like the days.

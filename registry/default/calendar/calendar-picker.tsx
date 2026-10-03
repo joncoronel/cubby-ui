@@ -19,11 +19,11 @@ export const focusRing =
  * the paint sits behind the label, not the surface around it.
  */
 export const pressPaint =
-  "relative isolate before:pointer-events-none before:absolute before:inset-0 before:-z-1 before:rounded-[inherit] before:bg-[var(--cell-paint,var(--cell-press,transparent))] before:transition-[scale,border-radius] before:duration-[100ms,150ms] before:ease-out active:[--cell-press:var(--surface-active)] active:before:scale-[0.96]";
+  "relative isolate before:pointer-events-none before:absolute before:inset-0 before:-z-1 before:rounded-[inherit] before:bg-[var(--cell-paint,var(--cell-press,transparent))] before:transition-[scale,border-radius] before:duration-[100ms,150ms] before:ease-out active:[--cell-press:var(--surface-active)] active:before:scale-[0.96] motion-reduce:before:transition-none motion-reduce:active:before:scale-100";
 
 export const cellButtonClassName = cn(
   // Layout
-  "relative z-1 flex size-full items-center justify-center rounded-lg text-sm tabular-nums",
+  "z-1 flex size-full items-center justify-center rounded-lg text-sm tabular-nums",
   // Focus
   focusRing,
   "focus-visible:z-2",

@@ -12,16 +12,28 @@ import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 export const focusRing =
   "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2";
 
+/**
+ * A background in `::before` that shrinks on press while the label holds
+ * still, as Button's does. It paints `--cell-paint`, or the press colour
+ * when the cell has none, so a touch press shows without hover. Isolated so
+ * the paint sits behind the label, not the surface around it.
+ */
+export const pressPaint =
+  "relative isolate before:pointer-events-none before:absolute before:inset-0 before:-z-1 before:rounded-[inherit] before:bg-[var(--cell-paint,var(--cell-press,transparent))] before:transition-[scale,border-radius] before:duration-[100ms,150ms] before:ease-out active:[--cell-press:var(--surface-active)] active:before:scale-[0.96] motion-reduce:before:transition-none motion-reduce:active:before:scale-100";
+
 export const cellButtonClassName = cn(
   // Layout
-  "relative z-1 flex size-full items-center justify-center rounded-lg text-sm tabular-nums",
+  "z-1 flex size-full items-center justify-center rounded-lg text-sm tabular-nums",
   // Focus
   focusRing,
   "focus-visible:z-2",
   // Interaction: colours change instantly, since a fade would trail the
-  // pointer across the days.
-  "cursor-pointer transition-[scale,outline-color,outline-offset] duration-150 ease-out active:scale-[0.96] motion-reduce:active:scale-100",
-  "hover:bg-surface-hover",
+  // pointer across the days. A mode can time the text colour (and the today
+  // dot with it) through --cell-text-duration and --cell-text-delay.
+  "cursor-pointer transition-[outline-color,outline-offset,color] duration-[150ms,150ms,var(--cell-text-duration,0s)] delay-[0s,0s,var(--cell-text-delay,0s)] ease-out",
+  "after:transition-[background-color] after:duration-[var(--cell-text-duration,0s)] after:delay-[var(--cell-text-delay,0s)] after:ease-out",
+  pressPaint,
+  "hover:[--cell-paint:var(--surface-hover)]",
   // Today: a dot under the number, re-coloured when the day is filled
   "after:pointer-events-none after:absolute after:inset-x-0 after:bottom-1 after:mx-auto after:size-1 after:rounded-full after:bg-primary after:opacity-0",
 );
@@ -246,7 +258,7 @@ function CalendarPicker({
                   cellButtonClassName,
                   "text-muted-foreground h-8 w-full shrink-0",
                   "data-today:after:opacity-100",
-                  "data-active:text-foreground data-active:bg-surface-hover data-active:font-semibold",
+                  "data-active:text-foreground data-active:font-semibold data-active:[--cell-paint:var(--surface-hover)]",
                 )}
               >
                 {option}
@@ -298,7 +310,7 @@ function CalendarPicker({
                 cellButtonClassName,
                 "h-9 w-full self-center font-medium sm:h-8",
                 "data-today:after:opacity-100",
-                "data-active:bg-primary data-active:text-primary-foreground data-active:after:bg-primary-foreground data-active:hover:bg-(--primary-hover)",
+                "data-active:text-primary-foreground data-active:after:bg-primary-foreground data-active:[--cell-paint:var(--primary)] data-active:hover:[--cell-paint:var(--primary-hover)]",
                 "disabled:pointer-events-none disabled:opacity-40",
               )}
             >

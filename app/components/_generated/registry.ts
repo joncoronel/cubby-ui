@@ -195,6 +195,7 @@ import date_range_picker_date_range_picker_editable from "@/registry/examples/da
 import date_range_picker_date_range_picker_min_max_nights from "@/registry/examples/date-range-picker/date-range-picker-min-max-nights";
 import date_range_picker_date_range_picker_one_month from "@/registry/examples/date-range-picker/date-range-picker-one-month";
 import date_range_picker_date_range_picker_presets from "@/registry/examples/date-range-picker/date-range-picker-presets";
+import date_range_picker_date_range_picker_status from "@/registry/examples/date-range-picker/date-range-picker-status";
 import date_range_picker_date_range_picker_with_format from "@/registry/examples/date-range-picker/date-range-picker-with-format";
 import date_range_picker_date_range_picker_with_placeholder from "@/registry/examples/date-range-picker/date-range-picker-with-placeholder";
 import dialog_dialog_basic from "@/registry/examples/dialog/dialog-basic";
@@ -2603,7 +2604,7 @@ export const exampleRegistry = {
     {
       "title": "Min Max Nights",
       "importPath": "date-range-picker-min-max-nights",
-      "source": "import { DateRangePicker } from \"@/components/ui/cubby-ui/date-range-picker\";\n\nexport default function DateRangePickerMinMaxNights() {\n  return (\n    <DateRangePicker\n      placeholder=\"Book a stay\"\n      minDate={new Date()}\n      minNights={2}\n      maxNights={14}\n      // A stay is counted in nights, one fewer than the days it spans.\n      labels={{\n        duration: (days) => `${days - 1} ${days === 2 ? \"night\" : \"nights\"}`,\n      }}\n    />\n  );\n}\n"
+      "source": "import { DateRangePicker } from \"@/components/ui/cubby-ui/date-range-picker\";\n\nexport default function DateRangePickerMinMaxNights() {\n  return (\n    <DateRangePicker\n      placeholder=\"Book a stay\"\n      minDate={new Date()}\n      minNights={2}\n      maxNights={14}\n      showStatus\n      // A stay is counted in nights, one fewer than the days it spans.\n      labels={{\n        duration: (days) => `${days - 1} ${days === 2 ? \"night\" : \"nights\"}`,\n      }}\n    />\n  );\n}\n"
     },
     {
       "title": "One Month",
@@ -2614,6 +2615,11 @@ export const exampleRegistry = {
       "title": "Presets",
       "importPath": "date-range-picker-presets",
       "source": "\"use client\";\n\nimport { useState } from \"react\";\nimport {\n  DateRangePicker,\n  type DateRangePreset,\n  type DateRangeValue,\n} from \"@/components/ui/cubby-ui/date-range-picker\";\n\nfunction daysAgo(days: number): Date {\n  const date = new Date();\n  date.setDate(date.getDate() - days);\n  return date;\n}\n\nconst presets: DateRangePreset[] = [\n  { label: \"Today\", value: () => ({ from: new Date(), to: new Date() }) },\n  { label: \"Last 7 days\", value: () => ({ from: daysAgo(6), to: new Date() }) },\n  {\n    label: \"Last 30 days\",\n    value: () => ({ from: daysAgo(29), to: new Date() }),\n  },\n  {\n    label: \"This month\",\n    value: () => {\n      const today = new Date();\n      return {\n        from: new Date(today.getFullYear(), today.getMonth(), 1),\n        to: today,\n      };\n    },\n  },\n  {\n    label: \"Last month\",\n    value: () => {\n      const today = new Date();\n      return {\n        from: new Date(today.getFullYear(), today.getMonth() - 1, 1),\n        to: new Date(today.getFullYear(), today.getMonth(), 0),\n      };\n    },\n  },\n  {\n    label: \"Year to date\",\n    value: () => ({\n      from: new Date(new Date().getFullYear(), 0, 1),\n      to: new Date(),\n    }),\n  },\n];\n\nexport default function DateRangePickerPresets() {\n  const [range, setRange] = useState<DateRangeValue | null>(null);\n\n  return (\n    <DateRangePicker\n      value={range}\n      onValueChange={setRange}\n      presets={presets}\n      maxDate={new Date()}\n    />\n  );\n}\n"
+    },
+    {
+      "title": "Status",
+      "importPath": "date-range-picker-status",
+      "source": "import { DateRangePicker } from \"@/components/ui/cubby-ui/date-range-picker\";\n\nexport default function DateRangePickerStatus() {\n  return <DateRangePicker showStatus />;\n}\n"
     },
     {
       "title": "With Format",
@@ -4460,6 +4466,7 @@ export const componentMap = {
   "date-range-picker-min-max-nights": date_range_picker_date_range_picker_min_max_nights,
   "date-range-picker-one-month": date_range_picker_date_range_picker_one_month,
   "date-range-picker-presets": date_range_picker_date_range_picker_presets,
+  "date-range-picker-status": date_range_picker_date_range_picker_status,
   "date-range-picker-with-format": date_range_picker_date_range_picker_with_format,
   "date-range-picker-with-placeholder": date_range_picker_date_range_picker_with_placeholder,
   "dialog-basic": dialog_dialog_basic,

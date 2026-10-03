@@ -28,7 +28,7 @@ To select a single date, use [`DatePicker`](/docs/components/date-picker) instea
 
 ## Examples
 
-The value changes only after you pick both ends; closing the popover halfway keeps the previous range. A status line under the calendar shows the range and its length.
+The value changes only after you pick both ends; closing the popover halfway keeps the previous range.
 
 ### Typing a Range
 
@@ -48,9 +48,18 @@ Use `presets` to add one-click ranges beside the calendar. Give each a function 
   example="date-range-picker-presets"
 />
 
+### Status Line
+
+Use `showStatus` to show the range being picked and its length under the calendar. It's off by default, since the trigger shows the finished range.
+
+<ComponentPreview
+  component="date-range-picker"
+  example="date-range-picker-status"
+/>
+
 ### Minimum and Maximum Length
 
-Use `minNights` and `maxNights` to limit the range's length, counted in nights between the ends, and `minDate` and `maxDate` to limit where it falls. For stays, set `labels.duration` to count nights instead of days in the status line.
+Use `minNights` and `maxNights` to limit the range's length, counted in nights between the ends, and `minDate` and `maxDate` to limit where it falls. For stays, set `labels.duration` to count nights instead of days in the status line and its announcement.
 
 <ComponentPreview
   component="date-range-picker"
@@ -95,7 +104,7 @@ Use `disabled` to stop the picker from opening.
 
 ## Accessibility
 
-The trigger is a button that opens the calendar in a popover and moves focus into it. Use the arrow keys to move between days and `Enter` or `Space` to set the start and then the end; the preview band follows keyboard focus as well as the pointer. The status line under the calendar is a polite live region, so screen readers announce each step ("pick an end date", then the finished range and its length). `Escape` closes the popover without a change.
+The trigger is a button that opens the calendar in a popover and moves focus into it. Use the arrow keys to move between days and `Enter` or `Space` to set the start and then the end; the preview band follows keyboard focus as well as the pointer. A polite live region announces each step to screen readers ("pick an end date", then the finished range and its length), whether or not `showStatus` displays it. `Escape` closes the popover without a change.
 
 ## API Reference
 
@@ -162,8 +171,8 @@ DateRangePicker composes [`Calendar`](/docs/components/calendar) in `range` mode
   fullType="(range: { from: Date; to: Date }) => string"
   simpleType="function"
 >
-  Writes the range on the trigger and in the status line. Defaults to the
-  locale's compact range.
+  Writes the range on the trigger and in the status line and its announcement.
+  Defaults to the locale's compact range.
 </ApiProp>
 
 <ApiProp name="editable" fullType="boolean" defaultValue="false">
@@ -199,6 +208,11 @@ DateRangePicker composes [`Calendar`](/docs/components/calendar) in `range` mode
 <ApiProp name="numberOfMonths" fullType="number">
   Months shown side by side. Defaults to 2 from the `sm` breakpoint up, 1 below
   it.
+</ApiProp>
+
+<ApiProp name="showStatus" fullType="boolean" defaultValue="false">
+  Shows a line under the calendar with the range being picked and its length.
+  Screen readers hear each step either way.
 </ApiProp>
 
 <ApiProp

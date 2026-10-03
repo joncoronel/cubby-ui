@@ -122,6 +122,11 @@ export type DateRangePickerProps = PickerControlProps &
     maxNights?: number;
     /** Months shown side by side. Defaults to 2, or 1 on small screens. */
     numberOfMonths?: number;
+    /**
+     * Shows a line under the calendar with the range being picked and its
+     * length. Hidden, it still announces each step to screen readers.
+     */
+    showStatus?: boolean;
     /** One-click ranges shown beside the calendar. */
     presets?: DateRangePreset[];
     /** Submits the ends as `YYYY-MM-DD` under `${name}From` and `${name}To`. */
@@ -193,6 +198,7 @@ function DateRangePicker({
   minNights,
   maxNights,
   numberOfMonths,
+  showStatus = false,
   presets,
   name,
   calendarProps,
@@ -379,7 +385,11 @@ function DateRangePicker({
               startMonth={calendarProps?.startMonth ?? minDate}
               endMonth={calendarProps?.endMonth ?? maxDate}
             />
-            <div className="flex min-h-9 items-center px-2 pt-1">
+            <div
+              className={
+                showStatus ? "flex min-h-9 items-center px-2 pt-1" : "sr-only"
+              }
+            >
               {/* Wraps rather than truncates: a cross-year range or a longer
                   locale can run past one month's width. */}
               <p

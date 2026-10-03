@@ -275,9 +275,9 @@
 }
 
 /* All anchor features or none: a partial implementation would leave the fill
- * unsized or tied to another calendar. */
+ * unplaced or tied to another calendar. */
 @supports (anchor-name: --calendar-selection) and
-  (anchor-scope: --calendar-selection) and (width: anchor-size(width)) {
+  (anchor-scope: --calendar-selection) and (inset: anchor(inside)) {
   [data-slot="calendar"] {
     anchor-scope: --calendar-selection;
   }
@@ -310,17 +310,13 @@
     display: block;
     position: absolute;
     position-anchor: --calendar-selection;
-    top: anchor(top);
-    left: anchor(left);
-    width: anchor-size(width);
-    height: anchor-size(height);
+    inset: anchor(inside);
     z-index: -1;
     border-radius: var(--calendar-radius);
     background: var(--color-primary);
     pointer-events: none;
     transition:
-      top var(--calendar-duration) var(--calendar-ease),
-      left var(--calendar-duration) var(--calendar-ease),
+      inset var(--calendar-duration) var(--calendar-ease),
       opacity 150ms ease-out,
       scale var(--calendar-duration) var(--calendar-ease);
   }

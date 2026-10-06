@@ -25,7 +25,7 @@ export default function CircularSliderThumbShape() {
         {RINGS.map(({ label, thumbShape, thickness }) => (
           <div key={label} className="flex flex-col items-center gap-3">
             <CircularSlider
-              defaultValue={58}
+              defaultValue={60}
               thumbShape={thumbShape}
               thickness={thickness}
               size={128}
@@ -41,12 +41,13 @@ export default function CircularSliderThumbShape() {
             <CircularSliderRoot
               variant="knob"
               thumbShape={thumbShape}
-              defaultValue={58}
+              defaultValue={60}
+              step={5}
               size={112}
               thickness={8}
               aria-label="Volume"
             >
-              <CircularSliderTicks count={24} />
+              <CircularSliderTicks count={20} />
               <CircularSliderKnob />
             </CircularSliderRoot>
             <p className="text-muted-foreground text-sm">{label}</p>

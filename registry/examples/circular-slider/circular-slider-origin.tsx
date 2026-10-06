@@ -11,7 +11,7 @@ const formatPan = (v: number): string =>
   v === 0 ? "C" : v < 0 ? `L ${-v}` : `R ${v}`;
 
 export default function CircularSliderOrigin() {
-  const [pan, setPan] = React.useState(-18);
+  const [pan, setPan] = React.useState(-20);
 
   return (
     <div className="flex flex-col items-center gap-3">
@@ -21,6 +21,7 @@ export default function CircularSliderOrigin() {
         onValueChange={setPan}
         min={-50}
         max={50}
+        step={5}
         origin={0}
         size={120}
         thickness={9}

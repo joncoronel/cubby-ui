@@ -9,7 +9,7 @@ import {
 
 const KNOBS = [
   { label: "Drive", defaultValue: 30 },
-  { label: "Tone", defaultValue: 62 },
+  { label: "Tone", defaultValue: 60 },
   { label: "Level", defaultValue: 75 },
 ] as const;
 
@@ -37,6 +37,7 @@ function KnobControl({
       <CircularSliderRoot
         variant="knob"
         dragMode="vertical"
+        step={5}
         value={value}
         onValueChange={setValue}
         size={88}

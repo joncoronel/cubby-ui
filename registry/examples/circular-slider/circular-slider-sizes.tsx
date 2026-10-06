@@ -17,7 +17,7 @@ export default function CircularSliderSizes() {
           defaultValue={60}
           size={size}
           thickness={thickness}
-          aria-label="Brightness"
+          aria-label={`Brightness, ${size}px dial`}
         />
       ))}
     </div>

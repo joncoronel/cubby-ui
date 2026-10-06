@@ -45,6 +45,11 @@ export function normalizeAngle(angle: number): number {
   return normalized < 0 ? normalized + 360 : normalized;
 }
 
+/** Remainder that is never negative: `mod(-1, 360)` is 359. */
+export function mod(x: number, n: number): number {
+  return ((x % n) + n) % n;
+}
+
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
@@ -103,7 +108,7 @@ export function snapValue(dial: Dial, value: number): number {
   const steps = Math.round((value - min) / step);
   let snapped = Number((min + steps * step).toFixed(stepDecimals(step)));
   if (dial.wrap) {
-    snapped = min + ((((snapped - min) % range) + range) % range);
+    snapped = min + mod(snapped - min, range);
     return Number(snapped.toFixed(stepDecimals(step)));
   }
   return clamp(snapped, min, max);
@@ -135,17 +140,6 @@ export function pointToAngle(
 }
 
 /**
- * Progress for a screen angle. Angles in the gap of a partial sweep project
- * onto the nearer end.
- */
-export function angleToProgress(dial: Dial, angle: number): number {
-  const offset = normalizeAngle((angle - dial.start) * dial.dir);
-  if (offset <= dial.sweep) return offset;
-  const gap = 360 - dial.sweep;
-  return offset - dial.sweep < gap / 2 ? dial.sweep : 0;
-}
-
-/**
  * Like `angleToProgress`, but an angle in the gap keeps going past the nearer
  * end (negative before the start, above `sweep` after the end) instead of
  * snapping onto it. A drag that holds the thumb at an offset from the pointer
@@ -157,6 +151,14 @@ export function angleToUnclampedProgress(dial: Dial, angle: number): number {
   if (offset <= dial.sweep) return offset;
   const gap = 360 - dial.sweep;
   return offset - dial.sweep < gap / 2 ? offset : offset - 360;
+}
+
+/**
+ * Progress for a screen angle. Angles in the gap of a partial sweep project
+ * onto the nearer end.
+ */
+export function angleToProgress(dial: Dial, angle: number): number {
+  return clamp(angleToUnclampedProgress(dial, angle), 0, dial.sweep);
 }
 
 /**
@@ -179,7 +181,7 @@ export function continueDrag(
 
 /** Signed shortest difference between two progresses on a wrapping dial. */
 export function wrapDelta(from: number, to: number, period: number): number {
-  const delta = (((to - from) % period) + period) % period;
+  const delta = mod(to - from, period);
   return delta > period / 2 ? delta - period : delta;
 }
 
@@ -211,7 +213,7 @@ export function getActiveSpan(
     const a = valueToProgress(dial, values[0]);
     const b = valueToProgress(dial, values[values.length - 1]);
     if (dial.wrap) {
-      return { from: a, length: (((b - a) % 360) + 360) % 360 };
+      return { from: a, length: mod(b - a, 360) };
     }
     return { from: Math.min(a, b), length: Math.abs(b - a) };
   }
@@ -226,7 +228,7 @@ export function getActiveSpan(
 export function isInSpan(dial: Dial, progress: number, span: Span): boolean {
   const epsilon = 0.0001;
   if (dial.wrap) {
-    const offset = (((progress - span.from) % 360) + 360) % 360;
+    const offset = mod(progress - span.from, 360);
     return offset <= span.length + epsilon;
   }
   return (
@@ -383,7 +385,7 @@ export function placeRangeThumb(
   }
 
   const range = dial.max - dial.min;
-  const span = (((b - a) % range) + range) % range;
+  const span = mod(b - a, range);
   let delta = wrapDelta(values[index], candidate, range);
   // Moving the start forward shortens the span; moving the end forward
   // lengthens it. Either way the span must stay within [gap, range - gap].
@@ -412,4 +414,23 @@ export function placeRangeThumb(
  */
 export function widenSpan(span: Span, by: number): Span {
   return { from: span.from - by, length: span.length + by * 2 };
+}
+
+/**
+ * Which of a range's two thumbs to take when a press lands on both: the one
+ * that can move the way the pointer went. Forward (increasing progress)
+ * takes the thumb ahead, backward the one behind. On a wrapping dial the end
+ * is ahead of the start while the range is the short way round.
+ */
+export function pickOverlappedThumb(
+  dial: Dial,
+  values: readonly number[],
+  forward: boolean,
+): number {
+  const range = dial.max - dial.min;
+  const endAhead = dial.wrap
+    ? mod(values[1] - values[0], range) < range / 2
+    : values[1] >= values[0];
+  const ahead = endAhead ? 1 : 0;
+  return forward ? ahead : 1 - ahead;
 }

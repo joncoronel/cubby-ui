@@ -14,7 +14,7 @@ export default function CircularSliderSweep() {
             sweep={sweep}
             size={112}
             thickness={10}
-            aria-label="Volume"
+            aria-label={`Volume, ${sweep}° dial`}
           />
           <p className="text-muted-foreground text-sm tabular-nums">{sweep}°</p>
         </div>

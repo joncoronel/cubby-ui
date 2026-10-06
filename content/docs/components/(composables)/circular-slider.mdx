@@ -139,7 +139,9 @@ Use `direction` to set which way the value increases.
 
 ## Accessibility
 
-Each thumb is a visually hidden native `<input type="range">`, so it takes focus, joins forms, and announces as a slider. Name it with `aria-label` on the root, or with `getAriaLabel` for each thumb of a range, and pass `getAriaValueText` when the number alone doesn't say enough ("21.5 degrees", "07:00").
+Each thumb is a visually hidden native `<input type="range">`, so it takes focus, joins forms, and announces as a slider. Name it with `aria-label` on the root. Screen readers speak the value through `formatValue`; pass `getAriaValueText` when the spoken form should differ from the displayed one ("21.5 degrees" for "21.5°").
+
+A range renders as a group named by `aria-label`, with thumbs named "Start" and "End". Use `getAriaLabel` to name them yourself.
 
 ### Keyboard
 
@@ -161,7 +163,7 @@ The Circular Slider is a custom SVG component. It follows Base UI's patterns: ev
 
 #### CircularSliderRoot
 
-Holds the value and geometry, and renders a hidden range input per thumb. `CircularSlider` takes the same props plus `formatValue`.
+Holds the value and geometry, and renders a hidden range input per thumb.
 
 <ApiPropsList>
 
@@ -297,33 +299,62 @@ Holds the value and geometry, and renders a hidden range input per thumb. `Circu
 </ApiProp>
 
 <ApiProp
+  name="formatValue"
+  fullType="(value: number, index: number) => string"
+  simpleType="function"
+>
+  Formats each value for display. `CircularSliderValue` reads it, and screen
+  readers speak it unless `getAriaValueText` is set.
+</ApiProp>
+
+<ApiProp
   name="getAriaLabel"
   fullType="(index: number) => string"
   simpleType="function"
 >
-  Accessible name for each thumb of a range.
+  Accessible name for each thumb of a range. Defaults to "Start" and "End";
+  `aria-label` names the range as a group.
 </ApiProp>
 
 <ApiProp
   name="getAriaValueText"
   fullType="(value: number, index: number) => string"
   simpleType="function"
+  defaultValue="formatValue"
 >
-  Spoken value for a thumb.
+  Spoken value for a thumb, when it should differ from the displayed one.
 </ApiProp>
 
 </ApiPropsList>
 
-`name`, `form`, `id`, `aria-label`, `aria-labelledby`, and `aria-describedby` go to the hidden inputs.
+`name`, `form`, `id` and `aria-describedby` go to the hidden inputs. `aria-label` and `aria-labelledby` name the input on a single-value dial, and the group on a range.
 
-#### CircularSliderThumb
+#### CircularSlider
 
-A bead set into the end of the indicator. Renders one per value.
+The ready-made ring: Track, Indicator, Thumb and Value inside a root. Takes the root's props, except `variant`; compose a knob with `CircularSliderRoot`.
 
 <ApiPropsList>
 
-<ApiProp name="size" fullType="number" defaultValue="thickness - 4">
-  Bead diameter in pixels.
+<ApiProp
+  name="formatValue"
+  fullType="((value: number, index: number) => string) | null"
+  simpleType="function"
+>
+  Formats the centered value, and what screen readers speak unless
+  `getAriaValueText` is set. Pass `null` to hide the value.
+</ApiProp>
+
+</ApiPropsList>
+
+#### CircularSliderThumb
+
+The thumb for each value, shaped by the root's `thumbShape`: a bead set into the end of the indicator, or a slim pill across the band. When a range's two beads meet, they join into one pill.
+
+<ApiPropsList>
+
+<ApiProp name="beadSize" fullType="number" defaultValue="thickness - 4">
+  Bead diameter in pixels. Applies to the bead only; a pill's shape follows the
+  band.
 </ApiProp>
 
 </ApiPropsList>
@@ -375,7 +406,7 @@ The value as text, centered in the dial.
   fullType="(value: number, index: number) => string"
   simpleType="function"
 >
-  Formats each value.
+  Formats each value. Defaults to the root's `formatValue`.
 </ApiProp>
 
 <ApiProp name="separator" fullType="string" defaultValue='" – "'>

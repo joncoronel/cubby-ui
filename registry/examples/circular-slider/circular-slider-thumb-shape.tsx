@@ -29,7 +29,7 @@ export default function CircularSliderThumbShape() {
               thumbShape={thumbShape}
               thickness={thickness}
               size={128}
-              aria-label="Volume"
+              aria-label={`Volume, ${label.toLowerCase()}`}
             />
             <p className="text-muted-foreground text-sm">{label}</p>
           </div>
@@ -45,7 +45,7 @@ export default function CircularSliderThumbShape() {
               step={5}
               size={112}
               thickness={8}
-              aria-label="Volume"
+              aria-label={`Volume, ${label.toLowerCase()}`}
             >
               <CircularSliderTicks count={20} />
               <CircularSliderKnob />

@@ -39,8 +39,8 @@ export default function CircularSliderRange() {
       wrap
       size={208}
       thickness={16}
-      getAriaLabel={(i) => (i === 0 ? "Quiet hours start" : "Quiet hours end")}
-      getAriaValueText={(v) => formatTime(v)}
+      aria-label="Quiet hours"
+      formatValue={formatTime}
     >
       <CircularSliderTrack />
       <CircularSliderTicks count={24} />
@@ -50,11 +50,7 @@ export default function CircularSliderRange() {
         <span className="text-muted-foreground text-xs font-medium">
           Quiet hours
         </span>
-        <CircularSliderValue
-          formatValue={formatTime}
-          separator="–"
-          className="text-xl"
-        />
+        <CircularSliderValue separator="–" className="text-xl" />
         <span className="text-muted-foreground text-xs tabular-nums">
           {formatDuration(length)}
         </span>

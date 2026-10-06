@@ -10,6 +10,8 @@ import {
   ringHeight,
   trimOriginCap,
   placeRangeThumb,
+  mod,
+  pickOverlappedThumb,
   pointToAngle,
   progressToAngle,
   resolveStartAngle,
@@ -305,5 +307,28 @@ describe("widenSpan", () => {
     expect(isInSpan(dial, 157.5, widenSpan(span, half))).toBe(true);
     // The next tick along stays dark.
     expect(isInSpan(dial, 168.75, widenSpan(span, half))).toBe(false);
+  });
+});
+
+describe("mod", () => {
+  it("never goes negative", () => {
+    expect(mod(-1, 360)).toBe(359);
+    expect(mod(725, 360)).toBe(5);
+  });
+});
+
+describe("pickOverlappedThumb", () => {
+  it("takes the thumb that can move the way the pointer went", () => {
+    const dial = createDial(base);
+    expect(pickOverlappedThumb(dial, [40, 40], true)).toBe(1);
+    expect(pickOverlappedThumb(dial, [40, 40], false)).toBe(0);
+  });
+
+  it("follows the short way round on a wrapping dial", () => {
+    const clock = createDial({ ...base, max: 24, sweep: 360, wrap: true });
+    // End just ahead of the start, through midnight.
+    expect(pickOverlappedThumb(clock, [23.75, 0], true)).toBe(1);
+    // End just behind the start: the start is the one ahead.
+    expect(pickOverlappedThumb(clock, [0, 23.75], true)).toBe(0);
   });
 });

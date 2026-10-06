@@ -306,16 +306,19 @@ export function trimOriginCap(
 /**
  * Height a ring needs to show its whole arc, measured from the top of its
  * square: the lowest point of the band (an end, or 6 o'clock when the sweep
- * passes it) plus the round cap. A 180° dial is about half as tall as it is
+ * passes it) plus the round cap. `inset` is how far the band sits in from the
+ * edge to leave room for a thumb that overhangs it, which overhangs the ends
+ * by the same amount. A 180° dial is about half as tall as it is
  * wide; a full circle, or any sweep through the bottom, is square.
  */
 export function ringHeight(
   dial: Dial,
   size: number,
   thickness: number,
+  inset = 0,
 ): number {
   const c = size / 2;
-  const r = size / 2 - thickness / 2;
+  const r = size / 2 - inset - thickness / 2;
   const yAt = (angle: number): number =>
     c - r * Math.cos((angle * Math.PI) / 180);
   const startAngle = dial.start;
@@ -329,7 +332,9 @@ export function ringHeight(
   // Content centered in the dial (the value) hangs below the center, so a
   // shallow sweep still leaves it a little room.
   const contentFloor = c + size * 0.1;
-  return round(Math.min(size, Math.max(lowest + thickness / 2, contentFloor)));
+  return round(
+    Math.min(size, Math.max(lowest + thickness / 2 + inset, contentFloor)),
+  );
 }
 
 export type ThumbCollision = "push" | "none";

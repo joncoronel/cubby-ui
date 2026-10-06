@@ -58,6 +58,9 @@ interface CircularSliderContextValue {
   origin: number;
   size: number;
   thickness: number;
+  /** How far the band sits in from the edge, making room for a pill thumb. */
+  inset: number;
+  thumbShape: "bead" | "pill";
   variant: "ring" | "knob";
   pressed: boolean;
   dragging: boolean;
@@ -193,6 +196,12 @@ export interface CircularSliderRootProps<
   disabled?: boolean;
   name?: string;
   form?: string;
+  /**
+   * `bead` sits inside the band at the end of the indicator. `pill` is a
+   * slim handle across the band that overhangs it on both sides; the band
+   * moves in to make room, so the dial keeps its size.
+   */
+  thumbShape?: "bead" | "pill";
   /** Least distance, in steps, between a range's thumbs. */
   minStepsBetweenValues?: number;
   /**
@@ -237,6 +246,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
   "aria-describedby": ariaDescribedby,
   getAriaLabel,
   getAriaValueText,
+  thumbShape = "bead",
   minStepsBetweenValues = 0,
   thumbCollisionBehavior = "push",
   ...props
@@ -253,7 +263,10 @@ function CircularSliderRoot<Value extends SliderValue = number>({
   const values = toArray(rawValue);
   const isRange = typeof rawValue !== "number";
   const origin = clamp(originProp ?? min, min, max);
-  const height = variant === "ring" ? ringHeight(dial, size, thickness) : size;
+  const inset =
+    variant === "ring" && thumbShape === "pill" ? pillOverhang(thickness) : 0;
+  const height =
+    variant === "ring" ? ringHeight(dial, size, thickness, inset) : size;
   const thumbGap = Math.max(0, minStepsBetweenValues) * step;
 
   // Latest values for event handlers, which outlive the render they came from.
@@ -357,7 +370,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
 
       // A ring only answers along its band, so whatever sits in the middle
       // stays clickable; a knob answers anywhere on its face.
-      const bandInner = outer - thickness * scale;
+      const bandInner = outer - (inset + thickness) * scale;
       const slop = 10 * scale;
       if (
         variant === "ring"
@@ -398,7 +411,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
       } else {
         // Grabbing the thumb itself holds on without moving it; anywhere
         // else on the band jumps (and animates) the nearest thumb there.
-        const radius = outer - (thickness * scale) / 2 || 1;
+        const radius = outer - (inset + thickness / 2) * scale || 1;
         const grabDegrees =
           ((thickness * scale * 0.75 + 8 * scale) / radius) * (180 / Math.PI);
         const thumbAngle = progressToAngle(dial, thumbProgress);
@@ -446,6 +459,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
       disabled,
       size,
       thickness,
+      inset,
       variant,
       dragMode,
       dial,
@@ -468,7 +482,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
             box.top + box.width / 2,
           );
           const scale = box.width / size;
-          const radius = box.width / 2 - (thickness * scale) / 2 || 1;
+          const radius = box.width / 2 - (inset + thickness / 2) * scale || 1;
           const grabDegrees =
             ((thickness * scale * 0.75 + 8 * scale) / radius) * (180 / Math.PI);
           const current = valuesRef.current;
@@ -608,6 +622,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
       variant,
       size,
       thickness,
+      inset,
       origin,
       grabHover,
       setThumbFromProgress,
@@ -733,6 +748,8 @@ function CircularSliderRoot<Value extends SliderValue = number>({
       origin,
       size,
       thickness,
+      inset,
+      thumbShape,
       variant,
       pressed,
       dragging,
@@ -749,6 +766,8 @@ function CircularSliderRoot<Value extends SliderValue = number>({
       origin,
       size,
       thickness,
+      inset,
+      thumbShape,
       variant,
       pressed,
       dragging,
@@ -804,7 +823,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
             aria-hidden
             data-grab-hover={grabHover || undefined}
             className="absolute inset-0 z-1 cursor-pointer touch-none group-data-pressed/circular-slider:cursor-grabbing data-grab-hover:cursor-grab"
-            style={{ clipPath: bandClipPath(size, thickness) }}
+            style={{ clipPath: bandClipPath(size, thickness, inset) }}
           />
         )}
         {values.map((thumbValue, index) => (
@@ -860,12 +879,12 @@ function CircularSliderRoot<Value extends SliderValue = number>({
  * A ring-shaped clip for the band's hit layer: the band plus a little slop on
  * each side. clip-path also clips hit-testing, so the middle stays free.
  */
-function bandClipPath(size: number, thickness: number): string {
+function bandClipPath(size: number, thickness: number, inset: number): string {
   const c = size / 2;
   const circle = (r: number): string =>
     `M ${c - r} ${c} a ${r} ${r} 0 1 0 ${2 * r} 0 a ${r} ${r} 0 1 0 ${-2 * r} 0 Z`;
   const outer = c + 6;
-  const inner = Math.max(0, c - thickness - 8);
+  const inner = Math.max(0, c - inset - thickness - 8);
   return `path(evenodd, "${circle(outer)} ${circle(inner)}")`;
 }
 
@@ -886,8 +905,45 @@ function overlayProps(slot: string, size: number, className?: string) {
 }
 
 /** Radius of the center line of the outer band. */
-function bandRadius(size: number, thickness: number): number {
-  return size / 2 - thickness / 2;
+function bandRadius(size: number, thickness: number, inset = 0): number {
+  return size / 2 - inset - thickness / 2;
+}
+
+/**
+ * How far a pill thumb reaches past each side of the band. The band moves in
+ * by the same amount so the pill stays inside the dial's box.
+ */
+function pillOverhang(thickness: number): number {
+  return Math.max(3, Math.round(thickness * 0.3));
+}
+
+/** Pill thumb width: slim, but never a hairline. */
+function pillWidth(thickness: number): number {
+  return clamp(Math.round(thickness / 3), 3, 6);
+}
+
+/**
+ * The stretch of progress the track is drawn over.
+ *
+ * A round cap reaches half the band past each end, and a pill thumb is
+ * slimmer than that, so at min or max a sliver of cap would show beyond it.
+ * With a pill the track is pulled in at both ends until its rounded tip
+ * lands on the pill's outer edge: the thumb sits flush with the end, as
+ * Base UI's `thumbAlignment="edge"` does for a straight slider. A full
+ * circle has no ends to pull in.
+ */
+function trackSpan(
+  dial: Dial,
+  radius: number,
+  thickness: number,
+  thumbShape: "bead" | "pill",
+): Span {
+  if (thumbShape !== "pill" || dial.sweep >= 360) {
+    return { from: 0, length: dial.sweep };
+  }
+  const px = thickness / 2 - pillWidth(thickness) / 2;
+  const degrees = ((px / radius) * 180) / Math.PI;
+  return { from: degrees, length: Math.max(0, dial.sweep - degrees * 2) };
 }
 
 const svgRotateStyle = {
@@ -903,9 +959,14 @@ function CircularSliderTrack({
   render,
   ...props
 }: CircularSliderTrackProps) {
-  const { dial, size, thickness } = useCircularSliderContext();
-  const radius = bandRadius(size, thickness);
-  const stroke = arcStroke(dial, radius, { from: 0, length: dial.sweep });
+  const { dial, size, thickness, inset, thumbShape } =
+    useCircularSliderContext();
+  const radius = bandRadius(size, thickness, inset);
+  const stroke = arcStroke(
+    dial,
+    radius,
+    trackSpan(dial, radius, thickness, thumbShape),
+  );
 
   return useRender({
     defaultTagName: "svg",
@@ -948,8 +1009,10 @@ function CircularSliderIndicator({
   render,
   ...props
 }: CircularSliderIndicatorProps) {
-  const { dial, values, origin, size, thickness } = useCircularSliderContext();
-  const radius = bandRadius(size, thickness);
+  const { dial, values, origin, size, thickness, inset, thumbShape } =
+    useCircularSliderContext();
+  const radius = bandRadius(size, thickness, inset);
+  const capDegrees = ((thickness / 2 / radius) * 180) / Math.PI;
   const span = getActiveSpan(dial, values, origin);
   // From a reference reading (not min), start the arc at the reading itself.
   const fromReference = values.length === 1 && origin !== dial.min;
@@ -958,11 +1021,52 @@ function CircularSliderIndicator({
         span,
         valueToProgress(dial, values[0]),
         valueToProgress(dial, origin),
-        ((thickness / 2 / radius) * 180) / Math.PI,
+        capDegrees,
       )
     : span;
-  const stroke = arcStroke(dial, radius, drawn);
   const hidden = fromReference && drawn.length === 0;
+
+  // useId output can hold characters that break a url(#...) reference.
+  const maskId = `circular-slider-mask-${React.useId().replace(/[^\w-]/g, "")}`;
+  const isPill = thumbShape === "pill";
+  // A pill thumb is slimmer than the band, so the indicator's ends are cut
+  // flat (a round end would bulge out past the pill) and the whole arc is
+  // masked to the track's silhouette. That lets the free end run on into the
+  // track's rounded tip and fill it exactly, while an end under a thumb stops
+  // flat at the thumb's center, and nothing ever pokes outside the track.
+  let pillSpan: Span | null = null;
+  if (isPill) {
+    const startsAtMin = values.length === 1 && origin === dial.min;
+    const reach = dial.sweep < 360 && startsAtMin ? capDegrees : 0;
+    pillSpan = { from: span.from - reach, length: span.length + reach };
+  }
+  const track = trackSpan(dial, radius, thickness, thumbShape);
+
+  const indicatorArc = (piece: Span, cap: "round" | "butt") => {
+    const stroke = arcStroke(dial, radius, piece);
+    return (
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        strokeWidth={thickness}
+        strokeLinecap={cap}
+        className={cn(
+          "stroke-primary transition-[stroke-dasharray,rotate,opacity]",
+          SETTLE_TRANSITION,
+          hidden && "opacity-0",
+        )}
+        style={{
+          ...svgRotateStyle,
+          strokeDasharray: stroke.strokeDasharray,
+          rotate: stroke.rotate,
+        }}
+      />
+    );
+  };
+  const trackStroke = arcStroke(dial, radius, track);
+  const c = size / 2;
 
   return useRender({
     defaultTagName: "svg",
@@ -971,25 +1075,31 @@ function CircularSliderIndicator({
       overlayProps("circular-slider-indicator", size, className),
       props,
       {
-        children: (
-          <circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            fill="none"
-            strokeWidth={thickness}
-            strokeLinecap="round"
-            className={cn(
-              "stroke-primary transition-[stroke-dasharray,rotate,opacity]",
-              SETTLE_TRANSITION,
-              hidden && "opacity-0",
-            )}
-            style={{
-              ...svgRotateStyle,
-              strokeDasharray: stroke.strokeDasharray,
-              rotate: stroke.rotate,
-            }}
-          />
+        children: isPill ? (
+          <>
+            <defs>
+              <mask id={maskId} maskUnits="userSpaceOnUse">
+                <circle
+                  cx={c}
+                  cy={c}
+                  r={radius}
+                  fill="none"
+                  stroke="white"
+                  strokeWidth={thickness}
+                  strokeLinecap="round"
+                  strokeDasharray={trackStroke.strokeDasharray}
+                  // An attribute rather than CSS: CSS transforms inside mask
+                  // content are not reliable across engines.
+                  transform={`rotate(${parseFloat(trackStroke.rotate)} ${c} ${c})`}
+                />
+              </mask>
+            </defs>
+            <g mask={`url(#${maskId})`}>
+              {indicatorArc(pillSpan as Span, "butt")}
+            </g>
+          </>
+        ) : (
+          indicatorArc(drawn, "round")
         ),
       },
     ),
@@ -997,7 +1107,10 @@ function CircularSliderIndicator({
 }
 
 export interface CircularSliderThumbProps extends useRender.ComponentProps<"svg"> {
-  /** Bead diameter in px. Defaults to the band's thickness less 4px. */
+  /**
+   * Bead diameter in px. Defaults to the band's thickness less 4px. The
+   * pill's shape follows the band; set it with `thumbShape` on the root.
+   */
   size?: number;
 }
 
@@ -1025,18 +1138,26 @@ function CircularSliderThumb({
     values,
     size,
     thickness,
+    inset,
+    thumbShape,
     pressed,
     activeIndex,
     focusVisibleIndex,
   } = useCircularSliderContext();
+  const isPill = thumbShape === "pill";
   const bead = beadSize ?? Math.max(4, thickness - 4);
-  const radius = bandRadius(size, thickness);
+  const radius = bandRadius(size, thickness, inset);
   const c = size / 2;
+  // Center of the band at 12 o'clock, before each thumb is rotated into place.
+  const cy = inset + thickness / 2;
+  const pillW = pillWidth(thickness);
+  const pillH = thickness + inset * 2;
   const progresses = values.map((v) => valueToProgress(dial, v));
 
-  // The short way between a range's thumbs, in degrees of progress.
-  let pill: Span | null = null;
-  if (progresses.length === 2) {
+  // Beads in a range that would touch merge into one pill along the arc,
+  // taking the short way between them. Slim pill thumbs never need to.
+  let merged: Span | null = null;
+  if (!isPill && progresses.length === 2) {
     const [p0, p1] = progresses;
     let from = Math.min(p0, p1);
     let length = Math.abs(p1 - p0);
@@ -1047,7 +1168,7 @@ function CircularSliderThumb({
     }
     const gapPx = (length * Math.PI * radius) / 180;
     // Closer than a bead plus a hairline: the two would touch, so draw one.
-    if (gapPx < bead + 2) pill = { from, length };
+    if (gapPx < bead + 2) merged = { from, length };
   }
 
   // The thumb in front is the one last moved.
@@ -1060,9 +1181,49 @@ function CircularSliderThumb({
     rotate: `${round(angle)}deg`,
   });
 
+  // A rounded rect centered on the band at 12 o'clock.
+  const capsule = (
+    w: number,
+    h: number,
+    extra: React.SVGProps<SVGRectElement>,
+  ) => (
+    <rect
+      x={c - w / 2}
+      y={cy - h / 2}
+      width={w}
+      height={h}
+      rx={w / 2}
+      {...extra}
+    />
+  );
+
+  const thumbState = (index: number) => ({
+    "data-slot": "circular-slider-thumb",
+    "data-index": index,
+    "data-shape": thumbShape,
+    "data-active": index === activeIndex || undefined,
+    "data-pressed": (pressed && index === activeIndex) || undefined,
+  });
+
+  // Grows on hover and on grab. A bead stays inside the band, so a ring of
+  // indicator always frames it.
+  const growClasses = cn(
+    "[transform-origin:center] [transform-box:fill-box]",
+    "transition-[scale] duration-150 ease-out motion-reduce:transition-none",
+    isPill
+      ? "group-hover/circular-slider:scale-108 data-pressed:scale-112 group-hover/circular-slider:data-pressed:scale-112"
+      : "group-hover/circular-slider:scale-110 data-pressed:scale-115 group-hover/circular-slider:data-pressed:scale-115",
+  );
+
+  const focusIndex =
+    focusVisibleIndex !== null && progresses[focusVisibleIndex] !== undefined
+      ? focusVisibleIndex
+      : null;
+  const ring = isPill ? { w: pillW + 7, h: pillH + 7 } : null;
+
   const children = (
     <>
-      {pill ? (
+      {merged ? (
         <circle
           data-slot="circular-slider-thumb"
           data-merged=""
@@ -1078,8 +1239,8 @@ function CircularSliderThumb({
           )}
           style={{
             ...svgRotateStyle,
-            strokeDasharray: arcStroke(dial, radius, pill).strokeDasharray,
-            rotate: arcStroke(dial, radius, pill).rotate,
+            strokeDasharray: arcStroke(dial, radius, merged).strokeDasharray,
+            rotate: arcStroke(dial, radius, merged).rotate,
           }}
         />
       ) : (
@@ -1089,54 +1250,71 @@ function CircularSliderThumb({
             className={cn("transition-[rotate]", SETTLE_TRANSITION)}
             style={rotated(progressToAngle(dial, progresses[index]))}
           >
-            <circle
-              data-slot="circular-slider-thumb"
-              data-index={index}
-              data-active={index === activeIndex || undefined}
-              data-pressed={(pressed && index === activeIndex) || undefined}
-              cx={c}
-              cy={thickness / 2}
-              r={bead / 2}
-              className={cn(
-                "fill-primary-foreground [transform-origin:center] [transform-box:fill-box]",
-                "transition-[scale] duration-150 ease-out motion-reduce:transition-none",
-                // Grows on hover and on grab but stays inside the band, so a
-                // ring of indicator always frames it.
-                "group-hover/circular-slider:scale-110 data-pressed:scale-115 group-hover/circular-slider:data-pressed:scale-115",
-              )}
-            />
+            {isPill ? (
+              // The pill crosses the grey track as well as the blue, so it
+              // carries a single hairline edge, even all round so neither
+              // side reads heavier.
+              <g {...thumbState(index)} className={growClasses}>
+                {capsule(pillW + 1, pillH + 1, { className: "fill-black/14" })}
+                {capsule(pillW, pillH, {
+                  className: "fill-primary-foreground",
+                })}
+              </g>
+            ) : (
+              <circle
+                {...thumbState(index)}
+                cx={c}
+                cy={cy}
+                r={bead / 2}
+                className={cn("fill-primary-foreground", growClasses)}
+              />
+            )}
           </g>
         ))
       )}
       {/* Focus: a full-strength ring, edged with the page color on both
           sides so it stays distinct where it crosses the blue arc. */}
-      {focusVisibleIndex !== null &&
-        progresses[focusVisibleIndex] !== undefined && (
-          <g
-            data-slot="circular-slider-thumb-focus"
-            className={cn("transition-[rotate]", SETTLE_TRANSITION)}
-            style={rotated(
-              progressToAngle(dial, progresses[focusVisibleIndex]),
-            )}
-          >
-            <circle
-              cx={c}
-              cy={thickness / 2}
-              r={bead / 2 + 3.5}
-              fill="none"
-              strokeWidth={5}
-              className="stroke-background"
-            />
-            <circle
-              cx={c}
-              cy={thickness / 2}
-              r={bead / 2 + 3.5}
-              fill="none"
-              strokeWidth={2}
-              className="stroke-ring"
-            />
-          </g>
-        )}
+      {focusIndex !== null && (
+        <g
+          data-slot="circular-slider-thumb-focus"
+          className={cn("transition-[rotate]", SETTLE_TRANSITION)}
+          style={rotated(progressToAngle(dial, progresses[focusIndex]))}
+        >
+          {ring ? (
+            <>
+              {capsule(ring.w, ring.h, {
+                fill: "none",
+                strokeWidth: 5,
+                className: "stroke-background",
+              })}
+              {capsule(ring.w, ring.h, {
+                fill: "none",
+                strokeWidth: 2,
+                className: "stroke-ring",
+              })}
+            </>
+          ) : (
+            <>
+              <circle
+                cx={c}
+                cy={cy}
+                r={bead / 2 + 3.5}
+                fill="none"
+                strokeWidth={5}
+                className="stroke-background"
+              />
+              <circle
+                cx={c}
+                cy={cy}
+                r={bead / 2 + 3.5}
+                fill="none"
+                strokeWidth={2}
+                className="stroke-ring"
+              />
+            </>
+          )}
+        </g>
+      )}
     </>
   );
 
@@ -1178,6 +1356,7 @@ function CircularSliderTicks({
     origin,
     size,
     thickness,
+    inset,
     variant,
     dragging,
     instant,
@@ -1186,7 +1365,7 @@ function CircularSliderTicks({
   const isKnob = variant === "knob";
   const tickCount = count ?? (isKnob ? 30 : 20);
   const tickLength = length ?? (isKnob ? thickness : 4);
-  const outerY = isKnob ? 1 : thickness + 4;
+  const outerY = isKnob ? 1 : inset + thickness + 4;
   const tickWidth = isKnob ? 2 : 1.5;
 
   const span = getActiveSpan(dial, values, origin);
@@ -1270,7 +1449,7 @@ function CircularSliderMark({
   value,
   ...props
 }: CircularSliderMarkProps) {
-  const { dial, size, thickness, variant } = useCircularSliderContext();
+  const { dial, size, thickness, inset, variant } = useCircularSliderContext();
   const angle = progressToAngle(
     dial,
     valueToProgress(dial, clamp(value, dial.min, dial.max)),
@@ -1294,8 +1473,8 @@ function CircularSliderMark({
             <line
               x1={size / 2}
               x2={size / 2}
-              y1={isKnob ? -2 : 1}
-              y2={thickness + (isKnob ? 2 : 4)}
+              y1={isKnob ? -2 : inset + 1}
+              y2={inset + thickness + (isKnob ? 2 : 4)}
               strokeWidth={5}
               strokeLinecap="round"
               className="stroke-background"
@@ -1303,8 +1482,8 @@ function CircularSliderMark({
             <line
               x1={size / 2}
               x2={size / 2}
-              y1={isKnob ? -2 : 1}
-              y2={thickness + (isKnob ? 2 : 4)}
+              y1={isKnob ? -2 : inset + 1}
+              y2={inset + thickness + (isKnob ? 2 : 4)}
               strokeWidth={2}
               strokeLinecap="round"
               className="stroke-foreground"

@@ -47,6 +47,20 @@ CircularSliderRoot
 
 ## Examples
 
+### Thumb shape
+
+Use `thumbShape` to choose the thumb's look. The pill reaches past both edges of the band, and the band moves in to make room so the dial keeps its size.
+
+<ComponentPreview
+  component="circular-slider"
+  example="circular-slider-thumb-shape"
+/>
+
+| Shape  | Description                                                  |
+| ------ | ------------------------------------------------------------ |
+| `bead` | A round bead set inside the end of the indicator. Default.   |
+| `pill` | A slim handle across the band that points at an exact value. |
+
 ### Knob
 
 Set `variant="knob"` and render `CircularSliderKnob` with `CircularSliderTicks` for a face you turn. Grabbing a knob never jumps its value.
@@ -253,6 +267,16 @@ Holds the value and geometry, and renders a hidden range input per thumb. `Circu
 
 <ApiProp name="disabled" fullType="boolean" defaultValue="false">
   Ignore input and dim the dial.
+</ApiProp>
+
+<ApiProp
+  name="thumbShape"
+  fullType='"bead" | "pill"'
+  simpleType="string"
+  defaultValue='"bead"'
+>
+  The thumb's look on a ring. `pill` overhangs the band, which moves in to make
+  room.
 </ApiProp>
 
 <ApiProp name="minStepsBetweenValues" fullType="number" defaultValue="0">

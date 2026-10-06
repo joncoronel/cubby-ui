@@ -2,6 +2,8 @@
 
 Running todo for the project, grouped by area. Completed work is archived at the bottom.
 
+New component ideas live in [`COMPONENT_IDEAS.md`](COMPONENT_IDEAS.md); move one here when it's picked up.
+
 ## Open
 
 ### Elevation / surface system

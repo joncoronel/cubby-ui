@@ -1,12 +1,8 @@
 /**
- * Geometry for the circular slider.
- *
- * Everything is measured in degrees with 0° at 12 o'clock, increasing
- * clockwise. Values map to a *progress* along the dial's sweep (0 at the
- * start, `sweep` at the end); progress maps to a screen angle through the
- * start angle and direction. Keeping the two spaces apart is what lets one
- * set of functions handle partial sweeps, counterclockwise dials, and
- * wrapping without special cases.
+ * Geometry for the circular slider. Angles are degrees, 0° at 12 o'clock,
+ * clockwise. Values map to a *progress* along the sweep (0 to `sweep`), and
+ * progress maps to a screen angle through the start and direction. Keeping
+ * the two apart lets partial, counterclockwise and wrapping dials share code.
  */
 
 export type CircularSliderDirection = "clockwise" | "counterclockwise";
@@ -54,11 +50,7 @@ export function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
 
-/**
- * Default start angle: a partial sweep is centered on 12 o'clock so its gap
- * sits at the bottom (a 270° dial starts at 225°, a 180° dial at 270°). A
- * full circle starts at the top.
- */
+/** Centers a partial sweep on 12 o'clock so its gap sits at the bottom. */
 export function resolveStartAngle(
   sweep: number,
   direction: CircularSliderDirection,
@@ -98,9 +90,8 @@ function stepDecimals(step: number): number {
 }
 
 /**
- * Snaps to the step grid anchored at `min`, then keeps the value in range:
- * clamped normally, folded back into `[min, max)` on a wrapping dial (where
- * max and min are the same position).
+ * Snaps to the step grid from `min`, then clamps, or folds into `[min, max)`
+ * on a wrapping dial, where max and min share a position.
  */
 export function snapValue(dial: Dial, value: number): number {
   const { min, max, step } = dial;
@@ -140,11 +131,9 @@ export function pointToAngle(
 }
 
 /**
- * Like `angleToProgress`, but an angle in the gap keeps going past the nearer
- * end (negative before the start, above `sweep` after the end) instead of
- * snapping onto it. A drag that holds the thumb at an offset from the pointer
- * needs this to reach the ends: clamping before the offset is added stops it
- * short by the offset.
+ * Like `angleToProgress`, but angles in the gap run past the nearer end
+ * instead of clamping to it. A thumb held at an offset from the pointer needs
+ * this, or clamping before the offset stops it short of the end.
  */
 export function angleToUnclampedProgress(dial: Dial, angle: number): number {
   const offset = normalizeAngle((angle - dial.start) * dial.dir);
@@ -153,19 +142,15 @@ export function angleToUnclampedProgress(dial: Dial, angle: number): number {
   return offset - dial.sweep < gap / 2 ? offset : offset - 360;
 }
 
-/**
- * Progress for a screen angle. Angles in the gap of a partial sweep project
- * onto the nearer end.
- */
+/** Progress for a screen angle; angles in the gap clamp to the nearer end. */
 export function angleToProgress(dial: Dial, angle: number): number {
   return clamp(angleToUnclampedProgress(dial, angle), 0, dial.sweep);
 }
 
 /**
- * Keeps a drag from teleporting across the ends. A jump of more than half
- * the sweep between two pointer samples can only mean the pointer crossed
- * the seam (or the gap), so a non-wrapping dial pins to the end it came
- * from instead of flipping to the other one.
+ * A jump of over half the sweep between samples means the pointer crossed
+ * the seam or the gap, so a non-wrapping dial pins to the end it came from
+ * instead of flipping to the other.
  */
 export function continueDrag(
   dial: Dial,
@@ -199,10 +184,9 @@ export interface Span {
 }
 
 /**
- * The active span the indicator and lit ticks cover. A range covers the
- * stretch between its two values (clockwise from the first on a wrapping
- * dial, so 22:00 to 07:00 runs through midnight). A single value covers the
- * stretch between `origin` and the value, in whichever direction.
+ * The span the indicator and lit ticks cover: between a range's values
+ * (clockwise from the first on a wrapping dial, so 22:00 to 07:00 runs through
+ * midnight), or between `origin` and a single value.
  */
 export function getActiveSpan(
   dial: Dial,
@@ -238,13 +222,9 @@ export function isInSpan(dial: Dial, progress: number, span: Span): boolean {
 }
 
 /**
- * Stroke props that draw an arc on a `<circle>` as a single dash.
- *
- * A circle's stroke starts at 3 o'clock, so the circle is rotated to put the
- * dash's start on the arc's first screen angle. Drawing arcs this way rather
- * than as path data means a change of value is two numbers that CSS can
- * transition (the dash length and the rotation), so the arc sweeps along the
- * ring instead of being re-drawn.
+ * Draws an arc on a `<circle>` as one dash, rotated from the stroke's 3
+ * o'clock start. A value change is then two numbers CSS can transition, so
+ * the arc sweeps along the ring instead of being redrawn as path data.
  */
 export function arcStroke(
   dial: Dial,
@@ -264,10 +244,7 @@ export function arcStroke(
   };
 }
 
-/**
- * Progress of each tick. A partial sweep gets a tick at both ends; a full
- * circle skips the last one, which would land on the first.
- */
+/** Tick positions; a full circle skips the last, which would land on the first. */
 export function tickProgresses(dial: Dial, count: number): number[] {
   const intervals = Math.max(1, Math.round(count));
   const total = dial.sweep >= 360 ? intervals : intervals + 1;
@@ -277,9 +254,8 @@ export function tickProgresses(dial: Dial, count: number): number[] {
 }
 
 /**
- * Inverse of the ease-out-expo curve (`1 - 2^(-10t)`): the share of the
- * duration the indicator needs to cover `x` of its distance. Ticks use it to
- * light up as the arc's head passes them rather than on a linear schedule.
+ * Inverse of ease-out-expo: the share of the duration the arc needs to cover
+ * `x` of its distance, so ticks light as its head passes them.
  */
 export function easeOutExpoTimeAt(x: number): number {
   if (x <= 0) return 0;
@@ -288,9 +264,8 @@ export function easeOutExpoTimeAt(x: number): number {
 }
 
 /**
- * Pulls an indicator's `origin` end in by its round cap, so an arc drawn from
- * a reference reading starts at the reading instead of half a stroke behind
- * it. The value end keeps its cap, which sits under the thumb.
+ * Pulls the indicator's origin end in by its round cap, so an arc from a
+ * reference reading starts at the reading, not half a stroke behind it.
  */
 export function trimOriginCap(
   span: Span,
@@ -306,12 +281,9 @@ export function trimOriginCap(
 }
 
 /**
- * Height a ring needs to show its whole arc, measured from the top of its
- * square: the lowest point of the band (an end, or 6 o'clock when the sweep
- * passes it) plus the round cap. `inset` is how far the band sits in from the
- * edge to leave room for a thumb that overhangs it, which overhangs the ends
- * by the same amount. A 180° dial is about half as tall as it is
- * wide; a full circle, or any sweep through the bottom, is square.
+ * Height a ring needs from the top of its square: the band's lowest point (an
+ * end, or 6 o'clock if the sweep passes it) plus the cap and any pill `inset`.
+ * A 180° dial comes out about half as tall as it is wide.
  */
 export function ringHeight(
   dial: Dial,
@@ -331,8 +303,7 @@ export function ringHeight(
   const lowest = passesBottom
     ? c + r
     : Math.max(yAt(startAngle), yAt(endAngle));
-  // Content centered in the dial (the value) hangs below the center, so a
-  // shallow sweep still leaves it a little room.
+  // Leave room for the centered value below a shallow sweep.
   const contentFloor = c + size * 0.1;
   return round(
     Math.min(size, Math.max(lowest + thickness / 2 + inset, contentFloor)),
@@ -342,13 +313,9 @@ export function ringHeight(
 export type ThumbCollision = "push" | "none";
 
 /**
- * Moves one thumb of a two-value range to `candidate`, keeping the thumbs at
- * least `gap` apart. When the moving thumb reaches the other one, `push`
- * carries the other along (as Base UI's Slider does) and `none` stops it.
- *
- * On a wrapping dial a range is the clockwise stretch from the first value to
- * the second, and the move is measured the short way round, so a thumb can
- * push the other through the seam.
+ * Moves one thumb of a range, keeping the thumbs `gap` apart: `push` carries
+ * the other along, as in Base UI's Slider, and `none` stops at it. On a
+ * wrapping dial moves go the short way, so a thumb can push through the seam.
  */
 export function placeRangeThumb(
   dial: Dial,
@@ -387,14 +354,12 @@ export function placeRangeThumb(
   const range = dial.max - dial.min;
   const span = mod(b - a, range);
   let delta = wrapDelta(values[index], candidate, range);
-  // Moving the start forward shortens the span; moving the end forward
-  // lengthens it. Either way the span must stay within [gap, range - gap].
+  // The span must stay within [gap, range - gap].
   const after = index === 0 ? span - delta : span + delta;
   const short = after < gap ? gap - after : 0;
   const long = after > range - gap ? after - (range - gap) : 0;
   const other = 1 - index;
   if (short || long) {
-    // Which way the other thumb has to go to restore the gap.
     const shift = index === 0 ? short - long : long - short;
     if (collision === "push") {
       next[other] = snapValue(dial, values[other] + shift);
@@ -406,21 +371,14 @@ export function placeRangeThumb(
   return next;
 }
 
-/**
- * Grows a span by `by` degrees at both ends. Ticks light against a span
- * widened by just under half a tick interval, so the tick a value is closest
- * to counts as reached: a marker pointing at a tick never leaves it unlit
- * because the value stopped a fraction short of it.
- */
+/** Grows a span by `by` degrees at both ends. */
 export function widenSpan(span: Span, by: number): Span {
   return { from: span.from - by, length: span.length + by * 2 };
 }
 
 /**
- * Which of a range's two thumbs to take when a press lands on both: the one
- * that can move the way the pointer went. Forward (increasing progress)
- * takes the thumb ahead, backward the one behind. On a wrapping dial the end
- * is ahead of the start while the range is the short way round.
+ * For a press on both of a range's thumbs: the one that can move the way the
+ * pointer went, the thumb ahead going forward and the one behind going back.
  */
 export function pickOverlappedThumb(
   dial: Dial,

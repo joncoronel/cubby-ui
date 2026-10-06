@@ -128,9 +128,7 @@ const PICK_TRAVEL = 4;
 const KNOB_DEAD_ZONE = 0.15;
 
 interface PointerGeometry {
-  /** Screen angle of the pointer around the dial's center. */
   angle: number;
-  /** Distance from the center, in screen px. */
   distance: number;
   /** Rendered px per authored px, for a root resized with CSS. */
   scale: number;
@@ -166,7 +164,6 @@ function measurePointer(
   };
 }
 
-/** Degrees of arc a slop of `px` covers at the band's radius. */
 function slopDegrees(px: number, radius: number): number {
   return ((px / radius) * 180) / Math.PI;
 }
@@ -186,10 +183,7 @@ interface ThumbDrag extends DragBase {
   grabOffset: number;
 }
 
-/**
- * Pressed where both of a range's thumbs sit. Which one is held is decided
- * by the first clear move, so the drag takes the thumb that can go that way.
- */
+/** Pressed where a range's thumbs overlap; the first clear move picks one. */
 interface PendingDrag extends DragBase {
   mode: "pending";
   downPointer: number;
@@ -272,11 +266,10 @@ export interface CircularSliderRootProps<
   name?: string;
   form?: string;
   /**
-   * The thumb's look. On a ring, `bead` sits inside the band at the end of
-   * the indicator and `pill` is a slim handle across the band that overhangs
-   * it (the band moves in to make room, so the dial keeps its size). On a
-   * knob it is the face's marker: a dot or a line. Defaults to `bead` on a
-   * ring and `pill` on a knob.
+   * On a ring, `bead` sits inside the band and `pill` is a slim handle that
+   * overhangs it (the band moves in, so the dial keeps its size). On a knob
+   * it is the face's marker: a dot or a line. Defaults to `bead` on a ring
+   * and `pill` on a knob.
    */
   thumbShape?: "bead" | "pill";
   /** Least distance, in steps, between a range's thumbs. */
@@ -351,9 +344,8 @@ function CircularSliderRoot<Value extends SliderValue = number>({
     value: valueProp,
     defaultValue: defaultValue ?? min,
   });
-  // Normalized once, so the text, the arc, the hidden input and what a screen
-  // reader announces all agree: a value past either end clamps (or folds, on a
-  // wrapping dial) and lands on the step grid, the way the native input would.
+  // Clamped (or folded, when wrapping) and snapped once, so the text, arc,
+  // hidden input and screen reader all agree, as with a native input.
   const values = toArray(rawValue).map((v) => snapValue(dial, v));
   const isRange = typeof rawValue !== "number";
   const origin = clamp(originProp ?? min, min, max);
@@ -370,15 +362,13 @@ function CircularSliderRoot<Value extends SliderValue = number>({
     valuesRef.current = values;
   });
 
-  // Arrow-key steps repeat many times a second while a key is held, so they
-  // land instantly; a sweep per step would trail the value. Keyed by the
-  // values they produced, and cleared by any other change, so a later change
-  // from anywhere else animates even if it lands on the same values.
+  // Held arrow keys repeat fast, so those steps land instantly instead of
+  // trailing the value. Keyed by the values they produced and cleared by any
+  // other change, so later changes still animate.
   const [instantKey, setInstantKey] = React.useState<string | null>(null);
 
-  // The values before the latest change, kept for the tick sweep. Stored
-  // during render (the "previous props" pattern) so the first frame of a
-  // change already knows where it came from.
+  // Values before the latest change, for the tick sweep. Stored during render
+  // ("previous props" pattern) so a change's first frame knows its origin.
   const valuesKey = values.join(",");
   const [history, setHistory] = React.useState({
     key: valuesKey,
@@ -422,9 +412,8 @@ function CircularSliderRoot<Value extends SliderValue = number>({
   // consumed by its focus handler.
   const focusFromPointer = React.useRef(false);
 
-  // Move keyboard focus to a thumb's input after a pointer interaction, so
-  // arrow keys keep working. An input that already has focus fires no focus
-  // event, so the flag is only set when one will.
+  // Focus a thumb after a pointer press so arrow keys work. The flag is only
+  // set when a focus event will fire (an already-focused input fires none).
   const focusThumbInput = React.useCallback((index: number) => {
     const input = inputRefs.current[index];
     if (!input || document.activeElement === input) return;
@@ -449,8 +438,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
     [isRange, setRawValue, onValueChange, emit],
   );
 
-  // The one path every input takes to move a thumb: pointer, keyboard and
-  // assistive tech all go through the same gap and collision rules.
+  // Pointer, keyboard and assistive tech all move thumbs through here.
   const moveThumb = React.useCallback(
     (
       index: number,
@@ -493,7 +481,6 @@ function CircularSliderRoot<Value extends SliderValue = number>({
           if (p < -edge || p > dial.sweep + edge) return;
         }
       } else if (g.distance > outer + slop) {
-        // A knob answers anywhere on its face.
         return;
       }
 
@@ -552,8 +539,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
             shift: 0,
           };
         } else {
-          // Anywhere else on the band jumps (and animates) the nearest thumb
-          // there, then holds it.
+          // Elsewhere on the band: jump the nearest thumb there, then hold it.
           const next = moveThumb(
             index,
             progressToValue(dial, pointer),
@@ -902,10 +888,9 @@ function CircularSliderRoot<Value extends SliderValue = number>({
       "group/circular-slider relative shrink-0 select-none",
       variant === "knob" && "touch-none",
       "data-disabled:pointer-events-none data-disabled:opacity-60",
-      // A partial ring is shorter than its dial's square. Clip just below the
-      // bottom so the empty rest of the square never covers (or catches
-      // clicks meant for) whatever sits beneath; clip-path clips hit-testing
-      // too. The other sides keep room for focus rings and the pill.
+      // A partial ring is shorter than its square. Clip just below the bottom
+      // so the empty rest never catches clicks (clip-path clips hit-testing
+      // too); other sides keep room for focus rings and the pill.
       height < size && "[clip-path:inset(-24px_-24px_-8px_-24px)]",
       variant === "knob" &&
         !disabled &&
@@ -1003,10 +988,8 @@ function CircularSliderRoot<Value extends SliderValue = number>({
 }
 
 /**
- * The band's hit layer clip: the swept arc plus a little slop on each side,
- * radially and past each end. clip-path also clips hit-testing, so the
- * middle and the gap of a partial sweep stay free, and a short half dial's
- * hidden lower half never catches clicks or touches below the component.
+ * Clip for the band's hit layer: the swept arc plus slop. clip-path also
+ * clips hit-testing, so the middle and a partial sweep's gap stay free.
  */
 function bandClipPath(
   dial: Dial,
@@ -1024,7 +1007,6 @@ function bandClipPath(
   }
   const radius = bandRadius(size, thickness, inset);
   const edge = slopDegrees(thickness / 2 + BAND_SLOP, radius);
-  // Clockwise screen angles of the arc's two ends, past each by the slop.
   const first = (dial.dir === 1 ? dial.start : dial.start - dial.sweep) - edge;
   const span = Math.min(359.9, dial.sweep + edge * 2);
   const last = first + span;
@@ -1052,7 +1034,6 @@ function overlayProps(slot: string, size: number, className?: string) {
   };
 }
 
-/** Radius of the center line of the outer band. */
 function bandRadius(size: number, thickness: number, inset = 0): number {
   return size / 2 - inset - thickness / 2;
 }
@@ -1070,20 +1051,14 @@ function pillOverhang(thickness: number): number {
   );
 }
 
-/** Pill thumb width: slim, but never a hairline. */
 function pillWidth(thickness: number): number {
   return clamp(Math.round(thickness / 3), 4, 6);
 }
 
 /**
- * The stretch of progress the track is drawn over.
- *
- * A round cap reaches half the band past each end, and a pill thumb is
- * slimmer than that, so at min or max a sliver of cap would show beyond it.
- * With a pill the track is pulled in at both ends until its rounded tip
- * lands on the pill's outer edge: the thumb sits flush with the end, as
- * Base UI's `thumbAlignment="edge"` does for a straight slider. A full
- * circle has no ends to pull in.
+ * Progress the track is drawn over. With a pill, the ends pull in so the
+ * round cap ends flush with the pill instead of a sliver showing past it,
+ * like Base UI's `thumbAlignment="edge"`.
  */
 function trackSpan(
   dial: Dial,
@@ -1153,9 +1128,8 @@ export type CircularSliderIndicatorProps = useRender.ComponentProps<"svg">;
 
 /**
  * The filled arc: from `origin` to the value, or between a range's thumbs.
- * Sweeps along the ring on click, Home/End/Page and outside changes; arrow
- * steps land at once, and drags track the pointer 1:1
- * while dragging.
+ * Sweeps on click, Home/End/Page and outside changes; arrow steps and drags
+ * land at once.
  */
 function CircularSliderIndicator({
   className,
@@ -1182,11 +1156,9 @@ function CircularSliderIndicator({
   // useId output can hold characters that break a url(#...) reference.
   const maskId = `circular-slider-mask-${React.useId().replace(/[^\w-]/g, "")}`;
   const isPill = thumbShape === "pill";
-  // A pill thumb is slimmer than the band, so the indicator's ends are cut
-  // flat (a round end would bulge out past the pill) and the whole arc is
-  // masked to the track's silhouette. That lets the free end run on into the
-  // track's rounded tip and fill it exactly, while an end under a thumb stops
-  // flat at the thumb's center, and nothing ever pokes outside the track.
+  // A round end would bulge past a slim pill, so with a pill the ends are cut
+  // flat and the arc is masked to the track, letting the free end fill the
+  // track's rounded tip without poking outside it.
   let pillSpan: Span | null = null;
   if (isPill) {
     const startsAtMin = values.length === 1 && origin === dial.min;
@@ -1268,18 +1240,11 @@ export interface CircularSliderThumbProps extends useRender.ComponentProps<"svg"
 }
 
 /**
- * A bead set into the end of the indicator, one per value.
+ * One thumb per value, set into the end of the indicator.
  *
- * Drawn in SVG, in the same rotated space as the indicator, so the bead and
- * the round end it sits in go through one rasterizer: an HTML bead over an
- * SVG arc rounds its edges differently at fractional display scales and
- * reads as off-center even when the two are mathematically concentric.
- * Each bead rotates about the center, so a change of value travels along
- * the arc rather than cutting across it.
- *
- * Renders the thumb for each value. When a range's two beads come within a
- * bead's width of each other, a bridge fills the gap between them so they
- * read as one pill along the arc instead of stacking.
+ * Drawn in SVG in the indicator's rotated space so both share a rasterizer:
+ * an HTML bead over an SVG arc reads as off-center at fractional scales.
+ * Rotating about the center makes value changes travel along the arc.
  */
 function CircularSliderThumb({
   className,
@@ -1308,10 +1273,8 @@ function CircularSliderThumb({
   const pillH = thickness + inset * 2;
   const progresses = values.map((v) => valueToProgress(dial, v));
 
-  // The short way between a range's two thumbs. When the beads would touch,
-  // a bridge the width of a bead fills it, so the pair reads as one pill.
-  // The bridge is always mounted and sweeps with the beads; it only fades in
-  // once they have nearly arrived, so a merge never pops in ahead of them.
+  // When a range's beads would touch, a bridge fills the short way between
+  // them so they read as one pill. Always mounted so it sweeps with them.
   let bridge: Span | null = null;
   let merged = false;
   if (!isPill && progresses.length === 2) {
@@ -1324,7 +1287,6 @@ function CircularSliderThumb({
       length = Math.min(forward, 360 - forward);
     }
     bridge = { from, length };
-    // Closer than a bead plus a hairline: the two would touch.
     merged = (length * Math.PI * radius) / 180 < bead + 2;
   }
 
@@ -1338,7 +1300,6 @@ function CircularSliderThumb({
     rotate: `${round(angle)}deg`,
   });
 
-  // A rounded rect centered on the band at 12 o'clock.
   const capsule = (
     w: number,
     h: number,
@@ -1362,12 +1323,10 @@ function CircularSliderThumb({
     "data-pressed": (pressed && index === activeIndex) || undefined,
   });
 
-  // Grows on hover and on grab. A bead stays inside the band, so a ring of
-  // indicator always frames it.
+  // Grows over the grab zone and on grab; a bead stays inside the band.
   const growClasses = cn(
     "[transform-origin:center] [transform-box:fill-box]",
     "transition-[scale] duration-150 ease-out motion-reduce:transition-none",
-    // Only over the grab zone: hovering the empty middle does nothing.
     isPill
       ? "group-data-grab-hover/circular-slider:scale-108 data-pressed:scale-112 group-data-grab-hover/circular-slider:data-pressed:scale-112"
       : "group-data-grab-hover/circular-slider:scale-110 data-pressed:scale-115 group-data-grab-hover/circular-slider:data-pressed:scale-115",
@@ -1412,9 +1371,8 @@ function CircularSliderThumb({
           style={rotated(progressToAngle(dial, progresses[index]))}
         >
           {isPill ? (
-            // The pill crosses the grey track as well as the blue, so it
-            // carries a single hairline edge, even all round so neither side
-            // reads heavier.
+            // The pill crosses both grey track and blue arc, so an even
+            // hairline edge keeps it distinct on both.
             <g {...thumbState(index)} className={growClasses}>
               {capsule(pillW + 1, pillH + 1, { className: "fill-black/14" })}
               {capsule(pillW, pillH, {
@@ -1497,10 +1455,8 @@ export interface CircularSliderTicksProps extends useRender.ComponentProps<"svg"
 }
 
 /**
- * A scale of ticks. On a ring they sit just inside the band as a quiet
- * scale; on a knob they are the band, and the ones inside the value light
- * up. When the value animates, ticks change as the indicator's head passes
- * them rather than all at once.
+ * A scale of ticks: inside a ring's band, or as a knob's band. Ticks up to
+ * the value light, in step with the indicator's sweep.
  */
 function CircularSliderTicks({
   className,
@@ -1528,10 +1484,8 @@ function CircularSliderTicks({
   const outerY = isKnob ? 1 : inset + thickness + 4;
   const tickWidth = isKnob ? 2 : 1.5;
 
-  // Light the tick a value is nearest to, not only the ticks it has passed:
-  // a value a fraction short of a tick would otherwise leave the tick its
-  // marker points at dark. Just under half an interval, so a value midway
-  // between two ticks never lights both.
+  // Also light the nearest tick, so a value just short of a tick still lights
+  // it. Just under half an interval, so a midpoint never lights both.
   const halfInterval =
     (dial.sweep / Math.max(1, Math.round(tickCount)) / 2) * 0.999;
   const span = widenSpan(getActiveSpan(dial, values, origin), halfInterval);
@@ -1607,11 +1561,7 @@ export interface CircularSliderMarkProps extends useRender.ComponentProps<"svg">
   value: number;
 }
 
-/**
- * A read-only mark across the band for a second value: the current reading
- * against a target, a recommended level, a previous setting. Glides when
- * the reading changes.
- */
+/** A read-only mark across the band for a second value, such as a current reading. */
 function CircularSliderMark({
   className,
   render,
@@ -1624,9 +1574,8 @@ function CircularSliderMark({
     dial,
     valueToProgress(dial, clamp(value, dial.min, dial.max)),
   );
-  // The rotation actually rendered, kept unwrapped so a reading that crosses
-  // the seam of a wrapping dial (355 to 5) turns the short way, not almost a
-  // full turn backwards. Updated during render, the "previous props" pattern.
+  // Rendered rotation, kept unwrapped so crossing a wrapping dial's seam
+  // (355 to 5) turns the short way. Updated during render ("previous props").
   const [shown, setShown] = React.useState(angle);
   let rotation = shown;
   if (round(mod(shown, 360)) !== round(mod(angle, 360))) {
@@ -1798,11 +1747,9 @@ function CircularSliderValue({
         "data-slot": "circular-slider-value",
         "aria-hidden": true,
         className: cn(
-          // Sized to the dial with a legible floor, and held inside the open
-          // middle: longer text truncates rather than running over the arc.
-          // Screen readers get the whole value from the hidden input. The
-          // line box is a little taller than the text so the clip that
-          // truncation needs never cuts descenders or tall accents.
+          // Truncates inside the open middle rather than running over the
+          // arc (screen readers read the hidden input). leading-tight keeps
+          // the truncation clip off descenders and tall accents.
           "pointer-events-none relative max-w-[calc(var(--circular-slider-hole)-0.5rem)] truncate text-[length:max(0.6875rem,calc(var(--circular-slider-size)*0.17))] leading-tight font-semibold tabular-nums",
           className,
         ),

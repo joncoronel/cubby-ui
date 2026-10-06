@@ -25,6 +25,7 @@ import {
   snapValue,
   tickProgresses,
   valueToProgress,
+  widenSpan,
   wrapDelta,
   placeRangeThumb,
   type CircularSliderDirection,
@@ -197,9 +198,11 @@ export interface CircularSliderRootProps<
   name?: string;
   form?: string;
   /**
-   * `bead` sits inside the band at the end of the indicator. `pill` is a
-   * slim handle across the band that overhangs it on both sides; the band
-   * moves in to make room, so the dial keeps its size.
+   * The thumb's look. On a ring, `bead` sits inside the band at the end of
+   * the indicator and `pill` is a slim handle across the band that overhangs
+   * it (the band moves in to make room, so the dial keeps its size). On a
+   * knob it is the face's marker: a dot or a line. Defaults to `bead` on a
+   * ring and `pill` on a knob.
    */
   thumbShape?: "bead" | "pill";
   /** Least distance, in steps, between a range's thumbs. */
@@ -246,7 +249,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
   "aria-describedby": ariaDescribedby,
   getAriaLabel,
   getAriaValueText,
-  thumbShape = "bead",
+  thumbShape: thumbShapeProp,
   minStepsBetweenValues = 0,
   thumbCollisionBehavior = "push",
   ...props
@@ -254,6 +257,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
   // Past about 30% of the diameter a band stops reading as a ring and the
   // middle closes into a disc, so cap it there.
   const thickness = Math.min(thicknessProp, size * 0.3);
+  const thumbShape = thumbShapeProp ?? (variant === "knob" ? "pill" : "bead");
   const dial = React.useMemo(
     () => createDial({ min, max, step, sweep, startAngle, direction, wrap }),
     [min, max, step, sweep, startAngle, direction, wrap],
@@ -1381,8 +1385,17 @@ function CircularSliderTicks({
   const outerY = isKnob ? 1 : inset + thickness + 4;
   const tickWidth = isKnob ? 2 : 1.5;
 
-  const span = getActiveSpan(dial, values, origin);
-  const previousSpan = getActiveSpan(dial, previousValues, origin);
+  // Light the tick a value is nearest to, not only the ticks it has passed:
+  // a value a fraction short of a tick would otherwise leave the tick its
+  // marker points at dark. Just under half an interval, so a value midway
+  // between two ticks never lights both.
+  const halfInterval =
+    (dial.sweep / Math.max(1, Math.round(tickCount)) / 2) * 0.999;
+  const span = widenSpan(getActiveSpan(dial, values, origin), halfInterval);
+  const previousSpan = widenSpan(
+    getActiveSpan(dial, previousValues, origin),
+    halfInterval,
+  );
 
   // The tick sweep follows the one thumb that moved. A range shifted as a
   // whole, or several thumbs at once, changes its ticks together.
@@ -1462,12 +1475,22 @@ function CircularSliderMark({
   value,
   ...props
 }: CircularSliderMarkProps) {
-  const { dial, size, thickness, inset, variant } = useCircularSliderContext();
+  const { dial, size, thickness, inset, thumbShape, variant } =
+    useCircularSliderContext();
   const angle = progressToAngle(
     dial,
     valueToProgress(dial, clamp(value, dial.min, dial.max)),
   );
   const isKnob = variant === "knob";
+  // Beside a pill thumb the mark spans the same length, so the reading and
+  // the target read as a matching pair of lines bracketing the span.
+  const matchPill = !isKnob && thumbShape === "pill";
+  const y1 = isKnob ? -2 : matchPill ? 0 : inset + 1;
+  const y2 = isKnob
+    ? thickness + 2
+    : matchPill
+      ? inset * 2 + thickness
+      : inset + thickness + 4;
 
   return useRender({
     defaultTagName: "svg",
@@ -1486,8 +1509,8 @@ function CircularSliderMark({
             <line
               x1={size / 2}
               x2={size / 2}
-              y1={isKnob ? -2 : inset + 1}
-              y2={inset + thickness + (isKnob ? 2 : 4)}
+              y1={y1}
+              y2={y2}
               strokeWidth={5}
               strokeLinecap="round"
               className="stroke-background"
@@ -1495,8 +1518,8 @@ function CircularSliderMark({
             <line
               x1={size / 2}
               x2={size / 2}
-              y1={isKnob ? -2 : inset + 1}
-              y2={inset + thickness + (isKnob ? 2 : 4)}
+              y1={y1}
+              y2={y2}
               strokeWidth={2}
               strokeLinecap="round"
               className="stroke-foreground"
@@ -1520,8 +1543,15 @@ function CircularSliderKnob({
   children,
   ...props
 }: CircularSliderKnobProps) {
-  const { dial, values, size, thickness, activeIndex, focusVisibleIndex } =
-    useCircularSliderContext();
+  const {
+    dial,
+    values,
+    size,
+    thickness,
+    thumbShape,
+    activeIndex,
+    focusVisibleIndex,
+  } = useCircularSliderContext();
   const value = values[Math.min(activeIndex, values.length - 1)];
   const angle = progressToAngle(dial, valueToProgress(dial, value));
   const insetPercent = ((thickness + KNOB_GAP) / size) * 100;
@@ -1554,7 +1584,13 @@ function CircularSliderKnob({
             {children ?? (
               <span
                 data-slot="circular-slider-knob-notch"
-                className="bg-foreground absolute top-[9%] left-1/2 h-[16%] w-[3px] -translate-x-1/2 rounded-full"
+                data-shape={thumbShape}
+                className={cn(
+                  "bg-foreground absolute left-1/2 -translate-x-1/2 rounded-full",
+                  thumbShape === "bead"
+                    ? "top-[11%] aspect-square w-[10%]"
+                    : "top-[9%] h-[16%] w-[3px]",
+                )}
               />
             )}
           </span>

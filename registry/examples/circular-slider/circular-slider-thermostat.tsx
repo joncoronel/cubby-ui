@@ -57,6 +57,7 @@ export default function CircularSliderThermostat() {
         origin={current}
         size={208}
         thickness={14}
+        thumbShape="pill"
         aria-label="Target temperature"
         getAriaValueText={(v) => `${v} degrees`}
       >

@@ -403,3 +403,13 @@ export function placeRangeThumb(
   next[index] = snapValue(dial, values[index] + delta);
   return next;
 }
+
+/**
+ * Grows a span by `by` degrees at both ends. Ticks light against a span
+ * widened by just under half a tick interval, so the tick a value is closest
+ * to counts as reached: a marker pointing at a tick never leaves it unlit
+ * because the value stopped a fraction short of it.
+ */
+export function widenSpan(span: Span, by: number): Span {
+  return { from: span.from - by, length: span.length + by * 2 };
+}

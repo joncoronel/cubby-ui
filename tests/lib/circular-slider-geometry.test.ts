@@ -16,6 +16,7 @@ import {
   snapValue,
   tickProgresses,
   valueToProgress,
+  widenSpan,
   wrapDelta,
   type CreateDialOptions,
 } from "@/registry/default/circular-slider/lib/geometry";
@@ -290,5 +291,19 @@ describe("placeRangeThumb", () => {
     it("stops at the gap without push", () => {
       expect(placeRangeThumb(clock, [6, 7], 0, 8, 1, "none")).toEqual([6, 7]);
     });
+  });
+});
+
+describe("widenSpan", () => {
+  it("lights the tick a value stops just short of", () => {
+    const dial = createDial(base);
+    // 24 intervals over 270°: a tick every 11.25°. 58 sits at 156.6°, just
+    // short of the tick at 157.5°.
+    const span = getActiveSpan(dial, [58], 0);
+    expect(isInSpan(dial, 157.5, span)).toBe(false);
+    const half = (270 / 24 / 2) * 0.999;
+    expect(isInSpan(dial, 157.5, widenSpan(span, half))).toBe(true);
+    // The next tick along stays dark.
+    expect(isInSpan(dial, 168.75, widenSpan(span, half))).toBe(false);
   });
 });

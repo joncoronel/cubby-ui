@@ -234,7 +234,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
   wrap = false,
   origin: originProp,
   size = 144,
-  thickness = 12,
+  thickness: thicknessProp = 12,
   variant = "ring",
   dragMode = "angular",
   disabled = false,
@@ -251,6 +251,9 @@ function CircularSliderRoot<Value extends SliderValue = number>({
   thumbCollisionBehavior = "push",
   ...props
 }: CircularSliderRootProps<Value>) {
+  // Past about 30% of the diameter a band stops reading as a ring and the
+  // middle closes into a disc, so cap it there.
+  const thickness = Math.min(thicknessProp, size * 0.3);
   const dial = React.useMemo(
     () => createDial({ min, max, step, sweep, startAngle, direction, wrap }),
     [min, max, step, sweep, startAngle, direction, wrap],
@@ -260,7 +263,10 @@ function CircularSliderRoot<Value extends SliderValue = number>({
     value: valueProp,
     defaultValue: defaultValue ?? min,
   });
-  const values = toArray(rawValue);
+  // Normalized once, so the text, the arc, the hidden input and what a screen
+  // reader announces all agree: a value past either end clamps (or folds, on a
+  // wrapping dial) and lands on the step grid, the way the native input would.
+  const values = toArray(rawValue).map((v) => snapValue(dial, v));
   const isRange = typeof rawValue !== "number";
   const origin = clamp(originProp ?? min, min, max);
   const inset =
@@ -801,6 +807,8 @@ function CircularSliderRoot<Value extends SliderValue = number>({
       width: size,
       aspectRatio: `${size} / ${height}`,
       "--circular-slider-size": `${size}px`,
+      // The open middle of the dial, for content centered in it.
+      "--circular-slider-hole": `${Math.max(0, size - 2 * (variant === "knob" ? thickness + KNOB_GAP : inset + thickness))}px`,
       ...style,
     } as React.CSSProperties,
     onPointerDown: handlePointerDown,
@@ -914,12 +922,17 @@ function bandRadius(size: number, thickness: number, inset = 0): number {
  * by the same amount so the pill stays inside the dial's box.
  */
 function pillOverhang(thickness: number): number {
-  return Math.max(3, Math.round(thickness * 0.3));
+  // At least long enough (12px) to see and aim at, however thin the band.
+  return Math.max(
+    3,
+    Math.round(thickness * 0.3),
+    Math.ceil((12 - thickness) / 2),
+  );
 }
 
 /** Pill thumb width: slim, but never a hairline. */
 function pillWidth(thickness: number): number {
-  return clamp(Math.round(thickness / 3), 3, 6);
+  return clamp(Math.round(thickness / 3), 4, 6);
 }
 
 /**
@@ -1587,7 +1600,12 @@ function CircularSliderValue({
         "data-slot": "circular-slider-value",
         "aria-hidden": true,
         className: cn(
-          "pointer-events-none relative text-[length:calc(var(--circular-slider-size)*0.17)] leading-none font-semibold whitespace-nowrap tabular-nums",
+          // Sized to the dial with a legible floor, and held inside the open
+          // middle: longer text truncates rather than running over the arc.
+          // Screen readers get the whole value from getAriaValueText. The
+          // line box is a little taller than the text so the clip that
+          // truncation needs never cuts descenders or tall accents.
+          "pointer-events-none relative max-w-[calc(var(--circular-slider-hole)-0.5rem)] truncate text-[length:max(0.6875rem,calc(var(--circular-slider-size)*0.17))] leading-tight font-semibold tabular-nums",
           className,
         ),
         children: text,

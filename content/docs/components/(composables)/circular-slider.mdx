@@ -212,7 +212,9 @@ Holds the value and geometry, and renders a hidden range input per thumb. `Circu
 </ApiProp>
 
 <ApiProp name="sweep" fullType="number" defaultValue="270">
-  Arc of the dial in degrees, from 1 to 360.
+  Arc of the dial in degrees, from 1 to 360. Partial dials work best at 180° or
+  more; below that there is little room to drag and the arc stops reading as a
+  dial.
 </ApiProp>
 
 <ApiProp name="startAngle" fullType="number">
@@ -244,6 +246,7 @@ Holds the value and geometry, and renders a hidden range input per thumb. `Circu
 
 <ApiProp name="thickness" fullType="number" defaultValue="12">
   Width in pixels of the outer band: the ring's stroke, or a knob's ticks.
+  Capped at 30% of `size`, past which the ring closes into a disc.
 </ApiProp>
 
 <ApiProp

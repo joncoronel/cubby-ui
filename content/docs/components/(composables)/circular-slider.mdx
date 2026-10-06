@@ -37,12 +37,12 @@ CircularSliderRoot
 
 ## Features
 
-- Clicks, `Home`/`End`/`Page` keys, and changes from outside sweep along the ring. Arrow steps and drags land at once, so a held key or a drag never trails.
+- Clicks, `Home`/`End`/`Page` keys and outside changes sweep along the ring. Arrow steps and drags land at once, so a held key keeps up.
 - Grabbing a thumb holds it where it is. Clicking elsewhere on the band jumps the nearest thumb there.
-- Pressing where a range's two thumbs overlap picks the one that can move the way you drag.
+- A range thumb pushes the other along when they collide, and the two merge into one pill when they meet. Press where they overlap and the drag takes the one that can move your way.
 - Dragging past either end of a dial pins at that end instead of flipping to the other.
 - Ticks change as the indicator's head passes them, not all at once.
-- The middle of a ring ignores the pointer, so buttons and text placed there stay usable, and on touch a swipe that starts there scrolls the page. Only the band captures the gesture.
+- Only the band takes the pointer. Buttons in the middle of a ring stay usable, and on touch a swipe from the middle scrolls the page.
 - A partial sweep is only as tall as its arc, so a 180° dial takes about half the height of a full one.
 
 ## Examples
@@ -92,7 +92,7 @@ Set `origin` to a midpoint for a bipolar control; the indicator grows from there
 
 ### Range
 
-Pass an array of two values for a range. Drag the filled span to move both ends at once; on a `wrap` dial the span runs clockwise from the first value, through the seam. A thumb that runs into the other pushes it along, and when the two meet they merge into one pill. Set `thumbCollisionBehavior="none"` to stop at the other thumb instead, and `minStepsBetweenValues` to keep them apart.
+Pass an array of two values for a range, and drag the filled span to move both ends. On a `wrap` dial the span runs clockwise from the first value, so 22:00 to 07:00 runs through midnight.
 
 <ComponentPreview component="circular-slider" example="circular-slider-range" />
 
@@ -157,7 +157,7 @@ On a `wrap` dial the arrow keys loop past the ends, and `End` stops one step sho
 
 ## API Reference
 
-The Circular Slider is a custom SVG component. It follows Base UI's patterns: every part renders through `useRender`, so each accepts a `render` prop.
+The Circular Slider is a custom SVG component. Every part renders through Base UI's `useRender`, so each accepts a `render` prop.
 
 ### Props
 
@@ -214,14 +214,13 @@ Holds the value and geometry, and renders a hidden range input per thumb.
 </ApiProp>
 
 <ApiProp name="sweep" fullType="number" defaultValue="270">
-  Arc of the dial in degrees, from 1 to 360. Partial dials work best at 180° or
-  more; below that there is little room to drag and the arc stops reading as a
-  dial.
+  Arc of the dial in degrees, from 1 to 360. Below 180°, a partial dial leaves
+  little room to drag.
 </ApiProp>
 
 <ApiProp name="startAngle" fullType="number">
-  Screen angle of `min`, in degrees clockwise from 12 o'clock. By default a
-  partial sweep is centered on the top, and a full circle starts there.
+  Screen angle of `min`, in degrees clockwise from 12 o'clock. Defaults to
+  centering a partial sweep on the top; a full circle starts at the top.
 </ApiProp>
 
 <ApiProp
@@ -239,7 +238,8 @@ Holds the value and geometry, and renders a hidden range input per thumb.
 </ApiProp>
 
 <ApiProp name="origin" fullType="number" defaultValue="min">
-  Where the indicator grows from. Ignored by ranges.
+  Where the indicator grows from. Set a midpoint for a bipolar control, or a
+  live reading to show the distance to a target. Ranges ignore it.
 </ApiProp>
 
 <ApiProp name="size" fullType="number" defaultValue="144">
@@ -257,8 +257,8 @@ Holds the value and geometry, and renders a hidden range input per thumb.
   simpleType="string"
   defaultValue='"ring"'
 >
-  A ring answers along its band and jumps to a click; a knob answers anywhere on
-  its face and only turns relative to the drag.
+  A ring takes presses along its band and jumps to a click; a knob takes them
+  anywhere on its face and turns with the drag.
 </ApiProp>
 
 <ApiProp
@@ -267,11 +267,12 @@ Holds the value and geometry, and renders a hidden range input per thumb.
   simpleType="string"
   defaultValue='"angular"'
 >
-  Follow the pointer around the center, or turn with up and down drags.
+  `angular` follows the pointer around the center; `vertical` turns the value
+  with up and down drags.
 </ApiProp>
 
 <ApiProp name="disabled" fullType="boolean" defaultValue="false">
-  Ignore input and dim the dial.
+  Ignores input and dims the dial.
 </ApiProp>
 
 <ApiProp
@@ -345,6 +346,14 @@ The ready-made ring: Track, Indicator, Thumb and Value inside a root. Takes the 
 </ApiProp>
 
 </ApiPropsList>
+
+#### CircularSliderTrack
+
+The full sweep of the band, drawn behind the indicator.
+
+#### CircularSliderIndicator
+
+The filled arc: from `origin` to the value, or between a range's thumbs.
 
 #### CircularSliderThumb
 

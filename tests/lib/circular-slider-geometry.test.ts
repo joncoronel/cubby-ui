@@ -80,6 +80,14 @@ describe("snapValue", () => {
     expect(snapValue(dial, -1)).toBe(359);
     expect(snapValue(dial, 725)).toBe(5);
   });
+
+  it("stays on the step grid when the step does not divide the range", () => {
+    const dial = createDial({ ...base, sweep: 360, wrap: true, step: 3 });
+    // Grid: 0, 3, ... 99. One step past 99 wraps to 0, one before 0 to 99.
+    expect(snapValue(dial, 102)).toBe(0);
+    expect(snapValue(dial, -3)).toBe(99);
+    expect(snapValue(dial, 50)).toBe(51);
+  });
 });
 
 describe("angles and progress", () => {

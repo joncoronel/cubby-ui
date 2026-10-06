@@ -90,19 +90,24 @@ function stepDecimals(step: number): number {
 }
 
 /**
- * Snaps to the step grid from `min`, then clamps, or folds into `[min, max)`
- * on a wrapping dial, where max and min share a position.
+ * Snaps to the step grid from `min`, then clamps. On a wrapping dial, where
+ * max and min share a position, it wraps by grid position instead, so a
+ * range that `step` doesn't divide (0 to 100 by 3) still stays on the grid.
  */
 export function snapValue(dial: Dial, value: number): number {
   const { min, max, step } = dial;
   const range = max - min;
   const steps = Math.round((value - min) / step);
-  let snapped = Number((min + steps * step).toFixed(stepDecimals(step)));
   if (dial.wrap) {
-    snapped = min + mod(snapped - min, range);
-    return Number(snapped.toFixed(stepDecimals(step)));
+    const positions = Math.max(1, Math.ceil(range / step - 1e-9));
+    const wrapped = min + mod(steps, positions) * step;
+    return Number(wrapped.toFixed(stepDecimals(step)));
   }
-  return clamp(snapped, min, max);
+  return clamp(
+    Number((min + steps * step).toFixed(stepDecimals(step))),
+    min,
+    max,
+  );
 }
 
 export function valueToProgress(dial: Dial, value: number): number {

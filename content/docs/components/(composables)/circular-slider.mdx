@@ -1,10 +1,12 @@
 ---
 title: Circular Slider
-description: A radial slider component for selecting values along a circular path
+description: A radial input you drag around a ring or turn like a knob
 type: composable
 ---
 
-The circular slider selects a numeric value by dragging a thumb around a ring. Use it for radial inputs like timers, volume or brightness knobs, temperature dials, and color or angle pickers.
+The circular slider sets a value by dragging around a ring or turning a raised knob. Use it for dials where the circle means something: temperature, volume, an angle, or a window of hours on a clock face.
+
+For a value on a straight line, use [Slider](/docs/components/slider) instead.
 
 ## Preview
 
@@ -20,170 +22,205 @@ The circular slider selects a numeric value by dragging a thumb around a ring. U
 
 ## Composition
 
+`CircularSlider` is the ready-made ring. Compose the parts with `CircularSliderRoot` for ticks, a reference mark, a knob face, or your own center content.
+
 ```text
 CircularSliderRoot
 ├── CircularSliderTrack
+├── CircularSliderTicks
 ├── CircularSliderIndicator
+├── CircularSliderMark
 ├── CircularSliderThumb
-├── CircularSliderValue
-└── CircularSliderMarkers
+├── CircularSliderKnob
+└── CircularSliderValue
 ```
+
+## Features
+
+- Clicks, `Home`/`End`/`Page` keys and outside changes sweep along the ring. Arrow steps and drags land at once, so a held key keeps up.
+- Grabbing a thumb holds it where it is. Clicking elsewhere on the band jumps the nearest thumb there.
+- A range thumb pushes the other along when they collide, and the two merge into one pill when they meet. Press where they overlap and the drag takes the one that can move your way.
+- Dragging past either end of a dial pins at that end instead of flipping to the other.
+- Ticks change as the indicator's head passes them, not all at once.
+- Only the band takes the pointer. Buttons in the middle of a ring stay usable, and on touch a swipe from the middle scrolls the page.
+- A partial sweep is only as tall as its arc, so a 180° dial takes about half the height of a full one.
 
 ## Examples
 
-### With Value Display
+### Thumb shape
 
-Add `CircularSliderValue` to render the current value in the center.
+Use `thumbShape` to choose the thumb's look. On a ring the pill reaches past both edges of the band, and the band moves in to make room so the dial keeps its size. On a knob it sets the face's marker.
 
 <ComponentPreview
   component="circular-slider"
-  example="circular-slider-with-value"
+  example="circular-slider-thumb-shape"
+/>
+
+| Shape  | Description                                                                              |
+| ------ | ---------------------------------------------------------------------------------------- |
+| `bead` | A round bead set inside the end of the indicator, or a dot on a knob. Default on a ring. |
+| `pill` | A slim handle across the band, or a line on a knob. Default on a knob.                   |
+
+### Knob
+
+Set `variant="knob"` and render `CircularSliderKnob` with `CircularSliderTicks` for a face you turn. Grabbing a knob never jumps its value.
+
+<ComponentPreview component="circular-slider" example="circular-slider-knob" />
+
+| Variant | Description                                                   |
+| ------- | ------------------------------------------------------------- |
+| `ring`  | A stroke with a thumb, grabbed anywhere on the band. Default. |
+| `knob`  | A raised face ringed by ticks that light up.                  |
+
+### Reference mark
+
+Use `CircularSliderMark` to show a second reading, and set `origin` to it so the indicator spans the distance between the reading and the target.
+
+<ComponentPreview
+  component="circular-slider"
+  example="circular-slider-thermostat"
+/>
+
+### Origin
+
+Set `origin` to a midpoint for a bipolar control; the indicator grows from there in either direction.
+
+<ComponentPreview
+  component="circular-slider"
+  example="circular-slider-origin"
+/>
+
+### Range
+
+Pass an array of two values for a range, and drag the filled span to move both ends. On a `wrap` dial the span runs clockwise from the first value, so 22:00 to 07:00 runs through midnight.
+
+<ComponentPreview component="circular-slider" example="circular-slider-range" />
+
+### Sweep
+
+Use `sweep` to set the dial's arc in degrees. Partial sweeps center on the top, with the gap at the bottom; set `startAngle` to move them.
+
+<ComponentPreview component="circular-slider" example="circular-slider-sweep" />
+
+### Wrap
+
+Set `wrap` on a full circle to let values loop past `max` back to `min`, for angles and times of day.
+
+<ComponentPreview component="circular-slider" example="circular-slider-wrap" />
+
+### Vertical drag
+
+Set `dragMode="vertical"` to turn the value with up and down drags, like an audio knob. It suits small knobs in a row, where circling each one is fiddly.
+
+<ComponentPreview
+  component="circular-slider"
+  example="circular-slider-drag-mode"
 />
 
 ### Sizes
 
-Set `size` on the root and `strokeWidth` or thumb `size` on the parts to scale each dimension independently.
+Use `size` for the diameter and `thickness` for the band; the thumb follows the band.
 
 <ComponentPreview component="circular-slider" example="circular-slider-sizes" />
 
-### Variants
-
-Use `variant` to switch between a ring and a filled circle with a radial indicator.
-
-<ComponentPreview
-  component="circular-slider"
-  example="circular-slider-variants"
-/>
-
-| Value     | Description                                          |
-| --------- | --------------------------------------------------- |
-| `default` | A ring track with a circular thumb. Default.        |
-| `filled`  | A filled circle with a radial indicator line.       |
-
-### Format Value
-
-Pass `formatValue` to `CircularSliderValue` to append units or symbols to the displayed value.
-
-<ComponentPreview
-  component="circular-slider"
-  example="circular-slider-format-value"
-/>
-
-### With Markers
-
-Add `CircularSliderMarkers` to draw evenly-spaced tick marks around the circle.
-
-<ComponentPreview
-  component="circular-slider"
-  example="circular-slider-with-markers"
-/>
-
 ### Direction
 
-Use `direction` to set which way the value progresses around the circle.
+Use `direction` to set which way the value increases.
 
 <ComponentPreview
   component="circular-slider"
   example="circular-slider-counterclockwise"
 />
 
-| Value              | Description                            |
-| ------------------ | -------------------------------------- |
-| `clockwise`        | Value increases clockwise. Default.    |
-| `counterclockwise` | Value increases counterclockwise.      |
-
-### Non-Continuous Mode
-
-Set `continuous={false}` to show a gap at the bottom and stop the value from wrapping between max and min.
-
-<ComponentPreview
-  component="circular-slider"
-  example="circular-slider-non-continuous"
-/>
-
-### Custom Start Angle
-
-Use `startAngle` to set where the value scale begins on the circle.
-
-<ComponentPreview
-  component="circular-slider"
-  example="circular-slider-custom-start"
-/>
+| Value              | Description                         |
+| ------------------ | ----------------------------------- |
+| `clockwise`        | Value increases clockwise. Default. |
+| `counterclockwise` | Value increases counterclockwise.   |
 
 ## Accessibility
 
-The slider renders a visually hidden native `<input type="range">` that owns focus, value semantics, and form integration, so screen readers announce it as a slider. Set `aria-label` (or `aria-labelledby`) on `CircularSliderRoot` to name it, and pass `aria-valuetext` to announce a formatted value instead of the raw number.
+Each thumb is a visually hidden native `<input type="range">`, so it takes focus, joins forms, and announces as a slider. Name it with `aria-label` on the root. Screen readers speak the value through `formatValue`; pass `getAriaValueText` when the spoken form should differ from the displayed one ("21.5 degrees" for "21.5°").
+
+A range renders as a group named by `aria-label`, with thumbs named "Start" and "End". Use `getAriaLabel` to name them yourself.
 
 ### Keyboard
 
-When the slider is focused, the native range input handles arrow keys, `Home`, and `End`. `Page Up` and `Page Down` move by `largeStep`.
+| Key                     | Action                 |
+| ----------------------- | ---------------------- |
+| `↑` / `→`               | Increase by `step`.    |
+| `↓` / `←`               | Decrease by `step`.    |
+| `Shift` + arrow         | Change by `largeStep`. |
+| `Page Up` / `Page Down` | Change by `largeStep`. |
+| `Home` / `End`          | Jump to `min` / `max`. |
 
-| Key                   | Action                                  |
-| --------------------- | --------------------------------------- |
-| `↑` / `→`             | Increase by `step`.                     |
-| `↓` / `←`             | Decrease by `step`.                     |
-| `Page Up`             | Increase by `largeStep`.                |
-| `Page Down`           | Decrease by `largeStep`.                |
-| `Home` / `End`        | Jump to `min` / `max`.                  |
+On a `wrap` dial the arrow keys loop past the ends, and `End` stops one step short of `max`, which shares `min`'s position.
 
 ## API Reference
 
-The Circular Slider is a custom component built with SVG and follows the established patterns from Base UI components (using `useRender` and `mergeProps`).
+The Circular Slider is a custom SVG component. Every part renders through Base UI's `useRender`, so each accepts a `render` prop.
 
 ### Props
 
 #### CircularSliderRoot
 
-The root container that manages state and provides context to child components.
+Holds the value and geometry, and renders a hidden range input per thumb.
 
 <ApiPropsList>
 
-<ApiProp name="value" fullType="number">
-  Controlled value for the slider.
+<ApiProp name="value" fullType="number | readonly number[]">
+  Controlled value. Pass an array of two numbers for a range.
 </ApiProp>
 
-<ApiProp name="defaultValue" fullType="number" defaultValue="0">
-  Uncontrolled default value for the slider.
+<ApiProp
+  name="defaultValue"
+  fullType="number | readonly number[]"
+  defaultValue="min"
+>
+  Uncontrolled initial value.
 </ApiProp>
 
 <ApiProp
   name="onValueChange"
-  fullType='(value: number, reason: "drag" | "keyboard" | "click") => void'
+  fullType='(value: number | readonly number[], details: { reason: "drag" | "click" | "keyboard"; activeThumbIndex: number }) => void'
   simpleType="function"
 >
-  Callback fired when the slider value changes. Receives the new value and the
-  reason for the change (drag, keyboard, or click).
+  Fires on every change. `activeThumbIndex` is `-1` when a range's span moved as
+  a whole.
 </ApiProp>
 
 <ApiProp
   name="onValueCommitted"
-  fullType="(value: number) => void"
+  fullType="(value: number | readonly number[]) => void"
   simpleType="function"
 >
-  Callback fired when the user stops interacting with the slider (on pointer
-  up).
+  Fires when an interaction ends: on pointer release, or after each keyboard
+  step.
 </ApiProp>
 
 <ApiProp name="min" fullType="number" defaultValue="0">
-  Minimum value of the slider range.
+  Lowest value.
 </ApiProp>
 
 <ApiProp name="max" fullType="number" defaultValue="100">
-  Maximum value of the slider range.
+  Highest value.
 </ApiProp>
 
 <ApiProp name="step" fullType="number" defaultValue="1">
-  Step increment for value changes. The slider value will snap to multiples of
-  this value.
+  Granularity of the value.
 </ApiProp>
 
 <ApiProp name="largeStep" fullType="number" defaultValue="10">
-  Step increment for Page Up/Down keyboard navigation.
+  Step for `Page Up`, `Page Down`, and `Shift` with an arrow key.
 </ApiProp>
 
-<ApiProp name="startAngle" fullType="number" defaultValue="0">
-  Starting angle in degrees where 0° is at the top (12 o'clock position). Use
-  90° for right, 180° for bottom, 270° for left.
+<ApiProp name="sweep" fullType="number" defaultValue="270">
+  Arc of the dial in degrees, from 1 to 360. Below 180°, a partial dial leaves
+  little room to drag.
+</ApiProp>
+
+<ApiProp name="startAngle" fullType="number">
+  Screen angle of `min`, in degrees clockwise from 12 o'clock. Defaults to
+  centering a partial sweep on the top; a full circle starts at the top.
 </ApiProp>
 
 <ApiProp
@@ -192,148 +229,197 @@ The root container that manages state and provides context to child components.
   simpleType="string"
   defaultValue='"clockwise"'
 >
-  Direction of value progression around the circle.
+  Which way the value increases.
 </ApiProp>
 
-<ApiProp name="continuous" fullType="boolean" defaultValue="true">
-  Enable continuous mode where the slider can loop seamlessly from max back to
-  min (e.g., 360° → 0°). When false, displays a gap at the bottom.
+<ApiProp name="wrap" fullType="boolean" defaultValue="false">
+  On a 360° sweep, let values loop past `max` back to `min`. `max` and `min`
+  then share a position, so the value stays below `max`.
 </ApiProp>
 
-<ApiProp name="disabled" fullType="boolean" defaultValue="false">
-  Disable all interactions with the slider.
+<ApiProp name="origin" fullType="number" defaultValue="min">
+  Where the indicator grows from. Set a midpoint for a bipolar control, or a
+  live reading to show the distance to a target. Ranges ignore it.
 </ApiProp>
 
-<ApiProp name="size" fullType="number" defaultValue="96">
-  Size of the circular slider container in pixels. This only affects the
-  container dimensions, not the track or thumb sizes.
+<ApiProp name="size" fullType="number" defaultValue="144">
+  Diameter in pixels.
+</ApiProp>
+
+<ApiProp name="thickness" fullType="number" defaultValue="12">
+  Width in pixels of the outer band: the ring's stroke, or a knob's ticks.
+  Capped at 30% of `size`, past which the ring closes into a disc.
 </ApiProp>
 
 <ApiProp
   name="variant"
-  fullType='"default" | "filled"'
+  fullType='"ring" | "knob"'
   simpleType="string"
-  defaultValue='"default"'
+  defaultValue='"ring"'
 >
-  Visual style variant. "default" shows a ring style, "filled" shows a filled
-  circle with a radial indicator line.
+  A ring takes presses along its band and jumps to a click; a knob takes them
+  anywhere on its face and turns with the drag.
+</ApiProp>
+
+<ApiProp
+  name="dragMode"
+  fullType='"angular" | "vertical"'
+  simpleType="string"
+  defaultValue='"angular"'
+>
+  `angular` follows the pointer around the center; `vertical` turns the value
+  with up and down drags.
+</ApiProp>
+
+<ApiProp name="disabled" fullType="boolean" defaultValue="false">
+  Ignores input and dims the dial.
+</ApiProp>
+
+<ApiProp
+  name="thumbShape"
+  fullType='"bead" | "pill"'
+  simpleType="string"
+  defaultValue='"bead" (ring) / "pill" (knob)'
+>
+  The thumb's look. On a ring, `pill` overhangs the band, which moves in to make
+  room. On a knob, it picks the face's marker: a dot or a line.
+</ApiProp>
+
+<ApiProp name="minStepsBetweenValues" fullType="number" defaultValue="0">
+  Least distance, in steps, between a range's thumbs.
+</ApiProp>
+
+<ApiProp
+  name="thumbCollisionBehavior"
+  fullType='"push" | "none"'
+  simpleType="string"
+  defaultValue='"push"'
+>
+  What a range thumb does when it runs into the other: `push` carries the other
+  along, `none` stops it there.
+</ApiProp>
+
+<ApiProp
+  name="formatValue"
+  fullType="(value: number, index: number) => string"
+  simpleType="function"
+>
+  Formats each value for display. `CircularSliderValue` reads it, and screen
+  readers speak it unless `getAriaValueText` is set.
+</ApiProp>
+
+<ApiProp
+  name="getAriaLabel"
+  fullType="(index: number) => string"
+  simpleType="function"
+>
+  Accessible name for each thumb of a range. Defaults to "Start" and "End";
+  `aria-label` names the range as a group.
+</ApiProp>
+
+<ApiProp
+  name="getAriaValueText"
+  fullType="(value: number, index: number) => string"
+  simpleType="function"
+  defaultValue="formatValue"
+>
+  Spoken value for a thumb, when it should differ from the displayed one.
 </ApiProp>
 
 </ApiPropsList>
 
-#### Form & Accessibility
+`name`, `form`, `id` and `aria-describedby` go to the hidden inputs. `aria-label` and `aria-labelledby` name the input on a single-value dial, and the group on a range.
 
-These props are forwarded to an underlying native `<input type="range">` for form integration and screen reader support.
+#### CircularSlider
+
+The ready-made ring: Track, Indicator, Thumb and Value inside a root. Takes the root's props, except `variant`; compose a knob with `CircularSliderRoot`.
 
 <ApiPropsList>
 
-<ApiProp name="name" fullType="string">
-  Form submission name.
-</ApiProp>
-
-<ApiProp name="id" fullType="string">
-  Element ID for label association.
-</ApiProp>
-
-<ApiProp name="required" fullType="boolean">
-  Required for form validation.
-</ApiProp>
-
-<ApiProp name="form" fullType="string">
-  Associate with a form by ID.
-</ApiProp>
-
-<ApiProp name="aria-label" fullType="string">
-  Accessible label.
-</ApiProp>
-
-<ApiProp name="aria-labelledby" fullType="string">
-  ID of labelling element.
-</ApiProp>
-
-<ApiProp name="aria-describedby" fullType="string">
-  ID of describing element.
-</ApiProp>
-
-<ApiProp name="aria-valuetext" fullType="string | ((value: number) => string)">
-  Human-readable value. Can be a function for dynamic text.
+<ApiProp
+  name="formatValue"
+  fullType="((value: number, index: number) => string) | null"
+  simpleType="function"
+>
+  Formats the centered value, and what screen readers speak unless
+  `getAriaValueText` is set. Pass `null` to hide the value.
 </ApiProp>
 
 </ApiPropsList>
 
 #### CircularSliderTrack
 
-The background circle or arc that shows the full range.
-
-<ApiPropsList>
-
-<ApiProp name="strokeWidth" fullType="number" defaultValue="16">
-  Width of the track stroke in pixels. This value is converted to SVG units for
-  consistent sizing across different container sizes.
-</ApiProp>
-
-</ApiPropsList>
+The full sweep of the band, drawn behind the indicator.
 
 #### CircularSliderIndicator
 
-The arc that shows the selected value range from min to current value.
-
-<ApiPropsList>
-
-<ApiProp name="strokeWidth" fullType="number" defaultValue="16">
-  Width of the indicator stroke in pixels. Should typically match the track
-  strokeWidth for visual consistency.
-</ApiProp>
-
-</ApiPropsList>
+The filled arc: from `origin` to the value, or between a range's thumbs.
 
 #### CircularSliderThumb
 
-The draggable handle on the circle that controls the value.
+The thumb for each value, shaped by the root's `thumbShape`: a bead set into the end of the indicator, or a slim pill across the band. When a range's two beads meet, they join into one pill.
 
 <ApiPropsList>
 
-<ApiProp name="size" fullType="number" defaultValue="16">
-  Size of the thumb in pixels. For default variant, this is both width and
-  height. For filled variant, this is the length of the radial line.
+<ApiProp name="beadSize" fullType="number" defaultValue="thickness - 4">
+  Bead diameter in pixels. Applies to the bead only; a pill's shape follows the
+  band.
 </ApiProp>
 
 </ApiPropsList>
 
-#### CircularSliderValue
+#### CircularSliderTicks
 
-Text display of the current value, typically shown in the center of the circle.
-
-<ApiPropsList>
-
-<ApiProp
-  name="formatValue"
-  fullType="(value: number) => string"
-  simpleType="function"
->
-  Custom formatter for the displayed value. Useful for adding units or custom
-  formatting (e.g., adding "h" for hours, "°" for degrees).
-</ApiProp>
-
-</ApiPropsList>
-
-#### CircularSliderMarkers
-
-Visual tick marks around the circle for better value indication.
+A scale of ticks: just inside a ring's band, or as a knob's band. Ticks up to the value carry `data-active`; a value between two ticks lights the nearer one. Pick a `count` that divides your range by `step`, so the value lands on ticks.
 
 <ApiPropsList>
 
-<ApiProp name="count" fullType="number" defaultValue="12">
-  Number of evenly-spaced markers to display around the circle.
+<ApiProp name="count" fullType="number" defaultValue="20 (ring) / 30 (knob)">
+  Number of intervals across the sweep.
 </ApiProp>
 
 <ApiProp
   name="length"
   fullType="number"
-  defaultValue="10 (filled) / 5 (default)"
+  defaultValue="4 (ring) / thickness (knob)"
 >
-  Length of each marker line in pixels. Default length varies by variant: 10px
-  for filled variant, 5px for default variant.
+  Tick length in pixels.
+</ApiProp>
+
+</ApiPropsList>
+
+#### CircularSliderMark
+
+A read-only line across the band for a second value. Glides when the value changes.
+
+<ApiPropsList>
+
+<ApiProp name="value" fullType="number" required>
+  The reading to mark.
+</ApiProp>
+
+</ApiPropsList>
+
+#### CircularSliderKnob
+
+The raised face of a `knob` dial. Turns with the value and presses in while held. Pass `children` to replace the notch.
+
+#### CircularSliderValue
+
+The value as text, centered in the dial.
+
+<ApiPropsList>
+
+<ApiProp
+  name="formatValue"
+  fullType="(value: number, index: number) => string"
+  simpleType="function"
+>
+  Formats each value. Defaults to the root's `formatValue`.
+</ApiProp>
+
+<ApiProp name="separator" fullType="string" defaultValue='" – "'>
+  Joins the two ends of a range.
 </ApiProp>
 
 </ApiPropsList>

@@ -30,8 +30,8 @@ import {
 } from "@/components/home/slab-styles";
 import TextMorphNumbers from "@/registry/examples/text-morph/text-morph-numbers";
 import TextMorphModes from "@/registry/examples/text-morph/text-morph-modes";
-import CircularSliderWithValue from "@/registry/examples/circular-slider/circular-slider-with-value";
-import CircularSliderWithMarkers from "@/registry/examples/circular-slider/circular-slider-with-markers";
+import CircularSliderRange from "@/registry/examples/circular-slider/circular-slider-range";
+import CircularSliderKnob from "@/registry/examples/circular-slider/circular-slider-knob";
 import CodeBlockWithFilename from "@/registry/examples/code-block/code-block-with-filename";
 import FiltersBasic from "@/registry/examples/filters/filters-basic";
 import TransitionPanelBasic from "@/registry/examples/transition-panel/transition-panel-basic";
@@ -125,7 +125,7 @@ export default async function Home() {
                 {
                   slug: "circular-slider",
                   name: "Circular Slider",
-                  demo: <CircularSliderWithValue />,
+                  demo: <CircularSliderRange />,
                 },
                 { slug: "tree", name: "Tree", demo: <TreeDemo /> },
                 { slug: "qr-code", name: "QR Code", demo: <QrDemo /> },
@@ -161,7 +161,7 @@ export default async function Home() {
               name="Circular Slider"
               span="md:col-span-2"
             >
-              <CircularSliderWithMarkers />
+              <CircularSliderKnob />
             </GalleryCard>
             <GalleryCard slug="qr-code" name="QR Code" span="md:col-span-2">
               <QrLogoDemo />

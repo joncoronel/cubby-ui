@@ -401,28 +401,13 @@
           "target": "components/ui/cubby-ui/circular-slider/circular-slider.tsx"
         },
         {
-          "path": "registry/default/circular-slider/lib/angle-calculations.ts",
+          "path": "registry/default/circular-slider/lib/geometry.ts",
           "type": "registry:lib",
-          "target": "components/ui/cubby-ui/circular-slider/lib/angle-calculations.ts"
-        },
-        {
-          "path": "registry/default/circular-slider/lib/pointer-utils.ts",
-          "type": "registry:lib",
-          "target": "components/ui/cubby-ui/circular-slider/lib/pointer-utils.ts"
-        },
-        {
-          "path": "registry/default/circular-slider/lib/svg-constants.ts",
-          "type": "registry:lib",
-          "target": "components/ui/cubby-ui/circular-slider/lib/svg-constants.ts"
-        },
-        {
-          "path": "registry/default/circular-slider/lib/svg-utils.ts",
-          "type": "registry:lib",
-          "target": "components/ui/cubby-ui/circular-slider/lib/svg-utils.ts"
+          "target": "components/ui/cubby-ui/circular-slider/lib/geometry.ts"
         }
       ],
-      "dependencies": [
-        "class-variance-authority"
+      "registryDependencies": [
+        "@cubby-ui/use-controllable-state"
       ]
     },
     {

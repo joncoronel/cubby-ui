@@ -1306,9 +1306,8 @@
         }
       ],
       "dependencies": [
-        "react-resizable-panels",
-        "@hugeicons/react",
-        "@hugeicons/core-free-icons"
+        "class-variance-authority",
+        "react-resizable-panels"
       ]
     },
     {

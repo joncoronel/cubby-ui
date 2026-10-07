@@ -5,14 +5,24 @@ import { Meter as BaseMeter } from "@base-ui/react/meter";
 
 import { cn } from "@/lib/utils";
 
-type MeterStatus = "optimum" | "suboptimum" | "critical";
+export type MeterStatus = "optimum" | "suboptimum" | "critical";
 
 /** Width of the notch cut into the track at each threshold, in px. */
 const NOTCH_WIDTH = 2;
 
-export interface MeterRootProps extends React.ComponentProps<
-  typeof BaseMeter.Root
+export interface MeterRootProps extends Omit<
+  React.ComponentProps<typeof BaseMeter.Root>,
+  "getAriaValueText"
 > {
+  /**
+   * Text for screen readers in place of the formatted value. Receives the
+   * threshold status too, since the indicator color alone isn't announced.
+   */
+  getAriaValueText?: (
+    formattedValue: string,
+    value: number,
+    status: MeterStatus | undefined,
+  ) => string;
   /** Track thickness. */
   size?: "sm" | "md" | "lg";
   /** Upper bound of the low region. Values below it are "low". */
@@ -28,8 +38,8 @@ export interface MeterRootProps extends React.ComponentProps<
 }
 
 /**
- * Mirrors the HTML `<meter>` algorithm: the value's distance from the
- * optimum's region decides how good it is. Returns `undefined` when no
+ * Mirrors the HTML `<meter>` gauge regions as browsers implement them,
+ * including which side each boundary belongs to. Returns `undefined` when no
  * thresholds are set so the meter stays a neutral color.
  */
 function getMeterStatus(
@@ -44,17 +54,26 @@ function getMeterStatus(
     return undefined;
   }
 
+  const current = clamp(value, min, max);
   const lowBound = clamp(low ?? min, min, max);
   const highBound = clamp(high ?? max, lowBound, max);
   const ideal = clamp(optimum ?? (min + max) / 2, min, max);
 
-  const region = (v: number): number =>
-    v < lowBound ? 0 : v > highBound ? 2 : 1;
-  const distance = Math.abs(region(value) - region(ideal));
-
-  if (distance === 0) return "optimum";
-  if (distance === 1) return "suboptimum";
-  return "critical";
+  // Higher is better: a boundary counts toward the optimum's side
+  if (ideal > highBound) {
+    if (current >= highBound) return "optimum";
+    if (current > lowBound) return "suboptimum";
+    return "critical";
+  }
+  // Lower is better
+  if (ideal < lowBound) {
+    if (current <= lowBound) return "optimum";
+    if (current < highBound) return "suboptimum";
+    return "critical";
+  }
+  // Middle is best: both outer regions are only suboptimum
+  if (current >= lowBound && current <= highBound) return "optimum";
+  return "suboptimum";
 }
 
 function clamp(value: number, min: number, max: number): number {
@@ -77,7 +96,7 @@ function notchMask(positions: number[]): string | undefined {
     (p) =>
       `#000 0 calc(${p}% - ${half}px), transparent 0 calc(${p}% + ${half}px)`,
   );
-  return `linear-gradient(to right, ${stops.join(", ")}, #000 0)`;
+  return `linear-gradient(var(--meter-direction), ${stops.join(", ")}, #000 0)`;
 }
 
 function MeterRoot({
@@ -90,6 +109,7 @@ function MeterRoot({
   low,
   high,
   optimum,
+  getAriaValueText,
   ...props
 }: MeterRootProps) {
   const status = getMeterStatus(value, min, max, low, high, optimum);
@@ -104,6 +124,11 @@ function MeterRoot({
       data-slot="meter"
       data-size={size}
       data-status={status}
+      getAriaValueText={
+        getAriaValueText
+          ? (formatted, current) => getAriaValueText(formatted, current, status)
+          : undefined
+      }
       value={value}
       min={min}
       max={max}
@@ -111,6 +136,9 @@ function MeterRoot({
         "group/meter grid w-full grid-flow-row-dense grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 gap-y-2",
         // Label and value share the first row; the track and anything else span both columns
         "[&>:not([data-slot=meter-label],[data-slot=meter-value])]:col-span-full",
+        "[&>[data-slot=meter-value]]:col-start-2 [&>[data-slot=meter-value]]:justify-self-end",
+        // Notches follow the fill, which starts at the inline start
+        "[--meter-direction:to_right] rtl:[--meter-direction:to_left]",
         "[--meter-color:var(--primary)]",
         "data-[status=optimum]:[--meter-color:var(--success-foreground)]",
         "data-[status=suboptimum]:[--meter-color:var(--warning-foreground)]",
@@ -206,10 +234,7 @@ function MeterValue({
   return (
     <BaseMeter.Value
       data-slot="meter-value"
-      className={cn(
-        "text-muted-foreground col-start-2 justify-self-end text-sm tabular-nums",
-        className,
-      )}
+      className={cn("text-muted-foreground text-sm tabular-nums", className)}
       {...props}
     />
   );

@@ -13,6 +13,7 @@ export default function ProgressFormat() {
       max={4.2}
       format={{ style: "unit", unit: "gigabyte", maximumFractionDigits: 1 }}
       className="max-w-sm"
+      getAriaValueText={(formatted) => `${formatted} of 4.2 GB`}
     >
       <ProgressLabel>Downloading macOS image</ProgressLabel>
       <ProgressValue>{(formatted) => `${formatted} of 4.2 GB`}</ProgressValue>

@@ -50,6 +50,8 @@ Use `size` to set the track thickness.
 
 `low`, `high`, and `optimum` work like the native [`<meter>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/meter) element. `low` and `high` split the range into three regions, and `optimum` says which region is ideal. A value in that region is optimum (green), the next region over is suboptimum (amber), and the far region is critical (red). A small notch marks each threshold on the track.
 
+Color alone isn't announced, so `getAriaValueText` receives the status as a third argument. Use it to put the status into what screen readers hear.
+
 <ComponentPreview component="meter" example="meter-thresholds" />
 
 | Reading          | Thresholds                              |
@@ -108,6 +110,15 @@ For the complete Base UI API, see the [Base UI Meter documentation](https://base
 <ApiProp name="optimum" fullType="number" defaultValue="(min + max) / 2">
   The ideal value. The region that contains it is optimum. Status colors only
   apply when at least one of `low`, `high`, or `optimum` is set.
+</ApiProp>
+
+<ApiProp
+  name="getAriaValueText"
+  fullType="(formattedValue: string, value: number, status: MeterStatus | undefined) => string"
+  simpleType="function"
+>
+  Text for screen readers in place of the formatted value. Extends Base UI's
+  callback with the threshold `status`, which is `undefined` without thresholds.
 </ApiProp>
 
 </ApiPropsList>

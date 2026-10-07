@@ -20,6 +20,7 @@ export default function MeterFormat() {
         low={1500}
         high={2250}
         optimum={0}
+        getAriaValueText={(formatted) => `${formatted} of $2,500`}
       >
         <MeterLabel>Monthly cloud spend</MeterLabel>
         <MeterValue>{(formatted) => `${formatted} of $2,500`}</MeterValue>
@@ -33,6 +34,7 @@ export default function MeterFormat() {
         min={1}
         max={5}
         format={{ maximumFractionDigits: 1 }}
+        getAriaValueText={(formatted) => `${formatted} out of 5`}
       >
         <MeterLabel>Average rating</MeterLabel>
         <MeterValue>{(formatted) => `${formatted} / 5`}</MeterValue>

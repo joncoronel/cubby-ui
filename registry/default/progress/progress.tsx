@@ -13,6 +13,7 @@ const progressRootVariants = cva(
     // Label and value share the first row; the track and anything else span both columns
     "group/progress grid w-full grid-flow-row-dense grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 gap-y-2",
     "[&>:not([data-slot=progress-label],[data-slot=progress-value])]:col-span-full",
+    "[&>[data-slot=progress-value]]:col-start-2 [&>[data-slot=progress-value]]:justify-self-end",
     // With a ring, everything sits inline: ring, then label and value
     "has-[>[data-slot=progress-circle]]:flex has-[>[data-slot=progress-circle]]:w-auto has-[>[data-slot=progress-circle]]:items-center has-[>[data-slot=progress-circle]]:gap-x-2",
   ],
@@ -31,6 +32,10 @@ const progressRootVariants = cva(
     },
   },
 );
+
+// Lets the indicator and ring remount when the value switches to or from
+// null, so neither tweens between the sweep and a real value.
+const ProgressIndeterminateContext = React.createContext(false);
 
 export interface ProgressRootProps
   extends
@@ -63,20 +68,22 @@ function ProgressRoot({
   } as React.CSSProperties;
 
   return (
-    <BaseProgress.Root
-      data-slot="progress"
-      data-size={size}
-      data-empty={percent === 0 || undefined}
-      value={value}
-      min={min}
-      max={max}
-      className={cn(progressRootVariants({ variant }), className)}
-      style={(state) => ({
-        ...vars,
-        ...(typeof style === "function" ? style(state) : style),
-      })}
-      {...props}
-    />
+    <ProgressIndeterminateContext.Provider value={value === null}>
+      <BaseProgress.Root
+        data-slot="progress"
+        data-size={size}
+        data-empty={percent === 0 || undefined}
+        value={value}
+        min={min}
+        max={max}
+        className={cn(progressRootVariants({ variant }), className)}
+        style={(state) => ({
+          ...vars,
+          ...(typeof style === "function" ? style(state) : style),
+        })}
+        {...props}
+      />
+    </ProgressIndeterminateContext.Provider>
   );
 }
 
@@ -94,6 +101,8 @@ function ProgressTrack({
       data-slot="progress-track"
       className={cn(
         "bg-foreground/9 relative w-full overflow-hidden rounded-full",
+        // The sweep keyframes move left to right; mirror them for RTL
+        "rtl:data-indeterminate:-scale-x-100",
         "group-data-[size=lg]/progress:h-2.5 group-data-[size=md]/progress:h-1.5 group-data-[size=sm]/progress:h-1",
         className,
       )}
@@ -106,14 +115,17 @@ function ProgressIndicator({
   className,
   ...props
 }: React.ComponentProps<typeof BaseProgress.Indicator>) {
+  const indeterminate = React.useContext(ProgressIndeterminateContext);
+
   return (
     <BaseProgress.Indicator
+      key={indeterminate ? "indeterminate" : "determinate"}
       data-slot="progress-indicator"
       className={cn(
         "relative h-full rounded-full bg-(--progress-color)",
         "ease-out-expo transition-[width,background-color] duration-500 motion-reduce:transition-none",
         // Indeterminate: a 40% sweep, or a slow full-width breathe under reduced motion
-        "data-indeterminate:absolute data-indeterminate:inset-y-0 data-indeterminate:left-0 data-indeterminate:w-2/5",
+        "data-indeterminate:absolute data-indeterminate:inset-y-0 data-indeterminate:start-0 data-indeterminate:w-2/5",
         "data-indeterminate:animate-[progress-indeterminate_1.6s_var(--ease-in-out-cubic)_infinite]",
         "motion-reduce:data-indeterminate:w-full motion-reduce:data-indeterminate:animate-[progress-breathe_2.4s_ease-in-out_infinite]",
         className,
@@ -167,6 +179,7 @@ function ProgressCircle({
   children,
   ...props
 }: ProgressCircleProps) {
+  const indeterminate = React.useContext(ProgressIndeterminateContext);
   const stroke = thickness ?? Math.max(2, size / 10);
   const radius = (size - stroke) / 2;
   const center = size / 2;
@@ -177,7 +190,7 @@ function ProgressCircle({
       className={cn(
         "relative inline-grid shrink-0 place-items-center",
         // A centered ProgressValue scales with the ring instead of using its own text size
-        "[&>[data-slot=progress-value]]:text-foreground [&>[data-slot=progress-value]]:col-start-auto [&>[data-slot=progress-value]]:justify-self-center [&>[data-slot=progress-value]]:text-[length:inherit] [&>[data-slot=progress-value]]:leading-none [&>[data-slot=progress-value]]:font-medium",
+        "[&>[data-slot=progress-value]]:text-foreground [&>[data-slot=progress-value]]:text-[length:inherit] [&>[data-slot=progress-value]]:leading-none [&>[data-slot=progress-value]]:font-medium",
         className,
       )}
       style={{
@@ -208,6 +221,7 @@ function ProgressCircle({
           className="stroke-foreground/9"
         />
         <circle
+          key={indeterminate ? "indeterminate" : "determinate"}
           cx={center}
           cy={center}
           r={radius}
@@ -218,9 +232,9 @@ function ProgressCircle({
           strokeDasharray="100 100"
           className={cn(
             "stroke-(--progress-color) [stroke-dashoffset:calc(100_-_var(--progress-percent,0))]",
-            "ease-out-expo transition-[stroke-dashoffset,stroke] duration-500 motion-reduce:transition-none",
-            // A round cap still paints a dot at zero length
-            "group-data-empty/progress:opacity-0",
+            "ease-out-expo transition-[stroke-dashoffset,stroke,opacity] duration-500 motion-reduce:transition-none",
+            // A round cap still paints a dot at zero length; fade it once the arc has drained
+            "group-data-empty/progress:opacity-0 group-data-empty/progress:[transition-delay:0s,0s,300ms]",
             "group-data-indeterminate/progress:[stroke-dashoffset:75]",
             "motion-reduce:group-data-indeterminate/progress:animate-[progress-breathe_2.4s_ease-in-out_infinite]",
           )}
@@ -255,7 +269,7 @@ function ProgressValue({
     <BaseProgress.Value
       data-slot="progress-value"
       className={cn(
-        "text-muted-foreground col-start-2 justify-self-end text-sm tabular-nums",
+        "text-muted-foreground text-sm tabular-nums",
         // Base UI prints "indeterminate" when value is null
         "data-indeterminate:hidden",
         className,

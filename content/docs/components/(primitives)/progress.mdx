@@ -125,7 +125,7 @@ For the complete Base UI API, see the [Base UI Progress documentation](https://b
   simpleType="string"
   defaultValue='"md"'
 >
-  Thickness of the track.
+  Thickness of the track. A `ProgressCircle` takes its own pixel `size` instead.
 </ApiProp>
 
 <ApiProp name="buffer" fullType="number">
@@ -150,13 +150,15 @@ For the complete Base UI API, see the [Base UI Progress documentation](https://b
 
 ### Data Attributes
 
-| Attribute            | Element   | Description                             |
-| -------------------- | --------- | --------------------------------------- |
-| `data-indeterminate` | All parts | Present while `value` is `null`.        |
-| `data-progressing`   | All parts | Present while the value is below `max`. |
-| `data-complete`      | All parts | Present once the value reaches `max`.   |
-| `data-size`          | Root      | The current `size`.                     |
-| `data-empty`         | Root      | Present while the value equals `min`.   |
+| Attribute            | Element       | Description                             |
+| -------------------- | ------------- | --------------------------------------- |
+| `data-indeterminate` | Base UI parts | Present while `value` is `null`.        |
+| `data-progressing`   | Base UI parts | Present while the value is below `max`. |
+| `data-complete`      | Base UI parts | Present once the value reaches `max`.   |
+| `data-size`          | Root          | The current `size`.                     |
+| `data-empty`         | Root          | Present while the value equals `min`.   |
+
+The state attributes land on the Base UI parts: root, track, indicator, label, and value. `ProgressBuffer` and `ProgressCircle` are plain elements, so style them from the root with `group-data-complete/progress:` and similar.
 
 ### CSS Variables
 

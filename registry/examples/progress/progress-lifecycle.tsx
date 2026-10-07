@@ -20,21 +20,20 @@ const LABELS: Record<Phase, string> = {
 };
 
 export default function ProgressLifecycle() {
-  const [phase, setPhase] = React.useState<Phase>("idle");
+  const [step, setStep] = React.useState<Exclude<Phase, "done">>("idle");
   const [value, setValue] = React.useState(0);
+
+  // "done" is derived, so the upload loop only ever touches the value
+  const phase: Phase = step === "uploading" && value >= 100 ? "done" : step;
 
   React.useEffect(() => {
     if (phase === "connecting") {
-      const timeout = setTimeout(() => setPhase("uploading"), 1200);
+      const timeout = setTimeout(() => setStep("uploading"), 1200);
       return () => clearTimeout(timeout);
     }
     if (phase === "uploading") {
       const timer = setInterval(() => {
-        setValue((prev) => {
-          const next = Math.min(100, prev + Math.random() * 18 + 4);
-          if (next >= 100) setPhase("done");
-          return next;
-        });
+        setValue((prev) => Math.min(100, prev + Math.random() * 18 + 4));
       }, 400);
       return () => clearInterval(timer);
     }
@@ -42,7 +41,7 @@ export default function ProgressLifecycle() {
 
   const start = () => {
     setValue(0);
-    setPhase("connecting");
+    setStep("connecting");
   };
 
   return (

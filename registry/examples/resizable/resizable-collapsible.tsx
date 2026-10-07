@@ -67,7 +67,7 @@ export default function ResizableCollapsible() {
                 className={
                   collapsed
                     ? "opacity-0"
-                    : "truncate opacity-100 transition-opacity duration-200"
+                    : "truncate opacity-100 transition-opacity delay-150 duration-200 motion-reduce:transition-none"
                 }
               >
                 {item.label}

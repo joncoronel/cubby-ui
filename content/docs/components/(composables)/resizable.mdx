@@ -110,29 +110,33 @@ Nest a `ResizablePanelGroup` inside a `ResizablePanel` to split in both directio
 <ComponentPreview component="resizable" example="resizable-persistent" />
 
 <Callout type="warn">
-  The hook reads `localStorage` while rendering, which doesn't exist on the server. In a server-rendered app, pass a no-op `storage` until hydration and remount the group once the saved layout can be read, as the example does. To restore the layout with no shift at all, save it to a cookie and read it on the server instead.
+  The hook reads `localStorage` while rendering, which doesn't exist on the
+  server. In a server-rendered app, pass a no-op `storage` until hydration and
+  remount the group once the saved layout can be read, as the example does. To
+  restore the layout with no shift at all, save it to a cookie and read it on
+  the server instead.
 </Callout>
 
 ## Animation
 
-Layout changes you ask for ease into place over 320ms: `collapse()`, `expand()`, `resize()`, `setLayout()`, a double-click reset and keyboard steps. Dragging never animates, and neither does a change forced by the group itself resizing, such as a pixel-sized panel holding its width while the window shrinks. Set `--resizable-duration` on the group to retune, or `0ms` to turn it off. Under reduced motion every change is instant.
+In a panel group, layout changes you ask for ease into place over 320ms: `collapse()`, `expand()`, `resize()`, `setLayout()`, a double-click reset and keyboard steps. Dragging never animates, and neither does a change forced by the group itself resizing, such as a pixel-sized panel holding its width while the window shrinks. Set `--resizable-duration` on the group to retune, or `0ms` to turn it off. Under reduced motion every change is instant. Grids don't animate; their tracks always move at once.
 
 ## Accessibility
 
 Each handle is a `separator` with `aria-valuenow`, `aria-valuemin` and `aria-valuemax`, and it is in the tab order.
 
-| Key            | Action                                 |
-| -------------- | -------------------------------------- |
-| Arrow keys     | Resize by a small step                 |
-| `Home` / `End` | Resize to the minimum or maximum       |
-| `Enter`        | Collapse or expand a collapsible panel |
-| `F6`           | Move focus to the next handle          |
+| Key            | Action                                                               |
+| -------------- | -------------------------------------------------------------------- |
+| Arrow keys     | Resize by a small step                                               |
+| `Home` / `End` | Resize to the minimum or maximum                                     |
+| `Enter`        | Collapse or expand the panel before the handle, if it is collapsible |
+| `F6`           | Move focus to the next handle                                        |
 
 Double-click a handle to reset its panel to the default size. Pass `disableDoubleClick` to turn that off.
 
 ## API Reference
 
-Resizable is built on [react-resizable-panels](https://react-resizable-panels.vercel.app). All props pass through to `Group`, `Panel`, `Separator`, `Grid`, `Cell` and `Gridline`. The hooks `usePanelRef`, `useGroupRef`, `useGridRef`, `useDefaultLayout` and `useDefaultGridLayout` are re-exported from the same module.
+Resizable is built on [react-resizable-panels](https://react-resizable-panels.vercel.app). All props pass through to `Group`, `Panel`, `Separator`, `Grid` and `Cell`. `Gridline` only accepts the props listed below, plus `className`, `style`, `disabled`, `elementRef` and `children`. The hooks `usePanelRef`, `useGroupRef`, `useGridRef`, `useDefaultLayout` and `useDefaultGridLayout` are re-exported from the same module.
 
 ### Props
 
@@ -212,6 +216,12 @@ A single resizable region. Wraps `Panel`. `className` and `style` apply to the p
 
 <ApiProp name="collapsedSize" fullType="number | string" defaultValue='"0%"'>
   Size of the panel when collapsed.
+</ApiProp>
+
+<ApiProp name="collapsedThreshold" fullType="number | string">
+  How far past `minSize` the panel must be dragged before it collapses, and past
+  `collapsedSize` before it expands. Defaults to half the distance between the
+  two.
 </ApiProp>
 
 <ApiProp name="id" fullType="string | number">
@@ -319,13 +329,23 @@ Draggable line between two columns or two rows. Takes the same `variant` as `Res
 </ApiProp>
 
 <ApiProp name="column" fullType="number">
-  For a column line, the column it sits before. For a row line, the first column
-  it spans.
+  For a column line, the column it sits before (required). For a row line, the
+  first column it spans. Defaults to `0`.
 </ApiProp>
 
 <ApiProp name="row" fullType="number">
-  For a row line, the row it sits above. For a column line, the first row it
-  spans.
+  For a row line, the row it sits above (required). For a column line, the first
+  row it spans. Defaults to `0`.
+</ApiProp>
+
+<ApiProp name="rowSpan" fullType="number">
+  Column lines only. How many rows the line spans. Defaults to all rows from
+  `row`. Use it to stop a line at a cell that spans across it.
+</ApiProp>
+
+<ApiProp name="columnSpan" fullType="number">
+  Row lines only. How many columns the line spans. Defaults to all columns from
+  `column`.
 </ApiProp>
 
 </ApiPropsList>

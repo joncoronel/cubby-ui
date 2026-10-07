@@ -140,11 +140,17 @@ const resizableHandleVariants = cva(
 // crosses, but appears at once on press and leaves at once. Its growth is a
 // variable rather than competing scale classes: every live state writes
 // `--reach`, so none of them depends on stylesheet order to beat the rest.
+//
+// A plain click focuses the handle (so arrow keys work next), and while
+// focused the library reports `focus` instead of `hover`. The bar stays up
+// for that state, so a clicked handle doesn't go blank under the cursor.
+// Keyboard focus is focus-visible and paints primary on top.
 const resizableIndicatorVariants = cva(
   [
     "pointer-events-none absolute opacity-0",
     "transition-[opacity,scale,background-color] duration-150 ease-out motion-reduce:transition-none",
     "group-data-[separator=hover]/handle:opacity-100 group-data-[separator=hover]/handle:delay-100 group-data-[separator=hover]/handle:[--reach:1]",
+    "group-data-[separator=focus]/handle:opacity-100 group-data-[separator=focus]/handle:[--reach:1]",
     "group-data-[separator=active]/handle:bg-primary group-data-[separator=active]/handle:opacity-100 group-data-[separator=active]/handle:[--reach:1]",
     "group-focus-visible/handle:bg-primary group-focus-visible/handle:opacity-100 group-focus-visible/handle:[--reach:1]",
     "group-data-[separator=disabled]/handle:hidden",
@@ -165,9 +171,6 @@ const resizableIndicatorVariants = cva(
           "group-aria-[orientation=horizontal]/handle:h-1 group-aria-[orientation=horizontal]/handle:w-8",
         ],
       },
-    },
-    defaultVariants: {
-      variant: "line",
     },
   },
 );
@@ -281,13 +284,28 @@ function ResizableGridline({
   variant,
   className,
   children,
+  elementRef,
   ...props
 }: ResizableGridlineProps) {
   const resolvedVariant = variant ?? "line";
 
+  // Gridline forwards only className, style, disabled, elementRef and
+  // children to its element, so the data attributes go on through the ref.
+  const ref = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      if (node) {
+        node.dataset.slot = "resizable-gridline";
+        node.dataset.variant = resolvedVariant;
+      }
+      assignRef(elementRef, node);
+    },
+    [elementRef, resolvedVariant],
+  );
+
   return (
     <ResizablePrimitive.Gridline
       {...(props as ResizablePrimitive.GridlineProps)}
+      elementRef={ref}
       className={cn(
         resizableHandleVariants({ variant: resolvedVariant }),
         // Gridlines are stretched by the grid, not the flex row.

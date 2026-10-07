@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 // animate again. Long enough to cover a window drag's trailing events.
 const SETTLE_DELAY = 150;
 
-function assignRef<T>(ref: React.Ref<T> | undefined, value: T) {
+function assignRef<T>(ref: React.Ref<T> | undefined, value: T): void {
   if (typeof ref === "function") ref(value);
   else if (ref) ref.current = value;
 }

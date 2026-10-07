@@ -101,7 +101,7 @@ function ProgressTrack({
       data-slot="progress-track"
       className={cn(
         "bg-foreground/9 relative w-full overflow-hidden rounded-full",
-        // The sweep keyframes move left to right; mirror them for RTL
+        // The sweep is physical (left-0, moving right); mirroring the track reverses it for RTL
         "rtl:data-indeterminate:-scale-x-100",
         "group-data-[size=lg]/progress:h-2.5 group-data-[size=md]/progress:h-1.5 group-data-[size=sm]/progress:h-1",
         className,
@@ -125,7 +125,7 @@ function ProgressIndicator({
         "relative h-full rounded-full bg-(--progress-color)",
         "ease-out-expo transition-[width,background-color] duration-500 motion-reduce:transition-none",
         // Indeterminate: a 40% sweep, or a slow full-width breathe under reduced motion
-        "data-indeterminate:absolute data-indeterminate:inset-y-0 data-indeterminate:start-0 data-indeterminate:w-2/5",
+        "data-indeterminate:absolute data-indeterminate:inset-y-0 data-indeterminate:left-0 data-indeterminate:w-2/5",
         "data-indeterminate:animate-[progress-indeterminate_1.6s_var(--ease-in-out-cubic)_infinite]",
         "motion-reduce:data-indeterminate:w-full motion-reduce:data-indeterminate:animate-[progress-breathe_2.4s_ease-in-out_infinite]",
         className,

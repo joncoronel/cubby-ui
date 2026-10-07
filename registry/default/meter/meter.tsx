@@ -59,16 +59,16 @@ function getMeterStatus(
   const highBound = clamp(high ?? max, lowBound, max);
   const ideal = clamp(optimum ?? (min + max) / 2, min, max);
 
-  // Higher is better: a boundary counts toward the optimum's side
+  // Higher is better. Both boundaries count toward the better side
   if (ideal > highBound) {
     if (current >= highBound) return "optimum";
-    if (current > lowBound) return "suboptimum";
+    if (current >= lowBound) return "suboptimum";
     return "critical";
   }
   // Lower is better
   if (ideal < lowBound) {
     if (current <= lowBound) return "optimum";
-    if (current < highBound) return "suboptimum";
+    if (current <= highBound) return "suboptimum";
     return "critical";
   }
   // Middle is best: both outer regions are only suboptimum

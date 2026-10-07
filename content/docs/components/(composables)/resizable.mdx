@@ -10,9 +10,7 @@ import {
   ResizablePanel,
 } from "@/registry/default/resizable/resizable";
 
-Resizable splits a layout into panels separated by draggable handles, so users can size regions to taste. Use it for split editors, sidebars beside content, or any pane layout the user should control. It is built on react-resizable-panels v4.
-
-Handles stay a quiet hairline until you reach for them: a bar grows out of the line on hover, turns blue while you drag or focus it from the keyboard, and the hit area is wider than what you see. Collapsing, expanding and resetting a panel ease into place, while dragging always tracks the pointer exactly.
+Resizable splits a layout into panels with draggable handles between them. Use it for split editors, a sidebar beside content, or any pane layout your users should size themselves.
 
 ## Preview
 
@@ -35,61 +33,75 @@ ResizablePanelGroup
 └── ResizablePanel
 ```
 
-Place a `ResizableHandle` between each pair of panels. Groups lay out horizontally by default; set `orientation="vertical"` to stack them.
+Place a `ResizableHandle` between each pair of panels.
+
+## Features
+
+- Collapse, expand, `resize()`, `setLayout()`, keyboard steps and a double-click reset ease over 320ms; drags track the pointer 1:1.
+- Set `--resizable-duration` on the group to retune the easing, or `0ms` to turn it off. Reduced motion turns it off too.
+- Double-click a handle to reset its panel to its default size.
+- Panels clip content along the resize axis instead of showing a scrollbar, and scroll along the other.
+- Size the group with ordinary classes such as `h-64`.
 
 ## Sizes
 
-Every size prop takes a number or a string, and the two mean different things:
+Size props take a number or a string, and the two mean different things.
 
 | Value     | Meaning                                   |
 | --------- | ----------------------------------------- |
 | `200`     | Pixels                                    |
 | `"30%"`   | Percent of the group                      |
-| `"30"`    | Also percent (a string without a unit)    |
+| `"30"`    | Percent (a string with no unit)           |
 | `"12rem"` | Any of `px`, `%`, `em`, `rem`, `vh`, `vw` |
 
 <Callout type="warn">
-  A bare number is pixels. `defaultSize={50}` is 50px wide, not half the group.
-  Use `defaultSize="50%"` for a percentage.
+  `defaultSize={50}` is 50px wide, not half the group. Write `defaultSize="50%"`
+  for a percentage.
 </Callout>
 
 ## Examples
 
 ### Vertical
 
-Set `orientation="vertical"` on `ResizablePanelGroup` to stack panels.
+Set `orientation="vertical"` on the group to stack panels.
 
 <ComponentPreview component="resizable" example="resizable-vertical" />
 
 ### Three Panels
 
-Add more `ResizablePanel` and `ResizableHandle` pairs for additional sections.
+Add a `ResizablePanel` and `ResizableHandle` pair for each extra section.
 
 <ComponentPreview component="resizable" example="resizable-three-panels" />
 
 ### Min and Max Size
 
-Mix units freely. Here the sidebar is held between 160 and 280 pixels while the main panel keeps at least 40% of the group.
+Use `minSize` and `maxSize` to clamp a panel; this sidebar stays between 160 and 280px while the main panel keeps at least 40%.
 
 <ComponentPreview component="resizable" example="resizable-min-max-size" />
 
 ### Collapsible
 
-A `collapsible` panel snaps to its `collapsedSize` when dragged past its `minSize`. Grab a ref with `usePanelRef` to collapse and expand it from a button; the change animates. Pairing a collapsed size with icon-only content gives you a rail. `collapsedThreshold` sets how far past the minimum you drag before it snaps; it defaults to half the distance between the two sizes, and the example narrows it to 24px so the snap commits sooner.
+Use `collapsible` and `collapsedSize` to let a panel snap shut when dragged past its `minSize`, and `usePanelRef` to toggle it from a button. This example sets `collapsedThreshold={24}` so the snap commits after a short drag.
 
 <ComponentPreview component="resizable" example="resizable-collapsible" />
 
 ### Grip
 
-`variant="grip"` adds a visible grip to the handle, which helps when the line alone is too subtle to find.
+Use `variant="grip"` to add a visible grip when the line alone is hard to find.
 
 <ComponentPreview component="resizable" example="resizable-grip" />
 
 ### Gap
 
-`variant="gap"` turns the handle into a gutter, for layouts where each panel is a card of its own. A pill appears in the gutter on hover.
+Use `variant="gap"` for a gutter between panels that are cards of their own.
 
 <ComponentPreview component="resizable" example="resizable-gap" />
+
+| Variant | Description                                         |
+| ------- | --------------------------------------------------- |
+| `line`  | The default hairline; a bar grows from it on hover. |
+| `grip`  | The hairline plus a raised pill.                    |
+| `gap`   | An 8px gutter with a pill that shows on hover.      |
 
 ### Nested
 
@@ -99,50 +111,47 @@ Nest a `ResizablePanelGroup` inside a `ResizablePanel` to split in both directio
 
 ### Grid
 
-`ResizableGrid` resizes columns and rows together. Drag where two gridlines cross to resize both at once. Cells can span tracks with `columnSpan` and `rowSpan`.
+Use `ResizableGrid` to resize columns and rows together; drag where two gridlines cross to resize both.
 
 <ComponentPreview component="resizable" example="resizable-grid" />
 
 ### Saving the Layout
 
-`useDefaultLayout` restores the layout from `localStorage` on mount and saves it after each resize. Give every panel an `id` so the saved sizes find their way back. Pass `storage` to use `sessionStorage`, cookies, or your own store.
+Use `useDefaultLayout` and give each panel an `id` to save the layout to `localStorage` and restore it on load.
 
 <ComponentPreview component="resizable" example="resizable-persistent" />
 
 <Callout type="warn">
-  The hook reads `localStorage` while rendering, which doesn't exist on the
-  server. In a server-rendered app, pass a no-op `storage` until hydration and
-  remount the group once the saved layout can be read, as the example does. To
-  restore the layout with no shift at all, save it to a cookie and read it on
-  the server instead.
+  The hook reads `localStorage` while rendering, so it crashes on the server.
+  Pass a no-op `storage` until hydration and remount the group once the saved
+  layout is readable, as the example does. For no layout shift at all, store the
+  layout in a cookie and read it on the server.
 </Callout>
-
-## Animation
-
-In a panel group, layout changes you ask for ease into place over 320ms: `collapse()`, `expand()`, `resize()`, `setLayout()`, a double-click reset and keyboard steps. Dragging never animates, and neither does a change forced by the group itself resizing, such as a pixel-sized panel holding its width while the window shrinks. Set `--resizable-duration` on the group to retune, or `0ms` to turn it off. Under reduced motion every change is instant. Grids don't animate; their tracks always move at once.
 
 ## Accessibility
 
-Each handle is a `separator` with `aria-valuenow`, `aria-valuemin` and `aria-valuemax`, and it is in the tab order.
+Each handle is a `separator` in the tab order, with `aria-valuenow`, `aria-valuemin` and `aria-valuemax`.
 
-| Key            | Action                                                               |
-| -------------- | -------------------------------------------------------------------- |
-| Arrow keys     | Resize by a small step                                               |
-| `Home` / `End` | Resize to the minimum or maximum                                     |
-| `Enter`        | Collapse or expand the panel before the handle, if it is collapsible |
-| `F6`           | Move focus to the next handle                                        |
+| Key            | Action                                                    |
+| -------------- | --------------------------------------------------------- |
+| Arrow keys     | Resize by 5%                                              |
+| `Home` / `End` | Resize to the minimum or maximum                          |
+| `Enter`        | Collapse or expand the panel before the handle, if it can |
+| `F6`           | Move focus to the next handle                             |
 
-Double-click a handle to reset its panel to the default size. Pass `disableDoubleClick` to turn that off.
+Clicking a handle focuses it, so the arrow keys work straight after.
 
 ## API Reference
 
-Resizable is built on [react-resizable-panels](https://react-resizable-panels.vercel.app). All props pass through to `Group`, `Panel`, `Separator`, `Grid` and `Cell`. `Gridline` only accepts the props listed below, plus `className`, `style`, `disabled`, `elementRef` and `children`. The hooks `usePanelRef`, `useGroupRef`, `useGridRef`, `useDefaultLayout` and `useDefaultGridLayout` are re-exported from the same module.
+Resizable is built on [react-resizable-panels](https://react-resizable-panels.vercel.app) v4. All of its props are supported. The documentation below covers custom props, changed behavior, and the props you need most. `usePanelRef`, `useGroupRef`, `useGridRef`, `useDefaultLayout` and `useDefaultGridLayout` are re-exported from the same module.
+
+For the complete API, see the [react-resizable-panels documentation](https://react-resizable-panels.vercel.app).
 
 ### Props
 
 #### ResizablePanelGroup
 
-Container that lays out panels and tracks their sizes. Wraps `Group`.
+Lays out panels and tracks their sizes. Wraps `Group`, minus its inline `height` and `width`, so sizing classes apply.
 
 <ApiPropsList>
 
@@ -152,12 +161,11 @@ Container that lays out panels and tracks their sizes. Wraps `Group`.
   simpleType="string"
   defaultValue='"horizontal"'
 >
-  Axis the panels resize along. `"horizontal"` drags left and right,
-  `"vertical"` drags up and down.
+  Axis the panels resize along.
 </ApiProp>
 
 <ApiProp name="defaultLayout" fullType="{ [panelId: string]: number }">
-  Initial sizes as percentages keyed by panel `id`. Usually comes from
+  Initial sizes as percentages, keyed by panel `id`. Usually comes from
   `useDefaultLayout`.
 </ApiProp>
 
@@ -165,40 +173,20 @@ Container that lays out panels and tracks their sizes. Wraps `Group`.
   name="onLayoutChanged"
   fullType="(layout: Layout, meta: LayoutChangedMeta) => void"
 >
-  Called once a resize finishes (on pointer release). Use it to persist the
-  layout.
-</ApiProp>
-
-<ApiProp name="onLayoutChange" fullType="(layout: Layout) => void">
-  Called on every change, including each pointer move during a drag.
-</ApiProp>
-
-<ApiProp name="groupRef" fullType="Ref<GroupImperativeHandle>">
-  Imperative API with `getLayout()` and `setLayout(layout)`.
-</ApiProp>
-
-<ApiProp name="disabled" fullType="boolean" defaultValue="false">
-  Turns off resizing for the whole group.
-</ApiProp>
-
-<ApiProp
-  name="resizeTargetMinimumSize"
-  fullType="{ coarse: number; fine: number }"
-  defaultValue="{ coarse: 20, fine: 10 }"
->
-  Minimum hit area in pixels for touch and mouse input.
+  Runs once a resize finishes. Use it to persist the layout; `onLayoutChange`
+  runs on every pointer move instead.
 </ApiProp>
 
 </ApiPropsList>
 
 #### ResizablePanel
 
-A single resizable region. Wraps `Panel`. `className` and `style` apply to the panel's inner container. Content that doesn't fit is clipped along the resize axis and scrolls along the other; set `style={{ overflow: "auto" }}` to scroll both ways.
+One resizable region. Wraps `Panel`. `className` and `style` apply to the inner container, which clips along the resize axis; pass `style={{ overflow: "auto" }}` to scroll both ways.
 
 <ApiPropsList>
 
 <ApiProp name="defaultSize" fullType="number | string">
-  Initial size. Numbers are pixels, strings are percentages unless they carry a
+  Initial size. Numbers are pixels; strings are percentages unless they carry a
   unit.
 </ApiProp>
 
@@ -211,17 +199,16 @@ A single resizable region. Wraps `Panel`. `className` and `style` apply to the p
 </ApiProp>
 
 <ApiProp name="collapsible" fullType="boolean" defaultValue="false">
-  Lets the panel collapse to `collapsedSize` when dragged below `minSize`.
+  Lets the panel snap to `collapsedSize` when dragged below `minSize`.
 </ApiProp>
 
 <ApiProp name="collapsedSize" fullType="number | string" defaultValue='"0%"'>
-  Size of the panel when collapsed.
+  Size of the collapsed panel.
 </ApiProp>
 
 <ApiProp name="collapsedThreshold" fullType="number | string">
-  How far past `minSize` the panel must be dragged before it collapses, and past
-  `collapsedSize` before it expands. Defaults to half the distance between the
-  two.
+  Distance past `minSize` before the panel collapses, and past `collapsedSize`
+  before it expands. Defaults to half the gap between the two.
 </ApiProp>
 
 <ApiProp name="id" fullType="string | number">
@@ -229,22 +216,8 @@ A single resizable region. Wraps `Panel`. `className` and `style` apply to the p
 </ApiProp>
 
 <ApiProp name="panelRef" fullType="Ref<PanelImperativeHandle>">
-  Imperative API with `collapse()`, `expand()`, `resize(size)`, `getSize()` and
+  Exposes `collapse()`, `expand()`, `resize(size)`, `getSize()` and
   `isCollapsed()`.
-</ApiProp>
-
-<ApiProp name="onResize" fullType="(size: PanelSize, id, prevSize) => void">
-  Called whenever the panel's size changes.
-</ApiProp>
-
-<ApiProp
-  name="groupResizeBehavior"
-  fullType='"preserve-relative-size" | "preserve-pixel-size"'
-  simpleType="string"
-  defaultValue='"preserve-relative-size"'
->
-  Whether the panel keeps its percentage or its pixel width when the group
-  resizes.
 </ApiProp>
 
 </ApiPropsList>
@@ -261,42 +234,32 @@ Draggable divider between two panels. Wraps `Separator`.
   simpleType="string"
   defaultValue='"line"'
 >
-  `line` is a hairline, `grip` adds a visible grip, `gap` is an 8px gutter with
-  no line.
-</ApiProp>
-
-<ApiProp name="disableDoubleClick" fullType="boolean" defaultValue="false">
-  Stops a double-click from resetting the panel to its default size.
-</ApiProp>
-
-<ApiProp name="disabled" fullType="boolean" defaultValue="false">
-  Stops this handle from resizing its panels.
+  Handle style. See the [variant table](#gap). Custom prop not available in
+  react-resizable-panels.
 </ApiProp>
 
 </ApiPropsList>
 
 #### ResizableGrid
 
-Two-dimensional layout of cells. Wraps `Grid`. Cells resize on both axes, so they clip content on both; place a scroll container inside a cell that needs one.
+Two-dimensional layout of cells. Wraps `Grid`, minus its inline `height` and `width`.
 
 <ApiPropsList>
 
 <ApiProp name="columns" fullType="number | GridTrackProps[]" required>
-  Number of columns, or one set of size constraints per column (`minSize`,
-  `maxSize`, `collapsible` and so on).
+  Column count, or one set of constraints per column (`minSize`, `maxSize`,
+  `collapsible` and the rest of the panel size props).
 </ApiProp>
 
 <ApiProp name="rows" fullType="number | GridTrackProps[]" required>
-  Number of rows, or one set of size constraints per row.
-</ApiProp>
-
-<ApiProp name="gridRef" fullType="Ref<GridImperativeHandle>">
-  Imperative API with `getLayout()`, `setLayout()` and per-track handles.
+  Row count, or one set of constraints per row.
 </ApiProp>
 
 </ApiPropsList>
 
 #### ResizableCell
+
+One cell of a grid. Wraps `Cell` and clips its content on both axes; put a scroll container inside a cell that needs one.
 
 <ApiPropsList>
 
@@ -320,7 +283,7 @@ Two-dimensional layout of cells. Wraps `Grid`. Cells resize on both axes, so the
 
 #### ResizableGridline
 
-Draggable line between two columns or two rows. Takes the same `variant` as `ResizableHandle`.
+Draggable line between two columns or two rows. Wraps `Gridline`, which forwards only `className`, `style`, `disabled`, `elementRef` and `children` besides the props below.
 
 <ApiPropsList>
 
@@ -329,30 +292,39 @@ Draggable line between two columns or two rows. Takes the same `variant` as `Res
 </ApiProp>
 
 <ApiProp name="column" fullType="number">
-  For a column line, the column it sits before (required). For a row line, the
+  Required for a column line: the column it sits before. For a row line, the
   first column it spans. Defaults to `0`.
 </ApiProp>
 
 <ApiProp name="row" fullType="number">
-  For a row line, the row it sits above (required). For a column line, the first
+  Required for a row line: the row it sits above. For a column line, the first
   row it spans. Defaults to `0`.
 </ApiProp>
 
 <ApiProp name="rowSpan" fullType="number">
-  Column lines only. How many rows the line spans. Defaults to all rows from
-  `row`. Use it to stop a line at a cell that spans across it.
+  Column lines only. Rows the line spans; defaults to all rows from `row`. Use
+  it to stop a line at a cell that spans across it.
 </ApiProp>
 
 <ApiProp name="columnSpan" fullType="number">
-  Row lines only. How many columns the line spans. Defaults to all columns from
-  `column`.
+  Row lines only. Columns the line spans; defaults to all columns from `column`.
+</ApiProp>
+
+<ApiProp
+  name="variant"
+  fullType='"line" | "grip" | "gap"'
+  simpleType="string"
+  defaultValue='"line"'
+>
+  Same styles as `ResizableHandle`. Custom prop not available in
+  react-resizable-panels.
 </ApiProp>
 
 </ApiPropsList>
 
 ## Migrating from v3
 
-| Before                           | Now                                      |
+| v3                               | v4                                       |
 | -------------------------------- | ---------------------------------------- |
 | `direction="horizontal"`         | `orientation="horizontal"` (the default) |
 | `defaultSize={30}`               | `defaultSize="30%"`                      |

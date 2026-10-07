@@ -9,8 +9,7 @@ import {
   useDefaultLayout,
 } from "@/registry/default/resizable/resizable";
 
-// Stands in for localStorage on the server and during hydration, so the first
-// client render matches the server's HTML.
+// Used on the server and during hydration, so the first render matches.
 const NOOP_STORAGE = {
   getItem: () => null,
   setItem: () => {},
@@ -25,7 +24,6 @@ export default function ResizablePersistent() {
     () => false,
   );
 
-  // Reads the saved layout and writes it back after each resize.
   const { defaultLayout, onLayoutChanged } = useDefaultLayout({
     id: "cubby-resizable-persistent",
     storage: hydrated ? localStorage : NOOP_STORAGE,
@@ -33,8 +31,7 @@ export default function ResizablePersistent() {
 
   return (
     <ResizablePanelGroup
-      // A default layout only applies on mount, so remount once the saved
-      // one can be read.
+      // defaultLayout only applies on mount; remount once storage is readable.
       key={hydrated ? "client" : "server"}
       defaultLayout={defaultLayout}
       onLayoutChanged={onLayoutChanged}

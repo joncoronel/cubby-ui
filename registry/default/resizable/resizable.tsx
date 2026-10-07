@@ -6,8 +6,7 @@ import * as ResizablePrimitive from "react-resizable-panels";
 
 import { cn } from "@/lib/utils";
 
-// How long a group must go without changing size before layout changes
-// animate again. Long enough to cover a window drag's trailing events.
+// Quiet period after the group last resized before layout changes ease again.
 const SETTLE_DELAY = 150;
 
 function assignRef<T>(ref: React.Ref<T> | undefined, value: T): void {
@@ -36,13 +35,10 @@ function ResizablePanelGroup({
     [elementRef],
   );
 
-  // Layout changes the user asks for (collapse, expand, double-click reset,
-  // keyboard steps, setLayout) ease into place. Changes the browser forces do
-  // not: on mount the library swaps the SSR flex-basis for its own flex-grow,
-  // and a pixel-constrained panel recomputes on every frame of a window
-  // resize. Easing either would trail behind. So `data-settled` is only set
-  // once the group has held its size for a moment, and dropped the instant it
-  // changes. Written to the DOM directly so React never reconciles it away.
+  // Requested layout changes (collapse, reset, keyboard, setLayout) ease;
+  // forced ones (mount, window resize) must not, or panels trail behind.
+  // `data-settled` marks a group that has held its size, and is set on the
+  // DOM directly so React never reconciles it away.
   React.useEffect(() => {
     const node = localRef.current;
     if (!node) return;
@@ -70,14 +66,12 @@ function ResizablePanelGroup({
         data-orientation={orientation}
         orientation={orientation}
         elementRef={ref}
-        // The library sizes the group with an inline `height: 100%` and
-        // `width: 100%`, which no class can beat. Clearing them hands sizing to
-        // `size-full` below, so `className="h-64"` works like anywhere else.
+        // The library's inline 100% height/width beats any class; clearing it
+        // lets `size-full` and a caller's `h-*` apply.
         style={{ height: undefined, width: undefined, ...style }}
         className={cn(
           "size-full",
-          // The flex-grow the library writes inline is the only thing that
-          // moves. A drag must track the pointer 1:1, so it never eases.
+          // Never during a drag, which must track the pointer 1:1.
           "motion-safe:data-settled:not-has-[>[data-separator=active]]:*:data-panel:[transition:flex-grow_var(--resizable-duration,320ms)_var(--ease-out-expo)]",
           className,
         )}
@@ -89,11 +83,9 @@ function ResizablePanelGroup({
 
 export type ResizablePanelProps = ResizablePrimitive.PanelProps;
 
-// `className` and `style` land on the panel's inner scroll container, not the
-// flex item. The library makes that container `overflow: auto`, so content
-// squeezed along the resize axis grew a scrollbar. It clips on that axis
-// instead, since the user chose the size, and still scrolls on the other.
-// The library writes the overflow inline, so it's overridden through `style`.
+// `className` and `style` land on the inner scroll container. Its inline
+// `overflow: auto` is overridden to clip on the resize axis instead of growing
+// a scrollbar, while still scrolling on the other.
 function ResizablePanel({ style, ...props }: ResizablePanelProps) {
   const orientation = React.useContext(OrientationContext);
 
@@ -109,11 +101,9 @@ function ResizablePanel({ style, ...props }: ResizablePanelProps) {
   );
 }
 
-// Every state reads the `data-separator` attribute the library maintains
-// (inactive, hover, active, focus, disabled), so pointer hit-testing stays
-// with the library and its forgiving hit area, not the painted 1px.
-// `aria-orientation` is the line's own axis: a horizontal group draws vertical
-// lines.
+// States come from the library's `data-separator`, so hit-testing uses its
+// wide hit area rather than the painted 1px. `aria-orientation` is the line's
+// own axis: a horizontal group draws vertical lines.
 const resizableHandleVariants = cva(
   [
     "group/handle relative flex shrink-0 items-center justify-center outline-none",
@@ -124,8 +114,7 @@ const resizableHandleVariants = cva(
       variant: {
         line: "bg-border",
         grip: "bg-border",
-        // A gutter between panels that are cards of their own. Override the
-        // width with a `w-*` / `h-*` class.
+        // Gutter between card-like panels; resize it with a `w-*` / `h-*` class.
         gap: "aria-[orientation=vertical]:w-2 aria-[orientation=horizontal]:h-2",
       },
     },
@@ -135,16 +124,10 @@ const resizableHandleVariants = cva(
   },
 );
 
-// The bar that answers the pointer. It waits a beat before showing on hover,
-// so sweeping the cursor across a layout doesn't flicker every line it
-// crosses, but appears at once on press and leaves at once. Its growth is a
-// variable rather than competing scale classes: every live state writes
-// `--reach`, so none of them depends on stylesheet order to beat the rest.
-//
-// A plain click focuses the handle (so arrow keys work next), and while
-// focused the library reports `focus` instead of `hover`. The bar stays up
-// for that state, so a clicked handle doesn't go blank under the cursor.
-// Keyboard focus is focus-visible and paints primary on top.
+// Shows after a short delay on hover, so sweeping past doesn't flicker, and at
+// once on press. `--reach` drives the scale so no state depends on class order.
+// A clicked handle keeps focus for arrow keys and reports `focus`, not `hover`,
+// so the bar stays up for it too.
 const resizableIndicatorVariants = cva(
   [
     "pointer-events-none absolute opacity-0",
@@ -158,7 +141,7 @@ const resizableIndicatorVariants = cva(
   {
     variants: {
       variant: {
-        // Full-length bar, three times the hairline, growing out of it.
+        // Full-length bar growing out of the hairline.
         line: [
           "bg-foreground/25 [--reach:0.34]",
           "group-aria-[orientation=vertical]/handle:inset-y-0 group-aria-[orientation=vertical]/handle:w-[3px] group-aria-[orientation=vertical]/handle:scale-x-(--reach)",
@@ -175,8 +158,7 @@ const resizableIndicatorVariants = cva(
   },
 );
 
-// A raised pill sitting on the line. The edge is a real border, not the
-// surface ladder's rim: a rim that faint disappears against a dark page.
+// A real border, not the surface rim, which vanishes against a dark page.
 const resizableGripClassName = cn(
   "pointer-events-none relative shrink-0 rounded-full border",
   "bg-surface-3 border-foreground/15 shadow-(--surface-shadow-3)",
@@ -264,9 +246,8 @@ function ResizableGrid({ className, style, ...props }: ResizableGridProps) {
 
 export type ResizableCellProps = ResizablePrimitive.CellProps;
 
-// Cells resize on both axes, so they clip on both, like panels do on theirs.
-// The library writes `overflow: auto` inline, so it's overridden through
-// `style`. Put a scroll container inside a cell that needs one.
+// Cells resize on both axes, so they clip on both. Inline, like the library's
+// `overflow: auto` it replaces.
 function ResizableCell({ style, ...props }: ResizableCellProps) {
   return (
     <ResizablePrimitive.Cell
@@ -289,8 +270,7 @@ function ResizableGridline({
 }: ResizableGridlineProps) {
   const resolvedVariant = variant ?? "line";
 
-  // Gridline forwards only className, style, disabled, elementRef and
-  // children to its element, so the data attributes go on through the ref.
+  // Gridline drops unknown props, so the data attributes go on via the ref.
   const ref = React.useCallback(
     (node: HTMLDivElement | null) => {
       if (node) {

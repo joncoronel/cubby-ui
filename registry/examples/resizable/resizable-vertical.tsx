@@ -1,24 +1,24 @@
 import {
-  ResizablePanelGroup,
-  ResizablePanel,
   ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
 } from "@/registry/default/resizable/resizable";
 
 export default function ResizableVertical() {
   return (
     <ResizablePanelGroup
-      direction="vertical"
-      className="min-h-[200px] max-w-md rounded-lg border"
+      orientation="vertical"
+      className="h-64 max-w-md rounded-xl border"
     >
-      <ResizablePanel defaultSize={25}>
-        <div className="flex h-full items-center justify-center p-6">
-          <span className="font-semibold">Header</span>
+      <ResizablePanel defaultSize="30%" minSize="15%">
+        <div className="flex h-full items-center justify-center">
+          <span className="text-sm font-medium">Header</span>
         </div>
       </ResizablePanel>
       <ResizableHandle />
-      <ResizablePanel defaultSize={75}>
-        <div className="flex h-full items-center justify-center p-6">
-          <span className="font-semibold">Content</span>
+      <ResizablePanel minSize="15%">
+        <div className="flex h-full items-center justify-center">
+          <span className="text-sm font-medium">Content</span>
         </div>
       </ResizablePanel>
     </ResizablePanelGroup>

@@ -16,6 +16,7 @@ pnpm run lint --fix   # Auto-fix lint issues
 pnpm test             # Run tests in watch mode
 pnpm test:run         # Run tests once (CI)
 pnpm run registry:sync # Sync component registry metadata
+pnpm run registry:all  # Sync metadata and rebuild installable public/r/*.json
 ```
 
 ## Code Style Guidelines
@@ -157,7 +158,7 @@ hooks/                      # App hooks
 
 1. Add/modify components in `registry/default/[component]/`
 2. Create examples in `registry/examples/[component]/`
-3. Run `pnpm run registry:sync` to update metadata
+3. Run `pnpm run registry:all` to update metadata and the installable `public/r/*.json`
 4. Create/update MDX docs in `content/docs/components/`
 
 ## When Adding Hooks or Utilities
@@ -182,7 +183,7 @@ Components (thin wrappers around Base UI) do not need tests.
 1. Run `pnpm run lint` - fix any errors
 2. Run `pnpm test:run` - ensure all tests pass
 3. Ensure code follows patterns above
-4. Run `pnpm run registry:sync` if components changed
+4. Run `pnpm run registry:all` if components changed (`registry:sync` alone leaves `public/r/*.json` stale)
 5. Verify component examples work in dev server
 
 ## Detailed Documentation

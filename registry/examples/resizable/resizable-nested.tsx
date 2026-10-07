@@ -1,32 +1,29 @@
 import {
-  ResizablePanelGroup,
-  ResizablePanel,
   ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
 } from "@/registry/default/resizable/resizable";
 
 export default function ResizableNested() {
   return (
-    <ResizablePanelGroup
-      direction="horizontal"
-      className="min-h-[200px] max-w-md rounded-lg border"
-    >
-      <ResizablePanel defaultSize={25}>
-        <div className="flex h-full items-center justify-center p-6">
-          <span className="font-semibold">Sidebar</span>
+    <ResizablePanelGroup className="h-64 max-w-lg rounded-xl border">
+      <ResizablePanel defaultSize="30%" minSize="15%">
+        <div className="flex h-full items-center justify-center">
+          <span className="text-sm font-medium">Sidebar</span>
         </div>
       </ResizablePanel>
-      <ResizableHandle withHandle />
-      <ResizablePanel defaultSize={75}>
-        <ResizablePanelGroup direction="vertical">
-          <ResizablePanel defaultSize={25}>
-            <div className="flex h-full items-center justify-center p-6">
-              <span className="font-semibold">Header</span>
+      <ResizableHandle />
+      <ResizablePanel minSize="15%">
+        <ResizablePanelGroup orientation="vertical">
+          <ResizablePanel defaultSize="35%" minSize="15%">
+            <div className="flex h-full items-center justify-center">
+              <span className="text-sm font-medium">Header</span>
             </div>
           </ResizablePanel>
-          <ResizableHandle withHandle />
-          <ResizablePanel defaultSize={75}>
-            <div className="flex h-full items-center justify-center p-6">
-              <span className="font-semibold">Main Content</span>
+          <ResizableHandle />
+          <ResizablePanel minSize="15%">
+            <div className="flex h-full items-center justify-center">
+              <span className="text-sm font-medium">Content</span>
             </div>
           </ResizablePanel>
         </ResizablePanelGroup>

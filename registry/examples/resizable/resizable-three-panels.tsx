@@ -1,30 +1,27 @@
 import {
-  ResizablePanelGroup,
-  ResizablePanel,
   ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
 } from "@/registry/default/resizable/resizable";
 
 export default function ResizableThreePanels() {
   return (
-    <ResizablePanelGroup
-      direction="horizontal"
-      className="max-w-md rounded-lg border"
-    >
-      <ResizablePanel defaultSize={25}>
-        <div className="flex h-[200px] items-center justify-center p-6">
-          <span className="font-semibold">Left</span>
+    <ResizablePanelGroup className="h-56 max-w-lg rounded-xl border">
+      <ResizablePanel defaultSize="25%" minSize="15%">
+        <div className="flex h-full items-center justify-center">
+          <span className="text-sm font-medium">Left</span>
         </div>
       </ResizablePanel>
-      <ResizableHandle withHandle />
-      <ResizablePanel defaultSize={50}>
-        <div className="flex h-[200px] items-center justify-center p-6">
-          <span className="font-semibold">Middle</span>
+      <ResizableHandle />
+      <ResizablePanel defaultSize="50%" minSize="15%">
+        <div className="flex h-full items-center justify-center">
+          <span className="text-sm font-medium">Middle</span>
         </div>
       </ResizablePanel>
-      <ResizableHandle withHandle />
-      <ResizablePanel defaultSize={25}>
-        <div className="flex h-[200px] items-center justify-center p-6">
-          <span className="font-semibold">Right</span>
+      <ResizableHandle />
+      <ResizablePanel defaultSize="25%" minSize="15%">
+        <div className="flex h-full items-center justify-center">
+          <span className="text-sm font-medium">Right</span>
         </div>
       </ResizablePanel>
     </ResizablePanelGroup>

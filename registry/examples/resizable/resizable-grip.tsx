@@ -4,15 +4,15 @@ import {
   ResizablePanelGroup,
 } from "@/registry/default/resizable/resizable";
 
-export default function ResizableBasic() {
+export default function ResizableGrip() {
   return (
     <ResizablePanelGroup className="h-56 max-w-md rounded-xl border">
-      <ResizablePanel defaultSize="40%" minSize="15%">
+      <ResizablePanel minSize="15%">
         <div className="flex h-full items-center justify-center">
           <span className="text-sm font-medium">One</span>
         </div>
       </ResizablePanel>
-      <ResizableHandle />
+      <ResizableHandle variant="grip" />
       <ResizablePanel minSize="15%">
         <div className="flex h-full items-center justify-center">
           <span className="text-sm font-medium">Two</span>

@@ -1,12 +1,12 @@
 ---
 title: Progress
-description: Visual indicator showing completion progress of a task or operation
+description: Show how far along a task is, or that it's running when the end is unknown
 type: primitive
 ---
 
 import { Progress } from "@/registry/default/progress/progress";
 
-A progress bar shows how far along a task or operation is, from a starting value to completion. Use it for uploads, downloads, or any determinate loading; for a static reading within a fixed range, use [`Meter`](/docs/components/meter) instead.
+A progress bar shows how far along a task is, from start to completion. Use it for uploads, downloads, exports, or any work you can measure; pass `value={null}` while you can't measure it yet. For a static reading within a fixed range, use [`Meter`](/docs/components/meter) instead.
 
 ## Preview
 
@@ -27,46 +27,76 @@ ProgressRoot
 ├── ProgressLabel
 ├── ProgressValue
 └── ProgressTrack
+    ├── ProgressBuffer
     └── ProgressIndicator
 ```
 
+For a ring, swap the track for `ProgressCircle`:
+
+```text
+ProgressRoot
+├── ProgressCircle
+│   └── ProgressValue
+└── ProgressLabel
+```
+
+`ProgressRoot` lays its children out on a grid: the label and value share the first row, and the track (plus anything else you add, like helper text) spans the full width below. No wrapper element is needed.
+
 ## Examples
 
-### Different Sizes
+### Sizes
 
-Use `size` to set the track height and text size.
+Use `size` to set the track thickness.
 
-<ComponentPreview component="progress" example="progress-different-sizes" />
+<ComponentPreview component="progress" example="progress-sizes" />
 
-| Value | Description                       |
-| ----- | --------------------------------- |
-| `sm`  | Thin track with extra-small text. |
-| `md`  | The default track and text.       |
-| `lg`  | Thick track with larger text.     |
+| Value | Description                         |
+| ----- | ----------------------------------- |
+| `sm`  | 4px track for dense lists and rows. |
+| `md`  | The default 6px track.              |
+| `lg`  | 10px track for a focal task.        |
 
-### Custom Colors
+### Variants
 
-Pass a `className` to `ProgressIndicator` to recolor the filled bar.
+Use `variant` to color the indicator with a status token.
 
-<ComponentPreview component="progress" example="progress-custom-colors" />
+<ComponentPreview component="progress" example="progress-variants" />
 
-### With Label
+### Indeterminate
 
-Add `ProgressLabel` and `ProgressValue` to caption the bar.
+Pass `value={null}` while the amount of work is unknown. The indicator sweeps across the track; with reduced motion it breathes in place instead.
 
-<ComponentPreview component="progress" example="progress-with-label" />
+<ComponentPreview component="progress" example="progress-indeterminate" />
 
-### Dynamic Progress
+### Upload Lifecycle
 
-Set `animated` on `ProgressRoot` to ease the indicator between values as they update.
+Move from indeterminate to determinate to a `success` variant to walk a task from connecting to done. Width and color changes ease between values on their own.
 
-<ComponentPreview component="progress" example="progress-dynamic" />
+<ComponentPreview component="progress" example="progress-lifecycle" />
 
-### File Upload
+### Buffer
 
-Drive `value` from an upload's progress; the bar shows a completed state when it reaches `max`.
+Set `buffer` on the root and add `ProgressBuffer` inside the track to show a secondary value behind the indicator, like how much of a stream has loaded.
 
-<ComponentPreview component="progress" example="progress-file-upload" />
+<ComponentPreview component="progress" example="progress-buffer" />
+
+### Circle
+
+Use `ProgressCircle` in place of the track where a bar won't fit. Put a `ProgressValue` inside it to center the value; its text scales with the ring. With a ring, the root lays its children out in a row, so a label sits beside it. At `value={null}` a quarter arc spins, which makes a small ring a drop-in spinner.
+
+<ComponentPreview component="progress" example="progress-circle" />
+
+### Attachment List
+
+Small rings fit inline in rows. Each file waits as queued, uploads, then switches to `success`.
+
+<ComponentPreview component="progress" example="progress-circle-attachments" />
+
+### Custom Range and Format
+
+Set `min` and `max` for a range other than 0 to 100, and pass `Intl.NumberFormat` options to `format`. `ProgressValue` takes a render function for full control over the text.
+
+<ComponentPreview component="progress" example="progress-format" />
 
 ## API Reference
 
@@ -74,14 +104,19 @@ The Progress component is built on top of [Base UI's Progress](https://base-ui.c
 
 For the complete Base UI API, see the [Base UI Progress documentation](https://base-ui.com/react/components/progress).
 
-### Props
+### Custom Props
 
 #### ProgressRoot
 
 <ApiPropsList>
 
-<ApiProp name="animated" fullType="boolean" defaultValue="false">
-  Ease the indicator between values as it updates.
+<ApiProp
+  name="variant"
+  fullType='"default" | "success" | "warning" | "danger" | "info"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Color of the indicator and buffer.
 </ApiProp>
 
 <ApiProp
@@ -90,39 +125,43 @@ For the complete Base UI API, see the [Base UI Progress documentation](https://b
   simpleType="string"
   defaultValue='"md"'
 >
-  Size of the progress bar.
+  Thickness of the track.
 </ApiProp>
 
-<ApiProp name="min" fullType="number" defaultValue="0">
-  Minimum value of the progress range.
-</ApiProp>
-
-<ApiProp name="max" fullType="number" defaultValue="100">
-  Maximum value of the progress range.
+<ApiProp name="buffer" fullType="number">
+  A secondary value, in the same range as `value`, drawn by `ProgressBuffer`.
 </ApiProp>
 
 </ApiPropsList>
 
-#### ProgressTrack
+#### ProgressCircle
 
 <ApiPropsList>
 
-<ApiProp name="striped" fullType="boolean">
-  Add a striped pattern to the track.
+<ApiProp name="size" fullType="number" defaultValue="20">
+  Diameter of the ring in px.
+</ApiProp>
+
+<ApiProp name="thickness" fullType="number" defaultValue="max(2, size / 10)">
+  Stroke width of the ring in px.
 </ApiProp>
 
 </ApiPropsList>
 
-#### ProgressValue
+### Data Attributes
 
-<ApiPropsList>
+| Attribute            | Element   | Description                             |
+| -------------------- | --------- | --------------------------------------- |
+| `data-indeterminate` | All parts | Present while `value` is `null`.        |
+| `data-progressing`   | All parts | Present while the value is below `max`. |
+| `data-complete`      | All parts | Present once the value reaches `max`.   |
+| `data-size`          | Root      | The current `size`.                     |
+| `data-empty`         | Root      | Present while the value equals `min`.   |
 
-<ApiProp
-  name="format"
-  fullType="(value: number, max: number) => string"
-  simpleType="function"
->
-  Format the displayed value. Receives the current value and max as arguments.
-</ApiProp>
+### CSS Variables
 
-</ApiPropsList>
+| Variable             | Element | Description                                      |
+| -------------------- | ------- | ------------------------------------------------ |
+| `--progress-color`   | Root    | Indicator and buffer color, set by `variant`.    |
+| `--progress-buffer`  | Root    | The `buffer` value as a percentage of the track. |
+| `--progress-percent` | Root    | The value as a unitless 0 to 100 number.         |

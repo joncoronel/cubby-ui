@@ -8,11 +8,9 @@ import {
 
 export default function MeterBasic() {
   return (
-    <MeterRoot value={75}>
-      <div className="flex items-center justify-between gap-2">
-        <MeterLabel>Storage Usage</MeterLabel>
-        <MeterValue />
-      </div>
+    <MeterRoot value={68} className="max-w-sm">
+      <MeterLabel>Storage</MeterLabel>
+      <MeterValue />
       <MeterTrack>
         <MeterIndicator />
       </MeterTrack>

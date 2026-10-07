@@ -1,30 +1,31 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import * as React from "react";
 import {
   ProgressRoot,
   ProgressTrack,
   ProgressIndicator,
+  ProgressLabel,
+  ProgressValue,
 } from "@/registry/default/progress/progress";
 
 export default function ProgressBasic() {
-  const [progress, setProgress] = useState(0);
+  const [value, setValue] = React.useState(12);
 
-  useEffect(() => {
+  // Advance in uneven steps, then start over, like a real upload
+  React.useEffect(() => {
     const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          return 0; // Reset to 0 when complete
-        }
-        return prev + 1;
-      });
-    }, 100);
-
+      setValue((prev) =>
+        prev >= 100 ? 0 : Math.min(100, prev + Math.random() * 14),
+      );
+    }, 700);
     return () => clearInterval(timer);
   }, []);
 
   return (
-    <ProgressRoot value={progress} animated className="w-[400px]">
+    <ProgressRoot value={value} className="max-w-sm">
+      <ProgressLabel>Uploading assets</ProgressLabel>
+      <ProgressValue />
       <ProgressTrack>
         <ProgressIndicator />
       </ProgressTrack>

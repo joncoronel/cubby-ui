@@ -1,0 +1,26 @@
+/* -------------------------------------------------------------------------------------------------
+ * Progress indeterminate motion.
+ *
+ * The indicator is 40% of the track, so travelling from -100% to 250% of its
+ * own width carries it fully off both edges. Under reduced motion the sweep is
+ * swapped for a slow full-width breathe (see progress.tsx).
+ * -------------------------------------------------------------------------------------------------*/
+
+@keyframes progress-indeterminate {
+  from {
+    translate: -100% 0;
+  }
+  to {
+    translate: 250% 0;
+  }
+}
+
+@keyframes progress-breathe {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}

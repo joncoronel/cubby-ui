@@ -12,7 +12,7 @@ interface Attachment {
   id: string;
   name: string;
   size: string;
-  /** Upload starts after this many ticks; until then it's queued. */
+  /** Ticks spent queued before the upload starts. */
   delay: number;
 }
 
@@ -25,7 +25,7 @@ const ATTACHMENTS: Attachment[] = [
 export default function ProgressCircleAttachments() {
   const [tick, setTick] = React.useState(0);
 
-  // Loop: uploads start in turn, finish, then the list resets
+  // Uploads start in turn, finish, then the list resets
   React.useEffect(() => {
     const timer = setInterval(() => setTick((t) => (t >= 24 ? 0 : t + 1)), 450);
     return () => clearInterval(timer);

@@ -10,11 +10,11 @@ import "./progress.css";
 
 const progressRootVariants = cva(
   [
-    // Label and value share the first row; the track and anything else span both columns
+    // Label and value share row one; everything else spans below
     "group/progress grid w-full grid-flow-row-dense grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 gap-y-2",
     "[&>:not([data-slot=progress-label],[data-slot=progress-value])]:col-span-full",
     "[&>[data-slot=progress-value]]:col-start-2 [&>[data-slot=progress-value]]:justify-self-end",
-    // With a ring, everything sits inline: ring, then label and value
+    // With a ring: one inline row
     "has-[>[data-slot=progress-circle]]:flex has-[>[data-slot=progress-circle]]:w-auto has-[>[data-slot=progress-circle]]:items-center has-[>[data-slot=progress-circle]]:gap-x-2",
   ],
   {
@@ -33,8 +33,8 @@ const progressRootVariants = cva(
   },
 );
 
-// Lets the indicator and ring remount when the value switches to or from
-// null, so neither tweens between the sweep and a real value.
+// Remounts the indicator and ring when value toggles null, so neither tweens
+// between the indeterminate state and a real value.
 const ProgressIndeterminateContext = React.createContext(false);
 
 export interface ProgressRootProps
@@ -43,7 +43,7 @@ export interface ProgressRootProps
     VariantProps<typeof progressRootVariants> {
   /** Track thickness. */
   size?: "sm" | "md" | "lg";
-  /** A secondary value drawn behind the indicator, such as how much of a video has loaded. */
+  /** Secondary value drawn behind the indicator, like loaded media. */
   buffer?: number;
 }
 
@@ -101,7 +101,7 @@ function ProgressTrack({
       data-slot="progress-track"
       className={cn(
         "bg-foreground/9 relative w-full overflow-hidden rounded-full",
-        // The sweep is physical (left-0, moving right); mirroring the track reverses it for RTL
+        // The sweep runs left to right; mirroring the track reverses it in RTL
         "rtl:data-indeterminate:-scale-x-100",
         "group-data-[size=lg]/progress:h-2.5 group-data-[size=md]/progress:h-1.5 group-data-[size=sm]/progress:h-1",
         className,
@@ -124,7 +124,7 @@ function ProgressIndicator({
       className={cn(
         "relative h-full rounded-full bg-(--progress-color)",
         "ease-out-expo transition-[width,background-color] duration-500 motion-reduce:transition-none",
-        // Indeterminate: a 40% sweep, or a slow full-width breathe under reduced motion
+        // Indeterminate: a 40% sweep, or a full-width breathe under reduced motion
         "data-indeterminate:absolute data-indeterminate:inset-y-0 data-indeterminate:left-0 data-indeterminate:w-2/5",
         "data-indeterminate:animate-[progress-indeterminate_1.6s_var(--ease-in-out-cubic)_infinite]",
         "motion-reduce:data-indeterminate:w-full motion-reduce:data-indeterminate:animate-[progress-breathe_2.4s_ease-in-out_infinite]",
@@ -135,10 +135,7 @@ function ProgressIndicator({
   );
 }
 
-/**
- * Draws the root's `buffer` value behind the indicator. Place it before
- * `ProgressIndicator` inside the track. Hidden while indeterminate.
- */
+/** Draws the root's `buffer`. Place it before `ProgressIndicator` in the track. */
 function ProgressBuffer({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -167,10 +164,7 @@ export interface ProgressCircleProps extends Omit<
   children?: React.ReactNode;
 }
 
-/**
- * A ring alternative to `ProgressTrack`. Use it in place of the track inside
- * `ProgressRoot`; the root's value, variant, and indeterminate state apply.
- */
+/** A ring used in place of `ProgressTrack`, driven by the same root. */
 function ProgressCircle({
   className,
   style,
@@ -189,7 +183,7 @@ function ProgressCircle({
       data-slot="progress-circle"
       className={cn(
         "relative inline-grid shrink-0 place-items-center",
-        // A centered ProgressValue scales with the ring instead of using its own text size
+        // A centered ProgressValue scales with the ring
         "[&>[data-slot=progress-value]]:text-foreground [&>[data-slot=progress-value]]:text-[length:inherit] [&>[data-slot=progress-value]]:leading-none [&>[data-slot=progress-value]]:font-medium",
         className,
       )}
@@ -208,7 +202,7 @@ function ProgressCircle({
         viewBox={`0 0 ${size} ${size}`}
         className={cn(
           "absolute inset-0 -rotate-90",
-          // Indeterminate: a quarter arc spinning, or breathing in place under reduced motion
+          // Indeterminate: a spinning quarter arc, or a breathe under reduced motion
           "group-data-indeterminate/progress:animate-spin motion-reduce:group-data-indeterminate/progress:animate-none",
         )}
       >
@@ -233,7 +227,7 @@ function ProgressCircle({
           className={cn(
             "stroke-(--progress-color) [stroke-dashoffset:calc(100_-_var(--progress-percent,0))]",
             "ease-out-expo transition-[stroke-dashoffset,stroke,opacity] duration-500 motion-reduce:transition-none",
-            // A round cap still paints a dot at zero length; fade it once the arc has drained
+            // Round caps paint a dot at zero length; fade once the arc drains
             "group-data-empty/progress:opacity-0 group-data-empty/progress:[transition-delay:0s,0s,300ms]",
             "group-data-indeterminate/progress:[stroke-dashoffset:75]",
             "motion-reduce:group-data-indeterminate/progress:animate-[progress-breathe_2.4s_ease-in-out_infinite]",

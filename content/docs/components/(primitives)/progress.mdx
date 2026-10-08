@@ -1,12 +1,12 @@
 ---
 title: Progress
-description: Show how far along a task is, or that it's running when the end is unknown
+description: Show how far a task has gotten, or that it's running when the end is unknown
 type: primitive
 ---
 
 import { Progress } from "@/registry/default/progress/progress";
 
-A progress bar shows how far along a task is, from start to completion. Use it for uploads, downloads, exports, or any work you can measure; pass `value={null}` while you can't measure it yet. For a static reading within a fixed range, use [`Meter`](/docs/components/meter) instead.
+A progress bar shows how far a task has gotten. Use it for uploads, downloads, and exports, and pass `value={null}` until you can measure the work. For a static reading in a fixed range, use [`Meter`](/docs/components/meter) instead.
 
 ## Preview
 
@@ -31,7 +31,7 @@ ProgressRoot
     └── ProgressIndicator
 ```
 
-For a ring, swap the track for `ProgressCircle`:
+The root puts the label and value on the first row and spans everything else below, so you don't need a wrapper. For a ring, swap the track for `ProgressCircle`:
 
 ```text
 ProgressRoot
@@ -39,8 +39,6 @@ ProgressRoot
 │   └── ProgressValue
 └── ProgressLabel
 ```
-
-`ProgressRoot` lays its children out on a grid: the label and value share the first row, and the track (plus anything else you add, like helper text) spans the full width below. No wrapper element is needed.
 
 ## Examples
 
@@ -50,11 +48,11 @@ Use `size` to set the track thickness.
 
 <ComponentPreview component="progress" example="progress-sizes" />
 
-| Value | Description                         |
-| ----- | ----------------------------------- |
-| `sm`  | 4px track for dense lists and rows. |
-| `md`  | The default 6px track.              |
-| `lg`  | 10px track for a focal task.        |
+| Value | Description                        |
+| ----- | ---------------------------------- |
+| `sm`  | 4px, for dense lists and rows.     |
+| `md`  | The default 6px track.             |
+| `lg`  | 10px, for a task in the spotlight. |
 
 ### Variants
 
@@ -62,41 +60,57 @@ Use `variant` to color the indicator with a status token.
 
 <ComponentPreview component="progress" example="progress-variants" />
 
+| Value     | Description                     |
+| --------- | ------------------------------- |
+| `default` | The primary color.              |
+| `info`    | Background work, like indexing. |
+| `success` | A finished task.                |
+| `warning` | A slow or retrying task.        |
+| `danger`  | A stalled or failed task.       |
+
 ### Indeterminate
 
-Pass `value={null}` while the amount of work is unknown. The indicator sweeps across the track; with reduced motion it breathes in place instead.
+Pass `value={null}` while the amount of work is unknown, and the indicator sweeps across the track.
 
 <ComponentPreview component="progress" example="progress-indeterminate" />
 
 ### Upload Lifecycle
 
-Move from indeterminate to determinate to a `success` variant to walk a task from connecting to done. Width and color changes ease between values on their own.
+Switch `value` from `null` to a number, then `variant` to `"success"`, to walk a task from connecting to done.
 
 <ComponentPreview component="progress" example="progress-lifecycle" />
 
 ### Buffer
 
-Set `buffer` on the root and add `ProgressBuffer` inside the track to show a secondary value behind the indicator, like how much of a stream has loaded.
+Set `buffer` on the root and place `ProgressBuffer` before the indicator to show a second value, like loaded media.
 
 <ComponentPreview component="progress" example="progress-buffer" />
 
 ### Circle
 
-Use `ProgressCircle` in place of the track where a bar won't fit. Put a `ProgressValue` inside it to center the value; its text scales with the ring. With a ring, the root lays its children out in a row, so a label sits beside it. At `value={null}` a quarter arc spins, which makes a small ring a drop-in spinner.
+Use `ProgressCircle` in place of the track where a bar won't fit; a nested `ProgressValue` centers and scales with the ring. At `value={null}` it spins, so a small ring doubles as a spinner.
 
 <ComponentPreview component="progress" example="progress-circle" />
 
 ### Attachment List
 
-Small rings fit inline in rows. Each file waits as queued, uploads, then switches to `success`.
+Give `ProgressCircle` a small `size` to fit a ring inline in a list row.
 
 <ComponentPreview component="progress" example="progress-circle-attachments" />
 
 ### Custom Range and Format
 
-Set `min` and `max` for a range other than 0 to 100, and pass `Intl.NumberFormat` options to `format`. `ProgressValue` takes a render function for full control over the text.
+Use `min`, `max`, and `format` to count in your own units.
 
 <ComponentPreview component="progress" example="progress-format" />
+
+## Accessibility
+
+Screen readers skip `ProgressValue` and read the root's value text instead. When the visible text adds context, like "1.4 GB of 4.2 GB", pass the same string through `getAriaValueText`.
+
+With reduced motion on, the indicator jumps between values, and the indeterminate sweep and ring spin turn into a slow fade.
+
+`ProgressRoot` renders a `<div>`. To put a ring inside a button, pass `render={<span />}` to keep the markup valid.
 
 ## API Reference
 
@@ -104,9 +118,11 @@ The Progress component is built on top of [Base UI's Progress](https://base-ui.c
 
 For the complete Base UI API, see the [Base UI Progress documentation](https://base-ui.com/react/components/progress).
 
-### Custom Props
+### Props
 
 #### ProgressRoot
+
+Holds the value and lays out the parts. Wraps Base UI's `Progress.Root`.
 
 <ApiPropsList>
 
@@ -125,16 +141,30 @@ For the complete Base UI API, see the [Base UI Progress documentation](https://b
   simpleType="string"
   defaultValue='"md"'
 >
-  Thickness of the track. A `ProgressCircle` takes its own pixel `size` instead.
+  Thickness of the track. `ProgressCircle` takes its own pixel `size`.
 </ApiProp>
 
 <ApiProp name="buffer" fullType="number">
-  A secondary value, in the same range as `value`, drawn by `ProgressBuffer`.
+  A second value in the same range as `value`, drawn by `ProgressBuffer`.
 </ApiProp>
 
 </ApiPropsList>
 
+#### ProgressTrack
+
+The full range of the bar. Wraps Base UI's `Progress.Track`.
+
+#### ProgressIndicator
+
+The filled part of the track. Wraps Base UI's `Progress.Indicator`.
+
+#### ProgressBuffer
+
+The root's `buffer`, drawn behind the indicator. A plain `<div>`, hidden while indeterminate.
+
 #### ProgressCircle
+
+A ring drawn in place of the track, driven by the same root. A plain `<span>` holding an SVG.
 
 <ApiPropsList>
 
@@ -148,6 +178,10 @@ For the complete Base UI API, see the [Base UI Progress documentation](https://b
 
 </ApiPropsList>
 
+#### ProgressValue
+
+The formatted value text, hidden while indeterminate. Wraps Base UI's `Progress.Value`.
+
 ### Data Attributes
 
 | Attribute            | Element       | Description                             |
@@ -158,7 +192,7 @@ For the complete Base UI API, see the [Base UI Progress documentation](https://b
 | `data-size`          | Root          | The current `size`.                     |
 | `data-empty`         | Root          | Present while the value equals `min`.   |
 
-The state attributes land on the Base UI parts: root, track, indicator, label, and value. `ProgressBuffer` and `ProgressCircle` are plain elements, so style them from the root with `group-data-complete/progress:` and similar.
+`ProgressBuffer` and `ProgressCircle` don't get the state attributes. Style them from the root with `group-data-complete/progress:` and the like.
 
 ### CSS Variables
 
@@ -166,4 +200,4 @@ The state attributes land on the Base UI parts: root, track, indicator, label, a
 | -------------------- | ------- | ------------------------------------------------ |
 | `--progress-color`   | Root    | Indicator and buffer color, set by `variant`.    |
 | `--progress-buffer`  | Root    | The `buffer` value as a percentage of the track. |
-| `--progress-percent` | Root    | The value as a unitless 0 to 100 number.         |
+| `--progress-percent` | Root    | The value as a unitless number from 0 to 100.    |

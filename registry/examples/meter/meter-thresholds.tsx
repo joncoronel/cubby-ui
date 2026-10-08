@@ -13,7 +13,7 @@ const STATUS_TEXT: Record<MeterStatus, string> = {
   critical: "critical",
 };
 
-// Color alone doesn't reach screen readers, so each meter also says its status
+// Color isn't announced, so screen readers hear the status too
 function withStatus(formatted: string, _: number, status?: MeterStatus) {
   return status ? `${formatted}, ${STATUS_TEXT[status]}` : formatted;
 }

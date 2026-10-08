@@ -7,17 +7,14 @@ import { cn } from "@/lib/utils";
 
 export type MeterStatus = "optimum" | "suboptimum" | "critical";
 
-/** Width of the notch cut into the track at each threshold, in px. */
+/** Threshold notch width, in px. */
 const NOTCH_WIDTH = 2;
 
 export interface MeterRootProps extends Omit<
   React.ComponentProps<typeof BaseMeter.Root>,
   "getAriaValueText"
 > {
-  /**
-   * Text for screen readers in place of the formatted value. Receives the
-   * threshold status too, since the indicator color alone isn't announced.
-   */
+  /** Screen-reader text for the value. Gets the status too, since color alone isn't announced. */
   getAriaValueText?: (
     formattedValue: string,
     value: number,
@@ -30,17 +27,15 @@ export interface MeterRootProps extends Omit<
   /** Lower bound of the high region. Values above it are "high". */
   high?: number;
   /**
-   * The ideal value. Whichever region (low, middle, or high) contains it is
-   * the optimum; the adjacent region is suboptimum, the far one critical.
-   * Defaults to the midpoint of `min` and `max`.
+   * The ideal value. Its region is optimum, the adjacent one suboptimum, the
+   * far one critical. Defaults to the midpoint of `min` and `max`.
    */
   optimum?: number;
 }
 
 /**
- * Mirrors the HTML `<meter>` gauge regions as browsers implement them,
- * including which side each boundary belongs to. Returns `undefined` when no
- * thresholds are set so the meter stays a neutral color.
+ * Native `<meter>` gauge regions, boundaries included. Returns `undefined`
+ * without thresholds so the meter stays neutral.
  */
 function getMeterStatus(
   value: number,
@@ -59,7 +54,7 @@ function getMeterStatus(
   const highBound = clamp(high ?? max, lowBound, max);
   const ideal = clamp(optimum ?? (min + max) / 2, min, max);
 
-  // Higher is better. Both boundaries count toward the better side
+  // Higher is better; boundaries go to the better side
   if (ideal > highBound) {
     if (current >= highBound) return "optimum";
     if (current >= lowBound) return "suboptimum";
@@ -71,7 +66,7 @@ function getMeterStatus(
     if (current <= highBound) return "suboptimum";
     return "critical";
   }
-  // Middle is best: both outer regions are only suboptimum
+  // Middle is best; both outer regions are suboptimum
   if (current >= lowBound && current <= highBound) return "optimum";
   return "suboptimum";
 }
@@ -85,9 +80,9 @@ function toPercent(value: number, min: number, max: number): number {
   return clamp(((value - min) / (max - min)) * 100, 0, 100);
 }
 
-/** A mask that cuts a thin transparent notch at each position (in %). */
+/** Mask with a transparent notch at each position (in %). */
 function notchMask(positions: number[]): string | undefined {
-  // Notches at the very ends would only shave the rounded caps
+  // End notches would only shave the rounded caps
   const inner = positions.filter((p) => p > 0 && p < 100).sort((a, b) => a - b);
   if (inner.length === 0) return undefined;
 
@@ -134,10 +129,10 @@ function MeterRoot({
       max={max}
       className={cn(
         "group/meter grid w-full grid-flow-row-dense grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 gap-y-2",
-        // Label and value share the first row; the track and anything else span both columns
+        // Label and value share row one; everything else spans below
         "[&>:not([data-slot=meter-label],[data-slot=meter-value])]:col-span-full",
         "[&>[data-slot=meter-value]]:col-start-2 [&>[data-slot=meter-value]]:justify-self-end",
-        // Notches follow the fill, which starts at the inline start
+        // Notches follow the fill direction
         "[--meter-direction:to_right] rtl:[--meter-direction:to_left]",
         "[--meter-color:var(--primary)]",
         "data-[status=optimum]:[--meter-color:var(--success-foreground)]",
@@ -166,9 +161,8 @@ export interface MeterTrackProps extends React.ComponentProps<
 function MeterTrack({ className, style, segments, ...props }: MeterTrackProps) {
   const isSegmented = segments !== undefined && segments > 1;
 
-  // Gaps are cut with a mask so they show whatever surface sits behind the
-  // meter. Segments already give the track a scale, so they replace the
-  // threshold notches rather than stacking with them.
+  // Masked gaps show whatever surface is behind the meter. Segments replace
+  // the threshold notches, since they already give the track a scale.
   const gap = "var(--meter-segment-gap)";
   const maskImage = isSegmented
     ? `repeating-linear-gradient(to right, #000 0 calc((100% + ${gap}) / ${segments} - ${gap}), transparent 0 calc((100% + ${gap}) / ${segments}))`

@@ -12,7 +12,7 @@ import {
 export default function ProgressBasic() {
   const [value, setValue] = React.useState(12);
 
-  // Advance in uneven steps, then start over, like a real upload
+  // Uneven steps, then restart, like a real upload
   React.useEffect(() => {
     const timer = setInterval(() => {
       setValue((prev) =>

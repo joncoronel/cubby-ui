@@ -23,7 +23,7 @@ export default function ProgressLifecycle() {
   const [step, setStep] = React.useState<Exclude<Phase, "done">>("idle");
   const [value, setValue] = React.useState(0);
 
-  // "done" is derived, so the upload loop only ever touches the value
+  // "done" is derived from the value
   const phase: Phase = step === "uploading" && value >= 100 ? "done" : step;
 
   React.useEffect(() => {

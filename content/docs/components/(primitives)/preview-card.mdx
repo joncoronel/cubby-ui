@@ -1,12 +1,12 @@
 ---
 title: Preview Card
-description: Interactive card that displays content preview on hover or click
+description: A card of extra context that opens when you rest on a link
 type: primitive
 ---
 
 import { PreviewCard } from "@/registry/default/preview-card/preview-card";
 
-A preview card reveals a floating panel of supplementary content when the user hovers or focuses a trigger. Use it for link previews, profile cards, or any rich hover tooltip; for plain text on hover, use [`Tooltip`](/docs/components/tooltip) instead.
+A preview card shows what a link points to, like a profile, an article, or a definition, when the pointer rests on the link or it gets focus. Use it to help someone decide whether to follow the link. For a short label on an icon button, use [`Tooltip`](/docs/components/tooltip). For anything with controls inside, use [`Popover`](/docs/components/popover).
 
 ## Preview
 
@@ -26,35 +26,78 @@ A preview card reveals a floating panel of supplementary content when the user h
 PreviewCard
 ├── PreviewCardTrigger
 └── PreviewCardContent
+    ├── PreviewCardMedia
+    ├── PreviewCardTitle
+    └── PreviewCardDescription
 ```
 
-`PreviewCardContent` composes the portal, positioner, popup, and arrow internally. Set `arrow={false}` to hide the pointer.
+`PreviewCardContent` renders the portal, positioner, popup, and viewport. The media, title, and description parts are optional; put any markup you like inside the content.
+
+`PreviewCardTrigger` renders an `<a>`. Give it an `href` so the link still works for anyone who clicks, taps, or never sees the card.
 
 ## Examples
 
-### Simple
+### Link Preview
 
-A minimal card with text content.
+Use `PreviewCardMedia` to run an image edge to edge along the top, in the 1.91:1 ratio of a page's `og:image`.
 
-<ComponentPreview component="preview-card" example="preview-card-simple" />
+<ComponentPreview component="preview-card" example="preview-card-link" />
 
-### Product Preview
+### Shared Card
 
-Render rich content like an image and price inside `PreviewCardContent`.
+Pass one handle from `createPreviewCardHandle` to a `PreviewCard` and any number of triggers, and the card glides between them, rendering each trigger's `payload`.
 
-<ComponentPreview component="preview-card" example="preview-card-product" />
+<ComponentPreview component="preview-card" example="preview-card-group" />
 
-### Text Trigger
+```tsx
+const handle = createPreviewCardHandle<Person>();
 
-Wrap an inline `<span>` in `PreviewCardTrigger` to anchor the card to text.
+function Contributors({ people }: { people: Person[] }) {
+  return (
+    <>
+      {people.map((person) => (
+        <PreviewCardTrigger
+          key={person.id}
+          handle={handle}
+          payload={person}
+          href={person.url}
+        >
+          {person.name}
+        </PreviewCardTrigger>
+      ))}
+      <PreviewCard handle={handle}>
+        {({ payload }) => (
+          <PreviewCardContent>{payload?.name}</PreviewCardContent>
+        )}
+      </PreviewCard>
+    </>
+  );
+}
+```
 
-<ComponentPreview component="preview-card" example="preview-card-text-trigger" />
+The triggers can sit anywhere in the tree, and a long list mounts one card instead of one per row.
 
-### Inline (wrapping text)
+### Arrow
 
-When the trigger phrase wraps across lines, the card anchors to the line box under the pointer rather than the full bounding box, and it works with no extra props.
+Set `arrow` to point the card at its trigger.
+
+<ComponentPreview component="preview-card" example="preview-card-arrow" />
+
+### Wrapping Text
+
+When the link wraps across lines, the card anchors to the line under the pointer, with no extra props.
 
 <ComponentPreview component="preview-card" example="preview-card-inline" />
+
+## Accessibility
+
+### Keep essential information out of the card
+
+Touch screens have no hover, so tapping the trigger follows the link and the card never opens. Anything a reader needs belongs on the page itself.
+
+### Keyboard and motion
+
+Focusing the trigger opens the card after the same delay as hover, without animation, and Escape closes it. With reduced motion on, the card fades in and out and switching triggers crossfades the content, with no scale, blur, glide, or nudge.
 
 ## API Reference
 
@@ -62,43 +105,191 @@ The PreviewCard component is built on top of [Base UI's PreviewCard](https://bas
 
 For the complete Base UI API, see the [Base UI PreviewCard documentation](https://base-ui.com/react/components/preview-card).
 
-### Custom Props
+### Utilities
 
-#### PreviewCardContent
+#### createPreviewCardHandle
+
+Creates a handle that connects one `PreviewCard` to triggers anywhere in the tree. Pass a type argument to type each trigger's `payload`. The handle also has `open(triggerId)`, `close()`, and `isOpen` for driving the card from your own code.
+
+### Props
+
+#### PreviewCardTrigger
+
+Link that opens the card. Wraps Base UI's `PreviewCard.Trigger`.
 
 <ApiPropsList>
 
-<ApiProp name="arrow" fullType="boolean" simpleType="boolean" defaultValue="true">
-  Show or hide the arrow pointing to the trigger. Custom prop not available in Base UI.
+<ApiProp name="delay" fullType="number" simpleType="number" defaultValue="400">
+  Milliseconds the pointer rests on the trigger before the card opens. Base UI
+  defaults to `600`.
 </ApiProp>
 
-<ApiProp name="side" fullType='"top" | "bottom" | "left" | "right" | "inline-start" | "inline-end"' simpleType="string" defaultValue='"bottom"'>
-  Which side of the trigger to place the preview card on. Flattened from Positioner for convenience.
-</ApiProp>
-
-<ApiProp name="align" fullType='"start" | "center" | "end"' simpleType="string">
-  How to align the preview card. Flattened from Positioner for convenience.
-</ApiProp>
-
-<ApiProp name="sideOffset" fullType="number" simpleType="number">
-  Distance in pixels for positioning. Flattened from Positioner for convenience.
-</ApiProp>
-
-<ApiProp name="alignOffset" fullType="number" simpleType="number" defaultValue="0">
-  Additional offset in pixels along the alignment axis. Flattened from Positioner for convenience.
-</ApiProp>
-
-<ApiProp name="positionMethod" fullType='"absolute" | "fixed"' simpleType="string" defaultValue='"absolute"'>
-  CSS position strategy for the card. Use `"fixed"` when the trigger is itself fixed (a floating rail or toolbar), so the card stays put while the page scrolls. Flattened from Positioner for convenience.
+<ApiProp
+  name="closeDelay"
+  fullType="number"
+  simpleType="number"
+  defaultValue="200"
+>
+  Milliseconds after the pointer leaves before the card closes. Long enough to
+  reach a neighboring trigger on the same handle. Base UI defaults to `300`.
 </ApiProp>
 
 </ApiPropsList>
 
-### Modified Defaults
+#### PreviewCardContent
 
-Our implementation changes the following Base UI prop defaults:
+The card itself. Composes `PreviewCard.Portal`, `PreviewCard.Positioner`, `PreviewCard.Popup`, and `PreviewCard.Viewport`, and optionally `PreviewCard.Arrow`. Props are forwarded to `PreviewCard.Popup`.
 
-- **PreviewCardTrigger**: `delay` defaults to `0` (Base UI defaults to `600`)
-- **PreviewCardTrigger**: `closeDelay` defaults to `0` (Base UI defaults to `300`)
-- **PreviewCardContent**: `align` defaults to `"center"` (Base UI defaults to `"start"`)
-- **PreviewCardContent**: `sideOffset` defaults to `8` (Base UI defaults to `0`)
+<ApiPropsList>
+
+<ApiProp
+  name="side"
+  fullType='"top" | "bottom" | "left" | "right" | "inline-start" | "inline-end"'
+  simpleType="string"
+  defaultValue='"bottom"'
+>
+  Side of the trigger to place the card on. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp
+  name="align"
+  fullType='"start" | "center" | "end"'
+  simpleType="string"
+  defaultValue='"center"'
+>
+  Alignment against the trigger. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp
+  name="sideOffset"
+  fullType="number"
+  simpleType="number"
+  defaultValue="8"
+>
+  Gap in pixels between the trigger and the card. Flattened from Positioner.
+  Base UI defaults to `0`.
+</ApiProp>
+
+<ApiProp
+  name="alignOffset"
+  fullType="number"
+  simpleType="number"
+  defaultValue="0"
+>
+  Offset in pixels along the alignment axis. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp
+  name="collisionPadding"
+  fullType="number | Rect"
+  simpleType="number"
+  defaultValue="10"
+>
+  Space between the card and the edge of the collision boundary. Flattened from
+  Positioner. Base UI defaults to `5`.
+</ApiProp>
+
+<ApiProp
+  name="collisionBoundary"
+  fullType="Boundary"
+  simpleType="Boundary"
+  defaultValue='"clipping-ancestors"'
+>
+  Area the card stays inside. Flattened from Positioner.
+</ApiProp>
+
+<ApiProp
+  name="sticky"
+  fullType="boolean"
+  simpleType="boolean"
+  defaultValue="false"
+>
+  Keeps the card in view after the trigger scrolls out of it. Flattened from
+  Positioner.
+</ApiProp>
+
+<ApiProp
+  name="positionMethod"
+  fullType='"absolute" | "fixed"'
+  simpleType="string"
+  defaultValue='"absolute"'
+>
+  CSS position method. Use `"fixed"` when the trigger is fixed, like a floating
+  toolbar, so the card stays put while the page scrolls. Flattened from
+  Positioner.
+</ApiProp>
+
+<ApiProp
+  name="anchor"
+  fullType="Element | VirtualElement | RefObject<Element> | (() => Element | VirtualElement | null) | null"
+  simpleType="Element"
+>
+  Element to position the card against instead of the trigger. Flattened from
+  Positioner.
+</ApiProp>
+
+<ApiProp
+  name="arrow"
+  fullType="boolean"
+  simpleType="boolean"
+  defaultValue="false"
+>
+  Shows an arrow pointing at the trigger. Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp
+  name="arrowPadding"
+  fullType="number"
+  simpleType="number"
+  defaultValue="5"
+>
+  Minimum distance in pixels between the arrow and the card's corners. Flattened
+  from Positioner.
+</ApiProp>
+
+<ApiProp
+  name="level"
+  fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8"
+  simpleType="number"
+  defaultValue="3"
+>
+  Surface elevation of the card background. Raise it when the card opens over
+  another raised surface, like a dialog.
+</ApiProp>
+
+<ApiProp
+  name="shadowLevel"
+  fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8"
+  simpleType="number"
+  defaultValue="3"
+>
+  Shadow weight, separate from `level` so the shadow stays the same at any
+  nesting depth.
+</ApiProp>
+
+<ApiProp name="viewportClassName" fullType="string" simpleType="string">
+  Classes for the inner viewport. Set the card padding here with
+  `[--viewport-padding:0.75rem]`; the padding, `PreviewCardMedia`, and the
+  content width all follow it.
+</ApiProp>
+
+<ApiProp
+  name="container"
+  fullType="HTMLElement | ShadowRoot | RefObject<HTMLElement | ShadowRoot | null> | null"
+  simpleType="HTMLElement"
+>
+  Element to portal the card into. Flattened from Portal.
+</ApiProp>
+
+</ApiPropsList>
+
+## Upgrading
+
+If you're reinstalling over an earlier version, check these changes:
+
+| Before                                                      | Now                                                                                                             |
+| ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Opened and closed instantly (`delay={0}`, `closeDelay={0}`) | 400ms open and 200ms close delays. Pass `delay={0}` and `closeDelay={0}` on the trigger to keep the old timing. |
+| `arrow` defaulted to `true`                                 | `arrow` defaults to `false`. Pass `arrow` to keep it.                                                           |
+| Padding on the card, removed with `className="p-0"`         | Padding on the inner viewport. Use `viewportClassName="[--viewport-padding:0px]"`.                              |
+| Fixed `w-64` card                                           | Sizes to its content up to 20rem. Set a width with `className="w-64"`, and `max-w-*` to go past 20rem.          |

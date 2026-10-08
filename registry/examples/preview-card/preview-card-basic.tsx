@@ -3,43 +3,46 @@ import {
   PreviewCardTrigger,
   PreviewCardContent,
 } from "@/registry/default/preview-card/preview-card";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Calendar01Icon, MapPinIcon } from "@hugeicons/core-free-icons";
+import { Avatar, AvatarFallback } from "@/registry/default/avatar/avatar";
+
 export default function PreviewCardBasic() {
   return (
-    <PreviewCard>
-      <PreviewCardTrigger>
-        <span className="cursor-pointer font-medium text-blue-600 hover:underline">
-          @nextjs
-        </span>
-      </PreviewCardTrigger>
-      <PreviewCardContent>
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-2">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 font-bold text-white">
-              N
-            </div>
-            <div>
-              <h3 className="font-semibold">Next.js</h3>
-              <p className="text-muted-foreground text-sm">@nextjs</p>
+    <p className="text-muted-foreground max-w-80 text-sm leading-7">
+      The type scale was drawn up by{" "}
+      <PreviewCard>
+        <PreviewCardTrigger
+          href="#"
+          className="text-foreground decoration-foreground/30 hover:decoration-foreground data-popup-open:decoration-foreground focus-visible:outline-ring rounded-sm font-medium underline underline-offset-4 transition-[text-decoration-color] duration-150 focus-visible:outline-2 focus-visible:outline-offset-2"
+        >
+          @maren
+        </PreviewCardTrigger>
+        <PreviewCardContent className="w-72">
+          <div className="flex items-center gap-3">
+            <Avatar size="lg">
+              <AvatarFallback className="bg-amber-100 font-medium text-amber-900 dark:bg-amber-950 dark:text-amber-200">
+                MO
+              </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0">
+              <p className="text-foreground font-semibold">Maren Okafor</p>
+              <p className="text-muted-foreground">@maren</p>
             </div>
           </div>
-          <p className="text-sm">
-            The React Framework for the Web. Used by some of the world&apos;s
-            largest companies.
+          <p className="text-foreground mt-3 leading-relaxed text-pretty">
+            Type designer. Spends too long on the spacing of question marks.
           </p>
-          <div className="text-muted-foreground flex items-center gap-4 text-sm">
-            <div className="flex items-center gap-1">
-              <HugeiconsIcon icon={Calendar01Icon} className="h-4 w-4"  strokeWidth={2} />
-              <span>Joined March 2020</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <HugeiconsIcon icon={MapPinIcon} className="h-4 w-4"  strokeWidth={2} />
-              <span>San Francisco, CA</span>
-            </div>
+          <div className="text-muted-foreground mt-3 flex gap-4 tabular-nums">
+            <span>
+              <span className="text-foreground font-medium">214</span> following
+            </span>
+            <span>
+              <span className="text-foreground font-medium">8,902</span>{" "}
+              followers
+            </span>
           </div>
-        </div>
-      </PreviewCardContent>
-    </PreviewCard>
+        </PreviewCardContent>
+      </PreviewCard>{" "}
+      over a long winter, then tested at every size it would ever be read.
+    </p>
   );
 }

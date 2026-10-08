@@ -22,6 +22,8 @@ export interface MeterRootProps extends Omit<
   ) => string;
   /** Track thickness. */
   size?: "sm" | "md" | "lg";
+  /** Indicator color when no thresholds are set. */
+  variant?: "default" | "neutral";
   /** Upper bound of the low region. Values below it are "low". */
   low?: number;
   /** Lower bound of the high region. Values above it are "high". */
@@ -98,6 +100,7 @@ function MeterRoot({
   className,
   style,
   size = "md",
+  variant = "default",
   value,
   min = 0,
   max = 100,
@@ -134,7 +137,9 @@ function MeterRoot({
         "[&>[data-slot=meter-value]]:col-start-2 [&>[data-slot=meter-value]]:justify-self-end",
         // Notches follow the fill direction
         "[--meter-direction:to_right] rtl:[--meter-direction:to_left]",
-        "[--meter-color:var(--primary)]",
+        variant === "neutral"
+          ? "[--meter-color:var(--neutral)]"
+          : "[--meter-color:var(--primary)]",
         "data-[status=optimum]:[--meter-color:var(--success-foreground)]",
         "data-[status=suboptimum]:[--meter-color:var(--warning-foreground)]",
         "data-[status=critical]:[--meter-color:var(--danger-foreground)]",

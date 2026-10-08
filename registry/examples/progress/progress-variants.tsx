@@ -8,6 +8,7 @@ import {
 
 const VARIANTS = [
   { variant: "default", label: "Syncing library", value: 48 },
+  { variant: "neutral", label: "Generating thumbnails", value: 73 },
   { variant: "info", label: "Indexing documents", value: 62 },
   { variant: "success", label: "Backup verified", value: 100 },
   { variant: "warning", label: "Retrying chunk 4 of 9", value: 41 },

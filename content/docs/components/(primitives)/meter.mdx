@@ -46,6 +46,19 @@ Use `size` to set the track thickness.
 | `md`  | The default 6px track.                |
 | `lg`  | 10px, for a reading in the spotlight. |
 
+### Variants
+
+Use `variant` to set the indicator color for a meter without thresholds.
+
+<ComponentPreview component="meter" example="meter-variants" />
+
+| Value     | Description                              |
+| --------- | ---------------------------------------- |
+| `default` | The primary color.                       |
+| `neutral` | No hue, for quiet readings like storage. |
+
+Once you set thresholds, the status colors take over.
+
 ### Thresholds
 
 Use `low` and `high` to split the range into three regions, and `optimum` to mark the best one, as on the native [`<meter>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/meter).
@@ -113,6 +126,15 @@ Holds the value, works out the status, and lays out the parts. Wraps Base UI's `
   Thickness of the track.
 </ApiProp>
 
+<ApiProp
+  name="variant"
+  fullType='"default" | "neutral"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Indicator color when no thresholds are set.
+</ApiProp>
+
 <ApiProp name="low" fullType="number">
   Upper bound of the low region.
 </ApiProp>
@@ -163,7 +185,7 @@ The filled part of the track, colored by status. Wraps Base UI's `Meter.Indicato
 
 ### CSS Variables
 
-| Variable              | Element | Description                              |
-| --------------------- | ------- | ---------------------------------------- |
-| `--meter-color`       | Root    | Indicator color, set from `data-status`. |
-| `--meter-segment-gap` | Track   | Gap between segments. Defaults to `3px`. |
+| Variable              | Element | Description                                         |
+| --------------------- | ------- | --------------------------------------------------- |
+| `--meter-color`       | Root    | Indicator color, set by `variant` or `data-status`. |
+| `--meter-segment-gap` | Track   | Gap between segments. Defaults to `3px`.            |

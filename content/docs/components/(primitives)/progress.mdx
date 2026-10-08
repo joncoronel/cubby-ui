@@ -56,17 +56,18 @@ Use `size` to set the track thickness.
 
 ### Variants
 
-Use `variant` to color the indicator with a status token.
+Use `variant` to color the indicator with the primary, neutral, or a status token.
 
 <ComponentPreview component="progress" example="progress-variants" />
 
-| Value     | Description                     |
-| --------- | ------------------------------- |
-| `default` | The primary color.              |
-| `info`    | Background work, like indexing. |
-| `success` | A finished task.                |
-| `warning` | A slow or retrying task.        |
-| `danger`  | A stalled or failed task.       |
+| Value     | Description                                 |
+| --------- | ------------------------------------------- |
+| `default` | The primary color.                          |
+| `neutral` | No hue, for quiet UI like lists and toasts. |
+| `info`    | Background work, like indexing.             |
+| `success` | A finished task.                            |
+| `warning` | A slow or retrying task.                    |
+| `danger`  | A stalled or failed task.                   |
 
 ### Indeterminate
 
@@ -128,7 +129,7 @@ Holds the value and lays out the parts. Wraps Base UI's `Progress.Root`.
 
 <ApiProp
   name="variant"
-  fullType='"default" | "success" | "warning" | "danger" | "info"'
+  fullType='"default" | "neutral" | "success" | "warning" | "danger" | "info"'
   simpleType="string"
   defaultValue='"default"'
 >

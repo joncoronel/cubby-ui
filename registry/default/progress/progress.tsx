@@ -21,6 +21,7 @@ const progressRootVariants = cva(
     variants: {
       variant: {
         default: "[--progress-color:var(--primary)]",
+        neutral: "[--progress-color:var(--neutral)]",
         success: "[--progress-color:var(--success-foreground)]",
         warning: "[--progress-color:var(--warning-foreground)]",
         danger: "[--progress-color:var(--danger-foreground)]",

@@ -312,6 +312,7 @@ import meter_meter_live from "@/registry/examples/meter/meter-live";
 import meter_meter_segments from "@/registry/examples/meter/meter-segments";
 import meter_meter_sizes from "@/registry/examples/meter/meter-sizes";
 import meter_meter_thresholds from "@/registry/examples/meter/meter-thresholds";
+import meter_meter_variants from "@/registry/examples/meter/meter-variants";
 import navigation_menu_navigation_menu_basic from "@/registry/examples/navigation-menu/navigation-menu-basic";
 import navigation_menu_navigation_menu_custom_styled_dropdown from "@/registry/examples/navigation-menu/navigation-menu-custom-styled-dropdown";
 import navigation_menu_navigation_menu_flexible_nextjs_link from "@/registry/examples/navigation-menu/navigation-menu-flexible-nextjs-link";
@@ -3235,6 +3236,11 @@ export const exampleRegistry = {
       "title": "Thresholds",
       "importPath": "meter-thresholds",
       "source": "import {\n  type MeterStatus,\n  MeterRoot,\n  MeterTrack,\n  MeterIndicator,\n  MeterLabel,\n  MeterValue,\n} from \"@/components/ui/cubby-ui/meter\";\n\nconst STATUS_TEXT: Record<MeterStatus, string> = {\n  optimum: \"good\",\n  suboptimum: \"fair\",\n  critical: \"critical\",\n};\n\n// Color isn't announced, so screen readers hear the status too\nfunction withStatus(formatted: string, _: number, status?: MeterStatus) {\n  return status ? `${formatted}, ${STATUS_TEXT[status]}` : formatted;\n}\n\nexport default function MeterThresholds() {\n  return (\n    <div className=\"flex w-full max-w-sm flex-col gap-6\">\n      {/* Lower is better: optimum sits in the low region */}\n      <MeterRoot\n        value={91}\n        low={60}\n        high={85}\n        optimum={0}\n        getAriaValueText={withStatus}\n      >\n        <MeterLabel>Disk usage</MeterLabel>\n        <MeterValue />\n        <MeterTrack>\n          <MeterIndicator />\n        </MeterTrack>\n      </MeterRoot>\n\n      {/* Higher is better: optimum sits in the high region */}\n      <MeterRoot\n        value={34}\n        low={20}\n        high={50}\n        optimum={100}\n        getAriaValueText={withStatus}\n      >\n        <MeterLabel>Battery</MeterLabel>\n        <MeterValue />\n        <MeterTrack>\n          <MeterIndicator />\n        </MeterTrack>\n      </MeterRoot>\n\n      {/* Middle is best: optimum sits between low and high */}\n      <MeterRoot\n        value={46}\n        low={30}\n        high={60}\n        optimum={45}\n        getAriaValueText={withStatus}\n      >\n        <MeterLabel>Humidity</MeterLabel>\n        <MeterValue />\n        <MeterTrack>\n          <MeterIndicator />\n        </MeterTrack>\n      </MeterRoot>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Variants",
+      "importPath": "meter-variants",
+      "source": "import {\n  MeterRoot,\n  MeterTrack,\n  MeterIndicator,\n  MeterLabel,\n  MeterValue,\n} from \"@/components/ui/cubby-ui/meter\";\n\nexport default function MeterVariants() {\n  return (\n    <div className=\"flex w-full max-w-sm flex-col gap-6\">\n      <MeterRoot value={64}>\n        <MeterLabel>Default</MeterLabel>\n        <MeterValue />\n        <MeterTrack>\n          <MeterIndicator />\n        </MeterTrack>\n      </MeterRoot>\n\n      <MeterRoot value={64} variant=\"neutral\">\n        <MeterLabel>Neutral</MeterLabel>\n        <MeterValue />\n        <MeterTrack>\n          <MeterIndicator />\n        </MeterTrack>\n      </MeterRoot>\n    </div>\n  );\n}\n"
     }
   ],
   "navigation-menu": [
@@ -3478,7 +3484,7 @@ export const exampleRegistry = {
     {
       "title": "Variants",
       "importPath": "progress-variants",
-      "source": "import {\n  ProgressRoot,\n  ProgressTrack,\n  ProgressIndicator,\n  ProgressLabel,\n  ProgressValue,\n} from \"@/components/ui/cubby-ui/progress/progress\";\n\nconst VARIANTS = [\n  { variant: \"default\", label: \"Syncing library\", value: 48 },\n  { variant: \"info\", label: \"Indexing documents\", value: 62 },\n  { variant: \"success\", label: \"Backup verified\", value: 100 },\n  { variant: \"warning\", label: \"Retrying chunk 4 of 9\", value: 41 },\n  { variant: \"danger\", label: \"Upload stalled\", value: 27 },\n] as const;\n\nexport default function ProgressVariants() {\n  return (\n    <div className=\"flex w-full max-w-sm flex-col gap-6\">\n      {VARIANTS.map(({ variant, label, value }) => (\n        <ProgressRoot key={variant} value={value} variant={variant}>\n          <ProgressLabel>{label}</ProgressLabel>\n          <ProgressValue />\n          <ProgressTrack>\n            <ProgressIndicator />\n          </ProgressTrack>\n        </ProgressRoot>\n      ))}\n    </div>\n  );\n}\n"
+      "source": "import {\n  ProgressRoot,\n  ProgressTrack,\n  ProgressIndicator,\n  ProgressLabel,\n  ProgressValue,\n} from \"@/components/ui/cubby-ui/progress/progress\";\n\nconst VARIANTS = [\n  { variant: \"default\", label: \"Syncing library\", value: 48 },\n  { variant: \"neutral\", label: \"Generating thumbnails\", value: 73 },\n  { variant: \"info\", label: \"Indexing documents\", value: 62 },\n  { variant: \"success\", label: \"Backup verified\", value: 100 },\n  { variant: \"warning\", label: \"Retrying chunk 4 of 9\", value: 41 },\n  { variant: \"danger\", label: \"Upload stalled\", value: 27 },\n] as const;\n\nexport default function ProgressVariants() {\n  return (\n    <div className=\"flex w-full max-w-sm flex-col gap-6\">\n      {VARIANTS.map(({ variant, label, value }) => (\n        <ProgressRoot key={variant} value={value} variant={variant}>\n          <ProgressLabel>{label}</ProgressLabel>\n          <ProgressValue />\n          <ProgressTrack>\n            <ProgressIndicator />\n          </ProgressTrack>\n        </ProgressRoot>\n      ))}\n    </div>\n  );\n}\n"
     }
   ],
   "qr-code": [
@@ -4628,6 +4634,7 @@ export const componentMap = {
   "meter-segments": meter_meter_segments,
   "meter-sizes": meter_meter_sizes,
   "meter-thresholds": meter_meter_thresholds,
+  "meter-variants": meter_meter_variants,
   "navigation-menu-basic": navigation_menu_navigation_menu_basic,
   "navigation-menu-custom-styled-dropdown": navigation_menu_navigation_menu_custom_styled_dropdown,
   "navigation-menu-flexible-nextjs-link": navigation_menu_navigation_menu_flexible_nextjs_link,

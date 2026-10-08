@@ -54,7 +54,7 @@ function Minimap({ toc }: { toc: TOCItemType[] }) {
         sideOffset={-56}
         positionMethod="fixed"
         className="w-60"
-        viewportClassName="p-0"
+        viewportClassName="[--viewport-padding:0px]"
       >
         <nav aria-label="On this page">
           <ScrollArea

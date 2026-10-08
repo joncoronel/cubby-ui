@@ -40,15 +40,6 @@ function PreviewCardPortal({ ...props }: BasePreviewCard.Portal.Props) {
   return <BasePreviewCard.Portal data-slot="preview-card-portal" {...props} />;
 }
 
-function PreviewCardPositioner({ ...props }: BasePreviewCard.Positioner.Props) {
-  return (
-    <BasePreviewCard.Positioner
-      data-slot="preview-card-positioner"
-      {...props}
-    />
-  );
-}
-
 function PreviewCardArrow({ ...props }: BasePreviewCard.Arrow.Props) {
   return <BasePreviewCard.Arrow data-slot="preview-card-arrow" {...props} />;
 }
@@ -83,7 +74,7 @@ function PreviewCardContent({
   positionMethod?: BasePreviewCard.Positioner.Props["positionMethod"];
   /** Positions against this element instead of the trigger. */
   anchor?: BasePreviewCard.Positioner.Props["anchor"];
-  /** Classes for the inner viewport, e.g. to change its padding. */
+  /** Classes for the inner viewport. Set the padding with `[--viewport-padding:…]` so PreviewCardMedia and the content width follow it. */
   viewportClassName?: string;
   arrow?: boolean;
   arrowPadding?: number;
@@ -111,7 +102,7 @@ function PreviewCardContent({
         // and the size morph share one 200ms curve so the card moves as a
         // single object; split timings read as lag when the pointer sweeps
         // along a row of triggers.
-        className="z-50 h-(--positioner-height) max-h-(--available-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
+        className="z-50 h-(--positioner-height) max-h-(--available-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none motion-reduce:transition-none"
       >
         <BasePreviewCard.Popup
           data-slot="preview-card-content"
@@ -172,7 +163,7 @@ function PreviewCardContent({
               // card's corners.
               // `h-full` and the cap do different jobs; both are load-bearing.
               // See PopoverContent's viewport for the full reasoning.
-              "relative h-full max-h-(--available-height) w-full overflow-clip rounded-[inherit] p-4 [--viewport-padding:1rem]",
+              "relative h-full max-h-(--available-height) w-full overflow-clip rounded-[inherit] p-(--viewport-padding) [--viewport-padding:1rem]",
               "overscroll-contain not-data-transitioning:overflow-y-auto",
               // Content width calculation (edge-to-edge minus padding)
               "**:data-current:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
@@ -198,9 +189,15 @@ function PreviewCardContent({
               // sideways instead of drifting on both axes at once.
               "data-[activation-direction~=down]:not-data-[activation-direction~=left]:not-data-[activation-direction~=right]:**:data-current:data-starting-style:translate-y-2",
               "data-[activation-direction~=up]:not-data-[activation-direction~=left]:not-data-[activation-direction~=right]:**:data-current:data-starting-style:-translate-y-2",
-              // Reduced motion: only opacity transitions, so the nudge and
-              // blur snap away and the swap is a plain crossfade.
+              // Reduced motion: only opacity transitions and the blur is
+              // dropped, so the swap is a plain crossfade (the nudge, not
+              // transitioned, lands at once while the content is invisible).
               "motion-reduce:**:data-current:transition-opacity motion-reduce:**:data-previous:transition-opacity",
+              "motion-reduce:**:data-previous:data-ending-style:blur-none motion-reduce:**:data-current:data-starting-style:blur-none",
+              // A keyboard (focus) open skips the swap, as it skips the
+              // popup's own animation, so position, size and content move
+              // together.
+              "data-instant:**:data-current:transition-none data-instant:**:data-previous:transition-none",
               viewportClassName,
             )}
           >
@@ -275,8 +272,5 @@ export {
   PreviewCardMedia,
   PreviewCardTitle,
   PreviewCardDescription,
-  PreviewCardArrow,
-  PreviewCardPositioner,
-  PreviewCardPortal,
   createPreviewCardHandle,
 };

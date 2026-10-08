@@ -177,26 +177,29 @@ function PreviewCardContent({
               // Content width calculation (edge-to-edge minus padding)
               "**:data-current:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
               "**:data-previous:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
-              // Swap between triggers, as a short carousel: the incoming
-              // content slides in from 30% of the way along the direction of
-              // travel while the outgoing one slides off the other side. The
-              // fade runs shorter than the slide, so the two never sit on top
-              // of each other as double-exposed text. Both finish inside the
-              // card's 200ms glide: a switch that interrupts another restarts
-              // the outgoing content from rest, so a quick sweep along a row
-              // only looks clean if each swap is done before the next hop.
+              // Swap between triggers: a crossfade in place, as in Popover,
+              // with a short nudge from the direction of travel and a blur on
+              // both sides. A switch that interrupts another restarts the
+              // outgoing content from rest, so a quick sweep along a row puts
+              // two cards on top of each other at each hop; the blur melts
+              // them into one changing card instead of two sharp ones. 150ms,
+              // as in Popover: on the glide's curve, but done before the card
+              // arrives, so the content has settled by the time it lands.
               "**:data-current:opacity-100 **:data-previous:opacity-100",
-              "**:data-current:transition-[translate,opacity] **:data-current:duration-[200ms,100ms] **:data-current:ease-[cubic-bezier(0.22,1,0.36,1)]",
-              "**:data-previous:transition-[translate,opacity] **:data-previous:duration-[200ms,100ms] **:data-previous:ease-[cubic-bezier(0.22,1,0.36,1)]",
-              "**:data-previous:data-ending-style:opacity-0 **:data-current:data-starting-style:opacity-0",
-              "data-[activation-direction~=right]:**:data-previous:data-ending-style:-translate-x-[30%] data-[activation-direction~=right]:**:data-current:data-starting-style:translate-x-[30%]",
-              "data-[activation-direction~=left]:**:data-previous:data-ending-style:translate-x-[30%] data-[activation-direction~=left]:**:data-current:data-starting-style:-translate-x-[30%]",
-              // A purely vertical move (a stacked list) slides vertically.
+              "**:data-current:transition-[translate,opacity,filter] **:data-current:duration-150 **:data-current:ease-[cubic-bezier(0.22,1,0.36,1)]",
+              "**:data-previous:transition-[translate,opacity,filter] **:data-previous:duration-150 **:data-previous:ease-[cubic-bezier(0.22,1,0.36,1)]",
+              "**:data-current:data-starting-style:opacity-0 **:data-current:data-starting-style:blur-[2px]",
+              "**:data-previous:data-ending-style:opacity-0 **:data-previous:data-ending-style:blur-[2px]",
+              "data-[activation-direction~=right]:**:data-current:data-starting-style:translate-x-2",
+              "data-[activation-direction~=left]:**:data-current:data-starting-style:-translate-x-2",
+              // A purely vertical move (a stacked list) nudges vertically.
               // Base UI reports both axes, as in "right down", so this
-              // excludes any horizontal token: a diagonal hop only slides
+              // excludes any horizontal token: a diagonal hop only nudges
               // sideways instead of drifting on both axes at once.
-              "data-[activation-direction~=down]:not-data-[activation-direction~=left]:not-data-[activation-direction~=right]:**:data-previous:data-ending-style:-translate-y-[30%] data-[activation-direction~=down]:not-data-[activation-direction~=left]:not-data-[activation-direction~=right]:**:data-current:data-starting-style:translate-y-[30%]",
-              "data-[activation-direction~=up]:not-data-[activation-direction~=left]:not-data-[activation-direction~=right]:**:data-previous:data-ending-style:translate-y-[30%] data-[activation-direction~=up]:not-data-[activation-direction~=left]:not-data-[activation-direction~=right]:**:data-current:data-starting-style:-translate-y-[30%]",
+              "data-[activation-direction~=down]:not-data-[activation-direction~=left]:not-data-[activation-direction~=right]:**:data-current:data-starting-style:translate-y-2",
+              "data-[activation-direction~=up]:not-data-[activation-direction~=left]:not-data-[activation-direction~=right]:**:data-current:data-starting-style:-translate-y-2",
+              // Reduced motion: only opacity transitions, so the nudge and
+              // blur snap away and the swap is a plain crossfade.
               "motion-reduce:**:data-current:transition-opacity motion-reduce:**:data-previous:transition-opacity",
               viewportClassName,
             )}

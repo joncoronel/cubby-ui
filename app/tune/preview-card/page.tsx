@@ -54,7 +54,8 @@ const LEVEL = 3;
 const START_SCALE = 0.98;
 const START_BLUR = 1;
 const END_SCALE = 0.98;
-const SLIDE_DISTANCE = 30; // % of the content's width
+const NUDGE = 8; // px the incoming content travels on a switch
+const SWAP_BLUR = 2; // px blur on both sides of a switch
 
 const EXPO: EasingConfig["ease"] = [0.19, 1, 0.22, 1]; // --ease-out-expo
 const QUINT: EasingConfig["ease"] = [0.22, 1, 0.36, 1];
@@ -72,16 +73,17 @@ const EXIT_DEFAULT: EasingConfig = {
   duration: 0.1,
   ease: [0, 0, 0.2, 1],
 };
-// A trigger switch runs four transitions together: the popup resizes, the
-// positioner (and arrow) glides, and the content slides while it fades.
+// A trigger switch runs these together: the popup resizes, the positioner
+// (and arrow) glides, and the content crossfades with a nudge and a blur.
 const SIZE_DEFAULT: EasingConfig = {
   type: "easing",
   duration: 0.2,
   ease: QUINT,
 };
 const GLIDE_DEFAULT: EasingConfig = { ...SIZE_DEFAULT };
-const SLIDE_DEFAULT: EasingConfig = { ...SIZE_DEFAULT, duration: 0.15 };
-const SLIDE_FADE_DEFAULT: EasingConfig = { ...SIZE_DEFAULT, duration: 0.1 };
+// The swap's translate, opacity, and filter share the glide's curve, but
+// finish sooner.
+const SWAP_DEFAULT: EasingConfig = { ...SIZE_DEFAULT, duration: 0.15 };
 
 type Person = {
   id: string;
@@ -142,9 +144,11 @@ const handle = createPreviewCardHandle<Person>();
 // comparison of the switch motion.
 const baseHandle = BasePreviewCard.createHandle<Person>();
 // Stacked list: moving down or up the list is a purely vertical switch, which
-// is the only case that slides the content vertically.
+// is the only case that nudges the content vertically.
 const listHandle = createPreviewCardHandle<Person>();
 const BASE_POSITIONER = '[data-tune="base-positioner"]';
+const NOT_HORIZONTAL =
+  ':not([data-activation-direction~="left"], [data-activation-direction~="right"])';
 
 // Component values only. Playback controls live in the TuneToolbar so they
 // stay out of DialKit's Copy output and saved versions.
@@ -182,9 +186,9 @@ const CONFIG = {
   morph: {
     glide: { ...GLIDE_DEFAULT },
     size: { ...SIZE_DEFAULT },
-    slide: { ...SLIDE_DEFAULT },
-    slideFade: { ...SLIDE_FADE_DEFAULT },
-    slideDistance: [SLIDE_DISTANCE, 0, 100, 1],
+    swap: { ...SWAP_DEFAULT }, // nudge, fade, and blur together
+    nudge: [NUDGE, 0, 40, 1], // px along the direction of travel
+    swapBlur: [SWAP_BLUR, 0, 8, 0.5], // px, incoming and outgoing
   },
 } satisfies DialConfig;
 
@@ -213,22 +217,18 @@ export default function PreviewCardTune(): React.ReactElement {
   const exit = bezierOnly(v.exit.curve, EXIT_DEFAULT);
   const size = bezierOnly(v.morph.size, SIZE_DEFAULT);
   const glide = bezierOnly(v.morph.glide, GLIDE_DEFAULT);
-  const slide = bezierOnly(v.morph.slide, SLIDE_DEFAULT);
-  const slideFade = bezierOnly(v.morph.slideFade, SLIDE_FADE_DEFAULT);
+  const swap = bezierOnly(v.morph.swap, SWAP_DEFAULT);
   const scaleTiming = transitionToCss(scale);
   const fadeTiming = transitionToCss(fade);
   const exitTiming = transitionToCss(exit);
   const sizeTiming = transitionToCss(size);
   const glideTiming = transitionToCss(glide);
-  const slideTiming = transitionToCss(slide);
-  const slideFadeTiming = transitionToCss(slideFade);
+  const swapTiming = transitionToCss(swap);
 
   const enterChanged =
     isChanged(scale, SCALE_DEFAULT) ||
     isChanged(fade, FADE_DEFAULT) ||
     isChanged(size, SIZE_DEFAULT);
-  const slideChanged =
-    isChanged(slide, SLIDE_DEFAULT) || isChanged(slideFade, SLIDE_FADE_DEFAULT);
 
   const longestMs = Math.max(toMs(scaleTiming), toMs(fadeTiming));
 
@@ -242,7 +242,7 @@ export default function PreviewCardTune(): React.ReactElement {
     replayTimer.current = window.setTimeout(() => setOpen(!leaving), ms);
   }
 
-  const d = v.morph.slideDistance;
+  const n = v.morph.nudge;
   const css = [
     v.surface.radius !== RADIUS &&
       `${SELECTOR} { border-radius: ${v.surface.radius}px; }`,
@@ -271,21 +271,20 @@ export default function PreviewCardTune(): React.ReactElement {
         transition-duration: ${glideTiming.duration};
         transition-timing-function: ${glideTiming.easing};
       }`,
-    // Order matches transition-[translate,opacity] on the content wrappers.
-    slideChanged &&
+    // One timing for all three of transition-[translate,opacity,filter].
+    isChanged(swap, SWAP_DEFAULT) &&
       `${VIEWPORT} :is([data-current], [data-previous]) {
-        transition-duration: ${slideTiming.duration}, ${slideFadeTiming.duration};
-        transition-timing-function: ${slideTiming.easing}, ${slideFadeTiming.easing};
+        transition-duration: ${swapTiming.duration};
+        transition-timing-function: ${swapTiming.easing};
       }`,
-    d !== SLIDE_DISTANCE &&
-      `${VIEWPORT}[data-activation-direction~="right"] [data-current][data-starting-style],
-      ${VIEWPORT}[data-activation-direction~="left"] [data-previous][data-ending-style] { translate: ${d}% 0; }
-      ${VIEWPORT}[data-activation-direction~="left"] [data-current][data-starting-style],
-      ${VIEWPORT}[data-activation-direction~="right"] [data-previous][data-ending-style] { translate: -${d}% 0; }
-      ${VIEWPORT}[data-activation-direction~="down"]:not([data-activation-direction~="left"], [data-activation-direction~="right"]) [data-current][data-starting-style],
-      ${VIEWPORT}[data-activation-direction~="up"]:not([data-activation-direction~="left"], [data-activation-direction~="right"]) [data-previous][data-ending-style] { translate: 0 ${d}%; }
-      ${VIEWPORT}[data-activation-direction~="up"]:not([data-activation-direction~="left"], [data-activation-direction~="right"]) [data-current][data-starting-style],
-      ${VIEWPORT}[data-activation-direction~="down"]:not([data-activation-direction~="left"], [data-activation-direction~="right"]) [data-previous][data-ending-style] { translate: 0 -${d}%; }`,
+    v.morph.swapBlur !== SWAP_BLUR &&
+      `${VIEWPORT} [data-current][data-starting-style],
+      ${VIEWPORT} [data-previous][data-ending-style] { filter: blur(${v.morph.swapBlur}px); }`,
+    n !== NUDGE &&
+      `${VIEWPORT}[data-activation-direction~="right"] [data-current][data-starting-style] { translate: ${n}px 0; }
+      ${VIEWPORT}[data-activation-direction~="left"] [data-current][data-starting-style] { translate: -${n}px 0; }
+      ${VIEWPORT}[data-activation-direction~="down"]${NOT_HORIZONTAL} [data-current][data-starting-style] { translate: 0 ${n}px; }
+      ${VIEWPORT}[data-activation-direction~="up"]${NOT_HORIZONTAL} [data-current][data-starting-style] { translate: 0 -${n}px; }`,
   ]
     .filter(Boolean)
     .join("\n");

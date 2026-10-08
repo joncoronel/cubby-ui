@@ -25,6 +25,8 @@ function Minimap({ toc }: { toc: TOCItemType[] }) {
   return (
     <PreviewCard>
       <PreviewCardTrigger
+        delay={0}
+        closeDelay={0}
         render={
           <div
             aria-hidden="true"
@@ -51,8 +53,8 @@ function Minimap({ toc }: { toc: TOCItemType[] }) {
         align="center"
         sideOffset={-56}
         positionMethod="fixed"
-        arrow={false}
-        className="w-60 p-0"
+        className="w-60"
+        viewportClassName="p-0"
       >
         <nav aria-label="On this page">
           <ScrollArea

@@ -1042,7 +1042,12 @@
         {
           "path": "registry/default/meter/meter.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/meter.tsx"
+          "target": "components/ui/cubby-ui/meter/meter.tsx"
+        },
+        {
+          "path": "registry/default/meter/lib/meter-thresholds.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/meter/lib/meter-thresholds.ts"
         }
       ]
     },

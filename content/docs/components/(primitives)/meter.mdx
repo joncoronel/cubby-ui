@@ -26,8 +26,9 @@ A meter shows a measurement in a known range, like disk usage, battery level, or
 MeterRoot
 ├── MeterLabel
 ├── MeterValue
-└── MeterTrack
-    └── MeterIndicator
+├── MeterTrack
+│   └── MeterIndicator
+└── MeterTargetRange
 ```
 
 The root puts the label and value on the first row and spans everything else below, so you don't need a wrapper.
@@ -72,6 +73,12 @@ A reading in the optimum's region is green, the next region amber, and the far r
 | Lower is better  | Below `low`, like disk usage.            |
 | Higher is better | Above `high`, like battery.              |
 | Middle is best   | Between `low` and `high`, like humidity. |
+
+### Target Range
+
+Add `MeterTargetRange` after the track to underline the range from `low` to `high` when `optimum` sits between them. Leaving out `optimum` counts, since it defaults to the midpoint of `min` and `max`.
+
+<ComponentPreview component="meter" example="meter-target-range" />
 
 ### Live Readings
 
@@ -171,21 +178,28 @@ The full range of the meter. Wraps Base UI's `Meter.Track`.
 
 </ApiPropsList>
 
+#### MeterTargetRange
+
+A line under the track spanning `low` to `high`, shown when `optimum` sits between them, including the default midpoint. A plain `<div>`, hidden from screen readers, so state the range in text too. `Meter` always renders it, so set `optimum` outside the range to hide it.
+
 #### MeterIndicator
 
 The filled part of the track, colored by status. Wraps Base UI's `Meter.Indicator`.
 
 ### Data Attributes
 
-| Attribute        | Element | Description                                                   |
-| ---------------- | ------- | ------------------------------------------------------------- |
-| `data-status`    | Root    | `optimum`, `suboptimum`, or `critical` when thresholds apply. |
-| `data-size`      | Root    | The current `size`.                                           |
-| `data-segmented` | Track   | Present when `segments` is greater than 1.                    |
+| Attribute           | Element | Description                                                   |
+| ------------------- | ------- | ------------------------------------------------------------- |
+| `data-status`       | Root    | `optimum`, `suboptimum`, or `critical` when thresholds apply. |
+| `data-size`         | Root    | The current `size`.                                           |
+| `data-segmented`    | Track   | Present when `segments` is greater than 1.                    |
+| `data-target-range` | Root    | Present when `optimum` sits between `low` and `high`.         |
 
 ### CSS Variables
 
-| Variable              | Element | Description                                         |
-| --------------------- | ------- | --------------------------------------------------- |
-| `--meter-color`       | Root    | Indicator color, set by `variant` or `data-status`. |
-| `--meter-segment-gap` | Track   | Gap between segments. Defaults to `3px`.            |
+| Variable               | Element | Description                                                  |
+| ---------------------- | ------- | ------------------------------------------------------------ |
+| `--meter-color`        | Root    | Indicator color, set by `variant` or `data-status`.          |
+| `--meter-segment-gap`  | Track   | Gap between segments. Defaults to `3px`.                     |
+| `--meter-target-start` | Root    | Where the target range starts, as a percentage of the track. |
+| `--meter-target-size`  | Root    | Width of the target range, as a percentage of the track.     |

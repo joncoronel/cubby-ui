@@ -5,7 +5,9 @@ import { Meter as BaseMeter } from "@base-ui/react/meter";
 
 import { cn } from "@/lib/utils";
 
-export type MeterStatus = "optimum" | "suboptimum" | "critical";
+import { readMeter, type MeterStatus } from "./lib/meter-thresholds";
+
+export type { MeterStatus };
 
 /** Threshold notch width, in px. */
 const NOTCH_WIDTH = 2;
@@ -33,53 +35,6 @@ export interface MeterRootProps extends Omit<
    * far one critical. Defaults to the midpoint of `min` and `max`.
    */
   optimum?: number;
-}
-
-/**
- * Native `<meter>` gauge regions, boundaries included. Returns `undefined`
- * without thresholds so the meter stays neutral.
- */
-function getMeterStatus(
-  value: number,
-  min: number,
-  max: number,
-  low: number | undefined,
-  high: number | undefined,
-  optimum: number | undefined,
-): MeterStatus | undefined {
-  if (low === undefined && high === undefined && optimum === undefined) {
-    return undefined;
-  }
-
-  const current = clamp(value, min, max);
-  const lowBound = clamp(low ?? min, min, max);
-  const highBound = clamp(high ?? max, lowBound, max);
-  const ideal = clamp(optimum ?? (min + max) / 2, min, max);
-
-  // Higher is better; boundaries go to the better side
-  if (ideal > highBound) {
-    if (current >= highBound) return "optimum";
-    if (current >= lowBound) return "suboptimum";
-    return "critical";
-  }
-  // Lower is better
-  if (ideal < lowBound) {
-    if (current <= lowBound) return "optimum";
-    if (current <= highBound) return "suboptimum";
-    return "critical";
-  }
-  // Middle is best; both outer regions are suboptimum
-  if (current >= lowBound && current <= highBound) return "optimum";
-  return "suboptimum";
-}
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value));
-}
-
-function toPercent(value: number, min: number, max: number): number {
-  if (max <= min) return 0;
-  return clamp(((value - min) / (max - min)) * 100, 0, 100);
 }
 
 /** Mask with a transparent notch at each position (in %). */
@@ -110,18 +65,21 @@ function MeterRoot({
   getAriaValueText,
   ...props
 }: MeterRootProps) {
-  const status = getMeterStatus(value, min, max, low, high, optimum);
-
-  const thresholds = [low, high]
-    .filter((t): t is number => t !== undefined)
-    .map((t) => toPercent(t, min, max));
-  const notches = notchMask(thresholds);
+  const { status, notches, targetRange } = readMeter({
+    value,
+    min,
+    max,
+    low,
+    high,
+    optimum,
+  });
 
   return (
     <BaseMeter.Root
       data-slot="meter"
       data-size={size}
       data-status={status}
+      data-target-range={targetRange ? "" : undefined}
       getAriaValueText={
         getAriaValueText
           ? (formatted, current) => getAriaValueText(formatted, current, status)
@@ -147,7 +105,10 @@ function MeterRoot({
       )}
       style={(state) =>
         ({
-          "--meter-notches": notches,
+          "--meter-notches": notchMask(notches),
+          "--meter-target-start": targetRange && `${targetRange.start}%`,
+          "--meter-target-size":
+            targetRange && `${targetRange.end - targetRange.start}%`,
           ...(typeof style === "function" ? style(state) : style),
         }) as React.CSSProperties
       }
@@ -210,6 +171,30 @@ function MeterIndicator({
   );
 }
 
+/**
+ * Underlines the target range when `optimum` sits between `low` and `high`.
+ * Place it after `MeterTrack`; it renders nothing visible otherwise.
+ */
+function MeterTargetRange({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  return (
+    <div
+      aria-hidden
+      data-slot="meter-target-range"
+      className={cn(
+        // Its own grid row, pulled up to sit 4px under the track
+        "bg-success-foreground -mt-1 hidden h-0.5 rounded-full",
+        "ms-(--meter-target-start) w-(--meter-target-size)",
+        "group-data-target-range/meter:block",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
 function MeterLabel({
   className,
   ...props
@@ -239,7 +224,7 @@ function MeterValue({
   );
 }
 
-/** Root, track, and indicator in one. Children render above the track. */
+/** Root, track, indicator, and target range in one. Children render above the track. */
 function Meter({ children, ...props }: MeterRootProps) {
   return (
     <MeterRoot {...props}>
@@ -247,8 +232,17 @@ function Meter({ children, ...props }: MeterRootProps) {
       <MeterTrack>
         <MeterIndicator />
       </MeterTrack>
+      <MeterTargetRange />
     </MeterRoot>
   );
 }
 
-export { Meter, MeterRoot, MeterTrack, MeterIndicator, MeterLabel, MeterValue };
+export {
+  Meter,
+  MeterRoot,
+  MeterTrack,
+  MeterIndicator,
+  MeterTargetRange,
+  MeterLabel,
+  MeterValue,
+};

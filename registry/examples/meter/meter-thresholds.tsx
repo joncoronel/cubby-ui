@@ -3,6 +3,7 @@ import {
   MeterRoot,
   MeterTrack,
   MeterIndicator,
+  MeterTargetRange,
   MeterLabel,
   MeterValue,
 } from "@/registry/default/meter/meter";
@@ -14,7 +15,11 @@ const STATUS_TEXT: Record<MeterStatus, string> = {
 };
 
 // Color isn't announced, so screen readers hear the status too
-function withStatus(formatted: string, _: number, status?: MeterStatus) {
+function withStatus(
+  formatted: string,
+  _: number,
+  status?: MeterStatus,
+): string {
   return status ? `${formatted}, ${STATUS_TEXT[status]}` : formatted;
 }
 
@@ -64,6 +69,7 @@ export default function MeterThresholds() {
         <MeterTrack>
           <MeterIndicator />
         </MeterTrack>
+        <MeterTargetRange />
       </MeterRoot>
     </div>
   );

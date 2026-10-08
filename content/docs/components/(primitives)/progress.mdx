@@ -1,12 +1,12 @@
 ---
 title: Progress
-description: Visual indicator showing completion progress of a task or operation
+description: Show how far a task has gotten, or that it's running when the end is unknown
 type: primitive
 ---
 
 import { Progress } from "@/registry/default/progress/progress";
 
-A progress bar shows how far along a task or operation is, from a starting value to completion. Use it for uploads, downloads, or any determinate loading; for a static reading within a fixed range, use [`Meter`](/docs/components/meter) instead.
+A progress bar shows how far a task has gotten. Use it for uploads, downloads, and exports, and pass `value={null}` until you can measure the work. For a static reading in a fixed range, use [`Meter`](/docs/components/meter) instead.
 
 ## Preview
 
@@ -27,46 +27,91 @@ ProgressRoot
 ├── ProgressLabel
 ├── ProgressValue
 └── ProgressTrack
+    ├── ProgressBuffer
     └── ProgressIndicator
+```
+
+The root puts the label and value on the first row and spans everything else below, so you don't need a wrapper. For a ring, swap the track for `ProgressCircle`:
+
+```text
+ProgressRoot
+├── ProgressCircle
+│   └── ProgressValue
+└── ProgressLabel
 ```
 
 ## Examples
 
-### Different Sizes
+### Sizes
 
-Use `size` to set the track height and text size.
+Use `size` to set the track thickness.
 
-<ComponentPreview component="progress" example="progress-different-sizes" />
+<ComponentPreview component="progress" example="progress-sizes" />
 
-| Value | Description                       |
-| ----- | --------------------------------- |
-| `sm`  | Thin track with extra-small text. |
-| `md`  | The default track and text.       |
-| `lg`  | Thick track with larger text.     |
+| Value | Description                        |
+| ----- | ---------------------------------- |
+| `sm`  | 4px, for dense lists and rows.     |
+| `md`  | The default 6px track.             |
+| `lg`  | 10px, for a task in the spotlight. |
 
-### Custom Colors
+### Variants
 
-Pass a `className` to `ProgressIndicator` to recolor the filled bar.
+Use `variant` to color the indicator with the primary, neutral, or a status token.
 
-<ComponentPreview component="progress" example="progress-custom-colors" />
+<ComponentPreview component="progress" example="progress-variants" />
 
-### With Label
+| Value     | Description                                 |
+| --------- | ------------------------------------------- |
+| `default` | The primary color.                          |
+| `neutral` | No hue, for quiet UI like lists and toasts. |
+| `info`    | Background work, like indexing.             |
+| `success` | A finished task.                            |
+| `warning` | A slow or retrying task.                    |
+| `danger`  | A stalled or failed task.                   |
 
-Add `ProgressLabel` and `ProgressValue` to caption the bar.
+### Indeterminate
 
-<ComponentPreview component="progress" example="progress-with-label" />
+Pass `value={null}` while the amount of work is unknown, and the indicator sweeps across the track.
 
-### Dynamic Progress
+<ComponentPreview component="progress" example="progress-indeterminate" />
 
-Set `animated` on `ProgressRoot` to ease the indicator between values as they update.
+### Upload Lifecycle
 
-<ComponentPreview component="progress" example="progress-dynamic" />
+Switch `value` from `null` to a number, then `variant` to `"success"`, to walk a task from connecting to done.
 
-### File Upload
+<ComponentPreview component="progress" example="progress-lifecycle" />
 
-Drive `value` from an upload's progress; the bar shows a completed state when it reaches `max`.
+### Buffer
 
-<ComponentPreview component="progress" example="progress-file-upload" />
+Set `buffer` on the root and place `ProgressBuffer` before the indicator to show a second value, like loaded media.
+
+<ComponentPreview component="progress" example="progress-buffer" />
+
+### Circle
+
+Use `ProgressCircle` in place of the track where a bar won't fit; a nested `ProgressValue` centers and scales with the ring. At `value={null}` it spins, so a small ring doubles as a spinner.
+
+<ComponentPreview component="progress" example="progress-circle" />
+
+### Attachment List
+
+Give `ProgressCircle` a small `size` to fit a ring inline in a list row.
+
+<ComponentPreview component="progress" example="progress-circle-attachments" />
+
+### Custom Range and Format
+
+Use `min`, `max`, and `format` to count in your own units.
+
+<ComponentPreview component="progress" example="progress-format" />
+
+## Accessibility
+
+Screen readers skip `ProgressValue` and read the root's value text instead. When the visible text adds context, like "1.4 GB of 4.2 GB", pass the same string through `getAriaValueText`.
+
+With reduced motion on, the indicator jumps between values, and the indeterminate sweep and ring spin turn into a slow fade.
+
+`ProgressRoot` renders a `<div>`. To put a ring inside a button, pass `render={<span />}` to keep the markup valid.
 
 ## API Reference
 
@@ -78,10 +123,17 @@ For the complete Base UI API, see the [Base UI Progress documentation](https://b
 
 #### ProgressRoot
 
+Holds the value and lays out the parts. Wraps Base UI's `Progress.Root`.
+
 <ApiPropsList>
 
-<ApiProp name="animated" fullType="boolean" defaultValue="false">
-  Ease the indicator between values as it updates.
+<ApiProp
+  name="variant"
+  fullType='"default" | "neutral" | "success" | "warning" | "danger" | "info"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Color of the indicator and buffer.
 </ApiProp>
 
 <ApiProp
@@ -90,39 +142,63 @@ For the complete Base UI API, see the [Base UI Progress documentation](https://b
   simpleType="string"
   defaultValue='"md"'
 >
-  Size of the progress bar.
+  Thickness of the track. `ProgressCircle` takes its own pixel `size`.
 </ApiProp>
 
-<ApiProp name="min" fullType="number" defaultValue="0">
-  Minimum value of the progress range.
-</ApiProp>
-
-<ApiProp name="max" fullType="number" defaultValue="100">
-  Maximum value of the progress range.
+<ApiProp name="buffer" fullType="number">
+  A second value in the same range as `value`, drawn by `ProgressBuffer`.
 </ApiProp>
 
 </ApiPropsList>
 
 #### ProgressTrack
 
+The full range of the bar. Wraps Base UI's `Progress.Track`.
+
+#### ProgressIndicator
+
+The filled part of the track. Wraps Base UI's `Progress.Indicator`.
+
+#### ProgressBuffer
+
+The root's `buffer`, drawn behind the indicator. A plain `<div>`, hidden while indeterminate.
+
+#### ProgressCircle
+
+A ring drawn in place of the track, driven by the same root. A plain `<span>` holding an SVG.
+
 <ApiPropsList>
 
-<ApiProp name="striped" fullType="boolean">
-  Add a striped pattern to the track.
+<ApiProp name="size" fullType="number" defaultValue="20">
+  Diameter of the ring in px.
+</ApiProp>
+
+<ApiProp name="thickness" fullType="number" defaultValue="max(2, size / 10)">
+  Stroke width of the ring in px.
 </ApiProp>
 
 </ApiPropsList>
 
 #### ProgressValue
 
-<ApiPropsList>
+The formatted value text, hidden while indeterminate. Wraps Base UI's `Progress.Value`.
 
-<ApiProp
-  name="format"
-  fullType="(value: number, max: number) => string"
-  simpleType="function"
->
-  Format the displayed value. Receives the current value and max as arguments.
-</ApiProp>
+### Data Attributes
 
-</ApiPropsList>
+| Attribute            | Element       | Description                             |
+| -------------------- | ------------- | --------------------------------------- |
+| `data-indeterminate` | Base UI parts | Present while `value` is `null`.        |
+| `data-progressing`   | Base UI parts | Present while the value is below `max`. |
+| `data-complete`      | Base UI parts | Present once the value reaches `max`.   |
+| `data-size`          | Root          | The current `size`.                     |
+| `data-empty`         | Root          | Present while the value equals `min`.   |
+
+`ProgressBuffer` and `ProgressCircle` don't get the state attributes. Style them from the root with `group-data-complete/progress:` and the like.
+
+### CSS Variables
+
+| Variable             | Element | Description                                      |
+| -------------------- | ------- | ------------------------------------------------ |
+| `--progress-color`   | Root    | Indicator and buffer color, set by `variant`.    |
+| `--progress-buffer`  | Root    | The `buffer` value as a percentage of the track. |
+| `--progress-percent` | Root    | The value as a unitless number from 0 to 100.    |

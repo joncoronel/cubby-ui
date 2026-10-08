@@ -1,0 +1,21 @@
+/* The indicator is 40% of the track, so -100% to 250% of its own width
+ * carries it fully off both edges. */
+
+@keyframes progress-indeterminate {
+  from {
+    translate: -100% 0;
+  }
+  to {
+    translate: 250% 0;
+  }
+}
+
+@keyframes progress-breathe {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}

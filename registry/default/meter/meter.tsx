@@ -2,219 +2,154 @@
 
 import * as React from "react";
 import { Meter as BaseMeter } from "@base-ui/react/meter";
-import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
-const meterRootVariants = cva("max-w-[300px] w-full flex flex-col", {
-  variants: {
-    size: {
-      sm: "gap-2",
-      md: "gap-2",
-      lg: "gap-2",
-    },
-  },
-  defaultVariants: {
-    size: "md",
-  },
-});
+import { readMeter, type MeterStatus } from "./lib/meter-thresholds";
 
-interface MeterRootProps
-  extends React.ComponentProps<typeof BaseMeter.Root>,
-    VariantProps<typeof meterRootVariants> {
-  animated?: boolean;
+export type { MeterStatus };
+
+/** Threshold notch width, in px. */
+const NOTCH_WIDTH = 2;
+
+export interface MeterRootProps extends Omit<
+  React.ComponentProps<typeof BaseMeter.Root>,
+  "getAriaValueText"
+> {
+  /** Screen-reader text for the value. Gets the status too, since color alone isn't announced. */
+  getAriaValueText?: (
+    formattedValue: string,
+    value: number,
+    status: MeterStatus | undefined,
+  ) => string;
+  /** Track thickness. */
+  size?: "sm" | "md" | "lg";
+  /** Indicator color when no thresholds are set. */
+  variant?: "default" | "neutral";
+  /** Upper bound of the low region. Values below it are "low". */
   low?: number;
+  /** Lower bound of the high region. Values above it are "high". */
   high?: number;
-  optimumMin?: number;
-  optimumMax?: number;
-  showOptimumMarkers?: boolean;
-  showThresholdColors?: boolean;
+  /**
+   * The ideal value. Its region is optimum, the adjacent one suboptimum, the
+   * far one critical. Defaults to the midpoint of `min` and `max`.
+   */
+  optimum?: number;
+}
+
+/** Mask with a transparent notch at each position (in %). */
+function notchMask(positions: number[]): string | undefined {
+  // End notches would only shave the rounded caps
+  const inner = positions.filter((p) => p > 0 && p < 100).sort((a, b) => a - b);
+  if (inner.length === 0) return undefined;
+
+  const half = NOTCH_WIDTH / 2;
+  const stops = inner.map(
+    (p) =>
+      `#000 0 calc(${p}% - ${half}px), transparent 0 calc(${p}% + ${half}px)`,
+  );
+  return `linear-gradient(var(--meter-direction), ${stops.join(", ")}, #000 0)`;
 }
 
 function MeterRoot({
   className,
-  children,
+  style,
   size = "md",
-  animated = false,
-  value = 0,
+  variant = "default",
+  value,
   min = 0,
   max = 100,
   low,
   high,
-  optimumMin,
-  optimumMax,
-  showOptimumMarkers = true,
-  showThresholdColors = true,
+  optimum,
+  getAriaValueText,
   ...props
 }: MeterRootProps) {
-  const optimumStyles =
-    optimumMin !== undefined && optimumMax !== undefined
-      ? {
-          "--meter-optimum-min-percent": `${((optimumMin - min) / (max - min)) * 100}%`,
-          "--meter-optimum-max-percent": `${((optimumMax - min) / (max - min)) * 100}%`,
-          "--meter-optimum-width-percent": `${((optimumMax - optimumMin) / (max - min)) * 100}%`,
-        }
-      : {};
-
-  // Status from thresholds, most-specific config first:
-  const getStatus = () => {
-    // Range (optimumMin + optimumMax): in-range is optimal, low/high mark danger
-    if (optimumMin !== undefined && optimumMax !== undefined) {
-      if (low !== undefined && value < low) return "danger";
-      if (high !== undefined && value > high) return "danger";
-      if (value >= optimumMin && value <= optimumMax) return "optimal";
-      return "suboptimal";
-    }
-
-    // Directional three-tier, higher is better (e.g. battery: low=15, optimumMin=75)
-    if (optimumMin !== undefined && low !== undefined) {
-      if (value < low) return "danger";
-      if (value >= optimumMin) return "optimal";
-      return "suboptimal";
-    }
-
-    // Directional three-tier, lower is better (e.g. temp: optimumMax=60, high=80)
-    if (optimumMax !== undefined && high !== undefined) {
-      if (value > high) return "danger";
-      if (value <= optimumMax) return "optimal";
-      return "suboptimal";
-    }
-
-    // Two-tier: low only (higher is better)
-    if (low !== undefined && high === undefined) {
-      if (value < low) return "danger";
-      return "optimal";
-    }
-
-    // Two-tier: high only (lower is better)
-    if (high !== undefined && low === undefined) {
-      if (value > high) return "danger";
-      return "optimal";
-    }
-
-    // Two-tier: both (middle is best)
-    if (low !== undefined && high !== undefined) {
-      if (value < low || value > high) return "danger";
-      return "optimal";
-    }
-
-    return "normal";
-  };
+  const { status, notches, targetRange } = readMeter({
+    value,
+    min,
+    max,
+    low,
+    high,
+    optimum,
+  });
 
   return (
     <BaseMeter.Root
+      data-slot="meter"
+      data-size={size}
+      data-status={status}
+      data-target-range={targetRange ? "" : undefined}
+      getAriaValueText={
+        getAriaValueText
+          ? (formatted, current) => getAriaValueText(formatted, current, status)
+          : undefined
+      }
       value={value}
       min={min}
       max={max}
-      data-slot="meter"
-      data-size={size}
-      data-animated={animated}
-      data-low={low}
-      data-high={high}
-      data-optimum-min={showOptimumMarkers ? optimumMin : undefined}
-      data-optimum-max={showOptimumMarkers ? optimumMax : undefined}
-      data-status={showThresholdColors ? getStatus() : "normal"}
-      className={cn("group/meter", meterRootVariants({ size }), className)}
-      style={optimumStyles as React.CSSProperties}
+      className={cn(
+        "group/meter grid w-full grid-flow-row-dense grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 gap-y-2",
+        // Label and value share row one; everything else spans below
+        "[&>:not([data-slot=meter-label],[data-slot=meter-value])]:col-span-full",
+        "[&>[data-slot=meter-value]]:col-start-2 [&>[data-slot=meter-value]]:justify-self-end",
+        // Notches follow the fill direction
+        "[--meter-direction:to_right] rtl:[--meter-direction:to_left]",
+        variant === "neutral"
+          ? "[--meter-color:var(--neutral)]"
+          : "[--meter-color:var(--primary)]",
+        "data-[status=optimum]:[--meter-color:var(--success-foreground)]",
+        "data-[status=suboptimum]:[--meter-color:var(--warning-foreground)]",
+        "data-[status=critical]:[--meter-color:var(--danger-foreground)]",
+        className,
+      )}
+      style={(state) =>
+        ({
+          "--meter-notches": notchMask(notches),
+          "--meter-target-start": targetRange && `${targetRange.start}%`,
+          "--meter-target-size":
+            targetRange && `${targetRange.end - targetRange.start}%`,
+          ...(typeof style === "function" ? style(state) : style),
+        }) as React.CSSProperties
+      }
       {...props}
-    >
-      {children}
-    </BaseMeter.Root>
+    />
   );
 }
 
-interface MeterTrackProps extends React.ComponentProps<typeof BaseMeter.Track> {
+export interface MeterTrackProps extends React.ComponentProps<
+  typeof BaseMeter.Track
+> {
+  /** Divide the track into this many equal blocks separated by gaps. */
   segments?: number;
-  striped?: boolean;
-  gradient?: boolean;
 }
 
-function MeterTrack({
-  className,
-  children,
-  segments,
-  striped,
-  gradient,
-  ...props
-}: MeterTrackProps) {
-  return (
-    <div className="relative">
-      <BaseMeter.Track
-        data-slot="meter-track"
-        data-segments={segments}
-        data-striped={striped}
-        data-gradient={gradient}
-        className={cn(
-          "bg-primary/20 relative w-full overflow-hidden rounded-md",
-          "group-data-[size=lg]/meter:h-3 group-data-[size=md]/meter:h-2 group-data-[size=sm]/meter:h-1.5",
-          striped &&
-            "from-primary/20 to-primary/30 bg-gradient-to-r bg-[length:1rem_1rem]",
-          gradient &&
-            "from-primary/10 via-primary/20 to-primary/10 bg-gradient-to-r",
-          className,
-        )}
-        {...props}
-      >
-        {children}
-        {segments && segments > 1 && <MeterSegments segments={segments} />}
-        <MeterOptimumTicks />
-      </BaseMeter.Track>
-      <MeterOptimumRangeLine />
-    </div>
-  );
-}
+function MeterTrack({ className, style, segments, ...props }: MeterTrackProps) {
+  const isSegmented = segments !== undefined && segments > 1;
 
-function MeterSegments({ segments }: { segments: number }) {
-  return (
-    <div className="absolute inset-0">
-      {Array.from({ length: segments - 1 }).map((_, i) => (
-        <div
-          key={i}
-          className="bg-background/50 absolute top-0 bottom-0 w-px"
-          style={{ left: `${((i + 1) / segments) * 100}%` }}
-        />
-      ))}
-    </div>
-  );
-}
+  // Masked gaps show whatever surface is behind the meter. Segments replace
+  // the threshold notches, since they already give the track a scale.
+  const gap = "var(--meter-segment-gap)";
+  const maskImage = isSegmented
+    ? `repeating-linear-gradient(to right, #000 0 calc((100% + ${gap}) / ${segments} - ${gap}), transparent 0 calc((100% + ${gap}) / ${segments}))`
+    : "var(--meter-notches, none)";
 
-// Vertical tick markers above the track. Shown only when both optimumMin and
-// optimumMax are set (the doubled group-data selector).
-function MeterOptimumTicks() {
   return (
-    <div className="pointer-events-none absolute inset-0 hidden group-data-[optimum-min]/meter:group-data-[optimum-max]/meter:block">
-      {/* Start marker */}
-      <div
-        className="absolute -top-2 h-3 w-px"
-        style={{ left: "calc(var(--meter-optimum-min-percent) - 0.5px)" }}
-      >
-        <div className="bg-foreground ring-background h-full w-full rounded-full ring-1" />
-      </div>
-      {/* End marker */}
-      <div
-        className="absolute -top-2 h-3 w-px"
-        style={{ left: "calc(var(--meter-optimum-max-percent) - 0.5px)" }}
-      >
-        <div className="bg-foreground ring-background h-full w-full rounded-full ring-1" />
-      </div>
-    </div>
-  );
-}
-
-// Horizontal range line below the track. Same dual-optimum visibility gate.
-function MeterOptimumRangeLine() {
-  return (
-    <div className="pointer-events-none absolute inset-x-0 top-full hidden group-data-[optimum-min]/meter:group-data-[optimum-max]/meter:block">
-      <div
-        className="absolute top-0.5 h-0.5"
-        style={{
-          left: "calc(var(--meter-optimum-min-percent) - 0.25px)",
-          width: "calc(var(--meter-optimum-width-percent) + 0.5px)",
-        }}
-      >
-        <div className="bg-foreground/70 ring-background h-full w-full rounded-full ring-1" />
-      </div>
-    </div>
+    <BaseMeter.Track
+      data-slot="meter-track"
+      data-segmented={isSegmented || undefined}
+      className={cn(
+        "bg-foreground/9 relative w-full overflow-hidden rounded-full [--meter-segment-gap:3px]",
+        "group-data-[size=lg]/meter:h-2.5 group-data-[size=md]/meter:h-1.5 group-data-[size=sm]/meter:h-1",
+        "group-data-[size=sm]/meter:[--meter-segment-gap:2px] data-segmented:rounded-[3px]",
+        className,
+      )}
+      style={(state) => ({
+        maskImage,
+        ...(typeof style === "function" ? style(state) : style),
+      })}
+      {...props}
+    />
   );
 }
 
@@ -226,13 +161,33 @@ function MeterIndicator({
     <BaseMeter.Indicator
       data-slot="meter-indicator"
       className={cn(
-        "h-full",
-        "group-data-[animated=true]/meter:transition-all group-data-[animated=true]/meter:duration-300 group-data-[animated=true]/meter:ease-out",
-        // Status-based colors using semantic theme colors
-        "group-data-[status=normal]/meter:bg-primary",
-        "group-data-[status=optimal]/meter:bg-success",
-        "group-data-[status=suboptimal]/meter:bg-warning",
-        "group-data-[status=danger]/meter:bg-danger",
+        "h-full rounded-full bg-(--meter-color)",
+        "in-data-segmented:rounded-none",
+        "ease-out-expo transition-[width,background-color] duration-500 motion-reduce:transition-none",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+/**
+ * Underlines the target range when `optimum` sits between `low` and `high`.
+ * Place it after `MeterTrack`; it renders nothing visible otherwise.
+ */
+function MeterTargetRange({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  return (
+    <div
+      aria-hidden
+      data-slot="meter-target-range"
+      className={cn(
+        // Its own grid row, pulled up to sit 4px under the track
+        "bg-success-foreground -mt-1 hidden h-0.5 rounded-full",
+        "ms-(--meter-target-start) w-(--meter-target-size)",
+        "group-data-target-range/meter:block",
         className,
       )}
       {...props}
@@ -248,8 +203,7 @@ function MeterLabel({
     <BaseMeter.Label
       data-slot="meter-label"
       className={cn(
-        "font-medium",
-        "group-data-[size=lg]/meter:text-base group-data-[size=md]/meter:text-sm group-data-[size=sm]/meter:text-xs",
+        "text-foreground col-start-1 text-sm font-medium",
         className,
       )}
       {...props}
@@ -264,39 +218,21 @@ function MeterValue({
   return (
     <BaseMeter.Value
       data-slot="meter-value"
-      className={cn(
-        "text-muted-foreground",
-        "group-data-[size=lg]/meter:text-base group-data-[size=md]/meter:text-sm group-data-[size=sm]/meter:text-xs",
-        className,
-      )}
+      className={cn("text-muted-foreground text-sm tabular-nums", className)}
       {...props}
     />
   );
 }
 
-// Legacy default export for backward compatibility
-function Meter({
-  className,
-  children,
-  low,
-  high,
-  optimumMin,
-  optimumMax,
-  ...props
-}: MeterRootProps) {
+/** Root, track, indicator, and target range in one. Children render above the track. */
+function Meter({ children, ...props }: MeterRootProps) {
   return (
-    <MeterRoot
-      className={className}
-      low={low}
-      high={high}
-      optimumMin={optimumMin}
-      optimumMax={optimumMax}
-      {...props}
-    >
+    <MeterRoot {...props}>
       {children}
       <MeterTrack>
         <MeterIndicator />
       </MeterTrack>
+      <MeterTargetRange />
     </MeterRoot>
   );
 }
@@ -306,8 +242,7 @@ export {
   MeterRoot,
   MeterTrack,
   MeterIndicator,
+  MeterTargetRange,
   MeterLabel,
   MeterValue,
-  type MeterRootProps,
-  type MeterTrackProps,
 };

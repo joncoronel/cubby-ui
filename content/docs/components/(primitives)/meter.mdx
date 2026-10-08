@@ -1,12 +1,12 @@
 ---
 title: Meter
-description: Display scalar measurements within a known range with visual indicators
+description: Show a measurement in a known range, colored by how good the reading is
 type: primitive
 ---
 
 import { Meter } from "@/registry/default/meter/meter";
 
-A meter displays a scalar measurement within a known range, with optional thresholds that color the indicator by status. Use it for static readings like disk usage, battery level, or a score; for the changing completion of a task, use [`Progress`](/docs/components/progress) instead.
+A meter shows a measurement in a known range, like disk usage, battery level, or a score. Give it thresholds and it turns green, amber, or red by how good the reading is. For a task that moves toward completion, use [`Progress`](/docs/components/progress) instead.
 
 ## Preview
 
@@ -26,53 +26,89 @@ A meter displays a scalar measurement within a known range, with optional thresh
 MeterRoot
 ├── MeterLabel
 ├── MeterValue
-└── MeterTrack
-    └── MeterIndicator
+├── MeterTrack
+│   └── MeterIndicator
+└── MeterTargetRange
 ```
+
+The root puts the label and value on the first row and spans everything else below, so you don't need a wrapper.
 
 ## Examples
 
-### Different Sizes
+### Sizes
 
-Use `size` to set the track height and text size.
+Use `size` to set the track thickness.
 
-<ComponentPreview component="meter" example="meter-different-sizes" />
+<ComponentPreview component="meter" example="meter-sizes" />
 
-| Value | Description                       |
-| ----- | --------------------------------- |
-| `sm`  | Thin track with extra-small text. |
-| `md`  | The default track and text.       |
-| `lg`  | Thick track with larger text.     |
+| Value | Description                           |
+| ----- | ------------------------------------- |
+| `sm`  | 4px, for dense lists and rows.        |
+| `md`  | The default 6px track.                |
+| `lg`  | 10px, for a reading in the spotlight. |
 
-### With Labels
+### Variants
 
-Add `MeterLabel` and `MeterValue` to caption the meter.
+Use `variant` to set the indicator color for a meter without thresholds.
 
-<ComponentPreview component="meter" example="meter-with-labels" />
+<ComponentPreview component="meter" example="meter-variants" />
 
-### With Min and Max
+| Value     | Description                              |
+| --------- | ---------------------------------------- |
+| `default` | The primary color.                       |
+| `neutral` | No hue, for quiet readings like storage. |
 
-Set `min` and `max` to scale the value to a custom range.
+Once you set thresholds, the status colors take over.
 
-<ComponentPreview component="meter" example="meter-with-min-max" />
+### Thresholds
 
-### With Optimum Range
+Use `low` and `high` to split the range into three regions, and `optimum` to mark the best one, as on the native [`<meter>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/meter).
 
-Set `optimumMin` and `optimumMax` to mark the ideal range with tick markers.
+<ComponentPreview component="meter" example="meter-thresholds" />
 
-<ComponentPreview component="meter" example="meter-with-optimum-range" />
+A reading in the optimum's region is green, the next region amber, and the far region red. A notch marks each threshold on the track.
 
-### With Thresholds
+| Reading          | Where `optimum` goes                     |
+| ---------------- | ---------------------------------------- |
+| Lower is better  | Below `low`, like disk usage.            |
+| Higher is better | Above `high`, like battery.              |
+| Middle is best   | Between `low` and `high`, like humidity. |
 
-Set `low` and `high` to color the indicator by status as the value crosses each threshold.
+### Target Range
 
-<ComponentPreview component="meter" example="meter-with-thresholds" />
+Add `MeterTargetRange` after the track to underline the range from `low` to `high` when `optimum` sits between them. Leaving out `optimum` counts, since it defaults to the midpoint of `min` and `max`.
 
-### With Segments
+<ComponentPreview component="meter" example="meter-target-range" />
 
-Set `segments` on `MeterTrack` to divide the track into discrete blocks.
+### Live Readings
 
-<ComponentPreview component="meter" example="meter-with-segments" />
+Update `value` as often as you like; the indicator eases to each reading and fades its color across thresholds.
+
+<ComponentPreview component="meter" example="meter-live" />
+
+### Segments
+
+Set `segments` on `MeterTrack` to split the track into equal blocks, which replace the threshold notches.
+
+<ComponentPreview component="meter" example="meter-segments" />
+
+### Custom Range and Format
+
+Use `min`, `max`, and `format` to measure in your own units.
+
+<ComponentPreview component="meter" example="meter-format" />
+
+## Accessibility
+
+Screen readers skip `MeterValue` and read the root's value text, and they can't see the status color. `getAriaValueText` receives the status as a third argument, so you can announce it:
+
+```tsx
+getAriaValueText={(formatted, _value, status) =>
+  status === "critical" ? `${formatted}, critical` : formatted
+}
+```
+
+With reduced motion on, the indicator jumps between values instead of easing.
 
 ## API Reference
 
@@ -80,70 +116,90 @@ The Meter component is built on top of [Base UI's Meter](https://base-ui.com/rea
 
 For the complete Base UI API, see the [Base UI Meter documentation](https://base-ui.com/react/components/meter).
 
-### Custom Props
+### Props
 
 #### MeterRoot
 
+Holds the value, works out the status, and lays out the parts. Wraps Base UI's `Meter.Root`.
+
 <ApiPropsList>
 
-<ApiProp name="animated" fullType="boolean" defaultValue="false">
-  Custom prop not available in Base UI. Enable progress animations for the
-  meter indicator.
+<ApiProp
+  name="size"
+  fullType='"sm" | "md" | "lg"'
+  simpleType="string"
+  defaultValue='"md"'
+>
+  Thickness of the track.
 </ApiProp>
 
-<ApiProp name="size" fullType='"sm" | "md" | "lg"' simpleType="string" defaultValue='"md"'>
-  Custom prop not available in Base UI. Size variant for the meter component.
+<ApiProp
+  name="variant"
+  fullType='"default" | "neutral"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Indicator color when no thresholds are set.
 </ApiProp>
 
 <ApiProp name="low" fullType="number">
-  Low threshold value. Values below this threshold are considered low and may
-  trigger visual indicators.
+  Upper bound of the low region.
 </ApiProp>
 
 <ApiProp name="high" fullType="number">
-  High threshold value. Values above this threshold are considered high and may
-  trigger visual indicators.
+  Lower bound of the high region.
 </ApiProp>
 
-<ApiProp name="optimumMin" fullType="number">
-  Optimum range minimum value. Defines the lower bound of the optimal value
-  range.
+<ApiProp name="optimum" fullType="number" defaultValue="(min + max) / 2">
+  The ideal value. Its region is optimum, the next one suboptimum, the far one
+  critical. Status colors apply once you set `low`, `high`, or `optimum`.
 </ApiProp>
 
-<ApiProp name="optimumMax" fullType="number">
-  Optimum range maximum value. Defines the upper bound of the optimal value
-  range.
-</ApiProp>
-
-<ApiProp name="showOptimumMarkers" fullType="boolean" defaultValue="true">
-  Custom prop not available in Base UI. Whether to show visual markers for the
-  optimum range.
-</ApiProp>
-
-<ApiProp name="showThresholdColors" fullType="boolean" defaultValue="true">
-  Custom prop not available in Base UI. Whether to apply threshold-based colors
-  to the meter indicator.
+<ApiProp
+  name="getAriaValueText"
+  fullType="(formattedValue: string, value: number, status: MeterStatus | undefined) => string"
+  simpleType="function"
+>
+  Screen-reader text for the value. Adds the threshold `status` to Base UI's
+  callback, `undefined` without thresholds.
 </ApiProp>
 
 </ApiPropsList>
 
 #### MeterTrack
 
+The full range of the meter. Wraps Base UI's `Meter.Track`.
+
 <ApiPropsList>
 
 <ApiProp name="segments" fullType="number">
-  Custom prop not available in Base UI. Number of segments to divide the track
-  into for a segmented appearance.
-</ApiProp>
-
-<ApiProp name="striped" fullType="boolean">
-  Custom prop not available in Base UI. Apply a striped background pattern to
-  the track.
-</ApiProp>
-
-<ApiProp name="gradient" fullType="boolean">
-  Custom prop not available in Base UI. Apply a gradient background to the
-  track.
+  Splits the track into this many equal blocks.
 </ApiProp>
 
 </ApiPropsList>
+
+#### MeterTargetRange
+
+A line under the track spanning `low` to `high`, shown when `optimum` sits between them, including the default midpoint. A plain `<div>`, hidden from screen readers, so state the range in text too. `Meter` always renders it; to leave it out, compose the parts without it.
+
+#### MeterIndicator
+
+The filled part of the track, colored by status. Wraps Base UI's `Meter.Indicator`.
+
+### Data Attributes
+
+| Attribute           | Element | Description                                                                 |
+| ------------------- | ------- | --------------------------------------------------------------------------- |
+| `data-status`       | Root    | `optimum`, `suboptimum`, or `critical` when thresholds apply.               |
+| `data-size`         | Root    | The current `size`.                                                         |
+| `data-segmented`    | Track   | Present when `segments` is greater than 1.                                  |
+| `data-target-range` | Root    | Present when `low` and `high` are both set and `optimum` sits between them. |
+
+### CSS Variables
+
+| Variable               | Element | Description                                                  |
+| ---------------------- | ------- | ------------------------------------------------------------ |
+| `--meter-color`        | Root    | Indicator color, set by `variant` or `data-status`.          |
+| `--meter-segment-gap`  | Track   | Gap between segments. Defaults to `3px`.                     |
+| `--meter-target-start` | Root    | Where the target range starts, as a percentage of the track. |
+| `--meter-target-size`  | Root    | Width of the target range, as a percentage of the track.     |

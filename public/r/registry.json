@@ -1042,11 +1042,13 @@
         {
           "path": "registry/default/meter/meter.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/meter.tsx"
+          "target": "components/ui/cubby-ui/meter/meter.tsx"
+        },
+        {
+          "path": "registry/default/meter/lib/meter-thresholds.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/meter/lib/meter-thresholds.ts"
         }
-      ],
-      "dependencies": [
-        "class-variance-authority"
       ]
     },
     {
@@ -1190,7 +1192,12 @@
         {
           "path": "registry/default/progress/progress.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/progress.tsx"
+          "target": "components/ui/cubby-ui/progress/progress.tsx"
+        },
+        {
+          "path": "registry/default/progress/progress.css",
+          "type": "registry:file",
+          "target": "components/ui/cubby-ui/progress/progress.css"
         }
       ],
       "dependencies": [

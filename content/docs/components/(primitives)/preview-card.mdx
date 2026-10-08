@@ -6,7 +6,7 @@ type: primitive
 
 import { PreviewCard } from "@/registry/default/preview-card/preview-card";
 
-A preview card shows a richer look at what a link points to, like a profile, an article, or a definition, when the pointer rests on it or it receives focus. Use it for content that helps someone decide whether to follow the link. For a short label on an icon button, use [`Tooltip`](/docs/components/tooltip). For anything with controls inside, use [`Popover`](/docs/components/popover).
+A preview card shows what a link points to, like a profile, an article, or a definition, when the pointer rests on the link or it gets focus. Use it to help someone decide whether to follow the link. For a short label on an icon button, use [`Tooltip`](/docs/components/tooltip). For anything with controls inside, use [`Popover`](/docs/components/popover).
 
 ## Preview
 
@@ -31,21 +31,21 @@ PreviewCard
     └── PreviewCardDescription
 ```
 
-`PreviewCardContent` composes the portal, positioner, popup, and viewport for you. The media, title, and description parts are optional. Put any markup you like inside the content.
+`PreviewCardContent` renders the portal, positioner, popup, and viewport. The media, title, and description parts are optional; put any markup you like inside the content.
 
-`PreviewCardTrigger` renders an `<a>`. Give it an `href` so the link still works for someone who clicks, taps, or never sees the card.
+`PreviewCardTrigger` renders an `<a>`. Give it an `href` so the link still works for anyone who clicks, taps, or never sees the card.
 
 ## Examples
 
 ### Link Preview
 
-Use `PreviewCardMedia` for an image along the top edge. It bleeds past the card padding, follows the card's corners, and defaults to the 1.91:1 Open Graph ratio, so a page's `og:image` fits without cropping.
+Use `PreviewCardMedia` to run an image edge to edge along the top, in the 1.91:1 ratio of a page's `og:image`.
 
 <ComponentPreview component="preview-card" example="preview-card-link" />
 
 ### Shared Card
 
-Create a handle with `createPreviewCardHandle` and pass it to one `PreviewCard` and to any number of triggers. Each trigger sends its own `payload`, and the card renders it with a function child. Moving from one trigger to the next glides the card across and slides the new content in from the direction you moved.
+Pass one handle from `createPreviewCardHandle` to a `PreviewCard` and any number of triggers, and the card glides between them, rendering each trigger's `payload`.
 
 <ComponentPreview component="preview-card" example="preview-card-group" />
 
@@ -75,27 +75,29 @@ function Contributors({ people }: { people: Person[] }) {
 }
 ```
 
-The triggers can live anywhere in the tree. One card serving a long list also mounts far less than a card per row.
+The triggers can sit anywhere in the tree, and a long list mounts one card instead of one per row.
 
 ### Arrow
 
-Set `arrow` to point the card at its trigger. It tracks the trigger as the card flips or shifts near the edge of the screen.
+Set `arrow` to point the card at its trigger.
 
 <ComponentPreview component="preview-card" example="preview-card-arrow" />
 
 ### Wrapping Text
 
-When the link wraps across lines, the card anchors to the line the pointer is on instead of the whole phrase. It works with no extra props.
+When the link wraps across lines, the card anchors to the line under the pointer, with no extra props.
 
 <ComponentPreview component="preview-card" example="preview-card-inline" />
 
-## Behavior
+## Accessibility
 
-- **Timing.** The card opens after the pointer rests on the trigger for 400ms and closes 200ms after it leaves. Set `delay` and `closeDelay` on the trigger to change them.
-- **Reaching the card.** The pointer can travel from the trigger into the card without it closing, so links inside the card stay usable.
-- **Keyboard.** Focusing the trigger opens the card after the same delay, without the entrance animation. Escape closes it.
-- **Touch.** Preview cards open on hover and focus, which touch screens don't have. Tapping the trigger follows the link, so never put the only copy of important information in the card.
-- **Reduced motion.** With reduced motion on, the card fades in and out, and switching triggers crossfades the content. It doesn't scale, blur, glide or nudge.
+### Keep essential information out of the card
+
+Touch screens have no hover, so tapping the trigger follows the link and the card never opens. Anything a reader needs belongs on the page itself.
+
+### Keyboard and motion
+
+Focusing the trigger opens the card after the same delay as hover, without animation, and Escape closes it. With reduced motion on, the card fades in and out and switching triggers crossfades the content, with no scale, blur, glide, or nudge.
 
 ## API Reference
 
@@ -103,9 +105,40 @@ The PreviewCard component is built on top of [Base UI's PreviewCard](https://bas
 
 For the complete Base UI API, see the [Base UI PreviewCard documentation](https://base-ui.com/react/components/preview-card).
 
-### Custom Props
+### Utilities
+
+#### createPreviewCardHandle
+
+Creates a handle that connects one `PreviewCard` to triggers anywhere in the tree. Pass a type argument to type each trigger's `payload`. The handle also has `open(triggerId)`, `close()`, and `isOpen` for driving the card from your own code.
+
+### Props
+
+#### PreviewCardTrigger
+
+Link that opens the card. Wraps Base UI's `PreviewCard.Trigger`.
+
+<ApiPropsList>
+
+<ApiProp name="delay" fullType="number" simpleType="number" defaultValue="400">
+  Milliseconds the pointer rests on the trigger before the card opens. Base UI
+  defaults to `600`.
+</ApiProp>
+
+<ApiProp
+  name="closeDelay"
+  fullType="number"
+  simpleType="number"
+  defaultValue="200"
+>
+  Milliseconds after the pointer leaves before the card closes. Long enough to
+  reach a neighboring trigger on the same handle. Base UI defaults to `300`.
+</ApiProp>
+
+</ApiPropsList>
 
 #### PreviewCardContent
+
+The card itself. Composes `PreviewCard.Portal`, `PreviewCard.Positioner`, `PreviewCard.Popup`, and `PreviewCard.Viewport`, and optionally `PreviewCard.Arrow`. Props are forwarded to `PreviewCard.Popup`.
 
 <ApiPropsList>
 
@@ -115,8 +148,7 @@ For the complete Base UI API, see the [Base UI PreviewCard documentation](https:
   simpleType="string"
   defaultValue='"bottom"'
 >
-  Which side of the trigger to place the card on. Flattened from Positioner for
-  convenience.
+  Side of the trigger to place the card on. Flattened from Positioner.
 </ApiProp>
 
 <ApiProp
@@ -125,8 +157,7 @@ For the complete Base UI API, see the [Base UI PreviewCard documentation](https:
   simpleType="string"
   defaultValue='"center"'
 >
-  How to align the card against the trigger. Flattened from Positioner for
-  convenience.
+  Alignment against the trigger. Flattened from Positioner.
 </ApiProp>
 
 <ApiProp
@@ -135,8 +166,8 @@ For the complete Base UI API, see the [Base UI PreviewCard documentation](https:
   simpleType="number"
   defaultValue="8"
 >
-  Gap in pixels between the trigger and the card. Flattened from Positioner for
-  convenience.
+  Gap in pixels between the trigger and the card. Flattened from Positioner.
+  Base UI defaults to `0`.
 </ApiProp>
 
 <ApiProp
@@ -145,8 +176,7 @@ For the complete Base UI API, see the [Base UI PreviewCard documentation](https:
   simpleType="number"
   defaultValue="0"
 >
-  Additional offset in pixels along the alignment axis. Flattened from
-  Positioner for convenience.
+  Offset in pixels along the alignment axis. Flattened from Positioner.
 </ApiProp>
 
 <ApiProp
@@ -155,8 +185,8 @@ For the complete Base UI API, see the [Base UI PreviewCard documentation](https:
   simpleType="number"
   defaultValue="10"
 >
-  Space to keep between the card and the edge of the collision boundary.
-  Flattened from Positioner for convenience.
+  Space between the card and the edge of the collision boundary. Flattened from
+  Positioner. Base UI defaults to `5`.
 </ApiProp>
 
 <ApiProp
@@ -165,8 +195,7 @@ For the complete Base UI API, see the [Base UI PreviewCard documentation](https:
   simpleType="Boundary"
   defaultValue='"clipping-ancestors"'
 >
-  The area the card is kept inside of. Flattened from Positioner for
-  convenience.
+  Area the card stays inside. Flattened from Positioner.
 </ApiProp>
 
 <ApiProp
@@ -175,8 +204,8 @@ For the complete Base UI API, see the [Base UI PreviewCard documentation](https:
   simpleType="boolean"
   defaultValue="false"
 >
-  Keep the card in view after the trigger scrolls out of it. Flattened from
-  Positioner for convenience.
+  Keeps the card in view after the trigger scrolls out of it. Flattened from
+  Positioner.
 </ApiProp>
 
 <ApiProp
@@ -185,9 +214,9 @@ For the complete Base UI API, see the [Base UI PreviewCard documentation](https:
   simpleType="string"
   defaultValue='"absolute"'
 >
-  CSS position strategy for the card. Use `"fixed"` when the trigger is itself
-  fixed, like a floating rail or toolbar, so the card stays put while the page
-  scrolls. Flattened from Positioner for convenience.
+  CSS position method. Use `"fixed"` when the trigger is fixed, like a floating
+  toolbar, so the card stays put while the page scrolls. Flattened from
+  Positioner.
 </ApiProp>
 
 <ApiProp
@@ -195,8 +224,8 @@ For the complete Base UI API, see the [Base UI PreviewCard documentation](https:
   fullType="Element | VirtualElement | RefObject<Element> | (() => Element | VirtualElement | null) | null"
   simpleType="Element"
 >
-  Position the card against this element instead of the trigger. Flattened from
-  Positioner for convenience.
+  Element to position the card against instead of the trigger. Flattened from
+  Positioner.
 </ApiProp>
 
 <ApiProp
@@ -205,7 +234,7 @@ For the complete Base UI API, see the [Base UI PreviewCard documentation](https:
   simpleType="boolean"
   defaultValue="false"
 >
-  Show an arrow pointing at the trigger.
+  Shows an arrow pointing at the trigger. Custom prop not available in Base UI.
 </ApiProp>
 
 <ApiProp
@@ -214,7 +243,8 @@ For the complete Base UI API, see the [Base UI PreviewCard documentation](https:
   simpleType="number"
   defaultValue="5"
 >
-  Minimum distance in pixels between the arrow and the card's corners.
+  Minimum distance in pixels between the arrow and the card's corners. Flattened
+  from Positioner.
 </ApiProp>
 
 <ApiProp
@@ -223,7 +253,7 @@ For the complete Base UI API, see the [Base UI PreviewCard documentation](https:
   simpleType="number"
   defaultValue="3"
 >
-  Surface elevation for the card background. Raise it when the card opens over
+  Surface elevation of the card background. Raise it when the card opens over
   another raised surface, like a dialog.
 </ApiProp>
 
@@ -233,14 +263,14 @@ For the complete Base UI API, see the [Base UI PreviewCard documentation](https:
   simpleType="number"
   defaultValue="3"
 >
-  Shadow weight. Kept separate from `level` so the card casts the same shadow at
-  any nesting depth.
+  Shadow weight, separate from `level` so the shadow stays the same at any
+  nesting depth.
 </ApiProp>
 
 <ApiProp name="viewportClassName" fullType="string" simpleType="string">
-  Classes for the inner viewport. To change the card padding, set
-  `--viewport-padding` here, as in `[--viewport-padding:0.75rem]`. The padding,
-  `PreviewCardMedia`'s bleed and the content width all follow it.
+  Classes for the inner viewport. Set the card padding here with
+  `[--viewport-padding:0.75rem]`; the padding, `PreviewCardMedia`, and the
+  content width all follow it.
 </ApiProp>
 
 <ApiProp
@@ -248,31 +278,18 @@ For the complete Base UI API, see the [Base UI PreviewCard documentation](https:
   fullType="HTMLElement | ShadowRoot | RefObject<HTMLElement | ShadowRoot | null> | null"
   simpleType="HTMLElement"
 >
-  The element to portal the card into. Defaults to the document body.
+  Element to portal the card into. Flattened from Portal.
 </ApiProp>
 
 </ApiPropsList>
 
-#### createPreviewCardHandle
-
-Returns a handle that connects triggers to a `PreviewCard` anywhere in the tree. Pass a type argument to type each trigger's `payload`. The handle also has `open(triggerId)`, `close()`, and `isOpen` for opening and closing the card from your own code.
-
-### Modified Defaults
-
-Our implementation changes the following Base UI prop defaults:
-
-- **PreviewCardTrigger**: `delay` defaults to `400` (Base UI defaults to `600`)
-- **PreviewCardTrigger**: `closeDelay` defaults to `200` (Base UI defaults to `300`)
-- **PreviewCardContent**: `sideOffset` defaults to `8` (Base UI defaults to `0`)
-- **PreviewCardContent**: `collisionPadding` defaults to `10` (Base UI defaults to `5`)
-
 ## Upgrading
 
-Earlier versions of this component behaved differently. If you reinstall over one, check these:
+If you're reinstalling over an earlier version, check these changes:
 
 | Before                                                      | Now                                                                                                             |
 | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | Opened and closed instantly (`delay={0}`, `closeDelay={0}`) | 400ms open and 200ms close delays. Pass `delay={0}` and `closeDelay={0}` on the trigger to keep the old timing. |
 | `arrow` defaulted to `true`                                 | `arrow` defaults to `false`. Pass `arrow` to keep it.                                                           |
 | Padding on the card, removed with `className="p-0"`         | Padding on the inner viewport. Use `viewportClassName="[--viewport-padding:0px]"`.                              |
-| Fixed `w-64` card                                           | Sizes to its content up to 20rem. Set a width with `className="w-64"`, and use `max-w-*` to go past 20rem.      |
+| Fixed `w-64` card                                           | Sizes to its content up to 20rem. Set a width with `className="w-64"`, and `max-w-*` to go past 20rem.          |

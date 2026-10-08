@@ -16,13 +16,10 @@ function PreviewCard<Payload = unknown>({
 }
 
 function PreviewCardTrigger<Payload = unknown>({
-  // Base UI's 600ms reads as lag on a link you meant to inspect, but 0 opens a
-  // card for every link the pointer sweeps across on its way somewhere else.
-  // 400ms is long enough to mean "I'm resting here".
+  // Base UI's 600ms feels laggy; 0 opens a card for every link the pointer crosses.
   delay = 400,
-  // Long enough to cross a gap between neighbouring triggers that share a
-  // handle, so the card glides to the next one instead of closing and
-  // reopening. safePolygon already covers the trip into the card itself.
+  // Long enough to reach a neighbouring trigger on the same handle, so the card
+  // glides to it instead of closing.
   closeDelay = 200,
   ...props
 }: BasePreviewCard.Trigger.Props<Payload>) {
@@ -74,7 +71,7 @@ function PreviewCardContent({
   positionMethod?: BasePreviewCard.Positioner.Props["positionMethod"];
   /** Positions against this element instead of the trigger. */
   anchor?: BasePreviewCard.Positioner.Props["anchor"];
-  /** Classes for the inner viewport. Set the padding with `[--viewport-padding:…]` so PreviewCardMedia and the content width follow it. */
+  /** Classes for the inner viewport. Set padding with `[--viewport-padding:…]`. */
   viewportClassName?: string;
   arrow?: boolean;
   arrowPadding?: number;
@@ -98,10 +95,8 @@ function PreviewCardContent({
         positionMethod={positionMethod}
         anchor={anchor}
         arrowPadding={arrowPadding}
-        // Glides to the next trigger when one card serves several. The glide
-        // and the size morph share one 200ms curve so the card moves as a
-        // single object; split timings read as lag when the pointer sweeps
-        // along a row of triggers.
+        // Glides between triggers on the size morph's 200ms curve, so the card
+        // moves as one object.
         className="z-50 h-(--positioner-height) max-h-(--available-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none motion-reduce:transition-none"
       >
         <BasePreviewCard.Popup
@@ -113,27 +108,20 @@ function PreviewCardContent({
             "h-(--popup-height,auto) w-(--popup-width,auto)",
             "max-h-(--available-height) max-w-[min(var(--available-width),20rem)]",
             "origin-(--transform-origin)",
-            // Surface elevation — bg tracks `level`, shadow weight tracks `shadowLevel`
+            // Surface elevation
             solidSurface(level, shadowLevel),
-            // Enter: a quick rise out of a soft focus, scaled from the side
-            // that faces the trigger. The 1px blur keeps the first frames
-            // from reading as a hard-edged box popping in without adding
-            // time. Width/height only move when the card swaps triggers.
+            // Enter: scale and a 1px blur from the trigger side. Width and
+            // height only transition when the card switches triggers.
             "transition-[width,height,scale,opacity,filter] duration-[200ms,200ms,100ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo),var(--ease-out-expo)]",
             "data-starting-style:scale-[0.98] data-starting-style:opacity-0 data-starting-style:blur-[1px]",
-            // Exit: as quick as the enter, with a plain ease-out, so leaving
-            // a link never makes you wait on the card you are done with.
+            // Exit
             "data-ending-style:scale-[0.98] data-ending-style:opacity-0 data-ending-style:duration-100 data-ending-style:ease-out",
-            // Chrome won't composite the scale while width/height transition,
-            // so text re-rasters and shifts as the entrance ends. Promoting
-            // the layer rasters it once.
+            // Chrome re-rasters text while width/height transition, which
+            // shifts it as the entrance ends. A promoted layer rasters once.
             "will-change-transform",
-            // 'focus' opens and 'dismiss' (Escape, press) closes skip the
-            // animation: keyboard opens should show at once, and a deliberate
-            // dismissal should not linger.
+            // Keyboard opens and Escape/press closes skip the animation
             "data-instant:transition-none",
-            // Reduced motion keeps the fade, which carries no movement, and
-            // drops the scale, blur, and size morph.
+            // Reduced motion: fade only
             "motion-reduce:transition-opacity motion-reduce:duration-150 motion-reduce:will-change-auto",
             "motion-reduce:data-ending-style:scale-100 motion-reduce:data-starting-style:scale-100 motion-reduce:data-starting-style:blur-none",
             className,
@@ -157,25 +145,16 @@ function PreviewCardContent({
           <BasePreviewCard.Viewport
             data-slot="preview-card-viewport"
             className={cn(
-              // Clips here rather than on the popup so the arrow, which sits
-              // outside the popup's box, is not cut off. `rounded-[inherit]`
-              // keeps the clip, and a bleeding PreviewCardMedia, on the
-              // card's corners.
-              // `h-full` and the cap do different jobs; both are load-bearing.
-              // See PopoverContent's viewport for the full reasoning.
+              // Clips here, not on the popup, so the arrow isn't cut off.
+              // `h-full` and the max-h cap are both needed; see PopoverContent.
               "relative h-full max-h-(--available-height) w-full overflow-clip rounded-[inherit] p-(--viewport-padding) [--viewport-padding:1rem]",
               "overscroll-contain not-data-transitioning:overflow-y-auto",
-              // Content width calculation (edge-to-edge minus padding)
+              // Content width (edge to edge minus padding)
               "**:data-current:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
               "**:data-previous:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
-              // Swap between triggers: a crossfade in place, as in Popover,
-              // with a short nudge from the direction of travel and a blur on
-              // both sides. A switch that interrupts another restarts the
-              // outgoing content from rest, so a quick sweep along a row puts
-              // two cards on top of each other at each hop; the blur melts
-              // them into one changing card instead of two sharp ones. 150ms,
-              // as in Popover: on the glide's curve, but done before the card
-              // arrives, so the content has settled by the time it lands.
+              // Trigger switch: crossfade with an 8px nudge from the direction
+              // of travel. A switch that interrupts another restarts the old
+              // content from rest; the 2px blur merges the two into one card.
               "**:data-current:opacity-100 **:data-previous:opacity-100",
               "**:data-current:transition-[translate,opacity,filter] **:data-current:duration-150 **:data-current:ease-[cubic-bezier(0.22,1,0.36,1)]",
               "**:data-previous:transition-[translate,opacity,filter] **:data-previous:duration-150 **:data-previous:ease-[cubic-bezier(0.22,1,0.36,1)]",
@@ -183,20 +162,14 @@ function PreviewCardContent({
               "**:data-previous:data-ending-style:opacity-0 **:data-previous:data-ending-style:blur-[2px]",
               "data-[activation-direction~=right]:**:data-current:data-starting-style:translate-x-2",
               "data-[activation-direction~=left]:**:data-current:data-starting-style:-translate-x-2",
-              // A purely vertical move (a stacked list) nudges vertically.
-              // Base UI reports both axes, as in "right down", so this
-              // excludes any horizontal token: a diagonal hop only nudges
-              // sideways instead of drifting on both axes at once.
+              // Vertical nudge only on a purely vertical move. Base UI reports
+              // diagonals as "right down", which nudge sideways.
               "data-[activation-direction~=down]:not-data-[activation-direction~=left]:not-data-[activation-direction~=right]:**:data-current:data-starting-style:translate-y-2",
               "data-[activation-direction~=up]:not-data-[activation-direction~=left]:not-data-[activation-direction~=right]:**:data-current:data-starting-style:-translate-y-2",
-              // Reduced motion: only opacity transitions and the blur is
-              // dropped, so the swap is a plain crossfade (the nudge, not
-              // transitioned, lands at once while the content is invisible).
+              // Reduced motion: plain crossfade
               "motion-reduce:**:data-current:transition-opacity motion-reduce:**:data-previous:transition-opacity",
               "motion-reduce:**:data-previous:data-ending-style:blur-none motion-reduce:**:data-current:data-starting-style:blur-none",
-              // A keyboard (focus) open skips the swap, as it skips the
-              // popup's own animation, so position, size and content move
-              // together.
+              // Keyboard opens skip the swap, like the popup
               "data-instant:**:data-current:transition-none data-instant:**:data-previous:transition-none",
               viewportClassName,
             )}
@@ -209,11 +182,7 @@ function PreviewCardContent({
   );
 }
 
-/**
- * Edge-to-edge image or banner at the top of the card. Bleeds through the
- * viewport padding and picks up the card's top corners. Defaults to the 1.91:1
- * Open Graph ratio, so a link's `og:image` drops straight in.
- */
+/** Edge-to-edge image at the top of the card, in the 1.91:1 Open Graph ratio. */
 function PreviewCardMedia({
   className,
   ...props
@@ -224,8 +193,7 @@ function PreviewCardMedia({
       className={cn(
         "bg-muted relative -mx-(--viewport-padding) -mt-(--viewport-padding) mb-3 aspect-[1.91/1] overflow-hidden",
         "*:[img,video]:size-full *:[img,video]:object-cover",
-        // A hairline over the image, not around it: light images otherwise
-        // dissolve into a light card. Neutral, so it reads on any photo.
+        // Bottom hairline, so light images don't dissolve into the card
         "after:pointer-events-none after:absolute after:inset-0 after:shadow-[inset_0_-1px_0_oklch(0_0_0/0.1)] dark:after:shadow-[inset_0_-1px_0_oklch(1_0_0/0.1)]",
         className,
       )}

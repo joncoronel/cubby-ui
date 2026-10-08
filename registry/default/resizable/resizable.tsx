@@ -71,11 +71,9 @@ function ResizablePanelGroup({
         style={{ height: undefined, width: undefined, ...style }}
         className={cn(
           "size-full",
-          // Never during a drag, which must track the pointer 1:1. Written on
-          // the group with a direct-child target rather than as Tailwind's
-          // not-has + star variants: those compile to :has() inside
-          // :is(... *), which makes every DOM change on the page restyle the
-          // whole document (see TODO.md, Performance).
+          // Never during a drag, which must track the pointer 1:1. Written as
+          // a root :has() with a direct-child target: Tailwind's not-has +
+          // star variants restyle the whole page on any DOM change (TODO.md).
           "motion-safe:[&[data-settled]:not(:has(>[data-separator=active]))>[data-panel]]:[transition:flex-grow_var(--resizable-duration,320ms)_var(--ease-out-expo)]",
           className,
         )}

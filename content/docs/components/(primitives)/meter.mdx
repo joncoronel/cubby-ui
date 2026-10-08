@@ -180,7 +180,7 @@ The full range of the meter. Wraps Base UI's `Meter.Track`.
 
 #### MeterTargetRange
 
-A line under the track spanning `low` to `high`, shown when `optimum` sits between them, including the default midpoint. A plain `<div>`, hidden from screen readers, so state the range in text too. `Meter` always renders it, so set `optimum` outside the range to hide it.
+A line under the track spanning `low` to `high`, shown when `optimum` sits between them, including the default midpoint. A plain `<div>`, hidden from screen readers, so state the range in text too. `Meter` always renders it; to leave it out, compose the parts without it.
 
 #### MeterIndicator
 
@@ -188,12 +188,12 @@ The filled part of the track, colored by status. Wraps Base UI's `Meter.Indicato
 
 ### Data Attributes
 
-| Attribute           | Element | Description                                                   |
-| ------------------- | ------- | ------------------------------------------------------------- |
-| `data-status`       | Root    | `optimum`, `suboptimum`, or `critical` when thresholds apply. |
-| `data-size`         | Root    | The current `size`.                                           |
-| `data-segmented`    | Track   | Present when `segments` is greater than 1.                    |
-| `data-target-range` | Root    | Present when `optimum` sits between `low` and `high`.         |
+| Attribute           | Element | Description                                                                 |
+| ------------------- | ------- | --------------------------------------------------------------------------- |
+| `data-status`       | Root    | `optimum`, `suboptimum`, or `critical` when thresholds apply.               |
+| `data-size`         | Root    | The current `size`.                                                         |
+| `data-segmented`    | Track   | Present when `segments` is greater than 1.                                  |
+| `data-target-range` | Root    | Present when `low` and `high` are both set and `optimum` sits between them. |
 
 ### CSS Variables
 

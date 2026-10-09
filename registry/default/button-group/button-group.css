@@ -209,6 +209,11 @@
     pointer-events: none;
     opacity: 0;
     scale: 0.96;
+    /* Kept on its own compositor layer. Otherwise Chrome promotes it for each
+     * scale transition and merges it back after, and at fractional device
+     * pixel ratios (125%, 175% display scaling) the two round its edges
+     * differently, so the press visibly jitters as it starts and ends. */
+    will-change: scale, opacity;
     /* Exponential ease-out on the glide so it lands decisively. Entering, the
      * anchor goes from none to a button, which can't interpolate, so the pill
      * appears in place and only fades and grows. */

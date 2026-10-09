@@ -11,8 +11,6 @@ import {
   NumberFieldInput,
 } from "@/registry/default/number-field/number-field";
 
-import { HugeiconsIcon } from "@hugeicons/react";
-import { MinusSignIcon, PlusSignIcon } from "@hugeicons/core-free-icons";
 export default function NumberFieldField() {
   return (
     <Form
@@ -25,13 +23,9 @@ export default function NumberFieldField() {
         <NumberField min={1} max={99} required>
           <FieldLabel>Quantity</FieldLabel>
           <NumberFieldGroup>
-            <NumberFieldDecrement>
-              <HugeiconsIcon icon={MinusSignIcon} className="size-4"  strokeWidth={2} />
-            </NumberFieldDecrement>
+            <NumberFieldDecrement />
             <NumberFieldInput />
-            <NumberFieldIncrement>
-              <HugeiconsIcon icon={PlusSignIcon} className="size-4"  strokeWidth={2} />
-            </NumberFieldIncrement>
+            <NumberFieldIncrement />
           </NumberFieldGroup>
         </NumberField>
         <FieldError />

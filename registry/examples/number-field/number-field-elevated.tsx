@@ -17,9 +17,6 @@ import {
   NumberFieldInput,
 } from "@/registry/default/number-field/number-field";
 
-import { HugeiconsIcon } from "@hugeicons/react";
-import { MinusSignIcon, PlusSignIcon } from "@hugeicons/core-free-icons";
-
 export default function NumberFieldElevated() {
   const defaultId = React.useId();
   const elevatedId = React.useId();
@@ -38,42 +35,18 @@ export default function NumberFieldElevated() {
         <NumberField id={defaultId} defaultValue={100}>
           <Label htmlFor={defaultId}>Default</Label>
           <NumberFieldGroup>
-            <NumberFieldDecrement>
-              <HugeiconsIcon
-                icon={MinusSignIcon}
-                className="size-4"
-                strokeWidth={2}
-              />
-            </NumberFieldDecrement>
+            <NumberFieldDecrement />
             <NumberFieldInput />
-            <NumberFieldIncrement>
-              <HugeiconsIcon
-                icon={PlusSignIcon}
-                className="size-4"
-                strokeWidth={2}
-              />
-            </NumberFieldIncrement>
+            <NumberFieldIncrement />
           </NumberFieldGroup>
         </NumberField>
 
         <NumberField id={elevatedId} defaultValue={100}>
           <Label htmlFor={elevatedId}>Elevated</Label>
           <NumberFieldGroup variant="elevated">
-            <NumberFieldDecrement>
-              <HugeiconsIcon
-                icon={MinusSignIcon}
-                className="size-4"
-                strokeWidth={2}
-              />
-            </NumberFieldDecrement>
+            <NumberFieldDecrement />
             <NumberFieldInput />
-            <NumberFieldIncrement>
-              <HugeiconsIcon
-                icon={PlusSignIcon}
-                className="size-4"
-                strokeWidth={2}
-              />
-            </NumberFieldIncrement>
+            <NumberFieldIncrement />
           </NumberFieldGroup>
         </NumberField>
       </CardContent>

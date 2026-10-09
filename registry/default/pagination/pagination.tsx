@@ -32,23 +32,17 @@ function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
   );
 }
 
-// The list is the shell, as in Button Group: links sit inside it, quiet, and
-// the current page is a solid indicator that glides to the new page when it
-// changes (pagination.css). Links fill the shell edge to edge and carry a
-// 2px transparent border with their paint inside, as in Button Group:
-// borders round to whole device pixels the same on every side, so the inset
-// stays even at fractional display scales, and hit areas reach the shell's
-// edges. The shell's corners step down with the size, matching Button; the
-// paint's are those minus the shell border and the 2px, so they stay
-// concentric and --radius drives both. Set [--radius:9999px] for a pill.
+// The list is a shell, as in Button Group, with a current-page fill that
+// glides between links (pagination.css). Links fill it with a 2px
+// transparent-border inset (even at fractional display scales); paint
+// corners are the shell's minus its border and the 2px.
 const paginationContentVariants = cva(
   [
     "relative isolate flex w-fit flex-row items-stretch rounded-(--pagination-radius)",
     "[--pagination-item-radius:max(0px,calc(var(--pagination-radius)-var(--pagination-border,0px)-2px))]",
-    // The shell is the fixed size and the links stretch to fill it, square
-    // at least (aspect-ratio, so wider labels still grow).
+    // Fixed shell; links stretch to fill it
     "h-(--pagination-h)",
-    // The current page's fill and label. Override to recolor it.
+    // Current page colors (override to recolor)
     "[--pagination-current-bg:var(--neutral)] [--pagination-current-fg:var(--neutral-foreground)]",
   ],
   {
@@ -59,8 +53,7 @@ const paginationContentVariants = cva(
         soft: "bg-secondary text-secondary-foreground",
         ghost: "",
       },
-      // Outer height, matching Button's ladder (one step taller below sm),
-      // and corners that step down with it.
+      // Button's height ladder (one step taller below sm); corners step with it.
       size: {
         sm: "[--pagination-h:--spacing(9)] sm:[--pagination-h:--spacing(8)] [--pagination-radius:calc(var(--radius)-2px)]",
         default:
@@ -94,9 +87,7 @@ function PaginationContent({
       {...props}
     >
       {children}
-      {/* The current-page fill, placed and animated by pagination.css. Last,
-          so consumers' first-child selectors still match the first item; it
-          sits under the links at z-index -1 inside the isolated list. */}
+      {/* Last, so first-child selectors still match the first item. */}
       <li aria-hidden data-slot="pagination-indicator" />
     </ul>
   );
@@ -119,29 +110,21 @@ type PaginationLinkProps = useRender.ComponentProps<"a"> & {
   isDisabled?: boolean;
 };
 
-// Real anchors styled with the flat `buttonVariants` recipe on purpose:
-// rendering them through <Button render={<a/>}> would bolt button semantics
-// (role="button", no Space navigation) onto elements that must stay links.
-// `render` swaps in a router link (Next.js <Link>) that renders an anchor.
-// Ghost, resized to fill the shell, with the label color at 10% for hover,
-// as in Button Group.
+// Real anchors with the flat `buttonVariants` recipe: <Button render={<a/>}>
+// would add button semantics to elements that must stay links.
 const linkClasses = cn(
   buttonVariants({ variant: "ghost", size: null }),
   "aspect-square h-auto self-stretch border-2 border-transparent px-2 text-sm tabular-nums",
-  // The box's corners are the paint's + its 2px border and the paint sets
-  // its own, so paint, gap, and focus ring are concentric. The ring sits on
-  // the box's edge at offset 0, 2px off the paint as on a standalone Button.
+  // Box corners are the paint's + 2px, so paint, gap, and focus ring (at
+  // offset 0) are concentric.
   "rounded-[calc(var(--pagination-item-radius)+2px)] before:rounded-(--pagination-item-radius) focus-visible:outline-offset-0",
-  // Hover is the label color at 10%; a press deepens it to 14%, about
-  // Button's active-to-hover step.
+  // Hover and press: the label color at 10% / 14%
   "[--btn-bg-hover:color-mix(in_oklab,currentColor_10%,transparent)] [--btn-bg-active:color-mix(in_oklab,currentColor_14%,transparent)]",
-  // Where the indicator can't glide, the current page paints its own fill.
+  // Current page fallback fill, where the indicator can't glide
   "aria-[current=page]:text-(--pagination-current-fg) aria-[current=page]:hover:text-(--pagination-current-fg) aria-[current=page]:[--btn-bg:var(--pagination-current-bg)] aria-[current=page]:[--btn-bg-hover:var(--pagination-current-bg)] aria-[current=page]:[--btn-bg-active:var(--pagination-current-bg)]",
   "aria-disabled:pointer-events-none aria-disabled:opacity-60",
-  // No transitions on the link itself. When the link that becomes current
-  // starts one, Chrome skips the indicator's slide to it. The label inside
-  // fades its color instead (pagination.css), and the current link's paint
-  // changes at once.
+  // No transitions on the link: Chrome skips the indicator's slide when the
+  // new current link starts one. The label span fades instead.
   "transition-[outline-width,outline-offset,outline-color] aria-[current=page]:before:transition-none",
 );
 
@@ -158,8 +141,7 @@ function PaginationLink({
   const defaultProps = {
     "aria-current": isActive ? ("page" as const) : undefined,
     "aria-disabled": isDisabled || undefined,
-    // A disabled link drops its href (and keeps its link role), so neither a
-    // lingering focus nor a screen reader's virtual cursor can follow it.
+    // No href, so a screen reader's virtual cursor can't follow it.
     href: isDisabled ? undefined : href,
     role: isDisabled ? "link" : undefined,
     onClick: (event: React.MouseEvent<HTMLAnchorElement>) => {
@@ -191,9 +173,7 @@ function PaginationLink({
   });
 }
 
-// Below sm, Previous and Next show only their arrows. The label stays in
-// the accessibility tree (sr-only), so it is the accessible name and a
-// custom or translated label carries through.
+// Below sm the label is sr-only; it stays the accessible name.
 function PaginationPrevious({
   className,
   children = "Previous",
@@ -245,9 +225,7 @@ function PaginationEllipsis({
   );
 }
 
-// A read-only position between Previous and Next ("Page 3 of 12",
-// "21–40 of 240"), for compact pagers. A polite live region, so the new
-// position is announced when it changes.
+// Read-only position for compact pagers, announced when it changes.
 function PaginationStatus({ className, ...props }: React.ComponentProps<"li">) {
   return (
     <li

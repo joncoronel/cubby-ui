@@ -14,40 +14,31 @@ import {
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/registry/default/button/button";
 
-// The group is a field-colored shell, like Button Group's: the input and the
-// steppers fill it edge to edge, quiet, so the whole field reads as one
-// control. Each carries a 2px transparent border with its paint inside, as
-// in Button Group: borders round to whole device pixels the same on every
-// side, so the inset stays even at fractional display scales, and the
-// steppers' hit areas reach the shell's edges. The shell has Input's height
-// and corners per size; the paint's corners are the shell's minus its
-// border and the 2px, so they stay concentric and --radius drives both. Set
-// [--radius:9999px] for a pill.
+// A field-colored shell, like Button Group's. The input and steppers fill it
+// with a 2px transparent-border inset (even at fractional display scales).
+// Paint corners are the shell's minus its border and the 2px.
 const numberFieldGroupVariants = cva(
   [
     "relative flex h-(--number-field-h) w-fit items-stretch rounded-(--number-field-radius) border bg-clip-padding",
     "[--number-field-item-radius:max(0px,calc(var(--number-field-radius)-3px))]",
-    // One ring around the whole field while typing or invalid, not just the input.
+    // Focus and invalid rings
     "outline-0 outline-offset-0 outline-transparent outline-solid transition-[outline-width,outline-offset,outline-color] duration-100 ease-out",
     "has-[[data-slot=number-field-input]:focus-visible]:outline-ring/50 has-[[data-slot=number-field-input]:focus-visible]:outline-2 has-[[data-slot=number-field-input]:focus-visible]:outline-offset-2",
     "has-[[data-slot=number-field-input][aria-invalid=true]]:outline-destructive/50 has-[[data-slot=number-field-input][aria-invalid=true]]:outline-2 has-[[data-slot=number-field-input][aria-invalid=true]]:outline-offset-2",
-    // A disabled field dims once, here. The steppers' own disabled opacity
-    // (from the Button recipe) is cancelled inside it so it doesn't stack;
-    // a stepper disabled alone at min or max still dims.
+    // Disabled: dims once here; the steppers' own disabled opacity is
+    // cancelled so it doesn't stack. A stepper alone at min or max still dims.
     "data-disabled:opacity-60 data-disabled:[&_button]:opacity-100",
-    // A scrub label inside the shell is a leading prefix: the value sits
-    // beside it instead of centered between steppers.
+    // Inline scrub prefix
     "has-[>[data-slot=number-field-scrub-area]]:[&>[data-slot=number-field-input]]:text-left",
   ],
   {
     variants: {
-      // Same surfaces as Input and Select.
+      // Input's surfaces
       variant: {
         default: "bg-input",
         elevated: "bg-input-elevated",
       },
-      // Outer height, matching Input (one step taller below sm), and
-      // corners that step down with it.
+      // Input's heights (one step taller below sm); corners step with them.
       size: {
         default:
           "[--number-field-h:--spacing(10)] sm:[--number-field-h:--spacing(9)] [--number-field-radius:var(--radius)]",
@@ -61,16 +52,11 @@ const numberFieldGroupVariants = cva(
   },
 );
 
-// Steppers use the Button recipe (ghost, so labels go muted → foreground on
-// hover), resized to fill the shell. Hover paint is the label color at 10%,
-// as in Button Group, so it reads on both surfaces in both modes; a press
-// deepens it to 14%, about Button's active-to-hover step.
+// Ghost Button recipe, sized by the shell. Hover and press are the label
+// color at 10% / 14%, as in Button Group.
 const stepperClasses = cn(
-  // size: null drops Button's height ladder; the shell sets the size.
   buttonVariants({ variant: "ghost", size: null }),
   "aspect-square h-auto self-stretch border-2 border-transparent text-sm rounded-(--number-field-item-radius) [--btn-bg-hover:color-mix(in_oklab,currentColor_10%,transparent)] [--btn-bg-active:color-mix(in_oklab,currentColor_14%,transparent)]",
-  // Base UI keeps stepper buttons out of the tab order (arrow keys step the
-  // input), so they never show a focus ring of their own.
 );
 
 type NumberFieldProps = BaseNumberField.Root.Props;
@@ -114,18 +100,12 @@ function NumberFieldInput({
       data-slot="number-field-input"
       className={cn(
         "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground",
-        // Bare: the shell carries the surface and the focus ring.
         "w-16 min-w-0 self-stretch border-2 border-transparent bg-transparent px-1 text-center text-base font-normal tabular-nums outline-none md:text-sm",
-        // Short inset hairlines against a neighboring stepper, drawn as two
-        // background layers on the input's outer (border-box) edges, midway
-        // between its paint and the stepper's. Each has zero height until a
-        // stepper sits beside it, and collapses to its center while that
-        // stepper is hovered or pressed, so the paint never sits against a
-        // line.
+        // Dividers: two background layers on the input's edges. Each shows
+        // only beside a stepper and collapses while that stepper is lit.
         "bg-[linear-gradient(var(--border),var(--border)),linear-gradient(var(--border),var(--border))] [background-size:1px_var(--number-field-divider-s,0px),1px_var(--number-field-divider-e,0px)] [background-position:left_center,right_center] bg-no-repeat [background-origin:border-box] transition-[background-size] duration-100 ease-out motion-reduce:transition-none",
         "has-[+[data-slot=number-field-increment]]:[--number-field-divider-e:calc(100%_-_12px)] has-[+[data-slot=number-field-stepper]]:[--number-field-divider-e:calc(100%_-_12px)] [[data-slot=number-field-decrement]+&]:[--number-field-divider-s:calc(100%_-_12px)]",
-        // Hover only where hover is real, so a tap doesn't leave a divider
-        // collapsed beside an unpainted stepper on touch screens.
+        // Hover is gated to real hover: a raw :hover sticks after a tap.
         "has-[+[data-slot=number-field-increment]:active]:[--number-field-divider-e:0px] has-[+[data-slot=number-field-stepper]:active]:[--number-field-divider-e:0px] [[data-slot=number-field-decrement]:active+&]:[--number-field-divider-s:0px]",
         "[@media(hover:hover)]:has-[+[data-slot=number-field-increment]:hover]:[--number-field-divider-e:0px] [@media(hover:hover)]:has-[+[data-slot=number-field-stepper]:hover]:[--number-field-divider-e:0px] [@media(hover:hover)]:[[data-slot=number-field-decrement]:hover+&]:[--number-field-divider-s:0px]",
         "disabled:pointer-events-none disabled:cursor-not-allowed",
@@ -170,11 +150,7 @@ function NumberFieldIncrement({
   );
 }
 
-// Increment over decrement on the trailing edge, the styled equivalent of a
-// native number spinner. Each half is a quiet stepper: the one corner that
-// sits in the shell's corner follows it, and the rest stay tight.
-// Appends a consumer className to ours, keeping Base UI's function form
-// (className as a function of the part's state) working.
+// Appends a consumer className, including Base UI's function-of-state form.
 function withClassName<State>(
   base: string,
   className: string | ((state: State) => string | undefined) | undefined,
@@ -192,6 +168,8 @@ type NumberFieldStepperProps = React.ComponentProps<"div"> & {
   decrementProps?: BaseNumberField.Decrement.Props;
 };
 
+// Stacked chevrons, like a native spinner. Only the corner inside the
+// shell's corner follows it; the rest stay tight.
 function NumberFieldStepper({
   className,
   incrementProps,
@@ -241,9 +219,7 @@ function NumberFieldStepper({
   );
 }
 
-// Drag horizontally to change the value. Wrap a label outside the group, or
-// place it inside the group as a leading prefix (a design tool's W / H
-// field), where it sits quiet and brightens on hover and while scrubbing.
+// Wraps a label outside the group, or sits inside it as a quiet prefix.
 function NumberFieldScrubArea({
   className,
   ...props
@@ -252,12 +228,10 @@ function NumberFieldScrubArea({
     <BaseNumberField.ScrubArea
       data-slot="number-field-scrub-area"
       className={cn(
-        // Children inherit the cursor: a <label> otherwise resets it to the
-        // default arrow over its own text.
+        // A <label> otherwise resets the cursor over its text.
         "cursor-ew-resize select-none [&_*]:cursor-[inherit]",
-        // A flex box, so it's exactly as tall as the label inside it, like
-        // Label. As a plain span it would size to the page's body line
-        // height and leave extra space under the label.
+        // As a plain span it takes the body line height, leaving space under
+        // the label.
         "flex w-fit items-center",
         "in-data-[slot=number-field-group]:text-muted-foreground in-data-[slot=number-field-group]:hover:text-foreground in-data-[slot=number-field-group]:data-scrubbing:text-foreground in-data-[slot=number-field-group]:flex in-data-[slot=number-field-group]:items-center in-data-[slot=number-field-group]:ps-2.5 in-data-[slot=number-field-group]:pe-1 in-data-[slot=number-field-group]:text-sm in-data-[slot=number-field-group]:font-medium in-data-[slot=number-field-group]:transition-colors in-data-[slot=number-field-group]:duration-100",
         className,
@@ -267,8 +241,7 @@ function NumberFieldScrubArea({
   );
 }
 
-// The cursor shown while scrubbing (the real one is hidden and locked).
-// Defaults to a two-way arrow drawn like a system resize cursor.
+// Replaces the locked pointer while scrubbing. Defaults to a two-way arrow.
 function NumberFieldScrubAreaCursor({
   className,
   children,

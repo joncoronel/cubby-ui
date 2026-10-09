@@ -1,13 +1,15 @@
 ---
 title: Button Group
-description: A row of related actions that share one surface
+description: A row of related actions on one shared surface
 type: composable
 builtOn: ["button"]
 ---
 
 import { ButtonGroup } from "@/registry/default/button-group/button-group";
 
-A button group holds related actions on one shared surface, like a file's share, duplicate, and archive actions or an editor's undo and redo. A highlight glides from button to button as the pointer or keyboard focus moves along the row. To attach buttons to an input or select, use the `attached` variant. When one button stays selected, use [`ToggleGroup`](/docs/components/toggle-group) instead. When the row needs arrow-key navigation, use [`Toolbar`](/docs/components/toolbar).
+A button group puts related actions on one surface, like a file's share, duplicate, and archive, or an editor's undo and redo. A highlight glides between the buttons as you hover or tab along the row.
+
+When one button stays selected, use [`ToggleGroup`](/docs/components/toggle-group). When the row needs arrow-key navigation, use [`Toolbar`](/docs/components/toolbar).
 
 ## Preview
 
@@ -30,27 +32,27 @@ ButtonGroup
 └── ButtonGroupText
 ```
 
-Buttons inside a group take its style, so leave their `variant` unset. A button that has a `variant` keeps its own fill.
+Leave `variant` unset on the buttons inside; they take the group's style.
 
 ## Examples
 
 ### Variants
 
-`outline` (the default), `soft`, `elevated`, and `solid` draw the shell; the buttons inside sit bare on it.
+Use `variant` to pick the shell the buttons sit on.
 
 <ComponentPreview component="button-group" example="button-group-variants" />
 
-| Value        | Use it for                                                                            |
-| ------------ | ------------------------------------------------------------------------------------- |
-| `"outline"`  | Actions on a page or card. The fill and border of an outline Button.                  |
-| `"soft"`     | Editor and canvas chrome. The fill of a secondary Button, no edge.                    |
-| `"elevated"` | Toolbars that float over content, like a selection menu. A raised surface and shadow. |
-| `"solid"`    | A primary action and its options. The neutral fill.                                   |
-| `"attached"` | Buttons attached to fields. See [Attached](#attached).                                |
+| Variant    | Description                                                   |
+| ---------- | ------------------------------------------------------------- |
+| `outline`  | The default. An outline Button's fill and border.             |
+| `soft`     | A secondary Button's fill, for editor chrome.                 |
+| `elevated` | A raised surface, for toolbars that float.                    |
+| `solid`    | The neutral fill, for a primary action and options.           |
+| `attached` | No shell; joins buttons to fields. See [Attached](#attached). |
 
 ### Separator
 
-`ButtonGroupSeparator` splits actions into clusters. The line hides while the highlight is on a button next to it.
+Use `ButtonGroupSeparator` to split actions into clusters; it hides beside the highlight.
 
 <ComponentPreview
   component="button-group"
@@ -59,13 +61,13 @@ Buttons inside a group take its style, so leave their `variant` unset. A button 
 
 ### Emphasis
 
-Give one button a `variant` to mark it as the main action. It keeps its own fill while the rest of the group stays quiet.
+Give one button a `variant` to mark the main action; it keeps its own fill.
 
 <ComponentPreview component="button-group" example="button-group-emphasis" />
 
 ### Pill
 
-Each button fills the shell edge to edge, with its fill 2px in from its own edges. The inset is drawn as a transparent border, which the browser rounds to whole pixels the same on every side, so the gaps stay even at any display scale. The shell's corners match a Button of the same size, and the fills' corners are those minus the shell's border and the 2px, so the two stay concentric and both follow `--radius`. Set `[--radius:9999px]` on the group for a pill.
+Set `[--radius:9999px]` on the group for a pill; the buttons' corners follow.
 
 ```tsx
 <ButtonGroup className="[--radius:9999px]">…</ButtonGroup>
@@ -73,47 +75,45 @@ Each button fills the shell edge to edge, with its fill 2px in from its own edge
 
 ### With Text
 
-`ButtonGroupText` holds a read-only label between buttons, like the count on a bar of bulk actions. It uses tabular numerals, so a changing count keeps its width. For a value people can type or step, use [`NumberField`](/docs/components/number-field).
+Use `ButtonGroupText` for a read-only label between buttons, like a selection count. For a value people type or step, use [`NumberField`](/docs/components/number-field).
 
 <ComponentPreview component="button-group" example="button-group-text" />
 
 ### With Fields
 
-Inputs and selects in a shell drop their own border and fill and sit in the row like the buttons. The highlight glides onto a select's trigger. An input lights in place while you hover or type, since it isn't an action. For fields that keep their own borders, use [Attached](#attached).
+Put an `Input` or `Select` in a shell and it drops its border to sit in the row like a button.
 
 <ComponentPreview component="button-group" example="button-group-fields" />
 
 ### With Dropdown
 
-Pair an action with a menu of related ones. The trigger keeps the highlight color while its menu is open. The trigger fills the shell to its edge, so the menu's usual offset already clears the shell.
+Pair an action with a menu of related ones; the trigger keeps the highlight while the menu is open.
 
 <ComponentPreview component="button-group" example="button-group-dropdown" />
 
 ### Orientation
 
-Set `orientation="vertical"` to stack the buttons. Separators turn to match.
+Set `orientation="vertical"` to stack the buttons; separators turn to match.
 
 <ComponentPreview component="button-group" example="button-group-orientation" />
 
 ### Size
 
-Set `size` on the group. Its outer height matches a Button of the same size, so a group lines up with buttons and inputs in the same row. The buttons inside fill it, with their fills 2px in from each edge. Icon-only buttons still need an `icon` size to stay square.
+Use `size` to match the group's height to a Button of the same size. Icon-only buttons still need an `icon` size to stay square.
 
 <ComponentPreview component="button-group" example="button-group-size" />
 
 ### Nested
 
-A group of groups acts as a layout wrapper with no shell of its own. Each inner group keeps its own shell and highlight, and takes the wrapper's `variant` and `size` unless it sets its own.
+Nest groups to lay out several shells; inner groups inherit the outer `variant` and `size`.
 
 <ComponentPreview component="button-group" example="button-group-nested" />
 
 ### Attached
 
-`variant="attached"` joins the buttons into one control and collapses the borders between them. The buttons keep their own variant here, so pass one, usually `outline`.
+Use `variant="attached"` to join buttons, inputs, and selects into one control, with their own borders and variants.
 
 <ComponentPreview component="button-group" example="button-group-attached" />
-
-Inputs and selects can share an attached group with buttons.
 
 <ComponentPreview component="button-group" example="button-group-input" />
 
@@ -125,21 +125,27 @@ Inputs and selects can share an attached group with buttons.
 
 ## Accessibility
 
-The group renders `role="group"`. Give it an `aria-label` that names the set ("File actions", "Zoom"), and an `aria-label` on every icon-only button.
+### Labels
 
-Tab moves through the buttons one at a time. For a long row where arrow keys should move between buttons, use [`Toolbar`](/docs/components/toolbar).
+The group renders `role="group"`. Give it an `aria-label` that names the set ("File actions"), and give every icon-only button its own.
 
-The highlight only marks where the pointer or focus is. Disabled buttons are skipped. Keyboard focus also gets the focus ring, so the highlight is never the only cue. With reduced motion, the highlight jumps to the next button instead of sliding.
+### Keyboard
 
-The highlight uses CSS anchor positioning. In browsers without it, each button shows its own hover color instead.
+Tab moves through the buttons one at a time. For arrow-key navigation along a long row, use [`Toolbar`](/docs/components/toolbar).
+
+### Highlight
+
+The highlight follows the pointer and keyboard focus and skips disabled buttons. Focus also draws a ring, so the highlight is never the only cue. With reduced motion, it jumps instead of sliding. Browsers without CSS anchor positioning show a hover color on each button instead.
 
 ## API Reference
+
+Button Group is a custom component built from plain HTML elements; every prop below is specific to it. Each part also accepts the props of the element it renders.
 
 ### Props
 
 #### ButtonGroup
 
-Groups buttons on a shared surface. Renders a `div` with `role="group"` and accepts all `div` props.
+Groups buttons on one surface. Renders a `div` with `role="group"`.
 
 <ApiPropsList>
 
@@ -149,8 +155,8 @@ Groups buttons on a shared surface. Renders a `div` with `role="group"` and acce
   simpleType="string"
   defaultValue='"outline"'
 >
-  The shell. `attached` draws no shell and joins its children instead. A nested
-  group defaults to its parent's variant.
+  Shell style. `attached` draws no shell and joins its children. A nested group
+  inherits its parent's variant.
 </ApiProp>
 
 <ApiProp
@@ -159,9 +165,8 @@ Groups buttons on a shared surface. Renders a `div` with `role="group"` and acce
   simpleType="string"
   defaultValue='"default"'
 >
-  Outer height, matching Button's `sm`, `default`, and `lg` heights. The buttons
-  inside fill it. Has no effect on `attached`, where the buttons size
-  themselves.
+  Sets the outer height to Button's `sm`, `default`, or `lg`. Has no effect on
+  `attached`.
 </ApiProp>
 
 <ApiProp
@@ -173,14 +178,8 @@ Groups buttons on a shared surface. Renders a `div` with `role="group"` and acce
   Lays the buttons out in a row or a column.
 </ApiProp>
 
-<ApiProp
-  name="highlight"
-  fullType="boolean"
-  simpleType="boolean"
-  defaultValue="true"
->
-  Glides one shared highlight between buttons, using CSS anchor positioning.
-  With `false`, or in a browser without anchor positioning, each button paints
+<ApiProp name="highlight" fullType="boolean" defaultValue="true">
+  Glides one shared highlight between buttons. With `false`, each button paints
   its own hover. Has no effect on `attached`.
 </ApiProp>
 
@@ -188,7 +187,7 @@ Groups buttons on a shared surface. Renders a `div` with `role="group"` and acce
 
 #### ButtonGroupSeparator
 
-A line between buttons. Wraps [`Separator`](/docs/components/separator) and accepts its props.
+A line between buttons. Wraps [`Separator`](/docs/components/separator).
 
 <ApiPropsList>
 
@@ -198,22 +197,21 @@ A line between buttons. Wraps [`Separator`](/docs/components/separator) and acce
   simpleType="string"
   defaultValue="perpendicular to the group"
 >
-  Direction of the line. Defaults to vertical in a row and horizontal in a
-  column.
+  Direction of the line: vertical in a row, horizontal in a column.
 </ApiProp>
 
 </ApiPropsList>
 
 #### ButtonGroupText
 
-A non-interactive segment for a label or value. Renders a `div` and accepts a `render` prop, for example `render={<label />}` to label an input in an attached group.
+A read-only segment for a label or value. Renders a `div`; pass `render={<label />}` to label an input in an attached group.
 
 ## Upgrading
 
 If you're reinstalling over an earlier version, check these changes:
 
-| Before                                       | Now                                                                                                 |
-| -------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| Children fused into one bordered control     | Default is `outline`, a shell with bare buttons inside. Pass `variant="attached"` for the old look. |
-| `ButtonGroupSeparator` defaulted to vertical | Perpendicular to the group, so vertical groups no longer need `orientation="horizontal"`.           |
-| Buttons in a group set `variant="outline"`   | Leave `variant` unset in a shell variant. A set variant now marks the button as the main action.    |
+| Before                                       | Now                                                                                  |
+| -------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Children fused into one bordered control     | The default is `outline`, a shell. Pass `variant="attached"` for the old look.       |
+| `ButtonGroupSeparator` defaulted to vertical | It turns perpendicular to the group, so vertical groups need no `orientation`.       |
+| Buttons in a group set `variant="outline"`   | Leave `variant` unset in a shell. A set variant marks the button as the main action. |

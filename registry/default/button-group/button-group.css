@@ -1,24 +1,17 @@
 /* -------------------------------------------------------------------------------------------------
  * Gliding highlight, in CSS anchor positioning.
  *
- * The button under the pointer (or keyboard focus, a press, or an open menu)
- * takes the anchor name, and one shared pill in the group is anchored to it,
- * so the pill slides from button to button as the anchor moves.
- *
- * Without anchor positioning (and anchor-scope, so groups don't share an
- * anchor) the pill isn't drawn and each button paints its own hover, set by
- * the tray classes in button-group.tsx.
+ * The lit button (hover, focus, press, open menu) takes the anchor name and
+ * the shared pill follows it. Without anchor positioning and anchor-scope,
+ * each button paints its own hover instead.
  * -------------------------------------------------------------------------------------------------*/
 
 [data-slot="button-group-highlight"] {
   display: none;
 }
 
-/* Buttons fill the shell edge to edge, so the only dead space is around a
- * separator (its line and margins, about 5px). The buttons on either side
- * reach over half of it, so the pill never lets go mid-glide. A select's
- * hidden form input (out of the layout, but still a sibling) is stepped
- * over. */
+/* Hit areas: buttons reach over half of a separator's ~5px, so the pill
+ * never drops mid-glide. A select's hidden form input is stepped over. */
 [data-glide] > :is(button, a[href], [role="button"]) {
   position: relative;
 }
@@ -67,19 +60,16 @@
 /* -------------------------------------------------------------------------------------------------
  * Quiet fields.
  *
- * In a shell, inputs and select triggers drop their own border and fill and
- * take the buttons' height and radius, so they sit in the row like a search
- * box built into a toolbar. A select trigger is a button, so the pill glides
- * onto it like any other; an input isn't an action, so it lights in place
- * on hover and while you type. Their focus rings stay.
+ * Inputs and select triggers drop their border and fill and take the
+ * buttons' size. The pill glides onto a select trigger; an input lights in
+ * place.
  * -------------------------------------------------------------------------------------------------*/
 
 [data-slot="button-group"]:not([data-variant="attached"])
   > :is([data-slot="input"], [data-slot="select-trigger"]) {
   height: auto;
   align-self: stretch;
-  /* The same 2px transparent border as the buttons, with the fill inside
-   * it; the corner is the inner radius + the border. */
+  /* The buttons' 2px border, fill inside it. */
   border-width: 2px;
   border-color: transparent;
   border-radius: calc(var(--group-item-radius) + 2px);
@@ -96,21 +86,20 @@
     background-color, outline-width, outline-offset, outline-color;
 }
 
-/* Focus rings sit on the field's edge, 2px off its fill, as on the buttons. */
+/* Focus ring 2px off the fill, as on the buttons. */
 [data-slot="button-group"]:not([data-variant="attached"])
   > :is([data-slot="input"], [data-slot="select-trigger"]):focus-visible {
   outline-offset: 0;
 }
 
-/* Fields light while focused, and on hover where hover is real (a raw
- * :hover sticks after a tap on touch screens). */
+/* Hover is gated to real hover: a raw :hover sticks after a tap. */
 [data-slot="button-group"]:not([data-variant="attached"])
   > [data-slot="input"]:focus {
   background-color: var(--group-highlight);
 }
 
-/* A select trigger paints its own hover and open state, like the buttons;
- * where the pill glides, the @supports block below turns it off. */
+/* Select triggers paint their own hover and open state, like the buttons;
+ * the @supports block turns it off where the pill glides. */
 [data-slot="button-group"]:not([data-variant="attached"])
   > [data-slot="select-trigger"][data-popup-open] {
   background-color: var(--group-highlight);
@@ -123,7 +112,7 @@
   }
 }
 
-/* All anchor features or none: a partial implementation would leave the pill
+/* All anchor features or none: a partial implementation leaves the pill
  * unplaced or tied to another group. */
 @supports (anchor-name: --button-group-item) and
   (anchor-scope: --button-group-item) and (inset: anchor(inside)) {
@@ -131,24 +120,21 @@
     anchor-scope: --button-group-item;
   }
 
-  /* The pill stands in for hover, so quiet buttons stop painting their own. */
+  /* The pill stands in for hover. */
   [data-glide] > :is(button, a[href], [role="button"]):not([data-variant]) {
     --btn-bg-hover: transparent;
     --btn-bg-active: transparent;
   }
 
-  /* Same for a select trigger's own hover and open paint. Selectors match
-   * the specificity of the rules above that set it. */
+  /* Matches the specificity of the select rules above. */
   [data-slot="button-group"][data-glide]:not([data-variant="attached"])
     > [data-slot="select-trigger"]:is(:hover, [data-popup-open]) {
     background-color: transparent;
   }
 
-  /* What the pill lands on. Hover only where hover is real, so a tap doesn't
-   * leave it stuck on touch screens; :active covers the tap instead. While a
-   * menu is open, or a button is held down, the pill stays on that button:
-   * a pointer drifting onto a neighbor mid-press would otherwise light both,
-   * and the pill would dart between them as it shrinks. */
+  /* Hover is gated to real hover (:active covers taps). An open menu or a
+   * held button keeps the pill, or a pointer drifting mid-press would light
+   * two buttons and the pill would dart between them. */
   [data-glide]
     > :is(button, a[href], [role="button"]):not(:disabled, [data-disabled]):is(
       :focus-visible,
@@ -168,9 +154,8 @@
     }
   }
 
-  /* Leaving the group, the last button keeps the anchor while the pill fades,
-   * so it fades out in place instead of collapsing. Between buttons there is
-   * no delay, so the pill moves the moment the next one is lit. */
+  /* Leaving the group, the last button holds the anchor while the pill fades,
+   * so it fades in place instead of collapsing. */
   [data-glide]:not(
       :has(
         > :is(button, a[href], [role="button"]):not(
@@ -180,8 +165,7 @@
       )
     )
     > :is(button, a[href], [role="button"]) {
-    /* The Button recipe's own transitions (button.tsx), restated so adding
-     * the anchor hold doesn't drop them. */
+    /* Button's own transitions (button.tsx), restated so they survive. */
     transition:
       outline-width 100ms ease-out,
       outline-offset 100ms ease-out,
@@ -196,20 +180,18 @@
     position: absolute;
     position-anchor: --button-group-item;
     inset: anchor(inside);
-    /* The anchor is the button's border box; the same 2px transparent
-     * border puts the fill exactly over the button's own paint area. */
+    /* The anchor is the button's border box; the same 2px border lines the
+     * fill up with the button's paint. */
     border: 2px solid transparent;
     border-radius: calc(var(--group-item-radius) + 2px);
     background: var(--group-highlight) padding-box;
-    /* Rendered after the buttons (so consumers' first-child selectors still
-     * match the first button); it sits under them inside the isolated group. */
+    /* Rendered last, so it sits under the buttons inside the isolated group. */
     z-index: -1;
     pointer-events: none;
     opacity: 0;
     scale: 0.96;
-    /* Exponential ease-out on the glide so it lands decisively. Entering, the
-     * anchor goes from none to a button, which can't interpolate, so the pill
-     * appears in place and only fades and grows. */
+    /* Entering from no anchor can't interpolate, so the pill appears in
+     * place and only fades and grows. */
     transition:
       inset 80ms var(--ease-out-expo, cubic-bezier(0.19, 1, 0.22, 1)),
       opacity 80ms ease-out,
@@ -241,8 +223,7 @@
     }
   }
 
-  /* A press shrinks and deepens the pill, matching the Button recipe's
-   * active paint. Menu triggers skip it, as Button does. */
+  /* Press, as on Button. Menu triggers skip it. */
   [data-glide]:has(
       > :is(button, a[href], [role="button"]):active:not(
           [aria-haspopup],
@@ -254,7 +235,7 @@
     background-color: var(--group-press);
   }
 
-  /* The hairlines beside the pill step aside so it never sits between two. */
+  /* Separators beside the pill hide. */
   [data-glide]
     > :is(button, a[href], [role="button"]):not(:disabled, [data-disabled]):is(
       :focus-visible,

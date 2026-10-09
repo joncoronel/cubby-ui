@@ -17,13 +17,9 @@ function range(start: number, end: number): number[] {
 }
 
 /**
- * The pages and ellipses to render for `page` of `pageCount`.
- *
- * The result always has the same length for a given pageCount, siblingCount,
- * and boundaryCount (once there are enough pages to need an ellipsis): an
- * ellipsis that would hide a single page shows that page instead. So the row
- * keeps its width as the current page moves, and the current-page indicator
- * glides instead of the links shuffling under it.
+ * The pages and ellipses to render for `page` of `pageCount`. The length is
+ * fixed for given counts (an ellipsis that would hide one page shows it), so
+ * the row keeps its width as the page changes.
  */
 export function getPaginationRange({
   page,
@@ -31,8 +27,7 @@ export function getPaginationRange({
   siblingCount = 1,
   boundaryCount = 1,
 }: PaginationRangeOptions): PaginationRangeItem[] {
-  // Non-finite input (NaN from Number(searchParams.get("page"))) falls back
-  // to no pages, or to page 1.
+  // NaN (e.g. from Number(searchParams.get("page"))) means no pages or page 1.
   const count = Number.isFinite(pageCount)
     ? Math.max(0, Math.floor(pageCount))
     : 0;
@@ -43,16 +38,14 @@ export function getPaginationRange({
   const siblings = Math.max(0, Math.floor(siblingCount));
   const boundaries = Math.max(0, Math.floor(boundaryCount));
 
-  // Everything fits: boundaries, siblings, the current page, and the two
-  // slots the ellipses would take.
+  // Everything fits, ellipsis slots included.
   if (count <= boundaries * 2 + siblings * 2 + 3) return range(1, count);
 
-  // From here count > 2 * boundaries + 2 * siblings + 3, so the boundary
-  // runs never overlap and need no clamping.
+  // From here the boundary runs can't overlap.
   const startPages = range(1, boundaries);
   const endPages = range(count - boundaries + 1, count);
 
-  // The sibling window, pushed inward at either end so the total stays fixed.
+  // Sibling window, pushed inward at the ends so the length stays fixed.
   const siblingsStart = Math.max(
     Math.min(current - siblings, count - boundaries - siblings * 2 - 1),
     boundaries + 2,

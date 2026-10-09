@@ -13,7 +13,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Sent02Icon } from "@hugeicons/core-free-icons";
 export default function ButtonGroupSelect() {
   return (
-    <ButtonGroup>
+    <ButtonGroup variant="attached">
       <Select defaultValue="usd">
         <SelectTrigger aria-label="Select currency">
           <SelectValue />
@@ -28,7 +28,7 @@ export default function ButtonGroupSelect() {
       <Input type="number" placeholder="0.00" />
 
       <Button size="icon" aria-label="Send" variant="outline">
-        <HugeiconsIcon icon={Sent02Icon}  strokeWidth={2} />
+        <HugeiconsIcon icon={Sent02Icon} strokeWidth={2} />
       </Button>
     </ButtonGroup>
   );

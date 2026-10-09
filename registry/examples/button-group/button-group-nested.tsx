@@ -3,31 +3,29 @@ import { ButtonGroup } from "@/registry/default/button-group/button-group";
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@hugeicons/core-free-icons";
+
+const PAGES = [1, 2, 3, 4, 5];
+
 export default function ButtonGroupNested() {
   return (
-    <ButtonGroup>
+    <ButtonGroup aria-label="Pagination">
       <ButtonGroup>
-        <Button variant="outline" size="icon">
-          1
-        </Button>
-        <Button variant="outline" size="icon">
-          2
-        </Button>
-        <Button variant="outline" size="icon">
-          3
-        </Button>
-        <Button variant="outline" size="icon">
-          4
-        </Button>
-        <Button variant="outline" size="icon">
-          5
-        </Button>
+        {PAGES.map((page) => (
+          <Button
+            key={page}
+            size="icon"
+            aria-label={`Page ${page}`}
+            className="tabular-nums"
+          >
+            {page}
+          </Button>
+        ))}
       </ButtonGroup>
       <ButtonGroup>
-        <Button variant="outline" size="icon" aria-label="Previous page">
+        <Button size="icon" aria-label="Previous page">
           <HugeiconsIcon icon={ChevronLeftIcon} strokeWidth={2} />
         </Button>
-        <Button variant="outline" size="icon" aria-label="Next page">
+        <Button size="icon" aria-label="Next page">
           <HugeiconsIcon icon={ChevronRightIcon} strokeWidth={2} />
         </Button>
       </ButtonGroup>

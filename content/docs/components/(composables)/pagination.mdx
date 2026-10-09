@@ -1,17 +1,24 @@
 ---
 title: Pagination
-description: Navigate through multiple pages of content with numbered controls
+description: Links between the pages of a long list
 type: composable
 builtOn: ["button"]
 ---
 
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/registry/default/pagination/pagination";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/registry/default/pagination/pagination";
 
-Pagination splits long content into numbered pages with previous and next controls. Use it for search results, tables, or any list too long for a single view. It renders links, so wire each `PaginationLink` to your own page state or route.
+Pagination links the pages of a long list, like search results, tables, and feeds. A solid fill marks the current page and glides to the new one when it changes.
 
 ## Preview
 
-<ComponentPreview component="pagination" example="pagination-basic-pagination" />
+<ComponentPreview component="pagination" example="pagination-demo" />
 
 ## Installation
 
@@ -26,66 +33,189 @@ Pagination splits long content into numbered pages with previous and next contro
 ```text
 Pagination
 └── PaginationContent
-    └── PaginationItem
-        ├── PaginationPrevious
-        ├── PaginationLink
-        ├── PaginationEllipsis
-        └── PaginationNext
+    ├── PaginationItem
+    │   ├── PaginationPrevious
+    │   ├── PaginationLink
+    │   ├── PaginationEllipsis
+    │   └── PaginationNext
+    └── PaginationStatus
 ```
 
-Mark the current page with `isActive` on its `PaginationLink`, and use `isDisabled` to gray out unavailable controls.
+Mark the current page with `isActive`, and use `isDisabled` on Previous at the first page and Next at the last.
 
 ## Examples
 
-### Interactive
+### Page Range
 
-Drive the active page from state and update it from each `PaginationLink`.
+Use `getPaginationRange` to get the pages and ellipses to show; it returns the same number of items for every page, so the row keeps its width.
 
-<ComponentPreview component="pagination" example="pagination-interactive-pagination" />
+```tsx
+getPaginationRange({ page: 10, pageCount: 20 });
+// [1, "start-ellipsis", 9, 10, 11, "end-ellipsis", 20]
+```
 
-### With Ellipsis
+Set `siblingCount` for pages beside the current one and `boundaryCount` for pages kept at each end. Both default to `1`.
 
-Use `PaginationEllipsis` to collapse skipped page ranges when there are many pages.
+### Router Links
 
-<ComponentPreview component="pagination" example="pagination-with-ellipsis" />
+Pass `render` to use your router's link, so changing pages doesn't reload the document.
 
-### Minimal
+```tsx
+import Link from "next/link";
 
-Drop the numbered links to leave only `PaginationPrevious` and `PaginationNext`.
+<PaginationLink render={<Link href={`?page=${n}`} />} isActive={n === page}>
+  {n}
+</PaginationLink>;
+```
 
-<ComponentPreview component="pagination" example="pagination-minimal-pagination" />
+### Variants
+
+Use `variant` on `PaginationContent` to pick the shell around the links.
+
+<ComponentPreview component="pagination" example="pagination-variants" />
+
+| Variant   | Description                                       |
+| --------- | ------------------------------------------------- |
+| `outline` | The default. An outline Button's fill and border. |
+| `soft`    | A secondary Button's fill, no edge.               |
+| `ghost`   | No shell.                                         |
+
+### Size
+
+Use `size` on `PaginationContent` to match a Button of the same size.
+
+<ComponentPreview component="pagination" example="pagination-size" />
+
+Set `[--radius:9999px]` for a pill. Recolor the current page with `--pagination-current-bg` and `--pagination-current-fg`.
+
+```tsx
+<PaginationContent className="[--pagination-current-bg:var(--primary)] [--pagination-current-fg:var(--primary-foreground)]">
+```
+
+### Compact
+
+Use `PaginationStatus` between Previous and Next to show the position alone.
+
+<ComponentPreview component="pagination" example="pagination-compact" />
 
 ## Accessibility
 
-The `Pagination` root is a labeled `nav` landmark. `PaginationLink` sets `aria-current="page"` when `isActive`, and `PaginationEllipsis` is hidden from assistive tech with a visually hidden "More pages" label.
+### Landmark and current page
+
+`Pagination` is a `nav` labeled "Pagination", and the current page's link has `aria-current="page"`. In forced-colors mode the current page gets a Highlight border, since the fill disappears.
+
+### Previous and Next
+
+Below the `sm` breakpoint they show only their arrows. Their label stays as the accessible name, so a custom or translated label carries through.
+
+### Disabled links
+
+A disabled link leaves the tab order, blocks its click, and drops its `href`. A router link passed through `render` keeps the `href` it requires, but its click is still blocked.
+
+### Status and motion
+
+`PaginationStatus` is a polite live region, so screen readers announce the new position. With reduced motion, the current-page fill moves without sliding.
 
 ## API Reference
 
-Pagination is a set of custom navigation parts built from plain HTML elements. `PaginationLink` styles itself with `buttonVariants` from [`Button`](/docs/components/button), so all props below are specific to this implementation. Each part also accepts the standard props for its underlying element (`nav`, `ul`, `li`, `a`, or `span`).
+Pagination is a custom component built from plain HTML elements; every prop below is specific to it. Each part also accepts the props of the element it renders (`nav`, `ul`, `li`, `a`, or `span`).
+
+### Utilities
+
+#### getPaginationRange
+
+Takes `{ page, pageCount, siblingCount?, boundaryCount? }` and returns page numbers, `"start-ellipsis"`, and `"end-ellipsis"`. The page clamps to `1..pageCount`. In a Server Component, import it from `pagination/lib/range`, since the pagination module is a client module.
 
 ### Props
 
-#### PaginationLink
+#### PaginationContent
 
-Single page link, rendered as an `a` styled with `buttonVariants`. `PaginationPrevious`, `PaginationNext`, and the numbered links all build on it.
+The list and its shell. Renders a `ul`.
 
 <ApiPropsList>
 
-<ApiProp name="isActive" fullType="boolean" defaultValue="false">
-  Marks the link as the current page. Switches the variant to `outline` and sets `aria-current="page"`.
-</ApiProp>
-
-<ApiProp name="isDisabled" fullType="boolean" defaultValue="false">
-  Disables the link. Removes pointer events, lowers opacity, and sets `aria-disabled`.
+<ApiProp
+  name="variant"
+  fullType='"outline" | "soft" | "ghost"'
+  simpleType="string"
+  defaultValue='"outline"'
+>
+  Shell style. `ghost` draws none.
 </ApiProp>
 
 <ApiProp
   name="size"
-  fullType='"xs" | "sm" | "default" | "lg" | "icon" | "icon_xs" | "icon_sm" | "icon_lg"'
+  fullType='"sm" | "default" | "lg"'
   simpleType="string"
-  defaultValue='"icon"'
+  defaultValue='"default"'
 >
-  Size passed to `buttonVariants`. `PaginationPrevious` and `PaginationNext` override this to `"default"` to fit their label.
+  Outer height, matching `Button`.
 </ApiProp>
 
 </ApiPropsList>
+
+#### PaginationLink
+
+A page link. Renders an `a`. `PaginationPrevious` and `PaginationNext` build on it and take the same props.
+
+<ApiPropsList>
+
+<ApiProp
+  name="render"
+  fullType="ReactElement | ((props, state) => ReactElement)"
+  simpleType="ReactElement"
+>
+  Renders another element in place of the `a`, like a router `Link`. It must
+  render an anchor.
+</ApiProp>
+
+<ApiProp name="isActive" fullType="boolean" defaultValue="false">
+  Marks the current page: the fill moves to it and it gets
+  `aria-current="page"`.
+</ApiProp>
+
+<ApiProp name="isDisabled" fullType="boolean" defaultValue="false">
+  Turns the link off: no `href`, no pointer events, lower opacity,
+  `aria-disabled`, and out of the tab order.
+</ApiProp>
+
+</ApiPropsList>
+
+#### PaginationPrevious / PaginationNext
+
+Links to the previous and next page, with an arrow.
+
+<ApiPropsList>
+
+<ApiProp
+  name="children"
+  fullType="ReactNode"
+  simpleType="node"
+  defaultValue='"Previous" / "Next"'
+>
+  The label and accessible name. Visually hidden below `sm`.
+</ApiProp>
+
+</ApiPropsList>
+
+### Notes
+
+#### PaginationEllipsis
+
+Stands in for skipped pages. Renders a `span` that screen readers announce as "More pages".
+
+#### PaginationStatus
+
+A read-only position, like "Page 3 of 12". Renders an `li` that is a polite live region.
+
+## Upgrading
+
+If you're reinstalling over an earlier version, check these changes:
+
+| Before                                         | Now                                                                                                                                                                           |
+| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Installed as `cubby-ui/pagination.tsx`         | Installs into a `cubby-ui/pagination/` folder with `pagination.css` and `lib/range.ts`. Import from `@/components/ui/cubby-ui/pagination/pagination` and delete the old file. |
+| Bare links, the current page an outline button | A shell (`outline` by default) with a gliding fill. Use `variant="ghost"` for none.                                                                                           |
+| `PaginationLink` took a `size`                 | Set `size` once on `PaginationContent`.                                                                                                                                       |
+| `aria-label="pagination"` on `nav`             | `aria-label="Pagination"`, overridable.                                                                                                                                       |
+| Previous and Next had fixed accessible names   | Their label is the accessible name; it's visually hidden below `sm`.                                                                                                          |

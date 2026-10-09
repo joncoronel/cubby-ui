@@ -12,13 +12,15 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { SparklesIcon } from "@hugeicons/core-free-icons";
 export default function ButtonGroupPopover() {
   return (
-    <ButtonGroup>
+    <ButtonGroup variant="attached">
       <Popover>
         <PopoverTrigger
           render={
             <Button
               variant="outline"
-              leadingIcon={<HugeiconsIcon icon={SparklesIcon}  strokeWidth={2} />}
+              leadingIcon={
+                <HugeiconsIcon icon={SparklesIcon} strokeWidth={2} />
+              }
               aria-label="Open Copilot assistant"
             />
           }
@@ -35,7 +37,11 @@ export default function ButtonGroupPopover() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="task">Task</Label>
-              <Input id="task" variant="elevated" placeholder="E.g., Write a blog post about..." />
+              <Input
+                id="task"
+                variant="elevated"
+                placeholder="E.g., Write a blog post about..."
+              />
             </div>
           </div>
         </PopoverContent>

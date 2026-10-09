@@ -1,0 +1,286 @@
+/* -------------------------------------------------------------------------------------------------
+ * Gliding highlight, in CSS anchor positioning.
+ *
+ * The lit button (hover, focus, press, open menu) takes the anchor name and
+ * the shared pill follows it. Without anchor positioning and anchor-scope,
+ * each button paints its own hover instead.
+ * -------------------------------------------------------------------------------------------------*/
+
+[data-slot="button-group-highlight"] {
+  display: none;
+}
+
+/* Hit areas: buttons reach over half of a separator's ~5px, so the pill
+ * never drops mid-glide. A select's hidden form input is stepped over. */
+[data-glide] > :is(button, a[href], [role="button"]) {
+  position: relative;
+}
+
+[data-glide]
+  > :is(button, a[href], [role="button"]):has(
+    + [data-slot="button-group-separator"],
+    + input[aria-hidden="true"] + [data-slot="button-group-separator"]
+  )::after,
+[data-glide]
+  > [data-slot="button-group-separator"]
+  + :is(button, a[href], [role="button"])::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+}
+
+[data-glide][data-orientation="horizontal"]
+  > :is(button, a[href], [role="button"]):has(
+    + [data-slot="button-group-separator"],
+    + input[aria-hidden="true"] + [data-slot="button-group-separator"]
+  )::after {
+  inset-inline-end: -5px;
+}
+
+[data-glide][data-orientation="horizontal"]
+  > [data-slot="button-group-separator"]
+  + :is(button, a[href], [role="button"])::after {
+  inset-inline-start: -5px;
+}
+
+[data-glide][data-orientation="vertical"]
+  > :is(button, a[href], [role="button"]):has(
+    + [data-slot="button-group-separator"],
+    + input[aria-hidden="true"] + [data-slot="button-group-separator"]
+  )::after {
+  inset-block-end: -5px;
+}
+
+[data-glide][data-orientation="vertical"]
+  > [data-slot="button-group-separator"]
+  + :is(button, a[href], [role="button"])::after {
+  inset-block-start: -5px;
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Quiet fields.
+ *
+ * Inputs and select triggers drop their border and fill and take the
+ * buttons' size. The pill glides onto a select trigger; an input lights in
+ * place.
+ * -------------------------------------------------------------------------------------------------*/
+
+[data-slot="button-group"]:not([data-variant="attached"])
+  > :is([data-slot="input"], [data-slot="select-trigger"]) {
+  height: auto;
+  align-self: stretch;
+  /* The buttons' 2px border, fill inside it. */
+  border-width: 2px;
+  border-color: transparent;
+  border-radius: calc(var(--group-item-radius) + 2px);
+  background-color: transparent;
+  background-clip: padding-box;
+  box-shadow: none;
+}
+
+[data-slot="button-group"]:not([data-variant="attached"])
+  > [data-slot="input"] {
+  padding-inline: 0.625rem;
+  color: inherit;
+  transition-property:
+    background-color, outline-width, outline-offset, outline-color;
+}
+
+/* Focus ring 2px off the fill, as on the buttons. */
+[data-slot="button-group"]:not([data-variant="attached"])
+  > :is([data-slot="input"], [data-slot="select-trigger"]):focus-visible {
+  outline-offset: 0;
+}
+
+/* Hover is gated to real hover: a raw :hover sticks after a tap. */
+[data-slot="button-group"]:not([data-variant="attached"])
+  > [data-slot="input"]:focus {
+  background-color: var(--group-highlight);
+}
+
+/* Select triggers paint their own hover and open state, like the buttons;
+ * the @supports block turns it off where the pill glides. */
+[data-slot="button-group"]:not([data-variant="attached"])
+  > [data-slot="select-trigger"][data-popup-open] {
+  background-color: var(--group-highlight);
+}
+
+@media (hover: hover) {
+  [data-slot="button-group"]:not([data-variant="attached"])
+    > :is([data-slot="input"], [data-slot="select-trigger"]):hover {
+    background-color: var(--group-highlight);
+  }
+}
+
+/* All anchor features or none: a partial implementation leaves the pill
+ * unplaced or tied to another group. */
+@supports (anchor-name: --button-group-item) and
+  (anchor-scope: --button-group-item) and (inset: anchor(inside)) {
+  [data-glide] {
+    anchor-scope: --button-group-item;
+  }
+
+  /* The pill stands in for hover. */
+  [data-glide] > :is(button, a[href], [role="button"]):not([data-variant]) {
+    --btn-bg-hover: transparent;
+    --btn-bg-active: transparent;
+  }
+
+  /* Matches the specificity of the select rules above. */
+  [data-slot="button-group"][data-glide]:not([data-variant="attached"])
+    > [data-slot="select-trigger"]:is(:hover, [data-popup-open]) {
+    background-color: transparent;
+  }
+
+  /* Hover is gated to real hover (:active covers taps). An open menu or a
+   * held button keeps the pill, or a pointer drifting mid-press would light
+   * two buttons and the pill would dart between them. */
+  [data-glide]
+    > :is(button, a[href], [role="button"]):not(:disabled, [data-disabled]):is(
+      :focus-visible,
+      :active,
+      [data-popup-open]
+    ) {
+    anchor-name: --button-group-item;
+  }
+
+  @media (hover: hover) {
+    [data-glide]:not(:has(> [data-popup-open], > :active))
+      > :is(button, a[href], [role="button"]):not(
+        :disabled,
+        [data-disabled]
+      ):hover {
+      anchor-name: --button-group-item;
+    }
+  }
+
+  /* Leaving the group, the last button holds the anchor while the pill fades,
+   * so it fades in place instead of collapsing. */
+  [data-glide]:not(
+      :has(
+        > :is(button, a[href], [role="button"]):not(
+            :disabled,
+            [data-disabled]
+          ):is(:hover, :focus-visible, :active, [data-popup-open])
+      )
+    )
+    > :is(button, a[href], [role="button"]) {
+    /* Button's own transitions (button.tsx), restated so they survive. */
+    transition:
+      outline-width 100ms ease-out,
+      outline-offset 100ms ease-out,
+      outline-color 100ms ease-out,
+      opacity 100ms ease-out,
+      color 100ms ease-out,
+      anchor-name 0s 80ms allow-discrete;
+  }
+
+  [data-glide] > [data-slot="button-group-highlight"] {
+    display: block;
+    position: absolute;
+    position-anchor: --button-group-item;
+    inset: anchor(inside);
+    /* The anchor is the button's border box; the same 2px border lines the
+     * fill up with the button's paint. */
+    border: 2px solid transparent;
+    border-radius: calc(var(--group-item-radius) + 2px);
+    background: var(--group-highlight) padding-box;
+    /* Rendered last, so it sits under the buttons inside the isolated group. */
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0;
+    scale: 0.96;
+    /* Entering from no anchor can't interpolate, so the pill appears in
+     * place and only fades and grows. */
+    transition:
+      inset 80ms var(--ease-out-expo, cubic-bezier(0.19, 1, 0.22, 1)),
+      opacity 80ms ease-out,
+      scale 80ms ease-out,
+      background-color 80ms ease-out;
+  }
+
+  [data-glide]:has(
+      > :is(button, a[href], [role="button"]):not(
+          :disabled,
+          [data-disabled]
+        ):is(:focus-visible, :active, [data-popup-open])
+    )
+    > [data-slot="button-group-highlight"] {
+    opacity: 1;
+    scale: 1;
+  }
+
+  @media (hover: hover) {
+    [data-glide]:has(
+        > :is(button, a[href], [role="button"]):not(
+            :disabled,
+            [data-disabled]
+          ):hover
+      )
+      > [data-slot="button-group-highlight"] {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+
+  /* Press, as on Button. Menu triggers skip it. */
+  [data-glide]:has(
+      > :is(button, a[href], [role="button"]):active:not(
+          [aria-haspopup],
+          :disabled
+        )
+    )
+    > [data-slot="button-group-highlight"] {
+    scale: var(--group-press-scale, 0.98);
+    background-color: var(--group-press);
+  }
+
+  /* Separators beside the pill hide. */
+  [data-glide]
+    > :is(button, a[href], [role="button"]):not(:disabled, [data-disabled]):is(
+      :focus-visible,
+      :active,
+      [data-popup-open]
+    )
+    + [data-slot="button-group-separator"],
+  [data-glide]
+    > [data-slot="button-group-separator"]:has(
+      + :is(button, a[href], [role="button"]):not(
+          :disabled,
+          [data-disabled]
+        ):is(:focus-visible, :active, [data-popup-open])
+    ) {
+    opacity: 0;
+  }
+
+  @media (hover: hover) {
+    [data-glide]
+      > :is(button, a[href], [role="button"]):not(
+        :disabled,
+        [data-disabled]
+      ):hover
+      + [data-slot="button-group-separator"],
+    [data-glide]
+      > [data-slot="button-group-separator"]:has(
+        + :is(button, a[href], [role="button"]):not(
+            :disabled,
+            [data-disabled]
+          ):hover
+      ) {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-glide] {
+      --group-press-scale: 1;
+    }
+
+    [data-glide] > [data-slot="button-group-highlight"] {
+      scale: 1;
+      transition:
+        opacity 80ms ease-out,
+        background-color 80ms ease-out;
+    }
+  }
+}

@@ -1,41 +1,43 @@
-"use client";
-
-import * as React from "react";
 import { Button } from "@/registry/default/button/button";
 import {
   ButtonGroup,
+  ButtonGroupSeparator,
   ButtonGroupText,
 } from "@/registry/default/button-group/button-group";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ChevronLeftIcon, ChevronRightIcon } from "@hugeicons/core-free-icons";
+import {
+  Archive02Icon,
+  Cancel01Icon,
+  Delete02Icon,
+  FolderTransferIcon,
+  Tag01Icon,
+} from "@hugeicons/core-free-icons";
 
 export default function ButtonGroupTextExample() {
-  const [page, setPage] = React.useState(1);
-  const totalPages = 24;
-
   return (
-    <ButtonGroup>
-      <Button
-        variant="outline"
-        size="icon"
-        aria-label="Previous page"
-        disabled={page <= 1}
-        onClick={() => setPage((p) => Math.max(1, p - 1))}
-      >
-        <HugeiconsIcon icon={ChevronLeftIcon} strokeWidth={2} />
+    <ButtonGroup
+      variant="elevated"
+      aria-label="Selected files"
+      className="[--radius:9999px]"
+    >
+      <ButtonGroupText>3 selected</ButtonGroupText>
+      <ButtonGroupSeparator />
+      <Button size="icon" aria-label="Move">
+        <HugeiconsIcon icon={FolderTransferIcon} strokeWidth={2} />
       </Button>
-      <ButtonGroupText>
-        Page {page} of {totalPages}
-      </ButtonGroupText>
-      <Button
-        variant="outline"
-        size="icon"
-        aria-label="Next page"
-        disabled={page >= totalPages}
-        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-      >
-        <HugeiconsIcon icon={ChevronRightIcon} strokeWidth={2} />
+      <Button size="icon" aria-label="Add label">
+        <HugeiconsIcon icon={Tag01Icon} strokeWidth={2} />
+      </Button>
+      <Button size="icon" aria-label="Archive">
+        <HugeiconsIcon icon={Archive02Icon} strokeWidth={2} />
+      </Button>
+      <Button size="icon" aria-label="Delete">
+        <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />
+      </Button>
+      <ButtonGroupSeparator />
+      <Button size="icon" aria-label="Clear selection">
+        <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} />
       </Button>
     </ButtonGroup>
   );

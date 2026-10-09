@@ -1,116 +1,66 @@
-"use client";
-
-import * as React from "react";
 import { Button } from "@/registry/default/button/button";
-import { ButtonGroup } from "@/registry/default/button-group/button-group";
+import {
+  ButtonGroup,
+  ButtonGroupSeparator,
+} from "@/registry/default/button-group/button-group";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/registry/default/dropdown-menu/dropdown-menu";
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  ArchiveIcon,
-  CalendarAdd01Icon,
-  ChevronLeftIcon,
-  Clock01Icon,
+  Archive02Icon,
+  ChevronDownIcon,
+  Copy01Icon,
   Delete02Icon,
-  FilterIcon,
-  MailValidation01Icon,
-  MoreHorizontalIcon,
-  Tag01Icon,
+  Edit02Icon,
+  Link04Icon,
+  PinIcon,
 } from "@hugeicons/core-free-icons";
-export default function ButtonGroupDemo() {
-  const [label, setLabel] = React.useState("personal");
 
+export default function ButtonGroupDemo() {
   return (
-    <ButtonGroup>
-      <ButtonGroup className="hidden sm:flex">
-        <Button variant="outline" size="icon" aria-label="Go Back">
-          <HugeiconsIcon icon={ChevronLeftIcon} strokeWidth={2} />
-        </Button>
-      </ButtonGroup>
-      <ButtonGroup>
-        <Button variant="outline">Archive</Button>
-        <Button variant="outline">Report</Button>
-      </ButtonGroup>
-      <ButtonGroup>
-        <Button variant="outline">Snooze</Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <Button variant="outline" size="icon" aria-label="More Options">
-                <HugeiconsIcon icon={MoreHorizontalIcon} strokeWidth={2} />
-              </Button>
-            }
-          />
-          <DropdownMenuContent align="end" className="w-52">
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <HugeiconsIcon icon={MailValidation01Icon} strokeWidth={2} />
-                Mark as Read
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <HugeiconsIcon icon={ArchiveIcon} strokeWidth={2} />
-                Archive
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <HugeiconsIcon icon={Clock01Icon} strokeWidth={2} />
-                Snooze
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <HugeiconsIcon icon={CalendarAdd01Icon} strokeWidth={2} />
-                Add to Calendar
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <HugeiconsIcon icon={FilterIcon} strokeWidth={2} />
-                Add to List
-              </DropdownMenuItem>
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
-                  <HugeiconsIcon icon={Tag01Icon} strokeWidth={2} />
-                  Label As...
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent>
-                  <DropdownMenuRadioGroup
-                    value={label}
-                    onValueChange={setLabel}
-                  >
-                    <DropdownMenuRadioItem value="personal">
-                      Personal
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="work">
-                      Work
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="other">
-                      Other
-                    </DropdownMenuRadioItem>
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem variant="destructive">
-                <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />
-                Trash
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </ButtonGroup>
+    <ButtonGroup aria-label="File actions" className="[--radius:9999px]">
+      <Button leadingIcon={<HugeiconsIcon icon={Link04Icon} strokeWidth={2} />}>
+        Share
+      </Button>
+      <ButtonGroupSeparator />
+      <Button leadingIcon={<HugeiconsIcon icon={Copy01Icon} strokeWidth={2} />}>
+        Duplicate
+      </Button>
+      <ButtonGroupSeparator />
+      <Button
+        leadingIcon={<HugeiconsIcon icon={Archive02Icon} strokeWidth={2} />}
+      >
+        Archive
+      </Button>
+      <ButtonGroupSeparator />
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={<Button size="icon" aria-label="More actions" />}
+        >
+          <HugeiconsIcon icon={ChevronDownIcon} strokeWidth={2} />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-44">
+          <DropdownMenuItem>
+            <HugeiconsIcon icon={Edit02Icon} strokeWidth={2} />
+            Rename
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <HugeiconsIcon icon={PinIcon} strokeWidth={2} />
+            Pin to top
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem variant="destructive">
+            <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </ButtonGroup>
   );
 }

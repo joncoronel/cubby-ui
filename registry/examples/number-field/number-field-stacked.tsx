@@ -16,7 +16,7 @@ export default function NumberFieldStacked() {
     <NumberField id={id} defaultValue={100}>
       <Label htmlFor={id}>Amount</Label>
       <NumberFieldGroup>
-        <NumberFieldInput />
+        <NumberFieldInput className="w-20" />
         <NumberFieldStepper />
       </NumberFieldGroup>
     </NumberField>

@@ -2,36 +2,30 @@ import { Button } from "@/registry/default/button/button";
 import { ButtonGroup } from "@/registry/default/button-group/button-group";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import { MinusSignIcon, PlusSignIcon } from "@hugeicons/core-free-icons";
+import {
+  TextBoldIcon,
+  TextItalicIcon,
+  TextUnderlineIcon,
+} from "@hugeicons/core-free-icons";
+
+const SIZES = ["sm", "default", "lg"] as const;
+
 export default function ButtonGroupSize() {
   return (
-    <div className="flex flex-col items-start gap-4">
-      <ButtonGroup>
-        <Button variant="outline" size="icon_sm" aria-label="Decrease">
-          <HugeiconsIcon icon={MinusSignIcon} className="size-3.5"  strokeWidth={2} />
-        </Button>
-        <Button variant="outline" size="icon_sm" aria-label="Increase">
-          <HugeiconsIcon icon={PlusSignIcon} className="size-3.5"  strokeWidth={2} />
-        </Button>
-      </ButtonGroup>
-
-      <ButtonGroup>
-        <Button variant="outline" size="icon" aria-label="Decrease">
-          <HugeiconsIcon icon={MinusSignIcon}  strokeWidth={2} />
-        </Button>
-        <Button variant="outline" size="icon" aria-label="Increase">
-          <HugeiconsIcon icon={PlusSignIcon}  strokeWidth={2} />
-        </Button>
-      </ButtonGroup>
-
-      <ButtonGroup>
-        <Button variant="outline" size="icon_lg" aria-label="Decrease">
-          <HugeiconsIcon icon={MinusSignIcon} className="size-5"  strokeWidth={2} />
-        </Button>
-        <Button variant="outline" size="icon_lg" aria-label="Increase">
-          <HugeiconsIcon icon={PlusSignIcon} className="size-5"  strokeWidth={2} />
-        </Button>
-      </ButtonGroup>
+    <div className="flex flex-col items-center gap-4">
+      {SIZES.map((size) => (
+        <ButtonGroup key={size} size={size} aria-label="Text style">
+          <Button size="icon" aria-label="Bold">
+            <HugeiconsIcon icon={TextBoldIcon} strokeWidth={2} />
+          </Button>
+          <Button size="icon" aria-label="Italic">
+            <HugeiconsIcon icon={TextItalicIcon} strokeWidth={2} />
+          </Button>
+          <Button size="icon" aria-label="Underline">
+            <HugeiconsIcon icon={TextUnderlineIcon} strokeWidth={2} />
+          </Button>
+        </ButtonGroup>
+      ))}
     </div>
   );
 }

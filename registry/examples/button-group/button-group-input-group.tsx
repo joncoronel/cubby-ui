@@ -22,13 +22,13 @@ export default function ButtonGroupInputGroup() {
   const [voiceEnabled, setVoiceEnabled] = React.useState(false);
 
   return (
-    <ButtonGroup className="[--radius:9999rem]">
-      <ButtonGroup>
-        <Button variant="outline" size="icon">
-          <HugeiconsIcon icon={PlusSignIcon}  strokeWidth={2} />
+    <ButtonGroup variant="attached" className="[--radius:9999rem]">
+      <ButtonGroup variant="attached">
+        <Button variant="outline" size="icon" aria-label="Add attachment">
+          <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />
         </Button>
       </ButtonGroup>
-      <ButtonGroup>
+      <ButtonGroup variant="attached">
         <InputGroup>
           <InputGroupInput
             placeholder={
@@ -47,7 +47,7 @@ export default function ButtonGroupInputGroup() {
                     className="data-[active=true]:bg-orange-100 data-[active=true]:text-orange-700 dark:data-[active=true]:bg-orange-800 dark:data-[active=true]:text-orange-100"
                     aria-pressed={voiceEnabled}
                   >
-                    <HugeiconsIcon icon={AudioWave02Icon}  strokeWidth={2} />
+                    <HugeiconsIcon icon={AudioWave02Icon} strokeWidth={2} />
                   </InputGroupButton>
                 }
               />

@@ -1,5 +1,8 @@
 import { Button } from "@/registry/default/button/button";
-import { ButtonGroup } from "@/registry/default/button-group/button-group";
+import {
+  ButtonGroup,
+  ButtonGroupSeparator,
+} from "@/registry/default/button-group/button-group";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,35 +13,32 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ChevronDownIcon,
-  NotificationOff03Icon,
-  UserAdd01Icon,
-  ViewOffIcon,
+  Clock01Icon,
+  FloppyDiskIcon,
+  GlobeIcon,
 } from "@hugeicons/core-free-icons";
+
 export default function ButtonGroupDropdown() {
   return (
-    <ButtonGroup>
-      <Button
-        leadingIcon={<HugeiconsIcon icon={UserAdd01Icon} strokeWidth={2} />}
-        variant="outline"
-      >
-        Follow
+    <ButtonGroup variant="solid" aria-label="Publish">
+      <Button leadingIcon={<HugeiconsIcon icon={GlobeIcon} strokeWidth={2} />}>
+        Publish
       </Button>
+      <ButtonGroupSeparator />
       <DropdownMenu>
         <DropdownMenuTrigger
-          render={
-            <Button size="icon" aria-label="More options" variant="outline" />
-          }
+          render={<Button size="icon" aria-label="More publish options" />}
         >
           <HugeiconsIcon icon={ChevronDownIcon} strokeWidth={2} />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem>
-            <HugeiconsIcon icon={NotificationOff03Icon} strokeWidth={2} />
-            Mute conversation
+            <HugeiconsIcon icon={Clock01Icon} strokeWidth={2} />
+            Schedule
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <HugeiconsIcon icon={ViewOffIcon} strokeWidth={2} />
-            Hide conversation
+            <HugeiconsIcon icon={FloppyDiskIcon} strokeWidth={2} />
+            Save as draft
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

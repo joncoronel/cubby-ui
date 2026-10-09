@@ -1,6 +1,6 @@
 ---
 title: Number Field
-description: Numeric input with increment and decrement buttons and optional scrub area
+description: A numeric input you can type into, step, or drag
 type: primitive
 ---
 
@@ -15,7 +15,9 @@ import {
   NumberFieldScrubAreaCursor,
 } from "@/registry/default/number-field/number-field";
 
-A number field is a numeric input with increment and decrement buttons and an optional scrub area for dragging the value. Use it for bounded, steppable quantities like counts, prices, or percentages, where the value should stay numeric.
+A number field holds a value you can type, step with buttons or arrow keys, or drag. Use it for bounded quantities like counts, prices, and percentages.
+
+For a read-only value between buttons, use [`ButtonGroupText`](/docs/components/button-group#with-text).
 
 ## Preview
 
@@ -33,16 +35,17 @@ A number field is a numeric input with increment and decrement buttons and an op
 
 ```text
 NumberField
+├── NumberFieldScrubArea
+│   └── NumberFieldScrubAreaCursor
 └── NumberFieldGroup
     ├── NumberFieldDecrement
     ├── NumberFieldInput
     ├── NumberFieldIncrement
     ├── NumberFieldStepper
     └── NumberFieldScrubArea
-        └── NumberFieldScrubAreaCursor
 ```
 
-`NumberFieldStepper` is an alternative to the separate `NumberFieldDecrement` / `NumberFieldIncrement`, stacking both on the right edge.
+`NumberFieldStepper` replaces `NumberFieldDecrement` and `NumberFieldIncrement` with stacked chevrons on the trailing edge.
 
 ## Examples
 
@@ -52,68 +55,99 @@ Use `value` and `onValueChange` on `NumberField` to drive the value yourself.
 
 <ComponentPreview component="number-field" example="number-field-controlled" />
 
-### Min / Max
+### Min and Max
 
-Set `min` and `max` on `NumberField` to constrain the value to a range.
+Set `min` and `max` to keep the value in a range; each stepper turns off at its limit.
 
 <ComponentPreview component="number-field" example="number-field-min-max" />
 
-### Formatted Display
+### Format
 
-Pass `format` (an `Intl.NumberFormat` options object) to display the value as currency, a percentage, or another number format.
+Pass `format`, an `Intl.NumberFormat` options object, to show currency, a percentage, or a unit.
 
 <ComponentPreview component="number-field" example="number-field-format" />
 
-### Stacked steppers
+### Size
 
-Use `NumberFieldStepper` for a vertically-stacked increment/decrement cluster on the right, the styled equivalent of a native number spinner. The group detects the stepper and caps the input's left edge automatically.
+Use `size` on `NumberFieldGroup` to match an `Input` of the same size.
+
+<ComponentPreview component="number-field" example="number-field-size" />
+
+Set `[--radius:9999px]` on the group for a pill; the steppers' corners follow.
+
+```tsx
+<NumberFieldGroup className="[--radius:9999px]">…</NumberFieldGroup>
+```
+
+### Stacked Stepper
+
+Use `NumberFieldStepper` for an increment over decrement, like a native number spinner.
 
 <ComponentPreview component="number-field" example="number-field-stacked" />
 
 ### Scrub Area
 
-Wrap a label in `NumberFieldScrubArea` to let the user drag horizontally to change the value.
+Wrap a label in `NumberFieldScrubArea` to change the value by dragging sideways.
 
 <ComponentPreview component="number-field" example="number-field-scrub-area" />
 
+### Inline Scrub
+
+Put `NumberFieldScrubArea` inside the group for a draggable prefix, like a design tool's width field.
+
+<ComponentPreview
+  component="number-field"
+  example="number-field-scrub-inline"
+/>
+
 ### Disabled
 
-Set `disabled` on `NumberField` to prevent interaction.
+Set `disabled` on `NumberField` to turn off typing and stepping.
 
 <ComponentPreview component="number-field" example="number-field-disabled" />
 
-### Elevated Variant
+### Elevated
 
-On a Card, Dialog, or popover surface, the opaque `default` group collapses into its parent. Use `variant="elevated"` on `NumberFieldGroup` for a translucent overlay that adapts to the substrate. See the [Surfaces](/docs/getting-started/surfaces) docs.
+Use `variant="elevated"` on `NumberFieldGroup` inside a Card, Dialog, or popover; see [Surfaces](/docs/getting-started/surfaces).
 
 <ComponentPreview component="number-field" example="number-field-elevated" />
 
-| Variant    | Description                                                  |
-| ---------- | ----------------------------------------------------------- |
-| `default`  | Opaque `bg-input` group for page-level surfaces.            |
-| `elevated` | Translucent group for use inside Card, Dialog, or popover.  |
+| Variant    | Description                                        |
+| ---------- | -------------------------------------------------- |
+| `default`  | Opaque fill for the page.                          |
+| `elevated` | Translucent fill for Cards, Dialogs, and popovers. |
 
 ### Form Integration
 
-Use [Field](/docs/components/field) for labeling and form participation. See the [Forms guide](/docs/getting-started/forms) for more patterns.
+Use [Field](/docs/components/field) for the label, validation, and form submission; see the [Forms guide](/docs/getting-started/forms).
 
 <ComponentPreview component="number-field" example="number-field-field" />
 
+## Accessibility
+
+### Keyboard
+
+The input is a `spinbutton`. Arrow keys step by `step`, Shift+arrow by `largeStep`, and Alt+arrow by `smallStep`. Home and End jump to `min` and `max`.
+
+### Steppers
+
+The steppers stay out of the tab order, since the arrow keys already step the value. Their labels are "Decrease" and "Increase"; localize them with `aria-label`, or with `incrementProps` and `decrementProps` on `NumberFieldStepper`.
+
+### Labels
+
+Label the field with `Label` or `FieldLabel`. With an inline scrub prefix, give the input its own `aria-label`, since the prefix is only a symbol.
+
 ## API Reference
 
-The Number Field component is built on top of [Base UI's Number Field](https://base-ui.com/react/components/number-field). All Base UI props are supported. The documentation below only covers the sub-components available.
+The Number Field is built on top of [Base UI's Number Field](https://base-ui.com/react/components/number-field). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
 
 For the complete Base UI API, see the [Base UI Number Field documentation](https://base-ui.com/react/components/number-field).
 
-### Sub-components
-
-#### NumberField
-
-Groups all parts and manages state. Renders a `<div>` element. Accepts `defaultValue`, `value`, `onValueChange`, `min`, `max`, `step`, `format`, `name`, `required`, `disabled`, `readOnly`, and all other Base UI Number Field Root props.
+### Props
 
 #### NumberFieldGroup
 
-Groups the input with increment and decrement buttons. Renders a `<div>` element. The group carries the field's surface (background, shadow, border) so the `[-][input][+]` cluster reads as a single lifted element.
+The shell around the input and steppers. Wraps Base UI's `NumberField.Group`.
 
 <ApiPropsList>
 
@@ -123,31 +157,93 @@ Groups the input with increment and decrement buttons. Renders a `<div>` element
   simpleType="string"
   defaultValue='"default"'
 >
-  Surface appearance of the group. `default` uses opaque `bg-input` + soft `shadow-input` in light mode. `elevated` uses translucent `bg-input-elevated` for use inside Card, Dialog, or popover surfaces. See the [Surfaces](/docs/getting-started/surfaces) docs.
+  Fill of the shell. Use `elevated` on Cards, Dialogs, and popovers.
+</ApiProp>
+
+<ApiProp
+  name="size"
+  fullType='"default" | "sm"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Outer height, matching `Input`.
 </ApiProp>
 
 </ApiPropsList>
 
-#### NumberFieldInput
+#### NumberFieldDecrement / NumberFieldIncrement
 
-The numeric input control. Renders an `<input>` element. Inherits its surface from `NumberFieldGroup`, with no `variant` prop of its own.
+Step the value down and up. Wrap Base UI's `NumberField.Decrement` and `NumberField.Increment`.
 
-#### NumberFieldIncrement
+<ApiPropsList>
 
-Button that increases the value when clicked. Renders a `<button>` element.
+<ApiProp name="children" fullType="ReactNode" simpleType="node">
+  The icon. Defaults to a minus or plus icon.
+</ApiProp>
 
-#### NumberFieldDecrement
+<ApiProp
+  name="aria-label"
+  fullType="string"
+  defaultValue='"Decrease" / "Increase"'
+>
+  Accessible name of the button.
+</ApiProp>
 
-Button that decreases the value when clicked. Renders a `<button>` element.
+</ApiPropsList>
 
 #### NumberFieldStepper
 
-A vertically-stacked increment (top) and decrement (bottom) cluster for the group's right edge, with built-in chevron icons. Renders a `<div>` wrapping Base UI's `Increment` and `Decrement`. `NumberFieldGroup` detects it and rounds/borders the input's left edge automatically.
+Stacked increment and decrement chevrons for the trailing edge. Renders a `div` around Base UI's `NumberField.Increment` and `NumberField.Decrement`; other props go to the `div`.
 
-#### NumberFieldScrubArea
+<ApiPropsList>
 
-An interactive area where the user can click and drag to change the value. Renders a `<span>` element.
+<ApiProp
+  name="incrementProps"
+  fullType="NumberField.Increment.Props"
+  simpleType="object"
+>
+  Props for the increment button, like a localized `aria-label`.
+</ApiProp>
+
+<ApiProp
+  name="decrementProps"
+  fullType="NumberField.Decrement.Props"
+  simpleType="object"
+>
+  Props for the decrement button, like a localized `aria-label`.
+</ApiProp>
+
+</ApiPropsList>
 
 #### NumberFieldScrubAreaCursor
 
-A custom cursor element displayed while scrubbing. Renders a `<span>` element.
+Replaces the pointer while scrubbing. Wraps Base UI's `NumberField.ScrubAreaCursor`.
+
+<ApiPropsList>
+
+<ApiProp name="children" fullType="ReactNode" simpleType="node">
+  The cursor graphic. Defaults to a two-way arrow.
+</ApiProp>
+
+</ApiPropsList>
+
+### Notes
+
+#### NumberFieldInput
+
+Wraps Base UI's `NumberField.Input`. The value uses tabular numerals, centered between steppers or left-aligned after an inline scrub prefix. Set the width with `className`, like `className="w-24"` for currency.
+
+#### NumberFieldScrubArea
+
+Wraps Base UI's `NumberField.ScrubArea`. Outside the group it wraps a label; inside it, it renders as a quiet prefix.
+
+## Upgrading
+
+If you're reinstalling over an earlier version, check these changes:
+
+| Before                                            | Now                                                                        |
+| ------------------------------------------------- | -------------------------------------------------------------------------- |
+| Bordered input fused between bordered buttons     | One shell with the input and steppers inside. Remove any per-part borders. |
+| Steppers needed an icon child                     | Minus and plus by default. Existing icon children still work.              |
+| `NumberFieldScrubAreaCursor` needed an icon child | A two-way arrow by default.                                                |
+| `NumberFieldInput` was `w-24`                     | `w-16`. Pass a width for formatted values, like `className="w-24"`.        |

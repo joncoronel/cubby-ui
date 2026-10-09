@@ -1,0 +1,73 @@
+/* -------------------------------------------------------------------------------------------------
+ * Gliding current page, in CSS anchor positioning.
+ *
+ * The current link takes the anchor name and the shared fill follows it.
+ * Without anchor positioning and anchor-scope, the current link paints its
+ * own fill instead.
+ * -------------------------------------------------------------------------------------------------*/
+
+[data-slot="pagination-indicator"] {
+  display: none;
+}
+
+/* Links don't transition (see pagination.tsx); labels fade instead. */
+[data-slot="pagination-link-label"] {
+  transition: color 100ms ease-out;
+}
+
+/* All anchor features or none: a partial implementation leaves the fill
+ * unplaced or tied to another list. */
+@supports (anchor-name: --pagination-current) and
+  (anchor-scope: --pagination-current) and (inset: anchor(inside)) {
+  [data-slot="pagination-content"] {
+    anchor-scope: --pagination-current;
+  }
+
+  [data-slot="pagination-link"][aria-current="page"] {
+    anchor-name: --pagination-current;
+    --btn-bg: transparent;
+    --btn-bg-hover: transparent;
+    --btn-bg-active: transparent;
+  }
+
+  /* The new label waits for the fill so it never sits light on the shell. */
+  [data-slot="pagination-link"][aria-current="page"]
+    > [data-slot="pagination-link-label"] {
+    transition-delay: 70ms;
+  }
+
+  [data-slot="pagination-indicator"] {
+    display: block;
+    position: absolute;
+    position-anchor: --pagination-current;
+    inset: anchor(inside);
+    /* The anchor is the link's border box; the same 2px border lines the
+     * fill up with the link's paint. */
+    border: 2px solid transparent;
+    border-radius: calc(var(--pagination-item-radius) + 2px);
+    background: var(--pagination-current-bg) padding-box;
+    z-index: -1;
+    pointer-events: none;
+    /* On first paint the anchor can't interpolate, so the fill starts in
+     * place. */
+    transition: inset 200ms var(--ease-out-expo, cubic-bezier(0.19, 1, 0.22, 1));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-slot="pagination-indicator"] {
+      transition: none;
+    }
+
+    [data-slot="pagination-link"][aria-current="page"]
+      > [data-slot="pagination-link-label"] {
+      transition-delay: 0s;
+    }
+  }
+}
+
+/* Forced colors drop the fill, so the current page gets a Highlight border. */
+@media (forced-colors: active) {
+  [data-slot="pagination-link"][aria-current="page"] {
+    border-color: Highlight;
+  }
+}

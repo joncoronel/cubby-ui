@@ -10,22 +10,16 @@ import {
   NumberFieldInput,
 } from "@/registry/default/number-field/number-field";
 
-import { HugeiconsIcon } from "@hugeicons/react";
-import { MinusSignIcon, PlusSignIcon } from "@hugeicons/core-free-icons";
 export default function NumberFieldDemo() {
   const id = React.useId();
 
   return (
-    <NumberField id={id} defaultValue={100}>
-      <Label htmlFor={id}>Amount</Label>
+    <NumberField id={id} defaultValue={2} min={1}>
+      <Label htmlFor={id}>Guests</Label>
       <NumberFieldGroup>
-        <NumberFieldDecrement>
-          <HugeiconsIcon icon={MinusSignIcon} className="size-4"  strokeWidth={2} />
-        </NumberFieldDecrement>
+        <NumberFieldDecrement />
         <NumberFieldInput />
-        <NumberFieldIncrement>
-          <HugeiconsIcon icon={PlusSignIcon} className="size-4"  strokeWidth={2} />
-        </NumberFieldIncrement>
+        <NumberFieldIncrement />
       </NumberFieldGroup>
     </NumberField>
   );

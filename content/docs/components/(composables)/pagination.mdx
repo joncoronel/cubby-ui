@@ -212,9 +212,10 @@ A read-only position, like "Page 3 of 12". Renders an `li` that is a polite live
 
 If you're reinstalling over an earlier version, check these changes:
 
-| Before                                         | Now                                                                                 |
-| ---------------------------------------------- | ----------------------------------------------------------------------------------- |
-| Bare links, the current page an outline button | A shell (`outline` by default) with a gliding fill. Use `variant="ghost"` for none. |
-| `PaginationLink` took a `size`                 | Set `size` once on `PaginationContent`.                                             |
-| `aria-label="pagination"` on `nav`             | `aria-label="Pagination"`, overridable.                                             |
-| Previous and Next had fixed accessible names   | Their label is the accessible name; it's visually hidden below `sm`.                |
+| Before                                         | Now                                                                                                                                                                           |
+| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Installed as `cubby-ui/pagination.tsx`         | Installs into a `cubby-ui/pagination/` folder with `pagination.css` and `lib/range.ts`. Import from `@/components/ui/cubby-ui/pagination/pagination` and delete the old file. |
+| Bare links, the current page an outline button | A shell (`outline` by default) with a gliding fill. Use `variant="ghost"` for none.                                                                                           |
+| `PaginationLink` took a `size`                 | Set `size` once on `PaginationContent`.                                                                                                                                       |
+| `aria-label="pagination"` on `nav`             | `aria-label="Pagination"`, overridable.                                                                                                                                       |
+| Previous and Next had fixed accessible names   | Their label is the accessible name; it's visually hidden below `sm`.                                                                                                          |

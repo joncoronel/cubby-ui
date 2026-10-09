@@ -90,8 +90,10 @@ const trayClasses = cn(
   // rounded at fractional scales can't throw their size off. Icon buttons
   // stay square.
   "data-[orientation=horizontal]:h-(--group-h) data-[orientation=horizontal]:[&>:is(button,a)]:h-auto data-[orientation=horizontal]:[&>:is(button,a)]:self-stretch",
-  "data-[orientation=vertical]:w-(--group-h) data-[orientation=vertical]:[&>:is(button,a)]:w-auto data-[orientation=vertical]:[&>:is(button,a)]:self-stretch data-[orientation=vertical]:[&>:is(button,a):not([data-size^=icon])]:h-[calc(var(--group-h)-var(--group-border,0px)*2)]",
-  "[&>:is(button,a)[data-size^=icon]]:aspect-square data-[orientation=horizontal]:[&>:is(button,a)[data-size^=icon]]:w-auto data-[orientation=vertical]:[&>:is(button,a)[data-size^=icon]]:h-auto",
+  // Vertical: at least the ladder width, growing for text buttons; every
+  // button keeps the ladder height and stretches to the widest.
+  "data-[orientation=vertical]:w-fit data-[orientation=vertical]:min-w-(--group-h) data-[orientation=vertical]:[&>:is(button,a)]:w-auto data-[orientation=vertical]:[&>:is(button,a)]:self-stretch data-[orientation=vertical]:[&>:is(button,a)]:h-[calc(var(--group-h)-var(--group-border,0px)*2)]",
+  "data-[orientation=horizontal]:[&>:is(button,a)[data-size^=icon]]:aspect-square data-[orientation=horizontal]:[&>:is(button,a)[data-size^=icon]]:w-auto",
   // Quiet children. A Button without a variant renders `primary`, so this
   // list (with text-current below) must undo everything `primary` sets: fill,
   // hover, press, border, and label color. A style added to `primary` needs

@@ -210,8 +210,9 @@ A read-only segment for a label or value. Renders a `div`; pass `render={<label 
 
 If you're reinstalling over an earlier version, check these changes:
 
-| Before                                       | Now                                                                                  |
-| -------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Children fused into one bordered control     | The default is `outline`, a shell. Pass `variant="attached"` for the old look.       |
-| `ButtonGroupSeparator` defaulted to vertical | It turns perpendicular to the group, so vertical groups need no `orientation`.       |
-| Buttons in a group set `variant="outline"`   | Leave `variant` unset in a shell. A set variant marks the button as the main action. |
+| Before                                       | Now                                                                                                                                                                |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Installed as `cubby-ui/button-group.tsx`     | Installs into a `cubby-ui/button-group/` folder with `button-group.css`. Import from `@/components/ui/cubby-ui/button-group/button-group` and delete the old file. |
+| Children fused into one bordered control     | The default is `outline`, a shell. Pass `variant="attached"` for the old look.                                                                                     |
+| `ButtonGroupSeparator` defaulted to vertical | It turns perpendicular to the group, so vertical groups need no `orientation`.                                                                                     |
+| Buttons in a group set `variant="outline"`   | Leave `variant` unset in a shell. A set variant marks the button as the main action.                                                                               |

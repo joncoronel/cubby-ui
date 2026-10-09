@@ -1,0 +1,73 @@
+/* -------------------------------------------------------------------------------------------------
+ * Gliding current page, in CSS anchor positioning.
+ *
+ * The current page's link takes the anchor name and one shared fill in the
+ * list is anchored to it, so the fill slides to the new page when it changes.
+ * Hover stays an instant tint: motion only marks the change of page.
+ *
+ * Without anchor positioning (and anchor-scope, so lists don't share an
+ * anchor) the fill isn't drawn and the current link paints its own, set by
+ * the link classes in pagination.tsx.
+ * -------------------------------------------------------------------------------------------------*/
+
+[data-slot="pagination-indicator"] {
+  display: none;
+}
+
+/* Links don't transition (see pagination.tsx); their labels fade color. */
+[data-slot="pagination-link-label"] {
+  transition: color 100ms ease-out;
+}
+
+/* All anchor features or none: a partial implementation would leave the fill
+ * unplaced or tied to another list. */
+@supports (anchor-name: --pagination-current) and
+  (anchor-scope: --pagination-current) and (inset: anchor(inside)) {
+  [data-slot="pagination-content"] {
+    anchor-scope: --pagination-current;
+  }
+
+  /* The fill stands in for the current link's own paint. */
+  [data-slot="pagination-link"][aria-current="page"] {
+    anchor-name: --pagination-current;
+    --btn-bg: transparent;
+    --btn-bg-hover: transparent;
+    --btn-bg-active: transparent;
+  }
+
+  /* The new page's label waits for the fill to slide over before turning
+   * light, so it never sits light on the bare shell; the page being left
+   * darkens right away. */
+  [data-slot="pagination-link"][aria-current="page"]
+    > [data-slot="pagination-link-label"] {
+    transition-delay: 70ms;
+  }
+
+  [data-slot="pagination-indicator"] {
+    display: block;
+    position: absolute;
+    position-anchor: --pagination-current;
+    inset: anchor(inside);
+    /* The anchor is the link's border box; the same 2px transparent border
+     * puts the fill exactly over the link's own paint area. */
+    border: 2px solid transparent;
+    border-radius: calc(var(--pagination-item-radius) + 2px);
+    background: var(--pagination-current-bg) padding-box;
+    pointer-events: none;
+    /* Exponential ease-out so it lands decisively. On first paint the anchor
+     * goes from none to a link, which can't interpolate, so it starts in
+     * place instead of sliding in. */
+    transition: inset 200ms var(--ease-out-expo, cubic-bezier(0.19, 1, 0.22, 1));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-slot="pagination-indicator"] {
+      transition: none;
+    }
+
+    [data-slot="pagination-link"][aria-current="page"]
+      > [data-slot="pagination-link-label"] {
+      transition-delay: 0s;
+    }
+  }
+}

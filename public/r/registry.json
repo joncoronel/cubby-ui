@@ -1088,6 +1088,9 @@
           "target": "components/ui/cubby-ui/number-field.tsx"
         }
       ],
+      "registryDependencies": [
+        "@cubby-ui/button"
+      ],
       "dependencies": [
         "class-variance-authority",
         "@hugeicons/react",
@@ -1129,7 +1132,17 @@
         {
           "path": "registry/default/pagination/pagination.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/pagination.tsx"
+          "target": "components/ui/cubby-ui/pagination/pagination.tsx"
+        },
+        {
+          "path": "registry/default/pagination/lib/range.ts",
+          "type": "registry:lib",
+          "target": "components/ui/cubby-ui/pagination/lib/range.ts"
+        },
+        {
+          "path": "registry/default/pagination/pagination.css",
+          "type": "registry:file",
+          "target": "components/ui/cubby-ui/pagination/pagination.css"
         }
       ],
       "registryDependencies": [

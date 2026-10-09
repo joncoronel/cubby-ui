@@ -1,17 +1,24 @@
 ---
 title: Pagination
-description: Navigate through multiple pages of content with numbered controls
+description: Links between the pages of a long list
 type: composable
 builtOn: ["button"]
 ---
 
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/registry/default/pagination/pagination";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/registry/default/pagination/pagination";
 
-Pagination splits long content into numbered pages with previous and next controls. Use it for search results, tables, or any list too long for a single view. It renders links, so wire each `PaginationLink` to your own page state or route.
+Pagination splits a long list into pages and links between them, for search results, tables, and feeds. The current page is a solid fill that glides to the new page when it changes. It renders real links, so point each one at your route, or handle the click to update your own state.
 
 ## Preview
 
-<ComponentPreview component="pagination" example="pagination-basic-pagination" />
+<ComponentPreview component="pagination" example="pagination-demo" />
 
 ## Installation
 
@@ -26,66 +33,161 @@ Pagination splits long content into numbered pages with previous and next contro
 ```text
 Pagination
 └── PaginationContent
-    └── PaginationItem
-        ├── PaginationPrevious
-        ├── PaginationLink
-        ├── PaginationEllipsis
-        └── PaginationNext
+    ├── PaginationItem
+    │   ├── PaginationPrevious
+    │   ├── PaginationLink
+    │   ├── PaginationEllipsis
+    │   └── PaginationNext
+    └── PaginationStatus
 ```
 
-Mark the current page with `isActive` on its `PaginationLink`, and use `isDisabled` to gray out unavailable controls.
+Mark the current page with `isActive` on its `PaginationLink`, and use `isDisabled` on Previous at the first page and Next at the last.
 
 ## Examples
 
-### Interactive
+### Page Range
 
-Drive the active page from state and update it from each `PaginationLink`.
+`getPaginationRange` returns the pages and ellipses to show for the current page. It always returns the same number of items, so the row keeps its width and the fill glides instead of the links moving under it.
 
-<ComponentPreview component="pagination" example="pagination-interactive-pagination" />
+```tsx
+getPaginationRange({ page: 10, pageCount: 20 });
+// [1, "start-ellipsis", 9, 10, 11, "end-ellipsis", 20]
+```
 
-### With Ellipsis
+Widen it with `siblingCount` (pages on each side of the current one) and `boundaryCount` (pages kept at each end). Both default to `1`.
 
-Use `PaginationEllipsis` to collapse skipped page ranges when there are many pages.
+The pagination module is a client module, so a Server Component that reads the page from `searchParams` can't call the re-export. Import it from `pagination/lib/range` there instead.
 
-<ComponentPreview component="pagination" example="pagination-with-ellipsis" />
+### Router Links
 
-### Minimal
+Pass `render` to use your router's link, so moving between pages doesn't reload the document.
 
-Drop the numbered links to leave only `PaginationPrevious` and `PaginationNext`.
+```tsx
+import Link from "next/link";
 
-<ComponentPreview component="pagination" example="pagination-minimal-pagination" />
+<PaginationLink render={<Link href={`?page=${n}`} />} isActive={n === page}>
+  {n}
+</PaginationLink>;
+```
+
+### Variants
+
+`outline` (the default) and `soft` draw a shell around the links, like [Button Group](/docs/components/button-group). `ghost` has none.
+
+<ComponentPreview component="pagination" example="pagination-variants" />
+
+### Size
+
+Set `size` on `PaginationContent`. Heights match `Button`.
+
+<ComponentPreview component="pagination" example="pagination-size" />
+
+The shell's corners match a `Button` of the same size, and the links' corners are those minus the border and their 2px inset, so the two stay concentric and both follow `--radius`. Set `[--radius:9999px]` for a pill. To recolor the current page, set `--pagination-current-bg` and `--pagination-current-fg`.
+
+```tsx
+<PaginationContent className="[--pagination-current-bg:var(--primary)] [--pagination-current-fg:var(--primary-foreground)]">
+```
+
+### Compact
+
+Use `PaginationStatus` between Previous and Next for the position alone, when there are too many pages to list or too little room.
+
+<ComponentPreview component="pagination" example="pagination-compact" />
 
 ## Accessibility
 
-The `Pagination` root is a labeled `nav` landmark. `PaginationLink` sets `aria-current="page"` when `isActive`, and `PaginationEllipsis` is hidden from assistive tech with a visually hidden "More pages" label.
+`Pagination` is a `nav` landmark labeled "Pagination". The current page's link has `aria-current="page"`. A disabled link has `aria-disabled` and leaves the tab order. `PaginationEllipsis` reads as "More pages".
+
+Below the `sm` breakpoint, Previous and Next show only their arrows. Their accessible names, "Go to previous page" and "Go to next page", stay the same.
+
+`PaginationStatus` is a polite live region, so the new position is announced when it changes.
+
+With reduced motion, the current-page fill moves without sliding. Where the browser lacks CSS anchor positioning, the current link paints its own fill instead.
 
 ## API Reference
 
-Pagination is a set of custom navigation parts built from plain HTML elements. `PaginationLink` styles itself with `buttonVariants` from [`Button`](/docs/components/button), so all props below are specific to this implementation. Each part also accepts the standard props for its underlying element (`nav`, `ul`, `li`, `a`, or `span`).
+Pagination is built from plain HTML elements. Each part accepts the props of its element (`nav`, `ul`, `li`, `a`, or `span`).
+
+### Utilities
+
+#### getPaginationRange
+
+Takes `{ page, pageCount, siblingCount?, boundaryCount? }` and returns an array of page numbers, `"start-ellipsis"`, and `"end-ellipsis"`. The page is clamped to `1..pageCount`. Exported from the pagination module, and from `pagination/lib/range` for Server Components.
 
 ### Props
 
-#### PaginationLink
+#### PaginationContent
 
-Single page link, rendered as an `a` styled with `buttonVariants`. `PaginationPrevious`, `PaginationNext`, and the numbered links all build on it.
+The list and its shell. Renders a `ul`.
 
 <ApiPropsList>
 
-<ApiProp name="isActive" fullType="boolean" defaultValue="false">
-  Marks the link as the current page. Switches the variant to `outline` and sets `aria-current="page"`.
-</ApiProp>
-
-<ApiProp name="isDisabled" fullType="boolean" defaultValue="false">
-  Disables the link. Removes pointer events, lowers opacity, and sets `aria-disabled`.
+<ApiProp
+  name="variant"
+  fullType='"outline" | "soft" | "ghost"'
+  simpleType="string"
+  defaultValue='"outline"'
+>
+  The shell. `ghost` draws none.
 </ApiProp>
 
 <ApiProp
   name="size"
-  fullType='"xs" | "sm" | "default" | "lg" | "icon" | "icon_xs" | "icon_sm" | "icon_lg"'
+  fullType='"sm" | "default" | "lg"'
   simpleType="string"
-  defaultValue='"icon"'
+  defaultValue='"default"'
 >
-  Size passed to `buttonVariants`. `PaginationPrevious` and `PaginationNext` override this to `"default"` to fit their label.
+  Outer height, matching `Button`.
 </ApiProp>
 
 </ApiPropsList>
+
+#### PaginationLink
+
+A page link. Renders an `a`. `PaginationPrevious` and `PaginationNext` build on it and take the same props.
+
+<ApiPropsList>
+
+<ApiProp
+  name="render"
+  fullType="ReactElement | ((props, state) => ReactElement)"
+  simpleType="ReactElement"
+>
+  Renders a different element in place of the `a`, like a router `Link`. It must
+  render an anchor.
+</ApiProp>
+
+<ApiProp name="isActive" fullType="boolean" defaultValue="false">
+  Marks the current page: the fill moves to it and it gets
+  `aria-current="page"`.
+</ApiProp>
+
+<ApiProp name="isDisabled" fullType="boolean" defaultValue="false">
+  Turns the link off: no pointer events, lower opacity, `aria-disabled`, and out
+  of the tab order.
+</ApiProp>
+
+</ApiPropsList>
+
+#### PaginationPrevious / PaginationNext
+
+Links to the previous and next page, with an arrow. Their `children` are the label, "Previous" and "Next" by default, which hides below `sm`.
+
+#### PaginationEllipsis
+
+Stands in for skipped pages. Renders a `span`.
+
+#### PaginationStatus
+
+A read-only position, like "Page 3 of 12". Renders an `li` that is a polite live region.
+
+## Upgrading
+
+If you're reinstalling over an earlier version, check these changes:
+
+| Before                                         | Now                                                                                            |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Bare links, the current page an outline button | A shell (`outline` by default) with a gliding solid fill. Pass `variant="ghost"` for no shell. |
+| `PaginationLink` took a `size`                 | Set `size` once on `PaginationContent`.                                                        |
+| `aria-label="pagination"` on `nav`             | `aria-label="Pagination"`, overridable.                                                        |
+| Previous and Next always showed their labels   | Labels hide below `sm`; the arrows and accessible names remain.                                |

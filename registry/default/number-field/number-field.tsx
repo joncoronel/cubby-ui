@@ -220,6 +220,10 @@ function NumberFieldScrubArea({
         // Children inherit the cursor: a <label> otherwise resets it to the
         // default arrow over its own text.
         "cursor-ew-resize select-none [&_*]:cursor-[inherit]",
+        // A flex box, so it's exactly as tall as the label inside it, like
+        // Label. As a plain span it would size to the page's body line
+        // height and leave extra space under the label.
+        "flex w-fit items-center",
         "in-data-[slot=number-field-group]:text-muted-foreground in-data-[slot=number-field-group]:hover:text-foreground in-data-[slot=number-field-group]:data-scrubbing:text-foreground in-data-[slot=number-field-group]:flex in-data-[slot=number-field-group]:items-center in-data-[slot=number-field-group]:ps-2.5 in-data-[slot=number-field-group]:pe-1 in-data-[slot=number-field-group]:text-sm in-data-[slot=number-field-group]:font-medium in-data-[slot=number-field-group]:transition-colors in-data-[slot=number-field-group]:duration-100",
         className,
       )}

@@ -65,7 +65,7 @@ Give one button a `variant` to mark it as the main action. It keeps its own fill
 
 ### Pill
 
-Each button sits 3px inside the shell, and the shell's corners are the buttons' radius plus those 3px, so both follow `--radius`. Set `[--radius:9999px]` on the group for a pill.
+Each button fills the shell edge to edge, with its fill 2px in from its own edges. The inset is drawn as a transparent border, which the browser rounds to whole pixels the same on every side, so the gaps stay even at any display scale. The shell's corners match a Button of the same size, and the fills' corners are those minus the shell's border and the 2px, so the two stay concentric and both follow `--radius`. Set `[--radius:9999px]` on the group for a pill.
 
 ```tsx
 <ButtonGroup className="[--radius:9999px]">…</ButtonGroup>
@@ -85,7 +85,7 @@ Inputs and selects in a shell drop their own border and fill and sit in the row 
 
 ### With Dropdown
 
-Pair an action with a menu of related ones. The trigger keeps the highlight color while its menu is open. Menus measure their offset from the trigger, which sits 3px inside the shell, so add 3 to `sideOffset` to keep the usual gap from the shell's edge.
+Pair an action with a menu of related ones. The trigger keeps the highlight color while its menu is open. The trigger fills the shell to its edge, so the menu's usual offset already clears the shell.
 
 <ComponentPreview component="button-group" example="button-group-dropdown" />
 
@@ -97,7 +97,7 @@ Set `orientation="vertical"` to stack the buttons. Separators turn to match.
 
 ### Size
 
-Set `size` on the group. Its outer height matches a Button of the same size, so a group lines up with buttons and inputs in the same row. The buttons inside are 6px shorter. Icon-only buttons still need an `icon` size to stay square.
+Set `size` on the group. Its outer height matches a Button of the same size, so a group lines up with buttons and inputs in the same row. The buttons inside fill it, with their fills 2px in from each edge. Icon-only buttons still need an `icon` size to stay square.
 
 <ComponentPreview component="button-group" example="button-group-size" />
 

@@ -24,32 +24,33 @@ import "./button-group.css";
 // primary action. Tag selectors (button, a) rather than data-slot, because a
 // Base UI trigger rendering a Button stamps its own data-slot.
 const buttonGroupVariants = cva(
-  "relative flex w-fit items-stretch [&>*:focus-visible]:relative [&>*:focus-visible]:z-10 [&>*[data-popup-open]]:relative [&>*[data-popup-open]]:z-10",
+  "relative flex w-fit items-stretch [--group-border:0px] [&>*:focus-visible]:relative [&>*:focus-visible]:z-10 [&>*[data-popup-open]]:relative [&>*[data-popup-open]]:z-10",
   {
     variants: {
       variant: {
         attached:
           "[&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit [&>input]:flex-1 has-[select[aria-hidden=true]:last-child]:[&>[data-slot=select-trigger]:last-of-type]:rounded-r-lg has-[>[data-slot=button-group]]:gap-2 [&>input]:bg-card",
         // Each shell takes a Button variant's fill and label color. Outline's
-        // 1px border is part of its 3px inset, and sits outside the fill
-        // (bg-clip-padding) as on an outline Button. The others have no
-        // border, so their 3px is all padding and nothing comes between the
-        // edge and the surface's own shadow ring.
+        // 1px border sits outside the fill (bg-clip-padding) as on an
+        // outline Button, and outside the 4px inset. The others have no
+        // border, so nothing comes between the edge and the surface's own
+        // shadow ring.
         outline:
-          "border-border bg-card text-foreground border bg-clip-padding p-0.5",
-        soft: "bg-secondary text-secondary-foreground p-[3px]",
-        elevated: cn(solidSurface(3, 3), "text-foreground p-[3px]"),
+          "border-border bg-card text-foreground border bg-clip-padding [--group-border:1px]",
+        soft: "bg-secondary text-secondary-foreground",
+        elevated: cn(solidSurface(3, 3), "text-foreground"),
         // The one shell opposite the page in brightness. Eyes adapt to the
         // page, so the same tint reads weaker inside it; it takes more.
-        solid:
-          "bg-neutral text-neutral-foreground p-[3px] [--group-highlight-mix:16%]",
+        solid: "bg-neutral text-neutral-foreground [--group-highlight-mix:16%]",
       },
-      // Outer height, matching Button's ladder (one step taller below sm), so
-      // a group lines up with a standalone Button or Input of the same size.
+      // Outer height, matching Button's ladder (one step taller below sm),
+      // and the shell's corners, which step down with the size so a small
+      // group isn't rounder than a small Button.
       size: {
-        sm: "[--group-h:--spacing(9)] sm:[--group-h:--spacing(8)]",
-        default: "[--group-h:--spacing(10)] sm:[--group-h:--spacing(9)]",
-        lg: "[--group-h:--spacing(11)] sm:[--group-h:--spacing(10)]",
+        sm: "[--group-h:--spacing(9)] sm:[--group-h:--spacing(8)] [--group-radius:calc(var(--radius)-2px)]",
+        default:
+          "[--group-h:--spacing(10)] sm:[--group-h:--spacing(9)] [--group-radius:var(--radius)]",
+        lg: "[--group-h:--spacing(11)] sm:[--group-h:--spacing(10)] [--group-radius:calc(var(--radius)+2px)]",
       },
       orientation: {
         horizontal: "",
@@ -88,10 +89,25 @@ const buttonGroupVariants = cva(
 
 // Shared by every tray variant.
 const trayClasses = cn(
-  // Shell: a 3px inset around every button (see the variants). Corners are
-  // the buttons' radius + that inset, so the whole group follows --radius.
-  // Set [--radius:9999px] for a pill.
-  "gap-0.5 rounded-[calc(var(--radius)+3px)]",
+  // Shell: no padding. Each button fills it edge to edge and carries a 2px
+  // transparent border instead, with its paint (and the pill) inside. A
+  // border, unlike padding, always rounds to whole device pixels and the
+  // same on every side, so the inset stays even at fractional display
+  // scales (2px of padding is 3.5 device pixels at 175% and rounds 3 above,
+  // 4 below). Buttons also cover the shell's edges, so there's no dead zone.
+  // The shell's corners come from the size; the paint's are those minus the
+  // shell border and the 2px, so they stay concentric and the whole group
+  // follows --radius. Set [--radius:9999px] for a pill.
+  "rounded-(--group-radius) [--group-item-radius:max(0px,calc(var(--group-radius)-var(--group-border,0px)-2px))]",
+  "[&>:is(button,a)]:border-2 [&>:is(button,a)]:border-transparent",
+  // The box's corners are the paint's + its 2px border, and the paint sets
+  // its own (instead of inheriting the box's), so paint, gap, and focus ring
+  // are concentric. The ring sits on the box's edge at offset 0: 2px off the
+  // paint, as on a standalone Button, and over the shell's edge if need be.
+  // Select triggers are skipped for the before: rule: they don't use the
+  // Button recipe, and before: would give them an empty pseudo-element that
+  // becomes a flex item (plus a gap) beside their value.
+  "[&>:is(button,a)]:rounded-[calc(var(--group-item-radius)+2px)] [&>:is(button,a):not([data-slot=select-trigger])]:before:rounded-(--group-item-radius) [&>:is(button,a)]:focus-visible:outline-offset-0",
   // The pill (and, without the glide, each button's hover) is the label color
   // at 10%. Button's hover tokens are tuned to repaint a whole button and
   // read too faint as a pill on the same fill, most of all on dark fills. A
@@ -100,17 +116,24 @@ const trayClasses = cn(
   // resolves where the variable is used: the pill and buttons inherit the
   // shell's label color. --group-highlight-mix sets the strength.
   "[--group-highlight:color-mix(in_oklab,currentColor_var(--group-highlight-mix,10%),transparent)]",
-  // Buttons fill the shell: its height minus the inset on both sides. Icon
-  // sizes stay square. The Button's own size still sets type and icon size.
-  "[&>:is(button,a)]:h-[calc(var(--group-h)-6px)] [&>:is(button,a)[data-size^=icon]]:w-[calc(var(--group-h)-6px)]",
+  // The shell is the fixed size and the buttons stretch to fill it, rather
+  // than each computing its own, which the shell's own border (rounded at
+  // fractional scales) would throw off. Icon sizes stay square. The
+  // Button's own size still sets type and icon size.
+  "data-[orientation=horizontal]:h-(--group-h) data-[orientation=horizontal]:[&>:is(button,a)]:h-auto data-[orientation=horizontal]:[&>:is(button,a)]:self-stretch",
+  "data-[orientation=vertical]:w-(--group-h) data-[orientation=vertical]:[&>:is(button,a)]:w-auto data-[orientation=vertical]:[&>:is(button,a)]:self-stretch data-[orientation=vertical]:[&>:is(button,a):not([data-size^=icon])]:h-[calc(var(--group-h)-var(--group-border,0px)*2)]",
+  "[&>:is(button,a)[data-size^=icon]]:aspect-square data-[orientation=horizontal]:[&>:is(button,a)[data-size^=icon]]:w-auto data-[orientation=vertical]:[&>:is(button,a)[data-size^=icon]]:h-auto",
   // Quiet children: no fill or border, the shell's highlight color on hover,
   // and the shell's radius. Where the pill glides, button-group.css turns
-  // their own hover paint off.
-  "[&>:is(button,a)]:rounded-[var(--radius)] [&>:is(button,a):not([data-variant])]:[--btn-bg:transparent] [&>:is(button,a):not([data-variant])]:[--btn-border:transparent] [&>:is(button,a):not([data-variant])]:[--btn-bg-hover:var(--group-highlight)] [&>:is(button,a):not([data-variant])]:[--btn-bg-active:var(--group-highlight)]",
+  // their own hover paint off. A Button without a variant renders `primary`,
+  // so this list (with text-current below) must undo everything `primary`
+  // sets: fill, hover, press, border, and label color. Adding a style to
+  // `primary` means overriding it here too.
+  "[&>:is(button,a):not([data-variant])]:[--btn-bg:transparent] [&>:is(button,a):not([data-variant])]:[--btn-border:transparent] [&>:is(button,a):not([data-variant])]:[--btn-bg-hover:var(--group-highlight)] [&>:is(button,a):not([data-variant])]:[--btn-bg-active:var(--group-highlight)]",
   // Label color: foreground on light shells, inherited on solid.
   "[&>:is(button,a):not([data-variant])]:text-current",
   // Groups of groups are a layout wrapper: no shell of their own.
-  "has-[>[data-slot=button-group]]:gap-2 has-[>[data-slot=button-group]]:bg-transparent has-[>[data-slot=button-group]]:p-0 has-[>[data-slot=button-group]]:border-0 has-[>[data-slot=button-group]]:shadow-none",
+  "has-[>[data-slot=button-group]]:gap-2 has-[>[data-slot=button-group]]:bg-transparent has-[>[data-slot=button-group]]:p-0 has-[>[data-slot=button-group]]:border-0 has-[>[data-slot=button-group]]:shadow-none has-[>[data-slot=button-group]]:h-auto has-[>[data-slot=button-group]]:w-fit",
 );
 
 type ButtonGroupVariant = NonNullable<
@@ -210,7 +233,9 @@ function ButtonGroupText({
       "flex items-center gap-2 text-sm font-medium whitespace-nowrap tabular-nums [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
       variant === "attached"
         ? "bg-muted rounded-lg border bg-clip-padding px-4"
-        : "px-2.5",
+        : // The buttons' 2px transparent border, so the text clears the shell's
+          // edge and lines up with the labels beside it.
+          "border-2 border-transparent px-3",
       className,
     ),
   };

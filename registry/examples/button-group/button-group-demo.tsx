@@ -45,7 +45,7 @@ export default function ButtonGroupDemo() {
         >
           <HugeiconsIcon icon={ChevronDownIcon} strokeWidth={2} />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" sideOffset={7} className="w-44">
+        <DropdownMenuContent align="end" className="w-44">
           <DropdownMenuItem>
             <HugeiconsIcon icon={Edit02Icon} strokeWidth={2} />
             Rename

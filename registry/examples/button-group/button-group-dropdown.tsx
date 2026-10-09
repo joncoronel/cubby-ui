@@ -31,7 +31,7 @@ export default function ButtonGroupDropdown() {
         >
           <HugeiconsIcon icon={ChevronDownIcon} strokeWidth={2} />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" sideOffset={7}>
+        <DropdownMenuContent align="end">
           <DropdownMenuItem>
             <HugeiconsIcon icon={Clock01Icon} strokeWidth={2} />
             Schedule

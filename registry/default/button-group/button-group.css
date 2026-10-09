@@ -14,49 +14,29 @@
   display: none;
 }
 
-/* Every hover target, separator or not, widens over the gap beside it, so
- * moving between buttons never crosses dead space and the pill never lets go
- * mid-glide. Half the 2px gap between neighbors, about half the 9px across a
- * separator (gap, margin, line, margin, gap), and the 3px shell inset at the
- * ends. Overshooting is worse than a gap: the later button paints over the
- * earlier one's edge and steals its hover. A select's hidden form input (out
- * of the layout, but still a sibling) is stepped over. */
+/* Buttons fill the shell edge to edge, so the only dead space is around a
+ * separator (its line and margins, about 5px). The buttons on either side
+ * reach over half of it, so the pill never lets go mid-glide. A select's
+ * hidden form input (out of the layout, but still a sibling) is stepped
+ * over. */
 [data-glide] > :is(button, a[href], [role="button"]) {
   position: relative;
 }
 
-[data-glide] > :is(button, a[href], [role="button"])::after {
-  content: "";
-  position: absolute;
-  inset: -3px -1px;
-}
-
-[data-glide][data-orientation="vertical"]
-  > :is(button, a[href], [role="button"])::after {
-  inset: -1px -3px;
-}
-
 [data-glide]
-  > [data-slot="button-group-highlight"]
-  + :is(button, a[href], [role="button"])::after {
-  inset-inline-start: -3px;
-}
-
-[data-glide]
-  > :is(button, a[href], [role="button"]):is(
-    :last-child,
-    :has(+ input[aria-hidden="true"]:last-child)
-  )::after {
-  inset-inline-end: -3px;
-}
-
+  > :is(button, a[href], [role="button"]):has(
+    + [data-slot="button-group-separator"],
+    + input[aria-hidden="true"] + [data-slot="button-group-separator"]
+  )::after,
 [data-glide]
   > [data-slot="button-group-separator"]
   + :is(button, a[href], [role="button"])::after {
-  inset-inline-start: -5px;
+  content: "";
+  position: absolute;
+  inset: -2px;
 }
 
-[data-glide]
+[data-glide][data-orientation="horizontal"]
   > :is(button, a[href], [role="button"]):has(
     + [data-slot="button-group-separator"],
     + input[aria-hidden="true"] + [data-slot="button-group-separator"]
@@ -64,36 +44,23 @@
   inset-inline-end: -5px;
 }
 
-[data-glide][data-orientation="vertical"]
-  > [data-slot="button-group-highlight"]
+[data-glide][data-orientation="horizontal"]
+  > [data-slot="button-group-separator"]
   + :is(button, a[href], [role="button"])::after {
-  inset-inline-start: -3px;
-  inset-block-start: -3px;
+  inset-inline-start: -5px;
 }
 
 [data-glide][data-orientation="vertical"]
-  > :is(button, a[href], [role="button"]):is(
-    :last-child,
-    :has(+ input[aria-hidden="true"]:last-child)
+  > :is(button, a[href], [role="button"]):has(
+    + [data-slot="button-group-separator"]
   )::after {
-  inset-inline-end: -3px;
-  inset-block-end: -3px;
+  inset-block-end: -5px;
 }
 
 [data-glide][data-orientation="vertical"]
   > [data-slot="button-group-separator"]
   + :is(button, a[href], [role="button"])::after {
-  inset-inline-start: -3px;
   inset-block-start: -5px;
-}
-
-[data-glide][data-orientation="vertical"]
-  > :is(button, a[href], [role="button"]):has(
-    + [data-slot="button-group-separator"],
-    + input[aria-hidden="true"] + [data-slot="button-group-separator"]
-  )::after {
-  inset-inline-end: -3px;
-  inset-block-end: -5px;
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -108,10 +75,15 @@
 
 [data-slot="button-group"]:not([data-variant="attached"])
   > :is([data-slot="input"], [data-slot="select-trigger"]) {
-  height: calc(var(--group-h) - 6px);
+  height: auto;
+  align-self: stretch;
+  /* The same 2px transparent border as the buttons, with the fill inside
+   * it; the corner is the inner radius + the border. */
+  border-width: 2px;
   border-color: transparent;
-  border-radius: var(--radius);
+  border-radius: calc(var(--group-item-radius) + 2px);
   background-color: transparent;
+  background-clip: padding-box;
   box-shadow: none;
 }
 
@@ -121,6 +93,12 @@
   color: inherit;
   transition-property:
     background-color, outline-width, outline-offset, outline-color;
+}
+
+/* Focus rings sit on the field's edge, 2px off its fill, as on the buttons. */
+[data-slot="button-group"]:not([data-variant="attached"])
+  > :is([data-slot="input"], [data-slot="select-trigger"]):focus-visible {
+  outline-offset: 0;
 }
 
 [data-slot="button-group"]:not([data-variant="attached"])
@@ -204,16 +182,14 @@
     position: absolute;
     position-anchor: --button-group-item;
     inset: anchor(inside);
-    border-radius: var(--radius);
-    background: var(--group-highlight);
+    /* The anchor is the button's border box; the same 2px transparent
+     * border puts the fill exactly over the button's own paint area. */
+    border: 2px solid transparent;
+    border-radius: calc(var(--group-item-radius) + 2px);
+    background: var(--group-highlight) padding-box;
     pointer-events: none;
     opacity: 0;
     scale: 0.96;
-    /* Kept on its own compositor layer. Otherwise Chrome promotes it for each
-     * scale transition and merges it back after, and at fractional device
-     * pixel ratios (125%, 175% display scaling) the two round its edges
-     * differently, so the press visibly jitters as it starts and ends. */
-    will-change: scale, opacity;
     /* Exponential ease-out on the glide so it lands decisively. Entering, the
      * anchor goes from none to a button, which can't interpolate, so the pill
      * appears in place and only fades and grows. */

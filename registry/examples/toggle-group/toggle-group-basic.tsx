@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
 import {
   ToggleGroup,
   ToggleGroupItem,
-} from "@/registry/default/toggle-group/toggle-group"
+} from "@/registry/default/toggle-group/toggle-group";
 
 export default function ToggleGroupBasic() {
   return (
@@ -12,5 +12,5 @@ export default function ToggleGroupBasic() {
       <ToggleGroupItem value="center">Center</ToggleGroupItem>
       <ToggleGroupItem value="right">Right</ToggleGroupItem>
     </ToggleGroup>
-  )
+  );
 }

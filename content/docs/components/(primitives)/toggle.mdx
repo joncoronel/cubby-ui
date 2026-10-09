@@ -28,11 +28,11 @@ Use `size` to set the toggle's height and padding.
 
 <ComponentPreview component="toggle" example="toggle-different-sizes" />
 
-| Size      | Description                       |
-| --------- | --------------------------------- |
-| `sm`      | Compact, for dense toolbars.      |
-| `default` | The standard height.              |
-| `lg`      | Taller, for prominent controls.   |
+| Size      | Description                     |
+| --------- | ------------------------------- |
+| `sm`      | Compact, for dense toolbars.    |
+| `default` | The standard height.            |
+| `lg`      | Taller, for prominent controls. |
 
 ### With Text
 
@@ -40,23 +40,19 @@ Place a text label alongside the icon inside the toggle.
 
 <ComponentPreview component="toggle" example="toggle-with-text" />
 
-### Solid Variant
+### Variants
 
-Set `variant="solid"` for a filled button: a muted plate when off that insets when on (the same treatment the detached toggle group gives its cells).
+Use `variant` to set the toggle's fill.
 
-<ComponentPreview component="toggle" example="toggle-solid-variant" />
-
-### Outline Variant
-
-Set `variant="outline"` to frame the toggle with a border.
+<ComponentPreview component="toggle" example="toggle-soft-variant" />
 
 <ComponentPreview component="toggle" example="toggle-outline-variant" />
 
-| Variant   | Description                                          |
-| --------- | ---------------------------------------------------- |
-| `ghost`   | Borderless. Transparent when off, filled when on. Default. |
-| `solid`   | Muted plate when off; insets to the selected overlay when on. |
-| `outline` | Framed with a border. Fills when on.                 |
+| Variant   | Description                                                    |
+| --------- | -------------------------------------------------------------- |
+| `ghost`   | The default. No fill when off, a neutral fill when on.         |
+| `soft`    | A secondary Button's fill when off, a deeper one when on.      |
+| `outline` | An outline Button's fill and border, a secondary fill when on. |
 
 ### Custom Colors
 
@@ -93,17 +89,12 @@ translucent tint with `color-mix` instead:
 </Toggle>
 ```
 
-Any variable you don't override keeps the variant's color for that state. The
-`solid` variant is the exception: its plate is `--tgl-bg` and its hover and
-selected states composite a translucent overlay on top of that plate, so retint
-it through `--tgl-bg` rather than the per-state variables.
+Any variable you don't override keeps the variant's color for that state.
 
 The border lives on the toggle's paint pseudo-element, so `before:` classes
 restyle it, for example `before:border-dashed` or `before:border-2`. Only
 `outline` sets a visible `--tgl-border`, so on the other variants pair those
-classes with a color: `[--tgl-border:var(--border)] before:border-dashed`. Cells
-in an attached `solid` or `ghost` group are the exception, since the group
-strips their borders to keep the track seamless.
+classes with a color: `[--tgl-border:var(--border)] before:border-dashed`.
 
 ### Controlled
 
@@ -141,11 +132,11 @@ For the complete Base UI API, see the [Base UI Toggle documentation](https://bas
 
 <ApiProp
   name="variant"
-  fullType='"ghost" | "solid" | "outline"'
+  fullType='"ghost" | "soft" | "outline"'
   simpleType="string"
   defaultValue='"ghost"'
 >
-  Visual style variant for the toggle button. Custom prop not available in Base UI.
+  Fill style. See [Variants](#variants).
 </ApiProp>
 
 <ApiProp
@@ -154,7 +145,16 @@ For the complete Base UI API, see the [Base UI Toggle documentation](https://bas
   simpleType="string"
   defaultValue='"default"'
 >
-  Size variant for the toggle button. Custom prop not available in Base UI.
+  Height, matching `Button`.
 </ApiProp>
 
 </ApiPropsList>
+
+## Upgrading
+
+If you're reinstalling over an earlier version, check these changes:
+
+| Before            | Now                                                      |
+| ----------------- | -------------------------------------------------------- |
+| `variant="solid"` | `variant="soft"`, a secondary fill that deepens when on. |
+| Pressed at 0.97   | Pressed at 0.98, as on `Button`.                         |

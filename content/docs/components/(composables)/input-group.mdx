@@ -1,17 +1,15 @@
 ---
 title: Input Group
-description: Combine input fields with buttons, icons, or text for enhanced functionality
+description: An input or textarea with icons, text, or buttons inside its border
 type: composable
 builtOn: ["input"]
 ---
 
 import { InputGroup } from "@/registry/default/input-group/input-group";
-import InputGroupPassword from "@/registry/examples/input-group/input-group-password";
-import InputGroupWithSuffix from "@/registry/examples/input-group/input-group-with-suffix";
-import InputGroupKeyboardShortcut from "@/registry/examples/input-group/input-group-keyboard-shortcut";
-import InputGroupValidation from "@/registry/examples/input-group/input-group-validation";
 
-The input group wraps an input or textarea together with icons, text, or buttons as a single bordered control. Use it for search fields with a leading icon, password fields with a visibility toggle, inputs with unit suffixes, or any field that needs inline addons.
+An input group puts icons, text, and buttons inside a field's border, like a search icon, a unit suffix, or a show-password button. Buttons sit in the field's corners with an even 2px gap.
+
+For a number with step buttons, use [`NumberField`](/docs/components/number-field). To join a field to buttons outside it, use [`ButtonGroup`](/docs/components/button-group#attached).
 
 ## Preview
 
@@ -29,68 +27,79 @@ The input group wraps an input or textarea together with icons, text, or buttons
 
 ```text
 InputGroup
-├── InputGroupInput      (or InputGroupTextarea)
+├── InputGroupInput (or InputGroupTextarea)
 └── InputGroupAddon
     ├── InputGroupButton
     └── InputGroupText
 ```
 
-Place one or more `InputGroupAddon` blocks alongside the input and position each with its `align` prop.
+Set each addon's side with `align`; a button on an inline addon's outer edge fits into the field's corner.
 
 ## Examples
 
 ### Password Toggle
 
-Use `InputGroupButton` to create a visibility toggle for password fields.
+Use `InputGroupButton` with `size="icon"` for an icon button in the field.
 
-<ComponentPreview component="input-group" example="input-group-password">
-  <InputGroupPassword />
-</ComponentPreview>
+<ComponentPreview component="input-group" example="input-group-password" />
 
 ### With Suffix
 
-Add unit labels or currency codes using `align="inline-end"`.
+Use `align="inline-end"` for units and currency codes.
 
-<ComponentPreview component="input-group" example="input-group-with-suffix">
-  <InputGroupWithSuffix />
-</ComponentPreview>
+<ComponentPreview component="input-group" example="input-group-with-suffix" />
 
 ### Keyboard Shortcut
 
-Display keyboard shortcuts using the `Kbd` component inside an addon.
+Put a `Kbd` in an addon to show a shortcut.
 
-<ComponentPreview component="input-group" example="input-group-keyboard-shortcut">
-  <InputGroupKeyboardShortcut />
-</ComponentPreview>
+<ComponentPreview
+  component="input-group"
+  example="input-group-keyboard-shortcut"
+/>
 
-### Validation State
+### Size
 
-Use `aria-invalid="true"` on the input to show error styling on the group.
+Use `size` to match an `Input` of the same size; buttons inside follow.
 
-<ComponentPreview component="input-group" example="input-group-validation">
-  <InputGroupValidation />
-</ComponentPreview>
+<ComponentPreview component="input-group" example="input-group-size" />
 
-### Elevated Variant
+### Validation
 
-Use `variant="elevated"` on `InputGroup` so the group reads correctly on a Card, Dialog, or popover surface. The inner input is transparent, so the container's variant controls the whole group. See the [Surfaces](/docs/getting-started/surfaces) docs.
+Set `aria-invalid` on the input to put the error ring on the group.
+
+<ComponentPreview component="input-group" example="input-group-validation" />
+
+### Elevated
+
+Use `variant="elevated"` inside a Card, Dialog, or popover; see [Surfaces](/docs/getting-started/surfaces).
 
 <ComponentPreview component="input-group" example="input-group-elevated" />
 
-| Value      | Description                                                       |
-| ---------- | ----------------------------------------------------------------- |
-| `default`  | Opaque `bg-input` container for standard backgrounds.             |
-| `elevated` | Translucent `bg-input-elevated` container for layered surfaces.   |
+| Variant    | Description                                        |
+| ---------- | -------------------------------------------------- |
+| `default`  | Opaque fill for the page.                          |
+| `elevated` | Translucent fill for Cards, Dialogs, and popovers. |
+
+## Accessibility
+
+### Labels
+
+The group renders `role="group"`; label the input itself with `Label` or `FieldLabel`. Give every icon-only button an `aria-label`.
+
+### Addons
+
+Clicking an addon's icon or text focuses the input or textarea. Addon text isn't part of the input's name, so repeat a unit like "kg" in the label if it matters.
 
 ## API Reference
 
-The Input Group is a custom layout component for combining inputs with addons. All props listed below are custom to this implementation.
+Input Group is a custom component built from plain HTML elements and [`Input`](/docs/components/input), [`Textarea`](/docs/components/textarea), and [`Button`](/docs/components/button); every prop below is specific to it. Each part also accepts the props of what it renders.
 
 ### Props
 
 #### InputGroup
 
-Container that combines inputs with addons. Renders a `div` with `role="group"`. Accepts standard `div` props.
+The field's border and fill. Renders a `div` with `role="group"`.
 
 <ApiPropsList>
 
@@ -100,14 +109,24 @@ Container that combines inputs with addons. Renders a `div` with `role="group"`.
   simpleType="string"
   defaultValue='"default"'
 >
-  Surface appearance of the group container. `default` uses opaque `bg-input`. `elevated` uses translucent `bg-input-elevated` for use inside Card, Dialog, or popover surfaces. The inner Input/Textarea inherits visually (it's transparent inside the group). See the [Surfaces](/docs/getting-started/surfaces) docs.
+  Fill of the shell. Use `elevated` on Cards, Dialogs, and popovers.
+</ApiProp>
+
+<ApiProp
+  name="size"
+  fullType='"default" | "sm"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Outer height, matching `Input`. A group with a textarea or a block addon grows
+  to fit.
 </ApiProp>
 
 </ApiPropsList>
 
 #### InputGroupAddon
 
-Container for icons, text, or buttons positioned relative to the input.
+Icons, text, or buttons beside the input. Renders a `div`.
 
 <ApiPropsList>
 
@@ -117,14 +136,14 @@ Container for icons, text, or buttons positioned relative to the input.
   simpleType="string"
   defaultValue='"inline-start"'
 >
-  Position of the addon relative to the input. Use `inline-start` for left side, `inline-end` for right side, `block-start` for above, and `block-end` for below.
+  Side of the input: before, after, above, or below.
 </ApiProp>
 
 </ApiPropsList>
 
 #### InputGroupButton
 
-Styled button for use inside addons. Wraps the [Button](/docs/components/button) component with size variants optimized for input groups. Accepts all Button props except `size`.
+A button for an addon. Wraps [`Button`](/docs/components/button).
 
 <ApiPropsList>
 
@@ -134,28 +153,39 @@ Styled button for use inside addons. Wraps the [Button](/docs/components/button)
   simpleType="string"
   defaultValue='"ghost"'
 >
-  Visual style variant of the button. Inherits from the Button component.
+  Button's variant. `ghost` takes the label-color hover, as in Button Group.
 </ApiProp>
 
 <ApiProp
   name="size"
-  fullType='"xs" | "sm" | "icon_xs" | "icon_sm"'
+  fullType='"default" | "icon"'
   simpleType="string"
-  defaultValue='"xs"'
+  defaultValue='"default"'
 >
-  Size of the button. Use `icon_xs` or `icon_sm` for icon-only buttons.
+  `icon` keeps an icon-only button square. In an inline addon the button fills
+  the field's height; in a block addon it's 32px tall.
 </ApiProp>
 
 </ApiPropsList>
 
+### Notes
+
+#### InputGroupInput / InputGroupTextarea
+
+Wrap [`Input`](/docs/components/input) and [`Textarea`](/docs/components/textarea) without their border and fill, which the group draws.
+
 #### InputGroupText
 
-Styled text container for labels or static content inside addons. Renders a `span`. Accepts standard `span` props.
+Muted text for an addon, like a prefix or a count. Renders a `span`.
 
-#### InputGroupInput
+## Upgrading
 
-Styled input for use inside the group. Wraps the [Input](/docs/components/input) component with transparent styling. Accepts all Input props.
+If you're reinstalling over an earlier version, check these changes:
 
-#### InputGroupTextarea
-
-Styled textarea for multi-line inputs. Wraps the [Textarea](/docs/components/textarea) component with transparent styling. Accepts all Textarea props.
+| Before                                        | Now                                                                                        |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| The group was 2px taller than an `Input`      | It matches `Input`'s height. Set `size="sm"` to match a small one.                         |
+| `InputGroupButton` sizes `xs` and `sm`        | `size="default"`.                                                                          |
+| `InputGroupButton` sizes `icon_xs`, `icon_sm` | `size="icon"`.                                                                             |
+| Inline buttons floated with their own corners | They fill the field's height with corners concentric to it; drop `rounded-full` overrides. |
+| Clicking an addon focused only an input       | It focuses a textarea too.                                                                 |

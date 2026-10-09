@@ -10,8 +10,11 @@ import { Textarea } from "@/registry/default/textarea/textarea";
 
 const inputGroupVariants = cva(
   [
-    "group/input-group relative flex w-full items-center rounded-lg border bg-clip-padding",
-    "min-w-0 has-[>textarea]:h-auto",
+    "group/input-group relative flex w-full min-w-0 items-center rounded-(--input-group-radius) border bg-clip-padding",
+    "[--input-group-item-radius:max(0px,calc(var(--input-group-radius)-3px))]",
+    // A fixed shell, as in Number Field: the input stretches to fill it, and
+    // buttons sit in it with a 2px transparent-border inset.
+    "h-(--input-group-h) has-[>textarea]:h-auto",
 
     // Addons follow the control: dimmed while it's disabled, and a block
     // addon tucked closer to an input. Here on the group, with a direct
@@ -38,6 +41,12 @@ const inputGroupVariants = cva(
   ],
   {
     variants: {
+      // Input's heights (one step taller below sm); corners step with them.
+      size: {
+        default:
+          "[--input-group-h:--spacing(10)] sm:[--input-group-h:--spacing(9)] [--input-group-radius:var(--radius)]",
+        sm: "[--input-group-h:--spacing(9)] sm:[--input-group-h:--spacing(8)] [--input-group-radius:calc(var(--radius)-2px)]",
+      },
       variant: {
         // Opaque "lifted" bg — use on the page or any non-elevated substrate.
         default: "bg-input",
@@ -48,34 +57,38 @@ const inputGroupVariants = cva(
     },
     defaultVariants: {
       variant: "default",
+      size: "default",
     },
   },
 );
 
-function InputGroup({
-  className,
-  variant,
-  ...props
-}: React.ComponentProps<"div"> & VariantProps<typeof inputGroupVariants>) {
+export type InputGroupProps = React.ComponentProps<"div"> &
+  VariantProps<typeof inputGroupVariants>;
+
+function InputGroup({ className, variant, size, ...props }: InputGroupProps) {
   return (
     <div
       data-slot="input-group"
+      data-size={size ?? "default"}
       role="group"
-      className={cn(inputGroupVariants({ variant }), className)}
+      className={cn(inputGroupVariants({ variant, size }), className)}
       {...props}
     />
   );
 }
 
 const inputGroupAddonVariants = cva(
-  "text-muted-foreground flex h-auto cursor-text items-center justify-center gap-2 py-1.5 text-sm font-medium select-none [&>svg:not([class*='size-'])]:size-4 [&>kbd]:rounded-[calc(var(--radius)-5px)]",
+  "text-muted-foreground flex h-auto cursor-text items-center justify-center gap-2 text-sm font-medium select-none [&>svg:not([class*='size-'])]:size-4 [&>kbd]:rounded-[calc(var(--radius)-5px)]",
   {
     variants: {
+      // Inline addons fill the shell's height. A button on the outer edge
+      // takes the place of the padding, so its corners are concentric with
+      // the shell's.
       align: {
         "inline-start":
-          "order-first pl-3 has-[>button]:ml-[-0.45rem] has-[>kbd]:ml-[-0.35rem]",
+          "order-first self-stretch pl-3 has-[>button:first-child]:pl-0 has-[>kbd]:pl-2",
         "inline-end":
-          "order-last pr-3 has-[>button]:mr-[-0.45rem] has-[>kbd]:mr-[-0.35rem]",
+          "order-last self-stretch pr-3 has-[>button:last-child]:pr-0 has-[>kbd]:pr-2",
         "block-start":
           "order-first w-full justify-start px-3 pt-3 [.border-b]:pb-3",
         "block-end":
@@ -88,62 +101,103 @@ const inputGroupAddonVariants = cva(
   },
 );
 
+type InputGroupAddonAlign = NonNullable<
+  VariantProps<typeof inputGroupAddonVariants>["align"]
+>;
+
+const InputGroupAddonContext =
+  React.createContext<InputGroupAddonAlign>("inline-start");
+
+export type InputGroupAddonProps = React.ComponentProps<"div"> &
+  VariantProps<typeof inputGroupAddonVariants>;
+
 function InputGroupAddon({
   className,
   align = "inline-start",
+  onClick,
   ...props
-}: React.ComponentProps<"div"> & VariantProps<typeof inputGroupAddonVariants>) {
+}: InputGroupAddonProps) {
   return (
-    <div
-      role="group"
-      data-slot="input-group-addon"
-      data-align={align}
-      className={cn(inputGroupAddonVariants({ align }), className)}
-      onClick={(e) => {
-        if ((e.target as HTMLElement).closest("button")) {
-          return;
-        }
-        e.currentTarget.parentElement?.querySelector("input")?.focus();
-      }}
-      {...props}
-    />
+    <InputGroupAddonContext.Provider value={align ?? "inline-start"}>
+      <div
+        role="group"
+        data-slot="input-group-addon"
+        data-align={align}
+        className={cn(inputGroupAddonVariants({ align }), className)}
+        onClick={(event) => {
+          onClick?.(event);
+          if ((event.target as HTMLElement).closest("button")) return;
+          event.currentTarget.parentElement
+            ?.querySelector<HTMLElement>("[data-slot=input-group-control]")
+            ?.focus();
+        }}
+        {...props}
+      />
+    </InputGroupAddonContext.Provider>
   );
 }
 
-// Sizes here are deliberately smaller than the standalone Button's — the button
-// must fit inside the input's border and track the input's height, not the
-// viewport. Note the name collision: `xs` here is 24px vs the Button's 32px.
-// Intentional; don't "reconcile" them with the Button scale.
 const inputGroupButtonVariants = cva(
-  "text-sm shadow-none flex gap-2 items-center min-h-0",
+  [
+    "border-2 border-transparent shadow-none",
+    // Hover and press on a quiet button: the label color at 10% / 14%
+    "data-[variant=ghost]:[--btn-bg-hover:color-mix(in_oklab,currentColor_10%,transparent)] data-[variant=ghost]:[--btn-bg-active:color-mix(in_oklab,currentColor_14%,transparent)]",
+  ],
   {
     variants: {
       size: {
-        xs: "h-6 sm:h-6 gap-1 px-2 rounded-[calc(var(--radius)-5px)] [&>svg:not([class*='size-'])]:size-3.5 has-[>svg]:px-2",
-        sm: "h-8 sm:h-8 px-2 gap-1.5 rounded-[calc(var(--radius)-5px)] has-[>svg]:px-2",
-        icon_xs:
-          "size-6 sm:size-6 rounded-[calc(var(--radius)-5px)] p-0 has-[>svg]:p-0",
-        icon_sm: "size-8 sm:size-8 p-0 has-[>svg]:p-0",
+        default: "px-2.5",
+        icon: "",
+      },
+      // Inline: stretched to the shell's height, with box corners the
+      // paint's + 2px so paint, gap, and focus ring (at offset 0) are
+      // concentric. Block: a fixed height in a toolbar row.
+      placement: {
+        inline:
+          "self-stretch rounded-[calc(var(--input-group-item-radius)+2px)] before:rounded-(--input-group-item-radius) focus-visible:outline-offset-0",
+        block: "",
       },
     },
+    compoundVariants: [
+      { size: "default", placement: "inline", className: "h-auto sm:h-auto" },
+      {
+        size: "icon",
+        placement: "inline",
+        className: "size-auto aspect-square sm:size-auto",
+      },
+      { size: "default", placement: "block", className: "h-8 sm:h-8" },
+      { size: "icon", placement: "block", className: "size-8 sm:size-8" },
+    ],
     defaultVariants: {
-      size: "xs",
+      size: "default",
+      placement: "inline",
     },
   },
 );
 
+export type InputGroupButtonProps = Omit<
+  React.ComponentProps<typeof Button>,
+  "size"
+> & {
+  /** `icon` keeps an icon-only button square. */
+  size?: "default" | "icon";
+};
+
 function InputGroupButton({
   className,
   variant = "ghost",
-  size = "xs",
+  size = "default",
   ...props
-}: Omit<React.ComponentProps<typeof Button>, "size"> &
-  VariantProps<typeof inputGroupButtonVariants>) {
+}: InputGroupButtonProps) {
+  const align = React.use(InputGroupAddonContext);
+  const placement = align.startsWith("inline") ? "inline" : "block";
+
   return (
     <Button
-      data-size={size}
+      data-slot="input-group-button"
       variant={variant}
-      className={cn(inputGroupButtonVariants({ size }), className)}
+      size={size === "icon" ? "icon_sm" : "sm"}
+      className={cn(inputGroupButtonVariants({ size, placement }), className)}
       {...props}
     />
   );
@@ -152,6 +206,7 @@ function InputGroupButton({
 function InputGroupText({ className, ...props }: React.ComponentProps<"span">) {
   return (
     <span
+      data-slot="input-group-text"
       className={cn(
         "text-muted-foreground flex items-center gap-2 text-sm [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
         className,
@@ -169,7 +224,7 @@ function InputGroupInput({ className, size, ...props }: InputGroupInputProps) {
       data-slot="input-group-control"
       size={size}
       className={cn(
-        "flex-1 rounded-none border-0 bg-transparent shadow-none focus-visible:outline-0 aria-invalid:outline-0 dark:bg-transparent",
+        "h-auto flex-1 self-stretch rounded-none border-0 bg-transparent shadow-none focus-visible:outline-0 aria-invalid:outline-0 sm:h-auto dark:bg-transparent",
         className,
       )}
       {...props}

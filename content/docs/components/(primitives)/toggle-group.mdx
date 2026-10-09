@@ -1,12 +1,14 @@
 ---
 title: Toggle Group
-description: Group of toggle buttons for selecting one or multiple options
+description: A set of toggles on one shell, with one or several pressed
 type: primitive
 ---
 
 import { ToggleGroup } from "@/registry/default/toggle-group/toggle-group";
 
-A toggle group joins a set of [`Toggle`](/docs/components/toggle) buttons into one connected segmented control: a shared track with hairline dividers, where each pressed toggle fills to mark the selection. Use it for related on/off choices that share a slot, like text alignment or a view switcher, where one or several can be active at once.
+A toggle group sets related options on one shell, like text alignment or bold, italic, and underline. Pressed items sink into a deeper fill, whether one or several are on.
+
+For actions rather than options, use [`ButtonGroup`](/docs/components/button-group). For a single on/off control, use [`Toggle`](/docs/components/toggle).
 
 ## Preview
 
@@ -24,100 +26,114 @@ A toggle group joins a set of [`Toggle`](/docs/components/toggle) buttons into o
 
 ```text
 ToggleGroup
-└── ToggleGroupItem
+├── ToggleGroupItem
+└── ToggleGroupSeparator
 ```
 
-`ToggleGroup` wraps a row of `ToggleGroupItem`s into one connected track, dividing them with hairlines and filling each pressed one to mark the selection. Each `ToggleGroupItem` is a [`Toggle`](/docs/components/toggle) that inherits the group's `size` and `variant`, and carries its own `value`.
+Give each `ToggleGroupItem` a `value`; the group reports the pressed values as an array.
 
 ## Examples
 
+### Variants
+
+Use `variant` to pick the shell the items sit on.
+
+<ComponentPreview component="toggle-group" example="toggle-group-variants" />
+
+| Variant   | Description                                       |
+| --------- | ------------------------------------------------- |
+| `outline` | The default. An outline Button's fill and border. |
+| `soft`    | A secondary Button's fill.                        |
+| `ghost`   | No shell.                                         |
+
+### Size
+
+Use `size` to match the group's height to a Button of the same size.
+
+<ComponentPreview component="toggle-group" example="toggle-group-sizes" />
+
+Set `[--radius:9999px]` on the group for a pill; the items' corners follow.
+
 ### With Icons
 
-Use an icon as a `ToggleGroupItem`'s content for a compact control. Give each icon-only item an `aria-label`.
+Use icons for a compact group, with an `aria-label` on each item.
 
 <ComponentPreview component="toggle-group" example="toggle-group-with-icons" />
 
 ### Multiple
 
-Add the `multiple` prop to let more than one toggle stay pressed at once. Each selected toggle fills independently.
+Set `multiple` to let several items stay pressed.
 
 <ComponentPreview component="toggle-group" example="toggle-group-multiple" />
 
-### Variants
+### Separator
 
-Set `variant` to change the container chrome. Each pressed cell fills to mark the selection.
+Use `ToggleGroupSeparator` to split items into clusters.
 
-<ComponentPreview component="toggle-group" example="toggle-group-variants" />
+<ComponentPreview component="toggle-group" example="toggle-group-separator" />
 
-| Variant   | Description                              |
-| --------- | ---------------------------------------- |
-| `solid`   | Filled track. The default.               |
-| `outline` | Bordered cells collapsed into one framed control. |
-| `ghost`   | No track chrome; just the buttons and dividers. |
+### Always Selected
 
-### Sizes
+Pressing the selected item clears the group. Control the value and ignore an empty one to keep a selection.
 
-Set `size` on the group to size every cell at once. Child `ToggleGroupItem`s inherit it unless they set their own.
-
-<ComponentPreview component="toggle-group" example="toggle-group-sizes" />
-
-| Size      | Description                  |
-| --------- | ---------------------------- |
-| `sm`      | Compact, for dense toolbars. |
-| `default` | The standard height.         |
-| `lg`      | Taller, for prominent rows.  |
-
-### Detached
-
-Set `detached` to split the buttons into standalone pills with gaps instead of one connected track.
-
-<ComponentPreview component="toggle-group" example="toggle-group-detached" />
-
-Detached cells leave the shared track, so each one takes on its `variant`'s own look: a filled plate for `solid`, a framed card for `outline`, or a bare button for `ghost`.
-
-<ComponentPreview component="toggle-group" example="toggle-group-detached-variants" />
-
-### Without Separators
-
-Set `separators={false}` to drop the hairline dividers between attached cells. (The `outline` variant divides cells with their collapsed borders instead, so it ignores this.)
-
-<ComponentPreview component="toggle-group" example="toggle-group-without-separator" />
+<ComponentPreview component="toggle-group" example="toggle-group-required" />
 
 ### Orientation
 
-Set `orientation="vertical"` to stack the buttons. Dividers and cell sizing follow the axis.
+Set `orientation="vertical"` to stack the items; arrow keys follow the axis.
 
 <ComponentPreview component="toggle-group" example="toggle-group-orientation" />
 
-### Custom Selected Color
+### Custom Color
 
-The selected cell is neutral by design. There's no accent prop; recolor it by overriding the cell's selected-fill variable, `--tgl-bg-selected` (see [Toggle's custom colors](/docs/components/toggle#custom-colors) for the full set), plus the ink with a text class. Note that `--primary` is light enough that it fails contrast as text on a tint, so the accent look pairs the tint with `--info-foreground` (the accessible brand-hue ink).
+Set `--toggle-group-selected-bg` and `--toggle-group-selected-fg` on the group to recolor the fill.
 
-This applies to attached groups and to `detached` groups whose `variant` is `outline` or `ghost`. Detached `solid` cells paint selection with a translucent overlay composited on their plate, so retint those through `--tgl-bg` instead.
-
-<ComponentPreview component="toggle-group" example="toggle-group-custom-color" />
+<ComponentPreview
+  component="toggle-group"
+  example="toggle-group-custom-color"
+/>
 
 ### Disabled
 
-Set `disabled` on the group to disable every cell at once, or on a single `ToggleGroupItem` to disable just that one.
+Set `disabled` on the group to turn off every item, or on one `ToggleGroupItem`.
 
 <ComponentPreview component="toggle-group" example="toggle-group-disabled" />
 
+## Accessibility
+
+### Labels
+
+Give the group an `aria-label` that names the choice ("Text alignment"), and every icon-only item its own.
+
+### Keyboard
+
+Tab moves focus into the group; arrow keys move between items, and Space or Enter presses one. Set `loopFocus={false}` to stop at the ends.
+
+### Selection
+
+Each item exposes its state with `aria-pressed`, and the label darkens when pressed, so the fill is never the only cue. In forced-colors mode the pressed item gets a Highlight border.
+
 ## API Reference
 
-The ToggleGroup component is built on top of [Base UI's ToggleGroup](https://base-ui.com/react/components/toggle-group). All Base UI props are supported and passed through, including `value`, `defaultValue`, `onValueChange`, `multiple`, `orientation`, and `disabled` (see the [Base UI ToggleGroup documentation](https://base-ui.com/react/components/toggle-group)). The custom props below are specific to our implementation.
+The Toggle Group is built on top of [Base UI's Toggle Group](https://base-ui.com/react/components/toggle-group). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
 
-### Custom Props
+For the complete Base UI API, see the [Base UI Toggle Group documentation](https://base-ui.com/react/components/toggle-group).
+
+### Props
+
+#### ToggleGroup
+
+The shell around the items. Wraps Base UI's `ToggleGroup`.
 
 <ApiPropsList>
 
 <ApiProp
   name="variant"
-  fullType='"solid" | "outline" | "ghost"'
+  fullType='"outline" | "soft" | "ghost"'
   simpleType="string"
-  defaultValue='"solid"'
+  defaultValue='"outline"'
 >
-  Container chrome: a filled track (`solid`), a bordered track (`outline`), or none (`ghost`).
+  Shell style. `ghost` draws none.
 </ApiProp>
 
 <ApiProp
@@ -126,15 +142,29 @@ The ToggleGroup component is built on top of [Base UI's ToggleGroup](https://bas
   simpleType="string"
   defaultValue='"default"'
 >
-  Sizes every cell at once. Propagated to child `ToggleGroupItem`s that don't set their own `size`.
-</ApiProp>
-
-<ApiProp name="detached" fullType="boolean" simpleType="boolean" defaultValue="false">
-  Splits the buttons into standalone pills separated by gaps instead of one connected track.
-</ApiProp>
-
-<ApiProp name="separators" fullType="boolean" simpleType="boolean" defaultValue="true">
-  Hairline dividers between attached cells. Ignored when `detached` or `variant="outline"` (which divides cells with their collapsed borders).
+  Outer height, matching `Button`. Items take it from the group.
 </ApiProp>
 
 </ApiPropsList>
+
+### Notes
+
+#### ToggleGroupItem
+
+Wraps [`Toggle`](/docs/components/toggle) and takes its props except `variant` and `size`, which come from the group.
+
+#### ToggleGroupSeparator
+
+A line between items. Wraps [`Separator`](/docs/components/separator); its `orientation` defaults to perpendicular to the group. Arrow keys skip it.
+
+## Upgrading
+
+If you're reinstalling over an earlier version, check these changes:
+
+| Before                                        | Now                                                                               |
+| --------------------------------------------- | --------------------------------------------------------------------------------- |
+| `variant="solid"`, a muted track, the default | `variant="outline"` is the default. `variant="soft"` is closest to the old track. |
+| `detached` split items into separate toggles  | Removed. Use `variant="ghost"` with `className="gap-1"`.                          |
+| `separators` drew lines between every item    | Place a `ToggleGroupSeparator` where you want one.                                |
+| `ToggleGroupItem` took `variant` and `size`   | Both come from the group.                                                         |
+| Recolored with `--tgl-bg-selected` on items   | Set `--toggle-group-selected-bg` and `--toggle-group-selected-fg` on the group.   |

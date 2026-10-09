@@ -34,7 +34,7 @@ const toggleBase = cn(
 // transparent when unset. -z-10 keeps it under the content (the root's
 // `isolate` contains it), and pressing scales only the pseudo.
 const togglePaint =
-  "before:content-[''] before:absolute before:inset-0 before:-z-10 before:rounded-[inherit] before:border before:border-[color:var(--tgl-border,transparent)] before:bg-[var(--tgl-paint,transparent)] before:transition-[background-color,border-color,scale] before:duration-100 before:ease-out active:before:scale-[0.97]";
+  "before:content-[''] before:absolute before:inset-0 before:-z-10 before:rounded-[inherit] before:border before:border-[color:var(--tgl-border,transparent)] before:bg-[var(--tgl-paint,transparent)] before:transition-[background-color,border-color,scale] before:duration-100 before:ease-out active:before:scale-[0.98]";
 
 const toggleVariants = cva(cn(toggleBase, togglePaint), {
   variants: {
@@ -42,12 +42,9 @@ const toggleVariants = cva(cn(toggleBase, togglePaint), {
       // Borderless: transparent when off, a neutral selected overlay when on.
       ghost:
         "[--tgl-bg-hover:var(--surface-hover)] [--tgl-bg-active:var(--surface-active)] [--tgl-bg-selected:var(--surface-selected)]",
-      // Filled: an opaque muted plate that never changes color. Hover/selected
-      // are the shared surface-hover / surface-selected overlays composited on
-      // a second ::after layer that scales with the plate, so a
-      // standalone/detached solid cell matches the group track exactly.
-      solid:
-        "[--tgl-bg:var(--muted)] after:pointer-events-none after:absolute after:inset-0 after:-z-10 after:rounded-[inherit] after:content-[''] after:bg-surface-hover after:opacity-0 after:transition-[opacity,background-color,scale] after:duration-100 after:ease-out hover:not-data-pressed:after:opacity-100 data-pressed:after:bg-surface-selected data-pressed:after:opacity-100 active:after:scale-[0.97]",
+      // Secondary Button's fill. On deepens it with the label color, so the
+      // plate stays opaque and reads as pressed in.
+      soft: "[--tgl-bg:var(--secondary)] [--tgl-bg-hover:var(--secondary-hover)] [--tgl-bg-active:var(--secondary-active)] [--tgl-bg-selected:color-mix(in_oklab,var(--secondary),currentColor_14%)]",
       // Framed card. The border color is a token like every other, so it stays
       // through press (only the fill changes) — the frame never drops out, and
       // in a group the collapsed outline stays continuous when a cell is

@@ -130,7 +130,9 @@ const linkClasses = cn(
   // its own, so paint, gap, and focus ring are concentric. The ring sits on
   // the box's edge at offset 0, 2px off the paint as on a standalone Button.
   "rounded-[calc(var(--pagination-item-radius)+2px)] before:rounded-(--pagination-item-radius) focus-visible:outline-offset-0",
-  "[--btn-bg-hover:color-mix(in_oklab,currentColor_10%,transparent)] [--btn-bg-active:color-mix(in_oklab,currentColor_10%,transparent)]",
+  // Hover is the label color at 10%; a press deepens it to 14%, about
+  // Button's active-to-hover step.
+  "[--btn-bg-hover:color-mix(in_oklab,currentColor_10%,transparent)] [--btn-bg-active:color-mix(in_oklab,currentColor_14%,transparent)]",
   // Where the indicator can't glide, the current page paints its own fill.
   "aria-[current=page]:text-(--pagination-current-fg) aria-[current=page]:hover:text-(--pagination-current-fg) aria-[current=page]:[--btn-bg:var(--pagination-current-bg)] aria-[current=page]:[--btn-bg-hover:var(--pagination-current-bg)] aria-[current=page]:[--btn-bg-active:var(--pagination-current-bg)]",
   "aria-disabled:pointer-events-none aria-disabled:opacity-60",

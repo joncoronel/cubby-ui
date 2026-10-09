@@ -60,11 +60,12 @@ const numberFieldGroupVariants = cva(
 
 // Steppers use the Button recipe (ghost, so labels go muted → foreground on
 // hover), resized to fill the shell. Hover paint is the label color at 10%,
-// as in Button Group, so it reads on both surfaces in both modes.
+// as in Button Group, so it reads on both surfaces in both modes; a press
+// deepens it to 14%, about Button's active-to-hover step.
 const stepperClasses = cn(
   // size: null drops Button's height ladder; the shell sets the size.
   buttonVariants({ variant: "ghost", size: null }),
-  "aspect-square h-auto self-stretch border-2 border-transparent text-sm rounded-(--number-field-item-radius) [--btn-bg-hover:color-mix(in_oklab,currentColor_10%,transparent)] [--btn-bg-active:color-mix(in_oklab,currentColor_10%,transparent)]",
+  "aspect-square h-auto self-stretch border-2 border-transparent text-sm rounded-(--number-field-item-radius) [--btn-bg-hover:color-mix(in_oklab,currentColor_10%,transparent)] [--btn-bg-active:color-mix(in_oklab,currentColor_14%,transparent)]",
   // Base UI keeps stepper buttons out of the tab order (arrow keys step the
   // input), so they never show a focus ring of their own.
   "data-disabled:opacity-60",

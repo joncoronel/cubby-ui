@@ -41,7 +41,8 @@ const buttonGroupVariants = cva(
         elevated: cn(solidSurface(3, 3), "text-foreground"),
         // The one shell opposite the page in brightness. Eyes adapt to the
         // page, so the same tint reads weaker inside it; it takes more.
-        solid: "bg-neutral text-neutral-foreground [--group-highlight-mix:16%]",
+        solid:
+          "bg-neutral text-neutral-foreground [--group-highlight-mix:16%] [--group-press-mix:22%]",
       },
       // Outer height, matching Button's ladder (one step taller below sm),
       // and the shell's corners, which step down with the size so a small
@@ -114,8 +115,10 @@ const trayClasses = cn(
   // tint of the label always moves away from the fill, on every shell and in
   // both modes, since the label has to contrast with it. currentColor
   // resolves where the variable is used: the pill and buttons inherit the
-  // shell's label color. --group-highlight-mix sets the strength.
-  "[--group-highlight:color-mix(in_oklab,currentColor_var(--group-highlight-mix,10%),transparent)]",
+  // shell's label color. --group-highlight-mix sets the strength. A press
+  // deepens it, as Button's active paint does (about 1.4x its hover), set
+  // by --group-press-mix.
+  "[--group-highlight:color-mix(in_oklab,currentColor_var(--group-highlight-mix,10%),transparent)] [--group-press:color-mix(in_oklab,currentColor_var(--group-press-mix,14%),transparent)]",
   // The shell is the fixed size and the buttons stretch to fill it, rather
   // than each computing its own, which the shell's own border (rounded at
   // fractional scales) would throw off. Icon sizes stay square. The
@@ -129,7 +132,7 @@ const trayClasses = cn(
   // so this list (with text-current below) must undo everything `primary`
   // sets: fill, hover, press, border, and label color. Adding a style to
   // `primary` means overriding it here too.
-  "[&>:is(button,a):not([data-variant])]:[--btn-bg:transparent] [&>:is(button,a):not([data-variant])]:[--btn-border:transparent] [&>:is(button,a):not([data-variant])]:[--btn-bg-hover:var(--group-highlight)] [&>:is(button,a):not([data-variant])]:[--btn-bg-active:var(--group-highlight)]",
+  "[&>:is(button,a):not([data-variant])]:[--btn-bg:transparent] [&>:is(button,a):not([data-variant])]:[--btn-border:transparent] [&>:is(button,a):not([data-variant])]:[--btn-bg-hover:var(--group-highlight)] [&>:is(button,a):not([data-variant])]:[--btn-bg-active:var(--group-press)]",
   // Label color: foreground on light shells, inherited on solid.
   "[&>:is(button,a):not([data-variant])]:text-current",
   // Groups of groups are a layout wrapper: no shell of their own.

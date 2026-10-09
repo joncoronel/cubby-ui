@@ -196,7 +196,8 @@
     transition:
       inset 80ms var(--ease-out-expo, cubic-bezier(0.19, 1, 0.22, 1)),
       opacity 80ms ease-out,
-      scale 80ms ease-out;
+      scale 80ms ease-out,
+      background-color 80ms ease-out;
   }
 
   [data-glide]:has(
@@ -223,8 +224,8 @@
     }
   }
 
-  /* A press shrinks the pill, matching the Button recipe. Menu triggers skip
-   * it, as Button does. */
+  /* A press shrinks and deepens the pill, matching the Button recipe's
+   * active paint. Menu triggers skip it, as Button does. */
   [data-glide]:has(
       > :is(button, a[href], [role="button"]):active:not(
           [aria-haspopup],
@@ -233,6 +234,7 @@
     )
     > [data-slot="button-group-highlight"] {
     scale: 0.98;
+    background-color: var(--group-press);
   }
 
   /* The hairlines beside the pill step aside so it never sits between two. */

@@ -98,7 +98,7 @@ Use `PaginationStatus` between Previous and Next for the position alone, when th
 
 `Pagination` is a `nav` landmark labeled "Pagination". The current page's link has `aria-current="page"`. A disabled link has `aria-disabled` and leaves the tab order. `PaginationEllipsis` reads as "More pages".
 
-Below the `sm` breakpoint, Previous and Next show only their arrows; their label stays available to screen readers and is their accessible name, so a custom or translated label carries through. A disabled Previous or Next drops its `href`, so it can't be followed. In forced-colors mode the current page gets a Highlight border.
+Below the `sm` breakpoint, Previous and Next show only their arrows; their label stays available to screen readers and is their accessible name, so a custom or translated label carries through. A disabled Previous or Next leaves the tab order, blocks its click, and drops its `href`. A router link passed through `render` keeps the `href` it requires, but its click is still blocked. In forced-colors mode the current page gets a Highlight border.
 
 `PaginationStatus` is a polite live region, so the new position is announced when it changes.
 

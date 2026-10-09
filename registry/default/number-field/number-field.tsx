@@ -173,6 +173,18 @@ function NumberFieldIncrement({
 // Increment over decrement on the trailing edge, the styled equivalent of a
 // native number spinner. Each half is a quiet stepper: the one corner that
 // sits in the shell's corner follows it, and the rest stay tight.
+// Appends a consumer className to ours, keeping Base UI's function form
+// (className as a function of the part's state) working.
+function withClassName<State>(
+  base: string,
+  className: string | ((state: State) => string | undefined) | undefined,
+): string | ((state: State) => string) {
+  if (typeof className === "function") {
+    return (state) => cn(base, className(state));
+  }
+  return cn(base, className);
+}
+
 type NumberFieldStepperProps = React.ComponentProps<"div"> & {
   /** Props for the increment half, e.g. a localized `aria-label`. */
   incrementProps?: BaseNumberField.Increment.Props;
@@ -201,12 +213,12 @@ function NumberFieldStepper({
         data-slot="number-field-increment"
         aria-label="Increase"
         {...incrementProps}
-        className={cn(
-          stepClassName,
-          "rounded-[3px] rounded-se-(--number-field-item-radius) border-b",
-          typeof incrementProps?.className === "string"
-            ? incrementProps.className
-            : undefined,
+        className={withClassName(
+          cn(
+            stepClassName,
+            "rounded-[3px] rounded-se-(--number-field-item-radius) border-b",
+          ),
+          incrementProps?.className,
         )}
       >
         <HugeiconsIcon icon={ChevronUpIcon} strokeWidth={2} />
@@ -215,12 +227,12 @@ function NumberFieldStepper({
         data-slot="number-field-decrement"
         aria-label="Decrease"
         {...decrementProps}
-        className={cn(
-          stepClassName,
-          "rounded-[3px] rounded-ee-(--number-field-item-radius) border-t",
-          typeof decrementProps?.className === "string"
-            ? decrementProps.className
-            : undefined,
+        className={withClassName(
+          cn(
+            stepClassName,
+            "rounded-[3px] rounded-ee-(--number-field-item-radius) border-t",
+          ),
+          decrementProps?.className,
         )}
       >
         <HugeiconsIcon icon={ChevronDownIcon} strokeWidth={2} />

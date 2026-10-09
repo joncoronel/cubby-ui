@@ -24,7 +24,7 @@ export default function ButtonGroupInputGroup() {
   return (
     <ButtonGroup variant="attached" className="[--radius:9999rem]">
       <ButtonGroup variant="attached">
-        <Button variant="outline" size="icon">
+        <Button variant="outline" size="icon" aria-label="Add attachment">
           <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />
         </Button>
       </ButtonGroup>

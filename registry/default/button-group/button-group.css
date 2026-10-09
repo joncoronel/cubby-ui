@@ -52,7 +52,8 @@
 
 [data-glide][data-orientation="vertical"]
   > :is(button, a[href], [role="button"]):has(
-    + [data-slot="button-group-separator"]
+    + [data-slot="button-group-separator"],
+    + input[aria-hidden="true"] + [data-slot="button-group-separator"]
   )::after {
   inset-block-end: -5px;
 }
@@ -101,23 +102,23 @@
   outline-offset: 0;
 }
 
+/* Fields light while focused, and on hover where hover is real (a raw
+ * :hover sticks after a tap on touch screens). */
 [data-slot="button-group"]:not([data-variant="attached"])
-  > [data-slot="input"]:is(:hover, :focus) {
+  > [data-slot="input"]:focus {
   background-color: var(--group-highlight);
 }
 
-/* Where the pill doesn't run (turned off, or no anchor positioning), a select
- * trigger paints its own hover, like the buttons do. */
-[data-slot="button-group"]:not([data-variant="attached"], [data-glide])
-  > [data-slot="select-trigger"]:is(:hover, [data-popup-open]) {
+/* A select trigger paints its own hover and open state, like the buttons;
+ * where the pill glides, the @supports block below turns it off. */
+[data-slot="button-group"]:not([data-variant="attached"])
+  > [data-slot="select-trigger"][data-popup-open] {
   background-color: var(--group-highlight);
 }
 
-@supports not (
-  (anchor-name: --button-group-item) and (anchor-scope: --button-group-item) and
-    (inset: anchor(inside))
-) {
-  [data-glide] > [data-slot="select-trigger"]:is(:hover, [data-popup-open]) {
+@media (hover: hover) {
+  [data-slot="button-group"]:not([data-variant="attached"])
+    > :is([data-slot="input"], [data-slot="select-trigger"]):hover {
     background-color: var(--group-highlight);
   }
 }
@@ -134,6 +135,13 @@
   [data-glide] > :is(button, a[href], [role="button"]):not([data-variant]) {
     --btn-bg-hover: transparent;
     --btn-bg-active: transparent;
+  }
+
+  /* Same for a select trigger's own hover and open paint. Selectors match
+   * the specificity of the rules above that set it. */
+  [data-slot="button-group"][data-glide]:not([data-variant="attached"])
+    > [data-slot="select-trigger"]:is(:hover, [data-popup-open]) {
+    background-color: transparent;
   }
 
   /* What the pill lands on. Hover only where hover is real, so a tap doesn't
@@ -165,16 +173,22 @@
    * no delay, so the pill moves the moment the next one is lit. */
   [data-glide]:not(
       :has(
-        > :is(button, a[href], [role="button"]):is(
-            :hover,
-            :focus-visible,
-            :active,
-            [data-popup-open]
-          )
+        > :is(button, a[href], [role="button"]):not(
+            :disabled,
+            [data-disabled]
+          ):is(:hover, :focus-visible, :active, [data-popup-open])
       )
     )
     > :is(button, a[href], [role="button"]) {
-    transition: anchor-name 0s 80ms allow-discrete;
+    /* The Button recipe's own transitions (button.tsx), restated so adding
+     * the anchor hold doesn't drop them. */
+    transition:
+      outline-width 100ms ease-out,
+      outline-offset 100ms ease-out,
+      outline-color 100ms ease-out,
+      opacity 100ms ease-out,
+      color 100ms ease-out,
+      anchor-name 0s 80ms allow-discrete;
   }
 
   [data-glide] > [data-slot="button-group-highlight"] {
@@ -187,6 +201,9 @@
     border: 2px solid transparent;
     border-radius: calc(var(--group-item-radius) + 2px);
     background: var(--group-highlight) padding-box;
+    /* Rendered after the buttons (so consumers' first-child selectors still
+     * match the first button); it sits under them inside the isolated group. */
+    z-index: -1;
     pointer-events: none;
     opacity: 0;
     scale: 0.96;
@@ -233,7 +250,7 @@
         )
     )
     > [data-slot="button-group-highlight"] {
-    scale: 0.98;
+    scale: var(--group-press-scale, 0.98);
     background-color: var(--group-press);
   }
 
@@ -241,6 +258,7 @@
   [data-glide]
     > :is(button, a[href], [role="button"]):not(:disabled, [data-disabled]):is(
       :focus-visible,
+      :active,
       [data-popup-open]
     )
     + [data-slot="button-group-separator"],
@@ -249,7 +267,7 @@
       + :is(button, a[href], [role="button"]):not(
           :disabled,
           [data-disabled]
-        ):is(:focus-visible, [data-popup-open])
+        ):is(:focus-visible, :active, [data-popup-open])
     ) {
     opacity: 0;
   }
@@ -273,9 +291,15 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    [data-glide] {
+      --group-press-scale: 1;
+    }
+
     [data-glide] > [data-slot="button-group-highlight"] {
       scale: 1;
-      transition: opacity 80ms ease-out;
+      transition:
+        opacity 80ms ease-out,
+        background-color 80ms ease-out;
     }
   }
 }

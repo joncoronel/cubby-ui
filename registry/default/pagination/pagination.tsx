@@ -43,7 +43,7 @@ function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
 // concentric and --radius drives both. Set [--radius:9999px] for a pill.
 const paginationContentVariants = cva(
   [
-    "relative flex w-fit flex-row items-stretch rounded-(--pagination-radius)",
+    "relative isolate flex w-fit flex-row items-stretch rounded-(--pagination-radius)",
     "[--pagination-item-radius:max(0px,calc(var(--pagination-radius)-var(--pagination-border,0px)-2px))]",
     // The shell is the fixed size and the links stretch to fill it, square
     // at least (aspect-ratio, so wider labels still grow).
@@ -93,9 +93,11 @@ function PaginationContent({
       className={cn(paginationContentVariants({ variant, size }), className)}
       {...props}
     >
-      {/* The current-page fill, placed and animated by pagination.css. */}
-      <li aria-hidden data-slot="pagination-indicator" />
       {children}
+      {/* The current-page fill, placed and animated by pagination.css. Last,
+          so consumers' first-child selectors still match the first item; it
+          sits under the links at z-index -1 inside the isolated list. */}
+      <li aria-hidden data-slot="pagination-indicator" />
     </ul>
   );
 }
@@ -149,11 +151,24 @@ function PaginationLink({
   isDisabled,
   render,
   children,
+  href,
+  onClick,
   ...props
 }: PaginationLinkProps) {
   const defaultProps = {
     "aria-current": isActive ? ("page" as const) : undefined,
     "aria-disabled": isDisabled || undefined,
+    // A disabled link drops its href (and keeps its link role), so neither a
+    // lingering focus nor a screen reader's virtual cursor can follow it.
+    href: isDisabled ? undefined : href,
+    role: isDisabled ? "link" : undefined,
+    onClick: (event: React.MouseEvent<HTMLAnchorElement>) => {
+      if (isDisabled) {
+        event.preventDefault();
+        return;
+      }
+      onClick?.(event);
+    },
     tabIndex: isDisabled ? -1 : undefined,
     "data-slot": "pagination-link",
     "data-active": isActive || undefined,
@@ -176,8 +191,9 @@ function PaginationLink({
   });
 }
 
-// Below sm, Previous and Next drop their labels to icons; the accessible
-// name stays.
+// Below sm, Previous and Next show only their arrows. The label stays in
+// the accessibility tree (sr-only), so it is the accessible name and a
+// custom or translated label carries through.
 function PaginationPrevious({
   className,
   children = "Previous",
@@ -185,12 +201,11 @@ function PaginationPrevious({
 }: PaginationLinkProps) {
   return (
     <PaginationLink
-      aria-label="Go to previous page"
       className={cn("gap-1.5 sm:ps-2 sm:pe-3", className)}
       {...props}
     >
-      <HugeiconsIcon icon={ChevronLeftIcon} strokeWidth={2} />
-      <span className="max-sm:hidden">{children}</span>
+      <HugeiconsIcon icon={ChevronLeftIcon} strokeWidth={2} aria-hidden />
+      <span className="max-sm:sr-only">{children}</span>
     </PaginationLink>
   );
 }
@@ -202,12 +217,11 @@ function PaginationNext({
 }: PaginationLinkProps) {
   return (
     <PaginationLink
-      aria-label="Go to next page"
       className={cn("gap-1.5 sm:ps-3 sm:pe-2", className)}
       {...props}
     >
-      <span className="max-sm:hidden">{children}</span>
-      <HugeiconsIcon icon={ChevronRightIcon} strokeWidth={2} />
+      <span className="max-sm:sr-only">{children}</span>
+      <HugeiconsIcon icon={ChevronRightIcon} strokeWidth={2} aria-hidden />
     </PaginationLink>
   );
 }

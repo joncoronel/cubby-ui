@@ -112,6 +112,19 @@ describe("getPaginationRange", () => {
     );
   });
 
+  it("treats a non-finite page as page 1", () => {
+    expect(getPaginationRange({ page: NaN, pageCount: 20 })).toEqual(
+      getPaginationRange({ page: 1, pageCount: 20 }),
+    );
+    expect(getPaginationRange({ page: Infinity, pageCount: 20 })).toEqual(
+      getPaginationRange({ page: 1, pageCount: 20 }),
+    );
+  });
+
+  it("returns nothing for a non-finite page count", () => {
+    expect(getPaginationRange({ page: 1, pageCount: NaN })).toEqual([]);
+  });
+
   it("includes the current page", () => {
     for (let page = 1; page <= 25; page++) {
       expect(getPaginationRange({ page, pageCount: 25 })).toContain(page);

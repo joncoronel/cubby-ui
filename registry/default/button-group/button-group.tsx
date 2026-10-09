@@ -209,13 +209,16 @@ function ButtonGroup({
         className={cn(
           buttonGroupVariants({ variant, size, orientation }),
           isTray && trayClasses,
+          // Contains the pill's z-index -1 so it sits above the shell fill.
+          glides && "isolate",
           className,
         )}
         {...props}
       >
-        {/* Placed and animated by button-group.css. */}
-        {glides && <span aria-hidden data-slot="button-group-highlight" />}
         {children}
+        {/* Placed and animated by button-group.css. Last, so consumers'
+            first-child selectors still match the first button. */}
+        {glides && <span aria-hidden data-slot="button-group-highlight" />}
       </div>
     </ButtonGroupContext.Provider>
   );
@@ -273,7 +276,7 @@ function ButtonGroupSeparator({
           ? "dark:bg-input"
           : cn(
               // Inset hairline. button-group.css fades it beside the pill.
-              "transition-opacity duration-150 data-[orientation=horizontal]:!mx-1.5 data-[orientation=horizontal]:!my-0.5 data-[orientation=vertical]:!mx-0.5 data-[orientation=vertical]:!my-1.5",
+              "transition-opacity duration-[80ms] ease-out data-[orientation=horizontal]:!mx-1.5 data-[orientation=horizontal]:!my-0.5 data-[orientation=vertical]:!mx-0.5 data-[orientation=vertical]:!my-1.5",
               group.variant === "solid" && "bg-neutral-foreground/15",
             ),
         className,

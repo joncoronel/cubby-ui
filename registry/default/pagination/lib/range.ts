@@ -31,9 +31,15 @@ export function getPaginationRange({
   siblingCount = 1,
   boundaryCount = 1,
 }: PaginationRangeOptions): PaginationRangeItem[] {
-  const count = Math.max(0, Math.floor(pageCount));
+  // Non-finite input (NaN from Number(searchParams.get("page"))) falls back
+  // to no pages, or to page 1.
+  const count = Number.isFinite(pageCount)
+    ? Math.max(0, Math.floor(pageCount))
+    : 0;
   if (count === 0) return [];
-  const current = Math.min(Math.max(1, Math.floor(page)), count);
+  const current = Number.isFinite(page)
+    ? Math.min(Math.max(1, Math.floor(page)), count)
+    : 1;
   const siblings = Math.max(0, Math.floor(siblingCount));
   const boundaries = Math.max(0, Math.floor(boundaryCount));
 
@@ -41,11 +47,10 @@ export function getPaginationRange({
   // slots the ellipses would take.
   if (count <= boundaries * 2 + siblings * 2 + 3) return range(1, count);
 
-  const startPages = range(1, Math.min(boundaries, count));
-  const endPages = range(
-    Math.max(count - boundaries + 1, boundaries + 1),
-    count,
-  );
+  // From here count > 2 * boundaries + 2 * siblings + 3, so the boundary
+  // runs never overlap and need no clamping.
+  const startPages = range(1, boundaries);
+  const endPages = range(count - boundaries + 1, count);
 
   // The sibling window, pushed inward at either end so the total stays fixed.
   const siblingsStart = Math.max(
@@ -54,7 +59,7 @@ export function getPaginationRange({
   );
   const siblingsEnd = Math.min(
     Math.max(current + siblings, boundaries + siblings * 2 + 2),
-    endPages.length > 0 ? endPages[0] - 2 : count - 1,
+    count - boundaries - 1,
   );
 
   return [

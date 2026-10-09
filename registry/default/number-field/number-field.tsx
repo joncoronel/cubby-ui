@@ -31,7 +31,10 @@ const numberFieldGroupVariants = cva(
     "outline-0 outline-offset-0 outline-transparent outline-solid transition-[outline-width,outline-offset,outline-color] duration-100 ease-out",
     "has-[[data-slot=number-field-input]:focus-visible]:outline-ring/50 has-[[data-slot=number-field-input]:focus-visible]:outline-2 has-[[data-slot=number-field-input]:focus-visible]:outline-offset-2",
     "has-[[data-slot=number-field-input][aria-invalid=true]]:outline-destructive/50 has-[[data-slot=number-field-input][aria-invalid=true]]:outline-2 has-[[data-slot=number-field-input][aria-invalid=true]]:outline-offset-2",
-    "data-disabled:opacity-60",
+    // A disabled field dims once, here. The steppers' own disabled opacity
+    // (from the Button recipe) is cancelled inside it so it doesn't stack;
+    // a stepper disabled alone at min or max still dims.
+    "data-disabled:opacity-60 data-disabled:[&_button]:opacity-100",
     // A scrub label inside the shell is a leading prefix: the value sits
     // beside it instead of centered between steppers.
     "has-[>[data-slot=number-field-scrub-area]]:[&>[data-slot=number-field-input]]:text-left",
@@ -68,7 +71,6 @@ const stepperClasses = cn(
   "aspect-square h-auto self-stretch border-2 border-transparent text-sm rounded-(--number-field-item-radius) [--btn-bg-hover:color-mix(in_oklab,currentColor_10%,transparent)] [--btn-bg-active:color-mix(in_oklab,currentColor_14%,transparent)]",
   // Base UI keeps stepper buttons out of the tab order (arrow keys step the
   // input), so they never show a focus ring of their own.
-  "data-disabled:opacity-60",
 );
 
 type NumberFieldProps = BaseNumberField.Root.Props;
@@ -95,6 +97,7 @@ function NumberFieldGroup({
   return (
     <BaseNumberField.Group
       data-slot="number-field-group"
+      data-variant={variant ?? "default"}
       data-size={size ?? "default"}
       className={cn(numberFieldGroupVariants({ variant, size }), className)}
       {...props}
@@ -119,9 +122,12 @@ function NumberFieldInput({
         // stepper sits beside it, and collapses to its center while that
         // stepper is hovered or pressed, so the paint never sits against a
         // line.
-        "bg-[linear-gradient(var(--border),var(--border)),linear-gradient(var(--border),var(--border))] [background-size:1px_var(--number-field-divider-s,0px),1px_var(--number-field-divider-e,0px)] [background-position:left_center,right_center] bg-no-repeat [background-origin:border-box] transition-[background-size] duration-100 ease-out",
+        "bg-[linear-gradient(var(--border),var(--border)),linear-gradient(var(--border),var(--border))] [background-size:1px_var(--number-field-divider-s,0px),1px_var(--number-field-divider-e,0px)] [background-position:left_center,right_center] bg-no-repeat [background-origin:border-box] transition-[background-size] duration-100 ease-out motion-reduce:transition-none",
         "has-[+[data-slot=number-field-increment]]:[--number-field-divider-e:calc(100%_-_12px)] has-[+[data-slot=number-field-stepper]]:[--number-field-divider-e:calc(100%_-_12px)] [[data-slot=number-field-decrement]+&]:[--number-field-divider-s:calc(100%_-_12px)]",
-        "has-[+[data-slot=number-field-increment]:is(:hover,:active)]:[--number-field-divider-e:0px] has-[+[data-slot=number-field-stepper]:hover]:[--number-field-divider-e:0px] [[data-slot=number-field-decrement]:is(:hover,:active)+&]:[--number-field-divider-s:0px]",
+        // Hover only where hover is real, so a tap doesn't leave a divider
+        // collapsed beside an unpainted stepper on touch screens.
+        "has-[+[data-slot=number-field-increment]:active]:[--number-field-divider-e:0px] has-[+[data-slot=number-field-stepper]:active]:[--number-field-divider-e:0px] [[data-slot=number-field-decrement]:active+&]:[--number-field-divider-s:0px]",
+        "[@media(hover:hover)]:has-[+[data-slot=number-field-increment]:hover]:[--number-field-divider-e:0px] [@media(hover:hover)]:has-[+[data-slot=number-field-stepper]:hover]:[--number-field-divider-e:0px] [@media(hover:hover)]:[[data-slot=number-field-decrement]:hover+&]:[--number-field-divider-s:0px]",
         "disabled:pointer-events-none disabled:cursor-not-allowed",
         className,
       )}
@@ -167,10 +173,19 @@ function NumberFieldIncrement({
 // Increment over decrement on the trailing edge, the styled equivalent of a
 // native number spinner. Each half is a quiet stepper: the one corner that
 // sits in the shell's corner follows it, and the rest stay tight.
+type NumberFieldStepperProps = React.ComponentProps<"div"> & {
+  /** Props for the increment half, e.g. a localized `aria-label`. */
+  incrementProps?: BaseNumberField.Increment.Props;
+  /** Props for the decrement half, e.g. a localized `aria-label`. */
+  decrementProps?: BaseNumberField.Decrement.Props;
+};
+
 function NumberFieldStepper({
   className,
+  incrementProps,
+  decrementProps,
   ...props
-}: React.ComponentProps<"div">) {
+}: NumberFieldStepperProps) {
   const stepClassName = cn(
     stepperClasses,
     "aspect-auto w-7 flex-1 [&_svg:not([class*='size-'])]:size-3.5",
@@ -185,9 +200,13 @@ function NumberFieldStepper({
       <BaseNumberField.Increment
         data-slot="number-field-increment"
         aria-label="Increase"
+        {...incrementProps}
         className={cn(
           stepClassName,
           "rounded-[3px] rounded-se-(--number-field-item-radius) border-b",
+          typeof incrementProps?.className === "string"
+            ? incrementProps.className
+            : undefined,
         )}
       >
         <HugeiconsIcon icon={ChevronUpIcon} strokeWidth={2} />
@@ -195,9 +214,13 @@ function NumberFieldStepper({
       <BaseNumberField.Decrement
         data-slot="number-field-decrement"
         aria-label="Decrease"
+        {...decrementProps}
         className={cn(
           stepClassName,
           "rounded-[3px] rounded-ee-(--number-field-item-radius) border-t",
+          typeof decrementProps?.className === "string"
+            ? decrementProps.className
+            : undefined,
         )}
       >
         <HugeiconsIcon icon={ChevronDownIcon} strokeWidth={2} />
@@ -273,4 +296,8 @@ export {
   numberFieldGroupVariants,
 };
 
-export type { NumberFieldProps, NumberFieldGroupProps };
+export type {
+  NumberFieldProps,
+  NumberFieldGroupProps,
+  NumberFieldStepperProps,
+};

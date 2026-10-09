@@ -53,6 +53,7 @@
     border: 2px solid transparent;
     border-radius: calc(var(--pagination-item-radius) + 2px);
     background: var(--pagination-current-bg) padding-box;
+    z-index: -1;
     pointer-events: none;
     /* Exponential ease-out so it lands decisively. On first paint the anchor
      * goes from none to a link, which can't interpolate, so it starts in
@@ -69,5 +70,13 @@
       > [data-slot="pagination-link-label"] {
       transition-delay: 0s;
     }
+  }
+}
+
+/* Forced colors replace the fill and label color, so the current page gets
+ * a Highlight border (its 2px inset border) to stay distinct. */
+@media (forced-colors: active) {
+  [data-slot="pagination-link"][aria-current="page"] {
+    border-color: Highlight;
   }
 }

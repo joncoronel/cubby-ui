@@ -273,11 +273,17 @@
         {
           "path": "registry/default/button-group/button-group.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/button-group.tsx"
+          "target": "components/ui/cubby-ui/button-group/button-group.tsx"
+        },
+        {
+          "path": "registry/default/button-group/button-group.css",
+          "type": "registry:file",
+          "target": "components/ui/cubby-ui/button-group/button-group.css"
         }
       ],
       "registryDependencies": [
-        "@cubby-ui/separator"
+        "@cubby-ui/separator",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "class-variance-authority"

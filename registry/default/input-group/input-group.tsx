@@ -131,13 +131,12 @@ function InputGroupAddon({
         )}
         onClick={(event) => {
           onClick?.(event);
-          // Clicks on the addon's own controls stay with them. Scoped to the
-          // addon: a dialog or popover around the group carries tabindex too.
+          // Leave focus alone for the addon's own controls. Scoped to the
+          // addon, since a dialog around the group has a tabindex too.
           const control = (event.target as HTMLElement).closest(
             "button, a, input, select, textarea, [role=button], [tabindex]",
           );
-          // A portaled popup opened from the addon bubbles here through React
-          // but sits outside it in the DOM.
+          // Portaled popups bubble here through React but sit outside the DOM.
           if (
             event.defaultPrevented ||
             !event.currentTarget.contains(event.target as Node) ||
@@ -242,9 +241,8 @@ function InputGroupInput({ className, size, ...props }: InputGroupInputProps) {
       size={size}
       className={cn(
         "h-auto flex-1 self-stretch rounded-none border-0 bg-transparent shadow-none focus-visible:outline-0 aria-invalid:outline-0 sm:h-auto dark:bg-transparent",
-        // A small group gives the input Input's small padding. The ancestor
-        // variant is as weak as the input's own padding, so the group's
-        // addon-side padding still wins.
+        // Small padding in a small group, weak enough that addon-side
+        // padding still wins
         "in-[[data-slot=input-group][data-size=sm]]:px-2.5 in-[[data-slot=input-group][data-size=sm]]:py-1.5",
         className,
       )}

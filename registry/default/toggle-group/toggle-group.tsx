@@ -8,24 +8,21 @@ import { cn } from "@/lib/utils";
 import { Separator } from "@/registry/default/separator/separator";
 import { Toggle, type ToggleProps } from "@/registry/default/toggle/toggle";
 
-// A shell, as in Button Group, whose items latch. Each pressed item paints
-// its own fill, so single and multiple groups look the same. Items fill the
-// shell with a 2px transparent-border inset (even at fractional display
-// scales); paint corners are the shell's minus its border and the 2px.
+// A shell, as in Button Group, whose items latch. Items fill it with a 2px
+// transparent-border inset (even at fractional display scales); paint corners
+// are the shell's minus its border and the 2px.
 const toggleGroupVariants = cva(
   [
     "relative isolate flex w-fit items-stretch rounded-(--toggle-group-radius) data-[orientation=vertical]:flex-col",
     "[--toggle-group-item-radius:max(0px,calc(var(--toggle-group-radius)-var(--toggle-group-border,0px)-2px))]",
-    // Corners between neighboring items: small, so a run of pressed items
-    // reads as one connected control.
+    // Small corners between neighbors, so pressed runs read as one control
     "[--toggle-group-inner-radius:min(3px,var(--toggle-group-item-radius))]",
-    // Hover and press: the label color at 10% / 14%, as in Button Group.
-    // Pressed is a deeper tint, pressed in rather than raised. Override the
+    // Label-color tints: hover 10%, press 14%, pressed 16%. Override the
     // selected variables to recolor.
     "[--toggle-group-highlight:color-mix(in_oklab,currentColor_10%,transparent)] [--toggle-group-press:color-mix(in_oklab,currentColor_14%,transparent)]",
     "[--toggle-group-selected-bg:color-mix(in_oklab,currentColor_16%,transparent)] [--toggle-group-selected-fg:var(--foreground)]",
-    // Sizing: the shell is fixed and items stretch to fill it. Vertical
-    // shells grow to the widest item.
+    // The shell is fixed and items stretch to fill it; columns grow to the
+    // widest item.
     "data-[orientation=horizontal]:h-(--toggle-group-h) data-[orientation=horizontal]:[&>[data-slot=toggle-group-item]:not([data-icon-only])]:aspect-square",
     "data-[orientation=vertical]:min-w-(--toggle-group-h) data-[orientation=vertical]:[&>[data-slot=toggle-group-item]:not([data-icon-only])]:h-(--toggle-group-item-length)",
     "data-disabled:opacity-60 data-disabled:[&>*]:opacity-100",
@@ -106,14 +103,13 @@ const itemClasses = cn(
   // Main-axis length in a column: the fill's cross size plus the borders at
   // each end (2px, or 1px against a neighbor).
   "[--toggle-group-item-start:2px] [--toggle-group-item-end:2px] [--toggle-group-item-length:calc(var(--toggle-group-h)-var(--toggle-group-border,0px)*2-4px+var(--toggle-group-item-start)+var(--toggle-group-item-end))]",
-  // Icon-only items drop their padding and wrap a square box (see
-  // ToggleGroupItem), so the area inside the borders is square.
+  // Icon-only items wrap a square box instead (see ToggleGroupItem)
   "data-icon-only:px-0",
   // Box corners are the paint's + the border, so paint, gap, and focus ring
   // (at offset 0) are concentric.
   "rounded-[calc(var(--toggle-group-item-radius)+2px)] before:rounded-(--toggle-group-item-radius) focus-visible:outline-offset-0 focus-visible:z-10",
   "[--tgl-bg-hover:var(--toggle-group-highlight)] [--tgl-bg-active:var(--toggle-group-press)] [--tgl-bg-selected:var(--toggle-group-selected-bg)]",
-  // Labels are muted until hovered or pressed.
+  // Label color
   "text-muted-foreground data-pressed:text-(--toggle-group-selected-fg) hover:not-data-pressed:text-foreground",
   // Forced colors drop the fill, so a pressed item gets a Highlight border.
   "forced-colors:data-pressed:border-[Highlight]",
@@ -169,9 +165,8 @@ function ToggleGroupItem({
       {...props}
     >
       {iconOnly ? (
-        // Square in the cross axis, so the item shrink-wraps it. Borders snap
-        // to whole device pixels, 1px and 2px by different amounts, so sizing
-        // the box from them can't keep the fill square at every scale.
+        // The item shrink-wraps this square, so the fill stays square however
+        // the 1px and 2px borders snap to device pixels.
         <span
           className={cn(
             "flex aspect-square items-center justify-center",

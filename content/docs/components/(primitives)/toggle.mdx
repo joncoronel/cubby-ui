@@ -36,7 +36,7 @@ Use `size` to set the toggle's height and padding.
 
 ### With Text
 
-Place a text label alongside the icon inside the toggle.
+Put a text label beside the icon.
 
 <ComponentPreview component="toggle" example="toggle-with-text" />
 
@@ -66,13 +66,11 @@ The toggle paints its fill from CSS variables, one per state:
 | `--tgl-bg-selected` | On.                                     |
 | `--tgl-border`      | Border color, in every state.           |
 
-Each variant sets them and the toggle switches between them internally, so
-recoloring the fill is just overriding the variables, with no `hover:` or
-`data-pressed:` prefixes needed. Override the variables instead of `bg-*`
-classes: root-level `bg-*` paints behind the fill layer, so it is hidden by
-opaque variants and blended by transparent ones, which is rarely what you want.
-The label color is not tokenized, so it stays a normal state-prefixed text
-class:
+Each variant sets them and the toggle picks one per state, so you recolor
+the fill by overriding them, with no `hover:` or `data-pressed:` prefixes.
+Override them rather than adding `bg-*` to the root: a root `bg-*` paints
+behind the fill layer, where opaque variants hide it. Set the label color with
+a state-prefixed text class:
 
 ```tsx showLineNumbers
 <Toggle className="[--tgl-bg-selected:var(--color-violet-600)] data-pressed:text-white">
@@ -80,8 +78,8 @@ class:
 </Toggle>
 ```
 
-Custom property values can't take Tailwind's `/10` opacity shorthand, so build a
-translucent tint with `color-mix` instead:
+Custom properties can't take Tailwind's `/10` opacity shorthand; build a
+translucent tint with `color-mix`:
 
 ```tsx showLineNumbers
 <Toggle className="[--tgl-bg-selected:color-mix(in_oklab,var(--primary)_10%,transparent)]">
@@ -102,17 +100,17 @@ Use `pressed` and `onPressedChange` to drive the toggle state yourself.
 
 <ComponentPreview component="toggle" example="toggle-controlled" />
 
-### Disabled State
+### Disabled
 
-Use `disabled` to prevent interaction.
+Set `disabled` to block interaction.
 
 <ComponentPreview component="toggle" example="toggle-disabled-state" />
 
 ## Accessibility
 
-### Label icon-only toggles
+### Labels
 
-An icon-only toggle has no text for a screen reader to announce. Give it an `aria-label` describing the action it controls.
+Give an icon-only toggle an `aria-label` that names what it controls, since it has no text for a screen reader to announce.
 
 ```tsx showLineNumbers
 <Toggle aria-label="Toggle bold">
@@ -126,7 +124,11 @@ The Toggle component is built on top of [Base UI's Toggle](https://base-ui.com/r
 
 For the complete Base UI API, see the [Base UI Toggle documentation](https://base-ui.com/react/components/toggle).
 
-### Custom Props
+### Props
+
+#### Toggle
+
+A two-state button. Wraps Base UI's `Toggle`.
 
 <ApiPropsList>
 

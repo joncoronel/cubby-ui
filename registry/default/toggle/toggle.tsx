@@ -24,9 +24,8 @@ const toggleBase = cn(
   // State machine: unset tokens fall through to transparent. Selection is
   // terminal, so neither hover nor press alters a selected toggle; both are
   // scoped to the off state. The pressed-down step exists because the scale
-  // alone is invisible on a variant that paints nothing at rest (ghost), which
-  // is every attached group cell and every toggle on touch, where `hover:`
-  // never matches.
+  // alone is invisible on a variant that paints nothing at rest (ghost), and
+  // on touch `hover:` never matches.
   "[--tgl-paint:var(--tgl-bg,transparent)] hover:not-data-pressed:[--tgl-paint:var(--tgl-bg-hover,var(--tgl-bg,transparent))] active:not-data-pressed:[--tgl-paint:var(--tgl-bg-active,var(--tgl-bg-hover,var(--tgl-bg,transparent)))] data-pressed:[--tgl-paint:var(--tgl-bg-selected,var(--tgl-bg,transparent))]",
 );
 

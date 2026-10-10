@@ -46,10 +46,8 @@ const toggleVariants = cva(cn(toggleBase, togglePaint), {
       // plate stays opaque and reads as pressed in.
       soft: "[--tgl-bg:var(--secondary)] [--tgl-bg-hover:var(--secondary-hover)] [--tgl-bg-active:var(--secondary-active)] [--tgl-bg-selected:color-mix(in_oklab,var(--secondary),currentColor_14%)]",
       // Framed card. The border color is a token like every other, so it stays
-      // through press (only the fill changes) — the frame never drops out, and
-      // in a group the collapsed outline stays continuous when a cell is
-      // selected. bg-clip-padding keeps the card fill out from under the
-      // translucent border.
+      // through press; only the fill changes. bg-clip-padding keeps the card
+      // fill out from under the translucent border.
       outline:
         "[--tgl-border:var(--border)] [--tgl-bg:var(--card)] [--tgl-bg-hover:var(--outline-hover)] [--tgl-bg-active:var(--outline-active)] [--tgl-bg-selected:var(--secondary)] before:bg-clip-padding",
     },

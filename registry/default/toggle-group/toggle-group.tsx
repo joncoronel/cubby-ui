@@ -74,21 +74,22 @@ export type ToggleGroupProps = BaseToggleGroup.Props &
 function ToggleGroup({
   className,
   variant,
-  size = "default",
+  size,
   orientation = "horizontal",
   children,
   ...props
 }: ToggleGroupProps) {
+  const resolvedSize = size ?? "default";
   const context = React.useMemo(
-    () => ({ size: size ?? "default", orientation }),
-    [size, orientation],
+    () => ({ size: resolvedSize, orientation }),
+    [resolvedSize, orientation],
   );
 
   return (
     <BaseToggleGroup
       data-slot="toggle-group"
       data-variant={variant ?? "outline"}
-      data-size={size ?? "default"}
+      data-size={resolvedSize}
       orientation={orientation}
       className={cn(toggleGroupVariants({ variant, size }), className)}
       {...props}
@@ -112,9 +113,8 @@ const itemClasses = cn(
   // (at offset 0) are concentric.
   "rounded-[calc(var(--toggle-group-item-radius)+2px)] before:rounded-(--toggle-group-item-radius) focus-visible:outline-offset-0 focus-visible:z-10",
   "[--tgl-bg-hover:var(--toggle-group-highlight)] [--tgl-bg-active:var(--toggle-group-press)] [--tgl-bg-selected:var(--toggle-group-selected-bg)]",
-  // Labels are muted until hovered or pressed. Hover is gated to real hover:
-  // a raw :hover sticks after a tap.
-  "text-muted-foreground data-pressed:text-(--toggle-group-selected-fg) [@media(hover:hover)]:hover:text-foreground",
+  // Labels are muted until hovered or pressed.
+  "text-muted-foreground data-pressed:text-(--toggle-group-selected-fg) hover:not-data-pressed:text-foreground",
   // Forced colors drop the fill, so a pressed item gets a Highlight border.
   "forced-colors:data-pressed:border-[Highlight]",
 );
@@ -135,23 +135,29 @@ const joinedClasses = {
 
 export type ToggleGroupItemProps = Omit<ToggleProps, "variant" | "size">;
 
-/** A `Toggle` sized and styled by its `ToggleGroup`. */
-// A lone icon component or <svg>, with no text beside it. CSS can't tell:
-// :only-child ignores text nodes.
-function isIconOnly(children: React.ReactNode): boolean {
+// A labelled item whose only child is an icon component or <svg>. CSS can't
+// tell: :only-child ignores text nodes. The label check keeps a lone text
+// component (<Trans>, <FormattedMessage>) from counting as an icon.
+function isIconOnly(
+  children: React.ReactNode,
+  props: ToggleGroupItemProps,
+): boolean {
   return (
     React.isValidElement(children) &&
-    (typeof children.type !== "string" || children.type === "svg")
+    children.type !== React.Fragment &&
+    (typeof children.type !== "string" || children.type === "svg") &&
+    Boolean(props["aria-label"] || props["aria-labelledby"])
   );
 }
 
+/** A `Toggle` sized and styled by its `ToggleGroup`. */
 function ToggleGroupItem({
   className,
   children,
   ...props
 }: ToggleGroupItemProps) {
   const { size, orientation } = React.use(ToggleGroupContext);
-  const iconOnly = isIconOnly(children);
+  const iconOnly = isIconOnly(children, props);
 
   return (
     <Toggle
@@ -198,8 +204,8 @@ function ToggleGroupSeparator({
       data-slot="toggle-group-separator"
       orientation={resolved}
       className={cn(
-        "relative !m-0 self-stretch data-[orientation=vertical]:h-auto",
-        "data-[orientation=horizontal]:!mx-1.5 data-[orientation=horizontal]:!my-0.5 data-[orientation=vertical]:!mx-0.5 data-[orientation=vertical]:!my-1.5",
+        "self-stretch data-[orientation=vertical]:h-auto",
+        "data-[orientation=horizontal]:mx-1.5 data-[orientation=horizontal]:my-0.5 data-[orientation=vertical]:mx-0.5 data-[orientation=vertical]:my-1.5",
         className,
       )}
       {...props}

@@ -56,7 +56,7 @@ Set `[--radius:9999px]` on the group for a pill; the items' corners follow.
 
 ### With Icons
 
-Use icons for a compact group, with an `aria-label` on each item.
+Use icons for a compact group, with an `aria-label` on each item; a labelled item whose only child is an icon stays square.
 
 <ComponentPreview component="toggle-group" example="toggle-group-with-icons" />
 
@@ -111,7 +111,7 @@ Tab moves focus into the group; arrow keys move between items, and Space or Ente
 
 ### Selection
 
-Each item exposes its state with `aria-pressed`, and the label darkens when pressed, so the fill is never the only cue. In forced-colors mode the pressed item gets a Highlight border.
+Each item exposes its state with `aria-pressed`, and the label switches to full contrast when pressed, so the fill is never the only cue. In forced-colors mode the pressed item gets a Highlight border.
 
 ## API Reference
 
@@ -164,7 +164,7 @@ If you're reinstalling over an earlier version, check these changes:
 | Before                                        | Now                                                                               |
 | --------------------------------------------- | --------------------------------------------------------------------------------- |
 | `variant="solid"`, a muted track, the default | `variant="outline"` is the default. `variant="soft"` is closest to the old track. |
-| `detached` split items into separate toggles  | Removed. Use `variant="ghost"` with `className="gap-1"`.                          |
+| `detached` split items into separate toggles  | Removed; items join in one shell. For standalone toggles, use separate `Toggle`s. |
 | `separators` drew lines between every item    | Place a `ToggleGroupSeparator` where you want one.                                |
 | `ToggleGroupItem` took `variant` and `size`   | Both come from the group.                                                         |
 | Recolored with `--tgl-bg-selected` on items   | Set `--toggle-group-selected-bg` and `--toggle-group-selected-fg` on the group.   |

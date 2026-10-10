@@ -26,8 +26,8 @@ const toggleGroupVariants = cva(
     "[--toggle-group-selected-bg:color-mix(in_oklab,currentColor_16%,transparent)] [--toggle-group-selected-fg:var(--foreground)]",
     // Sizing: the shell is fixed and items stretch to fill it. Vertical
     // shells grow to the widest item.
-    "data-[orientation=horizontal]:h-(--toggle-group-h) data-[orientation=horizontal]:[&>[data-slot=toggle-group-item]]:aspect-square",
-    "data-[orientation=vertical]:min-w-(--toggle-group-h) data-[orientation=vertical]:[&>[data-slot=toggle-group-item]]:h-[calc(var(--toggle-group-h)-var(--toggle-group-border,0px)*2)]",
+    "data-[orientation=horizontal]:h-(--toggle-group-h) data-[orientation=horizontal]:[&>[data-slot=toggle-group-item]:not([data-icon-only])]:aspect-square",
+    "data-[orientation=vertical]:min-w-(--toggle-group-h) data-[orientation=vertical]:[&>[data-slot=toggle-group-item]:not([data-icon-only])]:h-(--toggle-group-item-length)",
     "data-disabled:opacity-60 data-disabled:[&>*]:opacity-100",
   ],
   {
@@ -102,7 +102,11 @@ function ToggleGroup({
 
 const itemClasses = cn(
   "h-auto min-w-auto self-stretch border-2 border-transparent text-sm sm:h-auto sm:min-w-auto",
-  // Icon-only items drop their padding so they stay square.
+  // Main-axis length in a column: the fill's cross size plus the borders at
+  // each end (2px, or 1px against a neighbor).
+  "[--toggle-group-item-start:2px] [--toggle-group-item-end:2px] [--toggle-group-item-length:calc(var(--toggle-group-h)-var(--toggle-group-border,0px)*2-4px+var(--toggle-group-item-start)+var(--toggle-group-item-end))]",
+  // Icon-only items drop their padding and wrap a square box (see
+  // ToggleGroupItem), so the area inside the borders is square.
   "data-icon-only:px-0",
   // Box corners are the paint's + the border, so paint, gap, and focus ring
   // (at offset 0) are concentric.
@@ -120,12 +124,12 @@ const itemClasses = cn(
 // 2px border and the shell-concentric corners.
 const joinedClasses = {
   horizontal: cn(
-    "[[data-slot=toggle-group-item]+&]:border-s [[data-slot=toggle-group-item]+&]:rounded-s-[calc(var(--toggle-group-inner-radius)+1px)] [[data-slot=toggle-group-item]+&]:before:rounded-s-(--toggle-group-inner-radius)",
-    "has-[+[data-slot=toggle-group-item]]:border-e has-[+[data-slot=toggle-group-item]]:rounded-e-[calc(var(--toggle-group-inner-radius)+1px)] has-[+[data-slot=toggle-group-item]]:before:rounded-e-(--toggle-group-inner-radius)",
+    "[[data-slot=toggle-group-item]+&]:border-s [[data-slot=toggle-group-item]+&]:[--toggle-group-item-start:1px] [[data-slot=toggle-group-item]+&]:rounded-s-[calc(var(--toggle-group-inner-radius)+1px)] [[data-slot=toggle-group-item]+&]:before:rounded-s-(--toggle-group-inner-radius)",
+    "has-[+[data-slot=toggle-group-item]]:border-e has-[+[data-slot=toggle-group-item]]:[--toggle-group-item-end:1px] has-[+[data-slot=toggle-group-item]]:rounded-e-[calc(var(--toggle-group-inner-radius)+1px)] has-[+[data-slot=toggle-group-item]]:before:rounded-e-(--toggle-group-inner-radius)",
   ),
   vertical: cn(
-    "[[data-slot=toggle-group-item]+&]:border-t [[data-slot=toggle-group-item]+&]:rounded-t-[calc(var(--toggle-group-inner-radius)+1px)] [[data-slot=toggle-group-item]+&]:before:rounded-t-(--toggle-group-inner-radius)",
-    "has-[+[data-slot=toggle-group-item]]:border-b has-[+[data-slot=toggle-group-item]]:rounded-b-[calc(var(--toggle-group-inner-radius)+1px)] has-[+[data-slot=toggle-group-item]]:before:rounded-b-(--toggle-group-inner-radius)",
+    "[[data-slot=toggle-group-item]+&]:border-t [[data-slot=toggle-group-item]+&]:[--toggle-group-item-start:1px] [[data-slot=toggle-group-item]+&]:rounded-t-[calc(var(--toggle-group-inner-radius)+1px)] [[data-slot=toggle-group-item]+&]:before:rounded-t-(--toggle-group-inner-radius)",
+    "has-[+[data-slot=toggle-group-item]]:border-b has-[+[data-slot=toggle-group-item]]:[--toggle-group-item-end:1px] has-[+[data-slot=toggle-group-item]]:rounded-b-[calc(var(--toggle-group-inner-radius)+1px)] has-[+[data-slot=toggle-group-item]]:before:rounded-b-(--toggle-group-inner-radius)",
   ),
 };
 
@@ -147,17 +151,32 @@ function ToggleGroupItem({
   ...props
 }: ToggleGroupItemProps) {
   const { size, orientation } = React.use(ToggleGroupContext);
+  const iconOnly = isIconOnly(children);
 
   return (
     <Toggle
       data-slot="toggle-group-item"
       variant="ghost"
       size={size}
-      data-icon-only={isIconOnly(children) || undefined}
+      data-icon-only={iconOnly || undefined}
       className={cn(itemClasses, joinedClasses[orientation], className)}
       {...props}
     >
-      {children}
+      {iconOnly ? (
+        // Square in the cross axis, so the item shrink-wraps it. Borders snap
+        // to whole device pixels, 1px and 2px by different amounts, so sizing
+        // the box from them can't keep the fill square at every scale.
+        <span
+          className={cn(
+            "flex aspect-square items-center justify-center",
+            orientation === "vertical" ? "w-full" : "h-full",
+          )}
+        >
+          {children}
+        </span>
+      ) : (
+        children
+      )}
     </Toggle>
   );
 }

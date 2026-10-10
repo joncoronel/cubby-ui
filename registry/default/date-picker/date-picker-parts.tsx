@@ -274,6 +274,7 @@ function DatePickerField<T>({
     <InputGroup
       ref={groupRef}
       variant={variant}
+      size={size}
       data-slot="date-picker-field"
       className={className}
     >
@@ -281,7 +282,7 @@ function DatePickerField<T>({
         <PopoverTrigger
           disabled={disabled}
           aria-label={triggerLabel}
-          render={<InputGroupButton size="icon_xs" />}
+          render={<InputGroupButton size="icon" />}
         >
           <HugeiconsIcon icon={Calendar01Icon} strokeWidth={2} />
         </PopoverTrigger>
@@ -351,7 +352,7 @@ function DatePickerField<T>({
           </span>
           {showClear && !editing && (
             <InputGroupButton
-              size="icon_xs"
+              size="icon"
               aria-label={clearLabel}
               onClick={() => {
                 onCommit(null);

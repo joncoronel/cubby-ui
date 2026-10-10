@@ -10,7 +10,7 @@ export default function ToggleControlled() {
 
   return (
     <Toggle pressed={isPressed} onPressedChange={setIsPressed}>
-      <HugeiconsIcon icon={TextBoldIcon} className="h-4 w-4"  strokeWidth={2} />
+      <HugeiconsIcon icon={TextBoldIcon} className="h-4 w-4" strokeWidth={2} />
     </Toggle>
   );
 }

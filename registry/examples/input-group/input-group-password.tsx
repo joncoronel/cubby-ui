@@ -21,12 +21,16 @@ export default function InputGroupPassword() {
       />
       <InputGroupAddon align="inline-end">
         <InputGroupButton
-          size="icon_xs"
+          size="icon"
           variant="ghost"
           onClick={() => setShowPassword(!showPassword)}
           aria-label={showPassword ? "Hide password" : "Show password"}
         >
-          {showPassword ? <HugeiconsIcon icon={ViewOffIcon}  strokeWidth={2} /> : <HugeiconsIcon icon={ViewIcon}  strokeWidth={2} />}
+          {showPassword ? (
+            <HugeiconsIcon icon={ViewOffIcon} strokeWidth={2} />
+          ) : (
+            <HugeiconsIcon icon={ViewIcon} strokeWidth={2} />
+          )}
         </InputGroupButton>
       </InputGroupAddon>
     </InputGroup>

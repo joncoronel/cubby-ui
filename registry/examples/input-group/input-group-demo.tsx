@@ -45,8 +45,8 @@ export default function InputGroupDemo() {
         <InputGroupAddon align="inline-end">
           <Tooltip>
             <InputGroupButton
-              className="rounded-full"
-              size="icon_xs"
+              size="icon"
+              aria-label="More info"
               render={(props) => <TooltipTrigger {...props} />}
             >
               <HugeiconsIcon icon={InformationCircleIcon} strokeWidth={2} />
@@ -61,7 +61,7 @@ export default function InputGroupDemo() {
           <InputGroupButton
             variant="outline"
             className="rounded-full"
-            size="icon_xs"
+            size="icon"
           >
             <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />
           </InputGroupButton>
@@ -83,7 +83,7 @@ export default function InputGroupDemo() {
           <InputGroupButton
             variant="neutral"
             className="rounded-full"
-            size="icon_xs"
+            size="icon"
             disabled
           >
             <HugeiconsIcon icon={ArrowUp02Icon} strokeWidth={2} />

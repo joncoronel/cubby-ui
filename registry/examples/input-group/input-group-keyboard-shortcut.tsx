@@ -12,7 +12,7 @@ export default function InputGroupKeyboardShortcut() {
     <InputGroup className="max-w-sm">
       <InputGroupInput placeholder="Search..." />
       <InputGroupAddon>
-        <HugeiconsIcon icon={Search01Icon}  strokeWidth={2} />
+        <HugeiconsIcon icon={Search01Icon} strokeWidth={2} />
       </InputGroupAddon>
       <InputGroupAddon align="inline-end">
         <Kbd>⌘K</Kbd>

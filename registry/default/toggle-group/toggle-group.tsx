@@ -1,166 +1,216 @@
 "use client";
 
 import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 import { ToggleGroup as BaseToggleGroup } from "@base-ui/react/toggle-group";
 
 import { cn } from "@/lib/utils";
+import { Separator } from "@/registry/default/separator/separator";
 import { Toggle, type ToggleProps } from "@/registry/default/toggle/toggle";
 
-type ToggleGroupSize = "sm" | "default" | "lg";
-type ToggleGroupVariant = "solid" | "outline" | "ghost";
+// A shell, as in Button Group, whose items latch. Items fill it with a 2px
+// transparent-border inset (even at fractional display scales); paint corners
+// are the shell's minus its border and the 2px.
+const toggleGroupVariants = cva(
+  [
+    "relative isolate flex w-fit items-stretch rounded-(--toggle-group-radius) data-[orientation=vertical]:flex-col",
+    "[--toggle-group-item-radius:max(0px,calc(var(--toggle-group-radius)-var(--toggle-group-border,0px)-2px))]",
+    // Small corners between neighbors, so pressed runs read as one control
+    "[--toggle-group-inner-radius:min(3px,var(--toggle-group-item-radius))]",
+    // Label-color tints: hover 10%, press 14%, pressed 16%. Override the
+    // selected variables to recolor.
+    "[--toggle-group-highlight:color-mix(in_oklab,currentColor_10%,transparent)] [--toggle-group-press:color-mix(in_oklab,currentColor_14%,transparent)]",
+    "[--toggle-group-selected-bg:color-mix(in_oklab,currentColor_16%,transparent)] [--toggle-group-selected-fg:var(--foreground)]",
+    // The shell is fixed and items stretch to fill it; columns grow to the
+    // widest item.
+    "data-[orientation=horizontal]:h-(--toggle-group-h) data-[orientation=horizontal]:[&>[data-slot=toggle-group-item]:not([data-icon-only])]:aspect-square",
+    "data-[orientation=vertical]:min-w-(--toggle-group-h) data-[orientation=vertical]:[&>[data-slot=toggle-group-item]:not([data-icon-only])]:h-(--toggle-group-item-length)",
+    "data-disabled:opacity-60 data-disabled:[&>*]:opacity-100",
+  ],
+  {
+    variants: {
+      variant: {
+        // Outline's border sits outside the fill, as on an outline Button.
+        outline:
+          "border-border bg-card border bg-clip-padding [--toggle-group-border:1px]",
+        soft: "bg-secondary",
+        ghost: "",
+      },
+      // Button's height ladder (one step taller below sm); corners step with it.
+      size: {
+        sm: "[--toggle-group-h:--spacing(9)] sm:[--toggle-group-h:--spacing(8)] [--toggle-group-radius:calc(var(--radius)-2px)]",
+        default:
+          "[--toggle-group-h:--spacing(10)] sm:[--toggle-group-h:--spacing(9)] [--toggle-group-radius:var(--radius)]",
+        lg: "[--toggle-group-h:--spacing(11)] sm:[--toggle-group-h:--spacing(10)] [--toggle-group-radius:calc(var(--radius)+2px)]",
+      },
+    },
+    defaultVariants: {
+      variant: "outline",
+      size: "default",
+    },
+  },
+);
 
-export type ToggleGroupProps = BaseToggleGroup.Props & {
-  /** Cell size, propagated to child `ToggleGroupItem`s that don't set their own. */
-  size?: ToggleGroupSize;
-  /** Container chrome: filled track, bordered track, or none. */
-  variant?: ToggleGroupVariant;
-  /** Split the buttons into standalone pills with gaps instead of one track. */
-  detached?: boolean;
-  /** Hairline dividers between attached cells. Ignored when `detached` or `outline`. */
-  separators?: boolean;
-};
+type ToggleGroupSize = NonNullable<
+  VariantProps<typeof toggleGroupVariants>["size"]
+>;
 
-// Config the group hands its items. Internal to this file — `Toggle` never reads
-// it, so it stays a standalone primitive.
 type ToggleGroupContextValue = {
-  size?: ToggleGroupSize;
-  variant?: ToggleGroupVariant;
-  detached?: boolean;
-};
-const ToggleGroupContext = React.createContext<ToggleGroupContextValue>({});
-
-// Literal classes so the Tailwind scanner keeps them.
-const TRACK_RADIUS: Record<ToggleGroupSize, string> = {
-  sm: "rounded-md",
-  default: "rounded-lg",
-  lg: "rounded-xl",
-};
-const CELL_RADIUS: Record<ToggleGroupSize, string> = {
-  sm: "**:data-[slot=toggle]:rounded-md",
-  default: "**:data-[slot=toggle]:rounded-lg",
-  lg: "**:data-[slot=toggle]:rounded-xl",
+  size: ToggleGroupSize;
+  orientation: "horizontal" | "vertical";
 };
 
-// Shared cell resets for the attached variants. Press-scale is deliberately NOT
-// reset here: the Toggle recipe scales only its paint pseudo-element, so a cell
-// presses by shrinking its own fill inside the track while the label, the track,
-// and the dividers hold still — the same thing an attached Button does in a
-// ButtonGroup. Careful adding `after:` utilities to cells: Tailwind's `after:`
-// variant also emits `content: ""`, so a rule that only means to tweak a property
-// materializes an in-flow pseudo, which the cell's `gap` then pushes out to 8px
-// of phantom width. Only style ::after alongside `absolute` (as the dividers do).
-const ATTACHED_CELL =
-  "**:data-[slot=toggle]:shadow-none **:data-[slot=toggle]:focus-visible:z-10";
+const ToggleGroupContext = React.createContext<ToggleGroupContextValue>({
+  size: "default",
+  orientation: "horizontal",
+});
+
+export type ToggleGroupProps = BaseToggleGroup.Props &
+  VariantProps<typeof toggleGroupVariants>;
 
 function ToggleGroup({
   className,
-  size = "default",
-  variant = "solid",
-  detached = false,
-  separators = true,
+  variant,
+  size,
+  orientation = "horizontal",
   children,
   ...props
 }: ToggleGroupProps) {
-  const contextValue = React.useMemo(
-    () => ({ size, variant, detached }),
-    [size, variant, detached],
+  const resolvedSize = size ?? "default";
+  const context = React.useMemo(
+    () => ({ size: resolvedSize, orientation }),
+    [resolvedSize, orientation],
   );
 
-  // Cell styling lives here on the parent, via **:data-[slot=toggle]: descendant
-  // selectors, rather than on ToggleGroupItem — on purpose. The item owns cell
-  // *identity* (variant/size, fed through context); the group owns *adjacency*:
-  // border collapse, end-cap radius, dividers, and track chrome. Keeping it
-  // parent-side also makes the neutral-selection accent a single group-level
-  // override hook (see toggle-group-custom-color). The selectors reach any
-  // descendant [data-slot=toggle] so they don't depend on the item wrapper, but
-  // they assume the variant ToggleGroupItem resolves: attached cells render as
-  // `ghost` or `outline`, never `solid`, which is what leaves ::after free for
-  // the dividers below.
   return (
     <BaseToggleGroup
       data-slot="toggle-group"
-      data-variant={variant}
-      data-detached={detached ? "" : undefined}
-      className={cn(
-        "inline-flex w-fit items-stretch data-[orientation=vertical]:flex-col",
-        "[&[data-orientation=vertical]_[data-slot=toggle]]:w-full",
-        detached
-          ? // Detached: each cell is a standalone Toggle of the group's variant,
-            // so it paints itself — the group only lays them out.
-            "items-center gap-1.5 data-[orientation=vertical]:items-stretch"
-          : variant === "outline"
-            ? [
-                // Outline: cells are Toggle `outline`s (see ToggleGroupItem), so they
-                // paint themselves — a card fill and an opaque same-family
-                // `--outline-hover`, both on the cell's ::before, with the border a
-                // token that survives selection. That fixes the dark-mode darkening a
-                // neutral overlay caused. The group only collapses the borders: adjacent
-                // rules merge into one that frames the control and divides the cells.
-                ATTACHED_CELL,
-                CELL_RADIUS[size],
-                "data-[orientation=horizontal]:**:data-[slot=toggle]:not-first:rounded-s-none data-[orientation=horizontal]:**:data-[slot=toggle]:not-last:rounded-e-none data-[orientation=horizontal]:**:data-[slot=toggle]:not-first:before:border-s-0",
-                "data-[orientation=vertical]:**:data-[slot=toggle]:not-first:rounded-t-none data-[orientation=vertical]:**:data-[slot=toggle]:not-last:rounded-b-none data-[orientation=vertical]:**:data-[slot=toggle]:not-first:before:border-t-0",
-              ]
-            : [
-                // Solid / ghost: one connected track; cells flatten and inherit the track's
-                // corner radius on the ends (size-agnostic), with floating ::after dividers.
-                // Each cell's own paint tokens (ghost → surface-selected when on) provide
-                // the selected look, so the group sets no fill on the cells at all: the
-                // track chrome below is the group's own background, not the cells'.
-                TRACK_RADIUS[size],
-                variant === "solid" && "bg-muted",
-                // ghost: no container chrome.
-                ATTACHED_CELL,
-                "**:data-[slot=toggle]:rounded-none **:data-[slot=toggle]:before:border-0",
-                "**:data-[slot=toggle]:first:rounded-s-[inherit] **:data-[slot=toggle]:last:rounded-e-[inherit] data-[orientation=vertical]:**:data-[slot=toggle]:first:rounded-s-none data-[orientation=vertical]:**:data-[slot=toggle]:first:rounded-t-[inherit] data-[orientation=vertical]:**:data-[slot=toggle]:last:rounded-e-none data-[orientation=vertical]:**:data-[slot=toggle]:last:rounded-b-[inherit]",
-                separators && [
-                  // Floating inset rule at 50% that tracks its cell's ink. It
-                  // rides ::after because ::before is the cell's paint layer
-                  // now; attached solid/ghost cells render as `ghost`, whose
-                  // ::after is otherwise unused (only `solid` paints one).
-                  "**:data-[slot=toggle]:not-first:after:pointer-events-none **:data-[slot=toggle]:not-first:after:absolute **:data-[slot=toggle]:not-first:after:z-0 **:data-[slot=toggle]:not-first:after:rounded-full **:data-[slot=toggle]:not-first:after:bg-current **:data-[slot=toggle]:not-first:after:opacity-15 **:data-[slot=toggle]:not-first:after:content-['']",
-                  "**:data-[slot=toggle]:not-first:after:start-0 **:data-[slot=toggle]:not-first:after:top-1/4 **:data-[slot=toggle]:not-first:after:h-1/2 **:data-[slot=toggle]:not-first:after:w-px",
-                  "data-[orientation=vertical]:**:data-[slot=toggle]:not-first:after:inset-s-1/4 data-[orientation=vertical]:**:data-[slot=toggle]:not-first:after:top-0 data-[orientation=vertical]:**:data-[slot=toggle]:not-first:after:h-px data-[orientation=vertical]:**:data-[slot=toggle]:not-first:after:w-1/2",
-                ],
-              ],
-        className,
-      )}
+      data-variant={variant ?? "outline"}
+      data-size={resolvedSize}
+      orientation={orientation}
+      className={cn(toggleGroupVariants({ variant, size }), className)}
       {...props}
     >
-      {/* Memoized so the context value is stable across the group's re-renders
-          — a consumer (ToggleGroupItem) that memoizes on it isn't invalidated
-          every time the parent renders for an unrelated reason. Restored after
-          a registry refresh dropped it; nothing auto-memoizes this, the React
-          Compiler is not enabled here (only its lint rules, via
-          eslint-plugin-react-hooks). */}
-      <ToggleGroupContext.Provider value={contextValue}>
+      <ToggleGroupContext.Provider value={context}>
         {children}
       </ToggleGroupContext.Provider>
     </BaseToggleGroup>
   );
 }
 
-export type ToggleGroupItemProps = ToggleProps;
+const itemClasses = cn(
+  "h-auto min-w-auto self-stretch border-2 border-transparent text-sm sm:h-auto sm:min-w-auto",
+  // Main-axis length in a column: the fill's cross size plus the borders at
+  // each end (2px, or 1px against a neighbor).
+  "[--toggle-group-item-start:2px] [--toggle-group-item-end:2px] [--toggle-group-item-length:calc(var(--toggle-group-h)-var(--toggle-group-border,0px)*2-4px+var(--toggle-group-item-start)+var(--toggle-group-item-end))]",
+  // Icon-only items wrap a square box instead (see ToggleGroupItem)
+  "data-icon-only:px-0",
+  // Box corners are the paint's + the border, so paint, gap, and focus ring
+  // (at offset 0) are concentric.
+  "rounded-[calc(var(--toggle-group-item-radius)+2px)] before:rounded-(--toggle-group-item-radius) focus-visible:outline-offset-0 focus-visible:z-10",
+  "[--tgl-bg-hover:var(--toggle-group-highlight)] [--tgl-bg-active:var(--toggle-group-press)] [--tgl-bg-selected:var(--toggle-group-selected-bg)]",
+  // Label color
+  "text-muted-foreground data-pressed:text-(--toggle-group-selected-fg) hover:not-data-pressed:text-foreground",
+  // Forced colors drop the fill, so a pressed item gets a Highlight border.
+  "forced-colors:data-pressed:border-[Highlight]",
+);
 
-/**
- * A cell in a `ToggleGroup`. Accepts all `Toggle` props; `size` and `variant`
- * are inherited from the group through context. A per-item `variant` only takes
- * effect when the group is `detached` — attached cells are painted by the group
- * and ignore it.
- */
-function ToggleGroupItem({ variant, size, ...props }: ToggleGroupItemProps) {
-  const group = React.use(ToggleGroupContext);
-  const resolvedSize = size ?? group.size ?? "default";
-  // Detached cells own their variant (reusing the Toggle cva). Attached `outline`
-  // reuses the Toggle `outline` too so its states stay in the card family; solid /
-  // ghost cells are flattened and painted by the group, so they render as ghost.
-  const resolvedVariant = group.detached
-    ? (variant ?? group.variant ?? "solid")
-    : group.variant === "outline"
-      ? "outline"
-      : "ghost";
+// Sides facing another item take a 1px border, for a 2px seam between fills,
+// and the small inner corners. Sides at the shell or a separator keep the
+// 2px border and the shell-concentric corners.
+const joinedClasses = {
+  horizontal: cn(
+    "[[data-slot=toggle-group-item]+&]:border-s [[data-slot=toggle-group-item]+&]:[--toggle-group-item-start:1px] [[data-slot=toggle-group-item]+&]:rounded-s-[calc(var(--toggle-group-inner-radius)+1px)] [[data-slot=toggle-group-item]+&]:before:rounded-s-(--toggle-group-inner-radius)",
+    "has-[+[data-slot=toggle-group-item]]:border-e has-[+[data-slot=toggle-group-item]]:[--toggle-group-item-end:1px] has-[+[data-slot=toggle-group-item]]:rounded-e-[calc(var(--toggle-group-inner-radius)+1px)] has-[+[data-slot=toggle-group-item]]:before:rounded-e-(--toggle-group-inner-radius)",
+  ),
+  vertical: cn(
+    "[[data-slot=toggle-group-item]+&]:border-t [[data-slot=toggle-group-item]+&]:[--toggle-group-item-start:1px] [[data-slot=toggle-group-item]+&]:rounded-t-[calc(var(--toggle-group-inner-radius)+1px)] [[data-slot=toggle-group-item]+&]:before:rounded-t-(--toggle-group-inner-radius)",
+    "has-[+[data-slot=toggle-group-item]]:border-b has-[+[data-slot=toggle-group-item]]:[--toggle-group-item-end:1px] has-[+[data-slot=toggle-group-item]]:rounded-b-[calc(var(--toggle-group-inner-radius)+1px)] has-[+[data-slot=toggle-group-item]]:before:rounded-b-(--toggle-group-inner-radius)",
+  ),
+};
 
-  return <Toggle variant={resolvedVariant} size={resolvedSize} {...props} />;
+export type ToggleGroupItemProps = Omit<ToggleProps, "variant" | "size">;
+
+// A labelled item whose only child is an icon component or <svg>. CSS can't
+// tell: :only-child ignores text nodes. The label check keeps a lone text
+// component (<Trans>, <FormattedMessage>) from counting as an icon.
+function isIconOnly(
+  children: React.ReactNode,
+  props: ToggleGroupItemProps,
+): boolean {
+  return (
+    React.isValidElement(children) &&
+    children.type !== React.Fragment &&
+    (typeof children.type !== "string" || children.type === "svg") &&
+    Boolean(props["aria-label"] || props["aria-labelledby"])
+  );
 }
 
-export { ToggleGroup, ToggleGroupItem };
+/** A `Toggle` sized and styled by its `ToggleGroup`. */
+function ToggleGroupItem({
+  className,
+  children,
+  ...props
+}: ToggleGroupItemProps) {
+  const { size, orientation } = React.use(ToggleGroupContext);
+  const iconOnly = isIconOnly(children, props);
+
+  return (
+    <Toggle
+      data-slot="toggle-group-item"
+      variant="ghost"
+      size={size}
+      data-icon-only={iconOnly || undefined}
+      className={cn(itemClasses, joinedClasses[orientation], className)}
+      {...props}
+    >
+      {iconOnly ? (
+        // The item shrink-wraps this square, so the fill stays square however
+        // the 1px and 2px borders snap to device pixels.
+        <span
+          className={cn(
+            "flex aspect-square items-center justify-center",
+            orientation === "vertical" ? "w-full" : "h-full",
+          )}
+        >
+          {children}
+        </span>
+      ) : (
+        children
+      )}
+    </Toggle>
+  );
+}
+
+export type ToggleGroupSeparatorProps = React.ComponentProps<typeof Separator>;
+
+function ToggleGroupSeparator({
+  className,
+  orientation,
+  ...props
+}: ToggleGroupSeparatorProps) {
+  const group = React.use(ToggleGroupContext);
+  const resolved =
+    orientation ??
+    (group.orientation === "vertical" ? "horizontal" : "vertical");
+
+  return (
+    <Separator
+      data-slot="toggle-group-separator"
+      orientation={resolved}
+      className={cn(
+        "self-stretch data-[orientation=vertical]:h-auto",
+        "data-[orientation=horizontal]:mx-1.5 data-[orientation=horizontal]:my-0.5 data-[orientation=vertical]:mx-0.5 data-[orientation=vertical]:my-1.5",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+export {
+  ToggleGroup,
+  ToggleGroupItem,
+  ToggleGroupSeparator,
+  toggleGroupVariants,
+};

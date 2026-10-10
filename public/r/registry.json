@@ -1990,7 +1990,11 @@
         }
       ],
       "registryDependencies": [
+        "@cubby-ui/separator",
         "@cubby-ui/toggle"
+      ],
+      "dependencies": [
+        "class-variance-authority"
       ]
     },
     {

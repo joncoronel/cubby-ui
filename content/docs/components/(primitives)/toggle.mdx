@@ -28,35 +28,31 @@ Use `size` to set the toggle's height and padding.
 
 <ComponentPreview component="toggle" example="toggle-different-sizes" />
 
-| Size      | Description                       |
-| --------- | --------------------------------- |
-| `sm`      | Compact, for dense toolbars.      |
-| `default` | The standard height.              |
-| `lg`      | Taller, for prominent controls.   |
+| Size      | Description                     |
+| --------- | ------------------------------- |
+| `sm`      | Compact, for dense toolbars.    |
+| `default` | The standard height.            |
+| `lg`      | Taller, for prominent controls. |
 
 ### With Text
 
-Place a text label alongside the icon inside the toggle.
+Put a text label beside the icon.
 
 <ComponentPreview component="toggle" example="toggle-with-text" />
 
-### Solid Variant
+### Variants
 
-Set `variant="solid"` for a filled button: a muted plate when off that insets when on (the same treatment the detached toggle group gives its cells).
+Use `variant` to set the toggle's fill.
 
-<ComponentPreview component="toggle" example="toggle-solid-variant" />
-
-### Outline Variant
-
-Set `variant="outline"` to frame the toggle with a border.
+<ComponentPreview component="toggle" example="toggle-soft-variant" />
 
 <ComponentPreview component="toggle" example="toggle-outline-variant" />
 
-| Variant   | Description                                          |
-| --------- | ---------------------------------------------------- |
-| `ghost`   | Borderless. Transparent when off, filled when on. Default. |
-| `solid`   | Muted plate when off; insets to the selected overlay when on. |
-| `outline` | Framed with a border. Fills when on.                 |
+| Variant   | Description                                                    |
+| --------- | -------------------------------------------------------------- |
+| `ghost`   | The default. No fill when off, a neutral fill when on.         |
+| `soft`    | A secondary Button's fill when off, a deeper one when on.      |
+| `outline` | An outline Button's fill and border, a secondary fill when on. |
 
 ### Custom Colors
 
@@ -70,13 +66,11 @@ The toggle paints its fill from CSS variables, one per state:
 | `--tgl-bg-selected` | On.                                     |
 | `--tgl-border`      | Border color, in every state.           |
 
-Each variant sets them and the toggle switches between them internally, so
-recoloring the fill is just overriding the variables, with no `hover:` or
-`data-pressed:` prefixes needed. Override the variables instead of `bg-*`
-classes: root-level `bg-*` paints behind the fill layer, so it is hidden by
-opaque variants and blended by transparent ones, which is rarely what you want.
-The label color is not tokenized, so it stays a normal state-prefixed text
-class:
+Each variant sets them and the toggle picks one per state, so you recolor
+the fill by overriding them, with no `hover:` or `data-pressed:` prefixes.
+Override them rather than adding `bg-*` to the root: a root `bg-*` paints
+behind the fill layer, where opaque variants hide it. Set the label color with
+a state-prefixed text class:
 
 ```tsx showLineNumbers
 <Toggle className="[--tgl-bg-selected:var(--color-violet-600)] data-pressed:text-white">
@@ -84,8 +78,8 @@ class:
 </Toggle>
 ```
 
-Custom property values can't take Tailwind's `/10` opacity shorthand, so build a
-translucent tint with `color-mix` instead:
+Custom properties can't take Tailwind's `/10` opacity shorthand; build a
+translucent tint with `color-mix`:
 
 ```tsx showLineNumbers
 <Toggle className="[--tgl-bg-selected:color-mix(in_oklab,var(--primary)_10%,transparent)]">
@@ -93,17 +87,12 @@ translucent tint with `color-mix` instead:
 </Toggle>
 ```
 
-Any variable you don't override keeps the variant's color for that state. The
-`solid` variant is the exception: its plate is `--tgl-bg` and its hover and
-selected states composite a translucent overlay on top of that plate, so retint
-it through `--tgl-bg` rather than the per-state variables.
+Any variable you don't override keeps the variant's color for that state.
 
 The border lives on the toggle's paint pseudo-element, so `before:` classes
 restyle it, for example `before:border-dashed` or `before:border-2`. Only
 `outline` sets a visible `--tgl-border`, so on the other variants pair those
-classes with a color: `[--tgl-border:var(--border)] before:border-dashed`. Cells
-in an attached `solid` or `ghost` group are the exception, since the group
-strips their borders to keep the track seamless.
+classes with a color: `[--tgl-border:var(--border)] before:border-dashed`.
 
 ### Controlled
 
@@ -111,17 +100,17 @@ Use `pressed` and `onPressedChange` to drive the toggle state yourself.
 
 <ComponentPreview component="toggle" example="toggle-controlled" />
 
-### Disabled State
+### Disabled
 
-Use `disabled` to prevent interaction.
+Set `disabled` to block interaction.
 
 <ComponentPreview component="toggle" example="toggle-disabled-state" />
 
 ## Accessibility
 
-### Label icon-only toggles
+### Labels
 
-An icon-only toggle has no text for a screen reader to announce. Give it an `aria-label` describing the action it controls.
+Give an icon-only toggle an `aria-label` that names what it controls, since it has no text for a screen reader to announce.
 
 ```tsx showLineNumbers
 <Toggle aria-label="Toggle bold">
@@ -135,17 +124,21 @@ The Toggle component is built on top of [Base UI's Toggle](https://base-ui.com/r
 
 For the complete Base UI API, see the [Base UI Toggle documentation](https://base-ui.com/react/components/toggle).
 
-### Custom Props
+### Props
+
+#### Toggle
+
+A two-state button. Wraps Base UI's `Toggle`.
 
 <ApiPropsList>
 
 <ApiProp
   name="variant"
-  fullType='"ghost" | "solid" | "outline"'
+  fullType='"ghost" | "soft" | "outline"'
   simpleType="string"
   defaultValue='"ghost"'
 >
-  Visual style variant for the toggle button. Custom prop not available in Base UI.
+  Fill style. See [Variants](#variants).
 </ApiProp>
 
 <ApiProp
@@ -154,7 +147,16 @@ For the complete Base UI API, see the [Base UI Toggle documentation](https://bas
   simpleType="string"
   defaultValue='"default"'
 >
-  Size variant for the toggle button. Custom prop not available in Base UI.
+  Height, matching `Button`.
 </ApiProp>
 
 </ApiPropsList>
+
+## Upgrading
+
+If you're reinstalling over an earlier version, check these changes:
+
+| Before            | Now                                                      |
+| ----------------- | -------------------------------------------------------- |
+| `variant="solid"` | `variant="soft"`, a secondary fill that deepens when on. |
+| Pressed at 0.97   | Pressed at 0.98, as on `Button`.                         |

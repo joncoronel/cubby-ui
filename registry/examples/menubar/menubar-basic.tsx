@@ -9,7 +9,7 @@ import {
   MenubarSubContent,
   MenubarSubTrigger,
   MenubarTrigger,
-} from "@/registry/default/menubar/menubar"
+} from "@/registry/default/menubar/menubar";
 
 export default function MenubarBasic() {
   return (
@@ -25,7 +25,8 @@ export default function MenubarBasic() {
           </MenubarItem>
           <MenubarItem disabled>New Incognito Window</MenubarItem>
           <MenubarSeparator />
-          <MenubarItem>Print... <MenubarShortcut>⌘P</MenubarShortcut>
+          <MenubarItem>
+            Print... <MenubarShortcut>⌘P</MenubarShortcut>
           </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
@@ -50,7 +51,8 @@ export default function MenubarBasic() {
           <MenubarItem>Always Show Bookmarks Bar</MenubarItem>
           <MenubarItem>Always Show Full URLs</MenubarItem>
           <MenubarSeparator />
-          <MenubarItem inset>Reload <MenubarShortcut>⌘R</MenubarShortcut>
+          <MenubarItem inset>
+            Reload <MenubarShortcut>⌘R</MenubarShortcut>
           </MenubarItem>
           <MenubarItem disabled inset>
             Force Reload <MenubarShortcut>⇧⌘R</MenubarShortcut>
@@ -59,9 +61,15 @@ export default function MenubarBasic() {
           <MenubarSub>
             <MenubarSubTrigger inset>Zoom</MenubarSubTrigger>
             <MenubarSubContent>
-              <MenubarItem>Zoom In <MenubarShortcut>⌘+</MenubarShortcut></MenubarItem>
-              <MenubarItem>Zoom Out <MenubarShortcut>⌘-</MenubarShortcut></MenubarItem>
-              <MenubarItem>Actual Size <MenubarShortcut>⌘0</MenubarShortcut></MenubarItem>
+              <MenubarItem>
+                Zoom In <MenubarShortcut>⌘+</MenubarShortcut>
+              </MenubarItem>
+              <MenubarItem>
+                Zoom Out <MenubarShortcut>⌘-</MenubarShortcut>
+              </MenubarItem>
+              <MenubarItem>
+                Actual Size <MenubarShortcut>⌘0</MenubarShortcut>
+              </MenubarItem>
               <MenubarSeparator />
               <MenubarItem>Fit to Window</MenubarItem>
             </MenubarSubContent>
@@ -70,5 +78,5 @@ export default function MenubarBasic() {
         </MenubarContent>
       </MenubarMenu>
     </Menubar>
-  )
+  );
 }

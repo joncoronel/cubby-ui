@@ -1,0 +1,138 @@
+/* -------------------------------------------------------------------------------------------------
+ * Gliding highlight, in CSS anchor positioning, as in Button Group and Toolbar.
+ *
+ * The lit trigger (hover, focus, open menu) takes the anchor name and the
+ * shared pill follows it. Without anchor positioning and anchor-scope, each
+ * trigger paints its own hover instead.
+ * -------------------------------------------------------------------------------------------------*/
+
+[data-slot="menubar-highlight"] {
+  display: none;
+}
+
+/* All anchor features or none: a partial implementation leaves the pill
+ * unplaced or tied to another menubar. */
+@supports (anchor-name: --menubar-item) and (anchor-scope: --menubar-item) and
+  (inset: anchor(inside)) {
+  [data-slot="menubar"][data-glide] {
+    anchor-scope: --menubar-item;
+  }
+
+  /* The pill stands in for the triggers' own hover. */
+  [data-slot="menubar"][data-glide] [data-menubar-item] {
+    --btn-bg-hover: transparent;
+    --btn-bg-active: transparent;
+  }
+
+  /* Hover is gated to real hover (:active covers taps). An open menu or a
+   * held item keeps the pill, so a pointer drifting mid-press doesn't light
+   * two items. */
+  [data-slot="menubar"][data-glide]
+    [data-menubar-item]:not(:disabled, [data-disabled]):is(
+      :focus-visible,
+      :active,
+      [data-popup-open]
+    ) {
+    anchor-name: --menubar-item;
+  }
+
+  @media (hover: hover) {
+    [data-slot="menubar"][data-glide]:not(
+        :has([data-menubar-item][data-popup-open], [data-menubar-item]:active)
+      )
+      [data-menubar-item]:not(:disabled, [data-disabled]):hover {
+      anchor-name: --menubar-item;
+    }
+  }
+
+  /* Leaving the menubar, the last trigger holds the anchor while the pill fades,
+   * so it fades in place instead of collapsing. Button's own transitions
+   * are restated so they survive. */
+  [data-slot="menubar"][data-glide]:not(
+      :has(
+        [data-menubar-item]:not(:disabled, [data-disabled]):is(
+            :hover,
+            :focus-visible,
+            :active,
+            [data-popup-open]
+          )
+      )
+    )
+    [data-menubar-item] {
+    transition:
+      outline-width 100ms ease-out,
+      outline-offset 100ms ease-out,
+      outline-color 100ms ease-out,
+      opacity 100ms ease-out,
+      color 100ms ease-out,
+      anchor-name 0s 80ms allow-discrete;
+  }
+
+  [data-slot="menubar"][data-glide] > [data-slot="menubar-highlight"] {
+    display: block;
+    position: absolute;
+    position-anchor: --menubar-item;
+    inset: anchor(inside);
+    /* The anchor is the item's border box; the same 2px border lines the
+     * fill up with the item's paint. */
+    border: 2px solid transparent;
+    border-radius: calc(var(--menubar-item-radius) + 2px);
+    background: var(--menubar-highlight) padding-box;
+    /* Rendered last, so it sits under the triggers inside the isolated menubar. */
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0;
+    scale: 0.96;
+    /* Entering from no anchor can't interpolate, so the pill appears in
+     * place and only fades and grows. */
+    transition:
+      inset 80ms var(--ease-out-expo, cubic-bezier(0.19, 1, 0.22, 1)),
+      opacity 80ms ease-out,
+      scale 80ms ease-out,
+      background-color 80ms ease-out;
+  }
+
+  [data-slot="menubar"][data-glide]:has(
+      [data-menubar-item]:not(:disabled, [data-disabled]):is(
+          :focus-visible,
+          :active,
+          [data-popup-open]
+        )
+    )
+    > [data-slot="menubar-highlight"] {
+    opacity: 1;
+    scale: 1;
+  }
+
+  @media (hover: hover) {
+    [data-slot="menubar"][data-glide]:has(
+        [data-menubar-item]:not(:disabled, [data-disabled]):hover
+      )
+      > [data-slot="menubar-highlight"] {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+
+  /* Press, as on Button. Menu triggers skip it. */
+  [data-slot="menubar"][data-glide]:has(
+      [data-menubar-item]:active:not([aria-haspopup], :disabled)
+    )
+    > [data-slot="menubar-highlight"] {
+    scale: var(--menubar-press-scale, 0.98);
+    background-color: var(--menubar-press);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-slot="menubar"][data-glide] {
+      --menubar-press-scale: 1;
+    }
+
+    [data-slot="menubar"][data-glide] > [data-slot="menubar-highlight"] {
+      scale: 1;
+      transition:
+        opacity 80ms ease-out,
+        background-color 80ms ease-out;
+    }
+  }
+}

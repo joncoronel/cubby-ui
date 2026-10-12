@@ -223,10 +223,22 @@ function DataTable<TData, TValue>({
   );
 }
 
-function DataTableToolbar({ className, ...props }: ToolbarProps) {
+// A plain row above the table: its controls are fields and triggers, not
+// toolbar buttons, so it skips the shell's fixed height and highlight.
+function DataTableToolbar({
+  className,
+  variant = "ghost",
+  highlight = false,
+  ...props
+}: ToolbarProps) {
   return (
     <Toolbar
-      className={cn("rounded-b-none px-2 pt-2 pb-0", className)}
+      variant={variant}
+      highlight={highlight}
+      className={cn(
+        "h-auto w-full items-center gap-1 rounded-b-none px-2 pt-2 pb-0 data-[orientation=horizontal]:h-auto",
+        className,
+      )}
       {...props}
     />
   );

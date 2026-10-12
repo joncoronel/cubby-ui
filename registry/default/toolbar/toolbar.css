@@ -1,0 +1,147 @@
+/* -------------------------------------------------------------------------------------------------
+ * Gliding highlight, in CSS anchor positioning, as in Button Group.
+ *
+ * The lit item (hover, focus, press, open menu) takes the anchor name and the
+ * shared pill follows it. Items are matched by data-toolbar-item, so they can
+ * sit inside groups. Without anchor positioning and anchor-scope, each item
+ * paints its own hover instead.
+ * -------------------------------------------------------------------------------------------------*/
+
+[data-slot="toolbar-highlight"] {
+  display: none;
+}
+
+/* All anchor features or none: a partial implementation leaves the pill
+ * unplaced or tied to another toolbar. */
+@supports (anchor-name: --toolbar-item) and (anchor-scope: --toolbar-item) and
+  (inset: anchor(inside)) {
+  [data-slot="toolbar"][data-glide] {
+    anchor-scope: --toolbar-item;
+  }
+
+  /* The pill stands in for hover and press on quiet items; a button with a
+   * set variant keeps its own. Pressed toggles keep their fill. */
+  [data-slot="toolbar"][data-glide]
+    :is([data-toolbar-item]:not([data-variant]), [data-slot="toolbar-toggle"]) {
+    --btn-bg-hover: transparent;
+    --btn-bg-active: transparent;
+    --tgl-bg-hover: transparent;
+    --tgl-bg-active: transparent;
+  }
+
+  [data-slot="toolbar"][data-glide] [data-slot="toolbar-link"]::before {
+    background-color: transparent;
+  }
+
+  /* Hover is gated to real hover (:active covers taps). An open menu or a
+   * held item keeps the pill, so a pointer drifting mid-press doesn't light
+   * two items. */
+  [data-slot="toolbar"][data-glide]
+    [data-toolbar-item]:not(:disabled, [data-disabled]):is(
+      :focus-visible,
+      :active,
+      [data-popup-open]
+    ) {
+    anchor-name: --toolbar-item;
+  }
+
+  @media (hover: hover) {
+    [data-slot="toolbar"][data-glide]:not(
+        :has([data-toolbar-item][data-popup-open], [data-toolbar-item]:active)
+      )
+      [data-toolbar-item]:not(:disabled, [data-disabled]):hover {
+      anchor-name: --toolbar-item;
+    }
+  }
+
+  /* Leaving the toolbar, the last item holds the anchor while the pill fades,
+   * so it fades in place instead of collapsing. Button's and Toggle's own
+   * transitions are restated so they survive. */
+  [data-slot="toolbar"][data-glide]:not(
+      :has(
+        [data-toolbar-item]:not(:disabled, [data-disabled]):is(
+            :hover,
+            :focus-visible,
+            :active,
+            [data-popup-open]
+          )
+      )
+    )
+    [data-toolbar-item] {
+    transition:
+      outline-width 100ms ease-out,
+      outline-offset 100ms ease-out,
+      outline-color 100ms ease-out,
+      opacity 100ms ease-out,
+      color 100ms ease-out,
+      anchor-name 0s 80ms allow-discrete;
+  }
+
+  [data-slot="toolbar"][data-glide] > [data-slot="toolbar-highlight"] {
+    display: block;
+    position: absolute;
+    position-anchor: --toolbar-item;
+    inset: anchor(inside);
+    /* The anchor is the item's border box; the same 2px border lines the
+     * fill up with the item's paint. */
+    border: 2px solid transparent;
+    border-radius: calc(var(--toolbar-item-radius) + 2px);
+    background: var(--toolbar-highlight) padding-box;
+    /* Rendered last, so it sits under the items inside the isolated toolbar. */
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0;
+    scale: 0.96;
+    /* Entering from no anchor can't interpolate, so the pill appears in
+     * place and only fades and grows. */
+    transition:
+      inset 80ms var(--ease-out-expo, cubic-bezier(0.19, 1, 0.22, 1)),
+      opacity 80ms ease-out,
+      scale 80ms ease-out,
+      background-color 80ms ease-out;
+  }
+
+  [data-slot="toolbar"][data-glide]:has(
+      [data-toolbar-item]:not(:disabled, [data-disabled]):is(
+          :focus-visible,
+          :active,
+          [data-popup-open]
+        )
+    )
+    > [data-slot="toolbar-highlight"] {
+    opacity: 1;
+    scale: 1;
+  }
+
+  @media (hover: hover) {
+    [data-slot="toolbar"][data-glide]:has(
+        [data-toolbar-item]:not(:disabled, [data-disabled]):hover
+      )
+      > [data-slot="toolbar-highlight"] {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+
+  /* Press, as on Button. Menu triggers skip it. */
+  [data-slot="toolbar"][data-glide]:has(
+      [data-toolbar-item]:active:not([aria-haspopup], :disabled)
+    )
+    > [data-slot="toolbar-highlight"] {
+    scale: var(--toolbar-press-scale, 0.98);
+    background-color: var(--toolbar-press);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-slot="toolbar"][data-glide] {
+      --toolbar-press-scale: 1;
+    }
+
+    [data-slot="toolbar"][data-glide] > [data-slot="toolbar-highlight"] {
+      scale: 1;
+      transition:
+        opacity 80ms ease-out,
+        background-color 80ms ease-out;
+    }
+  }
+}

@@ -24,6 +24,7 @@ import FiltersMultiselect from "@/registry/examples/filters/filters-multiselect"
 import FiltersManual from "@/registry/examples/filters/filters-manual";
 import FiltersEmptyState from "@/registry/examples/filters/filters-empty-state";
 import FiltersSizes from "@/registry/examples/filters/filters-sizes";
+import FiltersVariants from "@/registry/examples/filters/filters-variants";
 import FiltersOverflow from "@/registry/examples/filters/filters-overflow";
 import FiltersAffixes from "@/registry/examples/filters/filters-affixes";
 import FiltersShortcut from "@/registry/examples/filters/filters-shortcut";
@@ -140,6 +141,22 @@ Use `size` to set the height of every chip in the bar.
 <ComponentPreview component="filters" example="filters-sizes">
   <FiltersSizes />
 </ComponentPreview>
+
+### Variants
+
+Use `variant` to pick the shell the chips and the add button sit on.
+
+<ComponentPreview component="filters" example="filters-variants">
+  <FiltersVariants />
+</ComponentPreview>
+
+| Variant    | Description                                          |
+| ---------- | ---------------------------------------------------- |
+| `outline`  | The default. An outline Button's fill and border.    |
+| `soft`     | A secondary Button's fill, for quieter toolbars.     |
+| `elevated` | A raised surface, for bars inside Cards and Dialogs. |
+
+A filter with no value yet shows a dashed border on every variant.
 
 ### Keyboard shortcut
 
@@ -259,6 +276,15 @@ Filters composes Cubby UI primitives and has no Base UI root of its own.
   defaultValue='"default"'
 >
   Height of the chips and the add button.
+</ApiProp>
+
+<ApiProp
+  name="variant"
+  fullType='"outline" | "soft" | "elevated"'
+  simpleType="string"
+  defaultValue='"outline"'
+>
+  Shell style of the chips and the add button.
 </ApiProp>
 
 <ApiProp name="allowDuplicateFields" fullType="boolean" defaultValue="false">

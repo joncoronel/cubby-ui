@@ -47,6 +47,8 @@ import {
   FILTER_SEGMENT,
   FILTER_SEGMENT_INTERACTIVE,
   FILTER_SIZES,
+  FILTER_TINTS,
+  FILTER_VARIANTS,
   patchFilter,
   resolveOperators,
 } from "./lib/filters-utils";
@@ -123,6 +125,7 @@ function FiltersProvider({
   defaultValue = [],
   onValueChange,
   size = "default",
+  variant = "outline",
   allowDuplicateFields = false,
   labels: labelsProp,
   children,
@@ -220,6 +223,7 @@ function FiltersProvider({
     () => ({
       fields,
       size,
+      variant,
       labels,
       fieldsById,
       usedFieldIds,
@@ -233,6 +237,7 @@ function FiltersProvider({
     [
       fields,
       size,
+      variant,
       labels,
       fieldsById,
       usedFieldIds,
@@ -313,6 +318,7 @@ function Filters({
   defaultValue,
   onValueChange,
   size,
+  variant,
   allowDuplicateFields,
   labels,
   ...barProps
@@ -324,6 +330,7 @@ function Filters({
       defaultValue={defaultValue}
       onValueChange={onValueChange}
       size={size}
+      variant={variant}
       allowDuplicateFields={allowDuplicateFields}
       labels={labels}
     >
@@ -408,7 +415,8 @@ const FilterChip = React.memo(function FilterChip({
   onKeyDown,
   ...props
 }: FilterChipProps) {
-  const { size, removeFilter, fieldsById, labels } = useFiltersActions();
+  const { size, variant, removeFilter, fieldsById, labels } =
+    useFiltersActions();
   const presenceRef = useFlowPresence(ref);
   const field = fieldProp ?? fieldsById.get(filter.field);
 
@@ -428,11 +436,14 @@ const FilterChip = React.memo(function FilterChip({
         role="group"
         data-slot="filter-chip"
         data-size={size}
+        data-variant={variant}
         data-filter-id={filter.id}
         data-incomplete={incomplete ? "" : undefined}
         aria-label={describeFilter(field, filter, labels.operators)}
         className={cn(
-          "bg-card text-foreground inline-flex max-w-full shrink-0 items-center gap-0.5 rounded-lg border bg-clip-padding p-0.5",
+          "text-foreground inline-flex max-w-full shrink-0 items-center rounded-lg border",
+          FILTER_VARIANTS[variant],
+          FILTER_TINTS,
           "transition-[border-color] duration-150 data-incomplete:border-dashed",
           FILTER_SIZES[size],
           className,
@@ -478,7 +489,7 @@ function FilterChipField({
     <span
       data-slot="filter-chip-field"
       className={cn(
-        "text-muted-foreground inline-flex h-full shrink-0 items-center gap-1.5 ps-(--seg-x) pe-1 whitespace-nowrap",
+        "text-muted-foreground inline-flex h-full shrink-0 items-center gap-1.5 border-2 border-transparent ps-(--seg-x) pe-1 whitespace-nowrap",
         className,
       )}
       {...props}
@@ -615,15 +626,18 @@ function FilterActions({
   /** Key that opens the add menu from the keyboard (e.g. `"f"`). */
   shortcut?: string;
 }) {
-  const { size } = useFiltersActions();
+  const { size, variant } = useFiltersActions();
   return (
     <div
       role="group"
       data-slot="filter-actions"
       data-size={size}
+      data-variant={variant}
       className={cn(
         // No gap: a folded clear segment would still get one; it brings its own.
-        "bg-card text-foreground inline-flex shrink-0 items-center rounded-lg border bg-clip-padding p-0.5",
+        "text-foreground inline-flex shrink-0 items-center rounded-lg border",
+        FILTER_VARIANTS[variant],
+        FILTER_TINTS,
         FILTER_SIZES[size],
         className,
       )}
@@ -772,6 +786,7 @@ export type {
   FilterOperatorShape,
   FilterValue,
   FilterSize,
+  FilterVariant,
   FiltersLabels,
   FiltersOverflow,
   FiltersProps,

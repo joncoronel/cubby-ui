@@ -273,6 +273,7 @@ import filters_filters_operators from "@/registry/examples/filters/filters-opera
 import filters_filters_overflow from "@/registry/examples/filters/filters-overflow";
 import filters_filters_shortcut from "@/registry/examples/filters/filters-shortcut";
 import filters_filters_sizes from "@/registry/examples/filters/filters-sizes";
+import filters_filters_variants from "@/registry/examples/filters/filters-variants";
 import form_form_demo from "@/registry/examples/form/form-demo";
 import form_form_complete from "@/registry/examples/form/form-complete";
 import form_form_constraint_validation from "@/registry/examples/form/form-constraint-validation";
@@ -1028,7 +1029,8 @@ export const componentMetadata = {
       "@cubby-ui/kbd",
       "@cubby-ui/popover",
       "@cubby-ui/transition-panel",
-      "@cubby-ui/use-controllable-state"
+      "@cubby-ui/use-controllable-state",
+      "@cubby-ui/elevated"
     ],
     "dependencies": [
       "@hugeicons/react",
@@ -3038,6 +3040,11 @@ export const exampleRegistry = {
       "title": "Sizes",
       "importPath": "filters-sizes",
       "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  Filters,\n  createFilter,\n  type FilterField,\n  type FilterSize,\n  type FilterValue,\n} from \"@/components/ui/cubby-ui/filters/filters\";\n\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport { DashboardCircleIcon, TextFontIcon } from \"@hugeicons/core-free-icons\";\n\nfunction Dot({ className }: { className: string }) {\n  return (\n    <span aria-hidden className={`size-2 shrink-0 rounded-full ${className}`} />\n  );\n}\n\nconst fields: FilterField[] = [\n  {\n    id: \"status\",\n    label: \"Status\",\n    icon: <HugeiconsIcon icon={DashboardCircleIcon} strokeWidth={2} />,\n    type: \"select\",\n    options: [\n      {\n        value: \"todo\",\n        label: \"Todo\",\n        icon: <Dot className=\"bg-[oklch(0.7_0_0)]\" />,\n      },\n      {\n        value: \"in_progress\",\n        label: \"In progress\",\n        icon: <Dot className=\"bg-[oklch(0.75_0.15_75)]\" />,\n      },\n      {\n        value: \"done\",\n        label: \"Done\",\n        icon: <Dot className=\"bg-[oklch(0.7_0.16_150)]\" />,\n      },\n    ],\n  },\n  {\n    id: \"title\",\n    label: \"Title\",\n    icon: <HugeiconsIcon icon={TextFontIcon} strokeWidth={2} />,\n    type: \"text\",\n  },\n];\n\nconst sizes: FilterSize[] = [\"sm\", \"default\", \"lg\"];\n\nexport default function FiltersSizes() {\n  const [value, setValue] = React.useState<FilterValue[]>(() => [\n    createFilter(fields[0], { id: \"seed-status\", value: \"in_progress\" }),\n  ]);\n\n  return (\n    <div className=\"flex w-full flex-col gap-4\">\n      {sizes.map((size) => (\n        <Filters\n          key={size}\n          fields={fields}\n          size={size}\n          value={value}\n          onValueChange={setValue}\n        />\n      ))}\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Variants",
+      "importPath": "filters-variants",
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  Filters,\n  createFilter,\n  type FilterField,\n  type FilterVariant,\n  type FilterValue,\n} from \"@/components/ui/cubby-ui/filters/filters\";\n\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport { DashboardCircleIcon, TextFontIcon } from \"@hugeicons/core-free-icons\";\n\nfunction Dot({ className }: { className: string }) {\n  return (\n    <span aria-hidden className={`size-2 shrink-0 rounded-full ${className}`} />\n  );\n}\n\nconst fields: FilterField[] = [\n  {\n    id: \"status\",\n    label: \"Status\",\n    icon: <HugeiconsIcon icon={DashboardCircleIcon} strokeWidth={2} />,\n    type: \"select\",\n    options: [\n      {\n        value: \"todo\",\n        label: \"Todo\",\n        icon: <Dot className=\"bg-[oklch(0.7_0_0)]\" />,\n      },\n      {\n        value: \"in_progress\",\n        label: \"In progress\",\n        icon: <Dot className=\"bg-[oklch(0.75_0.15_75)]\" />,\n      },\n      {\n        value: \"done\",\n        label: \"Done\",\n        icon: <Dot className=\"bg-[oklch(0.7_0.16_150)]\" />,\n      },\n    ],\n  },\n  {\n    id: \"title\",\n    label: \"Title\",\n    icon: <HugeiconsIcon icon={TextFontIcon} strokeWidth={2} />,\n    type: \"text\",\n  },\n];\n\nconst variants: FilterVariant[] = [\"outline\", \"soft\", \"elevated\"];\n\nexport default function FiltersVariants() {\n  const [value, setValue] = React.useState<FilterValue[]>(() => [\n    createFilter(fields[0], { id: \"seed-status\", value: \"in_progress\" }),\n    // No value yet, to show the incomplete border on every variant.\n    createFilter(fields[1], { id: \"seed-title\" }),\n  ]);\n\n  return (\n    <div className=\"flex w-full flex-col gap-4\">\n      {variants.map((variant) => (\n        <Filters\n          key={variant}\n          fields={fields}\n          variant={variant}\n          value={value}\n          onValueChange={setValue}\n        />\n      ))}\n    </div>\n  );\n}\n"
     }
   ],
   "form": [
@@ -4643,6 +4650,7 @@ export const componentMap = {
   "filters-overflow": filters_filters_overflow,
   "filters-shortcut": filters_filters_shortcut,
   "filters-sizes": filters_filters_sizes,
+  "filters-variants": filters_filters_variants,
   "form-demo": form_form_demo,
   "form-complete": form_form_complete,
   "form-constraint-validation": form_form_constraint_validation,

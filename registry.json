@@ -901,7 +901,8 @@
         "@cubby-ui/kbd",
         "@cubby-ui/popover",
         "@cubby-ui/transition-panel",
-        "@cubby-ui/use-controllable-state"
+        "@cubby-ui/use-controllable-state",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "@hugeicons/react",

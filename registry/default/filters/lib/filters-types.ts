@@ -3,6 +3,9 @@ import type * as React from "react";
 /** Size of the filter bar and its chips. */
 export type FilterSize = "sm" | "default" | "lg";
 
+/** Shell style for chips and the add/clear capsule. */
+export type FilterVariant = "outline" | "soft" | "elevated";
+
 /** Built-in field types. `custom` renders its own value control. */
 export type FilterFieldType =
   | "select"
@@ -176,6 +179,8 @@ export interface FiltersProviderProps {
   defaultValue?: FilterValue[];
   onValueChange?: (value: FilterValue[]) => void;
   size?: FilterSize;
+  /** Shell style for chips and the add/clear capsule. Defaults to `"outline"`. */
+  variant?: FilterVariant;
   /** Allow the same field to be added more than once. Defaults to `false`. */
   allowDuplicateFields?: boolean;
   labels?: Partial<FiltersLabels>;

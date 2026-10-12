@@ -1,3 +1,6 @@
+import { cn } from "@/lib/utils";
+import { solidSurface } from "@/registry/default/lib/elevated";
+
 import type {
   FilterField,
   FilterFieldType,
@@ -5,18 +8,55 @@ import type {
   FilterOperatorShape,
   FilterSize,
   FilterValue,
+  FilterVariant,
   NumberRange,
 } from "./filters-types";
 
 /** TextMorph duration for click-driven labels; snappier than the default 240ms. */
 export const CLICK_MORPH_MS = 209;
 
-/** Shared segment classes. Radius is the chip's minus 1px border and 2px inset, for concentric hover plates. */
-export const FILTER_SEGMENT =
-  "inline-flex h-full shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[calc(var(--radius-lg)-3px)] px-(--seg-x) outline-0 outline-transparent outline-solid transition-[background-color,color,outline-color] duration-100 ease-out focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring/50";
+/**
+ * Shared segment classes. The inset from the chip's edge is a 2px transparent
+ * border: borders snap to whole device pixels, so the gaps stay even at
+ * fractional display scales, where padding rounds unevenly. The hover plate
+ * paints on ::before inside that border, so it can scale on press while the
+ * label holds still. Box corners are the chip's minus its border; the
+ * plate's are 2px less, so plate, gap, and focus ring are concentric.
+ */
+export const FILTER_SEGMENT = cn(
+  "relative isolate inline-flex h-full shrink-0 items-center gap-1.5 whitespace-nowrap border-2 border-transparent bg-clip-padding rounded-[calc(var(--radius-lg)-var(--filter-border,1px))] px-(--seg-x) outline-0 outline-transparent outline-solid transition-[background-color,color,outline-color] duration-100 ease-out focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring/50",
+  "before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-[calc(var(--radius-lg)-var(--filter-border,1px)-2px)] before:content-[''] before:transition-[background-color,scale] before:duration-100 before:ease-out",
+);
 
+/**
+ * Hover and press as in Button Group: the label color at 10% / 14%, and the
+ * plate scales to 0.98. Menu triggers (aria-haspopup) skip the press and hold
+ * the hover plate while open.
+ */
 export const FILTER_SEGMENT_INTERACTIVE =
-  "cursor-pointer hover:bg-surface-hover active:bg-surface-active data-popup-open:bg-surface-hover";
+  "cursor-pointer hover:before:bg-(--filter-highlight) active:not-aria-[haspopup]:before:bg-(--filter-press) active:not-aria-[haspopup]:before:scale-[0.98] data-popup-open:before:bg-(--filter-highlight) motion-reduce:active:before:scale-100";
+
+/**
+ * Shell classes per variant. An incomplete filter shows a dashed edge.
+ * Elevated has no border, so its shadow ring and inner rim meet as on other
+ * elevated surfaces; incomplete, it swaps the ring for a dashed outline. `--filter-chip-bg` lets
+ * stacked option icons ring in the fill.
+ */
+export const FILTER_VARIANTS: Record<FilterVariant, string> = {
+  outline:
+    "bg-card border-border bg-clip-padding [--filter-chip-bg:var(--card)]",
+  soft: "bg-secondary border-transparent data-incomplete:border-border [--filter-chip-bg:var(--secondary)]",
+  elevated: cn(
+    solidSurface(3, 3),
+    "border-0 [--filter-border:0px] [--filter-chip-bg:var(--surface-3)]",
+    // Incomplete: the drop shadow stays; a dashed outline takes the ring's place.
+    "data-incomplete:shadow-[0_1px_1px_-0.5px_var(--surface-shadow-near),0_3px_3px_-1.5px_var(--surface-shadow-mid)] data-incomplete:outline-1 data-incomplete:outline-offset-0 data-incomplete:outline-border data-incomplete:outline-dashed",
+  ),
+};
+
+/** Tints for segment hover and press, set on each shell. */
+export const FILTER_TINTS =
+  "[--filter-highlight:color-mix(in_oklab,var(--foreground)_10%,transparent)] [--filter-press:color-mix(in_oklab,var(--foreground)_14%,transparent)]";
 
 /**
  * Per-size chip classes; heights match the `Button` ramp. `--seg-x` is segment

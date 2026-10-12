@@ -176,13 +176,13 @@ function MenubarContent({
             // escapes it by transitioning scale and opacity alone.
             "will-change-transform",
             "motion-reduce:transition-none motion-reduce:will-change-auto",
-            // No data-instant guard, deliberately. 'group' is the menubar case,
-            // File to Edit, and suppressing it is the conventional choice. Each
-            // MenubarMenu owns its popup, so the swap is a real unmount and
-            // mount: a guard would snap two separate animations where letting
-            // them run reads as a crossfade. 'dismiss' must animate or there is
-            // no exit, and 'trigger-change' cannot fire with one trigger per
-            // root.
+            // 'group' marks a switch to another menu in the bar, File to Edit.
+            // Those swap instantly, as in native menu bars; only the first
+            // open and the final close animate. 'dismiss' must animate or
+            // there is no exit.
+            // The start and end styles are pinned too, or the swap frame shows
+            // both popups at opacity 0.
+            "data-[instant=group]:transition-none data-[instant=group]:data-ending-style:scale-100 data-[instant=group]:data-ending-style:opacity-100 data-[instant=group]:data-starting-style:scale-100 data-[instant=group]:data-starting-style:opacity-100",
             className,
           )}
           {...props}

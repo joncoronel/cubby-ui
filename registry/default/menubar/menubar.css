@@ -24,9 +24,8 @@
     --btn-bg-active: transparent;
   }
 
-  /* Hover is gated to real hover (:active covers taps). An open menu or a
-   * held item keeps the pill, so a pointer drifting mid-press doesn't light
-   * two items. */
+  /* Focus, press, and the open menu's trigger hold the pill. Hover is gated
+   * to real hover (:active covers taps). */
   [data-slot="menubar"][data-glide]
     [data-menubar-item]:not(:disabled, [data-disabled]):is(
       :focus-visible,
@@ -36,12 +35,20 @@
     anchor-name: --menubar-item;
   }
 
+  /* While a menu is open, hovering another trigger opens it, so the pill
+   * moves on hover rather than waiting for that menu to mount. The open
+   * trigger lets go meanwhile, or two triggers would share the anchor. */
   @media (hover: hover) {
-    [data-slot="menubar"][data-glide]:not(
-        :has([data-menubar-item][data-popup-open], [data-menubar-item]:active)
-      )
+    [data-slot="menubar"][data-glide]:not(:has([data-menubar-item]:active))
       [data-menubar-item]:not(:disabled, [data-disabled]):hover {
       anchor-name: --menubar-item;
+    }
+
+    [data-slot="menubar"][data-glide]:has(
+        [data-menubar-item]:not(:disabled, [data-disabled]):hover
+      )
+      [data-menubar-item][data-popup-open]:not(:hover, :focus-visible) {
+      anchor-name: none;
     }
   }
 
@@ -121,6 +128,14 @@
     > [data-slot="menubar-highlight"] {
     scale: var(--menubar-press-scale, 0.98);
     background-color: var(--menubar-press);
+  }
+
+  /* While a menu is open, moving across the bar opens the next one, and that
+   * mount blocks the main thread for a few frames. The inset transition runs
+   * there too, so it would stutter; the pill jumps with the menu instead. */
+  [data-slot="menubar"][data-glide]:has([data-menubar-item][data-popup-open])
+    > [data-slot="menubar-highlight"] {
+    transition-property: opacity, scale, background-color;
   }
 
   @media (prefers-reduced-motion: reduce) {

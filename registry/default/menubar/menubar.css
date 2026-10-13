@@ -147,3 +147,10 @@
   outline: 2px solid color-mix(in oklab, var(--color-ring) 50%, transparent);
   outline-offset: -2px;
 }
+
+/* Forced colors drop the fills, so the open trigger gets a Highlight border. */
+@media (forced-colors: active) {
+  [data-slot="menubar"] [data-menubar-item][data-popup-open] {
+    border-color: Highlight;
+  }
+}

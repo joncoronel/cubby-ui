@@ -15,7 +15,11 @@ export default function MenubarVariants() {
   return (
     <div className="flex flex-col items-center gap-4">
       {variants.map((variant) => (
-        <Menubar key={variant} variant={variant}>
+        <Menubar
+          key={variant}
+          variant={variant}
+          aria-label={`${variant} menubar`}
+        >
           <MenubarMenu>
             <MenubarTrigger>File</MenubarTrigger>
             <MenubarContent>

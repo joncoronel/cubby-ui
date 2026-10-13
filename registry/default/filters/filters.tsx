@@ -679,7 +679,7 @@ function FilterActionsClear({
             snap alike at every display scale. */}
         <span
           aria-hidden
-          className="after:border-s-border flex shrink-0 self-stretch border-e-[3px] border-transparent before:border-s-[3px] before:border-transparent before:content-[''] after:h-5 after:self-center after:rounded-full after:border-s-[1.5px] after:border-transparent after:content-['']"
+          className="after:border-s-border pointer-events-none flex shrink-0 self-stretch border-e-[3px] border-transparent before:border-s-[3px] before:border-transparent before:content-[''] after:h-5 after:self-center after:rounded-full after:border-s-[1.5px] after:border-transparent after:content-['']"
         />
         <Tooltip>
           <TooltipTrigger

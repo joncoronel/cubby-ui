@@ -245,12 +245,13 @@
  * unplaced or tied to another group. */
 @supports (anchor-name: --button-group-item) and
   (anchor-scope: --button-group-item) and (inset: anchor(inside)) {
-  [data-glide] {
+  [data-slot="button-group"][data-glide] {
     anchor-scope: --button-group-item;
   }
 
   /* The pill stands in for hover. */
-  [data-glide] > :is(button, a[href], [role="button"]):not([data-variant]) {
+  [data-slot="button-group"][data-glide]
+    > :is(button, a[href], [role="button"]):not([data-variant]) {
     --btn-bg-hover: transparent;
     --btn-bg-active: transparent;
   }
@@ -265,7 +266,7 @@
    * held button keeps the pill, or a pointer drifting mid-press would light
    * two buttons and the pill would dart between them. Keyboard focus
    * outranks hover. */
-  [data-glide]
+  [data-slot="button-group"][data-glide]
     > :is(button, a[href], [role="button"]):not(:disabled, [data-disabled]):is(
       :focus-visible,
       :active,
@@ -275,7 +276,7 @@
   }
 
   @media (hover: hover) {
-    [data-glide]:not(
+    [data-slot="button-group"][data-glide]:not(
         :has(
           > [data-popup-open],
           > :active,
@@ -290,7 +291,8 @@
     }
   }
 
-  [data-glide] > [data-slot="button-group-highlight"] {
+  [data-slot="button-group"][data-glide]
+    > [data-slot="button-group-highlight"] {
     display: block;
     position: absolute;
     position-anchor: --button-group-item;
@@ -309,7 +311,7 @@
       background-color 100ms var(--ease-out, cubic-bezier(0, 0, 0.2, 1));
   }
 
-  [data-glide]:has(
+  [data-slot="button-group"][data-glide]:has(
       > :is(button, a[href], [role="button"]):not(
           :disabled,
           [data-disabled]
@@ -320,7 +322,7 @@
   }
 
   @media (hover: hover) {
-    [data-glide]:has(
+    [data-slot="button-group"][data-glide]:has(
         > :is(button, a[href], [role="button"]):not(
             :disabled,
             [data-disabled]
@@ -334,12 +336,12 @@
   /* Press, as on Button; menu triggers skip it. The pill is anchored to the
    * plate, so a quiet button's plate holds still and the pill does the
    * press scale on its own, one clean motion. */
-  [data-glide]
+  [data-slot="button-group"][data-glide]
     > :is(button, a[href], [role="button"]):not([data-variant]):active::before {
     scale: none;
   }
 
-  [data-glide]:has(
+  [data-slot="button-group"][data-glide]:has(
       > :is(button, a[href], [role="button"]):active:not(
           [aria-haspopup],
           :disabled
@@ -351,11 +353,12 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    [data-glide] {
+    [data-slot="button-group"][data-glide] {
       --group-press-scale: 1;
     }
 
-    [data-glide] > [data-slot="button-group-highlight"] {
+    [data-slot="button-group"][data-glide]
+      > [data-slot="button-group-highlight"] {
       transition: background-color 100ms
         var(--ease-out, cubic-bezier(0, 0, 0.2, 1));
     }

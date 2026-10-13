@@ -6,7 +6,11 @@ import { ToggleGroup as BaseToggleGroup } from "@base-ui/react/toggle-group";
 
 import { cn } from "@/lib/utils";
 import { Separator } from "@/registry/default/separator/separator";
-import { Toggle, type ToggleProps } from "@/registry/default/toggle/toggle";
+import {
+  isIconOnly,
+  Toggle,
+  type ToggleProps,
+} from "@/registry/default/toggle/toggle";
 
 // A shell, as in Button Group, whose items latch. The inset is the items'
 // own transparent borders: 2px on a side facing the shell's edge, 1px on a
@@ -33,8 +37,10 @@ const toggleGroupVariants = cva(
     "data-[orientation=vertical]:min-w-(--toggle-group-h) data-[orientation=vertical]:[&>[data-slot=toggle-group-item]]:box-content data-[orientation=vertical]:[&>[data-slot=toggle-group-item]]:h-[calc(var(--toggle-group-h)-4px)]",
     "data-[orientation=vertical]:[&>[data-slot=toggle-group-item]]:border-x-2 data-[orientation=vertical]:[&>:nth-child(1_of_[data-slot=toggle-group-item])]:border-t-2 data-[orientation=vertical]:[&>:nth-last-child(1_of_[data-slot=toggle-group-item])]:border-b-2",
     // A square hit area over each item's whole box, borders and rounded
-    // corners included, so hover never flickers off between items.
+    // corners included, so hover never flickers off between items. Beside a
+    // separator it reaches to the line: 1px border + 3px air + half the line.
     "[&>[data-slot=toggle-group-item]]:after:absolute [&>[data-slot=toggle-group-item]]:after:content-[''] [&>[data-slot=toggle-group-item]]:after:-inset-x-px [&>[data-slot=toggle-group-item]]:after:-inset-y-0.5 data-[orientation=vertical]:[&>[data-slot=toggle-group-item]]:after:-inset-x-0.5 data-[orientation=vertical]:[&>[data-slot=toggle-group-item]]:after:-inset-y-px",
+    "data-[orientation=horizontal]:[&>[data-slot=toggle-group-item]:has(+[data-slot=toggle-group-separator])]:after:-end-[5px] data-[orientation=horizontal]:[&>[data-slot=toggle-group-separator]+[data-slot=toggle-group-item]]:after:-start-[5px] data-[orientation=vertical]:[&>[data-slot=toggle-group-item]:has(+[data-slot=toggle-group-separator])]:after:-bottom-[5px] data-[orientation=vertical]:[&>[data-slot=toggle-group-separator]+[data-slot=toggle-group-item]]:after:-top-[5px]",
     // Icon-only items: the paint is square, whatever each side's border.
     "[&>[data-slot=toggle-group-item][data-icon-only]]:box-content [&>[data-slot=toggle-group-item][data-icon-only]]:aspect-square data-[orientation=vertical]:[&>[data-slot=toggle-group-item][data-icon-only]]:h-auto",
     "data-disabled:opacity-60 data-disabled:[&>*]:opacity-100",
@@ -144,18 +150,6 @@ export type ToggleGroupItemProps = Omit<ToggleProps, "variant" | "size">;
 // A labelled item whose only child is an icon component or <svg>. CSS can't
 // tell: :only-child ignores text nodes. The label check keeps a lone text
 // component (<Trans>, <FormattedMessage>) from counting as an icon.
-function isIconOnly(
-  children: React.ReactNode,
-  props: ToggleGroupItemProps,
-): boolean {
-  return (
-    React.isValidElement(children) &&
-    children.type !== React.Fragment &&
-    (typeof children.type !== "string" || children.type === "svg") &&
-    Boolean(props["aria-label"] || props["aria-labelledby"])
-  );
-}
-
 /** A `Toggle` sized and styled by its `ToggleGroup`. */
 function ToggleGroupItem({
   className,
@@ -163,7 +157,10 @@ function ToggleGroupItem({
   ...props
 }: ToggleGroupItemProps) {
   const { size, orientation } = React.use(ToggleGroupContext);
-  const iconOnly = isIconOnly(children, props);
+  const iconOnly = isIconOnly(
+    children,
+    props["aria-label"] || props["aria-labelledby"],
+  );
 
   return (
     <Toggle
@@ -198,7 +195,7 @@ function ToggleGroupSeparator({
       className={cn(
         // Air and line are all borders, as in Button Group, so both sides
         // snap alike at every display scale.
-        "flex shrink-0 self-stretch border-transparent bg-transparent data-[orientation=horizontal]:h-auto data-[orientation=horizontal]:w-auto data-[orientation=horizontal]:flex-col data-[orientation=vertical]:w-auto",
+        "pointer-events-none flex shrink-0 self-stretch border-transparent bg-transparent data-[orientation=horizontal]:h-auto data-[orientation=horizontal]:w-auto data-[orientation=horizontal]:flex-col data-[orientation=vertical]:w-auto",
         "before:border-transparent before:content-[''] after:border-transparent after:content-['']",
         "data-[orientation=vertical]:after:border-s-border data-[orientation=vertical]:border-e-[3px] data-[orientation=vertical]:before:border-s-[3px] data-[orientation=vertical]:after:h-5 data-[orientation=vertical]:after:self-center data-[orientation=vertical]:after:rounded-full data-[orientation=vertical]:after:border-s-[1.5px]",
         "data-[orientation=horizontal]:after:border-t-border data-[orientation=horizontal]:border-b-[3px] data-[orientation=horizontal]:before:border-t-[3px] data-[orientation=horizontal]:after:w-5 data-[orientation=horizontal]:after:self-center data-[orientation=horizontal]:after:rounded-full data-[orientation=horizontal]:after:border-t-[1.5px]",

@@ -7,7 +7,11 @@ import { ToggleGroup as BaseToggleGroup } from "@base-ui/react/toggle-group";
 
 import { cn } from "@/lib/utils";
 import { Button, type ButtonProps } from "@/registry/default/button/button";
-import { Toggle, type ToggleProps } from "@/registry/default/toggle/toggle";
+import {
+  isIconOnly,
+  Toggle,
+  type ToggleProps,
+} from "@/registry/default/toggle/toggle";
 import { solidSurface } from "@/registry/default/lib/elevated";
 import "./toolbar.css";
 
@@ -62,11 +66,8 @@ const itemShell = cn(
 
 // Icon-only items have a square paint (the content box, with no padding),
 // whatever each side's border: as tall as the row, or as wide as the column.
-const iconSquare = {
-  horizontal: "box-content aspect-square w-auto px-0 sm:w-auto",
-  vertical:
-    "box-content aspect-square w-auto px-0 sm:w-auto group-data-[orientation=vertical]/toolbar:h-auto sm:group-data-[orientation=vertical]/toolbar:h-auto",
-};
+const iconSquare =
+  "box-content aspect-square w-auto px-0 sm:w-auto group-data-[orientation=vertical]/toolbar:h-auto sm:group-data-[orientation=vertical]/toolbar:h-auto";
 
 type ToolbarVariant = NonNullable<
   VariantProps<typeof toolbarVariants>["variant"]
@@ -76,20 +77,6 @@ type ToolbarSize = NonNullable<VariantProps<typeof toolbarVariants>["size"]>;
 const ToolbarContext = React.createContext<{
   orientation: "horizontal" | "vertical";
 }>({ orientation: "horizontal" });
-
-// A labelled item whose only child is an icon component or <svg>. CSS can't
-// tell: :only-child ignores text nodes.
-function isIconOnly(
-  children: React.ReactNode,
-  label: string | undefined,
-): boolean {
-  return (
-    React.isValidElement(children) &&
-    children.type !== React.Fragment &&
-    (typeof children.type !== "string" || children.type === "svg") &&
-    Boolean(label)
-  );
-}
 
 export type ToolbarProps = BaseToolbar.Root.Props & {
   /** Shell style. */
@@ -143,7 +130,6 @@ function ToolbarButton({
   render,
   ...props
 }: ToolbarButtonProps) {
-  const { orientation } = React.use(ToolbarContext);
   const iconOnly = size?.startsWith("icon");
 
   return (
@@ -158,7 +144,7 @@ function ToolbarButton({
           render={render}
           className={cn(
             itemShell,
-            iconOnly && iconSquare[orientation],
+            iconOnly && iconSquare,
             // Quiet: undo primary's fill and border, hover and press with the
             // label tints. A set variant keeps its own paint.
             !variant &&
@@ -176,8 +162,12 @@ export type ToolbarToggleProps = BaseToolbar.Button.Props &
   Omit<ToggleProps, "variant" | "size">;
 
 /** A Toggle that stays pressed when on, with Toggle Group's deeper tint. */
-function ToolbarToggle({ className, children, ...props }: ToolbarToggleProps) {
-  const { orientation } = React.use(ToolbarContext);
+function ToolbarToggle({
+  className,
+  children,
+  render,
+  ...props
+}: ToolbarToggleProps) {
   const iconOnly = isIconOnly(
     children,
     props["aria-label"] ?? props["aria-labelledby"],
@@ -191,13 +181,13 @@ function ToolbarToggle({ className, children, ...props }: ToolbarToggleProps) {
       render={
         <Toggle
           variant="ghost"
+          render={render}
           className={cn(
             itemShell,
             "min-w-auto px-2.5 text-sm sm:min-w-auto",
-            iconOnly && iconSquare[orientation],
+            iconOnly && iconSquare,
             "text-current",
             "[--tgl-bg-active:var(--toolbar-press)] [--tgl-bg-hover:var(--toolbar-highlight)] [--tgl-bg-selected:var(--toolbar-pressed)]",
-            "forced-colors:data-pressed:border-[Highlight]",
             className,
           )}
         />
@@ -272,8 +262,9 @@ function ToolbarInput({ className, ...props }: ToolbarInputProps) {
       className={cn(
         itemShell,
         "placeholder:text-muted-foreground min-w-0 bg-transparent bg-clip-padding px-2.5 text-sm text-current",
-        "outline-0 outline-transparent transition-[background-color,outline-width,outline-color] duration-100 ease-out outline-solid",
-        "focus-visible:outline-ring/50 hover:bg-(--toolbar-highlight) focus:bg-(--toolbar-highlight) focus-visible:outline-2",
+        // Hover is instant, as on the other items; the focus ring is in
+        // toolbar.css.
+        "hover:bg-(--toolbar-highlight) focus:bg-(--toolbar-highlight)",
         "data-disabled:cursor-not-allowed data-disabled:opacity-60",
         className,
       )}
@@ -296,7 +287,6 @@ function ToolbarLink({ className, ...props }: ToolbarLinkProps) {
         itemShell,
         "before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:transition-[background-color,scale] before:duration-100 before:ease-out before:content-['']",
         "hover:before:bg-(--toolbar-highlight) active:before:scale-[0.98] active:before:bg-(--toolbar-press) motion-reduce:active:before:scale-100",
-        "focus-visible:outline-ring/50 outline-0 outline-transparent outline-solid focus-visible:outline-2",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}

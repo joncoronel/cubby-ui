@@ -85,11 +85,11 @@ Give the toolbar an `aria-label` that names what it controls ("Text formatting")
 
 ### Keyboard
 
-Tab moves focus into and out of the toolbar in one stop. Arrow keys move between controls, Home and End jump to the ends, and focus loops unless you set `loopFocus={false}`. A disabled control stays focusable, so keyboard users can still find it.
+Tab moves focus into and out of the toolbar in one stop. Arrow keys move between controls, and focus loops unless you set `loopFocus={false}`. A disabled control stays focusable, so keyboard users can still find it.
 
 ### Toggles
 
-`ToolbarToggle` exposes its state with `aria-pressed`, and its label switches to full contrast when pressed. In forced-colors mode a pressed toggle gets a Highlight border.
+`ToolbarToggle` exposes its state with `aria-pressed`, and a pressed toggle keeps a deeper tint than hover. In forced-colors mode a pressed toggle gets a Highlight border.
 
 ## API Reference
 

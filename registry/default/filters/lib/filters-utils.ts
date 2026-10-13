@@ -41,6 +41,8 @@ export const FILTER_SEGMENT = cn(
  */
 export const FILTER_ENDS = cn(
   "[&>:nth-child(1_of_[data-slot^=filter-chip-])]:border-s-2 [&>:nth-last-child(1_of_[data-slot^=filter-chip-])]:border-e-2",
+  // With clear unfolded, add and clear reach to the separator's line.
+  "[&:has([data-slot=filter-clear-segment][data-active])_[data-slot=filter-add]]:after:-end-[5px] [&_[data-slot=filter-clear]]:after:-start-[5px]",
   "[&_[data-slot=filter-add]]:border-s-2 [&:has([data-slot=filter-clear-segment][data-active])_[data-slot=filter-clear]]:border-e-2 [&:not(:has([data-slot=filter-clear-segment][data-active]))_[data-slot=filter-add]]:border-e-2",
 );
 

@@ -316,3 +316,10 @@
     outline-offset: -2px;
   }
 }
+
+/* Forced colors drop the fills, so a pressed toggle gets a Highlight border. */
+@media (forced-colors: active) {
+  [data-slot="toolbar"] [data-slot="toolbar-toggle"][data-pressed] {
+    border-color: Highlight;
+  }
+}

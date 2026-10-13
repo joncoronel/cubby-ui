@@ -15,7 +15,7 @@ export default function MenubarSize() {
   return (
     <div className="flex flex-col items-center gap-4">
       {sizes.map((size) => (
-        <Menubar key={size} size={size}>
+        <Menubar key={size} size={size} aria-label={`${size} menubar`}>
           <MenubarMenu>
             <MenubarTrigger>File</MenubarTrigger>
             <MenubarContent>

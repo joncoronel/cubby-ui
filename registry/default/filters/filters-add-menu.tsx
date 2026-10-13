@@ -778,9 +778,8 @@ function AddMenu({
                     className={cn(
                       FILTER_SEGMENT,
                       FILTER_SEGMENT_INTERACTIVE,
-                      // The "+" sits in the side padding, as in the label's
-                      // layout before; folded, the padding goes and the "+"
-                      // square (below) sets the width.
+                      // The "+" sits in the side padding; folded, the
+                      // padding goes and the "+" square (below) sets the width.
                       "text-muted-foreground hover:text-foreground data-popup-open:text-foreground gap-0 px-(--seg-icon-x) data-compact:px-0",
                       className,
                     )}
@@ -816,7 +815,7 @@ function AddMenu({
             >
               {inActions && (
                 // Folded to "+", a square as tall as the plate, so the
-                // segment is square however its borders snap to device pixels.
+                // segment stays square at any display scale.
                 <span className="flex h-full shrink-0 items-center justify-center in-data-compact:aspect-square">
                   <HugeiconsIcon
                     icon={PlusSignIcon}

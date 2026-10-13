@@ -1,9 +1,5 @@
 /* -------------------------------------------------------------------------------------------------
- * Inset.
- *
- * The gaps are the links' own transparent borders, as in Button Group: 2px
- * on a side facing the shell's edge, 1px on a side facing a neighbour. They
- * snap to whole device pixels, so the edge is never thinner than the gap.
+ * Inset: link borders, 2px facing the shell's edge, 1px facing a neighbour.
  * The ends are the first and last list items; the indicator is skipped.
  * -------------------------------------------------------------------------------------------------*/
 
@@ -12,9 +8,8 @@
   border-block-width: 2px;
 }
 
-/* A square hit area over the link's whole box, borders and rounded corners
- * included, so the notch where two links' corners meet still belongs to one
- * of them and hover never flickers off between them. */
+/* A square hit area over the whole box, corners included, so hover never
+ * drops between links. */
 [data-slot="pagination-content"] [data-slot="pagination-link"]::after {
   content: "";
   position: absolute;
@@ -48,9 +43,8 @@
   display: none;
 }
 
-/* Hover is instant, as in the other shells: links don't transition (see
- * pagination.tsx) and neither do their labels. Only the label of the page
- * becoming current fades, after the fill (below). */
+/* Hover is instant. Only the label of the page becoming current fades,
+ * after the fill (below). */
 
 /* All anchor features or none: a partial implementation leaves the fill
  * unplaced or tied to another list. */
@@ -110,13 +104,8 @@
 }
 
 /* -------------------------------------------------------------------------------------------------
- * Focus ring.
- *
- * On the fill's own edge: 2px just inside it, following its corners, the
- * same on every side whatever the item's border widths, and never past the
- * item. Items draw it on their plate (::before); fields, which can't have
- * one, as an inset shadow, with an outline where forced colors drop
- * shadows.
+ * Focus ring: 2px inside the fill's edge, on the plate (::before), following
+ * its corners.
  * -------------------------------------------------------------------------------------------------*/
 
 [data-slot="pagination-content"] [data-slot="pagination-link"]:focus-visible {

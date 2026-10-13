@@ -675,8 +675,7 @@ function FilterActionsClear({
       className="grid h-full grid-cols-[minmax(0,0fr)] overflow-hidden opacity-0 transition-[grid-template-columns,opacity] duration-220 ease-[cubic-bezier(0.22,1,0.36,1)] data-active:grid-cols-[minmax(0,1fr)] data-active:opacity-100 motion-reduce:transition-none"
     >
       <div className="flex h-full min-w-0 items-center">
-        {/* Air and line are all borders, as in Button Group, so both sides
-            snap alike at every display scale. */}
+        {/* Air and line are all borders, so both sides snap alike. */}
         <span
           aria-hidden
           className="after:border-s-border pointer-events-none flex shrink-0 self-stretch border-e-[3px] border-transparent before:border-s-[3px] before:border-transparent before:content-[''] after:h-5 after:self-center after:rounded-full after:border-s-[1.5px] after:border-transparent after:content-['']"

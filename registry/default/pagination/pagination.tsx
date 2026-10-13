@@ -33,9 +33,8 @@ function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
 }
 
 // The list is a shell, as in Button Group, with a current-page fill that
-// glides between links (pagination.css). The inset is the links' own
-// transparent borders (pagination.css). Paint corners are the shell's minus
-// the 2px edge border.
+// glides between links. Insets are link borders (pagination.css); plate
+// corners are the shell's minus the 2px edge border.
 const paginationContentVariants = cva(
   [
     "relative isolate flex w-fit flex-row items-stretch rounded-(--pagination-radius)",
@@ -114,11 +113,9 @@ type PaginationLinkProps = useRender.ComponentProps<"a"> & {
 // would add button semantics to elements that must stay links.
 const linkClasses = cn(
   buttonVariants({ variant: "ghost", size: null }),
-  // The paint (content box, no padding) is square, whatever each side's
-  // border; wider labels grow it.
+  // The plate (content box, no padding) is square; wider labels grow it.
   "box-content aspect-square h-auto self-stretch px-0 text-sm tabular-nums",
-  // Box corners are the paint's + 2px, the shell's. The ring overlaps the
-  // border, inside the gutter.
+  // Box corners are the plate's + 2px; the focus ring is in pagination.css.
   "rounded-[calc(var(--pagination-item-radius)+2px)] before:rounded-(--pagination-item-radius)",
   // Hover and press: the label color at 10% / 14%
   "[--btn-bg-hover:color-mix(in_oklab,currentColor_10%,transparent)] [--btn-bg-active:color-mix(in_oklab,currentColor_14%,transparent)]",
@@ -126,8 +123,8 @@ const linkClasses = cn(
   "aria-[current=page]:text-(--pagination-current-fg) aria-[current=page]:hover:text-(--pagination-current-fg) aria-[current=page]:[--btn-bg:var(--pagination-current-bg)] aria-[current=page]:[--btn-bg-hover:var(--pagination-current-bg)] aria-[current=page]:[--btn-bg-active:var(--pagination-current-bg)]",
   "aria-disabled:pointer-events-none aria-disabled:opacity-60",
   // No transitions on the link: Chrome skips the indicator's slide when the
-  // new current link starts one. Hover is instant, as in the other shells;
-  // the press tint still fades (Button's 100ms).
+  // new current link starts one. Hover is instant; the press tint still
+  // fades (Button's 100ms).
   "transition-[outline-width,outline-offset,outline-color] before:[transition-duration:0ms,100ms,100ms] active:before:[transition-duration:100ms] aria-[current=page]:before:transition-none",
 );
 

@@ -1,20 +1,16 @@
 /* -------------------------------------------------------------------------------------------------
- * Gliding highlight, in CSS anchor positioning.
- *
- * The lit button's plate (hover, focus, press, open menu) takes the anchor name and
- * the shared pill follows it. Without anchor positioning and anchor-scope,
- * each button paints its own hover instead.
+ * Gliding highlight. The lit button's plate (::before) is the anchor and the
+ * pill follows it. Without anchor positioning, each button paints its own
+ * hover.
  * -------------------------------------------------------------------------------------------------*/
 
 [data-slot="button-group-highlight"] {
   display: none;
 }
 
-/* Hit areas. Each button's ::after is a square hit area over its whole box,
- * borders and rounded corners included, so the notch where two buttons'
- * corners meet still belongs to one of them. Beside a separator it reaches
- * to the line, so the neighbours meet there. The highlight shows exactly
- * where a click lands. A select's hidden form input is stepped over. */
+/* Hit areas: a square ::after over the whole box, corners included, so the
+ * notch between two buttons isn't dead. Beside a separator it reaches the
+ * line, stepping over a select's hidden input. */
 [data-slot="button-group"]:not([data-variant="attached"])
   > :is(button, a[href], [role="button"]) {
   position: relative;
@@ -36,8 +32,7 @@
   inset-inline: -2px;
 }
 
-/* Beside a separator: the button's 1px border, the separator's 3px of air,
- * and half its line. */
+/* 1px border + 3px air + half the line. */
 [data-slot="button-group"]:not(
     [data-variant="attached"]
   )[data-orientation="horizontal"]
@@ -75,16 +70,10 @@
 }
 
 /* -------------------------------------------------------------------------------------------------
- * Inset.
- *
- * The gaps are the items' own transparent borders, not shell padding or a
- * shell border: 2px on a side facing the shell's edge, 1px on a side facing
- * a neighbour. Borders snap to whole device pixels, so the edge is never
- * thinner than the gap and neither lands between pixels (2 and 2 at 100%,
- * 3 and 2 at 175%). The edge gap belongs to the item, so it hovers, and the
- * shell has no border to push elevated's rim inward. `of` counts items only,
- * so the guard spans Base UI inserts after an open trigger can't move the
- * ends.
+ * Inset: item borders, 2px facing the shell's edge, 1px facing a neighbour.
+ * Borders snap to whole device pixels, so the edge is never thinner than the
+ * gap, and the shell has no border to push elevated's rim inward. `of`
+ * counts items only, so Base UI's guard spans can't move the ends.
  * -------------------------------------------------------------------------------------------------*/
 
 [data-slot="button-group"]:not([data-variant="attached"])
@@ -262,10 +251,8 @@
     background-color: transparent;
   }
 
-  /* Hover is gated to real hover (:active covers taps). An open menu or a
-   * held button keeps the pill, or a pointer drifting mid-press would light
-   * two buttons and the pill would dart between them. Keyboard focus
-   * outranks hover. */
+  /* Real hover only (:active covers taps). An open menu, a held button, or
+   * keyboard focus keeps the pill. */
   [data-slot="button-group"][data-glide]
     > :is(button, a[href], [role="button"]):not(:disabled, [data-disabled]):is(
       :focus-visible,
@@ -303,8 +290,7 @@
     z-index: -1;
     pointer-events: none;
     opacity: 0;
-    /* It glides between items. Entering or leaving there is nothing to
-     * glide from or to, so it appears and goes instantly. */
+    /* Glides between buttons; appears and goes instantly. */
     transition:
       inset 80ms var(--ease-out-expo, cubic-bezier(0.19, 1, 0.22, 1)),
       scale 100ms var(--ease-out, cubic-bezier(0, 0, 0.2, 1)),
@@ -333,9 +319,8 @@
     }
   }
 
-  /* Press, as on Button; menu triggers skip it. The pill is anchored to the
-   * plate, so a quiet button's plate holds still and the pill does the
-   * press scale on its own, one clean motion. */
+  /* Press: the plate holds still and the pill shrinks. Menu triggers skip
+   * it. */
   [data-slot="button-group"][data-glide]
     > :is(button, a[href], [role="button"]):not([data-variant]):active::before {
     scale: none;
@@ -366,13 +351,9 @@
 }
 
 /* -------------------------------------------------------------------------------------------------
- * Focus ring.
- *
- * On the fill's own edge: 2px just inside it, following its corners, the
- * same on every side whatever the item's border widths, and never past the
- * item. Items draw it on their plate (::before); fields, which can't have
- * one, as an inset shadow, with an outline where forced colors drop
- * shadows.
+ * Focus ring: 2px inside the fill's edge, following its corners. Items draw
+ * it on their plate (::before); fields, which have none, as an inset shadow,
+ * with an outline under forced colors.
  * -------------------------------------------------------------------------------------------------*/
 
 [data-slot="button-group"]:not([data-variant="attached"])

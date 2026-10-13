@@ -1,7 +1,5 @@
-/* Hit areas. Each trigger's ::after is a square hit area over its whole
- * box, borders and rounded corners included, so the notch where two
- * triggers' corners meet still belongs to one of them. The highlight shows
- * exactly where a click lands. */
+/* Hit areas: a square ::after over the whole box, corners included, so the
+ * notch between two triggers isn't dead. */
 [data-slot="menubar"] [data-menubar-item]::after {
   content: "";
   position: absolute;
@@ -15,12 +13,9 @@
 }
 
 /* -------------------------------------------------------------------------------------------------
- * Gliding highlight, in CSS anchor positioning, as in Button Group and Toolbar.
- *
- * The lit trigger's plate (its ::before, inside the border) takes the anchor
- * name, so the pill matches the plate whatever the trigger's border widths.
- * Without anchor positioning and anchor-scope, each trigger paints its own
- * hover instead.
+ * Gliding highlight. The lit trigger's plate (::before) is the anchor, so
+ * the pill matches it whatever the borders. Without anchor positioning, each
+ * trigger paints its own hover.
  * -------------------------------------------------------------------------------------------------*/
 
 [data-slot="menubar-highlight"] {
@@ -53,11 +48,9 @@
   }
 
   /* While a menu is open, hovering another trigger opens it, so the pill
-   * moves on hover rather than waiting for that menu to mount. The open
-   * trigger lets go meanwhile, or two triggers would share the anchor, and
-   * paints its own tint until it closes. If arrow keys switched menus under
-   * a resting pointer, the open one still reads as open. Keyboard focus
-   * outranks hover. */
+   * leads on hover instead of waiting for the mount. The open trigger lets
+   * go and keeps its own tint until it closes, so an arrow-key switch still
+   * reads as open. Keyboard focus outranks hover. */
   @media (hover: hover) {
     [data-slot="menubar"][data-glide]:not(
         :has([data-menubar-item]:is(:active, :focus-visible))
@@ -86,8 +79,7 @@
     z-index: -1;
     pointer-events: none;
     opacity: 0;
-    /* It glides between triggers. Entering or leaving there is nothing to
-     * glide from or to, so it appears and goes instantly. */
+    /* Glides between triggers; appears and goes instantly. */
     transition:
       inset 80ms var(--ease-out-expo, cubic-bezier(0.19, 1, 0.22, 1)),
       background-color 100ms var(--ease-out, cubic-bezier(0, 0, 0.2, 1));
@@ -130,13 +122,8 @@
 }
 
 /* -------------------------------------------------------------------------------------------------
- * Focus ring.
- *
- * On the fill's own edge: 2px just inside it, following its corners, the
- * same on every side whatever the item's border widths, and never past the
- * item. Items draw it on their plate (::before); fields, which can't have
- * one, as an inset shadow, with an outline where forced colors drop
- * shadows.
+ * Focus ring: 2px inside the fill's edge, on the plate (::before), following
+ * its corners.
  * -------------------------------------------------------------------------------------------------*/
 
 [data-slot="menubar"] [data-menubar-item]:focus-visible {

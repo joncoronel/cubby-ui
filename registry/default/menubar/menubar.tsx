@@ -29,14 +29,10 @@ import {
 } from "@/registry/default/lib/elevated";
 import "./menubar.css";
 
-// A shell, as in Button Group and Toolbar. The inset is the triggers' own
-// transparent borders: 2px on a side facing the shell's edge, 1px on a side
-// facing a neighbour. Borders snap to whole device pixels, so the edge is
-// never thinner than the gap, and the edge gap hovers with its trigger.
-// `of` counts triggers only, so the guard spans Base UI inserts after an
-// open trigger can't move the ends. Outline draws its line as an outline
-// just outside the shell. A highlight glides to the hovered, focused, or
-// open trigger's plate (menubar.css).
+// A shell, as in Button Group and Toolbar. Trigger insets are borders, 2px
+// facing the shell's edge and 1px facing a neighbour; `of` counts triggers
+// only, so Base UI's guard spans can't move the ends. Hit areas, the gliding
+// highlight and focus rings are in menubar.css.
 const menubarVariants = cva(
   [
     "group/menubar relative isolate flex w-fit items-stretch rounded-(--menubar-radius) data-[orientation=vertical]:flex-col",
@@ -105,7 +101,6 @@ function Menubar({
       {...props}
     >
       {children}
-      {/* Last, so first-child selectors still match the first trigger. */}
       {highlight && <span aria-hidden data-slot="menubar-highlight" />}
     </BaseMenubar>
   );
@@ -121,11 +116,9 @@ const triggerClasses = cn(
   buttonVariants({ variant: "ghost", size: null }),
   "shrink-0 border border-transparent px-2.5 text-sm font-medium text-current hover:text-current data-popup-open:text-current",
   "[--btn-bg-hover:var(--menubar-highlight)] [--btn-bg-active:var(--menubar-press)]",
-  // Box corners are the paint's + 2px, the shell's. The ring overlaps the
-  // border, inside the gutter.
+  // Box corners are the plate's + 2px.
   "rounded-[calc(var(--menubar-item-radius)+2px)] before:rounded-(--menubar-item-radius) focus-visible:z-10",
-  // In a column every trigger gets the row's paint height, whatever its
-  // borders.
+  // In a column every trigger gets the row's paint height.
   "h-auto self-stretch group-data-[orientation=vertical]/menubar:box-content group-data-[orientation=vertical]/menubar:h-[calc(var(--menubar-h)-4px)] group-data-[orientation=vertical]/menubar:py-0 group-data-[orientation=vertical]/menubar:justify-start",
 );
 
@@ -192,12 +185,9 @@ function MenubarContent({
             // escapes it by transitioning scale and opacity alone.
             "will-change-transform",
             "motion-reduce:transition-none motion-reduce:will-change-auto",
-            // 'group' marks a switch to another menu in the bar, File to Edit,
-            // and a close by tabbing out. Both are instant, as in native menu
-            // bars; the first open and other closes animate. 'dismiss' must
-            // animate or there is no exit.
-            // The start and end styles are pinned too, or the swap frame shows
-            // both popups at opacity 0.
+            // 'group' (a switch to another menu, or a tab-out close) is
+            // instant, as in native menu bars. Start and end styles are pinned
+            // too, or the swap frame shows both popups at opacity 0.
             "data-[instant=group]:transition-none data-[instant=group]:data-ending-style:scale-100 data-[instant=group]:data-ending-style:opacity-100 data-[instant=group]:data-starting-style:scale-100 data-[instant=group]:data-starting-style:opacity-100",
             className,
           )}

@@ -16,28 +16,23 @@ import type {
 export const CLICK_MORPH_MS = 209;
 
 /**
- * Shared segment classes. The inset is the segments' own transparent
- * borders, as in Button Group: 2px on a side facing the chip's edge, 1px on
- * a side facing a neighbour (FILTER_ENDS sets the ends). They snap to whole
- * device pixels, so the edge is never thinner than the gap, and the edge gap
- * hovers with its segment. The hover plate paints on ::before inside the
- * border, so it can scale on press while the label holds still. Hover is
- * instant, as in the gliding groups; the press tint still fades. Box corners
- * are the chip's; the plate's are 2px less, so plate and chip are concentric.
+ * Shared segment classes. Insets are segment borders, 2px facing the chip's
+ * edge and 1px facing a neighbour (FILTER_ENDS sets the ends). The plate is
+ * ::before, so it scales on press while the label holds still; its corners
+ * are the chip's minus 2px. Hover is instant; the press tint still fades.
  */
 export const FILTER_SEGMENT = cn(
   "relative isolate inline-flex h-full shrink-0 items-center gap-1.5 whitespace-nowrap border border-y-2 border-transparent bg-clip-padding rounded-lg px-(--seg-x) outline-0 outline-transparent outline-solid transition-[background-color,color,outline-color] duration-100 ease-out [transition-duration:100ms,0ms,100ms] focus-visible:before:outline-2 focus-visible:before:-outline-offset-2 focus-visible:before:outline-ring/50",
-  // A square hit area over the whole box, borders and rounded corners
-  // included, so hover never flickers off between segments.
+  // A square hit area over the whole box, so hover never drops between
+  // segments.
   "after:absolute after:-inset-x-px after:-inset-y-0.5 after:content-['']",
   "before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-[calc(var(--radius-lg)-2px)] before:content-[''] before:transition-[background-color,scale] before:duration-100 before:ease-out before:[transition-duration:0ms,100ms] active:before:[transition-duration:100ms]",
 );
 
 /**
- * The ends of a chip or the actions capsule: the segment facing each edge
- * gets the 2px border. `of` counts segments only, so guard spans after an
- * open trigger can't move them. In the capsule, add is the end until the
- * clear segment unfolds.
+ * Ends of a chip or the actions capsule get the 2px border. `of` counts
+ * segments only, so Base UI's guard spans can't move them. In the capsule,
+ * add is the end until clear unfolds.
  */
 export const FILTER_ENDS = cn(
   "[&>:nth-child(1_of_[data-slot^=filter-chip-])]:border-s-2 [&>:nth-last-child(1_of_[data-slot^=filter-chip-])]:border-e-2",
@@ -46,7 +41,7 @@ export const FILTER_ENDS = cn(
   "[&_[data-slot=filter-add]]:border-s-2 [&:has([data-slot=filter-clear-segment][data-active])_[data-slot=filter-clear]]:border-e-2 [&:not(:has([data-slot=filter-clear-segment][data-active]))_[data-slot=filter-add]]:border-e-2",
 );
 
-/** Icon-only segments: the paint (content box) is square, whatever each side's border. */
+/** Icon-only segments: the plate (content box) is square. */
 export const FILTER_SEGMENT_SQUARE =
   "box-content aspect-square h-auto self-stretch justify-center px-0";
 
@@ -60,10 +55,8 @@ export const FILTER_SEGMENT_INTERACTIVE =
 
 /**
  * Shell classes per variant. The chip has no border; its segments carry the
- * inset. Outline draws its line as an outline just outside, the way
- * elevated's shadow ring sits outside; elevated keeps its rim and top light.
- * An incomplete filter dashes that line. `--filter-chip-bg`
- * lets stacked option icons ring in the fill.
+ * inset. Outline draws its line just outside, and an incomplete filter
+ * dashes it. `--filter-chip-bg` lets stacked option icons ring in the fill.
  */
 export const FILTER_VARIANTS: Record<FilterVariant, string> = {
   outline:

@@ -15,11 +15,8 @@ import {
 import { solidSurface } from "@/registry/default/lib/elevated";
 import "./toolbar.css";
 
-// A shell, as in Button Group, with Base UI's roving focus. The inset is
-// the items' own transparent borders, 2px facing the shell's edge and 1px
-// facing a neighbour (toolbar.css). Outline draws its line as an outline
-// just outside the shell. A highlight glides to the hovered or focused
-// item's plate (toolbar.css).
+// A shell, as in Button Group, with Base UI's roving focus. Insets, hit
+// areas, the gliding highlight and focus rings are in toolbar.css.
 const toolbarVariants = cva(
   [
     "group/toolbar relative isolate flex w-fit items-stretch rounded-(--toolbar-radius) data-[orientation=vertical]:flex-col",
@@ -52,15 +49,12 @@ const toolbarVariants = cva(
   },
 );
 
-// Shared by every item: concentric corners and stretch. The inset borders
-// are in toolbar.css. Box corners are the paint's + 2px, the shell's; the
-// ring overlaps the border, inside the gutter.
+// Shared by every item: concentric corners and stretch.
 const itemShell = cn(
   "shrink-0",
   "rounded-[calc(var(--toolbar-item-radius)+2px)] before:rounded-(--toolbar-item-radius) focus-visible:z-10",
   "h-auto self-stretch sm:h-auto",
-  // In a column every item gets the row's paint height, whatever its
-  // borders.
+  // In a column every item gets the row's paint height.
   "group-data-[orientation=vertical]/toolbar:box-content group-data-[orientation=vertical]/toolbar:py-0 group-data-[orientation=vertical]/toolbar:h-[calc(var(--toolbar-h)-4px)] sm:group-data-[orientation=vertical]/toolbar:h-[calc(var(--toolbar-h)-4px)]",
 );
 
@@ -110,7 +104,6 @@ function Toolbar({
         {...props}
       >
         {children}
-        {/* Last, so first-child selectors still match the first item. */}
         {highlight && <span aria-hidden data-slot="toolbar-highlight" />}
       </BaseToolbar.Root>
     </ToolbarContext.Provider>
@@ -237,9 +230,7 @@ function ToolbarSeparator({ className, ...props }: ToolbarSeparatorProps) {
     <BaseToolbar.Separator
       data-slot="toolbar-separator"
       className={cn(
-        // Base UI orients the separator across the toolbar. Air and line
-        // are all borders, as in Button Group, so both sides snap alike. The
-        // neighbours' hit areas meet under it (toolbar.css).
+        // Air and line are all borders, so both sides snap alike.
         "pointer-events-none flex shrink-0 self-stretch border-transparent bg-transparent data-[orientation=horizontal]:h-auto data-[orientation=horizontal]:w-auto data-[orientation=horizontal]:flex-col data-[orientation=vertical]:w-auto",
         "before:border-transparent before:content-[''] after:border-transparent after:content-['']",
         "data-[orientation=vertical]:after:border-s-border data-[orientation=vertical]:border-e-[3px] data-[orientation=vertical]:before:border-s-[3px] data-[orientation=vertical]:after:h-5 data-[orientation=vertical]:after:self-center data-[orientation=vertical]:after:rounded-full data-[orientation=vertical]:after:border-s-[1.5px]",
@@ -262,8 +253,7 @@ function ToolbarInput({ className, ...props }: ToolbarInputProps) {
       className={cn(
         itemShell,
         "placeholder:text-muted-foreground min-w-0 bg-transparent bg-clip-padding px-2.5 text-sm text-current",
-        // Hover is instant, as on the other items; the focus ring is in
-        // toolbar.css.
+        // Instant hover; the focus ring is in toolbar.css.
         "hover:bg-(--toolbar-highlight) focus:bg-(--toolbar-highlight)",
         "data-disabled:cursor-not-allowed data-disabled:opacity-60",
         className,

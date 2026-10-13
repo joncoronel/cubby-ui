@@ -72,11 +72,9 @@ const buttonGroupVariants = cva(
 );
 
 const trayClasses = cn(
-  // The inset is the items' own transparent borders (button-group.css).
-  // Paint corners are the shell's minus the 2px edge border, so paint and
-  // shell are concentric. The ring overlaps the border, inside the gutter.
-  // Select triggers skip the before: rule: it would give them an empty
-  // pseudo-element that becomes a flex item.
+  // Insets are item borders (button-group.css). Plate corners are the
+  // shell's minus the 2px edge border. Select triggers skip the before:
+  // rule, or its empty pseudo-element becomes a flex item.
   "rounded-(--group-radius) [--group-item-radius:max(0px,calc(var(--group-radius)-2px))]",
   "[&>:is(button,a):not([data-slot=select-trigger])]:before:rounded-(--group-item-radius)",
   // Highlight and press: the label color at 10% / 14%. Button's hover tokens
@@ -173,7 +171,6 @@ function ButtonGroup({
         {...props}
       >
         {children}
-        {/* Last, so first-child selectors still match the first button. */}
         {glides && <span aria-hidden data-slot="button-group-highlight" />}
       </div>
     </ButtonGroupContext.Provider>
@@ -230,9 +227,7 @@ function ButtonGroupSeparator({
         group.variant === "attached"
           ? "dark:bg-input"
           : cn(
-              // Air and line are all borders, so both sides snap alike at
-              // every display scale. The neighbours' hit areas meet under it
-              // (button-group.css).
+              // Air and line are all borders, so both sides snap alike.
               "pointer-events-none",
               "flex shrink-0 self-stretch border-transparent bg-transparent data-[orientation=horizontal]:h-auto data-[orientation=horizontal]:w-auto data-[orientation=horizontal]:flex-col data-[orientation=vertical]:w-auto",
               "before:border-transparent before:content-[''] after:border-transparent after:content-['']",

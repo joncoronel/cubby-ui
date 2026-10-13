@@ -444,7 +444,7 @@ const FilterChip = React.memo(function FilterChip({
           "text-foreground inline-flex max-w-full shrink-0 items-center rounded-lg border",
           FILTER_VARIANTS[variant],
           FILTER_TINTS,
-          "transition-[border-color] duration-150 data-incomplete:border-dashed",
+          "transition-[outline-color,border-color] duration-150",
           FILTER_SIZES[size],
           className,
         )}
@@ -489,7 +489,7 @@ function FilterChipField({
     <span
       data-slot="filter-chip-field"
       className={cn(
-        "text-muted-foreground inline-flex h-full shrink-0 items-center gap-1.5 border-2 border-transparent ps-(--seg-x) pe-1 whitespace-nowrap",
+        "text-muted-foreground inline-flex h-full shrink-0 items-center gap-1.5 border border-transparent ps-(--seg-x) pe-1 whitespace-nowrap",
         className,
       )}
       {...props}

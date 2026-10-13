@@ -1,7 +1,9 @@
 /* -------------------------------------------------------------------------------------------------
  * Gliding current page, in CSS anchor positioning.
  *
- * The current link takes the anchor name and the shared fill follows it.
+ * The current link's plate (its ::before, inside the border) takes the
+ * anchor name, so the fill matches the plate whatever the link's border
+ * widths.
  * Without anchor positioning and anchor-scope, the current link paints its
  * own fill instead.
  * -------------------------------------------------------------------------------------------------*/
@@ -23,8 +25,11 @@
     anchor-scope: --pagination-current;
   }
 
-  [data-slot="pagination-link"][aria-current="page"] {
+  [data-slot="pagination-link"][aria-current="page"]::before {
     anchor-name: --pagination-current;
+  }
+
+  [data-slot="pagination-link"][aria-current="page"] {
     --btn-bg: transparent;
     --btn-bg-hover: transparent;
     --btn-bg-active: transparent;
@@ -41,11 +46,8 @@
     position: absolute;
     position-anchor: --pagination-current;
     inset: anchor(inside);
-    /* The anchor is the link's border box; the same 2px border lines the
-     * fill up with the link's paint. */
-    border: 2px solid transparent;
-    border-radius: calc(var(--pagination-item-radius) + 2px);
-    background: var(--pagination-current-bg) padding-box;
+    border-radius: var(--pagination-item-radius);
+    background-color: var(--pagination-current-bg);
     z-index: -1;
     pointer-events: none;
     /* On first paint the anchor can't interpolate, so the fill starts in

@@ -29,14 +29,16 @@ import {
 } from "@/registry/default/lib/elevated";
 import "./menubar.css";
 
-// A shell, as in Button Group and Toolbar. Triggers fill it with a 2px
-// transparent-border inset (even at fractional display scales), and a
-// highlight glides to the hovered, focused, or open trigger (menubar.css), so
-// moving across open menus slides it from File to Edit.
+// A shell, as in Button Group and Toolbar. The inset is two 1px transparent
+// borders, one on the shell and one on each trigger, so plates sit 2px from
+// the edge and from each other and snap alike at every display scale.
+// Outline draws its line as an outline just outside the shell, the way
+// elevated's shadow ring sits outside. A highlight glides to the hovered, focused, or open trigger's
+// plate (menubar.css).
 const menubarVariants = cva(
   [
     "relative isolate flex w-fit items-stretch rounded-(--menubar-radius) data-[orientation=vertical]:flex-col",
-    "[--menubar-item-radius:max(0px,calc(var(--menubar-radius)-var(--menubar-border,0px)-2px))]",
+    "[--menubar-item-radius:max(0px,calc(var(--menubar-radius)-var(--menubar-border)-1px))]",
     // Label-color tints: hover 10%, press 14%
     "[--menubar-highlight:color-mix(in_oklab,currentColor_10%,transparent)] [--menubar-press:color-mix(in_oklab,currentColor_14%,transparent)]",
     "data-[orientation=horizontal]:h-(--menubar-h) data-[orientation=vertical]:min-w-(--menubar-h)",
@@ -45,12 +47,17 @@ const menubarVariants = cva(
   {
     variants: {
       variant: {
-        elevated: cn(solidSurface(2, 2), "text-foreground"),
-        // Outline's border sits outside the fill, as on an outline Button.
+        // The surface's inner rim is the 1px border, so it meets the shadow
+        // ring as on other raised surfaces.
+        elevated: cn(
+          solidSurface(2, 2),
+          "text-foreground shadow-(--surface-shadow-2) border border-(--surface-rim-color) [--menubar-border:1px]",
+        ),
         outline:
-          "border-border bg-card text-foreground border bg-clip-padding [--menubar-border:1px]",
-        soft: "bg-secondary text-secondary-foreground",
-        ghost: "text-foreground",
+          "bg-card text-foreground border border-transparent outline outline-border [--menubar-border:1px]",
+        soft: "bg-secondary text-secondary-foreground border border-transparent [--menubar-border:1px]",
+        ghost:
+          "text-foreground border border-transparent [--menubar-border:1px]",
       },
       // Button's height ladder (one step taller below sm); corners step with it.
       size: {
@@ -105,12 +112,12 @@ function MenubarMenu(props: BaseMenu.Root.Props) {
 // skip Button's press, as everywhere else.
 const triggerClasses = cn(
   buttonVariants({ variant: "ghost", size: null }),
-  "shrink-0 border-2 border-transparent px-2.5 text-sm font-medium text-current hover:text-current data-popup-open:text-current",
+  "shrink-0 border border-transparent px-2.5 text-sm font-medium text-current hover:text-current data-popup-open:text-current",
   "[--btn-bg-hover:var(--menubar-highlight)] [--btn-bg-active:var(--menubar-press)]",
-  // Box corners are the paint's + 2px, so paint, gap, and focus ring (at
+  // Box corners are the paint's + 1px, so paint, gap, and focus ring (at
   // offset 0) are concentric.
-  "rounded-[calc(var(--menubar-item-radius)+2px)] before:rounded-(--menubar-item-radius) focus-visible:outline-offset-0 focus-visible:z-10",
-  "h-auto self-stretch in-data-[orientation=vertical]:h-[calc(var(--menubar-h)-var(--menubar-border,0px)*2)] in-data-[orientation=vertical]:justify-start",
+  "rounded-[calc(var(--menubar-item-radius)+1px)] before:rounded-(--menubar-item-radius) focus-visible:outline-offset-0 focus-visible:z-10",
+  "h-auto self-stretch in-data-[orientation=vertical]:h-[calc(var(--menubar-h)-var(--menubar-border)*2)] in-data-[orientation=vertical]:justify-start",
 );
 
 function MenubarTrigger({

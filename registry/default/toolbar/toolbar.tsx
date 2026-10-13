@@ -11,14 +11,17 @@ import { Toggle, type ToggleProps } from "@/registry/default/toggle/toggle";
 import { solidSurface } from "@/registry/default/lib/elevated";
 import "./toolbar.css";
 
-// A shell, as in Button Group, with Base UI's roving focus. Items fill it with
-// a 2px transparent-border inset (even at fractional display scales), and a
-// highlight glides between them on hover and focus (toolbar.css). Items carry
-// data-toolbar-item, so they can sit inside groups and still glide.
+// A shell, as in Button Group, with Base UI's roving focus. The inset is two
+// 1px transparent borders: one on the shell, one on each item. Plate to edge
+// is shell + item, plate to plate is item + item, and since both are the same
+// border, they snap to device pixels alike and stay even at every display
+// scale. Outline draws its line as an outline just outside the shell, the way
+// elevated's shadow ring sits outside. A highlight glides to the
+// hovered or focused item's plate (toolbar.css).
 const toolbarVariants = cva(
   [
     "relative isolate flex w-fit items-stretch rounded-(--toolbar-radius) data-[orientation=vertical]:flex-col",
-    "[--toolbar-item-radius:max(0px,calc(var(--toolbar-radius)-var(--toolbar-border,0px)-2px))]",
+    "[--toolbar-item-radius:max(0px,calc(var(--toolbar-radius)-var(--toolbar-border)-1px))]",
     // Label-color tints: hover 10%, press 14%, pressed toggle 16%
     "[--toolbar-highlight:color-mix(in_oklab,currentColor_var(--toolbar-highlight-mix,10%),transparent)] [--toolbar-press:color-mix(in_oklab,currentColor_var(--toolbar-press-mix,14%),transparent)] [--toolbar-pressed:color-mix(in_oklab,currentColor_16%,transparent)]",
     // The shell is fixed and items stretch to fill it; columns grow to the
@@ -29,12 +32,17 @@ const toolbarVariants = cva(
   {
     variants: {
       variant: {
-        elevated: cn(solidSurface(3, 3), "text-foreground"),
-        // Outline's border sits outside the fill, as on an outline Button.
+        // The surface's inner rim is the 1px border, so it meets the shadow
+        // ring as on other raised surfaces.
+        elevated: cn(
+          solidSurface(3, 3),
+          "text-foreground shadow-(--surface-shadow-3) border border-(--surface-rim-color) [--toolbar-border:1px]",
+        ),
         outline:
-          "border-border bg-card text-foreground border bg-clip-padding [--toolbar-border:1px]",
-        soft: "bg-secondary text-secondary-foreground",
-        ghost: "text-foreground",
+          "bg-card text-foreground border border-transparent outline outline-border [--toolbar-border:1px]",
+        soft: "bg-secondary text-secondary-foreground border border-transparent [--toolbar-border:1px]",
+        ghost:
+          "text-foreground border border-transparent [--toolbar-border:1px]",
       },
       // Button's height ladder (one step taller below sm); corners step with it.
       size: {
@@ -51,12 +59,21 @@ const toolbarVariants = cva(
   },
 );
 
-// Shared by every item: the inset, concentric corners, and stretch.
+// Shared by every item: the 1px inset, concentric corners, and stretch.
 const itemShell = cn(
-  "shrink-0 border-2 border-transparent",
-  "rounded-[calc(var(--toolbar-item-radius)+2px)] before:rounded-(--toolbar-item-radius) focus-visible:outline-offset-0 focus-visible:z-10",
-  "h-auto self-stretch sm:h-auto in-data-[orientation=vertical]:h-[calc(var(--toolbar-h)-var(--toolbar-border,0px)*2)] in-data-[orientation=vertical]:sm:h-[calc(var(--toolbar-h)-var(--toolbar-border,0px)*2)]",
+  "shrink-0 border border-transparent",
+  "rounded-[calc(var(--toolbar-item-radius)+1px)] before:rounded-(--toolbar-item-radius) focus-visible:outline-offset-0 focus-visible:z-10",
+  "h-auto self-stretch sm:h-auto",
+  // In a column every item keeps the ladder height.
+  "in-data-[orientation=vertical]:h-[calc(var(--toolbar-h)-var(--toolbar-border)*2)] in-data-[orientation=vertical]:sm:h-[calc(var(--toolbar-h)-var(--toolbar-border)*2)]",
 );
+
+// Icon-only items are square: as wide as the row is tall, or in a column,
+// as wide as the column.
+const iconSquare = {
+  horizontal: "aspect-square w-auto px-0 sm:w-auto",
+  vertical: "w-full px-0",
+};
 
 type ToolbarVariant = NonNullable<
   VariantProps<typeof toolbarVariants>["variant"]
@@ -66,6 +83,20 @@ type ToolbarSize = NonNullable<VariantProps<typeof toolbarVariants>["size"]>;
 const ToolbarContext = React.createContext<{
   orientation: "horizontal" | "vertical";
 }>({ orientation: "horizontal" });
+
+// A labelled item whose only child is an icon component or <svg>. CSS can't
+// tell: :only-child ignores text nodes.
+function isIconOnly(
+  children: React.ReactNode,
+  label: string | undefined,
+): boolean {
+  return (
+    React.isValidElement(children) &&
+    children.type !== React.Fragment &&
+    (typeof children.type !== "string" || children.type === "svg") &&
+    Boolean(label)
+  );
+}
 
 export type ToolbarProps = BaseToolbar.Root.Props & {
   /** Shell style. */
@@ -119,6 +150,9 @@ function ToolbarButton({
   render,
   ...props
 }: ToolbarButtonProps) {
+  const { orientation } = React.use(ToolbarContext);
+  const iconOnly = size?.startsWith("icon");
+
   return (
     <BaseToolbar.Button
       data-slot="toolbar-button"
@@ -130,8 +164,7 @@ function ToolbarButton({
           render={render}
           className={cn(
             itemShell,
-            size?.startsWith("icon") &&
-              "aspect-square w-auto in-data-[orientation=vertical]:aspect-auto in-data-[orientation=vertical]:w-full sm:w-auto",
+            iconOnly && iconSquare[orientation],
             // Quiet: undo primary's fill and border, hover and press with the
             // label tints. A set variant keeps its own paint.
             !variant &&
@@ -149,7 +182,13 @@ export type ToolbarToggleProps = BaseToolbar.Button.Props &
   Omit<ToggleProps, "variant" | "size">;
 
 /** A Toggle that stays pressed when on, with Toggle Group's deeper tint. */
-function ToolbarToggle({ className, ...props }: ToolbarToggleProps) {
+function ToolbarToggle({ className, children, ...props }: ToolbarToggleProps) {
+  const { orientation } = React.use(ToolbarContext);
+  const iconOnly = isIconOnly(
+    children,
+    props["aria-label"] ?? props["aria-labelledby"],
+  );
+
   return (
     <BaseToolbar.Button
       data-slot="toolbar-toggle"
@@ -160,7 +199,7 @@ function ToolbarToggle({ className, ...props }: ToolbarToggleProps) {
           className={cn(
             itemShell,
             "min-w-auto px-2.5 text-sm sm:min-w-auto",
-            "has-[>svg:only-child]:aspect-square has-[>svg:only-child]:px-0 in-data-[orientation=vertical]:has-[>svg:only-child]:aspect-auto",
+            iconOnly && iconSquare[orientation],
             "text-current",
             "[--tgl-bg-active:var(--toolbar-press)] [--tgl-bg-hover:var(--toolbar-highlight)] [--tgl-bg-selected:var(--toolbar-pressed)]",
             "forced-colors:data-pressed:border-[Highlight]",
@@ -169,7 +208,9 @@ function ToolbarToggle({ className, ...props }: ToolbarToggleProps) {
         />
       }
       {...props}
-    />
+    >
+      {children}
+    </BaseToolbar.Button>
   );
 }
 

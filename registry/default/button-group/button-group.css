@@ -1,7 +1,7 @@
 /* -------------------------------------------------------------------------------------------------
  * Gliding highlight, in CSS anchor positioning.
  *
- * The lit button (hover, focus, press, open menu) takes the anchor name and
+ * The lit button's plate (hover, focus, press, open menu) takes the anchor name and
  * the shared pill follows it. Without anchor positioning and anchor-scope,
  * each button paints its own hover instead.
  * -------------------------------------------------------------------------------------------------*/
@@ -69,10 +69,10 @@
   > :is([data-slot="input"], [data-slot="select-trigger"]) {
   height: auto;
   align-self: stretch;
-  /* The buttons' 2px border, fill inside it. */
-  border-width: 2px;
+  /* The buttons' 1px border, fill inside it. */
+  border-width: 1px;
   border-color: transparent;
-  border-radius: calc(var(--group-item-radius) + 2px);
+  border-radius: calc(var(--group-item-radius) + 1px);
   background-color: transparent;
   background-clip: padding-box;
   box-shadow: none;
@@ -86,7 +86,7 @@
     background-color, outline-width, outline-offset, outline-color;
 }
 
-/* Focus ring 2px off the fill, as on the buttons. */
+/* Focus ring 1px off the fill, as on the buttons. */
 [data-slot="button-group"]:not([data-variant="attached"])
   > :is([data-slot="input"], [data-slot="select-trigger"]):focus-visible {
   outline-offset: 0;
@@ -110,6 +110,17 @@
     > :is([data-slot="input"], [data-slot="select-trigger"]):hover {
     background-color: var(--group-highlight);
   }
+}
+
+/* Select triggers have no paint layer of their own; this one is the anchor
+ * for the pill. */
+[data-slot="button-group"]:not([data-variant="attached"])
+  > [data-slot="select-trigger"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--group-item-radius);
+  pointer-events: none;
 }
 
 /* All anchor features or none: a partial implementation leaves the pill
@@ -140,7 +151,7 @@
       :focus-visible,
       :active,
       [data-popup-open]
-    ) {
+    )::before {
     anchor-name: --button-group-item;
   }
 
@@ -149,13 +160,15 @@
       > :is(button, a[href], [role="button"]):not(
         :disabled,
         [data-disabled]
-      ):hover {
+      ):hover::before {
       anchor-name: --button-group-item;
     }
   }
 
   /* Leaving the group, the last button holds the anchor while the pill fades,
-   * so it fades in place instead of collapsing. */
+   * so it fades in place instead of collapsing. The anchor is the button's
+   * plate (its ::before, inside the border), so the pill matches the plate
+   * whatever the button's border widths. */
   [data-glide]:not(
       :has(
         > :is(button, a[href], [role="button"]):not(
@@ -164,14 +177,12 @@
           ):is(:hover, :focus-visible, :active, [data-popup-open])
       )
     )
-    > :is(button, a[href], [role="button"]) {
-    /* Button's own transitions (button.tsx), restated so they survive. */
+    > :is(button, a[href], [role="button"])::before {
+    /* The plate's own transitions (button.tsx), restated so they survive. */
     transition:
-      outline-width 100ms ease-out,
-      outline-offset 100ms ease-out,
-      outline-color 100ms ease-out,
-      opacity 100ms ease-out,
-      color 100ms ease-out,
+      background-color 100ms ease-out,
+      border-color 100ms ease-out,
+      scale 100ms ease-out,
       anchor-name 0s 80ms allow-discrete;
   }
 
@@ -180,11 +191,8 @@
     position: absolute;
     position-anchor: --button-group-item;
     inset: anchor(inside);
-    /* The anchor is the button's border box; the same 2px border lines the
-     * fill up with the button's paint. */
-    border: 2px solid transparent;
-    border-radius: calc(var(--group-item-radius) + 2px);
-    background: var(--group-highlight) padding-box;
+    border-radius: var(--group-item-radius);
+    background-color: var(--group-highlight);
     /* Rendered last, so it sits under the buttons inside the isolated group. */
     z-index: -1;
     pointer-events: none;
@@ -223,7 +231,14 @@
     }
   }
 
-  /* Press, as on Button. Menu triggers skip it. */
+  /* Press, as on Button; menu triggers skip it. The pill is anchored to the
+   * plate, so a quiet button's plate holds still and the pill does the
+   * press scale on its own, one clean motion. */
+  [data-glide]
+    > :is(button, a[href], [role="button"]):not([data-variant]):active::before {
+    scale: none;
+  }
+
   [data-glide]:has(
       > :is(button, a[href], [role="button"]):active:not(
           [aria-haspopup],

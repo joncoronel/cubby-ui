@@ -16,16 +16,16 @@ import type {
 export const CLICK_MORPH_MS = 209;
 
 /**
- * Shared segment classes. The inset from the chip's edge is a 2px transparent
- * border: borders snap to whole device pixels, so the gaps stay even at
- * fractional display scales, where padding rounds unevenly. The hover plate
- * paints on ::before inside that border, so it can scale on press while the
+ * Shared segment classes. The inset is two 1px transparent borders, the
+ * chip's and each segment's, so plates sit 2px from the edge and from each
+ * other and snap alike at every display scale. The hover plate paints on
+ * ::before inside the segment's border, so it can scale on press while the
  * label holds still. Box corners are the chip's minus its border; the
- * plate's are 2px less, so plate, gap, and focus ring are concentric.
+ * plate's are 1px less, so plate, gap, and focus ring are concentric.
  */
 export const FILTER_SEGMENT = cn(
-  "relative isolate inline-flex h-full shrink-0 items-center gap-1.5 whitespace-nowrap border-2 border-transparent bg-clip-padding rounded-[calc(var(--radius-lg)-var(--filter-border,1px))] px-(--seg-x) outline-0 outline-transparent outline-solid transition-[background-color,color,outline-color] duration-100 ease-out focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring/50",
-  "before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-[calc(var(--radius-lg)-var(--filter-border,1px)-2px)] before:content-[''] before:transition-[background-color,scale] before:duration-100 before:ease-out",
+  "relative isolate inline-flex h-full shrink-0 items-center gap-1.5 whitespace-nowrap border border-transparent bg-clip-padding rounded-[calc(var(--radius-lg)-var(--filter-border,1px))] px-(--seg-x) outline-0 outline-transparent outline-solid transition-[background-color,color,outline-color] duration-100 ease-out focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-ring/50",
+  "before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-[calc(var(--radius-lg)-var(--filter-border,1px)-1px)] before:content-[''] before:transition-[background-color,scale] before:duration-100 before:ease-out",
 );
 
 /**
@@ -37,20 +37,21 @@ export const FILTER_SEGMENT_INTERACTIVE =
   "cursor-pointer hover:before:bg-(--filter-highlight) active:not-aria-[haspopup]:before:bg-(--filter-press) active:not-aria-[haspopup]:before:scale-[0.98] data-popup-open:before:bg-(--filter-highlight) motion-reduce:active:before:scale-100";
 
 /**
- * Shell classes per variant. An incomplete filter shows a dashed edge.
- * Elevated has no border, so its shadow ring and inner rim meet as on other
- * elevated surfaces; incomplete, it swaps the ring for a dashed outline. `--filter-chip-bg` lets
- * stacked option icons ring in the fill.
+ * Shell classes per variant. Every chip has a 1px transparent border, the
+ * outer half of the inset. Outline draws its line as an outline just outside,
+ * the way elevated's shadow ring sits outside; elevated's inner rim is the
+ * border itself. An incomplete filter dashes that line. `--filter-chip-bg`
+ * lets stacked option icons ring in the fill.
  */
 export const FILTER_VARIANTS: Record<FilterVariant, string> = {
   outline:
-    "bg-card border-border bg-clip-padding [--filter-chip-bg:var(--card)]",
-  soft: "bg-secondary border-transparent data-incomplete:border-border [--filter-chip-bg:var(--secondary)]",
+    "bg-card border-transparent outline outline-border data-incomplete:outline-dashed [--filter-chip-bg:var(--card)]",
+  soft: "bg-secondary border-transparent data-incomplete:outline data-incomplete:outline-border data-incomplete:outline-dashed [--filter-chip-bg:var(--secondary)]",
   elevated: cn(
     solidSurface(3, 3),
-    "border-0 [--filter-border:0px] [--filter-chip-bg:var(--surface-3)]",
+    "shadow-(--surface-shadow-3) border-(--surface-rim-color) [--filter-chip-bg:var(--surface-3)]",
     // Incomplete: the drop shadow stays; a dashed outline takes the ring's place.
-    "data-incomplete:shadow-[0_1px_1px_-0.5px_var(--surface-shadow-near),0_3px_3px_-1.5px_var(--surface-shadow-mid)] data-incomplete:outline-1 data-incomplete:outline-offset-0 data-incomplete:outline-border data-incomplete:outline-dashed",
+    "data-incomplete:border-transparent data-incomplete:shadow-[0_1px_1px_-0.5px_var(--surface-shadow-near),0_3px_3px_-1.5px_var(--surface-shadow-mid)] data-incomplete:outline data-incomplete:outline-border data-incomplete:outline-dashed",
   ),
 };
 
@@ -61,13 +62,13 @@ export const FILTER_TINTS =
 /**
  * Per-size chip classes; heights match the `Button` ramp. `--seg-x` is segment
  * side padding; `--seg-icon-x` squares an icon-only segment:
- * (height - 2*(1px border + 2px inset) - 16px icon) / 2.
+ * (height - 2*(1px chip border + 1px segment border) - 16px icon) / 2.
  */
 export const FILTER_SIZES: Record<FilterSize, string> = {
-  sm: "h-9 sm:h-8 [--seg-icon-x:7px] sm:[--seg-icon-x:5px] text-sm [--seg-x:0.5rem] [&_[data-slot=filter-chip-field]_svg]:size-3.5",
+  sm: "h-9 sm:h-8 [--seg-icon-x:8px] sm:[--seg-icon-x:6px] text-sm [--seg-x:0.5rem] [&_[data-slot=filter-chip-field]_svg]:size-3.5",
   default:
-    "h-10 sm:h-9 [--seg-icon-x:9px] sm:[--seg-icon-x:7px] text-sm [--seg-x:0.625rem] [&_[data-slot=filter-chip-field]_svg]:size-3.5",
-  lg: "h-11 sm:h-10 [--seg-icon-x:11px] sm:[--seg-icon-x:9px] text-base [--seg-x:0.75rem] [&_[data-slot=filter-chip-field]_svg]:size-4",
+    "h-10 sm:h-9 [--seg-icon-x:10px] sm:[--seg-icon-x:8px] text-sm [--seg-x:0.625rem] [&_[data-slot=filter-chip-field]_svg]:size-3.5",
+  lg: "h-11 sm:h-10 [--seg-icon-x:12px] sm:[--seg-icon-x:10px] text-base [--seg-x:0.75rem] [&_[data-slot=filter-chip-field]_svg]:size-4",
 };
 
 // `FilterValue.value` is `unknown` and may come from untrusted input (URL

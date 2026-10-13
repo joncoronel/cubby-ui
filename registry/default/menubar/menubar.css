@@ -1,8 +1,8 @@
 /* -------------------------------------------------------------------------------------------------
  * Gliding highlight, in CSS anchor positioning, as in Button Group and Toolbar.
  *
- * The lit trigger (hover, focus, open menu) takes the anchor name and the
- * shared pill follows it. Without anchor positioning and anchor-scope, each
+ * The lit trigger's plate (its ::before, inside the border) takes the anchor
+ * name, so the pill matches the plate whatever the trigger's border widths. Without anchor positioning and anchor-scope, each
  * trigger paints its own hover instead.
  * -------------------------------------------------------------------------------------------------*/
 
@@ -31,7 +31,7 @@
       :focus-visible,
       :active,
       [data-popup-open]
-    ) {
+    )::before {
     anchor-name: --menubar-item;
   }
 
@@ -40,21 +40,21 @@
    * trigger lets go meanwhile, or two triggers would share the anchor. */
   @media (hover: hover) {
     [data-slot="menubar"][data-glide]:not(:has([data-menubar-item]:active))
-      [data-menubar-item]:not(:disabled, [data-disabled]):hover {
+      [data-menubar-item]:not(:disabled, [data-disabled]):hover::before {
       anchor-name: --menubar-item;
     }
 
     [data-slot="menubar"][data-glide]:has(
         [data-menubar-item]:not(:disabled, [data-disabled]):hover
       )
-      [data-menubar-item][data-popup-open]:not(:hover, :focus-visible) {
+      [data-menubar-item][data-popup-open]:not(:hover, :focus-visible)::before {
       anchor-name: none;
     }
   }
 
-  /* Leaving the menubar, the last trigger holds the anchor while the pill fades,
-   * so it fades in place instead of collapsing. Button's own transitions
-   * are restated so they survive. */
+  /* Leaving the menubar, the last trigger holds the anchor while the pill
+   * fades, so it fades in place instead of collapsing. The plate's own
+   * transitions are restated so they survive. */
   [data-slot="menubar"][data-glide]:not(
       :has(
         [data-menubar-item]:not(:disabled, [data-disabled]):is(
@@ -65,13 +65,11 @@
           )
       )
     )
-    [data-menubar-item] {
+    [data-menubar-item]::before {
     transition:
-      outline-width 100ms ease-out,
-      outline-offset 100ms ease-out,
-      outline-color 100ms ease-out,
-      opacity 100ms ease-out,
-      color 100ms ease-out,
+      background-color 100ms ease-out,
+      border-color 100ms ease-out,
+      scale 100ms ease-out,
       anchor-name 0s 80ms allow-discrete;
   }
 
@@ -80,11 +78,8 @@
     position: absolute;
     position-anchor: --menubar-item;
     inset: anchor(inside);
-    /* The anchor is the item's border box; the same 2px border lines the
-     * fill up with the item's paint. */
-    border: 2px solid transparent;
-    border-radius: calc(var(--menubar-item-radius) + 2px);
-    background: var(--menubar-highlight) padding-box;
+    border-radius: var(--menubar-item-radius);
+    background-color: var(--menubar-highlight);
     /* Rendered last, so it sits under the triggers inside the isolated menubar. */
     z-index: -1;
     pointer-events: none;

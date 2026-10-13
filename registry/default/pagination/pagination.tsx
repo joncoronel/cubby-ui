@@ -33,13 +33,12 @@ function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
 }
 
 // The list is a shell, as in Button Group, with a current-page fill that
-// glides between links (pagination.css). Links fill it with a 2px
-// transparent-border inset (even at fractional display scales); paint
-// corners are the shell's minus its border and the 2px.
+// glides between links (pagination.css). Paint corners are the shell's minus
+// its border and the link's 1px.
 const paginationContentVariants = cva(
   [
     "relative isolate flex w-fit flex-row items-stretch rounded-(--pagination-radius)",
-    "[--pagination-item-radius:max(0px,calc(var(--pagination-radius)-var(--pagination-border,0px)-2px))]",
+    "[--pagination-item-radius:max(0px,calc(var(--pagination-radius)-var(--pagination-border)-1px))]",
     // Fixed shell; links stretch to fill it
     "h-(--pagination-h)",
     // Current page colors (override to recolor)
@@ -48,10 +47,14 @@ const paginationContentVariants = cva(
   {
     variants: {
       variant: {
+        // The inset is two 1px transparent borders, the shell's and each
+        // link's, so plates sit 2px from the edge and from each other and
+        // snap alike at every display scale. Outline draws its line as an
+        // outline just outside the shell, as elevated's ring sits outside.
         outline:
-          "border-border bg-card border bg-clip-padding [--pagination-border:1px]",
-        soft: "bg-secondary text-secondary-foreground",
-        ghost: "",
+          "bg-card border border-transparent outline outline-border [--pagination-border:1px]",
+        soft: "bg-secondary text-secondary-foreground border border-transparent [--pagination-border:1px]",
+        ghost: "border border-transparent [--pagination-border:1px]",
       },
       // Button's height ladder (one step taller below sm); corners step with it.
       size: {
@@ -114,10 +117,10 @@ type PaginationLinkProps = useRender.ComponentProps<"a"> & {
 // would add button semantics to elements that must stay links.
 const linkClasses = cn(
   buttonVariants({ variant: "ghost", size: null }),
-  "aspect-square h-auto self-stretch border-2 border-transparent px-2 text-sm tabular-nums",
-  // Box corners are the paint's + 2px, so paint, gap, and focus ring (at
+  "aspect-square h-auto self-stretch border border-transparent px-2 text-sm tabular-nums",
+  // Box corners are the paint's + 1px, so paint, gap, and focus ring (at
   // offset 0) are concentric.
-  "rounded-[calc(var(--pagination-item-radius)+2px)] before:rounded-(--pagination-item-radius) focus-visible:outline-offset-0",
+  "rounded-[calc(var(--pagination-item-radius)+1px)] before:rounded-(--pagination-item-radius) focus-visible:outline-offset-0",
   // Hover and press: the label color at 10% / 14%
   "[--btn-bg-hover:color-mix(in_oklab,currentColor_10%,transparent)] [--btn-bg-active:color-mix(in_oklab,currentColor_14%,transparent)]",
   // Current page fallback fill, where the indicator can't glide

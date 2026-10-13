@@ -8,13 +8,15 @@ import { cn } from "@/lib/utils";
 import { Separator } from "@/registry/default/separator/separator";
 import { Toggle, type ToggleProps } from "@/registry/default/toggle/toggle";
 
-// A shell, as in Button Group, whose items latch. Items fill it with a 2px
-// transparent-border inset (even at fractional display scales); paint corners
-// are the shell's minus its border and the 2px.
+// A shell, as in Button Group, whose items latch. The inset is two 1px
+// transparent borders, one on the shell and one on each item, so fills sit
+// 2px from the edge and from each other and snap alike at every display
+// scale. Outline draws its line as an outline just outside the shell. Paint
+// corners are the shell's minus its border and the item's 1px.
 const toggleGroupVariants = cva(
   [
     "relative isolate flex w-fit items-stretch rounded-(--toggle-group-radius) data-[orientation=vertical]:flex-col",
-    "[--toggle-group-item-radius:max(0px,calc(var(--toggle-group-radius)-var(--toggle-group-border,0px)-2px))]",
+    "[--toggle-group-item-radius:max(0px,calc(var(--toggle-group-radius)-var(--toggle-group-border)-1px))]",
     // Small corners between neighbors, so pressed runs read as one control
     "[--toggle-group-inner-radius:min(3px,var(--toggle-group-item-radius))]",
     // Label-color tints: hover 10%, press 14%, pressed 16%. Override the
@@ -23,18 +25,17 @@ const toggleGroupVariants = cva(
     "[--toggle-group-selected-bg:color-mix(in_oklab,currentColor_16%,transparent)] [--toggle-group-selected-fg:var(--foreground)]",
     // The shell is fixed and items stretch to fill it; columns grow to the
     // widest item.
-    "data-[orientation=horizontal]:h-(--toggle-group-h) data-[orientation=horizontal]:[&>[data-slot=toggle-group-item]:not([data-icon-only])]:aspect-square",
-    "data-[orientation=vertical]:min-w-(--toggle-group-h) data-[orientation=vertical]:[&>[data-slot=toggle-group-item]:not([data-icon-only])]:h-(--toggle-group-item-length)",
+    "data-[orientation=horizontal]:h-(--toggle-group-h) data-[orientation=horizontal]:[&>[data-slot=toggle-group-item]]:aspect-square",
+    "data-[orientation=vertical]:min-w-(--toggle-group-h) data-[orientation=vertical]:[&>[data-slot=toggle-group-item]]:h-[calc(var(--toggle-group-h)-var(--toggle-group-border)*2)]",
     "data-disabled:opacity-60 data-disabled:[&>*]:opacity-100",
   ],
   {
     variants: {
       variant: {
-        // Outline's border sits outside the fill, as on an outline Button.
         outline:
-          "border-border bg-card border bg-clip-padding [--toggle-group-border:1px]",
-        soft: "bg-secondary",
-        ghost: "",
+          "bg-card border border-transparent outline outline-border [--toggle-group-border:1px]",
+        soft: "bg-secondary border border-transparent [--toggle-group-border:1px]",
+        ghost: "border border-transparent [--toggle-group-border:1px]",
       },
       // Button's height ladder (one step taller below sm); corners step with it.
       size: {
@@ -99,15 +100,12 @@ function ToggleGroup({
 }
 
 const itemClasses = cn(
-  "h-auto min-w-auto self-stretch border-2 border-transparent text-sm sm:h-auto sm:min-w-auto",
-  // Main-axis length in a column: the fill's cross size plus the borders at
-  // each end (2px, or 1px against a neighbor).
-  "[--toggle-group-item-start:2px] [--toggle-group-item-end:2px] [--toggle-group-item-length:calc(var(--toggle-group-h)-var(--toggle-group-border,0px)*2-4px+var(--toggle-group-item-start)+var(--toggle-group-item-end))]",
-  // Icon-only items wrap a square box instead (see ToggleGroupItem)
+  "h-auto min-w-auto self-stretch border border-transparent text-sm sm:h-auto sm:min-w-auto",
+  // Icon-only items drop their padding, so they're square.
   "data-icon-only:px-0",
-  // Box corners are the paint's + the border, so paint, gap, and focus ring
-  // (at offset 0) are concentric.
-  "rounded-[calc(var(--toggle-group-item-radius)+2px)] before:rounded-(--toggle-group-item-radius) focus-visible:outline-offset-0 focus-visible:z-10",
+  // Box corners are the paint's + 1px, so paint, gap, and focus ring (at
+  // offset 0) are concentric.
+  "rounded-[calc(var(--toggle-group-item-radius)+1px)] before:rounded-(--toggle-group-item-radius) focus-visible:outline-offset-0 focus-visible:z-10",
   "[--tgl-bg-hover:var(--toggle-group-highlight)] [--tgl-bg-active:var(--toggle-group-press)] [--tgl-bg-selected:var(--toggle-group-selected-bg)]",
   // Label color
   "text-muted-foreground data-pressed:text-(--toggle-group-selected-fg) hover:not-data-pressed:text-foreground",
@@ -115,17 +113,16 @@ const itemClasses = cn(
   "forced-colors:data-pressed:border-[Highlight]",
 );
 
-// Sides facing another item take a 1px border, for a 2px seam between fills,
-// and the small inner corners. Sides at the shell or a separator keep the
-// 2px border and the shell-concentric corners.
+// Corners that face another item are small, so a run of pressed items reads
+// as one control. Corners at the shell or a separator stay concentric.
 const joinedClasses = {
   horizontal: cn(
-    "[[data-slot=toggle-group-item]+&]:border-s [[data-slot=toggle-group-item]+&]:[--toggle-group-item-start:1px] [[data-slot=toggle-group-item]+&]:rounded-s-[calc(var(--toggle-group-inner-radius)+1px)] [[data-slot=toggle-group-item]+&]:before:rounded-s-(--toggle-group-inner-radius)",
-    "has-[+[data-slot=toggle-group-item]]:border-e has-[+[data-slot=toggle-group-item]]:[--toggle-group-item-end:1px] has-[+[data-slot=toggle-group-item]]:rounded-e-[calc(var(--toggle-group-inner-radius)+1px)] has-[+[data-slot=toggle-group-item]]:before:rounded-e-(--toggle-group-inner-radius)",
+    "[[data-slot=toggle-group-item]+&]:rounded-s-[calc(var(--toggle-group-inner-radius)+1px)] [[data-slot=toggle-group-item]+&]:before:rounded-s-(--toggle-group-inner-radius)",
+    "has-[+[data-slot=toggle-group-item]]:rounded-e-[calc(var(--toggle-group-inner-radius)+1px)] has-[+[data-slot=toggle-group-item]]:before:rounded-e-(--toggle-group-inner-radius)",
   ),
   vertical: cn(
-    "[[data-slot=toggle-group-item]+&]:border-t [[data-slot=toggle-group-item]+&]:[--toggle-group-item-start:1px] [[data-slot=toggle-group-item]+&]:rounded-t-[calc(var(--toggle-group-inner-radius)+1px)] [[data-slot=toggle-group-item]+&]:before:rounded-t-(--toggle-group-inner-radius)",
-    "has-[+[data-slot=toggle-group-item]]:border-b has-[+[data-slot=toggle-group-item]]:[--toggle-group-item-end:1px] has-[+[data-slot=toggle-group-item]]:rounded-b-[calc(var(--toggle-group-inner-radius)+1px)] has-[+[data-slot=toggle-group-item]]:before:rounded-b-(--toggle-group-inner-radius)",
+    "[[data-slot=toggle-group-item]+&]:rounded-t-[calc(var(--toggle-group-inner-radius)+1px)] [[data-slot=toggle-group-item]+&]:before:rounded-t-(--toggle-group-inner-radius)",
+    "has-[+[data-slot=toggle-group-item]]:rounded-b-[calc(var(--toggle-group-inner-radius)+1px)] has-[+[data-slot=toggle-group-item]]:before:rounded-b-(--toggle-group-inner-radius)",
   ),
 };
 
@@ -164,20 +161,7 @@ function ToggleGroupItem({
       className={cn(itemClasses, joinedClasses[orientation], className)}
       {...props}
     >
-      {iconOnly ? (
-        // The item shrink-wraps this square, so the fill stays square however
-        // the 1px and 2px borders snap to device pixels.
-        <span
-          className={cn(
-            "flex aspect-square items-center justify-center",
-            orientation === "vertical" ? "w-full" : "h-full",
-          )}
-        >
-          {children}
-        </span>
-      ) : (
-        children
-      )}
+      {children}
     </Toggle>
   );
 }

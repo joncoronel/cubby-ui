@@ -1,10 +1,10 @@
 /* -------------------------------------------------------------------------------------------------
  * Gliding highlight, in CSS anchor positioning, as in Button Group.
  *
- * The lit item (hover, focus, press, open menu) takes the anchor name and the
- * shared pill follows it. Items are matched by data-toolbar-item, so they can
- * sit inside groups. Without anchor positioning and anchor-scope, each item
- * paints its own hover instead.
+ * The lit item's plate (its ::before, inside the border) takes the anchor
+ * name, so the pill matches the plate whatever the item's border widths.
+ * Without anchor positioning and anchor-scope, each item paints its own
+ * hover instead.
  * -------------------------------------------------------------------------------------------------*/
 
 [data-slot="toolbar-highlight"] {
@@ -41,7 +41,7 @@
       :focus-visible,
       :active,
       [data-popup-open]
-    ) {
+    )::before {
     anchor-name: --toolbar-item;
   }
 
@@ -49,14 +49,14 @@
     [data-slot="toolbar"][data-glide]:not(
         :has([data-toolbar-item][data-popup-open], [data-toolbar-item]:active)
       )
-      [data-toolbar-item]:not(:disabled, [data-disabled]):hover {
+      [data-toolbar-item]:not(:disabled, [data-disabled]):hover::before {
       anchor-name: --toolbar-item;
     }
   }
 
   /* Leaving the toolbar, the last item holds the anchor while the pill fades,
-   * so it fades in place instead of collapsing. Button's and Toggle's own
-   * transitions are restated so they survive. */
+   * so it fades in place instead of collapsing. The plate's own transitions
+   * are restated so they survive. */
   [data-slot="toolbar"][data-glide]:not(
       :has(
         [data-toolbar-item]:not(:disabled, [data-disabled]):is(
@@ -67,13 +67,11 @@
           )
       )
     )
-    [data-toolbar-item] {
+    [data-toolbar-item]::before {
     transition:
-      outline-width 100ms ease-out,
-      outline-offset 100ms ease-out,
-      outline-color 100ms ease-out,
-      opacity 100ms ease-out,
-      color 100ms ease-out,
+      background-color 100ms ease-out,
+      border-color 100ms ease-out,
+      scale 100ms ease-out,
       anchor-name 0s 80ms allow-discrete;
   }
 
@@ -82,11 +80,8 @@
     position: absolute;
     position-anchor: --toolbar-item;
     inset: anchor(inside);
-    /* The anchor is the item's border box; the same 2px border lines the
-     * fill up with the item's paint. */
-    border: 2px solid transparent;
-    border-radius: calc(var(--toolbar-item-radius) + 2px);
-    background: var(--toolbar-highlight) padding-box;
+    border-radius: var(--toolbar-item-radius);
+    background-color: var(--toolbar-highlight);
     /* Rendered last, so it sits under the items inside the isolated toolbar. */
     z-index: -1;
     pointer-events: none;
@@ -123,7 +118,17 @@
     }
   }
 
-  /* Press, as on Button. Menu triggers skip it. */
+  /* Press, as on Button; menu triggers skip it. The pill is anchored to the
+   * plate, so a quiet item's plate holds still and the pill does the press
+   * scale on its own, one clean motion. Pressed toggles keep their own. */
+  [data-slot="toolbar"][data-glide]
+    :is(
+      [data-toolbar-item]:not([data-variant], [data-slot="toolbar-toggle"]),
+      [data-slot="toolbar-toggle"]:not([data-pressed])
+    ):active::before {
+    scale: none;
+  }
+
   [data-slot="toolbar"][data-glide]:has(
       [data-toolbar-item]:active:not([aria-haspopup], :disabled)
     )

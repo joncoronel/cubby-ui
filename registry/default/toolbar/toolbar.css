@@ -88,6 +88,67 @@
   border-block-end-width: 2px;
 }
 
+/* Hit areas. Each item's ::after is a square hit area over its whole box,
+ * borders and rounded corners included, so the notch where two items'
+ * corners meet still belongs to one of them. Beside a separator it reaches
+ * to the line, so the neighbours meet there. The highlight shows exactly
+ * where a click lands. */
+[data-slot="toolbar"] [data-toolbar-part]::after {
+  content: "";
+  position: absolute;
+  inset-block: -2px;
+  inset-inline: -1px;
+}
+
+[data-slot="toolbar"][data-orientation="vertical"] [data-toolbar-part]::after {
+  inset-block: -1px;
+  inset-inline: -2px;
+}
+
+/* Beside a separator: the item's 1px border, the separator's 3px of air,
+ * and half its line. One level into a group where the item sits there. */
+[data-slot="toolbar"][data-orientation="horizontal"]
+  :is(
+    [data-toolbar-part]:has(+ [data-slot="toolbar-separator"]),
+    :is([data-slot="toolbar-group"], [data-slot="toolbar-toggle-group"]):has(
+        + [data-slot="toolbar-separator"]
+      )
+      > :nth-last-child(1 of [data-toolbar-part])
+  )::after {
+  inset-inline-end: -5px;
+}
+
+[data-slot="toolbar"][data-orientation="horizontal"]
+  :is(
+    [data-slot="toolbar-separator"] + [data-toolbar-part],
+    [data-slot="toolbar-separator"]
+      + :is([data-slot="toolbar-group"], [data-slot="toolbar-toggle-group"])
+      > :nth-child(1 of [data-toolbar-part])
+  )::after {
+  inset-inline-start: -5px;
+}
+
+[data-slot="toolbar"][data-orientation="vertical"]
+  :is(
+    [data-toolbar-part]:has(+ [data-slot="toolbar-separator"]),
+    :is([data-slot="toolbar-group"], [data-slot="toolbar-toggle-group"]):has(
+        + [data-slot="toolbar-separator"]
+      )
+      > :nth-last-child(1 of [data-toolbar-part])
+  )::after {
+  inset-block-end: -5px;
+}
+
+[data-slot="toolbar"][data-orientation="vertical"]
+  :is(
+    [data-slot="toolbar-separator"] + [data-toolbar-part],
+    [data-slot="toolbar-separator"]
+      + :is([data-slot="toolbar-group"], [data-slot="toolbar-toggle-group"])
+      > :nth-child(1 of [data-toolbar-part])
+  )::after {
+  inset-block-start: -5px;
+}
+
 /* -------------------------------------------------------------------------------------------------
  * Gliding highlight, in CSS anchor positioning, as in Button Group.
  *
@@ -109,10 +170,9 @@
     anchor-scope: --toolbar-item;
   }
 
-  /* The pill stands in for hover and press. A button with a set variant
-   * carries no data-toolbar-item and keeps its own. A pressed toggle is
-   * skipped too: it is already lit, so it presses on its own fill, as in
-   * Toggle Group, rather than stacking the pill on it. */
+  /* The pill stands in for hover and press tints. A button with a set
+   * variant carries no data-toolbar-item and keeps its own. A pressed
+   * toggle's fill stays on its plate, under the pill. */
   [data-slot="toolbar"][data-glide] [data-toolbar-item] {
     --btn-bg-hover: transparent;
     --btn-bg-active: transparent;
@@ -129,7 +189,7 @@
    * doesn't light two items. Open is aria-expanded, not data-popup-open,
    * which tooltip triggers set too. */
   [data-slot="toolbar"][data-glide]
-    [data-toolbar-item]:not(:disabled, [data-disabled], [data-pressed]):is(
+    [data-toolbar-item]:not(:disabled, [data-disabled]):is(
       :focus-visible,
       :active,
       [aria-expanded="true"]
@@ -147,34 +207,9 @@
           )
         )
       )
-      [data-toolbar-item]:not(
-        :disabled,
-        [data-disabled],
-        [data-pressed]
-      ):hover::before {
+      [data-toolbar-item]:not(:disabled, [data-disabled]):hover::before {
       anchor-name: --toolbar-item;
     }
-  }
-
-  /* Leaving the toolbar, the last item holds the anchor while the pill fades,
-   * so it fades in place instead of collapsing. The plate's own transitions
-   * are restated so they survive. */
-  [data-slot="toolbar"][data-glide]:not(
-      :has(
-        [data-toolbar-item]:not(:disabled, [data-disabled], [data-pressed]):is(
-            :hover,
-            :focus-visible,
-            :active,
-            [aria-expanded="true"]
-          )
-      )
-    )
-    [data-toolbar-item]::before {
-    transition:
-      background-color 100ms ease-out,
-      border-color 100ms ease-out,
-      scale 100ms ease-out,
-      anchor-name 0s 80ms allow-discrete;
   }
 
   [data-slot="toolbar"][data-glide] > [data-slot="toolbar-highlight"] {
@@ -188,18 +223,16 @@
     z-index: -1;
     pointer-events: none;
     opacity: 0;
-    scale: 0.96;
-    /* Entering from no anchor can't interpolate, so the pill appears in
-     * place and only fades and grows. */
+    /* It glides between items. Entering or leaving there is nothing to
+     * glide from or to, so it appears and goes instantly. */
     transition:
       inset 80ms var(--ease-out-expo, cubic-bezier(0.19, 1, 0.22, 1)),
-      opacity 80ms ease-out,
-      scale 80ms ease-out,
-      background-color 80ms ease-out;
+      scale 100ms var(--ease-out, cubic-bezier(0, 0, 0.2, 1)),
+      background-color 100ms var(--ease-out, cubic-bezier(0, 0, 0.2, 1));
   }
 
   [data-slot="toolbar"][data-glide]:has(
-      [data-toolbar-item]:not(:disabled, [data-disabled], [data-pressed]):is(
+      [data-toolbar-item]:not(:disabled, [data-disabled]):is(
           :focus-visible,
           :active,
           [aria-expanded="true"]
@@ -207,29 +240,30 @@
     )
     > [data-slot="toolbar-highlight"] {
     opacity: 1;
-    scale: 1;
   }
 
   @media (hover: hover) {
     [data-slot="toolbar"][data-glide]:has(
-        [data-toolbar-item]:not(
-            :disabled,
-            [data-disabled],
-            [data-pressed]
-          ):hover
+        [data-toolbar-item]:not(:disabled, [data-disabled]):hover
       )
       > [data-slot="toolbar-highlight"] {
       opacity: 1;
-      scale: 1;
     }
   }
 
-  /* Press, as on Button; menu triggers skip it. The pill is anchored to the
-   * plate, so the plate holds still and the pill does the press scale on its
-   * own, one clean motion. */
-  [data-slot="toolbar"][data-glide]
-    [data-toolbar-item]:not([data-pressed]):active::before {
+  /* Press, as on Button. The plate holds still and the pill does the press,
+   * one clean motion. A pressed toggle's fill would show an edge around a
+   * shrinking pill, so on a pressed toggle the pill only deepens. Menu
+   * triggers skip it. */
+  [data-slot="toolbar"][data-glide] [data-toolbar-item]:active::before {
     scale: none;
+  }
+
+  [data-slot="toolbar"][data-glide]:has(
+      [data-toolbar-item]:active:not([aria-haspopup], :disabled)
+    )
+    > [data-slot="toolbar-highlight"] {
+    background-color: var(--toolbar-press);
   }
 
   [data-slot="toolbar"][data-glide]:has(
@@ -237,7 +271,6 @@
     )
     > [data-slot="toolbar-highlight"] {
     scale: var(--toolbar-press-scale, 0.98);
-    background-color: var(--toolbar-press);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -246,10 +279,8 @@
     }
 
     [data-slot="toolbar"][data-glide] > [data-slot="toolbar-highlight"] {
-      scale: 1;
-      transition:
-        opacity 80ms ease-out,
-        background-color 80ms ease-out;
+      transition: background-color 100ms
+        var(--ease-out, cubic-bezier(0, 0, 0.2, 1));
     }
   }
 }

@@ -126,8 +126,9 @@ const linkClasses = cn(
   "aria-[current=page]:text-(--pagination-current-fg) aria-[current=page]:hover:text-(--pagination-current-fg) aria-[current=page]:[--btn-bg:var(--pagination-current-bg)] aria-[current=page]:[--btn-bg-hover:var(--pagination-current-bg)] aria-[current=page]:[--btn-bg-active:var(--pagination-current-bg)]",
   "aria-disabled:pointer-events-none aria-disabled:opacity-60",
   // No transitions on the link: Chrome skips the indicator's slide when the
-  // new current link starts one. The label span fades instead.
-  "transition-[outline-width,outline-offset,outline-color] aria-[current=page]:before:transition-none",
+  // new current link starts one. Hover is instant, as in the other shells;
+  // the press tint still fades (Button's 100ms).
+  "transition-[outline-width,outline-offset,outline-color] before:[transition-duration:0ms,100ms,100ms] active:before:[transition-duration:100ms] aria-[current=page]:before:transition-none",
 );
 
 function PaginationLink({

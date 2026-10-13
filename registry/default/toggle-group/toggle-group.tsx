@@ -32,6 +32,9 @@ const toggleGroupVariants = cva(
     // every item gets the row's paint height, whatever its borders.
     "data-[orientation=vertical]:min-w-(--toggle-group-h) data-[orientation=vertical]:[&>[data-slot=toggle-group-item]]:box-content data-[orientation=vertical]:[&>[data-slot=toggle-group-item]]:h-[calc(var(--toggle-group-h)-4px)]",
     "data-[orientation=vertical]:[&>[data-slot=toggle-group-item]]:border-x-2 data-[orientation=vertical]:[&>:nth-child(1_of_[data-slot=toggle-group-item])]:border-t-2 data-[orientation=vertical]:[&>:nth-last-child(1_of_[data-slot=toggle-group-item])]:border-b-2",
+    // A square hit area over each item's whole box, borders and rounded
+    // corners included, so hover never flickers off between items.
+    "[&>[data-slot=toggle-group-item]]:after:absolute [&>[data-slot=toggle-group-item]]:after:content-[''] [&>[data-slot=toggle-group-item]]:after:-inset-x-px [&>[data-slot=toggle-group-item]]:after:-inset-y-0.5 data-[orientation=vertical]:[&>[data-slot=toggle-group-item]]:after:-inset-x-0.5 data-[orientation=vertical]:[&>[data-slot=toggle-group-item]]:after:-inset-y-px",
     // Icon-only items: the paint is square, whatever each side's border.
     "[&>[data-slot=toggle-group-item][data-icon-only]]:box-content [&>[data-slot=toggle-group-item][data-icon-only]]:aspect-square data-[orientation=vertical]:[&>[data-slot=toggle-group-item][data-icon-only]]:h-auto",
     "data-disabled:opacity-60 data-disabled:[&>*]:opacity-100",
@@ -115,6 +118,10 @@ const itemClasses = cn(
   "[--tgl-bg-hover:var(--toggle-group-highlight)] [--tgl-bg-active:var(--toggle-group-press)] [--tgl-bg-selected:var(--toggle-group-selected-bg)]",
   // Label color
   "text-muted-foreground data-pressed:text-(--toggle-group-selected-fg) hover:not-data-pressed:text-foreground",
+  // Hover is instant, as in the gliding groups: sweeping across the row never
+  // shows two items half-lit. The press tint and the pressed fill still fade
+  // (Toggle's 100ms); the press scale keeps its timing.
+  "[transition-duration:100ms,100ms,100ms,100ms,0ms] before:[transition-duration:0ms,100ms,100ms] active:before:[transition-duration:100ms] data-pressed:before:[transition-duration:100ms]",
   // Forced colors drop the fill, so a pressed item gets a Highlight border.
   "forced-colors:data-pressed:border-[Highlight]",
 );
@@ -189,8 +196,12 @@ function ToggleGroupSeparator({
       data-slot="toggle-group-separator"
       orientation={resolved}
       className={cn(
-        "self-stretch data-[orientation=vertical]:h-auto",
-        "data-[orientation=horizontal]:mx-1.5 data-[orientation=horizontal]:my-0.5 data-[orientation=vertical]:mx-0.5 data-[orientation=vertical]:my-1.5",
+        // Air and line are all borders, as in Button Group, so both sides
+        // snap alike at every display scale.
+        "flex shrink-0 self-stretch border-transparent bg-transparent data-[orientation=horizontal]:h-auto data-[orientation=horizontal]:w-auto data-[orientation=horizontal]:flex-col data-[orientation=vertical]:w-auto",
+        "before:border-transparent before:content-[''] after:border-transparent after:content-['']",
+        "data-[orientation=vertical]:after:border-s-border data-[orientation=vertical]:border-e-[3px] data-[orientation=vertical]:before:border-s-[3px] data-[orientation=vertical]:after:h-5 data-[orientation=vertical]:after:self-center data-[orientation=vertical]:after:rounded-full data-[orientation=vertical]:after:border-s-[1.5px]",
+        "data-[orientation=horizontal]:after:border-t-border data-[orientation=horizontal]:border-b-[3px] data-[orientation=horizontal]:before:border-t-[3px] data-[orientation=horizontal]:after:w-5 data-[orientation=horizontal]:after:self-center data-[orientation=horizontal]:after:rounded-full data-[orientation=horizontal]:after:border-t-[1.5px]",
         className,
       )}
       {...props}

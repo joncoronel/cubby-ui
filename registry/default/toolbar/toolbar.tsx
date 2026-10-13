@@ -247,10 +247,13 @@ function ToolbarSeparator({ className, ...props }: ToolbarSeparatorProps) {
     <BaseToolbar.Separator
       data-slot="toolbar-separator"
       className={cn(
-        "bg-border shrink-0 self-stretch",
-        // Base UI orients the separator across the toolbar.
-        "data-[orientation=vertical]:mx-1.5 data-[orientation=vertical]:my-2 data-[orientation=vertical]:w-px",
-        "data-[orientation=horizontal]:mx-2 data-[orientation=horizontal]:my-1.5 data-[orientation=horizontal]:h-px",
+        // Base UI orients the separator across the toolbar. Air and line
+        // are all borders, as in Button Group, so both sides snap alike. The
+        // neighbours' hit areas meet under it (toolbar.css).
+        "pointer-events-none flex shrink-0 self-stretch border-transparent bg-transparent data-[orientation=horizontal]:h-auto data-[orientation=horizontal]:w-auto data-[orientation=horizontal]:flex-col data-[orientation=vertical]:w-auto",
+        "before:border-transparent before:content-[''] after:border-transparent after:content-['']",
+        "data-[orientation=vertical]:after:border-s-border data-[orientation=vertical]:border-e-[3px] data-[orientation=vertical]:before:border-s-[3px] data-[orientation=vertical]:after:h-5 data-[orientation=vertical]:after:self-center data-[orientation=vertical]:after:rounded-full data-[orientation=vertical]:after:border-s-[1.5px]",
+        "data-[orientation=horizontal]:after:border-t-border data-[orientation=horizontal]:border-b-[3px] data-[orientation=horizontal]:before:border-t-[3px] data-[orientation=horizontal]:after:w-5 data-[orientation=horizontal]:after:self-center data-[orientation=horizontal]:after:rounded-full data-[orientation=horizontal]:after:border-t-[1.5px]",
         className,
       )}
       {...props}

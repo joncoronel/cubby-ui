@@ -21,12 +21,16 @@ export const CLICK_MORPH_MS = 209;
  * a side facing a neighbour (FILTER_ENDS sets the ends). They snap to whole
  * device pixels, so the edge is never thinner than the gap, and the edge gap
  * hovers with its segment. The hover plate paints on ::before inside the
- * border, so it can scale on press while the label holds still. Box corners
+ * border, so it can scale on press while the label holds still. Hover is
+ * instant, as in the gliding groups; the press tint still fades. Box corners
  * are the chip's; the plate's are 2px less, so plate and chip are concentric.
  */
 export const FILTER_SEGMENT = cn(
-  "relative isolate inline-flex h-full shrink-0 items-center gap-1.5 whitespace-nowrap border border-y-2 border-transparent bg-clip-padding rounded-lg px-(--seg-x) outline-0 outline-transparent outline-solid transition-[background-color,color,outline-color] duration-100 ease-out focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-ring/50",
-  "before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-[calc(var(--radius-lg)-2px)] before:content-[''] before:transition-[background-color,scale] before:duration-100 before:ease-out",
+  "relative isolate inline-flex h-full shrink-0 items-center gap-1.5 whitespace-nowrap border border-y-2 border-transparent bg-clip-padding rounded-lg px-(--seg-x) outline-0 outline-transparent outline-solid transition-[background-color,color,outline-color] duration-100 ease-out [transition-duration:100ms,0ms,100ms] focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-ring/50",
+  // A square hit area over the whole box, borders and rounded corners
+  // included, so hover never flickers off between segments.
+  "after:absolute after:-inset-x-px after:-inset-y-0.5 after:content-['']",
+  "before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-[calc(var(--radius-lg)-2px)] before:content-[''] before:transition-[background-color,scale] before:duration-100 before:ease-out before:[transition-duration:0ms,100ms] active:before:[transition-duration:100ms]",
 );
 
 /**

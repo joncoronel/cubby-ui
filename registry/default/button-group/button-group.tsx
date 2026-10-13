@@ -230,8 +230,16 @@ function ButtonGroupSeparator({
         group.variant === "attached"
           ? "dark:bg-input"
           : cn(
-              "transition-opacity duration-[80ms] ease-out data-[orientation=horizontal]:!mx-1.5 data-[orientation=horizontal]:!my-0.5 data-[orientation=vertical]:!mx-0.5 data-[orientation=vertical]:!my-1.5",
-              group.variant === "solid" && "bg-neutral-foreground/15",
+              // Air and line are all borders, so both sides snap alike at
+              // every display scale. The neighbours' hit areas meet under it
+              // (button-group.css).
+              "pointer-events-none",
+              "flex shrink-0 self-stretch border-transparent bg-transparent data-[orientation=horizontal]:h-auto data-[orientation=horizontal]:w-auto data-[orientation=horizontal]:flex-col data-[orientation=vertical]:w-auto",
+              "before:border-transparent before:content-[''] after:border-transparent after:content-['']",
+              "data-[orientation=vertical]:after:border-s-border data-[orientation=vertical]:border-e-[3px] data-[orientation=vertical]:before:border-s-[3px] data-[orientation=vertical]:after:h-5 data-[orientation=vertical]:after:self-center data-[orientation=vertical]:after:rounded-full data-[orientation=vertical]:after:border-s-[1.5px]",
+              "data-[orientation=horizontal]:after:border-t-border data-[orientation=horizontal]:border-b-[3px] data-[orientation=horizontal]:before:border-t-[3px] data-[orientation=horizontal]:after:w-5 data-[orientation=horizontal]:after:self-center data-[orientation=horizontal]:after:rounded-full data-[orientation=horizontal]:after:border-t-[1.5px]",
+              group.variant === "solid" &&
+                "data-[orientation=vertical]:after:border-s-neutral-foreground/15 data-[orientation=horizontal]:after:border-t-neutral-foreground/15",
             ),
         className,
       )}

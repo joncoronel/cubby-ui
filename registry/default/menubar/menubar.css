@@ -1,3 +1,19 @@
+/* Hit areas. Each trigger's ::after is a square hit area over its whole
+ * box, borders and rounded corners included, so the notch where two
+ * triggers' corners meet still belongs to one of them. The highlight shows
+ * exactly where a click lands. */
+[data-slot="menubar"] [data-menubar-item]::after {
+  content: "";
+  position: absolute;
+  inset-block: -2px;
+  inset-inline: -1px;
+}
+
+[data-slot="menubar"][data-orientation="vertical"] [data-menubar-item]::after {
+  inset-block: -1px;
+  inset-inline: -2px;
+}
+
 /* -------------------------------------------------------------------------------------------------
  * Gliding highlight, in CSS anchor positioning, as in Button Group and Toolbar.
  *
@@ -59,27 +75,6 @@
     }
   }
 
-  /* Leaving the menubar, the last trigger holds the anchor while the pill
-   * fades, so it fades in place instead of collapsing. The plate's own
-   * transitions are restated so they survive. */
-  [data-slot="menubar"][data-glide]:not(
-      :has(
-        [data-menubar-item]:not(:disabled, [data-disabled]):is(
-            :hover,
-            :focus-visible,
-            :active,
-            [data-popup-open]
-          )
-      )
-    )
-    [data-menubar-item]::before {
-    transition:
-      background-color 100ms ease-out,
-      border-color 100ms ease-out,
-      scale 100ms ease-out,
-      anchor-name 0s 80ms allow-discrete;
-  }
-
   [data-slot="menubar"][data-glide] > [data-slot="menubar-highlight"] {
     display: block;
     position: absolute;
@@ -91,14 +86,11 @@
     z-index: -1;
     pointer-events: none;
     opacity: 0;
-    scale: 0.96;
-    /* Entering from no anchor can't interpolate, so the pill appears in
-     * place and only fades and grows. */
+    /* It glides between triggers. Entering or leaving there is nothing to
+     * glide from or to, so it appears and goes instantly. */
     transition:
       inset 80ms var(--ease-out-expo, cubic-bezier(0.19, 1, 0.22, 1)),
-      opacity 80ms ease-out,
-      scale 80ms ease-out,
-      background-color 80ms ease-out;
+      background-color 100ms var(--ease-out, cubic-bezier(0, 0, 0.2, 1));
   }
 
   [data-slot="menubar"][data-glide]:has(
@@ -110,7 +102,6 @@
     )
     > [data-slot="menubar-highlight"] {
     opacity: 1;
-    scale: 1;
   }
 
   @media (hover: hover) {
@@ -119,17 +110,7 @@
       )
       > [data-slot="menubar-highlight"] {
       opacity: 1;
-      scale: 1;
     }
-  }
-
-  /* Press, as on Button. Menu triggers skip it. */
-  [data-slot="menubar"][data-glide]:has(
-      [data-menubar-item]:active:not([aria-haspopup], :disabled)
-    )
-    > [data-slot="menubar-highlight"] {
-    scale: var(--menubar-press-scale, 0.98);
-    background-color: var(--menubar-press);
   }
 
   /* While a menu is open, moving across the bar opens the next one, and that
@@ -137,19 +118,13 @@
    * there too, so it would stutter; the pill jumps with the menu instead. */
   [data-slot="menubar"][data-glide]:has([data-menubar-item][data-popup-open])
     > [data-slot="menubar-highlight"] {
-    transition-property: opacity, scale, background-color;
+    transition-property: background-color;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    [data-slot="menubar"][data-glide] {
-      --menubar-press-scale: 1;
-    }
-
     [data-slot="menubar"][data-glide] > [data-slot="menubar-highlight"] {
-      scale: 1;
-      transition:
-        opacity 80ms ease-out,
-        background-color 80ms ease-out;
+      transition: background-color 100ms
+        var(--ease-out, cubic-bezier(0, 0, 0.2, 1));
     }
   }
 }

@@ -10,26 +10,37 @@
   display: none;
 }
 
-/* Hit areas: buttons reach over half of a separator's ~5px, so the pill
- * never drops mid-glide. A select's hidden form input is stepped over. */
-[data-glide] > :is(button, a[href], [role="button"]) {
+/* Hit areas. Each button's ::after is a square hit area over its whole box,
+ * borders and rounded corners included, so the notch where two buttons'
+ * corners meet still belongs to one of them. Beside a separator it reaches
+ * to the line, so the neighbours meet there. The highlight shows exactly
+ * where a click lands. A select's hidden form input is stepped over. */
+[data-slot="button-group"]:not([data-variant="attached"])
+  > :is(button, a[href], [role="button"]) {
   position: relative;
 }
 
-[data-glide]
-  > :is(button, a[href], [role="button"]):has(
-    + [data-slot="button-group-separator"],
-    + input[aria-hidden="true"] + [data-slot="button-group-separator"]
-  )::after,
-[data-glide]
-  > [data-slot="button-group-separator"]
-  + :is(button, a[href], [role="button"])::after {
+[data-slot="button-group"]:not([data-variant="attached"])
+  > :is(button, a[href], [role="button"])::after {
   content: "";
   position: absolute;
-  inset: -2px;
+  inset-block: -2px;
+  inset-inline: -1px;
 }
 
-[data-glide][data-orientation="horizontal"]
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="vertical"]
+  > :is(button, a[href], [role="button"])::after {
+  inset-block: -1px;
+  inset-inline: -2px;
+}
+
+/* Beside a separator: the button's 1px border, the separator's 3px of air,
+ * and half its line. */
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="horizontal"]
   > :is(button, a[href], [role="button"]):has(
     + [data-slot="button-group-separator"],
     + input[aria-hidden="true"] + [data-slot="button-group-separator"]
@@ -37,13 +48,17 @@
   inset-inline-end: -5px;
 }
 
-[data-glide][data-orientation="horizontal"]
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="horizontal"]
   > [data-slot="button-group-separator"]
   + :is(button, a[href], [role="button"])::after {
   inset-inline-start: -5px;
 }
 
-[data-glide][data-orientation="vertical"]
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="vertical"]
   > :is(button, a[href], [role="button"]):has(
     + [data-slot="button-group-separator"],
     + input[aria-hidden="true"] + [data-slot="button-group-separator"]
@@ -51,7 +66,9 @@
   inset-block-end: -5px;
 }
 
-[data-glide][data-orientation="vertical"]
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="vertical"]
   > [data-slot="button-group-separator"]
   + :is(button, a[href], [role="button"])::after {
   inset-block-start: -5px;
@@ -279,27 +296,6 @@
     }
   }
 
-  /* Leaving the group, the last button holds the anchor while the pill fades,
-   * so it fades in place instead of collapsing. The anchor is the button's
-   * plate (its ::before, inside the border), so the pill matches the plate
-   * whatever the button's border widths. */
-  [data-glide]:not(
-      :has(
-        > :is(button, a[href], [role="button"]):not(
-            :disabled,
-            [data-disabled]
-          ):is(:hover, :focus-visible, :active, [data-popup-open])
-      )
-    )
-    > :is(button, a[href], [role="button"])::before {
-    /* The plate's own transitions (button.tsx), restated so they survive. */
-    transition:
-      background-color 100ms ease-out,
-      border-color 100ms ease-out,
-      scale 100ms ease-out,
-      anchor-name 0s 80ms allow-discrete;
-  }
-
   [data-glide] > [data-slot="button-group-highlight"] {
     display: block;
     position: absolute;
@@ -311,14 +307,12 @@
     z-index: -1;
     pointer-events: none;
     opacity: 0;
-    scale: 0.96;
-    /* Entering from no anchor can't interpolate, so the pill appears in
-     * place and only fades and grows. */
+    /* It glides between items. Entering or leaving there is nothing to
+     * glide from or to, so it appears and goes instantly. */
     transition:
       inset 80ms var(--ease-out-expo, cubic-bezier(0.19, 1, 0.22, 1)),
-      opacity 80ms ease-out,
-      scale 80ms ease-out,
-      background-color 80ms ease-out;
+      scale 100ms var(--ease-out, cubic-bezier(0, 0, 0.2, 1)),
+      background-color 100ms var(--ease-out, cubic-bezier(0, 0, 0.2, 1));
   }
 
   [data-glide]:has(
@@ -329,7 +323,6 @@
     )
     > [data-slot="button-group-highlight"] {
     opacity: 1;
-    scale: 1;
   }
 
   @media (hover: hover) {
@@ -341,7 +334,6 @@
       )
       > [data-slot="button-group-highlight"] {
       opacity: 1;
-      scale: 1;
     }
   }
 
@@ -364,52 +356,14 @@
     background-color: var(--group-press);
   }
 
-  /* Separators beside the pill hide. */
-  [data-glide]
-    > :is(button, a[href], [role="button"]):not(:disabled, [data-disabled]):is(
-      :focus-visible,
-      :active,
-      [data-popup-open]
-    )
-    + [data-slot="button-group-separator"],
-  [data-glide]
-    > [data-slot="button-group-separator"]:has(
-      + :is(button, a[href], [role="button"]):not(
-          :disabled,
-          [data-disabled]
-        ):is(:focus-visible, :active, [data-popup-open])
-    ) {
-    opacity: 0;
-  }
-
-  @media (hover: hover) {
-    [data-glide]
-      > :is(button, a[href], [role="button"]):not(
-        :disabled,
-        [data-disabled]
-      ):hover
-      + [data-slot="button-group-separator"],
-    [data-glide]
-      > [data-slot="button-group-separator"]:has(
-        + :is(button, a[href], [role="button"]):not(
-            :disabled,
-            [data-disabled]
-          ):hover
-      ) {
-      opacity: 0;
-    }
-  }
-
   @media (prefers-reduced-motion: reduce) {
     [data-glide] {
       --group-press-scale: 1;
     }
 
     [data-glide] > [data-slot="button-group-highlight"] {
-      scale: 1;
-      transition:
-        opacity 80ms ease-out,
-        background-color 80ms ease-out;
+      transition: background-color 100ms
+        var(--ease-out, cubic-bezier(0, 0, 0.2, 1));
     }
   }
 }

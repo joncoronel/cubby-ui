@@ -12,6 +12,16 @@
   border-block-width: 2px;
 }
 
+/* A square hit area over the link's whole box, borders and rounded corners
+ * included, so the notch where two links' corners meet still belongs to one
+ * of them and hover never flickers off between them. */
+[data-slot="pagination-content"] [data-slot="pagination-link"]::after {
+  content: "";
+  position: absolute;
+  inset-block: -2px;
+  inset-inline: -1px;
+}
+
 [data-slot="pagination-content"]
   > :nth-child(1 of :not([data-slot="pagination-indicator"]))
   > [data-slot="pagination-link"] {
@@ -38,10 +48,9 @@
   display: none;
 }
 
-/* Links don't transition (see pagination.tsx); labels fade instead. */
-[data-slot="pagination-link-label"] {
-  transition: color 100ms ease-out;
-}
+/* Hover is instant, as in the other shells: links don't transition (see
+ * pagination.tsx) and neither do their labels. Only the label of the page
+ * becoming current fades, after the fill (below). */
 
 /* All anchor features or none: a partial implementation leaves the fill
  * unplaced or tied to another list. */
@@ -64,7 +73,7 @@
   /* The new label waits for the fill so it never sits light on the shell. */
   [data-slot="pagination-link"][aria-current="page"]
     > [data-slot="pagination-link-label"] {
-    transition-delay: 70ms;
+    transition: color 100ms ease-out 70ms;
   }
 
   [data-slot="pagination-indicator"] {

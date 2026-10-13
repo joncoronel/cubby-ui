@@ -61,7 +61,7 @@ Use `variant` to pick the shell the controls sit on.
 
 ### Size
 
-Use `size` to match the toolbar's height to a Button of the same size.
+Use `size` to match the toolbar to a Button of the same size; its controls scale their padding, text, and icons with it.
 
 <ComponentPreview component="toolbar" example="toolbar-size" />
 
@@ -120,7 +120,8 @@ The shell. Wraps Base UI's `Toolbar.Root`.
   simpleType="string"
   defaultValue='"default"'
 >
-  Outer height, matching `Button`.
+  Outer height, matching `Button`. Controls take their padding, text, and icon
+  size from it.
 </ApiProp>
 
 <ApiProp name="highlight" fullType="boolean" defaultValue="true">
@@ -149,10 +150,10 @@ A quiet [`Button`](/docs/components/button) in the toolbar. Wraps Base UI's `Too
   name="size"
   fullType='"icon" | "sm" | "default" | "lg" | ...'
   simpleType="string"
-  defaultValue='"icon"'
 >
-  Button's size. `icon` keeps an icon-only button square; text sizes set the
-  padding, and the toolbar sets the height.
+  Button's size. Defaults to the toolbar's: an icon child with `aria-label` or
+  `aria-labelledby` gets the matching icon size (`icon_sm`, `icon`, `icon_lg`),
+  anything else the text size. The toolbar sets the height.
 </ApiProp>
 
 </ApiPropsList>
@@ -189,4 +190,5 @@ If you're reinstalling over an earlier version, check these changes:
 | `variant="default"`                            | `variant="elevated"`, still the default.                                                                                                       |
 | `level` and `shadowLevel` on `Toolbar`         | Removed; `elevated` uses a fixed surface.                                                                                                      |
 | `ToolbarButton` defaulted to `variant="ghost"` | Leave `variant` unset for the quiet style; a set variant marks the main action.                                                                |
+| `ToolbarButton` defaulted to `size="icon_sm"`  | Size follows the toolbar. An icon-only button needs `aria-label` or `aria-labelledby` to stay square, or pass `size`.                          |
 | `ToolbarGroup` laid out its buttons            | It adds no layout; use `ToolbarSeparator` to split clusters.                                                                                   |

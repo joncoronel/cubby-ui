@@ -22,9 +22,7 @@ export default function ToolbarWithInput() {
       <ToolbarButton aria-label="Filters">
         <HugeiconsIcon icon={FilterHorizontalIcon} strokeWidth={2} />
       </ToolbarButton>
-      <ToolbarButton variant="primary" size="sm">
-        New file
-      </ToolbarButton>
+      <ToolbarButton variant="primary">New file</ToolbarButton>
     </Toolbar>
   );
 }

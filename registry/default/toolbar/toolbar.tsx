@@ -70,7 +70,20 @@ type ToolbarSize = NonNullable<VariantProps<typeof toolbarVariants>["size"]>;
 
 const ToolbarContext = React.createContext<{
   orientation: "horizontal" | "vertical";
-}>({ orientation: "horizontal" });
+  size: ToolbarSize;
+}>({ orientation: "horizontal", size: "default" });
+
+// Items take their padding, text, and icon size from the toolbar's size, on
+// Toggle's and Button's scales.
+const itemSize: Record<ToolbarSize, string> = {
+  sm: "px-2 text-sm [&_svg:not([class*='size-'])]:size-4",
+  default: "px-2.5 text-sm [&_svg:not([class*='size-'])]:size-4",
+  lg: "px-3 text-base [&_svg:not([class*='size-'])]:size-5",
+};
+
+// Button's icon size for each toolbar size; text buttons use the toolbar's
+// size as is.
+const iconSize = { sm: "icon_sm", default: "icon", lg: "icon_lg" } as const;
 
 export type ToolbarProps = BaseToolbar.Root.Props & {
   /** Shell style. */
@@ -90,7 +103,10 @@ function Toolbar({
   children,
   ...props
 }: ToolbarProps) {
-  const context = React.useMemo(() => ({ orientation }), [orientation]);
+  const context = React.useMemo(
+    () => ({ orientation, size }),
+    [orientation, size],
+  );
 
   return (
     <ToolbarContext.Provider value={context}>
@@ -114,16 +130,24 @@ export type ToolbarButtonProps = BaseToolbar.Button.Props & ButtonProps;
 
 /**
  * A quiet Button. Give it a `variant` to mark the main action; it keeps its
- * own fill and hover, and the highlight skips it.
+ * own fill and hover, and the highlight skips it. Without a `size`, it takes
+ * Button's size for the toolbar's, icon or text by its content.
  */
 function ToolbarButton({
   className,
   variant,
-  size = "icon",
+  size: sizeProp,
   render,
   ...props
 }: ToolbarButtonProps) {
-  const iconOnly = size?.startsWith("icon");
+  const toolbar = React.use(ToolbarContext);
+  const iconOnly = sizeProp
+    ? sizeProp.startsWith("icon")
+    : isIconOnly(
+        props.children,
+        props["aria-label"] ?? props["aria-labelledby"],
+      );
+  const size = sizeProp ?? (iconOnly ? iconSize[toolbar.size] : toolbar.size);
 
   return (
     <BaseToolbar.Button
@@ -161,6 +185,7 @@ function ToolbarToggle({
   render,
   ...props
 }: ToolbarToggleProps) {
+  const { size } = React.use(ToolbarContext);
   const iconOnly = isIconOnly(
     children,
     props["aria-label"] ?? props["aria-labelledby"],
@@ -177,7 +202,8 @@ function ToolbarToggle({
           render={render}
           className={cn(
             itemShell,
-            "min-w-auto px-2.5 text-sm sm:min-w-auto",
+            "min-w-auto sm:min-w-auto",
+            itemSize[size],
             iconOnly && iconSquare,
             "text-current",
             "[--tgl-bg-active:var(--toolbar-press)] [--tgl-bg-hover:var(--toolbar-highlight)] [--tgl-bg-selected:var(--toolbar-pressed)]",
@@ -246,13 +272,15 @@ export type ToolbarInputProps = BaseToolbar.Input.Props;
 
 /** A quiet field, inset like the buttons. It lights in place on hover and focus. */
 function ToolbarInput({ className, ...props }: ToolbarInputProps) {
+  const { size } = React.use(ToolbarContext);
   return (
     <BaseToolbar.Input
       data-slot="toolbar-input"
       data-toolbar-part=""
       className={cn(
         itemShell,
-        "placeholder:text-muted-foreground min-w-0 bg-transparent bg-clip-padding px-2.5 text-sm text-current",
+        "placeholder:text-muted-foreground min-w-0 bg-transparent bg-clip-padding text-current",
+        itemSize[size],
         // Instant hover; the focus ring is in toolbar.css.
         "hover:bg-(--toolbar-highlight) focus:bg-(--toolbar-highlight)",
         "data-disabled:cursor-not-allowed data-disabled:opacity-60",
@@ -267,17 +295,19 @@ export type ToolbarLinkProps = BaseToolbar.Link.Props;
 
 /** A quiet link, styled like the buttons. */
 function ToolbarLink({ className, ...props }: ToolbarLinkProps) {
+  const { size } = React.use(ToolbarContext);
   return (
     <BaseToolbar.Link
       data-slot="toolbar-link"
       data-toolbar-part=""
       data-toolbar-item=""
       className={cn(
-        "relative isolate inline-flex items-center gap-1.5 px-2.5 text-sm font-medium whitespace-nowrap no-underline",
+        "relative isolate inline-flex items-center gap-1.5 font-medium whitespace-nowrap no-underline",
+        itemSize[size],
         itemShell,
         "before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:transition-[background-color,scale] before:duration-100 before:ease-out before:content-['']",
         "hover:before:bg-(--toolbar-highlight) active:before:scale-[0.98] active:before:bg-(--toolbar-press) motion-reduce:active:before:scale-100",
-        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "[&_svg]:pointer-events-none [&_svg]:shrink-0",
         className,
       )}
       {...props}

@@ -32,7 +32,7 @@ export default function ToolbarSize() {
             <HugeiconsIcon icon={TextBoldIcon} strokeWidth={2} />
           </ToolbarToggle>
           <ToolbarSeparator />
-          <ToolbarButton size={size}>Share</ToolbarButton>
+          <ToolbarButton>Share</ToolbarButton>
         </Toolbar>
       ))}
     </div>

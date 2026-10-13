@@ -53,7 +53,7 @@ const toolbarVariants = cva(
 // ring overlaps the border, inside the gutter.
 const itemShell = cn(
   "shrink-0",
-  "rounded-[calc(var(--toolbar-item-radius)+2px)] before:rounded-(--toolbar-item-radius) focus-visible:-outline-offset-1 focus-visible:z-10",
+  "rounded-[calc(var(--toolbar-item-radius)+2px)] before:rounded-(--toolbar-item-radius) focus-visible:z-10",
   "h-auto self-stretch sm:h-auto",
   // In a column every item gets the row's paint height, whatever its
   // borders.

@@ -123,7 +123,7 @@ const triggerClasses = cn(
   "[--btn-bg-hover:var(--menubar-highlight)] [--btn-bg-active:var(--menubar-press)]",
   // Box corners are the paint's + 2px, the shell's. The ring overlaps the
   // border, inside the gutter.
-  "rounded-[calc(var(--menubar-item-radius)+2px)] before:rounded-(--menubar-item-radius) focus-visible:-outline-offset-1 focus-visible:z-10",
+  "rounded-[calc(var(--menubar-item-radius)+2px)] before:rounded-(--menubar-item-radius) focus-visible:z-10",
   // In a column every trigger gets the row's paint height, whatever its
   // borders.
   "h-auto self-stretch group-data-[orientation=vertical]/menubar:box-content group-data-[orientation=vertical]/menubar:h-[calc(var(--menubar-h)-4px)] group-data-[orientation=vertical]/menubar:py-0 group-data-[orientation=vertical]/menubar:justify-start",

@@ -778,7 +778,10 @@ function AddMenu({
                     className={cn(
                       FILTER_SEGMENT,
                       FILTER_SEGMENT_INTERACTIVE,
-                      "text-muted-foreground hover:text-foreground data-popup-open:text-foreground gap-0 px-0",
+                      // The "+" sits in the side padding, as in the label's
+                      // layout before; folded, the padding goes and the "+"
+                      // square (below) sets the width.
+                      "text-muted-foreground hover:text-foreground data-popup-open:text-foreground gap-0 px-(--seg-icon-x) data-compact:px-0",
                       className,
                     )}
                     {...(props as React.ComponentProps<"button">)}
@@ -812,9 +815,9 @@ function AddMenu({
               }
             >
               {inActions && (
-                // A square as tall as the plate, so the folded segment is
-                // square however its borders snap to device pixels.
-                <span className="flex aspect-square h-full shrink-0 items-center justify-center">
+                // Folded to "+", a square as tall as the plate, so the
+                // segment is square however its borders snap to device pixels.
+                <span className="flex h-full shrink-0 items-center justify-center in-data-compact:aspect-square">
                   <HugeiconsIcon
                     icon={PlusSignIcon}
                     strokeWidth={2}
@@ -831,10 +834,7 @@ function AddMenu({
                 <span
                   // Text side gets 2px more than the icon side: the "+" glyph has
                   // ~2.7px of internal space, so this balances by ink.
-                  className={cn(
-                    "flex min-w-0 items-center gap-1.5 overflow-hidden ps-1.5",
-                    inActions ? "pe-[calc(var(--seg-icon-x)+2px)]" : "pe-0.5",
-                  )}
+                  className="flex min-w-0 items-center gap-1.5 overflow-hidden ps-1.5 pe-0.5"
                 >
                   {children ?? labels.add}
                   {shortcut && (

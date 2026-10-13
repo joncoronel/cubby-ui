@@ -78,7 +78,7 @@ const trayClasses = cn(
   // Select triggers skip the before: rule: it would give them an empty
   // pseudo-element that becomes a flex item.
   "rounded-(--group-radius) [--group-item-radius:max(0px,calc(var(--group-radius)-2px))]",
-  "[&>:is(button,a):not([data-slot=select-trigger])]:before:rounded-(--group-item-radius) [&>:is(button,a)]:focus-visible:-outline-offset-1",
+  "[&>:is(button,a):not([data-slot=select-trigger])]:before:rounded-(--group-item-radius)",
   // Highlight and press: the label color at 10% / 14%. Button's hover tokens
   // read too faint as a pill on the same fill; a tint of the label always
   // contrasts with it. currentColor resolves where the variable is used.

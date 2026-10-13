@@ -128,3 +128,22 @@
     }
   }
 }
+
+/* -------------------------------------------------------------------------------------------------
+ * Focus ring.
+ *
+ * On the fill's own edge: 2px just inside it, following its corners, the
+ * same on every side whatever the item's border widths, and never past the
+ * item. Items draw it on their plate (::before); fields, which can't have
+ * one, as an inset shadow, with an outline where forced colors drop
+ * shadows.
+ * -------------------------------------------------------------------------------------------------*/
+
+[data-slot="menubar"] [data-menubar-item]:focus-visible {
+  outline-color: transparent;
+}
+
+[data-slot="menubar"] [data-menubar-item]:focus-visible::before {
+  outline: 2px solid color-mix(in oklab, var(--color-ring) 50%, transparent);
+  outline-offset: -2px;
+}

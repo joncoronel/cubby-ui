@@ -302,8 +302,10 @@ function OptionsValueControl({
 
 const INPUT_SEGMENT = cn(
   FILTER_SEGMENT,
-  // Inputs can't render ::before, so their plate is their own background.
+  // Inputs can't render ::before, so their plate is their own background,
+  // and their focus ring an inset one (an outline where forced colors drop it).
   "hover:bg-(--filter-highlight) focus-visible:bg-(--filter-highlight) cursor-text bg-transparent font-medium",
+  "focus-visible:inset-ring-2 focus-visible:inset-ring-ring/50 forced-colors:focus-visible:outline-2 forced-colors:focus-visible:-outline-offset-2 forced-colors:focus-visible:outline-[Highlight]",
   "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground placeholder:font-normal",
   "field-sizing-content max-w-48 min-w-[1ch] not-supports-[field-sizing:content]:w-28",
   // 16px on small screens, below which iOS zooms in on a focused input.

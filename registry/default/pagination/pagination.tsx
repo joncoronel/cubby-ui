@@ -119,7 +119,7 @@ const linkClasses = cn(
   "box-content aspect-square h-auto self-stretch px-0 text-sm tabular-nums",
   // Box corners are the paint's + 2px, the shell's. The ring overlaps the
   // border, inside the gutter.
-  "rounded-[calc(var(--pagination-item-radius)+2px)] before:rounded-(--pagination-item-radius) focus-visible:-outline-offset-1",
+  "rounded-[calc(var(--pagination-item-radius)+2px)] before:rounded-(--pagination-item-radius)",
   // Hover and press: the label color at 10% / 14%
   "[--btn-bg-hover:color-mix(in_oklab,currentColor_10%,transparent)] [--btn-bg-active:color-mix(in_oklab,currentColor_14%,transparent)]",
   // Current page fallback fill, where the indicator can't glide

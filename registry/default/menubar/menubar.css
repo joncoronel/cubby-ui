@@ -2,8 +2,9 @@
  * Gliding highlight, in CSS anchor positioning, as in Button Group and Toolbar.
  *
  * The lit trigger's plate (its ::before, inside the border) takes the anchor
- * name, so the pill matches the plate whatever the trigger's border widths. Without anchor positioning and anchor-scope, each
- * trigger paints its own hover instead.
+ * name, so the pill matches the plate whatever the trigger's border widths.
+ * Without anchor positioning and anchor-scope, each trigger paints its own
+ * hover instead.
  * -------------------------------------------------------------------------------------------------*/
 
 [data-slot="menubar-highlight"] {
@@ -37,18 +38,24 @@
 
   /* While a menu is open, hovering another trigger opens it, so the pill
    * moves on hover rather than waiting for that menu to mount. The open
-   * trigger lets go meanwhile, or two triggers would share the anchor. */
+   * trigger lets go meanwhile, or two triggers would share the anchor, and
+   * paints its own tint until it closes. If arrow keys switched menus under
+   * a resting pointer, the open one still reads as open. Keyboard focus
+   * outranks hover. */
   @media (hover: hover) {
-    [data-slot="menubar"][data-glide]:not(:has([data-menubar-item]:active))
+    [data-slot="menubar"][data-glide]:not(
+        :has([data-menubar-item]:is(:active, :focus-visible))
+      )
       [data-menubar-item]:not(:disabled, [data-disabled]):hover::before {
       anchor-name: --menubar-item;
     }
 
     [data-slot="menubar"][data-glide]:has(
         [data-menubar-item]:not(:disabled, [data-disabled]):hover
-      )
+      ):not(:has([data-menubar-item]:is(:active, :focus-visible)))
       [data-menubar-item][data-popup-open]:not(:hover, :focus-visible)::before {
       anchor-name: none;
+      background-color: var(--menubar-highlight);
     }
   }
 

@@ -1,4 +1,94 @@
 /* -------------------------------------------------------------------------------------------------
+ * Inset.
+ *
+ * The gaps are the items' own transparent borders, as in Button Group: 2px
+ * on a side facing the shell's edge, 1px on a side facing a neighbour. They
+ * snap to whole device pixels, so the edge is never thinner than the gap,
+ * and the edge gap hovers with its item. Groups add no box, so an end item
+ * may sit one level down, inside the first or last group. `of` counts items
+ * and groups only, so guard spans after an open trigger and the highlight
+ * can't move the ends.
+ * -------------------------------------------------------------------------------------------------*/
+
+[data-slot="toolbar"] [data-toolbar-part] {
+  border: 1px solid transparent;
+}
+
+[data-slot="toolbar"][data-orientation="horizontal"] [data-toolbar-part] {
+  border-block-width: 2px;
+}
+
+[data-slot="toolbar"][data-orientation="vertical"] [data-toolbar-part] {
+  border-inline-width: 2px;
+}
+
+/* The ends: the first or last item or group, and in a group, its first
+ * or last item. */
+[data-slot="toolbar"][data-orientation="horizontal"]
+  > :nth-child(
+    1 of [data-toolbar-part],
+    [data-slot="toolbar-group"],
+    [data-slot="toolbar-toggle-group"]
+  )[data-toolbar-part],
+[data-slot="toolbar"][data-orientation="horizontal"]
+  > :nth-child(
+    1 of [data-toolbar-part],
+    [data-slot="toolbar-group"],
+    [data-slot="toolbar-toggle-group"]
+  )
+  > :nth-child(1 of [data-toolbar-part]) {
+  border-inline-start-width: 2px;
+}
+
+[data-slot="toolbar"][data-orientation="horizontal"]
+  > :nth-last-child(
+    1 of [data-toolbar-part],
+    [data-slot="toolbar-group"],
+    [data-slot="toolbar-toggle-group"]
+  )[data-toolbar-part],
+[data-slot="toolbar"][data-orientation="horizontal"]
+  > :nth-last-child(
+    1 of [data-toolbar-part],
+    [data-slot="toolbar-group"],
+    [data-slot="toolbar-toggle-group"]
+  )
+  > :nth-last-child(1 of [data-toolbar-part]) {
+  border-inline-end-width: 2px;
+}
+
+[data-slot="toolbar"][data-orientation="vertical"]
+  > :nth-child(
+    1 of [data-toolbar-part],
+    [data-slot="toolbar-group"],
+    [data-slot="toolbar-toggle-group"]
+  )[data-toolbar-part],
+[data-slot="toolbar"][data-orientation="vertical"]
+  > :nth-child(
+    1 of [data-toolbar-part],
+    [data-slot="toolbar-group"],
+    [data-slot="toolbar-toggle-group"]
+  )
+  > :nth-child(1 of [data-toolbar-part]) {
+  border-block-start-width: 2px;
+}
+
+[data-slot="toolbar"][data-orientation="vertical"]
+  > :nth-last-child(
+    1 of [data-toolbar-part],
+    [data-slot="toolbar-group"],
+    [data-slot="toolbar-toggle-group"]
+  )[data-toolbar-part],
+[data-slot="toolbar"][data-orientation="vertical"]
+  > :nth-last-child(
+    1 of [data-toolbar-part],
+    [data-slot="toolbar-group"],
+    [data-slot="toolbar-toggle-group"]
+  )
+  > :nth-last-child(1 of [data-toolbar-part]) {
+  border-block-end-width: 2px;
+}
+
+/* -------------------------------------------------------------------------------------------------
  * Gliding highlight, in CSS anchor positioning, as in Button Group.
  *
  * The lit item's plate (its ::before, inside the border) takes the anchor
@@ -19,10 +109,11 @@
     anchor-scope: --toolbar-item;
   }
 
-  /* The pill stands in for hover and press on quiet items; a button with a
-   * set variant keeps its own. Pressed toggles keep their fill. */
-  [data-slot="toolbar"][data-glide]
-    :is([data-toolbar-item]:not([data-variant]), [data-slot="toolbar-toggle"]) {
+  /* The pill stands in for hover and press. A button with a set variant
+   * carries no data-toolbar-item and keeps its own. A pressed toggle is
+   * skipped too: it is already lit, so it presses on its own fill, as in
+   * Toggle Group, rather than stacking the pill on it. */
+  [data-slot="toolbar"][data-glide] [data-toolbar-item] {
     --btn-bg-hover: transparent;
     --btn-bg-active: transparent;
     --tgl-bg-hover: transparent;
@@ -33,23 +124,34 @@
     background-color: transparent;
   }
 
-  /* Hover is gated to real hover (:active covers taps). An open menu or a
-   * held item keeps the pill, so a pointer drifting mid-press doesn't light
-   * two items. */
+  /* Hover is gated to real hover (:active covers taps). An open menu, a held
+   * item, or keyboard focus keeps the pill, so a pointer drifting mid-press
+   * doesn't light two items. Open is aria-expanded, not data-popup-open,
+   * which tooltip triggers set too. */
   [data-slot="toolbar"][data-glide]
-    [data-toolbar-item]:not(:disabled, [data-disabled]):is(
+    [data-toolbar-item]:not(:disabled, [data-disabled], [data-pressed]):is(
       :focus-visible,
       :active,
-      [data-popup-open]
+      [aria-expanded="true"]
     )::before {
     anchor-name: --toolbar-item;
   }
 
   @media (hover: hover) {
     [data-slot="toolbar"][data-glide]:not(
-        :has([data-toolbar-item][data-popup-open], [data-toolbar-item]:active)
+        :has(
+          [data-toolbar-item]:is(
+            [aria-expanded="true"],
+            :active,
+            :focus-visible
+          )
+        )
       )
-      [data-toolbar-item]:not(:disabled, [data-disabled]):hover::before {
+      [data-toolbar-item]:not(
+        :disabled,
+        [data-disabled],
+        [data-pressed]
+      ):hover::before {
       anchor-name: --toolbar-item;
     }
   }
@@ -59,11 +161,11 @@
    * are restated so they survive. */
   [data-slot="toolbar"][data-glide]:not(
       :has(
-        [data-toolbar-item]:not(:disabled, [data-disabled]):is(
+        [data-toolbar-item]:not(:disabled, [data-disabled], [data-pressed]):is(
             :hover,
             :focus-visible,
             :active,
-            [data-popup-open]
+            [aria-expanded="true"]
           )
       )
     )
@@ -97,10 +199,10 @@
   }
 
   [data-slot="toolbar"][data-glide]:has(
-      [data-toolbar-item]:not(:disabled, [data-disabled]):is(
+      [data-toolbar-item]:not(:disabled, [data-disabled], [data-pressed]):is(
           :focus-visible,
           :active,
-          [data-popup-open]
+          [aria-expanded="true"]
         )
     )
     > [data-slot="toolbar-highlight"] {
@@ -110,7 +212,11 @@
 
   @media (hover: hover) {
     [data-slot="toolbar"][data-glide]:has(
-        [data-toolbar-item]:not(:disabled, [data-disabled]):hover
+        [data-toolbar-item]:not(
+            :disabled,
+            [data-disabled],
+            [data-pressed]
+          ):hover
       )
       > [data-slot="toolbar-highlight"] {
       opacity: 1;
@@ -119,18 +225,15 @@
   }
 
   /* Press, as on Button; menu triggers skip it. The pill is anchored to the
-   * plate, so a quiet item's plate holds still and the pill does the press
-   * scale on its own, one clean motion. Pressed toggles keep their own. */
+   * plate, so the plate holds still and the pill does the press scale on its
+   * own, one clean motion. */
   [data-slot="toolbar"][data-glide]
-    :is(
-      [data-toolbar-item]:not([data-variant], [data-slot="toolbar-toggle"]),
-      [data-slot="toolbar-toggle"]:not([data-pressed])
-    ):active::before {
+    [data-toolbar-item]:not([data-pressed]):active::before {
     scale: none;
   }
 
   [data-slot="toolbar"][data-glide]:has(
-      [data-toolbar-item]:active:not([aria-haspopup], :disabled)
+      [data-toolbar-item]:active:not([aria-haspopup], :disabled, [data-pressed])
     )
     > [data-slot="toolbar-highlight"] {
     scale: var(--toolbar-press-scale, 0.98);

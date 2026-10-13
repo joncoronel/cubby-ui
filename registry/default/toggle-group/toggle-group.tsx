@@ -8,34 +8,40 @@ import { cn } from "@/lib/utils";
 import { Separator } from "@/registry/default/separator/separator";
 import { Toggle, type ToggleProps } from "@/registry/default/toggle/toggle";
 
-// A shell, as in Button Group, whose items latch. The inset is two 1px
-// transparent borders, one on the shell and one on each item, so fills sit
-// 2px from the edge and from each other and snap alike at every display
-// scale. Outline draws its line as an outline just outside the shell. Paint
-// corners are the shell's minus its border and the item's 1px.
+// A shell, as in Button Group, whose items latch. The inset is the items'
+// own transparent borders: 2px on a side facing the shell's edge, 1px on a
+// side facing a neighbour. Borders snap to whole device pixels, so the edge
+// is never thinner than the gap, and the edge gap hovers with its item.
+// `of` counts items only, so separators don't move the ends. Outline draws
+// its line as an outline just outside the shell. Paint corners are the
+// shell's minus the 2px edge border.
 const toggleGroupVariants = cva(
   [
     "relative isolate flex w-fit items-stretch rounded-(--toggle-group-radius) data-[orientation=vertical]:flex-col",
-    "[--toggle-group-item-radius:max(0px,calc(var(--toggle-group-radius)-var(--toggle-group-border)-1px))]",
+    "[--toggle-group-item-radius:max(0px,calc(var(--toggle-group-radius)-2px))]",
     // Small corners between neighbors, so pressed runs read as one control
     "[--toggle-group-inner-radius:min(3px,var(--toggle-group-item-radius))]",
     // Label-color tints: hover 10%, press 14%, pressed 16%. Override the
     // selected variables to recolor.
     "[--toggle-group-highlight:color-mix(in_oklab,currentColor_10%,transparent)] [--toggle-group-press:color-mix(in_oklab,currentColor_14%,transparent)]",
     "[--toggle-group-selected-bg:color-mix(in_oklab,currentColor_16%,transparent)] [--toggle-group-selected-fg:var(--foreground)]",
-    // The shell is fixed and items stretch to fill it; columns grow to the
-    // widest item.
+    // A row is the ladder height and items stretch to fill it.
     "data-[orientation=horizontal]:h-(--toggle-group-h) data-[orientation=horizontal]:[&>[data-slot=toggle-group-item]]:aspect-square",
-    "data-[orientation=vertical]:min-w-(--toggle-group-h) data-[orientation=vertical]:[&>[data-slot=toggle-group-item]]:h-[calc(var(--toggle-group-h)-var(--toggle-group-border)*2)]",
+    "data-[orientation=horizontal]:[&>[data-slot=toggle-group-item]]:border-y-2 data-[orientation=horizontal]:[&>:nth-child(1_of_[data-slot=toggle-group-item])]:border-s-2 data-[orientation=horizontal]:[&>:nth-last-child(1_of_[data-slot=toggle-group-item])]:border-e-2",
+    // A column is at least the ladder width and grows to the widest item;
+    // every item gets the row's paint height, whatever its borders.
+    "data-[orientation=vertical]:min-w-(--toggle-group-h) data-[orientation=vertical]:[&>[data-slot=toggle-group-item]]:box-content data-[orientation=vertical]:[&>[data-slot=toggle-group-item]]:h-[calc(var(--toggle-group-h)-4px)]",
+    "data-[orientation=vertical]:[&>[data-slot=toggle-group-item]]:border-x-2 data-[orientation=vertical]:[&>:nth-child(1_of_[data-slot=toggle-group-item])]:border-t-2 data-[orientation=vertical]:[&>:nth-last-child(1_of_[data-slot=toggle-group-item])]:border-b-2",
+    // Icon-only items: the paint is square, whatever each side's border.
+    "[&>[data-slot=toggle-group-item][data-icon-only]]:box-content [&>[data-slot=toggle-group-item][data-icon-only]]:aspect-square data-[orientation=vertical]:[&>[data-slot=toggle-group-item][data-icon-only]]:h-auto",
     "data-disabled:opacity-60 data-disabled:[&>*]:opacity-100",
   ],
   {
     variants: {
       variant: {
-        outline:
-          "bg-card border border-transparent outline outline-border [--toggle-group-border:1px]",
-        soft: "bg-secondary border border-transparent [--toggle-group-border:1px]",
-        ghost: "border border-transparent [--toggle-group-border:1px]",
+        outline: "bg-card outline outline-border",
+        soft: "bg-secondary",
+        ghost: "",
       },
       // Button's height ladder (one step taller below sm); corners step with it.
       size: {
@@ -103,9 +109,9 @@ const itemClasses = cn(
   "h-auto min-w-auto self-stretch border border-transparent text-sm sm:h-auto sm:min-w-auto",
   // Icon-only items drop their padding, so they're square.
   "data-icon-only:px-0",
-  // Box corners are the paint's + 1px, so paint, gap, and focus ring (at
-  // offset 0) are concentric.
-  "rounded-[calc(var(--toggle-group-item-radius)+1px)] before:rounded-(--toggle-group-item-radius) focus-visible:outline-offset-0 focus-visible:z-10",
+  // Box corners are the paint's + 2px, the shell's. The ring overlaps the
+  // border, inside the gutter.
+  "rounded-[calc(var(--toggle-group-item-radius)+2px)] before:rounded-(--toggle-group-item-radius) focus-visible:-outline-offset-1 focus-visible:z-10",
   "[--tgl-bg-hover:var(--toggle-group-highlight)] [--tgl-bg-active:var(--toggle-group-press)] [--tgl-bg-selected:var(--toggle-group-selected-bg)]",
   // Label color
   "text-muted-foreground data-pressed:text-(--toggle-group-selected-fg) hover:not-data-pressed:text-foreground",

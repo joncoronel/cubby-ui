@@ -236,7 +236,7 @@ function DataTableToolbar({
       variant={variant}
       highlight={highlight}
       className={cn(
-        "h-auto w-full items-center gap-1 rounded-b-none border-0 px-2 pt-2 pb-0 data-[orientation=horizontal]:h-auto",
+        "w-full items-center gap-1 rounded-b-none border-0 px-2 pt-2 pb-0 data-[orientation=horizontal]:h-auto",
         className,
       )}
       {...props}

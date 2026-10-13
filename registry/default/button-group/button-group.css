@@ -58,6 +58,118 @@
 }
 
 /* -------------------------------------------------------------------------------------------------
+ * Inset.
+ *
+ * The gaps are the items' own transparent borders, not shell padding or a
+ * shell border: 2px on a side facing the shell's edge, 1px on a side facing
+ * a neighbour. Borders snap to whole device pixels, so the edge is never
+ * thinner than the gap and neither lands between pixels (2 and 2 at 100%,
+ * 3 and 2 at 175%). The edge gap belongs to the item, so it hovers, and the
+ * shell has no border to push elevated's rim inward. `of` counts items only,
+ * so the guard spans Base UI inserts after an open trigger can't move the
+ * ends.
+ * -------------------------------------------------------------------------------------------------*/
+
+[data-slot="button-group"]:not([data-variant="attached"])
+  > :is(button, a, [data-slot="input"], [data-slot="button-group-text"]) {
+  border: 1px solid transparent;
+  border-radius: calc(var(--group-item-radius) + 2px);
+}
+
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="horizontal"]
+  > :is(button, a, [data-slot="input"], [data-slot="button-group-text"]) {
+  border-block-width: 2px;
+  height: auto;
+  align-self: stretch;
+}
+
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="horizontal"]
+  > :nth-child(
+    1 of button,
+    a,
+    [data-slot="input"],
+    [data-slot="button-group-text"]
+  ) {
+  border-inline-start-width: 2px;
+}
+
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="horizontal"]
+  > :nth-last-child(
+    1 of button,
+    a,
+    [data-slot="input"],
+    [data-slot="button-group-text"]
+  ) {
+  border-inline-end-width: 2px;
+}
+
+/* A column: every item has the row's paint height, whatever its borders,
+ * and stretches to the widest. */
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="vertical"]
+  > :is(button, a, [data-slot="input"], [data-slot="button-group-text"]) {
+  border-inline-width: 2px;
+  box-sizing: content-box;
+  height: calc(var(--group-h) - 4px);
+  width: auto;
+  padding-block: 0;
+  align-self: stretch;
+}
+
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="vertical"]
+  > :nth-child(
+    1 of button,
+    a,
+    [data-slot="input"],
+    [data-slot="button-group-text"]
+  ) {
+  border-block-start-width: 2px;
+}
+
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="vertical"]
+  > :nth-last-child(
+    1 of button,
+    a,
+    [data-slot="input"],
+    [data-slot="button-group-text"]
+  ) {
+  border-block-end-width: 2px;
+}
+
+/* Icon buttons: the paint is square, whatever each side's border. */
+[data-slot="button-group"]:not([data-variant="attached"])
+  > :is(button, a)[data-size^="icon"] {
+  box-sizing: content-box;
+  aspect-ratio: 1;
+  padding-inline: 0;
+}
+
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="horizontal"]
+  > :is(button, a)[data-size^="icon"] {
+  width: auto;
+}
+
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="vertical"]
+  > :is(button, a)[data-size^="icon"] {
+  height: auto;
+}
+
+/* -------------------------------------------------------------------------------------------------
  * Quiet fields.
  *
  * Inputs and select triggers drop their border and fill and take the
@@ -67,12 +179,7 @@
 
 [data-slot="button-group"]:not([data-variant="attached"])
   > :is([data-slot="input"], [data-slot="select-trigger"]) {
-  height: auto;
-  align-self: stretch;
-  /* The buttons' 1px border, fill inside it. */
-  border-width: 1px;
-  border-color: transparent;
-  border-radius: calc(var(--group-item-radius) + 1px);
+  /* Fill inside the inset border. */
   background-color: transparent;
   background-clip: padding-box;
   box-shadow: none;
@@ -145,7 +252,8 @@
 
   /* Hover is gated to real hover (:active covers taps). An open menu or a
    * held button keeps the pill, or a pointer drifting mid-press would light
-   * two buttons and the pill would dart between them. */
+   * two buttons and the pill would dart between them. Keyboard focus
+   * outranks hover. */
   [data-glide]
     > :is(button, a[href], [role="button"]):not(:disabled, [data-disabled]):is(
       :focus-visible,
@@ -156,7 +264,13 @@
   }
 
   @media (hover: hover) {
-    [data-glide]:not(:has(> [data-popup-open], > :active))
+    [data-glide]:not(
+        :has(
+          > [data-popup-open],
+          > :active,
+          > :is(button, a[href], [role="button"]):focus-visible
+        )
+      )
       > :is(button, a[href], [role="button"]):not(
         :disabled,
         [data-disabled]

@@ -1,4 +1,30 @@
 /* -------------------------------------------------------------------------------------------------
+ * Inset.
+ *
+ * The gaps are the links' own transparent borders, as in Button Group: 2px
+ * on a side facing the shell's edge, 1px on a side facing a neighbour. They
+ * snap to whole device pixels, so the edge is never thinner than the gap.
+ * The ends are the first and last list items; the indicator is skipped.
+ * -------------------------------------------------------------------------------------------------*/
+
+[data-slot="pagination-content"] [data-slot="pagination-link"] {
+  border: 1px solid transparent;
+  border-block-width: 2px;
+}
+
+[data-slot="pagination-content"]
+  > :nth-child(1 of :not([data-slot="pagination-indicator"]))
+  > [data-slot="pagination-link"] {
+  border-inline-start-width: 2px;
+}
+
+[data-slot="pagination-content"]
+  > :nth-last-child(1 of :not([data-slot="pagination-indicator"]))
+  > [data-slot="pagination-link"] {
+  border-inline-end-width: 2px;
+}
+
+/* -------------------------------------------------------------------------------------------------
  * Gliding current page, in CSS anchor positioning.
  *
  * The current link's plate (its ::before, inside the border) takes the

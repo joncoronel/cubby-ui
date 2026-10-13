@@ -16,26 +16,21 @@ import "./button-group.css";
 // (button-group.css). Selectors match tags, not data-slot, because a Base UI
 // trigger rendering a Button stamps its own data-slot.
 const buttonGroupVariants = cva(
-  "relative flex w-fit items-stretch [--group-border:0px] [&>*:focus-visible]:relative [&>*:focus-visible]:z-10 [&>*[data-popup-open]]:relative [&>*[data-popup-open]]:z-10",
+  "relative flex w-fit items-stretch [&>*:focus-visible]:relative [&>*:focus-visible]:z-10 [&>*[data-popup-open]]:relative [&>*[data-popup-open]]:z-10",
   {
     variants: {
       variant: {
         attached:
           "[&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit [&>input]:flex-1 has-[select[aria-hidden=true]:last-child]:[&>[data-slot=select-trigger]:last-of-type]:rounded-r-lg has-[>[data-slot=button-group]]:gap-2 [&>input]:bg-card",
-        // Outline's border sits outside the fill, as on an outline Button. The
-        // others have no border, so elevated's shadow ring meets its edge.
-        outline:
-          "bg-card text-foreground border border-transparent outline outline-border [--group-border:1px]",
-        soft: "bg-secondary text-secondary-foreground border border-transparent [--group-border:1px]",
-        // The surface's inner rim is the 1px border, so it meets the shadow
-        // ring as on other raised surfaces.
-        elevated: cn(
-          solidSurface(3, 3),
-          "text-foreground shadow-(--surface-shadow-3) border border-(--surface-rim-color) [--group-border:1px]",
-        ),
+        // Outline draws its line just outside the fill, as on an outline
+        // Button. The others have no border, so elevated's rim and shadow
+        // ring meet its edge.
+        outline: "bg-card text-foreground outline outline-border",
+        soft: "bg-secondary text-secondary-foreground",
+        elevated: cn(solidSurface(3, 3), "text-foreground"),
         // Opposite the page in brightness, so the tint needs more strength.
         solid:
-          "bg-neutral text-neutral-foreground border border-transparent [--group-border:1px] [--group-highlight-mix:16%] [--group-press-mix:22%]",
+          "bg-neutral text-neutral-foreground [--group-highlight-mix:16%] [--group-press-mix:22%]",
       },
       // Button's height ladder (one step taller below sm); corners step with it.
       size: {
@@ -77,31 +72,20 @@ const buttonGroupVariants = cva(
 );
 
 const trayClasses = cn(
-  // Inset: two 1px transparent borders, one on the shell and one on each
-  // button, not padding. Plate to edge is shell + button, plate to plate is
-  // button + button; borders round to whole device pixels and both are the
-  // same width, so the gaps stay even at every display scale. Outline draws
-  // its line as an outline just outside the shell, as elevated's ring sits
-  // outside. Paint
-  // corners are the shell's minus its border and the button's 1px.
-  "rounded-(--group-radius) [--group-item-radius:max(0px,calc(var(--group-radius)-var(--group-border,0px)-1px))]",
-  "[&>:is(button,a)]:border [&>:is(button,a)]:border-transparent",
-  // Box corners are the paint's + 1px, so paint, gap, and focus ring (at
-  // offset 0) are concentric. Select triggers skip the before: rule: it would
-  // give them an empty pseudo-element that becomes a flex item.
-  "[&>:is(button,a)]:rounded-[calc(var(--group-item-radius)+1px)] [&>:is(button,a):not([data-slot=select-trigger])]:before:rounded-(--group-item-radius) [&>:is(button,a)]:focus-visible:outline-offset-0",
+  // The inset is the items' own transparent borders (button-group.css).
+  // Paint corners are the shell's minus the 2px edge border, so paint and
+  // shell are concentric. The ring overlaps the border, inside the gutter.
+  // Select triggers skip the before: rule: it would give them an empty
+  // pseudo-element that becomes a flex item.
+  "rounded-(--group-radius) [--group-item-radius:max(0px,calc(var(--group-radius)-2px))]",
+  "[&>:is(button,a):not([data-slot=select-trigger])]:before:rounded-(--group-item-radius) [&>:is(button,a)]:focus-visible:-outline-offset-1",
   // Highlight and press: the label color at 10% / 14%. Button's hover tokens
   // read too faint as a pill on the same fill; a tint of the label always
   // contrasts with it. currentColor resolves where the variable is used.
   "[--group-highlight:color-mix(in_oklab,currentColor_var(--group-highlight-mix,10%),transparent)] [--group-press:color-mix(in_oklab,currentColor_var(--group-press-mix,14%),transparent)]",
-  // Sizing: the shell is fixed and buttons stretch to fill it, so a border
-  // rounded at fractional scales can't throw their size off. Icon buttons
-  // stay square.
-  "data-[orientation=horizontal]:h-(--group-h) data-[orientation=horizontal]:[&>:is(button,a)]:h-auto data-[orientation=horizontal]:[&>:is(button,a)]:self-stretch",
-  // Vertical: at least the ladder width, growing for text buttons; every
-  // button keeps the ladder height and stretches to the widest.
-  "data-[orientation=vertical]:w-fit data-[orientation=vertical]:min-w-(--group-h) data-[orientation=vertical]:[&>:is(button,a)]:w-auto data-[orientation=vertical]:[&>:is(button,a)]:self-stretch data-[orientation=vertical]:[&>:is(button,a)]:h-[calc(var(--group-h)-var(--group-border,0px)*2)]",
-  "data-[orientation=horizontal]:[&>:is(button,a)[data-size^=icon]]:aspect-square data-[orientation=horizontal]:[&>:is(button,a)[data-size^=icon]]:w-auto",
+  // Sizing: a row is the ladder height, a column at least the ladder width.
+  // Items size themselves in button-group.css.
+  "data-[orientation=horizontal]:h-(--group-h) data-[orientation=vertical]:w-fit data-[orientation=vertical]:min-w-(--group-h)",
   // Quiet children. A Button without a variant renders `primary`, so this
   // list (with text-current below) must undo everything `primary` sets: fill,
   // hover, press, border, and label color. A style added to `primary` needs
@@ -211,8 +195,9 @@ function ButtonGroupText({
       "flex items-center gap-2 text-sm font-medium whitespace-nowrap tabular-nums [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
       variant === "attached"
         ? "bg-muted rounded-lg border bg-clip-padding px-4"
-        : // The buttons' 1px border, so text lines up with their labels.
-          "border border-transparent px-3",
+        : // Inset like the buttons (button-group.css), so text lines up
+          // with their labels.
+          "px-3",
       className,
     ),
   };

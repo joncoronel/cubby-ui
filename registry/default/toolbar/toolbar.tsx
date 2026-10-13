@@ -11,38 +11,31 @@ import { Toggle, type ToggleProps } from "@/registry/default/toggle/toggle";
 import { solidSurface } from "@/registry/default/lib/elevated";
 import "./toolbar.css";
 
-// A shell, as in Button Group, with Base UI's roving focus. The inset is two
-// 1px transparent borders: one on the shell, one on each item. Plate to edge
-// is shell + item, plate to plate is item + item, and since both are the same
-// border, they snap to device pixels alike and stay even at every display
-// scale. Outline draws its line as an outline just outside the shell, the way
-// elevated's shadow ring sits outside. A highlight glides to the
-// hovered or focused item's plate (toolbar.css).
+// A shell, as in Button Group, with Base UI's roving focus. The inset is
+// the items' own transparent borders, 2px facing the shell's edge and 1px
+// facing a neighbour (toolbar.css). Outline draws its line as an outline
+// just outside the shell. A highlight glides to the hovered or focused
+// item's plate (toolbar.css).
 const toolbarVariants = cva(
   [
-    "relative isolate flex w-fit items-stretch rounded-(--toolbar-radius) data-[orientation=vertical]:flex-col",
-    "[--toolbar-item-radius:max(0px,calc(var(--toolbar-radius)-var(--toolbar-border)-1px))]",
+    "group/toolbar relative isolate flex w-fit items-stretch rounded-(--toolbar-radius) data-[orientation=vertical]:flex-col",
+    // Paint corners are the shell's minus the 2px edge border.
+    "[--toolbar-item-radius:max(0px,calc(var(--toolbar-radius)-2px))]",
     // Label-color tints: hover 10%, press 14%, pressed toggle 16%
-    "[--toolbar-highlight:color-mix(in_oklab,currentColor_var(--toolbar-highlight-mix,10%),transparent)] [--toolbar-press:color-mix(in_oklab,currentColor_var(--toolbar-press-mix,14%),transparent)] [--toolbar-pressed:color-mix(in_oklab,currentColor_16%,transparent)]",
+    "[--toolbar-highlight:color-mix(in_oklab,currentColor_10%,transparent)] [--toolbar-press:color-mix(in_oklab,currentColor_14%,transparent)] [--toolbar-pressed:color-mix(in_oklab,currentColor_16%,transparent)]",
     // The shell is fixed and items stretch to fill it; columns grow to the
     // widest item.
     "data-[orientation=horizontal]:h-(--toolbar-h) data-[orientation=vertical]:min-w-(--toolbar-h)",
-    "data-disabled:opacity-60 data-disabled:**:data-toolbar-item:opacity-100",
+    // Parts dim with the shell, not twice.
+    "data-disabled:opacity-60 data-disabled:**:data-toolbar-part:opacity-100",
   ],
   {
     variants: {
       variant: {
-        // The surface's inner rim is the 1px border, so it meets the shadow
-        // ring as on other raised surfaces.
-        elevated: cn(
-          solidSurface(3, 3),
-          "text-foreground shadow-(--surface-shadow-3) border border-(--surface-rim-color) [--toolbar-border:1px]",
-        ),
-        outline:
-          "bg-card text-foreground border border-transparent outline outline-border [--toolbar-border:1px]",
-        soft: "bg-secondary text-secondary-foreground border border-transparent [--toolbar-border:1px]",
-        ghost:
-          "text-foreground border border-transparent [--toolbar-border:1px]",
+        elevated: cn(solidSurface(3, 3), "text-foreground"),
+        outline: "bg-card text-foreground outline outline-border",
+        soft: "bg-secondary text-secondary-foreground",
+        ghost: "text-foreground",
       },
       // Button's height ladder (one step taller below sm); corners step with it.
       size: {
@@ -52,27 +45,27 @@ const toolbarVariants = cva(
         lg: "[--toolbar-h:--spacing(11)] sm:[--toolbar-h:--spacing(10)] [--toolbar-radius:calc(var(--radius)+2px)]",
       },
     },
-    defaultVariants: {
-      variant: "elevated",
-      size: "default",
-    },
   },
 );
 
-// Shared by every item: the 1px inset, concentric corners, and stretch.
+// Shared by every item: concentric corners and stretch. The inset borders
+// are in toolbar.css. Box corners are the paint's + 2px, the shell's; the
+// ring overlaps the border, inside the gutter.
 const itemShell = cn(
-  "shrink-0 border border-transparent",
-  "rounded-[calc(var(--toolbar-item-radius)+1px)] before:rounded-(--toolbar-item-radius) focus-visible:outline-offset-0 focus-visible:z-10",
+  "shrink-0",
+  "rounded-[calc(var(--toolbar-item-radius)+2px)] before:rounded-(--toolbar-item-radius) focus-visible:-outline-offset-1 focus-visible:z-10",
   "h-auto self-stretch sm:h-auto",
-  // In a column every item keeps the ladder height.
-  "in-data-[orientation=vertical]:h-[calc(var(--toolbar-h)-var(--toolbar-border)*2)] in-data-[orientation=vertical]:sm:h-[calc(var(--toolbar-h)-var(--toolbar-border)*2)]",
+  // In a column every item gets the row's paint height, whatever its
+  // borders.
+  "group-data-[orientation=vertical]/toolbar:box-content group-data-[orientation=vertical]/toolbar:py-0 group-data-[orientation=vertical]/toolbar:h-[calc(var(--toolbar-h)-4px)] sm:group-data-[orientation=vertical]/toolbar:h-[calc(var(--toolbar-h)-4px)]",
 );
 
-// Icon-only items are square: as wide as the row is tall, or in a column,
-// as wide as the column.
+// Icon-only items have a square paint (the content box, with no padding),
+// whatever each side's border: as tall as the row, or as wide as the column.
 const iconSquare = {
-  horizontal: "aspect-square w-auto px-0 sm:w-auto",
-  vertical: "w-full px-0",
+  horizontal: "box-content aspect-square w-auto px-0 sm:w-auto",
+  vertical:
+    "box-content aspect-square w-auto px-0 sm:w-auto group-data-[orientation=vertical]/toolbar:h-auto sm:group-data-[orientation=vertical]/toolbar:h-auto",
 };
 
 type ToolbarVariant = NonNullable<
@@ -109,8 +102,8 @@ export type ToolbarProps = BaseToolbar.Root.Props & {
 
 function Toolbar({
   className,
-  variant,
-  size,
+  variant = "elevated",
+  size = "default",
   orientation = "horizontal",
   highlight = true,
   children,
@@ -122,8 +115,8 @@ function Toolbar({
     <ToolbarContext.Provider value={context}>
       <BaseToolbar.Root
         data-slot="toolbar"
-        data-variant={variant ?? "elevated"}
-        data-size={size ?? "default"}
+        data-variant={variant}
+        data-size={size}
         data-glide={highlight ? "" : undefined}
         orientation={orientation}
         className={cn(toolbarVariants({ variant, size }), className)}
@@ -141,7 +134,7 @@ export type ToolbarButtonProps = BaseToolbar.Button.Props & ButtonProps;
 
 /**
  * A quiet Button. Give it a `variant` to mark the main action; it keeps its
- * own fill.
+ * own fill and hover, and the highlight skips it.
  */
 function ToolbarButton({
   className,
@@ -156,7 +149,8 @@ function ToolbarButton({
   return (
     <BaseToolbar.Button
       data-slot="toolbar-button"
-      data-toolbar-item=""
+      data-toolbar-part=""
+      data-toolbar-item={variant ? undefined : ""}
       render={
         <Button
           variant={variant}
@@ -192,6 +186,7 @@ function ToolbarToggle({ className, children, ...props }: ToolbarToggleProps) {
   return (
     <BaseToolbar.Button
       data-slot="toolbar-toggle"
+      data-toolbar-part=""
       data-toolbar-item=""
       render={
         <Toggle
@@ -270,6 +265,7 @@ function ToolbarInput({ className, ...props }: ToolbarInputProps) {
   return (
     <BaseToolbar.Input
       data-slot="toolbar-input"
+      data-toolbar-part=""
       className={cn(
         itemShell,
         "placeholder:text-muted-foreground min-w-0 bg-transparent bg-clip-padding px-2.5 text-sm text-current",
@@ -290,6 +286,7 @@ function ToolbarLink({ className, ...props }: ToolbarLinkProps) {
   return (
     <BaseToolbar.Link
       data-slot="toolbar-link"
+      data-toolbar-part=""
       data-toolbar-item=""
       className={cn(
         "relative isolate inline-flex items-center gap-1.5 px-2.5 text-sm font-medium whitespace-nowrap no-underline",

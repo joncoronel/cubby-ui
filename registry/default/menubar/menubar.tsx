@@ -29,35 +29,34 @@ import {
 } from "@/registry/default/lib/elevated";
 import "./menubar.css";
 
-// A shell, as in Button Group and Toolbar. The inset is two 1px transparent
-// borders, one on the shell and one on each trigger, so plates sit 2px from
-// the edge and from each other and snap alike at every display scale.
-// Outline draws its line as an outline just outside the shell, the way
-// elevated's shadow ring sits outside. A highlight glides to the hovered, focused, or open trigger's
-// plate (menubar.css).
+// A shell, as in Button Group and Toolbar. The inset is the triggers' own
+// transparent borders: 2px on a side facing the shell's edge, 1px on a side
+// facing a neighbour. Borders snap to whole device pixels, so the edge is
+// never thinner than the gap, and the edge gap hovers with its trigger.
+// `of` counts triggers only, so the guard spans Base UI inserts after an
+// open trigger can't move the ends. Outline draws its line as an outline
+// just outside the shell. A highlight glides to the hovered, focused, or
+// open trigger's plate (menubar.css).
 const menubarVariants = cva(
   [
-    "relative isolate flex w-fit items-stretch rounded-(--menubar-radius) data-[orientation=vertical]:flex-col",
-    "[--menubar-item-radius:max(0px,calc(var(--menubar-radius)-var(--menubar-border)-1px))]",
+    "group/menubar relative isolate flex w-fit items-stretch rounded-(--menubar-radius) data-[orientation=vertical]:flex-col",
+    // Paint corners are the shell's minus the 2px edge border.
+    "[--menubar-item-radius:max(0px,calc(var(--menubar-radius)-2px))]",
     // Label-color tints: hover 10%, press 14%
     "[--menubar-highlight:color-mix(in_oklab,currentColor_10%,transparent)] [--menubar-press:color-mix(in_oklab,currentColor_14%,transparent)]",
     "data-[orientation=horizontal]:h-(--menubar-h) data-[orientation=vertical]:min-w-(--menubar-h)",
-    "data-disabled:opacity-60",
+    "data-[orientation=horizontal]:[&>[data-menubar-item]]:border-y-2 data-[orientation=horizontal]:[&>:nth-child(1_of_[data-menubar-item])]:border-s-2 data-[orientation=horizontal]:[&>:nth-last-child(1_of_[data-menubar-item])]:border-e-2",
+    "data-[orientation=vertical]:[&>[data-menubar-item]]:border-x-2 data-[orientation=vertical]:[&>:nth-child(1_of_[data-menubar-item])]:border-t-2 data-[orientation=vertical]:[&>:nth-last-child(1_of_[data-menubar-item])]:border-b-2",
+    // Triggers dim with the shell, not twice.
+    "data-disabled:opacity-60 data-disabled:**:data-menubar-item:opacity-100",
   ],
   {
     variants: {
       variant: {
-        // The surface's inner rim is the 1px border, so it meets the shadow
-        // ring as on other raised surfaces.
-        elevated: cn(
-          solidSurface(2, 2),
-          "text-foreground shadow-(--surface-shadow-2) border border-(--surface-rim-color) [--menubar-border:1px]",
-        ),
-        outline:
-          "bg-card text-foreground border border-transparent outline outline-border [--menubar-border:1px]",
-        soft: "bg-secondary text-secondary-foreground border border-transparent [--menubar-border:1px]",
-        ghost:
-          "text-foreground border border-transparent [--menubar-border:1px]",
+        elevated: cn(solidSurface(2, 2), "text-foreground"),
+        outline: "bg-card text-foreground outline outline-border",
+        soft: "bg-secondary text-secondary-foreground",
+        ghost: "text-foreground",
       },
       // Button's height ladder (one step taller below sm); corners step with it.
       size: {
@@ -67,33 +66,41 @@ const menubarVariants = cva(
         lg: "[--menubar-h:--spacing(11)] sm:[--menubar-h:--spacing(10)] [--menubar-radius:calc(var(--radius)+2px)]",
       },
     },
-    defaultVariants: {
-      variant: "elevated",
-      size: "default",
-    },
   },
 );
 
-export type MenubarProps = BaseMenubar.Props &
-  VariantProps<typeof menubarVariants> & {
-    /** Glide a shared highlight between triggers. */
-    highlight?: boolean;
-  };
+type MenubarVariant = NonNullable<
+  VariantProps<typeof menubarVariants>["variant"]
+>;
+type MenubarSize = NonNullable<VariantProps<typeof menubarVariants>["size"]>;
+
+export type MenubarProps = BaseMenubar.Props & {
+  /** Shell style. */
+  variant?: MenubarVariant;
+  /** Outer height, on Button's ladder. */
+  size?: MenubarSize;
+  /** Glide a shared highlight between triggers. */
+  highlight?: boolean;
+};
 
 function Menubar({
   className,
-  variant,
-  size,
+  variant = "elevated",
+  size = "default",
   highlight = true,
+  disabled,
   children,
   ...props
 }: MenubarProps) {
   return (
     <BaseMenubar
       data-slot="menubar"
-      data-variant={variant ?? "elevated"}
-      data-size={size ?? "default"}
+      data-variant={variant}
+      data-size={size}
+      // Base UI's Menubar state has no disabled flag, so it sets no attribute.
+      data-disabled={disabled ? "" : undefined}
       data-glide={highlight ? "" : undefined}
+      disabled={disabled}
       className={cn(menubarVariants({ variant, size }), className)}
       {...props}
     >
@@ -114,10 +121,12 @@ const triggerClasses = cn(
   buttonVariants({ variant: "ghost", size: null }),
   "shrink-0 border border-transparent px-2.5 text-sm font-medium text-current hover:text-current data-popup-open:text-current",
   "[--btn-bg-hover:var(--menubar-highlight)] [--btn-bg-active:var(--menubar-press)]",
-  // Box corners are the paint's + 1px, so paint, gap, and focus ring (at
-  // offset 0) are concentric.
-  "rounded-[calc(var(--menubar-item-radius)+1px)] before:rounded-(--menubar-item-radius) focus-visible:outline-offset-0 focus-visible:z-10",
-  "h-auto self-stretch in-data-[orientation=vertical]:h-[calc(var(--menubar-h)-var(--menubar-border)*2)] in-data-[orientation=vertical]:justify-start",
+  // Box corners are the paint's + 2px, the shell's. The ring overlaps the
+  // border, inside the gutter.
+  "rounded-[calc(var(--menubar-item-radius)+2px)] before:rounded-(--menubar-item-radius) focus-visible:-outline-offset-1 focus-visible:z-10",
+  // In a column every trigger gets the row's paint height, whatever its
+  // borders.
+  "h-auto self-stretch group-data-[orientation=vertical]/menubar:box-content group-data-[orientation=vertical]/menubar:h-[calc(var(--menubar-h)-4px)] group-data-[orientation=vertical]/menubar:py-0 group-data-[orientation=vertical]/menubar:justify-start",
 );
 
 function MenubarTrigger({
@@ -183,10 +192,10 @@ function MenubarContent({
             // escapes it by transitioning scale and opacity alone.
             "will-change-transform",
             "motion-reduce:transition-none motion-reduce:will-change-auto",
-            // 'group' marks a switch to another menu in the bar, File to Edit.
-            // Those swap instantly, as in native menu bars; only the first
-            // open and the final close animate. 'dismiss' must animate or
-            // there is no exit.
+            // 'group' marks a switch to another menu in the bar, File to Edit,
+            // and a close by tabbing out. Both are instant, as in native menu
+            // bars; the first open and other closes animate. 'dismiss' must
+            // animate or there is no exit.
             // The start and end styles are pinned too, or the swap frame shows
             // both popups at opacity 0.
             "data-[instant=group]:transition-none data-[instant=group]:data-ending-style:scale-100 data-[instant=group]:data-ending-style:opacity-100 data-[instant=group]:data-starting-style:scale-100 data-[instant=group]:data-starting-style:opacity-100",

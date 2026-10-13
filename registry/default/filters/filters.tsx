@@ -44,8 +44,10 @@ import {
   describeFilter,
   isFilterComplete,
   operatorLabel,
+  FILTER_ENDS,
   FILTER_SEGMENT,
   FILTER_SEGMENT_INTERACTIVE,
+  FILTER_SEGMENT_SQUARE,
   FILTER_SIZES,
   FILTER_TINTS,
   FILTER_VARIANTS,
@@ -441,8 +443,9 @@ const FilterChip = React.memo(function FilterChip({
         data-incomplete={incomplete ? "" : undefined}
         aria-label={describeFilter(field, filter, labels.operators)}
         className={cn(
-          "text-foreground inline-flex max-w-full shrink-0 items-center rounded-lg border",
+          "text-foreground inline-flex max-w-full shrink-0 items-center rounded-lg",
           FILTER_VARIANTS[variant],
+          FILTER_ENDS,
           FILTER_TINTS,
           "transition-[outline-color,border-color] duration-150",
           FILTER_SIZES[size],
@@ -489,7 +492,7 @@ function FilterChipField({
     <span
       data-slot="filter-chip-field"
       className={cn(
-        "text-muted-foreground inline-flex h-full shrink-0 items-center gap-1.5 border border-transparent ps-(--seg-x) pe-1 whitespace-nowrap",
+        "text-muted-foreground inline-flex h-full shrink-0 items-center gap-1.5 border border-y-2 border-transparent ps-(--seg-x) pe-1 whitespace-nowrap",
         className,
       )}
       {...props}
@@ -567,7 +570,8 @@ function FilterChipRemove({
       className={cn(
         FILTER_SEGMENT,
         FILTER_SEGMENT_INTERACTIVE,
-        "text-muted-foreground hover:text-foreground aspect-square justify-center px-0 [&_svg]:size-3.5",
+        "text-muted-foreground hover:text-foreground [&_svg]:size-3.5",
+        FILTER_SEGMENT_SQUARE,
         className,
       )}
       onClick={(event) => {
@@ -635,8 +639,9 @@ function FilterActions({
       data-variant={variant}
       className={cn(
         // No gap: a folded clear segment would still get one; it brings its own.
-        "text-foreground inline-flex shrink-0 items-center rounded-lg border",
+        "text-foreground inline-flex shrink-0 items-center rounded-lg",
         FILTER_VARIANTS[variant],
+        FILTER_ENDS,
         FILTER_TINTS,
         FILTER_SIZES[size],
         className,
@@ -684,7 +689,8 @@ function FilterActionsClear({
                 className={cn(
                   FILTER_SEGMENT,
                   FILTER_SEGMENT_INTERACTIVE,
-                  "text-muted-foreground hover:text-foreground aspect-square justify-center px-0 [&_svg]:size-4",
+                  "text-muted-foreground hover:text-foreground [&_svg]:size-4",
+                  FILTER_SEGMENT_SQUARE,
                   className,
                 )}
                 {...props}

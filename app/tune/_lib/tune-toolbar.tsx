@@ -131,7 +131,10 @@ export function TuneToolbar({
   }
 
   return (
-    <Toolbar className="fixed bottom-4 left-1/2 z-50 max-w-[calc(100vw-2rem)] -translate-x-1/2 flex-wrap justify-center">
+    <Toolbar
+      highlight={false}
+      className="fixed bottom-4 left-1/2 z-50 max-w-[calc(100vw-2rem)] -translate-x-1/2 flex-wrap items-center justify-center gap-1 p-1 data-[orientation=horizontal]:h-auto"
+    >
       <ToolbarGroup>
         <Button size="xs" variant="ghost" onClick={onReplay}>
           Replay

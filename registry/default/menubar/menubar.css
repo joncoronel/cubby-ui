@@ -1,0 +1,143 @@
+/* Hit areas: a square ::after over the whole box, corners included, so the
+ * notch between two triggers isn't dead. */
+[data-slot="menubar"] [data-menubar-item]::after {
+  content: "";
+  position: absolute;
+  inset-block: -2px;
+  inset-inline: -1px;
+}
+
+[data-slot="menubar"][data-orientation="vertical"] [data-menubar-item]::after {
+  inset-block: -1px;
+  inset-inline: -2px;
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Gliding highlight. The lit trigger's plate (::before) is the anchor, so
+ * the pill matches it whatever the borders. Without anchor positioning, each
+ * trigger paints its own hover.
+ * -------------------------------------------------------------------------------------------------*/
+
+[data-slot="menubar-highlight"] {
+  display: none;
+}
+
+/* All anchor features or none: a partial implementation leaves the pill
+ * unplaced or tied to another menubar. */
+@supports (anchor-name: --menubar-item) and (anchor-scope: --menubar-item) and
+  (inset: anchor(inside)) {
+  [data-slot="menubar"][data-glide] {
+    anchor-scope: --menubar-item;
+  }
+
+  /* The pill stands in for the triggers' own hover. */
+  [data-slot="menubar"][data-glide] [data-menubar-item] {
+    --btn-bg-hover: transparent;
+    --btn-bg-active: transparent;
+  }
+
+  /* Focus, press, and the open menu's trigger hold the pill. Hover is gated
+   * to real hover (:active covers taps). */
+  [data-slot="menubar"][data-glide]
+    [data-menubar-item]:not(:disabled, [data-disabled]):is(
+      :focus-visible,
+      :active,
+      [data-popup-open]
+    )::before {
+    anchor-name: --menubar-item;
+  }
+
+  /* While a menu is open, hovering another trigger opens it, so the pill
+   * leads on hover instead of waiting for the mount. The open trigger lets
+   * go and keeps its own tint until it closes, so an arrow-key switch still
+   * reads as open. Keyboard focus outranks hover. */
+  @media (hover: hover) {
+    [data-slot="menubar"][data-glide]:not(
+        :has([data-menubar-item]:is(:active, :focus-visible))
+      )
+      [data-menubar-item]:not(:disabled, [data-disabled]):hover::before {
+      anchor-name: --menubar-item;
+    }
+
+    [data-slot="menubar"][data-glide]:has(
+        [data-menubar-item]:not(:disabled, [data-disabled]):hover
+      ):not(:has([data-menubar-item]:is(:active, :focus-visible)))
+      [data-menubar-item][data-popup-open]:not(:hover, :focus-visible)::before {
+      anchor-name: none;
+      background-color: var(--menubar-highlight);
+    }
+  }
+
+  [data-slot="menubar"][data-glide] > [data-slot="menubar-highlight"] {
+    display: block;
+    position: absolute;
+    position-anchor: --menubar-item;
+    inset: anchor(inside);
+    border-radius: var(--menubar-item-radius);
+    background-color: var(--menubar-highlight);
+    /* Rendered last, so it sits under the triggers inside the isolated menubar. */
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0;
+    /* Glides between triggers; appears and goes instantly. */
+    transition:
+      inset 80ms var(--ease-out-expo, cubic-bezier(0.19, 1, 0.22, 1)),
+      background-color 100ms var(--ease-out, cubic-bezier(0, 0, 0.2, 1));
+  }
+
+  [data-slot="menubar"][data-glide]:has(
+      [data-menubar-item]:not(:disabled, [data-disabled]):is(
+          :focus-visible,
+          :active,
+          [data-popup-open]
+        )
+    )
+    > [data-slot="menubar-highlight"] {
+    opacity: 1;
+  }
+
+  @media (hover: hover) {
+    [data-slot="menubar"][data-glide]:has(
+        [data-menubar-item]:not(:disabled, [data-disabled]):hover
+      )
+      > [data-slot="menubar-highlight"] {
+      opacity: 1;
+    }
+  }
+
+  /* While a menu is open, moving across the bar opens the next one, and that
+   * mount blocks the main thread for a few frames. The inset transition runs
+   * there too, so it would stutter; the pill jumps with the menu instead. */
+  [data-slot="menubar"][data-glide]:has([data-menubar-item][data-popup-open])
+    > [data-slot="menubar-highlight"] {
+    transition-property: background-color;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-slot="menubar"][data-glide] > [data-slot="menubar-highlight"] {
+      transition: background-color 100ms
+        var(--ease-out, cubic-bezier(0, 0, 0.2, 1));
+    }
+  }
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Focus ring: 2px inside the fill's edge, on the plate (::before), following
+ * its corners.
+ * -------------------------------------------------------------------------------------------------*/
+
+[data-slot="menubar"] [data-menubar-item]:focus-visible {
+  outline-color: transparent;
+}
+
+[data-slot="menubar"] [data-menubar-item]:focus-visible::before {
+  outline: 2px solid color-mix(in oklab, var(--color-ring) 50%, transparent);
+  outline-offset: -2px;
+}
+
+/* Forced colors drop the fills, so the open trigger gets a Highlight border. */
+@media (forced-colors: active) {
+  [data-slot="menubar"] [data-menubar-item][data-popup-open] {
+    border-color: Highlight;
+  }
+}

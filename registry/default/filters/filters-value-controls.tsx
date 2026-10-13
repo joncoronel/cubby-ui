@@ -138,7 +138,7 @@ function StackedIcons({ options }: { options: FilterOption[] }) {
           key={option.value}
           style={{ zIndex: withIcons.length - index }}
           className={cn(
-            "bg-card ring-card relative flex items-center justify-center rounded-full ring-[1.5px]",
+            "relative flex items-center justify-center rounded-full bg-(--filter-chip-bg) ring-[1.5px] ring-(--filter-chip-bg)",
             index > 0 && "-ms-0.5",
             "transition-[scale,opacity] duration-150 ease-out motion-reduce:transition-none starting:scale-50 starting:opacity-0",
           )}
@@ -302,7 +302,10 @@ function OptionsValueControl({
 
 const INPUT_SEGMENT = cn(
   FILTER_SEGMENT,
-  "hover:bg-surface-hover focus-visible:bg-surface-hover cursor-text bg-transparent font-medium",
+  // Inputs can't render ::before, so their plate is their own background,
+  // and their focus ring an inset one (an outline where forced colors drop it).
+  "hover:bg-(--filter-highlight) focus-visible:bg-(--filter-highlight) cursor-text bg-transparent font-medium [transition-duration:0ms,0ms,100ms]",
+  "focus-visible:inset-ring-2 focus-visible:inset-ring-ring/50 forced-colors:focus-visible:outline-2 forced-colors:focus-visible:-outline-offset-2 forced-colors:focus-visible:outline-[Highlight]",
   "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground placeholder:font-normal",
   "field-sizing-content max-w-48 min-w-[1ch] not-supports-[field-sizing:content]:w-28",
   // 16px on small screens, below which iOS zooms in on a focused input.

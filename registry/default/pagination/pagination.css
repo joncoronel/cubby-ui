@@ -1,7 +1,40 @@
 /* -------------------------------------------------------------------------------------------------
+ * Inset: link borders, 2px facing the shell's edge, 1px facing a neighbour.
+ * The ends are the first and last list items; the indicator is skipped.
+ * -------------------------------------------------------------------------------------------------*/
+
+[data-slot="pagination-content"] [data-slot="pagination-link"] {
+  border: 1px solid transparent;
+  border-block-width: 2px;
+}
+
+/* A square hit area over the whole box, corners included, so hover never
+ * drops between links. */
+[data-slot="pagination-content"] [data-slot="pagination-link"]::after {
+  content: "";
+  position: absolute;
+  inset-block: -2px;
+  inset-inline: -1px;
+}
+
+[data-slot="pagination-content"]
+  > :nth-child(1 of :not([data-slot="pagination-indicator"]))
+  > [data-slot="pagination-link"] {
+  border-inline-start-width: 2px;
+}
+
+[data-slot="pagination-content"]
+  > :nth-last-child(1 of :not([data-slot="pagination-indicator"]))
+  > [data-slot="pagination-link"] {
+  border-inline-end-width: 2px;
+}
+
+/* -------------------------------------------------------------------------------------------------
  * Gliding current page, in CSS anchor positioning.
  *
- * The current link takes the anchor name and the shared fill follows it.
+ * The current link's plate (its ::before, inside the border) takes the
+ * anchor name, so the fill matches the plate whatever the link's border
+ * widths.
  * Without anchor positioning and anchor-scope, the current link paints its
  * own fill instead.
  * -------------------------------------------------------------------------------------------------*/
@@ -10,10 +43,8 @@
   display: none;
 }
 
-/* Links don't transition (see pagination.tsx); labels fade instead. */
-[data-slot="pagination-link-label"] {
-  transition: color 100ms ease-out;
-}
+/* Hover is instant. Only the label of the page becoming current fades,
+ * after the fill (below). */
 
 /* All anchor features or none: a partial implementation leaves the fill
  * unplaced or tied to another list. */
@@ -23,8 +54,11 @@
     anchor-scope: --pagination-current;
   }
 
-  [data-slot="pagination-link"][aria-current="page"] {
+  [data-slot="pagination-link"][aria-current="page"]::before {
     anchor-name: --pagination-current;
+  }
+
+  [data-slot="pagination-link"][aria-current="page"] {
     --btn-bg: transparent;
     --btn-bg-hover: transparent;
     --btn-bg-active: transparent;
@@ -33,7 +67,7 @@
   /* The new label waits for the fill so it never sits light on the shell. */
   [data-slot="pagination-link"][aria-current="page"]
     > [data-slot="pagination-link-label"] {
-    transition-delay: 70ms;
+    transition: color 100ms ease-out 70ms;
   }
 
   [data-slot="pagination-indicator"] {
@@ -41,11 +75,8 @@
     position: absolute;
     position-anchor: --pagination-current;
     inset: anchor(inside);
-    /* The anchor is the link's border box; the same 2px border lines the
-     * fill up with the link's paint. */
-    border: 2px solid transparent;
-    border-radius: calc(var(--pagination-item-radius) + 2px);
-    background: var(--pagination-current-bg) padding-box;
+    border-radius: var(--pagination-item-radius);
+    background-color: var(--pagination-current-bg);
     z-index: -1;
     pointer-events: none;
     /* On first paint the anchor can't interpolate, so the fill starts in
@@ -70,4 +101,19 @@
   [data-slot="pagination-link"][aria-current="page"] {
     border-color: Highlight;
   }
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Focus ring: 2px inside the fill's edge, on the plate (::before), following
+ * its corners.
+ * -------------------------------------------------------------------------------------------------*/
+
+[data-slot="pagination-content"] [data-slot="pagination-link"]:focus-visible {
+  outline-color: transparent;
+}
+
+[data-slot="pagination-content"]
+  [data-slot="pagination-link"]:focus-visible::before {
+  outline: 2px solid color-mix(in oklab, var(--color-ring) 50%, transparent);
+  outline-offset: -2px;
 }

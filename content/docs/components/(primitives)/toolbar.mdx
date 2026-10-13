@@ -1,16 +1,18 @@
 ---
 title: Toolbar
-description: Container for grouping related actions and controls
+description: A row of actions and toggles with arrow-key navigation
 type: primitive
 ---
 
-import { Toolbar, ToolbarButton, ToolbarSeparator } from "@/registry/default/toolbar/toolbar";
+import { Toolbar } from "@/registry/default/toolbar/toolbar";
 
-A toolbar groups related buttons, links, and inputs into a single horizontal or vertical strip with arrow-key navigation between its controls. Use it for a formatting bar, a media player's transport controls, or any cluster of actions that act on the same context.
+A toolbar puts the controls for one context on a single shell, like an editor's formatting bar or a canvas's tool palette. Tab enters and leaves it in one stop, and arrow keys move between controls.
+
+For a short row of actions without arrow keys, use [`ButtonGroup`](/docs/components/button-group). For one set of exclusive options, use [`ToggleGroup`](/docs/components/toggle-group).
 
 ## Preview
 
-<ComponentPreview component="toolbar" example="toolbar-basic" />
+<ComponentPreview component="toolbar" example="toolbar-demo" />
 
 ## Installation
 
@@ -24,48 +26,169 @@ A toolbar groups related buttons, links, and inputs into a single horizontal or 
 
 ```text
 Toolbar
+├── ToolbarButton
+├── ToolbarToggle
+├── ToolbarToggleGroup
+│   └── ToolbarToggle
 ├── ToolbarGroup
-│   └── ToolbarButton
 ├── ToolbarSeparator
 ├── ToolbarInput
 └── ToolbarLink
 ```
 
-Wrap related buttons in `ToolbarGroup` to keep them visually clustered, and use `ToolbarSeparator` to divide groups. `ToolbarButton` defaults to the `ghost` button variant.
+Leave `variant` unset on `ToolbarButton`; it takes the toolbar's quiet style. To open a menu, popover, or dialog, render its trigger as a `ToolbarButton`.
+
+```tsx
+<DropdownMenuTrigger render={<ToolbarButton aria-label="More" />}>
+  <MoreIcon />
+</DropdownMenuTrigger>
+```
 
 ## Examples
 
+### Variants
+
+Use `variant` to pick the shell the controls sit on.
+
+<ComponentPreview component="toolbar" example="toolbar-variants" />
+
+| Variant    | Description                                       |
+| ---------- | ------------------------------------------------- |
+| `elevated` | The default. A raised surface, for floating bars. |
+| `outline`  | An outline Button's fill and border.              |
+| `soft`     | A secondary Button's fill, for editor chrome.     |
+| `ghost`    | No shell, for bars inside a card or header.       |
+
+### Size
+
+Use `size` to match the toolbar to a Button of the same size; its controls scale their padding, text, and icons with it.
+
+<ComponentPreview component="toolbar" example="toolbar-size" />
+
 ### With Input
 
-Use `ToolbarInput` to place a text field inline with the toolbar's buttons.
+Use `ToolbarInput` for a quiet field in the row; give one button a `variant` to mark the main action.
 
 <ComponentPreview component="toolbar" example="toolbar-with-input" />
 
+### Orientation
+
+Set `orientation="vertical"` for a tool palette; arrow keys follow the axis.
+
+<ComponentPreview component="toolbar" example="toolbar-orientation" />
+
 ## Accessibility
 
-### Keyboard navigation
+### Labels
 
-The toolbar manages a single tab stop with a roving tabindex: `Tab` moves focus into and out of the whole toolbar, and the arrow keys move between controls inside it. Match the arrow direction to the layout by setting `orientation` to `"horizontal"` or `"vertical"`.
+Give the toolbar an `aria-label` that names what it controls ("Text formatting"), and every icon-only control its own.
 
-### Label icon-only buttons
+### Keyboard
 
-A `ToolbarButton` with only an icon has no text for a screen reader to announce. Give it an `aria-label` describing the action.
+Tab moves focus into and out of the toolbar in one stop. Arrow keys move between controls, and focus loops unless you set `loopFocus={false}`. A disabled control stays focusable, so keyboard users can still find it.
 
-```tsx showLineNumbers
-<ToolbarButton aria-label="Bold">
-  <BoldIcon />
-</ToolbarButton>
-```
+### Toggles
+
+`ToolbarToggle` exposes its state with `aria-pressed`, and a pressed toggle keeps a deeper tint than hover. In forced-colors mode a pressed toggle gets a Highlight border.
 
 ## API Reference
 
-The Toolbar component is built on top of [Base UI's Toolbar](https://base-ui.com/react/components/toolbar). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+The Toolbar is built on top of [Base UI's Toolbar](https://base-ui.com/react/components/toolbar). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
 
 For the complete Base UI API, see the [Base UI Toolbar documentation](https://base-ui.com/react/components/toolbar).
 
-### Modified Defaults
+### Props
 
-Our implementation changes the following Base UI prop defaults on ToolbarButton:
+#### Toolbar
 
-- **variant**: defaults to `"ghost"` (Base UI Button defaults to `"solid"`)
-- **size**: defaults to `"default"` (standard Base UI default, but made explicit with buttonVariants)
+The shell. Wraps Base UI's `Toolbar.Root`.
+
+<ApiPropsList>
+
+<ApiProp
+  name="variant"
+  fullType='"elevated" | "outline" | "soft" | "ghost"'
+  simpleType="string"
+  defaultValue='"elevated"'
+>
+  Shell style. `ghost` draws none.
+</ApiProp>
+
+<ApiProp
+  name="size"
+  fullType='"sm" | "default" | "lg"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Outer height, matching `Button`. Controls take their padding, text, and icon
+  size from it.
+</ApiProp>
+
+<ApiProp name="highlight" fullType="boolean" defaultValue="true">
+  Glides one shared highlight between controls. With `false`, each control
+  paints its own hover.
+</ApiProp>
+
+</ApiPropsList>
+
+#### ToolbarButton
+
+A quiet [`Button`](/docs/components/button) in the toolbar. Wraps Base UI's `Toolbar.Button` and takes Button's props.
+
+<ApiPropsList>
+
+<ApiProp
+  name="variant"
+  fullType='"primary" | "secondary" | "outline" | "ghost" | "destructive" | ...'
+  simpleType="string"
+>
+  Unset by default, for the toolbar's quiet style. Set one to mark the main
+  action.
+</ApiProp>
+
+<ApiProp
+  name="size"
+  fullType='"icon" | "sm" | "default" | "lg" | ...'
+  simpleType="string"
+>
+  Button's size. Defaults to the toolbar's: an icon child with `aria-label` or
+  `aria-labelledby` gets the matching icon size (`icon_sm`, `icon`, `icon_lg`),
+  anything else the text size. The toolbar sets the height.
+</ApiProp>
+
+</ApiPropsList>
+
+### Notes
+
+#### ToolbarToggle
+
+A [`Toggle`](/docs/components/toggle) that stays pressed when on. Wraps Base UI's `Toolbar.Button` and takes Toggle's props except `variant` and `size`.
+
+#### ToolbarToggleGroup
+
+Toggles that share a value, like text alignment. Wraps Base UI's `ToggleGroup` and lays its items into the toolbar's row.
+
+#### ToolbarGroup
+
+Groups controls, for example to disable them together with `disabled`. Wraps Base UI's `Toolbar.Group` and adds no layout.
+
+#### ToolbarSeparator
+
+A line between controls, across the toolbar's axis. Arrow keys skip it.
+
+#### ToolbarInput / ToolbarLink
+
+A quiet field and a quiet link. Wrap Base UI's `Toolbar.Input` and `Toolbar.Link`.
+
+## Upgrading
+
+If you're reinstalling over an earlier version, check these changes:
+
+| Before                                         | Now                                                                                                                                            |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Installed as `cubby-ui/toolbar.tsx`            | Installs into a `cubby-ui/toolbar/` folder with `toolbar.css`. Import from `@/components/ui/cubby-ui/toolbar/toolbar` and delete the old file. |
+| `variant="default"`                            | `variant="elevated"`, still the default.                                                                                                       |
+| `level` and `shadowLevel` on `Toolbar`         | Removed; `elevated` uses a fixed surface.                                                                                                      |
+| `ToolbarButton` defaulted to `variant="ghost"` | Leave `variant` unset for the quiet style; a set variant marks the main action.                                                                |
+| `ToolbarButton` defaulted to `size="icon_sm"`  | Size follows the toolbar. An icon-only button needs `aria-label` or `aria-labelledby` to stay square, or pass `size`.                          |
+| `ToolbarGroup` laid out its buttons            | It adds no layout; use `ToolbarSeparator` to split clusters.                                                                                   |

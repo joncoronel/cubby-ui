@@ -33,13 +33,12 @@ function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
 }
 
 // The list is a shell, as in Button Group, with a current-page fill that
-// glides between links (pagination.css). Links fill it with a 2px
-// transparent-border inset (even at fractional display scales); paint
-// corners are the shell's minus its border and the 2px.
+// glides between links. Insets are link borders (pagination.css); plate
+// corners are the shell's minus the 2px edge border.
 const paginationContentVariants = cva(
   [
     "relative isolate flex w-fit flex-row items-stretch rounded-(--pagination-radius)",
-    "[--pagination-item-radius:max(0px,calc(var(--pagination-radius)-var(--pagination-border,0px)-2px))]",
+    "[--pagination-item-radius:max(0px,calc(var(--pagination-radius)-2px))]",
     // Fixed shell; links stretch to fill it
     "h-(--pagination-h)",
     // Current page colors (override to recolor)
@@ -48,8 +47,8 @@ const paginationContentVariants = cva(
   {
     variants: {
       variant: {
-        outline:
-          "border-border bg-card border bg-clip-padding [--pagination-border:1px]",
+        // Outline draws its line as an outline just outside the shell.
+        outline: "bg-card outline outline-border",
         soft: "bg-secondary text-secondary-foreground",
         ghost: "",
       },
@@ -114,18 +113,19 @@ type PaginationLinkProps = useRender.ComponentProps<"a"> & {
 // would add button semantics to elements that must stay links.
 const linkClasses = cn(
   buttonVariants({ variant: "ghost", size: null }),
-  "aspect-square h-auto self-stretch border-2 border-transparent px-2 text-sm tabular-nums",
-  // Box corners are the paint's + 2px, so paint, gap, and focus ring (at
-  // offset 0) are concentric.
-  "rounded-[calc(var(--pagination-item-radius)+2px)] before:rounded-(--pagination-item-radius) focus-visible:outline-offset-0",
+  // The plate (content box, no padding) is square; wider labels grow it.
+  "box-content aspect-square h-auto self-stretch px-0 text-sm tabular-nums",
+  // Box corners are the plate's + 2px; the focus ring is in pagination.css.
+  "rounded-[calc(var(--pagination-item-radius)+2px)] before:rounded-(--pagination-item-radius)",
   // Hover and press: the label color at 10% / 14%
   "[--btn-bg-hover:color-mix(in_oklab,currentColor_10%,transparent)] [--btn-bg-active:color-mix(in_oklab,currentColor_14%,transparent)]",
   // Current page fallback fill, where the indicator can't glide
   "aria-[current=page]:text-(--pagination-current-fg) aria-[current=page]:hover:text-(--pagination-current-fg) aria-[current=page]:[--btn-bg:var(--pagination-current-bg)] aria-[current=page]:[--btn-bg-hover:var(--pagination-current-bg)] aria-[current=page]:[--btn-bg-active:var(--pagination-current-bg)]",
   "aria-disabled:pointer-events-none aria-disabled:opacity-60",
   // No transitions on the link: Chrome skips the indicator's slide when the
-  // new current link starts one. The label span fades instead.
-  "transition-[outline-width,outline-offset,outline-color] aria-[current=page]:before:transition-none",
+  // new current link starts one. Hover is instant; the press tint still
+  // fades (Button's 100ms).
+  "transition-[outline-width,outline-offset,outline-color] before:[transition-duration:0ms,100ms,100ms] active:before:[transition-duration:100ms] aria-[current=page]:before:transition-none",
 );
 
 function PaginationLink({

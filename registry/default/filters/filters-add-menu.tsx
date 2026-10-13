@@ -778,8 +778,9 @@ function AddMenu({
                     className={cn(
                       FILTER_SEGMENT,
                       FILTER_SEGMENT_INTERACTIVE,
-                      // Even icon inset, so the folded segment is square.
-                      "text-muted-foreground hover:text-foreground data-popup-open:text-foreground gap-0 px-(--seg-icon-x)",
+                      // The "+" sits in the side padding; folded, the
+                      // padding goes and the "+" square (below) sets the width.
+                      "text-muted-foreground hover:text-foreground data-popup-open:text-foreground gap-0 px-(--seg-icon-x) data-compact:px-0",
                       className,
                     )}
                     {...(props as React.ComponentProps<"button">)}
@@ -813,11 +814,15 @@ function AddMenu({
               }
             >
               {inActions && (
-                <HugeiconsIcon
-                  icon={PlusSignIcon}
-                  strokeWidth={2}
-                  className="size-4 shrink-0"
-                />
+                // Folded to "+", a square as tall as the plate, so the
+                // segment stays square at any display scale.
+                <span className="flex h-full shrink-0 items-center justify-center in-data-compact:aspect-square">
+                  <HugeiconsIcon
+                    icon={PlusSignIcon}
+                    strokeWidth={2}
+                    className="size-4"
+                  />
+                </span>
               )}
               {/* Folds via a grid column once filters exist: animates in every
                   browser (auto width doesn't) and stays readable to screen readers. */}

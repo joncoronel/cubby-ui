@@ -1,102 +1,140 @@
+"use client";
+
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 import { Menu as BaseMenu } from "@base-ui/react/menu";
 import { Menubar as BaseMenubar } from "@base-ui/react/menubar";
+
 import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/registry/default/button/button";
+import {
+  DropdownMenuCheckboxItem,
+  DropdownMenuGroup,
+  DropdownMenuGroupLabel,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuLinkItem,
+  DropdownMenuPortal,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+} from "@/registry/default/dropdown-menu/dropdown-menu";
 import {
   solidSurface,
   type SurfaceLevel,
 } from "@/registry/default/lib/elevated";
+import "./menubar.css";
 
-import { HugeiconsIcon } from "@hugeicons/react";
-import { CheckIcon, ChevronRightIcon } from "@hugeicons/core-free-icons";
-import {
-  SwitchVisual,
-  type SwitchVisualProps,
-} from "@/registry/default/switch/switch";
+// A shell, as in Button Group and Toolbar. Trigger insets are borders, 2px
+// facing the shell's edge and 1px facing a neighbour; `of` counts triggers
+// only, so Base UI's guard spans can't move the ends. Hit areas, the gliding
+// highlight and focus rings are in menubar.css.
+const menubarVariants = cva(
+  [
+    "group/menubar relative isolate flex w-fit items-stretch rounded-(--menubar-radius) data-[orientation=vertical]:flex-col",
+    // Paint corners are the shell's minus the 2px edge border.
+    "[--menubar-item-radius:max(0px,calc(var(--menubar-radius)-2px))]",
+    // Label-color tints: hover 10%, press 14%
+    "[--menubar-highlight:color-mix(in_oklab,currentColor_10%,transparent)] [--menubar-press:color-mix(in_oklab,currentColor_14%,transparent)]",
+    "data-[orientation=horizontal]:h-(--menubar-h) data-[orientation=vertical]:min-w-(--menubar-h)",
+    "data-[orientation=horizontal]:[&>[data-menubar-item]]:border-y-2 data-[orientation=horizontal]:[&>:nth-child(1_of_[data-menubar-item])]:border-s-2 data-[orientation=horizontal]:[&>:nth-last-child(1_of_[data-menubar-item])]:border-e-2",
+    "data-[orientation=vertical]:[&>[data-menubar-item]]:border-x-2 data-[orientation=vertical]:[&>:nth-child(1_of_[data-menubar-item])]:border-t-2 data-[orientation=vertical]:[&>:nth-last-child(1_of_[data-menubar-item])]:border-b-2",
+    // Triggers dim with the shell, not twice.
+    "data-disabled:opacity-60 data-disabled:**:data-menubar-item:opacity-100",
+  ],
+  {
+    variants: {
+      variant: {
+        elevated: cn(solidSurface(2, 2), "text-foreground"),
+        outline: "bg-card text-foreground outline outline-border",
+        soft: "bg-secondary text-secondary-foreground",
+        ghost: "text-foreground",
+      },
+      // Button's height ladder (one step taller below sm); corners step with it.
+      size: {
+        sm: "[--menubar-h:--spacing(9)] sm:[--menubar-h:--spacing(8)] [--menubar-radius:calc(var(--radius)-2px)]",
+        default:
+          "[--menubar-h:--spacing(10)] sm:[--menubar-h:--spacing(9)] [--menubar-radius:var(--radius)]",
+        lg: "[--menubar-h:--spacing(11)] sm:[--menubar-h:--spacing(10)] [--menubar-radius:calc(var(--radius)+2px)]",
+      },
+    },
+  },
+);
 
-// Shared shell for checkbox and radio items. Padding matches the plain menu
-// item so labels line up across every item type; the indicator lives in a
-// reserved right-hand column so toggling never shifts the label.
-const toggleItemClasses =
-  "group/switch data-highlighted:bg-surface-hover data-highlighted:text-accent-foreground grid cursor-default items-center rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
+type MenubarVariant = NonNullable<
+  VariantProps<typeof menubarVariants>["variant"]
+>;
+type MenubarSize = NonNullable<VariantProps<typeof menubarVariants>["size"]>;
 
-// The check draws itself in. `pathLength` restates the path as 1 unit
-// long, so the dash values are fractions of the stroke and survive a HugeIcons
-// reshape. Deriving the icon array is the only way to reach the path.
-const checkIcon = CheckIcon.map(([tag, attrs]) => [
-  tag,
-  { ...attrs, pathLength: 1 },
-]) as typeof CheckIcon;
-
-const checkmarkClasses =
-  "[&_path]:ease-out-expo [&_path]:transition-[stroke-dashoffset] [&_path]:duration-150 [&_path]:[stroke-dasharray:1] in-data-checked:[&_path]:[stroke-dashoffset:0] in-data-unchecked:[&_path]:[stroke-dashoffset:1] motion-reduce:[&_path]:transition-none";
+export type MenubarProps = BaseMenubar.Props & {
+  /** Shell style. */
+  variant?: MenubarVariant;
+  /** Outer height, on Button's ladder. */
+  size?: MenubarSize;
+  /** Glide a shared highlight between triggers. */
+  highlight?: boolean;
+};
 
 function Menubar({
   className,
-  level = 2,
-  shadowLevel = 2,
+  variant = "elevated",
+  size = "default",
+  highlight = true,
+  disabled,
+  children,
   ...props
-}: React.ComponentProps<typeof BaseMenubar> & {
-  /** Surface elevation level (1-8). Defaults to 2 — a subtle inline toolbar that sits just above the page. */
-  level?: SurfaceLevel;
-  /** Shadow weight (1-8). Defaults to 2. */
-  shadowLevel?: SurfaceLevel;
-}) {
+}: MenubarProps) {
   return (
     <BaseMenubar
       data-slot="menubar"
-      data-level={level}
-      className={cn(
-        "relative flex h-9 items-center gap-1 rounded-lg p-1",
-        solidSurface(level, shadowLevel),
-        className,
-      )}
+      data-variant={variant}
+      data-size={size}
+      // Base UI's Menubar state has no disabled flag, so it sets no attribute.
+      data-disabled={disabled ? "" : undefined}
+      data-glide={highlight ? "" : undefined}
+      disabled={disabled}
+      className={cn(menubarVariants({ variant, size }), className)}
       {...props}
-    />
+    >
+      {children}
+      {highlight && <span aria-hidden data-slot="menubar-highlight" />}
+    </BaseMenubar>
   );
 }
 
-function MenubarMenu({ ...props }: React.ComponentProps<typeof BaseMenu.Root>) {
+function MenubarMenu(props: BaseMenu.Root.Props) {
   return <BaseMenu.Root data-slot="menubar-menu" {...props} />;
 }
 
-function MenubarGroup({
-  ...props
-}: React.ComponentProps<typeof BaseMenu.Group>) {
-  return <BaseMenu.Group data-slot="menubar-group" {...props} />;
-}
-
-function MenubarPortal({
-  ...props
-}: React.ComponentProps<typeof BaseMenu.Portal>) {
-  return <BaseMenu.Portal data-slot="menubar-portal" {...props} />;
-}
-
-function MenubarRadioGroup({
-  ...props
-}: React.ComponentProps<typeof BaseMenu.RadioGroup>) {
-  return <BaseMenu.RadioGroup data-slot="menubar-radio-group" {...props} />;
-}
+// A quiet Button: hover and the open menu paint the label tint. Menu triggers
+// skip Button's press, as everywhere else.
+const triggerClasses = cn(
+  buttonVariants({ variant: "ghost", size: null }),
+  "shrink-0 border border-transparent px-2.5 text-sm font-medium text-current hover:text-current data-popup-open:text-current",
+  "[--btn-bg-hover:var(--menubar-highlight)] [--btn-bg-active:var(--menubar-press)]",
+  // Box corners are the plate's + 2px.
+  "rounded-[calc(var(--menubar-item-radius)+2px)] before:rounded-(--menubar-item-radius) focus-visible:z-10",
+  // In a column every trigger gets the row's paint height.
+  "h-auto self-stretch group-data-[orientation=vertical]/menubar:box-content group-data-[orientation=vertical]/menubar:h-[calc(var(--menubar-h)-4px)] group-data-[orientation=vertical]/menubar:py-0 group-data-[orientation=vertical]/menubar:justify-start",
+);
 
 function MenubarTrigger({
   className,
   delay = 0,
   closeDelay = 0,
   ...props
-}: React.ComponentProps<typeof BaseMenu.Trigger>) {
+}: BaseMenu.Trigger.Props) {
   return (
     <BaseMenu.Trigger
       data-slot="menubar-trigger"
+      data-menubar-item=""
       delay={delay}
       closeDelay={closeDelay}
-      className={cn(
-        "data-popup-open:text-accent-foreground hover:text-accent-foreground hover:bg-surface-hover data-popup-open:bg-surface-hover flex items-center rounded-sm px-2.5 py-1 text-sm font-medium select-none",
-        // Menubar triggers are a real tab stop and arrowing between them moves
-        // DOM focus, so they need a visible indicator. `outline-offset-1`
-        // rather than the usual 2 because the triggers sit in a tight row and
-        // a wider ring would collide with its neighbours.
-        "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-1",
-        className,
-      )}
+      className={cn(triggerClasses, className)}
       {...props}
     />
   );
@@ -106,8 +144,8 @@ function MenubarContent({
   className,
   children,
   align = "start",
-  alignOffset = -4,
-  sideOffset = 8,
+  alignOffset = 0,
+  sideOffset = 4,
   level = 3,
   shadowLevel = 3,
   ...props
@@ -121,7 +159,7 @@ function MenubarContent({
   shadowLevel?: SurfaceLevel;
 }) {
   return (
-    <MenubarPortal>
+    <BaseMenu.Portal>
       {/* No guard here, unlike DropdownMenu: there one positioner is shared by
           detached triggers and physically travels between them. Each MenubarMenu
           mounts its own, with no previous position to animate from. */}
@@ -147,13 +185,10 @@ function MenubarContent({
             // escapes it by transitioning scale and opacity alone.
             "will-change-transform",
             "motion-reduce:transition-none motion-reduce:will-change-auto",
-            // No data-instant guard, deliberately. 'group' is the menubar case,
-            // File to Edit, and suppressing it is the conventional choice. Each
-            // MenubarMenu owns its popup, so the swap is a real unmount and
-            // mount: a guard would snap two separate animations where letting
-            // them run reads as a crossfade. 'dismiss' must animate or there is
-            // no exit, and 'trigger-change' cannot fire with one trigger per
-            // root.
+            // 'group' (a switch to another menu, or a tab-out close) is
+            // instant, as in native menu bars. Start and end styles are pinned
+            // too, or the swap frame shows both popups at opacity 0.
+            "data-[instant=group]:transition-none data-[instant=group]:data-ending-style:scale-100 data-[instant=group]:data-ending-style:opacity-100 data-[instant=group]:data-starting-style:scale-100 data-[instant=group]:data-starting-style:opacity-100",
             className,
           )}
           {...props}
@@ -182,308 +217,26 @@ function MenubarContent({
           </BaseMenu.Viewport>
         </BaseMenu.Popup>
       </BaseMenu.Positioner>
-    </MenubarPortal>
+    </BaseMenu.Portal>
   );
 }
 
-function MenubarItem({
-  className,
-  inset,
-  variant = "default",
-  ...props
-}: React.ComponentProps<typeof BaseMenu.Item> & {
-  inset?: boolean;
-  variant?: "default" | "destructive";
-}) {
-  return (
-    <BaseMenu.Item
-      data-slot="menubar-item"
-      data-inset={inset || undefined}
-      data-variant={variant}
-      className={cn(
-        "data-highlighted:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:data-highlighted:bg-destructive/20 data-[variant=destructive]:data-highlighted:text-destructive-foreground data-[variant=destructive]:*:[svg]:text-destructive! data-highlighted:data-[variant=destructive]:*:[svg]:text-destructive-foreground! [&_svg:not([class*='text-'])]:text-muted-foreground data-highlighted:bg-surface-hover relative flex cursor-default items-center gap-2 rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-
-function MenubarLinkItem({
-  className,
-  inset,
-  ...props
-}: React.ComponentProps<typeof BaseMenu.LinkItem> & {
-  inset?: boolean;
-}) {
-  return (
-    <BaseMenu.LinkItem
-      data-slot="menubar-link-item"
-      data-inset={inset || undefined}
-      className={cn(
-        "data-highlighted:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground data-highlighted:bg-surface-hover relative flex cursor-default items-center gap-2 rounded-md px-2.5 py-1.5 text-sm no-underline outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-
-function MenubarCheckboxItem({
-  className,
-  children,
-  checked,
-  inset,
-  indicator = "check",
-  switchColor = "primary",
-  switchShape = "circle",
-  switchSize = "xs",
-  switchMotion = "default",
-  ...props
-}: React.ComponentProps<typeof BaseMenu.CheckboxItem> & {
-  inset?: boolean;
-  /** Which indicator sits in the right-hand column. `"switch"` is visual only — the item keeps the `menuitemcheckbox` role. */
-  indicator?: "check" | "switch";
-  /** Checked track colour, when `indicator="switch"`. */
-  switchColor?: SwitchVisualProps["color"];
-  /** Thumb silhouette, when `indicator="switch"`. */
-  switchShape?: SwitchVisualProps["shape"];
-  /** Thumb size, when `indicator="switch"`. Defaults to `xs`, which matches the row's text. */
-  switchSize?: SwitchVisualProps["size"];
-  /** How the thumb travels, when `indicator="switch"`. */
-  switchMotion?: SwitchVisualProps["motion"];
-}) {
-  return (
-    <BaseMenu.CheckboxItem
-      data-slot="menubar-checkbox-item"
-      data-inset={inset || undefined}
-      data-indicator={indicator}
-      className={cn(
-        toggleItemClasses,
-        indicator === "switch"
-          ? "grid-cols-[1fr_auto] gap-3"
-          : "grid-cols-[1fr_1rem] gap-2",
-        className,
-      )}
-      checked={checked}
-      {...props}
-    >
-      <span className="col-start-1 flex min-w-0 items-center gap-2">
-        {children}
-      </span>
-      {indicator === "switch" ? (
-        // Visual only: the row carries the role and the click target, so a real
-        // Switch here would nest a focusable control inside a menuitemcheckbox.
-        // Base UI's indicator supplies the aria-hidden.
-        <SwitchVisual
-          color={switchColor}
-          shape={switchShape}
-          size={switchSize}
-          motion={switchMotion}
-          className="col-start-2"
-          render={<BaseMenu.CheckboxItemIndicator keepMounted />}
-        />
-      ) : (
-        <BaseMenu.CheckboxItemIndicator
-          keepMounted
-          className="col-start-2 flex items-center justify-center"
-        >
-          <HugeiconsIcon
-            icon={checkIcon}
-            strokeWidth={2.5}
-            className={cn("size-4", checkmarkClasses)}
-          />
-        </BaseMenu.CheckboxItemIndicator>
-      )}
-    </BaseMenu.CheckboxItem>
-  );
-}
-
-function MenubarRadioItem({
-  className,
-  children,
-  inset,
-  ...props
-}: React.ComponentProps<typeof BaseMenu.RadioItem> & {
-  inset?: boolean;
-}) {
-  return (
-    <BaseMenu.RadioItem
-      data-slot="menubar-radio-item"
-      data-inset={inset || undefined}
-      className={cn(toggleItemClasses, "grid-cols-[1fr_1rem] gap-2", className)}
-      {...props}
-    >
-      <span className="col-start-1 flex min-w-0 items-center gap-2">
-        {children}
-      </span>
-      <BaseMenu.RadioItemIndicator
-        keepMounted
-        className="col-start-2 flex items-center justify-center"
-      >
-        <HugeiconsIcon
-          icon={checkIcon}
-          strokeWidth={2.5}
-          className={cn("size-4", checkmarkClasses)}
-        />
-      </BaseMenu.RadioItemIndicator>
-    </BaseMenu.RadioItem>
-  );
-}
-
-function MenubarLabel({
-  className,
-  inset,
-  ...props
-}: React.ComponentProps<"div"> & {
-  inset?: boolean;
-}) {
-  return (
-    <div
-      data-slot="menubar-label"
-      data-inset={inset || undefined}
-      className={cn(
-        "px-2.5 py-1.5 text-xs font-medium data-inset:pl-8",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-
-function MenubarGroupLabel({
-  className,
-  inset,
-  ...props
-}: React.ComponentProps<typeof BaseMenu.GroupLabel> & {
-  inset?: boolean;
-}) {
-  return (
-    <BaseMenu.GroupLabel
-      data-slot="menubar-group-label"
-      data-inset={inset || undefined}
-      className={cn(
-        "px-2.5 py-1.5 text-xs font-medium data-inset:pl-8",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-
-function MenubarSeparator({
-  className,
-  ...props
-}: React.ComponentProps<typeof BaseMenu.Separator>) {
-  return (
-    <BaseMenu.Separator
-      data-slot="menubar-separator"
-      // Inset to the item label, not the popup edge: mx-2.5 clears the
-      // viewport's p-1 plus the item's px-2.5, so the rule starts where the
-      // text does instead of running into the popup's rounded corners.
-      className={cn("bg-border mx-2.5 my-1 h-px", className)}
-      {...props}
-    />
-  );
-}
-
-function MenubarShortcut({
-  className,
-  ...props
-}: React.ComponentProps<"span">) {
-  return (
-    <span
-      data-slot="menubar-shortcut"
-      className={cn(
-        "text-muted-foreground ml-auto text-xs tracking-widest",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-
-function MenubarSub({
-  ...props
-}: React.ComponentProps<typeof BaseMenu.SubmenuRoot>) {
-  return <BaseMenu.SubmenuRoot data-slot="menubar-sub" {...props} />;
-}
-
-function MenubarSubTrigger({
-  className,
-  inset,
-  children,
-  ...props
-}: React.ComponentProps<typeof BaseMenu.SubmenuTrigger> & {
-  inset?: boolean;
-}) {
-  return (
-    <BaseMenu.SubmenuTrigger
-      data-slot="menubar-sub-trigger"
-      data-inset={inset || undefined}
-      className={cn(
-        "data-highlighted:text-accent-foreground data-popup-open:text-accent-foreground data-highlighted:bg-surface-hover data-popup-open:bg-surface-hover flex cursor-default items-center rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-inset:pl-8",
-        className,
-      )}
-      {...props}
-    >
-      {children}
-      <HugeiconsIcon
-        icon={ChevronRightIcon}
-        className="ml-auto h-4 w-4"
-        strokeWidth={2}
-      />
-    </BaseMenu.SubmenuTrigger>
-  );
-}
-
-function MenubarSubContent({
-  className,
-  children,
-  sideOffset = 8,
-  level = 5,
-  shadowLevel = 3,
-  ...props
-}: React.ComponentProps<typeof BaseMenu.Popup> & {
-  sideOffset?: BaseMenu.Positioner.Props["sideOffset"];
-  /** Surface elevation level for the submenu bg (1-8). Defaults to 5 — one tier above the parent menu's default of 3. */
-  level?: SurfaceLevel;
-  /** Shadow weight (1-8). Pinned to 3 by default so the submenu reads the same dropdown weight as its parent. */
-  shadowLevel?: SurfaceLevel;
-}) {
-  return (
-    <MenubarPortal>
-      <BaseMenu.Positioner
-        className="z-50 max-h-(--available-height) max-w-(--available-width)"
-        sideOffset={sideOffset}
-      >
-        <BaseMenu.Popup
-          data-slot="menubar-sub-content"
-          data-level={level}
-          className={cn(
-            "text-popover-foreground relative max-h-(--available-height) max-w-(--available-width) min-w-[12rem] overflow-hidden rounded-xl outline-none",
-            solidSurface(level, shadowLevel),
-            // Submenus open as their own popup (no Viewport content-swap) — scale + fade
-            "ease-out-expo origin-(--transform-origin) transition-[transform,scale,opacity] duration-100",
-            "data-starting-style:scale-95 data-starting-style:opacity-0",
-            "data-ending-style:scale-95 data-ending-style:opacity-0",
-            "motion-reduce:transition-none",
-            className,
-          )}
-          {...props}
-        >
-          {/* The popup above is capped at --available-height and clips, so the
-            scroll container has to live here or a tall submenu silently
-            truncates. The main popups get this from Menu.Viewport; a
-            submenu has none, so it is spelled out. */}
-          <div className="max-h-(--available-height) overflow-x-hidden overflow-y-auto p-1">
-            {children}
-          </div>
-        </BaseMenu.Popup>
-      </BaseMenu.Positioner>
-    </MenubarPortal>
-  );
-}
+// The menu's contents are Dropdown Menu's parts: a menubar menu is the same
+// Base UI Menu.
+const MenubarPortal = DropdownMenuPortal;
+const MenubarGroup = DropdownMenuGroup;
+const MenubarLabel = DropdownMenuLabel;
+const MenubarGroupLabel = DropdownMenuGroupLabel;
+const MenubarItem = DropdownMenuItem;
+const MenubarLinkItem = DropdownMenuLinkItem;
+const MenubarCheckboxItem = DropdownMenuCheckboxItem;
+const MenubarRadioGroup = DropdownMenuRadioGroup;
+const MenubarRadioItem = DropdownMenuRadioItem;
+const MenubarSeparator = DropdownMenuSeparator;
+const MenubarShortcut = DropdownMenuShortcut;
+const MenubarSub = DropdownMenuSub;
+const MenubarSubTrigger = DropdownMenuSubTrigger;
+const MenubarSubContent = DropdownMenuSubContent;
 
 export {
   Menubar,
@@ -504,4 +257,5 @@ export {
   MenubarSub,
   MenubarSubTrigger,
   MenubarSubContent,
+  menubarVariants,
 };

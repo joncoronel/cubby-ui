@@ -1,3 +1,6 @@
+import { cn } from "@/lib/utils";
+import { solidSurface } from "@/registry/default/lib/elevated";
+
 import type {
   FilterField,
   FilterFieldType,
@@ -5,29 +8,82 @@ import type {
   FilterOperatorShape,
   FilterSize,
   FilterValue,
+  FilterVariant,
   NumberRange,
 } from "./filters-types";
 
 /** TextMorph duration for click-driven labels; snappier than the default 240ms. */
 export const CLICK_MORPH_MS = 209;
 
-/** Shared segment classes. Radius is the chip's minus 1px border and 2px inset, for concentric hover plates. */
-export const FILTER_SEGMENT =
-  "inline-flex h-full shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[calc(var(--radius-lg)-3px)] px-(--seg-x) outline-0 outline-transparent outline-solid transition-[background-color,color,outline-color] duration-100 ease-out focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring/50";
+/**
+ * Shared segment classes. Insets are segment borders, 2px facing the chip's
+ * edge and 1px facing a neighbour (FILTER_ENDS sets the ends). The plate is
+ * ::before, so it scales on press while the label holds still; its corners
+ * are the chip's minus 2px. Hover is instant; the press tint still fades.
+ */
+export const FILTER_SEGMENT = cn(
+  "relative isolate inline-flex h-full shrink-0 items-center gap-1.5 whitespace-nowrap border border-y-2 border-transparent bg-clip-padding rounded-lg px-(--seg-x) outline-0 outline-transparent outline-solid transition-[background-color,color,outline-color] duration-100 ease-out [transition-duration:100ms,0ms,100ms] focus-visible:before:outline-2 focus-visible:before:-outline-offset-2 focus-visible:before:outline-ring/50",
+  // A square hit area over the whole box, so hover never drops between
+  // segments.
+  "after:absolute after:-inset-x-px after:-inset-y-0.5 after:content-['']",
+  "before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-[calc(var(--radius-lg)-2px)] before:content-[''] before:transition-[background-color,scale] before:duration-100 before:ease-out before:[transition-duration:0ms,100ms] active:before:[transition-duration:100ms]",
+);
 
+/**
+ * Ends of a chip or the actions capsule get the 2px border. `of` counts
+ * segments only, so Base UI's guard spans can't move them. In the capsule,
+ * add is the end until clear unfolds.
+ */
+export const FILTER_ENDS = cn(
+  "[&>:nth-child(1_of_[data-slot^=filter-chip-])]:border-s-2 [&>:nth-last-child(1_of_[data-slot^=filter-chip-])]:border-e-2",
+  // With clear unfolded, add and clear reach to the separator's line.
+  "[&:has([data-slot=filter-clear-segment][data-active])_[data-slot=filter-add]]:after:-end-[5px] [&_[data-slot=filter-clear]]:after:-start-[5px]",
+  "[&_[data-slot=filter-add]]:border-s-2 [&:has([data-slot=filter-clear-segment][data-active])_[data-slot=filter-clear]]:border-e-2 [&:not(:has([data-slot=filter-clear-segment][data-active]))_[data-slot=filter-add]]:border-e-2",
+);
+
+/** Icon-only segments: the plate (content box) is square. */
+export const FILTER_SEGMENT_SQUARE =
+  "box-content aspect-square h-auto self-stretch justify-center px-0";
+
+/**
+ * Hover and press as in Button Group: the label color at 10% / 14%, and the
+ * plate scales to 0.98. Menu triggers (aria-haspopup) skip the press and hold
+ * the hover plate while open.
+ */
 export const FILTER_SEGMENT_INTERACTIVE =
-  "cursor-pointer hover:bg-surface-hover active:bg-surface-active data-popup-open:bg-surface-hover";
+  "cursor-pointer hover:before:bg-(--filter-highlight) active:not-aria-[haspopup]:before:bg-(--filter-press) active:not-aria-[haspopup]:before:scale-[0.98] data-popup-open:before:bg-(--filter-highlight) motion-reduce:active:before:scale-100";
+
+/**
+ * Shell classes per variant. The chip has no border; its segments carry the
+ * inset. Outline draws its line just outside, and an incomplete filter
+ * dashes it. `--filter-chip-bg` lets stacked option icons ring in the fill.
+ */
+export const FILTER_VARIANTS: Record<FilterVariant, string> = {
+  outline:
+    "bg-card outline outline-border data-incomplete:outline-dashed [--filter-chip-bg:var(--card)]",
+  soft: "bg-secondary data-incomplete:outline data-incomplete:outline-border data-incomplete:outline-dashed [--filter-chip-bg:var(--secondary)]",
+  elevated: cn(
+    solidSurface(3, 3),
+    "[--filter-chip-bg:var(--surface-3)]",
+    // Incomplete: the drop shadow stays; a dashed outline takes the ring's place.
+    "data-incomplete:shadow-[0_1px_1px_-0.5px_var(--surface-shadow-near),0_3px_3px_-1.5px_var(--surface-shadow-mid)] data-incomplete:outline data-incomplete:outline-border data-incomplete:outline-dashed",
+  ),
+};
+
+/** Tints for segment hover and press, set on each shell. */
+export const FILTER_TINTS =
+  "[--filter-highlight:color-mix(in_oklab,var(--foreground)_10%,transparent)] [--filter-press:color-mix(in_oklab,var(--foreground)_14%,transparent)]";
 
 /**
  * Per-size chip classes; heights match the `Button` ramp. `--seg-x` is segment
  * side padding; `--seg-icon-x` squares an icon-only segment:
- * (height - 2*(1px border + 2px inset) - 16px icon) / 2.
+ * (height - 2*2px segment border - 16px icon) / 2.
  */
 export const FILTER_SIZES: Record<FilterSize, string> = {
-  sm: "h-9 sm:h-8 [--seg-icon-x:7px] sm:[--seg-icon-x:5px] text-sm [--seg-x:0.5rem] [&_[data-slot=filter-chip-field]_svg]:size-3.5",
+  sm: "h-9 sm:h-8 [--seg-icon-x:8px] sm:[--seg-icon-x:6px] text-sm [--seg-x:0.5rem] [&_[data-slot=filter-chip-field]_svg]:size-3.5",
   default:
-    "h-10 sm:h-9 [--seg-icon-x:9px] sm:[--seg-icon-x:7px] text-sm [--seg-x:0.625rem] [&_[data-slot=filter-chip-field]_svg]:size-3.5",
-  lg: "h-11 sm:h-10 [--seg-icon-x:11px] sm:[--seg-icon-x:9px] text-base [--seg-x:0.75rem] [&_[data-slot=filter-chip-field]_svg]:size-4",
+    "h-10 sm:h-9 [--seg-icon-x:10px] sm:[--seg-icon-x:8px] text-sm [--seg-x:0.625rem] [&_[data-slot=filter-chip-field]_svg]:size-3.5",
+  lg: "h-11 sm:h-10 [--seg-icon-x:12px] sm:[--seg-icon-x:10px] text-base [--seg-x:0.75rem] [&_[data-slot=filter-chip-field]_svg]:size-4",
 };
 
 // `FilterValue.value` is `unknown` and may come from untrusted input (URL

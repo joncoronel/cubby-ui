@@ -6,6 +6,7 @@ import type {
   FilterField,
   FilterSize,
   FilterValue,
+  FilterVariant,
   FiltersLabels,
 } from "./lib/filters-types";
 
@@ -18,6 +19,7 @@ interface FiltersStateContextValue {
 interface FiltersActionsContextValue {
   fields: FilterField[];
   size: FilterSize;
+  variant: FilterVariant;
   labels: FiltersLabels;
   fieldsById: Map<string, FilterField>;
   /** Field ids with at least one active filter. Stable across value edits. */

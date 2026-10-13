@@ -77,4 +77,20 @@ function Toggle({ className, variant, size, ...props }: ToggleProps) {
   );
 }
 
-export { Toggle, toggleVariants };
+// A labelled toggle whose only child is an icon component or <svg>, for
+// wrappers that square icon-only items. CSS can't tell: :only-child ignores
+// text nodes. The label check keeps a lone text component (<Trans>) from
+// counting as an icon.
+function isIconOnly(
+  children: React.ReactNode,
+  label: string | undefined,
+): boolean {
+  return (
+    React.isValidElement(children) &&
+    children.type !== React.Fragment &&
+    (typeof children.type !== "string" || children.type === "svg") &&
+    Boolean(label)
+  );
+}
+
+export { Toggle, toggleVariants, isIconOnly };

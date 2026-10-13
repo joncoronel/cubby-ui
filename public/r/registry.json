@@ -901,7 +901,8 @@
         "@cubby-ui/kbd",
         "@cubby-ui/popover",
         "@cubby-ui/transition-panel",
-        "@cubby-ui/use-controllable-state"
+        "@cubby-ui/use-controllable-state",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -1027,16 +1028,21 @@
         {
           "path": "registry/default/menubar/menubar.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/menubar.tsx"
+          "target": "components/ui/cubby-ui/menubar/menubar.tsx"
+        },
+        {
+          "path": "registry/default/menubar/menubar.css",
+          "type": "registry:file",
+          "target": "components/ui/cubby-ui/menubar/menubar.css"
         }
       ],
       "registryDependencies": [
-        "@cubby-ui/switch",
+        "@cubby-ui/button",
+        "@cubby-ui/dropdown-menu",
         "@cubby-ui/elevated"
       ],
       "dependencies": [
-        "@hugeicons/react",
-        "@hugeicons/core-free-icons"
+        "class-variance-authority"
       ]
     },
     {
@@ -2006,11 +2012,17 @@
         {
           "path": "registry/default/toolbar/toolbar.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/toolbar.tsx"
+          "target": "components/ui/cubby-ui/toolbar/toolbar.tsx"
+        },
+        {
+          "path": "registry/default/toolbar/toolbar.css",
+          "type": "registry:file",
+          "target": "components/ui/cubby-ui/toolbar/toolbar.css"
         }
       ],
       "registryDependencies": [
         "@cubby-ui/button",
+        "@cubby-ui/toggle",
         "@cubby-ui/elevated"
       ],
       "dependencies": [

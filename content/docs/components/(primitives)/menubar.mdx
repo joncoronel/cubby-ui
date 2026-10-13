@@ -1,18 +1,14 @@
 ---
 title: Menubar
-description: Horizontal menu bar for organizing navigation and actions
+description: A row of menus, like an app's File, Edit, and View
 type: primitive
 ---
 
-import {
-  Menubar,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarTrigger,
-} from "@/registry/default/menubar/menubar";
+import { Menubar } from "@/registry/default/menubar/menubar";
 
-A horizontal bar of top-level menus, like the File / Edit / View bar in a desktop app. Use it for application-style command surfaces where several menus sit side by side and moving between them keeps the next menu open. For a single menu opened from one button, use [Dropdown Menu](/docs/components/dropdown-menu) instead.
+A menubar sets an app's top-level menus side by side, like File, Edit, and View. Once one menu is open, moving across the bar opens the next, and a highlight glides to the open menu's trigger.
+
+For one menu opened from a button, use [`DropdownMenu`](/docs/components/dropdown-menu).
 
 ## Preview
 
@@ -30,66 +26,124 @@ A horizontal bar of top-level menus, like the File / Edit / View bar in a deskto
 
 ```text
 Menubar
-└── MenubarMenu          (one per top-level menu)
+└── MenubarMenu
     ├── MenubarTrigger
     └── MenubarContent
-        ├── MenubarGroup
-        │   └── MenubarGroupLabel
-        ├── MenubarLabel
         ├── MenubarItem
+        │   └── MenubarShortcut
         ├── MenubarLinkItem
         ├── MenubarCheckboxItem
         ├── MenubarRadioGroup
         │   └── MenubarRadioItem
-        ├── MenubarShortcut   (inside an item)
+        ├── MenubarGroup
+        │   └── MenubarGroupLabel
+        ├── MenubarLabel
         ├── MenubarSeparator
         └── MenubarSub
             ├── MenubarSubTrigger
             └── MenubarSubContent
 ```
 
+Add one `MenubarMenu` per top-level menu. The parts inside `MenubarContent` are [Dropdown Menu](/docs/components/dropdown-menu)'s, under Menubar names.
+
 ## Examples
+
+### Variants
+
+Use `variant` to pick the shell the triggers sit on.
+
+<ComponentPreview component="menubar" example="menubar-variants" />
+
+| Variant    | Description                             |
+| ---------- | --------------------------------------- |
+| `elevated` | The default. A raised surface.          |
+| `outline`  | An outline Button's fill and border.    |
+| `soft`     | A secondary Button's fill.              |
+| `ghost`    | No shell, for a bar in an app's header. |
+
+### Size
+
+Use `size` to match the bar's height to a Button of the same size.
+
+<ComponentPreview component="menubar" example="menubar-size" />
 
 ### With Checkboxes and Switches
 
-Use `MenubarCheckboxItem` for toggles and `MenubarRadioGroup` for single-choice options. Set `indicator="switch"` on a checkbox item to swap its checkmark for a switch.
+Use `MenubarCheckboxItem` for settings and `MenubarRadioGroup` for one choice; set `indicator="switch"` on a checkbox item for a switch.
 
 <ComponentPreview
   component="menubar"
   example="menubar-with-checkboxes-and-switches"
 />
 
+## Accessibility
+
+### Keyboard
+
+Tab moves focus into and out of the bar in one stop. Arrow keys move between triggers, Down or Enter opens a menu, and Left and Right move to the next menu while one is open.
+
+### Highlight
+
+The highlight follows the pointer, keyboard focus, and the open menu. Focus also draws a ring, so the highlight is never the only cue. With reduced motion, it jumps instead of sliding.
+
 ## API Reference
 
-The Menubar component is built on top of [Base UI's Menubar](https://base-ui.com/react/components/menubar). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
+The Menubar is built on top of [Base UI's Menubar](https://base-ui.com/react/components/menubar) and [Menu](https://base-ui.com/react/components/menu). All Base UI props are supported. The documentation below only covers custom props and modified defaults specific to our implementation.
 
 For the complete Base UI API, see the [Base UI Menubar documentation](https://base-ui.com/react/components/menubar).
 
-### Custom Props
+### Props
 
 #### Menubar
 
-The bar element itself is a subtle inline toolbar that sits visibly elevated above the page.
+The shell around the triggers. Wraps Base UI's `Menubar`.
 
 <ApiPropsList>
 
-<ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="2">
-  Surface elevation level for the bar. Defaults to `2`, a subtle toolbar that
-  lifts gently from the page. See the [Surfaces](/docs/getting-started/surfaces)
-  docs.
+<ApiProp
+  name="variant"
+  fullType='"elevated" | "outline" | "soft" | "ghost"'
+  simpleType="string"
+  defaultValue='"elevated"'
+>
+  Shell style. `ghost` draws none.
 </ApiProp>
 
 <ApiProp
-  name="shadowLevel"
-  fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8"
-  defaultValue="2"
+  name="size"
+  fullType='"sm" | "default" | "lg"'
+  simpleType="string"
+  defaultValue='"default"'
 >
-  Shadow weight for the bar.
+  Outer height, matching `Button`.
+</ApiProp>
+
+<ApiProp name="highlight" fullType="boolean" defaultValue="true">
+  Glides one shared highlight between triggers. With `false`, each trigger
+  paints its own hover.
+</ApiProp>
+
+</ApiPropsList>
+
+#### MenubarTrigger
+
+Opens its menu. Wraps Base UI's `Menu.Trigger`.
+
+<ApiPropsList>
+
+<ApiProp name="delay" fullType="number" defaultValue="0">
+  Hover delay before opening, in milliseconds. Base UI defaults to `100`.
+</ApiProp>
+
+<ApiProp name="closeDelay" fullType="number" defaultValue="0">
+  Hover delay before closing, in milliseconds.
 </ApiProp>
 
 </ApiPropsList>
 
 #### MenubarContent
+
+The menu's popup, aligned to the start of its trigger. Composes `Menu.Portal`, `Menu.Positioner`, `Menu.Popup`, and `Menu.Viewport`. Props are forwarded to `Menu.Popup`.
 
 <ApiPropsList>
 
@@ -99,208 +153,50 @@ The bar element itself is a subtle inline toolbar that sits visibly elevated abo
   simpleType="string"
   defaultValue='"start"'
 >
-  How to align the menu. Flattened from Positioner. Base UI defaults to
-  `'center'`.
+  Alignment against the trigger.
 </ApiProp>
 
-<ApiProp name="alignOffset" fullType="number" defaultValue="-4">
-  Offset along alignment axis. Flattened from Positioner.
+<ApiProp name="alignOffset" fullType="number" defaultValue="0">
+  Shift along the bar from the aligned edge, in pixels.
 </ApiProp>
 
-<ApiProp name="sideOffset" fullType="number" defaultValue="8">
-  Distance in pixels for positioning. Flattened from Positioner. Base UI
-  defaults to `0`.
+<ApiProp name="sideOffset" fullType="number" defaultValue="4">
+  Gap between the bar and the menu, in pixels.
 </ApiProp>
 
-<ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
-  Surface elevation level for the dropdown popup.
+<ApiProp
+  name="level"
+  fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8"
+  simpleType="number"
+  defaultValue="3"
+>
+  Surface level of the popup. Raise it inside a Dialog.
 </ApiProp>
 
 <ApiProp
   name="shadowLevel"
   fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8"
+  simpleType="number"
   defaultValue="3"
 >
-  Shadow weight for the dropdown popup.
+  Shadow weight of the popup. It stays at 3 when you raise `level`, so the menu looks the same at any depth.
 </ApiProp>
 
 </ApiPropsList>
 
-#### MenubarSubContent
+### Notes
 
-<ApiPropsList>
+#### Menu parts
 
-<ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="5">
-  Surface elevation level. Submenus default to `5` so they pop above the parent
-  menu.
-</ApiProp>
+`MenubarItem`, `MenubarCheckboxItem`, `MenubarRadioItem`, `MenubarSub`, and the other parts inside `MenubarContent` are Dropdown Menu's. See the [Dropdown Menu API](/docs/components/dropdown-menu#api-reference) for their props.
 
-<ApiProp
-  name="shadowLevel"
-  fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8"
-  defaultValue="3"
->
-  Shadow weight. Kept at `3`, since submenus are still small popups.
-</ApiProp>
+## Upgrading
 
-</ApiPropsList>
+If you're reinstalling over an earlier version, check these changes:
 
-#### MenubarItem
-
-<ApiPropsList>
-
-<ApiProp name="inset" fullType="boolean">
-  Add left padding to align with items that have icons. Custom prop not
-  available in Base UI.
-</ApiProp>
-
-<ApiProp
-  name="variant"
-  fullType='"default" | "destructive"'
-  simpleType="string"
-  defaultValue='"default"'
->
-  Visual style variant for dangerous actions. Custom prop not available in Base
-  UI.
-</ApiProp>
-
-</ApiPropsList>
-
-#### MenubarLinkItem
-
-Menu item that renders as an anchor (`<a>`) for navigation links. Wraps Base UI's `Menu.LinkItem`.
-
-<ApiPropsList>
-
-<ApiProp name="inset" fullType="boolean">
-  Add left padding to align with items that have icons. Custom prop not
-  available in Base UI.
-</ApiProp>
-
-</ApiPropsList>
-
-#### MenubarCheckboxItem
-
-Toggleable menu item. Wraps Base UI's `Menu.CheckboxItem`. The indicator sits in a reserved column on the right.
-
-<ApiPropsList>
-
-<ApiProp
-  name="indicator"
-  fullType='"check" | "switch"'
-  simpleType="string"
-  defaultValue='"check"'
->
-  Indicator style. `"switch"` renders a decorative switch in place of the
-  checkmark. It is purely visual: the item keeps the `menuitemcheckbox` role,
-  the same props, and the same behavior. Custom prop not available in Base UI.
-</ApiProp>
-
-<ApiProp
-  name="switchColor"
-  fullType='"primary" | "neutral"'
-  simpleType="string"
-  defaultValue='"primary"'
->
-  Checked track colour, when `indicator="switch"`. Forwarded to
-  [Switch](/docs/components/switch). Custom prop not available in Base UI.
-</ApiProp>
-
-<ApiProp
-  name="switchShape"
-  fullType='"circle" | "pill" | "squircle"'
-  simpleType="string"
-  defaultValue='"circle"'
->
-  Thumb silhouette, when `indicator="switch"`. Forwarded to
-  [Switch](/docs/components/switch). Custom prop not available in Base UI.
-</ApiProp>
-
-<ApiProp
-  name="switchSize"
-  fullType='"xs" | "sm" | "default"'
-  simpleType="string"
-  defaultValue='"xs"'
->
-  Thumb size, when `indicator="switch"`. The default matches the row's text.
-  Custom prop not available in Base UI.
-</ApiProp>
-
-<ApiProp
-  name="switchMotion"
-  fullType='"default" | "stretch"'
-  simpleType="string"
-  defaultValue='"default"'
->
-  What the thumb does while toggling, when `indicator="switch"`. `"stretch"`
-  sends the leading edge first, so the thumb spans the track mid-toggle. Custom
-  prop not available in Base UI.
-</ApiProp>
-
-<ApiProp name="inset" fullType="boolean">
-  Add left padding to align with items that have icons. Custom prop not
-  available in Base UI.
-</ApiProp>
-
-</ApiPropsList>
-
-#### MenubarRadioItem
-
-Mutually exclusive menu item. Wraps Base UI's `Menu.RadioItem`. Uses the same right-aligned checkmark as `MenubarCheckboxItem`.
-
-<ApiPropsList>
-
-<ApiProp name="inset" fullType="boolean">
-  Add left padding to align with items that have icons. Custom prop not
-  available in Base UI.
-</ApiProp>
-
-</ApiPropsList>
-
-#### MenubarLabel
-
-Standalone label. Renders a plain `div`, so it can sit anywhere inside `MenubarContent`.
-
-<ApiPropsList>
-
-<ApiProp name="inset" fullType="boolean">
-  Add left padding to align with items that have icons. Custom prop not
-  available in Base UI.
-</ApiProp>
-
-</ApiPropsList>
-
-#### MenubarGroupLabel
-
-Label for a `MenubarGroup`. Wraps Base UI's `Menu.GroupLabel`, which names the group for assistive tech. It must have a `MenubarGroup` ancestor. Use `MenubarLabel` for a label that is not attached to a group.
-
-<ApiPropsList>
-
-<ApiProp name="inset" fullType="boolean">
-  Add left padding to align with items that have icons. Custom prop not
-  available in Base UI.
-</ApiProp>
-
-</ApiPropsList>
-
-#### MenubarSubTrigger
-
-<ApiPropsList>
-
-<ApiProp name="inset" fullType="boolean">
-  Add left padding to align with items that have icons. Custom prop not
-  available in Base UI.
-</ApiProp>
-
-</ApiPropsList>
-
-### Modified Defaults
-
-Our implementation changes the following Base UI prop defaults:
-
-- **MenubarTrigger**: `delay` defaults to `0` (Base UI defaults to `600`)
-- **MenubarTrigger**: `closeDelay` defaults to `0`
-- **MenubarContent**: `align` defaults to `'start'` (Base UI defaults to `'center'`)
-- **MenubarContent**: `alignOffset` defaults to `-4`
-- **MenubarContent**: `sideOffset` defaults to `8` (Base UI defaults to `0`)
-- **MenubarSubContent**: `sideOffset` defaults to `8`
+| Before                                                             | Now                                                                                                                                                                        |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Installed as `cubby-ui/menubar.tsx`                                | Installs into a `cubby-ui/menubar/` folder with `menubar.css`, and installs Dropdown Menu. Import from `@/components/ui/cubby-ui/menubar/menubar` and delete the old file. |
+| `level` and `shadowLevel` on `Menubar`                             | Removed; use `variant`. `MenubarContent` keeps them.                                                                                                                       |
+| `MenubarContent` defaulted to `sideOffset={8}`, `alignOffset={-4}` | `sideOffset={4}`, `alignOffset={0}`, since triggers now reach the bar's edge.                                                                                              |
+| Sub-menus opened after a 100ms hover delay                         | They open at once, as in Dropdown Menu.                                                                                                                                    |

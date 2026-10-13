@@ -6,33 +6,45 @@ import { ToggleGroup as BaseToggleGroup } from "@base-ui/react/toggle-group";
 
 import { cn } from "@/lib/utils";
 import { Separator } from "@/registry/default/separator/separator";
-import { Toggle, type ToggleProps } from "@/registry/default/toggle/toggle";
+import {
+  isIconOnly,
+  Toggle,
+  type ToggleProps,
+} from "@/registry/default/toggle/toggle";
 
-// A shell, as in Button Group, whose items latch. Items fill it with a 2px
-// transparent-border inset (even at fractional display scales); paint corners
-// are the shell's minus its border and the 2px.
+// A shell, as in Button Group, whose items latch. Insets are item borders,
+// 2px facing the shell's edge and 1px facing a neighbour; `of` counts items
+// only, so separators don't move the ends. Plate corners are the shell's
+// minus the 2px edge border.
 const toggleGroupVariants = cva(
   [
     "relative isolate flex w-fit items-stretch rounded-(--toggle-group-radius) data-[orientation=vertical]:flex-col",
-    "[--toggle-group-item-radius:max(0px,calc(var(--toggle-group-radius)-var(--toggle-group-border,0px)-2px))]",
+    "[--toggle-group-item-radius:max(0px,calc(var(--toggle-group-radius)-2px))]",
     // Small corners between neighbors, so pressed runs read as one control
     "[--toggle-group-inner-radius:min(3px,var(--toggle-group-item-radius))]",
     // Label-color tints: hover 10%, press 14%, pressed 16%. Override the
     // selected variables to recolor.
     "[--toggle-group-highlight:color-mix(in_oklab,currentColor_10%,transparent)] [--toggle-group-press:color-mix(in_oklab,currentColor_14%,transparent)]",
     "[--toggle-group-selected-bg:color-mix(in_oklab,currentColor_16%,transparent)] [--toggle-group-selected-fg:var(--foreground)]",
-    // The shell is fixed and items stretch to fill it; columns grow to the
-    // widest item.
-    "data-[orientation=horizontal]:h-(--toggle-group-h) data-[orientation=horizontal]:[&>[data-slot=toggle-group-item]:not([data-icon-only])]:aspect-square",
-    "data-[orientation=vertical]:min-w-(--toggle-group-h) data-[orientation=vertical]:[&>[data-slot=toggle-group-item]:not([data-icon-only])]:h-(--toggle-group-item-length)",
+    // A row is the ladder height and items stretch to fill it.
+    "data-[orientation=horizontal]:h-(--toggle-group-h) data-[orientation=horizontal]:[&>[data-slot=toggle-group-item]]:aspect-square",
+    "data-[orientation=horizontal]:[&>[data-slot=toggle-group-item]]:border-y-2 data-[orientation=horizontal]:[&>:nth-child(1_of_[data-slot=toggle-group-item])]:border-s-2 data-[orientation=horizontal]:[&>:nth-last-child(1_of_[data-slot=toggle-group-item])]:border-e-2",
+    // A column is at least the ladder width; every item gets the row's
+    // paint height.
+    "data-[orientation=vertical]:min-w-(--toggle-group-h) data-[orientation=vertical]:[&>[data-slot=toggle-group-item]]:box-content data-[orientation=vertical]:[&>[data-slot=toggle-group-item]]:h-[calc(var(--toggle-group-h)-4px)]",
+    "data-[orientation=vertical]:[&>[data-slot=toggle-group-item]]:border-x-2 data-[orientation=vertical]:[&>:nth-child(1_of_[data-slot=toggle-group-item])]:border-t-2 data-[orientation=vertical]:[&>:nth-last-child(1_of_[data-slot=toggle-group-item])]:border-b-2",
+    // A square hit area over the whole box, corners included, so hover
+    // never drops between items. Beside a separator it reaches the line.
+    "[&>[data-slot=toggle-group-item]]:after:absolute [&>[data-slot=toggle-group-item]]:after:content-[''] [&>[data-slot=toggle-group-item]]:after:-inset-x-px [&>[data-slot=toggle-group-item]]:after:-inset-y-0.5 data-[orientation=vertical]:[&>[data-slot=toggle-group-item]]:after:-inset-x-0.5 data-[orientation=vertical]:[&>[data-slot=toggle-group-item]]:after:-inset-y-px",
+    "data-[orientation=horizontal]:[&>[data-slot=toggle-group-item]:has(+[data-slot=toggle-group-separator])]:after:-end-[5px] data-[orientation=horizontal]:[&>[data-slot=toggle-group-separator]+[data-slot=toggle-group-item]]:after:-start-[5px] data-[orientation=vertical]:[&>[data-slot=toggle-group-item]:has(+[data-slot=toggle-group-separator])]:after:-bottom-[5px] data-[orientation=vertical]:[&>[data-slot=toggle-group-separator]+[data-slot=toggle-group-item]]:after:-top-[5px]",
+    // Icon-only items: the paint is square, whatever each side's border.
+    "[&>[data-slot=toggle-group-item][data-icon-only]]:box-content [&>[data-slot=toggle-group-item][data-icon-only]]:aspect-square data-[orientation=vertical]:[&>[data-slot=toggle-group-item][data-icon-only]]:h-auto",
     "data-disabled:opacity-60 data-disabled:[&>*]:opacity-100",
   ],
   {
     variants: {
       variant: {
-        // Outline's border sits outside the fill, as on an outline Button.
-        outline:
-          "border-border bg-card border bg-clip-padding [--toggle-group-border:1px]",
+        outline: "bg-card outline outline-border",
         soft: "bg-secondary",
         ghost: "",
       },
@@ -99,52 +111,35 @@ function ToggleGroup({
 }
 
 const itemClasses = cn(
-  "h-auto min-w-auto self-stretch border-2 border-transparent text-sm sm:h-auto sm:min-w-auto",
-  // Main-axis length in a column: the fill's cross size plus the borders at
-  // each end (2px, or 1px against a neighbor).
-  "[--toggle-group-item-start:2px] [--toggle-group-item-end:2px] [--toggle-group-item-length:calc(var(--toggle-group-h)-var(--toggle-group-border,0px)*2-4px+var(--toggle-group-item-start)+var(--toggle-group-item-end))]",
-  // Icon-only items wrap a square box instead (see ToggleGroupItem)
+  "h-auto min-w-auto self-stretch border border-transparent text-sm sm:h-auto sm:min-w-auto",
+  // Icon-only items drop their padding, so they're square.
   "data-icon-only:px-0",
-  // Box corners are the paint's + the border, so paint, gap, and focus ring
-  // (at offset 0) are concentric.
-  "rounded-[calc(var(--toggle-group-item-radius)+2px)] before:rounded-(--toggle-group-item-radius) focus-visible:outline-offset-0 focus-visible:z-10",
+  // Box corners are the plate's + 2px; the focus ring sits on the plate.
+  "rounded-[calc(var(--toggle-group-item-radius)+2px)] before:rounded-(--toggle-group-item-radius) focus-visible:outline-transparent focus-visible:before:outline-2 focus-visible:before:-outline-offset-2 focus-visible:before:outline-ring/50 focus-visible:z-10",
   "[--tgl-bg-hover:var(--toggle-group-highlight)] [--tgl-bg-active:var(--toggle-group-press)] [--tgl-bg-selected:var(--toggle-group-selected-bg)]",
   // Label color
   "text-muted-foreground data-pressed:text-(--toggle-group-selected-fg) hover:not-data-pressed:text-foreground",
+  // Instant hover, so a sweep never shows two items half-lit. The press
+  // tint and pressed fill still fade (Toggle's 100ms).
+  "[transition-duration:100ms,100ms,100ms,100ms,0ms] before:[transition-duration:0ms,100ms,100ms] active:before:[transition-duration:100ms] data-pressed:before:[transition-duration:100ms]",
   // Forced colors drop the fill, so a pressed item gets a Highlight border.
   "forced-colors:data-pressed:border-[Highlight]",
 );
 
-// Sides facing another item take a 1px border, for a 2px seam between fills,
-// and the small inner corners. Sides at the shell or a separator keep the
-// 2px border and the shell-concentric corners.
+// Corners that face another item are small, so a run of pressed items reads
+// as one control. Corners at the shell or a separator stay concentric.
 const joinedClasses = {
   horizontal: cn(
-    "[[data-slot=toggle-group-item]+&]:border-s [[data-slot=toggle-group-item]+&]:[--toggle-group-item-start:1px] [[data-slot=toggle-group-item]+&]:rounded-s-[calc(var(--toggle-group-inner-radius)+1px)] [[data-slot=toggle-group-item]+&]:before:rounded-s-(--toggle-group-inner-radius)",
-    "has-[+[data-slot=toggle-group-item]]:border-e has-[+[data-slot=toggle-group-item]]:[--toggle-group-item-end:1px] has-[+[data-slot=toggle-group-item]]:rounded-e-[calc(var(--toggle-group-inner-radius)+1px)] has-[+[data-slot=toggle-group-item]]:before:rounded-e-(--toggle-group-inner-radius)",
+    "[[data-slot=toggle-group-item]+&]:rounded-s-[calc(var(--toggle-group-inner-radius)+1px)] [[data-slot=toggle-group-item]+&]:before:rounded-s-(--toggle-group-inner-radius)",
+    "has-[+[data-slot=toggle-group-item]]:rounded-e-[calc(var(--toggle-group-inner-radius)+1px)] has-[+[data-slot=toggle-group-item]]:before:rounded-e-(--toggle-group-inner-radius)",
   ),
   vertical: cn(
-    "[[data-slot=toggle-group-item]+&]:border-t [[data-slot=toggle-group-item]+&]:[--toggle-group-item-start:1px] [[data-slot=toggle-group-item]+&]:rounded-t-[calc(var(--toggle-group-inner-radius)+1px)] [[data-slot=toggle-group-item]+&]:before:rounded-t-(--toggle-group-inner-radius)",
-    "has-[+[data-slot=toggle-group-item]]:border-b has-[+[data-slot=toggle-group-item]]:[--toggle-group-item-end:1px] has-[+[data-slot=toggle-group-item]]:rounded-b-[calc(var(--toggle-group-inner-radius)+1px)] has-[+[data-slot=toggle-group-item]]:before:rounded-b-(--toggle-group-inner-radius)",
+    "[[data-slot=toggle-group-item]+&]:rounded-t-[calc(var(--toggle-group-inner-radius)+1px)] [[data-slot=toggle-group-item]+&]:before:rounded-t-(--toggle-group-inner-radius)",
+    "has-[+[data-slot=toggle-group-item]]:rounded-b-[calc(var(--toggle-group-inner-radius)+1px)] has-[+[data-slot=toggle-group-item]]:before:rounded-b-(--toggle-group-inner-radius)",
   ),
 };
 
 export type ToggleGroupItemProps = Omit<ToggleProps, "variant" | "size">;
-
-// A labelled item whose only child is an icon component or <svg>. CSS can't
-// tell: :only-child ignores text nodes. The label check keeps a lone text
-// component (<Trans>, <FormattedMessage>) from counting as an icon.
-function isIconOnly(
-  children: React.ReactNode,
-  props: ToggleGroupItemProps,
-): boolean {
-  return (
-    React.isValidElement(children) &&
-    children.type !== React.Fragment &&
-    (typeof children.type !== "string" || children.type === "svg") &&
-    Boolean(props["aria-label"] || props["aria-labelledby"])
-  );
-}
 
 /** A `Toggle` sized and styled by its `ToggleGroup`. */
 function ToggleGroupItem({
@@ -153,7 +148,10 @@ function ToggleGroupItem({
   ...props
 }: ToggleGroupItemProps) {
   const { size, orientation } = React.use(ToggleGroupContext);
-  const iconOnly = isIconOnly(children, props);
+  const iconOnly = isIconOnly(
+    children,
+    props["aria-label"] || props["aria-labelledby"],
+  );
 
   return (
     <Toggle
@@ -164,20 +162,7 @@ function ToggleGroupItem({
       className={cn(itemClasses, joinedClasses[orientation], className)}
       {...props}
     >
-      {iconOnly ? (
-        // The item shrink-wraps this square, so the fill stays square however
-        // the 1px and 2px borders snap to device pixels.
-        <span
-          className={cn(
-            "flex aspect-square items-center justify-center",
-            orientation === "vertical" ? "w-full" : "h-full",
-          )}
-        >
-          {children}
-        </span>
-      ) : (
-        children
-      )}
+      {children}
     </Toggle>
   );
 }
@@ -199,8 +184,11 @@ function ToggleGroupSeparator({
       data-slot="toggle-group-separator"
       orientation={resolved}
       className={cn(
-        "self-stretch data-[orientation=vertical]:h-auto",
-        "data-[orientation=horizontal]:mx-1.5 data-[orientation=horizontal]:my-0.5 data-[orientation=vertical]:mx-0.5 data-[orientation=vertical]:my-1.5",
+        // Air and line are all borders, so both sides snap alike.
+        "pointer-events-none flex shrink-0 self-stretch border-transparent bg-transparent data-[orientation=horizontal]:h-auto data-[orientation=horizontal]:w-auto data-[orientation=horizontal]:flex-col data-[orientation=vertical]:w-auto",
+        "before:border-transparent before:content-[''] after:border-transparent after:content-['']",
+        "data-[orientation=vertical]:after:border-s-border data-[orientation=vertical]:border-e-[3px] data-[orientation=vertical]:before:border-s-[3px] data-[orientation=vertical]:after:h-5 data-[orientation=vertical]:after:self-center data-[orientation=vertical]:after:rounded-full data-[orientation=vertical]:after:border-s-[1.5px]",
+        "data-[orientation=horizontal]:after:border-t-border data-[orientation=horizontal]:border-b-[3px] data-[orientation=horizontal]:before:border-t-[3px] data-[orientation=horizontal]:after:w-5 data-[orientation=horizontal]:after:self-center data-[orientation=horizontal]:after:rounded-full data-[orientation=horizontal]:after:border-t-[1.5px]",
         className,
       )}
       {...props}

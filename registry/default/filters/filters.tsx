@@ -44,9 +44,13 @@ import {
   describeFilter,
   isFilterComplete,
   operatorLabel,
+  FILTER_ENDS,
   FILTER_SEGMENT,
   FILTER_SEGMENT_INTERACTIVE,
+  FILTER_SEGMENT_SQUARE,
   FILTER_SIZES,
+  FILTER_TINTS,
+  FILTER_VARIANTS,
   patchFilter,
   resolveOperators,
 } from "./lib/filters-utils";
@@ -123,6 +127,7 @@ function FiltersProvider({
   defaultValue = [],
   onValueChange,
   size = "default",
+  variant = "outline",
   allowDuplicateFields = false,
   labels: labelsProp,
   children,
@@ -220,6 +225,7 @@ function FiltersProvider({
     () => ({
       fields,
       size,
+      variant,
       labels,
       fieldsById,
       usedFieldIds,
@@ -233,6 +239,7 @@ function FiltersProvider({
     [
       fields,
       size,
+      variant,
       labels,
       fieldsById,
       usedFieldIds,
@@ -313,6 +320,7 @@ function Filters({
   defaultValue,
   onValueChange,
   size,
+  variant,
   allowDuplicateFields,
   labels,
   ...barProps
@@ -324,6 +332,7 @@ function Filters({
       defaultValue={defaultValue}
       onValueChange={onValueChange}
       size={size}
+      variant={variant}
       allowDuplicateFields={allowDuplicateFields}
       labels={labels}
     >
@@ -408,7 +417,8 @@ const FilterChip = React.memo(function FilterChip({
   onKeyDown,
   ...props
 }: FilterChipProps) {
-  const { size, removeFilter, fieldsById, labels } = useFiltersActions();
+  const { size, variant, removeFilter, fieldsById, labels } =
+    useFiltersActions();
   const presenceRef = useFlowPresence(ref);
   const field = fieldProp ?? fieldsById.get(filter.field);
 
@@ -428,12 +438,16 @@ const FilterChip = React.memo(function FilterChip({
         role="group"
         data-slot="filter-chip"
         data-size={size}
+        data-variant={variant}
         data-filter-id={filter.id}
         data-incomplete={incomplete ? "" : undefined}
         aria-label={describeFilter(field, filter, labels.operators)}
         className={cn(
-          "bg-card text-foreground inline-flex max-w-full shrink-0 items-center gap-0.5 rounded-lg border bg-clip-padding p-0.5",
-          "transition-[border-color] duration-150 data-incomplete:border-dashed",
+          "text-foreground inline-flex max-w-full shrink-0 items-center rounded-lg",
+          FILTER_VARIANTS[variant],
+          FILTER_ENDS,
+          FILTER_TINTS,
+          "transition-[outline-color,border-color] duration-150",
           FILTER_SIZES[size],
           className,
         )}
@@ -478,7 +492,7 @@ function FilterChipField({
     <span
       data-slot="filter-chip-field"
       className={cn(
-        "text-muted-foreground inline-flex h-full shrink-0 items-center gap-1.5 ps-(--seg-x) pe-1 whitespace-nowrap",
+        "text-muted-foreground inline-flex h-full shrink-0 items-center gap-1.5 border border-y-2 border-transparent ps-(--seg-x) pe-1 whitespace-nowrap",
         className,
       )}
       {...props}
@@ -556,7 +570,8 @@ function FilterChipRemove({
       className={cn(
         FILTER_SEGMENT,
         FILTER_SEGMENT_INTERACTIVE,
-        "text-muted-foreground hover:text-foreground aspect-square justify-center px-0 [&_svg]:size-3.5",
+        "text-muted-foreground hover:text-foreground [&_svg]:size-3.5",
+        FILTER_SEGMENT_SQUARE,
         className,
       )}
       onClick={(event) => {
@@ -615,15 +630,19 @@ function FilterActions({
   /** Key that opens the add menu from the keyboard (e.g. `"f"`). */
   shortcut?: string;
 }) {
-  const { size } = useFiltersActions();
+  const { size, variant } = useFiltersActions();
   return (
     <div
       role="group"
       data-slot="filter-actions"
       data-size={size}
+      data-variant={variant}
       className={cn(
         // No gap: a folded clear segment would still get one; it brings its own.
-        "bg-card text-foreground inline-flex shrink-0 items-center rounded-lg border bg-clip-padding p-0.5",
+        "text-foreground inline-flex shrink-0 items-center rounded-lg",
+        FILTER_VARIANTS[variant],
+        FILTER_ENDS,
+        FILTER_TINTS,
         FILTER_SIZES[size],
         className,
       )}
@@ -655,10 +674,11 @@ function FilterActionsClear({
       inert={!active}
       className="grid h-full grid-cols-[minmax(0,0fr)] overflow-hidden opacity-0 transition-[grid-template-columns,opacity] duration-220 ease-[cubic-bezier(0.22,1,0.36,1)] data-active:grid-cols-[minmax(0,1fr)] data-active:opacity-100 motion-reduce:transition-none"
     >
-      <div className="flex h-full min-w-0 items-center gap-0.5 ps-0.5">
+      <div className="flex h-full min-w-0 items-center">
+        {/* Air and line are all borders, so both sides snap alike. */}
         <span
           aria-hidden
-          className="bg-border my-1.5 w-px shrink-0 self-stretch"
+          className="after:border-s-border pointer-events-none flex shrink-0 self-stretch border-e-[3px] border-transparent before:border-s-[3px] before:border-transparent before:content-[''] after:h-5 after:self-center after:rounded-full after:border-s-[1.5px] after:border-transparent after:content-['']"
         />
         <Tooltip>
           <TooltipTrigger
@@ -670,7 +690,8 @@ function FilterActionsClear({
                 className={cn(
                   FILTER_SEGMENT,
                   FILTER_SEGMENT_INTERACTIVE,
-                  "text-muted-foreground hover:text-foreground aspect-square justify-center px-0 [&_svg]:size-4",
+                  "text-muted-foreground hover:text-foreground [&_svg]:size-4",
+                  FILTER_SEGMENT_SQUARE,
                   className,
                 )}
                 {...props}
@@ -772,6 +793,7 @@ export type {
   FilterOperatorShape,
   FilterValue,
   FilterSize,
+  FilterVariant,
   FiltersLabels,
   FiltersOverflow,
   FiltersProps,

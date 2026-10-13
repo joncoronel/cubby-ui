@@ -1,35 +1,41 @@
 /* -------------------------------------------------------------------------------------------------
- * Gliding highlight, in CSS anchor positioning.
- *
- * The lit button (hover, focus, press, open menu) takes the anchor name and
- * the shared pill follows it. Without anchor positioning and anchor-scope,
- * each button paints its own hover instead.
+ * Gliding highlight. The lit button's plate (::before) is the anchor and the
+ * pill follows it. Without anchor positioning, each button paints its own
+ * hover.
  * -------------------------------------------------------------------------------------------------*/
 
 [data-slot="button-group-highlight"] {
   display: none;
 }
 
-/* Hit areas: buttons reach over half of a separator's ~5px, so the pill
- * never drops mid-glide. A select's hidden form input is stepped over. */
-[data-glide] > :is(button, a[href], [role="button"]) {
+/* Hit areas: a square ::after over the whole box, corners included, so the
+ * notch between two buttons isn't dead. Beside a separator it reaches the
+ * line, stepping over a select's hidden input. */
+[data-slot="button-group"]:not([data-variant="attached"])
+  > :is(button, a[href], [role="button"]) {
   position: relative;
 }
 
-[data-glide]
-  > :is(button, a[href], [role="button"]):has(
-    + [data-slot="button-group-separator"],
-    + input[aria-hidden="true"] + [data-slot="button-group-separator"]
-  )::after,
-[data-glide]
-  > [data-slot="button-group-separator"]
-  + :is(button, a[href], [role="button"])::after {
+[data-slot="button-group"]:not([data-variant="attached"])
+  > :is(button, a[href], [role="button"])::after {
   content: "";
   position: absolute;
-  inset: -2px;
+  inset-block: -2px;
+  inset-inline: -1px;
 }
 
-[data-glide][data-orientation="horizontal"]
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="vertical"]
+  > :is(button, a[href], [role="button"])::after {
+  inset-block: -1px;
+  inset-inline: -2px;
+}
+
+/* 1px border + 3px air + half the line. */
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="horizontal"]
   > :is(button, a[href], [role="button"]):has(
     + [data-slot="button-group-separator"],
     + input[aria-hidden="true"] + [data-slot="button-group-separator"]
@@ -37,13 +43,17 @@
   inset-inline-end: -5px;
 }
 
-[data-glide][data-orientation="horizontal"]
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="horizontal"]
   > [data-slot="button-group-separator"]
   + :is(button, a[href], [role="button"])::after {
   inset-inline-start: -5px;
 }
 
-[data-glide][data-orientation="vertical"]
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="vertical"]
   > :is(button, a[href], [role="button"]):has(
     + [data-slot="button-group-separator"],
     + input[aria-hidden="true"] + [data-slot="button-group-separator"]
@@ -51,10 +61,118 @@
   inset-block-end: -5px;
 }
 
-[data-glide][data-orientation="vertical"]
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="vertical"]
   > [data-slot="button-group-separator"]
   + :is(button, a[href], [role="button"])::after {
   inset-block-start: -5px;
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Inset: item borders, 2px facing the shell's edge, 1px facing a neighbour.
+ * Borders snap to whole device pixels, so the edge is never thinner than the
+ * gap, and the shell has no border to push elevated's rim inward. `of`
+ * counts items only, so Base UI's guard spans can't move the ends.
+ * -------------------------------------------------------------------------------------------------*/
+
+[data-slot="button-group"]:not([data-variant="attached"])
+  > :is(button, a, [data-slot="input"], [data-slot="button-group-text"]) {
+  border: 1px solid transparent;
+  border-radius: calc(var(--group-item-radius) + 2px);
+}
+
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="horizontal"]
+  > :is(button, a, [data-slot="input"], [data-slot="button-group-text"]) {
+  border-block-width: 2px;
+  height: auto;
+  align-self: stretch;
+}
+
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="horizontal"]
+  > :nth-child(
+    1 of button,
+    a,
+    [data-slot="input"],
+    [data-slot="button-group-text"]
+  ) {
+  border-inline-start-width: 2px;
+}
+
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="horizontal"]
+  > :nth-last-child(
+    1 of button,
+    a,
+    [data-slot="input"],
+    [data-slot="button-group-text"]
+  ) {
+  border-inline-end-width: 2px;
+}
+
+/* A column: every item has the row's paint height, whatever its borders,
+ * and stretches to the widest. */
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="vertical"]
+  > :is(button, a, [data-slot="input"], [data-slot="button-group-text"]) {
+  border-inline-width: 2px;
+  box-sizing: content-box;
+  height: calc(var(--group-h) - 4px);
+  width: auto;
+  padding-block: 0;
+  align-self: stretch;
+}
+
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="vertical"]
+  > :nth-child(
+    1 of button,
+    a,
+    [data-slot="input"],
+    [data-slot="button-group-text"]
+  ) {
+  border-block-start-width: 2px;
+}
+
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="vertical"]
+  > :nth-last-child(
+    1 of button,
+    a,
+    [data-slot="input"],
+    [data-slot="button-group-text"]
+  ) {
+  border-block-end-width: 2px;
+}
+
+/* Icon buttons: the paint is square, whatever each side's border. */
+[data-slot="button-group"]:not([data-variant="attached"])
+  > :is(button, a)[data-size^="icon"] {
+  box-sizing: content-box;
+  aspect-ratio: 1;
+  padding-inline: 0;
+}
+
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="horizontal"]
+  > :is(button, a)[data-size^="icon"] {
+  width: auto;
+}
+
+[data-slot="button-group"]:not(
+    [data-variant="attached"]
+  )[data-orientation="vertical"]
+  > :is(button, a)[data-size^="icon"] {
+  height: auto;
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -67,12 +185,7 @@
 
 [data-slot="button-group"]:not([data-variant="attached"])
   > :is([data-slot="input"], [data-slot="select-trigger"]) {
-  height: auto;
-  align-self: stretch;
-  /* The buttons' 2px border, fill inside it. */
-  border-width: 2px;
-  border-color: transparent;
-  border-radius: calc(var(--group-item-radius) + 2px);
+  /* Fill inside the inset border. */
   background-color: transparent;
   background-clip: padding-box;
   box-shadow: none;
@@ -84,12 +197,6 @@
   color: inherit;
   transition-property:
     background-color, outline-width, outline-offset, outline-color;
-}
-
-/* Focus ring 2px off the fill, as on the buttons. */
-[data-slot="button-group"]:not([data-variant="attached"])
-  > :is([data-slot="input"], [data-slot="select-trigger"]):focus-visible {
-  outline-offset: 0;
 }
 
 /* Hover is gated to real hover: a raw :hover sticks after a tap. */
@@ -112,16 +219,28 @@
   }
 }
 
+/* Select triggers have no paint layer of their own; this one is the anchor
+ * for the pill. */
+[data-slot="button-group"]:not([data-variant="attached"])
+  > [data-slot="select-trigger"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--group-item-radius);
+  pointer-events: none;
+}
+
 /* All anchor features or none: a partial implementation leaves the pill
  * unplaced or tied to another group. */
 @supports (anchor-name: --button-group-item) and
   (anchor-scope: --button-group-item) and (inset: anchor(inside)) {
-  [data-glide] {
+  [data-slot="button-group"][data-glide] {
     anchor-scope: --button-group-item;
   }
 
   /* The pill stands in for hover. */
-  [data-glide] > :is(button, a[href], [role="button"]):not([data-variant]) {
+  [data-slot="button-group"][data-glide]
+    > :is(button, a[href], [role="button"]):not([data-variant]) {
     --btn-bg-hover: transparent;
     --btn-bg-active: transparent;
   }
@@ -132,74 +251,53 @@
     background-color: transparent;
   }
 
-  /* Hover is gated to real hover (:active covers taps). An open menu or a
-   * held button keeps the pill, or a pointer drifting mid-press would light
-   * two buttons and the pill would dart between them. */
-  [data-glide]
+  /* Real hover only (:active covers taps). An open menu, a held button, or
+   * keyboard focus keeps the pill. */
+  [data-slot="button-group"][data-glide]
     > :is(button, a[href], [role="button"]):not(:disabled, [data-disabled]):is(
       :focus-visible,
       :active,
       [data-popup-open]
-    ) {
+    )::before {
     anchor-name: --button-group-item;
   }
 
   @media (hover: hover) {
-    [data-glide]:not(:has(> [data-popup-open], > :active))
+    [data-slot="button-group"][data-glide]:not(
+        :has(
+          > [data-popup-open],
+          > :active,
+          > :is(button, a[href], [role="button"]):focus-visible
+        )
+      )
       > :is(button, a[href], [role="button"]):not(
         :disabled,
         [data-disabled]
-      ):hover {
+      ):hover::before {
       anchor-name: --button-group-item;
     }
   }
 
-  /* Leaving the group, the last button holds the anchor while the pill fades,
-   * so it fades in place instead of collapsing. */
-  [data-glide]:not(
-      :has(
-        > :is(button, a[href], [role="button"]):not(
-            :disabled,
-            [data-disabled]
-          ):is(:hover, :focus-visible, :active, [data-popup-open])
-      )
-    )
-    > :is(button, a[href], [role="button"]) {
-    /* Button's own transitions (button.tsx), restated so they survive. */
-    transition:
-      outline-width 100ms ease-out,
-      outline-offset 100ms ease-out,
-      outline-color 100ms ease-out,
-      opacity 100ms ease-out,
-      color 100ms ease-out,
-      anchor-name 0s 80ms allow-discrete;
-  }
-
-  [data-glide] > [data-slot="button-group-highlight"] {
+  [data-slot="button-group"][data-glide]
+    > [data-slot="button-group-highlight"] {
     display: block;
     position: absolute;
     position-anchor: --button-group-item;
     inset: anchor(inside);
-    /* The anchor is the button's border box; the same 2px border lines the
-     * fill up with the button's paint. */
-    border: 2px solid transparent;
-    border-radius: calc(var(--group-item-radius) + 2px);
-    background: var(--group-highlight) padding-box;
+    border-radius: var(--group-item-radius);
+    background-color: var(--group-highlight);
     /* Rendered last, so it sits under the buttons inside the isolated group. */
     z-index: -1;
     pointer-events: none;
     opacity: 0;
-    scale: 0.96;
-    /* Entering from no anchor can't interpolate, so the pill appears in
-     * place and only fades and grows. */
+    /* Glides between buttons; appears and goes instantly. */
     transition:
       inset 80ms var(--ease-out-expo, cubic-bezier(0.19, 1, 0.22, 1)),
-      opacity 80ms ease-out,
-      scale 80ms ease-out,
-      background-color 80ms ease-out;
+      scale 100ms var(--ease-out, cubic-bezier(0, 0, 0.2, 1)),
+      background-color 100ms var(--ease-out, cubic-bezier(0, 0, 0.2, 1));
   }
 
-  [data-glide]:has(
+  [data-slot="button-group"][data-glide]:has(
       > :is(button, a[href], [role="button"]):not(
           :disabled,
           [data-disabled]
@@ -207,11 +305,10 @@
     )
     > [data-slot="button-group-highlight"] {
     opacity: 1;
-    scale: 1;
   }
 
   @media (hover: hover) {
-    [data-glide]:has(
+    [data-slot="button-group"][data-glide]:has(
         > :is(button, a[href], [role="button"]):not(
             :disabled,
             [data-disabled]
@@ -219,12 +316,17 @@
       )
       > [data-slot="button-group-highlight"] {
       opacity: 1;
-      scale: 1;
     }
   }
 
-  /* Press, as on Button. Menu triggers skip it. */
-  [data-glide]:has(
+  /* Press: the plate holds still and the pill shrinks. Menu triggers skip
+   * it. */
+  [data-slot="button-group"][data-glide]
+    > :is(button, a[href], [role="button"]):not([data-variant]):active::before {
+    scale: none;
+  }
+
+  [data-slot="button-group"][data-glide]:has(
       > :is(button, a[href], [role="button"]):active:not(
           [aria-haspopup],
           :disabled
@@ -235,52 +337,47 @@
     background-color: var(--group-press);
   }
 
-  /* Separators beside the pill hide. */
-  [data-glide]
-    > :is(button, a[href], [role="button"]):not(:disabled, [data-disabled]):is(
-      :focus-visible,
-      :active,
-      [data-popup-open]
-    )
-    + [data-slot="button-group-separator"],
-  [data-glide]
-    > [data-slot="button-group-separator"]:has(
-      + :is(button, a[href], [role="button"]):not(
-          :disabled,
-          [data-disabled]
-        ):is(:focus-visible, :active, [data-popup-open])
-    ) {
-    opacity: 0;
-  }
-
-  @media (hover: hover) {
-    [data-glide]
-      > :is(button, a[href], [role="button"]):not(
-        :disabled,
-        [data-disabled]
-      ):hover
-      + [data-slot="button-group-separator"],
-    [data-glide]
-      > [data-slot="button-group-separator"]:has(
-        + :is(button, a[href], [role="button"]):not(
-            :disabled,
-            [data-disabled]
-          ):hover
-      ) {
-      opacity: 0;
-    }
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    [data-glide] {
+    [data-slot="button-group"][data-glide] {
       --group-press-scale: 1;
     }
 
-    [data-glide] > [data-slot="button-group-highlight"] {
-      scale: 1;
-      transition:
-        opacity 80ms ease-out,
-        background-color 80ms ease-out;
+    [data-slot="button-group"][data-glide]
+      > [data-slot="button-group-highlight"] {
+      transition: background-color 100ms
+        var(--ease-out, cubic-bezier(0, 0, 0.2, 1));
     }
+  }
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Focus ring: 2px inside the fill's edge, following its corners. Items draw
+ * it on their plate (::before); fields, which have none, as an inset shadow,
+ * with an outline under forced colors.
+ * -------------------------------------------------------------------------------------------------*/
+
+[data-slot="button-group"]:not([data-variant="attached"])
+  > :is(button, a):focus-visible {
+  outline-color: transparent;
+}
+
+[data-slot="button-group"]:not([data-variant="attached"])
+  > :is(button, a):focus-visible::before {
+  outline: 2px solid color-mix(in oklab, var(--color-ring) 50%, transparent);
+  outline-offset: -2px;
+}
+
+[data-slot="button-group"]:not([data-variant="attached"])
+  > [data-slot="input"]:focus-visible {
+  outline-color: transparent;
+  box-shadow: inset 0 0 0 2px
+    color-mix(in oklab, var(--color-ring) 50%, transparent);
+}
+
+@media (forced-colors: active) {
+  [data-slot="button-group"]:not([data-variant="attached"])
+    > [data-slot="input"]:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
   }
 }

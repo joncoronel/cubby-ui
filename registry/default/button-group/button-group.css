@@ -197,6 +197,8 @@
   color: inherit;
   transition-property:
     background-color, outline-width, outline-offset, outline-color;
+  /* Instant hover, like the buttons. */
+  transition-duration: 0ms, 100ms, 100ms, 100ms;
 }
 
 /* Hover is gated to real hover: a raw :hover sticks after a tap. */

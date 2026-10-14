@@ -19,6 +19,8 @@ import {
 const toggleGroupVariants = cva(
   [
     "relative isolate flex w-fit items-stretch rounded-(--toggle-group-radius) data-[orientation=vertical]:flex-col",
+    // Never narrower than its items; overflow is the container's to handle.
+    "min-w-max",
     "[--toggle-group-item-radius:max(0px,calc(var(--toggle-group-radius)-2px))]",
     // Small corners between neighbors, so pressed runs read as one control
     "[--toggle-group-inner-radius:min(3px,var(--toggle-group-item-radius))]",

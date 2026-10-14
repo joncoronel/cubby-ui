@@ -36,6 +36,8 @@ import "./menubar.css";
 const menubarVariants = cva(
   [
     "group/menubar relative isolate flex w-fit items-stretch rounded-(--menubar-radius) data-[orientation=vertical]:flex-col",
+    // Never narrower than its triggers; overflow is the container's to handle.
+    "min-w-max",
     // Paint corners are the shell's minus the 2px edge border.
     "[--menubar-item-radius:max(0px,calc(var(--menubar-radius)-2px))]",
     // Label-color tints: hover 10%, press 14%
@@ -116,6 +118,8 @@ const triggerClasses = cn(
   buttonVariants({ variant: "ghost", size: null }),
   "shrink-0 border border-transparent px-2.5 text-sm font-medium text-current hover:text-current data-popup-open:text-current",
   "[--btn-bg-hover:var(--menubar-highlight)] [--btn-bg-active:var(--menubar-press)]",
+  // Instant hover, so a sweep never shows two triggers half-lit.
+  "before:[transition-duration:0ms,100ms,100ms] active:before:[transition-duration:100ms]",
   // Box corners are the plate's + 2px.
   "rounded-[calc(var(--menubar-item-radius)+2px)] before:rounded-(--menubar-item-radius) focus-visible:z-10",
   // In a column every trigger gets the row's paint height.

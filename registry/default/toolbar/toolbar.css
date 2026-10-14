@@ -159,7 +159,9 @@
   }
 
   /* The pill stands in for hover and press tints. Variant buttons (no
-   * data-toolbar-item) keep their own; a pressed fill stays under the pill. */
+   * data-toolbar-item) keep their own. A pressed toggle never takes the pill,
+   * so like Toggle Group it shows its fill alone; the fill swaps instantly,
+   * so pressing hands the pill's tint straight to it. */
   [data-slot="toolbar"][data-glide] [data-toolbar-item] {
     --btn-bg-hover: transparent;
     --btn-bg-active: transparent;
@@ -167,15 +169,19 @@
     --tgl-bg-active: transparent;
   }
 
+  [data-slot="toolbar"][data-glide] [data-toolbar-item]::before {
+    transition-duration: 0ms, 0ms, 100ms;
+  }
+
   [data-slot="toolbar"][data-glide] [data-slot="toolbar-link"]::before {
     background-color: transparent;
   }
 
   /* Real hover only (:active covers taps). An open menu, a held item, or
-   * keyboard focus keeps the pill. Open is aria-expanded: tooltip triggers
-   * set data-popup-open too. */
+   * keyboard focus keeps the pill, unless that item can't take it. Open is
+   * aria-expanded: tooltip triggers set data-popup-open too. */
   [data-slot="toolbar"][data-glide]
-    [data-toolbar-item]:not(:disabled, [data-disabled]):is(
+    [data-toolbar-item]:not(:disabled, [data-disabled], [data-pressed]):is(
       :focus-visible,
       :active,
       [aria-expanded="true"]
@@ -186,14 +192,18 @@
   @media (hover: hover) {
     [data-slot="toolbar"][data-glide]:not(
         :has(
-          [data-toolbar-item]:is(
-            [aria-expanded="true"],
-            :active,
-            :focus-visible
-          )
+          [data-toolbar-item]:not(
+              :disabled,
+              [data-disabled],
+              [data-pressed]
+            ):is([aria-expanded="true"], :active, :focus-visible)
         )
       )
-      [data-toolbar-item]:not(:disabled, [data-disabled]):hover::before {
+      [data-toolbar-item]:not(
+        :disabled,
+        [data-disabled],
+        [data-pressed]
+      ):hover::before {
       anchor-name: --toolbar-item;
     }
   }
@@ -217,7 +227,7 @@
   }
 
   [data-slot="toolbar"][data-glide]:has(
-      [data-toolbar-item]:not(:disabled, [data-disabled]):is(
+      [data-toolbar-item]:not(:disabled, [data-disabled], [data-pressed]):is(
           :focus-visible,
           :active,
           [aria-expanded="true"]
@@ -229,17 +239,21 @@
 
   @media (hover: hover) {
     [data-slot="toolbar"][data-glide]:has(
-        [data-toolbar-item]:not(:disabled, [data-disabled]):hover
+        [data-toolbar-item]:not(
+            :disabled,
+            [data-disabled],
+            [data-pressed]
+          ):hover
       )
       > [data-slot="toolbar-highlight"] {
       opacity: 1;
     }
   }
 
-  /* Press: the plate holds still and the pill shrinks. On a pressed toggle
-   * the pill only deepens, or the fill would show an edge. Menu triggers
-   * skip it. */
-  [data-slot="toolbar"][data-glide] [data-toolbar-item]:active::before {
+  /* Press: the plate holds still and the pill shrinks. A pressed toggle
+   * keeps Toggle's own plate press. Menu triggers skip it. */
+  [data-slot="toolbar"][data-glide]
+    [data-toolbar-item]:not([data-pressed]):active::before {
     scale: none;
   }
 
@@ -248,12 +262,6 @@
     )
     > [data-slot="toolbar-highlight"] {
     background-color: var(--toolbar-press);
-  }
-
-  [data-slot="toolbar"][data-glide]:has(
-      [data-toolbar-item]:active:not([aria-haspopup], :disabled, [data-pressed])
-    )
-    > [data-slot="toolbar-highlight"] {
     scale: var(--toolbar-press-scale, 0.98);
   }
 

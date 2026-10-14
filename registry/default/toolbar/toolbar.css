@@ -258,7 +258,12 @@
   }
 
   [data-slot="toolbar"][data-glide]:has(
-      [data-toolbar-item]:active:not([aria-haspopup], :disabled)
+      [data-toolbar-item]:active:not(
+          :disabled,
+          [data-disabled],
+          [data-pressed],
+          [aria-haspopup]
+        )
     )
     > [data-slot="toolbar-highlight"] {
     background-color: var(--toolbar-press);

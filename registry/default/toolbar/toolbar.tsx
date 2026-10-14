@@ -28,7 +28,7 @@ const toolbarVariants = cva(
     "[--toolbar-highlight:color-mix(in_oklab,currentColor_10%,transparent)] [--toolbar-press:color-mix(in_oklab,currentColor_14%,transparent)] [--toolbar-pressed:color-mix(in_oklab,currentColor_16%,transparent)]",
     // The shell is fixed and items stretch to fill it; columns grow to the
     // widest item.
-    "data-[orientation=horizontal]:h-(--toolbar-h) data-[orientation=vertical]:min-w-(--toolbar-h)",
+    "data-[orientation=horizontal]:h-(--toolbar-h)",
     // Parts dim with the shell, not twice.
     "data-disabled:opacity-60 data-disabled:**:data-toolbar-part:opacity-100",
   ],
@@ -56,12 +56,14 @@ const itemShell = cn(
   "shrink-0",
   "rounded-[calc(var(--toolbar-item-radius)+2px)] before:rounded-(--toolbar-item-radius) focus-visible:z-10",
   "h-auto self-stretch sm:h-auto",
-  // In a column every item gets the row's paint height.
-  "group-data-[orientation=vertical]/toolbar:box-content group-data-[orientation=vertical]/toolbar:py-0 group-data-[orientation=vertical]/toolbar:h-[calc(var(--toolbar-h)-4px)] sm:group-data-[orientation=vertical]/toolbar:h-[calc(var(--toolbar-h)-4px)]",
+  // In a column every item gets the row's paint height, and at least its
+  // width, so the column is never narrower than the row is tall.
+  "group-data-[orientation=vertical]/toolbar:box-content group-data-[orientation=vertical]/toolbar:py-0 group-data-[orientation=vertical]/toolbar:h-[calc(var(--toolbar-h)-4px)] sm:group-data-[orientation=vertical]/toolbar:h-[calc(var(--toolbar-h)-4px)] group-data-[orientation=vertical]/toolbar:min-w-[calc(var(--toolbar-h)-4px)]",
 );
 
-// Hover lights instantly, so a sweep never shows two items half-lit; press
-// and the pressed fill still fade.
+// Without the pill, hover lights instantly, so a sweep never shows two items
+// half-lit; press and the pressed fill still fade. toolbar.css times the
+// fills while the pill glides.
 const instantHover =
   "before:[transition-duration:0ms,100ms,100ms] active:before:[transition-duration:100ms] data-pressed:before:[transition-duration:100ms]";
 

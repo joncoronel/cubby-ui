@@ -44,6 +44,8 @@ Leave `variant` unset on `ToolbarButton`; it takes the toolbar's quiet style. To
 </DropdownMenuTrigger>
 ```
 
+The toolbar never gets narrower than its controls. If it may not fit on small screens, put it in a container that scrolls sideways, such as a [`ScrollArea`](/docs/components/scroll-area) with `nativeScroll`. To let a `flex-1` `ToolbarInput` shrink instead, pass `className="min-w-0"` to the toolbar.
+
 ## Examples
 
 ### Variants
@@ -125,8 +127,8 @@ The shell. Wraps Base UI's `Toolbar.Root`.
 </ApiProp>
 
 <ApiProp name="highlight" fullType="boolean" defaultValue="true">
-  Glides one shared highlight between controls. With `false`, each control
-  paints its own hover.
+  Glides one shared highlight between controls. Pressed toggles keep their own
+  fill and never take it. With `false`, each control paints its own hover.
 </ApiProp>
 
 </ApiPropsList>

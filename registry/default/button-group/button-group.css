@@ -116,7 +116,7 @@
 }
 
 /* A column: every item has the row's paint height, whatever its borders,
- * and stretches to the widest. */
+ * at least that width, and stretches to the widest. */
 [data-slot="button-group"]:not(
     [data-variant="attached"]
   )[data-orientation="vertical"]
@@ -124,6 +124,7 @@
   border-inline-width: 2px;
   box-sizing: content-box;
   height: calc(var(--group-h) - 4px);
+  min-width: calc(var(--group-h) - 4px);
   width: auto;
   padding-block: 0;
   align-self: stretch;

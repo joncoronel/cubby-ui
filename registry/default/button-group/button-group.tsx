@@ -83,7 +83,7 @@ const trayClasses = cn(
   "[--group-highlight:color-mix(in_oklab,currentColor_var(--group-highlight-mix,10%),transparent)] [--group-press:color-mix(in_oklab,currentColor_var(--group-press-mix,14%),transparent)]",
   // Sizing: a row is the ladder height, a column at least the ladder width.
   // Items size themselves in button-group.css.
-  "data-[orientation=horizontal]:h-(--group-h) data-[orientation=vertical]:w-fit data-[orientation=vertical]:min-w-(--group-h)",
+  "data-[orientation=horizontal]:h-(--group-h) data-[orientation=vertical]:w-fit",
   // Quiet children. A Button without a variant renders `primary`, so this
   // list (with text-current below) must undo everything `primary` sets: fill,
   // hover, press, border, and label color. A style added to `primary` needs

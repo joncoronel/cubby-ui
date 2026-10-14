@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { ContextMenu as BaseContextMenu } from "@base-ui/react/context-menu";
+import { Menu as BaseMenu } from "@base-ui/react/menu";
 import { cn } from "@/lib/utils";
 import {
   solidSurface,
@@ -9,7 +10,12 @@ import {
 } from "@/registry/default/lib/elevated";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import { CheckIcon, ChevronRightIcon } from "@hugeicons/core-free-icons";
+import {
+  Cancel01Icon,
+  CheckIcon,
+  ChevronRightIcon,
+  Search01Icon,
+} from "@hugeicons/core-free-icons";
 import {
   SwitchVisual,
   type SwitchVisualProps,
@@ -326,7 +332,13 @@ function ContextMenuSeparator({
       // Inset to the item label, not the popup edge: mx-2.5 clears the popup's
       // p-1 plus the item's px-2.5, so the rule starts where the text does
       // instead of running into the popup's rounded corners.
-      className={cn("bg-border mx-2.5 my-1 h-px", className)}
+      className={cn(
+        "bg-border mx-2.5 my-1 h-px",
+        // While filtering, Base UI hides emptied groups. Drop a rule that
+        // would follow one, or that has nothing left to separate below it.
+        "[&:not(:has(~:not([hidden]):not([role=separator])))]:hidden [[hidden]+&]:hidden",
+        className,
+      )}
       {...props}
     />
   );
@@ -436,6 +448,95 @@ function ContextMenuSubContent({
   );
 }
 
+// Filtering (Base UI preview API). ContextMenu renders a Menu root inside, so
+// Menu's filter parts work here: wrap `ContextMenu` or `ContextMenuSub` in the
+// provider, then put a `ContextMenuInput` above a `ContextMenuList`.
+function ContextMenuFilter({
+  autoHighlight = true,
+  ...props
+}: BaseMenu.FilterProvider.Props) {
+  // Highlight the top match while typing, so Enter runs it.
+  return <BaseMenu.FilterProvider autoHighlight={autoHighlight} {...props} />;
+}
+
+function ContextMenuInput({
+  className,
+  inputClassName,
+  showClear = true,
+  ...props
+}: BaseMenu.Input.Props & {
+  /** Class applied to the inner `<input>`. `className` styles the search row. */
+  inputClassName?: string;
+  /** Show a clear button while the query has text. */
+  showClear?: boolean;
+}) {
+  return (
+    <div
+      data-slot="context-menu-input-group"
+      className={cn(
+        // Pinned to the top of the popup, which is its own scroll container.
+        // The negative margins cancel its p-1 so the row and its rule run edge
+        // to edge, and the row's px-3.5 lines the icon up with the item labels.
+        "sticky -top-1 z-10 -mx-1 -mt-1 mb-1 flex h-10 items-center gap-2 border-b bg-(--popup-surface) px-3.5",
+        className,
+      )}
+    >
+      <HugeiconsIcon
+        icon={Search01Icon}
+        strokeWidth={2}
+        className="text-muted-foreground size-4 shrink-0"
+      />
+      <BaseMenu.Input
+        data-slot="context-menu-input"
+        className={cn(
+          "placeholder:text-muted-foreground h-full min-w-0 flex-1 bg-transparent text-sm outline-none",
+          inputClassName,
+        )}
+        {...props}
+      />
+      {showClear && <ContextMenuClear />}
+    </div>
+  );
+}
+
+function ContextMenuClear({
+  className,
+  children,
+  ...props
+}: BaseMenu.Clear.Props) {
+  return (
+    <BaseMenu.Clear
+      data-slot="context-menu-clear"
+      aria-label="Clear search"
+      className={cn(
+        "text-muted-foreground hover:text-foreground focus-visible:ring-ring/70 -mr-1 inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors duration-100 outline-none focus-visible:ring-2",
+        className,
+      )}
+      {...props}
+    >
+      {children ?? (
+        <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-4" />
+      )}
+    </BaseMenu.Clear>
+  );
+}
+
+function ContextMenuList({ ...props }: BaseMenu.List.Props) {
+  return <BaseMenu.List data-slot="context-menu-list" {...props} />;
+}
+
+function ContextMenuEmpty({ className, ...props }: BaseMenu.Empty.Props) {
+  return (
+    <BaseMenu.Empty
+      data-slot="context-menu-empty"
+      className={cn("text-muted-foreground px-2.5 py-1.5 text-sm", className)}
+      {...props}
+    />
+  );
+}
+
+const useContextMenuFilter = BaseMenu.useFilter;
+
 export {
   ContextMenu,
   ContextMenuContent,
@@ -455,4 +556,10 @@ export {
   ContextMenuSub,
   ContextMenuSubTrigger,
   ContextMenuSubContent,
+  ContextMenuFilter,
+  ContextMenuInput,
+  ContextMenuClear,
+  ContextMenuList,
+  ContextMenuEmpty,
+  useContextMenuFilter,
 };

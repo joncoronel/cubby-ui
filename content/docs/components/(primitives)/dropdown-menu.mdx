@@ -28,9 +28,13 @@ A menu of actions or links that opens from a trigger button. Use it for row acti
 ## Composition
 
 ```text
+DropdownMenuFilter         (optional, enables filtering)
 DropdownMenu
 ├── DropdownMenuTrigger
 └── DropdownMenuContent
+    ├── DropdownMenuInput      (with filtering)
+    ├── DropdownMenuEmpty      (with filtering)
+    ├── DropdownMenuList       (with filtering, wraps the items)
     ├── DropdownMenuGroup
     │   ├── DropdownMenuGroupLabel
     │   └── DropdownMenuItem
@@ -105,6 +109,17 @@ Nest a `DropdownMenuSub` to open a submenu on hover.
   component="dropdown-menu"
   example="dropdown-menu-with-sub-menu"
 />
+
+### With Filter
+
+Wrap `DropdownMenu` in `DropdownMenuFilter`, then put a `DropdownMenuInput` above a `DropdownMenuList` to filter items as you type. Wrap a `DropdownMenuSub` in its own `DropdownMenuFilter` to make the submenu searchable too.
+
+<ComponentPreview
+  component="dropdown-menu"
+  example="dropdown-menu-with-filter"
+/>
+
+Set a width on `DropdownMenuContent` so the menu doesn't narrow as long items filter out. Items match on their text, ignoring case, accents, and punctuation. Give an item a `label` when its text isn't what people would type, or pass a `filter` function (such as `startsWith` from `useDropdownMenuFilter()`) to change how items match. Filtering is a preview API in Base UI and may change in a minor release.
 
 ### Animated (Detached Triggers)
 
@@ -374,6 +389,42 @@ Submenu container with positioning. Composes `Menu.Portal`, `Menu.Positioner`, a
 >
   Shadow weight. Kept at `3` (same as parent dropdown), since submenus are still
   small popups.
+</ApiProp>
+
+</ApiPropsList>
+
+#### DropdownMenuFilter
+
+Enables filtering for the `DropdownMenu` or `DropdownMenuSub` it wraps. Wraps Base UI's `Menu.FilterProvider` and renders no element.
+
+<ApiPropsList>
+
+<ApiProp
+  name="autoHighlight"
+  fullType="boolean | 'always'"
+  simpleType="boolean | string"
+  defaultValue="true"
+>
+  Highlight the first matching item while the query has text, so Enter runs it.
+  Base UI defaults to `false`.
+</ApiProp>
+
+</ApiPropsList>
+
+#### DropdownMenuInput
+
+The search row: an icon, Base UI's `Menu.Input`, and a clear button, pinned to the top of the menu while the list scrolls. Props are forwarded to `Menu.Input`.
+
+<ApiPropsList>
+
+<ApiProp name="showClear" fullType="boolean" defaultValue="true">
+  Show a `DropdownMenuClear` button while the query has text. Custom prop not
+  available in Base UI.
+</ApiProp>
+
+<ApiProp name="inputClassName" fullType="string">
+  Class applied to the inner `<input>`. `className` styles the search row.
+  Custom prop not available in Base UI.
 </ApiProp>
 
 </ApiPropsList>

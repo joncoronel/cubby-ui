@@ -9,11 +9,16 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/registry/default/button/button";
 import {
   DropdownMenuCheckboxItem,
+  DropdownMenuClear,
+  DropdownMenuEmpty,
+  DropdownMenuFilter,
   DropdownMenuGroup,
   DropdownMenuGroupLabel,
+  DropdownMenuInput,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuLinkItem,
+  DropdownMenuList,
   DropdownMenuPortal,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -22,6 +27,7 @@ import {
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
+  useDropdownMenuFilter,
 } from "@/registry/default/dropdown-menu/dropdown-menu";
 import {
   solidSurface,
@@ -241,6 +247,13 @@ const MenubarShortcut = DropdownMenuShortcut;
 const MenubarSub = DropdownMenuSub;
 const MenubarSubTrigger = DropdownMenuSubTrigger;
 const MenubarSubContent = DropdownMenuSubContent;
+// Filtering: wrap a MenubarMenu (or MenubarSub) in MenubarFilter.
+const MenubarFilter = DropdownMenuFilter;
+const MenubarInput = DropdownMenuInput;
+const MenubarClear = DropdownMenuClear;
+const MenubarList = DropdownMenuList;
+const MenubarEmpty = DropdownMenuEmpty;
+const useMenubarFilter = useDropdownMenuFilter;
 
 export {
   Menubar,
@@ -261,5 +274,11 @@ export {
   MenubarSub,
   MenubarSubTrigger,
   MenubarSubContent,
+  MenubarFilter,
+  MenubarInput,
+  MenubarClear,
+  MenubarList,
+  MenubarEmpty,
+  useMenubarFilter,
   menubarVariants,
 };

@@ -26,9 +26,12 @@ For one menu opened from a button, use [`DropdownMenu`](/docs/components/dropdow
 
 ```text
 Menubar
-└── MenubarMenu
+└── MenubarMenu                (inside a MenubarFilter to enable filtering)
     ├── MenubarTrigger
     └── MenubarContent
+        ├── MenubarInput           (with filtering)
+        ├── MenubarEmpty           (with filtering)
+        ├── MenubarList            (with filtering, wraps the items)
         ├── MenubarItem
         │   └── MenubarShortcut
         ├── MenubarLinkItem
@@ -75,6 +78,12 @@ Use `MenubarCheckboxItem` for settings and `MenubarRadioGroup` for one choice; s
   component="menubar"
   example="menubar-with-checkboxes-and-switches"
 />
+
+### With Filter
+
+Wrap a `MenubarMenu` in `MenubarFilter`, then put a `MenubarInput` above a `MenubarList` to filter items as you type. The parts work the same as [Dropdown Menu's](/docs/components/dropdown-menu#with-filter). While the search field has focus, Left and Right move the text cursor rather than switching menus.
+
+<ComponentPreview component="menubar" example="menubar-with-filter" />
 
 ## Accessibility
 

@@ -28,9 +28,13 @@ The context menu opens on right-click and lists actions scoped to the element un
 ## Composition
 
 ```text
+ContextMenuFilter          (optional, enables filtering)
 ContextMenu
 ├── ContextMenuTrigger
 └── ContextMenuContent
+    ├── ContextMenuInput       (with filtering)
+    ├── ContextMenuEmpty       (with filtering)
+    ├── ContextMenuList        (with filtering, wraps the items)
     ├── ContextMenuLabel
     ├── ContextMenuItem
     ├── ContextMenuLinkItem
@@ -81,6 +85,12 @@ Use `ContextMenuCheckboxItem` for toggles and `ContextMenuRadioGroup` for single
 Set `indicator="switch"` on `ContextMenuCheckboxItem` to swap the checkmark for a switch. Visual only: the item keeps its `menuitemcheckbox` role, the row stays the click target, and the menu stays open on toggle.
 
 <ComponentPreview component="context-menu" example="context-menu-with-switch" />
+
+### With Filter
+
+Wrap a `ContextMenuSub` (or the whole `ContextMenu`) in `ContextMenuFilter`, then put a `ContextMenuInput` above a `ContextMenuList` to filter items as you type. The parts work the same as [Dropdown Menu's](/docs/components/dropdown-menu#with-filter).
+
+<ComponentPreview component="context-menu" example="context-menu-with-filter" />
 
 ## API Reference
 
@@ -305,6 +315,40 @@ Mutually exclusive menu item. Wraps Base UI's `ContextMenu.RadioItem`. Uses the 
   defaultValue="3"
 >
   Shadow weight. Kept at `3` since submenus are still small popups.
+</ApiProp>
+
+</ApiPropsList>
+
+### ContextMenuFilter
+
+Wraps Base UI's `Menu.FilterProvider`, which works here because `ContextMenu` renders a Menu root inside.
+
+<ApiPropsList>
+
+<ApiProp
+  name="autoHighlight"
+  fullType="boolean | 'always'"
+  simpleType="boolean | string"
+  defaultValue="true"
+>
+  Highlight the first matching item while the query has text, so Enter runs it.
+  Base UI defaults to `false`.
+</ApiProp>
+
+</ApiPropsList>
+
+### ContextMenuInput
+
+<ApiPropsList>
+
+<ApiProp name="showClear" fullType="boolean" defaultValue="true">
+  Show a `ContextMenuClear` button while the query has text. Custom prop not
+  available in Base UI.
+</ApiProp>
+
+<ApiProp name="inputClassName" fullType="string">
+  Class applied to the inner `<input>`. `className` styles the search row.
+  Custom prop not available in Base UI.
 </ApiProp>
 
 </ApiPropsList>

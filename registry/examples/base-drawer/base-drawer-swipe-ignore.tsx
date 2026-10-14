@@ -27,10 +27,10 @@ export default function BaseDrawerSwipeIgnore() {
         </BaseDrawerHeader>
         <BaseDrawerPanel>
           <div className="flex flex-col gap-6 py-2">
-            <Slider defaultValue={70} data-base-ui-swipe-ignore="x">
+            <Slider defaultValue={70}>
               <SliderLabel>Volume</SliderLabel>
             </Slider>
-            <Slider defaultValue={40} data-base-ui-swipe-ignore="x">
+            <Slider defaultValue={40}>
               <SliderLabel>Bass</SliderLabel>
             </Slider>
           </div>

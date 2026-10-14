@@ -124,9 +124,11 @@ Use `BaseDrawerPanel` for scrollable content that coexists with swipe gestures.
 
 ### Draggable Controls
 
-Use `data-base-ui-swipe-ignore` to keep the drawer from swiping when a drag starts on a control that handles its own drags. Set it to `"x"` or `"y"` to hand only that axis to the control, so a horizontal slider in a bottom drawer still lets a downward swipe dismiss.
+[Slider](/docs/components/slider) and [Circular Slider](/docs/components/circular-slider) keep their drags from swiping the drawer, with no setup. A horizontal slider in a bottom drawer still lets a downward swipe dismiss.
 
 <ComponentPreview component="base-drawer" example="base-drawer-swipe-ignore" />
+
+For your own draggable controls, add `data-base-ui-swipe-ignore`. Set it to `"x"` or `"y"` to hand only that axis to the control.
 
 | Value      | Description                                                       |
 | ---------- | ----------------------------------------------------------------- |
@@ -134,7 +136,7 @@ Use `data-base-ui-swipe-ignore` to keep the drawer from swiping when a drag star
 | `"x"`      | Touch drags along the x axis go to the element; others can swipe. |
 | `"y"`      | Touch drags along the y axis go to the element; others can swipe. |
 
-Mouse and pen drags ignore the swipe for any value, since they can't wait to see which axis the gesture takes. [Circular Slider](/docs/components/circular-slider) sets the attribute on its drag surface already.
+Mouse and pen drags ignore the swipe for any value, since they can't wait to see which axis the gesture takes.
 
 ### Menu Items
 

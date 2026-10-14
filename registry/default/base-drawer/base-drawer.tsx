@@ -105,7 +105,9 @@ function BaseDrawerIndent({
       data-slot="base-drawer-indent"
       className={cn(
         "transition-[transform,border-radius] duration-400 ease-[cubic-bezier(.32,.72,0,1)]",
-        "data-active:scale-[0.94] data-active:overflow-hidden data-active:rounded-lg",
+        // The page recedes behind an open drawer; with reduced motion it
+        // stays put and the backdrop alone marks the drawer.
+        "data-active:overflow-hidden motion-safe:data-active:scale-[0.94] motion-safe:data-active:rounded-lg",
         className,
       )}
       {...props}

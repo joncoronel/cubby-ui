@@ -20,13 +20,15 @@ import "./toolbar.css";
 const toolbarVariants = cva(
   [
     "group/toolbar relative isolate flex w-fit items-stretch rounded-(--toolbar-radius) data-[orientation=vertical]:flex-col",
+    // Never narrower than its items; overflow is the container's to handle.
+    "min-w-max",
     // Paint corners are the shell's minus the 2px edge border.
     "[--toolbar-item-radius:max(0px,calc(var(--toolbar-radius)-2px))]",
     // Label-color tints: hover 10%, press 14%, pressed toggle 16%
     "[--toolbar-highlight:color-mix(in_oklab,currentColor_10%,transparent)] [--toolbar-press:color-mix(in_oklab,currentColor_14%,transparent)] [--toolbar-pressed:color-mix(in_oklab,currentColor_16%,transparent)]",
     // The shell is fixed and items stretch to fill it; columns grow to the
     // widest item.
-    "data-[orientation=horizontal]:h-(--toolbar-h) data-[orientation=vertical]:min-w-(--toolbar-h)",
+    "data-[orientation=horizontal]:h-(--toolbar-h)",
     // Parts dim with the shell, not twice.
     "data-disabled:opacity-60 data-disabled:**:data-toolbar-part:opacity-100",
   ],
@@ -54,9 +56,16 @@ const itemShell = cn(
   "shrink-0",
   "rounded-[calc(var(--toolbar-item-radius)+2px)] before:rounded-(--toolbar-item-radius) focus-visible:z-10",
   "h-auto self-stretch sm:h-auto",
-  // In a column every item gets the row's paint height.
-  "group-data-[orientation=vertical]/toolbar:box-content group-data-[orientation=vertical]/toolbar:py-0 group-data-[orientation=vertical]/toolbar:h-[calc(var(--toolbar-h)-4px)] sm:group-data-[orientation=vertical]/toolbar:h-[calc(var(--toolbar-h)-4px)]",
+  // In a column every item gets the row's paint height, and at least its
+  // width, so the column is never narrower than the row is tall.
+  "group-data-[orientation=vertical]/toolbar:box-content group-data-[orientation=vertical]/toolbar:py-0 group-data-[orientation=vertical]/toolbar:h-[calc(var(--toolbar-h)-4px)] sm:group-data-[orientation=vertical]/toolbar:h-[calc(var(--toolbar-h)-4px)] group-data-[orientation=vertical]/toolbar:min-w-[calc(var(--toolbar-h)-4px)]",
 );
+
+// Without the pill, hover lights instantly, so a sweep never shows two items
+// half-lit; press and the pressed fill still fade. toolbar.css times the
+// fills while the pill glides.
+const instantHover =
+  "before:[transition-duration:0ms,100ms,100ms] active:before:[transition-duration:100ms] data-pressed:before:[transition-duration:100ms]";
 
 // Icon-only items have a square paint (the content box, with no padding),
 // whatever each side's border: as tall as the row, or as wide as the column.
@@ -165,7 +174,10 @@ function ToolbarButton({
             // Quiet: undo primary's fill and border, hover and press with the
             // label tints. A set variant keeps its own paint.
             !variant &&
-              "text-current [--btn-bg-active:var(--toolbar-press)] [--btn-bg-hover:var(--toolbar-highlight)] [--btn-bg:transparent] [--btn-border:transparent]",
+              cn(
+                "text-current [--btn-bg-active:var(--toolbar-press)] [--btn-bg-hover:var(--toolbar-highlight)] [--btn-bg:transparent] [--btn-border:transparent]",
+                instantHover,
+              ),
             className,
           )}
         />
@@ -207,6 +219,7 @@ function ToolbarToggle({
             iconOnly && iconSquare,
             "text-current",
             "[--tgl-bg-active:var(--toolbar-press)] [--tgl-bg-hover:var(--toolbar-highlight)] [--tgl-bg-selected:var(--toolbar-pressed)]",
+            instantHover,
             className,
           )}
         />
@@ -306,6 +319,7 @@ function ToolbarLink({ className, ...props }: ToolbarLinkProps) {
         itemSize[size],
         itemShell,
         "before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:transition-[background-color,scale] before:duration-100 before:ease-out before:content-['']",
+        "before:[transition-duration:0ms,100ms] active:before:[transition-duration:100ms]",
         "hover:before:bg-(--toolbar-highlight) active:before:scale-[0.98] active:before:bg-(--toolbar-press) motion-reduce:active:before:scale-100",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0",
         className,

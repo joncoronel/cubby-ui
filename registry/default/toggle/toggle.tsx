@@ -31,9 +31,10 @@ const toggleBase = cn(
 
 // The paint pseudo-element: 1px border + fill from the resolved vars,
 // transparent when unset. -z-10 keeps it under the content (the root's
-// `isolate` contains it), and pressing scales only the pseudo.
+// `isolate` contains it), and pressing scales only the pseudo. Reduced motion
+// keeps the press tint only.
 const togglePaint =
-  "before:content-[''] before:absolute before:inset-0 before:-z-10 before:rounded-[inherit] before:border before:border-[color:var(--tgl-border,transparent)] before:bg-[var(--tgl-paint,transparent)] before:transition-[background-color,border-color,scale] before:duration-100 before:ease-out active:before:scale-[0.98]";
+  "before:content-[''] before:absolute before:inset-0 before:-z-10 before:rounded-[inherit] before:border before:border-[color:var(--tgl-border,transparent)] before:bg-[var(--tgl-paint,transparent)] before:transition-[background-color,border-color,scale] before:duration-100 before:ease-out motion-safe:active:before:scale-[0.98]";
 
 const toggleVariants = cva(cn(toggleBase, togglePaint), {
   variants: {

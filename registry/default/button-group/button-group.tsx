@@ -83,7 +83,7 @@ const trayClasses = cn(
   "[--group-highlight:color-mix(in_oklab,currentColor_var(--group-highlight-mix,10%),transparent)] [--group-press:color-mix(in_oklab,currentColor_var(--group-press-mix,14%),transparent)]",
   // Sizing: a row is the ladder height, a column at least the ladder width.
   // Items size themselves in button-group.css.
-  "data-[orientation=horizontal]:h-(--group-h) data-[orientation=vertical]:w-fit data-[orientation=vertical]:min-w-(--group-h)",
+  "data-[orientation=horizontal]:h-(--group-h) data-[orientation=vertical]:w-fit",
   // Quiet children. A Button without a variant renders `primary`, so this
   // list (with text-current below) must undo everything `primary` sets: fill,
   // hover, press, border, and label color. A style added to `primary` needs
@@ -91,6 +91,10 @@ const trayClasses = cn(
   "[&>:is(button,a):not([data-variant])]:[--btn-bg:transparent] [&>:is(button,a):not([data-variant])]:[--btn-border:transparent] [&>:is(button,a):not([data-variant])]:[--btn-bg-hover:var(--group-highlight)] [&>:is(button,a):not([data-variant])]:[--btn-bg-active:var(--group-press)]",
   // Label color
   "[&>:is(button,a):not([data-variant])]:text-current",
+  // Instant hover, so a sweep never shows two buttons half-lit.
+  "[&>:is(button,a):not([data-variant])]:before:[transition-duration:0ms,100ms,100ms] [&>:is(button,a):not([data-variant])]:active:before:[transition-duration:100ms]",
+  // Never narrower than its items; overflow is the container's to handle.
+  "min-w-max",
   // Groups of groups are a layout wrapper with no shell
   "has-[>[data-slot=button-group]]:gap-2 has-[>[data-slot=button-group]]:bg-transparent has-[>[data-slot=button-group]]:p-0 has-[>[data-slot=button-group]]:border-0 has-[>[data-slot=button-group]]:outline-0 has-[>[data-slot=button-group]]:shadow-none has-[>[data-slot=button-group]]:h-auto has-[>[data-slot=button-group]]:w-fit",
 );

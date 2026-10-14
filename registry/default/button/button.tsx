@@ -40,9 +40,9 @@ const buttonBase = cn(
 // transparent when unset. -z-10 keeps it under the content (the root's
 // `isolate` contains it), and pressing scales only the pseudo — except on
 // popup triggers (aria-haspopup), which skip press feedback and hold their
-// hover paint while open instead.
+// hover paint while open instead. Reduced motion keeps the press tint only.
 const buttonPaint =
-  "before:content-[''] before:absolute before:inset-0 before:-z-10 before:rounded-[inherit] before:border before:border-[color:var(--btn-border,transparent)] before:bg-[var(--btn-paint,transparent)] before:transition-[background-color,border-color,scale] before:duration-100 before:ease-out active:not-aria-[haspopup]:before:scale-[0.98]";
+  "before:content-[''] before:absolute before:inset-0 before:-z-10 before:rounded-[inherit] before:border before:border-[color:var(--btn-border,transparent)] before:bg-[var(--btn-paint,transparent)] before:transition-[background-color,border-color,scale] before:duration-100 before:ease-out motion-safe:active:not-aria-[haspopup]:before:scale-[0.98]";
 
 // Text classes plus the paint tokens the state machine reads.
 const buttonVariantClasses = {

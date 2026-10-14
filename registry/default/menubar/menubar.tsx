@@ -36,11 +36,13 @@ import "./menubar.css";
 const menubarVariants = cva(
   [
     "group/menubar relative isolate flex w-fit items-stretch rounded-(--menubar-radius) data-[orientation=vertical]:flex-col",
+    // Never narrower than its triggers; overflow is the container's to handle.
+    "min-w-max",
     // Paint corners are the shell's minus the 2px edge border.
     "[--menubar-item-radius:max(0px,calc(var(--menubar-radius)-2px))]",
     // Label-color tints: hover 10%, press 14%
     "[--menubar-highlight:color-mix(in_oklab,currentColor_10%,transparent)] [--menubar-press:color-mix(in_oklab,currentColor_14%,transparent)]",
-    "data-[orientation=horizontal]:h-(--menubar-h) data-[orientation=vertical]:min-w-(--menubar-h)",
+    "data-[orientation=horizontal]:h-(--menubar-h)",
     "data-[orientation=horizontal]:[&>[data-menubar-item]]:border-y-2 data-[orientation=horizontal]:[&>:nth-child(1_of_[data-menubar-item])]:border-s-2 data-[orientation=horizontal]:[&>:nth-last-child(1_of_[data-menubar-item])]:border-e-2",
     "data-[orientation=vertical]:[&>[data-menubar-item]]:border-x-2 data-[orientation=vertical]:[&>:nth-child(1_of_[data-menubar-item])]:border-t-2 data-[orientation=vertical]:[&>:nth-last-child(1_of_[data-menubar-item])]:border-b-2",
     // Triggers dim with the shell, not twice.
@@ -116,10 +118,12 @@ const triggerClasses = cn(
   buttonVariants({ variant: "ghost", size: null }),
   "shrink-0 border border-transparent px-2.5 text-sm font-medium text-current hover:text-current data-popup-open:text-current",
   "[--btn-bg-hover:var(--menubar-highlight)] [--btn-bg-active:var(--menubar-press)]",
+  // Instant hover, so a sweep never shows two triggers half-lit.
+  "before:[transition-duration:0ms,100ms,100ms] active:before:[transition-duration:100ms]",
   // Box corners are the plate's + 2px.
   "rounded-[calc(var(--menubar-item-radius)+2px)] before:rounded-(--menubar-item-radius) focus-visible:z-10",
   // In a column every trigger gets the row's paint height.
-  "h-auto self-stretch group-data-[orientation=vertical]/menubar:box-content group-data-[orientation=vertical]/menubar:h-[calc(var(--menubar-h)-4px)] group-data-[orientation=vertical]/menubar:py-0 group-data-[orientation=vertical]/menubar:justify-start",
+  "h-auto self-stretch group-data-[orientation=vertical]/menubar:box-content group-data-[orientation=vertical]/menubar:h-[calc(var(--menubar-h)-4px)] group-data-[orientation=vertical]/menubar:min-w-[calc(var(--menubar-h)-4px)] group-data-[orientation=vertical]/menubar:py-0 group-data-[orientation=vertical]/menubar:justify-start",
 );
 
 function MenubarTrigger({

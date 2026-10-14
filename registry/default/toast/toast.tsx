@@ -1640,7 +1640,7 @@ function GroupedToastCard({ data, isTop }: GroupedToastCardProps) {
     <div
       ref={cardRef}
       data-slot="grouped-toast-card"
-      data-swipe-ignore
+      data-base-ui-swipe-ignore
       className={cn(
         "max-h-64 w-full overflow-y-auto overscroll-contain rounded-lg",
         // Surface elevation — level=5 because it pops above the level-3 toast.
@@ -1838,7 +1838,7 @@ function CompletedItemsCard({ items, isTop }: CompletedItemsCardProps) {
     <div
       ref={cardRef}
       data-slot="completed-items-card"
-      data-swipe-ignore
+      data-base-ui-swipe-ignore
       className={cn(
         "max-h-48 w-full overflow-y-auto overscroll-contain rounded-lg",
         // bg-muted is intentionally recessed vs the active card; shadow stays at level=5 to match.

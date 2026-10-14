@@ -5,6 +5,7 @@ import accordion_accordion_demo from "@/registry/examples/accordion/accordion-de
 import accordion_accordion_default_expanded from "@/registry/examples/accordion/accordion-default-expanded";
 import accordion_accordion_chevron_indicator from "@/registry/examples/accordion/accordion-chevron-indicator";
 import accordion_accordion_disabled from "@/registry/examples/accordion/accordion-disabled";
+import accordion_accordion_hidden_until_found from "@/registry/examples/accordion/accordion-hidden-until-found";
 import accordion_accordion_indicator_start from "@/registry/examples/accordion/accordion-indicator-start";
 import accordion_accordion_isolated_bordered_variant from "@/registry/examples/accordion/accordion-isolated-bordered-variant";
 import accordion_accordion_isolated_filled_bordered_variant from "@/registry/examples/accordion/accordion-isolated-filled-bordered-variant";
@@ -65,6 +66,7 @@ import base_drawer_base_drawer_keyboard_aware from "@/registry/examples/base-dra
 import base_drawer_base_drawer_nested from "@/registry/examples/base-drawer/base-drawer-nested";
 import base_drawer_base_drawer_side from "@/registry/examples/base-drawer/base-drawer-side";
 import base_drawer_base_drawer_snap_points from "@/registry/examples/base-drawer/base-drawer-snap-points";
+import base_drawer_base_drawer_swipe_ignore from "@/registry/examples/base-drawer/base-drawer-swipe-ignore";
 import base_drawer_base_drawer_with_form from "@/registry/examples/base-drawer/base-drawer-with-form";
 import base_drawer_base_drawer_with_menu from "@/registry/examples/base-drawer/base-drawer-with-menu";
 import base_drawer_base_drawer_with_scroll from "@/registry/examples/base-drawer/base-drawer-with-scroll";
@@ -1644,6 +1646,11 @@ export const exampleRegistry = {
       "source": "import {\n  Accordion,\n  AccordionContent,\n  AccordionItem,\n  AccordionTrigger,\n} from \"@/components/ui/cubby-ui/accordion\";\n\nexport default function AccordionDisabled() {\n  return (\n    <Accordion multiple={true} className=\"w-full max-w-lg\">\n      <AccordionItem value=\"item-1\">\n        <AccordionTrigger>Account Information</AccordionTrigger>\n        <AccordionContent>\n          Update your personal details, contact information, and profile\n          preferences. Changes are saved automatically.\n        </AccordionContent>\n      </AccordionItem>\n      <AccordionItem value=\"item-2\" disabled>\n        <AccordionTrigger>Subscription Settings</AccordionTrigger>\n        <AccordionContent>\n          Manage your subscription plan, billing details, and payment methods.\n          This section is temporarily unavailable for maintenance.\n        </AccordionContent>\n      </AccordionItem>\n      <AccordionItem value=\"item-3\">\n        <AccordionTrigger>Privacy & Security</AccordionTrigger>\n        <AccordionContent>\n          Configure your privacy settings, manage connected accounts, and enable\n          two-factor authentication to keep your account secure.\n        </AccordionContent>\n      </AccordionItem>\n    </Accordion>\n  );\n}\n"
     },
     {
+      "title": "Hidden Until Found",
+      "importPath": "accordion-hidden-until-found",
+      "source": "import {\n  Accordion,\n  AccordionContent,\n  AccordionItem,\n  AccordionTrigger,\n} from \"@/components/ui/cubby-ui/accordion\";\n\nexport default function AccordionHiddenUntilFound() {\n  return (\n    <Accordion hiddenUntilFound className=\"w-full max-w-lg\">\n      <AccordionItem value=\"shipping\">\n        <AccordionTrigger>Shipping</AccordionTrigger>\n        <AccordionContent>\n          Orders ship within two business days. Tracking details arrive by\n          email once the parcel leaves the warehouse.\n        </AccordionContent>\n      </AccordionItem>\n      <AccordionItem value=\"returns\">\n        <AccordionTrigger>Returns</AccordionTrigger>\n        <AccordionContent>\n          Return unused items within 30 days for a full refund. Opened\n          electronics carry a 15% restocking fee.\n        </AccordionContent>\n      </AccordionItem>\n      <AccordionItem value=\"warranty\">\n        <AccordionTrigger>Warranty</AccordionTrigger>\n        <AccordionContent>\n          Every product includes a one-year warranty covering manufacturing\n          defects. Contact support with your order number to start a claim.\n        </AccordionContent>\n      </AccordionItem>\n    </Accordion>\n  );\n}\n"
+    },
+    {
       "title": "Indicator Start",
       "importPath": "accordion-indicator-start",
       "source": "import {\n  Accordion,\n  AccordionContent,\n  AccordionItem,\n  AccordionTrigger,\n} from \"@/components/ui/cubby-ui/accordion\";\n\nexport default function AccordionIndicatorStart() {\n  return (\n    <Accordion className=\"w-full max-w-lg\">\n      <AccordionItem value=\"item-1\">\n        <AccordionTrigger indicatorPosition=\"start\">\n          Desktop Application\n        </AccordionTrigger>\n        <AccordionContent>\n          Our desktop app is available for Windows, macOS, and Linux. It offers\n          offline mode, native notifications, and seamless syncing with your\n          cloud account.\n        </AccordionContent>\n      </AccordionItem>\n      <AccordionItem value=\"item-2\">\n        <AccordionTrigger indicatorPosition=\"start\">\n          Mobile Application\n        </AccordionTrigger>\n        <AccordionContent>\n          Download our mobile app for iOS and Android. Features include\n          biometric authentication, push notifications, and full functionality\n          even when you&apos;re offline.\n        </AccordionContent>\n      </AccordionItem>\n      <AccordionItem value=\"item-3\">\n        <AccordionTrigger indicatorPosition=\"start\">\n          Web Platform\n        </AccordionTrigger>\n        <AccordionContent>\n          Access your account from any browser with our web platform. No\n          installation required, automatic updates, and consistent experience\n          across all devices.\n        </AccordionContent>\n      </AccordionItem>\n    </Accordion>\n  );\n}\n"
@@ -1956,6 +1963,11 @@ export const exampleRegistry = {
       "title": "Snap Points",
       "importPath": "base-drawer-snap-points",
       "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  BaseDrawer,\n  BaseDrawerClose,\n  BaseDrawerDescription,\n  BaseDrawerHeader,\n  BaseDrawerPanel,\n  BaseDrawerPopup,\n  BaseDrawerTitle,\n  BaseDrawerTrigger,\n} from \"@/components/ui/cubby-ui/base-drawer\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\n\nconst snapPoints = [\"300px\", 1] as const;\n\nexport default function BaseDrawerSnapPoints() {\n  const [snapPoint, setSnapPoint] = React.useState<\n    (typeof snapPoints)[number] | null\n  >(snapPoints[0]);\n\n  return (\n    <BaseDrawer\n      snapPoints={[...snapPoints]}\n      snapPoint={snapPoint}\n      onSnapPointChange={(point) =>\n        setSnapPoint(point as (typeof snapPoints)[number] | null)\n      }\n      snapToSequentialPoints\n    >\n      <BaseDrawerTrigger render={<Button variant=\"outline\" />}>\n        Open Snap Drawer\n      </BaseDrawerTrigger>\n      <BaseDrawerPopup showBar>\n        <BaseDrawerHeader>\n          <BaseDrawerTitle>Snap Points</BaseDrawerTitle>\n          <BaseDrawerDescription>\n            Drag the drawer to snap between a compact peek and full-height view.\n          </BaseDrawerDescription>\n        </BaseDrawerHeader>\n        <BaseDrawerPanel>\n          <div className=\"flex flex-col gap-2\">\n            {Array.from({ length: 48 }, (_, i) => (\n              <div\n                key={i}\n                className=\"bg-muted h-12 shrink-0 rounded-xl border\"\n              />\n            ))}\n          </div>\n          <div className=\"mt-4 flex justify-end\">\n            <BaseDrawerClose render={<Button variant=\"outline\" />}>\n              Close\n            </BaseDrawerClose>\n          </div>\n        </BaseDrawerPanel>\n      </BaseDrawerPopup>\n    </BaseDrawer>\n  );\n}\n"
+    },
+    {
+      "title": "Swipe Ignore",
+      "importPath": "base-drawer-swipe-ignore",
+      "source": "import {\n  BaseDrawer,\n  BaseDrawerClose,\n  BaseDrawerDescription,\n  BaseDrawerFooter,\n  BaseDrawerHeader,\n  BaseDrawerPanel,\n  BaseDrawerPopup,\n  BaseDrawerTitle,\n  BaseDrawerTrigger,\n} from \"@/components/ui/cubby-ui/base-drawer\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Slider, SliderLabel } from \"@/components/ui/cubby-ui/slider\";\n\nexport default function BaseDrawerSwipeIgnore() {\n  return (\n    <BaseDrawer>\n      <BaseDrawerTrigger render={<Button variant=\"outline\" />}>\n        Open Audio Settings\n      </BaseDrawerTrigger>\n      <BaseDrawerPopup showBar>\n        <BaseDrawerHeader>\n          <BaseDrawerTitle>Audio</BaseDrawerTitle>\n          <BaseDrawerDescription>\n            Drag the sliders sideways. Swipe down anywhere to dismiss.\n          </BaseDrawerDescription>\n        </BaseDrawerHeader>\n        <BaseDrawerPanel>\n          <div className=\"flex flex-col gap-6 py-2\">\n            <Slider defaultValue={70} data-base-ui-swipe-ignore=\"x\">\n              <SliderLabel>Volume</SliderLabel>\n            </Slider>\n            <Slider defaultValue={40} data-base-ui-swipe-ignore=\"x\">\n              <SliderLabel>Bass</SliderLabel>\n            </Slider>\n          </div>\n        </BaseDrawerPanel>\n        <BaseDrawerFooter>\n          <BaseDrawerClose render={<Button className=\"w-full\" />}>\n            Done\n          </BaseDrawerClose>\n        </BaseDrawerFooter>\n      </BaseDrawerPopup>\n    </BaseDrawer>\n  );\n}\n"
     },
     {
       "title": "With Form",
@@ -4413,6 +4425,7 @@ export const componentMap = {
   "accordion-default-expanded": accordion_accordion_default_expanded,
   "accordion-chevron-indicator": accordion_accordion_chevron_indicator,
   "accordion-disabled": accordion_accordion_disabled,
+  "accordion-hidden-until-found": accordion_accordion_hidden_until_found,
   "accordion-indicator-start": accordion_accordion_indicator_start,
   "accordion-isolated-bordered-variant": accordion_accordion_isolated_bordered_variant,
   "accordion-isolated-filled-bordered-variant": accordion_accordion_isolated_filled_bordered_variant,
@@ -4473,6 +4486,7 @@ export const componentMap = {
   "base-drawer-nested": base_drawer_base_drawer_nested,
   "base-drawer-side": base_drawer_base_drawer_side,
   "base-drawer-snap-points": base_drawer_base_drawer_snap_points,
+  "base-drawer-swipe-ignore": base_drawer_base_drawer_swipe_ignore,
   "base-drawer-with-form": base_drawer_base_drawer_with_form,
   "base-drawer-with-menu": base_drawer_base_drawer_with_menu,
   "base-drawer-with-scroll": base_drawer_base_drawer_with_scroll,

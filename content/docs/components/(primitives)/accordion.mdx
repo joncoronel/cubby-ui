@@ -81,6 +81,14 @@ Use the `subtitle` prop on `AccordionTrigger` to render secondary text below the
 
 <ComponentPreview component="accordion" example="accordion-with-subtitle" />
 
+### Searchable Content
+
+Use `hiddenUntilFound` on `Accordion` (or on a single `AccordionContent`) so the browser's find-in-page can search closed panels and open the one with a match. Try searching this page for "restocking".
+
+<ComponentPreview component="accordion" example="accordion-hidden-until-found" />
+
+Closed panels stay in the DOM, so search engines can index their text too. Browsers without `hidden="until-found"` support keep the panels closed and skip them in find-in-page.
+
 ### Variants
 
 Use `variant` on `Accordion` to change how items are framed and separated.

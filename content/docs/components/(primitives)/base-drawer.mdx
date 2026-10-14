@@ -392,15 +392,16 @@ Single-choice drawer row. Wraps Base UI's `Radio.Root` and must sit inside a `Ba
 
 ### CSS Variables
 
-Base UI's Drawer exposes CSS custom properties on the popup element:
+Base UI's Drawer exposes CSS custom properties on the popup element, plus the keyboard inset on the viewport:
 
-| Variable                     | Description                                              |
-| ---------------------------- | -------------------------------------------------------- |
-| `--drawer-swipe-progress`    | Progress toward dismissed (0 = open, 1 = dismissed)      |
-| `--drawer-swipe-movement-x`  | Horizontal swipe offset in pixels                        |
-| `--drawer-swipe-movement-y`  | Vertical swipe offset in pixels                          |
-| `--drawer-swipe-strength`    | Velocity-based strength (scales exit animation duration) |
-| `--drawer-snap-point-offset` | Vertical offset for snap point positioning               |
-| `--drawer-height`            | Current drawer height                                    |
-| `--drawer-frontmost-height`  | Height of the frontmost drawer in a nested stack         |
-| `--nested-drawers`           | Number of nested drawers open                            |
+| Variable                     | Description                                                      |
+| ---------------------------- | ---------------------------------------------------------------- |
+| `--drawer-swipe-progress`    | Progress toward dismissed (0 = open, 1 = dismissed)              |
+| `--drawer-swipe-movement-x`  | Horizontal swipe offset in pixels                                |
+| `--drawer-swipe-movement-y`  | Vertical swipe offset in pixels                                  |
+| `--drawer-swipe-strength`    | Velocity-based strength (scales exit animation duration)         |
+| `--drawer-snap-point-offset` | Vertical offset for snap point positioning                       |
+| `--drawer-height`            | Current drawer height                                            |
+| `--drawer-frontmost-height`  | Height of the frontmost drawer in a nested stack                 |
+| `--nested-drawers`           | Number of nested drawers open                                    |
+| `--drawer-keyboard-inset`    | On-screen keyboard height from the bottom edge (viewport only)   |

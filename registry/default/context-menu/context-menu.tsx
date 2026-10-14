@@ -463,6 +463,7 @@ function ContextMenuInput({
   className,
   inputClassName,
   showClear = true,
+  "aria-label": ariaLabel = "Search",
   ...props
 }: BaseMenu.Input.Props & {
   /** Class applied to the inner `<input>`. `className` styles the search row. */
@@ -489,9 +490,11 @@ function ContextMenuInput({
       <BaseMenu.Input
         data-slot="context-menu-input"
         className={cn(
-          "placeholder:text-muted-foreground h-full min-w-0 flex-1 bg-transparent text-sm outline-none",
+          "placeholder:text-muted-foreground h-full min-w-0 flex-1 bg-transparent text-base outline-none md:text-sm",
           inputClassName,
         )}
+        // The placeholder isn't a name; pass a specific label when you can.
+        aria-label={ariaLabel}
         {...props}
       />
       {showClear && <ContextMenuClear />}
@@ -509,7 +512,10 @@ function ContextMenuClear({
       data-slot="context-menu-clear"
       aria-label="Clear search"
       className={cn(
-        "text-muted-foreground hover:text-foreground focus-visible:ring-ring/70 -mr-1 inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors duration-100 outline-none focus-visible:ring-2",
+        "text-muted-foreground hover:text-foreground focus-visible:ring-ring/70 relative -mr-1 inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors duration-100 outline-none focus-visible:ring-2",
+        // 40px hit area: it reaches the input across the gap and stays inside
+        // the row, so the two never overlap.
+        "after:absolute after:-inset-2",
         className,
       )}
       {...props}

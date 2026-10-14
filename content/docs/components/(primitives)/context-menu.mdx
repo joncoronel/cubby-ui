@@ -341,6 +341,11 @@ Wraps Base UI's `Menu.FilterProvider`, which works here because `ContextMenu` re
 
 <ApiPropsList>
 
+<ApiProp name="aria-label" fullType="string" defaultValue='"Search"'>
+  Accessible name for the field, since the placeholder doesn't count as one.
+  Pass something specific, like `"Search actions"`.
+</ApiProp>
+
 <ApiProp name="showClear" fullType="boolean" defaultValue="true">
   Show a `ContextMenuClear` button while the query has text. Custom prop not
   available in Base UI.

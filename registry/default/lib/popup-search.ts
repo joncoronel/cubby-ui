@@ -1,6 +1,6 @@
-// The search field that sits at the top of a popup list: Combobox's `popup`
-// input, the Filters add menu, and the filterable menus. One look for all of
-// them, so they can't drift apart.
+// Shared classes for the search field at the top of a popup list. It serves
+// Combobox's `popup` input, the Filters add menu, and the filterable menus,
+// with one look for all of them so they can't drift apart.
 //
 // It is drawn like the list's own rows: the same 4px gutter, the item radius
 // and the item's 10px label inset, so the search icon starts where item labels
@@ -32,6 +32,13 @@ export const POPUP_SEARCH_INPUT =
  */
 export const POPUP_SEARCH_CLEAR =
   "text-muted-foreground hover:text-foreground focus-visible:ring-ring/70 relative -mr-1 inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors duration-100 outline-none focus-visible:ring-2 after:absolute after:-inset-2";
+
+/**
+ * A menu's search field, placed above its list: an item's height, inset 4px
+ * like the items, and never squeezed by the list in the popup's column. The
+ * gap below it is the list's own padding, so rows scroll up under the field.
+ */
+export const POPUP_SEARCH_MENU_FIELD = "mx-1 mt-1 h-8 shrink-0";
 
 /** The search icon's classes. */
 export const POPUP_SEARCH_ICON = "text-muted-foreground size-4 shrink-0";

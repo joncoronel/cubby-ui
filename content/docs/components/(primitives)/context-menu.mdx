@@ -129,8 +129,9 @@ Wrap a `ContextMenuSub` (or the whole `ContextMenu`) in `ContextMenuFilter`, the
 
 <ApiProp name="positionerClassName" fullType="string">
   Classes for the positioner, the element Base UI moves into place. Merged last,
-  so it overrides the defaults, such as `max-h-96` to cap the menu's height.
-  Custom prop not available in Base UI.
+  so it overrides the defaults, such as `z-60` to raise the menu. To cap the
+  height, use `className`, which styles the popup. Custom prop not available in
+  Base UI.
 </ApiProp>
 
 </ApiPropsList>
@@ -325,8 +326,9 @@ Mutually exclusive menu item. Wraps Base UI's `ContextMenu.RadioItem`. Uses the 
 
 <ApiProp name="positionerClassName" fullType="string">
   Classes for the positioner, the element Base UI moves into place. Merged last,
-  so it overrides the defaults, such as `max-h-96` to cap the menu's height.
-  Custom prop not available in Base UI.
+  so it overrides the defaults, such as `z-60` to raise the menu. To cap the
+  height, use `className`, which styles the popup. Custom prop not available in
+  Base UI.
 </ApiProp>
 
 </ApiPropsList>
@@ -368,7 +370,16 @@ Wraps Base UI's `Menu.FilterProvider`, which works here because `ContextMenu` re
   Custom prop not available in Base UI.
 </ApiProp>
 
+<ApiProp name="clearLabel" fullType="string" defaultValue='"Clear search"'>
+  Accessible name of the clear button, e.g. for a translated menu. Custom prop
+  not available in Base UI.
+</ApiProp>
+
 </ApiPropsList>
+
+### ContextMenuList, ContextMenuEmpty, ContextMenuClear
+
+These work like [Dropdown Menu's](/docs/components/dropdown-menu#dropdownmenulist): the list scrolls below the field in a `ScrollArea` (its `className` goes there), the empty message shows when nothing matches, and the clear button empties the query.
 
 ### Additional Props
 

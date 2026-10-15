@@ -20,6 +20,7 @@ import {
   POPUP_SEARCH_FIELD,
   POPUP_SEARCH_ICON,
   POPUP_SEARCH_INPUT,
+  POPUP_SEARCH_MENU_FIELD,
 } from "@/registry/default/lib/popup-search";
 import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 import {
@@ -550,18 +551,11 @@ function DropdownMenuSubContent({
         align={align}
         alignOffset={alignOffset ?? defaultAlignOffset}
       >
-        <BaseMenu.Popup
+        <DropdownMenuPopup
           data-slot="dropdown-menu-content"
-          data-level={level}
-          className={cn(
-            "text-popover-foreground relative max-h-(--available-height) max-w-(--available-width) min-w-[12rem] overflow-hidden rounded-xl outline-none",
-            solidSurface(level, shadowLevel),
-            "ease-out-expo origin-(--transform-origin) transition-[transform,scale,opacity] duration-100",
-            "data-starting-style:scale-95 data-starting-style:opacity-0",
-            "data-ending-style:scale-95 data-ending-style:opacity-0",
-            "motion-reduce:transition-none",
-            className,
-          )}
+          level={level}
+          shadowLevel={shadowLevel}
+          className={className}
           {...props}
         >
           {/* The popup above is capped at --available-height and clips, so the
@@ -576,7 +570,7 @@ function DropdownMenuSubContent({
           >
             {children}
           </div>
-        </BaseMenu.Popup>
+        </DropdownMenuPopup>
       </DropdownMenuPositioner>
     </DropdownMenuPortal>
   );
@@ -596,6 +590,7 @@ function DropdownMenuInput({
   className,
   inputClassName,
   showClear = true,
+  clearLabel,
   "aria-label": ariaLabel = "Search",
   ...props
 }: BaseMenu.Input.Props & {
@@ -603,6 +598,8 @@ function DropdownMenuInput({
   inputClassName?: string;
   /** Show a clear button while the query has text. */
   showClear?: boolean;
+  /** Accessible name of the clear button. Defaults to "Clear search". */
+  clearLabel?: string;
 }) {
   return (
     <div
@@ -610,7 +607,7 @@ function DropdownMenuInput({
       // Above the list, outside its scroll, as in Base UI's filter demo. An
       // item's height (32px), inset like the items; the gap below it is the
       // list's own padding, so rows scroll right up to the field.
-      className={cn(POPUP_SEARCH_FIELD, "mx-1 mt-1 h-8 shrink-0", className)}
+      className={cn(POPUP_SEARCH_FIELD, POPUP_SEARCH_MENU_FIELD, className)}
     >
       <HugeiconsIcon
         icon={Search01Icon}
@@ -624,7 +621,7 @@ function DropdownMenuInput({
         aria-label={ariaLabel}
         {...props}
       />
-      {showClear && <DropdownMenuClear />}
+      {showClear && <DropdownMenuClear aria-label={clearLabel} />}
     </div>
   );
 }
@@ -632,12 +629,13 @@ function DropdownMenuInput({
 function DropdownMenuClear({
   className,
   children,
+  "aria-label": ariaLabel = "Clear search",
   ...props
 }: BaseMenu.Clear.Props) {
   return (
     <BaseMenu.Clear
       data-slot="dropdown-menu-clear"
-      aria-label="Clear search"
+      aria-label={ariaLabel}
       className={cn(POPUP_SEARCH_CLEAR, className)}
       {...props}
     >

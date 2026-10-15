@@ -770,6 +770,7 @@ export {
 } from "./filters-context";
 export {
   allowsDuplicates,
+  isOptionField,
   createFilter,
   patchFilter,
   resolveOperators,

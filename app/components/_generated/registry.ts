@@ -1594,7 +1594,7 @@ export const componentMetadata = {
   "date-utils": {
     "name": "date-utils",
     "title": "dateUtils",
-    "description": "A utility function for date utils.",
+    "description": "Small local-time date helpers shared by the calendar, the date pickers, and parse-date.",
     "category": "UI",
     "registryDependencies": [],
     "dependencies": [],
@@ -1621,7 +1621,7 @@ export const componentMetadata = {
   "parse-date": {
     "name": "parse-date",
     "title": "parseDate",
-    "description": "A utility function for parse date.",
+    "description": "Forgiving parsers for dates people type: \"tomorrow\", \"next fri\", \"in 3 weeks\", \"mar 14\", \"14 March 2027\", \"3/14\", \"2026-03-14\", and ranges such as \"Oct 1 – 8, 2026\" or \"last 30 days\".",
     "category": "UI",
     "registryDependencies": [
       "@cubby-ui/date-utils"
@@ -1632,7 +1632,7 @@ export const componentMetadata = {
   "popup-search": {
     "name": "popup-search",
     "title": "popupSearch",
-    "description": "A utility function for popup search.",
+    "description": "Shared classes for the search field at the top of a popup list.",
     "category": "UI",
     "registryDependencies": [],
     "dependencies": [],

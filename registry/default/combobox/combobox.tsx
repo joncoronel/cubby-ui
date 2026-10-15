@@ -80,6 +80,7 @@ function ComboboxInput({
   showClear = true,
   start,
   end,
+  "aria-label": ariaLabelProp,
   ...props
 }: BaseCombobox.Input.Props & {
   showTrigger?: boolean;
@@ -99,6 +100,11 @@ function ComboboxInput({
   const context = React.use(ComboboxContext);
   const id = idProp ?? context?.id;
   const popup = variant === "popup";
+  // A popup's search field has no visible label, and a placeholder isn't a
+  // name: default it, as the menus' search fields do.
+  const ariaLabel =
+    ariaLabelProp ??
+    (popup && props["aria-labelledby"] === undefined ? "Search" : undefined);
   const leading =
     popup && start === undefined ? (
       <HugeiconsIcon
@@ -147,6 +153,7 @@ function ComboboxInput({
           "file:text-foreground file:inline-flex file:h-7 file:rounded-md file:border-0 file:bg-transparent file:text-sm file:font-medium",
           inputClassName,
         )}
+        aria-label={ariaLabel}
         {...props}
       />
       {end != null && (

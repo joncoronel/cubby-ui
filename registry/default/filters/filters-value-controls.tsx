@@ -15,7 +15,7 @@ import {
 import { TextMorph } from "@/registry/default/text-morph/text-morph";
 import { NumberField as BaseNumberField } from "@base-ui/react/number-field";
 
-import { LIST_PADDING, OptionContent } from "./filters-add-menu";
+import { OptionContent } from "./filters-add-menu";
 import { useFilterChip, useFiltersActions } from "./filters-context";
 import {
   asNumberOrNull,
@@ -37,6 +37,11 @@ import type {
   SelectFilterField,
   TextFilterField,
 } from "./lib/filters-types";
+
+// Breathing room above the first option and below the last in the chips'
+// value lists, dropped once nothing matches so the empty message sits evenly
+// between the field and whatever follows.
+const LIST_PADDING = "py-1 not-has-[[data-slot=combobox-item]]:py-0";
 
 interface ValueControlProps<F extends FilterField> {
   field: F;

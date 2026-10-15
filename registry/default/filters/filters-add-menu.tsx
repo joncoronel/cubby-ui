@@ -31,6 +31,7 @@ import { useControllableState } from "@/registry/default/hooks/use-controllable-
 import {
   POPUP_SEARCH_FIELD,
   POPUP_SEARCH_INPUT,
+  POPUP_SEARCH_MENU_FIELD,
 } from "@/registry/default/lib/popup-search";
 import {
   Tooltip,
@@ -47,6 +48,7 @@ import {
   allowsDuplicates,
   asStringArray,
   createFilter,
+  isOptionField,
   operatorLabel,
   FILTER_SEGMENT,
   FILTER_SEGMENT_INTERACTIVE,
@@ -94,27 +96,26 @@ function OptionContent({ option }: { option: FilterOption }) {
   );
 }
 
+// A search field's name, from its placeholder: the trailing "..." is a visual
+// cue, not something a screen reader should read out.
+function fieldName(placeholder: string): string {
+  return placeholder.replace(/\s*(\.{3}|…)$/, "");
+}
+
 function hasValueStep(field: FilterField): boolean {
   return field.type !== "custom" && scalarOperatorFor(field) !== undefined;
 }
 
-// Breathing room above the first option and below the last in the chips'
-// value lists, dropped once nothing matches so the empty message sits evenly
-// between the field and whatever follows.
-const LIST_PADDING = "py-1 not-has-[[data-slot=combobox-item]]:py-0";
+/** An option field with a value step: its submenu edits its one chip. */
+function editsInPlace(field: FilterField): field is OptionsField {
+  return isOptionField(field) && hasValueStep(field);
+}
 
 const DECIMAL = /^[+-]?(\d+\.?\d*|\.\d+)$/;
 
-// Submenus open and close in place, popup and positioner alike: they switch
-// as the pointer sweeps down the list, and a fade on each switch reads as lag.
-// The popup also neutralises its enter and exit states, which would otherwise
-// show a blank frame (opacity 0) between one submenu and the next.
+// Submenu positioners don't glide: submenus switch as the pointer sweeps down
+// the list, and each sits beside its own row.
 const SUBMENU_POSITIONER_STATIC = "transition-none";
-const SUBMENU_POPUP_STATIC = cn(
-  "transition-none",
-  "data-starting-style:scale-100 data-starting-style:opacity-100",
-  "data-ending-style:scale-100 data-ending-style:opacity-100",
-);
 
 /** Closes the menu, optionally handing focus to a newly added filter. */
 type OnDone = (focusFilterId?: string) => void;
@@ -205,18 +206,17 @@ function ValueSubmenuTrigger({
 }
 
 // A field with values opens them in its own searchable submenu, beside the
-// menu (stacked over it where there's no room, like any submenu). Memoised:
-// adding a filter re-renders the menu (the used fields change), and without
-// this every submenu re-renders with it, on the frames the new chip slides in.
+// menu (stacked over it where there's no room, like any submenu). Memoised so
+// the menu's own re-render on a filter change skips the text and number
+// submenus; option submenus read filter state and update regardless.
 const ValueSubmenu = React.memo(function ValueSubmenu(
   props: SubmenuProps<FilterField>,
 ) {
   const { field } = props;
   switch (field.type) {
     case "select":
-      return <SelectSubmenu {...props} field={field} />;
     case "multiselect":
-      return <MultiSelectSubmenu {...props} field={field} />;
+      return <OptionsSubmenu {...props} field={field} />;
     case "text":
     case "number":
       return <InputSubmenu {...props} field={field} />;
@@ -225,60 +225,78 @@ const ValueSubmenu = React.memo(function ValueSubmenu(
   }
 });
 
-// Edits the field's one filter: the current value is the checked radio, and
-// picking another changes the chip (or adds it when there is none).
-function SelectSubmenu({ field, disabled }: SubmenuProps<SelectFilterField>) {
-  const { labels } = useFiltersActions();
-  const { values, write } = useOptionFilter(field);
+// An option field's values as menu items, editing its one chip: radios for a
+// single choice, checkboxes for several. The submenu and the root search both
+// render these, so they always agree on what is checked. A single choice
+// closes the menu on any pick, the checked one included; checkboxes close it
+// only in search, which is for jumping straight to a value.
+function OptionItems({
+  field,
+  inSearch = false,
+  trailing,
+  onEdited,
+}: {
+  field: OptionsField;
+  inSearch?: boolean;
+  /** Shown at the end of each row, e.g. the field's name in search. */
+  trailing?: React.ReactNode;
+  /** Called with the chip's id when a pick changed an existing chip. */
+  onEdited?: (filterId: string) => void;
+}) {
+  const { filterId, values, write, atMax } = useOptionFilter(field);
+  const pick = (next: string[]) => {
+    write(next);
+    if (filterId) onEdited?.(filterId);
+  };
 
-  return (
-    <DropdownMenuFilter>
-      <DropdownMenuSub>
-        <ValueSubmenuTrigger field={field} disabled={disabled} />
-        <DropdownMenuSubContent
-          className="w-60"
-          viewportClassName="p-0"
-          positionerClassName={SUBMENU_POSITIONER_STATIC}
-        >
-          <DropdownMenuInput
-            aria-label={labels.searchFieldValues(field)}
-            placeholder={field.placeholder ?? labels.searchFieldValues(field)}
-          />
-          <DropdownMenuEmpty>{labels.noResults}</DropdownMenuEmpty>
-          <DropdownMenuList>
-            <DropdownMenuRadioGroup
-              value={values[0] ?? null}
-              onValueChange={(value: string) => write([value])}
-            >
-              {field.options.map((option) => (
-                // Closes on any pick, the checked one included: a single
-                // choice is done once made.
-                <DropdownMenuRadioItem
-                  key={option.value}
-                  value={option.value}
-                  label={option.label}
-                  closeOnClick
-                >
-                  <OptionContent option={option} />
-                </DropdownMenuRadioItem>
-              ))}
-            </DropdownMenuRadioGroup>
-          </DropdownMenuList>
-        </DropdownMenuSubContent>
-      </DropdownMenuSub>
-    </DropdownMenuFilter>
-  );
+  if (field.type === "select") {
+    return (
+      <DropdownMenuRadioGroup
+        value={values[0] ?? null}
+        onValueChange={(value: string) => pick([value])}
+      >
+        {field.options.map((option) => (
+          <DropdownMenuRadioItem
+            key={option.value}
+            value={option.value}
+            label={option.label}
+            closeOnClick
+          >
+            <OptionContent option={option} />
+            {trailing}
+          </DropdownMenuRadioItem>
+        ))}
+      </DropdownMenuRadioGroup>
+    );
+  }
+
+  return field.options.map((option) => {
+    const checked = values.includes(option.value);
+    return (
+      <DropdownMenuCheckboxItem
+        key={option.value}
+        label={option.label}
+        checked={checked}
+        disabled={atMax && !checked}
+        closeOnClick={inSearch}
+        onCheckedChange={(next) => pick(toggled(values, option.value, next))}
+      >
+        <OptionContent option={option} />
+        {trailing}
+      </DropdownMenuCheckboxItem>
+    );
+  });
 }
 
-// Checks edit the field's one filter live, so the submenu shows what is on the
-// chip; the first check adds it and clearing every check removes it.
-function MultiSelectSubmenu({
+// A select or multiselect field's searchable submenu. Multiselect adds a
+// footer with the count and a Done button, since its checks keep it open.
+function OptionsSubmenu({
   field,
   disabled,
   onDone,
-}: SubmenuProps<MultiSelectFilterField>) {
+}: SubmenuProps<OptionsField>) {
   const { labels } = useFiltersActions();
-  const { values, write, atMax } = useOptionFilter(field);
+  const { values } = useOptionFilter(field);
 
   return (
     <DropdownMenuFilter>
@@ -290,40 +308,27 @@ function MultiSelectSubmenu({
           positionerClassName={SUBMENU_POSITIONER_STATIC}
         >
           <DropdownMenuInput
-            aria-label={labels.searchFieldValues(field)}
+            aria-label={fieldName(labels.searchFieldValues(field))}
             placeholder={field.placeholder ?? labels.searchFieldValues(field)}
           />
           <DropdownMenuEmpty>{labels.noResults}</DropdownMenuEmpty>
           <DropdownMenuList>
-            {field.options.map((option) => {
-              const checked = values.includes(option.value);
-              return (
-                <DropdownMenuCheckboxItem
-                  key={option.value}
-                  label={option.label}
-                  checked={checked}
-                  disabled={atMax && !checked}
-                  onCheckedChange={(next) =>
-                    write(toggled(values, option.value, next))
-                  }
-                >
-                  <OptionContent option={option} />
-                </DropdownMenuCheckboxItem>
-              );
-            })}
+            <OptionItems field={field} />
           </DropdownMenuList>
-          {/* Edge to edge under the list, which ends with its own 4px of
-              padding below the last option. */}
-          <div className="flex h-10 items-center justify-between gap-2 border-t ps-3.5 pe-1.5">
-            <span className="text-muted-foreground text-xs tabular-nums">
-              {values.length > 0
-                ? labels.selectedCount(values.length, field)
-                : ""}
-            </span>
-            <Button variant="ghost" size="xs" onClick={() => onDone()}>
-              {labels.done}
-            </Button>
-          </div>
+          {field.type === "multiselect" && (
+            // Edge to edge under the list, which ends with its own 4px of
+            // padding below the last option.
+            <div className="flex h-10 items-center justify-between gap-2 border-t ps-3.5 pe-1.5">
+              <span className="text-muted-foreground text-xs tabular-nums">
+                {values.length > 0
+                  ? labels.selectedCount(values.length, field)
+                  : ""}
+              </span>
+              <Button variant="ghost" size="xs" onClick={() => onDone()}>
+                {labels.done}
+              </Button>
+            </div>
+          )}
         </DropdownMenuSubContent>
       </DropdownMenuSub>
     </DropdownMenuFilter>
@@ -342,6 +347,7 @@ function InputSubmenu({
   const { labels, addFilter } = useFiltersActions();
   const [text, setText] = React.useState("");
   const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const hintId = React.useId();
   const operator = scalarOperatorFor(field);
   const isNumber = field.type === "number";
   const decimal = text.trim().replace(",", ".");
@@ -375,7 +381,7 @@ function InputSubmenu({
         >
           <div
             data-slot="filter-add-input"
-            className={cn(POPUP_SEARCH_FIELD, "mx-1 mt-1 h-8 shrink-0")}
+            className={cn(POPUP_SEARCH_FIELD, POPUP_SEARCH_MENU_FIELD)}
           >
             {prefix && (
               // Pulls in 4px to match the chip's affix spacing.
@@ -387,6 +393,7 @@ function InputSubmenu({
               ref={inputRef}
               aria-label={`${field.label} ${operatorText}`.trim()}
               aria-invalid={invalid || undefined}
+              aria-describedby={invalid ? hintId : undefined}
               inputMode={isNumber ? "decimal" : undefined}
               placeholder={field.placeholder ?? labels.enterValue}
               className={cn(
@@ -402,6 +409,7 @@ function InputSubmenu({
             )}
           </div>
           <DropdownMenuEmpty
+            id={hintId}
             className={cn(invalid && "text-danger-foreground")}
           >
             {invalid ? labels.invalidNumber : `${field.label} ${operatorText}…`}
@@ -434,67 +442,6 @@ function InputSubmenu({
       </DropdownMenuSub>
     </DropdownMenuFilter>
   );
-}
-
-// One field's values among the root search's results, with the same items as
-// its submenu, so applied values show as checked. Any pick closes the menu:
-// search is for jumping straight to a value.
-function SearchValues({
-  field,
-  onEdited,
-}: {
-  field: OptionsField;
-  /** Called with the chip's id when a pick changed an existing chip. */
-  onEdited: (filterId: string) => void;
-}) {
-  const { filterId, values, write, atMax } = useOptionFilter(field);
-  const pick = (next: string[]) => {
-    write(next);
-    if (filterId) onEdited(filterId);
-  };
-  const fieldName = (
-    <span className="text-muted-foreground ms-auto shrink-0 text-xs">
-      {field.label}
-    </span>
-  );
-
-  if (field.type === "select") {
-    return (
-      <DropdownMenuRadioGroup
-        value={values[0] ?? null}
-        onValueChange={(value: string) => pick([value])}
-      >
-        {field.options.map((option) => (
-          <DropdownMenuRadioItem
-            key={option.value}
-            value={option.value}
-            label={option.label}
-            closeOnClick
-          >
-            <OptionContent option={option} />
-            {fieldName}
-          </DropdownMenuRadioItem>
-        ))}
-      </DropdownMenuRadioGroup>
-    );
-  }
-
-  return field.options.map((option) => {
-    const checked = values.includes(option.value);
-    return (
-      <DropdownMenuCheckboxItem
-        key={option.value}
-        label={option.label}
-        checked={checked}
-        disabled={atMax && !checked}
-        closeOnClick
-        onCheckedChange={(next) => pick(toggled(values, option.value, next))}
-      >
-        <OptionContent option={option} />
-        {fieldName}
-      </DropdownMenuCheckboxItem>
-    );
-  });
 }
 
 // A chip's value control, focused after the menu adds that filter.
@@ -619,12 +566,7 @@ function AddMenu({
 
   // Option fields whose values join the results while searching.
   const optionFields = React.useMemo(
-    () =>
-      fields.filter(
-        (field): field is OptionsField =>
-          (field.type === "select" || field.type === "multiselect") &&
-          scalarOperatorFor(field) !== undefined,
-      ),
+    () => fields.filter(editsInPlace),
     [fields],
   );
 
@@ -760,9 +702,9 @@ function AddMenu({
         </Tooltip>
         <DropdownMenuPortal>
           {/* Composed without DropdownMenuContent's viewport: this menu never
-              swaps content, and leaving the viewport out keeps the positioner
-              on `transform`, so the glide as chips shift the trigger stays on
-              the compositor. */}
+              swaps content, and leaving the viewport out keeps Base UI
+              positioning it with `transform` at whole pixels. It follows the
+              trigger as chips shift it, without a glide. */}
           <DropdownMenuPositioner
             side="bottom"
             align="start"
@@ -784,7 +726,7 @@ function AddMenu({
               }}
             >
               <DropdownMenuInput
-                aria-label={labels.searchFields}
+                aria-label={fieldName(labels.searchFields)}
                 placeholder={labels.searchFields}
               />
               <DropdownMenuEmpty>{labels.noFields}</DropdownMenuEmpty>
@@ -798,12 +740,9 @@ function AddMenu({
                   {fields.map((field) => {
                     // Option fields edit their one filter in place, so they
                     // stay open; the rest close once used unless they repeat.
-                    const editsInPlace =
-                      hasValueStep(field) &&
-                      (field.type === "select" || field.type === "multiselect");
                     const disabled =
                       usedFieldIds.has(field.id) &&
-                      !editsInPlace &&
+                      !editsInPlace(field) &&
                       !allowsDuplicates(field, allowDuplicateFields);
                     if (!hasValueStep(field)) {
                       return (
@@ -839,10 +778,16 @@ function AddMenu({
                       {labels.values}
                     </DropdownMenuGroupLabel>
                     {optionFields.map((field) => (
-                      <SearchValues
+                      <OptionItems
                         key={field.id}
                         field={field}
+                        inSearch
                         onEdited={revealChip}
+                        trailing={
+                          <span className="text-muted-foreground ms-auto shrink-0 text-xs">
+                            {field.label}
+                          </span>
+                        }
                       />
                     ))}
                   </DropdownMenuGroup>
@@ -868,10 +813,4 @@ function FilterActionsAdd(
   return <AddMenu {...(props as AddMenuProps)} kind="segment" />;
 }
 
-export {
-  FilterAddButton,
-  FilterActionsAdd,
-  FieldIcon,
-  LIST_PADDING,
-  OptionContent,
-};
+export { FilterAddButton, FilterActionsAdd, FieldIcon, OptionContent };

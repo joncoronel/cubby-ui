@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import type { FilterField } from "@/registry/default/filters/lib/filters-types";
 import {
   allowsDuplicates,
+  isOptionField,
   asFilterValues,
   createFilter,
   describeFilter,
@@ -250,5 +251,13 @@ describe("allowsDuplicates", () => {
     expect(
       allowsDuplicates({ ...estimate, allowDuplicates: false }, true),
     ).toBe(false);
+  });
+});
+
+describe("isOptionField", () => {
+  it("is true for select and multiselect fields only", () => {
+    expect(isOptionField(status)).toBe(true);
+    expect(isOptionField(labels)).toBe(true);
+    expect(isOptionField(estimate)).toBe(false);
   });
 });

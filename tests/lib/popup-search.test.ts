@@ -4,6 +4,7 @@ import {
   POPUP_SEARCH_CLEAR,
   POPUP_SEARCH_FIELD,
   POPUP_SEARCH_INPUT,
+  POPUP_SEARCH_MENU_FIELD,
 } from "@/registry/default/lib/popup-search";
 
 const classes = (value: string): string[] => value.split(/\s+/);
@@ -42,6 +43,12 @@ describe("popup search classes", () => {
   it("pads the band to the 4px row gutter on the sides and top", () => {
     expect(classes(POPUP_SEARCH_BAND)).toEqual(
       expect.arrayContaining(["px-1", "pt-1", "bg-(--popup-surface)"]),
+    );
+  });
+
+  it("insets a menu's field like an item and keeps it from shrinking", () => {
+    expect(classes(POPUP_SEARCH_MENU_FIELD)).toEqual(
+      expect.arrayContaining(["mx-1", "mt-1", "h-8", "shrink-0"]),
     );
   });
 });

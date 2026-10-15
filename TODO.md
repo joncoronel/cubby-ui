@@ -157,6 +157,12 @@ Ways out, untried: rewrite every costly rule (a cheaper selector shape, or a dat
 
 ### Code hygiene
 
+#### Placeholder ellipsis: "..." or "…"
+
+Placeholders and loading copy mix three dots and the ellipsis character. Filters' default labels use three dots ("Filter by...", "Search...", "Select...", and "Search status..." from `searchFieldValues`), as do roughly 30 example files; three examples use "…" ("Write a reply…", "Search issues…", "Connecting…"). Pick one and apply it everywhere: "…" is the typographic choice and what most interface guidelines recommend.
+
+This is visual only. Where a placeholder doubles as a field's accessible name, the Filters add menu already strips the trailing dots for the name (`fieldName` in `filters-add-menu.tsx`), so screen readers never hear them. Keep that helper whichever form wins, since it handles both.
+
 #### Canonical Tailwind class sweep (repo-wide)
 
 Tailwind CSS IntelliSense flags non-canonical v4 class spellings (`suggestCanonicalClasses`). These are editor warnings only — ESLint does not catch them, so `pnpm run lint` stays green either way. Purely cosmetic; the compiled CSS is identical.

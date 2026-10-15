@@ -13,6 +13,7 @@ import {
   POPUP_SEARCH_FIELD,
   POPUP_SEARCH_ICON,
   POPUP_SEARCH_INPUT,
+  POPUP_SEARCH_MENU_FIELD,
 } from "@/registry/default/lib/popup-search";
 import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 
@@ -486,6 +487,7 @@ function ContextMenuInput({
   className,
   inputClassName,
   showClear = true,
+  clearLabel,
   "aria-label": ariaLabel = "Search",
   ...props
 }: BaseMenu.Input.Props & {
@@ -493,6 +495,8 @@ function ContextMenuInput({
   inputClassName?: string;
   /** Show a clear button while the query has text. */
   showClear?: boolean;
+  /** Accessible name of the clear button. Defaults to "Clear search". */
+  clearLabel?: string;
 }) {
   return (
     <div
@@ -500,7 +504,7 @@ function ContextMenuInput({
       // Above the list, outside its scroll, as in Base UI's filter demo. An
       // item's height (32px), inset like the items; the gap below it is the
       // list's own padding, so rows scroll right up to the field.
-      className={cn(POPUP_SEARCH_FIELD, "mx-1 mt-1 h-8 shrink-0", className)}
+      className={cn(POPUP_SEARCH_FIELD, POPUP_SEARCH_MENU_FIELD, className)}
     >
       <HugeiconsIcon
         icon={Search01Icon}
@@ -514,7 +518,7 @@ function ContextMenuInput({
         aria-label={ariaLabel}
         {...props}
       />
-      {showClear && <ContextMenuClear />}
+      {showClear && <ContextMenuClear aria-label={clearLabel} />}
     </div>
   );
 }
@@ -522,12 +526,13 @@ function ContextMenuInput({
 function ContextMenuClear({
   className,
   children,
+  "aria-label": ariaLabel = "Clear search",
   ...props
 }: BaseMenu.Clear.Props) {
   return (
     <BaseMenu.Clear
       data-slot="context-menu-clear"
-      aria-label="Clear search"
+      aria-label={ariaLabel}
       className={cn(POPUP_SEARCH_CLEAR, className)}
       {...props}
     >

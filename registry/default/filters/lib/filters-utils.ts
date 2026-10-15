@@ -9,7 +9,9 @@ import type {
   FilterSize,
   FilterValue,
   FilterVariant,
+  MultiSelectFilterField,
   NumberRange,
+  SelectFilterField,
 } from "./filters-types";
 
 /** TextMorph duration for click-driven labels; snappier than the default 240ms. */
@@ -224,8 +226,15 @@ export function allowsDuplicates(
   field: FilterField,
   barDefault: boolean,
 ): boolean {
-  if (field.type === "select" || field.type === "multiselect") return false;
+  if (isOptionField(field)) return false;
   return field.allowDuplicates ?? barDefault;
+}
+
+/** Whether `field` picks from a list of options (select or multiselect). */
+export function isOptionField(
+  field: FilterField,
+): field is SelectFilterField | MultiSelectFilterField {
+  return field.type === "select" || field.type === "multiselect";
 }
 
 /** A typed empty value for a fresh filter of `field` with `operatorId`. */

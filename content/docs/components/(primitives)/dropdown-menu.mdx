@@ -199,6 +199,10 @@ Dropdown container with positioning and animations. Composes `DropdownMenuPortal
 
 </ApiPropsList>
 
+#### DropdownMenuPositioner
+
+Base UI's `Menu.Positioner` with a `data-slot`, for composing the parts yourself. It adds no styles, so give it a z-index (`z-50`).
+
 #### DropdownMenuPopup
 
 The styled menu surface, with its entrance and exit. Accepts `level` and `shadowLevel` like `DropdownMenuContent`; other props go to `Menu.Popup`.
@@ -466,4 +470,21 @@ The search field: an icon, Base UI's `Menu.Input`, and a clear button, drawn lik
   Custom prop not available in Base UI.
 </ApiProp>
 
+<ApiProp name="clearLabel" fullType="string" defaultValue='"Clear search"'>
+  Accessible name of the clear button, e.g. for a translated menu. Custom prop
+  not available in Base UI.
+</ApiProp>
+
 </ApiPropsList>
+
+#### DropdownMenuList
+
+Base UI's `Menu.List` inside a `ScrollArea`, so the items scroll below the search field with an edge fade. It is capped at 20rem and shrinks to fit a short screen. `className` goes to the scroll area, e.g. `max-h-96` to change the cap; other props go to `Menu.List`.
+
+#### DropdownMenuEmpty
+
+Base UI's `Menu.Empty`: shown in place of the items when nothing matches, lined up with their labels. Props go to `Menu.Empty`.
+
+#### DropdownMenuClear
+
+Base UI's `Menu.Clear` as a small icon button that empties the query. `DropdownMenuInput` renders it; use it directly only with `showClear={false}`. Its `aria-label` defaults to `"Clear search"`.

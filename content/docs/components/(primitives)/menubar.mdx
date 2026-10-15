@@ -188,7 +188,14 @@ The menu's popup, aligned to the start of its trigger. Composes `Menu.Portal`, `
   simpleType="number"
   defaultValue="3"
 >
-  Shadow weight of the popup. It stays at 3 when you raise `level`, so the menu looks the same at any depth.
+  Shadow weight of the popup. It stays at 3 when you raise `level`, so the menu
+  looks the same at any depth.
+</ApiProp>
+
+<ApiProp name="positionerClassName" fullType="string">
+  Classes for the positioner, the element Base UI moves into place. Merged last,
+  so it overrides the defaults, such as `duration-100` for a faster glide.
+  Custom prop not available in Base UI.
 </ApiProp>
 
 </ApiPropsList>

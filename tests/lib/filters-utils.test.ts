@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import type { FilterField } from "@/registry/default/filters/lib/filters-types";
 import {
+  allowsDuplicates,
   asFilterValues,
   createFilter,
   describeFilter,
@@ -228,5 +229,26 @@ describe("operators", () => {
     const [is] = resolveOperators(status);
     expect(operatorLabel(is)).toBe("is");
     expect(operatorLabel(is, { is: "est" })).toBe("est");
+  });
+});
+
+describe("allowsDuplicates", () => {
+  it("never lets option fields repeat", () => {
+    expect(allowsDuplicates(status, true)).toBe(false);
+    expect(allowsDuplicates(labels, true)).toBe(false);
+  });
+
+  it("falls back to the bar default for other fields", () => {
+    expect(allowsDuplicates(estimate, true)).toBe(true);
+    expect(allowsDuplicates(estimate, false)).toBe(false);
+  });
+
+  it("lets the field override the bar default", () => {
+    expect(
+      allowsDuplicates({ ...estimate, allowDuplicates: true }, false),
+    ).toBe(true);
+    expect(
+      allowsDuplicates({ ...estimate, allowDuplicates: false }, true),
+    ).toBe(false);
   });
 });

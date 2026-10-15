@@ -215,6 +215,19 @@ export function operatorShapeFor(
   return operator ? operatorShape(operator) : "scalar";
 }
 
+/**
+ * Whether `field` can have more than one filter. Option fields never can: one
+ * chip already holds any number of values, so the add menu edits it instead.
+ * Other fields use their `allowDuplicates`, falling back to the bar's default.
+ */
+export function allowsDuplicates(
+  field: FilterField,
+  barDefault: boolean,
+): boolean {
+  if (field.type === "select" || field.type === "multiselect") return false;
+  return field.allowDuplicates ?? barDefault;
+}
+
 /** A typed empty value for a fresh filter of `field` with `operatorId`. */
 export function emptyValueFor(field: FilterField, operatorId: string): unknown {
   const shape = operatorShapeFor(field, operatorId);

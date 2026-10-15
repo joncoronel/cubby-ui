@@ -769,6 +769,7 @@ export {
   useFilterChip,
 } from "./filters-context";
 export {
+  allowsDuplicates,
   createFilter,
   patchFilter,
   resolveOperators,

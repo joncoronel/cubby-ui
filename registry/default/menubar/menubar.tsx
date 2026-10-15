@@ -152,6 +152,7 @@ function MenubarTrigger({
 
 function MenubarContent({
   className,
+  positionerClassName,
   children,
   align = "start",
   alignOffset = 0,
@@ -160,6 +161,8 @@ function MenubarContent({
   shadowLevel = 3,
   ...props
 }: React.ComponentProps<typeof BaseMenu.Popup> & {
+  /** Classes for the positioner (the element Base UI moves into place), merged last. */
+  positionerClassName?: string;
   align?: BaseMenu.Positioner.Props["align"];
   alignOffset?: BaseMenu.Positioner.Props["alignOffset"];
   sideOffset?: BaseMenu.Positioner.Props["sideOffset"];
@@ -174,7 +177,10 @@ function MenubarContent({
           detached triggers and physically travels between them. Each MenubarMenu
           mounts its own, with no previous position to animate from. */}
       <BaseMenu.Positioner
-        className="z-50 h-(--positioner-height) max-h-(--available-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
+        className={cn(
+          "z-50 h-(--positioner-height) max-h-(--available-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
+          positionerClassName,
+        )}
         align={align}
         alignOffset={alignOffset}
         sideOffset={sideOffset}

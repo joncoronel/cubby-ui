@@ -75,101 +75,139 @@ function DropdownMenuPositioner({
   );
 }
 
-function DropdownMenuContent({
+function DropdownMenuPopup({
   className,
-  children,
-  sideOffset = 4,
-  align = "center",
-  side = "bottom",
   level = 3,
   shadowLevel = 3,
   ...props
 }: React.ComponentProps<typeof BaseMenu.Popup> & {
-  align?: BaseMenu.Positioner.Props["align"];
-  sideOffset?: BaseMenu.Positioner.Props["sideOffset"];
-  side?: BaseMenu.Positioner.Props["side"];
   /** Surface elevation level for the popup bg (1-8). Bump when nesting inside a Dialog or other elevated container. Defaults to 3. */
   level?: SurfaceLevel;
   /** Shadow weight (1-8). Pinned to 3 by default so the menu reads the same regardless of nesting depth. */
   shadowLevel?: SurfaceLevel;
 }) {
   return (
+    <BaseMenu.Popup
+      data-slot="dropdown-menu-popup"
+      data-level={level}
+      className={cn(
+        "text-popover-foreground relative max-h-(--available-height) max-w-(--available-width) min-w-[12rem] overflow-hidden rounded-xl outline-none",
+        solidSurface(level, shadowLevel),
+        "origin-(--transform-origin) transition-[scale,opacity] duration-100 ease-(--ease-out-expo)",
+        "data-starting-style:scale-95 data-starting-style:opacity-0",
+        "data-ending-style:scale-95 data-ending-style:opacity-0",
+        // Own compositor layer while mounted. The scale stretches the popup
+        // downward from an origin just above it, so the top edge moves
+        // ~0.2px and the bottom ~7px; every row lands on a different
+        // sub-pixel offset, which on an evenly spaced stack of identical
+        // text reads as a ripple. Promoted, the rows raster once.
+        "will-change-transform",
+        "motion-reduce:transition-none motion-reduce:will-change-auto",
+        // Only 'trigger-change', which fires once a detached-trigger swap has
+        // settled. The others must animate: Base UI waits on this transition
+        // before unmounting, so suppressing 'dismiss' means no exit at all,
+        // and 'click' is inferred from `event.detail === 0`, which every
+        // right-click matches.
+        "data-[instant=trigger-change]:transition-none",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+/**
+ * Crossfades content when a detached trigger swaps what the menu shows. Its
+ * presence also switches Base UI's positioner from `transform` to `top`/`left`
+ * so the popup can grow from the right edge, so leave it out of menus that
+ * never swap content.
+ */
+function DropdownMenuViewport({
+  className,
+  ...props
+}: React.ComponentProps<typeof BaseMenu.Viewport>) {
+  return (
+    <BaseMenu.Viewport
+      data-slot="dropdown-menu-viewport"
+      className={cn(
+        // `h-full` and the cap do different jobs; both are load-bearing. At
+        // rest --popup-height is `auto`, so the percentage is indefinite and
+        // only the cap bounds the viewport, which is what engages the
+        // overflow-y below. Mid-swap it is a definite px that transitions,
+        // and the percentage tracks it. Without that the viewport snaps to
+        // the incoming content's height on frame one, because Base UI takes
+        // the outgoing content out of flow with position:absolute, and
+        // overflow-clip cuts its extra rows instead of letting them fade.
+        // No `max-w`: `w-full` resolves against the popup's already-capped
+        // content box, so the width bound is inherited for free.
+        "relative h-full max-h-(--available-height) w-full overflow-clip p-1 [--viewport-padding:0.25rem]",
+        "not-data-transitioning:overflow-y-auto",
+        // Content width
+        "**:data-current:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
+        "**:data-previous:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
+        // Non-directional crossfade, matching Popover: the two halves
+        // dissolve in place and both recede to 0.96, so the swap reads
+        // the same whichever trigger you came from and the popup's own
+        // width/height morph carries the movement.
+        "**:data-current:scale-100 **:data-current:opacity-100",
+        "**:data-previous:scale-100 **:data-previous:opacity-100",
+        "**:data-current:transition-[scale,opacity] **:data-current:duration-150 **:data-current:ease-[cubic-bezier(0.22,1,0.36,1)]",
+        "**:data-previous:transition-[scale,opacity] **:data-previous:duration-150 **:data-previous:ease-[cubic-bezier(0.22,1,0.36,1)]",
+        "**:data-current:data-starting-style:scale-[0.96] **:data-current:data-starting-style:opacity-0",
+        "**:data-previous:data-ending-style:scale-[0.96] **:data-previous:data-ending-style:opacity-0",
+        // Value-matched to the popup's guard so one policy governs the
+        // subtree. Targets the content: the viewport has no transitions of
+        // its own and transition-property does not inherit.
+        "[[data-instant=trigger-change]_&_[data-current]]:transition-none [[data-instant=trigger-change]_&_[data-previous]]:transition-none",
+        "motion-reduce:**:data-current:transition-none motion-reduce:**:data-previous:transition-none",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+function DropdownMenuContent({
+  className,
+  positionerClassName,
+  children,
+  sideOffset = 4,
+  align = "center",
+  side = "bottom",
+  ...props
+}: React.ComponentProps<typeof DropdownMenuPopup> & {
+  /** Classes for the positioner (the element Base UI moves into place), merged last. */
+  positionerClassName?: string;
+  align?: BaseMenu.Positioner.Props["align"];
+  sideOffset?: BaseMenu.Positioner.Props["sideOffset"];
+  side?: BaseMenu.Positioner.Props["side"];
+}) {
+  return (
     <DropdownMenuPortal>
       <DropdownMenuPositioner
-        className="z-50 h-(--positioner-height) max-h-(--available-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none motion-reduce:transition-none"
+        className={cn(
+          "z-50 h-(--positioner-height) max-h-(--available-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-150 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none motion-reduce:transition-none",
+          positionerClassName,
+        )}
         sideOffset={sideOffset}
         align={align}
         side={side}
       >
-        <BaseMenu.Popup
+        <DropdownMenuPopup
           data-slot="dropdown-menu-content"
-          data-level={level}
           className={cn(
             // Base UI derives --popup-width by measuring at `width:auto`, so two
             // menus that both sit on this floor morph position and height but not
             // width. That is the accepted trade: menus narrower than 12rem read
             // as cramped, and width is the least visible of the three.
-            "text-popover-foreground relative max-h-(--available-height) max-w-(--available-width) min-w-[12rem] overflow-hidden rounded-xl outline-none",
-            solidSurface(level, shadowLevel),
             "h-(--popup-height,auto) w-(--popup-width,auto)",
-            "origin-(--transform-origin) transition-[width,height,scale,opacity] duration-[150ms,150ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
-            "data-starting-style:scale-95 data-starting-style:opacity-0",
-            "data-ending-style:scale-95 data-ending-style:opacity-0",
-            // Own compositor layer while mounted. The scale stretches the popup
-            // downward from an origin just above it, so the top edge moves
-            // ~0.2px and the bottom ~7px; every row lands on a different
-            // sub-pixel offset, which on an evenly spaced stack of identical
-            // text reads as a ripple. Promoted, the rows raster once.
-            "will-change-transform",
-            "motion-reduce:transition-none motion-reduce:will-change-auto",
-            // Only 'trigger-change', which fires once a detached-trigger swap has
-            // settled. The others must animate: Base UI waits on this transition
-            // before unmounting, so suppressing 'dismiss' means no exit at all,
-            // and 'click' is inferred from `event.detail === 0`, which every
-            // right-click matches.
-            "data-[instant=trigger-change]:transition-none",
+            "transition-[width,height,scale,opacity] duration-[150ms,150ms,100ms,100ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),var(--ease-out-expo),var(--ease-out-expo)]",
             className,
           )}
           {...props}
         >
-          <BaseMenu.Viewport
-            data-slot="dropdown-menu-viewport"
-            className={cn(
-              // `h-full` and the cap do different jobs; both are load-bearing. At
-              // rest --popup-height is `auto`, so the percentage is indefinite and
-              // only the cap bounds the viewport, which is what engages the
-              // overflow-y below. Mid-swap it is a definite px that transitions,
-              // and the percentage tracks it. Without that the viewport snaps to
-              // the incoming content's height on frame one, because Base UI takes
-              // the outgoing content out of flow with position:absolute, and
-              // overflow-clip cuts its extra rows instead of letting them fade.
-              // No `max-w`: `w-full` resolves against the popup's already-capped
-              // content box, so the width bound is inherited for free.
-              "relative h-full max-h-(--available-height) w-full overflow-clip p-1 [--viewport-padding:0.25rem]",
-              "not-data-transitioning:overflow-y-auto",
-              // Content width
-              "**:data-current:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
-              "**:data-previous:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
-              // Non-directional crossfade, matching Popover: the two halves
-              // dissolve in place and both recede to 0.96, so the swap reads
-              // the same whichever trigger you came from and the popup's own
-              // width/height morph carries the movement.
-              "**:data-current:scale-100 **:data-current:opacity-100",
-              "**:data-previous:scale-100 **:data-previous:opacity-100",
-              "**:data-current:transition-[scale,opacity] **:data-current:duration-150 **:data-current:ease-[cubic-bezier(0.22,1,0.36,1)]",
-              "**:data-previous:transition-[scale,opacity] **:data-previous:duration-150 **:data-previous:ease-[cubic-bezier(0.22,1,0.36,1)]",
-              "**:data-current:data-starting-style:scale-[0.96] **:data-current:data-starting-style:opacity-0",
-              "**:data-previous:data-ending-style:scale-[0.96] **:data-previous:data-ending-style:opacity-0",
-              // Value-matched to the popup's guard above so one policy governs the
-              // subtree. Targets the content: the viewport has no transitions of
-              // its own and transition-property does not inherit.
-              "[[data-instant=trigger-change]_&_[data-current]]:transition-none [[data-instant=trigger-change]_&_[data-previous]]:transition-none",
-              "motion-reduce:**:data-current:transition-none motion-reduce:**:data-previous:transition-none",
-            )}
-          >
-            {children}
-          </BaseMenu.Viewport>
-        </BaseMenu.Popup>
+          <DropdownMenuViewport>{children}</DropdownMenuViewport>
+        </DropdownMenuPopup>
       </DropdownMenuPositioner>
     </DropdownMenuPortal>
   );
@@ -452,6 +490,7 @@ function DropdownMenuSubTrigger({
 
 function DropdownMenuSubContent({
   className,
+  positionerClassName,
   children,
   // 8px, not 0: the positioner anchors to the sub-trigger, which sits 4px
   // inside the parent popup because of its p-1. A 0 offset therefore overlaps
@@ -463,6 +502,8 @@ function DropdownMenuSubContent({
   shadowLevel = 3,
   ...props
 }: React.ComponentProps<typeof BaseMenu.Popup> & {
+  /** Classes for the positioner (the element Base UI moves into place), merged last. */
+  positionerClassName?: string;
   align?: BaseMenu.Positioner.Props["align"];
   alignOffset?: BaseMenu.Positioner.Props["alignOffset"];
   sideOffset?: BaseMenu.Positioner.Props["sideOffset"];
@@ -476,8 +517,14 @@ function DropdownMenuSubContent({
 
   return (
     <DropdownMenuPortal>
+      {/* Base UI re-places a submenu a frame after its parent moves, so it
+          steps behind a gliding menu. The same glide as the parent smooths
+          that out. */}
       <DropdownMenuPositioner
-        className="z-50 max-h-(--available-height) max-w-(--available-width)"
+        className={cn(
+          "z-50 max-h-(--available-height) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-150 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none motion-reduce:transition-none",
+          positionerClassName,
+        )}
         sideOffset={sideOffset}
         align={align}
         alignOffset={alignOffset ?? defaultAlignOffset}
@@ -608,6 +655,9 @@ export {
   DropdownMenu,
   DropdownMenuPortal,
   DropdownMenuTrigger,
+  DropdownMenuPositioner,
+  DropdownMenuPopup,
+  DropdownMenuViewport,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuLabel,

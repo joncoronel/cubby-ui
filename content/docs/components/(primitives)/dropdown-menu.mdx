@@ -52,6 +52,8 @@ DropdownMenu
 
 `DropdownMenuContent` composes the portal, positioner, and popup internally, so you place items directly inside it.
 
+To control positioning or the popup yourself, compose the parts instead: `DropdownMenuPortal` › `DropdownMenuPositioner` › `DropdownMenuPopup`. `DropdownMenuContent` also wraps its items in a `DropdownMenuViewport`, which crossfades content when detached triggers swap the menu. Leave the viewport out of menus that never swap content: without it Base UI positions the menu with `transform`, which keeps movement on the compositor.
+
 ## Examples
 
 ### With Icons and Shortcuts
@@ -139,7 +141,7 @@ One exception: `DropdownMenuSub` renders `Menu.SubmenuRoot`, which does not acce
 
 #### DropdownMenuContent
 
-Dropdown container with positioning and animations. Composes `Menu.Portal`, `Menu.Positioner`, and `Menu.Popup`. Props are forwarded to `Menu.Popup`.
+Dropdown container with positioning and animations. Composes `DropdownMenuPortal`, `DropdownMenuPositioner`, `DropdownMenuPopup`, and `DropdownMenuViewport`. Props are forwarded to `DropdownMenuPopup`.
 
 <ApiPropsList>
 
@@ -183,7 +185,21 @@ Dropdown container with positioning and animations. Composes `Menu.Portal`, `Men
   color.
 </ApiProp>
 
+<ApiProp name="positionerClassName" fullType="string">
+  Classes for the positioner, the element Base UI moves into place. Merged last,
+  so it overrides the defaults, such as `duration-100` for a faster glide.
+  Custom prop not available in Base UI.
+</ApiProp>
+
 </ApiPropsList>
+
+#### DropdownMenuPopup
+
+The styled menu surface, with its entrance and exit. Accepts `level` and `shadowLevel` like `DropdownMenuContent`; other props go to `Menu.Popup`.
+
+#### DropdownMenuViewport
+
+Crossfades content when detached triggers swap what the menu shows, with `p-1` around the items. Props go to `Menu.Viewport`.
 
 #### DropdownMenuItem
 
@@ -389,6 +405,12 @@ Submenu container with positioning. Composes `Menu.Portal`, `Menu.Positioner`, a
 >
   Shadow weight. Kept at `3` (same as parent dropdown), since submenus are still
   small popups.
+</ApiProp>
+
+<ApiProp name="positionerClassName" fullType="string">
+  Classes for the positioner, the element Base UI moves into place. Merged last,
+  so it overrides the defaults, such as `duration-100` for a faster glide.
+  Custom prop not available in Base UI.
 </ApiProp>
 
 </ApiPropsList>

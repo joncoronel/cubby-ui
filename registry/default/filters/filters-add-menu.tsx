@@ -8,7 +8,6 @@ import { Button } from "@/registry/default/button/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
-  DropdownMenuContent,
   DropdownMenuEmpty,
   DropdownMenuFilter,
   DropdownMenuGroup,
@@ -16,6 +15,11 @@ import {
   DropdownMenuInput,
   DropdownMenuItem,
   DropdownMenuList,
+  DropdownMenuPopup,
+  DropdownMenuPortal,
+  DropdownMenuPositioner,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuSub,
   DropdownMenuSubContent,
@@ -40,6 +44,7 @@ import { PlusSignIcon } from "@hugeicons/core-free-icons";
 import { useFiltersActions, useFiltersState } from "./filters-context";
 import { revealInScroller } from "./lib/flow-presence";
 import {
+  allowsDuplicates,
   asStringArray,
   createFilter,
   operatorLabel,
@@ -47,7 +52,6 @@ import {
   FILTER_SEGMENT_INTERACTIVE,
   operatorShapeFor,
   scalarOperatorFor,
-  withOption,
 } from "./lib/filters-utils";
 import type {
   FilterField,
@@ -101,6 +105,17 @@ const LIST_PADDING = "py-1 not-has-[[data-slot=combobox-item]]:py-0";
 
 const DECIMAL = /^[+-]?(\d+\.?\d*|\.\d+)$/;
 
+// Submenus open and close in place, popup and positioner alike: they switch
+// as the pointer sweeps down the list, and a fade on each switch reads as lag.
+// The popup also neutralises its enter and exit states, which would otherwise
+// show a blank frame (opacity 0) between one submenu and the next.
+const SUBMENU_POSITIONER_STATIC = "transition-none";
+const SUBMENU_POPUP_STATIC = cn(
+  "transition-none",
+  "data-starting-style:scale-100 data-starting-style:opacity-100",
+  "data-ending-style:scale-100 data-ending-style:opacity-100",
+);
+
 /** Closes the menu, optionally handing focus to a newly added filter. */
 type OnDone = (focusFilterId?: string) => void;
 
@@ -108,6 +123,62 @@ interface SubmenuProps<F extends FilterField> {
   field: F;
   disabled: boolean;
   onDone: OnDone;
+}
+
+/**
+ * An option field's one filter and how to write it. The submenus and the
+ * search results both go through here, so they always agree on what is
+ * checked. `values` are the checked options; `write` adds the filter, edits
+ * it, or removes it once nothing is checked.
+ */
+function useOptionFilter(field: OptionsField) {
+  const { addFilter, updateFilter, removeFilter } = useFiltersActions();
+  const { filters } = useFiltersState();
+  const filter = filters.find((candidate) => candidate.field === field.id);
+  // An "is empty" chip holds no value; writing one switches it to "is".
+  const valueless =
+    filter !== undefined && operatorShapeFor(field, filter.operator) === "none";
+  const values =
+    filter === undefined || valueless
+      ? []
+      : field.type === "multiselect"
+        ? asStringArray(filter.value)
+        : typeof filter.value === "string"
+          ? [filter.value]
+          : [];
+
+  const write = (next: string[]) => {
+    const scalar = scalarOperatorFor(field);
+    if (!scalar) return;
+    const value = field.type === "multiselect" ? next : next[0];
+    if (!filter) {
+      if (next.length > 0) {
+        addFilter(createFilter(field, { operator: scalar.id, value }));
+      }
+      return;
+    }
+    if (next.length === 0) {
+      removeFilter(filter.id);
+      return;
+    }
+    updateFilter(filter.id, {
+      ...(valueless && { operator: scalar.id }),
+      value,
+    });
+  };
+
+  const atMax =
+    field.type === "multiselect" &&
+    field.maxSelections != null &&
+    values.length >= field.maxSelections;
+
+  return { filterId: filter?.id, values, write, atMax };
+}
+
+function toggled(values: string[], value: string, checked: boolean): string[] {
+  return checked
+    ? [...values, value]
+    : values.filter((existing) => existing !== value);
 }
 
 function ValueSubmenuTrigger({
@@ -118,7 +189,15 @@ function ValueSubmenuTrigger({
   disabled: boolean;
 }) {
   return (
-    <DropdownMenuSubTrigger disabled={disabled} label={field.label}>
+    // The submenus have no exit animation, so on a fast sweep the old one
+    // could close before the next one has rendered, leaving a blank frame.
+    // Holding the close lets the next submenu replace it (opening one closes
+    // its sibling at once), so this never keeps two open.
+    <DropdownMenuSubTrigger
+      disabled={disabled}
+      label={field.label}
+      closeDelay={1}
+    >
       <FieldIcon>{field.icon}</FieldIcon>
       <span className="truncate">{field.label}</span>
     </DropdownMenuSubTrigger>
@@ -126,8 +205,12 @@ function ValueSubmenuTrigger({
 }
 
 // A field with values opens them in its own searchable submenu, beside the
-// menu (stacked over it where there's no room, like any submenu).
-function ValueSubmenu(props: SubmenuProps<FilterField>) {
+// menu (stacked over it where there's no room, like any submenu). Memoised:
+// adding a filter re-renders the menu (the used fields change), and without
+// this every submenu re-renders with it, on the frames the new chip slides in.
+const ValueSubmenu = React.memo(function ValueSubmenu(
+  props: SubmenuProps<FilterField>,
+) {
   const { field } = props;
   switch (field.type) {
     case "select":
@@ -140,44 +223,45 @@ function ValueSubmenu(props: SubmenuProps<FilterField>) {
     default:
       return null;
   }
-}
+});
 
-function SelectSubmenu({
-  field,
-  disabled,
-  onDone,
-}: SubmenuProps<SelectFilterField>) {
-  const { labels, addFilter } = useFiltersActions();
+// Edits the field's one filter: the current value is the checked radio, and
+// picking another changes the chip (or adds it when there is none).
+function SelectSubmenu({ field, disabled }: SubmenuProps<SelectFilterField>) {
+  const { labels } = useFiltersActions();
+  const { values, write } = useOptionFilter(field);
+
   return (
     <DropdownMenuFilter>
       <DropdownMenuSub>
         <ValueSubmenuTrigger field={field} disabled={disabled} />
-        <DropdownMenuSubContent className="w-60">
+        <DropdownMenuSubContent
+          className="w-60"
+          positionerClassName={SUBMENU_POSITIONER_STATIC}
+        >
           <DropdownMenuInput
             aria-label={labels.searchFieldValues(field)}
             placeholder={field.placeholder ?? labels.searchFieldValues(field)}
           />
           <DropdownMenuEmpty>{labels.noResults}</DropdownMenuEmpty>
           <DropdownMenuList>
-            {field.options.map((option) => (
-              <DropdownMenuItem
-                key={option.value}
-                label={option.label}
-                onClick={() => {
-                  const scalar = scalarOperatorFor(field);
-                  if (!scalar) return;
-                  addFilter(
-                    createFilter(field, {
-                      operator: scalar.id,
-                      value: option.value,
-                    }),
-                  );
-                  onDone();
-                }}
-              >
-                <OptionContent option={option} />
-              </DropdownMenuItem>
-            ))}
+            <DropdownMenuRadioGroup
+              value={values[0] ?? null}
+              onValueChange={(value: string) => write([value])}
+            >
+              {field.options.map((option) => (
+                // Closes on any pick, the checked one included: a single
+                // choice is done once made.
+                <DropdownMenuRadioItem
+                  key={option.value}
+                  value={option.value}
+                  label={option.label}
+                  closeOnClick
+                >
+                  <OptionContent option={option} />
+                </DropdownMenuRadioItem>
+              ))}
+            </DropdownMenuRadioGroup>
           </DropdownMenuList>
         </DropdownMenuSubContent>
       </DropdownMenuSub>
@@ -185,48 +269,24 @@ function SelectSubmenu({
   );
 }
 
-// The first check adds the filter and later checks edit it live; clearing
-// every check removes it again.
+// Checks edit the field's one filter live, so the submenu shows what is on the
+// chip; the first check adds it and clearing every check removes it.
 function MultiSelectSubmenu({
   field,
   disabled,
   onDone,
 }: SubmenuProps<MultiSelectFilterField>) {
-  const { labels, addFilter, updateFilter, removeFilter } = useFiltersActions();
-  const { filters } = useFiltersState();
-  const [draftId, setDraftId] = React.useState<string | null>(null);
-  const draft = draftId
-    ? filters.find((filter) => filter.id === draftId)
-    : undefined;
-  const values = asStringArray(draft?.value);
-  const atMax =
-    field.maxSelections != null && values.length >= field.maxSelections;
-
-  const toggle = (value: string, checked: boolean) => {
-    const next = checked
-      ? [...values, value]
-      : values.filter((existing) => existing !== value);
-    if (!draft) {
-      const scalar = scalarOperatorFor(field);
-      if (!scalar || next.length === 0) return;
-      const filter = createFilter(field, { operator: scalar.id, value: next });
-      addFilter(filter);
-      setDraftId(filter.id);
-      return;
-    }
-    if (next.length === 0) {
-      removeFilter(draft.id);
-      setDraftId(null);
-      return;
-    }
-    updateFilter(draft.id, { value: next });
-  };
+  const { labels } = useFiltersActions();
+  const { values, write, atMax } = useOptionFilter(field);
 
   return (
     <DropdownMenuFilter>
       <DropdownMenuSub>
         <ValueSubmenuTrigger field={field} disabled={disabled} />
-        <DropdownMenuSubContent className="w-60">
+        <DropdownMenuSubContent
+          className="w-60"
+          positionerClassName={SUBMENU_POSITIONER_STATIC}
+        >
           <DropdownMenuInput
             aria-label={labels.searchFieldValues(field)}
             placeholder={field.placeholder ?? labels.searchFieldValues(field)}
@@ -241,7 +301,9 @@ function MultiSelectSubmenu({
                   label={option.label}
                   checked={checked}
                   disabled={atMax && !checked}
-                  onCheckedChange={(next) => toggle(option.value, next)}
+                  onCheckedChange={(next) =>
+                    write(toggled(values, option.value, next))
+                  }
                 >
                   <OptionContent option={option} />
                 </DropdownMenuCheckboxItem>
@@ -304,7 +366,10 @@ function InputSubmenu({
         }}
       >
         <ValueSubmenuTrigger field={field} disabled={disabled} />
-        <DropdownMenuSubContent className="w-64">
+        <DropdownMenuSubContent
+          className="w-64"
+          positionerClassName={SUBMENU_POSITIONER_STATIC}
+        >
           <div
             data-slot="filter-add-input"
             className={cn(POPUP_SEARCH_FIELD, "mb-1 h-8")}
@@ -368,6 +433,67 @@ function InputSubmenu({
   );
 }
 
+// One field's values among the root search's results, with the same items as
+// its submenu, so applied values show as checked. Any pick closes the menu:
+// search is for jumping straight to a value.
+function SearchValues({
+  field,
+  onEdited,
+}: {
+  field: OptionsField;
+  /** Called with the chip's id when a pick changed an existing chip. */
+  onEdited: (filterId: string) => void;
+}) {
+  const { filterId, values, write, atMax } = useOptionFilter(field);
+  const pick = (next: string[]) => {
+    write(next);
+    if (filterId) onEdited(filterId);
+  };
+  const fieldName = (
+    <span className="text-muted-foreground ms-auto shrink-0 text-xs">
+      {field.label}
+    </span>
+  );
+
+  if (field.type === "select") {
+    return (
+      <DropdownMenuRadioGroup
+        value={values[0] ?? null}
+        onValueChange={(value: string) => pick([value])}
+      >
+        {field.options.map((option) => (
+          <DropdownMenuRadioItem
+            key={option.value}
+            value={option.value}
+            label={option.label}
+            closeOnClick
+          >
+            <OptionContent option={option} />
+            {fieldName}
+          </DropdownMenuRadioItem>
+        ))}
+      </DropdownMenuRadioGroup>
+    );
+  }
+
+  return field.options.map((option) => {
+    const checked = values.includes(option.value);
+    return (
+      <DropdownMenuCheckboxItem
+        key={option.value}
+        label={option.label}
+        checked={checked}
+        disabled={atMax && !checked}
+        closeOnClick
+        onCheckedChange={(next) => pick(toggled(values, option.value, next))}
+      >
+        <OptionContent option={option} />
+        {fieldName}
+      </DropdownMenuCheckboxItem>
+    );
+  });
+}
+
 // A chip's value control, focused after the menu adds that filter.
 const CHIP_FOCUS_TARGET =
   '[data-slot="filter-chip-value"]:is(button, input), [data-slot="filter-chip-value"] :is(button, input, select, textarea, [tabindex]:not([tabindex="-1"]))';
@@ -403,8 +529,6 @@ function AddMenu({
     usedFieldIds,
     allowDuplicateFields,
     addFilter,
-    updateFilter,
-    getFilters,
   } = useFiltersActions();
   const compact = usedFieldIds.size > 0;
   const inActions = kind === "segment";
@@ -490,54 +614,34 @@ function AddMenu({
     [changeOpen],
   );
 
-  const optionItems = React.useMemo(
+  // Option fields whose values join the results while searching.
+  const optionFields = React.useMemo(
     () =>
-      fields.flatMap((field) =>
-        (field.type === "select" || field.type === "multiselect") &&
-        scalarOperatorFor(field)
-          ? field.options.map((option) => ({ field, option }))
-          : [],
+      fields.filter(
+        (field): field is OptionsField =>
+          (field.type === "select" || field.type === "multiselect") &&
+          scalarOperatorFor(field) !== undefined,
       ),
     [fields],
   );
 
-  const pickOption = (field: OptionsField, option: FilterOption) => {
-    const scalar = scalarOperatorFor(field);
-    if (!scalar) return;
-    // Without duplicates, a searched value joins the field's existing filter.
-    // Filters are read via `getFilters`, not subscribed, so the menu doesn't
-    // re-render on every chip keystroke.
-    const existing = allowDuplicateFields
-      ? undefined
-      : getFilters().find((filter) => filter.field === field.id);
-    if (existing) {
-      const valueless = operatorShapeFor(field, existing.operator) === "none";
-      updateFilter(existing.id, {
-        ...(valueless && { operator: scalar.id }),
-        value: withOption(
-          field,
-          valueless ? null : existing.value,
-          option.value,
-        ),
-      });
+  // An edited chip may sit outside a scrolling bar; bring it into view.
+  const revealChip = React.useCallback(
+    (filterId: string) => {
       requestAnimationFrame(() => {
-        const chip = findChip(existing.id);
+        const chip = findChip(filterId);
         if (chip) revealInScroller(chip);
       });
-    } else {
-      addFilter(
-        createFilter(field, {
-          operator: scalar.id,
-          value: field.type === "multiselect" ? [option.value] : option.value,
-        }),
-      );
-    }
-    onDone();
-  };
+    },
+    [findChip],
+  );
 
   return (
     <DropdownMenuFilter value={query} onValueChange={setQuery}>
-      <DropdownMenu open={open} onOpenChange={changeOpen}>
+      {/* Non-modal, like a popover: a modal menu measures its trigger while
+          rendering, which forces a full layout mid-way through a new chip's
+          entrance when a pick closes the menu. */}
+      <DropdownMenu open={open} onOpenChange={changeOpen} modal={false}>
         {/* Only once folded to "+" (the label is hidden) and while closed. */}
         <Tooltip
           disabled={!compact || open}
@@ -651,81 +755,99 @@ function AddMenu({
             )}
           </TooltipContent>
         </Tooltip>
-        <DropdownMenuContent
-          aria-label={labels.add}
-          align="start"
-          sideOffset={6}
-          className="w-64"
-          finalFocus={() => {
-            const id = focusFilterIdRef.current;
-            focusFilterIdRef.current = null;
-            if (!id) return true;
-            return (
-              findChip(id)?.querySelector<HTMLElement>(CHIP_FOCUS_TARGET) ??
-              true
-            );
-          }}
-        >
-          <DropdownMenuInput
-            aria-label={labels.searchFields}
-            placeholder={labels.searchFields}
-          />
-          <DropdownMenuEmpty>{labels.noFields}</DropdownMenuEmpty>
-          <DropdownMenuList>
-            <DropdownMenuGroup>
-              {searching && (
-                <DropdownMenuGroupLabel>{labels.fields}</DropdownMenuGroupLabel>
-              )}
-              {fields.map((field) => {
-                const disabled =
-                  !allowDuplicateFields && usedFieldIds.has(field.id);
-                if (!hasValueStep(field)) {
-                  return (
-                    <DropdownMenuItem
-                      key={field.id}
-                      label={field.label}
-                      disabled={disabled}
-                      onClick={() => {
-                        const filter = createFilter(field);
-                        addFilter(filter);
-                        onDone(filter.id);
-                      }}
-                    >
-                      <FieldIcon>{field.icon}</FieldIcon>
-                      <span className="truncate">{field.label}</span>
-                    </DropdownMenuItem>
-                  );
-                }
+        <DropdownMenuPortal>
+          {/* Composed without DropdownMenuContent's viewport: this menu never
+              swaps content, and leaving the viewport out keeps the positioner
+              on `transform`, so the glide as chips shift the trigger stays on
+              the compositor. */}
+          <DropdownMenuPositioner
+            side="bottom"
+            align="start"
+            sideOffset={6}
+            collisionPadding={8}
+            className="z-50"
+          >
+            <DropdownMenuPopup
+              aria-label={labels.add}
+              className="w-64 p-1"
+              finalFocus={() => {
+                const id = focusFilterIdRef.current;
+                focusFilterIdRef.current = null;
+                if (!id) return true;
                 return (
-                  <ValueSubmenu
-                    key={field.id}
-                    field={field}
-                    disabled={disabled}
-                    onDone={onDone}
-                  />
+                  findChip(id)?.querySelector<HTMLElement>(CHIP_FOCUS_TARGET) ??
+                  true
                 );
-              })}
-            </DropdownMenuGroup>
-            {searching && <DropdownMenuSeparator />}
-            {searching && (
-              <DropdownMenuGroup>
-                <DropdownMenuGroupLabel>{labels.values}</DropdownMenuGroupLabel>
-                {optionItems.map(({ field, option }) => (
-                  <DropdownMenuItem
-                    key={`${field.id}:${option.value}`}
-                    label={option.label}
-                    onClick={() => pickOption(field, option)}
-                  >
-                    <OptionContent option={option} />
-                    <span className="text-muted-foreground ms-auto shrink-0 text-xs">
-                      {field.label}
-                    </span>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuGroup>
-            )}
-          </DropdownMenuList>
-        </DropdownMenuContent>
+              }}
+            >
+              <DropdownMenuInput
+                aria-label={labels.searchFields}
+                placeholder={labels.searchFields}
+              />
+              <DropdownMenuEmpty>{labels.noFields}</DropdownMenuEmpty>
+              <DropdownMenuList>
+                <DropdownMenuGroup>
+                  {searching && (
+                    <DropdownMenuGroupLabel>
+                      {labels.fields}
+                    </DropdownMenuGroupLabel>
+                  )}
+                  {fields.map((field) => {
+                    // Option fields edit their one filter in place, so they
+                    // stay open; the rest close once used unless they repeat.
+                    const editsInPlace =
+                      hasValueStep(field) &&
+                      (field.type === "select" || field.type === "multiselect");
+                    const disabled =
+                      usedFieldIds.has(field.id) &&
+                      !editsInPlace &&
+                      !allowsDuplicates(field, allowDuplicateFields);
+                    if (!hasValueStep(field)) {
+                      return (
+                        <DropdownMenuItem
+                          key={field.id}
+                          label={field.label}
+                          disabled={disabled}
+                          onClick={() => {
+                            const filter = createFilter(field);
+                            addFilter(filter);
+                            onDone(filter.id);
+                          }}
+                        >
+                          <FieldIcon>{field.icon}</FieldIcon>
+                          <span className="truncate">{field.label}</span>
+                        </DropdownMenuItem>
+                      );
+                    }
+                    return (
+                      <ValueSubmenu
+                        key={field.id}
+                        field={field}
+                        disabled={disabled}
+                        onDone={onDone}
+                      />
+                    );
+                  })}
+                </DropdownMenuGroup>
+                {searching && <DropdownMenuSeparator />}
+                {searching && (
+                  <DropdownMenuGroup>
+                    <DropdownMenuGroupLabel>
+                      {labels.values}
+                    </DropdownMenuGroupLabel>
+                    {optionFields.map((field) => (
+                      <SearchValues
+                        key={field.id}
+                        field={field}
+                        onEdited={revealChip}
+                      />
+                    ))}
+                  </DropdownMenuGroup>
+                )}
+              </DropdownMenuList>
+            </DropdownMenuPopup>
+          </DropdownMenuPositioner>
+        </DropdownMenuPortal>
       </DropdownMenu>
     </DropdownMenuFilter>
   );

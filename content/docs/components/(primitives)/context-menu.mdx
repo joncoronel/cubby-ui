@@ -127,6 +127,12 @@ Wrap a `ContextMenuSub` (or the whole `ContextMenu`) in `ContextMenuFilter`, the
   color.
 </ApiProp>
 
+<ApiProp name="positionerClassName" fullType="string">
+  Classes for the positioner, the element Base UI moves into place. Merged last,
+  so it overrides the defaults, such as `max-h-96` to cap the menu's height.
+  Custom prop not available in Base UI.
+</ApiProp>
+
 </ApiPropsList>
 
 ### ContextMenuItem
@@ -315,6 +321,12 @@ Mutually exclusive menu item. Wraps Base UI's `ContextMenu.RadioItem`. Uses the 
   defaultValue="3"
 >
   Shadow weight. Kept at `3` since submenus are still small popups.
+</ApiProp>
+
+<ApiProp name="positionerClassName" fullType="string">
+  Classes for the positioner, the element Base UI moves into place. Merged last,
+  so it overrides the defaults, such as `max-h-96` to cap the menu's height.
+  Custom prop not available in Base UI.
 </ApiProp>
 
 </ApiPropsList>

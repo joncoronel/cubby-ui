@@ -100,12 +100,15 @@ function ContextMenuRadioGroup({
 
 function ContextMenuContent({
   className,
+  positionerClassName,
   sideOffset = 4,
   align = "start",
   level = 3,
   shadowLevel = 3,
   ...props
 }: React.ComponentProps<typeof BaseContextMenu.Popup> & {
+  /** Classes for the positioner (the element Base UI moves into place), merged last. */
+  positionerClassName?: string;
   align?: BaseContextMenu.Positioner.Props["align"];
   sideOffset?: BaseContextMenu.Positioner.Props["sideOffset"];
   /** Surface elevation level for the popup bg (1-8). Bump when nesting inside a Dialog or other elevated container. Defaults to 3. */
@@ -116,7 +119,10 @@ function ContextMenuContent({
   return (
     <ContextMenuPortal>
       <ContextMenuPositioner
-        className="max-h-(--available-height) max-w-(--available-width)"
+        className={cn(
+          "max-h-(--available-height) max-w-(--available-width)",
+          positionerClassName,
+        )}
         align={align}
         sideOffset={sideOffset}
       >
@@ -414,6 +420,7 @@ function ContextMenuSubTrigger({
 
 function ContextMenuSubContent({
   className,
+  positionerClassName,
   // 8px, not 0: the positioner anchors to the sub-trigger, which sits 4px
   // inside the parent popup because of its p-1. A 0 offset therefore overlaps
   // the parent's edge by 4px; 8 leaves a 4px gap, matching Menubar.
@@ -423,6 +430,8 @@ function ContextMenuSubContent({
   shadowLevel = 3,
   ...props
 }: React.ComponentProps<typeof BaseContextMenu.Popup> & {
+  /** Classes for the positioner (the element Base UI moves into place), merged last. */
+  positionerClassName?: string;
   align?: BaseContextMenu.Positioner.Props["align"];
   sideOffset?: BaseContextMenu.Positioner.Props["sideOffset"];
   /** Surface elevation level for the submenu bg (1-8). Defaults to 5 — one tier above the parent menu's default of 3. Bump higher when nesting inside a Dialog. */
@@ -433,7 +442,10 @@ function ContextMenuSubContent({
   return (
     <ContextMenuPortal>
       <ContextMenuPositioner
-        className="max-h-(--available-height) max-w-(--available-width)"
+        className={cn(
+          "max-h-(--available-height) max-w-(--available-width)",
+          positionerClassName,
+        )}
         sideOffset={sideOffset}
         align={align}
       >

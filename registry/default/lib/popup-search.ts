@@ -35,3 +35,11 @@ export const POPUP_SEARCH_CLEAR =
 
 /** The search icon's classes. */
 export const POPUP_SEARCH_ICON = "text-muted-foreground size-4 shrink-0";
+
+/**
+ * Height cap for a menu's filterable list, which scrolls on its own below the
+ * field (as Base UI's filter demo does). The menu's box keeps the rest:
+ * 2.75rem is its 4px padding top and bottom, the 32px field and the 4px gap.
+ */
+export const POPUP_SEARCH_MENU_LIST =
+  "max-h-[min(20rem,calc(var(--available-height)-2.75rem))]";

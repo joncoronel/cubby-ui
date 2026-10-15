@@ -16,17 +16,17 @@ import {
   type SurfaceLevel,
 } from "@/registry/default/lib/elevated";
 import {
-  POPUP_SEARCH_BAND,
   POPUP_SEARCH_CLEAR,
   POPUP_SEARCH_FIELD,
   POPUP_SEARCH_ICON,
   POPUP_SEARCH_INPUT,
+  POPUP_SEARCH_MENU_LIST,
 } from "@/registry/default/lib/popup-search";
+import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 import {
   SwitchVisual,
   type SwitchVisualProps,
 } from "@/registry/default/switch/switch";
-import "./dropdown-menu.css";
 
 // Shared shell for checkbox and radio items. Padding matches the plain menu
 // item so labels line up across every item type; the indicator lives in a
@@ -530,34 +530,23 @@ function DropdownMenuInput({
   return (
     <div
       data-slot="dropdown-menu-input-group"
-      data-popup-search="sticky"
-      className={cn(
-        POPUP_SEARCH_BAND,
-        // Pinned to the top of the scroll container. The negative margins cancel
-        // its p-1 so the band covers the gutter, and pb-1 is the gap to the
-        // first item.
-        "sticky -top-1 z-10 -mx-1 -mt-1 pb-1",
-      )}
+      // Above the list, outside its scroll, as in Base UI's filter demo. An
+      // item's height (32px); mb-1 is the gap to the first item.
+      className={cn(POPUP_SEARCH_FIELD, "mb-1 h-8", className)}
     >
-      <div
-        data-slot="dropdown-menu-input-field"
-        // An item's height (32px), so the field reads as part of the list.
-        className={cn(POPUP_SEARCH_FIELD, "h-8", className)}
-      >
-        <HugeiconsIcon
-          icon={Search01Icon}
-          strokeWidth={2}
-          className={POPUP_SEARCH_ICON}
-        />
-        <BaseMenu.Input
-          data-slot="dropdown-menu-input"
-          className={cn(POPUP_SEARCH_INPUT, inputClassName)}
-          // The placeholder isn't a name; pass a specific label when you can.
-          aria-label={ariaLabel}
-          {...props}
-        />
-        {showClear && <DropdownMenuClear />}
-      </div>
+      <HugeiconsIcon
+        icon={Search01Icon}
+        strokeWidth={2}
+        className={POPUP_SEARCH_ICON}
+      />
+      <BaseMenu.Input
+        data-slot="dropdown-menu-input"
+        className={cn(POPUP_SEARCH_INPUT, inputClassName)}
+        // The placeholder isn't a name; pass a specific label when you can.
+        aria-label={ariaLabel}
+        {...props}
+      />
+      {showClear && <DropdownMenuClear />}
     </div>
   );
 }
@@ -581,8 +570,20 @@ function DropdownMenuClear({
   );
 }
 
-function DropdownMenuList({ ...props }: BaseMenu.List.Props) {
-  return <BaseMenu.List data-slot="dropdown-menu-list" {...props} />;
+function DropdownMenuList({
+  className,
+  ...props
+}: Omit<BaseMenu.List.Props, "className"> & {
+  /** Styles the scroll area around the list, e.g. to change its height cap. */
+  className?: string;
+}) {
+  return (
+    // The list scrolls on its own so the field above it stays put, with the
+    // same edge fade as Combobox's list.
+    <ScrollArea fadeEdges="y" className={cn(POPUP_SEARCH_MENU_LIST, className)}>
+      <BaseMenu.List data-slot="dropdown-menu-list" {...props} />
+    </ScrollArea>
+  );
 }
 
 function DropdownMenuEmpty({ className, ...props }: BaseMenu.Empty.Props) {

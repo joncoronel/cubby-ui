@@ -544,15 +544,11 @@
         {
           "path": "registry/default/context-menu/context-menu.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/context-menu/context-menu.tsx"
-        },
-        {
-          "path": "registry/default/context-menu/context-menu.css",
-          "type": "registry:file",
-          "target": "components/ui/cubby-ui/context-menu/context-menu.css"
+          "target": "components/ui/cubby-ui/context-menu.tsx"
         }
       ],
       "registryDependencies": [
+        "@cubby-ui/scroll-area",
         "@cubby-ui/switch",
         "@cubby-ui/elevated",
         "@cubby-ui/popup-search"
@@ -786,15 +782,11 @@
         {
           "path": "registry/default/dropdown-menu/dropdown-menu.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/dropdown-menu/dropdown-menu.tsx"
-        },
-        {
-          "path": "registry/default/dropdown-menu/dropdown-menu.css",
-          "type": "registry:file",
-          "target": "components/ui/cubby-ui/dropdown-menu/dropdown-menu.css"
+          "target": "components/ui/cubby-ui/dropdown-menu.tsx"
         }
       ],
       "registryDependencies": [
+        "@cubby-ui/scroll-area",
         "@cubby-ui/switch",
         "@cubby-ui/elevated",
         "@cubby-ui/popup-search"

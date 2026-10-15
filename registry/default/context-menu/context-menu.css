@@ -1,0 +1,34 @@
+/* Scroll fade under a menu's pinned search field.
+ *
+ * The field has no rule under it, so rows passing beneath it would be cut off
+ * flat. Instead a short surface-colored fade sits just below the band and
+ * only appears once the list has scrolled, driven by the menu's own scroll
+ * position. Without scroll-driven animations there is no fade, which reads
+ * the same as an unscrolled list.
+ *
+ * Kept byte-identical with context-menu.css, so the two never conflict when
+ * both are installed. */
+@keyframes popup-search-fade {
+  to {
+    opacity: 1;
+  }
+}
+
+[data-popup-search="sticky"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 100%;
+  height: 1.25rem;
+  pointer-events: none;
+  background: linear-gradient(to bottom, var(--popup-surface), transparent);
+  opacity: 0;
+}
+
+@supports (animation-timeline: scroll()) {
+  [data-popup-search="sticky"]::after {
+    animation: popup-search-fade linear both;
+    animation-timeline: scroll(nearest block);
+    animation-range: 0 1rem;
+  }
+}

@@ -505,7 +505,8 @@
       "registryDependencies": [
         "@cubby-ui/label",
         "@cubby-ui/scroll-area",
-        "@cubby-ui/elevated"
+        "@cubby-ui/elevated",
+        "@cubby-ui/popup-search"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -543,12 +544,18 @@
         {
           "path": "registry/default/context-menu/context-menu.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/context-menu.tsx"
+          "target": "components/ui/cubby-ui/context-menu/context-menu.tsx"
+        },
+        {
+          "path": "registry/default/context-menu/context-menu.css",
+          "type": "registry:file",
+          "target": "components/ui/cubby-ui/context-menu/context-menu.css"
         }
       ],
       "registryDependencies": [
         "@cubby-ui/switch",
-        "@cubby-ui/elevated"
+        "@cubby-ui/elevated",
+        "@cubby-ui/popup-search"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -779,12 +786,18 @@
         {
           "path": "registry/default/dropdown-menu/dropdown-menu.tsx",
           "type": "registry:ui",
-          "target": "components/ui/cubby-ui/dropdown-menu.tsx"
+          "target": "components/ui/cubby-ui/dropdown-menu/dropdown-menu.tsx"
+        },
+        {
+          "path": "registry/default/dropdown-menu/dropdown-menu.css",
+          "type": "registry:file",
+          "target": "components/ui/cubby-ui/dropdown-menu/dropdown-menu.css"
         }
       ],
       "registryDependencies": [
         "@cubby-ui/switch",
-        "@cubby-ui/elevated"
+        "@cubby-ui/elevated",
+        "@cubby-ui/popup-search"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -902,7 +915,8 @@
         "@cubby-ui/popover",
         "@cubby-ui/transition-panel",
         "@cubby-ui/use-controllable-state",
-        "@cubby-ui/elevated"
+        "@cubby-ui/elevated",
+        "@cubby-ui/popup-search"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -1190,6 +1204,19 @@
       ],
       "registryDependencies": [
         "@cubby-ui/elevated"
+      ]
+    },
+    {
+      "name": "popup-search",
+      "type": "registry:lib",
+      "title": "popupSearch",
+      "description": "A utility function for popup search.",
+      "files": [
+        {
+          "path": "registry/default/lib/popup-search.ts",
+          "type": "registry:lib",
+          "target": "lib/cubby-ui/popup-search.ts"
+        }
       ]
     },
     {

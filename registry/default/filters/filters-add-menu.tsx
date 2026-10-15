@@ -38,10 +38,14 @@ import {
   ArrowLeft01Icon,
   ArrowRight01Icon,
   PlusSignIcon,
-  Search01Icon,
 } from "@hugeicons/core-free-icons";
 
 import { useFiltersActions, useFiltersState } from "./filters-context";
+import {
+  POPUP_SEARCH_BAND,
+  POPUP_SEARCH_FIELD,
+  POPUP_SEARCH_INPUT,
+} from "@/registry/default/lib/popup-search";
 import { revealInScroller } from "./lib/flow-presence";
 import {
   asStringArray,
@@ -108,24 +112,12 @@ function hasValueStep(field: FilterField): boolean {
   return field.type !== "custom" && scalarOperatorFor(field) !== undefined;
 }
 
-const STEP_ROW =
-  "h-11 gap-2 rounded-none border-0 border-b sm:h-11 bg-transparent px-3 outline-0 focus-within:outline-0 focus-within:outline-offset-0 dark:bg-transparent";
-
 // Lists shrink first, so a menu squeezed against the viewport edge keeps its
 // search row and footer visible. `--available-height` comes from the positioner.
-const LIST_HEIGHT = "max-h-[min(18rem,calc(var(--available-height)-2.75rem))]";
+// The search header is 2.5rem: a 4px gutter above the 36px field.
+const LIST_HEIGHT = "max-h-[min(18rem,calc(var(--available-height)-2.5rem))]";
 const LIST_WITH_FOOTER_HEIGHT =
-  "max-h-[min(16rem,calc(var(--available-height)-5.25rem))]";
-
-function SearchIcon() {
-  return (
-    <HugeiconsIcon
-      icon={Search01Icon}
-      strokeWidth={2}
-      className="text-muted-foreground size-4"
-    />
-  );
-}
+  "max-h-[min(16rem,calc(var(--available-height)-5rem))]";
 
 /** The drilled-in field at the start of the step's input; clicking it goes back. */
 function ScopeToken({
@@ -290,11 +282,9 @@ function FieldStep({
       <div className="flex flex-col">
         <ComboboxInput
           ref={inputRef}
-          showTrigger={false}
           showClear={false}
           placeholder={labels.searchFields}
-          start={<SearchIcon />}
-          className={STEP_ROW}
+          variant="popup"
         />
         <ComboboxEmpty>{labels.noFields}</ComboboxEmpty>
         <ComboboxList className={LIST_HEIGHT}>
@@ -386,11 +376,10 @@ function SelectStep({
       <div className="flex flex-col">
         <ComboboxInput
           ref={inputRef}
-          showTrigger={false}
           showClear={false}
           placeholder={field.placeholder ?? labels.searchValues}
+          variant="popup"
           start={<ScopeToken field={field} onBack={onBack} />}
-          className={STEP_ROW}
           onKeyDown={(event) => backOnEmptyBackspace(event, onBack)}
         />
         <ComboboxEmpty>{labels.noResults}</ComboboxEmpty>
@@ -463,11 +452,10 @@ function MultiSelectStep({
       <div className="flex flex-col">
         <ComboboxInput
           ref={inputRef}
-          showTrigger={false}
           showClear={false}
           placeholder={field.placeholder ?? labels.searchValues}
+          variant="popup"
           start={<ScopeToken field={field} onBack={onBack} />}
-          className={STEP_ROW}
           onKeyDown={(event) => backOnEmptyBackspace(event, onBack)}
         />
         <ComboboxEmpty>{labels.noResults}</ComboboxEmpty>
@@ -529,71 +517,77 @@ function InputStep({
   };
 
   return (
+    // The same field as the search steps, with nothing below it, so the band
+    // closes with its own bottom gutter.
     <div
-      data-slot="filter-add-input"
-      // A single row, so no divider under it.
-      className={cn("flex w-full items-center text-sm", STEP_ROW, "border-b-0")}
+      data-slot="filter-add-input-band"
+      className={cn(POPUP_SEARCH_BAND, "pb-1")}
     >
-      <ScopeToken field={field} onBack={onBack} />
-      {operator && (
-        <span className="text-muted-foreground shrink-0">
-          {operatorLabel(operator, labels.operators)}
-        </span>
-      )}
-      {typeof field.prefix === "string" && (
-        // Pulls in 4px to match the chip's affix spacing.
-        <span className="text-muted-foreground -me-1 shrink-0">
-          {field.prefix}
-        </span>
-      )}
-      <input
-        ref={inputRef}
-        type="text"
-        inputMode={isNumber ? "decimal" : undefined}
-        aria-label={`${field.label} ${operator ? operatorLabel(operator, labels.operators) : ""}`.trim()}
-        aria-invalid={invalid || undefined}
-        aria-describedby={invalid ? hintId : undefined}
-        placeholder={field.placeholder ?? labels.enterValue}
-        value={text}
-        onChange={(event) => setText(event.target.value)}
-        onKeyDown={(event) => {
-          if (event.key === "Enter") {
-            event.preventDefault();
-            submit();
-            return;
-          }
-          backOnEmptyBackspace(event, onBack);
-        }}
-        className={cn(
-          "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground h-full min-w-0 flex-1 bg-transparent text-base outline-none md:text-sm",
-          isNumber && "tabular-nums",
-          "aria-invalid:text-danger-foreground",
+      <div
+        data-slot="filter-add-input"
+        className={cn(POPUP_SEARCH_FIELD, "h-9 w-full text-sm")}
+      >
+        <ScopeToken field={field} onBack={onBack} />
+        {operator && (
+          <span className="text-muted-foreground shrink-0">
+            {operatorLabel(operator, labels.operators)}
+          </span>
         )}
-      />
-      {typeof field.suffix === "string" && (
-        <span className="text-muted-foreground shrink-0">{field.suffix}</span>
-      )}
-      {invalid && (
-        <span
-          id={hintId}
-          className="text-danger-foreground shrink-0 text-xs whitespace-nowrap"
-        >
-          {labels.invalidNumber}
-        </span>
-      )}
-      {valid && (
-        // The Enter hint doubles as the pointer submit.
-        <button
-          type="button"
-          aria-label={labels.addTooltip}
-          onClick={submit}
-          className="hover:bg-surface-hover focus-visible:outline-ring/50 -me-1.5 flex shrink-0 cursor-pointer items-center rounded-md p-0.5 outline-0 transition-[background-color,opacity,scale] duration-150 ease-out outline-solid focus-visible:outline-2 motion-reduce:transition-none starting:scale-90 starting:opacity-0"
-        >
-          <Kbd size="sm" aria-hidden>
-            Enter
-          </Kbd>
-        </button>
-      )}
+        {typeof field.prefix === "string" && (
+          // Pulls in 4px to match the chip's affix spacing.
+          <span className="text-muted-foreground -me-1 shrink-0">
+            {field.prefix}
+          </span>
+        )}
+        <input
+          ref={inputRef}
+          type="text"
+          inputMode={isNumber ? "decimal" : undefined}
+          aria-label={`${field.label} ${operator ? operatorLabel(operator, labels.operators) : ""}`.trim()}
+          aria-invalid={invalid || undefined}
+          aria-describedby={invalid ? hintId : undefined}
+          placeholder={field.placeholder ?? labels.enterValue}
+          value={text}
+          onChange={(event) => setText(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              submit();
+              return;
+            }
+            backOnEmptyBackspace(event, onBack);
+          }}
+          className={cn(
+            POPUP_SEARCH_INPUT,
+            isNumber && "tabular-nums",
+            "aria-invalid:text-danger-foreground",
+          )}
+        />
+        {typeof field.suffix === "string" && (
+          <span className="text-muted-foreground shrink-0">{field.suffix}</span>
+        )}
+        {invalid && (
+          <span
+            id={hintId}
+            className="text-danger-foreground shrink-0 text-xs whitespace-nowrap"
+          >
+            {labels.invalidNumber}
+          </span>
+        )}
+        {valid && (
+          // The Enter hint doubles as the pointer submit.
+          <button
+            type="button"
+            aria-label={labels.addTooltip}
+            onClick={submit}
+            className="hover:bg-surface-hover focus-visible:outline-ring/50 -me-1.5 flex shrink-0 cursor-pointer items-center rounded-md p-0.5 outline-0 transition-[background-color,opacity,scale] duration-150 ease-out outline-solid focus-visible:outline-2 motion-reduce:transition-none starting:scale-90 starting:opacity-0"
+          >
+            <Kbd size="sm" aria-hidden>
+              Enter
+            </Kbd>
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -933,11 +927,4 @@ function FilterActionsAdd(
   return <AddMenu {...(props as AddMenuProps)} kind="segment" />;
 }
 
-export {
-  FilterAddButton,
-  FilterActionsAdd,
-  FieldIcon,
-  OptionContent,
-  SearchIcon,
-  STEP_ROW,
-};
+export { FilterAddButton, FilterActionsAdd, FieldIcon, OptionContent };

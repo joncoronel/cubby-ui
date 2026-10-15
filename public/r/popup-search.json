@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "popup-search",
+  "title": "popupSearch",
+  "description": "A utility function for popup search.",
+  "files": [
+    {
+      "path": "registry/default/lib/popup-search.ts",
+      "content": "// The search field that sits at the top of a popup list: Combobox's `popup`\n// input, the Filters add menu, and the filterable menus. One look for all of\n// them, so they can't drift apart.\n//\n// It is drawn like the list's own rows: the same 4px gutter, the item radius\n// and the item's 10px label inset, so the search icon starts where item labels\n// do. Each component sets the height to match its item height.\n\n/**\n * The surface-colored band around the field. Covers the side and top gutters;\n * the list below supplies the 4px gap under the field.\n */\nexport const POPUP_SEARCH_BAND = \"bg-(--popup-surface) px-1 pt-1\";\n\n/**\n * The field itself. Outlined, never filled: a highlighted item is a filled\n * box of the same size, so a filled field right above one reads as a second\n * highlight. The ring takes no room, so the icon still lines up with the item\n * labels. No focus ring: the field has focus for as long as the popup is\n * open, so a ring would say nothing.\n */\nexport const POPUP_SEARCH_FIELD =\n  \"flex items-center gap-2 rounded-md px-2.5 inset-ring inset-ring-border\";\n\n/** The `<input>`. 16px below `md` so iOS Safari doesn't zoom on focus. */\nexport const POPUP_SEARCH_INPUT =\n  \"placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground h-full min-w-0 flex-1 bg-transparent text-base outline-none md:text-sm\";\n\n/**\n * A clear button inside the field: 24px to look at, with a 40px hit area that\n * reaches the input across the gap without covering it.\n */\nexport const POPUP_SEARCH_CLEAR =\n  \"text-muted-foreground hover:text-foreground focus-visible:ring-ring/70 relative -mr-1 inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors duration-100 outline-none focus-visible:ring-2 after:absolute after:-inset-2\";\n\n/** The search icon's classes. */\nexport const POPUP_SEARCH_ICON = \"text-muted-foreground size-4 shrink-0\";\n",
+      "type": "registry:lib",
+      "target": "lib/cubby-ui/popup-search.ts"
+    }
+  ],
+  "type": "registry:lib"
+}

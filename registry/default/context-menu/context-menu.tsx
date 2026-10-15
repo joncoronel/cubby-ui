@@ -8,6 +8,14 @@ import {
   solidSurface,
   type SurfaceLevel,
 } from "@/registry/default/lib/elevated";
+import {
+  POPUP_SEARCH_BAND,
+  POPUP_SEARCH_CLEAR,
+  POPUP_SEARCH_FIELD,
+  POPUP_SEARCH_ICON,
+  POPUP_SEARCH_INPUT,
+} from "@/registry/default/lib/popup-search";
+import "./context-menu.css";
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -466,7 +474,7 @@ function ContextMenuInput({
   "aria-label": ariaLabel = "Search",
   ...props
 }: BaseMenu.Input.Props & {
-  /** Class applied to the inner `<input>`. `className` styles the search row. */
+  /** Class applied to the inner `<input>`. `className` styles the field. */
   inputClassName?: string;
   /** Show a clear button while the query has text. */
   showClear?: boolean;
@@ -474,30 +482,34 @@ function ContextMenuInput({
   return (
     <div
       data-slot="context-menu-input-group"
+      data-popup-search="sticky"
       className={cn(
-        // Pinned to the top of the popup, which is its own scroll container.
-        // The negative margins cancel its p-1 so the row and its rule run edge
-        // to edge, and the row's px-3.5 lines the icon up with the item labels.
-        "sticky -top-1 z-10 -mx-1 -mt-1 mb-1 flex h-10 items-center gap-2 border-b bg-(--popup-surface) px-3.5",
-        className,
+        POPUP_SEARCH_BAND,
+        // Pinned to the top of the scroll container. The negative margins cancel
+        // its p-1 so the band covers the gutter, and pb-1 is the gap to the
+        // first item.
+        "sticky -top-1 z-10 -mx-1 -mt-1 pb-1",
       )}
     >
-      <HugeiconsIcon
-        icon={Search01Icon}
-        strokeWidth={2}
-        className="text-muted-foreground size-4 shrink-0"
-      />
-      <BaseMenu.Input
-        data-slot="context-menu-input"
-        className={cn(
-          "placeholder:text-muted-foreground h-full min-w-0 flex-1 bg-transparent text-base outline-none md:text-sm",
-          inputClassName,
-        )}
-        // The placeholder isn't a name; pass a specific label when you can.
-        aria-label={ariaLabel}
-        {...props}
-      />
-      {showClear && <ContextMenuClear />}
+      <div
+        data-slot="context-menu-input-field"
+        // An item's height (32px), so the field reads as part of the list.
+        className={cn(POPUP_SEARCH_FIELD, "h-8", className)}
+      >
+        <HugeiconsIcon
+          icon={Search01Icon}
+          strokeWidth={2}
+          className={POPUP_SEARCH_ICON}
+        />
+        <BaseMenu.Input
+          data-slot="context-menu-input"
+          className={cn(POPUP_SEARCH_INPUT, inputClassName)}
+          // The placeholder isn't a name; pass a specific label when you can.
+          aria-label={ariaLabel}
+          {...props}
+        />
+        {showClear && <ContextMenuClear />}
+      </div>
     </div>
   );
 }
@@ -511,13 +523,7 @@ function ContextMenuClear({
     <BaseMenu.Clear
       data-slot="context-menu-clear"
       aria-label="Clear search"
-      className={cn(
-        "text-muted-foreground hover:text-foreground focus-visible:ring-ring/70 relative -mr-1 inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors duration-100 outline-none focus-visible:ring-2",
-        // 40px hit area: it reaches the input across the gap and stays inside
-        // the row, so the two never overlap.
-        "after:absolute after:-inset-2",
-        className,
-      )}
+      className={cn(POPUP_SEARCH_CLEAR, className)}
       {...props}
     >
       {children ?? (

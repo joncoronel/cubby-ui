@@ -51,7 +51,7 @@ Pass `multiple` on `Combobox` to select more than one option.
 
 ### Input Inside Popup
 
-Move `ComboboxInput` inside `ComboboxPopup` so the search field sits in the dropdown.
+Move `ComboboxInput` inside `ComboboxPopup` and set `variant="popup"` so the search field sits in the dropdown. It's drawn like the list's rows, with a search icon and no trigger, the same field the menus and Filters use.
 
 <ComponentPreview component="combobox" example="combobox-input-inside-popup" />
 
@@ -132,15 +132,16 @@ Text input with built-in trigger and clear buttons. Wraps Base UI's `Combobox.In
 <ApiPropsList>
 
 <ApiProp name="showTrigger" fullType="boolean" defaultValue="true">
-  Show a chevron trigger button to open the popup.
+  Show a chevron trigger button to open the popup. Defaults to `false` when
+  `variant="popup"`.
 </ApiProp>
 
 <ApiProp name="showClear" fullType="boolean" defaultValue="true">
   Show a clear button to reset the input value. Only visible when the input has a value.
 </ApiProp>
 
-<ApiProp name="variant" fullType='"default" | "elevated"' defaultValue='"default"'>
-  Surface appearance of the input. `default` uses opaque `bg-input`. `elevated` uses translucent `bg-input-elevated` for use inside Card, Dialog, or popover surfaces. See the [Surfaces](/docs/getting-started/surfaces) docs.
+<ApiProp name="variant" fullType='"default" | "elevated" | "popup"' simpleType="string" defaultValue='"default"'>
+  Surface appearance of the input. `default` uses opaque `bg-input`. `elevated` uses translucent `bg-input-elevated` for use inside Card, Dialog, or popover surfaces. See the [Surfaces](/docs/getting-started/surfaces) docs. `popup` is the search field inside `ComboboxPopup`: outlined, row height, with a search icon in `start` unless you pass your own.
 </ApiProp>
 
 <ApiProp name="start" fullType="ReactNode" simpleType="node">

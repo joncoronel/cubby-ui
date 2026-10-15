@@ -15,7 +15,7 @@ import {
 import { TextMorph } from "@/registry/default/text-morph/text-morph";
 import { NumberField as BaseNumberField } from "@base-ui/react/number-field";
 
-import { OptionContent, SearchIcon, STEP_ROW } from "./filters-add-menu";
+import { OptionContent } from "./filters-add-menu";
 import { useFilterChip, useFiltersActions } from "./filters-context";
 import {
   asNumberOrNull,
@@ -167,11 +167,9 @@ function FilterSearchPopup({
       className={cn("flex w-64 flex-col p-0", className)}
     >
       <ComboboxInput
-        showTrigger={false}
         showClear={false}
+        variant="popup"
         placeholder={placeholder}
-        start={<SearchIcon />}
-        className={STEP_ROW}
       />
       <ComboboxEmpty>{empty}</ComboboxEmpty>
       <ComboboxList className="max-h-72 py-1">{children}</ComboboxList>

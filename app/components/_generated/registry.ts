@@ -1040,10 +1040,8 @@ export const componentMetadata = {
       "@cubby-ui/scroll-area",
       "@cubby-ui/text-morph",
       "@cubby-ui/tooltip",
-      "@cubby-ui/combobox",
       "@cubby-ui/kbd",
-      "@cubby-ui/popover",
-      "@cubby-ui/transition-panel",
+      "@cubby-ui/combobox",
       "@cubby-ui/use-controllable-state",
       "@cubby-ui/elevated",
       "@cubby-ui/popup-search"

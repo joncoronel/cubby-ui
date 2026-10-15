@@ -1,51 +1,43 @@
 "use client";
 
 import * as React from "react";
+import { Menu as BaseMenu } from "@base-ui/react/menu";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/registry/default/button/button";
 import {
-  Combobox,
-  ComboboxCollection,
-  ComboboxEmpty,
-  ComboboxGroup,
-  ComboboxGroupLabel,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-} from "@/registry/default/combobox/combobox";
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuEmpty,
+  DropdownMenuFilter,
+  DropdownMenuGroup,
+  DropdownMenuGroupLabel,
+  DropdownMenuInput,
+  DropdownMenuItem,
+  DropdownMenuList,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/registry/default/dropdown-menu/dropdown-menu";
 import { Kbd } from "@/registry/default/kbd/kbd";
 import { useControllableState } from "@/registry/default/hooks/use-controllable-state";
 import {
-  Popover,
-  PopoverPopup,
-  PopoverPortal,
-  PopoverPositioner,
-  PopoverTrigger,
-} from "@/registry/default/popover/popover";
+  POPUP_SEARCH_FIELD,
+  POPUP_SEARCH_INPUT,
+} from "@/registry/default/lib/popup-search";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/registry/default/tooltip/tooltip";
-import {
-  TransitionPanel,
-  TransitionPanelView,
-} from "@/registry/default/transition-panel/transition-panel";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  ArrowLeft01Icon,
-  ArrowRight01Icon,
-  PlusSignIcon,
-} from "@hugeicons/core-free-icons";
+import { PlusSignIcon } from "@hugeicons/core-free-icons";
 
 import { useFiltersActions, useFiltersState } from "./filters-context";
-import {
-  POPUP_SEARCH_BAND,
-  POPUP_SEARCH_FIELD,
-  POPUP_SEARCH_INPUT,
-} from "@/registry/default/lib/popup-search";
 import { revealInScroller } from "./lib/flow-presence";
 import {
   asStringArray,
@@ -67,16 +59,6 @@ import type {
 } from "./lib/filters-types";
 
 type OptionsField = SelectFilterField | MultiSelectFilterField;
-
-type AddMenuItem =
-  | { kind: "field"; key: string; field: FilterField }
-  | { kind: "option"; key: string; field: OptionsField; option: FilterOption };
-
-interface AddMenuGroup {
-  value: "fields" | "values";
-  label: string;
-  items: AddMenuItem[];
-}
 
 function FieldIcon({
   className,
@@ -112,302 +94,104 @@ function hasValueStep(field: FilterField): boolean {
   return field.type !== "custom" && scalarOperatorFor(field) !== undefined;
 }
 
-// Lists shrink first, so a menu squeezed against the viewport edge keeps its
-// search row and footer visible. `--available-height` comes from the positioner.
-// The search header is 2.5rem: a 4px gutter above the 36px field.
-const LIST_HEIGHT = "max-h-[min(18rem,calc(var(--available-height)-2.5rem))]";
-const LIST_WITH_FOOTER_HEIGHT =
-  "max-h-[min(16rem,calc(var(--available-height)-5rem))]";
-
-// Breathing room above the first option and below the last, dropped once
-// nothing matches so the empty message sits evenly between the field and
-// whatever follows.
+// Breathing room above the first option and below the last in the chips'
+// value lists, dropped once nothing matches so the empty message sits evenly
+// between the field and whatever follows.
 const LIST_PADDING = "py-1 not-has-[[data-slot=combobox-item]]:py-0";
 
-/** The drilled-in field at the start of the step's input; clicking it goes back. */
-function ScopeToken({
+const DECIMAL = /^[+-]?(\d+\.?\d*|\.\d+)$/;
+
+/** Closes the menu, optionally handing focus to a newly added filter. */
+type OnDone = (focusFilterId?: string) => void;
+
+interface SubmenuProps<F extends FilterField> {
+  field: F;
+  disabled: boolean;
+  onDone: OnDone;
+}
+
+function ValueSubmenuTrigger({
   field,
-  onBack,
+  disabled,
 }: {
   field: FilterField;
-  onBack: () => void;
+  disabled: boolean;
 }) {
-  const { labels } = useFiltersActions();
   return (
-    <button
-      type="button"
-      data-slot="filter-add-scope"
-      aria-label={`${labels.back}: ${field.label}`}
-      onClick={onBack}
-      className="bg-surface-hover hover:bg-surface-active text-foreground focus-visible:outline-ring/50 -ms-1 inline-flex h-6 max-w-32 shrink-0 cursor-pointer items-center gap-1 rounded-md ps-0.5 pe-2 text-xs font-medium outline-0 transition-colors duration-100 outline-solid focus-visible:outline-2"
-    >
-      <HugeiconsIcon
-        icon={ArrowLeft01Icon}
-        strokeWidth={2}
-        className="text-muted-foreground size-3.5 shrink-0 rtl:rotate-180"
-      />
-      <FieldIcon className="[&_svg]:size-3">{field.icon}</FieldIcon>
+    <DropdownMenuSubTrigger disabled={disabled} label={field.label}>
+      <FieldIcon>{field.icon}</FieldIcon>
       <span className="truncate">{field.label}</span>
-    </button>
+    </DropdownMenuSubTrigger>
   );
 }
 
-function backOnEmptyBackspace(
-  event: React.KeyboardEvent<HTMLInputElement>,
-  onBack: () => void,
-) {
-  if (event.key !== "Backspace" || event.currentTarget.value !== "") return;
-  event.preventDefault();
-  onBack();
+// A field with values opens them in its own searchable submenu, beside the
+// menu (stacked over it where there's no room, like any submenu).
+function ValueSubmenu(props: SubmenuProps<FilterField>) {
+  const { field } = props;
+  switch (field.type) {
+    case "select":
+      return <SelectSubmenu {...props} field={field} />;
+    case "multiselect":
+      return <MultiSelectSubmenu {...props} field={field} />;
+    case "text":
+    case "number":
+      return <InputSubmenu {...props} field={field} />;
+    default:
+      return null;
+  }
 }
 
-interface StepProps {
-  inputRef: React.RefObject<HTMLInputElement | null>;
-  /** Closes the menu, optionally handing focus to a newly added filter. */
-  onDone: (focusFilterId?: string) => void;
-}
-
-function FieldStep({
-  inputRef,
-  onDone,
-  onDrill,
-  findChip,
-}: StepProps & {
-  onDrill: (fieldId: string) => void;
-  findChip: (filterId: string) => HTMLElement | null;
-}) {
-  const {
-    fields,
-    labels,
-    usedFieldIds,
-    allowDuplicateFields,
-    addFilter,
-    updateFilter,
-    getFilters,
-  } = useFiltersActions();
-  // Filters are read via `getFilters`, not subscribed: the menu stays mounted
-  // while closed and would otherwise re-render on every chip keystroke.
-  const [query, setQuery] = React.useState("");
-
-  const fieldItems = React.useMemo<AddMenuItem[]>(
-    () =>
-      fields.map((field) => ({ kind: "field", key: `f:${field.id}`, field })),
-    [fields],
-  );
-  const optionItems = React.useMemo<AddMenuItem[]>(
-    () =>
-      fields.flatMap((field) =>
-        (field.type === "select" || field.type === "multiselect") &&
-        scalarOperatorFor(field)
-          ? field.options.map((option) => ({
-              kind: "option" as const,
-              key: `o:${field.id}:${option.value}`,
-              field,
-              option,
-            }))
-          : [],
-      ),
-    [fields],
-  );
-  // Values join the list only while searching.
-  const searching = query.trim() !== "";
-  const groups = React.useMemo<AddMenuGroup[]>(
-    () =>
-      searching
-        ? [
-            { value: "fields", label: labels.fields, items: fieldItems },
-            { value: "values", label: labels.values, items: optionItems },
-          ]
-        : [{ value: "fields", label: labels.fields, items: fieldItems }],
-    [searching, labels.fields, labels.values, fieldItems, optionItems],
-  );
-
-  const pickField = (field: FilterField) => {
-    if (hasValueStep(field)) {
-      onDrill(field.id);
-      return;
-    }
-    const filter = createFilter(field);
-    addFilter(filter);
-    onDone(filter.id);
-  };
-
-  const pickOption = (field: OptionsField, option: FilterOption) => {
-    const scalar = scalarOperatorFor(field);
-    if (!scalar) return;
-    // Without duplicates, a searched value joins the field's existing filter.
-    const existing = allowDuplicateFields
-      ? undefined
-      : getFilters().find((filter) => filter.field === field.id);
-    if (existing) {
-      const valueless = operatorShapeFor(field, existing.operator) === "none";
-      updateFilter(existing.id, {
-        ...(valueless && { operator: scalar.id }),
-        value: withOption(
-          field,
-          valueless ? null : existing.value,
-          option.value,
-        ),
-      });
-      requestAnimationFrame(() => {
-        const chip = findChip(existing.id);
-        if (chip) revealInScroller(chip);
-      });
-    } else {
-      addFilter(
-        createFilter(field, {
-          operator: scalar.id,
-          value: field.type === "multiselect" ? [option.value] : option.value,
-        }),
-      );
-    }
-    onDone();
-  };
-
-  return (
-    <Combobox<AddMenuItem, false>
-      inline
-      open
-      autoHighlight
-      items={groups}
-      value={null}
-      inputValue={query}
-      onInputValueChange={setQuery}
-      onValueChange={(item) => {
-        if (!item) return;
-        if (item.kind === "field") pickField(item.field);
-        else pickOption(item.field, item.option);
-      }}
-      itemToStringLabel={(item) =>
-        item.kind === "field" ? item.field.label : item.option.label
-      }
-      isItemEqualToValue={(a, b) => a.key === b.key}
-    >
-      {/* Flex column so the list's scroll area can resolve its height. */}
-      <div className="flex flex-col">
-        <ComboboxInput
-          ref={inputRef}
-          showClear={false}
-          placeholder={labels.searchFields}
-          variant="popup"
-        />
-        <ComboboxEmpty>{labels.noFields}</ComboboxEmpty>
-        <ComboboxList className={LIST_HEIGHT}>
-          {(group: AddMenuGroup) => (
-            <ComboboxGroup
-              key={group.value}
-              items={group.items}
-              className="py-1 not-last:border-b"
-            >
-              {searching && (
-                <ComboboxGroupLabel>{group.label}</ComboboxGroupLabel>
-              )}
-              <ComboboxCollection>
-                {(item: AddMenuItem) =>
-                  item.kind === "field" ? (
-                    <ComboboxItem
-                      key={item.key}
-                      value={item}
-                      disabled={
-                        !allowDuplicateFields && usedFieldIds.has(item.field.id)
-                      }
-                      className="my-0! grid-cols-[minmax(0,1fr)]"
-                    >
-                      <span className="flex w-full items-center gap-2.5">
-                        <FieldIcon>{item.field.icon}</FieldIcon>
-                        <span className="truncate">{item.field.label}</span>
-                        {hasValueStep(item.field) && (
-                          <HugeiconsIcon
-                            icon={ArrowRight01Icon}
-                            strokeWidth={2}
-                            className="text-muted-foreground ms-auto size-3.5 shrink-0 rtl:rotate-180"
-                          />
-                        )}
-                      </span>
-                    </ComboboxItem>
-                  ) : (
-                    <ComboboxItem
-                      key={item.key}
-                      value={item}
-                      className="my-0! grid-cols-[minmax(0,1fr)]"
-                    >
-                      <span className="flex w-full items-center gap-2.5">
-                        <OptionContent option={item.option} />
-                        <span className="text-muted-foreground ms-auto shrink-0 text-xs">
-                          {item.field.label}
-                        </span>
-                      </span>
-                    </ComboboxItem>
-                  )
-                }
-              </ComboboxCollection>
-            </ComboboxGroup>
-          )}
-        </ComboboxList>
-      </div>
-    </Combobox>
-  );
-}
-
-interface ValueStepProps<F extends FilterField> extends StepProps {
-  field: F;
-  onBack: () => void;
-}
-
-function SelectStep({
+function SelectSubmenu({
   field,
-  inputRef,
-  onBack,
+  disabled,
   onDone,
-}: ValueStepProps<SelectFilterField>) {
+}: SubmenuProps<SelectFilterField>) {
   const { labels, addFilter } = useFiltersActions();
   return (
-    <Combobox<FilterOption, false>
-      inline
-      open
-      autoHighlight
-      items={field.options}
-      value={null}
-      onValueChange={(option) => {
-        const scalar = scalarOperatorFor(field);
-        if (!option || !scalar) return;
-        addFilter(
-          createFilter(field, { operator: scalar.id, value: option.value }),
-        );
-        onDone();
-      }}
-      itemToStringLabel={(option) => option.label}
-    >
-      <div className="flex flex-col">
-        <ComboboxInput
-          ref={inputRef}
-          showClear={false}
-          placeholder={field.placeholder ?? labels.searchValues}
-          variant="popup"
-          start={<ScopeToken field={field} onBack={onBack} />}
-          onKeyDown={(event) => backOnEmptyBackspace(event, onBack)}
-        />
-        <ComboboxEmpty>{labels.noResults}</ComboboxEmpty>
-        <ComboboxList className={cn(LIST_HEIGHT, LIST_PADDING)}>
-          {(option: FilterOption) => (
-            <ComboboxItem key={option.value} value={option} className="my-0!">
-              <OptionContent option={option} />
-            </ComboboxItem>
-          )}
-        </ComboboxList>
-      </div>
-    </Combobox>
+    <DropdownMenuFilter>
+      <DropdownMenuSub>
+        <ValueSubmenuTrigger field={field} disabled={disabled} />
+        <DropdownMenuSubContent className="w-60">
+          <DropdownMenuInput
+            aria-label={labels.searchFieldValues(field)}
+            placeholder={field.placeholder ?? labels.searchFieldValues(field)}
+          />
+          <DropdownMenuEmpty>{labels.noResults}</DropdownMenuEmpty>
+          <DropdownMenuList>
+            {field.options.map((option) => (
+              <DropdownMenuItem
+                key={option.value}
+                label={option.label}
+                onClick={() => {
+                  const scalar = scalarOperatorFor(field);
+                  if (!scalar) return;
+                  addFilter(
+                    createFilter(field, {
+                      operator: scalar.id,
+                      value: option.value,
+                    }),
+                  );
+                  onDone();
+                }}
+              >
+                <OptionContent option={option} />
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuList>
+        </DropdownMenuSubContent>
+      </DropdownMenuSub>
+    </DropdownMenuFilter>
   );
 }
 
-// The first pick adds the filter and later picks edit it live; clearing every
-// pick removes it again.
-function MultiSelectStep({
+// The first check adds the filter and later checks edit it live; clearing
+// every check removes it again.
+function MultiSelectSubmenu({
   field,
-  inputRef,
-  onBack,
+  disabled,
   onDone,
-}: ValueStepProps<MultiSelectFilterField>) {
+}: SubmenuProps<MultiSelectFilterField>) {
   const { labels, addFilter, updateFilter, removeFilter } = useFiltersActions();
   const { filters } = useFiltersState();
   const [draftId, setDraftId] = React.useState<string | null>(null);
@@ -415,95 +199,85 @@ function MultiSelectStep({
     ? filters.find((filter) => filter.id === draftId)
     : undefined;
   const values = asStringArray(draft?.value);
-  const selected = field.options.filter((option) =>
-    values.includes(option.value),
-  );
   const atMax =
     field.maxSelections != null && values.length >= field.maxSelections;
 
+  const toggle = (value: string, checked: boolean) => {
+    const next = checked
+      ? [...values, value]
+      : values.filter((existing) => existing !== value);
+    if (!draft) {
+      const scalar = scalarOperatorFor(field);
+      if (!scalar || next.length === 0) return;
+      const filter = createFilter(field, { operator: scalar.id, value: next });
+      addFilter(filter);
+      setDraftId(filter.id);
+      return;
+    }
+    if (next.length === 0) {
+      removeFilter(draft.id);
+      setDraftId(null);
+      return;
+    }
+    updateFilter(draft.id, { value: next });
+  };
+
   return (
-    <Combobox<FilterOption, true>
-      inline
-      open
-      multiple
-      autoHighlight
-      items={field.options}
-      value={selected}
-      onValueChange={(next) => {
-        if (field.maxSelections != null && next.length > field.maxSelections) {
-          return;
-        }
-        const nextValues = next.map((option) => option.value);
-        if (!draft) {
-          const scalar = scalarOperatorFor(field);
-          if (!scalar || nextValues.length === 0) return;
-          const filter = createFilter(field, {
-            operator: scalar.id,
-            value: nextValues,
-          });
-          addFilter(filter);
-          setDraftId(filter.id);
-          return;
-        }
-        if (nextValues.length === 0) {
-          removeFilter(draft.id);
-          setDraftId(null);
-          return;
-        }
-        updateFilter(draft.id, { value: nextValues });
-      }}
-      itemToStringLabel={(option) => option.label}
-    >
-      <div className="flex flex-col">
-        <ComboboxInput
-          ref={inputRef}
-          showClear={false}
-          placeholder={field.placeholder ?? labels.searchValues}
-          variant="popup"
-          start={<ScopeToken field={field} onBack={onBack} />}
-          onKeyDown={(event) => backOnEmptyBackspace(event, onBack)}
-        />
-        <ComboboxEmpty>{labels.noResults}</ComboboxEmpty>
-        <ComboboxList className={cn(LIST_WITH_FOOTER_HEIGHT, LIST_PADDING)}>
-          {(option: FilterOption) => (
-            <ComboboxItem
-              key={option.value}
-              value={option}
-              disabled={atMax && !values.includes(option.value)}
-              className="my-0!"
-            >
-              <OptionContent option={option} />
-            </ComboboxItem>
-          )}
-        </ComboboxList>
-        <div className="flex h-10 items-center justify-between gap-2 border-t ps-3 pe-1.5">
-          <span className="text-muted-foreground text-xs tabular-nums">
-            {values.length > 0
-              ? labels.selectedCount(values.length, field)
-              : ""}
-          </span>
-          <Button variant="ghost" size="xs" onClick={() => onDone()}>
-            {labels.done}
-          </Button>
-        </div>
-      </div>
-    </Combobox>
+    <DropdownMenuFilter>
+      <DropdownMenuSub>
+        <ValueSubmenuTrigger field={field} disabled={disabled} />
+        <DropdownMenuSubContent className="w-60">
+          <DropdownMenuInput
+            aria-label={labels.searchFieldValues(field)}
+            placeholder={field.placeholder ?? labels.searchFieldValues(field)}
+          />
+          <DropdownMenuEmpty>{labels.noResults}</DropdownMenuEmpty>
+          <DropdownMenuList>
+            {field.options.map((option) => {
+              const checked = values.includes(option.value);
+              return (
+                <DropdownMenuCheckboxItem
+                  key={option.value}
+                  label={option.label}
+                  checked={checked}
+                  disabled={atMax && !checked}
+                  onCheckedChange={(next) => toggle(option.value, next)}
+                >
+                  <OptionContent option={option} />
+                </DropdownMenuCheckboxItem>
+              );
+            })}
+          </DropdownMenuList>
+          {/* Edge to edge under the list: the negative margins cancel the
+              submenu's 4px padding. */}
+          <div className="-mx-1 mt-1 -mb-1 flex h-10 items-center justify-between gap-2 border-t ps-3.5 pe-1.5">
+            <span className="text-muted-foreground text-xs tabular-nums">
+              {values.length > 0
+                ? labels.selectedCount(values.length, field)
+                : ""}
+            </span>
+            <Button variant="ghost" size="xs" onClick={() => onDone()}>
+              {labels.done}
+            </Button>
+          </div>
+        </DropdownMenuSubContent>
+      </DropdownMenuSub>
+    </DropdownMenuFilter>
   );
 }
 
-const DECIMAL = /^[+-]?(\d+\.?\d*|\.\d+)$/;
-
-// The value field, then the filter it would add as a row: Enter or a tap adds
-// it. The row is always there (a prompt, the filter, or the error), so the
-// popup holds its height while typing.
-function InputStep({
+// The value field, then the filter it would add as a row: Enter or a click
+// adds it. The submenu's own matching is off (the field holds a value, not a
+// search), and the row is always there (a prompt, the filter, or the error) so
+// the submenu holds its height while typing.
+function InputSubmenu({
   field,
-  inputRef,
-  onBack,
+  disabled,
   onDone,
-}: ValueStepProps<TextFilterField | NumberFilterField>) {
+}: SubmenuProps<TextFilterField | NumberFilterField>) {
   const { labels, addFilter } = useFiltersActions();
   const [text, setText] = React.useState("");
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
   const operator = scalarOperatorFor(field);
   const isNumber = field.type === "number";
   const decimal = text.trim().replace(",", ".");
@@ -511,115 +285,87 @@ function InputStep({
   const parsed = DECIMAL.test(decimal) ? Number(decimal) : NaN;
   const valid = text.trim() !== "" && (!isNumber || Number.isFinite(parsed));
   const invalid = text.trim() !== "" && !valid;
-  const rowId = React.useId();
   const prefix = typeof field.prefix === "string" ? field.prefix : null;
   const suffix = typeof field.suffix === "string" ? field.suffix : null;
   const operatorText = operator
     ? operatorLabel(operator, labels.operators)
     : "";
 
-  const submit = () => {
-    if (!valid || !operator) return;
-    addFilter(
-      createFilter(field, {
-        operator: operator.id,
-        value: isNumber ? parsed : text,
-      }),
-    );
-    onDone();
-  };
-
   return (
-    <div data-slot="filter-add-input-step">
-      <div data-slot="filter-add-input-band" className={POPUP_SEARCH_BAND}>
-        <div
-          data-slot="filter-add-input"
-          className={cn(POPUP_SEARCH_FIELD, "h-9 w-full text-sm")}
-        >
-          <ScopeToken field={field} onBack={onBack} />
-          {prefix && (
-            // Pulls in 4px to match the chip's affix spacing.
-            <span className="text-muted-foreground -me-1 shrink-0">
-              {prefix}
-            </span>
-          )}
-          <input
-            ref={inputRef}
-            type="text"
-            inputMode={isNumber ? "decimal" : undefined}
-            aria-label={`${field.label} ${operatorText}`.trim()}
-            aria-invalid={invalid || undefined}
-            aria-describedby={rowId}
-            placeholder={field.placeholder ?? labels.enterValue}
-            value={text}
-            onChange={(event) => setText(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                event.preventDefault();
-                submit();
-                return;
-              }
-              backOnEmptyBackspace(event, onBack);
-            }}
-            className={cn(
-              POPUP_SEARCH_INPUT,
-              isNumber && "tabular-nums",
-              "aria-invalid:text-danger-foreground",
-            )}
-          />
-          {suffix && (
-            <span className="text-muted-foreground shrink-0">{suffix}</span>
-          )}
-        </div>
-      </div>
-      <div className="p-1">
-        {valid ? (
-          <button
-            type="button"
-            id={rowId}
-            onClick={submit}
-            // Drawn highlighted: it's what Enter adds, like a combobox's
-            // auto-highlighted first match.
-            className="bg-surface-hover text-accent-foreground focus-visible:outline-ring/50 flex h-9 w-full min-w-0 cursor-pointer items-center gap-1.5 rounded-md px-2.5 text-start text-sm outline-0 outline-solid focus-visible:outline-2"
+    <DropdownMenuFilter filter={null} value={text} onValueChange={setText}>
+      <DropdownMenuSub
+        onOpenChange={(open, details) => {
+          // A tap or click on the row means "enter a value": put the caret
+          // in the field (on touch, Base UI leaves focus alone). Hover-opens
+          // don't, so sweeping past the row never steals the root search.
+          if (open && details.reason === "trigger-press") {
+            requestAnimationFrame(() => inputRef.current?.focus());
+          }
+        }}
+      >
+        <ValueSubmenuTrigger field={field} disabled={disabled} />
+        <DropdownMenuSubContent className="w-64">
+          <div
+            data-slot="filter-add-input"
+            className={cn(POPUP_SEARCH_FIELD, "mb-1 h-8")}
           >
-            <span className="text-muted-foreground shrink-0">
-              {field.label} {operatorText}
-            </span>
-            <span className="truncate font-medium">
-              {prefix}
-              {isNumber ? parsed : `“${text}”`}
-              {suffix && ` ${suffix}`}
-            </span>
-          </button>
-        ) : (
-          <p
-            id={rowId}
-            className={cn(
-              "flex h-9 items-center px-2.5 text-sm",
-              invalid ? "text-danger-foreground" : "text-muted-foreground",
+            {prefix && (
+              // Pulls in 4px to match the chip's affix spacing.
+              <span className="text-muted-foreground -me-1 shrink-0 text-sm">
+                {prefix}
+              </span>
             )}
+            <BaseMenu.Input
+              ref={inputRef}
+              aria-label={`${field.label} ${operatorText}`.trim()}
+              aria-invalid={invalid || undefined}
+              inputMode={isNumber ? "decimal" : undefined}
+              placeholder={field.placeholder ?? labels.enterValue}
+              className={cn(
+                POPUP_SEARCH_INPUT,
+                isNumber && "tabular-nums",
+                "aria-invalid:text-danger-foreground",
+              )}
+            />
+            {suffix && (
+              <span className="text-muted-foreground shrink-0 text-sm">
+                {suffix}
+              </span>
+            )}
+          </div>
+          <DropdownMenuEmpty
+            className={cn(invalid && "text-danger-foreground")}
           >
             {invalid ? labels.invalidNumber : `${field.label} ${operatorText}…`}
-          </p>
-        )}
-      </div>
-    </div>
+          </DropdownMenuEmpty>
+          <DropdownMenuList>
+            {valid && operator && (
+              <DropdownMenuItem
+                onClick={() => {
+                  addFilter(
+                    createFilter(field, {
+                      operator: operator.id,
+                      value: isNumber ? parsed : text,
+                    }),
+                  );
+                  onDone();
+                }}
+              >
+                <span className="text-muted-foreground shrink-0">
+                  {field.label} {operatorText}
+                </span>
+                <span className="truncate font-medium">
+                  {prefix}
+                  {isNumber ? parsed : `“${text}”`}
+                  {suffix && ` ${suffix}`}
+                </span>
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuList>
+        </DropdownMenuSubContent>
+      </DropdownMenuSub>
+    </DropdownMenuFilter>
   );
-}
-
-function ValueStep(props: ValueStepProps<FilterField>) {
-  const { field } = props;
-  switch (field.type) {
-    case "select":
-      return <SelectStep {...props} field={field} />;
-    case "multiselect":
-      return <MultiSelectStep {...props} field={field} />;
-    case "text":
-    case "number":
-      return <InputStep {...props} field={field} />;
-    default:
-      return null;
-  }
 }
 
 // A chip's value control, focused after the menu adds that filter.
@@ -650,7 +396,16 @@ function AddMenu({
   onOpenChange,
   ...props
 }: AddMenuProps & { kind: "button" | "segment" }) {
-  const { fieldsById, labels, size, usedFieldIds } = useFiltersActions();
+  const {
+    fields,
+    labels,
+    size,
+    usedFieldIds,
+    allowDuplicateFields,
+    addFilter,
+    updateFilter,
+    getFilters,
+  } = useFiltersActions();
   const compact = usedFieldIds.size > 0;
   const inActions = kind === "segment";
   const [open, setOpen] = useControllableState({
@@ -658,15 +413,11 @@ function AddMenu({
     defaultValue: defaultOpen,
     onValueChange: onOpenChange,
   });
-  const [step, setStep] = React.useState<"fields" | "value">("fields");
-  // Kept after stepping back so the value view has content while sliding out.
-  const [fieldId, setFieldId] = React.useState<string | null>(null);
-  const field = fieldId ? fieldsById.get(fieldId) : undefined;
-  // Bumped on each open to remount the panel.
-  const [session, setSession] = React.useState(0);
+  // The root's search. Base UI clears it when the menu closes.
+  const [query, setQuery] = React.useState("");
+  // Values join the list only while searching.
+  const searching = query.trim() !== "";
 
-  const fieldsInputRef = React.useRef<HTMLInputElement | null>(null);
-  const valueInputRef = React.useRef<HTMLInputElement | null>(null);
   const focusFilterIdRef = React.useRef<string | null>(null);
   const triggerRef = React.useRef<HTMLButtonElement | null>(null);
   // Scoped to this bar: two bars can show the same filters.
@@ -678,9 +429,6 @@ function AddMenu({
     );
   }, []);
 
-  // `keepMounted` keeps teardown off the main thread while a new chip animates
-  // in; the panel is remounted on open instead (a reshown hidden panel would
-  // replay its @starting-style entrance).
   // Closing restores focus to the button; until focus leaves it, focus-driven
   // tooltip opens are refused (hover still opens it).
   const [quietTooltip, setQuietTooltip] = React.useState(false);
@@ -689,13 +437,7 @@ function AddMenu({
   const [shownOpen, setShownOpen] = React.useState(open);
   if (open !== shownOpen) {
     setShownOpen(open);
-    if (open) {
-      setStep("fields");
-      setFieldId(null);
-      setSession((count) => count + 1);
-    } else {
-      setQuietTooltip(true);
-    }
+    if (!open) setQuietTooltip(true);
   }
   const changeOpen = React.useCallback(
     (nextOpen: boolean) => setOpen(nextOpen),
@@ -740,208 +482,252 @@ function AddMenu({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [shortcut, changeOpen]);
 
-  const onDone = React.useCallback(
-    (focusFilterId?: string) => {
+  const onDone = React.useCallback<OnDone>(
+    (focusFilterId) => {
       focusFilterIdRef.current = focusFilterId ?? null;
       changeOpen(false);
     },
     [changeOpen],
   );
-  const onDrill = React.useCallback((id: string) => {
-    setFieldId(id);
-    setStep("value");
-  }, []);
-  const onBack = React.useCallback(() => setStep("fields"), []);
-  // Opened or driven by touch, focusing a search field would pull up the
-  // on-screen keyboard over half the screen before anything is chosen, so
-  // only the text and number steps (which need typing) take focus then.
-  const [touch, setTouch] = React.useState(false);
-  const typesValue = field?.type === "text" || field?.type === "number";
+
+  const optionItems = React.useMemo(
+    () =>
+      fields.flatMap((field) =>
+        (field.type === "select" || field.type === "multiselect") &&
+        scalarOperatorFor(field)
+          ? field.options.map((option) => ({ field, option }))
+          : [],
+      ),
+    [fields],
+  );
+
+  const pickOption = (field: OptionsField, option: FilterOption) => {
+    const scalar = scalarOperatorFor(field);
+    if (!scalar) return;
+    // Without duplicates, a searched value joins the field's existing filter.
+    // Filters are read via `getFilters`, not subscribed, so the menu doesn't
+    // re-render on every chip keystroke.
+    const existing = allowDuplicateFields
+      ? undefined
+      : getFilters().find((filter) => filter.field === field.id);
+    if (existing) {
+      const valueless = operatorShapeFor(field, existing.operator) === "none";
+      updateFilter(existing.id, {
+        ...(valueless && { operator: scalar.id }),
+        value: withOption(
+          field,
+          valueless ? null : existing.value,
+          option.value,
+        ),
+      });
+      requestAnimationFrame(() => {
+        const chip = findChip(existing.id);
+        if (chip) revealInScroller(chip);
+      });
+    } else {
+      addFilter(
+        createFilter(field, {
+          operator: scalar.id,
+          value: field.type === "multiselect" ? [option.value] : option.value,
+        }),
+      );
+    }
+    onDone();
+  };
 
   return (
-    <Popover open={open} onOpenChange={changeOpen}>
-      {/* Only once folded to "+" (the label is hidden) and while closed. */}
-      <Tooltip
-        disabled={!compact || open}
-        open={tooltipOpen}
-        onOpenChange={(nextOpen, details) => {
-          if (nextOpen && quietTooltip && details.reason === "trigger-focus") {
-            return;
-          }
-          setTooltipOpen(nextOpen);
-        }}
-      >
-        <TooltipTrigger
-          render={
-            <PopoverTrigger
-              ref={triggerRef}
-              render={
-                inActions ? (
-                  <button
-                    type="button"
-                    data-slot="filter-add"
-                    aria-keyshortcuts={shortcut?.toUpperCase()}
-                    data-compact={compact ? "" : undefined}
-                    onBlur={(event: React.FocusEvent<HTMLButtonElement>) => {
-                      // Base UI's event type has extra fields; cast through.
-                      onBlur?.(
-                        event as Parameters<NonNullable<typeof onBlur>>[0],
-                      );
-                      wakeTooltip();
-                    }}
-                    className={cn(
-                      FILTER_SEGMENT,
-                      FILTER_SEGMENT_INTERACTIVE,
-                      // The "+" sits in the side padding; folded, the
-                      // padding goes and the "+" square (below) sets the width.
-                      "text-muted-foreground hover:text-foreground data-popup-open:text-foreground gap-0 px-(--seg-icon-x) data-compact:px-0",
-                      className,
-                    )}
-                    {...(props as React.ComponentProps<"button">)}
-                  />
-                ) : (
-                  <Button
-                    data-slot="filter-add"
-                    aria-keyshortcuts={shortcut?.toUpperCase()}
-                    data-compact={compact ? "" : undefined}
-                    onBlur={(event: React.FocusEvent<HTMLButtonElement>) => {
-                      // Base UI's event type has extra fields; cast through.
-                      onBlur?.(
-                        event as Parameters<NonNullable<typeof onBlur>>[0],
-                      );
-                      wakeTooltip();
-                    }}
-                    variant="outline"
-                    size={size}
-                    className={cn(
-                      "text-muted-foreground hover:text-foreground data-popup-open:text-foreground gap-0",
-                      // Matches the icon side; the label adds the rest when shown.
-                      size === "sm" ? "pe-2" : "pe-2.5",
-                      className,
-                    )}
-                    leadingIcon={
-                      <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />
-                    }
-                    {...props}
-                  />
-                )
-              }
-            >
-              {inActions && (
-                // Folded to "+", a square as tall as the plate, so the
-                // segment stays square at any display scale.
-                <span className="flex h-full shrink-0 items-center justify-center in-data-compact:aspect-square">
-                  <HugeiconsIcon
-                    icon={PlusSignIcon}
-                    strokeWidth={2}
-                    className="size-4"
-                  />
-                </span>
-              )}
-              {/* Folds via a grid column once filters exist: animates in every
-                  browser (auto width doesn't) and stays readable to screen readers. */}
-              <span
-                data-slot="filter-add-label"
-                className="grid grid-cols-[minmax(0,1fr)] overflow-hidden transition-[grid-template-columns,opacity] duration-220 ease-[cubic-bezier(0.22,1,0.36,1)] in-data-compact:grid-cols-[minmax(0,0fr)] in-data-compact:opacity-0 motion-reduce:transition-none"
+    <DropdownMenuFilter value={query} onValueChange={setQuery}>
+      <DropdownMenu open={open} onOpenChange={changeOpen}>
+        {/* Only once folded to "+" (the label is hidden) and while closed. */}
+        <Tooltip
+          disabled={!compact || open}
+          open={tooltipOpen}
+          onOpenChange={(nextOpen, details) => {
+            if (
+              nextOpen &&
+              quietTooltip &&
+              details.reason === "trigger-focus"
+            ) {
+              return;
+            }
+            setTooltipOpen(nextOpen);
+          }}
+        >
+          <TooltipTrigger
+            render={
+              <DropdownMenuTrigger
+                ref={triggerRef}
+                render={
+                  inActions ? (
+                    <button
+                      type="button"
+                      data-slot="filter-add"
+                      aria-keyshortcuts={shortcut?.toUpperCase()}
+                      data-compact={compact ? "" : undefined}
+                      onBlur={(event: React.FocusEvent<HTMLButtonElement>) => {
+                        // Base UI's event type has extra fields; cast through.
+                        onBlur?.(
+                          event as Parameters<NonNullable<typeof onBlur>>[0],
+                        );
+                        wakeTooltip();
+                      }}
+                      className={cn(
+                        FILTER_SEGMENT,
+                        FILTER_SEGMENT_INTERACTIVE,
+                        // The "+" sits in the side padding; folded, the
+                        // padding goes and the "+" square (below) sets the width.
+                        "text-muted-foreground hover:text-foreground data-popup-open:text-foreground gap-0 px-(--seg-icon-x) data-compact:px-0",
+                        className,
+                      )}
+                      {...(props as React.ComponentProps<"button">)}
+                    />
+                  ) : (
+                    <Button
+                      data-slot="filter-add"
+                      aria-keyshortcuts={shortcut?.toUpperCase()}
+                      data-compact={compact ? "" : undefined}
+                      onBlur={(event: React.FocusEvent<HTMLButtonElement>) => {
+                        // Base UI's event type has extra fields; cast through.
+                        onBlur?.(
+                          event as Parameters<NonNullable<typeof onBlur>>[0],
+                        );
+                        wakeTooltip();
+                      }}
+                      variant="outline"
+                      size={size}
+                      className={cn(
+                        "text-muted-foreground hover:text-foreground data-popup-open:text-foreground gap-0",
+                        // Matches the icon side; the label adds the rest when shown.
+                        size === "sm" ? "pe-2" : "pe-2.5",
+                        className,
+                      )}
+                      leadingIcon={
+                        <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />
+                      }
+                      {...props}
+                    />
+                  )
+                }
               >
+                {inActions && (
+                  // Folded to "+", a square as tall as the plate, so the
+                  // segment stays square at any display scale.
+                  <span className="flex h-full shrink-0 items-center justify-center in-data-compact:aspect-square">
+                    <HugeiconsIcon
+                      icon={PlusSignIcon}
+                      strokeWidth={2}
+                      className="size-4"
+                    />
+                  </span>
+                )}
+                {/* Folds via a grid column once filters exist: animates in every
+                    browser (auto width doesn't) and stays readable to screen readers. */}
                 <span
-                  // Text side gets 2px more than the icon side: the "+" glyph has
-                  // ~2.7px of internal space, so this balances by ink.
-                  className="flex min-w-0 items-center gap-1.5 overflow-hidden ps-1.5 pe-0.5"
+                  data-slot="filter-add-label"
+                  className="grid grid-cols-[minmax(0,1fr)] overflow-hidden transition-[grid-template-columns,opacity] duration-220 ease-[cubic-bezier(0.22,1,0.36,1)] in-data-compact:grid-cols-[minmax(0,0fr)] in-data-compact:opacity-0 motion-reduce:transition-none"
                 >
-                  {children ?? labels.add}
-                  {shortcut && (
-                    <Kbd size="sm" variant="ghost" aria-hidden>
-                      {shortcut.toUpperCase()}
-                    </Kbd>
-                  )}
+                  <span
+                    // Text side gets 2px more than the icon side: the "+" glyph has
+                    // ~2.7px of internal space, so this balances by ink.
+                    className="flex min-w-0 items-center gap-1.5 overflow-hidden ps-1.5 pe-0.5"
+                  >
+                    {children ?? labels.add}
+                    {shortcut && (
+                      <Kbd size="sm" variant="ghost" aria-hidden>
+                        {shortcut.toUpperCase()}
+                      </Kbd>
+                    )}
+                  </span>
                 </span>
-              </span>
-            </PopoverTrigger>
-          }
-        />
-        <TooltipContent className="flex items-center gap-2">
-          {labels.addTooltip}
-          {shortcut && (
-            <Kbd size="sm" variant="ghost">
-              {shortcut.toUpperCase()}
-            </Kbd>
-          )}
-        </TooltipContent>
-      </Tooltip>
-      <PopoverPortal keepMounted>
-        <PopoverPositioner
-          side="bottom"
+              </DropdownMenuTrigger>
+            }
+          />
+          <TooltipContent className="flex items-center gap-2">
+            {labels.addTooltip}
+            {shortcut && (
+              <Kbd size="sm" variant="ghost">
+                {shortcut.toUpperCase()}
+              </Kbd>
+            )}
+          </TooltipContent>
+        </Tooltip>
+        <DropdownMenuContent
+          aria-label={labels.add}
           align="start"
           sideOffset={6}
-          collisionPadding={8}
-          // Glides with the button as chips enter and leave.
-          className="z-50 transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none motion-reduce:transition-none"
+          className="w-64"
+          finalFocus={() => {
+            const id = focusFilterIdRef.current;
+            focusFilterIdRef.current = null;
+            if (!id) return true;
+            return (
+              findChip(id)?.querySelector<HTMLElement>(CHIP_FOCUS_TARGET) ??
+              true
+            );
+          }}
         >
-          <PopoverPopup
-            data-slot="filter-add-menu"
-            aria-label={labels.add}
-            initialFocus={(openType) => {
-              const byTouch = openType === "touch";
-              setTouch(byTouch);
-              return byTouch ? false : fieldsInputRef.current;
-            }}
-            onPointerDownCapture={(event) =>
-              setTouch(event.pointerType === "touch")
-            }
-            finalFocus={() => {
-              const id = focusFilterIdRef.current;
-              focusFilterIdRef.current = null;
-              if (!id) return true;
-              return (
-                findChip(id)?.querySelector<HTMLElement>(CHIP_FOCUS_TARGET) ??
-                true
-              );
-            }}
-            className={cn(
-              "w-72 overflow-clip",
-              "ease-out-expo transition-[scale,opacity] duration-150",
-              "data-starting-style:scale-95 data-starting-style:opacity-0",
-              "data-ending-style:scale-95 data-ending-style:opacity-0 data-ending-style:duration-100",
-              "motion-reduce:transition-none",
-            )}
-          >
-            <TransitionPanel
-              key={session}
-              activeKey={step}
-              // In step with the chips (default is 240ms).
-              style={{ "--tp-duration": "200ms" } as React.CSSProperties}
-            >
-              <TransitionPanelView
-                viewKey="fields"
-                initialFocus={touch ? false : fieldsInputRef}
-              >
-                <FieldStep
-                  inputRef={fieldsInputRef}
-                  onDone={onDone}
-                  onDrill={onDrill}
-                  findChip={findChip}
-                />
-              </TransitionPanelView>
-              <TransitionPanelView
-                viewKey="value"
-                initialFocus={touch && !typesValue ? false : valueInputRef}
-              >
-                {field && (
-                  <ValueStep
+          <DropdownMenuInput
+            aria-label={labels.searchFields}
+            placeholder={labels.searchFields}
+          />
+          <DropdownMenuEmpty>{labels.noFields}</DropdownMenuEmpty>
+          <DropdownMenuList>
+            <DropdownMenuGroup>
+              {searching && (
+                <DropdownMenuGroupLabel>{labels.fields}</DropdownMenuGroupLabel>
+              )}
+              {fields.map((field) => {
+                const disabled =
+                  !allowDuplicateFields && usedFieldIds.has(field.id);
+                if (!hasValueStep(field)) {
+                  return (
+                    <DropdownMenuItem
+                      key={field.id}
+                      label={field.label}
+                      disabled={disabled}
+                      onClick={() => {
+                        const filter = createFilter(field);
+                        addFilter(filter);
+                        onDone(filter.id);
+                      }}
+                    >
+                      <FieldIcon>{field.icon}</FieldIcon>
+                      <span className="truncate">{field.label}</span>
+                    </DropdownMenuItem>
+                  );
+                }
+                return (
+                  <ValueSubmenu
                     key={field.id}
                     field={field}
-                    inputRef={valueInputRef}
-                    onBack={onBack}
+                    disabled={disabled}
                     onDone={onDone}
                   />
-                )}
-              </TransitionPanelView>
-            </TransitionPanel>
-          </PopoverPopup>
-        </PopoverPositioner>
-      </PopoverPortal>
-    </Popover>
+                );
+              })}
+            </DropdownMenuGroup>
+            {searching && <DropdownMenuSeparator />}
+            {searching && (
+              <DropdownMenuGroup>
+                <DropdownMenuGroupLabel>{labels.values}</DropdownMenuGroupLabel>
+                {optionItems.map(({ field, option }) => (
+                  <DropdownMenuItem
+                    key={`${field.id}:${option.value}`}
+                    label={option.label}
+                    onClick={() => pickOption(field, option)}
+                  >
+                    <OptionContent option={option} />
+                    <span className="text-muted-foreground ms-auto shrink-0 text-xs">
+                      {field.label}
+                    </span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuGroup>
+            )}
+          </DropdownMenuList>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </DropdownMenuFilter>
   );
 }
 

@@ -133,6 +133,8 @@ export interface FiltersLabels {
   clear: string;
   searchFields: string;
   searchValues: string;
+  /** Placeholder of a field's value search in the add menu, e.g. "Search labels...". */
+  searchFieldValues: (field: FilterField) => string;
   noFields: string;
   noResults: string;
   selectValue: string;
@@ -146,7 +148,10 @@ export interface FiltersLabels {
   fields: string;
   /** Group heading for matching values in the add menu while searching. */
   values: string;
-  /** Accessible name of the add menu's back button. */
+  /**
+   * @deprecated The add menu opens values in submenus and has no back button
+   * any more. Kept so existing overrides still type-check.
+   */
   back: string;
   /** Closes the add menu after picking several values of a multiselect. */
   done: string;

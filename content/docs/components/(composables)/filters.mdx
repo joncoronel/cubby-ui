@@ -1,14 +1,12 @@
 ---
 title: Filters
-description: A filter bar of sentence-like chips with per-field operators and a two-step add menu
+description: A filter bar of sentence-like chips with per-field operators and a searchable add menu
 type: composable
 builtOn:
   [
     "combobox",
     "dropdown-menu",
-    "popover",
     "scroll-area",
-    "transition-panel",
     "text-morph",
     "tooltip",
     "kbd",
@@ -65,7 +63,7 @@ Filters                  (FiltersProvider + FiltersBar)
 
 ## Features
 
-- Picking a field in the add menu slides to its values, so a chip appears only once it has one.
+- Each field in the add menu opens its values in a searchable submenu beside the menu (stacked over it on narrow screens), so a chip appears only once it has a value.
 - Searching the menu also matches values across fields: type "done" to add "Status is Done" in one step.
 - Chips that outgrow the row scroll sideways, and the add and clear buttons stay in view.
 - A chip still waiting on its value shows a dashed edge and doesn't count as active.
@@ -226,7 +224,8 @@ Use `FiltersProvider` and `FiltersBar` separately when UI outside the row (a res
 | ----------------------- | ------------------------- | ------------------------------------------------- |
 | Your `shortcut`         | Anywhere but a text field | Opens the add menu                                |
 | `Enter`                 | Add menu                  | Picks the highlighted item, or adds a typed value |
-| `Backspace`             | Empty add menu search     | Goes back to the field list                       |
+| `ArrowRight`            | A field in the add menu   | Opens its values                                  |
+| `ArrowLeft`             | A field's values          | Goes back to the field list                       |
 | `Escape`                | Add menu                  | Closes it and returns focus to the add button     |
 | `Backspace` or `Delete` | A chip's remove button    | Removes the filter and focuses the next chip      |
 | Arrow keys              | Number input              | Steps the value                                   |
@@ -318,6 +317,7 @@ Filters composes Cubby UI primitives and has no Base UI root of its own.
 | `clear`            | `"Clear filters"`                                          |
 | `searchFields`     | `"Filter by..."`                                           |
 | `searchValues`     | `"Search..."`                                              |
+| `searchFieldValues` | `(field) => "Search labels..."`, a field's value search   |
 | `noFields`         | `"No matches."`                                            |
 | `noResults`        | `"No results found."`                                      |
 | `selectValue`      | `"Select..."`                                              |
@@ -326,7 +326,6 @@ Filters composes Cubby UI primitives and has no Base UI root of its own.
 | `min`, `max`       | `"Min"`, `"Max"`                                           |
 | `and`              | `"and"`, joins a range                                     |
 | `fields`, `values` | `"Fields"`, `"Values"`, add menu headings                  |
-| `back`             | `"Back to fields"`                                         |
 | `done`             | `"Done"`                                                   |
 | `invalidNumber`    | `"Enter a number"`                                         |
 | `operator`         | `"operator"`                                               |

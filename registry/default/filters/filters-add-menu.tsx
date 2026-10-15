@@ -315,8 +315,9 @@ function OptionsSubmenu({
             <OptionItems field={field} />
           </DropdownMenuList>
           {field.type === "multiselect" && (
-            // Edge to edge; the list's own 4px padding sits above it.
-            <div className="flex h-10 items-center justify-between gap-2 border-t ps-3.5 pe-1.5">
+            // Edge to edge; the list's own 4px padding sits above it. The same
+            // 4px gutter sizes the band, and the count lines up with the labels.
+            <div className="flex items-center justify-between gap-2 border-t p-1 ps-3.5">
               <span className="text-muted-foreground text-xs tabular-nums">
                 {values.length > 0
                   ? labels.selectedCount(values.length, field)

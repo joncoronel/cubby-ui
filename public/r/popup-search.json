@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "popup-search",
+  "title": "popupSearch",
+  "description": "Shared classes for the search field at the top of a popup list.",
+  "files": [
+    {
+      "path": "registry/default/lib/popup-search.ts",
+      "content": "// Shared classes for the search field at the top of a popup list. Combobox,\n// the Filters add menu and the filterable menus share them so they can't drift.\n// It matches the rows (4px gutter, item radius, 10px label inset) so the icon\n// starts where item labels do. Each component sets the height.\n\n/** The surface band over the side and top gutters; the list supplies the gap below. */\nexport const POPUP_SEARCH_BAND = \"bg-(--popup-surface) px-1 pt-1\";\n\n/**\n * The field. Outlined, since a filled field above a highlighted item reads as\n * a second highlight; the inset ring takes no room, so the icon stays aligned.\n * No focus ring: the field holds focus the whole time the popup is open.\n */\nexport const POPUP_SEARCH_FIELD =\n  \"flex items-center gap-2 rounded-md px-2.5 inset-ring inset-ring-border\";\n\n/** The `<input>`. 16px below `md` so iOS Safari doesn't zoom on focus. */\nexport const POPUP_SEARCH_INPUT =\n  \"placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground h-full min-w-0 flex-1 bg-transparent text-base outline-none md:text-sm\";\n\n/**\n * A clear button inside the field: 24px to look at, with a 40px hit area that\n * reaches the input across the gap without covering it.\n */\nexport const POPUP_SEARCH_CLEAR =\n  \"text-muted-foreground hover:text-foreground focus-visible:ring-ring/70 relative -mr-1 inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors duration-100 outline-none focus-visible:ring-2 after:absolute after:-inset-2\";\n\n/**\n * A menu's search field above its list: an item's height, inset 4px, never\n * squeezed. The list's own padding is the gap, so rows scroll under the field.\n */\nexport const POPUP_SEARCH_MENU_FIELD = \"mx-1 mt-1 h-8 shrink-0\";\n\n/** The search icon's classes. */\nexport const POPUP_SEARCH_ICON = \"text-muted-foreground size-4 shrink-0\";\n",
+      "type": "registry:lib",
+      "target": "lib/cubby-ui/popup-search.ts"
+    }
+  ],
+  "type": "registry:lib"
+}

@@ -28,9 +28,13 @@ The context menu opens on right-click and lists actions scoped to the element un
 ## Composition
 
 ```text
+ContextMenuFilter          (optional, enables filtering)
 ContextMenu
 ├── ContextMenuTrigger
 └── ContextMenuContent
+    ├── ContextMenuInput       (with filtering)
+    ├── ContextMenuEmpty       (with filtering)
+    ├── ContextMenuList        (with filtering, wraps the items)
     ├── ContextMenuLabel
     ├── ContextMenuItem
     ├── ContextMenuLinkItem
@@ -82,6 +86,12 @@ Set `indicator="switch"` on `ContextMenuCheckboxItem` to swap the checkmark for 
 
 <ComponentPreview component="context-menu" example="context-menu-with-switch" />
 
+### With Filter
+
+Wrap a `ContextMenuSub` (or the whole `ContextMenu`) in `ContextMenuFilter`, then put a `ContextMenuInput` above a `ContextMenuList` to filter items as you type. Add `p-0` to that content's `className`; the field and list bring their own spacing. The parts work like [Dropdown Menu's](/docs/components/dropdown-menu#with-filter).
+
+<ComponentPreview component="context-menu" example="context-menu-with-filter" />
+
 ## API Reference
 
 ### ContextMenuContent
@@ -115,6 +125,12 @@ Set `indicator="switch"` on `ContextMenuCheckboxItem` to swap the checkmark for 
 >
   Shadow weight. Controls drop-shadow intensity independently of substrate
   color.
+</ApiProp>
+
+<ApiProp name="positionerClassName" fullType="string">
+  Classes for the positioner, the element Base UI moves into place. Merged last
+  to override the defaults, such as `z-60` to raise the menu. To cap the height,
+  use `className`, which styles the popup. Custom prop not available in Base UI.
 </ApiProp>
 
 </ApiPropsList>
@@ -307,7 +323,63 @@ Mutually exclusive menu item. Wraps Base UI's `ContextMenu.RadioItem`. Uses the 
   Shadow weight. Kept at `3` since submenus are still small popups.
 </ApiProp>
 
+<ApiProp name="positionerClassName" fullType="string">
+  Classes for the positioner, the element Base UI moves into place. Merged last
+  to override the defaults, such as `z-60` to raise the menu. To cap the height,
+  use `className`, which styles the popup. Custom prop not available in Base UI.
+</ApiProp>
+
 </ApiPropsList>
+
+### ContextMenuFilter
+
+Enables filtering for the `ContextMenu` or `ContextMenuSub` it wraps. Wraps Base UI's `Menu.FilterProvider`, which works because `ContextMenu` renders a Menu root inside.
+
+<ApiPropsList>
+
+<ApiProp
+  name="autoHighlight"
+  fullType="boolean | 'always'"
+  simpleType="boolean | string"
+  defaultValue="true"
+>
+  Highlight the first matching item while the query has text, so Enter runs it.
+  Base UI defaults to `false`.
+</ApiProp>
+
+</ApiPropsList>
+
+### ContextMenuInput
+
+Search field above `ContextMenuList`, built like `DropdownMenuInput`. Props are forwarded to `Menu.Input`.
+
+<ApiPropsList>
+
+<ApiProp name="aria-label" fullType="string" defaultValue='"Search"'>
+  Accessible name for the field, since the placeholder doesn't count as one.
+  Pass something specific, like `"Search actions"`.
+</ApiProp>
+
+<ApiProp name="showClear" fullType="boolean" defaultValue="true">
+  Show a `ContextMenuClear` button while the query has text. Custom prop not
+  available in Base UI.
+</ApiProp>
+
+<ApiProp name="inputClassName" fullType="string">
+  Class applied to the inner `<input>`. `className` styles the field.
+  Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="clearLabel" fullType="string" defaultValue='"Clear search"'>
+  Accessible name of the clear button, such as a translated label. Custom prop
+  not available in Base UI.
+</ApiProp>
+
+</ApiPropsList>
+
+### ContextMenuList, ContextMenuEmpty, ContextMenuClear
+
+These work like [Dropdown Menu's](/docs/components/dropdown-menu#dropdownmenulist): the list scrolls below the field in a `ScrollArea` (its `className` goes there), the empty message shows when nothing matches, and the clear button empties the query.
 
 ### Additional Props
 

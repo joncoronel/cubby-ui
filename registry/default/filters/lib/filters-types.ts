@@ -45,6 +45,18 @@ interface FilterFieldBase {
   disabledOperators?: string[];
 }
 
+/**
+ * Fields whose filters can repeat: text, number and custom. Option fields
+ * (select, multiselect) always keep one filter, which the add menu edits.
+ */
+interface RepeatableFieldBase extends FilterFieldBase {
+  /**
+   * Lets this field have more than one filter, e.g. "contains" one word and
+   * "does not contain" another. Defaults to the bar's `allowDuplicateFields`.
+   */
+  allowDuplicates?: boolean;
+}
+
 export interface SelectFilterField extends FilterFieldBase {
   type: "select";
   options: FilterOption[];
@@ -59,7 +71,7 @@ export interface MultiSelectFilterField extends FilterFieldBase {
   maxSelections?: number;
 }
 
-export interface TextFilterField extends FilterFieldBase {
+export interface TextFilterField extends RepeatableFieldBase {
   type: "text";
   placeholder?: string;
   /** Content shown before the input, e.g. `@` or an icon. */
@@ -68,7 +80,7 @@ export interface TextFilterField extends FilterFieldBase {
   suffix?: React.ReactNode;
 }
 
-export interface NumberFilterField extends FilterFieldBase {
+export interface NumberFilterField extends RepeatableFieldBase {
   type: "number";
   placeholder?: string;
   step?: number;
@@ -78,7 +90,7 @@ export interface NumberFilterField extends FilterFieldBase {
   suffix?: React.ReactNode;
 }
 
-export interface CustomFilterField extends FilterFieldBase {
+export interface CustomFilterField extends RepeatableFieldBase {
   type: "custom";
   /** Renders the value segment and reports changes back to the filter. */
   renderValue: (props: FilterValueControlProps) => React.ReactNode;
@@ -133,6 +145,8 @@ export interface FiltersLabels {
   clear: string;
   searchFields: string;
   searchValues: string;
+  /** Placeholder of a field's value search in the add menu, e.g. "Search labels...". */
+  searchFieldValues: (field: FilterField) => string;
   noFields: string;
   noResults: string;
   selectValue: string;
@@ -146,7 +160,7 @@ export interface FiltersLabels {
   fields: string;
   /** Group heading for matching values in the add menu while searching. */
   values: string;
-  /** Accessible name of the add menu's back button. */
+  /** @deprecated The add menu has no back button. Kept so existing overrides type-check. */
   back: string;
   /** Closes the add menu after picking several values of a multiselect. */
   done: string;
@@ -181,7 +195,10 @@ export interface FiltersProviderProps {
   size?: FilterSize;
   /** Shell style for chips and the add/clear capsule. Defaults to `"outline"`. */
   variant?: FilterVariant;
-  /** Allow the same field to be added more than once. Defaults to `false`. */
+  /**
+   * Default for each text, number and custom field's `allowDuplicates`.
+   * Option fields always keep one filter. Defaults to `false`.
+   */
   allowDuplicateFields?: boolean;
   labels?: Partial<FiltersLabels>;
   children?: React.ReactNode;

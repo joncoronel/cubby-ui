@@ -505,7 +505,8 @@
       "registryDependencies": [
         "@cubby-ui/label",
         "@cubby-ui/scroll-area",
-        "@cubby-ui/elevated"
+        "@cubby-ui/elevated",
+        "@cubby-ui/popup-search"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -547,8 +548,10 @@
         }
       ],
       "registryDependencies": [
+        "@cubby-ui/scroll-area",
         "@cubby-ui/switch",
-        "@cubby-ui/elevated"
+        "@cubby-ui/elevated",
+        "@cubby-ui/popup-search"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -691,7 +694,7 @@
       "name": "date-utils",
       "type": "registry:lib",
       "title": "dateUtils",
-      "description": "A utility function for date utils.",
+      "description": "Small local-time date helpers shared by the calendar, the date pickers, and parse-date.",
       "files": [
         {
           "path": "registry/default/lib/date-utils.ts",
@@ -783,8 +786,10 @@
         }
       ],
       "registryDependencies": [
+        "@cubby-ui/scroll-area",
         "@cubby-ui/switch",
-        "@cubby-ui/elevated"
+        "@cubby-ui/elevated",
+        "@cubby-ui/popup-search"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -897,12 +902,11 @@
         "@cubby-ui/scroll-area",
         "@cubby-ui/text-morph",
         "@cubby-ui/tooltip",
-        "@cubby-ui/combobox",
         "@cubby-ui/kbd",
-        "@cubby-ui/popover",
-        "@cubby-ui/transition-panel",
+        "@cubby-ui/combobox",
         "@cubby-ui/use-controllable-state",
-        "@cubby-ui/elevated"
+        "@cubby-ui/elevated",
+        "@cubby-ui/popup-search"
       ],
       "dependencies": [
         "@hugeicons/react",
@@ -1164,7 +1168,7 @@
       "name": "parse-date",
       "type": "registry:lib",
       "title": "parseDate",
-      "description": "A utility function for parse date.",
+      "description": "Forgiving parsers for dates people type: \"tomorrow\", \"next fri\", \"in 3 weeks\", \"mar 14\", \"14 March 2027\", \"3/14\", \"2026-03-14\", and ranges such as \"Oct 1 – 8, 2026\" or \"last 30 days\".",
       "files": [
         {
           "path": "registry/default/lib/parse-date.ts",
@@ -1190,6 +1194,19 @@
       ],
       "registryDependencies": [
         "@cubby-ui/elevated"
+      ]
+    },
+    {
+      "name": "popup-search",
+      "type": "registry:lib",
+      "title": "popupSearch",
+      "description": "Shared classes for the search field at the top of a popup list.",
+      "files": [
+        {
+          "path": "registry/default/lib/popup-search.ts",
+          "type": "registry:lib",
+          "target": "lib/cubby-ui/popup-search.ts"
+        }
       ]
     },
     {

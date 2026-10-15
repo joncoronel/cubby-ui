@@ -18,7 +18,14 @@ import {
   Cancel01Icon,
   CheckIcon,
   ChevronDownIcon,
+  Search01Icon,
 } from "@hugeicons/core-free-icons";
+import {
+  POPUP_SEARCH_BAND,
+  POPUP_SEARCH_CLEAR,
+  POPUP_SEARCH_FIELD,
+  POPUP_SEARCH_ICON,
+} from "@/registry/default/lib/popup-search";
 const useComboboxFilter = BaseCombobox.useFilter;
 const useComboboxFilteredItems = BaseCombobox.useFilteredItems;
 const createComboboxItems = BaseCombobox.createItems;
@@ -68,16 +75,21 @@ function ComboboxInput({
   id: idProp,
   className,
   inputClassName,
-  showTrigger = true,
-  showClear = true,
   variant = "default",
+  showTrigger = variant !== "popup",
+  showClear = true,
   start,
   end,
+  "aria-label": ariaLabelProp,
   ...props
 }: BaseCombobox.Input.Props & {
   showTrigger?: boolean;
   showClear?: boolean;
-  variant?: "default" | "elevated";
+  /**
+   * `"popup"` is the search field at the top of a `ComboboxPopup`: drawn like
+   * the list's rows, with a search icon and no trigger by default.
+   */
+  variant?: "default" | "elevated" | "popup";
   /** Content pinned to the start (leading edge) of the field, e.g. a search icon. */
   start?: React.ReactNode;
   /** Content pinned to the end of the field, before Clear and Trigger, e.g. a loading spinner. */
@@ -87,29 +99,50 @@ function ComboboxInput({
 }) {
   const context = React.use(ComboboxContext);
   const id = idProp ?? context?.id;
+  const popup = variant === "popup";
+  // A popup's search field has no visible label, and a placeholder isn't a
+  // name: default it, as the menus' search fields do.
+  const ariaLabel =
+    ariaLabelProp ??
+    (popup && props["aria-labelledby"] === undefined ? "Search" : undefined);
+  const leading =
+    popup && start === undefined ? (
+      <HugeiconsIcon
+        icon={Search01Icon}
+        strokeWidth={2}
+        className={POPUP_SEARCH_ICON}
+      />
+    ) : (
+      start
+    );
 
-  return (
+  const field = (
     // The wrapper carries the field chrome (border, bg, height, focus ring) so
     // start/end/clear/trigger lay out as flex siblings instead of overlapping
     // the input via absolute positioning + hand-tuned padding.
     <BaseCombobox.InputGroup
       data-slot="combobox-input-group"
       className={cn(
-        "flex h-10 w-full min-w-0 cursor-text items-center gap-2 rounded-lg border bg-clip-padding px-3 sm:h-9",
-        variant === "default" ? "bg-input" : "bg-input-elevated",
-        // Focus ring follows the input via focus-within (same pattern as ComboboxChips).
-        "focus-within:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-within:outline-2 focus-within:outline-offset-2",
+        popup
+          ? // An item's height (36px), so the field reads as part of the list.
+            cn(POPUP_SEARCH_FIELD, "h-9 cursor-text")
+          : [
+              "flex h-10 w-full min-w-0 cursor-text items-center gap-2 rounded-lg border bg-clip-padding px-3 sm:h-9",
+              variant === "default" ? "bg-input" : "bg-input-elevated",
+              // Focus ring follows the input via focus-within (same pattern as ComboboxChips).
+              "focus-within:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-within:outline-2 focus-within:outline-offset-2",
+            ],
         // Disabled state (input or field-level) dims and locks the whole field.
         "has-[input:disabled]:pointer-events-none has-[input:disabled]:cursor-not-allowed has-[input:disabled]:opacity-60",
         className,
       )}
     >
-      {start != null && (
+      {leading != null && (
         <div
           data-slot="combobox-input-start"
           className={comboboxAddonClassName}
         >
-          {start}
+          {leading}
         </div>
       )}
       <BaseCombobox.Input
@@ -120,6 +153,7 @@ function ComboboxInput({
           "file:text-foreground file:inline-flex file:h-7 file:rounded-md file:border-0 file:bg-transparent file:text-sm file:font-medium",
           inputClassName,
         )}
+        aria-label={ariaLabel}
         {...props}
       />
       {end != null && (
@@ -129,11 +163,23 @@ function ComboboxInput({
       )}
       {(showClear || showTrigger) && (
         <div className="flex shrink-0 items-center gap-2">
-          {showClear && <ComboboxClear />}
+          {showClear && (
+            <ComboboxClear className={popup ? POPUP_SEARCH_CLEAR : undefined} />
+          )}
           {showTrigger && <ComboboxTrigger />}
         </div>
       )}
     </BaseCombobox.InputGroup>
+  );
+
+  if (!popup) return field;
+
+  return (
+    // Covers the side and top gutters; the list's own top padding is the gap
+    // under the field.
+    <div data-slot="combobox-input-band" className={POPUP_SEARCH_BAND}>
+      {field}
+    </div>
   );
 }
 
@@ -327,7 +373,7 @@ function ComboboxEmpty({ className, ...props }: BaseCombobox.Empty.Props) {
     <BaseCombobox.Empty
       data-slot="combobox-empty"
       className={cn(
-        "text-muted-foreground px-3 py-2.5 text-sm empty:m-0 empty:p-0",
+        "text-muted-foreground px-3.5 py-2.5 text-sm empty:m-0 empty:p-0",
         className,
       )}
       {...props}
@@ -389,7 +435,7 @@ function ComboboxVirtualizedList({
     <>
       <BaseCombobox.Empty
         data-slot="combobox-empty"
-        className="text-muted-foreground px-3 py-2.5 text-sm empty:m-0 empty:p-0"
+        className="text-muted-foreground px-3.5 py-2.5 text-sm empty:m-0 empty:p-0"
       >
         {emptyMessage}
       </BaseCombobox.Empty>

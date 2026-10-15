@@ -1,18 +1,9 @@
 ---
 title: Filters
-description: A filter bar of sentence-like chips with per-field operators and a two-step add menu
+description: A filter bar of sentence-like chips with per-field operators and a searchable add menu
 type: composable
 builtOn:
-  [
-    "combobox",
-    "dropdown-menu",
-    "popover",
-    "scroll-area",
-    "transition-panel",
-    "text-morph",
-    "tooltip",
-    "kbd",
-  ]
+  ["combobox", "dropdown-menu", "scroll-area", "text-morph", "tooltip", "kbd"]
 ---
 
 import { Filters } from "@/registry/default/filters/filters";
@@ -21,6 +12,7 @@ import FiltersControlled from "@/registry/examples/filters/filters-controlled";
 import FiltersFieldTypes from "@/registry/examples/filters/filters-field-types";
 import FiltersOperators from "@/registry/examples/filters/filters-operators";
 import FiltersMultiselect from "@/registry/examples/filters/filters-multiselect";
+import FiltersDuplicates from "@/registry/examples/filters/filters-duplicates";
 import FiltersManual from "@/registry/examples/filters/filters-manual";
 import FiltersEmptyState from "@/registry/examples/filters/filters-empty-state";
 import FiltersSizes from "@/registry/examples/filters/filters-sizes";
@@ -65,8 +57,9 @@ Filters                  (FiltersProvider + FiltersBar)
 
 ## Features
 
-- Picking a field in the add menu slides to its values, so a chip appears only once it has one.
-- Searching the menu also matches values across fields: type "done" to add "Status is Done" in one step.
+- Each field in the add menu opens its values in a searchable submenu beside the menu (stacked over it on narrow screens), so a chip appears only once it has a value.
+- A select or multiselect field keeps one chip. Reopening the field shows its current values checked, and the menu edits that chip.
+- Searching the menu also matches values across fields: type "done" to add "Status is Done" in one step. Values already on a chip show checked; picking one edits that chip.
 - Chips that outgrow the row scroll sideways, and the add and clear buttons stay in view.
 - A chip still waiting on its value shows a dashed edge and doesn't count as active.
 
@@ -108,6 +101,28 @@ Use `maxSelections` to cap the picks and `labels.selectedCount` to word the "3 s
 
 <ComponentPreview component="filters" example="filters-multiselect">
   <FiltersMultiselect />
+</ComponentPreview>
+
+A `select` field filters on one value, such as "Status is Done". To match any of several values when each item has only one, such as "Status is any of Todo, In progress", declare the field as `multiselect` and hide `includes_all`, which never matches a single value:
+
+```tsx
+{
+  id: "status",
+  label: "Status",
+  type: "multiselect",
+  disabledOperators: ["includes_all"],
+  options: statuses,
+}
+```
+
+### Duplicate fields
+
+Each field gets one chip by default. Set `allowDuplicateFields` to let text, number, and custom fields have more, such as a title that contains one word and not another. A field's own `allowDuplicates` overrides the bar. Here Estimate opts out, since `between` fits a range in one chip.
+
+Select and multiselect fields always keep one chip. It holds any number of values, so the add menu edits it.
+
+<ComponentPreview component="filters" example="filters-duplicates">
+  <FiltersDuplicates />
 </ComponentPreview>
 
 ### Prefix and suffix
@@ -226,7 +241,8 @@ Use `FiltersProvider` and `FiltersBar` separately when UI outside the row (a res
 | ----------------------- | ------------------------- | ------------------------------------------------- |
 | Your `shortcut`         | Anywhere but a text field | Opens the add menu                                |
 | `Enter`                 | Add menu                  | Picks the highlighted item, or adds a typed value |
-| `Backspace`             | Empty add menu search     | Goes back to the field list                       |
+| `ArrowRight`            | A field in the add menu   | Opens its values                                  |
+| `ArrowLeft`             | A field's values          | Goes back to the field list                       |
 | `Escape`                | Add menu                  | Closes it and returns focus to the add button     |
 | `Backspace` or `Delete` | A chip's remove button    | Removes the filter and focuses the next chip      |
 | Arrow keys              | Number input              | Steps the value                                   |
@@ -234,6 +250,7 @@ Use `FiltersProvider` and `FiltersBar` separately when UI outside the row (a res
 ### Screen readers
 
 - Each chip is a group named after its filter, such as "Status is In progress", and each segment names itself.
+- In the add menu, a single-choice field lists its values as radio items and a multi-choice field as checkboxes, so screen readers announce the current value as checked.
 - A hidden status region announces adds, removes, and clears, since focus lands elsewhere.
 - The add menu flags an unreadable number with an "Enter a number" hint tied to the input.
 
@@ -288,7 +305,11 @@ Filters composes Cubby UI primitives and has no Base UI root of its own.
 </ApiProp>
 
 <ApiProp name="allowDuplicateFields" fullType="boolean" defaultValue="false">
-  Lets a field have more than one filter.
+  Lets text, number, and custom fields have more than one filter, such as
+  "contains" one word and "does not contain" another. A field's own
+  `allowDuplicates` overrides it. Select and multiselect fields always keep one
+  filter, since one chip holds any number of values. For a number range, use
+  `between` instead of two filters.
 </ApiProp>
 
 <ApiProp name="shortcut" fullType="string">
@@ -311,32 +332,32 @@ Filters composes Cubby UI primitives and has no Base UI root of its own.
     <AccordionTrigger indicatorType="chevron">Every label and its default</AccordionTrigger>
     <AccordionContent>
 
-| Label              | Default                                                    |
-| ------------------ | ---------------------------------------------------------- |
-| `add`              | `"Filter"`                                                 |
-| `addTooltip`       | `"Add filter"`                                             |
-| `clear`            | `"Clear filters"`                                          |
-| `searchFields`     | `"Filter by..."`                                           |
-| `searchValues`     | `"Search..."`                                              |
-| `noFields`         | `"No matches."`                                            |
-| `noResults`        | `"No results found."`                                      |
-| `selectValue`      | `"Select..."`                                              |
-| `enterValue`       | `"Enter value"`                                            |
-| `value`            | `"Value"`                                                  |
-| `min`, `max`       | `"Min"`, `"Max"`                                           |
-| `and`              | `"and"`, joins a range                                     |
-| `fields`, `values` | `"Fields"`, `"Values"`, add menu headings                  |
-| `back`             | `"Back to fields"`                                         |
-| `done`             | `"Done"`                                                   |
-| `invalidNumber`    | `"Enter a number"`                                         |
-| `operator`         | `"operator"`                                               |
-| `operators`        | `{}`, operator names by id, e.g. `{ is_not: "n'est pas" }` |
-| `filtersCleared`   | `"Cleared all filters"`                                    |
-| `activeCount`      | `(count) => "3 active"`                                    |
-| `selectedCount`    | `(count) => "3 selected"`                                  |
-| `removeFilter`     | `(field) => "Remove Status filter"`                        |
-| `filterAdded`      | `(description) => "Added Status is Done"`                  |
-| `filterRemoved`    | `(description) => "Removed Status is Done"`                |
+| Label               | Default                                                    |
+| ------------------- | ---------------------------------------------------------- |
+| `add`               | `"Filter"`                                                 |
+| `addTooltip`        | `"Add filter"`                                             |
+| `clear`             | `"Clear filters"`                                          |
+| `searchFields`      | `"Filter by..."`                                           |
+| `searchValues`      | `"Search..."`                                              |
+| `searchFieldValues` | `(field) => "Search labels..."`, a field's value search    |
+| `noFields`          | `"No matches."`                                            |
+| `noResults`         | `"No results found."`                                      |
+| `selectValue`       | `"Select..."`                                              |
+| `enterValue`        | `"Enter value"`                                            |
+| `value`             | `"Value"`                                                  |
+| `min`, `max`        | `"Min"`, `"Max"`                                           |
+| `and`               | `"and"`, joins a range                                     |
+| `fields`, `values`  | `"Fields"`, `"Values"`, add menu headings                  |
+| `done`              | `"Done"`                                                   |
+| `invalidNumber`     | `"Enter a number"`                                         |
+| `operator`          | `"operator"`                                               |
+| `operators`         | `{}`, operator names by id, e.g. `{ is_not: "n'est pas" }` |
+| `filtersCleared`    | `"Cleared all filters"`                                    |
+| `activeCount`       | `(count) => "3 active"`                                    |
+| `selectedCount`     | `(count) => "3 selected"`                                  |
+| `removeFilter`      | `(field) => "Remove Status filter"`                        |
+| `filterAdded`       | `(description) => "Added Status is Done"`                  |
+| `filterRemoved`     | `(description) => "Removed Status is Done"`                |
 
     </AccordionContent>
 
@@ -417,6 +438,8 @@ A union keyed on `type`. Every field has `id`, `label`, and optional `icon`, `op
 | `text`, `number`        | `prefix`, `suffix`, `placeholder`; `number` also takes `step` |
 | `custom`                | `renderValue`, and optional `defaultValue` and `formatValue`  |
 
+Text, number, and custom fields also take `allowDuplicates`, which allows more than one filter on that field and overrides the bar's `allowDuplicateFields`.
+
 `renderValue` renders as its own component, so it can use hooks. `formatValue` turns the value into text for the chip's name; strings, numbers, and booleans work without it.
 
 #### FilterValue
@@ -434,6 +457,7 @@ interface FilterValue {
 
 | Helper                                  | Does                                                                    |
 | --------------------------------------- | ----------------------------------------------------------------------- |
+| `allowsDuplicates(field, barDefault)`   | Whether a field can have more than one filter.                          |
 | `createFilter(field, partial?)`         | A new filter with an id, the first operator, and an empty value.        |
 | `patchFilter(field, filter, patch)`     | Applies a patch, resetting the value when the operator's shape changes. |
 | `asFilterValues(json)`                  | Parses untrusted JSON (a URL param) into filters.                       |

@@ -874,6 +874,9 @@ function CircularSliderRoot<Value extends SliderValue = number>({
     "data-disabled": disabled || undefined,
     "data-range": isRange || undefined,
     "data-grab-hover": grabHover || undefined,
+    // Base UI drawers and toasts don't swipe from a drag on the dial. A knob
+    // owns its whole face; a ring only its band (marked below).
+    "data-base-ui-swipe-ignore": variant === "knob" ? "" : undefined,
     // A range is two sliders; the group carries the shared name and each
     // thumb its own ("Start", "End").
     ...(isRange && {
@@ -924,6 +927,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
         {variant === "ring" && (
           <div
             data-slot="circular-slider-band"
+            data-base-ui-swipe-ignore
             aria-hidden
             className={cn(
               "absolute inset-0 z-1 touch-none",

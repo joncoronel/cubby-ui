@@ -2,14 +2,28 @@
 
 import * as React from "react";
 import { ContextMenu as BaseContextMenu } from "@base-ui/react/context-menu";
+import { Menu as BaseMenu } from "@base-ui/react/menu";
 import { cn } from "@/lib/utils";
 import {
   solidSurface,
   type SurfaceLevel,
 } from "@/registry/default/lib/elevated";
+import {
+  POPUP_SEARCH_CLEAR,
+  POPUP_SEARCH_FIELD,
+  POPUP_SEARCH_ICON,
+  POPUP_SEARCH_INPUT,
+  POPUP_SEARCH_MENU_FIELD,
+} from "@/registry/default/lib/popup-search";
+import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import { CheckIcon, ChevronRightIcon } from "@hugeicons/core-free-icons";
+import {
+  Cancel01Icon,
+  CheckIcon,
+  ChevronRightIcon,
+  Search01Icon,
+} from "@hugeicons/core-free-icons";
 import {
   SwitchVisual,
   type SwitchVisualProps,
@@ -30,7 +44,9 @@ const checkIcon = CheckIcon.map(([tag, attrs]) => [
 ]) as typeof CheckIcon;
 
 const checkmarkClasses =
-  "[&_path]:ease-out-expo [&_path]:transition-[stroke-dashoffset] [&_path]:duration-150 [&_path]:[stroke-dasharray:1] in-data-checked:[&_path]:[stroke-dashoffset:0] in-data-unchecked:[&_path]:[stroke-dashoffset:1] motion-reduce:[&_path]:transition-none";
+  "[&_path]:ease-out-expo [&_path]:transition-[stroke-dashoffset] [&_path]:duration-150 [&_path]:[stroke-dasharray:1] in-data-checked:[&_path]:[stroke-dashoffset:0] in-data-unchecked:[&_path]:[stroke-dashoffset:1] motion-reduce:[&_path]:transition-none" +
+  // Fade the unchecked mark out to hide the round-cap dot an undrawn dash leaves.
+  " transition-opacity duration-150 ease-out in-data-unchecked:opacity-0 motion-reduce:transition-none";
 
 function ContextMenu({
   ...props
@@ -82,12 +98,15 @@ function ContextMenuRadioGroup({
 
 function ContextMenuContent({
   className,
+  positionerClassName,
   sideOffset = 4,
   align = "start",
   level = 3,
   shadowLevel = 3,
   ...props
 }: React.ComponentProps<typeof BaseContextMenu.Popup> & {
+  /** Classes for the positioner (the element Base UI moves into place), merged last. */
+  positionerClassName?: string;
   align?: BaseContextMenu.Positioner.Props["align"];
   sideOffset?: BaseContextMenu.Positioner.Props["sideOffset"];
   /** Surface elevation level for the popup bg (1-8). Bump when nesting inside a Dialog or other elevated container. Defaults to 3. */
@@ -98,7 +117,10 @@ function ContextMenuContent({
   return (
     <ContextMenuPortal>
       <ContextMenuPositioner
-        className="max-h-(--available-height) max-w-(--available-width)"
+        className={cn(
+          "max-h-(--available-height) max-w-(--available-width)",
+          positionerClassName,
+        )}
         align={align}
         sideOffset={sideOffset}
       >
@@ -110,7 +132,7 @@ function ContextMenuContent({
             // one for), so the popup is its own scroll container: capped at
             // --available-height, clipping on x for the rounded corners and
             // scrolling on y. Without the cap a tall menu runs off screen.
-            "text-popover-foreground relative z-50 max-h-(--available-height) max-w-(--available-width) min-w-[12rem] origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-xl p-1 outline-none",
+            "text-popover-foreground relative z-50 flex max-h-(--available-height) max-w-(--available-width) min-w-[12rem] origin-(--transform-origin) flex-col overflow-x-hidden overflow-y-auto rounded-xl p-1 outline-none",
             // Modern enter/exit — scale + fade from the transform origin, matching
             // popover/dropdown-menu (replaces the legacy animate-in/zoom/slide classes)
             "ease-out-expo transition-[scale,opacity] duration-100",
@@ -326,7 +348,12 @@ function ContextMenuSeparator({
       // Inset to the item label, not the popup edge: mx-2.5 clears the popup's
       // p-1 plus the item's px-2.5, so the rule starts where the text does
       // instead of running into the popup's rounded corners.
-      className={cn("bg-border mx-2.5 my-1 h-px", className)}
+      className={cn(
+        "bg-border mx-2.5 my-1 h-px",
+        // Drop rules orphaned when filtering hides an emptied group.
+        "[&:not(:has(~:not([hidden]):not([role=separator])))]:hidden [[hidden]+&]:hidden",
+        className,
+      )}
       {...props}
     />
   );
@@ -373,7 +400,7 @@ function ContextMenuSubTrigger({
       delay={delay}
       closeDelay={closeDelay}
       className={cn(
-        "data-highlighted:text-accent-foreground data-popup-open:text-accent-foreground data-highlighted:bg-surface-hover data-popup-open:bg-surface-hover flex cursor-default items-center rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-inset:pl-8",
+        "data-highlighted:text-accent-foreground data-popup-open:text-accent-foreground data-highlighted:bg-surface-hover data-popup-open:bg-surface-hover flex cursor-default items-center rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8",
         className,
       )}
       {...props}
@@ -390,6 +417,7 @@ function ContextMenuSubTrigger({
 
 function ContextMenuSubContent({
   className,
+  positionerClassName,
   // 8px, not 0: the positioner anchors to the sub-trigger, which sits 4px
   // inside the parent popup because of its p-1. A 0 offset therefore overlaps
   // the parent's edge by 4px; 8 leaves a 4px gap, matching Menubar.
@@ -399,6 +427,8 @@ function ContextMenuSubContent({
   shadowLevel = 3,
   ...props
 }: React.ComponentProps<typeof BaseContextMenu.Popup> & {
+  /** Classes for the positioner (the element Base UI moves into place), merged last. */
+  positionerClassName?: string;
   align?: BaseContextMenu.Positioner.Props["align"];
   sideOffset?: BaseContextMenu.Positioner.Props["sideOffset"];
   /** Surface elevation level for the submenu bg (1-8). Defaults to 5 — one tier above the parent menu's default of 3. Bump higher when nesting inside a Dialog. */
@@ -409,7 +439,10 @@ function ContextMenuSubContent({
   return (
     <ContextMenuPortal>
       <ContextMenuPositioner
-        className="max-h-(--available-height) max-w-(--available-width)"
+        className={cn(
+          "max-h-(--available-height) max-w-(--available-width)",
+          positionerClassName,
+        )}
         sideOffset={sideOffset}
         align={align}
       >
@@ -418,7 +451,7 @@ function ContextMenuSubContent({
           data-level={level}
           className={cn(
             // Its own scroll container, like ContextMenuContent above.
-            "text-popover-foreground relative z-50 max-h-(--available-height) max-w-(--available-width) min-w-[12rem] origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-xl p-1 outline-none",
+            "text-popover-foreground relative z-50 flex max-h-(--available-height) max-w-(--available-width) min-w-[12rem] origin-(--transform-origin) flex-col overflow-x-hidden overflow-y-auto rounded-xl p-1 outline-none",
             // Modern enter/exit — scale + fade from the transform origin, matching
             // popover/dropdown-menu (replaces the legacy animate-in/zoom/slide classes)
             "ease-out-expo transition-[scale,opacity] duration-100",
@@ -435,6 +468,110 @@ function ContextMenuSubContent({
     </ContextMenuPortal>
   );
 }
+
+// Filtering (Base UI preview API). ContextMenu renders a Menu root inside, so
+// Menu's filter parts work here: wrap `ContextMenu` or `ContextMenuSub` in the
+// provider, then put a `ContextMenuInput` above a `ContextMenuList`.
+function ContextMenuFilter({
+  autoHighlight = true,
+  ...props
+}: BaseMenu.FilterProvider.Props) {
+  // Highlight the top match while typing, so Enter runs it.
+  return <BaseMenu.FilterProvider autoHighlight={autoHighlight} {...props} />;
+}
+
+function ContextMenuInput({
+  className,
+  inputClassName,
+  showClear = true,
+  clearLabel,
+  "aria-label": ariaLabel = "Search",
+  ...props
+}: BaseMenu.Input.Props & {
+  /** Class applied to the inner `<input>`. `className` styles the field. */
+  inputClassName?: string;
+  /** Show a clear button while the query has text. */
+  showClear?: boolean;
+  /** Accessible name of the clear button. Defaults to "Clear search". */
+  clearLabel?: string;
+}) {
+  return (
+    <div
+      data-slot="context-menu-input-group"
+      // Outside the list's scroll, as in Base UI's filter demo. An item's height
+      // (32px); the list's own padding forms the gap below it.
+      className={cn(POPUP_SEARCH_FIELD, POPUP_SEARCH_MENU_FIELD, className)}
+    >
+      <HugeiconsIcon
+        icon={Search01Icon}
+        strokeWidth={2}
+        className={POPUP_SEARCH_ICON}
+      />
+      <BaseMenu.Input
+        data-slot="context-menu-input"
+        className={cn(POPUP_SEARCH_INPUT, inputClassName)}
+        // The placeholder isn't a name; pass a specific label when you can.
+        aria-label={ariaLabel}
+        {...props}
+      />
+      {showClear && <ContextMenuClear aria-label={clearLabel} />}
+    </div>
+  );
+}
+
+function ContextMenuClear({
+  className,
+  children,
+  "aria-label": ariaLabel = "Clear search",
+  ...props
+}: BaseMenu.Clear.Props) {
+  return (
+    <BaseMenu.Clear
+      data-slot="context-menu-clear"
+      aria-label={ariaLabel}
+      className={cn(POPUP_SEARCH_CLEAR, className)}
+      {...props}
+    >
+      {children ?? (
+        <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-4" />
+      )}
+    </BaseMenu.Clear>
+  );
+}
+
+function ContextMenuList({
+  className,
+  ...props
+}: Omit<BaseMenu.List.Props, "className"> & {
+  /** Styles the scroll area around the list, e.g. to change its height cap. */
+  className?: string;
+}) {
+  return (
+    // Scrolls on its own so the field stays put. Padding sits inside the scroll so
+    // rows reach the popup's edges. Capped at 20rem; shrinks as a flex item to
+    // fit a short screen, as Combobox's and Select's lists do.
+    <ScrollArea fadeEdges="y" className={cn("max-h-80", className)}>
+      <BaseMenu.List data-slot="context-menu-list" className="p-1" {...props} />
+    </ScrollArea>
+  );
+}
+
+function ContextMenuEmpty({ className, ...props }: BaseMenu.Empty.Props) {
+  return (
+    <BaseMenu.Empty
+      data-slot="context-menu-empty"
+      // Lines up with the item labels. The list's 8px padding still renders below,
+      // so it sits 10px from the field and the bottom.
+      className={cn(
+        "text-muted-foreground shrink-0 px-3.5 pt-2.5 pb-0.5 text-sm",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+const useContextMenuFilter = BaseMenu.useFilter;
 
 export {
   ContextMenu,
@@ -455,4 +592,10 @@ export {
   ContextMenuSub,
   ContextMenuSubTrigger,
   ContextMenuSubContent,
+  ContextMenuFilter,
+  ContextMenuInput,
+  ContextMenuClear,
+  ContextMenuList,
+  ContextMenuEmpty,
+  useContextMenuFilter,
 };

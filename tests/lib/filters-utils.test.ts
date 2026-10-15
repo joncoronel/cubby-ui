@@ -1,6 +1,9 @@
 import { describe, it, expect } from "vitest";
 import type { FilterField } from "@/registry/default/filters/lib/filters-types";
 import {
+  allowsDuplicates,
+  isOptionField,
+  nameFromPlaceholder,
   asFilterValues,
   createFilter,
   describeFilter,
@@ -228,5 +231,48 @@ describe("operators", () => {
     const [is] = resolveOperators(status);
     expect(operatorLabel(is)).toBe("is");
     expect(operatorLabel(is, { is: "est" })).toBe("est");
+  });
+});
+
+describe("allowsDuplicates", () => {
+  it("never lets option fields repeat", () => {
+    expect(allowsDuplicates(status, true)).toBe(false);
+    expect(allowsDuplicates(labels, true)).toBe(false);
+  });
+
+  it("falls back to the bar default for other fields", () => {
+    expect(allowsDuplicates(estimate, true)).toBe(true);
+    expect(allowsDuplicates(estimate, false)).toBe(false);
+  });
+
+  it("lets the field override the bar default", () => {
+    expect(
+      allowsDuplicates({ ...estimate, allowDuplicates: true }, false),
+    ).toBe(true);
+    expect(
+      allowsDuplicates({ ...estimate, allowDuplicates: false }, true),
+    ).toBe(false);
+  });
+});
+
+describe("isOptionField", () => {
+  it("is true for select and multiselect fields only", () => {
+    expect(isOptionField(status)).toBe(true);
+    expect(isOptionField(labels)).toBe(true);
+    expect(isOptionField(estimate)).toBe(false);
+  });
+});
+
+describe("nameFromPlaceholder", () => {
+  it("drops a trailing ellipsis in either form", () => {
+    expect(nameFromPlaceholder("Search status...")).toBe("Search status");
+    expect(nameFromPlaceholder("Filter by…")).toBe("Filter by");
+  });
+
+  it("leaves other text alone", () => {
+    expect(nameFromPlaceholder("Search")).toBe("Search");
+    expect(nameFromPlaceholder("Wait... then search")).toBe(
+      "Wait... then search",
+    );
   });
 });

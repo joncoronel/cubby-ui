@@ -37,7 +37,9 @@ const checkIcon = CheckIcon.map(([tag, attrs]) => [
 ]) as typeof CheckIcon;
 
 const checkmarkClasses =
-  "[&_path]:ease-out-expo [&_path]:transition-[stroke-dashoffset] [&_path]:duration-150 [&_path]:[stroke-dasharray:1] in-data-checked:[&_path]:[stroke-dashoffset:0] in-data-unchecked:[&_path]:[stroke-dashoffset:1] motion-reduce:[&_path]:transition-none";
+  "[&_path]:ease-out-expo [&_path]:transition-[stroke-dashoffset] [&_path]:duration-150 [&_path]:[stroke-dasharray:1] in-data-checked:[&_path]:[stroke-dashoffset:0] in-data-unchecked:[&_path]:[stroke-dashoffset:1] motion-reduce:[&_path]:transition-none" +
+  // Fade the unchecked mark out to hide the round-cap dot an undrawn dash leaves.
+  " transition-opacity duration-150 ease-out in-data-unchecked:opacity-0 motion-reduce:transition-none";
 
 type DrawerPosition = "right" | "left" | "top" | "bottom";
 

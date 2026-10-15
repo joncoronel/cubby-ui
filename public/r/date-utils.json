@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "date-utils",
   "title": "dateUtils",
-  "description": "A utility function for date utils.",
+  "description": "Small local-time date helpers shared by the calendar, the date pickers, and parse-date.",
   "files": [
     {
       "path": "registry/default/lib/date-utils.ts",

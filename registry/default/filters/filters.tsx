@@ -71,6 +71,7 @@ const DEFAULT_LABELS: FiltersLabels = {
   clear: "Clear filters",
   searchFields: "Filter by...",
   searchValues: "Search...",
+  searchFieldValues: (field) => `Search ${field.label.toLowerCase()}...`,
   noFields: "No matches.",
   noResults: "No results found.",
   selectValue: "Select...",
@@ -768,6 +769,9 @@ export {
   useFilterChip,
 } from "./filters-context";
 export {
+  allowsDuplicates,
+  isOptionField,
+  nameFromPlaceholder,
   createFilter,
   patchFilter,
   resolveOperators,

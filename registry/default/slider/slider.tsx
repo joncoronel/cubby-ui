@@ -120,6 +120,9 @@ function Slider({
       max={max}
       className={cn(sliderVariants({ variant }), className)}
       thumbAlignment={variant === "contained" ? "edge" : "center"}
+      // Drags along the slider's axis are the slider's, so a Base UI drawer
+      // or toast doesn't swipe; across it, a drawer still can.
+      data-base-ui-swipe-ignore={props.orientation === "vertical" ? "y" : "x"}
       {...props}
     >
       {children}

@@ -1175,10 +1175,12 @@ function scanSharedDirectories(): Array<{
       // Generate title from name (e.g., "use-fuzzy-filter" -> "useFuzzyFilter")
       const title = name.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 
-      // Generate description
-      const description = isHook
-        ? `A custom React hook for ${name.replace("use-", "").replace(/-/g, " ")}.`
-        : `A utility function for ${name.replace(/-/g, " ")}.`;
+      // The file's opening comment says what it is; the template is a fallback.
+      const description =
+        leadingCommentSentence(filePath) ??
+        (isHook
+          ? `A custom React hook for ${name.replace("use-", "").replace(/-/g, " ")}.`
+          : `A utility function for ${name.replace(/-/g, " ")}.`);
 
       // Get target path
       const registryPath = `registry/${DEFAULT_STYLE}/${dir}/${file}`;
@@ -2245,3 +2247,35 @@ async function generateStaticComponentFiles(items: any[]) {
 
 // Run sync
 syncRegistry();
+
+/**
+ * The first sentence of a file's opening comment (a JSDoc block or a run of
+ * `//` lines before any code), or undefined when the file starts with code.
+ */
+function leadingCommentSentence(filePath: string): string | undefined {
+  const source = fsSync.readFileSync(filePath, "utf-8").trimStart();
+  let text: string | undefined;
+  if (source.startsWith("/*")) {
+    const end = source.indexOf("*/");
+    if (end === -1) return undefined;
+    text = source
+      .slice(2, end)
+      .split(/\r?\n/)
+      .map((line) => line.replace(/^\s*\*+ ?/, ""))
+      .join(" ");
+  } else if (source.startsWith("//")) {
+    const lines: string[] = [];
+    for (const line of source.split(/\r?\n/)) {
+      if (!line.trimStart().startsWith("//")) break;
+      const content = line.replace(/^\s*\/\/ ?/, "");
+      if (content.trim() === "") break;
+      lines.push(content);
+    }
+    text = lines.join(" ");
+  }
+  const sentence = text
+    ?.replace(/\s+/g, " ")
+    .trim()
+    .match(/^.*?[.!?](?=\s|$)/)?.[0];
+  return sentence || undefined;
+}

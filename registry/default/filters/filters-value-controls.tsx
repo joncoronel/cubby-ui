@@ -15,7 +15,7 @@ import {
 import { TextMorph } from "@/registry/default/text-morph/text-morph";
 import { NumberField as BaseNumberField } from "@base-ui/react/number-field";
 
-import { OptionContent, SearchIcon, STEP_ROW } from "./filters-add-menu";
+import { OptionContent } from "./filters-add-menu";
 import { useFilterChip, useFiltersActions } from "./filters-context";
 import {
   asNumberOrNull,
@@ -25,6 +25,7 @@ import {
   CLICK_MORPH_MS,
   FILTER_SEGMENT,
   FILTER_SEGMENT_INTERACTIVE,
+  nameFromPlaceholder,
   operatorShapeFor,
 } from "./lib/filters-utils";
 import type {
@@ -37,6 +38,10 @@ import type {
   SelectFilterField,
   TextFilterField,
 } from "./lib/filters-types";
+
+// Padding around the chips' value lists, dropped once nothing matches so the
+// empty message sits evenly.
+const LIST_PADDING = "py-1 not-has-[[data-slot=combobox-item]]:py-0";
 
 interface ValueControlProps<F extends FilterField> {
   field: F;
@@ -152,11 +157,14 @@ function StackedIcons({ options }: { options: FilterOption[] }) {
 
 function FilterSearchPopup({
   placeholder,
+  label,
   empty,
   className,
   children,
 }: {
   placeholder: string;
+  /** The search field's accessible name, e.g. "Search status". */
+  label: string;
   empty: React.ReactNode;
   className?: string;
   children: React.ComponentProps<typeof ComboboxList>["children"];
@@ -167,14 +175,15 @@ function FilterSearchPopup({
       className={cn("flex w-64 flex-col p-0", className)}
     >
       <ComboboxInput
-        showTrigger={false}
         showClear={false}
+        variant="popup"
+        aria-label={label}
         placeholder={placeholder}
-        start={<SearchIcon />}
-        className={STEP_ROW}
       />
       <ComboboxEmpty>{empty}</ComboboxEmpty>
-      <ComboboxList className="max-h-72 py-1">{children}</ComboboxList>
+      <ComboboxList className={cn("max-h-72", LIST_PADDING)}>
+        {children}
+      </ComboboxList>
     </ComboboxPopup>
   );
 }
@@ -246,6 +255,7 @@ function OptionsValueControl({
   const popup = (
     <FilterSearchPopup
       placeholder={labels.searchValues}
+      label={nameFromPlaceholder(labels.searchFieldValues(field))}
       empty={labels.noResults}
     >
       {(option: FilterOption) => (

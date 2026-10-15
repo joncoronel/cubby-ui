@@ -9,11 +9,16 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/registry/default/button/button";
 import {
   DropdownMenuCheckboxItem,
+  DropdownMenuClear,
+  DropdownMenuEmpty,
+  DropdownMenuFilter,
   DropdownMenuGroup,
   DropdownMenuGroupLabel,
+  DropdownMenuInput,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuLinkItem,
+  DropdownMenuList,
   DropdownMenuPortal,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -22,6 +27,7 @@ import {
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
+  useDropdownMenuFilter,
 } from "@/registry/default/dropdown-menu/dropdown-menu";
 import {
   solidSurface,
@@ -146,6 +152,8 @@ function MenubarTrigger({
 
 function MenubarContent({
   className,
+  positionerClassName,
+  viewportClassName,
   children,
   align = "start",
   alignOffset = 0,
@@ -154,6 +162,10 @@ function MenubarContent({
   shadowLevel = 3,
   ...props
 }: React.ComponentProps<typeof BaseMenu.Popup> & {
+  /** Classes for the positioner (the element Base UI moves into place), merged last. */
+  positionerClassName?: string;
+  /** Classes for the padded box around the items, e.g. `p-0` for a filterable menu. */
+  viewportClassName?: string;
   align?: BaseMenu.Positioner.Props["align"];
   alignOffset?: BaseMenu.Positioner.Props["alignOffset"];
   sideOffset?: BaseMenu.Positioner.Props["sideOffset"];
@@ -168,7 +180,10 @@ function MenubarContent({
           detached triggers and physically travels between them. Each MenubarMenu
           mounts its own, with no previous position to animate from. */}
       <BaseMenu.Positioner
-        className="z-50 h-(--positioner-height) max-h-(--available-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
+        className={cn(
+          "z-50 h-(--positioner-height) max-h-(--available-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-150 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
+          positionerClassName,
+        )}
         align={align}
         alignOffset={alignOffset}
         sideOffset={sideOffset}
@@ -215,7 +230,12 @@ function MenubarContent({
             data-slot="menubar-viewport"
             // No `max-w`: `w-full` resolves against the popup's already-capped
             // content box, so the width bound is inherited for free.
-            className="relative max-h-(--available-height) w-full overflow-clip overflow-y-auto p-1"
+            className={cn(
+              "relative max-h-(--available-height) w-full overflow-clip overflow-y-auto p-1",
+              // Lets a filterable list shrink to fit; off during swaps (see DropdownMenu).
+              "flex flex-col *:data-current:flex *:data-current:flex-col not-data-transitioning:*:data-current:min-h-0",
+              viewportClassName,
+            )}
           >
             {children}
           </BaseMenu.Viewport>
@@ -241,6 +261,13 @@ const MenubarShortcut = DropdownMenuShortcut;
 const MenubarSub = DropdownMenuSub;
 const MenubarSubTrigger = DropdownMenuSubTrigger;
 const MenubarSubContent = DropdownMenuSubContent;
+// Filtering: wrap a MenubarMenu (or MenubarSub) in MenubarFilter.
+const MenubarFilter = DropdownMenuFilter;
+const MenubarInput = DropdownMenuInput;
+const MenubarClear = DropdownMenuClear;
+const MenubarList = DropdownMenuList;
+const MenubarEmpty = DropdownMenuEmpty;
+const useMenubarFilter = useDropdownMenuFilter;
 
 export {
   Menubar,
@@ -261,5 +288,11 @@ export {
   MenubarSub,
   MenubarSubTrigger,
   MenubarSubContent,
+  MenubarFilter,
+  MenubarInput,
+  MenubarClear,
+  MenubarList,
+  MenubarEmpty,
+  useMenubarFilter,
   menubarVariants,
 };

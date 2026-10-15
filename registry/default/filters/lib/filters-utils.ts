@@ -9,7 +9,9 @@ import type {
   FilterSize,
   FilterValue,
   FilterVariant,
+  MultiSelectFilterField,
   NumberRange,
+  SelectFilterField,
 } from "./filters-types";
 
 /** TextMorph duration for click-driven labels; snappier than the default 240ms. */
@@ -213,6 +215,30 @@ export function operatorShapeFor(
 ): FilterOperatorShape {
   const operator = resolveOperators(field).find((o) => o.id === operatorId);
   return operator ? operatorShape(operator) : "scalar";
+}
+
+/**
+ * Whether `field` can have more than one filter. Option fields never can (one
+ * chip holds every value); others use `allowDuplicates` or the bar's default.
+ */
+export function allowsDuplicates(
+  field: FilterField,
+  barDefault: boolean,
+): boolean {
+  if (isOptionField(field)) return false;
+  return field.allowDuplicates ?? barDefault;
+}
+
+/** A search field's accessible name: its placeholder without the trailing "..." or "…". */
+export function nameFromPlaceholder(placeholder: string): string {
+  return placeholder.replace(/\s*(\.{3}|…)$/, "");
+}
+
+/** Whether `field` picks from a list of options (select or multiselect). */
+export function isOptionField(
+  field: FilterField,
+): field is SelectFilterField | MultiSelectFilterField {
+  return field.type === "select" || field.type === "multiselect";
 }
 
 /** A typed empty value for a fresh filter of `field` with `operatorId`. */

@@ -493,6 +493,9 @@ function MultiSelectStep({
 
 const DECIMAL = /^[+-]?(\d+\.?\d*|\.\d+)$/;
 
+// The value field, then the filter it would add as a row: Enter or a tap adds
+// it. The row is always there (a prompt, the filter, or the error), so the
+// popup holds its height while typing.
 function InputStep({
   field,
   inputRef,
@@ -508,7 +511,12 @@ function InputStep({
   const parsed = DECIMAL.test(decimal) ? Number(decimal) : NaN;
   const valid = text.trim() !== "" && (!isNumber || Number.isFinite(parsed));
   const invalid = text.trim() !== "" && !valid;
-  const hintId = React.useId();
+  const rowId = React.useId();
+  const prefix = typeof field.prefix === "string" ? field.prefix : null;
+  const suffix = typeof field.suffix === "string" ? field.suffix : null;
+  const operatorText = operator
+    ? operatorLabel(operator, labels.operators)
+    : "";
 
   const submit = () => {
     if (!valid || !operator) return;
@@ -522,75 +530,77 @@ function InputStep({
   };
 
   return (
-    // The same field as the search steps, with nothing below it, so the band
-    // closes with its own bottom gutter.
-    <div
-      data-slot="filter-add-input-band"
-      className={cn(POPUP_SEARCH_BAND, "pb-1")}
-    >
-      <div
-        data-slot="filter-add-input"
-        className={cn(POPUP_SEARCH_FIELD, "h-9 w-full text-sm")}
-      >
-        <ScopeToken field={field} onBack={onBack} />
-        {operator && (
-          <span className="text-muted-foreground shrink-0">
-            {operatorLabel(operator, labels.operators)}
-          </span>
-        )}
-        {typeof field.prefix === "string" && (
-          // Pulls in 4px to match the chip's affix spacing.
-          <span className="text-muted-foreground -me-1 shrink-0">
-            {field.prefix}
-          </span>
-        )}
-        <input
-          ref={inputRef}
-          type="text"
-          inputMode={isNumber ? "decimal" : undefined}
-          aria-label={`${field.label} ${operator ? operatorLabel(operator, labels.operators) : ""}`.trim()}
-          aria-invalid={invalid || undefined}
-          aria-describedby={invalid ? hintId : undefined}
-          placeholder={field.placeholder ?? labels.enterValue}
-          value={text}
-          onChange={(event) => setText(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") {
-              event.preventDefault();
-              submit();
-              return;
-            }
-            backOnEmptyBackspace(event, onBack);
-          }}
-          className={cn(
-            POPUP_SEARCH_INPUT,
-            isNumber && "tabular-nums",
-            "aria-invalid:text-danger-foreground",
+    <div data-slot="filter-add-input-step">
+      <div data-slot="filter-add-input-band" className={POPUP_SEARCH_BAND}>
+        <div
+          data-slot="filter-add-input"
+          className={cn(POPUP_SEARCH_FIELD, "h-9 w-full text-sm")}
+        >
+          <ScopeToken field={field} onBack={onBack} />
+          {prefix && (
+            // Pulls in 4px to match the chip's affix spacing.
+            <span className="text-muted-foreground -me-1 shrink-0">
+              {prefix}
+            </span>
           )}
-        />
-        {typeof field.suffix === "string" && (
-          <span className="text-muted-foreground shrink-0">{field.suffix}</span>
-        )}
-        {invalid && (
-          <span
-            id={hintId}
-            className="text-danger-foreground shrink-0 text-xs whitespace-nowrap"
-          >
-            {labels.invalidNumber}
-          </span>
-        )}
-        {valid && (
-          // The Enter hint doubles as the pointer submit.
+          <input
+            ref={inputRef}
+            type="text"
+            inputMode={isNumber ? "decimal" : undefined}
+            aria-label={`${field.label} ${operatorText}`.trim()}
+            aria-invalid={invalid || undefined}
+            aria-describedby={rowId}
+            placeholder={field.placeholder ?? labels.enterValue}
+            value={text}
+            onChange={(event) => setText(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                submit();
+                return;
+              }
+              backOnEmptyBackspace(event, onBack);
+            }}
+            className={cn(
+              POPUP_SEARCH_INPUT,
+              isNumber && "tabular-nums",
+              "aria-invalid:text-danger-foreground",
+            )}
+          />
+          {suffix && (
+            <span className="text-muted-foreground shrink-0">{suffix}</span>
+          )}
+        </div>
+      </div>
+      <div className="p-1">
+        {valid ? (
           <button
             type="button"
-            aria-label={labels.addTooltip}
+            id={rowId}
             onClick={submit}
-            className="hover:bg-surface-hover focus-visible:outline-ring/50 -me-1.5 flex shrink-0 cursor-pointer items-center rounded-md p-0.5 outline-0 transition-[background-color,opacity,scale] duration-150 ease-out outline-solid focus-visible:outline-2 motion-reduce:transition-none starting:scale-90 starting:opacity-0"
+            // Drawn highlighted: it's what Enter adds, like a combobox's
+            // auto-highlighted first match.
+            className="bg-surface-hover text-accent-foreground focus-visible:outline-ring/50 flex h-9 w-full min-w-0 cursor-pointer items-center gap-1.5 rounded-md px-2.5 text-start text-sm outline-0 outline-solid focus-visible:outline-2"
           >
-            <Kbd size="sm" aria-hidden>
-              Enter
-            </Kbd>
+            <span className="text-muted-foreground shrink-0">
+              {field.label} {operatorText}
+            </span>
+            <span className="truncate font-medium">
+              {prefix}
+              {isNumber ? parsed : `“${text}”`}
+              {suffix && ` ${suffix}`}
+            </span>
           </button>
+        ) : (
+          <p
+            id={rowId}
+            className={cn(
+              "flex h-9 items-center px-2.5 text-sm",
+              invalid ? "text-danger-foreground" : "text-muted-foreground",
+            )}
+          >
+            {invalid ? labels.invalidNumber : `${field.label} ${operatorText}…`}
+          </p>
         )}
       </div>
     </div>
@@ -742,6 +752,11 @@ function AddMenu({
     setStep("value");
   }, []);
   const onBack = React.useCallback(() => setStep("fields"), []);
+  // Opened or driven by touch, focusing a search field would pull up the
+  // on-screen keyboard over half the screen before anything is chosen, so
+  // only the text and number steps (which need typing) take focus then.
+  const [touch, setTouch] = React.useState(false);
+  const typesValue = field?.type === "text" || field?.type === "number";
 
   return (
     <Popover open={open} onOpenChange={changeOpen}>
@@ -866,7 +881,14 @@ function AddMenu({
           <PopoverPopup
             data-slot="filter-add-menu"
             aria-label={labels.add}
-            initialFocus={fieldsInputRef}
+            initialFocus={(openType) => {
+              const byTouch = openType === "touch";
+              setTouch(byTouch);
+              return byTouch ? false : fieldsInputRef.current;
+            }}
+            onPointerDownCapture={(event) =>
+              setTouch(event.pointerType === "touch")
+            }
             finalFocus={() => {
               const id = focusFilterIdRef.current;
               focusFilterIdRef.current = null;
@@ -892,7 +914,7 @@ function AddMenu({
             >
               <TransitionPanelView
                 viewKey="fields"
-                initialFocus={fieldsInputRef}
+                initialFocus={touch ? false : fieldsInputRef}
               >
                 <FieldStep
                   inputRef={fieldsInputRef}
@@ -901,7 +923,10 @@ function AddMenu({
                   findChip={findChip}
                 />
               </TransitionPanelView>
-              <TransitionPanelView viewKey="value" initialFocus={valueInputRef}>
+              <TransitionPanelView
+                viewKey="value"
+                initialFocus={touch && !typesValue ? false : valueInputRef}
+              >
                 {field && (
                   <ValueStep
                     key={field.id}

@@ -121,11 +121,22 @@ interface SubmenuProps<F extends FilterField> {
   onDone: OnDone;
 }
 
+interface OptionFilter {
+  /** The field's chip, if it has one. */
+  filterId: string | undefined;
+  /** The checked option values. */
+  values: string[];
+  /** Adds the chip, edits it, or removes it once nothing is checked. */
+  write: (next: string[]) => void;
+  /** Whether a multiselect has reached its `maxSelections`. */
+  atMax: boolean;
+}
+
 /**
  * An option field's one filter and how to write it, shared by the submenus and
- * search so they agree on what is checked. `write` adds, edits or removes it.
+ * search so they agree on what is checked.
  */
-function useOptionFilter(field: OptionsField) {
+function useOptionFilter(field: OptionsField): OptionFilter {
   const { addFilter, updateFilter, removeFilter } = useFiltersActions();
   const { filters } = useFiltersState();
   const filter = filters.find((candidate) => candidate.field === field.id);
@@ -230,7 +241,7 @@ function OptionItems({
   trailing?: React.ReactNode;
   /** Called with the chip's id when a pick changed an existing chip. */
   onEdited?: (filterId: string) => void;
-}) {
+}): React.ReactNode {
   const { filterId, values, write, atMax } = useOptionFilter(field);
   const pick = (next: string[]) => {
     write(next);
@@ -282,7 +293,7 @@ function OptionsSubmenu({
   field,
   disabled,
   onDone,
-}: SubmenuProps<OptionsField>) {
+}: SubmenuProps<OptionsField>): React.ReactElement {
   const { labels } = useFiltersActions();
   const { values } = useOptionFilter(field);
 

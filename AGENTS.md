@@ -168,7 +168,7 @@ hooks/                      # App hooks
 - `registry/default/hooks/` → add test in `tests/hooks/[hook-name].test.ts`
 - `registry/default/lib/` → add test in `tests/lib/[util-name].test.ts`
 
-Components (thin wrappers around Base UI) do not need tests.
+Components (thin wrappers around Base UI) do not need tests, and neither do `lib/` files that only export Tailwind class strings (such as `popup-search.ts`), which `TESTING.md` leaves to visual checks.
 
 ## Key Dependencies
 

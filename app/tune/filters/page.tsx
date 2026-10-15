@@ -32,8 +32,8 @@ type FiltersProps = { size?: FilterSize; variant?: FilterVariant };
 
 const PANEL_ID = "filters";
 const BAR = '[data-slot="filters"]';
-// The add menu's popup; its submenus use `dropdown-menu-content` and switch
-// with no motion, and its positioner doesn't glide, so neither has a dial.
+// The add menu's popup. Its submenus switch with no motion and its positioner
+// doesn't glide, so neither has a dial.
 const MENU_POPUP = '[data-slot="dropdown-menu-popup"]';
 const FOLDS =
   '[data-slot="filter-add-label"], [data-slot="filter-clear-segment"]';
@@ -67,8 +67,7 @@ const MENU_SCALE_DEFAULT: EasingConfig = {
 const MENU_FADE_DEFAULT: EasingConfig = { ...MENU_SCALE_DEFAULT };
 const START_SCALE = 0.95;
 
-// The values flow-presence.ts passes to element.animate(), used to recognise
-// which call is which.
+// The values flow-presence.ts passes to element.animate(), to tell calls apart.
 const FLOW_MS = 220;
 const EXIT_FADE_MS = 130;
 const FLOW_EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
@@ -77,9 +76,8 @@ const FLOW_EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
 const CONFIG = {
   size: { type: "select", options: [SIZE, "sm", "lg"] },
   variant: { type: "select", options: [VARIANT, "soft", "elevated"] },
-  // Chips entering and leaving, and the bar sliding to make room. Easing
-  // only: the space is a negative margin, and an overshoot would pull the
-  // chip over its neighbour.
+  // Easing only: the space is a negative margin, so an overshoot would pull
+  // the chip over its neighbour.
   chips: {
     flow: { ...FLOW_DEFAULT },
     fadeIn: { ...CHIP_FADE_DEFAULT },
@@ -103,9 +101,8 @@ type FlowOverrides = {
 };
 
 /**
- * Rewrites the timing of flow-presence's element.animate() calls inside a
- * Filters bar, recognised by their fixed duration and easing. Returns the
- * cleanup that restores the original.
+ * Rewrites flow-presence's element.animate() timings inside a Filters bar,
+ * matched by fixed duration and easing. Returns a cleanup that restores it.
  */
 function patchFlowAnimations(read: () => FlowOverrides): () => void {
   const original = Element.prototype.animate;
@@ -246,8 +243,8 @@ export default function FiltersTune(): React.ReactElement {
     phase: tune.phase,
     time: tune.time,
   });
-  // Slow motion does reach the chips, but flow-presence removes a leaving
-  // chip's copy on a real-time timer, so slowed exits get cut short.
+  // Slow motion reaches the chips, but flow-presence removes a leaving chip's
+  // copy on a real-time timer, so slowed exits get cut short.
   useSlowMotion(`${BAR}, [data-slot="dropdown-menu-positioner"]`, tune.rate);
 
   const flow = bezierOnly(v.chips.flow, FLOW_DEFAULT);

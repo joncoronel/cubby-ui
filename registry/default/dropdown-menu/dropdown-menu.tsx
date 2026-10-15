@@ -44,9 +44,8 @@ const checkIcon = CheckIcon.map(([tag, attrs]) => [
 
 const checkmarkClasses =
   "[&_path]:ease-out-expo [&_path]:transition-[stroke-dashoffset] [&_path]:duration-150 [&_path]:[stroke-dasharray:1] in-data-checked:[&_path]:[stroke-dashoffset:0] in-data-unchecked:[&_path]:[stroke-dashoffset:1] motion-reduce:[&_path]:transition-none" +
-  // Fully undrawn, the dash still ends exactly at the path's start: a
-  // zero-length piece whose round cap shows as a dot on high-density screens.
-  // Fading the unchecked mark out, as Checkbox does, removes it.
+  // Fully undrawn, the dash leaves a zero-length piece whose round cap shows
+  // as a dot on high-density screens. Fading the unchecked mark out hides it.
   " transition-opacity duration-150 ease-out in-data-unchecked:opacity-0 motion-reduce:transition-none";
 
 function DropdownMenu<Payload = unknown>({
@@ -81,9 +80,9 @@ function DropdownMenuPopup({
   shadowLevel = 3,
   ...props
 }: React.ComponentProps<typeof BaseMenu.Popup> & {
-  /** Surface elevation level for the popup bg (1-8). Bump when nesting inside a Dialog or other elevated container. Defaults to 3. */
+  /** Surface elevation (1-8) for the popup bg. Bump inside a Dialog or other elevated container. Defaults to 3. */
   level?: SurfaceLevel;
-  /** Shadow weight (1-8). Pinned to 3 by default so the menu reads the same regardless of nesting depth. */
+  /** Shadow weight (1-8). Defaults to 3 so the menu looks the same at any nesting depth. */
   shadowLevel?: SurfaceLevel;
 }) {
   return (
@@ -96,18 +95,14 @@ function DropdownMenuPopup({
         "origin-(--transform-origin) transition-[scale,opacity] duration-100 ease-(--ease-out-expo)",
         "data-starting-style:scale-95 data-starting-style:opacity-0",
         "data-ending-style:scale-95 data-ending-style:opacity-0",
-        // Own compositor layer while mounted. The scale stretches the popup
-        // downward from an origin just above it, so the top edge moves
-        // ~0.2px and the bottom ~7px; every row lands on a different
-        // sub-pixel offset, which on an evenly spaced stack of identical
-        // text reads as a ripple. Promoted, the rows raster once.
+        // Own compositor layer while mounted. The scale-in puts each row at a
+        // different sub-pixel offset, which reads as a ripple; promoted, the
+        // rows raster once.
         "will-change-transform",
         "motion-reduce:transition-none motion-reduce:will-change-auto",
-        // Only 'trigger-change', which fires once a detached-trigger swap has
-        // settled. The others must animate: Base UI waits on this transition
-        // before unmounting, so suppressing 'dismiss' means no exit at all,
-        // and 'click' is inferred from `event.detail === 0`, which every
-        // right-click matches.
+        // Only 'trigger-change'. Base UI waits on this transition to unmount, so
+        // suppressing 'dismiss' kills the exit, and 'click' is inferred from
+        // `event.detail === 0`, which every right-click matches.
         "data-[instant=trigger-change]:transition-none",
         className,
       )}
@@ -119,8 +114,8 @@ function DropdownMenuPopup({
 /**
  * Crossfades content when a detached trigger swaps what the menu shows. Its
  * presence also switches Base UI's positioner from `transform` to `top`/`left`
- * so the popup can grow from the right edge, so leave it out of menus that
- * never swap content.
+ * so the popup can grow from the right edge. Leave it out of menus that never
+ * swap content.
  */
 function DropdownMenuViewport({
   className,
@@ -130,42 +125,32 @@ function DropdownMenuViewport({
     <BaseMenu.Viewport
       data-slot="dropdown-menu-viewport"
       className={cn(
-        // `h-full` and the cap do different jobs; both are load-bearing. At
-        // rest --popup-height is `auto`, so the percentage is indefinite and
-        // only the cap bounds the viewport, which is what engages the
-        // overflow-y below. Mid-swap it is a definite px that transitions,
-        // and the percentage tracks it. Without that the viewport snaps to
-        // the incoming content's height on frame one, because Base UI takes
-        // the outgoing content out of flow with position:absolute, and
-        // overflow-clip cuts its extra rows instead of letting them fade.
-        // No `max-w`: `w-full` resolves against the popup's already-capped
-        // content box, so the width bound is inherited for free.
+        // `h-full` and the cap both matter. At rest --popup-height is `auto`, so
+        // only the cap bounds the viewport and engages overflow-y. Mid-swap it is
+        // a transitioning px value that `h-full` tracks; without it the viewport
+        // snaps to the new content's height and clips the outgoing rows.
+        // No `max-w`: `w-full` inherits the popup's capped width.
         "relative h-full max-h-(--available-height) w-full overflow-clip p-1 [--viewport-padding:0.25rem]",
-        // A column down to Base UI's content wrapper, so a filterable menu's
-        // list shrinks to fit a short screen (as in Combobox and Select). Not
-        // while content swaps: the viewport's height animates then, and letting
-        // the new content shrink with it would collapse its separators.
+        // A column down to Base UI's content wrapper, so a filterable list shrinks
+        // to fit a short screen. Off during swaps: the animating height would
+        // collapse the new content's separators.
         "flex flex-col *:data-current:flex *:data-current:flex-col not-data-transitioning:*:data-current:min-h-0",
         "not-data-transitioning:overflow-y-auto",
-        // Content width, only while content swaps between detached triggers,
-        // so it doesn't re-flow as the popup morphs. Base UI also pins
-        // --popup-width during the entrance, to the content's natural width,
-        // which a width set on the popup or a dropped padding would contradict.
+        // Content width only during a swap, so content doesn't re-flow as the popup
+        // morphs. Base UI pins --popup-width to the natural width during the
+        // entrance, which a popup width or dropped padding would contradict.
         "data-transitioning:**:data-current:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
         "**:data-previous:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
-        // Non-directional crossfade, matching Popover: the two halves
-        // dissolve in place and both recede to 0.96, so the swap reads
-        // the same whichever trigger you came from and the popup's own
-        // width/height morph carries the movement.
+        // Non-directional crossfade, matching Popover: both halves recede to 0.96
+        // in place and the popup's size morph carries the movement.
         "**:data-current:scale-100 **:data-current:opacity-100",
         "**:data-previous:scale-100 **:data-previous:opacity-100",
         "**:data-current:transition-[scale,opacity] **:data-current:duration-150 **:data-current:ease-[cubic-bezier(0.22,1,0.36,1)]",
         "**:data-previous:transition-[scale,opacity] **:data-previous:duration-150 **:data-previous:ease-[cubic-bezier(0.22,1,0.36,1)]",
         "**:data-current:data-starting-style:scale-[0.96] **:data-current:data-starting-style:opacity-0",
         "**:data-previous:data-ending-style:scale-[0.96] **:data-previous:data-ending-style:opacity-0",
-        // Value-matched to the popup's guard so one policy governs the
-        // subtree. Targets the content: the viewport has no transitions of
-        // its own and transition-property does not inherit.
+        // Same guard as the popup's. Targets the content: the viewport has no
+        // transitions and transition-property doesn't inherit.
         "[[data-instant=trigger-change]_&_[data-current]]:transition-none [[data-instant=trigger-change]_&_[data-previous]]:transition-none",
         "motion-reduce:**:data-current:transition-none motion-reduce:**:data-previous:transition-none",
         className,
@@ -187,10 +172,7 @@ function DropdownMenuContent({
 }: React.ComponentProps<typeof DropdownMenuPopup> & {
   /** Classes for the positioner (the element Base UI moves into place), merged last. */
   positionerClassName?: string;
-  /**
-   * Classes for the padded box around the items, e.g. `p-0` for a filterable
-   * menu, whose field and list bring their own spacing.
-   */
+  /** Classes for the padded box around the items, e.g. `p-0` for a filterable menu. */
   viewportClassName?: string;
   align?: BaseMenu.Positioner.Props["align"];
   sideOffset?: BaseMenu.Positioner.Props["sideOffset"];
@@ -528,10 +510,7 @@ function DropdownMenuSubContent({
   level?: SurfaceLevel;
   /** Shadow weight (1-8). Pinned to 3 by default so the submenu reads the same dropdown weight as its parent. */
   shadowLevel?: SurfaceLevel;
-  /**
-   * Classes for the padded box around the items, e.g. `p-0` for a filterable
-   * menu, whose field and list bring their own spacing.
-   */
+  /** Classes for the padded box around the items, e.g. `p-0` for a filterable menu. */
   viewportClassName?: string;
 }) {
   // Default alignOffset to -5 when align is not "center" to line up first item with trigger
@@ -539,9 +518,8 @@ function DropdownMenuSubContent({
 
   return (
     <DropdownMenuPortal>
-      {/* Base UI re-places a submenu a frame after its parent moves, so it
-          steps behind a gliding menu. The same glide as the parent smooths
-          that out. */}
+      {/* Base UI re-places a submenu a frame after its parent moves; the
+          parent's glide hides the lag. */}
       <DropdownMenuPositioner
         className={cn(
           "z-50 max-h-(--available-height) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-150 ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none motion-reduce:transition-none",
@@ -604,9 +582,8 @@ function DropdownMenuInput({
   return (
     <div
       data-slot="dropdown-menu-input-group"
-      // Above the list, outside its scroll, as in Base UI's filter demo. An
-      // item's height (32px), inset like the items; the gap below it is the
-      // list's own padding, so rows scroll right up to the field.
+      // Outside the list's scroll, as in Base UI's filter demo. An item's height
+      // (32px); the list's own padding forms the gap below it.
       className={cn(POPUP_SEARCH_FIELD, POPUP_SEARCH_MENU_FIELD, className)}
     >
       <HugeiconsIcon
@@ -654,12 +631,9 @@ function DropdownMenuList({
   className?: string;
 }) {
   return (
-    // The list scrolls on its own so the field above it stays put, with the
-    // same edge fade as Combobox's list. Its padding sits inside the scroll,
-    // as in Combobox, so rows scroll to the popup's edges and up under the
-    // field. Filterable menus drop their container's padding to match. Capped
-    // at 20rem; on a short screen it shrinks as a flex item to fit the popup,
-    // as Combobox's and Select's lists do.
+    // Scrolls on its own so the field stays put. Padding sits inside the scroll so
+    // rows reach the popup's edges. Capped at 20rem; shrinks as a flex item to
+    // fit a short screen, as Combobox's and Select's lists do.
     <ScrollArea fadeEdges="y" className={cn("max-h-80", className)}>
       <BaseMenu.List
         data-slot="dropdown-menu-list"
@@ -674,8 +648,8 @@ function DropdownMenuEmpty({ className, ...props }: BaseMenu.Empty.Props) {
   return (
     <BaseMenu.Empty
       data-slot="dropdown-menu-empty"
-      // Lines up with the item labels. Sits 10px from the field and 10px from
-      // the bottom: the list's 8px of padding still renders below it.
+      // Lines up with the item labels. The list's 8px padding still renders below,
+      // so it sits 10px from the field and the bottom.
       className={cn(
         "text-muted-foreground shrink-0 px-3.5 pt-2.5 pb-0.5 text-sm",
         className,

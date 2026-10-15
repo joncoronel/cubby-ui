@@ -88,7 +88,7 @@ Set `indicator="switch"` on `ContextMenuCheckboxItem` to swap the checkmark for 
 
 ### With Filter
 
-Wrap a `ContextMenuSub` (or the whole `ContextMenu`) in `ContextMenuFilter`, then put a `ContextMenuInput` above a `ContextMenuList` to filter items as you type. Add `p-0` to that content's `className`, since the field and list bring their own spacing. The parts work the same as [Dropdown Menu's](/docs/components/dropdown-menu#with-filter).
+Wrap a `ContextMenuSub` (or the whole `ContextMenu`) in `ContextMenuFilter`, then put a `ContextMenuInput` above a `ContextMenuList` to filter items as you type. Add `p-0` to that content's `className`; the field and list bring their own spacing. The parts work like [Dropdown Menu's](/docs/components/dropdown-menu#with-filter).
 
 <ComponentPreview component="context-menu" example="context-menu-with-filter" />
 
@@ -128,10 +128,9 @@ Wrap a `ContextMenuSub` (or the whole `ContextMenu`) in `ContextMenuFilter`, the
 </ApiProp>
 
 <ApiProp name="positionerClassName" fullType="string">
-  Classes for the positioner, the element Base UI moves into place. Merged last,
-  so it overrides the defaults, such as `z-60` to raise the menu. To cap the
-  height, use `className`, which styles the popup. Custom prop not available in
-  Base UI.
+  Classes for the positioner, the element Base UI moves into place. Merged last
+  to override the defaults, such as `z-60` to raise the menu. To cap the height,
+  use `className`, which styles the popup. Custom prop not available in Base UI.
 </ApiProp>
 
 </ApiPropsList>
@@ -325,17 +324,16 @@ Mutually exclusive menu item. Wraps Base UI's `ContextMenu.RadioItem`. Uses the 
 </ApiProp>
 
 <ApiProp name="positionerClassName" fullType="string">
-  Classes for the positioner, the element Base UI moves into place. Merged last,
-  so it overrides the defaults, such as `z-60` to raise the menu. To cap the
-  height, use `className`, which styles the popup. Custom prop not available in
-  Base UI.
+  Classes for the positioner, the element Base UI moves into place. Merged last
+  to override the defaults, such as `z-60` to raise the menu. To cap the height,
+  use `className`, which styles the popup. Custom prop not available in Base UI.
 </ApiProp>
 
 </ApiPropsList>
 
 ### ContextMenuFilter
 
-Wraps Base UI's `Menu.FilterProvider`, which works here because `ContextMenu` renders a Menu root inside.
+Enables filtering for the `ContextMenu` or `ContextMenuSub` it wraps. Wraps Base UI's `Menu.FilterProvider`, which works because `ContextMenu` renders a Menu root inside.
 
 <ApiPropsList>
 
@@ -352,6 +350,8 @@ Wraps Base UI's `Menu.FilterProvider`, which works here because `ContextMenu` re
 </ApiPropsList>
 
 ### ContextMenuInput
+
+Search field above `ContextMenuList`, built like `DropdownMenuInput`. Props are forwarded to `Menu.Input`.
 
 <ApiPropsList>
 
@@ -371,7 +371,7 @@ Wraps Base UI's `Menu.FilterProvider`, which works here because `ContextMenu` re
 </ApiProp>
 
 <ApiProp name="clearLabel" fullType="string" defaultValue='"Clear search"'>
-  Accessible name of the clear button, e.g. for a translated menu. Custom prop
+  Accessible name of the clear button, such as a translated label. Custom prop
   not available in Base UI.
 </ApiProp>
 

@@ -4,7 +4,12 @@ description: Vertically stacked set of interactive headings that reveal or hide 
 type: primitive
 ---
 
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/registry/default/accordion/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/registry/default/accordion/accordion";
 
 The accordion stacks collapsible sections, each with a header that toggles its content. Use it for FAQs, settings groups, or any list where showing one section at a time keeps the page short.
 
@@ -85,9 +90,12 @@ Use the `subtitle` prop on `AccordionTrigger` to render secondary text below the
 
 Use `hiddenUntilFound` on `Accordion` (or on a single `AccordionContent`) so the browser's find-in-page can search closed panels and open the one with a match. Try searching this page for "restocking".
 
-<ComponentPreview component="accordion" example="accordion-hidden-until-found" />
+<ComponentPreview
+  component="accordion"
+  example="accordion-hidden-until-found"
+/>
 
-Closed panels stay in the DOM, so search engines can index their text too. Browsers without `hidden="until-found"` support keep the panels closed and skip them in find-in-page.
+Closed panels stay in the DOM, so search engines can index their text. Browsers without `hidden="until-found"` support keep the panels closed and skip them in find-in-page.
 
 ### Variants
 
@@ -95,23 +103,32 @@ Use `variant` on `Accordion` to change how items are framed and separated.
 
 <ComponentPreview component="accordion" example="accordion-outline-variant" />
 
-| Variant                    | Description                                                       |
-| -------------------------- | ---------------------------------------------------------------- |
-| `default`                  | Borderless items divided by a bottom rule.                       |
-| `split`                    | Each item is its own bordered card.                              |
-| `outline`                  | Items grouped inside one bordered card.                          |
-| `nested`                   | Indented items inside a muted, rounded container.                |
-| `isolated-bordered`        | Bordered items that detach and round when opened.                |
-| `isolated-filled`          | Filled items that detach and round when opened.                  |
-| `isolated-filled-bordered` | Filled items with dividers that detach and round when opened.    |
+| Variant                    | Description                                                   |
+| -------------------------- | ------------------------------------------------------------- |
+| `default`                  | Borderless items divided by a bottom rule.                    |
+| `split`                    | Each item is its own bordered card.                           |
+| `outline`                  | Items grouped inside one bordered card.                       |
+| `nested`                   | Indented items inside a muted, rounded container.             |
+| `isolated-bordered`        | Bordered items that detach and round when opened.             |
+| `isolated-filled`          | Filled items that detach and round when opened.               |
+| `isolated-filled-bordered` | Filled items with dividers that detach and round when opened. |
 
 <ComponentPreview component="accordion" example="accordion-split-variant" />
 
-<ComponentPreview component="accordion" example="accordion-isolated-bordered-variant" />
+<ComponentPreview
+  component="accordion"
+  example="accordion-isolated-bordered-variant"
+/>
 
-<ComponentPreview component="accordion" example="accordion-isolated-filled-variant" />
+<ComponentPreview
+  component="accordion"
+  example="accordion-isolated-filled-variant"
+/>
 
-<ComponentPreview component="accordion" example="accordion-isolated-filled-bordered-variant" />
+<ComponentPreview
+  component="accordion"
+  example="accordion-isolated-filled-bordered-variant"
+/>
 
 <ComponentPreview component="accordion" example="accordion-nested-varaint" />
 
@@ -138,12 +155,9 @@ Collapsible container that groups expandable content sections. Wraps Base UI's `
   Visual styling variant for the accordion.
 </ApiProp>
 
-<ApiProp
-  name="multiple"
-  fullType="boolean"
-  defaultValue="false"
->
-  Allow multiple accordion items to be expanded at the same time. Base UI doesn't set a default.
+<ApiProp name="multiple" fullType="boolean" defaultValue="false">
+  Allow multiple accordion items to be expanded at the same time. Base UI
+  doesn't set a default.
 </ApiProp>
 
 </ApiPropsList>
@@ -154,12 +168,9 @@ Clickable header that toggles content visibility. Wraps Base UI's `Accordion.Tri
 
 <ApiPropsList>
 
-<ApiProp
-  name="showIndicator"
-  fullType="boolean"
-  defaultValue="true"
->
-  Show or hide the expand/collapse indicator icon. Custom prop not available in Base UI.
+<ApiProp name="showIndicator" fullType="boolean" defaultValue="true">
+  Show or hide the expand/collapse indicator icon. Custom prop not available in
+  Base UI.
 </ApiProp>
 
 <ApiProp
@@ -177,21 +188,18 @@ Clickable header that toggles content visibility. Wraps Base UI's `Accordion.Tri
   simpleType="string"
   defaultValue='"end"'
 >
-  Position of the indicator icon relative to the trigger text. Custom prop not available in Base UI.
+  Position of the indicator icon relative to the trigger text. Custom prop not
+  available in Base UI.
 </ApiProp>
 
-<ApiProp
-  name="icon"
-  fullType="ReactNode"
->
-  Custom icon to display at the start of the trigger. Custom prop not available in Base UI.
+<ApiProp name="icon" fullType="ReactNode">
+  Custom icon to display at the start of the trigger. Custom prop not available
+  in Base UI.
 </ApiProp>
 
-<ApiProp
-  name="subtitle"
-  fullType="ReactNode"
->
-  Subtitle text to display below the trigger text. Custom prop not available in Base UI.
+<ApiProp name="subtitle" fullType="ReactNode">
+  Subtitle text to display below the trigger text. Custom prop not available in
+  Base UI.
 </ApiProp>
 
 </ApiPropsList>

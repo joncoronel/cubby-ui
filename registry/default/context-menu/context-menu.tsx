@@ -45,9 +45,7 @@ const checkIcon = CheckIcon.map(([tag, attrs]) => [
 
 const checkmarkClasses =
   "[&_path]:ease-out-expo [&_path]:transition-[stroke-dashoffset] [&_path]:duration-150 [&_path]:[stroke-dasharray:1] in-data-checked:[&_path]:[stroke-dashoffset:0] in-data-unchecked:[&_path]:[stroke-dashoffset:1] motion-reduce:[&_path]:transition-none" +
-  // Fully undrawn, the dash still ends exactly at the path's start: a
-  // zero-length piece whose round cap shows as a dot on high-density screens.
-  // Fading the unchecked mark out, as Checkbox does, removes it.
+  // Fade the unchecked mark out to hide the round-cap dot an undrawn dash leaves.
   " transition-opacity duration-150 ease-out in-data-unchecked:opacity-0 motion-reduce:transition-none";
 
 function ContextMenu({
@@ -352,8 +350,7 @@ function ContextMenuSeparator({
       // instead of running into the popup's rounded corners.
       className={cn(
         "bg-border mx-2.5 my-1 h-px",
-        // While filtering, Base UI hides emptied groups. Drop a rule that
-        // would follow one, or that has nothing left to separate below it.
+        // Drop rules orphaned when filtering hides an emptied group.
         "[&:not(:has(~:not([hidden]):not([role=separator])))]:hidden [[hidden]+&]:hidden",
         className,
       )}
@@ -501,9 +498,8 @@ function ContextMenuInput({
   return (
     <div
       data-slot="context-menu-input-group"
-      // Above the list, outside its scroll, as in Base UI's filter demo. An
-      // item's height (32px), inset like the items; the gap below it is the
-      // list's own padding, so rows scroll right up to the field.
+      // Outside the list's scroll, as in Base UI's filter demo. An item's height
+      // (32px); the list's own padding forms the gap below it.
       className={cn(POPUP_SEARCH_FIELD, POPUP_SEARCH_MENU_FIELD, className)}
     >
       <HugeiconsIcon
@@ -551,12 +547,9 @@ function ContextMenuList({
   className?: string;
 }) {
   return (
-    // The list scrolls on its own so the field above it stays put, with the
-    // same edge fade as Combobox's list. Its padding sits inside the scroll,
-    // as in Combobox, so rows scroll to the popup's edges and up under the
-    // field. Filterable menus drop their container's padding to match. Capped
-    // at 20rem; on a short screen it shrinks as a flex item to fit the popup,
-    // as Combobox's and Select's lists do.
+    // Scrolls on its own so the field stays put. Padding sits inside the scroll so
+    // rows reach the popup's edges. Capped at 20rem; shrinks as a flex item to
+    // fit a short screen, as Combobox's and Select's lists do.
     <ScrollArea fadeEdges="y" className={cn("max-h-80", className)}>
       <BaseMenu.List data-slot="context-menu-list" className="p-1" {...props} />
     </ScrollArea>
@@ -567,8 +560,8 @@ function ContextMenuEmpty({ className, ...props }: BaseMenu.Empty.Props) {
   return (
     <BaseMenu.Empty
       data-slot="context-menu-empty"
-      // Lines up with the item labels. Sits 10px from the field and 10px from
-      // the bottom: the list's 8px of padding still renders below it.
+      // Lines up with the item labels. The list's 8px padding still renders below,
+      // so it sits 10px from the field and the bottom.
       className={cn(
         "text-muted-foreground shrink-0 px-3.5 pt-2.5 pb-0.5 text-sm",
         className,

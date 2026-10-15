@@ -51,7 +51,7 @@ Pass `multiple` on `Combobox` to select more than one option.
 
 ### Input Inside Popup
 
-Move `ComboboxInput` inside `ComboboxPopup` and set `variant="popup"` so the search field sits in the dropdown. It's drawn like the list's rows, with a search icon and no trigger, the same field the menus and Filters use.
+Move `ComboboxInput` inside `ComboboxPopup` and set `variant="popup"` so the search field sits in the dropdown. That variant matches the list's rows, with a search icon and no trigger, and is the same field the menus and Filters use.
 
 <ComponentPreview component="combobox" example="combobox-input-inside-popup" />
 
@@ -106,10 +106,10 @@ Use `variant="elevated"` on `ComboboxInput` for a Card, Dialog, or popover surfa
 
 <ComponentPreview component="combobox" example="combobox-elevated" />
 
-| Value      | Description                                                       |
-| ---------- | ---------------------------------------------------------------- |
-| `default`  | Opaque `bg-input`, for standard page backgrounds.                |
-| `elevated` | Translucent `bg-input-elevated`, for Card, Dialog, or popovers.  |
+| Value      | Description                                                     |
+| ---------- | --------------------------------------------------------------- |
+| `default`  | Opaque `bg-input`, for standard page backgrounds.               |
+| `elevated` | Translucent `bg-input-elevated`, for Card, Dialog, or popovers. |
 
 ### Form Integration
 
@@ -137,19 +137,31 @@ Text input with built-in trigger and clear buttons. Wraps Base UI's `Combobox.In
 </ApiProp>
 
 <ApiProp name="showClear" fullType="boolean" defaultValue="true">
-  Show a clear button to reset the input value. Only visible when the input has a value.
+  Show a clear button to reset the input value. Only visible when the input has
+  a value.
 </ApiProp>
 
-<ApiProp name="variant" fullType='"default" | "elevated" | "popup"' simpleType="string" defaultValue='"default"'>
-  Surface appearance of the input. `default` uses opaque `bg-input`. `elevated` uses translucent `bg-input-elevated` for use inside Card, Dialog, or popover surfaces. See the [Surfaces](/docs/getting-started/surfaces) docs. `popup` is the search field inside `ComboboxPopup`: outlined, row height, with a search icon in `start` unless you pass your own.
+<ApiProp
+  name="variant"
+  fullType='"default" | "elevated" | "popup"'
+  simpleType="string"
+  defaultValue='"default"'
+>
+  Surface appearance of the input. `default` uses opaque `bg-input`. `elevated`
+  uses translucent `bg-input-elevated` for use inside Card, Dialog, or popover
+  surfaces. See the [Surfaces](/docs/getting-started/surfaces) docs. `popup` is
+  the search field inside `ComboboxPopup`: outlined, row height, with a search
+  icon in `start` unless you pass your own.
 </ApiProp>
 
 <ApiProp name="start" fullType="ReactNode" simpleType="node">
-  Content pinned to the leading edge of the field, such as a search icon. Bare SVGs default to `size-4` and inherit the muted foreground color.
+  Content pinned to the leading edge of the field, such as a search icon. Bare
+  SVGs default to `size-4` and inherit the muted foreground color.
 </ApiProp>
 
 <ApiProp name="end" fullType="ReactNode" simpleType="node">
-  Content pinned to the trailing edge, before the clear and trigger buttons. Useful for an async loading spinner.
+  Content pinned to the trailing edge, before the clear and trigger buttons.
+  Useful for an async loading spinner.
 </ApiProp>
 
 <ApiProp name="inputClassName" fullType="string">
@@ -175,7 +187,8 @@ Dropdown container for the option list with positioning. Composes Base UI's `Com
   fullType="'top' | 'right' | 'bottom' | 'left' | 'inline-start' | 'inline-end'"
   defaultValue='"bottom"'
 >
-  Which side of the anchor to position the popup. Forwarded to the internal Positioner. Inherits Base UI's default.
+  Which side of the anchor to position the popup. Forwarded to the internal
+  Positioner. Inherits Base UI's default.
 </ApiProp>
 
 <ApiProp
@@ -183,30 +196,26 @@ Dropdown container for the option list with positioning. Composes Base UI's `Com
   fullType="'start' | 'center' | 'end'"
   defaultValue='"center"'
 >
-  How to align the popup relative to the anchor. Forwarded to the internal Positioner. Inherits Base UI's default.
+  How to align the popup relative to the anchor. Forwarded to the internal
+  Positioner. Inherits Base UI's default.
 </ApiProp>
 
-<ApiProp
-  name="sideOffset"
-  fullType="number"
-  defaultValue="6"
->
-  Distance in pixels between the popup and the anchor element. Forwarded to the internal Positioner. Type is inferred from Base UI's Positioner component.
+<ApiProp name="sideOffset" fullType="number" defaultValue="6">
+  Distance in pixels between the popup and the anchor element. Forwarded to the
+  internal Positioner. Type is inferred from Base UI's Positioner component.
 </ApiProp>
 
-<ApiProp
-  name="alignOffset"
-  fullType="number"
-  defaultValue="0"
->
-  Offset in pixels along the alignment axis. Forwarded to the internal Positioner. Inherits Base UI's default.
+<ApiProp name="alignOffset" fullType="number" defaultValue="0">
+  Offset in pixels along the alignment axis. Forwarded to the internal
+  Positioner. Inherits Base UI's default.
 </ApiProp>
 
 <ApiProp
   name="collisionBoundary"
   fullType="Element | Element[] | 'clipping-ancestors'"
 >
-  Boundary used for collision detection. Forwarded to the internal Positioner. Inherits Base UI's default.
+  Boundary used for collision detection. Forwarded to the internal Positioner.
+  Inherits Base UI's default.
 </ApiProp>
 
 <ApiProp
@@ -214,15 +223,14 @@ Dropdown container for the option list with positioning. Composes Base UI's `Com
   fullType="number | Partial<Record<Side, number>>"
   defaultValue="5"
 >
-  Padding from the collision boundary edge. Forwarded to the internal Positioner. Inherits Base UI's default.
+  Padding from the collision boundary edge. Forwarded to the internal
+  Positioner. Inherits Base UI's default.
 </ApiProp>
 
-<ApiProp
-  name="sticky"
-  fullType="boolean"
-  defaultValue="false"
->
-  Whether to keep the popup visible in the viewport after the anchor has scrolled out of view. Forwarded to the internal Positioner. Inherits Base UI's default.
+<ApiProp name="sticky" fullType="boolean" defaultValue="false">
+  Whether to keep the popup visible in the viewport after the anchor has
+  scrolled out of view. Forwarded to the internal Positioner. Inherits Base UI's
+  default.
 </ApiProp>
 
 <ApiProp
@@ -230,23 +238,28 @@ Dropdown container for the option list with positioning. Composes Base UI's `Com
   fullType="'absolute' | 'fixed'"
   defaultValue='"absolute"'
 >
-  CSS position method for the popup. Forwarded to the internal Positioner. Inherits Base UI's default.
+  CSS position method for the popup. Forwarded to the internal Positioner.
+  Inherits Base UI's default.
 </ApiProp>
 
-<ApiProp
-  name="backdrop"
-  fullType="boolean"
-  defaultValue="false"
->
-  Show a backdrop overlay behind the popup. Custom prop not available in Base UI.
+<ApiProp name="backdrop" fullType="boolean" defaultValue="false">
+  Show a backdrop overlay behind the popup. Custom prop not available in Base
+  UI.
 </ApiProp>
 
 <ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
-  Surface elevation level for the popup. See the [Surfaces](/docs/getting-started/surfaces) docs. Uses `elevatedSurface` (rim on `::after`) so sticky group labels stay below the rim edge.
+  Surface elevation level for the popup. See the
+  [Surfaces](/docs/getting-started/surfaces) docs. Uses `elevatedSurface` (rim
+  on `::after`) so sticky group labels stay below the rim edge.
 </ApiProp>
 
-<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
-  Shadow weight. Controls drop-shadow intensity independently of substrate color.
+<ApiProp
+  name="shadowLevel"
+  fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8"
+  defaultValue="3"
+>
+  Shadow weight. Controls drop-shadow intensity independently of substrate
+  color.
 </ApiProp>
 
 </ApiPropsList>
@@ -257,12 +270,10 @@ Scrollable list of selectable options. Wraps Base UI's `Combobox.Listbox`.
 
 <ApiPropsList>
 
-<ApiProp
-  name="nativeScroll"
-  fullType="boolean"
-  defaultValue="false"
->
-  Use native browser scrolling instead of the custom ScrollArea component. Useful for custom layouts where you need more control over scroll behavior, or when nesting the list inside your own scroll container.
+<ApiProp name="nativeScroll" fullType="boolean" defaultValue="false">
+  Use native browser scrolling instead of the custom ScrollArea component.
+  Useful for custom layouts where you need more control over scroll behavior, or
+  when nesting the list inside your own scroll container.
 </ApiProp>
 
 <ApiProp
@@ -270,30 +281,20 @@ Scrollable list of selectable options. Wraps Base UI's `Combobox.Listbox`.
   fullType="boolean | 'top' | 'bottom' | 'left' | 'right' | 'x' | 'y' | FadeEdge[]"
   defaultValue="true"
 >
-  Controls the fade effect on scroll edges. See [ScrollArea](/docs/components/scroll-area#custom-props) for all options.
+  Controls the fade effect on scroll edges. See
+  [ScrollArea](/docs/components/scroll-area#custom-props) for all options.
 </ApiProp>
 
-<ApiProp
-  name="scrollbarGutter"
-  fullType="boolean"
-  defaultValue="false"
->
-  Reserves space for the scrollbar when content overflows, preventing layout shift.
+<ApiProp name="scrollbarGutter" fullType="boolean" defaultValue="false">
+  Reserves space for the scrollbar when content overflows, preventing layout
+  shift.
 </ApiProp>
 
-<ApiProp
-  name="persistScrollbar"
-  fullType="boolean"
-  defaultValue="false"
->
+<ApiProp name="persistScrollbar" fullType="boolean" defaultValue="false">
   Always show the scrollbar instead of fading it in on hover or scroll.
 </ApiProp>
 
-<ApiProp
-  name="hideScrollbar"
-  fullType="boolean"
-  defaultValue="false"
->
+<ApiProp name="hideScrollbar" fullType="boolean" defaultValue="false">
   Hides the scrollbar while keeping scroll functionality.
 </ApiProp>
 

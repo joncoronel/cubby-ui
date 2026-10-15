@@ -81,7 +81,7 @@ Use `MenubarCheckboxItem` for settings and `MenubarRadioGroup` for one choice; s
 
 ### With Filter
 
-Wrap a `MenubarMenu` in `MenubarFilter`, then put a `MenubarInput` above a `MenubarList` to filter items as you type, and pass `viewportClassName="p-0"` to its `MenubarContent`. The parts work the same as [Dropdown Menu's](/docs/components/dropdown-menu#with-filter). While the search field has focus, Left and Right move the text cursor rather than switching menus.
+Wrap a `MenubarMenu` in `MenubarFilter`, then put a `MenubarInput` above a `MenubarList` to filter items as you type. Pass `viewportClassName="p-0"` to its `MenubarContent`. The parts work like [Dropdown Menu's](/docs/components/dropdown-menu#with-filter). While the search field has focus, Left and Right move the text cursor instead of switching menus.
 
 <ComponentPreview component="menubar" example="menubar-with-filter" />
 
@@ -193,9 +193,9 @@ The menu's popup, aligned to the start of its trigger. Composes `Menu.Portal`, `
 </ApiProp>
 
 <ApiProp name="positionerClassName" fullType="string">
-  Classes for the positioner, the element Base UI moves into place. Merged last,
-  so it overrides the defaults, such as `duration-100` for a faster glide.
-  Custom prop not available in Base UI.
+  Classes for the positioner, the element Base UI moves into place. Merged last
+  to override the defaults, such as `duration-100` for a faster glide. Custom
+  prop not available in Base UI.
 </ApiProp>
 
 <ApiProp name="viewportClassName" fullType="string">

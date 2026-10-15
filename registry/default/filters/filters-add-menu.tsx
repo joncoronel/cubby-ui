@@ -122,10 +122,8 @@ interface SubmenuProps<F extends FilterField> {
 }
 
 /**
- * An option field's one filter and how to write it. The submenus and the
- * search results both go through here, so they always agree on what is
- * checked. `values` are the checked options; `write` adds the filter, edits
- * it, or removes it once nothing is checked.
+ * An option field's one filter and how to write it, shared by the submenus and
+ * search so they agree on what is checked. `write` adds, edits or removes it.
  */
 function useOptionFilter(field: OptionsField) {
   const { addFilter, updateFilter, removeFilter } = useFiltersActions();
@@ -185,10 +183,9 @@ function ValueSubmenuTrigger({
   disabled: boolean;
 }) {
   return (
-    // The submenus have no exit animation, so on a fast sweep the old one
-    // could close before the next one has rendered, leaving a blank frame.
-    // Holding the close lets the next submenu replace it (opening one closes
-    // its sibling at once), so this never keeps two open.
+    // Submenus have no exit animation: without the delay a fast sweep closes
+    // the old one before the next renders, leaving a blank frame. Opening one
+    // closes its sibling at once, so two never stay open.
     <DropdownMenuSubTrigger
       disabled={disabled}
       label={field.label}
@@ -200,10 +197,8 @@ function ValueSubmenuTrigger({
   );
 }
 
-// A field with values opens them in its own searchable submenu, beside the
-// menu (stacked over it where there's no room, like any submenu). Memoised so
-// the menu's own re-render on a filter change skips the text and number
-// submenus; option submenus read filter state and update regardless.
+// A field's searchable value submenu. Memoised so a filter change skips the
+// text and number submenus; option submenus read filter state regardless.
 const ValueSubmenu = React.memo(function ValueSubmenu(
   props: SubmenuProps<FilterField>,
 ) {
@@ -220,11 +215,9 @@ const ValueSubmenu = React.memo(function ValueSubmenu(
   }
 });
 
-// An option field's values as menu items, editing its one chip: radios for a
-// single choice, checkboxes for several. The submenu and the root search both
-// render these, so they always agree on what is checked. A single choice
-// closes the menu on any pick, the checked one included; checkboxes close it
-// only in search, which is for jumping straight to a value.
+// An option field's values as menu items: radios for a single choice,
+// checkboxes for several. A single choice closes the menu on any pick;
+// checkboxes close it only in search, which jumps straight to a value.
 function OptionItems({
   field,
   inSearch = false,
@@ -311,8 +304,7 @@ function OptionsSubmenu({
             <OptionItems field={field} />
           </DropdownMenuList>
           {field.type === "multiselect" && (
-            // Edge to edge under the list, which ends with its own 4px of
-            // padding below the last option.
+            // Edge to edge; the list's own 4px padding sits above it.
             <div className="flex h-10 items-center justify-between gap-2 border-t ps-3.5 pe-1.5">
               <span className="text-muted-foreground text-xs tabular-nums">
                 {values.length > 0
@@ -330,10 +322,9 @@ function OptionsSubmenu({
   );
 }
 
-// The value field, then the filter it would add as a row: Enter or a click
-// adds it. The submenu's own matching is off (the field holds a value, not a
-// search), and the row is always there (a prompt, the filter, or the error) so
-// the submenu holds its height while typing.
+// The value field, then the filter it would add as a row. Matching is off
+// since the field holds a value, and the row always renders so the submenu
+// keeps its height while typing.
 function InputSubmenu({
   field,
   disabled,
@@ -360,9 +351,9 @@ function InputSubmenu({
     <DropdownMenuFilter filter={null} value={text} onValueChange={setText}>
       <DropdownMenuSub
         onOpenChange={(open, details) => {
-          // A tap or click on the row means "enter a value": put the caret
-          // in the field (on touch, Base UI leaves focus alone). Hover-opens
-          // don't, so sweeping past the row never steals the root search.
+          // A tap or click puts the caret in the field (on touch, Base UI
+          // leaves focus alone). Hover-opens don't, so a sweep never steals
+          // the root search.
           if (open && details.reason === "trigger-press") {
             requestAnimationFrame(() => inputRef.current?.focus());
           }
@@ -578,9 +569,8 @@ function AddMenu({
 
   return (
     <DropdownMenuFilter value={query} onValueChange={setQuery}>
-      {/* Non-modal, like a popover: a modal menu measures its trigger while
-          rendering, which forces a full layout mid-way through a new chip's
-          entrance when a pick closes the menu. */}
+      {/* Non-modal: a modal menu measures its trigger while rendering, forcing
+          a layout mid chip entrance when a pick closes the menu. */}
       <DropdownMenu open={open} onOpenChange={changeOpen} modal={false}>
         {/* Only once folded to "+" (the label is hidden) and while closed. */}
         <Tooltip
@@ -618,8 +608,8 @@ function AddMenu({
                       className={cn(
                         FILTER_SEGMENT,
                         FILTER_SEGMENT_INTERACTIVE,
-                        // The "+" sits in the side padding; folded, the
-                        // padding goes and the "+" square (below) sets the width.
+                        // Folded, the side padding goes and the "+" square
+                        // below sets the width.
                         "text-muted-foreground hover:text-foreground data-popup-open:text-foreground gap-0 px-(--seg-icon-x) data-compact:px-0",
                         className,
                       )}
@@ -664,15 +654,15 @@ function AddMenu({
                     />
                   </span>
                 )}
-                {/* Folds via a grid column once filters exist: animates in every
-                    browser (auto width doesn't) and stays readable to screen readers. */}
+                {/* A grid column folds it: animates in every browser (auto width
+                    doesn't) and stays readable to screen readers. */}
                 <span
                   data-slot="filter-add-label"
                   className="grid grid-cols-[minmax(0,1fr)] overflow-hidden transition-[grid-template-columns,opacity] duration-220 ease-[cubic-bezier(0.22,1,0.36,1)] in-data-compact:grid-cols-[minmax(0,0fr)] in-data-compact:opacity-0 motion-reduce:transition-none"
                 >
                   <span
-                    // Text side gets 2px more than the icon side: the "+" glyph has
-                    // ~2.7px of internal space, so this balances by ink.
+                    // 2px more than the icon side: the "+" glyph has ~2.7px of
+                    // internal space, so this balances by ink.
                     className="flex min-w-0 items-center gap-1.5 overflow-hidden ps-1.5 pe-0.5"
                   >
                     {children ?? labels.add}
@@ -697,9 +687,8 @@ function AddMenu({
         </Tooltip>
         <DropdownMenuPortal>
           {/* Composed without DropdownMenuContent's viewport: this menu never
-              swaps content, and leaving the viewport out keeps Base UI
-              positioning it with `transform` at whole pixels. It follows the
-              trigger as chips shift it, without a glide. */}
+              swaps content, and without it Base UI positions with `transform`
+              at whole pixels, following the trigger without a glide. */}
           <DropdownMenuPositioner
             side="bottom"
             align="start"

@@ -114,7 +114,10 @@ Use `BaseDrawerPanel` to hold form elements; it wraps content in `Drawer.Content
 
 Bottom drawers keep focused fields clear of the on-screen keyboard. Fields in `BaseDrawerPanel` scroll into view, and a field in `BaseDrawerFooter`, like a reply box, lifts the footer above the keyboard while it has focus. No props needed.
 
-<ComponentPreview component="base-drawer" example="base-drawer-keyboard-aware" />
+<ComponentPreview
+  component="base-drawer"
+  example="base-drawer-keyboard-aware"
+/>
 
 ### Scrollable Content
 
@@ -124,7 +127,7 @@ Use `BaseDrawerPanel` for scrollable content that coexists with swipe gestures.
 
 ### Draggable Controls
 
-[Slider](/docs/components/slider) and [Circular Slider](/docs/components/circular-slider) keep their drags from swiping the drawer, with no setup. A horizontal slider in a bottom drawer still lets a downward swipe dismiss.
+Dragging a [Slider](/docs/components/slider) or [Circular Slider](/docs/components/circular-slider) never swipes the drawer, and needs no setup. A horizontal slider in a bottom drawer still lets a downward swipe dismiss it.
 
 <ComponentPreview component="base-drawer" example="base-drawer-swipe-ignore" />
 
@@ -136,7 +139,7 @@ For your own draggable controls, add `data-base-ui-swipe-ignore`. Set it to `"x"
 | `"x"`      | Touch drags along the x axis go to the element; others can swipe. |
 | `"y"`      | Touch drags along the y axis go to the element; others can swipe. |
 
-Mouse and pen drags ignore the swipe for any value, since they can't wait to see which axis the gesture takes.
+For mouse and pen drags, any value blocks the swipe, since those drags can't wait to see which axis the gesture takes.
 
 ### Menu Items
 
@@ -394,14 +397,14 @@ Single-choice drawer row. Wraps Base UI's `Radio.Root` and must sit inside a `Ba
 
 Base UI's Drawer exposes CSS custom properties on the popup element, plus the keyboard inset on the viewport:
 
-| Variable                     | Description                                                      |
-| ---------------------------- | ---------------------------------------------------------------- |
-| `--drawer-swipe-progress`    | Progress toward dismissed (0 = open, 1 = dismissed)              |
-| `--drawer-swipe-movement-x`  | Horizontal swipe offset in pixels                                |
-| `--drawer-swipe-movement-y`  | Vertical swipe offset in pixels                                  |
-| `--drawer-swipe-strength`    | Velocity-based strength (scales exit animation duration)         |
-| `--drawer-snap-point-offset` | Vertical offset for snap point positioning                       |
-| `--drawer-height`            | Current drawer height                                            |
-| `--drawer-frontmost-height`  | Height of the frontmost drawer in a nested stack                 |
-| `--nested-drawers`           | Number of nested drawers open                                    |
-| `--drawer-keyboard-inset`    | On-screen keyboard height from the bottom edge (viewport only)   |
+| Variable                     | Description                                                    |
+| ---------------------------- | -------------------------------------------------------------- |
+| `--drawer-swipe-progress`    | Progress toward dismissed (0 = open, 1 = dismissed)            |
+| `--drawer-swipe-movement-x`  | Horizontal swipe offset in pixels                              |
+| `--drawer-swipe-movement-y`  | Vertical swipe offset in pixels                                |
+| `--drawer-swipe-strength`    | Velocity-based strength (scales exit animation duration)       |
+| `--drawer-snap-point-offset` | Vertical offset for snap point positioning                     |
+| `--drawer-height`            | Current drawer height                                          |
+| `--drawer-frontmost-height`  | Height of the frontmost drawer in a nested stack               |
+| `--nested-drawers`           | Number of nested drawers open                                  |
+| `--drawer-keyboard-inset`    | On-screen keyboard height from the bottom edge (viewport only) |

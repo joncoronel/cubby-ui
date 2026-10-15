@@ -58,8 +58,8 @@ Filters                  (FiltersProvider + FiltersBar)
 ## Features
 
 - Each field in the add menu opens its values in a searchable submenu beside the menu (stacked over it on narrow screens), so a chip appears only once it has a value.
-- A select or multiselect field keeps one chip: reopening it shows the current values checked, and the menu edits that chip.
-- Searching the menu also matches values across fields: type "done" to add "Status is Done" in one step. Values already on a chip show as checked, and picking one edits that chip.
+- A select or multiselect field keeps one chip. Reopening the field shows its current values checked, and the menu edits that chip.
+- Searching the menu also matches values across fields: type "done" to add "Status is Done" in one step. Values already on a chip show checked; picking one edits that chip.
 - Chips that outgrow the row scroll sideways, and the add and clear buttons stay in view.
 - A chip still waiting on its value shows a dashed edge and doesn't count as active.
 
@@ -103,7 +103,7 @@ Use `maxSelections` to cap the picks and `labels.selectedCount` to word the "3 s
   <FiltersMultiselect />
 </ComponentPreview>
 
-A `select` field filters on one value at a time, such as "Status is Done". To match any of several values of a field where each item has only one, such as "Status is any of Todo, In progress", declare it as a `multiselect` and hide `includes_all`, which can never match a single value:
+A `select` field filters on one value, such as "Status is Done". To match any of several values when each item has only one, such as "Status is any of Todo, In progress", declare the field as `multiselect` and hide `includes_all`, which never matches a single value:
 
 ```tsx
 {
@@ -117,9 +117,9 @@ A `select` field filters on one value at a time, such as "Status is Done". To ma
 
 ### Duplicate fields
 
-By default each field gets one chip. Set `allowDuplicateFields` to let text, number, and custom fields have more than one, such as a title that contains one word and not another. A field's own `allowDuplicates` overrides the bar. Here Estimate opts out, since `between` already fits a range in one chip.
+Each field gets one chip by default. Set `allowDuplicateFields` to let text, number, and custom fields have more, such as a title that contains one word and not another. A field's own `allowDuplicates` overrides the bar. Here Estimate opts out, since `between` fits a range in one chip.
 
-Select and multiselect fields always keep one chip: it already holds any number of values, so the add menu edits it instead.
+Select and multiselect fields always keep one chip. It holds any number of values, so the add menu edits it.
 
 <ComponentPreview component="filters" example="filters-duplicates">
   <FiltersDuplicates />
@@ -250,7 +250,7 @@ Use `FiltersProvider` and `FiltersBar` separately when UI outside the row (a res
 ### Screen readers
 
 - Each chip is a group named after its filter, such as "Status is In progress", and each segment names itself.
-- In the add menu, a single-choice field lists its values as radio items and a multi-choice field as checkboxes, so the current value is announced as checked.
+- In the add menu, a single-choice field lists its values as radio items and a multi-choice field as checkboxes, so screen readers announce the current value as checked.
 - A hidden status region announces adds, removes, and clears, since focus lands elsewhere.
 - The add menu flags an unreadable number with an "Enter a number" hint tied to the input.
 
@@ -308,8 +308,8 @@ Filters composes Cubby UI primitives and has no Base UI root of its own.
   Lets text, number, and custom fields have more than one filter, such as
   "contains" one word and "does not contain" another. A field's own
   `allowDuplicates` overrides it. Select and multiselect fields always keep one
-  filter, since one chip already holds any number of values. For a number range,
-  use the `between` operator rather than two filters.
+  filter, since one chip holds any number of values. For a number range, use
+  `between` instead of two filters.
 </ApiProp>
 
 <ApiProp name="shortcut" fullType="string">
@@ -438,7 +438,7 @@ A union keyed on `type`. Every field has `id`, `label`, and optional `icon`, `op
 | `text`, `number`        | `prefix`, `suffix`, `placeholder`; `number` also takes `step` |
 | `custom`                | `renderValue`, and optional `defaultValue` and `formatValue`  |
 
-Text, number, and custom fields also take `allowDuplicates`, which lets that field have more than one filter and overrides the bar's `allowDuplicateFields`.
+Text, number, and custom fields also take `allowDuplicates`, which allows more than one filter on that field and overrides the bar's `allowDuplicateFields`.
 
 `renderValue` renders as its own component, so it can use hooks. `formatValue` turns the value into text for the chip's name; strings, numbers, and booleans work without it.
 

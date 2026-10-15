@@ -39,9 +39,8 @@ import type {
   TextFilterField,
 } from "./lib/filters-types";
 
-// Breathing room above the first option and below the last in the chips'
-// value lists, dropped once nothing matches so the empty message sits evenly
-// between the field and whatever follows.
+// Padding around the chips' value lists, dropped once nothing matches so the
+// empty message sits evenly.
 const LIST_PADDING = "py-1 not-has-[[data-slot=combobox-item]]:py-0";
 
 interface ValueControlProps<F extends FilterField> {

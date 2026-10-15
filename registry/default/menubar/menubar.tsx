@@ -164,10 +164,7 @@ function MenubarContent({
 }: React.ComponentProps<typeof BaseMenu.Popup> & {
   /** Classes for the positioner (the element Base UI moves into place), merged last. */
   positionerClassName?: string;
-  /**
-   * Classes for the padded box around the items, e.g. `p-0` for a filterable
-   * menu, whose field and list bring their own spacing.
-   */
+  /** Classes for the padded box around the items, e.g. `p-0` for a filterable menu. */
   viewportClassName?: string;
   align?: BaseMenu.Positioner.Props["align"];
   alignOffset?: BaseMenu.Positioner.Props["alignOffset"];
@@ -235,10 +232,7 @@ function MenubarContent({
             // content box, so the width bound is inherited for free.
             className={cn(
               "relative max-h-(--available-height) w-full overflow-clip overflow-y-auto p-1",
-              // A column down to Base UI's content wrapper, so a filterable menu's
-              // list shrinks to fit a short screen (as in Combobox and Select). Not
-              // while content swaps: the viewport's height animates then, and letting
-              // the new content shrink with it would collapse its separators.
+              // Lets a filterable list shrink to fit; off during swaps (see DropdownMenu).
               "flex flex-col *:data-current:flex *:data-current:flex-col not-data-transitioning:*:data-current:min-h-0",
               viewportClassName,
             )}

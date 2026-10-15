@@ -218,9 +218,8 @@ export function operatorShapeFor(
 }
 
 /**
- * Whether `field` can have more than one filter. Option fields never can: one
- * chip already holds any number of values, so the add menu edits it instead.
- * Other fields use their `allowDuplicates`, falling back to the bar's default.
+ * Whether `field` can have more than one filter. Option fields never can (one
+ * chip holds every value); others use `allowDuplicates` or the bar's default.
  */
 export function allowsDuplicates(
   field: FilterField,
@@ -230,10 +229,7 @@ export function allowsDuplicates(
   return field.allowDuplicates ?? barDefault;
 }
 
-/**
- * A search field's accessible name, from its placeholder: the trailing "..."
- * (or "…") is a visual cue, not something a screen reader should read out.
- */
+/** A search field's accessible name: its placeholder without the trailing "..." or "…". */
 export function nameFromPlaceholder(placeholder: string): string {
   return placeholder.replace(/\s*(\.{3}|…)$/, "");
 }

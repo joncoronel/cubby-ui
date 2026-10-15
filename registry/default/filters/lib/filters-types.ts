@@ -160,10 +160,7 @@ export interface FiltersLabels {
   fields: string;
   /** Group heading for matching values in the add menu while searching. */
   values: string;
-  /**
-   * @deprecated The add menu opens values in submenus and has no back button
-   * any more. Kept so existing overrides still type-check.
-   */
+  /** @deprecated The add menu has no back button. Kept so existing overrides type-check. */
   back: string;
   /** Closes the add menu after picking several values of a multiselect. */
   done: string;

@@ -52,7 +52,7 @@ DropdownMenu
 
 `DropdownMenuContent` composes the portal, positioner, and popup internally, so you place items directly inside it.
 
-To control positioning or the popup yourself, compose the parts instead: `DropdownMenuPortal` › `DropdownMenuPositioner` › `DropdownMenuPopup`. `DropdownMenuContent` also wraps its items in a `DropdownMenuViewport`, which crossfades content when detached triggers swap the menu. Leave the viewport out of menus that never swap content: without it Base UI positions the menu with `transform`, which keeps movement on the compositor.
+To control positioning or the popup yourself, compose the parts: `DropdownMenuPortal` › `DropdownMenuPositioner` › `DropdownMenuPopup`. `DropdownMenuContent` also wraps its items in a `DropdownMenuViewport`, which crossfades content when detached triggers swap the menu. Leave the viewport out of menus that never swap content: without it Base UI positions the menu with `transform`, which keeps movement on the compositor.
 
 ## Examples
 
@@ -114,7 +114,7 @@ Nest a `DropdownMenuSub` to open a submenu on hover.
 
 ### With Filter
 
-Wrap `DropdownMenu` in `DropdownMenuFilter`, then put a `DropdownMenuInput` above a `DropdownMenuList` to filter items as you type. Wrap a `DropdownMenuSub` in its own `DropdownMenuFilter` to make the submenu searchable too. Pass `viewportClassName="p-0"` to the content: the field and list bring their own spacing, so the list scrolls right to the menu's edges.
+Wrap `DropdownMenu` in `DropdownMenuFilter`, then put a `DropdownMenuInput` above a `DropdownMenuList` to filter items as you type. Wrap a `DropdownMenuSub` in its own `DropdownMenuFilter` to make the submenu searchable too. Pass `viewportClassName="p-0"` to the content; the field and list bring their own spacing, so the list scrolls to the menu's edges.
 
 <ComponentPreview
   component="dropdown-menu"
@@ -186,9 +186,9 @@ Dropdown container with positioning and animations. Composes `DropdownMenuPortal
 </ApiProp>
 
 <ApiProp name="positionerClassName" fullType="string">
-  Classes for the positioner, the element Base UI moves into place. Merged last,
-  so it overrides the defaults, such as `duration-100` for a faster glide.
-  Custom prop not available in Base UI.
+  Classes for the positioner, the element Base UI moves into place. Merged last
+  to override the defaults, such as `duration-100` for a faster glide. Custom
+  prop not available in Base UI.
 </ApiProp>
 
 <ApiProp name="viewportClassName" fullType="string">
@@ -201,15 +201,15 @@ Dropdown container with positioning and animations. Composes `DropdownMenuPortal
 
 #### DropdownMenuPositioner
 
-Base UI's `Menu.Positioner` with a `data-slot`, for composing the parts yourself. It adds no styles, so give it a z-index (`z-50`).
+Positions the menu when you compose the parts yourself. Wraps Base UI's `Menu.Positioner` with a `data-slot` and no styles, so give it a z-index (`z-50`).
 
 #### DropdownMenuPopup
 
-The styled menu surface, with its entrance and exit. Accepts `level` and `shadowLevel` like `DropdownMenuContent`; other props go to `Menu.Popup`.
+Styled menu surface with its entrance and exit. Accepts `level` and `shadowLevel` like `DropdownMenuContent`; other props go to `Menu.Popup`.
 
 #### DropdownMenuViewport
 
-Crossfades content when detached triggers swap what the menu shows, with `p-1` around the items. Props go to `Menu.Viewport`.
+Crossfades content when detached triggers swap what the menu shows, with `p-1` around the items. Wraps Base UI's `Menu.Viewport`.
 
 #### DropdownMenuItem
 
@@ -418,9 +418,9 @@ Submenu container with positioning. Composes `Menu.Portal`, `Menu.Positioner`, a
 </ApiProp>
 
 <ApiProp name="positionerClassName" fullType="string">
-  Classes for the positioner, the element Base UI moves into place. Merged last,
-  so it overrides the defaults, such as `duration-100` for a faster glide.
-  Custom prop not available in Base UI.
+  Classes for the positioner, the element Base UI moves into place. Merged last
+  to override the defaults, such as `duration-100` for a faster glide. Custom
+  prop not available in Base UI.
 </ApiProp>
 
 <ApiProp name="viewportClassName" fullType="string">
@@ -451,7 +451,7 @@ Enables filtering for the `DropdownMenu` or `DropdownMenuSub` it wraps. Wraps Ba
 
 #### DropdownMenuInput
 
-The search field: an icon, Base UI's `Menu.Input`, and a clear button, drawn like the menu's rows. It sits above `DropdownMenuList`, which scrolls on its own with the same edge fade as Combobox's list. Props are forwarded to `Menu.Input`.
+Search field drawn like the menu's rows: an icon, Base UI's `Menu.Input`, and a clear button. It sits above `DropdownMenuList`, which scrolls on its own with the same edge fade as Combobox's list. Props are forwarded to `Menu.Input`.
 
 <ApiPropsList>
 
@@ -471,7 +471,7 @@ The search field: an icon, Base UI's `Menu.Input`, and a clear button, drawn lik
 </ApiProp>
 
 <ApiProp name="clearLabel" fullType="string" defaultValue='"Clear search"'>
-  Accessible name of the clear button, e.g. for a translated menu. Custom prop
+  Accessible name of the clear button, such as a translated label. Custom prop
   not available in Base UI.
 </ApiProp>
 
@@ -479,12 +479,12 @@ The search field: an icon, Base UI's `Menu.Input`, and a clear button, drawn lik
 
 #### DropdownMenuList
 
-Base UI's `Menu.List` inside a `ScrollArea`, so the items scroll below the search field with an edge fade. It is capped at 20rem and shrinks to fit a short screen. `className` goes to the scroll area, e.g. `max-h-96` to change the cap; other props go to `Menu.List`.
+Scrolling list of items below the search field, with an edge fade. Wraps Base UI's `Menu.List` in a `ScrollArea`, capped at 20rem and shrinking to fit a short screen. `className` goes to the scroll area, e.g. `max-h-96` to change the cap; other props go to `Menu.List`.
 
 #### DropdownMenuEmpty
 
-Base UI's `Menu.Empty`: shown in place of the items when nothing matches, lined up with their labels. Props go to `Menu.Empty`.
+Shows in place of the items when nothing matches, lined up with their labels. Wraps Base UI's `Menu.Empty`.
 
 #### DropdownMenuClear
 
-Base UI's `Menu.Clear` as a small icon button that empties the query. `DropdownMenuInput` renders it; use it directly only with `showClear={false}`. Its `aria-label` defaults to `"Clear search"`.
+Small icon button that empties the query. Wraps Base UI's `Menu.Clear`. `DropdownMenuInput` renders it, so use it directly only with `showClear={false}`. Its `aria-label` defaults to `"Clear search"`.

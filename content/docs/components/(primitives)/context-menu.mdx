@@ -88,7 +88,7 @@ Set `indicator="switch"` on `ContextMenuCheckboxItem` to swap the checkmark for 
 
 ### With Filter
 
-Wrap a `ContextMenuSub` (or the whole `ContextMenu`) in `ContextMenuFilter`, then put a `ContextMenuInput` above a `ContextMenuList` to filter items as you type. The parts work the same as [Dropdown Menu's](/docs/components/dropdown-menu#with-filter).
+Wrap a `ContextMenuSub` (or the whole `ContextMenu`) in `ContextMenuFilter`, then put a `ContextMenuInput` above a `ContextMenuList` to filter items as you type. Add `p-0` to that content's `className`, since the field and list bring their own spacing. The parts work the same as [Dropdown Menu's](/docs/components/dropdown-menu#with-filter).
 
 <ComponentPreview component="context-menu" example="context-menu-with-filter" />
 

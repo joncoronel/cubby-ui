@@ -46,7 +46,7 @@ export default function MenubarWithFilter() {
       <MenubarFilter>
         <MenubarMenu>
           <MenubarTrigger>Help</MenubarTrigger>
-          <MenubarContent className="w-64">
+          <MenubarContent className="w-64" viewportClassName="p-0">
             <MenubarInput aria-label="Search help" placeholder="Search..." />
             <MenubarEmpty>No matching topics.</MenubarEmpty>
             <MenubarList>

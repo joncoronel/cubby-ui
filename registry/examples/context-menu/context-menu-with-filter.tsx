@@ -41,7 +41,7 @@ export default function ContextMenuWithFilter() {
         <ContextMenuFilter>
           <ContextMenuSub>
             <ContextMenuSubTrigger>Move to</ContextMenuSubTrigger>
-            <ContextMenuSubContent className="w-56">
+            <ContextMenuSubContent className="w-56 p-0">
               <ContextMenuInput
                 aria-label="Search folders"
                 placeholder="Search folders..."

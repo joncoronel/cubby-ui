@@ -20,7 +20,6 @@ import {
   POPUP_SEARCH_FIELD,
   POPUP_SEARCH_ICON,
   POPUP_SEARCH_INPUT,
-  POPUP_SEARCH_MENU_LIST,
 } from "@/registry/default/lib/popup-search";
 import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 import {
@@ -141,9 +140,17 @@ function DropdownMenuViewport({
         // No `max-w`: `w-full` resolves against the popup's already-capped
         // content box, so the width bound is inherited for free.
         "relative h-full max-h-(--available-height) w-full overflow-clip p-1 [--viewport-padding:0.25rem]",
+        // A column down to Base UI's content wrapper, so a filterable menu's
+        // list shrinks to fit a short screen (as in Combobox and Select). Not
+        // while content swaps: the viewport's height animates then, and letting
+        // the new content shrink with it would collapse its separators.
+        "flex flex-col *:data-current:flex *:data-current:flex-col not-data-transitioning:*:data-current:min-h-0",
         "not-data-transitioning:overflow-y-auto",
-        // Content width
-        "**:data-current:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
+        // Content width, only while content swaps between detached triggers,
+        // so it doesn't re-flow as the popup morphs. Base UI also pins
+        // --popup-width during the entrance, to the content's natural width,
+        // which a width set on the popup or a dropped padding would contradict.
+        "data-transitioning:**:data-current:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
         "**:data-previous:w-[calc(var(--popup-width)-2*var(--viewport-padding))]",
         // Non-directional crossfade, matching Popover: the two halves
         // dissolve in place and both recede to 0.96, so the swap reads
@@ -170,6 +177,7 @@ function DropdownMenuViewport({
 function DropdownMenuContent({
   className,
   positionerClassName,
+  viewportClassName,
   children,
   sideOffset = 4,
   align = "center",
@@ -178,6 +186,11 @@ function DropdownMenuContent({
 }: React.ComponentProps<typeof DropdownMenuPopup> & {
   /** Classes for the positioner (the element Base UI moves into place), merged last. */
   positionerClassName?: string;
+  /**
+   * Classes for the padded box around the items, e.g. `p-0` for a filterable
+   * menu, whose field and list bring their own spacing.
+   */
+  viewportClassName?: string;
   align?: BaseMenu.Positioner.Props["align"];
   sideOffset?: BaseMenu.Positioner.Props["sideOffset"];
   side?: BaseMenu.Positioner.Props["side"];
@@ -206,7 +219,9 @@ function DropdownMenuContent({
           )}
           {...props}
         >
-          <DropdownMenuViewport>{children}</DropdownMenuViewport>
+          <DropdownMenuViewport className={viewportClassName}>
+            {children}
+          </DropdownMenuViewport>
         </DropdownMenuPopup>
       </DropdownMenuPositioner>
     </DropdownMenuPortal>
@@ -491,6 +506,7 @@ function DropdownMenuSubTrigger({
 function DropdownMenuSubContent({
   className,
   positionerClassName,
+  viewportClassName,
   children,
   // 8px, not 0: the positioner anchors to the sub-trigger, which sits 4px
   // inside the parent popup because of its p-1. A 0 offset therefore overlaps
@@ -511,6 +527,11 @@ function DropdownMenuSubContent({
   level?: SurfaceLevel;
   /** Shadow weight (1-8). Pinned to 3 by default so the submenu reads the same dropdown weight as its parent. */
   shadowLevel?: SurfaceLevel;
+  /**
+   * Classes for the padded box around the items, e.g. `p-0` for a filterable
+   * menu, whose field and list bring their own spacing.
+   */
+  viewportClassName?: string;
 }) {
   // Default alignOffset to -5 when align is not "center" to line up first item with trigger
   const defaultAlignOffset = align !== "center" ? -4 : undefined;
@@ -547,7 +568,12 @@ function DropdownMenuSubContent({
             scroll container has to live here or a tall submenu silently
             truncates. The main popups get this from Menu.Viewport; a
             submenu has none, so it is spelled out. */}
-          <div className="max-h-(--available-height) overflow-x-hidden overflow-y-auto p-1">
+          <div
+            className={cn(
+              "flex max-h-(--available-height) flex-col overflow-x-hidden overflow-y-auto p-1",
+              viewportClassName,
+            )}
+          >
             {children}
           </div>
         </BaseMenu.Popup>
@@ -582,8 +608,9 @@ function DropdownMenuInput({
     <div
       data-slot="dropdown-menu-input-group"
       // Above the list, outside its scroll, as in Base UI's filter demo. An
-      // item's height (32px); mb-1 is the gap to the first item.
-      className={cn(POPUP_SEARCH_FIELD, "mb-1 h-8", className)}
+      // item's height (32px), inset like the items; the gap below it is the
+      // list's own padding, so rows scroll right up to the field.
+      className={cn(POPUP_SEARCH_FIELD, "mx-1 mt-1 h-8 shrink-0", className)}
     >
       <HugeiconsIcon
         icon={Search01Icon}
@@ -630,9 +657,17 @@ function DropdownMenuList({
 }) {
   return (
     // The list scrolls on its own so the field above it stays put, with the
-    // same edge fade as Combobox's list.
-    <ScrollArea fadeEdges="y" className={cn(POPUP_SEARCH_MENU_LIST, className)}>
-      <BaseMenu.List data-slot="dropdown-menu-list" {...props} />
+    // same edge fade as Combobox's list. Its padding sits inside the scroll,
+    // as in Combobox, so rows scroll to the popup's edges and up under the
+    // field. Filterable menus drop their container's padding to match. Capped
+    // at 20rem; on a short screen it shrinks as a flex item to fit the popup,
+    // as Combobox's and Select's lists do.
+    <ScrollArea fadeEdges="y" className={cn("max-h-80", className)}>
+      <BaseMenu.List
+        data-slot="dropdown-menu-list"
+        className="p-1"
+        {...props}
+      />
     </ScrollArea>
   );
 }
@@ -641,7 +676,12 @@ function DropdownMenuEmpty({ className, ...props }: BaseMenu.Empty.Props) {
   return (
     <BaseMenu.Empty
       data-slot="dropdown-menu-empty"
-      className={cn("text-muted-foreground px-2.5 py-1.5 text-sm", className)}
+      // Lines up with the item labels. Sits 10px from the field and 10px from
+      // the bottom: the list's 8px of padding still renders below it.
+      className={cn(
+        "text-muted-foreground shrink-0 px-3.5 pt-2.5 pb-0.5 text-sm",
+        className,
+      )}
       {...props}
     />
   );

@@ -13,7 +13,6 @@ import {
   POPUP_SEARCH_FIELD,
   POPUP_SEARCH_ICON,
   POPUP_SEARCH_INPUT,
-  POPUP_SEARCH_MENU_LIST,
 } from "@/registry/default/lib/popup-search";
 import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
 
@@ -134,7 +133,7 @@ function ContextMenuContent({
             // one for), so the popup is its own scroll container: capped at
             // --available-height, clipping on x for the rounded corners and
             // scrolling on y. Without the cap a tall menu runs off screen.
-            "text-popover-foreground relative z-50 max-h-(--available-height) max-w-(--available-width) min-w-[12rem] origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-xl p-1 outline-none",
+            "text-popover-foreground relative z-50 flex max-h-(--available-height) max-w-(--available-width) min-w-[12rem] origin-(--transform-origin) flex-col overflow-x-hidden overflow-y-auto rounded-xl p-1 outline-none",
             // Modern enter/exit — scale + fade from the transform origin, matching
             // popover/dropdown-menu (replaces the legacy animate-in/zoom/slide classes)
             "ease-out-expo transition-[scale,opacity] duration-100",
@@ -454,7 +453,7 @@ function ContextMenuSubContent({
           data-level={level}
           className={cn(
             // Its own scroll container, like ContextMenuContent above.
-            "text-popover-foreground relative z-50 max-h-(--available-height) max-w-(--available-width) min-w-[12rem] origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-xl p-1 outline-none",
+            "text-popover-foreground relative z-50 flex max-h-(--available-height) max-w-(--available-width) min-w-[12rem] origin-(--transform-origin) flex-col overflow-x-hidden overflow-y-auto rounded-xl p-1 outline-none",
             // Modern enter/exit — scale + fade from the transform origin, matching
             // popover/dropdown-menu (replaces the legacy animate-in/zoom/slide classes)
             "ease-out-expo transition-[scale,opacity] duration-100",
@@ -499,8 +498,9 @@ function ContextMenuInput({
     <div
       data-slot="context-menu-input-group"
       // Above the list, outside its scroll, as in Base UI's filter demo. An
-      // item's height (32px); mb-1 is the gap to the first item.
-      className={cn(POPUP_SEARCH_FIELD, "mb-1 h-8", className)}
+      // item's height (32px), inset like the items; the gap below it is the
+      // list's own padding, so rows scroll right up to the field.
+      className={cn(POPUP_SEARCH_FIELD, "mx-1 mt-1 h-8 shrink-0", className)}
     >
       <HugeiconsIcon
         icon={Search01Icon}
@@ -547,9 +547,13 @@ function ContextMenuList({
 }) {
   return (
     // The list scrolls on its own so the field above it stays put, with the
-    // same edge fade as Combobox's list.
-    <ScrollArea fadeEdges="y" className={cn(POPUP_SEARCH_MENU_LIST, className)}>
-      <BaseMenu.List data-slot="context-menu-list" {...props} />
+    // same edge fade as Combobox's list. Its padding sits inside the scroll,
+    // as in Combobox, so rows scroll to the popup's edges and up under the
+    // field. Filterable menus drop their container's padding to match. Capped
+    // at 20rem; on a short screen it shrinks as a flex item to fit the popup,
+    // as Combobox's and Select's lists do.
+    <ScrollArea fadeEdges="y" className={cn("max-h-80", className)}>
+      <BaseMenu.List data-slot="context-menu-list" className="p-1" {...props} />
     </ScrollArea>
   );
 }
@@ -558,7 +562,12 @@ function ContextMenuEmpty({ className, ...props }: BaseMenu.Empty.Props) {
   return (
     <BaseMenu.Empty
       data-slot="context-menu-empty"
-      className={cn("text-muted-foreground px-2.5 py-1.5 text-sm", className)}
+      // Lines up with the item labels. Sits 10px from the field and 10px from
+      // the bottom: the list's 8px of padding still renders below it.
+      className={cn(
+        "text-muted-foreground shrink-0 px-3.5 pt-2.5 pb-0.5 text-sm",
+        className,
+      )}
       {...props}
     />
   );

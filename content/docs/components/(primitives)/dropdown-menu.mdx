@@ -114,7 +114,7 @@ Nest a `DropdownMenuSub` to open a submenu on hover.
 
 ### With Filter
 
-Wrap `DropdownMenu` in `DropdownMenuFilter`, then put a `DropdownMenuInput` above a `DropdownMenuList` to filter items as you type. Wrap a `DropdownMenuSub` in its own `DropdownMenuFilter` to make the submenu searchable too.
+Wrap `DropdownMenu` in `DropdownMenuFilter`, then put a `DropdownMenuInput` above a `DropdownMenuList` to filter items as you type. Wrap a `DropdownMenuSub` in its own `DropdownMenuFilter` to make the submenu searchable too. Pass `viewportClassName="p-0"` to the content: the field and list bring their own spacing, so the list scrolls right to the menu's edges.
 
 <ComponentPreview
   component="dropdown-menu"
@@ -189,6 +189,12 @@ Dropdown container with positioning and animations. Composes `DropdownMenuPortal
   Classes for the positioner, the element Base UI moves into place. Merged last,
   so it overrides the defaults, such as `duration-100` for a faster glide.
   Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="viewportClassName" fullType="string">
+  Classes for the padded box around the items. Pass `p-0` for a filterable menu,
+  whose search field and list bring their own spacing. Custom prop not available
+  in Base UI.
 </ApiProp>
 
 </ApiPropsList>
@@ -411,6 +417,12 @@ Submenu container with positioning. Composes `Menu.Portal`, `Menu.Positioner`, a
   Classes for the positioner, the element Base UI moves into place. Merged last,
   so it overrides the defaults, such as `duration-100` for a faster glide.
   Custom prop not available in Base UI.
+</ApiProp>
+
+<ApiProp name="viewportClassName" fullType="string">
+  Classes for the padded box around the items. Pass `p-0` for a filterable menu,
+  whose search field and list bring their own spacing. Custom prop not available
+  in Base UI.
 </ApiProp>
 
 </ApiPropsList>

@@ -237,6 +237,7 @@ function SelectSubmenu({ field, disabled }: SubmenuProps<SelectFilterField>) {
         <ValueSubmenuTrigger field={field} disabled={disabled} />
         <DropdownMenuSubContent
           className="w-60"
+          viewportClassName="p-0"
           positionerClassName={SUBMENU_POSITIONER_STATIC}
         >
           <DropdownMenuInput
@@ -285,6 +286,7 @@ function MultiSelectSubmenu({
         <ValueSubmenuTrigger field={field} disabled={disabled} />
         <DropdownMenuSubContent
           className="w-60"
+          viewportClassName="p-0"
           positionerClassName={SUBMENU_POSITIONER_STATIC}
         >
           <DropdownMenuInput
@@ -310,9 +312,9 @@ function MultiSelectSubmenu({
               );
             })}
           </DropdownMenuList>
-          {/* Edge to edge under the list: the negative margins cancel the
-              submenu's 4px padding. */}
-          <div className="-mx-1 mt-1 -mb-1 flex h-10 items-center justify-between gap-2 border-t ps-3.5 pe-1.5">
+          {/* Edge to edge under the list, which ends with its own 4px of
+              padding below the last option. */}
+          <div className="flex h-10 items-center justify-between gap-2 border-t ps-3.5 pe-1.5">
             <span className="text-muted-foreground text-xs tabular-nums">
               {values.length > 0
                 ? labels.selectedCount(values.length, field)
@@ -368,11 +370,12 @@ function InputSubmenu({
         <ValueSubmenuTrigger field={field} disabled={disabled} />
         <DropdownMenuSubContent
           className="w-64"
+          viewportClassName="p-0"
           positionerClassName={SUBMENU_POSITIONER_STATIC}
         >
           <div
             data-slot="filter-add-input"
-            className={cn(POPUP_SEARCH_FIELD, "mb-1 h-8")}
+            className={cn(POPUP_SEARCH_FIELD, "mx-1 mt-1 h-8 shrink-0")}
           >
             {prefix && (
               // Pulls in 4px to match the chip's affix spacing.
@@ -769,7 +772,7 @@ function AddMenu({
           >
             <DropdownMenuPopup
               aria-label={labels.add}
-              className="w-64 p-1"
+              className="flex w-64 flex-col"
               finalFocus={() => {
                 const id = focusFilterIdRef.current;
                 focusFilterIdRef.current = null;

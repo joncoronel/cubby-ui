@@ -119,6 +119,11 @@ const LIST_HEIGHT = "max-h-[min(18rem,calc(var(--available-height)-2.5rem))]";
 const LIST_WITH_FOOTER_HEIGHT =
   "max-h-[min(16rem,calc(var(--available-height)-5rem))]";
 
+// Breathing room above the first option and below the last, dropped once
+// nothing matches so the empty message sits evenly between the field and
+// whatever follows.
+const LIST_PADDING = "py-1 not-has-[[data-slot=combobox-item]]:py-0";
+
 /** The drilled-in field at the start of the step's input; clicking it goes back. */
 function ScopeToken({
   field,
@@ -383,7 +388,7 @@ function SelectStep({
           onKeyDown={(event) => backOnEmptyBackspace(event, onBack)}
         />
         <ComboboxEmpty>{labels.noResults}</ComboboxEmpty>
-        <ComboboxList className={cn(LIST_HEIGHT, "py-1")}>
+        <ComboboxList className={cn(LIST_HEIGHT, LIST_PADDING)}>
           {(option: FilterOption) => (
             <ComboboxItem key={option.value} value={option} className="my-0!">
               <OptionContent option={option} />
@@ -459,7 +464,7 @@ function MultiSelectStep({
           onKeyDown={(event) => backOnEmptyBackspace(event, onBack)}
         />
         <ComboboxEmpty>{labels.noResults}</ComboboxEmpty>
-        <ComboboxList className={cn(LIST_WITH_FOOTER_HEIGHT, "py-1")}>
+        <ComboboxList className={cn(LIST_WITH_FOOTER_HEIGHT, LIST_PADDING)}>
           {(option: FilterOption) => (
             <ComboboxItem
               key={option.value}
@@ -927,4 +932,10 @@ function FilterActionsAdd(
   return <AddMenu {...(props as AddMenuProps)} kind="segment" />;
 }
 
-export { FilterAddButton, FilterActionsAdd, FieldIcon, OptionContent };
+export {
+  FilterAddButton,
+  FilterActionsAdd,
+  FieldIcon,
+  LIST_PADDING,
+  OptionContent,
+};

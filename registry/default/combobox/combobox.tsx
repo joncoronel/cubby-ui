@@ -366,7 +366,7 @@ function ComboboxEmpty({ className, ...props }: BaseCombobox.Empty.Props) {
     <BaseCombobox.Empty
       data-slot="combobox-empty"
       className={cn(
-        "text-muted-foreground px-3 py-2.5 text-sm empty:m-0 empty:p-0",
+        "text-muted-foreground px-3.5 py-2.5 text-sm empty:m-0 empty:p-0",
         className,
       )}
       {...props}
@@ -428,7 +428,7 @@ function ComboboxVirtualizedList({
     <>
       <BaseCombobox.Empty
         data-slot="combobox-empty"
-        className="text-muted-foreground px-3 py-2.5 text-sm empty:m-0 empty:p-0"
+        className="text-muted-foreground px-3.5 py-2.5 text-sm empty:m-0 empty:p-0"
       >
         {emptyMessage}
       </BaseCombobox.Empty>

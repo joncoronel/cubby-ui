@@ -15,7 +15,7 @@ import {
 import { TextMorph } from "@/registry/default/text-morph/text-morph";
 import { NumberField as BaseNumberField } from "@base-ui/react/number-field";
 
-import { OptionContent } from "./filters-add-menu";
+import { LIST_PADDING, OptionContent } from "./filters-add-menu";
 import { useFilterChip, useFiltersActions } from "./filters-context";
 import {
   asNumberOrNull,
@@ -172,7 +172,9 @@ function FilterSearchPopup({
         placeholder={placeholder}
       />
       <ComboboxEmpty>{empty}</ComboboxEmpty>
-      <ComboboxList className="max-h-72 py-1">{children}</ComboboxList>
+      <ComboboxList className={cn("max-h-72", LIST_PADDING)}>
+        {children}
+      </ComboboxList>
     </ComboboxPopup>
   );
 }

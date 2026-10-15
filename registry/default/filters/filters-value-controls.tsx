@@ -25,6 +25,7 @@ import {
   CLICK_MORPH_MS,
   FILTER_SEGMENT,
   FILTER_SEGMENT_INTERACTIVE,
+  nameFromPlaceholder,
   operatorShapeFor,
 } from "./lib/filters-utils";
 import type {
@@ -157,11 +158,14 @@ function StackedIcons({ options }: { options: FilterOption[] }) {
 
 function FilterSearchPopup({
   placeholder,
+  label,
   empty,
   className,
   children,
 }: {
   placeholder: string;
+  /** The search field's accessible name, e.g. "Search status". */
+  label: string;
   empty: React.ReactNode;
   className?: string;
   children: React.ComponentProps<typeof ComboboxList>["children"];
@@ -174,6 +178,7 @@ function FilterSearchPopup({
       <ComboboxInput
         showClear={false}
         variant="popup"
+        aria-label={label}
         placeholder={placeholder}
       />
       <ComboboxEmpty>{empty}</ComboboxEmpty>
@@ -251,6 +256,7 @@ function OptionsValueControl({
   const popup = (
     <FilterSearchPopup
       placeholder={labels.searchValues}
+      label={nameFromPlaceholder(labels.searchFieldValues(field))}
       empty={labels.noResults}
     >
       {(option: FilterOption) => (

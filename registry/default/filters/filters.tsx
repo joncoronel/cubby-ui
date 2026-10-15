@@ -771,6 +771,7 @@ export {
 export {
   allowsDuplicates,
   isOptionField,
+  nameFromPlaceholder,
   createFilter,
   patchFilter,
   resolveOperators,

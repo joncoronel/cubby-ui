@@ -230,6 +230,14 @@ export function allowsDuplicates(
   return field.allowDuplicates ?? barDefault;
 }
 
+/**
+ * A search field's accessible name, from its placeholder: the trailing "..."
+ * (or "…") is a visual cue, not something a screen reader should read out.
+ */
+export function nameFromPlaceholder(placeholder: string): string {
+  return placeholder.replace(/\s*(\.{3}|…)$/, "");
+}
+
 /** Whether `field` picks from a list of options (select or multiselect). */
 export function isOptionField(
   field: FilterField,

@@ -3,6 +3,7 @@ import type { FilterField } from "@/registry/default/filters/lib/filters-types";
 import {
   allowsDuplicates,
   isOptionField,
+  nameFromPlaceholder,
   asFilterValues,
   createFilter,
   describeFilter,
@@ -259,5 +260,19 @@ describe("isOptionField", () => {
     expect(isOptionField(status)).toBe(true);
     expect(isOptionField(labels)).toBe(true);
     expect(isOptionField(estimate)).toBe(false);
+  });
+});
+
+describe("nameFromPlaceholder", () => {
+  it("drops a trailing ellipsis in either form", () => {
+    expect(nameFromPlaceholder("Search status...")).toBe("Search status");
+    expect(nameFromPlaceholder("Filter by…")).toBe("Filter by");
+  });
+
+  it("leaves other text alone", () => {
+    expect(nameFromPlaceholder("Search")).toBe("Search");
+    expect(nameFromPlaceholder("Wait... then search")).toBe(
+      "Wait... then search",
+    );
   });
 });

@@ -49,6 +49,7 @@ import {
   asStringArray,
   createFilter,
   isOptionField,
+  nameFromPlaceholder,
   operatorLabel,
   FILTER_SEGMENT,
   FILTER_SEGMENT_INTERACTIVE,
@@ -94,12 +95,6 @@ function OptionContent({ option }: { option: FilterOption }) {
       <span className="truncate">{option.label}</span>
     </span>
   );
-}
-
-// A search field's name, from its placeholder: the trailing "..." is a visual
-// cue, not something a screen reader should read out.
-function fieldName(placeholder: string): string {
-  return placeholder.replace(/\s*(\.{3}|…)$/, "");
 }
 
 function hasValueStep(field: FilterField): boolean {
@@ -308,7 +303,7 @@ function OptionsSubmenu({
           positionerClassName={SUBMENU_POSITIONER_STATIC}
         >
           <DropdownMenuInput
-            aria-label={fieldName(labels.searchFieldValues(field))}
+            aria-label={nameFromPlaceholder(labels.searchFieldValues(field))}
             placeholder={field.placeholder ?? labels.searchFieldValues(field)}
           />
           <DropdownMenuEmpty>{labels.noResults}</DropdownMenuEmpty>
@@ -726,7 +721,7 @@ function AddMenu({
               }}
             >
               <DropdownMenuInput
-                aria-label={fieldName(labels.searchFields)}
+                aria-label={nameFromPlaceholder(labels.searchFields)}
                 placeholder={labels.searchFields}
               />
               <DropdownMenuEmpty>{labels.noFields}</DropdownMenuEmpty>
@@ -738,13 +733,14 @@ function AddMenu({
                     </DropdownMenuGroupLabel>
                   )}
                   {fields.map((field) => {
+                    const valueStep = hasValueStep(field);
                     // Option fields edit their one filter in place, so they
                     // stay open; the rest close once used unless they repeat.
                     const disabled =
                       usedFieldIds.has(field.id) &&
-                      !editsInPlace(field) &&
+                      !(valueStep && isOptionField(field)) &&
                       !allowsDuplicates(field, allowDuplicateFields);
-                    if (!hasValueStep(field)) {
+                    if (!valueStep) {
                       return (
                         <DropdownMenuItem
                           key={field.id}

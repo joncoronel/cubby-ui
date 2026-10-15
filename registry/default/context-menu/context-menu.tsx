@@ -44,7 +44,11 @@ const checkIcon = CheckIcon.map(([tag, attrs]) => [
 ]) as typeof CheckIcon;
 
 const checkmarkClasses =
-  "[&_path]:ease-out-expo [&_path]:transition-[stroke-dashoffset] [&_path]:duration-150 [&_path]:[stroke-dasharray:1] in-data-checked:[&_path]:[stroke-dashoffset:0] in-data-unchecked:[&_path]:[stroke-dashoffset:1] motion-reduce:[&_path]:transition-none";
+  "[&_path]:ease-out-expo [&_path]:transition-[stroke-dashoffset] [&_path]:duration-150 [&_path]:[stroke-dasharray:1] in-data-checked:[&_path]:[stroke-dashoffset:0] in-data-unchecked:[&_path]:[stroke-dashoffset:1] motion-reduce:[&_path]:transition-none" +
+  // Fully undrawn, the dash still ends exactly at the path's start: a
+  // zero-length piece whose round cap shows as a dot on high-density screens.
+  // Fading the unchecked mark out, as Checkbox does, removes it.
+  " transition-opacity duration-150 ease-out in-data-unchecked:opacity-0 motion-reduce:transition-none";
 
 function ContextMenu({
   ...props
@@ -393,7 +397,7 @@ function ContextMenuSubTrigger({
       delay={delay}
       closeDelay={closeDelay}
       className={cn(
-        "data-highlighted:text-accent-foreground data-popup-open:text-accent-foreground data-highlighted:bg-surface-hover data-popup-open:bg-surface-hover flex cursor-default items-center rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-inset:pl-8",
+        "data-highlighted:text-accent-foreground data-popup-open:text-accent-foreground data-highlighted:bg-surface-hover data-popup-open:bg-surface-hover flex cursor-default items-center rounded-md px-2.5 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-60 data-inset:pl-8",
         className,
       )}
       {...props}

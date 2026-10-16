@@ -1,12 +1,8 @@
-// Shared classes for popup lists: their rows, and the search field at the
-// top. Menus, Select, Combobox, Autocomplete and the Filters add menu share
-// them so they can't drift. The field matches the rows (4px gutter, item
-// radius, 10px label inset, height) so the icon starts where labels do.
+// Shared classes for popup list rows and the search field above them, so
+// menus, Select, Combobox, Autocomplete and Filters can't drift. The field
+// matches the rows (gutter, radius, label inset, height).
 
-/**
- * A row's box and text: 32px, 40px on touch screens. To change a row's
- * padding, override `pointer-coarse:py-*` too, or touch screens keep 40px.
- */
+/** A row: 32px, 40px on touch. Padding overrides need a `pointer-coarse:py-*` twin. */
 export const POPUP_ITEM =
   "rounded-md px-2.5 py-1.5 text-sm pointer-coarse:py-2.5";
 

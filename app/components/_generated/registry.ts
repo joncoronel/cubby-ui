@@ -1634,7 +1634,7 @@ export const componentMetadata = {
   "popup-search": {
     "name": "popup-search",
     "title": "popupSearch",
-    "description": "Shared classes for popup lists: their rows, and the search field at the top.",
+    "description": "Shared classes for popup list rows and the search field above them, so menus, Select, Combobox, Autocomplete and Filters can't drift.",
     "category": "UI",
     "registryDependencies": [],
     "dependencies": [],

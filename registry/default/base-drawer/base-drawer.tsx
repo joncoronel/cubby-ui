@@ -637,7 +637,7 @@ function BaseDrawerMenuTrigger({
   return (
     <BaseDrawerTrigger
       className={cn(
-        "text-foreground hover:bg-surface-hover hover:text-accent-foreground focus-visible:outline-ring/50 flex min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid sm:text-sm sm:not-pointer-coarse:min-h-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
+        "text-foreground hover:bg-surface-hover hover:text-accent-foreground focus-visible:outline-ring/50 flex min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid sm:text-sm sm:not-pointer-coarse:min-h-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4.5 sm:not-pointer-coarse:[&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       data-slot="base-drawer-menu-trigger"
@@ -684,14 +684,14 @@ function BaseDrawerMenuCheckboxItem({
     <CheckboxPrimitive.Root
       checked={checked}
       className={cn(
-        "text-foreground hover:bg-surface-hover hover:text-accent-foreground focus-visible:outline-ring/50 grid min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid data-disabled:pointer-events-none data-disabled:opacity-60 sm:text-sm sm:not-pointer-coarse:min-h-8 [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
+        "text-foreground hover:bg-surface-hover hover:text-accent-foreground focus-visible:outline-ring/50 grid min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid data-disabled:pointer-events-none data-disabled:opacity-60 sm:text-sm sm:not-pointer-coarse:min-h-8 [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:not-pointer-coarse:[&_svg:not([class*='size-'])]:size-4",
         // `group/switch` lets a switch indicator pick up the row's press
         // state, so the whole row behaves as the control rather than just the
         // switch. Named, so an unrelated `.group` on an ancestor cannot.
         "group/switch",
         indicator === "switch"
           ? "grid-cols-[1fr_auto] gap-4 pe-1.5"
-          : "grid-cols-[1fr_1.125rem] pe-2 sm:grid-cols-[1fr_1rem]",
+          : "grid-cols-[1fr_1.125rem] pe-2 sm:not-pointer-coarse:grid-cols-[1fr_1rem]",
         className,
       )}
       data-slot="base-drawer-menu-checkbox-item"
@@ -766,8 +766,8 @@ function BaseDrawerMenuRadioItem({
   return (
     <RadioPrimitive.Root
       className={cn(
-        "text-foreground hover:bg-surface-hover hover:text-accent-foreground focus-visible:outline-ring/50 grid min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid data-disabled:pointer-events-none data-disabled:opacity-60 sm:text-sm sm:not-pointer-coarse:min-h-8 [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
-        "grid-cols-[1fr_1.125rem] items-center pe-2 sm:grid-cols-[1fr_1rem]",
+        "text-foreground hover:bg-surface-hover hover:text-accent-foreground focus-visible:outline-ring/50 grid min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid data-disabled:pointer-events-none data-disabled:opacity-60 sm:text-sm sm:not-pointer-coarse:min-h-8 [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:not-pointer-coarse:[&_svg:not([class*='size-'])]:size-4",
+        "grid-cols-[1fr_1.125rem] items-center pe-2 sm:not-pointer-coarse:grid-cols-[1fr_1rem]",
         className,
       )}
       data-slot="base-drawer-menu-radio-item"

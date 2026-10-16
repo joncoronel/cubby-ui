@@ -185,7 +185,7 @@ const DEFAULT_CLASS_NAMES: NonNullable<DayPickerProps["classNames"]> = {
   ),
   // Fixed side columns keep the caption centred on a month without arrows.
   month: cn(
-    "grid grid-cols-[2.25rem_1fr_2.25rem] grid-rows-[auto_1fr] gap-y-1 sm:grid-cols-[2rem_1fr_2rem]",
+    "grid grid-cols-[2.25rem_1fr_2.25rem] grid-rows-[auto_1fr] gap-y-1 sm:not-pointer-coarse:grid-cols-[2rem_1fr_2rem]",
     "max-sm:relative max-sm:isolate",
     "max-sm:before:absolute max-sm:before:inset-x-0 max-sm:before:top-0 max-sm:before:-z-1 max-sm:before:h-[calc(var(--calendar-header)-0.25rem)] max-sm:before:rounded-xl max-sm:before:bg-muted",
   ),

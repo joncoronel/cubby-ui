@@ -113,7 +113,7 @@ function ToggleGroup({
 }
 
 const itemClasses = cn(
-  "h-auto min-w-auto self-stretch border border-transparent text-sm sm:h-auto sm:min-w-auto",
+  "h-auto min-w-auto self-stretch border border-transparent text-sm sm:not-pointer-coarse:h-auto sm:not-pointer-coarse:min-w-auto",
   // Icon-only items drop their padding, so they're square.
   "data-icon-only:px-0",
   // Box corners are the plate's + 2px; the focus ring sits on the plate.

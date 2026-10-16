@@ -176,11 +176,15 @@ const inputGroupButtonVariants = cva(
       },
     },
     compoundVariants: [
-      { size: "default", placement: "inline", className: "h-auto sm:h-auto" },
+      {
+        size: "default",
+        placement: "inline",
+        className: "h-auto sm:not-pointer-coarse:h-auto",
+      },
       {
         size: "icon",
         placement: "inline",
-        className: "size-auto aspect-square sm:size-auto",
+        className: "size-auto aspect-square sm:not-pointer-coarse:size-auto",
       },
       {
         size: "default",
@@ -249,7 +253,7 @@ function InputGroupInput({ className, size, ...props }: InputGroupInputProps) {
       data-slot="input-group-control"
       size={size}
       className={cn(
-        "h-auto flex-1 self-stretch rounded-none border-0 bg-transparent shadow-none focus-visible:outline-0 aria-invalid:outline-0 sm:h-auto dark:bg-transparent",
+        "h-auto flex-1 self-stretch rounded-none border-0 bg-transparent shadow-none focus-visible:outline-0 aria-invalid:outline-0 sm:not-pointer-coarse:h-auto dark:bg-transparent",
         // Small padding in a small group, weak enough that addon-side
         // padding still wins
         "in-[[data-slot=input-group][data-size=sm]]:px-2.5 in-[[data-slot=input-group][data-size=sm]]:py-1.5",

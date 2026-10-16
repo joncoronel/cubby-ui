@@ -19,10 +19,8 @@ const inputGroupVariants = cva(
     // A block addon sits closer to an input.
     "[&:has(>input)>[data-align=block-start]]:pt-2.5 [&:has(>input)>[data-align=block-end]]:pb-2.5",
 
-    // Variants based on alignment. The input checks its siblings rather
-    // than `:has()` on the group: Chrome prices `:has()` by the element it
-    // styles, and an `input` there makes every DOM insertion restyle every
-    // input on the page.
+    // Variants based on alignment. The input checks its siblings, not the
+    // group, so `:has()` stays cheap (see CODE_STANDARDS.md, Performance).
     "[&>input:is(:has(~[data-align=inline-start]),[data-align=inline-start]~*)]:pl-2",
     "[&>input:is(:has(~[data-align=inline-end]),[data-align=inline-end]~*)]:pr-2",
     "has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col [&>input:is(:has(~[data-align=block-start]),[data-align=block-start]~*)]:pb-3",
@@ -78,10 +76,8 @@ function InputGroup({ className, variant, size, ...props }: InputGroupProps) {
 const inputGroupAddonVariants = cva(
   [
     "text-muted-foreground flex h-auto cursor-text items-center justify-center gap-2 text-sm font-medium select-none [&>svg:not([class*='size-'])]:size-4 [&>kbd]:rounded-[calc(var(--radius)-5px)]",
-    // Dimmed while the control is disabled. Written from the addon so it's
-    // matched by its own class: Chrome prices `:has()` by the element it
-    // styles, and a `data-slot` target makes every DOM insertion restyle
-    // the whole page.
+    // Dimmed while the control is disabled. Written from the addon so
+    // `:has()` stays cheap (see CODE_STANDARDS.md, Performance).
     "[[data-slot=input-group]:has([data-slot=input-group-control]:disabled)>&]:opacity-60",
   ],
   {

@@ -6,10 +6,6 @@ import { useRender } from "@base-ui/react/use-render";
 
 import { cn } from "@/lib/utils";
 
-// A title and description share the row only when both are there. Set on
-// each part as `[<root>:has(…)>&]`, so the styled element is matched by its
-// own class: Chrome prices `:has()` by the element it styles, and a
-// `data-slot` target makes every DOM insertion restyle the whole page.
 const alertVariants = cva(
   "relative w-full rounded-lg border border-border/70 px-4 py-3 pl-6 text-sm grid has-[>svg]:grid-cols-[auto_1fr] grid-cols-[0_1fr] has-[>svg]:gap-x-3 gap-y-0.5 items-start [&>svg]:row-span-2 [&>svg]:text-current shadow-sm has-[*[data-slot=alert-action]]:grid-cols-[0_1fr] has-[>svg]:has-[*[data-slot=alert-action]]:grid-cols-[auto_1fr] sm:has-[*[data-slot=alert-action]]:grid-cols-[0_1fr_auto] sm:has-[>svg]:has-[*[data-slot=alert-action]]:grid-cols-[auto_1fr_auto] [&>svg]:size-5 group before:absolute before:left-2 before:top-2 before:bottom-2 before:w-1 before:rounded-full bg-card dark:bg-muted",
   {
@@ -54,6 +50,8 @@ export type AlertTitleProps = useRender.ComponentProps<"h4">;
 function AlertTitle({ className, render, ...props }: AlertTitleProps) {
   const defaultProps = {
     "data-slot": "alert-title",
+    // Title and description share the row only when both are there. Written
+    // from each part, not the root, so `:has()` stays cheap (see CODE_STANDARDS.md, Performance).
     className: cn(
       "col-start-2 min-h-4 font-medium tracking-tight row-span-2 self-center text-card-foreground [[data-slot=alert]:has(>[data-slot=alert-description])>&]:row-span-1",
       className,

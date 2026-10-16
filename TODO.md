@@ -149,7 +149,7 @@ Cause: Chrome prices a `:has()` on an ancestor by the element the rule styles. W
 
 Rewrote every costly rule: the glide highlights (Toolbar, Menubar, Button group) now match `[data-…-highlight]` attributes; Button group's hover rule and Filters' clear-segment rules check siblings; Calendar's joined-corner rules match a `calendar-day-button` class; Alert, Autocomplete, InputGroup (addon opacity), Field error and NumberField scrub write the variant on the styled element; InputGroup's input padding beside addons checks siblings. Button group's rule for a Select trigger before a hidden `<select>` was dead (Base UI now renders a hidden `<input>`) and is gone.
 
-Drawer's `html:has()` rules (hide the page scrollbar while a side drawer is open, so it meets the screen edge) now key off a `data-drawer-side` count that DrawerContent sets on `<html>` while mounted.
+Drawer's `html:has()` rules (hide the page scrollbar while a side drawer is open, so it meets the screen edge) now key off a `data-side-drawers` count that DrawerContent sets on `<html>` while mounted.
 
 Residual: `:root:has(.docs-root)` in `app/docs/docs.css` (~0.45ms). Could be a class on `<html>` set by the docs layout, but the root layout owns `<html>`, so it needs an inline script (an effect would flash the wrong frame color) plus cleanup when leaving docs.
 

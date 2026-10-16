@@ -94,7 +94,7 @@ Write code that is **accessible, performant, type-safe, and maintainable**. Focu
 - Avoid barrel files (index files that re-export everything) when they cause circular dependencies
 - Use proper image components (e.g., Next.js `<Image>`) over `<img>` tags
 - Memoize expensive calculations and components when appropriate
-- When `:has()` sits on an ancestor, match the element it styles by its own class or a rare attribute (`[data-toolbar-highlight]`), never by `data-slot`, a bare tag, or `*`. Chrome prices `:has()` by the styled element, so a common one makes every DOM insertion on the page restyle every element like it (~15ms on a large docs page). For Tailwind, write the variant on the target with `&` at the end of the arbitrary selector, or check siblings with `:has(~ …)` on the target itself.
+- When `:has()` sits on an ancestor, match the element it styles by its own class or a rare attribute (`[data-toolbar-highlight]`), never by `data-slot`, a bare tag, or `*`. Chrome prices `:has()` by the styled element, so a common one makes every DOM insertion on the page restyle every element like it (~17ms on a large docs page). For Tailwind, write the variant on the target with `&` at the end of the arbitrary selector, or check siblings with `:has(~ …)` on the target itself.
 
 ### Framework-Specific Guidance
 

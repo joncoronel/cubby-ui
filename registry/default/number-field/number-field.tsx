@@ -99,9 +99,8 @@ function NumberFieldInput({
       className={cn(
         "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground",
         "w-16 min-w-0 self-stretch border-2 border-transparent bg-transparent px-1 text-center text-base font-normal tabular-nums outline-none md:text-sm",
-        // Inline scrub prefix. Written from the input so it's matched by its
-        // own class: Chrome prices `:has()` by the element it styles, and a
-        // `data-slot` target makes every DOM insertion restyle the page.
+        // Inline scrub prefix. Written from the input so `:has()` stays
+        // cheap (see CODE_STANDARDS.md, Performance).
         "[[data-slot=number-field-group]:has(>[data-slot=number-field-scrub-area])>&]:text-left",
         // Dividers: two background layers on the input's edges. Each shows
         // only beside a stepper and collapses while that stepper is lit.

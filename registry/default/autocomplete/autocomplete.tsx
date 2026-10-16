@@ -28,7 +28,7 @@ function AutocompleteInput({
   return (
     <BaseAutocomplete.InputGroup
       data-slot="autocomplete-input-group"
-      className={cn("relative")}
+      className="relative"
     >
       <BaseAutocomplete.Input
         data-slot="autocomplete-input"
@@ -36,9 +36,7 @@ function AutocompleteInput({
           "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground flex h-10 w-full min-w-0 rounded-lg border bg-clip-padding px-3 text-base font-normal disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 sm:h-9 md:text-sm",
           // Room for the clear and trigger buttons while they're there (the
           // clear button only shows with text). Written from the input so
-          // it's matched by its own class: Chrome prices `:has()` by the
-          // element it styles, and a `data-slot` target makes every DOM
-          // insertion restyle the whole page.
+          // `:has()` stays cheap (see CODE_STANDARDS.md, Performance).
           "[[data-slot=autocomplete-input-group]:has([data-slot=autocomplete-clear])>&]:pr-7",
           "[[data-slot=autocomplete-input-group]:has([data-slot=autocomplete-trigger])>&]:pr-7",
           "[[data-slot=autocomplete-input-group]:has([data-slot=autocomplete-clear]):has([data-slot=autocomplete-trigger])>&]:pr-13",

@@ -63,11 +63,11 @@ function FieldError({ className, ...props }: BaseField.Error.Props) {
       data-slot="field-error"
       className={cn(
         "text-destructive text-sm",
-        // In a FieldErrorSlot, swapping errors: the exiting one hides at
-        // once and the entering one shows. Written from the error so it's
-        // matched by its own class: Chrome prices `:has()` by the element it
-        // styles, and a `data-slot` target makes every DOM insertion
-        // restyle the whole page.
+        // In a FieldErrorSlot: fades in and out, and on a swap the exiting
+        // error hides at once while the entering one shows. Written from the
+        // error, not the slot, so `:has()` stays cheap (see CODE_STANDARDS.md, Performance).
+        "[[data-slot=field-error-slot]>&]:transition-opacity [[data-slot=field-error-slot]>&]:duration-140 motion-reduce:[[data-slot=field-error-slot]>&]:transition-none",
+        "[[data-slot=field-error-slot]>&[data-ending-style]]:opacity-0 [[data-slot=field-error-slot]>&[data-starting-style]]:opacity-0",
         "[[data-slot=field-error-slot]:has(>[data-slot=field-error]:not([data-ending-style]))>&[data-ending-style]]:hidden",
         "[[data-slot=field-error-slot]:has(>[data-slot=field-error][data-ending-style])>&[data-starting-style]]:opacity-100",
         className,
@@ -85,9 +85,6 @@ function FieldErrorSlot({ className, ...props }: React.ComponentProps<"div">) {
         "-mt-2 grid h-0 overflow-clip [interpolate-size:allow-keywords] *:col-start-1 *:row-start-1",
         "ease-out-expo transition-[height,margin-top] duration-140 motion-reduce:transition-none",
         "has-[[data-slot=field-error]:not([data-ending-style])]:mt-0 has-[[data-slot=field-error]:not([data-ending-style])]:h-auto",
-        // Opacity fade on child FieldError
-        "*:data-[slot=field-error]:transition-opacity *:data-[slot=field-error]:duration-140 motion-reduce:*:data-[slot=field-error]:transition-none",
-        "[&>[data-slot=field-error][data-ending-style]]:opacity-0 [&>[data-slot=field-error][data-starting-style]]:opacity-0",
         className,
       )}
       {...props}

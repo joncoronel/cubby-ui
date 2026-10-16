@@ -34,13 +34,14 @@ export const FILTER_SEGMENT = cn(
 /**
  * Ends of a chip or the actions capsule get the 2px border. `of` counts
  * segments only, so Base UI's guard spans can't move them. In the capsule,
- * add is the end until clear unfolds.
+ * add is the end until clear unfolds, which add reads from its sibling to
+ * keep `:has()` cheap.
  */
 export const FILTER_ENDS = cn(
   "[&>:nth-child(1_of_[data-slot^=filter-chip-])]:border-s-2 [&>:nth-last-child(1_of_[data-slot^=filter-chip-])]:border-e-2",
   // With clear unfolded, add and clear reach to the separator's line.
-  "[&:has([data-slot=filter-clear-segment][data-active])_[data-slot=filter-add]]:after:-end-[5px] [&_[data-slot=filter-clear]]:after:-start-[5px]",
-  "[&_[data-slot=filter-add]]:border-s-2 [&:has([data-slot=filter-clear-segment][data-active])_[data-slot=filter-clear]]:border-e-2 [&:not(:has([data-slot=filter-clear-segment][data-active]))_[data-slot=filter-add]]:border-e-2",
+  "[&_[data-slot=filter-add]:has(~[data-slot=filter-clear-segment][data-active])]:after:-end-[5px] [&_[data-slot=filter-clear]]:after:-start-[5px]",
+  "[&_[data-slot=filter-add]]:border-s-2 [&_[data-slot=filter-clear-segment][data-active]_[data-slot=filter-clear]]:border-e-2 [&_[data-slot=filter-add]:not(:has(~[data-slot=filter-clear-segment][data-active]))]:border-e-2",
 );
 
 /** Icon-only segments: the plate (content box) is square. */

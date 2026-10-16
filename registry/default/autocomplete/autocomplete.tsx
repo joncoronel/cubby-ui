@@ -28,22 +28,17 @@ function AutocompleteInput({
   return (
     <BaseAutocomplete.InputGroup
       data-slot="autocomplete-input-group"
-      className={cn(
-        "relative",
-        // Room for the clear and trigger buttons while they're there (the
-        // clear button only shows with text). On the group, with the input,
-        // a direct child, as the target: `has-*:**:` variants compile to
-        // `:has()` inside `:is(… *)`, which makes Chrome restyle the whole
-        // page on any DOM insertion.
-        "[&:has([data-slot=autocomplete-clear])>[data-slot=autocomplete-input]]:pr-7",
-        "[&:has([data-slot=autocomplete-trigger])>[data-slot=autocomplete-input]]:pr-7",
-        "[&:has([data-slot=autocomplete-clear]):has([data-slot=autocomplete-trigger])>[data-slot=autocomplete-input]]:pr-13",
-      )}
+      className="relative"
     >
       <BaseAutocomplete.Input
         data-slot="autocomplete-input"
         className={cn(
           "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground flex h-10 w-full min-w-0 rounded-lg border bg-clip-padding px-3 text-base font-normal disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 sm:h-9 md:text-sm",
+          // Room for the clear (shown with text) and trigger buttons. Set on
+          // the input, not the group, to keep `:has()` cheap.
+          "[[data-slot=autocomplete-input-group]:has([data-slot=autocomplete-clear])>&]:pr-7",
+          "[[data-slot=autocomplete-input-group]:has([data-slot=autocomplete-trigger])>&]:pr-7",
+          "[[data-slot=autocomplete-input-group]:has([data-slot=autocomplete-clear]):has([data-slot=autocomplete-trigger])>&]:pr-13",
           variant === "default" ? "bg-input" : "bg-input-elevated",
           "file:text-foreground file:inline-flex file:h-7 file:rounded-md file:border-0 file:bg-transparent file:text-sm file:font-medium",
           "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",

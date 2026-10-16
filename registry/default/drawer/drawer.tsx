@@ -905,6 +905,19 @@ function DrawerContentInner({
     parentNesting?.setNestedDragging(isDragging);
   }, [isDragging, parentNesting]);
 
+  // Counts mounted side drawers on <html> for drawer.css. An `html:has()`
+  // would re-check <html> on every DOM change.
+  React.useLayoutEffect(() => {
+    if (isVertical) return;
+    const { dataset } = document.documentElement;
+    dataset.sideDrawers = String(Number(dataset.sideDrawers ?? 0) + 1);
+    return () => {
+      const count = Number(dataset.sideDrawers ?? 1) - 1;
+      if (count > 0) dataset.sideDrawers = String(count);
+      else delete dataset.sideDrawers;
+    };
+  }, [isVertical]);
+
   React.useLayoutEffect(() => {
     if (!open) {
       parentNesting?.clearNestedDragProgress();

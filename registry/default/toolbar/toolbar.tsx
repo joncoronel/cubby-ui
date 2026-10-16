@@ -129,7 +129,13 @@ function Toolbar({
         {...props}
       >
         {children}
-        {highlight && <span aria-hidden data-slot="toolbar-highlight" />}
+        {highlight && (
+          <span
+            aria-hidden
+            data-slot="toolbar-highlight"
+            data-toolbar-highlight
+          />
+        )}
       </BaseToolbar.Root>
     </ToolbarContext.Provider>
   );

@@ -28,8 +28,6 @@ const numberFieldGroupVariants = cva(
     // Disabled: dims once here; the steppers' own disabled opacity is
     // cancelled so it doesn't stack. A stepper alone at min or max still dims.
     "data-disabled:opacity-60 data-disabled:[&_button]:opacity-100",
-    // Inline scrub prefix
-    "has-[>[data-slot=number-field-scrub-area]]:[&>[data-slot=number-field-input]]:text-left",
   ],
   {
     variants: {
@@ -101,6 +99,8 @@ function NumberFieldInput({
       className={cn(
         "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground",
         "w-16 min-w-0 self-stretch border-2 border-transparent bg-transparent px-1 text-center text-base font-normal tabular-nums outline-none md:text-sm",
+        // Inline scrub prefix. Set on the input to keep `:has()` cheap.
+        "[[data-slot=number-field-group]:has(>[data-slot=number-field-scrub-area])>&]:text-left",
         // Dividers: two background layers on the input's edges. Each shows
         // only beside a stepper and collapses while that stepper is lit.
         "bg-[linear-gradient(var(--border),var(--border)),linear-gradient(var(--border),var(--border))] [background-size:1px_var(--number-field-divider-s,0px),1px_var(--number-field-divider-e,0px)] [background-position:left_center,right_center] bg-no-repeat [background-origin:border-box] transition-[background-size] duration-100 ease-out motion-reduce:transition-none",

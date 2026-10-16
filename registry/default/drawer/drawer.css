@@ -35,18 +35,13 @@
   }
 }
 
-/* Horizontal drawers: prevent page scroll interference */
-html:has([data-slot="drawer-viewport"][data-direction="left"]),
-html:has([data-slot="drawer-viewport"][data-direction="right"]) {
+/* Side drawers: no page scrollbar (the scroll lock leaves its gutter), so
+ * the drawer meets the screen edge. DrawerContent sets the attribute. */
+html[data-side-drawers] {
   overscroll-behavior: none;
   scrollbar-width: none;
 }
 
-html:has(
-    [data-slot="drawer-viewport"][data-direction="left"]
-  )::-webkit-scrollbar,
-html:has(
-    [data-slot="drawer-viewport"][data-direction="right"]
-  )::-webkit-scrollbar {
+html[data-side-drawers]::-webkit-scrollbar {
   display: none !important;
 }

@@ -210,6 +210,7 @@ const DEFAULT_CLASS_NAMES: NonNullable<DayPickerProps["classNames"]> = {
     "data-disabled:pointer-events-none",
   ),
   day_button: cn(
+    "calendar-day-button",
     cellButtonClassName,
     // Outside the displayed month
     "group-data-muted/day:text-muted-foreground",

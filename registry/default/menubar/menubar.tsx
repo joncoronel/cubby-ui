@@ -109,7 +109,13 @@ function Menubar({
       {...props}
     >
       {children}
-      {highlight && <span aria-hidden data-slot="menubar-highlight" />}
+      {highlight && (
+        <span
+          aria-hidden
+          data-slot="menubar-highlight"
+          data-menubar-highlight
+        />
+      )}
     </BaseMenubar>
   );
 }

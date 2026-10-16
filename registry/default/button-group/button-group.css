@@ -4,7 +4,7 @@
  * hover.
  * -------------------------------------------------------------------------------------------------*/
 
-[data-slot="button-group-highlight"] {
+[data-button-group-highlight] {
   display: none;
 }
 
@@ -265,24 +265,31 @@
     anchor-name: --button-group-item;
   }
 
+  /* Checks siblings: a `:has()` on the group would restyle every button on
+   * any DOM change. */
   @media (hover: hover) {
-    [data-slot="button-group"][data-glide]:not(
-        :has(
-          > [data-popup-open],
-          > :active,
-          > :is(button, a[href], [role="button"]):focus-visible
-        )
-      )
+    [data-slot="button-group"][data-glide]
       > :is(button, a[href], [role="button"]):not(
         :disabled,
-        [data-disabled]
+        [data-disabled],
+        [data-popup-open],
+        :active,
+        :focus-visible
+      ):not(
+        :has(
+          ~ [data-popup-open],
+          ~ :active,
+          ~ :is(button, a[href], [role="button"]):focus-visible
+        ),
+        [data-popup-open] ~ *,
+        :active ~ *,
+        :is(button, a[href], [role="button"]):focus-visible ~ *
       ):hover::before {
       anchor-name: --button-group-item;
     }
   }
 
-  [data-slot="button-group"][data-glide]
-    > [data-slot="button-group-highlight"] {
+  [data-slot="button-group"][data-glide] > [data-button-group-highlight] {
     display: block;
     position: absolute;
     position-anchor: --button-group-item;
@@ -306,7 +313,7 @@
           [data-disabled]
         ):is(:focus-visible, :active, [data-popup-open])
     )
-    > [data-slot="button-group-highlight"] {
+    > [data-button-group-highlight] {
     opacity: 1;
   }
 
@@ -317,7 +324,7 @@
             [data-disabled]
           ):hover
       )
-      > [data-slot="button-group-highlight"] {
+      > [data-button-group-highlight] {
       opacity: 1;
     }
   }
@@ -335,7 +342,7 @@
           :disabled
         )
     )
-    > [data-slot="button-group-highlight"] {
+    > [data-button-group-highlight] {
     scale: var(--group-press-scale, 0.98);
     background-color: var(--group-press);
   }
@@ -345,8 +352,7 @@
       --group-press-scale: 1;
     }
 
-    [data-slot="button-group"][data-glide]
-      > [data-slot="button-group-highlight"] {
+    [data-slot="button-group"][data-glide] > [data-button-group-highlight] {
       transition: background-color 100ms
         var(--ease-out, cubic-bezier(0, 0, 0.2, 1));
     }

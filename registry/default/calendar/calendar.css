@@ -232,19 +232,20 @@
  *
  * Selected days side by side in a week join into one shape: the corners
  * between them square off. In multiple mode that's any two picks; in range
- * mode, a two-day range's ends. Logical corners, so it holds in RTL.
+ * mode, a two-day range's ends. Logical corners, so it holds in RTL. The
+ * button is matched by class to keep `:has()` cheap.
  * -------------------------------------------------------------------------------------------------*/
 
 [data-slot="calendar"][data-mode="multiple"]
   [data-slot="calendar-day"][data-filled]:not([data-hidden]):has(
     + [data-filled]:not([data-hidden])
   )
-  > button::before,
+  > .calendar-day-button::before,
 [data-slot="calendar"][data-mode="range"]
   [data-slot="calendar-day"][data-range-start]:not([data-hidden]):has(
     + [data-range-end]:not([data-hidden])
   )
-  > button::before {
+  > .calendar-day-button::before {
   border-start-end-radius: 0;
   border-end-end-radius: 0;
 }
@@ -252,11 +253,11 @@
 [data-slot="calendar"][data-mode="multiple"]
   [data-slot="calendar-day"][data-filled]:not([data-hidden])
   + [data-filled]:not([data-hidden])
-  > button::before,
+  > .calendar-day-button::before,
 [data-slot="calendar"][data-mode="range"]
   [data-slot="calendar-day"][data-range-start]:not([data-hidden])
   + [data-range-end]:not([data-hidden])
-  > button::before {
+  > .calendar-day-button::before {
   border-start-start-radius: 0;
   border-end-start-radius: 0;
 }

@@ -146,7 +146,7 @@
  * item paints its own hover.
  * -------------------------------------------------------------------------------------------------*/
 
-[data-slot="toolbar-highlight"] {
+[data-toolbar-highlight] {
   display: none;
 }
 
@@ -208,7 +208,7 @@
     }
   }
 
-  [data-slot="toolbar"][data-glide] > [data-slot="toolbar-highlight"] {
+  [data-slot="toolbar"][data-glide] > [data-toolbar-highlight] {
     display: block;
     position: absolute;
     position-anchor: --toolbar-item;
@@ -233,7 +233,7 @@
           [aria-expanded="true"]
         )
     )
-    > [data-slot="toolbar-highlight"] {
+    > [data-toolbar-highlight] {
     opacity: 1;
   }
 
@@ -245,7 +245,7 @@
             [data-pressed]
           ):hover
       )
-      > [data-slot="toolbar-highlight"] {
+      > [data-toolbar-highlight] {
       opacity: 1;
     }
   }
@@ -265,7 +265,7 @@
           [aria-haspopup]
         )
     )
-    > [data-slot="toolbar-highlight"] {
+    > [data-toolbar-highlight] {
     background-color: var(--toolbar-press);
     scale: var(--toolbar-press-scale, 0.98);
   }
@@ -275,7 +275,7 @@
       --toolbar-press-scale: 1;
     }
 
-    [data-slot="toolbar"][data-glide] > [data-slot="toolbar-highlight"] {
+    [data-slot="toolbar"][data-glide] > [data-toolbar-highlight] {
       transition: background-color 100ms
         var(--ease-out, cubic-bezier(0, 0, 0.2, 1));
     }

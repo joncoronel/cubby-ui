@@ -18,7 +18,7 @@
  * trigger paints its own hover.
  * -------------------------------------------------------------------------------------------------*/
 
-[data-slot="menubar-highlight"] {
+[data-menubar-highlight] {
   display: none;
 }
 
@@ -68,7 +68,7 @@
     }
   }
 
-  [data-slot="menubar"][data-glide] > [data-slot="menubar-highlight"] {
+  [data-slot="menubar"][data-glide] > [data-menubar-highlight] {
     display: block;
     position: absolute;
     position-anchor: --menubar-item;
@@ -92,7 +92,7 @@
           [data-popup-open]
         )
     )
-    > [data-slot="menubar-highlight"] {
+    > [data-menubar-highlight] {
     opacity: 1;
   }
 
@@ -100,7 +100,7 @@
     [data-slot="menubar"][data-glide]:has(
         [data-menubar-item]:not(:disabled, [data-disabled]):hover
       )
-      > [data-slot="menubar-highlight"] {
+      > [data-menubar-highlight] {
       opacity: 1;
     }
   }
@@ -109,12 +109,12 @@
    * mount blocks the main thread for a few frames. The inset transition runs
    * there too, so it would stutter; the pill jumps with the menu instead. */
   [data-slot="menubar"][data-glide]:has([data-menubar-item][data-popup-open])
-    > [data-slot="menubar-highlight"] {
+    > [data-menubar-highlight] {
     transition-property: background-color;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    [data-slot="menubar"][data-glide] > [data-slot="menubar-highlight"] {
+    [data-slot="menubar"][data-glide] > [data-menubar-highlight] {
       transition: background-color 100ms
         var(--ease-out, cubic-bezier(0, 0, 0.2, 1));
     }

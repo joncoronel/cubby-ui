@@ -265,8 +265,8 @@
     anchor-name: --button-group-item;
   }
 
-  /* Checks the siblings rather than `:has()` on the group, which would make
-   * every DOM insertion on the page restyle every button. */
+  /* Checks siblings: a `:has()` on the group would restyle every button on
+   * any DOM change. */
   @media (hover: hover) {
     [data-slot="button-group"][data-glide]
       > :is(button, a[href], [role="button"]):not(

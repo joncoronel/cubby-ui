@@ -905,11 +905,8 @@ function DrawerContentInner({
     parentNesting?.setNestedDragging(isDragging);
   }, [isDragging, parentNesting]);
 
-  // While side drawers are mounted, <html> carries `data-side-drawers`
-  // (how many, for stacked drawers) so drawer.css can hide the page
-  // scrollbar and the drawer meets the screen edge. An attribute rather than
-  // `html:has()`, which makes Chrome re-check <html> on every DOM change on
-  // any page that loads the stylesheet.
+  // Counts mounted side drawers on <html> for drawer.css. An `html:has()`
+  // would re-check <html> on every DOM change.
   React.useLayoutEffect(() => {
     if (isVertical) return;
     const { dataset } = document.documentElement;

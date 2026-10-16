@@ -63,9 +63,8 @@ function FieldError({ className, ...props }: BaseField.Error.Props) {
       data-slot="field-error"
       className={cn(
         "text-destructive text-sm",
-        // In a FieldErrorSlot: fades in and out, and on a swap the exiting
-        // error hides at once while the entering one shows. Written from the
-        // error, not the slot, so `:has()` stays cheap (see CODE_STANDARDS.md, Performance).
+        // In a FieldErrorSlot: fades in and out; on a swap the old error
+        // hides at once. Set here, not on the slot, to keep `:has()` cheap.
         "[[data-slot=field-error-slot]>&]:transition-opacity [[data-slot=field-error-slot]>&]:duration-140 motion-reduce:[[data-slot=field-error-slot]>&]:transition-none",
         "[[data-slot=field-error-slot]>&[data-ending-style]]:opacity-0 [[data-slot=field-error-slot]>&[data-starting-style]]:opacity-0",
         "[[data-slot=field-error-slot]:has(>[data-slot=field-error]:not([data-ending-style]))>&[data-ending-style]]:hidden",

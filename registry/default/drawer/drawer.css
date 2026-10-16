@@ -35,9 +35,8 @@
   }
 }
 
-/* Side drawers: no page scrollbar, so the drawer meets the screen edge (the
- * scroll lock would leave its gutter showing), and no page overscroll. The
- * attribute is set by DrawerContent while a left or right drawer is mounted. */
+/* Side drawers: no page scrollbar (the scroll lock leaves its gutter), so
+ * the drawer meets the screen edge. DrawerContent sets the attribute. */
 html[data-side-drawers] {
   overscroll-behavior: none;
   scrollbar-width: none;

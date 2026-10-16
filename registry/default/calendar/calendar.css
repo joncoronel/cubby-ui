@@ -233,8 +233,7 @@
  * Selected days side by side in a week join into one shape: the corners
  * between them square off. In multiple mode that's any two picks; in range
  * mode, a two-day range's ends. Logical corners, so it holds in RTL. The
- * button is matched by class: a `button` type selector after `:has()` makes
- * every DOM insertion on the page restyle every button.
+ * button is matched by class to keep `:has()` cheap.
  * -------------------------------------------------------------------------------------------------*/
 
 [data-slot="calendar"][data-mode="multiple"]

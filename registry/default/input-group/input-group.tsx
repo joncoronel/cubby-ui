@@ -19,8 +19,8 @@ const inputGroupVariants = cva(
     // A block addon sits closer to an input.
     "[&:has(>input)>[data-align=block-start]]:pt-2.5 [&:has(>input)>[data-align=block-end]]:pb-2.5",
 
-    // Variants based on alignment. The input checks its siblings, not the
-    // group, so `:has()` stays cheap (see CODE_STANDARDS.md, Performance).
+    // Variants based on alignment. The input checks its siblings to keep
+    // `:has()` cheap.
     "[&>input:is(:has(~[data-align=inline-start]),[data-align=inline-start]~*)]:pl-2",
     "[&>input:is(:has(~[data-align=inline-end]),[data-align=inline-end]~*)]:pr-2",
     "has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col [&>input:is(:has(~[data-align=block-start]),[data-align=block-start]~*)]:pb-3",
@@ -76,8 +76,8 @@ function InputGroup({ className, variant, size, ...props }: InputGroupProps) {
 const inputGroupAddonVariants = cva(
   [
     "text-muted-foreground flex h-auto cursor-text items-center justify-center gap-2 text-sm font-medium select-none [&>svg:not([class*='size-'])]:size-4 [&>kbd]:rounded-[calc(var(--radius)-5px)]",
-    // Dimmed while the control is disabled. Written from the addon so
-    // `:has()` stays cheap (see CODE_STANDARDS.md, Performance).
+    // Dimmed while the control is disabled. Set on the addon, not the
+    // group, to keep `:has()` cheap.
     "[[data-slot=input-group]:has([data-slot=input-group-control]:disabled)>&]:opacity-60",
   ],
   {

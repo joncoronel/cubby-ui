@@ -50,8 +50,8 @@ export type AlertTitleProps = useRender.ComponentProps<"h4">;
 function AlertTitle({ className, render, ...props }: AlertTitleProps) {
   const defaultProps = {
     "data-slot": "alert-title",
-    // Title and description share the row only when both are there. Written
-    // from each part, not the root, so `:has()` stays cheap (see CODE_STANDARDS.md, Performance).
+    // Shares the row with a description. Set here, not on the root, to keep
+    // `:has()` cheap.
     className: cn(
       "col-start-2 min-h-4 font-medium tracking-tight row-span-2 self-center text-card-foreground [[data-slot=alert]:has(>[data-slot=alert-description])>&]:row-span-1",
       className,

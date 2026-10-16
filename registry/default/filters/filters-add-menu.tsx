@@ -308,7 +308,7 @@ function OptionsSubmenu({
         >
           <DropdownMenuInput
             aria-label={nameFromPlaceholder(labels.searchFieldValues(field))}
-            placeholder={field.placeholder ?? labels.searchFieldValues(field)}
+            placeholder={labels.searchFieldValues(field)}
           />
           <DropdownMenuEmpty>{labels.noResults}</DropdownMenuEmpty>
           <DropdownMenuList>

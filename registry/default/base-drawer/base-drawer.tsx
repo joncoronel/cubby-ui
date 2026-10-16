@@ -559,7 +559,7 @@ function BaseDrawerMenuItem({
 }) {
   const defaultProps = {
     className: cn(
-      "flex min-h-9 w-full cursor-default select-none items-center gap-2 rounded-sm px-2 py-1 text-base text-foreground outline-none focus-visible:outline-ring/50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid hover:bg-surface-hover hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-60 data-[variant=destructive]:text-destructive-foreground sm:min-h-8 sm:text-sm [&>svg:not([class*='opacity-'])]:opacity-80 [&>svg:not([class*='size-'])]:size-4.5 sm:[&>svg:not([class*='size-'])]:size-4 [&>svg]:pointer-events-none [&>svg]:-mx-0.5 [&>svg]:shrink-0",
+      "flex min-h-9 w-full cursor-default select-none items-center gap-2 rounded-sm px-2 py-1 text-base text-foreground outline-none focus-visible:outline-ring/50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid hover:bg-surface-hover hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-60 data-[variant=destructive]:text-destructive-foreground sm:not-pointer-coarse:min-h-8 sm:text-sm [&>svg:not([class*='opacity-'])]:opacity-80 [&>svg:not([class*='size-'])]:size-4.5 sm:not-pointer-coarse:[&>svg:not([class*='size-'])]:size-4 [&>svg]:pointer-events-none [&>svg]:-mx-0.5 [&>svg]:shrink-0",
       className,
     ),
     "data-slot": "base-drawer-menu-item",
@@ -637,7 +637,7 @@ function BaseDrawerMenuTrigger({
   return (
     <BaseDrawerTrigger
       className={cn(
-        "text-foreground hover:bg-surface-hover hover:text-accent-foreground focus-visible:outline-ring/50 flex min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid sm:min-h-8 sm:text-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
+        "text-foreground hover:bg-surface-hover hover:text-accent-foreground focus-visible:outline-ring/50 flex min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid sm:text-sm sm:not-pointer-coarse:min-h-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       data-slot="base-drawer-menu-trigger"
@@ -684,7 +684,7 @@ function BaseDrawerMenuCheckboxItem({
     <CheckboxPrimitive.Root
       checked={checked}
       className={cn(
-        "text-foreground hover:bg-surface-hover hover:text-accent-foreground focus-visible:outline-ring/50 grid min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid data-disabled:pointer-events-none data-disabled:opacity-60 sm:min-h-8 sm:text-sm [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
+        "text-foreground hover:bg-surface-hover hover:text-accent-foreground focus-visible:outline-ring/50 grid min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid data-disabled:pointer-events-none data-disabled:opacity-60 sm:text-sm sm:not-pointer-coarse:min-h-8 [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
         // `group/switch` lets a switch indicator pick up the row's press
         // state, so the whole row behaves as the control rather than just the
         // switch. Named, so an unrelated `.group` on an ancestor cannot.
@@ -713,7 +713,7 @@ function BaseDrawerMenuCheckboxItem({
           // Touch-sized on mobile, matching the taller drawer rows; drops to
           // the same 14px thumb the desktop menus use (`size="xs"`) from `sm`
           // up. Responsive sizing can't come from the cva variant.
-          className="col-start-2 sm:[--thumb-size:--spacing(3.5)]"
+          className="col-start-2 sm:not-pointer-coarse:[--thumb-size:--spacing(3.5)]"
           // Checkbox.Indicator does not inject aria-hidden the way the menu
           // primitives do, and this span sits inside the row's accessible name.
           aria-hidden
@@ -728,7 +728,10 @@ function BaseDrawerMenuCheckboxItem({
           <HugeiconsIcon
             icon={checkIcon}
             strokeWidth={2.5}
-            className={cn("size-4.5 sm:size-4", checkmarkClasses)}
+            className={cn(
+              "size-4.5 sm:not-pointer-coarse:size-4",
+              checkmarkClasses,
+            )}
           />
         </CheckboxPrimitive.Indicator>
       )}
@@ -763,7 +766,7 @@ function BaseDrawerMenuRadioItem({
   return (
     <RadioPrimitive.Root
       className={cn(
-        "text-foreground hover:bg-surface-hover hover:text-accent-foreground focus-visible:outline-ring/50 grid min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid data-disabled:pointer-events-none data-disabled:opacity-60 sm:min-h-8 sm:text-sm [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
+        "text-foreground hover:bg-surface-hover hover:text-accent-foreground focus-visible:outline-ring/50 grid min-h-9 w-full cursor-default items-center gap-2 rounded-sm px-2 py-1 text-base outline-none select-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid data-disabled:pointer-events-none data-disabled:opacity-60 sm:text-sm sm:not-pointer-coarse:min-h-8 [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
         "grid-cols-[1fr_1.125rem] items-center pe-2 sm:grid-cols-[1fr_1rem]",
         className,
       )}
@@ -785,7 +788,10 @@ function BaseDrawerMenuRadioItem({
         <HugeiconsIcon
           icon={checkIcon}
           strokeWidth={2.5}
-          className={cn("size-4.5 sm:size-4", checkmarkClasses)}
+          className={cn(
+            "size-4.5 sm:not-pointer-coarse:size-4",
+            checkmarkClasses,
+          )}
         />
       </RadioPrimitive.Indicator>
     </RadioPrimitive.Root>

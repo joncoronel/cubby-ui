@@ -39,8 +39,8 @@ const numberFieldGroupVariants = cva(
       // Input's heights (one step taller below sm); corners step with them.
       size: {
         default:
-          "[--number-field-h:--spacing(10)] sm:[--number-field-h:--spacing(9)] [--number-field-radius:var(--radius)]",
-        sm: "[--number-field-h:--spacing(9)] sm:[--number-field-h:--spacing(8)] [--number-field-radius:calc(var(--radius)-2px)]",
+          "[--number-field-h:--spacing(10)] sm:not-pointer-coarse:[--number-field-h:--spacing(9)] [--number-field-radius:var(--radius)]",
+        sm: "[--number-field-h:--spacing(9)] sm:not-pointer-coarse:[--number-field-h:--spacing(8)] [--number-field-radius:calc(var(--radius)-2px)]",
       },
     },
     defaultVariants: {

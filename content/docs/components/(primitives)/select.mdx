@@ -93,8 +93,8 @@ On a Card, Dialog, or popover surface, the opaque `default` trigger collapses in
 <ComponentPreview component="select" example="select-elevated" />
 
 | Variant    | Description                                                  |
-| ---------- | ----------------------------------------------------------- |
-| `default`  | Opaque `bg-input` trigger for page-level surfaces.          |
+| ---------- | ------------------------------------------------------------ |
+| `default`  | Opaque `bg-input` trigger for page-level surfaces.           |
 | `elevated` | Translucent trigger for use inside Card, Dialog, or popover. |
 | `ghost`    | Chromeless trigger that mirrors the Button `ghost` variant.  |
 
@@ -147,7 +147,12 @@ Button that opens the dropdown when clicked. Wraps Base UI's `Select.Trigger`.
   simpleType="string"
   defaultValue='"default"'
 >
-  Surface appearance. `default` uses opaque `bg-input` with a soft drop shadow in light mode. `elevated` uses translucent `bg-input-elevated` for use inside Card, Dialog, or popover surfaces. `ghost` is chromeless and mirrors the Button `ghost` variant for toolbars and dense UI. `default` and `elevated` match the same prop on Input, Combobox, and Autocomplete. See the [Surfaces](/docs/getting-started/surfaces) docs.
+  Surface appearance. `default` uses opaque `bg-input` with a soft drop shadow
+  in light mode. `elevated` uses translucent `bg-input-elevated` for use inside
+  Card, Dialog, or popover surfaces. `ghost` is chromeless and mirrors the
+  Button `ghost` variant for toolbars and dense UI. `default` and `elevated`
+  match the same prop on Input, Combobox, and Autocomplete. See the
+  [Surfaces](/docs/getting-started/surfaces) docs.
 </ApiProp>
 
 <ApiProp name="hideChevronRotation" fullType="boolean" defaultValue="false">
@@ -162,13 +167,10 @@ Dropdown container for the option list with positioning. Composes Base UI's `Sel
 
 <ApiPropsList>
 
-<ApiProp
-  name="size"
-  fullType="'sm' | 'default'"
-  simpleType="string"
->
-  Size variant for the popup items. Should match the trigger's size when using
-  `alignItemWithTrigger` to ensure proper alignment.
+<ApiProp name="size" fullType="'sm' | 'default'" simpleType="string">
+  Match the trigger's size. Only used with `alignItemWithTrigger`, where it
+  lines the items up with a small trigger; otherwise items are the same at both
+  sizes.
 </ApiProp>
 
 <ApiProp name="alignItemWithTrigger" fullType="boolean" defaultValue="false">
@@ -208,11 +210,18 @@ Dropdown container for the option list with positioning. Composes Base UI's `Sel
 </ApiProp>
 
 <ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
-  Surface elevation level for the popup. See the [Surfaces](/docs/getting-started/surfaces) docs. Uses `elevatedSurface` (rim on `::after`) so sticky group labels stay below the rim edge.
+  Surface elevation level for the popup. See the
+  [Surfaces](/docs/getting-started/surfaces) docs. Uses `elevatedSurface` (rim
+  on `::after`) so sticky group labels stay below the rim edge.
 </ApiProp>
 
-<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
-  Shadow weight. Controls drop-shadow intensity independently of substrate color.
+<ApiProp
+  name="shadowLevel"
+  fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8"
+  defaultValue="3"
+>
+  Shadow weight. Controls drop-shadow intensity independently of substrate
+  color.
 </ApiProp>
 
 </ApiPropsList>

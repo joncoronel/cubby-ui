@@ -40,8 +40,8 @@ const inputGroupVariants = cva(
       // Input's heights (one step taller below sm); corners step with them.
       size: {
         default:
-          "[--input-group-h:--spacing(10)] sm:[--input-group-h:--spacing(9)] [--input-group-radius:var(--radius)]",
-        sm: "[--input-group-h:--spacing(9)] sm:[--input-group-h:--spacing(8)] [--input-group-radius:calc(var(--radius)-2px)]",
+          "[--input-group-h:--spacing(10)] sm:not-pointer-coarse:[--input-group-h:--spacing(9)] [--input-group-radius:var(--radius)]",
+        sm: "[--input-group-h:--spacing(9)] sm:not-pointer-coarse:[--input-group-h:--spacing(8)] [--input-group-radius:calc(var(--radius)-2px)]",
       },
       variant: {
         // Opaque "lifted" bg — use on the page or any non-elevated substrate.
@@ -182,8 +182,16 @@ const inputGroupButtonVariants = cva(
         placement: "inline",
         className: "size-auto aspect-square sm:size-auto",
       },
-      { size: "default", placement: "block", className: "h-8 sm:h-8" },
-      { size: "icon", placement: "block", className: "size-8 sm:size-8" },
+      {
+        size: "default",
+        placement: "block",
+        className: "h-8 sm:not-pointer-coarse:h-8",
+      },
+      {
+        size: "icon",
+        placement: "block",
+        className: "size-8 sm:not-pointer-coarse:size-8",
+      },
     ],
     defaultVariants: {
       size: "default",

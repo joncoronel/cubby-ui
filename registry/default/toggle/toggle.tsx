@@ -52,9 +52,9 @@ const toggleVariants = cva(cn(toggleBase, togglePaint), {
         "[--tgl-border:var(--border)] [--tgl-bg:var(--card)] [--tgl-bg-hover:var(--outline-hover)] [--tgl-bg-active:var(--outline-active)] [--tgl-bg-selected:var(--secondary)] before:bg-clip-padding",
     },
     size: {
-      sm: "h-9 min-w-9 gap-1.5 px-2 sm:h-8 sm:min-w-8",
-      default: "h-10 min-w-10 px-2.5 sm:h-9 sm:min-w-9",
-      lg: "h-11 min-w-11 px-3 sm:h-10 sm:min-w-10",
+      sm: "h-9 min-w-9 gap-1.5 px-2 sm:not-pointer-coarse:h-8 sm:min-w-8",
+      default: "h-10 min-w-10 px-2.5 sm:not-pointer-coarse:h-9 sm:min-w-9",
+      lg: "h-11 min-w-11 px-3 sm:not-pointer-coarse:h-10 sm:min-w-10",
     },
   },
   defaultVariants: {

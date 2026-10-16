@@ -34,7 +34,7 @@ function AutocompleteInput({
       <BaseAutocomplete.Input
         data-slot="autocomplete-input"
         className={cn(
-          "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground flex h-10 w-full min-w-0 rounded-lg border bg-clip-padding px-3 text-base font-normal disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 sm:h-9 sm:not-pointer-coarse:text-sm",
+          "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground flex h-10 w-full min-w-0 rounded-lg border bg-clip-padding px-3 text-base font-normal disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 sm:not-pointer-coarse:h-9 sm:not-pointer-coarse:text-sm",
           // Room for the clear (shown with text) and trigger buttons. Set on
           // the input, not the group, to keep `:has()` cheap.
           "[[data-slot=autocomplete-input-group]:has([data-slot=autocomplete-clear])>&]:pr-7",
@@ -368,7 +368,7 @@ function AutocompleteItem({
       data-slot="autocomplete-item"
       className={cn(
         POPUP_ITEM,
-        "data-highlighted:text-accent-foreground data-highlighted:bg-surface-hover relative flex cursor-default items-center text-sm outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60",
+        "data-highlighted:text-accent-foreground data-highlighted:bg-surface-hover relative flex cursor-default items-center outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60",
         // Spacing from list edges
         "mx-1 first:mt-1 last:mb-1",
         className,

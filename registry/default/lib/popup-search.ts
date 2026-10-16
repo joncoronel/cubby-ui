@@ -3,8 +3,12 @@
 // them so they can't drift. The field matches the rows (4px gutter, item
 // radius, 10px label inset, height) so the icon starts where labels do.
 
-/** A row's box: 32px, 40px on touch screens. */
-export const POPUP_ITEM = "rounded-md px-2.5 py-1.5 pointer-coarse:py-2.5";
+/**
+ * A row's box and text: 32px, 40px on touch screens. To change a row's
+ * padding, override `pointer-coarse:py-*` too, or touch screens keep 40px.
+ */
+export const POPUP_ITEM =
+  "rounded-md px-2.5 py-1.5 text-sm pointer-coarse:py-2.5";
 
 /** The surface band over the side and top gutters; the list supplies the gap below. */
 export const POPUP_SEARCH_BAND = "bg-(--popup-surface) px-1 pt-1";

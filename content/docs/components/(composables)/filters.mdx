@@ -332,31 +332,31 @@ Filters composes Cubby UI primitives and has no Base UI root of its own.
     <AccordionTrigger indicatorType="chevron">Every label and its default</AccordionTrigger>
     <AccordionContent>
 
-| Label               | Default                                                    |
-| ------------------- | ---------------------------------------------------------- |
-| `add`               | `"Filter"`                                                 |
-| `addTooltip`        | `"Add filter"`                                             |
-| `clear`             | `"Clear filters"`                                          |
-| `searchFields`      | `"Filter by..."`                                           |
-| `searchFieldValues` | `(field) => "Search labels..."`, a field's value search    |
-| `noFields`          | `"No matches."`                                            |
-| `noResults`         | `"No results found."`                                      |
-| `selectValue`       | `"Select..."`                                              |
-| `enterValue`        | `"Enter value"`                                            |
-| `value`             | `"Value"`                                                  |
-| `min`, `max`        | `"Min"`, `"Max"`                                           |
-| `and`               | `"and"`, joins a range                                     |
-| `fields`, `values`  | `"Fields"`, `"Values"`, add menu headings                  |
-| `done`              | `"Done"`                                                   |
-| `invalidNumber`     | `"Enter a number"`                                         |
-| `operator`          | `"operator"`                                               |
-| `operators`         | `{}`, operator names by id, e.g. `{ is_not: "n'est pas" }` |
-| `filtersCleared`    | `"Cleared all filters"`                                    |
-| `activeCount`       | `(count) => "3 active"`                                    |
-| `selectedCount`     | `(count) => "3 selected"`                                  |
-| `removeFilter`      | `(field) => "Remove Status filter"`                        |
-| `filterAdded`       | `(description) => "Added Status is Done"`                  |
-| `filterRemoved`     | `(description) => "Removed Status is Done"`                |
+| Label               | Default                                                                                              |
+| ------------------- | ---------------------------------------------------------------------------------------------------- |
+| `add`               | `"Filter"`                                                                                           |
+| `addTooltip`        | `"Add filter"`                                                                                       |
+| `clear`             | `"Clear filters"`                                                                                    |
+| `searchFields`      | `"Filter by..."`                                                                                     |
+| `searchFieldValues` | `(field) => "Search labels..."`, a field's value search (add menu and chip); replaces `searchValues` |
+| `noFields`          | `"No matches."`                                                                                      |
+| `noResults`         | `"No results found."`                                                                                |
+| `selectValue`       | `"Select..."`                                                                                        |
+| `enterValue`        | `"Enter value"`                                                                                      |
+| `value`             | `"Value"`                                                                                            |
+| `min`, `max`        | `"Min"`, `"Max"`                                                                                     |
+| `and`               | `"and"`, joins a range                                                                               |
+| `fields`, `values`  | `"Fields"`, `"Values"`, add menu headings                                                            |
+| `done`              | `"Done"`                                                                                             |
+| `invalidNumber`     | `"Enter a number"`                                                                                   |
+| `operator`          | `"operator"`                                                                                         |
+| `operators`         | `{}`, operator names by id, e.g. `{ is_not: "n'est pas" }`                                           |
+| `filtersCleared`    | `"Cleared all filters"`                                                                              |
+| `activeCount`       | `(count) => "3 active"`                                                                              |
+| `selectedCount`     | `(count) => "3 selected"`                                                                            |
+| `removeFilter`      | `(field) => "Remove Status filter"`                                                                  |
+| `filterAdded`       | `(description) => "Added Status is Done"`                                                            |
+| `filterRemoved`     | `(description) => "Removed Status is Done"`                                                          |
 
     </AccordionContent>
 

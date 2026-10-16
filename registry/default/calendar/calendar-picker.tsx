@@ -308,7 +308,7 @@ function CalendarPicker({
               onClick={() => onSelectMonth(monthOfYear)}
               className={cn(
                 cellButtonClassName,
-                "h-9 w-full self-center font-medium sm:h-8",
+                "h-9 w-full self-center font-medium sm:not-pointer-coarse:h-8",
                 "data-today:after:opacity-100",
                 "data-active:text-primary-foreground data-active:after:bg-primary-foreground data-active:[--cell-paint:var(--primary)] data-active:hover:[--cell-paint:var(--primary-hover)]",
                 "disabled:pointer-events-none disabled:opacity-40",

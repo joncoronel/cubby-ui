@@ -25,8 +25,8 @@ const inputVariants = cva(
         elevated: "bg-input-elevated",
       },
       size: {
-        default: "h-10 px-3 py-2 sm:h-9",
-        sm: "h-9 px-2.5 py-1.5 sm:h-8",
+        default: "h-10 px-3 py-2 sm:not-pointer-coarse:h-9",
+        sm: "h-9 px-2.5 py-1.5 sm:not-pointer-coarse:h-8",
       },
     },
     defaultVariants: {

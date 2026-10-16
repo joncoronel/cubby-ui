@@ -42,10 +42,10 @@ const toolbarVariants = cva(
       },
       // Button's height ladder (one step taller below sm); corners step with it.
       size: {
-        sm: "[--toolbar-h:--spacing(9)] sm:[--toolbar-h:--spacing(8)] [--toolbar-radius:calc(var(--radius)-2px)]",
+        sm: "[--toolbar-h:--spacing(9)] sm:not-pointer-coarse:[--toolbar-h:--spacing(8)] [--toolbar-radius:calc(var(--radius)-2px)]",
         default:
-          "[--toolbar-h:--spacing(10)] sm:[--toolbar-h:--spacing(9)] [--toolbar-radius:var(--radius)]",
-        lg: "[--toolbar-h:--spacing(11)] sm:[--toolbar-h:--spacing(10)] [--toolbar-radius:calc(var(--radius)+2px)]",
+          "[--toolbar-h:--spacing(10)] sm:not-pointer-coarse:[--toolbar-h:--spacing(9)] [--toolbar-radius:var(--radius)]",
+        lg: "[--toolbar-h:--spacing(11)] sm:not-pointer-coarse:[--toolbar-h:--spacing(10)] [--toolbar-radius:calc(var(--radius)+2px)]",
       },
     },
   },

@@ -83,10 +83,10 @@ export const FILTER_TINTS =
  * (height - 2*2px segment border - 16px icon) / 2.
  */
 export const FILTER_SIZES: Record<FilterSize, string> = {
-  sm: "h-9 sm:h-8 [--seg-icon-x:8px] sm:[--seg-icon-x:6px] text-sm [--seg-x:0.5rem] [&_[data-slot=filter-chip-field]_svg]:size-3.5",
+  sm: "h-9 sm:not-pointer-coarse:h-8 [--seg-icon-x:8px] sm:not-pointer-coarse:[--seg-icon-x:6px] text-sm [--seg-x:0.5rem] [&_[data-slot=filter-chip-field]_svg]:size-3.5",
   default:
-    "h-10 sm:h-9 [--seg-icon-x:10px] sm:[--seg-icon-x:8px] text-sm [--seg-x:0.625rem] [&_[data-slot=filter-chip-field]_svg]:size-3.5",
-  lg: "h-11 sm:h-10 [--seg-icon-x:12px] sm:[--seg-icon-x:10px] text-base [--seg-x:0.75rem] [&_[data-slot=filter-chip-field]_svg]:size-4",
+    "h-10 sm:not-pointer-coarse:h-9 [--seg-icon-x:10px] sm:not-pointer-coarse:[--seg-icon-x:8px] text-sm [--seg-x:0.625rem] [&_[data-slot=filter-chip-field]_svg]:size-3.5",
+  lg: "h-11 sm:not-pointer-coarse:h-10 [--seg-icon-x:12px] sm:not-pointer-coarse:[--seg-icon-x:10px] text-base [--seg-x:0.75rem] [&_[data-slot=filter-chip-field]_svg]:size-4",
 };
 
 // `FilterValue.value` is `unknown` and may come from untrusted input (URL

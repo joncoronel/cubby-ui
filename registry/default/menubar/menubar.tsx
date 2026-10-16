@@ -64,10 +64,10 @@ const menubarVariants = cva(
       },
       // Button's height ladder (one step taller below sm); corners step with it.
       size: {
-        sm: "[--menubar-h:--spacing(9)] sm:[--menubar-h:--spacing(8)] [--menubar-radius:calc(var(--radius)-2px)]",
+        sm: "[--menubar-h:--spacing(9)] sm:not-pointer-coarse:[--menubar-h:--spacing(8)] [--menubar-radius:calc(var(--radius)-2px)]",
         default:
-          "[--menubar-h:--spacing(10)] sm:[--menubar-h:--spacing(9)] [--menubar-radius:var(--radius)]",
-        lg: "[--menubar-h:--spacing(11)] sm:[--menubar-h:--spacing(10)] [--menubar-radius:calc(var(--radius)+2px)]",
+          "[--menubar-h:--spacing(10)] sm:not-pointer-coarse:[--menubar-h:--spacing(9)] [--menubar-radius:var(--radius)]",
+        lg: "[--menubar-h:--spacing(11)] sm:not-pointer-coarse:[--menubar-h:--spacing(10)] [--menubar-radius:calc(var(--radius)+2px)]",
       },
     },
   },

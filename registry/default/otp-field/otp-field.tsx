@@ -69,7 +69,7 @@ function OTPFieldInput({
             data-disabled={state.disabled ? "" : undefined}
             className={cn(
               // Base styling
-              "relative flex h-10 w-10 cursor-text items-center justify-center rounded-[var(--otp-field-radius,var(--radius-lg))] border bg-clip-padding text-base font-medium tabular-nums sm:h-9 sm:w-9 sm:not-pointer-coarse:text-sm",
+              "relative flex h-10 w-10 cursor-text items-center justify-center rounded-[var(--otp-field-radius,var(--radius-lg))] border bg-clip-padding text-base font-medium tabular-nums sm:not-pointer-coarse:h-9 sm:not-pointer-coarse:w-9 sm:not-pointer-coarse:text-sm",
               variant === "default" ? "bg-input" : "bg-input-elevated",
               // Invalid state (the focused slot's ring comes from the root)
               "data-[invalid]:outline-destructive/50 data-[invalid]:outline-2 data-[invalid]:outline-offset-2 data-[invalid]:outline-solid",

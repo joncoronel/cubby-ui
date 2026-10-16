@@ -144,7 +144,7 @@ export interface FiltersLabels {
   addTooltip: string;
   clear: string;
   searchFields: string;
-  /** Placeholder of a field's value search in the add menu, e.g. "Search labels...". */
+  /** Placeholder of a field's value search, in the add menu and on its chip, e.g. "Search labels...". Replaces `searchValues`. */
   searchFieldValues: (field: FilterField) => string;
   noFields: string;
   noResults: string;

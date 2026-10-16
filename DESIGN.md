@@ -295,7 +295,7 @@ Structure is typographic: groups are set apart by space and a small label, not b
 ### Buttons
 Tactile and small. Paint lives on a `::before` layer so press can scale it without moving the label.
 - **Shape:** gently rounded (`{rounded.lg}`); xs and icon_xs sizes drop to 10px.
-- **Sizes:** default 36px tall desktop, 40px below sm (touch step); sm 32px, lg 40px, xs 28px; 14px inline padding.
+- **Sizes:** default 36px tall with a mouse, one step up (40px) on touch screens and below sm; sm 32px, lg 40px, xs 28px, each a step up the same way. Field text is 16px on touch and below sm, 14px otherwise; 14px inline padding.
 - **Primary:** `{colors.primary}` fill, white label. Hover mixes 5% black (light) or 10% white (dark); pressed goes one step further (8% / 14%).
 - **Outline:** card fill with a hairline border; **Ghost:** Quiet Ink label brightening to ink on a surface-hover wash; **Neutral:** the chrome-black fill that lightens on hover; **Primary-soft / Destructive-soft:** accent-colored label on the Plate Gray plate.
 - **Hover / Focus:** 100ms ease-out on color and fill; press scales the paint to 0.98; focus draws a 2px ring at 50% ring color, offset 2px.

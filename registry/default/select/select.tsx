@@ -248,9 +248,10 @@ function SelectItem({ className, children, ...props }: BaseSelect.Item.Props) {
         // Combobox-style item with grid layout
         POPUP_ITEM,
         "relative grid cursor-default grid-cols-[1fr_1rem] items-center gap-2 outline-none select-none in-data-[side=none]:min-w-[calc(var(--anchor-width))]",
-        // Over the trigger (alignItemWithTrigger), rows take its height and
-        // its inset plus 1px, so the popup covers the trigger's edge.
+        // Over the trigger (alignItemWithTrigger), rows take its height, text
+        // size and inset plus 1px, so the popup covers the trigger's edge.
         "in-data-[side=none]:min-h-(--anchor-height) in-data-[side=none]:px-3 in-data-[side=none]:py-0 in-data-[side=none]:pointer-coarse:py-0 [[data-side=none]_[data-size=sm]_&]:px-2.5",
+        "in-data-[side=none]:text-base in-data-[side=none]:sm:not-pointer-coarse:text-sm",
         // Spacing from list edges
         "mx-1 first:mt-1 last:mb-1",
         // Hover and highlight states — uses --surface-hover overlay so the

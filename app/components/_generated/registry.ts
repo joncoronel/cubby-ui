@@ -596,6 +596,7 @@ export const componentMetadata = {
     "category": "UI",
     "registryDependencies": [
       "@cubby-ui/scroll-area",
+      "@cubby-ui/popup-search",
       "@cubby-ui/elevated"
     ],
     "dependencies": [
@@ -1304,6 +1305,7 @@ export const componentMetadata = {
     "category": "UI",
     "registryDependencies": [
       "@cubby-ui/scroll-area",
+      "@cubby-ui/popup-search",
       "@cubby-ui/elevated"
     ],
     "dependencies": [
@@ -1632,7 +1634,7 @@ export const componentMetadata = {
   "popup-search": {
     "name": "popup-search",
     "title": "popupSearch",
-    "description": "Shared classes for the search field at the top of a popup list.",
+    "description": "Shared classes for popup lists: their rows, and the search field at the top.",
     "category": "UI",
     "registryDependencies": [],
     "dependencies": [],

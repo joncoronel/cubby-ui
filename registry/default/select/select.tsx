@@ -12,6 +12,7 @@ import {
 } from "@hugeicons/core-free-icons";
 
 import { cn } from "@/lib/utils";
+import { POPUP_ITEM } from "@/registry/default/lib/popup-search";
 import {
   elevatedSurface,
   type SurfaceLevel,
@@ -54,7 +55,7 @@ const selectTriggerVariants = cva(
     // Invalid state
     "aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
     // Text + placeholder + icon
-    "text-base font-normal whitespace-nowrap md:text-sm",
+    "text-base font-normal whitespace-nowrap sm:not-pointer-coarse:text-sm",
     "data-placeholder:text-muted-foreground",
     "[&_svg:not([class*='text-'])]:text-muted-foreground",
     "*:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 *:data-[slot=select-value]:overflow-hidden",
@@ -245,9 +246,11 @@ function SelectItem({ className, children, ...props }: BaseSelect.Item.Props) {
       data-slot="select-item"
       className={cn(
         // Combobox-style item with grid layout
-        "relative grid cursor-default grid-cols-[1fr_1rem] items-center gap-2 rounded-md px-3 py-2 text-sm outline-none select-none in-data-[side=none]:min-w-[calc(var(--anchor-width))]",
-        // Size variants (inherited from SelectContent via data-size attribute)
-        "in-data-[size=sm]:px-2.5 in-data-[size=sm]:py-1.5",
+        POPUP_ITEM,
+        "relative grid cursor-default grid-cols-[1fr_1rem] items-center gap-2 text-sm outline-none select-none in-data-[side=none]:min-w-[calc(var(--anchor-width))]",
+        // Over the trigger (alignItemWithTrigger), rows take its height and
+        // its inset plus 1px, so the popup covers the trigger's edge.
+        "in-data-[side=none]:min-h-(--anchor-height) in-data-[side=none]:px-3 in-data-[side=none]:py-0 [[data-side=none]_[data-size=sm]_&]:px-2.5",
         // Spacing from list edges
         "mx-1 first:mt-1 last:mb-1",
         // Hover and highlight states — uses --surface-hover overlay so the

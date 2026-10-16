@@ -98,7 +98,7 @@ function NumberFieldInput({
       data-slot="number-field-input"
       className={cn(
         "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground",
-        "w-16 min-w-0 self-stretch border-2 border-transparent bg-transparent px-1 text-center text-base font-normal tabular-nums outline-none md:text-sm",
+        "w-16 min-w-0 self-stretch border-2 border-transparent bg-transparent px-1 text-center text-base font-normal tabular-nums outline-none sm:not-pointer-coarse:text-sm",
         // Inline scrub prefix. Set on the input to keep `:has()` cheap.
         "[[data-slot=number-field-group]:has(>[data-slot=number-field-scrub-area])>&]:text-left",
         // Dividers: two background layers on the input's edges. Each shows

@@ -70,7 +70,6 @@ const DEFAULT_LABELS: FiltersLabels = {
   addTooltip: "Add filter",
   clear: "Clear filters",
   searchFields: "Filter by...",
-  searchValues: "Search...",
   searchFieldValues: (field) => `Search ${field.label.toLowerCase()}...`,
   noFields: "No matches.",
   noResults: "No results found.",

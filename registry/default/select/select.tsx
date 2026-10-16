@@ -12,6 +12,7 @@ import {
 } from "@hugeicons/core-free-icons";
 
 import { cn } from "@/lib/utils";
+import { POPUP_ITEM } from "@/registry/default/lib/popup-search";
 import {
   elevatedSurface,
   type SurfaceLevel,
@@ -39,7 +40,7 @@ function SelectValue({ className, ...props }: BaseSelect.Value.Props) {
   return (
     <BaseSelect.Value
       data-slot="select-value"
-      className={cn(`text-sm`, className)}
+      className={className}
       {...props}
     />
   );
@@ -54,7 +55,7 @@ const selectTriggerVariants = cva(
     // Invalid state
     "aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
     // Text + placeholder + icon
-    "text-base font-normal whitespace-nowrap md:text-sm",
+    "text-base font-normal whitespace-nowrap sm:not-pointer-coarse:text-sm",
     "data-placeholder:text-muted-foreground",
     "[&_svg:not([class*='text-'])]:text-muted-foreground",
     "*:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 *:data-[slot=select-value]:overflow-hidden",
@@ -81,11 +82,11 @@ const selectTriggerVariants = cva(
           "border-transparent bg-transparent text-muted-foreground hover:bg-surface-hover hover:text-foreground data-popup-open:bg-surface-hover data-popup-open:text-foreground group-hover/select-trigger:[&_svg:not([class*='text-'])]:text-foreground",
       },
       size: {
-        default: "h-10 px-3.5 pr-2.5 py-2 sm:h-9",
+        default: "h-10 px-3.5 pr-2.5 py-2 sm:not-pointer-coarse:h-9",
         // Compact trigger. Note: tighter than the Button sm size (px-3), so
         // ghost triggers in toolbars pair best with icon-size ghost buttons,
         // which carry no horizontal padding.
-        sm: "h-9 px-3 pr-2 py-1.5 sm:h-8",
+        sm: "h-9 px-3 pr-2 py-1.5 sm:not-pointer-coarse:h-8",
       },
     },
     defaultVariants: {
@@ -245,9 +246,12 @@ function SelectItem({ className, children, ...props }: BaseSelect.Item.Props) {
       data-slot="select-item"
       className={cn(
         // Combobox-style item with grid layout
-        "relative grid cursor-default grid-cols-[1fr_1rem] items-center gap-2 rounded-md px-3 py-2 text-sm outline-none select-none in-data-[side=none]:min-w-[calc(var(--anchor-width))]",
-        // Size variants (inherited from SelectContent via data-size attribute)
-        "in-data-[size=sm]:px-2.5 in-data-[size=sm]:py-1.5",
+        POPUP_ITEM,
+        "relative grid cursor-default grid-cols-[1fr_1rem] items-center gap-2 outline-none select-none in-data-[side=none]:min-w-[calc(var(--anchor-width))]",
+        // Over the trigger (alignItemWithTrigger), rows take its height, text
+        // size and inset plus 1px, so the popup covers the trigger's edge.
+        "in-data-[side=none]:min-h-(--anchor-height) in-data-[side=none]:px-3 in-data-[side=none]:py-0 in-data-[side=none]:pointer-coarse:py-0 [[data-side=none]_[data-size=sm]_&]:px-2.5",
+        "in-data-[side=none]:text-base in-data-[side=none]:sm:not-pointer-coarse:text-sm",
         // Spacing from list edges
         "mx-1 first:mt-1 last:mb-1",
         // Hover and highlight states — uses --surface-hover overlay so the

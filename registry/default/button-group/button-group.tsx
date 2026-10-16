@@ -34,10 +34,10 @@ const buttonGroupVariants = cva(
       },
       // Button's height ladder (one step taller below sm); corners step with it.
       size: {
-        sm: "[--group-h:--spacing(9)] sm:[--group-h:--spacing(8)] [--group-radius:calc(var(--radius)-2px)]",
+        sm: "[--group-h:--spacing(9)] sm:not-pointer-coarse:[--group-h:--spacing(8)] [--group-radius:calc(var(--radius)-2px)]",
         default:
-          "[--group-h:--spacing(10)] sm:[--group-h:--spacing(9)] [--group-radius:var(--radius)]",
-        lg: "[--group-h:--spacing(11)] sm:[--group-h:--spacing(10)] [--group-radius:calc(var(--radius)+2px)]",
+          "[--group-h:--spacing(10)] sm:not-pointer-coarse:[--group-h:--spacing(9)] [--group-radius:var(--radius)]",
+        lg: "[--group-h:--spacing(11)] sm:not-pointer-coarse:[--group-h:--spacing(10)] [--group-radius:calc(var(--radius)+2px)]",
       },
       orientation: {
         horizontal: "",

@@ -181,7 +181,7 @@ function FilterSearchPopup({
         placeholder={placeholder}
       />
       <ComboboxEmpty>{empty}</ComboboxEmpty>
-      <ComboboxList className={cn("max-h-72", LIST_PADDING)}>
+      <ComboboxList className={cn("max-h-80", LIST_PADDING)}>
         {children}
       </ComboboxList>
     </ComboboxPopup>
@@ -254,7 +254,7 @@ function OptionsValueControl({
 
   const popup = (
     <FilterSearchPopup
-      placeholder={labels.searchValues}
+      placeholder={labels.searchFieldValues(field)}
       label={nameFromPlaceholder(labels.searchFieldValues(field))}
       empty={labels.noResults}
     >

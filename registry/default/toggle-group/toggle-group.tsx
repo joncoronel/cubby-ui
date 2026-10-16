@@ -52,10 +52,10 @@ const toggleGroupVariants = cva(
       },
       // Button's height ladder (one step taller below sm); corners step with it.
       size: {
-        sm: "[--toggle-group-h:--spacing(9)] sm:[--toggle-group-h:--spacing(8)] [--toggle-group-radius:calc(var(--radius)-2px)]",
+        sm: "[--toggle-group-h:--spacing(9)] sm:not-pointer-coarse:[--toggle-group-h:--spacing(8)] [--toggle-group-radius:calc(var(--radius)-2px)]",
         default:
-          "[--toggle-group-h:--spacing(10)] sm:[--toggle-group-h:--spacing(9)] [--toggle-group-radius:var(--radius)]",
-        lg: "[--toggle-group-h:--spacing(11)] sm:[--toggle-group-h:--spacing(10)] [--toggle-group-radius:calc(var(--radius)+2px)]",
+          "[--toggle-group-h:--spacing(10)] sm:not-pointer-coarse:[--toggle-group-h:--spacing(9)] [--toggle-group-radius:var(--radius)]",
+        lg: "[--toggle-group-h:--spacing(11)] sm:not-pointer-coarse:[--toggle-group-h:--spacing(10)] [--toggle-group-radius:calc(var(--radius)+2px)]",
       },
     },
     defaultVariants: {
@@ -113,7 +113,7 @@ function ToggleGroup({
 }
 
 const itemClasses = cn(
-  "h-auto min-w-auto self-stretch border border-transparent text-sm sm:h-auto sm:min-w-auto",
+  "h-auto min-w-auto self-stretch border border-transparent text-sm sm:not-pointer-coarse:h-auto sm:not-pointer-coarse:min-w-auto",
   // Icon-only items drop their padding, so they're square.
   "data-icon-only:px-0",
   // Box corners are the plate's + 2px; the focus ring sits on the plate.

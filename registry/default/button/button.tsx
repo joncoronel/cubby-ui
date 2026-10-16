@@ -76,15 +76,16 @@ const buttonVariantClasses = {
 // with form fields. Below the sm breakpoint each size is one step taller for
 // touch targets.
 const buttonSizeVariantClasses = {
-  default: "h-10 sm:h-9 px-3.5 gap-1.5 text-sm",
-  xs: "h-8 sm:h-7 px-2.5 gap-1 text-xs rounded-md [&_svg:not([class*='size-'])]:size-3.5",
-  sm: "h-9 sm:h-8 px-3 gap-1.5 text-sm",
-  lg: "h-11 sm:h-10 px-3.5 gap-1.5 text-base [&_svg:not([class*='size-'])]:size-5",
-  icon: "size-10 sm:size-9 text-sm",
+  default: "h-10 sm:not-pointer-coarse:h-9 px-3.5 gap-1.5 text-sm",
+  xs: "h-8 sm:not-pointer-coarse:h-7 px-2.5 gap-1 text-xs rounded-md [&_svg:not([class*='size-'])]:size-3.5",
+  sm: "h-9 sm:not-pointer-coarse:h-8 px-3 gap-1.5 text-sm",
+  lg: "h-11 sm:not-pointer-coarse:h-10 px-3.5 gap-1.5 text-base [&_svg:not([class*='size-'])]:size-5",
+  icon: "size-10 sm:not-pointer-coarse:size-9 text-sm",
   icon_xs:
-    "size-8 sm:size-7 rounded-md text-xs [&_svg:not([class*='size-'])]:size-3.5",
-  icon_sm: "size-9 sm:size-8 text-sm",
-  icon_lg: "size-11 sm:size-10 text-base [&_svg:not([class*='size-'])]:size-5",
+    "size-8 sm:not-pointer-coarse:size-7 rounded-md text-xs [&_svg:not([class*='size-'])]:size-3.5",
+  icon_sm: "size-9 sm:not-pointer-coarse:size-8 text-sm",
+  icon_lg:
+    "size-11 sm:not-pointer-coarse:size-10 text-base [&_svg:not([class*='size-'])]:size-5",
 };
 
 // Sizes with no text slot. For these, children render bare (no text-box

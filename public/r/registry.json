@@ -167,6 +167,7 @@
       ],
       "registryDependencies": [
         "@cubby-ui/scroll-area",
+        "@cubby-ui/popup-search",
         "@cubby-ui/elevated"
       ],
       "dependencies": [
@@ -1200,7 +1201,7 @@
       "name": "popup-search",
       "type": "registry:lib",
       "title": "popupSearch",
-      "description": "Shared classes for the search field at the top of a popup list.",
+      "description": "Shared classes for popup list rows and the search field above them, so menus, Select, Combobox, Autocomplete and Filters can't drift.",
       "files": [
         {
           "path": "registry/default/lib/popup-search.ts",
@@ -1404,6 +1405,7 @@
       ],
       "registryDependencies": [
         "@cubby-ui/scroll-area",
+        "@cubby-ui/popup-search",
         "@cubby-ui/elevated"
       ],
       "dependencies": [

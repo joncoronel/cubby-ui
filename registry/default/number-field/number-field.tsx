@@ -39,8 +39,8 @@ const numberFieldGroupVariants = cva(
       // Input's heights (one step taller below sm); corners step with them.
       size: {
         default:
-          "[--number-field-h:--spacing(10)] sm:[--number-field-h:--spacing(9)] [--number-field-radius:var(--radius)]",
-        sm: "[--number-field-h:--spacing(9)] sm:[--number-field-h:--spacing(8)] [--number-field-radius:calc(var(--radius)-2px)]",
+          "[--number-field-h:--spacing(10)] sm:not-pointer-coarse:[--number-field-h:--spacing(9)] [--number-field-radius:var(--radius)]",
+        sm: "[--number-field-h:--spacing(9)] sm:not-pointer-coarse:[--number-field-h:--spacing(8)] [--number-field-radius:calc(var(--radius)-2px)]",
       },
     },
     defaultVariants: {
@@ -98,7 +98,7 @@ function NumberFieldInput({
       data-slot="number-field-input"
       className={cn(
         "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground",
-        "w-16 min-w-0 self-stretch border-2 border-transparent bg-transparent px-1 text-center text-base font-normal tabular-nums outline-none md:text-sm",
+        "w-16 min-w-0 self-stretch border-2 border-transparent bg-transparent px-1 text-center text-base font-normal tabular-nums outline-none sm:not-pointer-coarse:text-sm",
         // Inline scrub prefix. Set on the input to keep `:has()` cheap.
         "[[data-slot=number-field-group]:has(>[data-slot=number-field-scrub-area])>&]:text-left",
         // Dividers: two background layers on the input's edges. Each shows

@@ -40,8 +40,8 @@ const inputGroupVariants = cva(
       // Input's heights (one step taller below sm); corners step with them.
       size: {
         default:
-          "[--input-group-h:--spacing(10)] sm:[--input-group-h:--spacing(9)] [--input-group-radius:var(--radius)]",
-        sm: "[--input-group-h:--spacing(9)] sm:[--input-group-h:--spacing(8)] [--input-group-radius:calc(var(--radius)-2px)]",
+          "[--input-group-h:--spacing(10)] sm:not-pointer-coarse:[--input-group-h:--spacing(9)] [--input-group-radius:var(--radius)]",
+        sm: "[--input-group-h:--spacing(9)] sm:not-pointer-coarse:[--input-group-h:--spacing(8)] [--input-group-radius:calc(var(--radius)-2px)]",
       },
       variant: {
         // Opaque "lifted" bg — use on the page or any non-elevated substrate.
@@ -176,14 +176,26 @@ const inputGroupButtonVariants = cva(
       },
     },
     compoundVariants: [
-      { size: "default", placement: "inline", className: "h-auto sm:h-auto" },
+      {
+        size: "default",
+        placement: "inline",
+        className: "h-auto sm:not-pointer-coarse:h-auto",
+      },
       {
         size: "icon",
         placement: "inline",
-        className: "size-auto aspect-square sm:size-auto",
+        className: "size-auto aspect-square sm:not-pointer-coarse:size-auto",
       },
-      { size: "default", placement: "block", className: "h-8 sm:h-8" },
-      { size: "icon", placement: "block", className: "size-8 sm:size-8" },
+      {
+        size: "default",
+        placement: "block",
+        className: "h-8 sm:not-pointer-coarse:h-8",
+      },
+      {
+        size: "icon",
+        placement: "block",
+        className: "size-8 sm:not-pointer-coarse:size-8",
+      },
     ],
     defaultVariants: {
       size: "default",
@@ -241,7 +253,7 @@ function InputGroupInput({ className, size, ...props }: InputGroupInputProps) {
       data-slot="input-group-control"
       size={size}
       className={cn(
-        "h-auto flex-1 self-stretch rounded-none border-0 bg-transparent shadow-none focus-visible:outline-0 aria-invalid:outline-0 sm:h-auto dark:bg-transparent",
+        "h-auto flex-1 self-stretch rounded-none border-0 bg-transparent shadow-none focus-visible:outline-0 aria-invalid:outline-0 sm:not-pointer-coarse:h-auto dark:bg-transparent",
         // Small padding in a small group, weak enough that addon-side
         // padding still wins
         "in-[[data-slot=input-group][data-size=sm]]:px-2.5 in-[[data-slot=input-group][data-size=sm]]:py-1.5",

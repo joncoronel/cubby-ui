@@ -42,10 +42,10 @@ const toolbarVariants = cva(
       },
       // Button's height ladder (one step taller below sm); corners step with it.
       size: {
-        sm: "[--toolbar-h:--spacing(9)] sm:[--toolbar-h:--spacing(8)] [--toolbar-radius:calc(var(--radius)-2px)]",
+        sm: "[--toolbar-h:--spacing(9)] sm:not-pointer-coarse:[--toolbar-h:--spacing(8)] [--toolbar-radius:calc(var(--radius)-2px)]",
         default:
-          "[--toolbar-h:--spacing(10)] sm:[--toolbar-h:--spacing(9)] [--toolbar-radius:var(--radius)]",
-        lg: "[--toolbar-h:--spacing(11)] sm:[--toolbar-h:--spacing(10)] [--toolbar-radius:calc(var(--radius)+2px)]",
+          "[--toolbar-h:--spacing(10)] sm:not-pointer-coarse:[--toolbar-h:--spacing(9)] [--toolbar-radius:var(--radius)]",
+        lg: "[--toolbar-h:--spacing(11)] sm:not-pointer-coarse:[--toolbar-h:--spacing(10)] [--toolbar-radius:calc(var(--radius)+2px)]",
       },
     },
   },
@@ -55,10 +55,10 @@ const toolbarVariants = cva(
 const itemShell = cn(
   "shrink-0",
   "rounded-[calc(var(--toolbar-item-radius)+2px)] before:rounded-(--toolbar-item-radius) focus-visible:z-10",
-  "h-auto self-stretch sm:h-auto",
+  "h-auto self-stretch sm:not-pointer-coarse:h-auto",
   // In a column every item gets the row's paint height, and at least its
   // width, so the column is never narrower than the row is tall.
-  "group-data-[orientation=vertical]/toolbar:box-content group-data-[orientation=vertical]/toolbar:py-0 group-data-[orientation=vertical]/toolbar:h-[calc(var(--toolbar-h)-4px)] sm:group-data-[orientation=vertical]/toolbar:h-[calc(var(--toolbar-h)-4px)] group-data-[orientation=vertical]/toolbar:min-w-[calc(var(--toolbar-h)-4px)]",
+  "group-data-[orientation=vertical]/toolbar:box-content group-data-[orientation=vertical]/toolbar:py-0 group-data-[orientation=vertical]/toolbar:h-[calc(var(--toolbar-h)-4px)] sm:not-pointer-coarse:group-data-[orientation=vertical]/toolbar:h-[calc(var(--toolbar-h)-4px)] group-data-[orientation=vertical]/toolbar:min-w-[calc(var(--toolbar-h)-4px)]",
 );
 
 // Without the pill, hover lights instantly, so a sweep never shows two items
@@ -70,7 +70,7 @@ const instantHover =
 // Icon-only items have a square paint (the content box, with no padding),
 // whatever each side's border: as tall as the row, or as wide as the column.
 const iconSquare =
-  "box-content aspect-square w-auto px-0 sm:w-auto group-data-[orientation=vertical]/toolbar:h-auto sm:group-data-[orientation=vertical]/toolbar:h-auto";
+  "box-content aspect-square w-auto px-0 sm:not-pointer-coarse:w-auto group-data-[orientation=vertical]/toolbar:h-auto sm:not-pointer-coarse:group-data-[orientation=vertical]/toolbar:h-auto";
 
 type ToolbarVariant = NonNullable<
   VariantProps<typeof toolbarVariants>["variant"]
@@ -220,7 +220,7 @@ function ToolbarToggle({
           render={render}
           className={cn(
             itemShell,
-            "min-w-auto sm:min-w-auto",
+            "min-w-auto sm:not-pointer-coarse:min-w-auto",
             itemSize[size],
             iconOnly && iconSquare,
             "text-current",

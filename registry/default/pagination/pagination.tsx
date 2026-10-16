@@ -54,10 +54,10 @@ const paginationContentVariants = cva(
       },
       // Button's height ladder (one step taller below sm); corners step with it.
       size: {
-        sm: "[--pagination-h:--spacing(9)] sm:[--pagination-h:--spacing(8)] [--pagination-radius:calc(var(--radius)-2px)]",
+        sm: "[--pagination-h:--spacing(9)] sm:not-pointer-coarse:[--pagination-h:--spacing(8)] [--pagination-radius:calc(var(--radius)-2px)]",
         default:
-          "[--pagination-h:--spacing(10)] sm:[--pagination-h:--spacing(9)] [--pagination-radius:var(--radius)]",
-        lg: "[--pagination-h:--spacing(11)] sm:[--pagination-h:--spacing(10)] [--pagination-radius:calc(var(--radius)+2px)]",
+          "[--pagination-h:--spacing(10)] sm:not-pointer-coarse:[--pagination-h:--spacing(9)] [--pagination-radius:var(--radius)]",
+        lg: "[--pagination-h:--spacing(11)] sm:not-pointer-coarse:[--pagination-h:--spacing(10)] [--pagination-radius:calc(var(--radius)+2px)]",
       },
     },
     defaultVariants: {

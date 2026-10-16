@@ -21,6 +21,7 @@ import {
   Search01Icon,
 } from "@hugeicons/core-free-icons";
 import {
+  POPUP_ITEM,
   POPUP_SEARCH_BAND,
   POPUP_SEARCH_CLEAR,
   POPUP_SEARCH_FIELD,
@@ -124,10 +125,10 @@ function ComboboxInput({
       data-slot="combobox-input-group"
       className={cn(
         popup
-          ? // An item's height (36px), so the field reads as part of the list.
-            cn(POPUP_SEARCH_FIELD, "h-9 cursor-text")
+          ? // An item's height, so the field reads as part of the list.
+            [POPUP_SEARCH_FIELD, "cursor-text"]
           : [
-              "flex h-10 w-full min-w-0 cursor-text items-center gap-2 rounded-lg border bg-clip-padding px-3 sm:h-9",
+              "flex h-10 w-full min-w-0 cursor-text items-center gap-2 rounded-lg border bg-clip-padding px-3 sm:not-pointer-coarse:h-9",
               variant === "default" ? "bg-input" : "bg-input-elevated",
               // Focus ring follows the input via focus-within (same pattern as ComboboxChips).
               "focus-within:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-within:outline-2 focus-within:outline-offset-2",
@@ -149,7 +150,7 @@ function ComboboxInput({
         id={id}
         data-slot="combobox-input"
         className={cn(
-          "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground h-full min-w-0 flex-1 border-none bg-transparent p-0 text-base font-normal shadow-none outline-none disabled:cursor-not-allowed md:text-sm",
+          "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground h-full min-w-0 flex-1 border-none bg-transparent p-0 text-base font-normal shadow-none outline-none disabled:cursor-not-allowed sm:not-pointer-coarse:text-sm",
           "file:text-foreground file:inline-flex file:h-7 file:rounded-md file:border-0 file:bg-transparent file:text-sm file:font-medium",
           inputClassName,
         )}
@@ -196,7 +197,7 @@ function ComboboxChipInput({
       id={id}
       data-slot="combobox-input"
       className={cn(
-        "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground h-7 min-w-12 flex-1 rounded-none border-none bg-transparent p-0 pl-1.5 text-base font-normal shadow-none outline-none focus-visible:ring-0 focus-visible:ring-offset-0 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 sm:h-6 md:text-sm",
+        "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground h-7 min-w-12 flex-1 rounded-none border-none bg-transparent p-0 pl-1.5 text-base font-normal shadow-none outline-none focus-visible:ring-0 focus-visible:ring-offset-0 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 sm:not-pointer-coarse:h-6 sm:not-pointer-coarse:text-sm",
 
         className,
       )}
@@ -491,7 +492,8 @@ function ComboboxItem({
       ref={ref}
       data-slot="combobox-item"
       className={cn(
-        "data-highlighted:text-accent-foreground data-highlighted:bg-surface-hover relative grid cursor-default grid-cols-[1fr_1rem] items-center gap-2 rounded-md px-2.5 py-2 pr-2 text-sm outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60",
+        POPUP_ITEM,
+        "data-highlighted:text-accent-foreground data-highlighted:bg-surface-hover relative grid cursor-default grid-cols-[1fr_1rem] items-center gap-2 pr-2 outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-60",
         // Spacing from list edges
         "mx-1 first:mt-1 last:mb-1",
         className,

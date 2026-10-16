@@ -185,12 +185,12 @@ const DEFAULT_CLASS_NAMES: NonNullable<DayPickerProps["classNames"]> = {
   ),
   // Fixed side columns keep the caption centred on a month without arrows.
   month: cn(
-    "grid grid-cols-[2.25rem_1fr_2.25rem] grid-rows-[auto_1fr] gap-y-1 sm:grid-cols-[2rem_1fr_2rem]",
+    "grid grid-cols-[2.25rem_1fr_2.25rem] grid-rows-[auto_1fr] gap-y-1 sm:not-pointer-coarse:grid-cols-[2rem_1fr_2rem]",
     "max-sm:relative max-sm:isolate",
     "max-sm:before:absolute max-sm:before:inset-x-0 max-sm:before:top-0 max-sm:before:-z-1 max-sm:before:h-[calc(var(--calendar-header)-0.25rem)] max-sm:before:rounded-xl max-sm:before:bg-muted",
   ),
   month_caption:
-    "col-start-2 row-start-1 flex h-9 min-w-0 items-center justify-center sm:h-8",
+    "col-start-2 row-start-1 flex h-9 min-w-0 items-center justify-center sm:not-pointer-coarse:h-8",
   button_previous: "col-start-1 row-start-1 self-center justify-self-start",
   button_next: "col-start-3 row-start-1 self-center justify-self-end",
   caption_label: "text-sm font-medium",
@@ -199,14 +199,15 @@ const DEFAULT_CLASS_NAMES: NonNullable<DayPickerProps["classNames"]> = {
   dropdown: "absolute inset-0 cursor-pointer opacity-0",
   month_grid: "w-full border-separate border-spacing-x-0 border-spacing-y-0.5",
   weekdays: "",
-  weekday: "text-muted-foreground h-8 w-10 p-0 text-xs font-medium sm:w-9",
-  week_number_header: "h-8 w-10 p-0 sm:w-9",
+  weekday:
+    "text-muted-foreground h-8 w-10 p-0 text-xs font-medium sm:not-pointer-coarse:w-9",
+  week_number_header: "h-8 w-10 p-0 sm:not-pointer-coarse:w-9",
   week_number:
-    "text-muted-foreground/70 size-10 p-0 text-xs tabular-nums sm:size-9",
+    "text-muted-foreground/70 size-10 p-0 text-xs tabular-nums sm:not-pointer-coarse:size-9",
   weeks: "",
   week: "",
   day: cn(
-    "group/day relative size-10 p-0 text-center sm:size-9",
+    "group/day relative size-10 p-0 text-center sm:not-pointer-coarse:size-9",
     "data-disabled:pointer-events-none",
   ),
   day_button: cn(
@@ -747,7 +748,7 @@ function Calendar({
             : undefined
         }
         className={cn(
-          "relative w-fit [--calendar-header:2.5rem] sm:[--calendar-header:2.25rem]",
+          "relative w-fit [--calendar-header:2.5rem] sm:not-pointer-coarse:[--calendar-header:2.25rem]",
           framed && cn("rounded-2xl p-1", solidSurface(3, 1)),
           className,
         )}

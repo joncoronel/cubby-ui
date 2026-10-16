@@ -14,7 +14,7 @@ export default function SelectObjectValues() {
       defaultValue={shippingMethods[0]}
       itemToStringValue={(method) => method?.id ?? ""}
     >
-      <SelectTrigger className="h-auto min-h-10 w-[280px] sm:h-auto sm:min-h-9">
+      <SelectTrigger className="h-auto min-h-10 w-[280px] sm:not-pointer-coarse:h-auto sm:not-pointer-coarse:min-h-9">
         <SelectValue>
           {(method: ShippingMethod) => (
             <span className="flex flex-col items-start gap-0.5">

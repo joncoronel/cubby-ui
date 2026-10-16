@@ -21,7 +21,7 @@ const buttonGroupVariants = cva(
     variants: {
       variant: {
         attached:
-          "[&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit [&>input]:flex-1 has-[select[aria-hidden=true]:last-child]:[&>[data-slot=select-trigger]:last-of-type]:rounded-r-lg has-[>[data-slot=button-group]]:gap-2 [&>input]:bg-card",
+          "[&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit [&>input]:flex-1 has-[>[data-slot=button-group]]:gap-2 [&>input]:bg-card",
         // Outline draws its line just outside the fill, as on an outline
         // Button. The others have no border, so elevated's rim and shadow
         // ring meet its edge.
@@ -175,7 +175,13 @@ function ButtonGroup({
         {...props}
       >
         {children}
-        {glides && <span aria-hidden data-slot="button-group-highlight" />}
+        {glides && (
+          <span
+            aria-hidden
+            data-slot="button-group-highlight"
+            data-button-group-highlight
+          />
+        )}
       </div>
     </ButtonGroupContext.Provider>
   );

@@ -16,19 +16,17 @@ const inputGroupVariants = cva(
     // buttons sit in it with a 2px transparent-border inset.
     "h-(--input-group-h) has-[>textarea]:h-auto",
 
-    // Addons follow the control: dimmed while it's disabled, and a block
-    // addon tucked closer to an input. Here on the group, with a direct
-    // child as the target, rather than as group-has variants on the addon:
-    // those compile to `:has()` inside `:is(… *)`, which makes Chrome
-    // restyle the whole page on any DOM insertion (~8ms on a docs page).
-    "[&:has([data-slot=input-group-control]:disabled)>[data-slot=input-group-addon]]:opacity-60",
+    // A block addon sits closer to an input.
     "[&:has(>input)>[data-align=block-start]]:pt-2.5 [&:has(>input)>[data-align=block-end]]:pb-2.5",
 
-    // Variants based on alignment.
-    "has-[>[data-align=inline-start]]:[&>input]:pl-2",
-    "has-[>[data-align=inline-end]]:[&>input]:pr-2",
-    "has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col has-[>[data-align=block-start]]:[&>input]:pb-3",
-    "has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-end]]:[&>input]:pt-3",
+    // Variants based on alignment. The input checks its siblings rather
+    // than `:has()` on the group: Chrome prices `:has()` by the element it
+    // styles, and an `input` there makes every DOM insertion restyle every
+    // input on the page.
+    "[&>input:is(:has(~[data-align=inline-start]),[data-align=inline-start]~*)]:pl-2",
+    "[&>input:is(:has(~[data-align=inline-end]),[data-align=inline-end]~*)]:pr-2",
+    "has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col [&>input:is(:has(~[data-align=block-start]),[data-align=block-start]~*)]:pb-3",
+    "has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col [&>input:is(:has(~[data-align=block-end]),[data-align=block-end]~*)]:pt-3",
 
     // Focus state.
     "has-[[data-slot=input-group-control]:focus-visible]:outline-ring/50 has-[[data-slot=input-group-control]:focus-visible]:outline-2 has-[[data-slot=input-group-control]:focus-visible]:outline-offset-2 has-[[data-slot=input-group-control]:focus-visible]:outline-solid",
@@ -78,7 +76,14 @@ function InputGroup({ className, variant, size, ...props }: InputGroupProps) {
 }
 
 const inputGroupAddonVariants = cva(
-  "text-muted-foreground flex h-auto cursor-text items-center justify-center gap-2 text-sm font-medium select-none [&>svg:not([class*='size-'])]:size-4 [&>kbd]:rounded-[calc(var(--radius)-5px)]",
+  [
+    "text-muted-foreground flex h-auto cursor-text items-center justify-center gap-2 text-sm font-medium select-none [&>svg:not([class*='size-'])]:size-4 [&>kbd]:rounded-[calc(var(--radius)-5px)]",
+    // Dimmed while the control is disabled. Written from the addon so it's
+    // matched by its own class: Chrome prices `:has()` by the element it
+    // styles, and a `data-slot` target makes every DOM insertion restyle
+    // the whole page.
+    "[[data-slot=input-group]:has([data-slot=input-group-control]:disabled)>&]:opacity-60",
+  ],
   {
     variants: {
       // Inline addons fill the shell's height. A button on the outer edge

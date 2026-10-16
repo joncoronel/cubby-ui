@@ -61,7 +61,17 @@ function FieldError({ className, ...props }: BaseField.Error.Props) {
   return (
     <BaseField.Error
       data-slot="field-error"
-      className={cn("text-destructive text-sm", className)}
+      className={cn(
+        "text-destructive text-sm",
+        // In a FieldErrorSlot, swapping errors: the exiting one hides at
+        // once and the entering one shows. Written from the error so it's
+        // matched by its own class: Chrome prices `:has()` by the element it
+        // styles, and a `data-slot` target makes every DOM insertion
+        // restyle the whole page.
+        "[[data-slot=field-error-slot]:has(>[data-slot=field-error]:not([data-ending-style]))>&[data-ending-style]]:hidden",
+        "[[data-slot=field-error-slot]:has(>[data-slot=field-error][data-ending-style])>&[data-starting-style]]:opacity-100",
+        className,
+      )}
       {...props}
     />
   );
@@ -78,9 +88,6 @@ function FieldErrorSlot({ className, ...props }: React.ComponentProps<"div">) {
         // Opacity fade on child FieldError
         "*:data-[slot=field-error]:transition-opacity *:data-[slot=field-error]:duration-140 motion-reduce:*:data-[slot=field-error]:transition-none",
         "[&>[data-slot=field-error][data-ending-style]]:opacity-0 [&>[data-slot=field-error][data-starting-style]]:opacity-0",
-        // When swapping errors: instantly hide the exiting one, show the entering one.
-        "[&:has(>[data-slot=field-error]:not([data-ending-style]))>[data-slot=field-error][data-ending-style]]:hidden",
-        "[&:has(>[data-slot=field-error][data-ending-style])>[data-slot=field-error][data-starting-style]]:opacity-100",
         className,
       )}
       {...props}

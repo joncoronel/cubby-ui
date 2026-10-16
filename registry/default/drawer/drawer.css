@@ -35,18 +35,14 @@
   }
 }
 
-/* Horizontal drawers: prevent page scroll interference */
-html:has([data-slot="drawer-viewport"][data-direction="left"]),
-html:has([data-slot="drawer-viewport"][data-direction="right"]) {
+/* Side drawers: no page scrollbar, so the drawer meets the screen edge (the
+ * scroll lock would leave its gutter showing), and no page overscroll. The
+ * attribute is set by DrawerContent while a left or right drawer is mounted. */
+html[data-drawer-side] {
   overscroll-behavior: none;
   scrollbar-width: none;
 }
 
-html:has(
-    [data-slot="drawer-viewport"][data-direction="left"]
-  )::-webkit-scrollbar,
-html:has(
-    [data-slot="drawer-viewport"][data-direction="right"]
-  )::-webkit-scrollbar {
+html[data-drawer-side]::-webkit-scrollbar {
   display: none !important;
 }

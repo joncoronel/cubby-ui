@@ -905,6 +905,22 @@ function DrawerContentInner({
     parentNesting?.setNestedDragging(isDragging);
   }, [isDragging, parentNesting]);
 
+  // While a side drawer is mounted, <html> carries `data-drawer-side` (a
+  // count, for stacked drawers) so drawer.css can hide the page scrollbar and
+  // the drawer meets the screen edge. An attribute rather than `html:has()`,
+  // which makes Chrome re-check <html> on every DOM change on any page that
+  // loads the stylesheet.
+  React.useLayoutEffect(() => {
+    if (isVertical) return;
+    const { dataset } = document.documentElement;
+    dataset.drawerSide = String(Number(dataset.drawerSide ?? 0) + 1);
+    return () => {
+      const count = Number(dataset.drawerSide ?? 1) - 1;
+      if (count > 0) dataset.drawerSide = String(count);
+      else delete dataset.drawerSide;
+    };
+  }, [isVertical]);
+
   React.useLayoutEffect(() => {
     if (!open) {
       parentNesting?.clearNestedDragProgress();

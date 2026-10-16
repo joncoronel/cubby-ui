@@ -84,12 +84,13 @@ const inputGroupAddonVariants = cva(
     variants: {
       // Inline addons fill the shell's height. A button on the outer edge
       // takes the place of the padding, so its corners are concentric with
-      // the shell's.
+      // the shell's. The edge check skips the hidden spans an open popup
+      // renders beside its trigger and portal (focus guards, aria-owns).
       align: {
         "inline-start":
-          "order-first self-stretch pl-3 has-[>button:first-child]:pl-0 has-[>kbd]:pl-2",
+          "order-first self-stretch pl-3 has-[>button:nth-child(1_of_:not([data-base-ui-focus-guard],[aria-owns]))]:pl-0 has-[>kbd]:pl-2",
         "inline-end":
-          "order-last self-stretch pr-3 has-[>button:last-child]:pr-0 has-[>kbd]:pr-2",
+          "order-last self-stretch pr-3 has-[>button:nth-last-child(1_of_:not([data-base-ui-focus-guard],[aria-owns]))]:pr-0 has-[>kbd]:pr-2",
         "block-start":
           "order-first w-full justify-start px-3 pt-3 [.border-b]:pb-3",
         "block-end":

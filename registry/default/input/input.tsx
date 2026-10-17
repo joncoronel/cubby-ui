@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 const inputVariants = cva(
   [
     "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground",
-    "border bg-clip-padding",
+    "border border-transparent",
     "flex w-full min-w-0 rounded-lg",
     "text-base transition-colors duration-200 sm:not-pointer-coarse:text-sm",
     "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60",
@@ -18,10 +18,10 @@ const inputVariants = cva(
   {
     variants: {
       variant: {
-        // Opaque bg — use on the page or any non-elevated substrate.
+        // Filled bg — use on the page or any non-elevated substrate.
         default: "bg-input",
-        // Translucent overlay — use inside Cards, Dialogs, or any elevated
-        // surface where the opaque default would collapse into its parent.
+        // Slightly stronger tint — use inside Cards, Dialogs, or any elevated
+        // surface.
         elevated: "bg-input-elevated",
       },
       size: {

@@ -11,7 +11,7 @@
 
   /* Background colors — the page is surface-1, cards and popovers surface-3. */
   --background: var(--surface-1);
-  --foreground: oklch(0.18 var(--neutral-chroma) var(--neutral-hue));
+  --foreground: oklch(0.3 var(--neutral-chroma) var(--neutral-hue));
 
   --card: var(--surface-3);
   --card-foreground: var(--foreground);
@@ -19,25 +19,28 @@
   --popover-foreground: var(--foreground);
 
   /* Primary & accent colors */
-  --primary: oklch(0.6 0.2 250);
+  /* Light runs a step deeper than dark (0.75) so the fill holds against the
+     page: 2.5:1 here vs 2:1 at 0.75. White labels sit at 2.7:1, below AA,
+     a deliberate trade for the brighter sky. */
+  --primary: oklch(0.68 0.16 232.65);
   --primary-foreground: oklch(1 0 0);
   /* Primary as text on a neutral plate (the `primary-soft` button), derived so
      it tracks any brand colour. Dark brightens it; solid --primary is too dim
      as text on the darker secondary surface. */
-  --primary-soft-foreground: var(--primary);
+  --primary-soft-foreground: color-mix(in oklch, var(--primary), black 25%);
   /* Carries the tint, unlike the other light fills: a pure-neutral black beside
      --foreground's faintly cool one reads as two blacks rather than one black at
      two weights. Also the light --chrome fill. */
-  --neutral: oklch(0.21 var(--neutral-chroma) var(--neutral-hue));
+  --neutral: oklch(0.32 var(--neutral-chroma) var(--neutral-hue));
   --neutral-foreground: oklch(
     0.98 var(--neutral-chroma-low) var(--neutral-hue)
   );
   --secondary: oklch(0.92 0 0);
   --secondary-foreground: oklch(0.32 var(--neutral-chroma) var(--neutral-hue));
   --muted: oklch(0.94 0 0);
-  --muted-foreground: oklch(0.5 var(--neutral-chroma) var(--neutral-hue));
+  --muted-foreground: oklch(0.53 var(--neutral-chroma) var(--neutral-hue));
   --accent: oklch(0.91 0 0);
-  --accent-foreground: oklch(0.22 var(--neutral-chroma) var(--neutral-hue));
+  --accent-foreground: oklch(0.3 var(--neutral-chroma) var(--neutral-hue));
   --destructive: oklch(0.53 0.19 25);
   --destructive-foreground: oklch(
     0.98 var(--neutral-chroma-low) var(--neutral-hue)
@@ -79,26 +82,35 @@
   /* Hover colours shift AWAY from the token's own lightness so the change always
      reads. Most light tokens darken, but --neutral is already dark and barely
      moves when blacked, so it lightens instead. */
+  /* The outline Button's fill and edge. Light sits on the card. Dark recesses
+     it with a translucent black (so it darkens whatever it sits on) and a
+     brighter edge, reading as an outlined control rather than a raised slab. */
+  --outline: var(--card);
+  --outline-border: var(--border);
+
   --primary-hover: color-mix(in oklch, var(--primary), black 5%);
   --neutral-hover: color-mix(in oklch, var(--neutral), white 10%);
   --destructive-hover: color-mix(in oklch, var(--destructive), black 5%);
   --secondary-hover: color-mix(in oklch, var(--secondary), black 5%);
-  --outline-hover: color-mix(in oklch, var(--card), black 5%);
+  --outline-hover: color-mix(in oklch, var(--outline), black 4%);
 
   /* Pressed — one step past hover in the same direction. */
   --primary-active: color-mix(in oklch, var(--primary), black 8%);
   --neutral-active: color-mix(in oklch, var(--neutral), white 14%);
   --destructive-active: color-mix(in oklch, var(--destructive), black 8%);
   --secondary-active: color-mix(in oklch, var(--secondary), black 8%);
-  --outline-active: color-mix(in oklch, var(--card), black 8%);
+  --outline-active: color-mix(in oklch, var(--outline), black 7%);
 
   /* Borders & inputs */
   /* Re-declared in .dark: a custom property resolves its var()s where DECLARED,
      so without it a subtree-scoped .dark inherits this light-resolved value. */
   --border: color-mix(in oklab, var(--foreground) 10%, transparent);
-  --input: var(--surface-3);
-  --input-elevated: oklch(0 0 0 / 8%);
-  --ring: oklch(0.55 0.2 250);
+  /* Form fields are filled, not outlined: a translucent tint that darkens
+     whatever it sits on, so one value reads on the page, a Card or a popup. */
+  --input: oklch(0 0 0 / 4.5%);
+  --input-hover: oklch(0 0 0 / 7.5%);
+  --input-elevated: oklch(0 0 0 / 6%);
+  --ring: oklch(0.7 0.15 232.65);
   --scrollbar: oklch(0.87 0 0);
 
   /* Sidebar — aliases onto the core tokens, so no .dark overrides are needed;
@@ -120,9 +132,9 @@
   --warning: oklch(0.98 0.06 85);
   --warning-foreground: oklch(0.58 0.14 85);
   --warning-border: oklch(0.92 0.1 85);
-  --info: oklch(0.97 0.04 250);
-  --info-foreground: oklch(0.45 0.2 250);
-  --info-border: oklch(0.9 0.1 250);
+  --info: oklch(0.97 0.03 232.65);
+  --info-foreground: oklch(0.5 0.13 232.65);
+  --info-border: oklch(0.9 0.07 232.65);
   --success: oklch(0.97 0.04 145);
   --success-foreground: oklch(0.48 0.18 145);
   --success-border: oklch(0.9 0.1 145);
@@ -147,10 +159,10 @@
 
   /* Opacity falls as blur grows, mimicking light fall-off. The 1px ring stays
      at full opacity so elevated containers keep a defined edge. */
-  --surface-shadow-ring: oklch(0 0 0 / 0.06); /* crisp edge */
-  --surface-shadow-near: oklch(0 0 0 / 0.06); /* 1px blur (contact) */
-  --surface-shadow-mid: oklch(0 0 0 / 0.05); /* 3–6px blur */
-  --surface-shadow-far: oklch(0 0 0 / 0.04); /* 12–24px blur */
+  --surface-shadow-ring: oklch(0 0 0 / 0.035); /* crisp edge */
+  --surface-shadow-near: oklch(0 0 0 / 0.04); /* 1px blur (contact) */
+  --surface-shadow-mid: oklch(0 0 0 / 0.04); /* 3–6px blur */
+  --surface-shadow-far: oklch(0 0 0 / 0.035); /* 12–24px blur */
   --surface-shadow-ambient: oklch(0 0 0 / 0.03); /* 48–96px blur */
   --surface-shadow-1: 0 0 0 1px var(--surface-shadow-ring);
   --surface-shadow-2:
@@ -247,6 +259,8 @@
   --destructive: oklch(0.5 0.22 25);
   --destructive-foreground: oklch(1 0 0);
   /* Brightened so primary-soft's label stays readable on the darker plate. */
+  /* The bright sky reads well on dark surfaces (8.3:1 against the page). */
+  --primary: oklch(0.75 0.16 232.65);
   --primary-soft-foreground: color-mix(in oklch, var(--primary), white 30%);
   /* Same treatment for destructive-soft's label on its tinted plate. */
   --destructive-soft-foreground: color-mix(
@@ -280,11 +294,16 @@
   );
 
   /* Dark hover — mix toward white so hovered buttons brighten. */
+  /* Re-declared, see the :root note on --outline. A faint white ring over a
+     fill a shade darker than its surround; hover lifts it just above it. */
+  --outline: oklch(0 0 0 / 0.3);
+  --outline-border: oklch(1 0 0 / 0.08);
+
   --primary-hover: color-mix(in oklch, var(--primary), white 10%);
   --neutral-hover: color-mix(in oklch, var(--neutral), black 10%);
   --destructive-hover: color-mix(in oklch, var(--destructive), white 15%);
   --secondary-hover: color-mix(in oklch, var(--secondary), white 5%);
-  --outline-hover: color-mix(in oklch, var(--card), white 5%);
+  --outline-hover: oklch(1 0 0 / 0.03);
 
   /* Dark pressed. --destructive-active darkens instead: brightening the
      saturated red drops white-label contrast below AA. */
@@ -292,12 +311,14 @@
   --neutral-active: color-mix(in oklch, var(--neutral), black 14%);
   --destructive-active: color-mix(in oklch, var(--destructive), black 8%);
   --secondary-active: color-mix(in oklch, var(--secondary), white 8%);
-  --outline-active: color-mix(in oklch, var(--card), white 8%);
+  --outline-active: oklch(1 0 0 / 0.05);
 
   /* Re-declared rather than inherited: a custom property resolves its var()s
      where DECLARED, so this must re-mix against dark's --foreground. */
   --border: color-mix(in oklab, var(--foreground) 10%, transparent);
-  --input-elevated: oklch(1 0 0 / 9%);
+  --input: oklch(1 0 0 / 5%);
+  --input-hover: oklch(1 0 0 / 9%);
+  --input-elevated: oklch(1 0 0 / 7%);
   --scrollbar: oklch(0.7 var(--neutral-chroma) var(--neutral-hue));
 
   /* Only --sidebar-border needs a dark value; the rest are aliases. */
@@ -310,9 +331,9 @@
   --warning: oklch(0.28 0.06 85);
   --warning-foreground: oklch(0.78 0.12 85);
   --warning-border: oklch(0.38 0.09 85);
-  --info: oklch(0.26 0.07 250);
-  --info-foreground: oklch(0.72 0.16 250);
-  --info-border: oklch(0.36 0.11 250);
+  --info: oklch(0.26 0.06 232.65);
+  --info-foreground: oklch(0.78 0.13 232.65);
+  --info-border: oklch(0.36 0.09 232.65);
   --success: oklch(0.26 0.07 145);
   --success-foreground: oklch(0.72 0.15 145);
   --success-border: oklch(0.36 0.11 145);
@@ -353,32 +374,32 @@
   --surface-shadow-1: 0 0 transparent;
   --surface-shadow-2: 0 1px 1px -0.5px var(--surface-shadow-near);
   --surface-shadow-3:
-    0 0 0 1px oklch(0 0 0 / 0.12), 0 1px 1px -0.5px var(--surface-shadow-near),
+    0 0 0 1px oklch(0 0 0 / 0.08), 0 1px 1px -0.5px var(--surface-shadow-near),
     0 3px 3px -1.5px var(--surface-shadow-mid);
   --surface-shadow-4:
-    0 0 0 1px oklch(0 0 0 / 0.14), 0 1px 1px -0.5px var(--surface-shadow-near),
+    0 0 0 1px oklch(0 0 0 / 0.1), 0 1px 1px -0.5px var(--surface-shadow-near),
     0 3px 3px -1.5px var(--surface-shadow-mid),
     0 6px 6px -3px var(--surface-shadow-mid);
   --surface-shadow-5:
-    0 0 0 1px oklch(0 0 0 / 0.16), 0 1px 1px -0.5px var(--surface-shadow-near),
+    0 0 0 1px oklch(0 0 0 / 0.12), 0 1px 1px -0.5px var(--surface-shadow-near),
     0 3px 3px -1.5px var(--surface-shadow-mid),
     0 6px 6px -3px var(--surface-shadow-mid),
     0 12px 12px -6px var(--surface-shadow-far);
   --surface-shadow-6:
-    0 0 0 1px oklch(0 0 0 / 0.18), 0 1px 1px -0.5px var(--surface-shadow-near),
+    0 0 0 1px oklch(0 0 0 / 0.14), 0 1px 1px -0.5px var(--surface-shadow-near),
     0 3px 3px -1.5px var(--surface-shadow-mid),
     0 6px 6px -3px var(--surface-shadow-mid),
     0 12px 12px -6px var(--surface-shadow-far),
     0 24px 24px -12px var(--surface-shadow-far);
   --surface-shadow-7:
-    0 0 0 1px oklch(0 0 0 / 0.2), 0 1px 1px -0.5px var(--surface-shadow-near),
+    0 0 0 1px oklch(0 0 0 / 0.16), 0 1px 1px -0.5px var(--surface-shadow-near),
     0 3px 3px -1.5px var(--surface-shadow-mid),
     0 6px 6px -3px var(--surface-shadow-mid),
     0 12px 12px -6px var(--surface-shadow-far),
     0 24px 24px -12px var(--surface-shadow-far),
     0 48px 48px -24px var(--surface-shadow-ambient);
   --surface-shadow-8:
-    0 0 0 1px oklch(0 0 0 / 0.22), 0 1px 1px -0.5px var(--surface-shadow-near),
+    0 0 0 1px oklch(0 0 0 / 0.18), 0 1px 1px -0.5px var(--surface-shadow-near),
     0 3px 3px -1.5px var(--surface-shadow-mid),
     0 6px 6px -3px var(--surface-shadow-mid),
     0 12px 12px -6px var(--surface-shadow-far),
@@ -466,6 +487,7 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-input-elevated: var(--input-elevated);
+  --color-input-hover: var(--input-hover);
   --color-ring: var(--ring);
   --color-scrollbar: var(--scrollbar);
 

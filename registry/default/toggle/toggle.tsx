@@ -49,7 +49,7 @@ const toggleVariants = cva(cn(toggleBase, togglePaint), {
       // through press; only the fill changes. bg-clip-padding keeps the card
       // fill out from under the translucent border.
       outline:
-        "[--tgl-border:var(--border)] [--tgl-bg:var(--card)] [--tgl-bg-hover:var(--outline-hover)] [--tgl-bg-active:var(--outline-active)] [--tgl-bg-selected:var(--secondary)] before:bg-clip-padding",
+        "[--tgl-border:var(--outline-border)] [--tgl-bg:var(--outline)] [--tgl-bg-hover:var(--outline-hover)] [--tgl-bg-active:var(--outline-active)] [--tgl-bg-selected:var(--secondary)] before:bg-clip-padding",
     },
     size: {
       sm: "h-9 min-w-9 gap-1.5 px-2 sm:not-pointer-coarse:h-8 sm:not-pointer-coarse:min-w-8",

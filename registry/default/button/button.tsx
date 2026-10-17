@@ -56,20 +56,21 @@ const buttonVariantClasses = {
     "text-destructive-foreground [--btn-border:rgb(0_0_0/0.05)] dark:[--btn-border:rgb(255_255_255/0.05)] [--btn-bg:var(--destructive)] [--btn-bg-hover:var(--destructive-hover)] [--btn-bg-active:var(--destructive-active)]",
   "destructive-soft":
     "text-(--destructive-soft-foreground) [--btn-bg:color-mix(in_oklab,var(--destructive)_12%,transparent)] [--btn-bg-hover:color-mix(in_oklab,var(--destructive)_20%,transparent)] [--btn-bg-active:color-mix(in_oklab,var(--destructive)_25%,transparent)]",
-  // bg-clip-padding keeps the card fill out from under the translucent
+  // bg-clip-padding keeps the fill out from under the translucent
   // border. Deliberately NOT in the shared paint: with the default
   // transparent border it would inset every solid fill by 1px.
   outline:
-    "[--btn-border:var(--border)] [--btn-bg:var(--card)] [--btn-bg-hover:var(--outline-hover)] [--btn-bg-active:var(--outline-active)] before:bg-clip-padding",
+    "[--btn-border:var(--outline-border)] [--btn-bg:var(--outline)] [--btn-bg-hover:var(--outline-hover)] [--btn-bg-active:var(--outline-active)] before:bg-clip-padding",
   // Outline's border with ghost's transparent fill, for elevated substrates
   // (Cards, Dialogs) where outline's solid card fill would look mismatched.
   "outline-ghost":
-    "[--btn-border:var(--border)] [--btn-bg-hover:var(--surface-hover)] [--btn-bg-active:var(--surface-active)]",
+    "[--btn-border:var(--outline-border)] [--btn-bg-hover:var(--surface-hover)] [--btn-bg-active:var(--surface-active)]",
   secondary:
     "text-secondary-foreground [--btn-bg:var(--secondary)] [--btn-bg-hover:var(--secondary-hover)] [--btn-bg-active:var(--secondary-active)]",
   ghost:
     "text-muted-foreground hover:text-foreground data-popup-open:text-foreground [--btn-bg-hover:var(--surface-hover)] [--btn-bg-active:var(--surface-active)]",
-  link: "text-primary underline-offset-4 hover:underline",
+  // The ink token, not --primary: the brand fill is too light to read as text.
+  link: "text-(--primary-soft-foreground) underline-offset-4 hover:underline",
 };
 
 // Heights match the Input/Select ramp (36px desktop default) so buttons pair

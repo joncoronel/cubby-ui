@@ -34,7 +34,7 @@ function AutocompleteInput({
       <BaseAutocomplete.Input
         data-slot="autocomplete-input"
         className={cn(
-          "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground flex h-10 w-full min-w-0 rounded-lg border bg-clip-padding px-3 text-base font-normal disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 sm:not-pointer-coarse:h-9 sm:not-pointer-coarse:text-sm",
+          "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground flex h-10 w-full min-w-0 rounded-lg border border-transparent px-3 text-base font-normal disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 sm:not-pointer-coarse:h-9 sm:not-pointer-coarse:text-sm",
           // Room for the clear (shown with text) and trigger buttons. Set on
           // the input, not the group, to keep `:has()` cheap.
           "[[data-slot=autocomplete-input-group]:has([data-slot=autocomplete-clear])>&]:pr-7",

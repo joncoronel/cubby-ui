@@ -128,7 +128,7 @@ function ComboboxInput({
           ? // An item's height, so the field reads as part of the list.
             [POPUP_SEARCH_FIELD, "cursor-text"]
           : [
-              "flex h-10 w-full min-w-0 cursor-text items-center gap-2 rounded-lg border bg-clip-padding px-3 sm:not-pointer-coarse:h-9",
+              "flex h-10 w-full min-w-0 cursor-text items-center gap-2 rounded-lg border border-transparent px-3 sm:not-pointer-coarse:h-9",
               variant === "default" ? "bg-input" : "bg-input-elevated",
               // Focus ring follows the input via focus-within (same pattern as ComboboxChips).
               "focus-within:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-within:outline-2 focus-within:outline-offset-2",
@@ -574,7 +574,7 @@ function ComboboxChips({
       ref={context?.setChipsElement}
       data-slot="combobox-chips"
       className={cn(
-        "flex min-h-9 w-full flex-wrap items-center gap-1.5 rounded-lg border bg-clip-padding px-1.5 py-1.5",
+        "flex min-h-9 w-full flex-wrap items-center gap-1.5 rounded-lg border border-transparent px-1.5 py-1.5",
         variant === "default" ? "bg-input" : "bg-input-elevated",
         "focus-within:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-within:outline-2 focus-within:outline-offset-2",
 

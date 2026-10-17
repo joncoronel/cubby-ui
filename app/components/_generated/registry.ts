@@ -7,7 +7,6 @@ import accordion_accordion_chevron_indicator from "@/registry/examples/accordion
 import accordion_accordion_disabled from "@/registry/examples/accordion/accordion-disabled";
 import accordion_accordion_hidden_until_found from "@/registry/examples/accordion/accordion-hidden-until-found";
 import accordion_accordion_indicator_start from "@/registry/examples/accordion/accordion-indicator-start";
-import accordion_accordion_isolated_bordered_variant from "@/registry/examples/accordion/accordion-isolated-bordered-variant";
 import accordion_accordion_isolated_filled_bordered_variant from "@/registry/examples/accordion/accordion-isolated-filled-bordered-variant";
 import accordion_accordion_isolated_filled_variant from "@/registry/examples/accordion/accordion-isolated-filled-variant";
 import accordion_accordion_multiple from "@/registry/examples/accordion/accordion-multiple";
@@ -1673,11 +1672,6 @@ export const exampleRegistry = {
       "title": "Indicator Start",
       "importPath": "accordion-indicator-start",
       "source": "import {\n  Accordion,\n  AccordionContent,\n  AccordionItem,\n  AccordionTrigger,\n} from \"@/components/ui/cubby-ui/accordion\";\n\nexport default function AccordionIndicatorStart() {\n  return (\n    <Accordion className=\"w-full max-w-lg\">\n      <AccordionItem value=\"item-1\">\n        <AccordionTrigger indicatorPosition=\"start\">\n          Desktop Application\n        </AccordionTrigger>\n        <AccordionContent>\n          Our desktop app is available for Windows, macOS, and Linux. It offers\n          offline mode, native notifications, and seamless syncing with your\n          cloud account.\n        </AccordionContent>\n      </AccordionItem>\n      <AccordionItem value=\"item-2\">\n        <AccordionTrigger indicatorPosition=\"start\">\n          Mobile Application\n        </AccordionTrigger>\n        <AccordionContent>\n          Download our mobile app for iOS and Android. Features include\n          biometric authentication, push notifications, and full functionality\n          even when you&apos;re offline.\n        </AccordionContent>\n      </AccordionItem>\n      <AccordionItem value=\"item-3\">\n        <AccordionTrigger indicatorPosition=\"start\">\n          Web Platform\n        </AccordionTrigger>\n        <AccordionContent>\n          Access your account from any browser with our web platform. No\n          installation required, automatic updates, and consistent experience\n          across all devices.\n        </AccordionContent>\n      </AccordionItem>\n    </Accordion>\n  );\n}\n"
-    },
-    {
-      "title": "Isolated Bordered Variant",
-      "importPath": "accordion-isolated-bordered-variant",
-      "source": "import {\n  Accordion,\n  AccordionContent,\n  AccordionItem,\n  AccordionTrigger,\n} from \"@/components/ui/cubby-ui/accordion\";\n\nexport default function AccordionIsolatedBorderedVariant() {\n  return (\n    <Accordion variant=\"isolated-bordered\" className=\"w-full max-w-lg\">\n      <AccordionItem value=\"item-1\">\n        <AccordionTrigger>Account Settings</AccordionTrigger>\n        <AccordionContent>\n          Manage your account preferences and personal information. Update your\n          profile details, change your password, and configure your account\n          settings here.\n        </AccordionContent>\n      </AccordionItem>\n      <AccordionItem value=\"item-2\">\n        <AccordionTrigger>Notifications</AccordionTrigger>\n        <AccordionContent>\n          Configure how and when you receive notifications. Customize email\n          alerts, push notifications, and other communication preferences.\n        </AccordionContent>\n      </AccordionItem>\n      <AccordionItem value=\"item-3\">\n        <AccordionTrigger>Privacy & Security</AccordionTrigger>\n        <AccordionContent>\n          Control your privacy settings and security options. Adjust data\n          sharing preferences, manage activity tracking, and review your\n          security settings.\n        </AccordionContent>\n      </AccordionItem>\n      <AccordionItem value=\"item-4\">\n        <AccordionTrigger>Billing & Payments</AccordionTrigger>\n        <AccordionContent>\n          View and manage your billing information, payment methods, and\n          subscription details. Update your payment preferences and review your\n          billing history.\n        </AccordionContent>\n      </AccordionItem>\n    </Accordion>\n  );\n}\n"
     },
     {
       "title": "Isolated Filled Bordered Variant",
@@ -4466,7 +4460,6 @@ export const componentMap = {
   "accordion-disabled": accordion_accordion_disabled,
   "accordion-hidden-until-found": accordion_accordion_hidden_until_found,
   "accordion-indicator-start": accordion_accordion_indicator_start,
-  "accordion-isolated-bordered-variant": accordion_accordion_isolated_bordered_variant,
   "accordion-isolated-filled-bordered-variant": accordion_accordion_isolated_filled_bordered_variant,
   "accordion-isolated-filled-variant": accordion_accordion_isolated_filled_variant,
   "accordion-multiple": accordion_accordion_multiple,

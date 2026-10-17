@@ -21,11 +21,12 @@ const buttonGroupVariants = cva(
     variants: {
       variant: {
         attached:
-          "[&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit [&>input]:flex-1 has-[>[data-slot=button-group]]:gap-2 [&>input]:bg-card",
+          "[&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit [&>input]:flex-1 has-[>[data-slot=button-group]]:gap-2",
         // Outline draws its line just outside the fill, as on an outline
         // Button. The others have no border, so elevated's rim and shadow
         // ring meet its edge.
-        outline: "bg-card text-foreground outline outline-border",
+        outline:
+          "bg-(--outline) text-foreground outline outline-(--outline-border)",
         soft: "bg-secondary text-secondary-foreground",
         elevated: cn(solidSurface(3, 3), "text-foreground"),
         // Opposite the page in brightness, so the tint needs more strength.
@@ -201,7 +202,7 @@ function ButtonGroupText({
     className: cn(
       "flex items-center gap-2 text-sm font-medium whitespace-nowrap tabular-nums [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
       variant === "attached"
-        ? "bg-muted rounded-lg border bg-clip-padding px-4"
+        ? "bg-muted rounded-lg border border-transparent px-4"
         : // Inset like the buttons (button-group.css), so text lines up
           // with their labels.
           "px-3",

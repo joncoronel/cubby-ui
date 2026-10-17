@@ -10,7 +10,7 @@ import { Textarea } from "@/registry/default/textarea/textarea";
 
 const inputGroupVariants = cva(
   [
-    "group/input-group relative flex w-full min-w-0 items-center rounded-(--input-group-radius) border bg-clip-padding",
+    "group/input-group relative flex w-full min-w-0 items-center rounded-(--input-group-radius) border border-transparent",
     "[--input-group-item-radius:max(0px,calc(var(--input-group-radius)-3px))]",
     // A fixed shell, as in Number Field: the input stretches to fill it, and
     // buttons sit in it with a 2px transparent-border inset.
@@ -44,10 +44,10 @@ const inputGroupVariants = cva(
         sm: "[--input-group-h:--spacing(9)] sm:not-pointer-coarse:[--input-group-h:--spacing(8)] [--input-group-radius:calc(var(--radius)-2px)]",
       },
       variant: {
-        // Opaque "lifted" bg — use on the page or any non-elevated substrate.
+        // Filled bg — use on the page or any non-elevated substrate.
         default: "bg-input",
-        // Translucent overlay — use inside Cards, Dialogs, or any surface
-        // where the opaque default would collapse into its parent.
+        // Slightly stronger tint — use inside Cards, Dialogs, or any elevated
+        // surface.
         elevated: "bg-input-elevated",
       },
     },

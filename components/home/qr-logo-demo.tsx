@@ -17,7 +17,7 @@ export function QrLogoDemo() {
       finder={{
         outerStyle: "rounded",
         innerStyle: "circle",
-        innerColor: "oklch(0.55 0.2 250)",
+        innerColor: "oklch(0.55 0.15 232.65)",
       }}
       logo={
         <CubbyUILogo className="h-auto w-full text-[oklch(0.2_0.004_270)]" />

@@ -60,7 +60,7 @@ function renderHighlightedContent(content: string): React.ReactNode {
     const match = part.match(/^<mark>(.*?)<\/mark>$/);
     if (match) {
       return (
-        <mark key={i} className="text-primary bg-transparent font-bold">
+        <mark key={i} className="bg-transparent font-bold text-(--primary-soft-foreground)">
           {match[1]}
         </mark>
       );

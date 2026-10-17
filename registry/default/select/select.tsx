@@ -49,7 +49,7 @@ function SelectValue({ className, ...props }: BaseSelect.Value.Props) {
 const selectTriggerVariants = cva(
   [
     // Layout — w-fit by default since selects size to their value, not full-width
-    "group/select-trigger relative inline-flex w-fit items-center justify-between gap-2.5 rounded-lg border bg-clip-padding",
+    "group/select-trigger relative inline-flex w-fit items-center justify-between gap-2.5 rounded-lg border border-transparent",
     // Focus ring
     "focus-visible:outline-ring/50 ease-out-expo outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
     // Invalid state
@@ -68,14 +68,13 @@ const selectTriggerVariants = cva(
   {
     variants: {
       variant: {
-        // Opaque bg for page-level or non-elevated substrates. --outline-hover
-        // is a deliberate -5% darken of --card/--input for a sharp hover delta.
+        // Filled bg for the page or non-elevated substrates; hover deepens the
+        // same translucent tint.
         default:
-          "bg-input hover:bg-(--outline-hover) data-popup-open:bg-(--outline-hover)",
-        // Translucent overlay for Cards, Dialogs, etc. --surface-hover (alpha
-        // overlay) preserves translucency on any substrate depth.
+          "bg-input hover:bg-input-hover data-popup-open:bg-input-hover",
+        // Slightly stronger tint for Cards, Dialogs, etc.
         elevated:
-          "bg-input-elevated hover:bg-surface-hover data-popup-open:bg-surface-hover",
+          "bg-input-elevated hover:bg-input-hover data-popup-open:bg-input-hover",
         // Chromeless — mirrors the button's ghost variant for use in toolbars
         // and inline next to ghost buttons. Chevron follows the text on hover.
         ghost:

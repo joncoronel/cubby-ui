@@ -19,7 +19,7 @@ import { buttonVariants } from "@/registry/default/button/button";
 // Paint corners are the shell's minus its border and the 2px.
 const numberFieldGroupVariants = cva(
   [
-    "relative flex h-(--number-field-h) w-fit items-stretch rounded-(--number-field-radius) border bg-clip-padding",
+    "relative flex h-(--number-field-h) w-fit items-stretch rounded-(--number-field-radius) border border-transparent",
     "[--number-field-item-radius:max(0px,calc(var(--number-field-radius)-3px))]",
     // Focus and invalid rings
     "outline-0 outline-offset-0 outline-transparent outline-solid transition-[outline-width,outline-offset,outline-color] duration-100 ease-out",

@@ -1,38 +1,52 @@
 ---
 name: Cubby UI
-description: Styled primitives, your code. A component library site built on a tinted OKLCH surface ladder, one blue accent, and Bricolage headings.
+description: Styled primitives, your code. A component library site built on a tinted OKLCH surface ladder, filled controls, one sky accent, and Bricolage headings.
 colors:
-  primary: "oklch(0.6 0.2 250)"
+  primary: "oklch(0.68 0.16 232.65)"
   primary-foreground: "oklch(1 0 0)"
-  ring: "oklch(0.55 0.2 250)"
-  foreground: "oklch(0.18 0.004 270)"
-  muted-foreground: "oklch(0.5 0.004 270)"
+  primary-soft-foreground: "color-mix(in oklch, oklch(0.68 0.16 232.65), black 25%)"
+  ring: "oklch(0.7 0.15 232.65)"
+  dark-primary: "oklch(0.75 0.16 232.65)"
+  dark-primary-soft-foreground: "color-mix(in oklch, oklch(0.75 0.16 232.65), white 30%)"
+  foreground: "oklch(0.3 0.004 270)"
+  muted-foreground: "oklch(0.53 0.004 270)"
   surface-1: "oklch(0.97 0 0)"
   surface-2: "oklch(0.985 0 0)"
   surface-3: "oklch(1 0 0)"
   secondary: "oklch(0.92 0 0)"
   secondary-foreground: "oklch(0.32 0.004 270)"
-  neutral: "oklch(0.21 0.004 270)"
+  muted: "oklch(0.94 0 0)"
+  neutral: "oklch(0.32 0.004 270)"
   neutral-foreground: "oklch(0.98 0.002 270)"
-  border: "color-mix(in oklab, oklch(0.18 0.004 270) 10%, transparent)"
+  border: "color-mix(in oklab, oklch(0.3 0.004 270) 10%, transparent)"
+  outline: "oklch(1 0 0)"
+  outline-border: "color-mix(in oklab, oklch(0.3 0.004 270) 10%, transparent)"
+  dark-outline: "oklch(0 0 0 / 0.3)"
+  dark-outline-border: "oklch(1 0 0 / 0.08)"
+  input: "oklch(0 0 0 / 0.045)"
+  input-hover: "oklch(0 0 0 / 0.075)"
+  input-elevated: "oklch(0 0 0 / 0.06)"
+  dark-input: "oklch(1 0 0 / 0.05)"
+  dark-input-hover: "oklch(1 0 0 / 0.09)"
+  dark-input-elevated: "oklch(1 0 0 / 0.07)"
   destructive: "oklch(0.53 0.19 25)"
   danger-foreground: "oklch(0.55 0.18 25)"
   warning-foreground: "oklch(0.58 0.14 85)"
-  info-foreground: "oklch(0.45 0.2 250)"
+  info-foreground: "oklch(0.5 0.13 232.65)"
   success-foreground: "oklch(0.48 0.18 145)"
   dark-surface-1: "oklch(0.205 0.004 270)"
   dark-surface-3: "oklch(0.264 0.004 270)"
   dark-foreground: "oklch(0.94 0.004 270)"
   dark-muted-foreground: "oklch(0.73 0.004 270)"
   dark-chrome: "oklch(0.159 0.004 270)"
-  landing-field: "oklch(0.47 0.2 264)"
-  landing-on-field: "oklch(0.985 0.008 264)"
-  landing-on-field-muted: "oklch(0.87 0.05 264)"
+  landing-field: "oklch(0.5 0.14 232.65)"
+  landing-on-field: "oklch(0.985 0.008 232.65)"
+  landing-on-field-muted: "oklch(0.9 0.04 232.65)"
   landing-field-line: "oklch(1 0 0 / 0.16)"
-  landing-slug: "oklch(0.5 0.2 258)"
-  dark-landing-field: "oklch(0.37 0.16 264)"
-  dark-landing-slug: "oklch(0.76 0.13 255)"
-  dark-landing-on-field-muted: "oklch(0.84 0.05 264)"
+  landing-slug: "oklch(0.5 0.13 232.65)"
+  dark-landing-field: "oklch(0.4 0.11 232.65)"
+  dark-landing-slug: "oklch(0.78 0.12 232.65)"
+  dark-landing-on-field-muted: "oklch(0.86 0.04 232.65)"
   dark-landing-field-line: "oklch(1 0 0 / 0.12)"
 typography:
   display:
@@ -116,7 +130,7 @@ components:
     padding: "0 14px"
     height: "36px"
   button-outline:
-    backgroundColor: "{colors.surface-3}"
+    backgroundColor: "{colors.outline}"
     textColor: "{colors.foreground}"
     rounded: "{rounded.lg}"
     padding: "0 14px"
@@ -132,6 +146,24 @@ components:
     rounded: "{rounded.lg}"
     padding: "0 14px"
     height: "36px"
+  button-link:
+    textColor: "{colors.primary-soft-foreground}"
+    height: "36px"
+  input-field:
+    backgroundColor: "{colors.input}"
+    textColor: "{colors.foreground}"
+    rounded: "{rounded.lg}"
+    padding: "8px 12px"
+    height: "36px"
+  input-field-hover:
+    backgroundColor: "{colors.input-hover}"
+  input-field-elevated:
+    backgroundColor: "{colors.input-elevated}"
+  alert:
+    backgroundColor: "{colors.muted}"
+    textColor: "{colors.foreground}"
+    rounded: "{rounded.lg}"
+    padding: "12px 16px 12px 24px"
   shelf-link:
     textColor: "{colors.muted-foreground}"
     typography: "{typography.label}"
@@ -194,17 +226,18 @@ components:
 
 **Creative North Star: "The Cubby Shelf"**
 
-A well-made wooden shelf of labeled cubbies: everything has a place, the place is marked with a hairline and a name, and nothing is shouting. The system is quiet on purpose. Tinted near-neutrals carry the page, one blue carries meaning, and the display type carries the voice. Depth comes from a measured surface ladder rather than from decoration, and structure is ruled with hairlines rather than boxed with cards.
+A well-made wooden shelf of labeled cubbies: everything has a place, the place is marked with a hairline and a name, and nothing is shouting. The system is quiet on purpose. Tinted near-neutrals carry the page, one sky blue carries meaning, and the display type carries the voice. Depth comes from a measured surface ladder rather than from decoration, and structure is ruled with hairlines rather than boxed with cards. Controls are soft rather than drawn: in the spirit of yui540's soft grey work, fields, alerts, badges and accordions are set apart by a solid or translucent fill instead of a hard border, elevation is kept faint, and a single sky accent does the pointing.
 
 Density is calm and reading-first. Pages sit in one centered column with generous vertical rhythm; controls stay small, muted until touched, and brighten to full foreground on hover. Motion is a single settle curve (ease-out-expo) that opens slowly and closes quickly, and every motion collapses to a plain opacity change under reduced motion.
 
 Light and dark are both designed. Light keeps fills neutral and lets layered shadow carry elevation; dark steps lightness up a tinted ladder and adds a lit top rim. The docs surface carries the cubby mark as a four-cell glyph in its shelf trigger.
 
-This system is the docs world. The landing page (`app/(home)`) is deliberately its own world, scoped under `.landing`: it keeps the fonts, the page background, the ladder and the registry components, and adds only an ultramarine slab. Everything below applies to the docs; where the landing departs, the **Landing page** section at the end is normative inside `.landing` and nowhere else.
+This system is the docs world. The landing page (`app/(home)`) is deliberately its own world, scoped under `.landing`: it keeps the fonts, the page background, the ladder and the registry components, and adds only a deep-sky slab. Everything below applies to the docs; where the landing departs, the **Landing page** section at the end is normative inside `.landing` and nowhere else.
 
 **Key Characteristics:**
 - Neutrals tinted toward hue 270 at very low chroma (0.004, 0.002 near the extremes), tuned from three root variables.
-- One chromatic accent, the primary blue; status hues appear only on status plates.
+- One chromatic accent, the primary sky blue (hue 232.65); status hues appear only on status plates.
+- Filled, not outlined: form fields, alerts, status badges and accordions are fills with no visible edge; hairlines are kept for structure and for checkboxes and radios.
 - Bricolage Grotesque (optical-size axis) for h1 to h3 and the wordmark; Geist for body and UI; Geist Mono for code.
 - An 8-rung surface ladder with matching shadow and rim recipes; state overlays are translucent deltas.
 - Hairline structure at 10% foreground; lighter 7% lines inside rows.
@@ -212,23 +245,27 @@ This system is the docs world. The landing page (`app/(home)`) is deliberately i
 
 ## Colors
 
-A cool, faintly violet-tinted neutral stack with a single saturated blue, expressed entirely in OKLCH and color-mix so the whole palette retunes from a few roots.
+A cool, faintly violet-tinted neutral stack with a single bright sky blue, expressed entirely in OKLCH and color-mix so the whole palette retunes from a few roots.
 
 ### Primary
-- **Cubby Blue** (`{colors.primary}`): primary buttons, focus ring (via `{colors.ring}` at 50 to 55% opacity), text selection (24% mix), caret, link-underline hover, the current-page mark in the shelf, and the first cell of the cubby glyph. In dark mode the soft variant label brightens it by mixing 30% white.
+- **Cubby Blue** (`{colors.primary}` / dark `{colors.dark-primary}`): a bright sky. Primary buttons, focus ring (via `{colors.ring}` at 50 to 55% opacity), text selection (24% mix), caret, link-underline hover, the current-page mark in the shelf, and the first cell of the cubby glyph. Light runs a step deeper than dark so the fill holds against the page. The white label sits at about 2.7:1 on the light fill, below AA: a deliberate brand trade for the brighter sky, not a defect to repair.
+- **Sky Ink** (`{colors.primary-soft-foreground}` / dark `{colors.dark-primary-soft-foreground}`): Cubby Blue as text, darkened 25% toward black in light and lightened 30% toward white in dark, because the fill itself is too light to read as text. It labels the primary-soft button, the link Button variant and the bold matches in search highlights (`highlightText`).
 
 ### Neutral
 - **Ink** (`{colors.foreground}` / dark `{colors.dark-foreground}`): headings, active labels, current-page marks. Docs prose runs at 88% ink mixed into the page background, so body text sits one step below headings.
 - **Quiet Ink** (`{colors.muted-foreground}` / dark `{colors.dark-muted-foreground}`): descriptions, meta lines, idle controls, table headers, minimap labels.
 - **Page** (`{colors.surface-1}` / dark `{colors.dark-surface-1}`): the page background and every docs surface that should read as the page itself (header when scrolled, stage).
-- **Raised Paper** (`{colors.surface-2}`, `{colors.surface-3}` / dark `{colors.dark-surface-3}`): cards, popovers, default inputs, outline buttons. Light rungs 3 to 8 share one white and differ only in shadow; dark rungs climb in lightness from 0.205 to 0.402.
+- **Raised Paper** (`{colors.surface-2}`, `{colors.surface-3}` / dark `{colors.dark-surface-3}`): cards, popovers, and the light outline button. Light rungs 3 to 8 share one white and differ only in shadow; dark rungs climb in lightness from 0.205 to 0.402.
+- **Field Tint** (`{colors.input}`, hover `{colors.input-hover}`, elevated `{colors.input-elevated}` / dark `{colors.dark-input}`, `{colors.dark-input-hover}`, `{colors.dark-input-elevated}`): the fill of every text field and select trigger. Translucent (black in light, white in dark), so one value reads on the page, a card or a popup; the elevated step is for fields inside cards and dialogs.
+- **Recessed Outline** (`{colors.outline}`, `{colors.outline-border}` / dark `{colors.dark-outline}`, `{colors.dark-outline-border}`): the outline control's fill and edge. Light is the card fill with a hairline; dark is a 30% black fill with an 8% white edge, so the control sits a shade below its surround (a recessed look, modeled on jakub.kr), and hover and press lift it with 3% and 5% white. Shared by the outline Button, the outline-ghost Button's edge, the outline Toggle and the outline ButtonGroup.
+- **Muted Plate** (`{colors.muted}`): the quiet fill of alerts, accordion containers, button-group text and the code tray.
 - **Plate Gray** (`{colors.secondary}`, text `{colors.secondary-foreground}`): secondary and primary-soft button plates.
 - **Hairline** (`{colors.border}`): the default 1px rule, re-derived in dark from dark ink.
 - **Chrome Black** (`{colors.neutral}` light, `{colors.dark-chrome}` dark): persistent instrument chrome and the solid neutral button in light. Its foreground is `{colors.neutral-foreground}`; its muted text, hover, and border are 71%, 10%, and 12% mixes of that foreground.
 
 ### Status
 - **Destructive** (`{colors.destructive}`): destructive button fills only.
-- **Danger / Warning / Info / Success** (`{colors.danger-foreground}`, `{colors.warning-foreground}`, `{colors.info-foreground}`, `{colors.success-foreground}`): text on their own pale plates (lightness 0.97 to 0.98, chroma 0.04 to 0.06) with a 0.9 to 0.92 border; dark inverts to 0.26 to 0.28 plates with 0.72 to 0.78 text. The docs "required" prop flag uses danger text with no plate.
+- **Danger / Warning / Info / Success** (`{colors.danger-foreground}`, `{colors.warning-foreground}`, `{colors.info-foreground}`, `{colors.success-foreground}`): text on their own pale plates (lightness 0.97 to 0.98, chroma 0.03 to 0.06); dark inverts to 0.26 to 0.28 plates with 0.72 to 0.78 text. Info shares the primary hue (232.65) at lower chroma. Badges and alerts paint the plate alone, with no edge; the `-border` tokens (0.9 to 0.92 light) stay defined, but no registry plate draws them. The docs "required" prop flag uses danger text with no plate.
 
 ### Named Rules
 **The One Blue Rule.** Blue is the only chromatic accent outside status plates, and it means action, focus, or relation. The current location is marked in ink, never in blue; blue is reserved for what a thing is built on or what you can press.
@@ -269,18 +306,20 @@ The table of contents is a fixed tick minimap in the right margin at the xl brea
 
 ## Elevation & Depth
 
-A hybrid: light mode keeps fills neutral and communicates elevation with layered shadow; dark mode steps lightness up the tinted ladder, adds an inset top-edge highlight and ring, and uses darker, tighter shadow alphas so wide layers stay visible. Every rung is one shadow token plus one rim token, combined as `--surface-shadow-combined-N`. State overlays (`--surface-hover` 6%, `--surface-active` 8%, `--surface-selected` 10%, black in light, white in dark) raise whatever they sit on by a fixed perceptual delta.
+A hybrid, kept soft: light mode keeps fills neutral and communicates elevation with faint layered shadow (ring 3.5%, contact and mid 4%, far 3.5%, ambient 3%); dark mode steps lightness up the tinted ladder, adds an inset top-edge highlight and ring, and uses darker, tighter shadow alphas so wide layers stay visible; its outer black ring climbs from 8% at rung 3 to 18% at rung 8. Every rung is one shadow token plus one rim token, combined as `--surface-shadow-combined-N`. State overlays (`--surface-hover` 6%, `--surface-active` 8%, `--surface-selected` 10%, black in light, white in dark) raise whatever they sit on by a fixed perceptual delta.
 
 ### Shadow Vocabulary
-- **Hairline ring** (`box-shadow: 0 0 0 1px oklch(0 0 0 / 0.06)`, rung 1): flush containers that need an edge without lift; also the light chrome edge.
-- **Resting card** (rung 3: `0 0 0 1px oklch(0 0 0 / 0.06), 0 1px 1px -0.5px oklch(0 0 0 / 0.06), 0 3px 3px -1.5px oklch(0 0 0 / 0.05)`): cards and inputs at rest.
-- **Floating** (rungs 5 to 8, adding 12px, 24px, 48px, and 96px layers at 0.04 to 0.03 alpha): popovers, dialogs, menus.
+- **Hairline ring** (`box-shadow: 0 0 0 1px oklch(0 0 0 / 0.035)`, rung 1): flush containers that need an edge without lift; also the light chrome edge.
+- **Resting card** (rung 3: `0 0 0 1px oklch(0 0 0 / 0.035), 0 1px 1px -0.5px oklch(0 0 0 / 0.04), 0 3px 3px -1.5px oklch(0 0 0 / 0.04)`): cards at rest. Fields take no shadow; their fill is their definition.
+- **Floating** (rungs 5 to 8, adding 12px, 24px, 48px, and 96px layers at 0.035 to 0.03 alpha): popovers, dialogs, menus.
 - **Docs float** (`0 0 0 1px var(--border), 0 16px 40px -12px oklch(0 0 0 / 0.14)`, dark 0.5): menus and the minimap's PreviewCard use the component's own surface. The shelf window takes its fill and shadow from the surface ladder (`solidSurface(3, 5)`), like the other floating controls.
 - **Dark chrome edge** (`0 0 0 1px oklch(0 0 0 / 0.7), inset 0 1px 0 0 oklch(1 0 0 / 0.065)`): defines the chrome fill against a dark page.
 - **Stage outline** (`0 0 0 1px var(--border)`): previews are drawn, not lifted.
 
 ### Named Rules
 **The Ladder Rule.** Elevation is chosen from the ladder, never hand-written. A floating chrome surface is built from the near, mid, and far shadow alphas with no ladder ring, because rungs 3 to 8 carry their own ring.
+
+**The Fill-Not-Stroke Rule.** A control or plate is set apart by its fill, not by a hard border. Fields fill with the translucent field tint, alerts and accordions with the muted plate, status badges with their own plate; each keeps a 1px transparent border only so its geometry matches its bordered siblings. Checkboxes and radios keep their borders on purpose: an empty box needs an edge to read as a box. The outline variants are the one place a control draws a visible edge, and it is the soft outline edge, never a darker one.
 
 **The Drawn-Not-Lifted Rule.** Reading surfaces on docs (note, tables, API rows) sit flat on the page, defined by hairlines or a faint ink wash. Shadow appears only on things that float over content: the open shelf, the minimap card, menus.
 
@@ -297,12 +336,14 @@ Tactile and small. Paint lives on a `::before` layer so press can scale it witho
 - **Shape:** gently rounded (`{rounded.lg}`); xs and icon_xs sizes drop to 10px.
 - **Sizes:** default 36px tall with a mouse, one step up (40px) on touch screens and below sm; sm 32px, lg 40px, xs 28px, each a step up the same way. Field text is 16px on touch and below sm, 14px otherwise; 14px inline padding.
 - **Primary:** `{colors.primary}` fill, white label. Hover mixes 5% black (light) or 10% white (dark); pressed goes one step further (8% / 14%).
-- **Outline:** card fill with a hairline border; **Ghost:** Quiet Ink label brightening to ink on a surface-hover wash; **Neutral:** the chrome-black fill that lightens on hover; **Primary-soft / Destructive-soft:** accent-colored label on the Plate Gray plate.
+- **Outline:** the Recessed Outline fill and edge (card and hairline in light; 30% black with an 8% white edge in dark), hover and press darkening 4% and 7% in light or lifting with 3% and 5% white in dark; **Outline-ghost:** the outline edge over a transparent fill, washed with surface-hover; **Link:** a Sky Ink label, underlined on hover; **Ghost:** Quiet Ink label brightening to ink on a surface-hover wash; **Neutral:** the chrome-black fill that lightens on hover; **Primary-soft / Destructive-soft:** accent-colored label on the Plate Gray plate.
 - **Hover / Focus:** 100ms ease-out on color and fill; press scales the paint to 0.98; focus draws a 2px ring at 50% ring color, offset 2px.
 
 ### Inputs / Fields
-- **Style:** opaque surface-3 fill tracking the ladder; inside cards and dialogs, a translucent elevated fill (black 8% light, white 9% dark).
-- **Focus:** the shared 2px half-strength ring; the caret is blue on docs.
+Filled, not outlined.
+- **Style:** the translucent Field Tint (`{colors.input}`), 12px radius, no shadow, and a 1px transparent border kept only for geometry; inside cards and dialogs, the slightly stronger elevated tint. Select triggers deepen to the hover tint on hover and while their popup is open. 40px tall on touch and below sm, 36px otherwise (sm 36px / 32px), 12px inline padding.
+- **Focus:** the shared 2px half-strength ring, offset 2px; invalid fields take the same outline in 50% destructive. The caret is blue on docs.
+- **Checkbox and radio:** keep their real border (with `bg-clip-padding`, so the checked fill covers it); they are the deliberate exception to filled fields.
 
 ### Navigation
 - **Docs header:** 56px, fixed, sitting on the frame above the card; it never changes as the page scrolls. The logo enters as one composited fade and settle (opacity and scale, 600ms), not the landing's drawn stroke, which freezes while the page hydrates.
@@ -381,6 +422,10 @@ A block with a header (package-manager or file tabs) sits in the muted tray; a b
 
 ### Cards / Notes / Tables
 - **Note:** 14px radius, 4% ink wash, 14px by 18px padding, 0.9375rem at 1.65 line height, no border.
+- **Alert:** filled, never bordered or shadowed: the Muted Plate by default, each status variant on its own tinted plate, 12px radius, 12px by 16px padding (24px at the start) with a 4px full-round status bar inset 8px down the leading edge.
+- **Badge:** 8px radius, 0.75rem 500 label; secondary and status badges are their plate alone, with no edge.
+- **Accordion:** outline, nested and split variants sit on the Muted Plate with no visible border (12px radius; nested pads 4px). There is no bordered isolated variant.
+- **Toggle / ButtonGroup:** the outline Toggle and outline ButtonGroup use the Recessed Outline fill and edge, like the outline Button; a selected outline Toggle takes Plate Gray. ButtonGroup text segments are the Muted Plate with no edge.
 - **Table:** 0.875rem tabular numerals; Quiet Ink 0.8125rem headers over a full hairline; rows split by 7% ink lines.
 
 ## Do's and Don'ts
@@ -389,6 +434,8 @@ A block with a header (package-manager or file tabs) sits in the muted tray; a b
 - **Do** retune neutrals through `--neutral-hue` (270), `--neutral-chroma` (0.004), and `--neutral-chroma-low` (0.002) rather than editing individual grays.
 - **Do** take elevation from the surface ladder (`--surface-N`, `--surface-shadow-combined-N`) and state from the translucent overlays (6%, 8%, 10%).
 - **Do** keep blue for action, focus, and relation; mark the current location in ink.
+- **Do** set fields, alerts, status badges and accordions apart with a fill (field tint, muted plate, status plate), keeping a transparent 1px border for geometry; use `--outline` / `--outline-border` for any outlined control.
+- **Do** set Cubby Blue as text through `--primary-soft-foreground`, never the fill token.
 - **Do** set h1 to h3 in Bricolage Grotesque at 600 with negative tracking, and everything else in Geist.
 - **Do** open with ease-out-expo (`cubic-bezier(0.19, 1, 0.22, 1)`) and close faster with ease-in-cubic (`cubic-bezier(0.55, 0.055, 0.675, 0.19)`); keep hovers at 150ms ease-out.
 - **Do** collapse every transform, clip, blur, and draw to opacity or nothing under `prefers-reduced-motion`.
@@ -401,19 +448,20 @@ A block with a header (package-manager or file tabs) sits in the muted tray; a b
 - **Don't** use neon glows, gradient meshes, or cool-AI dark-mode effects; the only gradients are the stage's 3.5% light and the edge-fade masks on scrolling rows.
 - **Don't** use the reflex fonts PRODUCT.md bans (Inter, DM Sans, Plus Jakarta, Space Grotesk, Fraunces, Playfair, Cormorant, Instrument Serif, Crimson).
 - **Don't** box reading content in shadowed cards on docs; rule it with hairlines or a faint wash.
+- **Don't** add a hard border or a shadow to a field, alert, status badge or accordion; checkboxes and radios are the only form controls that keep a visible edge.
 
 ## Landing page
 
-The landing page (`app/(home)`, styles in `app/(home)/home.css`) is its own world, separate from the docs on purpose. Its tokens are declared on `.landing` (the layout's wrapper) and on `.land-vars`, which carries them to the phone menu, portalled outside `.landing`; none of it reaches `/docs` or the registry. It keeps the docs' fonts, the app's own page background (`.landing` paints `--background`, the same as the docs), the surface ladder (`solidSurface`), the hairline and the registry components; what it adds is a drenched ultramarine slab with near-white ink. Inside `.landing` the slab's tokens override the docs' where they conflict: the slab is painted at hue 264, off Cubby Blue's 250, and is the landing's field, not an accent. Everything off the slab follows the docs, and blue keeps its docs meaning: registry components use Cubby Blue for their own actions and focus, and the command's component name is a contrast-tuned Cubby Blue.
+The landing page (`app/(home)`, styles in `app/(home)/home.css`) is its own world, separate from the docs on purpose. Its tokens are declared on `.landing` (the layout's wrapper) and on `.land-vars`, which carries them to the phone menu, portalled outside `.landing`; none of it reaches `/docs` or the registry. It keeps the docs' fonts, the app's own page background (`.landing` paints `--background`, the same as the docs), the surface ladder (`solidSurface`), the hairline and the registry components; what it adds is a drenched deep-sky slab with near-white ink. Inside `.landing` the slab's tokens override the docs' where they conflict: the slab shares Cubby Blue's hue (232.65) but sits much deeper and calmer (lightness 0.5, chroma 0.14; 0.4 and 0.11 in dark), and is the landing's field, not an accent. Everything off the slab follows the docs, and blue keeps its docs meaning: registry components use Cubby Blue for their own actions and focus, and the command's component name is a contrast-tuned Cubby Blue.
 
 ### Colors
-- **Ultramarine Field** (`{colors.landing-field}` / dark `{colors.dark-landing-field}`): the slab, the phone menu, the gallery's closing "browse all" card, text selection (24% mix) and the caret everywhere on the landing.
+- **Deep Sky Field** (`{colors.landing-field}` / dark `{colors.dark-landing-field}`): the slab, the phone menu, the gallery's closing "browse all" card, text selection (24% mix) and the caret everywhere on the landing.
 - **On Field** (`{colors.landing-on-field}`, the same in both themes): headline, wordmark, the light primary pill and the current tab's fill; also the 2px focus outline on the slab.
 - **On Field Muted** (`{colors.landing-on-field-muted}` / dark `{colors.dark-landing-on-field-muted}`): the headline's second sentence, leads on the slab, idle nav controls and idle tabs.
 - **Field Line** (`{colors.landing-field-line}` / dark `{colors.dark-landing-field-line}`): white at 16% (12% in dark); the secondary pill's inset ring and the hover wash of every control on the field. Selection on the slab is white at 28%.
 - **Slug Blue** (`{colors.landing-slug}` / dark `{colors.dark-landing-slug}`): the component name in the install command, and nothing else. It is Cubby Blue deepened in light and lifted in dark so small mono text clears 4.5:1 on the muted command bar.
 
-**The Paint-On-Field Rule.** Anything set on the ultramarine field paints with the on-field tokens (ink, muted, line) and focuses with a 2px on-field outline; docs tokens (foreground, border, ring) never appear on the slab.
+**The Paint-On-Field Rule.** Anything set on the sky field paints with the on-field tokens (ink, muted, line) and focuses with a 2px on-field outline; docs tokens (foreground, border, ring) never appear on the slab.
 
 ### Typography
 - **Hero** (`{typography.landing-display}`, Bricolage 600, leading 0.98, -0.04em, balanced): 2.625rem base, 3.5rem from sm, 3.75rem from lg, 4.5rem from xl. Two stacked sentences, the second in On Field Muted. The direction contract allowed up to 5.5rem; the build tops out at 4.5rem.

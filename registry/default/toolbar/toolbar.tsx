@@ -24,9 +24,10 @@ const toolbarVariants = cva(
     "min-w-max",
     // Paint corners are the shell's minus the 2px edge border.
     "[--toolbar-item-radius:max(0px,calc(var(--toolbar-radius)-2px))]",
-    // Label-color tints: hover 10%, press 14%. The toggled-on fill comes from
+    // Pure overlays (black, white in dark): hover 8%, press 10%. Not a tint of
+    // the label, whose faint cool hue shows as a cast. The toggled-on fill comes from
     // `pressedStyle` below.
-    "[--toolbar-highlight:color-mix(in_oklab,currentColor_10%,transparent)] [--toolbar-press:color-mix(in_oklab,currentColor_14%,transparent)]",
+    "[--toolbar-highlight:var(--surface-active)] [--toolbar-press:var(--surface-selected)]",
     // The shell is fixed and items stretch to fill it; columns grow to the
     // widest item.
     "data-[orientation=horizontal]:h-(--toolbar-h)",
@@ -43,11 +44,11 @@ const toolbarVariants = cva(
         ghost: "text-foreground",
       },
       // How a toggled-on ToolbarToggle looks. Subtle (the default) is a quiet
-      // label tint, for editor rows where several toggles are on at once; solid
+      // 12% overlay, for editor rows where several toggles are on at once; solid
       // is the emphasis grey that Toggle Group, Tabs and checkboxes use.
       pressedStyle: {
         subtle:
-          "[--toolbar-pressed:color-mix(in_oklab,currentColor_16%,transparent)] [--toolbar-pressed-foreground:currentColor]",
+          "[--toolbar-pressed:oklch(0_0_0/12%)] dark:[--toolbar-pressed:oklch(1_0_0/12%)] [--toolbar-pressed-foreground:currentColor]",
         solid:
           "[--toolbar-pressed:var(--emphasis)] [--toolbar-pressed-foreground:var(--emphasis-foreground)]",
       },
@@ -196,7 +197,7 @@ function ToolbarButton({
             itemShell,
             iconOnly && iconSquare,
             // Quiet: undo primary's fill and border, hover and press with the
-            // label tints. A set variant keeps its own paint.
+            // toolbar overlays. A set variant keeps its own paint.
             !variant &&
               cn(
                 "text-current [--btn-bg-active:var(--toolbar-press)] [--btn-bg-hover:var(--toolbar-highlight)] [--btn-bg:transparent] [--btn-border:transparent]",

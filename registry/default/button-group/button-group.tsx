@@ -29,9 +29,11 @@ const buttonGroupVariants = cva(
           "bg-(--outline) text-foreground outline outline-(--outline-border)",
         soft: "bg-secondary text-secondary-foreground",
         elevated: cn(solidSurface(3, 3), "text-foreground"),
-        // Opposite the page in brightness, so the tint needs more strength.
+        // Opposite the page in brightness: the overlays flip (white on the
+        // dark light-mode fill, black on the light dark-mode one) and need more
+        // strength to show.
         solid:
-          "bg-neutral text-neutral-foreground [--group-highlight-mix:16%] [--group-press-mix:22%]",
+          "bg-neutral text-neutral-foreground [--group-highlight-fill:oklch(1_0_0/16%)] [--group-press-fill:oklch(1_0_0/22%)] dark:[--group-highlight-fill:oklch(0_0_0/16%)] dark:[--group-press-fill:oklch(0_0_0/22%)]",
       },
       // Button's height ladder (one step taller below sm); corners step with it.
       size: {
@@ -78,10 +80,11 @@ const trayClasses = cn(
   // rule, or its empty pseudo-element becomes a flex item.
   "rounded-(--group-radius) [--group-item-radius:max(0px,calc(var(--group-radius)-2px))]",
   "[&>:is(button,a):not([data-slot=select-trigger])]:before:rounded-(--group-item-radius)",
-  // Highlight and press: the label color at 10% / 14%. Button's hover tokens
-  // read too faint as a pill on the same fill; a tint of the label always
-  // contrasts with it. currentColor resolves where the variable is used.
-  "[--group-highlight:color-mix(in_oklab,currentColor_var(--group-highlight-mix,10%),transparent)] [--group-press:color-mix(in_oklab,currentColor_var(--group-press-mix,14%),transparent)]",
+  // Highlight and press: the pure 8% / 10% overlays (black, white in dark), a
+  // step past Button's 6% hover, which reads too faint as a pill on the same
+  // fill. Not a tint of the label: the text color carries the neutrals' faint
+  // cool hue, which shows as a cast. Solid sets its own fills.
+  "[--group-highlight:var(--group-highlight-fill,var(--surface-active))] [--group-press:var(--group-press-fill,var(--surface-selected))]",
   // Sizing: a row is the ladder height, a column at least the ladder width.
   // Items size themselves in button-group.css.
   "data-[orientation=horizontal]:h-(--group-h) data-[orientation=vertical]:w-fit",

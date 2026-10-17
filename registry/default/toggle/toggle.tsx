@@ -42,14 +42,23 @@ const toggleVariants = cva(cn(toggleBase, togglePaint), {
       // Borderless: transparent when off, a neutral selected overlay when on.
       ghost:
         "[--tgl-bg-hover:var(--surface-hover)] [--tgl-bg-active:var(--surface-active)] [--tgl-bg-selected:var(--surface-selected)]",
-      // Secondary Button's fill. On deepens it with the label color, so the
-      // plate stays opaque and reads as pressed in.
-      soft: "[--tgl-bg:var(--secondary)] [--tgl-bg-hover:var(--secondary-hover)] [--tgl-bg-active:var(--secondary-active)] [--tgl-bg-selected:color-mix(in_oklab,var(--secondary),currentColor_14%)]",
+      // Secondary Button's fill. On deepens it 12% toward black (white in
+      // dark), so the plate stays opaque and reads as pressed in. A pure ink,
+      // not the label color, whose faint cool hue shows as a cast.
+      soft: "[--tgl-ink:black] dark:[--tgl-ink:white] [--tgl-bg:var(--secondary)] [--tgl-bg-hover:var(--secondary-hover)] [--tgl-bg-active:var(--secondary-active)] [--tgl-bg-selected:color-mix(in_oklch,var(--secondary),var(--tgl-ink)_12%)]",
       // Framed card. The border color is a token like every other, so it stays
       // through press; only the fill changes. bg-clip-padding keeps the card
       // fill out from under the translucent border.
       outline:
         "[--tgl-border:var(--outline-border)] [--tgl-bg:var(--outline)] [--tgl-bg-hover:var(--outline-hover)] [--tgl-bg-active:var(--outline-active)] [--tgl-bg-selected:var(--secondary)] before:bg-clip-padding",
+    },
+    // How a toggled-on Toggle looks. Subtle (the default) keeps each variant's
+    // quiet on state; solid is the emphasis grey with a white label, as in
+    // Toggle Group, Tabs and checked checkboxes.
+    pressedStyle: {
+      subtle: "",
+      solid:
+        "[--tgl-bg-selected:var(--emphasis)] data-pressed:text-emphasis-foreground",
     },
     size: {
       sm: "h-9 min-w-9 gap-1.5 px-2 sm:not-pointer-coarse:h-8 sm:not-pointer-coarse:min-w-8",
@@ -61,19 +70,27 @@ const toggleVariants = cva(cn(toggleBase, togglePaint), {
   defaultVariants: {
     variant: "ghost",
     size: "default",
+    pressedStyle: "subtle",
   },
 });
 
 export type ToggleProps = BaseToggle.Props &
   VariantProps<typeof toggleVariants>;
 
-function Toggle({ className, variant, size, ...props }: ToggleProps) {
+function Toggle({
+  className,
+  variant,
+  size,
+  pressedStyle,
+  ...props
+}: ToggleProps) {
   return (
     <BaseToggle
       data-slot="toggle"
       data-variant={variant}
       data-size={size}
-      className={cn(toggleVariants({ variant, size }), className)}
+      data-pressed-style={pressedStyle ?? "subtle"}
+      className={cn(toggleVariants({ variant, size, pressedStyle }), className)}
       {...props}
     />
   );

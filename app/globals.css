@@ -54,9 +54,9 @@ html {
      pressed toggle-group item), so the sky primary stays for actions. */
   --emphasis: oklch(0.51 var(--neutral-chroma) var(--neutral-hue));
   --emphasis-foreground: oklch(1 0 0);
-  --secondary: oklch(0.94 0 0);
+  --secondary: oklch(0.93 0 0);
   --secondary-foreground: oklch(0.32 var(--neutral-chroma) var(--neutral-hue));
-  --muted: oklch(0.96 0 0);
+  --muted: oklch(0.95 0 0);
   --muted-foreground: oklch(0.53 var(--neutral-chroma) var(--neutral-hue));
   --accent: oklch(0.91 0 0);
   --accent-foreground: oklch(0.3 var(--neutral-chroma) var(--neutral-hue));

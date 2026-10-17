@@ -49,8 +49,8 @@ export const FILTER_SEGMENT_SQUARE =
   "box-content aspect-square h-auto self-stretch justify-center px-0";
 
 /**
- * Hover and press as in Button Group: the label color at 10% / 14%, and the
- * plate scales to 0.98. Menu triggers (aria-haspopup) skip the press and hold
+ * Hover and press fill the plate (see FILTER_TINTS), and the plate scales to
+ * 0.98. Menu triggers (aria-haspopup) skip the press and hold
  * the hover plate while open.
  */
 export const FILTER_SEGMENT_INTERACTIVE =
@@ -76,9 +76,13 @@ export const FILTER_VARIANTS: Record<FilterVariant, string> = {
   ),
 };
 
-/** Tints for segment hover and press, set on each shell. */
+/**
+ * Hover and press, set on each shell: the pure overlays (8% / 10% black, white
+ * in dark), not a tint of the text color. The text color carries the neutrals'
+ * faint cool hue, which read as a blue cast beside colored option icons.
+ */
 export const FILTER_TINTS =
-  "[--filter-highlight:color-mix(in_oklab,var(--foreground)_10%,transparent)] [--filter-press:color-mix(in_oklab,var(--foreground)_14%,transparent)]";
+  "[--filter-highlight:var(--surface-active)] [--filter-press:var(--surface-selected)]";
 
 /**
  * Per-size chip classes; heights match the `Button` ramp. `--seg-x` is segment

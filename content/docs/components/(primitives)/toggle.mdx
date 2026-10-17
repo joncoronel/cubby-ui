@@ -54,6 +54,12 @@ Use `variant` to set the toggle's fill.
 | `soft`    | A secondary Button's fill when off, a deeper one when on.      |
 | `outline` | An outline Button's fill and border, a secondary fill when on. |
 
+### Pressed Style
+
+Use `pressedStyle` to set how a toggled-on Toggle looks. `subtle` (the default) keeps each variant's quiet on state. `solid` uses the mid emphasis grey with a white label, the same as Toggle Group, Tabs and checked checkboxes, for a toggle that should clearly read as on.
+
+<ComponentPreview component="toggle" example="toggle-pressed-style" />
+
 ### Custom Colors
 
 The toggle paints its fill from CSS variables, one per state:
@@ -148,6 +154,16 @@ A two-state button. Wraps Base UI's `Toggle`.
   defaultValue='"default"'
 >
   Height, matching `Button`.
+</ApiProp>
+
+<ApiProp
+  name="pressedStyle"
+  fullType='"subtle" | "solid"'
+  simpleType="string"
+  defaultValue='"subtle"'
+>
+  How the toggle looks when on. `subtle` keeps the variant's quiet on state;
+  `solid` is the emphasis grey with a white label.
 </ApiProp>
 
 </ApiPropsList>

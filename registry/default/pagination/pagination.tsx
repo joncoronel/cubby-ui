@@ -117,8 +117,8 @@ const linkClasses = cn(
   "box-content aspect-square h-auto self-stretch px-0 text-sm tabular-nums",
   // Box corners are the plate's + 2px; the focus ring is in pagination.css.
   "rounded-[calc(var(--pagination-item-radius)+2px)] before:rounded-(--pagination-item-radius)",
-  // Hover and press: the label color at 10% / 14%
-  "[--btn-bg-hover:color-mix(in_oklab,currentColor_10%,transparent)] [--btn-bg-active:color-mix(in_oklab,currentColor_14%,transparent)]",
+  // Hover and press: the pure 8% / 10% overlays (black, white in dark)
+  "[--btn-bg-hover:var(--surface-active)] [--btn-bg-active:var(--surface-selected)]",
   // Current page fallback fill, where the indicator can't glide
   "aria-[current=page]:text-(--pagination-current-fg) aria-[current=page]:hover:text-(--pagination-current-fg) aria-[current=page]:[--btn-bg:var(--pagination-current-bg)] aria-[current=page]:[--btn-bg-hover:var(--pagination-current-bg)] aria-[current=page]:[--btn-bg-active:var(--pagination-current-bg)]",
   "aria-disabled:pointer-events-none aria-disabled:opacity-60",

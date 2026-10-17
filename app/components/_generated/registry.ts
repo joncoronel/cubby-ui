@@ -501,6 +501,7 @@ import toggle_toggle_controlled from "@/registry/examples/toggle/toggle-controll
 import toggle_toggle_different_sizes from "@/registry/examples/toggle/toggle-different-sizes";
 import toggle_toggle_disabled_state from "@/registry/examples/toggle/toggle-disabled-state";
 import toggle_toggle_outline_variant from "@/registry/examples/toggle/toggle-outline-variant";
+import toggle_toggle_pressed_style from "@/registry/examples/toggle/toggle-pressed-style";
 import toggle_toggle_soft_variant from "@/registry/examples/toggle/toggle-soft-variant";
 import toggle_toggle_with_text from "@/registry/examples/toggle/toggle-with-text";
 import toggle_group_toggle_group_basic from "@/registry/examples/toggle-group/toggle-group-basic";
@@ -4278,6 +4279,11 @@ export const exampleRegistry = {
       "source": "import { Toggle } from \"@/components/ui/cubby-ui/toggle\";\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport { TextUnderlineIcon } from \"@hugeicons/core-free-icons\";\nexport default function ToggleOutlineVariant() {\n  return (\n    <Toggle variant=\"outline\">\n      <HugeiconsIcon\n        icon={TextUnderlineIcon}\n        className=\"h-4 w-4\"\n        strokeWidth={2}\n      />\n    </Toggle>\n  );\n}\n"
     },
     {
+      "title": "Pressed Style",
+      "importPath": "toggle-pressed-style",
+      "source": "import { HugeiconsIcon } from \"@hugeicons/react\";\nimport { StarIcon } from \"@hugeicons/core-free-icons\";\n\nimport { Toggle } from \"@/components/ui/cubby-ui/toggle\";\n\nexport default function TogglePressedStyle() {\n  return (\n    <div className=\"flex flex-wrap items-center gap-3\">\n      <Toggle variant=\"soft\" defaultPressed>\n        <HugeiconsIcon icon={StarIcon} strokeWidth={2} />\n        Subtle\n      </Toggle>\n      <Toggle variant=\"soft\" pressedStyle=\"solid\" defaultPressed>\n        <HugeiconsIcon icon={StarIcon} strokeWidth={2} />\n        Solid\n      </Toggle>\n    </div>\n  );\n}\n"
+    },
+    {
       "title": "Soft Variant",
       "importPath": "toggle-soft-variant",
       "source": "\"use client\";\n\nimport { Toggle } from \"@/components/ui/cubby-ui/toggle\";\nimport { HugeiconsIcon } from \"@hugeicons/react\";\nimport { TextBoldIcon } from \"@hugeicons/core-free-icons\";\n\nexport default function ToggleSoftVariant() {\n  return (\n    <Toggle variant=\"soft\" aria-label=\"Bold\">\n      <HugeiconsIcon icon={TextBoldIcon} className=\"h-4 w-4\" strokeWidth={2} />\n    </Toggle>\n  );\n}\n"
@@ -4971,6 +4977,7 @@ export const componentMap = {
   "toggle-different-sizes": toggle_toggle_different_sizes,
   "toggle-disabled-state": toggle_toggle_disabled_state,
   "toggle-outline-variant": toggle_toggle_outline_variant,
+  "toggle-pressed-style": toggle_toggle_pressed_style,
   "toggle-soft-variant": toggle_toggle_soft_variant,
   "toggle-with-text": toggle_toggle_with_text,
   "toggle-group-basic": toggle_group_toggle_group_basic,

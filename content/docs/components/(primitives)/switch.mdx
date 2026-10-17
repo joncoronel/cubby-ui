@@ -34,10 +34,10 @@ Use `color` to set the checked track. The unchecked track is a translucent overl
 
 <ComponentPreview component="switch" example="switch-color" />
 
-| Color     | Description                                                         |
-| --------- | ------------------------------------------------------------------- |
-| `primary` | The default, your brand colour.                                     |
-| `neutral` | A dark neutral, for switches that should not compete for attention. |
+| Color     | Description                                                      |
+| --------- | ---------------------------------------------------------------- |
+| `neutral` | The default, the mid grey shared by checkboxes, radios and tabs. |
+| `primary` | Your brand colour, for a switch that should stand out.           |
 
 For anything outside the scale, set `--switch-fill` on the switch or any ancestor. The hover step is derived from whatever it resolves to, so a custom colour gets a matching hover without a second value:
 
@@ -138,7 +138,7 @@ Toggle control for binary on/off states. Wraps Base UI's `Switch.Root` and `Swit
   name="color"
   fullType='"primary" | "neutral"'
   simpleType="string"
-  defaultValue='"primary"'
+  defaultValue='"neutral"'
 >
   Checked track colour. `className` or an ancestor can set `--switch-fill` to
   override it for a colour outside the scale; the hover step is derived from

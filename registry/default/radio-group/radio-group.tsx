@@ -17,17 +17,30 @@ function RadioGroup({
   );
 }
 
+// The selected fill. Neutral is the mid emphasis grey shared by every
+// selection control; primary brings in the brand fill.
+const radioTones = {
+  neutral:
+    "[--radio-fill:var(--emphasis)] [--radio-dot:var(--emphasis-foreground)]",
+  primary:
+    "[--radio-fill:var(--primary)] [--radio-dot:var(--primary-foreground)]",
+};
+
 function RadioGroupItem({
   className,
   variant = "default",
+  tone = "neutral",
   ...props
 }: React.ComponentProps<typeof Radio.Root> & {
   variant?: "default" | "elevated";
+  tone?: "neutral" | "primary";
 }) {
   return (
     <Radio.Root
       data-slot="radio-group-item"
+      data-tone={tone}
       className={cn(
+        radioTones[tone],
         "group relative inline-flex size-4 shrink-0 items-center justify-center rounded-full",
         "focus-visible:outline-ring/50 ease-out-expo outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-150 outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
         "disabled:cursor-not-allowed disabled:opacity-60",
@@ -42,7 +55,7 @@ function RadioGroupItem({
     >
       <Radio.Indicator
         className={cn(
-          "bg-emphasis before:bg-emphasis-foreground absolute -inset-px z-1 flex items-center justify-center rounded-full",
+          "absolute -inset-px z-1 flex items-center justify-center rounded-full bg-(--radio-fill) before:bg-(--radio-dot)",
           "ease-out-expo transition-opacity duration-150",
           "data-starting-style:opacity-0",
           "data-ending-style:opacity-0",

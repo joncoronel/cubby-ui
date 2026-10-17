@@ -54,8 +54,10 @@ const sliderIndicatorVariants = cva(
   },
 );
 
+// A borderless white knob like the Switch thumb: a hairline and a soft drop
+// give it its edge, so it reads on the filled range and the bare track alike.
 const sliderThumbVariants = cva(
-  "bg-background border-primary relative block size-5 shrink-0 rounded-full border-2 shadow-[0_2px_4px_0_oklch(0.18_0_0_/_0.15)] transition-[box-shadow] duration-200 hover:shadow-[0_3px_8px_0_oklch(0.18_0_0_/_0.2)] has-[:focus-visible]:outline-hidden has-[:focus-visible]:z-10 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background",
+  "bg-white relative block size-5 shrink-0 rounded-full shadow-[0_0_0_0.5px_oklch(0_0_0/0.08),0_1px_3px_0_oklch(0.18_0_0/0.2)] transition-[box-shadow] duration-200 hover:shadow-[0_0_0_0.5px_oklch(0_0_0/0.08),0_2px_8px_0_oklch(0.18_0_0/0.24)] has-[:focus-visible]:outline-hidden has-[:focus-visible]:z-10 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background",
   {
     variants: {
       variant: {
@@ -63,7 +65,7 @@ const sliderThumbVariants = cva(
         contained:
           "h-full w-6 bg-primary border-none hover:shadow-none shadow-none rounded-full data-[orientation=vertical]:h-6 data-[orientation=vertical]:w-full after:bg-primary-foreground flex items-center justify-center after:size-[60%]  after:rounded-full  after:origin-center data-[dragging]:after:scale-85 after:transition-transform after:ease-out after:duration-100 after:shadow-[0_2px_4px_0_oklch(0.18_0_0_/_0.15)]",
         squareThumb:
-          "h-5 w-2.5 bg-card border-1 border-border/70 rounded-[.125rem] data-[orientation=vertical]:h-2.5 data-[orientation=vertical]:w-5",
+          "h-5 w-2.5 rounded-[.125rem] data-[orientation=vertical]:h-2.5 data-[orientation=vertical]:w-5",
       },
     },
     defaultVariants: {

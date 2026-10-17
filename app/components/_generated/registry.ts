@@ -120,6 +120,7 @@ import checkbox_checkbox_disabled_state from "@/registry/examples/checkbox/check
 import checkbox_checkbox_elevated from "@/registry/examples/checkbox/checkbox-elevated";
 import checkbox_checkbox_field from "@/registry/examples/checkbox/checkbox-field";
 import checkbox_checkbox_form_example from "@/registry/examples/checkbox/checkbox-form-example";
+import checkbox_checkbox_tone from "@/registry/examples/checkbox/checkbox-tone";
 import checkbox_checkbox_with_label from "@/registry/examples/checkbox/checkbox-with-label";
 import checkbox_group_checkbox_group_basic from "@/registry/examples/checkbox-group/checkbox-group-basic";
 import checkbox_group_checkbox_group_cards from "@/registry/examples/checkbox-group/checkbox-group-cards";
@@ -386,6 +387,7 @@ import radio_group_radio_group_controlled from "@/registry/examples/radio-group/
 import radio_group_radio_group_disabled_options from "@/registry/examples/radio-group/radio-group-disabled-options";
 import radio_group_radio_group_elevated from "@/registry/examples/radio-group/radio-group-elevated";
 import radio_group_radio_group_field from "@/registry/examples/radio-group/radio-group-field";
+import radio_group_radio_group_tone from "@/registry/examples/radio-group/radio-group-tone";
 import radio_group_radio_group_with_descriptions from "@/registry/examples/radio-group/radio-group-with-descriptions";
 import resizable_resizable_basic from "@/registry/examples/resizable/resizable-basic";
 import resizable_resizable_collapsible from "@/registry/examples/resizable/resizable-collapsible";
@@ -2266,6 +2268,11 @@ export const exampleRegistry = {
       "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { Checkbox } from \"@/components/ui/cubby-ui/checkbox\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { toast } from \"@/components/ui/cubby-ui/toast/toast\";\n\nexport default function CheckboxFormExample() {\n  const [accepted, setAccepted] = React.useState(false);\n\n  const handleSubmit = (e: React.FormEvent) => {\n    e.preventDefault();\n\n    if (!accepted) {\n      toast.error({\n        title: \"Terms not accepted\",\n        description: \"Please accept the terms and conditions to continue.\",\n      });\n      return;\n    }\n\n    toast.success({\n      title: \"Form submitted\",\n      description: \"Thank you for accepting the terms.\",\n    });\n  };\n\n  return (\n    <form onSubmit={handleSubmit} className=\"space-y-4\">\n      <Label className=\"flex-row items-start gap-3 font-normal\">\n        <Checkbox\n          checked={accepted}\n          onCheckedChange={(value) => setAccepted(value as boolean)}\n          className=\"mt-0.5\"\n        />\n        <span>\n          I agree to the terms and conditions\n        </span>\n      </Label>\n      <Button variant=\"neutral\" type=\"submit\">Submit</Button>\n    </form>\n  );\n}\n"
     },
     {
+      "title": "Tone",
+      "importPath": "checkbox-tone",
+      "source": "import { Checkbox } from \"@/components/ui/cubby-ui/checkbox\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function CheckboxTone() {\n  return (\n    <div className=\"flex flex-col gap-3\">\n      <div className=\"flex items-center gap-2\">\n        <Checkbox id=\"tone-neutral\" defaultChecked />\n        <Label htmlFor=\"tone-neutral\">Neutral</Label>\n      </div>\n      <div className=\"flex items-center gap-2\">\n        <Checkbox id=\"tone-primary\" tone=\"primary\" defaultChecked />\n        <Label htmlFor=\"tone-primary\">Primary</Label>\n      </div>\n    </div>\n  );\n}\n"
+    },
+    {
       "title": "With Label",
       "importPath": "checkbox-with-label",
       "source": "import { Checkbox } from \"@/components/ui/cubby-ui/checkbox\"\nimport { Label } from \"@/components/ui/cubby-ui/label\"\n\nexport default function CheckboxWithLabel() {\n  return (\n    <div className=\"flex items-center space-x-2\">\n      <Checkbox id=\"terms\" />\n      <Label htmlFor=\"terms\">\n        Accept terms and conditions\n      </Label>\n    </div>\n  )\n}"
@@ -3666,6 +3673,11 @@ export const exampleRegistry = {
       "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Field,\n  FieldError,\n  FieldItem,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Fieldset, FieldsetLegend } from \"@/components/ui/cubby-ui/fieldset\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\nimport {\n  RadioGroup,\n  RadioGroupItem,\n} from \"@/components/ui/cubby-ui/radio-group\";\n\nexport default function RadioGroupField() {\n  return (\n    <Form\n      className=\"space-y-4\"\n      onFormSubmit={(values) => {\n        alert(JSON.stringify(values, null, 2));\n      }}\n    >\n      <Field name=\"plan\">\n        <Fieldset render={<RadioGroup defaultValue=\"free\" />}>\n          <FieldsetLegend>Select a plan</FieldsetLegend>\n          <FieldItem>\n            <FieldLabel>\n              <RadioGroupItem value=\"free\" />\n              Free\n            </FieldLabel>\n          </FieldItem>\n          <FieldItem>\n            <FieldLabel>\n              <RadioGroupItem value=\"pro\" />\n              Pro\n            </FieldLabel>\n          </FieldItem>\n          <FieldItem>\n            <FieldLabel>\n              <RadioGroupItem value=\"enterprise\" />\n              Enterprise\n            </FieldLabel>\n          </FieldItem>\n        </Fieldset>\n        <FieldError />\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\">\n        Submit\n      </Button>\n    </Form>\n  );\n}\n"
     },
     {
+      "title": "Tone",
+      "importPath": "radio-group-tone",
+      "source": "import {\n  RadioGroup,\n  RadioGroupItem,\n} from \"@/components/ui/cubby-ui/radio-group\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function RadioGroupTone() {\n  return (\n    <div className=\"flex gap-10\">\n      <RadioGroup defaultValue=\"neutral-a\" aria-label=\"Neutral tone\">\n        <Label className=\"flex-row items-center gap-2\">\n          <RadioGroupItem value=\"neutral-a\" />\n          Neutral\n        </Label>\n        <Label className=\"flex-row items-center gap-2\">\n          <RadioGroupItem value=\"neutral-b\" />\n          Option\n        </Label>\n      </RadioGroup>\n      <RadioGroup defaultValue=\"primary-a\" aria-label=\"Primary tone\">\n        <Label className=\"flex-row items-center gap-2\">\n          <RadioGroupItem value=\"primary-a\" tone=\"primary\" />\n          Primary\n        </Label>\n        <Label className=\"flex-row items-center gap-2\">\n          <RadioGroupItem value=\"primary-b\" tone=\"primary\" />\n          Option\n        </Label>\n      </RadioGroup>\n    </div>\n  );\n}\n"
+    },
+    {
       "title": "With Descriptions",
       "importPath": "radio-group-with-descriptions",
       "source": "import { RadioGroup, RadioGroupItem } from \"@/components/ui/cubby-ui/radio-group\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function RadioGroupWithDescriptions() {\n  return (\n    <RadioGroup defaultValue=\"standard\">\n      <Label className=\"flex-row items-start gap-2 mb-4\">\n        <RadioGroupItem value=\"free\" className=\"mt-0.5\" />\n        <div>\n          <span className=\"font-medium\">Free Plan</span>\n          <p className=\"text-sm text-muted-foreground font-normal\">\n            Basic features for personal use\n          </p>\n        </div>\n      </Label>\n      <Label className=\"flex-row items-start gap-2 mb-4\">\n        <RadioGroupItem value=\"standard\" className=\"mt-0.5\" />\n        <div>\n          <span className=\"font-medium\">Standard Plan</span>\n          <p className=\"text-sm text-muted-foreground font-normal\">\n            Advanced features for teams\n          </p>\n        </div>\n      </Label>\n      <Label className=\"flex-row items-start gap-2\">\n        <RadioGroupItem value=\"premium\" className=\"mt-0.5\" />\n        <div>\n          <span className=\"font-medium\">Premium Plan</span>\n          <p className=\"text-sm text-muted-foreground font-normal\">\n            All features with priority support\n          </p>\n        </div>\n      </Label>\n    </RadioGroup>\n  );\n}"
@@ -4018,7 +4030,7 @@ export const exampleRegistry = {
     {
       "title": "Color",
       "importPath": "switch-color",
-      "source": "import { Switch } from \"@/components/ui/cubby-ui/switch/switch\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function SwitchColor() {\n  return (\n    <div className=\"flex items-center gap-6\">\n      <Label className=\"flex-row items-center gap-2\" htmlFor=\"color-primary\">\n        <Switch defaultChecked id=\"color-primary\" />\n        primary\n      </Label>\n      <Label className=\"flex-row items-center gap-2\" htmlFor=\"color-neutral\">\n        <Switch defaultChecked color=\"neutral\" id=\"color-neutral\" />\n        neutral\n      </Label>\n      <Label className=\"flex-row items-center gap-2\" htmlFor=\"color-custom\">\n        <Switch\n          className=\"[--switch-fill:var(--color-emerald-600)]\"\n          defaultChecked\n          id=\"color-custom\"\n        />\n        custom\n      </Label>\n    </div>\n  );\n}\n"
+      "source": "import { Switch } from \"@/components/ui/cubby-ui/switch/switch\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function SwitchColor() {\n  return (\n    <div className=\"flex items-center gap-6\">\n      <Label className=\"flex-row items-center gap-2\" htmlFor=\"color-neutral\">\n        <Switch defaultChecked id=\"color-neutral\" />\n        neutral\n      </Label>\n      <Label className=\"flex-row items-center gap-2\" htmlFor=\"color-primary\">\n        <Switch defaultChecked color=\"primary\" id=\"color-primary\" />\n        primary\n      </Label>\n      <Label className=\"flex-row items-center gap-2\" htmlFor=\"color-custom\">\n        <Switch\n          className=\"[--switch-fill:var(--color-emerald-600)]\"\n          defaultChecked\n          id=\"color-custom\"\n        />\n        custom\n      </Label>\n    </div>\n  );\n}\n"
     },
     {
       "title": "Field",
@@ -4572,6 +4584,7 @@ export const componentMap = {
   "checkbox-elevated": checkbox_checkbox_elevated,
   "checkbox-field": checkbox_checkbox_field,
   "checkbox-form-example": checkbox_checkbox_form_example,
+  "checkbox-tone": checkbox_checkbox_tone,
   "checkbox-with-label": checkbox_checkbox_with_label,
   "checkbox-group-basic": checkbox_group_checkbox_group_basic,
   "checkbox-group-cards": checkbox_group_checkbox_group_cards,
@@ -4838,6 +4851,7 @@ export const componentMap = {
   "radio-group-disabled-options": radio_group_radio_group_disabled_options,
   "radio-group-elevated": radio_group_radio_group_elevated,
   "radio-group-field": radio_group_radio_group_field,
+  "radio-group-tone": radio_group_radio_group_tone,
   "radio-group-with-descriptions": radio_group_radio_group_with_descriptions,
   "resizable-basic": resizable_resizable_basic,
   "resizable-collapsible": resizable_resizable_collapsible,

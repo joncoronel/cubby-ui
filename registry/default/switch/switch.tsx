@@ -89,8 +89,8 @@ const switchVariants = cva(
     // component works the moment it is installed; set --switch-track /
     // --switch-track-hover on any ancestor to retune. Translucent, so one
     // colour works on any substrate and hover steps along the same overlay.
-    "[--switch-track-bg:var(--switch-track,oklch(0_0_0/8%))]",
-    "[--switch-track-bg-hover:var(--switch-track-hover,oklch(0_0_0/12%))]",
+    "[--switch-track-bg:var(--switch-track,oklch(0_0_0/15%))]",
+    "[--switch-track-bg-hover:var(--switch-track-hover,oklch(0_0_0/19%))]",
     "dark:[--switch-track-bg:var(--switch-track,oklch(1_0_0/20%))]",
     "dark:[--switch-track-bg-hover:var(--switch-track-hover,oklch(1_0_0/24%))]",
     // Checked fill and thumb both read through an indirection: `color` supplies
@@ -140,15 +140,15 @@ const switchVariants = cva(
   {
     variants: {
       // Each colour pairs a fill with the foreground that sits on it, as Button
-      // pairs --btn-bg with text-*-foreground. Not decoration: --neutral is
-      // light in dark mode, where a white thumb would vanish into it. The base
+      // pairs --btn-bg with text-*-foreground. Neutral is the emphasis grey that
+      // checked checkboxes and radios use; primary is the brand fill. The base
       // array applies these while checked only, since the unchecked track is a
       // translucent overlay that a dark thumb disappears into.
       color: {
         primary:
           "[--switch-fill-preset:var(--primary)] [--switch-thumb-preset:var(--primary-foreground)]",
         neutral:
-          "[--switch-fill-preset:var(--neutral)] [--switch-thumb-preset:var(--neutral-foreground)]",
+          "[--switch-fill-preset:var(--emphasis)] [--switch-thumb-preset:var(--emphasis-foreground)]",
       },
       // Shape sets the thumb's silhouette, size sets its height. They are
       // independent, so radii are fractions of --thumb-size rather than fixed
@@ -239,7 +239,7 @@ const switchVariants = cva(
       },
     },
     defaultVariants: {
-      color: "primary",
+      color: "neutral",
       shape: "circle",
       size: "default",
       motion: "default",
@@ -358,7 +358,7 @@ type SwitchProps = React.ComponentProps<typeof BaseSwitch.Root> &
 
 function Switch({
   className,
-  color = "primary",
+  color = "neutral",
   shape = "circle",
   size = "default",
   motion = "default",
@@ -415,7 +415,7 @@ type SwitchVisualProps = Omit<useRender.ComponentProps<"span">, "children"> &
 
 function SwitchVisual({
   className,
-  color = "primary",
+  color = "neutral",
   shape = "circle",
   size = "xs",
   motion = "default",

@@ -54,20 +54,20 @@ Use `size` to set the track thickness.
 | `md`  | The default 6px track.             |
 | `lg`  | 10px, for a task in the spotlight. |
 
-### Variants
+### Color
 
-Use `variant` to color the indicator with the primary, neutral, or a status token.
+Use `color` to set the indicator. `neutral` (the default) is the same grey Slider and checked controls fill with; `primary` is the brand color; the status colors mark a task's state.
 
-<ComponentPreview component="progress" example="progress-variants" />
+<ComponentPreview component="progress" example="progress-color" />
 
-| Value     | Description                                 |
-| --------- | ------------------------------------------- |
-| `default` | The primary color.                          |
-| `neutral` | No hue, for quiet UI like lists and toasts. |
-| `info`    | Background work, like indexing.             |
-| `success` | A finished task.                            |
-| `warning` | A slow or retrying task.                    |
-| `danger`  | A stalled or failed task.                   |
+| Value     | Description                     |
+| --------- | ------------------------------- |
+| `neutral` | The default. The emphasis grey. |
+| `primary` | The brand color.                |
+| `info`    | Background work, like indexing. |
+| `success` | A finished task.                |
+| `warning` | A slow or retrying task.        |
+| `danger`  | A stalled or failed task.       |
 
 ### Indeterminate
 
@@ -77,7 +77,7 @@ Pass `value={null}` while the amount of work is unknown, and the indicator sweep
 
 ### Upload Lifecycle
 
-Switch `value` from `null` to a number, then `variant` to `"success"`, to walk a task from connecting to done.
+Switch `value` from `null` to a number, then `color` to `"success"`, to walk a task from connecting to done.
 
 <ComponentPreview component="progress" example="progress-lifecycle" />
 
@@ -128,10 +128,10 @@ Holds the value and lays out the parts. Wraps Base UI's `Progress.Root`.
 <ApiPropsList>
 
 <ApiProp
-  name="variant"
-  fullType='"default" | "neutral" | "success" | "warning" | "danger" | "info"'
+  name="color"
+  fullType='"neutral" | "primary" | "success" | "warning" | "danger" | "info"'
   simpleType="string"
-  defaultValue='"default"'
+  defaultValue='"neutral"'
 >
   Color of the indicator and buffer.
 </ApiProp>
@@ -199,6 +199,6 @@ The formatted value text, hidden while indeterminate. Wraps Base UI's `Progress.
 
 | Variable             | Element | Description                                      |
 | -------------------- | ------- | ------------------------------------------------ |
-| `--progress-color`   | Root    | Indicator and buffer color, set by `variant`.    |
+| `--progress-color`   | Root    | Indicator and buffer color, set by `color`.      |
 | `--progress-buffer`  | Root    | The `buffer` value as a percentage of the track. |
 | `--progress-percent` | Root    | The value as a unitless number from 0 to 100.    |

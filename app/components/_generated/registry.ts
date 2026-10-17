@@ -321,13 +321,13 @@ import menubar_menubar_variants from "@/registry/examples/menubar/menubar-varian
 import menubar_menubar_with_checkboxes_and_switches from "@/registry/examples/menubar/menubar-with-checkboxes-and-switches";
 import menubar_menubar_with_filter from "@/registry/examples/menubar/menubar-with-filter";
 import meter_meter_basic from "@/registry/examples/meter/meter-basic";
+import meter_meter_color from "@/registry/examples/meter/meter-color";
 import meter_meter_format from "@/registry/examples/meter/meter-format";
 import meter_meter_live from "@/registry/examples/meter/meter-live";
 import meter_meter_segments from "@/registry/examples/meter/meter-segments";
 import meter_meter_sizes from "@/registry/examples/meter/meter-sizes";
 import meter_meter_target_range from "@/registry/examples/meter/meter-target-range";
 import meter_meter_thresholds from "@/registry/examples/meter/meter-thresholds";
-import meter_meter_variants from "@/registry/examples/meter/meter-variants";
 import navigation_menu_navigation_menu_basic from "@/registry/examples/navigation-menu/navigation-menu-basic";
 import navigation_menu_navigation_menu_custom_styled_dropdown from "@/registry/examples/navigation-menu/navigation-menu-custom-styled-dropdown";
 import navigation_menu_navigation_menu_flexible_nextjs_link from "@/registry/examples/navigation-menu/navigation-menu-flexible-nextjs-link";
@@ -371,11 +371,11 @@ import progress_progress_basic from "@/registry/examples/progress/progress-basic
 import progress_progress_buffer from "@/registry/examples/progress/progress-buffer";
 import progress_progress_circle from "@/registry/examples/progress/progress-circle";
 import progress_progress_circle_attachments from "@/registry/examples/progress/progress-circle-attachments";
+import progress_progress_color from "@/registry/examples/progress/progress-color";
 import progress_progress_format from "@/registry/examples/progress/progress-format";
 import progress_progress_indeterminate from "@/registry/examples/progress/progress-indeterminate";
 import progress_progress_lifecycle from "@/registry/examples/progress/progress-lifecycle";
 import progress_progress_sizes from "@/registry/examples/progress/progress-sizes";
-import progress_progress_variants from "@/registry/examples/progress/progress-variants";
 import qr_code_qr_code_basic from "@/registry/examples/qr-code/qr-code-basic";
 import qr_code_qr_code_branded from "@/registry/examples/qr-code/qr-code-branded";
 import qr_code_qr_code_custom_finders from "@/registry/examples/qr-code/qr-code-custom-finders";
@@ -3328,6 +3328,11 @@ export const exampleRegistry = {
       "source": "import {\n  MeterRoot,\n  MeterTrack,\n  MeterIndicator,\n  MeterLabel,\n  MeterValue,\n} from \"@/components/ui/cubby-ui/meter/meter\";\n\nexport default function MeterBasic() {\n  return (\n    <MeterRoot value={68} className=\"max-w-sm\">\n      <MeterLabel>Storage</MeterLabel>\n      <MeterValue />\n      <MeterTrack>\n        <MeterIndicator />\n      </MeterTrack>\n    </MeterRoot>\n  );\n}\n"
     },
     {
+      "title": "Color",
+      "importPath": "meter-color",
+      "source": "import {\n  MeterRoot,\n  MeterTrack,\n  MeterIndicator,\n  MeterLabel,\n  MeterValue,\n} from \"@/components/ui/cubby-ui/meter/meter\";\n\nexport default function MeterColor() {\n  return (\n    <div className=\"flex w-full max-w-sm flex-col gap-6\">\n      <MeterRoot value={64}>\n        <MeterLabel>Neutral</MeterLabel>\n        <MeterValue />\n        <MeterTrack>\n          <MeterIndicator />\n        </MeterTrack>\n      </MeterRoot>\n\n      <MeterRoot value={64} color=\"primary\">\n        <MeterLabel>Primary</MeterLabel>\n        <MeterValue />\n        <MeterTrack>\n          <MeterIndicator />\n        </MeterTrack>\n      </MeterRoot>\n    </div>\n  );\n}\n"
+    },
+    {
       "title": "Format",
       "importPath": "meter-format",
       "source": "import {\n  MeterRoot,\n  MeterTrack,\n  MeterIndicator,\n  MeterLabel,\n  MeterValue,\n} from \"@/components/ui/cubby-ui/meter/meter\";\n\nexport default function MeterFormat() {\n  return (\n    <div className=\"flex w-full max-w-sm flex-col gap-6\">\n      <MeterRoot\n        value={1840}\n        max={2500}\n        format={{\n          style: \"currency\",\n          currency: \"USD\",\n          maximumFractionDigits: 0,\n        }}\n        low={1500}\n        high={2250}\n        optimum={0}\n        getAriaValueText={(formatted) => `${formatted} of $2,500`}\n      >\n        <MeterLabel>Monthly cloud spend</MeterLabel>\n        <MeterValue>{(formatted) => `${formatted} of $2,500`}</MeterValue>\n        <MeterTrack>\n          <MeterIndicator />\n        </MeterTrack>\n      </MeterRoot>\n\n      <MeterRoot\n        value={4.6}\n        min={1}\n        max={5}\n        format={{ maximumFractionDigits: 1 }}\n        getAriaValueText={(formatted) => `${formatted} out of 5`}\n      >\n        <MeterLabel>Average rating</MeterLabel>\n        <MeterValue>{(formatted) => `${formatted} / 5`}</MeterValue>\n        <MeterTrack>\n          <MeterIndicator />\n        </MeterTrack>\n      </MeterRoot>\n    </div>\n  );\n}\n"
@@ -3356,11 +3361,6 @@ export const exampleRegistry = {
       "title": "Thresholds",
       "importPath": "meter-thresholds",
       "source": "import {\n  type MeterStatus,\n  MeterRoot,\n  MeterTrack,\n  MeterIndicator,\n  MeterTargetRange,\n  MeterLabel,\n  MeterValue,\n} from \"@/components/ui/cubby-ui/meter/meter\";\n\nconst STATUS_TEXT: Record<MeterStatus, string> = {\n  optimum: \"good\",\n  suboptimum: \"fair\",\n  critical: \"critical\",\n};\n\n// Color isn't announced, so screen readers hear the status too\nfunction withStatus(\n  formatted: string,\n  _: number,\n  status?: MeterStatus,\n): string {\n  return status ? `${formatted}, ${STATUS_TEXT[status]}` : formatted;\n}\n\nexport default function MeterThresholds() {\n  return (\n    <div className=\"flex w-full max-w-sm flex-col gap-6\">\n      {/* Lower is better: optimum sits in the low region */}\n      <MeterRoot\n        value={91}\n        low={60}\n        high={85}\n        optimum={0}\n        getAriaValueText={withStatus}\n      >\n        <MeterLabel>Disk usage</MeterLabel>\n        <MeterValue />\n        <MeterTrack>\n          <MeterIndicator />\n        </MeterTrack>\n      </MeterRoot>\n\n      {/* Higher is better: optimum sits in the high region */}\n      <MeterRoot\n        value={34}\n        low={20}\n        high={50}\n        optimum={100}\n        getAriaValueText={withStatus}\n      >\n        <MeterLabel>Battery</MeterLabel>\n        <MeterValue />\n        <MeterTrack>\n          <MeterIndicator />\n        </MeterTrack>\n      </MeterRoot>\n\n      {/* Middle is best: optimum sits between low and high */}\n      <MeterRoot\n        value={46}\n        low={30}\n        high={60}\n        optimum={45}\n        getAriaValueText={withStatus}\n      >\n        <MeterLabel>Humidity</MeterLabel>\n        <MeterValue />\n        <MeterTrack>\n          <MeterIndicator />\n        </MeterTrack>\n        <MeterTargetRange />\n      </MeterRoot>\n    </div>\n  );\n}\n"
-    },
-    {
-      "title": "Variants",
-      "importPath": "meter-variants",
-      "source": "import {\n  MeterRoot,\n  MeterTrack,\n  MeterIndicator,\n  MeterLabel,\n  MeterValue,\n} from \"@/components/ui/cubby-ui/meter/meter\";\n\nexport default function MeterVariants() {\n  return (\n    <div className=\"flex w-full max-w-sm flex-col gap-6\">\n      <MeterRoot value={64}>\n        <MeterLabel>Default</MeterLabel>\n        <MeterValue />\n        <MeterTrack>\n          <MeterIndicator />\n        </MeterTrack>\n      </MeterRoot>\n\n      <MeterRoot value={64} variant=\"neutral\">\n        <MeterLabel>Neutral</MeterLabel>\n        <MeterValue />\n        <MeterTrack>\n          <MeterIndicator />\n        </MeterTrack>\n      </MeterRoot>\n    </div>\n  );\n}\n"
     }
   ],
   "navigation-menu": [
@@ -3589,7 +3589,12 @@ export const exampleRegistry = {
     {
       "title": "Circle Attachments",
       "importPath": "progress-circle-attachments",
-      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  ProgressRoot,\n  ProgressCircle,\n  ProgressLabel,\n  ProgressValue,\n} from \"@/components/ui/cubby-ui/progress/progress\";\n\ninterface Attachment {\n  id: string;\n  name: string;\n  size: string;\n  /** Ticks spent queued before the upload starts. */\n  delay: number;\n}\n\nconst ATTACHMENTS: Attachment[] = [\n  { id: \"brief\", name: \"launch-brief.pdf\", size: \"2.4 MB\", delay: 0 },\n  { id: \"deck\", name: \"investor-deck.key\", size: \"18.1 MB\", delay: 3 },\n  { id: \"notes\", name: \"call-notes.md\", size: \"12 KB\", delay: 6 },\n];\n\nexport default function ProgressCircleAttachments() {\n  const [tick, setTick] = React.useState(0);\n\n  // Uploads start in turn, finish, then the list resets\n  React.useEffect(() => {\n    const timer = setInterval(() => setTick((t) => (t >= 24 ? 0 : t + 1)), 450);\n    return () => clearInterval(timer);\n  }, []);\n\n  return (\n    <ul className=\"divide-border flex w-full max-w-sm flex-col divide-y\">\n      {ATTACHMENTS.map((file) => {\n        const elapsed = tick - file.delay;\n        const value = elapsed < 0 ? null : Math.min(100, elapsed * 14);\n        const done = value === 100;\n\n        return (\n          <li key={file.id} className=\"py-3\">\n            <ProgressRoot value={value} variant={done ? \"success\" : \"default\"}>\n              <ProgressCircle size={18} />\n              <ProgressLabel className=\"min-w-0 truncate\">\n                {file.name}\n              </ProgressLabel>\n              <ProgressValue className=\"ml-auto\">\n                {(formatted) => (done ? file.size : formatted)}\n              </ProgressValue>\n              {value === null && (\n                <span className=\"text-muted-foreground ml-auto text-sm\">\n                  Queued\n                </span>\n              )}\n            </ProgressRoot>\n          </li>\n        );\n      })}\n    </ul>\n  );\n}\n"
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport {\n  ProgressRoot,\n  ProgressCircle,\n  ProgressLabel,\n  ProgressValue,\n} from \"@/components/ui/cubby-ui/progress/progress\";\n\ninterface Attachment {\n  id: string;\n  name: string;\n  size: string;\n  /** Ticks spent queued before the upload starts. */\n  delay: number;\n}\n\nconst ATTACHMENTS: Attachment[] = [\n  { id: \"brief\", name: \"launch-brief.pdf\", size: \"2.4 MB\", delay: 0 },\n  { id: \"deck\", name: \"investor-deck.key\", size: \"18.1 MB\", delay: 3 },\n  { id: \"notes\", name: \"call-notes.md\", size: \"12 KB\", delay: 6 },\n];\n\nexport default function ProgressCircleAttachments() {\n  const [tick, setTick] = React.useState(0);\n\n  // Uploads start in turn, finish, then the list resets\n  React.useEffect(() => {\n    const timer = setInterval(() => setTick((t) => (t >= 24 ? 0 : t + 1)), 450);\n    return () => clearInterval(timer);\n  }, []);\n\n  return (\n    <ul className=\"divide-border flex w-full max-w-sm flex-col divide-y\">\n      {ATTACHMENTS.map((file) => {\n        const elapsed = tick - file.delay;\n        const value = elapsed < 0 ? null : Math.min(100, elapsed * 14);\n        const done = value === 100;\n\n        return (\n          <li key={file.id} className=\"py-3\">\n            <ProgressRoot value={value} color={done ? \"success\" : \"primary\"}>\n              <ProgressCircle size={18} />\n              <ProgressLabel className=\"min-w-0 truncate\">\n                {file.name}\n              </ProgressLabel>\n              <ProgressValue className=\"ml-auto\">\n                {(formatted) => (done ? file.size : formatted)}\n              </ProgressValue>\n              {value === null && (\n                <span className=\"text-muted-foreground ml-auto text-sm\">\n                  Queued\n                </span>\n              )}\n            </ProgressRoot>\n          </li>\n        );\n      })}\n    </ul>\n  );\n}\n"
+    },
+    {
+      "title": "Color",
+      "importPath": "progress-color",
+      "source": "import {\n  ProgressRoot,\n  ProgressTrack,\n  ProgressIndicator,\n  ProgressLabel,\n  ProgressValue,\n} from \"@/components/ui/cubby-ui/progress/progress\";\n\nconst COLORS = [\n  { color: \"neutral\", label: \"Generating thumbnails\", value: 73 },\n  { color: \"primary\", label: \"Syncing library\", value: 48 },\n  { color: \"info\", label: \"Indexing documents\", value: 62 },\n  { color: \"success\", label: \"Backup verified\", value: 100 },\n  { color: \"warning\", label: \"Retrying chunk 4 of 9\", value: 41 },\n  { color: \"danger\", label: \"Upload stalled\", value: 27 },\n] as const;\n\nexport default function ProgressColor() {\n  return (\n    <div className=\"flex w-full max-w-sm flex-col gap-6\">\n      {COLORS.map(({ color, label, value }) => (\n        <ProgressRoot key={color} value={value} color={color}>\n          <ProgressLabel>{label}</ProgressLabel>\n          <ProgressValue />\n          <ProgressTrack>\n            <ProgressIndicator />\n          </ProgressTrack>\n        </ProgressRoot>\n      ))}\n    </div>\n  );\n}\n"
     },
     {
       "title": "Format",
@@ -3604,17 +3609,12 @@ export const exampleRegistry = {
     {
       "title": "Lifecycle",
       "importPath": "progress-lifecycle",
-      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  ProgressRoot,\n  ProgressTrack,\n  ProgressIndicator,\n  ProgressLabel,\n  ProgressValue,\n} from \"@/components/ui/cubby-ui/progress/progress\";\n\ntype Phase = \"idle\" | \"connecting\" | \"uploading\" | \"done\";\n\nconst LABELS: Record<Phase, string> = {\n  idle: \"quarterly-report.pdf\",\n  connecting: \"Connecting…\",\n  uploading: \"Uploading quarterly-report.pdf\",\n  done: \"Uploaded quarterly-report.pdf\",\n};\n\nexport default function ProgressLifecycle() {\n  const [step, setStep] = React.useState<Exclude<Phase, \"done\">>(\"idle\");\n  const [value, setValue] = React.useState(0);\n\n  // \"done\" is derived from the value\n  const phase: Phase = step === \"uploading\" && value >= 100 ? \"done\" : step;\n\n  React.useEffect(() => {\n    if (phase === \"connecting\") {\n      const timeout = setTimeout(() => setStep(\"uploading\"), 1200);\n      return () => clearTimeout(timeout);\n    }\n    if (phase === \"uploading\") {\n      const timer = setInterval(() => {\n        setValue((prev) => Math.min(100, prev + Math.random() * 18 + 4));\n      }, 400);\n      return () => clearInterval(timer);\n    }\n  }, [phase]);\n\n  const start = () => {\n    setValue(0);\n    setStep(\"connecting\");\n  };\n\n  return (\n    <div className=\"flex w-full max-w-sm flex-col gap-5\">\n      <ProgressRoot\n        value={phase === \"connecting\" ? null : value}\n        variant={phase === \"done\" ? \"success\" : \"default\"}\n      >\n        <ProgressLabel>{LABELS[phase]}</ProgressLabel>\n        <ProgressValue>\n          {(formatted) => (phase === \"done\" ? \"Done\" : formatted)}\n        </ProgressValue>\n        <ProgressTrack>\n          <ProgressIndicator />\n        </ProgressTrack>\n      </ProgressRoot>\n      <Button\n        variant=\"outline\"\n        size=\"sm\"\n        className=\"self-start\"\n        onClick={start}\n        disabled={phase === \"connecting\" || phase === \"uploading\"}\n      >\n        {phase === \"done\" ? \"Upload again\" : \"Upload\"}\n      </Button>\n    </div>\n  );\n}\n"
+      "source": "\"use client\";\n\nimport * as React from \"react\";\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  ProgressRoot,\n  ProgressTrack,\n  ProgressIndicator,\n  ProgressLabel,\n  ProgressValue,\n} from \"@/components/ui/cubby-ui/progress/progress\";\n\ntype Phase = \"idle\" | \"connecting\" | \"uploading\" | \"done\";\n\nconst LABELS: Record<Phase, string> = {\n  idle: \"quarterly-report.pdf\",\n  connecting: \"Connecting…\",\n  uploading: \"Uploading quarterly-report.pdf\",\n  done: \"Uploaded quarterly-report.pdf\",\n};\n\nexport default function ProgressLifecycle() {\n  const [step, setStep] = React.useState<Exclude<Phase, \"done\">>(\"idle\");\n  const [value, setValue] = React.useState(0);\n\n  // \"done\" is derived from the value\n  const phase: Phase = step === \"uploading\" && value >= 100 ? \"done\" : step;\n\n  React.useEffect(() => {\n    if (phase === \"connecting\") {\n      const timeout = setTimeout(() => setStep(\"uploading\"), 1200);\n      return () => clearTimeout(timeout);\n    }\n    if (phase === \"uploading\") {\n      const timer = setInterval(() => {\n        setValue((prev) => Math.min(100, prev + Math.random() * 18 + 4));\n      }, 400);\n      return () => clearInterval(timer);\n    }\n  }, [phase]);\n\n  const start = () => {\n    setValue(0);\n    setStep(\"connecting\");\n  };\n\n  return (\n    <div className=\"flex w-full max-w-sm flex-col gap-5\">\n      <ProgressRoot\n        value={phase === \"connecting\" ? null : value}\n        color={phase === \"done\" ? \"success\" : \"primary\"}\n      >\n        <ProgressLabel>{LABELS[phase]}</ProgressLabel>\n        <ProgressValue>\n          {(formatted) => (phase === \"done\" ? \"Done\" : formatted)}\n        </ProgressValue>\n        <ProgressTrack>\n          <ProgressIndicator />\n        </ProgressTrack>\n      </ProgressRoot>\n      <Button\n        variant=\"outline\"\n        size=\"sm\"\n        className=\"self-start\"\n        onClick={start}\n        disabled={phase === \"connecting\" || phase === \"uploading\"}\n      >\n        {phase === \"done\" ? \"Upload again\" : \"Upload\"}\n      </Button>\n    </div>\n  );\n}\n"
     },
     {
       "title": "Sizes",
       "importPath": "progress-sizes",
       "source": "import {\n  ProgressRoot,\n  ProgressTrack,\n  ProgressIndicator,\n  ProgressLabel,\n  ProgressValue,\n} from \"@/components/ui/cubby-ui/progress/progress\";\n\nexport default function ProgressSizes() {\n  return (\n    <div className=\"flex w-full max-w-sm flex-col gap-6\">\n      {([\"sm\", \"md\", \"lg\"] as const).map((size) => (\n        <ProgressRoot key={size} value={64} size={size}>\n          <ProgressLabel className=\"capitalize\">{size}</ProgressLabel>\n          <ProgressValue />\n          <ProgressTrack>\n            <ProgressIndicator />\n          </ProgressTrack>\n        </ProgressRoot>\n      ))}\n    </div>\n  );\n}\n"
-    },
-    {
-      "title": "Variants",
-      "importPath": "progress-variants",
-      "source": "import {\n  ProgressRoot,\n  ProgressTrack,\n  ProgressIndicator,\n  ProgressLabel,\n  ProgressValue,\n} from \"@/components/ui/cubby-ui/progress/progress\";\n\nconst VARIANTS = [\n  { variant: \"default\", label: \"Syncing library\", value: 48 },\n  { variant: \"neutral\", label: \"Generating thumbnails\", value: 73 },\n  { variant: \"info\", label: \"Indexing documents\", value: 62 },\n  { variant: \"success\", label: \"Backup verified\", value: 100 },\n  { variant: \"warning\", label: \"Retrying chunk 4 of 9\", value: 41 },\n  { variant: \"danger\", label: \"Upload stalled\", value: 27 },\n] as const;\n\nexport default function ProgressVariants() {\n  return (\n    <div className=\"flex w-full max-w-sm flex-col gap-6\">\n      {VARIANTS.map(({ variant, label, value }) => (\n        <ProgressRoot key={variant} value={value} variant={variant}>\n          <ProgressLabel>{label}</ProgressLabel>\n          <ProgressValue />\n          <ProgressTrack>\n            <ProgressIndicator />\n          </ProgressTrack>\n        </ProgressRoot>\n      ))}\n    </div>\n  );\n}\n"
     }
   ],
   "qr-code": [
@@ -4803,13 +4803,13 @@ export const componentMap = {
   "menubar-with-checkboxes-and-switches": menubar_menubar_with_checkboxes_and_switches,
   "menubar-with-filter": menubar_menubar_with_filter,
   "meter-basic": meter_meter_basic,
+  "meter-color": meter_meter_color,
   "meter-format": meter_meter_format,
   "meter-live": meter_meter_live,
   "meter-segments": meter_meter_segments,
   "meter-sizes": meter_meter_sizes,
   "meter-target-range": meter_meter_target_range,
   "meter-thresholds": meter_meter_thresholds,
-  "meter-variants": meter_meter_variants,
   "navigation-menu-basic": navigation_menu_navigation_menu_basic,
   "navigation-menu-custom-styled-dropdown": navigation_menu_navigation_menu_custom_styled_dropdown,
   "navigation-menu-flexible-nextjs-link": navigation_menu_navigation_menu_flexible_nextjs_link,
@@ -4853,11 +4853,11 @@ export const componentMap = {
   "progress-buffer": progress_progress_buffer,
   "progress-circle": progress_progress_circle,
   "progress-circle-attachments": progress_progress_circle_attachments,
+  "progress-color": progress_progress_color,
   "progress-format": progress_progress_format,
   "progress-indeterminate": progress_progress_indeterminate,
   "progress-lifecycle": progress_progress_lifecycle,
   "progress-sizes": progress_progress_sizes,
-  "progress-variants": progress_progress_variants,
   "qr-code-basic": qr_code_qr_code_basic,
   "qr-code-branded": qr_code_qr_code_branded,
   "qr-code-custom-finders": qr_code_qr_code_custom_finders,

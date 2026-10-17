@@ -19,9 +19,12 @@ const progressRootVariants = cva(
   ],
   {
     variants: {
-      variant: {
-        default: "[--progress-color:var(--primary)]",
-        neutral: "[--progress-color:var(--neutral)]",
+      // Neutral (the default) is the emphasis grey that Slider and every
+      // selection control fill with; primary is the brand fill. The status
+      // colors carry meaning and stay colored.
+      color: {
+        neutral: "[--progress-color:var(--emphasis)]",
+        primary: "[--progress-color:var(--primary)]",
         success: "[--progress-color:var(--success-foreground)]",
         warning: "[--progress-color:var(--warning-foreground)]",
         danger: "[--progress-color:var(--danger-foreground)]",
@@ -29,7 +32,7 @@ const progressRootVariants = cva(
       },
     },
     defaultVariants: {
-      variant: "default",
+      color: "neutral",
     },
   },
 );
@@ -40,7 +43,7 @@ const ProgressIndeterminateContext = React.createContext(false);
 
 export interface ProgressRootProps
   extends
-    React.ComponentProps<typeof BaseProgress.Root>,
+    Omit<React.ComponentProps<typeof BaseProgress.Root>, "color">,
     VariantProps<typeof progressRootVariants> {
   /** Track thickness. */
   size?: "sm" | "md" | "lg";
@@ -51,7 +54,7 @@ export interface ProgressRootProps
 function ProgressRoot({
   className,
   style,
-  variant,
+  color,
   size = "md",
   buffer,
   value,
@@ -72,12 +75,13 @@ function ProgressRoot({
     <ProgressIndeterminateContext.Provider value={value === null}>
       <BaseProgress.Root
         data-slot="progress"
+        data-color={color ?? "neutral"}
         data-size={size}
         data-empty={percent === 0 || undefined}
         value={value}
         min={min}
         max={max}
-        className={cn(progressRootVariants({ variant }), className)}
+        className={cn(progressRootVariants({ color }), className)}
         style={(state) => ({
           ...vars,
           ...(typeof style === "function" ? style(state) : style),

@@ -50,9 +50,13 @@ html {
   --neutral-foreground: oklch(
     0.98 var(--neutral-chroma-low) var(--neutral-hue)
   );
-  --secondary: oklch(0.92 0 0);
+  /* Mid grey for selection (checked boxes and radios, the tab capsule, a
+     pressed toggle-group item), so the sky primary stays for actions. */
+  --emphasis: oklch(0.47 var(--neutral-chroma) var(--neutral-hue));
+  --emphasis-foreground: oklch(0.99 var(--neutral-chroma-low) var(--neutral-hue));
+  --secondary: oklch(0.94 0 0);
   --secondary-foreground: oklch(0.32 var(--neutral-chroma) var(--neutral-hue));
-  --muted: oklch(0.94 0 0);
+  --muted: oklch(0.96 0 0);
   --muted-foreground: oklch(0.53 var(--neutral-chroma) var(--neutral-hue));
   --accent: oklch(0.91 0 0);
   --accent-foreground: oklch(0.3 var(--neutral-chroma) var(--neutral-hue));
@@ -158,8 +162,8 @@ html {
 
   /* Surface elevation ladder. Light stays neutral and lets shadow alone carry
      elevation; dark adds a lightness step plus the brand tint (see .dark). */
-  --surface-1: oklch(0.97 0 0);
-  --surface-2: oklch(0.985 0 0);
+  --surface-1: oklch(0.99 0 0);
+  --surface-2: oklch(0.995 0 0);
   --surface-3: oklch(1 0 0);
   --surface-4: oklch(1 0 0);
   --surface-5: oklch(1 0 0);
@@ -268,8 +272,9 @@ html {
 .dark {
   /* Dark-mode overrides. Tokens sharing a light value are not redeclared. */
   --foreground: oklch(0.94 var(--neutral-chroma) var(--neutral-hue));
-  --neutral: oklch(0.95 var(--neutral-chroma) var(--neutral-hue));
+  --neutral: oklch(0.9 var(--neutral-chroma) var(--neutral-hue));
   --neutral-foreground: oklch(0.13 var(--neutral-chroma) var(--neutral-hue));
+  --emphasis: oklch(0.52 var(--neutral-chroma) var(--neutral-hue));
   --secondary: oklch(0.35 var(--neutral-chroma) var(--neutral-hue));
   --secondary-foreground: oklch(0.94 var(--neutral-chroma) var(--neutral-hue));
   --muted: oklch(0.24 var(--neutral-chroma) var(--neutral-hue));
@@ -508,6 +513,8 @@ html {
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
   --color-neutral-foreground: var(--neutral-foreground);
+  --color-emphasis: var(--emphasis);
+  --color-emphasis-foreground: var(--emphasis-foreground);
   --color-neutral: var(--neutral);
   /* Only the fill gets a utility; the rest of the palette reaches controls
      through `[data-surface="chrome"]`, deliberately the one way to paint here. */

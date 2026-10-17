@@ -10,14 +10,18 @@ colors:
   dark-primary-soft-foreground: "color-mix(in oklch, oklch(0.75 0.16 232.65), white 30%)"
   foreground: "oklch(0.3 0.004 270)"
   muted-foreground: "oklch(0.53 0.004 270)"
-  surface-1: "oklch(0.97 0 0)"
-  surface-2: "oklch(0.985 0 0)"
+  surface-1: "oklch(0.99 0 0)"
+  surface-2: "oklch(0.995 0 0)"
   surface-3: "oklch(1 0 0)"
-  secondary: "oklch(0.92 0 0)"
+  secondary: "oklch(0.94 0 0)"
   secondary-foreground: "oklch(0.32 0.004 270)"
-  muted: "oklch(0.94 0 0)"
+  muted: "oklch(0.96 0 0)"
   neutral: "oklch(0.32 0.004 270)"
   neutral-foreground: "oklch(0.98 0.002 270)"
+  emphasis: "oklch(0.47 0.004 270)"
+  emphasis-foreground: "oklch(0.99 0.002 270)"
+  dark-emphasis: "oklch(0.52 0.004 270)"
+  dark-neutral: "oklch(0.9 0.004 270)"
   border: "color-mix(in oklab, oklch(0.3 0.004 270) 10%, transparent)"
   outline: "oklch(1 0 0)"
   outline-border: "color-mix(in oklab, oklch(0.3 0.004 270) 10%, transparent)"
@@ -259,7 +263,8 @@ A cool, faintly violet-tinted neutral stack with a single bright sky blue, expre
 - **Field Tint** (`{colors.input}`, hover `{colors.input-hover}`, elevated `{colors.input-elevated}` / dark `{colors.dark-input}`, `{colors.dark-input-hover}`, `{colors.dark-input-elevated}`): the fill of every text field and select trigger. Translucent (black in light, white in dark), so one value reads on the page, a card or a popup; the elevated step is for fields inside cards and dialogs.
 - **Recessed Outline** (`{colors.outline}`, `{colors.outline-border}` / dark `{colors.dark-outline}`, `{colors.dark-outline-border}`): the outline control's fill and edge. Light is the card fill with a hairline; dark is a 30% black fill with an 8% white edge, so the control sits a shade below its surround (a recessed look, modeled on jakub.kr), and hover and press lift it with 3% and 5% white. Shared by the outline Button, the outline-ghost Button's edge, the outline Toggle and the outline ButtonGroup.
 - **Muted Plate** (`{colors.muted}`): the quiet fill of alerts, accordion containers, button-group text and the code tray.
-- **Plate Gray** (`{colors.secondary}`, text `{colors.secondary-foreground}`): secondary and primary-soft button plates.
+- **Plate Gray** (`{colors.secondary}`, text `{colors.secondary-foreground}`): the secondary button plate. Primary-soft sits on a 14% primary tint instead (20% hover, 25% press), with Sky Ink text.
+- **Emphasis Grey** (`{colors.emphasis}` / dark `{colors.dark-emphasis}`, label `{colors.emphasis-foreground}`): selection, not action. Checked checkboxes and radios, the tab capsule indicator and pressed toggle-group items. The sky primary stays for actions and the switch on-state.
 - **Hairline** (`{colors.border}`): the default 1px rule, re-derived in dark from dark ink.
 - **Chrome Black** (`{colors.neutral}` light, `{colors.dark-chrome}` dark): persistent instrument chrome and the solid neutral button in light. Its foreground is `{colors.neutral-foreground}`; its muted text, hover, and border are 71%, 10%, and 12% mixes of that foreground.
 

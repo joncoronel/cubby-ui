@@ -49,7 +49,7 @@ const buttonVariantClasses = {
   primary:
     "text-primary-foreground [--btn-bg:var(--primary)] [--btn-bg-hover:var(--primary-hover)] [--btn-bg-active:var(--primary-active)]",
   "primary-soft":
-    "text-(--primary-soft-foreground) [--btn-bg:var(--secondary)] [--btn-bg-hover:var(--secondary-hover)] [--btn-bg-active:var(--secondary-active)]",
+    "text-(--primary-soft-foreground) [--btn-bg:color-mix(in_oklab,var(--primary)_14%,transparent)] [--btn-bg-hover:color-mix(in_oklab,var(--primary)_20%,transparent)] [--btn-bg-active:color-mix(in_oklab,var(--primary)_25%,transparent)]",
   neutral:
     "text-neutral-foreground [--btn-bg:var(--neutral)] [--btn-bg-hover:var(--neutral-hover)] [--btn-bg-active:var(--neutral-active)]",
   destructive:

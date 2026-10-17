@@ -1408,7 +1408,6 @@ export const componentMetadata = {
     "description": "A tabs component.",
     "category": "UI",
     "registryDependencies": [
-      "@cubby-ui/elevated",
       "@cubby-ui/use-animated-height"
     ],
     "dependencies": [

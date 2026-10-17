@@ -24,10 +24,10 @@ const toggleGroupVariants = cva(
     "[--toggle-group-item-radius:max(0px,calc(var(--toggle-group-radius)-2px))]",
     // Small corners between neighbors, so pressed runs read as one control
     "[--toggle-group-inner-radius:min(3px,var(--toggle-group-item-radius))]",
-    // Label-color tints: hover 10%, press 14%, pressed 16%. Override the
-    // selected variables to recolor.
+    // Label-color tints for hover (10%) and press (14%); pressed items take the
+    // solid emphasis grey. Override the selected variables to recolor.
     "[--toggle-group-highlight:color-mix(in_oklab,currentColor_10%,transparent)] [--toggle-group-press:color-mix(in_oklab,currentColor_14%,transparent)]",
-    "[--toggle-group-selected-bg:color-mix(in_oklab,currentColor_16%,transparent)] [--toggle-group-selected-fg:var(--foreground)]",
+    "[--toggle-group-selected-bg:var(--emphasis)] [--toggle-group-selected-fg:var(--emphasis-foreground)]",
     // A row is the ladder height and items stretch to fill it.
     "data-[orientation=horizontal]:h-(--toggle-group-h) data-[orientation=horizontal]:[&>[data-slot=toggle-group-item]]:aspect-square",
     "data-[orientation=horizontal]:[&>[data-slot=toggle-group-item]]:border-y-2 data-[orientation=horizontal]:[&>:nth-child(1_of_[data-slot=toggle-group-item])]:border-s-2 data-[orientation=horizontal]:[&>:nth-last-child(1_of_[data-slot=toggle-group-item])]:border-e-2",

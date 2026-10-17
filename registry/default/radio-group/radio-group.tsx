@@ -42,7 +42,7 @@ function RadioGroupItem({
     >
       <Radio.Indicator
         className={cn(
-          "bg-primary before:bg-primary-foreground absolute -inset-px z-1 flex items-center justify-center rounded-full",
+          "bg-emphasis before:bg-emphasis-foreground absolute -inset-px z-1 flex items-center justify-center rounded-full",
           "ease-out-expo transition-opacity duration-150",
           "data-starting-style:opacity-0",
           "data-ending-style:opacity-0",

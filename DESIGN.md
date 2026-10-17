@@ -262,6 +262,7 @@ A cool, faintly violet-tinted neutral stack with a single bright sky blue, expre
 - **Recessed Outline** (`{colors.outline}`, `{colors.outline-border}` / dark `{colors.dark-outline}`, `{colors.dark-outline-border}`): the outline control's fill and edge. Light is the card fill with a hairline; dark is a 30% black fill with an 8% white edge, so the control sits a shade below its surround (a recessed look, modeled on jakub.kr), and hover and press lift it with 3% and 5% white. Shared by the outline Button, the outline-ghost Button's edge, the outline Toggle and the outline ButtonGroup.
 - **Muted Plate** (`{colors.muted}`): the quiet fill of alerts, accordion containers, button-group text and the code tray.
 - **Plate Gray** (`{colors.secondary}`, text `{colors.secondary-foreground}`): the secondary button plate. Primary-soft sits on a 14% primary tint instead (20% hover, 25% press), with Sky Ink text.
+- **Range Track** (`--control-track`, 9% black / 10% white in dark): the empty part of Slider, Circular Slider, Progress and Meter. Quieter than the Off Grey so the filled part (Emphasis Grey or primary) clears 3:1 against it in both themes.
 - **Off Grey** (`--control-off`, 15% black / 15% white in dark, deeper on hover): the one resting colour for on/off controls. The Switch track fills with it; unchecked Checkbox and Radio draw a 2px inset ring of it around a white middle (the surface itself in dark). None of the three takes a surface `variant`.
 - **Emphasis Grey** (`{colors.emphasis}` / dark `{colors.dark-emphasis}`, label `{colors.emphasis-foreground}`): selection, not action. Checked checkboxes and radios, the tab capsule indicator and pressed toggle-group items. The sky primary stays for actions and the switch on-state.
 - **Hairline** (`{colors.border}`): the default 1px rule, re-derived in dark from dark ink.
@@ -348,7 +349,7 @@ Filled, not outlined.
 - **Style:** the translucent Field Tint (`{colors.input}`), 12px radius, no shadow, and a 1px transparent border kept only for geometry. Select triggers and date-picker triggers deepen to the hover tint on hover and while open.
 - **Outline variant:** `variant="outline"` on every field swaps the tint for the Recessed Outline fill and edge, the same as the outline Button (card and hairline in light; recessed with a faint ring in dark).
 - **Focus:** the shared 2px half-strength ring, offset 2px; invalid fields take the same outline in 50% destructive. The caret is blue on docs.
-- **Checkbox, radio, switch and slider:** rest on the Off Grey (a ring for checkbox and radio, a fill for the switch and slider tracks) and take `color="neutral" | "primary"` for the on state, neutral (Emphasis Grey) by default.
+- **Checkbox, radio, switch, slider and circular slider:** checkbox and radio rest on an Off Grey ring and the switch on an Off Grey track; slider and circular slider tracks use the quieter Range Track and take `color="neutral" | "primary"` for the on state, neutral (Emphasis Grey) by default.
 
 ### Navigation
 - **Docs header:** 56px, fixed, sitting on the frame above the card; it never changes as the page scrolls. The logo enters as one composited fade and settle (opacity and scale, 600ms), not the landing's drawn stroke, which freezes while the page hydrates.

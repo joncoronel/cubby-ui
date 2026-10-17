@@ -258,6 +258,11 @@ export interface CircularSliderRootProps<
    */
   variant?: "ring" | "knob";
   /**
+   * The filled arc, thumb and active ticks. `neutral` is the emphasis grey
+   * shared by every selection control; `primary` is the brand fill.
+   */
+  color?: "neutral" | "primary";
+  /**
    * `angular` follows the pointer around the center. `vertical` turns the
    * value with up and down drags, like an audio knob.
    */
@@ -315,6 +320,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
   size = 144,
   thickness: thicknessProp = 12,
   variant = "ring",
+  color = "neutral",
   dragMode = "angular",
   disabled = false,
   name,
@@ -867,6 +873,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
   const defaultProps = {
     "data-slot": "circular-slider",
     "data-variant": variant,
+    "data-color": color,
     "data-drag-mode": dragMode,
     "data-pressed": pressed || undefined,
     "data-dragging": dragging || undefined,
@@ -889,6 +896,9 @@ function CircularSliderRoot<Value extends SliderValue = number>({
       // touches on its band (the band layer below); swipes that start in the
       // middle still scroll the page.
       "group/circular-slider relative shrink-0 select-none",
+      color === "primary"
+        ? "[--circular-slider-fill:var(--primary)] [--circular-slider-fill-foreground:var(--primary-foreground)]"
+        : "[--circular-slider-fill:var(--emphasis)] [--circular-slider-fill-foreground:var(--emphasis-foreground)]",
       variant === "knob" && "touch-none",
       "data-disabled:pointer-events-none data-disabled:opacity-60",
       // A partial ring is shorter than its square. Clip just below the bottom
@@ -1115,7 +1125,7 @@ function CircularSliderTrack({
             fill="none"
             strokeWidth={thickness}
             strokeLinecap="round"
-            className="stroke-foreground/9 dark:stroke-foreground/10"
+            className="stroke-control-track"
             style={{
               ...svgRotateStyle,
               strokeDasharray: stroke.strokeDasharray,
@@ -1182,7 +1192,7 @@ function CircularSliderIndicator({
         strokeWidth={thickness}
         strokeLinecap={cap}
         className={cn(
-          "stroke-primary transition-[stroke-dasharray,rotate,opacity]",
+          "stroke-(--circular-slider-fill) transition-[stroke-dasharray,rotate,opacity]",
           SETTLE_TRANSITION,
           hidden && "opacity-0",
         )}
@@ -1355,7 +1365,7 @@ function CircularSliderThumb({
           strokeWidth={bead}
           strokeLinecap="butt"
           className={cn(
-            "stroke-primary-foreground transition-[stroke-dasharray,rotate,opacity]",
+            "stroke-(--circular-slider-fill-foreground) transition-[stroke-dasharray,rotate,opacity]",
             SETTLE_TRANSITION,
             merged ? "opacity-100" : "opacity-0",
           )}
@@ -1380,7 +1390,7 @@ function CircularSliderThumb({
             <g {...thumbState(index)} className={growClasses}>
               {capsule(pillW + 1, pillH + 1, { className: "fill-black/14" })}
               {capsule(pillW, pillH, {
-                className: "fill-primary-foreground",
+                className: "fill-(--circular-slider-fill-foreground)",
               })}
             </g>
           ) : (
@@ -1389,7 +1399,10 @@ function CircularSliderThumb({
               cx={c}
               cy={cy}
               r={bead / 2}
-              className={cn("fill-primary-foreground", growClasses)}
+              className={cn(
+                "fill-(--circular-slider-fill-foreground)",
+                growClasses,
+              )}
             />
           )}
         </g>
@@ -1549,7 +1562,7 @@ function CircularSliderTicks({
             className={cn(
               "transition-[stroke] [transition-delay:var(--tick-delay)] duration-150 ease-out motion-reduce:[transition-delay:0ms]",
               isKnob
-                ? "stroke-foreground/14 data-active:stroke-primary"
+                ? "stroke-foreground/14 data-active:stroke-(--circular-slider-fill)"
                 : "stroke-foreground/14 data-active:stroke-foreground/40",
             )}
             style={{ "--tick-delay": `${tick.delay}ms` } as React.CSSProperties}

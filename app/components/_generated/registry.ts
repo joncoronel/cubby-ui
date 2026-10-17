@@ -131,6 +131,7 @@ import checkbox_group_checkbox_group_nested from "@/registry/examples/checkbox-g
 import checkbox_group_checkbox_group_parent from "@/registry/examples/checkbox-group/checkbox-group-parent";
 import checkbox_group_checkbox_group_with_descriptions from "@/registry/examples/checkbox-group/checkbox-group-with-descriptions";
 import circular_slider_circular_slider_basic from "@/registry/examples/circular-slider/circular-slider-basic";
+import circular_slider_circular_slider_color from "@/registry/examples/circular-slider/circular-slider-color";
 import circular_slider_circular_slider_counterclockwise from "@/registry/examples/circular-slider/circular-slider-counterclockwise";
 import circular_slider_circular_slider_drag_mode from "@/registry/examples/circular-slider/circular-slider-drag-mode";
 import circular_slider_circular_slider_knob from "@/registry/examples/circular-slider/circular-slider-knob";
@@ -2327,6 +2328,11 @@ export const exampleRegistry = {
       "title": "Basic",
       "importPath": "circular-slider-basic",
       "source": "\"use client\";\n\nimport { CircularSlider } from \"@/components/ui/cubby-ui/circular-slider/circular-slider\";\n\nexport default function CircularSliderBasic() {\n  return (\n    <CircularSlider\n      defaultValue={64}\n      aria-label=\"Brightness\"\n      formatValue={(v) => `${v}%`}\n      getAriaValueText={(v) => `${v} percent`}\n    />\n  );\n}\n"
+    },
+    {
+      "title": "Color",
+      "importPath": "circular-slider-color",
+      "source": "\"use client\";\n\nimport { CircularSlider } from \"@/components/ui/cubby-ui/circular-slider/circular-slider\";\n\nexport default function CircularSliderColor() {\n  return (\n    <div className=\"flex flex-wrap items-center justify-center gap-10\">\n      <CircularSlider\n        defaultValue={64}\n        aria-label=\"Brightness, neutral\"\n        formatValue={(v) => `${v}%`}\n        getAriaValueText={(v) => `${v} percent`}\n      />\n      <CircularSlider\n        color=\"primary\"\n        defaultValue={64}\n        aria-label=\"Brightness, primary\"\n        formatValue={(v) => `${v}%`}\n        getAriaValueText={(v) => `${v} percent`}\n      />\n    </div>\n  );\n}\n"
     },
     {
       "title": "Counterclockwise",
@@ -4607,6 +4613,7 @@ export const componentMap = {
   "checkbox-group-parent": checkbox_group_checkbox_group_parent,
   "checkbox-group-with-descriptions": checkbox_group_checkbox_group_with_descriptions,
   "circular-slider-basic": circular_slider_circular_slider_basic,
+  "circular-slider-color": circular_slider_circular_slider_color,
   "circular-slider-counterclockwise": circular_slider_circular_slider_counterclockwise,
   "circular-slider-drag-mode": circular_slider_circular_slider_drag_mode,
   "circular-slider-knob": circular_slider_circular_slider_knob,

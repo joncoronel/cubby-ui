@@ -101,7 +101,7 @@ function ProgressTrack({
     <BaseProgress.Track
       data-slot="progress-track"
       className={cn(
-        "bg-foreground/9 relative w-full overflow-hidden rounded-full",
+        "bg-control-track relative w-full overflow-hidden rounded-full",
         // The sweep runs left to right; mirroring the track reverses it in RTL
         "rtl:data-indeterminate:-scale-x-100",
         "group-data-[size=lg]/progress:h-2.5 group-data-[size=md]/progress:h-1.5 group-data-[size=sm]/progress:h-1",
@@ -213,7 +213,7 @@ function ProgressCircle({
           r={radius}
           fill="none"
           strokeWidth={stroke}
-          className="stroke-foreground/9"
+          className="stroke-control-track"
         />
         <circle
           key={indeterminate ? "indeterminate" : "determinate"}

@@ -117,6 +117,7 @@ Copy and paste the following into your `globals.css` file:
   --input-hover: oklch(0 0 0 / 7.5%);
   --control-off: oklch(0 0 0 / 15%);
   --control-off-hover: oklch(0 0 0 / 19%);
+  --control-track: oklch(0 0 0 / 9%);
   --ring: oklch(0.7 0.15 232.65);
   --scrollbar: oklch(0.87 0 0);
 
@@ -292,6 +293,7 @@ Copy and paste the following into your `globals.css` file:
   --input-hover: oklch(1 0 0 / 9%);
   --control-off: oklch(1 0 0 / 15%);
   --control-off-hover: oklch(1 0 0 / 19%);
+  --control-track: oklch(1 0 0 / 10%);
   --scrollbar: oklch(0.7 var(--neutral-chroma) var(--neutral-hue));
 
   /* Only --sidebar-border needs a dark value; the rest are aliases. */
@@ -440,6 +442,7 @@ Copy and paste the following into your `globals.css` file:
   --color-border: var(--border);
   --color-input: var(--input);
   --color-input-hover: var(--input-hover);
+  --color-control-track: var(--control-track);
   --color-ring: var(--ring);
   --color-scrollbar: var(--scrollbar);
 
@@ -528,6 +531,11 @@ Copy and paste the following into your `globals.css` file:
     var(--chrome-foreground) 28%,
     transparent
   );
+  --control-track: color-mix(
+    in oklab,
+    var(--chrome-foreground) 12%,
+    transparent
+  );
 }
 ```
 
@@ -584,8 +592,9 @@ Form fields and on/off controls use these dedicated tokens:
 - `--input`: the filled field tint (translucent, so it reads on the page, a Card or a popup)
 - `--input-hover`: the deeper tint for hovered and open select and date-picker triggers
 - `--outline` / `--outline-border`: the fill and edge of the `outline` field variant and the outline Button
-- `--control-off` / `--control-off-hover`: the resting grey of Switch and Slider tracks and the Checkbox and Radio ring
-- `--emphasis` / `--emphasis-foreground`: the neutral on-state fill of Checkbox, Radio, Switch, Slider, Tabs and Toggle Group
+- `--control-off` / `--control-off-hover`: the resting grey of the Switch track and the Checkbox and Radio ring
+- `--control-track`: the empty part of Slider, Circular Slider, Progress and Meter
+- `--emphasis` / `--emphasis-foreground`: the neutral on-state fill of Checkbox, Radio, Switch, Slider, Circular Slider, Tabs and Toggle Group
 
 See the [Forms](/docs/getting-started/forms) guide for when to use the `outline` variant.
 

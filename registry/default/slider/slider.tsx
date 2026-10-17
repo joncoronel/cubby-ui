@@ -21,7 +21,7 @@ const sliderVariants = cva(
 );
 
 const sliderTrackVariants = cva(
-  "bg-(--control-off) flex flex-1 size-[inherit] min-size-[inherit] relative grow rounded-full data-[orientation=horizontal]:h-3 data-[orientation=horizontal]:w-full data-[orientation=vertical]:min-h-full data-[orientation=vertical]:w-3",
+  "bg-control-track flex flex-1 size-[inherit] min-size-[inherit] relative grow rounded-full data-[orientation=horizontal]:h-3 data-[orientation=horizontal]:w-full data-[orientation=vertical]:min-h-full data-[orientation=vertical]:w-3",
   {
     variants: {
       variant: {

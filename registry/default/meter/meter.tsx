@@ -139,7 +139,7 @@ function MeterTrack({ className, style, segments, ...props }: MeterTrackProps) {
       data-slot="meter-track"
       data-segmented={isSegmented || undefined}
       className={cn(
-        "bg-foreground/9 relative w-full overflow-hidden rounded-full [--meter-segment-gap:3px]",
+        "bg-control-track relative w-full overflow-hidden rounded-full [--meter-segment-gap:3px]",
         "group-data-[size=lg]/meter:h-2.5 group-data-[size=md]/meter:h-1.5 group-data-[size=sm]/meter:h-1",
         "group-data-[size=sm]/meter:[--meter-segment-gap:2px] data-segmented:rounded-[3px]",
         className,

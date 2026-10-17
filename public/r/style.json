@@ -32,6 +32,7 @@
       "color-border": "var(--border)",
       "color-input": "var(--input)",
       "color-input-hover": "var(--input-hover)",
+      "color-control-track": "var(--control-track)",
       "color-ring": "var(--ring)",
       "color-scrollbar": "var(--scrollbar)",
       "color-sidebar": "var(--sidebar)",
@@ -129,6 +130,7 @@
       "input-hover": "oklch(0 0 0 / 7.5%)",
       "control-off": "oklch(0 0 0 / 15%)",
       "control-off-hover": "oklch(0 0 0 / 19%)",
+      "control-track": "oklch(0 0 0 / 9%)",
       "ring": "oklch(0.7 0.15 232.65)",
       "scrollbar": "oklch(0.87 0 0)",
       "sidebar": "var(--surface-1)",
@@ -232,6 +234,7 @@
       "input-hover": "oklch(1 0 0 / 9%)",
       "control-off": "oklch(1 0 0 / 15%)",
       "control-off-hover": "oklch(1 0 0 / 19%)",
+      "control-track": "oklch(1 0 0 / 10%)",
       "scrollbar": "oklch(0.7 var(--neutral-chroma) var(--neutral-hue))",
       "sidebar-border": "oklch(0.28 var(--neutral-chroma) var(--neutral-hue))",
       "danger": "oklch(0.26 0.07 25)",
@@ -316,7 +319,8 @@
       "--surface-hover": "var(--chrome-hover)",
       "--surface-active": "var(--chrome-hover)",
       "--control-off": "color-mix(in oklab, var(--chrome-foreground) 22%, transparent)",
-      "--control-off-hover": "color-mix(\n    in oklab,\n    var(--chrome-foreground) 28%,\n    transparent\n  )"
+      "--control-off-hover": "color-mix(\n    in oklab,\n    var(--chrome-foreground) 28%,\n    transparent\n  )",
+      "--control-track": "color-mix(\n    in oklab,\n    var(--chrome-foreground) 12%,\n    transparent\n  )"
     }
   },
   "type": "registry:style"

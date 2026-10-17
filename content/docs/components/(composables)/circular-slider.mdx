@@ -47,6 +47,12 @@ CircularSliderRoot
 
 ## Examples
 
+### Color
+
+The filled arc, thumb and active ticks use the neutral emphasis grey by default, the same grey as Slider, Switch and checked checkboxes. Pass `color="primary"` to use the brand color instead. The empty track stays the quiet range-track grey either way.
+
+<ComponentPreview component="circular-slider" example="circular-slider-color" />
+
 ### Thumb shape
 
 Use `thumbShape` to choose the thumb's look. On a ring the pill reaches past both edges of the band, and the band moves in to make room so the dial keeps its size. On a knob it sets the face's marker.
@@ -259,6 +265,16 @@ Holds the value and geometry, and renders a hidden range input per thumb.
 >
   A ring takes presses along its band and jumps to a click; a knob takes them
   anywhere on its face and turns with the drag.
+</ApiProp>
+
+<ApiProp
+  name="color"
+  fullType='"neutral" | "primary"'
+  simpleType="string"
+  defaultValue='"neutral"'
+>
+  Fill color of the arc, thumb and active knob ticks. `neutral` uses the
+  emphasis grey shared by selection controls; `primary` uses the brand fill.
 </ApiProp>
 
 <ApiProp

@@ -63,7 +63,9 @@ Copy and paste the following into your `globals.css` file:
     0.98 var(--neutral-chroma-low) var(--neutral-hue)
   );
   --emphasis: oklch(0.47 var(--neutral-chroma) var(--neutral-hue));
-  --emphasis-foreground: oklch(0.99 var(--neutral-chroma-low) var(--neutral-hue));
+  --emphasis-foreground: oklch(
+    0.99 var(--neutral-chroma-low) var(--neutral-hue)
+  );
   --secondary: oklch(0.94 0 0);
   --secondary-foreground: oklch(0.32 var(--neutral-chroma) var(--neutral-hue));
   --muted: oklch(0.96 0 0);
@@ -116,6 +118,8 @@ Copy and paste the following into your `globals.css` file:
   --input: oklch(0 0 0 / 4.5%);
   --input-hover: oklch(0 0 0 / 7.5%);
   --input-elevated: oklch(0 0 0 / 6%);
+  --control-off: oklch(0 0 0 / 15%);
+  --control-off-hover: oklch(0 0 0 / 19%);
   --ring: oklch(0.7 0.15 232.65);
   --scrollbar: oklch(0.87 0 0);
 
@@ -232,7 +236,7 @@ Copy and paste the following into your `globals.css` file:
   --foreground: oklch(0.94 var(--neutral-chroma) var(--neutral-hue));
   --neutral: oklch(0.9 var(--neutral-chroma) var(--neutral-hue));
   --neutral-foreground: oklch(0.13 var(--neutral-chroma) var(--neutral-hue));
-  --emphasis: oklch(0.52 var(--neutral-chroma) var(--neutral-hue));
+  --emphasis: oklch(0.58 var(--neutral-chroma) var(--neutral-hue));
   --secondary: oklch(0.35 var(--neutral-chroma) var(--neutral-hue));
   --secondary-foreground: oklch(0.94 var(--neutral-chroma) var(--neutral-hue));
   --muted: oklch(0.24 var(--neutral-chroma) var(--neutral-hue));
@@ -290,6 +294,8 @@ Copy and paste the following into your `globals.css` file:
   --input: oklch(1 0 0 / 5%);
   --input-hover: oklch(1 0 0 / 9%);
   --input-elevated: oklch(1 0 0 / 7%);
+  --control-off: oklch(1 0 0 / 12%);
+  --control-off-hover: oklch(1 0 0 / 16%);
   --scrollbar: oklch(0.7 var(--neutral-chroma) var(--neutral-hue));
 
   /* Only --sidebar-border needs a dark value; the rest are aliases. */
@@ -521,6 +527,12 @@ Copy and paste the following into your `globals.css` file:
   --input: var(--chrome-hover);
   --surface-hover: var(--chrome-hover);
   --surface-active: var(--chrome-hover);
+  --control-off: color-mix(in oklab, var(--chrome-foreground) 22%, transparent);
+  --control-off-hover: color-mix(
+    in oklab,
+    var(--chrome-foreground) 28%,
+    transparent
+  );
 }
 ```
 

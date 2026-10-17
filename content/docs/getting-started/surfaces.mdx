@@ -377,33 +377,33 @@ The reference aliases `--muted` to `surface-2` because its system has no recesse
     </AccordionTrigger>
     <AccordionContent>
 
-Form fields come in two appearances, exposed as a `variant` prop on Input, Textarea, NumberField, InputGroup, OTP, Combobox, Autocomplete, Checkbox, and Radio:
+Form fields come in two appearances, exposed as a `variant` prop on Input, Textarea, NumberField, InputGroup, OTP, Combobox and Autocomplete:
 
 ```tsx
-// Default: opaque "clean lifted card" look. Use on the page.
+// Default: a light tint. Use on the page.
 <Input />
 
-// Elevated: translucent overlay that adapts to its substrate. Use inside a
-// Card, Dialog, or popover, where the opaque default would disappear.
+// Elevated: a slightly stronger tint. Use inside a Card, Dialog, or popover.
 <Card>
   <Input variant="elevated" />
 </Card>
 ```
 
-`--input` resolves to `var(--surface-3)` in both modes (white in light, surface-3 in dark). `--input-elevated` is the same family as the state overlays but stronger, so it adapts to any substrate:
+Both are translucent tints, the same family as the state overlays, so they adapt to whatever they sit on:
 
 ```css
 /* light */
---input: var(--surface-3); /* opaque, "clean lifted" */
---input-elevated: oklch(0 0 0 / 0.08); /* 8% black overlay */
+--input: oklch(0 0 0 / 4.5%);
+--input-elevated: oklch(0 0 0 / 6%);
 
 /* dark */
---input-elevated: oklch(1 0 0 / 0.09); /* 9% white overlay */
+--input: oklch(1 0 0 / 5%);
+--input-elevated: oklch(1 0 0 / 7%);
 ```
 
-One token cannot satisfy every context: an opaque white input feels right on the page, but disappears on a Card or inside a Dialog (also white in light mode), where the translucent overlay is needed instead. The `variant` prop lets the caller choose per context.
+The tint reads on the page as is; on a white Card or inside a Dialog the slightly stronger `elevated` tint keeps the field from looking washed out. The `variant` prop lets the caller choose per context.
 
-Switch skips the variant. Its unchecked track has to contrast with both its thumb and the parent surface at once, and a single translucent `bg-input-elevated` overlay handles both: it adapts to whatever it sits on while staying a clear gray against the thumb. So Switch has no `variant` prop; it always uses `bg-input-elevated`.
+Switch, Checkbox and Radio skip the variant. Their resting state is the shared `--control-off` grey (15% black, 12% white in dark): the Switch track fills with it, and unchecked boxes and radios draw a 2px ring of it around a white middle. It reads on any surface, so none of the three needs a `variant` prop.
 
     </AccordionContent>
 

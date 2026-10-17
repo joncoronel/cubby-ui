@@ -28,11 +28,9 @@ const radioTones = {
 
 function RadioGroupItem({
   className,
-  variant = "default",
   tone = "neutral",
   ...props
 }: React.ComponentProps<typeof Radio.Root> & {
-  variant?: "default" | "elevated";
   tone?: "neutral" | "primary";
 }) {
   return (
@@ -45,17 +43,17 @@ function RadioGroupItem({
         "focus-visible:outline-ring/50 ease-out-expo outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-150 outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
         "disabled:cursor-not-allowed disabled:opacity-60",
         "aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
-        // bg-clip-padding keeps the border on the substrate (matches Input);
-        // Indicator uses -inset-px to cover the border when selected.
-        "border bg-clip-padding",
-        variant === "default" ? "bg-input" : "bg-input-elevated",
+        // Off: a 2px ring in the shared --control-off grey around a white
+        // middle (the surface itself in dark), drawn as an inset shadow so the
+        // Indicator at inset-0 covers it completely when selected.
+        "bg-white shadow-[inset_0_0_0_2px_var(--control-off)] not-data-disabled:hover:shadow-[inset_0_0_0_2px_var(--control-off-hover)] dark:bg-transparent",
         className,
       )}
       {...props}
     >
       <Radio.Indicator
         className={cn(
-          "absolute -inset-px z-1 flex items-center justify-center rounded-full bg-(--radio-fill) before:bg-(--radio-dot)",
+          "absolute inset-0 z-1 flex items-center justify-center rounded-full bg-(--radio-fill) before:bg-(--radio-dot)",
           "ease-out-expo transition-opacity duration-150",
           "data-starting-style:opacity-0",
           "data-ending-style:opacity-0",

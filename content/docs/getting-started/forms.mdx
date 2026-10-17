@@ -11,7 +11,12 @@ Cubby UI provides three components for building accessible forms: [Form](/docs/c
 
 ```tsx
 import { Button } from "@/components/ui/cubby-ui/button";
-import { Field, FieldControl, FieldError, FieldLabel } from "@/components/ui/cubby-ui/field";
+import {
+  Field,
+  FieldControl,
+  FieldError,
+  FieldLabel,
+} from "@/components/ui/cubby-ui/field";
 import { Form } from "@/components/ui/cubby-ui/form";
 
 <Form onFormSubmit={(values) => console.log(values)}>
@@ -22,7 +27,7 @@ import { Form } from "@/components/ui/cubby-ui/form";
     <FieldError match="typeMismatch">Enter a valid email</FieldError>
   </Field>
   <Button type="submit">Submit</Button>
-</Form>
+</Form>;
 ```
 
 ## Labeling form controls
@@ -45,8 +50,7 @@ For Checkbox, Radio, and Switch, wrap the control inside `FieldLabel` for implic
 ```tsx
 <Field name="terms">
   <FieldLabel>
-    <Checkbox required />
-    I accept the terms
+    <Checkbox required />I accept the terms
   </FieldLabel>
 </Field>
 ```
@@ -177,7 +181,7 @@ const [errors, setErrors] = React.useState({});
   }}
 >
   <Field name="email">...</Field>
-</Form>
+</Form>;
 ```
 
 ## Submitting data
@@ -187,11 +191,13 @@ const [errors, setErrors] = React.useState({});
 Use `onSubmit` with `FormData` for standard form submission:
 
 ```tsx
-<Form onSubmit={(event) => {
-  event.preventDefault();
-  const formData = new FormData(event.currentTarget);
-  // send formData
-}} />
+<Form
+  onSubmit={(event) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    // send formData
+  }}
+/>
 ```
 
 ### JavaScript object with onFormSubmit
@@ -199,9 +205,11 @@ Use `onSubmit` with `FormData` for standard form submission:
 Use `onFormSubmit` to receive values as a plain object. `preventDefault` is called automatically:
 
 ```tsx
-<Form onFormSubmit={(values) => {
-  // values is { name: "...", email: "...", ... }
-}} />
+<Form
+  onFormSubmit={(values) => {
+    // values is { name: "...", email: "...", ... }
+  }}
+/>
 ```
 
 ## Third-party library integration
@@ -293,7 +301,7 @@ const form = useForm({
       </Field>
     )}
   </form.Field>
-</form>
+</form>;
 ```
 
 ## Forms on elevated surfaces
@@ -305,19 +313,23 @@ When a form lives inside a Card, Dialog, Sheet, Drawer, or any other elevated co
   <DialogContent>
     <Field name="email">
       <FieldLabel>Email</FieldLabel>
-      <FieldControl render={<Input variant="elevated" />} type="email" required />
+      <FieldControl
+        render={<Input variant="elevated" />}
+        type="email"
+        required
+      />
     </Field>
-    <Checkbox variant="elevated" />
+    <Checkbox />
   </DialogContent>
 </Dialog>
 ```
 
-Applies to Input, Textarea, NumberFieldGroup (not NumberFieldInput), InputGroup, OTPFieldInput, ComboboxInput, ComboboxChips, AutocompleteInput, Checkbox, and RadioGroupItem. Switch handles this automatically; no variant prop needed. See the [Surfaces](/docs/getting-started/surfaces) docs for the full reasoning.
+Applies to Input, Textarea, NumberFieldGroup (not NumberFieldInput), InputGroup, OTPFieldInput, ComboboxInput, ComboboxChips and AutocompleteInput. Checkbox, RadioGroupItem and Switch need no variant: their resting grey is translucent and holds on any surface. See the [Surfaces](/docs/getting-started/surfaces) docs for the full reasoning.
 
 ## Component reference
 
-| Component | Use for |
-| --- | --- |
-| [Form](/docs/components/form) | Form wrapper with `errors`, `onFormSubmit`, `validationMode` |
-| [Field](/docs/components/field) | Field wrapper with label, control, description, error, validation |
-| [Fieldset](/docs/components/fieldset) | Grouping related fields with a shared legend |
+| Component                             | Use for                                                           |
+| ------------------------------------- | ----------------------------------------------------------------- |
+| [Form](/docs/components/form)         | Form wrapper with `errors`, `onFormSubmit`, `validationMode`      |
+| [Field](/docs/components/field)       | Field wrapper with label, control, description, error, validation |
+| [Fieldset](/docs/components/fieldset) | Grouping related fields with a shared legend                      |

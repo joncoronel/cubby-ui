@@ -117,7 +117,6 @@ import carousel_carousel_responsive_sizes from "@/registry/examples/carousel/car
 import checkbox_checkbox_basic from "@/registry/examples/checkbox/checkbox-basic";
 import checkbox_checkbox_controlled from "@/registry/examples/checkbox/checkbox-controlled";
 import checkbox_checkbox_disabled_state from "@/registry/examples/checkbox/checkbox-disabled-state";
-import checkbox_checkbox_elevated from "@/registry/examples/checkbox/checkbox-elevated";
 import checkbox_checkbox_field from "@/registry/examples/checkbox/checkbox-field";
 import checkbox_checkbox_form_example from "@/registry/examples/checkbox/checkbox-form-example";
 import checkbox_checkbox_tone from "@/registry/examples/checkbox/checkbox-tone";
@@ -385,7 +384,6 @@ import qr_code_qr_code_with_logo from "@/registry/examples/qr-code/qr-code-with-
 import radio_group_radio_group_basic from "@/registry/examples/radio-group/radio-group-basic";
 import radio_group_radio_group_controlled from "@/registry/examples/radio-group/radio-group-controlled";
 import radio_group_radio_group_disabled_options from "@/registry/examples/radio-group/radio-group-disabled-options";
-import radio_group_radio_group_elevated from "@/registry/examples/radio-group/radio-group-elevated";
 import radio_group_radio_group_field from "@/registry/examples/radio-group/radio-group-field";
 import radio_group_radio_group_tone from "@/registry/examples/radio-group/radio-group-tone";
 import radio_group_radio_group_with_descriptions from "@/registry/examples/radio-group/radio-group-with-descriptions";
@@ -2253,11 +2251,6 @@ export const exampleRegistry = {
       "source": "import { Checkbox } from \"@/components/ui/cubby-ui/checkbox\"\nimport { Label } from \"@/components/ui/cubby-ui/label\"\n\nexport default function CheckboxDisabledState() {\n  return (\n    <div className=\"space-y-2\">\n      <div className=\"flex items-center space-x-2\">\n        <Checkbox id=\"disabled1\" disabled />\n        <Label htmlFor=\"disabled1\" className=\"text-muted-foreground\">\n          Disabled unchecked\n        </Label>\n      </div>\n      <div className=\"flex items-center space-x-2\">\n        <Checkbox id=\"disabled2\" disabled checked />\n        <Label htmlFor=\"disabled2\" className=\"text-muted-foreground\">\n          Disabled checked\n        </Label>\n      </div>\n    </div>\n  )\n}"
     },
     {
-      "title": "Elevated",
-      "importPath": "checkbox-elevated",
-      "source": "import {\n  Card,\n  CardContent,\n  CardDescription,\n  CardHeader,\n  CardTitle,\n} from \"@/components/ui/cubby-ui/card\";\nimport { Checkbox } from \"@/components/ui/cubby-ui/checkbox\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function CheckboxElevated() {\n  return (\n    <Card className=\"w-full max-w-sm\">\n      <CardHeader>\n        <CardTitle>On a Card surface</CardTitle>\n        <CardDescription>\n          Use <code>variant=&quot;elevated&quot;</code> when the checkbox sits\n          inside a Card, Dialog, or popover.\n        </CardDescription>\n      </CardHeader>\n      <CardContent className=\"flex flex-col gap-4\">\n        <Label className=\"flex flex-row items-center gap-2\">\n          <Checkbox id=\"checkbox-default\" />\n          Default — collapses into the card\n        </Label>\n        <Label className=\"flex flex-row items-center gap-2\">\n          <Checkbox id=\"checkbox-elevated\" variant=\"elevated\" />\n          Elevated — reads against the substrate\n        </Label>\n      </CardContent>\n    </Card>\n  );\n}\n"
-    },
-    {
       "title": "Field",
       "importPath": "checkbox-field",
       "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport { Checkbox } from \"@/components/ui/cubby-ui/checkbox\";\nimport { Field, FieldError, FieldLabel } from \"@/components/ui/cubby-ui/field\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\n\nexport default function CheckboxField() {\n  return (\n    <Form\n      className=\"space-y-4\"\n      onFormSubmit={(values) => {\n        alert(JSON.stringify(values, null, 2));\n      }}\n    >\n      <Field name=\"terms\">\n        <FieldLabel>\n          <Checkbox required />\n          I accept the terms and conditions\n        </FieldLabel>\n        <FieldError />\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\">\n        Submit\n      </Button>\n    </Form>\n  );\n}\n"
@@ -3663,11 +3656,6 @@ export const exampleRegistry = {
       "source": "import { RadioGroup, RadioGroupItem } from \"@/components/ui/cubby-ui/radio-group\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\n\nexport default function RadioGroupDisabledOptions() {\n  return (\n    <RadioGroup defaultValue=\"option2\">\n      <Label className=\"flex-row items-center gap-2\">\n        <RadioGroupItem value=\"option1\" />\n        Available Option\n      </Label>\n      <Label className=\"flex-row items-center gap-2\">\n        <RadioGroupItem value=\"option2\" />\n        Selected Option\n      </Label>\n      <Label className=\"flex-row items-center gap-2 opacity-50\">\n        <RadioGroupItem value=\"option3\" disabled />\n        Disabled Option\n      </Label>\n    </RadioGroup>\n  );\n}"
     },
     {
-      "title": "Elevated",
-      "importPath": "radio-group-elevated",
-      "source": "import {\n  Card,\n  CardContent,\n  CardDescription,\n  CardHeader,\n  CardTitle,\n} from \"@/components/ui/cubby-ui/card\";\nimport { Label } from \"@/components/ui/cubby-ui/label\";\nimport {\n  RadioGroup,\n  RadioGroupItem,\n} from \"@/components/ui/cubby-ui/radio-group\";\n\nexport default function RadioGroupElevated() {\n  return (\n    <Card className=\"w-full max-w-sm\">\n      <CardHeader>\n        <CardTitle>On a Card surface</CardTitle>\n        <CardDescription>\n          Use <code>variant=&quot;elevated&quot;</code> on{\" \"}\n          <code>RadioGroupItem</code> when the radio group sits inside a Card,\n          Dialog, or popover.\n        </CardDescription>\n      </CardHeader>\n      <CardContent className=\"grid grid-cols-2 gap-6\">\n        <div className=\"flex flex-col gap-2\">\n          <p className=\"text-sm font-medium\">Default</p>\n          <RadioGroup defaultValue=\"comfortable\">\n            <Label className=\"flex-row items-center gap-2\">\n              <RadioGroupItem value=\"default\" />\n              Default\n            </Label>\n            <Label className=\"flex-row items-center gap-2\">\n              <RadioGroupItem value=\"comfortable\" />\n              Comfortable\n            </Label>\n            <Label className=\"flex-row items-center gap-2\">\n              <RadioGroupItem value=\"compact\" />\n              Compact\n            </Label>\n          </RadioGroup>\n        </div>\n        <div className=\"flex flex-col gap-2\">\n          <p className=\"text-sm font-medium\">Elevated</p>\n          <RadioGroup defaultValue=\"comfortable\">\n            <Label className=\"flex-row items-center gap-2\">\n              <RadioGroupItem variant=\"elevated\" value=\"default\" />\n              Default\n            </Label>\n            <Label className=\"flex-row items-center gap-2\">\n              <RadioGroupItem variant=\"elevated\" value=\"comfortable\" />\n              Comfortable\n            </Label>\n            <Label className=\"flex-row items-center gap-2\">\n              <RadioGroupItem variant=\"elevated\" value=\"compact\" />\n              Compact\n            </Label>\n          </RadioGroup>\n        </div>\n      </CardContent>\n    </Card>\n  );\n}\n"
-    },
-    {
       "title": "Field",
       "importPath": "radio-group-field",
       "source": "\"use client\";\n\nimport { Button } from \"@/components/ui/cubby-ui/button\";\nimport {\n  Field,\n  FieldError,\n  FieldItem,\n  FieldLabel,\n} from \"@/components/ui/cubby-ui/field\";\nimport { Fieldset, FieldsetLegend } from \"@/components/ui/cubby-ui/fieldset\";\nimport { Form } from \"@/components/ui/cubby-ui/form\";\nimport {\n  RadioGroup,\n  RadioGroupItem,\n} from \"@/components/ui/cubby-ui/radio-group\";\n\nexport default function RadioGroupField() {\n  return (\n    <Form\n      className=\"space-y-4\"\n      onFormSubmit={(values) => {\n        alert(JSON.stringify(values, null, 2));\n      }}\n    >\n      <Field name=\"plan\">\n        <Fieldset render={<RadioGroup defaultValue=\"free\" />}>\n          <FieldsetLegend>Select a plan</FieldsetLegend>\n          <FieldItem>\n            <FieldLabel>\n              <RadioGroupItem value=\"free\" />\n              Free\n            </FieldLabel>\n          </FieldItem>\n          <FieldItem>\n            <FieldLabel>\n              <RadioGroupItem value=\"pro\" />\n              Pro\n            </FieldLabel>\n          </FieldItem>\n          <FieldItem>\n            <FieldLabel>\n              <RadioGroupItem value=\"enterprise\" />\n              Enterprise\n            </FieldLabel>\n          </FieldItem>\n        </Fieldset>\n        <FieldError />\n      </Field>\n      <Button type=\"submit\" variant=\"neutral\">\n        Submit\n      </Button>\n    </Form>\n  );\n}\n"
@@ -4581,7 +4569,6 @@ export const componentMap = {
   "checkbox-basic": checkbox_checkbox_basic,
   "checkbox-controlled": checkbox_checkbox_controlled,
   "checkbox-disabled-state": checkbox_checkbox_disabled_state,
-  "checkbox-elevated": checkbox_checkbox_elevated,
   "checkbox-field": checkbox_checkbox_field,
   "checkbox-form-example": checkbox_checkbox_form_example,
   "checkbox-tone": checkbox_checkbox_tone,
@@ -4849,7 +4836,6 @@ export const componentMap = {
   "radio-group-basic": radio_group_radio_group_basic,
   "radio-group-controlled": radio_group_radio_group_controlled,
   "radio-group-disabled-options": radio_group_radio_group_disabled_options,
-  "radio-group-elevated": radio_group_radio_group_elevated,
   "radio-group-field": radio_group_radio_group_field,
   "radio-group-tone": radio_group_radio_group_tone,
   "radio-group-with-descriptions": radio_group_radio_group_with_descriptions,

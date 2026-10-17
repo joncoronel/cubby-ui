@@ -85,14 +85,11 @@ const switchVariants = cva(
     "motion-safe:pointer-fine:not-data-disabled:data-highlighted:[--switch-hover-part:var(--switch-hover-ext)]",
     "motion-safe:pointer-fine:not-data-disabled:active:[--switch-press-part:var(--switch-press-ext)]",
     "motion-safe:pointer-fine:not-data-disabled:group-active/switch:[--switch-press-part:var(--switch-press-ext)]",
-    // Unchecked track. Values live here rather than in the theme so the
-    // component works the moment it is installed; set --switch-track /
-    // --switch-track-hover on any ancestor to retune. Translucent, so one
-    // colour works on any substrate and hover steps along the same overlay.
-    "[--switch-track-bg:var(--switch-track,oklch(0_0_0/15%))]",
-    "[--switch-track-bg-hover:var(--switch-track-hover,oklch(0_0_0/19%))]",
-    "dark:[--switch-track-bg:var(--switch-track,oklch(1_0_0/20%))]",
-    "dark:[--switch-track-bg-hover:var(--switch-track-hover,oklch(1_0_0/24%))]",
+    // Unchecked track: the shared --control-off grey that Checkbox and Radio
+    // draw their edge with. Set --switch-track / --switch-track-hover on any
+    // ancestor to retune.
+    "[--switch-track-bg:var(--switch-track,var(--control-off))]",
+    "[--switch-track-bg-hover:var(--switch-track-hover,var(--control-off-hover))]",
     // Checked fill and thumb both read through an indirection: `color` supplies
     // the preset, and --switch-fill / --switch-thumb from an ancestor or
     // className win over it.

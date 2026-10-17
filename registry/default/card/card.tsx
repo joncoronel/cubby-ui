@@ -43,8 +43,11 @@ function Card({
         cardVariants({ variant }),
         solidSurface(level, shadowLevel),
         // bg-muted overrides solidSurface's bg, making the outer a gray frame
-        // while keeping its shadow, rim, and --popup-surface.
+        // while keeping its shadow, rim, and --popup-surface. At the default
+        // ring-only shadow the fill is the edge: that ring would land lighter
+        // than the muted frame on a near-white page, a pale fringe.
         variant === "inset" && "bg-muted",
+        variant === "inset" && shadowLevel === 1 && "shadow-none",
         className,
       )}
       {...props}

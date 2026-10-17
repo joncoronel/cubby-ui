@@ -43,7 +43,9 @@ export function ComponentPreview({
       data-slot="preview"
       className={cn(
         "docs-stage-wrap not-prose",
-        code && ["docs-example", solidSurface(3, 1), "bg-muted"],
+        // The muted fill is the edge; the level-1 ring would land lighter than
+        // it on the near-white page and read as a pale fringe.
+        code && ["docs-example", solidSurface(3, 1), "bg-muted shadow-none"],
         className,
       )}
     >

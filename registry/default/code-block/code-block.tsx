@@ -179,9 +179,11 @@ function CodeBlock({
     "data-slot": "code-block",
     className: cn(
       "group max-w-full w-full rounded-2xl p-1 pt-0 relative",
-      // bg-muted follows solidSurface to override its bg-surface-3.
+      // bg-muted follows solidSurface to override its bg-surface-3, and the
+      // fill is the edge: the level-1 ring would land lighter than the muted
+      // tray on a near-white page, a pale fringe.
       solidSurface(3, 1),
-      "bg-muted",
+      "bg-muted shadow-none",
       // No header: the tray has nothing to hold, so drop it and let the code
       // card stand on its own.
       // Its own child only: a code block nested inside (a card holding a

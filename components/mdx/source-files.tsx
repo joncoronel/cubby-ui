@@ -231,7 +231,7 @@ export function SourceFiles({
     <div
       ref={rootRef}
       data-layout={wide ? "tree" : "picker"}
-      className={cn("docs-files", solidSurface(3, 1), "bg-muted")}
+      className={cn("docs-files", solidSurface(3, 1), "bg-muted shadow-none")}
     >
       {wide ? (
         <>

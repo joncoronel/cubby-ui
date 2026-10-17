@@ -39,7 +39,10 @@ export default function BaseDrawerKeyboardAware() {
         <BaseDrawerPanel>
           <ul className="flex flex-col gap-3">
             {comments.map((comment) => (
-              <li key={comment.id} className="bg-muted/50 rounded-lg border p-3">
+              <li
+                key={comment.id}
+                className="bg-muted/50 rounded-lg border p-3"
+              >
                 <p className="text-sm font-medium">{comment.author}</p>
                 <p className="text-muted-foreground text-sm">{comment.text}</p>
               </li>
@@ -50,7 +53,6 @@ export default function BaseDrawerKeyboardAware() {
           <Input
             aria-label="Reply"
             placeholder="Write a reply…"
-            variant="elevated"
             className="flex-1"
           />
           <Button size="icon" aria-label="Send reply">

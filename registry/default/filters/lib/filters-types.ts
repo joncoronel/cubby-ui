@@ -192,7 +192,7 @@ export interface FiltersProviderProps {
   defaultValue?: FilterValue[];
   onValueChange?: (value: FilterValue[]) => void;
   size?: FilterSize;
-  /** Shell style for chips and the add/clear capsule. Defaults to `"outline"`. */
+  /** Shell style for chips and the add/clear capsule. Defaults to `"soft"`. */
   variant?: FilterVariant;
   /**
    * Default for each text, number and custom field's `allowDuplicates`.

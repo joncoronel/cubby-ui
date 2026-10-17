@@ -125,16 +125,12 @@ html {
   /* Re-declared in .dark: a custom property resolves its var()s where DECLARED,
      so without it a subtree-scoped .dark inherits this light-resolved value. */
   --border: color-mix(in oklab, var(--foreground) 10%, transparent);
-  /* Default form-field bg — opaque, aliased to surface-3 so it tracks the ladder. */
   /* Form fields are filled, not outlined: a translucent tint that darkens
      whatever it sits on, so one value reads on the page, a Card or a popup. */
   --input: oklch(0 0 0 / 4.5%);
   --input-hover: oklch(0 0 0 / 7.5%);
-  /* Elevated form-field bg — translucent, for fields inside Cards, Dialogs and
-     popovers where the opaque default collapses into its surround. */
-  --input-elevated: oklch(0 0 0 / 6%);
   /* The "off" grey every on/off control shares: the Switch track fills with
-     it, Checkbox and Radio draw their edge with it, so the three read as one
+     it, Checkbox and Radio draw a ring of it, so the three read as one
      family at rest. Translucent, so it holds on any substrate. */
   --control-off: oklch(0 0 0 / 15%);
   --control-off-hover: oklch(0 0 0 / 19%);
@@ -350,11 +346,10 @@ html {
   --border: color-mix(in oklab, var(--foreground) 10%, transparent);
   --input: oklch(1 0 0 / 5%);
   --input-hover: oklch(1 0 0 / 9%);
-  --input-elevated: oklch(1 0 0 / 7%);
   /* Lower than light, so the resting grey stays well clear of the lifted
      --emphasis that marks the on state. */
-  --control-off: oklch(1 0 0 / 12%);
-  --control-off-hover: oklch(1 0 0 / 16%);
+  --control-off: oklch(1 0 0 / 15%);
+  --control-off-hover: oklch(1 0 0 / 19%);
   --scrollbar: oklch(0.7 var(--neutral-chroma) var(--neutral-hue));
 
   /* Only --sidebar-border needs a dark value; the rest are aliases. */
@@ -511,7 +506,6 @@ html {
 
   --color-ring: var(--ring);
   --color-input: var(--input);
-  --color-input-elevated: var(--input-elevated);
   --color-input-hover: var(--input-hover);
   --color-border: var(--border);
   --color-destructive: var(--destructive);

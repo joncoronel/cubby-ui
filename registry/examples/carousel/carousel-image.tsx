@@ -23,7 +23,9 @@ export default function CarouselImage() {
                 <CardContent
                   className={`flex aspect-square items-center justify-center p-6 ${item.color}`}
                 >
-                  <span className="text-xl font-semibold">{item.text}</span>
+                  <span className="text-xl font-semibold text-neutral-800">
+                    {item.text}
+                  </span>
                 </CardContent>
               </Card>
             </div>

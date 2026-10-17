@@ -68,13 +68,12 @@ const selectTriggerVariants = cva(
   {
     variants: {
       variant: {
-        // Filled bg for the page or non-elevated substrates; hover deepens the
+        // Filled: a translucent tint on any surface; hover deepens the
         // same translucent tint.
-        default:
-          "bg-input hover:bg-input-hover data-popup-open:bg-input-hover",
-        // Slightly stronger tint for Cards, Dialogs, etc.
-        elevated:
-          "bg-input-elevated hover:bg-input-hover data-popup-open:bg-input-hover",
+        default: "bg-input hover:bg-input-hover data-popup-open:bg-input-hover",
+        // Outline: the outline Button's fill and edge.
+        outline:
+          "bg-(--outline) border-(--outline-border) bg-clip-padding hover:bg-(--outline-hover) data-popup-open:bg-(--outline-hover)",
         // Chromeless — mirrors the button's ghost variant for use in toolbars
         // and inline next to ghost buttons. Chevron follows the text on hover.
         ghost:

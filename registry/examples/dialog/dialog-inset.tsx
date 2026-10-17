@@ -29,11 +29,11 @@ export default function DialogInset() {
         <DialogBody className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="name">Name</Label>
-            <Input id="name" variant="elevated" defaultValue="John Doe" />
+            <Input id="name" defaultValue="John Doe" />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="username">Username</Label>
-            <Input id="username" variant="elevated" defaultValue="@johndoe" />
+            <Input id="username" defaultValue="@johndoe" />
           </div>
         </DialogBody>
         <DialogFooter>

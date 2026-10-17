@@ -117,7 +117,6 @@ Copy and paste the following into your `globals.css` file:
   --border: color-mix(in oklab, var(--foreground) 10%, transparent);
   --input: oklch(0 0 0 / 4.5%);
   --input-hover: oklch(0 0 0 / 7.5%);
-  --input-elevated: oklch(0 0 0 / 6%);
   --control-off: oklch(0 0 0 / 15%);
   --control-off-hover: oklch(0 0 0 / 19%);
   --ring: oklch(0.7 0.15 232.65);
@@ -293,9 +292,8 @@ Copy and paste the following into your `globals.css` file:
   --border: color-mix(in oklab, var(--foreground) 10%, transparent);
   --input: oklch(1 0 0 / 5%);
   --input-hover: oklch(1 0 0 / 9%);
-  --input-elevated: oklch(1 0 0 / 7%);
-  --control-off: oklch(1 0 0 / 12%);
-  --control-off-hover: oklch(1 0 0 / 16%);
+  --control-off: oklch(1 0 0 / 15%);
+  --control-off-hover: oklch(1 0 0 / 19%);
   --scrollbar: oklch(0.7 var(--neutral-chroma) var(--neutral-hue));
 
   /* Only --sidebar-border needs a dark value; the rest are aliases. */
@@ -443,7 +441,6 @@ Copy and paste the following into your `globals.css` file:
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
-  --color-input-elevated: var(--input-elevated);
   --color-input-hover: var(--input-hover);
   --color-ring: var(--ring);
   --color-scrollbar: var(--scrollbar);
@@ -584,12 +581,15 @@ For the full elevation system docs, see [Surfaces](/docs/getting-started/surface
 
 ## Form-field tokens
 
-Form fields (Input, Textarea, Checkbox, Radio, etc.) use three dedicated tokens:
+Form fields and on/off controls use these dedicated tokens:
 
-- `--input`: Default bg, aliased to `--surface-3` so it matches Card surfaces
-- `--input-elevated`: Translucent overlay for the `elevated` variant, adapts to any substrate (use inside Cards, Dialogs, popovers)
+- `--input`: the filled field tint (translucent, so it reads on the page, a Card or a popup)
+- `--input-hover`: the deeper tint for hovered and open select and date-picker triggers
+- `--outline` / `--outline-border`: the fill and edge of the `outline` field variant and the outline Button
+- `--control-off` / `--control-off-hover`: the resting grey of Switch and Slider tracks and the Checkbox and Radio ring
+- `--emphasis` / `--emphasis-foreground`: the neutral on-state fill of Checkbox, Radio, Switch, Slider, Tabs and Toggle Group
 
-See the [Forms](/docs/getting-started/forms) guide for when to use which variant.
+See the [Forms](/docs/getting-started/forms) guide for when to use the `outline` variant.
 
 ## Base UI Requirements
 

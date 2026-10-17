@@ -40,7 +40,7 @@ export type OTPFieldInputProps = Omit<
   /** Applied to the visible slot around the input. */
   className?: string;
   style?: React.CSSProperties;
-  variant?: "default" | "elevated";
+  variant?: "default" | "outline";
 };
 
 function OTPFieldInput({
@@ -70,7 +70,9 @@ function OTPFieldInput({
             className={cn(
               // Base styling
               "relative flex h-10 w-10 cursor-text items-center justify-center rounded-[var(--otp-field-radius,var(--radius-lg))] border border-transparent text-base font-medium tabular-nums sm:not-pointer-coarse:h-9 sm:not-pointer-coarse:w-9 sm:not-pointer-coarse:text-sm",
-              variant === "default" ? "bg-input" : "bg-input-elevated",
+              variant === "outline"
+                ? "border-(--outline-border) bg-(--outline) bg-clip-padding"
+                : "bg-input",
               // Invalid state (the focused slot's ring comes from the root)
               "data-[invalid]:outline-destructive/50 data-[invalid]:outline-2 data-[invalid]:outline-offset-2 data-[invalid]:outline-solid",
               // Disabled state

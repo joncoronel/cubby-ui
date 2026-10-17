@@ -61,6 +61,12 @@ Use `variant` to pick the shell the controls sit on.
 | `soft`     | A secondary Button's fill, for editor chrome.     |
 | `ghost`    | No shell, for bars inside a card or header.       |
 
+### Pressed Style
+
+Use `pressedStyle` to set how toggled-on toggles look. `subtle` (the default) is a quiet tint, which stays calm when several toggles are on at once, as in a text editor. `solid` uses the mid emphasis grey with a light label, matching Toggle Group, Tabs and checked checkboxes.
+
+<ComponentPreview component="toolbar" example="toolbar-pressed-style" />
+
 ### Size
 
 Use `size` to match the toolbar to a Button of the same size; its controls scale their padding, text, and icons with it.
@@ -124,6 +130,16 @@ The shell. Wraps Base UI's `Toolbar.Root`.
 >
   Outer height, matching `Button`. Controls take their padding, text, and icon
   size from it.
+</ApiProp>
+
+<ApiProp
+  name="pressedStyle"
+  fullType='"subtle" | "solid"'
+  simpleType="string"
+  defaultValue='"subtle"'
+>
+  How toggled-on `ToolbarToggle` items look. `subtle` is a tint of the label
+  color; `solid` is the emphasis grey with a light label.
 </ApiProp>
 
 <ApiProp name="highlight" fullType="boolean" defaultValue="true">

@@ -16,18 +16,17 @@ import {
 
 const OTP_LENGTH = 6;
 
-export default function OtpFieldElevated() {
+export default function OtpFieldOutline() {
   const defaultId = React.useId();
-  const elevatedId = React.useId();
+  const outlineId = React.useId();
 
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle>On a Card surface</CardTitle>
+        <CardTitle>Default and outline</CardTitle>
         <CardDescription>
-          Use <code>variant=&quot;elevated&quot;</code> on{" "}
-          <code>OTPFieldInput</code> when the field sits inside a Card, Dialog,
-          or popover.
+          Both read on a Card. <code>outline</code> takes the outline
+          Button&apos;s fill and edge.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
@@ -43,12 +42,12 @@ export default function OtpFieldElevated() {
           </OTPField>
         </div>
         <div className="flex flex-col gap-2">
-          <Label htmlFor={elevatedId}>Elevated</Label>
-          <OTPField id={elevatedId} length={OTP_LENGTH}>
+          <Label htmlFor={outlineId}>Outline</Label>
+          <OTPField id={outlineId} length={OTP_LENGTH}>
             {Array.from({ length: OTP_LENGTH }, (_, index) => (
               <OTPFieldInput
                 key={index}
-                variant="elevated"
+                variant="outline"
                 aria-label={`Character ${index + 1} of ${OTP_LENGTH}`}
               />
             ))}

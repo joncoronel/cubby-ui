@@ -8,27 +8,27 @@ import {
 import { Input } from "@/registry/default/input/input";
 import { Label } from "@/registry/default/label/label";
 
-export default function InputElevated() {
+export default function InputOutline() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle>On a Card surface</CardTitle>
+        <CardTitle>Default and outline</CardTitle>
         <CardDescription>
-          Use <code>variant=&quot;elevated&quot;</code> when the input sits
-          inside a Card, Dialog, or popover.
+          Both read on a Card. <code>outline</code> takes the outline
+          Button&apos;s fill and edge.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <Label htmlFor="input-default">Default</Label>
-          <Input id="input-default" placeholder="Collapses into the card" />
+          <Input id="input-default" placeholder="Filled tint" />
         </div>
         <div className="flex flex-col gap-2">
-          <Label htmlFor="input-elevated">Elevated</Label>
+          <Label htmlFor="input-outline">Outline</Label>
           <Input
-            id="input-elevated"
-            variant="elevated"
-            placeholder="Reads against the substrate"
+            id="input-outline"
+            variant="outline"
+            placeholder="Fill with an edge"
           />
         </div>
       </CardContent>

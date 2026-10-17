@@ -373,37 +373,35 @@ The reference aliases `--muted` to `surface-2` because its system has no recesse
   </AccordionItem>
   <AccordionItem value="form-fields">
     <AccordionTrigger indicatorType="chevron">
-      Form fields use `--input` and `--input-elevated`
+      Form fields use `--input`, with an `outline` option
     </AccordionTrigger>
     <AccordionContent>
 
-Form fields come in two appearances, exposed as a `variant` prop on Input, Textarea, NumberField, InputGroup, OTP, Combobox and Autocomplete:
+Form fields come in two appearances, exposed as a `variant` prop on Input, Textarea, NumberField, InputGroup, OTP, Combobox, Autocomplete, Select and the date pickers:
 
 ```tsx
-// Default: a light tint. Use on the page.
+// Default: a filled tint. Reads on the page, a Card, a Dialog, or a popover.
 <Input />
 
-// Elevated: a slightly stronger tint. Use inside a Card, Dialog, or popover.
+// Outline: the outline Button's fill and edge. A style choice, usable anywhere.
 <Card>
-  <Input variant="elevated" />
+  <Input variant="outline" />
 </Card>
 ```
 
-Both are translucent tints, the same family as the state overlays, so they adapt to whatever they sit on:
+The default is a translucent tint, the same family as the state overlays, so it adapts to whatever it sits on:
 
 ```css
 /* light */
 --input: oklch(0 0 0 / 4.5%);
---input-elevated: oklch(0 0 0 / 6%);
 
 /* dark */
 --input: oklch(1 0 0 / 5%);
---input-elevated: oklch(1 0 0 / 7%);
 ```
 
-The tint reads on the page as is; on a white Card or inside a Dialog the slightly stronger `elevated` tint keeps the field from looking washed out. The `variant` prop lets the caller choose per context.
+Because the tint holds on every surface, no field needs a per-context switch. `outline` reuses the outline Button's `--outline` fill and `--outline-border` edge: the card fill with a hairline border in light mode, and a recessed darker fill with a faint 8% white ring in dark mode. Reach for it when fields should match outline buttons.
 
-Switch, Checkbox and Radio skip the variant. Their resting state is the shared `--control-off` grey (15% black, 12% white in dark): the Switch track fills with it, and unchecked boxes and radios draw a 2px ring of it around a white middle. It reads on any surface, so none of the three needs a `variant` prop.
+Switch, Checkbox and Radio skip the variant. Their resting state is the shared `--control-off` grey (15% black, 15% white in dark): the Switch track fills with it, and unchecked boxes and radios draw a 2px ring of it around a white middle. It reads on any surface, so none of the three needs a `variant` prop.
 
     </AccordionContent>
 
@@ -447,8 +445,7 @@ Every token lives on `:root` and is exposed as a Tailwind utility through `@them
 --surface-hover                  /* hover overlay */
 --surface-active                 /* pressed overlay */
 --surface-selected               /* selected overlay */
---input                          /* opaque form-field bg = surface-3 */
---input-elevated                 /* stronger overlay for elevated fields and Switch */
+--input                          /* translucent form-field fill */
 --surface-rim-color              /* single-edge rim color (flush sheets) */
 --popup-surface                  /* set by the helpers, read by descendants */
 

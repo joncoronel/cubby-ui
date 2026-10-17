@@ -65,7 +65,7 @@ const buttonGroupVariants = cva(
       },
     ],
     defaultVariants: {
-      variant: "outline",
+      variant: "soft",
       size: "default",
       orientation: "horizontal",
     },
@@ -122,13 +122,13 @@ const ButtonGroupContext = React.createContext<ButtonGroupContextValue | null>(
 );
 
 const DEFAULT_CONTEXT: ButtonGroupContextValue = {
-  variant: "outline",
+  variant: "soft",
   size: "default",
   orientation: "horizontal",
 };
 
 export type ButtonGroupProps = React.ComponentProps<"div"> & {
-  /** Defaults to the parent group's variant, or `"outline"`. */
+  /** Defaults to the parent group's variant, or `"soft"`. */
   variant?: ButtonGroupVariant;
   /** Outer height, on Button's ladder. Defaults to the parent group's size, or `"default"`. */
   size?: ButtonGroupSize;

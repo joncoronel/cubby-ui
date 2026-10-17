@@ -17,18 +17,17 @@ import {
   NumberFieldInput,
 } from "@/registry/default/number-field/number-field";
 
-export default function NumberFieldElevated() {
+export default function NumberFieldOutline() {
   const defaultId = React.useId();
-  const elevatedId = React.useId();
+  const outlineId = React.useId();
 
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle>On a Card surface</CardTitle>
+        <CardTitle>Default and outline</CardTitle>
         <CardDescription>
-          Use <code>variant=&quot;elevated&quot;</code> on{" "}
-          <code>NumberFieldGroup</code> when the field sits inside a Card,
-          Dialog, or popover.
+          Both read on a Card. <code>outline</code> takes the outline
+          Button&apos;s fill and edge.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
@@ -41,9 +40,9 @@ export default function NumberFieldElevated() {
           </NumberFieldGroup>
         </NumberField>
 
-        <NumberField id={elevatedId} defaultValue={100}>
-          <Label htmlFor={elevatedId}>Elevated</Label>
-          <NumberFieldGroup variant="elevated">
+        <NumberField id={outlineId} defaultValue={100}>
+          <Label htmlFor={outlineId}>Outline</Label>
+          <NumberFieldGroup variant="outline">
             <NumberFieldDecrement />
             <NumberFieldInput />
             <NumberFieldIncrement />

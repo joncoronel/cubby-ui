@@ -20,15 +20,14 @@ const items = [
   { label: "Orange", value: "orange" },
 ];
 
-export default function SelectElevated() {
+export default function SelectOutline() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle>On a Card surface</CardTitle>
+        <CardTitle>Default and outline</CardTitle>
         <CardDescription>
-          Use <code>variant=&quot;elevated&quot;</code> on{" "}
-          <code>SelectTrigger</code> when the select sits inside a Card, Dialog,
-          or popover.
+          Both read on a Card. <code>outline</code> takes the outline
+          Button&apos;s fill and edge.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
@@ -36,7 +35,7 @@ export default function SelectElevated() {
           <div className="flex flex-col gap-1">
             <SelectLabel>Default</SelectLabel>
             <SelectTrigger className="w-[220px]">
-              <SelectValue placeholder="Collapses into the card" />
+              <SelectValue placeholder="Filled tint" />
             </SelectTrigger>
           </div>
           <SelectContent>
@@ -50,9 +49,9 @@ export default function SelectElevated() {
 
         <Select items={items}>
           <div className="flex flex-col gap-1">
-            <SelectLabel>Elevated</SelectLabel>
-            <SelectTrigger variant="elevated" className="w-[220px]">
-              <SelectValue placeholder="Reads against the substrate" />
+            <SelectLabel>Outline</SelectLabel>
+            <SelectTrigger variant="outline" className="w-[220px]">
+              <SelectValue placeholder="Fill with an edge" />
             </SelectTrigger>
           </div>
           <SelectContent>

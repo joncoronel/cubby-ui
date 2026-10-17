@@ -46,8 +46,8 @@ Use `variant` to pick the shell the buttons sit on.
 
 | Variant    | Description                                                   |
 | ---------- | ------------------------------------------------------------- |
-| `outline`  | The default. An outline Button's fill and border.             |
-| `soft`     | A secondary Button's fill, for editor chrome.                 |
+| `outline`  | An outline Button's fill and border.                          |
+| `soft`     | The default. A secondary Button's fill, no edge.              |
 | `elevated` | A raised surface, for toolbars that float.                    |
 | `solid`    | The neutral fill, for a primary action and options.           |
 | `attached` | No shell; joins buttons to fields. See [Attached](#attached). |
@@ -155,7 +155,7 @@ Groups buttons on one surface. Renders a `div` with `role="group"`.
   name="variant"
   fullType='"outline" | "soft" | "elevated" | "solid" | "attached"'
   simpleType="string"
-  defaultValue='"outline"'
+  defaultValue='"soft"'
 >
   Shell style. `attached` draws no shell and joins its children. A nested group
   inherits its parent's variant.
@@ -215,6 +215,6 @@ If you're reinstalling over an earlier version, check these changes:
 | Before                                       | Now                                                                                                                                                                |
 | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Installed as `cubby-ui/button-group.tsx`     | Installs into a `cubby-ui/button-group/` folder with `button-group.css`. Import from `@/components/ui/cubby-ui/button-group/button-group` and delete the old file. |
-| Children fused into one bordered control     | The default is `outline`, a shell. Pass `variant="attached"` for the old look.                                                                                     |
+| Children fused into one bordered control     | The default is `soft`, a filled shell. Pass `variant="attached"` for the old look.                                                                                 |
 | `ButtonGroupSeparator` defaulted to vertical | It turns perpendicular to the group, so vertical groups need no `orientation`.                                                                                     |
 | Buttons in a group set `variant="outline"`   | Leave `variant` unset in a shell. A set variant marks the button as the main action.                                                                               |

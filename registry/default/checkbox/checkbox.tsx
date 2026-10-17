@@ -49,7 +49,7 @@ const minusClasses = cn(
 
 // The checked fill. Neutral is the mid emphasis grey shared by every
 // selection control; primary brings in the brand fill for a louder check.
-const checkboxTones = {
+const checkboxColors = {
   neutral:
     "[--checkbox-fill:var(--emphasis)] [--checkbox-mark:var(--emphasis-foreground)]",
   primary:
@@ -58,17 +58,17 @@ const checkboxTones = {
 
 function Checkbox({
   className,
-  tone = "neutral",
+  color = "neutral",
   ...props
 }: React.ComponentProps<typeof BaseCheckbox.Root> & {
-  tone?: "neutral" | "primary";
+  color?: "neutral" | "primary";
 }) {
   return (
     <BaseCheckbox.Root
       data-slot="checkbox"
-      data-tone={tone}
+      data-color={color}
       className={cn(
-        checkboxTones[tone],
+        checkboxColors[color],
         "peer aria-invalid:outline-destructive/50 aria-invalid:text-destructive focus-visible:outline-ring/50 ease-out-expo relative flex aspect-square size-4.5 shrink-0 items-center justify-center rounded-xs text-(--checkbox-mark) outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-200 outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid data-disabled:cursor-not-allowed data-disabled:opacity-60 motion-reduce:transition-none sm:not-pointer-coarse:size-4",
         // Off: a 2px ring in the shared --control-off grey (the Switch track
         // fills with the same grey) around a white middle, or the surface

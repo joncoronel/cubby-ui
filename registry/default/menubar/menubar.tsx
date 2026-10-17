@@ -58,7 +58,8 @@ const menubarVariants = cva(
     variants: {
       variant: {
         elevated: cn(solidSurface(2, 2), "text-foreground"),
-        outline: "bg-card text-foreground outline outline-border",
+        outline:
+          "bg-(--outline) text-foreground outline outline-(--outline-border)",
         soft: "bg-secondary text-secondary-foreground",
         ghost: "text-foreground",
       },

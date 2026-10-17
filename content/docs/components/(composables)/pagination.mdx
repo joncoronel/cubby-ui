@@ -14,7 +14,7 @@ import {
   PaginationPrevious,
 } from "@/registry/default/pagination/pagination";
 
-Pagination links the pages of a long list, like search results, tables, and feeds. A solid fill marks the current page and glides to the new one when it changes.
+Pagination links the pages of a long list, like search results, tables, and feeds. A solid grey fill, the same as every selected control, marks the current page and glides to the new one when it changes.
 
 ## Preview
 
@@ -74,11 +74,11 @@ Use `variant` on `PaginationContent` to pick the shell around the links.
 
 <ComponentPreview component="pagination" example="pagination-variants" />
 
-| Variant   | Description                                       |
-| --------- | ------------------------------------------------- |
-| `outline` | The default. An outline Button's fill and border. |
-| `soft`    | A secondary Button's fill, no edge.               |
-| `ghost`   | No shell.                                         |
+| Variant   | Description                                      |
+| --------- | ------------------------------------------------ |
+| `outline` | An outline Button's fill and border.             |
+| `soft`    | The default. A secondary Button's fill, no edge. |
+| `ghost`   | No shell.                                        |
 
 ### Size
 
@@ -138,7 +138,7 @@ The list and its shell. Renders a `ul`.
   name="variant"
   fullType='"outline" | "soft" | "ghost"'
   simpleType="string"
-  defaultValue='"outline"'
+  defaultValue='"soft"'
 >
   Shell style. `ghost` draws none.
 </ApiProp>
@@ -215,7 +215,7 @@ If you're reinstalling over an earlier version, check these changes:
 | Before                                         | Now                                                                                                                                                                           |
 | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Installed as `cubby-ui/pagination.tsx`         | Installs into a `cubby-ui/pagination/` folder with `pagination.css` and `lib/range.ts`. Import from `@/components/ui/cubby-ui/pagination/pagination` and delete the old file. |
-| Bare links, the current page an outline button | A shell (`outline` by default) with a gliding fill. Use `variant="ghost"` for none.                                                                                           |
+| Bare links, the current page an outline button | A shell (`soft` by default) with a gliding fill. Use `variant="ghost"` for none.                                                                                              |
 | `PaginationLink` took a `size`                 | Set `size` once on `PaginationContent`.                                                                                                                                       |
 | `aria-label="pagination"` on `nav`             | `aria-label="Pagination"`, overridable.                                                                                                                                       |
 | Previous and Next had fixed accessible names   | Their label is the accessible name; it's visually hidden below `sm`.                                                                                                          |

@@ -44,11 +44,11 @@ const inputGroupVariants = cva(
         sm: "[--input-group-h:--spacing(9)] sm:not-pointer-coarse:[--input-group-h:--spacing(8)] [--input-group-radius:calc(var(--radius)-2px)]",
       },
       variant: {
-        // Filled bg — use on the page or any non-elevated substrate.
+        // Filled: a translucent tint that holds on any surface.
         default: "bg-input",
-        // Slightly stronger tint — use inside Cards, Dialogs, or any elevated
-        // surface.
-        elevated: "bg-input-elevated",
+        // Outline: the outline Button's fill and edge (card and hairline in
+        // light, a recessed fill with a faint ring in dark).
+        outline: "bg-(--outline) border-(--outline-border) bg-clip-padding",
       },
     },
     defaultVariants: {

@@ -78,9 +78,9 @@ function DatePickerTrigger({
       className={cn(
         inputVariants({ variant, size }),
         "cursor-pointer items-center gap-2 text-start",
-        variant === "elevated"
-          ? "hover:bg-surface-hover data-popup-open:bg-surface-hover"
-          : "hover:bg-(--outline-hover) data-popup-open:bg-(--outline-hover)",
+        variant === "outline"
+          ? "hover:bg-(--outline-hover) data-popup-open:bg-(--outline-hover)"
+          : "hover:bg-input-hover data-popup-open:bg-input-hover",
         "data-placeholder:text-muted-foreground",
         showClear && "pe-9",
       )}

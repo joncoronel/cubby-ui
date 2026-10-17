@@ -86,17 +86,17 @@ Use objects as values instead of primitives. The `itemToStringValue` prop conver
 
 <ComponentPreview component="select" example="select-object-values" />
 
-### Elevated Variant
+### Outline Variant
 
-On a Card, Dialog, or popover surface, the opaque `default` trigger collapses into its parent. Use `variant="elevated"` on `SelectTrigger` for a translucent overlay that adapts to the substrate. See the [Surfaces](/docs/getting-started/surfaces) docs.
+`default` is a filled translucent tint that reads on the page, a Card, a Dialog, or a popover alike, so the field never needs a per-surface switch. Use `variant="outline"` on `SelectTrigger` when you want the outline Button's fill and edge instead: a card fill with a hairline border in light mode, and a recessed fill with a faint ring in dark mode.
 
-<ComponentPreview component="select" example="select-elevated" />
+<ComponentPreview component="select" example="select-outline" />
 
-| Variant    | Description                                                  |
-| ---------- | ------------------------------------------------------------ |
-| `default`  | Opaque `bg-input` trigger for page-level surfaces.           |
-| `elevated` | Translucent trigger for use inside Card, Dialog, or popover. |
-| `ghost`    | Chromeless trigger that mirrors the Button `ghost` variant.  |
+| Variant   | Description                                                 |
+| --------- | ----------------------------------------------------------- |
+| `default` | A filled translucent tint that reads on any surface.        |
+| `outline` | The outline Button's fill and hairline edge.                |
+| `ghost`   | Chromeless trigger that mirrors the Button `ghost` variant. |
 
 ### Ghost Variant
 
@@ -143,16 +143,15 @@ Button that opens the dropdown when clicked. Wraps Base UI's `Select.Trigger`.
 
 <ApiProp
   name="variant"
-  fullType="'default' | 'elevated' | 'ghost'"
+  fullType="'default' | 'outline' | 'ghost'"
   simpleType="string"
   defaultValue='"default"'
 >
-  Surface appearance. `default` uses opaque `bg-input` with a soft drop shadow
-  in light mode. `elevated` uses translucent `bg-input-elevated` for use inside
-  Card, Dialog, or popover surfaces. `ghost` is chromeless and mirrors the
-  Button `ghost` variant for toolbars and dense UI. `default` and `elevated`
-  match the same prop on Input, Combobox, and Autocomplete. See the
-  [Surfaces](/docs/getting-started/surfaces) docs.
+  Surface appearance. `default` is a filled translucent tint that reads on any
+  surface. `outline` uses the outline Button's fill and hairline edge. `ghost`
+  is chromeless and mirrors the Button `ghost` variant for toolbars and dense
+  UI. `default` and `outline` match the same prop on Input, Combobox, and
+  Autocomplete.
 </ApiProp>
 
 <ApiProp name="hideChevronRotation" fullType="boolean" defaultValue="false">

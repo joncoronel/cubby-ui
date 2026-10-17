@@ -24,10 +24,9 @@ const toggleGroupVariants = cva(
     "[--toggle-group-item-radius:max(0px,calc(var(--toggle-group-radius)-2px))]",
     // Small corners between neighbors, so pressed runs read as one control
     "[--toggle-group-inner-radius:min(3px,var(--toggle-group-item-radius))]",
-    // Label-color tints for hover (10%) and press (14%); pressed items take the
-    // solid emphasis grey. Override the selected variables to recolor.
+    // Label-color tints for hover (10%) and press (14%). The pressed fill comes
+    // from `pressedStyle`; override the selected variables to recolor.
     "[--toggle-group-highlight:color-mix(in_oklab,currentColor_10%,transparent)] [--toggle-group-press:color-mix(in_oklab,currentColor_14%,transparent)]",
-    "[--toggle-group-selected-bg:var(--emphasis)] [--toggle-group-selected-fg:var(--emphasis-foreground)]",
     // A row is the ladder height and items stretch to fill it.
     "data-[orientation=horizontal]:h-(--toggle-group-h) data-[orientation=horizontal]:[&>[data-slot=toggle-group-item]]:aspect-square",
     "data-[orientation=horizontal]:[&>[data-slot=toggle-group-item]]:border-y-2 data-[orientation=horizontal]:[&>:nth-child(1_of_[data-slot=toggle-group-item])]:border-s-2 data-[orientation=horizontal]:[&>:nth-last-child(1_of_[data-slot=toggle-group-item])]:border-e-2",
@@ -45,8 +44,16 @@ const toggleGroupVariants = cva(
   ],
   {
     variants: {
+      // How pressed items look. Solid (the default) is the emphasis grey shared
+      // with Tabs and checkboxes; subtle is a quiet label tint, like Toolbar.
+      pressedStyle: {
+        solid:
+          "[--toggle-group-selected-bg:var(--emphasis)] [--toggle-group-selected-fg:var(--emphasis-foreground)]",
+        subtle:
+          "[--toggle-group-selected-bg:color-mix(in_oklab,currentColor_16%,transparent)] [--toggle-group-selected-fg:var(--foreground)]",
+      },
       variant: {
-        outline: "bg-card outline outline-border",
+        outline: "bg-(--outline) outline outline-(--outline-border)",
         soft: "bg-secondary",
         ghost: "",
       },
@@ -59,8 +66,9 @@ const toggleGroupVariants = cva(
       },
     },
     defaultVariants: {
-      variant: "outline",
+      variant: "soft",
       size: "default",
+      pressedStyle: "solid",
     },
   },
 );
@@ -86,6 +94,7 @@ function ToggleGroup({
   className,
   variant,
   size,
+  pressedStyle,
   orientation = "horizontal",
   children,
   ...props
@@ -99,10 +108,14 @@ function ToggleGroup({
   return (
     <BaseToggleGroup
       data-slot="toggle-group"
-      data-variant={variant ?? "outline"}
+      data-variant={variant ?? "soft"}
       data-size={resolvedSize}
+      data-pressed-style={pressedStyle ?? "solid"}
       orientation={orientation}
-      className={cn(toggleGroupVariants({ variant, size }), className)}
+      className={cn(
+        toggleGroupVariants({ variant, size, pressedStyle }),
+        className,
+      )}
       {...props}
     >
       <ToggleGroupContext.Provider value={context}>

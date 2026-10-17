@@ -306,25 +306,21 @@ const form = useForm({
 
 ## Forms on elevated surfaces
 
-When a form lives inside a Card, Dialog, Sheet, Drawer, or any other elevated container, the form-field defaults will collapse into the parent's white background in light mode. Switch every field that takes a `variant` prop to `variant="elevated"`:
+Forms inside a Card, Dialog, Sheet, Drawer, or popover need no changes. The default field fill is a translucent tint, so it reads on the page and on every raised surface alike:
 
 ```tsx
 <Dialog>
   <DialogContent>
     <Field name="email">
       <FieldLabel>Email</FieldLabel>
-      <FieldControl
-        render={<Input variant="elevated" />}
-        type="email"
-        required
-      />
+      <FieldControl render={<Input />} type="email" required />
     </Field>
     <Checkbox />
   </DialogContent>
 </Dialog>
 ```
 
-Applies to Input, Textarea, NumberFieldGroup (not NumberFieldInput), InputGroup, OTPFieldInput, ComboboxInput, ComboboxChips and AutocompleteInput. Checkbox, RadioGroupItem and Switch need no variant: their resting grey is translucent and holds on any surface. See the [Surfaces](/docs/getting-started/surfaces) docs for the full reasoning.
+For a different look, pass `variant="outline"` to give fields the outline Button's fill and hairline edge. It is a style choice, not a surface fix, and works anywhere. The prop exists on Input, Textarea, NumberFieldGroup (not NumberFieldInput), InputGroup, OTPFieldInput, ComboboxInput, ComboboxChips, AutocompleteInput, SelectTrigger and the DatePicker and DateRangePicker triggers. Checkbox, RadioGroupItem and Switch have no variant: their resting grey holds on any surface. See the [Surfaces](/docs/getting-started/surfaces) docs for the full reasoning.
 
 ## Component reference
 

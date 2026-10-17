@@ -4,10 +4,10 @@ import {
 } from "@/registry/default/radio-group/radio-group";
 import { Label } from "@/registry/default/label/label";
 
-export default function RadioGroupTone() {
+export default function RadioGroupColor() {
   return (
     <div className="flex gap-10">
-      <RadioGroup defaultValue="neutral-a" aria-label="Neutral tone">
+      <RadioGroup defaultValue="neutral-a" aria-label="Neutral color">
         <Label className="flex-row items-center gap-2">
           <RadioGroupItem value="neutral-a" />
           Neutral
@@ -17,13 +17,13 @@ export default function RadioGroupTone() {
           Option
         </Label>
       </RadioGroup>
-      <RadioGroup defaultValue="primary-a" aria-label="Primary tone">
+      <RadioGroup defaultValue="primary-a" aria-label="Primary color">
         <Label className="flex-row items-center gap-2">
-          <RadioGroupItem value="primary-a" tone="primary" />
+          <RadioGroupItem value="primary-a" color="primary" />
           Primary
         </Label>
         <Label className="flex-row items-center gap-2">
-          <RadioGroupItem value="primary-b" tone="primary" />
+          <RadioGroupItem value="primary-b" color="primary" />
           Option
         </Label>
       </RadioGroup>

@@ -24,7 +24,7 @@ function AutocompleteInput({
 }: BaseAutocomplete.Input.Props & {
   showTrigger?: boolean;
   showClear?: boolean;
-  variant?: "default" | "elevated";
+  variant?: "default" | "outline";
 }) {
   return (
     <BaseAutocomplete.InputGroup
@@ -40,7 +40,9 @@ function AutocompleteInput({
           "[[data-slot=autocomplete-input-group]:has([data-slot=autocomplete-clear])>&]:pr-7",
           "[[data-slot=autocomplete-input-group]:has([data-slot=autocomplete-trigger])>&]:pr-7",
           "[[data-slot=autocomplete-input-group]:has([data-slot=autocomplete-clear]):has([data-slot=autocomplete-trigger])>&]:pr-13",
-          variant === "default" ? "bg-input" : "bg-input-elevated",
+          variant === "outline"
+            ? "border-(--outline-border) bg-(--outline) bg-clip-padding"
+            : "bg-input",
           "file:text-foreground file:inline-flex file:h-7 file:rounded-md file:border-0 file:bg-transparent file:text-sm file:font-medium",
           "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
           "aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",

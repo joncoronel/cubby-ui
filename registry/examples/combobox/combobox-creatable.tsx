@@ -60,7 +60,11 @@ export default function ComboboxCreatable() {
                     <ComboboxChip key={label.id} aria-label={label.value}>
                       {label.value}
                       <ComboboxChipRemove aria-label="Remove">
-                        <HugeiconsIcon icon={Cancel01Icon} className="h-3 w-3"  strokeWidth={2} />
+                        <HugeiconsIcon
+                          icon={Cancel01Icon}
+                          className="h-3 w-3"
+                          strokeWidth={2}
+                        />
                       </ComboboxChipRemove>
                     </ComboboxChip>
                   ))}
@@ -84,7 +88,11 @@ export default function ComboboxCreatable() {
                   className="grid-cols-auto"
                 >
                   <div className="grid grid-cols-[1rem_1fr] items-center gap-2">
-                    <HugeiconsIcon icon={PlusSignIcon} className="h-4 w-4"  strokeWidth={2} />
+                    <HugeiconsIcon
+                      icon={PlusSignIcon}
+                      className="h-4 w-4"
+                      strokeWidth={2}
+                    />
                     <span className="break-all">
                       Create &quot;{item.creatable}&quot;
                     </span>
@@ -110,7 +118,6 @@ export default function ComboboxCreatable() {
             <DialogBody>
               <Input
                 key={dialogInputProps.defaultValue}
-                variant="elevated"
                 {...dialogInputProps}
                 placeholder="Label name"
                 autoFocus

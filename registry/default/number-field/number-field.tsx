@@ -34,7 +34,7 @@ const numberFieldGroupVariants = cva(
       // Input's surfaces
       variant: {
         default: "bg-input",
-        elevated: "bg-input-elevated",
+        outline: "bg-(--outline) border-(--outline-border) bg-clip-padding",
       },
       // Input's heights (one step taller below sm); corners step with them.
       size: {
@@ -101,13 +101,6 @@ function NumberFieldInput({
         "w-16 min-w-0 self-stretch border-2 border-transparent bg-transparent px-1 text-center text-base font-normal tabular-nums outline-none sm:not-pointer-coarse:text-sm",
         // Inline scrub prefix. Set on the input to keep `:has()` cheap.
         "[[data-slot=number-field-group]:has(>[data-slot=number-field-scrub-area])>&]:text-left",
-        // Dividers: two background layers on the input's edges. Each shows
-        // only beside a stepper and collapses while that stepper is lit.
-        "bg-[linear-gradient(var(--border),var(--border)),linear-gradient(var(--border),var(--border))] [background-size:1px_var(--number-field-divider-s,0px),1px_var(--number-field-divider-e,0px)] [background-position:left_center,right_center] bg-no-repeat [background-origin:border-box] transition-[background-size] duration-100 ease-out motion-reduce:transition-none",
-        "has-[+[data-slot=number-field-increment]]:[--number-field-divider-e:calc(100%_-_12px)] has-[+[data-slot=number-field-stepper]]:[--number-field-divider-e:calc(100%_-_12px)] [[data-slot=number-field-decrement]+&]:[--number-field-divider-s:calc(100%_-_12px)]",
-        // Hover is gated to real hover: a raw :hover sticks after a tap.
-        "has-[+[data-slot=number-field-increment]:active]:[--number-field-divider-e:0px] has-[+[data-slot=number-field-stepper]:active]:[--number-field-divider-e:0px] [[data-slot=number-field-decrement]:active+&]:[--number-field-divider-s:0px]",
-        "[@media(hover:hover)]:has-[+[data-slot=number-field-increment]:hover]:[--number-field-divider-e:0px] [@media(hover:hover)]:has-[+[data-slot=number-field-stepper]:hover]:[--number-field-divider-e:0px] [@media(hover:hover)]:[[data-slot=number-field-decrement]:hover+&]:[--number-field-divider-s:0px]",
         "disabled:pointer-events-none disabled:cursor-not-allowed",
         className,
       )}

@@ -63,7 +63,10 @@ export const FILTER_SEGMENT_INTERACTIVE =
  */
 export const FILTER_VARIANTS: Record<FilterVariant, string> = {
   outline:
-    "bg-card outline outline-border data-incomplete:outline-dashed [--filter-chip-bg:var(--card)]",
+    // The outline Button's edge over an opaque fill: stacked option icons ring
+    // in --filter-chip-bg, so it cannot be dark --outline's translucent black.
+    // Dark mixes the same 30% black into the page to match it.
+    "bg-(--filter-chip-bg) outline outline-(--outline-border) data-incomplete:outline-dashed [--filter-chip-bg:var(--card)] dark:[--filter-chip-bg:color-mix(in_oklab,var(--background),black_30%)]",
   soft: "bg-secondary data-incomplete:outline data-incomplete:outline-border data-incomplete:outline-dashed [--filter-chip-bg:var(--secondary)]",
   elevated: cn(
     solidSurface(3, 3),

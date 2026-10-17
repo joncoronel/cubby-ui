@@ -21,7 +21,7 @@ const sliderVariants = cva(
 );
 
 const sliderTrackVariants = cva(
-  "bg-muted flex flex-1 ring-border/60 size-[inherit] min-size-[inherit] ring-1 relative grow rounded-full data-[orientation=horizontal]:h-3 data-[orientation=horizontal]:w-full data-[orientation=vertical]:min-h-full data-[orientation=vertical]:w-3",
+  "bg-(--control-off) flex flex-1 size-[inherit] min-size-[inherit] relative grow rounded-full data-[orientation=horizontal]:h-3 data-[orientation=horizontal]:w-full data-[orientation=vertical]:min-h-full data-[orientation=vertical]:w-3",
   {
     variants: {
       variant: {
@@ -38,7 +38,7 @@ const sliderTrackVariants = cva(
 );
 
 const sliderIndicatorVariants = cva(
-  "bg-primary absolute rounded-full shadow-[0_1px_3px_0_oklch(0.18_0_0_/_0.1)] data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full",
+  "bg-(--slider-fill) absolute rounded-full shadow-[0_1px_3px_0_oklch(0.18_0_0_/_0.1)] data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full",
   {
     variants: {
       variant: {
@@ -63,7 +63,7 @@ const sliderThumbVariants = cva(
       variant: {
         default: "",
         contained:
-          "h-full w-6 bg-primary border-none hover:shadow-none shadow-none rounded-full data-[orientation=vertical]:h-6 data-[orientation=vertical]:w-full after:bg-primary-foreground flex items-center justify-center after:size-[60%]  after:rounded-full  after:origin-center data-[dragging]:after:scale-85 after:transition-transform after:ease-out after:duration-100 after:shadow-[0_2px_4px_0_oklch(0.18_0_0_/_0.15)]",
+          "h-full w-6 bg-(--slider-fill) border-none hover:shadow-none shadow-none rounded-full data-[orientation=vertical]:h-6 data-[orientation=vertical]:w-full after:bg-(--slider-fill-foreground) flex items-center justify-center after:size-[60%]  after:rounded-full  after:origin-center data-[dragging]:after:scale-85 after:transition-transform after:ease-out after:duration-100 after:shadow-[0_2px_4px_0_oklch(0.18_0_0_/_0.15)]",
         squareThumb:
           "h-5 w-2.5 rounded-[.125rem] data-[orientation=vertical]:h-2.5 data-[orientation=vertical]:w-5",
       },
@@ -74,10 +74,20 @@ const sliderThumbVariants = cva(
   },
 );
 
+// The filled range. Neutral is the emphasis grey shared by every selection
+// and on/off control; primary brings in the brand fill.
+const sliderColors = {
+  neutral:
+    "[--slider-fill:var(--emphasis)] [--slider-fill-foreground:var(--emphasis-foreground)]",
+  primary:
+    "[--slider-fill:var(--primary)] [--slider-fill-foreground:var(--primary-foreground)]",
+};
+
 export interface SliderProps
   extends
     React.ComponentProps<typeof BaseSlider.Root>,
     VariantProps<typeof sliderVariants> {
+  color?: "neutral" | "primary";
   showSteps?: boolean;
   getAriaLabel?: ((index: number) => string) | null;
 }
@@ -90,6 +100,7 @@ function Slider({
   min = 0,
   max = 100,
   variant,
+  color = "neutral",
   showSteps = false,
   getAriaLabel,
   ...props
@@ -116,11 +127,16 @@ function Slider({
   return (
     <BaseSlider.Root
       data-slot="slider"
+      data-color={color}
       defaultValue={defaultValue}
       value={value}
       min={min}
       max={max}
-      className={cn(sliderVariants({ variant }), className)}
+      className={cn(
+        sliderColors[color],
+        sliderVariants({ variant }),
+        className,
+      )}
       thumbAlignment={variant === "contained" ? "edge" : "center"}
       // Drags along the slider's axis are the slider's, so a Base UI drawer
       // or toast doesn't swipe; across it, a drawer still can.

@@ -39,7 +39,7 @@ Slider
 </Slider>
 ```
 
-For content *below* the track, render it as a sibling of `Slider` rather than a child (for example, a `<FieldDescription>` inside the enclosing `<Field>`).
+For content _below_ the track, render it as a sibling of `Slider` rather than a child (for example, a `<FieldDescription>` inside the enclosing `<Field>`).
 
 ## Examples
 
@@ -79,11 +79,17 @@ Use `variant` to change the slider's visual style.
 
 <ComponentPreview component="slider" example="slider-variant" />
 
-| Variant       | Description                                          |
+| Variant       | Description                                         |
 | ------------- | --------------------------------------------------- |
 | `default`     | A round thumb centered on the track.                |
 | `contained`   | The thumb aligns to the track edges at min and max. |
 | `squareThumb` | A square thumb in place of the round default.       |
+
+### Color
+
+The filled range uses the neutral emphasis grey by default, the same grey as checked checkboxes, radios and switches. Pass `color="primary"` to fill it with the brand color instead.
+
+<ComponentPreview component="slider" example="slider-color" />
 
 ### With Reference Scale
 
@@ -132,8 +138,20 @@ Give the slider an accessible name when there is no visible `SliderLabel`. For a
   aligned to edges), or squareThumb styles.
 </ApiProp>
 
+<ApiProp
+  name="color"
+  fullType='"neutral" | "primary"'
+  simpleType="string"
+  defaultValue='"neutral"'
+>
+  Fill color of the selected range (and the contained thumb). `neutral` uses the
+  emphasis grey shared by selection controls. `primary` uses the brand fill.
+</ApiProp>
+
 <ApiProp name="getAriaLabel" fullType="((index: number) => string) | null">
-  A function that returns an accessible name for each thumb. Use for sliders without a visible label, or for range sliders where each thumb needs a distinct label.
+  A function that returns an accessible name for each thumb. Use for sliders
+  without a visible label, or for range sliders where each thumb needs a
+  distinct label.
 </ApiProp>
 
 <ApiProp name="showSteps" fullType="boolean" defaultValue="false">

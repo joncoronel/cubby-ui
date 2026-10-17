@@ -70,16 +70,16 @@ Set `aria-invalid` on the input to put the error ring on the group.
 
 <ComponentPreview component="input-group" example="input-group-validation" />
 
-### Elevated
+### Outline Variant
 
-Use `variant="elevated"` inside a Card, Dialog, or popover; see [Surfaces](/docs/getting-started/surfaces).
+`default` is a filled translucent tint that reads on the page, a Card, a Dialog, or a popover alike, so the field never needs a per-surface switch. Use `variant="outline"` when you want the outline Button's fill and edge instead: a card fill with a hairline border in light mode, and a recessed fill with a faint ring in dark mode.
 
-<ComponentPreview component="input-group" example="input-group-elevated" />
+<ComponentPreview component="input-group" example="input-group-outline" />
 
-| Variant    | Description                                        |
-| ---------- | -------------------------------------------------- |
-| `default`  | Opaque fill for the page.                          |
-| `elevated` | Translucent fill for Cards, Dialogs, and popovers. |
+| Variant   | Description                                          |
+| --------- | ---------------------------------------------------- |
+| `default` | A filled translucent tint that reads on any surface. |
+| `outline` | The outline Button's fill and hairline edge.         |
 
 ## Accessibility
 
@@ -105,11 +105,11 @@ The field's border and fill. Renders a `div` with `role="group"`.
 
 <ApiProp
   name="variant"
-  fullType='"default" | "elevated"'
+  fullType='"default" | "outline"'
   simpleType="string"
   defaultValue='"default"'
 >
-  Fill of the shell. Use `elevated` on Cards, Dialogs, and popovers.
+  Fill of the shell. `default` is a filled translucent tint that reads on any surface. `outline` uses the outline Button's fill and hairline edge.
 </ApiProp>
 
 <ApiProp

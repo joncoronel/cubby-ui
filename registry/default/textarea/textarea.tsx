@@ -15,7 +15,7 @@ const textareaVariants = cva(
     variants: {
       variant: {
         default: "bg-input",
-        elevated: "bg-input-elevated",
+        outline: "bg-(--outline) border-(--outline-border) bg-clip-padding",
       },
     },
     defaultVariants: {

@@ -23,7 +23,13 @@ export default function SheetNested() {
         render={
           <Button
             variant="outline"
-            leadingIcon={<HugeiconsIcon icon={Settings01Icon} className="size-4"  strokeWidth={2} />}
+            leadingIcon={
+              <HugeiconsIcon
+                icon={Settings01Icon}
+                className="size-4"
+                strokeWidth={2}
+              />
+            }
           />
         }
       >
@@ -39,11 +45,11 @@ export default function SheetNested() {
         <SheetBody className="space-y-4">
           <div className="grid gap-2">
             <Label htmlFor="username">Username</Label>
-            <Input id="username" variant="elevated" defaultValue="johndoe" />
+            <Input id="username" defaultValue="johndoe" />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" variant="elevated" type="email" defaultValue="john@example.com" />
+            <Input id="email" type="email" defaultValue="john@example.com" />
           </div>
         </SheetBody>
         <SheetFooter className="justify-between">
@@ -70,7 +76,6 @@ export default function SheetNested() {
                   confirm.
                 </p>
                 <Input
-                  variant="elevated"
                   className="mt-2"
                   placeholder="Type 'delete' to confirm"
                 />

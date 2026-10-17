@@ -17,22 +17,21 @@ import {
   ComboboxPopup,
 } from "@/registry/default/combobox/combobox";
 
-export default function ComboboxElevated() {
+export default function ComboboxOutline() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle>On a Card surface</CardTitle>
+        <CardTitle>Default and outline</CardTitle>
         <CardDescription>
-          Use <code>variant=&quot;elevated&quot;</code> on{" "}
-          <code>ComboboxInput</code> when the combobox sits inside a Card,
-          Dialog, or popover.
+          Both read on a Card. <code>outline</code> takes the outline
+          Button&apos;s fill and edge.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <Combobox items={fruits}>
           <div className="flex flex-col gap-1">
             <ComboboxLabel>Default</ComboboxLabel>
-            <ComboboxInput placeholder="Collapses into the card" />
+            <ComboboxInput placeholder="Filled tint" />
           </div>
           <ComboboxPopup>
             <ComboboxEmpty>No fruits found.</ComboboxEmpty>
@@ -48,11 +47,8 @@ export default function ComboboxElevated() {
 
         <Combobox items={fruits}>
           <div className="flex flex-col gap-1">
-            <ComboboxLabel>Elevated</ComboboxLabel>
-            <ComboboxInput
-              variant="elevated"
-              placeholder="Reads against the substrate"
-            />
+            <ComboboxLabel>Outline</ComboboxLabel>
+            <ComboboxInput variant="outline" placeholder="Fill with an edge" />
           </div>
           <ComboboxPopup>
             <ComboboxEmpty>No fruits found.</ComboboxEmpty>

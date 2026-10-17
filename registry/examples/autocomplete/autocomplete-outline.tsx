@@ -31,22 +31,21 @@ const tags: Tag[] = [
   { id: "t6", value: "mobile" },
 ];
 
-export default function AutocompleteElevated() {
+export default function AutocompleteOutline() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle>On a Card surface</CardTitle>
+        <CardTitle>Default and outline</CardTitle>
         <CardDescription>
-          Use <code>variant=&quot;elevated&quot;</code> on{" "}
-          <code>AutocompleteInput</code> when the autocomplete sits inside a
-          Card, Dialog, or popover.
+          Both read on a Card. <code>outline</code> takes the outline
+          Button&apos;s fill and edge.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <AutocompleteRoot items={tags}>
           <Label className="w-full">
             Default
-            <AutocompleteInput placeholder="Collapses into the card" />
+            <AutocompleteInput placeholder="Filled tint" />
           </Label>
           <AutocompletePortal>
             <AutocompletePositioner>
@@ -66,10 +65,10 @@ export default function AutocompleteElevated() {
 
         <AutocompleteRoot items={tags}>
           <Label className="w-full">
-            Elevated
+            Outline
             <AutocompleteInput
-              variant="elevated"
-              placeholder="Reads against the substrate"
+              variant="outline"
+              placeholder="Fill with an edge"
             />
           </Label>
           <AutocompletePortal>

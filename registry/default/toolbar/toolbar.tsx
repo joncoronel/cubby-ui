@@ -24,8 +24,9 @@ const toolbarVariants = cva(
     "min-w-max",
     // Paint corners are the shell's minus the 2px edge border.
     "[--toolbar-item-radius:max(0px,calc(var(--toolbar-radius)-2px))]",
-    // Label-color tints: hover 10%, press 14%, pressed toggle 16%
-    "[--toolbar-highlight:color-mix(in_oklab,currentColor_10%,transparent)] [--toolbar-press:color-mix(in_oklab,currentColor_14%,transparent)] [--toolbar-pressed:color-mix(in_oklab,currentColor_16%,transparent)]",
+    // Label-color tints: hover 10%, press 14%. The toggled-on fill comes from
+    // `pressedStyle` below.
+    "[--toolbar-highlight:color-mix(in_oklab,currentColor_10%,transparent)] [--toolbar-press:color-mix(in_oklab,currentColor_14%,transparent)]",
     // The shell is fixed and items stretch to fill it; columns grow to the
     // widest item.
     "data-[orientation=horizontal]:h-(--toolbar-h)",
@@ -36,9 +37,19 @@ const toolbarVariants = cva(
     variants: {
       variant: {
         elevated: cn(solidSurface(3, 3), "text-foreground"),
-        outline: "bg-card text-foreground outline outline-border",
+        outline:
+          "bg-(--outline) text-foreground outline outline-(--outline-border)",
         soft: "bg-secondary text-secondary-foreground",
         ghost: "text-foreground",
+      },
+      // How a toggled-on ToolbarToggle looks. Subtle (the default) is a quiet
+      // label tint, for editor rows where several toggles are on at once; solid
+      // is the emphasis grey that Toggle Group, Tabs and checkboxes use.
+      pressedStyle: {
+        subtle:
+          "[--toolbar-pressed:color-mix(in_oklab,currentColor_16%,transparent)] [--toolbar-pressed-foreground:currentColor]",
+        solid:
+          "[--toolbar-pressed:var(--emphasis)] [--toolbar-pressed-foreground:var(--emphasis-foreground)]",
       },
       // Button's height ladder (one step taller below sm); corners step with it.
       size: {
@@ -101,6 +112,8 @@ export type ToolbarProps = BaseToolbar.Root.Props & {
   size?: ToolbarSize;
   /** Glide a shared highlight between items on hover and focus. */
   highlight?: boolean;
+  /** How toggled-on toggles look: a quiet tint or the solid emphasis grey. */
+  pressedStyle?: "subtle" | "solid";
 };
 
 function Toolbar({
@@ -109,6 +122,7 @@ function Toolbar({
   size = "default",
   orientation = "horizontal",
   highlight = true,
+  pressedStyle = "subtle",
   children,
   ...props
 }: ToolbarProps) {
@@ -124,8 +138,12 @@ function Toolbar({
         data-variant={variant}
         data-size={size}
         data-glide={highlight ? "" : undefined}
+        data-pressed-style={pressedStyle}
         orientation={orientation}
-        className={cn(toolbarVariants({ variant, size }), className)}
+        className={cn(
+          toolbarVariants({ variant, size, pressedStyle }),
+          className,
+        )}
         {...props}
       >
         {children}
@@ -224,7 +242,7 @@ function ToolbarToggle({
             itemSize[size],
             iconOnly && iconSquare,
             "text-current",
-            "[--tgl-bg-active:var(--toolbar-press)] [--tgl-bg-hover:var(--toolbar-highlight)] [--tgl-bg-selected:var(--toolbar-pressed)]",
+            "[--tgl-bg-active:var(--toolbar-press)] [--tgl-bg-hover:var(--toolbar-highlight)] [--tgl-bg-selected:var(--toolbar-pressed)] data-pressed:text-(--toolbar-pressed-foreground)",
             instantHover,
             className,
           )}

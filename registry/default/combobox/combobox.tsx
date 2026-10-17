@@ -90,7 +90,7 @@ function ComboboxInput({
    * `"popup"` is the search field at the top of a `ComboboxPopup`: drawn like
    * the list's rows, with a search icon and no trigger by default.
    */
-  variant?: "default" | "elevated" | "popup";
+  variant?: "default" | "outline" | "popup";
   /** Content pinned to the start (leading edge) of the field, e.g. a search icon. */
   start?: React.ReactNode;
   /** Content pinned to the end of the field, before Clear and Trigger, e.g. a loading spinner. */
@@ -129,7 +129,9 @@ function ComboboxInput({
             [POPUP_SEARCH_FIELD, "cursor-text"]
           : [
               "flex h-10 w-full min-w-0 cursor-text items-center gap-2 rounded-lg border border-transparent px-3 sm:not-pointer-coarse:h-9",
-              variant === "default" ? "bg-input" : "bg-input-elevated",
+              variant === "outline"
+                ? "border-(--outline-border) bg-(--outline) bg-clip-padding"
+                : "bg-input",
               // Focus ring follows the input via focus-within (same pattern as ComboboxChips).
               "focus-within:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-within:outline-2 focus-within:outline-offset-2",
             ],
@@ -566,7 +568,7 @@ function ComboboxChips({
   className,
   variant = "default",
   ...props
-}: BaseCombobox.Chips.Props & { variant?: "default" | "elevated" }) {
+}: BaseCombobox.Chips.Props & { variant?: "default" | "outline" }) {
   const context = React.use(ComboboxContext);
 
   return (
@@ -575,7 +577,9 @@ function ComboboxChips({
       data-slot="combobox-chips"
       className={cn(
         "flex min-h-9 w-full flex-wrap items-center gap-1.5 rounded-lg border border-transparent px-1.5 py-1.5",
-        variant === "default" ? "bg-input" : "bg-input-elevated",
+        variant === "outline"
+          ? "border-(--outline-border) bg-(--outline) bg-clip-padding"
+          : "bg-input",
         "focus-within:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-within:outline-2 focus-within:outline-offset-2",
 
         className,

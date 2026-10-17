@@ -8,30 +8,27 @@ import {
 import { Label } from "@/registry/default/label/label";
 import { Textarea } from "@/registry/default/textarea/textarea";
 
-export default function TextareaElevated() {
+export default function TextareaOutline() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle>On a Card surface</CardTitle>
+        <CardTitle>Default and outline</CardTitle>
         <CardDescription>
-          Use <code>variant=&quot;elevated&quot;</code> when the textarea sits
-          inside a Card, Dialog, or popover.
+          Both read on a Card. <code>outline</code> takes the outline
+          Button&apos;s fill and edge.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <Label htmlFor="textarea-default">Default</Label>
-          <Textarea
-            id="textarea-default"
-            placeholder="Collapses into the card"
-          />
+          <Textarea id="textarea-default" placeholder="Filled tint" />
         </div>
         <div className="flex flex-col gap-2">
-          <Label htmlFor="textarea-elevated">Elevated</Label>
+          <Label htmlFor="textarea-outline">Outline</Label>
           <Textarea
-            id="textarea-elevated"
-            variant="elevated"
-            placeholder="Reads against the substrate"
+            id="textarea-outline"
+            variant="outline"
+            placeholder="Fill with an edge"
           />
         </div>
       </CardContent>

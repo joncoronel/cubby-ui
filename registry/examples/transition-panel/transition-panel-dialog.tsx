@@ -175,13 +175,13 @@ export default function TransitionPanelDialog() {
                   >
                     <OTPFieldGroup>
                       {Array.from({ length: 3 }, (_, index) => (
-                        <OTPFieldInput variant="elevated" key={index} />
+                        <OTPFieldInput key={index} />
                       ))}
                     </OTPFieldGroup>
                     <OTPFieldSeparator />
                     <OTPFieldGroup>
                       {Array.from({ length: 3 }, (_, index) => (
-                        <OTPFieldInput variant="elevated" key={index + 3} />
+                        <OTPFieldInput key={index + 3} />
                       ))}
                     </OTPFieldGroup>
                   </OTPField>

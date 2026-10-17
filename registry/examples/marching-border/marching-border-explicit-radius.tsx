@@ -8,7 +8,7 @@ export default function MarchingBorderExplicitRadius() {
         <MarchingBorder className="text-primary" />
       </div>
 
-      <div className="text-foreground bg-muted relative flex h-24 items-center justify-center text-sm">
+      <div className="text-foreground bg-muted relative flex h-24 items-center justify-center rounded-[24px] text-sm">
         <span className="text-muted-foreground">rounded-[24px]</span>
         <MarchingBorder className="text-primary rounded-[24px]" />
       </div>

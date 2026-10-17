@@ -29,10 +29,8 @@ colors:
   dark-outline-border: "oklch(1 0 0 / 0.08)"
   input: "oklch(0 0 0 / 0.045)"
   input-hover: "oklch(0 0 0 / 0.075)"
-  input-elevated: "oklch(0 0 0 / 0.06)"
   dark-input: "oklch(1 0 0 / 0.05)"
   dark-input-hover: "oklch(1 0 0 / 0.09)"
-  dark-input-elevated: "oklch(1 0 0 / 0.07)"
   destructive: "oklch(0.53 0.19 25)"
   danger-foreground: "oklch(0.55 0.18 25)"
   warning-foreground: "oklch(0.58 0.14 85)"
@@ -161,8 +159,8 @@ components:
     height: "36px"
   input-field-hover:
     backgroundColor: "{colors.input-hover}"
-  input-field-elevated:
-    backgroundColor: "{colors.input-elevated}"
+  input-field-outline:
+    backgroundColor: "{colors.outline}"
   alert:
     backgroundColor: "{colors.muted}"
     textColor: "{colors.foreground}"
@@ -260,11 +258,11 @@ A cool, faintly violet-tinted neutral stack with a single bright sky blue, expre
 - **Quiet Ink** (`{colors.muted-foreground}` / dark `{colors.dark-muted-foreground}`): descriptions, meta lines, idle controls, table headers, minimap labels.
 - **Page** (`{colors.surface-1}` / dark `{colors.dark-surface-1}`): the page background and every docs surface that should read as the page itself (header when scrolled, stage).
 - **Raised Paper** (`{colors.surface-2}`, `{colors.surface-3}` / dark `{colors.dark-surface-3}`): cards, popovers, and the light outline button. Light rungs 3 to 8 share one white and differ only in shadow; dark rungs climb in lightness from 0.205 to 0.402.
-- **Field Tint** (`{colors.input}`, hover `{colors.input-hover}`, elevated `{colors.input-elevated}` / dark `{colors.dark-input}`, `{colors.dark-input-hover}`, `{colors.dark-input-elevated}`): the fill of every text field and select trigger. Translucent (black in light, white in dark), so one value reads on the page, a card or a popup; the elevated step is for fields inside cards and dialogs.
+- **Field Tint** (`{colors.input}`, hover `{colors.input-hover}` / dark `{colors.dark-input}`, `{colors.dark-input-hover}`): the fill of every text field and select trigger. Translucent (black in light, white in dark), so one value reads on the page, a card or a popup, with no per-surface variant.
 - **Recessed Outline** (`{colors.outline}`, `{colors.outline-border}` / dark `{colors.dark-outline}`, `{colors.dark-outline-border}`): the outline control's fill and edge. Light is the card fill with a hairline; dark is a 30% black fill with an 8% white edge, so the control sits a shade below its surround (a recessed look, modeled on jakub.kr), and hover and press lift it with 3% and 5% white. Shared by the outline Button, the outline-ghost Button's edge, the outline Toggle and the outline ButtonGroup.
 - **Muted Plate** (`{colors.muted}`): the quiet fill of alerts, accordion containers, button-group text and the code tray.
 - **Plate Gray** (`{colors.secondary}`, text `{colors.secondary-foreground}`): the secondary button plate. Primary-soft sits on a 14% primary tint instead (20% hover, 25% press), with Sky Ink text.
-- **Off Grey** (`--control-off`, 15% black / 12% white in dark, deeper on hover): the one resting colour for on/off controls. The Switch track fills with it; unchecked Checkbox and Radio draw a 2px inset ring of it around a white middle (the surface itself in dark). None of the three takes a surface `variant`.
+- **Off Grey** (`--control-off`, 15% black / 15% white in dark, deeper on hover): the one resting colour for on/off controls. The Switch track fills with it; unchecked Checkbox and Radio draw a 2px inset ring of it around a white middle (the surface itself in dark). None of the three takes a surface `variant`.
 - **Emphasis Grey** (`{colors.emphasis}` / dark `{colors.dark-emphasis}`, label `{colors.emphasis-foreground}`): selection, not action. Checked checkboxes and radios, the tab capsule indicator and pressed toggle-group items. The sky primary stays for actions and the switch on-state.
 - **Hairline** (`{colors.border}`): the default 1px rule, re-derived in dark from dark ink.
 - **Chrome Black** (`{colors.neutral}` light, `{colors.dark-chrome}` dark): persistent instrument chrome and the solid neutral button in light. Its foreground is `{colors.neutral-foreground}`; its muted text, hover, and border are 71%, 10%, and 12% mixes of that foreground.
@@ -347,9 +345,10 @@ Tactile and small. Paint lives on a `::before` layer so press can scale it witho
 
 ### Inputs / Fields
 Filled, not outlined.
-- **Style:** the translucent Field Tint (`{colors.input}`), 12px radius, no shadow, and a 1px transparent border kept only for geometry; inside cards and dialogs, the slightly stronger elevated tint. Select triggers deepen to the hover tint on hover and while their popup is open. 40px tall on touch and below sm, 36px otherwise (sm 36px / 32px), 12px inline padding.
+- **Style:** the translucent Field Tint (`{colors.input}`), 12px radius, no shadow, and a 1px transparent border kept only for geometry. Select triggers and date-picker triggers deepen to the hover tint on hover and while open.
+- **Outline variant:** `variant="outline"` on every field swaps the tint for the Recessed Outline fill and edge, the same as the outline Button (card and hairline in light; recessed with a faint ring in dark).
 - **Focus:** the shared 2px half-strength ring, offset 2px; invalid fields take the same outline in 50% destructive. The caret is blue on docs.
-- **Checkbox and radio:** keep their real border (with `bg-clip-padding`, so the checked fill covers it); they are the deliberate exception to filled fields.
+- **Checkbox, radio, switch and slider:** rest on the Off Grey (a ring for checkbox and radio, a fill for the switch and slider tracks) and take `color="neutral" | "primary"` for the on state, neutral (Emphasis Grey) by default.
 
 ### Navigation
 - **Docs header:** 56px, fixed, sitting on the frame above the card; it never changes as the page scrolls. The logo enters as one composited fade and settle (opacity and scale, 600ms), not the landing's drawn stroke, which freezes while the page hydrates.

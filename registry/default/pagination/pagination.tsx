@@ -41,14 +41,14 @@ const paginationContentVariants = cva(
     "[--pagination-item-radius:max(0px,calc(var(--pagination-radius)-2px))]",
     // Fixed shell; links stretch to fill it
     "h-(--pagination-h)",
-    // Current page colors (override to recolor)
-    "[--pagination-current-bg:var(--neutral)] [--pagination-current-fg:var(--neutral-foreground)]",
+    // Current page: the emphasis grey every selection uses (override to recolor)
+    "[--pagination-current-bg:var(--emphasis)] [--pagination-current-fg:var(--emphasis-foreground)]",
   ],
   {
     variants: {
       variant: {
         // Outline draws its line as an outline just outside the shell.
-        outline: "bg-card outline outline-border",
+        outline: "bg-(--outline) outline outline-(--outline-border)",
         soft: "bg-secondary text-secondary-foreground",
         ghost: "",
       },
@@ -61,7 +61,7 @@ const paginationContentVariants = cva(
       },
     },
     defaultVariants: {
-      variant: "outline",
+      variant: "soft",
       size: "default",
     },
   },
@@ -80,7 +80,7 @@ function PaginationContent({
   return (
     <ul
       data-slot="pagination-content"
-      data-variant={variant ?? "outline"}
+      data-variant={variant ?? "soft"}
       data-size={size ?? "default"}
       className={cn(paginationContentVariants({ variant, size }), className)}
       {...props}

@@ -196,7 +196,7 @@ function TabsTrigger({ className, ...props }: BaseTabs.Tab.Props) {
         "text-muted-foreground data-active:text-foreground group-data-[variant=capsule]/tabs-list:data-active:text-emphasis-foreground flex cursor-pointer items-center gap-1.5 font-medium text-nowrap whitespace-nowrap",
         "transition-[outline-offset,color] duration-200 ease-out",
         "focus-visible:outline-ring/50 focus-visible:outline-2 focus-visible:outline-offset-2",
-        "hover:text-muted-foreground/75",
+        "hover:not-data-active:text-muted-foreground/75",
         "data-disabled:pointer-events-none data-disabled:opacity-60",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         // Orientation

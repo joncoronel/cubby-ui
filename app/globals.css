@@ -52,10 +52,8 @@ html {
   );
   /* Mid grey for selection (checked boxes and radios, the tab capsule, a
      pressed toggle-group item), so the sky primary stays for actions. */
-  --emphasis: oklch(0.47 var(--neutral-chroma) var(--neutral-hue));
-  --emphasis-foreground: oklch(
-    0.99 var(--neutral-chroma-low) var(--neutral-hue)
-  );
+  --emphasis: oklch(0.51 var(--neutral-chroma) var(--neutral-hue));
+  --emphasis-foreground: oklch(1 0 0);
   --secondary: oklch(0.94 0 0);
   --secondary-foreground: oklch(0.32 var(--neutral-chroma) var(--neutral-hue));
   --muted: oklch(0.96 0 0);

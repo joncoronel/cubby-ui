@@ -17,7 +17,7 @@ export default function ButtonGroupPopover() {
         <PopoverTrigger
           render={
             <Button
-              variant="secondary"
+              variant="outline"
               leadingIcon={
                 <HugeiconsIcon icon={SparklesIcon} strokeWidth={2} />
               }
@@ -43,9 +43,9 @@ export default function ButtonGroupPopover() {
         </PopoverContent>
       </Popover>
 
-      <Input placeholder="Type a message..." />
+      <Input variant="outline" placeholder="Type a message..." />
 
-      <Button variant="tonal">Send</Button>
+      <Button variant="outline">Send</Button>
     </ButtonGroup>
   );
 }

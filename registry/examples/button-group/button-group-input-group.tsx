@@ -24,12 +24,12 @@ export default function ButtonGroupInputGroup() {
   return (
     <ButtonGroup variant="attached" className="[--radius:9999rem]">
       <ButtonGroup variant="attached">
-        <Button variant="secondary" size="icon" aria-label="Add attachment">
+        <Button variant="outline" size="icon" aria-label="Add attachment">
           <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />
         </Button>
       </ButtonGroup>
       <ButtonGroup variant="attached">
-        <InputGroup>
+        <InputGroup variant="outline">
           <InputGroupInput
             placeholder={
               voiceEnabled ? "Record and send audio..." : "Send a message..."
@@ -44,7 +44,7 @@ export default function ButtonGroupInputGroup() {
                     onClick={() => setVoiceEnabled(!voiceEnabled)}
                     size="icon"
                     data-active={voiceEnabled}
-                    className="data-[active=true]:bg-orange-100 data-[active=true]:text-orange-700 dark:data-[active=true]:bg-orange-800 dark:data-[active=true]:text-orange-100"
+                    className="data-[active=true]:text-orange-700 data-[active=true]:[--btn-bg-active:var(--color-orange-100)]! data-[active=true]:[--btn-bg-hover:var(--color-orange-100)]! data-[active=true]:[--btn-bg:var(--color-orange-100)]! dark:data-[active=true]:text-orange-100 dark:data-[active=true]:[--btn-bg-active:var(--color-orange-800)]! dark:data-[active=true]:[--btn-bg-hover:var(--color-orange-800)]! dark:data-[active=true]:[--btn-bg:var(--color-orange-800)]!"
                     aria-pressed={voiceEnabled}
                   >
                     <HugeiconsIcon icon={AudioWave02Icon} strokeWidth={2} />

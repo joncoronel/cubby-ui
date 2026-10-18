@@ -69,6 +69,10 @@ const buttonVariantClasses = {
   // (Cards, Dialogs) where outline's solid card fill would look mismatched.
   "outline-ghost":
     "[--btn-border:var(--outline-border)] [--btn-bg-hover:var(--surface-hover)] [--btn-bg-active:var(--surface-active)]",
+  // The field's own tint and hover, for a button that sits beside or inside
+  // a filled field and should read as part of it.
+  field:
+    "text-foreground [--btn-bg:var(--input)] [--btn-bg-hover:var(--input-hover)] [--btn-bg-active:var(--surface-selected)]",
   secondary:
     "text-secondary-foreground [--btn-bg:var(--secondary)] [--btn-bg-hover:var(--secondary-hover)] [--btn-bg-active:var(--secondary-active)]",
   ghost:

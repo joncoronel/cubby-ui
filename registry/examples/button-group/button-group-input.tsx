@@ -7,8 +7,8 @@ import { Search01Icon } from "@hugeicons/core-free-icons";
 export default function ButtonGroupInput() {
   return (
     <ButtonGroup variant="attached">
-      <Input placeholder="Search..." />
-      <Button size="icon" aria-label="Search" variant="tonal">
+      <Input variant="outline" placeholder="Search..." />
+      <Button size="icon" aria-label="Search" variant="outline">
         <HugeiconsIcon icon={Search01Icon} strokeWidth={2} />
       </Button>
     </ButtonGroup>

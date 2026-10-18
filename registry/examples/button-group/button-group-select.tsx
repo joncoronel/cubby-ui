@@ -15,7 +15,7 @@ export default function ButtonGroupSelect() {
   return (
     <ButtonGroup variant="attached">
       <Select defaultValue="usd">
-        <SelectTrigger aria-label="Select currency">
+        <SelectTrigger variant="outline" aria-label="Select currency">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -25,9 +25,9 @@ export default function ButtonGroupSelect() {
         </SelectContent>
       </Select>
 
-      <Input type="number" placeholder="0.00" />
+      <Input variant="outline" type="number" placeholder="0.00" />
 
-      <Button size="icon" aria-label="Send" variant="tonal">
+      <Button size="icon" aria-label="Send" variant="outline">
         <HugeiconsIcon icon={Sent02Icon} strokeWidth={2} />
       </Button>
     </ButtonGroup>

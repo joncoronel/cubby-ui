@@ -158,8 +158,9 @@ function InputGroupAddon({
 const inputGroupButtonVariants = cva(
   [
     "border-2 border-transparent shadow-none",
-    // Hover and press on a quiet button: the label color at 10% / 14%
-    "data-[variant=ghost]:[--btn-bg-hover:color-mix(in_oklab,currentColor_10%,transparent)] data-[variant=ghost]:[--btn-bg-active:color-mix(in_oklab,currentColor_14%,transparent)]",
+    // Hover and press on a quiet button: the pure 8% / 10% overlays (black,
+    // white in dark), not a tint of the label, whose cool hue shows as a cast.
+    "data-[variant=ghost]:[--btn-bg-hover:var(--surface-active)] data-[variant=ghost]:[--btn-bg-active:var(--surface-selected)]",
   ],
   {
     variants: {

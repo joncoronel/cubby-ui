@@ -121,10 +121,6 @@
   background: color-mix(in oklab, var(--primary) 24%, transparent);
 }
 
-.docs-root input {
-  caret-color: var(--primary);
-}
-
 /* ── Header ─────────────────────────────────────────────────────────────── */
 
 /* The header sits on the frame, above the card, so it never changes as the

@@ -5,7 +5,8 @@ colors:
   primary: "oklch(0.68 0.16 232.65)"
   primary-foreground: "oklch(1 0 0)"
   primary-soft-foreground: "color-mix(in oklch, oklch(0.68 0.16 232.65), black 25%)"
-  ring: "oklch(0.7 0.15 232.65)"
+  ring: "oklch(0.6 0.15 232.65)"
+  dark-ring: "oklch(0.75 0.15 232.65)"
   dark-primary: "oklch(0.75 0.16 232.65)"
   dark-primary-soft-foreground: "color-mix(in oklch, oklch(0.75 0.16 232.65), white 30%)"
   foreground: "oklch(0.3 0.004 270)"
@@ -250,7 +251,7 @@ This system is the docs world. The landing page (`app/(home)`) is deliberately i
 A cool, faintly violet-tinted neutral stack with a single bright sky blue, expressed entirely in OKLCH and color-mix so the whole palette retunes from a few roots.
 
 ### Primary
-- **Cubby Blue** (`{colors.primary}` / dark `{colors.dark-primary}`): a bright sky. Primary buttons, focus ring (via `{colors.ring}` at 50 to 55% opacity), text selection (24% mix), caret, link-underline hover, the current-page mark in the shelf, and the first cell of the cubby glyph. Light runs a step deeper than dark so the fill holds against the page. The white label sits at about 2.7:1 on the light fill, below AA: a deliberate brand trade for the brighter sky, not a defect to repair.
+- **Cubby Blue** (`{colors.primary}` / dark `{colors.dark-primary}`): a bright sky. Primary buttons, text selection (24% mix), link-underline hover, the current-page mark in the shelf, and the first cell of the cubby glyph. Light runs a step deeper than dark so the fill holds against the page. The white label sits at about 2.7:1 on the light fill, below AA: a deliberate brand trade for the brighter sky, not a defect to repair.
 - **Sky Ink** (`{colors.primary-soft-foreground}` / dark `{colors.dark-primary-soft-foreground}`): Cubby Blue as text, darkened 25% toward black in light and lightened 30% toward white in dark, because the fill itself is too light to read as text. It labels the primary-soft button, the link Button variant and the bold matches in search highlights (`highlightText`).
 
 ### Neutral
@@ -342,13 +343,13 @@ Tactile and small. Paint lives on a `::before` layer so press can scale it witho
 - **Sizes:** default 36px tall with a mouse, one step up (40px) on touch screens and below sm; sm 32px, lg 40px, xs 28px, each a step up the same way. Field text is 16px on touch and below sm, 14px otherwise; 14px inline padding.
 - **Primary:** `{colors.primary}` fill, white label. Hover mixes 5% black (light) or 10% white (dark); pressed goes one step further (8% / 14%).
 - **Outline:** the Recessed Outline fill and edge (card and hairline in light; 30% black with an 8% white edge in dark), hover and press darkening 4% and 7% in light or lifting with 3% and 5% white in dark; **Outline-ghost:** the outline edge over a transparent fill, washed with surface-hover; **Link:** a Sky Ink label, underlined on hover; **Ghost:** Quiet Ink label brightening to ink on a surface-hover wash; **Neutral:** the chrome-black fill that lightens on hover; **Primary-soft / Destructive-soft:** accent-colored label on the Plate Gray plate.
-- **Hover / Focus:** 100ms ease-out on color and fill; press scales the paint to 0.98; focus draws a 2px ring at 50% ring color, offset 2px.
+- **Hover / Focus:** 100ms ease-out on color and fill; press scales the paint to 0.98; focus draws the shared solid 2px ring (see Inputs / Fields).
 
 ### Inputs / Fields
 Filled, not outlined.
 - **Style:** the translucent Field Tint (`{colors.input}`), 12px radius, no shadow, and a 1px transparent border kept only for geometry. Select triggers and date-picker triggers deepen to the hover tint on hover and while open.
 - **Outline variant:** `variant="outline"` on every field swaps the tint for the Recessed Outline fill and edge, the same as the outline Button (card and hairline in light; recessed with a faint ring in dark).
-- **Focus:** the shared 2px half-strength ring, offset 2px; invalid fields take the same outline in 50% destructive. The caret is blue on docs.
+- **Focus:** one ring everywhere: a solid 2px outline in `{colors.ring}` (L 0.6 light, 0.75 dark) at outline-offset -1px, so it straddles the element's edge with no gap. It grows and fades in place (outline-width and outline-color, 100ms ease-out), never sliding. Invalid fields take the same ring in solid destructive. The caret is the text color.
 - **Checkbox, radio, switch, slider and circular slider:** checkbox and radio rest on an Off Grey ring and the switch on an Off Grey track; slider and circular slider tracks use the quieter Range Track and take `color="neutral" | "primary"` for the on state, neutral (Emphasis Grey) by default.
 
 ### Navigation

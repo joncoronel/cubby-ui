@@ -10,12 +10,13 @@ export const POPUP_ITEM =
 export const POPUP_SEARCH_BAND = "bg-(--popup-surface) px-1 pt-1";
 
 /**
- * The field. Outlined, since a filled field above a highlighted item reads as
- * a second highlight; the inset ring takes no room, so the icon stays aligned.
+ * The field: the outline field's fill and edge (`--outline`, `--outline-border`),
+ * not the filled tint, since a filled field above a highlighted item reads as
+ * a second highlight. The inset ring takes no room, so the icon stays aligned.
  * No focus ring: the field holds focus the whole time the popup is open.
  */
 export const POPUP_SEARCH_FIELD =
-  "flex h-8 items-center gap-2 rounded-md px-2.5 inset-ring inset-ring-border pointer-coarse:h-10";
+  "flex h-8 items-center gap-2 rounded-md bg-(--outline) px-2.5 inset-ring inset-ring-(--outline-border) pointer-coarse:h-10";
 
 /** The `<input>`. 16px on touch screens and below `sm`, so iOS Safari doesn't zoom on focus. */
 export const POPUP_SEARCH_INPUT =

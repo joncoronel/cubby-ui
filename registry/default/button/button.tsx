@@ -52,6 +52,10 @@ const buttonVariantClasses = {
     "text-(--primary-soft-foreground) [--btn-bg:color-mix(in_oklab,var(--primary)_14%,transparent)] [--btn-bg-hover:color-mix(in_oklab,var(--primary)_20%,transparent)] [--btn-bg-active:color-mix(in_oklab,var(--primary)_25%,transparent)]",
   neutral:
     "text-neutral-foreground [--btn-bg:var(--neutral)] [--btn-bg-hover:var(--neutral-hover)] [--btn-bg-active:var(--neutral-active)]",
+  // Medium emphasis, between neutral and secondary: the emphasis grey that
+  // selection controls fill with, with a white label.
+  tonal:
+    "text-emphasis-foreground [--btn-bg:var(--emphasis)] [--btn-bg-hover:var(--emphasis-hover)] [--btn-bg-active:var(--emphasis-active)]",
   destructive:
     "text-destructive-foreground [--btn-border:rgb(0_0_0/0.05)] dark:[--btn-border:rgb(255_255_255/0.05)] [--btn-bg:var(--destructive)] [--btn-bg-hover:var(--destructive-hover)] [--btn-bg-active:var(--destructive-active)]",
   "destructive-soft":

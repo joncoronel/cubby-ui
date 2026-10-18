@@ -20,7 +20,7 @@ colors:
   neutral-foreground: "oklch(0.98 0.002 270)"
   emphasis: "oklch(0.51 0.004 270)"
   emphasis-foreground: "oklch(1 0 0)"
-  dark-emphasis: "oklch(0.58 0.004 270)"
+  dark-emphasis: "oklch(0.56 0.004 270)"
   dark-neutral: "oklch(0.9 0.004 270)"
   border: "color-mix(in oklab, oklch(0.3 0.004 270) 10%, transparent)"
   outline: "oklch(1 0 0)"
@@ -262,9 +262,9 @@ A cool, faintly violet-tinted neutral stack with a single bright sky blue, expre
 - **Recessed Outline** (`{colors.outline}`, `{colors.outline-border}` / dark `{colors.dark-outline}`, `{colors.dark-outline-border}`): the outline control's fill and edge. Light is the card fill with a hairline; dark is a 30% black fill with an 8% white edge, so the control sits a shade below its surround (a recessed look, modeled on jakub.kr), and hover and press lift it with 3% and 5% white. Shared by the outline Button, the outline-ghost Button's edge, the outline Toggle and the outline ButtonGroup.
 - **Muted Plate** (`{colors.muted}`): the quiet fill of alerts, accordion containers, button-group text and the code tray.
 - **Plate Gray** (`{colors.secondary}`, text `{colors.secondary-foreground}`): the secondary button plate. Primary-soft sits on a 14% primary tint instead (20% hover, 25% press), with Sky Ink text.
-- **Range Track** (`--control-track`, 9% black / 10% white in dark): the empty part of Slider, Circular Slider, Progress and Meter. Quieter than the Off Grey so the filled part (Emphasis Grey or primary) clears 3:1 against it in both themes.
+- **Range Track** (`--control-track`, 9% black / 8% white in dark): the empty part of Slider, Circular Slider, Progress and Meter. Quieter than the Off Grey so the filled part (Emphasis Grey or primary) clears 3:1 against it in both themes.
 - **Off Grey** (`--control-off`, 15% black / 15% white in dark, deeper on hover): the one resting colour for on/off controls. The Switch track fills with it; unchecked Checkbox and Radio draw a 2px inset ring of it around a white middle (the surface itself in dark). None of the three takes a surface `variant`.
-- **Emphasis Grey** (`{colors.emphasis}` / dark `{colors.dark-emphasis}`, label `{colors.emphasis-foreground}`): selection, not action. Checked checkboxes and radios, the tab capsule indicator and pressed toggle-group items. The sky primary stays for actions and the switch on-state.
+- **Emphasis Grey** (`{colors.emphasis}` / dark `{colors.dark-emphasis}`, label `{colors.emphasis-foreground}`): emphasis in the neutral family. Checked checkboxes and radios, the switch, slider and progress fills, the tab capsule, pressed toggle-group items and the current page; also the medium-weight `tonal` Button, between `secondary` and `neutral`.
 - **Hairline** (`{colors.border}`): the default 1px rule, re-derived in dark from dark ink.
 - **Chrome Black** (`{colors.neutral}` light, `{colors.dark-chrome}` dark): persistent instrument chrome and the solid neutral button in light. Its foreground is `{colors.neutral-foreground}`; its muted text, hover, and border are 71%, 10%, and 12% mixes of that foreground.
 

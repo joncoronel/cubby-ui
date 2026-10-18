@@ -30,18 +30,19 @@ Use `variant` to change the button's visual weight and color.
 
 <ComponentPreview component="button" example="button-variants" />
 
-| Variant            | Description                                              |
-| ------------------ | ------------------------------------------------------- |
-| `primary`          | The default, highest-emphasis action.                   |
-| `primary-soft`     | A tinted primary for a lower-emphasis branded action.   |
-| `neutral`          | A solid neutral action with no brand color.             |
-| `secondary`        | The standard lower-emphasis action.                     |
-| `outline`          | A bordered action for secondary actions.                |
-| `outline-ghost`    | A bordered, transparent action for elevated surfaces.   |
-| `ghost`            | A borderless action for toolbars and dense UI.          |
-| `link`             | Renders as inline text, like a link.                    |
-| `destructive`      | A destructive action such as delete.                    |
-| `destructive-soft` | A tinted destructive for a lower-emphasis warning.      |
+| Variant            | Description                                               |
+| ------------------ | --------------------------------------------------------- |
+| `primary`          | The default, highest-emphasis action.                     |
+| `primary-soft`     | A tinted primary for a lower-emphasis branded action.     |
+| `neutral`          | A solid neutral action with no brand color.               |
+| `tonal`            | A medium-weight grey fill, between neutral and secondary. |
+| `secondary`        | The standard lower-emphasis action.                       |
+| `outline`          | A bordered action for secondary actions.                  |
+| `outline-ghost`    | A bordered, transparent action for elevated surfaces.     |
+| `ghost`            | A borderless action for toolbars and dense UI.            |
+| `link`             | Renders as inline text, like a link.                      |
+| `destructive`      | A destructive action such as delete.                      |
+| `destructive-soft` | A tinted destructive for a lower-emphasis warning.        |
 
 ### Sizes
 
@@ -83,7 +84,7 @@ prefixes needed. Override the variables instead of `bg-*` classes: root-level
 blended by transparent ones, which is rarely what you want:
 
 ```tsx showLineNumbers
-<Button className="[--btn-bg:var(--color-violet-600)] [--btn-bg-hover:var(--color-violet-700)] [--btn-bg-active:var(--color-violet-800)]">
+<Button className="[--btn-bg-active:var(--color-violet-800)] [--btn-bg-hover:var(--color-violet-700)] [--btn-bg:var(--color-violet-600)]">
   Custom
 </Button>
 ```
@@ -132,11 +133,13 @@ Clickable element that triggers actions. Wraps Base UI's `Button`.
 
 <ApiProp
   name="variant"
-  fullType='"primary" | "primary-soft" | "neutral" | "secondary" | "outline" | "outline-ghost" | "ghost" | "link" | "destructive" | "destructive-soft"'
+  fullType='"primary" | "primary-soft" | "neutral" | "tonal" | "secondary" | "outline" | "outline-ghost" | "ghost" | "link" | "destructive" | "destructive-soft"'
   simpleType="string"
   defaultValue='"primary"'
 >
-  Visual style variant of the button. The `-soft` variants are tinted-background versions of their solid counterparts, for less-prominent CTAs that still need to read as branded or destructive. Custom prop not available in Base UI.
+  Visual style variant of the button. The `-soft` variants are tinted-background
+  versions of their solid counterparts, for less-prominent CTAs that still need
+  to read as branded or destructive. Custom prop not available in Base UI.
 </ApiProp>
 
 <ApiProp
@@ -150,15 +153,18 @@ Clickable element that triggers actions. Wraps Base UI's `Button`.
 </ApiProp>
 
 <ApiProp name="loading" fullType="boolean" defaultValue="false">
-  Display loading state with spinner. Automatically disables the button and sets `focusableWhenDisabled` to `true` for keyboard accessibility.
+  Display loading state with spinner. Automatically disables the button and sets
+  `focusableWhenDisabled` to `true` for keyboard accessibility.
 </ApiProp>
 
 <ApiProp name="leadingIcon" fullType="ReactNode" simpleType="node">
-  Icon to display before the button text. Padding on the leading edge tightens automatically. Custom prop not available in Base UI.
+  Icon to display before the button text. Padding on the leading edge tightens
+  automatically. Custom prop not available in Base UI.
 </ApiProp>
 
 <ApiProp name="trailingIcon" fullType="ReactNode" simpleType="node">
-  Icon to display after the button text. Padding on the trailing edge tightens automatically. Custom prop not available in Base UI.
+  Icon to display after the button text. Padding on the trailing edge tightens
+  automatically. Custom prop not available in Base UI.
 </ApiProp>
 
 </ApiPropsList>

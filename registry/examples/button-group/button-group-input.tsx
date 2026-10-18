@@ -8,7 +8,7 @@ export default function ButtonGroupInput() {
   return (
     <ButtonGroup variant="attached">
       <Input placeholder="Search..." />
-      <Button size="icon" aria-label="Search" variant="outline">
+      <Button size="icon" aria-label="Search" variant="tonal">
         <HugeiconsIcon icon={Search01Icon} strokeWidth={2} />
       </Button>
     </ButtonGroup>

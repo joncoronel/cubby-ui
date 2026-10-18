@@ -27,7 +27,7 @@ export default function ButtonGroupSelect() {
 
       <Input type="number" placeholder="0.00" />
 
-      <Button size="icon" aria-label="Send" variant="outline">
+      <Button size="icon" aria-label="Send" variant="tonal">
         <HugeiconsIcon icon={Sent02Icon} strokeWidth={2} />
       </Button>
     </ButtonGroup>

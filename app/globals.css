@@ -109,6 +109,8 @@ html {
 
   --primary-hover: color-mix(in oklch, var(--primary), black 5%);
   --neutral-hover: color-mix(in oklch, var(--neutral), white 10%);
+  /* The tonal Button: the emphasis grey, darkening on hover and press. */
+  --emphasis-hover: color-mix(in oklch, var(--emphasis), black 8%);
   --destructive-hover: color-mix(in oklch, var(--destructive), black 5%);
   --secondary-hover: color-mix(in oklch, var(--secondary), black 5%);
   --outline-hover: color-mix(in oklch, var(--outline), black 4%);
@@ -116,6 +118,7 @@ html {
   /* Pressed — one step past hover in the same direction. */
   --primary-active: color-mix(in oklch, var(--primary), black 8%);
   --neutral-active: color-mix(in oklch, var(--neutral), white 14%);
+  --emphasis-active: color-mix(in oklch, var(--emphasis), black 12%);
   --destructive-active: color-mix(in oklch, var(--destructive), black 8%);
   --secondary-active: color-mix(in oklch, var(--secondary), black 8%);
   --outline-active: color-mix(in oklch, var(--outline), black 7%);
@@ -279,7 +282,8 @@ html {
   --foreground: oklch(0.94 var(--neutral-chroma) var(--neutral-hue));
   --neutral: oklch(0.9 var(--neutral-chroma) var(--neutral-hue));
   --neutral-foreground: oklch(0.13 var(--neutral-chroma) var(--neutral-hue));
-  --emphasis: oklch(0.58 var(--neutral-chroma) var(--neutral-hue));
+  /* 0.56: white labels on it clear 4.5:1 (0.58 measured 4.28). */
+  --emphasis: oklch(0.56 var(--neutral-chroma) var(--neutral-hue));
   --secondary: oklch(0.35 var(--neutral-chroma) var(--neutral-hue));
   --secondary-foreground: oklch(0.94 var(--neutral-chroma) var(--neutral-hue));
   --muted: oklch(0.24 var(--neutral-chroma) var(--neutral-hue));
@@ -331,6 +335,7 @@ html {
 
   --primary-hover: color-mix(in oklch, var(--primary), white 10%);
   --neutral-hover: color-mix(in oklch, var(--neutral), black 10%);
+  --emphasis-hover: color-mix(in oklch, var(--emphasis), white 10%);
   --destructive-hover: color-mix(in oklch, var(--destructive), white 15%);
   --secondary-hover: color-mix(in oklch, var(--secondary), white 5%);
   --outline-hover: oklch(1 0 0 / 0.03);
@@ -339,6 +344,7 @@ html {
      saturated red drops white-label contrast below AA. */
   --primary-active: color-mix(in oklch, var(--primary), white 14%);
   --neutral-active: color-mix(in oklch, var(--neutral), black 14%);
+  --emphasis-active: color-mix(in oklch, var(--emphasis), white 14%);
   --destructive-active: color-mix(in oklch, var(--destructive), black 8%);
   --secondary-active: color-mix(in oklch, var(--secondary), white 8%);
   --outline-active: oklch(1 0 0 / 0.05);
@@ -352,7 +358,7 @@ html {
      --emphasis that marks the on state. */
   --control-off: oklch(1 0 0 / 15%);
   --control-off-hover: oklch(1 0 0 / 19%);
-  --control-track: oklch(1 0 0 / 10%);
+  --control-track: oklch(1 0 0 / 8%);
   --scrollbar: oklch(0.7 var(--neutral-chroma) var(--neutral-hue));
 
   /* Only --sidebar-border needs a dark value; the rest are aliases. */

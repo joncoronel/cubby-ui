@@ -11,17 +11,25 @@ import {
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Sent02Icon } from "@hugeicons/core-free-icons";
+const currencies = [
+  { label: "USD", value: "usd" },
+  { label: "EUR", value: "eur" },
+  { label: "GBP", value: "gbp" },
+];
+
 export default function ButtonGroupSelect() {
   return (
     <ButtonGroup variant="attached">
-      <Select defaultValue="usd">
+      <Select items={currencies} defaultValue="usd">
         <SelectTrigger variant="outline" aria-label="Select currency">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="usd">USD</SelectItem>
-          <SelectItem value="eur">EUR</SelectItem>
-          <SelectItem value="gbp">GBP</SelectItem>
+          {currencies.map((currency) => (
+            <SelectItem key={currency.value} value={currency.value}>
+              {currency.label}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 

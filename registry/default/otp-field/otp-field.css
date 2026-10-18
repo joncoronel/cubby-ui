@@ -58,18 +58,13 @@
   }
 
   [data-slot="otp-field-slot"]:focus-within {
-    outline: 2px solid
-      color-mix(in oklab, var(--color-ring, Highlight) 50%, transparent);
-    outline-offset: 2px;
+    outline: 2px solid var(--color-ring, Highlight);
+    outline-offset: -1px;
   }
 
   .otp-field-shake-a [data-slot="otp-field-slot"]:focus-within,
   .otp-field-shake-b [data-slot="otp-field-slot"]:focus-within {
-    outline-color: color-mix(
-      in oklab,
-      var(--color-destructive, red) 80%,
-      transparent
-    );
+    outline-color: var(--color-destructive, red);
   }
 }
 
@@ -127,11 +122,7 @@
 
 .otp-field-shake-a > .otp-field-indicator,
 .otp-field-shake-b > .otp-field-indicator {
-  outline-color: color-mix(
-    in oklab,
-    var(--color-destructive, red) 80%,
-    transparent
-  );
+  outline-color: var(--color-destructive, red);
 }
 
 .otp-field-shake-a > .otp-field-indicator,

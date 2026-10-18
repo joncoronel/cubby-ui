@@ -196,10 +196,9 @@
   > [data-slot="input"] {
   padding-inline: 0.625rem;
   color: inherit;
-  transition-property:
-    background-color, outline-width, outline-offset, outline-color;
+  transition-property: background-color, outline-width, outline-color;
   /* Instant hover, like the buttons. */
-  transition-duration: 0ms, 100ms, 100ms, 100ms;
+  transition-duration: 0ms, 100ms, 100ms;
 }
 
 /* Hover is gated to real hover: a raw :hover sticks after a tap. */
@@ -372,15 +371,14 @@
 
 [data-slot="button-group"]:not([data-variant="attached"])
   > :is(button, a):focus-visible::before {
-  outline: 2px solid color-mix(in oklab, var(--color-ring) 50%, transparent);
-  outline-offset: -2px;
+  outline: 2px solid var(--color-ring);
+  outline-offset: -1px;
 }
 
 [data-slot="button-group"]:not([data-variant="attached"])
   > [data-slot="input"]:focus-visible {
   outline-color: transparent;
-  box-shadow: inset 0 0 0 2px
-    color-mix(in oklab, var(--color-ring) 50%, transparent);
+  box-shadow: inset 0 0 0 2px var(--color-ring);
 }
 
 @media (forced-colors: active) {

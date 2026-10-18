@@ -133,7 +133,7 @@ function ComboboxInput({
                 ? "border-(--outline-border) bg-(--outline) bg-clip-padding"
                 : "bg-input",
               // Focus ring follows the input via focus-within (same pattern as ComboboxChips).
-              "focus-within:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-within:outline-2 focus-within:outline-offset-2",
+              "focus-within:outline-ring outline-0 -outline-offset-1 outline-transparent transition-[outline-width,outline-color] duration-100 ease-out outline-solid focus-within:outline-2 focus-within:-outline-offset-1",
             ],
         // Disabled state (input or field-level) dims and locks the whole field.
         "has-[input:disabled]:pointer-events-none has-[input:disabled]:cursor-not-allowed has-[input:disabled]:opacity-60",
@@ -219,7 +219,7 @@ function ComboboxTrigger({
       aria-label="Open popup"
       className={cn(
         "inline-flex size-4 cursor-pointer items-center justify-center rounded-md border-none bg-transparent p-0 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-60",
-        "focus-visible:ring-ring/70 outline-none focus-visible:ring-2",
+        "focus-visible:outline-ring outline-none focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-solid",
         className,
       )}
       {...props}
@@ -255,7 +255,7 @@ function ComboboxClear({ className, ...props }: BaseCombobox.Clear.Props) {
       aria-label="Clear selection"
       className={cn(
         "inline-flex h-4 w-4 cursor-pointer items-center justify-center rounded-sm opacity-70 transition-[opacity,scale,transform,translate] hover:opacity-100 disabled:pointer-events-none",
-        "focus-visible:ring-ring/70 duration-100 outline-none focus-visible:ring-2",
+        "focus-visible:outline-ring duration-100 outline-none focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-solid",
         "data-ending-style:translate-x-1 data-ending-style:opacity-0 data-starting-style:translate-x-1 data-starting-style:opacity-0",
         className,
       )}
@@ -580,7 +580,7 @@ function ComboboxChips({
         variant === "outline"
           ? "border-(--outline-border) bg-(--outline) bg-clip-padding"
           : "bg-input",
-        "focus-within:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-within:outline-2 focus-within:outline-offset-2",
+        "focus-within:outline-ring outline-0 -outline-offset-1 outline-transparent transition-[outline-width,outline-color] duration-100 ease-out outline-solid focus-within:outline-2 focus-within:-outline-offset-1",
 
         className,
       )}
@@ -597,7 +597,7 @@ function ComboboxChip({ className, ...props }: BaseCombobox.Chip.Props) {
         "bg-surface-selected text-accent-foreground flex items-center gap-1 rounded-sm px-2 py-1 text-sm font-medium break-all sm:text-xs",
         // Ring (not outline) avoids clipping neighbors in the packed chip row;
         // outline-none suppresses the browser default (currentColor → white in dark mode).
-        "focus-visible:ring-ring/70 outline-none focus-visible:ring-2",
+        "focus-visible:outline-ring outline-none focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-solid",
         className,
       )}
       {...props}
@@ -614,7 +614,7 @@ function ComboboxChipRemove({
       data-slot="combobox-chip-remove"
       className={cn(
         "ml-1 inline-flex h-4 w-4 items-center justify-center rounded-sm opacity-70 transition-opacity hover:opacity-100 disabled:pointer-events-none",
-        "focus-visible:ring-ring/70 cursor-pointer outline-none focus-visible:ring-2",
+        "focus-visible:outline-ring cursor-pointer outline-none focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-solid",
         className,
       )}
       {...props}

@@ -27,13 +27,13 @@ const inputGroupVariants = cva(
     "has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col [&>input:is(:has(~[data-align=block-end]),[data-align=block-end]~*)]:pt-3",
 
     // Focus state.
-    "has-[[data-slot=input-group-control]:focus-visible]:outline-ring/50 has-[[data-slot=input-group-control]:focus-visible]:outline-2 has-[[data-slot=input-group-control]:focus-visible]:outline-offset-2 has-[[data-slot=input-group-control]:focus-visible]:outline-solid",
+    "has-[[data-slot=input-group-control]:focus-visible]:outline-ring has-[[data-slot=input-group-control]:focus-visible]:outline-2 has-[[data-slot=input-group-control]:focus-visible]:-outline-offset-1 has-[[data-slot=input-group-control]:focus-visible]:outline-solid",
 
     // Error state.
-    "has-[[data-slot][aria-invalid=true]]:outline-destructive/50 has-[[data-slot][aria-invalid=true]]:outline-2 has-[[data-slot][aria-invalid=true]]:outline-offset-2 has-[[data-slot][aria-invalid=true]]:outline-solid",
+    "has-[[data-slot][aria-invalid=true]]:outline-destructive has-[[data-slot][aria-invalid=true]]:outline-2 has-[[data-slot][aria-invalid=true]]:-outline-offset-1 has-[[data-slot][aria-invalid=true]]:outline-solid",
 
     // Transition outline
-    "outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out",
+    "outline-0 -outline-offset-1 outline-transparent transition-[outline-width,outline-color] duration-100 ease-out",
   ],
   {
     variants: {
@@ -173,7 +173,7 @@ const inputGroupButtonVariants = cva(
       // concentric. Block: a fixed height in a toolbar row.
       placement: {
         inline:
-          "self-stretch rounded-[calc(var(--input-group-item-radius)+2px)] before:rounded-(--input-group-item-radius) focus-visible:outline-offset-0",
+          "self-stretch rounded-[calc(var(--input-group-item-radius)+2px)] before:rounded-(--input-group-item-radius) focus-visible:-outline-offset-2",
         block: "",
       },
     },

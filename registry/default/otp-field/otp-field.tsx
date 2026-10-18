@@ -27,7 +27,7 @@ function OTPField({
       <span
         aria-hidden="true"
         data-slot="otp-field-indicator"
-        className="otp-field-indicator outline-ring/50 group-data-[invalid]/otp-field:outline-destructive/50 outline-2 outline-offset-2 outline-solid"
+        className="otp-field-indicator outline-ring group-data-[invalid]/otp-field:outline-destructive outline-2 -outline-offset-1 outline-solid"
       />
     </BaseOTPField.Root>
   );
@@ -74,7 +74,7 @@ function OTPFieldInput({
                 ? "border-(--outline-border) bg-(--outline) bg-clip-padding"
                 : "bg-input",
               // Invalid state (the focused slot's ring comes from the root)
-              "data-[invalid]:outline-destructive/50 data-[invalid]:outline-2 data-[invalid]:outline-offset-2 data-[invalid]:outline-solid",
+              "data-[invalid]:outline-destructive data-[invalid]:outline-2 data-[invalid]:-outline-offset-1 data-[invalid]:outline-solid",
               // Disabled state
               "data-[disabled]:pointer-events-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60",
               className,

@@ -139,7 +139,9 @@ html {
      quieter than --control-off so the filled part stays clearly apart from
      it, 3:1 or better against the emphasis fill in both themes. */
   --control-track: oklch(0 0 0 / 9%);
-  --ring: oklch(0.7 0.15 232.65);
+  /* Solid and flush (outline-offset -1px straddles the edge). L 0.6 keeps the
+     ring at 3:1 or better against the near-white page; dark lifts it. */
+  --ring: oklch(0.68 0.15 232.65);
   --scrollbar: oklch(0.87 0 0);
 
   /* Sidebar — aliases onto the core tokens, so no .dark overrides are needed;
@@ -284,6 +286,7 @@ html {
   --neutral-foreground: oklch(0.13 var(--neutral-chroma) var(--neutral-hue));
   /* 0.56: white labels on it clear 4.5:1 (0.58 measured 4.28). */
   --emphasis: oklch(0.56 var(--neutral-chroma) var(--neutral-hue));
+  --ring: oklch(0.75 0.15 232.65);
   --secondary: oklch(0.35 var(--neutral-chroma) var(--neutral-hue));
   --secondary-foreground: oklch(0.94 var(--neutral-chroma) var(--neutral-hue));
   --muted: oklch(0.24 var(--neutral-chroma) var(--neutral-hue));

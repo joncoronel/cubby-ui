@@ -26,7 +26,7 @@ export const POPUP_SEARCH_INPUT =
  * reaches the input across the gap without covering it.
  */
 export const POPUP_SEARCH_CLEAR =
-  "text-muted-foreground hover:text-foreground focus-visible:ring-ring/70 relative -mr-1 inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors duration-100 outline-none focus-visible:ring-2 after:absolute after:-inset-2";
+  "text-muted-foreground hover:text-foreground relative -mr-1 inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors duration-100 outline-none focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-solid focus-visible:outline-ring after:absolute after:-inset-2";
 
 /**
  * A menu's search field above its list: inset 4px, never squeezed. The

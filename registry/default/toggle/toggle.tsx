@@ -20,7 +20,7 @@ const toggleBase = cn(
   // Label + icon stay full-contrast (text-foreground) in every state; the
   // background carries the state, not the text — so resting toggles read as
   // legible options, not dimmed ones.
-  "relative isolate inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg text-sm font-medium whitespace-nowrap text-foreground select-none data-disabled:pointer-events-none data-disabled:opacity-60 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 transition-[outline-width,outline-offset,outline-color,opacity,color] duration-100 ease-out focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
+  "relative isolate inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg text-sm font-medium whitespace-nowrap text-foreground select-none data-disabled:pointer-events-none data-disabled:opacity-60 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 transition-[outline-width,outline-color,opacity,color] duration-100 ease-out focus-visible:outline-ring outline-0 -outline-offset-1 outline-transparent outline-solid focus-visible:outline-2 focus-visible:-outline-offset-1 aria-invalid:outline-destructive aria-invalid:outline-2 aria-invalid:-outline-offset-1 aria-invalid:outline-solid",
   // State machine: unset tokens fall through to transparent. Selection is
   // terminal, so neither hover nor press alters a selected toggle; both are
   // scoped to the off state. The pressed-down step exists because the scale

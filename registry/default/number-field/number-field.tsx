@@ -22,9 +22,9 @@ const numberFieldGroupVariants = cva(
     "relative flex h-(--number-field-h) w-fit items-stretch rounded-(--number-field-radius) border border-transparent",
     "[--number-field-item-radius:max(0px,calc(var(--number-field-radius)-3px))]",
     // Focus and invalid rings
-    "outline-0 outline-offset-0 outline-transparent outline-solid transition-[outline-width,outline-offset,outline-color] duration-100 ease-out",
-    "has-[[data-slot=number-field-input]:focus-visible]:outline-ring/50 has-[[data-slot=number-field-input]:focus-visible]:outline-2 has-[[data-slot=number-field-input]:focus-visible]:outline-offset-2",
-    "has-[[data-slot=number-field-input][aria-invalid=true]]:outline-destructive/50 has-[[data-slot=number-field-input][aria-invalid=true]]:outline-2 has-[[data-slot=number-field-input][aria-invalid=true]]:outline-offset-2",
+    "outline-0 -outline-offset-1 outline-transparent outline-solid transition-[outline-width,outline-color] duration-100 ease-out",
+    "has-[[data-slot=number-field-input]:focus-visible]:outline-ring has-[[data-slot=number-field-input]:focus-visible]:outline-2 has-[[data-slot=number-field-input]:focus-visible]:-outline-offset-1",
+    "has-[[data-slot=number-field-input][aria-invalid=true]]:outline-destructive has-[[data-slot=number-field-input][aria-invalid=true]]:outline-2 has-[[data-slot=number-field-input][aria-invalid=true]]:-outline-offset-1",
     // Disabled: dims once here; the steppers' own disabled opacity is
     // cancelled so it doesn't stack. A stepper alone at min or max still dims.
     "data-disabled:opacity-60 data-disabled:[&_button]:opacity-100",

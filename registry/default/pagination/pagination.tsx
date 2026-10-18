@@ -125,7 +125,7 @@ const linkClasses = cn(
   // No transitions on the link: Chrome skips the indicator's slide when the
   // new current link starts one. Hover is instant; the press tint still
   // fades (Button's 100ms).
-  "transition-[outline-width,outline-offset,outline-color] before:[transition-duration:0ms,100ms,100ms] active:before:[transition-duration:100ms] aria-[current=page]:before:transition-none",
+  "transition-[outline-width,outline-color] before:[transition-duration:0ms,100ms,100ms] active:before:[transition-duration:100ms] aria-[current=page]:before:transition-none",
 );
 
 function PaginationLink({

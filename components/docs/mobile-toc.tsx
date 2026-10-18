@@ -106,7 +106,7 @@ export function MobileToc({ toc }: { toc: TOCItemType[] }) {
             <button
               type="button"
               className={cn(
-                "docs-toc-pill focus-visible:outline-ring/50 flex h-10 max-w-full min-w-0 items-center gap-2.5 rounded-full pr-3 pl-3.5 text-sm outline-none focus-visible:outline-2 focus-visible:outline-offset-2",
+                "docs-toc-pill focus-visible:outline-ring flex h-10 max-w-full min-w-0 items-center gap-2.5 rounded-full pr-3 pl-3.5 text-sm outline-none focus-visible:outline-2 focus-visible:-outline-offset-1",
                 solidSurface(3, 5),
               )}
             />

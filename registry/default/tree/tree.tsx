@@ -694,7 +694,7 @@ function TreeItemInternal<
       ? "h-7 gap-1.5 px-1.5 text-[0.8125rem]"
       : "h-8 gap-2 px-2 text-sm",
     "hover:bg-surface-hover",
-    "focus-visible:outline-ring/50 outline-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:-outline-offset-2",
+    "focus-visible:outline-ring outline-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:-outline-offset-2",
     isSelected &&
       !context.disableSelection &&
       "bg-surface-selected text-foreground",

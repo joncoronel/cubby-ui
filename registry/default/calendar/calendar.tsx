@@ -375,7 +375,7 @@ function CalendarMonthCaption({
         onClick={() => context.togglePicker(displayIndex)}
         className={cn(
           "inline-flex h-full cursor-pointer items-center gap-1.5 rounded-xl ps-2.5 pe-2 text-sm",
-          "hover:bg-surface-hover aria-expanded:bg-surface-hover transition-[background-color,outline-color,outline-offset] duration-150 ease-out",
+          "hover:bg-surface-hover aria-expanded:bg-surface-hover transition-[background-color,outline-color] duration-150 ease-out",
           focusRing,
         )}
       >
@@ -888,7 +888,7 @@ function CalendarPreset({
         pressPaint,
         focusRing,
         // Hover changes colour instantly, like the days.
-        "transition-[outline-color,outline-offset] duration-150 ease-out",
+        "transition-[outline-color] duration-150 ease-out",
         className,
       )}
       {...props}

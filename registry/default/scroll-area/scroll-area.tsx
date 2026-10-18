@@ -166,7 +166,7 @@ function ScrollArea({
         data-slot="scroll-area-viewport"
         className={cn(
           "h-full rounded-[inherit]",
-          "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+          "focus-visible:outline-ring outline-0 -outline-offset-1 outline-transparent transition-[outline-width,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:-outline-offset-1",
           hasFade && "[--scroll-fade-size:min(12%,2.5rem)]",
           fade.top &&
             "mask-t-from-[calc(100%-min(var(--scroll-fade-size),var(--scroll-area-overflow-y-start,0px)))]",
@@ -336,7 +336,7 @@ function NativeScrollArea({
       data-native-scroll
       className={cn(
         "size-full min-h-0 overflow-auto rounded-[inherit]",
-        "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+        "focus-visible:outline-ring outline-0 -outline-offset-1 outline-transparent transition-[outline-width,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:-outline-offset-1",
         hasFade && "[--scroll-fade-size:min(12%,2.5rem)]",
         // Mask amounts come from CSS variables driven by scroll-driven
         // animations where supported, and from a static fallback otherwise.

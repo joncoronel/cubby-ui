@@ -126,7 +126,7 @@ const switchVariants = cva(
     // switch moves, so the lists themselves live on `motion` below.
     "ease-out-cubic",
     "motion-reduce:transition-none",
-    "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+    "focus-visible:outline-ring outline-0 -outline-offset-1 outline-transparent outline-solid focus-visible:outline-2 focus-visible:-outline-offset-1",
     // The border box is the painted box, so a mouse already has an exact
     // target. Coarse pointers get 24px (WCAG 2.5.8), where reach matters and
     // there is no hover to mismatch.

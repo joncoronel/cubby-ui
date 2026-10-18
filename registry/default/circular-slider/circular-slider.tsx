@@ -1694,7 +1694,7 @@ function CircularSliderKnob({
           "absolute overflow-hidden rounded-full bg-surface-4 shadow-(--surface-shadow-combined-4) group-hover/circular-slider:shadow-(--surface-shadow-combined-5) group-data-disabled/circular-slider:shadow-(--surface-shadow-combined-4)",
           "transition-[scale,box-shadow,outline-color] duration-150 ease-out",
           "group-data-pressed/circular-slider:scale-[0.98] motion-reduce:group-data-pressed/circular-slider:scale-100",
-          "outline-2 outline-offset-2 outline-transparent data-focus-visible:outline-ring",
+          "outline-2 -outline-offset-1 outline-transparent data-focus-visible:outline-ring",
           className,
         ),
         style: { inset: `${insetPercent}%` },

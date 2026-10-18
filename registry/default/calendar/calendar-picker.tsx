@@ -10,7 +10,7 @@ import { ScrollArea } from "@/registry/default/scroll-area/scroll-area";
  * -------------------------------------------------------------------------------------------------*/
 
 export const focusRing =
-  "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-2";
+  "focus-visible:outline-ring outline-0 -outline-offset-1 outline-transparent outline-solid focus-visible:outline-2 focus-visible:-outline-offset-1";
 
 /**
  * A background in `::before` that shrinks on press while the label holds
@@ -30,7 +30,7 @@ export const cellButtonClassName = cn(
   // Interaction: colours change instantly, since a fade would trail the
   // pointer across the days. A mode can time the text colour (and the today
   // dot with it) through --cell-text-duration and --cell-text-delay.
-  "cursor-pointer transition-[outline-color,outline-offset,color] duration-[150ms,150ms,var(--cell-text-duration,0s)] delay-[0s,0s,var(--cell-text-delay,0s)] ease-out",
+  "cursor-pointer transition-[outline-color,color] duration-[150ms,150ms,var(--cell-text-duration,0s)] delay-[0s,0s,var(--cell-text-delay,0s)] ease-out",
   "after:transition-[background-color] after:duration-[var(--cell-text-duration,0s)] after:delay-[var(--cell-text-delay,0s)] after:ease-out",
   pressPaint,
   "hover:[--cell-paint:var(--surface-hover)]",

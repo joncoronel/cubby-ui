@@ -24,7 +24,7 @@ export const CLICK_MORPH_MS = 209;
  * are the chip's minus 2px. Hover is instant; the press tint still fades.
  */
 export const FILTER_SEGMENT = cn(
-  "relative isolate inline-flex h-full shrink-0 items-center gap-1.5 whitespace-nowrap border border-y-2 border-transparent bg-clip-padding rounded-lg px-(--seg-x) outline-0 outline-transparent outline-solid transition-[background-color,color,outline-color] duration-100 ease-out [transition-duration:100ms,0ms,100ms] focus-visible:before:outline-2 focus-visible:before:-outline-offset-2 focus-visible:before:outline-ring/50",
+  "relative isolate inline-flex h-full shrink-0 items-center gap-1.5 whitespace-nowrap border border-y-2 border-transparent bg-clip-padding rounded-lg px-(--seg-x) outline-0 outline-transparent outline-solid transition-[background-color,color,outline-color] duration-100 ease-out [transition-duration:100ms,0ms,100ms] focus-visible:before:outline-2 focus-visible:before:-outline-offset-2 focus-visible:before:outline-ring",
   // A square hit area over the whole box, so hover never drops between
   // segments.
   "after:absolute after:-inset-x-px after:-inset-y-0.5 after:content-['']",

@@ -44,8 +44,8 @@ function AutocompleteInput({
             ? "border-(--outline-border) bg-(--outline) bg-clip-padding"
             : "bg-input",
           "file:text-foreground file:inline-flex file:h-7 file:rounded-md file:border-0 file:bg-transparent file:text-sm file:font-medium",
-          "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
-          "aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
+          "focus-visible:outline-ring outline-0 -outline-offset-1 outline-transparent transition-[outline-width,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:-outline-offset-1",
+          "aria-invalid:outline-destructive aria-invalid:outline-2 aria-invalid:-outline-offset-1 aria-invalid:outline-solid",
           className,
         )}
         {...props}
@@ -71,7 +71,7 @@ function AutocompleteTrigger({
       aria-label="Open popup"
       className={cn(
         "inline-flex size-4 cursor-pointer items-center justify-center rounded-md border-none bg-transparent p-0 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-60",
-        "focus-visible:ring-ring/70 outline-none focus-visible:ring-2",
+        "focus-visible:outline-ring outline-none focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-solid",
         className,
       )}
       {...props}
@@ -111,7 +111,7 @@ function AutocompleteClear({
       aria-label="Clear selection"
       className={cn(
         "inline-flex h-4 w-4 cursor-pointer items-center justify-center rounded-sm opacity-70 transition-[opacity,scale,transform,translate] hover:opacity-100 disabled:pointer-events-none",
-        "focus-visible:ring-ring/70 duration-100 outline-none focus-visible:ring-2",
+        "focus-visible:outline-ring duration-100 outline-none focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-solid",
         "data-ending-style:translate-x-1 data-ending-style:opacity-0 data-starting-style:translate-x-1 data-starting-style:opacity-0",
         className,
       )}

@@ -83,7 +83,7 @@ function SectionCrumb() {
         render={
           <button
             type="button"
-            className="docs-crumb-section text-muted-foreground hover:text-foreground focus-visible:outline-ring/50 flex h-8 min-w-0 items-center gap-1 rounded-md px-1.5 text-sm outline-none focus-visible:outline-2"
+            className="docs-crumb-section text-muted-foreground hover:text-foreground focus-visible:outline-ring flex h-8 min-w-0 items-center gap-1 rounded-md px-1.5 text-sm outline-none focus-visible:outline-2"
           />
         }
       >
@@ -190,7 +190,7 @@ export function DocsHeader({ groups }: { groups: ShelfGroup[] }) {
           <Link
             href="/"
             aria-label="Cubby UI home"
-            className="focus-visible:outline-ring/50 flex h-9 shrink-0 items-center gap-2.5 rounded-md px-2 outline-none focus-visible:outline-2"
+            className="focus-visible:outline-ring flex h-9 shrink-0 items-center gap-2.5 rounded-md px-2 outline-none focus-visible:outline-2"
           >
             <CubbyUILogo className="text-foreground h-[18px] w-auto" />
             <span className="text-foreground font-display hidden text-[1.05rem] leading-none font-semibold tracking-tight lg:inline">
@@ -206,7 +206,7 @@ export function DocsHeader({ groups }: { groups: ShelfGroup[] }) {
               aria-controls={SHELF_ID}
               data-open={open ? "" : undefined}
               onClick={() => setOpen((o) => !o)}
-              className="docs-shelf-trigger focus-visible:outline-ring/50 flex h-9 min-w-0 items-center gap-2 rounded-full pr-2.5 pl-2.5 text-sm outline-none focus-visible:outline-2"
+              className="docs-shelf-trigger focus-visible:outline-ring flex h-9 min-w-0 items-center gap-2 rounded-full pr-2.5 pl-2.5 text-sm outline-none focus-visible:outline-2"
             >
               <CubbyGlyph />
               <span className="flex min-w-0 items-baseline gap-1.5">

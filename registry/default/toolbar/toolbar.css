@@ -293,14 +293,13 @@
 }
 
 [data-slot="toolbar"] [data-toolbar-part]:not(input):focus-visible::before {
-  outline: 2px solid color-mix(in oklab, var(--color-ring) 50%, transparent);
-  outline-offset: -2px;
+  outline: 2px solid var(--color-ring);
+  outline-offset: -1px;
 }
 
 [data-slot="toolbar"] [data-slot="toolbar-input"]:focus-visible {
   outline-color: transparent;
-  box-shadow: inset 0 0 0 2px
-    color-mix(in oklab, var(--color-ring) 50%, transparent);
+  box-shadow: inset 0 0 0 2px var(--color-ring);
 }
 
 @media (forced-colors: active) {

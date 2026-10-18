@@ -12,8 +12,8 @@ const inputVariants = cva(
     "text-base transition-colors duration-200 sm:not-pointer-coarse:text-sm",
     "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60",
     "file:text-foreground file:inline-flex file:h-7 file:rounded-md file:border-0 file:bg-transparent file:text-sm file:font-medium",
-    "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
-    "aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid font-normal",
+    "focus-visible:outline-ring outline-0 -outline-offset-1 outline-transparent transition-[outline-width,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:-outline-offset-1",
+    "aria-invalid:outline-destructive aria-invalid:outline-2 aria-invalid:-outline-offset-1 aria-invalid:outline-solid font-normal",
   ],
   {
     variants: {

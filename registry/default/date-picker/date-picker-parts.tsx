@@ -113,8 +113,8 @@ function DatePickerClear({
         "text-muted-foreground hover:text-foreground hover:bg-surface-hover absolute end-1.5 top-1/2 flex size-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md",
         // A 44px hit area without growing the button.
         "before:absolute before:-inset-2.5",
-        "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent outline-solid focus-visible:outline-2 focus-visible:outline-offset-1",
-        "transition-[outline-color,outline-offset] duration-150 ease-out",
+        "focus-visible:outline-ring outline-0 -outline-offset-1 outline-transparent outline-solid focus-visible:outline-2 focus-visible:-outline-offset-1",
+        "transition-[outline-color] duration-150 ease-out",
       )}
     >
       <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-3.5" />

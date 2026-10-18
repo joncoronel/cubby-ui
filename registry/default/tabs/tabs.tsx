@@ -194,15 +194,14 @@ function TabsTrigger({ className, ...props }: BaseTabs.Tab.Props) {
       className={cn(
         // Base styles
         "text-muted-foreground data-active:text-foreground group-data-[variant=capsule]/tabs-list:data-active:text-emphasis-foreground flex cursor-pointer items-center gap-1.5 font-medium text-nowrap whitespace-nowrap",
-        "transition-[outline-offset,color] duration-200 ease-out",
-        "focus-visible:outline-ring/50 focus-visible:outline-2 focus-visible:outline-offset-2",
+        "transition-[color] duration-200 ease-out",
+        "focus-visible:outline-ring focus-visible:outline-2 focus-visible:-outline-offset-1",
         "hover:not-data-active:text-muted-foreground/75",
         "data-disabled:pointer-events-none data-disabled:opacity-60",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         // Orientation
         "data-[orientation=horizontal]:flex-1 data-[orientation=vertical]:w-full",
         "justify-center",
-        "group-data-[variant=underline]/tabs-list:focus-visible:outline-offset-0",
         // Default size (small) - overridden by group data attribute for medium
         "rounded-sm px-2 py-1 text-xs",
         // Medium size via parent group

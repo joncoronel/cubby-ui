@@ -387,8 +387,8 @@
 }
 .docs-shelf-link:focus-visible {
   color: var(--foreground);
-  outline: 2px solid color-mix(in oklab, var(--ring) 55%, transparent);
-  outline-offset: -2px;
+  outline: 2px solid var(--ring);
+  outline-offset: -1px;
 }
 .docs-shelf-link[aria-current="page"] {
   color: var(--foreground);
@@ -1005,8 +1005,8 @@
   }
 }
 .docs-prop-trigger:focus-visible {
-  outline: 2px solid color-mix(in oklab, var(--ring) 55%, transparent);
-  outline-offset: -2px;
+  outline: 2px solid var(--ring);
+  outline-offset: -1px;
 }
 .docs-prop-head {
   display: flex;

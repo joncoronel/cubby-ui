@@ -51,9 +51,9 @@ const selectTriggerVariants = cva(
     // Layout — w-fit by default since selects size to their value, not full-width
     "group/select-trigger relative inline-flex w-fit items-center justify-between gap-2.5 rounded-lg border border-transparent",
     // Focus ring
-    "focus-visible:outline-ring/50 ease-out-expo outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+    "focus-visible:outline-ring ease-out-expo outline-0 -outline-offset-1 outline-transparent transition-[outline-width,outline-color] duration-100 outline-solid focus-visible:outline-2 focus-visible:-outline-offset-1",
     // Invalid state
-    "aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
+    "aria-invalid:outline-destructive aria-invalid:outline-2 aria-invalid:-outline-offset-1 aria-invalid:outline-solid",
     // Text + placeholder + icon
     "text-base font-normal whitespace-nowrap sm:not-pointer-coarse:text-sm",
     "data-placeholder:text-muted-foreground",

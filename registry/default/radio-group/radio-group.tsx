@@ -40,9 +40,9 @@ function RadioGroupItem({
       className={cn(
         radioColors[color],
         "group relative inline-flex size-4 shrink-0 items-center justify-center rounded-full",
-        "focus-visible:outline-ring/50 ease-out-expo outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-150 outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+        "focus-visible:outline-ring ease-out-expo outline-0 -outline-offset-1 outline-transparent transition-[outline-width,outline-color] duration-150 outline-solid focus-visible:outline-2 focus-visible:-outline-offset-1",
         "disabled:cursor-not-allowed disabled:opacity-60",
-        "aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
+        "aria-invalid:outline-destructive aria-invalid:outline-2 aria-invalid:-outline-offset-1 aria-invalid:outline-solid",
         // Off: a 2px ring in the shared --control-off grey around a white
         // middle (the surface itself in dark), drawn as an inset shadow so the
         // Indicator at inset-0 covers it completely when selected.

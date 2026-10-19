@@ -139,6 +139,10 @@ html {
      quieter than --control-off so the filled part stays clearly apart from
      it, 3:1 or better against the emphasis fill in both themes. */
   --control-track: oklch(0 0 0 / 9%);
+  /* The code panel inside a CodeBlock's muted tray, styled like the outline
+     variant: white in light, a solid near-black recess in dark, edged with
+     --outline-border. */
+  --code-panel: oklch(1 0 0);
   /* Solid and flush (outline-offset -1px straddles the edge). L 0.6 keeps the
      ring at 3:1 or better against the near-white page; dark lifts it. */
   --ring: oklch(0.68 0.15 232.65);
@@ -362,6 +366,10 @@ html {
   --control-off: oklch(1 0 0 / 15%);
   --control-off-hover: oklch(1 0 0 / 19%);
   --control-track: oklch(1 0 0 / 8%);
+  /* The outline recess (30% black) mixed into the tray, so it stays solid for
+     the copy button and fades that paint with it. */
+  --code-panel: color-mix(in oklab, var(--muted), black 30%);
+
   --scrollbar: oklch(0.7 var(--neutral-chroma) var(--neutral-hue));
 
   /* Only --sidebar-border needs a dark value; the rest are aliases. */
@@ -520,6 +528,7 @@ html {
   --color-input: var(--input);
   --color-input-hover: var(--input-hover);
   --color-control-track: var(--control-track);
+  --color-code-panel: var(--code-panel);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);

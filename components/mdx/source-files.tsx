@@ -28,8 +28,6 @@ import {
   TreeItemLabel,
   type TreeNode,
 } from "@/registry/default/tree/tree";
-import { solidSurface } from "@/registry/default/lib/elevated";
-import { cn } from "@/lib/utils";
 import { CodePeek } from "./code-peek";
 
 export interface SourceFile {
@@ -231,7 +229,7 @@ export function SourceFiles({
     <div
       ref={rootRef}
       data-layout={wide ? "tree" : "picker"}
-      className={cn("docs-files", solidSurface(3, 1), "bg-muted shadow-none")}
+      className="docs-files bg-muted"
     >
       {wide ? (
         <>

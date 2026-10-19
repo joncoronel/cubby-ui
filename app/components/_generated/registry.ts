@@ -790,8 +790,7 @@ export const componentMetadata = {
     "registryDependencies": [
       "@cubby-ui/copy-button",
       "@cubby-ui/tabs",
-      "@cubby-ui/scroll-area",
-      "@cubby-ui/elevated"
+      "@cubby-ui/scroll-area"
     ],
     "dependencies": [
       "@icons-pack/react-simple-icons",

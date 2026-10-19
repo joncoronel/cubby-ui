@@ -457,8 +457,7 @@
       "registryDependencies": [
         "@cubby-ui/copy-button",
         "@cubby-ui/tabs",
-        "@cubby-ui/scroll-area",
-        "@cubby-ui/elevated"
+        "@cubby-ui/scroll-area"
       ],
       "dependencies": [
         "@icons-pack/react-simple-icons",
@@ -1535,6 +1534,7 @@
           "color-input": "var(--input)",
           "color-input-hover": "var(--input-hover)",
           "color-control-track": "var(--control-track)",
+          "color-code-panel": "var(--code-panel)",
           "color-ring": "var(--ring)",
           "color-scrollbar": "var(--scrollbar)",
           "color-sidebar": "var(--sidebar)",
@@ -1635,6 +1635,7 @@
           "control-off": "oklch(0 0 0 / 15%)",
           "control-off-hover": "oklch(0 0 0 / 19%)",
           "control-track": "oklch(0 0 0 / 9%)",
+          "code-panel": "oklch(1 0 0)",
           "ring": "oklch(0.6 0.15 232.65)",
           "scrollbar": "oklch(0.87 0 0)",
           "sidebar": "var(--surface-1)",
@@ -1742,6 +1743,7 @@
           "control-off": "oklch(1 0 0 / 15%)",
           "control-off-hover": "oklch(1 0 0 / 19%)",
           "control-track": "oklch(1 0 0 / 8%)",
+          "code-panel": "color-mix(in oklab, var(--muted), black 30%)",
           "scrollbar": "oklch(0.7 var(--neutral-chroma) var(--neutral-hue))",
           "sidebar-border": "oklch(0.28 var(--neutral-chroma) var(--neutral-hue))",
           "danger": "oklch(0.26 0.07 25)",

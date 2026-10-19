@@ -2,7 +2,6 @@
 
 import type { ReactElement } from "react";
 import { componentMap } from "@/app/components/_generated/registry";
-import { solidSurface } from "@/registry/default/lib/elevated";
 import { cn } from "@/lib/utils";
 import { CodePeek } from "./code-peek";
 
@@ -43,9 +42,8 @@ export function ComponentPreview({
       data-slot="preview"
       className={cn(
         "docs-stage-wrap not-prose",
-        // The muted fill is the edge; the level-1 ring would land lighter than
-        // it on the near-white page and read as a pale fringe.
-        code && ["docs-example", solidSurface(3, 1), "bg-muted shadow-none"],
+        // A flat muted tray: the fill is the edge, no elevation.
+        code && ["docs-example", "bg-muted"],
         className,
       )}
     >

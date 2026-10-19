@@ -6,10 +6,12 @@ import { cva } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 import { useAnimatedHeight } from "@/registry/default/hooks/use-animated-height";
+import { solidSurface } from "@/registry/default/lib/elevated";
 
 type TabsVariant = "capsule" | "underline";
 type TabsSize = "small" | "medium";
 type TabsSide = "left" | "right";
+type TabsIndicator = "solid" | "raised";
 
 /* -------------------------------------------------------------------------------------------------
  * CVA Variants
@@ -85,7 +87,6 @@ const tabIndicatorVariants = cva(
           "data-[orientation=horizontal]:bottom-0 data-[orientation=horizontal]:top-auto data-[orientation=horizontal]:h-0.75 data-[orientation=horizontal]:translate-y-0",
         ],
         capsule: [
-          "bg-emphasis",
           "data-[orientation=vertical]:w-auto",
           "data-[orientation=horizontal]:top-1/2 data-[orientation=horizontal]:h-(--active-tab-height)",
         ],
@@ -98,8 +99,17 @@ const tabIndicatorVariants = cva(
         left: "",
         right: "",
       },
+      // Capsule only. Solid is the emphasis grey with a light label, like
+      // Toggle Group; raised is a lifted chip on the track with the label in
+      // the text color.
+      indicator: {
+        solid: "",
+        raised: "",
+      },
     },
     compoundVariants: [
+      { variant: "capsule", indicator: "solid", class: "bg-emphasis" },
+      { variant: "capsule", indicator: "raised", class: solidSurface(5, 2) },
       {
         variant: "capsule",
         size: "small",
@@ -125,6 +135,7 @@ const tabIndicatorVariants = cva(
       variant: "capsule",
       size: "medium",
       side: "left",
+      indicator: "solid",
     },
   },
 );
@@ -148,6 +159,7 @@ function TabsList({
   variant = "capsule",
   size = "medium",
   side = "left",
+  indicator = "solid",
   className,
   children,
   ...props
@@ -155,6 +167,8 @@ function TabsList({
   variant?: TabsVariant;
   size?: TabsSize;
   side?: TabsSide;
+  /** Capsule only: the emphasis-grey chip (solid) or a lifted chip (raised). */
+  indicator?: TabsIndicator;
 }) {
   return (
     <BaseTabs.List
@@ -162,6 +176,7 @@ function TabsList({
       data-variant={variant}
       data-size={size}
       data-side={side}
+      data-indicator={variant === "capsule" ? indicator : undefined}
       className={cn(tabsListVariants({ variant, size, side }), className)}
       {...props}
     >
@@ -182,7 +197,12 @@ function TabsList({
         )}
         aria-hidden="true"
       />
-      <TabIndicator variant={variant} size={size} side={side} />
+      <TabIndicator
+        variant={variant}
+        size={size}
+        side={side}
+        indicator={indicator}
+      />
     </BaseTabs.List>
   );
 }
@@ -193,7 +213,7 @@ function TabsTrigger({ className, ...props }: BaseTabs.Tab.Props) {
       data-slot="tabs-trigger"
       className={cn(
         // Base styles
-        "text-muted-foreground data-active:text-foreground group-data-[variant=capsule]/tabs-list:data-active:text-emphasis-foreground flex cursor-pointer items-center gap-1.5 font-medium text-nowrap whitespace-nowrap",
+        "text-muted-foreground data-active:text-foreground group-data-[indicator=solid]/tabs-list:data-active:text-emphasis-foreground flex cursor-pointer items-center gap-1.5 font-medium text-nowrap whitespace-nowrap",
         "transition-[color] duration-200 ease-out",
         "focus-visible:outline-ring focus-visible:outline-2 focus-visible:-outline-offset-1",
         "hover:not-data-active:text-muted-foreground/75",
@@ -217,17 +237,22 @@ function TabIndicator({
   variant = "capsule",
   size = "medium",
   side = "left",
+  indicator = "solid",
   className,
   ...props
 }: BaseTabs.Indicator.Props & {
   variant?: TabsVariant;
   size?: TabsSize;
   side?: TabsSide;
+  indicator?: TabsIndicator;
 }) {
   return (
     <BaseTabs.Indicator
       data-slot="tab-indicator"
-      className={cn(tabIndicatorVariants({ variant, size, side }), className)}
+      className={cn(
+        tabIndicatorVariants({ variant, size, side, indicator }),
+        className,
+      )}
       {...props}
     />
   );

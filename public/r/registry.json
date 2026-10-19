@@ -1884,7 +1884,8 @@
         }
       ],
       "registryDependencies": [
-        "@cubby-ui/use-animated-height"
+        "@cubby-ui/use-animated-height",
+        "@cubby-ui/elevated"
       ],
       "dependencies": [
         "class-variance-authority"

@@ -382,7 +382,7 @@ function NavigationMenuSub({
             data-slot="navigation-menu-sub-content"
             className={cn(
               "text-popover-foreground relative h-(--popup-height) w-(--popup-width) origin-(--transform-origin) overflow-hidden rounded-xl transition-[opacity,transform,width,height,scale,translate] duration-(--duration) ease-(--easing) data-ending-style:scale-90 data-ending-style:opacity-0 data-ending-style:duration-150 data-starting-style:scale-90 data-starting-style:opacity-0",
-              solidSurface(5, 5),
+              solidSurface(3, 3),
             )}
           >
             {arrow && <NavigationMenuArrow />}

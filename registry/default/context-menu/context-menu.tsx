@@ -429,7 +429,7 @@ function ContextMenuSubContent({
   // the parent's edge by 4px; 8 leaves a 4px gap, matching Menubar.
   sideOffset = 8,
   align = "start",
-  level = 5,
+  level = 3,
   shadowLevel = 3,
   ...props
 }: React.ComponentProps<typeof BaseContextMenu.Popup> & {
@@ -437,7 +437,7 @@ function ContextMenuSubContent({
   positionerClassName?: string;
   align?: BaseContextMenu.Positioner.Props["align"];
   sideOffset?: BaseContextMenu.Positioner.Props["sideOffset"];
-  /** Surface elevation level for the submenu bg (1-8). Defaults to 5 — one tier above the parent menu's default of 3. Bump higher when nesting inside a Dialog. */
+  /** Surface elevation level for the submenu bg (1-8). Defaults to 3, the parent menu's level, since a submenu continues the same menu. Raise it with the parent when nesting inside a Dialog. */
   level?: SurfaceLevel;
   /** Shadow weight (1-8). Pinned to 3 by default so the submenu reads the same dropdown weight as its parent. */
   shadowLevel?: SurfaceLevel;

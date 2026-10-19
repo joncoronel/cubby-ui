@@ -64,6 +64,7 @@ function OTPFieldInput({
         return (
           <span
             data-slot="otp-field-slot"
+            data-variant={variant}
             data-filled={state.filled ? "" : undefined}
             data-invalid={invalid ? "" : undefined}
             data-disabled={state.disabled ? "" : undefined}

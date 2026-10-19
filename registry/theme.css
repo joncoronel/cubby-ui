@@ -116,6 +116,7 @@
      whatever it sits on, so one value reads on the page, a Card or a popup. */
   --input: oklch(0 0 0 / 4.5%);
   --input-hover: oklch(0 0 0 / 7.5%);
+  --input-active: oklch(0 0 0 / 10.5%);
   /* The "off" grey every on/off control shares: the Switch track fills with
      it, Checkbox and Radio draw a ring of it, so the three read as one
      family at rest. Translucent, so it holds on any substrate. */
@@ -128,7 +129,7 @@
   /* The code panel inside a CodeBlock's muted tray, styled like the outline
      variant: white in light, a solid near-black recess in dark, edged with
      --outline-border. */
-  --code-panel: oklch(1 0 0);
+  --code-panel: var(--outline);
   /* Solid and flush (outline-offset -1px straddles the edge). L 0.6 keeps the
      ring at 3:1 or better against the near-white page; dark lifts it. */
   --ring: oklch(0.6 0.15 232.65);
@@ -344,6 +345,7 @@
   --border: color-mix(in oklab, var(--foreground) 10%, transparent);
   --input: oklch(1 0 0 / 5%);
   --input-hover: oklch(1 0 0 / 9%);
+  --input-active: oklch(1 0 0 / 13%);
   /* Lower than light, so the resting grey stays well clear of the lifted
      --emphasis that marks the on state. */
   --control-off: oklch(1 0 0 / 15%);

@@ -92,7 +92,8 @@ type ToolbarSize = NonNullable<VariantProps<typeof toolbarVariants>["size"]>;
 const ToolbarContext = React.createContext<{
   orientation: "horizontal" | "vertical";
   size: ToolbarSize;
-}>({ orientation: "horizontal", size: "default" });
+  pressedStyle: "subtle" | "solid";
+}>({ orientation: "horizontal", size: "default", pressedStyle: "subtle" });
 
 // Items take their padding, text, and icon size from the toolbar's size, on
 // Toggle's and Button's scales.
@@ -128,8 +129,8 @@ function Toolbar({
   ...props
 }: ToolbarProps) {
   const context = React.useMemo(
-    () => ({ orientation, size }),
-    [orientation, size],
+    () => ({ orientation, size, pressedStyle }),
+    [orientation, size, pressedStyle],
   );
 
   return (
@@ -212,8 +213,9 @@ function ToolbarButton({
   );
 }
 
+// The toolbar sets the pressed look, so toggles take no `pressedStyle` of their own.
 export type ToolbarToggleProps = BaseToolbar.Button.Props &
-  Omit<ToggleProps, "variant" | "size">;
+  Omit<ToggleProps, "variant" | "size" | "pressedStyle">;
 
 /** A Toggle that stays pressed when on, with Toggle Group's deeper tint. */
 function ToolbarToggle({
@@ -222,7 +224,7 @@ function ToolbarToggle({
   render,
   ...props
 }: ToolbarToggleProps) {
-  const { size } = React.use(ToolbarContext);
+  const { size, pressedStyle } = React.use(ToolbarContext);
   const iconOnly = isIconOnly(
     children,
     props["aria-label"] ?? props["aria-labelledby"],
@@ -237,6 +239,7 @@ function ToolbarToggle({
         <Toggle
           variant="ghost"
           render={render}
+          data-pressed-style={pressedStyle}
           className={cn(
             itemShell,
             "min-w-auto sm:not-pointer-coarse:min-w-auto",

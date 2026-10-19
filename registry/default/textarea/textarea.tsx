@@ -31,6 +31,7 @@ function Textarea({ className, variant, ...props }: TextareaProps) {
   return (
     <textarea
       data-slot="textarea"
+      data-variant={variant ?? "default"}
       className={cn(textareaVariants({ variant }), className)}
       {...props}
     />

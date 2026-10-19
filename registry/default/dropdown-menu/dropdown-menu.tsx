@@ -77,10 +77,14 @@ function DropdownMenuPositioner({
   );
 }
 
+// The level of the nearest menu popup, so a submenu defaults to its parent's.
+const DropdownMenuLevelContext = React.createContext<SurfaceLevel>(3);
+
 function DropdownMenuPopup({
   className,
   level = 3,
   shadowLevel = 3,
+  children,
   ...props
 }: React.ComponentProps<typeof BaseMenu.Popup> & {
   /** Surface elevation (1-8) for the popup bg. Bump inside a Dialog or other elevated container. Defaults to 3. */
@@ -110,7 +114,11 @@ function DropdownMenuPopup({
         className,
       )}
       {...props}
-    />
+    >
+      <DropdownMenuLevelContext.Provider value={level}>
+        {children}
+      </DropdownMenuLevelContext.Provider>
+    </BaseMenu.Popup>
   );
 }
 
@@ -503,7 +511,7 @@ function DropdownMenuSubContent({
   sideOffset = 8,
   align = "start",
   alignOffset,
-  level = 3,
+  level,
   shadowLevel = 3,
   ...props
 }: React.ComponentProps<typeof BaseMenu.Popup> & {
@@ -512,13 +520,14 @@ function DropdownMenuSubContent({
   align?: BaseMenu.Positioner.Props["align"];
   alignOffset?: BaseMenu.Positioner.Props["alignOffset"];
   sideOffset?: BaseMenu.Positioner.Props["sideOffset"];
-  /** Surface elevation level for the submenu bg (1-8). Defaults to 3, the parent menu's level, since a submenu continues the same menu. Raise it with the parent when nesting inside a Dialog. */
+  /** Surface elevation level for the submenu bg (1-8). Defaults to the parent menu's level, since a submenu continues the same menu. */
   level?: SurfaceLevel;
   /** Shadow weight (1-8). Pinned to 3 by default so the submenu reads the same dropdown weight as its parent. */
   shadowLevel?: SurfaceLevel;
   /** Classes for the padded box around the items, e.g. `p-0` for a filterable menu. */
   viewportClassName?: string;
 }) {
+  const parentLevel = React.use(DropdownMenuLevelContext);
   // Default alignOffset to -5 when align is not "center" to line up first item with trigger
   const defaultAlignOffset = align !== "center" ? -4 : undefined;
 
@@ -537,7 +546,7 @@ function DropdownMenuSubContent({
       >
         <DropdownMenuPopup
           data-slot="dropdown-menu-content"
-          level={level}
+          level={level ?? parentLevel}
           shadowLevel={shadowLevel}
           className={className}
           {...props}
@@ -675,6 +684,7 @@ export {
   DropdownMenuTrigger,
   DropdownMenuPositioner,
   DropdownMenuPopup,
+  DropdownMenuLevelContext,
   DropdownMenuViewport,
   DropdownMenuContent,
   DropdownMenuGroup,

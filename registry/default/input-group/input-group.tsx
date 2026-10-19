@@ -65,6 +65,7 @@ function InputGroup({ className, variant, size, ...props }: InputGroupProps) {
   return (
     <div
       data-slot="input-group"
+      data-variant={variant ?? "default"}
       data-size={size ?? "default"}
       role="group"
       className={cn(inputGroupVariants({ variant, size }), className)}

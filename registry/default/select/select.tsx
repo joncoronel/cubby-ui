@@ -110,6 +110,9 @@ function SelectTrigger({
   return (
     <BaseSelect.Trigger
       data-slot="select-trigger"
+      // Unset when no variant is passed, like Button, so a Button Group still
+      // treats a plain trigger as one of its quiet items.
+      data-variant={variant ?? undefined}
       className={cn(selectTriggerVariants({ size, variant }), className)}
       {...props}
     >

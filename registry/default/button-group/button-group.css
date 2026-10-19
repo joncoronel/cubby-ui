@@ -359,7 +359,7 @@
 }
 
 /* -------------------------------------------------------------------------------------------------
- * Focus ring: 2px inside the fill's edge, following its corners. Items draw
+ * Focus ring: 2px, at -1px offset so it straddles the edge. Items draw
  * it on their plate (::before); fields, which have none, as an inset shadow,
  * with an outline under forced colors.
  * -------------------------------------------------------------------------------------------------*/

@@ -8,6 +8,7 @@ import {
   AnchoredToastProvider,
 } from "@/registry/default/toast/toast";
 import type { ReactNode } from "react";
+import { ThemeColorSync } from "./theme-color-sync";
 
 interface ProvidersProps {
   children: ReactNode;
@@ -26,6 +27,7 @@ export function Providers({ children }: ProvidersProps) {
         enableSystem
         disableTransitionOnChange
       >
+        <ThemeColorSync />
         <ToastProvider position="bottom-right">
           <AnchoredToastProvider>{children}</AnchoredToastProvider>
         </ToastProvider>

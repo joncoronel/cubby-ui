@@ -43,6 +43,7 @@ function Input({ className, size, variant, ...props }: InputProps) {
   return (
     <BaseInput
       data-slot="input"
+      data-variant={variant ?? "default"}
       className={cn(inputVariants({ size, variant }), className)}
       {...props}
     />

@@ -63,7 +63,7 @@ Use `variant` to pick the shell the controls sit on.
 
 ### Pressed Style
 
-Use `pressedStyle` to set how toggled-on toggles look. `subtle` (the default) is a quiet tint, which stays calm when several toggles are on at once, as in a text editor. `solid` uses the mid emphasis grey with a light label, matching Toggle Group, Tabs and checked checkboxes.
+Use `pressedStyle` to set how toggled-on toggles look. `subtle` (the default) is a quiet 12% neutral overlay, which stays calm when several toggles are on at once, as in a text editor. `solid` uses the mid emphasis grey with a white label, matching Toggle Group, Tabs and checked checkboxes.
 
 <ComponentPreview component="toolbar" example="toolbar-pressed-style" />
 
@@ -138,8 +138,8 @@ The shell. Wraps Base UI's `Toolbar.Root`.
   simpleType="string"
   defaultValue='"subtle"'
 >
-  How toggled-on `ToolbarToggle` items look. `subtle` is a tint of the label
-  color; `solid` is the emphasis grey with a light label.
+  How toggled-on `ToolbarToggle` items look. `subtle` is a 12% neutral overlay;
+  `solid` is the emphasis grey with a white label.
 </ApiProp>
 
 <ApiProp name="highlight" fullType="boolean" defaultValue="true">

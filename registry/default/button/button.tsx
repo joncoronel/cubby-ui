@@ -72,7 +72,7 @@ const buttonVariantClasses = {
   // The field's own tint and hover, for a button that sits beside or inside
   // a filled field and should read as part of it.
   field:
-    "text-foreground [--btn-bg:var(--input)] [--btn-bg-hover:var(--input-hover)] [--btn-bg-active:var(--surface-selected)]",
+    "text-foreground [--btn-bg:var(--input)] [--btn-bg-hover:var(--input-hover)] [--btn-bg-active:var(--input-active)]",
   secondary:
     "text-secondary-foreground [--btn-bg:var(--secondary)] [--btn-bg-hover:var(--secondary-hover)] [--btn-bg-active:var(--secondary-active)]",
   ghost:

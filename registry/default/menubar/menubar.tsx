@@ -17,6 +17,7 @@ import {
   DropdownMenuInput,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuLevelContext,
   DropdownMenuLinkItem,
   DropdownMenuList,
   DropdownMenuPortal,
@@ -244,7 +245,9 @@ function MenubarContent({
               viewportClassName,
             )}
           >
-            {children}
+            <DropdownMenuLevelContext.Provider value={level}>
+              {children}
+            </DropdownMenuLevelContext.Provider>
           </BaseMenu.Viewport>
         </BaseMenu.Popup>
       </BaseMenu.Positioner>

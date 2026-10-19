@@ -99,7 +99,7 @@ const tabIndicatorVariants = cva(
         left: "",
         right: "",
       },
-      // Capsule only. Solid is the emphasis grey with a light label, like
+      // Capsule only. Solid is the emphasis grey with a white label, like
       // Toggle Group; raised is a lifted chip on the track with the label in
       // the text color.
       indicator: {
@@ -214,8 +214,9 @@ function TabsTrigger({ className, ...props }: BaseTabs.Tab.Props) {
       className={cn(
         // Base styles
         "text-muted-foreground data-active:text-foreground group-data-[indicator=solid]/tabs-list:data-active:text-emphasis-foreground flex cursor-pointer items-center gap-1.5 font-medium text-nowrap whitespace-nowrap",
-        "transition-[color] duration-200 ease-out",
-        "focus-visible:outline-ring focus-visible:outline-2 focus-visible:-outline-offset-1",
+        // The label color eases over 200ms; the focus ring fades in 100ms.
+        "transition-[color,outline-width,outline-color] [transition-duration:200ms,100ms,100ms] ease-out",
+        "focus-visible:outline-ring outline-0 -outline-offset-1 outline-transparent outline-solid focus-visible:outline-2",
         "hover:not-data-active:text-muted-foreground/75",
         "data-disabled:pointer-events-none data-disabled:opacity-60",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",

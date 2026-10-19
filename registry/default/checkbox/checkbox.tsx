@@ -69,7 +69,7 @@ function Checkbox({
       data-color={color}
       className={cn(
         checkboxColors[color],
-        "peer aria-invalid:outline-destructive aria-invalid:text-destructive focus-visible:outline-ring ease-out-expo relative flex aspect-square size-4.5 shrink-0 items-center justify-center rounded-xs text-(--checkbox-mark) outline-0 -outline-offset-1 outline-transparent transition-[outline-width,outline-color] duration-200 outline-solid focus-visible:outline-2 focus-visible:-outline-offset-1 aria-invalid:outline-2 aria-invalid:-outline-offset-1 aria-invalid:outline-solid data-disabled:cursor-not-allowed data-disabled:opacity-60 motion-reduce:transition-none sm:not-pointer-coarse:size-4",
+        "peer aria-invalid:outline-destructive aria-invalid:text-destructive focus-visible:outline-ring ease-out-expo relative flex aspect-square size-4.5 shrink-0 items-center justify-center rounded-xs text-(--checkbox-mark) outline-0 -outline-offset-1 outline-transparent transition-[outline-width,outline-color] duration-100 outline-solid focus-visible:outline-2 focus-visible:-outline-offset-1 aria-invalid:outline-2 aria-invalid:-outline-offset-1 aria-invalid:outline-solid data-disabled:cursor-not-allowed data-disabled:opacity-60 motion-reduce:transition-none sm:not-pointer-coarse:size-4",
         // Off: a 2px ring in the shared --control-off grey (the Switch track
         // fills with the same grey) around a white middle, or the surface
         // itself in dark. An inset shadow rather than a border, so the ::before

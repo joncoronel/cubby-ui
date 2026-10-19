@@ -81,11 +81,13 @@ type ToggleGroupSize = NonNullable<
 type ToggleGroupContextValue = {
   size: ToggleGroupSize;
   orientation: "horizontal" | "vertical";
+  pressedStyle: "solid" | "subtle";
 };
 
 const ToggleGroupContext = React.createContext<ToggleGroupContextValue>({
   size: "default",
   orientation: "horizontal",
+  pressedStyle: "solid",
 });
 
 export type ToggleGroupProps = BaseToggleGroup.Props &
@@ -101,9 +103,14 @@ function ToggleGroup({
   ...props
 }: ToggleGroupProps) {
   const resolvedSize = size ?? "default";
+  const resolvedPressedStyle = pressedStyle ?? "solid";
   const context = React.useMemo(
-    () => ({ size: resolvedSize, orientation }),
-    [resolvedSize, orientation],
+    () => ({
+      size: resolvedSize,
+      orientation,
+      pressedStyle: resolvedPressedStyle,
+    }),
+    [resolvedSize, orientation, resolvedPressedStyle],
   );
 
   return (
@@ -111,7 +118,7 @@ function ToggleGroup({
       data-slot="toggle-group"
       data-variant={variant ?? "soft"}
       data-size={resolvedSize}
-      data-pressed-style={pressedStyle ?? "solid"}
+      data-pressed-style={resolvedPressedStyle}
       orientation={orientation}
       className={cn(
         toggleGroupVariants({ variant, size, pressedStyle }),
@@ -155,7 +162,11 @@ const joinedClasses = {
   ),
 };
 
-export type ToggleGroupItemProps = Omit<ToggleProps, "variant" | "size">;
+// The group sets the pressed look, so items take no `pressedStyle` of their own.
+export type ToggleGroupItemProps = Omit<
+  ToggleProps,
+  "variant" | "size" | "pressedStyle"
+>;
 
 /** A `Toggle` sized and styled by its `ToggleGroup`. */
 function ToggleGroupItem({
@@ -163,7 +174,7 @@ function ToggleGroupItem({
   children,
   ...props
 }: ToggleGroupItemProps) {
-  const { size, orientation } = React.use(ToggleGroupContext);
+  const { size, orientation, pressedStyle } = React.use(ToggleGroupContext);
   const iconOnly = isIconOnly(
     children,
     props["aria-label"] || props["aria-labelledby"],
@@ -174,6 +185,7 @@ function ToggleGroupItem({
       data-slot="toggle-group-item"
       variant="ghost"
       size={size}
+      data-pressed-style={pressedStyle}
       data-icon-only={iconOnly || undefined}
       className={cn(itemClasses, joinedClasses[orientation], className)}
       {...props}

@@ -21,7 +21,7 @@ function CollapsibleTrigger({
     <BaseCollapsible.Trigger
       data-slot="collapsible-trigger"
       className={cn(
-        "bg-muted hover:bg-accent group hover:text-accent-foreground focus-visible:outline-ring flex w-full cursor-pointer items-center justify-between rounded-md border border-transparent px-3 py-2 text-left text-sm font-medium outline-0 transition-[outline] duration-100 ease-out focus-visible:outline-2 focus-visible:-outline-offset-1 disabled:pointer-events-none disabled:opacity-60",
+        "bg-muted hover:bg-accent group hover:text-accent-foreground focus-visible:outline-ring flex w-full cursor-pointer items-center justify-between rounded-md border border-transparent px-3 py-2 text-left text-sm font-medium outline-0 -outline-offset-1 outline-transparent transition-[outline-width,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:-outline-offset-1 disabled:pointer-events-none disabled:opacity-60",
         className,
       )}
       {...props}

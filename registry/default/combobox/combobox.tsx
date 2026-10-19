@@ -123,6 +123,7 @@ function ComboboxInput({
     // the input via absolute positioning + hand-tuned padding.
     <BaseCombobox.InputGroup
       data-slot="combobox-input-group"
+      data-variant={variant}
       className={cn(
         popup
           ? // An item's height, so the field reads as part of the list.
@@ -575,6 +576,7 @@ function ComboboxChips({
     <BaseCombobox.Chips
       ref={context?.setChipsElement}
       data-slot="combobox-chips"
+      data-variant={variant}
       className={cn(
         "flex min-h-9 w-full flex-wrap items-center gap-1.5 rounded-lg border border-transparent px-1.5 py-1.5",
         variant === "outline"

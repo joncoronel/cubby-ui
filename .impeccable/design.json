@@ -149,11 +149,6 @@
         "displayName": "Field Tint Hover",
         "canonical": "oklch(0 0 0 / 0.075)"
       },
-      "input-elevated": {
-        "role": "neutral",
-        "displayName": "Field Tint Elevated",
-        "canonical": "oklch(0 0 0 / 0.06)"
-      },
       "dark-input": {
         "role": "neutral",
         "displayName": "Field Tint (dark)",
@@ -163,11 +158,6 @@
         "role": "neutral",
         "displayName": "Field Tint Hover (dark)",
         "canonical": "oklch(1 0 0 / 0.09)"
-      },
-      "dark-input-elevated": {
-        "role": "neutral",
-        "displayName": "Field Tint Elevated (dark)",
-        "canonical": "oklch(1 0 0 / 0.07)"
       },
       "destructive": {
         "role": "status",
@@ -326,22 +316,22 @@
     "shadows": [
       {
         "name": "surface-shadow-1",
-        "value": "0 0 0 1px oklch(0 0 0 / 0.035)",
+        "value": "0 0 0 1px oklch(0 0 0 / 0.045)",
         "purpose": "Hairline ring; flush containers, the light chrome edge, landing gallery trays."
       },
       {
         "name": "surface-shadow-3",
-        "value": "0 0 0 1px oklch(0 0 0 / 0.035), 0 1px 1px -0.5px oklch(0 0 0 / 0.04), 0 3px 3px -1.5px oklch(0 0 0 / 0.04)",
+        "value": "0 0 0 1px oklch(0 0 0 / 0.045), 0 1px 1px -0.5px oklch(0 0 0 / 0.06), 0 3px 3px -1.5px oklch(0 0 0 / 0.06)",
         "purpose": "Resting cards. Fields take no shadow."
       },
       {
         "name": "surface-shadow-6",
-        "value": "0 0 0 1px oklch(0 0 0 / 0.035), 0 1px 1px -0.5px oklch(0 0 0 / 0.04), 0 3px 3px -1.5px oklch(0 0 0 / 0.04), 0 6px 6px -3px oklch(0 0 0 / 0.04), 0 12px 12px -6px oklch(0 0 0 / 0.035), 0 24px 24px -12px oklch(0 0 0 / 0.035)",
+        "value": "0 0 0 1px oklch(0 0 0 / 0.045), 0 1px 1px -0.5px oklch(0 0 0 / 0.06), 0 3px 3px -1.5px oklch(0 0 0 / 0.06), 0 6px 6px -3px oklch(0 0 0 / 0.06), 0 12px 12px -6px oklch(0 0 0 / 0.05), 0 24px 24px -12px oklch(0 0 0 / 0.05)",
         "purpose": "Popovers, menus, the landing hero stage (rung 3 fill, rung 6 shadow)."
       },
       {
         "name": "surface-shadow-8",
-        "value": "0 0 0 1px oklch(0 0 0 / 0.035), 0 1px 1px -0.5px oklch(0 0 0 / 0.04), 0 3px 3px -1.5px oklch(0 0 0 / 0.04), 0 6px 6px -3px oklch(0 0 0 / 0.04), 0 12px 12px -6px oklch(0 0 0 / 0.035), 0 24px 24px -12px oklch(0 0 0 / 0.035), 0 48px 48px -24px oklch(0 0 0 / 0.03), 0 96px 96px -48px oklch(0 0 0 / 0.03)",
+        "value": "0 0 0 1px oklch(0 0 0 / 0.045), 0 1px 1px -0.5px oklch(0 0 0 / 0.06), 0 3px 3px -1.5px oklch(0 0 0 / 0.06), 0 6px 6px -3px oklch(0 0 0 / 0.06), 0 12px 12px -6px oklch(0 0 0 / 0.05), 0 24px 24px -12px oklch(0 0 0 / 0.05), 0 48px 48px -24px oklch(0 0 0 / 0.04), 0 96px 96px -48px oklch(0 0 0 / 0.04)",
         "purpose": "Top of the ladder: dialogs and the highest floats."
       },
       {
@@ -581,7 +571,7 @@
       "refersTo": "landing-command-bar",
       "description": "Hero signature: tab pills, a stage card of live demos, and a neutral install command joined beneath with the component name in Slug Blue.",
       "html": "<div class=\"ds-sc\"><div class=\"ds-sc-tabs\"><button class=\"ds-sc-tab ds-sc-tab-on\">Text Morph<span class=\"ds-sc-dwell\"></span></button><button class=\"ds-sc-tab\">Circular Slider</button><button class=\"ds-sc-tab\">Tree</button><button class=\"ds-sc-tab\">QR Code</button></div><div class=\"ds-sc-card\"><div class=\"ds-sc-stage\">$1,234.56</div><div class=\"ds-sc-cmd\"><code><span class=\"ds-sc-dollar\">$ </span>pnpm dlx shadcn@latest add @cubby-ui/<span class=\"ds-sc-slug\">text-morph</span></code></div></div></div>",
-      "css": ".ds-sc { background: oklch(0.5 0.14 232.65); border-radius: 28px; padding: 24px; display: flex; flex-direction: column; gap: 12px; font-family: Geist, ui-sans-serif, system-ui, sans-serif; } .ds-sc-tabs { display: flex; gap: 4px; } .ds-sc-tab { position: relative; overflow: hidden; height: 32px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; color: oklch(0.9 0.04 232.65); font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; outline: 0 solid transparent; outline-offset: 2px; } .ds-sc-tab:hover { background: oklch(1 0 0 / 0.16); color: oklch(0.985 0.008 232.65); } .ds-sc-tab:focus-visible { outline: 2px solid oklch(0.985 0.008 232.65); } .ds-sc-tab-on, .ds-sc-tab-on:hover { background: oklch(0.985 0.008 232.65); color: oklch(0.5 0.14 232.65); } .ds-sc-dwell { position: absolute; left: 12px; right: 12px; bottom: 4px; height: 1px; background: color-mix(in oklab, oklch(0.5 0.14 232.65) 40%, transparent); transform-origin: left; animation: ds-dwell 5.2s linear infinite; } @keyframes ds-dwell { from { transform: scaleX(0); } } @media (prefers-reduced-motion: reduce) { .ds-sc-dwell { animation: none; } } .ds-sc-card { overflow: hidden; border-radius: 20px; background: oklch(1 0 0); box-shadow: 0 0 0 1px oklch(0 0 0 / 0.035), 0 3px 3px -1.5px oklch(0 0 0 / 0.04), 0 12px 12px -6px oklch(0 0 0 / 0.035), 0 24px 24px -12px oklch(0 0 0 / 0.035); } .ds-sc-stage { height: 15rem; padding: 20px; display: flex; align-items: center; justify-content: center; font: 600 40px/1 Geist, ui-sans-serif, system-ui, sans-serif; color: oklch(0.3 0.004 270); } .ds-sc-cmd { background: var(--muted, oklch(0.955 0 0)); color: oklch(0.3 0.004 270); border-top: 1px solid color-mix(in oklab, oklch(0.3 0.004 270) 10%, transparent); padding: 10px 8px 10px 16px; font: 13px/1.4 'Geist Mono', ui-monospace, monospace; white-space: nowrap; overflow-x: auto; scrollbar-width: none; } .ds-sc-dollar { color: oklch(0.53 0.004 270); } .ds-sc-slug { color: oklch(0.5 0.13 232.65); font-weight: 500; }"
+      "css": ".ds-sc { background: oklch(0.5 0.14 232.65); border-radius: 28px; padding: 24px; display: flex; flex-direction: column; gap: 12px; font-family: Geist, ui-sans-serif, system-ui, sans-serif; } .ds-sc-tabs { display: flex; gap: 4px; } .ds-sc-tab { position: relative; overflow: hidden; height: 32px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; color: oklch(0.9 0.04 232.65); font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; outline: 0 solid transparent; outline-offset: 2px; } .ds-sc-tab:hover { background: oklch(1 0 0 / 0.16); color: oklch(0.985 0.008 232.65); } .ds-sc-tab:focus-visible { outline: 2px solid oklch(0.985 0.008 232.65); } .ds-sc-tab-on, .ds-sc-tab-on:hover { background: oklch(0.985 0.008 232.65); color: oklch(0.5 0.14 232.65); } .ds-sc-dwell { position: absolute; left: 12px; right: 12px; bottom: 4px; height: 1px; background: color-mix(in oklab, oklch(0.5 0.14 232.65) 40%, transparent); transform-origin: left; animation: ds-dwell 5.2s linear infinite; } @keyframes ds-dwell { from { transform: scaleX(0); } } @media (prefers-reduced-motion: reduce) { .ds-sc-dwell { animation: none; } } .ds-sc-card { overflow: hidden; border-radius: 20px; background: oklch(1 0 0); box-shadow: 0 0 0 1px oklch(0 0 0 / 0.045), 0 3px 3px -1.5px oklch(0 0 0 / 0.06), 0 12px 12px -6px oklch(0 0 0 / 0.05), 0 24px 24px -12px oklch(0 0 0 / 0.05); } .ds-sc-stage { height: 15rem; padding: 20px; display: flex; align-items: center; justify-content: center; font: 600 40px/1 Geist, ui-sans-serif, system-ui, sans-serif; color: oklch(0.3 0.004 270); } .ds-sc-cmd { background: var(--muted, oklch(0.955 0 0)); color: oklch(0.3 0.004 270); border-top: 1px solid color-mix(in oklab, oklch(0.3 0.004 270) 10%, transparent); padding: 10px 8px 10px 16px; font: 13px/1.4 'Geist Mono', ui-monospace, monospace; white-space: nowrap; overflow-x: auto; scrollbar-width: none; } .ds-sc-dollar { color: oklch(0.53 0.004 270); } .ds-sc-slug { color: oklch(0.5 0.13 232.65); font-weight: 500; }"
     },
     {
       "name": "Landing Gallery Card",
@@ -589,7 +579,7 @@
       "refersTo": "landing-gallery-card",
       "description": "The docs example tray: a live component on a page-background card inside a muted 20px tray, name, description and a round docs arrow on the tray below.",
       "html": "<article class=\"ds-gc\"><div class=\"ds-gc-demo\"><button class=\"ds-gc-sample\">Live component</button></div><div class=\"ds-gc-foot\"><div><h3 class=\"ds-gc-name\">Circular Slider</h3><p class=\"ds-gc-desc\">A round slider for values on a dial.</p></div><a class=\"ds-gc-arrow\" href=\"#\" aria-label=\"Circular Slider docs\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9 6l6 6-6 6\"/></svg></a></div></article>",
-      "css": ".ds-gc { display: flex; flex-direction: column; max-width: 360px; padding: 4px; border-radius: 20px; background: var(--muted, oklch(0.955 0 0)); color: oklch(0.3 0.004 270); box-shadow: 0 0 0 1px oklch(0 0 0 / 0.035); font-family: Geist, ui-sans-serif, system-ui, sans-serif; } .ds-gc-demo { min-height: 16rem; display: flex; align-items: center; justify-content: center; padding: 40px 24px; border-radius: 16px; background: var(--background, oklch(0.97 0 0)); } .ds-gc-sample { height: 36px; padding: 0 14px; border: 0; border-radius: 12px; background: oklch(0.68 0.16 232.65); color: white; font-family: inherit; font-size: 14px; font-weight: 500; } .ds-gc-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; padding: 14px 16px 12px; } .ds-gc-name { margin: 0; font: 600 19px/1.25 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.01em; } .ds-gc-desc { margin: 4px 0 0; font-size: 14px; color: oklch(0.53 0.004 270); } .ds-gc-arrow { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 999px; color: oklch(0.53 0.004 270); outline: 0 solid transparent; outline-offset: 2px; } .ds-gc-arrow:hover { color: oklch(0.3 0.004 270); background: oklch(0 0 0 / 0.06); } .ds-gc-arrow:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.7 0.15 232.65) 50%, transparent); }"
+      "css": ".ds-gc { display: flex; flex-direction: column; max-width: 360px; padding: 4px; border-radius: 20px; background: var(--muted, oklch(0.955 0 0)); color: oklch(0.3 0.004 270); box-shadow: 0 0 0 1px oklch(0 0 0 / 0.045); font-family: Geist, ui-sans-serif, system-ui, sans-serif; } .ds-gc-demo { min-height: 16rem; display: flex; align-items: center; justify-content: center; padding: 40px 24px; border-radius: 16px; background: var(--background, oklch(0.97 0 0)); } .ds-gc-sample { height: 36px; padding: 0 14px; border: 0; border-radius: 12px; background: oklch(0.68 0.16 232.65); color: white; font-family: inherit; font-size: 14px; font-weight: 500; } .ds-gc-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; padding: 14px 16px 12px; } .ds-gc-name { margin: 0; font: 600 19px/1.25 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.01em; } .ds-gc-desc { margin: 4px 0 0; font-size: 14px; color: oklch(0.53 0.004 270); } .ds-gc-arrow { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 999px; color: oklch(0.53 0.004 270); outline: 0 solid transparent; outline-offset: 2px; } .ds-gc-arrow:hover { color: oklch(0.3 0.004 270); background: oklch(0 0 0 / 0.06); } .ds-gc-arrow:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.7 0.15 232.65) 50%, transparent); }"
     }
   ],
   "narrative": {

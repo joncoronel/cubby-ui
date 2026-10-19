@@ -66,7 +66,7 @@ const fields: FilterField[] = [
       {
         value: "docs",
         label: "Docs",
-        icon: <Dot className="bg-[oklch(0.6_0.2_250)]" />,
+        icon: <Dot className="bg-[oklch(0.68_0.16_232.65)]" />,
       },
     ],
   },

@@ -181,10 +181,11 @@ A line between items. Wraps [`Separator`](/docs/components/separator); its `orie
 
 If you're reinstalling over an earlier version, check these changes:
 
-| Before                                        | Now                                                                               |
-| --------------------------------------------- | --------------------------------------------------------------------------------- |
-| `variant="solid"`, a muted track, the default | `variant="soft"` is the default and closest to the old track.                     |
-| `detached` split items into separate toggles  | Removed; items join in one shell. For standalone toggles, use separate `Toggle`s. |
-| `separators` drew lines between every item    | Place a `ToggleGroupSeparator` where you want one.                                |
-| `ToggleGroupItem` took `variant` and `size`   | Both come from the group.                                                         |
-| Recolored with `--tgl-bg-selected` on items   | Set `--toggle-group-selected-bg` and `--toggle-group-selected-fg` on the group.   |
+| Before                                        | Now                                                                                                         |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `variant="solid"`, a muted track, the default | `variant="soft"` is the default and closest to the old track.                                               |
+| `detached` split items into separate toggles  | Removed; items join in one shell. For standalone toggles, use separate `Toggle`s.                           |
+| `separators` drew lines between every item    | Place a `ToggleGroupSeparator` where you want one.                                                          |
+| `ToggleGroupItem` took `variant` and `size`   | Both come from the group.                                                                                   |
+| Recolored with `--tgl-bg-selected` on items   | Set `--toggle-group-selected-bg` and `--toggle-group-selected-fg` on the group.                             |
+| Pressed items took a 16% label-color tint     | They fill with the emphasis grey (`pressedStyle="solid"`). Pass `pressedStyle="subtle"` for a quieter tint. |

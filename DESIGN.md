@@ -312,12 +312,12 @@ The table of contents is a fixed tick minimap in the right margin at the xl brea
 
 ## Elevation & Depth
 
-A hybrid, kept soft: light mode keeps fills neutral and communicates elevation with faint layered shadow (ring 3.5%, contact and mid 4%, far 3.5%, ambient 3%); dark mode steps lightness up the tinted ladder, adds an inset top-edge highlight and ring, and uses darker, tighter shadow alphas so wide layers stay visible; its outer black ring climbs from 8% at rung 3 to 18% at rung 8. Every rung is one shadow token plus one rim token, combined as `--surface-shadow-combined-N`. State overlays (`--surface-hover` 6%, `--surface-active` 8%, `--surface-selected` 10%, black in light, white in dark) raise whatever they sit on by a fixed perceptual delta.
+A hybrid, kept soft: light mode keeps fills neutral and communicates elevation with layered shadow under a faint edge (ring 4.5%; contact and mid 6%, far 5%, ambient 4%), since a crisp line reads as a border while the blurred drops carry the lift; dark mode steps lightness up the tinted ladder, adds an inset top-edge highlight and ring, and uses darker, tighter shadow alphas so wide layers stay visible; its outer black ring climbs from 8% at rung 3 to 18% at rung 8. Every rung is one shadow token plus one rim token, combined as `--surface-shadow-combined-N`. State overlays (`--surface-hover` 6%, `--surface-active` 8%, `--surface-selected` 10%, black in light, white in dark) raise whatever they sit on by a fixed perceptual delta.
 
 ### Shadow Vocabulary
-- **Hairline ring** (`box-shadow: 0 0 0 1px oklch(0 0 0 / 0.035)`, rung 1): flush containers that need an edge without lift; also the light chrome edge.
-- **Resting card** (rung 3: `0 0 0 1px oklch(0 0 0 / 0.035), 0 1px 1px -0.5px oklch(0 0 0 / 0.04), 0 3px 3px -1.5px oklch(0 0 0 / 0.04)`): cards at rest. Fields take no shadow; their fill is their definition.
-- **Floating** (rungs 5 to 8, adding 12px, 24px, 48px, and 96px layers at 0.035 to 0.03 alpha): popovers, dialogs, menus.
+- **Hairline ring** (`box-shadow: 0 0 0 1px oklch(0 0 0 / 0.045)`, rung 1): flush containers that need an edge without lift; also the light chrome edge.
+- **Resting card** (rung 3: `0 0 0 1px oklch(0 0 0 / 0.045), 0 1px 1px -0.5px oklch(0 0 0 / 0.06), 0 3px 3px -1.5px oklch(0 0 0 / 0.06)`): cards at rest. Fields take no shadow; their fill is their definition.
+- **Floating** (rungs 5 to 8, adding 12px, 24px, 48px, and 96px layers at 0.05 to 0.04 alpha): popovers, dialogs, menus.
 - **Docs float** (`0 0 0 1px var(--border), 0 16px 40px -12px oklch(0 0 0 / 0.14)`, dark 0.5): menus and the minimap's PreviewCard use the component's own surface. The shelf window takes its fill and shadow from the surface ladder (`solidSurface(3, 5)`), like the other floating controls.
 - **Dark chrome edge** (`0 0 0 1px oklch(0 0 0 / 0.7), inset 0 1px 0 0 oklch(1 0 0 / 0.065)`): defines the chrome fill against a dark page.
 - **Stage outline** (`0 0 0 1px var(--border)`): previews are drawn, not lifted.

@@ -190,3 +190,12 @@ const invalidFeedback = useInvalidFeedback();
 | `handleValueInvalid` | `(value: string) => void` | Triggers shake animation and status message. Wire to `OTPField`'s `onValueInvalid`. |
 | `className`          | `string \| undefined`     | Shake className while feedback is active, or `undefined`. Pass to `OTPField`.       |
 | `statusMessage`      | `string`                  | Screen reader announcement. Render inside an `aria-live="polite"` region.           |
+
+## Upgrading
+
+If you're reinstalling over an earlier version, check these changes:
+
+| Before                                               | Now                                                                                                              |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `variant="elevated"` for fields on Cards and Dialogs | Removed. The default fill is now a translucent tint that reads on the page, a Card or a popup, so drop the prop. |
+| One filled style                                     | `variant="outline"` adds a bordered style, matching the outline Button.                                          |

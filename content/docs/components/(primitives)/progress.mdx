@@ -202,3 +202,12 @@ The formatted value text, hidden while indeterminate. Wraps Base UI's `Progress.
 | `--progress-color`   | Root    | Indicator and buffer color, set by `color`.      |
 | `--progress-buffer`  | Root    | The `buffer` value as a percentage of the track. |
 | `--progress-percent` | Root    | The value as a unitless number from 0 to 100.    |
+
+## Upgrading
+
+If you're reinstalling over an earlier version, check these changes:
+
+| Before                                           | Now                                                                                         |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| `variant` set the indicator color                | Renamed to `color`, with the same status values.                                            |
+| `variant="default"` filled with the primary blue | The default is now `neutral`, the emphasis grey. Pass `color="primary"` for the brand fill. |

@@ -467,3 +467,11 @@ interface FilterValue {
 | `resolveOperators(field)`               | A field's operators after `operators` and `disabledOperators`.          |
 | `scalarOperatorFor(field)`              | The first operator that takes one value.                                |
 | `withOption(field, value, option)`      | Adds an option to a multiselect value, or replaces any other.           |
+
+## Upgrading
+
+If you're reinstalling over an earlier version, check these changes:
+
+| Before                              | Now                                                                               |
+| ----------------------------------- | --------------------------------------------------------------------------------- |
+| `variant="outline"` was the default | The default is `soft`, a filled shell. Pass `variant="outline"` for the old look. |

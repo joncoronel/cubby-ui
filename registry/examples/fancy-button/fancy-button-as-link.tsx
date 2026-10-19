@@ -16,7 +16,7 @@ export default function FancyButtonAsLink() {
       <FancyButton
         nativeButton={false}
         render={<Link href="https://example.com" target="_blank" />}
-        color="oklch(0.7 0.2 250)"
+        color="oklch(0.68 0.16 232.65)"
         rightSection={<HugeiconsIcon icon={LinkSquare02Icon} strokeWidth={2} />}
       >
         External Link

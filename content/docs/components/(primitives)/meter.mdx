@@ -204,3 +204,12 @@ The filled part of the track, colored by status. Wraps Base UI's `Meter.Indicato
 | `--meter-segment-gap`  | Track   | Gap between segments. Defaults to `3px`.                     |
 | `--meter-target-start` | Root    | Where the target range starts, as a percentage of the track. |
 | `--meter-target-size`  | Root    | Width of the target range, as a percentage of the track.     |
+
+## Upgrading
+
+If you're reinstalling over an earlier version, check these changes:
+
+| Before                                     | Now                                                                      |
+| ------------------------------------------ | ------------------------------------------------------------------------ |
+| `variant="default"` or `variant="neutral"` | Renamed to `color="primary"` or `color="neutral"`.                       |
+| Filled with the primary blue by default    | The default is now `neutral`. Pass `color="primary"` for the brand fill. |

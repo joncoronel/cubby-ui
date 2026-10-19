@@ -336,7 +336,7 @@ function GalleryCard({
         <Link
           href={`/docs/components/${slug}`}
           aria-label={`${name} docs`}
-          className="text-muted-foreground hover:text-foreground hover:bg-surface-hover focus-visible:outline-ring/50 inline-flex size-9 shrink-0 items-center justify-center rounded-full outline-0 outline-offset-2 outline-transparent outline-solid focus-visible:outline-2"
+          className="text-muted-foreground hover:text-foreground hover:bg-surface-hover focus-visible:outline-ring inline-flex size-9 shrink-0 items-center justify-center rounded-full outline-0 -outline-offset-1 outline-transparent outline-solid focus-visible:outline-2"
         >
           <HugeiconsIcon
             icon={ArrowRight01Icon}

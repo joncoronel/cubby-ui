@@ -242,9 +242,11 @@ Wraps Base UI's `NumberField.ScrubArea`. Outside the group it wraps a label; ins
 
 If you're reinstalling over an earlier version, check these changes:
 
-| Before                                            | Now                                                                        |
-| ------------------------------------------------- | -------------------------------------------------------------------------- |
-| Bordered input fused between bordered buttons     | One shell with the input and steppers inside. Remove any per-part borders. |
-| Steppers needed an icon child                     | Minus and plus by default. Existing icon children still work.              |
-| `NumberFieldScrubAreaCursor` needed an icon child | A two-way arrow by default.                                                |
-| `NumberFieldInput` was `w-24`                     | `w-16`. Pass a width for formatted values, like `className="w-24"`.        |
+| Before                                               | Now                                                                                                              |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Bordered input fused between bordered buttons        | One shell with the input and steppers inside. Remove any per-part borders.                                       |
+| Steppers needed an icon child                        | Minus and plus by default. Existing icon children still work.                                                    |
+| `NumberFieldScrubAreaCursor` needed an icon child    | A two-way arrow by default.                                                                                      |
+| `NumberFieldInput` was `w-24`                        | `w-16`. Pass a width for formatted values, like `className="w-24"`.                                              |
+| `variant="elevated"` for fields on Cards and Dialogs | Removed. The default fill is now a translucent tint that reads on the page, a Card or a popup, so drop the prop. |
+| One filled style                                     | `variant="outline"` adds a bordered style, matching the outline Button.                                          |

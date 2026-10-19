@@ -50,11 +50,11 @@ const numberFieldGroupVariants = cva(
   },
 );
 
-// Ghost Button recipe, sized by the shell. Hover and press are the label
-// color at 10% / 14%, as in Button Group.
+// Ghost Button recipe, sized by the shell. Hover and press are the pure
+// neutral overlays, as in Button Group.
 const stepperClasses = cn(
   buttonVariants({ variant: "ghost", size: null }),
-  "aspect-square h-auto self-stretch border-2 border-transparent text-sm rounded-(--number-field-item-radius) [--btn-bg-hover:color-mix(in_oklab,currentColor_10%,transparent)] [--btn-bg-active:color-mix(in_oklab,currentColor_14%,transparent)]",
+  "aspect-square h-auto self-stretch border-2 border-transparent text-sm rounded-(--number-field-item-radius) [--btn-bg-hover:var(--surface-active)] [--btn-bg-active:var(--surface-selected)]",
 );
 
 type NumberFieldProps = BaseNumberField.Root.Props;

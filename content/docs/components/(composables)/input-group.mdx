@@ -109,7 +109,8 @@ The field's border and fill. Renders a `div` with `role="group"`.
   simpleType="string"
   defaultValue='"default"'
 >
-  Fill of the shell. `default` is a filled translucent tint that reads on any surface. `outline` uses the outline Button's fill and hairline edge.
+  Fill of the shell. `default` is a filled translucent tint that reads on any
+  surface. `outline` uses the outline Button's fill and hairline edge.
 </ApiProp>
 
 <ApiProp
@@ -182,10 +183,12 @@ Muted text for an addon, like a prefix or a count. Renders a `span`.
 
 If you're reinstalling over an earlier version, check these changes:
 
-| Before                                        | Now                                                                                        |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| The group was 2px taller than an `Input`      | It matches `Input`'s height. Set `size="sm"` to match a small one.                         |
-| `InputGroupButton` sizes `xs` and `sm`        | `size="default"`.                                                                          |
-| `InputGroupButton` sizes `icon_xs`, `icon_sm` | `size="icon"`.                                                                             |
-| Inline buttons floated with their own corners | They fill the field's height with corners concentric to it; drop `rounded-full` overrides. |
-| Clicking an addon focused only an input       | It focuses a textarea too.                                                                 |
+| Before                                               | Now                                                                                                              |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| The group was 2px taller than an `Input`             | It matches `Input`'s height. Set `size="sm"` to match a small one.                                               |
+| `InputGroupButton` sizes `xs` and `sm`               | `size="default"`.                                                                                                |
+| `InputGroupButton` sizes `icon_xs`, `icon_sm`        | `size="icon"`.                                                                                                   |
+| Inline buttons floated with their own corners        | They fill the field's height with corners concentric to it; drop `rounded-full` overrides.                       |
+| Clicking an addon focused only an input              | It focuses a textarea too.                                                                                       |
+| `variant="elevated"` for fields on Cards and Dialogs | Removed. The default fill is now a translucent tint that reads on the page, a Card or a popup, so drop the prop. |
+| One filled style                                     | `variant="outline"` adds a bordered style, matching the outline Button.                                          |

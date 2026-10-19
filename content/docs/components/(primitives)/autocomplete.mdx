@@ -357,3 +357,12 @@ See [useFuzzyFilter](/docs/hooks/use-fuzzy-filter) for full documentation and AP
 Provides virtualization for large autocomplete lists using TanStack Virtual. Abstracts scroll handling, item positioning, and keyboard navigation.
 
 See [useListVirtualizer](/docs/hooks/use-list-virtualizer) for full documentation and API reference.
+
+## Upgrading
+
+If you're reinstalling over an earlier version, check these changes:
+
+| Before                                               | Now                                                                                                              |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `variant="elevated"` for fields on Cards and Dialogs | Removed. The default fill is now a translucent tint that reads on the page, a Card or a popup, so drop the prop. |
+| One filled style                                     | `variant="outline"` adds a bordered style, matching the outline Button.                                          |

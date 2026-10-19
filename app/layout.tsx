@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import {
   Bricolage_Grotesque,
   Geist,
@@ -54,14 +54,6 @@ export const metadata: Metadata = {
     apple: "/apple-icon.png",
   },
 };
-
-// export const viewport: Viewport = {
-//   colorScheme: "light dark",
-//   themeColor: [
-//     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-//     { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
-//   ],
-// };
 
 // Display face for headings across the whole site (home and docs).
 const display = Bricolage_Grotesque({

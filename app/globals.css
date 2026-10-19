@@ -195,13 +195,13 @@ html {
      doesn't read with 3 of 4 edges at the viewport boundary. */
   --surface-rim-color: oklch(0 0 0 / 0);
 
-  /* Opacity falls as blur grows, mimicking light fall-off. The 1px ring stays
-     at full opacity so elevated containers keep a defined edge. */
-  --surface-shadow-ring: oklch(0 0 0 / 0.035); /* crisp edge */
-  --surface-shadow-near: oklch(0 0 0 / 0.04); /* 1px blur (contact) */
-  --surface-shadow-mid: oklch(0 0 0 / 0.04); /* 3–6px blur */
-  --surface-shadow-far: oklch(0 0 0 / 0.035); /* 12–24px blur */
-  --surface-shadow-ambient: oklch(0 0 0 / 0.03); /* 48–96px blur */
+  /* Opacity falls as blur grows, mimicking light fall-off. The 1px ring is kept
+     faint, since a crisp line reads as a border; the blurred drops carry the lift. */
+  --surface-shadow-ring: oklch(0 0 0 / 0.045); /* crisp edge */
+  --surface-shadow-near: oklch(0 0 0 / 0.06); /* 1px blur (contact) */
+  --surface-shadow-mid: oklch(0 0 0 / 0.06); /* 3–6px blur */
+  --surface-shadow-far: oklch(0 0 0 / 0.05); /* 12–24px blur */
+  --surface-shadow-ambient: oklch(0 0 0 / 0.04); /* 48–96px blur */
   --surface-shadow-1: 0 0 0 1px var(--surface-shadow-ring);
   --surface-shadow-2:
     0 0 0 1px var(--surface-shadow-ring),

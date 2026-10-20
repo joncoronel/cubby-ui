@@ -72,6 +72,8 @@ function Checkbox({
         // Off: a 2px --control-off ring (the Switch track grey) around a white
         // middle. An inset shadow, not a border, so the inset-0 fill covers it.
         "bg-white shadow-[inset_0_0_0_2px_var(--control-off)] not-data-disabled:hover:shadow-[inset_0_0_0_2px_var(--control-off-hover)] dark:bg-transparent",
+        // Forced colors drop the shadow ring, so draw a system-color border.
+        "forced-colors:border forced-colors:border-[CanvasText]",
         // Background scale animation using ::before pseudo-element
         "before:absolute before:inset-0 before:rounded-xs before:bg-(--checkbox-fill) before:content-['']",
         "before:ease-out-expo before:origin-center before:scale-80 before:transform-gpu before:opacity-0 before:transition-[transform,opacity,scale] before:duration-200 before:will-change-transform motion-reduce:before:transition-none",

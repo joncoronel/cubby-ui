@@ -45,6 +45,8 @@ function RadioGroupItem({
         // Off: a 2px --control-off ring around a white middle. An inset shadow,
         // not a border, so the inset-0 Indicator covers it.
         "bg-white shadow-[inset_0_0_0_2px_var(--control-off)] not-data-disabled:hover:shadow-[inset_0_0_0_2px_var(--control-off-hover)] dark:bg-transparent",
+        // Forced colors drop the shadow ring, so draw a system-color border.
+        "forced-colors:border forced-colors:border-[CanvasText]",
         className,
       )}
       {...props}
@@ -58,6 +60,8 @@ function RadioGroupItem({
           "before:ease-out-expo before:size-full before:origin-center before:scale-50 before:rounded-full before:transition-[scale] before:duration-250 before:content-['']",
           "data-starting-style:before:scale-100",
           "data-ending-style:before:scale-100",
+          // Forced colors repaint backgrounds, so keep the dot in the text color.
+          "forced-colors:before:bg-[CanvasText] forced-colors:before:[forced-color-adjust:none]",
         )}
       />
     </Radio.Root>

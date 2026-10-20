@@ -71,12 +71,12 @@ function highlightText(text: string, query: string): ReactNode
 Matched text is wrapped in `<mark>` elements with the following default styles:
 
 ```tsx
-<mark className="text-primary bg-transparent font-bold">
+<mark className="bg-transparent font-bold text-(--primary-soft-foreground)">
   {matchedText}
 </mark>
 ```
 
-Matches read as `text-primary` with bold weight and no background.
+Matches render bold, with no background, in `--primary-soft-foreground`: a darker mix of the primary that stays legible as text.
 
 ## Implementation Details
 

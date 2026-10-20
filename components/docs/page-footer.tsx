@@ -5,7 +5,11 @@ import { ArrowLeft02Icon, ArrowRight02Icon } from "@hugeicons/core-free-icons";
 import { source } from "@/lib/source";
 import { cn } from "@/lib/utils";
 
-type Neighbour = { name: React.ReactNode; url: string; description?: React.ReactNode };
+type Neighbour = {
+  name: React.ReactNode;
+  url: string;
+  description?: React.ReactNode;
+};
 
 function NeighbourLink({
   item,
@@ -33,7 +37,7 @@ function NeighbourLink({
       href={item.url}
       aria-label={`${next ? "Next" : "Previous"}: ${typeof item.name === "string" ? item.name : ""}`}
       className={cn(
-        "group/neighbour focus-visible:outline-ring/50 flex min-w-0 flex-col gap-1.5 rounded-xl py-3 outline-none focus-visible:outline-2 focus-visible:outline-offset-4",
+        "group/neighbour focus-visible:outline-ring flex min-w-0 flex-col gap-1.5 rounded-xl py-3 outline-none focus-visible:outline-2 focus-visible:-outline-offset-1",
         next && "items-end text-right",
       )}
     >

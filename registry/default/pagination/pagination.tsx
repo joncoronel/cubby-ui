@@ -41,14 +41,14 @@ const paginationContentVariants = cva(
     "[--pagination-item-radius:max(0px,calc(var(--pagination-radius)-2px))]",
     // Fixed shell; links stretch to fill it
     "h-(--pagination-h)",
-    // Current page colors (override to recolor)
-    "[--pagination-current-bg:var(--neutral)] [--pagination-current-fg:var(--neutral-foreground)]",
+    // Current page: the emphasis grey every selection uses (override to recolor)
+    "[--pagination-current-bg:var(--emphasis)] [--pagination-current-fg:var(--emphasis-foreground)]",
   ],
   {
     variants: {
       variant: {
         // Outline draws its line as an outline just outside the shell.
-        outline: "bg-card outline outline-border",
+        outline: "bg-(--outline) outline outline-(--outline-border)",
         soft: "bg-secondary text-secondary-foreground",
         ghost: "",
       },
@@ -61,7 +61,7 @@ const paginationContentVariants = cva(
       },
     },
     defaultVariants: {
-      variant: "outline",
+      variant: "soft",
       size: "default",
     },
   },
@@ -80,7 +80,7 @@ function PaginationContent({
   return (
     <ul
       data-slot="pagination-content"
-      data-variant={variant ?? "outline"}
+      data-variant={variant ?? "soft"}
       data-size={size ?? "default"}
       className={cn(paginationContentVariants({ variant, size }), className)}
       {...props}
@@ -117,15 +117,15 @@ const linkClasses = cn(
   "box-content aspect-square h-auto self-stretch px-0 text-sm tabular-nums",
   // Box corners are the plate's + 2px; the focus ring is in pagination.css.
   "rounded-[calc(var(--pagination-item-radius)+2px)] before:rounded-(--pagination-item-radius)",
-  // Hover and press: the label color at 10% / 14%
-  "[--btn-bg-hover:color-mix(in_oklab,currentColor_10%,transparent)] [--btn-bg-active:color-mix(in_oklab,currentColor_14%,transparent)]",
+  // Hover and press: the pure 8% / 10% overlays (black, white in dark)
+  "[--btn-bg-hover:var(--surface-active)] [--btn-bg-active:var(--surface-selected)]",
   // Current page fallback fill, where the indicator can't glide
   "aria-[current=page]:text-(--pagination-current-fg) aria-[current=page]:hover:text-(--pagination-current-fg) aria-[current=page]:[--btn-bg:var(--pagination-current-bg)] aria-[current=page]:[--btn-bg-hover:var(--pagination-current-bg)] aria-[current=page]:[--btn-bg-active:var(--pagination-current-bg)]",
   "aria-disabled:pointer-events-none aria-disabled:opacity-60",
   // No transitions on the link: Chrome skips the indicator's slide when the
   // new current link starts one. Hover is instant; the press tint still
   // fades (Button's 100ms).
-  "transition-[outline-width,outline-offset,outline-color] before:[transition-duration:0ms,100ms,100ms] active:before:[transition-duration:100ms] aria-[current=page]:before:transition-none",
+  "transition-[outline-width,outline-color] before:[transition-duration:0ms,100ms,100ms] active:before:[transition-duration:100ms] aria-[current=page]:before:transition-none",
 );
 
 function PaginationLink({

@@ -9,7 +9,6 @@ type AccordionVariant =
   | "split"
   | "outline"
   | "nested"
-  | "isolated-bordered"
   | "isolated-filled"
   | "isolated-filled-bordered";
 
@@ -27,8 +26,10 @@ function Accordion({
       className={cn(
         "group flex w-full flex-col",
         variant === "split" && "space-y-2",
-        variant === "outline" && "bg-card overflow-hidden rounded-lg border",
-        variant === "nested" && "bg-muted rounded-lg border p-1",
+        variant === "outline" &&
+          "bg-muted overflow-hidden rounded-lg border border-transparent",
+        variant === "nested" &&
+          "bg-muted rounded-lg border border-transparent p-1",
         className,
       )}
       {...props}
@@ -45,27 +46,11 @@ function AccordionItem({ className, ...props }: BaseAccordion.Item.Props) {
         // Default variant styles
         "group-data-[variant=default]:border-b group-data-[variant=default]:last:border-b-0",
         // Split variant styles (individual cards)
-        "group-data-[variant=split]:bg-card group-data-[variant=split]:border-border group-data-[variant=split]:overflow-hidden group-data-[variant=split]:rounded-lg group-data-[variant=split]:border",
+        "group-data-[variant=split]:bg-muted group-data-[variant=split]:overflow-hidden group-data-[variant=split]:rounded-lg group-data-[variant=split]:border group-data-[variant=split]:border-transparent",
         // Outline variant styles (items within single card)
         "group-data-[variant=outline]:border-border group-data-[variant=outline]:border-b group-data-[variant=outline]:last:border-b-0",
         // Nested variant styles - items within the single outer card
         "group-data-[variant=nested]:mt-0.5 group-data-[variant=nested]:first:mt-0",
-        // Isolated bordered variant styles - dynamically separates open items from closed ones
-        // Base styles: all items have borders and background to look like cards
-        "group-data-[variant=isolated-bordered]:bg-card group-data-[variant=isolated-bordered]:border-border group-data-[variant=isolated-bordered]:overflow-hidden group-data-[variant=isolated-bordered]:border",
-        // Closed items: group together by overlapping borders with negative margin
-        // Only apply to closed items that follow another closed item (not open items, first item, or items after open items)
-        "group-data-[variant=isolated-bordered]:relative group-data-[variant=isolated-bordered]:not-first:not-data-open:not-[[data-open]+&]:-mt-px",
-        // Opened item - separated with margins
-        "group-data-[variant=isolated-bordered]:data-open:mt-2 group-data-[variant=isolated-bordered]:data-open:mb-2 group-data-[variant=isolated-bordered]:data-open:rounded-lg",
-        // First item
-        "group-data-[variant=isolated-bordered]:first:rounded-t-lg group-data-[variant=isolated-bordered]:data-open:first:mt-0",
-        // Last item
-        "group-data-[variant=isolated-bordered]:last:rounded-b-lg group-data-[variant=isolated-bordered]:data-open:last:mb-0",
-        // Item after open item: round top corners (start of new group)
-        "group-data-[variant=isolated-bordered]:[[data-open]+&]:rounded-t-lg",
-        // Item before open item: round bottom corners (end of group)
-        "group-data-[variant=isolated-bordered]:[&:has(+_[data-open])]:rounded-b-lg",
         // Isolated filled variant
         "group-data-[variant=isolated-filled]:bg-muted group-data-[variant=isolated-filled]:overflow-hidden",
         // Opened item - separated with margins and rounded
@@ -233,7 +218,6 @@ function AccordionContent({
           // Nested variant
           "group-data-[variant=nested]:bg-background group-data-[variant=nested]:mt-1 group-data-[variant=nested]:mb-0.5 group-data-[variant=nested]:rounded-sm group-data-[variant=nested]:border group-data-[variant=nested]:p-3 group-data-[variant=nested]:[[data-slot=accordion-item]:last-child_&]:mb-0",
           // Isolated bordered variant
-          "group-data-[variant=isolated-bordered]:pt-0",
           // Isolated filled variant
           "group-data-[variant=isolated-filled]:pt-0",
           // Isolated filled bordered variant

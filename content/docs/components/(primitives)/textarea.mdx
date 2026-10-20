@@ -46,16 +46,16 @@ Set `disabled` to block input and dim the field.
 
 <ComponentPreview component="textarea" example="textarea-disabled-state" />
 
-### Elevated Variant
+### Outline Variant
 
-Use `variant="elevated"` for a translucent overlay that adapts to the substrate, so the field reads clearly on a Card, Dialog, or popover instead of collapsing into it. See the [Surfaces](/docs/getting-started/surfaces) docs.
+Use `variant="outline"` to match the outline Button: a card fill with a hairline border in light mode, a recessed fill with a faint ring in dark mode. The `default` tint already reads on the page, Cards, Dialogs, and popovers, so no field needs a per-surface variant.
 
-<ComponentPreview component="textarea" example="textarea-elevated" />
+<ComponentPreview component="textarea" example="textarea-outline" />
 
-| Variant    | Description                                                  |
-| ---------- | ----------------------------------------------------------- |
-| `default`  | Opaque `bg-input`, for fields on the page background.       |
-| `elevated` | Translucent `bg-input-elevated`, for raised surfaces.       |
+| Variant   | Description                                   |
+| --------- | --------------------------------------------- |
+| `default` | A translucent tint that reads on any surface. |
+| `outline` | The outline Button's fill and hairline edge.  |
 
 ## API Reference
 
@@ -65,11 +65,21 @@ Use `variant="elevated"` for a translucent overlay that adapts to the substrate,
 
 <ApiProp
   name="variant"
-  fullType='"default" | "elevated"'
+  fullType='"default" | "outline"'
   simpleType="string"
   defaultValue='"default"'
 >
-  Surface appearance. `default` uses opaque `bg-input`. `elevated` uses translucent `bg-input-elevated` for use inside Card, Dialog, or popover surfaces. See the [Surfaces](/docs/getting-started/surfaces) docs.
+  Sets the field's fill. `default` is a translucent tint that reads on any
+  surface; `outline` uses the outline Button's fill and hairline edge.
 </ApiProp>
 
 </ApiPropsList>
+
+## Upgrading
+
+If you're reinstalling over an earlier version, check these changes:
+
+| Before                                               | Now                                                                     |
+| ---------------------------------------------------- | ----------------------------------------------------------------------- |
+| `variant="elevated"` for fields on Cards and Dialogs | Removed. The default tint works on any surface, so drop the prop.       |
+| One filled style                                     | `variant="outline"` adds a bordered style, matching the outline Button. |

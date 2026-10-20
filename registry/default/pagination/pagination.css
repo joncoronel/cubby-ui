@@ -114,6 +114,6 @@
 
 [data-slot="pagination-content"]
   [data-slot="pagination-link"]:focus-visible::before {
-  outline: 2px solid color-mix(in oklab, var(--color-ring) 50%, transparent);
-  outline-offset: -2px;
+  outline: 2px solid var(--color-ring);
+  outline-offset: -1px;
 }

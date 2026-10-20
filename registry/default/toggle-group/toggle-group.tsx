@@ -24,10 +24,9 @@ const toggleGroupVariants = cva(
     "[--toggle-group-item-radius:max(0px,calc(var(--toggle-group-radius)-2px))]",
     // Small corners between neighbors, so pressed runs read as one control
     "[--toggle-group-inner-radius:min(3px,var(--toggle-group-item-radius))]",
-    // Label-color tints: hover 10%, press 14%, pressed 16%. Override the
-    // selected variables to recolor.
-    "[--toggle-group-highlight:color-mix(in_oklab,currentColor_10%,transparent)] [--toggle-group-press:color-mix(in_oklab,currentColor_14%,transparent)]",
-    "[--toggle-group-selected-bg:color-mix(in_oklab,currentColor_16%,transparent)] [--toggle-group-selected-fg:var(--foreground)]",
+    // Hover 8%, press 10%: black overlays (white in dark), not a cool-cast label
+    // tint. `pressedStyle` sets the pressed fill; override its variables to recolor.
+    "[--toggle-group-highlight:var(--surface-active)] [--toggle-group-press:var(--surface-selected)]",
     // A row is the ladder height and items stretch to fill it.
     "data-[orientation=horizontal]:h-(--toggle-group-h) data-[orientation=horizontal]:[&>[data-slot=toggle-group-item]]:aspect-square",
     "data-[orientation=horizontal]:[&>[data-slot=toggle-group-item]]:border-y-2 data-[orientation=horizontal]:[&>:nth-child(1_of_[data-slot=toggle-group-item])]:border-s-2 data-[orientation=horizontal]:[&>:nth-last-child(1_of_[data-slot=toggle-group-item])]:border-e-2",
@@ -45,8 +44,16 @@ const toggleGroupVariants = cva(
   ],
   {
     variants: {
+      // How pressed items look. Solid (the default) is the emphasis grey shared
+      // with Tabs and checkboxes; subtle is a quiet 12% overlay, like Toolbar.
+      pressedStyle: {
+        solid:
+          "[--toggle-group-selected-bg:var(--emphasis)] [--toggle-group-selected-fg:var(--emphasis-foreground)]",
+        subtle:
+          "[--toggle-group-selected-bg:oklch(0_0_0/12%)] dark:[--toggle-group-selected-bg:oklch(1_0_0/12%)] [--toggle-group-selected-fg:var(--foreground)]",
+      },
       variant: {
-        outline: "bg-card outline outline-border",
+        outline: "bg-(--outline) outline outline-(--outline-border)",
         soft: "bg-secondary",
         ghost: "",
       },
@@ -59,8 +66,9 @@ const toggleGroupVariants = cva(
       },
     },
     defaultVariants: {
-      variant: "outline",
+      variant: "soft",
       size: "default",
+      pressedStyle: "solid",
     },
   },
 );
@@ -72,11 +80,13 @@ type ToggleGroupSize = NonNullable<
 type ToggleGroupContextValue = {
   size: ToggleGroupSize;
   orientation: "horizontal" | "vertical";
+  pressedStyle: "solid" | "subtle";
 };
 
 const ToggleGroupContext = React.createContext<ToggleGroupContextValue>({
   size: "default",
   orientation: "horizontal",
+  pressedStyle: "solid",
 });
 
 export type ToggleGroupProps = BaseToggleGroup.Props &
@@ -86,23 +96,33 @@ function ToggleGroup({
   className,
   variant,
   size,
+  pressedStyle,
   orientation = "horizontal",
   children,
   ...props
 }: ToggleGroupProps) {
   const resolvedSize = size ?? "default";
+  const resolvedPressedStyle = pressedStyle ?? "solid";
   const context = React.useMemo(
-    () => ({ size: resolvedSize, orientation }),
-    [resolvedSize, orientation],
+    () => ({
+      size: resolvedSize,
+      orientation,
+      pressedStyle: resolvedPressedStyle,
+    }),
+    [resolvedSize, orientation, resolvedPressedStyle],
   );
 
   return (
     <BaseToggleGroup
       data-slot="toggle-group"
-      data-variant={variant ?? "outline"}
+      data-variant={variant ?? "soft"}
       data-size={resolvedSize}
+      data-pressed-style={resolvedPressedStyle}
       orientation={orientation}
-      className={cn(toggleGroupVariants({ variant, size }), className)}
+      className={cn(
+        toggleGroupVariants({ variant, size, pressedStyle }),
+        className,
+      )}
       {...props}
     >
       <ToggleGroupContext.Provider value={context}>
@@ -117,7 +137,7 @@ const itemClasses = cn(
   // Icon-only items drop their padding, so they're square.
   "data-icon-only:px-0",
   // Box corners are the plate's + 2px; the focus ring sits on the plate.
-  "rounded-[calc(var(--toggle-group-item-radius)+2px)] before:rounded-(--toggle-group-item-radius) focus-visible:outline-transparent focus-visible:before:outline-2 focus-visible:before:-outline-offset-2 focus-visible:before:outline-ring/50 focus-visible:z-10",
+  "rounded-[calc(var(--toggle-group-item-radius)+2px)] before:rounded-(--toggle-group-item-radius) focus-visible:outline-transparent focus-visible:before:outline-2 focus-visible:before:-outline-offset-2 focus-visible:before:outline-ring focus-visible:z-10",
   "[--tgl-bg-hover:var(--toggle-group-highlight)] [--tgl-bg-active:var(--toggle-group-press)] [--tgl-bg-selected:var(--toggle-group-selected-bg)]",
   // Label color
   "text-muted-foreground data-pressed:text-(--toggle-group-selected-fg) hover:not-data-pressed:text-foreground",
@@ -141,7 +161,11 @@ const joinedClasses = {
   ),
 };
 
-export type ToggleGroupItemProps = Omit<ToggleProps, "variant" | "size">;
+// The group sets the pressed look, so items take no `pressedStyle` of their own.
+export type ToggleGroupItemProps = Omit<
+  ToggleProps,
+  "variant" | "size" | "pressedStyle"
+>;
 
 /** A `Toggle` sized and styled by its `ToggleGroup`. */
 function ToggleGroupItem({
@@ -149,7 +173,7 @@ function ToggleGroupItem({
   children,
   ...props
 }: ToggleGroupItemProps) {
-  const { size, orientation } = React.use(ToggleGroupContext);
+  const { size, orientation, pressedStyle } = React.use(ToggleGroupContext);
   const iconOnly = isIconOnly(
     children,
     props["aria-label"] || props["aria-labelledby"],
@@ -160,6 +184,7 @@ function ToggleGroupItem({
       data-slot="toggle-group-item"
       variant="ghost"
       size={size}
+      data-pressed-style={pressedStyle}
       data-icon-only={iconOnly || undefined}
       className={cn(itemClasses, joinedClasses[orientation], className)}
       {...props}

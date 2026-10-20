@@ -167,8 +167,8 @@ Use `variant` to pick the shell the chips and the add button sit on.
 
 | Variant    | Description                                          |
 | ---------- | ---------------------------------------------------- |
-| `outline`  | The default. An outline Button's fill and border.    |
-| `soft`     | A secondary Button's fill, for quieter toolbars.     |
+| `outline`  | An outline Button's fill and border.                 |
+| `soft`     | The default. A secondary Button's fill.              |
 | `elevated` | A raised surface, for bars inside Cards and Dialogs. |
 
 A filter with no value yet shows a dashed border on every variant.
@@ -299,7 +299,7 @@ Filters composes Cubby UI primitives and has no Base UI root of its own.
   name="variant"
   fullType='"outline" | "soft" | "elevated"'
   simpleType="string"
-  defaultValue='"outline"'
+  defaultValue='"soft"'
 >
   Shell style of the chips and the add button.
 </ApiProp>
@@ -467,3 +467,11 @@ interface FilterValue {
 | `resolveOperators(field)`               | A field's operators after `operators` and `disabledOperators`.          |
 | `scalarOperatorFor(field)`              | The first operator that takes one value.                                |
 | `withOption(field, value, option)`      | Adds an option to a multiselect value, or replaces any other.           |
+
+## Upgrading
+
+If you're reinstalling over an earlier version, check these changes:
+
+| Before                              | Now                                                                               |
+| ----------------------------------- | --------------------------------------------------------------------------------- |
+| `variant="outline"` was the default | The default is `soft`, a filled shell. Pass `variant="outline"` for the old look. |

@@ -57,8 +57,8 @@ export function SearchTrigger() {
       onClick={() => setOpenSearch(true)}
       className={cn(
         "group text-muted-foreground hover:text-foreground flex h-9 items-center gap-2 rounded-full border border-transparent pr-1.5 pl-3 text-sm font-normal transition-colors",
-        "hover:border-border/70 hover:bg-card/70",
-        "focus-visible:outline-ring/50 outline-none focus-visible:outline-2 focus-visible:outline-offset-2",
+        "hover:bg-surface-hover",
+        "focus-visible:outline-ring outline-0 -outline-offset-1 outline-transparent outline-solid focus-visible:outline-2",
       )}
     >
       <HugeiconsIcon icon={Search01Icon} className="size-4" strokeWidth={2} />

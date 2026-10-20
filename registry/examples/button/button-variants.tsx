@@ -6,6 +6,8 @@ export default function ButtonVariants() {
       <Button>Primary</Button>
       <Button variant="primary-soft">Primary Soft</Button>
       <Button variant="neutral">Neutral</Button>
+      <Button variant="tonal">Tonal</Button>
+      <Button variant="field">Field</Button>
       <Button variant="secondary">Secondary</Button>
       <Button variant="outline">Outline</Button>
       <Button variant="outline-ghost">Outline Ghost</Button>

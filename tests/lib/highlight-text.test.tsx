@@ -115,7 +115,11 @@ describe("highlightText", () => {
       render(<>{result}</>);
 
       const mark = screen.getByText("World");
-      expect(mark).toHaveClass("text-primary", "bg-transparent", "font-bold");
+      expect(mark).toHaveClass(
+        "text-(--primary-soft-foreground)",
+        "bg-transparent",
+        "font-bold",
+      );
     });
   });
 });

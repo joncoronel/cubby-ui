@@ -47,25 +47,35 @@ const minusClasses = cn(
   "motion-reduce:[&_path]:transition-none",
 );
 
+// Checked fill: the shared selection-control grey, or the brand fill.
+const checkboxColors = {
+  neutral:
+    "[--checkbox-fill:var(--emphasis)] [--checkbox-mark:var(--emphasis-foreground)]",
+  primary:
+    "[--checkbox-fill:var(--primary)] [--checkbox-mark:var(--primary-foreground)]",
+};
+
 function Checkbox({
   className,
-  variant = "default",
+  color = "neutral",
   ...props
 }: React.ComponentProps<typeof BaseCheckbox.Root> & {
-  variant?: "default" | "elevated";
+  color?: "neutral" | "primary";
 }) {
   return (
     <BaseCheckbox.Root
       data-slot="checkbox"
+      data-color={color}
       className={cn(
-        "peer text-primary-foreground aria-invalid:outline-destructive/50 aria-invalid:text-destructive focus-visible:outline-ring/50 ease-out-expo relative flex aspect-square size-4.5 shrink-0 items-center justify-center rounded-xs outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-200 outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid data-disabled:cursor-not-allowed data-disabled:opacity-60 motion-reduce:transition-none sm:not-pointer-coarse:size-4",
-        // Edge: real border + bg-clip-padding so the border draws on the
-        // substrate (matches Input). The ::before fill uses -inset-px to
-        // extend over the border area when checked, hiding it completely.
-        "border bg-clip-padding",
-        variant === "default" ? "bg-input" : "bg-input-elevated",
+        checkboxColors[color],
+        "peer aria-invalid:outline-destructive aria-invalid:text-destructive focus-visible:outline-ring ease-out-expo relative flex aspect-square size-4.5 shrink-0 items-center justify-center rounded-xs text-(--checkbox-mark) outline-0 -outline-offset-1 outline-transparent transition-[outline-width,outline-color] duration-100 outline-solid focus-visible:outline-2 focus-visible:-outline-offset-1 aria-invalid:outline-2 aria-invalid:-outline-offset-1 aria-invalid:outline-solid data-disabled:cursor-not-allowed data-disabled:opacity-60 motion-reduce:transition-none sm:not-pointer-coarse:size-4",
+        // Off: a 2px --control-off ring (the Switch track grey) around a white
+        // middle. An inset shadow, not a border, so the inset-0 fill covers it.
+        "bg-white shadow-[inset_0_0_0_2px_var(--control-off)] not-data-disabled:hover:shadow-[inset_0_0_0_2px_var(--control-off-hover)] dark:bg-transparent",
+        // Forced colors drop the shadow ring, so draw a system-color border.
+        "forced-colors:border forced-colors:border-[CanvasText]",
         // Background scale animation using ::before pseudo-element
-        "before:bg-primary before:absolute before:-inset-px before:rounded-xs before:content-['']",
+        "before:absolute before:inset-0 before:rounded-xs before:bg-(--checkbox-fill) before:content-['']",
         "before:ease-out-expo before:origin-center before:scale-80 before:transform-gpu before:opacity-0 before:transition-[transform,opacity,scale] before:duration-200 before:will-change-transform motion-reduce:before:transition-none",
         "data-checked:before:scale-100 data-checked:before:opacity-100",
         "data-indeterminate:before:scale-100 data-indeterminate:before:opacity-100",

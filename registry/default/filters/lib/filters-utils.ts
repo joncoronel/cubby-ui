@@ -24,7 +24,7 @@ export const CLICK_MORPH_MS = 209;
  * are the chip's minus 2px. Hover is instant; the press tint still fades.
  */
 export const FILTER_SEGMENT = cn(
-  "relative isolate inline-flex h-full shrink-0 items-center gap-1.5 whitespace-nowrap border border-y-2 border-transparent bg-clip-padding rounded-lg px-(--seg-x) outline-0 outline-transparent outline-solid transition-[background-color,color,outline-color] duration-100 ease-out [transition-duration:100ms,0ms,100ms] focus-visible:before:outline-2 focus-visible:before:-outline-offset-2 focus-visible:before:outline-ring/50",
+  "relative isolate inline-flex h-full shrink-0 items-center gap-1.5 whitespace-nowrap border border-y-2 border-transparent bg-clip-padding rounded-lg px-(--seg-x) outline-0 outline-transparent outline-solid transition-[background-color,color,outline-color] duration-100 ease-out [transition-duration:100ms,0ms,100ms] focus-visible:before:outline-2 focus-visible:before:-outline-offset-2 focus-visible:before:outline-ring",
   // A square hit area over the whole box, so hover never drops between
   // segments.
   "after:absolute after:-inset-x-px after:-inset-y-0.5 after:content-['']",
@@ -49,8 +49,8 @@ export const FILTER_SEGMENT_SQUARE =
   "box-content aspect-square h-auto self-stretch justify-center px-0";
 
 /**
- * Hover and press as in Button Group: the label color at 10% / 14%, and the
- * plate scales to 0.98. Menu triggers (aria-haspopup) skip the press and hold
+ * Hover and press fill the plate (see FILTER_TINTS), and the plate scales to
+ * 0.98. Menu triggers (aria-haspopup) skip the press and hold
  * the hover plate while open.
  */
 export const FILTER_SEGMENT_INTERACTIVE =
@@ -63,7 +63,9 @@ export const FILTER_SEGMENT_INTERACTIVE =
  */
 export const FILTER_VARIANTS: Record<FilterVariant, string> = {
   outline:
-    "bg-card outline outline-border data-incomplete:outline-dashed [--filter-chip-bg:var(--card)]",
+    // Opaque, unlike dark --outline, since stacked option icons ring in
+    // --filter-chip-bg. Dark mixes 30% black into the page to match it.
+    "bg-(--filter-chip-bg) outline outline-(--outline-border) data-incomplete:outline-dashed [--filter-chip-bg:var(--card)] dark:[--filter-chip-bg:color-mix(in_oklab,var(--background),black_30%)]",
   soft: "bg-secondary data-incomplete:outline data-incomplete:outline-border data-incomplete:outline-dashed [--filter-chip-bg:var(--secondary)]",
   elevated: cn(
     solidSurface(3, 3),
@@ -73,9 +75,12 @@ export const FILTER_VARIANTS: Record<FilterVariant, string> = {
   ),
 };
 
-/** Tints for segment hover and press, set on each shell. */
+/**
+ * Hover and press, set on each shell: 8% / 10% black overlays (white in dark).
+ * A text-color tint would show a blue cast beside colored option icons.
+ */
 export const FILTER_TINTS =
-  "[--filter-highlight:color-mix(in_oklab,var(--foreground)_10%,transparent)] [--filter-press:color-mix(in_oklab,var(--foreground)_14%,transparent)]";
+  "[--filter-highlight:var(--surface-active)] [--filter-press:var(--surface-selected)]";
 
 /**
  * Per-size chip classes; heights match the `Button` ramp. `--seg-x` is segment

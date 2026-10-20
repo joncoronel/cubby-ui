@@ -14,7 +14,7 @@ const NOTCH_WIDTH = 2;
 
 export interface MeterRootProps extends Omit<
   React.ComponentProps<typeof BaseMeter.Root>,
-  "getAriaValueText"
+  "getAriaValueText" | "color"
 > {
   /** Screen-reader text for the value. Gets the status too, since color alone isn't announced. */
   getAriaValueText?: (
@@ -24,8 +24,11 @@ export interface MeterRootProps extends Omit<
   ) => string;
   /** Track thickness. */
   size?: "sm" | "md" | "lg";
-  /** Indicator color when no thresholds are set. */
-  variant?: "default" | "neutral";
+  /**
+   * Indicator color when no thresholds are set: the emphasis grey (neutral)
+   * or the brand fill (primary). Thresholds override it with status colors.
+   */
+  color?: "neutral" | "primary";
   /** Upper bound of the low region. Values below it are "low". */
   low?: number;
   /** Lower bound of the high region. Values above it are "high". */
@@ -55,7 +58,7 @@ function MeterRoot({
   className,
   style,
   size = "md",
-  variant = "default",
+  color = "neutral",
   value,
   min = 0,
   max = 100,
@@ -77,6 +80,7 @@ function MeterRoot({
   return (
     <BaseMeter.Root
       data-slot="meter"
+      data-color={color}
       data-size={size}
       data-status={status}
       data-target-range={targetRange ? "" : undefined}
@@ -95,9 +99,9 @@ function MeterRoot({
         "[&>[data-slot=meter-value]]:col-start-2 [&>[data-slot=meter-value]]:justify-self-end",
         // Notches follow the fill direction
         "[--meter-direction:to_right] rtl:[--meter-direction:to_left]",
-        variant === "neutral"
-          ? "[--meter-color:var(--neutral)]"
-          : "[--meter-color:var(--primary)]",
+        color === "primary"
+          ? "[--meter-color:var(--primary)]"
+          : "[--meter-color:var(--emphasis)]",
         "data-[status=optimum]:[--meter-color:var(--success-foreground)]",
         "data-[status=suboptimum]:[--meter-color:var(--warning-foreground)]",
         "data-[status=critical]:[--meter-color:var(--danger-foreground)]",
@@ -139,7 +143,7 @@ function MeterTrack({ className, style, segments, ...props }: MeterTrackProps) {
       data-slot="meter-track"
       data-segmented={isSegmented || undefined}
       className={cn(
-        "bg-foreground/9 relative w-full overflow-hidden rounded-full [--meter-segment-gap:3px]",
+        "bg-control-track relative w-full overflow-hidden rounded-full [--meter-segment-gap:3px]",
         "group-data-[size=lg]/meter:h-2.5 group-data-[size=md]/meter:h-1.5 group-data-[size=sm]/meter:h-1",
         "group-data-[size=sm]/meter:[--meter-segment-gap:2px] data-segmented:rounded-[3px]",
         className,

@@ -16,10 +16,14 @@ const kbdVariants = cva(
         lg: "h-7 min-w-7 px-2.5 text-sm",
       },
       variant: {
-        default: "bg-card bg-clip-padding text-foreground",
+        // Keycap: the outline Button's fill and edge, so dark recesses it
+        // instead of raising a grey slab.
+        default:
+          "bg-(--outline) border-(--outline-border) bg-clip-padding text-foreground",
         primary: "bg-primary text-primary-foreground border-primary",
         secondary: "bg-secondary text-secondary-foreground border-secondary",
-        outline: "bg-transparent text-foreground shadow-none",
+        outline:
+          "bg-transparent text-foreground border-(--outline-border) shadow-none",
         ghost: "border-transparent bg-muted text-muted-foreground shadow-none",
         danger: "bg-destructive text-destructive-foreground border-destructive",
       },

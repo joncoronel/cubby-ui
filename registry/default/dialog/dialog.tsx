@@ -357,8 +357,8 @@ function DialogFooter({
         "in-[[data-slot=dialog-content]:not(:has([data-slot=dialog-header])):not(:has([data-slot=dialog-body]))]:pt-6",
         // Reduce top padding when body is present
         "not-in-data-[variant=inset]:in-[[data-slot=dialog-content]:has([data-slot=dialog-body])]:pt-3",
-        // Inset variant: muted background with top border for separation
-        "in-data-[variant=inset]:border-border in-data-[variant=inset]:bg-muted in-data-[variant=inset]:rounded-b-2xl in-data-[variant=inset]:border-t in-data-[variant=inset]:pt-4 in-data-[variant=inset]:pb-4",
+        // Inset variant: muted background; the fill alone separates it
+        "in-data-[variant=inset]:bg-muted in-data-[variant=inset]:rounded-b-2xl in-data-[variant=inset]:border-t in-data-[variant=inset]:border-transparent in-data-[variant=inset]:pt-4 in-data-[variant=inset]:pb-4",
         className,
       )}
       {...props}

@@ -4,7 +4,10 @@ description: Group of radio buttons for selecting a single option from multiple 
 type: primitive
 ---
 
-import { RadioGroup, RadioGroupItem } from "@/registry/default/radio-group/radio-group";
+import {
+  RadioGroup,
+  RadioGroupItem,
+} from "@/registry/default/radio-group/radio-group";
 
 A radio group lets the user pick exactly one option from a small, visible set. Use it when every choice should stay on screen, like a plan tier or a shipping speed. For more than a handful of options, or when the choices can stay collapsed, use [`Select`](/docs/components/select) instead.
 
@@ -41,24 +44,25 @@ Use `value` and `onValueChange` on `RadioGroup` to drive the selection yourself.
 
 Pair each item with a label and helper text for richer options.
 
-<ComponentPreview component="radio-group" example="radio-group-with-descriptions" />
+<ComponentPreview
+  component="radio-group"
+  example="radio-group-with-descriptions"
+/>
 
 ### Disabled Options
 
 Set `disabled` on a `RadioGroupItem` to take a single option out of play.
 
-<ComponentPreview component="radio-group" example="radio-group-disabled-options" />
+<ComponentPreview
+  component="radio-group"
+  example="radio-group-disabled-options"
+/>
 
-### Elevated Variant
+### Color
 
-Use `variant="elevated"` on `RadioGroupItem` for a translucent overlay that adapts to the substrate, so the control reads clearly on a Card, Dialog, or popover instead of collapsing into it. See the [Surfaces](/docs/getting-started/surfaces) docs.
+Use `color="primary"` on `RadioGroupItem` to fill the selected radio with the brand color instead of the default emphasis grey. Set the same color on every item in a group.
 
-<ComponentPreview component="radio-group" example="radio-group-elevated" />
-
-| Variant    | Description                                                  |
-| ---------- | ----------------------------------------------------------- |
-| `default`  | Opaque `bg-input`, for radios on the page background.       |
-| `elevated` | Translucent `bg-input-elevated`, for raised surfaces.       |
+<ComponentPreview component="radio-group" example="radio-group-color" />
 
 ### Form Integration
 
@@ -77,12 +81,22 @@ The RadioGroup component is built on top of [Base UI's RadioGroup](https://base-
 <ApiPropsList>
 
 <ApiProp
-  name="variant"
-  fullType='"default" | "elevated"'
+  name="color"
+  fullType='"neutral" | "primary"'
   simpleType="string"
-  defaultValue='"default"'
+  defaultValue='"neutral"'
 >
-  Surface appearance. `default` uses opaque `bg-input`. `elevated` uses translucent `bg-input-elevated` for use inside Card, Dialog, or popover surfaces. See the [Surfaces](/docs/getting-started/surfaces) docs.
+  Sets the fill when selected. `neutral` is the emphasis grey shared by
+  selection controls; `primary` is the brand fill.
 </ApiProp>
 
 </ApiPropsList>
+
+## Upgrading
+
+If you're reinstalling over an earlier version, check these changes:
+
+| Before                           | Now                                                               |
+| -------------------------------- | ----------------------------------------------------------------- |
+| `variant="elevated"`             | Removed. The default works on any surface, so drop the prop.      |
+| Checked fill in the primary blue | Neutral emphasis grey. Pass `color="primary"` for the brand fill. |

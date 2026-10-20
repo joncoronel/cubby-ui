@@ -110,11 +110,11 @@ Use virtualization for large lists (100+ items) so only the items in view are re
 
 > **Manual filtering still works.** If you need custom filter logic (fuzzy search, server-side filtering), you can still compute `filteredItems` externally, pass `filter={null}` to `Autocomplete.Root`, and spread `rootProps` from `useListVirtualizer`. See [useAutocompleteFilter](#useautocompletefilter).
 
-### Elevated Variant
+### Outline Variant
 
-On a Card, Dialog, or popover surface, the opaque `default` input collapses into its parent. Use `variant="elevated"` on `AutocompleteInput` for a translucent overlay that adapts to the substrate. See the [Surfaces](/docs/getting-started/surfaces) docs.
+Use `variant="outline"` on `AutocompleteInput` to match the outline Button: a card fill with a hairline border in light mode, a recessed fill with a faint ring in dark mode. The `default` tint already reads on the page, Cards, Dialogs, and popovers, so no field needs a per-surface variant.
 
-<ComponentPreview component="autocomplete" example="autocomplete-elevated" />
+<ComponentPreview component="autocomplete" example="autocomplete-outline" />
 
 ### Form Integration
 
@@ -141,11 +141,17 @@ Text input with optional trigger and clear buttons. When `showTrigger` or `showC
 </ApiProp>
 
 <ApiProp name="showClear" fullType="boolean" defaultValue="false">
-  Show a clear button to reset the input value. Only visible when the input has a value.
+  Show a clear button to reset the input value. Only visible when the input has
+  a value.
 </ApiProp>
 
-<ApiProp name="variant" fullType='"default" | "elevated"' defaultValue='"default"'>
-  Surface appearance of the input. `default` uses opaque `bg-input`. `elevated` uses translucent `bg-input-elevated` for use inside Card, Dialog, or popover surfaces. See the [Surfaces](/docs/getting-started/surfaces) docs.
+<ApiProp
+  name="variant"
+  fullType='"default" | "outline"'
+  defaultValue='"default"'
+>
+  Sets the input's fill. `default` is a translucent tint that reads on any
+  surface; `outline` uses the outline Button's fill and hairline edge.
 </ApiProp>
 
 </ApiPropsList>
@@ -169,11 +175,18 @@ The popup container. Wraps Base UI's `Autocomplete.Popup`.
 <ApiPropsList>
 
 <ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
-  Surface elevation level for the popup. See the [Surfaces](/docs/getting-started/surfaces) docs. Uses `elevatedSurface` (rim on `::after`) so sticky group labels stay below the rim edge.
+  Surface elevation level for the popup. See the
+  [Surfaces](/docs/getting-started/surfaces) docs. Uses `elevatedSurface` (rim
+  on `::after`) so sticky group labels stay below the rim edge.
 </ApiProp>
 
-<ApiProp name="shadowLevel" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="3">
-  Shadow weight. Controls drop-shadow intensity independently of substrate color.
+<ApiProp
+  name="shadowLevel"
+  fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8"
+  defaultValue="3"
+>
+  Shadow weight. Controls drop-shadow intensity independently of substrate
+  color.
 </ApiProp>
 
 </ApiPropsList>
@@ -343,3 +356,12 @@ See [useFuzzyFilter](/docs/hooks/use-fuzzy-filter) for full documentation and AP
 Provides virtualization for large autocomplete lists using TanStack Virtual. Abstracts scroll handling, item positioning, and keyboard navigation.
 
 See [useListVirtualizer](/docs/hooks/use-list-virtualizer) for full documentation and API reference.
+
+## Upgrading
+
+If you're reinstalling over an earlier version, check these changes:
+
+| Before                                               | Now                                                                     |
+| ---------------------------------------------------- | ----------------------------------------------------------------------- |
+| `variant="elevated"` for fields on Cards and Dialogs | Removed. The default tint works on any surface, so drop the prop.       |
+| One filled style                                     | `variant="outline"` adds a bordered style, matching the outline Button. |

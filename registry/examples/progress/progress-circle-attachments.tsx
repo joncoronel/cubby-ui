@@ -40,7 +40,7 @@ export default function ProgressCircleAttachments() {
 
         return (
           <li key={file.id} className="py-3">
-            <ProgressRoot value={value} variant={done ? "success" : "default"}>
+            <ProgressRoot value={value} color={done ? "success" : "primary"}>
               <ProgressCircle size={18} />
               <ProgressLabel className="min-w-0 truncate">
                 {file.name}

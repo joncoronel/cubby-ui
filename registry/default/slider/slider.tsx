@@ -21,7 +21,7 @@ const sliderVariants = cva(
 );
 
 const sliderTrackVariants = cva(
-  "bg-muted flex flex-1 ring-border/60 size-[inherit] min-size-[inherit] ring-1 relative grow rounded-full data-[orientation=horizontal]:h-3 data-[orientation=horizontal]:w-full data-[orientation=vertical]:min-h-full data-[orientation=vertical]:w-3",
+  "bg-control-track flex flex-1 size-[inherit] min-size-[inherit] relative grow rounded-full data-[orientation=horizontal]:h-3 data-[orientation=horizontal]:w-full data-[orientation=vertical]:min-h-full data-[orientation=vertical]:w-3",
   {
     variants: {
       variant: {
@@ -38,7 +38,7 @@ const sliderTrackVariants = cva(
 );
 
 const sliderIndicatorVariants = cva(
-  "bg-primary absolute rounded-full shadow-[0_1px_3px_0_oklch(0.18_0_0_/_0.1)] data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full",
+  "bg-(--slider-fill) absolute rounded-full shadow-[0_1px_3px_0_oklch(0.18_0_0_/_0.1)] data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full",
   {
     variants: {
       variant: {
@@ -54,16 +54,18 @@ const sliderIndicatorVariants = cva(
   },
 );
 
+// A borderless white knob like the Switch thumb: a hairline and a soft drop
+// give it its edge, so it reads on the filled range and the bare track alike.
 const sliderThumbVariants = cva(
-  "bg-background border-primary relative block size-5 shrink-0 rounded-full border-2 shadow-[0_2px_4px_0_oklch(0.18_0_0_/_0.15)] transition-[box-shadow] duration-200 hover:shadow-[0_3px_8px_0_oklch(0.18_0_0_/_0.2)] has-[:focus-visible]:outline-hidden has-[:focus-visible]:z-10 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background",
+  "bg-white relative block size-5 shrink-0 rounded-full shadow-[0_0_0_0.5px_oklch(0_0_0/0.08),0_1px_3px_0_oklch(0.18_0_0/0.2)] duration-200 hover:shadow-[0_0_0_0.5px_oklch(0_0_0/0.08),0_2px_8px_0_oklch(0.18_0_0/0.24)] outline-0 -outline-offset-1 outline-transparent outline-solid transition-[box-shadow,outline-width,outline-color] has-[:focus-visible]:z-10 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-ring forced-colors:border forced-colors:border-[CanvasText]",
   {
     variants: {
       variant: {
         default: "",
         contained:
-          "h-full w-6 bg-primary border-none hover:shadow-none shadow-none rounded-full data-[orientation=vertical]:h-6 data-[orientation=vertical]:w-full after:bg-primary-foreground flex items-center justify-center after:size-[60%]  after:rounded-full  after:origin-center data-[dragging]:after:scale-85 after:transition-transform after:ease-out after:duration-100 after:shadow-[0_2px_4px_0_oklch(0.18_0_0_/_0.15)]",
+          "h-full w-6 bg-(--slider-fill) border-none hover:shadow-none shadow-none rounded-full data-[orientation=vertical]:h-6 data-[orientation=vertical]:w-full after:bg-(--slider-fill-foreground) flex items-center justify-center after:size-[60%]  after:rounded-full  after:origin-center data-[dragging]:after:scale-85 after:transition-transform after:ease-out after:duration-100 after:shadow-[0_2px_4px_0_oklch(0.18_0_0_/_0.15)]",
         squareThumb:
-          "h-5 w-2.5 bg-card border-1 border-border/70 rounded-[.125rem] data-[orientation=vertical]:h-2.5 data-[orientation=vertical]:w-5",
+          "h-5 w-2.5 rounded-[.125rem] data-[orientation=vertical]:h-2.5 data-[orientation=vertical]:w-5",
       },
     },
     defaultVariants: {
@@ -72,10 +74,19 @@ const sliderThumbVariants = cva(
   },
 );
 
+// Filled range: the shared selection-control grey, or the brand fill.
+const sliderColors = {
+  neutral:
+    "[--slider-fill:var(--emphasis)] [--slider-fill-foreground:var(--emphasis-foreground)]",
+  primary:
+    "[--slider-fill:var(--primary)] [--slider-fill-foreground:var(--primary-foreground)]",
+};
+
 export interface SliderProps
   extends
     React.ComponentProps<typeof BaseSlider.Root>,
     VariantProps<typeof sliderVariants> {
+  color?: "neutral" | "primary";
   showSteps?: boolean;
   getAriaLabel?: ((index: number) => string) | null;
 }
@@ -88,6 +99,7 @@ function Slider({
   min = 0,
   max = 100,
   variant,
+  color = "neutral",
   showSteps = false,
   getAriaLabel,
   ...props
@@ -114,11 +126,16 @@ function Slider({
   return (
     <BaseSlider.Root
       data-slot="slider"
+      data-color={color}
       defaultValue={defaultValue}
       value={value}
       min={min}
       max={max}
-      className={cn(sliderVariants({ variant }), className)}
+      className={cn(
+        sliderColors[color],
+        sliderVariants({ variant }),
+        className,
+      )}
       thumbAlignment={variant === "contained" ? "edge" : "center"}
       // Drags along the slider's axis are the slider's, so a Base UI drawer
       // or toast doesn't swipe; across it, a drawer still can.

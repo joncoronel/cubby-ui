@@ -69,16 +69,16 @@ Set `mask` on `OTPField` to obscure entered characters for shared screens.
 
 <ComponentPreview component="otp-field" example="otp-field-masked" />
 
-### Elevated Variant
+### Outline Variant
 
-On a Card, Dialog, or popover surface, the opaque `default` slots collapse into the parent. Use `variant="elevated"` on each `OTPFieldInput` for a translucent overlay that adapts to the substrate. See the [Surfaces](/docs/getting-started/surfaces) docs.
+Use `variant="outline"` on each `OTPFieldInput` to match the outline Button: a card fill with a hairline border in light mode, a recessed fill with a faint ring in dark mode. The `default` tint already reads on the page, Cards, Dialogs, and popovers, so no field needs a per-surface variant.
 
-<ComponentPreview component="otp-field" example="otp-field-elevated" />
+<ComponentPreview component="otp-field" example="otp-field-outline" />
 
-| Variant    | Description                                                |
-| ---------- | ---------------------------------------------------------- |
-| `default`  | Opaque `bg-input` slots for page-level surfaces.           |
-| `elevated` | Translucent slots for use inside Card, Dialog, or popover. |
+| Variant   | Description                                   |
+| --------- | --------------------------------------------- |
+| `default` | A translucent tint that reads on any surface. |
+| `outline` | The outline Button's fill and hairline edge.  |
 
 ### Form Integration
 
@@ -108,13 +108,12 @@ Individual character input slot. Wraps Base UI's `OTPField.Input`. Renders an `<
 
 <ApiProp
   name="variant"
-  fullType='"default" | "elevated"'
+  fullType='"default" | "outline"'
   simpleType="string"
   defaultValue='"default"'
 >
-  Surface appearance of the slot. `default` uses opaque `bg-input`. `elevated`
-  uses translucent `bg-input-elevated` for use inside Card, Dialog, or popover
-  surfaces. See the [Surfaces](/docs/getting-started/surfaces) docs.
+  Sets the slot's fill. `default` is a translucent tint that reads on any
+  surface; `outline` uses the outline Button's fill and hairline edge.
 </ApiProp>
 
 </ApiPropsList>
@@ -190,3 +189,12 @@ const invalidFeedback = useInvalidFeedback();
 | `handleValueInvalid` | `(value: string) => void` | Triggers shake animation and status message. Wire to `OTPField`'s `onValueInvalid`. |
 | `className`          | `string \| undefined`     | Shake className while feedback is active, or `undefined`. Pass to `OTPField`.       |
 | `statusMessage`      | `string`                  | Screen reader announcement. Render inside an `aria-live="polite"` region.           |
+
+## Upgrading
+
+If you're reinstalling over an earlier version, check these changes:
+
+| Before                                               | Now                                                                     |
+| ---------------------------------------------------- | ----------------------------------------------------------------------- |
+| `variant="elevated"` for fields on Cards and Dialogs | Removed. The default tint works on any surface, so drop the prop.       |
+| One filled style                                     | `variant="outline"` adds a bordered style, matching the outline Button. |

@@ -74,7 +74,7 @@ export function ComponentInstall({
               setManualShown(true);
               setManualOpen((o) => !o);
             }}
-            className="docs-disclosure text-muted-foreground hover:text-foreground focus-visible:outline-ring/50 -ml-1 flex w-fit items-center gap-1 rounded-md px-1 py-0.5 text-sm outline-none focus-visible:outline-2"
+            className="docs-disclosure text-muted-foreground hover:text-foreground focus-visible:outline-ring -ml-1 flex w-fit items-center gap-1 rounded-md px-1 py-0.5 text-sm outline-none focus-visible:outline-2"
           >
             <HugeiconsIcon
               icon={ArrowRight01Icon}

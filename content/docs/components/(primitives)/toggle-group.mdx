@@ -40,11 +40,25 @@ Use `variant` to pick the shell the items sit on.
 
 <ComponentPreview component="toggle-group" example="toggle-group-variants" />
 
-| Variant   | Description                                       |
-| --------- | ------------------------------------------------- |
-| `outline` | The default. An outline Button's fill and border. |
-| `soft`    | A secondary Button's fill.                        |
-| `ghost`   | No shell.                                         |
+| Variant   | Description                             |
+| --------- | --------------------------------------- |
+| `outline` | An outline Button's fill and border.    |
+| `soft`    | The default. A secondary Button's fill. |
+| `ghost`   | No shell.                               |
+
+### Pressed Style
+
+Use `pressedStyle` to set how pressed items look.
+
+<ComponentPreview
+  component="toggle-group"
+  example="toggle-group-pressed-style"
+/>
+
+| Style    | Description                                                                    |
+| -------- | ------------------------------------------------------------------------------ |
+| `solid`  | The default. Emphasis grey with a white label, like Tabs.                      |
+| `subtle` | A 12% neutral overlay (black in light, white in dark), like Toolbar's default. |
 
 ### Size
 
@@ -131,7 +145,7 @@ The shell around the items. Wraps Base UI's `ToggleGroup`.
   name="variant"
   fullType='"outline" | "soft" | "ghost"'
   simpleType="string"
-  defaultValue='"outline"'
+  defaultValue='"soft"'
 >
   Shell style. `ghost` draws none.
 </ApiProp>
@@ -143,6 +157,17 @@ The shell around the items. Wraps Base UI's `ToggleGroup`.
   defaultValue='"default"'
 >
   Outer height, matching `Button`. Items take it from the group.
+</ApiProp>
+
+<ApiProp
+  name="pressedStyle"
+  fullType='"solid" | "subtle"'
+  simpleType="string"
+  defaultValue='"solid"'
+>
+  Sets how pressed items look. `solid` is the emphasis grey with a white label;
+  `subtle` is a 12% neutral overlay. Set `--toggle-group-selected-bg` and
+  `--toggle-group-selected-fg` to recolor either.
 </ApiProp>
 
 </ApiPropsList>
@@ -161,10 +186,11 @@ A line between items. Wraps [`Separator`](/docs/components/separator); its `orie
 
 If you're reinstalling over an earlier version, check these changes:
 
-| Before                                        | Now                                                                               |
-| --------------------------------------------- | --------------------------------------------------------------------------------- |
-| `variant="solid"`, a muted track, the default | `variant="outline"` is the default. `variant="soft"` is closest to the old track. |
-| `detached` split items into separate toggles  | Removed; items join in one shell. For standalone toggles, use separate `Toggle`s. |
-| `separators` drew lines between every item    | Place a `ToggleGroupSeparator` where you want one.                                |
-| `ToggleGroupItem` took `variant` and `size`   | Both come from the group.                                                         |
-| Recolored with `--tgl-bg-selected` on items   | Set `--toggle-group-selected-bg` and `--toggle-group-selected-fg` on the group.   |
+| Before                                        | Now                                                                                                     |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `variant="solid"`, a muted track, the default | `variant="soft"` is the default and closest to the old track.                                           |
+| `detached` split items into separate toggles  | Removed; items join in one shell. For standalone toggles, use separate `Toggle`s.                       |
+| `separators` drew lines between every item    | Place a `ToggleGroupSeparator` where you want one.                                                      |
+| `ToggleGroupItem` took `variant` and `size`   | Both come from the group.                                                                               |
+| Recolored with `--tgl-bg-selected` on items   | Set `--toggle-group-selected-bg` and `--toggle-group-selected-fg` on the group.                         |
+| Pressed items took a 16% label-color tint     | An emphasis-grey fill (`pressedStyle="solid"`). Pass `pressedStyle="subtle"` for a 12% neutral overlay. |

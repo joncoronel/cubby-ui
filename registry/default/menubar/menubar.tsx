@@ -17,6 +17,7 @@ import {
   DropdownMenuInput,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuLevelContext,
   DropdownMenuLinkItem,
   DropdownMenuList,
   DropdownMenuPortal,
@@ -46,8 +47,8 @@ const menubarVariants = cva(
     "min-w-max",
     // Paint corners are the shell's minus the 2px edge border.
     "[--menubar-item-radius:max(0px,calc(var(--menubar-radius)-2px))]",
-    // Label-color tints: hover 10%, press 14%
-    "[--menubar-highlight:color-mix(in_oklab,currentColor_10%,transparent)] [--menubar-press:color-mix(in_oklab,currentColor_14%,transparent)]",
+    // Pure overlays (black, white in dark): hover 8%, press 10%
+    "[--menubar-highlight:var(--surface-active)] [--menubar-press:var(--surface-selected)]",
     "data-[orientation=horizontal]:h-(--menubar-h)",
     "data-[orientation=horizontal]:[&>[data-menubar-item]]:border-y-2 data-[orientation=horizontal]:[&>:nth-child(1_of_[data-menubar-item])]:border-s-2 data-[orientation=horizontal]:[&>:nth-last-child(1_of_[data-menubar-item])]:border-e-2",
     "data-[orientation=vertical]:[&>[data-menubar-item]]:border-x-2 data-[orientation=vertical]:[&>:nth-child(1_of_[data-menubar-item])]:border-t-2 data-[orientation=vertical]:[&>:nth-last-child(1_of_[data-menubar-item])]:border-b-2",
@@ -58,7 +59,8 @@ const menubarVariants = cva(
     variants: {
       variant: {
         elevated: cn(solidSurface(2, 2), "text-foreground"),
-        outline: "bg-card text-foreground outline outline-border",
+        outline:
+          "bg-(--outline) text-foreground outline outline-(--outline-border)",
         soft: "bg-secondary text-secondary-foreground",
         ghost: "text-foreground",
       },
@@ -124,7 +126,7 @@ function MenubarMenu(props: BaseMenu.Root.Props) {
   return <BaseMenu.Root data-slot="menubar-menu" {...props} />;
 }
 
-// A quiet Button: hover and the open menu paint the label tint. Menu triggers
+// A quiet Button: hover and the open menu paint the menubar overlay. Menu triggers
 // skip Button's press, as everywhere else.
 const triggerClasses = cn(
   buttonVariants({ variant: "ghost", size: null }),
@@ -243,7 +245,9 @@ function MenubarContent({
               viewportClassName,
             )}
           >
-            {children}
+            <DropdownMenuLevelContext.Provider value={level}>
+              {children}
+            </DropdownMenuLevelContext.Provider>
           </BaseMenu.Viewport>
         </BaseMenu.Popup>
       </BaseMenu.Positioner>

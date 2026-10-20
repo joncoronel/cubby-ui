@@ -127,7 +127,7 @@ function FiltersProvider({
   defaultValue = [],
   onValueChange,
   size = "default",
-  variant = "outline",
+  variant = "soft",
   allowDuplicateFields = false,
   labels: labelsProp,
   children,

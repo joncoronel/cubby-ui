@@ -14,28 +14,30 @@ export default function CollapsibleCustomTrigger() {
           <Button
             {...props}
             variant="outline"
-            className="w-full justify-between"
-          >
-            <span className="flex items-center gap-2">
+            className="w-full justify-start"
+            leadingIcon={
               <HugeiconsIcon
                 icon={Settings01Icon}
                 className="size-4"
                 strokeWidth={2}
               />
-              Custom Settings
-            </span>
-            <HugeiconsIcon
-              icon={ChevronRightIcon}
-              className={`size-4 transition-transform duration-200 ease-out ${
-                state.open ? "rotate-90" : ""
-              }`}
-              strokeWidth={2}
-            />
+            }
+            trailingIcon={
+              <HugeiconsIcon
+                icon={ChevronRightIcon}
+                className={`ms-auto size-4 transition-transform duration-200 ease-out ${
+                  state.open ? "rotate-90" : ""
+                }`}
+                strokeWidth={2}
+              />
+            }
+          >
+            Custom Settings
           </Button>
         )}
       />
       <CollapsibleContent>
-        <div className="border-border bg-card mt-2 space-y-4 rounded-md border px-4 py-3">
+        <div className="bg-muted mt-2 space-y-4 rounded-md px-4 py-3">
           <div className="flex items-center justify-between">
             <label htmlFor="dark-mode" className="text-sm font-medium">
               Dark mode

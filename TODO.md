@@ -90,6 +90,12 @@ Kept deliberately: the value looks right as shipped, and reaching 3:1 by fill al
 
 If it is ever revisited, the cheaper route than darkening the fill is restoring a boundary: the pre-branch switch carried `inset-shadow-xs`, and a `--switch-track-ring` token at ≥3:1 against both the surface and the thumb would satisfy 1.4.11 without changing the track's weight.
 
+#### Field boundary contrast is an accepted trade
+
+The redesign fills fields instead of outlining them. The default fill (`--input`, 4.5% black / 5% white) sits about 1.1:1 against the page, and the `outline` variant's hairline (`--outline-border`) about 1.2:1 light and 1.25:1 dark. WCAG 1.4.11 asks 3:1 for what identifies a control, so neither meets it alone.
+
+Kept deliberately: the soft, borderless field is the point of the redesign, and every field carries a visible label or placeholder, a text caret on focus and the 2px focus ring, which does meet 3:1. If it is ever revisited, raise `--outline-border` for the outline variant first; a 3:1 hairline brings back the hard edge the default variant was built to drop.
+
 #### Popup size caps: two accepted residuals
 
 Every popup and positioner in the popup family (Dropdown Menu, Menubar, Context Menu, Popover, Tooltip) is capped at `max-h-(--available-height)` / `max-w-(--available-width)`, and each viewport carries its own `max-h` so `overflow-y: auto` has a definite bound to work against. Two things that cap deliberately does not solve:

@@ -331,8 +331,8 @@ function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
         "in-[[data-slot=sheet-content]:not(:has([data-slot=sheet-header])):not(:has([data-slot=sheet-body]))]:pt-6",
         // Reduce top padding when body is present
         "not-in-data-[footer-variant=inset]:in-[[data-slot=sheet-content]:has([data-slot=sheet-body])]:pt-3",
-        // Inset variant: muted background with top border for separation
-        "in-data-[footer-variant=inset]:border-border in-data-[footer-variant=inset]:bg-muted in-data-[footer-variant=inset]:border-t in-data-[footer-variant=inset]:pt-4 in-data-[footer-variant=inset]:pb-4",
+        // Inset variant: muted background; the fill alone separates it
+        "in-data-[footer-variant=inset]:bg-muted in-data-[footer-variant=inset]:border-t in-data-[footer-variant=inset]:border-transparent in-data-[footer-variant=inset]:pt-4 in-data-[footer-variant=inset]:pb-4",
         className,
       )}
       {...props}

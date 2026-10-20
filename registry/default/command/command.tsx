@@ -153,10 +153,7 @@ function CommandInput({
   ...props
 }: AutocompleteBase.Input.Props & { loading?: boolean }) {
   return (
-    <InputGroup
-      variant="elevated"
-      className={cn("mt-2 w-[calc(100%-1rem)]", className)}
-    >
+    <InputGroup className={cn("mt-2 w-[calc(100%-1rem)]", className)}>
       <AutocompleteBase.Input
         data-slot="command-input"
         render={(props) => <InputGroupInput {...props} />}
@@ -185,8 +182,9 @@ function CommandContent({
     <div
       data-slot="command-content"
       className={cn(
-        // Surface-1 "well" inside the surface-2 outer frame; ring defines the edge.
-        "bg-surface-3 dark:bg-surface-1 ring-border/25 dark:ring-border/10 flex min-h-0 flex-1 flex-col items-center overflow-hidden rounded-2xl ring-1",
+        // A white well (page-dark in dark mode) inside the muted frame; the fill
+        // step alone defines the edge.
+        "bg-surface-3 dark:bg-surface-1 flex min-h-0 flex-1 flex-col items-center overflow-hidden rounded-2xl",
         className,
       )}
       {...props}

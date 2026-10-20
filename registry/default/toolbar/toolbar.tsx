@@ -24,8 +24,9 @@ const toolbarVariants = cva(
     "min-w-max",
     // Paint corners are the shell's minus the 2px edge border.
     "[--toolbar-item-radius:max(0px,calc(var(--toolbar-radius)-2px))]",
-    // Label-color tints: hover 10%, press 14%, pressed toggle 16%
-    "[--toolbar-highlight:color-mix(in_oklab,currentColor_10%,transparent)] [--toolbar-press:color-mix(in_oklab,currentColor_14%,transparent)] [--toolbar-pressed:color-mix(in_oklab,currentColor_16%,transparent)]",
+    // Hover 8%, press 10%: black overlays (white in dark), not a cool-cast label
+    // tint. `pressedStyle` below sets the toggled-on fill.
+    "[--toolbar-highlight:var(--surface-active)] [--toolbar-press:var(--surface-selected)]",
     // The shell is fixed and items stretch to fill it; columns grow to the
     // widest item.
     "data-[orientation=horizontal]:h-(--toolbar-h)",
@@ -36,9 +37,18 @@ const toolbarVariants = cva(
     variants: {
       variant: {
         elevated: cn(solidSurface(3, 3), "text-foreground"),
-        outline: "bg-card text-foreground outline outline-border",
+        outline:
+          "bg-(--outline) text-foreground outline outline-(--outline-border)",
         soft: "bg-secondary text-secondary-foreground",
         ghost: "text-foreground",
+      },
+      // Subtle (default) is a quiet 12% overlay for rows with several toggles
+      // on; solid is the emphasis grey, as in Toggle Group and Tabs.
+      pressedStyle: {
+        subtle:
+          "[--toolbar-pressed:oklch(0_0_0/12%)] dark:[--toolbar-pressed:oklch(1_0_0/12%)] [--toolbar-pressed-foreground:currentColor]",
+        solid:
+          "[--toolbar-pressed:var(--emphasis)] [--toolbar-pressed-foreground:var(--emphasis-foreground)]",
       },
       // Button's height ladder (one step taller below sm); corners step with it.
       size: {
@@ -80,7 +90,8 @@ type ToolbarSize = NonNullable<VariantProps<typeof toolbarVariants>["size"]>;
 const ToolbarContext = React.createContext<{
   orientation: "horizontal" | "vertical";
   size: ToolbarSize;
-}>({ orientation: "horizontal", size: "default" });
+  pressedStyle: "subtle" | "solid";
+}>({ orientation: "horizontal", size: "default", pressedStyle: "subtle" });
 
 // Items take their padding, text, and icon size from the toolbar's size, on
 // Toggle's and Button's scales.
@@ -101,6 +112,8 @@ export type ToolbarProps = BaseToolbar.Root.Props & {
   size?: ToolbarSize;
   /** Glide a shared highlight between items on hover and focus. */
   highlight?: boolean;
+  /** How toggled-on toggles look: a quiet tint or the solid emphasis grey. */
+  pressedStyle?: "subtle" | "solid";
 };
 
 function Toolbar({
@@ -109,12 +122,13 @@ function Toolbar({
   size = "default",
   orientation = "horizontal",
   highlight = true,
+  pressedStyle = "subtle",
   children,
   ...props
 }: ToolbarProps) {
   const context = React.useMemo(
-    () => ({ orientation, size }),
-    [orientation, size],
+    () => ({ orientation, size, pressedStyle }),
+    [orientation, size, pressedStyle],
   );
 
   return (
@@ -124,8 +138,12 @@ function Toolbar({
         data-variant={variant}
         data-size={size}
         data-glide={highlight ? "" : undefined}
+        data-pressed-style={pressedStyle}
         orientation={orientation}
-        className={cn(toolbarVariants({ variant, size }), className)}
+        className={cn(
+          toolbarVariants({ variant, size, pressedStyle }),
+          className,
+        )}
         {...props}
       >
         {children}
@@ -178,7 +196,7 @@ function ToolbarButton({
             itemShell,
             iconOnly && iconSquare,
             // Quiet: undo primary's fill and border, hover and press with the
-            // label tints. A set variant keeps its own paint.
+            // toolbar overlays. A set variant keeps its own paint.
             !variant &&
               cn(
                 "text-current [--btn-bg-active:var(--toolbar-press)] [--btn-bg-hover:var(--toolbar-highlight)] [--btn-bg:transparent] [--btn-border:transparent]",
@@ -193,8 +211,9 @@ function ToolbarButton({
   );
 }
 
+// The toolbar sets the pressed look, so toggles take no `pressedStyle` of their own.
 export type ToolbarToggleProps = BaseToolbar.Button.Props &
-  Omit<ToggleProps, "variant" | "size">;
+  Omit<ToggleProps, "variant" | "size" | "pressedStyle">;
 
 /** A Toggle that stays pressed when on, with Toggle Group's deeper tint. */
 function ToolbarToggle({
@@ -203,7 +222,7 @@ function ToolbarToggle({
   render,
   ...props
 }: ToolbarToggleProps) {
-  const { size } = React.use(ToolbarContext);
+  const { size, pressedStyle } = React.use(ToolbarContext);
   const iconOnly = isIconOnly(
     children,
     props["aria-label"] ?? props["aria-labelledby"],
@@ -218,13 +237,14 @@ function ToolbarToggle({
         <Toggle
           variant="ghost"
           render={render}
+          data-pressed-style={pressedStyle}
           className={cn(
             itemShell,
             "min-w-auto sm:not-pointer-coarse:min-w-auto",
             itemSize[size],
             iconOnly && iconSquare,
             "text-current",
-            "[--tgl-bg-active:var(--toolbar-press)] [--tgl-bg-hover:var(--toolbar-highlight)] [--tgl-bg-selected:var(--toolbar-pressed)]",
+            "[--tgl-bg-active:var(--toolbar-press)] [--tgl-bg-hover:var(--toolbar-highlight)] [--tgl-bg-selected:var(--toolbar-pressed)] data-pressed:text-(--toolbar-pressed-foreground)",
             instantHover,
             className,
           )}

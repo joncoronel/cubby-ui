@@ -35,7 +35,7 @@
     height 280ms cubic-bezier(0.19, 1, 0.22, 1),
     scale 240ms cubic-bezier(0.19, 1, 0.22, 1),
     opacity 150ms ease-out,
-    outline-color 150ms ease-out;
+    outline-color 100ms ease-out;
 }
 
 [data-slot="otp-field"]:focus-within > .otp-field-indicator {
@@ -58,18 +58,13 @@
   }
 
   [data-slot="otp-field-slot"]:focus-within {
-    outline: 2px solid
-      color-mix(in oklab, var(--color-ring, Highlight) 50%, transparent);
-    outline-offset: 2px;
+    outline: 2px solid var(--color-ring, Highlight);
+    outline-offset: -1px;
   }
 
   .otp-field-shake-a [data-slot="otp-field-slot"]:focus-within,
   .otp-field-shake-b [data-slot="otp-field-slot"]:focus-within {
-    outline-color: color-mix(
-      in oklab,
-      var(--color-destructive, red) 80%,
-      transparent
-    );
+    outline-color: var(--color-destructive, red);
   }
 }
 
@@ -84,7 +79,8 @@
 [data-slot="otp-field-slot"] > input[data-slot="otp-field-input"] {
   color: transparent;
   -webkit-text-fill-color: transparent;
-  caret-color: var(--color-primary, CanvasText);
+  /* Set explicitly: the default caret follows the transparent text color. */
+  caret-color: var(--color-foreground, CanvasText);
 }
 
 [data-slot="otp-field-slot"][data-filled] > input[data-slot="otp-field-input"] {
@@ -127,11 +123,7 @@
 
 .otp-field-shake-a > .otp-field-indicator,
 .otp-field-shake-b > .otp-field-indicator {
-  outline-color: color-mix(
-    in oklab,
-    var(--color-destructive, red) 80%,
-    transparent
-  );
+  outline-color: var(--color-destructive, red);
 }
 
 .otp-field-shake-a > .otp-field-indicator,
@@ -174,7 +166,7 @@
   .otp-field-indicator {
     transition:
       opacity 150ms ease-out,
-      outline-color 150ms ease-out;
+      outline-color 100ms ease-out;
   }
 
   [data-slot="otp-field"]:focus-within > .otp-field-indicator {

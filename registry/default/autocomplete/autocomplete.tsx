@@ -24,7 +24,7 @@ function AutocompleteInput({
 }: BaseAutocomplete.Input.Props & {
   showTrigger?: boolean;
   showClear?: boolean;
-  variant?: "default" | "elevated";
+  variant?: "default" | "outline";
 }) {
   return (
     <BaseAutocomplete.InputGroup
@@ -33,17 +33,20 @@ function AutocompleteInput({
     >
       <BaseAutocomplete.Input
         data-slot="autocomplete-input"
+        data-variant={variant}
         className={cn(
-          "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground flex h-10 w-full min-w-0 rounded-lg border bg-clip-padding px-3 text-base font-normal disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 sm:not-pointer-coarse:h-9 sm:not-pointer-coarse:text-sm",
+          "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground flex h-10 w-full min-w-0 rounded-lg border border-transparent px-3 text-base font-normal disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 sm:not-pointer-coarse:h-9 sm:not-pointer-coarse:text-sm",
           // Room for the clear (shown with text) and trigger buttons. Set on
           // the input, not the group, to keep `:has()` cheap.
           "[[data-slot=autocomplete-input-group]:has([data-slot=autocomplete-clear])>&]:pr-7",
           "[[data-slot=autocomplete-input-group]:has([data-slot=autocomplete-trigger])>&]:pr-7",
           "[[data-slot=autocomplete-input-group]:has([data-slot=autocomplete-clear]):has([data-slot=autocomplete-trigger])>&]:pr-13",
-          variant === "default" ? "bg-input" : "bg-input-elevated",
+          variant === "outline"
+            ? "border-(--outline-border) bg-(--outline) bg-clip-padding"
+            : "bg-input",
           "file:text-foreground file:inline-flex file:h-7 file:rounded-md file:border-0 file:bg-transparent file:text-sm file:font-medium",
-          "focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
-          "aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
+          "focus-visible:outline-ring outline-0 -outline-offset-1 outline-transparent transition-[outline-width,outline-color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:-outline-offset-1",
+          "aria-invalid:outline-destructive aria-invalid:outline-2 aria-invalid:-outline-offset-1 aria-invalid:outline-solid",
           className,
         )}
         {...props}
@@ -69,7 +72,7 @@ function AutocompleteTrigger({
       aria-label="Open popup"
       className={cn(
         "inline-flex size-4 cursor-pointer items-center justify-center rounded-md border-none bg-transparent p-0 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-60",
-        "focus-visible:ring-ring/70 outline-none focus-visible:ring-2",
+        "focus-visible:outline-ring outline-none focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-solid",
         className,
       )}
       {...props}
@@ -109,7 +112,7 @@ function AutocompleteClear({
       aria-label="Clear selection"
       className={cn(
         "inline-flex h-4 w-4 cursor-pointer items-center justify-center rounded-sm opacity-70 transition-[opacity,scale,transform,translate] hover:opacity-100 disabled:pointer-events-none",
-        "focus-visible:ring-ring/70 duration-100 outline-none focus-visible:ring-2",
+        "focus-visible:outline-ring duration-100 outline-none focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-solid",
         "data-ending-style:translate-x-1 data-ending-style:opacity-0 data-starting-style:translate-x-1 data-starting-style:opacity-0",
         className,
       )}

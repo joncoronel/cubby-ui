@@ -1,22 +1,22 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-30T00:00:00Z",
+  "generatedAt": "2026-10-16T00:00:00Z",
   "title": "Design System: Cubby UI",
   "extensions": {
     "colorMeta": {
       "primary": {
         "role": "primary",
         "displayName": "Cubby Blue",
-        "canonical": "oklch(0.6 0.2 250)",
+        "canonical": "oklch(0.68 0.16 232.65)",
         "tonalRamp": [
-          "oklch(0.15 0.06 250)",
-          "oklch(0.26 0.1 250)",
-          "oklch(0.37 0.14 250)",
-          "oklch(0.48 0.18 250)",
-          "oklch(0.6 0.2 250)",
-          "oklch(0.72 0.15 250)",
-          "oklch(0.84 0.09 250)",
-          "oklch(0.95 0.03 250)"
+          "oklch(0.15 0.056 232.65)",
+          "oklch(0.26 0.096 232.65)",
+          "oklch(0.37 0.136 232.65)",
+          "oklch(0.48 0.16 232.65)",
+          "oklch(0.6 0.16 232.65)",
+          "oklch(0.72 0.136 232.65)",
+          "oklch(0.84 0.08 232.65)",
+          "oklch(0.95 0.029 232.65)"
         ]
       },
       "primary-foreground": {
@@ -27,17 +27,32 @@
       "ring": {
         "role": "primary",
         "displayName": "Focus Blue",
-        "canonical": "oklch(0.55 0.2 250)"
+        "canonical": "oklch(0.7 0.15 232.65)"
+      },
+      "primary-soft-foreground": {
+        "role": "primary",
+        "displayName": "Sky Ink",
+        "canonical": "color-mix(in oklch, oklch(0.68 0.16 232.65), black 25%)"
+      },
+      "dark-primary": {
+        "role": "primary",
+        "displayName": "Cubby Blue (dark)",
+        "canonical": "oklch(0.75 0.16 232.65)"
+      },
+      "dark-primary-soft-foreground": {
+        "role": "primary",
+        "displayName": "Sky Ink (dark)",
+        "canonical": "color-mix(in oklch, oklch(0.75 0.16 232.65), white 30%)"
       },
       "foreground": {
         "role": "neutral",
         "displayName": "Ink",
-        "canonical": "oklch(0.18 0.004 270)",
+        "canonical": "oklch(0.3 0.004 270)",
         "tonalRamp": [
           "oklch(0.15 0.004 270)",
-          "oklch(0.18 0.004 270)",
+          "oklch(0.3 0.004 270)",
           "oklch(0.32 0.004 270)",
-          "oklch(0.5 0.004 270)",
+          "oklch(0.53 0.004 270)",
           "oklch(0.73 0.004 270)",
           "oklch(0.87 0.004 270)",
           "oklch(0.94 0.004 270)",
@@ -47,7 +62,7 @@
       "muted-foreground": {
         "role": "neutral",
         "displayName": "Quiet Ink",
-        "canonical": "oklch(0.5 0.004 270)"
+        "canonical": "oklch(0.53 0.004 270)"
       },
       "surface-1": {
         "role": "neutral",
@@ -84,10 +99,15 @@
         "displayName": "Plate Ink",
         "canonical": "oklch(0.32 0.004 270)"
       },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted Plate",
+        "canonical": "oklch(0.94 0 0)"
+      },
       "neutral": {
         "role": "neutral",
         "displayName": "Chrome Black",
-        "canonical": "oklch(0.21 0.004 270)"
+        "canonical": "oklch(0.32 0.004 270)"
       },
       "neutral-foreground": {
         "role": "neutral",
@@ -98,6 +118,46 @@
         "role": "neutral",
         "displayName": "Hairline",
         "canonical": "color-mix(in oklab, var(--foreground) 10%, transparent)"
+      },
+      "outline": {
+        "role": "neutral",
+        "displayName": "Recessed Outline",
+        "canonical": "oklch(1 0 0)"
+      },
+      "outline-border": {
+        "role": "neutral",
+        "displayName": "Outline Edge",
+        "canonical": "color-mix(in oklab, var(--foreground) 10%, transparent)"
+      },
+      "dark-outline": {
+        "role": "neutral",
+        "displayName": "Recessed Outline (dark)",
+        "canonical": "oklch(0 0 0 / 0.3)"
+      },
+      "dark-outline-border": {
+        "role": "neutral",
+        "displayName": "Outline Edge (dark)",
+        "canonical": "oklch(1 0 0 / 0.08)"
+      },
+      "input": {
+        "role": "neutral",
+        "displayName": "Field Tint",
+        "canonical": "oklch(0 0 0 / 0.045)"
+      },
+      "input-hover": {
+        "role": "neutral",
+        "displayName": "Field Tint Hover",
+        "canonical": "oklch(0 0 0 / 0.075)"
+      },
+      "dark-input": {
+        "role": "neutral",
+        "displayName": "Field Tint (dark)",
+        "canonical": "oklch(1 0 0 / 0.05)"
+      },
+      "dark-input-hover": {
+        "role": "neutral",
+        "displayName": "Field Tint Hover (dark)",
+        "canonical": "oklch(1 0 0 / 0.09)"
       },
       "destructive": {
         "role": "status",
@@ -117,7 +177,7 @@
       "info-foreground": {
         "role": "status",
         "displayName": "Info",
-        "canonical": "oklch(0.45 0.2 250)"
+        "canonical": "oklch(0.5 0.13 232.65)"
       },
       "success-foreground": {
         "role": "status",
@@ -161,28 +221,28 @@
       },
       "landing-field": {
         "role": "primary",
-        "displayName": "Ultramarine Field",
-        "canonical": "oklch(0.47 0.2 264)",
+        "displayName": "Deep Sky Field",
+        "canonical": "oklch(0.5 0.14 232.65)",
         "tonalRamp": [
-          "oklch(0.15 0.06 264)",
-          "oklch(0.26 0.11 264)",
-          "oklch(0.37 0.16 264)",
-          "oklch(0.47 0.2 264)",
-          "oklch(0.6 0.16 264)",
-          "oklch(0.72 0.11 264)",
-          "oklch(0.85 0.06 264)",
-          "oklch(0.95 0.02 264)"
+          "oklch(0.15 0.049 232.65)",
+          "oklch(0.26 0.084 232.65)",
+          "oklch(0.37 0.119 232.65)",
+          "oklch(0.48 0.14 232.65)",
+          "oklch(0.6 0.14 232.65)",
+          "oklch(0.72 0.119 232.65)",
+          "oklch(0.84 0.07 232.65)",
+          "oklch(0.95 0.025 232.65)"
         ]
       },
       "landing-on-field": {
         "role": "neutral",
         "displayName": "On Field",
-        "canonical": "oklch(0.985 0.008 264)"
+        "canonical": "oklch(0.985 0.008 232.65)"
       },
       "landing-on-field-muted": {
         "role": "neutral",
         "displayName": "On Field Muted",
-        "canonical": "oklch(0.87 0.05 264)"
+        "canonical": "oklch(0.9 0.04 232.65)"
       },
       "landing-field-line": {
         "role": "neutral",
@@ -191,13 +251,13 @@
       },
       "dark-landing-field": {
         "role": "primary",
-        "displayName": "Ultramarine Field (dark)",
-        "canonical": "oklch(0.37 0.16 264)"
+        "displayName": "Deep Sky Field (dark)",
+        "canonical": "oklch(0.4 0.11 232.65)"
       },
       "dark-landing-on-field-muted": {
         "role": "neutral",
         "displayName": "On Field Muted (dark)",
-        "canonical": "oklch(0.84 0.05 264)"
+        "canonical": "oklch(0.86 0.04 232.65)"
       },
       "dark-landing-field-line": {
         "role": "neutral",
@@ -207,12 +267,12 @@
       "landing-slug": {
         "role": "primary",
         "displayName": "Slug Blue",
-        "canonical": "oklch(0.5 0.2 258)"
+        "canonical": "oklch(0.5 0.13 232.65)"
       },
       "dark-landing-slug": {
         "role": "primary",
         "displayName": "Slug Blue (dark)",
-        "canonical": "oklch(0.76 0.13 255)"
+        "canonical": "oklch(0.78 0.12 232.65)"
       }
     },
     "typographyMeta": {
@@ -256,23 +316,28 @@
     "shadows": [
       {
         "name": "surface-shadow-1",
-        "value": "0 0 0 1px oklch(0 0 0 / 0.06)",
+        "value": "0 0 0 1px oklch(0 0 0 / 0.045)",
         "purpose": "Hairline ring; flush containers, the light chrome edge, landing gallery trays."
       },
       {
         "name": "surface-shadow-3",
-        "value": "0 0 0 1px oklch(0 0 0 / 0.06), 0 1px 1px -0.5px oklch(0 0 0 / 0.06), 0 3px 3px -1.5px oklch(0 0 0 / 0.05)",
-        "purpose": "Resting cards, inputs."
+        "value": "0 0 0 1px oklch(0 0 0 / 0.045), 0 1px 1px -0.5px oklch(0 0 0 / 0.06), 0 3px 3px -1.5px oklch(0 0 0 / 0.06)",
+        "purpose": "Resting cards. Fields take no shadow."
       },
       {
         "name": "surface-shadow-6",
-        "value": "0 0 0 1px oklch(0 0 0 / 0.06), 0 1px 1px -0.5px oklch(0 0 0 / 0.06), 0 3px 3px -1.5px oklch(0 0 0 / 0.05), 0 6px 6px -3px oklch(0 0 0 / 0.05), 0 12px 12px -6px oklch(0 0 0 / 0.04), 0 24px 24px -12px oklch(0 0 0 / 0.04)",
+        "value": "0 0 0 1px oklch(0 0 0 / 0.045), 0 1px 1px -0.5px oklch(0 0 0 / 0.06), 0 3px 3px -1.5px oklch(0 0 0 / 0.06), 0 6px 6px -3px oklch(0 0 0 / 0.06), 0 12px 12px -6px oklch(0 0 0 / 0.05), 0 24px 24px -12px oklch(0 0 0 / 0.05)",
         "purpose": "Popovers, menus, the landing hero stage (rung 3 fill, rung 6 shadow)."
       },
       {
         "name": "surface-shadow-8",
-        "value": "0 0 0 1px oklch(0 0 0 / 0.06), 0 1px 1px -0.5px oklch(0 0 0 / 0.06), 0 3px 3px -1.5px oklch(0 0 0 / 0.05), 0 6px 6px -3px oklch(0 0 0 / 0.05), 0 12px 12px -6px oklch(0 0 0 / 0.04), 0 24px 24px -12px oklch(0 0 0 / 0.04), 0 48px 48px -24px oklch(0 0 0 / 0.03), 0 96px 96px -48px oklch(0 0 0 / 0.03)",
+        "value": "0 0 0 1px oklch(0 0 0 / 0.045), 0 1px 1px -0.5px oklch(0 0 0 / 0.06), 0 3px 3px -1.5px oklch(0 0 0 / 0.06), 0 6px 6px -3px oklch(0 0 0 / 0.06), 0 12px 12px -6px oklch(0 0 0 / 0.05), 0 24px 24px -12px oklch(0 0 0 / 0.05), 0 48px 48px -24px oklch(0 0 0 / 0.04), 0 96px 96px -48px oklch(0 0 0 / 0.04)",
         "purpose": "Top of the ladder: dialogs and the highest floats."
+      },
+      {
+        "name": "dark-outer-ring",
+        "value": "0 0 0 1px oklch(0 0 0 / 0.08) at rung 3, climbing 2% a rung to 0.18 at rung 8",
+        "purpose": "Dark ladder's outer ring, softened; paired with the inset rim."
       },
       {
         "name": "dark-rim-3",
@@ -412,15 +477,15 @@
       "refersTo": "button-primary",
       "description": "The one blue action; paint on a pseudo-layer that scales on press.",
       "html": "<button class=\"ds-btn ds-btn-primary\">Get started</button>",
-      "css": ".ds-btn { position: relative; isolation: isolate; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px; padding: 0 14px; border: 0; border-radius: 12px; font: 500 14px/1 Geist, ui-sans-serif, system-ui, sans-serif; cursor: pointer; background: transparent; outline: 0 solid transparent; outline-offset: 0; transition: outline-width 100ms ease-out, outline-offset 100ms ease-out, color 100ms ease-out; } .ds-btn::before { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: var(--ds-paint, transparent); border: 1px solid var(--ds-border, transparent); transition: background-color 100ms ease-out, scale 100ms ease-out; } .ds-btn:active::before { scale: 0.98; } .ds-btn:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.55 0.2 250) 50%, transparent); outline-offset: 2px; } .ds-btn-primary { color: oklch(1 0 0); --ds-paint: oklch(0.6 0.2 250); } .ds-btn-primary:hover { --ds-paint: color-mix(in oklch, oklch(0.6 0.2 250), black 5%); } .ds-btn-primary:active { --ds-paint: color-mix(in oklch, oklch(0.6 0.2 250), black 8%); }"
+      "css": ".ds-btn { position: relative; isolation: isolate; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px; padding: 0 14px; border: 0; border-radius: 12px; font: 500 14px/1 Geist, ui-sans-serif, system-ui, sans-serif; cursor: pointer; background: transparent; outline: 0 solid transparent; outline-offset: 0; transition: outline-width 100ms ease-out, outline-offset 100ms ease-out, color 100ms ease-out; } .ds-btn::before { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: var(--ds-paint, transparent); border: 1px solid var(--ds-border, transparent); transition: background-color 100ms ease-out, scale 100ms ease-out; } .ds-btn:active::before { scale: 0.98; } .ds-btn:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.7 0.15 232.65) 50%, transparent); outline-offset: 2px; } .ds-btn-primary { color: oklch(1 0 0); --ds-paint: oklch(0.68 0.16 232.65); } .ds-btn-primary:hover { --ds-paint: color-mix(in oklch, oklch(0.68 0.16 232.65), black 5%); } .ds-btn-primary:active { --ds-paint: color-mix(in oklch, oklch(0.68 0.16 232.65), black 8%); }"
     },
     {
       "name": "Outline Button",
       "kind": "button",
       "refersTo": "button-outline",
-      "description": "Secondary action on the page: card fill with a hairline.",
+      "description": "Recessed outline: card fill and hairline in light; in dark a 30% black fill with an 8% white edge (var(--outline), var(--outline-border)).",
       "html": "<button class=\"ds-btn-o\">Browse components</button>",
-      "css": ".ds-btn-o { position: relative; display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 12px; border: 1px solid color-mix(in oklab, oklch(0.18 0.004 270) 10%, transparent); background: oklch(1 0 0); color: oklch(0.18 0.004 270); font: 500 14px/1 Geist, ui-sans-serif, system-ui, sans-serif; cursor: pointer; transition: background-color 100ms ease-out, scale 100ms ease-out; } .ds-btn-o:hover { background: color-mix(in oklch, oklch(1 0 0), black 5%); } .ds-btn-o:active { background: color-mix(in oklch, oklch(1 0 0), black 8%); scale: 0.98; } .ds-btn-o:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.55 0.2 250) 50%, transparent); outline-offset: 2px; }"
+      "css": ".ds-btn-o { position: relative; display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--outline-border, color-mix(in oklab, oklch(0.3 0.004 270) 10%, transparent)); background: var(--outline, oklch(1 0 0)); color: oklch(0.3 0.004 270); font: 500 14px/1 Geist, ui-sans-serif, system-ui, sans-serif; cursor: pointer; transition: background-color 100ms ease-out, scale 100ms ease-out; } .ds-btn-o:hover { background: color-mix(in oklch, oklch(1 0 0), black 4%); } .ds-btn-o:active { background: color-mix(in oklch, oklch(1 0 0), black 7%); scale: 0.98; } .ds-btn-o:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.7 0.15 232.65) 50%, transparent); outline-offset: 2px; }"
     },
     {
       "name": "Ghost Button",
@@ -428,7 +493,23 @@
       "refersTo": "button-ghost",
       "description": "Quiet tool: Quiet Ink label that brightens to ink on a 6% wash.",
       "html": "<button class=\"ds-btn-g\">Copy page</button>",
-      "css": ".ds-btn-g { display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border: 0; border-radius: 12px; background: transparent; color: oklch(0.5 0.004 270); font: 500 14px/1 Geist, ui-sans-serif, system-ui, sans-serif; cursor: pointer; transition: background-color 100ms ease-out, color 100ms ease-out; } .ds-btn-g:hover { color: oklch(0.18 0.004 270); background: oklch(0 0 0 / 0.06); } .ds-btn-g:active { background: oklch(0 0 0 / 0.08); } .ds-btn-g:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.55 0.2 250) 50%, transparent); outline-offset: 2px; }"
+      "css": ".ds-btn-g { display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border: 0; border-radius: 12px; background: transparent; color: oklch(0.53 0.004 270); font: 500 14px/1 Geist, ui-sans-serif, system-ui, sans-serif; cursor: pointer; transition: background-color 100ms ease-out, color 100ms ease-out; } .ds-btn-g:hover { color: oklch(0.3 0.004 270); background: oklch(0 0 0 / 0.06); } .ds-btn-g:active { background: oklch(0 0 0 / 0.08); } .ds-btn-g:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.7 0.15 232.65) 50%, transparent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Filled, not outlined: a translucent field tint with a transparent 1px border for geometry; hover deepens the tint.",
+      "html": "<input class=\"ds-field\" placeholder=\"you@example.com\" aria-label=\"Email\">",
+      "css": ".ds-field { height: 36px; width: 260px; padding: 8px 12px; border: 1px solid transparent; border-radius: 12px; background: oklch(0 0 0 / 0.045); color: oklch(0.3 0.004 270); font: 400 14px/1.4 Geist, ui-sans-serif, system-ui, sans-serif; outline: 0 solid transparent; outline-offset: 0; transition: background-color 200ms, outline-width 100ms ease-out, outline-offset 100ms ease-out; } .ds-field::placeholder { color: oklch(0.53 0.004 270); } .ds-field:hover { background: oklch(0 0 0 / 0.075); } .ds-field:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.7 0.15 232.65) 50%, transparent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Alert",
+      "kind": "card",
+      "refersTo": "alert",
+      "description": "Filled plate with a leading status bar; no border, no shadow.",
+      "html": "<div class=\"ds-alert\" role=\"status\"><strong>Heads up</strong><span>Components are copied into your project.</span></div><div class=\"ds-alert ds-alert-info\" role=\"status\"><strong>Info</strong><span>The info plate shares the primary hue.</span></div>",
+      "css": ".ds-alert { position: relative; display: grid; gap: 2px; max-width: 360px; margin-bottom: 8px; padding: 12px 16px 12px 24px; border: 1px solid transparent; border-radius: 12px; background: oklch(0.94 0 0); color: oklch(0.3 0.004 270); font: 400 14px/1.45 Geist, ui-sans-serif, system-ui, sans-serif; } .ds-alert::before { content: ''; position: absolute; left: 8px; top: 8px; bottom: 8px; width: 4px; border-radius: 999px; background: color-mix(in oklab, oklch(0.3 0.004 270) 10%, transparent); } .ds-alert strong { font-weight: 500; } .ds-alert-info { background: oklch(0.97 0.03 232.65); } .ds-alert-info::before { background: oklch(0.5 0.13 232.65); }"
     },
     {
       "name": "Shelf Trigger",
@@ -436,7 +517,7 @@
       "refersTo": "shelf-trigger",
       "description": "Header pill naming the current page, with the four-cell cubby glyph.",
       "html": "<button class=\"ds-trigger\" aria-expanded=\"false\"><svg class=\"ds-glyph\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\"><rect x=\"1.5\" y=\"1.5\" width=\"5.5\" height=\"5.5\" rx=\"1.6\"/><rect x=\"9\" y=\"1.5\" width=\"5.5\" height=\"5.5\" rx=\"1.6\"/><rect x=\"1.5\" y=\"9\" width=\"5.5\" height=\"5.5\" rx=\"1.6\"/><rect x=\"9\" y=\"9\" width=\"5.5\" height=\"5.5\" rx=\"1.6\"/></svg><span class=\"ds-trigger-group\">Components</span><span class=\"ds-trigger-sep\">/</span><span class=\"ds-trigger-page\">Button</span><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"ds-chev\" aria-hidden=\"true\"><path d=\"M18 9l-6 6-6-6\"/></svg></button>",
-      "css": ".ds-trigger { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 10px; border: 0; border-radius: 999px; background: transparent; font: 400 14px/1 Geist, ui-sans-serif, system-ui, sans-serif; cursor: pointer; transition: background-color 150ms ease-out; } .ds-trigger:hover { background: oklch(0 0 0 / 0.06); } .ds-trigger[aria-expanded='true'] { background: oklch(0 0 0 / 0.1); } .ds-trigger:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.55 0.2 250) 50%, transparent); } .ds-glyph rect { fill: currentColor; opacity: 0.32; } .ds-glyph rect:first-child { fill: oklch(0.6 0.2 250); opacity: 1; } .ds-trigger-group { color: oklch(0.5 0.004 270); } .ds-trigger-sep { color: color-mix(in oklab, oklch(0.18 0.004 270) 10%, transparent); } .ds-trigger-page { color: oklch(0.18 0.004 270); font-weight: 500; } .ds-chev { color: oklch(0.5 0.004 270); transition: rotate 400ms cubic-bezier(0.19, 1, 0.22, 1); } .ds-trigger[aria-expanded='true'] .ds-chev { rotate: 180deg; }"
+      "css": ".ds-trigger { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 10px; border: 0; border-radius: 999px; background: transparent; font: 400 14px/1 Geist, ui-sans-serif, system-ui, sans-serif; cursor: pointer; transition: background-color 150ms ease-out; } .ds-trigger:hover { background: oklch(0 0 0 / 0.06); } .ds-trigger[aria-expanded='true'] { background: oklch(0 0 0 / 0.1); } .ds-trigger:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.7 0.15 232.65) 50%, transparent); } .ds-glyph rect { fill: currentColor; opacity: 0.32; } .ds-glyph rect:first-child { fill: oklch(0.68 0.16 232.65); opacity: 1; } .ds-trigger-group { color: oklch(0.53 0.004 270); } .ds-trigger-sep { color: color-mix(in oklab, oklch(0.3 0.004 270) 10%, transparent); } .ds-trigger-page { color: oklch(0.3 0.004 270); font-weight: 500; } .ds-chev { color: oklch(0.53 0.004 270); transition: rotate 400ms cubic-bezier(0.19, 1, 0.22, 1); } .ds-trigger[aria-expanded='true'] .ds-chev { rotate: 180deg; }"
     },
     {
       "name": "Cubby Shelf Index",
@@ -444,7 +525,7 @@
       "refersTo": "shelf-link",
       "description": "A contents page: plain links flowing down columns; the current page takes a small blue mark.",
       "html": "<ul class=\"ds-index\"><li><a class=\"ds-link\" href=\"#\"><span class=\"ds-mark\"></span>Accordion</a></li><li><a class=\"ds-link\" href=\"#\"><span class=\"ds-mark\"></span>Alert</a></li><li><a class=\"ds-link\" aria-current=\"page\" href=\"#\"><span class=\"ds-mark\"></span>Button</a></li><li><a class=\"ds-link\" href=\"#\"><span class=\"ds-mark\"></span>Card</a></li><li><a class=\"ds-link\" href=\"#\"><span class=\"ds-mark\"></span>Dialog</a></li><li><a class=\"ds-link\" href=\"#\"><span class=\"ds-mark\"></span>Popover</a></li></ul>",
-      "css": ".ds-index { columns: 2; column-gap: 24px; list-style: none; margin: 0; padding: 0; } .ds-index > li { break-inside: avoid; } .ds-link { display: flex; align-items: center; height: 32px; margin: 0 -8px; padding: 0 8px; border-radius: 8px; font: 400 14px/1 Geist, ui-sans-serif, system-ui, sans-serif; color: oklch(0.5 0.004 270); text-decoration: none; transition: color 150ms ease-out, background-color 150ms ease-out; } .ds-link:hover { color: oklch(0.18 0.004 270); background: oklch(0 0 0 / 0.06); } .ds-link:focus-visible { color: oklch(0.18 0.004 270); outline: 2px solid color-mix(in oklab, oklch(0.55 0.2 250) 55%, transparent); outline-offset: -2px; } .ds-link[aria-current='page'] { color: oklch(0.18 0.004 270); font-weight: 500; } .ds-mark { flex-shrink: 0; width: 0; height: 6px; margin-right: 0; border-radius: 2px; background: oklch(0.6 0.2 250); scale: 0; transition: width 300ms cubic-bezier(0.19, 1, 0.22, 1), margin 300ms cubic-bezier(0.19, 1, 0.22, 1), scale 300ms cubic-bezier(0.19, 1, 0.22, 1); } .ds-link[aria-current='page'] .ds-mark { width: 6px; margin-right: 8px; scale: 1; }"
+      "css": ".ds-index { columns: 2; column-gap: 24px; list-style: none; margin: 0; padding: 0; } .ds-index > li { break-inside: avoid; } .ds-link { display: flex; align-items: center; height: 32px; margin: 0 -8px; padding: 0 8px; border-radius: 8px; font: 400 14px/1 Geist, ui-sans-serif, system-ui, sans-serif; color: oklch(0.53 0.004 270); text-decoration: none; transition: color 150ms ease-out, background-color 150ms ease-out; } .ds-link:hover { color: oklch(0.3 0.004 270); background: oklch(0 0 0 / 0.06); } .ds-link:focus-visible { color: oklch(0.3 0.004 270); outline: 2px solid color-mix(in oklab, oklch(0.7 0.15 232.65) 55%, transparent); outline-offset: -2px; } .ds-link[aria-current='page'] { color: oklch(0.3 0.004 270); font-weight: 500; } .ds-mark { flex-shrink: 0; width: 0; height: 6px; margin-right: 0; border-radius: 2px; background: oklch(0.68 0.16 232.65); scale: 0; transition: width 300ms cubic-bezier(0.19, 1, 0.22, 1), margin 300ms cubic-bezier(0.19, 1, 0.22, 1), scale 300ms cubic-bezier(0.19, 1, 0.22, 1); } .ds-link[aria-current='page'] .ds-mark { width: 6px; margin-right: 8px; scale: 1; }"
     },
     {
       "name": "Preview Stage",
@@ -452,21 +533,21 @@
       "refersTo": "preview-stage",
       "description": "The live component's stage: drawn with a hairline, faint light from above, tools top-right.",
       "html": "<figure class=\"ds-stage\"><div class=\"ds-tools\"><button class=\"ds-tool\" aria-expanded=\"false\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M8 7l-5 5 5 5\"/><path d=\"M16 7l5 5-5 5\"/></svg>Code</button></div><div class=\"ds-canvas\"><button class=\"ds-demo\">Button</button></div></figure>",
-      "css": ".ds-stage { position: relative; display: flex; min-height: 16rem; margin: 0; border-radius: 18px; background-color: oklch(0.97 0 0); background-image: radial-gradient(120% 90% at 50% 0%, color-mix(in oklab, oklch(0.18 0.004 270) 3.5%, transparent), transparent 70%); box-shadow: 0 0 0 1px color-mix(in oklab, oklch(0.18 0.004 270) 10%, transparent); } .ds-tools { position: absolute; top: 8px; right: 8px; display: flex; gap: 2px; } .ds-tool { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 8px; border: 0; border-radius: 8px; background: transparent; color: oklch(0.5 0.004 270); font: 500 12px/1 Geist, ui-sans-serif, system-ui, sans-serif; cursor: pointer; transition: color 150ms ease-out, background-color 150ms ease-out; } .ds-tool:hover { color: oklch(0.18 0.004 270); background: oklch(0 0 0 / 0.06); } .ds-tool[aria-expanded='true'] { color: oklch(0.18 0.004 270); background: oklch(0 0 0 / 0.1); } .ds-tool:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.55 0.2 250) 50%, transparent); } .ds-canvas { display: flex; flex: 1; align-items: center; justify-content: center; padding: 52px 24px 40px; } .ds-demo { height: 36px; padding: 0 14px; border: 0; border-radius: 12px; background: oklch(0.6 0.2 250); color: oklch(1 0 0); font: 500 14px/1 Geist, ui-sans-serif, system-ui, sans-serif; }"
+      "css": ".ds-stage { position: relative; display: flex; min-height: 16rem; margin: 0; border-radius: 18px; background-color: oklch(0.97 0 0); background-image: radial-gradient(120% 90% at 50% 0%, color-mix(in oklab, oklch(0.3 0.004 270) 3.5%, transparent), transparent 70%); box-shadow: 0 0 0 1px color-mix(in oklab, oklch(0.3 0.004 270) 10%, transparent); } .ds-tools { position: absolute; top: 8px; right: 8px; display: flex; gap: 2px; } .ds-tool { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 8px; border: 0; border-radius: 8px; background: transparent; color: oklch(0.53 0.004 270); font: 500 12px/1 Geist, ui-sans-serif, system-ui, sans-serif; cursor: pointer; transition: color 150ms ease-out, background-color 150ms ease-out; } .ds-tool:hover { color: oklch(0.3 0.004 270); background: oklch(0 0 0 / 0.06); } .ds-tool[aria-expanded='true'] { color: oklch(0.3 0.004 270); background: oklch(0 0 0 / 0.1); } .ds-tool:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.7 0.15 232.65) 50%, transparent); } .ds-canvas { display: flex; flex: 1; align-items: center; justify-content: center; padding: 52px 24px 40px; } .ds-demo { height: 36px; padding: 0 14px; border: 0; border-radius: 12px; background: oklch(0.68 0.16 232.65); color: oklch(1 0 0); font: 500 14px/1 Geist, ui-sans-serif, system-ui, sans-serif; }"
     },
     {
       "name": "Tick Rail",
       "kind": "nav",
       "description": "Table of contents as ticks; expands into a floating panel with labels on hover or focus.",
       "html": "<nav class=\"ds-rail\"><a class=\"ds-rl\" href=\"#\"><span class=\"ds-rl-label\">Installation</span><span class=\"ds-tick\"></span></a><a class=\"ds-rl\" data-active href=\"#\"><span class=\"ds-rl-label\">Usage</span><span class=\"ds-tick\"></span></a><a class=\"ds-rl ds-deep\" href=\"#\"><span class=\"ds-rl-label\">Variants</span><span class=\"ds-tick\"></span></a><a class=\"ds-rl\" href=\"#\"><span class=\"ds-rl-label\">API reference</span><span class=\"ds-tick\"></span></a></nav>",
-      "css": ".ds-rail { display: inline-flex; flex-direction: column; padding: 8px; border-radius: 16px; background: transparent; box-shadow: 0 0 0 1px transparent; transition: background-color 250ms ease-out, box-shadow 250ms ease-out; } .ds-rail:hover, .ds-rail:focus-within { background: oklch(0.97 0 0); box-shadow: 0 0 0 1px color-mix(in oklab, oklch(0.18 0.004 270) 10%, transparent), 0 16px 40px -12px oklch(0 0 0 / 0.14); } .ds-rl { display: flex; align-items: center; height: 10px; border-radius: 6px; text-decoration: none; transition: height 350ms cubic-bezier(0.19, 1, 0.22, 1); } .ds-rail:hover .ds-rl, .ds-rail:focus-within .ds-rl { height: 26px; } .ds-rl-label { flex: 1; max-width: 0; overflow: hidden; white-space: nowrap; font: 400 13px/1 Geist, ui-sans-serif, system-ui, sans-serif; color: oklch(0.5 0.004 270); opacity: 0; transition: max-width 350ms cubic-bezier(0.19, 1, 0.22, 1), opacity 200ms ease-out, color 150ms ease-out; } .ds-rail:hover .ds-rl-label, .ds-rail:focus-within .ds-rl-label { max-width: 15rem; margin-right: 14px; opacity: 1; } .ds-deep .ds-rl-label { padding-left: 12px; } .ds-rl:hover .ds-rl-label, .ds-rl[data-active] .ds-rl-label { color: oklch(0.18 0.004 270); } .ds-tick { flex-shrink: 0; margin-left: auto; width: 12px; height: 2px; border-radius: 1px; background: color-mix(in oklab, oklch(0.18 0.004 270) 16%, transparent); transition: width 350ms cubic-bezier(0.19, 1, 0.22, 1), background-color 200ms ease-out; } .ds-deep .ds-tick { width: 7px; } .ds-rl[data-active] .ds-tick { width: 20px; background: oklch(0.18 0.004 270); } .ds-rl:hover .ds-tick { background: oklch(0.18 0.004 270); } .ds-rl:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.55 0.2 250) 55%, transparent); outline-offset: 1px; }"
+      "css": ".ds-rail { display: inline-flex; flex-direction: column; padding: 8px; border-radius: 16px; background: transparent; box-shadow: 0 0 0 1px transparent; transition: background-color 250ms ease-out, box-shadow 250ms ease-out; } .ds-rail:hover, .ds-rail:focus-within { background: oklch(0.97 0 0); box-shadow: 0 0 0 1px color-mix(in oklab, oklch(0.3 0.004 270) 10%, transparent), 0 16px 40px -12px oklch(0 0 0 / 0.14); } .ds-rl { display: flex; align-items: center; height: 10px; border-radius: 6px; text-decoration: none; transition: height 350ms cubic-bezier(0.19, 1, 0.22, 1); } .ds-rail:hover .ds-rl, .ds-rail:focus-within .ds-rl { height: 26px; } .ds-rl-label { flex: 1; max-width: 0; overflow: hidden; white-space: nowrap; font: 400 13px/1 Geist, ui-sans-serif, system-ui, sans-serif; color: oklch(0.53 0.004 270); opacity: 0; transition: max-width 350ms cubic-bezier(0.19, 1, 0.22, 1), opacity 200ms ease-out, color 150ms ease-out; } .ds-rail:hover .ds-rl-label, .ds-rail:focus-within .ds-rl-label { max-width: 15rem; margin-right: 14px; opacity: 1; } .ds-deep .ds-rl-label { padding-left: 12px; } .ds-rl:hover .ds-rl-label, .ds-rl[data-active] .ds-rl-label { color: oklch(0.3 0.004 270); } .ds-tick { flex-shrink: 0; margin-left: auto; width: 12px; height: 2px; border-radius: 1px; background: color-mix(in oklab, oklch(0.3 0.004 270) 16%, transparent); transition: width 350ms cubic-bezier(0.19, 1, 0.22, 1), background-color 200ms ease-out; } .ds-deep .ds-tick { width: 7px; } .ds-rl[data-active] .ds-tick { width: 20px; background: oklch(0.3 0.004 270); } .ds-rl:hover .ds-tick { background: oklch(0.3 0.004 270); } .ds-rl:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.7 0.15 232.65) 55%, transparent); outline-offset: 1px; }"
     },
     {
       "name": "API Prop Row",
       "kind": "custom",
       "description": "Quiet hairline row: mono name, type, default, and a turning chevron.",
       "html": "<button class=\"ds-prop\"><code class=\"ds-prop-name\">variant</code><code class=\"ds-prop-meta\">\"primary\" | \"outline\" | \"ghost\"</code><code class=\"ds-prop-meta\">\"primary\"</code><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"ds-prop-chev\" aria-hidden=\"true\"><path d=\"M9 6l6 6-6 6\"/></svg></button>",
-      "css": ".ds-prop { display: grid; grid-template-columns: auto minmax(0, 1fr) auto min-content; align-items: center; width: 100%; padding: 0; border: 0; border-bottom: 1px solid color-mix(in oklab, color-mix(in oklab, oklch(0.18 0.004 270) 10%, transparent) 70%, transparent); border-radius: 0; background: transparent; text-align: left; cursor: pointer; transition: background-color 150ms ease-out; } .ds-prop:hover { background: color-mix(in oklab, oklch(0.18 0.004 270) 2.5%, transparent); } .ds-prop:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.55 0.2 250) 50%, transparent); border-radius: 10px; } .ds-prop > * { padding: 12px 16px 12px 0; } .ds-prop-name { font: 500 13px/1.4 'Geist Mono', ui-monospace, monospace; color: oklch(0.18 0.004 270); } .ds-prop-meta { font: 400 13px/1.4 'Geist Mono', ui-monospace, monospace; color: oklch(0.5 0.004 270); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-prop-chev { color: oklch(0.5 0.004 270); padding: 0; transition: rotate 300ms cubic-bezier(0.19, 1, 0.22, 1); } .ds-prop[aria-expanded='true'] .ds-prop-chev { rotate: 90deg; }"
+      "css": ".ds-prop { display: grid; grid-template-columns: auto minmax(0, 1fr) auto min-content; align-items: center; width: 100%; padding: 0; border: 0; border-bottom: 1px solid color-mix(in oklab, color-mix(in oklab, oklch(0.3 0.004 270) 10%, transparent) 70%, transparent); border-radius: 0; background: transparent; text-align: left; cursor: pointer; transition: background-color 150ms ease-out; } .ds-prop:hover { background: color-mix(in oklab, oklch(0.3 0.004 270) 2.5%, transparent); } .ds-prop:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.7 0.15 232.65) 50%, transparent); border-radius: 10px; } .ds-prop > * { padding: 12px 16px 12px 0; } .ds-prop-name { font: 500 13px/1.4 'Geist Mono', ui-monospace, monospace; color: oklch(0.3 0.004 270); } .ds-prop-meta { font: 400 13px/1.4 'Geist Mono', ui-monospace, monospace; color: oklch(0.53 0.004 270); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-prop-chev { color: oklch(0.53 0.004 270); padding: 0; transition: rotate 300ms cubic-bezier(0.19, 1, 0.22, 1); } .ds-prop[aria-expanded='true'] .ds-prop-chev { rotate: 90deg; }"
     },
     {
       "name": "Docs Note",
@@ -474,15 +555,15 @@
       "refersTo": "docs-note",
       "description": "Callout drawn with a 4% ink wash, no border or shadow.",
       "html": "<aside class=\"ds-note\"><p>Components are copied into your project. You own the source.</p></aside>",
-      "css": ".ds-note { padding: 14px 18px; border-radius: 14px; background: color-mix(in oklab, oklch(0.18 0.004 270) 4%, transparent); color: color-mix(in oklab, oklch(0.18 0.004 270) 88%, oklch(0.97 0 0)); font: 400 15px/1.65 Geist, ui-sans-serif, system-ui, sans-serif; } .ds-note p { margin: 0; }"
+      "css": ".ds-note { padding: 14px 18px; border-radius: 14px; background: color-mix(in oklab, oklch(0.3 0.004 270) 4%, transparent); color: color-mix(in oklab, oklch(0.3 0.004 270) 88%, oklch(0.97 0 0)); font: 400 15px/1.65 Geist, ui-sans-serif, system-ui, sans-serif; } .ds-note p { margin: 0; }"
     },
     {
       "name": "Landing Slab Actions",
       "kind": "button",
       "refersTo": "landing-button-primary",
-      "description": "The landing's two pills on the ultramarine slab: light primary and ringed ghost.",
+      "description": "The landing's two pills on the deep-sky slab: light primary and ringed ghost.",
       "html": "<div class=\"ds-land-slab ds-land-actions\"><a class=\"ds-land-pill ds-land-pill-primary\" href=\"#\">Get started <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9 6l6 6-6 6\"/></svg></a><a class=\"ds-land-pill ds-land-pill-ghost\" href=\"#\">Browse components</a></div>",
-      "css": ".ds-land-slab { background: oklch(0.47 0.2 264); color: oklch(0.985 0.008 264); border-radius: 28px; padding: 32px; } .ds-land-actions { display: flex; flex-wrap: wrap; gap: 12px; } .ds-land-pill { display: inline-flex; align-items: center; gap: 6px; height: 44px; border-radius: 999px; font: 500 15px/1 Geist, ui-sans-serif, system-ui, sans-serif; text-decoration: none; outline: 0 solid transparent; outline-offset: 2px; transition: opacity 150ms ease-out, background-color 150ms ease-out, scale 100ms ease-out; } .ds-land-pill:focus-visible { outline: 2px solid oklch(0.985 0.008 264); } .ds-land-pill:active { scale: 0.97; } .ds-land-pill-primary { background: oklch(0.985 0.008 264); color: oklch(0.47 0.2 264); padding: 0 16px 0 20px; } .ds-land-pill-primary:hover { opacity: 0.9; } .ds-land-pill-ghost { color: oklch(0.985 0.008 264); padding: 0 20px; box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.16); } .ds-land-pill-ghost:hover { background: oklch(1 0 0 / 0.16); }"
+      "css": ".ds-land-slab { background: oklch(0.5 0.14 232.65); color: oklch(0.985 0.008 232.65); border-radius: 28px; padding: 32px; } .ds-land-actions { display: flex; flex-wrap: wrap; gap: 12px; } .ds-land-pill { display: inline-flex; align-items: center; gap: 6px; height: 44px; border-radius: 999px; font: 500 15px/1 Geist, ui-sans-serif, system-ui, sans-serif; text-decoration: none; outline: 0 solid transparent; outline-offset: 2px; transition: opacity 150ms ease-out, background-color 150ms ease-out, scale 100ms ease-out; } .ds-land-pill:focus-visible { outline: 2px solid oklch(0.985 0.008 232.65); } .ds-land-pill:active { scale: 0.97; } .ds-land-pill-primary { background: oklch(0.985 0.008 232.65); color: oklch(0.5 0.14 232.65); padding: 0 16px 0 20px; } .ds-land-pill-primary:hover { opacity: 0.9; } .ds-land-pill-ghost { color: oklch(0.985 0.008 232.65); padding: 0 20px; box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.16); } .ds-land-pill-ghost:hover { background: oklch(1 0 0 / 0.16); }"
     },
     {
       "name": "Landing Showcase",
@@ -490,7 +571,7 @@
       "refersTo": "landing-command-bar",
       "description": "Hero signature: tab pills, a stage card of live demos, and a neutral install command joined beneath with the component name in Slug Blue.",
       "html": "<div class=\"ds-sc\"><div class=\"ds-sc-tabs\"><button class=\"ds-sc-tab ds-sc-tab-on\">Text Morph<span class=\"ds-sc-dwell\"></span></button><button class=\"ds-sc-tab\">Circular Slider</button><button class=\"ds-sc-tab\">Tree</button><button class=\"ds-sc-tab\">QR Code</button></div><div class=\"ds-sc-card\"><div class=\"ds-sc-stage\">$1,234.56</div><div class=\"ds-sc-cmd\"><code><span class=\"ds-sc-dollar\">$ </span>pnpm dlx shadcn@latest add @cubby-ui/<span class=\"ds-sc-slug\">text-morph</span></code></div></div></div>",
-      "css": ".ds-sc { background: oklch(0.47 0.2 264); border-radius: 28px; padding: 24px; display: flex; flex-direction: column; gap: 12px; font-family: Geist, ui-sans-serif, system-ui, sans-serif; } .ds-sc-tabs { display: flex; gap: 4px; } .ds-sc-tab { position: relative; overflow: hidden; height: 32px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; color: oklch(0.87 0.05 264); font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; outline: 0 solid transparent; outline-offset: 2px; } .ds-sc-tab:hover { background: oklch(1 0 0 / 0.16); color: oklch(0.985 0.008 264); } .ds-sc-tab:focus-visible { outline: 2px solid oklch(0.985 0.008 264); } .ds-sc-tab-on, .ds-sc-tab-on:hover { background: oklch(0.985 0.008 264); color: oklch(0.47 0.2 264); } .ds-sc-dwell { position: absolute; left: 12px; right: 12px; bottom: 4px; height: 1px; background: color-mix(in oklab, oklch(0.47 0.2 264) 40%, transparent); transform-origin: left; animation: ds-dwell 5.2s linear infinite; } @keyframes ds-dwell { from { transform: scaleX(0); } } @media (prefers-reduced-motion: reduce) { .ds-sc-dwell { animation: none; } } .ds-sc-card { overflow: hidden; border-radius: 20px; background: oklch(1 0 0); box-shadow: 0 0 0 1px oklch(0 0 0 / 0.06), 0 3px 3px -1.5px oklch(0 0 0 / 0.05), 0 12px 12px -6px oklch(0 0 0 / 0.04), 0 24px 24px -12px oklch(0 0 0 / 0.04); } .ds-sc-stage { height: 15rem; padding: 20px; display: flex; align-items: center; justify-content: center; font: 600 40px/1 Geist, ui-sans-serif, system-ui, sans-serif; color: oklch(0.18 0.004 270); } .ds-sc-cmd { background: var(--muted, oklch(0.955 0 0)); color: oklch(0.18 0.004 270); border-top: 1px solid color-mix(in oklab, oklch(0.18 0.004 270) 10%, transparent); padding: 10px 8px 10px 16px; font: 13px/1.4 'Geist Mono', ui-monospace, monospace; white-space: nowrap; overflow-x: auto; scrollbar-width: none; } .ds-sc-dollar { color: oklch(0.5 0.004 270); } .ds-sc-slug { color: oklch(0.5 0.2 258); font-weight: 500; }"
+      "css": ".ds-sc { background: oklch(0.5 0.14 232.65); border-radius: 28px; padding: 24px; display: flex; flex-direction: column; gap: 12px; font-family: Geist, ui-sans-serif, system-ui, sans-serif; } .ds-sc-tabs { display: flex; gap: 4px; } .ds-sc-tab { position: relative; overflow: hidden; height: 32px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; color: oklch(0.9 0.04 232.65); font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; outline: 0 solid transparent; outline-offset: 2px; } .ds-sc-tab:hover { background: oklch(1 0 0 / 0.16); color: oklch(0.985 0.008 232.65); } .ds-sc-tab:focus-visible { outline: 2px solid oklch(0.985 0.008 232.65); } .ds-sc-tab-on, .ds-sc-tab-on:hover { background: oklch(0.985 0.008 232.65); color: oklch(0.5 0.14 232.65); } .ds-sc-dwell { position: absolute; left: 12px; right: 12px; bottom: 4px; height: 1px; background: color-mix(in oklab, oklch(0.5 0.14 232.65) 40%, transparent); transform-origin: left; animation: ds-dwell 5.2s linear infinite; } @keyframes ds-dwell { from { transform: scaleX(0); } } @media (prefers-reduced-motion: reduce) { .ds-sc-dwell { animation: none; } } .ds-sc-card { overflow: hidden; border-radius: 20px; background: oklch(1 0 0); box-shadow: 0 0 0 1px oklch(0 0 0 / 0.045), 0 3px 3px -1.5px oklch(0 0 0 / 0.06), 0 12px 12px -6px oklch(0 0 0 / 0.05), 0 24px 24px -12px oklch(0 0 0 / 0.05); } .ds-sc-stage { height: 15rem; padding: 20px; display: flex; align-items: center; justify-content: center; font: 600 40px/1 Geist, ui-sans-serif, system-ui, sans-serif; color: oklch(0.3 0.004 270); } .ds-sc-cmd { background: var(--muted, oklch(0.955 0 0)); color: oklch(0.3 0.004 270); border-top: 1px solid color-mix(in oklab, oklch(0.3 0.004 270) 10%, transparent); padding: 10px 8px 10px 16px; font: 13px/1.4 'Geist Mono', ui-monospace, monospace; white-space: nowrap; overflow-x: auto; scrollbar-width: none; } .ds-sc-dollar { color: oklch(0.53 0.004 270); } .ds-sc-slug { color: oklch(0.5 0.13 232.65); font-weight: 500; }"
     },
     {
       "name": "Landing Gallery Card",
@@ -498,15 +579,16 @@
       "refersTo": "landing-gallery-card",
       "description": "The docs example tray: a live component on a page-background card inside a muted 20px tray, name, description and a round docs arrow on the tray below.",
       "html": "<article class=\"ds-gc\"><div class=\"ds-gc-demo\"><button class=\"ds-gc-sample\">Live component</button></div><div class=\"ds-gc-foot\"><div><h3 class=\"ds-gc-name\">Circular Slider</h3><p class=\"ds-gc-desc\">A round slider for values on a dial.</p></div><a class=\"ds-gc-arrow\" href=\"#\" aria-label=\"Circular Slider docs\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9 6l6 6-6 6\"/></svg></a></div></article>",
-      "css": ".ds-gc { display: flex; flex-direction: column; max-width: 360px; padding: 4px; border-radius: 20px; background: var(--muted, oklch(0.955 0 0)); color: oklch(0.18 0.004 270); box-shadow: 0 0 0 1px oklch(0 0 0 / 0.06); font-family: Geist, ui-sans-serif, system-ui, sans-serif; } .ds-gc-demo { min-height: 16rem; display: flex; align-items: center; justify-content: center; padding: 40px 24px; border-radius: 16px; background: var(--background, oklch(0.97 0 0)); } .ds-gc-sample { height: 36px; padding: 0 14px; border: 0; border-radius: 12px; background: oklch(0.6 0.2 250); color: white; font-family: inherit; font-size: 14px; font-weight: 500; } .ds-gc-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; padding: 14px 16px 12px; } .ds-gc-name { margin: 0; font: 600 19px/1.25 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.01em; } .ds-gc-desc { margin: 4px 0 0; font-size: 14px; color: oklch(0.5 0.004 270); } .ds-gc-arrow { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 999px; color: oklch(0.5 0.004 270); outline: 0 solid transparent; outline-offset: 2px; } .ds-gc-arrow:hover { color: oklch(0.18 0.004 270); background: oklch(0 0 0 / 0.06); } .ds-gc-arrow:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.55 0.2 250) 50%, transparent); }"
+      "css": ".ds-gc { display: flex; flex-direction: column; max-width: 360px; padding: 4px; border-radius: 20px; background: var(--muted, oklch(0.955 0 0)); color: oklch(0.3 0.004 270); box-shadow: 0 0 0 1px oklch(0 0 0 / 0.045); font-family: Geist, ui-sans-serif, system-ui, sans-serif; } .ds-gc-demo { min-height: 16rem; display: flex; align-items: center; justify-content: center; padding: 40px 24px; border-radius: 16px; background: var(--background, oklch(0.97 0 0)); } .ds-gc-sample { height: 36px; padding: 0 14px; border: 0; border-radius: 12px; background: oklch(0.68 0.16 232.65); color: white; font-family: inherit; font-size: 14px; font-weight: 500; } .ds-gc-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; padding: 14px 16px 12px; } .ds-gc-name { margin: 0; font: 600 19px/1.25 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.01em; } .ds-gc-desc { margin: 4px 0 0; font-size: 14px; color: oklch(0.53 0.004 270); } .ds-gc-arrow { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 999px; color: oklch(0.53 0.004 270); outline: 0 solid transparent; outline-offset: 2px; } .ds-gc-arrow:hover { color: oklch(0.3 0.004 270); background: oklch(0 0 0 / 0.06); } .ds-gc-arrow:focus-visible { outline: 2px solid color-mix(in oklab, oklch(0.7 0.15 232.65) 50%, transparent); }"
     }
   ],
   "narrative": {
     "northStar": "The Cubby Shelf",
-    "overview": "A well-made wooden shelf of labeled cubbies: everything has a place, the place is marked with a hairline and a name, and nothing is shouting. The system is quiet on purpose. Tinted near-neutrals carry the page, one blue carries meaning, and the display type carries the voice. Depth comes from a measured surface ladder rather than from decoration, and structure is ruled with hairlines rather than boxed with cards.\n\nDensity is calm and reading-first. Pages sit in one centered column with generous vertical rhythm; controls stay small, muted until touched, and brighten to full foreground on hover. Motion is a single settle curve (ease-out-expo) that opens slowly and closes quickly, and every motion collapses to a plain opacity change under reduced motion.\n\nLight and dark are both designed. Light keeps fills neutral and lets layered shadow carry elevation; dark steps lightness up a tinted ladder and adds a lit top rim. The docs surface carries the cubby mark as a four-cell glyph in its shelf trigger.\n\nThis system is the docs world. The landing page (`app/(home)`) is deliberately its own world, scoped under `.landing`: it keeps the fonts, the page background, the ladder and the registry components, and adds only an ultramarine slab. Everything below applies to the docs; where the landing departs, the **Landing page** section at the end is normative inside `.landing` and nowhere else.",
+    "overview": "A well-made wooden shelf of labeled cubbies: everything has a place, the place is marked with a hairline and a name, and nothing is shouting. The system is quiet on purpose. Tinted near-neutrals carry the page, one sky blue carries meaning, and the display type carries the voice. Depth comes from a measured surface ladder rather than from decoration, and structure is ruled with hairlines rather than boxed with cards. Controls are soft rather than drawn: in the spirit of yui540's soft grey work, fields, alerts, badges and accordions are set apart by a solid or translucent fill instead of a hard border, elevation is kept faint, and a single sky accent does the pointing.\n\nDensity is calm and reading-first. Pages sit in one centered column with generous vertical rhythm; controls stay small, muted until touched, and brighten to full foreground on hover. Motion is a single settle curve (ease-out-expo) that opens slowly and closes quickly, and every motion collapses to a plain opacity change under reduced motion.\n\nLight and dark are both designed. Light keeps fills neutral and lets layered shadow carry elevation; dark steps lightness up a tinted ladder and adds a lit top rim. The docs surface carries the cubby mark as a four-cell glyph in its shelf trigger.\n\nThis system is the docs world. The landing page (`app/(home)`) is deliberately its own world, scoped under `.landing`: it keeps the fonts, the page background, the ladder and the registry components, and adds only a deep-sky slab. Everything below applies to the docs; where the landing departs, the **Landing page** section at the end is normative inside `.landing` and nowhere else.",
     "keyCharacteristics": [
       "Neutrals tinted toward hue 270 at very low chroma (0.004, 0.002 near the extremes), tuned from three root variables.",
-      "One chromatic accent, the primary blue; status hues appear only on status plates.",
+      "One chromatic accent, the primary sky blue (hue 232.65); status hues appear only on status plates.",
+      "Filled, not outlined: form fields, alerts, status badges and accordions are fills with no visible edge; hairlines are kept for structure and for checkboxes and radios.",
       "Bricolage Grotesque (optical-size axis) for h1 to h3 and the wordmark; Geist for body and UI; Geist Mono for code.",
       "An 8-rung surface ladder with matching shadow and rim recipes; state overlays are translucent deltas.",
       "Hairline structure at 10% foreground; lighter 7% lines inside rows.",
@@ -544,13 +626,18 @@
         "section": "elevation"
       },
       {
+        "name": "The Fill-Not-Stroke Rule",
+        "body": "A control or plate is set apart by its fill, not by a hard border. Fields fill with the translucent field tint, alerts and accordions with the muted plate, status badges with their own plate; each keeps a 1px transparent border only so its geometry matches its bordered siblings. Checkboxes and radios keep their borders on purpose: an empty box needs an edge to read as a box. The outline variants are the one place a control draws a visible edge, and it is the soft outline edge, never a darker one.",
+        "section": "elevation"
+      },
+      {
         "name": "The Drawn-Not-Lifted Rule",
-        "body": "Reading surfaces on docs (stage, note, tables, API rows, shelf grid) sit flat on the page, defined by hairlines or a faint ink wash. Shadow appears only on things that float over content: the open shelf, the expanded rail, menus.",
+        "body": "Reading surfaces on docs (note, tables, API rows) sit flat on the page, defined by hairlines or a faint ink wash. Shadow appears only on things that float over content: the open shelf, the minimap card, menus.",
         "section": "elevation"
       },
       {
         "name": "The Paint-On-Field Rule",
-        "body": "Anything set on the ultramarine field paints with the on-field tokens (ink, muted, line) and focuses with a 2px on-field outline; docs tokens (foreground, border, ring) never appear on the slab.",
+        "body": "Anything set on the sky field paints with the on-field tokens (ink, muted, line) and focuses with a 2px on-field outline; docs tokens (foreground, border, ring) never appear on the slab.",
         "section": "colors"
       },
       {
@@ -563,6 +650,8 @@
       "**Do** retune neutrals through `--neutral-hue` (270), `--neutral-chroma` (0.004), and `--neutral-chroma-low` (0.002) rather than editing individual grays.",
       "**Do** take elevation from the surface ladder (`--surface-N`, `--surface-shadow-combined-N`) and state from the translucent overlays (6%, 8%, 10%).",
       "**Do** keep blue for action, focus, and relation; mark the current location in ink.",
+      "**Do** set fields, alerts, status badges and accordions apart with a fill (field tint, muted plate, status plate), keeping a transparent 1px border for geometry; use `--outline` / `--outline-border` for any outlined control.",
+      "**Do** set Cubby Blue as text through `--primary-soft-foreground`, never the fill token.",
       "**Do** set h1 to h3 in Bricolage Grotesque at 600 with negative tracking, and everything else in Geist.",
       "**Do** open with ease-out-expo (`cubic-bezier(0.19, 1, 0.22, 1)`) and close faster with ease-in-cubic (`cubic-bezier(0.55, 0.055, 0.675, 0.19)`); keep hovers at 150ms ease-out.",
       "**Do** collapse every transform, clip, blur, and draw to opacity or nothing under `prefers-reduced-motion`.",
@@ -574,7 +663,8 @@
       "**Don't** use elastic or bouncy easing on controls.",
       "**Don't** use neon glows, gradient meshes, or cool-AI dark-mode effects; the only gradients are the stage's 3.5% light and the edge-fade masks on scrolling rows.",
       "**Don't** use the reflex fonts PRODUCT.md bans (Inter, DM Sans, Plus Jakarta, Space Grotesk, Fraunces, Playfair, Cormorant, Instrument Serif, Crimson).",
-      "**Don't** box reading content in shadowed cards on docs; rule it with hairlines or a faint wash."
+      "**Don't** box reading content in shadowed cards on docs; rule it with hairlines or a faint wash.",
+      "**Don't** add a hard border or a shadow to a field, alert, status badge or accordion; checkboxes and radios are the only form controls that keep a visible edge."
     ]
   }
 }

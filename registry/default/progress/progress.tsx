@@ -19,9 +19,11 @@ const progressRootVariants = cva(
   ],
   {
     variants: {
-      variant: {
-        default: "[--progress-color:var(--primary)]",
-        neutral: "[--progress-color:var(--neutral)]",
+      // Neutral (default) is the selection-control grey, primary the brand fill.
+      // Status colors carry meaning and stay colored.
+      color: {
+        neutral: "[--progress-color:var(--emphasis)]",
+        primary: "[--progress-color:var(--primary)]",
         success: "[--progress-color:var(--success-foreground)]",
         warning: "[--progress-color:var(--warning-foreground)]",
         danger: "[--progress-color:var(--danger-foreground)]",
@@ -29,7 +31,7 @@ const progressRootVariants = cva(
       },
     },
     defaultVariants: {
-      variant: "default",
+      color: "neutral",
     },
   },
 );
@@ -40,7 +42,7 @@ const ProgressIndeterminateContext = React.createContext(false);
 
 export interface ProgressRootProps
   extends
-    React.ComponentProps<typeof BaseProgress.Root>,
+    Omit<React.ComponentProps<typeof BaseProgress.Root>, "color">,
     VariantProps<typeof progressRootVariants> {
   /** Track thickness. */
   size?: "sm" | "md" | "lg";
@@ -51,7 +53,7 @@ export interface ProgressRootProps
 function ProgressRoot({
   className,
   style,
-  variant,
+  color,
   size = "md",
   buffer,
   value,
@@ -72,12 +74,13 @@ function ProgressRoot({
     <ProgressIndeterminateContext.Provider value={value === null}>
       <BaseProgress.Root
         data-slot="progress"
+        data-color={color ?? "neutral"}
         data-size={size}
         data-empty={percent === 0 || undefined}
         value={value}
         min={min}
         max={max}
-        className={cn(progressRootVariants({ variant }), className)}
+        className={cn(progressRootVariants({ color }), className)}
         style={(state) => ({
           ...vars,
           ...(typeof style === "function" ? style(state) : style),
@@ -101,7 +104,7 @@ function ProgressTrack({
     <BaseProgress.Track
       data-slot="progress-track"
       className={cn(
-        "bg-foreground/9 relative w-full overflow-hidden rounded-full",
+        "bg-control-track relative w-full overflow-hidden rounded-full",
         // The sweep runs left to right; mirroring the track reverses it in RTL
         "rtl:data-indeterminate:-scale-x-100",
         "group-data-[size=lg]/progress:h-2.5 group-data-[size=md]/progress:h-1.5 group-data-[size=sm]/progress:h-1",
@@ -213,7 +216,7 @@ function ProgressCircle({
           r={radius}
           fill="none"
           strokeWidth={stroke}
-          className="stroke-foreground/9"
+          className="stroke-control-track"
         />
         <circle
           key={indeterminate ? "indeterminate" : "determinate"}

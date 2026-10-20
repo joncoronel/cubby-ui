@@ -19,12 +19,12 @@ import { buttonVariants } from "@/registry/default/button/button";
 // Paint corners are the shell's minus its border and the 2px.
 const numberFieldGroupVariants = cva(
   [
-    "relative flex h-(--number-field-h) w-fit items-stretch rounded-(--number-field-radius) border bg-clip-padding",
+    "relative flex h-(--number-field-h) w-fit items-stretch rounded-(--number-field-radius) border border-transparent",
     "[--number-field-item-radius:max(0px,calc(var(--number-field-radius)-3px))]",
     // Focus and invalid rings
-    "outline-0 outline-offset-0 outline-transparent outline-solid transition-[outline-width,outline-offset,outline-color] duration-100 ease-out",
-    "has-[[data-slot=number-field-input]:focus-visible]:outline-ring/50 has-[[data-slot=number-field-input]:focus-visible]:outline-2 has-[[data-slot=number-field-input]:focus-visible]:outline-offset-2",
-    "has-[[data-slot=number-field-input][aria-invalid=true]]:outline-destructive/50 has-[[data-slot=number-field-input][aria-invalid=true]]:outline-2 has-[[data-slot=number-field-input][aria-invalid=true]]:outline-offset-2",
+    "outline-0 -outline-offset-1 outline-transparent outline-solid transition-[outline-width,outline-color] duration-100 ease-out",
+    "has-[[data-slot=number-field-input]:focus-visible]:outline-ring has-[[data-slot=number-field-input]:focus-visible]:outline-2 has-[[data-slot=number-field-input]:focus-visible]:-outline-offset-1",
+    "has-[[data-slot=number-field-input][aria-invalid=true]]:outline-destructive has-[[data-slot=number-field-input][aria-invalid=true]]:outline-2 has-[[data-slot=number-field-input][aria-invalid=true]]:-outline-offset-1",
     // Disabled: dims once here; the steppers' own disabled opacity is
     // cancelled so it doesn't stack. A stepper alone at min or max still dims.
     "data-disabled:opacity-60 data-disabled:[&_button]:opacity-100",
@@ -34,7 +34,7 @@ const numberFieldGroupVariants = cva(
       // Input's surfaces
       variant: {
         default: "bg-input",
-        elevated: "bg-input-elevated",
+        outline: "bg-(--outline) border-(--outline-border) bg-clip-padding",
       },
       // Input's heights (one step taller below sm); corners step with them.
       size: {
@@ -50,11 +50,10 @@ const numberFieldGroupVariants = cva(
   },
 );
 
-// Ghost Button recipe, sized by the shell. Hover and press are the label
-// color at 10% / 14%, as in Button Group.
+// Ghost Button sized by the shell, with Button Group's hover and press overlays.
 const stepperClasses = cn(
   buttonVariants({ variant: "ghost", size: null }),
-  "aspect-square h-auto self-stretch border-2 border-transparent text-sm rounded-(--number-field-item-radius) [--btn-bg-hover:color-mix(in_oklab,currentColor_10%,transparent)] [--btn-bg-active:color-mix(in_oklab,currentColor_14%,transparent)]",
+  "aspect-square h-auto self-stretch border-2 border-transparent text-sm rounded-(--number-field-item-radius) [--btn-bg-hover:var(--surface-active)] [--btn-bg-active:var(--surface-selected)]",
 );
 
 type NumberFieldProps = BaseNumberField.Root.Props;
@@ -101,13 +100,6 @@ function NumberFieldInput({
         "w-16 min-w-0 self-stretch border-2 border-transparent bg-transparent px-1 text-center text-base font-normal tabular-nums outline-none sm:not-pointer-coarse:text-sm",
         // Inline scrub prefix. Set on the input to keep `:has()` cheap.
         "[[data-slot=number-field-group]:has(>[data-slot=number-field-scrub-area])>&]:text-left",
-        // Dividers: two background layers on the input's edges. Each shows
-        // only beside a stepper and collapses while that stepper is lit.
-        "bg-[linear-gradient(var(--border),var(--border)),linear-gradient(var(--border),var(--border))] [background-size:1px_var(--number-field-divider-s,0px),1px_var(--number-field-divider-e,0px)] [background-position:left_center,right_center] bg-no-repeat [background-origin:border-box] transition-[background-size] duration-100 ease-out motion-reduce:transition-none",
-        "has-[+[data-slot=number-field-increment]]:[--number-field-divider-e:calc(100%_-_12px)] has-[+[data-slot=number-field-stepper]]:[--number-field-divider-e:calc(100%_-_12px)] [[data-slot=number-field-decrement]+&]:[--number-field-divider-s:calc(100%_-_12px)]",
-        // Hover is gated to real hover: a raw :hover sticks after a tap.
-        "has-[+[data-slot=number-field-increment]:active]:[--number-field-divider-e:0px] has-[+[data-slot=number-field-stepper]:active]:[--number-field-divider-e:0px] [[data-slot=number-field-decrement]:active+&]:[--number-field-divider-s:0px]",
-        "[@media(hover:hover)]:has-[+[data-slot=number-field-increment]:hover]:[--number-field-divider-e:0px] [@media(hover:hover)]:has-[+[data-slot=number-field-stepper]:hover]:[--number-field-divider-e:0px] [@media(hover:hover)]:[[data-slot=number-field-decrement]:hover+&]:[--number-field-divider-s:0px]",
         "disabled:pointer-events-none disabled:cursor-not-allowed",
         className,
       )}

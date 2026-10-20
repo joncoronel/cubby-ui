@@ -48,7 +48,7 @@ export default function ProgressLifecycle() {
     <div className="flex w-full max-w-sm flex-col gap-5">
       <ProgressRoot
         value={phase === "connecting" ? null : value}
-        variant={phase === "done" ? "success" : "default"}
+        color={phase === "done" ? "success" : "primary"}
       >
         <ProgressLabel>{LABELS[phase]}</ProgressLabel>
         <ProgressValue>

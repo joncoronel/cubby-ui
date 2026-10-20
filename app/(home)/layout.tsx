@@ -1,7 +1,16 @@
 import type { ReactNode } from "react";
+import type { Viewport } from "next";
 import { LandingNav } from "@/components/home/landing-nav";
 import { LandingFooter } from "@/components/home/landing-footer";
 import "./home.css";
+
+// Hex copies of --background (0.99 / 0.205); keep them in sync.
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fcfcfc" },
+    { media: "(prefers-color-scheme: dark)", color: "#161719" },
+  ],
+};
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (

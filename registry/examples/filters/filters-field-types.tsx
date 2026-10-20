@@ -65,7 +65,7 @@ const fields: FilterField[] = [
       {
         value: "docs",
         label: "Docs",
-        icon: <Dot className="bg-[oklch(0.6_0.2_250)]" />,
+        icon: <Dot className="bg-[oklch(0.68_0.16_232.65)]" />,
       },
       {
         value: "design",
@@ -98,7 +98,7 @@ const fields: FilterField[] = [
         type="date"
         value={typeof value === "string" ? value : ""}
         onChange={(event) => onValueChange(event.target.value)}
-        className="hover:bg-surface-hover focus-visible:outline-ring/50 h-full rounded-[calc(var(--radius-lg)-3px)] bg-transparent px-(--seg-x) text-sm font-medium outline-none focus-visible:outline-2 focus-visible:-outline-offset-2"
+        className="hover:bg-surface-hover focus-visible:outline-ring h-full rounded-[calc(var(--radius-lg)-3px)] bg-transparent px-(--seg-x) text-sm font-medium outline-none focus-visible:outline-2 focus-visible:-outline-offset-2"
       />
     ),
   },

@@ -40,16 +40,11 @@ Set `disabled` to prevent interaction.
 
 <ComponentPreview component="checkbox" example="checkbox-disabled-state" />
 
-### Elevated Variant
+### Color
 
-Use `variant="elevated"` on a Card, Dialog, or popover surface, where the opaque `default` checkbox would collapse into its parent. See the [Surfaces](/docs/getting-started/surfaces) docs.
+Use `color="primary"` to fill a checked box with the brand color instead of the default emphasis grey that other selection controls share.
 
-<ComponentPreview component="checkbox" example="checkbox-elevated" />
-
-| Value      | Description                                                          |
-| ---------- | ------------------------------------------------------------------- |
-| `default`  | Opaque `bg-input`, for standard page backgrounds.                   |
-| `elevated` | Translucent `bg-input-elevated`, for Card, Dialog, or popovers.     |
+<ComponentPreview component="checkbox" example="checkbox-color" />
 
 ### Form Integration
 
@@ -66,12 +61,22 @@ The Checkbox component is built on top of [Base UI's Checkbox](https://base-ui.c
 <ApiPropsList>
 
 <ApiProp
-  name="variant"
-  fullType='"default" | "elevated"'
+  name="color"
+  fullType='"neutral" | "primary"'
   simpleType="string"
-  defaultValue='"default"'
+  defaultValue='"neutral"'
 >
-  Surface appearance. `default` uses opaque `bg-input`. `elevated` uses translucent `bg-input-elevated` for use inside Card, Dialog, or popover surfaces. See the [Surfaces](/docs/getting-started/surfaces) docs.
+  Sets the fill when checked or indeterminate. `neutral` is the emphasis grey
+  shared by selection controls; `primary` is the brand fill.
 </ApiProp>
 
 </ApiPropsList>
+
+## Upgrading
+
+If you're reinstalling over an earlier version, check these changes:
+
+| Before                           | Now                                                               |
+| -------------------------------- | ----------------------------------------------------------------- |
+| `variant="elevated"`             | Removed. The default works on any surface, so drop the prop.      |
+| Checked fill in the primary blue | Neutral emphasis grey. Pass `color="primary"` for the brand fill. |

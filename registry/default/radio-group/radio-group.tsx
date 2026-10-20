@@ -17,38 +17,51 @@ function RadioGroup({
   );
 }
 
+// Selected fill: the shared selection-control grey, or the brand fill.
+const radioColors = {
+  neutral:
+    "[--radio-fill:var(--emphasis)] [--radio-dot:var(--emphasis-foreground)]",
+  primary:
+    "[--radio-fill:var(--primary)] [--radio-dot:var(--primary-foreground)]",
+};
+
 function RadioGroupItem({
   className,
-  variant = "default",
+  color = "neutral",
   ...props
 }: React.ComponentProps<typeof Radio.Root> & {
-  variant?: "default" | "elevated";
+  color?: "neutral" | "primary";
 }) {
   return (
     <Radio.Root
       data-slot="radio-group-item"
+      data-color={color}
       className={cn(
+        radioColors[color],
         "group relative inline-flex size-4 shrink-0 items-center justify-center rounded-full",
-        "focus-visible:outline-ring/50 ease-out-expo outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-150 outline-solid focus-visible:outline-2 focus-visible:outline-offset-2",
+        "focus-visible:outline-ring ease-out-expo outline-0 -outline-offset-1 outline-transparent transition-[outline-width,outline-color] duration-100 outline-solid focus-visible:outline-2 focus-visible:-outline-offset-1",
         "disabled:cursor-not-allowed disabled:opacity-60",
-        "aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
-        // bg-clip-padding keeps the border on the substrate (matches Input);
-        // Indicator uses -inset-px to cover the border when selected.
-        "border bg-clip-padding",
-        variant === "default" ? "bg-input" : "bg-input-elevated",
+        "aria-invalid:outline-destructive aria-invalid:outline-2 aria-invalid:-outline-offset-1 aria-invalid:outline-solid",
+        // Off: a 2px --control-off ring around a white middle. An inset shadow,
+        // not a border, so the inset-0 Indicator covers it.
+        "bg-white shadow-[inset_0_0_0_2px_var(--control-off)] not-data-disabled:hover:shadow-[inset_0_0_0_2px_var(--control-off-hover)] dark:bg-transparent",
+        // Forced colors drop the shadow ring, so draw a system-color border.
+        "forced-colors:border forced-colors:border-[CanvasText]",
         className,
       )}
       {...props}
     >
       <Radio.Indicator
         className={cn(
-          "bg-primary before:bg-primary-foreground absolute -inset-px z-1 flex items-center justify-center rounded-full",
+          "absolute inset-0 z-1 flex items-center justify-center rounded-full bg-(--radio-fill) before:bg-(--radio-dot)",
           "ease-out-expo transition-opacity duration-150",
           "data-starting-style:opacity-0",
           "data-ending-style:opacity-0",
           "before:ease-out-expo before:size-full before:origin-center before:scale-50 before:rounded-full before:transition-[scale] before:duration-250 before:content-['']",
           "data-starting-style:before:scale-100",
           "data-ending-style:before:scale-100",
+          // Forced colors repaint backgrounds, so keep the dot in the text color.
+          "forced-colors:before:bg-[CanvasText] forced-colors:before:[forced-color-adjust:none]",
         )}
       />
     </Radio.Root>

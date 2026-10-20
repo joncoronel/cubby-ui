@@ -21,16 +21,18 @@ const buttonGroupVariants = cva(
     variants: {
       variant: {
         attached:
-          "[&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit [&>input]:flex-1 has-[>[data-slot=button-group]]:gap-2 [&>input]:bg-card",
+          "[&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit [&>input]:flex-1 has-[>[data-slot=button-group]]:gap-2",
         // Outline draws its line just outside the fill, as on an outline
         // Button. The others have no border, so elevated's rim and shadow
         // ring meet its edge.
-        outline: "bg-card text-foreground outline outline-border",
+        outline:
+          "bg-(--outline) text-foreground outline outline-(--outline-border)",
         soft: "bg-secondary text-secondary-foreground",
         elevated: cn(solidSurface(3, 3), "text-foreground"),
-        // Opposite the page in brightness, so the tint needs more strength.
+        // The fill inverts the page, so the overlays flip (white in light,
+        // black in dark) and run stronger to show.
         solid:
-          "bg-neutral text-neutral-foreground [--group-highlight-mix:16%] [--group-press-mix:22%]",
+          "bg-neutral text-neutral-foreground [--group-highlight-fill:oklch(1_0_0/16%)] [--group-press-fill:oklch(1_0_0/22%)] dark:[--group-highlight-fill:oklch(0_0_0/16%)] dark:[--group-press-fill:oklch(0_0_0/22%)]",
       },
       // Button's height ladder (one step taller below sm); corners step with it.
       size: {
@@ -64,7 +66,7 @@ const buttonGroupVariants = cva(
       },
     ],
     defaultVariants: {
-      variant: "outline",
+      variant: "soft",
       size: "default",
       orientation: "horizontal",
     },
@@ -77,10 +79,9 @@ const trayClasses = cn(
   // rule, or its empty pseudo-element becomes a flex item.
   "rounded-(--group-radius) [--group-item-radius:max(0px,calc(var(--group-radius)-2px))]",
   "[&>:is(button,a):not([data-slot=select-trigger])]:before:rounded-(--group-item-radius)",
-  // Highlight and press: the label color at 10% / 14%. Button's hover tokens
-  // read too faint as a pill on the same fill; a tint of the label always
-  // contrasts with it. currentColor resolves where the variable is used.
-  "[--group-highlight:color-mix(in_oklab,currentColor_var(--group-highlight-mix,10%),transparent)] [--group-press:color-mix(in_oklab,currentColor_var(--group-press-mix,14%),transparent)]",
+  // Highlight and press: 8% / 10% black overlays (white in dark). Button's 6%
+  // reads too faint here, and a label tint shows a cool cast. Solid sets its own.
+  "[--group-highlight:var(--group-highlight-fill,var(--surface-active))] [--group-press:var(--group-press-fill,var(--surface-selected))]",
   // Sizing: a row is the ladder height, a column at least the ladder width.
   // Items size themselves in button-group.css.
   "data-[orientation=horizontal]:h-(--group-h) data-[orientation=vertical]:w-fit",
@@ -121,13 +122,13 @@ const ButtonGroupContext = React.createContext<ButtonGroupContextValue | null>(
 );
 
 const DEFAULT_CONTEXT: ButtonGroupContextValue = {
-  variant: "outline",
+  variant: "soft",
   size: "default",
   orientation: "horizontal",
 };
 
 export type ButtonGroupProps = React.ComponentProps<"div"> & {
-  /** Defaults to the parent group's variant, or `"outline"`. */
+  /** Defaults to the parent group's variant, or `"soft"`. */
   variant?: ButtonGroupVariant;
   /** Outer height, on Button's ladder. Defaults to the parent group's size, or `"default"`. */
   size?: ButtonGroupSize;
@@ -201,7 +202,7 @@ function ButtonGroupText({
     className: cn(
       "flex items-center gap-2 text-sm font-medium whitespace-nowrap tabular-nums [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
       variant === "attached"
-        ? "bg-muted rounded-lg border bg-clip-padding px-4"
+        ? "bg-muted rounded-lg border border-transparent px-4"
         : // Inset like the buttons (button-group.css), so text lines up
           // with their labels.
           "px-3",

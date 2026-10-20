@@ -12,7 +12,7 @@ export function highlightText(text: string, query: string): React.ReactNode {
 
   return text.split(regex).map((part, idx) =>
     part.toLowerCase() === limited.toLowerCase() ? (
-      <mark key={idx} className="text-primary bg-transparent font-bold">
+      <mark key={idx} className="bg-transparent font-bold text-(--primary-soft-foreground)">
         {part}
       </mark>
     ) : (

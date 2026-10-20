@@ -2,7 +2,6 @@
 
 import type { ReactElement } from "react";
 import { componentMap } from "@/app/components/_generated/registry";
-import { solidSurface } from "@/registry/default/lib/elevated";
 import { cn } from "@/lib/utils";
 import { CodePeek } from "./code-peek";
 
@@ -43,7 +42,7 @@ export function ComponentPreview({
       data-slot="preview"
       className={cn(
         "docs-stage-wrap not-prose",
-        code && ["docs-example", solidSurface(3, 1), "bg-muted"],
+        code && ["docs-example", "bg-muted"],
         className,
       )}
     >

@@ -4,7 +4,13 @@ description: Organize content into multiple panels with tab navigation
 type: primitive
 ---
 
-import { Tabs, TabsContent, TabsList, TabsPanels, TabsTrigger } from "@/registry/default/tabs/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsPanels,
+  TabsTrigger,
+} from "@/registry/default/tabs/tabs";
 
 Tabs split related content into panels and show one at a time behind a row of triggers. Use them to organize a settings screen, a card's detail views, or any section where the panels are peers and only one is relevant at once.
 
@@ -45,6 +51,17 @@ Use `size` on `TabsList` to switch between `small` and `medium`; the list and in
 | `small`  | Compact triggers with tighter padding. |
 | `medium` | The default, roomier triggers.         |
 
+### Indicator
+
+Use `indicator` on a capsule `TabsList` to choose how the active tab is marked.
+
+<ComponentPreview component="tabs" example="tabs-indicator" />
+
+| Indicator | Description                                                                                |
+| --------- | ------------------------------------------------------------------------------------------ |
+| `solid`   | The default. Emphasis grey with a white label, like Toggle Group.                          |
+| `raised`  | A lifted white chip with the label in the text color, for settings panels and dense forms. |
+
 ### Controlled
 
 Use `value` and `onValueChange` on `Tabs` to drive the active tab yourself.
@@ -57,10 +74,10 @@ Set `variant="underline"` on `TabsList` for an underline indicator instead of th
 
 <ComponentPreview component="tabs" example="tabs-underline-variant" />
 
-| Variant     | Description                                          |
-| ----------- | --------------------------------------------------- |
-| `capsule`   | The default, a filled pill behind the active tab.   |
-| `underline` | A bar under (or beside) the active tab.             |
+| Variant     | Description                                       |
+| ----------- | ------------------------------------------------- |
+| `capsule`   | The default, a filled pill behind the active tab. |
+| `underline` | A bar under (or beside) the active tab.           |
 
 ### Vertical Layout
 
@@ -78,7 +95,10 @@ Combine `orientation="vertical"` with `variant="underline"` for a side rail.
 
 Use `side` on `TabsList` to place the underline on the `left` or `right` edge.
 
-<ComponentPreview component="tabs" example="tabs-vertical-underline-with-sides" />
+<ComponentPreview
+  component="tabs"
+  example="tabs-vertical-underline-with-sides"
+/>
 
 ### Animated
 
@@ -108,20 +128,19 @@ Container for tab triggers with visual styling. Wraps Base UI's `Tabs.List`.
   Visual style variant for the tabs list. Custom prop not available in Base UI.
 </ApiProp>
 
-<ApiProp
-  name="size"
-  fullType="'small' | 'medium'"
-  defaultValue="'medium'"
->
+<ApiProp name="size" fullType="'small' | 'medium'" defaultValue="'medium'">
   Size variant for the tabs. Custom prop not available in Base UI.
 </ApiProp>
 
-<ApiProp
-  name="side"
-  fullType="'left' | 'right'"
-  defaultValue="'left'"
->
-  Side positioning for vertical tab orientation. Custom prop not available in Base UI.
+<ApiProp name="side" fullType="'left' | 'right'" defaultValue="'left'">
+  Side positioning for vertical tab orientation. Custom prop not available in
+  Base UI.
+</ApiProp>
+
+<ApiProp name="indicator" fullType="'solid' | 'raised'" defaultValue="'solid'">
+  Sets how the capsule variant marks the active tab: `solid` is an emphasis-grey
+  chip with a white label, `raised` a lifted chip with the label in the text
+  color. No effect on `underline`.
 </ApiProp>
 
 </ApiPropsList>
@@ -133,3 +152,11 @@ Grid container for tab panels. Wrap all `TabsContent` items in `TabsPanels` to e
 #### TabsContent
 
 Panel that displays content for the active tab. Wraps Base UI's `Tabs.Panel`.
+
+## Upgrading
+
+If you're reinstalling over an earlier version, check these changes:
+
+| Before                                        | Now                                                                                                     |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| The capsule indicator was a raised white chip | An emphasis-grey fill under a white label. Pass `indicator="raised"` on `TabsList` for the lifted chip. |

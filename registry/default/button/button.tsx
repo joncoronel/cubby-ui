@@ -28,7 +28,7 @@ import { cn } from "@/lib/utils";
 // (className="[--btn-bg:...]") and restyle the border via `before:` classes
 // (className="before:border-dashed").
 const buttonBase = cn(
-  "relative isolate inline-flex items-center cursor-pointer justify-center whitespace-nowrap rounded-lg font-medium data-disabled:pointer-events-none data-disabled:opacity-60 data-disabled:focus-visible:outline-ring [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 focus-visible:outline-ring/50 outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color,scale,opacity,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 aria-invalid:outline-destructive/50 aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-solid",
+  "relative isolate inline-flex items-center cursor-pointer justify-center whitespace-nowrap rounded-lg font-medium data-disabled:pointer-events-none data-disabled:opacity-60 data-disabled:focus-visible:outline-ring [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 focus-visible:outline-ring outline-0 -outline-offset-1 outline-transparent transition-[outline-width,outline-color,scale,opacity,background-color,color] duration-100 ease-out outline-solid focus-visible:outline-2 focus-visible:-outline-offset-1 aria-invalid:outline-destructive aria-invalid:outline-2 aria-invalid:-outline-offset-1 aria-invalid:outline-solid",
   // State machine: unset tokens fall through to transparent. Pressing shows
   // the active paint — except on popup triggers (aria-haspopup), which skip
   // pressed feedback entirely (mirroring the press-scale guard) and simply
@@ -49,27 +49,34 @@ const buttonVariantClasses = {
   primary:
     "text-primary-foreground [--btn-bg:var(--primary)] [--btn-bg-hover:var(--primary-hover)] [--btn-bg-active:var(--primary-active)]",
   "primary-soft":
-    "text-(--primary-soft-foreground) [--btn-bg:var(--secondary)] [--btn-bg-hover:var(--secondary-hover)] [--btn-bg-active:var(--secondary-active)]",
+    "text-(--primary-soft-foreground) [--btn-bg:color-mix(in_oklab,var(--primary)_14%,transparent)] [--btn-bg-hover:color-mix(in_oklab,var(--primary)_20%,transparent)] [--btn-bg-active:color-mix(in_oklab,var(--primary)_25%,transparent)]",
   neutral:
     "text-neutral-foreground [--btn-bg:var(--neutral)] [--btn-bg-hover:var(--neutral-hover)] [--btn-bg-active:var(--neutral-active)]",
+  // Between neutral and secondary: the selection-control grey, white label.
+  tonal:
+    "text-emphasis-foreground [--btn-bg:var(--emphasis)] [--btn-bg-hover:var(--emphasis-hover)] [--btn-bg-active:var(--emphasis-active)]",
   destructive:
     "text-destructive-foreground [--btn-border:rgb(0_0_0/0.05)] dark:[--btn-border:rgb(255_255_255/0.05)] [--btn-bg:var(--destructive)] [--btn-bg-hover:var(--destructive-hover)] [--btn-bg-active:var(--destructive-active)]",
   "destructive-soft":
     "text-(--destructive-soft-foreground) [--btn-bg:color-mix(in_oklab,var(--destructive)_12%,transparent)] [--btn-bg-hover:color-mix(in_oklab,var(--destructive)_20%,transparent)] [--btn-bg-active:color-mix(in_oklab,var(--destructive)_25%,transparent)]",
-  // bg-clip-padding keeps the card fill out from under the translucent
+  // bg-clip-padding keeps the fill out from under the translucent
   // border. Deliberately NOT in the shared paint: with the default
   // transparent border it would inset every solid fill by 1px.
   outline:
-    "[--btn-border:var(--border)] [--btn-bg:var(--card)] [--btn-bg-hover:var(--outline-hover)] [--btn-bg-active:var(--outline-active)] before:bg-clip-padding",
+    "[--btn-border:var(--outline-border)] [--btn-bg:var(--outline)] [--btn-bg-hover:var(--outline-hover)] [--btn-bg-active:var(--outline-active)] before:bg-clip-padding",
   // Outline's border with ghost's transparent fill, for elevated substrates
   // (Cards, Dialogs) where outline's solid card fill would look mismatched.
   "outline-ghost":
-    "[--btn-border:var(--border)] [--btn-bg-hover:var(--surface-hover)] [--btn-bg-active:var(--surface-active)]",
+    "[--btn-border:var(--outline-border)] [--btn-bg-hover:var(--surface-hover)] [--btn-bg-active:var(--surface-active)]",
+  // A filled field's tint, for a button that sits in or beside one.
+  field:
+    "text-foreground [--btn-bg:var(--input)] [--btn-bg-hover:var(--input-hover)] [--btn-bg-active:var(--input-active)]",
   secondary:
     "text-secondary-foreground [--btn-bg:var(--secondary)] [--btn-bg-hover:var(--secondary-hover)] [--btn-bg-active:var(--secondary-active)]",
   ghost:
     "text-muted-foreground hover:text-foreground data-popup-open:text-foreground [--btn-bg-hover:var(--surface-hover)] [--btn-bg-active:var(--surface-active)]",
-  link: "text-primary underline-offset-4 hover:underline",
+  // The ink token, not --primary: the brand fill is too light to read as text.
+  link: "text-(--primary-soft-foreground) underline-offset-4 hover:underline",
 };
 
 // Heights match the Input/Select ramp (36px desktop default) so buttons pair

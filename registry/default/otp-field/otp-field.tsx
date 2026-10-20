@@ -27,7 +27,7 @@ function OTPField({
       <span
         aria-hidden="true"
         data-slot="otp-field-indicator"
-        className="otp-field-indicator outline-ring/50 group-data-[invalid]/otp-field:outline-destructive/50 outline-2 outline-offset-2 outline-solid"
+        className="otp-field-indicator outline-ring group-data-[invalid]/otp-field:outline-destructive outline-2 -outline-offset-1 outline-solid"
       />
     </BaseOTPField.Root>
   );
@@ -40,7 +40,7 @@ export type OTPFieldInputProps = Omit<
   /** Applied to the visible slot around the input. */
   className?: string;
   style?: React.CSSProperties;
-  variant?: "default" | "elevated";
+  variant?: "default" | "outline";
 };
 
 function OTPFieldInput({
@@ -64,15 +64,18 @@ function OTPFieldInput({
         return (
           <span
             data-slot="otp-field-slot"
+            data-variant={variant}
             data-filled={state.filled ? "" : undefined}
             data-invalid={invalid ? "" : undefined}
             data-disabled={state.disabled ? "" : undefined}
             className={cn(
               // Base styling
-              "relative flex h-10 w-10 cursor-text items-center justify-center rounded-[var(--otp-field-radius,var(--radius-lg))] border bg-clip-padding text-base font-medium tabular-nums sm:not-pointer-coarse:h-9 sm:not-pointer-coarse:w-9 sm:not-pointer-coarse:text-sm",
-              variant === "default" ? "bg-input" : "bg-input-elevated",
+              "relative flex h-10 w-10 cursor-text items-center justify-center rounded-[var(--otp-field-radius,var(--radius-lg))] border border-transparent text-base font-medium tabular-nums sm:not-pointer-coarse:h-9 sm:not-pointer-coarse:w-9 sm:not-pointer-coarse:text-sm",
+              variant === "outline"
+                ? "border-(--outline-border) bg-(--outline) bg-clip-padding"
+                : "bg-input",
               // Invalid state (the focused slot's ring comes from the root)
-              "data-[invalid]:outline-destructive/50 data-[invalid]:outline-2 data-[invalid]:outline-offset-2 data-[invalid]:outline-solid",
+              "data-[invalid]:outline-destructive data-[invalid]:outline-2 data-[invalid]:-outline-offset-1 data-[invalid]:outline-solid",
               // Disabled state
               "data-[disabled]:pointer-events-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60",
               className,

@@ -19,17 +19,16 @@ const timelineVariants = cva("group/timeline flex", {
   },
 });
 
+// Solid fills, no stroke: the transparent 2px border only keeps the content box
+// the size the step icons were drawn for.
 const timelineIndicatorVariants = cva(
-  "absolute flex items-center justify-center rounded-full border-2 transition-all duration-200 size-6",
+  "absolute flex items-center justify-center rounded-full border-2 border-transparent transition-all duration-200 size-6",
   {
     variants: {
       state: {
-        pending:
-          "border-border/80 bg-muted shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.08)]",
-        current:
-          "border-primary bg-primary/5 outline-2 outline-primary/20 outline-offset-2 shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.08)]",
-        completed:
-          "border-primary bg-primary text-primary-foreground shadow-[0_1px_2px_0_oklch(0.18_0_0_/_0.08)]",
+        pending: "bg-secondary text-secondary-foreground",
+        current: "bg-primary/18 text-(--primary-soft-foreground)",
+        completed: "bg-primary text-primary-foreground",
       },
     },
     defaultVariants: {

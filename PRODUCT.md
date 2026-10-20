@@ -19,7 +19,9 @@ Three words: **warm, crafted, confident**.
 
 **Theme**: system default on first paint. Both light and dark must be designed explicitly — dark is not the brand-primary mode and never an inverted afterthought.
 
-**Color direction**: the current primary (`oklch(0.6 0.2 250)`, cool blue) is a starting point, not a fixture. Evolution toward a warmer / more distinctive accent is on the table when it serves "warm and human." Neutrals must be tinted toward the brand hue — no pure gray, no pure white, no pure black.
+**Color direction**: one sky accent, `oklch(0.75 0.16 232.65)`, run a step deeper in light (`0.68`) so the fill holds against the page. Primary buttons keep white labels by choice, even though that sits below AA. Neutrals keep their faint 270 tint (chroma 0.004); text and the neutral button are soft charcoal (about L 0.3), not near-black.
+
+**Surfaces**: solid fills over hard borders, after yui540's soft grey work. Fields, alerts and grouped containers separate by fill; elevation is soft, low-alpha shadow; outline variants keep their edge (dark outline is a recessed fill with a faint white ring). Borders stay for dividers, tables and controls whose outline is their identity (checkbox, radio). Borrow the palette and surfaces only: not the pill shapes, overshoot motion or rounded fonts.
 
 **Typography direction**: Geist is a reflex default; it gets the job done but does not carry warmth. Prefer pairing a more characterful display face with a readable body face. Do not reach for Inter, DM Sans, Plus Jakarta, Space Grotesk, Fraunces, Playfair, Cormorant, Instrument Serif, or Crimson — they are banned reflex fonts.
 
@@ -28,6 +30,8 @@ Three words: **warm, crafted, confident**.
 - Rauno Freiberg's personal site — craft and restraint.
 - Craft, Tuple, Arc marketing — warm, considered, software-with-soul.
 - Printed magazines — deliberate hierarchy and considered spacing.
+- yui540 (yui540.com/motions, github.com/yui540/comimi) — soft greys, solid fills, borderless surfaces.
+- jakub.kr — the dark outline button: recessed fill, faint ring.
 
 **Anti-references — explicitly NOT this**:
 
@@ -38,7 +42,7 @@ Three words: **warm, crafted, confident**.
 
 ### Design Principles
 
-1. **Warmth without sacrificing precision.** Soften edges, tint neutrals, choose a warm accent — but never at the cost of sharp typographic hierarchy or clean spacing logic.
+1. **Warmth without sacrificing precision.** Soften edges, fill instead of outline, keep one confident accent — but never at the cost of sharp typographic hierarchy or clean spacing logic.
 2. **Typography carries the voice.** Most of the personality lives in type pairing and rhythm, not in decorative elements. Skip the reflex font list above; find something with actual character.
 3. **Earn every ornament.** If a gradient, shadow, or illustration doesn't reinforce "warm, crafted, indie," it doesn't ship.
 4. **Not another devtool template.** Audit every layout against the anti-references. If it could be any dev tool's homepage, redesign it.

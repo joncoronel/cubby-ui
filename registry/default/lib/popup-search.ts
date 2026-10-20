@@ -10,12 +10,12 @@ export const POPUP_ITEM =
 export const POPUP_SEARCH_BAND = "bg-(--popup-surface) px-1 pt-1";
 
 /**
- * The field. Outlined, since a filled field above a highlighted item reads as
- * a second highlight; the inset ring takes no room, so the icon stays aligned.
+ * The field takes the outline fill and edge: a filled field above a highlighted
+ * item reads as a second highlight. The inset ring keeps the icon aligned.
  * No focus ring: the field holds focus the whole time the popup is open.
  */
 export const POPUP_SEARCH_FIELD =
-  "flex h-8 items-center gap-2 rounded-md px-2.5 inset-ring inset-ring-border pointer-coarse:h-10";
+  "flex h-8 items-center gap-2 rounded-md bg-(--outline) px-2.5 inset-ring inset-ring-(--outline-border) pointer-coarse:h-10";
 
 /** The `<input>`. 16px on touch screens and below `sm`, so iOS Safari doesn't zoom on focus. */
 export const POPUP_SEARCH_INPUT =
@@ -26,7 +26,7 @@ export const POPUP_SEARCH_INPUT =
  * reaches the input across the gap without covering it.
  */
 export const POPUP_SEARCH_CLEAR =
-  "text-muted-foreground hover:text-foreground focus-visible:ring-ring/70 relative -mr-1 inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors duration-100 outline-none focus-visible:ring-2 after:absolute after:-inset-2";
+  "text-muted-foreground hover:text-foreground relative -mr-1 inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors duration-100 outline-none focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-solid focus-visible:outline-ring after:absolute after:-inset-2";
 
 /**
  * A menu's search field above its list: inset 4px, never squeezed. The

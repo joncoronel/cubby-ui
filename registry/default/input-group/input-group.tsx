@@ -10,7 +10,7 @@ import { Textarea } from "@/registry/default/textarea/textarea";
 
 const inputGroupVariants = cva(
   [
-    "group/input-group relative flex w-full min-w-0 items-center rounded-(--input-group-radius) border bg-clip-padding",
+    "group/input-group relative flex w-full min-w-0 items-center rounded-(--input-group-radius) border border-transparent",
     "[--input-group-item-radius:max(0px,calc(var(--input-group-radius)-3px))]",
     // A fixed shell, as in Number Field: the input stretches to fill it, and
     // buttons sit in it with a 2px transparent-border inset.
@@ -27,13 +27,13 @@ const inputGroupVariants = cva(
     "has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col [&>input:is(:has(~[data-align=block-end]),[data-align=block-end]~*)]:pt-3",
 
     // Focus state.
-    "has-[[data-slot=input-group-control]:focus-visible]:outline-ring/50 has-[[data-slot=input-group-control]:focus-visible]:outline-2 has-[[data-slot=input-group-control]:focus-visible]:outline-offset-2 has-[[data-slot=input-group-control]:focus-visible]:outline-solid",
+    "has-[[data-slot=input-group-control]:focus-visible]:outline-ring has-[[data-slot=input-group-control]:focus-visible]:outline-2 has-[[data-slot=input-group-control]:focus-visible]:-outline-offset-1 has-[[data-slot=input-group-control]:focus-visible]:outline-solid",
 
     // Error state.
-    "has-[[data-slot][aria-invalid=true]]:outline-destructive/50 has-[[data-slot][aria-invalid=true]]:outline-2 has-[[data-slot][aria-invalid=true]]:outline-offset-2 has-[[data-slot][aria-invalid=true]]:outline-solid",
+    "has-[[data-slot][aria-invalid=true]]:outline-destructive has-[[data-slot][aria-invalid=true]]:outline-2 has-[[data-slot][aria-invalid=true]]:-outline-offset-1 has-[[data-slot][aria-invalid=true]]:outline-solid",
 
     // Transition outline
-    "outline-0 outline-offset-0 outline-transparent transition-[outline-width,outline-offset,outline-color] duration-100 ease-out",
+    "outline-0 -outline-offset-1 outline-transparent transition-[outline-width,outline-color] duration-100 ease-out",
   ],
   {
     variants: {
@@ -44,11 +44,10 @@ const inputGroupVariants = cva(
         sm: "[--input-group-h:--spacing(9)] sm:not-pointer-coarse:[--input-group-h:--spacing(8)] [--input-group-radius:calc(var(--radius)-2px)]",
       },
       variant: {
-        // Opaque "lifted" bg — use on the page or any non-elevated substrate.
+        // Filled: a translucent tint that holds on any surface.
         default: "bg-input",
-        // Translucent overlay — use inside Cards, Dialogs, or any surface
-        // where the opaque default would collapse into its parent.
-        elevated: "bg-input-elevated",
+        // Outline: the outline Button's fill and edge.
+        outline: "bg-(--outline) border-(--outline-border) bg-clip-padding",
       },
     },
     defaultVariants: {
@@ -65,6 +64,7 @@ function InputGroup({ className, variant, size, ...props }: InputGroupProps) {
   return (
     <div
       data-slot="input-group"
+      data-variant={variant ?? "default"}
       data-size={size ?? "default"}
       role="group"
       className={cn(inputGroupVariants({ variant, size }), className)}
@@ -158,8 +158,9 @@ function InputGroupAddon({
 const inputGroupButtonVariants = cva(
   [
     "border-2 border-transparent shadow-none",
-    // Hover and press on a quiet button: the label color at 10% / 14%
-    "data-[variant=ghost]:[--btn-bg-hover:color-mix(in_oklab,currentColor_10%,transparent)] data-[variant=ghost]:[--btn-bg-active:color-mix(in_oklab,currentColor_14%,transparent)]",
+    // Quiet button hover and press: 8% / 10% black overlays (white in dark),
+    // not a label tint, which shows a cool cast.
+    "data-[variant=ghost]:[--btn-bg-hover:var(--surface-active)] data-[variant=ghost]:[--btn-bg-active:var(--surface-selected)]",
   ],
   {
     variants: {
@@ -172,7 +173,7 @@ const inputGroupButtonVariants = cva(
       // concentric. Block: a fixed height in a toolbar row.
       placement: {
         inline:
-          "self-stretch rounded-[calc(var(--input-group-item-radius)+2px)] before:rounded-(--input-group-item-radius) focus-visible:outline-offset-0",
+          "self-stretch rounded-[calc(var(--input-group-item-radius)+2px)] before:rounded-(--input-group-item-radius) focus-visible:-outline-offset-2",
         block: "",
       },
     },

@@ -13,7 +13,6 @@ import { useRender } from "@base-ui/react/use-render";
 import { highlight } from "@/registry/default/code-block/lib/shiki-shared";
 import { stripDiffMarker } from "@/registry/default/code-block/lib/transformers/utils";
 import { cn } from "@/lib/utils";
-import { solidSurface } from "@/registry/default/lib/elevated";
 import { CopyButton } from "@/registry/default/copy-button/copy-button";
 import {
   SiTypescript,
@@ -179,14 +178,16 @@ function CodeBlock({
     "data-slot": "code-block",
     className: cn(
       "group max-w-full w-full rounded-2xl p-1 pt-0 relative",
-      // bg-muted follows solidSurface to override its bg-surface-3.
-      solidSurface(3, 1),
+      // Flat muted tray around the code panel, matching the docs example stage.
       "bg-muted",
       // No header: the tray has nothing to hold, so drop it and let the code
       // card stand on its own.
       // Its own child only: a code block nested inside (a card holding a
       // peek) also opens with a pre, and stripped the tray around it.
       "has-[>[data-slot='code-block-pre']:first-child]:bg-transparent has-[>[data-slot='code-block-pre']:first-child]:p-0 has-[>[data-slot='code-block-pre']:first-child]:shadow-none",
+      // Panel color and edge for CodeBlockPre: outline-style in a tray, muted
+      // with no edge when headerless, outline-style again when nested.
+      "[--code-block-panel:var(--code-panel)] [--code-block-edge:var(--outline-border)] has-[>[data-slot='code-block-pre']:first-child]:[--code-block-panel:var(--muted)] has-[>[data-slot='code-block-pre']:first-child]:[--code-block-edge:transparent] [[data-slot=code-block]_&]:has-[>[data-slot='code-block-pre']:first-child]:[--code-block-panel:var(--code-panel)] [[data-slot=code-block]_&]:has-[>[data-slot='code-block-pre']:first-child]:[--code-block-edge:var(--outline-border)]",
       className,
     ),
     children: content,
@@ -468,8 +469,8 @@ function CodeBlockPre({
     "data-has-focus": hasFocus ? "true" : undefined,
     className: cn(
       "relative rounded-lg whitespace-pre overflow-hidden max-h-96 flex flex-col",
-      // Inner code body card sitting in the gray tray.
-      solidSurface(3),
+      // The block sets the color via --code-block-panel; a bg-* here overrides.
+      "bg-(--code-block-panel,var(--code-panel)) inset-ring inset-ring-[color:var(--code-block-edge,transparent)]",
       // Focus mode: blur non-focused lines
       "[&[data-has-focus]_.line:not([data-focused])]:opacity-60 [&[data-has-focus]_.line:not([data-focused])]:blur-[1px] [&[data-has-focus]_.line:not([data-focused])]:transition-all",
       className,

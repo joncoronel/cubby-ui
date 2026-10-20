@@ -5,12 +5,13 @@ import { Tabs as BaseTabs } from "@base-ui/react/tabs";
 import { cva } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
-import { solidSurface } from "@/registry/default/lib/elevated";
 import { useAnimatedHeight } from "@/registry/default/hooks/use-animated-height";
+import { solidSurface } from "@/registry/default/lib/elevated";
 
 type TabsVariant = "capsule" | "underline";
 type TabsSize = "small" | "medium";
 type TabsSide = "left" | "right";
+type TabsIndicator = "solid" | "raised";
 
 /* -------------------------------------------------------------------------------------------------
  * CVA Variants
@@ -86,7 +87,6 @@ const tabIndicatorVariants = cva(
           "data-[orientation=horizontal]:bottom-0 data-[orientation=horizontal]:top-auto data-[orientation=horizontal]:h-0.75 data-[orientation=horizontal]:translate-y-0",
         ],
         capsule: [
-          solidSurface(5, 1),
           "data-[orientation=vertical]:w-auto",
           "data-[orientation=horizontal]:top-1/2 data-[orientation=horizontal]:h-(--active-tab-height)",
         ],
@@ -99,8 +99,16 @@ const tabIndicatorVariants = cva(
         left: "",
         right: "",
       },
+      // Capsule only: an emphasis-grey chip with a white label (solid), or a
+      // lifted chip on the track (raised).
+      indicator: {
+        solid: "",
+        raised: "",
+      },
     },
     compoundVariants: [
+      { variant: "capsule", indicator: "solid", class: "bg-emphasis" },
+      { variant: "capsule", indicator: "raised", class: solidSurface(5, 2) },
       {
         variant: "capsule",
         size: "small",
@@ -126,6 +134,7 @@ const tabIndicatorVariants = cva(
       variant: "capsule",
       size: "medium",
       side: "left",
+      indicator: "solid",
     },
   },
 );
@@ -149,6 +158,7 @@ function TabsList({
   variant = "capsule",
   size = "medium",
   side = "left",
+  indicator = "solid",
   className,
   children,
   ...props
@@ -156,6 +166,8 @@ function TabsList({
   variant?: TabsVariant;
   size?: TabsSize;
   side?: TabsSide;
+  /** Capsule only: the emphasis-grey chip (solid) or a lifted chip (raised). */
+  indicator?: TabsIndicator;
 }) {
   return (
     <BaseTabs.List
@@ -163,6 +175,7 @@ function TabsList({
       data-variant={variant}
       data-size={size}
       data-side={side}
+      data-indicator={variant === "capsule" ? indicator : undefined}
       className={cn(tabsListVariants({ variant, size, side }), className)}
       {...props}
     >
@@ -183,7 +196,12 @@ function TabsList({
         )}
         aria-hidden="true"
       />
-      <TabIndicator variant={variant} size={size} side={side} />
+      <TabIndicator
+        variant={variant}
+        size={size}
+        side={side}
+        indicator={indicator}
+      />
     </BaseTabs.List>
   );
 }
@@ -194,16 +212,16 @@ function TabsTrigger({ className, ...props }: BaseTabs.Tab.Props) {
       data-slot="tabs-trigger"
       className={cn(
         // Base styles
-        "text-muted-foreground data-active:text-foreground flex cursor-pointer items-center gap-1.5 font-medium text-nowrap whitespace-nowrap",
-        "transition-[outline-offset,color] duration-200 ease-out",
-        "focus-visible:outline-ring/50 focus-visible:outline-2 focus-visible:outline-offset-2",
-        "hover:text-muted-foreground/75",
+        "text-muted-foreground data-active:text-foreground group-data-[indicator=solid]/tabs-list:data-active:text-emphasis-foreground flex cursor-pointer items-center gap-1.5 font-medium text-nowrap whitespace-nowrap",
+        // The label color eases over 200ms; the focus ring fades in 100ms.
+        "transition-[color,outline-width,outline-color] [transition-duration:200ms,100ms,100ms] ease-out",
+        "focus-visible:outline-ring outline-0 -outline-offset-1 outline-transparent outline-solid focus-visible:outline-2",
+        "hover:not-data-active:text-muted-foreground/75",
         "data-disabled:pointer-events-none data-disabled:opacity-60",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         // Orientation
         "data-[orientation=horizontal]:flex-1 data-[orientation=vertical]:w-full",
         "justify-center",
-        "group-data-[variant=underline]/tabs-list:focus-visible:outline-offset-0",
         // Default size (small) - overridden by group data attribute for medium
         "rounded-sm px-2 py-1 text-xs",
         // Medium size via parent group
@@ -219,17 +237,22 @@ function TabIndicator({
   variant = "capsule",
   size = "medium",
   side = "left",
+  indicator = "solid",
   className,
   ...props
 }: BaseTabs.Indicator.Props & {
   variant?: TabsVariant;
   size?: TabsSize;
   side?: TabsSide;
+  indicator?: TabsIndicator;
 }) {
   return (
     <BaseTabs.Indicator
       data-slot="tab-indicator"
-      className={cn(tabIndicatorVariants({ variant, size, side }), className)}
+      className={cn(
+        tabIndicatorVariants({ variant, size, side, indicator }),
+        className,
+      )}
       {...props}
     />
   );

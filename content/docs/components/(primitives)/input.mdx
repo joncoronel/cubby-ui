@@ -34,11 +34,11 @@ Set `disabled` to prevent interaction and dim the input.
 
 <ComponentPreview component="input" example="input-disabled" />
 
-### Elevated Variant
+### Outline Variant
 
-On a Card, Dialog, or popover surface, the opaque `default` input collapses into its parent. Use `variant="elevated"` for a translucent overlay that adapts to the substrate. See the [Surfaces](/docs/getting-started/surfaces) docs for the full reasoning.
+Use `variant="outline"` to match the outline Button: a card fill with a hairline border in light mode, a recessed fill with a faint ring in dark mode. The `default` tint already reads on the page, Cards, Dialogs, and popovers, so no field needs a per-surface variant.
 
-<ComponentPreview component="input" example="input-elevated" />
+<ComponentPreview component="input" example="input-outline" />
 
 ### Form Integration
 
@@ -67,11 +67,21 @@ For the complete Base UI API, see the [Base UI Input documentation](https://base
 
 <ApiProp
   name="variant"
-  fullType="'default' | 'elevated'"
+  fullType="'default' | 'outline'"
   simpleType="string"
   defaultValue='"default"'
 >
-  Surface appearance. `default` uses opaque `bg-input` (clean "lifted card" feel on the page). `elevated` uses translucent `bg-input-elevated`; use this when the input sits inside a Card, Dialog, popover, or any elevated surface where the opaque default would visually collapse into its parent. See the [Surfaces](/docs/getting-started/surfaces) docs.
+  Sets the field's fill. `default` is a translucent tint that reads on any
+  surface; `outline` uses the outline Button's fill and hairline edge.
 </ApiProp>
 
 </ApiPropsList>
+
+## Upgrading
+
+If you're reinstalling over an earlier version, check these changes:
+
+| Before                                               | Now                                                                     |
+| ---------------------------------------------------- | ----------------------------------------------------------------------- |
+| `variant="elevated"` for fields on Cards and Dialogs | Removed. The default tint works on any surface, so drop the prop.       |
+| One filled style                                     | `variant="outline"` adds a bordered style, matching the outline Button. |

@@ -82,7 +82,7 @@ function BreadcrumbLink({ className, render, ...props }: BreadcrumbLinkProps) {
     "data-slot": "breadcrumb-link",
     className: cn(
       "rounded-sm transition-colors duration-200 hover:text-foreground",
-      "outline-solid outline-2 outline-offset-2 outline-transparent focus-visible:outline-ring/50",
+      "outline-solid outline-2 -outline-offset-1 outline-transparent focus-visible:outline-ring",
       // surface variant — padded hit area so links sit inside the track.
       "group-data-[variant=surface]:px-1.5 group-data-[variant=surface]:py-0.5",
       className,

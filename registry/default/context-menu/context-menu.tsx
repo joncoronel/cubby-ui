@@ -99,6 +99,9 @@ function ContextMenuRadioGroup({
   );
 }
 
+// The level of the nearest menu popup, so a submenu defaults to its parent's.
+const ContextMenuLevelContext = React.createContext<SurfaceLevel>(3);
+
 function ContextMenuContent({
   className,
   positionerClassName,
@@ -106,6 +109,7 @@ function ContextMenuContent({
   align = "start",
   level = 3,
   shadowLevel = 3,
+  children,
   ...props
 }: React.ComponentProps<typeof BaseContextMenu.Popup> & {
   /** Classes for the positioner (the element Base UI moves into place), merged last. */
@@ -150,7 +154,11 @@ function ContextMenuContent({
             className,
           )}
           {...props}
-        />
+        >
+          <ContextMenuLevelContext.Provider value={level}>
+            {children}
+          </ContextMenuLevelContext.Provider>
+        </BaseContextMenu.Popup>
       </ContextMenuPositioner>
     </ContextMenuPortal>
   );
@@ -429,19 +437,22 @@ function ContextMenuSubContent({
   // the parent's edge by 4px; 8 leaves a 4px gap, matching Menubar.
   sideOffset = 8,
   align = "start",
-  level = 5,
+  level,
   shadowLevel = 3,
+  children,
   ...props
 }: React.ComponentProps<typeof BaseContextMenu.Popup> & {
   /** Classes for the positioner (the element Base UI moves into place), merged last. */
   positionerClassName?: string;
   align?: BaseContextMenu.Positioner.Props["align"];
   sideOffset?: BaseContextMenu.Positioner.Props["sideOffset"];
-  /** Surface elevation level for the submenu bg (1-8). Defaults to 5 — one tier above the parent menu's default of 3. Bump higher when nesting inside a Dialog. */
+  /** Surface elevation level for the submenu bg (1-8). Defaults to the parent menu's level. */
   level?: SurfaceLevel;
   /** Shadow weight (1-8). Pinned to 3 by default so the submenu reads the same dropdown weight as its parent. */
   shadowLevel?: SurfaceLevel;
 }) {
+  const parentLevel = React.use(ContextMenuLevelContext);
+  const resolvedLevel = level ?? parentLevel;
   return (
     <ContextMenuPortal>
       <ContextMenuPositioner
@@ -454,7 +465,7 @@ function ContextMenuSubContent({
       >
         <BaseContextMenu.Popup
           data-slot="context-menu-sub-content"
-          data-level={level}
+          data-level={resolvedLevel}
           className={cn(
             // Its own scroll container, like ContextMenuContent above.
             "text-popover-foreground relative z-50 flex max-h-(--available-height) max-w-(--available-width) min-w-[12rem] origin-(--transform-origin) flex-col overflow-x-hidden overflow-y-auto rounded-xl p-1 outline-none",
@@ -465,11 +476,15 @@ function ContextMenuSubContent({
             "data-ending-style:scale-95 data-ending-style:opacity-0",
             // See ContextMenuContent for why there is no data-instant guard.
             "motion-reduce:transition-none",
-            solidSurface(level, shadowLevel),
+            solidSurface(resolvedLevel, shadowLevel),
             className,
           )}
           {...props}
-        />
+        >
+          <ContextMenuLevelContext.Provider value={resolvedLevel}>
+            {children}
+          </ContextMenuLevelContext.Provider>
+        </BaseContextMenu.Popup>
       </ContextMenuPositioner>
     </ContextMenuPortal>
   );

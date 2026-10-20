@@ -16,7 +16,7 @@ export default function FancyButtonWithIcons() {
           <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />
         </FancyButton>
 
-        <FancyButton size="icon" color="#3b82f6">
+        <FancyButton size="icon" color="oklch(0.68 0.16 232.65)">
           <HugeiconsIcon icon={Settings01Icon} strokeWidth={2} />
         </FancyButton>
       </div>

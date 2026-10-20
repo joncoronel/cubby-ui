@@ -7,17 +7,18 @@ import { useRender } from "@base-ui/react/use-render";
 import { cn } from "@/lib/utils";
 
 const alertVariants = cva(
-  "relative w-full rounded-lg border border-border/70 px-4 py-3 pl-6 text-sm grid has-[>svg]:grid-cols-[auto_1fr] grid-cols-[0_1fr] has-[>svg]:gap-x-3 gap-y-0.5 items-start [&>svg]:row-span-2 [&>svg]:text-current shadow-sm has-[*[data-slot=alert-action]]:grid-cols-[0_1fr] has-[>svg]:has-[*[data-slot=alert-action]]:grid-cols-[auto_1fr] sm:has-[*[data-slot=alert-action]]:grid-cols-[0_1fr_auto] sm:has-[>svg]:has-[*[data-slot=alert-action]]:grid-cols-[auto_1fr_auto] [&>svg]:size-5 group before:absolute before:left-2 before:top-2 before:bottom-2 before:w-1 before:rounded-full bg-card dark:bg-muted",
+  "relative w-full rounded-lg border border-transparent px-4 py-3 pl-6 text-sm grid has-[>svg]:grid-cols-[auto_1fr] grid-cols-[0_1fr] has-[>svg]:gap-x-3 gap-y-0.5 items-start [&>svg]:row-span-2 [&>svg]:text-current has-[*[data-slot=alert-action]]:grid-cols-[0_1fr] has-[>svg]:has-[*[data-slot=alert-action]]:grid-cols-[auto_1fr] sm:has-[*[data-slot=alert-action]]:grid-cols-[0_1fr_auto] sm:has-[>svg]:has-[*[data-slot=alert-action]]:grid-cols-[auto_1fr_auto] [&>svg]:size-5 group before:absolute before:left-2 before:top-2 before:bottom-2 before:w-1 before:rounded-full bg-muted",
   {
     variants: {
       variant: {
-        default: "[&>svg]:text-card-foreground  before:bg-border",
+        default: "[&>svg]:text-card-foreground before:bg-border",
         warning:
-          "  [&>svg]:text-warning-foreground before:bg-warning-foreground",
-        danger: " [&>svg]:text-danger-foreground  before:bg-danger-foreground",
-        info: "  [&>svg]:text-info-foreground  before:bg-info-foreground",
+          "bg-warning [&>svg]:text-warning-foreground before:bg-warning-foreground",
+        danger:
+          "bg-danger [&>svg]:text-danger-foreground before:bg-danger-foreground",
+        info: "bg-info [&>svg]:text-info-foreground before:bg-info-foreground",
         success:
-          "  [&>svg]:text-success-foreground before:bg-success-foreground",
+          "bg-success [&>svg]:text-success-foreground before:bg-success-foreground",
       },
     },
     defaultVariants: {

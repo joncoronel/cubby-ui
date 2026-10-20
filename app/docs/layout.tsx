@@ -1,6 +1,15 @@
+import type { Viewport } from "next";
 import { DocsHeader } from "@/components/docs/docs-header";
 import { getShelfGroups } from "@/lib/docs-nav";
 import "./docs.css";
+
+// Hex copies of the docs frame color (0.925 / 0.159); keep them in sync.
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#e5e6e7" },
+    { media: "(prefers-color-scheme: dark)", color: "#0c0d0f" },
+  ],
+};
 
 export default function Layout({ children }: LayoutProps<"/docs">) {
   const groups = getShelfGroups();

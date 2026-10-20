@@ -106,19 +106,13 @@ Use `variant` on `Accordion` to change how items are framed and separated.
 | Variant                    | Description                                                   |
 | -------------------------- | ------------------------------------------------------------- |
 | `default`                  | Borderless items divided by a bottom rule.                    |
-| `split`                    | Each item is its own bordered card.                           |
-| `outline`                  | Items grouped inside one bordered card.                       |
+| `split`                    | Each item is its own filled card.                             |
+| `outline`                  | Items grouped inside one filled card, divided by lines.       |
 | `nested`                   | Indented items inside a muted, rounded container.             |
-| `isolated-bordered`        | Bordered items that detach and round when opened.             |
 | `isolated-filled`          | Filled items that detach and round when opened.               |
 | `isolated-filled-bordered` | Filled items with dividers that detach and round when opened. |
 
 <ComponentPreview component="accordion" example="accordion-split-variant" />
-
-<ComponentPreview
-  component="accordion"
-  example="accordion-isolated-bordered-variant"
-/>
 
 <ComponentPreview
   component="accordion"
@@ -148,7 +142,7 @@ Collapsible container that groups expandable content sections. Wraps Base UI's `
 
 <ApiProp
   name="variant"
-  fullType='"default" | "split" | "outline" | "nested" | "isolated-bordered" | "isolated-filled" | "isolated-filled-bordered"'
+  fullType='"default" | "split" | "outline" | "nested" | "isolated-filled" | "isolated-filled-bordered"'
   simpleType="string"
   defaultValue='"default"'
 >
@@ -203,3 +197,11 @@ Clickable header that toggles content visibility. Wraps Base UI's `Accordion.Tri
 </ApiProp>
 
 </ApiPropsList>
+
+## Upgrading
+
+If you're reinstalling over an earlier version, check these changes:
+
+| Before                        | Now                                                                                          |
+| ----------------------------- | -------------------------------------------------------------------------------------------- |
+| `variant="isolated-bordered"` | Removed. Use `isolated-filled`, or `isolated-filled-bordered` for dividers inside each item. |

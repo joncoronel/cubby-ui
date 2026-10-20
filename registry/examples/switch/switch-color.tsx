@@ -4,13 +4,13 @@ import { Label } from "@/registry/default/label/label";
 export default function SwitchColor() {
   return (
     <div className="flex items-center gap-6">
-      <Label className="flex-row items-center gap-2" htmlFor="color-primary">
-        <Switch defaultChecked id="color-primary" />
-        primary
-      </Label>
       <Label className="flex-row items-center gap-2" htmlFor="color-neutral">
-        <Switch defaultChecked color="neutral" id="color-neutral" />
+        <Switch defaultChecked id="color-neutral" />
         neutral
+      </Label>
+      <Label className="flex-row items-center gap-2" htmlFor="color-primary">
+        <Switch defaultChecked color="primary" id="color-primary" />
+        primary
       </Label>
       <Label className="flex-row items-center gap-2" htmlFor="color-custom">
         <Switch

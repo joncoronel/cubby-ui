@@ -20,8 +20,7 @@ const inputVariants = cva(
       variant: {
         // Filled: a translucent tint that holds on any surface.
         default: "bg-input",
-        // Outline: the outline Button's fill and edge (card and hairline in
-        // light, a recessed fill with a faint ring in dark).
+        // Outline: the outline Button's fill and edge.
         outline: "bg-(--outline) border-(--outline-border) bg-clip-padding",
       },
       size: {

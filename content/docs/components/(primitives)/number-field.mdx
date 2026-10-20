@@ -108,14 +108,14 @@ Set `disabled` on `NumberField` to turn off typing and stepping.
 
 ### Outline Variant
 
-`default` is a filled translucent tint that reads on the page, a Card, a Dialog, or a popover alike, so the field never needs a per-surface switch. Use `variant="outline"` on `NumberFieldGroup` when you want the outline Button's fill and edge instead: a card fill with a hairline border in light mode, and a recessed fill with a faint ring in dark mode.
+Use `variant="outline"` on `NumberFieldGroup` to match the outline Button: a card fill with a hairline border in light mode, a recessed fill with a faint ring in dark mode. The `default` tint already reads on the page, Cards, Dialogs, and popovers, so no field needs a per-surface variant.
 
 <ComponentPreview component="number-field" example="number-field-outline" />
 
-| Variant   | Description                                          |
-| --------- | ---------------------------------------------------- |
-| `default` | A filled translucent tint that reads on any surface. |
-| `outline` | The outline Button's fill and hairline edge.         |
+| Variant   | Description                                   |
+| --------- | --------------------------------------------- |
+| `default` | A translucent tint that reads on any surface. |
+| `outline` | The outline Button's fill and hairline edge.  |
 
 ### Form Integration
 
@@ -157,8 +157,8 @@ The shell around the input and steppers. Wraps Base UI's `NumberField.Group`.
   simpleType="string"
   defaultValue='"default"'
 >
-  Fill of the shell. `default` is a filled translucent tint that reads on any
-  surface. `outline` uses the outline Button's fill and hairline edge.
+  Sets the shell's fill. `default` is a translucent tint that reads on any
+  surface; `outline` uses the outline Button's fill and hairline edge.
 </ApiProp>
 
 <ApiProp
@@ -242,11 +242,11 @@ Wraps Base UI's `NumberField.ScrubArea`. Outside the group it wraps a label; ins
 
 If you're reinstalling over an earlier version, check these changes:
 
-| Before                                               | Now                                                                                                              |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Bordered input fused between bordered buttons        | One shell with the input and steppers inside. Remove any per-part borders.                                       |
-| Steppers needed an icon child                        | Minus and plus by default. Existing icon children still work.                                                    |
-| `NumberFieldScrubAreaCursor` needed an icon child    | A two-way arrow by default.                                                                                      |
-| `NumberFieldInput` was `w-24`                        | `w-16`. Pass a width for formatted values, like `className="w-24"`.                                              |
-| `variant="elevated"` for fields on Cards and Dialogs | Removed. The default fill is now a translucent tint that reads on the page, a Card or a popup, so drop the prop. |
-| One filled style                                     | `variant="outline"` adds a bordered style, matching the outline Button.                                          |
+| Before                                               | Now                                                                        |
+| ---------------------------------------------------- | -------------------------------------------------------------------------- |
+| Bordered input fused between bordered buttons        | One shell with the input and steppers inside. Remove any per-part borders. |
+| Steppers needed an icon child                        | Minus and plus by default. Existing icon children still work.              |
+| `NumberFieldScrubAreaCursor` needed an icon child    | A two-way arrow by default.                                                |
+| `NumberFieldInput` was `w-24`                        | `w-16`. Pass a width for formatted values, like `className="w-24"`.        |
+| `variant="elevated"` for fields on Cards and Dialogs | Removed. The default tint works on any surface, so drop the prop.          |
+| One filled style                                     | `variant="outline"` adds a bordered style, matching the outline Button.    |

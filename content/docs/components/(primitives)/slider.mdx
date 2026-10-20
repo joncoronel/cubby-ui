@@ -87,7 +87,7 @@ Use `variant` to change the slider's visual style.
 
 ### Color
 
-The filled range uses the neutral emphasis grey by default, the same grey as checked checkboxes, radios and switches. Pass `color="primary"` to fill it with the brand color instead.
+Use `color="primary"` to fill the range with the brand color instead of the default emphasis grey that checked checkboxes, radios, and switches share.
 
 <ComponentPreview component="slider" example="slider-color" />
 
@@ -144,8 +144,8 @@ Give the slider an accessible name when there is no visible `SliderLabel`. For a
   simpleType="string"
   defaultValue='"neutral"'
 >
-  Fill color of the selected range (and the contained thumb). `neutral` uses the
-  emphasis grey shared by selection controls. `primary` uses the brand fill.
+  Sets the fill of the selected range and the contained thumb. `neutral` is the
+  emphasis grey shared by selection controls; `primary` is the brand fill.
 </ApiProp>
 
 <ApiProp name="getAriaLabel" fullType="((index: number) => string) | null">

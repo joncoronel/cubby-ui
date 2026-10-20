@@ -99,9 +99,8 @@ const tabIndicatorVariants = cva(
         left: "",
         right: "",
       },
-      // Capsule only. Solid is the emphasis grey with a white label, like
-      // Toggle Group; raised is a lifted chip on the track with the label in
-      // the text color.
+      // Capsule only: an emphasis-grey chip with a white label (solid), or a
+      // lifted chip on the track (raised).
       indicator: {
         solid: "",
         raised: "",

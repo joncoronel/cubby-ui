@@ -62,6 +62,7 @@ Copy and paste the following into your `globals.css` file:
   --neutral-foreground: oklch(
     0.98 var(--neutral-chroma-low) var(--neutral-hue)
   );
+  /* Selection grey, so the primary stays reserved for actions. */
   --emphasis: oklch(0.51 var(--neutral-chroma) var(--neutral-hue));
   --emphasis-foreground: oklch(1 0 0);
   --secondary: oklch(0.93 0 0);
@@ -95,12 +96,12 @@ Copy and paste the following into your `globals.css` file:
     transparent
   );
 
+  /* Dark recesses it with a translucent black, so it darkens any surface. */
   --outline: var(--card);
   --outline-border: var(--border);
 
   --primary-hover: color-mix(in oklch, var(--primary), black 5%);
   --neutral-hover: color-mix(in oklch, var(--neutral), white 10%);
-  /* The tonal Button: the emphasis grey, darkening on hover and press. */
   --emphasis-hover: color-mix(in oklch, var(--emphasis), black 8%);
   --destructive-hover: color-mix(in oklch, var(--destructive), black 5%);
   --secondary-hover: color-mix(in oklch, var(--secondary), black 5%);
@@ -116,13 +117,18 @@ Copy and paste the following into your `globals.css` file:
 
   /* Borders & inputs */
   --border: color-mix(in oklab, var(--foreground) 10%, transparent);
+  /* Translucent, so one value works on the page, a Card or a popup. */
   --input: oklch(0 0 0 / 4.5%);
   --input-hover: oklch(0 0 0 / 7.5%);
   --input-active: oklch(0 0 0 / 10.5%);
+  /* Shared off state: the Switch track fill and the Checkbox and Radio ring. */
   --control-off: oklch(0 0 0 / 15%);
   --control-off-hover: oklch(0 0 0 / 19%);
+  /* Empty part of a range. Keeps 3:1 or better against the emphasis fill. */
   --control-track: oklch(0 0 0 / 9%);
+  /* CodeBlock's inner panel, matching the outline variant. */
   --code-panel: var(--outline);
+  /* L 0.6 keeps the ring at 3:1 or better against the page. */
   --ring: oklch(0.6 0.15 232.65);
   --scrollbar: oklch(0.87 0 0);
 
@@ -239,7 +245,7 @@ Copy and paste the following into your `globals.css` file:
   --foreground: oklch(0.94 var(--neutral-chroma) var(--neutral-hue));
   --neutral: oklch(0.9 var(--neutral-chroma) var(--neutral-hue));
   --neutral-foreground: oklch(0.13 var(--neutral-chroma) var(--neutral-hue));
-  /* 0.56: white labels on it clear 4.5:1 (0.58 measured 4.28). */
+  /* 0.56 so white labels clear 4.5:1. */
   --emphasis: oklch(0.56 var(--neutral-chroma) var(--neutral-hue));
   --ring: oklch(0.75 0.15 232.65);
   --secondary: oklch(0.35 var(--neutral-chroma) var(--neutral-hue));
@@ -251,7 +257,6 @@ Copy and paste the following into your `globals.css` file:
   --destructive: oklch(0.5 0.22 25);
   --destructive-foreground: oklch(1 0 0);
   /* Brightened so primary-soft's label stays readable on the darker plate. */
-  /* The bright sky reads well on dark surfaces (8.3:1 against the page). */
   --primary: oklch(0.75 0.16 232.65);
   --primary-soft-foreground: color-mix(in oklch, var(--primary), white 30%);
   /* Same treatment for destructive-soft's label on its tinted plate. */
@@ -304,6 +309,7 @@ Copy and paste the following into your `globals.css` file:
   --control-off: oklch(1 0 0 / 15%);
   --control-off-hover: oklch(1 0 0 / 19%);
   --control-track: oklch(1 0 0 / 8%);
+  /* Solid, since the copy button's fade paints with it. */
   --code-panel: color-mix(in oklab, var(--muted), black 30%);
   --scrollbar: oklch(0.7 var(--neutral-chroma) var(--neutral-hue));
 
@@ -601,7 +607,7 @@ For the full elevation system docs, see [Surfaces](/docs/getting-started/surface
 
 Form fields and on/off controls use these dedicated tokens:
 
-- `--input`: the filled field tint (translucent, so it reads on the page, a Card or a popup)
+- `--input`: the translucent field fill, which reads on the page, a Card, or a popup
 - `--input-hover`: the deeper tint for hovered and open select and date-picker triggers
 - `--outline` / `--outline-border`: the fill and edge of the `outline` field variant and the outline Button
 - `--control-off` / `--control-off-hover`: the resting grey of the Switch track and the Checkbox and Radio ring

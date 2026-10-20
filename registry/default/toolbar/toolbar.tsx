@@ -24,9 +24,8 @@ const toolbarVariants = cva(
     "min-w-max",
     // Paint corners are the shell's minus the 2px edge border.
     "[--toolbar-item-radius:max(0px,calc(var(--toolbar-radius)-2px))]",
-    // Pure overlays (black, white in dark): hover 8%, press 10%. Not a tint of
-    // the label, whose faint cool hue shows as a cast. The toggled-on fill comes from
-    // `pressedStyle` below.
+    // Hover 8%, press 10%: black overlays (white in dark), not a cool-cast label
+    // tint. `pressedStyle` below sets the toggled-on fill.
     "[--toolbar-highlight:var(--surface-active)] [--toolbar-press:var(--surface-selected)]",
     // The shell is fixed and items stretch to fill it; columns grow to the
     // widest item.
@@ -43,9 +42,8 @@ const toolbarVariants = cva(
         soft: "bg-secondary text-secondary-foreground",
         ghost: "text-foreground",
       },
-      // How a toggled-on ToolbarToggle looks. Subtle (the default) is a quiet
-      // 12% overlay, for editor rows where several toggles are on at once; solid
-      // is the emphasis grey that Toggle Group, Tabs and checkboxes use.
+      // Subtle (default) is a quiet 12% overlay for rows with several toggles
+      // on; solid is the emphasis grey, as in Toggle Group and Tabs.
       pressedStyle: {
         subtle:
           "[--toolbar-pressed:oklch(0_0_0/12%)] dark:[--toolbar-pressed:oklch(1_0_0/12%)] [--toolbar-pressed-foreground:currentColor]",

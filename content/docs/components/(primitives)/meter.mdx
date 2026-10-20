@@ -49,14 +49,14 @@ Use `size` to set the track thickness.
 
 ### Color
 
-Use `color` to set the indicator for a meter without thresholds. `neutral` (the default) is the same grey Slider and checked controls fill with; `primary` is the brand color.
+Use `color` to set the indicator on a meter without thresholds.
 
 <ComponentPreview component="meter" example="meter-color" />
 
-| Value     | Description                     |
-| --------- | ------------------------------- |
-| `neutral` | The default. The emphasis grey. |
-| `primary` | The brand color.                |
+| Value     | Description                                                         |
+| --------- | ------------------------------------------------------------------- |
+| `neutral` | The default emphasis grey, shared with Slider and checked controls. |
+| `primary` | The brand color.                                                    |
 
 Once you set thresholds, the status colors take over.
 
@@ -139,8 +139,8 @@ Holds the value, works out the status, and lays out the parts. Wraps Base UI's `
   simpleType="string"
   defaultValue='"neutral"'
 >
-  Indicator color when no thresholds are set. Thresholds override it with status
-  colors.
+  Sets the indicator color when no thresholds are set. Thresholds override it
+  with status colors.
 </ApiProp>
 
 <ApiProp name="low" fullType="number">

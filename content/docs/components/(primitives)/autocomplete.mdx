@@ -112,7 +112,7 @@ Use virtualization for large lists (100+ items) so only the items in view are re
 
 ### Outline Variant
 
-`default` is a filled translucent tint that reads on the page, a Card, a Dialog, or a popover alike, so the field never needs a per-surface switch. Use `variant="outline"` on `AutocompleteInput` when you want the outline Button's fill and edge instead: a card fill with a hairline border in light mode, and a recessed fill with a faint ring in dark mode.
+Use `variant="outline"` on `AutocompleteInput` to match the outline Button: a card fill with a hairline border in light mode, a recessed fill with a faint ring in dark mode. The `default` tint already reads on the page, Cards, Dialogs, and popovers, so no field needs a per-surface variant.
 
 <ComponentPreview component="autocomplete" example="autocomplete-outline" />
 
@@ -150,9 +150,8 @@ Text input with optional trigger and clear buttons. When `showTrigger` or `showC
   fullType='"default" | "outline"'
   defaultValue='"default"'
 >
-  Surface appearance of the input. `default` is a filled translucent tint that
-  reads on any surface. `outline` uses the outline Button's fill and hairline
-  edge.
+  Sets the input's fill. `default` is a translucent tint that reads on any
+  surface; `outline` uses the outline Button's fill and hairline edge.
 </ApiProp>
 
 </ApiPropsList>
@@ -362,7 +361,7 @@ See [useListVirtualizer](/docs/hooks/use-list-virtualizer) for full documentatio
 
 If you're reinstalling over an earlier version, check these changes:
 
-| Before                                               | Now                                                                                                              |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `variant="elevated"` for fields on Cards and Dialogs | Removed. The default fill is now a translucent tint that reads on the page, a Card or a popup, so drop the prop. |
-| One filled style                                     | `variant="outline"` adds a bordered style, matching the outline Button.                                          |
+| Before                                               | Now                                                                     |
+| ---------------------------------------------------- | ----------------------------------------------------------------------- |
+| `variant="elevated"` for fields on Cards and Dialogs | Removed. The default tint works on any surface, so drop the prop.       |
+| One filled style                                     | `variant="outline"` adds a bordered style, matching the outline Button. |

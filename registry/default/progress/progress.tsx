@@ -19,9 +19,8 @@ const progressRootVariants = cva(
   ],
   {
     variants: {
-      // Neutral (the default) is the emphasis grey that Slider and every
-      // selection control fill with; primary is the brand fill. The status
-      // colors carry meaning and stay colored.
+      // Neutral (default) is the selection-control grey, primary the brand fill.
+      // Status colors carry meaning and stay colored.
       color: {
         neutral: "[--progress-color:var(--emphasis)]",
         primary: "[--progress-color:var(--primary)]",

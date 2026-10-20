@@ -29,9 +29,8 @@ const buttonGroupVariants = cva(
           "bg-(--outline) text-foreground outline outline-(--outline-border)",
         soft: "bg-secondary text-secondary-foreground",
         elevated: cn(solidSurface(3, 3), "text-foreground"),
-        // Opposite the page in brightness: the overlays flip (white on the
-        // dark light-mode fill, black on the light dark-mode one) and need more
-        // strength to show.
+        // The fill inverts the page, so the overlays flip (white in light,
+        // black in dark) and run stronger to show.
         solid:
           "bg-neutral text-neutral-foreground [--group-highlight-fill:oklch(1_0_0/16%)] [--group-press-fill:oklch(1_0_0/22%)] dark:[--group-highlight-fill:oklch(0_0_0/16%)] dark:[--group-press-fill:oklch(0_0_0/22%)]",
       },
@@ -80,10 +79,8 @@ const trayClasses = cn(
   // rule, or its empty pseudo-element becomes a flex item.
   "rounded-(--group-radius) [--group-item-radius:max(0px,calc(var(--group-radius)-2px))]",
   "[&>:is(button,a):not([data-slot=select-trigger])]:before:rounded-(--group-item-radius)",
-  // Highlight and press: the pure 8% / 10% overlays (black, white in dark), a
-  // step past Button's 6% hover, which reads too faint as a pill on the same
-  // fill. Not a tint of the label: the text color carries the neutrals' faint
-  // cool hue, which shows as a cast. Solid sets its own fills.
+  // Highlight and press: 8% / 10% black overlays (white in dark). Button's 6%
+  // reads too faint here, and a label tint shows a cool cast. Solid sets its own.
   "[--group-highlight:var(--group-highlight-fill,var(--surface-active))] [--group-press:var(--group-press-fill,var(--surface-selected))]",
   // Sizing: a row is the ladder height, a column at least the ladder width.
   // Items size themselves in button-group.css.

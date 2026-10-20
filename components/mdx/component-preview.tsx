@@ -42,7 +42,6 @@ export function ComponentPreview({
       data-slot="preview"
       className={cn(
         "docs-stage-wrap not-prose",
-        // A flat muted tray: the fill is the edge, no elevation.
         code && ["docs-example", "bg-muted"],
         className,
       )}

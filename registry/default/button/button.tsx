@@ -52,8 +52,7 @@ const buttonVariantClasses = {
     "text-(--primary-soft-foreground) [--btn-bg:color-mix(in_oklab,var(--primary)_14%,transparent)] [--btn-bg-hover:color-mix(in_oklab,var(--primary)_20%,transparent)] [--btn-bg-active:color-mix(in_oklab,var(--primary)_25%,transparent)]",
   neutral:
     "text-neutral-foreground [--btn-bg:var(--neutral)] [--btn-bg-hover:var(--neutral-hover)] [--btn-bg-active:var(--neutral-active)]",
-  // Medium emphasis, between neutral and secondary: the emphasis grey that
-  // selection controls fill with, with a white label.
+  // Between neutral and secondary: the selection-control grey, white label.
   tonal:
     "text-emphasis-foreground [--btn-bg:var(--emphasis)] [--btn-bg-hover:var(--emphasis-hover)] [--btn-bg-active:var(--emphasis-active)]",
   destructive:
@@ -69,8 +68,7 @@ const buttonVariantClasses = {
   // (Cards, Dialogs) where outline's solid card fill would look mismatched.
   "outline-ghost":
     "[--btn-border:var(--outline-border)] [--btn-bg-hover:var(--surface-hover)] [--btn-bg-active:var(--surface-active)]",
-  // The field's own tint and hover, for a button that sits beside or inside
-  // a filled field and should read as part of it.
+  // A filled field's tint, for a button that sits in or beside one.
   field:
     "text-foreground [--btn-bg:var(--input)] [--btn-bg-hover:var(--input-hover)] [--btn-bg-active:var(--input-active)]",
   secondary:

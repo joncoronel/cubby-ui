@@ -446,7 +446,7 @@ function ContextMenuSubContent({
   positionerClassName?: string;
   align?: BaseContextMenu.Positioner.Props["align"];
   sideOffset?: BaseContextMenu.Positioner.Props["sideOffset"];
-  /** Surface elevation level for the submenu bg (1-8). Defaults to the parent menu's level, since a submenu continues the same menu. */
+  /** Surface elevation level for the submenu bg (1-8). Defaults to the parent menu's level. */
   level?: SurfaceLevel;
   /** Shadow weight (1-8). Pinned to 3 by default so the submenu reads the same dropdown weight as its parent. */
   shadowLevel?: SurfaceLevel;

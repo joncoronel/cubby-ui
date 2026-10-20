@@ -46,8 +46,7 @@ const inputGroupVariants = cva(
       variant: {
         // Filled: a translucent tint that holds on any surface.
         default: "bg-input",
-        // Outline: the outline Button's fill and edge (card and hairline in
-        // light, a recessed fill with a faint ring in dark).
+        // Outline: the outline Button's fill and edge.
         outline: "bg-(--outline) border-(--outline-border) bg-clip-padding",
       },
     },
@@ -159,8 +158,8 @@ function InputGroupAddon({
 const inputGroupButtonVariants = cva(
   [
     "border-2 border-transparent shadow-none",
-    // Hover and press on a quiet button: the pure 8% / 10% overlays (black,
-    // white in dark), not a tint of the label, whose cool hue shows as a cast.
+    // Quiet button hover and press: 8% / 10% black overlays (white in dark),
+    // not a label tint, which shows a cool cast.
     "data-[variant=ghost]:[--btn-bg-hover:var(--surface-active)] data-[variant=ghost]:[--btn-bg-active:var(--surface-selected)]",
   ],
   {

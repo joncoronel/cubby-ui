@@ -153,7 +153,7 @@ You do not need these day to day; they are what each component already uses. Rea
 | Combobox             | `3`             | `3`                              |
 | Autocomplete         | `3`             | `3`                              |
 
-The flat-card family (Card, Table, DataTable) shares `solidSurface(3, 1)`: a surface-3 background with a 1px rim and no drop shadow. They are embedded containers, not floating popups, so they read as lifted just enough to define an edge rather than casting a shadow over content. Code blocks and ComponentPreview trays sit lower still: flat `bg-muted` wells with no shadow at all.
+The flat-card family (Card, Table, DataTable) shares `solidSurface(3, 1)`: a surface-3 background with a 1px rim and no drop shadow. They are embedded containers, not floating popups, so they read as lifted just enough to define an edge rather than casting a shadow over content. Code blocks and ComponentPreview trays sit lower, as flat `bg-muted` wells with no shadow.
 
     </AccordionContent>
 
@@ -397,9 +397,9 @@ The default is a translucent tint, the same family as the state overlays, so it 
 --input: oklch(1 0 0 / 5%);
 ```
 
-Because the tint holds on every surface, no field needs a per-context switch. `outline` reuses the outline Button's `--outline` fill and `--outline-border` edge: the card fill with a hairline border in light mode, and a recessed darker fill with a faint 8% white ring in dark mode. Reach for it when fields should match outline buttons.
+Since the tint holds on every surface, fields need no per-context switch. `outline` reuses the outline Button's `--outline` fill and `--outline-border` edge: the card fill with a hairline border in light mode, and a darker recessed fill with a faint 8% white ring in dark mode. Use it when fields should match outline buttons.
 
-Switch, Checkbox and Radio skip the variant. Their resting state is the shared `--control-off` grey (15% black, 15% white in dark): the Switch track fills with it, and unchecked boxes and radios draw a 2px ring of it around a white middle. It reads on any surface, so none of the three needs a `variant` prop.
+Switch, Checkbox, and Radio have no `variant` prop. Their resting state is the shared `--control-off` grey (15% black, or 15% white in dark mode), which reads on any surface: the Switch track fills with it, and unchecked boxes and radios draw a 2px ring of it around a white middle.
 
     </AccordionContent>
 

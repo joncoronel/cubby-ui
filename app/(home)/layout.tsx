@@ -4,7 +4,7 @@ import { LandingNav } from "@/components/home/landing-nav";
 import { LandingFooter } from "@/components/home/landing-footer";
 import "./home.css";
 
-// The browser toolbar takes the landing page color: --background (0.99 / 0.205).
+// Hex copies of --background (0.99 / 0.205); keep them in sync.
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#fcfcfc" },

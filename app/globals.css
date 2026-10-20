@@ -34,9 +34,8 @@ html {
   --card-foreground: var(--foreground);
   --popover: var(--surface-3);
   --popover-foreground: var(--foreground);
-  /* Light runs a step deeper than dark (0.75) so the fill holds against the
-     page: 2.5:1 here vs 2:1 at 0.75. White labels sit at 2.7:1, below AA,
-     a deliberate trade for the brighter sky. */
+  /* Deeper than dark (0.75) to hold 2.5:1 on the page. White labels drop to
+     2.7:1, below AA, as a deliberate trade. */
   --primary: oklch(0.68 0.16 232.65);
   --primary-foreground: oklch(1 0 0);
   /* Primary as text on a neutral plate (the `primary-soft` button), derived so
@@ -50,8 +49,7 @@ html {
   --neutral-foreground: oklch(
     0.98 var(--neutral-chroma-low) var(--neutral-hue)
   );
-  /* Mid grey for selection (checked boxes and radios, the tab capsule, a
-     pressed toggle-group item), so the sky primary stays for actions. */
+  /* Selection grey, so the primary stays reserved for actions. */
   --emphasis: oklch(0.51 var(--neutral-chroma) var(--neutral-hue));
   --emphasis-foreground: oklch(1 0 0);
   --secondary: oklch(0.93 0 0);
@@ -101,15 +99,12 @@ html {
   /* Hover colours shift AWAY from the token's own lightness so the change always
      reads. Most light tokens darken, but --neutral is already dark and barely
      moves when blacked, so it lightens instead. */
-  /* The outline Button's fill and edge. Light sits on the card. Dark recesses
-     it with a translucent black (so it darkens whatever it sits on) and a
-     brighter edge, reading as an outlined control rather than a raised slab. */
+  /* Dark recesses it with a translucent black, so it darkens any surface. */
   --outline: var(--card);
   --outline-border: var(--border);
 
   --primary-hover: color-mix(in oklch, var(--primary), black 5%);
   --neutral-hover: color-mix(in oklch, var(--neutral), white 10%);
-  /* The tonal Button: the emphasis grey, darkening on hover and press. */
   --emphasis-hover: color-mix(in oklch, var(--emphasis), black 8%);
   --destructive-hover: color-mix(in oklch, var(--destructive), black 5%);
   --secondary-hover: color-mix(in oklch, var(--secondary), black 5%);
@@ -126,26 +121,18 @@ html {
   /* Re-declared in .dark: a custom property resolves its var()s where DECLARED,
      so without it a subtree-scoped .dark inherits this light-resolved value. */
   --border: color-mix(in oklab, var(--foreground) 10%, transparent);
-  /* Form fields are filled, not outlined: a translucent tint that darkens
-     whatever it sits on, so one value reads on the page, a Card or a popup. */
+  /* Translucent, so one value works on the page, a Card or a popup. */
   --input: oklch(0 0 0 / 4.5%);
   --input-hover: oklch(0 0 0 / 7.5%);
   --input-active: oklch(0 0 0 / 10.5%);
-  /* The "off" grey every on/off control shares: the Switch track fills with
-     it, Checkbox and Radio draw a ring of it, so the three read as one
-     family at rest. Translucent, so it holds on any substrate. */
+  /* Shared off state: the Switch track fill and the Checkbox and Radio ring. */
   --control-off: oklch(0 0 0 / 15%);
   --control-off-hover: oklch(0 0 0 / 19%);
-  /* The empty part of a range (Slider, Circular Slider, Progress, Meter):
-     quieter than --control-off so the filled part stays clearly apart from
-     it, 3:1 or better against the emphasis fill in both themes. */
+  /* Empty part of a range. Keeps 3:1 or better against the emphasis fill. */
   --control-track: oklch(0 0 0 / 9%);
-  /* The code panel inside a CodeBlock's muted tray, styled like the outline
-     variant: white in light, a solid near-black recess in dark, edged with
-     --outline-border. */
+  /* CodeBlock's inner panel, matching the outline variant. */
   --code-panel: var(--outline);
-  /* Solid and flush (outline-offset -1px straddles the edge). L 0.6 keeps the
-     ring at 3:1 or better against the near-white page; dark lifts it. */
+  /* L 0.6 keeps the ring at 3:1 or better against the page. */
   --ring: oklch(0.6 0.15 232.65);
   --scrollbar: oklch(0.87 0 0);
 
@@ -196,8 +183,8 @@ html {
      doesn't read with 3 of 4 edges at the viewport boundary. */
   --surface-rim-color: oklch(0 0 0 / 0);
 
-  /* Opacity falls as blur grows, mimicking light fall-off. The 1px ring is kept
-     faint, since a crisp line reads as a border; the blurred drops carry the lift. */
+  /* Opacity falls as blur grows, mimicking light fall-off. The ring stays faint
+     so it doesn't read as a border. */
   --surface-shadow-ring: oklch(0 0 0 / 0.045); /* crisp edge */
   --surface-shadow-near: oklch(0 0 0 / 0.06); /* 1px blur (contact) */
   --surface-shadow-mid: oklch(0 0 0 / 0.06); /* 3–6px blur */
@@ -289,7 +276,7 @@ html {
   --foreground: oklch(0.94 var(--neutral-chroma) var(--neutral-hue));
   --neutral: oklch(0.9 var(--neutral-chroma) var(--neutral-hue));
   --neutral-foreground: oklch(0.13 var(--neutral-chroma) var(--neutral-hue));
-  /* 0.56: white labels on it clear 4.5:1 (0.58 measured 4.28). */
+  /* 0.56 so white labels clear 4.5:1. */
   --emphasis: oklch(0.56 var(--neutral-chroma) var(--neutral-hue));
   --ring: oklch(0.75 0.15 232.65);
   --secondary: oklch(0.35 var(--neutral-chroma) var(--neutral-hue));
@@ -301,7 +288,6 @@ html {
   --destructive: oklch(0.5 0.22 25);
   --destructive-foreground: oklch(1 0 0);
   /* Brightened so primary-soft's label stays readable on the darker plate. */
-  /* The bright sky reads well on dark surfaces (8.3:1 against the page). */
   --primary: oklch(0.75 0.16 232.65);
   --primary-soft-foreground: color-mix(in oklch, var(--primary), white 30%);
   /* Same treatment for destructive-soft's label on its tinted plate. */
@@ -336,8 +322,6 @@ html {
   );
 
   /* Dark hover — mix toward white so hovered buttons brighten. */
-  /* Re-declared, see the :root note on --outline. A faint white ring over a
-     fill a shade darker than its surround; hover lifts it just above it. */
   --outline: oklch(0 0 0 / 0.3);
   --outline-border: oklch(1 0 0 / 0.08);
 
@@ -363,13 +347,10 @@ html {
   --input: oklch(1 0 0 / 5%);
   --input-hover: oklch(1 0 0 / 9%);
   --input-active: oklch(1 0 0 / 13%);
-  /* Lower than light, so the resting grey stays well clear of the lifted
-     --emphasis that marks the on state. */
   --control-off: oklch(1 0 0 / 15%);
   --control-off-hover: oklch(1 0 0 / 19%);
   --control-track: oklch(1 0 0 / 8%);
-  /* The outline recess (30% black) mixed into the tray, so it stays solid for
-     the copy button and fades that paint with it. */
+  /* Solid, since the copy button's fade paints with it. */
   --code-panel: color-mix(in oklab, var(--muted), black 30%);
 
   --scrollbar: oklch(0.7 var(--neutral-chroma) var(--neutral-hue));

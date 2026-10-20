@@ -4,11 +4,8 @@ import * as React from "react";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 
-// The route layouts ship `theme-color` per OS scheme, which is right before
-// hydration but wrong when the visitor picks a theme against their OS. Once
-// the theme resolves, point every theme-color tag at the page's actual
-// background, so the browser toolbar follows the chosen theme and the CSS
-// stays the single source of the color.
+// The layouts ship `theme-color` per OS scheme, wrong when the chosen theme
+// differs. Once it resolves, copy the body background into every tag.
 function toHex(color: string): string | null {
   const context = document.createElement("canvas").getContext("2d");
   if (!context) return null;
@@ -24,8 +21,7 @@ export function ThemeColorSync(): null {
 
   React.useEffect(() => {
     if (!resolvedTheme) return;
-    // A task later: this effect runs before ThemeProvider's own, which is
-    // what swaps the theme class, so the old background would still be read.
+    // Defer a task: this runs before ThemeProvider swaps the theme class.
     const timer = setTimeout(() => {
       const color = toHex(getComputedStyle(document.body).backgroundColor);
       if (!color) return;

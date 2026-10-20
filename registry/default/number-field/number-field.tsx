@@ -50,8 +50,7 @@ const numberFieldGroupVariants = cva(
   },
 );
 
-// Ghost Button recipe, sized by the shell. Hover and press are the pure
-// neutral overlays, as in Button Group.
+// Ghost Button sized by the shell, with Button Group's hover and press overlays.
 const stepperClasses = cn(
   buttonVariants({ variant: "ghost", size: null }),
   "aspect-square h-auto self-stretch border-2 border-transparent text-sm rounded-(--number-field-item-radius) [--btn-bg-hover:var(--surface-active)] [--btn-bg-active:var(--surface-selected)]",

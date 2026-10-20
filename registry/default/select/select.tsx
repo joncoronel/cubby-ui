@@ -68,8 +68,7 @@ const selectTriggerVariants = cva(
   {
     variants: {
       variant: {
-        // Filled: a translucent tint on any surface; hover deepens the
-        // same translucent tint.
+        // Filled: a translucent tint on any surface; hover deepens it.
         default: "bg-input hover:bg-input-hover data-popup-open:bg-input-hover",
         // Outline: the outline Button's fill and edge.
         outline:

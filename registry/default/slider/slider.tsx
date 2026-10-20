@@ -74,8 +74,7 @@ const sliderThumbVariants = cva(
   },
 );
 
-// The filled range. Neutral is the emphasis grey shared by every selection
-// and on/off control; primary brings in the brand fill.
+// Filled range: the shared selection-control grey, or the brand fill.
 const sliderColors = {
   neutral:
     "[--slider-fill:var(--emphasis)] [--slider-fill-foreground:var(--emphasis-foreground)]",

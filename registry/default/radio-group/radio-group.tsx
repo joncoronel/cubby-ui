@@ -17,8 +17,7 @@ function RadioGroup({
   );
 }
 
-// The selected fill. Neutral is the mid emphasis grey shared by every
-// selection control; primary brings in the brand fill.
+// Selected fill: the shared selection-control grey, or the brand fill.
 const radioColors = {
   neutral:
     "[--radio-fill:var(--emphasis)] [--radio-dot:var(--emphasis-foreground)]",
@@ -43,9 +42,8 @@ function RadioGroupItem({
         "focus-visible:outline-ring ease-out-expo outline-0 -outline-offset-1 outline-transparent transition-[outline-width,outline-color] duration-100 outline-solid focus-visible:outline-2 focus-visible:-outline-offset-1",
         "disabled:cursor-not-allowed disabled:opacity-60",
         "aria-invalid:outline-destructive aria-invalid:outline-2 aria-invalid:-outline-offset-1 aria-invalid:outline-solid",
-        // Off: a 2px ring in the shared --control-off grey around a white
-        // middle (the surface itself in dark), drawn as an inset shadow so the
-        // Indicator at inset-0 covers it completely when selected.
+        // Off: a 2px --control-off ring around a white middle. An inset shadow,
+        // not a border, so the inset-0 Indicator covers it.
         "bg-white shadow-[inset_0_0_0_2px_var(--control-off)] not-data-disabled:hover:shadow-[inset_0_0_0_2px_var(--control-off-hover)] dark:bg-transparent",
         className,
       )}

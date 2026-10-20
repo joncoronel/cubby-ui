@@ -60,7 +60,7 @@ Set `disabled` on a `RadioGroupItem` to take a single option out of play.
 
 ### Color
 
-The selected radio fills with the neutral emphasis grey by default. Pass `color="primary"` on `RadioGroupItem` to use the brand color instead. Set the same color on every item in a group.
+Use `color="primary"` on `RadioGroupItem` to fill the selected radio with the brand color instead of the default emphasis grey. Set the same color on every item in a group.
 
 <ComponentPreview component="radio-group" example="radio-group-color" />
 
@@ -86,8 +86,8 @@ The RadioGroup component is built on top of [Base UI's RadioGroup](https://base-
   simpleType="string"
   defaultValue='"neutral"'
 >
-  Fill color when selected. `neutral` uses the emphasis grey shared by selection
-  controls. `primary` uses the brand fill.
+  Sets the fill when selected. `neutral` is the emphasis grey shared by
+  selection controls; `primary` is the brand fill.
 </ApiProp>
 
 </ApiPropsList>
@@ -96,7 +96,7 @@ The RadioGroup component is built on top of [Base UI's RadioGroup](https://base-
 
 If you're reinstalling over an earlier version, check these changes:
 
-| Before                           | Now                                                                                       |
-| -------------------------------- | ----------------------------------------------------------------------------------------- |
-| `variant="elevated"`             | Removed. The default works on any surface, so drop the prop.                              |
-| Checked fill in the primary blue | The checked fill is the neutral emphasis grey. Pass `color="primary"` for the brand fill. |
+| Before                           | Now                                                               |
+| -------------------------------- | ----------------------------------------------------------------- |
+| `variant="elevated"`             | Removed. The default works on any surface, so drop the prop.      |
+| Checked fill in the primary blue | Neutral emphasis grey. Pass `color="primary"` for the brand fill. |

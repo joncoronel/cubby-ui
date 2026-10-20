@@ -42,9 +42,8 @@ const toggleVariants = cva(cn(toggleBase, togglePaint), {
       // Borderless: transparent when off, a neutral selected overlay when on.
       ghost:
         "[--tgl-bg-hover:var(--surface-hover)] [--tgl-bg-active:var(--surface-active)] [--tgl-bg-selected:var(--surface-selected)]",
-      // Secondary Button's fill. On deepens it 12% toward black (white in
-      // dark), so the plate stays opaque and reads as pressed in. A pure ink,
-      // not the label color, whose faint cool hue shows as a cast.
+      // Secondary Button's fill. On mixes in 12% black (white in dark), so the
+      // plate stays opaque. A pure ink, since the label color shows a cool cast.
       soft: "[--tgl-ink:black] dark:[--tgl-ink:white] [--tgl-bg:var(--secondary)] [--tgl-bg-hover:var(--secondary-hover)] [--tgl-bg-active:var(--secondary-active)] [--tgl-bg-selected:color-mix(in_oklch,var(--secondary),var(--tgl-ink)_12%)]",
       // Framed card. The border color is a token like every other, so it stays
       // through press; only the fill changes. bg-clip-padding keeps the card
@@ -52,9 +51,8 @@ const toggleVariants = cva(cn(toggleBase, togglePaint), {
       outline:
         "[--tgl-border:var(--outline-border)] [--tgl-bg:var(--outline)] [--tgl-bg-hover:var(--outline-hover)] [--tgl-bg-active:var(--outline-active)] [--tgl-bg-selected:var(--secondary)] before:bg-clip-padding",
     },
-    // How a toggled-on Toggle looks. Subtle (the default) keeps each variant's
-    // quiet on state; solid is the emphasis grey with a white label, as in
-    // Toggle Group, Tabs and checked checkboxes.
+    // Subtle (default) keeps each variant's quiet on state; solid is the
+    // emphasis grey with a white label, as in Toggle Group and Tabs.
     pressedStyle: {
       subtle: "",
       solid:

@@ -3,8 +3,7 @@ import { DocsHeader } from "@/components/docs/docs-header";
 import { getShelfGroups } from "@/lib/docs-nav";
 import "./docs.css";
 
-// The browser toolbar takes the docs frame color (0.925 / 0.159), which runs
-// along the top of every docs page.
+// Hex copies of the docs frame color (0.925 / 0.159); keep them in sync.
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#e5e6e7" },

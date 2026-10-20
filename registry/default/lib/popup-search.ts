@@ -10,9 +10,8 @@ export const POPUP_ITEM =
 export const POPUP_SEARCH_BAND = "bg-(--popup-surface) px-1 pt-1";
 
 /**
- * The field: the outline field's fill and edge (`--outline`, `--outline-border`),
- * not the filled tint, since a filled field above a highlighted item reads as
- * a second highlight. The inset ring takes no room, so the icon stays aligned.
+ * The field takes the outline fill and edge: a filled field above a highlighted
+ * item reads as a second highlight. The inset ring keeps the icon aligned.
  * No focus ring: the field holds focus the whole time the popup is open.
  */
 export const POPUP_SEARCH_FIELD =

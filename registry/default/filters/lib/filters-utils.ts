@@ -63,9 +63,8 @@ export const FILTER_SEGMENT_INTERACTIVE =
  */
 export const FILTER_VARIANTS: Record<FilterVariant, string> = {
   outline:
-    // The outline Button's edge over an opaque fill: stacked option icons ring
-    // in --filter-chip-bg, so it cannot be dark --outline's translucent black.
-    // Dark mixes the same 30% black into the page to match it.
+    // Opaque, unlike dark --outline, since stacked option icons ring in
+    // --filter-chip-bg. Dark mixes 30% black into the page to match it.
     "bg-(--filter-chip-bg) outline outline-(--outline-border) data-incomplete:outline-dashed [--filter-chip-bg:var(--card)] dark:[--filter-chip-bg:color-mix(in_oklab,var(--background),black_30%)]",
   soft: "bg-secondary data-incomplete:outline data-incomplete:outline-border data-incomplete:outline-dashed [--filter-chip-bg:var(--secondary)]",
   elevated: cn(
@@ -77,9 +76,8 @@ export const FILTER_VARIANTS: Record<FilterVariant, string> = {
 };
 
 /**
- * Hover and press, set on each shell: the pure overlays (8% / 10% black, white
- * in dark), not a tint of the text color. The text color carries the neutrals'
- * faint cool hue, which read as a blue cast beside colored option icons.
+ * Hover and press, set on each shell: 8% / 10% black overlays (white in dark).
+ * A text-color tint would show a blue cast beside colored option icons.
  */
 export const FILTER_TINTS =
   "[--filter-highlight:var(--surface-active)] [--filter-press:var(--surface-selected)]";

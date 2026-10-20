@@ -258,8 +258,8 @@ export interface CircularSliderRootProps<
    */
   variant?: "ring" | "knob";
   /**
-   * The filled arc, thumb and active ticks. `neutral` is the emphasis grey
-   * shared by every selection control; `primary` is the brand fill.
+   * Color of the filled arc, thumb and active ticks: the selection-control
+   * grey (`neutral`) or the brand fill (`primary`).
    */
   color?: "neutral" | "primary";
   /**

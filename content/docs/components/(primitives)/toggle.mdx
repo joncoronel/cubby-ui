@@ -56,9 +56,14 @@ Use `variant` to set the toggle's fill.
 
 ### Pressed Style
 
-Use `pressedStyle` to set how a toggled-on Toggle looks. `subtle` (the default) keeps each variant's quiet on state. `solid` uses the mid emphasis grey with a white label, the same as Toggle Group, Tabs and checked checkboxes, for a toggle that should clearly read as on.
+Use `pressedStyle` to set how a toggled-on Toggle looks.
 
 <ComponentPreview component="toggle" example="toggle-pressed-style" />
+
+| Style    | Description                                                                             |
+| -------- | --------------------------------------------------------------------------------------- |
+| `subtle` | The default. Each variant's quiet on state.                                             |
+| `solid`  | Emphasis grey with a white label, like Toggle Group, for a toggle that must read as on. |
 
 ### Custom Colors
 
@@ -162,8 +167,8 @@ A two-state button. Wraps Base UI's `Toggle`.
   simpleType="string"
   defaultValue='"subtle"'
 >
-  How the toggle looks when on. `subtle` keeps the variant's quiet on state;
-  `solid` is the emphasis grey with a white label.
+  Sets how the toggle looks when on. `subtle` keeps the variant's quiet on
+  state; `solid` is the emphasis grey with a white label.
 </ApiProp>
 
 </ApiPropsList>

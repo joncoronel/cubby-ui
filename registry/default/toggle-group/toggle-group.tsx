@@ -24,9 +24,8 @@ const toggleGroupVariants = cva(
     "[--toggle-group-item-radius:max(0px,calc(var(--toggle-group-radius)-2px))]",
     // Small corners between neighbors, so pressed runs read as one control
     "[--toggle-group-inner-radius:min(3px,var(--toggle-group-item-radius))]",
-    // Pure overlays (black, white in dark) for hover (8%) and press (10%), not a
-    // tint of the label, whose faint cool hue shows as a cast. The pressed fill comes
-    // from `pressedStyle`; override the selected variables to recolor.
+    // Hover 8%, press 10%: black overlays (white in dark), not a cool-cast label
+    // tint. `pressedStyle` sets the pressed fill; override its variables to recolor.
     "[--toggle-group-highlight:var(--surface-active)] [--toggle-group-press:var(--surface-selected)]",
     // A row is the ladder height and items stretch to fill it.
     "data-[orientation=horizontal]:h-(--toggle-group-h) data-[orientation=horizontal]:[&>[data-slot=toggle-group-item]]:aspect-square",

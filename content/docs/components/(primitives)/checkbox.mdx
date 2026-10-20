@@ -42,7 +42,7 @@ Set `disabled` to prevent interaction.
 
 ### Color
 
-A checked box fills with the neutral emphasis grey by default, the same grey as every other selection control. Pass `color="primary"` to fill it with the brand color instead.
+Use `color="primary"` to fill a checked box with the brand color instead of the default emphasis grey that other selection controls share.
 
 <ComponentPreview component="checkbox" example="checkbox-color" />
 
@@ -66,8 +66,8 @@ The Checkbox component is built on top of [Base UI's Checkbox](https://base-ui.c
   simpleType="string"
   defaultValue='"neutral"'
 >
-  Fill color when checked or indeterminate. `neutral` uses the emphasis grey
-  shared by selection controls. `primary` uses the brand fill.
+  Sets the fill when checked or indeterminate. `neutral` is the emphasis grey
+  shared by selection controls; `primary` is the brand fill.
 </ApiProp>
 
 </ApiPropsList>
@@ -76,7 +76,7 @@ The Checkbox component is built on top of [Base UI's Checkbox](https://base-ui.c
 
 If you're reinstalling over an earlier version, check these changes:
 
-| Before                           | Now                                                                                       |
-| -------------------------------- | ----------------------------------------------------------------------------------------- |
-| `variant="elevated"`             | Removed. The default works on any surface, so drop the prop.                              |
-| Checked fill in the primary blue | The checked fill is the neutral emphasis grey. Pass `color="primary"` for the brand fill. |
+| Before                           | Now                                                               |
+| -------------------------------- | ----------------------------------------------------------------- |
+| `variant="elevated"`             | Removed. The default works on any surface, so drop the prop.      |
+| Checked fill in the primary blue | Neutral emphasis grey. Pass `color="primary"` for the brand fill. |

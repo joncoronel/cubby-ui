@@ -79,8 +79,7 @@
 [data-slot="otp-field-slot"] > input[data-slot="otp-field-input"] {
   color: transparent;
   -webkit-text-fill-color: transparent;
-  /* The text color, set explicitly: the input's own color is transparent,
-     and the default caret would follow it. */
+  /* Set explicitly: the default caret follows the transparent text color. */
   caret-color: var(--color-foreground, CanvasText);
 }
 

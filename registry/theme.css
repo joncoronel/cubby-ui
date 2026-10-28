@@ -30,12 +30,12 @@
   /* Carries the tint, unlike the other light fills: a pure-neutral black beside
      --foreground's faintly cool one reads as two blacks rather than one black at
      two weights. Also the light --chrome fill. */
-  --neutral: oklch(0.32 var(--neutral-chroma) var(--neutral-hue));
+  --neutral: oklch(0.3 var(--neutral-chroma) var(--neutral-hue));
   --neutral-foreground: oklch(
     0.98 var(--neutral-chroma-low) var(--neutral-hue)
   );
   /* Selection grey, so the primary stays reserved for actions. */
-  --emphasis: oklch(0.51 var(--neutral-chroma) var(--neutral-hue));
+  --emphasis: oklch(0.45 var(--neutral-chroma) var(--neutral-hue));
   --emphasis-foreground: oklch(1 0 0);
   --secondary: oklch(0.93 0 0);
   --secondary-foreground: oklch(0.32 var(--neutral-chroma) var(--neutral-hue));

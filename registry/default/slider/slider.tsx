@@ -188,12 +188,25 @@ function Slider({
   // track's own at either end.
   const insetCenter = (p: number): string =>
     `(100% - ${INSET_THUMB_SIZE}px) * ${p / 100}`;
+  // The bar's fill rounds its ends like the track (--fill-radius, set once
+  // measured), so the grey tucks under those corners instead. An end on the
+  // track's own edge reaches past it, leaving the track to round it alone.
+  const fillStartsInside = isRange && first > 0;
+  const fillEndsInside = last < 100;
   const trackStyle = bar
     ? ({
-        "--fill-start": isRange ? `${first}%` : "0px",
-        "--fill-end": `${last}%`,
-        "--grey-until": isRange ? `calc(${first}% + 1px)` : "0px",
-        "--grey-from": `calc(${last}% - 1px)`,
+        "--fill-start": fillStartsInside
+          ? `${first}%`
+          : "calc(var(--radius-sm) * -1)",
+        "--fill-end": fillEndsInside
+          ? `${last}%`
+          : "calc(100% + var(--radius-sm))",
+        "--grey-until": fillStartsInside
+          ? `calc(${first}% + max(1px, var(--fill-radius)))`
+          : "0px",
+        "--grey-from": fillEndsInside
+          ? `calc(${last}% - max(1px, var(--fill-radius)))`
+          : "100%",
       } as React.CSSProperties)
     : inset
       ? ({
@@ -289,6 +302,16 @@ function Slider({
     bar && labelReach
       ? values.map((_, index) => barHandle(index).at(labelReach.size))
       : [];
+  // The fill's ends grow into the track's rounding as it widens, at a
+  // quarter of its width, so a narrow fill keeps a square end instead of
+  // reading as a small capsule, and matches the track from 32px on.
+  const fillPx = labelReach
+    ? ((last - (isRange ? first : 0)) * labelReach.size) / 100
+    : null;
+  const fillRadius =
+    fillPx === null
+      ? "var(--radius-sm)"
+      : `min(var(--radius-sm), ${fillPx / 4}px)`;
 
   // Drawn in both layers like the labels, so the handle turns the fill's
   // foreground color exactly where the fill covers it. Near a label it
@@ -375,7 +398,14 @@ function Slider({
       >
         <BaseSlider.Track
           data-slot="slider-track"
-          style={trackStyle}
+          style={
+            bar
+              ? ({
+                  ...trackStyle,
+                  "--fill-radius": fillRadius,
+                } as React.CSSProperties)
+              : trackStyle
+          }
           className={cn(
             sliderTrackVariants({ variant }),
             (bar || inset) &&
@@ -412,8 +442,8 @@ function Slider({
                   "forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]",
                   BAR_LABEL_VALUE,
                   vertical
-                    ? "flex-col-reverse items-center py-2.5 [clip-path:inset(calc(100%-var(--fill-end))_0_var(--fill-start)_0)]"
-                    : "items-center px-3 [clip-path:inset(0_calc(100%-var(--fill-end))_0_var(--fill-start))] rtl:[clip-path:inset(0_var(--fill-start)_0_calc(100%-var(--fill-end)))]",
+                    ? "flex-col-reverse items-center py-2.5 [clip-path:inset(calc(100%-var(--fill-end))_0_var(--fill-start)_0_round_var(--fill-radius))]"
+                    : "items-center px-3 [clip-path:inset(0_calc(100%-var(--fill-end))_0_var(--fill-start)_round_var(--fill-radius))] rtl:[clip-path:inset(0_var(--fill-start)_0_calc(100%-var(--fill-end))_round_var(--fill-radius))]",
                 )}
               >
                 {barContent(

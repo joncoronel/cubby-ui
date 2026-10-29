@@ -79,11 +79,11 @@ Use `variant` to change the slider's visual style.
 
 <ComponentPreview component="slider" example="slider-variant" />
 
-| Variant       | Description                                         |
-| ------------- | --------------------------------------------------- |
-| `default`     | A round thumb centered on the track.                |
-| `contained`   | The thumb aligns to the track edges at min and max. |
-| `squareThumb` | A square thumb in place of the round default.       |
+| Variant       | Description                                           |
+| ------------- | ----------------------------------------------------- |
+| `default`     | A round thumb centered on the track.                  |
+| `inset`       | A tall track with a handle that sits inside the fill. |
+| `squareThumb` | A square thumb in place of the round default.         |
 
 ### Color
 
@@ -130,12 +130,12 @@ Give the slider an accessible name when there is no visible `SliderLabel`. For a
 
 <ApiProp
   name="variant"
-  fullType='"default" | "contained" | "squareThumb"'
+  fullType='"default" | "inset" | "squareThumb"'
   simpleType="string"
   defaultValue='"default"'
 >
-  Visual style variant for the slider. Choose from default, contained (thumb
-  aligned to edges), or squareThumb styles.
+  Sets the visual style. `inset` is a tall track with the handle inside the
+  fill; `squareThumb` swaps the round thumb for a square one.
 </ApiProp>
 
 <ApiProp
@@ -144,8 +144,8 @@ Give the slider an accessible name when there is no visible `SliderLabel`. For a
   simpleType="string"
   defaultValue='"neutral"'
 >
-  Sets the fill of the selected range and the contained thumb. `neutral` is the
-  emphasis grey shared by selection controls; `primary` is the brand fill.
+  Sets the fill of the selected range. `neutral` is the emphasis grey shared by
+  selection controls; `primary` is the brand fill.
 </ApiProp>
 
 <ApiProp name="getAriaLabel" fullType="((index: number) => string) | null">
@@ -155,8 +155,8 @@ Give the slider an accessible name when there is no visible `SliderLabel`. For a
 </ApiProp>
 
 <ApiProp name="showSteps" fullType="boolean" defaultValue="false">
-  Show step indicator dots along the slider track for discrete value
-  visualization.
+  Marks each step on the track. The `inset` variant marks every step, with
+  lighter marks on the fill.
 </ApiProp>
 
 <ApiProp name="min" fullType="number" defaultValue="0">
@@ -168,8 +168,8 @@ Give the slider an accessible name when there is no visible `SliderLabel`. For a
 </ApiProp>
 
 <ApiProp name="thumbAlignment" fullType='"center" | "edge"' simpleType="string">
-  Alignment of the slider thumb. Automatically set to 'edge' when variant is
-  'contained', otherwise defaults to 'center'.
+  Sets how the thumb aligns at the ends. The `inset` variant uses `"edge"`; the
+  others use `"center"`.
 </ApiProp>
 
 </ApiPropsList>
@@ -185,3 +185,4 @@ If you're reinstalling over an earlier version, check these changes:
 | Before                              | Now                                                                              |
 | ----------------------------------- | -------------------------------------------------------------------------------- |
 | Range and thumb in the primary blue | A `color` prop, `neutral` by default. Pass `color="primary"` for the brand fill. |
+| `variant="contained"`               | Removed. Use `variant="inset"`, a tall track with the handle inside the fill.    |

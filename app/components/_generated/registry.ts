@@ -3997,7 +3997,7 @@ export const exampleRegistry = {
     {
       "title": "Variant",
       "importPath": "slider-variant",
-      "source": "import { Slider } from \"@/components/ui/cubby-ui/slider\";\n\nexport default function SliderVariant() {\n  return (\n    <div className=\"w-full max-w-sm space-y-2\">\n      <Slider variant=\"contained\" defaultValue={50} getAriaLabel={() => \"Contained variant\"} />\n\n      <Slider variant=\"squareThumb\" defaultValue={50} getAriaLabel={() => \"Square thumb variant\"} />\n    </div>\n  );\n}\n"
+      "source": "import { Slider } from \"@/components/ui/cubby-ui/slider\";\n\nexport default function SliderVariant() {\n  return (\n    <div className=\"w-full max-w-sm space-y-6\">\n      <Slider\n        variant=\"inset\"\n        defaultValue={25}\n        step={25}\n        showSteps\n        getAriaLabel={() => \"Inset variant\"}\n      />\n\n      <Slider\n        variant=\"squareThumb\"\n        defaultValue={50}\n        getAriaLabel={() => \"Square thumb variant\"}\n      />\n    </div>\n  );\n}\n"
     },
     {
       "title": "Vertical",

@@ -4,13 +4,17 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
+// The inset thumb's box, in px, for the step-mark math. Keep in step with
+// --inset-thumb-size on the inset variant.
+const INSET_THUMB_SIZE = 18;
+
 const sliderVariants = cva(
   "relative w-full touch-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-60 data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col ",
   {
     variants: {
       variant: {
         default: "",
-        contained: "",
+        inset: "[--inset-thumb-size:18px]",
         squareThumb: "",
       },
     },
@@ -26,8 +30,9 @@ const sliderTrackVariants = cva(
     variants: {
       variant: {
         default: "",
-        contained:
-          "data-[orientation=horizontal]:h-6 data-[orientation=vertical]:w-6 rounded-full ",
+        // A tall track the thumb sits inside.
+        inset:
+          "rounded-xs data-[orientation=horizontal]:h-6 data-[orientation=vertical]:w-6",
         squareThumb: "",
       },
     },
@@ -43,8 +48,11 @@ const sliderIndicatorVariants = cva(
     variants: {
       variant: {
         default: "",
-        contained:
-          "rounded-full data-[orientation=vertical]:rounded-t-none data-[orientation=horizontal]:rounded-r-none",
+        // Ends at the thumb's center, under the thumb, so only the outer end
+        // is rounded. The half-pixel spread covers the track's anti-aliased
+        // edge, which otherwise rims the fill's corners in grey.
+        inset:
+          "shadow-[0_0_0_0.5px_var(--slider-fill)] data-[orientation=horizontal]:rounded-s-xs data-[orientation=horizontal]:rounded-e-none data-[orientation=vertical]:rounded-b-xs data-[orientation=vertical]:rounded-t-none",
         squareThumb: "",
       },
     },
@@ -62,8 +70,23 @@ const sliderThumbVariants = cva(
     variants: {
       variant: {
         default: "",
-        contained:
-          "h-full w-6 bg-(--slider-fill) border-none hover:shadow-none shadow-none rounded-full data-[orientation=vertical]:h-6 data-[orientation=vertical]:w-full after:bg-(--slider-fill-foreground) flex items-center justify-center after:size-[60%]  after:rounded-full  after:origin-center data-[dragging]:after:scale-85 after:transition-transform after:ease-out after:duration-100 after:shadow-[0_2px_4px_0_oklch(0.18_0_0_/_0.15)]",
+        // The box is fill-colored, so the range runs on past the white handle
+        // and frames it; the handle is a ::before inside the box's border. A
+        // border, not an inset, because borders snap to whole device pixels:
+        // an inset rounds differently top and bottom at fractional DPRs.
+        inset: [
+          "border-2 border-(--slider-fill) bg-(--slider-fill) rounded-xs shadow-[0_0_0_0.5px_var(--slider-fill)] hover:shadow-[0_0_0_0.5px_var(--slider-fill)]",
+          "data-[orientation=horizontal]:h-full data-[orientation=horizontal]:w-(--inset-thumb-size)",
+          "data-[orientation=vertical]:w-full data-[orientation=vertical]:h-(--inset-thumb-size)",
+          "before:absolute before:inset-0 before:rounded-[calc(var(--radius-xs)-2px)] before:bg-white before:shadow-[0_1px_2px_0_oklch(0.18_0_0/0.15)] before:content-['']",
+          // Press: the handle gives a little, felt more than seen. The thumb
+          // gets its own layer, or the scaled handle repaints at a new subpixel
+          // offset on every drag move and shimmers. The whole thumb, not the
+          // handle alone, so the frame and handle snap together and stay
+          // centered.
+          "will-change-transform before:transition-[scale] before:duration-150 before:ease-out data-[dragging]:before:scale-95 motion-reduce:before:transition-none",
+          "forced-colors:before:border forced-colors:before:border-[CanvasText]",
+        ],
         squareThumb:
           "h-5 w-2.5 rounded-[.125rem] data-[orientation=vertical]:h-2.5 data-[orientation=vertical]:w-5",
       },
@@ -82,6 +105,10 @@ const sliderColors = {
     "[--slider-fill:var(--primary)] [--slider-fill-foreground:var(--primary-foreground)]",
 };
 
+function toArray(value: number | readonly number[]): number[] {
+  return Array.isArray(value) ? [...value] : [value as number];
+}
+
 export interface SliderProps
   extends
     React.ComponentProps<typeof BaseSlider.Root>,
@@ -96,6 +123,7 @@ function Slider({
   children,
   defaultValue,
   value,
+  onValueChange,
   min = 0,
   max = 100,
   variant,
@@ -104,17 +132,16 @@ function Slider({
   getAriaLabel,
   ...props
 }: SliderProps) {
-  const values = React.useMemo(() => {
-    if (value !== undefined) {
-      return Array.isArray(value) ? value : [value];
-    }
-    if (defaultValue !== undefined) {
-      return Array.isArray(defaultValue) ? defaultValue : [defaultValue];
-    }
-    return [min];
-  }, [value, defaultValue, min]);
+  // Uncontrolled sliders still need the live value to color the inset
+  // variant's step marks, so mirror it.
+  const [uncontrolledValues, setUncontrolledValues] = React.useState(() =>
+    defaultValue !== undefined ? toArray(defaultValue) : [min],
+  );
+  const values = value !== undefined ? toArray(value) : uncontrolledValues;
 
   const isRange = values.length > 1;
+  const inset = variant === "inset";
+  const vertical = props.orientation === "vertical";
 
   const steps = React.useMemo(() => {
     if (!showSteps) return [];
@@ -123,12 +150,18 @@ function Slider({
     return Array.from({ length: stepCount }, (_, i) => min + i * step);
   }, [showSteps, props.step, min, max]);
 
+  const handleValueChange: SliderProps["onValueChange"] = (next, details) => {
+    if (value === undefined) setUncontrolledValues(toArray(next));
+    onValueChange?.(next, details);
+  };
+
   return (
     <BaseSlider.Root
       data-slot="slider"
       data-color={color}
       defaultValue={defaultValue}
       value={value}
+      onValueChange={handleValueChange}
       min={min}
       max={max}
       className={cn(
@@ -136,10 +169,10 @@ function Slider({
         sliderVariants({ variant }),
         className,
       )}
-      thumbAlignment={variant === "contained" ? "edge" : "center"}
+      thumbAlignment={inset ? "edge" : "center"}
       // Drags along the slider's axis are the slider's, so a Base UI drawer
       // or toast doesn't swipe; across it, a drawer still can.
-      data-base-ui-swipe-ignore={props.orientation === "vertical" ? "y" : "x"}
+      data-base-ui-swipe-ignore={vertical ? "y" : "x"}
       {...props}
     >
       {children}
@@ -159,60 +192,56 @@ function Slider({
             )}
           />
 
-          {showSteps &&
-            steps.map((step, index) => {
-              // Skip first and last step when using center alignment
-              if (
-                variant !== "contained" &&
-                (index === 0 || index === steps.length - 1)
-              ) {
-                return null;
-              }
+          {steps.map((step, index) => {
+            // Centered thumbs cover the end marks, so skip them.
+            if (!inset && (index === 0 || index === steps.length - 1)) {
+              return null;
+            }
 
-              const percentage = ((step - min) / (max - min)) * 100;
+            const percentage = ((step - min) / (max - min)) * 100;
+            // Edge-aligned thumbs travel the track minus their own size.
+            const position = inset
+              ? `calc(${INSET_THUMB_SIZE / 2}px + ${percentage}% * (100% - ${INSET_THUMB_SIZE}px) / 100%)`
+              : `${percentage}%`;
+            const filled = isRange
+              ? step >= values[0] && step <= values[values.length - 1]
+              : step <= values[0];
 
-              // Contained variant uses edge alignment, so offset by half the thumb width.
-              const isContained = variant === "contained";
-              const thumbWidth = isContained ? 24 : 0; // w-6 = 24px for contained variant
-
-              return (
-                <div
-                  key={step}
-                  className="bg-border pointer-events-none absolute size-1.5 rounded-full"
-                  data-orientation={props.orientation}
-                  style={
-                    props.orientation === "vertical"
-                      ? isContained
-                        ? {
-                            bottom: `calc(${thumbWidth / 2}px + ${percentage}% * (100% - ${thumbWidth}px) / 100%)`,
-                            left: "50%",
-                            transform: "translate(-50%, 50%)",
-                          }
-                        : {
-                            bottom: `${percentage}%`,
-                            left: "50%",
-                            transform: "translate(-50%, 50%)",
-                          }
-                      : isContained
-                        ? {
-                            left: `calc(${thumbWidth / 2}px + ${percentage}% * (100% - ${thumbWidth}px) / 100%)`,
-                            top: "50%",
-                            transform: "translate(-50%, -50%)",
-                          }
-                        : {
-                            left: `${percentage}%`,
-                            top: "50%",
-                            transform: "translate(-50%, -50%)",
-                          }
-                  }
-                />
-              );
-            })}
+            return (
+              <div
+                key={step}
+                data-slot="slider-step"
+                data-filled={filled ? "" : undefined}
+                className={cn(
+                  "pointer-events-none absolute rounded-full",
+                  inset
+                    ? cn(
+                        vertical ? "h-0.5 w-1.5" : "h-1.5 w-0.5",
+                        "bg-[color-mix(in_oklab,var(--foreground)_22%,transparent)] data-filled:bg-[color-mix(in_oklab,var(--slider-fill-foreground)_45%,transparent)]",
+                      )
+                    : "bg-border size-1.5",
+                )}
+                style={
+                  vertical
+                    ? {
+                        bottom: position,
+                        left: "50%",
+                        transform: "translate(-50%, 50%)",
+                      }
+                    : {
+                        left: position,
+                        top: "50%",
+                        transform: "translate(-50%, -50%)",
+                      }
+                }
+              />
+            );
+          })}
 
           {values.map((_, index) => (
             <BaseSlider.Thumb
               data-slot="slider-thumb"
-              data-orientation={props.orientation}
+              data-orientation={vertical ? "vertical" : "horizontal"}
               key={index}
               index={index}
               getAriaLabel={getAriaLabel}

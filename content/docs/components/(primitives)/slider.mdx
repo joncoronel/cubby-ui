@@ -57,7 +57,7 @@ Pass an array value to render two thumbs and select a range.
 
 ### With Steps
 
-Use `step` to snap to discrete values, and `showSteps` to mark them on the track.
+Use `step` to snap to discrete values, and `showSteps` to mark them on the track. To keep dragging smooth but still mark the scale, leave `step` small and set `markStep` to space the marks further apart. Pass `showSteps="hover"` to show the marks only while the slider is hovered, focused, or dragged.
 
 <ComponentPreview component="slider" example="slider-with-steps" />
 
@@ -79,11 +79,18 @@ Use `variant` to change the slider's visual style.
 
 <ComponentPreview component="slider" example="slider-variant" />
 
-| Variant       | Description                                           |
-| ------------- | ----------------------------------------------------- |
-| `default`     | A round thumb centered on the track.                  |
-| `inset`       | A tall track with a handle that sits inside the fill. |
-| `squareThumb` | A square thumb in place of the round default.         |
+| Variant       | Description                                                                                                                                    |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `default`     | A round thumb centered on the track.                                                                                                           |
+| `inset`       | A tall track with a handle that sits inside the fill.                                                                                          |
+| `bar`         | A tall track with a thin bar handle and optional `startLabel` and `endLabel` text. The fill ends at the value, with the handle just inside it. |
+| `squareThumb` | A square thumb in place of the round default.                                                                                                  |
+
+### Bar With Value
+
+The `bar` variant's labels are optional and take any node. Pass `SliderValue` as `endLabel` to show the live value inside the track; it picks up the track's text style and changes color under the fill. Format it with the slider's `format` prop. The labels are decorative, so still name the slider with `getAriaLabel` or a `SliderLabel`.
+
+<ComponentPreview component="slider" example="slider-bar-value" />
 
 ### Color
 
@@ -130,12 +137,13 @@ Give the slider an accessible name when there is no visible `SliderLabel`. For a
 
 <ApiProp
   name="variant"
-  fullType='"default" | "inset" | "squareThumb"'
+  fullType='"default" | "inset" | "bar" | "squareThumb"'
   simpleType="string"
   defaultValue='"default"'
 >
   Sets the visual style. `inset` is a tall track with the handle inside the
-  fill; `squareThumb` swaps the round thumb for a square one.
+  fill; `bar` is a tall track with a thin bar handle and room for labels;
+  `squareThumb` swaps the round thumb for a square one.
 </ApiProp>
 
 <ApiProp
@@ -154,9 +162,26 @@ Give the slider an accessible name when there is no visible `SliderLabel`. For a
   distinct label.
 </ApiProp>
 
-<ApiProp name="showSteps" fullType="boolean" defaultValue="false">
-  Marks each step on the track. The `inset` variant marks every step, with
-  lighter marks on the fill.
+<ApiProp name="showSteps" fullType='boolean | "hover"' defaultValue="false">
+  Marks each step on the track. `"hover"` shows the marks only while the slider
+  is hovered, focused, or dragged. The `inset` variant marks every step, with
+  lighter marks on the fill; the others skip the ends, where the thumb sits.
+</ApiProp>
+
+<ApiProp name="markStep" fullType="number">
+  The spacing between marks, in value units. Defaults to `step`. Set it wider
+  than `step` to mark the scale without snapping to the marks.
+</ApiProp>
+
+<ApiProp name="startLabel" fullType="React.ReactNode">
+  Optional content inside the track at its start, such as "Low" or a setting
+  name. Turns the fill's foreground color where the fill covers it. `bar`
+  variant only.
+</ApiProp>
+
+<ApiProp name="endLabel" fullType="React.ReactNode">
+  Optional content inside the track at its end, such as "High" or a
+  `SliderValue`. `bar` variant only.
 </ApiProp>
 
 <ApiProp name="min" fullType="number" defaultValue="0">

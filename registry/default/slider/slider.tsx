@@ -9,6 +9,12 @@ import { cn } from "@/lib/utils";
 const INSET_THUMB_SIZE = 18;
 // How far the bar handle sits inside the fill's end, in px.
 const BAR_HANDLE_INSET = 7;
+// The least space, in px, between a range's two bar handles.
+const BAR_HANDLE_GAP = 4;
+// How close, in px, the bar handle can come to a label before it steps
+// aside, and a mark to the handle or a label before it hides.
+const BAR_LABEL_GAP = 6;
+const BAR_MARK_GAP = 5;
 // A SliderValue passed as a bar label takes the layer's text, so it turns
 // the fill's foreground color with the rest.
 const BAR_LABEL_VALUE =
@@ -38,8 +44,9 @@ const sliderTrackVariants = cva(
       variant: {
         default: "",
         // A tall track the thumb sits inside.
+        // The grey is a gradient set inline, as on the bar.
         inset:
-          "rounded-xs data-[orientation=horizontal]:h-6 data-[orientation=vertical]:w-6",
+          "bg-transparent rounded-xs data-[orientation=horizontal]:h-6 data-[orientation=vertical]:w-6",
         // Tall enough to hold the labels. The grey is a gradient set inline,
         // left out under the fill; the clip rounds the fill's outer corners.
         // The thumb is invisible, so focus shows on the track.
@@ -60,10 +67,9 @@ const sliderIndicatorVariants = cva(
       variant: {
         default: "",
         // Ends at the thumb's center, under the thumb, so only the outer end
-        // is rounded. The half-pixel spread covers the track's anti-aliased
-        // edge, which otherwise rims the fill's corners in grey.
+        // is rounded.
         inset:
-          "shadow-[0_0_0_0.5px_var(--slider-fill)] data-[orientation=horizontal]:rounded-s-xs data-[orientation=horizontal]:rounded-e-none data-[orientation=vertical]:rounded-b-xs data-[orientation=vertical]:rounded-t-none",
+          "shadow-none data-[orientation=horizontal]:rounded-s-xs data-[orientation=horizontal]:rounded-e-none data-[orientation=vertical]:rounded-b-xs data-[orientation=vertical]:rounded-t-none",
         // Unused: the bar variant draws its own fill.
         bar: "",
         squareThumb: "",
@@ -88,7 +94,7 @@ const sliderThumbVariants = cva(
         // border, not an inset, because borders snap to whole device pixels:
         // an inset rounds differently top and bottom at fractional DPRs.
         inset: [
-          "border-2 border-(--slider-fill) bg-(--slider-fill) rounded-xs shadow-[0_0_0_0.5px_var(--slider-fill)] hover:shadow-[0_0_0_0.5px_var(--slider-fill)]",
+          "border-2 border-(--slider-fill) bg-(--slider-fill) rounded-xs shadow-none hover:shadow-none",
           "data-[orientation=horizontal]:h-full data-[orientation=horizontal]:w-(--edge-thumb-size)",
           "data-[orientation=vertical]:w-full data-[orientation=vertical]:h-(--edge-thumb-size)",
           "before:absolute before:inset-0 before:rounded-[calc(var(--radius-xs)-2px)] before:bg-white before:shadow-[0_1px_2px_0_oklch(0.18_0_0/0.15)] before:content-['']",
@@ -174,44 +180,150 @@ function Slider({
   const first = percent(values[0]);
   const last = percent(values[values.length - 1]);
 
-  // The bar's fill ends exactly at the value, so it follows the pointer and
-  // is nothing at the minimum. The track's grey starts a pixel under the
-  // fill's ends rather than running beneath it, where it would rim the fill's
-  // anti-aliased edges.
-  const barTrackStyle = bar
+  // The track's grey stops where the fill and thumbs take over, rather than
+  // running beneath them, where it would rim their anti-aliased edges. On
+  // the bar it tucks a pixel under the fill's ends. On the inset it tucks
+  // under the thumbs' rounded corners, the only part of them that doesn't
+  // cover the track edge to edge, except where a thumb's corners meet the
+  // track's own at either end.
+  const insetCenter = (p: number): string =>
+    `(100% - ${INSET_THUMB_SIZE}px) * ${p / 100}`;
+  const trackStyle = bar
     ? ({
         "--fill-start": isRange ? `${first}%` : "0px",
         "--fill-end": `${last}%`,
         "--grey-until": isRange ? `calc(${first}% + 1px)` : "0px",
         "--grey-from": `calc(${last}% - 1px)`,
       } as React.CSSProperties)
-    : undefined;
+    : inset
+      ? ({
+          "--grey-until":
+            isRange && first > 0
+              ? `calc(var(--radius-xs) + ${insetCenter(first)})`
+              : "0px",
+          "--grey-from":
+            last < 100
+              ? `calc(${INSET_THUMB_SIZE}px - var(--radius-xs) + ${insetCenter(last)})`
+              : "100%",
+        } as React.CSSProperties)
+      : undefined;
+
+  // How far the bar's labels reach in from each end of the track, so the
+  // handle and marks can step aside for them. Measured, since labels are any
+  // content and a live value changes width as it runs.
+  const labelsRef = React.useRef<HTMLDivElement>(null);
+  const [labelReach, setLabelReach] = React.useState<{
+    size: number;
+    start: number;
+    end: number;
+  } | null>(null);
+  React.useLayoutEffect(() => {
+    const layer = labelsRef.current;
+    if (!layer) return;
+    const [startLabelEl, endLabelEl] = Array.from(
+      layer.children,
+    ) as HTMLElement[];
+
+    const measure = (): void => {
+      const box = layer.getBoundingClientRect();
+      const rtl = getComputedStyle(layer).direction === "rtl";
+      const reach = (el: HTMLElement, fromStart: boolean): number => {
+        const r = el.getBoundingClientRect();
+        if (r.width === 0 || r.height === 0) return 0;
+        if (vertical)
+          return fromStart ? box.bottom - r.top : r.bottom - box.top;
+        return fromStart === rtl ? box.right - r.left : r.right - box.left;
+      };
+      const next = {
+        size: vertical ? box.height : box.width,
+        start: reach(startLabelEl, true),
+        end: reach(endLabelEl, false),
+      };
+      setLabelReach((prev) =>
+        prev &&
+        prev.size === next.size &&
+        prev.start === next.start &&
+        prev.end === next.end
+          ? prev
+          : next,
+      );
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    for (const el of [layer, startLabelEl, endLabelEl]) observer.observe(el);
+    return () => observer.disconnect();
+  }, [bar, vertical]);
+
   // The handle sits just inside the fill's end, but never past the track's
-  // edge, so at the minimum it waits at the start with no fill behind it.
-  // It's drawn in both layers like the labels, so it turns the fill's
-  // foreground color exactly where the fill covers it.
+  // edge, so at the minimum it waits at the start with no fill behind it. In
+  // a range, the two handles give up their inset as the range narrows,
+  // keeping apart until they sit on the fill's ends, so they never cross or
+  // leave it. Returns the CSS position and
+  // the same in px, for a measured track.
+  const barHandle = (
+    index: number,
+  ): { position: string; at: (size: number) => number } => {
+    const p = percent(values[index]);
+    if (!isRange) {
+      return {
+        position: `max(${BAR_HANDLE_INSET}px, calc(${p}% - ${BAR_HANDLE_INSET}px))`,
+        at: (size) =>
+          Math.max(BAR_HANDLE_INSET, (p * size) / 100 - BAR_HANDLE_INSET),
+      };
+    }
+    const half = (last - first) / 2;
+    const sign = index === 0 ? 1 : -1;
+    return {
+      position: `calc(${p}% ${index === 0 ? "+" : "-"} clamp(0px, ${half}% - ${BAR_HANDLE_GAP / 2}px, ${BAR_HANDLE_INSET}px))`,
+      at: (size) =>
+        (p * size) / 100 +
+        sign *
+          Math.min(
+            BAR_HANDLE_INSET,
+            Math.max(0, (half * size) / 100 - BAR_HANDLE_GAP / 2),
+          ),
+    };
+  };
+  const barHandlePx =
+    bar && labelReach
+      ? values.map((_, index) => barHandle(index).at(labelReach.size))
+      : [];
+
+  // Drawn in both layers like the labels, so the handle turns the fill's
+  // foreground color exactly where the fill covers it. Near a label it
+  // shrinks and fades out of the text's way.
   const barContent = (handleClass: string): React.ReactElement => (
     <>
       <span>{startLabel}</span>
       <span>{endLabel}</span>
-      {values.map((v, index) => {
-        const p = percent(v);
-        const position =
-          isRange && index === 0
-            ? `min(calc(100% - ${BAR_HANDLE_INSET}px), calc(${p}% + ${BAR_HANDLE_INSET}px))`
-            : `max(${BAR_HANDLE_INSET}px, calc(${p}% - ${BAR_HANDLE_INSET}px))`;
+      {values.map((_, index) => {
+        const { position } = barHandle(index);
+        const px = barHandlePx[index];
+        const dodge =
+          labelReach !== null &&
+          px !== undefined &&
+          ((labelReach.start > 0 && px < labelReach.start + BAR_LABEL_GAP) ||
+            (labelReach.end > 0 &&
+              px > labelReach.size - labelReach.end - BAR_LABEL_GAP));
         return (
           <span
             key={index}
+            data-dodge={dodge ? "" : undefined}
             className={cn(
               "absolute rounded-full",
-              // Press: the bar reaches a little further, as if picked up. Its
-              // own layer, or it repaints at a new subpixel offset on every
-              // drag move and shimmers.
-              "transition-[scale] duration-150 ease-out will-change-transform motion-reduce:transition-none",
+              // Its own layer, or it repaints at a new subpixel offset on
+              // every drag move and shimmers.
+              "transition-[scale,opacity] duration-150 ease-out will-change-transform motion-reduce:transition-none",
               vertical
-                ? "left-1/2 h-0.5 w-3.5 -translate-x-1/2 translate-y-1/2 group-data-dragging/slider:scale-x-[1.15]"
-                : "top-1/2 h-3.5 w-0.5 -translate-x-1/2 -translate-y-1/2 group-data-dragging/slider:scale-y-[1.15] rtl:translate-x-1/2",
+                ? "left-1/2 h-0.5 w-3.5 -translate-x-1/2 translate-y-1/2"
+                : "top-1/2 h-3.5 w-0.5 -translate-x-1/2 -translate-y-1/2 rtl:translate-x-1/2",
+              // Press: the bar reaches a little further, as if picked up.
+              dodge
+                ? cn("opacity-25", vertical ? "scale-x-75" : "scale-y-75")
+                : vertical
+                  ? "group-data-dragging/slider:scale-x-[1.15]"
+                  : "group-data-dragging/slider:scale-y-[1.15]",
               handleClass,
             )}
             style={
@@ -263,10 +375,10 @@ function Slider({
       >
         <BaseSlider.Track
           data-slot="slider-track"
-          style={barTrackStyle}
+          style={trackStyle}
           className={cn(
             sliderTrackVariants({ variant }),
-            bar &&
+            (bar || inset) &&
               (vertical
                 ? "bg-[linear-gradient(to_top,var(--color-control-track)_var(--grey-until),transparent_var(--grey-until)_var(--grey-from),var(--color-control-track)_var(--grey-from))]"
                 : "bg-[linear-gradient(to_right,var(--color-control-track)_var(--grey-until),transparent_var(--grey-until)_var(--grey-from),var(--color-control-track)_var(--grey-from))] rtl:bg-[linear-gradient(to_left,var(--color-control-track)_var(--grey-until),transparent_var(--grey-until)_var(--grey-from),var(--color-control-track)_var(--grey-from))]"),
@@ -275,6 +387,7 @@ function Slider({
           {bar ? (
             <>
               <div
+                ref={labelsRef}
                 aria-hidden
                 data-slot="slider-labels"
                 className={cn(
@@ -332,6 +445,20 @@ function Slider({
             const filled = isRange
               ? step >= values[0] && step <= values[values.length - 1]
               : step <= values[0];
+            // Bar marks hide under the labels and beside the handle, where
+            // they'd read as a second handle.
+            const markPx = labelReach
+              ? (percent(step) * labelReach.size) / 100
+              : undefined;
+            const covered =
+              bar &&
+              labelReach !== null &&
+              markPx !== undefined &&
+              ((labelReach.start > 0 &&
+                markPx < labelReach.start + BAR_MARK_GAP) ||
+                (labelReach.end > 0 &&
+                  markPx > labelReach.size - labelReach.end - BAR_MARK_GAP) ||
+                barHandlePx.some((px) => Math.abs(px - markPx) < BAR_MARK_GAP));
 
             return (
               <div
@@ -342,8 +469,14 @@ function Slider({
                   "pointer-events-none absolute rounded-full",
                   // Hover-only marks also show while dragging or focused, so
                   // touch and keyboard users still see them.
-                  showSteps === "hover" &&
-                    "opacity-0 transition-opacity duration-150 ease-out group-hover/slider:opacity-100 group-has-[:focus-visible]/slider:opacity-100 group-data-dragging/slider:opacity-100",
+                  "transition-opacity duration-150 ease-out",
+                  covered
+                    ? "opacity-0"
+                    : showSteps === "hover" &&
+                        "opacity-0 group-hover/slider:opacity-100 group-has-[:focus-visible]/slider:opacity-100 group-data-dragging/slider:opacity-100",
+                  vertical
+                    ? "left-1/2 -translate-x-1/2 translate-y-1/2"
+                    : "top-1/2 -translate-x-1/2 -translate-y-1/2 rtl:translate-x-1/2",
                   inset && (vertical ? "h-0.5 w-2" : "h-2 w-0.5"),
                   bar && (vertical ? "h-0.5 w-2.5" : "h-2.5 w-0.5"),
                   inset || bar
@@ -352,16 +485,8 @@ function Slider({
                 )}
                 style={
                   vertical
-                    ? {
-                        bottom: position,
-                        left: "50%",
-                        transform: "translate(-50%, 50%)",
-                      }
-                    : {
-                        left: position,
-                        top: "50%",
-                        transform: "translate(-50%, -50%)",
-                      }
+                    ? { bottom: position }
+                    : { insetInlineStart: position }
                 }
               />
             );

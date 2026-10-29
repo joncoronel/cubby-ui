@@ -485,7 +485,11 @@ function Slider({
                   bar && (vertical ? "h-0.5 w-2.5" : "h-2.5 w-0.5"),
                   inset || bar
                     ? "bg-[color-mix(in_oklab,var(--foreground)_22%,transparent)] data-filled:bg-[color-mix(in_oklab,var(--slider-fill-foreground)_45%,transparent)]"
-                    : "bg-border size-1.5 data-filled:bg-[color-mix(in_oklab,var(--slider-fill-foreground)_45%,transparent)]",
+                    : // A 4px dot drawn as a gradient in a larger box. A
+                      // small rounded box snaps to whole device pixels at
+                      // fractional scales and can come out oval; the
+                      // gradient stays round wherever its box lands.
+                      "size-2 bg-[radial-gradient(circle,var(--mark)_1.7px,transparent_2.3px)] [--mark:var(--color-border)] data-filled:[--mark:color-mix(in_oklab,var(--slider-fill-foreground)_45%,transparent)]",
                 )}
                 style={
                   vertical

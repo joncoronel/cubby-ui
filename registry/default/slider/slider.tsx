@@ -485,7 +485,7 @@ function Slider({
                   bar && (vertical ? "h-0.5 w-2.5" : "h-2.5 w-0.5"),
                   inset || bar
                     ? "bg-[color-mix(in_oklab,var(--foreground)_22%,transparent)] data-filled:bg-[color-mix(in_oklab,var(--slider-fill-foreground)_45%,transparent)]"
-                    : "bg-border size-1.5",
+                    : "bg-border size-1.5 data-filled:bg-[color-mix(in_oklab,var(--slider-fill-foreground)_45%,transparent)]",
                 )}
                 style={
                   vertical

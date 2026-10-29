@@ -426,7 +426,11 @@ function Slider({
               data-slot="slider-indicator"
               className={cn(
                 sliderIndicatorVariants({ variant }),
-                isRange && "rounded-none",
+                // A range's fill starts and ends under the thumbs, so it's
+                // square, or its corners and the thumb's leave a notch. Also
+                // under orientation, to beat the inset's rounded start.
+                isRange &&
+                  "rounded-none data-[orientation=horizontal]:rounded-none data-[orientation=vertical]:rounded-none",
               )}
             />
           )}

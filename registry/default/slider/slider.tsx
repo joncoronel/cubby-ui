@@ -862,7 +862,19 @@ function Slider({
               key={index}
               index={index}
               getAriaLabel={getAriaLabel}
-              style={along(dragPosition(percent(values[index])))}
+              // The inset thumb fills the track's height, so it's placed by
+              // its edges rather than centered: Base UI's -50% translate
+              // lands on a half device pixel at some zooms, and the thumb's
+              // own layer then draws half a pixel off the fill.
+              style={
+                inset
+                  ? {
+                      ...along(`calc(${insetTravel(percent(values[index]))})`),
+                      [vertical ? "left" : "top"]: 0,
+                      translate: "none",
+                    }
+                  : along(dragPosition(percent(values[index])))
+              }
               onFocus={(event) => {
                 if (event.target.matches(":focus-visible")) setFocused(index);
               }}

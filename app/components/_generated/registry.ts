@@ -442,6 +442,7 @@ import skeleton_skeleton_multiline from "@/registry/examples/skeleton/skeleton-m
 import skeleton_skeleton_sync from "@/registry/examples/skeleton/skeleton-sync";
 import skeleton_skeleton_wrap from "@/registry/examples/skeleton/skeleton-wrap";
 import slider_slider_basic from "@/registry/examples/slider/slider-basic";
+import slider_slider_bar_value from "@/registry/examples/slider/slider-bar-value";
 import slider_slider_color from "@/registry/examples/slider/slider-color";
 import slider_slider_controlled from "@/registry/examples/slider/slider-controlled";
 import slider_slider_disabled_state from "@/registry/examples/slider/slider-disabled-state";
@@ -3970,6 +3971,11 @@ export const exampleRegistry = {
       "source": "import { Slider, SliderLabel } from \"@/components/ui/cubby-ui/slider\";\n\nexport default function SliderBasic() {\n  return (\n    <Slider className=\"max-w-sm\" defaultValue={50}>\n      <SliderLabel>Volume</SliderLabel>\n    </Slider>\n  );\n}\n"
     },
     {
+      "title": "Bar Value",
+      "importPath": "slider-bar-value",
+      "source": "import { Slider, SliderValue } from \"@/components/ui/cubby-ui/slider\";\n\nexport default function SliderBarValue() {\n  return (\n    <Slider\n      variant=\"bar\"\n      className=\"max-w-sm\"\n      defaultValue={1.45}\n      min={0}\n      max={3}\n      step={0.05}\n      format={{ minimumFractionDigits: 2, maximumFractionDigits: 2 }}\n      showSteps=\"hover\"\n      markStep={1}\n      startLabel=\"Duration\"\n      endLabel={<SliderValue />}\n      getAriaLabel={() => \"Duration\"}\n    />\n  );\n}\n"
+    },
+    {
       "title": "Color",
       "importPath": "slider-color",
       "source": "import { Slider, SliderLabel } from \"@/components/ui/cubby-ui/slider\";\n\nexport default function SliderColor() {\n  return (\n    <div className=\"flex w-full max-w-sm flex-col gap-8\">\n      <Slider defaultValue={50}>\n        <SliderLabel>Neutral</SliderLabel>\n      </Slider>\n      <Slider color=\"primary\" defaultValue={50}>\n        <SliderLabel>Primary</SliderLabel>\n      </Slider>\n    </div>\n  );\n}\n"
@@ -3997,7 +4003,7 @@ export const exampleRegistry = {
     {
       "title": "Variant",
       "importPath": "slider-variant",
-      "source": "import { Slider } from \"@/components/ui/cubby-ui/slider\";\n\nexport default function SliderVariant() {\n  return (\n    <div className=\"w-full max-w-sm space-y-2\">\n      <Slider variant=\"contained\" defaultValue={50} getAriaLabel={() => \"Contained variant\"} />\n\n      <Slider variant=\"squareThumb\" defaultValue={50} getAriaLabel={() => \"Square thumb variant\"} />\n    </div>\n  );\n}\n"
+      "source": "import { Slider } from \"@/components/ui/cubby-ui/slider\";\n\nexport default function SliderVariant() {\n  return (\n    <div className=\"w-full max-w-sm space-y-6\">\n      <Slider\n        variant=\"inset\"\n        defaultValue={25}\n        showSteps\n        markStep={25}\n        getAriaLabel={() => \"Inset variant\"}\n      />\n\n      <Slider\n        variant=\"bar\"\n        defaultValue={60}\n        showSteps\n        markStep={20}\n        startLabel=\"Low\"\n        endLabel=\"High\"\n        getAriaLabel={() => \"Bar variant\"}\n      />\n\n      <Slider\n        variant=\"squareThumb\"\n        defaultValue={50}\n        getAriaLabel={() => \"Square thumb variant\"}\n      />\n    </div>\n  );\n}\n"
     },
     {
       "title": "Vertical",
@@ -4930,6 +4936,7 @@ export const componentMap = {
   "skeleton-sync": skeleton_skeleton_sync,
   "skeleton-wrap": skeleton_skeleton_wrap,
   "slider-basic": slider_slider_basic,
+  "slider-bar-value": slider_slider_bar_value,
   "slider-color": slider_slider_color,
   "slider-controlled": slider_slider_controlled,
   "slider-disabled-state": slider_slider_disabled_state,

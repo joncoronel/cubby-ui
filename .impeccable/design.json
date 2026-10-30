@@ -51,7 +51,6 @@
         "tonalRamp": [
           "oklch(0.15 0.004 270)",
           "oklch(0.3 0.004 270)",
-          "oklch(0.32 0.004 270)",
           "oklch(0.53 0.004 270)",
           "oklch(0.73 0.004 270)",
           "oklch(0.87 0.004 270)",
@@ -107,7 +106,7 @@
       "neutral": {
         "role": "neutral",
         "displayName": "Chrome Black",
-        "canonical": "oklch(0.32 0.004 270)"
+        "canonical": "oklch(0.3 0.004 270)"
       },
       "neutral-foreground": {
         "role": "neutral",

@@ -302,6 +302,14 @@ function CalendarDay({ day, modifiers, style, ...props }: DayProps) {
   return (
     <td
       {...props}
+      // The states calendar.css checks inside `:has()`, as classes: an
+      // attribute there makes any change to it, anywhere, restyle the page.
+      className={cn(
+        props.className,
+        modifiers.hidden && "calendar-day-hidden",
+        filled && "calendar-day-filled",
+        modifiers.range_end && "calendar-day-range-end",
+      )}
       style={
         wipe
           ? ({

@@ -95,6 +95,9 @@ Write code that is **accessible, performant, type-safe, and maintainable**. Focu
 - Use proper image components (e.g., Next.js `<Image>`) over `<img>` tags
 - Memoize expensive calculations and components when appropriate
 - When `:has()` sits on an ancestor, match the element it styles by its own class or a rare attribute (`[data-toolbar-highlight]`), never by `data-slot`, a bare tag, or `*`. Chrome prices `:has()` by the styled element, so a common one makes every DOM insertion on the page restyle every element like it (~17ms on a large docs page). For Tailwind, write the variant on the target with `&` at the end of the arbitrary selector, or check siblings with `:has(~ …)` on the target itself.
+- A `:has()` that checks siblings (`:has(+ …)`, `:has(~ …)`) must style the element it sits on, not something inside it: `td:has(+ .x) > button` costs as much as an ancestor `:has()` matched by a common attribute. To reach a child, set a custom property there and read it in the child (Calendar's `--calendar-join-end`).
+- Never use Tailwind's `group-has-*`: it compiles to `:is(:where(.group):has(…) *)`, so the styled element is `*`. Write `[[data-slot=x]:has(…)>&]:…` on the target instead.
+- Inside `:has()`, check a state that changes at runtime by class, not attribute (`:has(+ .calendar-day-filled)`, not `:has(+ [data-filled])`). Each flip of an attribute named there, anywhere on the page, costs ~0.5ms; a class costs nothing.
 
 ### Framework-Specific Guidance
 

@@ -64,7 +64,8 @@ type TuneToolbarProps = {
    * name: `{ PopoverContent: { sideOffset: 12 } }`. Copied as new defaults.
    */
   props?: Record<string, Record<string, unknown>>;
-  onReplay: () => void;
+  /** Replays the motion. Leave it out to hide the playback controls. */
+  onReplay?: () => void;
   /** Show the keep-open toggle (popups only). */
   showKeepOpen?: boolean;
   scrubMax?: number;
@@ -135,76 +136,80 @@ export function TuneToolbar({
       highlight={false}
       className="fixed bottom-4 left-1/2 z-50 max-w-[calc(100vw-2rem)] -translate-x-1/2 flex-wrap items-center justify-center gap-1 p-1 data-[orientation=horizontal]:h-auto"
     >
-      <ToolbarGroup>
-        <Button size="xs" variant="ghost" onClick={onReplay}>
-          Replay
-        </Button>
-        <ToggleGroup
-          size="sm"
-          aria-label="Playback speed"
-          value={[String(state.rate)]}
-          onValueChange={(value) => {
-            if (value[0]) set("rate", Number(value[0]));
-          }}
-        >
-          {SPEEDS.map((rate) => (
-            <ToggleGroupItem
-              key={rate}
-              value={String(rate)}
-              className="text-xs"
-            >
-              {rate}×
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
-      </ToolbarGroup>
-
-      <ToolbarSeparator />
-
-      <ToolbarGroup>
-        <Toggle
-          size="sm"
-          className="text-xs"
-          pressed={state.freeze}
-          onPressedChange={(pressed) => set("freeze", pressed)}
-        >
-          Freeze
-        </Toggle>
-        {state.freeze && (
-          <>
+      {onReplay && (
+        <>
+          <ToolbarGroup>
+            <Button size="xs" variant="ghost" onClick={onReplay}>
+              Replay
+            </Button>
             <ToggleGroup
               size="sm"
-              aria-label="Scrub phase"
-              value={[state.phase]}
+              aria-label="Playback speed"
+              value={[String(state.rate)]}
               onValueChange={(value) => {
-                if (value[0]) set("phase", value[0] as ScrubPhase);
+                if (value[0]) set("rate", Number(value[0]));
               }}
             >
-              <ToggleGroupItem value="enter" className="text-xs">
-                Enter
-              </ToggleGroupItem>
-              <ToggleGroupItem value="exit" className="text-xs">
-                Exit
-              </ToggleGroupItem>
+              {SPEEDS.map((rate) => (
+                <ToggleGroupItem
+                  key={rate}
+                  value={String(rate)}
+                  className="text-xs"
+                >
+                  {rate}×
+                </ToggleGroupItem>
+              ))}
             </ToggleGroup>
-            <Slider
-              aria-label="Scrub time"
-              className="w-32"
-              min={0}
-              max={scrubMax}
-              value={scrubTime}
-              onValueChange={(value) =>
-                set("time", Array.isArray(value) ? (value[0] ?? 0) : value)
-              }
-            />
-            <span className="text-muted-foreground w-12 text-right text-xs tabular-nums">
-              {scrubTime}ms
-            </span>
-          </>
-        )}
-      </ToolbarGroup>
+          </ToolbarGroup>
 
-      <ToolbarSeparator />
+          <ToolbarSeparator />
+
+          <ToolbarGroup>
+            <Toggle
+              size="sm"
+              className="text-xs"
+              pressed={state.freeze}
+              onPressedChange={(pressed) => set("freeze", pressed)}
+            >
+              Freeze
+            </Toggle>
+            {state.freeze && (
+              <>
+                <ToggleGroup
+                  size="sm"
+                  aria-label="Scrub phase"
+                  value={[state.phase]}
+                  onValueChange={(value) => {
+                    if (value[0]) set("phase", value[0] as ScrubPhase);
+                  }}
+                >
+                  <ToggleGroupItem value="enter" className="text-xs">
+                    Enter
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="exit" className="text-xs">
+                    Exit
+                  </ToggleGroupItem>
+                </ToggleGroup>
+                <Slider
+                  aria-label="Scrub time"
+                  className="w-32"
+                  min={0}
+                  max={scrubMax}
+                  value={scrubTime}
+                  onValueChange={(value) =>
+                    set("time", Array.isArray(value) ? (value[0] ?? 0) : value)
+                  }
+                />
+                <span className="text-muted-foreground w-12 text-right text-xs tabular-nums">
+                  {scrubTime}ms
+                </span>
+              </>
+            )}
+          </ToolbarGroup>
+
+          <ToolbarSeparator />
+        </>
+      )}
 
       <ToolbarGroup>
         <Toggle

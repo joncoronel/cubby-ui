@@ -134,7 +134,7 @@
 
 [data-slot="calendar-day"]:is([data-in-range], [data-preview-middle]):is(
     td:last-of-type,
-    td:has(+ td[data-hidden])
+    td:has(+ .calendar-day-hidden)
   ) {
   border-start-end-radius: var(--calendar-radius);
   border-end-end-radius: var(--calendar-radius);
@@ -143,7 +143,7 @@
 /* An end with no visible inward neighbour has nothing to reach toward. */
 [data-slot="calendar-day"]:is([data-range-start], [data-preview-start]):is(
     td:last-of-type,
-    td:has(+ td[data-hidden])
+    td:has(+ .calendar-day-hidden)
   ),
 [data-slot="calendar-day"]:is([data-range-end], [data-preview-end]):is(
     td:first-of-type,
@@ -233,21 +233,26 @@
  * Selected days side by side in a week join into one shape: the corners
  * between them square off. In multiple mode that's any two picks; in range
  * mode, a two-day range's ends. Logical corners, so it holds in RTL. The
- * button is matched by class to keep `:has()` cheap.
+ * neighbour is checked by class, not attribute, to keep `:has()` cheap: an
+ * attribute there makes any change to it, anywhere, restyle the page.
  * -------------------------------------------------------------------------------------------------*/
 
 [data-slot="calendar"][data-mode="multiple"]
   [data-slot="calendar-day"][data-filled]:not([data-hidden]):has(
-    + [data-filled]:not([data-hidden])
-  )
-  > .calendar-day-button::before,
+    + .calendar-day-filled:not(.calendar-day-hidden)
+  ),
 [data-slot="calendar"][data-mode="range"]
   [data-slot="calendar-day"][data-range-start]:not([data-hidden]):has(
-    + [data-range-end]:not([data-hidden])
-  )
-  > .calendar-day-button::before {
-  border-start-end-radius: 0;
-  border-end-end-radius: 0;
+    + .calendar-day-range-end:not(.calendar-day-hidden)
+  ) {
+  --calendar-join-end: 0px;
+}
+
+/* Read from the cell, since a `:has()` there that styles the button below it
+ * makes every insertion on the page restyle the calendar. */
+.calendar-day-button::before {
+  border-start-end-radius: var(--calendar-join-end, inherit);
+  border-end-end-radius: var(--calendar-join-end, inherit);
 }
 
 [data-slot="calendar"][data-mode="multiple"]

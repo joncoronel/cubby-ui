@@ -138,13 +138,93 @@ const sliderColors = {
     "[--slider-fill:var(--primary)] [--slider-fill-foreground:var(--primary-foreground)]",
 };
 
-function toArray(value: number | readonly number[]): number[] {
-  return Array.isArray(value) ? [...value] : [value as number];
+// The values as Base UI holds them: clamped to the range, and in order.
+function toValues(
+  value: number | readonly number[],
+  min: number,
+  max: number,
+): number[] {
+  const values = Array.isArray(value) ? value : [value as number];
+  return values
+    .map((v) => Math.min(Math.max(v, min), max))
+    .sort((a, b) => a - b);
+}
+
+type LabelReach = { size: number; start: number; end: number };
+
+// How far the bar's labels reach in from each end of the track, so the
+// handle and marks can step aside for them. Measured, since labels are any
+// content and a live value changes width as it runs.
+function useLabelReach(
+  bar: boolean,
+  vertical: boolean,
+): {
+  labelsRef: React.RefObject<HTMLDivElement | null>;
+  labelReach: LabelReach | null;
+  nearLabel: (px: number, gap: number) => boolean;
+  measured: boolean;
+} {
+  const labelsRef = React.useRef<HTMLDivElement>(null);
+  const [labelReach, setLabelReach] = React.useState<LabelReach | null>(null);
+  React.useLayoutEffect(() => {
+    const layer = labelsRef.current;
+    if (!layer) return;
+    const [startLabelEl, endLabelEl] = Array.from(
+      layer.children,
+    ) as HTMLElement[];
+
+    const measure = (): void => {
+      const box = layer.getBoundingClientRect();
+      const rtl = getComputedStyle(layer).direction === "rtl";
+      const reach = (el: HTMLElement, fromStart: boolean): number => {
+        const r = el.getBoundingClientRect();
+        if (r.width === 0 || r.height === 0) return 0;
+        if (vertical)
+          return fromStart ? box.bottom - r.top : r.bottom - box.top;
+        return fromStart === rtl ? box.right - r.left : r.right - box.left;
+      };
+      const next = {
+        size: vertical ? box.height : box.width,
+        start: reach(startLabelEl, true),
+        end: reach(endLabelEl, false),
+      };
+      setLabelReach((prev) =>
+        prev &&
+        prev.size === next.size &&
+        prev.start === next.start &&
+        prev.end === next.end
+          ? prev
+          : next,
+      );
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    for (const el of [layer, startLabelEl, endLabelEl]) observer.observe(el);
+    return () => observer.disconnect();
+  }, [bar, vertical]);
+
+  // Whether a point along the bar, in px, is within `gap` of a label.
+  const nearLabel = (px: number, gap: number): boolean =>
+    labelReach !== null &&
+    ((labelReach.start > 0 && px < labelReach.start + gap) ||
+      (labelReach.end > 0 && px > labelReach.size - labelReach.end - gap));
+  // Set a frame after the first measure. Until then the server's HTML has no
+  // dodging, and easing into it would animate on load.
+  const [measured, setMeasured] = React.useState(false);
+  React.useEffect(() => {
+    if (!labelReach || measured) return;
+    const frame = requestAnimationFrame(() => setMeasured(true));
+    return () => cancelAnimationFrame(frame);
+  }, [labelReach, measured]);
+
+  return { labelsRef, labelReach, nearLabel, measured };
 }
 
 export interface SliderProps
+  // The variant sets the alignment, which the drawing math follows.
   extends
-    React.ComponentProps<typeof BaseSlider.Root>,
+    Omit<React.ComponentProps<typeof BaseSlider.Root>, "thumbAlignment">,
     VariantProps<typeof sliderVariants> {
   color?: "neutral" | "primary";
   /** Marks steps on the track; `"hover"` shows them only while in use. */
@@ -178,10 +258,10 @@ function Slider({
   // Uncontrolled sliders still need the live value to color step marks and
   // draw the bar variant's fill, so mirror it.
   const [uncontrolledValues, setUncontrolledValues] = React.useState(() =>
-    defaultValue !== undefined ? toArray(defaultValue) : [min],
+    defaultValue !== undefined ? toValues(defaultValue, min, max) : [min],
   );
   const snappedValues =
-    value !== undefined ? toArray(value) : uncontrolledValues;
+    value !== undefined ? toValues(value, min, max) : uncontrolledValues;
 
   // While dragging, the thumb and fill follow the pointer itself, so coarse
   // steps drag as smoothly as fine ones. The value still snaps; the thumb
@@ -199,6 +279,9 @@ function Slider({
   // The thumb in hand, from press to release. Base UI's `data-dragging`
   // waits for movement and marks every thumb.
   const [held, setHeld] = React.useState<number | null>(null);
+  // The thumb with keyboard focus, so the bar can mark its handle; the bar's
+  // thumbs are invisible.
+  const [focused, setFocused] = React.useState<number | null>(null);
   // Where each thumb is drawn while one is dragged: the held one at the
   // pointer, and any it pushes against it.
   const [drag, setDrag] = React.useState<{
@@ -272,7 +355,8 @@ function Slider({
 
   // Moves the held thumb to `to` as Base UI moves its value, without the
   // rounding to steps: pushing its neighbors along, which stay where pushed,
-  // or stopping at them.
+  // or stopping at them. Mirrors Base UI's getPushedThumbValues ("push") and
+  // resolveThumbCollision ("none", and "swap" up to the swap).
   const gap = (props.step ?? 1) * (props.minStepsBetweenValues ?? 0);
   function placeDrag(from: number[], index: number, to: number): number[] {
     const next = from.slice();
@@ -348,7 +432,7 @@ function Slider({
     setHeld(index);
     pointerRef.current = {
       index,
-      offset: thumb ? start.pos - thumbAt(snappedValues[index]) : 0,
+      offset: thumb ? start.pos - thumbAt(shownRef.current[index]) : 0,
       x: event.clientX,
       y: event.clientY,
       moved: false,
@@ -462,52 +546,10 @@ function Slider({
         } as React.CSSProperties)
       : undefined;
 
-  // How far the bar's labels reach in from each end of the track, so the
-  // handle and marks can step aside for them. Measured, since labels are any
-  // content and a live value changes width as it runs.
-  const labelsRef = React.useRef<HTMLDivElement>(null);
-  const [labelReach, setLabelReach] = React.useState<{
-    size: number;
-    start: number;
-    end: number;
-  } | null>(null);
-  React.useLayoutEffect(() => {
-    const layer = labelsRef.current;
-    if (!layer) return;
-    const [startLabelEl, endLabelEl] = Array.from(
-      layer.children,
-    ) as HTMLElement[];
-
-    const measure = (): void => {
-      const box = layer.getBoundingClientRect();
-      const rtl = getComputedStyle(layer).direction === "rtl";
-      const reach = (el: HTMLElement, fromStart: boolean): number => {
-        const r = el.getBoundingClientRect();
-        if (r.width === 0 || r.height === 0) return 0;
-        if (vertical)
-          return fromStart ? box.bottom - r.top : r.bottom - box.top;
-        return fromStart === rtl ? box.right - r.left : r.right - box.left;
-      };
-      const next = {
-        size: vertical ? box.height : box.width,
-        start: reach(startLabelEl, true),
-        end: reach(endLabelEl, false),
-      };
-      setLabelReach((prev) =>
-        prev &&
-        prev.size === next.size &&
-        prev.start === next.start &&
-        prev.end === next.end
-          ? prev
-          : next,
-      );
-    };
-
-    measure();
-    const observer = new ResizeObserver(measure);
-    for (const el of [layer, startLabelEl, endLabelEl]) observer.observe(el);
-    return () => observer.disconnect();
-  }, [bar, vertical]);
+  const { labelsRef, labelReach, nearLabel, measured } = useLabelReach(
+    bar,
+    vertical,
+  );
 
   // The handle sits just inside the fill's end, but never past the track's
   // edge, so at the minimum it waits at the start with no fill behind it. In
@@ -564,32 +606,31 @@ function Slider({
       {values.map((_, index) => {
         const { position } = barHandle(index);
         const px = barHandlePx[index];
-        const dodge =
-          labelReach !== null &&
-          px !== undefined &&
-          ((labelReach.start > 0 && px < labelReach.start + BAR_LABEL_GAP) ||
-            (labelReach.end > 0 &&
-              px > labelReach.size - labelReach.end - BAR_LABEL_GAP));
+        const dodge = px !== undefined && nearLabel(px, BAR_LABEL_GAP);
         return (
           <span
             key={index}
             data-dodge={dodge ? "" : undefined}
             data-held={held === index ? "" : undefined}
+            data-focused={focused === index ? "" : undefined}
             className={cn(
               "absolute rounded-full",
               // Its own layer, or it repaints at a new subpixel offset on
               // every drag move and shimmers.
-              "transition-[scale,opacity] duration-150 ease-out will-change-transform motion-reduce:transition-none",
+              "will-change-transform",
+              measured &&
+                "transition-[scale,opacity] duration-150 ease-out motion-reduce:transition-none",
               vertical
                 ? "left-1/2 h-0.5 w-3.5 -translate-x-1/2 translate-y-1/2"
                 : "top-1/2 h-3.5 w-0.5 -translate-x-1/2 -translate-y-1/2 rtl:translate-x-1/2",
               // Press: the held bar reaches a little further, as if picked
-              // up.
+              // up. Keyboard focus does the same, so a range shows which
+              // handle the arrow keys move.
               dodge
                 ? cn("opacity-25", vertical ? "scale-x-75" : "scale-y-75")
                 : vertical
-                  ? "data-held:scale-x-[1.15]"
-                  : "data-held:scale-y-[1.15]",
+                  ? "data-focused:scale-x-[1.15] data-held:scale-x-[1.15]"
+                  : "data-focused:scale-y-[1.15] data-held:scale-y-[1.15]",
               handleClass,
             )}
             style={
@@ -603,20 +644,21 @@ function Slider({
 
   const steps = React.useMemo(() => {
     if (!showSteps) return [];
-    const step = markStep ?? props.step ?? 1;
+    const step = markStep && markStep > 0 ? markStep : (props.step ?? 1);
     const stepCount = Math.floor((max - min) / step) + 1;
     return Array.from({ length: stepCount }, (_, i) => min + i * step);
   }, [showSteps, markStep, props.step, min, max]);
 
   const handleValueChange: SliderProps["onValueChange"] = (next, details) => {
-    if (value === undefined) setUncontrolledValues(toArray(next));
+    onValueChange?.(next, details);
+    if (details.isCanceled) return;
+    if (value === undefined) setUncontrolledValues(toValues(next, min, max));
     if (pointerRef.current && details.activeThumbIndex >= 0) {
       pointerRef.current.index = details.activeThumbIndex;
       setHeld(details.activeThumbIndex);
     }
-    if (details.reason === "track-press") glide(toArray(next));
+    if (details.reason === "track-press") glide(toValues(next, min, max));
     else if (details.reason === "keyboard") stopGliding();
-    onValueChange?.(next, details);
   };
 
   const fillStart = isRange ? dragPosition(first) : "0px";
@@ -650,11 +692,11 @@ function Slider({
         sliderVariants({ variant }),
         className,
       )}
-      thumbAlignment={inset ? "edge" : "center"}
       // Drags along the slider's axis are the slider's, so a Base UI drawer
       // or toast doesn't swipe; across it, a drawer still can.
       data-base-ui-swipe-ignore={vertical ? "y" : "x"}
       {...props}
+      thumbAlignment={inset ? "edge" : "center"}
     >
       {children}
       <BaseSlider.Control
@@ -741,10 +783,7 @@ function Slider({
               return null;
             }
 
-            // Edge-aligned thumbs travel the track minus their own size.
-            const position = inset
-              ? `calc(${INSET_THUMB_SIZE / 2}px + ${percent(step)}% * (100% - ${INSET_THUMB_SIZE}px) / 100%)`
-              : `${percent(step)}%`;
+            const position = dragPosition(percent(step));
             const filled = isRange
               ? step >= values[0] && step <= values[values.length - 1]
               : step <= values[0];
@@ -755,12 +794,8 @@ function Slider({
               : undefined;
             const covered =
               bar &&
-              labelReach !== null &&
               markPx !== undefined &&
-              ((labelReach.start > 0 &&
-                markPx < labelReach.start + BAR_MARK_GAP) ||
-                (labelReach.end > 0 &&
-                  markPx > labelReach.size - labelReach.end - BAR_MARK_GAP) ||
+              (nearLabel(markPx, BAR_MARK_GAP) ||
                 barHandlePx.some((px) => Math.abs(px - markPx) < BAR_MARK_GAP));
 
             return (
@@ -775,11 +810,12 @@ function Slider({
                   // on the track with the mark itself as the target, not with
                   // `group-has`, which makes every insertion on the page
                   // restyle it.
-                  "transition-opacity duration-150 ease-out",
+                  (!bar || measured) &&
+                    "transition-opacity duration-150 ease-out",
                   covered
                     ? "opacity-0"
                     : showSteps === "hover" &&
-                        "opacity-0 group-hover/slider:opacity-100 [[data-slot=slider-track]:has(:focus-visible)>&]:opacity-100 group-data-dragging/slider:opacity-100",
+                        "opacity-0 group-hover/slider:opacity-100 group-data-dragging/slider:opacity-100 [[data-slot=slider-track]:has(:focus-visible)>&]:opacity-100",
                   vertical
                     ? "left-1/2 -translate-x-1/2 translate-y-1/2"
                     : "top-1/2 -translate-x-1/2 -translate-y-1/2 rtl:translate-x-1/2",
@@ -809,11 +845,20 @@ function Slider({
               key={index}
               index={index}
               getAriaLabel={getAriaLabel}
-              style={
-                vertical
-                  ? { bottom: dragPosition(percent(values[index])) }
-                  : { insetInlineStart: dragPosition(percent(values[index])) }
-              }
+              // The bar's invisible thumb sits on its handle, which is inset
+              // from the value, so a press on the handle lands on the thumb.
+              style={(() => {
+                const position = bar
+                  ? barHandle(index).position
+                  : dragPosition(percent(values[index]));
+                return vertical
+                  ? { bottom: position }
+                  : { insetInlineStart: position };
+              })()}
+              onFocus={(event) => {
+                if (event.target.matches(":focus-visible")) setFocused(index);
+              }}
+              onBlur={() => setFocused(null)}
               data-held={held === index ? "" : undefined}
               className={cn(sliderThumbVariants({ variant }))}
             />

@@ -181,7 +181,8 @@ Give the slider an accessible name when there is no visible `SliderLabel`. For a
 
 <ApiProp name="endLabel" fullType="React.ReactNode">
   Optional content inside the track at its end, such as "High" or a
-  `SliderValue`. `bar` variant only.
+  `SliderValue`. Turns the fill's foreground color where the fill covers it.
+  `bar` variant only.
 </ApiProp>
 
 <ApiProp name="min" fullType="number" defaultValue="0">
@@ -192,16 +193,11 @@ Give the slider an accessible name when there is no visible `SliderLabel`. For a
   Maximum value of the slider range.
 </ApiProp>
 
-<ApiProp name="thumbAlignment" fullType='"center" | "edge"' simpleType="string">
-  Sets how the thumb aligns at the ends. The `inset` variant uses `"edge"`; the
-  others use `"center"`.
-</ApiProp>
-
 </ApiPropsList>
 
 ### Additional Props
 
-Slider inherits all props from [Base UI Slider](https://base-ui.com/react/components/slider#api-reference), including orientation, step, value, defaultValue, onChange, and accessibility props.
+Slider inherits all props from [Base UI Slider](https://base-ui.com/react/components/slider#api-reference), including orientation, step, value, defaultValue, onChange, and accessibility props. The exception is `thumbAlignment`, which the variant sets.
 
 ## Upgrading
 

@@ -720,6 +720,9 @@ function Slider({
       <BaseSlider.Control
         data-slot="slider-control"
         onPointerDown={handlePointerDown}
+        // Base UI focuses the pressed thumb. After a tap, the browser's
+        // stand-in mousedown on the track would blur it again.
+        onMouseDown={(event) => event.preventDefault()}
         className="flex flex-1 items-center data-[orientation=horizontal]:py-1 data-[orientation=vertical]:min-h-full data-[orientation=vertical]:flex-col data-[orientation=vertical]:justify-center data-[orientation=vertical]:px-1"
       >
         <BaseSlider.Track
@@ -822,9 +825,10 @@ function Slider({
                 data-filled={filled ? "" : undefined}
                 className={cn(
                   "pointer-events-none absolute rounded-full",
-                  // Hover-only marks also show while dragging or focused, so
-                  // touch and keyboard users still see them. Focus is matched
-                  // on the track with the mark itself as the target, not with
+                  // Hover-only marks also show while dragging, with keyboard
+                  // focus, and on touch screens with any focus, which a tap
+                  // gives the thumb until a tap elsewhere. Focus is matched on
+                  // the track with the mark itself as the target, not with
                   // `group-has`, which makes every insertion on the page
                   // restyle it.
                   (!bar || measured) &&
@@ -832,7 +836,7 @@ function Slider({
                   covered
                     ? "opacity-0"
                     : showSteps === "hover" &&
-                        "opacity-0 group-hover/slider:opacity-100 group-data-dragging/slider:opacity-100 [[data-slot=slider-track]:has(:focus-visible)>&]:opacity-100",
+                        "opacity-0 group-hover/slider:opacity-100 group-data-dragging/slider:opacity-100 pointer-coarse:[[data-slot=slider-track]:has(:focus)>&]:opacity-100 [[data-slot=slider-track]:has(:focus-visible)>&]:opacity-100",
                   vertical
                     ? "left-1/2 -translate-x-1/2 translate-y-1/2"
                     : "top-1/2 -translate-x-1/2 -translate-y-1/2 rtl:translate-x-1/2",

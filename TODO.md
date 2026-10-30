@@ -157,6 +157,13 @@ Rewrote every costly rule: the glide highlights (Toolbar, Menubar, Button group)
 
 Drawer's `html:has()` rules (hide the page scrollbar while a side drawer is open, so it meets the screen edge) now key off a `data-side-drawers` count that DrawerContent sets on `<html>` while mounted.
 
+**Regressed and fixed again (2026-10-29).** On `/docs/components/slider` insertions and some attribute flips were back at ~17ms, so dragging the With Steps slider stuttered as marks flipped `data-filled`; the calendar page was at ~12ms. Two causes, both now ~0.6–0.9ms:
+
+- The Slider's hover-only marks showed on focus through a `group-has` variant, which compiles to `:is(:where(.group\/slider):has(:focus-visible) *)`: styled element `*`. Now the variant is written on the mark, with the track's `:has(:focus-visible)` in front of `&`. (Class names are paraphrased here, since Tailwind scans markdown.)
+- Calendar's joined-corner rules put `:has(+ …)` on the day cell but styled the button inside it, which costs like an ancestor `:has()` no matter how the cell is matched (~13ms per insertion on the calendar page). The cell now sets `--calendar-join-end` and the button's `::before` reads it. The neighbour checks also use classes (`calendar-day-filled`, `calendar-day-hidden`, `calendar-day-range-end`) rather than attributes, which saves ~0.5ms on every flip of those attributes page-wide (Slider marks and OTP field use `data-filled` too).
+
+The rules are in CODE_STANDARDS.md under Performance. When bisecting, remove the spans the probe appends after each measurement, or the growing DOM inflates every later reading.
+
 Residual: `:root:has(.docs-root)` in `app/docs/docs.css` (~0.45ms). Could be a class on `<html>` set by the docs layout, but the root layout owns `<html>`, so it needs an inline script (an effect would flash the wrong frame color) plus cleanup when leaving docs.
 
 Measuring: append a `<span>` inside any docs element, read `getBoundingClientRect()`, and average a batch of ~20 (one insertion is under `performance.now()` resolution). To find costly rules, delete every `:has()` rule from `document.styleSheets`, re-add each alone and probe. Restart the dev server first: Tailwind's dev build keeps classes it has seen, and markdown counts as source, so a class spelled out in a note like this one gets compiled in.

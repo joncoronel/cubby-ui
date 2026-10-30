@@ -28,7 +28,7 @@ Slider
 └── SliderValue
 ```
 
-`SliderLabel` and `SliderValue` are optional children that render **above** the track, so a header row (the label and value side by side) sits directly above the slider control:
+`SliderLabel` and `SliderValue` are optional children that render above the track, so a label and value side by side make a header row:
 
 ```tsx
 <Slider defaultValue={[50]}>
@@ -57,7 +57,7 @@ Pass an array value to render two thumbs and select a range.
 
 ### With Steps
 
-Use `step` to snap to discrete values, and `showSteps` to mark them on the track. To allow finer values than the marks show, leave `step` small and set `markStep` to space the marks further apart. Pass `showSteps="hover"` to show the marks only while the slider is hovered, focused, or dragged. However coarse the step, dragging follows the pointer smoothly and the thumb settles onto the nearest step when released.
+Use `step` to snap to discrete values and `showSteps` to mark them on the track; `markStep` spaces the marks wider than `step`, and `showSteps="hover"` shows them only while the slider is in use. Dragging follows the pointer between steps, and the thumb settles on the nearest one when you let go.
 
 <ComponentPreview component="slider" example="slider-with-steps" />
 
@@ -79,16 +79,16 @@ Use `variant` to change the slider's visual style.
 
 <ComponentPreview component="slider" example="slider-variant" />
 
-| Variant       | Description                                                                                                                                    |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `default`     | A round thumb centered on the track.                                                                                                           |
-| `inset`       | A tall track with a handle that sits inside the fill.                                                                                          |
-| `bar`         | A tall track with a thin bar handle and optional `startLabel` and `endLabel` text. The fill ends at the value, with the handle just inside it. |
-| `squareThumb` | A square thumb in place of the round default.                                                                                                  |
+| Variant       | Description                                                                                                    |
+| ------------- | -------------------------------------------------------------------------------------------------------------- |
+| `default`     | A round thumb centered on the track.                                                                           |
+| `inset`       | A tall track with a handle that sits inside the fill.                                                          |
+| `bar`         | A tall track with a thin bar handle just inside the fill's end, and optional `startLabel` and `endLabel` text. |
+| `squareThumb` | A square thumb in place of the round default.                                                                  |
 
 ### Bar With Value
 
-The `bar` variant's labels are optional and take any node. Pass `SliderValue` as `endLabel` to show the live value inside the track; it picks up the track's text style and changes color under the fill. Format it with the slider's `format` prop. The labels are decorative, so still name the slider with `getAriaLabel` or a `SliderLabel`.
+Pass `SliderValue` as `endLabel` to show the live value inside the track, formatted by the slider's `format` prop. The labels are decorative, so still name the slider with `getAriaLabel` or a `SliderLabel`.
 
 <ComponentPreview component="slider" example="slider-bar-value" />
 
@@ -100,7 +100,7 @@ Use `color="primary"` to fill the range with the brand color instead of the defa
 
 ### With Reference Scale
 
-Render annotations like a reference scale as a sibling of `Slider`. Content outside the `Slider` root doesn't need slider context, so it skips the label/value composition rules; a `SliderLabel` child still keeps the visible label above the track.
+Render a reference scale as a sibling below `Slider`, where it needs no slider context; a `SliderLabel` child still sits above the track.
 
 <ComponentPreview component="slider" example="slider-with-scale" />
 
@@ -131,7 +131,15 @@ Give the slider an accessible name when there is no visible `SliderLabel`. For a
 
 ## API Reference
 
-### Slider
+The Slider is built on top of [Base UI's Slider](https://base-ui.com/react/components/slider). All Base UI props are supported except `thumbAlignment`, which the variant sets. The documentation below only covers custom props and the props our implementation handles.
+
+For the complete Base UI API, see the [Base UI Slider documentation](https://base-ui.com/react/components/slider).
+
+### Props
+
+#### Slider
+
+Track, fill, marks, and thumbs for one value or a range. Composes Base UI's `Slider.Root`, `Slider.Control`, `Slider.Track`, `Slider.Indicator`, and `Slider.Thumb`. Props are forwarded to `Slider.Root`.
 
 <ApiPropsList>
 
@@ -156,12 +164,6 @@ Give the slider an accessible name when there is no visible `SliderLabel`. For a
   selection controls; `primary` is the brand fill.
 </ApiProp>
 
-<ApiProp name="getAriaLabel" fullType="((index: number) => string) | null">
-  A function that returns an accessible name for each thumb. Use for sliders
-  without a visible label, or for range sliders where each thumb needs a
-  distinct label.
-</ApiProp>
-
 <ApiProp name="showSteps" fullType='boolean | "hover"' defaultValue="false">
   Marks each step on the track. `"hover"` shows the marks only while the slider
   is hovered, focused, or dragged. The `inset` variant marks every step, with
@@ -174,30 +176,37 @@ Give the slider an accessible name when there is no visible `SliderLabel`. For a
 </ApiProp>
 
 <ApiProp name="startLabel" fullType="React.ReactNode">
-  Optional content inside the track at its start, such as "Low" or a setting
-  name. Turns the fill's foreground color where the fill covers it. `bar`
-  variant only.
+  Content inside the track at its start, such as "Low" or a setting name. Turns
+  the fill's foreground color where the fill covers it. `bar` variant only.
 </ApiProp>
 
 <ApiProp name="endLabel" fullType="React.ReactNode">
-  Optional content inside the track at its end, such as "High" or a
-  `SliderValue`. Turns the fill's foreground color where the fill covers it.
-  `bar` variant only.
+  Content inside the track at its end, such as "High" or a `SliderValue`. Turns
+  the fill's foreground color where the fill covers it. `bar` variant only.
+</ApiProp>
+
+<ApiProp name="getAriaLabel" fullType="((index: number) => string) | null">
+  Returns an accessible name for each thumb. Use it when there's no visible
+  label, or in a range so each thumb gets its own name.
 </ApiProp>
 
 <ApiProp name="min" fullType="number" defaultValue="0">
-  Minimum value of the slider range.
+  The lowest value.
 </ApiProp>
 
 <ApiProp name="max" fullType="number" defaultValue="100">
-  Maximum value of the slider range.
+  The highest value.
 </ApiProp>
 
 </ApiPropsList>
 
-### Additional Props
+#### SliderValue
 
-Slider inherits all props from [Base UI Slider](https://base-ui.com/react/components/slider#api-reference), including orientation, step, value, defaultValue, onChange, and accessibility props. The exception is `thumbAlignment`, which the variant sets.
+The current value as text, formatted by the slider's `format` prop. Wraps Base UI's `Slider.Value`.
+
+#### SliderLabel
+
+The slider's visible label. Wraps Base UI's `Slider.Label`.
 
 ## Upgrading
 

@@ -49,13 +49,11 @@ const sliderTrackVariants = cva(
     variants: {
       variant: {
         default: "",
-        // A tall track the thumb sits inside.
-        // The grey is a gradient set inline, as on the bar.
-        // Its own layer, shared by the fill: the thumb has one, and at
-        // fractional scales a layer snaps to whole pixels while the page
-        // doesn't, so the thumb's frame came out a pixel taller than the
-        // fill. Also, in the page's layer the fill's corners left stray
-        // pixels past the track's edge after repeated drags.
+        // A tall track the thumb sits inside. The grey is a gradient set
+        // inline, as on the bar. Its own layer, shared by the fill: the thumb
+        // has one, and at fractional scales a layer snaps to whole pixels
+        // where the page doesn't, which left the thumb's frame a pixel taller
+        // than the fill and stray fill pixels past the track's edge.
         inset:
           "bg-transparent rounded-xs will-change-transform data-[orientation=horizontal]:h-6 data-[orientation=vertical]:w-6",
         // Tall enough to hold the labels. The grey is a gradient set inline,
@@ -221,8 +219,9 @@ function useLabelReach(
   return { labelsRef, labelReach, nearLabel, measured };
 }
 
+// thumbAlignment is left out: the variant sets it, and the drawing math
+// follows the variant.
 export interface SliderProps
-  // The variant sets the alignment, which the drawing math follows.
   extends
     Omit<React.ComponentProps<typeof BaseSlider.Root>, "thumbAlignment">,
     VariantProps<typeof sliderVariants> {
@@ -357,8 +356,8 @@ function Slider({
   // rounding to steps: pushing its neighbors along, which stay where pushed,
   // or stopping at them. Mirrors Base UI's getPushedThumbValues ("push") and
   // resolveThumbCollision ("none", and "swap" up to the swap).
-  const gap = (props.step ?? 1) * (props.minStepsBetweenValues ?? 0);
   function placeDrag(from: number[], index: number, to: number): number[] {
+    const gap = (props.step ?? 1) * (props.minStepsBetweenValues ?? 0);
     const next = from.slice();
     const last = next.length - 1;
     if ((props.thumbCollisionBehavior ?? "push") !== "push") {
@@ -498,10 +497,13 @@ function Slider({
   // them at the snapped value, so they can follow a drag or glide. At rest the
   // two agree, except on the inset: Base UI places an edge-aligned thumb by a
   // percentage it measured, which lands a little off this.
+  const insetTravel = (p: number): string =>
+    `(100% - ${INSET_THUMB_SIZE}px) * ${p / 100}`;
   const dragPosition = (p: number): string =>
-    inset
-      ? `calc(${INSET_THUMB_SIZE / 2}px + (100% - ${INSET_THUMB_SIZE}px) * ${p / 100})`
-      : `${p}%`;
+    inset ? `calc(${INSET_THUMB_SIZE / 2}px + ${insetTravel(p)})` : `${p}%`;
+  // Positions an element along the slider's axis.
+  const along = (position: string): React.CSSProperties =>
+    vertical ? { bottom: position } : { insetInlineStart: position };
   const first = percent(values[0]);
   const last = percent(values[values.length - 1]);
 
@@ -511,8 +513,7 @@ function Slider({
   // under the thumbs' rounded corners, the only part of them that doesn't
   // cover the track edge to edge, except where a thumb's corners meet the
   // track's own at either end.
-  const insetCenter = (p: number): string =>
-    `(100% - ${INSET_THUMB_SIZE}px) * ${p / 100}`;
+  //
   // The bar's fill rounds its ends like the track (--fill-radius, set once
   // measured), so the grey tucks under those corners instead. An end on the
   // track's own edge reaches past it, leaving the track to round it alone.
@@ -537,11 +538,11 @@ function Slider({
       ? ({
           "--grey-until":
             isRange && first > 0
-              ? `calc(var(--radius-xs) + ${insetCenter(first)})`
+              ? `calc(var(--radius-xs) + ${insetTravel(first)})`
               : "0px",
           "--grey-from":
             last < 100
-              ? `calc(${INSET_THUMB_SIZE}px - var(--radius-xs) + ${insetCenter(last)})`
+              ? `calc(${INSET_THUMB_SIZE}px - var(--radius-xs) + ${insetTravel(last)})`
               : "100%",
         } as React.CSSProperties)
       : undefined;
@@ -555,8 +556,8 @@ function Slider({
   // edge, so at the minimum it waits at the start with no fill behind it. In
   // a range, the two handles give up their inset as the range narrows,
   // keeping apart until they sit on the fill's ends, so they never cross or
-  // leave it. Returns the CSS position and
-  // the same in px, for a measured track.
+  // leave it. Returns the CSS position, and the same in px for a measured
+  // track.
   const barHandle = (
     index: number,
   ): { position: string; at: (size: number) => number } => {
@@ -633,9 +634,7 @@ function Slider({
                   : "data-focused:scale-y-[1.15] data-held:scale-y-[1.15]",
               handleClass,
             )}
-            style={
-              vertical ? { bottom: position } : { insetInlineStart: position }
-            }
+            style={along(position)}
           />
         );
       })}
@@ -664,13 +663,12 @@ function Slider({
   const fillStart = isRange ? dragPosition(first) : "0px";
   const fillSize = isRange
     ? inset
-      ? `calc((100% - ${INSET_THUMB_SIZE}px) * ${(last - first) / 100})`
+      ? `calc(${insetTravel(last - first)})`
       : `${last - first}%`
     : dragPosition(last);
   const indicatorStyle: React.CSSProperties = {
-    ...(vertical
-      ? { bottom: fillStart, height: fillSize }
-      : { insetInlineStart: fillStart, width: fillSize }),
+    ...along(fillStart),
+    ...(vertical ? { height: fillSize } : { width: fillSize }),
     // At the minimum the inset's fill lies wholly under the thumb, its
     // rounded end on the thumb's own, and the two anti-aliased curves stack
     // into a fringe of fill around the thumb.
@@ -783,7 +781,6 @@ function Slider({
               return null;
             }
 
-            const position = dragPosition(percent(step));
             const filled = isRange
               ? step >= values[0] && step <= values[values.length - 1]
               : step <= values[0];
@@ -829,11 +826,7 @@ function Slider({
                       // gradient stays round wherever its box lands.
                       "size-2 bg-[radial-gradient(circle,var(--mark)_1.7px,transparent_2.3px)] [--mark:var(--color-border)] data-filled:[--mark:color-mix(in_oklab,var(--slider-fill-foreground)_45%,transparent)]",
                 )}
-                style={
-                  vertical
-                    ? { bottom: position }
-                    : { insetInlineStart: position }
-                }
+                style={along(dragPosition(percent(step)))}
               />
             );
           })}
@@ -847,20 +840,17 @@ function Slider({
               getAriaLabel={getAriaLabel}
               // The bar's invisible thumb sits on its handle, which is inset
               // from the value, so a press on the handle lands on the thumb.
-              style={(() => {
-                const position = bar
+              style={along(
+                bar
                   ? barHandle(index).position
-                  : dragPosition(percent(values[index]));
-                return vertical
-                  ? { bottom: position }
-                  : { insetInlineStart: position };
-              })()}
+                  : dragPosition(percent(values[index])),
+              )}
               onFocus={(event) => {
                 if (event.target.matches(":focus-visible")) setFocused(index);
               }}
               onBlur={() => setFocused(null)}
               data-held={held === index ? "" : undefined}
-              className={cn(sliderThumbVariants({ variant }))}
+              className={sliderThumbVariants({ variant })}
             />
           ))}
         </BaseSlider.Track>

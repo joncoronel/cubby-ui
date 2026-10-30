@@ -89,7 +89,7 @@ export default function SliderTune(): React.ReactElement {
       ${INSET} ${H} [data-slot="slider-indicator"] { border-start-start-radius: ${v.inset.radius}px; border-end-start-radius: ${v.inset.radius}px; }
       ${INSET} ${V} [data-slot="slider-indicator"] { border-bottom-left-radius: ${v.inset.radius}px; border-bottom-right-radius: ${v.inset.radius}px; }`,
     v.inset.press !== INSET_PRESS &&
-      `${INSET} [data-slot="slider-thumb"][data-dragging]::before { scale: ${v.inset.press}; }`,
+      `${INSET} [data-slot="slider-thumb"][data-held]::before { scale: ${v.inset.press}; }`,
     v.inset.mark !== INSET_MARK &&
       `${INSET} ${H} ${STEP} { height: ${v.inset.mark}px; }
       ${INSET} ${V} ${STEP} { width: ${v.inset.mark}px; }`,
@@ -103,8 +103,8 @@ export default function SliderTune(): React.ReactElement {
       `${BAR} ${H} ${BAR_HANDLE} { height: ${v.bar.handleLength}px; width: ${v.bar.handleWidth}px; }
       ${BAR} ${V} ${BAR_HANDLE} { width: ${v.bar.handleLength}px; height: ${v.bar.handleWidth}px; }`,
     v.bar.press !== BAR_PRESS &&
-      `${BAR} ${H}[data-dragging] ${BAR_HANDLE} { scale: 1 ${v.bar.press}; }
-      ${BAR} ${V}[data-dragging] ${BAR_HANDLE} { scale: ${v.bar.press} 1; }`,
+      `${BAR} ${H} ${BAR_HANDLE}[data-held]:not([data-dodge]) { scale: 1 ${v.bar.press}; }
+      ${BAR} ${V} ${BAR_HANDLE}[data-held]:not([data-dodge]) { scale: ${v.bar.press} 1; }`,
     v.bar.labelSize !== BAR_LABEL_SIZE &&
       `${BAR} ${BAR_LAYERS} { font-size: ${v.bar.labelSize}px; }`,
     v.bar.mark !== BAR_MARK &&

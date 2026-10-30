@@ -57,7 +57,7 @@ Pass an array value to render two thumbs and select a range.
 
 ### With Steps
 
-Use `step` to snap to discrete values, and `showSteps` to mark them on the track. To keep dragging smooth but still mark the scale, leave `step` small and set `markStep` to space the marks further apart. Pass `showSteps="hover"` to show the marks only while the slider is hovered, focused, or dragged.
+Use `step` to snap to discrete values, and `showSteps` to mark them on the track. To allow finer values than the marks show, leave `step` small and set `markStep` to space the marks further apart. Pass `showSteps="hover"` to show the marks only while the slider is hovered, focused, or dragged. However coarse the step, dragging follows the pointer smoothly and the thumb settles onto the nearest step when released.
 
 <ComponentPreview component="slider" example="slider-with-steps" />
 

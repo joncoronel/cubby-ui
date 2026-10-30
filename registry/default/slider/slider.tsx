@@ -15,6 +15,12 @@ const BAR_HANDLE_GAP = 4;
 // aside, and a mark to the handle or a label before it hides.
 const BAR_LABEL_GAP = 6;
 const BAR_MARK_GAP = 5;
+// How far, in px, a press has to travel before it's a drag rather than a
+// click on the track.
+const DRAG_THRESHOLD = 3;
+// The glide after a click on the track, and the settle onto a step after
+// a drag. Keyboard moves stay instant.
+const GLIDE_MS = 200;
 // A SliderValue passed as a bar label takes the layer's text, so it turns
 // the fill's foreground color with the rest.
 const BAR_LABEL_VALUE =
@@ -45,8 +51,13 @@ const sliderTrackVariants = cva(
         default: "",
         // A tall track the thumb sits inside.
         // The grey is a gradient set inline, as on the bar.
+        // Its own layer, shared by the fill: the thumb has one, and at
+        // fractional scales a layer snaps to whole pixels while the page
+        // doesn't, so the thumb's frame came out a pixel taller than the
+        // fill. Also, in the page's layer the fill's corners left stray
+        // pixels past the track's edge after repeated drags.
         inset:
-          "bg-transparent rounded-xs data-[orientation=horizontal]:h-6 data-[orientation=vertical]:w-6",
+          "bg-transparent rounded-xs will-change-transform data-[orientation=horizontal]:h-6 data-[orientation=vertical]:w-6",
         // Tall enough to hold the labels. The grey is a gradient set inline,
         // left out under the fill; the clip rounds the fill's outer corners.
         // The thumb is invisible, so focus shows on the track.
@@ -103,7 +114,7 @@ const sliderThumbVariants = cva(
           // offset on every drag move and shimmers. The whole thumb, not the
           // handle alone, so the frame and handle snap together and stay
           // centered.
-          "will-change-transform before:transition-[scale] before:duration-150 before:ease-out data-[dragging]:before:scale-95 motion-reduce:before:transition-none",
+          "will-change-transform before:transition-[scale] before:duration-150 before:ease-out data-held:before:scale-95 motion-reduce:before:transition-none",
           "forced-colors:before:border forced-colors:before:border-[CanvasText]",
         ],
         // An invisible hit area; the handle the user sees is drawn in the
@@ -169,7 +180,53 @@ function Slider({
   const [uncontrolledValues, setUncontrolledValues] = React.useState(() =>
     defaultValue !== undefined ? toArray(defaultValue) : [min],
   );
-  const values = value !== undefined ? toArray(value) : uncontrolledValues;
+  const snappedValues =
+    value !== undefined ? toArray(value) : uncontrolledValues;
+
+  // While dragging, the thumb and fill follow the pointer itself, so coarse
+  // steps drag as smoothly as fine ones. The value still snaps; the thumb
+  // settles onto its step on release, and glides to a clicked spot.
+  const trackRef = React.useRef<HTMLDivElement>(null);
+  const pointerRef = React.useRef<{
+    index: number;
+    offset: number;
+    x: number;
+    y: number;
+    moved: boolean;
+  } | null>(null);
+  const stopPointerRef = React.useRef<(() => void) | null>(null);
+  const glideFrame = React.useRef(0);
+  // The thumb in hand, from press to release. Base UI's `data-dragging`
+  // waits for movement and marks every thumb.
+  const [held, setHeld] = React.useState<number | null>(null);
+  // Where each thumb is drawn while one is dragged: the held one at the
+  // pointer, and any it pushes against it.
+  const [drag, setDrag] = React.useState<{
+    index: number;
+    values: number[];
+  } | null>(null);
+  // The values shown mid-glide. Animated here, frame by frame, rather than
+  // with CSS transitions, so the fill, grey, handles, and marks all move as
+  // one, and Chrome has no composited clip-path to hand back at the end,
+  // which could flash the old fill for a frame.
+  const [glideValues, setGlideValues] = React.useState<number[] | null>(null);
+  React.useEffect(
+    () => () => {
+      cancelAnimationFrame(glideFrame.current);
+      stopPointerRef.current?.();
+    },
+    [],
+  );
+
+  const values = drag?.values ?? glideValues ?? snappedValues;
+  // What's on screen and the value beneath it, for a glide to start from
+  // and settle onto.
+  const shownRef = React.useRef(values);
+  const snappedRef = React.useRef(snappedValues);
+  React.useLayoutEffect(() => {
+    shownRef.current = values;
+    snappedRef.current = snappedValues;
+  });
 
   const isRange = values.length > 1;
   const inset = variant === "inset";
@@ -177,6 +234,190 @@ function Slider({
   const vertical = props.orientation === "vertical";
 
   const percent = (v: number): number => ((v - min) / (max - min)) * 100;
+
+  // Eases from what's shown to the value. It starts in the same render as
+  // the value change, so the thumb never jumps ahead for a frame, and aims
+  // at the live value each frame, so a pointer that wobbles a step before
+  // release doesn't leave the glide to jump there at the end.
+  function glide(to: number[]): void {
+    cancelAnimationFrame(glideFrame.current);
+    const from = shownRef.current;
+    if (
+      from.length !== to.length ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      setGlideValues(null);
+      return;
+    }
+    const start = performance.now();
+    const tick = (now: number): void => {
+      const t = Math.min(1, (now - start) / GLIDE_MS);
+      if (t === 1) {
+        setGlideValues(null);
+        return;
+      }
+      const eased = 1 - (1 - t) ** 4;
+      const target = snappedRef.current;
+      setGlideValues(from.map((v, i) => v + (target[i] - v) * eased));
+      glideFrame.current = requestAnimationFrame(tick);
+    };
+    setGlideValues(from);
+    glideFrame.current = requestAnimationFrame(tick);
+  }
+
+  function stopGliding(): void {
+    cancelAnimationFrame(glideFrame.current);
+    setGlideValues(null);
+  }
+
+  // Moves the held thumb to `to` as Base UI moves its value, without the
+  // rounding to steps: pushing its neighbors along, which stay where pushed,
+  // or stopping at them.
+  const gap = (props.step ?? 1) * (props.minStepsBetweenValues ?? 0);
+  function placeDrag(from: number[], index: number, to: number): number[] {
+    const next = from.slice();
+    const last = next.length - 1;
+    if ((props.thumbCollisionBehavior ?? "push") !== "push") {
+      next[index] = Math.min(
+        Math.max(to, index > 0 ? from[index - 1] + gap : min),
+        index < last ? from[index + 1] - gap : max,
+      );
+      return next;
+    }
+    next[index] = Math.min(
+      Math.max(to, min + index * gap),
+      max - (last - index) * gap,
+    );
+    for (let i = index + 1; i <= last; i++) {
+      next[i] = Math.max(from[i], next[i - 1] + gap);
+    }
+    for (let i = index - 1; i >= 0; i--) {
+      next[i] = Math.min(from[i], next[i + 1] - gap);
+    }
+    return next;
+  }
+
+  // The pointer's distance along the track from its start, in px, and how
+  // far a thumb travels, as Base UI measures them: an edge-aligned thumb
+  // travels the track minus its own size.
+  function trackPosition(
+    clientX: number,
+    clientY: number,
+  ): { pos: number; travel: number; edge: number } | null {
+    const track = trackRef.current;
+    if (!track) return null;
+    const rect = track.getBoundingClientRect();
+    const rtl = getComputedStyle(track).direction === "rtl";
+    const edge = inset ? INSET_THUMB_SIZE / 2 : 0;
+    return {
+      pos: vertical
+        ? rect.bottom - clientY
+        : rtl
+          ? rect.right - clientX
+          : clientX - rect.left,
+      travel: (vertical ? rect.height : rect.width) - edge * 2,
+      edge,
+    };
+  }
+
+  function handlePointerDown(event: React.PointerEvent<HTMLDivElement>): void {
+    if (event.button !== 0 || props.disabled) return;
+    const start = trackPosition(event.clientX, event.clientY);
+    if (!start) return;
+
+    // The thumb under the pointer, or the nearest one, as Base UI picks it,
+    // and where on it the pointer took hold, so it doesn't jump to center.
+    const thumb = (event.target as HTMLElement).closest(
+      '[data-slot="slider-thumb"]',
+    );
+    const thumbAt = (v: number): number =>
+      start.edge + (percent(v) / 100) * start.travel;
+    let index = 0;
+    if (thumb) {
+      index = Number(thumb.getAttribute("data-index")) || 0;
+    } else {
+      snappedValues.forEach((v, i) => {
+        if (
+          Math.abs(thumbAt(v) - start.pos) <
+          Math.abs(thumbAt(snappedValues[index]) - start.pos)
+        ) {
+          index = i;
+        }
+      });
+    }
+    setHeld(index);
+    pointerRef.current = {
+      index,
+      offset: thumb ? start.pos - thumbAt(snappedValues[index]) : 0,
+      x: event.clientX,
+      y: event.clientY,
+      moved: false,
+    };
+
+    const doc = event.currentTarget.ownerDocument;
+    const move = (e: PointerEvent): void => {
+      const pointer = pointerRef.current;
+      if (!pointer) return;
+      if (!pointer.moved) {
+        if (
+          Math.hypot(e.clientX - pointer.x, e.clientY - pointer.y) <=
+          DRAG_THRESHOLD
+        ) {
+          return;
+        }
+        pointer.moved = true;
+        stopGliding();
+      }
+      const now = trackPosition(e.clientX, e.clientY);
+      if (!now) return;
+      const fraction = Math.min(
+        1,
+        Math.max(0, (now.pos - pointer.offset - now.edge) / now.travel),
+      );
+      const to = min + fraction * (max - min);
+      const { index } = pointer;
+      // A swap hands the drag to another thumb; start again from the values.
+      setDrag((prev) => ({
+        index,
+        values: placeDrag(
+          prev?.index === index ? prev.values : snappedRef.current,
+          index,
+          to,
+        ),
+      }));
+    };
+    const stop = (): void => {
+      doc.removeEventListener("pointermove", move);
+      doc.removeEventListener("pointerup", end);
+      doc.removeEventListener("pointercancel", end);
+      stopPointerRef.current = null;
+    };
+    const end = (): void => {
+      stop();
+      const moved = pointerRef.current?.moved;
+      pointerRef.current = null;
+      setHeld(null);
+      if (moved) {
+        setDrag(null);
+        glide(snappedRef.current);
+      }
+    };
+
+    stopPointerRef.current?.();
+    doc.addEventListener("pointermove", move);
+    doc.addEventListener("pointerup", end);
+    doc.addEventListener("pointercancel", end);
+    stopPointerRef.current = stop;
+  }
+
+  // The thumbs and fill are placed here rather than by Base UI, which places
+  // them at the snapped value, so they can follow a drag or glide. At rest the
+  // two agree, except on the inset: Base UI places an edge-aligned thumb by a
+  // percentage it measured, which lands a little off this.
+  const dragPosition = (p: number): string =>
+    inset
+      ? `calc(${INSET_THUMB_SIZE / 2}px + (100% - ${INSET_THUMB_SIZE}px) * ${p / 100})`
+      : `${p}%`;
   const first = percent(values[0]);
   const last = percent(values[values.length - 1]);
 
@@ -333,6 +574,7 @@ function Slider({
           <span
             key={index}
             data-dodge={dodge ? "" : undefined}
+            data-held={held === index ? "" : undefined}
             className={cn(
               "absolute rounded-full",
               // Its own layer, or it repaints at a new subpixel offset on
@@ -341,12 +583,13 @@ function Slider({
               vertical
                 ? "left-1/2 h-0.5 w-3.5 -translate-x-1/2 translate-y-1/2"
                 : "top-1/2 h-3.5 w-0.5 -translate-x-1/2 -translate-y-1/2 rtl:translate-x-1/2",
-              // Press: the bar reaches a little further, as if picked up.
+              // Press: the held bar reaches a little further, as if picked
+              // up.
               dodge
                 ? cn("opacity-25", vertical ? "scale-x-75" : "scale-y-75")
                 : vertical
-                  ? "group-data-dragging/slider:scale-x-[1.15]"
-                  : "group-data-dragging/slider:scale-y-[1.15]",
+                  ? "data-held:scale-x-[1.15]"
+                  : "data-held:scale-y-[1.15]",
               handleClass,
             )}
             style={
@@ -367,7 +610,29 @@ function Slider({
 
   const handleValueChange: SliderProps["onValueChange"] = (next, details) => {
     if (value === undefined) setUncontrolledValues(toArray(next));
+    if (pointerRef.current && details.activeThumbIndex >= 0) {
+      pointerRef.current.index = details.activeThumbIndex;
+      setHeld(details.activeThumbIndex);
+    }
+    if (details.reason === "track-press") glide(toArray(next));
+    else if (details.reason === "keyboard") stopGliding();
     onValueChange?.(next, details);
+  };
+
+  const fillStart = isRange ? dragPosition(first) : "0px";
+  const fillSize = isRange
+    ? inset
+      ? `calc((100% - ${INSET_THUMB_SIZE}px) * ${(last - first) / 100})`
+      : `${last - first}%`
+    : dragPosition(last);
+  const indicatorStyle: React.CSSProperties = {
+    ...(vertical
+      ? { bottom: fillStart, height: fillSize }
+      : { insetInlineStart: fillStart, width: fillSize }),
+    // At the minimum the inset's fill lies wholly under the thumb, its
+    // rounded end on the thumb's own, and the two anti-aliased curves stack
+    // into a fringe of fill around the thumb.
+    ...(inset && !isRange && last === 0 && { visibility: "hidden" }),
   };
 
   return (
@@ -394,17 +659,17 @@ function Slider({
       {children}
       <BaseSlider.Control
         data-slot="slider-control"
+        onPointerDown={handlePointerDown}
         className="flex flex-1 items-center data-[orientation=horizontal]:py-1 data-[orientation=vertical]:min-h-full data-[orientation=vertical]:flex-col data-[orientation=vertical]:justify-center data-[orientation=vertical]:px-1"
       >
         <BaseSlider.Track
+          ref={trackRef}
           data-slot="slider-track"
           style={
-            bar
-              ? ({
-                  ...trackStyle,
-                  "--fill-radius": fillRadius,
-                } as React.CSSProperties)
-              : trackStyle
+            {
+              ...trackStyle,
+              ...(bar && { "--fill-radius": fillRadius }),
+            } as React.CSSProperties
           }
           className={cn(
             sliderTrackVariants({ variant }),
@@ -433,12 +698,15 @@ function Slider({
               </div>
               {/* The fill is a full-size layer clipped to the range, with the
                   labels and handle again in the fill's foreground, so they
-                  change color exactly where the fill crosses them. */}
+                  change color exactly where the fill crosses them. Its own
+                  layer: with the handle on one inside it, Chrome can drop the
+                  clip's rounded corners until something repaints the track,
+                  such as the marks fading in. */}
               <div
                 aria-hidden
                 data-slot="slider-indicator"
                 className={cn(
-                  "pointer-events-none absolute inset-0 flex justify-between bg-(--slider-fill) text-[0.8125rem] leading-none font-medium text-(--slider-fill-foreground)",
+                  "pointer-events-none absolute inset-0 flex justify-between bg-(--slider-fill) text-[0.8125rem] leading-none font-medium text-(--slider-fill-foreground) will-change-transform",
                   "forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]",
                   BAR_LABEL_VALUE,
                   vertical
@@ -454,6 +722,7 @@ function Slider({
           ) : (
             <BaseSlider.Indicator
               data-slot="slider-indicator"
+              style={indicatorStyle}
               className={cn(
                 sliderIndicatorVariants({ variant }),
                 // A range's fill starts and ends under the thumbs, so it's
@@ -502,12 +771,15 @@ function Slider({
                 className={cn(
                   "pointer-events-none absolute rounded-full",
                   // Hover-only marks also show while dragging or focused, so
-                  // touch and keyboard users still see them.
+                  // touch and keyboard users still see them. Focus is matched
+                  // on the track with the mark itself as the target, not with
+                  // `group-has`, which makes every insertion on the page
+                  // restyle it.
                   "transition-opacity duration-150 ease-out",
                   covered
                     ? "opacity-0"
                     : showSteps === "hover" &&
-                        "opacity-0 group-hover/slider:opacity-100 group-has-[:focus-visible]/slider:opacity-100 group-data-dragging/slider:opacity-100",
+                        "opacity-0 group-hover/slider:opacity-100 [[data-slot=slider-track]:has(:focus-visible)>&]:opacity-100 group-data-dragging/slider:opacity-100",
                   vertical
                     ? "left-1/2 -translate-x-1/2 translate-y-1/2"
                     : "top-1/2 -translate-x-1/2 -translate-y-1/2 rtl:translate-x-1/2",
@@ -537,6 +809,12 @@ function Slider({
               key={index}
               index={index}
               getAriaLabel={getAriaLabel}
+              style={
+                vertical
+                  ? { bottom: dragPosition(percent(values[index])) }
+                  : { insetInlineStart: dragPosition(percent(values[index])) }
+              }
+              data-held={held === index ? "" : undefined}
               className={cn(sliderThumbVariants({ variant }))}
             />
           ))}

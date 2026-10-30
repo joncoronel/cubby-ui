@@ -116,8 +116,10 @@ const sliderThumbVariants = cva(
           "forced-colors:before:border forced-colors:before:border-[CanvasText]",
         ],
         // An invisible hit area; the handle the user sees is drawn in the
-        // track's layers, where it can sit behind the pointer.
-        bar: "bg-transparent shadow-none hover:shadow-none has-[:focus-visible]:outline-0 forced-colors:border-0 data-[orientation=horizontal]:h-full data-[orientation=horizontal]:w-3.5 data-[orientation=vertical]:h-3.5 data-[orientation=vertical]:w-full",
+        // track's layers, where it can sit behind the pointer. It stays
+        // centered on the value, as Base UI's drag offset assumes, and is
+        // wide enough to cover the handle inset 7px to either side.
+        bar: "bg-transparent shadow-none hover:shadow-none has-[:focus-visible]:outline-0 forced-colors:border-0 data-[orientation=horizontal]:h-full data-[orientation=horizontal]:w-7 data-[orientation=vertical]:h-7 data-[orientation=vertical]:w-full",
         squareThumb:
           "h-5 w-2.5 rounded-[.125rem] data-[orientation=vertical]:h-2.5 data-[orientation=vertical]:w-5",
       },
@@ -856,19 +858,15 @@ function Slider({
               key={index}
               index={index}
               getAriaLabel={getAriaLabel}
-              // The bar's invisible thumb sits on its handle, which is inset
-              // from the value, so a press on the handle lands on the thumb.
-              style={along(
-                bar
-                  ? barHandle(index).position
-                  : dragPosition(percent(values[index])),
-              )}
+              style={along(dragPosition(percent(values[index])))}
               onFocus={(event) => {
                 if (event.target.matches(":focus-visible")) setFocused(index);
               }}
               onBlur={() => setFocused(null)}
               data-held={held === index ? "" : undefined}
-              className={sliderThumbVariants({ variant })}
+              // cn() merges the variant's overrides (bar's bg-transparent,
+              // squareThumb's size) over the base classes; cva only joins.
+              className={cn(sliderThumbVariants({ variant }))}
             />
           ))}
         </BaseSlider.Track>

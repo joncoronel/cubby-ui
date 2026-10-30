@@ -126,6 +126,11 @@ const BAND_SLOP = 8;
 const PICK_TRAVEL = 4;
 /** Share of a knob's radius around its center where drags are ignored. */
 const KNOB_DEAD_ZONE = 0.15;
+/**
+ * Pointer travel, in px, before a press counts as a drag. Below it a click's
+ * small wobble neither moves the value nor cuts the click's sweep short.
+ */
+const DRAG_THRESHOLD = 3;
 
 interface PointerGeometry {
   angle: number;
@@ -172,6 +177,11 @@ interface DragBase {
   pointerId: number;
   /** A value changed during the gesture, so release commits. */
   changed: boolean;
+  /** Where the press landed, for the drag threshold. */
+  downX: number;
+  downY: number;
+  /** Past the drag threshold. */
+  moved: boolean;
 }
 
 /** Holding one thumb; it follows the pointer at the offset it was grabbed. */
@@ -497,7 +507,13 @@ function CircularSliderRoot<Value extends SliderValue = number>({
           ? nearestThumb(dial, current, g.angle, activeIndex)
           : 0;
       const thumbProgress = valueToProgress(dial, current[index]);
-      const base = { pointerId: event.pointerId, changed: false };
+      const base = {
+        pointerId: event.pointerId,
+        changed: false,
+        downX: event.clientX,
+        downY: event.clientY,
+        moved: false,
+      };
       let drag: DragState;
 
       if (dragMode === "vertical" || variant === "knob") {
@@ -617,6 +633,15 @@ function CircularSliderRoot<Value extends SliderValue = number>({
         return;
       }
       if (drag.pointerId !== event.pointerId) return;
+      if (!drag.moved) {
+        if (
+          Math.hypot(event.clientX - drag.downX, event.clientY - drag.downY) <=
+          DRAG_THRESHOLD
+        ) {
+          return;
+        }
+        drag.moved = true;
+      }
       if (!dragging) setDragging(true);
 
       const g = measurePointer(event, size, thickness, inset);
@@ -704,6 +729,9 @@ function CircularSliderRoot<Value extends SliderValue = number>({
         held = {
           pointerId: drag.pointerId,
           changed: drag.changed,
+          downX: drag.downX,
+          downY: drag.downY,
+          moved: drag.moved,
           mode: "thumb",
           index,
           lastPointer: drag.downPointer,
@@ -1385,9 +1413,16 @@ function CircularSliderThumb({
           style={rotated(progressToAngle(dial, progresses[index]))}
         >
           {isPill ? (
-            // The pill crosses both grey track and blue arc, so an even
-            // hairline edge keeps it distinct on both.
-            <g {...thumbState(index)} className={growClasses}>
+            // The pill crosses both the track and the filled arc, so a
+            // hairline and a soft drop, as on the linear slider's thumb, keep
+            // it distinct on both, the light track included.
+            <g
+              {...thumbState(index)}
+              className={cn(
+                growClasses,
+                "[filter:drop-shadow(0_1px_1.5px_oklch(0.18_0_0/0.2))]",
+              )}
+            >
               {capsule(pillW + 1, pillH + 1, { className: "fill-black/14" })}
               {capsule(pillW, pillH, {
                 className: "fill-(--circular-slider-fill-foreground)",
@@ -1408,7 +1443,7 @@ function CircularSliderThumb({
         </g>
       ))}
       {/* Focus: a full-strength ring, edged with the page color on both
-          sides so it stays distinct where it crosses the blue arc. */}
+          sides so it stays distinct where it crosses the filled arc. */}
       {focusIndex !== null && (
         <g
           data-slot="circular-slider-thumb-focus"
@@ -1625,7 +1660,7 @@ function CircularSliderMark({
             className="transition-[rotate] duration-350 ease-(--ease-out-expo) motion-reduce:transition-none"
             style={{ ...svgRotateStyle, rotate: `${round(rotation)}deg` }}
           >
-            {/* A page-colored edge keeps the mark legible on the blue arc. */}
+            {/* A page-colored edge keeps the mark legible on the filled arc. */}
             <line
               x1={size / 2}
               x2={size / 2}

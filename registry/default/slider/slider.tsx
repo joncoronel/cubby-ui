@@ -117,9 +117,9 @@ const sliderThumbVariants = cva(
         ],
         // An invisible hit area; the handle the user sees is drawn in the
         // track's layers, where it can sit behind the pointer. It stays
-        // centered on the value, as Base UI's drag offset assumes, and is
-        // wide enough to cover the handle inset 7px to either side.
-        bar: "bg-transparent shadow-none hover:shadow-none has-[:focus-visible]:outline-0 forced-colors:border-0 data-[orientation=horizontal]:h-full data-[orientation=horizontal]:w-7 data-[orientation=vertical]:h-7 data-[orientation=vertical]:w-full",
+        // centered on the value, as Base UI's drag offset assumes; the
+        // handle inset beside it is covered in the render below.
+        bar: "bg-transparent shadow-none hover:shadow-none has-[:focus-visible]:outline-0 forced-colors:border-0 data-[orientation=horizontal]:h-full data-[orientation=horizontal]:w-3.5 data-[orientation=vertical]:h-3.5 data-[orientation=vertical]:w-full",
         squareThumb:
           "h-5 w-2.5 rounded-[.125rem] data-[orientation=vertical]:h-2.5 data-[orientation=vertical]:w-5",
       },
@@ -415,8 +415,11 @@ function Slider({
     const start = trackPosition(event.clientX, event.clientY);
     if (!start) return;
 
-    // The thumb under the pointer, or the nearest one, as Base UI picks it,
-    // and where on it the pointer took hold, so it doesn't jump to center.
+    // The thumb under the pointer, or the nearest one, picked exactly as
+    // Base UI's startPressing does, so the drawn drag and the value move the
+    // same thumb: a pressed thumb at the max yields to the first one there,
+    // and on the track a tie goes to the later thumb. The offset below keeps
+    // the thumb from jumping to center under the pointer.
     const thumb = (event.target as HTMLElement).closest(
       '[data-slot="slider-thumb"]',
     );
@@ -425,11 +428,12 @@ function Slider({
     let index = 0;
     if (thumb) {
       index = Number(thumb.getAttribute("data-index")) || 0;
+      while (index > 0 && snappedValues[index - 1] === max) index--;
     } else {
-      snappedValues.forEach((v, i) => {
+      shownRef.current.forEach((v, i) => {
         if (
-          Math.abs(thumbAt(v) - start.pos) <
-          Math.abs(thumbAt(snappedValues[index]) - start.pos)
+          Math.abs(thumbAt(v) - start.pos) <=
+          Math.abs(thumbAt(shownRef.current[index]) - start.pos)
         ) {
           index = i;
         }
@@ -599,6 +603,18 @@ function Slider({
     bar && labelReach
       ? values.map((_, index) => barHandle(index).at(labelReach.size))
       : [];
+  // A range's bar thumbs narrow as the values close, so each stops at the
+  // midpoint and neither takes a press on the other's handle. The handles
+  // stop short of the midpoint, so each stays inside its own thumb. Stacked
+  // on one value, both keep the full width, so a press lands on the top
+  // thumb, the one used last, as Base UI decides between stacked thumbs.
+  const barGapPx = labelReach ? ((last - first) * labelReach.size) / 100 : 0;
+  const barRangeThumbPx =
+    bar && isRange && labelReach
+      ? barGapPx === 0
+        ? 16
+        : Math.max(4, Math.min(16, barGapPx))
+      : null;
   // The fill's ends grow into the track's rounding as it widens, at a
   // quarter of its width, so a narrow fill keeps a square end instead of
   // reading as a small capsule, and matches the track from 32px on.
@@ -873,7 +889,13 @@ function Slider({
                       [vertical ? "left" : "top"]: 0,
                       translate: "none",
                     }
-                  : along(dragPosition(percent(values[index])))
+                  : {
+                      ...along(dragPosition(percent(values[index]))),
+                      ...(barRangeThumbPx !== null &&
+                        (vertical
+                          ? { height: barRangeThumbPx }
+                          : { width: barRangeThumbPx })),
+                    }
               }
               onFocus={(event) => {
                 if (event.target.matches(":focus-visible")) setFocused(index);
@@ -882,7 +904,14 @@ function Slider({
               data-held={held === index ? "" : undefined}
               // cn() merges the variant's overrides (bar's bg-transparent,
               // squareThumb's size) over the base classes; cva only joins.
-              className={cn(sliderThumbVariants({ variant }))}
+              className={cn(
+                sliderThumbVariants({ variant }),
+                // A lone bar handle sits up to 7px to either side of its
+                // value, so its hit area widens both ways.
+                bar &&
+                  !isRange &&
+                  "data-[orientation=horizontal]:w-7 data-[orientation=vertical]:h-7",
+              )}
             />
           ))}
         </BaseSlider.Track>

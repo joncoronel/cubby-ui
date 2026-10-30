@@ -168,6 +168,15 @@ Residual: `:root:has(.docs-root)` in `app/docs/docs.css` (~0.45ms). Could be a c
 
 Measuring: append a `<span>` inside any docs element, read `getBoundingClientRect()`, and average a batch of ~20 (one insertion is under `performance.now()` resolution). To find costly rules, delete every `:has()` rule from `document.styleSheets`, re-add each alone and probe. Restart the dev server first: Tailwind's dev build keeps classes it has seen, and markdown counts as source, so a class spelled out in a note like this one gets compiled in.
 
+#### Slider drag cost with many marks (only if needed)
+
+Each drag or glide frame re-renders the Slider. Measured 2026-10-29 in the dev build with Chrome's Performance metrics, on a slider with a mark at every step (101 marks): about 5ms per move, against 2ms with no marks (+0.8ms script, +1.8 to 2.2ms style). Within a frame, and sliders with a few marks cost next to nothing, so nothing was changed.
+
+If a dense slider ever stutters, in order of payoff:
+
+1. Register the track's grey-gradient variables with `@property … inherits: false`, under slider-specific names. They change every frame and currently restyle every mark inside the track. Needs a slider CSS file in the registry item. The bar's fill-start and fill-end variables must keep inheriting, since the fill layer reads them.
+2. Memoize the marks as a small component, so only marks the fill crosses re-render.
+
 ### Code hygiene
 
 #### Placeholder ellipsis: "..." or "…"

@@ -301,6 +301,39 @@ describe("placeRangeThumb", () => {
     it("stops at the gap without push", () => {
       expect(placeRangeThumb(clock, [6, 7], 0, 8, 1, "none")).toEqual([6, 7]);
     });
+
+    it("places between steps without snap, folding past the seam", () => {
+      const quarter = createDial({
+        ...base,
+        max: 24,
+        step: 0.25,
+        sweep: 360,
+        wrap: true,
+      });
+      const [start, end] = placeRangeThumb(
+        quarter,
+        [22, 7],
+        1,
+        6.1,
+        0,
+        "push",
+        false,
+      );
+      expect(start).toBe(22);
+      expect(end).toBeCloseTo(6.1);
+      expect(
+        placeRangeThumb(quarter, [22, 7], 0, 24.3, 0, "push", false)[0],
+      ).toBeCloseTo(0.3);
+    });
+  });
+
+  it("places between steps without snap on a dial that doesn't wrap", () => {
+    expect(placeRangeThumb(dial, [20, 60], 0, 33.7, 0, "push", false)).toEqual([
+      33.7, 60,
+    ]);
+    expect(placeRangeThumb(dial, [20, 60], 0, 61.2, 0, "push", false)).toEqual([
+      61.2, 61.2,
+    ]);
   });
 });
 

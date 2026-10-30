@@ -259,19 +259,24 @@ function Slider({
   const [uncontrolledValues, setUncontrolledValues] = React.useState(() =>
     defaultValue !== undefined ? toValues(defaultValue, min, max) : [min],
   );
-  const snappedValues =
-    value !== undefined ? toValues(value, min, max) : uncontrolledValues;
+  // Clamped on every render, so a new `min` or `max` pulls an uncontrolled
+  // value in, as Base UI's own does.
+  const snappedValues = toValues(value ?? uncontrolledValues, min, max);
 
   // While dragging, the thumb and fill follow the pointer itself, so coarse
   // steps drag as smoothly as fine ones. The value still snaps; the thumb
   // settles onto its step on release, and glides to a clicked spot.
   const trackRef = React.useRef<HTMLDivElement>(null);
   const pointerRef = React.useRef<{
+    id: number;
     index: number;
     offset: number;
     x: number;
     y: number;
     moved: boolean;
+    // The caller cancelled a change during this press; the thumb waits at
+    // the kept value until one is accepted.
+    rejected: boolean;
   } | null>(null);
   const stopPointerRef = React.useRef<(() => void) | null>(null);
   const glideFrame = React.useRef(0);
@@ -430,17 +435,21 @@ function Slider({
     }
     setHeld(index);
     pointerRef.current = {
+      id: event.pointerId,
       index,
       offset: thumb ? start.pos - thumbAt(shownRef.current[index]) : 0,
       x: event.clientX,
       y: event.clientY,
       moved: false,
+      rejected: false,
     };
 
+    // Only the pointer that pressed drives the drag, so a second finger
+    // elsewhere neither moves nor ends it.
     const doc = event.currentTarget.ownerDocument;
     const move = (e: PointerEvent): void => {
       const pointer = pointerRef.current;
-      if (!pointer) return;
+      if (!pointer || e.pointerId !== pointer.id) return;
       if (!pointer.moved) {
         if (
           Math.hypot(e.clientX - pointer.x, e.clientY - pointer.y) <=
@@ -451,6 +460,7 @@ function Slider({
         pointer.moved = true;
         stopGliding();
       }
+      if (pointer.rejected) return;
       const now = trackPosition(e.clientX, e.clientY);
       if (!now) return;
       const fraction = Math.min(
@@ -475,7 +485,8 @@ function Slider({
       doc.removeEventListener("pointercancel", end);
       stopPointerRef.current = null;
     };
-    const end = (): void => {
+    const end = (e: PointerEvent): void => {
+      if (e.pointerId !== pointerRef.current?.id) return;
       stop();
       const moved = pointerRef.current?.moved;
       pointerRef.current = null;
@@ -650,7 +661,14 @@ function Slider({
 
   const handleValueChange: SliderProps["onValueChange"] = (next, details) => {
     onValueChange?.(next, details);
-    if (details.isCanceled) return;
+    if (details.isCanceled) {
+      if (pointerRef.current) {
+        pointerRef.current.rejected = true;
+        setDrag(null);
+      }
+      return;
+    }
+    if (pointerRef.current) pointerRef.current.rejected = false;
     if (value === undefined) setUncontrolledValues(toValues(next, min, max));
     if (pointerRef.current && details.activeThumbIndex >= 0) {
       pointerRef.current.index = details.activeThumbIndex;

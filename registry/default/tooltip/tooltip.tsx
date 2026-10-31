@@ -3,7 +3,7 @@ import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip";
 
 import { cn } from "@/lib/utils";
 import {
-  CHROME_SURFACE,
+  INVERSE_SURFACE,
   solidSurface,
   type SurfaceLevel,
 } from "@/registry/default/lib/elevated";
@@ -58,8 +58,8 @@ function TooltipArrow({
 
 /**
  * Surface treatment, as a union so the compiler rejects the impossible pair.
- * `chrome` is the near-black fill in both themes, for labels that read as
- * instrument rather than page. It sits off the elevation ladder, so `level` and
+ * `inverse` flips the page: a charcoal label in light, near-white in dark. It
+ * sits off the elevation ladder, so `level` and
  * `shadowLevel` would have nothing to select and are refused rather than
  * silently dropped.
  */
@@ -71,7 +71,7 @@ type TooltipSurfaceProps =
       /** Shadow weight (1-8). Pinned to 2 by default so tooltips read as quiet/subtle. */
       shadowLevel?: SurfaceLevel;
     }
-  | { variant: "chrome"; level?: never; shadowLevel?: never };
+  | { variant: "inverse"; level?: never; shadowLevel?: never };
 
 function TooltipContent({
   children,
@@ -104,7 +104,7 @@ function TooltipContent({
   arrowPadding?: number;
   container?: HTMLElement | undefined;
 } & TooltipSurfaceProps) {
-  const isChrome = variant === "chrome";
+  const isInverse = variant === "inverse";
   return (
     <TooltipPortal container={container}>
       <BaseTooltip.Positioner
@@ -125,8 +125,8 @@ function TooltipContent({
           data-variant={variant}
           // No level to report off the ladder. The popup carries the attribute
           // itself because portalled content can't inherit the page's.
-          data-level={isChrome ? undefined : level}
-          data-surface={isChrome ? "chrome" : undefined}
+          data-level={isInverse ? undefined : level}
+          data-surface={isInverse ? "inverse" : undefined}
           className={cn(
             // `relative` matches Popover and pins the arrow's containing block.
             // Without it the popup is a containing block only while `scale` is
@@ -134,12 +134,10 @@ function TooltipContent({
             // an absolutely positioned arrow would change reference frame
             // partway through the open.
             "relative h-(--popup-height,auto) max-h-(--available-height) w-(--popup-width,auto) max-w-(--available-width) origin-(--transform-origin) rounded-sm text-xs outline-none",
-            // The chrome rule re-points --foreground but deliberately leaves
-            // the popover/card pair alone, so chrome reads the former.
-            isChrome ? "text-foreground" : "text-popover-foreground",
-            // Fill only — `shadow-(--chrome-shadow)` is the opt-in edge, which a
-            // header bar needs and a two-line label does not.
-            isChrome ? CHROME_SURFACE : solidSurface(level, shadowLevel),
+            // The inverse rule re-points --foreground but deliberately leaves
+            // the popover/card pair alone, so inverse reads the former.
+            isInverse ? "text-foreground" : "text-popover-foreground",
+            isInverse ? INVERSE_SURFACE : solidSurface(level, shadowLevel),
             // No directional translate: the popup scales from
             // --transform-origin, which Base UI aims back at the trigger, so
             // the growth already reads as coming from the anchor. A per-side

@@ -62,27 +62,26 @@ Without a `TooltipProvider` there is no shared timing and no instant-reopen wind
 
 ## Examples
 
-### Chrome Surface
+### Inverse Surface
 
-Set `variant="chrome"` for a near-black tooltip in both light and dark. Use it
-for labels that belong to persistent app chrome, like a header bar or a
-floating toolbar, where a tooltip that borrows the page surface reads as part
-of the page rather than part of the control.
+Set `variant="inverse"` for a tooltip that flips the page: charcoal in light,
+near-white in dark. Use it when a label has to stand clear of whatever it
+floats over, where a tooltip that borrows the page surface would blend in.
 
-<ComponentPreview component="tooltip" example="tooltip-chrome" />
+<ComponentPreview component="tooltip" example="tooltip-inverse" />
 
-The chrome surface sits off the [elevation ladder](/docs/getting-started/surfaces), so `level` and `shadowLevel` have no effect on it. It also carries no edge: the chrome edge is an opt-in `shadow-(--chrome-shadow)` that larger containers add, and on a label two lines tall it is more boundary than there is object. A tooltip already carries its shape through its text and arrow.
+The inverse surface sits off the [elevation ladder](/docs/getting-started/surfaces), so `level` and `shadowLevel` have no effect on it. It carries no shadow either: the fill stands well clear of the page in both themes, so it needs none.
 
-It brings its own palette with it: text, muted text, borders, form-field fills and hover washes inside the tooltip resolve against the dark fill, so ordinary classes like `text-muted-foreground` keep working.
+It brings its own palette with it: text, muted text, borders, muted chips and Kbd hints inside the tooltip resolve against the inverted fill, so ordinary classes like `text-muted-foreground` keep working.
 
 ```tsx
-<TooltipContent variant="chrome">
+<TooltipContent variant="inverse">
   <p>Notifications</p>
-  <p className="text-muted-foreground">Reads correctly on the dark fill</p>
+  <p className="text-muted-foreground">Reads correctly on the inverted fill</p>
 </TooltipContent>
 ```
 
-The same surface is available to your own containers. Put `data-surface="chrome"` on any element and use `bg-chrome` for the fill, and everything inside paints against it with no per-control classes.
+The same surface is available to your own floating labels. Put `data-surface="inverse"` on the element and use `bg-neutral` for the fill, and everything inside paints against it with no per-control classes.
 
 ### Detached Trigger
 
@@ -236,12 +235,13 @@ Composed component for common tooltip layouts. Combines `Tooltip.Portal`, `Toolt
 
 <ApiProp
   name="variant"
-  fullType="'default' | 'chrome'"
+  fullType="'default' | 'inverse'"
   defaultValue='"default"'
 >
   Surface treatment. `default` sits on the elevation ladder and takes its color
-  from the page. `chrome` is a near-black fill in both themes, for labels
-  attached to persistent app chrome. `chrome` ignores `level` and `shadowLevel`.
+  from the page. `inverse` flips the page, charcoal in light and near-white in
+  dark, for labels that must stand clear. `inverse` ignores `level` and
+  `shadowLevel`.
 </ApiProp>
 
 <ApiProp name="level" fullType="1 | 2 | 3 | 4 | 5 | 6 | 7 | 8" defaultValue="2">

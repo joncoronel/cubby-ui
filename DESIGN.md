@@ -17,7 +17,7 @@ colors:
   secondary: "oklch(0.93 0 0)"
   secondary-foreground: "oklch(0.32 0.004 270)"
   muted: "oklch(0.95 0 0)"
-  neutral: "oklch(0.3 0.004 270)"
+  neutral: "oklch(0.29 0.004 270)"
   neutral-foreground: "oklch(0.98 0.002 270)"
   emphasis: "oklch(0.45 0.004 270)"
   emphasis-foreground: "oklch(1 0 0)"
@@ -41,7 +41,7 @@ colors:
   dark-surface-3: "oklch(0.264 0.004 270)"
   dark-foreground: "oklch(0.94 0.004 270)"
   dark-muted-foreground: "oklch(0.73 0.004 270)"
-  dark-chrome: "oklch(0.159 0.004 270)"
+  dark-docs-frame: "oklch(0.14 0.002 270)"
   landing-field: "oklch(0.5 0.14 232.65)"
   landing-on-field: "oklch(0.985 0.008 232.65)"
   landing-on-field-muted: "oklch(0.9 0.04 232.65)"
@@ -244,7 +244,7 @@ This system is the docs world. The landing page (`app/(home)`) is deliberately i
 - Bricolage Grotesque (optical-size axis) for h1 to h3 and the wordmark; Geist for body and UI; Geist Mono for code.
 - An 8-rung surface ladder with matching shadow and rim recipes; state overlays are translucent deltas.
 - Hairline structure at 10% foreground; lighter 7% lines inside rows.
-- A near-black chrome surface, off the ladder, in both themes.
+- An inverse surface off the ladder: the neutral fill, charcoal in light and near-white in dark.
 
 ## Colors
 
@@ -267,7 +267,7 @@ A cool, faintly violet-tinted neutral stack with a single bright sky blue, expre
 - **Off Grey** (`--control-off`, 15% black / 15% white in dark, deeper on hover): the one resting colour for on/off controls. The Switch track fills with it; unchecked Checkbox and Radio draw a 2px inset ring of it around a white middle (the surface itself in dark). None of the three takes a surface `variant`.
 - **Emphasis Grey** (`{colors.emphasis}` / dark `{colors.dark-emphasis}`, label `{colors.emphasis-foreground}`): emphasis in the neutral family. Checked checkboxes and radios, the switch, slider and progress fills, the tab capsule, pressed toggle-group items and the current page; also the medium-weight `tonal` Button, between `secondary` and `neutral`.
 - **Hairline** (`{colors.border}`): the default 1px rule, re-derived in dark from dark ink.
-- **Chrome Black** (`{colors.neutral}` light, `{colors.dark-chrome}` dark): persistent instrument chrome and the solid neutral button in light. Its foreground is `{colors.neutral-foreground}`; its muted text, hover, and border are 71%, 10%, and 12% mixes of that foreground.
+- **Neutral** (`{colors.neutral}`, near-white in dark): the solid neutral button and the inverse surface (the `inverse` tooltip and toast). Its foreground is `{colors.neutral-foreground}`; on the inverse surface its muted text, hover, and border are 71%, 10%, and 12% mixes of that foreground.
 
 ### Status
 - **Destructive** (`{colors.destructive}`): destructive button fills only.
@@ -278,7 +278,7 @@ A cool, faintly violet-tinted neutral stack with a single bright sky blue, expre
 
 **The Mix-Not-Pick Rule.** New tints are derived, not picked: color-mix of ink or blue into transparent at the established steps (2.5%, 3.5%, 4%, 7%, 9%, 10%, 16%, 24%, 35%, 40%). A new hard-coded gray is a defect.
 
-**The Chrome Is Below Rule.** The chrome surface is near-black in both themes and sits off the ladder: in dark it goes below the page (0.159 against 0.205), because up is where cards live. Paint on it only through `data-surface="chrome"`, which re-points ink, muted, border, input, and hover tokens for the whole subtree.
+**The Inverse Is Transient Rule.** The inverse surface flips the page (the neutral fill: charcoal in light, near-white in dark) and sits off the ladder. It is for transient floating surfaces, ones that dismiss themselves (tooltips and toasts), never persistent bars or surfaces you work inside, where a near-white slab in dark outshines the page. Paint on it only through `data-surface="inverse"`, which re-points ink, muted, border, button, and status-icon tokens for the whole subtree.
 
 ## Typography
 
@@ -304,7 +304,7 @@ A cool, faintly violet-tinted neutral stack with a single bright sky blue, expre
 
 ## Layout
 
-The docs page is a card set in a frame. The frame (`--docs-frame`: oklch 0.925 in light, the chrome near-black in dark) holds the header; the card keeps the page color (`--background`), so components sit on the background they were designed for. The card is inset 8px (12px from sm up) on the sides and bottom, starts under the 56px header, and has a 16px (20px) radius and no edge line: the frame's color around it draws its shape. The document still scrolls natively: two fixed layers draw the card fill behind the content and the frame in front of it (a rounded rectangle with a 100vmax spread shadow in the frame color), so content reads as scrolling inside the card while scroll restoration, anchors, and the mobile URL bar keep working. No layer is sized from both its top and bottom edge: Chrome on Android resolves those against a different viewport height while the URL bar slides, so the fill and the frame's top and sides are pinned to the top at `100lvh` (they never resize) and the bottom edge is its own bottom-pinned strip, which moves with the URL bar. The shelf opens over the card: a sheet across its top below md, a floating window inset 0.5rem from md up. One centered column. Everything, previews included, sits in one `{spacing.content}` (48rem) column; nothing breaks out wider, so every block shares both edges. Header and shelf content share a `{spacing.chrome-max}` (76rem) container with 1.25rem to 2rem side padding. The sticky header is `{spacing.header-height}` (56px) and scroll padding is 5rem.
+The docs page is a card set in a frame. The frame (`--docs-frame`: oklch 0.925 in light, `{colors.dark-docs-frame}` in dark, the same 0.065 step below the page in both) holds the header; the card keeps the page color (`--background`), so components sit on the background they were designed for. The card is inset 8px (12px from sm up) on the sides and bottom, starts under the 56px header, and has a 16px (20px) radius and no edge line: the frame's color around it draws its shape. The document still scrolls natively: two fixed layers draw the card fill behind the content and the frame in front of it (a rounded rectangle with a 100vmax spread shadow in the frame color), so content reads as scrolling inside the card while scroll restoration, anchors, and the mobile URL bar keep working. No layer is sized from both its top and bottom edge: Chrome on Android resolves those against a different viewport height while the URL bar slides, so the fill and the frame's top and sides are pinned to the top at `100lvh` (they never resize) and the bottom edge is its own bottom-pinned strip, which moves with the URL bar. The shelf opens over the card: a sheet across its top below md, a floating window inset 0.5rem from md up. One centered column. Everything, previews included, sits in one `{spacing.content}` (48rem) column; nothing breaks out wider, so every block shares both edges. Header and shelf content share a `{spacing.chrome-max}` (76rem) container with 1.25rem to 2rem side padding. The sticky header is `{spacing.header-height}` (56px) and scroll padding is 5rem.
 
 Vertical rhythm is set by the container, not the blocks: siblings flow at `{spacing.flow}`; any component block (preview, table, note) takes `{spacing.block}` above and below; h2 takes `{spacing.headline-above}` above, h3 `{spacing.title-above}`, h4 to h6 2.25rem; the gap after h2 and h3 is `{spacing.heading-below}`, after h4 0.5rem. The page footer sits 6rem below content. Lists indent 1.25rem with 0.375rem between items.
 
@@ -315,15 +315,14 @@ The table of contents is a fixed tick minimap in the right margin at the xl brea
 A hybrid, kept soft: light mode keeps fills neutral and communicates elevation with layered shadow under a faint edge (ring 4.5%; contact and mid 6%, far 5%, ambient 4%), since a crisp line reads as a border while the blurred drops carry the lift; dark mode steps lightness up the tinted ladder, adds an inset top-edge highlight and ring, and uses darker, tighter shadow alphas so wide layers stay visible; its outer black ring climbs from 8% at rung 3 to 18% at rung 8. Every rung is one shadow token plus one rim token, combined as `--surface-shadow-combined-N`. State overlays (`--surface-hover` 6%, `--surface-active` 8%, `--surface-selected` 10%, black in light, white in dark) raise whatever they sit on by a fixed perceptual delta.
 
 ### Shadow Vocabulary
-- **Hairline ring** (`box-shadow: 0 0 0 1px oklch(0 0 0 / 0.045)`, rung 1): flush containers that need an edge without lift; also the light chrome edge.
+- **Hairline ring** (`box-shadow: 0 0 0 1px oklch(0 0 0 / 0.045)`, rung 1): flush containers that need an edge without lift.
 - **Resting card** (rung 3: `0 0 0 1px oklch(0 0 0 / 0.045), 0 1px 1px -0.5px oklch(0 0 0 / 0.06), 0 3px 3px -1.5px oklch(0 0 0 / 0.06)`): cards at rest. Fields take no shadow; their fill is their definition.
 - **Floating** (rungs 5 to 8, adding 12px, 24px, 48px, and 96px layers at 0.05 to 0.04 alpha): popovers, dialogs, menus.
 - **Docs float** (`0 0 0 1px var(--border), 0 16px 40px -12px oklch(0 0 0 / 0.14)`, dark 0.5): menus and the minimap's PreviewCard use the component's own surface. The shelf window takes its fill and shadow from the surface ladder (`solidSurface(3, 5)`), like the other floating controls.
-- **Dark chrome edge** (`0 0 0 1px oklch(0 0 0 / 0.7), inset 0 1px 0 0 oklch(1 0 0 / 0.065)`): defines the chrome fill against a dark page.
 - **Stage outline** (`0 0 0 1px var(--border)`): previews are drawn, not lifted.
 
 ### Named Rules
-**The Ladder Rule.** Elevation is chosen from the ladder, never hand-written. A floating chrome surface is built from the near, mid, and far shadow alphas with no ladder ring, because rungs 3 to 8 carry their own ring.
+**The Ladder Rule.** Elevation is chosen from the ladder, never hand-written.
 
 **The Fill-Not-Stroke Rule.** A control or plate is set apart by its fill, not by a hard border. Fields fill with the translucent field tint, alerts and accordions with the muted plate, status badges with their own plate; each keeps a 1px transparent border only so its geometry matches its bordered siblings. Checkboxes and radios keep their borders on purpose: an empty box needs an edge to read as a box. The outline variants are the one place a control draws a visible edge, and it is the soft outline edge, never a darker one.
 
@@ -342,7 +341,7 @@ Tactile and small. Paint lives on a `::before` layer so press can scale it witho
 - **Shape:** gently rounded (`{rounded.lg}`); xs and icon_xs sizes drop to 10px.
 - **Sizes:** default 36px tall with a mouse, one step up (40px) on touch screens and below sm; sm 32px, lg 40px, xs 28px, each a step up the same way. Field text is 16px on touch and below sm, 14px otherwise; 14px inline padding.
 - **Primary:** `{colors.primary}` fill, white label. Hover mixes 5% black (light) or 10% white (dark); pressed goes one step further (8% / 14%).
-- **Outline:** the Recessed Outline fill and edge (card and hairline in light; 30% black with an 8% white edge in dark), hover and press darkening 4% and 7% in light or lifting with 3% and 5% white in dark; **Outline-ghost:** the outline edge over a transparent fill, washed with surface-hover; **Link:** a Sky Ink label, underlined on hover; **Ghost:** Quiet Ink label brightening to ink on a surface-hover wash; **Neutral:** the chrome-black fill that lightens on hover; **Primary-soft / Destructive-soft:** accent-colored label on the Plate Gray plate.
+- **Outline:** the Recessed Outline fill and edge (card and hairline in light; 30% black with an 8% white edge in dark), hover and press darkening 4% and 7% in light or lifting with 3% and 5% white in dark; **Outline-ghost:** the outline edge over a transparent fill, washed with surface-hover; **Link:** a Sky Ink label, underlined on hover; **Ghost:** Quiet Ink label brightening to ink on a surface-hover wash; **Neutral:** the charcoal fill that lightens on hover; **Primary-soft / Destructive-soft:** accent-colored label on the Plate Gray plate.
 - **Hover / Focus:** 100ms ease-out on color and fill; press scales the paint to 0.98; focus draws the shared solid 2px ring (see Inputs / Fields).
 
 ### Inputs / Fields
@@ -449,7 +448,7 @@ A block with a header (package-manager or file tabs) sits in the muted tray; a b
 - **Do** design dark explicitly: re-declare derived tokens in `.dark` so they resolve against dark roots.
 
 ### Don't:
-- **Don't** raise the chrome surface with a ladder rung or paint chrome controls by hand; use `data-surface="chrome"`.
+- **Don't** raise the inverse surface with a ladder rung or paint its controls by hand; use `data-surface="inverse"`.
 - **Don't** add a second accent hue outside status plates.
 - **Don't** use elastic or bouncy easing on controls.
 - **Don't** use neon glows, gradient meshes, or cool-AI dark-mode effects; the only gradients are the stage's 3.5% light and the edge-fade masks on scrolling rows.

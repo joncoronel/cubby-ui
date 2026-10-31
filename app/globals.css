@@ -44,8 +44,8 @@ html {
   --primary-soft-foreground: color-mix(in oklch, var(--primary), black 25%);
   /* Carries the tint, unlike the other light fills: a pure-neutral black beside
      --foreground's faintly cool one reads as two blacks rather than one black at
-     two weights. Also the light --chrome fill. */
-  --neutral: oklch(0.3 var(--neutral-chroma) var(--neutral-hue));
+     two weights. Also the inverse surface's fill. */
+  --neutral: oklch(0.29 var(--neutral-chroma) var(--neutral-hue));
   --neutral-foreground: oklch(
     0.98 var(--neutral-chroma-low) var(--neutral-hue)
   );
@@ -64,37 +64,6 @@ html {
   );
   /* Same idea for `destructive-soft`'s label on its tinted plate. */
   --destructive-soft-foreground: var(--destructive);
-
-  /* ── Chrome surface ──────────────────────────────────────────────────────
-     Near-black in BOTH themes, deliberately OFF the elevation ladder. For
-     persistent app chrome (a header bar) and for floating labels that should
-     read as instrument rather than page. Not "inverse": a white slab in dark
-     would sit at ~116x the page's luminance, in chrome you can't scroll away.
-
-     Light borrows --neutral, so this fill and the solid `neutral` Button are
-     one black; retuning that token moves both.
-
-     Paint on it with `data-surface="chrome"` (the unlayered rule below), not
-     by hand. Every token is re-declared in .dark, derived ones included: a
-     custom property substitutes its var()s where DECLARED, so derived tokens
-     living only here resolve against LIGHT roots under a subtree .dark. */
-  --chrome: var(--neutral);
-  --chrome-foreground: var(--neutral-foreground);
-  --chrome-muted-foreground: color-mix(
-    in oklab,
-    var(--chrome-foreground) 71%,
-    var(--chrome)
-  );
-  --chrome-hover: color-mix(
-    in oklab,
-    var(--chrome-foreground) 10%,
-    transparent
-  );
-  --chrome-border: color-mix(
-    in oklab,
-    var(--chrome-foreground) 12%,
-    transparent
-  );
 
   /* Hover colours shift AWAY from the token's own lightness so the change always
      reads. Most light tokens darken, but --neutral is already dark and barely
@@ -160,6 +129,14 @@ html {
   --info-border: oklch(0.9 0.07 232.65);
   --success: oklch(0.97 0.04 145);
   --success-foreground: oklch(0.48 0.18 145);
+
+  /* The inverse surface is dark here, so it borrows the dark theme's status
+     inks and outline edge. Read only by [data-surface="inverse"]. */
+  --inverse-danger-foreground: oklch(0.75 0.15 25);
+  --inverse-warning-foreground: oklch(0.78 0.12 85);
+  --inverse-info-foreground: oklch(0.78 0.13 232.65);
+  --inverse-success-foreground: oklch(0.72 0.15 145);
+  --inverse-outline-border: oklch(1 0 0 / 0.08);
   --success-border: oklch(0.9 0.1 145);
 
   /* Surface elevation ladder. Light stays neutral and lets shadow alone carry
@@ -256,19 +233,6 @@ html {
   --surface-shadow-combined-6: var(--surface-shadow-6), var(--surface-rim-6);
   --surface-shadow-combined-7: var(--surface-shadow-7), var(--surface-rim-7);
   --surface-shadow-combined-8: var(--surface-shadow-8), var(--surface-rim-8);
-
-  /* The chrome edge, applied with `shadow-(--chrome-shadow)`. A BOX-SHADOW
-     value, hence the name; re-declared in .dark for the same reason --border is.
-
-     Light needs no edge of its own, the fill lands 16.3:1 against the page, so
-     this is just the ladder's ring-without-drop rung, which keeps the surface
-     flush rather than raised. Dark is where it does the work.
-
-     Don't split it back into hairline/rim tokens: nothing recomposes them, and
-     a colour written into one silently voids the WHOLE box-shadow. Don't add an
-     inner --chrome-drop to swap the middle layer per element either — measured,
-     and it can't work, since this resolves on <html> (same trap as --border). */
-  --chrome-shadow: var(--surface-shadow-1);
 }
 
 .dark {
@@ -295,30 +259,6 @@ html {
     in oklch,
     var(--destructive),
     white 30%
-  );
-
-  /* ── Chrome surface ──────────────────────────────────────────────────────
-     BELOW the page, the only direction dark leaves open: up is where every card
-     lives, so a lifted near-black slab read as one more card. --neutral inverts
-     to near-white here for the Button, so only chroma and hue carry over. */
-  --chrome: oklch(0.159 var(--neutral-chroma) var(--neutral-hue));
-  --chrome-foreground: var(--foreground);
-  /* Re-resolved against dark's roots. See the :root block for why the derived
-     tokens cannot be declared once. */
-  --chrome-muted-foreground: color-mix(
-    in oklab,
-    var(--chrome-foreground) 71%,
-    var(--chrome)
-  );
-  --chrome-hover: color-mix(
-    in oklab,
-    var(--chrome-foreground) 10%,
-    transparent
-  );
-  --chrome-border: color-mix(
-    in oklab,
-    var(--chrome-foreground) 12%,
-    transparent
   );
 
   /* Dark hover — mix toward white so hovered buttons brighten. */
@@ -370,6 +310,19 @@ html {
   --info-border: oklch(0.36 0.09 232.65);
   --success: oklch(0.26 0.07 145);
   --success-foreground: oklch(0.72 0.15 145);
+
+  /* The inverse surface is light here, so it borrows the light theme's inks
+     and outline edge. Literals, because light's --foreground is not
+     reachable from here. */
+  --inverse-danger-foreground: oklch(0.55 0.18 25);
+  --inverse-warning-foreground: oklch(0.58 0.14 85);
+  --inverse-info-foreground: oklch(0.5 0.13 232.65);
+  --inverse-success-foreground: oklch(0.48 0.18 145);
+  --inverse-outline-border: color-mix(
+    in oklab,
+    oklch(0.3 var(--neutral-chroma) var(--neutral-hue)) 10%,
+    transparent
+  );
   --success-border: oklch(0.36 0.11 145);
 
   /* Surface ladder — progressive lightness with brand-hue tint */
@@ -477,23 +430,6 @@ html {
   --surface-shadow-combined-6: var(--surface-shadow-6), var(--surface-rim-6);
   --surface-shadow-combined-7: var(--surface-shadow-7), var(--surface-rim-7);
   --surface-shadow-combined-8: var(--surface-shadow-8), var(--surface-rim-8);
-
-  /* Not polish in dark — this IS the surface: the fill lands rgb 12 against a
-     page at rgb 22, a ratio of 1.08:1. (Light gets 15.96:1, hence nothing there.)
-
-     Boundary first, then the top-edge specular — the ladder lights from above
-     (every --surface-rim-* is `inset 0 1px 0 0`) and without it this reads as a
-     hole punched in the page. Neither layer comes from the ladder: --surface-rim-*
-     and the ring inside --surface-shadow-* both assume a fill LIGHTER than the
-     page, so the ladder's ring lands lighter than the fill it should define.
-
-     A floating chrome surface is NOT this plus a ladder rung. Rungs 3-8 bake in
-     their own ring, which would sit under this hairline, and the composed form
-     can only be written as `shadow-[...]`, which tailwind-merge files under
-     shadow-COLOR so `shadow-none` stops overriding. Build one from
-     --surface-shadow-near/-mid/-far with no ladder ring. */
-  --chrome-shadow:
-    0 0 0 1px oklch(0 0 0 / 0.7), inset 0 1px 0 0 oklch(1 0 0 / 0.065);
 }
 
 @theme inline {
@@ -526,9 +462,6 @@ html {
   --color-emphasis: var(--emphasis);
   --color-emphasis-foreground: var(--emphasis-foreground);
   --color-neutral: var(--neutral);
-  /* Only the fill gets a utility; the rest of the palette reaches controls
-     through `[data-surface="chrome"]`, deliberately the one way to paint here. */
-  --color-chrome: var(--chrome);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -645,41 +578,67 @@ html {
   }
 }
 
-/* Hands the chrome palette to the whole subtree, so controls keep using ordinary
-   page classes instead of being repainted one at a time. --primary is left alone
-   so a primary Button keeps its brand fill. Portalled content renders at the body
-   and correctly does NOT inherit this; a floating component that wants the look
-   carries the attribute itself, as `Tooltip variant="chrome"` does.
+/* Hands the inverse palette to the whole subtree, so controls keep using
+   ordinary page classes instead of being repainted one at a time. The fill is
+   --neutral in both themes (charcoal in light, near-white in dark), the same
+   fill as the solid `neutral` Button, so retuning that token moves both.
+   --primary is left alone so a primary Button keeps its brand fill.
+
+   For transient floating surfaces, ones that dismiss themselves: tooltips and
+   toasts. Not for persistent bars or surfaces you work inside: a near-white
+   slab in dark is far brighter than the page, in a spot you can't scroll away.
+
+   Portalled content renders at the body and correctly does NOT inherit this; a
+   floating component that wants the look carries the attribute itself, as
+   `Tooltip variant="inverse"` and the inverse toast do.
+
+   The derived colours are declared HERE, not on :root: a custom property
+   substitutes its var()s where it is declared, so tokens living on :root would
+   resolve against LIGHT roots under a subtree .dark. Here they read whichever
+   --neutral the element inherits.
 
    Unlayered on purpose. `.dark` is unlayered, and unlayered declarations beat
    layered ones regardless of specificity, so from `@layer base` this lost to
    `.dark` on any element carrying both.
 
-   Each re-pointed fill needs its foreground beside it, or a control pairs a
-   chrome background with a page text colour. --input is here for the reverse
-   case: Input and Textarea set a background but inherit their colour, so
-   without it they paint --chrome-foreground on a white fill. */
-[data-surface="chrome"] {
-  --foreground: var(--chrome-foreground);
-  --muted-foreground: var(--chrome-muted-foreground);
-  --border: var(--chrome-border);
-  --muted: var(--chrome-hover);
-  --accent: var(--chrome-hover);
-  --accent-foreground: var(--chrome-foreground);
-  --input: var(--chrome-hover);
-  --surface-hover: var(--chrome-hover);
-  --surface-active: var(--chrome-hover);
-  --control-off: color-mix(in oklab, var(--chrome-foreground) 22%, transparent);
-  --control-off-hover: color-mix(
+   Each re-pointed fill needs its foreground beside it, or a control pairs an
+   inverse background with a page text colour. Status inks and the outline
+   edge come from the OTHER theme (the --inverse-* tokens), so they look like
+   the library's own, not like new colours. The set covers what a tooltip
+   or toast holds: text, chips, dividers, ghost and outline buttons, and status
+   icons. Form fields and selection controls are left out on purpose; they
+   don't belong on a surface that dismisses itself. */
+[data-surface="inverse"] {
+  --foreground: var(--neutral-foreground);
+  --muted-foreground: color-mix(
     in oklab,
-    var(--chrome-foreground) 28%,
+    var(--neutral-foreground) 71%,
+    var(--neutral)
+  );
+  --border: color-mix(in oklab, var(--neutral-foreground) 12%, transparent);
+  --muted: color-mix(in oklab, var(--neutral-foreground) 10%, transparent);
+  --accent: color-mix(in oklab, var(--neutral-foreground) 10%, transparent);
+  --accent-foreground: var(--neutral-foreground);
+  --surface-hover: color-mix(
+    in oklab,
+    var(--neutral-foreground) 10%,
     transparent
   );
-  --control-track: color-mix(
+  --surface-active: color-mix(
     in oklab,
-    var(--chrome-foreground) 12%,
+    var(--neutral-foreground) 14%,
     transparent
   );
+  /* Outline drops its fill and takes the washes, so it reads as the
+     `outline-ghost` Button: a solid chip inside a filled toast clashes. */
+  --outline: transparent;
+  --outline-border: var(--inverse-outline-border);
+  --outline-hover: var(--surface-hover);
+  --outline-active: var(--surface-active);
+  --danger-foreground: var(--inverse-danger-foreground);
+  --warning-foreground: var(--inverse-warning-foreground);
+  --info-foreground: var(--inverse-info-foreground);
+  --success-foreground: var(--inverse-success-foreground);
 }
 
 /* Platform-specific hints: <html data-platform> is set by an inline script in

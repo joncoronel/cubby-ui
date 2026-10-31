@@ -105,12 +105,12 @@
       },
       "neutral": {
         "role": "neutral",
-        "displayName": "Chrome Black",
-        "canonical": "oklch(0.3 0.004 270)"
+        "displayName": "Charcoal",
+        "canonical": "oklch(0.29 0.004 270)"
       },
       "neutral-foreground": {
         "role": "neutral",
-        "displayName": "On Chrome",
+        "displayName": "On Charcoal",
         "canonical": "oklch(0.98 0.002 270)"
       },
       "border": {
@@ -213,10 +213,10 @@
         "displayName": "Dark Quiet Ink",
         "canonical": "oklch(0.73 0.004 270)"
       },
-      "dark-chrome": {
+      "dark-docs-frame": {
         "role": "neutral",
-        "displayName": "Dark Chrome",
-        "canonical": "oklch(0.159 0.004 270)"
+        "displayName": "Dark Docs Frame",
+        "canonical": "oklch(0.14 0.002 270)"
       },
       "landing-field": {
         "role": "primary",
@@ -316,7 +316,7 @@
       {
         "name": "surface-shadow-1",
         "value": "0 0 0 1px oklch(0 0 0 / 0.045)",
-        "purpose": "Hairline ring; flush containers, the light chrome edge, landing gallery trays."
+        "purpose": "Hairline ring; flush containers, landing gallery trays."
       },
       {
         "name": "surface-shadow-3",
@@ -342,11 +342,6 @@
         "name": "dark-rim-3",
         "value": "inset 0 1px 0 0 oklch(1 0 0 / 0.02), inset 0 0 0 1px oklch(1 0 0 / 0.02)",
         "purpose": "Dark-mode lit top edge and ring, painted on a pseudo-element above children."
-      },
-      {
-        "name": "dark-chrome-shadow",
-        "value": "0 0 0 1px oklch(0 0 0 / 0.7), inset 0 1px 0 0 oklch(1 0 0 / 0.065)",
-        "purpose": "Defines the dark chrome fill against the dark page."
       },
       {
         "name": "docs-shelf-panel",
@@ -591,7 +586,7 @@
       "Bricolage Grotesque (optical-size axis) for h1 to h3 and the wordmark; Geist for body and UI; Geist Mono for code.",
       "An 8-rung surface ladder with matching shadow and rim recipes; state overlays are translucent deltas.",
       "Hairline structure at 10% foreground; lighter 7% lines inside rows.",
-      "A near-black chrome surface, off the ladder, in both themes."
+      "An inverse surface off the ladder: the neutral fill, charcoal in light and near-white in dark."
     ],
     "rules": [
       {
@@ -605,8 +600,8 @@
         "section": "colors"
       },
       {
-        "name": "The Chrome Is Below Rule",
-        "body": "The chrome surface is near-black in both themes and sits off the ladder: in dark it goes below the page (0.159 against 0.205), because up is where cards live. Paint on it only through `data-surface=\"chrome\"`, which re-points ink, muted, border, input, and hover tokens for the whole subtree.",
+        "name": "The Inverse Is Transient Rule",
+        "body": "The inverse surface flips the page (the neutral fill: charcoal in light, near-white in dark) and sits off the ladder. It is for transient floating surfaces, ones that dismiss themselves (tooltips and toasts), never persistent bars or surfaces you work inside, where a near-white slab in dark outshines the page. Paint on it only through `data-surface=\"inverse\"`, which re-points ink, muted, border, button, and status-icon tokens for the whole subtree.",
         "section": "colors"
       },
       {
@@ -621,7 +616,7 @@
       },
       {
         "name": "The Ladder Rule",
-        "body": "Elevation is chosen from the ladder, never hand-written. A floating chrome surface is built from the near, mid, and far shadow alphas with no ladder ring, because rungs 3 to 8 carry their own ring.",
+        "body": "Elevation is chosen from the ladder, never hand-written.",
         "section": "elevation"
       },
       {
@@ -657,7 +652,7 @@
       "**Do** design dark explicitly: re-declare derived tokens in `.dark` so they resolve against dark roots."
     ],
     "donts": [
-      "**Don't** raise the chrome surface with a ladder rung or paint chrome controls by hand; use `data-surface=\"chrome\"`.",
+      "**Don't** raise the inverse surface with a ladder rung or paint its controls by hand; use `data-surface=\"inverse\"`.",
       "**Don't** add a second accent hue outside status plates.",
       "**Don't** use elastic or bouncy easing on controls.",
       "**Don't** use neon glows, gradient meshes, or cool-AI dark-mode effects; the only gradients are the stage's 3.5% light and the edge-fade masks on scrolling rows.",

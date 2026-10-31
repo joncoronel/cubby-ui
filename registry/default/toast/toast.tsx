@@ -17,7 +17,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 import { Button } from "@/registry/default/button/button";
-import { solidSurface } from "@/registry/default/lib/elevated";
+import { INVERSE_SURFACE, solidSurface } from "@/registry/default/lib/elevated";
 import "./toast.css";
 
 const toastManager = Toast.createToastManager();
@@ -69,18 +69,44 @@ function upsertReplayClassName(toast: {
     : "animate-[pulse-odd_0.28s_ease]";
 }
 
+export type ToastVariant = "default" | "inverse";
+
+/** A toast's own `variant` wins; otherwise the provider's applies. */
+function resolveVariant(data: unknown, fallback: ToastVariant): ToastVariant {
+  return (data as { variant?: ToastVariant } | undefined)?.variant ?? fallback;
+}
+
+// Surface for stacked toast roots, kept out of TOAST_ROOT_CLASSES so the two
+// variants never meet in one class list: tailwind-merge files the arbitrary
+// `shadow-[...]` under shadow-color, so it would not drop the other's shadow.
+// Both set --popup-surface rather than a bg, because the stacked-depth mix in
+// TOAST_ROOT_CLASSES paints the fill from it.
+const TOAST_SURFACE: Record<ToastVariant, string[]> = {
+  default: [
+    "text-popover-foreground",
+    // Surface elevation — manual composition because the bg uses color-mix for stacking.
+    // `[--popup-surface:var(--surface-3)]` exposes the surface color to descendants;
+    // `shadow-[drops-4,rim-3]` pairs a level-4 shadow weight with a level-3 rim color.
+    "[--popup-surface:var(--surface-3)]",
+    "shadow-[var(--surface-shadow-4),var(--surface-rim-3)]",
+  ],
+  // INVERSE_SURFACE's fill. The rim goes: the fill already stands clear of the
+  // page. The drop stays, since a toast floats over content with no anchor.
+  inverse: [
+    "text-foreground",
+    "[--popup-surface:var(--neutral)]",
+    "shadow-(--surface-shadow-4)",
+  ],
+};
+
 // Shared classes for stacked toast roots (StackedToastItem + GroupedToastRoot).
-// Each callsite appends its own extras (pulse animation, overflow behavior, etc).
+// Each callsite appends its surface from TOAST_SURFACE and its own extras
+// (pulse animation, overflow behavior, etc).
 // Shadow level=4 (heavier than a popover — toast floats unattached from any anchor);
 // the bg uses color-mix so stacked toasts get progressively darker.
 const TOAST_ROOT_CLASSES = [
   // Base styles & visual
-  "text-popover-foreground data-expanded:bg-(--popup-surface) absolute z-[calc(9999-var(--toast-index))] h-(--toast-calc-height) w-full rounded-lg select-none [transition:transform_.5s_cubic-bezier(.22,1,.36,1),opacity_.5s,height_.15s,background-color_.5s]",
-  // Surface elevation — manual composition because the bg uses color-mix for stacking.
-  // `[--popup-surface:var(--surface-3)]` exposes the surface color to descendants;
-  // `shadow-[drops-4,rim-3]` pairs a level-4 shadow weight with a level-3 rim color.
-  "[--popup-surface:var(--surface-3)]",
-  "shadow-[var(--surface-shadow-4),var(--surface-rim-3)]",
+  "data-expanded:bg-(--popup-surface) absolute z-[calc(9999-var(--toast-index))] h-(--toast-calc-height) w-full rounded-lg select-none [transition:transform_.5s_cubic-bezier(.22,1,.36,1),opacity_.5s,height_.15s,background-color_.5s]",
   // Stacked-depth bg: tints --popup-surface 1% darker per toast-index layer
   "bg-[color-mix(in_srgb,var(--popup-surface),var(--color-black)_calc(1%*max(0,var(--toast-index,0))))]",
   // Positioning
@@ -138,6 +164,8 @@ export interface ToastOptions<TData extends object = object> {
   onRemove?: () => void;
   /** Whether to show the close button. Defaults to true. */
   showCloseButton?: boolean;
+  /** Surface for this toast. Overrides the provider's `variant`. */
+  variant?: ToastVariant;
 }
 
 export interface AnchoredToastOptions<
@@ -249,6 +277,8 @@ export interface GroupedToastOptions<TData extends object = object> {
   };
   /** Duration in ms before the group auto-dismisses. Resets on each new item added. */
   duration?: number;
+  /** Surface for the group. Overrides the provider's `variant`. Set by the item that creates the group; later items don't change it. */
+  variant?: ToastVariant;
 }
 
 interface GroupedPromiseMessage {
@@ -303,6 +333,7 @@ interface GroupedToastData {
   duration?: number;
   /** Historical counts that persist even after items are dismissed */
   historicalCounts: HistoricalCounts;
+  variant?: ToastVariant;
 }
 
 function baseToast(jsx: React.ReactElement): string | undefined;
@@ -336,6 +367,7 @@ function baseToast<TData extends object = object>(
         customJSX: optionsOrJSX,
         ...(jsxOptions?.data && jsxOptions.data),
         showCloseButton: jsxOptions?.showCloseButton ?? true,
+        ...(jsxOptions?.variant && { variant: jsxOptions.variant }),
       },
       ...(jsxOptions?.onClose && { onClose: jsxOptions.onClose }),
       ...(jsxOptions?.onRemove && { onRemove: jsxOptions.onRemove }),
@@ -359,6 +391,7 @@ function baseToast<TData extends object = object>(
     data: {
       ...(options.data || {}),
       showCloseButton: options.showCloseButton ?? true,
+      ...(options.variant && { variant: options.variant }),
     },
     ...(options.onClose && { onClose: options.onClose }),
     ...(options.onRemove && { onRemove: options.onRemove }),
@@ -473,6 +506,7 @@ export const toast = Object.assign(baseToast, {
       data: {
         ...(options.data || {}),
         arrow: options.arrow ?? false,
+        ...(options.variant && { variant: options.variant }),
       },
       positionerProps: {
         anchor,
@@ -558,6 +592,7 @@ export const toast = Object.assign(baseToast, {
           warning: newItem.type === "warning" ? 1 : 0,
           info: newItem.type === "info" ? 1 : 0,
         },
+        variant: options.variant,
       };
       const toastId = toastManager.add({
         title: "",
@@ -891,6 +926,8 @@ interface ToastProviderProps {
   limit?: number;
   timeout?: number;
   container?: HTMLElement | React.RefObject<HTMLElement | null> | null;
+  /** Surface for every toast. A toast's own `variant` overrides it. */
+  variant?: ToastVariant;
 }
 
 export function ToastProvider({
@@ -899,6 +936,7 @@ export function ToastProvider({
   limit = 3,
   timeout = 5000,
   container,
+  variant = "default",
 }: ToastProviderProps) {
   return (
     <Toast.Provider limit={limit} timeout={timeout} toastManager={toastManager}>
@@ -919,14 +957,20 @@ export function ToastProvider({
             "data-[position*=center]:left-1/2 data-[position*=center]:-translate-x-1/2",
           )}
         >
-          <StackedToasts position={position} />
+          <StackedToasts position={position} variant={variant} />
         </Toast.Viewport>
       </Toast.Portal>
     </Toast.Provider>
   );
 }
 
-function StackedToasts({ position }: { position: ToastPosition }) {
+function StackedToasts({
+  position,
+  variant,
+}: {
+  position: ToastPosition;
+  variant: ToastVariant;
+}) {
   const { toasts } = Toast.useToastManager();
   const swipeDirection = getSwipeDirection(position);
 
@@ -938,6 +982,7 @@ function StackedToasts({ position }: { position: ToastPosition }) {
           toast={toast as ToastData}
           position={position}
           swipeDirection={swipeDirection}
+          defaultVariant={variant}
         />
       ))}
     </>
@@ -948,13 +993,16 @@ interface StackedToastItemProps {
   toast: ToastData;
   position: ToastPosition;
   swipeDirection: SwipeDirection[];
+  defaultVariant: ToastVariant;
 }
 
 function StackedToastItem({
   toast,
   position,
   swipeDirection,
+  defaultVariant,
 }: StackedToastItemProps) {
+  const variant = resolveVariant(toast.data, defaultVariant);
   const isGrouped =
     toast.data &&
     typeof toast.data === "object" &&
@@ -968,6 +1016,7 @@ function StackedToastItem({
         position={position}
         swipeDirection={swipeDirection}
         data={toast.data as GroupedToastData}
+        variant={variant}
       />
     );
   }
@@ -994,8 +1043,13 @@ function StackedToastItem({
       swipeDirection={swipeDirection}
       data-slot="toast"
       data-position={position}
+      data-variant={variant}
+      // Each root carries the attribute: the viewport is portalled, so the
+      // page's can't reach it.
+      data-surface={variant === "inverse" ? "inverse" : undefined}
       className={cn(
         TOAST_ROOT_CLASSES,
+        TOAST_SURFACE[variant],
         // Deduplicated toast pulse
         upsertReplayClassName(toast),
       )}
@@ -1085,6 +1139,8 @@ interface AnchoredToastProviderProps {
   limit?: number;
   timeout?: number;
   container?: HTMLElement | React.RefObject<HTMLElement | null> | null;
+  /** Surface for every anchored toast. A toast's own `variant` overrides it. */
+  variant?: ToastVariant;
 }
 
 export function AnchoredToastProvider({
@@ -1092,6 +1148,7 @@ export function AnchoredToastProvider({
   limit = 5,
   timeout = 2000,
   container,
+  variant = "default",
 }: AnchoredToastProviderProps) {
   return (
     <Toast.Provider
@@ -1102,14 +1159,14 @@ export function AnchoredToastProvider({
       {children}
       <Toast.Portal container={container}>
         <Toast.Viewport data-slot="toast-viewport" className="outline-none">
-          <AnchoredToasts />
+          <AnchoredToasts variant={variant} />
         </Toast.Viewport>
       </Toast.Portal>
     </Toast.Provider>
   );
 }
 
-function AnchoredToasts() {
+function AnchoredToasts({ variant }: { variant: ToastVariant }) {
   const { toasts } = Toast.useToastManager();
 
   return (
@@ -1119,13 +1176,25 @@ function AnchoredToasts() {
         if (!toastData.positionerProps?.anchor) {
           return null;
         }
-        return <AnchoredToastItem key={toast.id} toast={toastData} />;
+        return (
+          <AnchoredToastItem
+            key={toast.id}
+            toast={toastData}
+            variant={resolveVariant(toastData.data, variant)}
+          />
+        );
       })}
     </>
   );
 }
 
-function AnchoredToastItem({ toast }: { toast: ToastData }) {
+function AnchoredToastItem({
+  toast,
+  variant,
+}: {
+  toast: ToastData;
+  variant: ToastVariant;
+}) {
   const showArrow = Boolean(
     toast.data &&
     typeof toast.data === "object" &&
@@ -1142,11 +1211,15 @@ function AnchoredToastItem({ toast }: { toast: ToastData }) {
       <Toast.Root
         toast={toast}
         data-slot="toast"
+        data-variant={variant}
+        data-surface={variant === "inverse" ? "inverse" : undefined}
         className={cn(
           "flex w-max origin-(--transform-origin) flex-col rounded-md",
           // Surface elevation — level=3 (tooltip/popover tier), shadow matches.
-          solidSurface(3, 3),
-          "text-popover-foreground",
+          // Inverse is fill only, like the inverse Tooltip it resembles.
+          variant === "inverse"
+            ? [INVERSE_SURFACE, "text-foreground"]
+            : [solidSurface(3, 3), "text-popover-foreground"],
           "px-3 py-2 text-sm",
           "transition-all duration-200",
           "data-starting-style:scale-95 data-starting-style:opacity-0",
@@ -1180,6 +1253,7 @@ const supportsCalcSize =
   typeof CSS !== "undefined" && CSS.supports("height", "calc-size(auto, size)");
 
 interface GroupedToastRootProps {
+  variant: ToastVariant;
   toast: ToastData;
   position: ToastPosition;
   swipeDirection: SwipeDirection[];
@@ -1213,6 +1287,7 @@ function GroupedToastRoot({
   position,
   swipeDirection,
   data,
+  variant,
 }: GroupedToastRootProps) {
   const toastRootRef = React.useRef<HTMLDivElement>(null);
   const isTop = position.startsWith("top");
@@ -1239,8 +1314,12 @@ function GroupedToastRoot({
       swipeDirection={swipeDirection}
       data-slot="toast"
       data-position={position}
+      data-variant={variant}
+      // The expanded cards portal into this root, so they inherit it too.
+      data-surface={variant === "inverse" ? "inverse" : undefined}
       className={cn(
         TOAST_ROOT_CLASSES,
+        TOAST_SURFACE[variant],
         // overflow-visible required — the expanded popover renders outside the toast's bounds.
         "overflow-visible",
       )}
@@ -1282,7 +1361,11 @@ function GroupedToastRoot({
                 "data-ending-style:scale-95 data-ending-style:opacity-0",
               )}
             >
-              <ExpandedCardsContainer data={data} isTop={isTop} />
+              <ExpandedCardsContainer
+                data={data}
+                isTop={isTop}
+                variant={variant}
+              />
             </Popover.Popup>
           </Popover.Positioner>
         </Popover.Portal>
@@ -1535,10 +1618,15 @@ function GroupedToastSummaryContent({
 interface ExpandedCardsContainerProps {
   data: GroupedToastData;
   isTop: boolean;
+  variant: ToastVariant;
 }
 
 /** Container for expanded pending/completed item cards with enter/exit animations */
-function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
+function ExpandedCardsContainer({
+  data,
+  isTop,
+  variant,
+}: ExpandedCardsContainerProps) {
   const completedCount = (data.completedItems ?? []).length;
   const pendingCount = data.items.length;
   const hasCompletedItems = completedCount > 0;
@@ -1572,7 +1660,11 @@ function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <CompletedItemsCard items={data.completedItems} isTop={isTop} />
+            <CompletedItemsCard
+              items={data.completedItems}
+              isTop={isTop}
+              variant={variant}
+            />
           </motion.div>
         )}
 
@@ -1586,7 +1678,7 @@ function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
             transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <GroupedToastCard data={data} isTop={isTop} />
+            <GroupedToastCard data={data} isTop={isTop} variant={variant} />
           </motion.div>
         )}
 
@@ -1600,7 +1692,11 @@ function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <CompletedItemsCard items={data.completedItems} isTop={isTop} />
+            <CompletedItemsCard
+              items={data.completedItems}
+              isTop={isTop}
+              variant={variant}
+            />
           </motion.div>
         )}
       </AnimatePresence>
@@ -1611,9 +1707,10 @@ function ExpandedCardsContainer({ data, isTop }: ExpandedCardsContainerProps) {
 interface GroupedToastCardProps {
   data: GroupedToastData;
   isTop: boolean;
+  variant: ToastVariant;
 }
 
-function GroupedToastCard({ data, isTop }: GroupedToastCardProps) {
+function GroupedToastCard({ data, isTop, variant }: GroupedToastCardProps) {
   const cardRef = React.useRef<HTMLDivElement>(null);
 
   // Capture-phase native listeners prevent touch events from reaching the toast's swipe handler.
@@ -1644,8 +1741,10 @@ function GroupedToastCard({ data, isTop }: GroupedToastCardProps) {
       className={cn(
         "max-h-64 w-full overflow-y-auto overscroll-contain rounded-lg",
         // Surface elevation — level=5 because it pops above the level-3 toast.
-        solidSurface(5, 5),
-        "text-popover-foreground",
+        // Inverse matches the toast's fill and keeps a drop like the root's.
+        variant === "inverse"
+          ? [INVERSE_SURFACE, "text-foreground shadow-(--surface-shadow-5)"]
+          : [solidSurface(5, 5), "text-popover-foreground"],
         "animate-in fade-in-0 zoom-in-95",
         isTop ? "slide-in-from-top-2" : "slide-in-from-bottom-2",
       )}
@@ -1809,9 +1908,14 @@ function CompletedItemRow({ item, showSeparator }: CompletedItemRowProps) {
 interface CompletedItemsCardProps {
   items: GroupedToastItem[];
   isTop: boolean;
+  variant: ToastVariant;
 }
 
-function CompletedItemsCard({ items, isTop }: CompletedItemsCardProps) {
+function CompletedItemsCard({
+  items,
+  isTop,
+  variant,
+}: CompletedItemsCardProps) {
   const cardRef = React.useRef<HTMLDivElement>(null);
 
   // Same touch isolation as GroupedToastCard.
@@ -1842,8 +1946,11 @@ function CompletedItemsCard({ items, isTop }: CompletedItemsCardProps) {
       className={cn(
         "max-h-48 w-full overflow-y-auto overscroll-contain rounded-lg",
         // bg-muted is intentionally recessed vs the active card; shadow stays at level=5 to match.
-        "bg-muted text-popover-foreground",
-        "shadow-[var(--surface-shadow-5),var(--surface-rim-5)]",
+        // Inverse --muted is translucent, so it is composited onto the fill
+        // here; on its own it would show the page through the card.
+        variant === "inverse"
+          ? "text-foreground bg-[color-mix(in_oklab,var(--neutral-foreground)_10%,var(--neutral))] shadow-(--surface-shadow-5)"
+          : "bg-muted text-popover-foreground shadow-[var(--surface-shadow-5),var(--surface-rim-5)]",
         "animate-in fade-in-0 zoom-in-95",
         isTop ? "slide-in-from-top-2" : "slide-in-from-bottom-2",
       )}

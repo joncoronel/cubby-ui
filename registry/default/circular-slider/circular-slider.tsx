@@ -477,6 +477,10 @@ function CircularSliderRoot<Value extends SliderValue = number>({
   // other change, so later changes still animate.
   const [instantKey, setInstantKey] = React.useState<string | null>(null);
 
+  // What a press under the mouse would hold rather than jump: a thumb, by
+  // index, or a range's filled span.
+  const [hover, setHover] = React.useState<number | "span" | null>(null);
+
   // Values before the latest change, for the tick sweep. Stored during render
   // ("previous props" pattern) so a change's first frame knows its origin.
   const valuesKey = values.join(",");
@@ -488,6 +492,9 @@ function CircularSliderRoot<Value extends SliderValue = number>({
   if (history.key !== valuesKey) {
     setHistory({ key: valuesKey, previous: history.current, current: values });
     if (instantKey !== valuesKey) setInstantKey(null);
+    // A thumb may have moved out from under a still mouse; the next move, or
+    // a release, marks it again.
+    setHover(null);
   }
 
   // A step across a wrapping dial's seam lands without a transition.
@@ -509,9 +516,6 @@ function CircularSliderRoot<Value extends SliderValue = number>({
   // What the pointer holds: a thumb, or a range's filled span, which moves
   // both ends and so marks neither as held.
   const [pressed, setPressed] = React.useState<"thumb" | "span" | false>(false);
-  // What a press under the mouse would hold rather than jump: a thumb, by
-  // index, or a range's filled span.
-  const [hover, setHover] = React.useState<number | "span" | null>(null);
   const [dragging, setDragging] = React.useState(false);
   const [activeIndex, setActiveIndex] = React.useState(0);
   const [focusVisibleIndex, setFocusVisibleIndex] = React.useState<
@@ -567,8 +571,6 @@ function CircularSliderRoot<Value extends SliderValue = number>({
         thumbCollisionBehavior,
       );
       commitValues(next, { reason, activeThumbIndex: index });
-      // The thumb steps out from under a still mouse; the next move re-marks.
-      if (reason === "keyboard") setHover(null);
       return next;
     },
     [dial, thumbGap, thumbCollisionBehavior, commitValues],

@@ -251,12 +251,6 @@ function crossesSeam(
   );
 }
 
-/** Distance between two values, the short way round on a wrapping dial. */
-function valueGap(dial: Dial, a: number, b: number): number {
-  const d = Math.abs(a - b);
-  return dial.wrap ? Math.min(d, dial.max - dial.min - d) : d;
-}
-
 interface DragBase {
   pointerId: number;
   /** A value changed during the gesture, so release commits. */
@@ -504,13 +498,11 @@ function CircularSliderRoot<Value extends SliderValue = number>({
   const smooth = smoothProp ?? (variant === "ring" && dragMode === "angular");
   // Where a smooth drag draws the thumbs, between steps.
   const [drawn, setDrawn] = React.useState<number[] | null>(null);
-  // A controlled parent may refuse a drag's values; a drawn thumb then stays
-  // within a step of what it accepted instead of gliding on alone.
+  // A drawn thumb shows only while its step is the accepted value; one a
+  // controlled parent refused sits on what it accepted instead.
   const shown =
     drawn?.length === values.length
-      ? drawn.map((v, i) =>
-          valueGap(dial, v, values[i]) <= dial.step ? v : values[i],
-        )
+      ? drawn.map((v, i) => (snapValue(dial, v) === values[i] ? v : values[i]))
       : values;
 
   // What the pointer holds: a thumb, or a range's filled span, which moves
@@ -701,12 +693,16 @@ function CircularSliderRoot<Value extends SliderValue = number>({
           current.length > 1
             ? nearestThumb(dial, current, g.angle, activeIndex)
             : 0;
-        const target = ringPressTarget(dial, current, g, index, origin);
+        // A vertical drag holds the nearest thumb from anywhere on the band.
+        const target =
+          dragMode === "vertical"
+            ? "thumb"
+            : ringPressTarget(dial, current, g, index, origin);
         over = target === "span" ? "span" : target === "band" ? null : index;
       }
       setHover(over);
     },
-    [variant, size, thickness, inset, dial, activeIndex, origin],
+    [variant, dragMode, size, thickness, inset, dial, activeIndex, origin],
   );
 
   const handlePointerMove = React.useCallback(
@@ -738,13 +734,18 @@ function CircularSliderRoot<Value extends SliderValue = number>({
         setDrawn(next);
       };
       // Draws a thumb at an unsnapped value, pushing or stopping at the other
-      // as the value does.
-      const draw = (index: number, candidate: number): void => {
+      // as the value does. `before` is the values ahead of this move, since
+      // the move has already pushed the snapped ones.
+      const draw = (
+        index: number,
+        candidate: number,
+        before: readonly number[],
+      ): void => {
         if (!smooth) return;
         showDrawn(
           placeRangeThumb(
             dial,
-            dragRef.current?.drawn ?? valuesRef.current,
+            dragRef.current?.drawn ?? before,
             index,
             dial.wrap ? candidate : clamp(candidate, min, max),
             thumbGap,
@@ -786,7 +787,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
         if (next[drag.index] !== wanted) {
           drag.progress = valueToProgress(dial, next[drag.index]);
         }
-        draw(drag.index, progressToValue(dial, drag.progress));
+        draw(drag.index, progressToValue(dial, drag.progress), before);
         return;
       }
 
@@ -868,7 +869,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
       const before = valuesRef.current;
       const next = moveThumb(held.index, progressToValue(dial, target), "drag");
       if (!sameValues(next, before)) held.changed = true;
-      draw(held.index, progressToValue(dial, target));
+      draw(held.index, progressToValue(dial, target), before);
     },
     [
       dragging,
@@ -1851,12 +1852,18 @@ function CircularSliderKnob({
     size,
     thickness,
     thumbShape,
+    dragging,
+    heldIndex,
     focusVisibleIndex,
   } = useCircularSliderContext();
-  // The face follows the thumb whose value last changed, not the focused
-  // one, so moving focus between a range's thumbs never turns it.
+  // The face follows the thumb being dragged, else the one whose value last
+  // changed, not the focused one, so moving focus between a range's thumbs
+  // never turns it.
   const [faceIndex, setFaceIndex] = React.useState(0);
-  const moved = values.findIndex((v, i) => v !== previousValues[i]);
+  const moved =
+    dragging && heldIndex !== null
+      ? heldIndex
+      : values.findIndex((v, i) => v !== previousValues[i]);
   if (moved >= 0 && moved !== faceIndex) setFaceIndex(moved);
   const value =
     shown[Math.min(moved >= 0 ? moved : faceIndex, shown.length - 1)];

@@ -317,23 +317,25 @@ describe("placeRangeThumb", () => {
         6.1,
         0,
         "push",
-        false,
+        { snap: false },
       );
       expect(start).toBe(22);
       expect(end).toBeCloseTo(6.1);
       expect(
-        placeRangeThumb(quarter, [22, 7], 0, 24.3, 0, "push", false)[0],
+        placeRangeThumb(quarter, [22, 7], 0, 24.3, 0, "push", {
+          snap: false,
+        })[0],
       ).toBeCloseTo(0.3);
     });
   });
 
   it("places between steps without snap on a dial that doesn't wrap", () => {
-    expect(placeRangeThumb(dial, [20, 60], 0, 33.7, 0, "push", false)).toEqual([
-      33.7, 60,
-    ]);
-    expect(placeRangeThumb(dial, [20, 60], 0, 61.2, 0, "push", false)).toEqual([
-      61.2, 61.2,
-    ]);
+    expect(
+      placeRangeThumb(dial, [20, 60], 0, 33.7, 0, "push", { snap: false }),
+    ).toEqual([33.7, 60]);
+    expect(
+      placeRangeThumb(dial, [20, 60], 0, 61.2, 0, "push", { snap: false }),
+    ).toEqual([61.2, 61.2]);
   });
 });
 

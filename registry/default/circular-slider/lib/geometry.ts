@@ -329,8 +329,12 @@ export function placeRangeThumb(
   candidate: number,
   gap: number,
   collision: ThumbCollision,
-  /** Off to place a drawn drag between steps; on a wrap it then only folds. */
-  snap = true,
+  {
+    snap = true,
+  }: {
+    /** Off to place a drawn drag between steps; on a wrap it then only folds. */
+    snap?: boolean;
+  } = {},
 ): number[] {
   const settle = (value: number): number =>
     snap

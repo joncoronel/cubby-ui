@@ -392,6 +392,8 @@ The filled arc: from `origin` to the value, or between a range's thumbs.
 
 The thumb for each value, shaped by the root's `thumbShape`: a bead set into the end of the indicator, or a slim pill across the band. When a range's two beads meet, they join into one pill.
 
+A thumb carries `data-pressed` while the pointer holds it, but not while a range's span is dragged, since that moves both ends. With a mouse over a ring, the thumb a press would hold carries `data-hovered`.
+
 <ApiPropsList>
 
 <ApiProp name="beadSize" fullType="number" defaultValue="thickness - 4">

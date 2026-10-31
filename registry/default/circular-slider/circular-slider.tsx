@@ -56,6 +56,12 @@ type SliderValue = number | readonly number[];
 interface CircularSliderContextValue {
   dial: Dial;
   values: readonly number[];
+  /**
+   * Where the thumbs are drawn: between steps during a smooth drag, else the
+   * values. The arc, thumbs, ticks and knob face follow this; text and
+   * screen readers read `values`.
+   */
+  shown: readonly number[];
   /** Values before the latest change, for timing the tick sweep. */
   previousValues: readonly number[];
   origin: number;
@@ -68,6 +74,10 @@ interface CircularSliderContextValue {
   pressed: boolean;
   dragging: boolean;
   activeIndex: number;
+  /** The thumb the pointer holds; null when idle or dragging a span. */
+  heldIndex: number | null;
+  /** The thumb a press under the mouse would hold. */
+  hoverIndex: number | null;
   focusVisibleIndex: number | null;
   /** The latest change lands without a transition. */
   instant: boolean;
@@ -126,6 +136,11 @@ const BAND_SLOP = 8;
 const PICK_TRAVEL = 4;
 /** Share of a knob's radius around its center where drags are ignored. */
 const KNOB_DEAD_ZONE = 0.15;
+/**
+ * Pointer travel, in px, before a press counts as a drag. Below it a click's
+ * small wobble neither moves the value nor cuts the click's sweep short.
+ */
+const DRAG_THRESHOLD = 3;
 
 interface PointerGeometry {
   angle: number;
@@ -168,10 +183,85 @@ function slopDegrees(px: number, radius: number): number {
   return ((px / radius) * 180) / Math.PI;
 }
 
+/** On a ring's band, give or take the slop, and inside a partial sweep. */
+function isOnBand(
+  g: PointerGeometry,
+  dial: Dial,
+  size: number,
+  thickness: number,
+  inset: number,
+): boolean {
+  const outer = (size / 2) * g.scale;
+  const slop = BAND_SLOP * g.scale;
+  const bandInner = outer - (inset + thickness) * g.scale;
+  if (g.distance < bandInner - slop || g.distance > outer + slop) return false;
+  if (dial.wrap || dial.sweep >= 360) return true;
+  const p = angleToUnclampedProgress(dial, g.angle);
+  const edge = slopDegrees((thickness * g.scale) / 2 + slop, g.bandRadius);
+  return p >= -edge && p <= dial.sweep + edge;
+}
+
+/**
+ * What a press on a ring's band takes hold of. Press and hover both ask, so
+ * the thumb that grows under the mouse is the one a press would hold.
+ */
+function ringPressTarget(
+  dial: Dial,
+  values: readonly number[],
+  g: PointerGeometry,
+  index: number,
+  origin: number,
+): "pending" | "thumb" | "span" | "band" {
+  const near = (v: number) =>
+    angularDistance(progressToAngle(dial, valueToProgress(dial, v)), g.angle) <=
+    g.grabDegrees;
+  // Overlapping thumbs wait for the first clear move to pick one.
+  if (values.filter(near).length > 1) return "pending";
+  if (near(values[index])) return "thumb";
+  if (
+    values.length > 1 &&
+    isInSpan(
+      dial,
+      angleToProgress(dial, g.angle),
+      getActiveSpan(dial, values, origin),
+    )
+  ) {
+    return "span";
+  }
+  return "band";
+}
+
+/**
+ * A short move across a wrapping dial's seam (359° to 0°), which a transition
+ * would spin nearly a full turn the wrong way. A large jump still sweeps.
+ */
+function crossesSeam(
+  dial: Dial,
+  from: readonly number[],
+  to: readonly number[],
+): boolean {
+  return (
+    dial.wrap &&
+    from.length === to.length &&
+    from.some((value, i) => {
+      const a = valueToProgress(dial, value);
+      const b = valueToProgress(dial, to[i]);
+      return Math.abs(b - a) > 180 && Math.abs(wrapDelta(a, b, 360)) < 90;
+    })
+  );
+}
+
 interface DragBase {
   pointerId: number;
   /** A value changed during the gesture, so release commits. */
   changed: boolean;
+  /** Where the press landed, for the drag threshold. */
+  downX: number;
+  downY: number;
+  /** Past the drag threshold. */
+  moved: boolean;
+  /** Where a smooth drag last drew the thumbs. */
+  drawn?: number[];
 }
 
 /** Holding one thumb; it follows the pointer at the offset it was grabbed. */
@@ -267,6 +357,13 @@ export interface CircularSliderRootProps<
    * value with up and down drags, like an audio knob.
    */
   dragMode?: "angular" | "vertical";
+  /**
+   * During a drag the thumb follows the pointer between steps and settles
+   * onto the nearest one on release. Off, it moves in steps, like a notched
+   * knob. Defaults to on for a ring dragged around the dial, off for a knob
+   * or a vertical drag.
+   */
+  smooth?: boolean;
   disabled?: boolean;
   name?: string;
   form?: string;
@@ -322,6 +419,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
   variant = "ring",
   color = "neutral",
   dragMode = "angular",
+  smooth: smoothProp,
   disabled = false,
   name,
   form,
@@ -373,6 +471,10 @@ function CircularSliderRoot<Value extends SliderValue = number>({
   // other change, so later changes still animate.
   const [instantKey, setInstantKey] = React.useState<string | null>(null);
 
+  // What a press under the mouse would hold rather than jump: a thumb, by
+  // index, or a range's filled span.
+  const [hover, setHover] = React.useState<number | "span" | null>(null);
+
   // Values before the latest change, for the tick sweep. Stored during render
   // ("previous props" pattern) so a change's first frame knows its origin.
   const valuesKey = values.join(",");
@@ -384,27 +486,28 @@ function CircularSliderRoot<Value extends SliderValue = number>({
   if (history.key !== valuesKey) {
     setHistory({ key: valuesKey, previous: history.current, current: values });
     if (instantKey !== valuesKey) setInstantKey(null);
+    // A thumb may have moved out from under a still mouse; the next move, or
+    // a release, marks it again.
+    setHover(null);
   }
 
-  // A small step across the seam of a wrapping dial (359° to 0°) would spin
-  // the arc and thumb nearly a full turn the wrong way, so it lands without
-  // a transition. A large jump (a click across the dial) still sweeps.
-  const crossedSeam =
-    dial.wrap &&
-    history.previous.length === values.length &&
-    history.previous.some((previous, i) => {
-      const from = valueToProgress(dial, previous);
-      const to = valueToProgress(dial, values[i]);
-      return (
-        Math.abs(to - from) > 180 && Math.abs(wrapDelta(from, to, 360)) < 90
-      );
-    });
-  const instant = crossedSeam || instantKey === valuesKey;
+  // A step across a wrapping dial's seam lands without a transition.
+  const instant =
+    crossesSeam(dial, history.previous, values) || instantKey === valuesKey;
 
-  const [pressed, setPressed] = React.useState(false);
-  // Over a thumb, or a range's filled span: something a press would hold
-  // rather than jump.
-  const [grabHover, setGrabHover] = React.useState(false);
+  const smooth = smoothProp ?? (variant === "ring" && dragMode === "angular");
+  // Where a smooth drag draws the thumbs, between steps.
+  const [drawn, setDrawn] = React.useState<number[] | null>(null);
+  // A drawn thumb shows only while its step is the accepted value; one a
+  // controlled parent refused sits on what it accepted instead.
+  const shown =
+    drawn?.length === values.length
+      ? drawn.map((v, i) => (snapValue(dial, v) === values[i] ? v : values[i]))
+      : values;
+
+  // What the pointer holds: a thumb, or a range's filled span, which moves
+  // both ends and so marks neither as held.
+  const [pressed, setPressed] = React.useState<"thumb" | "span" | false>(false);
   const [dragging, setDragging] = React.useState(false);
   const [activeIndex, setActiveIndex] = React.useState(0);
   const [focusVisibleIndex, setFocusVisibleIndex] = React.useState<
@@ -470,23 +573,12 @@ function CircularSliderRoot<Value extends SliderValue = number>({
       if (disabled || event.button !== 0) return;
       const root = event.currentTarget;
       const g = measurePointer(event, size, thickness, inset);
-      const outer = (size / 2) * g.scale;
-      const slop = BAND_SLOP * g.scale;
 
       if (variant === "ring") {
         // A ring only answers along its band, so whatever sits in the middle
         // stays clickable, and not in the gap of a partial sweep.
-        const bandInner = outer - (inset + thickness) * g.scale;
-        if (g.distance < bandInner - slop || g.distance > outer + slop) return;
-        if (!dial.wrap && dial.sweep < 360) {
-          const p = angleToUnclampedProgress(dial, g.angle);
-          const edge = slopDegrees(
-            (thickness * g.scale) / 2 + slop,
-            g.bandRadius,
-          );
-          if (p < -edge || p > dial.sweep + edge) return;
-        }
-      } else if (g.distance > outer + slop) {
+        if (!isOnBand(g, dial, size, thickness, inset)) return;
+      } else if (g.distance > (size / 2 + BAND_SLOP) * g.scale) {
         return;
       }
 
@@ -497,7 +589,13 @@ function CircularSliderRoot<Value extends SliderValue = number>({
           ? nearestThumb(dial, current, g.angle, activeIndex)
           : 0;
       const thumbProgress = valueToProgress(dial, current[index]);
-      const base = { pointerId: event.pointerId, changed: false };
+      const base = {
+        pointerId: event.pointerId,
+        changed: false,
+        downX: event.clientX,
+        downY: event.clientY,
+        moved: false,
+      };
       let drag: DragState;
 
       if (dragMode === "vertical" || variant === "knob") {
@@ -510,19 +608,15 @@ function CircularSliderRoot<Value extends SliderValue = number>({
           lastY: event.clientY,
         };
       } else {
-        const near = (v: number) =>
-          angularDistance(
-            progressToAngle(dial, valueToProgress(dial, v)),
-            g.angle,
-          ) <= g.grabDegrees;
-        if (current.filter(near).length > 1) {
+        const target = ringPressTarget(dial, current, g, index, origin);
+        if (target === "pending") {
           drag = {
             ...base,
             mode: "pending",
             downPointer: pointer,
             bandRadius: g.bandRadius,
           };
-        } else if (near(current[index])) {
+        } else if (target === "thumb") {
           // Grabbing the thumb itself holds on without moving it.
           drag = {
             ...base,
@@ -533,10 +627,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
               ? wrapDelta(pointer, thumbProgress, 360)
               : thumbProgress - pointer,
           };
-        } else if (
-          current.length > 1 &&
-          isInSpan(dial, pointer, getActiveSpan(dial, current, origin))
-        ) {
+        } else if (target === "span") {
           drag = {
             ...base,
             mode: "span",
@@ -567,7 +658,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
       try {
         root.setPointerCapture(event.pointerId);
       } catch {}
-      setPressed(true);
+      setPressed(drag.mode === "span" ? "span" : "thumb");
       const held = "index" in drag ? drag.index : 0;
       if ("index" in drag) setActiveIndex(drag.index);
       // preventDefault stops the compatibility mousedown from moving focus
@@ -590,37 +681,79 @@ function CircularSliderRoot<Value extends SliderValue = number>({
     ],
   );
 
+  // Marks what a press under the mouse would hold.
+  const trackHover = React.useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (variant !== "ring" || event.pointerType !== "mouse") return;
+      const g = measurePointer(event, size, thickness, inset);
+      let over: number | "span" | null = null;
+      if (isOnBand(g, dial, size, thickness, inset)) {
+        const current = valuesRef.current;
+        const index =
+          current.length > 1
+            ? nearestThumb(dial, current, g.angle, activeIndex)
+            : 0;
+        // A vertical drag holds the nearest thumb from anywhere on the band.
+        const target =
+          dragMode === "vertical"
+            ? "thumb"
+            : ringPressTarget(dial, current, g, index, origin);
+        over = target === "span" ? "span" : target === "band" ? null : index;
+      }
+      setHover(over);
+    },
+    [variant, dragMode, size, thickness, inset, dial, activeIndex, origin],
+  );
+
   const handlePointerMove = React.useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
       const drag = dragRef.current;
       if (!drag) {
-        if (variant === "ring" && event.pointerType === "mouse") {
-          const g = measurePointer(event, size, thickness, inset);
-          const current = valuesRef.current;
-          const overThumb = current.some(
-            (v) =>
-              angularDistance(
-                progressToAngle(dial, valueToProgress(dial, v)),
-                g.angle,
-              ) <= g.grabDegrees,
-          );
-          const overSpan =
-            current.length > 1 &&
-            isInSpan(
-              dial,
-              angleToProgress(dial, g.angle),
-              getActiveSpan(dial, current, origin),
-            );
-          const over = overThumb || overSpan;
-          if (over !== grabHover) setGrabHover(over);
-        }
+        trackHover(event);
         return;
       }
       if (drag.pointerId !== event.pointerId) return;
+      if (!drag.moved) {
+        if (
+          Math.hypot(event.clientX - drag.downX, event.clientY - drag.downY) <=
+          DRAG_THRESHOLD
+        ) {
+          return;
+        }
+        drag.moved = true;
+      }
       if (!dragging) setDragging(true);
 
       const g = measurePointer(event, size, thickness, inset);
       const period = dial.sweep;
+      // Stored on the current drag, which a pending press replaces.
+      const showDrawn = (next: number[]): void => {
+        const current = dragRef.current;
+        if (!current) return;
+        current.drawn = next;
+        setDrawn(next);
+      };
+      // Draws a thumb at an unsnapped value, pushing or stopping at the other
+      // as the value does. `before` is the values ahead of this move, since
+      // the move has already pushed the snapped ones.
+      const draw = (
+        index: number,
+        candidate: number,
+        before: readonly number[],
+      ): void => {
+        if (!smooth) return;
+        showDrawn(
+          placeRangeThumb(
+            dial,
+            dragRef.current?.drawn ?? before,
+            index,
+            dial.wrap ? candidate : clamp(candidate, min, max),
+            thumbGap,
+            thumbCollisionBehavior,
+            { snap: false },
+          ),
+        );
+      };
       const settle = (progress: number): number =>
         dial.wrap ? mod(progress, period) : clamp(progress, 0, period);
       const mark = (changed: boolean) => {
@@ -654,6 +787,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
         if (next[drag.index] !== wanted) {
           drag.progress = valueToProgress(dial, next[drag.index]);
         }
+        draw(drag.index, progressToValue(dial, drag.progress), before);
         return;
       }
 
@@ -680,6 +814,13 @@ function CircularSliderRoot<Value extends SliderValue = number>({
           snapValue(dial, progressToValue(dial, settle(p + drag.shift))),
         );
         mark(commitValues(next, { reason: "drag", activeThumbIndex: -1 }));
+        if (smooth) {
+          showDrawn(
+            drag.start.map((p) =>
+              progressToValue(dial, settle(p + drag.shift)),
+            ),
+          );
+        }
         return;
       }
 
@@ -702,8 +843,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
         const index = pickOverlappedThumb(dial, valuesRef.current, moved > 0);
         const thumbProgress = valueToProgress(dial, valuesRef.current[index]);
         held = {
-          pointerId: drag.pointerId,
-          changed: drag.changed,
+          ...drag,
           mode: "thumb",
           index,
           lastPointer: drag.downPointer,
@@ -729,16 +869,20 @@ function CircularSliderRoot<Value extends SliderValue = number>({
       const before = valuesRef.current;
       const next = moveThumb(held.index, progressToValue(dial, target), "drag");
       if (!sameValues(next, before)) held.changed = true;
+      draw(held.index, progressToValue(dial, target), before);
     },
     [
       dragging,
       dial,
-      variant,
       size,
       thickness,
       inset,
-      origin,
-      grabHover,
+      trackHover,
+      smooth,
+      min,
+      max,
+      thumbGap,
+      thumbCollisionBehavior,
       moveThumb,
       commitValues,
       focusThumbInput,
@@ -752,6 +896,16 @@ function CircularSliderRoot<Value extends SliderValue = number>({
       dragRef.current = null;
       setPressed(false);
       setDragging(false);
+      if (drag.drawn) {
+        // The arc and thumbs sweep from where they were drawn onto the step.
+        // Across a wrapping dial's seam that sweep would spin the long way
+        // round, so it lands at once instead.
+        const settled = valuesRef.current;
+        if (crossesSeam(dial, drag.drawn, settled)) {
+          setInstantKey(settled.join(","));
+        }
+        setDrawn(null);
+      }
       // Guarded: on the cancel and lost-capture paths the capture may already
       // be gone, and releasing an inactive pointer throws.
       const root = event.currentTarget;
@@ -759,8 +913,11 @@ function CircularSliderRoot<Value extends SliderValue = number>({
         root.releasePointerCapture(event.pointerId);
       }
       if (drag.changed) onValueCommitted?.(emit(valuesRef.current));
+      // A click may have jumped a thumb under the mouse; mark it now rather
+      // than on the next move.
+      if (event.type === "pointerup") trackHover(event);
     },
-    [onValueCommitted, emit],
+    [dial, onValueCommitted, emit, trackHover],
   );
 
   const handleKeyDown = React.useCallback(
@@ -833,6 +990,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
     () => ({
       dial,
       values,
+      shown,
       previousValues: history.previous,
       origin,
       size,
@@ -840,9 +998,11 @@ function CircularSliderRoot<Value extends SliderValue = number>({
       inset,
       thumbShape,
       variant,
-      pressed,
+      pressed: pressed !== false,
       dragging,
       activeIndex,
+      heldIndex: pressed === "thumb" ? activeIndex : null,
+      hoverIndex: typeof hover === "number" ? hover : null,
       focusVisibleIndex,
       instant,
       formatValue,
@@ -852,6 +1012,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
     [
       dial,
       valuesKey,
+      drawn,
       history.previous,
       origin,
       size,
@@ -862,6 +1023,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
       pressed,
       dragging,
       activeIndex,
+      hover,
       focusVisibleIndex,
       instant,
       formatValue,
@@ -875,12 +1037,12 @@ function CircularSliderRoot<Value extends SliderValue = number>({
     "data-variant": variant,
     "data-color": color,
     "data-drag-mode": dragMode,
-    "data-pressed": pressed || undefined,
+    "data-pressed": pressed !== false || undefined,
     "data-dragging": dragging || undefined,
     "data-instant": instant || undefined,
     "data-disabled": disabled || undefined,
     "data-range": isRange || undefined,
-    "data-grab-hover": grabHover || undefined,
+    "data-grab-hover": hover !== null || undefined,
     // Base UI drawers and toasts don't swipe from a drag on the dial. A knob
     // owns its whole face; a ring only its band (marked below).
     "data-base-ui-swipe-ignore": variant === "knob" ? "" : undefined,
@@ -927,7 +1089,7 @@ function CircularSliderRoot<Value extends SliderValue = number>({
     // pointerup; these still end the drag and commit.
     onPointerCancel: handlePointerEnd,
     onLostPointerCapture: handlePointerEnd,
-    onPointerLeave: () => setGrabHover(false),
+    onPointerLeave: () => setHover(null),
     children: (
       // The dial's square, anchored to the top so a half dial can be shorter.
       <div
@@ -1150,8 +1312,15 @@ function CircularSliderIndicator({
   render,
   ...props
 }: CircularSliderIndicatorProps) {
-  const { dial, values, origin, size, thickness, inset, thumbShape } =
-    useCircularSliderContext();
+  const {
+    dial,
+    shown: values,
+    origin,
+    size,
+    thickness,
+    inset,
+    thumbShape,
+  } = useCircularSliderContext();
   const radius = bandRadius(size, thickness, inset);
   const capDegrees = ((thickness / 2 / radius) * 180) / Math.PI;
   const span = getActiveSpan(dial, values, origin);
@@ -1268,13 +1437,15 @@ function CircularSliderThumb({
 }: CircularSliderThumbProps) {
   const {
     dial,
-    values,
+    shown: values,
     size,
     thickness,
     inset,
     thumbShape,
     pressed,
     activeIndex,
+    heldIndex,
+    hoverIndex,
     focusVisibleIndex,
   } = useCircularSliderContext();
   const isPill = thumbShape === "pill";
@@ -1334,16 +1505,17 @@ function CircularSliderThumb({
     "data-index": index,
     "data-shape": thumbShape,
     "data-active": index === activeIndex || undefined,
-    "data-pressed": (pressed && index === activeIndex) || undefined,
+    "data-pressed": index === heldIndex || undefined,
+    "data-hovered": (!pressed && index === hoverIndex) || undefined,
   });
 
-  // Grows over the grab zone and on grab; a bead stays inside the band.
+  // Grows under the mouse and more on grab; a bead stays inside the band.
   const growClasses = cn(
     "[transform-origin:center] [transform-box:fill-box]",
     "transition-[scale] duration-150 ease-out motion-reduce:transition-none",
     isPill
-      ? "group-data-grab-hover/circular-slider:scale-108 data-pressed:scale-112 group-data-grab-hover/circular-slider:data-pressed:scale-112"
-      : "group-data-grab-hover/circular-slider:scale-110 data-pressed:scale-115 group-data-grab-hover/circular-slider:data-pressed:scale-115",
+      ? "data-hovered:scale-108 data-pressed:scale-112"
+      : "data-hovered:scale-110 data-pressed:scale-115",
   );
 
   const focusIndex =
@@ -1385,9 +1557,17 @@ function CircularSliderThumb({
           style={rotated(progressToAngle(dial, progresses[index]))}
         >
           {isPill ? (
-            // The pill crosses both grey track and blue arc, so an even
-            // hairline edge keeps it distinct on both.
-            <g {...thumbState(index)} className={growClasses}>
+            // The pill crosses both the track and the filled arc, so a
+            // hairline and a soft shadow keep it distinct on both, the light
+            // track included. The shadow is centered: an offset would turn
+            // with the thumb.
+            <g
+              {...thumbState(index)}
+              className={cn(
+                growClasses,
+                "[filter:drop-shadow(0_0_1.5px_oklch(0.18_0_0/0.25))]",
+              )}
+            >
               {capsule(pillW + 1, pillH + 1, { className: "fill-black/14" })}
               {capsule(pillW, pillH, {
                 className: "fill-(--circular-slider-fill-foreground)",
@@ -1408,7 +1588,7 @@ function CircularSliderThumb({
         </g>
       ))}
       {/* Focus: a full-strength ring, edged with the page color on both
-          sides so it stays distinct where it crosses the blue arc. */}
+          sides so it stays distinct where it crosses the filled arc. */}
       {focusIndex !== null && (
         <g
           data-slot="circular-slider-thumb-focus"
@@ -1485,6 +1665,7 @@ function CircularSliderTicks({
   const {
     dial,
     values,
+    shown,
     previousValues,
     origin,
     size,
@@ -1505,7 +1686,7 @@ function CircularSliderTicks({
   // it. Just under half an interval, so a midpoint never lights both.
   const halfInterval =
     (dial.sweep / Math.max(1, Math.round(tickCount)) / 2) * 0.999;
-  const span = widenSpan(getActiveSpan(dial, values, origin), halfInterval);
+  const span = widenSpan(getActiveSpan(dial, shown, origin), halfInterval);
   const previousSpan = widenSpan(
     getActiveSpan(dial, previousValues, origin),
     halfInterval,
@@ -1625,7 +1806,7 @@ function CircularSliderMark({
             className="transition-[rotate] duration-350 ease-(--ease-out-expo) motion-reduce:transition-none"
             style={{ ...svgRotateStyle, rotate: `${round(rotation)}deg` }}
           >
-            {/* A page-colored edge keeps the mark legible on the blue arc. */}
+            {/* A page-colored edge keeps the mark legible on the filled arc. */}
             <line
               x1={size / 2}
               x2={size / 2}
@@ -1666,19 +1847,26 @@ function CircularSliderKnob({
   const {
     dial,
     values,
+    shown,
     previousValues,
     size,
     thickness,
     thumbShape,
+    dragging,
+    heldIndex,
     focusVisibleIndex,
   } = useCircularSliderContext();
-  // The face follows the thumb whose value last changed, not the focused
-  // one, so moving focus between a range's thumbs never turns it.
+  // The face follows the thumb being dragged, else the one whose value last
+  // changed, not the focused one, so moving focus between a range's thumbs
+  // never turns it.
   const [faceIndex, setFaceIndex] = React.useState(0);
-  const moved = values.findIndex((v, i) => v !== previousValues[i]);
+  const moved =
+    dragging && heldIndex !== null
+      ? heldIndex
+      : values.findIndex((v, i) => v !== previousValues[i]);
   if (moved >= 0 && moved !== faceIndex) setFaceIndex(moved);
   const value =
-    values[Math.min(moved >= 0 ? moved : faceIndex, values.length - 1)];
+    shown[Math.min(moved >= 0 ? moved : faceIndex, shown.length - 1)];
   const angle = progressToAngle(dial, valueToProgress(dial, value));
   const insetPercent = ((thickness + KNOB_GAP) / size) * 100;
 

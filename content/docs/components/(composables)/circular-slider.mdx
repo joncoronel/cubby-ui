@@ -37,7 +37,8 @@ CircularSliderRoot
 
 ## Features
 
-- Clicks, `Home`/`End`/`Page` keys and outside changes sweep along the ring. Arrow steps and drags land at once, so a held key keeps up.
+- Clicks, `Home`/`End`/`Page` keys and outside changes sweep along the ring. Arrow steps land at once, so a held key keeps up.
+- Dragging a ring's thumb follows the pointer between steps and settles onto the nearest one on release. Knobs and vertical drags move in steps unless `smooth` is set.
 - Grabbing a thumb holds it where it is. Clicking elsewhere on the band jumps the nearest thumb there.
 - A range thumb pushes the other along when they collide, and the two merge into one pill when they meet. Press where they overlap and the drag takes the one that can move your way.
 - Dragging past either end of a dial pins at that end instead of flipping to the other.
@@ -101,6 +102,12 @@ Set `origin` to a midpoint for a bipolar control; the indicator grows from there
 Pass an array of two values for a range, and drag the filled span to move both ends. On a `wrap` dial the span runs clockwise from the first value, so 22:00 to 07:00 runs through midnight.
 
 <ComponentPreview component="circular-slider" example="circular-slider-range" />
+
+### Ticks
+
+Render `CircularSliderTicks` for a scale just inside the band; pick a `count` that divides the range by `step` so values land on ticks. Set `smooth={false}` for a thumb that moves in steps while dragged.
+
+<ComponentPreview component="circular-slider" example="circular-slider-ticks" />
 
 ### Sweep
 
@@ -287,6 +294,16 @@ Holds the value and geometry, and renders a hidden range input per thumb.
   with up and down drags.
 </ApiProp>
 
+<ApiProp
+  name="smooth"
+  fullType="boolean"
+  defaultValue="true (ring, angular) / false (knob, vertical)"
+>
+  Draws a dragged thumb between steps, following the pointer, and settles it
+  onto the nearest step on release. Off, it moves in steps, like a notched knob.
+  The value, its text and the screen reader always use the step.
+</ApiProp>
+
 <ApiProp name="disabled" fullType="boolean" defaultValue="false">
   Ignores input and dims the dial.
 </ApiProp>
@@ -374,6 +391,8 @@ The filled arc: from `origin` to the value, or between a range's thumbs.
 #### CircularSliderThumb
 
 The thumb for each value, shaped by the root's `thumbShape`: a bead set into the end of the indicator, or a slim pill across the band. When a range's two beads meet, they join into one pill.
+
+A thumb carries `data-pressed` while the pointer holds it, but not while a range's span is dragged, since that moves both ends. With a mouse over a ring, the thumb a press would hold carries `data-hovered`.
 
 <ApiPropsList>
 

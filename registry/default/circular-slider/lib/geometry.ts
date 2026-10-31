@@ -329,7 +329,17 @@ export function placeRangeThumb(
   candidate: number,
   gap: number,
   collision: ThumbCollision,
+  {
+    snap = true,
+  }: {
+    /** Off to place a drawn drag between steps; on a wrap it then only folds. */
+    snap?: boolean;
+  } = {},
 ): number[] {
+  const settle = (value: number): number =>
+    snap
+      ? snapValue(dial, value)
+      : dial.min + mod(value - dial.min, dial.max - dial.min);
   const next = [...values];
   if (values.length !== 2) {
     next[index] = candidate;
@@ -367,12 +377,12 @@ export function placeRangeThumb(
   if (short || long) {
     const shift = index === 0 ? short - long : long - short;
     if (collision === "push") {
-      next[other] = snapValue(dial, values[other] + shift);
+      next[other] = settle(values[other] + shift);
     } else {
       delta -= index === 0 ? short - long : long - short;
     }
   }
-  next[index] = snapValue(dial, values[index] + delta);
+  next[index] = settle(values[index] + delta);
   return next;
 }
 

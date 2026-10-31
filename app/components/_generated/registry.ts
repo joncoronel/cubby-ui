@@ -141,6 +141,7 @@ import circular_slider_circular_slider_sizes from "@/registry/examples/circular-
 import circular_slider_circular_slider_sweep from "@/registry/examples/circular-slider/circular-slider-sweep";
 import circular_slider_circular_slider_thermostat from "@/registry/examples/circular-slider/circular-slider-thermostat";
 import circular_slider_circular_slider_thumb_shape from "@/registry/examples/circular-slider/circular-slider-thumb-shape";
+import circular_slider_circular_slider_ticks from "@/registry/examples/circular-slider/circular-slider-ticks";
 import circular_slider_circular_slider_wrap from "@/registry/examples/circular-slider/circular-slider-wrap";
 import code_block_code_block_basic from "@/registry/examples/code-block/code-block-basic";
 import code_block_code_block_custom_icon from "@/registry/examples/code-block/code-block-custom-icon";
@@ -2380,6 +2381,11 @@ export const exampleRegistry = {
       "title": "Thumb Shape",
       "importPath": "circular-slider-thumb-shape",
       "source": "\"use client\";\n\nimport {\n  CircularSlider,\n  CircularSliderKnob,\n  CircularSliderRoot,\n  CircularSliderTicks,\n} from \"@/components/ui/cubby-ui/circular-slider/circular-slider\";\n\nconst RINGS = [\n  { label: \"Bead\", thumbShape: \"bead\", thickness: 12 },\n  { label: \"Pill\", thumbShape: \"pill\", thickness: 12 },\n  { label: \"Pill, thin band\", thumbShape: \"pill\", thickness: 6 },\n] as const;\n\nconst KNOBS = [\n  { label: \"Knob, pill\", thumbShape: \"pill\" },\n  { label: \"Knob, bead\", thumbShape: \"bead\" },\n] as const;\n\nexport default function CircularSliderThumbShape() {\n  return (\n    <div className=\"flex flex-col items-center gap-10\">\n      <div className=\"flex flex-wrap items-start justify-center gap-8\">\n        {RINGS.map(({ label, thumbShape, thickness }) => (\n          <div key={label} className=\"flex flex-col items-center gap-3\">\n            <CircularSlider\n              defaultValue={60}\n              thumbShape={thumbShape}\n              thickness={thickness}\n              size={128}\n              aria-label={`Volume, ${label.toLowerCase()}`}\n            />\n            <p className=\"text-muted-foreground text-sm\">{label}</p>\n          </div>\n        ))}\n      </div>\n      <div className=\"flex flex-wrap items-start justify-center gap-8\">\n        {KNOBS.map(({ label, thumbShape }) => (\n          <div key={label} className=\"flex flex-col items-center gap-3\">\n            <CircularSliderRoot\n              variant=\"knob\"\n              thumbShape={thumbShape}\n              defaultValue={60}\n              step={5}\n              size={112}\n              thickness={8}\n              aria-label={`Volume, ${label.toLowerCase()}`}\n            >\n              <CircularSliderTicks count={20} />\n              <CircularSliderKnob />\n            </CircularSliderRoot>\n            <p className=\"text-muted-foreground text-sm\">{label}</p>\n          </div>\n        ))}\n      </div>\n    </div>\n  );\n}\n"
+    },
+    {
+      "title": "Ticks",
+      "importPath": "circular-slider-ticks",
+      "source": "\"use client\";\n\nimport {\n  CircularSliderIndicator,\n  CircularSliderRoot,\n  CircularSliderThumb,\n  CircularSliderTicks,\n  CircularSliderTrack,\n  CircularSliderValue,\n} from \"@/components/ui/cubby-ui/circular-slider/circular-slider\";\n\nconst DIALS = [\n  { label: \"Smooth\", smooth: true },\n  { label: \"Stepped\", smooth: false },\n] as const;\n\nexport default function CircularSliderTicksExample() {\n  return (\n    <div className=\"flex flex-wrap items-start justify-center gap-10\">\n      {DIALS.map(({ label, smooth }) => (\n        <div key={label} className=\"flex flex-col items-center gap-3\">\n          <CircularSliderRoot\n            defaultValue={4}\n            min={0}\n            max={10}\n            smooth={smooth}\n            aria-label={`Intensity, ${label.toLowerCase()}`}\n          >\n            <CircularSliderTrack />\n            <CircularSliderTicks count={10} />\n            <CircularSliderIndicator />\n            <CircularSliderThumb />\n            <CircularSliderValue />\n          </CircularSliderRoot>\n          <p className=\"text-muted-foreground text-sm\">{label}</p>\n        </div>\n      ))}\n    </div>\n  );\n}\n"
     },
     {
       "title": "Wrap",
@@ -4635,6 +4641,7 @@ export const componentMap = {
   "circular-slider-sweep": circular_slider_circular_slider_sweep,
   "circular-slider-thermostat": circular_slider_circular_slider_thermostat,
   "circular-slider-thumb-shape": circular_slider_circular_slider_thumb_shape,
+  "circular-slider-ticks": circular_slider_circular_slider_ticks,
   "circular-slider-wrap": circular_slider_circular_slider_wrap,
   "code-block-basic": code_block_code_block_basic,
   "code-block-custom-icon": code_block_code_block_custom_icon,

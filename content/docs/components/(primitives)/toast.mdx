@@ -38,11 +38,11 @@ Use `type` (or the `toast.success`, `toast.error`, and similar shorthands) to se
 
 ### Inverse Surface
 
-Set `variant: "inverse"` for a toast that flips the page: charcoal in light, near-white in dark. It reads like a snackbar and stands clear of busy content, where a toast on the page surface would blend in. Status icons, the action button and the close button all adapt to the inverted fill.
+Use `variant: "inverse"` for a charcoal toast in light and a near-white one in dark, so it stands out over busy content. Its icons and buttons adapt to the fill.
 
 <ComponentPreview component="toast" example="toast-inverse" />
 
-To make every toast inverse, set `variant` on the provider instead. A toast's own `variant` still wins, so a single toast can opt back out with `variant: "default"`.
+Set `variant` on the provider to make every toast inverse. A toast's own `variant` still wins, so one toast can opt out with `variant: "default"`.
 
 ```tsx
 <ToastProvider variant="inverse">
@@ -300,7 +300,7 @@ toast.grouped({
 </ApiProp>
 
 <ApiProp name="variant" fullType='"default" | "inverse"'>
-  Surface for this toast. Overrides the provider's `variant`.
+  Surface for the group. Overrides the provider's `variant`. Later items don't change it.
 </ApiProp>
 
 <ApiProp name="showCloseButton" fullType="boolean" defaultValue="true">

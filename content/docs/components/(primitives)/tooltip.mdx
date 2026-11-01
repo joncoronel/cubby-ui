@@ -64,15 +64,11 @@ Without a `TooltipProvider` there is no shared timing and no instant-reopen wind
 
 ### Inverse Surface
 
-Set `variant="inverse"` for a tooltip that flips the page: charcoal in light,
-near-white in dark. Use it when a label has to stand clear of whatever it
-floats over, where a tooltip that borrows the page surface would blend in. It replaces the earlier `variant="chrome"`.
+Use `variant="inverse"` for a charcoal tooltip in light and a near-white one in dark, so the label stands out over busy content. It replaces `variant="chrome"`.
 
 <ComponentPreview component="tooltip" example="tooltip-inverse" />
 
-The inverse surface sits off the [elevation ladder](/docs/getting-started/surfaces), so `level` and `shadowLevel` have no effect on it. It carries no shadow either: the fill stands well clear of the page in both themes, so it needs none.
-
-It brings its own palette with it: text, muted text, borders, muted chips and Kbd hints inside the tooltip resolve against the inverted fill, so ordinary classes like `text-muted-foreground` keep working.
+The inverse surface sits off the [elevation ladder](/docs/getting-started/surfaces), so `level` and `shadowLevel` have no effect, and it has no shadow. Text, muted text, borders, muted chips and Kbd hints inside it paint against the fill, so classes like `text-muted-foreground` keep working.
 
 ```tsx
 <TooltipContent variant="inverse">
@@ -81,7 +77,7 @@ It brings its own palette with it: text, muted text, borders, muted chips and Kb
 </TooltipContent>
 ```
 
-The same surface is available to your own floating labels. Put `data-surface="inverse"` on the element and use `bg-neutral` for the fill, and everything inside paints against it with no per-control classes.
+For your own floating label, put `data-surface="inverse"` and `bg-neutral` on the element.
 
 ### Detached Trigger
 
@@ -238,9 +234,8 @@ Composed component for common tooltip layouts. Combines `Tooltip.Portal`, `Toolt
   fullType="'default' | 'inverse'"
   defaultValue='"default"'
 >
-  Surface treatment. `default` sits on the elevation ladder and takes its color
-  from the page. `inverse` flips the page, charcoal in light and near-white in
-  dark, for labels that must stand clear. `inverse` ignores `level` and
+  Surface treatment. `default` sits on the elevation ladder. `inverse` is
+  charcoal in light and near-white in dark, and ignores `level` and
   `shadowLevel`.
 </ApiProp>
 

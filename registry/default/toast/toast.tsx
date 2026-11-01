@@ -71,21 +71,16 @@ function upsertReplayClassName(toast: {
 
 export type ToastVariant = "default" | "inverse";
 
-/**
- * A toast's own `variant` wins; otherwise the provider's applies. It shares
- * `data` with the caller's own keys, so anything that isn't a variant name
- * falls back rather than indexing TOAST_SURFACE with it.
- */
+// A toast's own `variant` beats the provider's. `data` also holds the caller's
+// keys, so only a real variant name counts.
 function resolveVariant(data: unknown, fallback: ToastVariant): ToastVariant {
   const own = (data as { variant?: unknown } | undefined)?.variant;
   return own === "default" || own === "inverse" ? own : fallback;
 }
 
-// Surface for stacked toast roots, kept out of TOAST_ROOT_CLASSES so the two
-// variants never meet in one class list: tailwind-merge files the arbitrary
-// `shadow-[...]` under shadow-color, so it would not drop the other's shadow.
-// Both set --popup-surface rather than a bg, because the stacked-depth mix in
-// TOAST_ROOT_CLASSES paints the fill from it.
+// Stacked root surfaces, kept apart because tailwind-merge can't dedupe the
+// arbitrary `shadow-[...]`. Both set --popup-surface, which the stacked-depth
+// bg in TOAST_ROOT_CLASSES reads.
 const TOAST_SURFACE: Record<ToastVariant, string[]> = {
   default: [
     "text-popover-foreground",
@@ -95,8 +90,7 @@ const TOAST_SURFACE: Record<ToastVariant, string[]> = {
     "[--popup-surface:var(--surface-3)]",
     "shadow-[var(--surface-shadow-4),var(--surface-rim-3)]",
   ],
-  // INVERSE_SURFACE's fill. The rim goes: the fill already stands clear of the
-  // page. The drop stays, since a toast floats over content with no anchor.
+  // No rim: the fill already stands clear of the page.
   inverse: [
     "text-foreground",
     "[--popup-surface:var(--neutral)]",
@@ -1049,8 +1043,7 @@ function StackedToastItem({
       data-slot="toast"
       data-position={position}
       data-variant={variant}
-      // Each root carries the attribute: the viewport is portalled, so the
-      // page's can't reach it.
+      // Portalled, so the root carries the attribute itself.
       data-surface={variant === "inverse" ? "inverse" : undefined}
       className={cn(
         TOAST_ROOT_CLASSES,
@@ -1221,7 +1214,7 @@ function AnchoredToastItem({
         className={cn(
           "flex w-max origin-(--transform-origin) flex-col rounded-md",
           // Surface elevation — level=3 (tooltip/popover tier), shadow matches.
-          // Inverse is fill only, like the inverse Tooltip it resembles.
+          // Inverse is fill only, like the inverse Tooltip.
           variant === "inverse"
             ? [INVERSE_SURFACE, "text-foreground"]
             : [solidSurface(3, 3), "text-popover-foreground"],
@@ -1236,7 +1229,7 @@ function AnchoredToastItem({
             data-slot="toast-arrow"
             className={cn(
               "fill-(--popup-surface,var(--card)) [&>path:first-child]:fill-(--popup-surface,var(--card))",
-              // The inverse body has no edge, so neither does its arrow.
+              // No edge on the inverse body, so none on the arrow.
               variant === "inverse"
                 ? "[&>path:not(:first-child)]:hidden"
                 : "[&>path:not(:first-child)]:stroke-border",
@@ -1752,7 +1745,6 @@ function GroupedToastCard({ data, isTop, variant }: GroupedToastCardProps) {
       className={cn(
         "max-h-64 w-full overflow-y-auto overscroll-contain rounded-lg",
         // Surface elevation — level=5 because it pops above the level-3 toast.
-        // Inverse matches the toast's fill and keeps a drop like the root's.
         variant === "inverse"
           ? [INVERSE_SURFACE, "text-foreground shadow-(--surface-shadow-5)"]
           : [solidSurface(5, 5), "text-popover-foreground"],
@@ -1957,9 +1949,8 @@ function CompletedItemsCard({
       className={cn(
         "max-h-48 w-full overflow-y-auto overscroll-contain rounded-lg",
         // bg-muted is intentionally recessed vs the active card; shadow stays at level=5 to match.
-        // Inverse --muted is translucent and would show the page through, so
-        // the card darkens the fill instead: recessed reads darker in both
-        // themes, which a foreground mix would flip on the charcoal fill.
+        // Inverse --muted is translucent, so darken the fill instead; darker
+        // reads as recessed in both themes.
         variant === "inverse"
           ? "text-foreground bg-[color-mix(in_oklab,var(--neutral),black_12%)] shadow-(--surface-shadow-5)"
           : "bg-muted text-popover-foreground shadow-[var(--surface-shadow-5),var(--surface-rim-5)]",

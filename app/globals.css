@@ -131,8 +131,8 @@ html {
   --success-foreground: oklch(0.48 0.18 145);
   --success-border: oklch(0.9 0.1 145);
 
-  /* The inverse surface is dark here, so it borrows the dark theme's status
-     inks, outline edge and focus ring. Read only by [data-surface="inverse"]. */
+  /* The inverse surface is dark here, so it borrows dark's status inks,
+     outline edge and ring. Read only by [data-surface="inverse"]. */
   --inverse-danger-foreground: oklch(0.75 0.15 25);
   --inverse-warning-foreground: oklch(0.78 0.12 85);
   --inverse-info-foreground: oklch(0.78 0.13 232.65);
@@ -313,10 +313,9 @@ html {
   --success-foreground: oklch(0.72 0.15 145);
   --success-border: oklch(0.36 0.11 145);
 
-  /* The inverse surface is light here, so it borrows the light theme's inks,
-     outline edge and focus ring. Literals, because light's --foreground is
-     not reachable from here. The ring sits a step deeper than light's 0.6,
-     which falls just under 3:1 on the 0.9 fill. */
+  /* The inverse surface is light here, so it borrows light's inks, outline
+     edge and ring, as literals since light's tokens aren't reachable. The
+     ring is 0.55, not light's 0.6, to clear 3:1 on the 0.9 fill. */
   --inverse-danger-foreground: oklch(0.55 0.18 25);
   --inverse-warning-foreground: oklch(0.58 0.14 85);
   --inverse-info-foreground: oklch(0.5 0.13 232.65);
@@ -581,36 +580,26 @@ html {
   }
 }
 
-/* Hands the inverse palette to the whole subtree, so controls keep using
-   ordinary page classes instead of being repainted one at a time. The fill is
-   --neutral in both themes (charcoal in light, near-white in dark), the same
-   fill as the solid `neutral` Button, so retuning that token moves both.
-   --primary is left alone so a primary Button keeps its brand fill.
+/* Hands the inverse palette to the subtree so controls keep their page
+   classes. The fill is --neutral (charcoal in light, near-white in dark),
+   shared with the solid `neutral` Button. --primary stays, so a primary
+   Button keeps its brand fill.
 
-   For transient floating surfaces, ones that dismiss themselves: tooltips and
-   toasts. Not for persistent bars or surfaces you work inside: a near-white
-   slab in dark is far brighter than the page, in a spot you can't scroll away.
+   Only for surfaces that dismiss themselves (tooltips, toasts). A near-white
+   slab in dark outshines the page, so keep it off persistent bars.
 
-   Portalled content renders at the body and correctly does NOT inherit this; a
-   floating component that wants the look carries the attribute itself, as
-   `Tooltip variant="inverse"` and the inverse toast do.
+   Portalled content doesn't inherit this; floating components set the
+   attribute on themselves.
 
-   The derived colours are declared HERE, not on :root: a custom property
-   substitutes its var()s where it is declared, so tokens living on :root would
-   resolve against LIGHT roots under a subtree .dark. Here they read whichever
-   --neutral the element inherits.
+   The derived colours live here, not on :root: a custom property resolves
+   its var()s where it is declared, so on :root they'd read light roots under
+   a subtree .dark.
 
-   Unlayered on purpose. `.dark` is unlayered, and unlayered declarations beat
-   layered ones regardless of specificity, so from `@layer base` this lost to
-   `.dark` on any element carrying both.
+   Unlayered because `.dark` is: from `@layer base` this lost to `.dark` on an
+   element carrying both.
 
-   Each re-pointed fill needs its foreground beside it, or a control pairs an
-   inverse background with a page text colour. Status inks and the outline
-   edge come from the OTHER theme (the --inverse-* tokens), so they look like
-   the library's own, not like new colours. The set covers what a tooltip
-   or toast holds: text, chips, dividers, ghost and outline buttons, and status
-   icons. Form fields and selection controls are left out on purpose; they
-   don't belong on a surface that dismisses itself. */
+   Status inks, the outline edge and the ring come from the other theme
+   (--inverse-*). Form fields and selection controls are left out. */
 [data-surface="inverse"] {
   --foreground: var(--neutral-foreground);
   --muted-foreground: color-mix(
@@ -628,8 +617,7 @@ html {
     var(--neutral-foreground) 14%,
     transparent
   );
-  /* Outline drops its fill and takes the washes, so it reads as the
-     `outline-ghost` Button: a solid chip inside a filled toast clashes. */
+  /* Outline reads as `outline-ghost`: a solid chip clashes on the fill. */
   --outline: transparent;
   --outline-border: var(--inverse-outline-border);
   --outline-hover: var(--surface-hover);

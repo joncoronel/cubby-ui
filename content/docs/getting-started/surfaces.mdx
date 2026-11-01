@@ -260,11 +260,18 @@ function RightSheet({ children }) {
 
 ## The inverse surface
 
-One surface sits deliberately off the ladder. The inverse surface flips the page: its fill is `--neutral` in **both** themes, charcoal in light and near-white in dark, the same fill as a solid `neutral` Button, so retuning that token moves both. `TooltipContent` and `toast()` expose it as `variant="inverse"`.
+One surface sits off the ladder. The inverse surface fills with `--neutral` in **both** themes: charcoal in light, near-white in dark. A solid `neutral` Button uses the same fill, so retuning that token moves both. `TooltipContent` and `toast()` expose it as `variant="inverse"`.
 
-Use it for transient floating surfaces, ones that dismiss themselves, like tooltips and toasts, when they have to stand clear of whatever they sit over. Keep it off persistent bars and off surfaces you work inside, like menus and dialogs: a near-white slab in dark is far brighter than the page, in a spot you cannot scroll away from.
+Use it for surfaces that dismiss themselves, like tooltips and toasts, when they need to stand out over busy content. Keep it off persistent bars and off surfaces you work inside, like menus and dialogs: in dark, a near-white slab outshines the page and you can't scroll it away.
 
-Put `data-surface="inverse"` on the element and use ordinary page classes inside. That attribute re-points the tokens a tooltip or toast paints from, for the whole subtree: text and muted text, borders and muted chips, the accent and hover washes behind ghost buttons, the `--outline` set behind outline buttons, and the status inks behind success, error, warning and info icons. Status inks and the outline edge are borrowed from the other theme, so they match the library instead of introducing new colors. An outline button drops its fill and reads as `outline-ghost`, because a solid chip inside a filled surface clashes with it. Anything painting from those needs no per-control classes:
+Put `data-surface="inverse"` on the element and use ordinary page classes inside. The attribute re-points, for the whole subtree:
+
+- text, muted text, borders and muted chips
+- the hover washes behind ghost buttons
+- the `--outline` set, so an outline button drops its fill and reads as `outline-ghost`
+- the focus ring and the success, error, warning and info inks
+
+The ring, the status inks and the outline edge come from the other theme, so they match the library's existing colors.
 
 ```tsx
 import { INVERSE_SURFACE } from "@/registry/default/lib/elevated";
@@ -275,19 +282,15 @@ import { INVERSE_SURFACE } from "@/registry/default/lib/elevated";
 </div>;
 ```
 
-`INVERSE_SURFACE` paints the fill and nothing else, the same way `SURFACE_BG` does for a ladder rung. It needs no edge: the fill stands well clear of the page in both themes.
+`INVERSE_SURFACE` paints the fill and nothing else, like `SURFACE_BG` for a ladder rung. It needs no edge, and `level` and `shadowLevel` don't apply. `--primary` stays as it is, so a primary Button keeps its brand fill.
 
-`--primary` is left alone on purpose, so a primary Button keeps its brand fill anywhere. There is no inverse utility beyond `bg-neutral` for the fill: a second idiom for the same job is what the attribute exists to remove.
+Three things to know:
 
-Two things to know:
+- **Portalled content doesn't inherit it.** Menus, dialogs and tooltips render at the document body, so a floating component carries the attribute itself, as `TooltipContent variant="inverse"` and the inverse toast do.
+- **Form fields and selection controls aren't covered.** Inputs, switches and sliders keep their page colors.
+- **It works under a nested `.dark`.** The rule derives its colors from whichever `--neutral` the element inherits.
 
-- **Portalled content does not inherit it.** Menus, dialogs and tooltips render at the document body, so a floating component that wants this look has to carry the attribute itself. That is exactly what `TooltipContent variant="inverse"` and the inverse toast do.
-- **Form fields and selection controls are not covered.** Inputs, switches and sliders keep their page colors, because they don't belong on a surface that dismisses itself.
-- **It works under a nested `.dark`.** The derived colors are declared in the `[data-surface="inverse"]` rule itself, so they resolve against whichever `--neutral` the element inherits, including inside a `.dark` subtree.
-
-Because the inverse surface is off the ladder, `level` and `shadowLevel` do not apply to it.
-
-Earlier versions called this the chrome surface. If you used it, rename `variant="chrome"` to `variant="inverse"`, `CHROME_SURFACE` to `INVERSE_SURFACE`, `data-surface="chrome"` to `data-surface="inverse"`, and `bg-chrome` to `bg-neutral`. The `--chrome*` tokens are gone; the attribute derives everything from `--neutral` and `--neutral-foreground`.
+Earlier versions called this the chrome surface. To migrate, rename `variant="chrome"` to `variant="inverse"`, `CHROME_SURFACE` to `INVERSE_SURFACE`, `data-surface="chrome"` to `data-surface="inverse"`, and `bg-chrome` to `bg-neutral`. The `--chrome*` tokens are gone.
 
 ## Customizing the system
 

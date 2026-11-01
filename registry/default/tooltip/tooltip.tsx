@@ -58,10 +58,8 @@ function TooltipArrow({
 
 /**
  * Surface treatment, as a union so the compiler rejects the impossible pair.
- * `inverse` flips the page: a charcoal label in light, near-white in dark. It
- * sits off the elevation ladder, so `level` and
- * `shadowLevel` would have nothing to select and are refused rather than
- * silently dropped.
+ * `inverse` (charcoal in light, near-white in dark) sits off the elevation
+ * ladder, so it refuses `level` and `shadowLevel` instead of ignoring them.
  */
 type TooltipSurfaceProps =
   | {
@@ -134,8 +132,7 @@ function TooltipContent({
             // an absolutely positioned arrow would change reference frame
             // partway through the open.
             "relative h-(--popup-height,auto) max-h-(--available-height) w-(--popup-width,auto) max-w-(--available-width) origin-(--transform-origin) rounded-sm text-xs outline-none",
-            // The inverse rule re-points --foreground but deliberately leaves
-            // the popover/card pair alone, so inverse reads the former.
+            // The inverse rule re-points --foreground, not --popover-foreground.
             isInverse ? "text-foreground" : "text-popover-foreground",
             isInverse ? INVERSE_SURFACE : solidSurface(level, shadowLevel),
             // No directional translate: the popup scales from
@@ -208,7 +205,7 @@ function TooltipContent({
                   d="M9.66437 2.60207L4.80758 6.97318C4.07308 7.63423 3.11989 8 2.13172 8H0V9H20V8H18.5349C17.5468 8 16.5936 7.63423 15.8591 6.97318L11.0023 2.60207C10.622 2.2598 10.0447 2.25979 9.66437 2.60207Z"
                   className="fill-(--popup-surface,var(--card))"
                 />
-                {/* The inverse body has no edge, so neither does its arrow. */}
+                {/* No edge on the inverse body, so none on the arrow. */}
                 {!isInverse && (
                   <path
                     d="M10.3333 3.34539L5.47654 7.71648C4.55842 8.54279 3.36693 9 2.13172 9H0V8H2.13172C3.11989 8 4.07308 7.63423 4.80758 6.97318L9.66437 2.60207C10.0447 2.25979 10.622 2.2598 11.0023 2.60207L15.8591 6.97318C16.5936 7.63423 17.5468 8 18.5349 8H20V9H18.5349C17.2998 9 16.1083 8.54278 15.1901 7.71648L10.3333 3.34539Z"

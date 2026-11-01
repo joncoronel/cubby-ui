@@ -89,18 +89,13 @@ export const SURFACE_SHADOW_COMBINED: Record<SurfaceLevel, string> = {
 };
 
 /**
- * The inverse fill: `--neutral` in both themes (charcoal in light, near-white
- * in dark), deliberately OFF the elevation ladder. For transient floating
- * surfaces that dismiss themselves (tooltips, toasts); not for persistent bars,
- * where a near-white slab in dark outshines the page.
+ * The inverse fill, off the elevation ladder: `--neutral`, charcoal in light
+ * and near-white in dark. Only for surfaces that dismiss themselves (tooltips,
+ * toasts).
  *
- * Pair it with `data-surface="inverse"` on the same element — that attribute
- * re-points `--foreground`, `--border`, the washes and the status inks for the subtree, so
- * ordinary page classes keep working inside. Without it, contents paint
- * dark-on-dark (light-on-light in dark).
- *
- * Fill only, like `SURFACE_BG` + `SURFACE_VAR`. It needs no edge: the fill
- * sits well clear of the page in both themes.
+ * Pair it with `data-surface="inverse"` on the same element so page classes
+ * inside paint against the fill. Fill only, like `SURFACE_BG` + `SURFACE_VAR`;
+ * it needs no edge.
  */
 export const INVERSE_SURFACE = "bg-neutral [--popup-surface:var(--neutral)]";
 

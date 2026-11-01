@@ -287,6 +287,8 @@ Two things to know:
 
 Because the inverse surface is off the ladder, `level` and `shadowLevel` do not apply to it.
 
+Earlier versions called this the chrome surface. If you used it, rename `variant="chrome"` to `variant="inverse"`, `CHROME_SURFACE` to `INVERSE_SURFACE`, `data-surface="chrome"` to `data-surface="inverse"`, and `bg-chrome` to `bg-neutral`. The `--chrome*` tokens are gone; the attribute derives everything from `--neutral` and `--neutral-foreground`.
+
 ## Customizing the system
 
 ### Brand tint

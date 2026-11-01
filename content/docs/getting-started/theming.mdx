@@ -136,13 +136,14 @@ Copy and paste the following into your `globals.css` file:
   --info-border: oklch(0.9 0.07 232.65);
   --success: oklch(0.97 0.04 145);
   --success-foreground: oklch(0.48 0.18 145);
+  --success-border: oklch(0.9 0.1 145);
 
   --inverse-danger-foreground: oklch(0.75 0.15 25);
   --inverse-warning-foreground: oklch(0.78 0.12 85);
   --inverse-info-foreground: oklch(0.78 0.13 232.65);
   --inverse-success-foreground: oklch(0.72 0.15 145);
   --inverse-outline-border: oklch(1 0 0 / 0.08);
-  --success-border: oklch(0.9 0.1 145);
+  --inverse-ring: oklch(0.75 0.15 232.65);
 
   --surface-1: oklch(0.99 0 0);
   --surface-2: oklch(0.995 0 0);
@@ -296,6 +297,7 @@ Copy and paste the following into your `globals.css` file:
   --info-border: oklch(0.36 0.09 232.65);
   --success: oklch(0.26 0.07 145);
   --success-foreground: oklch(0.72 0.15 145);
+  --success-border: oklch(0.36 0.11 145);
 
   --inverse-danger-foreground: oklch(0.55 0.18 25);
   --inverse-warning-foreground: oklch(0.58 0.14 85);
@@ -306,7 +308,7 @@ Copy and paste the following into your `globals.css` file:
     oklch(0.3 var(--neutral-chroma) var(--neutral-hue)) 10%,
     transparent
   );
-  --success-border: oklch(0.36 0.11 145);
+  --inverse-ring: oklch(0.55 0.15 232.65);
 
   /* Surface ladder, progressive lightness with brand-hue tint */
   --surface-1: oklch(0.205 var(--neutral-chroma) var(--neutral-hue));
@@ -516,13 +518,9 @@ Copy and paste the following into your `globals.css` file:
   );
   --border: color-mix(in oklab, var(--neutral-foreground) 12%, transparent);
   --muted: color-mix(in oklab, var(--neutral-foreground) 10%, transparent);
-  --accent: color-mix(in oklab, var(--neutral-foreground) 10%, transparent);
+  --accent: var(--muted);
   --accent-foreground: var(--neutral-foreground);
-  --surface-hover: color-mix(
-    in oklab,
-    var(--neutral-foreground) 10%,
-    transparent
-  );
+  --surface-hover: var(--muted);
   --surface-active: color-mix(
     in oklab,
     var(--neutral-foreground) 14%,
@@ -536,6 +534,7 @@ Copy and paste the following into your `globals.css` file:
   --warning-foreground: var(--inverse-warning-foreground);
   --info-foreground: var(--inverse-info-foreground);
   --success-foreground: var(--inverse-success-foreground);
+  --ring: var(--inverse-ring);
 }
 ```
 

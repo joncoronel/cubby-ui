@@ -71,9 +71,14 @@ function upsertReplayClassName(toast: {
 
 export type ToastVariant = "default" | "inverse";
 
-/** A toast's own `variant` wins; otherwise the provider's applies. */
+/**
+ * A toast's own `variant` wins; otherwise the provider's applies. It shares
+ * `data` with the caller's own keys, so anything that isn't a variant name
+ * falls back rather than indexing TOAST_SURFACE with it.
+ */
 function resolveVariant(data: unknown, fallback: ToastVariant): ToastVariant {
-  return (data as { variant?: ToastVariant } | undefined)?.variant ?? fallback;
+  const own = (data as { variant?: unknown } | undefined)?.variant;
+  return own === "default" || own === "inverse" ? own : fallback;
 }
 
 // Surface for stacked toast roots, kept out of TOAST_ROOT_CLASSES so the two
@@ -1229,7 +1234,13 @@ function AnchoredToastItem({
         {showArrow && (
           <Toast.Arrow
             data-slot="toast-arrow"
-            className="[&>path:not(:first-child)]:stroke-border fill-(--popup-surface,var(--card)) [&>path:first-child]:fill-(--popup-surface,var(--card))"
+            className={cn(
+              "fill-(--popup-surface,var(--card)) [&>path:first-child]:fill-(--popup-surface,var(--card))",
+              // The inverse body has no edge, so neither does its arrow.
+              variant === "inverse"
+                ? "[&>path:not(:first-child)]:hidden"
+                : "[&>path:not(:first-child)]:stroke-border",
+            )}
           />
         )}
         <Toast.Content data-slot="toast-content">
@@ -1946,10 +1957,11 @@ function CompletedItemsCard({
       className={cn(
         "max-h-48 w-full overflow-y-auto overscroll-contain rounded-lg",
         // bg-muted is intentionally recessed vs the active card; shadow stays at level=5 to match.
-        // Inverse --muted is translucent, so it is composited onto the fill
-        // here; on its own it would show the page through the card.
+        // Inverse --muted is translucent and would show the page through, so
+        // the card darkens the fill instead: recessed reads darker in both
+        // themes, which a foreground mix would flip on the charcoal fill.
         variant === "inverse"
-          ? "text-foreground bg-[color-mix(in_oklab,var(--neutral-foreground)_10%,var(--neutral))] shadow-(--surface-shadow-5)"
+          ? "text-foreground bg-[color-mix(in_oklab,var(--neutral),black_12%)] shadow-(--surface-shadow-5)"
           : "bg-muted text-popover-foreground shadow-[var(--surface-shadow-5),var(--surface-rim-5)]",
         "animate-in fade-in-0 zoom-in-95",
         isTop ? "slide-in-from-top-2" : "slide-in-from-bottom-2",

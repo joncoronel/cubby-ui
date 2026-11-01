@@ -36,6 +36,22 @@ Use `type` (or the `toast.success`, `toast.error`, and similar shorthands) to se
 | `warning` | Flags a risk or caution.                     |
 | `info`    | Conveys neutral, non-status information.     |
 
+### Inverse Surface
+
+Use `variant: "inverse"` for a charcoal toast in light and a near-white one in dark, so it stands out over busy content. Its icons and buttons adapt to the fill.
+
+<ComponentPreview component="toast" example="toast-inverse" />
+
+Set `variant` on the provider to make every toast inverse. A toast's own `variant` still wins, so one toast can opt out with `variant: "default"`.
+
+```tsx
+<ToastProvider variant="inverse">
+  <AnchoredToastProvider variant="inverse">{children}</AnchoredToastProvider>
+</ToastProvider>
+```
+
+`toast.grouped()` takes the same option, and a group keeps the variant of the item that created it. `toast.promise()` follows the provider.
+
 ### Anchored Toast
 
 Use `toast.anchored()` to pin a toast to a specific element for contextual feedback like a "Copied" confirmation.
@@ -144,6 +160,10 @@ toast(<div>Custom JSX content</div>, { type: "info" });
   Fires when the toast is removed from the DOM.
 </ApiProp>
 
+<ApiProp name="variant" fullType='"default" | "inverse"'>
+  Surface for this toast. Overrides the provider's `variant`.
+</ApiProp>
+
 <ApiProp name="showCloseButton" fullType="boolean" defaultValue="true">
   Whether to show the close button.
 </ApiProp>
@@ -194,7 +214,6 @@ toast.anchored({
   anchor: buttonRef,
   side: "top",
   sideOffset: 8,
-  arrow: true,
   duration: 2000,
 });
 
@@ -277,6 +296,10 @@ toast.grouped({
 
 <ApiProp name="duration" fullType="number">
   For non-loading items: group auto-dismiss duration (resets on new item, pauses on hover). For loading items: progress bar duration after transitioning to success/error.
+</ApiProp>
+
+<ApiProp name="variant" fullType='"default" | "inverse"'>
+  Surface for the group. Overrides the provider's `variant`. Later items don't change it.
 </ApiProp>
 
 <ApiProp name="showCloseButton" fullType="boolean" defaultValue="true">
@@ -392,6 +415,10 @@ Wraps your app to enable stacked toast notifications. Composes Base UI's `Toast.
   Position of the toast viewport.
 </ApiProp>
 
+<ApiProp name="variant" fullType='"default" | "inverse"' defaultValue='"default"'>
+  Surface for every toast. A toast's own `variant` overrides it.
+</ApiProp>
+
 <ApiProp name="limit" fullType="number" defaultValue="3">
   Maximum number of toasts visible at once.
 </ApiProp>
@@ -414,6 +441,10 @@ Wraps your app to enable anchored toasts (positioned relative to elements). Comp
 
 <ApiProp name="limit" fullType="number" defaultValue="5">
   Maximum number of anchored toasts visible at once.
+</ApiProp>
+
+<ApiProp name="variant" fullType='"default" | "inverse"' defaultValue='"default"'>
+  Surface for every anchored toast. A toast's own `variant` overrides it.
 </ApiProp>
 
 <ApiProp name="timeout" fullType="number" defaultValue="2000">

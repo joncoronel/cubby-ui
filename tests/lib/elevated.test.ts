@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { cn } from "@/lib/utils";
 import {
-  CHROME_SURFACE,
+  INVERSE_SURFACE,
   SURFACE_LEVELS,
   elevatedSurface,
   flushSurface,
@@ -81,26 +81,15 @@ describe("surface shadow classes", () => {
   });
 });
 
-describe("chrome surface", () => {
-  // The chrome edge is opt-in, so the fill must carry no shadow of its own.
+describe("inverse surface", () => {
+  // Off the ladder, so the fill carries no shadow of its own.
   it("is fill only", () => {
-    expect(CHROME_SURFACE).not.toContain("shadow-");
-  });
-
-  // Same override guarantee as the ladder, via the same `shadow-(--var)` form.
-  it("stays overridable when the edge is added", () => {
-    const merged = cn(
-      CHROME_SURFACE,
-      "shadow-(--chrome-shadow)",
-      "shadow-none",
-    );
-    expect(merged).toContain("shadow-none");
-    expect(merged).not.toContain("shadow-(--chrome-shadow)");
+    expect(INVERSE_SURFACE).not.toContain("shadow-");
   });
 
   // Descendants track the fill through --popup-surface, not the ladder.
-  it("points --popup-surface at the chrome fill", () => {
-    expect(CHROME_SURFACE).toContain("[--popup-surface:var(--chrome)]");
+  it("points --popup-surface at the inverse fill", () => {
+    expect(INVERSE_SURFACE).toContain("[--popup-surface:var(--neutral)]");
   });
 });
 

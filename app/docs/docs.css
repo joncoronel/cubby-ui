@@ -20,8 +20,10 @@
   --frame-radius: 1rem;
   background-color: var(--docs-frame);
 }
+/* The same 0.065 lightness step below the dark page (0.205) as light's frame
+   takes below its page (0.99). */
 :root.dark:has(.docs-root) {
-  --docs-frame: var(--chrome);
+  --docs-frame: oklch(0.14 var(--neutral-chroma-low) var(--neutral-hue));
 }
 @media (min-width: 40rem) {
   :root:has(.docs-root) {

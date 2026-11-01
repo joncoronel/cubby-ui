@@ -20,7 +20,6 @@ export default function ToastAnchored() {
           anchor: buttonRef,
           side: "top",
           sideOffset: 8,
-          arrow: true,
           duration: 2000,
           onClose: () => setOpen(false),
         });

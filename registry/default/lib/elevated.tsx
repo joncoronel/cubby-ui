@@ -89,22 +89,15 @@ export const SURFACE_SHADOW_COMBINED: Record<SurfaceLevel, string> = {
 };
 
 /**
- * Near-black fill in BOTH themes, deliberately OFF the elevation ladder. For
- * persistent app chrome (a header bar) and for floating labels that should read
- * as instrument rather than page.
+ * The inverse fill, off the elevation ladder: `--neutral`, charcoal in light
+ * and near-white in dark. Only for surfaces that dismiss themselves (tooltips,
+ * toasts).
  *
- * Pair it with `data-surface="chrome"` on the same element — that attribute
- * re-points `--foreground`, `--border` and the washes for the subtree, so
- * ordinary page classes keep working inside. Without it, contents paint
- * dark-on-dark.
- *
- * Fill only, like `SURFACE_BG` + `SURFACE_VAR`. Add the edge separately with
- * `shadow-(--chrome-shadow)` for anything LARGE: in dark it is not decoration,
- * since the fill measures 1.08:1 against the page and that token is the only
- * thing defining the surface (light is 16.3:1 and needs none). Leave it off
- * for anything small, as the chrome `Tooltip` does.
+ * Pair it with `data-surface="inverse"` on the same element so page classes
+ * inside paint against the fill. Fill only, like `SURFACE_BG` + `SURFACE_VAR`;
+ * it needs no edge.
  */
-export const CHROME_SURFACE = "bg-chrome [--popup-surface:var(--chrome)]";
+export const INVERSE_SURFACE = "bg-neutral [--popup-surface:var(--neutral)]";
 
 export function surfaceClasses(
   level: SurfaceLevel,

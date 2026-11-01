@@ -3,7 +3,7 @@ import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip";
 
 import { cn } from "@/lib/utils";
 import {
-  CHROME_SURFACE,
+  INVERSE_SURFACE,
   solidSurface,
   type SurfaceLevel,
 } from "@/registry/default/lib/elevated";
@@ -58,10 +58,8 @@ function TooltipArrow({
 
 /**
  * Surface treatment, as a union so the compiler rejects the impossible pair.
- * `chrome` is the near-black fill in both themes, for labels that read as
- * instrument rather than page. It sits off the elevation ladder, so `level` and
- * `shadowLevel` would have nothing to select and are refused rather than
- * silently dropped.
+ * `inverse` (charcoal in light, near-white in dark) sits off the elevation
+ * ladder, so it refuses `level` and `shadowLevel` instead of ignoring them.
  */
 type TooltipSurfaceProps =
   | {
@@ -71,7 +69,7 @@ type TooltipSurfaceProps =
       /** Shadow weight (1-8). Pinned to 2 by default so tooltips read as quiet/subtle. */
       shadowLevel?: SurfaceLevel;
     }
-  | { variant: "chrome"; level?: never; shadowLevel?: never };
+  | { variant: "inverse"; level?: never; shadowLevel?: never };
 
 function TooltipContent({
   children,
@@ -104,7 +102,7 @@ function TooltipContent({
   arrowPadding?: number;
   container?: HTMLElement | undefined;
 } & TooltipSurfaceProps) {
-  const isChrome = variant === "chrome";
+  const isInverse = variant === "inverse";
   return (
     <TooltipPortal container={container}>
       <BaseTooltip.Positioner
@@ -125,8 +123,8 @@ function TooltipContent({
           data-variant={variant}
           // No level to report off the ladder. The popup carries the attribute
           // itself because portalled content can't inherit the page's.
-          data-level={isChrome ? undefined : level}
-          data-surface={isChrome ? "chrome" : undefined}
+          data-level={isInverse ? undefined : level}
+          data-surface={isInverse ? "inverse" : undefined}
           className={cn(
             // `relative` matches Popover and pins the arrow's containing block.
             // Without it the popup is a containing block only while `scale` is
@@ -134,12 +132,9 @@ function TooltipContent({
             // an absolutely positioned arrow would change reference frame
             // partway through the open.
             "relative h-(--popup-height,auto) max-h-(--available-height) w-(--popup-width,auto) max-w-(--available-width) origin-(--transform-origin) rounded-sm text-xs outline-none",
-            // The chrome rule re-points --foreground but deliberately leaves
-            // the popover/card pair alone, so chrome reads the former.
-            isChrome ? "text-foreground" : "text-popover-foreground",
-            // Fill only — `shadow-(--chrome-shadow)` is the opt-in edge, which a
-            // header bar needs and a two-line label does not.
-            isChrome ? CHROME_SURFACE : solidSurface(level, shadowLevel),
+            // The inverse rule re-points --foreground, not --popover-foreground.
+            isInverse ? "text-foreground" : "text-popover-foreground",
+            isInverse ? INVERSE_SURFACE : solidSurface(level, shadowLevel),
             // No directional translate: the popup scales from
             // --transform-origin, which Base UI aims back at the trigger, so
             // the growth already reads as coming from the anchor. A per-side
@@ -210,10 +205,13 @@ function TooltipContent({
                   d="M9.66437 2.60207L4.80758 6.97318C4.07308 7.63423 3.11989 8 2.13172 8H0V9H20V8H18.5349C17.5468 8 16.5936 7.63423 15.8591 6.97318L11.0023 2.60207C10.622 2.2598 10.0447 2.25979 9.66437 2.60207Z"
                   className="fill-(--popup-surface,var(--card))"
                 />
-                <path
-                  d="M10.3333 3.34539L5.47654 7.71648C4.55842 8.54279 3.36693 9 2.13172 9H0V8H2.13172C3.11989 8 4.07308 7.63423 4.80758 6.97318L9.66437 2.60207C10.0447 2.25979 10.622 2.2598 11.0023 2.60207L15.8591 6.97318C16.5936 7.63423 17.5468 8 18.5349 8H20V9H18.5349C17.2998 9 16.1083 8.54278 15.1901 7.71648L10.3333 3.34539Z"
-                  className="fill-border/80 dark:fill-border/60"
-                />
+                {/* No edge on the inverse body, so none on the arrow. */}
+                {!isInverse && (
+                  <path
+                    d="M10.3333 3.34539L5.47654 7.71648C4.55842 8.54279 3.36693 9 2.13172 9H0V8H2.13172C3.11989 8 4.07308 7.63423 4.80758 6.97318L9.66437 2.60207C10.0447 2.25979 10.622 2.2598 11.0023 2.60207L15.8591 6.97318C16.5936 7.63423 17.5468 8 18.5349 8H20V9H18.5349C17.2998 9 16.1083 8.54278 15.1901 7.71648L10.3333 3.34539Z"
+                    className="fill-border/80 dark:fill-border/60"
+                  />
+                )}
               </svg>
             </TooltipArrow>
           )}

@@ -31,7 +31,7 @@ Prettier auto-formats code. Run before committing:
 ### TypeScript
 
 - **Strict mode enabled** - `tsconfig.json` has `"strict": true`
-- Use explicit types for function parameters and return values
+- Use explicit types for function parameters. Give non-component functions explicit return types; React components may leave theirs to inference, as most of the registry does
 - Prefer `unknown` over `any` when type is genuinely unknown
 - Use `const` by default, `let` only when reassignment needed, never `var`
 - Use `ReactElement` instead of `JSX.Element` for better compatibility

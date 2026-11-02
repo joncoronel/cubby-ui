@@ -10,6 +10,17 @@
   initial-value: 0;
 }
 
+/**
+ * Written to the parent popup every scroll frame while a nested drawer drags.
+ * Only the popup itself reads it, so it doesn't inherit: an inherited write
+ * would restyle the parent's whole subtree on every frame.
+ */
+@property --nested-drag-progress {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
 @keyframes drawer-snap-progress {
   from {
     --drawer-snap-progress: 0;

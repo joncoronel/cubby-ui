@@ -1,24 +1,26 @@
-import { Kbd } from "@/registry/default/kbd/kbd"
+import { Kbd } from "@/registry/default/kbd/kbd";
+
+const SHORTCUTS = [
+  { label: "Open command palette", keys: ["mod", "k"] },
+  { label: "Save document", keys: ["mod", "s"] },
+  { label: "Find and replace", keys: ["mod", "alt", "f"] },
+  { label: "Toggle sidebar", keys: ["mod", "b"] },
+];
 
 export default function KbdKeyboardShortcutsList() {
   return (
-    <div className="space-y-2 max-w-xs">
-      <div className="flex items-center justify-between">
-        <span className="text-sm">Open command palette</span>
-        <Kbd keys={["cmd", "k"]} size="sm" />
-      </div>
-      <div className="flex items-center justify-between">
-        <span className="text-sm">Save document</span>
-        <Kbd keys={["cmd", "s"]} size="sm" />
-      </div>
-      <div className="flex items-center justify-between">
-        <span className="text-sm">Copy selection</span>
-        <Kbd keys={["cmd", "c"]} size="sm" />
-      </div>
-      <div className="flex items-center justify-between">
-        <span className="text-sm">Paste clipboard</span>
-        <Kbd keys={["cmd", "v"]} size="sm" />
-      </div>
-    </div>
-  )
+    <dl className="w-full max-w-xs space-y-2.5 text-sm">
+      {SHORTCUTS.map((shortcut) => (
+        <div
+          key={shortcut.label}
+          className="flex items-center justify-between gap-4"
+        >
+          <dt>{shortcut.label}</dt>
+          <dd>
+            <Kbd keys={shortcut.keys} />
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
 }

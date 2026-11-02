@@ -1,16 +1,16 @@
 ---
 title: Kbd
-description: Display keyboard shortcuts and key combinations with proper styling
+description: Display keyboard keys and shortcuts as soft keycaps that read the user's platform
 type: primitive
 ---
 
 import { Kbd } from "@/registry/default/kbd/kbd";
 
-Kbd renders a keyboard key or shortcut with key-cap styling. Use it in docs, tooltips, command menus, and shortcut lists to show combinations like `⌘ K` or `Ctrl + S`. Pass `keys` to render a combination, and it converts named keys to platform symbols automatically.
+Kbd renders a keyboard key as a soft keycap: a translucent fill with a one-pixel lip, both taken from the color of the text around it, so it reads on the page, in a tooltip and on a primary button without a variant per surface. Pass `keys` to draw a whole shortcut on one cap, and named keys like `mod` and `shift` become the right legend for the user's platform: <Kbd keys={["mod", "k"]} platform="mac" /> on a Mac, `Ctrl+K` everywhere else.
 
 ## Preview
 
-<ComponentPreview component="kbd" example="kbd-single-keys" />
+<ComponentPreview component="kbd" example="kbd-keyboard-shortcuts-list" />
 
 ## Installation
 
@@ -20,130 +20,138 @@ Kbd renders a keyboard key or shortcut with key-cap styling. Use it in docs, too
 
 <ComponentUsage component="kbd" />
 
+## Composition
+
+```text
+KbdGroup
+└── Kbd
+```
+
 ## Examples
 
-### Size Variants
+### Single Keys
 
-Use `size` to set the key's height and text size.
+Put the legend in `children` for a key you spell out yourself.
 
-<ComponentPreview component="kbd" example="kbd-size-variants" />
+<ComponentPreview component="kbd" example="kbd-single-keys" />
 
-| Size | Description                  |
-| ---- | ---------------------------- |
-| `sm` | Compact key for dense UI.    |
-| `md` | The default key size.        |
-| `lg` | Larger key for emphasis.     |
+### Shortcuts
 
-### Color Variants
-
-Use `variant` to set the key's color scheme.
-
-<ComponentPreview component="kbd" example="kbd-color-variants" />
-
-| Variant     | Description                              |
-| ----------- | ---------------------------------------- |
-| `default`   | Card-colored key with a subtle border.   |
-| `primary`   | Solid primary-colored key.               |
-| `secondary` | Solid secondary-colored key.             |
-| `outline`   | Borderless, transparent key.             |
-| `ghost`     | Muted key with no border or shadow.      |
-| `danger`    | Destructive-colored key.                 |
-
-### Manual Key Combinations
-
-Compose multiple `Kbd` elements to build a combination by hand.
-
-<ComponentPreview component="kbd" example="kbd-manual-key-combinations" />
-
-### Key Combinations with Props
-
-Use `keys` to render a combination from an array, joined by `separator`.
+Use `keys` to draw a shortcut on one cap. Mac legends sit side by side; elsewhere they're joined with `+`. Set `separator` to change that.
 
 <ComponentPreview component="kbd" example="kbd-key-combinations-with-props" />
 
-### Special Keys with Auto Conversion
+### Named Keys
 
-Named keys like `cmd` and `shift` convert to symbols automatically.
+Named keys are case-insensitive and turn into the platform's legend. Symbols carry a hidden label, so a screen reader says "Command" rather than the glyph's name. Any other single character is uppercased; longer names are drawn as written.
 
 <ComponentPreview component="kbd" example="kbd-special-keys-with-auto-conversion" />
 
-### Platform Detection
+| Key                    | Mac | Windows and Linux |
+| ---------------------- | --- | ----------------- |
+| `mod` (`cmd`, `command`) | ⌘ | Ctrl              |
+| `meta`                 | ⌘   | Win               |
+| `ctrl` (`control`)     | ⌃   | Ctrl              |
+| `alt` (`option`)       | ⌥   | Alt               |
+| `shift`                | ⇧   | Shift             |
+| `enter` (`return`)     | ↵   | Enter             |
+| `backspace`            | ⌫   | Backspace         |
+| `delete`               | ⌦   | Del               |
+| `tab`                  | ⇥   | Tab               |
+| `capslock`             | ⇪   | Caps Lock         |
+| `esc` (`escape`), `space` | Esc, Space | Esc, Space |
+| `up`, `down`, `left`, `right` | ↑ ↓ ← → | ↑ ↓ ← → |
 
-Use `platform` to force `mac` or `windows` symbols, or leave it `auto` to detect the user's OS.
+### Platform
+
+`platform` defaults to `"auto"`, which reads the user's OS. Set `"mac"` or `"windows"` to pin one. A key rendered on the server shows Mac legends until it hydrates; keys in menus, dialogs and tooltips mount on the client and are right from their first frame.
 
 <ComponentPreview component="kbd" example="kbd-platform-detection" />
 
-### In Context
+### Group
 
-Place `Kbd` inline within prose to reference a shortcut.
+Wrap several `Kbd` in `KbdGroup` to show a shortcut as separate caps, or a sequence with words between them. The group is an outer `kbd`, the HTML way to mark up a combination. Put text like `+` or "then" in a `span` and it stays quiet.
+
+<ComponentPreview component="kbd" example="kbd-group" />
+
+### Variants
+
+`default` is the filled keycap. `outline` takes the outline Button's fill and edge, for a key that sits on a muted plate; it keeps that surface's colors, so use `default` on a solid fill. `ghost` is the legend alone, for menus and dense rows.
+
+<ComponentPreview component="kbd" example="kbd-variants" />
+
+### Sizes
+
+<ComponentPreview component="kbd" example="kbd-size-variants" />
+
+| Size | Height | Use                                      |
+| ---- | ------ | ---------------------------------------- |
+| `sm` | 18px   | Tooltips, menu rows, command footers.    |
+| `md` | 20px   | Running text and shortcut lists.         |
+| `lg` | 24px   | Keyboards and anything you want to show. |
+
+### In Text
+
+Kbd sits on the text baseline, so it drops into a sentence without nudging the line.
 
 <ComponentPreview component="kbd" example="kbd-in-context" />
 
-### Keyboard Shortcuts List
+### In a Tooltip
 
-Pair labels with `Kbd` to document a set of shortcuts.
+The fill is mixed from the current ink, so the same key reads in the default tooltip and the inverse one.
 
-<ComponentPreview component="kbd" example="kbd-keyboard-shortcuts-list" />
+<ComponentPreview component="kbd" example="kbd-in-tooltip" />
 
-### Live Keyboard Input Detection
+### In a Button
 
-Reflect the keys the user is pressing in real time.
+Pass the key as `trailingIcon` so it sits apart from the label. It wears the button's text color and takes a stronger fill, so it reads on a solid fill with no override. Hide the key with `aria-hidden` and name the shortcut with `aria-keyshortcuts`, so the button is still announced as "Save".
+
+<ComponentPreview component="kbd" example="kbd-in-button" />
+
+### Pressed
+
+`pressed` pushes the key down a pixel, drops its lip and darkens its fill. Type to try it.
 
 <ComponentPreview component="kbd" example="kbd-live-keyboard-input-detection" />
 
-### States
-
-Use `pressed` and `disabled` to show active or unavailable keys.
-
-<ComponentPreview component="kbd" example="kbd-states" />
-
 ## API Reference
 
-Kbd is a custom styled `kbd` element. All props are custom or standard `kbd` attributes passed through.
+Kbd and KbdGroup render `kbd` elements. Other props pass through to the element.
 
 ### Props
 
 #### Kbd
 
-Keyboard key or shortcut with key-cap styling.
+One key, or a whole shortcut drawn on a single cap.
 
 <ApiPropsList>
+
+<ApiProp name="keys" fullType="string[]" simpleType="array">
+  Keys of one shortcut. Named keys become the platform's legend; other single characters are uppercased. When set, `children` is ignored.
+</ApiProp>
+
+<ApiProp name="separator" fullType="React.ReactNode" simpleType="ReactNode">
+  Placed between `keys`. Defaults to nothing on Mac and `+` elsewhere; pass `null` for none. Screen readers hear "plus" either way.
+</ApiProp>
+
+<ApiProp name="platform" fullType='"mac" | "windows" | "auto"' simpleType="string" defaultValue='"auto"'>
+  Legend set for named keys. `"auto"` reads the user's OS; `"windows"` also covers Linux.
+</ApiProp>
+
+<ApiProp name="variant" fullType='"default" | "outline" | "ghost"' simpleType="string" defaultValue='"default"'>
+  Filled keycap, outlined key, or the legend alone.
+</ApiProp>
 
 <ApiProp name="size" fullType='"sm" | "md" | "lg"' simpleType="string" defaultValue='"md"'>
   Height and text size of the key.
 </ApiProp>
 
-<ApiProp
-  name="variant"
-  fullType='"default" | "primary" | "secondary" | "outline" | "ghost" | "danger"'
-  simpleType="string"
-  defaultValue='"default"'
->
-  Color scheme of the key.
-</ApiProp>
-
 <ApiProp name="pressed" fullType="boolean" defaultValue="false">
-  Shows the key in a pressed-down state.
-</ApiProp>
-
-<ApiProp name="keys" fullType="string[]" simpleType="array">
-  Keys to render as a combination, joined by `separator`. When set, `children` is ignored. Named keys convert to platform symbols.
-</ApiProp>
-
-<ApiProp name="separator" fullType="string" defaultValue='"+"'>
-  Symbol placed between keys when rendering a `keys` combination.
-</ApiProp>
-
-<ApiProp name="platform" fullType='"mac" | "windows" | "auto"' simpleType="string" defaultValue='"auto"'>
-  Symbol set used for named keys. `"auto"` detects the user's OS.
-</ApiProp>
-
-<ApiProp name="disabled" fullType="boolean" defaultValue="false">
-  Dims the key and sets `aria-disabled` to mark it unavailable.
-</ApiProp>
-
-<ApiProp name="aria-label" fullType="string" simpleType="string">
-  Accessible label for the key, useful when the visible content is a symbol.
+  Draws the key held down. Sets `data-pressed` for your own styles.
 </ApiProp>
 
 </ApiPropsList>
+
+#### KbdGroup
+
+An outer `kbd` that lays out several keys as one shortcut. Takes standard `kbd` props.

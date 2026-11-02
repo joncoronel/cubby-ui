@@ -152,7 +152,7 @@ export default function CommandWithFooter() {
             <CommandFooter>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1.5">
-                  <Kbd size="sm" className="px-1">
+                  <Kbd size="sm">
                     <HugeiconsIcon
                       icon={ArrowTurnBackwardIcon}
                       className="size-3"
@@ -162,14 +162,14 @@ export default function CommandWithFooter() {
                   <span>to select</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Kbd size="sm" className="px-1">
+                  <Kbd size="sm">
                     <HugeiconsIcon
                       icon={ChevronUpIcon}
                       className="size-3"
                       strokeWidth={2}
                     />
                   </Kbd>
-                  <Kbd size="sm" className="px-1">
+                  <Kbd size="sm">
                     <HugeiconsIcon
                       icon={ChevronDownIcon}
                       className="size-3"

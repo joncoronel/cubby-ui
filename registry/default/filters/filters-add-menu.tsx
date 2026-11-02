@@ -679,7 +679,12 @@ function AddMenu({
                   >
                     {children ?? labels.add}
                     {shortcut && (
-                      <Kbd size="sm" variant="ghost" aria-hidden>
+                      <Kbd
+                        size="sm"
+                        variant="ghost"
+                        className="text-muted-foreground"
+                        aria-hidden
+                      >
                         {shortcut.toUpperCase()}
                       </Kbd>
                     )}
@@ -691,7 +696,7 @@ function AddMenu({
           <TooltipContent className="flex items-center gap-2">
             {labels.addTooltip}
             {shortcut && (
-              <Kbd size="sm" variant="ghost">
+              <Kbd size="sm" variant="ghost" className="text-muted-foreground">
                 {shortcut.toUpperCase()}
               </Kbd>
             )}

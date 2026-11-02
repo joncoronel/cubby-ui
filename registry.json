@@ -980,7 +980,7 @@
       "name": "kbd",
       "type": "registry:ui",
       "title": "Kbd",
-      "description": "A kbd component.",
+      "description": "Keyboard keys and shortcuts as soft keycaps that read the user's platform.",
       "files": [
         {
           "path": "registry/default/kbd/kbd.tsx",

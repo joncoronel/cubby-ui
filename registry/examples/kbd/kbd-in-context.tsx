@@ -1,17 +1,22 @@
-import { Kbd } from "@/registry/default/kbd/kbd"
+import { Kbd, KbdGroup } from "@/registry/default/kbd/kbd";
 
 export default function KbdInContext() {
   return (
-    <div className="space-y-2">
-      <p className="text-sm">
-        Press <Kbd>⌘</Kbd> + <Kbd>K</Kbd> to open the command palette
+    <div className="max-w-sm space-y-2 text-sm">
+      <p>
+        Press <Kbd keys={["mod", "k"]} /> to open the command palette.
       </p>
-      <p className="text-sm">
-        Use <Kbd>↑</Kbd> <Kbd>↓</Kbd> to navigate and <Kbd>↵</Kbd> to select
+      <p>
+        Use{" "}
+        <KbdGroup>
+          <Kbd keys={["up"]} />
+          <Kbd keys={["down"]} />
+        </KbdGroup>{" "}
+        to move and <Kbd keys={["enter"]} /> to pick.
       </p>
-      <p className="text-sm">
-        Press <Kbd>Esc</Kbd> to close any dialog
+      <p>
+        Press <Kbd keys={["esc"]} /> to close any dialog.
       </p>
     </div>
-  )
+  );
 }

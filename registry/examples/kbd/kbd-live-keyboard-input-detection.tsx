@@ -27,6 +27,7 @@ export default function KbdLiveKeyboardInputDetection() {
   const [held, setHeld] = React.useState<Set<string>>(() => new Set());
 
   React.useEffect(() => {
+    const isMac = /mac|iphone|ipad/i.test(navigator.userAgent);
     const handleKeyDown = (event: KeyboardEvent): void => {
       const key = normalize(event.key);
       setHeld((prev) => (prev.has(key) ? prev : new Set(prev).add(key)));
@@ -36,7 +37,8 @@ export default function KbdLiveKeyboardInputDetection() {
       setHeld((prev) => {
         // macOS fires no keyup for a letter released while Cmd is held, so
         // letting go of Cmd releases everything but the other modifiers.
-        if (key === "Meta") {
+        // Other platforms report every release, so they skip this.
+        if (isMac && key === "Meta") {
           return new Set(
             [...prev].filter((k) => k !== "Meta" && MODIFIER_CODES.has(k)),
           );

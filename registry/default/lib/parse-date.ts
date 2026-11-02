@@ -5,7 +5,7 @@
  * day/month order. Everything resolves to local midnight.
  */
 
-import { startOfDay } from "@/registry/default/lib/date-utils";
+import { makeDate, startOfDay } from "@/registry/default/lib/date-utils";
 
 export interface ParseDateOptions {
   /** The "today" that relative input resolves against. Defaults to now. */
@@ -88,13 +88,6 @@ const RANGE_SEPARATOR = /\s+(?:-|to|until|till|through|thru)\s+|\s*[–—]\s*/;
 /* -------------------------------------------------------------------------------------------------
  * Date arithmetic
  * -------------------------------------------------------------------------------------------------*/
-
-/** `new Date(y, m, d)`, except years 0–99 stay literal instead of meaning 1900–1999. */
-function makeDate(year: number, month: number, day: number): Date {
-  const date = new Date(2000, month, day);
-  date.setFullYear(year, month, day);
-  return date;
-}
 
 function daysInMonth(year: number, month: number): number {
   return makeDate(year, month + 1, 0).getDate();

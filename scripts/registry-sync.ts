@@ -21,11 +21,22 @@ const THEMING_DOC_PATH = path.join(
 );
 const DEFAULT_STYLE = "default";
 
-// Dependencies installed at a fixed major, so a new major on npm can't break
-// a fresh install before the component is migrated to it.
-const PINNED_DEPENDENCIES: Record<string, string> = {
-  "@tanstack/react-table": "^9",
-};
+// Dependencies installed at the major this repo builds against (read from
+// package.json), so a new major on npm can't break a fresh install before the
+// component is migrated to it.
+const PINNED_DEPENDENCY_NAMES = ["@tanstack/react-table"];
+const PINNED_DEPENDENCIES: Record<string, string> = (() => {
+  const { dependencies = {} } = JSON.parse(
+    fsSync.readFileSync(path.join(process.cwd(), "package.json"), "utf-8"),
+  ) as { dependencies?: Record<string, string> };
+  const pinned: Record<string, string> = {};
+  for (const name of PINNED_DEPENDENCY_NAMES) {
+    const major = dependencies[name]?.match(/\d+/)?.[0];
+    if (!major) throw new Error(`${name} must be a dependency in package.json`);
+    pinned[name] = `^${major}`;
+  }
+  return pinned;
+})();
 
 // Get registry URL from environment variable or use default
 const REGISTRY_URL = process.env.REGISTRY_URL || "https://www.cubby-ui.dev";

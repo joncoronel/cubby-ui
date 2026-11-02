@@ -113,6 +113,17 @@ const columns: ColumnDef<YourDataType>[] = [
 ]
 ```
 
+The data table also exports `Row`, `Column`, and `DataTableFeatures`, bound the same way, for typing your own cell and header helpers.
+
+The table registers sorting, filtering, pagination, row selection, and column visibility. To use another TanStack feature, such as column sizing or pinning, add it to `dataTableFeatures` in `data-table-context.tsx`.
+
+<Callout type="warn">
+  The data table runs on TanStack Table v9. If you installed it on v8, adding
+  it again replaces your copy. Import `ColumnDef`, `Row`, and `Column` from the
+  data table instead of `@tanstack/react-table`, and read state from
+  `table.state` instead of `table.getState()`.
+</Callout>
+
 ## API Reference
 
 ### DataTable

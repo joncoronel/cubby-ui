@@ -20,8 +20,8 @@ interface UseControllableStateParams<T> {
  * referentially stable across renders.
  *
  * A controlled parent may reject a change by not re-rendering. Asking for the
- * same value again still notifies it, so a validating parent gets a fresh
- * chance to accept.
+ * same value again in a later event still notifies it, so a validating parent
+ * gets a fresh chance to accept; a repeat within the same tick does not.
  */
 export function useControllableState<T>({
   value,
@@ -38,6 +38,8 @@ export function useControllableState<T>({
   const currentRef = React.useRef(current);
   // The value as last rendered, which the eager ref above can run ahead of.
   const renderedRef = React.useRef(current);
+  // Set while a controlled change notified in this tick is still unanswered.
+  const notifiedRef = React.useRef(false);
   React.useEffect(() => {
     onChangeRef.current = onValueChange;
     currentRef.current = current;
@@ -51,13 +53,20 @@ export function useControllableState<T>({
         typeof next === "function" ? (next as (prev: T) => T)(prev) : next;
       if (isControlled) {
         // A parent that rejected `prev` never re-rendered, so the ref still
-        // holds it: only skip a value the parent is actually showing.
-        if (Object.is(resolved, prev) && Object.is(resolved, renderedRef.current))
+        // holds it: skip it only while it is shown or was just sent.
+        if (
+          Object.is(resolved, prev) &&
+          (Object.is(resolved, renderedRef.current) || notifiedRef.current)
+        )
           return;
         // The parent owns the state, but advance the ref eagerly so a second
         // functional setValue in the same tick composes on this one instead of
         // clobbering it. The ref re-syncs from the prop at the next commit.
         currentRef.current = resolved;
+        notifiedRef.current = true;
+        queueMicrotask(() => {
+          notifiedRef.current = false;
+        });
         onChangeRef.current?.(resolved);
       } else {
         if (Object.is(resolved, prev)) return;

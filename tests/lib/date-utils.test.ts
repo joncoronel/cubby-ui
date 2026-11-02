@@ -2,9 +2,19 @@ import { describe, it, expect } from "vitest";
 import {
   daysBetween,
   isSameDay,
+  makeDate,
   startOfDay,
   toISODate,
 } from "@/registry/default/lib/date-utils";
+
+describe("makeDate", () => {
+  it("keeps years 1 to 99 literal and rolls overflow like new Date", () => {
+    const date = makeDate(50, 0, 32);
+    expect([date.getFullYear(), date.getMonth(), date.getDate()]).toEqual([
+      50, 1, 1,
+    ]);
+  });
+});
 
 describe("startOfDay", () => {
   it("drops the time of day", () => {

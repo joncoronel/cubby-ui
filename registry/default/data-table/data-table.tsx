@@ -474,6 +474,9 @@ export {
 
 export type {
   ColumnDef,
+  Row,
+  Column,
+  DataTableFeatures,
   SortingState,
   RowSelectionState,
   ColumnFiltersState,

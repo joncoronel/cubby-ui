@@ -5,6 +5,13 @@
 
 export const DAY_MS = 24 * 60 * 60 * 1000;
 
+/** `new Date(y, m, d)`, except years 0–99 stay literal instead of meaning 1900–1999. */
+export function makeDate(year: number, month: number, day: number): Date {
+  const date = new Date(2000, month, day);
+  date.setFullYear(year, month, day);
+  return date;
+}
+
 /** The same calendar day at local midnight. Years 0–99 stay literal. */
 export function startOfDay(date: Date): Date {
   const day = new Date(date);

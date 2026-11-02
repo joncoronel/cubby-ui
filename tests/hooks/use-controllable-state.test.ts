@@ -106,18 +106,32 @@ describe("useControllableState", () => {
       expect(onValueChange).toHaveBeenLastCalledWith(1);
     });
 
-    it("re-notifies a repeated value after a parent rejects it without re-rendering", () => {
+    it("re-notifies a repeated value after a parent rejects it without re-rendering", async () => {
       const onValueChange = vi.fn();
       const { result } = renderHook(() =>
         useControllableState({ value: "a", defaultValue: "a", onValueChange }),
       );
 
       // The parent ignores both calls and never re-renders.
-      act(() => result.current[1]("b"));
-      act(() => result.current[1]("b"));
+      await act(async () => result.current[1]("b"));
+      await act(async () => result.current[1]("b"));
 
       expect(onValueChange).toHaveBeenCalledTimes(2);
       expect(onValueChange).toHaveBeenLastCalledWith("b");
+    });
+
+    it("notifies a repeated value once within the same tick", () => {
+      const onValueChange = vi.fn();
+      const { result } = renderHook(() =>
+        useControllableState({ value: "a", defaultValue: "a", onValueChange }),
+      );
+
+      act(() => {
+        result.current[1]("b");
+        result.current[1]("b");
+      });
+
+      expect(onValueChange).toHaveBeenCalledTimes(1);
     });
 
     it("bails out without firing onValueChange when the value is unchanged", () => {

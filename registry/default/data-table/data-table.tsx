@@ -2,21 +2,18 @@
 
 import * as React from "react";
 import {
-  useReactTable,
-  getCoreRowModel,
-  getSortedRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
+  useTable,
   flexRender,
-  type ColumnDef,
+  type ColumnDef as TanStackColumnDef,
   type SortingState,
   type RowSelectionState,
   type ColumnFiltersState,
   type PaginationState,
-  type VisibilityState,
+  type ColumnVisibilityState,
   type OnChangeFn,
-  type Row,
-  type Column,
+  type Row as TanStackRow,
+  type Column as TanStackColumn,
+  type RowData,
 } from "@tanstack/react-table";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -30,7 +27,9 @@ import { elevatedSurface } from "@/registry/default/lib/elevated";
 import { Checkbox } from "@/registry/default/checkbox/checkbox";
 import {
   DataTableContext,
+  dataTableFeatures,
   useDataTable,
+  type DataTableFeatures,
 } from "@/registry/default/data-table/data-table-context";
 import {
   Toolbar,
@@ -51,7 +50,22 @@ import { DataTableSearch } from "@/registry/default/data-table/data-table-search
 import { DataTableColumnToggle } from "@/registry/default/data-table/data-table-column-toggle";
 import { DataTablePagination } from "@/registry/default/data-table/data-table-pagination";
 
-export interface DataTableProps<TData, TValue> {
+// TanStack v9 types take the table's feature set first. These bind it to
+// DataTable's, so column definitions stay `ColumnDef<Row>[]`.
+type ColumnDef<TData extends RowData, TValue = unknown> = TanStackColumnDef<
+  DataTableFeatures,
+  TData,
+  TValue
+>;
+type Row<TData extends RowData> = TanStackRow<DataTableFeatures, TData>;
+type Column<TData extends RowData, TValue = unknown> = TanStackColumn<
+  DataTableFeatures,
+  TData,
+  TValue
+>;
+type VisibilityState = ColumnVisibilityState;
+
+export interface DataTableProps<TData extends RowData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   children: React.ReactNode;
@@ -81,7 +95,7 @@ export interface DataTableProps<TData, TValue> {
   getRowId?: (originalRow: TData, index: number, parent?: Row<TData>) => string;
 }
 
-function DataTable<TData, TValue>({
+function DataTable<TData extends RowData, TValue>({
   columns: userColumns,
   data,
   children,
@@ -130,7 +144,10 @@ function DataTable<TData, TValue>({
   const columnVisibility =
     controlledColumnVisibility ?? internalColumnVisibility;
 
-  const columns = React.useMemo(() => {
+  // Columns of different value types only share a list typed `any`, the same
+  // type v9's own `columnHelper.columns()` returns.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const columns = React.useMemo((): ColumnDef<TData, any>[] => {
     if (!enableRowSelection || !showSelectionColumn) {
       return userColumns;
     }
@@ -175,7 +192,8 @@ function DataTable<TData, TValue>({
     showSelectionColumn,
   ]);
 
-  const table = useReactTable({
+  const table = useTable({
+    features: dataTableFeatures,
     data,
     columns,
     getRowId,
@@ -194,10 +212,10 @@ function DataTable<TData, TValue>({
     onGlobalFilterChange: onGlobalFilterChange ?? setInternalGlobalFilter,
     onColumnVisibilityChange:
       onColumnVisibilityChange ?? setInternalColumnVisibility,
-    getCoreRowModel: getCoreRowModel(),
-    ...(enableSorting && { getSortedRowModel: getSortedRowModel() }),
-    ...(enableFiltering && { getFilteredRowModel: getFilteredRowModel() }),
-    ...(enablePagination && { getPaginationRowModel: getPaginationRowModel() }),
+    // A disabled step passes rows through untouched.
+    manualSorting: !enableSorting,
+    manualFiltering: !enableFiltering,
+    manualPagination: !enablePagination,
     enableRowSelection,
     enableMultiRowSelection,
     globalFilterFn: "includesString",
@@ -277,7 +295,7 @@ function DataTableContent({
   );
 }
 
-function SortableHeader<TData>({
+function SortableHeader<TData extends RowData>({
   column,
   children,
   align,

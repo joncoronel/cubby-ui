@@ -5,9 +5,11 @@
 
 export const DAY_MS = 24 * 60 * 60 * 1000;
 
-/** The same calendar day at local midnight. */
+/** The same calendar day at local midnight. Years 0–99 stay literal. */
 export function startOfDay(date: Date): Date {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const day = new Date(date);
+  day.setHours(0, 0, 0, 0);
+  return day;
 }
 
 /** Whether two dates fall on the same calendar day, ignoring the time. */

@@ -130,6 +130,19 @@ describe("parseDate", () => {
       1, 2, 14,
     ]);
   });
+
+  it.each([
+    ["tomorrow", [50, 2, 15]],
+    ["in 1 month", [50, 3, 14]],
+    ["in 1 year", [51, 2, 14]],
+  ])("keeps years 1 to 99 literal in relative %j", (input, expected) => {
+    const reference = new Date(2000, 2, 14);
+    reference.setFullYear(50);
+    const date = parseDate(input, { referenceDate: reference, locale: "en-US" });
+    expect([date?.getFullYear(), date?.getMonth(), date?.getDate()]).toEqual(
+      expected,
+    );
+  });
 });
 
 describe("parseDateRange", () => {

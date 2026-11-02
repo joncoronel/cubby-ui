@@ -79,7 +79,7 @@ Set `striped` on `DataTableContent` for alternating row backgrounds.
 
 ## Column Definitions
 
-Define columns using the `ColumnDef` type from TanStack Table. Each column can have:
+Define columns using the `ColumnDef` type exported from the data table. It is TanStack Table's `ColumnDef` with the table's feature set already filled in, so you only pass your row type. Each column can have:
 
 - `accessorKey` - The key to access data from the row
 - `header` - Header content (string or render function)

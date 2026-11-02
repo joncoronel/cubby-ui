@@ -901,7 +901,7 @@ export const componentMetadata = {
       "@cubby-ui/elevated"
     ],
     "dependencies": [
-      "@tanstack/react-table",
+      "@tanstack/react-table@^9",
       "@hugeicons/react",
       "@hugeicons/core-free-icons"
     ],

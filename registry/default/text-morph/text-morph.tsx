@@ -1238,7 +1238,8 @@ function TextMorph({
   const [initialHtml] = React.useState(() => ({
     __html: glyphsHtml(value, split),
   }));
-  const shown = React.useRef(value);
+  // What the glyph markup currently shows, and how it was split.
+  const shown = React.useRef({ value, split });
   const resolved = resolveOptions(mode, options, duration);
   const latest = React.useRef({
     options: resolved,
@@ -1248,7 +1249,6 @@ function TextMorph({
     onMorphComplete,
     onMorphCancel,
     cursorIndex,
-    split,
   });
   React.useLayoutEffect(() => {
     latest.current = {
@@ -1259,7 +1259,6 @@ function TextMorph({
       onMorphComplete,
       onMorphCancel,
       cursorIndex,
-      split,
     };
   });
 
@@ -1291,10 +1290,12 @@ function TextMorph({
       !glyphLayer ||
       !ghostAnchor ||
       !ghostLayer ||
-      value === shown.current
+      (value === shown.current.value && split === shown.current.split)
     )
       return;
-    shown.current = value;
+    // A new split alone re-cuts the same text: rebuild it in place, quietly.
+    const resplit = value === shown.current.value;
+    shown.current = { value, split };
     inFlight.current?.cancel();
     inFlight.current = null;
 
@@ -1304,7 +1305,7 @@ function TextMorph({
       (current.reducedMotion === "user" &&
         window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     let over = false;
-    let silent = false;
+    let silent = resplit;
     const handle = {
       cancel: (): void => {
         if (over) return;
@@ -1328,12 +1329,12 @@ function TextMorph({
       root,
       steps: morphTo(
         { root, stage, glyphLayer, ghostAnchor, ghostLayer },
-        textUnits(value, current.split),
+        textUnits(value, split),
         current.options,
         { decimal: decimalFor(locale), caret: current.cursorIndex },
         // Read in the batch's first read phase, with the others.
         () =>
-          current.disableAnimation || !isOnScreen(root)
+          resplit || current.disableAnimation || !isOnScreen(root)
             ? "none"
             : reduce
               ? "reduced"
@@ -1350,7 +1351,7 @@ function TextMorph({
         void Promise.allSettled(started.map((a) => a.finished)).then(settle);
       },
     });
-  }, [value, locale]);
+  }, [value, split, locale]);
 
   const defaultProps = {
     "data-slot": "text-morph",

@@ -41,7 +41,7 @@ function DataTableSearch({
       <InputGroupInput
         placeholder={placeholder}
         size={size}
-        value={table.getState().globalFilter ?? ""}
+        value={table.state.globalFilter ?? ""}
         onChange={(e) => table.setGlobalFilter(e.target.value)}
         className={cn("py-0", className)}
         render={<Toolbar.Input />}

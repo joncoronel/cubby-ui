@@ -13,6 +13,12 @@ describe("startOfDay", () => {
       0, 0, 2,
     ]);
   });
+
+  it("keeps years 1 to 99 literal instead of mapping them to 19xx", () => {
+    const date = new Date(2000, 2, 14, 9);
+    date.setFullYear(50);
+    expect(startOfDay(date).getFullYear()).toBe(50);
+  });
 });
 
 describe("isSameDay", () => {

@@ -19,13 +19,9 @@ interface UseControllableStateParams<T> {
  * multiple `setValue` calls in one event tick compose. `setValue` is
  * referentially stable across renders.
  *
- * The ref re-syncs from the prop at the next commit — but only if one happens.
- * Known constraint: a controlled parent that ignores `onValueChange` AND never
- * re-renders leaves the ref advanced past the real value, and a repeat
- * `setValue` to that same value early-returns at the `Object.is` check without
- * re-notifying. Acceptable — a controlled parent that never commits is already
- * outside the controlled contract — but it is the first thing to check when a
- * controlled value appears stuck.
+ * A controlled parent may reject a change by not re-rendering. Asking for the
+ * same value again still notifies it, so a validating parent gets a fresh
+ * chance to accept.
  */
 export function useControllableState<T>({
   value,
@@ -40,9 +36,12 @@ export function useControllableState<T>({
   // Mirrors `current`. Re-synced after every commit; eagerly advanced by
   // setValue so multiple calls in one event tick compose.
   const currentRef = React.useRef(current);
+  // The value as last rendered, which the eager ref above can run ahead of.
+  const renderedRef = React.useRef(current);
   React.useEffect(() => {
     onChangeRef.current = onValueChange;
     currentRef.current = current;
+    renderedRef.current = current;
   });
 
   const setValue = React.useCallback(
@@ -50,15 +49,18 @@ export function useControllableState<T>({
       const prev = currentRef.current;
       const resolved =
         typeof next === "function" ? (next as (prev: T) => T)(prev) : next;
-      if (Object.is(resolved, prev)) return;
       if (isControlled) {
+        // A parent that rejected `prev` never re-rendered, so the ref still
+        // holds it: only skip a value the parent is actually showing.
+        if (Object.is(resolved, prev) && Object.is(resolved, renderedRef.current))
+          return;
         // The parent owns the state, but advance the ref eagerly so a second
         // functional setValue in the same tick composes on this one instead of
-        // clobbering it. The ref re-syncs from the prop at the next commit,
-        // which also corrects it if the parent rejected the change.
+        // clobbering it. The ref re-syncs from the prop at the next commit.
         currentRef.current = resolved;
         onChangeRef.current?.(resolved);
       } else {
+        if (Object.is(resolved, prev)) return;
         currentRef.current = resolved;
         setUncontrolled(resolved);
         onChangeRef.current?.(resolved);

@@ -146,6 +146,8 @@ function CopyButton({
       }}
       className={cn(
         "text-muted-foreground size-auto rounded-md p-1.5",
+        // Disabled only to block repeat copies: keep the success state at full strength
+        "data-copied:data-disabled:opacity-100",
         className,
       )}
       // Deliberately fixed while the state underneath is not. Focus stays here

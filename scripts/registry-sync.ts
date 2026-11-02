@@ -21,6 +21,12 @@ const THEMING_DOC_PATH = path.join(
 );
 const DEFAULT_STYLE = "default";
 
+// Dependencies installed at a fixed major, so a new major on npm can't break
+// a fresh install before the component is migrated to it.
+const PINNED_DEPENDENCIES: Record<string, string> = {
+  "@tanstack/react-table": "^9",
+};
+
 // Get registry URL from environment variable or use default
 const REGISTRY_URL = process.env.REGISTRY_URL || "https://www.cubby-ui.dev";
 
@@ -712,7 +718,8 @@ function extractImports(filePath: string): {
       const pkgName = importPath.startsWith("@")
         ? importPath.split("/").slice(0, 2).join("/")
         : importPath.split("/")[0];
-      dependencies.add(pkgName);
+      const pinned = PINNED_DEPENDENCIES[pkgName];
+      dependencies.add(pinned ? `${pkgName}@${pinned}` : pkgName);
     }
   }
 

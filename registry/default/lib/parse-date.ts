@@ -104,15 +104,15 @@ function daysInMonth(year: number, month: number): number {
 function add(date: Date, amount: number, unit: Unit): Date {
   if (unit === "day" || unit === "week") {
     const days = unit === "week" ? amount * 7 : amount;
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
+    return makeDate(date.getFullYear(), date.getMonth(), date.getDate() + days);
   }
   const months = unit === "year" ? amount * 12 : amount;
-  const target = new Date(date.getFullYear(), date.getMonth() + months, 1);
+  const target = makeDate(date.getFullYear(), date.getMonth() + months, 1);
   const day = Math.min(
     date.getDate(),
     daysInMonth(target.getFullYear(), target.getMonth()),
   );
-  return new Date(target.getFullYear(), target.getMonth(), day);
+  return makeDate(target.getFullYear(), target.getMonth(), day);
 }
 
 /* -------------------------------------------------------------------------------------------------

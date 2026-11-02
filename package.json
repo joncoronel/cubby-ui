@@ -29,7 +29,7 @@
     "@orama/orama": "^3.1.18",
     "@shadcn/react": "^0.1.0",
     "@tanstack/react-form": "^1.29.0",
-    "@tanstack/react-table": "^8.21.3",
+    "@tanstack/react-table": "^9.3.1",
     "@tanstack/react-virtual": "^3.13.23",
     "@types/mdx": "^2.0.13",
     "class-variance-authority": "^0.7.1",

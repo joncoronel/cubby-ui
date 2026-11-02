@@ -11,7 +11,8 @@ const kbdVariants = cva(
   // as on surfaces, so they follow the radius and every variant lines up.
   // No text color either: a key wears the ink of the text around it, so it
   // reads in muted copy, a tooltip or a primary button alike.
-  "inline-flex shrink-0 items-center justify-center gap-0.5 font-sans font-medium whitespace-nowrap transition-[background-color,box-shadow,translate] duration-100 ease-out data-pressed:translate-y-px [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  // Press lands the same frame, like the real key; release eases back.
+  "inline-flex shrink-0 items-center justify-center gap-0.5 font-sans font-medium whitespace-nowrap transition-[background-color,box-shadow,translate] duration-100 ease-out data-pressed:translate-y-px data-pressed:duration-0 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       size: {
@@ -25,11 +26,13 @@ const kbdVariants = cva(
         // lit rim above on a dark one) that sets it apart from an inline code
         // chip. The inverse surface is the other theme, so it flips the lip
         // and takes its own chip step (--muted, 10%). On a button's solid
-        // fill 7% vanishes, so a key there takes twice the step.
+        // fill 7% vanishes, so a key there takes twice the step, on the
+        // inverse surface too (the last rule outranks the inverse one).
         default: [
           "bg-[color-mix(in_oklab,currentColor_var(--kbd-fill),transparent)] shadow-(--kbd-lip) data-pressed:bg-[color-mix(in_oklab,currentColor_calc(var(--kbd-fill)_+_4%),transparent)] data-pressed:shadow-none",
           "[--kbd-fill:7%] in-data-[slot=button]:[--kbd-fill:14%] [--kbd-lip:inset_0_-1px_0_oklch(0_0_0/0.08)] dark:[--kbd-lip:inset_0_1px_0_oklch(1_0_0/0.06)]",
           "[[data-surface=inverse]_&]:[--kbd-fill:10%] [[data-surface=inverse]_&]:[--kbd-lip:inset_0_1px_0_oklch(1_0_0/0.06)] dark:[[data-surface=inverse]_&]:[--kbd-lip:inset_0_-1px_0_oklch(0_0_0/0.08)]",
+          "[[data-surface=inverse]_[data-slot=button]_&]:[--kbd-fill:14%]",
         ],
         outline:
           "bg-(--outline) inset-ring inset-ring-(--outline-border) data-pressed:bg-(--outline-active)",
@@ -49,7 +52,7 @@ type KeyLegend = { mac: string; windows: string; label?: string };
 
 // Named keys a `keys` array can use. `label` names the symbol legend for
 // screen readers.
-const KEY_LEGENDS: Record<string, KeyLegend> = {
+const KEY_LEGENDS = {
   mod: { mac: "⌘", windows: "Ctrl", label: "Command" },
   cmd: { mac: "⌘", windows: "Ctrl", label: "Command" },
   command: { mac: "⌘", windows: "Ctrl", label: "Command" },
@@ -63,7 +66,7 @@ const KEY_LEGENDS: Record<string, KeyLegend> = {
   enter: { mac: "↵", windows: "Enter", label: "Return" },
   return: { mac: "↵", windows: "Enter", label: "Return" },
   backspace: { mac: "⌫", windows: "Backspace", label: "Delete" },
-  delete: { mac: "⌫", windows: "Del", label: "Delete" },
+  delete: { mac: "⌦", windows: "Del", label: "Forward Delete" },
   tab: { mac: "⇥", windows: "Tab", label: "Tab" },
   esc: { mac: "Esc", windows: "Esc" },
   escape: { mac: "Esc", windows: "Esc" },
@@ -72,7 +75,10 @@ const KEY_LEGENDS: Record<string, KeyLegend> = {
   down: { mac: "↓", windows: "↓", label: "Down arrow" },
   left: { mac: "←", windows: "←", label: "Left arrow" },
   right: { mac: "→", windows: "→", label: "Right arrow" },
-};
+} satisfies Record<string, KeyLegend>;
+
+// Named keys autocomplete; any other string is drawn as written.
+type KbdKey = keyof typeof KEY_LEGENDS | (string & {});
 
 const subscribe = () => () => {};
 
@@ -93,7 +99,9 @@ function usePlatform(): Platform {
 }
 
 function renderKey(key: string, platform: Platform): React.ReactNode {
-  const legend = KEY_LEGENDS[key.toLowerCase()];
+  const legend: KeyLegend | undefined = (
+    KEY_LEGENDS as Record<string, KeyLegend>
+  )[key.toLowerCase()];
   if (!legend) return key.length === 1 ? key.toUpperCase() : key;
 
   const glyph = legend[platform];
@@ -111,8 +119,9 @@ export type KbdProps = React.ComponentProps<"kbd"> &
   VariantProps<typeof kbdVariants> & {
     /** Keys of one shortcut, drawn on a single cap. Named keys like `mod`,
      * `shift` and `enter` become the platform's legend. */
-    keys?: string[];
-    /** Placed between `keys`. Defaults to none on Mac and `+` elsewhere. */
+    keys?: KbdKey[];
+    /** Placed between `keys`. Defaults to none on Mac and `+` elsewhere;
+     * `null` shows none. */
     separator?: React.ReactNode;
     platform?: Platform | "auto";
     /** Draws the key pushed down, as when it's held. */
@@ -133,7 +142,11 @@ function Kbd({
   const detectedPlatform = usePlatform();
   const resolvedPlatform = platform === "auto" ? detectedPlatform : platform;
   const resolvedSeparator =
-    separator ?? (resolvedPlatform === "mac" ? null : "+");
+    separator === undefined
+      ? resolvedPlatform === "mac"
+        ? null
+        : "+"
+      : separator;
 
   return (
     <kbd
@@ -145,6 +158,9 @@ function Kbd({
       {keys
         ? keys.map((key, index) => (
             <React.Fragment key={`${index}-${key}`}>
+              {/* The drawn separator is hidden; screen readers get a spoken
+                  "plus" instead, so "⌘K" isn't read as one word. */}
+              {index > 0 && <span className="sr-only"> plus </span>}
               {index > 0 && resolvedSeparator !== null && (
                 <span aria-hidden="true" className="opacity-60">
                   {resolvedSeparator}

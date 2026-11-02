@@ -49,17 +49,17 @@ Named keys are case-insensitive and turn into the platform's legend. Symbols car
 
 | Key                    | Mac | Windows and Linux |
 | ---------------------- | --- | ----------------- |
-| `mod` (`cmd`)          | ⌘   | Ctrl              |
+| `mod` (`cmd`, `command`) | ⌘ | Ctrl              |
 | `meta`                 | ⌘   | Win               |
-| `ctrl`                 | ⌃   | Ctrl              |
+| `ctrl` (`control`)     | ⌃   | Ctrl              |
 | `alt` (`option`)       | ⌥   | Alt               |
 | `shift`                | ⇧   | Shift             |
 | `enter` (`return`)     | ↵   | Enter             |
 | `backspace`            | ⌫   | Backspace         |
-| `delete`               | ⌫   | Del               |
+| `delete`               | ⌦   | Del               |
 | `tab`                  | ⇥   | Tab               |
 | `capslock`             | ⇪   | Caps Lock         |
-| `esc`, `space`         | Esc, Space | Esc, Space |
+| `esc` (`escape`), `space` | Esc, Space | Esc, Space |
 | `up`, `down`, `left`, `right` | ↑ ↓ ← → | ↑ ↓ ← → |
 
 ### Platform
@@ -70,7 +70,7 @@ Named keys are case-insensitive and turn into the platform's legend. Symbols car
 
 ### Group
 
-Wrap several `Kbd` in `KbdGroup` to show a shortcut as separate caps, or a sequence with words between them. The group is an outer `kbd`, the HTML way to mark up a combination, and its loose text stays quiet.
+Wrap several `Kbd` in `KbdGroup` to show a shortcut as separate caps, or a sequence with words between them. The group is an outer `kbd`, the HTML way to mark up a combination. Put text like `+` or "then" in a `span` and it stays quiet.
 
 <ComponentPreview component="kbd" example="kbd-group" />
 
@@ -104,7 +104,7 @@ The fill is mixed from the current ink, so the same key reads in the default too
 
 ### In a Button
 
-Pass the key as `trailingIcon` so it sits apart from the label. It wears the button's text color and takes a stronger fill, so it reads on a solid fill with no override.
+Pass the key as `trailingIcon` so it sits apart from the label. It wears the button's text color and takes a stronger fill, so it reads on a solid fill with no override. Hide the key with `aria-hidden` and name the shortcut with `aria-keyshortcuts`, so the button is still announced as "Save".
 
 <ComponentPreview component="kbd" example="kbd-in-button" />
 
@@ -131,7 +131,7 @@ One key, or a whole shortcut drawn on a single cap.
 </ApiProp>
 
 <ApiProp name="separator" fullType="React.ReactNode" simpleType="ReactNode">
-  Placed between `keys`. Defaults to nothing on Mac and `+` elsewhere.
+  Placed between `keys`. Defaults to nothing on Mac and `+` elsewhere; pass `null` for none. Screen readers hear "plus" either way.
 </ApiProp>
 
 <ApiProp name="platform" fullType='"mac" | "windows" | "auto"' simpleType="string" defaultValue='"auto"'>

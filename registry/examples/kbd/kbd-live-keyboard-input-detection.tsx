@@ -17,6 +17,8 @@ const MODIFIERS = [
   { code: "Meta", keys: ["meta"] },
 ];
 
+const MODIFIER_CODES = new Set(MODIFIERS.map((modifier) => modifier.code));
+
 function normalize(key: string): string {
   return key.length === 1 ? key.toUpperCase() : key;
 }
@@ -32,6 +34,13 @@ export default function KbdLiveKeyboardInputDetection() {
     const handleKeyUp = (event: KeyboardEvent): void => {
       const key = normalize(event.key);
       setHeld((prev) => {
+        // macOS fires no keyup for a letter released while Cmd is held, so
+        // letting go of Cmd releases everything but the other modifiers.
+        if (key === "Meta") {
+          return new Set(
+            [...prev].filter((k) => k !== "Meta" && MODIFIER_CODES.has(k)),
+          );
+        }
         const next = new Set(prev);
         next.delete(key);
         return next;

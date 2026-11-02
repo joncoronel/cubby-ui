@@ -292,7 +292,7 @@
     "reference": [],
     "usage": {
       "imports": "import { Kbd, KbdGroup } from \"@/components/ui/cubby-ui/kbd\"",
-      "anatomy": "<Kbd keys={[\"mod\", \"k\"]} />\n\n<KbdGroup>\n  <Kbd>G</Kbd>\n  then\n  <Kbd>D</Kbd>\n</KbdGroup>"
+      "anatomy": "<Kbd keys={[\"mod\", \"k\"]} />\n\n<KbdGroup>\n  <Kbd>G</Kbd>\n  <span>then</span>\n  <Kbd>D</Kbd>\n</KbdGroup>"
     }
   },
   "label": {
